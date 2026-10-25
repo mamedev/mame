@@ -114,11 +114,7 @@ protected:
 
 	uint32_t m_pc;
 	uint32_t m_fetchpc;
-	union
-	{
-		uint32_t m_reg[32];
-		uint64_t m_fpair[16];
-	};
+	uint32_t m_reg[32];
 	union
 	{
 		uint64_t m_acc[4];
@@ -154,6 +150,10 @@ protected:
 	void execute();
 	void execute_short_imm();
 	void execute_reg_long_imm();
+	// Doublewords use an even/odd register pair addressed by the even register;
+	// the odd register holds the most significant word (SPRU109 2.2.1).
+	uint64_t reg_pair(int reg) const { return (uint64_t(m_reg[reg | 1]) << 32) | m_reg[reg & ~1]; }
+	void set_reg_pair(int reg, uint64_t data) { m_reg[reg & ~1] = uint32_t(data); m_reg[reg | 1] = uint32_t(data >> 32); }
 	uint32_t read_creg(int reg);
 	void write_creg(int reg, uint32_t data);
 	bool test_condition(int condition, uint32_t value);

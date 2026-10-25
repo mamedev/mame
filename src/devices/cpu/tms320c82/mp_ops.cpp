@@ -213,7 +213,7 @@ void tms320c82_mp_device::vector_loadstore()
 		}
 		case 0x03:          // vst.d
 		{
-			uint64_t data = m_fpair[rd >> 1];
+			uint64_t data = reg_pair(rd);
 			m_program.write_qword(m_outp & ~7U, data);
 			m_outp += 8;
 			break;
@@ -238,7 +238,7 @@ void tms320c82_mp_device::vector_loadstore()
 		{
 			uint64_t const data = m_program.read_qword(m_in0p & ~7U);
 			if (rd)
-				m_fpair[rd >> 1] = data;
+				set_reg_pair(rd, data);
 			m_in0p += 8;
 			break;
 		}
@@ -246,7 +246,7 @@ void tms320c82_mp_device::vector_loadstore()
 		{
 			uint64_t const data = m_program.read_qword(m_in1p & ~7U);
 			if (rd)
-				m_fpair[rd >> 1] = data;
+				set_reg_pair(rd, data);
 			m_in1p += 8;
 			break;
 		}
@@ -1207,7 +1207,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 			uint64_t r = m_program.read_qword(address & ~7U);
 
 			if (rd)
-				m_fpair[rd >> 1] = r;
+				set_reg_pair(rd, r);
 
 			break;
 		}
@@ -1316,7 +1316,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 			int const shift = BIT(m_ir, 11) ? 3 : 0;
 			int const base = OP_BASE();
 			uint32_t const address = m_reg[base] + ((has_imm ? imm32 : m_reg[OP_SRC1()]) << shift);
-			m_program.write_qword(address & ~7U, m_fpair[OP_RD() >> 1]);
+			m_program.write_qword(address & ~7U, reg_pair(OP_RD()));
 			if (BIT(m_ir, 15) && base)
 				m_reg[base] = address;
 			break;
@@ -1403,8 +1403,8 @@ void tms320c82_mp_device::execute_reg_long_imm()
 			int rd = OP_RS();
 			int src1 = OP_SRC1();
 
-			double source = has_imm ? (double)u2f(imm32) : (p1 ? u2d(m_fpair[src1 >> 1]) : (double)u2f(m_reg[src1]));
-			double source2 = pd ? u2d(m_fpair[rd >> 1]) : (double)(u2f(m_reg[rd]));
+			double source = has_imm ? (double)u2f(imm32) : (p1 ? u2d(reg_pair(src1)) : (double)u2f(m_reg[src1]));
+			double source2 = pd ? u2d(reg_pair(rd)) : (double)(u2f(m_reg[rd]));
 
 			// parallel load/store op
 			if (!(ls_bit1 == 0 && ls_bit2 == 0))
@@ -1417,7 +1417,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 				if (pd)
 				{
 					double res = source * source2;
-					m_fpair[rd >> 1] = d2u(res);
+					set_reg_pair(rd, d2u(res));
 				}
 				else
 				{
@@ -1448,7 +1448,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 			}
 			else
 			{
-				source = has_imm ? double(u2f(imm32)) : (BIT(m_ir, 5) ? u2d(m_fpair[rs >> 1]) : double(u2f(m_reg[rs])));
+				source = has_imm ? double(u2f(imm32)) : (BIT(m_ir, 5) ? u2d(reg_pair(rs)) : double(u2f(m_reg[rs])));
 			}
 
 			// Capture operands before the independent memory operation changes
@@ -1461,7 +1461,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 				switch (pd)
 				{
 				case 0: m_reg[rd] = f2u(round_single(source, mode)); break;
-				case 1: m_fpair[rd >> 1] = d2u(source); break;
+				case 1: set_reg_pair(rd, d2u(source)); break;
 				case 2: m_reg[rd] = round_integer(source, mode, false); break;
 				case 3: m_reg[rd] = round_integer(source, mode, true); break;
 				}
@@ -1507,7 +1507,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 				if (rd)
 				{
 					if (pd)
-						m_fpair[rd >> 1] = d2u(res);
+						set_reg_pair(rd, d2u(res));
 					else
 						m_reg[rd] = f2u(round_single(res, 1));
 				}
@@ -1550,7 +1550,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 				if (rd)
 				{
 					if (pd)
-						m_fpair[rd >> 1] = d2u(res);
+						set_reg_pair(rd, d2u(res));
 					else
 						m_reg[rd] = f2u(round_single(res, 1));
 				}
@@ -1587,31 +1587,31 @@ void tms320c82_mp_device::execute_reg_long_imm()
 						float s1 = u2f(has_imm ? imm32 : m_reg[src1]);
 						float s2 = u2f(m_reg[rs]);
 						uint64_t res = d2u(double(s1) + double(s2));
-						m_fpair[rd >> 1] = res;
+						set_reg_pair(rd, res);
 						break;
 					}
 					case 0x14:          // SP - DP -> DP
 					{
 						float s1 = u2f(has_imm ? imm32 : m_reg[src1]);
-						double s2 = u2d(m_fpair[rs >> 1]);
+						double s2 = u2d(reg_pair(rs));
 						uint64_t res = d2u((double) s1 + s2);
-						m_fpair[rd >> 1] = res;
+						set_reg_pair(rd, res);
 						break;
 					}
 					case 0x11:          // DP - SP -> DP
 					{
-						double s1 = has_imm ? u2f(imm32) : u2d(m_fpair[src1 >> 1]);
+						double s1 = has_imm ? u2f(imm32) : u2d(reg_pair(src1));
 						float s2 = u2f(m_reg[rs]);
 						uint64_t res = d2u(s1 + (double) s2);
-						m_fpair[rd >> 1] = res;
+						set_reg_pair(rd, res);
 						break;
 					}
 					case 0x15:          // DP - DP -> DP
 					{
-						double s1 = has_imm ? u2f(imm32) : u2d(m_fpair[src1 >> 1]);
-						double s2 = u2d(m_fpair[rs >> 1]);
+						double s1 = has_imm ? u2f(imm32) : u2d(reg_pair(src1));
+						double s2 = u2d(reg_pair(rs));
 						uint64_t res = d2u(s1 + s2);
-						m_fpair[rd >> 1] = res;
+						set_reg_pair(rd, res);
 						break;
 					}
 					default:
@@ -1645,31 +1645,31 @@ void tms320c82_mp_device::execute_reg_long_imm()
 						float s1 = u2f(has_imm ? imm32 : m_reg[src1]);
 						float s2 = u2f(m_reg[rs]);
 						uint64_t res = d2u(double(s1) - double(s2));
-						m_fpair[rd >> 1] = res;
+						set_reg_pair(rd, res);
 						break;
 					}
 					case 0x14:          // SP - DP -> DP
 					{
 						float s1 = u2f(has_imm ? imm32 : m_reg[src1]);
-						double s2 = u2d(m_fpair[rs >> 1]);
+						double s2 = u2d(reg_pair(rs));
 						uint64_t res = d2u((double) s1 - s2);
-						m_fpair[rd >> 1] = res;
+						set_reg_pair(rd, res);
 						break;
 					}
 					case 0x11:          // DP - SP -> DP
 					{
-						double s1 = has_imm ? u2f(imm32) : u2d(m_fpair[src1 >> 1]);
+						double s1 = has_imm ? u2f(imm32) : u2d(reg_pair(src1));
 						float s2 = u2f(m_reg[rs]);
 						uint64_t res = d2u(s1 - (double) s2);
-						m_fpair[rd >> 1] = res;
+						set_reg_pair(rd, res);
 						break;
 					}
 					case 0x15:          // DP - DP -> DP
 					{
-						double s1 = has_imm ? u2f(imm32) : u2d(m_fpair[src1 >> 1]);
-						double s2 = u2d(m_fpair[rs >> 1]);
+						double s1 = has_imm ? u2f(imm32) : u2d(reg_pair(src1));
+						double s2 = u2d(reg_pair(rs));
 						uint64_t res = d2u(s1 - s2);
-						m_fpair[rd >> 1] = res;
+						set_reg_pair(rd, res);
 						break;
 					}
 					default:
@@ -1703,31 +1703,31 @@ void tms320c82_mp_device::execute_reg_long_imm()
 						float s1 = u2f(has_imm ? imm32 : m_reg[src1]);
 						float s2 = u2f(m_reg[rs]);
 						uint64_t res = d2u(double(s1) * double(s2));
-						m_fpair[rd >> 1] = res;
+						set_reg_pair(rd, res);
 						break;
 					}
 					case 0x14:          // SP x DP -> DP
 					{
 						float s1 = u2f(has_imm ? imm32 : m_reg[src1]);
-						double s2 = u2d(m_fpair[rs >> 1]);
+						double s2 = u2d(reg_pair(rs));
 						uint64_t res = d2u((double)s1 * s2);
-						m_fpair[rd >> 1] = res;
+						set_reg_pair(rd, res);
 						break;
 					}
 					case 0x11:          // DP x SP -> DP
 					{
-						double s1 = has_imm ? u2f(imm32) : u2d(m_fpair[src1 >> 1]);
+						double s1 = has_imm ? u2f(imm32) : u2d(reg_pair(src1));
 						float s2 = u2f(m_reg[rs]);
 						uint64_t res = d2u(s1 * (double) s2);
-						m_fpair[rd >> 1] = res;
+						set_reg_pair(rd, res);
 						break;
 					}
 					case 0x15:          // DP x DP -> DP
 					{
-						double s1 = has_imm ? u2f(imm32) : u2d(m_fpair[src1 >> 1]);
-						double s2 = u2d(m_fpair[rs >> 1]);
+						double s1 = has_imm ? u2f(imm32) : u2d(reg_pair(src1));
+						double s2 = u2d(reg_pair(rs));
 						uint64_t res = d2u(s1 * s2);
-						m_fpair[rd >> 1] = res;
+						set_reg_pair(rd, res);
 						break;
 					}
 					case 0x2a:          // I x I -> I
@@ -1754,8 +1754,8 @@ void tms320c82_mp_device::execute_reg_long_imm()
 
 			if (rd)
 			{
-				double src1 = has_imm ? (double)u2f(imm32) : (p1 ? u2d(m_fpair[rs1 >> 1]) : (double)u2f(m_reg[rs1]));
-				double src2 = p2 ? u2d(m_fpair[rs2 >> 1]) : (double)u2f(m_reg[rs2]);
+				double src1 = has_imm ? (double)u2f(imm32) : (p1 ? u2d(reg_pair(rs1)) : (double)u2f(m_reg[rs1]));
+				double src2 = p2 ? u2d(reg_pair(rs2)) : (double)u2f(m_reg[rs2]);
 
 				double res;
 				if (src2 != 0.0)
@@ -1764,7 +1764,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 					res = 0.0f;
 
 				if (pd)
-					m_fpair[rd >> 1] = d2u(res);
+					set_reg_pair(rd, d2u(res));
 				else
 					m_reg[rd] = f2u((float)res);
 			}
@@ -1788,7 +1788,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 					s = has_imm ? (double)(u2f(imm32)) : (double)u2f(m_reg[src1]);
 					break;
 				case 1:
-					s = has_imm ? (double)(u2f(imm32)) : u2d(m_fpair[src1 >> 1]);
+					s = has_imm ? (double)(u2f(imm32)) : u2d(reg_pair(src1));
 					break;
 				case 2:
 					s = has_imm ? (double)((int32_t)(imm32)) : (double)(int32_t)(m_reg[src1]);
@@ -1808,7 +1808,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 						m_reg[rd] = f2u(round_single(s, mode));
 						break;
 					case 1:
-						m_fpair[rd >> 1] = d2u(s);
+						set_reg_pair(rd, d2u(s));
 						break;
 					case 2:
 						m_reg[rd] = round_integer(s, mode, false);
@@ -1830,8 +1830,8 @@ void tms320c82_mp_device::execute_reg_long_imm()
 			int rs1 = OP_SRC1();
 			int rs2 = OP_RS();
 
-			double src1 = has_imm ? (double)(u2f(imm32)) : (p1 ? u2d(m_fpair[rs1 >> 1]) : (double)u2f(m_reg[rs1]));
-			double src2 = p2 ? u2d(m_fpair[rs2 >> 1]) : (double)u2f(m_reg[rs2]);
+			double src1 = has_imm ? (double)(u2f(imm32)) : (p1 ? u2d(reg_pair(rs1)) : (double)u2f(m_reg[rs1]));
+			double src2 = p2 ? u2d(reg_pair(rs2)) : (double)u2f(m_reg[rs2]);
 
 			if (rd)
 			{
@@ -1867,7 +1867,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 			int src1 = OP_SRC1();
 			int p1 = m_ir & (1 << 5);
 			int pd = m_ir & (1 << 9);
-			double source = has_imm ? (double)u2f(imm32) : (p1 ? u2d(m_fpair[src1 >> 1]) : (double)u2f(m_reg[src1]));
+			double source = has_imm ? (double)u2f(imm32) : (p1 ? u2d(reg_pair(src1)) : (double)u2f(m_reg[src1]));
 
 			if (rd)
 			{
@@ -1878,7 +1878,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 					res = 0.0;
 
 				if (pd)
-					m_fpair[rd >> 1] = d2u(res);
+					set_reg_pair(rd, d2u(res));
 				else
 					m_reg[rd] = f2u((float)res);
 			}

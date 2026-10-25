@@ -687,7 +687,7 @@ void rollext_renderer::process_packet(const uint32_t *packet)
 	// Word 22:  (float) Base V coordinate
 	// Word 23:  (float) ? Seems to be a copy of the last X coordinate
 
-	for (unsigned j = 0; j < num_verts; j++)
+	for (int j = 0; j < num_verts; j++)
 	{
 		float fx = u2f(packet[(j * 4) + 1]);
 		float fy = u2f(packet[(j * 4) + 3]);
@@ -720,13 +720,20 @@ void rollext_renderer::process_packet(const uint32_t *packet)
 	// Primitive 00 carries a six-bit translucency coefficient in word 21 (only
 	// 32, half opacity, has been seen). Header mode 0xe with coefficient 15
 	// (rider shadows, translucent scenery) is drawn at half opacity, as the
-	// reference video suggests.
-	// FIXME: verify the other modes and coefficients, and translucent Z writes
+	// reference video suggests. Modes 1, 2, 7, 0xa and 0xb also occur with
+	// coefficient 15; they're drawn opaque.
+	// FIXME: decode the other modes and coefficients, and translucent Z writes
 	uint8_t const mode = BIT(packet[0], 20, 4), coefficient = BIT(packet[0], 15, 5);
+	bool const decoded = (!mode && !coefficient) || (mode == 0xe && coefficient == 15);
 	if (primitive == 0)
 		extra.alpha = BIT(packet[21], 16, 6) * 4;
 	else
 		extra.alpha = (mode == 0xe && coefficient == 15) ? 128 : 256;
+	if (!decoded && !BIT(m_logged_blend[mode], coefficient))
+	{
+		m_logged_blend[mode] |= 1U << coefficient;
+		m_screen.logerror("Undecoded header mode %x coefficient %d (primitive %d)\n", mode, coefficient, primitive);
+	}
 
 	// The MP's affine/2D path sets bit 29. These packets skip the depth test
 	// (the large road titles lie behind the background) but still write depth,
@@ -759,7 +766,6 @@ void rollext_renderer::palette_write(int index, uint16_t data)
 void rollext_renderer::texture_mask_write(int index, uint8_t data)
 {
 	wait();
-	int x = index & 0xff;
 	m_texture_mask[index] = data;
 }
 
