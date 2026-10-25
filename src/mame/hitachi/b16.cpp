@@ -100,8 +100,9 @@ namespace {
 class b16_state : public driver_device
 {
 public:
-	b16_state(const machine_config &mconfig, device_type type, const char *tag)
+	b16_state(const machine_config &mconfig, device_type type, const char *tag, unsigned graphics_planes = 3)
 		: driver_device(mconfig, type, tag)
+		, m_graphics_planes(graphics_planes)
 		, m_maincpu(*this, "maincpu")
 		, m_pit(*this, "pit")
 		, m_intm(*this, "intm")
@@ -111,6 +112,7 @@ public:
 		, m_crtc(*this, "crtc")
 		, m_screen(*this, "screen")
 		, m_vram(*this, "vram")
+		, m_gvram(*this, "gvram", graphics_planes * 0x10000, ENDIANNESS_LITTLE)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_kanji_rom(*this, "kanji")
@@ -133,6 +135,16 @@ protected:
 	void palette_init(palette_device &palette) const ATTR_COLD;
 
 private:
+	const unsigned m_graphics_planes;
+	u8 m_graphics_mask = 0xff;
+	u8 m_graphics_palette[16]{};
+	u8 m_graphics_data[4]{};
+	u8 m_graphics_latch[4]{};
+	u8 m_graphics_read_plane = 0;
+	u8 m_graphics_read_count = 4;
+	u8 m_graphics_write_count = 4;
+	u8 m_graphics_copy = 0;
+	u8 m_graphics_display_page = 0;
 	u16 m_tvram_attr_latch = 0;
 	u8 m_port84 = 0;
 	uint8_t m_port78 = 0;
@@ -140,6 +152,8 @@ private:
 	u8 m_dma_page = 0;
 	u32 m_fdc_rate = 250'000;
 	u8 m_port80_vblank_mask = 0xb0;
+	u8 m_port80_config_mask = 0;
+	u8 m_port80_config = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
@@ -150,6 +164,7 @@ private:
 	required_device<mc6845_device> m_crtc;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint16_t> m_vram;
+	memory_share_creator<u8> m_gvram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_region_ptr<uint8_t> m_kanji_rom;
@@ -160,6 +175,11 @@ private:
 
 	u16 tvram_r(offs_t offset);
 	void tvram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 graphics_r(offs_t offset);
+	void graphics_w(offs_t offset, u8 data);
+	void graphics_ctrl_w(offs_t offset, u8 data);
+	u8 graphics_palette_r(offs_t offset);
+	void graphics_palette_w(offs_t offset, u8 data);
 	u8 kanji_r(offs_t offset);
 	u8 ig_ram_r(offs_t offset);
 	void ig_ram_w(offs_t offset, uint8_t data);
@@ -172,14 +192,23 @@ private:
 	static void floppy_formats(format_registration &fr);
 };
 
-// TODO: palette format is a guess
+// The legacy C interface uses three planes; EX-II adds a fourth via D.
+class b16ex2_state : public b16_state
+{
+public:
+	b16ex2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: b16_state(mconfig, type, tag, 4)
+	{ }
+};
+
+// Text and bitmap colours use BGR components. Intensity levels are provisional.
 void b16_state::palette_init(palette_device &palette) const
 {
 	int i;
 	for (i = 0; i < 8; i++)
 	{
-		palette.set_pen_color(i, pal1bit(BIT(i, 1)), pal1bit(BIT(i, 2)), pal1bit(BIT(i, 0)));
-		palette.set_pen_color(i + 8, BIT(i, 1) * 0xaa + 0x55, BIT(i, 2) * 0xaa + 0x55, BIT(i, 0) * 0xaa + 0x55);
+		palette.set_pen_color(i, pal1bit(BIT(i, 2)), pal1bit(BIT(i, 1)), pal1bit(BIT(i, 0)));
+		palette.set_pen_color(i + 8, BIT(i, 2) * 0xaa + 0x55, BIT(i, 1) * 0xaa + 0x55, BIT(i, 0) * 0xaa + 0x55);
 	}
 }
 
@@ -189,6 +218,16 @@ void b16_state::video_start()
 	m_gfxdecode->gfx(1)->set_source_and_total(m_ig_ram.get(), 0x200);
 	save_pointer(NAME(m_ig_ram), 0x2000);
 	save_item(NAME(m_port84));
+	std::fill(m_gvram.begin(), m_gvram.end(), 0);
+	save_item(NAME(m_graphics_mask));
+	save_item(NAME(m_graphics_palette));
+	save_item(NAME(m_graphics_data));
+	save_item(NAME(m_graphics_latch));
+	save_item(NAME(m_graphics_read_plane));
+	save_item(NAME(m_graphics_read_count));
+	save_item(NAME(m_graphics_write_count));
+	save_item(NAME(m_graphics_copy));
+	save_item(NAME(m_graphics_display_page));
 
 	save_item(NAME(m_tvram_attr_latch));
 }
@@ -206,6 +245,9 @@ MC6845_UPDATE_ROW(b16_state::crtc_update_row)
 		return;
 
 	const pen_t *const palette = m_palette->pens();
+	// Raster rows within each plane are 0800h bytes apart. CC/DC uses
+	// 16 KiB units; the BIOS selects value 2 for the second 640x400 page.
+	const u32 graphics_row = (u32(m_graphics_display_page) << 14) + (u32(ra) << 11) + ma;
 	for (unsigned x = 0; x < x_count; x++)
 	{
 		const u32 tile_offset = (ma + x) & 0x1fff;
@@ -233,14 +275,24 @@ MC6845_UPDATE_ROW(b16_state::crtc_update_row)
 		// Keep it visible even over the black attributes left by BIOS/BASIC.
 		// TODO: confirm the cursor colour from the video circuitry.
 		const bool cursor = int(x) == cursor_x;
+		const u32 address = (graphics_row + x) & 0xffff;
 		for (unsigned xi = 0; xi < 8; xi++)
 		{
 			const int res_x = x * 8 + xi;
 			if (!cliprect.contains(res_x, y))
 				continue;
 
-			const int pen = cursor ? 7 : BIT(gfx_data, 7 - xi) ? fg_color : bg_color;
-			bitmap.pix(y, res_x) = palette[pen];
+			u8 graphics_color = 0;
+			for (unsigned plane = 0; plane < m_graphics_planes; plane++)
+				graphics_color |= BIT(m_gvram[plane * 0x10000 + address], 7 - xi) << plane;
+			bitmap.pix(y, res_x) = palette[16 + graphics_color];
+			if (cursor)
+				bitmap.pix(y, res_x) = palette[7];
+			else if (BIT(gfx_data, 7 - xi))
+				bitmap.pix(y, res_x) = palette[fg_color];
+			else if (bg_color)
+				// Background zero is transparent; coloured key labels are opaque.
+				bitmap.pix(y, res_x) = palette[bg_color];
 		}
 	}
 }
@@ -257,6 +309,85 @@ void b16_state::tvram_w(offs_t offset, u16 data, u16 mem_mask)
 	COMBINE_DATA(&m_vram[offset]);
 	if (offset < 0x2000 && BIT(m_port78, 2))
 		m_vram[offset + 0x2000] = m_tvram_attr_latch;
+}
+
+u8 b16_state::graphics_r(offs_t offset)
+{
+	const u8 data = m_gvram[m_graphics_read_plane * 0x10000 + offset];
+	if (!machine().side_effects_disabled())
+	{
+		// The BIOS uses a read followed by a write to move all planes together.
+		for (unsigned plane = 0; plane < m_graphics_planes; plane++)
+			m_graphics_latch[plane] = m_gvram[plane * 0x10000 + offset];
+		m_graphics_read_plane = (m_graphics_read_plane + 1) % m_graphics_read_count;
+	}
+	return data;
+}
+
+void b16_state::graphics_w(offs_t offset, u8 data)
+{
+	// CPU write data is a strobe. Pixel data comes from the plane registers
+	// (or the read latches during CEh/DEh transfers), selected by C0h's mask.
+	for (unsigned plane = 0; plane < m_graphics_write_count; plane++)
+	{
+		u8 &dest = m_gvram[plane * 0x10000 + offset];
+		const u8 source = m_graphics_copy ? m_graphics_latch[plane] : m_graphics_data[plane];
+		dest = (dest & ~m_graphics_mask) | (source & m_graphics_mask);
+	}
+}
+
+void b16_state::graphics_ctrl_w(offs_t offset, u8 data)
+{
+	// The C register set is used by the B16 BIOS;
+	// EX-II firmware uses the four-plane D register set and the same mask.
+	const unsigned reg = offset * 2;
+	const unsigned count = std::min(m_graphics_planes, reg < 0x10 ? 3U : 4U);
+	switch (reg)
+	{
+	case 0x00: m_graphics_mask = data; break;
+	case 0x02: case 0x04: case 0x06:
+	case 0x12: case 0x14: case 0x16:
+		m_graphics_data[((reg & 0x0f) - 2) / 2] = data;
+		m_graphics_write_count = count;
+		break;
+	case 0x10:
+		m_graphics_data[3] = data;
+		m_graphics_write_count = m_graphics_planes;
+		break;
+	case 0x08: case 0x18:
+		m_graphics_read_count = count;
+		m_graphics_read_plane = (data & 3) % count;
+		break;
+	case 0x0a: case 0x1a:
+		for (unsigned plane = 0; plane < count; plane++)
+			m_graphics_data[plane] = BIT(data, plane) ? 0xff : 0x00;
+		m_graphics_write_count = count;
+		break;
+	case 0x0c: case 0x1c:
+		m_graphics_display_page = data;
+		break;
+	case 0x0e: case 0x1e:
+		m_graphics_copy = BIT(data, 0);
+		m_graphics_write_count = count;
+		break;
+	}
+}
+
+u8 b16_state::graphics_palette_r(offs_t offset)
+{
+	// CTM reads the four colour bits inverted; unused bits remain high.
+	return m_graphics_palette[offset] ^ 0xff;
+}
+
+void b16_state::graphics_palette_w(offs_t offset, u8 data)
+{
+	m_graphics_palette[offset] = data & 0x0f;
+	// BGR component order agrees with the B16 colour display reference.
+	// TODO: confirm physical intensity levels.
+	const u8 low = BIT(data, 3) ? 0x55 : 0x00;
+	const u8 high = BIT(data, 3) ? 0xff : 0xaa;
+	m_palette->set_pen_color(16 + offset, rgb_t(
+		BIT(data, 2) ? high : low, BIT(data, 1) ? high : low, BIT(data, 0) ? high : low));
 }
 
 u8 b16_state::kanji_r(offs_t offset)
@@ -284,7 +415,7 @@ void b16_state::b16_map(address_map &map)
 	map.unmap_value_high();
 	// TODO: amount of work RAM depends on model type
 	map(0x00000, 0x9ffff).ram();
-	map(0xa0000, 0xaffff).ram(); // bitmap?
+	map(0xa0000, 0xaffff).rw(FUNC(b16_state::graphics_r), FUNC(b16_state::graphics_w)).umask16(0xffff);
 	map(0xb0000, 0xb7fff).ram().rw(FUNC(b16_state::tvram_r), FUNC(b16_state::tvram_w)).share("vram");
 	map(0xb8000, 0xbbfff).rw(FUNC(b16_state::ig_ram_r), FUNC(b16_state::ig_ram_w)).umask16(0x00ff);
 	map(0xc0000, 0xdffff).r(FUNC(b16_state::kanji_r)).umask16(0x00ff);
@@ -355,12 +486,14 @@ void b16_state::b16_io(address_map &map)
 	// TODO: confirm the source/polarity of these vblank-derived status bits.
 	map(0x80, 0x80).lrw8(
 		NAME([this] () {
-			return (m_port80 & ~m_port80_vblank_mask) | (m_screen->vblank() ? m_port80_vblank_mask : 0x00);
+			return (m_port80 & ~(m_port80_vblank_mask | m_port80_config_mask)) | m_port80_config
+				| (m_screen->vblank() ? m_port80_vblank_mask : 0x00);
 		}),
 		NAME([this] (u8 data) { m_port80 = data; })
 	);
 	map(0x84, 0x84).lw8(NAME([this] (u8 data) { m_port84 = data & 3; }));
-//  map(0x00a0, 0x00bf) DMA upper segments or video clut
+	map(0xa0, 0xbf).rw(FUNC(b16_state::graphics_palette_r), FUNC(b16_state::graphics_palette_w)).umask16(0x00ff);
+	map(0xc0, 0xdf).w(FUNC(b16_state::graphics_ctrl_w)).umask16(0x00ff);
 //  map(0x8020, 0x8023) external FDC? Can branch at FDC irq
 }
 
@@ -454,6 +587,14 @@ void b16_state::machine_reset()
 	m_port80 = 0;
 	m_tvram_attr_latch = 0;
 	m_port84 = 0;
+	m_graphics_mask = 0xff;
+	std::fill(std::begin(m_graphics_data), std::end(m_graphics_data), 0);
+	std::fill(std::begin(m_graphics_latch), std::end(m_graphics_latch), 0);
+	m_graphics_read_plane = 0;
+	m_graphics_read_count = m_graphics_write_count = m_graphics_planes;
+	m_graphics_copy = m_graphics_display_page = 0;
+	for (unsigned i = 0; i < 16; i++)
+		graphics_palette_w(i, i);
 	m_dma->dreq0_w(0);
 	m_fdc->tc_w(false);
 }
@@ -522,7 +663,7 @@ void b16_state::b16(machine_config &config)
 	screen.set_visarea_full();
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_b16);
-	PALETTE(config, m_palette, FUNC(b16_state::palette_init)).set_entries(16);
+	PALETTE(config, m_palette, FUNC(b16_state::palette_init)).set_entries(32);
 
 	SOFTWARE_LIST(config, "disk_list").set_original("b16");
 }
@@ -534,6 +675,11 @@ void b16_state::b16ex2(machine_config &config)
 	m_fdc->subdevice<floppy_connector>("1")->set_default_option("525hd");
 	m_fdc_rate = 500'000;
 	m_port80_vblank_mask = 0x90;
+	// EX-II BIOS reads bit 2 as the colour-display capability input.
+	// Control writes must not turn it into a monochrome configuration.
+	// TODO: confirm its physical source and configuration on other models.
+	m_port80_config_mask = 0x04;
+	m_port80_config = 0x04;
 	I80286(config.replace(), m_maincpu, XTAL(16'000'000) / 2); // A80286-8 / S
 	m_maincpu->set_addrmap(AS_PROGRAM, &b16_state::b16ex2_map);
 	m_maincpu->set_addrmap(AS_IO, &b16_state::b16_io);
@@ -547,7 +693,7 @@ void b16_state::b16ex2(machine_config &config)
 	m_pit->set_clk<2>(XTAL(16'000'000) / 2);
 //  m_pit->out_handler<2>()
 
-	m_palette->set_entries(16);
+	// Sixteen text pens remain independent of sixteen bitmap pens.
 
 	// 512~1.5M RAM
 	// 5.25" FDD x 2
@@ -583,7 +729,7 @@ COMP( 1982?, b16,     0,      0,      b16,     b16,   b16_state, empty_init, "Hi
 // B16 EX 8086-2
 // B16 SX superimpose option, 3.5" x 1.2MB floppies
 
-COMP( 1983?, b16ex2,  0,      0,      b16ex2,  b16,   b16_state, empty_init, "Hitachi", "B16 EX-II",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1983?, b16ex2,  0,      0,      b16ex2,  b16,   b16ex2_state, empty_init, "Hitachi", "B16 EX-II",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // B16 MX-II, 1~2MB RAM + 640x494 extra video mode + support for M[ultiuser?]DOS
 
 // B16 EX-III, 386 based? <fill me>
