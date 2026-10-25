@@ -289,7 +289,7 @@ ROM_END
 
 
 GAME( 2006, cscaoysd,  0,       base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Crayon Shin-chan - Arashi o Yobu! Sushitori Daigassen",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2006, pmsgk,     0,       base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Pocket Monsters - Sonans ga Koronda!",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, pmsgk,     0,       base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Pocket Monsters - Sonans ga Koronda!",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2006, dbzbgck,   0,       base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Dragon Ball Z - Bucchigiri no Chou Kessen (ver. 1.1)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2006, dbzbgck10, dbzbgck, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Dragon Ball Z - Bucchigiri no Chou Kessen (ver. 1.0)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2007, cmcwa,     0,       base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Chibi Maruko-chan - Wanage de Asobo!!",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
