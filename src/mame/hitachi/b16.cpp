@@ -136,6 +136,7 @@ protected:
 private:
 	uint8_t m_crtc_vreg[0x100]{}, m_crtc_index = 0;
 	u16 m_tvram_attr_latch = 0;
+	u8 m_port84 = 0;
 	uint8_t m_port78 = 0;
 	uint8_t m_port80 = 0;
 	u8 m_dma_page = 0;
@@ -161,6 +162,7 @@ private:
 
 	u16 tvram_r(offs_t offset);
 	void tvram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 kanji_r(offs_t offset);
 	u8 ig_ram_r(offs_t offset);
 	void ig_ram_w(offs_t offset, uint8_t data);
 	void crtc_address_w(uint8_t data);
@@ -204,8 +206,10 @@ void b16_state::palette_init(palette_device &palette) const
 
 void b16_state::video_start()
 {
-	m_ig_ram = make_unique_clear<u8[]>(0x4000);
-	m_gfxdecode->gfx(1)->set_source_and_total(m_ig_ram.get(), 0x200 * 2);
+	m_ig_ram = make_unique_clear<u8[]>(0x2000);
+	m_gfxdecode->gfx(1)->set_source_and_total(m_ig_ram.get(), 0x200);
+	save_pointer(NAME(m_ig_ram), 0x2000);
+	save_item(NAME(m_port84));
 
 	save_item(NAME(m_crtc_vreg));
 	save_item(NAME(m_crtc_index));
@@ -276,20 +280,24 @@ void b16_state::tvram_w(offs_t offset, u16 data, u16 mem_mask)
 		m_vram[offset + 0x2000] = m_tvram_attr_latch;
 }
 
+u8 b16_state::kanji_r(offs_t offset)
+{
+	// 84h.bit0 selects the left/right byte of a glyph row; bit1 selects
+	// the upper ROM half. The CPU window is on the low byte lane.
+	return m_kanji_rom[(offset << 1) | ((m_port84 & 2) << 16) | BIT(m_port84, 0)];
+}
+
 u8 b16_state::ig_ram_r(offs_t offset)
 {
-	// swap bit 0 for now, so we can see a setup thru debugger later on.
-	// SW does mov ah,0 -> stosw when uploading.
-	const u16 ig_offset = bitswap<13>(offset, 0, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1);
-	return m_ig_ram[ig_offset];
+	return m_ig_ram[offset];
 }
 
 void b16_state::ig_ram_w(offs_t offset, uint8_t data)
 {
-	const u16 ig_offset = bitswap<13>(offset, 0, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1);
-	m_ig_ram[ig_offset] = data;
-
-	m_gfxdecode->gfx(1)->mark_dirty(ig_offset >> 4);
+	// 8 KiB CGRAM uses the low byte lane of B8000h-BBFFFh. CPU A13
+	// separates the ordinary glyphs from the external glyphs at BA000h.
+	m_ig_ram[offset] = data;
+	m_gfxdecode->gfx(1)->mark_dirty(offset >> 4);
 }
 
 void b16_state::b16_map(address_map &map)
@@ -299,7 +307,8 @@ void b16_state::b16_map(address_map &map)
 	map(0x00000, 0x9ffff).ram();
 	map(0xa0000, 0xaffff).ram(); // bitmap?
 	map(0xb0000, 0xb7fff).ram().rw(FUNC(b16_state::tvram_r), FUNC(b16_state::tvram_w)).share("vram");
-	map(0xb8000, 0xbbfff).rw(FUNC(b16_state::ig_ram_r), FUNC(b16_state::ig_ram_w)).umask16(0xffff);
+	map(0xb8000, 0xbbfff).rw(FUNC(b16_state::ig_ram_r), FUNC(b16_state::ig_ram_w)).umask16(0x00ff);
+	map(0xc0000, 0xdffff).r(FUNC(b16_state::kanji_r)).umask16(0x00ff);
 	map(0xfc000, 0xfffff).rom().region("ipl", 0);
 }
 
@@ -383,6 +392,7 @@ void b16_state::b16_io(address_map &map)
 		}),
 		NAME([this] (u8 data) { m_port80 = data; })
 	);
+	map(0x84, 0x84).lw8(NAME([this] (u8 data) { m_port84 = data & 3; }));
 //  map(0x00a0, 0x00bf) DMA upper segments or video clut
 //  map(0x8020, 0x8023) external FDC? Can branch at FDC irq
 }
@@ -476,6 +486,7 @@ void b16_state::machine_reset()
 	m_port78 = 0;
 	m_port80 = 0;
 	m_tvram_attr_latch = 0;
+	m_port84 = 0;
 	m_dma->dreq0_w(0);
 	m_fdc->tc_w(false);
 }
