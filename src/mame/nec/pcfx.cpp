@@ -40,6 +40,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_huc6261(*this, "huc6261")
+		, m_huc6270(*this, "huc6270_%c", 'a')
 		, m_intc(*this, "intc")
 		, m_pads(*this, "P%u", 1U)
 	{ }
@@ -70,6 +71,27 @@ private:
 	TIMER_CALLBACK_MEMBER(timer_expired);
 	u32 timer_effective_period() const { return (m_timer_period ? m_timer_period : 0x10000) * 15; }
 
+	// the 16-bit video chips have their A1 on CPU A2, so a word access reaches the same register twice, low half first
+	template <typename Read>
+	static u32 read_halves(u32 mem_mask, Read &&read)
+	{
+		u32 data = 0;
+		if (ACCESSING_BITS_0_15)
+			data |= read();
+		if (ACCESSING_BITS_16_31)
+			data |= u32(read()) << 16;
+		return data;
+	}
+
+	template <typename Write>
+	static void write_halves(u32 data, u32 mem_mask, Write &&write)
+	{
+		if (ACCESSING_BITS_0_15)
+			write(u16(data));
+		if (ACCESSING_BITS_16_31)
+			write(u16(data >> 16));
+	}
+
 	void pcfx_io(address_map &map) ATTR_COLD;
 	void pcfx_mem(address_map &map) ATTR_COLD;
 
@@ -95,6 +117,7 @@ private:
 
 	required_device<v810_device> m_maincpu;
 	required_device<huc6261_device> m_huc6261;
+	required_device_array<huc6270_device, 2> m_huc6270;
 	required_device<pcfx_intc_device> m_intc;
 	required_ioport_array<2> m_pads;
 };
@@ -268,24 +291,15 @@ void pcfx_state::pcfx_io(address_map &map)
 	map(0x00000080, 0x000000ff).rw(FUNC(pcfx_state::pad_r<1>), FUNC(pcfx_state::pad_w<1>)); /* PAD */
 	map(0x00000100, 0x000001ff).w("huc6230", FUNC(huc6230_device::write)).umask32(0x00ff00ff);   /* HuC6230 */
 	map(0x00000200, 0x000002ff).m("huc6271", FUNC(huc6271_device::amap));   /* HuC6271 */
-	// HuC6261: A1 is wired to CPU A2, so a word access reaches the same register twice, low half first (two palette entries per OUT.W in dknight4)
 	map(0x00000300, 0x000003ff).lrw32(
-		NAME([this] (offs_t offset, u32 mem_mask) {
-			u32 data = 0;
-			if (ACCESSING_BITS_0_15)
-				data |= m_huc6261->read(offset);
-			if (ACCESSING_BITS_16_31)
-				data |= u32(m_huc6261->read(offset)) << 16;
-			return data;
-		}),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			if (ACCESSING_BITS_0_15)
-				m_huc6261->write(offset, data & 0xffff);
-			if (ACCESSING_BITS_16_31)
-				m_huc6261->write(offset, data >> 16);
-		}));
-	map(0x00000400, 0x000004ff).rw("huc6270_a", FUNC(huc6270_device::read16), FUNC(huc6270_device::write16)).umask32(0x0000ffff); /* HuC6270-A */
-	map(0x00000500, 0x000005ff).rw("huc6270_b", FUNC(huc6270_device::read16), FUNC(huc6270_device::write16)).umask32(0x0000ffff); /* HuC6270-B */
+		NAME([this] (offs_t offset, u32 mem_mask) -> u32 { return read_halves(mem_mask, [this, offset] { return m_huc6261->read(offset); }); }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { write_halves(data, mem_mask, [this, offset] (u16 d) { m_huc6261->write(offset, d); }); }));
+	map(0x00000400, 0x000004ff).lrw32(
+		NAME([this] (offs_t offset, u32 mem_mask) -> u32 { return read_halves(mem_mask, [this, offset] { return m_huc6270[0]->read16(offset); }); }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { write_halves(data, mem_mask, [this, offset] (u16 d) { m_huc6270[0]->write16(offset, d); }); }));
+	map(0x00000500, 0x000005ff).lrw32(
+		NAME([this] (offs_t offset, u32 mem_mask) -> u32 { return read_halves(mem_mask, [this, offset] { return m_huc6270[1]->read16(offset); }); }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { write_halves(data, mem_mask, [this, offset] (u16 d) { m_huc6270[1]->write16(offset, d); }); }));
 	map(0x00000600, 0x00000607).mirror(0xf8).m("huc6272", FUNC(huc6272_device::amap)); // King
 	map(0x00000c00, 0x00000c00).r("huc6270_a", FUNC(huc6270_device::get_ar));
 	map(0x00000c40, 0x00000c40).r("huc6270_b", FUNC(huc6270_device::get_ar));
