@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "machine/ram.h"
 #include "screen.h"
 
 class nwb_512_device : public device_t
@@ -29,8 +28,13 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
+	// The NWB-512 only works with the NWP-512D monitor, per the Sony NEWS Technical Manual
 	required_device<screen_device> m_nwp_512d;
-	required_device<ram_device> m_vram;
+
+	// VRAM consists of two types of memory chips:
+	// 4x NEC uPD41264C-12 64K x 4 dual-port DRAM chips (visible screen and small off-screen area)
+	// 12x Fujitsu MB81464-12 64K x 4 DRAM chips (off-screen buffer)
+	memory_share_creator<uint16_t> m_vram;
 
 	// Framebuffer state
 	// CXD1029: raster operation engine

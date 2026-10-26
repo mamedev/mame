@@ -269,8 +269,8 @@ namespace
 		required_device<news_iop_scsi_helper_device> m_scsi_dma;
 		required_ioport m_dip_switch;
 		required_device_array<rs232_port_device, 2> m_serial;
-		required_device<news_hid_serial_keyboard> m_keyboard;
-		required_device<news_hid_serial_mouse> m_mouse;
+		required_device<news_hid_serial_keyboard_device> m_keyboard;
+		required_device<news_hid_serial_mouse_device> m_mouse;
 		std::unique_ptr<u16[]> m_net_ram;
 
 		// Framebuffer and CRT
@@ -971,7 +971,7 @@ namespace
 		// Keyboard and mouse
 		NEWS_HID_SERIAL_KEYBOARD(config, m_keyboard);
 		m_keyboard->txd_handler().set(m_scc_peripheral, FUNC(z80scc_device::rxa_w));
-		m_scc_peripheral->out_txda_callback().set(m_keyboard, FUNC(news_hid_serial_keyboard::rxd_w));
+		m_scc_peripheral->out_txda_callback().set(m_keyboard, FUNC(news_hid_serial_keyboard_device::rxd_w));
 
 		NEWS_HID_SERIAL_MOUSE(config, m_mouse);
 		m_mouse->txd_handler().set(m_scc_peripheral, FUNC(z80scc_device::rxb_w));

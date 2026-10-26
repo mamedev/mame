@@ -54,22 +54,16 @@ namespace
 	static constexpr std::array raster_ops = {
 		"~S", "~(S | D)", "~S & D", "0", "~(S & D)", "~D", "S ^ D", "S & ~D", "~S | D", "~(S ^ D)", "D", "S & D", "1", "S | ~D", "S | D", "S"};
 
-	// Takes in an x,y coordinate and returns the byte offset into the framebuffer memory region
-	uint32_t coordinate_to_byte_offset(const uint16_t x, const uint16_t y)
+	// Takes in an x,y coordinate and returns the word offset into the framebuffer memory region
+	uint32_t coordinate_to_word_offset(const uint16_t x, const uint16_t y)
 	{
-		return (y % Y_MAX) * 256 + ((x % X_MAX) >> 3);
-	}
-
-	// Takes in an x,y coordinate and returns the 16-bit aligned byte offset into the framebuffer memory region
-	uint32_t coordinate_to_byte_offset_aligned(const uint16_t x, const uint16_t y)
-	{
-		return coordinate_to_byte_offset(x, y) & ~0x1;
+		return (y % Y_MAX) * (X_MAX / 16) + ((x % X_MAX) >> 4);
 	}
 
 	// Gets the pixel offset of a given x coordinate
-	uint8_t x_to_pixel_offset(const uint16_t x)
+	uint16_t x_to_pixel_offset(const uint16_t x)
 	{
-		return 7 - (x & 7); // pixel 0 = bit 7
+		return 15 - (x & 15); // pixel 0 = bit 15
 	}
 
 	// Extracts the X address from the data provided to an FB write
@@ -100,7 +94,7 @@ namespace
 nwb_512_device::nwb_512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, NWB_512, tag, owner, clock),
 	  m_nwp_512d(*this, "nwp_512d"),
-	  m_vram(*this, "vram")
+	  m_vram(*this, "vram", 0x80000, ENDIANNESS_BIG)
 {
 }
 
@@ -175,32 +169,25 @@ void nwb_512_device::device_add_mconfig(machine_config &config)
 						HORIZONTAL, 0, HORIZONTAL,
 						VERTICAL, 0, VERTICAL);
 	m_nwp_512d->set_physical_aspect(51, 64); // portrait mode CRT, square-ish pixels/~4:5 ratio assumed
-
-	// VRAM consists of two types of memory chips:
-	// 4x NEC uPD41264C-12 64K x 4 dual-port DRAM chips (visible screen and small off-screen area)
-	// 12x Fujitsu MB81464-12 64K x 4 DRAM chips (off-screen buffer)
-	RAM(config, m_vram);
-	m_vram->set_default_value(0);
-	m_vram->set_default_size("512KiB");
 }
 
 u32 nwb_512_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const rgb_t white = current_dim_color();
 	const rgb_t black = rgb_t::black();
-	const uint8_t *const vram = m_vram->pointer();
+	const uint16_t *const vram = m_vram;
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); ++y)
 	{
-		const uint8_t *const row = &vram[coordinate_to_byte_offset(0, y)]; // Y: 2048 / 8 = 256 bytes per row, not all visible.
+		const uint16_t *const row = &vram[coordinate_to_word_offset(0, y)]; // Y: 2048 / 8 = 256 bytes per row, not all visible.
 		uint32_t *dst_pixel = &bitmap.pix(y, cliprect.min_x);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; ++x)
+		for (int x = cliprect.left(); x <= cliprect.right(); ++x)
 		{
 			// The NWB-512 is a dimmable pure-monochrome display. Based on pictures of the similar NWS-711 monitor
 			// and the fact that NEWS Desk looks as it does on the laptop displays when assuming black-on-white,
 			// the NWB-512 is most likely also black-on-white (1 = black, 0 = white).
-			*dst_pixel++ = BIT(row[x >> 3], x_to_pixel_offset(x)) ? black : white;
+			*dst_pixel++ = BIT(row[x >> 4], x_to_pixel_offset(x)) ? black : white;
 		}
 	}
 
@@ -339,14 +326,18 @@ void nwb_512_device::pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	// Set pixel to 1 at X (data), Y (offset[12:1])
 	const uint16_t x = x_address(data);
 	const uint16_t y = y_address(offset);
-	const uint32_t byte_offset = coordinate_to_byte_offset(x, y);
+	const uint32_t word_offset = coordinate_to_word_offset(x, y);
 	const uint16_t x_bit = x_to_pixel_offset(x);
-	const uint8_t destination = m_vram->read(byte_offset) & (1u << x_bit) ? 1 : 0;
+	const uint8_t destination = m_vram[word_offset] & (1u << x_bit) ? 1 : 0;
 
 	// Use the result of the ROP engine before setting the pixel
 	const bool new_state = execute_rop(m_state.rop_function, 1, destination) & 1;
 	LOGMASKED(LOG_DATA, "pixel_w(0x%x, 0x%x) => Change (0x%x, 0x%x) from %u to %u\n", offset, data, x, y, destination, new_state ? 1u : 0u);
-	set_pixel(x, y, new_state);
+
+	// Set desired pixel
+	uint16_t pixel = m_vram[word_offset];
+	pixel = (pixel & ~(1u << x_bit)) | ((new_state ? 1u : 0u) << x_bit);
+	m_vram[word_offset] = pixel;
 }
 
 uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
@@ -514,8 +505,8 @@ void nwb_512_device::check_operation_start(offs_t offset)
 
 uint16_t nwb_512_device::coordinate_to_data(uint16_t x, uint16_t y)
 {
-	const uint32_t byte_offset = coordinate_to_byte_offset_aligned(x, y);
-	return (m_vram->read(byte_offset) << 8) | m_vram->read(byte_offset + 1);
+	const uint32_t word_offset = coordinate_to_word_offset(x, y);
+	return m_vram[word_offset];
 }
 
 uint16_t nwb_512_device::execute_rop(const uint8_t opcode, const uint16_t source, const uint16_t destination)
@@ -601,14 +592,14 @@ uint16_t nwb_512_device::shift(uint16_t data)
 
 void nwb_512_device::rop(uint16_t source)
 {
-	const offs_t byte_offset = coordinate_to_byte_offset_aligned(m_state.current_destination_x, m_state.destination_y);
+	const offs_t word_offset = coordinate_to_word_offset(m_state.current_destination_x, m_state.destination_y);
 	const uint16_t destination = coordinate_to_data(m_state.current_destination_x, m_state.destination_y);
 
 	// Execute raster operation with the appropriate source and destination data
 	uint16_t result = execute_rop(m_state.rop_function, source, destination);
 
 	LOGMASKED(LOG_DATA, "rop_cycle:\n");
-	LOGMASKED(LOG_DATA, "\tx,y(0x%x, 0x%x) => offs 0x%x\n", m_state.current_destination_x, m_state.destination_y, byte_offset);
+	LOGMASKED(LOG_DATA, "\tx,y(0x%x, 0x%x) => offs 0x%x\n", m_state.current_destination_x, m_state.destination_y, word_offset);
 	LOGMASKED(LOG_DATA, "\tshift = 0x%x, source = 0x%x, carry = 0x%x, destination = 0x%x\n", m_state.shift, source, m_state.carry, destination);
 	LOGMASKED(LOG_DATA, "\trop result = 0x%x\n", result);
 	const bool first_word = m_state.dest_words_left == m_state.dest_words_per_row;
@@ -627,8 +618,7 @@ void nwb_512_device::rop(uint16_t source)
 	}
 
 	// Write result back to VRAM
-	m_vram->write(byte_offset, result >> 8 & 0xff);
-	m_vram->write(byte_offset + 1, result & 0xff);
+	m_vram[word_offset] = result;
 
 	// Advance ROCC state
 	m_state.advance_dxa();
@@ -703,7 +693,8 @@ void nwb_512_device::start_operation()
 	// supported/used for reads. For now, assume the same for the NWB-512.
 	if (m_state.is_fb_to_host() && !m_state.x_direction)
 	{
-		fatalerror("Reverse reads are not supported!");
+		logerror("%s NWB-512: Reverse reads are not supported, skipping\n", machine().describe_context());
+		return;
 	}
 
 	// Set exec flag as operation is starting.
@@ -777,18 +768,6 @@ void nwb_512_device::end_operation()
 	m_state.destination_x &= ~0xf;
 }
 
-void nwb_512_device::set_pixel(uint16_t x, uint16_t y, bool on)
-{
-	// Determine byte offset in VRAM
-	const uint32_t byte_offset = coordinate_to_byte_offset(x, y);
-	const uint16_t x_bit = x_to_pixel_offset(x);
-
-	// Set desired pixel
-	uint8_t pixel = m_vram->read(byte_offset);
-	pixel = (pixel & ~(1u << x_bit)) | ((on ? 1u : 0u) << x_bit);
-	m_vram->write(byte_offset, pixel);
-}
-
 rgb_t nwb_512_device::current_dim_color()
 {
 	// Assume darkest dim is 25% brightness (0b11) with 50% (0b10) and 75% (0b01) as the other options.
@@ -808,8 +787,8 @@ rgb_t nwb_512_device::current_dim_color()
 ROM_START(nwb_512)
 // NWB-512 Kanji ROM
 ROM_REGION32_BE(0x40000, "krom", 0)
-ROM_LOAD16_BYTE("nwb512-ic128-hn62301ap-aa1.bin", 0x0000, 0x20000, CRC(3eaa0dbc) SHA1(9c4e66cc122fd60963f51649c945cdfc39f230eb))
-ROM_LOAD16_BYTE("nwb512-ic127-hn62301ap-aa2.bin", 0x0001, 0x20000, CRC(b8705af7) SHA1(915333f082ecbfee512f1166fc38d9dd29dcaf26))
+	ROM_LOAD16_BYTE("nwb512-ic128-hn62301ap-aa1.bin", 0x0000, 0x20000, CRC(3eaa0dbc) SHA1(9c4e66cc122fd60963f51649c945cdfc39f230eb))
+	ROM_LOAD16_BYTE("nwb512-ic127-hn62301ap-aa2.bin", 0x0001, 0x20000, CRC(b8705af7) SHA1(915333f082ecbfee512f1166fc38d9dd29dcaf26))
 ROM_END
 
 const tiny_rom_entry *nwb_512_device::device_rom_region() const
