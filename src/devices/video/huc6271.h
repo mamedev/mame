@@ -39,6 +39,7 @@ public:
 	void amap(address_map &map) ATTR_COLD;
 
 	// interface to the HuC6272
+	void hsync();
 	void decode_block(bool first, const fetch_delegate &fetch);
 	void swap_buffers();
 	int fetch_line(u32 *dest);
@@ -52,7 +53,8 @@ private:
 	struct lut_entry { u8 value; u8 length; };
 
 	u16 m_hscroll;
-	u16 m_control;
+	u16 m_control;          // R01 as currently applied
+	u16 m_control_reg;      // R01 as written
 	u16 m_back_y, m_back_u, m_back_v;
 	u16 m_hsync;
 

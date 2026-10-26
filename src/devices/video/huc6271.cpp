@@ -169,6 +169,7 @@ huc6271_device::huc6271_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, HUC6271, tag, owner, clock)
 	, m_hscroll(0)
 	, m_control(0)
+	, m_control_reg(0)
 	, m_back_y(0)
 	, m_back_u(0)
 	, m_back_v(0)
@@ -178,23 +179,62 @@ huc6271_device::huc6271_device(const machine_config &mconfig, const char *tag, d
 
 void huc6271_device::amap(address_map &map)
 {
+	// in the reset state only SRT can be written
 	// D0-D7 of $00 set the low byte, D0-D7 of $02 the high byte
 	map(0x00, 0x03).lw32(NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+		if (!BIT(m_control, 0))
+			return;
 		if (ACCESSING_BITS_0_7)
 			m_hscroll = (m_hscroll & 0xff00) | (data & 0xff);
 		if (ACCESSING_BITS_16_23)
 			m_hscroll = (m_hscroll & 0x00ff) | ((data >> 8) & 0xff00);
 		m_hscroll &= 0x1ff;
 	}));
-	// ---- -?-- <unknown>
-	// ---- --x- endless scroll mode
-	// ---- ---x enable Rainbow transfers
-	map(0x04, 0x05).lw16(NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_control); }));
+	// ---- -x-- FTS block noise filter
+	// ---- --x- CHR endless (cylinder) scroll mode
+	// ---- ---x SRT 0 = reset, 1 = run
+	// taken at the next HSync
+	map(0x04, 0x05).lw16(NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+		COMBINE_DATA(&m_control_reg);
+		if (!BIT(m_control, 0))
+			m_control_reg &= 1;
+	}));
 	// colour of null (skipped) macroblocks, signed
-	map(0x08, 0x09).lw16(NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_back_y); }));
-	map(0x0c, 0x0d).lw16(NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_back_u); }));
-	map(0x10, 0x11).lw16(NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_back_v); }));
-	map(0x14, 0x15).lw16(NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_hsync); }));
+	map(0x08, 0x09).lw16(NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+		if (BIT(m_control, 0))
+			COMBINE_DATA(&m_back_y);
+	}));
+	map(0x0c, 0x0d).lw16(NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+		if (BIT(m_control, 0))
+			COMBINE_DATA(&m_back_u);
+	}));
+	map(0x10, 0x11).lw16(NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+		if (BIT(m_control, 0))
+			COMBINE_DATA(&m_back_v);
+	}));
+	map(0x14, 0x15).lw16(NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+		if (BIT(m_control, 0))
+			COMBINE_DATA(&m_hsync);
+	}));
+}
+
+// R01 is taken at the falling edge of HSync; entering the reset state clears R00-R05 and the decoder
+void huc6271_device::hsync()
+{
+	if (!BIT(m_control_reg, 0))
+	{
+		if (BIT(m_control, 0))
+		{
+			m_hscroll = 0;
+			m_back_y = m_back_u = m_back_v = 0;
+			m_hsync = 0;
+			m_read_line = 0;
+			m_format[0] = m_format[1] = FORMAT_NONE;
+			m_garbage = false;
+		}
+		m_control_reg = 0;
+	}
+	m_control = m_control_reg;
 }
 
 //-------------------------------------------------
@@ -215,6 +255,7 @@ void huc6271_device::device_start()
 	}
 
 	save_item(NAME(m_control));
+	save_item(NAME(m_control_reg));
 	save_item(NAME(m_hscroll));
 	save_item(NAME(m_hsync));
 	save_item(NAME(m_back_y));
@@ -236,6 +277,7 @@ void huc6271_device::device_start()
 void huc6271_device::device_reset()
 {
 	m_control = 0;
+	m_control_reg = 0;
 	m_back_y = m_back_u = m_back_v = 0;
 	m_hscroll = 0;
 	m_read_line = 0;
@@ -563,6 +605,13 @@ void huc6271_device::swap_buffers()
 // fetch the next decoded line: YUV888 for FORMAT_YUV, palette index for FORMAT_PALETTE, 0 = transparent
 int huc6271_device::fetch_line(u32 *dest)
 {
+	// everything is transparent in the reset state
+	if (!BIT(m_control, 0))
+	{
+		std::fill_n(dest, 256, 0);
+		return FORMAT_NONE;
+	}
+
 	const int format = m_format[m_read_buffer];
 	const bool endless = BIT(m_control, 1);
 
