@@ -481,12 +481,47 @@ u16 huc6261_device::read(offs_t offset)
 					}
 					break;
 
+				case 0x04:
+				case 0x05:
+				case 0x06:
+				case 0x07:
+					data = m_palette_offset[m_register & 3];
+					break;
+
 				case 0x08:
 					data = m_priority[4] | (m_priority[5] << 4) | (m_priority[6] << 8);
 					break;
 
 				case 0x09:
 					data = m_priority[0] | (m_priority[1] << 4) | (m_priority[2] << 8) | (m_priority[3] << 12);
+					break;
+
+				case 0x0a:
+				case 0x0b:
+				case 0x0c:
+					data = m_chroma_key[m_register - 0x0a];
+					break;
+
+				case 0x0d:
+					data = m_cello_colour;
+					break;
+
+				// games fade by reading the cellophane registers back and stepping them (dknight4)
+				case 0x0e:
+					data = m_cello_enable;
+					break;
+
+				case 0x0f:
+					data = m_cello_sprite_mask;
+					break;
+
+				case 0x10:
+				case 0x11:
+				case 0x12:
+				case 0x13:
+				case 0x14:
+				case 0x15:
+					data = m_cello_coeff[m_register - 0x10];
 					break;
 			}
 			break;
@@ -629,6 +664,7 @@ void huc6261_device::device_start()
 	save_item(NAME(m_height));
 	save_item(NAME(m_palette));
 	save_item(NAME(m_palette_latch));
+	save_item(NAME(m_palette_offset));
 	save_item(NAME(m_address));
 	save_item(NAME(m_register));
 	save_item(NAME(m_control));
