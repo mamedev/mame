@@ -690,7 +690,13 @@ void huc6261_device::device_start()
 
 void huc6261_device::device_reset()
 {
+	// all registers are cleared except R0F, which is set to FFh
 	m_register = 0;
+	m_control = 0;
+	m_address = 0;
+	m_palette_latch = 0;
+	std::fill(std::begin(m_palette_offset), std::end(m_palette_offset), 0);
+	std::fill(std::begin(m_priority), std::end(m_priority), 0);
 	m_pixels_per_clock = 4;
 	m_height = 263;
 	m_pixel_clock = 0;
@@ -702,7 +708,7 @@ void huc6261_device::device_reset()
 	std::fill(std::begin(m_chroma_key), std::end(m_chroma_key), 0);
 	m_cello_colour = 0;
 	m_cello_enable = 0;
-	m_cello_sprite_mask = 0;
+	m_cello_sprite_mask = 0xff;
 	std::fill(std::begin(m_cello_coeff), std::end(m_cello_coeff), 0);
 	std::fill(std::begin(m_layer_rank), std::end(m_layer_rank), 0);
 
