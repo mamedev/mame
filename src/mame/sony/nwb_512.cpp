@@ -271,10 +271,8 @@ void nwb_512_device::rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	}
 
 	// These mappings are an educated guess based on NWS-1500 service manual and iopboot/mrx behavior
-	// I used to set fbread/write here as the DSC-008 does, but to make all ops work as iopboot/mrx expects,
-	// the address bits of limit_w would appear to override the settings if they disagreed.
 	// Experimentation on hardware or an NWB-512/DSC-001 service manual would be required to determine the function of the
-	// other bits, since the DSC-008 might differ from this card.
+	// other bits, since the DSC-008 probably differs from this card.
 	offset <<= 1; // use byte offset
 	m_state.x_direction = offset & 0x10;
 	m_state.y_direction = offset & 0x20;
