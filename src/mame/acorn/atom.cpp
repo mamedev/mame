@@ -93,7 +93,6 @@ Hardware:   PPIA 8255
     - mouse
     - color card
     - CP/M card
-    - econet
     - Busicomputers Prophet 2
         * The Shift and Return keys are orange and the Return key is large,
         * There is a MODE switch to the top right of the keyboard,
