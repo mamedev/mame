@@ -1372,8 +1372,12 @@ void huc6272_device::rainbow_control_w(offs_t offset, u32 data, u32 mem_mask)
 	m_rainbow.control = data & 3;
 	if (!BIT(data, 0))
 		m_rainbow.blocks = 0;
-	m_rainbow.raster_irq = false;
-	interrupt_update();
+	// resetting RINT clears the raster interrupt (so does a status read)
+	if (!BIT(data, 1))
+	{
+		m_rainbow.raster_irq = false;
+		interrupt_update();
+	}
 }
 
 void huc6272_device::rainbow_address_w(offs_t offset, u32 data, u32 mem_mask)
