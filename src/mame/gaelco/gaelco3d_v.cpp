@@ -35,7 +35,7 @@ gaelco3d_state::gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state) :
 	m_zbuffer(state.m_screen->width(), state.m_screen->height()),
 	m_polygons(0),
 	m_texture_size(state.memregion("texture")->bytes()),
-	m_texmask_size(state.memregion("texmask")->bytes() * 8),
+	m_texmask_size((state.m_texmask_rom ? state.m_texmask_rom.bytes() : TEXMASK_RAM_SIZE) * 8),
 	m_texture(std::make_unique<uint8_t[]>(m_texture_size)),
 	m_texmask(std::make_unique<uint8_t[]>(m_texmask_size))
 {
@@ -55,11 +55,14 @@ gaelco3d_state::gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state) :
 		}
 
 	/* then expand the mask data */
-	src = state.memregion("texmask")->base();
-	dst = m_texmask.get();
-	for (int y = 0; y < m_texmask_size/4096; y++)
-		for (int x = 0; x < 4096; x++)
-			dst[y * 4096 + x] = (src[(x / 1024) * (m_texmask_size / 8 / 4) + (y * 1024 + x % 1024) / 8] >> (x % 8)) & 1;
+	if (state.m_texmask_rom)
+	{
+		src = state.m_texmask_rom;
+		dst = m_texmask.get();
+		for (int y = 0; y < m_texmask_size/4096; y++)
+			for (int x = 0; x < 4096; x++)
+				dst[y * 4096 + x] = (src[(x / 1024) * (m_texmask_size / 8 / 4) + (y * 1024 + x % 1024) / 8] >> (x % 8)) & 1;
+	}
 }
 
 
@@ -444,6 +447,28 @@ void gaelco3d_state::paletteram_020_w(offs_t offset, uint32_t data, uint32_t mem
 	COMBINE_DATA(&m_paletteram32[offset]);
 	m_palette[offset * 2 + 0] = ((m_paletteram32[offset] & 0x7fe00000) >> 10) | ((m_paletteram32[offset] & 0x1f0000) >> 16);
 	m_palette[offset * 2 + 1] = ((m_paletteram32[offset] & 0x7fe0) << 6) | (m_paletteram32[offset] & 0x1f);
+}
+
+
+
+/*************************************
+ *
+ *  Texture mask RAM access
+ *
+ *************************************/
+
+// one bit per texel, in texture address order
+void gaelco3d_state::gaelco3d_renderer::texmask_w(offs_t offset, uint8_t data)
+{
+	wait("Texture mask change");
+	for (int i = 0; i < 8; i++)
+		m_texmask[offset * 8 + i] = BIT(data, i);
+}
+
+
+void gaelco3d_state::texmask_w(offs_t offset, uint8_t data)
+{
+	m_poly->texmask_w(offset, data);
 }
 
 
