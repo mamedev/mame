@@ -107,6 +107,7 @@ private:
 
 	u16 m_timer_control = 0;
 	u16 m_timer_period = 0;
+	u16 m_timer_counter = 0;
 	emu_timer *m_timer = nullptr;
 
 	u8 m_bram_control = 0;
@@ -221,14 +222,19 @@ u16 pcfx_state::timer_control_r()
 	return m_timer_control;
 }
 
+// TIREQ is set by every borrow; the interrupt is output while TIREQ, TCE and TIEN are all set
 void pcfx_state::timer_control_w(u16 data)
 {
 	if (!BIT(m_timer_control, 1) && BIT(data, 1))
 		m_timer->adjust(m_maincpu->clocks_to_attotime(timer_effective_period()));
-	else if (!BIT(data, 1))
+	else if (BIT(m_timer_control, 1) && !BIT(data, 1))
+	{
+		// a stopped counter keeps its value
+		m_timer_counter = timer_counter_r();
 		m_timer->adjust(attotime::never);
+	}
 	m_timer_control = data & 7;
-	m_intc->irq_w<9>(BIT(m_timer_control, 2));
+	m_intc->irq_w<9>((m_timer_control & 7) == 7);
 }
 
 u16 pcfx_state::timer_period_r()
@@ -244,7 +250,7 @@ void pcfx_state::timer_period_w(u16 data)
 u16 pcfx_state::timer_counter_r()
 {
 	if (!BIT(m_timer_control, 1))
-		return 0;
+		return m_timer_counter;
 	const u64 clocks = m_maincpu->attotime_to_clocks(m_timer->remaining());
 	return (clocks + 14) / 15;
 }
@@ -252,11 +258,8 @@ u16 pcfx_state::timer_counter_r()
 TIMER_CALLBACK_MEMBER(pcfx_state::timer_expired)
 {
 	m_timer->adjust(m_maincpu->clocks_to_attotime(timer_effective_period()));
-	if (BIT(m_timer_control, 0))
-	{
-		m_timer_control |= 4;
-		m_intc->irq_w<9>(ASSERT_LINE);
-	}
+	m_timer_control |= 4;
+	m_intc->irq_w<9>((m_timer_control & 7) == 7);
 }
 
 void pcfx_state::pcfx_mem(address_map &map)
@@ -379,13 +382,15 @@ void pcfx_state::machine_start()
 	save_item(NAME(m_dram_page));
 	save_item(NAME(m_timer_control));
 	save_item(NAME(m_timer_period));
+	save_item(NAME(m_timer_counter));
 }
 
 void pcfx_state::machine_reset()
 {
 	m_bram_control = 0;
 	m_timer_control = 0;
-	m_timer_period = 0;
+	m_timer_period = 0xffff;
+	m_timer_counter = 0xffff;
 	m_timer->adjust(attotime::never);
 	m_intc->irq_w<9>(CLEAR_LINE);
 }
