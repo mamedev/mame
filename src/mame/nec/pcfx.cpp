@@ -292,9 +292,11 @@ void pcfx_state::pcfx_mem(address_map &map)
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { m_io.write_dword(0x304 + ((offset >> 24) & 3) * 0x100, data, mem_mask); }));
 	map(0xa0000000, 0xafffffff).nopw();
 	map(0xb0000000, 0xbfffffff).lr32(NAME([] () -> u32 { return 0; }));
-	// internal backup control
+	// internal backup RAM, read and written only while enabled in C80h bit 0
 	map(0xe0000000, 0xe7ffffff).lrw8(
-		NAME([this] (offs_t offset) {
+		NAME([this] (offs_t offset) -> u8 {
+			if (!BIT(m_bram_control, 0) && !machine().side_effects_disabled())
+				return 0xff;
 			return m_nvram_ptr[offset & 0x7fff];
 		}),
 		NAME([this] (offs_t offset, u8 data) {
