@@ -50,6 +50,7 @@ private:
 	u8 m_kram_page_r, m_kram_page_w;
 	u32 m_kram_load_reg, m_kram_write_reg;
 	u32 m_page_setting;
+	u8 m_kram_mode;
 
 	struct bg_t {
 		u16 bat = 0;

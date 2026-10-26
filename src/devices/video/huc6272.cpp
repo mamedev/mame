@@ -58,6 +58,7 @@ huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, d
 	, m_kram_load_reg(0)
 	, m_kram_write_reg(0)
 	, m_page_setting(0)
+	, m_kram_mode(0)
 	, m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, -1, address_map_constructor(FUNC(huc6272_device::microprg_map), this))
 	, m_data_space_config("kram", ENDIANNESS_LITTLE, 16, 19, -1, address_map_constructor(FUNC(huc6272_device::kram_map), this))
 	, m_io_space_config("io", ENDIANNESS_LITTLE, 32, 7, -2, address_map_constructor(FUNC(huc6272_device::io_map), this))
@@ -112,6 +113,7 @@ void huc6272_device::device_start()
 	save_item(NAME(m_kram_load_reg));
 	save_item(NAME(m_kram_write_reg));
 	save_item(NAME(m_page_setting));
+	save_item(NAME(m_kram_mode));
 	save_item(NAME(m_irq_state));
 
 	save_item(STRUCT_MEMBER(m_scsi, data));
@@ -306,7 +308,13 @@ void huc6272_device::io_map(address_map &map)
 	map(0x5d, 0x5d).w(FUNC(huc6272_device::adpcm_end_address_w<1>));
 	map(0x5e, 0x5e).w(FUNC(huc6272_device::adpcm_imm_address_w<1>));
 
-//  map(0x61, 0x61) KRAM mode (undocumented, used by backup RAM menu)
+	// KRAM mode: D0 selects 1M or 4M DRAM; the IPL sets 4M before any KRAM access, so only the value is kept
+	map(0x61, 0x61).lrw32(
+		NAME([this] () -> u32 { return m_kram_mode; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (ACCESSING_BITS_0_15)
+				m_kram_mode = data & 1;
+		}));
 }
 
 
