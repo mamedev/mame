@@ -244,9 +244,9 @@ u32 huc6261_device::mix_pixel(u16 vdc0, u16 vdc1, u32 king, u32 rainbow) const
 		out_is_layer = true;
 	}
 
-	// front cellophane: the cellophane colour over everything
+	// front cellophane: the cellophane colour over everything, shown as is where every layer is transparent
 	if (cello_mode == 3)
-		out = cello_blend(m_cello_coeff[0], palette_yuv888_entry(m_cello_colour), m_cello_coeff[1], out);
+		out = out_is_layer ? cello_blend(m_cello_coeff[0], palette_yuv888_entry(m_cello_colour), m_cello_coeff[1], out) : palette_yuv888_entry(m_cello_colour);
 
 	return yuv888_to_rgb(out);
 }
