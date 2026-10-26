@@ -250,7 +250,7 @@ ROM_END
 ROM_START( cjddzsp )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "cjddzsp_igs036", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "cjddzsp_igs036.bin", 0x00000, 0x4000, CRC(1146d5f4) SHA1(910662ac3c1d3f3f94abdf0f654a2fb5d96b7b97) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "cjddzsp_s122cn.u18",  0x000000, 0x200000, CRC(4a42aad6) SHA1(96805e5bfbd50686177fe50020229ea8787ade17) )
@@ -336,7 +336,7 @@ Notes:
 ROM_START( lhtb ) // PCB-0799-02-IU-1, every ROM label starts with 龍虎特別版
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "cn1012_igs036", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "cn1012_igs036.bin", 0x00000, 0x4000, CRC(b321b813) SHA1(55a5e6898920acf2a7a4afb581a974c77ecaba2f) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "s-101cn.u18",  0x000000, 0x200000, CRC(1020f4b5) SHA1(953bb776a804738c624a1dca336e42beb10238f7) )
@@ -549,7 +549,7 @@ ROM_END
 ROM_START( jhzb )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "jhzb_igs036", 0x0000, 0x4000, NO_DUMP ) // stickered K7
+	ROM_LOAD( "jhzb_igs036.bin", 0x0000, 0x4000, CRC(5436812e) SHA1(f579044b3984598013648a637611e6041cd6055e) ) // stickered K7
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
 	ROM_LOAD( "xa", 0x00000, 0x10000, NO_DUMP )
@@ -570,7 +570,7 @@ ROM_END
 ROM_START( jxry )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "jhzb_igs036", 0x0000, 0x4000, NO_DUMP ) // stickered A3
+	ROM_LOAD( "jxry_igs036.bin", 0x0000, 0x4000, CRC(cb1d4974) SHA1(c1a29330f2f844d514841d1e30eeec9a28743084) ) // stickered A3
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) stickered IL U14
 	ROM_LOAD( "xa", 0x00000, 0x10000, NO_DUMP )
@@ -633,7 +633,7 @@ ROM_END
 ROM_START( xyddz )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "jhzb_igs036", 0x0000, 0x4000, NO_DUMP ) // stickered K8
+	ROM_LOAD( "xyddz_igs036.bin", 0x0000, 0x4000, CRC(865e7daf) SHA1(1fc1c43f94394a5a03b268a1113c0af03d8f9a44) ) // stickered K8
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
 	ROM_LOAD( "xa", 0x00000, 0x10000, NO_DUMP )
@@ -726,7 +726,7 @@ ROM_END
 ROM_START( mjzhizun ) // PCB-0918-02-JV. Has a Xilinx XC9536XL
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "v21.igs036", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "mjzhizun_igs036.bin", 0x00000, 0x4000, CRC(6c84b00e) SHA1(161c98f7c76e24d0bbf09be616efc1e431d33b45) ) // stickered V21
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "s100cn.u40",  0x000000, 0x200000, CRC(4593e1de) SHA1(d50bb4de47cb6f01ba73c72749712c17f241f8ff) )
