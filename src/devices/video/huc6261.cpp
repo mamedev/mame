@@ -537,7 +537,7 @@ void huc6261_device::write(offs_t offset, u16 data)
 	{
 		/* Register */
 		case 0x00:
-			m_register = data;
+			m_register = data & 0x1f;
 			break;
 
 		case 0x01:
@@ -583,9 +583,12 @@ void huc6261_device::write(offs_t offset, u16 data)
 				case 0x05:
 				// King BG 2 & 3
 				case 0x06:
-				// <unused> & Rainbow
-				case 0x07:
 					m_palette_offset[m_register & 3] = data;
+					break;
+
+				// <unused> & Rainbow, only the low byte is used
+				case 0x07:
+					m_palette_offset[3] = data & 0xff;
 					break;
 
 				// Priority 0
