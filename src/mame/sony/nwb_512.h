@@ -92,11 +92,6 @@ private:
 			return fb_read && !fb_write;
 		}
 
-		bool is_host_to_fb() const
-		{
-			return !fb_read && fb_write;
-		}
-
 		bool is_fb_to_fb() const
 		{
 			return fb_read && fb_write;

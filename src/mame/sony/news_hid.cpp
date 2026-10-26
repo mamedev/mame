@@ -280,15 +280,15 @@ news_hid_serial_keyboard_device::news_hid_serial_keyboard_device(
 
 void news_hid_serial_keyboard_device::device_start()
 {
-}
-
-void news_hid_serial_keyboard_device::device_reset()
-{
 	// Keyboard is always 8N1 serial @ 9600 baud
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_tra_rate(9600);
 	set_rcv_rate(9600);
+	m_write_txd(1);
+}
 
+void news_hid_serial_keyboard_device::device_reset()
+{
 	receive_register_reset();
 	transmit_register_reset();
 	clear_fifo();
@@ -337,6 +337,11 @@ void news_hid_serial_mouse_device::device_start()
 	save_item(NAME(m_mouse_x));
 	save_item(NAME(m_mouse_y));
 	save_item(NAME(m_mouse_b));
+
+	// Mouse is always 8N1 serial @ 1200 baud
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_rate(1200);
+	m_write_txd(1);
 }
 
 void news_hid_serial_mouse_device::device_reset()
@@ -345,9 +350,6 @@ void news_hid_serial_mouse_device::device_reset()
 	m_mouse_y = m_mouse_y_axis->read();
 	m_mouse_b = m_mouse_buttons->read();
 
-	// Mouse is always 8N1 serial @ 1200 baud
-	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rate(1200);
 	transmit_register_reset();
 	clear_fifo();
 }
