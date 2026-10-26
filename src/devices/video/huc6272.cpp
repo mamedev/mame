@@ -1517,19 +1517,23 @@ u32 huc6272_device::adpcm_status_r(offs_t offset)
 }
 
 // start address in 256 word units, end address in words, intermediate address in 64 word units
+// only the end address is wider than 16 bits; its halves are written independently
 template <unsigned N> void huc6272_device::adpcm_start_address_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_adpcm.start[N] = (data & 0x3ff) * 256;
+	if (ACCESSING_BITS_0_15)
+		m_adpcm.start[N] = (data & 0x3ff) * 256;
 }
 
 template <unsigned N> void huc6272_device::adpcm_end_address_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_adpcm.end[N] = data & 0x3ffff;
+	COMBINE_DATA(&m_adpcm.end[N]);
+	m_adpcm.end[N] &= 0x3ffff;
 }
 
 template <unsigned N> void huc6272_device::adpcm_imm_address_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_adpcm.imm[N] = (data & 0xfff) * 64;
+	if (ACCESSING_BITS_0_15)
+		m_adpcm.imm[N] = (data & 0xfff) * 64;
 }
 
 // fetch the next word of ADPCM data and handle the end/intermediate addresses
