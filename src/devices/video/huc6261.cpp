@@ -47,6 +47,7 @@ huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, d
 	, m_palette_latch(0)
 	, m_register(0)
 	, m_control(0)
+	, m_control_reg(0)
 	, m_priority{0}
 	, m_pixels_per_clock(0)
 	, m_pixel_data{0}
@@ -316,6 +317,13 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 			m_huc6270[1]->hsync_changed(1);
 			m_pixel_clock = 0;
 			v = (v + 1) % m_height;
+			if (v == 0)
+			{
+				m_control = m_control_reg;
+				m_pixels_per_clock = BIT(m_control, 3) ? 3 : 4;
+			}
+			else
+				m_control = (m_control & 0x80ff) | (m_control_reg & 0x7f00);
 			bitmap_line = &m_bmp.pix(v);
 			start_line(v);
 			break;
@@ -464,7 +472,7 @@ u16 huc6261_device::read(offs_t offset)
 			switch (m_register)
 			{
 				case 0x00:
-					data = m_control;
+					data = m_control_reg;
 					break;
 
 				case 0x01:
@@ -557,9 +565,9 @@ void huc6261_device::write(offs_t offset, u16 data)
 				// ---- ---- ---- x--- Dot clock: 0 - 5MHz, 1 - 7MHz
 				// ---- ---- ---- -x-- Synchronization: 0 - internal, 1 - external
 				// ---- ---- ---- --xx Screen height: 00 - 262 lines, 01 - 263 lines, 10 - interlace, 11 - unknown/undefined
+				// bits 8-14 take effect from the next line, the others from the next frame
 				case 0x00:
-					m_control = data;
-					m_pixels_per_clock = BIT(data, 3) ? 3 : 4;
+					m_control_reg = data;
 					break;
 
 				// Palette address
@@ -671,6 +679,7 @@ void huc6261_device::device_start()
 	save_item(NAME(m_address));
 	save_item(NAME(m_register));
 	save_item(NAME(m_control));
+	save_item(NAME(m_control_reg));
 	save_item(NAME(m_priority));
 	save_item(NAME(m_pixels_per_clock));
 	save_item(NAME(m_pixel_data));
@@ -693,6 +702,7 @@ void huc6261_device::device_reset()
 	// all registers are cleared except R0F, which is set to FFh
 	m_register = 0;
 	m_control = 0;
+	m_control_reg = 0;
 	m_address = 0;
 	m_palette_latch = 0;
 	std::fill(std::begin(m_palette_offset), std::end(m_palette_offset), 0);

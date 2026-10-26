@@ -79,7 +79,8 @@ private:
 	u16  m_address;
 	u16  m_palette_latch;
 	u16  m_register;
-	u16  m_control;
+	u16  m_control;         // R00 as currently applied
+	u16  m_control_reg;     // R00 as written
 	u8   m_priority[7];
 
 	u8   m_pixels_per_clock; // Number of pixels to output per colour clock
