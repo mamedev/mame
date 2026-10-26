@@ -66,7 +66,7 @@ HWND sourceview_info::create_source_file_combobox(HWND parent, LONG_PTR userdata
 		smart_show_window(result, false);
 	}
 
-	m_combownd = result;			// Cache a non-owning reference to update as PC changes
+	m_combownd = result;            // Cache a non-owning reference to update as PC changes
 	return result;
 }
 
@@ -121,7 +121,7 @@ void sourceview_info::update()
 		populate_source_file_combo();
 		return;
 	}
-	
+
 	// Current source-code-file can change just by stepping.  Update
 	// combobox selection to match whatever the current source-code-file is now.
 	LRESULT num_items = SendMessage(m_combownd, CB_GETCOUNT, 0, 0);

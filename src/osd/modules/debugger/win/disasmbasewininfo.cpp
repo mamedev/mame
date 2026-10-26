@@ -194,7 +194,7 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 
 				// first find an existing breakpoint at this address
 				const debug_breakpoint *bp = debug->breakpoint_find(address);
-				
+
 				// if it doesn't exist, add a new one
 				if (!is_main_console())
 				{

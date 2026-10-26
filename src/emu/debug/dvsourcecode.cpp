@@ -184,7 +184,7 @@ void debug_view_sourcecode::view_update()
 
 //-------------------------------------------------
 // viewdata_text_update - Helper for view_update
-// to do the actual printing of the source file 
+// to do the actual printing of the source file
 //-------------------------------------------------
 
 void debug_view_sourcecode::viewdata_text_update(bool pc_changed, offs_t pc)

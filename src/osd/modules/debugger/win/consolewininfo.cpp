@@ -412,7 +412,7 @@ void consolewin_info::recompute_children()
 	srcrect.bottom = disrect.bottom - EDGE_WIDTH;
 	srcrect.left = disrect.left;
 	srcrect.right = disrect.right;
-	
+
 	// set the bounds of things
 	smart_set_window_bounds(m_filecombownd, window(), comborect);
 	m_views[VIEW_IDX_SOURCE]->set_bounds(srcrect);

@@ -74,7 +74,7 @@ private:
 	device_t *m_current_cpu;
 	HMENU m_devices_menu;
 	std::map<std::string,std::string> slmap;
-	HWND m_filecombownd;						// Source-level debugging file selector
+	HWND m_filecombownd;                        // Source-level debugging file selector
 };
 
 } // namespace osd::debugger::win

@@ -1334,7 +1334,7 @@ void debugger_commands::execute_srcdbg_set_offset(const std::vector<std::string_
 //-------------------------------------------------
 //  execute_srcdbg_provider_list - execute the
 //  source-level debugging sdlist command to show
-// 	all loaded srcdbg providers
+//  all loaded srcdbg providers
 //-------------------------------------------------
 
 void debugger_commands::execute_srcdbg_provider_list(const std::vector<std::string_view> &)
@@ -1358,8 +1358,8 @@ void debugger_commands::execute_srcdbg_provider_list(const std::vector<std::stri
 //  execute_srcdbg_provider_list - execute the
 //  source-level debugging sdenable / sddisable
 //  commands to selectively enable or disable a
-//	loaded srcdbg provider, to allow for
-//	MMU-aware debugging
+//  loaded srcdbg provider, to allow for
+//  MMU-aware debugging
 //-------------------------------------------------
 
 void debugger_commands::execute_srcdbg_provider_disenable(bool enable, const std::vector<std::string_view> &params)

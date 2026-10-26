@@ -663,7 +663,7 @@ void SrcdbgDockWidget::update()
 		populateSrcdbgCombo();
 		return;
 	}
-	
+
 	u32 numItems = m_srcdbgCombo->count();
 	for (u32 comboIdx = 0; comboIdx < numItems; comboIdx++)
 	{

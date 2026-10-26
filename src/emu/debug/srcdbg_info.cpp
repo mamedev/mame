@@ -5,8 +5,8 @@
     srcdbg_info.cpp
 
     Implementation of srcdbg_provider_base (the interface to
-	source-debugging info consumed by the debugger) which
-	aggregates 1 or more loaded source-debugging files.
+    source-debugging info consumed by the debugger) which
+    aggregates 1 or more loaded source-debugging files.
 
 ***************************************************************************/
 
@@ -23,13 +23,13 @@
 //-------------------------------------------------
 // create_debug_info - Factory to instantiate
 // srcdbg_info, which in turn calls factories that
-// load individual srcdbg info files and instantiate their 
+// load individual srcdbg info files and instantiate their
 // srcdbg_provider_base implementations.  This
 // returns nullptr if there's an error or the user
 // is not running with source-debugging enabled.
 //-------------------------------------------------
 
-// static 
+// static
 srcdbg_info * srcdbg_info::create_debug_info(running_machine &machine)
 {
 	// Get paths to all srcdbg info files specified on command line
@@ -216,7 +216,7 @@ void srcdbg_info::get_srcdbg_symbols(
 	for (const srcdbg_provider_entry & sp : m_providers)
 	{
 		// Global fixed symbols - each one encountered gets cached in m_provider_globals
-		const std::vector<srcdbg_provider_base::global_fixed_symbol> & srcdbg_global_symbols = 
+		const std::vector<srcdbg_provider_base::global_fixed_symbol> & srcdbg_global_symbols =
 			sp.c_provider()->global_fixed_symbols();
 		for (u32 i=0; i < srcdbg_global_symbols.size(); i++)
 		{
@@ -232,7 +232,7 @@ void srcdbg_info::get_srcdbg_symbols(
 		}
 
 		// Local fixed symbols - each one encountered gets cached in m_provider_locals
-		const std::vector<srcdbg_provider_base::local_fixed_symbol> & srcdbg_local_fixed_symbols = 
+		const std::vector<srcdbg_provider_base::local_fixed_symbol> & srcdbg_local_fixed_symbols =
 			sp.c_provider()->local_fixed_symbols();
 		for (u32 i=0; i < srcdbg_local_fixed_symbols.size(); i++)
 		{
@@ -250,7 +250,7 @@ void srcdbg_info::get_srcdbg_symbols(
 
 		// Local "relative" symbols (values are offsets to a register) - each one
 		// encountered gets cached in m_provider_locals
-		const std::vector<srcdbg_provider_base::local_relative_symbol> & srcdbg_local_relative_symbols = 
+		const std::vector<srcdbg_provider_base::local_relative_symbol> & srcdbg_local_relative_symbols =
 			sp.c_provider()->local_relative_symbols();
 		for (u32 i=0; i < srcdbg_local_relative_symbols.size(); i++)
 		{
@@ -306,7 +306,7 @@ void srcdbg_info::get_srcdbg_symbols(
 //-------------------------------------------------
 
 bool srcdbg_info::file_index_to_path(u32 file_index, const srcdbg_provider_base::source_file_path ** path) const
-{ 
+{
 	std::vector<provider_file> provider_files;
 	if (!file_index_to_provider_files(file_index, provider_files))
 	{
@@ -390,7 +390,7 @@ bool srcdbg_info::file_index_to_provider_files(u32 file_index, std::vector<provi
 
 void srcdbg_info::file_line_to_address_ranges(u32 file_index, u32 line_number, std::vector<srcdbg_provider_base::address_range> & ranges) const
 {
-	std::vector<provider_file> provider_files;	
+	std::vector<provider_file> provider_files;
 	if (!file_index_to_provider_files(file_index, provider_files))
 	{
 		return;
@@ -449,7 +449,7 @@ bool srcdbg_info::address_to_file_line(offs_t address, file_line & loc) const
 
 //-------------------------------------------------
 // srcdbg_info - update_view_needs_full_refresh
-// Returns and then resets bool indicating whether 
+// Returns and then resets bool indicating whether
 // debug_view_sourcecode needs a full refresh
 // (e.g., b/c a source-debugging info was enabled
 // or disabled during MMU-aware debugging)
@@ -484,8 +484,8 @@ void srcdbg_info::coalesce()
 			m_path = path;
 			m_agg_idx = agg_idx;
 		}
-		const char *	m_path;
-		u32				m_agg_idx;
+		const char *    m_path;
+		u32             m_agg_idx;
 	};
 	std::vector<path_and_agg_idx> path_and_agg_idxs;
 
@@ -515,7 +515,7 @@ void srcdbg_info::coalesce()
 			// If this file has already been encountered from another provider,
 			// reuse the same aggregated file index
 			u32 agg_file_idx = u32(-1);
-			
+
 			for (const path_and_agg_idx & path_agg : path_and_agg_idxs)
 			{
 				std::error_code err;

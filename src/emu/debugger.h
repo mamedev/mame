@@ -44,7 +44,7 @@ private:
 	std::unique_ptr<debugger_commands> m_commands;
 	std::unique_ptr<debugger_cpu> m_cpu;
 	std::unique_ptr<debugger_console> m_console;
-	std::unique_ptr<srcdbg_info> m_debug_info;								// Note: wrapped ptr can be null!
+	std::unique_ptr<srcdbg_info> m_debug_info;                              // Note: wrapped ptr can be null!
 };
 
 

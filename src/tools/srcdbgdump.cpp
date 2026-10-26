@@ -129,10 +129,10 @@ bool srcdbg_dump::on_read_local_fixed_symbol_value(const local_fixed_symbol_valu
 	for (u32 i = 0; i < value.num_address_ranges; i++)
 	{
 		printf(
-			"value: $%08X, flags: $%08X\taddress range: $%04X-$%04X\n", 
+			"value: $%08X, flags: $%08X\taddress range: $%04X-$%04X\n",
 			value.local_fixed_address_ranges[i].symbol_value,
 			value.local_fixed_address_ranges[i].symbol_flags,
-			value.local_fixed_address_ranges[i].range.address_first, 
+			value.local_fixed_address_ranges[i].range.address_first,
 			value.local_fixed_address_ranges[i].range.address_last);
 	}
 	return true;

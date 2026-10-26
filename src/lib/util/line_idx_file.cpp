@@ -41,22 +41,22 @@ std::error_condition line_indexed_file::open(const char * file_path, int spaces_
 	}
 
 	unsigned int cur_line_start = 0;
-    for (unsigned int i = 0; i < m_data.size() - 1; i++)                 // Ignore final char, enable [i+1] in body
+	for (unsigned int i = 0; i < m_data.size() - 1; i++)                 // Ignore final char, enable [i+1] in body
 	{
 		// Replace tabs with spaces for more consistent alignment
 		if (m_data[i] == '\t')
 		{
-            unsigned int col = i - cur_line_start;
-            int num_spaces_until_next_tab_stop = spaces_per_tab - (col % spaces_per_tab);
-            m_data[i] = ' ';									// Tab char -> first space
+			unsigned int col = i - cur_line_start;
+			int num_spaces_until_next_tab_stop = spaces_per_tab - (col % spaces_per_tab);
+			m_data[i] = ' ';                                    // Tab char -> first space
 			for (int j = 0; j < num_spaces_until_next_tab_stop - 1; j++)
 			{
-                m_data.insert(m_data.cbegin() + i, ' ');		// Insert remaining spaces
+				m_data.insert(m_data.cbegin() + i, ' ');        // Insert remaining spaces
 			}
-            i += num_spaces_until_next_tab_stop - 1;			// Skip over inserted spaces
+			i += num_spaces_until_next_tab_stop - 1;            // Skip over inserted spaces
 			continue;
 		}
-		
+
 		// Check for line endings
 		bool crlf = (m_data[i] == '\r' && m_data[i+1] == '\n');
 		bool line_end = crlf || (m_data[i] == '\n');

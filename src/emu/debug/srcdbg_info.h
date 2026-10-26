@@ -5,8 +5,8 @@
     srcdbg_info.h
 
     Implementation of srcdbg_provider_base (the interface to
-	source-debugging info consumed by the debugger) which
-	aggregates 1 or more loaded source-debugging files.
+    source-debugging info consumed by the debugger) which
+    aggregates 1 or more loaded source-debugging files.
 
 ***************************************************************************/
 
@@ -45,7 +45,7 @@ public:
 			: m_name(std::move(that.m_name))
 			, m_provider(std::move(that.m_provider))
 			, m_enabled(that.m_enabled)
-		{			
+		{
 		}
 
 		~srcdbg_provider_entry() {}
@@ -104,8 +104,8 @@ private:
 			m_file_idx = file_idx;
 		}
 
-		std::size_t		m_provider_idx;
-		u32				m_file_idx;
+		std::size_t     m_provider_idx;
+		u32             m_file_idx;
 	};
 
 	// Pairs a provider with an index into its list of global syms
@@ -143,7 +143,7 @@ private:
 	// agg file index to list of (provider index, local file index) pairs
 	// [agg_file] = { (provider_idx, local_file_idx), ... }
 	std::vector<std::vector<provider_file>>  m_agg_file_to_provider_files;
-	
+
 	// provider index + local file index to agg file index
 	// [provider_idx[local_file_idx]] = agg_file
 	std::vector<std::vector<u32>>                                 m_provider_file_to_agg_file;
@@ -151,7 +151,7 @@ private:
 	// these map a symbol name to a list of provider symbols with that name
 	std::unordered_map<std::string, std::vector<provider_global>> m_provider_globals;
 	std::unordered_map<std::string, std::vector<provider_local>>  m_provider_locals;
-	
+
 	std::vector<srcdbg_provider_entry>                            m_providers;
 	s32                                                           m_offset;
 	bool                                                          m_view_needs_full_refresh;

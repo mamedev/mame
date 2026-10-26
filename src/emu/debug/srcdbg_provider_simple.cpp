@@ -26,10 +26,10 @@
 #include <filesystem>
 #include <sstream>
 
-#define LOG_WARNING		(1U << 1)
+#define LOG_WARNING     (1U << 1)
 // need to set LOG_OUTPUT_FUNC or LOG_OUTPUT_STREAM because there's no logerror outside devices
-#define LOG_OUTPUT_FUNC	osd_printf_verbose
-#define VERBOSE			(0)
+#define LOG_OUTPUT_FUNC osd_printf_verbose
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 
@@ -113,12 +113,12 @@ static bool symbol_from_reg_id(const device_state_interface * state, char reg_id
 			{ MAME_SRCDBG_REGISTER_6809_PC, M6809_PC },
 			{ MAME_SRCDBG_REGISTER_6809_SP, M6809_S },
 			{ MAME_SRCDBG_REGISTER_6809_CC, M6809_CC },
-			{ MAME_SRCDBG_REGISTER_6809_A, 	M6809_A },
-			{ MAME_SRCDBG_REGISTER_6809_B, 	M6809_B },
-			{ MAME_SRCDBG_REGISTER_6809_D, 	M6809_D },
-			{ MAME_SRCDBG_REGISTER_6809_U, 	M6809_U },
-			{ MAME_SRCDBG_REGISTER_6809_X, 	M6809_X },
-			{ MAME_SRCDBG_REGISTER_6809_Y, 	M6809_Y },
+			{ MAME_SRCDBG_REGISTER_6809_A,  M6809_A },
+			{ MAME_SRCDBG_REGISTER_6809_B,  M6809_B },
+			{ MAME_SRCDBG_REGISTER_6809_D,  M6809_D },
+			{ MAME_SRCDBG_REGISTER_6809_U,  M6809_U },
+			{ MAME_SRCDBG_REGISTER_6809_X,  M6809_X },
+			{ MAME_SRCDBG_REGISTER_6809_Y,  M6809_Y },
 			{ MAME_SRCDBG_REGISTER_6809_DP, M6809_DP },
 		};
 
@@ -254,7 +254,7 @@ bool srcdbg_import::on_read_local_fixed_symbol_value(const local_fixed_symbol_va
 	srcdbg_provider_base::local_fixed_symbol sym(
 		m_symbol_names[value.symbol_name_index],
 		std::move(ranges));
-	
+
 	m_srcdbg_simple.m_local_fixed_symbols.push_back(std::move(sym));
 
 	return true;
@@ -528,7 +528,7 @@ u64 srcdbg_provider_simple::get_global_fixed_sym_value(u32 global_idx) const
 // Called by is_in_scope() for srcdbg local-fixed symbols.
 bool srcdbg_provider_simple::is_local_fixed_sym_in_scope(u32 local_fixed_idx) const
 {
-	const device_state_interface * state = 
+	const device_state_interface * state =
 		device_interface_enumerator<device_state_interface>(m_machine.root_device()).first();
 
 	u64 pc = state->state_find_entry(STATE_GENPC)->value();
@@ -547,7 +547,7 @@ bool srcdbg_provider_simple::is_local_fixed_sym_in_scope(u32 local_fixed_idx) co
 // Called by value() for srcdbg local-fixed symbols.  Applies offset as necessary.
 u64 srcdbg_provider_simple::get_local_fixed_sym_value(u32 local_fixed_idx) const
 {
-	const device_state_interface * state = 
+	const device_state_interface * state =
 		device_interface_enumerator<device_state_interface>(m_machine.root_device()).first();
 
 	u64 pc = state->state_find_entry(STATE_GENPC)->value();
@@ -574,7 +574,7 @@ u64 srcdbg_provider_simple::get_local_fixed_sym_value(u32 local_fixed_idx) const
 // Called by is_in_scope() for srcdbg local-relative symbols.
 bool srcdbg_provider_simple::is_local_relative_sym_in_scope(u32 m_local_relative_idx) const
 {
-	const device_state_interface * state = 
+	const device_state_interface * state =
 		device_interface_enumerator<device_state_interface>(m_machine.root_device()).first();
 
 	u64 pc = state->state_find_entry(STATE_GENPC)->value();
@@ -586,13 +586,13 @@ bool srcdbg_provider_simple::is_local_relative_sym_in_scope(u32 m_local_relative
 		}
 	}
 
-	return false;	
+	return false;
 }
 
 // Called by value() for srcdbg local-relative symbols.
 u64 srcdbg_provider_simple::get_local_relative_sym_value(u32 local_relative_idx, symbol_table & symtable) const
 {
-	const device_state_interface * state = 
+	const device_state_interface * state =
 		device_interface_enumerator<device_state_interface>(m_machine.root_device()).first();
 
 	u64 pc = state->state_find_entry(STATE_GENPC)->value();
@@ -610,7 +610,7 @@ u64 srcdbg_provider_simple::get_local_relative_sym_value(u32 local_relative_idx,
 
 	// is_in_scope gates the calling of this function
 	assert (false && "get_local_relative_sym_value called when out of scope");
-	return 0;	
+	return 0;
 }
 
 // Helper used by get_local_relative_sym_value() to generate a string

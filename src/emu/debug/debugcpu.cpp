@@ -560,7 +560,7 @@ device_debug::device_debug(device_t &device)
 		{
 			m_symtable_device = std::make_unique<symbol_table>(device.machine(), symbol_table::CPU_STATE, &device.machine().debugger().cpu().global_symtable(), &device);
 			m_symtable = m_symtable_device.get();
-			
+
 			m_symtable_device->add("cycles", [this]() { return m_exec->cycles_remaining(); });
 			m_symtable_device->add("totalcycles", symbol_table::READ_ONLY, &m_total_cycles);
 			m_symtable_device->add("lastinstructioncycles", [this]() { return m_total_cycles - m_last_total_cycles; });
@@ -2312,7 +2312,7 @@ void device_debug::tracer::update(offs_t pc)
 
 //-------------------------------------------------
 //  get_srcdbg_line - given a pc, find the
-//	corresponding source line
+//  corresponding source line
 //-------------------------------------------------
 
 void device_debug::tracer::get_srcdbg_line(offs_t pc, std::string & srcdbg_line)
@@ -2328,7 +2328,7 @@ void device_debug::tracer::get_srcdbg_line(offs_t pc, std::string & srcdbg_line)
 	{
 		return;
 	}
-	
+
 	if (loc.file_index() != m_opened_srcdbg_file_index)
 	{
 		const srcdbg_provider_base::source_file_path * path;

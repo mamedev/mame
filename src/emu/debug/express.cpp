@@ -373,31 +373,31 @@ std::string expression_error::code_string() const
 {
 	switch (m_code)
 	{
-		case NOT_LVAL:              		return "not an lvalue";
-		case NOT_RVAL:              		return "not an rvalue";
-		case SYNTAX:                		return "syntax error";
-		case UNKNOWN_SYMBOL:        		return "unknown symbol";
-		case INVALID_NUMBER:        		return "invalid number";
-		case INVALID_TOKEN:         		return "invalid token";
-		case STACK_OVERFLOW:        		return "stack overflow";
-		case STACK_UNDERFLOW:       		return "stack underflow";
-		case UNBALANCED_PARENS:     		return "unbalanced parentheses";
-		case DIVIDE_BY_ZERO:        		return "divide by zero";
-		case OUT_OF_MEMORY:         		return "out of memory";
-		case INVALID_PARAM_COUNT:   		return "invalid number of parameters";
-		case TOO_FEW_PARAMS:        		return util::string_format(std::locale::classic(), "too few parameters (at least %d required)", m_num);
-		case TOO_MANY_PARAMS:       		return util::string_format(std::locale::classic(), "too many parameters (no more than %d accepted)", m_num);
-		case UNBALANCED_QUOTES:     		return "unbalanced quotes";
-		case TOO_MANY_STRINGS:      		return "too many strings";
-		case INVALID_MEMORY_SIZE:   		return "invalid memory size (b/w/d/q expected)";
-		case NO_SUCH_MEMORY_SPACE:  		return "non-existent memory space";
-		case INVALID_MEMORY_SPACE:  		return "invalid memory space (p/d/i/o/r/m/s expected)";
-		case INVALID_MEMORY_NAME:   		return "invalid memory name";
-		case MISSING_MEMORY_NAME:   		return "missing memory name";
+		case NOT_LVAL:                      return "not an lvalue";
+		case NOT_RVAL:                      return "not an rvalue";
+		case SYNTAX:                        return "syntax error";
+		case UNKNOWN_SYMBOL:                return "unknown symbol";
+		case INVALID_NUMBER:                return "invalid number";
+		case INVALID_TOKEN:                 return "invalid token";
+		case STACK_OVERFLOW:                return "stack overflow";
+		case STACK_UNDERFLOW:               return "stack underflow";
+		case UNBALANCED_PARENS:             return "unbalanced parentheses";
+		case DIVIDE_BY_ZERO:                return "divide by zero";
+		case OUT_OF_MEMORY:                 return "out of memory";
+		case INVALID_PARAM_COUNT:           return "invalid number of parameters";
+		case TOO_FEW_PARAMS:                return util::string_format(std::locale::classic(), "too few parameters (at least %d required)", m_num);
+		case TOO_MANY_PARAMS:               return util::string_format(std::locale::classic(), "too many parameters (no more than %d accepted)", m_num);
+		case UNBALANCED_QUOTES:             return "unbalanced quotes";
+		case TOO_MANY_STRINGS:              return "too many strings";
+		case INVALID_MEMORY_SIZE:           return "invalid memory size (b/w/d/q expected)";
+		case NO_SUCH_MEMORY_SPACE:          return "non-existent memory space";
+		case INVALID_MEMORY_SPACE:          return "invalid memory space (p/d/i/o/r/m/s expected)";
+		case INVALID_MEMORY_NAME:           return "invalid memory name";
+		case MISSING_MEMORY_NAME:           return "missing memory name";
 		case SRCDBG_UNAVAILABLE:            return "source-level debugging information is unavailable; '" OPTION_SRCDBGINFO "' option required";
 		case SRCDBG_FILE_UNAVAILABLE:       return "specified file path does not uniquely identify a source path from the source-level debugging information";
 		case SRCDBG_FILE_LINE_UNAVAILABLE:  return "specified file path was found, but no address is attributed to specified line number";
-		default:                    		return "unknown error";
+		default:                            return "unknown error";
 	}
 }
 

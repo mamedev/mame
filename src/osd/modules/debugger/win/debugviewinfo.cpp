@@ -371,7 +371,7 @@ void debugview_info::save_configuration_to_node(util::xml::data_node &node)
 
 ui_metrics const & debugview_info::metrics() const
 {
-	 return m_owner.metrics(); 
+	 return m_owner.metrics();
 }
 
 

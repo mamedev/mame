@@ -259,7 +259,7 @@ private:
 		offs_t              m_trace_over_target;        // target for tracing over
 														//    (0 = not tracing over,
 														//    ~0 = not currently tracing over)
-		u16					m_opened_srcdbg_file_index; // Index of source file currently opened
+		u16                 m_opened_srcdbg_file_index; // Index of source file currently opened
 		std::unique_ptr<util::line_indexed_file> m_opened_srcdbg_file; // Source file currently opened
 	};
 	std::unique_ptr<tracer>                m_trace;     // tracer state
