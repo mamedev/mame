@@ -1256,7 +1256,6 @@ end
 --------------------------------------------------
 -- Intel 8051 and derivatives
 --@src/devices/cpu/mcs51/i8051.h,CPUS["MCS51"] = true
---@src/devices/cpu/mcs51/dw8051.h,CPUS["MCS51"] = true
 --------------------------------------------------
 
 if CPUS["MCS51"] then
