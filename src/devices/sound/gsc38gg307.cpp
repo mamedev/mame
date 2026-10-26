@@ -212,7 +212,7 @@ void gsc38gg307_device::audio_es_write(const uint8_t *data, size_t length)
 	// an overflowing FIFO drops the newest data
 	length = std::min(length, AUDIO_BUFFER_SIZE - m_audio_es_tail);
 	std::copy_n(data, length, &m_audio_es[m_audio_es_tail]);
-	m_audio_es_tail += length;
+	m_audio_es_tail += uint32_t(length);
 }
 
 void gsc38gg307_device::audio_decode_pending()
@@ -253,7 +253,7 @@ void gsc38gg307_device::audio_decode_pending()
 		int pos = int(m_audio_es_head * 8);
 		int count = 0, rate = 0, channels = 0;
 		const bool decoded = m_audio->decode_buffer(pos, int((m_audio_es_head + frame_bytes) * 8), samples, count, rate, channels);
-		m_audio_es_head += frame_bytes;
+		m_audio_es_head += uint32_t(frame_bytes);
 		if (!decoded)
 		{
 			LOGMASKED(LOG_AUDIO, "FMA undecodable frame skipped\n");

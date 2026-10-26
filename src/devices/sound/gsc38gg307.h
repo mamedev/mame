@@ -143,7 +143,7 @@ private:
 	// driver keeps it far below its size.
 	static constexpr size_t AUDIO_BUFFER_SIZE = 64 * 1024;
 	uint8_t m_audio_es[AUDIO_BUFFER_SIZE]{};
-	size_t m_audio_es_head = 0, m_audio_es_tail = 0;
+	uint32_t m_audio_es_head = 0, m_audio_es_tail = 0;
 	std::unique_ptr<mpeg_audio> m_audio;
 	size_t audio_es_available() const { return m_audio_es_tail - m_audio_es_head; }
 
