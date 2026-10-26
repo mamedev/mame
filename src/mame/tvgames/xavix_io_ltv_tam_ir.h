@@ -8,6 +8,8 @@
 
 #include "xavix_io_ir.h"
 
+#include "imagedev/bitbngr.h"
+
 #include <array>
 #include <utility>
 
@@ -19,17 +21,17 @@ public:
 	template <typename... T> void set_event_callback(T &&... args) { m_event_out_cb.set(std::forward<T>(args)...); }
 
 	int data_r() const { return m_rx_data; }
-	void send_request(int state);
 	void tx_w(int state);
 
 protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
-	static constexpr unsigned PACKET_BYTES = 20;
-	static constexpr unsigned PACKET_BITS = PACKET_BYTES * 8;
+	// Stream frames have a two-byte big-endian byte count, followed by the payload.
+	// This buffer limit belongs to the transport, not the optical protocol.
+	static constexpr unsigned MAX_PACKET_BYTES = 256;
 	static constexpr u32 CARRIER_HALF_TICKS = (0x8d + 1) << 1;
 	static constexpr u32 LEADER_MARK_TICKS = 0x2d6 * CARRIER_HALF_TICKS;
 	static constexpr u32 LEADER_SPACE_TICKS = (0xc8 + 1) << 8;
@@ -47,13 +49,6 @@ private:
 	static constexpr u32 TX_BIT_THRESHOLD_TICKS = (ZERO_SPACE_TICKS + ONE_SPACE_TICKS) / 2;
 	static constexpr u32 TX_FRAME_GAP_MAX_TICKS = LEADER_SPACE_TICKS * 3 / 2;
 
-	// This factory-test request has no established real character/profile identity.
-	static constexpr std::array<u8, PACKET_BYTES> REQUEST_PACKET =
-	{
-		0xe4, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x24
-	};
-
 	enum receive_phase : u8
 	{
 		IDLE,
@@ -64,7 +59,9 @@ private:
 		TRAILER_MARK
 	};
 
+	TIMER_CALLBACK_MEMBER(poll_stream);
 	TIMER_CALLBACK_MEMBER(receive_tick);
+	void reset_link();
 	void start_receive_mark(receive_phase phase, u32 ticks);
 	u32 receive_space_ticks() const;
 	virtual void ir_burst_started(u64 gap_ticks) override;
@@ -72,22 +69,27 @@ private:
 	virtual void ir_idle_timeout() override;
 	void append_transmit_bit(bool bit);
 	void finish_transmit_packet();
-	bool validate_acknowledgement() const;
 
+	required_device<bitbanger_device> m_stream;
+	util::notifier_subscription m_media_notifier;
 	device_delegate<void ()> m_event_out_cb;
+	emu_timer *m_poll_timer;
 	emu_timer *m_receive_timer;
 
-	std::array<u8, PACKET_BYTES> m_receive_packet;
-	std::array<u8, PACKET_BYTES> m_transmit_packet;
+	std::array<u8, MAX_PACKET_BYTES> m_receive_packet;
+	std::array<u8, MAX_PACKET_BYTES> m_transmit_packet;
+	u16 m_stream_length;
+	u16 m_stream_bytes;
+	u8 m_stream_header_bytes;
 	u8 m_receive_phase;
+	u16 m_receive_length;
 	u16 m_receive_bit;
 	u8 m_transmit_shift;
 	u8 m_transmit_bit;
-	u8 m_transmit_bytes;
+	u16 m_transmit_bytes;
 	u8 m_rx_data;
 	bool m_transmit_frame;
 	bool m_transmit_mark_pending;
-	bool m_acknowledgement_valid;
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_TAMAGOTCHI_IR, xavix_tamagotchi_ir_device)

@@ -2,10 +2,11 @@
 // copyright-holders:MagikalUnicorn
 /***************************************************************************
 
-    Infrared link peer for the Let's! TV Play Tamagotchi system. Sends a
-    predefined Tamagotchi request as receiver pulses, decodes the console's
-    transmitted carrier bursts and validates its acknowledgement. This models
-    a single request/response exchange.
+    Infrared transceiver for the Let's! TV Play Tamagotchi system. A bitbanger
+    image connects an external peer using frames with a two-byte big-endian
+    length and 1-256 payload bytes. The device converts frames to timed receiver
+    pulses and transmitted carrier bursts back to frames. Application payloads,
+    checksums and acknowledgements belong to the ROM and external peer.
 
     TODO:
     - Measure external transmitter polarity and carrier-burst limits.
@@ -22,14 +23,6 @@
 
 DEFINE_DEVICE_TYPE(XAVIX_TAMAGOTCHI_IR, xavix_tamagotchi_ir_device, "xavix_tamagotchi_ir", "XaviX Tamagotchi Infrared Link")
 
-static INPUT_PORTS_START( xavix_tamagotchi_ir )
-	PORT_START("SEND")
-	// The implemented packet is a factory request with no identified retail profile.
-	// PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Send Tamagotchi Data") PORT_CODE(KEYCODE_T)
-	//     PORT_WRITE_LINE_MEMBER(FUNC(xavix_tamagotchi_ir_device::send_request))
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-INPUT_PORTS_END
-
 xavix_tamagotchi_ir_device::xavix_tamagotchi_ir_device(
 		const machine_config &mconfig,
 		const char *tag,
@@ -37,6 +30,7 @@ xavix_tamagotchi_ir_device::xavix_tamagotchi_ir_device(
 		u32 clock)
 	: device_t(mconfig, XAVIX_TAMAGOTCHI_IR, tag, owner, clock)
 	, xavix_ir_receiver_interface(*this, TX_SILENCE_TICKS, false)
+	, m_stream(*this, "stream")
 	, m_event_out_cb(*this)
 	, m_receive_phase(receive_phase::IDLE)
 	, m_rx_data(1)
@@ -44,9 +38,9 @@ xavix_tamagotchi_ir_device::xavix_tamagotchi_ir_device(
 {
 }
 
-ioport_constructor xavix_tamagotchi_ir_device::device_input_ports() const
+void xavix_tamagotchi_ir_device::device_add_mconfig(machine_config &config)
 {
-	return INPUT_PORTS_NAME( xavix_tamagotchi_ir );
+	BITBANGER(config, m_stream);
 }
 
 void xavix_tamagotchi_ir_device::device_start()
@@ -54,11 +48,18 @@ void xavix_tamagotchi_ir_device::device_start()
 	m_event_out_cb.resolve_safe();
 
 	assert(clock());
+	m_poll_timer = timer_alloc(FUNC(xavix_tamagotchi_ir_device::poll_stream), this);
 	m_receive_timer = timer_alloc(FUNC(xavix_tamagotchi_ir_device::receive_tick), this);
+	m_media_notifier = m_stream->add_media_change_notifier(
+		[this] (device_image_interface::media_change_event) { reset_link(); });
 
 	save_item(NAME(m_receive_packet));
 	save_item(NAME(m_transmit_packet));
+	save_item(NAME(m_stream_length));
+	save_item(NAME(m_stream_bytes));
+	save_item(NAME(m_stream_header_bytes));
 	save_item(NAME(m_receive_phase));
+	save_item(NAME(m_receive_length));
 	save_item(NAME(m_receive_bit));
 	save_item(NAME(m_transmit_shift));
 	save_item(NAME(m_transmit_bit));
@@ -66,16 +67,26 @@ void xavix_tamagotchi_ir_device::device_start()
 	save_item(NAME(m_rx_data));
 	save_item(NAME(m_transmit_frame));
 	save_item(NAME(m_transmit_mark_pending));
-	save_item(NAME(m_acknowledgement_valid));
 }
 
 void xavix_tamagotchi_ir_device::device_reset()
 {
-	m_receive_timer->adjust(attotime::never);
+	reset_link();
 	ir_receiver_reset(true);
+}
+
+void xavix_tamagotchi_ir_device::reset_link()
+{
+	m_poll_timer->adjust(attotime::zero);
+	m_receive_timer->adjust(attotime::never);
+	ir_receiver_reset(false);
 	m_receive_packet.fill(0);
 	m_transmit_packet.fill(0);
+	m_stream_length = 0;
+	m_stream_bytes = 0;
+	m_stream_header_bytes = 0;
 	m_receive_phase = receive_phase::IDLE;
+	m_receive_length = 0;
 	m_receive_bit = 0;
 	m_transmit_shift = 0;
 	m_transmit_bit = 0;
@@ -83,19 +94,50 @@ void xavix_tamagotchi_ir_device::device_reset()
 	m_rx_data = 1;
 	m_transmit_frame = false;
 	m_transmit_mark_pending = false;
-	m_acknowledgement_valid = false;
 }
 
-void xavix_tamagotchi_ir_device::send_request(int state)
+TIMER_CALLBACK_MEMBER(xavix_tamagotchi_ir_device::poll_stream)
 {
-	// The optical link has no framing for queued or overlapping exchanges.
-	if (!state || m_receive_phase != receive_phase::IDLE || ir_receiver_active() || m_transmit_frame)
+	// Polling assembles one complete frame; socket arrival times do not time optical edges.
+	m_poll_timer->adjust(attotime::from_msec(1));
+	if (m_receive_phase != receive_phase::IDLE || ir_receiver_active() || m_transmit_frame)
 		return;
 
-	m_receive_packet = REQUEST_PACKET;
-	m_receive_bit = 0;
-	m_acknowledgement_valid = false;
-	start_receive_mark(receive_phase::LEADER_MARK, LEADER_MARK_TICKS);
+	// Bound work per poll, including when discarding an oversized frame.
+	for (unsigned count = 0; count < MAX_PACKET_BYTES + 2; count++)
+	{
+		u8 data;
+		if (!m_stream->input(&data, 1))
+			return;
+
+		if (m_stream_header_bytes < 2)
+		{
+			m_stream_length = (m_stream_length << 8) | data;
+			if (++m_stream_header_bytes == 2 && !m_stream_length)
+				m_stream_header_bytes = 0;
+			continue;
+		}
+
+		if (m_stream_length <= m_receive_packet.size())
+			m_receive_packet[m_stream_bytes] = data;
+		if (++m_stream_bytes != m_stream_length)
+			continue;
+
+		m_stream_header_bytes = 0;
+		m_stream_bytes = 0;
+		if (m_stream_length > m_receive_packet.size())
+		{
+			LOGMASKED(LOG_PROTOCOL, "Discarded oversized infrared stream frame (%u bytes)\n", m_stream_length);
+			m_stream_length = 0;
+			continue;
+		}
+
+		m_receive_length = m_stream_length;
+		m_stream_length = 0;
+		m_receive_bit = 0;
+		start_receive_mark(receive_phase::LEADER_MARK, LEADER_MARK_TICKS);
+		return;
+	}
 }
 
 void xavix_tamagotchi_ir_device::start_receive_mark(receive_phase phase, u32 ticks)
@@ -133,7 +175,7 @@ TIMER_CALLBACK_MEMBER(xavix_tamagotchi_ir_device::receive_tick)
 		break;
 
 	case receive_phase::DATA_SPACE:
-		if (++m_receive_bit == PACKET_BITS)
+		if (++m_receive_bit == m_receive_length * 8)
 			start_receive_mark(receive_phase::TRAILER_MARK, TRAILER_MARK_TICKS);
 		else
 			start_receive_mark(receive_phase::DATA_MARK, DATA_MARK_TICKS);
@@ -158,10 +200,10 @@ void xavix_tamagotchi_ir_device::tx_w(int state)
 
 void xavix_tamagotchi_ir_device::ir_burst_started(u64 gap_ticks)
 {
-	// Abandon a partial response after more than the longest valid inter-burst gap.
+	// Abandon a partial frame after more than the longest valid inter-burst gap.
 	if (m_transmit_frame && gap_ticks > TX_FRAME_GAP_MAX_TICKS)
 	{
-		LOGMASKED(LOG_PROTOCOL, "%s: discarded truncated Tamagotchi IR response\n", machine().describe_context());
+		LOGMASKED(LOG_PROTOCOL, "%s: discarded truncated Tamagotchi IR frame\n", machine().describe_context());
 		m_transmit_frame = false;
 		m_transmit_mark_pending = false;
 	}
@@ -177,7 +219,7 @@ void xavix_tamagotchi_ir_device::ir_idle_timeout()
 {
 	if (m_transmit_frame)
 	{
-		LOGMASKED(LOG_PROTOCOL, "%s: discarded truncated Tamagotchi IR response\n", machine().describe_context());
+		LOGMASKED(LOG_PROTOCOL, "%s: discarded truncated Tamagotchi IR frame\n", machine().describe_context());
 		m_transmit_frame = false;
 		m_transmit_mark_pending = false;
 	}
@@ -221,7 +263,7 @@ void xavix_tamagotchi_ir_device::ir_burst_finished(u64 width_ticks)
 
 void xavix_tamagotchi_ir_device::append_transmit_bit(bool bit)
 {
-	if (m_transmit_bytes >= PACKET_BYTES)
+	if (m_transmit_bytes >= m_transmit_packet.size())
 	{
 		m_transmit_frame = false;
 		return;
@@ -240,20 +282,15 @@ void xavix_tamagotchi_ir_device::append_transmit_bit(bool bit)
 
 void xavix_tamagotchi_ir_device::finish_transmit_packet()
 {
-	m_acknowledgement_valid = validate_acknowledgement();
-	LOGMASKED(LOG_PROTOCOL, "%s: Tamagotchi IR response %s (%u bytes, %u partial bits)\n",
-		machine().describe_context(), m_acknowledgement_valid ? "accepted" : "rejected", m_transmit_bytes, m_transmit_bit);
+	if (m_transmit_bytes && !m_transmit_bit)
+	{
+		m_stream->output(u8(m_transmit_bytes >> 8));
+		m_stream->output(u8(m_transmit_bytes));
+		for (unsigned index = 0; index < m_transmit_bytes; index++)
+			m_stream->output(m_transmit_packet[index]);
+	}
+	LOGMASKED(LOG_PROTOCOL, "%s: Tamagotchi IR frame (%u bytes, %u partial bits)\n",
+		machine().describe_context(), m_transmit_bytes, m_transmit_bit);
 	m_transmit_frame = false;
 	m_transmit_mark_pending = false;
-}
-
-bool xavix_tamagotchi_ir_device::validate_acknowledgement() const
-{
-	if (m_transmit_bytes != PACKET_BYTES || m_transmit_bit)
-		return false;
-
-	std::array<u8, PACKET_BYTES> expected = REQUEST_PACKET;
-	expected[1] = 0x41;
-	++expected[PACKET_BYTES - 1];
-	return m_transmit_packet == expected;
 }

@@ -4,8 +4,7 @@
 
     Infrared step mats transmit either a preamble, pad bits and parity, or
     one of sixteen codewords. Later step-sensor software accepts the latter
-    format alongside its separate serial receiver. The console panel uses
-    a separate serial interface.
+    format alongside its separate serial receiver.
 
     The shared infrared generator owns transmission timing and saved state.
 
