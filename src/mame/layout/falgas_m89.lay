@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Tomás García-Merás Capote (ClawGrip)
+-->
+<!--
+Falgàs M89: the riser front panel and the loads switched by the board.
+TIMER-SOUND and LIGHT probably show the two 12 V supplies.
+-->
+<mamelayout version="2">
+
+	<element name="panel">
+		<rect>
+			<color red="0.93" green="0.76" blue="0.12" />
+		</rect>
+	</element>
+
+	<element name="cabinet">
+		<rect>
+			<color red="0.10" green="0.11" blue="0.13" />
+		</rect>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk>
+			<color red="0.05" green="0.05" blue="0.05" />
+		</disk>
+		<disk state="0">
+			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
+			<color red="0.30" green="0.05" blue="0.04" />
+		</disk>
+		<disk state="1">
+			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
+			<color red="1.00" green="0.20" blue="0.12" />
+		</disk>
+	</element>
+
+	<element name="lamp" defstate="0">
+		<disk state="0">
+			<color red="0.25" green="0.22" blue="0.14" />
+		</disk>
+		<disk state="1">
+			<color red="1.00" green="0.90" blue="0.50" />
+		</disk>
+	</element>
+
+	<element name="motor_state" defstate="0">
+		<rect state="0">
+			<color red="0.22" green="0.22" blue="0.24" />
+		</rect>
+		<text state="0" string="MOTOR OFF">
+			<color red="0.60" green="0.60" blue="0.62" />
+		</text>
+		<rect state="1">
+			<color red="0.10" green="0.55" blue="0.15" />
+		</rect>
+		<text state="1" string="MOTOR ON">
+			<color red="1.00" green="1.00" blue="1.00" />
+		</text>
+	</element>
+
+	<element name="lbl_motor">
+		<text string="Motor On"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="lbl_coin">
+		<text string="Coin Input"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="lbl_timer">
+		<text string="Timer-Sound"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="lbl_light">
+		<text string="Light"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="lbl_start">
+		<text string="START LAMP"><color red="0.85" green="0.85" blue="0.85" /></text>
+	</element>
+	<element name="lbl_lights1">
+		<text string="LIGHTS 1"><color red="0.85" green="0.85" blue="0.85" /></text>
+	</element>
+	<element name="lbl_lights2">
+		<text string="LIGHTS 2"><color red="0.85" green="0.85" blue="0.85" /></text>
+	</element>
+
+	<view name="Front Panel and Outputs">
+		<bounds left="0" top="0" right="320" bottom="164" />
+
+		<element ref="panel">
+			<bounds left="0" top="0" right="320" bottom="80" />
+		</element>
+
+		<element name="motor" ref="led">
+			<bounds left="28" top="20" right="52" bottom="44" />
+		</element>
+		<element ref="lbl_motor">
+			<bounds left="0" top="50" right="80" bottom="62" />
+		</element>
+
+		<element ref="led">
+			<bounds left="108" top="20" right="132" bottom="44" />
+		</element>
+		<element ref="lbl_coin">
+			<bounds left="80" top="50" right="160" bottom="62" />
+		</element>
+
+		<element ref="led">
+			<bounds left="188" top="20" right="212" bottom="44" />
+		</element>
+		<element ref="lbl_timer">
+			<bounds left="160" top="50" right="240" bottom="62" />
+		</element>
+
+		<element ref="led">
+			<bounds left="268" top="20" right="292" bottom="44" />
+		</element>
+		<element ref="lbl_light">
+			<bounds left="240" top="50" right="320" bottom="62" />
+		</element>
+
+		<element ref="cabinet">
+			<bounds left="0" top="80" right="320" bottom="164" />
+		</element>
+
+		<element name="lamp0" ref="lamp">
+			<bounds left="16" top="92" right="56" bottom="132" />
+		</element>
+		<element ref="lbl_start">
+			<bounds left="0" top="138" right="72" bottom="150" />
+		</element>
+
+		<element name="lamp1" ref="lamp">
+			<bounds left="88" top="92" right="128" bottom="132" />
+		</element>
+		<element ref="lbl_lights1">
+			<bounds left="72" top="138" right="144" bottom="150" />
+		</element>
+
+		<element name="lamp2" ref="lamp">
+			<bounds left="160" top="92" right="200" bottom="132" />
+		</element>
+		<element ref="lbl_lights2">
+			<bounds left="144" top="138" right="216" bottom="150" />
+		</element>
+
+		<element name="motor" ref="motor_state">
+			<bounds left="226" top="98" right="310" bottom="126" />
+		</element>
+	</view>
+
+</mamelayout>
