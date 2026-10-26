@@ -495,7 +495,7 @@ void pcfx_state::pcfx(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(m_huc6261, FUNC(huc6261_device::screen_update));
-	screen.set_raw(XTAL(21'477'272), huc6261_device::WPF, 64, 64 + 1024 + 64, huc6261_device::LPF, 18, 18 + 242);
+	screen.set_raw(XTAL(21'477'272) * 2, huc6261_device::WPF, 64, 64 + 1024 + 64, huc6261_device::SCREEN_LPF, 18 * 2, (18 + 242) * 2);
 
 	huc6270_device &huc6270_a(HUC6270(config, "huc6270_a", XTAL(21'477'272)));
 	huc6270_a.set_vram_size(0x20000);

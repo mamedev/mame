@@ -12,7 +12,8 @@
     VSync changes 30 master cycles after HSync would go low.
 
     TODO:
-    - Interlace and 7MHz dot clock alignment with the KING/RAINBOW layers
+    - 1/2 dot shift in interlace mode (DCC = 3)
+    - 7MHz dot clock alignment with the KING/RAINBOW layers
 
 **********************************************************************/
 
@@ -41,7 +42,9 @@ huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, d
 	, m_huc6272(*this, finder_base::DUMMY_TAG)
 	, m_last_h(0)
 	, m_last_v(0)
-	, m_height(0)
+	, m_height(LPF)
+	, m_interlace(false)
+	, m_odd_field(false)
 	, m_palette{0}
 	, m_address(0)
 	, m_palette_latch(0)
@@ -252,13 +255,42 @@ u32 huc6261_device::mix_pixel(u16 vdc0, u16 vdc1, u32 king, u32 rainbow) const
 	return yuv888_to_rgb(out);
 }
 
+// the screen counts at twice the master clock, so a screen line is half a display line
+std::pair<int, int> huc6261_device::beam_position() const
+{
+	const u32 clocks = (u32(screen().vpos()) * WPF + screen().hpos()) / 2;
+	return std::make_pair(int(clocks / WPF), int(clocks % WPF));
+}
+
+attotime huc6261_device::time_until_beam(int v, int h) const
+{
+	const u32 pos = (u32(v) * WPF + h) * 2;
+	return screen().time_until_pos(pos / WPF, pos % WPF);
+}
+
+// interlace starts with the odd field, then the fields alternate
+void huc6261_device::start_frame()
+{
+	const bool interlace = BIT(m_control, 1);
+	m_odd_field = interlace && (!m_interlace || !m_odd_field);
+	m_interlace = interlace;
+}
+
 TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 {
-	const int vpos = screen().vpos();
-	const int hpos = screen().hpos();
+	const auto [vpos, hpos] = beam_position();
 	int h = m_last_h;
 	int v = m_last_v;
-	u32 *bitmap_line = &m_bmp.pix(v);
+
+	// each display line covers two bitmap rows: both when not interlaced, the odd field on the lower one
+	u32 *bitmap_line = nullptr;
+	u32 *bitmap_line2 = nullptr;
+	auto set_rows = [this, &v, &bitmap_line, &bitmap_line2] ()
+	{
+		bitmap_line = &m_bmp.pix(v * 2 + (m_odd_field ? 1 : 0));
+		bitmap_line2 = m_interlace ? nullptr : &m_bmp.pix(v * 2 + 1);
+	};
+	set_rows();
 
 	// KING dots are 4 master clocks wide in both dot clock modes
 	const int king_start = BIT(m_control, 3) ? KING_START_7MHZ : KING_START_5MHZ;
@@ -284,6 +316,8 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 		}
 
 		bitmap_line[h] = m_pixel_rgb;
+		if (bitmap_line2)
+			bitmap_line2[h] = m_pixel_rgb;
 
 		m_pixel_clock = (m_pixel_clock + 1) % m_pixels_per_clock;
 		h = (h + 1) % WPF;
@@ -321,10 +355,23 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 			{
 				m_control = m_control_reg;
 				m_pixels_per_clock = BIT(m_control, 3) ? 3 : 4;
+				start_frame();
 			}
 			else
 				m_control = (m_control & 0x80ff) | (m_control_reg & 0x7f00);
-			bitmap_line = &m_bmp.pix(v);
+
+			// the frame length (DCC 01 = 262 lines, otherwise 263) is applied at the start of vblank,
+			// where the screen can be reconfigured without moving the beam
+			if (v == 260)
+			{
+				const int height = ((m_control & 3) == 1) ? 262 : 263;
+				if (height != m_height)
+				{
+					m_height = height;
+					screen().configure(WPF, m_height * 2, screen().visible_area(), attotime::from_ticks(u64(WPF) * m_height, clock()));
+				}
+			}
+			set_rows();
 			start_line(v);
 			break;
 
@@ -394,7 +441,7 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 		}
 	}
 
-	m_timer->adjust(screen().time_until_pos(v, h));
+	m_timer->adjust(time_until_beam(v, h));
 }
 
 
@@ -455,10 +502,11 @@ u16 huc6261_device::read(offs_t offset)
 		/* Status info */
 		case 0x00:
 			{
-				const u16 vpos = screen().vpos();
-				const u16 hpos = screen().hpos();
+				const auto [vpos, hpos] = beam_position();
 
 				data = (vpos << 5) | (m_register & 0x1f);
+				if (m_odd_field)
+					data |= 0x4000;
 
 				if (vpos >= 22 && vpos < 262 && hpos < HUC6261_HSYNC_START)
 				{
@@ -564,7 +612,7 @@ void huc6261_device::write(offs_t offset, u16 data)
 				// ---- ---- -x-- ---- Number of BG colors?: 0 - 16, 1 - 256
 				// ---- ---- ---- x--- Dot clock: 0 - 5MHz, 1 - 7MHz
 				// ---- ---- ---- -x-- Synchronization: 0 - internal, 1 - external
-				// ---- ---- ---- --xx Screen height: 00 - 262 lines, 01 - 263 lines, 10 - interlace, 11 - unknown/undefined
+				// ---- ---- ---- --xx Screen height: 00 - 263 lines, 01 - 262 lines, 10 - interlace, 11 - interlace with 1/2 dot shift
 				// bits 8-14 take effect from the next line, the others from the next frame
 				case 0x00:
 					m_control_reg = data;
@@ -668,11 +716,13 @@ void huc6261_device::device_start()
 {
 	m_timer = timer_alloc(FUNC(huc6261_device::update_events), this);
 
-	m_bmp.allocate(WPF, LPF);
+	m_bmp.allocate(WPF, SCREEN_LPF);
 
 	save_item(NAME(m_last_h));
 	save_item(NAME(m_last_v));
 	save_item(NAME(m_height));
+	save_item(NAME(m_interlace));
+	save_item(NAME(m_odd_field));
 	save_item(NAME(m_palette));
 	save_item(NAME(m_palette_latch));
 	save_item(NAME(m_palette_offset));
@@ -708,7 +758,13 @@ void huc6261_device::device_reset()
 	std::fill(std::begin(m_palette_offset), std::end(m_palette_offset), 0);
 	std::fill(std::begin(m_priority), std::end(m_priority), 0);
 	m_pixels_per_clock = 4;
-	m_height = 263;
+	m_interlace = false;
+	m_odd_field = false;
+	if (m_height != 263)
+	{
+		m_height = 263;
+		screen().configure(WPF, SCREEN_LPF, screen().visible_area(), attotime::from_ticks(u64(WPF) * LPF, clock()));
+	}
 	m_pixel_clock = 0;
 
 	memset(m_palette, 0, sizeof(m_palette));
@@ -722,7 +778,14 @@ void huc6261_device::device_reset()
 	std::fill(std::begin(m_cello_coeff), std::end(m_cello_coeff), 0);
 	std::fill(std::begin(m_layer_rank), std::end(m_layer_rank), 0);
 
-	m_last_v = screen().vpos();
-	m_last_h = screen().hpos();
-	m_timer->adjust(screen().time_until_pos((screen().vpos() + 1) % 263, 0));
+	const auto [v, h] = beam_position();
+	m_last_v = v;
+	m_last_h = h;
+	m_timer->adjust(time_until_beam((v + 1) % m_height, 0));
+}
+
+void huc6261_device::device_post_load()
+{
+	if (screen().height() != m_height * 2)
+		screen().configure(WPF, m_height * 2, screen().visible_area(), attotime::from_ticks(u64(WPF) * m_height, clock()));
 }
