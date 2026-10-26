@@ -67,37 +67,55 @@ const Desc *drc_frontend_base<Desc>::do_describe_code(T &&describe, offs_t start
 {
 	constexpr u32 MAX_STACK_DEPTH = 100;
 
-	// an entry that maps branches for our code walking
-	struct pc_stack_entry
+	// an stack of entries that maps branches for our code walking
+	class pc_stack
 	{
-		offs_t              targetpc;
-		offs_t              srcpc;
+	public:
+		struct entry { offs_t target, src; };
+
+		pc_stack() : ptr(&stack[0]) { }
+
+		bool empty() const { return &stack[0] == ptr; }
+		bool full() const { return &stack[MAX_STACK_DEPTH] <= ptr; }
+
+		void push(offs_t src, offs_t target)
+		{
+			ptr->src = src;
+			ptr->target = target;
+			++ptr;
+		}
+
+		entry const &pop()
+		{
+			return *--ptr;
+		}
+
+	private:
+		entry stack[MAX_STACK_DEPTH];
+		entry *ptr;
 	};
 
 	// release any descriptions we've accumulated
 	release_descriptions();
 
 	// add the initial PC to the stack
-	pc_stack_entry pcstack[MAX_STACK_DEPTH];
-	pc_stack_entry *pcstackptr = &pcstack[0];
-	pcstackptr->srcpc = 0;
-	pcstackptr->targetpc = startpc;
-	pcstackptr++;
+	pc_stack pcstack;
+	pcstack.push(0, startpc);
 
 	// loop while we still have a stack
 	offs_t const minpc = startpc - (std::min)(m_window_start, startpc);
 	offs_t const maxpc = startpc + (std::min)(m_window_end, 0xffffffff - startpc);
-	while (pcstackptr != &pcstack[0])
+	while (!pcstack.empty())
 	{
 		// if we've already hit this PC, just mark it a branch target and continue
-		pc_stack_entry *const curstack = --pcstackptr;
-		Desc *curdesc = m_desc_array[curstack->targetpc - minpc];
+		auto const curstack = pcstack.pop();
+		Desc *curdesc = m_desc_array[curstack.target - minpc];
 		if (curdesc != nullptr)
 		{
 			curdesc->set_is_branch_target();
 
 			// if the branch crosses a page boundary, mark the target as needing to revalidate
-			if (m_pageshift != 0 && ((curstack->srcpc ^ curdesc->pc) >> m_pageshift) != 0)
+			if (m_pageshift != 0 && ((curstack.src ^ curdesc->pc) >> m_pageshift) != 0)
 			{
 				curdesc->set_validate_tlb();
 				curdesc->set_can_cause_exception();
@@ -108,13 +126,13 @@ const Desc *drc_frontend_base<Desc>::do_describe_code(T &&describe, offs_t start
 		}
 
 		// loop until we exit the block
-		for (offs_t curpc = curstack->targetpc; curpc >= minpc && curpc < maxpc && m_desc_array[curpc - minpc] == nullptr; curpc += m_desc_array[curpc - minpc]->length)
+		for (offs_t curpc = curstack.target; curpc >= minpc && curpc < maxpc && m_desc_array[curpc - minpc] == nullptr; curpc += m_desc_array[curpc - minpc]->length)
 		{
 			// allocate a new description and describe this instruction
 			m_desc_array[curpc - minpc] = curdesc = describe_one(describe, curpc, curdesc);
 
 			// first instruction in a sequence is always a branch target
-			if (curpc == curstack->targetpc)
+			if (curpc == curstack.target)
 				curdesc->set_is_branch_target();
 
 			// stop if we hit a page fault
@@ -129,12 +147,10 @@ const Desc *drc_frontend_base<Desc>::do_describe_code(T &&describe, offs_t start
 			}
 
 			// if we are a branch within the block range, add the branch target to our stack
-			if (curdesc->is_branch() && (curdesc->targetpc >= minpc) && (curdesc->targetpc < maxpc) && (pcstackptr < &pcstack[MAX_STACK_DEPTH]))
+			if (curdesc->is_branch() && (curdesc->targetpc >= minpc) && (curdesc->targetpc < maxpc) && !pcstack.full())
 			{
 				curdesc->set_intrablock_branch();
-				pcstackptr->srcpc = curdesc->pc;
-				pcstackptr->targetpc = curdesc->targetpc;
-				pcstackptr++;
+				pcstack.push(curdesc->pc, curdesc->targetpc);
 			}
 
 			// if we're done, we're done
@@ -261,19 +277,19 @@ void drc_frontend_base<Desc>::build_sequence(int start, int end, bool redispatch
 				seqstart = descnum;
 			}
 
-			// if we are the last instruction, indicate end-of-sequence and redispatch
 			if (nextdesc == nullptr)
 			{
+				// if we are the last instruction, indicate end-of-sequence and redispatch
 				curdesc->set_end_sequence();
 				if (redispatch)
 					curdesc->set_redispatch();
 				else if (nextdescnum == end)
 					curdesc->set_return_to_start();
 			}
-
-			// otherwise, do some analysis based on the next instruction
 			else
 			{
+				// otherwise, do some analysis based on the next instruction
+
 				// if there are instructions between us and the next instruction, we must end our sequence here
 				int scandescnum;
 				Desc *scandesc = nullptr;
@@ -351,12 +367,39 @@ template <typename Desc>
 void drc_frontend_base<Desc>::accumulate_required_backwards(Desc &desc, typename Desc::regmask &reqmask)
 {
 	// recursively handle delay slots
-	if (desc.delay.first() != nullptr)
-		accumulate_required_backwards(*desc.delay.first(), reqmask);
+	auto const accumulate_delay =
+			[this] (Desc *first, auto &mask)
+			{
+				auto const acc =
+						[this] (Desc &slot, auto &mask, auto const &recurse) -> void
+						{
+							if (slot.next())
+								recurse(*slot.next(), mask, recurse);
+							accumulate_required_backwards(slot, mask);
+						};
+				if (first)
+				{
+					acc(*first, mask, acc);
+				}
+			};
 
 	// if this is a branch, we have to reset our requests
-	if (desc.is_branch())
+	if (desc.is_conditional_branch())
+	{
+		typename Desc::regmask branchmask;
+		branchmask.set();
+		accumulate_delay(desc.delay.first(), branchmask);
+		reqmask |= branchmask;
+	}
+	else if (desc.is_unconditional_branch())
+	{
 		reqmask.set();
+		accumulate_delay(desc.delay.first(), reqmask);
+	}
+	else
+	{
+		accumulate_delay(desc.delay.first(), reqmask);
+	}
 
 	// determine the required registers
 	desc.regreq = desc.regout & reqmask;
