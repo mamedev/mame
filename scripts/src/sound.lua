@@ -1638,6 +1638,18 @@ if SOUNDS["AD1848"] then
 end
 
 ---------------------------------------------------
+-- AD1859
+--@src/devices/sound/ad1859.h,SOUNDS["AD1859"] = true
+---------------------------------------------------
+
+if SOUNDS["AD1859"] then
+	files {
+		MAME_DIR .. "src/devices/sound/ad1859.cpp",
+		MAME_DIR .. "src/devices/sound/ad1859.h",
+	}
+end
+
+---------------------------------------------------
 -- GB_SOUND
 --@src/devices/sound/gb.h,SOUNDS["GB_SOUND"] = true
 ---------------------------------------------------
