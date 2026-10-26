@@ -5,10 +5,10 @@
 
 #pragma once
 
-#include "i8052.h"
+#include "dw8051.h"
 #include "machine/nrf2401.h"
 
-class nrf24e1_device : public i8052_device
+class nrf24e1_device : public dw8051_device
 {
 public:
 	nrf24e1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -29,22 +29,18 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_reset_after_children() override ATTR_COLD;
 
-	// i8052_device implementation
+	// dw8051_device implementation
 	virtual void sfr_map(address_map &map) override ATTR_COLD;
-	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override;
-	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override;
-	virtual u32 execute_max_cycles() const noexcept override;
-	virtual void execute_run() override;
+	virtual bool execute_ready() override;
+	virtual u16 interrupt_mask() override;
+	virtual u16 pending_irq_flags(u16 int_mask) override;
+	virtual unsigned interrupt_priority(unsigned source) const override;
 	virtual offs_t external_ram_iaddr(offs_t offset, offs_t mem_mask) override;
 
 private:
 	// Offsets in the extended SFR backing store (address minus 0x80).
 	enum : u8
 	{
-		SFR_DPL0 = 0x02,      // Data pointer 0 low byte
-		SFR_DPH1 = 0x05,      // Data pointer 1 high byte
-		SFR_DPS = 0x06,       // Active data pointer selection
-		SFR_CKCON = 0x0e,     // Timer clock dividers and MOVX stretch
 		SFR_EXIF = 0x11,      // ADC, SPI and radio interrupt flags
 		SFR_MPAGE = 0x12,     // High address byte for MOVX through R0/R1
 		SFR_P0_DIR = 0x14,    // Port 0 pin directions
@@ -69,17 +65,11 @@ private:
 		SFR_EIP = 0x78,       // Extended interrupt priorities
 		SFR_HWREV = 0x7e      // Hardware revision identifier
 	};
-	static const u8 INSTRUCTION_CYCLES[256];
 
 	void ram_map(address_map &map) ATTR_COLD;
 	void reset_registers();
 	void bootstrap() ATTR_COLD;
 	void sample_gpio();
-	void check_interrupts();
-	void advance_cycles(unsigned cycles);
-	bool timer01_enabled(unsigned timer) const;
-	void timer01_tick(unsigned timer);
-	void timer2_tick(unsigned cycles);
 	void clock_control_w(u8 data);
 	u8 extra_r(offs_t offset);
 	void extra_w(offs_t offset, u8 data);
@@ -114,10 +104,7 @@ private:
 	emu_timer *m_low_power_timer;
 
 	u8 m_extra[128];
-	u16 m_other_dptr;
-	u8 m_timer_divider;
 	u8 m_previous_gpio[2];
-	u8 m_irq_delay;
 	u16 m_adc_sample;
 	u8 m_adc_resolution;
 	u8 m_spi_tx;

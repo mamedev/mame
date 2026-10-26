@@ -1256,6 +1256,7 @@ end
 --------------------------------------------------
 -- Intel 8051 and derivatives
 --@src/devices/cpu/mcs51/i8051.h,CPUS["MCS51"] = true
+--@src/devices/cpu/mcs51/dw8051.h,CPUS["MCS51"] = true
 --------------------------------------------------
 
 if CPUS["MCS51"] then
@@ -1265,6 +1266,8 @@ if CPUS["MCS51"] then
 		MAME_DIR .. "src/devices/cpu/mcs51/mcs51ops.cpp",
 		MAME_DIR .. "src/devices/cpu/mcs51/i8052.cpp",
 		MAME_DIR .. "src/devices/cpu/mcs51/i8052.h",
+		MAME_DIR .. "src/devices/cpu/mcs51/dw8051.cpp",
+		MAME_DIR .. "src/devices/cpu/mcs51/dw8051.h",
 		MAME_DIR .. "src/devices/cpu/mcs51/i80c51.cpp",
 		MAME_DIR .. "src/devices/cpu/mcs51/i80c51.h",
 		MAME_DIR .. "src/devices/cpu/mcs51/i80c52.cpp",
