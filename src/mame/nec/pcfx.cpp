@@ -62,6 +62,7 @@ private:
 	[[maybe_unused]] void extio_w(offs_t offset, u8 data);
 
 	template <int Pad> TIMER_CALLBACK_MEMBER(pad_func);
+	void pad_irq_update();
 
 	u16 timer_control_r();
 	void timer_control_w(u16 data);
@@ -147,10 +148,12 @@ u16 pcfx_state::pad_r(offs_t offset)
 	{
 		// status
 		/*
-		---- x---
-		---- ---x incoming data state (0=available)
+		---- x--- END transfer finished
+		---- -x-- IOS input
+		---- --x- MOD multi-tap clear
+		---- ---x TRG transfer in progress
 		*/
-		res = m_pad.status[Pad];
+		res = m_pad.status[Pad] | m_pad.ctrl[Pad];
 		//logerror("%s: STATUS %d\n", machine().describe_context(), Pad);
 	}
 	else
@@ -163,7 +166,7 @@ u16 pcfx_state::pad_r(offs_t offset)
 			if (!machine().side_effects_disabled())
 			{
 				m_pad.status[Pad] &= ~8; // clear latch on LSB read according to docs
-				m_intc->irq_w<11>(CLEAR_LINE);
+				pad_irq_update();
 			}
 		}
 	}
@@ -177,7 +180,13 @@ TIMER_CALLBACK_MEMBER(pcfx_state::pad_func)
 	m_pad.latch[Pad] = m_pads[Pad]->read();
 	m_pad.status[Pad] |= 8;
 	m_pad.ctrl[Pad] &= ~1; // ack TX line
-	m_intc->irq_w<11>(ASSERT_LINE);
+	pad_irq_update();
+}
+
+// both ports share one interrupt, raised while either has END set
+void pcfx_state::pad_irq_update()
+{
+	m_intc->irq_w<11>(BIT(m_pad.status[0] | m_pad.status[1], 3));
 }
 
 template <int Pad>
@@ -191,7 +200,11 @@ void pcfx_state::pad_w(offs_t offset, u16 data)
 		---- --x- enable multi-tap
 		---- ---x enable send (0->1 transition)
 		*/
-		if ((data & 1) && !(m_pad.ctrl[Pad] & 1))
+		// only writable while TRG and END are both 0
+		if (BIT(m_pad.ctrl[Pad], 0) || BIT(m_pad.status[Pad], 3))
+			return;
+
+		if (data & 1)
 		{
 			m_pad_timers[Pad]->adjust(attotime::from_usec(100)); // TODO: time
 		}
@@ -362,13 +375,6 @@ INPUT_PORTS_END
 
 void pcfx_state::machine_start()
 {
-	for (int i = 0; i < 2; i++)
-	{
-		m_pad.ctrl[i] = 0;
-		m_pad.status[i] = 0;
-		m_pad.latch[i] = 0;
-	};
-
 	m_pad_timers[0] = timer_alloc(FUNC(pcfx_state::pad_func<0>), this);
 	m_pad_timers[1] = timer_alloc(FUNC(pcfx_state::pad_func<1>), this);
 	m_timer = timer_alloc(FUNC(pcfx_state::timer_expired), this);
@@ -378,6 +384,9 @@ void pcfx_state::machine_start()
 	subdevice<nvram_device>("nvram")->set_base(&m_nvram_ptr[0], 0x8000);
 
 	save_pointer(NAME(m_nvram_ptr), 0x8000);
+	save_item(NAME(m_pad.ctrl));
+	save_item(NAME(m_pad.status));
+	save_item(NAME(m_pad.latch));
 	save_item(NAME(m_bram_control));
 	save_item(NAME(m_dram_page));
 	save_item(NAME(m_timer_control));
@@ -387,6 +396,14 @@ void pcfx_state::machine_start()
 
 void pcfx_state::machine_reset()
 {
+	for (int i = 0; i < 2; i++)
+	{
+		m_pad.ctrl[i] = 6;
+		m_pad.status[i] = 0;
+		m_pad.latch[i] = 0;
+		m_pad_timers[i]->adjust(attotime::never);
+	}
+	pad_irq_update();
 	m_bram_control = 0;
 	m_timer_control = 0;
 	m_timer_period = 0xffff;
