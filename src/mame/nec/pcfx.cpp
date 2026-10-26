@@ -268,6 +268,13 @@ void pcfx_state::pcfx_mem(address_map &map)
 		NAME([this] (offs_t offset, u32 mem_mask) -> u32 { return m_io.read_dword(offset << 2, mem_mask); }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { m_io.write_dword(offset << 2, data, mem_mask); }));
 //  map(0x80700000, 0x807fffff).rom().region("scsi_rom", 0); // EXTIO ROM area
+	// data ports of the HuC6261, HuC6270 #0, HuC6270 #1 and HuC6272 for bit-string instructions, read at Axxxxxxx and written at Bxxxxxxx
+	map(0xa0000000, 0xafffffff).lr32(
+		NAME([this] (offs_t offset, u32 mem_mask) -> u32 { return m_io.read_dword(0x304 + ((offset >> 24) & 3) * 0x100, mem_mask); }));
+	map(0xb0000000, 0xbfffffff).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { m_io.write_dword(0x304 + ((offset >> 24) & 3) * 0x100, data, mem_mask); }));
+	map(0xa0000000, 0xafffffff).nopw();
+	map(0xb0000000, 0xbfffffff).lr32(NAME([] () -> u32 { return 0; }));
 	// internal backup control
 	map(0xe0000000, 0xe7ffffff).lrw8(
 		NAME([this] (offs_t offset) {
