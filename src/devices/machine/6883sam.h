@@ -24,6 +24,8 @@ class sam6883_friend_device_interface : public device_interface
 public:
 	sam6883_friend_device_interface(const machine_config &mconfig, device_t &device, int divider);
 
+	auto video_flush_callback() { return m_video_flush_cb.bind(); }
+
 protected:
 	// SAM state constants
 	static const uint16_t SAM_STATE_TY = 0x8000;
@@ -51,6 +53,8 @@ protected:
 
 	// base clock divider (/4 for MC6883, /8 for GIME)
 	int m_divider;
+
+	devcb_write_line m_video_flush_cb;
 
 	ATTR_FORCE_INLINE uint16_t display_offset()
 	{
@@ -100,19 +104,17 @@ public:
 		if (offset == (offs_t) ~0)
 		{
 			/* the VDG is telling the counter to reset */
-			m_counter = display_offset();
-			m_counter_xdiv = 0;
-			m_counter_ydiv = 0;
+			counter_reset(display_offset());
 		}
 		else if ((offset & 1) != (m_counter & 0x0001))
 		{
 			/* DA0 has been toggled - first bump B0-B3 of the counter */
-			bool bit3_carry = (m_counter & 0x000F) == 0x000F;
+			uint16_t old_counter = m_counter;
 			m_counter = (m_counter & ~0x000F) | ((m_counter + 1) & 0x000F);
 
-			/* and apply the carry (if applicable */
-			if (bit3_carry)
-				counter_carry_bit3();
+			// Track both edges: a later mode write can select this clock level.
+			if ((old_counter ^ m_counter) & 0x0008)
+				counter_update_bit3(!BIT(m_counter, 3));
 		}
 		return m_ram_space.read_byte(m_counter & m_counter_mask);
 	}
@@ -148,65 +150,23 @@ private:
 
 	// SAM state
 	uint16_t                    m_counter = 0;
-	uint8_t                     m_counter_xdiv = 0;
-	uint8_t                     m_counter_ydiv = 0;
+	uint8_t                     m_counter_xdiv[2] = {}; // independent /2 and /3 phases
+	uint8_t                     m_counter_ydiv[3] = {}; // independent /2, /3 and cascaded /4 phases
+	bool                        m_counter_bit4_input = false;
+	bool                        m_counter_bit5_input = false;
 
 	// typically called by CPU
 	void internal_write(offs_t offset, uint8_t data);
 
-	// called when there is a carry out of bit 3 on the counter
-	ATTR_FORCE_INLINE void counter_carry_bit3()
-	{
-		uint8_t x_division;
-		switch((m_sam_state & (SAM_STATE_V2|SAM_STATE_V1|SAM_STATE_V0)) / SAM_STATE_V0)
-		{
-			case 0x00:  x_division = 1; break;
-			case 0x01:  x_division = 3; break;
-			case 0x02:  x_division = 1; break;
-			case 0x03:  x_division = 2; break;
-			case 0x04:  x_division = 1; break;
-			case 0x05:  x_division = 1; break;
-			case 0x06:  x_division = 1; break;
-			case 0x07:  x_division = 1; break;
-			default:
-				fatalerror("Should not get here\n");
-				return;
-		}
-
-		if (++m_counter_xdiv >= x_division)
-		{
-			m_counter_xdiv = 0;
-			m_counter ^= 0x0010;
-			if ((m_counter & 0x0010) == 0x0000)
-				counter_carry_bit4();
-		}
-	}
-
-	// called when there is a carry out of bit 4 on the counter
-	ATTR_FORCE_INLINE void counter_carry_bit4()
-	{
-		uint8_t y_division;
-		switch((m_sam_state & (SAM_STATE_V2|SAM_STATE_V1|SAM_STATE_V0)) / SAM_STATE_V0)
-		{
-			case 0x00:  y_division = 12;    break;
-			case 0x01:  y_division = 1;     break;
-			case 0x02:  y_division = 3;     break;
-			case 0x03:  y_division = 1;     break;
-			case 0x04:  y_division = 2;     break;
-			case 0x05:  y_division = 1;     break;
-			case 0x06:  y_division = 1;     break;
-			case 0x07:  y_division = 1;     break;
-			default:
-				fatalerror("Should not get here\n");
-				return;
-		}
-
-		if (++m_counter_ydiv >= y_division)
-		{
-			m_counter_ydiv = 0;
-			m_counter += 0x0020;
-		}
-	}
+	// Divider outputs clock B4 and B5 on falling edges, including mode writes.
+	void counter_reset(uint16_t address);
+	bool counter_x_output() const;
+	bool counter_y_output() const;
+	void counter_update_bit3(bool falling);
+	void counter_update_bit4(bool falling);
+	void counter_set_bit4_input(bool level);
+	void counter_set_bit5_input(bool level);
+	void counter_mode_changed(uint8_t old_mode);
 
 	// other members
 	void horizontal_sync();

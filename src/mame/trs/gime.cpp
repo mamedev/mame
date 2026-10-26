@@ -862,10 +862,8 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 	if (((offset == 0x08 && (xorval & 0x80)) || (offset == 0x09 && (xorval & 0x1f))
 		|| (offset == 0x0f && xorval)) && !m_legacy_video)
 	{
-		// Preserve pixels and row pitch already fetched before changing modes
-		// or loading the horizontal offset for the following line.
-		// LPR-only writes must reach the pending row advance before capture;
-		// flushing them here would consume it with the old height (BOINK).
+		// Flush before mode or offset changes. LPR-only writes must apply
+		// before the pending row advance is consumed.
 		video_flush();
 	}
 	m_gime_registers[offset] = data;
@@ -1619,21 +1617,15 @@ void gime_device::record_body_scanline(uint16_t physical_scanline, uint16_t logi
 		return;
 	}
 
-	// Load the horizontal offset at the start of active video and retain it
-	// across partial captures.  Writes before active video can still change
-	// this line's offset; later writes only affect the next line.
+	// Latch the horizontal offset at active-video start for all partial captures.
 	if (!m_horizontal_offset_latched)
 	{
 		m_horizontal_offset = m_gime_registers[0x0f];
 		m_horizontal_offset_latched = true;
 	}
 
-	// Consume the previous line's pitch once, even when this line is captured
-	// in several parts.  A completed row must advance even if the new mode
-	// increases its height (Cloud Kingdoms switches from graphics to text).
-	// Shortening a repeated row must also advance before fetching pixels.
-	// Infinite-height mode is a hold: entering it must suppress even an
-	// otherwise completed row's advance (BOINK freezes below the ball).
+	// Advance once per scanline when either row height expires.
+	// Infinite-height mode suppresses advancement.
 	if (m_row_advance_pending)
 	{
 		const uint16_t lines_per_row = get_lines_per_row();
@@ -1745,7 +1737,6 @@ void gime_device::record_body_scanline(uint16_t physical_scanline, uint16_t logi
 	/* sanity checks */
 	assert(pitch > 0);
 
-	// Keep the pitch for the next line without advancing on a partial flush.
 	m_scanline_pitch = pitch;
 	m_scanline_lines_per_row = get_lines_per_row();
 }
@@ -1976,7 +1967,6 @@ inline void gime_device::render_scanline(const scanline_record *scanline, pixel_
 	/* offset the pixel counts depending on wide */
 	pixels += wide ? 0 : 64;
 
-	// Preserve the mode and resolved colors at each legacy artifact sample.
 	const bool artifacting = m_legacy_video && (sample_count > 0) && m_artifacter.get_ntsc_artifacting();
 	uint8_t artifact_modes[256]{};
 	pixel_t artifact_colors[256][2]{};

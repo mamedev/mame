@@ -833,6 +833,11 @@ void mc6847_base_device::record_scanline_res(int scanline, int32_t start_pos, in
 	const int sample_modulo = 32 / sample_count;
 	static_assert((32 / sample_modulo) == sample_count, "Expected 32 to be divisible by sample_count");
 
+	// DA0 continues toggling past the visible area: ten trailing fetches in
+	// 32-byte modes, six in 16-byte modes. These still clock the SAM counter.
+	// https://www.6809.org.uk/dragon/sam-vdg-interaction.shtml
+	end_pos = std::min(end_pos, (sample_count + (sample_count == 32 ? 10 : 6)) * sample_modulo);
+
 	uint8_t current_sample_count = (start_pos > 0) ? m_data[scanline].m_sample_count : 0;
 
 	// main loop
@@ -924,7 +929,8 @@ void mc6847_base_device::record_body_scanline(uint8_t mode, uint16_t physical_sc
 
 void mc6847_base_device::record_full_body_scanline(uint16_t physical_scanline, uint16_t scanline)
 {
-	record_body_scanline(m_mode, physical_scanline, scanline, 0, 32);
+	// Include trailing addresses; record_scanline_res clips to the fetch width.
+	record_body_scanline(m_mode, physical_scanline, scanline, 0, 44);
 }
 
 
@@ -936,7 +942,7 @@ void mc6847_base_device::record_full_body_scanline(uint16_t physical_scanline, u
 void mc6847_base_device::record_partial_body_scanline(uint16_t physical_scanline, uint16_t scanline, int32_t start_clock, int32_t end_clock)
 {
 	int32_t start_pos = std::max(scanline_position_from_clock(start_clock), 0);
-	int32_t end_pos = std::min(scanline_position_from_clock(end_clock), 42);
+	int32_t end_pos = std::min(scanline_position_from_clock(end_clock), 44);
 
 	if (start_pos < end_pos)
 		record_body_scanline(m_mode, physical_scanline, scanline, start_pos, end_pos);
@@ -958,10 +964,8 @@ void mc6847_base_device::record_partial_body_scanline(uint16_t physical_scanline
 
 int32_t mc6847_base_device::scanline_position_from_clock(int32_t clocks_since_hsync)
 {
-	// Dragon Fire changes CSS multiple times per scanline using CPU-timed
-	// loops.  Align the active-video origin to six slow CPU cycles (24 VDG
-	// clocks).  The previous offset of 25 shifts those transitions by one
-	// byte when CPU and VDG clocks are kept in an exact ratio.
+	// Align active video to six slow CPU cycles (24 VDG clocks),
+	// calibrated against Dragon Fire's CPU-timed CSS changes.
 	const int CLOCKS_OFFSET_TO_FIRST_VISIBLE_PIXEL = 24;
 
 	// Dividing by 4 converts 128 clocks per horizontal active video

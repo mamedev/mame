@@ -505,6 +505,8 @@ class mc6847_base_device : public mc6847_friend_device
 public:
 	auto input_callback() { return m_input_cb.bind(); }
 
+	void flush_pending_video() { video_flush(); }
+
 	void set_fixed_mode(uint8_t mode) { m_fixed_mode = mode; }
 	void set_black_and_white(bool bw) { m_black_and_white = bw; }
 

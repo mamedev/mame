@@ -612,6 +612,7 @@ void coco12_state::coco(machine_config &config)
 	m_vdg->hsync_wr_callback().set(FUNC(coco12_state::horizontal_sync));
 	m_vdg->fsync_wr_callback().set(FUNC(coco12_state::field_sync));
 	m_vdg->input_callback().set(FUNC(coco12_state::sam_read));
+	m_sam->video_flush_callback().set(FUNC(coco12_state::vdg_flush));
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("4K,16K,32K");
