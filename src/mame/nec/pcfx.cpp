@@ -455,7 +455,11 @@ int pcfx_state::bus_wait(offs_t address, int access, int size)
 	if (io || (address >= 0x80000000 && address < 0x80800000))
 	{
 		const offs_t port = address & 0x7fffff;
-		wait = (port >= 0x100 && port < 0x700) ? (write ? 2 : 4) : 0;
+		// writes to the chips go through a one-entry write buffer, other I/O writes take 6 cycles
+		if (port >= 0x100 && port < 0x700)
+			wait = write ? 2 : 4;
+		else
+			wait = write ? 4 : 0;
 	}
 	else if (address >= 0xf0000000)
 		wait = write ? 0 : 2;
