@@ -4,6 +4,8 @@
 #include "emu.h"
 #include "class200_lcdc.h"
 
+#include <algorithm>
+
 // unknown LCDC, possibly a ST7775R (if so, expand this and turn it into a device in the devices folder)
 
 DEFINE_DEVICE_TYPE(CLASS200_LCDC, class200_lcdc_device, "class200_lcdc", "unknown LCDC (class200)")
@@ -13,30 +15,40 @@ class200_lcdc_device::class200_lcdc_device(const machine_config &mconfig, const 
 {
 }
 
-void class200_lcdc_device::render_to_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 class200_lcdc_device::render_to_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (!(m_lcd_regs[0x07] & 0x0003))
 	{
 		bitmap.fill(rgb_t::black(), cliprect);
-		return;
+		return 0;
 	}
+
+	const bool bgr = !BIT(m_lcd_regs[0x03], 12);
+
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		if ((y >= 0) && (y < 176))
 		{
-			const u16 pixel = m_gram[x * 176 + y];
-			const u8 r = (pixel >> 11) & 0x1f;
-			const u8 g = (pixel >> 5) & 0x3f;
-			const u8 b = pixel & 0x1f;
-			// class200 PCB/panel uses BGR subpixel order; the LCD entry-mode
-			// BGR bit still reverses the GRAM transfer order relative to it.
-			// This is a provisional board-level colour calibration.
-			const bool bgr = !BIT(m_lcd_regs[0x03], 12);
-			bitmap.pix(y, x) = bgr
-				? rgb_t((b << 3) | (b >> 2), (g << 2) | (g >> 4), (r << 3) | (r >> 2))
-				: rgb_t((r << 3) | (r >> 2), (g << 2) | (g >> 4), (b << 3) | (b >> 2));
+			u32* const dst = &bitmap.pix(y);
+
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
+			{
+				if ((x >= 0) && (x < 220))
+				{
+					const u16 pixel = m_gram[x * 176 + y];
+					const u8 r = (pixel >> 11) & 0x1f;
+					const u8 g = (pixel >> 5) & 0x3f;
+					const u8 b = pixel & 0x1f;
+
+					dst[x] = bgr
+						? rgb_t((b << 3) | (b >> 2), (g << 2) | (g >> 4), (r << 3) | (r >> 2))
+						: rgb_t((r << 3) | (r >> 2), (g << 2) | (g >> 4), (b << 3) | (b >> 2));
+
+				}
+			}
 		}
 	}
+	return 0;
 }
 
 void class200_lcdc_device::class200_lcdc_advance()
@@ -55,12 +67,20 @@ void class200_lcdc_device::class200_lcdc_advance()
 	{
 		if (increase)
 		{
-			if (coord >= hi) { coord = lo; return true; }
+			if (coord >= hi)
+			{
+				coord = lo;
+				return true;
+			}
 			coord++;
 		}
 		else
 		{
-			if (coord <= lo) { coord = hi; return true; }
+			if (coord <= lo)
+			{
+				coord = hi;
+				return true;
+			}
 			coord--;
 		}
 		return false;

@@ -57,8 +57,6 @@ public:
 	void st22xx_cutepet(machine_config &config) ATTR_COLD;
 
 private:
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	void st22xx_dphh8213_map(address_map &map) ATTR_COLD;
 	void st22xx_cutepet_map(address_map &map) ATTR_COLD;
 
@@ -83,8 +81,6 @@ protected:
 	required_device<class200_lcdc_device> m_class200lcdc;
 
 private:
-	u32 class200_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	void st22xx_class200_map(address_map &map) ATTR_COLD;
 };
 
@@ -304,18 +300,6 @@ void st22xx_class200_state::st22xx_class200_map(address_map &map)
 }
 
 
-
-u32 st22xx_class200_state::class200_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	m_class200lcdc->render_to_bitmap(screen, bitmap, cliprect);
-	return 0;
-}
-
-u32 st22xx_dphh8213_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return m_lcdc->render_to_bitmap(screen, bitmap, cliprect);
-}
-
 u8 st22xx_dphh8213_state::porta_r()
 {
 	u8 input = 0x3f;
@@ -439,7 +423,7 @@ void st22xx_dphh8213_state::st22xx_dphh8213(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(160, 128);
 	m_screen->set_visarea(0, 160 - 1, 0, 128 - 1);
-	m_screen->set_screen_update(FUNC(st22xx_dphh8213_state::screen_update));
+	m_screen->set_screen_update(m_lcdc, FUNC(st7735_lcdc_device::render_to_bitmap));
 
 	ST7735(config, m_lcdc);
 }
@@ -468,7 +452,7 @@ void st22xx_class200_state::st22xx_class200(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(220, 176);
 	m_screen->set_visarea(0, 219, 0, 175);
-	m_screen->set_screen_update(FUNC(st22xx_class200_state::class200_screen_update));
+	m_screen->set_screen_update(m_class200lcdc, FUNC(class200_lcdc_device::render_to_bitmap));
 
 	CLASS200_LCDC(config, m_class200lcdc);
 }
