@@ -31,7 +31,7 @@ void pcfx_intc_device::device_start()
 
 void pcfx_intc_device::device_reset()
 {
-	m_irq_mask = 0xffff;
+	m_irq_mask = 0x7f;
 	m_irq_pending = 0;
 	std::fill_n(m_irq_priority, 8, 0);
 	if (m_int_level >= 0)
@@ -80,7 +80,6 @@ void pcfx_intc_device::write(offs_t offset, u16 data)
 			break;
 
 		// Interrupt mask
-		// ---- ---- x--- ---- Mask interrupt level 8  (Unknown)
 		// ---- ---- -x-- ---- Mask interrupt level 9  (Timer)
 		// ---- ---- --x- ---- Mask interrupt level 10 (Unknown)
 		// ---- ---- ---x ---- Mask interrupt level 11 (Pad)
@@ -90,8 +89,7 @@ void pcfx_intc_device::write(offs_t offset, u16 data)
 		// ---- ---- ---- ---x Mask interrupt level 15 (HuC6273)
 		// 0 - allow, 1 - ignore interrupt
 		case 0x40/4:
-			m_irq_mask = data;
-			// m_irq_pending = ~data;
+			m_irq_mask = data & 0x7f;
 			check_irqs();
 			break;
 
@@ -113,7 +111,6 @@ void pcfx_intc_device::write(offs_t offset, u16 data)
 			break;
 
 		// Interrupt priority 1
-		// ----xxx--------- Priority level interrupt 8
 		// -------xxx------ Priority level interrupt 9
 		// ----------xxx--- Priority level interrupt 10
 		// -------------xxx Priority level interrupt 11
@@ -123,7 +120,6 @@ void pcfx_intc_device::write(offs_t offset, u16 data)
 			m_irq_priority[3] = (data >> 0) & 0x07;
 			m_irq_priority[2] = (data >> 3) & 0x07;
 			m_irq_priority[1] = (data >> 6) & 0x07;
-			m_irq_priority[0] = (data >> 9) & 0x07;
 			check_irqs();
 			break;
 	}
