@@ -70,7 +70,7 @@ protected:
 
 	void texmask_w(offs_t offset, uint8_t data);
 
-	void main020_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 
@@ -188,7 +188,7 @@ private:
 
 	void adsp_data_map(address_map &map) ATTR_COLD;
 	void adsp_program_map(address_map &map) ATTR_COLD;
-	void main_map(address_map &map) ATTR_COLD;
+	void main020_map(address_map &map) ATTR_COLD;
 	void tms_map(address_map &map) ATTR_COLD;
 };
 

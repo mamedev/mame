@@ -146,18 +146,20 @@ REF. 970429
 Development PCB -- Radikal Bikers
 ----------
 
-3D-3G-AER/2. 68EC020 areas decoded by the PAL at U21, in addition to those of the production boards:
-  000000-0FFFFF  flash (U22/U30) at reset, RAM once latch bit 7 is set
-  100000-1FFFFF  RAM at reset, flash once latch bit 7 is set
-  200000-3FFFFF  flash once latch bit 7 is set
+3D-3G-AER/2, with a DIP-64 socket for the 68000 (U34), on a REF. 960520 bottom board whose
+68000 footprint is unpopulated. 68000 areas decoded by the PAL at U21, in addition to those
+of the production boards:
+  000000-0FFFFF  flash (U22/U30), or RAM when the swap bit is set
+  100000-1FFFFF  RAM, or flash when the swap bit is set
+  200000-3FFFFF  flash when the swap bit is set
   800000-BFFFFF  texture flash (not emulated)
   C00000-CFFFFF  texture mask RAM, low byte of each word
   D00000-DFFFFF  unknown, the program fills it with $ffff
   E00000-EFFFFF  unknown
-U21 decodes 1MB of RAM; the actual size is unknown.
+The RAM is two KM684002 (512K x 8).
 Not decoded by U21:
-  500000-500070  addressable latch, A4-A6 select the bit (assumed LS259 on D0)
   500004-500005  parallel link to the development host (not emulated)
+  500070         D0 = swap bit, cleared on reset (perhaps half of the 74LS74 at U46)
 
 
 **************************************************************************/
@@ -860,16 +862,37 @@ static INPUT_PORTS_START( radikalb )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( radikalbp )
-	PORT_INCLUDE( radikalb )
+	PORT_START("IN0")
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 )      // view
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )      // brake
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_MODIFY("IN2")
-	PORT_BIT( 0x0c000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("IN1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_MODIFY("IN3")
-	PORT_SERVICE_NO_TOGGLE( 0x02000000, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08000000, 0x08000000, "Boot mode" )
-	PORT_DIPSETTING(          0x00000000, "Development host" )
-	PORT_DIPSETTING(          0x08000000, "Flash program" )
+	PORT_START("IN2")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0e00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(gaelco3d_state::analog_bit_r<0>))
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(gaelco3d_state::analog_bit_r<1>))
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(gaelco3d_state::analog_bit_r<2>))
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(gaelco3d_state::analog_bit_r<3>))
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x0200, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x0800, 0x0800, "Boot mode" )
+	PORT_DIPSETTING(      0x0000, "Development host" )
+	PORT_DIPSETTING(      0x0800, "Flash program" )
+	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("ANALOG0")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(25)
 
 	PORT_START("ANALOG1")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
@@ -1055,7 +1078,6 @@ class radikalbp_state : public gaelco3d_state
 public:
 	radikalbp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: gaelco3d_state(mconfig, type, tag)
-		, m_devlatch(*this, "devlatch")
 		, m_boot_view(*this, "boot_view")
 		, m_texmask_ram(*this, "texmask_ram", TEXMASK_RAM_SIZE, ENDIANNESS_BIG)
 	{ }
@@ -1063,10 +1085,10 @@ public:
 	void radikalbp(machine_config &config) ATTR_COLD;
 
 protected:
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;
 
 private:
-	required_device<ls259_device> m_devlatch;
 	memory_view m_boot_view;
 	memory_share_creator<uint8_t> m_texmask_ram;
 
@@ -1074,6 +1096,14 @@ private:
 
 	void radikalbp_map(address_map &map) ATTR_COLD;
 };
+
+
+void radikalbp_state::machine_reset()
+{
+	gaelco3d_state::machine_reset();
+
+	m_boot_view.select(0);
+}
 
 
 void radikalbp_state::device_post_load()
@@ -1094,24 +1124,21 @@ void radikalbp_state::texmask_ram_w(offs_t offset, uint8_t data)
 
 void radikalbp_state::radikalbp_map(address_map &map)
 {
-	main020_map(map);
+	main_map(map);
 	map(0x000000, 0x3fffff).view(m_boot_view);
 	m_boot_view[0](0x000000, 0x0fffff).rom().region("maincpu", 0);
 	m_boot_view[0](0x100000, 0x1fffff).ram().share("prgram");
 	m_boot_view[1](0x000000, 0x0fffff).ram().share("prgram");
 	m_boot_view[1](0x100000, 0x3fffff).rom().region("maincpu", 0x100000);
-	map(0x500000, 0x500001).select(0x000070).lw16(NAME([this] (offs_t offset, u16 data) { m_devlatch->write_d0(offset >> 3, data); }));
+	map(0x500070, 0x500071).lw16(NAME([this] (u16 data) { m_boot_view.select(BIT(data, 0)); }));
 	map(0xc00000, 0xcfffff).umask16(0x00ff).w(FUNC(radikalbp_state::texmask_ram_w));
 }
 
 
 void radikalbp_state::radikalbp(machine_config &config)
 {
-	gaelco3d2(config);
+	gaelco3d(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &radikalbp_state::radikalbp_map);
-
-	LS259(config, m_devlatch);
-	m_devlatch->q_out_cb<7>().set([this] (int state) { m_boot_view.select(state); });
 }
 
 } // anonymous namespace
@@ -1710,9 +1737,10 @@ ROM_END
    200000  circuit data, identical to 100000-1e29ff of the final program but for one byte
    380000  texture mask, which the program copies to the mask RAM (215 bits differ from the final mask ROMs)
    The program expects circuit data at 30000 and a palette at 20000 in RAM, and a sine table at 200000,
-   none of which are in the flash, so it hangs preprocessing the circuits at boot. */
+   none of which are in the flash. It takes an address error while loading the first circuit, and its
+   built-in copy of the monitor then waits for the development host. */
 ROM_START( radikalbp ) // Development PCB, silkscreened "3D-3G-AER/2"
-	ROM_REGION( 0x400000, "maincpu", 0 )    // 68020 code
+	ROM_REGION( 0x400000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "29f016.u22", 0x000000, 0x200000, CRC(534ce101) SHA1(4763ecd7e075b69b0742912050633b5d87b26413) )
 	ROM_LOAD16_BYTE( "29f016.u30", 0x000001, 0x200000, CRC(48b26455) SHA1(743d7f32642891d608e345021cabbdf3dd025870) )
 
