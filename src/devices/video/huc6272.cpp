@@ -900,8 +900,7 @@ u16 huc6272_device::kram_read_data_r(offs_t offset, u16 mem_mask)
 	const u16 res = space(AS_DATA).read_word(((m_kram_addr_r) | (m_kram_page_r << 18)) << 0, mem_mask);
 	if (!machine().side_effects_disabled())
 	{
-		m_kram_addr_r += util::sext<s32>(m_kram_inc_r & 0x3ff, 10);
-		m_kram_addr_r &= 0x3ffff;
+		m_kram_addr_r = (m_kram_addr_r & 0x20000) | ((m_kram_addr_r + util::sext<s32>(m_kram_inc_r & 0x3ff, 10)) & 0x1ffff);
 	}
 	return res;
 }
@@ -913,8 +912,8 @@ void huc6272_device::kram_write_data_w(offs_t offset, u16 data, u16 mem_mask)
 		data,
 		mem_mask
 	);
-	m_kram_addr_w += util::sext<s32>(m_kram_inc_w & 0x3ff, 10);
-	m_kram_addr_w &= 0x3ffff;
+	// increments wrap within the A/B bank
+	m_kram_addr_w = (m_kram_addr_w & 0x20000) | ((m_kram_addr_w + util::sext<s32>(m_kram_inc_w & 0x3ff, 10)) & 0x1ffff);
 }
 
 /*
