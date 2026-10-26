@@ -20,19 +20,17 @@
 
 namespace {
 
-class st22xx_rom_handeld_state : public driver_device
+class st22xx_rom_handheld_state : public driver_device
 {
-public:
-	st22xx_rom_handeld_state(const machine_config &mconfig, device_type type, const char *tag)
+protected:
+	st22xx_rom_handheld_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		, m_porta(0xff)
 		, m_portb(0xff)
 	{
 	}
 
-protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
@@ -42,23 +40,22 @@ protected:
 	required_device<st2205u_base_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
-	u8 m_porta;
 	u8 m_portb;
 };
 
-class st22xx_dphh8213_state : public st22xx_rom_handeld_state
+class st22xx_dphh8213_state : public st22xx_rom_handheld_state
 {
 public:
 	st22xx_dphh8213_state(const machine_config &mconfig, device_type type, const char *tag)
-		: st22xx_rom_handeld_state(mconfig, type, tag)
+		: st22xx_rom_handheld_state(mconfig, type, tag)
 		, m_lcdc(*this, "lcdc")
 		, m_input_matrix(*this, "MATRIX%u", 1U)
 	{
 	}
 
-	void st22xx_bbl338(machine_config &config);
-	void st22xx_dphh8213(machine_config &config);
-	void st22xx_cutepet(machine_config &config);
+	void st22xx_bbl338(machine_config &config) ATTR_COLD;
+	void st22xx_dphh8213(machine_config &config) ATTR_COLD;
+	void st22xx_cutepet(machine_config &config) ATTR_COLD;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -73,13 +70,12 @@ private:
 	required_ioport_array<4> m_input_matrix;
 };
 
-class st22xx_class200_state : public st22xx_rom_handeld_state
+class st22xx_class200_state : public st22xx_rom_handheld_state
 {
 public:
 	st22xx_class200_state(const machine_config &mconfig, device_type type, const char *tag)
-		: st22xx_rom_handeld_state(mconfig, type, tag)
+		: st22xx_rom_handheld_state(mconfig, type, tag)
 		, m_class200lcdc(*this, "class200lcdc")
-		, m_ports(*this, "IN%u", 1U)
 	{
 	}
 
@@ -91,7 +87,6 @@ private:
 	void st22xx_class200_map(address_map &map) ATTR_COLD;
 
 	required_device<class200_lcdc_device> m_class200lcdc;
-	required_ioport_array<2> m_ports;
 };
 
 class st22xx_bbl338_sim_state : public st22xx_dphh8213_state
@@ -261,15 +256,13 @@ void st22xx_bbl338_sim_state::machine_start()
 	save_item(NAME(m_152_dat));
 }
 
-void st22xx_rom_handeld_state::machine_start()
+void st22xx_rom_handheld_state::machine_start()
 {
-	save_item(NAME(m_porta));
 	save_item(NAME(m_portb));
 }
 
-void st22xx_rom_handeld_state::machine_reset()
+void st22xx_rom_handheld_state::machine_reset()
 {
-	m_porta = 0xff;
 	m_portb = 0xff;
 }
 
@@ -337,14 +330,13 @@ u8 st22xx_dphh8213_state::porta_r()
 	return input;
 }
 
-void st22xx_rom_handeld_state::porta_w(u8 data)
+void st22xx_rom_handheld_state::porta_w(u8 data)
 {
 	// Menu control writes?
-	m_porta = data;
 	logerror("%s: port a write %02x\n", machine().describe_context(), data);
 }
 
-void st22xx_rom_handeld_state::portb_w(u8 data)
+void st22xx_rom_handheld_state::portb_w(u8 data)
 {
 //  logerror("%s: port b write %02x\n", machine().describe_context(), data);
 	m_portb = data;
@@ -396,7 +388,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START(class200)
 	PORT_START("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("ON/OFF")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_POWER_ON )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
@@ -457,7 +449,7 @@ void st22xx_dphh8213_state::st22xx_cutepet(machine_config &config)
 
 void st22xx_dphh8213_state::st22xx_bbl338(machine_config &config)
 {
-	ST2302U(config, m_maincpu, 32000000);
+	ST2302U(config, m_maincpu, 32'000'000); // guessed clock as this should be the same resolution as class200 so probably same SoC
 	m_maincpu->set_addrmap(AS_DATA, &st22xx_dphh8213_state::st22xx_bbl338_map);
 	m_maincpu->in_pa_callback().set(FUNC(st22xx_dphh8213_state::porta_r));
 	m_maincpu->out_pa_callback().set(FUNC(st22xx_dphh8213_state::porta_w));
@@ -481,7 +473,7 @@ void st22xx_dphh8213_state::st22xx_bbl338(machine_config &config)
 
 void st22xx_class200_state::st22xx_class200(machine_config &config)
 {
-	ST2302U(config, m_maincpu, 32000000);
+	ST2302U(config, m_maincpu, 32'000'000);
 	m_maincpu->set_addrmap(AS_DATA, &st22xx_class200_state::st22xx_class200_map);
 	m_maincpu->in_pa_callback().set_ioport("IN1");
 	m_maincpu->out_pa_callback().set(FUNC(st22xx_class200_state::porta_w));

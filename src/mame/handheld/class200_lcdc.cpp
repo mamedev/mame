@@ -44,14 +44,14 @@ void class200_lcdc_device::class200_lcdc_advance()
 	const u16 mode = m_lcd_regs[0x03];
 	const bool x_increment = bool(mode & 0x10);
 	const bool y_increment = bool(mode & 0x20);
-	const unsigned h_start = std::min<unsigned>(m_lcd_regs[0x37] & 0xff, 175);
-	const unsigned h_end = std::min<unsigned>(m_lcd_regs[0x36] & 0xff, 175);
-	const unsigned v_start = std::min<unsigned>(m_lcd_regs[0x39] & 0xff, 219);
-	const unsigned v_end = std::min<unsigned>(m_lcd_regs[0x38] & 0xff, 219);
+	const u32 h_start = std::min<unsigned>(m_lcd_regs[0x37] & 0xff, 175);
+	const u32 h_end = std::min<unsigned>(m_lcd_regs[0x36] & 0xff, 175);
+	const u32 v_start = std::min<unsigned>(m_lcd_regs[0x39] & 0xff, 219);
+	const u32 v_end = std::min<unsigned>(m_lcd_regs[0x38] & 0xff, 219);
 	if (h_start > h_end || v_start > v_end)
 		return;
 
-	const auto advance = [](u16 &coord, unsigned lo, unsigned hi, bool increase)
+	const auto advance = [](u16 &coord, u32 lo, u32  hi, bool increase)
 	{
 		if (increase)
 		{
@@ -111,15 +111,8 @@ void class200_lcdc_device::lcdc_data_w(u8 data)
 	if (r == 0x22)
 	{
 		++m_lcd_gram_writes;
-		if (value != 0 && !m_lcd_first_nonblack_logged)
-		{
-			logerror("class200_lcdc: first non-black LCD pixel=%04X cursor=(%u,%u) writes=%u\n",
-				value, m_lcd_regs[0x20] & 0xff, m_lcd_regs[0x21] & 0xff,
-				m_lcd_gram_writes);
-			m_lcd_first_nonblack_logged = true;
-		}
-		const unsigned col = m_lcd_regs[0x20] & 0xff;
-		const unsigned row = m_lcd_regs[0x21] & 0xff;
+		const u32 col = m_lcd_regs[0x20] & 0xff;
+		const u32 row = m_lcd_regs[0x21] & 0xff;
 		if (col < 176 && row < 220)
 			m_gram[row * 176 + col] = value;
 		class200_lcdc_advance();
@@ -142,7 +135,10 @@ u8 class200_lcdc_device::lcdc_data_r()
 		? m_gram[(m_lcd_regs[0x21] % 220) * 176 + (m_lcd_regs[0x20] % 176)]
 		: m_lcd_regs[m_lcd_reg];
 	const u8 result = m_lcd_read_phase ? u8(val) : u8(val >> 8);
-	m_lcd_read_phase ^= 1;
+
+	if (!machine().side_effects_disabled())
+		m_lcd_read_phase ^= 1;
+
 	return result;
 }
 
@@ -159,7 +155,6 @@ void class200_lcdc_device::device_start()
 	save_item(NAME(m_lcd_data_phase));
 	save_item(NAME(m_lcd_read_phase));
 	save_item(NAME(m_lcd_reg));
-	save_item(NAME(m_lcd_first_nonblack_logged));
 	save_item(NAME(m_lcd_gram_writes));
 }
 
@@ -175,6 +170,5 @@ void class200_lcdc_device::device_reset()
 	m_lcd_command_word = m_lcd_data_word = 0;
 	m_lcd_command_phase = m_lcd_data_phase = 0;
 	m_lcd_read_phase = m_lcd_reg = 0;
-	m_lcd_first_nonblack_logged = false;
 	m_lcd_gram_writes = 0;
 }
