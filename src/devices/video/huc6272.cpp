@@ -187,6 +187,16 @@ void huc6272_device::device_start()
 
 void huc6272_device::device_reset()
 {
+	// every register is 0 after reset, except $05 PHASE (1) and $07 (FFh); $0A reads 3FFFFh, equivalent to the 0 kept here
+	m_register = 0;
+	m_kram_addr_r = m_kram_addr_w = 0;
+	m_kram_inc_r = m_kram_inc_w = 0;
+	m_kram_page_r = m_kram_page_w = 0;
+	m_kram_load_reg = m_kram_write_reg = 0;
+	m_page_setting = 0;
+	m_kram_mode = 0;
+	m_micro_prg.index = 0;
+	m_adpcm = decltype(m_adpcm)();
 	for (auto &bg : m_bg)
 		bg = bg_t();
 	m_bg_mode = 0;
