@@ -40,11 +40,8 @@ Missing features and preservation limits:
   addressing, and a full ED track exceeds the supported 14-bit offsets.
   More than 64 IDAMs or a track larger than 0x3fff bytes also fails
   rather than silently discarding sectors or wrapping pointers.
-- Saving does not shrink an existing DMK's allocated geometry or track
-  size.  The stream API has no truncate operation, and trailing bytes
-  would violate the reader's exact file-size check.  A new output file
-  is needed to reclaim space.  REAL disk specification files are also
-  unsupported: they describe host drives rather than track contents.
+- REAL disk specification files are unsupported: they describe host
+  drives rather than track contents.
 
 *********************************************************************/
 
@@ -618,29 +615,8 @@ bool dmk_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	if (image.get_variant() == floppy_image::DSED)
 		return false; // A full ED revolution cannot fit DMK's 14-bit offsets.
 
-	// Existing DMK track lengths specify the timing more precisely than the
-	// variant (and cover compact SD storage).  Always save expanded FM.
-	disk_header old_disk;
-	bool const existing = read_header(io, old_disk);
-	if (existing)
-	{
-		int const cells = (old_disk.track_size - TRACK_HEADER_SIZE) * (util::BIT(old_disk.flags, 6) ? 32 : 16);
-		cell_size = (200000000 + cells / 2) / cells;
-	}
-
-	// The stream API cannot truncate.  Retain allocated geometry and track
-	// space so saving never leaves a stale tail that invalidates the file.
-	if (existing)
-	{
-		tracks = std::max(tracks, old_disk.tracks);
-		heads = std::max(heads, old_disk.heads);
-	}
-	int max_tracks, max_heads;
-	image.get_maximal_geometry(max_tracks, max_heads);
-	if (tracks > max_tracks || heads > max_heads)
-		return false;
 	std::vector<std::vector<uint8_t>> data(tracks * heads);
-	size_t track_size = existing ? old_disk.track_size : TRACK_HEADER_SIZE + 1;
+	size_t track_size = TRACK_HEADER_SIZE;
 	for (int track = 0; track < tracks; track++)
 		for (int head = 0; head < heads; head++)
 		{
@@ -649,10 +625,6 @@ bool dmk_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 				return false;
 			track_size = std::max(track_size, buffer.size());
 		}
-
-	uint64_t old_size;
-	if (io.length(old_size) || old_size > HEADER_SIZE + uint64_t(data.size()) * track_size)
-		return false;
 
 	uint8_t header[HEADER_SIZE] = { 0 };
 	header[1] = tracks;
