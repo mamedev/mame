@@ -63,6 +63,7 @@ private:
 
 	template <int Pad> TIMER_CALLBACK_MEMBER(pad_func);
 	void pad_irq_update();
+	u8 ar_hold(int chip) { const u8 ar = m_huc6270[chip]->get_ar(0); return (ar == 0x13) ? 0x03 : ar; }
 
 	u16 timer_control_r();
 	void timer_control_w(u16 data);
@@ -324,8 +325,9 @@ void pcfx_state::pcfx_io(address_map &map)
 		NAME([this] (offs_t offset, u32 mem_mask) -> u32 { return read_halves(mem_mask, [this, offset] { return m_huc6270[1]->read16(offset); }); }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { write_halves(data, mem_mask, [this, offset] (u16 d) { m_huc6270[1]->write16(offset, d); }); }));
 	map(0x00000600, 0x00000607).mirror(0xf8).m("huc6272", FUNC(huc6272_device::amap)); // King
-	map(0x00000c00, 0x00000c00).r("huc6270_a", FUNC(huc6270_device::get_ar));
-	map(0x00000c40, 0x00000c40).r("huc6270_b", FUNC(huc6270_device::get_ar));
+	// HuC6270 address hold registers: the last AR value written, with DVSSR ($13) reading as $03
+	map(0x00000c00, 0x00000c00).lr8(NAME([this] () -> u8 { return ar_hold(0); }));
+	map(0x00000c40, 0x00000c40).lr8(NAME([this] () -> u8 { return ar_hold(1); }));
 	map(0x00000c80, 0x00000c80).lrw8(
 		NAME([this] (offs_t offset) { return m_bram_control; }),
 		NAME([this] (offs_t offset, u8 data) {
