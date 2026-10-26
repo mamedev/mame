@@ -32,9 +32,13 @@
     ------              ------------------  --------------------------------
     Top Border          25                  1
     Body                192                 1
-    Bottom Border       26                  1
+    Bottom Border       27                  1
     Vertical Retrace    6                   0
-    Vertical Blanking   13 (or 13.5)        1
+    Vertical Blanking   13                  1
+
+    The NTSC GIME has 263 scanlines per field, one more than the MC6847.
+    The extra line precedes field sync, preserving the distance from field
+    sync to the next active area.  Both spacings matter for raster effects.
 
     Horizontal sync appears to be low only during retrace/blanking but
     field sync switches as soon as the last body pixel is displayed
@@ -103,6 +107,9 @@
 #define GIME_TYPE_1987          0
 #define NO_ATTRIBUTE            0x80
 
+// Active-video offset in VDG clocks from HS, estimated from the CSS hardware test.
+static constexpr int GIME_ACTIVE_VIDEO_CLOCK = 33;
+
 #define LOG_INT_MASKING (1U <<  1)
 #define LOG_GIME        (1U <<  2)
 #define LOG_TIMER       (1U <<  3)
@@ -143,7 +150,7 @@
 //-------------------------------------------------
 
 gime_device::gime_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool pal)
-	: mc6847_friend_device(mconfig, type, tag, owner, clock, true, 262, 25+192+26+1, 8, false, pal)
+	: mc6847_friend_device(mconfig, type, tag, owner, clock, true, pal ? 312 : 263, 25+192+26+1, 8, true, pal, pal ? 0 : 1)
 	, sam6883_friend_device_interface(mconfig, *this, 8)
 	, m_write_irq(*this)
 	, m_write_firq(*this)
@@ -200,6 +207,7 @@ void gime_device::device_start()
 
 	// allocate timer
 	m_gime_clock_timer = timer_alloc(FUNC(gime_device::timer_elapsed), this);
+	m_vertical_border_timer = timer_alloc(FUNC(gime_device::vertical_border_interrupt), this);
 
 	// setup banks
 	assert(std::size(m_read_banks) == std::size(m_write_banks));
@@ -236,6 +244,11 @@ void gime_device::device_start()
 	save_item(NAME(m_palette_rotated));
 	save_item(NAME(m_composite_phase_invert));
 	save_item(NAME(m_video_position));
+	save_item(NAME(m_scanline_pitch));
+	save_item(NAME(m_scanline_lines_per_row));
+	save_item(NAME(m_row_advance_pending));
+	save_item(NAME(m_horizontal_offset));
+	save_item(NAME(m_horizontal_offset_latched));
 	save_item(NAME(m_line_in_row));
 	save_item(NAME(m_legacy_video));
 	save_item(NAME(m_palette_rotated_position));
@@ -244,6 +257,7 @@ void gime_device::device_start()
 	for (int i = 0; i < std::size(m_scanlines); i++)
 	{
 		save_item(NAME(m_scanlines[i].m_border), i);
+		save_item(NAME(m_scanlines[i].m_css), i);
 		save_item(NAME(m_scanlines[i].m_line_in_row), i);
 		save_item(NAME(m_scanlines[i].m_ff22_value), i);
 		save_item(NAME(m_scanlines[i].m_ff98_value), i);
@@ -360,8 +374,14 @@ void gime_device::device_reset()
 	m_irq = 0x00;
 	m_firq = 0x00;
 	m_is_blinking = false;
+	m_vertical_border_timer->adjust(attotime::never);
 
 	m_legacy_video = false;
+	m_scanline_pitch = 0;
+	m_scanline_lines_per_row = 1;
+	m_row_advance_pending = false;
+	m_horizontal_offset = 0;
+	m_horizontal_offset_latched = false;
 
 	m_displayed_rgb = false;
 
@@ -665,7 +685,11 @@ void gime_device::pia_write(offs_t offset, uint8_t data)
 
 	/* only cache writes to $FF22 if the data register is addressed */
 	if (offset == 0x02 && ((m_ff23_value & 0x04) == 0x04))
+	{
+		if (m_legacy_video && ((m_ff22_value ^ data) & MODE_CSS))
+			video_flush();
 		m_ff22_value = data;
+	}
 }
 
 
@@ -835,6 +859,15 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 
 	// make the change, and track the difference
 	uint8_t xorval = m_gime_registers[offset] ^ data;
+	if (((offset == 0x08 && (xorval & 0x80)) || (offset == 0x09 && (xorval & 0x1f))
+		|| (offset == 0x0f && xorval)) && !m_legacy_video)
+	{
+		// Preserve pixels and row pitch already fetched before changing modes
+		// or loading the horizontal offset for the following line.
+		// LPR-only writes must reach the pending row advance before capture;
+		// flushing them here would consume it with the old height (BOINK).
+		video_flush();
+	}
 	m_gime_registers[offset] = data;
 
 	switch(offset)
@@ -1277,6 +1310,10 @@ void gime_device::new_frame()
 
 	/* latch in the video position */
 	m_video_position = get_video_base();
+	m_scanline_pitch = 0;
+	m_scanline_lines_per_row = 1;
+	m_row_advance_pending = false;
+	m_horizontal_offset_latched = false;
 
 	/* latch in the vertical scroll position */
 	m_line_in_row = m_gime_registers[0x00] & 0x80 ? 0 : m_gime_registers[0x0c] & 0x0f;
@@ -1296,6 +1333,14 @@ void gime_device::new_frame()
 
 TIMER_CALLBACK_MEMBER(gime_device::horizontal_sync_changed)
 {
+	// Defer row advancement until the next body line is captured, so its
+	// lines-per-row setting applies before fetching that line's data.
+	if (param)
+	{
+		m_row_advance_pending = (m_scanline_pitch != 0);
+		m_horizontal_offset_latched = false;
+	}
+
 	set_interrupt_value(INTERRUPT_HBORD, (bool)param);
 }
 
@@ -1307,6 +1352,17 @@ TIMER_CALLBACK_MEMBER(gime_device::horizontal_sync_changed)
 
 void gime_device::enter_bottom_border()
 {
+	// VBORD occurs near the left border, after HS rises, rather than at
+	// the scanline boundary.  The 1986 GIME offset from HS falling is
+	// 161/225 pixel clocks in 40/32-column modes (two more at high resolution).
+	const bool wide = !m_legacy_video && (m_gime_registers[0x09] & 0x04);
+	const bool high_resolution = !m_legacy_video && (m_gime_registers[0x09] & 0x10);
+	const int pixel_clocks = (wide ? 161 : 225) + (high_resolution ? 2 : 0);
+	m_vertical_border_timer->adjust(clocks_to_attotime(pixel_clocks * 2 - 16 * 8));
+}
+
+TIMER_CALLBACK_MEMBER(gime_device::vertical_border_interrupt)
+{
 	set_interrupt_value(INTERRUPT_VBORD, true);
 	set_interrupt_value(INTERRUPT_VBORD, false);
 }
@@ -1317,7 +1373,7 @@ void gime_device::enter_bottom_border()
 //  update_border
 //-------------------------------------------------
 
-void gime_device::update_border(uint16_t physical_scanline)
+void gime_device::update_border(uint16_t physical_scanline, int32_t start_clock, int32_t end_clock)
 {
 	uint8_t border;
 	if (m_legacy_video)
@@ -1344,7 +1400,14 @@ void gime_device::update_border(uint16_t physical_scanline)
 		/* get the border value from $FF9A */
 		border = m_gime_registers[0x0a] & 0x3f;
 	}
-	update_value(&m_scanlines[physical_scanline].m_border, border);
+	const int first_pixel = std::clamp((start_clock - GIME_ACTIVE_VIDEO_CLOCK) * 4 + 64, 0, 640);
+	const int last_pixel = std::clamp((end_clock - GIME_ACTIVE_VIDEO_CLOCK) * 4 + 64, 0, 640);
+	for (int x = first_pixel; x < last_pixel; x++)
+	{
+		update_value(&m_scanlines[physical_scanline].m_border[x], border);
+		if (x >= 64 && x < 576)
+			update_value(&m_scanlines[physical_scanline].m_css[x - 64], uint8_t(m_ff22_value & MODE_CSS));
+	}
 }
 
 
@@ -1355,7 +1418,12 @@ void gime_device::update_border(uint16_t physical_scanline)
 
 void gime_device::record_border_scanline(uint16_t physical_scanline)
 {
-	update_border(physical_scanline);
+	record_partial_border_scanline(physical_scanline, 0, 228);
+}
+
+void gime_device::record_partial_border_scanline(uint16_t physical_scanline, int32_t start_clock, int32_t end_clock)
+{
+	update_border(physical_scanline, start_clock, end_clock);
 	update_value(&m_scanlines[physical_scanline].m_line_in_row, uint8_t(~0));
 }
 
@@ -1430,13 +1498,20 @@ inline uint16_t gime_device::get_lines_per_row()
 //-------------------------------------------------
 
 template<uint8_t xres, gime_device::get_data_func get_data, bool record_mode>
-inline uint32_t gime_device::record_scanline_res(int scanline)
+inline uint32_t gime_device::record_scanline_res(int scanline, int32_t start_clock, int32_t end_clock)
 {
 	int column;
 	/* capture 512K memory bank per scan line */
 	uint32_t bank_512k = (m_gime_registers[0x0b] & 0x0f) * 0x80000;
-	uint32_t base_offset = m_legacy_video ? 0 : (m_gime_registers[0x0f] & 0x7f) * 2;
+	uint32_t base_offset = m_legacy_video ? 0 : (m_horizontal_offset & 0x7f) * 2;
 	uint32_t offset = 0;
+
+	// Wide modes add sixteen VDG clocks at each side of the active area.
+	const bool wide = !m_legacy_video && (m_gime_registers[0x09] & 0x04);
+	const int active_clock = GIME_ACTIVE_VIDEO_CLOCK - (wide ? 16 : 0);
+	const int active_clocks = wide ? 160 : 128;
+	const int first_column = std::clamp((start_clock - active_clock) * xres / active_clocks, 0, int(xres));
+	const int last_column = std::clamp((end_clock - active_clock) * xres / active_clocks, 0, int(xres));
 
 	/* main loop */
 	for (column = 0; column < xres; column++)
@@ -1444,6 +1519,9 @@ inline uint32_t gime_device::record_scanline_res(int scanline)
 		/* input data */
 		uint8_t data, mode;
 		offset += ((*this).*(get_data))((m_video_position + ((base_offset + offset) & 0xff)) | bank_512k, &data, &mode);
+
+		if (column < first_column || column >= last_column)
+			continue;
 
 		/* and record the pertinent values */
 		if (record_mode)
@@ -1525,8 +1603,50 @@ uint32_t gime_device::get_data_with_attributes(uint32_t video_position, uint8_t 
 
 void gime_device::record_full_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline)
 {
+	record_body_scanline(physical_scanline, logical_scanline, 0, 228);
+}
+
+void gime_device::record_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline, int32_t start_clock, int32_t end_clock)
+{
+	const bool wide = !m_legacy_video && (m_gime_registers[0x09] & 0x04);
+	const int active_clock = GIME_ACTIVE_VIDEO_CLOCK - (wide ? 16 : 0);
+	const int active_end_clock = GIME_ACTIVE_VIDEO_CLOCK + 128 + (wide ? 16 : 0);
+	// A blanking-only flush must not replace the completed line's mode,
+	// height or pitch with the settings intended for the following line.
+	if (end_clock <= active_clock || start_clock >= active_end_clock)
+	{
+		update_border(physical_scanline, start_clock, end_clock);
+		return;
+	}
+
+	// Load the horizontal offset at the start of active video and retain it
+	// across partial captures.  Writes before active video can still change
+	// this line's offset; later writes only affect the next line.
+	if (!m_horizontal_offset_latched)
+	{
+		m_horizontal_offset = m_gime_registers[0x0f];
+		m_horizontal_offset_latched = true;
+	}
+
+	// Consume the previous line's pitch once, even when this line is captured
+	// in several parts.  A completed row must advance even if the new mode
+	// increases its height (Cloud Kingdoms switches from graphics to text).
+	// Shortening a repeated row must also advance before fetching pixels.
+	// Infinite-height mode is a hold: entering it must suppress even an
+	// otherwise completed row's advance (BOINK freezes below the ball).
+	if (m_row_advance_pending)
+	{
+		const uint16_t lines_per_row = get_lines_per_row();
+		if (++m_line_in_row >= std::min(m_scanline_lines_per_row, lines_per_row) && lines_per_row != 0xffff)
+		{
+			m_line_in_row = 0;
+			m_video_position += m_scanline_pitch;
+		}
+		m_row_advance_pending = false;
+	}
+
 	/* update the border first */
-	update_border(physical_scanline);
+	update_border(physical_scanline, start_clock, end_clock);
 
 	/* set the line in row */
 	update_value(&m_scanlines[physical_scanline].m_line_in_row, m_line_in_row);
@@ -1547,9 +1667,9 @@ void gime_device::record_full_body_scanline(uint16_t physical_scanline, uint16_t
 			case MODE_AG|MODE_GM1|MODE_GM0:
 			case MODE_AG|MODE_GM2|MODE_GM0:
 				if (m_sam_state & SAM_STATE_V0)
-					pitch = record_scanline_res<16, &gime_device::get_data_mc6847, true>(physical_scanline);
+					pitch = record_scanline_res<16, &gime_device::get_data_mc6847, true>(physical_scanline, start_clock, end_clock);
 				else
-					pitch = record_scanline_res<32, &gime_device::get_data_mc6847, true>(physical_scanline);
+					pitch = record_scanline_res<32, &gime_device::get_data_mc6847, true>(physical_scanline, start_clock, end_clock);
 
 				break;
 
@@ -1565,7 +1685,7 @@ void gime_device::record_full_body_scanline(uint16_t physical_scanline, uint16_t
 			case MODE_AG|MODE_GM2:
 			case MODE_AG|MODE_GM2|MODE_GM1:
 			case MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0:
-				pitch = record_scanline_res<32, &gime_device::get_data_mc6847, true>(physical_scanline);
+				pitch = record_scanline_res<32, &gime_device::get_data_mc6847, true>(physical_scanline, start_clock, end_clock);
 				break;
 
 			default:
@@ -1585,14 +1705,14 @@ void gime_device::record_full_body_scanline(uint16_t physical_scanline, uint16_t
 			/* graphics */
 			switch(m_gime_registers[0x09] & 0x1c)
 			{
-				case 0x00:  pitch = record_scanline_res< 16, &gime_device::get_data_without_attributes, false>(physical_scanline); break;
-				case 0x04:  pitch = record_scanline_res< 20, &gime_device::get_data_without_attributes, false>(physical_scanline); break;
-				case 0x08:  pitch = record_scanline_res< 32, &gime_device::get_data_without_attributes, false>(physical_scanline); break;
-				case 0x0c:  pitch = record_scanline_res< 40, &gime_device::get_data_without_attributes, false>(physical_scanline); break;
-				case 0x10:  pitch = record_scanline_res< 64, &gime_device::get_data_without_attributes, false>(physical_scanline); break;
-				case 0x14:  pitch = record_scanline_res< 80, &gime_device::get_data_without_attributes, false>(physical_scanline); break;
-				case 0x18:  pitch = record_scanline_res<128, &gime_device::get_data_without_attributes, false>(physical_scanline); break;
-				case 0x1c:  pitch = record_scanline_res<160, &gime_device::get_data_without_attributes, false>(physical_scanline); break;
+				case 0x00:  pitch = record_scanline_res< 16, &gime_device::get_data_without_attributes, false>(physical_scanline, start_clock, end_clock); break;
+				case 0x04:  pitch = record_scanline_res< 20, &gime_device::get_data_without_attributes, false>(physical_scanline, start_clock, end_clock); break;
+				case 0x08:  pitch = record_scanline_res< 32, &gime_device::get_data_without_attributes, false>(physical_scanline, start_clock, end_clock); break;
+				case 0x0c:  pitch = record_scanline_res< 40, &gime_device::get_data_without_attributes, false>(physical_scanline, start_clock, end_clock); break;
+				case 0x10:  pitch = record_scanline_res< 64, &gime_device::get_data_without_attributes, false>(physical_scanline, start_clock, end_clock); break;
+				case 0x14:  pitch = record_scanline_res< 80, &gime_device::get_data_without_attributes, false>(physical_scanline, start_clock, end_clock); break;
+				case 0x18:  pitch = record_scanline_res<128, &gime_device::get_data_without_attributes, false>(physical_scanline, start_clock, end_clock); break;
+				case 0x1c:  pitch = record_scanline_res<160, &gime_device::get_data_without_attributes, false>(physical_scanline, start_clock, end_clock); break;
 				default:
 					fatalerror("Should not get here\n");
 			}
@@ -1602,21 +1722,21 @@ void gime_device::record_full_body_scanline(uint16_t physical_scanline, uint16_t
 			/* text */
 			switch(m_gime_registers[0x09] & 0x15)
 			{
-				case 0x00:  pitch = record_scanline_res< 32, &gime_device::get_data_without_attributes, true>(physical_scanline);  break;
-				case 0x01:  pitch = record_scanline_res< 32, &gime_device::get_data_with_attributes,    true>(physical_scanline);  break;
-				case 0x04:  pitch = record_scanline_res< 40, &gime_device::get_data_without_attributes, true>(physical_scanline);  break;
-				case 0x05:  pitch = record_scanline_res< 40, &gime_device::get_data_with_attributes,    true>(physical_scanline);  break;
-				case 0x10:  pitch = record_scanline_res< 64, &gime_device::get_data_without_attributes, true>(physical_scanline);  break;
-				case 0x11:  pitch = record_scanline_res< 64, &gime_device::get_data_with_attributes,    true>(physical_scanline);  break;
-				case 0x14:  pitch = record_scanline_res< 80, &gime_device::get_data_without_attributes, true>(physical_scanline);  break;
-				case 0x15:  pitch = record_scanline_res< 80, &gime_device::get_data_with_attributes,    true>(physical_scanline);  break;
+				case 0x00:  pitch = record_scanline_res< 32, &gime_device::get_data_without_attributes, true>(physical_scanline, start_clock, end_clock);  break;
+				case 0x01:  pitch = record_scanline_res< 32, &gime_device::get_data_with_attributes,    true>(physical_scanline, start_clock, end_clock);  break;
+				case 0x04:  pitch = record_scanline_res< 40, &gime_device::get_data_without_attributes, true>(physical_scanline, start_clock, end_clock);  break;
+				case 0x05:  pitch = record_scanline_res< 40, &gime_device::get_data_with_attributes,    true>(physical_scanline, start_clock, end_clock);  break;
+				case 0x10:  pitch = record_scanline_res< 64, &gime_device::get_data_without_attributes, true>(physical_scanline, start_clock, end_clock);  break;
+				case 0x11:  pitch = record_scanline_res< 64, &gime_device::get_data_with_attributes,    true>(physical_scanline, start_clock, end_clock);  break;
+				case 0x14:  pitch = record_scanline_res< 80, &gime_device::get_data_without_attributes, true>(physical_scanline, start_clock, end_clock);  break;
+				case 0x15:  pitch = record_scanline_res< 80, &gime_device::get_data_with_attributes,    true>(physical_scanline, start_clock, end_clock);  break;
 				default:
 					fatalerror("Should not get here\n");
 			}
 		}
 
 		/* is the GIME horizontal virtual screen enabled? */
-		if (m_gime_registers[0x0f] & 0x80)
+		if (m_horizontal_offset & 0x80)
 		{
 			pitch = 256;
 		}
@@ -1625,13 +1745,9 @@ void gime_device::record_full_body_scanline(uint16_t physical_scanline, uint16_t
 	/* sanity checks */
 	assert(pitch > 0);
 
-	/* are we moving on to the next line? */
-	if (++m_line_in_row >= get_lines_per_row())
-	{
-		/* next row */
-		m_line_in_row = 0;
-		m_video_position += pitch;
-	}
+	// Keep the pitch for the next line without advancing on a partial flush.
+	m_scanline_pitch = pitch;
+	m_scanline_lines_per_row = get_lines_per_row();
 }
 
 
@@ -1642,7 +1758,7 @@ void gime_device::record_full_body_scanline(uint16_t physical_scanline, uint16_t
 
 void gime_device::record_partial_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline, int32_t start_clock, int32_t end_clock)
 {
-	fatalerror("NYI");
+	record_body_scanline(physical_scanline, logical_scanline, start_clock, end_clock);
 }
 
 
@@ -1705,7 +1821,7 @@ void gime_device::update_geometry()
 //  emit_dummy_samples
 //-------------------------------------------------
 
-uint32_t gime_device::emit_dummy_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette)
+uint32_t gime_device::emit_dummy_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette, int pixel_start)
 {
 	fatalerror("Should not get here\n");
 }
@@ -1715,19 +1831,36 @@ uint32_t gime_device::emit_dummy_samples(const scanline_record *scanline, int sa
 //-------------------------------------------------
 
 template<int xscale>
-inline uint32_t gime_device::emit_mc6847_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette)
+inline uint32_t gime_device::emit_mc6847_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette, int pixel_start)
 {
-	return super::emit_mc6847_samples<xscale>(
-		scanline->m_mode[sample_start],
-		&scanline->m_data[sample_start],
-		sample_count,
-		pixels,
-		palette,
-		super::m_charrom_cb,
-		sample_start,
-		scanline->m_line_in_row);
-}
+	const uint8_t mode = scanline->m_mode[sample_start];
+	const auto emit = [&](uint8_t css_mode, pixel_t *output)
+	{
+		return super::emit_mc6847_samples<xscale>(css_mode,
+			&scanline->m_data[sample_start], sample_count, output, palette,
+			super::m_charrom_cb, sample_start, scanline->m_line_in_row);
+	};
+	const uint32_t count = emit(mode, pixels);
+	const unsigned visible_count = std::min<unsigned>(count, 512 - std::min(pixel_start, 512));
 
+	// CSS is an output signal, not a byte-fetch attribute.  Decode the same
+	// samples with the other color set only when CSS changes within this run.
+	for (unsigned i = 0; i < visible_count; i++)
+	{
+		if (scanline->m_css[pixel_start + i] != (mode & MODE_CSS))
+		{
+			pixel_t alternate[1024];
+			emit(mode ^ MODE_CSS, alternate);
+			for (; i < visible_count; i++)
+			{
+				if (scanline->m_css[pixel_start + i] != (mode & MODE_CSS))
+					pixels[i] = alternate[i];
+			}
+			break;
+		}
+	}
+	return count;
+}
 
 
 //-------------------------------------------------
@@ -1735,7 +1868,7 @@ inline uint32_t gime_device::emit_mc6847_samples(const scanline_record *scanline
 //-------------------------------------------------
 
 template<int xscale, int bits_per_pixel>
-inline uint32_t gime_device::emit_gime_graphics_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette)
+inline uint32_t gime_device::emit_gime_graphics_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette, int pixel_start)
 {
 	const uint8_t *data = &scanline->m_data[sample_start];
 	mc6847_friend_device::emit_graphics<bits_per_pixel, xscale>(data, sample_count, pixels, 0, palette);
@@ -1749,7 +1882,7 @@ inline uint32_t gime_device::emit_gime_graphics_samples(const scanline_record *s
 //-------------------------------------------------
 
 template<int xscale>
-inline uint32_t gime_device::emit_gime_text_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette)
+inline uint32_t gime_device::emit_gime_text_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette, int pixel_start)
 {
 	uint8_t attribute = scanline->m_mode[sample_start];
 	const uint8_t *data = &scanline->m_data[sample_start];
@@ -1811,7 +1944,6 @@ inline uint32_t gime_device::emit_gime_text_samples(const scanline_record *scanl
 template<int sample_count, gime_device::emit_samples_proc emit_samples>
 inline void gime_device::render_scanline(const scanline_record *scanline, pixel_t *pixels, int min_x, int max_x, palette_resolver *resolver)
 {
-	pixel_t border_color = resolver->lookup(scanline->m_border);
 
 	/* is this a wide video mode? */
 	bool wide = !m_legacy_video && (scanline->m_ff99_value & 0x04);
@@ -1832,17 +1964,22 @@ inline void gime_device::render_scanline(const scanline_record *scanline, pixel_
 	/* left border */
 	for (int x = min_x; x < left_border; x++)
 	{
-		pixels[x] = border_color;
+		pixels[x] = resolver->lookup(scanline->m_border[x]);
 	}
 
 	/* right border */
 	for (int x = right_border; x <= max_x; x++)
 	{
-		pixels[x] = border_color;
+		pixels[x] = resolver->lookup(scanline->m_border[x]);
 	}
 
 	/* offset the pixel counts depending on wide */
 	pixels += wide ? 0 : 64;
+
+	// Preserve the mode and resolved colors at each legacy artifact sample.
+	const bool artifacting = m_legacy_video && (sample_count > 0) && m_artifacter.get_ntsc_artifacting();
+	uint8_t artifact_modes[256]{};
+	pixel_t artifact_colors[256][2]{};
 
 	/* body */
 	const pixel_t *resolved_palette = nullptr;
@@ -1857,16 +1994,31 @@ inline void gime_device::render_scanline(const scanline_record *scanline, pixel_
 		resolved_palette = resolver->get_palette(scanline->m_palette[x]);
 
 		/* emit the samples, with a (hopefully) aggressively inlined function */
-		pixel_position += ((*this).*(emit_samples))(scanline, x, x2 - x, &pixels[pixel_position], resolved_palette);
+		const uint32_t pixel_count = ((*this).*(emit_samples))(scanline, x, x2 - x, &pixels[pixel_position], resolved_palette, pixel_position);
+
+		if (artifacting)
+		{
+			// GIME output has two pixels per legacy artifact sample.
+			const unsigned start = std::min<unsigned>(pixel_position / 2, 256);
+			const unsigned end = std::min<unsigned>((pixel_position + pixel_count) / 2, 256);
+			for (unsigned i = start; i < end; i++)
+			{
+				const uint8_t mode = (scanline->m_mode[x] & ~MODE_CSS) | scanline->m_css[i * 2];
+				artifact_modes[i] = mode;
+				artifact_colors[i][0] = resolved_palette[(mode & MODE_CSS) ? 10 : 8];
+				artifact_colors[i][1] = resolved_palette[(mode & MODE_CSS) ? 11 : 9];
+			}
+		}
+		pixel_position += pixel_count;
 
 		/* update x */
 		x = x2;
 	}
 
 	/* artifacting */
-	if (m_legacy_video && (sample_count > 0))
+	if (artifacting)
 	{
-		m_artifacter.process_artifacts<2>(pixels, scanline->m_mode[0], resolved_palette);
+		m_artifacter.process_artifacts<2>(pixels, scanline->m_mode[0], resolved_palette, artifact_modes, artifact_colors);
 	}
 }
 

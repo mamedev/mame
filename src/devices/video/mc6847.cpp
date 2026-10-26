@@ -198,7 +198,7 @@ const uint32_t mc6847_base_device::s_palette[mc6847_base_device::PALETTE_LENGTH]
 
 mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock,
 		bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, int divider,
-		bool supports_partial_body_scanlines, bool pal)
+		bool supports_partial_body_scanlines, bool pal, uint16_t extra_bottom_border_scanlines)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_font_rom_region(*this, "chargen")
@@ -209,10 +209,10 @@ mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device
 	, m_tpfs(tpfs)
 	, m_pal(pal)
 	, m_lines_top_border(pal ? LINES_TOP_BORDER + LINES_PADDING_TOP_PAL : LINES_TOP_BORDER)
-	, m_lines_until_vblank(pal ? LINES_UNTIL_VBLANK_PAL : LINES_UNTIL_VBLANK_NTSC)
-	, m_lines_until_retrace(pal ? LINES_UNTIL_RETRACE_PAL : LINES_UNTIL_RETRACE_NTSC)
+	, m_lines_until_vblank((pal ? LINES_UNTIL_VBLANK_PAL : LINES_UNTIL_VBLANK_NTSC) + extra_bottom_border_scanlines)
+	, m_lines_until_retrace((pal ? LINES_UNTIL_RETRACE_PAL : LINES_UNTIL_RETRACE_NTSC) + extra_bottom_border_scanlines)
 	, m_divider(divider)
-	, m_field_sync_falling_edge_scanline(pal ? field_sync_falling_edge_scanline + LINES_PADDING_TOP_PAL : field_sync_falling_edge_scanline)
+	, m_field_sync_falling_edge_scanline(field_sync_falling_edge_scanline + (pal ? LINES_PADDING_TOP_PAL : 0) + extra_bottom_border_scanlines)
 	, m_supports_partial_body_scanlines(supports_partial_body_scanlines)
 {
 	// Note: field_sync_falling_edge_scanline is parameterized because the MC6847
@@ -240,6 +240,7 @@ void mc6847_friend_device::device_start()
 	m_wide = false;
 	m_recording_scanline = false;
 	m_physical_scanline = 0;
+	m_logical_scanline = 0;
 	m_logical_scanline_zone = 0;
 	m_field_sync = false;
 	m_horizontal_sync = false;
@@ -370,7 +371,7 @@ TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_horizontal_sync)
 			{
 			case SCANLINE_ZONE_TOP_BORDER:
 			case SCANLINE_ZONE_BOTTOM_BORDER:
-				record_border_scanline(m_physical_scanline);
+				record_partial_border_scanline(m_physical_scanline, m_partial_scanline_clocks, CLOCKS_HSYNC_PERIOD);
 				break;
 
 			case SCANLINE_ZONE_BODY:
@@ -482,8 +483,11 @@ inline void mc6847_friend_device::next_scanline()
 		m_logical_scanline = 0;
 		m_logical_scanline_zone = SCANLINE_ZONE_BODY;
 	}
-	else if ((m_logical_scanline_zone == SCANLINE_ZONE_BODY) && (m_logical_scanline >= m_body_scanlines))
+	else if ((m_logical_scanline_zone == SCANLINE_ZONE_BODY)
+		&& (m_physical_scanline >= uint32_t(m_top_border_scanlines) + m_body_scanlines))
 	{
+		// Compare with the absolute end of the body: a mid-frame geometry
+		// change can move the top-border setting after the body has started.
 		/* we're now into the bottom border */
 		m_logical_scanline = 0;
 		m_logical_scanline_zone = SCANLINE_ZONE_BOTTOM_BORDER;
@@ -591,9 +595,8 @@ void mc6847_friend_device::record_border_scanline(uint16_t physical_scanline)
 
 int32_t mc6847_friend_device::get_clocks_since_hsync()
 {
-	uint64_t hsync_on_clocks = attotime_to_clocks(m_hsync_on_timer->start()) / m_divider;
-	uint64_t current_clocks = attotime_to_clocks(machine().time()) / m_divider;
-	return (int32_t) (current_clocks - hsync_on_clocks);
+	// Convert the elapsed time rather than rounding two absolute timestamps.
+	return attotime_to_clocks(machine().time() - m_hsync_on_timer->start()) / m_divider;
 }
 
 
@@ -607,8 +610,10 @@ void mc6847_friend_device::video_flush()
 	// first, only flush if...
 	//   1.  We support partial scanlines
 	//   2.  We're not already recording
-	//   3.  We're in the body
-	if (m_supports_partial_body_scanlines && !m_recording_scanline && (m_logical_scanline_zone == SCANLINE_ZONE_BODY))
+	//   3.  We're in visible video (body or border)
+	if (m_supports_partial_body_scanlines && !m_recording_scanline && ((m_logical_scanline_zone == SCANLINE_ZONE_BODY)
+		|| (m_logical_scanline_zone == SCANLINE_ZONE_TOP_BORDER)
+		|| (m_logical_scanline_zone == SCANLINE_ZONE_BOTTOM_BORDER)))
 	{
 		uint32_t new_partial_scanline_clocks = get_clocks_since_hsync();
 		if (m_partial_scanline_clocks < new_partial_scanline_clocks)
@@ -616,7 +621,10 @@ void mc6847_friend_device::video_flush()
 			LOGMASKED(LOG_FLUSH, "%s: new_partial_scanline_clocks=%u\n", describe_context(), new_partial_scanline_clocks);
 
 			m_recording_scanline = true;
-			record_partial_body_scanline(m_physical_scanline, m_logical_scanline, m_partial_scanline_clocks, new_partial_scanline_clocks);
+			if (m_logical_scanline_zone == SCANLINE_ZONE_BODY)
+				record_partial_body_scanline(m_physical_scanline, m_logical_scanline, m_partial_scanline_clocks, new_partial_scanline_clocks);
+			else
+				record_partial_border_scanline(m_physical_scanline, m_partial_scanline_clocks, new_partial_scanline_clocks);
 			m_recording_scanline = false;
 
 			m_partial_scanline_clocks = new_partial_scanline_clocks;
@@ -950,18 +958,11 @@ void mc6847_base_device::record_partial_body_scanline(uint16_t physical_scanline
 
 int32_t mc6847_base_device::scanline_position_from_clock(int32_t clocks_since_hsync)
 {
-	// This value determined by experimentation with coco_cart:drgnfire,
-	// which uses precise timing measurements to change video modes
-	// multiple times mid-line.  This value seems to minimize video
-	// garbage, but doesn't eliminate it, so there are likely timing
-	// issues elsewhere.
-	//
-	// Unfortunately, I don't understand why this value isn't
-	// simply 0.  I believe hsync-on appears AFTER the front-porch +
-	// HS pulse + back-porch combo, which should be the entirety of
-	// the horizontal blanking.  But this value makes coco_cart:drgnfire
-	// significantly better than 0 does.
-	const int CLOCKS_OFFSET_TO_FIRST_VISIBLE_PIXEL = 25;
+	// Dragon Fire changes CSS multiple times per scanline using CPU-timed
+	// loops.  Align the active-video origin to six slow CPU cycles (24 VDG
+	// clocks).  The previous offset of 25 shifts those transitions by one
+	// byte when CPU and VDG clocks are kept in an exact ratio.
+	const int CLOCKS_OFFSET_TO_FIRST_VISIBLE_PIXEL = 24;
 
 	// Dividing by 4 converts 128 clocks per horizontal active video
 	// into 32 bytes per horizontal active video.  The borders come
@@ -1020,7 +1021,7 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	const pixel_t *palette = m_palette;
 
 	/* if the video didn't change, indicate as much */
-	if (!m_artifacter.poll_config() && !has_video_changed())
+	if (!has_video_changed())
 		return UPDATE_HAS_NOT_CHANGED;
 	const bool ntsc_artifacting = m_artifacter.get_ntsc_artifacting();
 

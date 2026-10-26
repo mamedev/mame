@@ -67,7 +67,7 @@ public:
 protected:
 	mc6847_friend_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock,
 			bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline,
-			int divider, bool supports_partial_body_scanlines, bool pal);
+			int divider, bool supports_partial_body_scanlines, bool pal, uint16_t extra_bottom_border_scanlines = 0);
 
 	// fonts
 	required_memory_region m_font_rom_region;
@@ -208,7 +208,7 @@ protected:
 		}
 
 		template<int xscale>
-		ATTR_FORCE_INLINE void process_artifacts(pixel_t *pixels, uint8_t mode, const pixel_t *palette, const uint8_t *pixel_modes = nullptr)
+		ATTR_FORCE_INLINE void process_artifacts(pixel_t *pixels, uint8_t mode, const pixel_t *palette, const uint8_t *pixel_modes = nullptr, const pixel_t (*pixel_colors)[2] = nullptr)
 		{
 			if ((pixel_modes || ((mode & (MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0)) == (MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0)))
 				&& (m_artifacting != 0))
@@ -217,7 +217,8 @@ protected:
 				const auto is_set = [=](int x)
 				{
 					const uint8_t sample_mode = (pixel_modes && x >= 0 && x < 256) ? pixel_modes[x] : mode;
-					return pixels[x * xscale] == palette[(sample_mode & MODE_CSS) ? 11 : 9];
+					const pixel_t foreground = (pixel_colors && x >= 0 && x < 256) ? pixel_colors[x][1] : palette[(sample_mode & MODE_CSS) ? 11 : 9];
+					return pixels[x * xscale] == foreground;
 				};
 
 				// generate the new line
@@ -233,7 +234,9 @@ protected:
 						continue;
 					}
 
-					update_colors(palette[(pixel_mode & MODE_CSS) ? 10 : 8], palette[(pixel_mode & MODE_CSS) ? 11 : 9]);
+					update_colors(
+						pixel_colors ? pixel_colors[x][0] : palette[(pixel_mode & MODE_CSS) ? 10 : 8],
+						pixel_colors ? pixel_colors[x][1] : palette[(pixel_mode & MODE_CSS) ? 11 : 9]);
 					uint8_t val = (is_set(x - 2) ? 0x20 : 0x00)
 							| (is_set(x - 1) ? 0x10 : 0x00)
 							| (is_set(x + 0) ? 0x08 : 0x00)
@@ -292,6 +295,7 @@ protected:
 	virtual void field_sync_changed(bool line);
 	virtual void enter_bottom_border();
 	virtual void record_border_scanline(uint16_t physical_scanline);
+	virtual void record_partial_border_scanline(uint16_t physical_scanline, int32_t start_clock, int32_t end_clock) { record_border_scanline(physical_scanline); }
 	virtual void record_full_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline) = 0;
 	virtual void record_partial_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline, int32_t start_clock, int32_t end_clock) = 0;
 
@@ -324,10 +328,10 @@ protected:
 	ATTR_FORCE_INLINE bool has_video_changed()
 	{
 		/* poll the artifacting config */
-		m_artifacter.poll_config();
+		const bool artifacting_changed = m_artifacter.poll_config();
 
 		/* if the video didn't change, indicate as much */
-		bool video_changed = m_video_changed;
+		bool video_changed = m_video_changed || artifacting_changed;
 		m_video_changed = false;
 		return video_changed;
 	}

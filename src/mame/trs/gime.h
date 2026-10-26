@@ -81,6 +81,7 @@ protected:
 	virtual TIMER_CALLBACK_MEMBER(horizontal_sync_changed) override;
 	virtual void enter_bottom_border() override;
 	virtual void record_border_scanline(uint16_t physical_scanline) override;
+	virtual void record_partial_border_scanline(uint16_t physical_scanline, int32_t start_clock, int32_t end_clock) override;
 	virtual void record_full_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline) override;
 	virtual void record_partial_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline, int32_t start_clock, int32_t end_clock) override;
 
@@ -89,7 +90,8 @@ protected:
 
 	struct scanline_record
 	{
-		uint8_t m_border;
+		uint8_t m_border[640];
+		uint8_t m_css[512];
 		uint8_t m_line_in_row;
 		uint8_t m_ff22_value;
 		uint8_t m_ff98_value;
@@ -154,6 +156,11 @@ protected:
 	// video state
 	bool                        m_legacy_video;
 	uint32_t                    m_video_position;
+	uint32_t                    m_scanline_pitch = 0;
+	uint16_t                    m_scanline_lines_per_row = 1;
+	bool                        m_row_advance_pending = false;
+	uint8_t                     m_horizontal_offset = 0;
+	bool                        m_horizontal_offset_latched = false;
 	uint8_t                     m_line_in_row;
 	scanline_record             m_scanlines[25+25+192+26+25];
 	bool                        m_displayed_rgb;
@@ -167,6 +174,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	emu_timer *                 m_gime_clock_timer;
+	emu_timer *                 m_vertical_border_timer;
 	required_device<cococart_slot_device> m_cart_device;
 	memory_bank *               m_read_banks[9];
 	memory_bank *               m_write_banks[9];
@@ -222,13 +230,14 @@ protected:
 	const char *timer_type_string();
 	void reset_timer();
 	TIMER_CALLBACK_MEMBER(timer_elapsed);
+	TIMER_CALLBACK_MEMBER(vertical_border_interrupt);
 
 	// video
 	bool update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect, const pixel_t *palette);
 	void update_geometry();
 	void update_rgb_palette();
 	void update_composite_palette();
-	void update_border(uint16_t physical_scanline);
+	void update_border(uint16_t physical_scanline, int32_t start_clock, int32_t end_clock);
 	pixel_t get_composite_color(int color);
 	pixel_t get_rgb_color(int color);
 	offs_t get_video_base();
@@ -239,17 +248,18 @@ protected:
 
 	// template function for doing video update collection
 	template<uint8_t xres, get_data_func get_data, bool record_mode>
-	uint32_t record_scanline_res(int scanline);
+	uint32_t record_scanline_res(int scanline, int32_t start_clock, int32_t end_clock);
+	void record_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline, int32_t start_clock, int32_t end_clock);
 
 	// rendering sampled graphics
-	typedef uint32_t (gime_device::*emit_samples_proc)(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
-	uint32_t emit_dummy_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
+	typedef uint32_t (gime_device::*emit_samples_proc)(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette, int pixel_start);
+	uint32_t emit_dummy_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette, int pixel_start);
 	template<int xscale>
-	uint32_t emit_mc6847_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
+	uint32_t emit_mc6847_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette, int pixel_start);
 	template<int xscale>
-	uint32_t emit_gime_text_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
+	uint32_t emit_gime_text_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette, int pixel_start);
 	template<int xscale, int bits_per_pixel>
-	uint32_t emit_gime_graphics_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
+	uint32_t emit_gime_graphics_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette, int pixel_start);
 	template<int sample_count, emit_samples_proc emit_samples>
 	void render_scanline(const scanline_record *scanline, pixel_t *pixels, int min_x, int max_x, palette_resolver *resolver);
 };
