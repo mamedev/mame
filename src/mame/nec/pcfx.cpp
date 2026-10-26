@@ -91,6 +91,7 @@ private:
 	std::unique_ptr<u8[]> m_nvram_ptr;
 
 	u32 m_dram_page = 0;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_io;
 
 	required_device<v810_device> m_maincpu;
 	required_device<huc6261_device> m_huc6261;
@@ -239,7 +240,10 @@ void pcfx_state::pcfx_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x001fffff).ram();   /* RAM */
-//  map(0x80000000, 0x80ffffff).rw(FUNC(pcfx_state::extio_r), FUNC(pcfx_state::extio_w));    /* EXTIO */
+	// memory image of the I/O space
+	map(0x80000000, 0x807fffff).lrw32(
+		NAME([this] (offs_t offset, u32 mem_mask) -> u32 { return m_io.read_dword(offset << 2, mem_mask); }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { m_io.write_dword(offset << 2, data, mem_mask); }));
 //  map(0x80700000, 0x807fffff).rom().region("scsi_rom", 0); // EXTIO ROM area
 	// internal backup control
 	map(0xe0000000, 0xe7ffffff).lrw8(
@@ -344,6 +348,7 @@ void pcfx_state::machine_start()
 	m_pad_timers[0] = timer_alloc(FUNC(pcfx_state::pad_func<0>), this);
 	m_pad_timers[1] = timer_alloc(FUNC(pcfx_state::pad_func<1>), this);
 	m_timer = timer_alloc(FUNC(pcfx_state::timer_expired), this);
+	m_maincpu->space(AS_IO).specific(m_io);
 
 	m_nvram_ptr = make_unique_clear<u8[]>(0x8000);
 	subdevice<nvram_device>("nvram")->set_base(&m_nvram_ptr[0], 0x8000);
