@@ -37,7 +37,6 @@ private:
 	u8 m_lcd_data_phase;
 	u8 m_lcd_read_phase;
 	u8 m_lcd_reg;
-	bool m_lcd_first_nonblack_logged;
 	u32 m_lcd_gram_writes;
 };
 
