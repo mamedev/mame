@@ -105,8 +105,6 @@ namespace
 	class news_iop_state : public driver_device
 	{
 	public:
-		static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }
-
 		news_iop_state(machine_config const &mconfig, device_type type, char const *tag) :
 			driver_device(mconfig, type, tag),
 			m_iop(*this, "iop"),

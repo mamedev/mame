@@ -173,4 +173,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NWB_512, nwb_512_device)
 
-#endif
+#endif // MAME_SONY_NWB_512_H

@@ -28,7 +28,6 @@
  *
  * TODO:
  *   - slots (I/O and UBUS expansion slots)
- *   - graphics
  *   - sound
  *   - AST
  *   - Something in the format/install flow is iffy: you have to manually write the disklabel before the installer works

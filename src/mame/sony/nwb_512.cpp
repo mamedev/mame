@@ -42,6 +42,8 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
+#include <array>
+
 DEFINE_DEVICE_TYPE(NWB_512, nwb_512_device, "nwb_512", "Sony NWB-512 monochrome framebuffer")
 
 namespace
@@ -51,7 +53,7 @@ namespace
 	constexpr uint16_t Y_MAX = 2048;
 
 	// Hardware raster operations for logging
-	static constexpr std::array raster_ops = {
+	constexpr std::array RASTER_OPS = {
 		"~S", "~(S | D)", "~S & D", "0", "~(S & D)", "~D", "S ^ D", "S & ~D", "~S | D", "~(S ^ D)", "D", "S & D", "1", "S | ~D", "S | D", "S"};
 
 	// Takes in an x,y coordinate and returns the word offset into the framebuffer memory region
@@ -290,7 +292,7 @@ void nwb_512_device::rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mas
 			  m_state.y_direction ? "yfwd " : "yrev ",
 			  m_state.x_direction ? "xfwd " : "xrev ",
 			  m_state.pixel_mode ? "pixel " : "word ",
-			  load_rop_function ? util::string_format("func=0x%x/%s", m_state.rop_function, raster_ops[m_state.rop_function]) : "");
+			  load_rop_function ? util::string_format("func=0x%x/%s", m_state.rop_function, RASTER_OPS[m_state.rop_function]) : "");
 }
 
 void nwb_512_device::pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -552,7 +554,7 @@ uint16_t nwb_512_device::execute_rop(const uint8_t opcode, const uint16_t source
 		fatalerror("nwb_512: invalid ROP function code 0x%x", opcode);
 	}
 
-	LOGMASKED(LOG_DATA, "execute_rop(0x%x/%s, 0x%x, 0x%x) = 0x%x\n", opcode, raster_ops[opcode], source, destination, result);
+	LOGMASKED(LOG_DATA, "execute_rop(0x%x/%s, 0x%x, 0x%x) = 0x%x\n", opcode, RASTER_OPS[opcode], source, destination, result);
 	return result;
 }
 

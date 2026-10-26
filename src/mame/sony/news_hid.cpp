@@ -316,13 +316,13 @@ void news_hid_serial_keyboard_device::push_key(const u8 code)
 	transmit_byte(code);
 }
 
-void news_hid_serial_keyboard_device::received_byte(uint8_t byte)
+void news_hid_serial_keyboard_device::received_byte(u8 byte)
 {
 	// TODO: keyboard bell and anything else that the keyboard can do
 	LOG("received_byte(0x%x)\n", byte);
 }
 
-news_hid_serial_mouse_device::news_hid_serial_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+news_hid_serial_mouse_device::news_hid_serial_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, NEWS_HID_SERIAL_MOUSE, tag, owner, clock)
 	, device_buffered_serial_interface(mconfig, *this)
 	, m_write_txd(*this)
@@ -370,7 +370,7 @@ void news_hid_serial_mouse_device::tra_complete()
 		update_input();
 }
 
-void news_hid_serial_mouse_device::received_byte(uint8_t byte)
+void news_hid_serial_mouse_device::received_byte(u8 byte)
 {
 	// Mouse does not accept data
 }
