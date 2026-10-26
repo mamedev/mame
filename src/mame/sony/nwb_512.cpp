@@ -260,19 +260,6 @@ void nwb_512_device::limit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	check_operation_start(offset);
 }
 
-void nwb_512_device::shift_w(offs_t, uint16_t data, uint16_t mem_mask)
-{
-	LOGMASKED(LOG_ROP, "%s shift_w %x\n", machine().describe_context(), data);
-	check_mem_mask(mem_mask);
-	if (!m_state.enabled())
-	{
-		logerror("%s NWB-512 shift_w: framebuffer not enabled\n", machine().describe_context());
-		return;
-	}
-
-	m_state.shift = data;
-}
-
 void nwb_512_device::rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_ROP, "(%s) rop_config_w(0x%x, 0x%x)\n", machine().describe_context(), offset, data);

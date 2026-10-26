@@ -148,7 +148,6 @@ private:
 	void destination_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void source_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void limit_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	void shift_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t fifo_r(offs_t offset, uint16_t mem_mask);
