@@ -15,8 +15,7 @@ inder_vid_device::inder_vid_device(const machine_config &mconfig, const char *ta
 	: device_t(mconfig, INDER_VIDEO, tag, owner, clock),
 		m_vram(*this, "vram"),
 		m_ramdac(*this, "ramdac"),
-		m_tms(*this, "tms"),
-		m_8bpp_mode(false)
+		m_tms(*this, "tms")
 {
 }
 
@@ -25,7 +24,7 @@ void inder_vid_device::megaphx_tms_map(address_map &map)
 	map(0x00000000, 0x003fffff).ram().share(m_vram); // vram?
 	map(0x04000000, 0x0400007f).m(m_ramdac, FUNC(bt478_device::map)).umask16(0x00ff);
 	map(0x04000080, 0x0400008f).w(FUNC(inder_vid_device::mode_w)).umask16(0x00ff);
-	map(0x04000090, 0x0400009f).nopw();
+	map(0x04000090, 0x0400009f).w(FUNC(inder_vid_device::hscroll_w)).umask16(0x00ff);
 	map(0x7fc00000, 0x7fffffff).ram().mirror(0x80000000);
 }
 
@@ -42,6 +41,12 @@ void inder_vid_device::mode_w(uint8_t data)
 }
 
 
+void inder_vid_device::hscroll_w(uint8_t data)
+{
+	m_hscroll = data;
+}
+
+
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(inder_vid_device::scanline)
 {
 	uint16_t const *const vram = &m_vram[(params->rowaddr << 8) & 0x3ff00];
@@ -49,26 +54,24 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(inder_vid_device::scanline)
 
 	const pen_t *paldata = m_ramdac->pens();
 
-	int coladdr = params->coladdr;
-
 	if (m_8bpp_mode)
 	{
-		for (int x = params->heblnk; x < params->hsblnk; x += 2)
+		int pixaddr = (params->coladdr << 1) + ((m_hscroll - 1) & 1);
+		for (int x = params->heblnk; x < params->hsblnk; x++)
 		{
-			uint16_t pixels = vram[coladdr++ & 0xff];
-			dest[x + 0] = paldata[pixels & 0xff];
-			dest[x + 1] = paldata[pixels >> 8];
+			uint16_t pixels = vram[(pixaddr >> 1) & 0xff];
+			dest[x] = paldata[(pixels >> ((pixaddr & 1) * 8)) & 0xff];
+			pixaddr++;
 		}
 	}
 	else
 	{
-		for (int x = params->heblnk; x < params->hsblnk; x += 4)
+		int pixaddr = (params->coladdr << 2) + ((m_hscroll - 2) & 3);
+		for (int x = params->heblnk; x < params->hsblnk; x++)
 		{
-			uint16_t pixels = vram[coladdr++ & 0xff];
-			dest[x + 3] = paldata[((pixels & 0xf000) >> 12)];
-			dest[x + 2] = paldata[((pixels & 0x0f00) >> 8)];
-			dest[x + 1] = paldata[((pixels & 0x00f0) >> 4)];
-			dest[x + 0] = paldata[((pixels & 0x000f) >> 0)];
+			uint16_t pixels = vram[(pixaddr >> 2) & 0xff];
+			dest[x] = paldata[(pixels >> ((pixaddr & 3) * 4)) & 0x0f];
+			pixaddr++;
 		}
 	}
 }
@@ -119,10 +122,10 @@ void inder_vid_device::device_start()
 {
 	save_item(NAME(m_shiftfull));
 	save_item(NAME(m_8bpp_mode));
+	save_item(NAME(m_hscroll));
 }
 
 void inder_vid_device::device_reset()
 {
 	m_shiftfull = 0;
-	m_8bpp_mode = false;
 }
