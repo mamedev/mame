@@ -194,6 +194,8 @@ INPUT_PORTS_END
 
 void cdi_state::machine_start()
 {
+	save_item(NAME(m_cdic_intreq));
+	save_item(NAME(m_dvc_intreq));
 	save_item(NAME(m_in4_owner));
 }
 
@@ -221,6 +223,7 @@ void quizard_state::machine_start()
 	cdi_state::machine_start();
 
 	save_item(NAME(m_boot_press));
+	save_item(NAME(m_mcu_rxd));
 
 	m_boot_timer = timer_alloc(FUNC(quizard_state::boot_press_tick), this);
 }

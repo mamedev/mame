@@ -185,6 +185,7 @@ private:
 	void video_flush_stalled();
 	void release_held_reference();
 	void queue_picture(const picture_store &store);
+	void drop_picture();
 	mpeg_video::picture_buffers video_buffers() const;
 
 	void latch_display_frame();
@@ -200,8 +201,12 @@ private:
 
 	static uint32_t pack_timecode(uint32_t gop_timecode);
 
+	int free_picture_slot();
+	void register_picture_info(picture_info &info, const char *name, int index) ATTR_COLD;
+
 	// 4 Mbit of picture DRAM, 256K x 16
-	std::unique_ptr<uint16_t []> m_dram;
+	static constexpr size_t DRAM_WORDS = 0x80000 / 2;
+	uint16_t m_dram[DRAM_WORDS]{};
 
 	devcb_write_line m_irq_cb;
 	devcb_write_line m_drq_cb;
@@ -242,6 +247,7 @@ private:
 	bool m_register_update_latch = false;
 	bool m_register_update_scroll = false;
 	bool m_show_video = false;
+	bool m_stale_display = false;
 
 	// ---- timing ----
 	attotime m_dclk_origin;
@@ -255,12 +261,39 @@ private:
 	// ---- stream plumbing ----
 	mpeg_demux m_demux;
 
-	int64_t m_next_picture_dts = 0;
-	std::vector<int64_t> m_dts_fifo;
+	template <typename T, size_t N>
+	struct fixed_fifo
+	{
+		T items[N]{};
+		uint32_t head = 0, count = 0;
 
-	// decoded picture queue and the picture currently on screen
-	std::vector<picture> m_picture_fifo;
-	picture m_display;
+		bool empty() const { return count == 0; }
+		size_t size() const { return count; }
+		bool full() const { return count == N; }
+		T &front() { return items[head]; }
+		void push_back(T value) { items[(head + count) % N] = value; count++; }
+		void pop_front() { head = (head + 1) % N; count--; }
+		void clear() { head = count = 0; }
+		bool contains(T value) const
+		{
+			for (uint32_t i = 0; i < count; i++)
+			{
+				if (items[(head + i) % N] == value)
+					return true;
+			}
+			return false;
+		}
+	};
+
+	int64_t m_next_picture_dts = 0;
+	fixed_fifo<int64_t, 1024> m_dts_fifo;
+
+	static constexpr size_t MAX_PICTURES = 8;
+	static constexpr int32_t LATE_DROP_DESYNC = 64;
+	static constexpr size_t PICTURE_SLOTS = MAX_PICTURES + 2;
+	picture m_pictures[PICTURE_SLOTS];
+	fixed_fifo<uint8_t, PICTURE_SLOTS> m_picture_fifo;
+	int m_display_slot = -1;
 	bool m_display_valid = false;
 
 	// what the status registers report for the picture being displayed
@@ -292,7 +325,12 @@ private:
 	// into three stores, two reference pictures and a B picture, and they are
 	// put in display order here.
 	std::unique_ptr<mpeg_video> m_video;
-	std::vector<uint8_t> m_video_es;    // elementary stream the decoder has not taken
+	static constexpr size_t VIDEO_FIFO_FULL = 64 * 1024;
+	static constexpr size_t VIDEO_ES_SIZE = 4 * VIDEO_FIFO_FULL;
+	uint8_t m_video_es[VIDEO_ES_SIZE]{};  // elementary stream the decoder has not taken
+	uint32_t m_video_es_head = 0, m_video_es_tail = 0;
+	size_t video_es_size() const { return m_video_es_tail - m_video_es_head; }
+	void video_es_clear() { m_video_es_head = m_video_es_tail = 0; }
 	bool m_video_needs_data = false;    // the decoder stopped for want of stream data
 	picture_store m_store[3];
 	int m_store_newest = -1;            // the reference pictures
@@ -303,6 +341,8 @@ private:
 	int m_store_backward = -1;
 	bool m_pending_seq = false;         // headers the next intra picture reports
 	bool m_pending_gop = false;
+	bool m_gop_search = false;
+	bool m_skip_decoding = false;
 
 	bool m_irq_state = false;
 };
