@@ -264,7 +264,22 @@ void pcfx_state::pcfx_io(address_map &map)
 	map(0x00000080, 0x000000ff).rw(FUNC(pcfx_state::pad_r<1>), FUNC(pcfx_state::pad_w<1>)); /* PAD */
 	map(0x00000100, 0x000001ff).w("huc6230", FUNC(huc6230_device::write)).umask32(0x00ff00ff);   /* HuC6230 */
 	map(0x00000200, 0x000002ff).m("huc6271", FUNC(huc6271_device::amap));   /* HuC6271 */
-	map(0x00000300, 0x000003ff).rw(m_huc6261, FUNC(huc6261_device::read), FUNC(huc6261_device::write)).umask32(0x0000ffff);  /* HuC6261 */
+	// HuC6261: A1 is wired to CPU A2, so a word access reaches the same register twice, low half first (two palette entries per OUT.W in dknight4)
+	map(0x00000300, 0x000003ff).lrw32(
+		NAME([this] (offs_t offset, u32 mem_mask) {
+			u32 data = 0;
+			if (ACCESSING_BITS_0_15)
+				data |= m_huc6261->read(offset);
+			if (ACCESSING_BITS_16_31)
+				data |= u32(m_huc6261->read(offset)) << 16;
+			return data;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (ACCESSING_BITS_0_15)
+				m_huc6261->write(offset, data & 0xffff);
+			if (ACCESSING_BITS_16_31)
+				m_huc6261->write(offset, data >> 16);
+		}));
 	map(0x00000400, 0x000004ff).rw("huc6270_a", FUNC(huc6270_device::read16), FUNC(huc6270_device::write16)).umask32(0x0000ffff); /* HuC6270-A */
 	map(0x00000500, 0x000005ff).rw("huc6270_b", FUNC(huc6270_device::read16), FUNC(huc6270_device::write16)).umask32(0x0000ffff); /* HuC6270-B */
 	map(0x00000600, 0x00000607).mirror(0xf8).m("huc6272", FUNC(huc6272_device::amap)); // King
