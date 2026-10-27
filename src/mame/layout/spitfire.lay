@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+
+Simple tower artwork based on photographs of the original physical overlay.
+This omits the surrounding landscape and is not an exact artwork restoration.
+Placement approximates raw screen X=288..335, Y=192..255; collision bounds
+come from the program, not this layout. The screen retains its 4:3 aspect.
+-->
+<mamelayout version="2">
+
+	<element name="tower">
+		<image>
+			<bounds x="0" y="0" width="48" height="64" />
+			<data><![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="48" height="64" viewBox="0 0 48 64">
+					<!-- Supports and three bays of crossed braces. -->
+					<g fill="none" stroke="#aebfb0" stroke-width="1.6">
+						<path d="M11 21 L7 63 M37 21 L41 63 M10 35 H38 M9 49 H39 M7 63 H41" />
+						<path d="M11 21 L38 35 M37 21 L10 35 M10 35 L39 49 M38 35 L9 49 M9 49 L41 63 M39 49 L7 63" />
+					</g>
+					<!-- Glazed cabin, sign panel and projecting platform. -->
+					<path d="M3 4 H45 L42 13 H6 Z" fill="#5d9fae" stroke="#c2cec3" stroke-width="1" />
+					<path d="M13 4 L15 13 M24 4 V13 M35 4 L33 13" fill="none" stroke="#344d51" stroke-width="0.8" />
+					<rect x="6" y="13" width="36" height="6" fill="#b8c8b9" />
+					<path d="M2 20 H46 M2 3 H46" fill="none" stroke="#c2cec3" stroke-width="1.5" />
+					<path d="M24 0 V3 M22 1 H26" fill="none" stroke="#aebfb0" stroke-width="0.5" />
+				</svg>
+			]]></data>
+		</image>
+		<text string="I.C.C.">
+			<bounds x="9" y="13.3" width="30" height="5.4" />
+			<color red="0.08" green="0.14" blue="0.15" />
+		</text>
+	</element>
+
+	<view name="Tower Overlay">
+		<screen index="0">
+			<bounds x="0" y="0" width="4" height="3" />
+		</screen>
+		<element ref="tower" blend="alpha">
+			<bounds x="1.846154" y="2.146341" width="0.461538" height="0.780488" />
+		</element>
+	</view>
+
+	<view name="Screen Only">
+		<screen index="0">
+			<bounds x="0" y="0" width="4" height="3" />
+		</screen>
+	</view>
+
+</mamelayout>
