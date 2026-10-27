@@ -118,8 +118,8 @@ void galpani2_state::galpani2_eeprom_w(offs_t offset, uint16_t data, uint16_t me
 void galpani2_state::machine_start()
 {
 	uint8_t *ROM = memregion("subdata")->base();
-	membank("subdatabank")->configure_entries(0, 0x2000000/0x0800000, ROM, 0x0800000);
-	membank("subdatabank")->set_entry(0);
+	m_subdatabank->configure_entries(0, 0x2000000/0x0800000, ROM, 0x0800000);
+	m_subdatabank->set_entry(0);
 
 	save_item(NAME(m_eeprom_word));
 }
@@ -228,8 +228,10 @@ void galpani2_state::subdatabank_select_w(offs_t offset, uint16_t data, uint16_t
 {
 	data &= mem_mask;
 
-	if (data & 0xfffc) printf("subdatabank_select_w %04x\n", data);
-	membank("subdatabank")->set_entry(data&3);
+	if (data & 0xfffc)
+		logerror("subdatabank_select_w %04x\n", data);
+
+	m_subdatabank->set_entry(data & 3);
 }
 
 
@@ -383,7 +385,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpani2_state::galpani2_interrupt1)
 	int scanline = param;
 
 	if(scanline == 240)
-			m_maincpu->set_input_line(5, HOLD_LINE);
+		m_maincpu->set_input_line(5, HOLD_LINE);
 
 	/* MCU related? */
 	if(scanline == 128)
@@ -393,7 +395,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpani2_state::galpani2_interrupt1)
 	}
 
 	if(scanline == 0)
-			m_maincpu->set_input_line(6, HOLD_LINE); // hblank?
+		m_maincpu->set_input_line(6, HOLD_LINE); // hblank?
 }
 
 /* CPU#2 interrupts, lev 3,4 & 5 are tested on power up. The rest is rte, but lev 7 */
@@ -1244,6 +1246,39 @@ ROM_START( galpani2j )
 	ROM_LOAD( "gp2-101.60",  0x200000, 0x100000, CRC(3c45134f) SHA1(a5362bfcc6beb6e776c1bce4544475f8947fccea) )
 ROM_END
 
+
+ROM_START( gp2quiz )
+	ROM_REGION( 0x100000, "maincpu", 0 )            /* CPU#1 Code */
+	ROM_LOAD16_BYTE( "g000e3.u165-3", 0x000000, 0x080000, CRC(b6de2653) SHA1(a24daf5e6b6b268f60b1dbb374861c85f642cea5) )
+	ROM_LOAD16_BYTE( "g001e3.u164-3", 0x000001, 0x080000, CRC(74e8d0e8) SHA1(d131be9f52ee79e1b82f46721c2ad5d71b3da649) )
+
+	ROM_REGION( 0x40000, "sub", 0 )         /* CPU#2 Code */
+	ROM_LOAD16_BYTE( "g002e3.u64-3",  0x000000, 0x020000, CRC(5e523829) SHA1(dad11e4a3348c988ff658609cf78a3fbee58064e) )
+	ROM_LOAD16_BYTE( "g003e3.u63-3",  0x000001, 0x020000, CRC(2a0d5f89) SHA1(0a7031c4b8b7bc757da25250dbb5fa1004205aeb) )
+
+	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
+	ROM_LOAD( "gp2-300-j-0071.u175", 0x000000, 0x200000, CRC(3a0afc1d) SHA1(91fba9074cc3c28e919053f0ea07b28d88b2ce5f) )
+	ROM_LOAD( "gp2-301-j-0072.u176", 0x200000, 0x200000, CRC(5b6d1709) SHA1(a7d35247fe71895f2b6169409aa0bdaef446804c) )
+	ROM_LOAD( "gp2-302a-0057.u177", 0x400000, 0x100000, CRC(311fa273) SHA1(c2adeac45be701f6f474841755fac4347d44f844) )
+	ROM_LOAD( "gp2-302b-0058.u178", 0x500000, 0x100000, CRC(80cb211b) SHA1(7567c9d1309edddb9c1fa68346506de48e91ca6a) )
+	ROM_LOAD( "gp2-303a-0063.u179", 0x600000, 0x100000, CRC(162d83b7) SHA1(16daf2ba09e63eaca5e50c944472773b1774c946) )
+	ROM_LOAD( "gp2-303b-0064.u180", 0x700000, 0x100000, CRC(458a1fbc) SHA1(971548ec8cce592773e762a0c972264013b7cb8d) )
+
+	ROM_REGION( 0x500000, "kan_spr", 0 )   /* Sprites */
+	ROM_LOAD( "gp2-200-j-0073.u189", 0x000000, 0x200000, CRC(2f81e519) SHA1(c07f4dad15b6f7f1fb867f773c0ada309d172326) )
+	ROM_LOAD( "gp2-201-j-0074.u171", 0x200000, 0x200000, CRC(bbe404e0) SHA1(198db9a6c6ec97ed8fd32d946051ba4d6e4bd354) )
+	ROM_LOAD16_BYTE( "g204a3.u169-3", 0x400000, 0x080000, CRC(92a837b7) SHA1(f581e1f7754f1fb20255c6c55ffc4e486d867111) )
+	ROM_LOAD16_BYTE( "g204a4.u170-3", 0x400001, 0x080000, CRC(3c2dd1cd) SHA1(d5267ad6f51283191174988ac0519c0e0aa6552f) )
+
+	ROM_REGION( 0x180000, "oki1", 0 )   /* Samples */
+	ROM_LOAD( "gp2-100-0043.u61", 0x000000, 0x100000, CRC(a61e8868) SHA1(ad84ae00ebe7c70a36b1aa75e743686a0193e5d9) )
+	ROM_LOAD( "g104a3.u62-3", 0x100000, 0x080000, CRC(42b3470e) SHA1(c121ea6c98e6ff452f4bcc49c3a5179e99237128) )
+
+	ROM_REGION( 0x300000, "oki2", 0 )   /* Samples */
+	ROM_LOAD( "gp2-102-0045.u59",  0x000000, 0x200000, CRC(1bed6ecd) SHA1(3208aacac64ac95fcb6eeef59986c3154c1c415b) )
+	ROM_LOAD( "gp2-101-0044.u60",  0x200000, 0x100000, CRC(3c45134f) SHA1(a5362bfcc6beb6e776c1bce4544475f8947fccea) )
+ROM_END
+
 ROM_START( gp2se )
 	ROM_REGION( 0x100000, "maincpu", 0 )            /* CPU#1 Code */
 	ROM_LOAD16_BYTE( "g000j4.u165", 0x000000, 0x080000, CRC(d8258a7a) SHA1(12991392d7e70bfba394ec4ad49b427959ca019e) )
@@ -1282,38 +1317,8 @@ ROM_START( gp2se )
 ROM_END
 
 
-ROM_START( gp2quiz )
-	ROM_REGION( 0x100000, "maincpu", 0 )            /* CPU#1 Code */
-	ROM_LOAD16_BYTE( "g000e3.u165-3", 0x000000, 0x080000, CRC(b6de2653) SHA1(a24daf5e6b6b268f60b1dbb374861c85f642cea5) )
-	ROM_LOAD16_BYTE( "g001e3.u164-3", 0x000001, 0x080000, CRC(74e8d0e8) SHA1(d131be9f52ee79e1b82f46721c2ad5d71b3da649) )
 
-	ROM_REGION( 0x40000, "sub", 0 )         /* CPU#2 Code */
-	ROM_LOAD16_BYTE( "g002e3.u64-3",  0x000000, 0x020000, CRC(5e523829) SHA1(dad11e4a3348c988ff658609cf78a3fbee58064e) )
-	ROM_LOAD16_BYTE( "g003e3.u63-3",  0x000001, 0x020000, CRC(2a0d5f89) SHA1(0a7031c4b8b7bc757da25250dbb5fa1004205aeb) )
-
-	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
-	ROM_LOAD( "gp2-300-j-0071.u175", 0x000000, 0x200000, CRC(3a0afc1d) SHA1(91fba9074cc3c28e919053f0ea07b28d88b2ce5f) )
-	ROM_LOAD( "gp2-301-j-0072.u176", 0x200000, 0x200000, CRC(5b6d1709) SHA1(a7d35247fe71895f2b6169409aa0bdaef446804c) )
-	ROM_LOAD( "gp2-302a-0057.u177", 0x400000, 0x100000, CRC(311fa273) SHA1(c2adeac45be701f6f474841755fac4347d44f844) )
-	ROM_LOAD( "gp2-302b-0058.u178", 0x500000, 0x100000, CRC(80cb211b) SHA1(7567c9d1309edddb9c1fa68346506de48e91ca6a) )
-	ROM_LOAD( "gp2-303a-0063.u179", 0x600000, 0x100000, CRC(162d83b7) SHA1(16daf2ba09e63eaca5e50c944472773b1774c946) )
-	ROM_LOAD( "gp2-303b-0064.u180", 0x700000, 0x100000, CRC(458a1fbc) SHA1(971548ec8cce592773e762a0c972264013b7cb8d) )
-
-	ROM_REGION( 0x500000, "kan_spr", 0 )   /* Sprites */
-	ROM_LOAD( "gp2-200-j-0073.u189", 0x000000, 0x200000, CRC(2f81e519) SHA1(c07f4dad15b6f7f1fb867f773c0ada309d172326) )
-	ROM_LOAD( "gp2-201-j-0074.u171", 0x200000, 0x200000, CRC(bbe404e0) SHA1(198db9a6c6ec97ed8fd32d946051ba4d6e4bd354) )
-	ROM_LOAD16_BYTE( "g204a3.u169-3", 0x400000, 0x080000, CRC(92a837b7) SHA1(f581e1f7754f1fb20255c6c55ffc4e486d867111) )
-	ROM_LOAD16_BYTE( "g204a4.u170-3", 0x400001, 0x080000, CRC(3c2dd1cd) SHA1(d5267ad6f51283191174988ac0519c0e0aa6552f) )
-
-	ROM_REGION( 0x180000, "oki1", 0 )   /* Samples */
-	ROM_LOAD( "gp2-100-0043.u61", 0x000000, 0x100000, CRC(a61e8868) SHA1(ad84ae00ebe7c70a36b1aa75e743686a0193e5d9) )
-	ROM_LOAD( "g104a3.u62-3", 0x100000, 0x080000, CRC(42b3470e) SHA1(c121ea6c98e6ff452f4bcc49c3a5179e99237128) )
-
-	ROM_REGION( 0x300000, "oki2", 0 )   /* Samples */
-	ROM_LOAD( "gp2-102-0045.u59",  0x000000, 0x200000, CRC(1bed6ecd) SHA1(3208aacac64ac95fcb6eeef59986c3154c1c415b) )
-	ROM_LOAD( "gp2-101-0044.u60",  0x200000, 0x100000, CRC(3c45134f) SHA1(a5362bfcc6beb6e776c1bce4544475f8947fccea) )
-ROM_END
-
+// The regular version, has no attract demo
 GAME( 1993, galpani2,   0,        galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Asia)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, galpani2e,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (English)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, galpani2e2, galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (English, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
@@ -1323,8 +1328,11 @@ GAME( 1993, galpani2i,  galpani2, galpani2, galpani2, galpani2_state, empty_init
 GAME( 1993, galpani2gs, galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Germany, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, galpani2t,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Taiwan, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, galpani2k,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko (Karam Trading Co., Ltd. license)", "Gals Panic II (Korea, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2j,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // it is a 'quiz edition' but the title screen doesn't say, maybe all Japanese versions have the Quiz
 
+// The English Quiz version, and Japanese version seem to be a separate (later?) release with full attract mode
+// and additional features (such as the quiz)
 GAME( 1993, gp2quiz,    0,        galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II - Quiz Version", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // this one has 'quiz edition' on the title screen
+GAME( 1993, galpani2j,  gp2quiz,  galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // it is a 'quiz edition' but the title screen doesn't say, maybe all Japanese versions have the Quiz
 
+// Special Edition is yet another release
 GAME( 1994, gp2se,      0,        gp2se,    gp2se,    galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II' - Special Edition (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

@@ -34,7 +34,8 @@ public:
 		m_bg15(*this, "bg15"),
 		m_ram(*this, "ram"),
 		m_ram2(*this, "ram2"),
-		m_spriteram(*this, "spriteram")
+		m_spriteram(*this, "spriteram"),
+		m_subdatabank(*this, "subdatabank")
 	{ }
 
 	void galpani2(machine_config &config);
@@ -60,6 +61,7 @@ private:
 	required_shared_ptr<uint16_t> m_ram;
 	required_shared_ptr<uint16_t> m_ram2;
 	optional_shared_ptr<uint16_t> m_spriteram;
+	required_memory_bank m_subdatabank;
 
 	uint16_t m_eeprom_word = 0U;
 	bool m_is_special = false;

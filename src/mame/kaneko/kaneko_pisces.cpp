@@ -84,13 +84,15 @@ void kaneko_pisces_hle_device::scan_background_images()
 	uint32_t const rom_size = rom.bytes();
 
 	auto const byte = util::big_endian_cast<uint8_t const>(&rom.as_u16());
-	auto word = [&byte](uint32_t offset) -> uint16_t {
+	auto word = [&byte](uint32_t offset) -> uint16_t
+	{
 		return (uint16_t(byte[offset]) << 8) | byte[offset + 1];
 	};
 
 	// Parse one image stream starting at pos. Returns the byte offset
 	// just past the last data byte (before word-alignment), or 0 on failure.
-	auto parse_image = [&byte, &word, rom_size](uint32_t pos) -> uint32_t {
+	auto parse_image = [&byte, &word, rom_size](uint32_t pos) -> uint32_t
+	{
 		if (pos + 6 > rom_size)
 			return 0;
 		uint16_t const kind = word(pos);
@@ -253,10 +255,6 @@ void kaneko_pisces_hle_device::track_bg15_coverage(offs_t address, uint16_t data
 	m_girl_bitmap_pending_task = task;
 }
 
-// Pack the observed native coverage using the field's current pixel origin.
-static constexpr int      FIELD_COLS         = 256;
-static constexpr int      FIELD_ROWS         = 224;
-
 uint16_t kaneko_pisces_hle_device::generate_girl_bitmap(uint32_t dest_addr)
 {
 	// Derive BG15 plane from the sub CPU framebuffer destination.
@@ -274,6 +272,10 @@ uint16_t kaneko_pisces_hle_device::generate_girl_bitmap(uint32_t dest_addr)
 	uint16_t popcount = 0;
 	int byte_idx = 0;
 	address_space &mspace = m_maincpu->space(AS_PROGRAM);
+
+	// Pack the observed native coverage using the field's current pixel origin.
+	//const int      FIELD_COLS         = 256;
+	const int      FIELD_ROWS         = 224;
 
 	for (int row = 0; row < FIELD_ROWS; row++)
 	{
@@ -347,7 +349,8 @@ void kaneko_pisces_hle_device::process_main_queue()
 
 		switch (command)
 		{
-		case 0x02: { // Copy N bytes from RAM2 to RAM1?, gp2se is the only one to use it, often!
+		case 0x02:
+		{ // Copy N bytes from RAM2 to RAM1?, gp2se is the only one to use it, often!
 			uint16_t src = mspace.read_word(address + 2);
 			uint16_t dst = mspace.read_word(address + 6);
 			uint16_t size = mspace.read_word(address + 8);
@@ -362,7 +365,8 @@ void kaneko_pisces_hle_device::process_main_queue()
 			break;
 		}
 
-		case 0x0a: { // Copy N bytes from RAM1 to RAM2
+		case 0x0a:
+		{ // Copy N bytes from RAM1 to RAM2
 			uint16_t src = mspace.read_word(address + 2);
 			uint16_t dst = mspace.read_word(address + 6);
 			uint16_t size = mspace.read_word(address + 8);
@@ -387,7 +391,8 @@ void kaneko_pisces_hle_device::process_main_queue()
 			mspace.write_word(address, 0xffff);
 			continue;
 
-		default: {
+		default:
+		{
 			// Girl-area bitmap request. Defer the response until
 			// the sub CPU finishes decoding the image to BG15.
 			// vblank publishes its observed coverage on completion.
@@ -426,7 +431,8 @@ void kaneko_pisces_hle_device::process_sub_queue()
 
 		switch (command)
 		{
-		case 0x0c: { // Resolve an image ID to a raw offset in the background ROMs.
+		case 0x0c:
+		{ // Resolve an image ID to a raw offset in the background ROMs.
 			uint16_t const img = sspace.read_word(address);
 			uint32_t const iadr = (img < imlist_count) ? m_bg_image_offsets[img] : 0;
 			// The ROM script interpreter selects the bank and reads the header.
