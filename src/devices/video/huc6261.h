@@ -25,10 +25,10 @@ class huc6261_device :  public device_t,
 {
 public:
 	// Screen timing stuff
-	static constexpr unsigned WPF = 1365;   // width of a line in frame including blanking areas
-	static constexpr unsigned LPF = 263;    // max number of lines in a single frame
+	static constexpr u32 WPF = 1365;   // width of a line in frame including blanking areas
+	static constexpr u32 LPF = 263;    // max number of lines in a single frame
 	// the screen runs at twice the line rate and height, so interlaced fields can be woven into one picture
-	static constexpr unsigned SCREEN_LPF = LPF * 2;
+	static constexpr u32 SCREEN_LPF = LPF * 2;
 
 	// construction/destruction
 	huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -45,7 +45,6 @@ protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void device_post_load() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_events);
 

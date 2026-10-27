@@ -29,9 +29,6 @@
 static constexpr unsigned HUC6261_HSYNC_LENGTH = 237;
 static constexpr unsigned HUC6261_HSYNC_START  = (huc6261_device::WPF - HUC6261_HSYNC_LENGTH);
 
-constexpr unsigned huc6261_device::WPF;
-constexpr unsigned huc6261_device::LPF;
-
 DEFINE_DEVICE_TYPE(HUC6261, huc6261_device, "huc6261", "Hudson HuC6261 VCE")
 
 
@@ -327,23 +324,6 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 		case HUC6261_HSYNC_START:       /* Start of HSync */
 			m_huc6270[0]->hsync_changed(0);
 			m_huc6270[1]->hsync_changed(0);
-//          if (v == 0)
-//          {
-//              /* Check if the screen should be resized */
-//              m_height = LPF - (m_blur ? 1 : 0);
-//              if (m_height != video_screen_get_height(m_screen))
-//              {
-//                  rectangle visible_area;
-//
-//                  /* TODO: Set proper visible area parameters */
-//                  visible_area.min_x = 64;
-//                  visible_area.min_y = 18;
-//                  visible_area.max_x = 64 + 1024 + 64 - 1;
-//                  visible_area.max_y = 18 + 242 - 1;
-//
-//                  video_screen_configure(m_screen, WPF, m_height, &visible_area, HZ_TO_ATTOSECONDS(device->clock / (WPF * m_height)));
-//              }
-//          }
 			break;
 
 		case 0:     /* End of HSync */
@@ -358,7 +338,9 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 				start_frame();
 			}
 			else
+			{
 				m_control = (m_control & 0x80ff) | (m_control_reg & 0x7f00);
+			}
 
 			// the frame length (DCC 01 = 262 lines, otherwise 263) is applied at the start of vblank,
 			// where the screen can be reconfigured without moving the beam
@@ -734,7 +716,6 @@ void huc6261_device::device_start()
 	save_item(NAME(m_pixels_per_clock));
 	save_item(NAME(m_pixel_data));
 	save_item(NAME(m_pixel_clock));
-	save_item(NAME(m_bmp));
 	save_item(NAME(m_pixel_rgb));
 	save_item(NAME(m_king_line));
 	save_item(NAME(m_rainbow_line));
@@ -782,10 +763,4 @@ void huc6261_device::device_reset()
 	m_last_v = v;
 	m_last_h = h;
 	m_timer->adjust(time_until_beam((v + 1) % m_height, 0));
-}
-
-void huc6261_device::device_post_load()
-{
-	if (screen().height() != m_height * 2)
-		screen().configure(WPF, m_height * 2, screen().visible_area(), attotime::from_ticks(u64(WPF) * m_height, clock()));
 }
