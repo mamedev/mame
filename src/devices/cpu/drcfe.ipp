@@ -378,9 +378,7 @@ void drc_frontend_base<Desc>::accumulate_required_backwards(Desc &desc, typename
 							accumulate_required_backwards(slot, mask);
 						};
 				if (first)
-				{
 					acc(*first, mask, acc);
-				}
 			};
 
 	// if this is a branch, we have to reset our requests
