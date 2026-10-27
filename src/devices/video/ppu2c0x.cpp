@@ -877,8 +877,9 @@ void ppu2c0x_device::draw_sprites(u8 *line_priority)
 		if ((sprite_index == 0) && (sprite_xpos == 254))
 		{
 			sprite_ypos--;
-			/* set the "sprite 0 hit" flag if appropriate */
-			if (line_priority[sprite_xpos] & 0x02)
+			// set the "sprite 0 hit" flag if appropriate, but only on a line covered by the (shifted) sprite
+			// moejudo otherwise has garbled screen during fights and backtf23 as well as soon as the gameplay starts
+			if ((sprite_ypos <= m_scanline) && (m_scanline < sprite_ypos + size) && (line_priority[sprite_xpos] & 0x02))
 				m_regs[PPU_STATUS] |= PPU_STATUS_SPRITE0_HIT;
 		}
 
