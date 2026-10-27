@@ -63,6 +63,7 @@
 #include "bus/midi/midi.h"
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
+#include "bus/technics/kn6000/kn6000_expansion.h"
 #include "cpu/mn10300/mn10300.h"
 #include "imagedev/floppy.h"
 #include "machine/intelfsh.h"
@@ -311,6 +312,7 @@ public:
 		: kn_state(mconfig, type, tag)
 		, m_program(*this, "program")
 		, m_libram(*this, "libram")
+		, m_exp(*this, "exp")
 	{ }
 
 	void kn6000(machine_config &config) ATTR_COLD;
@@ -321,6 +323,7 @@ protected:
 private:
 	required_region_ptr<u32> m_program;
 	required_shared_ptr<u32> m_libram;
+	required_device<kn6000_expansion_connector> m_exp;
 
 	void kn6000_map(address_map &map) ATTR_COLD;
 };
@@ -865,6 +868,7 @@ void kn6000_state::machine_start()
 {
 	kn_state::machine_start();
 	std::copy_n(&m_program[0], m_program.length(), &m_libram[0]);
+	m_exp->program_map(m_maincpu->space(AS_PROGRAM));
 }
 
 
@@ -1113,6 +1117,10 @@ void kn6000_state::kn6000(machine_config &config)
 	fdc_add(config, false);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("kn6000_flop");
+
+	// FIXME: connect DRQ; the firmware services it in interrupt group 0x0f, whose source is not emulated
+
+	KN6000_EXPANSION(config, m_exp, kn6000_expansion_intf, nullptr);
 }
 
 void kn_state::kn24_common(machine_config &config)
