@@ -2178,6 +2178,7 @@ template<int Sel> u16 swp30_device::meg_map_r()
 template<int Sel> void swp30_device::meg_map_w(u16 data)
 {
 	m_meg->map_w<Sel>(data);
+	m_meg_program_changed = true;
 }
 
 
