@@ -2911,7 +2911,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsshangh" supported="no">
-		<description>Shanghai - Banri no Choujou</description>
+		<description>Shanghai: Banri no Choujou</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="上海 万里の長城" />
@@ -2925,7 +2925,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsshanghb" cloneof="bsshangh" supported="no">
-		<description>Shanghai - Banri no Choujou (bad header?)</description>
+		<description>Shanghai: Banri no Choujou (bad header?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="上海 万里の長城" />
@@ -4473,7 +4473,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bsshangha" cloneof="bsshangh" supported="no">
-		<description>Shanghai - Banri no Choujou (alt)</description>
+		<description>Shanghai: Banri no Choujou (alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="上海 万里の長城" />
