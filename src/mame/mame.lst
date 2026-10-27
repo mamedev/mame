@@ -21218,6 +21218,9 @@ mbs1
 @source:homebrew/arduboy.cpp
 arduboy
 
+@source:homebrew/avrtester.cpp
+avrtt
+
 @source:homebrew/chaos.cpp
 chaos
 
