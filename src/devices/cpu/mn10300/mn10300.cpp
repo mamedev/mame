@@ -517,18 +517,7 @@ TIMER_CALLBACK_MEMBER(mn10300_device::tm_underflow)
 // DMA controller channel 0. The control register (0x800) starts the channel when
 // its low nibble reads 0xf; 0x804 and 0x808 are the source and destination, and
 // 0x80c is a 16-bit count. The channel moves (count + 1) bytes, then raises its
-// end-of-transfer interrupt. The transfer moves bytes between the memory buffer
-// and the peripheral data port it is pointed at, with the peripheral end held at
-// a fixed address and the memory end advancing. The address modes are not yet
-// decoded from the control register, so the peripheral is taken to be the end
-// that lies in the I/O region.
-//
-// The Technics floppy code fits (count + 1) and no other length. The KN6000 loads
-// (length - 1) for a sector, and its end-of-transfer handler asserts the floppy
-// controller's terminal count; with (count + 2) every sector overran its buffer by
-// one byte. The KN7000 loads (length - 2), and its end-of-transfer handler waits
-// for the controller's last request, moves that byte itself, then asserts
-// terminal count.
+// end-of-transfer interrupt.
 u32 mn10300_device::dmac_r(offs_t offset)
 {
 	switch (offset)
