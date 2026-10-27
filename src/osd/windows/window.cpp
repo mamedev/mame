@@ -334,6 +334,13 @@ inline bool is_mame_window(HWND hwnd)
 	return false;
 }
 
+inline bool is_window_in_our_process(HWND hwnd)
+{
+	DWORD process_id = 0;
+	GetWindowThreadProcessId(hwnd, &process_id);
+	return process_id == GetCurrentProcessId();
+}
+
 inline BOOL handle_mouse_button(windows_osd_interface &osd, int button, int down, LPARAM lparam)
 {
 	MouseUpdateEventArgs args;
@@ -1402,7 +1409,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 					for (const auto &w : osd_common_t::window_list())
 						ShowWindow(dynamic_cast<win_window_info &>(*w).platform_window(), SW_RESTORE);
 				}
-				else if ((wparam == WA_INACTIVE) && !is_mame_window(HWND(lparam)))
+				else if ((wparam == WA_INACTIVE) && !is_mame_window(HWND(lparam)) && !is_window_in_our_process(HWND(lparam)))
 				{
 					for (const auto &w : osd_common_t::window_list())
 						ShowWindow(dynamic_cast<win_window_info &>(*w).platform_window(), SW_MINIMIZE);
