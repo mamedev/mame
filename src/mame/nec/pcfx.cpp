@@ -58,8 +58,6 @@ private:
 
 	template <int Pad> u16 pad_r(offs_t offset);
 	template <int Pad> void pad_w(offs_t offset, u16 data);
-	[[maybe_unused]] u8 extio_r(offs_t offset);
-	[[maybe_unused]] void extio_w(offs_t offset, u8 data);
 
 	template <int Pad> TIMER_CALLBACK_MEMBER(pad_func);
 	void pad_irq_update();
@@ -74,6 +72,7 @@ private:
 	u32 timer_effective_period() const { return (m_timer_period ? m_timer_period : 0x10000) * 15; }
 
 	// the 16-bit video chips have their A1 on CPU A2, so a word access reaches the same register twice, low half first
+	// TODO: byte accesses are undefined (HuC6261 manual 2.1.1) and are passed on as halfword accesses
 	template <typename Read>
 	static u32 read_halves(u32 mem_mask, Read &&read)
 	{
@@ -125,20 +124,6 @@ private:
 	required_ioport_array<2> m_pads;
 };
 
-
-u8 pcfx_state::extio_r(offs_t offset)
-{
-	address_space &io_space = m_maincpu->space(AS_IO);
-
-	return io_space.read_byte(offset);
-}
-
-void pcfx_state::extio_w(offs_t offset, u8 data)
-{
-	address_space &io_space = m_maincpu->space(AS_IO);
-
-	io_space.write_byte(offset, data);
-}
 
 template <int Pad>
 u16 pcfx_state::pad_r(offs_t offset)
@@ -295,7 +280,7 @@ void pcfx_state::pcfx_mem(address_map &map)
 	// internal backup RAM, read and written only while enabled in C80h bit 0
 	map(0xe0000000, 0xe7ffffff).lrw8(
 		NAME([this] (offs_t offset) -> u8 {
-			if (!BIT(m_bram_control, 0) && !machine().side_effects_disabled())
+			if (!BIT(m_bram_control, 0))
 				return 0xff;
 			return m_nvram_ptr[offset & 0x7fff];
 		}),
@@ -434,10 +419,10 @@ void pcfx_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 	std::copy(std::begin(FAT), std::end(FAT), &bram[0x80]);
 }
 
-// bus wait states: the DRAM charges 3 cycles when an access (opcode
-// fetches included) leaves the 2 KB page of the previous one, the BIOS ROM 2 cycles a
-// halfword, the video and sound chips 4 cycles a read and 2 a write; everything but
-// the DRAM is on a 16-bit bus, so a 32-bit access takes two bus cycles
+// bus wait states: the DRAM adds 3 when an access (opcode fetches included) leaves
+// the 2 KB page of the previous one, the BIOS ROM 2 a halfword, the video and sound
+// chips 4 a read and 2 a write, and writes to the gate array's own I/O registers 4;
+// everything but the DRAM is on a 16-bit bus, so a 32-bit access takes two bus cycles
 int pcfx_state::bus_wait(offs_t address, int access, int size)
 {
 	const bool io = access == v810_device::BUS_IO_READ || access == v810_device::BUS_IO_WRITE;
@@ -455,7 +440,7 @@ int pcfx_state::bus_wait(offs_t address, int access, int size)
 	if (io || (address >= 0x80000000 && address < 0x80800000))
 	{
 		const offs_t port = address & 0x7fffff;
-		// writes to the chips go through a one-entry write buffer, other I/O writes take 6 cycles
+		// writes to the chips go through a one-entry write buffer, other I/O writes take 4 wait states
 		if (port >= 0x100 && port < 0x700)
 			wait = write ? 2 : 4;
 		else
@@ -497,17 +482,17 @@ void pcfx_state::pcfx(machine_config &config)
 	screen.set_screen_update(m_huc6261, FUNC(huc6261_device::screen_update));
 	screen.set_raw(XTAL(21'477'272) * 2, huc6261_device::WPF, 64, 64 + 1024 + 64, huc6261_device::SCREEN_LPF, 18 * 2, (18 + 242) * 2);
 
-	huc6270_device &huc6270_a(HUC6270(config, "huc6270_a", XTAL(21'477'272)));
-	huc6270_a.set_vram_size(0x20000);
-	huc6270_a.irq().set(m_intc, FUNC(pcfx_intc_device::irq_w<12>));
+	HUC6270(config, m_huc6270[0], XTAL(21'477'272));
+	m_huc6270[0]->set_vram_size(0x20000);
+	m_huc6270[0]->irq().set(m_intc, FUNC(pcfx_intc_device::irq_w<12>));
 
-	huc6270_device &huc6270_b(HUC6270(config, "huc6270_b", XTAL(21'477'272)));
-	huc6270_b.set_vram_size(0x20000);
-	huc6270_b.irq().set(m_intc, FUNC(pcfx_intc_device::irq_w<14>));
+	HUC6270(config, m_huc6270[1], XTAL(21'477'272));
+	m_huc6270[1]->set_vram_size(0x20000);
+	m_huc6270[1]->irq().set(m_intc, FUNC(pcfx_intc_device::irq_w<14>));
 
 	HUC6261(config, m_huc6261, XTAL(21'477'272));
-	m_huc6261->set_vdc1_tag("huc6270_a");
-	m_huc6261->set_vdc2_tag("huc6270_b");
+	m_huc6261->set_vdc1_tag(m_huc6270[0]);
+	m_huc6261->set_vdc2_tag(m_huc6270[1]);
 	m_huc6261->set_king_tag("huc6272");
 
 	huc6272_device &huc6272(HUC6272(config, "huc6272", XTAL(21'477'272)));
