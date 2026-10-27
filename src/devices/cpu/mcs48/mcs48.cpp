@@ -601,24 +601,6 @@ u8 mcs48_cpu_device::p2_mask()
 
 
 /*-------------------------------------------------
-    p2_output - apply UPI-41 buffer flags to the
-    port pins without changing the port latch
--------------------------------------------------*/
-
-u8 mcs48_cpu_device::p2_output(u8 data) const
-{
-	if (m_flags_enabled)
-	{
-		if (!(m_sts & STS_OBF))
-			data &= ~P2_OBF;
-		if (m_sts & STS_IBF)
-			data &= ~P2_NIBF;
-	}
-	return data;
-}
-
-
-/*-------------------------------------------------
     expander_operation - perform an operation via
     the 8243 expander chip
 -------------------------------------------------*/
@@ -1437,6 +1419,36 @@ void mcs48_cpu_device::execute_run()
 /*******************************************************************************
     DATA ACCESS HELPERS
 *******************************************************************************/
+
+/*-------------------------------------------------
+    p2_output - apply UPI-41 buffer flags to the
+    port pins without changing the port latch
+-------------------------------------------------*/
+
+u8 upi41_cpu_device::p2_output(u8 data) const
+{
+	if (m_flags_enabled)
+	{
+		if (!(m_sts & STS_OBF))
+			data &= ~P2_OBF;
+		if (m_sts & STS_IBF)
+			data &= ~P2_NIBF;
+	}
+	return data;
+}
+
+
+u8 upi41_cpu_device::port_r(offs_t a)
+{
+	const u8 data = mcs48_cpu_device::port_r(a);
+	return a == 2 ? p2_output(data) : data;
+}
+
+void upi41_cpu_device::port_w(offs_t a, u8 v)
+{
+	mcs48_cpu_device::port_w(a, a == 2 ? p2_output(v) : v);
+}
+
 
 /*-------------------------------------------------
     upi41_master_r - master CPU data/status
