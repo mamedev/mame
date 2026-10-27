@@ -114,6 +114,7 @@ Track 2 Side 1 null-filled: no flux in MFM pulse intervals.
 		<!-- Licensed by Activision -->
 		<description>Shanghai II</description>
 		<year>1991</year>
+		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
 512 bytes/sector, 9 sectors/track, 80 tracks/side.
 Track 1 Side 0 null-filled: Only has flux in 4uS MFM pulse interval.
