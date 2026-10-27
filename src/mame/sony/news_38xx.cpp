@@ -105,8 +105,8 @@ public:
 		m_parallel(*this, "parallel"),
 		m_parallel_data(*this, "parallel_data"),
 		m_eprom(*this, "eprom"),
-		m_led(*this, "led%u", 0U),
-		m_fb(*this, "nwb_512")
+		m_fb(*this, "nwb_512"),
+		m_led(*this, "led%u", 0U)
 	{
 	}
 
@@ -256,13 +256,11 @@ protected:
 	required_device_array<nscsi_bus_device, 2> m_scsibus;
 	required_device<centronics_device> m_parallel;
 	optional_device<output_latch_device> m_parallel_data;
-
 	required_region_ptr<u32> m_eprom;
+	required_device<nwb_512_device> m_fb;
+
 	output_finder<4> m_led;
 	std::unique_ptr<u16[]> m_net_ram;
-
-	// Framebuffer and CRT
-	required_device<nwb_512_device> m_fb;
 
 	// For RAM test-and-set implementation
 	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_memory_access;

@@ -63,8 +63,8 @@
 #include "emu.h"
 
 #include "news_020_mmu.h"
-#include "news_iop_scsi.h"
 #include "news_hid.h"
+#include "news_iop_scsi.h"
 #include "nwb_512.h"
 
 #include "bus/nscsi/cd.h"
@@ -269,10 +269,8 @@ namespace
 		required_device_array<rs232_port_device, 2> m_serial;
 		required_device<news_hid_serial_keyboard_device> m_keyboard;
 		required_device<news_hid_serial_mouse_device> m_mouse;
-		std::unique_ptr<u16[]> m_net_ram;
-
-		// Framebuffer and CRT
 		required_device<nwb_512_device> m_fb;
+		std::unique_ptr<u16[]> m_net_ram;
 
 		// IOP IRQ state
 		const std::map<int, std::vector<iop_irq_number>> iop_irq_line_map;
