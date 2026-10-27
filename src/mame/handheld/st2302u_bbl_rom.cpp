@@ -405,14 +405,14 @@ static INPUT_PORTS_START(class200)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(cutepet)
-	PORT_START("IN0")
+	PORT_START("IN1")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")
+	PORT_START("IN2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // needed to power-up, inputs might be multiplexed here?
 	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")
+	PORT_START("IN3")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -442,9 +442,9 @@ void st22xx_cutepet_state::st22xx_cutepet(machine_config &config)
 {
 	ST2302U(config, m_maincpu, 24'000'000);
 	m_maincpu->set_addrmap(AS_DATA, &st22xx_cutepet_state::st22xx_cutepet_map);
-	m_maincpu->in_pa_callback().set_ioport("IN0");
-	m_maincpu->in_pb_callback().set_ioport("IN1");
-	m_maincpu->in_pc_callback().set_ioport("IN2");
+	m_maincpu->in_pa_callback().set_ioport("IN1");
+	m_maincpu->in_pb_callback().set_ioport("IN2");
+	m_maincpu->in_pc_callback().set_ioport("IN3");
 
 	SPEAKER(config, "mono").front_center();
 	m_maincpu->add_route(st2205u_base_device::PSG_OUTPUT_PWM, "mono", 1.00);
