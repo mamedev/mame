@@ -15,6 +15,7 @@
 
 #include <cstdio>
 #include <string>
+#include <assert.h>
 
 // --------------------------------------------------------------------------
 // Subclass of srcdbg_format_reader_callback to receive data as it is read

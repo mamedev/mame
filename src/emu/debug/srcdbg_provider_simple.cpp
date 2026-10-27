@@ -127,7 +127,7 @@ static bool symbol_from_reg_id(const device_state_interface * state, char reg_id
 			if (srcdbg_reg_id_to_m6809_reg_id[i].srcdbg_reg_id == reg_id)
 			{
 				symbol = state->state_find_entry(
-					srcdbg_reg_id_to_m6809_reg_id[i].m6809_reg_id)->symbol();
+					srcdbg_reg_id_to_m6809_reg_id[i].m6809_reg_id)->symbol().c_str();
 				return true;
 			}
 		}
