@@ -443,9 +443,11 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 				int const sync = mfm ? sync_count(track_data, offset, 0xa1)
 					: fm_sync_count(track_data, offset, fm_stride, previous + 7 * (previous_mfm ? 1 : fm_stride));
-				// Exact density-change positions are not recorded in DMK.  Switch
-				// before the entire sync preamble, without crossing the last ID.
-				encoding_start.emplace_back(std::max(previous + 1, offset - sync - 8));
+				// Exact density-change positions are not recorded.  Switch at
+				// the recognizable sync, where the writer can recover the same
+				// density and phase.  An arbitrary margin before it makes gap
+				// bytes alternate between FM and MFM on successive saves.
+				encoding_start.emplace_back(std::max(previous + 1, offset - sync));
 				if (!index)
 					first_sync = offset - sync;
 			}
