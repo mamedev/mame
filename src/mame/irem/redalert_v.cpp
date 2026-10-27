@@ -499,9 +499,9 @@ void redalert_state::demoneye_video(machine_config &config)
 
 	m_screen->set_screen_update(FUNC(redalert_state::screen_update_demoneye));
 
-	PALETTE(config, "palette", FUNC(redalert_state::panther_palette), NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1);
+	PALETTE(config, "palette", FUNC(redalert_state::demoneye_palette), NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1);
 
-	MCFG_VIDEO_START_OVERRIDE(redalert_state,demoneye)
+	MCFG_VIDEO_START_OVERRIDE(redalert_state, demoneye)
 }
 
 
@@ -511,7 +511,7 @@ void redalert_state::panther_video(machine_config &config)
 
 	m_screen->set_screen_update(FUNC(redalert_state::screen_update_panther));
 
-	PALETTE(config, "palette", FUNC(redalert_state::demoneye_palette), NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1);
+	PALETTE(config, "palette", FUNC(redalert_state::panther_palette), NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1);
 
-	MCFG_VIDEO_START_OVERRIDE(redalert_state,ww3)
+	MCFG_VIDEO_START_OVERRIDE(redalert_state, ww3)
 }
