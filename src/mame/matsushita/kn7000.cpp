@@ -148,6 +148,7 @@ public:
 		, m_lcdbuf(*this, "lcdbuf")
 		, m_customflash(*this, "custom_data")
 		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:0")
 		, m_midi_uart(*this, "midi_uart%u", 0U)
 		, m_wave_main_y(*this, "waveform_main_y")
 		, m_wave_main_x(*this, "waveform_main_x")
@@ -172,7 +173,7 @@ protected:
 	void kn_common(machine_config &config) ATTR_COLD;
 	void kn24_common(machine_config &config) ATTR_COLD;
 	void custom_flash_add(machine_config &config) ATTR_COLD;
-	void fdc_add(machine_config &config) ATTR_COLD;
+	void fdc_add(machine_config &config, bool drq_on_irq1) ATTR_COLD;
 	void configure_cpanel() ATTR_COLD;
 	void configure_tonegen() ATTR_COLD;
 	void common_map(address_map &map) ATTR_COLD;
@@ -192,6 +193,10 @@ protected:
 	required_device<kn_tonegen_base_device> m_tonegen;
 
 	u16 m_sdmbx_out = 0xff;
+	u16 m_gpio8004 = 0xffff;
+
+	u16 gpio8004_r();
+	void gpio8004_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 private:
 	enum { SIO_PANEL = 0, SIO_MIDI1 = 1, SIO_MIDI2 = 2 };
@@ -199,6 +204,7 @@ private:
 	required_shared_ptr<u32> m_lcdbuf;
 	optional_device<fujitsu_29lv160b_device> m_customflash;
 	optional_device<n82077aa_device> m_fdc;
+	optional_device<floppy_connector> m_floppy;
 	required_device_array<kn7000_sio_uart_device, 2> m_midi_uart;
 	optional_memory_region m_wave_main_y;
 	optional_memory_region m_wave_main_x;
@@ -219,6 +225,11 @@ private:
 	u16 m_tg_wave_bank[2];
 	u16 m_tg_wave_addr[2];
 
+	bool m_fdc_drq_on_irq1 = false;
+	u8 m_fdc_drq = 0;
+	u8 m_fdd_index = 0;
+	emu_timer *m_fdd_index_timer = nullptr;
+
 	void kn2400_map(address_map &map) ATTR_COLD;
 
 	u32 screen_update_gray(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -234,6 +245,12 @@ private:
 	u16 sdmbx_r();
 	void sdmbx_w(u16 data);
 	void update_volume();
+	void fdc_drq_w(int state);
+	u8 fdc_dack_r();
+	void fdc_dack_w(u8 data);
+	void fdd_loaded(floppy_image_device *floppy);
+	void fdd_unloaded(floppy_image_device *floppy);
+	TIMER_CALLBACK_MEMBER(fdd_index_poll);
 };
 
 
@@ -267,7 +284,6 @@ private:
 	emu_timer *m_sd_insert_timer = nullptr; // the power-on card-detect hack, see machine_reset()
 	emu_timer *m_sd_inuse_off = nullptr;
 	u8 m_sd_miso = 1; // the card's DO line
-	u16 m_gpio8004 = 0xffff;
 	u32 m_sdport = 0;
 
 	void sd_add(machine_config &config) ATTR_COLD;
@@ -281,8 +297,7 @@ private:
 	void sd_card_changed(int state);
 	u32 sdport_r();
 	void sdport_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	u16 gpio8004_r();
-	void gpio8004_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void sd_gpio8004_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	TIMER_CALLBACK_MEMBER(sd_insert);
 	TIMER_CALLBACK_MEMBER(sd_inuse_off);
 };
@@ -392,7 +407,8 @@ void kn_state::kn24_map(address_map &map)
 
 void kn_state::fdc_map(address_map &map)
 {
-	map(0x98010000, 0x98010003).rw(m_fdc, FUNC(n82077aa_device::dma_r), FUNC(n82077aa_device::dma_w));
+	map(0x36008004, 0x36008005).rw(FUNC(kn_state::gpio8004_r), FUNC(kn_state::gpio8004_w));
+	map(0x98010000, 0x98010003).rw(FUNC(kn_state::fdc_dack_r), FUNC(kn_state::fdc_dack_w));
 	map(0x98020004, 0x98020004).rw(m_fdc, FUNC(n82077aa_device::dor_r), FUNC(n82077aa_device::dor_w));
 	map(0x98020008, 0x98020008).rw(m_fdc, FUNC(n82077aa_device::msr_r), FUNC(n82077aa_device::dsr_w));
 	map(0x9802000a, 0x9802000a).rw(m_fdc, FUNC(n82077aa_device::fifo_r), FUNC(n82077aa_device::fifo_w));
@@ -414,7 +430,7 @@ void kn6000_state::kn6000_map(address_map &map)
 
 void kn_sd_state::sd_map(address_map &map)
 {
-	map(0x36008004, 0x36008005).rw(FUNC(kn_sd_state::gpio8004_r), FUNC(kn_sd_state::gpio8004_w));
+	map(0x36008004, 0x36008005).rw(FUNC(kn_sd_state::gpio8004_r), FUNC(kn_sd_state::sd_gpio8004_w));
 	map(0x9805000c, 0x9805000d).w(FUNC(kn_sd_state::sd_sdmbx_w));
 	map(0x9cc00008, 0x9cc0000b).rw(FUNC(kn_sd_state::sdport_r), FUNC(kn_sd_state::sdport_w));
 }
@@ -564,6 +580,76 @@ void kn_state::update_volume()
 	m_tonegen->set_output_gain(ALL_OUTPUTS, v * v);
 }
 
+// An output latch. Bit 4 is the floppy controller's terminal count, active low:
+// the firmware asserts it itself at the end of a sector transfer (the KN6000
+// around a dummy read of the DMA acknowledge port, the KN7000 after moving the
+// last byte).
+u16 kn_state::gpio8004_r()
+{
+	return m_gpio8004;
+}
+
+void kn_state::gpio8004_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_gpio8004);
+	if (m_fdc)
+		m_fdc->tc_w(BIT(~m_gpio8004, 4));
+}
+
+// The floppy controller's DRQ runs DMA channel 0. On the KN7000 and KN2400 the
+// firmware also reads it as IRQ1: its end-of-transfer handler waits there, with
+// the interrupt disabled, for the request of the last byte, which it moves itself.
+void kn_state::fdc_drq_w(int state)
+{
+	m_fdc_drq = state;
+	m_maincpu->dma_req_w(state);
+	if (m_fdc_drq_on_irq1)
+		m_maincpu->set_input_line(mn10300_device::IRQ1, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+// A DMA acknowledge cycle moves a byte only while the controller requests one.
+// The KN6000's end-of-transfer handler makes one more, a dummy read: after a read
+// DRQ is already low, but during a format it takes sector ID bytes out of the
+// FIFO and the formatted disk comes out unreadable.
+u8 kn_state::fdc_dack_r()
+{
+	return m_fdc_drq ? m_fdc->dma_r() : 0xff;
+}
+
+void kn_state::fdc_dack_w(u8 data)
+{
+	if (m_fdc_drq)
+		m_fdc->dma_w(data);
+}
+
+// The drive's INDEX pulse reaches the CPU on IRQ7. The firmware counts a disk
+// with the disk-change flag set as present only if an index interrupt arrived
+// recently, so without it a disk inserted while the machine runs is never seen.
+// The controller owns the drive's index callback, so the line is sampled, only
+// while a disk is in the drive.
+void kn_state::fdd_loaded(floppy_image_device *floppy)
+{
+	m_fdd_index_timer->adjust(attotime::from_usec(500), 0, attotime::from_usec(500));
+}
+
+void kn_state::fdd_unloaded(floppy_image_device *floppy)
+{
+	m_fdd_index_timer->adjust(attotime::never);
+	m_fdd_index = 0;
+	m_maincpu->set_input_line(mn10300_device::IRQ7, CLEAR_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(kn_state::fdd_index_poll)
+{
+	floppy_image_device *const floppy = m_floppy->get_device();
+	const u8 index = floppy ? floppy->idx_r() : 0;
+	if (index != m_fdd_index)
+	{
+		m_fdd_index = index;
+		m_maincpu->set_input_line(mn10300_device::IRQ7, index ? ASSERT_LINE : CLEAR_LINE);
+	}
+}
+
 // The SD slot has a hinged cover, and the firmware reads card-detect through
 // the cover switch: high on IRQ4 means no card or cover open.
 void kn_sd_state::sd_update_carddetect()
@@ -619,15 +705,10 @@ void kn_sd_state::sdport_w(offs_t offset, u32 data, u32 mem_mask)
 	m_sd_leds[1] = (m_sdport & 0xc0) ? 1 : 0;
 }
 
-u16 kn_sd_state::gpio8004_r()
-{
-	return m_gpio8004;
-}
-
 // Bit 1 is the card's SPI chip select, active low
-void kn_sd_state::gpio8004_w(offs_t offset, u16 data, u16 mem_mask)
+void kn_sd_state::sd_gpio8004_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_gpio8004);
+	gpio8004_w(offset, data, mem_mask);
 	m_sdcard->spi_ss_w(BIT(~m_gpio8004, 1));
 }
 
@@ -726,11 +807,27 @@ void kn_state::machine_start()
 	save_item(NAME(m_tg_wave_addr));
 	save_item(NAME(m_sdmbx_out));
 	save_item(NAME(m_sdspi_rate));
+	save_item(NAME(m_gpio8004));
+	save_item(NAME(m_fdc_drq));
+	save_item(NAME(m_fdd_index));
+
+	m_fdd_index_timer = timer_alloc(FUNC(kn_state::fdd_index_poll), this);
+	if (m_floppy && m_floppy->get_device())
+	{
+		floppy_image_device *const floppy = m_floppy->get_device();
+		floppy->setup_load_cb(floppy_image_device::load_cb(&kn_state::fdd_loaded, this));
+		floppy->setup_unload_cb(floppy_image_device::unload_cb(&kn_state::fdd_unloaded, this));
+		if (floppy->exists())
+			fdd_loaded(floppy);
+	}
 }
 
 void kn_state::machine_reset()
 {
 	update_volume();
+	m_gpio8004 = 0xffff;
+	if (m_fdc)
+		m_fdc->tc_w(0);
 }
 
 void kn_sd_state::machine_start()
@@ -741,7 +838,6 @@ void kn_sd_state::machine_start()
 	m_sd_inuse_off = timer_alloc(FUNC(kn_sd_state::sd_inuse_off), this);
 
 	save_item(NAME(m_sd_miso));
-	save_item(NAME(m_gpio8004));
 	save_item(NAME(m_sdport));
 }
 
@@ -758,7 +854,6 @@ void kn_sd_state::machine_reset()
 	else
 		m_sd_insert_timer->enable(false);
 
-	m_gpio8004 = 0xffff;
 	m_sdcard->spi_ss_w(0);
 	m_sdcard->spi_clock_w(1);           // mode 3: the clock idles high
 }
@@ -949,18 +1044,19 @@ void kn_state::custom_flash_add(machine_config &config)
 	FUJITSU_29LV160B(config, m_customflash);
 }
 
-void kn_state::fdc_add(machine_config &config)
+void kn_state::fdc_add(machine_config &config, bool drq_on_irq1)
 {
 	// IC103: a custom part (C1DB00000607) compatible with the N82077AA. INTRQ goes to
 	// IRQ2, whose handler issues the Sense Interrupt Status that ends a seek; DRQ drives
 	// the on-chip DMA controller's channel 0, which moves the sector data through the FDC
-	// data port at 0x98010000 and pulses the controller's terminal count back to the FDC.
-	// (The schematic prints INTRQ as IRQ1, but the board wires it to IRQ2 - follow the wire.)
+	// data port at 0x98010000. Terminal count comes from the output latch at 0x36008004,
+	// not from the channel. (The schematic prints INTRQ as IRQ1, but the board wires it to
+	// IRQ2 - follow the wire.)
 	N82077AA(config, m_fdc, 24'000'000);
-	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(mn10300_device::dma_req_w));
+	m_fdc->drq_wr_callback().set(FUNC(kn_state::fdc_drq_w));
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, mn10300_device::IRQ2);
-	m_maincpu->dma_tc_cb().set([this] (int state) { m_fdc->tc_w(state); });
-	FLOPPY_CONNECTOR(config, "fdc:0", kn_floppies, "35hd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
+	m_fdc_drq_on_irq1 = drq_on_irq1;
+	FLOPPY_CONNECTOR(config, m_floppy, kn_floppies, "35hd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 }
 
 void kn_state::configure_cpanel()
@@ -997,7 +1093,7 @@ void kn_sd_state::kn7000(machine_config &config)
 	KN7000_TONEGEN(config, m_tonegen);
 	configure_tonegen();
 	custom_flash_add(config);
-	fdc_add(config);
+	fdc_add(config, true);
 	sd_add(config);
 	SOFTWARE_LIST(config, "flop_list").set_original("kn7000_flop");
 	config.set_default_layout(layout_kn7000);
@@ -1014,7 +1110,7 @@ void kn6000_state::kn6000(machine_config &config)
 	KN6000_TONEGEN(config, m_tonegen);
 	configure_tonegen();
 	custom_flash_add(config);
-	fdc_add(config);
+	fdc_add(config, false);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("kn6000_flop");
 }
@@ -1038,7 +1134,7 @@ void kn_state::kn2400(machine_config &config)
 {
 	kn24_common(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kn_state::kn2400_map);
-	fdc_add(config);
+	fdc_add(config, true);
 }
 
 // FIXME: identified as a KN2600, the firmware runs its SD start-up and then leaves
