@@ -105,7 +105,7 @@ public:
 		m_parallel(*this, "parallel"),
 		m_parallel_data(*this, "parallel_data"),
 		m_eprom(*this, "eprom"),
-		m_fb(*this, "nwb_512"),
+		m_fb(*this, "nwb512"),
 		m_led(*this, "led%u", 0U)
 	{
 	}
@@ -424,10 +424,11 @@ void news_38xx_state::iop_map(address_map &map)
 	map(0x2c000000, 0x2c0000ff).rom().region("idrom", 0);
 	map(0x2c000100, 0x2c000103).portr("SW1");
 
-	map(0x2e000000, 0x2eefffff).r(FUNC(news_38xx_state::iop_bus_error_r)).mirror(0x10000000); // Expansion I/O
+	// Expansion I/O
+	map(0x2e000000, 0x2eefffff).mirror(0x10000000).r(FUNC(news_38xx_state::iop_bus_error_r));
 
-	// NWB-512 Monochrome Framebuffer
-	map(0x2ef00000, 0x2effffff).m(m_fb, FUNC(nwb_512_device::map));
+	// NWB-512 Monochrome Framebuffer (in Expansion I/O space)
+	map(0x2ef00000, 0x2effffff).mirror(0x10000000).m(m_fb, FUNC(nwb_512_device::map));
 }
 
 void news_38xx_state::iop_vector_map(address_map &map)

@@ -78,7 +78,7 @@ public:
 	news_hid_serial_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	auto txd_handler() { return m_write_txd.bind(); }
-	void rxd_w(int const state) { rx_w(state); }
+	void rxd_w(int state) { rx_w(state); }
 
 protected:
 	virtual void device_start() override ATTR_COLD;

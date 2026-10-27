@@ -270,7 +270,7 @@ u8 news_hid_hle_device::status_68k_r()
 }
 
 news_hid_serial_keyboard_device::news_hid_serial_keyboard_device(
-	machine_config const &mconfig, char const *tag, device_t *owner, u32 const clock)
+	machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, NEWS_HID_SERIAL_KEYBOARD, tag, owner, clock)
 	, device_buffered_serial_interface(mconfig, *this)
 	, device_matrix_keyboard_interface(mconfig, *this, "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7")
@@ -310,7 +310,7 @@ void news_hid_serial_keyboard_device::key_break(u8 row, u8 column)
 	push_key(0x80 | (row << 4) | column);
 }
 
-void news_hid_serial_keyboard_device::push_key(const u8 code)
+void news_hid_serial_keyboard_device::push_key(u8 code)
 {
 	LOG("push_key(0x%x)\n", code);
 	transmit_byte(code);
@@ -322,7 +322,7 @@ void news_hid_serial_keyboard_device::received_byte(u8 byte)
 	LOG("received_byte(0x%x)\n", byte);
 }
 
-news_hid_serial_mouse_device::news_hid_serial_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+news_hid_serial_mouse_device::news_hid_serial_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 const clock)
 	: device_t(mconfig, NEWS_HID_SERIAL_MOUSE, tag, owner, clock)
 	, device_buffered_serial_interface(mconfig, *this)
 	, m_write_txd(*this)

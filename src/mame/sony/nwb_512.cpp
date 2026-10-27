@@ -774,8 +774,8 @@ rgb_t nwb_512_device::current_dim_color()
 ROM_START(nwb_512)
 // NWB-512 Kanji ROM
 ROM_REGION32_BE(0x40000, "krom", 0)
-	ROM_LOAD16_BYTE("nwb512-ic128-hn62301ap-aa1.bin", 0x0000, 0x20000, CRC(3eaa0dbc) SHA1(9c4e66cc122fd60963f51649c945cdfc39f230eb))
-	ROM_LOAD16_BYTE("nwb512-ic127-hn62301ap-aa2.bin", 0x0001, 0x20000, CRC(b8705af7) SHA1(915333f082ecbfee512f1166fc38d9dd29dcaf26))
+	ROM_LOAD16_BYTE("hn62301ap-aa1.ic128", 0x0000, 0x20000, CRC(3eaa0dbc) SHA1(9c4e66cc122fd60963f51649c945cdfc39f230eb))
+	ROM_LOAD16_BYTE("hn62301ap-aa2.ic127", 0x0001, 0x20000, CRC(b8705af7) SHA1(915333f082ecbfee512f1166fc38d9dd29dcaf26))
 ROM_END
 
 const tiny_rom_entry *nwb_512_device::device_rom_region() const

@@ -540,10 +540,10 @@ namespace
 		map(0x03000000, 0x0300ffff).rom().region("eprom", 0).mirror(0x007f0000);
 
 		// IOP bus expansion I/O
-		map(0x20000000, 0x20efffff).rw(FUNC(news_iop_state::extio_bus_error_r), FUNC(news_iop_state::extio_bus_error_w)).mirror(0x1f000000);
+		map(0x20000000, 0x20efffff).mirror(0x1f000000).rw(FUNC(news_iop_state::extio_bus_error_r), FUNC(news_iop_state::extio_bus_error_w));
 
-		// NWB-512 Monochrome Framebuffer
-		map(0x20f00000, 0x20ffffff).m(m_fb, FUNC(nwb_512_device::map));
+		// NWB-512 Monochrome Framebuffer (in Expansion I/O space)
+		map(0x20f00000, 0x20ffffff).mirror(0x1f000000).m(m_fb, FUNC(nwb_512_device::map));
 
 		// Expansion slot SCC (bus errors here kill iopboot, so the probe process may not use bus errors, at least not with the same setup as extio)
 		// TODO: Does the fact that NEWS-OS 4 poke at these addresses mean that something is not configured properly elsewhere?
