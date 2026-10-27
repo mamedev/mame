@@ -201,10 +201,17 @@ VIDEO_START_MEMBER(redalert_state,ww3)
 
 uint32_t redalert_state::screen_update_redalert(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bool const flipscreen = !BIT(*m_video_control ^ m_control_xor, 2);
+
 	for (offs_t offs = 0; offs < 0x2000; offs++)
 	{
-		uint8_t y = offs & 0xff;
+		uint8_t const y = offs & 0xff;
 		uint8_t x = (~offs >> 8) << 3;
+		int const y_dst = flipscreen ? (y ^ 0xff) : y;
+		if (!cliprect.containsy(y_dst))
+			continue;
+
+		uint16_t *const dest = &bitmap.pix(y_dst);
 
 		uint8_t bitmap_data = m_bitmap_videoram[offs];
 		uint8_t bitmap_color = m_bitmap_colorram[offs >> 3];
@@ -227,20 +234,21 @@ uint32_t redalert_state::screen_update_redalert(screen_device &screen, bitmap_in
 
 		for (int i = 0; i < 8; i++)
 		{
-			bool const bitmap_bit = BIT(bitmap_data, 7);
-			uint8_t const color_prom_a0_a1 = (BIT(charmap_data_2, 7) << 1) | BIT(charmap_data_1, 7);
+			int const x_dst = flipscreen ? (x ^ 0xff) : x;
+			if (cliprect.containsx(x_dst))
+			{
+				bool const bitmap_bit = BIT(bitmap_data, 7);
+				uint8_t const color_prom_a0_a1 = (BIT(charmap_data_2, 7) << 1) | BIT(charmap_data_1, 7);
 
-			/* determine priority */
-			uint16_t pen;
-			if ((color_prom_a0_a1 == 0) || (bitmap_bit && ((charmap_code & 0xc0) == 0xc0)))
-				pen = bitmap_bit ? (NUM_CHARMAP_PENS + bitmap_color) : (NUM_CHARMAP_PENS + NUM_BITMAP_PENS);
-			else
-				pen = ((charmap_code & 0xfe) << 1) | color_prom_a0_a1;
+				/* determine priority */
+				uint16_t pen;
+				if ((color_prom_a0_a1 == 0) || (bitmap_bit && ((charmap_code & 0xc0) == 0xc0)))
+					pen = bitmap_bit ? (NUM_CHARMAP_PENS + bitmap_color) : (NUM_CHARMAP_PENS + NUM_BITMAP_PENS);
+				else
+					pen = ((charmap_code & 0xfe) << 1) | color_prom_a0_a1;
 
-			if (BIT(*m_video_control ^ m_control_xor, 2))
-				bitmap.pix(y, x) = pen;
-			else
-				bitmap.pix(y ^ 0xff, x ^ 0xff) = pen;
+				dest[x_dst] = pen;
+			}
 
 			/* next pixel */
 			x++;
@@ -283,10 +291,17 @@ void redalert_state::demoneye_bitmap_layer_w(offs_t offset, uint8_t data)
 
 uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bool const flipscreen = BIT(*m_video_control, 2);
+
 	for (offs_t offs = 0; offs < 0x2000; offs++)
 	{
-		uint8_t y = offs & 0xff;
+		uint8_t const y = offs & 0xff;
 		uint8_t x = (~offs >> 8) << 3;
+		int const y_dst = flipscreen ? (y ^ 0xff) : y;
+		if (!cliprect.containsy(y_dst))
+			continue;
+
+		uint16_t *const dest = &bitmap.pix(y_dst);
 
 		uint8_t bitmap_data = m_bitmap_videoram[offs];
 		uint8_t bitmap_color = m_bitmap_colorram[offs >> 3];
@@ -313,20 +328,21 @@ uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_in
 
 		for (int i = 0; i < 8; i++)
 		{
-			bool const bitmap_bit = BIT(bitmap_data, 7);
-			uint8_t const color_prom_a0_a1 = (BIT(charmap_data_2, 7) << 1) | BIT(charmap_data_1, 7);
+			int const x_dst = flipscreen ? (x ^ 0xff) : x;
+			if (cliprect.containsx(x_dst))
+			{
+				bool const bitmap_bit = BIT(bitmap_data, 7);
+				uint8_t const color_prom_a0_a1 = (BIT(charmap_data_2, 7) << 1) | BIT(charmap_data_1, 7);
 
-			/* determine priority */
-			uint16_t pen;
-			if ((color_prom_a0_a1 == 0) || (bitmap_bit && ((charmap_code & 0xc0) == 0xc0)))
-				pen = bitmap_bit ? (NUM_CHARMAP_PENS + bitmap_color) : (NUM_CHARMAP_PENS + NUM_BITMAP_PENS);
-			else
-				pen = ((charmap_code & 0xfe) << 1) | color_prom_a0_a1;
+				/* determine priority */
+				uint16_t pen;
+				if ((color_prom_a0_a1 == 0) || (bitmap_bit && ((charmap_code & 0xc0) == 0xc0)))
+					pen = bitmap_bit ? (NUM_CHARMAP_PENS + bitmap_color) : (NUM_CHARMAP_PENS + NUM_BITMAP_PENS);
+				else
+					pen = ((charmap_code & 0xfe) << 1) | color_prom_a0_a1;
 
-			if (BIT(*m_video_control, 2))
-				bitmap.pix(y ^ 0xff, x ^ 0xff) = pen;
-			else
-				bitmap.pix(y, x) = pen;
+				dest[x_dst] = pen;
+			}
 
 			/* next pixel */
 			x++;
@@ -344,43 +360,39 @@ uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_in
 	if (BIT(control, 0))
 	{
 		// TODO: pinpoint what the unknown bits are for (more zooming? color offset?)
-		// TODO: layer is offset wrt bullets collision
 		// Note: boss second form has even more offsetted collision (hence bigger?)
 		int const width = BIT(control, 1) ? 8 : 4;
-		int base = 0x1400 + (BIT(control, 4) ? 0x20 : 0) + ((m_demoneye_bitmap_reg[2] & 3) * 0x100);
+		int const base = 0x1400 + (BIT(control, 4) << 5) + ((m_demoneye_bitmap_reg[2] & 3) << 8);
 
-		for (int x_block = 0; x_block < 8; ++x_block)
+		for (int x_block = 0; x_block < width; ++x_block)
 		{
-			for (int y_block = 0; y_block < 8; ++y_block)
+			for (int y_block = 0; y_block < width; ++y_block)
 			{
-				if (y_block < width && x_block < width)
+				int const tile_base = base + (x_block * 8 + y_block) * 8;
+				for (int iy = 0; iy < 8; ++iy)
 				{
-					for (int iy = 0; iy < 8; ++iy)
-					{
-						int l0 = m_charmap_videoram[base + iy];
-						int l1 = m_charmap_videoram[base+0x400+iy];
-						int l2 = m_charmap_videoram[base+0x800+iy];
-						for (int ix = 0; ix < 8; ++ix)
-						{
-							int const ccc = (BIT(l0, 7) << 2) | (BIT(l1, 7) << 1) | BIT(l2, 7);
-							if (ccc)
-							{
-								// both are clearly reversed,
-								// cfr. boss first form (when opens the eye)
-								// or second form (follows player position)
-								int const y_dst = 8*width - (y_block*8 + iy);
-								int const x_dst = 8*width - (x_block*8 + 7 - ix);
-								bitmap.pix(y + y_dst, x + x_dst) = NUM_CHARMAP_PENS + ccc;
-							}
+					// both are clearly reversed,
+					// cfr. boss first form (when opens the eye)
+					// or second form (follows player position)
+					int const y_dst = y + 8 * width - (y_block * 8 + iy);
+					if (!cliprect.containsy(y_dst))
+						continue;
 
-							l0 <<= 1;
-							l1 <<= 1;
-							l2 <<= 1;
-						}
+					uint16_t *const dest = &bitmap.pix(y_dst);
+					u8 const l0 = m_charmap_videoram[tile_base + iy];
+					u8 const l1 = m_charmap_videoram[tile_base + 0x400 + iy];
+					u8 const l2 = m_charmap_videoram[tile_base + 0x800 + iy];
+					for (int ix = 0; ix < 8; ++ix)
+					{
+						int const x_dst = x - (x_block * 8 + 7 - ix);
+						if (!cliprect.containsx(x_dst))
+							continue;
+
+						u8 const color = (BIT(l0, 7 - ix) << 2) | (BIT(l1, 7 - ix) << 1) | BIT(l2, 7 - ix);
+						if (color)
+							dest[x_dst] = NUM_CHARMAP_PENS + color;
 					}
 				}
-
-				base += 8;
 			}
 		}
 	}
@@ -397,10 +409,17 @@ uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_in
 
 uint32_t redalert_state::screen_update_panther(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bool const flipscreen = !BIT(*m_video_control ^ m_control_xor, 2);
+
 	for (offs_t offs = 0; offs < 0x2000; offs++)
 	{
-		uint8_t y = offs & 0xff;
+		uint8_t const y = offs & 0xff;
 		uint8_t x = (~offs >> 8) << 3;
+		int const y_dst = flipscreen ? (y ^ 0xff) : y;
+		if (!cliprect.containsy(y_dst))
+			continue;
+
+		uint16_t *const dest = &bitmap.pix(y_dst);
 
 		uint8_t bitmap_data = m_bitmap_videoram[offs];
 		uint8_t bitmap_color = m_bitmap_colorram[offs >> 3];
@@ -423,20 +442,21 @@ uint32_t redalert_state::screen_update_panther(screen_device &screen, bitmap_ind
 
 		for (int i = 0; i < 8; i++)
 		{
-			bool const bitmap_bit = BIT(bitmap_data, 7);
-			uint8_t const color_prom_a0_a1 = (BIT(charmap_data_2, 7) << 1) | BIT(charmap_data_1, 7);
+			int const x_dst = flipscreen ? (x ^ 0xff) : x;
+			if (cliprect.containsx(x_dst))
+			{
+				bool const bitmap_bit = BIT(bitmap_data, 7);
+				uint8_t const color_prom_a0_a1 = (BIT(charmap_data_2, 7) << 1) | BIT(charmap_data_1, 7);
 
-			/* determine priority */
-			uint16_t pen;
-			if ((color_prom_a0_a1 == 0) || (bitmap_bit && ((charmap_code & 0xc0) == 0xc0)))
-				pen = bitmap_bit ? (NUM_CHARMAP_PENS + bitmap_color) : (NUM_CHARMAP_PENS + NUM_BITMAP_PENS);
-			else
-				pen = ((charmap_code & 0xfe) << 1) | color_prom_a0_a1;
+				/* determine priority */
+				uint16_t pen;
+				if ((color_prom_a0_a1 == 0) || (bitmap_bit && ((charmap_code & 0xc0) == 0xc0)))
+					pen = bitmap_bit ? (NUM_CHARMAP_PENS + bitmap_color) : (NUM_CHARMAP_PENS + NUM_BITMAP_PENS);
+				else
+					pen = ((charmap_code & 0xfe) << 1) | color_prom_a0_a1;
 
-			if (BIT(*m_video_control ^ m_control_xor, 2))
-				bitmap.pix(y, x) = pen;
-			else
-				bitmap.pix(y ^ 0xff, x ^ 0xff) = pen;
+				dest[x_dst] = pen;
+			}
 
 			/* next pixel */
 			x++;
