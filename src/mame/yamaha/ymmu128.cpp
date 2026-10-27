@@ -195,8 +195,31 @@ void mu128_state::mu128(machine_config &config)
 
 	SWP30(config, m_swp30s);
 	m_swp30s->set_addrmap(AS_DATA, &mu128_state::swp30_map);
-	m_swp30s->add_route(0, "speaker", 1.0, 0);
-	m_swp30s->add_route(1, "speaker", 1.0, 1);
+
+	// Inter-chip digital audio buses (MELO 4..17 <-> MELI 0..13)
+	m_swp30s->add_route( 0+4, m_swp30m, 1.0,  0);
+	m_swp30s->add_route( 1+4, m_swp30m, 1.0,  1);
+	m_swp30s->add_route( 2+4, m_swp30m, 1.0,  2);
+	m_swp30s->add_route( 3+4, m_swp30m, 1.0,  3);
+	m_swp30s->add_route( 4+4, m_swp30m, 1.0,  4);
+	m_swp30s->add_route( 5+4, m_swp30m, 1.0,  5);
+	m_swp30s->add_route( 6+4, m_swp30m, 1.0,  6);
+	m_swp30s->add_route( 7+4, m_swp30m, 1.0,  7);
+	m_swp30s->add_route( 8+4, m_swp30m, 1.0,  8);
+	m_swp30s->add_route( 9+4, m_swp30m, 1.0,  9);
+	m_swp30s->add_route(10+4, m_swp30m, 1.0, 10);
+	m_swp30s->add_route(11+4, m_swp30m, 1.0, 11);
+	m_swp30s->add_route(12+4, m_swp30m, 1.0, 12);
+	m_swp30s->add_route(13+4, m_swp30m, 1.0, 13);
+
+	m_swp30m->add_route( 0+4, m_swp30s, 1.0,  0);
+	m_swp30m->add_route( 1+4, m_swp30s, 1.0,  1);
+	m_swp30m->add_route( 2+4, m_swp30s, 1.0,  2);
+	m_swp30m->add_route( 3+4, m_swp30s, 1.0,  3);
+	m_swp30m->add_route( 4+4, m_swp30s, 1.0,  4);
+	m_swp30m->add_route( 5+4, m_swp30s, 1.0,  5);
+	m_swp30m->add_route( 8+4, m_swp30s, 1.0,  8);
+	m_swp30m->add_route( 9+4, m_swp30s, 1.0,  9);
 
 	INPUT_MERGER_ANY_HIGH(config, "irq0").output_handler().set_inputline(m_maincpu, 0);
 	I8251(config, m_sci, 10_MHz_XTAL); // uPD71051GU-10
