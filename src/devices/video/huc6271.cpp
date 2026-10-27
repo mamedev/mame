@@ -20,6 +20,7 @@
     TODO:
     - Chroma interpolation is not done, chroma is repeated over 2x2 dots;
     - Decode timing is approximate (one block per 16 lines);
+    - The R05 horizontal sync adjust is not applied;
 
 ***************************************************************************/
 
@@ -173,7 +174,7 @@ huc6271_device::huc6271_device(const machine_config &mconfig, const char *tag, d
 	, m_back_y(0)
 	, m_back_u(0)
 	, m_back_v(0)
-	, m_hsync(0)
+	, m_hsr(0)
 {
 }
 
@@ -212,13 +213,14 @@ void huc6271_device::amap(address_map &map)
 		if (BIT(m_control, 0))
 			COMBINE_DATA(&m_back_v);
 	}));
+	// HSR horizontal sync adjust, signed, in master clocks, positive moves the picture left (00h with the HuC6261)
 	map(0x14, 0x15).lw16(NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
 		if (BIT(m_control, 0))
-			COMBINE_DATA(&m_hsync);
+			COMBINE_DATA(&m_hsr);
 	}));
 }
 
-// R01 is taken at the falling edge of HSync; entering the reset state clears R00-R05 and the decoder
+// called at the falling edge of -HSYNC, where R01 is taken; entering the reset state clears R00-R05 and the decoder
 void huc6271_device::hsync()
 {
 	if (!BIT(m_control_reg, 0))
@@ -227,7 +229,7 @@ void huc6271_device::hsync()
 		{
 			m_hscroll = 0;
 			m_back_y = m_back_u = m_back_v = 0;
-			m_hsync = 0;
+			m_hsr = 0;
 			m_read_line = 0;
 			m_format[0] = m_format[1] = FORMAT_NONE;
 			m_garbage = false;
@@ -257,7 +259,7 @@ void huc6271_device::device_start()
 	save_item(NAME(m_control));
 	save_item(NAME(m_control_reg));
 	save_item(NAME(m_hscroll));
-	save_item(NAME(m_hsync));
+	save_item(NAME(m_hsr));
 	save_item(NAME(m_back_y));
 	save_item(NAME(m_back_u));
 	save_item(NAME(m_back_v));
@@ -280,6 +282,7 @@ void huc6271_device::device_reset()
 	m_control_reg = 0;
 	m_back_y = m_back_u = m_back_v = 0;
 	m_hscroll = 0;
+	m_hsr = 0;
 	m_read_line = 0;
 	m_read_buffer = 0;
 	m_format[0] = m_format[1] = FORMAT_NONE;

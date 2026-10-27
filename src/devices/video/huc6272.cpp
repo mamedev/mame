@@ -1422,8 +1422,6 @@ u8 huc6272_device::rainbow_fetch()
  */
 int huc6272_device::rainbow_line(int raster, u32 *dest)
 {
-	m_huc6271->hsync();
-
 	if (raster == m_rainbow.raster_irq_line && BIT(m_rainbow.control, 1))
 	{
 		m_rainbow.raster_irq = true;

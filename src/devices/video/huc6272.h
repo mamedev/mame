@@ -34,6 +34,7 @@ public:
 	// video output, for the '6261
 	void render_bg_line(int raster, u32 *dest);
 	int rainbow_line(int raster, u32 *dest);
+	void rainbow_hsync() { m_huc6271->hsync(); }
 
 protected:
 	virtual void device_start() override ATTR_COLD;

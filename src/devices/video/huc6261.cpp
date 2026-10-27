@@ -324,6 +324,7 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 		case HUC6261_HSYNC_START:       /* Start of HSync */
 			m_huc6270[0]->hsync_changed(0);
 			m_huc6270[1]->hsync_changed(0);
+			m_huc6272->rainbow_hsync();
 			break;
 
 		case 0:     /* End of HSync */

@@ -56,7 +56,7 @@ private:
 	u16 m_control;          // R01 as currently applied
 	u16 m_control_reg;      // R01 as written
 	u16 m_back_y, m_back_u, m_back_v;
-	u16 m_hsync;
+	u16 m_hsr;
 
 	// two 256x16 buffers, YUV888 or palette indices
 	u32 m_buffer[2][256 * 16];
