@@ -242,8 +242,12 @@ protected:
 	// ports are mapped to AS_IO and callbacks
 	u8 ext_r(offs_t a)          { return m_io.read_byte(a); }
 	void ext_w(offs_t a, u8 v)  { m_io.write_byte(a, v); }
-	u8 port_r(offs_t a)         { return m_port_in_cb[a - 1](); }
-	void port_w(offs_t a, u8 v) { m_port_out_cb[a - 1](v); }
+	u8 port_r(offs_t a)
+	{
+		const u8 data = m_port_in_cb[a - 1]();
+		return a == 2 ? p2_output(data) : data;
+	}
+	void port_w(offs_t a, u8 v) { m_port_out_cb[a - 1](a == 2 ? p2_output(v) : v); }
 	int test_r(offs_t a)        { return m_test_in_cb[a](); }
 	u8 bus_r()                  { return m_bus_in_cb(); }
 	void bus_w(u8 v)            { m_bus_out_cb(v); }
@@ -262,6 +266,7 @@ protected:
 	void execute_call(u16 address);
 	void execute_jcc(bool result);
 	u8 p2_mask();
+	u8 p2_output(u8 data) const;
 	void expander_operation(expander_op operation, u8 port);
 	void check_irqs();
 	void burn_cycles(int count);
