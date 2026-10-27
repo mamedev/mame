@@ -529,6 +529,7 @@ const double XTAL::known_xtals[] = {
 	 68'850'000, // 68.85_MHz_XTAL         Wyse WY-50
 	 69'196'800, // 69.1968_MHz_XTAL       DEC VCB0x/VAXstation dot clock
 	 69'551'990, // 69.55199_MHz_XTAL      Sharp X68000 31.5kHz video
+	 70'700'000, // 70.7_MHz_XTAL          Sony NWB-512 Framebuffer
 	 72'000'000, // 72_MHz_XTAL            Aristocrat MKV
 	 72'576'000, // 72.576_MHz_XTAL        Centipede, Millipede, Missile Command, Let's Go Bowling "Multipede"
 	 73'728'000, // 73.728_MHz_XTAL        Ms. Pac-Man/Galaga 20th Anniversary

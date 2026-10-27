@@ -35,9 +35,9 @@
 #include "emu.h"
 #include "nwb_512.h"
 
-#define LOG_CTRL (1 << 1)
-#define LOG_ROP (1 << 2)
-#define LOG_DATA (1 << 3)
+#define LOG_CTRL (1U << 1)
+#define LOG_ROP (1U << 2)
+#define LOG_DATA (1U << 3)
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -57,15 +57,15 @@ namespace
 		"~S", "~(S | D)", "~S & D", "0", "~(S & D)", "~D", "S ^ D", "S & ~D", "~S | D", "~(S ^ D)", "D", "S & D", "1", "S | ~D", "S | D", "S"};
 
 	// Takes in an x,y coordinate and returns the word offset into the framebuffer memory region
-	uint32_t coordinate_to_word_offset(const uint16_t x, const uint16_t y)
+	uint32_t coordinate_to_word_offset(uint16_t x, uint16_t y)
 	{
 		return (y % Y_MAX) * (X_MAX / 16) + ((x % X_MAX) >> 4);
 	}
 
 	// Gets the pixel offset of a given x coordinate
-	uint16_t x_to_pixel_offset(const uint16_t x)
+	uint16_t x_to_pixel_offset(uint16_t x)
 	{
-		return 15 - (x & 15); // pixel 0 = bit 15
+		return  ~x & 15; // pixel 0 = bit 15
 	}
 
 	// Extracts the X address from the data provided to an FB write
@@ -93,10 +93,10 @@ namespace
 	}
 }
 
-nwb_512_device::nwb_512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, NWB_512, tag, owner, clock),
-	  m_nwp_512d(*this, "nwp_512d"),
-	  m_vram(*this, "vram", 0x80000, ENDIANNESS_BIG)
+nwb_512_device::nwb_512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, NWB_512, tag, owner, clock),
+	m_nwp_512d(*this, "nwp_512d"),
+	m_vram(*this, "vram", 0x80000, ENDIANNESS_BIG)
 {
 }
 
@@ -165,12 +165,13 @@ void nwb_512_device::device_add_mconfig(machine_config &config)
 	// Sony NWP-512D 15" Monochrome CRT Monitor
 	constexpr uint16_t HORIZONTAL = 816;
 	constexpr uint16_t VERTICAL = 1024;
+
 	SCREEN(config, m_nwp_512d);
-	m_nwp_512d->set_screen_update(FUNC(nwb_512_device::screen_update));
-	m_nwp_512d->set_raw(HORIZONTAL * VERTICAL * 60,
+	m_nwp_512d->set_raw(70.7_MHz_XTAL, // TODO: the board has a 70.7MHz crystal, but it might be divided.
 						HORIZONTAL, 0, HORIZONTAL,
 						VERTICAL, 0, VERTICAL);
 	m_nwp_512d->set_physical_aspect(51, 64); // portrait mode CRT, square-ish pixels/~4:5 ratio assumed
+	m_nwp_512d->set_screen_update(FUNC(nwb_512_device::screen_update));
 }
 
 u32 nwb_512_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -201,7 +202,7 @@ void nwb_512_device::destination_w(offs_t offset, uint16_t data, uint16_t mem_ma
 	check_mem_mask(mem_mask);
 	if (!m_state.enabled())
 	{
-		logerror("%s NWB-512 destination_w: framebuffer not enabled\n", machine().describe_context());
+		logerror("%s destination_w: framebuffer not enabled\n", machine().describe_context());
 		return;
 	}
 
@@ -223,7 +224,7 @@ void nwb_512_device::source_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	check_mem_mask(mem_mask);
 	if (!m_state.enabled())
 	{
-		logerror("%s NWB-512 source_w: framebuffer not enabled\n", machine().describe_context());
+		logerror("%s source_w: framebuffer not enabled\n", machine().describe_context());
 		return;
 	}
 
@@ -245,7 +246,7 @@ void nwb_512_device::limit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	check_mem_mask(mem_mask);
 	if (!m_state.enabled())
 	{
-		logerror("%s NWB-512 limit_w: framebuffer not enabled\n", machine().describe_context());
+		logerror("%s limit_w: framebuffer not enabled\n", machine().describe_context());
 		return;
 	}
 
@@ -268,7 +269,7 @@ void nwb_512_device::rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	check_mem_mask(mem_mask);
 	if (!m_state.enabled())
 	{
-		logerror("%s NWB-512 rop_config_w: framebuffer not enabled\n", machine().describe_context());
+		logerror("%s rop_config_w: framebuffer not enabled\n", machine().describe_context());
 		return;
 	}
 
@@ -301,13 +302,13 @@ void nwb_512_device::pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	check_mem_mask(mem_mask);
 	if (!m_state.enabled())
 	{
-		logerror("%s NWB-512 pixel_w: framebuffer not enabled\n", machine().describe_context());
+		logerror("%s pixel_w: framebuffer not enabled\n", machine().describe_context());
 		return;
 	}
 
 	if (!m_state.pixel_mode)
 	{
-		logerror("%s NWB-512: Pixel write in word mode\n", machine().describe_context());
+		logerror("%s pixel_w: Pixel write in word mode\n", machine().describe_context());
 	}
 
 	// Set pixel to 1 at X (data), Y (offset[12:1])
@@ -315,7 +316,7 @@ void nwb_512_device::pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	const uint16_t y = y_address(offset);
 	const uint32_t word_offset = coordinate_to_word_offset(x, y);
 	const uint16_t x_bit = x_to_pixel_offset(x);
-	const uint8_t destination = m_vram[word_offset] & (1u << x_bit) ? 1 : 0;
+	const uint8_t destination = BIT(m_vram[word_offset], x_bit);
 
 	// Use the result of the ROP engine before setting the pixel
 	const bool new_state = execute_rop(m_state.rop_function, 1, destination) & 1;
@@ -331,19 +332,21 @@ uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
 {
 	if (machine().side_effects_disabled())
 	{
-		return 0;
+		// Reads only happen in the forward direction, so the shift logic to peek at the word is simple.
+		uint16_t peek = coordinate_to_data(m_state.current_source_x, m_state.source_y);
+		return uint16_t(peek >> m_state.shift | m_state.carry);
 	}
 
 	LOGMASKED(LOG_DATA, "(%s) fifo_r(0x%x, 0x%x)\n", machine().describe_context(), offset, mem_mask);
 	check_mem_mask(mem_mask);
 	if (!m_state.enabled())
 	{
-		logerror("%s NWB-512 fifo_r: framebuffer not enabled\n", machine().describe_context());
+		logerror("%s fifo_r: framebuffer not enabled\n", machine().describe_context());
 		return 0;
 	}
 	if (!m_state.is_fb_to_host() || !m_state.exec)
 	{
-		logerror("%s NWB-512: fifo_r when read op is not executing\n", machine().describe_context());
+		logerror("%s fifo_r: when read op is not executing\n", machine().describe_context());
 		return 0;
 	}
 
@@ -384,7 +387,7 @@ void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	check_mem_mask(mem_mask);
 	if (!m_state.enabled())
 	{
-		logerror("%s NWB-512 fifo_w: framebuffer not enabled\n", machine().describe_context());
+		logerror("%s fifo_w: framebuffer not enabled\n", machine().describe_context());
 		return;
 	}
 
@@ -398,7 +401,7 @@ void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	if (m_state.pixel_mode || !m_state.exec)
 	{
-		logerror("%s NWB-512: word write in pixel mode or not active, ignoring\n", machine().describe_context());
+		logerror("%s fifo_w: word write in pixel mode or not active, ignoring\n", machine().describe_context());
 		return;
 	}
 
@@ -455,7 +458,7 @@ void nwb_512_device::check_mem_mask(uint16_t mem_mask)
 	if (mem_mask != 0xffff)
 	{
 		// Registers are 16-bit. Log this just in case to chase down issues later.
-		logerror("%s NWB-512: unexpected non-word access with mem mask 0x%x!\n", machine().describe_context(), mem_mask);
+		logerror("%s unexpected non-word access with mem mask 0x%x!\n", machine().describe_context(), mem_mask);
 	}
 }
 
@@ -496,7 +499,7 @@ uint16_t nwb_512_device::coordinate_to_data(uint16_t x, uint16_t y)
 	return m_vram[word_offset];
 }
 
-uint16_t nwb_512_device::execute_rop(const uint8_t opcode, const uint16_t source, const uint16_t destination)
+uint16_t nwb_512_device::execute_rop(uint8_t opcode, uint16_t source, uint16_t destination)
 {
 	uint16_t result;
 
@@ -680,7 +683,7 @@ void nwb_512_device::start_operation()
 	// supported/used for reads. For now, assume the same for the NWB-512.
 	if (m_state.is_fb_to_host() && !m_state.x_direction)
 	{
-		logerror("%s NWB-512: Reverse reads are not supported, skipping\n", machine().describe_context());
+		logerror("%s start_operation: Reverse reads are not supported, skipping\n", machine().describe_context());
 		return;
 	}
 
@@ -733,12 +736,12 @@ void nwb_512_device::start_operation()
 	// I never saw these cases while testing, and I am not sure yet what real hardware would do here.
 	if (m_state.dest_words_per_row == 0)
 	{
-		logerror("%s NWB-512: unexpected empty operation detected, skipping\n", machine().describe_context());
+		logerror("%s start_operation: unexpected empty operation detected, skipping\n", machine().describe_context());
 		end_operation();
 	}
 	else if ((m_state.x_direction && m_state.destination_x > m_state.limit_x) || (!m_state.x_direction && m_state.limit_x > m_state.destination_x))
 	{
-		logerror("%s NWB-512: invalid destination/limit configuration, skipping\n", machine().describe_context());
+		logerror("%s start_operation: invalid destination/limit configuration, skipping\n", machine().describe_context());
 		end_operation();
 	}
 }
@@ -761,7 +764,7 @@ rgb_t nwb_512_device::current_dim_color()
 	// The DSC-001 dim functions in iopboot/mrx write 0b11 to bits 7:6 of the status register when the
 	// sxsession screen saver is active. The NWS-15xx service manual backs this up for the DSC-007 from 0b00 (brightest) -> 0b11 (darkest),
 	// but does not elaborate on the exact degree of dimming.
-	const uint8_t dim = (m_state.ctrl & 0xC0) >> 6;
+	const uint8_t dim = BIT(m_state.ctrl, 6, 2);
 	if (!dim)
 	{
 		return rgb_t::white();

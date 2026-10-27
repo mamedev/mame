@@ -293,7 +293,7 @@ void news_hid_serial_keyboard_device::device_reset()
 	transmit_register_reset();
 	clear_fifo();
 	reset_key_state();
-	start_processing(attotime::from_hz(9600));
+	start_processing(attotime::from_hz(1200));
 }
 
 void news_hid_serial_keyboard_device::key_make(u8 row, u8 column)

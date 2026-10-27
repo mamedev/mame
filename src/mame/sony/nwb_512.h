@@ -19,7 +19,7 @@ public:
 
 	nwb_512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -157,6 +157,7 @@ private:
 	uint16_t coordinate_to_data(uint16_t x, uint16_t y);
 	uint16_t execute_rop(uint8_t opcode, uint16_t source, uint16_t destination);
 	uint16_t shift(uint16_t data);
+	uint16_t shift_peek(uint16_t data) const;
 	void rop(uint16_t source);
 	void rop_cycle(uint16_t data);
 	void end_row();
