@@ -189,6 +189,8 @@ bool scl_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		d->trk = free_pos / SPT;   // combined logical track (side-interleaved)
 
 		// Write file data sectors
+		if (free_pos + sec_cnt > max_sectors)
+			break;
 		for (unsigned s = 0; s < sec_cnt; s++)
 			memcpy(trd.get() + (free_pos + s) * SEC_SIZE, file_data + s * SEC_SIZE, SEC_SIZE);
 
