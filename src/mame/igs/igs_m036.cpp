@@ -591,7 +591,7 @@ ROM_END
 ROM_START( slqzsp )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "jhzb_igs036", 0x0000, 0x4000, NO_DUMP ) // stickered F8
+	ROM_LOAD( "slqzsp_igs036.bin", 0x0000, 0x4000, CRC(b294079b) SHA1(5f1e63e302497fd8c9144fbc5c128cac215b28ec) ) // stickered F8
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) stickered IU U23
 	ROM_LOAD( "xa", 0x00000, 0x10000, NO_DUMP )
@@ -762,7 +762,7 @@ ROM_END
 ROM_START( huoqilin )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "igs036", 0x0000, 0x4000, NO_DUMP )
+	ROM_LOAD( "huoqilin_igs036.bin", 0x0000, 0x4000, CRC(6474b1d3) SHA1(3d6d778ac0fc37bac5ef7767efd98414e5d738b9) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v116cn.u20", 0x000000, 0x200000, CRC(9139ec5e) SHA1(46d7da21bfa047649c09cc6ce569eefba665ac9d) )
