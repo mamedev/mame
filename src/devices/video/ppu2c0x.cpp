@@ -104,6 +104,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 	m_x_fine(0),
 	m_toggle(false),
 	m_tilecount(0),
+	m_render_at_hblank(false),
 	m_latch(*this),
 	m_spriteramsize(0x100),
 	m_oamaddr_render_reset(true),
@@ -256,6 +257,7 @@ void ppu2c0x_device::start_nopalram()
 	save_item(NAME(m_regs));
 	save_item(NAME(m_draw_phase));
 	save_item(NAME(m_tilecount));
+	save_item(NAME(m_render_at_hblank));
 	save_pointer(NAME(m_spriteram), m_spriteramsize);
 
 	save_item(NAME(m_bitmap));
@@ -520,6 +522,10 @@ TIMER_CALLBACK_MEMBER(ppu2c0x_device::hblank_tick)
 	// Hudson Hawk relies on this as well.
 	if (m_oamaddr_render_reset && !blanked && ((m_scanline <= BOTTOM_VISIBLE_SCANLINE) || (m_scanline == m_scanlines_per_frame - 1)))
 		m_regs[PPU_SPRITE_ADDRESS] = 0;
+
+	// keep track of whether the PPU was rendering at HBLANK time (dot 256) so to decide if
+	// the line is drawn and if v is incremented (see update_visible_scanline below)
+	m_render_at_hblank = !blanked;
 
 	if (!m_hblank_callback_proc.isnull())
 		m_hblank_callback_proc(m_scanline, vblank, blanked);
@@ -1079,7 +1085,23 @@ void ppu2c0x_device::update_visible_disabled_scanline()
 
 void ppu2c0x_device::update_visible_scanline()
 {
-	/* Render this scanline if appropriate */
+	// PPU only increments v while rendering is enabled, so a line counts as rendered
+	// if rendering was on at dot 256, not at the end of the line.
+	// Among others, Jordan vs. Bird relies on this: playground has garbled graphics
+	// if v is incremented when rendering got on after that time.
+	if (m_scanline_timer->remaining() == attotime::zero)
+	{
+		if (m_render_at_hblank)
+		{
+			update_visible_enabled_scanline();
+			scanline_increment_fine_ycounter();
+		}
+		else
+			update_visible_disabled_scanline();
+		return;
+	}
+
+	// Render this scanline if appropriate
 	if (m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES))
 	{
 		update_visible_enabled_scanline();
@@ -1087,11 +1109,6 @@ void ppu2c0x_device::update_visible_scanline()
 	else
 	{
 		update_visible_disabled_scanline();
-	}
-
-	if (m_scanline_timer->remaining() == attotime::zero)
-	{
-		scanline_increment_fine_ycounter();
 	}
 }
 
