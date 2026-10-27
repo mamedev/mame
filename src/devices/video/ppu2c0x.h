@@ -222,6 +222,7 @@ protected:
 	latch_delegate              m_latch;
 
 	u16                         m_spriteramsize;
+	bool                        m_oamaddr_render_reset;
 
 	u8 readbyte(offs_t address);
 

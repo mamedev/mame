@@ -106,6 +106,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 	m_tilecount(0),
 	m_latch(*this),
 	m_spriteramsize(0x100),
+	m_oamaddr_render_reset(true),
 	m_scanline_callback_proc(*this),
 	m_hblank_callback_proc(*this),
 	m_int_callback(*this),
@@ -206,6 +207,9 @@ ppu2c04_clone_device::ppu2c04_clone_device(const machine_config &mconfig, const 
 {
 	m_scanlines_per_frame = VS_CLONE_SCANLINES_PER_FRAME;
 	m_vblank_first_scanline = VBLANK_FIRST_SCANLINE_VS_CLONE;
+
+	// this clone PPU does not writes to $2003, so we assume that OAMADDR is not being reset
+	m_oamaddr_render_reset = false;
 
 	// background and sprites are always enabled; monochrome and color emphasis aren't supported
 	m_regs[PPU_CONTROL1] = u8(~(PPU_CONTROL1_COLOR_EMPHASIS | PPU_CONTROL1_DISPLAY_MONO));
@@ -509,6 +513,13 @@ TIMER_CALLBACK_MEMBER(ppu2c0x_device::hblank_tick)
 	const bool vblank = (m_scanline >= m_vblank_first_scanline - 1) && (m_scanline < m_scanlines_per_frame - 1);
 
 	//update_scanline();
+
+	// Many games (e.g., equipped with MMC3 mapper or its Chinese clones) rely in OAMADDR
+	// being reset to 0 during dots 257-320 (sprite tile loading) at every visible scanline
+	// while rendering is enabled, otherwise wrong sprite data is used.
+	// Hudson Hawk relies on this as well.
+	if (m_oamaddr_render_reset && !blanked && ((m_scanline <= BOTTOM_VISIBLE_SCANLINE) || (m_scanline == m_scanlines_per_frame - 1)))
+		m_regs[PPU_SPRITE_ADDRESS] = 0;
 
 	if (!m_hblank_callback_proc.isnull())
 		m_hblank_callback_proc(m_scanline, vblank, blanked);
