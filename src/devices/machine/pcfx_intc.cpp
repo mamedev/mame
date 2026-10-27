@@ -63,7 +63,7 @@ u16 pcfx_intc_device::read(offs_t offset)
 
 		// Interrupt priority 1
 		case 0xc0/4:
-			data = m_irq_priority[3] | (m_irq_priority[2] << 3) | (m_irq_priority[1] << 6) | (m_irq_priority[0] << 9);
+			data = m_irq_priority[3] | (m_irq_priority[2] << 3) | (m_irq_priority[1] << 6);
 			break;
 	}
 
@@ -127,7 +127,7 @@ void pcfx_intc_device::write(offs_t offset, u16 data)
 
 inline void pcfx_intc_device::check_irqs()
 {
-	u16 active_irqs = m_irq_pending & ~m_irq_mask;
+	u16 active_irqs = m_irq_pending & ~m_irq_mask & 0x7f;
 	int highest_prio = -1;
 
 	for (auto & elem : m_irq_priority)
