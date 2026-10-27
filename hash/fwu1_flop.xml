@@ -42,7 +42,7 @@ Known undumped software releases:
 Track 38 Side 1 Sector 5 has an invalid byte sequence encoded at its DAM sequence marker offset.
 Manually fixing this sequence still results in flaky reads due to jitter in 4us MFM pulse interval (no pulses in 6uS and 8uS).
 ]]></notes>
-        <info name="alt_title" value="カサブランカに愛を"/>
+		<info name="alt_title" value="カサブランカに愛を"/>
 		<info name="serial" value="FW-SD2003"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -76,7 +76,7 @@ Track 0 Side 1 Sector 12 is missing its IDAM sequence marker, but has valid data
 	</software>
 
 	<software name="mickplut" supported="no">
-        <description>Mickey no Pluto o Sagase!</description>
+		<description>Mickey no Pluto o Sagase!</description>
 		<year>199?</year>
 		<publisher>Micro Cabin</publisher>
 		<notes><![CDATA[
@@ -84,11 +84,11 @@ Track 0 Side 1 Sector 12 is missing its IDAM sequence marker, but has valid data
 Track 3 Side 0 and Track 79 Side 1, which are
 1024 bytes/sector, 5 sectors/track.
 ]]></notes>
-        <info name="alt_title" value="ミッキーのプルートを探せ！"/>
+		<info name="alt_title" value="ミッキーのプルートを探せ！"/>
 		<info name="serial" value="WPS-23"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="738304">
-                <rom name="wps-23.mfm" size="738304" crc="efcf7bfe" sha1="ca328979f0df0b41f19711631c7c4a89d2f4ba55"/>
+				<rom name="wps-23.mfm" size="738304" crc="efcf7bfe" sha1="ca328979f0df0b41f19711631c7c4a89d2f4ba55"/>
 			</dataarea>
 		</part>
 	</software>
@@ -111,21 +111,19 @@ Track 2 Side 1 null-filled: no flux in MFM pulse intervals.
 	</software>
 
 	<software name="shang2" supported="no">
+		<!-- Licensed by Activision -->
 		<description>Shanghai II</description>
 		<year>1991</year>
-		<publisher>ASCII Corporation / Activision</publisher>
 		<notes><![CDATA[
 512 bytes/sector, 9 sectors/track, 80 tracks/side.
 Track 1 Side 0 null-filled: Only has flux in 4uS MFM pulse interval.
-
-Licensed from Mediagenic.
-Original game design by Brodie Lockard.
 ]]></notes>
-        <info name="alt_title" value="上海Ⅱ"/>
+		<info name="alt_title" value="上海Ⅱ"/>
+		<info name="developer" value="Mediagenic"/>
 		<info name="serial" value="WPS-18"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-                <rom name="wps-18.mfm" size="737280" crc="92176ed6" sha1="624430eda27c465ae1d230103c9ca3e85760a923"/>
+				<rom name="wps-18.mfm" size="737280" crc="92176ed6" sha1="624430eda27c465ae1d230103c9ca3e85760a923"/>
 			</dataarea>
 		</part>
 	</software>
@@ -133,27 +131,11 @@ Original game design by Brodie Lockard.
 	<software name="tetris" supported="no">
 		<description>Tetris</description>
 		<year>1988</year>
-		<publisher>Bullet-Proof Software Inc.</publisher>
+		<publisher>Andromeda Software Ltd.</publisher>
 		<notes><![CDATA[
 512 bytes/sector, 9 sectors/track, 80 tracks/side.
-
 Track 1 Side 1 contains empty sectors 2 to 5 (image bytes 0x3800..0x4000)
-with invalid data CRCs: expected 0xDA6E, but stored checksum is 0x5445
-(ASCII encoded "TE"). These sectors cover two non-standard overlapping
-FAT filesystem entries:
-
-- File b"\x94" in cluster 9 with size 0x1400 bytes (image bytes 0x3800..0x4c00);
-- File b"\x94\x94" in cluster 10 with size 0x17e8 bytes (image bytes 0x3c00..0x53e8);
-
-Image bytes 0x4000..0x6c00 duplicate file "OOO.PRG" at offset 0x800
-(image offset 0x7400). This file is in cluster 22 with size 0x3080 bytes
-(image bytes 0x6c00..0x9c80).
-
-TM and (C) 1987, Academy Soft-Elorg.
-Licensed to Andromeda Software Ltd.
-Sublicensed to Mirrorsoft Ltd., Sphere Inc. and Bullet-Proof Software Inc.
-Original concept by Alexey Pazhitnov.
-Original design and program by Vadim Gerasimov.
+with invalid data CRCs: expected 0xDA6E, but stored checksum is 0x5445 (ASCII encoded "TE").
 ]]></notes>
 		<info name="alt_title" value="テトリス"/>
 		<info name="serial" value="WPS-2"/>
