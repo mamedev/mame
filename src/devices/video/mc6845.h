@@ -120,6 +120,10 @@ public:
 	/* return the current value on the RA0-RA4 pins */
 	uint8_t get_ra();
 
+	// RESET pin (active low): the counters clear and the outputs go low,
+	// the registers are kept; release starts a frame at R12/R13
+	void reset_w(int state);
+
 	/* simulates the LO->HI clocking of the light pen pin (pin 3) */
 	void assert_light_pen_input();
 	void assert_light_pen_input(u16);
@@ -199,6 +203,7 @@ protected:
 	uint8_t   m_adjust_active;
 	uint16_t  m_line_address;
 	int16_t   m_cursor_x;
+	bool      m_reset_held;     // RESET pin low
 
 	/* timers */
 	emu_timer *m_line_timer;
@@ -244,6 +249,8 @@ protected:
 	bool is_row_end() const;
 	virtual bool check_cursor_visible(uint16_t ra, uint16_t line_addr);
 	TIMER_CALLBACK_MEMBER(handle_line_timer);
+	bool begin_frame();
+	void start_line(bool new_vsync);
 	TIMER_CALLBACK_MEMBER(de_off_tick);
 	TIMER_CALLBACK_MEMBER(cursor_on);
 	TIMER_CALLBACK_MEMBER(cursor_off);
