@@ -7,6 +7,9 @@ TODO:
 - add remaining SWs;
 - filter for PC-FXGA;
 - rename to pcfx_cdrom, assuming that anyone ever released anything workable from FX-BMP interface;
+- Several items are listed as "NCS ID" on redump. We assume they meant NEC instead and cargo culted
+  everywhere. Note that cover boxes and manuals seems to have differing numbers than the ones listed
+  in comments;
 - Items denoted with (*) are actually from EoceneMiacid thru following commit in 2017 thru redump.
   Needs to be checked after 10+ years new chdman conversion:
   https://github.com/mamedev/mame/commit/6e3ae6315c285b6860e8381d84faca5c58b121da
@@ -19,12 +22,12 @@ Release dates from https://refuge.tokyo/pcengine/pcfx.html
 <!-- !Games -->
 
 	<!-- (*) https://redump.info/disc/35926 -->
-	<software name="batlheat" supported="no">
+	<software name="batlheat" supported="partial">
 		<description>Battle Heat!</description>
 		<year>1994</year>
 		<publisher>Hudson Soft</publisher>
 		<notes><![CDATA[
-No [player] 2 inputs
+Optional [pad] 2nd player
 Has bias towards Dark side in CPU vs. CPU fights i.e. always wins with half HP left (verify)
 Has border color changes towards the end of a fight (verify)
 ]]></notes>
@@ -49,7 +52,7 @@ Has border color changes towards the end of a fight (verify)
 		<year>1996</year>
 		<publisher>Cocktail Soft</publisher>
 		<notes><![CDATA[
-[player] no inputs accepted from title screen
+Not extensively tested
 ]]></notes>
 		<info name="alt_title" value="きゃんきゃんバニー エクストラＤＸ"/>
 		<info name="barcode" value="4 904323 270309"/>
@@ -63,19 +66,82 @@ Has border color changes towards the end of a fight (verify)
 		</part>
 	</software>
 
+	<!-- https://redump.info/disc/58925 -->
+	<software name="chipkick" supported="partial">
+		<description>Chip-chan Kick!</description>
+		<year>1996</year>
+		<publisher>NEC Home Electronics</publisher>
+		<notes><![CDATA[
+[SoundBox] off by one samples
+]]></notes>
+		<info name="alt_title" value="チップちゃんキィーック!"/>
+		<info name="barcode" value="4 904323 270293"/>
+		<info name="developer" value="Cybertech Custom"/>
+		<info name="release" value="19960913"/>
+		<info name="serial" value="FXNHE626"/>
+		<!-- NEC ID: 79753630 -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="chip-chan kick (japan)" sha1="845e67d31e3e92099b872d0d3133304a891b3a41"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/65782 -->
+	<software name="chouzero" supported="partial">
+		<description>Choujin Heiki Zeroigar</description>
+		<year>1997</year>
+		<publisher>NEC Home Electronics</publisher>
+		<notes><![CDATA[
+Untested 『さくらいがーモード』 (warrants beating Anime Mode on Hard)
+]]></notes>
+		<info name="alt_title" value="超神兵器ゼロイガー"/>
+		<info name="barcode" value="4 904323 270262"/>
+		<info name="release" value="19970808"/>
+		<info name="serial" value="FXNHE624"/>
+		<!-- NEC ID: 79753620 -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="choujin heiki zeroigar (japan)" sha1="4ea9e0bf10a6edf77d6d22f01e2420ecdf1ddaaa"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/57884 -->
+	<!-- Not the same as pico:cuteyhon, original story based off New Cutey Honey -->
+	<!-- rather than Cutey Honey Flash (released in 1997) -->
+	<software name="cuteyhfx" supported="partial">
+		<description>Cutey Honey FX</description>
+		<year>1995</year>
+		<publisher>NEC Home Electronics</publisher>
+		<notes><![CDATA[
+(assume) optional [Mouse] support
+]]></notes>
+		<info name="alt_title" value="キューティーハニーFX"/>
+		<info name="barcode" value="4 904323 270071"/>
+		<info name="developer" value="Data West"/>
+		<info name="release" value="19951110"/>
+		<info name="serial" value="FXNHE511"/>
+		<!-- NEC ID: 79753594 -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cutey honey fx (japan)" sha1="43b508c6f6d28960bb3df2fb61af1fe11e158ecf"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- (*) https://redump.info/disc/35857 -->
-	<software name="langriss" supported="no">
+	<software name="langriss" supported="partial">
 		<description>Der Langrisser FX</description>
 		<year>1996</year>
 		<publisher>NCS</publisher>
 		<notes><![CDATA[
 Randomly pop ups SFXs at the end of dialogues during gameplay (including ones with no speech)
-Not extensively tested
 ]]></notes>
 		<info name="alt_title" value="デア ラングリッサーＦＸ"/>
 		<info name="barcode" value="4 904323 270224"/>
 		<info name="serial" value="FXNHE618"/>
-		<!-- NCS ID: 79753612 -->
+		<!-- NEC ID: 79753612 -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="langrisser fx, der (japan)" sha1="15e757fa66c46570f038a27d59b0709d1cf9d4bf"/>
@@ -84,14 +150,13 @@ Not extensively tested
 	</software>
 
 	<!-- (*) https://redump.info/disc/37882 -->
-	<software name="dokyuse2" supported="no">
+	<software name="dokyuse2" supported="partial">
 		<description>Doukyuusei 2</description>
 		<year>1996</year>
 		<!-- "Licensed by ELF" at best -->
 		<publisher>NEC Avenue</publisher>
 		<notes><![CDATA[
 Optional [mouse] support
-Not extensively tested (unpleasant to play with pad, needs reaching a save point)
 ]]></notes>
 		<info name="alt_title" value="同級生２"/>
 		<info name="barcode" value="4 988041 700706"/>
@@ -111,7 +176,7 @@ Not extensively tested (unpleasant to play with pad, needs reaching a save point
 		<year>1997</year>
 		<publisher>NEC Avenue</publisher>
 		<notes><![CDATA[
-Bad color palette in title, intro and gameplay
+Not extensively tested
 ]]></notes>
 		<info name="alt_title" value="ドラゴンナイト4"/>
 		<info name="barcode" value="4 988041 700713"/>
@@ -126,7 +191,7 @@ Bad color palette in title, intro and gameplay
 	</software>
 
 	<!-- (*) https://redump.info/disc/37888 -->
-	<software name="farland" supported="no">
+	<software name="farland" supported="partial">
 		<description>Farland Story FX</description>
 		<year>1996</year>
 		<publisher>NEC Home Electronics</publisher>
@@ -134,7 +199,6 @@ Bad color palette in title, intro and gameplay
 Sound dialogues pop at start/end, akin to langriss
 Sprite wobbling during gameplay on scrolls
 Optional [mouse] support
-Not extensively tested
 ]]></notes>
 		<info name="alt_title" value="ファーランドストーリーFX"/>
 		<info name="barcode" value="4 904323 270200"/>
@@ -156,7 +220,7 @@ Not extensively tested
 		<publisher>Tokuma Shoten</publisher>
 		<notes><![CDATA[
 Offset screens during gameplay (first school view, transitions)
-Not extensively tested (language barrier)
+Not extensively tested
 ]]></notes>
 		<info name="alt_title" value="ファイアーウーマン纏組"/>
 		<info name="barcode" value="4 904323 270378"/>
@@ -174,10 +238,9 @@ Not extensively tested (language barrier)
 	<software name="fushangl" supported="no">
 		<description>Fushigi no Kuni no Angelique</description>
 		<year>1996</year>
-		<publisher>Koei</publisher>
+		<publisher>NEC Home Electronics / Koei</publisher>
 		<notes><![CDATA[
-Bad colors for dialogue boxes during intro, no text
-[pad] doesn't seem responsive on name entry
+Not extensively tested
 ]]></notes>
 		<info name="alt_title" value="ふしぎの国のアンジェリーク"/>
 		<info name="barcode" value="4 904323 270330"/>
@@ -190,13 +253,62 @@ Bad colors for dialogue boxes during intro, no text
 		</part>
 	</software>
 
+	<software name="zenkifx" supported="partial">
+		<description>Kishin Douji Zenki FX: Vajra Fight</description>
+		<year>1995</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+Optional [pad] 2nd player
+Lip-sync at battle intros is off in places (verify)
+]]></notes>
+		<info name="alt_title" value="鬼神童子ZENKI FX 金剛炎闘"/>
+		<info name="barcode" value="T4988607305048"/>
+		<info name="release" value="19551222"/>
+		<info name="serial" value="FXHUD505"/>
+		<!-- JASRAC ID: 952544 -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="kishin douji zenki fx - vajra fight (japan)" sha1="6b5a1b118a1520c0dd05df20d5ddb2072f6ebab2"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/47963 / https://redump.info/disc/47964 -->
+	<software name="lastprin" supported="no">
+		<description>Last Imperial Prince</description>
+		<year>1997</year>
+		<publisher>NEC Home Electronics</publisher>
+		<notes><![CDATA[
+Untested B disc, which may warrant in-game disc swap (purged by the BIOS without a relevant backup RAM save at least)
+]]></notes>
+		<info name="alt_title" value="ラスト・インペリアルプリンス"/>
+		<info name="barcode" value="4 904323 270354"/>
+		<info name="developer" value="Nihon Application"/>
+		<info name="release" value="19970314"/>
+		<info name="serial" value="FXNHE635"/>
+		<!-- NEC ID: 79753638 (disc A) / 79753639 (disc B) / 78983301 (CD jewel back) / 78928851 (manual back) -->
+		<!-- Discs marked with a big A/B letter -->
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="A (red)"/>
+			<diskarea name="cdrom">
+				<disk name="last imperial prince (japan) (disc a)" sha1="d50c7c8d9215d5bd8041af7894e6a17ec705fe79"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="B (green)"/>
+			<diskarea name="cdrom">
+				<disk name="last imperial prince (japan) (disc b)" sha1="17d197c4d0784d4bc58fb8038edbb0d56bbb4b0e"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- (*) https://redump.info/disc/37885 -->
 	<software name="megamip2" supported="no">
 		<description>Megami Paradise II</description>
 		<year>1996</year>
 		<publisher>NEC Home Electronics</publisher>
 		<notes><![CDATA[
-Not extensively tested (language barrier)
+Not extensively tested
 ]]></notes>
 		<info name="alt_title" value="女神天国Ⅱ"/>
 		<info name="barcode" value="4 904323 270255"/>
@@ -209,6 +321,29 @@ Not extensively tested (language barrier)
 		</part>
 	</software>
 
+	<!-- https://redump.info/disc/58926 -->
+	<software name="pachikfx" supported="partial">
+		<description>Pachio-kun FX: Maboroshi no Shima Daikessen</description>
+		<year>1995</year>
+		<publisher>NEC Home Electronics</publisher>
+		<notes><![CDATA[
+Loops title without anything in-between (verify)
+Transitional frame of garbage when switching in character select (verify)
+Has green layer of alpha in free battle machine select screen (black blended in story mode) (verify)
+]]></notes>
+		<info name="alt_title" value="パチ夫くんFX 幻の島大決戦"/>
+		<info name="barcode" value="4 904323 270101"/>
+		<info name="developer" value="Coconuts Japan"/>
+		<info name="release" value="19950922"/>
+		<info name="serial" value="FXNHE508"/>
+		<!-- NEC ID: 79756589 -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pachio-kun fx - maboroshi no shima daisakusen (japan)" sha1="2f62501da7bdd7891315b4a2de90cc7dc06bdf48"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- NOTE: cfr. cancandx for alt joined bundle -->
 	<!-- (*) https://redump.info/disc/37889 -->
 	<software name="picarrot" supported="no">
@@ -216,7 +351,7 @@ Not extensively tested (language barrier)
 		<year>1997</year>
 		<publisher>Cocktail Soft</publisher>
 		<notes><![CDATA[
-Not extensively tested (language barrier, has fan translation)
+Not extensively tested
 ]]></notes>
 		<info name="alt_title" value="Ｐｉａ キャロットへようこそ！！"/>
 		<info name="barcode" value="4 904323 270408"/>
@@ -225,6 +360,44 @@ Not extensively tested (language barrier, has fan translation)
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pia carrot e youkoso weve been waiting for you (japan)" sha1="95a5c2f20d406dcaa0ab5e0ff692e3ee2cd4ad76"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/63680 -->
+	<software name="ruruli" supported="partial">
+		<description>Ruruli Ra Rura</description>
+		<year>1998</year>
+		<publisher>NEC Home Electronics</publisher>
+		<info name="alt_title" value="ルルリ・ラ・ルラ"/>
+		<info name="barcode" value="4 904323 270286"/>
+		<info name="release" value="19980220"/>
+		<info name="serial" value="FXNHE627"/>
+		<!-- NEC ID: 79753629 -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ruruli ra rura (japan)" sha1="b5c98b6b8706da42f2f5a7794925b4af193fbee3"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/67254 -->
+	<software name="shangban" supported="partial">
+		<description>Shanghai: Banri no Choujou</description>
+		<year>1996</year>
+		<publisher>NEC Home Electronics</publisher>
+		<notes><![CDATA[
+Optional [Mouse] support
+Optional [pad] 2nd player
+]]></notes>
+		<info name="alt_title" value="上海 万里の長城"/>
+		<info name="barcode" value="4 904323 270095"/>
+		<info name="release" value="19960315"/>
+		<info name="serial" value="FXNHE507"/>
+		<!-- NEC ID: 79753591 -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="shanghai - banri no choujou (japan)" sha1="db717314fc45aba417c8b7936cc8839105930ab6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -246,6 +419,91 @@ Not extensively tested
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sotsugyou ii fx - neo generation (japan)" sha1="8a9e5f269c854d1daa4114ba68a3e89598f26e81"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/46408 -->
+	<software name="spleagfx" supported="no">
+		<description>Super Power League FX</description>
+		<year>1996</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+Unresponsive [pad] run button at title screen (after some "push RUN button" cycles)
+]]></notes>
+		<info name="alt_title" value="スーパーパワーリーグFX"/>
+		<info name="barcode" value="T4988607305031"/>
+		<info name="release" value="19960426"/>
+		<info name="serial" value="FXHUD504"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="super power league fx (japan)" sha1="57dcabbfa3c0a5b86524d7683cd597826e4a77e5"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/57885 -->
+	<software name="tengaifx" supported="partial">
+		<description>Tengai Makyou: Dennou Karakuri Kakutouden</description>
+		<year>1995</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+Optional [pad] 2nd player (press select to switch in character select)
+]]></notes>
+		<info name="alt_title" value="天外魔境 電脳絡繰格闘伝"/>
+		<info name="barcode" value="T4988607305024"/>
+		<info name="release" value="19950728"/>
+		<info name="serial" value="FXHUD503"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="tengai makyou - dennou karakuri kakutouden (japan)" sha1="78ccc7aebc6252c99e6f9d4229a54f635d2f740c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/67253 -->
+	<software name="tokicard" supported="partial">
+		<description>Tokimeki Card Paradise: Koi no Royal Straight Flush</description>
+		<year>1996</year>
+		<publisher>Sonnet</publisher>
+		<notes><![CDATA[
+Transitional charset garbage during FMVs (verify)
+]]></notes>
+		<info name="alt_title" value="ときめきカードパラダイス 恋のロイヤルストレートフラッシュ"/>
+		<info name="barcode" value="T4513487000006"/>
+		<info name="release" value="19960126"/>
+		<info name="serial" value="FXSNT501"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="tokimeki card paradise - koi no royal straight flush (japan)" sha1="488777471c4de85180eabb10d34a6d33073d02cf"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/52310 / https://redump.info/disc/52311 -->
+	<software name="prowresq" supported="partial">
+		<description>Zen Nihon Joshi Pro Wres: Queen of Queens</description>
+		<year>1995</year>
+		<publisher>NEC Home Electronics</publisher>
+		<notes><![CDATA[
+Occasional bad char appearing during intro on right side
+Unmasked green color on victory sequence, should be black
+Has note on back about being FX-98IF compatible only with PC-9821Cb/Cx/Cf
+]]></notes>
+		<info name="alt_title" value="全日本女子プロレス Queen of Queens"/>
+		<info name="barcode" value="4 904323 270033"/>
+		<info name="release" value="19950324"/>
+		<info name="serial" value="FXNHE503"/>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="A disc (Zenjo vs Zenjo)"/>
+			<diskarea name="cdrom">
+				<disk name="zen nihon joshi pro wres - queen of queens (japan) (disc a) (zenjo vs zenjo)" sha1="0873586a5235b54600fac4ebcf081d8ec2332351"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="B disc (Zenjo vs KWP)"/>
+			<diskarea name="cdrom">
+				<disk name="zen nihon joshi pro wres - queen of queens (japan) (disc b) (zenjo vs kwp)" sha1="2369d89989cacb18fe1d21ee0d9ff566c51b6d7a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -318,8 +576,7 @@ Disc 2 is intended for a Win32 OS on PC-98 or DOS/V machines
 Bundled with PC-FXGA
 ]]></notes>
 		<info name="barcode" value="4 904323 240074"/>
-		<!-- labeled as NCS ID (?) on URL above -->
-		<info name="serial" value="79753599"/>
+		<!-- NEC ID: 79753599 -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="same game fx (japan) (nec pc-fxga)" sha1="940b7c0400fa617794764aa9d6dee60e002337be"/>

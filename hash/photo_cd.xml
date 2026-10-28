@@ -78,6 +78,10 @@ https://www.theworldofcdi.com/cd-i_encyclopedia/how-to-photograph-nature/
 3do_fz1*: purged at startup, incompatible?
 ibmpc win95: verify compatibility (conceals mouse cursor on Win 3.1 style windowing)
 ]]></notes>
+		<info name="barcode" value="0 90869 55262 8"/>
+		<info name="isbn" value="1-55755-262-2"/>
+		<!-- Side of box art -->
+		<info name="serial" value="S262"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pcd1904" sha1="19c7875a0329b2a75b3c0c05fa646536473e8c7d"/>
