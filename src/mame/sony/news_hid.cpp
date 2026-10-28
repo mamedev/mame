@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Patrick Mackinlay
+// copyright-holders:Patrick Mackinlay,Brice Onken
 
 /*
  * Sony NEWS keyboard and mouse (high-level emulation).
@@ -25,6 +25,8 @@
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NEWS_HID_HLE, news_hid_hle_device, "news_hid_hle", "Sony NEWS Keyboard and Mouse (HLE)")
+DEFINE_DEVICE_TYPE(NEWS_HID_SERIAL_KEYBOARD, news_hid_serial_keyboard_device, "news_hid_serial_keyboard_device", "Sony NEWS Serial Keyboard (HLE)")
+DEFINE_DEVICE_TYPE(NEWS_HID_SERIAL_MOUSE, news_hid_serial_mouse_device, "news_hid_serial_mouse_device", "Sony NEWS Serial Mouse (HLE)")
 
 news_hid_hle_device::news_hid_hle_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, NEWS_HID_HLE, tag, owner, clock)
@@ -267,7 +269,148 @@ u8 news_hid_hle_device::status_68k_r()
 	return data;
 }
 
-INPUT_PORTS_START(news_hid_hle_device)
+news_hid_serial_keyboard_device::news_hid_serial_keyboard_device(
+	machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, NEWS_HID_SERIAL_KEYBOARD, tag, owner, clock)
+	, device_buffered_serial_interface(mconfig, *this)
+	, device_matrix_keyboard_interface(mconfig, *this, "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7")
+	, m_write_txd(*this)
+{
+}
+
+void news_hid_serial_keyboard_device::device_start()
+{
+	// Keyboard is always 8N1 serial @ 9600 baud
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_tra_rate(9600);
+	set_rcv_rate(9600);
+	m_write_txd(1);
+}
+
+void news_hid_serial_keyboard_device::device_reset()
+{
+	receive_register_reset();
+	transmit_register_reset();
+	clear_fifo();
+	reset_key_state();
+	start_processing(attotime::from_hz(1200));
+}
+
+void news_hid_serial_keyboard_device::key_make(u8 row, u8 column)
+{
+	LOG("key_make row %d col %d\n", row, column);
+
+	push_key((row << 4) | column);
+}
+
+void news_hid_serial_keyboard_device::key_break(u8 row, u8 column)
+{
+	LOG("key_break row %d col %d\n", row, column);
+
+	push_key(0x80 | (row << 4) | column);
+}
+
+void news_hid_serial_keyboard_device::push_key(u8 code)
+{
+	LOG("push_key(0x%x)\n", code);
+	transmit_byte(code);
+}
+
+void news_hid_serial_keyboard_device::received_byte(u8 byte)
+{
+	// TODO: keyboard bell and anything else that the keyboard can do
+	LOG("received_byte(0x%x)\n", byte);
+}
+
+news_hid_serial_mouse_device::news_hid_serial_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 const clock)
+	: device_t(mconfig, NEWS_HID_SERIAL_MOUSE, tag, owner, clock)
+	, device_buffered_serial_interface(mconfig, *this)
+	, m_write_txd(*this)
+	, m_mouse_x_axis(*this, "mouse_x_axis")
+	, m_mouse_y_axis(*this, "mouse_y_axis")
+	, m_mouse_buttons(*this, "mouse_buttons")
+{
+}
+
+void news_hid_serial_mouse_device::device_start()
+{
+	save_item(NAME(m_mouse_x));
+	save_item(NAME(m_mouse_y));
+	save_item(NAME(m_mouse_b));
+
+	// Mouse is always 8N1 serial @ 1200 baud
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_rate(1200);
+	m_write_txd(1);
+}
+
+void news_hid_serial_mouse_device::device_reset()
+{
+	m_mouse_x = m_mouse_x_axis->read();
+	m_mouse_y = m_mouse_y_axis->read();
+	m_mouse_b = m_mouse_buttons->read();
+
+	transmit_register_reset();
+	clear_fifo();
+}
+
+INPUT_CHANGED_MEMBER(news_hid_serial_mouse_device::input_changed)
+{
+	if (fifo_empty() && is_transmit_register_empty())
+		update_input();
+}
+
+void news_hid_serial_mouse_device::tra_callback()
+{
+	m_write_txd(transmit_register_get_data_bit());
+}
+
+void news_hid_serial_mouse_device::tra_complete()
+{
+	device_buffered_serial_interface<8>::tra_complete();
+	if (fifo_empty() && is_transmit_register_empty())
+		update_input();
+}
+
+void news_hid_serial_mouse_device::received_byte(u8 byte)
+{
+	// Mouse does not accept data
+}
+
+void news_hid_serial_mouse_device::update_input()
+{
+	// read mouse state
+	s16 const x = m_mouse_x_axis->read();
+	s16 const y = m_mouse_y_axis->read();
+	u8 const b = m_mouse_buttons->read();
+
+	// compute delta
+	s8 const dx = x - m_mouse_x;
+	s8 const dy = y - m_mouse_y;
+	u8 const db = b ^ m_mouse_b;
+
+	// Report updated state
+	if (dx || dy || db)
+	{
+		LOG("mouse dx %d dy %d db %d\n", dx, dy, db);
+
+		// compute sign
+		u8 const sx = (dx < 0) ? 0x08 : 0x00;
+		u8 const sy = (dy < 0) ? 0x10 : 0x00;
+
+		// transmit data
+		transmit_byte(0x80 | sy | sx | b);
+		transmit_byte(dx & 0x7f);
+		transmit_byte(dy & 0x7f);
+
+		// update mouse state
+		m_mouse_x = x;
+		m_mouse_y = y;
+		m_mouse_b = b;
+	}
+}
+
+static INPUT_PORTS_START(news_keyboard)
 	PORT_START("ROW0")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1")           PORT_CODE(KEYCODE_F1)         PORT_CHAR(UCHAR_MAMEKEY(F1))
@@ -411,6 +554,10 @@ INPUT_PORTS_START(news_hid_hle_device)
 	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(news_hid_hle_device)
+	PORT_INCLUDE(news_keyboard)
 
 	PORT_START("mouse_x_axis")
 	PORT_BIT(0xffff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(100)
@@ -425,7 +572,35 @@ INPUT_PORTS_START(news_hid_hle_device)
 	PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(news_hid_serial_keyboard_device)
+	PORT_INCLUDE(news_keyboard)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(news_hid_serial_mouse_device)
+	PORT_START("mouse_x_axis")
+	PORT_BIT(0xffff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(news_hid_serial_mouse_device::input_changed), 0)
+
+	PORT_START("mouse_y_axis")
+	PORT_BIT(0xffff, 0, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(news_hid_serial_mouse_device::input_changed), 0)
+
+	PORT_START("mouse_buttons")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Left Button") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(news_hid_serial_mouse_device::input_changed), 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Right Button") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(news_hid_serial_mouse_device::input_changed), 0)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Middle Button") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(news_hid_serial_mouse_device::input_changed), 0)
+	PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
+
 ioport_constructor news_hid_hle_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(news_hid_hle_device);
+}
+
+ioport_constructor news_hid_serial_keyboard_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(news_hid_serial_keyboard_device);
+}
+
+ioport_constructor news_hid_serial_mouse_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(news_hid_serial_mouse_device);
 }
