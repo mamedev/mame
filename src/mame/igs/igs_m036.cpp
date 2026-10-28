@@ -781,7 +781,7 @@ ROM_END
 ROM_START( hyleyuan )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "igs036", 0x0000, 0x4000, NO_DUMP )
+	ROM_LOAD( "hyleyuan_igs036.bin", 0x0000, 0x4000, CRC(ea7cd4da) SHA1(cec3c04be1fdc15a7e11ca86bb98f73cbb8e6ebd) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "s_103cn.u24", 0x000000, 0x200000, CRC(248aa7e3) SHA1(d24ef32021dc03d9ae875f53767d742c91dd7d78) )

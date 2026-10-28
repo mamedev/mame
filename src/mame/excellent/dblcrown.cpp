@@ -629,7 +629,7 @@ ROM_END
 
 ROM_START( dblcrown095 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD("d2c_095_8l.hx.u33 ", 0x00000, 0x40000, CRC(7771f759) SHA1(153facf9d35932fc280934c448834c289390dc74) ) // handwritten label
+	ROM_LOAD("d2c_095_8l.hx.u33", 0x00000, 0x40000, CRC(7771f759) SHA1(153facf9d35932fc280934c448834c289390dc74) ) // handwritten label
 
 	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD("1.u43", 0x00000, 0x80000, CRC(04f653ad) SHA1(4e98965a3d489d68bf10b6bde5b51eaf9af7e4b4) )
