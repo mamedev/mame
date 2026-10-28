@@ -1858,8 +1858,7 @@ ROM_START( youmat )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "10.e19",       0x00000, 0x8000, CRC(804e7e4c) SHA1(d10edc6b2e283a8b0c8621645949ad70196a0dd6) )
 	ROM_LOAD( "9.e17",        0x08000, 0x4000, CRC(55d8f1a1) SHA1(886ed255007faf67908e8af3e52d7447c9eb260b) )
-	// probably a 27256 dumped as a 27128: the program also reads banks 0 and 1, which hold the terrain data
-	ROM_LOAD( "8.e16",        0x14000, 0x4000, BAD_DUMP CRC(8c5782da) SHA1(2673eae866e9c1e1832f2525c167972b147d2147) )
+	ROM_LOAD( "8.e16",        0x10000, 0x8000, CRC(26ae2305) SHA1(e1fed6c72593c9a8770f4955a64bf8de6b0f05fa) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // sound CPU code
 	ROM_LOAD( "16.e13",       0x00000, 0x4000, CRC(dd7e0be2) SHA1(32c63f1dde9561b7fce7e9dba7d34511fdd7d0b0) )
@@ -2064,6 +2063,6 @@ GAME( 1986, dangarbt, dangar,   galivan,  dangarb,  galivan_state,  empty_init, 
 GAME( 1986, ninjemak, 0,        ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Ninja Emaki (US)",                                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1986, youma,    ninjemak, ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Youma Ninpou Chou (Japan)",                           MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1986, youma2,   ninjemak, ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Youma Ninpou Chou (Japan, alt)",                      MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1986, youmat,   ninjemak, youmat,   youmat,   youmat_state,   empty_init,  ROT270, "Nichibutsu (Tecfri license)", "Youma Ninpou Chou (Tecfri license)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing terrain data, see 8.e16
+GAME( 1986, youmat,   ninjemak, youmat,   youmat,   youmat_state,   empty_init,  ROT270, "Nichibutsu (Tecfri license)", "Youma Ninpou Chou (Tecfri license)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1986, youmab,   ninjemak, youmab,   ninjemak, youmab_state,   empty_init,  ROT270, "bootleg",                     "Youma Ninpou Chou (Game Electronics bootleg, set 1)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // player is invincible
 GAME( 1986, youmab2,  ninjemak, youmab,   ninjemak, youmab_state,   empty_init,  ROT270, "bootleg",                     "Youma Ninpou Chou (Game Electronics bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // ""
