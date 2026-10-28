@@ -118,7 +118,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 	m_buffered_data(0),
 	m_sprite_page(0),
 	m_scan_scale(1), // set the scan scale (this is for dual monitor vertical setups)
-	m_draw_phase(0)
+	m_draw_phase(PPU_DRAW_NONE)
 {
 	for (auto &elem : m_regs)
 		elem = 0;
@@ -1022,7 +1022,10 @@ void ppu2c0x_device::render_scanline()
 	// if sprites are on, draw them, but we call always to process them
 	draw_sprites(line_priority);
 
-	m_draw_phase = PPU_DRAW_BG;
+	// outside line rendering we reset draw phase to NONE so that
+	// fetches through PPUDATA does not think these are BG
+	// (m_draw_phase is only used by MMC5, this is needed by uchuksdf)
+	m_draw_phase = PPU_DRAW_NONE;
 }
 
 void ppu2c0x_device::scanline_increment_fine_ycounter()
