@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
@@ -48,7 +48,7 @@ private:
 	};
 
 	uint8_t m_cmd_ff;
-	uint8_t m_cmd,m_cmd_param;
+	uint8_t m_cmd, m_cmd_param;
 	uint8_t m_reset_line;
 
 	uint16_t m_osd_addr;
@@ -62,6 +62,8 @@ private:
 	void mb90082_vram(address_map &map) ATTR_COLD;
 
 	const address_space_config      m_space_config;
+	required_memory_region m_char_rom;
+
 };
 
 
