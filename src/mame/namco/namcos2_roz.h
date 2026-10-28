@@ -9,6 +9,8 @@
 #include "screen.h"
 #include "tilemap.h"
 
+#include <memory>
+
 
 class namcos2_roz_device : public device_t, public device_gfx_interface, public device_video_interface
 {

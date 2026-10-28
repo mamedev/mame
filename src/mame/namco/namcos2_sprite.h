@@ -51,16 +51,14 @@ protected:
 		void shift();
 
 		u8 out() const;
-		u8 tra() const { return BIT(m_sr_tra, 3); }
-		u8 lda(int v1) const { return v1 ? out() : 0xff; }
-		u8 ldb(int v1) const { return v1 ? 0xff : out(); }
+		bool tra() const { return BIT(m_sr_tra, 3); }
 
 		// there is no reset on the die, start out idle
 		u32 m_sr_col = 0xffffffff;
 		u8 m_sr_tra = 0x0f;
 	};
 
-	// one entry of the object table, as latched for a frame
+	// one entry of the object table, as latched by get_sprites
 	struct sprite_entry
 	{
 		gfx_element *gfx;
@@ -91,7 +89,6 @@ protected:
 	template <class BitmapClass> void draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int control);
 
 	void add_sprite(gfx_element *gfx, u32 code, u32 color, bool flipx, bool flipy, int sx, int sy, int sizex, int sizey, u32 prival, u8 srcx, u8 srcy, u8 size);
-	void draw_line(int y, const rectangle &cliprect);
 
 	required_shared_ptr<u16> m_spriteram;
 	required_region_ptr<u8> m_scalelut_region;
@@ -104,10 +101,12 @@ protected:
 
 	u16 m_xmask;
 
-	c146 m_c146;
+private:
+	void draw_line(int y, const rectangle &cliprect);
+
 	sprite_entry m_sprite[128];
-	int m_sprite_count = 0;
-	u16 m_linebuf[2][0x800]; // line buffers A and B
+	int m_sprite_count;
+	u16 m_linebuf[0x800];
 };
 
 class namcos2_sprite_finallap_device : public namcos2_sprite_device

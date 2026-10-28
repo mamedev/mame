@@ -28,7 +28,8 @@
 
     The C106 zoom counter steps twice for each pixel out of the C146 (see draw_line).
     The one line delay of the real line buffers (a line is built while the previous one is
-    displayed) is not reproduced; sprite RAM is sampled when the line is drawn.
+    displayed) is not reproduced, and with it neither is the 1V steering of LDA/LDB. The
+    object table is latched once per draw_common(), not per line.
 
     Metal Hawk requires a different draw function, so might use a different chip unless the hookup
     is just scrambled (needs checking). Its object ROMs hold one byte per pixel and the rotated
@@ -47,6 +48,7 @@
 #include "namcos2_sprite.h"
 
 #include <algorithm>
+#include <iterator>
 
 
 namespace {
@@ -88,7 +90,8 @@ namcos2_sprite_device::namcos2_sprite_device(const machine_config &mconfig, devi
 	m_scalelut_region(*this, "scalelut"),
 	m_pri_cb(*this),
 	m_mix_cb(*this),
-	m_xmask(xmask)
+	m_xmask(xmask),
+	m_sprite_count(0)
 {
 }
 
@@ -111,11 +114,7 @@ void namcos2_sprite_device::device_start()
 	screen().register_screen_bitmap(m_renderbitmap);
 	screen().register_screen_bitmap(m_screenbitmap);
 
-	for (auto &buf : m_linebuf)
-		std::fill(std::begin(buf), std::end(buf), 0xffff);
-
-	save_item(NAME(m_c146.m_sr_col));
-	save_item(NAME(m_c146.m_sr_tra));
+	std::fill(std::begin(m_linebuf), std::end(m_linebuf), 0xffff);
 }
 
 /**************************************************************************************/
@@ -150,6 +149,8 @@ void namcos2_sprite_device::c146::shift()
 	m_sr_col = (m_sr_col << 1) | 0x11111111;
 }
 
+// load() and out() hand back the byte they were given, reversed within the group when
+// FLIP is set; the registers are kept so the plane interleaving stays in the code
 u8 namcos2_sprite_device::c146::out() const
 {
 	// SR_OUT: bit 3 of each register, gathered back into a colour
@@ -185,9 +186,8 @@ void namcos2_sprite_device::add_sprite(
 
 void namcos2_sprite_device::draw_line(int y, const rectangle &cliprect)
 {
-	// 1V high: this line is built in line buffer A and the pixels leave the C146 on LDA
-	const int v1 = BIT(y, 0);
-	u16 *const lb = m_linebuf[v1 ? 0 : 1];
+	c146 serialiser;
+	u16 *const lb = m_linebuf;
 
 	for (int i = 0; i < m_sprite_count; i++)
 	{
@@ -212,15 +212,15 @@ void namcos2_sprite_device::draw_line(int y, const rectangle &cliprect)
 		{
 			// the groups of a flipped object are fetched backwards, the C146
 			// turns the four pixels round inside each of them
-			m_c146.load(c146_ch(&src[spr.flipx ? (spr.size - 4 - n) : n]), spr.flipx);
+			serialiser.load(c146_ch(&src[spr.flipx ? (spr.size - 4 - n) : n]), spr.flipx);
 
 			for (int p = 0; p < 4; p++)
 			{
 				if (p)
-					m_c146.shift();
+					serialiser.shift();
 
-				const u8 c = v1 ? m_c146.lda(v1) : m_c146.ldb(v1);
-				const bool tra = m_c146.tra();
+				const u8 c = serialiser.out();
+				const bool tra = serialiser.tra();
 
 				// the zoom counter steps twice for every pixel out of the C146
 				for (int step = 0; step < 2; step++)
@@ -239,11 +239,10 @@ void namcos2_sprite_device::draw_line(int y, const rectangle &cliprect)
 		}
 	}
 
-	// scan-out; while this buffer is read the next line is built in the other
-	// one, so the C146 holds this bus at 0xff and the buffer comes back empty
+	// scan-out, then clear behind the beam
 	u16 *const dest = &m_renderbitmap.pix(y);
-	std::copy(&lb[cliprect.min_x], &lb[cliprect.max_x + 1], &dest[cliprect.min_x]);
-	std::fill_n(lb, std::size(m_linebuf[0]), 0xffff);
+	std::copy_n(&lb[cliprect.left()], cliprect.width(), &dest[cliprect.left()]);
+	std::fill_n(lb, std::size(m_linebuf), 0xffff);
 }
 
 void namcos2_sprite_device::copybitmap(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip)
@@ -309,8 +308,14 @@ void namcos2_sprite_finallap_device::get_tilenum_and_size(const u16 word0, const
 template <class BitmapClass>
 void namcos2_sprite_device::draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int control)
 {
+	// apply_clip() intersects the game's C116 window without normalising it,
+	// so it can arrive back to front with nothing to draw
+	if (cliprect.empty())
+		return;
+
+	m_sprite_count = 0;
 	get_sprites(control);
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		draw_line(y, cliprect);
 	copybitmap(screen, bitmap, cliprect);
 }
@@ -332,7 +337,6 @@ void namcos2_sprite_device::get_sprites(int control)
 	// cells are picked per entry, see add_sprite
 	sgfx->set_source_clip(0, 32, 0, 32);
 
-	m_sprite_count = 0;
 	const int offset = (control & 0x000f) * (128 * 4);
 	for (int loop = 0; loop < 128; loop++)
 	{
@@ -427,7 +431,6 @@ void namcos2_sprite_metalhawk_device::get_sprites(int control)
 	gfx(0)->set_source_clip(0, 32, 0, 32);
 	gfx(1)->set_source_clip(0, 32, 0, 32);
 
-	m_sprite_count = 0;
 	for (int loop = 0; loop < 128; loop++)
 	{
 		const u16 ypos  = m_spriteram[(loop * 8) + 0];

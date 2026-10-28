@@ -34,7 +34,8 @@
     c (1024x1024) or e (512x512).
 
     The CPU side (DTACK, RAM output enables, read latch) needs no emulation. The chip does not
-    drive the bus on register reads; the written values are still returned as before.
+    drive the bus on register reads; control_r() hands back the written value because this
+    region was previously mapped as plain RAM, and no game is known to read it.
 
     used by the following drivers
     namcos2.cpp (all games EXCEPT Final Lap 1,2,3 , Lucky & Wild , Steel Gunner 1,2 , Suzuka 8 Hours 1,2 , Metal Hawk)
@@ -50,7 +51,10 @@
 
 namespace {
 
-// pixel clocks from the end of horizontal sync to the first visible pixel
+// I6M clocks from the C102 line reload (end of /HSYNC, resampled on 1H) to the pixel shown
+// in the first visible column, i.e. the back porch less the delay through the ROZ RAM/ROM
+// and the mixer. This is the alignment the previous implementation used (xoffset = 38), it
+// has not been measured on hardware.
 constexpr int XOFFSET = 38;
 
 constexpr int ROZ_BLOCK_SIZE = 8;
@@ -123,7 +127,7 @@ TIMER_CALLBACK_MEMBER(namcos2_roz_device::line_start)
 	const int line = param;
 	const int prev = line ? (line - 1) : (screen().height() - 1);
 
-	if ((prev < visarea.min_y) || (prev > visarea.max_y))
+	if ((prev < visarea.top()) || (prev > visarea.bottom()))
 	{
 		// RESTART
 		m_accx = u32(m_roz_ctrl[4]) << 4;
@@ -144,7 +148,8 @@ TIMER_CALLBACK_MEMBER(namcos2_roz_device::line_start)
 	ls.incxy = roz_delta(m_roz_ctrl[1]);
 	ls.ctrl = m_roz_ctrl[7];
 
-	// the next line starts where the horizontal sync of this one ends
+	// the reload for the next line comes XOFFSET clocks before its first visible pixel, so
+	// with the visible area starting at hpos 0 it falls in the horizontal blanking of this one
 	m_line_timer->adjust(screen().time_until_pos(line, screen().width() - XOFFSET), (line + 1) % screen().height());
 }
 
@@ -163,13 +168,13 @@ void namcos2_roz_device::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, c
 	    line for nearly every pixel. The source pixels of a small screen block
 	    stay close together at any angle. Each line still uses its own C102 state.
 	*/
-	for (int y0 = cliprect.min_y; y0 <= cliprect.max_y; y0 += ROZ_BLOCK_SIZE)
+	for (int y0 = cliprect.top(); y0 <= cliprect.bottom(); y0 += ROZ_BLOCK_SIZE)
 	{
-		const int y1 = std::min(y0 + ROZ_BLOCK_SIZE - 1, cliprect.max_y);
+		const int y1 = std::min(y0 + ROZ_BLOCK_SIZE - 1, cliprect.bottom());
 
-		for (int x0 = cliprect.min_x; x0 <= cliprect.max_x; x0 += ROZ_BLOCK_SIZE)
+		for (int x0 = cliprect.left(); x0 <= cliprect.right(); x0 += ROZ_BLOCK_SIZE)
 		{
-			const int x1 = std::min(x0 + ROZ_BLOCK_SIZE - 1, cliprect.max_x);
+			const int x1 = std::min(x0 + ROZ_BLOCK_SIZE - 1, cliprect.right());
 
 			for (int y = y0; y <= y1; y++)
 			{
