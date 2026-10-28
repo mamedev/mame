@@ -662,6 +662,7 @@ mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_typ
 	: mc6847_friend_device(mconfig, type, tag, owner, clock, type == MC6847T1, tpfs, LINES_TOP_BORDER + LINES_ACTIVE_VIDEO - 1, 1, true, pal)
 	, m_input_cb(*this, 0)
 	, m_black_and_white(false)
+	, m_field_sync_extra_transitions(false)
 	, m_fixed_mode(0)
 	, m_fixed_mode_mask(0)
 {
@@ -987,11 +988,14 @@ void mc6847_base_device::field_sync_changed(bool line)
 	if (line)
 	{
 		m_input_cb(~0);
-		// Account for the initial two DA0 transitions after field reset.  The
-		// SAM's horizontal-sync clearing masks these in modes 0-6, but DMA
-		// mode retains them (a two-byte offset in CoCo hardware captures).
-		m_input_cb(1);
-		m_input_cb(0);
+		// Some configurations need two initial DA0 transitions after field
+		// reset.  SAM horizontal-sync clearing masks these in modes 0-6,
+		// while DMA mode retains them.  Enable only where verified.
+		if (m_field_sync_extra_transitions)
+		{
+			m_input_cb(1);
+			m_input_cb(0);
+		}
 	}
 }
 

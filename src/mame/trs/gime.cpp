@@ -1658,6 +1658,10 @@ void gime_device::record_body_scanline(uint16_t physical_scanline, uint16_t logi
 			case MODE_AG|MODE_GM0:
 			case MODE_AG|MODE_GM1|MODE_GM0:
 			case MODE_AG|MODE_GM2|MODE_GM0:
+			case MODE_AG|MODE_GM1:
+			case MODE_AG|MODE_GM2:
+			case MODE_AG|MODE_GM2|MODE_GM1:
+			case MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0:
 				if (m_sam_state & SAM_STATE_V0)
 					pitch = record_scanline_res<16, &gime_device::get_data_mc6847, true>(physical_scanline, start_clock, end_clock);
 				else
@@ -1673,10 +1677,6 @@ void gime_device::record_body_scanline(uint16_t physical_scanline, uint16_t logi
 			case MODE_GM2|MODE_GM0:
 			case MODE_GM2|MODE_GM1:
 			case MODE_GM2|MODE_GM1|MODE_GM0:
-			case MODE_AG|MODE_GM1:
-			case MODE_AG|MODE_GM2:
-			case MODE_AG|MODE_GM2|MODE_GM1:
-			case MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0:
 				pitch = record_scanline_res<32, &gime_device::get_data_mc6847, true>(physical_scanline, start_clock, end_clock);
 				break;
 
@@ -1821,14 +1821,52 @@ uint32_t gime_device::emit_dummy_samples(const scanline_record *scanline, int sa
 //  emit_mc6847_samples
 //-------------------------------------------------
 
-template<int xscale>
+template<int xscale, bool overlapping_colors>
 inline uint32_t gime_device::emit_mc6847_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette, int pixel_start)
 {
 	const uint8_t mode = scanline->m_mode[sample_start];
 	const auto emit = [&](uint8_t css_mode, pixel_t *output)
 	{
+		const uint8_t *data = &scanline->m_data[sample_start];
+		if constexpr (overlapping_colors)
+		{
+			// In 16-byte legacy four-color modes the shifter advances one bit
+			// per color sample: 7:6, 6:5, ... 1:0, then bit 0 followed by zero.
+			const uint16_t color_base = (css_mode & MODE_CSS) ? 4 : 0;
+			for (int i = 0; i < sample_count; i++)
+			{
+				for (int bit = 0; bit < 8; bit++)
+				{
+					const pixel_t color = palette[color_base + (((data[i] << bit) >> 6) & 3)];
+					std::fill_n(&output[(i * 8 + bit) * xscale * 2], xscale * 2, color);
+				}
+			}
+			return uint32_t(sample_count * 8 * xscale * 2);
+		}
+		uint8_t paired_data[32];
+		if constexpr (xscale == 1)
+		{
+			switch (css_mode & (MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0))
+			{
+			case MODE_AG|MODE_GM0:
+			case MODE_AG|MODE_GM1|MODE_GM0:
+			case MODE_AG|MODE_GM2|MODE_GM0:
+				// With 32-byte fetches in these legacy two-color modes, GIME
+				// displays bits 6, 4, 2 and 0 twice instead of all eight bits.
+				for (int i = 0; i < sample_count; i++)
+				{
+					const uint8_t bits = data[i] & 0x55;
+					paired_data[i] = bits | (bits << 1);
+				}
+				data = paired_data;
+				break;
+
+			default:
+				break;
+			}
+		}
 		return super::emit_mc6847_samples<xscale>(css_mode,
-			&scanline->m_data[sample_start], sample_count, output, palette,
+			data, sample_count, output, palette,
 			super::m_charrom_cb, sample_start, scanline->m_line_in_row);
 	};
 	const uint32_t count = emit(mode, pixels);
@@ -2055,6 +2093,24 @@ bool gime_device::update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 						render_scanline<16, &gime_device::emit_mc6847_samples<2>>(scanline, pixels, min_x, max_x, &resolver);
 					else
 						render_scanline<32, &gime_device::emit_mc6847_samples<1>>(scanline, pixels, min_x, max_x, &resolver);
+					break;
+
+				case MODE_AG|MODE_GM1:
+				case MODE_AG|MODE_GM2:
+				case MODE_AG|MODE_GM2|MODE_GM1:
+					if (m_sam_state & SAM_STATE_V0)
+						render_scanline<16, &gime_device::emit_mc6847_samples<2, true>>(scanline, pixels, min_x, max_x, &resolver);
+					else
+						render_scanline<32, &gime_device::emit_mc6847_samples<2>>(scanline, pixels, min_x, max_x, &resolver);
+					break;
+
+				case MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0:
+					// SAM V0 also selects 16-byte rows in the highest legacy
+					// two-color mode; each bit then spans two logical pixels.
+					if (m_sam_state & SAM_STATE_V0)
+						render_scanline<16, &gime_device::emit_mc6847_samples<4>>(scanline, pixels, min_x, max_x, &resolver);
+					else
+						render_scanline<32, &gime_device::emit_mc6847_samples<2>>(scanline, pixels, min_x, max_x, &resolver);
 					break;
 
 				default:

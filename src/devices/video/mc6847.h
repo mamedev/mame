@@ -509,6 +509,7 @@ public:
 
 	void set_fixed_mode(uint8_t mode) { m_fixed_mode = mode; }
 	void set_black_and_white(bool bw) { m_black_and_white = bw; }
+	void set_field_sync_extra_transitions(bool enabled) { m_field_sync_extra_transitions = enabled; }
 
 	/* updates the screen -- this will call begin_update(),
 	   followed by update_row() repeatedly and after all row
@@ -574,6 +575,7 @@ private:
 
 	/* if true, this is black and white */
 	bool m_black_and_white;
+	bool m_field_sync_extra_transitions;
 
 	// incidentals
 	uint8_t m_fixed_mode;

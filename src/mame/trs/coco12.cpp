@@ -608,6 +608,11 @@ void coco12_state::coco(machine_config &config)
 	m_screen->set_screen_update(m_vdg, FUNC(mc6847_base_device::screen_update));
 
 	MC6847(config, m_vdg, COCO_MASTER_CLOCK / 4); // VClk output from MC6883
+	// Hardware captures show two extra DA0 transitions on a CoCo 1 with a
+	// '783 SAM, but not on a CoCo 2B with a 6847T1 and '785 SAM.  A PAL
+	// CoCo report agrees with the CoCo 1; Dragon reports do not show it.
+	// TODO: The cause and exact timing remain uncertain: VDG, SAM or board.
+	m_vdg->set_field_sync_extra_transitions(true);
 	m_vdg->set_screen(m_screen);
 	m_vdg->hsync_wr_callback().set(FUNC(coco12_state::horizontal_sync));
 	m_vdg->fsync_wr_callback().set(FUNC(coco12_state::field_sync));
@@ -683,6 +688,7 @@ void coco12_state::coco2b(machine_config &config)
 	coco(config);
 
 	MC6847T1(config.replace(), m_vdg, COCO_MASTER_CLOCK / 4);
+	m_vdg->set_field_sync_extra_transitions(false);
 	m_vdg->set_screen(m_screen);
 	m_vdg->hsync_wr_callback().set(FUNC(coco12_state::horizontal_sync));
 	m_vdg->fsync_wr_callback().set(FUNC(coco12_state::field_sync));
