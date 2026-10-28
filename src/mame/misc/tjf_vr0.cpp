@@ -102,6 +102,34 @@ in the core makes all of them pass and the game gets to the HUD and the
 MISSION screen (where it still stops, TODO). That the real CPU ignores the low
 bits is deduced from this code, not verified.
 
+=============================================================================
+
+Medal games (xbnz, hzniqiu):
+
+Two kids games with 虹猫蓝兔 (Hongmao Lantu) stickers on a board marked
+T071030A (MAH-JONG and JAMMA edges): the main QFP (208 pins, marking sanded
+off, programmed as a VRenderZERO+), three 27C322 EPROMs (ROM4 socket empty),
+a stickered QFP and the usual SDRAMs. They have the TJF boot stub, I/O device
+and program scrambling, with these differences:
+
+- the address lines A8-A15 are reversed (A8 <-> A15, A9 <-> A14, A10 <-> A13,
+  A11 <-> A12) before the per-game inversions (raw A12-A15 for xbnz, A10-A15
+  for hzniqiu), again on all the EPROMs
+- the boot stub copies 0x4ec4 blocks of 27 words from 0x2ce to 0x02080000,
+  unscrambling them, and jumps there, so there is no loader to HLE
+- the I/O device uses other magic words and has an extra memory (see
+  medal_io_device below)
+- a FameG FS8806 is connected in SPI mode to PIO 12 (SCK), 13 (MOSI), 14 (CS)
+  and 15 (MISO), all in open collector mode. The program takes its DES key
+  from the I/O device memory at 0x80 and reads 8 bytes at 0x20 of the FS8806
+  EEPROM, whose first dword has to match the one at 0x98 of the I/O device
+  memory. xbnz also checks the 16 dwords at 0x00 of the I/O device memory
+  against constants of its own and, when anything fails, enables the watchdog
+  and waits for it (0x02084768).
+  The FS8806 EEPROM and the key and 0x80 areas of the I/O device memory are
+  erased in the default contents, which satisfies the checks; the real
+  contents are unknown.
+
 
     TODO:
     - Dump the second stage loader the external device sends to the boot stub
@@ -115,12 +143,15 @@ bits is deduced from this code, not verified.
     - kxddz's sound is too fast. The game sets the PLL at roughly 55 MHz, but it's currently
       bypassed by the HLE
     - Serial security memory: password, access rights, configuration zone
+    - xbnz, hzniqiu: unknown inputs, I/O device registers 0x05, 0x22 and 0x23, FS8806 EEPROM
+      and key
 
 ****************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/se3208/se3208.h"
+#include "machine/fs8806.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/vrender0.h"
@@ -415,10 +446,13 @@ public:
 	auto sda_callback() { return m_sda_cb.bind(); }
 	auto sda_in_callback() { return m_sda_in_cb.bind(); }
 
-	u8 read(offs_t offset);
-	void write(offs_t offset, u8 data);
+	virtual u8 read(offs_t offset);
+	virtual void write(offs_t offset, u8 data);
 
 protected:
+	tjf_io_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
+			u16 read_cmd, u16 read_magic, u16 write_cmd, u16 write_magic);
+
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -426,10 +460,22 @@ protected:
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
 
-private:
-	enum : u8 { XFER_IDLE, XFER_READ_MAGIC, XFER_READ_ADDR, XFER_READ, XFER_WRITE_MAGIC, XFER_WRITE_ADDR, XFER_WRITE };
+	enum : u8 { XFER_IDLE, XFER_READ_MAGIC, XFER_READ_ADDR, XFER_READ, XFER_WRITE_MAGIC, XFER_WRITE_ADDR, XFER_WRITE, XFER_DERIVED };
 
-	void word_sent(u8 hi, u8 lo);
+	virtual void word_sent(u8 hi, u8 lo);
+	virtual void word_received();
+	virtual bool command(u16 word) { return false; }
+
+	u8 m_rx_hi;
+	u8 m_rx_lo;
+	u8 m_xfer_state;
+	u16 m_xfer_count;
+
+private:
+	u16 const m_read_cmd;
+	u16 const m_read_magic;
+	u16 const m_write_cmd;
+	u16 const m_write_magic;
 
 	devcb_read8::array<3> m_in_cb;
 	devcb_read8 m_dsw_cb;
@@ -443,12 +489,8 @@ private:
 	u8 m_xfer_hi;
 	u8 m_xfer_lo;
 	u8 m_xfer_dir;
-	u8 m_rx_hi;
-	u8 m_rx_lo;
-	u8 m_xfer_state;
 	u8 m_xfer_sync;
 	u16 m_xfer_addr;
-	u16 m_xfer_count;
 	u8 m_sda_release;
 	u8 m_store[0x10000];
 };
@@ -456,8 +498,18 @@ private:
 DEFINE_DEVICE_TYPE_PRIVATE(TJF_IO, tjf_io_device, tjf_io_device, "tjf_io", "TJF I/O device")
 
 tjf_io_device::tjf_io_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, TJF_IO, tag, owner, clock),
+	tjf_io_device(mconfig, TJF_IO, tag, owner, clock, 0x000a, 0x6666, 0x000b, 0x7777)
+{
+}
+
+tjf_io_device::tjf_io_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
+		u16 read_cmd, u16 read_magic, u16 write_cmd, u16 write_magic) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
+	m_read_cmd(read_cmd),
+	m_read_magic(read_magic),
+	m_write_cmd(write_cmd),
+	m_write_magic(write_magic),
 	m_in_cb(*this, 0xff),
 	m_dsw_cb(*this, 0xff),
 	m_hopper_cb(*this),
@@ -534,11 +586,11 @@ void tjf_io_device::word_sent(u8 hi, u8 lo)
 			return;
 
 		case XFER_READ_MAGIC:
-			m_xfer_state = (word == 0x6666) ? XFER_READ_ADDR : XFER_IDLE;
+			m_xfer_state = (word == m_read_magic) ? XFER_READ_ADDR : XFER_IDLE;
 			return;
 
 		case XFER_WRITE_MAGIC:
-			m_xfer_state = (word == 0x7777) ? XFER_WRITE_ADDR : XFER_IDLE;
+			m_xfer_state = (word == m_write_magic) ? XFER_WRITE_ADDR : XFER_IDLE;
 			return;
 
 		case XFER_READ_ADDR:
@@ -560,11 +612,11 @@ void tjf_io_device::word_sent(u8 hi, u8 lo)
 	}
 	if (m_xfer_sync == 2)
 	{
-		if (word == 0x000a)
+		if (word == m_read_cmd)
 			m_xfer_state = XFER_READ_MAGIC;
-		else if (word == 0x000b)
+		else if (word == m_write_cmd)
 			m_xfer_state = XFER_WRITE_MAGIC;
-		else
+		else if (!command(word))
 			logerror("unknown command %04x\n", word);
 	}
 	else
@@ -572,6 +624,23 @@ void tjf_io_device::word_sent(u8 hi, u8 lo)
 		logerror("unexpected word %04x\n", word);
 	}
 	m_xfer_sync = 0;
+}
+
+void tjf_io_device::word_received()
+{
+	if (m_xfer_state == XFER_READ)
+	{
+		m_rx_lo = m_store[m_xfer_addr];
+		m_rx_hi = m_store[u16(m_xfer_addr + 1)];
+		m_xfer_addr += 2;
+		if (++m_xfer_count == 0xff)
+			m_xfer_state = XFER_IDLE;
+	}
+	else
+	{
+		logerror("%s: unexpected receive\n", machine().describe_context());
+		m_rx_lo = m_rx_hi = 0xff;
+	}
 }
 
 u8 tjf_io_device::read(offs_t offset)
@@ -631,22 +700,9 @@ void tjf_io_device::write(offs_t offset, u8 data)
 			if (BIT(data, 0))
 			{
 				if (!m_xfer_dir)
-				{
 					word_sent(m_xfer_hi, m_xfer_lo);
-				}
-				else if (m_xfer_state == XFER_READ)
-				{
-					m_rx_lo = m_store[m_xfer_addr];
-					m_rx_hi = m_store[u16(m_xfer_addr + 1)];
-					m_xfer_addr += 2;
-					if (++m_xfer_count == 0xff)
-						m_xfer_state = XFER_IDLE;
-				}
 				else
-				{
-					logerror("%s: unexpected receive\n", machine().describe_context());
-					m_rx_lo = m_rx_hi = 0xff;
-				}
+					word_received();
 			}
 			break;
 
@@ -678,29 +734,199 @@ void tjf_io_device::write(offs_t offset, u8 data)
 }
 
 
-class ddz_state : public driver_device
+/***************************************************************************
+
+    I/O device of the medal games (xbnz, hzniqiu)
+
+    Same registers and word transfers as the TJF one, with these differences
+    (from the code of both games):
+    - block storage: ffff ffff 000a 3728 <addr> followed by 0xff words writes
+      a block, ffff ffff 000b 7514 <addr> then 0xff received words reads one
+      (both games read the blocks at 0x2800 and 0x2e00 at boot)
+    - ffff ffff 000d <addr> then 0x20 received words reads 0x40 bytes of a
+      separate memory, ffff ffff 000e <addr> followed by 0x20 words writes
+      them. The games read 0x00, 0x40 and 0x80; xbnz checks the 16 dwords at
+      0x00 against constants of its own, which it then uses as variables, and
+      takes the FS8806 key from the start of 0x80. The size of this memory is
+      unknown, it is emulated as 0x100 bytes
+    - 0x05 is written with 0 before every word except the block data
+      (purpose unknown)
+    - 0x20-0x23 are pulsed while pending counts are decremented (0x02100dc2
+      in xbnz): 0x20 for the coins, 0x21 for the tickets, the other two
+      unknown. Emulated as coin counters
+
+***************************************************************************/
+
+class medal_io_device : public tjf_io_device
 {
 public:
-	ddz_state(const machine_config &mconfig, device_type type, const char *tag) :
+	medal_io_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	virtual void write(offs_t offset, u8 data) override;
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+
+	virtual void nvram_default() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
+
+	virtual void word_sent(u8 hi, u8 lo) override;
+	virtual void word_received() override;
+	virtual bool command(u16 word) override;
+
+private:
+	enum : u8 { XFER_ZONE_READ_ADDR = XFER_DERIVED, XFER_ZONE_READ, XFER_ZONE_WRITE_ADDR, XFER_ZONE_WRITE };
+
+	optional_region_ptr<u8> m_default;
+
+	u8 m_zone_addr;
+	u8 m_zone[0x100];
+};
+
+DEFINE_DEVICE_TYPE_PRIVATE(MEDAL_IO, medal_io_device, medal_io_device, "medal_io", "Medal I/O device")
+
+medal_io_device::medal_io_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	tjf_io_device(mconfig, MEDAL_IO, tag, owner, clock, 0x000b, 0x7514, 0x000a, 0x3728),
+	m_default(*this, DEVICE_SELF),
+	m_zone_addr(0)
+{
+}
+
+void medal_io_device::device_start()
+{
+	tjf_io_device::device_start();
+
+	save_item(NAME(m_zone_addr));
+	save_item(NAME(m_zone));
+}
+
+void medal_io_device::nvram_default()
+{
+	tjf_io_device::nvram_default();
+
+	if (m_default && (m_default.bytes() == sizeof(m_zone)))
+		std::copy_n(&m_default[0], sizeof(m_zone), m_zone);
+	else
+		std::fill(std::begin(m_zone), std::end(m_zone), 0xff);
+}
+
+bool medal_io_device::nvram_read(util::read_stream &file)
+{
+	if (!tjf_io_device::nvram_read(file))
+		return false;
+
+	auto const [err, actual] = util::read(file, m_zone, sizeof(m_zone));
+	return !err && (actual == sizeof(m_zone));
+}
+
+bool medal_io_device::nvram_write(util::write_stream &file)
+{
+	if (!tjf_io_device::nvram_write(file))
+		return false;
+
+	auto const [err, actual] = util::write(file, m_zone, sizeof(m_zone));
+	return !err;
+}
+
+bool medal_io_device::command(u16 word)
+{
+	switch (word)
+	{
+		case 0x000d:
+			m_xfer_state = XFER_ZONE_READ_ADDR;
+			return true;
+
+		case 0x000e:
+			m_xfer_state = XFER_ZONE_WRITE_ADDR;
+			return true;
+	}
+	return false;
+}
+
+void medal_io_device::word_sent(u8 hi, u8 lo)
+{
+	switch (m_xfer_state)
+	{
+		case XFER_ZONE_READ_ADDR:
+		case XFER_ZONE_WRITE_ADDR:
+			m_zone_addr = lo;
+			m_xfer_count = 0;
+			m_xfer_state = (m_xfer_state == XFER_ZONE_READ_ADDR) ? XFER_ZONE_READ : XFER_ZONE_WRITE;
+			return;
+
+		case XFER_ZONE_WRITE:
+			// same byte order as the block storage
+			m_zone[m_zone_addr++] = hi;
+			m_zone[m_zone_addr++] = lo;
+			if (++m_xfer_count == 0x20)
+				m_xfer_state = XFER_IDLE;
+			return;
+	}
+
+	tjf_io_device::word_sent(hi, lo);
+}
+
+void medal_io_device::word_received()
+{
+	if (m_xfer_state == XFER_ZONE_READ)
+	{
+		m_rx_lo = m_zone[m_zone_addr++];
+		m_rx_hi = m_zone[m_zone_addr++];
+		if (++m_xfer_count == 0x20)
+			m_xfer_state = XFER_IDLE;
+	}
+	else
+	{
+		tjf_io_device::word_received();
+	}
+}
+
+void medal_io_device::write(offs_t offset, u8 data)
+{
+	switch (offset << 2)
+	{
+		case 0x0500:
+			break;
+
+		case 0x2000:
+		case 0x2100:
+		case 0x2200:
+		case 0x2300:
+			machine().bookkeeping().coin_counter_w(((offset << 2) - 0x2000) >> 8, BIT(data, 0));
+			break;
+
+		default:
+			tjf_io_device::write(offset, data);
+			break;
+	}
+}
+
+
+class tjf_state : public driver_device
+{
+public:
+	tjf_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_encdata(*this, "enc_data"),
+		m_maincpu(*this, "maincpu"),
+		m_io(*this, "io"),
 		m_workram(*this, "workram"),
 		m_players(*this, "P%u", 1U),
 		m_matrix(*this, "KEY%u", 0U),
-		m_encdata(*this, "enc_data"),
-		m_maincpu(*this, "maincpu"),
 		m_vr0soc(*this, "vr0soc"),
-		m_io(*this, "io"),
 		m_cryptomem(*this, "cryptomem"),
 		m_hopper(*this, "hopper")
 	{ }
 
 
-	void init_ddz() ATTR_COLD;
+	void init_kxddz() ATTR_COLD;
 	void init_crzclass() ATTR_COLD;
 	void init_baibians() ATTR_COLD;
 	void init_cjmx() ATTR_COLD;
 	void init_btlfront() ATTR_COLD;
-	void ddz(machine_config &config) ATTR_COLD;
+
+	void kxddz(machine_config &config) ATTR_COLD;
 	void tjf(machine_config &config) ATTR_COLD;
 	void btlfront(machine_config &config) ATTR_COLD;
 
@@ -708,15 +934,22 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
+	required_region_ptr<u8> m_encdata;
+	required_device<se3208_device> m_maincpu;
+	required_device<tjf_io_device> m_io;
+
+	void tjf_common(machine_config &config) ATTR_COLD;
+
+	void main_map(address_map &map) ATTR_COLD;
+
+	template <unsigned Player> u8 player_r(offs_t offset);
+
 private:
 	required_shared_ptr<u32> m_workram;
 	required_ioport_array<2> m_players;
 	required_ioport_array<5> m_matrix;
-	required_region_ptr<u8> m_encdata;
 
-	required_device<se3208_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
-	required_device<tjf_io_device> m_io;
 	required_device<tjf_cryptomem_device> m_cryptomem;
 	required_device<hopper_device> m_hopper;
 
@@ -726,19 +959,51 @@ private:
 	u32 m_hle_restart[2] = { };
 	memory_passthrough_handler m_restart_tap;
 
-	template <unsigned Player> u8 player_r(offs_t offset);
-
 	static void descramble_flash(u8 *dst, u8 const *src, u32 len, u16 addrxor) ATTR_COLD;
 	static void unscramble_program(u8 *buf, u32 start, u32 end) ATTR_COLD;
 	void decrypt(u16 addrxor, u32 prog_start, u32 prog_end, u32 prog_base) ATTR_COLD;
 
-	void main_map(address_map &map) ATTR_COLD;
 	void btlfront_map(address_map &map) ATTR_COLD;
+};
+
+class tjf_medal_state : public tjf_state
+{
+public:
+	tjf_medal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		tjf_state(mconfig, type, tag),
+		m_fs8806(*this, "fs8806")
+	{ }
+
+	void medal(machine_config &config) ATTR_COLD;
+
+	void init_xbnz() ATTR_COLD;
+	void init_hzniqiu() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	required_device<fs8806_device> m_fs8806;
+
+	u32 m_piomod = 0;
+	u32 m_pioldat = 0;
+
+	void descramble(u16 addrxor) ATTR_COLD;
+
+	u32 pio_lines() const;
+	void pio_update();
+	u32 piomod_r() { return m_piomod; }
+	void piomod_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 pioldat_r() { return m_pioldat; }
+	void pioldat_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 pioedat_r();
+
+	void medal_map(address_map &map) ATTR_COLD;
 };
 
 
 template <unsigned Player>
-u8 ddz_state::player_r(offs_t offset)
+u8 tjf_state::player_r(offs_t offset)
 {
 	u8 data = m_players[Player]->read();
 	if (offset < 5)
@@ -749,7 +1014,7 @@ u8 ddz_state::player_r(offs_t offset)
 	return data;
 }
 
-void ddz_state::machine_start()
+void tjf_state::machine_start()
 {
 	if (m_prog_end)
 	{
@@ -771,7 +1036,7 @@ void ddz_state::machine_start()
 	}
 }
 
-void ddz_state::machine_reset()
+void tjf_state::machine_reset()
 {
 	if (m_prog_end)
 	{
@@ -789,8 +1054,50 @@ void ddz_state::machine_reset()
 	}
 }
 
+void tjf_medal_state::machine_start()
+{
+	tjf_state::machine_start();
 
-void ddz_state::main_map(address_map &map)
+	save_item(NAME(m_piomod));
+	save_item(NAME(m_pioldat));
+}
+
+// a pin in open collector mode (PIOMOD bit set) is pulled low by a 1 in PIOLDAT and released by a 0
+u32 tjf_medal_state::pio_lines() const
+{
+	return (m_pioldat & ~m_piomod) | (~m_pioldat & m_piomod);
+}
+
+void tjf_medal_state::pio_update()
+{
+	u32 const lines = pio_lines();
+	m_fs8806->spi_mosi_w(BIT(lines, 13));
+	m_fs8806->spi_cs_w(BIT(lines, 14));
+	m_fs8806->spi_sck_w(BIT(lines, 12));
+}
+
+void tjf_medal_state::piomod_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_piomod);
+	pio_update();
+}
+
+void tjf_medal_state::pioldat_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_pioldat);
+	pio_update();
+}
+
+u32 tjf_medal_state::pioedat_r()
+{
+	u32 data = pio_lines();
+	if (!m_fs8806->spi_miso_r())
+		data &= ~(u32(1) << 15);
+	return data;
+}
+
+
+void tjf_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 
@@ -810,12 +1117,21 @@ void ddz_state::main_map(address_map &map)
 	map(0x06000000, 0x06ffffff).rom().region("ipl", 0); // TODO: verify mirroring
 }
 
-void ddz_state::btlfront_map(address_map &map)
+void tjf_state::btlfront_map(address_map &map)
 {
 	main_map(map);
 
 	map(0x05000000, 0x05ffffff).rom().region("assets", 0);         // rom3, rom4
 	map(0x06000000, 0x06ffffff).rom().region("assets", 0x1000000); // rom1, rom2
+}
+
+void tjf_medal_state::medal_map(address_map &map)
+{
+	main_map(map);
+
+	map(0x01802000, 0x01802003).rw(FUNC(tjf_medal_state::piomod_r), FUNC(tjf_medal_state::piomod_w));
+	map(0x01802004, 0x01802007).rw(FUNC(tjf_medal_state::pioldat_r), FUNC(tjf_medal_state::pioldat_w));
+	map(0x01802008, 0x0180200b).r(FUNC(tjf_medal_state::pioedat_r));
 }
 
 
@@ -847,7 +1163,7 @@ void ddz_state::btlfront_map(address_map &map)
 	PORT_START("KEY4") \
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-static INPUT_PORTS_START( ddz )
+static INPUT_PORTS_START( tjf )
 	PORT_START("P1")
 	DDZ_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // 退币
@@ -876,7 +1192,7 @@ static INPUT_PORTS_START( ddz )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( btlfront )
-	PORT_INCLUDE( ddz )
+	PORT_INCLUDE( tjf )
 
 	PORT_MODIFY("P1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
@@ -885,18 +1201,41 @@ static INPUT_PORTS_START( btlfront )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( medal )
+	PORT_START("P1") // 0x01549500
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // ticket sensor
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) // also moves the cursor there
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )  // held: JAMMED MEDAL SELECTOR
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-void ddz_state::ddz(machine_config &config)
+	PORT_START("P2") // 0x01549700
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // also confirms in the bookkeeping
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SYS") // 0x01549600
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	DDZ_MATRIX
+
+	PORT_START("DSW") // read once at boot
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
+void tjf_state::tjf_common(machine_config &config)
 {
 	SE3208(config, m_maincpu, 14'318'180 * 3); // TODO : dynamic via PLL
-	m_maincpu->set_addrmap(AS_PROGRAM, &ddz_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tjf_state::main_map);
 	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	TJF_IO(config, m_io);
-	m_io->in_callback<0>().set(FUNC(ddz_state::player_r<0>));
-	m_io->in_callback<1>().set(FUNC(ddz_state::player_r<1>));
+	m_io->in_callback<0>().set(FUNC(tjf_state::player_r<0>));
+	m_io->in_callback<1>().set(FUNC(tjf_state::player_r<1>));
 	m_io->in_callback<2>().set_ioport("SYS");
 	m_io->dsw_callback().set_ioport("DSW");
 	m_io->hopper_callback().set(m_hopper, FUNC(hopper_device::motor_w));
@@ -917,20 +1256,41 @@ void ddz_state::ddz(machine_config &config)
 	m_vr0soc->add_route(1, "speaker", 1.0, 1);
 }
 
-void ddz_state::tjf(machine_config &config)
+void tjf_state::kxddz(machine_config &config)
 {
-	ddz(config);
+	TJF_IO(config, m_io);
 
-	// the TJF card games have the system inputs in the middle
-	m_io->in_callback<1>().set_ioport("SYS");
-	m_io->in_callback<2>().set(FUNC(ddz_state::player_r<1>));
+	tjf_common(config);
 }
 
-void ddz_state::btlfront(machine_config &config)
+void tjf_state::tjf(machine_config &config)
 {
-	ddz(config);
+	kxddz(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &ddz_state::btlfront_map);
+	m_io->in_callback<1>().set_ioport("SYS");
+	m_io->in_callback<2>().set(FUNC(tjf_state::player_r<1>));
+}
+
+void tjf_state::btlfront(machine_config &config)
+{
+	kxddz(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &tjf_state::btlfront_map);
+}
+
+void tjf_medal_state::medal(machine_config &config)
+{
+	MEDAL_IO(config, m_io);
+
+	tjf_common(config);
+
+	m_io->in_callback<1>().set_ioport("SYS");
+	m_io->in_callback<2>().set(FUNC(tjf_medal_state::player_r<1>));
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &tjf_medal_state::medal_map);
+
+	// the program takes the key from 0x80 of the I/O device memory, erased in the default contents
+	FS8806(config, m_fs8806).set_key(0xffffffff'ffffffffU);
 }
 
 
@@ -940,6 +1300,8 @@ void ddz_state::btlfront(machine_config &config)
       the 16 dwords the program checks. Zone 0 is left erased (the programs write their version word
       there), zone 1 too (the TJF card games compare its start with the block storage, also erased by
       default), the configuration zone (0xc0-0xff) is unknown.
+    - zones.bin: memory of the xbnz I/O device. Only the 16 dwords at 0x00 are known, as the constants
+      the program checks them against; the rest is left erased.
     - nvram.bin: crzclass and cjmx check 0x20071030 at 0x01501f80, outside the area the program clears
       on first boot; nothing in the program writes it (only an unreferenced routine does, with garbage).
 */
@@ -949,12 +1311,12 @@ ROM_START( kxddz )
 	ROM_REGION32_LE( 0x1000000, "ipl", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x1000000, "enc_data", ROMREGION_ERASEFF )
-	ROM_LOAD("ddz.001.rom",  0x000000, 0x400000, CRC(b379f823) SHA1(531885b35d668d22c75a9759994f4aca6eacb046) )
-	ROM_LOAD("ddz.002.rom",  0x400000, 0x400000, CRC(285c744d) SHA1(2f8bc70825e55e3114015cb263e786df35cde275) )
-	ROM_LOAD("ddz.003.rom",  0x800000, 0x400000, CRC(61c9b5c9) SHA1(0438417398403456a1c49408881797a94aa86f49) )
+	ROM_LOAD( "ddz.001.rom",  0x000000, 0x400000, CRC(b379f823) SHA1(531885b35d668d22c75a9759994f4aca6eacb046) )
+	ROM_LOAD( "ddz.002.rom",  0x400000, 0x400000, CRC(285c744d) SHA1(2f8bc70825e55e3114015cb263e786df35cde275) )
+	ROM_LOAD( "ddz.003.rom",  0x800000, 0x400000, CRC(61c9b5c9) SHA1(0438417398403456a1c49408881797a94aa86f49) )
 
 	ROM_REGION( 0x100, "cryptomem", 0 )
-	ROM_LOAD("at88sc153.bin", 0x000, 0x100, BAD_DUMP CRC(b8482d63) SHA1(0c43c82b556c01ef4852eb26141913fe28c52cf6) ) // AI-generated
+	ROM_LOAD( "at88sc153.bin", 0x000, 0x100, BAD_DUMP CRC(b8482d63) SHA1(0c43c82b556c01ef4852eb26141913fe28c52cf6) ) // AI-generated
 ROM_END
 
 /* "Chaoji Fengdou" PCB
@@ -990,16 +1352,16 @@ ROM_START( crzclass )
 	ROM_REGION32_LE( 0x1000000, "ipl", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x1000000, "enc_data", ROMREGION_ERASEFF )
-	ROM_LOAD("tjf-mahjong-rom1.bin",  0x000000, 0x400000, CRC(0a8af816) SHA1(9f292e847873078ed2b7584f463633cf9086c7e8) ) // SHARP LH28F320BJD-TTL80
-	ROM_LOAD("tjf-mahjong-rom2.bin",  0x400000, 0x400000, CRC(2a04e84a) SHA1(189b16fd4314fd2a5f8a1214618b5db83f8ac59a) ) // SHARP LH28F320BJD-TTL80
-	ROM_LOAD("tjf-mahjong-rom3.bin",  0x800000, 0x400000, CRC(1cacf3f9) SHA1(e6c88c98aeb7df4098f8e20f412018617005724d) ) // SHARP LH28F320BJD-TTL80
+	ROM_LOAD( "tjf-mahjong-rom1.bin",  0x000000, 0x400000, CRC(0a8af816) SHA1(9f292e847873078ed2b7584f463633cf9086c7e8) ) // SHARP LH28F320BJD-TTL80
+	ROM_LOAD( "tjf-mahjong-rom2.bin",  0x400000, 0x400000, CRC(2a04e84a) SHA1(189b16fd4314fd2a5f8a1214618b5db83f8ac59a) ) // SHARP LH28F320BJD-TTL80
+	ROM_LOAD( "tjf-mahjong-rom3.bin",  0x800000, 0x400000, CRC(1cacf3f9) SHA1(e6c88c98aeb7df4098f8e20f412018617005724d) ) // SHARP LH28F320BJD-TTL80
 	// rom4 not populated
 
 	ROM_REGION( 0x100, "cryptomem", 0 )
-	ROM_LOAD("at88sc153.bin", 0x000, 0x100, BAD_DUMP CRC(e062b61b) SHA1(fa77147fb8a4b48d253de815afec397082b53ff0) ) // AI-generated
+	ROM_LOAD( "at88sc153.bin", 0x000, 0x100, BAD_DUMP CRC(e062b61b) SHA1(fa77147fb8a4b48d253de815afec397082b53ff0) ) // AI-generated
 
 	ROM_REGION( 0x2000, "nvram", 0 )
-	ROM_LOAD("nvram.bin", 0x0000, 0x2000, BAD_DUMP CRC(e36b21e0) SHA1(9a2d4cefc9c0dbc829b72893a002fd73a7ea2a06) ) // AI-generated
+	ROM_LOAD( "nvram.bin", 0x0000, 0x2000, BAD_DUMP CRC(e36b21e0) SHA1(9a2d4cefc9c0dbc829b72893a002fd73a7ea2a06) ) // AI-generated
 ROM_END
 
 // 百变双扣 (Bǎibiàn Shuāngkòu) (Ever-Changing Shuangkou) - same PCB as crzclass
@@ -1007,13 +1369,13 @@ ROM_START( baibians )
 	ROM_REGION32_LE( 0x1000000, "ipl", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x1000000, "enc_data", ROMREGION_ERASEFF )
-	ROM_LOAD("rom1", 0x000000, 0x400000, CRC(b9a61efe) SHA1(e0114c231bf301779033b357bc65b133f2ab00be) ) // SHARP LH28F320BJD-TTL80
-	ROM_LOAD("rom2", 0x400000, 0x400000, CRC(8b17c3a8) SHA1(b7c65fe9c262ec819ecb0d92e885c6b67d1ee938) ) // SHARP LH28F320BJD-TTL80
-	ROM_LOAD("rom3", 0x800000, 0x400000, CRC(41b9b943) SHA1(3379ddf851818209cfede641e7bcc4be8b982034) ) // SHARP LH28F320BJD-TTL80
+	ROM_LOAD( "rom1", 0x000000, 0x400000, CRC(b9a61efe) SHA1(e0114c231bf301779033b357bc65b133f2ab00be) ) // SHARP LH28F320BJD-TTL80
+	ROM_LOAD( "rom2", 0x400000, 0x400000, CRC(8b17c3a8) SHA1(b7c65fe9c262ec819ecb0d92e885c6b67d1ee938) ) // SHARP LH28F320BJD-TTL80
+	ROM_LOAD( "rom3", 0x800000, 0x400000, CRC(41b9b943) SHA1(3379ddf851818209cfede641e7bcc4be8b982034) ) // SHARP LH28F320BJD-TTL80
 	// rom4 not populated
 
 	ROM_REGION( 0x100, "cryptomem", 0 )
-	ROM_LOAD("at88sc153.bin", 0x000, 0x100, BAD_DUMP CRC(456e82cf) SHA1(f16b213bb45894cfabab570e9c69fd42281f2551) ) // AI-generated
+	ROM_LOAD( "at88sc153.bin", 0x000, 0x100, BAD_DUMP CRC(456e82cf) SHA1(f16b213bb45894cfabab570e9c69fd42281f2551) ) // AI-generated
 ROM_END
 
 // 超级明星 · 两副牌斗地主 (Chāojí Míngxīng · Liǎng Fù Pái Dòu Dìzhǔ) (Super Star · Two-Deck Dou Dizhu)
@@ -1022,16 +1384,16 @@ ROM_START( cjmx )
 	ROM_REGION32_LE( 0x1000000, "ipl", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x1000000, "enc_data", ROMREGION_ERASEFF )
-	ROM_LOAD("rom1", 0x000000, 0x400000, CRC(518ff760) SHA1(68e3fc3269060e0abd8473abfc141f038d63e4e4) ) // SHARP LH28F320BJD-TTL80
-	ROM_LOAD("rom2", 0x400000, 0x400000, CRC(9caa6b70) SHA1(9914793ac772b9ae113f820c181a653ab8a9634d) ) // SHARP LH28F320BJD-TTL80
-	ROM_LOAD("rom3", 0x800000, 0x400000, CRC(738db095) SHA1(073c92d8d22cbec5e6f5f5e4c25e532d2ab914d5) ) // SHARP LH28F320BJD-TTL80
+	ROM_LOAD( "rom1", 0x000000, 0x400000, CRC(518ff760) SHA1(68e3fc3269060e0abd8473abfc141f038d63e4e4) ) // SHARP LH28F320BJD-TTL80
+	ROM_LOAD( "rom2", 0x400000, 0x400000, CRC(9caa6b70) SHA1(9914793ac772b9ae113f820c181a653ab8a9634d) ) // SHARP LH28F320BJD-TTL80
+	ROM_LOAD( "rom3", 0x800000, 0x400000, CRC(738db095) SHA1(073c92d8d22cbec5e6f5f5e4c25e532d2ab914d5) ) // SHARP LH28F320BJD-TTL80
 	// rom4 not populated
 
 	ROM_REGION( 0x100, "cryptomem", 0 )
-	ROM_LOAD("at88sc153.bin", 0x000, 0x100, BAD_DUMP CRC(3ad5e485) SHA1(c8b63cd6b2d843b7274ffbd0281edaec7f158c01) ) // AI-generated
+	ROM_LOAD( "at88sc153.bin", 0x000, 0x100, BAD_DUMP CRC(3ad5e485) SHA1(c8b63cd6b2d843b7274ffbd0281edaec7f158c01) ) // AI-generated
 
 	ROM_REGION( 0x2000, "nvram", 0 )
-	ROM_LOAD("nvram.bin", 0x0000, 0x2000, BAD_DUMP CRC(e36b21e0) SHA1(9a2d4cefc9c0dbc829b72893a002fd73a7ea2a06) ) // AI-generated
+	ROM_LOAD( "nvram.bin", 0x0000, 0x2000, BAD_DUMP CRC(e36b21e0) SHA1(9a2d4cefc9c0dbc829b72893a002fd73a7ea2a06) ) // AI-generated
 ROM_END
 
 ROM_START( btlfront )
@@ -1040,25 +1402,51 @@ ROM_START( btlfront )
 	ROM_REGION32_LE( 0x2000000, "assets", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x2200000, "enc_data", ROMREGION_ERASEFF )
-	ROM_LOAD("mxg023338.rom5", 0x0000000, 0x200000, CRC(9d27c8dd) SHA1(9ff30bde6cc8711167876e78319e6ba6a2c12390) ) // 29L1611GPC-10, there are remains of a sticker
-	ROM_LOAD("mxs0331.rom1",   0x0200000, 0x800000, CRC(3bc2a4e8) SHA1(7f8639f721ca4cd55850507fa10e98778da0e2aa) ) // 26L6420MC-10, no sticker
-	ROM_LOAD("mxs0304.rom2",   0x0a00000, 0x800000, CRC(84aa8ad7) SHA1(213e405cce2d204406923df14bc5ebb37b480e3f) ) // 26L6420MC-90, "
-	ROM_LOAD("mxs0239.rom3",   0x1200000, 0x800000, CRC(bfeccc8e) SHA1(7d3faad159a655140210abd98c658ad2f16cbcfc) ) // 26L6420MC-90, "
-	ROM_LOAD("mxs0524.rom4",   0x1a00000, 0x800000, CRC(eec8adb5) SHA1(ea7d2456419f4ae53a0e1bc0c1247390e802416f) ) // 26L6420MC-90, "
+	ROM_LOAD( "mxg023338.rom5", 0x0000000, 0x200000, CRC(9d27c8dd) SHA1(9ff30bde6cc8711167876e78319e6ba6a2c12390) ) // 29L1611GPC-10, there are remains of a sticker
+	ROM_LOAD( "mxs0331.rom1",   0x0200000, 0x800000, CRC(3bc2a4e8) SHA1(7f8639f721ca4cd55850507fa10e98778da0e2aa) ) // 26L6420MC-10, no sticker
+	ROM_LOAD( "mxs0304.rom2",   0x0a00000, 0x800000, CRC(84aa8ad7) SHA1(213e405cce2d204406923df14bc5ebb37b480e3f) ) // 26L6420MC-90, "
+	ROM_LOAD( "mxs0239.rom3",   0x1200000, 0x800000, CRC(bfeccc8e) SHA1(7d3faad159a655140210abd98c658ad2f16cbcfc) ) // 26L6420MC-90, "
+	ROM_LOAD( "mxs0524.rom4",   0x1a00000, 0x800000, CRC(eec8adb5) SHA1(ea7d2456419f4ae53a0e1bc0c1247390e802416f) ) // 26L6420MC-90, "
 
 	ROM_REGION( 0x100, "cryptomem", 0 )
-	ROM_LOAD("at88sc153.bin", 0x000, 0x100, BAD_DUMP CRC(456e82cf) SHA1(f16b213bb45894cfabab570e9c69fd42281f2551) ) // AI-generated
+	ROM_LOAD( "at88sc153.bin", 0x000, 0x100, BAD_DUMP CRC(456e82cf) SHA1(f16b213bb45894cfabab570e9c69fd42281f2551) ) // AI-generated
 ROM_END
 
 
-void ddz_state::descramble_flash(u8 *dst, u8 const *src, u32 len, u16 addrxor)
+// 西部牛仔 (Xībù Niúzǎi) (Western Cowboy) - 虹猫蓝兔 (Hóngmāo Lántù) stickers, the bookkeeping shows 80822
+ROM_START( xbnz )
+	ROM_REGION32_LE( 0x1000000, "ipl", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x1000000, "enc_data", ROMREGION_ERASEFF )
+	ROM_LOAD( "rom1.bin", 0x000000, 0x400000, CRC(5ceaeef7) SHA1(ff79fc0aebfbaeab56e79a29802ff007f5f2b45f) )
+	ROM_LOAD( "rom2.bin", 0x400000, 0x400000, CRC(87b86f53) SHA1(141097ee53ebbaa36993dbb841de5a1a5c458798) )
+	ROM_LOAD( "rom3.bin", 0x800000, 0x400000, CRC(61a5163b) SHA1(d8c9918142b746c86e9d3cb24179ccabb66d733a) )
+	// rom4 not populated
+
+	ROM_REGION( 0x100, "io", 0 )
+	ROM_LOAD( "zones.bin", 0x000, 0x100, BAD_DUMP CRC(c46bac53) SHA1(35bfd1468b6b405551830987867a74274adccdd8) ) // AI-generated
+ROM_END
+
+// 活捉泥鳅 (Huózhuō Níqiū) (Catch the Loach) - 虹猫蓝兔 (Hóngmāo Lántù) stickers, the bookkeeping shows 80821
+ROM_START( hzniqiu )
+	ROM_REGION32_LE( 0x1000000, "ipl", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x1000000, "enc_data", ROMREGION_ERASEFF )
+	ROM_LOAD( "rom1.bin", 0x000000, 0x400000, CRC(8c92fbb7) SHA1(c259c1597beaf48bf7368b0c0e4d048d56527db7) )
+	ROM_LOAD( "rom2.bin", 0x400000, 0x400000, CRC(e5685297) SHA1(c3081abe4645ee502bef0325cd895297e439bf41) )
+	ROM_LOAD( "rom3.bin", 0x800000, 0x400000, CRC(33eea853) SHA1(d0d3dd7870575e9099dda106cbc9e480b9f9aff9) )
+	// rom4 not populated
+ROM_END
+
+
+void tjf_state::descramble_flash(u8 *dst, u8 const *src, u32 len, u16 addrxor)
 {
 	// A10<->A13, A11<->A12, then per-game inversions; len must be a multiple of 0x10000
 	for (u32 i = 0; i < len; i++)
 		dst[i] = src[(i & ~0xffff) | (bitswap<16>(i, 15,14, 10,11,12,13, 9,8, 7,6,5,4,3,2,1,0) ^ addrxor)];
 }
 
-void ddz_state::unscramble_program(u8 *buf, u32 start, u32 end)
+void tjf_state::unscramble_program(u8 *buf, u32 start, u32 end)
 {
 	// blocks of 27 words: first 2 words in order, the following 25 reversed
 	for (u32 blk = start; (blk + 27 * 2) <= end; blk += 27 * 2)
@@ -1067,7 +1455,7 @@ void ddz_state::unscramble_program(u8 *buf, u32 start, u32 end)
 				std::swap(buf[blk + 4 + j * 2 + b], buf[blk + 4 + (24 - j) * 2 + b]);
 }
 
-void ddz_state::decrypt(u16 addrxor, u32 prog_start, u32 prog_end, u32 prog_base)
+void tjf_state::decrypt(u16 addrxor, u32 prog_start, u32 prog_end, u32 prog_base)
 {
 	u32 const len = m_encdata.bytes();
 	std::vector<u8> buf(len);
@@ -1084,27 +1472,27 @@ void ddz_state::decrypt(u16 addrxor, u32 prog_start, u32 prog_end, u32 prog_base
 	m_prog_base = prog_base;
 }
 
-void ddz_state::init_ddz()
+void tjf_state::init_kxddz()
 {
 	decrypt(0xc300, 0x406, 0x40000, 0x02640000);
 }
 
-void ddz_state::init_crzclass()
+void tjf_state::init_crzclass()
 {
 	decrypt(0xc700, 0x446, 0x80000, 0x02080000);
 }
 
-void ddz_state::init_baibians()
+void tjf_state::init_baibians()
 {
 	decrypt(0x4b00, 0x446, 0x80000, 0x02080000);
 }
 
-void ddz_state::init_cjmx()
+void tjf_state::init_cjmx()
 {
 	decrypt(0xcf00, 0x446, 0x80000, 0x02080000);
 }
 
-void ddz_state::init_btlfront()
+void tjf_state::init_btlfront()
 {
 	// rom5: boot stub and program
 	std::vector<u8> buf(0x200000);
@@ -1132,11 +1520,33 @@ void ddz_state::init_btlfront()
 	m_prog_base = 0x02710000;
 }
 
+void tjf_medal_state::descramble(u16 addrxor)
+{
+	// A8-A15 reversed, then per-game inversions; the boot stub copies and unscrambles the program by itself
+	u32 const len = m_encdata.bytes();
+	u8 *const ipl = memregion("ipl")->base();
+	for (u32 i = 0; i < len; i++)
+		ipl[BYTE4_XOR_LE(i)] = m_encdata[(i & ~0xffff) | (bitswap<16>(i, 8,9,10,11,12,13,14,15, 7,6,5,4,3,2,1,0) ^ addrxor)];
+}
+
+void tjf_medal_state::init_xbnz()
+{
+	descramble(0xf000);
+}
+
+void tjf_medal_state::init_hzniqiu()
+{
+	descramble(0xfc00);
+}
+
 } // anonymous namespace
 
 
-GAME( 200?, kxddz,    0, ddz,      ddz,      ddz_state, init_ddz,      ROT0, "TJF",  "Kaixin Dou Dizhu",    MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, crzclass, 0, tjf,      ddz,      ddz_state, init_crzclass, ROT0, "TJF",  "Chaoji Fengdou",      MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
-GAME( 200?, baibians, 0, tjf,      ddz,      ddz_state, init_baibians, ROT0, "TJF",  "Baibian Shuangkou",   MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
-GAME( 200?, cjmx,     0, tjf,      ddz,      ddz_state, init_cjmx,     ROT0, "TJF",  "Chaoji Mingxing",     MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
-GAME( 2005, btlfront, 0, btlfront, btlfront, ddz_state, init_btlfront, ROT0, "TJF",  "BattleFront (V133F)", MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+GAME( 200?, kxddz,    0, kxddz,    tjf,      tjf_state,       init_kxddz,    ROT0, "TJF", "Kaixin Dou Dizhu",    MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, crzclass, 0, tjf,      tjf,      tjf_state,       init_crzclass, ROT0, "TJF", "Chaoji Fengdou",      MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+GAME( 200?, baibians, 0, tjf,      tjf,      tjf_state,       init_baibians, ROT0, "TJF", "Baibian Shuangkou",   MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+GAME( 200?, cjmx,     0, tjf,      tjf,      tjf_state,       init_cjmx,     ROT0, "TJF", "Chaoji Mingxing",     MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+GAME( 2005, btlfront, 0, btlfront, btlfront, tjf_state,       init_btlfront, ROT0, "TJF", "BattleFront (V133F)", MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+
+GAME( 200?, xbnz,     0, medal,    medal,    tjf_medal_state, init_xbnz,     ROT0, "TJF", "Xibu Niuzai",         MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+GAME( 200?, hzniqiu,  0, medal,    medal,    tjf_medal_state, init_hzniqiu,  ROT0, "TJF", "Huozhuo Niqiu",       MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
