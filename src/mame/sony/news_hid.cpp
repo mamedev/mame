@@ -410,7 +410,7 @@ void news_hid_serial_mouse_device::update_input()
 	}
 }
 
-INPUT_PORTS_START(news_keyboard)
+static INPUT_PORTS_START(news_keyboard)
 	PORT_START("ROW0")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1")           PORT_CODE(KEYCODE_F1)         PORT_CHAR(UCHAR_MAMEKEY(F1))
@@ -556,7 +556,7 @@ INPUT_PORTS_START(news_keyboard)
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-INPUT_PORTS_START(news_hid_hle_device)
+static INPUT_PORTS_START(news_hid_hle_device)
 	PORT_INCLUDE(news_keyboard)
 
 	PORT_START("mouse_x_axis")
@@ -572,11 +572,11 @@ INPUT_PORTS_START(news_hid_hle_device)
 	PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-INPUT_PORTS_START(news_hid_serial_keyboard_device)
+static INPUT_PORTS_START(news_hid_serial_keyboard_device)
 	PORT_INCLUDE(news_keyboard)
 INPUT_PORTS_END
 
-INPUT_PORTS_START(news_hid_serial_mouse_device)
+static INPUT_PORTS_START(news_hid_serial_mouse_device)
 	PORT_START("mouse_x_axis")
 	PORT_BIT(0xffff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(news_hid_serial_mouse_device::input_changed), 0)
 

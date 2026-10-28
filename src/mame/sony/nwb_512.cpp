@@ -57,37 +57,37 @@ namespace
 		"~S", "~(S | D)", "~S & D", "0", "~(S & D)", "~D", "S ^ D", "S & ~D", "~S | D", "~(S ^ D)", "D", "S & D", "1", "S | ~D", "S | D", "S"};
 
 	// Takes in an x,y coordinate and returns the word offset into the framebuffer memory region
-	uint32_t coordinate_to_word_offset(uint16_t x, uint16_t y)
+	constexpr uint32_t coordinate_to_word_offset(uint16_t x, uint16_t y)
 	{
 		return (y % Y_MAX) * (X_MAX / 16) + ((x % X_MAX) >> 4);
 	}
 
 	// Gets the pixel offset of a given x coordinate
-	uint16_t x_to_pixel_offset(uint16_t x)
+	constexpr uint16_t x_to_pixel_offset(uint16_t x)
 	{
 		return  ~x & 15; // pixel 0 = bit 15
 	}
 
 	// Extracts the X address from the data provided to an FB write
-	uint16_t x_address(uint16_t data)
+	constexpr uint16_t x_address(uint16_t data)
 	{
 		return data & 0xfff; // When X is supplied, it is in D11-D0
 	}
 
 	// Extracts the Y address from the address provided to an FB write
-	uint16_t y_address(uint16_t data) // word offset
+	constexpr uint16_t y_address(uint16_t data) // word offset
 	{
 		return data & 0xfff; // When Y is supplied, it is in A12-A1
 	}
 
 	// True if address written specifies that the write should also load the shift
-	bool shift_load_requested(offs_t offset) // word offset
+	constexpr bool shift_load_requested(offs_t offset) // word offset
 	{
 		return offset & (0x2000 >> 1);
 	}
 
 	// True if address written specifies operation start
-	bool execution_requested(offs_t offset) // word offset
+	constexpr bool execution_requested(offs_t offset) // word offset
 	{
 		return offset & (0x4000 >> 1);
 	}
@@ -254,7 +254,7 @@ void nwb_512_device::limit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	// This behavior is an educated guess based on what iopboot, mrx, the NWS-800 monitor, and NWS-3800 monitor expect.
 	const bool write_op_start = execution_requested(offset);
 	m_state.fb_write = write_op_start;                                 // A14 = start write op
-	m_state.fb_read = write_op_start ? offset & (0x10000 >> 1) : true; // A14 clear = read only, otherwise read source type from A16 if writing
+	m_state.fb_read = !write_op_start || (offset & (0x10000 >> 1)); // A14 clear = read only, otherwise read source type from A16 if writing
 
 	m_state.limit_x = x_address(data);
 	m_state.limit_y = y_address(offset);
@@ -324,7 +324,7 @@ void nwb_512_device::pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	// Set desired pixel
 	uint16_t pixel = m_vram[word_offset];
-	pixel = (pixel & ~(1u << x_bit)) | ((new_state ? 1u : 0u) << x_bit);
+	pixel = (pixel & ~(1U << x_bit)) | ((new_state ? 1U : 0U) << x_bit);
 	m_vram[word_offset] = pixel;
 }
 
@@ -696,8 +696,8 @@ void nwb_512_device::start_operation()
 	m_state.current_source_x = m_state.source_x;
 
 	// Compute the phase of the source and destination (used to determine how the shifter is loaded)
-	const uint16_t src_phase = m_state.x_direction ? m_state.source_x & 15 : 15 - (m_state.source_x & 15);
-	const uint16_t dest_phase = m_state.x_direction ? m_state.destination_x & 15 : 15 - (m_state.destination_x & 15);
+	const uint16_t src_phase = (m_state.x_direction ? m_state.source_x : ~m_state.source_x) & 15;
+	const uint16_t dest_phase = (m_state.x_direction ? m_state.destination_x : ~m_state.destination_x) & 15;
 	const bool read = !m_state.fb_write;
 
 	// fwd: [dest, limit), rev: [limit, dest), but read is inclusive rather than exclusive and only works in the forward direction.
@@ -739,7 +739,7 @@ void nwb_512_device::start_operation()
 		logerror("%s start_operation: unexpected empty operation detected, skipping\n", machine().describe_context());
 		end_operation();
 	}
-	else if ((m_state.x_direction && m_state.destination_x > m_state.limit_x) || (!m_state.x_direction && m_state.limit_x > m_state.destination_x))
+	else if (m_state.x_direction ? (m_state.destination_x > m_state.limit_x) : (m_state.limit_x > m_state.destination_x))
 	{
 		logerror("%s start_operation: invalid destination/limit configuration, skipping\n", machine().describe_context());
 		end_operation();

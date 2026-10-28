@@ -38,34 +38,27 @@
 
 #include "emu.h"
 
-#include "cpu/mips/mips1.h"
-#include "cpu/m68000/m68030.h"
-
-// memory
-#include "machine/ram.h"
-
-// various hardware
-#include "machine/msm6242.h"
-#include "machine/z80scc.h"
-#include "machine/am79c90.h"
-#include "machine/upd765.h"
 #include "dmac_0266.h"
 #include "news_hid.h"
 #include "nwb_512.h"
-#include "machine/ncr5380.h"
 
-// video
-#include "screen.h"
-
-// busses and connectors
-#include "machine/nscsi_bus.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
 #include "bus/nscsi/tape.h"
 #include "bus/rs232/rs232.h"
-
+#include "cpu/m68000/m68030.h"
+#include "cpu/mips/mips1.h"
 #include "imagedev/floppy.h"
+#include "machine/am79c90.h"
+#include "machine/msm6242.h"
+#include "machine/ncr5380.h"
+#include "machine/nscsi_bus.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
+#include "machine/z80scc.h"
+
+#include "screen.h"
 
 #define LOG_INTERRUPT (1U << 1)
 #define LOG_TIMER (1U << 2)
