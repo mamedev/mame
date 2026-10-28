@@ -453,6 +453,11 @@ u8 midway_serial_pic2_device::read()
 	else if (m_index < m_total)
 		result = 0xff;
 
+	// or if a command is waiting for its next nibble; the real PIC puts 0xff on
+	// its data port while it waits, and mk4 checks for it before each clock nibble
+	else if (m_state != 0)
+		result = 0xff;
+
 	if (!machine().side_effects_disabled())
 		LOGPIC("%02X\n", result);
 	return result;
