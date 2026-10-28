@@ -285,25 +285,13 @@ Rev. 3
 Mark Gordon
 */
 
-/*
-
-    TODO:
-
-    - spinner INT
-    - printer
-    - SPI
-
-    http://drushel.cwru.edu/atm/atm.html
-    http://rich.dirocco.org/Coleco/adam/ADAM.htm
-    http://users.stargate.net/~drushel/pub/coleco/twwmca/index.html
-
-*/
-
 #include "emu.h"
 #include "adam.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include <algorithm>
 
 
 //**************************************************************************
@@ -552,9 +540,9 @@ uint8_t adam_state::iorq_r(offs_t offset)
 
 	case 7:
 		if (BIT(offset, 1))
-			data = m_joy2->read();
+			data = (m_joy2->read() & 0x7f) | (m_spinner_q[1] << 7);
 		else
-			data = m_joy1->read();
+			data = (m_joy1->read() & 0x7f) | (m_spinner_q[0] << 7);
 		break;
 	}
 
@@ -947,14 +935,36 @@ void adam_state::os3_w(int state)
 }
 
 
-void adam_state::joy1_irq_w(int state)
+template <unsigned N>
+void adam_state::spinner_w(int state)
 {
-	// TODO
+	if (state && !m_spinner_a[N] && !m_spinner_q[N])
+	{
+		m_spinner_q[N] = 1;
+		m_spinner_timer[N]->adjust(attotime::from_usec(470));
+
+		m_irqs->in_w<N + 2>(1);
+		m_spinner_int_timer[N]->adjust(attotime::from_usec(15));
+	}
+	else if (!state && !m_spinner_timer[N]->enabled())
+	{
+		m_spinner_q[N] = 0;
+	}
+
+	m_spinner_a[N] = state;
 }
 
-void adam_state::joy2_irq_w(int state)
+template <unsigned N>
+TIMER_CALLBACK_MEMBER(adam_state::spinner_one_shot)
 {
-	// TODO
+	if (!m_spinner_a[N])
+		m_spinner_q[N] = 0;
+}
+
+template <unsigned N>
+TIMER_CALLBACK_MEMBER(adam_state::spinner_int_off)
+{
+	m_irqs->in_w<N + 2>(0);
 }
 
 
@@ -969,6 +979,14 @@ void adam_state::joy2_irq_w(int state)
 
 void adam_state::machine_start()
 {
+	m_spinner_timer[0] = timer_alloc(FUNC(adam_state::spinner_one_shot<0>), this);
+	m_spinner_timer[1] = timer_alloc(FUNC(adam_state::spinner_one_shot<1>), this);
+	m_spinner_int_timer[0] = timer_alloc(FUNC(adam_state::spinner_int_off<0>), this);
+	m_spinner_int_timer[1] = timer_alloc(FUNC(adam_state::spinner_int_off<1>), this);
+
+	std::fill(std::begin(m_spinner_a), std::end(m_spinner_a), 0);
+	std::fill(std::begin(m_spinner_q), std::end(m_spinner_q), 0);
+
 	// state saving
 	save_item(NAME(m_mioc));
 	save_item(NAME(m_game));
@@ -979,6 +997,8 @@ void adam_state::machine_start()
 	save_item(NAME(m_data_in));
 	save_item(NAME(m_data_out));
 	save_item(NAME(m_spindis));
+	save_item(NAME(m_spinner_a));
+	save_item(NAME(m_spinner_q));
 }
 
 
@@ -1052,8 +1072,7 @@ void adam_state::adam(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SN76489A(config, m_psg, XTAL(7'159'090)/2);
 	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
-	// TODO: enable when Z80 has better WAIT pin emulation
-	//m_psg->ready_cb().set_inputline(m_maincpu, Z80_INPUT_LINE_WAIT).invert();
+	m_psg->ready_cb().set_inputline(m_maincpu, Z80_INPUT_LINE_WAIT).invert();
 
 	// devices
 	ADAMNET(config, m_adamnet);
@@ -1078,17 +1097,19 @@ void adam_state::adam(machine_config &config)
 	ADAMNET_SLOT(config, "net14", m_adamnet, adamnet_devices, nullptr);
 	ADAMNET_SLOT(config, "net15", m_adamnet, adamnet_devices, nullptr);
 
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
 	COLECOVISION_CARTRIDGE_SLOT(config, m_cart, colecovision_cartridges, nullptr);
 	ADAM_EXPANSION_SLOT(config, m_slot[0], XTAL(7'159'090)/2, adam_slot1_devices, "adamlink"); // left
-	m_slot[0]->irq().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_slot[0]->irq().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 	ADAM_EXPANSION_SLOT(config, m_slot[1], XTAL(7'159'090)/2, adam_slot2_devices, nullptr); // center
-	m_slot[1]->irq().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_slot[1]->irq().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	ADAM_EXPANSION_SLOT(config, m_slot[2], XTAL(7'159'090)/2, adam_slot3_devices, "ram"); // right
 
 	COLECOVISION_CONTROL_PORT(config, m_joy1, colecovision_control_port_devices, "hand");
-	m_joy1->irq().set(FUNC(adam_state::joy1_irq_w));
+	m_joy1->irq().set(FUNC(adam_state::spinner_w<0>));
 	COLECOVISION_CONTROL_PORT(config, m_joy2, colecovision_control_port_devices, nullptr);
-	m_joy2->irq().set(FUNC(adam_state::joy2_irq_w));
+	m_joy2->irq().set(FUNC(adam_state::spinner_w<1>));
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("64K");
