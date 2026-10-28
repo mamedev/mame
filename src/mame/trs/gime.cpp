@@ -107,8 +107,11 @@
 #define GIME_TYPE_1987          0
 #define NO_ATTRIBUTE            0x80
 
-// Active-video offset in VDG clocks from HS, estimated from the CSS hardware test.
-static constexpr int GIME_ACTIVE_VIDEO_CLOCK = 33;
+// Active-video offsets from HS rise, in VDG clocks.  Keep the legacy
+// CSS-test alignment; native video starts about 247 pixel clocks after
+// HS falls (64 pixel clocks before our HS-rise scanline boundary).
+static constexpr int GIME_LEGACY_ACTIVE_VIDEO_CLOCK = 33;
+static constexpr int GIME_NATIVE_ACTIVE_VIDEO_CLOCK = 46;
 
 #define LOG_INT_MASKING (1U <<  1)
 #define LOG_GIME        (1U <<  2)
@@ -859,6 +862,8 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 
 	// make the change, and track the difference
 	uint8_t xorval = m_gime_registers[offset] ^ data;
+	if (offset == 0x0a && (xorval & 0x3f) && !m_legacy_video)
+		video_flush();
 	if (((offset == 0x08 && (xorval & 0x80)) || (offset == 0x09 && (xorval & 0x1f))
 		|| (offset == 0x0f && xorval)) && !m_legacy_video)
 	{
@@ -1119,6 +1124,9 @@ inline void gime_device::write_palette_register(offs_t offset, uint8_t data)
 	/* has this entry changed? */
 	if (m_palette_rotated[m_palette_rotated_position][offset] != data)
 	{
+		// Capture elapsed pixels before changing the palette they use.
+		video_flush();
+
 		/* do we need to rotate the palette? */
 		if (m_palette_rotated_position_used)
 		{
@@ -1350,13 +1358,24 @@ TIMER_CALLBACK_MEMBER(gime_device::horizontal_sync_changed)
 
 void gime_device::enter_bottom_border()
 {
+	m_vertical_border_timer->adjust(field_sync_delay());
+}
+
+
+//-------------------------------------------------
+//  field_sync_delay
+//-------------------------------------------------
+
+attotime gime_device::field_sync_delay()
+{
+	// Field sync and VBORD share a horizontal timing point on GIME.
 	// VBORD occurs near the left border, after HS rises, rather than at
 	// the scanline boundary.  The 1986 GIME offset from HS falling is
 	// 161/225 pixel clocks in 40/32-column modes (two more at high resolution).
 	const bool wide = !m_legacy_video && (m_gime_registers[0x09] & 0x04);
 	const bool high_resolution = !m_legacy_video && (m_gime_registers[0x09] & 0x10);
 	const int pixel_clocks = (wide ? 161 : 225) + (high_resolution ? 2 : 0);
-	m_vertical_border_timer->adjust(clocks_to_attotime(pixel_clocks * 2 - 16 * 8));
+	return clocks_to_attotime(pixel_clocks * 2 - 16 * 8);
 }
 
 TIMER_CALLBACK_MEMBER(gime_device::vertical_border_interrupt)
@@ -1398,13 +1417,14 @@ void gime_device::update_border(uint16_t physical_scanline, int32_t start_clock,
 		/* get the border value from $FF9A */
 		border = m_gime_registers[0x0a] & 0x3f;
 	}
-	const int first_pixel = std::clamp((start_clock - GIME_ACTIVE_VIDEO_CLOCK) * 4 + 64, 0, 640);
-	const int last_pixel = std::clamp((end_clock - GIME_ACTIVE_VIDEO_CLOCK) * 4 + 64, 0, 640);
+	const int active_clock = m_legacy_video ? GIME_LEGACY_ACTIVE_VIDEO_CLOCK : GIME_NATIVE_ACTIVE_VIDEO_CLOCK;
+	const int first_pixel = std::clamp((start_clock - active_clock) * 4 + NARROW_BORDER, 0, SCREEN_WIDTH);
+	const int last_pixel = std::clamp((end_clock - active_clock) * 4 + NARROW_BORDER, 0, SCREEN_WIDTH);
 	for (int x = first_pixel; x < last_pixel; x++)
 	{
 		update_value(&m_scanlines[physical_scanline].m_border[x], border);
-		if (x >= 64 && x < 576)
-			update_value(&m_scanlines[physical_scanline].m_css[x - 64], uint8_t(m_ff22_value & MODE_CSS));
+		if (x >= NARROW_BORDER && x < NARROW_BORDER + 512)
+			update_value(&m_scanlines[physical_scanline].m_css[x - NARROW_BORDER], uint8_t(m_ff22_value & MODE_CSS));
 	}
 }
 
@@ -1505,8 +1525,8 @@ inline uint32_t gime_device::record_scanline_res(int scanline, int32_t start_clo
 	uint32_t offset = 0;
 
 	// Wide modes add sixteen VDG clocks at each side of the active area.
-	const bool wide = !m_legacy_video && (m_gime_registers[0x09] & 0x04);
-	const int active_clock = GIME_ACTIVE_VIDEO_CLOCK - (wide ? 16 : 0);
+	const bool wide = !m_legacy_video && (m_scanlines[scanline].m_ff99_value & 0x04);
+	const int active_clock = (m_legacy_video ? GIME_LEGACY_ACTIVE_VIDEO_CLOCK : GIME_NATIVE_ACTIVE_VIDEO_CLOCK) - (wide ? 16 : 0);
 	const int active_clocks = wide ? 160 : 128;
 	const int first_column = std::clamp((start_clock - active_clock) * xres / active_clocks, 0, int(xres));
 	const int last_column = std::clamp((end_clock - active_clock) * xres / active_clocks, 0, int(xres));
@@ -1606,9 +1626,14 @@ void gime_device::record_full_body_scanline(uint16_t physical_scanline, uint16_t
 
 void gime_device::record_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline, int32_t start_clock, int32_t end_clock)
 {
-	const bool wide = !m_legacy_video && (m_gime_registers[0x09] & 0x04);
-	const int active_clock = GIME_ACTIVE_VIDEO_CLOCK - (wide ? 16 : 0);
-	const int active_end_clock = GIME_ACTIVE_VIDEO_CLOCK + 128 + (wide ? 16 : 0);
+	// Native fetch and decode formats are stored per scanline.  Keep later
+	// partial captures in that same format rather than reinterpreting bytes
+	// already fetched before a trailing graphics/text or resolution change.
+	const uint8_t ff98 = m_horizontal_offset_latched ? m_scanlines[physical_scanline].m_ff98_value : m_gime_registers[0x08];
+	const uint8_t ff99 = m_horizontal_offset_latched ? m_scanlines[physical_scanline].m_ff99_value : m_gime_registers[0x09];
+	const bool wide = !m_legacy_video && (ff99 & 0x04);
+	const int active_clock = (m_legacy_video ? GIME_LEGACY_ACTIVE_VIDEO_CLOCK : GIME_NATIVE_ACTIVE_VIDEO_CLOCK) - (wide ? 16 : 0);
+	const int active_end_clock = active_clock + (wide ? 160 : 128);
 	// A blanking-only flush must not replace the completed line's mode,
 	// height or pitch with the settings intended for the following line.
 	if (end_clock <= active_clock || start_clock >= active_end_clock)
@@ -1618,7 +1643,8 @@ void gime_device::record_body_scanline(uint16_t physical_scanline, uint16_t logi
 	}
 
 	// Latch the horizontal offset at active-video start for all partial captures.
-	if (!m_horizontal_offset_latched)
+	const bool first_capture = !m_horizontal_offset_latched;
+	if (first_capture)
 	{
 		m_horizontal_offset = m_gime_registers[0x0f];
 		m_horizontal_offset_latched = true;
@@ -1688,14 +1714,14 @@ void gime_device::record_body_scanline(uint16_t physical_scanline, uint16_t logi
 	else
 	{
 		/* CoCo 3 video */
-		update_value(&m_scanlines[physical_scanline].m_ff98_value, m_gime_registers[0x08]);
-		update_value(&m_scanlines[physical_scanline].m_ff99_value, m_gime_registers[0x09]);
+		update_value(&m_scanlines[physical_scanline].m_ff98_value, ff98);
+		update_value(&m_scanlines[physical_scanline].m_ff99_value, ff99);
 
 		/* is this graphics or text? */
-		if (m_gime_registers[0x08] & 0x80)
+		if (ff98 & 0x80)
 		{
 			/* graphics */
-			switch(m_gime_registers[0x09] & 0x1c)
+			switch(ff99 & 0x1c)
 			{
 				case 0x00:  pitch = record_scanline_res< 16, &gime_device::get_data_without_attributes, false>(physical_scanline, start_clock, end_clock); break;
 				case 0x04:  pitch = record_scanline_res< 20, &gime_device::get_data_without_attributes, false>(physical_scanline, start_clock, end_clock); break;
@@ -1712,7 +1738,7 @@ void gime_device::record_body_scanline(uint16_t physical_scanline, uint16_t logi
 		else
 		{
 			/* text */
-			switch(m_gime_registers[0x09] & 0x15)
+			switch(ff99 & 0x15)
 			{
 				case 0x00:  pitch = record_scanline_res< 32, &gime_device::get_data_without_attributes, true>(physical_scanline, start_clock, end_clock);  break;
 				case 0x01:  pitch = record_scanline_res< 32, &gime_device::get_data_with_attributes,    true>(physical_scanline, start_clock, end_clock);  break;
@@ -1737,8 +1763,14 @@ void gime_device::record_body_scanline(uint16_t physical_scanline, uint16_t logi
 	/* sanity checks */
 	assert(pitch > 0);
 
-	m_scanline_pitch = pitch;
-	m_scanline_lines_per_row = get_lines_per_row();
+	// A trailing mode change must not replace the pitch or height of the
+	// row already fetched.  The next line must consume that row's advance
+	// even when its new mode has a greater height (Cloud Kingdoms).
+	if (first_capture || m_legacy_video)
+	{
+		m_scanline_pitch = pitch;
+		m_scanline_lines_per_row = get_lines_per_row();
+	}
 }
 
 
@@ -1981,13 +2013,13 @@ inline void gime_device::render_scanline(const scanline_record *scanline, pixel_
 	int left_border, right_border;
 	if (sample_count > 0)
 	{
-		left_border = wide ? 0 : 64;
-		right_border = wide ? 640 : 512;
+		left_border = wide ? WIDE_BORDER : NARROW_BORDER;
+		right_border = SCREEN_WIDTH - left_border;
 	}
 	else
 	{
-		left_border = 640;
-		right_border = 640;
+		left_border = SCREEN_WIDTH;
+		right_border = SCREEN_WIDTH;
 	}
 
 	/* left border */
@@ -2003,7 +2035,7 @@ inline void gime_device::render_scanline(const scanline_record *scanline, pixel_
 	}
 
 	/* offset the pixel counts depending on wide */
-	pixels += wide ? 0 : 64;
+	pixels += left_border;
 
 	const bool artifacting = m_legacy_video && (sample_count > 0) && m_artifacter.get_ntsc_artifacting();
 	uint8_t artifact_modes[256]{};
@@ -2058,9 +2090,8 @@ inline void gime_device::render_scanline(const scanline_record *scanline, pixel_
 
 bool gime_device::update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect, const pixel_t *RESTRICT palette)
 {
-	int base_x = 64;
 	int min_x = USE_HORIZONTAL_CLIP ? cliprect.left() : 0;
-	int max_x = USE_HORIZONTAL_CLIP ? cliprect.right() : (base_x * 2 + 512 - 1);
+	int max_x = USE_HORIZONTAL_CLIP ? cliprect.right() : (SCREEN_WIDTH - 1);
 	int min_y = cliprect.top();
 	int max_y = cliprect.bottom();
 	palette_resolver resolver(*this, palette);

@@ -319,13 +319,23 @@ void mc6847_friend_device::update_field_sync_timer()
 	if (expected_field_sync != m_field_sync)
 	{
 		// if so, determine the duration
-		attotime duration = clocks_to_attotime(TIMER_FSYNC_TIME * m_divider);
+		attotime duration = field_sync_delay();
 
 		// and reset the timer
 		m_fsync_timer->adjust(duration, expected_field_sync ? 1 : 0);
 	}
 }
 
+
+
+//-------------------------------------------------
+//  field_sync_delay
+//-------------------------------------------------
+
+attotime mc6847_friend_device::field_sync_delay()
+{
+	return clocks_to_attotime(TIMER_FSYNC_TIME * m_divider);
+}
 
 
 //-------------------------------------------------

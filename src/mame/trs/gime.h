@@ -30,6 +30,10 @@ class gime_device : public mc6847_friend_device, public sam6883_friend_device_in
 public:
 	virtual std::vector<std::string> searchpath() const override;
 
+	static constexpr int SCREEN_WIDTH = 720;
+	static constexpr int NARROW_BORDER = (SCREEN_WIDTH - 512) / 2;
+	static constexpr int WIDE_BORDER = (SCREEN_WIDTH - 640) / 2;
+
 	auto irq_wr_callback() { return m_write_irq.bind(); }
 	auto firq_wr_callback() { return m_write_firq.bind(); }
 	auto floating_bus_rd_callback() { return m_read_floating_bus.bind(); }
@@ -80,6 +84,7 @@ protected:
 	virtual void new_frame() override;
 	virtual TIMER_CALLBACK_MEMBER(horizontal_sync_changed) override;
 	virtual void enter_bottom_border() override;
+	virtual attotime field_sync_delay() override;
 	virtual void record_border_scanline(uint16_t physical_scanline) override;
 	virtual void record_partial_border_scanline(uint16_t physical_scanline, int32_t start_clock, int32_t end_clock) override;
 	virtual void record_full_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline) override;
@@ -90,7 +95,7 @@ protected:
 
 	struct scanline_record
 	{
-		uint8_t m_border[640];
+		uint8_t m_border[SCREEN_WIDTH];
 		uint8_t m_css[512];
 		uint8_t m_line_in_row;
 		uint8_t m_ff22_value;

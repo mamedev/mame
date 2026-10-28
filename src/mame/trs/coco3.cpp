@@ -456,7 +456,7 @@ void coco3_state::coco3(machine_config &config)
 
 	// monitor
 	SCREEN(config, m_screen);
-	m_screen->set_raw(master_clock / 2, 912, 0, 640, 263, 1, 240);
+	m_screen->set_raw(master_clock / 2, 912, 0, gime_device::SCREEN_WIDTH, 263, 1, 240);
 	m_screen->set_screen_update(FUNC(coco3_state::screen_update));
 
 	// internal ram

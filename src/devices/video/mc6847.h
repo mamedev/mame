@@ -454,6 +454,7 @@ protected:
 	bool is_top_pal_padding_line(int scanline) const;
 	bool is_bottom_pal_padding_line(int scanline) const;
 	bool is_pal_padding_line(int scanline) const;
+	virtual attotime field_sync_delay();
 
 private:
 	enum scanline_zone
