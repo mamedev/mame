@@ -346,8 +346,9 @@ FLOPPY_CONSTRUCT( imd_dsk_construct )
 		sector_num = header[3];
 		int track = (header[1]<<1) + (header[2] & 1);
 		if ((header[2] & 1)==1) tag->heads = 2;
-		if (track >= 84*2)
+		if (track >= 84*2) {
 			break;
+		}
 		tag->track_offsets[track] = pos;
 		tag->track_sectors[track] = sector_num;
 		pos += 5 + sector_num; // skip header and sector numbering map
