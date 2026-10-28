@@ -8,7 +8,7 @@
         * Missile Command
 
     Known issues:
-        * bootleg sets don't work yet
+        * unemulated sound hardware on the missilebl and x80wc bootlegs
 
 ******************************************************************************************
 
@@ -375,6 +375,7 @@ public:
 		, m_videoram(*this, "videoram", 0x10000, ENDIANNESS_LITTLE)
 		, m_watchdog(*this, "watchdog")
 		, m_pokey(*this, "pokey")
+		, m_ay(*this, "ay8912")
 		, m_inputs(*this, { "IN0", "IN1", "R10", "R8" })
 		, m_track(*this, { "TRACK0_X", "TRACK0_Y", "TRACK1_X", "TRACK1_Y" })
 		, m_screen(*this, "screen")
@@ -418,6 +419,8 @@ private:
 
 	uint8_t trackball_r();
 	void output_w(uint8_t data);
+	void mcombat_ay_w(offs_t offset, uint8_t data);
+	void mcombat_output_w(uint8_t data);
 	void palette_w(offs_t offset, uint8_t data);
 
 	void trampoline_map(address_map &map) ATTR_COLD;
@@ -434,6 +437,7 @@ private:
 	memory_share_creator<uint8_t> m_videoram;
 	required_device<watchdog_timer_device> m_watchdog;
 	optional_device<pokey_device> m_pokey;
+	optional_device<ay8912_device> m_ay;
 	required_ioport_array<4> m_inputs;
 	required_ioport_array<4> m_track;
 	required_device<screen_device> m_screen;
@@ -777,6 +781,22 @@ void missile_state::output_w(uint8_t data)
 	m_flipscreen = ~data & 0x40;
 }
 
+
+// bootlegs have the AY-3-8912 registers mapped flat at $4000-$400f, with the
+// output latch on the AY I/O port A (the program writes it at $400e)
+
+void missile_state::mcombat_ay_w(offs_t offset, uint8_t data)
+{
+	m_ay->address_w(offset);
+	m_ay->data_w(data);
+}
+
+void missile_state::mcombat_output_w(uint8_t data)
+{
+	// bit 0 selects trackball (other bits: LEDs/coin counters, not verified)
+	m_ctrld = data & 1;
+}
+
 void missile_state::palette_w(offs_t offset, uint8_t data)
 {
 	// color RAM
@@ -846,7 +866,9 @@ void missile_state::missilea_map(address_map &map)
 void missile_state::mcombat_map(address_map &map)
 {
 	missilea_map(map);
+	map(0x4000, 0x400f).w(FUNC(missile_state::mcombat_ay_w));
 	map(0x4900, 0x4900).mirror(0x00ff).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x4a00, 0x4a00).mirror(0x00ff).w(FUNC(missile_state::irqack_w));
 	map(0x4c00, 0x4c00).mirror(0x00ff).unmapw();
 }
 
@@ -942,7 +964,22 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( missileb )
 	PORT_INCLUDE(missile)
 
+	// inputs are wired active high (the program reads IN0 xor 0xff and IN1 xor 0x67)
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN3 )
+
 	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_TOGGLE // switch inside the coin door
 INPUT_PORTS_END
 
@@ -1013,7 +1050,9 @@ void missile_state::missileb(machine_config &config)
 
 	m_mainmap->set_map(&missile_state::mcombat_map);
 
-	AY8912(config, "ay8912", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 0.75);
+	AY8912(config, m_ay, MASTER_CLOCK/8);
+	m_ay->port_a_write_callback().set(FUNC(missile_state::mcombat_output_w));
+	m_ay->add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 
@@ -1422,8 +1461,8 @@ GAME( 1981, missilebl,  missile, missilea, missile,  missile_state, empty_init, 
 // the following bootleg has different unknown sound hardware (sound chip had been removed from the PCB the dump comes from)
 GAME( 1981, x80wc,      missile, missilea, missile,  missile_state, empty_init,    ROT0, "bootleg (ManilaMatic)", "X80 - War Command (ManilaMatic bootleg of Missile Command)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
-// the following bootlegs are on different hardware and don't work
-GAME( 1980, mcombat,    missile, missileb, missileb, missile_state, empty_init,    ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 1)", MACHINE_NOT_WORKING )
-GAME( 1980, mcombata,   missile, missileb, missileb, missile_state, empty_init,    ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 2)", MACHINE_NOT_WORKING )
-GAME( 1980, mcombats,   missile, missileb, missileb, missile_state, empty_init,    ROT0, "bootleg (Sidam)", "Missile Combat (Sidam bootleg)", MACHINE_NOT_WORKING )
+// the following bootlegs are on different hardware
+GAME( 1980, mcombat,    missile, missileb, missileb, missile_state, empty_init,    ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mcombata,   missile, missileb, missileb, missile_state, empty_init,    ROT0, "bootleg (Videotron)", "Missile Combat (Videotron bootleg, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mcombats,   missile, missileb, missileb, missile_state, empty_init,    ROT0, "bootleg (Sidam)", "Missile Combat (Sidam bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2005, missilem,   missile, missile,  missile,  missile_state, init_missilem, ROT0, "hack (Braze Technologies)", "Missile Command Multigame", MACHINE_NOT_WORKING )
