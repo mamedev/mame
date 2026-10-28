@@ -1431,6 +1431,7 @@ bool renderer_bgfx::update_dimensions()
 		if (window().index() == 0)
 		{
 			bgfx::reset(m_dimensions.width(), m_dimensions.height(), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+			bgfx::setViewFrameBuffer(s_current_view, BGFX_INVALID_HANDLE);
 		}
 		else
 		{
