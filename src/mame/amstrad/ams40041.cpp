@@ -80,7 +80,7 @@ DEFINE_DEVICE_TYPE(AMS40041, ams40041_device, "ams40041", "AMS40041 VDU")
 ams40041_device::ams40041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6845_device(mconfig, AMS40041, tag, owner, clock)
 	, m_char_rom(*this, DEVICE_SELF)
-	, m_lk(*this, "^LK") // hack
+	, m_lk_cb(*this, 0x60)
 {
 	m_clk_scale = 32;
 
@@ -484,7 +484,7 @@ int ams40041_device::get_display_mode(uint8_t mode)
 
 offs_t ams40041_device::get_char_rom_offset()
 {
-	return ((m_lk->read() >> 5) & 0x03) << 11;
+	return ((m_lk_cb() >> 5) & 0x03) << 11;
 }
 
 MC6845_UPDATE_ROW( ams40041_device::draw_alpha )
