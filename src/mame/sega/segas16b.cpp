@@ -3511,6 +3511,30 @@ static INPUT_PORTS_START( wb3 )
 INPUT_PORTS_END
 
 
+void wfishing_state::machine_start()
+{
+	segas16b_state::machine_start();
+
+	save_item(NAME(m_handle_pos));
+	save_item(NAME(m_handle_pulse));
+	save_item(NAME(m_handle_dir));
+}
+
+// turning the reel handle pulses P1 bit 3; P1 bits 6 and 7 (returned as bits 3 and 4) are HANDLE RIGHT and
+// HANDLE LEFT in input test
+ioport_value wfishing_state::handle_r()
+{
+	uint8_t const pos = m_handle->read();
+	if ((pos != m_handle_pos) && !machine().side_effects_disabled())
+	{
+		m_handle_pulse ^= 1;
+		m_handle_dir = (int8_t(pos - m_handle_pos) > 0) ? 0x08 : 0x10;
+		m_handle_pos = pos;
+	}
+	return m_handle_pulse | m_handle_dir;
+}
+
+
 static INPUT_PORTS_START( wfishing ) // dips taken from test mode
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -3524,13 +3548,18 @@ static INPUT_PORTS_START( wfishing ) // dips taken from test mode
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x36, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xc8, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(wfishing_state::handle_r))
 
 	PORT_START("UNUSED")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) // TODO: 'rod upper' and 'rod lower' are read here. TODO: Where are 'handle left' and 'handle right'?
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED ) // ROD UPPER and ROD LOWER: position switches of the motor-driven rod (not emulated)
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("HANDLE")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_NAME("Reel Handle")
 
 	PORT_START("DSW1")
 	PORT_DIPNAME(    0x0f, 0x0f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
@@ -10299,7 +10328,7 @@ GAME( 1988, wb34,       wb3,      system16b_fd1094,      wb3,      segas16b_stat
 GAME( 1988, wb33,       wb3,      system16b_fd1094,      wb3,      segas16b_state, init_generic_5704,       ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 3, World, System 16B) (FD1094 317-0089)", 0 )
 GAME( 1988, wb32,       wb3,      system16b_fd1094,      wb3,      segas16b_state, init_generic_5358,       ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 2, Japan, System 16B) (FD1094 317-0085)", 0 )
 
-GAME( 1996, wfishing,   0,        system16b_5797,        wfishing, segas16b_state, init_generic_5797,       ROT0,   "Sega", "Wanpaku Fishing", MACHINE_NOT_WORKING ) // needs correct controls
+GAME( 1996, wfishing,   0,        system16b_5797,        wfishing, wfishing_state, init_generic_5797,       ROT0,   "Sega", "Wanpaku Fishing", 0 )
 
 GAME( 1989, wrestwar,   0,        system16b_i8751,       wrestwar, segas16b_state, init_generic_5704,       ROT270, "Sega", "Wrestle War (set 3, World) (8751 317-0103)", 0 )
 GAME( 1989, wrestwar2,  wrestwar, system16b_fd1094,      wrestwar, segas16b_state, init_generic_5704,       ROT270, "Sega", "Wrestle War (set 2, World) (FD1094 317-0102)", 0 )

@@ -1198,7 +1198,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="akira" supported="no">
+	<software name="akira">
 		<description>Akira (Japan)</description>
 		<year>1988</year>
 		<publisher>Taito</publisher>
@@ -2386,7 +2386,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="backtf23" supported="no">
+<!-- game still seems to flash more than reference material -->
+	<software name="backtf23" supported="partial">
 		<description>Back to the Future II &amp; III (USA)</description>
 		<year>1990</year>
 		<publisher>LJN</publisher>
@@ -4475,7 +4476,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="blackbas" supported="no">
+	<software name="blackbas">
 		<description>The Black Bass (USA)</description>
 		<year>1989</year>
 		<publisher>Hot-B Co.</publisher>
@@ -6057,8 +6058,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-<!-- Graphics corrupt on parts of attract mode film reel. Once those have been viewed, in-game graphics flicker (wild nametable flipping) when picking up weapon upgrades, going through doors, etc. -->
-	<software name="cvania3u" cloneof="cvania3" supported="partial">
+	<software name="cvania3u" cloneof="cvania3">
 		<description>Castlevania III - Dracula's Curse (USA)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
@@ -6083,8 +6083,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-<!-- Crashes if you watch the attract mode film roll reel -->
-	<software name="cvania3" supported="partial">
+	<software name="cvania3">
 		<description>Castlevania III - Dracula's Curse (Europe)</description>
 		<year>1992</year>
 		<publisher>Palcom</publisher>
@@ -10779,7 +10778,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ddiamond" supported="partial">
+	<software name="ddiamond">
 		<description>Dusty Diamond's All-Star Softball (USA)</description>
 		<year>1990</year>
 		<publisher>Brøderbund</publisher>
@@ -13165,7 +13164,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="firehres" supported="no">
+	<software name="firehres">
 		<description>Fisher-Price - Firehouse Rescue (USA)</description>
 		<year>1992</year>
 		<publisher>GameTek</publisher>
@@ -15827,7 +15826,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		</part>
 	</software>
 
-	<software name="gunsight" cloneof="laserinv" supported="partial">
+	<software name="gunsight" cloneof="laserinv">
 		<description>Gun Sight (Japan)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
@@ -16842,7 +16841,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 	</software>
 
 	<software name="okhotsk">
-		<description>Hokkaidou Rensa Satsujin - Okhotsk ni Shoyu (Japan)</description>
+		<description>Hokkaidou Rensa Satsujin: Okhotsk ni Kiyu (Japan)</description>
 		<year>1987</year>
 		<publisher>Login Soft</publisher>
 		<info name="serial" value="HSP-07"/>
@@ -17370,7 +17369,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		</part>
 	</software>
 
-	<software name="hudsonhu" cloneof="hudsonh" supported="no">
+	<software name="hudsonhu" cloneof="hudsonh">
 		<description>Hudson Hawk (USA)</description>
 		<year>1992</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -19202,7 +19201,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		</part>
 	</software>
 
-	<software name="jordanb" supported="no">
+	<software name="jordanb">
 		<description>Jordan vs. Bird - One on One (USA)</description>
 		<year>1989</year>
 		<publisher>Milton Bradley</publisher>
@@ -19574,7 +19573,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		</part>
 	</software>
 
-	<software name="kaetteki" supported="no">
+	<software name="kaetteki" supported="partial">
 		<description>Kaettekita! Gunjin Shougi - Nanya Sore!? (Japan)</description>
 		<year>1989</year>
 		<publisher>SOFEL</publisher>
@@ -21246,7 +21245,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		</part>
 	</software>
 
-	<software name="khkoshn" supported="no">
+	<software name="khkoshn">
 		<description>Kyuukyoku Harikiri Koushien (Japan)</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
@@ -21338,7 +21337,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		</part>
 	</software>
 
-	<software name="khstadh" supported="no">
+	<software name="khstadh">
 		<description>Kyuukyoku Harikiri Stadium - Heisei Gannen Ban (Japan)</description>
 		<year>1989</year>
 		<publisher>Taito</publisher>
@@ -21475,7 +21474,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		</part>
 	</software>
 
-	<software name="laserinv" supported="partial">
+	<software name="laserinv">
 		<description>Laser Invasion (USA)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
@@ -23671,7 +23670,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		</part>
 	</software>
 
-	<software name="marioyos" supported="partial">
+	<software name="marioyos">
 		<description>Mario &amp; Yoshi (Europe)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
@@ -23978,7 +23977,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		</part>
 	</software>
 
-	<software name="mechatak" supported="no">
+	<software name="mechatak">
 		<description>Mechanized Attack (USA)</description>
 		<year>1990</year>
 		<publisher>SNK</publisher>
@@ -24591,7 +24590,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		</part>
 	</software>
 
-	<software name="msladerg" supported="partial">
+	<software name="msladerg">
 		<description>Metal Slader Glory (Japan)</description>
 		<year>1991</year>
 		<publisher>HAL Kenkyuujo</publisher>
@@ -25686,7 +25685,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		</part>
 	</software>
 
-	<software name="moejudo" supported="no">
+	<software name="moejudo">
 		<description>Moero!! Juudou Warriors (Japan)</description>
 		<year>1990</year>
 		<publisher>Jaleco</publisher>
@@ -27267,8 +27266,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		</part>
 	</software>
 
-<!-- Unlike the other clones this plays the entire intro song to a black screen THEN plays the intro story scenes sans music -->
-	<software name="nryuken2" cloneof="shadwar2" supported="partial">
+	<software name="nryuken2" cloneof="shadwar2">
 		<description>Ninja Ryukenden II - Ankoku no Jashinken (Japan)</description>
 		<year>1990</year>
 		<publisher>Tecmo</publisher>
@@ -32462,7 +32460,7 @@ This mod inserts recreations of the music tracks and sound effects into the prot
 	</software>
 
 <!-- Broken sprites. PPU bug? -->
-	<software name="sdbattle" supported="no">
+	<software name="sdbattle">
 		<description>SD Battle Oozumou - Heisei Hero Basho (Japan)</description>
 		<year>1990</year>
 		<publisher>Banpresto</publisher>
@@ -34001,8 +33999,7 @@ This mod inserts recreations of the music tracks and sound effects into the prot
 		</part>
 	</software>
 
-<!-- Among the many issues the entire screen oddly and incessantly scrolls down no matter what's on it -->
-	<software name="shin4num" supported="no">
+	<software name="shin4num">
 		<description>Shin 4-nin Uchi Mahjong - Yakuman Tengoku (Japan)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
@@ -34132,6 +34129,7 @@ This mod inserts recreations of the music tracks and sound effects into the prot
 	</software>
 
 <!-- Game crashes due to incorrect emulation of MMC1 reset writes. This happens when you select みる in the in-game command menu. -->
+<!-- Not reproducible in 2026-10?!? -->
 	<software name="shinsend" supported="no">
 		<description>Shinsenden (Japan)</description>
 		<year>1989</year>
@@ -34796,7 +34794,7 @@ This mod inserts recreations of the music tracks and sound effects into the prot
 		</part>
 	</software>
 
-	<software name="skullxb" supported="no">
+	<software name="skullxb">
 		<description>Skull &amp; Crossbones (USA)</description>
 		<year>1990</year>
 		<publisher>Tengen</publisher>
@@ -43666,7 +43664,7 @@ This mod inserts recreations of the music tracks and sound effects into the prot
 		</part>
 	</software>
 
-	<software name="yoshi" cloneof="marioyos" supported="partial">
+	<software name="yoshi" cloneof="marioyos">
 		<description>Yoshi (USA)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
@@ -45388,7 +45386,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<software name="blackbs2" cloneof="blackbas" supported="no">
+	<software name="blackbs2" cloneof="blackbas">
 		<description>The Black Bass II (Japan)</description>
 		<year>1988</year>
 		<publisher>Hot-B Co.</publisher>
@@ -46799,8 +46797,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="eliteu" cloneof="elite" supported="no">
-		<description>Elite (NTSC demo?)</description>
+	<!-- This is not programmed to work on NTSC system and indeed it has no glitches only on nespal -->
+	<software name="eliteu" cloneof="elite">
+		<description>Elite (Europe, unlicensed?)</description>
 		<year>1992</year>
 		<publisher>Ian Bell</publisher>
 		<part name="cart" interface="nes_cart">
@@ -49666,7 +49665,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="ngaiden2p" cloneof="shadwar2" supported="partial">
+	<software name="ngaiden2p" cloneof="shadwar2">
 		<description>Ninja Gaiden II - The Dark Sword of Chaos (USA, sample 36)</description>
 		<year>1990</year>
 		<publisher>Tecmo</publisher>
@@ -50980,7 +50979,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="softengk" cloneof="ddiamond" supported="partial">
+	<software name="softengk" cloneof="ddiamond">
 		<description>Softball Tengoku (Japan)</description>
 		<year>1989</year>
 		<publisher>Tonkin House</publisher>
@@ -56457,7 +56456,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="skullxbk" cloneof="skullxb" supported="no">
+	<software name="skullxbk" cloneof="skullxb">
 		<description>Skull &amp; Crossbones (Korea)</description>
 		<year>1991</year>
 		<publisher>Haitai</publisher>
@@ -56496,7 +56495,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- ES-1001 San Guo Zhi - Ying Jie Zhan - Chinese translation and slight hack of Destiny of an Emperor, see below -->
 
-	<software name="sanguo" cloneof="sangochu" supported="partial">
+	<software name="sanguo" cloneof="sangochu">
 		<description>Sānguózhì III (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -56520,7 +56519,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="dafuweng" supported="no">
+	<software name="dafuweng">
 		<description>Chāojí Dà Fùwēng - Super Rich (China)</description>
 		<year>1997</year>
 		<publisher>Waixing</publisher>
@@ -56767,8 +56766,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="linzexu" supported="no">
+	<software name="linzexu">
 		<description>Lín Zéxú Jìnyān (China)</description>
 		<year>1996</year>
 		<publisher>Waixing</publisher>
@@ -56893,8 +56891,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="duobaoxy" supported="no">
+	<software name="duobaoxy">
 		<description>Duó Bǎo Xiǎo Yīngháo - Guāngmíng Yǔ Hēi'àn Chuánshuō (China, decrypted SmyNES)</description>
 		<year>1996</year>
 		<publisher>Waixing</publisher>
@@ -56916,8 +56913,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="duobaoxya" cloneof="duobaoxy" supported="no">
+	<software name="duobaoxya" cloneof="duobaoxy">
 		<description>Duó Bǎo Xiǎo Yīngháo - Guāngmíng Yǔ Hēi'àn Chuánshuō (China)</description>
 		<year>1996</year>
 		<publisher>Waixing</publisher>
@@ -56957,8 +56953,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="zjshiji" supported="no">
+	<software name="zjshiji">
 		<description>Zhěngjiù Shìjì (China)</description>
 		<year>1996</year>
 		<publisher>Waixing</publisher>
@@ -56976,8 +56971,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="zjshiji1" cloneof="zjshiji" supported="no">
+	<software name="zjshiji1" cloneof="zjshiji">
 		<description>Zhěngjiù Shìjì (China, decrypted WXN)</description>
 		<year>1996</year>
 		<publisher>Waixing</publisher>
@@ -56995,8 +56989,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="gmzs" cloneof="zjshiji" supported="no">
+	<software name="gmzs" cloneof="zjshiji">
 		<description>Guāngmíng Zhī Shén (China)</description>
 		<year>1996</year>
 		<publisher>CoolBoy</publisher>
@@ -57097,8 +57090,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="xtqj2" supported="no">
+	<software name="xtqj2">
 		<!-- Notes: AKA Journey to the West 2 -->
 		<description>Xītiān Qǔjīng II (China)</description>
 		<year>19??</year>
@@ -57382,7 +57374,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="yangjiaj" supported="no">
+	<software name="yangjiaj">
 		<description>Yang Jia Jiang - Yang's Troops (China, decrypted SmyNES)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -57429,7 +57421,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="sanguoxb" supported="no">
+	<software name="sanguoxb">
 		<!-- Notes: AKA Fighting for Supremacy -->
 		<description>San Guo Zhi - Xiong Ba Tian Xia (China)</description>
 		<year>19??</year>
@@ -57469,7 +57461,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="napolwar" supported="no">
+	<software name="napolwar">
 		<description>Di Guo Feng Bao - Napoleon's War (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -57487,8 +57479,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="zjhwang" supported="no">
+	<software name="zjhwang">
 		<description>Zhēn Jiǎ Hóu Wáng (China)</description>
 		<year>1996</year>
 		<publisher>Waixing</publisher>
@@ -57622,7 +57613,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="sanxiawy" supported="no">
+	<software name="sanxiawy">
 		<description>San Xia Wu Yi (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -57643,7 +57634,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="sanxiawya" cloneof="sanxiawy" supported="no">
+	<software name="sanxiawya" cloneof="sanxiawy">
 		<description>San Xia Wu Yi (China, decrypted WXN)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -57664,7 +57655,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="sanxiawyb" cloneof="sanxiawy" supported="no">
+	<software name="sanxiawyb" cloneof="sanxiawy">
 		<description>San Xia Wu Yi (China, alt?)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -57685,7 +57676,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="dongzlgz" supported="no">
+	<software name="dongzlgz">
 		<description>DongZhou Lie GuoZhi (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -57703,7 +57694,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="dongzlgza" cloneof="dongzlgz" supported="no">
+	<software name="dongzlgza" cloneof="dongzlgz">
 		<description>DongZhou Lie GuoZhi (China, decrypted WXN)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -57741,8 +57732,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="dquest8" supported="no">
+	<software name="dquest8">
 		<description>Dragon Quest VIII (China)</description>
 		<year>1999</year>
 		<publisher>Waixing</publisher>
@@ -57763,8 +57753,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="grandia" supported="no">
+	<software name="grandia">
 		<description>Grandia (China)</description>
 		<year>1998</year>
 		<publisher>Waixing</publisher>
@@ -57784,8 +57773,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="grandiaa" cloneof="grandia" supported="no">
+	<software name="grandiaa" cloneof="grandia">
 		<description>Grandia (China, alt)</description>
 		<year>1998</year>
 		<publisher>CoolBoy</publisher>
@@ -58095,8 +58083,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="lingjihf" supported="no">
+	<software name="lingjihf">
 		<description>Língjiè Hùfǎ - Shock (China)</description>
 		<year>2001</year>
 		<publisher>Waixing</publisher>
@@ -58674,7 +58661,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- The identical game was also released by Nanjing (probably later?) as NJ103 -->
-	<software name="xiangscq" supported="no">
+	<software name="xiangscq">
 		<description>Xiāngshuài Chuánqí (China, Shenzhen Jncota)</description>
 		<year>200?</year>
 		<publisher>Shenzhen Jncota</publisher>
@@ -58762,7 +58749,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="chuliuxx" supported="no">
+	<software name="chuliuxx">
 		<description>Chǔ Liúxiāng Xīnzhuàn (China)</description>
 		<year>20??</year>
 		<publisher>Shenzhen Jncota</publisher>
@@ -60965,8 +60952,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="titan12" supported="no">
+	<software name="titan12">
 		<description>Titanic 1912 (Asia, hacked)</description>
 		<year>19??</year>
 		<publisher>Union Bond</publisher>
@@ -60987,8 +60973,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="ffant5" supported="no">
+	<software name="ffant5">
 		<description>Final Fantasy V (Asia)</description>
 		<year>19??</year>
 		<publisher>Union Bond?</publisher>
@@ -61050,8 +61035,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="yuefei" supported="no">
+	<software name="yuefei">
 		<description>Yuèfēi Chuán (Asia, hacked)</description>
 		<year>19??</year>
 		<publisher>Union Bond</publisher>
@@ -64012,7 +63996,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="popeye2" supported="partial">
+	<software name="popeye2">
 		<description>Popeye 2 - Travels In Persia ~ Aladdin III (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -64077,8 +64061,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="aladdin2" supported="no">
+	<software name="aladdin2">
 		<description>Aladdin 2 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -64962,8 +64945,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- nointro -->
-<!-- Broken sprites. PPU bug? -->
-	<software name="fankong" supported="no">
+	<software name="fankong">
 		<description>Fǎnkǒng Jīngyīng (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
@@ -65474,8 +65456,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="jwest" supported="no">
+	<software name="jwest">
 		<description>Xītiān Qǔjīng - Journey To The West (Asia)</description>
 		<year>19??</year>
 		<publisher>Micro Genius</publisher>
@@ -65492,8 +65473,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- nointro. Is this a multicart extract? -->
-<!-- Broken sprites. PPU bug? -->
-	<software name="jwesta" cloneof="jwest" supported="no">
+	<software name="jwesta" cloneof="jwest">
 		<description>Xītiān Qǔjīng - Journey To The West (Asia, alt)</description>
 		<year>19??</year>
 		<publisher>Micro Genius</publisher>
@@ -65731,7 +65711,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- nointro -->
-	<software name="mgfh" supported="no">
+	<software name="mgfh">
 		<description>Mei Guo Fu Hao - Super Rich (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
@@ -65771,8 +65751,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- nointro -->
-<!-- Broken sprites. PPU bug? -->
-	<software name="menghuan" supported="no">
+	<software name="menghuan">
 		<description>Mènghuàn - Xiāng Shuài Chuánqí Zhī Xuè Hǎi Piāolíng (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
@@ -66441,7 +66420,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="scontrax" supported="partial">
+	<software name="scontrax">
 		<description>Super Contra X (Asia, hacked)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -66883,8 +66862,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="wujimoji" supported="no">
+	<software name="wujimoji">
 		<description>Wújí Mójiè (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
@@ -67143,8 +67121,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="zhuoyzj" supported="no">
+	<software name="zhuoyzj">
 		<description>Zhuóyuè Zhī Jiàn (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
@@ -67229,7 +67206,7 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 <!-- How is this exactly related with Super Rich games? -->
-	<software name="bwfuweng" supported="no">
+	<software name="bwfuweng">
 		<description>Bǎi Wàn Fùwēng (China)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -67242,6 +67219,10 @@ from the NEStopia source, hence they would require confirmation. -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192" />
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -67360,8 +67341,7 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="chuliux" supported="no">
+	<software name="chuliux">
 		<description>Chǔ Liúxiāng (China)</description>
 		<year>1998</year>
 		<publisher>Waixing</publisher>
@@ -67732,8 +67712,7 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="goldnaxe" supported="no">
+	<software name="goldnaxe">
 		<description>Golden Axe (China, decrypted WXN)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -67782,7 +67761,7 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="happybiq" supported="no">
+	<software name="happybiq">
 		<description>Happy Biqi III - World Fighter (China, decrypted WXN)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -67799,7 +67778,7 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="happybiqa" cloneof="happybiq" supported="no">
+	<software name="happybiqa" cloneof="happybiq">
 		<description>Happy Biqi - The World Fighter (China, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -68017,8 +67996,7 @@ All musics were removed in this game.
 	</software>
 
 <!-- to be removed? -->
-<!-- Broken sprites. PPU bug? -->
-	<software name="linzexua" cloneof="linzexu" supported="no">
+	<software name="linzexua" cloneof="linzexu">
 		<description>Lín Zéxú Jìnyān (China, NTSC fix)</description>
 		<year>1996</year>
 		<publisher>Waixing</publisher>
@@ -68053,7 +68031,7 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-	<software name="mofamen" supported="no">
+	<software name="mofamen">
 		<description>Mo Fa Men - Ying Xiong Wu Di (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -68540,8 +68518,7 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="dafuwen2" supported="no">
+	<software name="dafuwen2">
 		<description>Dà Fùwēng 2 - Shànghǎi Dàhēng (China)</description>
 		<year>1996</year>
 		<publisher>Waixing</publisher>
@@ -68635,8 +68612,7 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="silucq" supported="no">
+	<software name="silucq">
 		<description>Sī Lù Chuánqí (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
@@ -68834,8 +68810,7 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-<!-- Broken sprites. PPU bug? -->
-	<software name="sdkongxj" supported="no">
+	<software name="sdkongxj">
 		<description>Super Donkey Kong - Xiang Jiao Chuan (China)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -77986,8 +77961,7 @@ We include them here as reference if they should coincide with later revisions o
 		</part>
 	</software>
 
-<!-- Same issue as US release -->
-	<software name="cvania3kc" cloneof="cvania3" supported="partial">
+	<software name="cvania3kc" cloneof="cvania3">
 		<description>Castlevania III - Dracula's Curse (ripped from PC Konami Classics)</description>
 		<year>200?</year>
 		<publisher>Konami</publisher>
@@ -78081,7 +78055,7 @@ We include them here as reference if they should coincide with later revisions o
 These have been ripped from SmyNES and decrypted (by CaH4e3?), but it would
 be better to redump them properly. -->
 
-	<software name="fengkuan" supported="no">
+	<software name="fengkuan">
 		<description>Feng Kuang Ji Dan Zi - Flighty Chicken (Asia, decrypted SmyNES)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -78098,7 +78072,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="chuhanzb" supported="no">
+	<software name="chuhanzb">
 		<description>Chu Han Zheng Ba - The War Between Chu &amp; Han (Asia, decrypted SmyNES)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

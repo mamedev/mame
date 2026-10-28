@@ -25,6 +25,7 @@ license:CC0-1.0
 		<description>ADAM Resident Debugger (prototype revision 2.0)</description>
 		<year>198?</year>
 		<publisher>Coleco?</publisher>
+		<info name="usage" value="Requires a dual-channel serial terminal board at I/O 50h-5Ch" />
 
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="0x6000">

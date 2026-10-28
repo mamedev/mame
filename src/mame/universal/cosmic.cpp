@@ -818,15 +818,15 @@ void cosmic_state::cosmic(machine_config &config)
 
 TIMER_DEVICE_CALLBACK_MEMBER(cosmic_state::panic_scanline)
 {
-	int scanline = param;
-
-	if(scanline == 224) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); // Z80 - RST 10h
-
-	if(scanline == 0) // vblank-in irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); // Z80 - RST 08h
+	if (param == 224 || param == 0) // vblank-out/vblank-in irqs
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
+IRQ_CALLBACK_MEMBER(cosmic_state::cpu_acknowledge_irq)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+	return (m_screen->vpos() >= 224) ? 0xd7 : 0xcf; // Z80 - RST 10h/08h
+}
 
 void cosmic_state::panic(machine_config &config)
 {
@@ -835,6 +835,7 @@ void cosmic_state::panic(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &cosmic_state::panic_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(cosmic_state::panic_scanline), "screen", 0, 1);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(cosmic_state::cpu_acknowledge_irq));
 
 	// video hardware
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_panic);

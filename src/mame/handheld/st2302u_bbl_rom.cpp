@@ -9,10 +9,10 @@
 
 #include "emu.h"
 
+#include "class200_lcdc.h"
+
 #include "cpu/m6502/st2205u.h"
 #include "video/st7735_lcdc.h"
-
-#include "class200_lcdc.h"
 
 #include "screen.h"
 #include "speaker.h"

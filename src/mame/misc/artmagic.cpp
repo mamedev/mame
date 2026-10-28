@@ -473,7 +473,7 @@ void artmagic_state::tms_map(address_map &map)
 	map(0x00000000, 0x001fffff).ram().share("vram0");
 	map(0x00400000, 0x005fffff).ram().share("vram1");
 	map(0x00800000, 0x0080007f).rw(FUNC(artmagic_state::blitter_r), FUNC(artmagic_state::blitter_w));
-	map(0x00c00000, 0x00c000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
+	map(0x00c00000, 0x00c0003f).m(m_ramdac, FUNC(bt476_device::map)).umask16(0x00ff);
 	map(0xffe00000, 0xffffffff).ram();
 }
 
@@ -483,7 +483,7 @@ void artmagic_state::stonebal_tms_map(address_map &map)
 	map(0x00000000, 0x001fffff).ram().share("vram0");
 	map(0x00400000, 0x005fffff).ram().share("vram1");
 	map(0x00800000, 0x0080007f).rw(FUNC(artmagic_state::blitter_r), FUNC(artmagic_state::blitter_w));
-	map(0x00c00000, 0x00c000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
+	map(0x00c00000, 0x00c0003f).m(m_ramdac, FUNC(bt476_device::map)).umask16(0x00ff);
 	map(0xffc00000, 0xffffffff).ram();
 }
 
@@ -790,7 +790,7 @@ void artmagic_state::artmagic(machine_config &config)
 	EEPROM_2816(config, "eeprom").write_time(attotime::from_usec(1)); // FIXME: false-readback polling should make this unnecessary
 
 	/* video hardware */
-	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
+	BT476(config, m_ramdac); // ADV476KN80E
 
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MASTER_CLOCK_40MHz/6, 428, 0, 320, 313, 0, 256);

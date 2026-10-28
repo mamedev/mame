@@ -43,6 +43,7 @@ m50734_device::m50734_device(const machine_config &mconfig, const char *tag, dev
 	, m_timer_reload{0xff, 0xff, 0xff}
 	, m_step_counter{0, 0}
 	, m_phase_counter(0)
+	, m_p2_output(0)
 	, m_smcon{0, 0}
 	, m_tx_count(0)
 	, m_tx_reload(0xffff)
@@ -76,11 +77,49 @@ void m50734_device::device_config_complete()
 	}
 }
 
+u8 m50734_device::phase_output(int which) const
+{
+	// Phase decoder patterns, from Figure 11 (relation between the phase counter
+	// and the phase output signals) of the M50734SP/FP datasheet in the 1989
+	// Mitsubishi Single-Chip 8-Bit Microcomputers data book.  Ha is P20/P24 and Hd
+	// is P23/P27, so as a nibble the 1-2 phase sequence is 9,1,3,2,6,4,c,8 and the
+	// 2-2 phase sequence is 9,3,6,c, repeating every four counts.
+	static constexpr u8 PHASE_2_2[4] = { 0x9, 0x3, 0x6, 0xc };
+	static constexpr u8 PHASE_1_2[8] = { 0x9, 0x1, 0x3, 0x2, 0x6, 0x4, 0xc, 0x8 };
+
+	const u8 phase = BIT(m_phase_counter, which * 4, 3);
+	return BIT(m_smcon[which], 0) ? PHASE_1_2[phase] : PHASE_2_2[phase & 3];
+}
+
+template <int N>
+void m50734_device::port_update()
+{
+	u8 data = (m_port_latch[N] & m_port_direction[N]) | (m_port_3state[N] & ~m_port_direction[N]);
+
+	if constexpr (N == 2)
+	{
+		// the stepper motor phase outputs replace the port latch when selected
+		if (BIT(m_p2_p3_function, 6))
+			data = (data & 0xf0) | phase_output(0);
+		if (BIT(m_p2_p3_function, 7))
+			data = (data & 0x0f) | (phase_output(1) << 4);
+		if (data == m_p2_output)
+			return;
+		m_p2_output = data;
+	}
+
+	m_port_out_cb[N](data);
+}
+
 void m50734_device::step_motor(int which)
 {
-	if (!BIT(m_smcon[which], 2))
-		return;
+	if (BIT(m_smcon[which], 2))
+		clock_motor(which);
+}
 
+void m50734_device::clock_motor(int which)
+{
+	// Timer underflow (while linked) and single shot share one clock for HC/VC and HPHC/VPHC
 	if (--m_step_counter[which] == 0 && !BIT(m_interrupt_control[0], which * 2 + 5))
 	{
 		LOGMASKED(LOG_TIMER, "%s counter empty at %s\n", which ? "Vertical" : "Horizontal", machine().time().to_string());
@@ -91,8 +130,7 @@ void m50734_device::step_motor(int which)
 
 	// Increment or decrement HPHC/VPHC
 	m_phase_counter = (m_phase_counter + ((BIT(m_smcon[which], 1) ? 7 : 1) << (which * 4))) & 0x77;
-
-	// TODO: single shot mode, phase decoder and P2 output
+	port_update<2>();
 }
 
 template <int N>
@@ -142,6 +180,7 @@ void m50734_device::device_start()
 	save_item(NAME(m_timer_reload));
 	save_item(NAME(m_step_counter));
 	save_item(NAME(m_phase_counter));
+	save_item(NAME(m_p2_output));
 	save_item(NAME(m_smcon));
 	save_item(NAME(m_tx_count));
 	save_item(NAME(m_tx_reload));
@@ -166,6 +205,7 @@ void m50734_device::device_reset()
 		m_port_out_cb[n](m_port_3state[n]);
 	m_p0_function = 0x00;
 	m_p2_p3_function = 0x00;
+	m_p2_output = m_port_3state[2];
 
 	// Reset A-D
 	m_ad_control |= 0x04;
@@ -368,11 +408,11 @@ void m50734_device::port_w(offs_t offset, u8 data)
 		{
 			LOGMASKED(LOG_INIT, "%s: Port P%d direction = $%02X\n", machine().describe_context(), N, data);
 			m_port_direction[N] = data;
-			m_port_out_cb[N]((data & m_port_latch[N]) | (m_port_3state[N] & ~m_port_direction[N]));
+			port_update<N>();
 		}
 	}
 	else if (((std::exchange(m_port_latch[N], data) ^ data) & m_port_direction[N]) != 0)
-		m_port_out_cb[N]((data & m_port_direction[N]) | (m_port_3state[N] & ~m_port_direction[N]));
+		port_update<N>();
 }
 
 u8 m50734_device::p4_r()
@@ -448,7 +488,7 @@ TIMER_CALLBACK_MEMBER(m50734_device::timer_s_strobe)
 	if (BIT(m_p0_function, 4) && !BIT(m_port_latch[0], 4))
 	{
 		m_port_latch[0] |= 0x10;
-		m_port_out_cb[0]((m_port_latch[0] & m_port_direction[0]) | (m_port_3state[0] & ~m_port_direction[0]));
+		port_update<0>();
 	}
 }
 
@@ -484,6 +524,7 @@ void m50734_device::p2_p3_function_w(u8 data)
 {
 	LOGMASKED(LOG_INIT, "%s: Port P2/P3 function = $%02X\n", machine().describe_context(), data);
 	m_p2_p3_function = data & 0xc7;
+	port_update<2>();
 }
 
 u8 m50734_device::ad_control_r()
@@ -559,8 +600,9 @@ u8 m50734_device::phase_counter_r()
 
 void m50734_device::phase_counter_w(u8 data)
 {
-	// HPHC and VPHC are 3-bit counters (TODO: P2 output)
+	// HPHC and VPHC are 3-bit counters
 	m_phase_counter = data & 0x77;
+	port_update<2>();
 }
 
 u8 m50734_device::smcon_r(offs_t offset)
@@ -570,9 +612,20 @@ u8 m50734_device::smcon_r(offs_t offset)
 
 void m50734_device::smcon_w(offs_t offset, u8 data)
 {
-	if (m_smcon[offset] != (data & 0x0f))
+	if (m_smcon[offset] != (data & 0x07))
 		LOGMASKED(LOG_INIT, "%s: SMCON%c = $%02X\n", machine().describe_context(), "HV"[offset], data);
-	m_smcon[offset] = data & 0x0f;
+
+	// Bit 3 triggers a single shot and is not stored, as SMCON is meant to be
+	// changed with SEB/CLB, which would otherwise fire it again.  The datasheet
+	// forbids single shots while bit 2 links the counters to their timer.
+	m_smcon[offset] = data & 0x07;
+	port_update<2>();
+
+	if (BIT(data, 3))
+	{
+		LOGMASKED(LOG_TIMER, "%s: %s single shot at %s\n", machine().describe_context(), offset ? "Vertical" : "Horizontal", machine().time().to_string());
+		clock_motor(offset);
+	}
 }
 
 TIMER_CALLBACK_MEMBER(m50734_device::timer_x_interrupt)

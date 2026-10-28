@@ -38,6 +38,7 @@ public:
 	metlfrzr_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_work_ram(*this, "wram"),
 		m_vram(*this, "vram"),
@@ -47,9 +48,9 @@ public:
 		m_mainbank(*this, "mainbank")
 	{ }
 
-	void metlfrzr(machine_config &config);
+	void metlfrzr(machine_config &config) ATTR_COLD;
 
-	void init_metlfrzr();
+	void init_metlfrzr() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -63,10 +64,12 @@ private:
 	uint32_t screen_update_metlfrzr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void output_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 	void metlfrzr_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_decrypted_opcodes;
 	required_shared_ptr<uint8_t> m_work_ram;
 	required_shared_ptr<uint8_t> m_vram;
@@ -365,14 +368,15 @@ GFXDECODE_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(metlfrzr_state::scanline)
 {
-	int scanline = param;
+	if (param == 240) // vblank-out irq
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	else if (param == 0) // vblank-in irq (TODO: check this irq)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+}
 
-	if (scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80 - RST 10h
-
-	// TODO: check this irq.
-	if (scanline == 0) // vblank-in irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 08h
+IRQ_CALLBACK_MEMBER(metlfrzr_state::cpu_acknowledge_irq)
+{
+	return (m_screen->vpos() >= 240) ? 0xd7 : 0xcf; // RST 10h / RST 08h
 }
 
 void metlfrzr_state::metlfrzr(machine_config &config)
@@ -382,6 +386,7 @@ void metlfrzr_state::metlfrzr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &metlfrzr_state::metlfrzr_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &metlfrzr_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(metlfrzr_state::scanline), "screen", 0, 1);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(metlfrzr_state::cpu_acknowledge_irq));
 
 	t5182_device &t5182(T5182(config, "t5182", XTAL(14'318'181)/4));
 	t5182.ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
@@ -392,13 +397,13 @@ void metlfrzr_state::metlfrzr(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_metlfrzr);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(256, 256);
-	screen.set_visarea(0, 256 - 1, 16, 256 - 16 - 1);
-	screen.set_screen_update(FUNC(metlfrzr_state::screen_update_metlfrzr));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256 - 1, 16, 256 - 16 - 1);
+	m_screen->set_screen_update(FUNC(metlfrzr_state::screen_update_metlfrzr));
+	m_screen->set_palette(m_palette);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

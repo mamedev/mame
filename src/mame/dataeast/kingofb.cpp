@@ -403,12 +403,12 @@ uint32_t ringking_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void kingofb_state::video_interrupt_w(uint8_t data)
 {
-	m_video_cpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_video_cpu->set_input_line(0, HOLD_LINE);
 }
 
 void kingofb_state::sprite_interrupt_w(uint8_t data)
 {
-	m_sprite_cpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_sprite_cpu->set_input_line(0, HOLD_LINE);
 }
 
 void kingofb_state::scroll_interrupt_w(uint8_t data)
@@ -420,7 +420,7 @@ void kingofb_state::scroll_interrupt_w(uint8_t data)
 void kingofb_state::sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 

@@ -1,26 +1,33 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
-    Fujitsu MB90082 OSD
+Fujitsu MB90082 OSD
 
-    preliminary device by Angelo Salese
+TODO:
+- stub-ish, just enough to show some chars in sfcbox;
+- warrants gfxdecode and palette for debugging aid (and, someday, for the proper ROM dumped);
 
-    TODO:
-    - get a real charset ROM;
-
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "mb90082.h"
 
+#define VERBOSE (LOG_GENERAL)
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
+#include "logmacro.h"
 
-// device type definition
+
 DEFINE_DEVICE_TYPE(MB90082, mb90082_device, "mb90082", "Fujitsu MB90082 OSD")
+
+mb90082_device::mb90082_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MB90082, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor(FUNC(mb90082_device::mb90082_vram), this))
+	, m_char_rom(*this, "char_rom")
+{
+}
+
 
 void mb90082_device::mb90082_vram(address_map &map)
 {
@@ -33,10 +40,10 @@ void mb90082_device::mb90082_vram(address_map &map)
 	}
 }
 
-/* charset is undumped, but apparently a normal ASCII one is enough for the time being (for example "fnt0808.x1" in Sharp X1) */
+// charset is LLM generated from MB90098A datasheet
 ROM_START( mb90082 )
-	ROM_REGION( 0x2000, "mb90082", ROMREGION_ERASEFF )
-	ROM_LOAD("mb90082_char.bin",     0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x4000, "char_rom", ROMREGION_ERASEFF )
+	ROM_LOAD("mb90082_char.bin",     0x0000, 0x4000, CRC(5272deba) SHA1(bab94592146b1295a219a551fb05e8140b3a673e) BAD_DUMP )
 ROM_END
 
 //-------------------------------------------------
@@ -82,22 +89,6 @@ inline void mb90082_device::write_word(offs_t address, uint16_t data)
 	space().write_word(address << 1, data);
 }
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  mb90082_device - constructor
-//-------------------------------------------------
-
-mb90082_device::mb90082_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MB90082, tag, owner, clock)
-	, device_memory_interface(mconfig, *this)
-	, m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor(FUNC(mb90082_device::mb90082_vram), this))
-{
-}
-
-
 //-------------------------------------------------
 //  device_validity_check - perform validity checks
 //  on this device
@@ -114,6 +105,15 @@ void mb90082_device::device_validity_check(validity_checker &valid) const
 
 void mb90082_device::device_start()
 {
+	save_item(NAME(m_cmd_ff));
+	save_item(NAME(m_cmd));
+	save_item(NAME(m_cmd_param));
+	save_item(NAME(m_reset_line));
+
+	save_item(NAME(m_osd_addr));
+	save_item(NAME(m_fil));
+	save_item(NAME(m_uc));
+	save_item(NAME(m_attr));
 }
 
 
@@ -144,17 +144,16 @@ void mb90082_device::set_cs_line(int state)
 
 void mb90082_device::write(uint8_t data)
 {
-	uint16_t dat;
-
 	switch(m_cmd_ff)
 	{
 		case OSD_COMMAND:
 			m_cmd = data & 0xf8;
 			m_cmd_param = data & 7;
-			//printf("cmd %02x\n",data);
+			//LOG("cmd %02x\n",data);
 			break;
 		case OSD_DATA:
-			dat = ((m_cmd_param & 7)<<7) | (data & 0x7f);
+		{
+			const uint16_t dat = ((m_cmd_param & 7) << 7) | (data & 0x7f);
 			switch(m_cmd)
 			{
 				case 0x80: // Preset VRAM address
@@ -165,26 +164,27 @@ void mb90082_device::write(uint8_t data)
 					m_attr = dat;
 					break;
 				case 0x90: // Write Character
-					int x,y;
+				{
+					int x, y;
 					x = (m_osd_addr & 0x01f);
 					y = (m_osd_addr & 0x1e0) >> 5;
 
 					if(m_fil)
 					{
-						int i;
 						if(x != 0)
-							printf("FIL with %d %d\n",x,y);
+							LOG("FIL with %d %d\n", x, y);
 
-						for(i=0;i<24;i++)
+						// on FIL operation reuse X for convenience
+						for(x = 0; x < 24; x++)
 						{
-							write_word((i+y*24)|0x000,dat);
-							write_word((i+y*24)|0x200,m_attr);
+							write_word((x + y * 24) | 0x000, dat);
+							write_word((x + y * 24) | 0x200, m_attr);
 						}
 					}
 					else
 					{
-						write_word((x+y*24)|0x000,dat);
-						write_word((x+y*24)|0x200,m_attr);
+						write_word((x + y * 24) | 0x000, dat);
+						write_word((x + y * 24) | 0x200, m_attr);
 
 						/* handle address increments */
 						x = ((x + 1) % 24);
@@ -193,12 +193,16 @@ void mb90082_device::write(uint8_t data)
 						m_osd_addr = x + (y << 5);
 					}
 					break;
+				}
 				case 0xd0: // Set Under Color
 					m_uc = dat & 7;
 					break;
-
+				default:
+					LOG("Unhandled command %02x\n", m_cmd);
+					break;
 			}
 			break;
+		}
 	}
 
 	m_cmd_ff ^= 1;
@@ -206,37 +210,47 @@ void mb90082_device::write(uint8_t data)
 
 uint32_t mb90082_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t const *const pcg = memregion("mb90082")->base();
+	// TODO: there's probably a way to control the brightness in this
+	uint8_t const bg_b = BIT(m_uc, 0) ? 0xdf : 0;
+	uint8_t const bg_g = BIT(m_uc, 1) ? 0xdf : 0;
+	uint8_t const bg_r = BIT(m_uc, 2) ? 0xdf : 0;
+	bitmap.fill(rgb_t(0xff, bg_r, bg_g, bg_b),cliprect);
 
-	/* TODO: there's probably a way to control the brightness in this */
-	uint8_t const bg_b = m_uc & 1 ? 0xdf : 0;
-	uint8_t const bg_g = m_uc & 2 ? 0xdf : 0;
-	uint8_t const bg_r = m_uc & 4 ? 0xdf : 0;
-	bitmap.fill(rgb_t(0xff,bg_r,bg_g,bg_b),cliprect);
-
-	for(int y=0;y<12;y++)
+	for(int y = 0; y < 12; y++)
 	{
-		for(int x=0;x<24;x++)
+		for(int x = 0; x < 24; x++)
 		{
-			uint16_t tile = read_word(x+y*24);
-			uint16_t attr = read_word((x+y*24)|0x200);
+			const u32 vram_offset = x + y * 24;
+			uint16_t tile = read_word(vram_offset);
+			uint16_t attr = read_word(vram_offset | 0x200);
 
-			/* TODO: charset hook-up is obviously WRONG so following mustn't be trusted at all */
-			for(int yi=0;yi<16;yi++)
+			for(int yi = 0; yi < 18; yi++)
 			{
-				for(int xi=0;xi<16;xi++)
+				const u32 tile_offset = (tile * 0x40) + (yi << 1);
+
+				for(int xi = 0; xi < 12; xi++)
 				{
+					int res_x = x * 12 + xi;
+					int res_y = y * 18 + yi;
+
+					if (!cliprect.contains(res_x, res_y))
+						continue;
+
+					const int xn = xi >> 3;
+					const int xf = xi & 7;
 					uint8_t const color = (attr & 0x70) >> 4;
 
-					uint8_t const pix = (pcg[(tile*8)+(yi >> 1)] >> (7-(xi >> 1))) & 1;
+					uint8_t const pix = BIT(m_char_rom->base()[tile_offset + xn], 7 - xf);
 
-					/* TODO: check this */
-					uint8_t const b = (color & 1) ? 0xff : 0;
-					uint8_t const g = (color & 2) ? 0xff : 0;
-					uint8_t const r = (color & 4) ? 0xff : 0;
+					if (pix)
+					{
+						// TODO: not trusted
+						uint8_t const b = (color & 1) ? 0xff : 0;
+						uint8_t const g = (color & 2) ? 0xff : 0;
+						uint8_t const r = (color & 4) ? 0xff : 0;
 
-					if(tile != 0xff && pix != 0)
-						bitmap.pix(y*16+yi,x*16+xi) = r << 16 | g << 8 | b;
+						bitmap.pix(res_y, res_x) = r << 16 | g << 8 | b;
+					}
 				}
 			}
 		}

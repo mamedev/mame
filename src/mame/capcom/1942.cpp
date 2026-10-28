@@ -206,11 +206,26 @@ TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::scanline)
 	// RST 08h at scanline 109 (writes to the soundlatch and drives freeze dip-switch)
 	// RST 10h at scanline 240 (vblank)
 	if (irq & 8)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc7 | (irq << 3 & 0x18));
+	{
+		m_irq_vector = 0xc7 | (irq << 3 & 0x18);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
 
 	// 4 audio interrupts per frame
 	if (irq & 4)
-		m_audiocpu->set_input_line(0, HOLD_LINE);
+		m_audiocpu->set_input_line(0, ASSERT_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(_1942_state::maincpu_acknowledge_irq)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+	return m_irq_vector;
+}
+
+IRQ_CALLBACK_MEMBER(_1942_state::audiocpu_acknowledge_irq)
+{
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
+	return 0xff; // Audio CPU runs in IM1
 }
 
 
@@ -581,6 +596,7 @@ void _1942_state::machine_start()
 {
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_scroll));
+	save_item(NAME(m_irq_vector));
 }
 
 void _1942_state::machine_reset()
@@ -588,6 +604,7 @@ void _1942_state::machine_reset()
 	m_palette_bank = 0;
 	m_scroll[0] = 0;
 	m_scroll[1] = 0;
+	m_irq_vector = 0xff;
 }
 
 void _1942_state::_1942(machine_config &config)
@@ -595,9 +612,11 @@ void _1942_state::_1942(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MAIN_CPU_CLOCK);    /* 3 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &_1942_state::_1942_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(_1942_state::maincpu_acknowledge_irq));
 
 	Z80(config, m_audiocpu, SOUND_CPU_CLOCK);  /* 3 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &_1942_state::sound_map);
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(_1942_state::audiocpu_acknowledge_irq));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(_1942_state::scanline), "screen", 0, 1);
 
@@ -654,12 +673,14 @@ void _1942p_state::_1942p(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MAIN_CPU_CLOCK_1942P);    /* 4 MHz - verified on PCB */
 	m_maincpu->set_addrmap(AS_PROGRAM, &_1942p_state::_1942p_map);
-	m_maincpu->set_vblank_int("screen", FUNC(_1942p_state::irq0_line_hold)); // note, powerups won't move down the screen with the original '1942' logic.
+	m_maincpu->set_vblank_int("screen", FUNC(_1942p_state::irq0_line_assert)); // note, powerups won't move down the screen with the original '1942' logic.
+	m_maincpu->set_irq_acknowledge_callback(FUNC(_1942p_state::maincpu_acknowledge_irq));
 
 	Z80(config, m_audiocpu, SOUND_CPU_CLOCK_1942P);  /* 4 MHz - verified on PCB */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &_1942p_state::_1942p_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &_1942p_state::_1942p_sound_io);
-	m_audiocpu->set_periodic_int(FUNC(_1942p_state::irq0_line_hold), attotime::from_hz(4*60));
+	m_audiocpu->set_periodic_int(FUNC(_1942p_state::irq0_line_assert), attotime::from_hz(4*60));
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(_1942p_state::audiocpu_acknowledge_irq));
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1942p);

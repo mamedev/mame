@@ -336,4 +336,28 @@ private:
 	required_ioport m_steer;
 };
 
+class wfishing_state : public segas16b_state
+{
+public:
+	// construction/destruction
+	wfishing_state(const machine_config &mconfig, device_type type, const char *tag)
+		: segas16b_state(mconfig, type, tag)
+		, m_handle(*this, "HANDLE")
+		, m_handle_pos(0)
+		, m_handle_pulse(0)
+		, m_handle_dir(0)
+	{ }
+
+	ioport_value handle_r();
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	required_ioport m_handle;
+	uint8_t m_handle_pos;
+	uint8_t m_handle_pulse;
+	uint8_t m_handle_dir;
+};
+
 #endif // MAME_SEGA_SEGAS16B_H

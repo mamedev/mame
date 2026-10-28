@@ -2735,6 +2735,19 @@ if MACHINES["MM74C922"] then
 end
 
 ---------------------------------------------------
+-- Panasonic MN664031A CD-ROM/SCSI controller
+--@src/devices/machine/mn66403.h,MACHINES["MN66403"] = true
+---------------------------------------------------
+
+if MACHINES["MN66403"] then
+	MACHINES["NSCSI"] = true
+	files {
+		MAME_DIR .. "src/devices/machine/mn66403.cpp",
+		MAME_DIR .. "src/devices/machine/mn66403.h",
+	}
+end
+
+---------------------------------------------------
 --
 --@src/devices/machine/mos6526.h,MACHINES["MOS6526"] = true
 ---------------------------------------------------

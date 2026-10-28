@@ -71,6 +71,9 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_region_ptr<uint8_t> m_irqprom;
 
+	// interrupt-related
+	uint8_t m_irq_vector = 0xff;
+
 	// video-related
 	tilemap_t *m_bg_tilemap = nullptr;
 	void videoram_w(offs_t offset, uint8_t data);
@@ -80,6 +83,7 @@ private:
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void program_map(address_map &map) ATTR_COLD;
 };
@@ -231,9 +235,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(higemaru_state::scanline)
 	// RST 08h at scanline 109
 	// RST 10h at scanline 240 (vblank)
 	if (irq & 8)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc7 | (irq << 3 & 0x18));
+	{
+		m_irq_vector = 0xc7 | (irq << 3 & 0x18);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
 
 	// irq & 4 = audiocpu interrupts, but unused here
+}
+
+IRQ_CALLBACK_MEMBER(higemaru_state::cpu_acknowledge_irq)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+	return m_irq_vector;
 }
 
 
@@ -372,6 +385,7 @@ void higemaru_state::higemaru(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, 12_MHz_XTAL / 4); // 3 MHz Sharp LH0080A Z80A-CPU-D
 	m_maincpu->set_addrmap(AS_PROGRAM, &higemaru_state::program_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(higemaru_state::cpu_acknowledge_irq));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(higemaru_state::scanline), "screen", 0, 1);
 

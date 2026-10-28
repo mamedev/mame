@@ -4,6 +4,9 @@
 
     Coleco Adam printer emulation
 
+    TODO:
+    - carriage and daisy wheel mechanics are not emulated, each motor step toggles its home sensor
+
 **********************************************************************/
 
 #include "emu.h"
@@ -74,7 +77,9 @@ void adam_printer_device::device_add_mconfig(machine_config &config)
 adam_printer_device::adam_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ADAM_PRN, tag, owner, clock),
 		device_adamnet_card_interface(mconfig, *this),
-		m_maincpu(*this, M6801_TAG)
+		m_maincpu(*this, M6801_TAG),
+		m_p1(0xff),
+		m_sensors(0)
 {
 }
 
@@ -85,6 +90,9 @@ adam_printer_device::adam_printer_device(const machine_config &mconfig, const ch
 
 void adam_printer_device::device_start()
 {
+	// state saving
+	save_item(NAME(m_p1));
+	save_item(NAME(m_sensors));
 }
 
 
@@ -118,6 +126,14 @@ void adam_printer_device::p1_w(uint8_t data)
 	    7       M3 phase C
 
 	*/
+
+	if ((data ^ m_p1) & 0x0f)
+		m_sensors ^= 0x10;
+
+	if ((data ^ m_p1) & 0xf0)
+		m_sensors ^= 0x40;
+
+	m_p1 = data;
 }
 
 
@@ -201,7 +217,7 @@ uint8_t adam_printer_device::p4_r()
 
 	*/
 
-	return 0x80;
+	return 0x80 | m_sensors;
 }
 
 

@@ -189,10 +189,13 @@ private:
 	required_device<airraid_video_device> m_airraid_video;
 	required_memory_bank m_mainbank;
 
+	uint8_t m_irq_vector;
+
 	void c500_w(uint8_t data);
 	void c700_w(uint8_t data);
 	void bank_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_decrypted_opcodes_map(address_map &map) ATTR_COLD;
@@ -206,13 +209,21 @@ private:
 
 TIMER_DEVICE_CALLBACK_MEMBER(airraid_state::scanline)
 {
-	int scanline = param;
+	if (param == 240) // updates scroll registers
+	{
+		m_irq_vector = 0xd7; // RST 10h
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+	else if (param == 0) // vblank-out irq
+	{
+		m_irq_vector = 0xcf; // RST 08h
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+}
 
-	if (scanline == 240) // updates scroll registers
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80 - RST 10h
-
-	if (scanline == 0) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 08h
+IRQ_CALLBACK_MEMBER(airraid_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 void airraid_state::c500_w(uint8_t data)
@@ -428,6 +439,7 @@ void airraid_state::airraid(machine_config &config)
 	Z80(config, m_maincpu, XTAL(12'000'000) / 2); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &airraid_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(airraid_state::scanline), "airraid_vid:screen", 0, 1);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(airraid_state::cpu_acknowledge_irq));
 
 	Z80(config, m_audiocpu, XTAL(14'318'181) / 4); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &airraid_state::sound_map);

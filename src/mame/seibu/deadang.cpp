@@ -83,11 +83,11 @@ public:
 		m_track(*this, "TRACK%c", 'X')
 	{ }
 
-	void deadang(machine_config &config);
-	void ghunter(machine_config &config);
+	void deadang(machine_config &config) ATTR_COLD;
+	void ghunter(machine_config &config) ATTR_COLD;
 
-	void init_adpcm();
-	void init_ghunter();
+	void init_adpcm() ATTR_COLD;
+	void init_ghunter() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -131,7 +131,8 @@ protected:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(main_scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(sub_scanline);
+	IRQ_CALLBACK_MEMBER(maincpu_acknowledge_irq);
+	IRQ_CALLBACK_MEMBER(subcpu_acknowledge_irq);
 
 	void main_map(address_map &map) ATTR_COLD;
 	void ghunter_main_map(address_map &map) ATTR_COLD;
@@ -760,24 +761,26 @@ GFXDECODE_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::main_scanline)
 {
-	int const scanline = param;
-
-	if (scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc4 / 4); // V30
-
-	if (scanline == 0) // vblank-in irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8 / 4); // V30
+	if (param == 240) // vblank-out irq
+	{
+		m_maincpu->set_input_line(0, HOLD_LINE);
+		m_subcpu->set_input_line(0, HOLD_LINE);
+	}
+	else if (param == 0) // vblank-in irq
+	{
+		m_maincpu->set_input_line(0, HOLD_LINE);
+		m_subcpu->set_input_line(0, HOLD_LINE);
+	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::sub_scanline)
+IRQ_CALLBACK_MEMBER(deadang_state::maincpu_acknowledge_irq)
 {
-	int const scanline = param;
+	return (m_screen->vpos() >= 240) ? (0xc4 / 4) : (0xc8 / 4);
+}
 
-	if (scanline == 240) // vblank-out irq
-		m_subcpu->set_input_line_and_vector(0, HOLD_LINE, 0xc4 / 4); // V30
-
-	if (scanline == 0) // vblank-in irq
-		m_subcpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8 / 4); // V30
+IRQ_CALLBACK_MEMBER(deadang_state::subcpu_acknowledge_irq)
+{
+	return (m_screen->vpos() >= 240) ? (0xc4 / 4) : (0xc8 / 4);
 }
 
 
@@ -788,11 +791,12 @@ void deadang_state::deadang(machine_config &config)
 	// basic machine hardware
 	V30(config, m_maincpu, XTAL(16'000'000) / 2); // Sony 8623h9 CXQ70116D-8 (V30 compatible)
 	m_maincpu->set_addrmap(AS_PROGRAM, &deadang_state::main_map);
-	TIMER(config, "scantimer1").configure_scanline(FUNC(deadang_state::main_scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(deadang_state::main_scanline), "screen", 0, 1);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(deadang_state::maincpu_acknowledge_irq));
 
 	V30(config, m_subcpu, XTAL(16'000'000) / 2); // Sony 8623h9 CXQ70116D-8 (V30 compatible)
 	m_subcpu->set_addrmap(AS_PROGRAM, &deadang_state::sub_map);
-	TIMER(config, "scantimer2").configure_scanline(FUNC(deadang_state::sub_scanline), "screen", 0, 1);
+	m_subcpu->set_irq_acknowledge_callback(FUNC(deadang_state::subcpu_acknowledge_irq));
 
 	Z80(config, m_audiocpu, XTAL(14'318'181) / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &deadang_state::sound_map);

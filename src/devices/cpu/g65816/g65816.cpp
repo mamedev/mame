@@ -878,7 +878,7 @@ bool g65816_device::get_x_flag() const
 void g65816_device::g65816_restore_state()
 {
 	// restore proper function pointers
-	g65816i_set_execution_mode((FLAG_M >> 4) | (FLAG_X >> 4));
+	g65816i_set_execution_mode(FLAG_E ? EXECUTION_MODE_E : ((FLAG_M >> 4) | (FLAG_X >> 4)));
 
 	// make sure the memory system can keep up
 	g65816i_jumping(REGISTER_PB | REGISTER_PC);

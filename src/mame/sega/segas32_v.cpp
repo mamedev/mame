@@ -289,6 +289,7 @@ void segas32_state::device_start()
 	save_item(NAME(m_v60_irq_control));
 	save_item(NAME(m_sound_irq_control));
 	save_item(NAME(m_sound_irq_input));
+	save_item(NAME(m_sound_irq_vector));
 	save_item(NAME(m_sound_dummy_value));
 	save_item(NAME(m_sound_bank));
 
