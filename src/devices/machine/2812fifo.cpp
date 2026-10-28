@@ -57,6 +57,20 @@ void fifo2812_device::mr_w(int state)
 		m_mr = state ? 1U : 0U;
 		if (!m_mr)
 			device_reset();
+		else if (m_pl)
+			parallel_load();
+	}
+}
+
+void fifo2812_device::parallel_load()
+{
+	if (!BIT(m_control, 0))
+	{
+		m_data[0] = m_d;
+		m_control |= u32(1) << 0;
+		m_ir_cb(1);
+		if (15U == ++m_count)
+			m_flag_cb(1);
 	}
 }
 
@@ -69,14 +83,7 @@ void fifo2812_device::pl_w(int state)
 		{
 			if (m_pl)
 			{
-				m_data[0] = m_d;
-				if (!BIT(m_control, 0))
-				{
-					m_control |= u32(1) << 0;
-					m_ir_cb(1);
-					if (15U == ++m_count)
-						m_flag_cb(1);
-				}
+				parallel_load();
 			}
 			else if (BIT(m_control, 0) && !BIT(m_control, 1))
 			{
@@ -91,7 +98,7 @@ void fifo2812_device::pl_w(int state)
 					m_control |= u32(1) << bit;
 					m_control &= ~(u32(1) << (bit - 1));
 				}
-				if (!m_pd && ((LENGTH - 1) == bit) && !BIT(m_control, bit))
+				if ((!m_pd || !m_oe || !m_dumped) && ((LENGTH - 1) == bit) && !BIT(m_control, bit))
 				{
 					if (m_data[bit] != m_data[bit - 1])
 					{
@@ -102,6 +109,14 @@ void fifo2812_device::pl_w(int state)
 					m_control |= u32(1) << bit;
 					m_control &= ~(u32(1) << (bit - 1));
 					m_or_cb(1);
+					if (m_pd && m_oe)
+					{
+						m_dumped = true;
+						m_control &= ~(u32(1) << bit);
+						m_or_cb(0);
+						if (15U == m_count--)
+							m_flag_cb(0);
+					}
 				}
 			}
 		}
@@ -113,19 +128,20 @@ void fifo2812_device::pd_w(int state)
 	if (bool(state) != bool(m_pd))
 	{
 		m_pd = state ? 1U : 0U;
-		if (m_mr)
+		if (m_mr && m_oe)
 		{
 			if (m_pd)
 			{
 				if (BIT(m_control, LENGTH - 1))
 				{
+					m_dumped = true;
 					m_control &= ~(u32(1) << (LENGTH - 1));
 					m_or_cb(0);
 					if (15U == m_count--)
 						m_flag_cb(0);
 				}
 			}
-			else if (BIT(m_control, LENGTH - 2))
+			else if (!BIT(m_control, LENGTH - 1) && BIT(m_control, LENGTH - 2))
 			{
 				unsigned bit(LENGTH - 2);
 				if (m_data[bit + 1] != m_data[bit])
@@ -152,6 +168,8 @@ void fifo2812_device::pd_w(int state)
 				}
 			}
 		}
+		if (!m_pd)
+			m_dumped = false;
 	}
 }
 
@@ -212,6 +230,7 @@ void fifo2812_device::device_start()
 	save_item(NAME(m_pl));
 	save_item(NAME(m_pd));
 	save_item(NAME(m_oe));
+	save_item(NAME(m_dumped));
 }
 
 void fifo2812_device::device_reset()
@@ -223,6 +242,7 @@ void fifo2812_device::device_reset()
 	m_control = 0U;
 	std::fill(std::begin(m_data), std::end(m_data), 0U);
 	m_count = 0U;
+	m_dumped = false;
 	if (m_oe && (0U != prev_q))
 		m_q_cb(0U, 0U, 0xffU);
 	if (prev_ir)
