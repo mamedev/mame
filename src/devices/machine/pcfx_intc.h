@@ -19,7 +19,7 @@ public:
 	u16 read(offs_t offset);
 	void write(offs_t offset, u16 data);
 
-	template <unsigned Which> void irq_w(int state)  { static_assert((Which >= 8) && (Which <= 15)); set_irq_line(Which, state); }
+	template <unsigned Which> void irq_w(int state)  { static_assert((Which >= 9) && (Which <= 15)); set_irq_line(Which, state); }
 
 protected:
 	virtual void device_start() override ATTR_COLD;
