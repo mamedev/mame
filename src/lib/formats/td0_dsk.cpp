@@ -742,7 +742,7 @@ FLOPPY_CONSTRUCT( td0_dsk_construct )
 		number_of_sectors = header[0];
 		if (number_of_sectors!=0xff){
 			position+=4;
-			if ((track<<1) + (header[2] & 1) >= 84*2) {
+			if ((track<<1) + (header[2] & 1) >= 84*2){
 				for(i=0;i<number_of_sectors;i++) {
 					header = tag->data + position;
 					position+=6;
