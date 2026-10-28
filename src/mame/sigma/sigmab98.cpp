@@ -83,7 +83,6 @@ public:
 		, m_buffered_spriteram(*this, "spriteram")
 		, m_spriteram(*this, "spriteram")
 		, m_leds(*this, "led%u", 0U)
-		, m_vblank(0)
 	{ }
 
 	void sigmab98(machine_config &config) ATTR_COLD;
@@ -109,6 +108,7 @@ protected:
 	u8 d021_r();
 
 	INTERRUPT_GEN_MEMBER(sigmab98_vblank_interrupt);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -137,7 +137,7 @@ protected:
 	u8 m_c4 = 0;
 	u8 m_c6 = 0;
 	u8 m_c8 = 0;
-	u8 m_vblank;
+	u8 m_irq_vector = 0;
 };
 
 
@@ -613,7 +613,13 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN_MEMBER(sigmab98_state::sigmab98_vblank_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x5a); // Z80
+	m_irq_vector = 0x5a;
+	m_maincpu->set_input_line(0, HOLD_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(sigmab98_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 void sigmab98_state::sigmab98(machine_config &config)
@@ -622,6 +628,7 @@ void sigmab98_state::sigmab98(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab98_state::gegege_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &sigmab98_state::gegege_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(sigmab98_state::sigmab98_vblank_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(sigmab98_state::cpu_acknowledge_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_93C46_16BIT(config, "eeprom");
@@ -666,25 +673,37 @@ void sigmab98_state::dodghero(machine_config &config)
 
 TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_state::lufykzku_irq)
 {
-	const int scanline = param;
-
-	if (scanline == 240)
+	if (param == 240)
 	{
-		if (m_vblank_vector) m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_vblank_vector); // Z80
+		if (m_vblank_vector)
+		{
+			m_irq_vector = m_vblank_vector;
+			m_maincpu->set_input_line(0, HOLD_LINE);
+		}
 	}
-	else if (scanline == 128)
+	else if (param == 128)
 	{
-		if (m_timer0_vector) m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer0_vector); // Z80
+		if (m_timer0_vector)
+		{
+			m_irq_vector = m_timer0_vector;
+			m_maincpu->set_input_line(0, HOLD_LINE);
+		}
 	}
-	else if ((scanline % 8) == 0)
+	else if ((param % 8) == 0)
 	{
-		if (m_timer1_vector) m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_timer1_vector); // Z80 - this needs to be called often or the state of the door is not read at boot (at least 5 times before bb9 is called)
+		if (m_timer1_vector)
+		{
+			// this needs to be called often or the state of the door is not read at boot (at least 5 times before bb9 is called)
+			m_irq_vector = m_timer1_vector;
+			m_maincpu->set_input_line(0, HOLD_LINE);
+		}
 	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_state::mnrockman_timer_irq)
 {
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfc);
+	m_irq_vector = 0xfc;
+	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 void lufykzku_state::lufykzku(machine_config &config)
@@ -693,6 +712,7 @@ void lufykzku_state::lufykzku(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &lufykzku_state::lufykzku_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &lufykzku_state::lufykzku_io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(lufykzku_state::lufykzku_irq), "screen", 0, 1);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(lufykzku_state::cpu_acknowledge_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);   // battery backed RAM (TC55257DFL-70L)
 	// No EEPROM

@@ -82,6 +82,9 @@ private:
 	u8 m_sc1on = 0;
 	u8 m_sc2on = 0;
 
+	// interrupt-related
+	uint8_t m_irq_vector = 0xff;
+
 	void videoram_w(offs_t offset, u8 data);
 	void colorram_w(offs_t offset, u8 data);
 	void control_w(u8 data);
@@ -94,6 +97,8 @@ private:
 	void palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	IRQ_CALLBACK_MEMBER(maincpu_acknowledge_irq);
+	IRQ_CALLBACK_MEMBER(audiocpu_acknowledge_irq);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
@@ -318,11 +323,26 @@ TIMER_DEVICE_CALLBACK_MEMBER(exedexes_state::scanline)
 	// RST 08h at scanline 109
 	// RST 10h at scanline 240 (vblank)
 	if (irq & 8)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc7 | (irq << 3 & 0x18));
+	{
+		m_irq_vector = 0xc7 | (irq << 3 & 0x18);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
 
 	// 4 audio interrupts per frame
 	if (irq & 4)
-		m_audiocpu->set_input_line(0, HOLD_LINE);
+		m_audiocpu->set_input_line(0, ASSERT_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(exedexes_state::maincpu_acknowledge_irq)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+	return m_irq_vector;
+}
+
+IRQ_CALLBACK_MEMBER(exedexes_state::audiocpu_acknowledge_irq)
+{
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
+	return 0xff;
 }
 
 
@@ -489,6 +509,7 @@ void exedexes_state::machine_start()
 	save_item(NAME(m_objon));
 	save_item(NAME(m_sc1on));
 	save_item(NAME(m_sc2on));
+	save_item(NAME(m_irq_vector));
 }
 
 void exedexes_state::machine_reset()
@@ -504,9 +525,11 @@ void exedexes_state::exedexes(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, 12_MHz_XTAL / 4); // 3 MHz, verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &exedexes_state::main_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(exedexes_state::maincpu_acknowledge_irq));
 
 	Z80(config, m_audiocpu, 12_MHz_XTAL / 4); // 3 MHz, verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &exedexes_state::sound_map);
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(exedexes_state::audiocpu_acknowledge_irq));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(exedexes_state::scanline), "screen", 0, 1);
 

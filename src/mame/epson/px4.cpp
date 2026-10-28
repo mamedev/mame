@@ -188,6 +188,7 @@ protected:
 	};
 
 	void gapnit_interrupt();
+	IRQ_CALLBACK_MEMBER(z80_acknowledge_int);
 
 	void serial_rx_w(int state);
 	void txd_w(int data);
@@ -217,6 +218,7 @@ protected:
 	uint8_t m_isr;
 	uint8_t m_ier;
 	uint8_t m_sior;
+	uint8_t m_int_vector;
 
 	// gapnit internal
 	uint16_t m_frc_value;
@@ -301,21 +303,29 @@ private:
 void px4_state::gapnit_interrupt()
 {
 	// any interrupts enabled and pending?
+	bool int_active = true;
 	if (m_ier & m_isr & INT0_7508)
 	{
 		m_isr &= ~INT0_7508;
-		m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf0); // Z80
+		m_int_vector = 0xf0;
 	}
 	else if (m_ier & m_isr & INT1_ART)
-		m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf2); // Z80
+		m_int_vector = 0xf2;
 	else if (m_ier & m_isr & INT2_ICF)
-		m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf4); // Z80
+		m_int_vector = 0xf4;
 	else if (m_ier & m_isr & INT3_OVF)
-		m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf6); // Z80
+		m_int_vector = 0xf6;
 	else if (m_ier & m_isr & INT4_EXT)
-		m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf8); // Z80
+		m_int_vector = 0xf8;
 	else
-		m_z80->set_input_line(0, CLEAR_LINE);
+		int_active = false;
+
+	m_z80->set_input_line(0, int_active ? ASSERT_LINE : CLEAR_LINE);
+}
+
+IRQ_CALLBACK_MEMBER( px4_state::z80_acknowledge_int )
+{
+	return m_int_vector;
 }
 
 // external cassette or barcode reader input
@@ -1250,6 +1260,7 @@ void px4_state::machine_start()
 void px4_state::machine_reset()
 {
 	m_artsr = ART_TXRDY | ART_TXEMPTY | (!m_rs232->dsr_r() << 7);
+	m_int_vector = 0;
 	receive_register_reset();
 	transmit_register_reset();
 }
@@ -1492,6 +1503,7 @@ void px4_state::px4(machine_config &config)
 	Z80(config, m_z80, XTAL(7'372'800) / 2);    // uPD70008
 	m_z80->set_addrmap(AS_PROGRAM, &px4_state::px4_mem);
 	m_z80->set_addrmap(AS_IO, &px4_state::px4_io);
+	m_z80->set_irq_acknowledge_callback(FUNC(px4_state::z80_acknowledge_int));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen").set_lcd());

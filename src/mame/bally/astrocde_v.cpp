@@ -235,6 +235,8 @@ void astrocde_state::init_savestate()
 
 	save_item(NAME(m_interrupt_enabl));
 	save_item(NAME(m_interrupt_vector));
+	save_item(NAME(m_interrupt_feedback));
+	save_item(NAME(m_interrupt_clear_on_ack));
 	save_item(NAME(m_interrupt_scanline));
 	save_item(NAME(m_vertical_feedback));
 	save_item(NAME(m_horizontal_feedback));
@@ -407,17 +409,18 @@ void astrocde_state::astrocade_trigger_lightpen(uint8_t vfeedback, uint8_t hfeed
 	/* blanking regions; we treat them both the same here */
 	if ((m_interrupt_enabl & 0x12) != 0)
 	{
-		/* bit 0 controls the interrupt mode: mode 0 means assert until acknowledged */
+		m_interrupt_vector = m_interrupt_feedback & 0xf0;
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+
+		/* bit 0 controls the interrupt mode: mode 0 means assert until acknowledged, mode 1 means assert for 1 instruction */
 		if ((m_interrupt_enabl & 0x01) == 0)
 		{
-			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_interrupt_vector & 0xf0); // Z80
+			m_interrupt_clear_on_ack = true;
 			m_intoff_timer->adjust(m_screen->time_until_pos(vfeedback));
 		}
-
-		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_interrupt_vector & 0xf0); // Z80
+			m_interrupt_clear_on_ack = false;
 			m_intoff_timer->adjust(m_maincpu->cycles_to_attotime(1));
 		}
 
@@ -447,17 +450,18 @@ TIMER_CALLBACK_MEMBER(astrocde_state::scanline_callback)
 	/* generate a scanline interrupt if it's time */
 	if (astrocade_scanline == m_interrupt_scanline && (m_interrupt_enabl & 0x08) != 0)
 	{
-		/* bit 2 controls the interrupt mode: mode 0 means assert until acknowledged */
+		m_interrupt_vector = m_interrupt_feedback;
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+
+		/* bit 2 controls the interrupt mode: mode 0 means assert until acknowledged, mode 1 means assert for 1 instruction */
 		if ((m_interrupt_enabl & 0x04) == 0)
 		{
-			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_interrupt_vector); // Z80
+			m_interrupt_clear_on_ack = true;
 			m_intoff_timer->adjust(m_screen->time_until_vblank_end());
 		}
-
-		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_interrupt_vector); // Z80
+			m_interrupt_clear_on_ack = false;
 			m_intoff_timer->adjust(m_maincpu->cycles_to_attotime(1));
 		}
 	}
@@ -547,7 +551,7 @@ void astrocde_state::video_register_w(offs_t offset, uint8_t data)
 		break;
 
 	case 0x0d:  /* interrupt feedback */
-		m_interrupt_vector = data;
+		m_interrupt_feedback = data;
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 		break;
 

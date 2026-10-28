@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Lee Taylor
 /*************************************************************************
 
-    Cosmic Guerilla & other Universal boards (in cosmic.c)
+    Cosmic Guerilla & other Universal boards (in cosmic.cpp)
 
 *************************************************************************/
 #ifndef MAME_UNIVERSAL_COSMIC_H
@@ -73,6 +73,7 @@ private:
 	int            m_dive_bomb_b_select = 0;
 
 	/* misc */
+	uint8_t        m_irq_vector;
 	optional_ioport_array<4> m_in_ports;
 	optional_ioport m_dsw;
 
@@ -115,6 +116,7 @@ private:
 	void cosmica_map(address_map &map) ATTR_COLD;
 	void magspot_map(address_map &map) ATTR_COLD;
 	void panic_map(address_map &map) ATTR_COLD;
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 };
 
 #endif // MAME_UNIVERSAL_COSMIC_H

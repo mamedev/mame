@@ -112,10 +112,12 @@ private:
 
 	void hold_load();
 	void set_int_line(int line, int state);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<vdt911_device> m_terminal;
 	uint16_t m_intlines;
+	uint8_t m_irq_vector;
 	int m_ckon_state;
 	emu_timer*  m_load_timer = nullptr;
 };
@@ -127,9 +129,6 @@ private:
 
 void ti990_10_state::set_int_line(int line, int state)
 {
-	int level;
-
-
 	if (state)
 		m_intlines |= (1 << line);
 	else
@@ -137,12 +136,16 @@ void ti990_10_state::set_int_line(int line, int state)
 
 	if (m_intlines)
 	{
-		for (level = 0; ! (m_intlines & (1 << level)); level++)
-			;
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, level);  /* TI990_10 - interrupt it, baby */
+		for (m_irq_vector = 0; ! (m_intlines & (1 << m_irq_vector)); m_irq_vector++);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 	else
 		m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(ti990_10_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 
@@ -249,6 +252,8 @@ void ti990_10_state::machine_start()
 {
 	m_load_timer = timer_alloc(FUNC(ti990_10_state::clear_load), this);
 
+	save_item(NAME(m_irq_vector));
+
 #if 0
 	/* load specific ti990/12 rom page */
 	const int page = 3;
@@ -260,6 +265,8 @@ void ti990_10_state::machine_start()
 void ti990_10_state::machine_reset()
 {
 	hold_load();
+
+	m_irq_vector = 0;
 }
 
 /*
@@ -338,6 +345,7 @@ void ti990_10_state::ti990_10(machine_config &config)
 	TI990_10(config, m_maincpu, 4000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti990_10_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &ti990_10_state::io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(ti990_10_state::cpu_acknowledge_irq));
 
 	// VDT 911 terminal
 	VDT911(config, m_terminal);

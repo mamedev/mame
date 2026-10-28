@@ -119,6 +119,7 @@ private:
 	u8 m_tree_collision_reset = 0;
 	u8 m_prev_value_31 = 0;
 	u8 m_dir_31 = 0;
+	u8 m_irq_vector = 0;
 
 	// handlers
 	u8 mcu_r();
@@ -145,6 +146,7 @@ private:
 	INTERRUPT_GEN_MEMBER(chl_mcu_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(changela_scanline);
 	TIMER_CALLBACK_MEMBER(changela_scanline_callback);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
 	u32 screen_update_changela(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_obj0(bitmap_ind16 &bitmap, int sy);
@@ -190,6 +192,7 @@ void changela_state::machine_start()
 	save_item(NAME(m_tree_collision_reset));
 	save_item(NAME(m_prev_value_31));
 	save_item(NAME(m_dir_31));
+	save_item(NAME(m_irq_vector));
 }
 
 void changela_state::machine_reset()
@@ -214,6 +217,7 @@ void changela_state::machine_reset()
 	m_tree_collision_reset = 0;
 	m_prev_value_31 = 0;
 	m_dir_31 = 0;
+	m_irq_vector = 0;
 }
 
 void changela_state::video_start()
@@ -298,50 +302,53 @@ e:|7 6 5 4 3 2 1 0 Hex|/RAMw /RAMr /ROM  /AdderOutput  AdderInput TrainInputs|
 
 TIMER_DEVICE_CALLBACK_MEMBER(changela_state::changela_scanline)
 {
-	int sy = param;
-
 	// vblank irq
-	if (sy == 256)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xdf); // Z80
+	if (param == 256)
+	{
+		m_irq_vector = 0xdf;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+	else if (((param % 64) == 0))
+	{
+		// timer irq, 3 times per given vblank field
+		m_irq_vector = 0xcf;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
 
-	// timer irq, 3 times per given vblank field
-	else if (((sy % 64) == 0))
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); // Z80
-
-	if (sy < 256)
+	if (param < 256)
 	{
 		// clear the current scanline first
-		const rectangle rect(0, 255, sy, sy);
+		const rectangle rect(0, 255, param, param);
 		m_river_bitmap.fill(0x00, rect);
 		m_obj0_bitmap.fill(0x00, rect);
 		m_tree_bitmap[0].fill(0x00, rect);
 		m_tree_bitmap[1].fill(0x00, rect);
 
-		draw_river(m_river_bitmap, sy);
-		draw_obj0(m_obj0_bitmap, sy);
-		draw_tree(m_tree_bitmap[0], sy, 0);
-		draw_tree(m_tree_bitmap[1], sy, 1);
+		draw_river(m_river_bitmap, param);
+		draw_obj0(m_obj0_bitmap, param);
+		draw_tree(m_tree_bitmap[0], param, 0);
+		draw_tree(m_tree_bitmap[1], param, 1);
 	}
 
-	if (sy >= 32 && sy < 256)
+	if (param >= 32 && param < 256)
 	{
 		// Collision Detection
 		for (int sx = 1; sx < 256; sx++)
 		{
-			u16 pix = m_river_bitmap.pix(sy, sx);
+			u16 pix = m_river_bitmap.pix(param, sx);
 			const bool riv_col = (pix == 0x08 || pix == 0x09 || pix == 0x0a);
 
-			pix = m_river_bitmap.pix(sy, sx-1);
+			pix = m_river_bitmap.pix(param, sx-1);
 			const bool prev_col = (pix == 0x08 || pix == 0x09 || pix == 0x0a);
 
-			if (m_obj0_bitmap.pix(sy, sx) == 0x14) // Car Outline Color
+			if (m_obj0_bitmap.pix(param, sx) == 0x14) // Car Outline Color
 			{
 				// Tree 0 Collision
-				if (m_tree_bitmap[0].pix(sy, sx) != 0)
+				if (m_tree_bitmap[0].pix(param, sx) != 0)
 					m_tree0_col = 1;
 
 				// Tree 1 Collision
-				if (m_tree_bitmap[1].pix(sy, sx) != 0)
+				if (m_tree_bitmap[1].pix(param, sx) != 0)
 					m_tree1_col = 1;
 
 				// Hit Right Bank
@@ -369,6 +376,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(changela_state::changela_scanline)
 			m_boat_shore_col = 0;
 		}
 	}
+}
+
+IRQ_CALLBACK_MEMBER(changela_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 
@@ -1242,6 +1254,7 @@ void changela_state::changela(machine_config &config)
 	Z80(config, m_maincpu, 20_MHz_XTAL/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &changela_state::changela_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(changela_state::changela_scanline), "screen", 0, 1);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(changela_state::cpu_acknowledge_irq));
 
 	M68705P3(config, m_mcu, 20_MHz_XTAL/8);
 	m_mcu->portb_r().set_ioport("MCU");

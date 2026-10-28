@@ -206,6 +206,7 @@ private:
 	uint8_t m_last_sound_data = 0;
 	uint8_t m_protection_data = 0;
 	uint8_t m_flip_screen = 0;
+	uint8_t m_irq_vector = 0;
 
 	emu_timer *m_interrupt_clear_timer = nullptr;
 	emu_timer *m_interrupt_assert_timer = nullptr;
@@ -221,6 +222,7 @@ private:
 	TIMER_CALLBACK_MEMBER(interrupt_clear_callback);
 	TIMER_CALLBACK_MEMBER(interrupt_assert_callback);
 	TIMER_CALLBACK_MEMBER(audio_interrupt_callback);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 	inline uint16_t vpos_to_vysnc_chain_counter(int vpos);
 	inline int vysnc_chain_counter_to_vpos(uint16_t counter);
 	void create_interrupt_timers();
@@ -259,32 +261,29 @@ TIMER_CALLBACK_MEMBER(enigma2_state::interrupt_clear_callback)
 
 TIMER_CALLBACK_MEMBER(enigma2_state::interrupt_assert_callback)
 {
-	uint16_t next_counter;
-	int next_vpos;
-
 	// compute vector and set the interrupt line
 	int vpos = m_screen->vpos();
 	uint16_t counter = vpos_to_vysnc_chain_counter(vpos);
-	uint8_t vector = 0xc7 | ((counter & 0x80) >> 3) | ((~counter & 0x80) >> 4);
-	m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector); // Z80
+	m_irq_vector = 0xc7 | ((counter & 0x80) >> 3) | ((~counter & 0x80) >> 4);
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	// set up for next interrupt
-	if (counter == INT_TRIGGER_COUNT_1)
-		next_counter = INT_TRIGGER_COUNT_2;
-	else
-		next_counter = INT_TRIGGER_COUNT_1;
-
-	next_vpos = vysnc_chain_counter_to_vpos(next_counter);
+	uint16_t next_counter = (counter == INT_TRIGGER_COUNT_1 ? INT_TRIGGER_COUNT_2 : INT_TRIGGER_COUNT_1);
+	int next_vpos = vysnc_chain_counter_to_vpos(next_counter);
 	m_interrupt_assert_timer->adjust(m_screen->time_until_pos(next_vpos));
 	m_interrupt_clear_timer->adjust(m_screen->time_until_pos(vpos + 1));
 }
-
 
 TIMER_CALLBACK_MEMBER(enigma2_state::audio_interrupt_callback)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 	int next_vpos = m_screen->vpos() + 16;
 	m_audio_interrupt_timer->adjust(m_screen->time_until_pos(next_vpos >= VTOTAL ? 8 : next_vpos));
+}
+
+IRQ_CALLBACK_MEMBER(enigma2_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 
@@ -314,6 +313,7 @@ void enigma2_state::machine_start()
 	save_item(NAME(m_last_sound_data));
 	save_item(NAME(m_protection_data));
 	save_item(NAME(m_flip_screen));
+	save_item(NAME(m_irq_vector));
 }
 
 
@@ -325,6 +325,7 @@ void enigma2_state::machine_reset()
 	m_flip_screen = 0;
 	m_sound_latch = 0;
 	m_blink_count = 0;
+	m_irq_vector = 0;
 
 	start_interrupt_timers();
 }
@@ -727,6 +728,7 @@ void enigma2_state::enigma2(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_main_cpu_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(enigma2_state::cpu_acknowledge_irq));
 
 	Z80(config, m_audiocpu, CPU_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_audio_cpu_map);
@@ -757,6 +759,7 @@ void enigma2_state::enigma2a(machine_config &config)
 	I8080(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2a_main_cpu_map);
 	m_maincpu->set_addrmap(AS_IO, &enigma2_state::enigma2a_main_cpu_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(enigma2_state::cpu_acknowledge_irq));
 
 	Z80(config, m_audiocpu, CPU_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_audio_cpu_map);

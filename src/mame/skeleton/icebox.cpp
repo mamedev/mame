@@ -182,6 +182,7 @@ public:
 private:
 	void drq_w(int state);
 	void intrq_w(int state);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 	void machine_reset() override ATTR_COLD;
@@ -296,14 +297,19 @@ void icebox_state::port_f1_w(u8 data)
 void icebox_state::drq_w(int state)
 {
 	if (BIT(m_f1, 2))
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE, 0x00); // Z80
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 // The next byte from floppy is available. Enable CPU so it can get the NOP byte, via IM0.
 void icebox_state::intrq_w(int state)
 {
 	if (BIT(m_f1, 2))
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE, 0x00); // Z80
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(icebox_state::cpu_acknowledge_irq)
+{
+	return 0x00;
 }
 
 static void floppies(device_slot_interface &device)
@@ -325,6 +331,7 @@ void icebox_state::icebox(machine_config &config)
 	Z80(config, m_maincpu, 9'830'400 / 4); // unknown divisor
 	m_maincpu->set_addrmap(AS_PROGRAM, &icebox_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &icebox_state::io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(icebox_state::cpu_acknowledge_irq));
 
 	I8251(config, m_uart0);
 	m_uart0->txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
