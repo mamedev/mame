@@ -50,7 +50,7 @@ void kaneko_pisces_hle_device::device_start()
 	// space owns the handler; only the pending job and coverage are saved.
 	m_subcpu->space(AS_PROGRAM).install_write_tap(
 		0x400000, 0x4fffff, "bg15_coverage",
-		[this](offs_t address, uint16_t &data, uint16_t mem_mask)
+		[this] (offs_t address, uint16_t &data, uint16_t mem_mask)
 		{
 			track_bg15_coverage(address, data, mem_mask);
 		});
@@ -84,14 +84,11 @@ void kaneko_pisces_hle_device::scan_background_images()
 	uint32_t const rom_size = rom.bytes();
 
 	auto const byte = util::big_endian_cast<uint8_t const>(&rom.as_u16());
-	auto word = [&byte](uint32_t offset) -> uint16_t
-	{
-		return (uint16_t(byte[offset]) << 8) | byte[offset + 1];
-	};
+	auto const word = [&byte] (uint32_t offset) -> uint16_t { return (uint16_t(byte[offset]) << 8) | byte[offset + 1]; };
 
 	// Parse one image stream starting at pos. Returns the byte offset
 	// just past the last data byte (before word-alignment), or 0 on failure.
-	auto parse_image = [&byte, &word, rom_size](uint32_t pos) -> uint32_t
+	auto const parse_image = [&byte, &word, rom_size] (uint32_t pos) -> uint32_t
 	{
 		if (pos + 6 > rom_size)
 			return 0;
@@ -290,7 +287,7 @@ uint16_t kaneko_pisces_hle_device::generate_girl_bitmap(uint32_t dest_addr)
 				uint32_t const pixel = bg15_row * 256 + bg15_col;
 				if (bg15_col < 256 && (m_bg15_coverage[pixel / 8] & (0x80 >> (pixel & 7))))
 				{
-					bits |= (1u << bit);
+					bits |= (1U << bit);
 					popcount++;
 				}
 			}

@@ -145,7 +145,7 @@ void galpani2_state::copybg8(bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap,
 			// palette 0001 is the dark backdrop between the menu diamonds;
 			// the header photos and cards are sprites above that backdrop.
 			bool const color_key = layer
-				? rgb_window && !BIT(pen, 11) && pen != 0x00e0 && pen != 0x00e4
+				? (rgb_window && !BIT(pen, 11) && pen != 0x00e0 && pen != 0x00e4)
 				: BIT(pen, 7);
 			bool const passthrough = ((color <= 0x0001) && color_key)
 				|| (layer == 1 && bg8_captured_field(pen));

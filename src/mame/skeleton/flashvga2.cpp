@@ -64,6 +64,8 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_STREAM std::cout
 
@@ -85,7 +87,7 @@ public:
 		, m_eeprom(*this, "eeprom")
 	{ }
 
-	void flashvga2(machine_config &config);
+	void flashvga2(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -108,7 +110,7 @@ private:
 
 uint32_t flashvga2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 *vram = (u8 *)(m_vram.target());
+	auto const vram = util::little_endian_cast<u8 const>(m_vram.target());
 
 	// palette is at top of VRAM, vectors provided by $be800 bank=7 ROM reads
 	// and translated from RAMDAC format to RGB565
@@ -141,7 +143,7 @@ void flashvga2_state::mem_map(address_map &map)
 {
 	map(0x00000, 0x30fff).ram();
 	// TODO: check limits and parallelism (access in 8-bit only?)
-	map(0x30000, 0x31fff).rw("rtc", FUNC(m48t02_device::read), FUNC(m48t02_device::write)).umask16(0x00ff);
+	map(0x30000, 0x31fff).umask16(0x00ff).rw("rtc", FUNC(m48t02_device::read), FUNC(m48t02_device::write));
 	map(0x32000, 0x3ffff).ram();
 	map(0x40000, 0x7ffff).ram().share("vram");
 	// TODO: several zero writes in this area (flash ROM side-effect?)
@@ -154,7 +156,7 @@ void flashvga2_state::mem_map(address_map &map)
 
 void flashvga2_state::io_map(address_map &map)
 {
-	map(0x2000, 0x201f).rw("uart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
+	map(0x2000, 0x201f).umask16(0x00ff).rw("uart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
 	map(0x2176, 0x2177).nopw();
 	map(0x2178, 0x2179).portr("IN0").nopw();
 	map(0x217a, 0x217b).portr("IN1").nopw();

@@ -40,6 +40,7 @@ fifo2812_device::fifo2812_device(machine_config const &mconfig, char const *tag,
 	m_flag_cb(*this),
 	m_control(0U),
 	m_count(0U),
+	m_dumped(0U),
 	m_d(0U), m_mr(1U), m_pl(0U), m_pd(0U), m_oe(1U)
 {
 	std::fill(std::begin(m_data), std::end(m_data), 0U);
@@ -111,7 +112,7 @@ void fifo2812_device::pl_w(int state)
 					m_or_cb(1);
 					if (m_pd && m_oe)
 					{
-						m_dumped = true;
+						m_dumped = 1U;
 						m_control &= ~(u32(1) << bit);
 						m_or_cb(0);
 						if (15U == m_count--)
@@ -134,7 +135,7 @@ void fifo2812_device::pd_w(int state)
 			{
 				if (BIT(m_control, LENGTH - 1))
 				{
-					m_dumped = true;
+					m_dumped = 1U;
 					m_control &= ~(u32(1) << (LENGTH - 1));
 					m_or_cb(0);
 					if (15U == m_count--)
@@ -169,7 +170,7 @@ void fifo2812_device::pd_w(int state)
 			}
 		}
 		if (!m_pd)
-			m_dumped = false;
+			m_dumped = 0U;
 	}
 }
 
@@ -225,12 +226,12 @@ void fifo2812_device::device_start()
 	save_item(NAME(m_control));
 	save_item(NAME(m_data));
 	save_item(NAME(m_count));
+	save_item(NAME(m_dumped));
 	save_item(NAME(m_d));
 	save_item(NAME(m_mr));
 	save_item(NAME(m_pl));
 	save_item(NAME(m_pd));
 	save_item(NAME(m_oe));
-	save_item(NAME(m_dumped));
 }
 
 void fifo2812_device::device_reset()
@@ -242,7 +243,7 @@ void fifo2812_device::device_reset()
 	m_control = 0U;
 	std::fill(std::begin(m_data), std::end(m_data), 0U);
 	m_count = 0U;
-	m_dumped = false;
+	m_dumped = 0U;
 	if (m_oe && (0U != prev_q))
 		m_q_cb(0U, 0U, 0xffU);
 	if (prev_ir)

@@ -38,8 +38,12 @@ public:
 		m_subdatabank(*this, "subdatabank")
 	{ }
 
-	void galpani2(machine_config &config);
-	void gp2se(machine_config &config);
+	void galpani2(machine_config &config) ATTR_COLD;
+	void gp2se(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -80,14 +84,13 @@ private:
 	void galpani2_oki1_bank_w(uint8_t data);
 	void galpani2_oki2_bank_w(uint8_t data);
 	void subdatabank_select_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update_galpani2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void copybg8(bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect, int layer, bool foreground);
 	void copybg15(bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect, int priority);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani2_interrupt1);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani2_interrupt2);
+
 	void galpani2_mem1(address_map &map) ATTR_COLD;
 	void galpani2_mem2(address_map &map) ATTR_COLD;
 };

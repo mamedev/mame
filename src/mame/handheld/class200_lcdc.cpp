@@ -29,7 +29,7 @@ u32 class200_lcdc_device::render_to_bitmap(screen_device &screen, bitmap_rgb32 &
 	{
 		if ((y >= 0) && (y < 176))
 		{
-			u32* const dst = &bitmap.pix(y);
+			u32 *const dst = &bitmap.pix(y);
 
 			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
@@ -63,28 +63,29 @@ void class200_lcdc_device::class200_lcdc_advance()
 	if (h_start > h_end || v_start > v_end)
 		return;
 
-	const auto advance = [](u16 &coord, u32 lo, u32  hi, bool increase)
-	{
-		if (increase)
+	const auto advance =
+		[] (u16 &coord, u32 lo, u32  hi, bool increase) -> bool
 		{
-			if (coord >= hi)
+			if (increase)
 			{
-				coord = lo;
-				return true;
+				if (coord >= hi)
+				{
+					coord = lo;
+					return true;
+				}
+				coord++;
 			}
-			coord++;
-		}
-		else
-		{
-			if (coord <= lo)
+			else
 			{
-				coord = hi;
-				return true;
+				if (coord <= lo)
+				{
+					coord = hi;
+					return true;
+				}
+				coord--;
 			}
-			coord--;
-		}
-		return false;
-	};
+			return false;
+		};
 
 	if (mode & 0x0008)
 	{

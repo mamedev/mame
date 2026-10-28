@@ -43,6 +43,10 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
+	static constexpr uint32_t GIRL_BITMAP_OFFSET = 0xe000;
+	static constexpr uint32_t GIRL_BITMAP_ADDR = 0x10e000;
+	static constexpr uint32_t BG15_COVERAGE_SIZE = 0x2000;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_memory_region m_subdata;
@@ -57,9 +61,6 @@ private:
 	uint8_t m_bg_decode_param_offset;
 	int m_field_origin_x;
 
-	static constexpr uint32_t GIRL_BITMAP_OFFSET = 0xe000;
-	static constexpr uint32_t GIRL_BITMAP_ADDR = 0x10e000;
-	static constexpr uint32_t BG15_COVERAGE_SIZE = 0x2000;
 	uint32_t m_girl_bitmap_pending_addr;
 	uint32_t m_girl_bitmap_pending_param;
 	uint32_t m_girl_bitmap_pending_task;

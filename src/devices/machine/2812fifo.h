@@ -63,9 +63,9 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void parallel_load();
-
 	enum { LENGTH = 32 };
+
+	void parallel_load();
 
 	// output callbacks
 	devcb_write8 m_q_cb;
@@ -77,10 +77,10 @@ private:
 	u32 m_control;
 	std::array<u8, LENGTH> m_data;
 	u8 m_count;
+	u8 m_dumped;
 
 	// input line states
 	u8 m_d, m_mr, m_pl, m_pd, m_oe;
-	bool m_dumped = false;
 };
 
 DECLARE_DEVICE_TYPE(FIFO2812, fifo2812_device)

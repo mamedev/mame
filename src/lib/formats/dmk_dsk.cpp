@@ -126,7 +126,7 @@ int track_offset(const std::vector<uint8_t> &data, int offset)
 {
 	int const length = int(data.size()) - TRACK_HEADER_SIZE;
 	int const relative = (offset - TRACK_HEADER_SIZE) % length;
-	return TRACK_HEADER_SIZE + (relative < 0 ? relative + length : relative);
+	return TRACK_HEADER_SIZE + (relative < 0 ? (relative + length) : relative);
 }
 
 // DMK retains data bytes, not individual clock bits.  Only change the clocks
@@ -214,7 +214,7 @@ bool decode_track(const std::vector<bool> &bits, bool initial_mfm, std::vector<u
 		// as the mark itself.  Select FM at their start on the output pass,
 		// before a previous MFM phase can turn them into AA bytes and emit
 		// part of the address mark as an extra byte.
-		if (fm_sync[position < 0 ? position + length : position]
+		if (fm_sync[(position < 0) ? (position + length) : position]
 			&& position >= protected_until && position >= splice_until)
 		{
 			mfm = false;
@@ -260,7 +260,7 @@ bool decode_track(const std::vector<bool> &bits, bool initial_mfm, std::vector<u
 		int const width = mfm ? 16 : 32;
 		uint8_t value = 0;
 		for (int bit = 0; bit < 8; bit++)
-			value = (value << 1) | raw(position + (mfm ? 2 * bit + 1 : 4 * bit + 2), 1);
+			value = (value << 1) | raw(position + (mfm ? (2 * bit + 1) : (4 * bit + 2)), 1);
 		if (mfm)
 		{
 			uint64_t const preamble = raw(position - 32, 32);
@@ -304,11 +304,11 @@ bool decode_track(const std::vector<bool> &bits, bool initial_mfm, std::vector<u
 			{
 				if (idams.size() == MAX_IDAMS || data.size() > 0x3ffe)
 					return false;
-				idams.push_back(uint16_t(data.size()) | (mfm ? 0x8000 : 0));
+				idams.emplace_back(uint16_t(data.size()) | (mfm ? 0x8000 : 0));
 			}
-			data.push_back(value);
+			data.emplace_back(value);
 			if (!mfm && position >= 0 && position + 16 < length)
-				data.push_back(value);
+				data.emplace_back(value);
 		}
 		next = position + width;
 	}
@@ -394,7 +394,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 			std::vector<int> idams;
 			for (int i = 0; i < MAX_IDAMS && get_u16le(&track_data[i * 2]); i++)
-				idams.push_back(get_u16le(&track_data[i * 2]) & 0x3fff);
+				idams.emplace_back(get_u16le(&track_data[i * 2]) & 0x3fff);
 
 			bool const initial_mfm = idams.empty() ? !util::BIT(disk.flags, 6) : util::BIT(track_data[1], 7);
 			std::vector<bool> encoding(disk.track_size, initial_mfm);
@@ -403,14 +403,14 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			int first_sync = idams.empty() ? TRACK_HEADER_SIZE : idams.front();
 			std::vector<int> encoding_start;
 			int const last_stride = idams.empty() || util::BIT(track_data[(idams.size() - 1) * 2 + 1], 7) ? 1 : fm_stride;
-			int iam_begin = idams.empty() ? TRACK_HEADER_SIZE : idams.back() - length + 7 * last_stride;
+			int iam_begin = idams.empty() ? TRACK_HEADER_SIZE : (idams.back() - length + 7 * last_stride);
 
 			// Use unwrapped offsets to describe density regions through index.
 			for (unsigned index = 0; index < idams.size(); index++)
 			{
 				int const offset = idams[index];
 				bool const mfm = util::BIT(track_data[index * 2 + 1], 7);
-				int const previous = index ? idams[index - 1] : idams.back() - length;
+				int const previous = index ? idams[index - 1] : (idams.back() - length);
 				bool const previous_mfm = util::BIT(track_data[((index + idams.size() - 1) % idams.size()) * 2 + 1], 7);
 
 				// Early versions of this writer emitted a phase-shifted first
@@ -433,7 +433,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					: fm_sync_count(track_data, offset, fm_stride, previous + 7 * (previous_mfm ? 1 : fm_stride));
 				// Exact density-change positions are not recorded in DMK.  Switch
 				// before the entire sync preamble, without crossing the last ID.
-				encoding_start.push_back(std::max(previous + 1, offset - sync - 8));
+				encoding_start.emplace_back(std::max(previous + 1, offset - sync - 8));
 				if (!index)
 					first_sync = offset - sync;
 			}
@@ -443,12 +443,12 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				int const offset = idams[index];
 				bool const mfm = util::BIT(track_data[index * 2 + 1], 7);
 				int const sync = mfm ? sync_count(track_data, offset, 0xa1) : 0;
-				int const next_idam = index + 1 < idams.size() ? idams[index + 1] : idams.front() + length;
+				int const next_idam = (index + 1 < idams.size()) ? idams[index + 1] : (idams.front() + length);
 				int const stride = mfm ? 1 : fm_stride;
 				has_idam = true;
 				has_mfm |= mfm;
 
-				int const end = index + 1 < idams.size() ? encoding_start[index + 1] : encoding_start.front() + length;
+				int const end = (index + 1 < idams.size()) ? encoding_start[index + 1] : (encoding_start.front() + length);
 				for (int i = encoding_start[index]; i < end; i++)
 					encoding[track_offset(track_data, i)] = mfm;
 
@@ -496,7 +496,7 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			// IAM encoding follows the first sector, not the FM storage flags.
 			// Step backwards in logical bytes so doubled FM selects the first FC.
 			int const iam_stride = initial_mfm ? 1 : fm_stride;
-			int const iam_end = idams.empty() ? TRACK_HEADER_SIZE + length - (length % iam_stride) : first_sync;
+			int const iam_end = idams.empty() ? (TRACK_HEADER_SIZE + length - (length % iam_stride)) : first_sync;
 			for (int i = iam_end - iam_stride; i >= iam_begin; i -= iam_stride)
 			{
 				int const iam = track_offset(track_data, i);
@@ -590,8 +590,8 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 	// Storage size is independent of the encoding actually present on disk.
 	bool const single_density = has_idam ? !has_mfm : util::BIT(disk.flags, 6);
-	image.set_variant(single_density ? (disk.heads == 2 ? floppy_image::DSSD : floppy_image::SSSD)
-		: (disk.heads == 2 ? floppy_image::DSDD : floppy_image::SSDD));
+	image.set_variant(single_density ? ((disk.heads == 2) ? floppy_image::DSSD : floppy_image::SSSD)
+		: ((disk.heads == 2) ? floppy_image::DSDD : floppy_image::SSDD));
 
 	return true;
 }
@@ -609,9 +609,9 @@ bool dmk_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 		return false;
 
 	bool const initial_mfm = image.get_variant() != floppy_image::SSSD && image.get_variant() != floppy_image::DSSD;
-	int cell_size = image.get_form_factor() == floppy_image::FF_8 ? 1200 : 2000;
+	int cell_size = (image.get_form_factor() == floppy_image::FF_8) ? 1200 : 2000;
 	if (image.get_variant() == floppy_image::DSHD)
-		cell_size = image.get_form_factor() == floppy_image::FF_35 ? 1000 : 1200;
+		cell_size = (image.get_form_factor() == floppy_image::FF_35) ? 1000 : 1200;
 	if (image.get_variant() == floppy_image::DSED)
 		return false; // A full ED revolution cannot fit DMK's 14-bit offsets.
 
@@ -629,7 +629,7 @@ bool dmk_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 	uint8_t header[HEADER_SIZE] = { 0 };
 	header[1] = tracks;
 	put_u16le(&header[2], track_size);
-	header[4] = heads == 1 ? 0x10 : 0;
+	header[4] = (heads == 1) ? 0x10 : 0;
 	auto const [header_error, header_actual] = write_at(io, 0, header, sizeof(header));
 	if (header_error || header_actual != sizeof(header))
 		return false;

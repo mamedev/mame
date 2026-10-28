@@ -170,11 +170,15 @@ void nwb_512_device::device_add_mconfig(machine_config &config)
 	constexpr uint16_t HORIZONTAL = 816;
 	constexpr uint16_t VERTICAL = 1024;
 
+	// TODO: measure or find documentation for video timing
+	// The board has a 70.7 MHz crystal
+	// 1066 total lines guessed based on SXGA 1280*1024 mode
+	// 1106 total horizontal clocks calculated to give ~59.57 Hz refresh
 	SCREEN(config, m_nwp_512d);
-	m_nwp_512d->set_raw(70.7_MHz_XTAL, // TODO: the board has a 70.7MHz crystal, but it might be divided.
-						HORIZONTAL, 0, HORIZONTAL,
-						VERTICAL, 0, VERTICAL);
-	m_nwp_512d->set_physical_aspect(51, 64); // portrait mode CRT, square-ish pixels/~4:5 ratio assumed
+	m_nwp_512d->set_raw(70.7_MHz_XTAL,
+			1106, 0, HORIZONTAL,
+			1066, 0, VERTICAL);
+	m_nwp_512d->set_physical_aspect(4, 5); // portrait mode CRT, square-ish pixels/~4:5 ratio assumed
 	m_nwp_512d->set_screen_update(FUNC(nwb_512_device::screen_update));
 }
 
