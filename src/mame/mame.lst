@@ -32551,9 +32551,6 @@ magicfly
 magictg
 magictga
 
-@source:misc/magreel.cpp
-magreel
-
 @source:misc/magtouch.cpp
 magtouch
 
@@ -33460,6 +33457,9 @@ rcorsair
 @source:misc/re900.cpp
 bs94
 re900
+
+@source:misc/reelmag.cpp
+reelmag
 
 @source:misc/rgum.cpp
 rgum
