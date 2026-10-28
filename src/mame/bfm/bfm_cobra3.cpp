@@ -28,14 +28,22 @@
    Other title user notes:
    - Radio Times accepts £1 (5), 50p (6), 20p (7) and 10p (8).  Its left A-D
      controls use A/B/C/D, its right A-D controls use Z/X/V/N, and Start is 1.
-   - Top of the Pops and The Phrase That Pays normally accept £1 (5), 50p (6),
-     20p (7) and £2 (8).  Although their software recognises 10p and 5p codes,
-     those denominations are inhibited and are not exposed as player inputs.
+   - Top of the Pops and The Phrase That Pays accept £1 (5), 50p (6), 20p (7),
+     10p (8), 5p and £2.  Assign keyboard controls for 5p and £2 in the input
+     settings.  Their encoded acceptors share inhibit outputs
+     between 5p/10p/50p and between £1/£2; 20p has its own output.
    - Top of the Pops identifies its payout unit as a £1 payslide.  The Phrase
      That Pays identifies its payout unit as a £1 hopper.
    - In The Phrase That Pays, after inserting credit, A (Right) (Left Shift)
      selects the 50p game and C (Right) (X) selects the £1 game.  Spin (1)
      starts the selected game.
+   - The Phrase That Pays offers three games for £1 with a £5 jackpot when
+     DIL 3 is enabled.  Restart after changing this setting.  C (Right)
+     selects the three-game offer.
+   - The Phrase That Pays has separate £5 and £10 note inputs.
+     Each note gives £1 of play credit and puts the remainder in the bank.
+     The parallel validator interface is simulated; the fitted validator
+     is unidentified.
 
    BTANB:
    - Pressing Test with the Back and Front Doors closed can skip or interrupt
@@ -104,6 +112,8 @@ public:
 	int pound_tube_low_r();
 	int twenty_p_tube_low_r();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	ioport_value note_data_r();
+	DECLARE_INPUT_CHANGED_MEMBER(note_inserted);
 
 protected:
 	void machine_start() override ATTR_COLD;
@@ -113,6 +123,14 @@ protected:
 
 private:
 	static constexpr unsigned NVRAM_BYTES = 16 * 1024;
+	enum : u8
+	{
+		NOTE_IDLE,
+		NOTE_FIRST_PULSE,
+		NOTE_WAIT_FIRST_ACK,
+		NOTE_SECOND_PULSE,
+		NOTE_WAIT_FINAL_ACK
+	};
 
 	void update_lamps();
 	void update_diverters();
@@ -121,6 +139,9 @@ private:
 	void output_latch_w(u16 data, u16 mem_mask);
 	void coin_lockouts_w(u8 enables);
 	void diverter_latch_w(u16 data, u16 mem_mask);
+	void note_control_w(u8 data);
+	void note_end_transfer();
+	TIMER_CALLBACK_MEMBER(note_pulse_expired);
 
 	void volume_step(bool direction);
 	void av110_reset_strobe_w(u8 data);
@@ -163,6 +184,7 @@ private:
 	required_ioport m_iostatus;
 	optional_ioport m_coin_inputs;
 	optional_ioport_array<2> m_initial_tube_fill;
+	optional_ioport m_note_inputs;
 	required_device<meters_device> m_meters;
 	optional_device<hopper_device> m_hopper;
 	output_finder<24> m_lamps;
@@ -178,6 +200,10 @@ private:
 	u8 m_pound_tube_level = 0;
 	u8 m_twenty_p_tube_level = 0;
 	bool m_tube_levels_initialized = false;
+	emu_timer *m_note_pulse_timer;
+	u8 m_note_control;
+	u8 m_note_phase;
+	u8 m_note_mask;
 };
 
 bfm_cobra3_state::bfm_cobra3_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -199,11 +225,13 @@ bfm_cobra3_state::bfm_cobra3_state(const machine_config &mconfig, device_type ty
 	, m_iostatus(*this, "IOSTATUS")
 	, m_coin_inputs(*this, "COINS")
 	, m_initial_tube_fill(*this, "TUBE%u", 0U)
+	, m_note_inputs(*this, "NOTES")
 	, m_meters(*this, "meters")
 	, m_hopper(*this, "hopper")
 	, m_lamps(*this, "lamp%u", 0U)
 	, m_coin_lockouts(*this, "coin_lockout%u", 0U)
 	, m_diverters(*this, "diverter%u", 0U)
+	, m_note_control(0)
 {
 }
 
@@ -298,12 +326,75 @@ void bfm_cobra3_state::coin_lockouts_w(u8 enables)
 	for (unsigned channel = 0; channel < std::size(lockouts); channel++)
 		m_coin_lockouts[channel] = lockouts[channel];
 
-	// The encoded acceptor uses the fourth logical coin input for £2, which has no inhibit output.
+	// The encoded acceptor groups 5p/10p/50p and £1/£2 on shared enable outputs.
 	unsigned const mapped_channels = m_coin_inputs.found() ? 3 : std::size(lockouts);
 	for (unsigned channel = 0; channel < mapped_channels; channel++)
 		machine().bookkeeping().coin_lockout_w(channel, lockouts[channel]);
 	if (m_coin_inputs.found())
-		machine().bookkeeping().coin_lockout_w(3, false);
+	{
+		machine().bookkeeping().coin_lockout_w(3, lockouts[1]); // 10p
+		machine().bookkeeping().coin_lockout_w(4, lockouts[1]); // 5p
+		machine().bookkeeping().coin_lockout_w(5, lockouts[0]); // £2
+	}
+}
+
+// Models the parallel note interface used by Phrase That Pays.  The fitted
+// validator is unidentified; 100 ms pulses satisfy the ROM's 8-12 sample window.
+// TODO: Identify the validator and verify its pulse timing against hardware.
+void bfm_cobra3_state::note_control_w(u8 data)
+{
+	u8 const previous = m_note_control;
+	m_note_control = data & 0x13;
+	if (m_note_phase == NOTE_IDLE)
+		return;
+
+	// Once both pulses have finished, retain the busy state until the host
+	// completes its acknowledgement, even if it has inhibited further notes.
+	if ((m_note_phase != NOTE_WAIT_FINAL_ACK) && !(m_note_control & m_note_mask))
+	{
+		note_end_transfer();
+		return;
+	}
+
+	if ((m_note_phase == NOTE_WAIT_FIRST_ACK) && BIT(previous, 4) && !BIT(m_note_control, 4))
+	{
+		m_note_phase = NOTE_SECOND_PULSE;
+		m_note_pulse_timer->adjust(attotime::from_msec(100));
+	}
+	else if ((m_note_phase == NOTE_WAIT_FINAL_ACK) && !BIT(previous, 4) && BIT(m_note_control, 4))
+	{
+		note_end_transfer();
+	}
+}
+
+ioport_value bfm_cobra3_state::note_data_r()
+{
+	return ((m_note_phase == NOTE_FIRST_PULSE) || (m_note_phase == NOTE_SECOND_PULSE)) ? m_note_mask : 0;
+}
+
+INPUT_CHANGED_MEMBER(bfm_cobra3_state::note_inserted)
+{
+	if (!newval || (m_note_phase != NOTE_IDLE) || !BIT(m_note_control, 4) || !(m_note_control & param))
+		return;
+
+	m_note_mask = param;
+	m_note_phase = NOTE_FIRST_PULSE;
+	m_note_pulse_timer->adjust(attotime::from_msec(100));
+}
+
+TIMER_CALLBACK_MEMBER(bfm_cobra3_state::note_pulse_expired)
+{
+	if (m_note_phase == NOTE_FIRST_PULSE)
+		m_note_phase = NOTE_WAIT_FIRST_ACK;
+	else if (m_note_phase == NOTE_SECOND_PULSE)
+		m_note_phase = NOTE_WAIT_FINAL_ACK;
+}
+
+void bfm_cobra3_state::note_end_transfer()
+{
+	m_note_phase = NOTE_IDLE;
+	m_note_mask = 0;
+	m_note_pulse_timer->adjust(attotime::never);
 }
 
 void bfm_cobra3_state::volume_step(bool direction)
@@ -431,11 +522,16 @@ void bfm_cobra3_state::io_w(offs_t offset, u16 data, u16 mem_mask)
 			diverter_latch_w(data, mem_mask);
 			break;
 
-		case 0xa00: // hopper drive outputs
+		case 0xa00: // hopper drive and note validator outputs
 		{
-			u16 const handled = m_hopper ? 0x0020 : 0x0000;
-			if (m_hopper && ACCESSING_BITS_0_7)
-				m_hopper->motor_w(BIT(data, 5));
+			u16 const handled = (m_hopper ? 0x0020 : 0x0000) | (m_note_inputs.found() ? 0x0013 : 0x0000);
+			if (ACCESSING_BITS_0_7)
+			{
+				if (m_hopper)
+					m_hopper->motor_w(BIT(data, 5));
+				if (m_note_inputs.found())
+					note_control_w(data);
+			}
 			if (data & mem_mask & ~handled)
 				LOGMASKED(LOG_UNKNOWN, "%s: unimplemented hopper drive output write offset %08x data %04x mask %04x\n", machine().describe_context(), offset * 2, data, mem_mask);
 			break;
@@ -591,12 +687,23 @@ void bfm_cobra3_state::machine_start()
 	save_item(NAME(m_pound_tube_level));
 	save_item(NAME(m_twenty_p_tube_level));
 	save_item(NAME(m_tube_levels_initialized));
+	if (m_note_inputs.found())
+	{
+		m_note_pulse_timer = timer_alloc(FUNC(bfm_cobra3_state::note_pulse_expired), this);
+		note_end_transfer();
+		save_item(NAME(m_note_control));
+		save_item(NAME(m_note_phase));
+		save_item(NAME(m_note_mask));
+	}
 	machine().save().register_postload(save_prepost_delegate(FUNC(bfm_cobra3_state::update_lamps), this));
 	machine().save().register_postload(save_prepost_delegate(FUNC(bfm_cobra3_state::update_diverters), this));
 }
 
 void bfm_cobra3_state::machine_reset()
 {
+	if (m_note_inputs.found())
+		note_end_transfer();
+
 	if (!m_tube_levels_initialized && m_initial_tube_fill[0].found() && m_initial_tube_fill[1].found())
 	{
 		m_pound_tube_level = (m_initial_tube_fill[0]->read() * 40 + 50) / 100; // £40 capacity in £1 coins
@@ -920,9 +1027,6 @@ static INPUT_PORTS_START( c3_totp )
 	PORT_MODIFY("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME(u8"£1") PORT_IMPULSE(3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bfm_cobra3_state::coin_inserted), 100)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("20p") PORT_IMPULSE(3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bfm_cobra3_state::coin_inserted), 20)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME(u8"£2") PORT_IMPULSE(3)
 
 	PORT_MODIFY("STROBE0")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -942,11 +1046,6 @@ static INPUT_PORTS_START( c3_ppays )
 	PORT_INCLUDE(cobra3_encoded_coins)
 	PORT_INCLUDE(cobra3_standard_dils)
 
-	PORT_MODIFY("COINS")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME(u8"£2") PORT_IMPULSE(3)
-
 	PORT_MODIFY("STROBE0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("A (Left)") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("B (Left)") PORT_CODE(KEYCODE_B)
@@ -961,17 +1060,24 @@ static INPUT_PORTS_START( c3_ppays )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_MODIFY("STROBE3")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(bfm_cobra3_state::note_data_r))
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_DOOR ) PORT_NAME("Cash Door Open") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Back and Front Doors Open") PORT_CODE(KEYCODE_T) PORT_TOGGLE
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Refill/Volume Setup Mode") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 
 	PORT_MODIFY("STROBE4")
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "DIL:!03" )
+	PORT_DIPNAME( 0x04, 0x00, u8"3 Games for £1" ) PORT_DIPLOCATION("DIL:!03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, "Refill Mode Statistics" ) PORT_DIPLOCATION("DIL:!04")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "DIL:!06" )
+
+	PORT_START("NOTES")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BILL1 ) PORT_NAME(u8"£5 Note") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bfm_cobra3_state::note_inserted), 0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME(u8"£10 Note") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bfm_cobra3_state::note_inserted), 0x02)
 INPUT_PORTS_END
 
 ROM_START( c3_rtime )
