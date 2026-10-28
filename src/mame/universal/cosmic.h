@@ -35,17 +35,17 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	void cosmic(machine_config &config);
-	void cosmica(machine_config &config);
-	void nomnlnd(machine_config &config);
-	void devzone(machine_config &config);
-	void panic(machine_config &config);
-	void magspot(machine_config &config);
+	void cosmic(machine_config &config) ATTR_COLD;
+	void cosmica(machine_config &config) ATTR_COLD;
+	void nomnlnd(machine_config &config) ATTR_COLD;
+	void devzone(machine_config &config) ATTR_COLD;
+	void panic(machine_config &config) ATTR_COLD;
+	void magspot(machine_config &config) ATTR_COLD;
 
-	void init_devzone();
-	void init_nomnlnd();
-	void init_cosmica();
-	void init_panic();
+	void init_devzone() ATTR_COLD;
+	void init_nomnlnd() ATTR_COLD;
+	void init_cosmica() ATTR_COLD;
+	void init_panic() ATTR_COLD;
 
 	void panic_coin_inserted(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(cosmica_coin_inserted);
@@ -73,7 +73,6 @@ private:
 	int            m_dive_bomb_b_select = 0;
 
 	/* misc */
-	uint8_t        m_irq_vector;
 	optional_ioport_array<4> m_in_ports;
 	optional_ioport m_dsw;
 

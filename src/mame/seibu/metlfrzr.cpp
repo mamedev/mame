@@ -38,6 +38,7 @@ public:
 	metlfrzr_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_work_ram(*this, "wram"),
 		m_vram(*this, "vram"),
@@ -47,9 +48,9 @@ public:
 		m_mainbank(*this, "mainbank")
 	{ }
 
-	void metlfrzr(machine_config &config);
+	void metlfrzr(machine_config &config) ATTR_COLD;
 
-	void init_metlfrzr();
+	void init_metlfrzr() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -68,6 +69,7 @@ private:
 	void metlfrzr_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_decrypted_opcodes;
 	required_shared_ptr<uint8_t> m_work_ram;
 	required_shared_ptr<uint8_t> m_vram;
@@ -79,7 +81,6 @@ private:
 
 	uint8_t m_fg_tilebank = 0;
 	bool m_rowscroll_enable = false;
-	uint8_t m_irq_vector = 0;
 };
 
 
@@ -327,13 +328,11 @@ INPUT_PORTS_END
 void metlfrzr_state::machine_start()
 {
 	m_mainbank->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
-	save_item(NAME(m_irq_vector));
 }
 
 void metlfrzr_state::machine_reset()
 {
 	m_mainbank->set_entry(0);
-	m_irq_vector = 0;
 }
 
 
@@ -370,20 +369,14 @@ GFXDECODE_END
 TIMER_DEVICE_CALLBACK_MEMBER(metlfrzr_state::scanline)
 {
 	if (param == 240) // vblank-out irq
-	{
-		m_irq_vector = 0xd7; // RST 10h
 		m_maincpu->set_input_line(0, HOLD_LINE);
-	}
 	else if (param == 0) // vblank-in irq (TODO: check this irq)
-	{
-		m_irq_vector = 0xcf; // RST 08h
 		m_maincpu->set_input_line(0, HOLD_LINE);
-	}
 }
 
 IRQ_CALLBACK_MEMBER(metlfrzr_state::cpu_acknowledge_irq)
 {
-	return m_irq_vector;
+	return (m_screen->vpos() >= 240) ? 0xd7 : 0xcf; // RST 10h / RST 08h
 }
 
 void metlfrzr_state::metlfrzr(machine_config &config)
@@ -404,13 +397,13 @@ void metlfrzr_state::metlfrzr(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_metlfrzr);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(256, 256);
-	screen.set_visarea(0, 256 - 1, 16, 256 - 16 - 1);
-	screen.set_screen_update(FUNC(metlfrzr_state::screen_update_metlfrzr));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256 - 1, 16, 256 - 16 - 1);
+	m_screen->set_screen_update(FUNC(metlfrzr_state::screen_update_metlfrzr));
+	m_screen->set_palette(m_palette);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

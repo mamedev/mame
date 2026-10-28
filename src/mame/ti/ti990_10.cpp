@@ -88,9 +88,10 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_terminal(*this, "vdt911")
 		, m_intlines(0)
-		, m_ckon_state(0) { }
+		, m_ckon_state(0)
+	{ }
 
-	void ti990_10(machine_config &config);
+	void ti990_10(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -117,7 +118,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<vdt911_device> m_terminal;
 	uint16_t m_intlines;
-	uint8_t m_irq_vector;
 	int m_ckon_state;
 	emu_timer*  m_load_timer = nullptr;
 };
@@ -135,17 +135,14 @@ void ti990_10_state::set_int_line(int line, int state)
 		m_intlines &= ~ (1 << line);
 
 	if (m_intlines)
-	{
-		for (m_irq_vector = 0; ! (m_intlines & (1 << m_irq_vector)); m_irq_vector++);
 		m_maincpu->set_input_line(0, ASSERT_LINE);
-	}
 	else
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 IRQ_CALLBACK_MEMBER(ti990_10_state::cpu_acknowledge_irq)
 {
-	return m_irq_vector;
+	return std::countr_zero(m_intlines);
 }
 
 
@@ -252,8 +249,6 @@ void ti990_10_state::machine_start()
 {
 	m_load_timer = timer_alloc(FUNC(ti990_10_state::clear_load), this);
 
-	save_item(NAME(m_irq_vector));
-
 #if 0
 	/* load specific ti990/12 rom page */
 	const int page = 3;
@@ -265,8 +260,6 @@ void ti990_10_state::machine_start()
 void ti990_10_state::machine_reset()
 {
 	hold_load();
-
-	m_irq_vector = 0;
 }
 
 /*
