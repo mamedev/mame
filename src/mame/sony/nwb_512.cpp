@@ -44,54 +44,58 @@
 
 #include <array>
 
-DEFINE_DEVICE_TYPE(NWB_512, nwb_512_device, "nwb_512", "Sony NWB-512 monochrome framebuffer")
 
-namespace
-{
-	// Total memory region is 2048 x 2048 pixels (512KiB)
-	constexpr uint16_t X_MAX = 2048;
-	constexpr uint16_t Y_MAX = 2048;
+namespace {
 
-	// Hardware raster operations for logging
-	constexpr std::array RASTER_OPS = {
+// Total memory region is 2048 x 2048 pixels (512KiB)
+constexpr uint16_t X_MAX = 2048;
+constexpr uint16_t Y_MAX = 2048;
+
+// Hardware raster operations for logging
+constexpr std::array RASTER_OPS = {
 		"~S", "~(S | D)", "~S & D", "0", "~(S & D)", "~D", "S ^ D", "S & ~D", "~S | D", "~(S ^ D)", "D", "S & D", "1", "S | ~D", "S | D", "S"};
 
-	// Takes in an x,y coordinate and returns the word offset into the framebuffer memory region
-	constexpr uint32_t coordinate_to_word_offset(uint16_t x, uint16_t y)
-	{
-		return (y % Y_MAX) * (X_MAX / 16) + ((x % X_MAX) >> 4);
-	}
-
-	// Gets the pixel offset of a given x coordinate
-	constexpr uint16_t x_to_pixel_offset(uint16_t x)
-	{
-		return  ~x & 15; // pixel 0 = bit 15
-	}
-
-	// Extracts the X address from the data provided to an FB write
-	constexpr uint16_t x_address(uint16_t data)
-	{
-		return data & 0xfff; // When X is supplied, it is in D11-D0
-	}
-
-	// Extracts the Y address from the address provided to an FB write
-	constexpr uint16_t y_address(uint16_t data) // word offset
-	{
-		return data & 0xfff; // When Y is supplied, it is in A12-A1
-	}
-
-	// True if address written specifies that the write should also load the shift
-	constexpr bool shift_load_requested(offs_t offset) // word offset
-	{
-		return offset & (0x2000 >> 1);
-	}
-
-	// True if address written specifies operation start
-	constexpr bool execution_requested(offs_t offset) // word offset
-	{
-		return offset & (0x4000 >> 1);
-	}
+// Takes in an x,y coordinate and returns the word offset into the framebuffer memory region
+constexpr uint32_t coordinate_to_word_offset(uint16_t x, uint16_t y)
+{
+	return (y % Y_MAX) * (X_MAX / 16) + ((x % X_MAX) >> 4);
 }
+
+// Gets the pixel offset of a given x coordinate
+constexpr uint16_t x_to_pixel_offset(uint16_t x)
+{
+	return  ~x & 15; // pixel 0 = bit 15
+}
+
+// Extracts the X address from the data provided to an FB write
+constexpr uint16_t x_address(uint16_t data)
+{
+	return data & 0xfff; // When X is supplied, it is in D11-D0
+}
+
+// Extracts the Y address from the address provided to an FB write
+constexpr uint16_t y_address(uint16_t data) // word offset
+{
+	return data & 0xfff; // When Y is supplied, it is in A12-A1
+}
+
+// True if address written specifies that the write should also load the shift
+constexpr bool shift_load_requested(offs_t offset) // word offset
+{
+	return offset & (0x2000 >> 1);
+}
+
+// True if address written specifies operation start
+constexpr bool execution_requested(offs_t offset) // word offset
+{
+	return offset & (0x4000 >> 1);
+}
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE(NWB_512, nwb_512_device, "nwb_512", "Sony NWB-512 monochrome framebuffer")
+
 
 nwb_512_device::nwb_512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NWB_512, tag, owner, clock),
