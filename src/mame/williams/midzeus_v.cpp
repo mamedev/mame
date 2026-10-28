@@ -1284,11 +1284,11 @@ static bool zeus_apply_color_key(uint8_t (&texels)[4], int32_t curu, int32_t cur
 
 void midzeus_renderer::render_poly(int32_t scanline, const extent_t& extent, const mz_poly_extra_data& object, int threadid)
 {
-	int32_t curz = extent.param[0].start;
+	int64_t curz = extent.param[0].start; // far geometry can reach z >= 2^31
 	int32_t curu = extent.param[1].start;
 	int32_t curv = extent.param[2].start;
 	int32_t curi = extent.param[3].start;
-	int32_t const dzdx = extent.param[0].dpdx;
+	int64_t const dzdx = extent.param[0].dpdx;
 	int32_t const dudx = extent.param[1].dpdx;
 	int32_t const dvdx = extent.param[2].dpdx;
 	int32_t const didx = extent.param[3].dpdx;
