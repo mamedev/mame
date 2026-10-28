@@ -985,7 +985,14 @@ void mc6847_base_device::field_sync_changed(bool line)
 {
 	/* when field sync is on, the DA* enter the Hi-Z state */
 	if (line)
+	{
 		m_input_cb(~0);
+		// Account for the initial two DA0 transitions after field reset.  The
+		// SAM's horizontal-sync clearing masks these in modes 0-6, but DMA
+		// mode retains them (a two-byte offset in CoCo hardware captures).
+		m_input_cb(1);
+		m_input_cb(0);
+	}
 }
 
 
@@ -1196,6 +1203,9 @@ void mc6847_friend_device::character_map::setup_font()
 			character_mask      = 0x7f;
 			color_base_0        = (mode & MODE_CSS ? 14 : 12);
 			color_base_1        = (mode & MODE_CSS ? 15 : 13);
+			// The stripe data is complemented; INV selects that polarity.
+			if (!(mode & MODE_INV))
+				std::swap(color_base_0, color_base_1);
 		}
 		else
 		{
