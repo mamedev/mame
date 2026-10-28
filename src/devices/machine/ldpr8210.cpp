@@ -31,7 +31,7 @@
 #define LOG_SERIAL     (1U << 2)
 #define LOG_SIMUTREK   (1U << 3)
 #define LOG_UNKNOWNS   (1U << 4)
-#define VERBOSE (LOG_SERIAL | LOG_SIMUTREK)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 
@@ -71,8 +71,9 @@
 //**************************************************************************
 
 // devices
-DEFINE_DEVICE_TYPE(PIONEER_PR8210,   pioneer_pr8210_device,   "pr8210",   "Pioneer PR-8210")
-DEFINE_DEVICE_TYPE(SIMUTREK_SPECIAL, simutrek_special_device, "simutrek", "Simutrek Modified PR-8210")
+DEFINE_DEVICE_TYPE(PIONEER_PR8210,    pioneer_pr8210_device,   "pr8210",   "Pioneer PR-8210")
+DEFINE_DEVICE_TYPE(SIMUTREK_SPECIAL,  simutrek_special_device, "simutrek", "Simutrek Modified PR-8210")
+DEFINE_DEVICE_TYPE(WILLIAMS_PR8210,   williams_pr8210_device,  "pr8210_williams", "Williams Modified PR-8210")
 
 
 // bitmaps for the characters
@@ -198,8 +199,7 @@ pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, devi
 	m_slowtrg(attotime::zero),
 	m_vsync(false),
 	m_i8049_port1(0),
-	m_i8049_port2(0),
-	m_pif_field(0)
+	m_i8049_port2(0)
 {
 }
 
@@ -259,7 +259,7 @@ void pioneer_pr8210_device::control_w(uint8_t data)
 				m_lastcommand = m_pia.porta;
 
 			// log the command and wait for a keypress
-			LOGMASKED(LOG_SERIAL, "%8.3f: --- Command = %02X\n", machine().time().as_double(), m_pia.porta >> 3);
+			LOGMASKED(LOG_SERIAL, "--- Command = %02X\n", m_pia.porta >> 3);
 
 			// reset the first bit time so that the accumulator clears on the next write
 			m_firstbittime = curtime - SERIAL_MAX_WORD_TIME;
@@ -277,7 +277,6 @@ void pioneer_pr8210_device::device_start()
 	// alocate timers
 	m_process_vbi_timer = timer_alloc(FUNC(pioneer_pr8210_device::process_vbi_data), this);
 	m_vsync_off_timer = timer_alloc(FUNC(pioneer_pr8210_device::vsync_off), this);
-	save_item(NAME(m_pif_field));
 
 	// pass through to the parent
 	laserdisc_device::device_start();
@@ -299,33 +298,6 @@ void pioneer_pr8210_device::device_reset()
 	m_firstbittime = curtime;
 	m_lastbittime = curtime;
 	m_slowtrg = curtime;
-	m_vsync = false;
-	m_pif_field = 0;
-	m_i8049_port1 = 0;
-	m_i8049_port2 = 0;
-	m_pia = {};
-}
-
-
-uint8_t pioneer_pr8210_device::pif_status_r()
-{
-	return (BIT(m_i8049_port2, 4) ? 0x20 : 0) | (m_pif_field ? 0 : 0x40) | (m_vsync ? 0x80 : 0);
-}
-
-
-uint8_t pioneer_pr8210_device::pif_data_r(offs_t offset)
-{
-	switch (offset)
-	{
-	case 0:
-		return 0xf8 | (m_pia.frame[2] & 0x07);
-	case 1:
-		return ((m_pia.frame[3] & 0x0f) << 4) | (m_pia.frame[4] & 0x0f);
-	case 2:
-		return ((m_pia.frame[5] & 0x0f) << 4) | (m_pia.frame[6] & 0x0f);
-	default:
-		return 0;
-	}
 }
 
 
@@ -424,8 +396,6 @@ void pioneer_pr8210_device::device_add_mconfig(machine_config &config)
 
 void pioneer_pr8210_device::player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
 {
-	m_pif_field = fieldnum;
-
 	// logging
 	if ((vbi.line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
 		LOGMASKED(LOG_VBLANK_VBI, "%3d:VSYNC(%d,%05d)\n", screen().vpos(), fieldnum, VBI_CAV_PICTURE(vbi.line1718));
@@ -670,7 +640,7 @@ void pioneer_pr8210_device::i8049_port1_w(uint8_t data)
 	uint8_t prev = m_i8049_port1;
 	m_i8049_port1 = data;
 	if (prev != data)
-		LOGMASKED(LOG_SIMUTREK, "%8.3f: PORT1 = %02X\n", machine().time().as_double(), data);
+		LOGMASKED(LOG_SIMUTREK, "PORT1 = %02X\n", data);
 
 	// bit 7 selects the direction of slider movement for JUMP TRG and scanning
 	int direction = (data & 0x80) ? 1 : -1;
@@ -1107,4 +1077,64 @@ int simutrek_special_device::i8748_t0_r()
 {
 	// return 1 if data is waiting from main CPU
 	return m_data_ready;
+}
+
+
+
+//**************************************************************************
+//  WILLIAMS IMPLEMENTATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  williams_pr8210_device - constructor
+//-------------------------------------------------
+
+williams_pr8210_device::williams_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pioneer_pr8210_device(mconfig, WILLIAMS_PR8210, tag, owner, clock),
+	m_field(false)
+{
+}
+
+
+//-------------------------------------------------
+//  device_start - device initialization
+//-------------------------------------------------
+
+void williams_pr8210_device::device_start()
+{
+	pioneer_pr8210_device::device_start();
+	save_item(NAME(m_field));
+}
+
+
+//-------------------------------------------------
+//  player_vsync - latch the field presented to PIF
+//-------------------------------------------------
+
+void williams_pr8210_device::player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
+{
+	m_field = (fieldnum != 0);
+	pioneer_pr8210_device::player_vsync(vbi, fieldnum, curtime);
+}
+
+
+//-------------------------------------------------
+//  pif_status_r - player signals presented to PIF
+//-------------------------------------------------
+
+uint8_t williams_pr8210_device::pif_status_r() const
+{
+	// FIXME: Derive the exported FIELD/VREF timing from the modified player circuit.
+	return (BIT(m_i8049_port2, 4) ? 0x20 : 0) | (m_field ? 0 : 0x40) | (m_vsync ? 0x80 : 0);
+}
+
+
+//-------------------------------------------------
+//  jump_trigger - external jump request
+//-------------------------------------------------
+
+void williams_pr8210_device::jump_trigger(bool forward)
+{
+	// FIXME: Model the modified player's jump servo and trigger selection.
+	advance_slider(forward ? 1 : -1);
 }

@@ -991,7 +991,7 @@ void laserdisc_device::read_track_data()
 
 	// if we're about to read the first field in a frame, advance
 	frame_data *frame = &m_frame[m_videoindex];
-	if (m_fieldnum == 0 && (vbidata.line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
+	if ((vbidata.line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
 	{
 		if (frame->m_numfields >= 2)
 			m_videoindex = (m_videoindex + 1) % std::size(m_frame);
