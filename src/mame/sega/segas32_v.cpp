@@ -1482,7 +1482,7 @@ int segas32_state::draw_one_sprite(uint16_t const *data, int xoffs, int yoffs, c
 	int ypos           = util::sext(data[4], 12);
 	int xpos           = util::sext(data[5], 12);
 	uint32_t addr      = data[6] | ((data[2] & 0xf000) << 4);
-	const int color    = data[7] & (bpp8 ? 0x7f00 : 0x7ff0);
+	int color          = data[7] & (bpp8 ? 0x7f00 : 0x7ff0);
 	int hzoom, vzoom;
 	int xdelta = 1, ydelta = 1;
 	int xtarget, ytarget, yacc = 0, pix, transmask;
