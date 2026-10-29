@@ -46,6 +46,8 @@
 #include "bus/heathzenith/h19/tlb.h"
 #include "bus/heathzenith/h89/h89bus.h"
 #include "bus/heathzenith/h89/cdr_fdc_880h.h"
+#include "bus/heathzenith/h89/dsm240.h"
+#include "bus/heathzenith/h89/gpp_speed.h"
 #include "bus/heathzenith/h89/h_88_3.h"
 #include "bus/heathzenith/h89/h_88_5.h"
 #include "bus/heathzenith/h89/h17_fdc.h"
@@ -103,7 +105,6 @@ protected:
 		, m_intr_socket(*this, "intr_socket")
 		, m_h89bus(*this, "h89bus")
 		, m_console(*this, "console")
-		, m_config(*this, "CONFIG")
 		, m_sw501(*this, "SW501")
 	{
 	}
@@ -119,7 +120,7 @@ protected:
 	required_device<heath_intr_socket>                   m_intr_socket;
 	required_device<h89bus_device>                       m_h89bus;
 	required_device<ins8250_device>                      m_console;
-	required_ioport                                      m_config, m_sw501;
+	required_ioport                                      m_sw501;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 
 	// General Purpose Port (GPP)
@@ -134,8 +135,6 @@ protected:
 	bool m_555a_latch;
 	bool m_555b_latch;
 	bool m_556b_latch;
-
-	u32  m_cpu_speed_multiplier;
 
 	bool m_installed;
 
@@ -182,6 +181,9 @@ protected:
 	void h89_right_cards(device_slot_interface &device);
 	void h89_right_cards_mms(device_slot_interface &device);
 	void h89_right_p506_cards(device_slot_interface &device);
+	void h89_cpu_upgrades(device_slot_interface &device);
+
+	void cpu_clock_w(u32 clock);
 };
 
 /**
@@ -379,12 +381,6 @@ static INPUT_PORTS_START( h88 )
 	PORT_DIPSETTING(    0x40, "19200" )
 	PORT_DIPSETTING(    0x80, "38400" )
 	PORT_DIPSETTING(    0xc0, "57600" )
-
-	PORT_START("CONFIG")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Clock Speed Upgrade")
-	PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-	PORT_CONFSETTING(    0x01, "2 / 4 MHz")
-	PORT_CONFSETTING(    0x02, "2 / 6 MHz")
 
 INPUT_PORTS_END
 
@@ -622,10 +618,6 @@ static INPUT_PORTS_START( h89 )
 
 
 	PORT_START("CONFIG")
-	PORT_CONFNAME(0x03, 0x00, "CPU Clock Speed Upgrade")
-	PORT_CONFSETTING(   0x00, DEF_STR( None ) )
-	PORT_CONFSETTING(   0x01, "2 / 4 MHz")
-	PORT_CONFSETTING(   0x02, "2 / 6 MHz")
 	PORT_CONFNAME(0x3c, 0x04, "Switch SW501 Definitions")
 	PORT_CONFSETTING(   0x00, "Generic" )
 	PORT_CONFSETTING(   0x04, "Heath MTR-90")
@@ -642,12 +634,13 @@ INPUT_PORTS_END
 
 void h89_base_state::machine_start()
 {
+	m_gpp = 0;
+
 	save_item(NAME(m_gpp));
 	save_item(NAME(m_rom_enabled));
 	save_item(NAME(m_timer_intr_enabled));
 	save_item(NAME(m_single_step_enabled));
 	save_item(NAME(m_floppy_ram_we));
-	save_item(NAME(m_cpu_speed_multiplier));
 	save_item(NAME(m_555a_latch));
 	save_item(NAME(m_555b_latch));
 	save_item(NAME(m_556b_latch));
@@ -754,29 +747,6 @@ void h89_base_state::machine_reset()
 	m_single_step_enabled = false;
 	reset_single_step_state();
 
-	ioport_value const cfg(m_config->read());
-
-	// CPU clock speed
-	const u8 selected_clock_upgrade = cfg & 0x3;
-
-	switch (selected_clock_upgrade)
-	{
-	case 0x01:
-		// 4 MHz was offered by several companies including Kres, ANAPRO, and an article
-		// in REMark magazine.
-		m_cpu_speed_multiplier = 2;
-		break;
-	case 0x02:
-		// 6 MHz was offered by at least ANAPRO, and a how to article in CHUG newsletter
-		m_cpu_speed_multiplier = 3;
-		break;
-	case 0x00:
-	default:
-		// No speed upgrade installed - Standard Clock
-		m_cpu_speed_multiplier = 1;
-		break;
-	}
-
 	update_gpp(0);
 	update_mem_view();
 }
@@ -876,10 +846,7 @@ void h89_base_state::update_gpp(u8 gpp)
 
 	m_timer_intr_enabled = bool(BIT(m_gpp, GPP_ENABLE_TIMER_INTERRUPT_BIT));
 
-	m_h89bus->set_mem0(BIT(m_gpp, GPP_MEM0_BIT));
-	m_h89bus->set_mem1(BIT(m_gpp, GPP_MEM1_BIT));
-	m_h89bus->set_io0(BIT(m_gpp, GPP_IO0_BIT));
-	m_h89bus->set_io1(BIT(m_gpp, GPP_IO1_BIT));
+	m_h89bus->gpp_w(m_gpp, changed_gpp);
 
 	if (BIT(changed_gpp, GPP_SINGLE_STEP_BIT))
 	{
@@ -897,12 +864,6 @@ void h89_base_state::update_gpp(u8 gpp)
 		m_rom_enabled = BIT(m_gpp, GPP_MEM1_BIT) == 0;
 
 		update_mem_view();
-	}
-
-	if (BIT(changed_gpp, GPP_MEM0_BIT))
-	{
-		m_maincpu->set_clock(BIT(m_gpp, GPP_MEM0_BIT) ?
-			H89_CLOCK * m_cpu_speed_multiplier : H89_CLOCK);
 	}
 }
 
@@ -981,6 +942,18 @@ void h89_base_state::h89_right_p506_cards(device_slot_interface &device)
 	device.option_add("we_pullup", H89BUS_WE_PULLUP);
 }
 
+void h89_base_state::h89_cpu_upgrades(device_slot_interface &device)
+{
+	device.option_add("dsm240",   H89BUS_DSM240);
+	device.option_add("gpp_4mhz", H89BUS_GPP_SPEED_4MHZ);
+	device.option_add("gpp_6mhz", H89BUS_GPP_SPEED_6MHZ);
+}
+
+void h89_base_state::cpu_clock_w(u32 clock)
+{
+	m_maincpu->set_clock(clock);
+}
+
 static void io_decoder_options(device_slot_interface &device)
 {
 	device.option_add("444_43",  H89BUS_IO_DECODER_444_43);
@@ -1020,7 +993,7 @@ void h89_base_state::h89_base(machine_config &config)
 
 	m_tlbc->reset_cb().set(FUNC(h89_base_state::reset_line));
 
-	H89BUS(config, m_h89bus);
+	H89BUS(config, m_h89bus, H89_CLOCK);
 	m_h89bus->set_program_space(m_maincpu, AS_PROGRAM);
 	m_h89bus->set_io_space(m_maincpu, AS_IO);
 	m_h89bus->out_int3_callback().set(FUNC(h89_base_state::slot_irq<3>));
@@ -1034,6 +1007,9 @@ void h89_base_state::h89_base(machine_config &config)
 	H89BUS_RIGHT_SLOT(config, "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, nullptr);
 	H89BUS_RIGHT_SLOT(config, "p505", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "ha_88_3");
 	H89BUS_RIGHT_SLOT(config, "p506", "h89bus", [this](device_slot_interface &device) { h89_right_p506_cards(device); }, "we_pullup").set_p506_signalling(true);
+
+	H89BUS_CPU_BOARD_MOD_SLOT(config, "cpu_upgrade", "h89bus", [this](device_slot_interface &device) { h89_cpu_upgrades(device); }, nullptr)
+		.out_cpu_clock_callback().set(FUNC(h89_base_state::cpu_clock_w));
 
 	// H89 interrupt interval is 2mSec
 	TIMER(config, "irq_timer").configure_periodic(FUNC(h89_base_state::h89_irq_timer), attotime::from_msec(2));
