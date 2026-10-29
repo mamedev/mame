@@ -32,6 +32,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "lk201.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/mcs51/i8051.h"
 //#include "machine/eepromser.h"
@@ -56,6 +57,7 @@ public:
 		m_screen(*this, "screen"),
 		m_duart(*this, "duart"),
 		m_nvr(*this, "nvr"),
+		m_kbd(*this, "lk201"),
 		m_host(*this, "host"),
 		m_printer(*this, "printer"),
 		m_chargen(*this, "chargen"),
@@ -79,6 +81,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<scn2681_device> m_duart;
 	optional_device<x2212_device> m_nvr;
+	required_device<lk201_device> m_kbd;
 	optional_device<rs232_port_device> m_host;
 	optional_device<rs232_port_device> m_printer;
 	required_region_ptr<u8> m_chargen;
@@ -116,6 +119,7 @@ private:
 	u8 p1_r();
 	int m_host_txd = 1;
 	int m_host_rxd = 1;
+	int m_kbd_rxd = 1;
 	void drb_w(int state);
 	int video_col(int x) const;
 	void cblank_w(int state);
@@ -418,6 +422,7 @@ void vt220_state::machine_start()
 	save_item(NAME(m_row_loading));
 	save_item(NAME(m_host_txd));
 	save_item(NAME(m_host_rxd));
+	save_item(NAME(m_kbd_rxd));
 	save_item(NAME(m_cblank));
 	if (m_crtc)
 		machine().save().register_postload(save_prepost_delegate(FUNC(vt220_state::set_columns), this));
@@ -482,6 +487,12 @@ void vt220_state::vt220(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &vt220_state::vt220_data);
 	m_maincpu->port_in_cb<1>().set_constant(0xff); // P1.4 PROD TEST low only from factory fixture on J1-1
 	m_maincpu->port_out_cb<1>().set(FUNC(vt220_state::p1_w));
+
+	// TM 4.2.8: LK201 on the 8051 UART, through EIA drivers and receivers at both ends
+	m_maincpu->port_in_cb<3>().set([this] () -> u8 { return 0xfe | m_kbd_rxd; }); // P3.0 RXD from KBR
+	m_maincpu->port_out_cb<3>().set([this] (u8 data) { m_kbd->rx_w(BIT(data, 1)); }); // P3.1 TXD to KBT
+	LK201(config, m_kbd);
+	m_kbd->tx_handler().set([this] (int state) { m_kbd_rxd = state; });
 
 	scn2681_device &duart(SCN2681(config, m_duart, XTAL(3'686'400)));
 	duart.irq_cb().set_inputline("maincpu", MCS51_INT1_LINE);
