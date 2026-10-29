@@ -28,7 +28,6 @@ TODO:
 - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
 - global offset is wrong in non-super22 testmode video test
 - ss22 testmode video test screen#04 translucent polygon should be higher priority than sprite
-- find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
 - there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
 - adillor race end should fade polygons to red, these are vics sprites with a size of 0, expected x/y size is 0x100
 - propcycl attract mode, when the altar button is pressed, global fade should affect the background sprite
