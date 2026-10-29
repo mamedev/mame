@@ -839,32 +839,26 @@ void tms320c3x_device::norm(tmsreg &dst, tmsreg &src)
 	{
 		dst.set_mantissa(0);
 		dst.set_exponent(-128);
+
+		// a nonzero mantissa with exponent -128 underflows and leaves Z clear
 		if (man != 0)
 			IREG(TMR_ST) |= UFFLAG | LUFFLAG;
-	}
-	else
-	{
-		int cnt;
-		if (man > 0)
-		{
-			cnt = std::countl_zero(uint32_t(man));
-			man <<= cnt;
-			exp -= cnt;
-		}
 		else
-		{
-			cnt = std::countl_one(uint32_t(man));
-			man <<= cnt;
-			exp -= cnt;
-		}
+			IREG(TMR_ST) |= ZFLAG;
+		return;
+	}
 
-		// check for underflow
-		if (exp <= -128)
-		{
-			man = 0x00000000;
-			exp = -128;
-			IREG(TMR_ST) |= UFFLAG | LUFFLAG;
-		}
+	// shift the most significant nonsign bit into bit 31, then replace it with the sign
+	int const cnt = (man > 0) ? std::countl_zero(uint32_t(man)) : std::countl_one(uint32_t(man));
+	man = ((cnt < 32) ? (uint32_t(man) << cnt) : 0) ^ 0x80000000;
+	exp -= cnt;
+
+	// check for underflow
+	if (exp <= -128)
+	{
+		man = 0x00000000;
+		exp = -128;
+		IREG(TMR_ST) |= UFFLAG | LUFFLAG;
 	}
 
 	dst.set_mantissa(man);
