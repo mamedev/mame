@@ -23,7 +23,7 @@ TODO:
   (to access the bonus round take out the targets on the middle-left then hit
    the ball into one of the portals at the top left)
 
-- dump color PROM
+- dump color PROMs
 - some unknown DSW and inputs
 - hopper
 - unknown writes
@@ -491,8 +491,10 @@ ROM_START( superwng )
 	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "7.8p", 0x0000, 0x4000, CRC(b472603c) SHA1(96f477a47a5be3db1292fea4f5c91ab155013f74) )
 
-	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "bprom.bin", 0x0000, 0x0040, NO_DUMP )
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "82s123.11j",   0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "82s123.11m",   0x0020, 0x0020, NO_DUMP )
+	ROM_LOAD( "tbp24s10.11c", 0x0040, 0x0100, CRC(852adffe) SHA1(9f70a63298d012a73a7b39942cb9f44abeff555c) )
 ROM_END
 
 } // anonymous namespace
