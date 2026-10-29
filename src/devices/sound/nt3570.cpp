@@ -132,7 +132,7 @@ void nt3570_device::update_irq()
 u8 nt3570_device::read(offs_t offset)
 {
 	if (!BIT(offset, 0))
-		return machine().time() < m_busy_until ? 1 : 0;
+		return (machine().time() < m_busy_until) ? 1 : 0;
 	if (!machine().side_effects_disabled())
 		m_stream->update();
 	if (m_select == 0x15)
@@ -162,7 +162,7 @@ u32 nt3570_device::envelope_step(u8 rate)
 	// sixteen times faster; maximum attack is immediate. These timings are
 	// deliberately isolated here pending measurements of a physical device.
 	rate &= 0x1f;
-	return rate ? (BIT(rate, 0) ? 4U : 3U) << (rate >> 1) : 0;
+	return rate ? ((BIT(rate, 0) ? 4U : 3U) << (rate >> 1)) : 0;
 }
 
 void nt3570_device::voice_stop(unsigned ch)
@@ -219,7 +219,7 @@ void nt3570_device::envelope_advance(unsigned ch)
 	{
 		// The four-bit release field spans the five-bit rate range. Unlike a
 		// zero sustain rate (hold), every release rate eventually becomes silent.
-		const u8 rate = state == ENV_RELEASE ? 2 * (m_registers[0xd0 | ch] & 15) + 1 : m_registers[0xc0 | ch];
+		const u8 rate = state == ENV_RELEASE ? (2 * (m_registers[0xd0 | ch] & 15) + 1) : m_registers[0xc0 | ch];
 		const u32 step = envelope_step(rate);
 		if (level <= step)
 			voice_stop(ch);
@@ -239,7 +239,7 @@ void nt3570_device::key_w(u8 data)
 		m_streaming[ch] = BIT(m_registers[0xa0 | ch], 7);
 		m_page[ch] = (u16(m_registers[0x60 | ch]) << 8) | m_registers[0x70 | ch];
 		m_last[ch] = BIT(m_registers[0x50 | ch], 0);
-		m_length[ch] = m_streaming[ch] ? 256 : 256U << BIT(m_registers[0x50 | ch], 1, 3);
+		m_length[ch] = m_streaming[ch] ? 256 : (256U << BIT(m_registers[0x50 | ch], 1, 3));
 		m_position[ch] = 0;
 		envelope_start(ch);
 	}

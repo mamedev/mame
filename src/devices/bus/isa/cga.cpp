@@ -2076,9 +2076,9 @@ void isa8_cga_chameleon_device::set_palette_luts(void)
 		}
 		else
 		{
-			m_palette_lut_2bpp[1] = (( m_color_select & 0x10) >> 1) | m_color_lut[0][1];
-			m_palette_lut_2bpp[2] = (( m_color_select & 0x10) >> 1) | m_color_lut[0][2];
-			m_palette_lut_2bpp[3] = (( m_color_select & 0x10) >> 1) | m_color_lut[0][3];
+			m_palette_lut_2bpp[1] = ((m_color_select & 0x10) >> 1) | m_color_lut[0][1];
+			m_palette_lut_2bpp[2] = ((m_color_select & 0x10) >> 1) | m_color_lut[0][2];
+			m_palette_lut_2bpp[3] = ((m_color_select & 0x10) >> 1) | m_color_lut[0][3];
 		}
 	}
 }
