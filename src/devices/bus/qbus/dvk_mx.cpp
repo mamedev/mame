@@ -359,7 +359,11 @@ uint16_t dvk_mx_device::read(offs_t offset)
 	case 1:
 		data = m_rbuf;
 		if (!machine().side_effects_disabled())
+		{
 			m_mxcs &= ~MXCSR_TR;
+			if (cur_live.byte_counter >= 0)
+				cur_live.byte_counter++;
+		}
 		break;
 	}
 
@@ -471,6 +475,7 @@ void dvk_mx_device::live_start(floppy_info &fi, int state)
 	cur_live.fi = &fi;
 	cur_live.shift_reg = 0;
 	cur_live.bit_counter = 0;
+	cur_live.byte_counter = 0;
 	cur_live.data_separator_phase = false;
 	cur_live.data_reg = 0;
 	cur_live.pll.reset(cur_live.tm);
@@ -595,6 +600,7 @@ void dvk_mx_device::live_run(attotime limit)
 				LOGLIVE("%s: Found SYNC\n", cur_live.tm.to_string());
 				cur_live.data_separator_phase = false;
 				cur_live.bit_counter = 0;
+				cur_live.byte_counter = 0;
 				cur_live.state = READ_TRACK_DATA_BYTE;
 				cur_live.data_reg = 0363; // 0xf3
 				checkpoint();
@@ -611,6 +617,11 @@ void dvk_mx_device::live_run(attotime limit)
 
 		case READ_TRACK_DATA_BYTE:
 			m_rbuf = cur_live.data_reg;
+			if ((m_mxcs & MXCSR_TR) && cur_live.byte_counter >= 0)
+			{
+				LOGWARN("read overrun at %d\n", cur_live.byte_counter);
+				cur_live.byte_counter = -1;
+			}
 			m_mxcs |= MXCSR_TR;
 			cur_live.state = READ_TRACK_DATA;
 			checkpoint();
@@ -749,11 +760,18 @@ void dvk_mx_device::write_data_start(floppy_info &fi)
 {
 	fi.main_state = WRITE_DATA;
 	fi.sub_state = WAIT_INDEX;
+	if (fi.dev)
+	{
+		const attotime now = machine().time();
+		fi.dev->set_write_splice(now);
+		fi.dev->write_start(now);
+	}
 	write_data_continue(fi);
 }
 
 void dvk_mx_device::write_data_continue(floppy_info &fi)
 {
+	const attotime now = machine().time();
 	for (;;)
 	{
 		switch (fi.sub_state)
@@ -771,6 +789,7 @@ void dvk_mx_device::write_data_continue(floppy_info &fi)
 
 		case TRACK_WRITTEN:
 			LOGSTATE("sub TRACK_WRITTEN\n");
+			fi.dev->write_end(now);
 			fi.sub_state = COMMAND_DONE;
 			break;
 
