@@ -568,13 +568,16 @@ void tms320c3x_device::addf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	// add
 	man = m1 + m2;
 
-	if (man == 0 || exp == -128)
+	// an exact zero result is not an underflow
+	if (man == 0)
 	{
-		// if the mantissa is zero, set the exponent appropriately
-		exp = -128;
-		man = 0x80000000;
+		dst.set_mantissa(0);
+		dst.set_exponent(-128);
+		IREG(TMR_ST) |= ZFLAG;
+		return;
 	}
-	else if (man >= int64_t(0x100000000U) || man < int64_t(0xffffffff00000000U))
+
+	if (man >= int64_t(0x100000000U) || man < int64_t(0xffffffff00000000U))
 	{
 		// if the mantissa is >= 2.0 or < -2.0, normalize
 		man >>= 1;
@@ -646,6 +649,11 @@ void tms320c3x_device::subf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 		OR_NZF(dst);
 		return;
 	}
+	if (src1.exponent() == -128)
+	{
+		negf(dst, src2);
+		return;
+	}
 
 	// extract mantissas from 1.0.31 values to 1.1.31 values
 	m1 = (int64_t)src1.mantissa() ^ 0x80000000;
@@ -679,15 +687,17 @@ void tms320c3x_device::subf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	// subtract
 	man = m1 - m2;
 
-	// if the mantissa is zero, set the exponent appropriately
-	if (man == 0 || exp == -128)
+	// an exact zero result is not an underflow
+	if (man == 0)
 	{
-		exp = -128;
-		man = 0x80000000;
+		dst.set_mantissa(0);
+		dst.set_exponent(-128);
+		IREG(TMR_ST) |= ZFLAG;
+		return;
 	}
 
 	// if the mantissa is >= 2.0 or < -2.0, normalize
-	else if (man >= int64_t(0x100000000U) || man < int64_t(0xffffffff00000000U))
+	if (man >= int64_t(0x100000000U) || man < int64_t(0xffffffff00000000U))
 	{
 		man >>= 1;
 		exp++;
@@ -713,11 +723,9 @@ void tms320c3x_device::subf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	// check for underflow
 	if (exp <= -128)
 	{
-		// make sure a 0 result doesn't set underflow
-		if (man != 0 || exp < -128)
-			IREG(TMR_ST) |= UFFLAG | LUFFLAG;
 		man = 0x80000000;
 		exp = -128;
+		IREG(TMR_ST) |= UFFLAG | LUFFLAG;
 	}
 
 	// check for overflow
