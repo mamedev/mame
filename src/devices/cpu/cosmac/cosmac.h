@@ -616,11 +616,13 @@ protected:
 	virtual bool idle_stops_clock() const override;
 	virtual bool has_test_mode() const override;
 
+	// hidden here, re-exposed by CDP1805
+	using cdp1804_device::set_ram_select;
+
 private:
 	static const ophandler s_opcodetable_ex[256];
 
 	using cdp1804_device::set_rom_select;
-	using cdp1804_device::set_ram_select;
 	using cdp1804_device::ems_cb;
 };
 
@@ -634,7 +636,7 @@ public:
 	cdp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// internal RAM location, decoded externally through ME
-	using cdp1804_device::set_ram_select;
+	using cdp1806_device::set_ram_select;
 
 private:
 	void internal_map(address_map &map) ATTR_COLD;
