@@ -17,6 +17,7 @@
 #include "sound/spkrdev.h"
 #include "machine/ram.h"
 #include "emupal.h"
+#include "screen.h"
 
 
 class pmd85_state : public driver_device
@@ -39,6 +40,7 @@ public:
 		, m_bank(*this, "bank%d", 0U)
 		, m_io_dsw0(*this, "DSW0")
 		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
 		, m_io_keyboard(*this, "KEY%u", 0U)
 		, m_leds(*this, "led%u", 0U)
 	{ }
@@ -68,6 +70,9 @@ private:
 	uint8_t m_ppi_port_outputs[4][3]{};
 	uint8_t m_startup_mem_map = 0;
 	uint8_t m_pmd853_memory_mapping = 0;
+	bool m_c2717_ram_at_8000 = false;
+	bool m_c2717_remapped = true;
+	bool m_c2717_width384 = false;
 	bool m_previous_level = false;
 	bool m_clk_level = false;
 	bool m_clk_level_tape = false;
@@ -80,7 +85,9 @@ private:
 	void mato_io_w(offs_t offset, uint8_t data);
 
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t c2717_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(cassette_timer_callback);
 	uint8_t ppi0_porta_r();
 	uint8_t ppi0_portb_r();
@@ -88,6 +95,7 @@ private:
 	void ppi0_porta_w(uint8_t data);
 	void ppi0_portb_w(uint8_t data);
 	void ppi0_portc_w(uint8_t data);
+	void c2717_ppi0_portc_w(uint8_t data);
 	uint8_t mato_ppi0_portb_r();
 	uint8_t mato_ppi0_portc_r();
 	void mato_ppi0_portc_w(uint8_t data);
@@ -127,6 +135,10 @@ private:
 	void alfa_update_memory();
 	void mato_update_memory();
 	void c2717_update_memory();
+	void c2717_update_screen();
+	uint16_t c2717_remap_addr(offs_t offset) const;
+	uint8_t c2717_hi_r(offs_t offset);
+	void c2717_hi_w(offs_t offset, uint8_t data);
 	void common_driver_init();
 
 	required_device<cpu_device> m_maincpu;
@@ -144,6 +156,7 @@ private:
 	optional_memory_bank_array<17> m_bank;
 	optional_ioport m_io_dsw0;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	optional_ioport_array<16> m_io_keyboard;
 	output_finder<3> m_leds;
 };

@@ -225,7 +225,6 @@ Some software items will crash MAME, for example "bdash".
 #include "emu.h"
 #include "pmd85.h"
 #include "cpu/i8085/i8085.h"
-#include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 #include "formats/pmd_cas.h"
@@ -254,6 +253,29 @@ uint32_t pmd85_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			bitmap.pix(y, x * 6 + 5) = BIT(line[x], 5) ? pen : 0;
 		}
 
+	}
+
+	return 0;
+}
+
+// The Consul 2717 can also show all 8 bits of each byte as pixels (384x256).
+uint32_t pmd85_state::c2717_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		uint8_t const *const line = m_ram->pointer() + 0xc000 + 0x40 * y;
+		uint16_t *const dest = &bitmap.pix(y);
+
+		if (m_c2717_width384)
+		{
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+				dest[x] = BIT(line[x >> 3], x & 7) ? 2 : 0;
+		}
+		else
+		{
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+				dest[x] = BIT(line[x / 6], x % 6) ? (BIT(line[x / 6], 7) ? 1 : 2) : 0;
+		}
 	}
 
 	return 0;
@@ -335,8 +357,8 @@ void pmd85_state::c2717_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).bankrw("bank1");
 	map(0x4000, 0x7fff).bankrw("bank2");
-	map(0x8000, 0xbfff).bankr("bank3");
-	map(0xc000, 0xffff).bankrw("bank4");
+	map(0x8000, 0xbfff).bankr(m_bank[3]);
+	map(0xc000, 0xffff).rw(FUNC(pmd85_state::c2717_hi_r), FUNC(pmd85_state::c2717_hi_w));
 }
 
 /* keyboard input */
@@ -654,7 +676,7 @@ void pmd85_state::pmd85(machine_config &config, bool with_uart)
 	m_pit->set_clk<2>(1);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen"));
+	screen_device &screen(SCREEN(config, m_screen));
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(0);
@@ -790,6 +812,18 @@ void pmd85_state::c2717(machine_config &config)
 {
 	pmd851(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pmd85_state::c2717_mem);
+
+	// motherboard 8255 port C while undriven: the 0xc000-0xffff remapping
+	// (PC7) is on at power-up; the other lines are taken as low
+	m_ppi0->tri_pc_callback().set_constant(0x80);
+	m_ppi0->out_pc_callback().set(FUNC(pmd85_state::c2717_ppi0_portc_w));
+
+	// timer 2 counts timer 1's output instead of the 1 Hz clock
+	m_pit->set_clk<2>(0);
+	m_pit->out_handler<1>().set(m_pit, FUNC(pit8253_device::write_clk2));
+
+	m_screen->set_size(384, 256);
+	m_screen->set_screen_update(FUNC(pmd85_state::c2717_screen_update));
 }
 
 
