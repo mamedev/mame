@@ -103,6 +103,8 @@ private:
 
 	uint8_t sci_ctl2;
 	uint8_t sci_status;
+	uint8_t sci_tdr;        // transmit data register, waiting for the shift register
+	bool sci_tdr_full;
 	//uint8_t sci_data;
 
 	uint8_t spi_status;

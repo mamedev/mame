@@ -549,6 +549,8 @@ void lk201_device::device_reset()
 	memset(m_timer.regs, 0, sizeof(m_timer.regs));
 
 	sci_status = (SCSR_TC | SCSR_TDRE);
+	sci_tdr = 0;
+	sci_tdr_full = false;
 
 	spi_status = 0;
 	spi_data = 0;
@@ -593,7 +595,18 @@ void lk201_device::rcv_complete()
 
 void lk201_device::tra_complete()
 {
-	sci_status |= (SCSR_TC | SCSR_TDRE);
+	// a byte waiting in the transmit data register follows at once; transmit
+	// complete only when there is none
+	if (sci_tdr_full)
+	{
+		sci_tdr_full = false;
+		transmit_register_setup(sci_tdr);
+		sci_status |= SCSR_TDRE;
+	}
+	else
+	{
+		sci_status |= (SCSR_TC | SCSR_TDRE);
+	}
 	update_interrupts();
 }
 
@@ -845,8 +858,22 @@ void lk201_device::sci_w(offs_t offset, uint8_t data)
 
 		case SCI_SCDR:  // Data
 //          printf("LK201: sending %02x\n", data);
-			transmit_register_setup(data);
-			sci_status &= ~(SCSR_TC | SCSR_TDRE);
+			// the transmit data register is double buffered: it moves to the shift
+			// register when that is idle, emptying again, or waits for the byte
+			// being sent (a write while it is still full replaces it); TDRE is set
+			// at once here, where the chip sets it as the byte moves (not modelled)
+			sci_status &= ~SCSR_TC;
+			if (is_transmit_register_empty())
+			{
+				transmit_register_setup(data);
+				sci_status |= SCSR_TDRE;
+			}
+			else
+			{
+				sci_tdr = data;
+				sci_tdr_full = true;
+				sci_status &= ~SCSR_TDRE;
+			}
 			m_maincpu->set_input_line(M68HC05EG_INT_CPI, 0);
 			update_interrupts();
 			break;
