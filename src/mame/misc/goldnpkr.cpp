@@ -1103,6 +1103,7 @@
 #include "lespendu.lh"
 #include "pmpoker.lh"
 #include "upndown.lh"
+#include "smb_be4k.lh"
 
 
 namespace {
@@ -5841,7 +5842,7 @@ void goldnpkr_state::smb_be4k(machine_config &config)
 	goldnpkr(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::smb_be4k_map);
-	
+
 	// basic machine hardware
 	mc6845_device &crtc(MC6845(config.replace(), "crtc", CPU_CLOCK));
 	crtc.set_screen("screen");
@@ -15680,4 +15681,4 @@ GAME(  1989, olym65bj,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_olym6
 /*************************************** MULTIGAMES ***************************************/
 
 //     YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT         ROT      COMPANY                     FULLNAME                       FLAGS  LAYOUT  
-GAMEL( 1984, smb_be4k,  0,        smb_be4k,  smb_be4k, goldnpkr_state, empty_init,  ROT0,   "Bonanza Enterprises, Ltd", "Super Mini-Boy (BE-4000/SMB)", 0,     layout_goldnpkr )
+GAMEL( 1984, smb_be4k,  0,        smb_be4k,  smb_be4k, goldnpkr_state, empty_init,  ROT0,   "Bonanza Enterprises, Ltd", "Super Mini-Boy (BE-4000/SMB)", 0,     layout_smb_be4k )
