@@ -50,18 +50,30 @@ public:
 	vt220_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_ram(*this, RAM_TAG)
+		m_ram(*this, RAM_TAG),
+		m_chargen(*this, "chargen")
 	{ }
 
 	void vt220(machine_config &config);
 	void vt220a(machine_config &config);
 
 private:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_vt220(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<i8051_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_region_ptr<u8> m_chargen;
+	u8 m_p1 = 0xff;
+	u8 m_char_addr = 0;
+	u8 m_conf = 0;
+	std::unique_ptr<u8[]> m_softchar;
+	void p1_w(u8 data);
+	void conf_w(u8 data);
+	void char_addr_w(u8 data);
+	u8 chargen_r(offs_t offset);
+	void chargen_w(offs_t offset, u8 data);
 	void vt220_data(address_map &map) ATTR_COLD;
 	void vt220_mem(address_map &map) ATTR_COLD;
 	void vt220a_data(address_map &map) ATTR_COLD;
@@ -89,11 +101,59 @@ void vt220_state::vt220_data(address_map &map)
 void vt220_state::vt220a_data(address_map &map)
 {
 	map.unmap_value_high();
+	map(0x2000, 0x2fff).mirror(0xc000).ram().share("screen_ram"); // RAM 0/1 (A000-AFFF in the technical manual)
+	map(0x3000, 0x300f).mirror(0xc7f0).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)); // B7F0-B7FF
+	map(0x8000, 0x8fff).mirror(0x4000).ram().share("attr_ram"); // attribute RAM 0/1
+	map(0x0800, 0x0800).mirror(0x47ff).w(FUNC(vt220_state::char_addr_w)); // 0FFF
+	map(0x0000, 0x0000).mirror(0x47ff).w(FUNC(vt220_state::conf_w)); // 07FF
+	map(0x9800, 0x980f).mirror(0x47f0).rw(FUNC(vt220_state::chargen_r), FUNC(vt220_state::chargen_w)); // 9FF0-9FFF
+}
+
+void vt220_state::p1_w(u8 data)
+{
+	m_p1 = data;
+}
+
+void vt220_state::conf_w(u8 data)
+{
+	// E26 (LS174) latches BAD0-5, bit order per firmware self-test (reverse of the sheet 2 Q labels):
+	// 0 NORM FIELD, 1 LBA CLRS, 2 EN CHR GEN RW, 3 ALT SEL, 4 RESET CMM, 5 LBA CLKS
+	// E32 F/F latches BAD6: set for ENA 20mA, reset for ENA EIA
+	m_conf = data;
+}
+
+void vt220_state::char_addr_w(u8 data)
+{
+	m_char_addr = data;
+}
+
+u8 vt220_state::chargen_r(offs_t offset)
+{
+	// ALT SEL H selects the soft character RAM; otherwise CHRG SEL H (P1.5) is the ROM's MSB
+	if (BIT(m_conf, 3))
+		return m_softchar[((m_char_addr & 0x7f) << 4) | offset];
+	return m_chargen[(BIT(m_p1, 5) << 12) | (m_char_addr << 4) | offset];
+}
+
+void vt220_state::chargen_w(offs_t offset, u8 data)
+{
+	if (BIT(m_conf, 3) && BIT(m_conf, 2))
+		m_softchar[((m_char_addr & 0x7f) << 4) | offset] = data;
 }
 
 /* Input ports */
 static INPUT_PORTS_START( vt220 )
 INPUT_PORTS_END
+
+void vt220_state::machine_start()
+{
+	m_softchar = make_unique_clear<u8[]>(0x800);
+
+	save_item(NAME(m_p1));
+	save_item(NAME(m_char_addr));
+	save_item(NAME(m_conf));
+	save_pointer(NAME(m_softchar), 0x800);
+}
 
 void vt220_state::machine_reset()
 {
@@ -116,7 +176,8 @@ void vt220_state::vt220(machine_config &config)
 	I8051(config, m_maincpu, XTAL(11'059'200)); // from schematic for earlier version
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt220_state::vt220_mem);
 	m_maincpu->set_addrmap(AS_DATA, &vt220_state::vt220_data);
-	m_maincpu->port_in_cb<1>().set_constant(0); // ???
+	m_maincpu->port_in_cb<1>().set_constant(0xff); // P1.4 PROD TEST low only from factory fixture on J1-1
+	m_maincpu->port_out_cb<1>().set(FUNC(vt220_state::p1_w));
 
 	scn2681_device &duart(SCN2681(config, "duart", XTAL(3'686'400)));
 	duart.irq_cb().set_inputline("maincpu", MCS51_INT1_LINE);
