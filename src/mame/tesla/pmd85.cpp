@@ -29,15 +29,18 @@ Notes on emulation status and to do list:
 1.  V.24.
 2.  Flash video attribute.
 3.  External interfaces connectors (K2-K5).
-4.  C2717PMD is marked MNW, but there's nothing to say why.
+4.  C2717PMD: no disc made for its PMD 32 driver is known.  Discs in the 8" layout
+    (boot records signed "C2717 ") load CP/M from the PMD 32, but their BIOS
+    drives the DS 2717 board.
 5.  Verify PMD-85.2A, PMD-85.3, Didaktik Alfa and Mato monitor roms.
 6.  Verify all Basic roms.
 7.  8251 in Didaktik Alfa.
 8.  Colors (if any). Seems most versions supported 4 colours via RGB connector. But, the TV modulator only carried the G line.
     The video signals are developed in a forest of gates which may take a while to work out.
 9.  PMD-85, Didaktik Alfa 2 and Didaktik Beta (ROMs and documentation needed).
-10. FDD interface (ROMs and disk images needed).
+10. Consul 2717 DS 2717 internal 8" floppy controller and classroom network.
 11. "Duch & Pampuch" Mato game displays scores with incorrect characters.
+12. PMD 32 on the PMD-85.2 and PMD-85.2A (needs the booter ROM module).
 
 
 PMD-85 technical information
@@ -219,6 +222,15 @@ Software list items: Some work, some don't, and some only work on certain machin
 - mato,pmd853 - does nothing
 
 Some software items will crash MAME, for example "bdash".
+
+Disks
+-----
+The I/O board's GPIO/0 connector (slot gpio0) takes the PMD 32 floppy unit
+(pmd32).
+- pmd853 : the PMD 32 is fitted; at power-on the monitor boots the disk in its
+  drive A (-flop1).
+- c2717pmd : the PMD 32 is fitted (-flop1, -flop2).  Its disk driver reads 26
+  sectors per track, the 8" layout (.img images of 26 x 128-byte sectors).
 
 *******************************************************************************************************************/
 
@@ -726,13 +738,18 @@ void pmd85_state::pmd851(machine_config &config)
 	m_ppi0->out_pb_callback().set(FUNC(pmd85_state::ppi0_portb_w));
 	m_ppi0->out_pc_callback().set(FUNC(pmd85_state::ppi0_portc_w));
 
+	// GPIO/0 is port A of the I/O board 8255, used in mode 2
 	I8255(config, m_ppi1);
-	m_ppi1->in_pa_callback().set(FUNC(pmd85_state::ppi1_porta_r));
+	m_ppi1->in_pa_callback().set(m_gpio, FUNC(pmd85_gpio_slot_device::pa_r));
 	m_ppi1->in_pb_callback().set(FUNC(pmd85_state::ppi1_portb_r));
 	m_ppi1->in_pc_callback().set(FUNC(pmd85_state::ppi1_portc_r));
-	m_ppi1->out_pa_callback().set(FUNC(pmd85_state::ppi1_porta_w));
+	m_ppi1->out_pa_callback().set(m_gpio, FUNC(pmd85_gpio_slot_device::pa_w));
 	m_ppi1->out_pb_callback().set(FUNC(pmd85_state::ppi1_portb_w));
-	m_ppi1->out_pc_callback().set(FUNC(pmd85_state::ppi1_portc_w));
+	m_ppi1->out_pc_callback().set(m_gpio, FUNC(pmd85_gpio_slot_device::pc_w));
+
+	PMD85_GPIO_SLOT(config, m_gpio, pmd85_gpio_devices, nullptr);
+	m_gpio->stb_callback().set(m_ppi1, FUNC(i8255_device::pc4_w));
+	m_gpio->ack_callback().set(m_ppi1, FUNC(i8255_device::pc6_w));
 
 	I8255(config, m_ppi2);
 	m_ppi2->in_pa_callback().set(FUNC(pmd85_state::ppi2_porta_r));
@@ -761,6 +778,9 @@ void pmd85_state::pmd853(machine_config &config)
 {
 	pmd851(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pmd85_state::pmd853_mem);
+
+	m_gpio->set_default_option("pmd32");
+	SOFTWARE_LIST(config, "flop_list").set_original("pmd85_flop");
 }
 
 void pmd85_state::alfa(machine_config &config)
@@ -824,6 +844,12 @@ void pmd85_state::c2717(machine_config &config)
 
 	m_screen->set_size(384, 256);
 	m_screen->set_screen_update(FUNC(pmd85_state::c2717_screen_update));
+}
+
+void pmd85_state::c2717pmd(machine_config &config)
+{
+	c2717(config);
+	m_gpio->set_default_option("pmd32");
 }
 
 
@@ -911,4 +937,4 @@ COMP( 1988, pmd853,   pmd851, 0,      pmd853,  pmd85, pmd85_state, init_pmd853, 
 COMP( 1986, alfa,     pmd851, 0,      alfa,    alfa,  pmd85_state, init_alfa,    "Didaktik Skalica", "Didaktik Alfa",             MACHINE_SUPPORTS_SAVE )
 COMP( 1985, mato,     pmd851, 0,      mato,    mato,  pmd85_state, init_mato,    "Statny",           "Mato",                      MACHINE_SUPPORTS_SAVE )
 COMP( 1989, c2717,    pmd851, 0,      c2717,   pmd85, pmd85_state, init_c2717,   "Zbrojovka Brno",   "Consul 2717",               MACHINE_SUPPORTS_SAVE )
-COMP( 1989, c2717pmd, pmd851, 0,      c2717,   pmd85, pmd85_state, init_c2717,   "Zbrojovka Brno",   "Consul 2717 (with PMD-32)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1989, c2717pmd, pmd851, 0,      c2717pmd, pmd85, pmd85_state, init_c2717,   "Zbrojovka Brno",   "Consul 2717 (with PMD 32)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
