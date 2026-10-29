@@ -13928,7 +13928,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="demolitn" supported="no">
+	<software name="demolitn">
 		<!-- SPS (CAPS) release 2712 -->
 		<description>Demolition (Europe)</description>
 		<!-- retail, standalone -->
@@ -13936,7 +13936,6 @@ ATK test: failed
 		<year>1987</year>
 		<publisher>Anco</publisher>
 		<notes><![CDATA[
-Black screen after title screen, [FDC] dsksync (fixed)
 ATK test: OK
 ]]></notes>
 		<info name="usage" value="Insert ABUSS when prompted for secret code"/>
@@ -16531,7 +16530,6 @@ ATK test: OK
 		<year>1988</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-Guru Meditation during initial boot, [FDC] with adkcon=$1100
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -19984,7 +19982,6 @@ ATK test: OK
 		<!-- Publisher: Prism Leisure -->
 		<publisher>Addictive</publisher>
 		<notes><![CDATA[
-Guru Meditation during Workbench load after pressing left mouse button on Hot Shot advertisement
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
