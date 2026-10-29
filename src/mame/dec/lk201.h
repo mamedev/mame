@@ -122,6 +122,7 @@ private:
 
 	void send_port(uint8_t offset, uint8_t data);
 	void update_interrupts();
+	void update_timer_interrupt();
 
 	int m_kbd_state;
 

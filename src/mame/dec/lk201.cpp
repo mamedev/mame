@@ -571,9 +571,13 @@ void lk201_device::device_reset()
 TIMER_CALLBACK_MEMBER(lk201_device::timer_irq)
 {
 	m_timer.tsr |= TSR_OCFL;
+	update_timer_interrupt();
+}
 
-	if ((m_timer.tcr & TCR_OCIE) && (m_timer.tsr & TSR_OCFL))
-		m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ASSERT_LINE);
+void lk201_device::update_timer_interrupt()
+{
+	// the output compare interrupt is requested while OCFL is set and enabled
+	m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ((m_timer.tcr & TCR_OCIE) && (m_timer.tsr & TSR_OCFL)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(lk201_device::beeper_off)
@@ -647,7 +651,7 @@ uint8_t lk201_device::timer_r(offs_t offset)
 	if(m_timer.tsr)
 	{
 		m_timer.tsr = 0;
-		m_maincpu->set_input_line(M68HC05EG_INT_TIMER, CLEAR_LINE);
+		update_timer_interrupt();
 	}
 	return ret;
 }
@@ -661,6 +665,9 @@ void lk201_device::timer_w(offs_t offset, uint8_t data)
 
 	switch (offset)
 	{
+	case 0: // TCR: OCIE enables or withdraws a pending request
+		update_timer_interrupt();
+		break;
 	case 4: // OCRH
 		save_tsr = m_timer.tsr; //  prevent crashes in between OCRH / OCRL loads
 		m_timer.tsr &= (255-TSR_OCFL); // OCFL flag tested for zero in TIMER routine
