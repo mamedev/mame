@@ -68,10 +68,16 @@ private:
 	u8 m_p1 = 0xff;
 	u8 m_char_addr = 0;
 	u8 m_conf = 0;
+	u8 m_lba = 0;
+	u8 m_lbf_bank = 0;
 	std::unique_ptr<u8[]> m_softchar;
+	std::unique_ptr<u8[]> m_lbf;
 	void p1_w(u8 data);
 	void conf_w(u8 data);
+	void duart_out_w(u8 data);
 	void char_addr_w(u8 data);
+	offs_t lbf_addr() const;
+	u8 char_code() const;
 	u8 chargen_r(offs_t offset);
 	void chargen_w(offs_t offset, u8 data);
 	void vt220_data(address_map &map) ATTR_COLD;
@@ -109,8 +115,24 @@ void vt220_state::vt220a_data(address_map &map)
 	map(0x9800, 0x980f).mirror(0x47f0).rw(FUNC(vt220_state::chargen_r), FUNC(vt220_state::chargen_w)); // 9FF0-9FFF
 }
 
+offs_t vt220_state::lbf_addr() const
+{
+	// E14 (2016): A10/A9 BNKS1/BNKS0, A8 ATR/CHR (high for character), A7-A0 LBA
+	return (m_lbf_bank << 9) | 0x100 | m_lba;
+}
+
+u8 vt220_state::char_code() const
+{
+	// CHRG LATCH2 (E20) takes the character address latch (E19) while LBF DISABLE H (P1.3) is high,
+	// otherwise the line buffer output
+	return BIT(m_p1, 3) ? m_char_addr : m_lbf[lbf_addr()];
+}
+
 void vt220_state::p1_w(u8 data)
 {
+	// DMA L (P1.0) falling edge loads the character address latch into the line buffer
+	if (BIT(m_p1, 0) && !BIT(data, 0) && !BIT(data, 3))
+		m_lbf[lbf_addr()] = m_char_addr;
 	m_p1 = data;
 }
 
@@ -119,7 +141,20 @@ void vt220_state::conf_w(u8 data)
 	// E26 (LS174) latches BAD0-5, bit order per firmware self-test (reverse of the sheet 2 Q labels):
 	// 0 NORM FIELD, 1 LBA CLRS, 2 EN CHR GEN RW, 3 ALT SEL, 4 RESET CMM, 5 LBA CLKS
 	// E32 F/F latches BAD6: set for ENA 20mA, reset for ENA EIA
+	// with EN CHR GEN RW H set, E30 gives the CPU the line buffer address counter (E7, LS393)
+	if (BIT(data, 2))
+	{
+		if (BIT(data, 1))
+			m_lba = 0;
+		else if (BIT(m_conf, 5) && !BIT(data, 5))
+			m_lba++;
+	}
 	m_conf = data;
+}
+
+void vt220_state::duart_out_w(u8 data)
+{
+	m_lbf_bank = (data >> 5) & 3; // OP5/OP6 BNK S0/S1
 }
 
 void vt220_state::char_addr_w(u8 data)
@@ -131,14 +166,14 @@ u8 vt220_state::chargen_r(offs_t offset)
 {
 	// ALT SEL H selects the soft character RAM; otherwise CHRG SEL H (P1.5) is the ROM's MSB
 	if (BIT(m_conf, 3))
-		return m_softchar[((m_char_addr & 0x7f) << 4) | offset];
-	return m_chargen[(BIT(m_p1, 5) << 12) | (m_char_addr << 4) | offset];
+		return m_softchar[((char_code() & 0x7f) << 4) | offset];
+	return m_chargen[(BIT(m_p1, 5) << 12) | (char_code() << 4) | offset];
 }
 
 void vt220_state::chargen_w(offs_t offset, u8 data)
 {
 	if (BIT(m_conf, 3) && BIT(m_conf, 2))
-		m_softchar[((m_char_addr & 0x7f) << 4) | offset] = data;
+		m_softchar[((char_code() & 0x7f) << 4) | offset] = data;
 }
 
 /* Input ports */
@@ -148,11 +183,15 @@ INPUT_PORTS_END
 void vt220_state::machine_start()
 {
 	m_softchar = make_unique_clear<u8[]>(0x800);
+	m_lbf = make_unique_clear<u8[]>(0x800);
 
 	save_item(NAME(m_p1));
 	save_item(NAME(m_char_addr));
 	save_item(NAME(m_conf));
+	save_item(NAME(m_lba));
+	save_item(NAME(m_lbf_bank));
 	save_pointer(NAME(m_softchar), 0x800);
+	save_pointer(NAME(m_lbf), 0x800);
 }
 
 void vt220_state::machine_reset()
@@ -181,6 +220,7 @@ void vt220_state::vt220(machine_config &config)
 
 	scn2681_device &duart(SCN2681(config, "duart", XTAL(3'686'400)));
 	duart.irq_cb().set_inputline("maincpu", MCS51_INT1_LINE);
+	duart.outport_cb().set(FUNC(vt220_state::duart_out_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen"));
