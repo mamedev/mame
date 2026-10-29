@@ -177,5 +177,5 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        ROT   COMPANY  FULLNAME   FLAGS
-GAME( 1995, cyclone, 0,      cyclone, cyclone, cyclone_state, empty_init, ROT0, "ICE",   "Cyclone", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+//    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        ROT   COMPANY  FULLNAME         FLAGS
+GAME( 1995, cyclone, 0,      cyclone, cyclone, cyclone_state, empty_init, ROT0, "ICE",   "Cyclone (ICE)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )
