@@ -32,6 +32,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/mcs51/i8051.h"
 //#include "machine/eepromser.h"
 #include "machine/mc68681.h"
@@ -55,6 +56,8 @@ public:
 		m_screen(*this, "screen"),
 		m_duart(*this, "duart"),
 		m_nvr(*this, "nvr"),
+		m_host(*this, "host"),
+		m_printer(*this, "printer"),
 		m_chargen(*this, "chargen"),
 		m_screen_ram(*this, "screen_ram"),
 		m_attr_ram(*this, "attr_ram")
@@ -76,6 +79,8 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<scn2681_device> m_duart;
 	optional_device<x2212_device> m_nvr;
+	optional_device<rs232_port_device> m_host;
+	optional_device<rs232_port_device> m_printer;
 	required_region_ptr<u8> m_chargen;
 	optional_shared_ptr<u8> m_screen_ram;
 	optional_shared_ptr<u8> m_attr_ram;
@@ -106,6 +111,11 @@ private:
 	u8 duart_r(offs_t offset);
 	u8 vram_r(offs_t offset);
 	void vlt_w(int state);
+	void host_txd_w(int state);
+	void host_rxd_w(int state);
+	u8 p1_r();
+	int m_host_txd = 1;
+	int m_host_rxd = 1;
 	void drb_w(int state);
 	int video_col(int x) const;
 	void cblank_w(int state);
@@ -287,6 +297,16 @@ void vt220_state::conf_w(u8 data)
 	// E26 (LS174) latches BAD0-5, bit order per firmware self-test (reverse of the sheet 2 Q labels):
 	// 0 NORM FIELD, 1 LBA CLRS, 2 EN CHR GEN RW, 3 ALT SEL, 4 RESET CMM, 5 LBA CLKS
 	// E32 F/F latches BAD6: set for ENA 20mA, reset for ENA EIA
+	// RESET CMM H resets the DUART
+	if (BIT(data, 4) && !BIT(m_conf, 4))
+		m_duart->reset();
+	// E32 selects the host interface: E33 passes HOST TXD to the EIA driver only with ENA EIA,
+	// and the receive gating takes EIA RXD only then (20 mA loop not emulated: idles marking)
+	if (m_host && BIT(data, 6) != BIT(m_conf, 6))
+	{
+		m_host->write_txd(BIT(data, 6) ? 1 : m_host_txd);
+		m_duart->rx_a_w(BIT(data, 6) ? 1 : m_host_rxd);
+	}
 	// with EN CHR GEN RW H set, E30 gives the CPU the line buffer address counter (E7, LS393)
 	if (BIT(data, 2))
 	{
@@ -300,11 +320,37 @@ void vt220_state::conf_w(u8 data)
 	m_conf = data;
 }
 
+void vt220_state::host_txd_w(int state)
+{
+	m_host_txd = state;
+	m_host->write_txd(BIT(m_conf, 6) ? 1 : state);
+}
+
+void vt220_state::host_rxd_w(int state)
+{
+	m_host_rxd = state;
+	if (!BIT(m_conf, 6))
+		m_duart->rx_a_w(state);
+}
+
+u8 vt220_state::p1_r()
+{
+	// P1.7 CAR DET H from the EIA receiver; the rest are outputs or the PROD TEST pull-up
+	return m_host ? (0x7f | (!m_host->dcd_r() << 7)) : 0xff;
+}
+
 void vt220_state::duart_out_w(u8 data)
 {
 	if (m_crtc)
 		m_screen->update_partial(m_screen->vpos());
 	m_duart_op = data;
+	if (m_host)
+	{
+		// the modem signals are active high here and active low on the RS-232 port
+		m_host->write_rts(!BIT(data, 0)); // OP0 RTS H
+		m_host->write_dtr(!BIT(data, 1)); // OP1 DTR H
+		m_host->write_spds(!BIT(data, 2)); // OP2 SPD SEL H
+	}
 	m_lbf_bank = (data >> 5) & 3; // OP5/OP6 BNK S0/S1
 	if (m_crtc && BIT(data, 4) != m_132col)
 	{
@@ -370,6 +416,8 @@ void vt220_state::machine_start()
 	save_item(NAME(m_vlt));
 	save_item(NAME(m_drb));
 	save_item(NAME(m_row_loading));
+	save_item(NAME(m_host_txd));
+	save_item(NAME(m_host_rxd));
 	save_item(NAME(m_cblank));
 	if (m_crtc)
 		machine().save().register_postload(save_prepost_delegate(FUNC(vt220_state::set_columns), this));
@@ -435,7 +483,7 @@ void vt220_state::vt220(machine_config &config)
 	m_maincpu->port_in_cb<1>().set_constant(0xff); // P1.4 PROD TEST low only from factory fixture on J1-1
 	m_maincpu->port_out_cb<1>().set(FUNC(vt220_state::p1_w));
 
-	scn2681_device &duart(SCN2681(config, "duart", XTAL(3'686'400)));
+	scn2681_device &duart(SCN2681(config, m_duart, XTAL(3'686'400)));
 	duart.irq_cb().set_inputline("maincpu", MCS51_INT1_LINE);
 	duart.outport_cb().set(FUNC(vt220_state::duart_out_w));
 
@@ -471,6 +519,21 @@ void vt220_state::vt220a(machine_config &config)
 	m_crtc->drb_callback().set(FUNC(vt220_state::drb_w));
 	m_crtc->vlt_callback().set(FUNC(vt220_state::vlt_w));
 	X2212(config, m_nvr); // E17
+
+	// TM table 5-1: channel A host (J3, EIA or 20 mA), channel B printer
+	m_maincpu->port_in_cb<1>().set(FUNC(vt220_state::p1_r));
+	m_duart->a_tx_cb().set(FUNC(vt220_state::host_txd_w));
+	m_duart->b_tx_cb().set(m_printer, FUNC(rs232_port_device::write_txd));
+
+	RS232_PORT(config, m_host, default_rs232_devices, nullptr);
+	m_host->rxd_handler().set(FUNC(vt220_state::host_rxd_w));
+	m_host->cts_handler().set(m_duart, FUNC(scn2681_device::ip0_w)).invert(); // CTS H
+	m_host->dsr_handler().set(m_duart, FUNC(scn2681_device::ip1_w)).invert(); // DSR H
+	m_host->si_handler().set(m_duart, FUNC(scn2681_device::ip2_w)).invert(); // SPD IND H
+
+	RS232_PORT(config, m_printer, default_rs232_devices, nullptr);
+	m_printer->rxd_handler().set(m_duart, FUNC(scn2681_device::rx_b_w));
+	m_printer->dsr_handler().set(m_duart, FUNC(scn2681_device::ip5_w)).invert(); // PTR DSR H
 
 	m_crtc->cblank_callback().set(FUNC(vt220_state::cblank_w));
 	m_screen->set_screen_update(FUNC(vt220_state::screen_update_vt220a));
