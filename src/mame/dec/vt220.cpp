@@ -370,7 +370,7 @@ void vt220_state::set_columns()
 	// horizontal totals are as the firmware programs the CRT9007
 	const XTAL dot = m_132col ? 22.896_MHz_XTAL : 15.288_MHz_XTAL;
 	const int width = m_132col ? 9 : 10;
-	const int htotal = (m_132col ? 164 : 99) * width;
+	const int htotal = (m_132col ? 163 : 98) * width;
 	const int hstart = (m_132col ? 22 : 12) * width; // horizontal delay as programmed
 	const int hvis = (m_132col ? 132 : 80) * width;
 	const int vstart = 16; // vertical delay as programmed (R05 - 1), then 24 rows of 10 scan lines
@@ -526,7 +526,7 @@ void vt220_state::vt220a(machine_config &config)
 	m_crtc->set_addrmap(0, &vt220_state::vt220a_vram);
 	m_crtc->set_character_width(10);
 	m_crtc->set_screen(m_screen);
-	m_screen->set_raw(15.288_MHz_XTAL, 990, 120, 920, 260, 16, 256);
+	m_screen->set_raw(15.288_MHz_XTAL, 980, 120, 920, 260, 16, 256);
 	m_crtc->vs_callback().set_inputline(m_maincpu, MCS51_T0_LINE);
 	m_crtc->hs_callback().set_inputline(m_maincpu, MCS51_T1_LINE);
 	m_crtc->drb_callback().set(FUNC(vt220_state::drb_w));
