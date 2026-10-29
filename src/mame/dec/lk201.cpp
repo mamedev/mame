@@ -839,7 +839,6 @@ uint8_t lk201_device::sci_r(offs_t offset)
 		case SCI_SCDR:  // Data
 			incoming = get_received_char();
 			sci_status &= ~SCSR_RDRF;
-			m_maincpu->set_input_line(M68HC05EG_INT_CPI, 0);
 			update_interrupts();
 			break;
 	}
@@ -885,7 +884,6 @@ void lk201_device::sci_w(offs_t offset, uint8_t data)
 				sci_tdr_full = true;
 				sci_status &= ~SCSR_TDRE;
 			}
-			m_maincpu->set_input_line(M68HC05EG_INT_CPI, 0);
 			update_interrupts();
 			break;
 	}
