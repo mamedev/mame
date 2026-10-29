@@ -36,7 +36,7 @@
 //#include "machine/eepromser.h"
 #include "machine/mc68681.h"
 #include "machine/ram.h"
-//#include "machine/x2212.h"
+#include "machine/x2212.h"
 #include "video/crt9007.h"
 #include "emupal.h"
 #include "screen.h"
@@ -54,6 +54,7 @@ public:
 		m_crtc(*this, "crtc"),
 		m_screen(*this, "screen"),
 		m_duart(*this, "duart"),
+		m_nvr(*this, "nvr"),
 		m_chargen(*this, "chargen"),
 		m_screen_ram(*this, "screen_ram"),
 		m_attr_ram(*this, "attr_ram")
@@ -74,6 +75,7 @@ private:
 	optional_device<crt9007_device> m_crtc;
 	required_device<screen_device> m_screen;
 	required_device<scn2681_device> m_duart;
+	optional_device<x2212_device> m_nvr;
 	required_region_ptr<u8> m_chargen;
 	optional_shared_ptr<u8> m_screen_ram;
 	optional_shared_ptr<u8> m_attr_ram;
@@ -139,6 +141,7 @@ void vt220_state::vt220a_data(address_map &map)
 	map(0x0800, 0x0800).mirror(0x47ff).w(FUNC(vt220_state::char_addr_w)); // 0FFF
 	map(0x0000, 0x0000).mirror(0x47ff).w(FUNC(vt220_state::conf_w)); // 07FF
 	map(0x1000, 0x103f).mirror(0x47c0).rw(m_crtc, FUNC(crt9007_device::read), FUNC(crt9007_device::write)); // 1700-17FF
+	map(0x9000, 0x90ff).mirror(0x4700).rw(m_nvr, FUNC(x2212_device::read), FUNC(x2212_device::write)); // 9700-97FF
 	map(0x9800, 0x980f).mirror(0x47f0).rw(FUNC(vt220_state::chargen_r), FUNC(vt220_state::chargen_w)); // 9FF0-9FFF
 }
 
@@ -242,6 +245,12 @@ void vt220_state::p1_w(u8 data)
 	{
 		m_lbf[lbf_addr(true, m_lba)] = m_char_addr;
 		m_lbf[lbf_addr(false, m_lba)] = m_atr_latch;
+	}
+	// NVR RECALL L (P1.1) and NVR STORE L (P1.2); the X2212 core takes them active high
+	if (m_nvr)
+	{
+		m_nvr->recall(!BIT(data, 1));
+		m_nvr->store(!BIT(data, 2));
 	}
 	// RESET CRT L (P1.6)
 	if (m_crtc && BIT(m_p1, 6) && !BIT(data, 6))
@@ -430,7 +439,9 @@ void vt220_state::vt220a(machine_config &config)
 	m_screen->set_raw(15.288_MHz_XTAL, 990, 0, 800, 260, 0, 240);
 	m_crtc->vs_callback().set_inputline(m_maincpu, MCS51_T0_LINE);
 	m_crtc->hs_callback().set_inputline(m_maincpu, MCS51_T1_LINE);
-	m_crtc->drb_callback().set_inputline(m_maincpu, MCS51_INT0_LINE); // DMA REQ L
+	m_crtc->drb_callback().set_inputline(m_maincpu, MCS51_INT0_LINE).invert(); // DRB is active low, as is DMA REQ L
+	X2212(config, m_nvr); // E17
+
 	m_crtc->wben_callback().set(FUNC(vt220_state::wben_w));
 	m_crtc->cblank_callback().set(FUNC(vt220_state::cblank_w));
 	m_screen->set_screen_update(FUNC(vt220_state::screen_update_vt220a));
