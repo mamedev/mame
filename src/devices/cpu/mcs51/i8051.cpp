@@ -1231,8 +1231,6 @@ void mcs51_cpu_device::device_start()
 	save_item(NAME(m_last_line_state));
 	save_item(NAME(m_t0_cnt));
 	save_item(NAME(m_t1_cnt));
-	save_item(NAME(m_t2_cnt));
-	save_item(NAME(m_t2ex_cnt));
 	save_item(NAME(m_cur_irq_prio));
 	save_item(NAME(m_irq_active));
 	save_item(NAME(m_irq_prio));
@@ -1334,8 +1332,6 @@ void mcs51_cpu_device::device_reset()
 	m_last_line_state = 0;
 	m_t0_cnt = 0;
 	m_t1_cnt = 0;
-	m_t2_cnt = 0;
-	m_t2ex_cnt = 0;
 
 	// Flag as NO IRQ in Progress
 	m_irq_active = 0;
