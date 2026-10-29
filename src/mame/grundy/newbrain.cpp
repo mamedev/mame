@@ -869,6 +869,7 @@ void newbrain_state::newbrain(machine_config &config)
 	Z80(config, m_maincpu, XTAL(16'000'000)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &newbrain_state::newbrain_mreq);
 	m_maincpu->set_addrmap(AS_IO, &newbrain_state::newbrain_iorq);
+	m_maincpu->busack_cb().set(m_exp, FUNC(newbrain_expansion_slot_device::busak_w));
 
 	COP420(config, m_cop, XTAL(16'000'000)/4);
 	m_cop->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true);
@@ -887,6 +888,7 @@ void newbrain_state::newbrain(machine_config &config)
 	NEWBRAIN_EXPANSION_SLOT(config, m_exp, XTAL(16'000'000)/4, newbrain_expansion_cards, "eim");
 	m_exp->int_callback().set(FUNC(newbrain_state::exp_int_w));
 	m_exp->m1_wait_callback().set([this] (int state) { m_maincpu->z80_set_m1_cycles(state ? 5 : 4); });
+	m_exp->busrq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_exp->host_mreq_r_callback().set(FUNC(newbrain_state::mreq_r));
 	m_exp->host_mreq_w_callback().set(FUNC(newbrain_state::mreq_w));
 	m_exp->host_main_r_callback().set([this] (offs_t offset) { return main_mreq_r(offset, 0xff, offset >> 13, false); });
