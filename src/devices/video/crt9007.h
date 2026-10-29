@@ -183,6 +183,7 @@ private:
 	uint8_t m_pending_attr;
 	uint8_t m_paint_attr;
 	uint8_t m_row_line;
+	bool m_row_attr_curs;
 
 	// timers
 	emu_timer *m_vsync_timer;

@@ -614,6 +614,7 @@ void crt9007_device::device_start()
 	save_item(NAME(m_pending_attr));
 	save_item(NAME(m_paint_attr));
 	save_item(NAME(m_row_line));
+	save_item(NAME(m_row_attr_curs));
 }
 
 
@@ -666,6 +667,7 @@ void crt9007_device::device_reset()
 	m_pending_attr = 0;
 	m_paint_attr = 0;
 	m_row_line = 0;
+	m_row_attr_curs = false;
 
 	// 29 (WBEN) = 0
 	m_write_wben(0);
@@ -755,6 +757,13 @@ TIMER_CALLBACK_MEMBER(crt9007_device::vlt_update)
 	int const lines = SCAN_LINES_PER_DATA_ROW;
 	if (m_vlt)
 	{
+		// a double height/width CURS level ends at the VLT leading edge
+		if (m_row_attr_curs)
+		{
+			m_row_attr_curs = false;
+			m_write_curs(m_curs);
+		}
+
 		// DRB is active through the top scan line of a data row
 		if (!m_drb)
 		{
@@ -778,7 +787,7 @@ TIMER_CALLBACK_MEMBER(crt9007_device::vlt_update)
 	else if (m_paint_attr && (m_row_line + 1 < lines))
 	{
 		// CURS marks each following scan line of a double height/width row,
-		// 3 CCLK after the VLT trailing edge for 1 CCLK
+		// from 3 CCLK after the VLT trailing edge
 		m_row_attr_curs_timer->adjust(clocks_to_attotime(3), 1);
 	}
 
@@ -946,12 +955,15 @@ TIMER_CALLBACK_MEMBER(crt9007_device::frame_update)
 
 TIMER_CALLBACK_MEMBER(crt9007_device::row_attr_curs_update)
 {
-	// a 1 CCLK pulse on CURS during horizontal retrace, for external logic to
-	// halve the dot rate on the following scan line
-	if (param)
+	// CURS during horizontal retrace tells external logic to halve the dot rate on the
+	// following scan line; it lasts until the VLT leading edge, or for 1 CCLK with a
+	// double row buffer (tables 1 and 2)
+	m_row_attr_curs = bool(param);
+	if (m_row_attr_curs)
 	{
 		m_write_curs(1);
-		m_row_attr_curs_timer->adjust(clocks_to_attotime(1), 0);
+		if (DOUBLE_ROW_BUFFER)
+			m_row_attr_curs_timer->adjust(clocks_to_attotime(1), 0);
 	}
 	else
 	{
