@@ -20,6 +20,14 @@
  * Sources:
  *   - Brooktree Product Databook 1991
  *
+ * Second sources:
+ *   - Analog Devices: ADV471, ADV475, ADV476, ADV477, ADV478
+ *   - AMD: Am81C471, Am81C478
+ *   - Samsung: KDA0471, KDA0476, KDA0478
+ *   - Sierra: SC11471, SC11476, SC11478
+ *   - AT&T: ATT20C475A, ATT20C477A, ATT20C478A
+ *   - Winbond: W82C476, W82C478
+ *
  * TODO:
  *   - remaining devices
  *   - bt479 window mode, overlay mask, 10-bit modes
