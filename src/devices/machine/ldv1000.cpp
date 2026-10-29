@@ -105,7 +105,12 @@ ROM_END
 //-------------------------------------------------
 
 pioneer_ldv1000_device::pioneer_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: parallel_laserdisc_device(mconfig, PIONEER_LDV1000, tag, owner, clock),
+	: pioneer_ldv1000_device(mconfig, PIONEER_LDV1000, tag, owner, clock)
+{
+}
+
+pioneer_ldv1000_device::pioneer_ldv1000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: parallel_laserdisc_device(mconfig, type, tag, owner, clock),
 		m_z80_cpu(*this, "ldv1000"),
 		m_z80_ctc(*this, "ldvctc"),
 		m_multitimer(nullptr),
