@@ -279,6 +279,17 @@ int32_t tms320c51_device::PREG_PSCALER(int32_t preg)
 	return 0;
 }
 
+// loads TREG0, and also TREG1/TREG2 in 'C2x compatible mode (TRM = 0)
+void tms320c51_device::LOAD_TREG0(uint16_t data)
+{
+	m_treg0 = data;
+	if (m_pmst.trm == 0)
+	{
+		m_treg1 = data;
+		m_treg2 = data;
+	}
+}
+
 
 
 void tms320c51_device::op_invalid()
@@ -292,13 +303,13 @@ void tms320c51_device::op_abs()
 {
 	if (m_acc < 0)
 	{
-		if ((uint32_t)(m_acc) == 0x80000000)
+		if (uint32_t(m_acc) == 0x8000'0000)
 		{
 			// special case: saturates to 0x7fffffff only when OVM is set
 			m_st0.ov = 1;
 			if (m_st0.ovm)
 			{
-				m_acc = 0x7fffffff;
+				m_acc = 0x7fff'ffff;
 			}
 		}
 		else
@@ -387,22 +398,22 @@ void tms320c51_device::op_addb()
 
 void tms320c51_device::op_addc()
 {
-	uint16_t ea = GET_ADDRESS();
-	uint16_t data = DM_READ16(ea);
+	uint16_t const ea = GET_ADDRESS();
+	uint16_t const data = DM_READ16(ea);
 
 	// sign extension suppressed
-	m_acc = ADD(m_acc, (uint32_t)(data) + m_st1.c, false);
+	m_acc = ADD(m_acc, data + m_st1.c, false);
 
 	CYCLES(1);
 }
 
 void tms320c51_device::op_adds()
 {
-	uint16_t ea = GET_ADDRESS();
-	uint16_t data = DM_READ16(ea);
+	uint16_t const ea = GET_ADDRESS();
+	uint16_t const data = DM_READ16(ea);
 
 	// data is always treated as unsigned
-	m_acc = ADD(m_acc, (uint32_t)(data), false);
+	m_acc = ADD(m_acc, data, false);
 
 	CYCLES(1);
 }
@@ -640,9 +651,9 @@ void tms320c51_device::op_orb()
 
 void tms320c51_device::op_rol()
 {
-	uint32_t c = m_st1.c;
-	m_st1.c = ((uint32_t)(m_acc) >> 31) & 1;
-	m_acc = (int32_t)(((uint32_t)(m_acc) << 1) | c);
+	uint32_t const c = m_st1.c;
+	m_st1.c = BIT(m_acc, 31);
+	m_acc = int32_t((uint32_t(m_acc) << 1) | c);
 
 	CYCLES(1);
 }
@@ -662,9 +673,9 @@ void tms320c51_device::op_rolb()
 
 void tms320c51_device::op_ror()
 {
-	uint32_t c = m_st1.c;
-	m_st1.c = m_acc & 1;
-	m_acc = (int32_t)(((uint32_t)(m_acc) >> 1) | (c << 31));
+	uint32_t const c = m_st1.c;
+	m_st1.c = BIT(m_acc, 0);
+	m_acc = int32_t((uint32_t(m_acc) >> 1) | (c << 31));
 
 	CYCLES(1);
 }
@@ -711,15 +722,15 @@ void tms320c51_device::op_samm()
 void tms320c51_device::op_sath()
 {
 	// shift right by 16 if bit 4 of TREG1 is set, C is unaffected
-	if (m_treg1 & 0x10)
+	if (BIT(m_treg1, 4))
 	{
 		if (m_st1.sxm)
 		{
-			m_acc = (int32_t)(m_acc) >> 16;
+			m_acc = m_acc >> 16;
 		}
 		else
 		{
-			m_acc = (uint32_t)(m_acc) >> 16;
+			m_acc = uint32_t(m_acc) >> 16;
 		}
 	}
 
@@ -822,20 +833,10 @@ void tms320c51_device::op_sub_mem()
 
 void tms320c51_device::op_sub_s16_mem()
 {
-	int32_t d;
-	uint16_t ea = GET_ADDRESS();
-	uint16_t data = DM_READ16(ea);
+	uint16_t const ea = GET_ADDRESS();
+	uint32_t const data = uint32_t(DM_READ16(ea)) << 16;
 
-	if (m_st1.sxm)
-	{
-		d = (int32_t)(int16_t)(data) << 16;
-	}
-	else
-	{
-		d = (uint32_t)(uint16_t)(data) << 16;
-	}
-
-	m_acc = SUB(m_acc, d, true);
+	m_acc = SUB(m_acc, data, true);
 
 	CYCLES(1);
 }
@@ -871,38 +872,38 @@ void tms320c51_device::op_sub_limm()
 
 void tms320c51_device::op_subb()
 {
-	uint16_t ea = GET_ADDRESS();
-	uint16_t data = DM_READ16(ea);
+	uint16_t const ea = GET_ADDRESS();
+	uint16_t const data = DM_READ16(ea);
 
 	// sign extension suppressed, subtracts the inverted carry
-	m_acc = SUB(m_acc, (uint32_t)(data) + (m_st1.c ^ 1), false);
+	m_acc = SUB(m_acc, data + (m_st1.c ^ 1), false);
 
 	CYCLES(1);
 }
 
 void tms320c51_device::op_subc()
 {
-	uint16_t ea = GET_ADDRESS();
-	uint32_t a = (uint32_t)(m_acc);
-	uint32_t d = (uint32_t)(DM_READ16(ea)) << 15;
-	uint32_t res = a - d;
+	uint16_t const ea = GET_ADDRESS();
+	uint32_t const a = uint32_t(m_acc);
+	uint32_t const d = uint32_t(DM_READ16(ea)) << 15;
+	uint32_t const res = a - d;
 
 	// C is cleared if borrow was generated
 	m_st1.c = (a < res) ? 0 : 1;
 
 	// OV is affected, but OVM is ignored (no saturation)
-	if ((a ^ d) & (a ^ res) & 0x80000000)
+	if ((a ^ d) & (a ^ res) & 0x8000'0000)
 	{
 		m_st0.ov = 1;
 	}
 
-	if ((int32_t)(res) >= 0)
+	if (int32_t(res) >= 0)
 	{
-		m_acc = (int32_t)((res << 1) + 1);
+		m_acc = int32_t((res << 1) + 1);
 	}
 	else
 	{
-		m_acc = (int32_t)(a << 1);
+		m_acc = int32_t(a << 1);
 	}
 
 	CYCLES(1);
@@ -910,11 +911,11 @@ void tms320c51_device::op_subc()
 
 void tms320c51_device::op_subs()
 {
-	uint16_t ea = GET_ADDRESS();
-	uint16_t data = DM_READ16(ea);
+	uint16_t const ea = GET_ADDRESS();
+	uint16_t const data = DM_READ16(ea);
 
 	// data is always treated as unsigned
-	m_acc = SUB(m_acc, (uint32_t)(data), false);
+	m_acc = SUB(m_acc, data, false);
 
 	CYCLES(1);
 }
@@ -956,11 +957,11 @@ void tms320c51_device::op_xorb()
 
 void tms320c51_device::op_zalr()
 {
-	uint16_t ea = GET_ADDRESS();
-	uint16_t data = DM_READ16(ea);
+	uint16_t const ea = GET_ADDRESS();
+	uint16_t const data = DM_READ16(ea);
 
 	// load ACCH and round, C is unaffected
-	m_acc = (int32_t)(((uint32_t)(data) << 16) | 0x8000);
+	m_acc = int32_t((uint32_t(data) << 16) | 0x8000);
 
 	CYCLES(1);
 }
@@ -1457,9 +1458,10 @@ void tms320c51_device::op_blpd_imm()
 
 void tms320c51_device::op_dmov()
 {
-	uint16_t ea = GET_ADDRESS();
-	uint16_t data = DM_READ16(ea);
+	uint16_t const ea = GET_ADDRESS();
+	uint16_t const data = DM_READ16(ea);
 
+	// FIXME: the data move only happens in on-chip RAM; external memory and MMRs are read but not written
 	DM_WRITE16(ea + 1, data);
 
 	CYCLES(1);
@@ -1646,10 +1648,10 @@ void tms320c51_device::op_apac()
 
 void tms320c51_device::op_lph()
 {
-	uint16_t ea = GET_ADDRESS();
-	uint16_t data = DM_READ16(ea);
+	uint16_t const ea = GET_ADDRESS();
+	uint16_t const data = DM_READ16(ea);
 
-	m_preg = (int32_t)(((uint32_t)(data) << 16) | ((uint32_t)(m_preg) & 0xffff));
+	m_preg = int32_t((uint32_t(data) << 16) | (uint32_t(m_preg) & 0xffff));
 
 	CYCLES(1);
 }
@@ -1659,12 +1661,7 @@ void tms320c51_device::op_lt()
 	uint16_t ea = GET_ADDRESS();
 	uint16_t data = DM_READ16(ea);
 
-	m_treg0 = data;
-	if (m_pmst.trm == 0)
-	{
-		m_treg1 = data;
-		m_treg2 = data;
-	}
+	LOAD_TREG0(data);
 
 	CYCLES(1);
 }
@@ -1675,50 +1672,34 @@ void tms320c51_device::op_lta()
 	uint16_t ea = GET_ADDRESS();
 	uint16_t data = DM_READ16(ea);
 
-	m_treg0 = data;
+	LOAD_TREG0(data);
 	spreg = PREG_PSCALER(m_preg);
 	m_acc = ADD(m_acc, spreg, false);
-	if (m_pmst.trm == 0)
-	{
-		m_treg1 = data;
-		m_treg2 = data;
-	}
 
 	CYCLES(1);
 }
 
 void tms320c51_device::op_ltd()
 {
-	uint16_t ea = GET_ADDRESS();
-	uint16_t data = DM_READ16(ea);
+	uint16_t const ea = GET_ADDRESS();
+	uint16_t const data = DM_READ16(ea);
 
-	m_treg0 = data;
-	if (m_pmst.trm == 0)
-	{
-		m_treg1 = data;
-		m_treg2 = data;
-	}
+	LOAD_TREG0(data);
 
+	// FIXME: the data move only happens in on-chip RAM; on external memory LTD behaves like LTA
 	DM_WRITE16(ea + 1, data);
 
-	int32_t spreg = PREG_PSCALER(m_preg);
-	m_acc = ADD(m_acc, spreg, false);
+	m_acc = ADD(m_acc, PREG_PSCALER(m_preg), false);
 
 	CYCLES(1);
 }
 
 void tms320c51_device::op_ltp()
 {
-	uint16_t ea = GET_ADDRESS();
-	uint16_t data = DM_READ16(ea);
+	uint16_t const ea = GET_ADDRESS();
+	uint16_t const data = DM_READ16(ea);
 
-	m_treg0 = data;
-	if (m_pmst.trm == 0)
-	{
-		m_treg1 = data;
-		m_treg2 = data;
-	}
-
+	LOAD_TREG0(data);
 	m_acc = PREG_PSCALER(m_preg);
 
 	CYCLES(1);
@@ -1726,18 +1707,11 @@ void tms320c51_device::op_ltp()
 
 void tms320c51_device::op_lts()
 {
-	uint16_t ea = GET_ADDRESS();
-	uint16_t data = DM_READ16(ea);
+	uint16_t const ea = GET_ADDRESS();
+	uint16_t const data = DM_READ16(ea);
 
-	m_treg0 = data;
-	if (m_pmst.trm == 0)
-	{
-		m_treg1 = data;
-		m_treg2 = data;
-	}
-
-	int32_t spreg = PREG_PSCALER(m_preg);
-	m_acc = SUB(m_acc, spreg, false);
+	LOAD_TREG0(data);
+	m_acc = SUB(m_acc, PREG_PSCALER(m_preg), false);
 
 	CYCLES(1);
 }
@@ -1775,58 +1749,50 @@ void tms320c51_device::op_mpy_mem()
 void tms320c51_device::op_mpy_simm()
 {
 	// 13-bit signed constant, sign-extended regardless of SXM
-	int32_t imm = m_op & 0x1fff;
-	if (imm & 0x1000)
-	{
-		imm -= 0x2000;
-	}
+	int32_t const imm = util::sext(m_op, 13);
 
-	m_preg = (int32_t)(int16_t)(m_treg0) * imm;
+	m_preg = int16_t(m_treg0) * imm;
 
 	CYCLES(1);
 }
 
 void tms320c51_device::op_mpy_limm()
 {
-	int16_t imm = (int16_t)(ROPCODE());
+	int16_t const imm = ROPCODE();
 
-	m_preg = (int32_t)(int16_t)(m_treg0) * (int32_t)(imm);
+	m_preg = int16_t(m_treg0) * imm;
 
 	CYCLES(2);
 }
 
 void tms320c51_device::op_mpya()
 {
-	uint16_t ea = GET_ADDRESS();
-	int16_t data = DM_READ16(ea);
+	uint16_t const ea = GET_ADDRESS();
+	int16_t const data = DM_READ16(ea);
 
-	int32_t spreg = PREG_PSCALER(m_preg);
-	m_acc = ADD(m_acc, spreg, false);
-
-	m_preg = (int32_t)(int16_t)(m_treg0) * (int32_t)(data);
+	m_acc = ADD(m_acc, PREG_PSCALER(m_preg), false);
+	m_preg = int16_t(m_treg0) * data;
 
 	CYCLES(1);
 }
 
 void tms320c51_device::op_mpys()
 {
-	uint16_t ea = GET_ADDRESS();
-	int16_t data = DM_READ16(ea);
+	uint16_t const ea = GET_ADDRESS();
+	int16_t const data = DM_READ16(ea);
 
-	int32_t spreg = PREG_PSCALER(m_preg);
-	m_acc = SUB(m_acc, spreg, false);
-
-	m_preg = (int32_t)(int16_t)(m_treg0) * (int32_t)(data);
+	m_acc = SUB(m_acc, PREG_PSCALER(m_preg), false);
+	m_preg = int16_t(m_treg0) * data;
 
 	CYCLES(1);
 }
 
 void tms320c51_device::op_mpyu()
 {
-	uint16_t ea = GET_ADDRESS();
-	uint16_t data = DM_READ16(ea);
+	uint16_t const ea = GET_ADDRESS();
+	uint16_t const data = DM_READ16(ea);
 
-	m_preg = (int32_t)((uint32_t)(uint16_t)(m_treg0) * (uint32_t)(data));
+	m_preg = int32_t(uint32_t(m_treg0) * data);
 
 	CYCLES(1);
 }
@@ -1840,8 +1806,7 @@ void tms320c51_device::op_pac()
 
 void tms320c51_device::op_spac()
 {
-	int32_t spreg = PREG_PSCALER(m_preg);
-	m_acc = SUB(m_acc, spreg, false);
+	m_acc = SUB(m_acc, PREG_PSCALER(m_preg), false);
 
 	CYCLES(1);
 }
@@ -1873,40 +1838,24 @@ void tms320c51_device::op_spm()
 
 void tms320c51_device::op_sqra()
 {
-	uint16_t ea = GET_ADDRESS();
-	uint16_t data = DM_READ16(ea);
+	uint16_t const ea = GET_ADDRESS();
+	int16_t const data = DM_READ16(ea);
 
-	int32_t spreg = PREG_PSCALER(m_preg);
-	m_acc = ADD(m_acc, spreg, false);
-
-	m_treg0 = data;
-	if (m_pmst.trm == 0)
-	{
-		m_treg1 = data;
-		m_treg2 = data;
-	}
-
-	m_preg = (int32_t)(int16_t)(data) * (int32_t)(int16_t)(data);
+	m_acc = ADD(m_acc, PREG_PSCALER(m_preg), false);
+	LOAD_TREG0(data);
+	m_preg = data * data;
 
 	CYCLES(1);
 }
 
 void tms320c51_device::op_sqrs()
 {
-	uint16_t ea = GET_ADDRESS();
-	uint16_t data = DM_READ16(ea);
+	uint16_t const ea = GET_ADDRESS();
+	int16_t const data = DM_READ16(ea);
 
-	int32_t spreg = PREG_PSCALER(m_preg);
-	m_acc = SUB(m_acc, spreg, false);
-
-	m_treg0 = data;
-	if (m_pmst.trm == 0)
-	{
-		m_treg1 = data;
-		m_treg2 = data;
-	}
-
-	m_preg = (int32_t)(int16_t)(data) * (int32_t)(int16_t)(data);
+	m_acc = SUB(m_acc, PREG_PSCALER(m_preg), false);
+	LOAD_TREG0(data);
+	m_preg = data * data;
 
 	CYCLES(1);
 }
@@ -2009,14 +1958,14 @@ void tms320c51_device::op_idle2()
 void tms320c51_device::op_lst_st0()
 {
 	// ARB is not affected, ARP is loaded from the data even with indirect addressing
-	uint16_t arb = m_st1.arb;
-	uint16_t ea = GET_ADDRESS();
-	uint16_t data = DM_READ16(ea);
+	uint16_t const arb = m_st1.arb;
+	uint16_t const ea = GET_ADDRESS();
+	uint16_t const data = DM_READ16(ea);
 
 	m_st1.arb = arb;
-	m_st0.arp = (data >> 13) & 0x7;
-	m_st0.ov = (data >> 12) & 1;
-	m_st0.ovm = (data >> 11) & 1;
+	m_st0.arp = BIT(data, 13, 3);
+	m_st0.ov = BIT(data, 12);
+	m_st0.ovm = BIT(data, 11);
 	// INTM is not affected
 	m_st0.dp = (data & 0x1ff) << 7;
 
@@ -2025,17 +1974,17 @@ void tms320c51_device::op_lst_st0()
 
 void tms320c51_device::op_lst_st1()
 {
-	uint16_t ea = GET_ADDRESS();
-	uint16_t data = DM_READ16(ea);
+	uint16_t const ea = GET_ADDRESS();
+	uint16_t const data = DM_READ16(ea);
 
-	m_st1.arb = (data >> 13) & 0x7;
-	m_st1.cnf = (data >> 12) & 1;
-	m_st1.tc = (data >> 11) & 1;
-	m_st1.sxm = (data >> 10) & 1;
-	m_st1.c = (data >> 9) & 1;
-	m_st1.hm = (data >> 6) & 1;
-	m_st1.xf = (data >> 4) & 1;
-	m_st1.pm = data & 0x3;
+	m_st1.arb = BIT(data, 13, 3);
+	m_st1.cnf = BIT(data, 12);
+	m_st1.tc = BIT(data, 11);
+	m_st1.sxm = BIT(data, 10);
+	m_st1.c = BIT(data, 9);
+	m_st1.hm = BIT(data, 6);
+	m_st1.xf = BIT(data, 4);
+	m_st1.pm = BIT(data, 0, 2);
 
 	// ARB is also loaded into ARP
 	m_st0.arp = m_st1.arb;
@@ -2052,7 +2001,7 @@ void tms320c51_device::op_pop()
 
 void tms320c51_device::op_popd()
 {
-	uint16_t ea = GET_ADDRESS();
+	uint16_t const ea = GET_ADDRESS();
 
 	DM_WRITE16(ea, POP_STACK());
 
@@ -2061,8 +2010,8 @@ void tms320c51_device::op_popd()
 
 void tms320c51_device::op_pshd()
 {
-	uint16_t ea = GET_ADDRESS();
-	uint16_t data = DM_READ16(ea);
+	uint16_t const ea = GET_ADDRESS();
+	uint16_t const data = DM_READ16(ea);
 
 	PUSH_STACK(data);
 
@@ -2071,7 +2020,7 @@ void tms320c51_device::op_pshd()
 
 void tms320c51_device::op_push()
 {
-	PUSH_STACK((uint16_t)(m_acc));
+	PUSH_STACK(uint16_t(m_acc));
 
 	CYCLES(1);
 }
@@ -2181,8 +2130,8 @@ void tms320c51_device::op_setc_intm()
 void tms320c51_device::op_sst_st0()
 {
 	// direct addressing always uses data page 0
-	uint16_t ea = (m_op & 0x80) ? GET_ADDRESS() : (m_op & 0x7f);
-	uint16_t data = (m_st0.arp << 13) | (m_st0.ov << 12) | (m_st0.ovm << 11) | (1 << 10) | (m_st0.intm << 9) | (m_st0.dp >> 7);
+	uint16_t const ea = (m_op & 0x80) ? GET_ADDRESS() : (m_op & 0x7f);
+	uint16_t const data = (m_st0.arp << 13) | (m_st0.ov << 12) | (m_st0.ovm << 11) | (1 << 10) | (m_st0.intm << 9) | (m_st0.dp >> 7);
 
 	DM_WRITE16(ea, data);
 
@@ -2192,8 +2141,8 @@ void tms320c51_device::op_sst_st0()
 void tms320c51_device::op_sst_st1()
 {
 	// direct addressing always uses data page 0, reserved bits read as 1
-	uint16_t ea = (m_op & 0x80) ? GET_ADDRESS() : (m_op & 0x7f);
-	uint16_t data = (m_st1.arb << 13) | (m_st1.cnf << 12) | (m_st1.tc << 11) | (m_st1.sxm << 10) | (m_st1.c << 9) |
+	uint16_t const ea = (m_op & 0x80) ? GET_ADDRESS() : (m_op & 0x7f);
+	uint16_t const data = (m_st1.arb << 13) | (m_st1.cnf << 12) | (m_st1.tc << 11) | (m_st1.sxm << 10) | (m_st1.c << 9) |
 			(3 << 7) | (m_st1.hm << 6) | (1 << 5) | (m_st1.xf << 4) | (3 << 2) | (m_st1.pm & 3);
 
 	DM_WRITE16(ea, data);

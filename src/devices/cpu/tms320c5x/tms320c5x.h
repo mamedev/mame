@@ -183,6 +183,7 @@ protected:
 	inline bool GET_ZLVC_CONDITION(int zlvc, int zlvc_mask);
 	inline bool GET_TP_CONDITION(int tp);
 	inline int32_t PREG_PSCALER(int32_t preg);
+	inline void LOAD_TREG0(uint16_t data);
 	void op_invalid();
 	void op_abs();
 	void op_adcb();
