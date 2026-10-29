@@ -412,7 +412,8 @@ inline void crt9007_device::update_drb_timer(bool state)
 inline void crt9007_device::update_dma_timer()
 {
 	// TODO burst count and burst delay
-	m_dma_timer->adjust(clocks_to_attotime(1));
+	// double height/width rows are addressed every other character clock
+	m_dma_timer->adjust(clocks_to_attotime((!m_table_count && m_dma_double_width) ? 2 : 1));
 }
 
 
@@ -561,7 +562,8 @@ crt9007_device::crt9007_device(const machine_config &mconfig, const char *tag, d
 	m_write_wben(*this),
 	m_write_cblank(*this),
 	m_write_slg(*this),
-	m_write_sld(*this)
+	m_write_sld(*this),
+	m_write_sl(*this)
 {
 	for (auto & elem : m_reg)
 		elem = 0;
@@ -582,6 +584,7 @@ void crt9007_device::device_start()
 	m_drb_timer = timer_alloc(FUNC(crt9007_device::drb_update), this);
 	m_dma_timer = timer_alloc(FUNC(crt9007_device::dma_update), this);
 	m_frame_timer = timer_alloc(FUNC(crt9007_device::frame_update), this);
+	m_row_attr_curs_timer = timer_alloc(FUNC(crt9007_device::row_attr_curs_update), this);
 
 	// save state
 	save_item(NAME(m_reg));
@@ -605,6 +608,12 @@ void crt9007_device::device_start()
 	save_item(NAME(m_dma_count));
 	save_item(NAME(m_dma_burst));
 	save_item(NAME(m_dma_delay));
+	save_item(NAME(m_dma_first));
+	save_item(NAME(m_dma_double_width));
+	save_item(NAME(m_next_attr));
+	save_item(NAME(m_pending_attr));
+	save_item(NAME(m_paint_attr));
+	save_item(NAME(m_row_line));
 }
 
 
@@ -651,6 +660,12 @@ void crt9007_device::device_reset()
 	m_row_addr = 0;
 	m_table_count = 0;
 	m_dma_count = 0;
+	m_dma_first = false;
+	m_dma_double_width = false;
+	m_next_attr = 0;
+	m_pending_attr = 0;
+	m_paint_attr = 0;
+	m_row_line = 0;
 
 	// 29 (WBEN) = 0
 	m_write_wben(0);
@@ -737,6 +752,36 @@ TIMER_CALLBACK_MEMBER(crt9007_device::vlt_update)
 
 	LOG("CRT9007 y %03u x %04u : VLT %u\n", screen().vpos(), screen().hpos(), m_vlt);
 
+	int const lines = SCAN_LINES_PER_DATA_ROW;
+	if (m_vlt)
+	{
+		// DRB is active through the top scan line of a data row
+		if (!m_drb)
+		{
+			m_row_line = 0;
+			m_paint_attr = DOUBLE_ROW_BUFFER ? m_pending_attr : m_next_attr;
+		}
+		else if (m_row_line < 0xff)
+		{
+			m_row_line++;
+		}
+
+		// the scan line counter advances every other scan line on double height
+		// rows, from 0 for the top half and from N/2 for the bottom half
+		unsigned sl = m_row_line;
+		if (m_paint_attr == 2)
+			sl = m_row_line / 2;
+		else if (m_paint_attr == 3)
+			sl = (lines / 2) + (m_row_line / 2);
+		m_write_sl(sl & 0x0f);
+	}
+	else if (m_paint_attr && (m_row_line + 1 < lines))
+	{
+		// CURS marks each following scan line of a double height/width row,
+		// 3 CCLK after the VLT trailing edge for 1 CCLK
+		m_row_attr_curs_timer->adjust(clocks_to_attotime(3), 1);
+	}
+
 	m_write_vlt(m_vlt);
 
 	update_vlt_timer(m_vlt);
@@ -764,6 +809,11 @@ TIMER_CALLBACK_MEMBER(crt9007_device::drb_update)
 
 	if (!m_drb && !DMA_DISABLE)
 	{
+		// with a double row buffer the row fetched now is painted after the one
+		// fetched last time, which starts with this scan line
+		m_pending_attr = m_next_attr;
+		m_dma_double_width = false;
+
 		// this edge starts the transfer of the next data row
 		if (!screen().vpos())
 		{
@@ -791,6 +841,7 @@ TIMER_CALLBACK_MEMBER(crt9007_device::drb_update)
 
 		// start DMA burst sequence
 		m_dma_count = CHARACTERS_PER_DATA_ROW;
+		m_dma_first = true;
 		m_dma_burst = DMA_BURST_COUNT ? (DMA_BURST_COUNT * 4) : CHARACTERS_PER_DATA_ROW;
 		m_dma_delay = DMA_BURST_DELAY;
 		m_dmar = true;
@@ -831,7 +882,22 @@ TIMER_CALLBACK_MEMBER(crt9007_device::dma_update)
 			m_table_addr = m_dma_addr;
 			m_dma_addr = m_row_addr & 0x3fff;
 
-			LOG("CRT9007 Data Row Address: %04x\n", m_dma_addr);
+			// row table address bits 15, 14: 01 double width, 10 double height top
+			// half, 11 bottom half; all of them address half as many characters
+			m_next_attr = m_row_addr >> 14;
+			if (m_next_attr)
+			{
+				m_dma_double_width = true;
+				m_dma_count = CHARACTERS_PER_DATA_ROW / 2;
+			}
+
+			// CURS signals a double height/width top scan line 1 CCLK after the
+			// high byte of the row table is read
+			uint8_t const top_attr = DOUBLE_ROW_BUFFER ? m_pending_attr : m_next_attr;
+			if (top_attr)
+				m_row_attr_curs_timer->adjust(clocks_to_attotime(1), 1);
+
+			LOG("CRT9007 Data Row Address: %04x attr %u\n", m_dma_addr, m_next_attr);
 
 			if (SINGLE_ROW_BUFFER)
 			{
@@ -846,8 +912,11 @@ TIMER_CALLBACK_MEMBER(crt9007_device::dma_update)
 	{
 		// the row buffer write is enabled with the first character, so that the
 		// write clock edge following it is the one that stores it in the buffer
-		if (m_dma_count == CHARACTERS_PER_DATA_ROW)
+		if (m_dma_first)
+		{
+			m_dma_first = false;
 			m_write_wben(1);
+		}
 
 		// transfer one character into the row buffer
 		readbyte(m_dma_addr++);
@@ -873,6 +942,21 @@ TIMER_CALLBACK_MEMBER(crt9007_device::dma_update)
 TIMER_CALLBACK_MEMBER(crt9007_device::frame_update)
 {
 	trigger_interrupt(IE_FRAME_TIMER);
+}
+
+TIMER_CALLBACK_MEMBER(crt9007_device::row_attr_curs_update)
+{
+	// a 1 CCLK pulse on CURS during horizontal retrace, for external logic to
+	// halve the dot rate on the following scan line
+	if (param)
+	{
+		m_write_curs(1);
+		m_row_attr_curs_timer->adjust(clocks_to_attotime(1), 0);
+	}
+	else
+	{
+		m_write_curs(m_curs);
+	}
 }
 
 

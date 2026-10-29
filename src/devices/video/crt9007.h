@@ -62,6 +62,7 @@ public:
 	auto cblank_callback() { return m_write_cblank.bind(); }
 	auto slg_callback() { return m_write_slg.bind(); }
 	auto sld_callback() { return m_write_sld.bind(); }
+	auto sl_callback() { return m_write_sl.bind(); } // SL3-SL0 with pin configuration 0
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -91,6 +92,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(drb_update);
 	TIMER_CALLBACK_MEMBER(dma_update);
 	TIMER_CALLBACK_MEMBER(frame_update);
+	TIMER_CALLBACK_MEMBER(row_attr_curs_update);
 
 private:
 	void crt9007(address_map &map) ATTR_COLD;
@@ -126,6 +128,7 @@ private:
 	devcb_write_line   m_write_cblank;
 	devcb_write_line   m_write_slg;
 	devcb_write_line   m_write_sld;
+	devcb_write8       m_write_sl;
 
 	// registers
 	uint8_t m_reg[0x3d];
@@ -171,6 +174,15 @@ private:
 	uint16_t m_dma_count;
 	uint16_t m_dma_burst;
 	uint8_t m_dma_delay;
+	bool m_dma_first;
+	bool m_dma_double_width;
+
+	// double height/width attributes (row table address bits 15, 14) of the row last
+	// fetched, of the row before it, and of the row being painted
+	uint8_t m_next_attr;
+	uint8_t m_pending_attr;
+	uint8_t m_paint_attr;
+	uint8_t m_row_line;
 
 	// timers
 	emu_timer *m_vsync_timer;
@@ -180,6 +192,7 @@ private:
 	emu_timer *m_drb_timer;
 	emu_timer *m_dma_timer;
 	emu_timer *m_frame_timer;
+	emu_timer *m_row_attr_curs_timer;
 };
 
 
