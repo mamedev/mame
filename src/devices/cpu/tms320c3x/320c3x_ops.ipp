@@ -5717,6 +5717,8 @@ void tms320c3x_device::retsc_reg(uint32_t op)
 
 /*-----------------------------------------------------*/
 
+// MPYF3 || ADDF3 and MPYF3 || SUBF3 clear N and Z; V and UF report either operation
+
 void tms320c3x_device::mpyaddf_0(uint32_t op)
 {
 	// src3 * src4, src1 + src2
@@ -5726,7 +5728,9 @@ void tms320c3x_device::mpyaddf_0(uint32_t op)
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[TMR_TEMP1], m_r[TMR_TEMP2]);
+	uint32_t const mflags = IREG(TMR_ST) & (VFLAG | UFFLAG);
 	addf(m_r[((op >> 22) & 1) | 2], m_r[(op >> 19) & 7], m_r[(op >> 16) & 7]);
+	IREG(TMR_ST) = (IREG(TMR_ST) & ~(NFLAG | ZFLAG)) | mflags;
 	m_r[(op >> 23) & 1] = m_r[TMR_TEMP3];
 	UPDATE_DEF();
 }
@@ -5740,7 +5744,9 @@ void tms320c3x_device::mpyaddf_1(uint32_t op)
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[TMR_TEMP1], m_r[(op >> 19) & 7]);
+	uint32_t const mflags = IREG(TMR_ST) & (VFLAG | UFFLAG);
 	addf(m_r[((op >> 22) & 1) | 2], m_r[TMR_TEMP2], m_r[(op >> 16) & 7]);
+	IREG(TMR_ST) = (IREG(TMR_ST) & ~(NFLAG | ZFLAG)) | mflags;
 	m_r[(op >> 23) & 1] = m_r[TMR_TEMP3];
 	UPDATE_DEF();
 }
@@ -5754,7 +5760,9 @@ void tms320c3x_device::mpyaddf_2(uint32_t op)
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[(op >> 19) & 7], m_r[(op >> 16) & 7]);
+	uint32_t const mflags = IREG(TMR_ST) & (VFLAG | UFFLAG);
 	addf(m_r[((op >> 22) & 1) | 2], m_r[TMR_TEMP1], m_r[TMR_TEMP2]);
+	IREG(TMR_ST) = (IREG(TMR_ST) & ~(NFLAG | ZFLAG)) | mflags;
 	m_r[(op >> 23) & 1] = m_r[TMR_TEMP3];
 	UPDATE_DEF();
 }
@@ -5768,7 +5776,9 @@ void tms320c3x_device::mpyaddf_3(uint32_t op)
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[TMR_TEMP1], m_r[(op >> 19) & 7]);
+	uint32_t const mflags = IREG(TMR_ST) & (VFLAG | UFFLAG);
 	addf(m_r[((op >> 22) & 1) | 2], m_r[(op >> 16) & 7], m_r[TMR_TEMP2]);
+	IREG(TMR_ST) = (IREG(TMR_ST) & ~(NFLAG | ZFLAG)) | mflags;
 	m_r[(op >> 23) & 1] = m_r[TMR_TEMP3];
 	UPDATE_DEF();
 }
@@ -5784,7 +5794,9 @@ void tms320c3x_device::mpysubf_0(uint32_t op)
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[TMR_TEMP1], m_r[TMR_TEMP2]);
+	uint32_t const mflags = IREG(TMR_ST) & (VFLAG | UFFLAG);
 	subf(m_r[((op >> 22) & 1) | 2], m_r[(op >> 19) & 7], m_r[(op >> 16) & 7]);
+	IREG(TMR_ST) = (IREG(TMR_ST) & ~(NFLAG | ZFLAG)) | mflags;
 	m_r[(op >> 23) & 1] = m_r[TMR_TEMP3];
 	UPDATE_DEF();
 }
@@ -5798,7 +5810,9 @@ void tms320c3x_device::mpysubf_1(uint32_t op)
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[TMR_TEMP1], m_r[(op >> 19) & 7]);
+	uint32_t const mflags = IREG(TMR_ST) & (VFLAG | UFFLAG);
 	subf(m_r[((op >> 22) & 1) | 2], m_r[TMR_TEMP2], m_r[(op >> 16) & 7]);
+	IREG(TMR_ST) = (IREG(TMR_ST) & ~(NFLAG | ZFLAG)) | mflags;
 	m_r[(op >> 23) & 1] = m_r[TMR_TEMP3];
 	UPDATE_DEF();
 }
@@ -5812,7 +5826,9 @@ void tms320c3x_device::mpysubf_2(uint32_t op)
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[(op >> 19) & 7], m_r[(op >> 16) & 7]);
+	uint32_t const mflags = IREG(TMR_ST) & (VFLAG | UFFLAG);
 	subf(m_r[((op >> 22) & 1) | 2], m_r[TMR_TEMP1], m_r[TMR_TEMP2]);
+	IREG(TMR_ST) = (IREG(TMR_ST) & ~(NFLAG | ZFLAG)) | mflags;
 	m_r[(op >> 23) & 1] = m_r[TMR_TEMP3];
 	UPDATE_DEF();
 }
@@ -5826,7 +5842,9 @@ void tms320c3x_device::mpysubf_3(uint32_t op)
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[TMR_TEMP1], m_r[(op >> 19) & 7]);
+	uint32_t const mflags = IREG(TMR_ST) & (VFLAG | UFFLAG);
 	subf(m_r[((op >> 22) & 1) | 2], m_r[(op >> 16) & 7], m_r[TMR_TEMP2]);
+	IREG(TMR_ST) = (IREG(TMR_ST) & ~(NFLAG | ZFLAG)) | mflags;
 	m_r[(op >> 23) & 1] = m_r[TMR_TEMP3];
 	UPDATE_DEF();
 }
