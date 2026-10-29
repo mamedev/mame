@@ -516,6 +516,16 @@ TIMER_CALLBACK_MEMBER(ppu2c0x_device::hblank_tick)
 
 	//update_scanline();
 
+	// 2C02 OAM row copy: if OAMADDR is not less than 8 when rendering starts, the eight bytes at OAMADDR & $F8
+	// are copied over OAM bytes 0-7 (NESdev wiki: PPU registers/OAMADDR and Errata). Not present in other PPU types.
+	// This makes pirate Huge Insect work (by chance?) in NES, while it works anyway in Dendy due to different timings.
+	if ((type() == PPU_2C02) && !blanked && (m_scanline == m_scanlines_per_frame - 1) && (m_regs[PPU_SPRITE_ADDRESS] >= 8))
+	{
+		const int src = m_regs[PPU_SPRITE_ADDRESS] & 0xf8;
+		for (int i = 0; i < 8; i++)
+			m_spriteram[i] = m_spriteram[src + i];
+	}
+
 	// Many games (e.g., equipped with MMC3 mapper or its Chinese clones) rely in OAMADDR
 	// being reset to 0 during dots 257-320 (sprite tile loading) at every visible scanline
 	// while rendering is enabled, otherwise wrong sprite data is used.
