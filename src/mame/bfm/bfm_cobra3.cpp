@@ -29,21 +29,17 @@
    - Radio Times accepts £1 (5), 50p (6), 20p (7) and 10p (8).  Its left A-D
      controls use A/B/C/D, its right A-D controls use Z/X/V/N, and Start is 1.
    - Top of the Pops and The Phrase That Pays accept £1 (5), 50p (6), 20p (7),
-     10p (8), 5p and £2.  Assign keyboard controls for 5p and £2 in the input
-     settings.  Their encoded acceptors share inhibit outputs
-     between 5p/10p/50p and between £1/£2; 20p has its own output.
+     10p (8), 5p and £2.
    - Top of the Pops identifies its payout unit as a £1 payslide.  The Phrase
      That Pays identifies its payout unit as a £1 hopper.
    - In The Phrase That Pays, after inserting credit, A (Right) (Left Shift)
      selects the 50p game and C (Right) (X) selects the £1 game.  Spin (1)
      starts the selected game.
    - The Phrase That Pays offers three games for £1 with a £5 jackpot when
-     DIL 3 is enabled.  Restart after changing this setting.  C (Right)
-     selects the three-game offer.
+     DIL 3 is enabled.  Restart after changing this setting.
    - The Phrase That Pays has separate £5 and £10 note inputs.
      Each note gives £1 of play credit and puts the remainder in the bank.
-     The parallel validator interface is simulated; the fitted validator
-     is unidentified.
+     The reported NV4 validator is simulated in parallel escrow mode.
 
    BTANB:
    - Pressing Test with the Back and Front Doors closed can skip or interrupt
@@ -126,10 +122,10 @@ private:
 	enum : u8
 	{
 		NOTE_IDLE,
-		NOTE_FIRST_PULSE,
-		NOTE_WAIT_FIRST_ACK,
-		NOTE_SECOND_PULSE,
-		NOTE_WAIT_FINAL_ACK
+		NOTE_VALIDATED_PULSE,
+		NOTE_ESCROW,
+		NOTE_ACCEPTED_PULSE,
+		NOTE_WAIT_REARM
 	};
 
 	void update_lamps();
@@ -141,7 +137,7 @@ private:
 	void diverter_latch_w(u16 data, u16 mem_mask);
 	void note_control_w(u8 data);
 	void note_end_transfer();
-	TIMER_CALLBACK_MEMBER(note_pulse_expired);
+	TIMER_CALLBACK_MEMBER(note_timer_expired);
 
 	void volume_step(bool direction);
 	void av110_reset_strobe_w(u8 data);
@@ -200,7 +196,7 @@ private:
 	u8 m_pound_tube_level = 0;
 	u8 m_twenty_p_tube_level = 0;
 	bool m_tube_levels_initialized = false;
-	emu_timer *m_note_pulse_timer;
+	emu_timer *m_note_timer;
 	u8 m_note_control;
 	u8 m_note_phase;
 	u8 m_note_mask;
@@ -326,7 +322,8 @@ void bfm_cobra3_state::coin_lockouts_w(u8 enables)
 	for (unsigned channel = 0; channel < std::size(lockouts); channel++)
 		m_coin_lockouts[channel] = lockouts[channel];
 
-	// The encoded acceptor groups 5p/10p/50p and £1/£2 on shared enable outputs.
+	// Follow the encoded-coin ROM tables: 5p/10p/50p use bit 2, and £1/£2 use bit 3.
+	// TODO: Verify £2 inhibit wiring; the standard BCO profile has separate £1/£2 inhibit inputs.
 	unsigned const mapped_channels = m_coin_inputs.found() ? 3 : std::size(lockouts);
 	for (unsigned channel = 0; channel < mapped_channels; channel++)
 		machine().bookkeeping().coin_lockout_w(channel, lockouts[channel]);
@@ -338,9 +335,9 @@ void bfm_cobra3_state::coin_lockouts_w(u8 enables)
 	}
 }
 
-// Models the parallel note interface used by Phrase That Pays.  The fitted
-// validator is unidentified; 100 ms pulses satisfy the ROM's 8-12 sample window.
-// TODO: Identify the validator and verify its pulse timing against hardware.
+// Phrase That Pays reportedly uses an Innovative Technology NV4 in parallel escrow mode,
+// with 100 ms vend pulses and a 30-second decision period (NV4/NV5 Operations Manual GA125, pp. 14-15).
+// Bit 4 is modelled as the inverse of the validator's pin 9 (escrow control).
 void bfm_cobra3_state::note_control_w(u8 data)
 {
 	u8 const previous = m_note_control;
@@ -348,20 +345,20 @@ void bfm_cobra3_state::note_control_w(u8 data)
 	if (m_note_phase == NOTE_IDLE)
 		return;
 
-	// Once both pulses have finished, retain the busy state until the host
-	// completes its acknowledgement, even if it has inhibited further notes.
-	if ((m_note_phase != NOTE_WAIT_FINAL_ACK) && !(m_note_control & m_note_mask))
+	// Inhibiting the denomination returns a note that has not been accepted.
+	// Once accepted, finish the vend pulse and wait for escrow to be re-armed.
+	if (((m_note_phase == NOTE_VALIDATED_PULSE) || (m_note_phase == NOTE_ESCROW)) && !(m_note_control & m_note_mask))
 	{
 		note_end_transfer();
 		return;
 	}
 
-	if ((m_note_phase == NOTE_WAIT_FIRST_ACK) && BIT(previous, 4) && !BIT(m_note_control, 4))
+	if ((m_note_phase == NOTE_ESCROW) && BIT(previous, 4) && !BIT(m_note_control, 4))
 	{
-		m_note_phase = NOTE_SECOND_PULSE;
-		m_note_pulse_timer->adjust(attotime::from_msec(100));
+		m_note_phase = NOTE_ACCEPTED_PULSE;
+		m_note_timer->adjust(attotime::from_msec(100));
 	}
-	else if ((m_note_phase == NOTE_WAIT_FINAL_ACK) && !BIT(previous, 4) && BIT(m_note_control, 4))
+	else if ((m_note_phase == NOTE_WAIT_REARM) && !BIT(previous, 4) && BIT(m_note_control, 4))
 	{
 		note_end_transfer();
 	}
@@ -369,7 +366,7 @@ void bfm_cobra3_state::note_control_w(u8 data)
 
 ioport_value bfm_cobra3_state::note_data_r()
 {
-	return ((m_note_phase == NOTE_FIRST_PULSE) || (m_note_phase == NOTE_SECOND_PULSE)) ? m_note_mask : 0;
+	return ((m_note_phase == NOTE_VALIDATED_PULSE) || (m_note_phase == NOTE_ACCEPTED_PULSE)) ? m_note_mask : 0;
 }
 
 INPUT_CHANGED_MEMBER(bfm_cobra3_state::note_inserted)
@@ -378,23 +375,32 @@ INPUT_CHANGED_MEMBER(bfm_cobra3_state::note_inserted)
 		return;
 
 	m_note_mask = param;
-	m_note_phase = NOTE_FIRST_PULSE;
-	m_note_pulse_timer->adjust(attotime::from_msec(100));
+	m_note_phase = NOTE_VALIDATED_PULSE;
+	m_note_timer->adjust(attotime::from_msec(100));
 }
 
-TIMER_CALLBACK_MEMBER(bfm_cobra3_state::note_pulse_expired)
+TIMER_CALLBACK_MEMBER(bfm_cobra3_state::note_timer_expired)
 {
-	if (m_note_phase == NOTE_FIRST_PULSE)
-		m_note_phase = NOTE_WAIT_FIRST_ACK;
-	else if (m_note_phase == NOTE_SECOND_PULSE)
-		m_note_phase = NOTE_WAIT_FINAL_ACK;
+	if (m_note_phase == NOTE_VALIDATED_PULSE)
+	{
+		m_note_phase = NOTE_ESCROW;
+		m_note_timer->adjust(attotime::from_seconds(30));
+	}
+	else if (m_note_phase == NOTE_ESCROW)
+	{
+		note_end_transfer();
+	}
+	else if (m_note_phase == NOTE_ACCEPTED_PULSE)
+	{
+		m_note_phase = NOTE_WAIT_REARM;
+	}
 }
 
 void bfm_cobra3_state::note_end_transfer()
 {
 	m_note_phase = NOTE_IDLE;
 	m_note_mask = 0;
-	m_note_pulse_timer->adjust(attotime::never);
+	m_note_timer->adjust(attotime::never);
 }
 
 void bfm_cobra3_state::volume_step(bool direction)
@@ -689,7 +695,7 @@ void bfm_cobra3_state::machine_start()
 	save_item(NAME(m_tube_levels_initialized));
 	if (m_note_inputs.found())
 	{
-		m_note_pulse_timer = timer_alloc(FUNC(bfm_cobra3_state::note_pulse_expired), this);
+		m_note_timer = timer_alloc(FUNC(bfm_cobra3_state::note_timer_expired), this);
 		note_end_transfer();
 		save_item(NAME(m_note_control));
 		save_item(NAME(m_note_phase));
