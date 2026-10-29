@@ -85,6 +85,7 @@ void m6502_device::init()
 	save_item(NAME(m_SP));
 	save_item(NAME(m_TMP));
 	save_item(NAME(m_TMP2));
+	save_item(NAME(m_store_dummy_cycle));
 	save_item(NAME(m_IR));
 	save_item(NAME(m_nmi_state));
 	save_item(NAME(m_irq_state));
@@ -517,6 +518,10 @@ void m6502_device::prefetch_end()
 		m_IR = 0x00;
 	} else
 		m_PC++;
+
+	// clear the latch now that it has been consumed, so the next instruction's polls start fresh
+	m_irq_sampled = false;
+	m_nmi_sampled = false;
 }
 
 void m6502_device::prefetch_end_noirq()

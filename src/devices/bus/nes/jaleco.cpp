@@ -5,6 +5,8 @@
 
  NES/Famicom cartridge emulation for Jaleco PCBs
 
+ iNES mappers: 18, 72, 78, 86, 92, 140
+
 
  Here we emulate the following PCBs
 
@@ -102,7 +104,6 @@ nes_ss88006_device::nes_ss88006_device(const machine_config &mconfig, device_typ
 	, m_irq_count_latch(0)
 	, m_irq_mode(0)
 	, m_irq_enable(0)
-	, irq_timer(nullptr)
 	, m_wram_protect(0)
 {
 }
@@ -159,8 +160,6 @@ void nes_jf17_device::pcb_reset()
 void nes_ss88006_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(FUNC(nes_ss88006_device::irq_timer_tick), this);
-	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_mmc_prg_bank));
 	save_item(NAME(m_mmc_vrom_bank));
@@ -198,6 +197,9 @@ void nes_ss88006_device::pcb_reset()
  Games: Bio Senshi Dan, Mississippi Satsujin Jiken,
  Yousai Club
 
+ The register is at 0x6000-0x7fff (so there is no PRG-RAM and no bus conflict)
+ and is ..PP CCCC: bits 5-4 select the 32K PRG bank and bits 3-0 the 8K CHR bank.
+
  iNES: mapper 140
 
  In MAME: Supported.
@@ -207,8 +209,8 @@ void nes_ss88006_device::pcb_reset()
 void nes_jf11_device::write_m(offs_t offset, u8 data)
 {
 	LOG("jf11 write_m, offset: %04x, data: %02x\n", offset, data);
-	chr8(data, CHRROM);
-	prg32(data >> 4);
+	chr8(data & 0x0f, CHRROM);
+	prg32((data >> 4) & 0x03);
 }
 
 /*-------------------------------------------------
@@ -273,7 +275,9 @@ void nes_jf16_device::write_h(offs_t offset, u8 data)
 
  iNES: mapper 72 & 92
 
- In MAME: Supported, see below for the games with samples
+ In MAME: Supported.
+
+ See below for the games with samples.
 
  -------------------------------------------------*/
 
@@ -311,7 +315,9 @@ void nes_jf17_device::write_h(offs_t offset, u8 data)
 
  iNES: mapper 18
 
- In MAME: Supported, see below for the games with samples
+ In MAME: Supported.
+
+ See below for the games with samples.
 
  -------------------------------------------------*/
 
@@ -386,7 +392,7 @@ void nes_ss88006_device::write_h(offs_t offset, u8 data)
 			shift = (offset & 1) << 2;
 			m_mmc_vrom_bank[bank] &= ~(0x0f << shift);
 			m_mmc_vrom_bank[bank] |= (data & 0x0f) << shift;
-			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
+			chr1_x(bank, m_mmc_vrom_bank[bank], m_chr_source);   // CHR-ROM, or CHR-RAM on boards without it
 			break;
 
 		case 0x6000:
@@ -617,77 +623,70 @@ static const char *const jf33_sample_names[] =
 
 void nes_jf13_device::device_add_mconfig(machine_config &config)
 {
-	// additional sound hardware
-	SPEAKER(config, "addon").front_center();
+	// additional sound hardware, mixed into the console audio through the cartridge connector
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(16);
 	m_samples->set_samples_names(jf13_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+	m_samples->add_route(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50);
 }
 
 void nes_jf17_adpcm_device::device_add_mconfig(machine_config &config)
 {
-	// additional sound hardware
-	SPEAKER(config, "addon").front_center();
+	// additional sound hardware, mixed into the console audio through the cartridge connector
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(20);
 	m_samples->set_samples_names(jf17_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+	m_samples->add_route(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50);
 }
 
 void nes_jf19_adpcm_device::device_add_mconfig(machine_config &config)
 {
-	// additional sound hardware
-	SPEAKER(config, "addon").front_center();
+	// additional sound hardware, mixed into the console audio through the cartridge connector
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(20);
 	m_samples->set_samples_names(jf19_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+	m_samples->add_route(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50);
 }
 
 void nes_jf23_device::device_add_mconfig(machine_config &config)
 {
-	// additional sound hardware
-	SPEAKER(config, "addon").front_center();
+	// additional sound hardware, mixed into the console audio through the cartridge connector
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(20);
 	m_samples->set_samples_names(jf23_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+	m_samples->add_route(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50);
 }
 
 void nes_jf24_device::device_add_mconfig(machine_config &config)
 {
-	// additional sound hardware
-	SPEAKER(config, "addon").front_center();
+	// additional sound hardware, mixed into the console audio through the cartridge connector
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(6);
 	m_samples->set_samples_names(jf24_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+	m_samples->add_route(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50);
 }
 
 void nes_jf29_device::device_add_mconfig(machine_config &config)
 {
-	// additional sound hardware
-	SPEAKER(config, "addon").front_center();
+	// additional sound hardware, mixed into the console audio through the cartridge connector
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(20);
 	m_samples->set_samples_names(jf29_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+	m_samples->add_route(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50);
 }
 
 void nes_jf33_device::device_add_mconfig(machine_config &config)
 {
-	// additional sound hardware
-	SPEAKER(config, "addon").front_center();
+	// additional sound hardware, mixed into the console audio through the cartridge connector
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(20);
 	m_samples->set_samples_names(jf33_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+	m_samples->add_route(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50);
 }

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli,Brian H. Gilbert
 /***********************************************************************************************************
 
 
@@ -67,6 +67,9 @@ nes_tf9_device::nes_tf9_device(const machine_config &mconfig, const char *tag, d
 
 nes_3dblock_device::nes_3dblock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_3DBLOCK, tag, owner, clock)
+	, m_pic(*this, "pic")
+	, m_addr(0)
+	, m_irq(false)
 {
 }
 
@@ -157,14 +160,92 @@ void nes_tf9_device::write_h(offs_t offset, u8 data)
 
 /*-------------------------------------------------
 
- Bootleg Board by RCM for 3-D Block
+ 3D-BLOCK board (UNIF 3D-BLOCK, NES 2.0 mapper 355)
 
- Games: 3-D Block Hwang Shinwei version
+ Games: 3-D Block (Hwang Shinwei), Block Force (the original version)
 
- NES 2.0: mapper 355
+ NROM-256 with 8K of CHR-RAM and a PIC16C54 microcontroller with its own program ROM, which watches CPU A4-A14 on
+ the cartridge connector and raises the cartridge /IRQ from what it sees (NESdev Wiki, NES 2.0 Mapper 355).
+ The PIC runs at one fourth of the M2 rate, its 1024 byte program ROM is the NES 2.0 miscellaneous ROM of the image
+ (the iNES loader reads it), and its ports are wired as:
+   RA0 /IRQ (output)   RA1 A6   RA2 A5   RA3 A4
+   RB0 A12   RB1 A7   RB2 A10   RB3 A11   RB4 A9   RB5 A8   RB6 A13   RB7 A14
+ The CPU data bus is not connected to it, so what the games write to $4xxx only matters through its address.
 
- In MAME: Not supported.
+ The PIC is given the address of the latest CPU cycle, which the M2 callback provides, and the scheduler switches
+ between the CPU and the PIC every few microseconds, so that the PIC sees the address bus close to the moment it
+ samples it.
 
- TODO: implement PIC16C54 protection
+ The images made without the PIC's program (the GoodNES dumps) leave the PIC with nothing to run.
 
  -------------------------------------------------*/
+
+ROM_START( 3dblock )
+	ROM_REGION16_LE( 0x400, "pic", ROMREGION_ERASE00 )
+ROM_END
+
+const tiny_rom_entry *nes_3dblock_device::device_rom_region() const
+{
+	return ROM_NAME( 3dblock );
+}
+
+void nes_3dblock_device::device_add_mconfig(machine_config &config)
+{
+	// the PIC16C54 takes four clocks for an instruction cycle, so the M2 rate as its clock gives one fourth of it
+	PIC16C54(config, m_pic, DERIVED_CLOCK(1, 1));
+	m_pic->read_a().set(FUNC(nes_3dblock_device::pic_porta_r));
+	m_pic->write_a().set(FUNC(nes_3dblock_device::pic_porta_w));
+	m_pic->read_b().set(FUNC(nes_3dblock_device::pic_portb_r));
+
+	config.set_maximum_quantum(attotime::from_usec(5));
+}
+
+void nes_3dblock_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_addr));
+	save_item(NAME(m_irq));
+}
+
+void nes_3dblock_device::pcb_reset()
+{
+	nes_nrom_device::pcb_reset();
+
+	m_addr = 0;
+	m_irq = false;
+
+	// the PIC's program ROM is the miscellaneous ROM of the image
+	u8 *const rom = memregion("pic")->base();
+	std::fill_n(rom, 0x400, 0);
+	if (m_misc_rom)
+		std::copy_n(m_misc_rom, std::min<u32>(m_misc_rom_size, 0x400), rom);
+	else
+		logerror("3D-BLOCK: the image has no PIC16C54 program ROM, the PIC has nothing to run\n");
+}
+
+void nes_3dblock_device::m2_w(int state, offs_t address, bool write)
+{
+	m_addr = address;
+}
+
+u8 nes_3dblock_device::pic_porta_r()
+{
+	return (m_irq ? 0 : 1) | (BIT(m_addr, 6) << 1) | (BIT(m_addr, 5) << 2) | (BIT(m_addr, 4) << 3);
+}
+
+u8 nes_3dblock_device::pic_portb_r()
+{
+	return BIT(m_addr, 12) | (BIT(m_addr, 7) << 1) | (BIT(m_addr, 10) << 2) | (BIT(m_addr, 11) << 3)
+			| (BIT(m_addr, 9) << 4) | (BIT(m_addr, 8) << 5) | (BIT(m_addr, 13) << 6) | (BIT(m_addr, 14) << 7);
+}
+
+void nes_3dblock_device::pic_porta_w(offs_t offset, u8 data, u8 mem_mask)
+{
+	// /IRQ is low while the PIC drives RA0 low; as an input or high the pin is released
+	const bool irq = BIT(mem_mask, 0) && !BIT(data, 0);
+	if (irq != m_irq)
+	{
+		m_irq = irq;
+		set_irq_line(irq ? ASSERT_LINE : CLEAR_LINE);
+	}
+}

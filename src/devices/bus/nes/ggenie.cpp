@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli,Brian H. Gilbert
 /***********************************************************************************************************
 
 
@@ -8,9 +8,23 @@
 
  Here we emulate the following PCBs
 
- * Galoob Game Genie, passthrough hacking cart
+ * Galoob Game Genie, pass-through cheat cartridge (NESdev: Game Genie)
 
- TODO: emulate bugs/quirks/bus conflicts. See NesDev wiki.
+ Menu mode: the 4 KiB ROM at $C000-$FFFF (mirrored), open bus at $8000-$BFFF,
+ pattern tables generated from PPU A2/A4-A7, code registers at $8000-$800C.
+ Game mode (until power off): everything on the cartridge connector passes
+ through to the cartridge plugged into the Game Genie, except the reads that
+ the three codes replace.
+
+ Bus conflict (NESdev): for a replaced read in $C020-$FFFF the Game Genie keeps
+ the plugged cartridge's /ROMSEL high, so the cartridge sees a read of
+ $4020-$7FFF and whatever it has mapped there drives the bus as well. Emulated
+ for cartridge RAM at $6000-$7FFF (codes at $E000-$FFFF), as the bitwise AND
+ of both drivers; what a board maps at $4020-$5FFF is board specific and is
+ not modelled.
+
+ Not emulated: cartridges that decode CHR from PPU /A13 alone (MMC5) show a
+ corrupted menu on hardware, as the Game Genie ignores that line.
 
  ***********************************************************************************************************/
 
@@ -103,28 +117,21 @@ void nes_ggenie_device::write_h(offs_t offset, u8 data)
 		return;
 	}
 
-	// From blargg: Codes are written to $8001-800C, starting at $800C and going down to $8001.
-	// Next, two values are written to $8000. The first specify the kind of codes which have
-	// been inserted, and disables the boot ROM. The second write to $8000 is always 0x00, and
-	// goes to the slave cart for unknown reasons.
-	// Once done, the code jumps to ($FFFC) to begin the game.
-	// All 12 bytes from $8001-800C are written regardless of how many codes are inserted.
-	// The value written to $8000 is the only clue as to what codes are actually valid and which
-	// ones have compare values.
-	if (offset)
+	// The ROM writes the three codes to $8001-$800C, then $8000 with bit 0 set (game mode), then $00 to $8000,
+	// which reaches the plugged cartridge because the Game Genie is already in game mode, and jumps to ($FFFC).
+	// The ROM also writes 0 to $FFF0, $FFF1 and $FFF0; what those do is unknown (NESdev), so they change nothing.
+	if ((offset > 0) && (offset <= 0x0c))
 	{
 		offset -= 1;
-		int code = BIT(offset, 2, 2);
-		if (code == 3)
-			return; // how did we end up here? the GG is not expected to write to $800d-800f!
+		int const code = BIT(offset, 2, 2);
 
 		switch (offset & 3)
 		{
-			case 0:
-				m_gg_addr[code] |= (data & 0x7f) << 8;
+			case 0: // address bits 8-14 (bit 15 is always set)
+				m_gg_addr[code] = (m_gg_addr[code] & 0x00ff) | ((data & 0x7f) << 8);
 				break;
-			case 1:
-				m_gg_addr[code] = data;
+			case 1: // address bits 0-7
+				m_gg_addr[code] = (m_gg_addr[code] & 0x7f00) | data;
 				break;
 			case 2:
 				m_gg_comp[code] = data;
@@ -134,7 +141,7 @@ void nes_ggenie_device::write_h(offs_t offset, u8 data)
 				break;
 		}
 	}
-	else // 0x8000
+	else if (offset == 0) // 0x8000
 	{
 		m_gg_bypass = BIT(data, 0);
 		for (int i = 0; i < 3; i++)
@@ -183,21 +190,32 @@ u8 nes_ggenie_device::read_h(offs_t offset)
 			if (m_gg_enable[i] && offset == m_gg_addr[i])
 			{
 				if (!m_gg_is_comp[i] || m_gg_comp[i] == rom_value)
+				{
+					// a replaced read at $E000-$FFFF is also seen by the plugged cartridge as a read of $6000-$7FFF:
+					// its RAM there drives the bus too
+					if ((offset >= 0x6000) && (m_ggslot->m_cart->get_prgram_size() || m_ggslot->m_cart->get_battery_size()))
+						return m_gg_repl[i] & m_ggslot->read_m(offset - 0x6000);
 					return m_gg_repl[i];
+				}
 			}
 		}
 
 		return rom_value;
 	}
-	return m_prg[offset & 0xfff]; // ROM is only 4K
+
+	// menu mode: the 4 KiB ROM at $C000-$FFFF, nothing drives the bus at $8000-$BFFF
+	if (offset < 0x4000)
+		return get_open_bus();
+	return m_prg[offset & 0xfff];
 }
 
 u8 nes_ggenie_device::read_m(offs_t offset)
 {
+	// in menu mode the plugged cartridge is not passed through, and the Game Genie has nothing here
 	if (m_gg_bypass)
 		return m_ggslot->read_m(offset);
 
-	return 0xff;
+	return get_open_bus();
 }
 
 u8 nes_ggenie_device::read_l(offs_t offset)
@@ -205,7 +223,7 @@ u8 nes_ggenie_device::read_l(offs_t offset)
 	if (m_gg_bypass)
 		return m_ggslot->read_l(offset);
 
-	return 0xff;
+	return get_open_bus();
 }
 
 void nes_ggenie_device::chr_w(offs_t offset, u8 data)
@@ -250,5 +268,8 @@ u8 nes_ggenie_device::nt_r(offs_t offset)
 
 void nes_ggenie_device::device_add_mconfig(machine_config &config)
 {
-	NES_CART_SLOT(config, "gg_slot", DERIVED_CLOCK(1, 1), nes_cart, nullptr).set_must_be_loaded(false);
+	nes_cart_slot_device &slot(NES_CART_SLOT(config, "gg_slot", DERIVED_CLOCK(1, 1), nes_cart, nullptr));
+	slot.set_must_be_loaded(false);
+	slot.irq_callback().set(FUNC(nes_ggenie_device::gg_irq_w));   // the plugged cartridge's IRQ reaches the console through the Game Genie
+	slot.add_route(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0);   // the cartridge plugged into the Game Genie is heard through it
 }

@@ -216,7 +216,7 @@ attotime device_execute_interface::local_time() const noexcept
 	{
 		assert(m_cycles_running >= *m_icountptr);
 		int cycles = m_cycles_running - *m_icountptr;
-		return m_localtime + cycles_to_attotime(cycles);
+		return m_localtime + cycles_to_attotime(cycles) + m_bus_offset;
 	}
 	return m_localtime;
 }

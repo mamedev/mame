@@ -212,6 +212,8 @@ void nes_vt02_vt03_soc_device::device_start()
 
 	m_ppu->set_scanline_callback(*this, FUNC(nes_vt02_vt03_soc_device::scanline_irq));
 	m_ppu->set_hblank_callback(*this, FUNC(nes_vt02_vt03_soc_device::hblank_irq));
+	m_ppu->set_a12_callback(*this, FUNC(nes_vt02_vt03_soc_device::a12_irq));
+	m_ppu->set_hblank_at_hsync(true);   // the hblank callback only clocks the timer in HSYNC mode
 
 	//m_ppu->set_hblank_callback(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::hblank_irq)));
 	//m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_r)), write8sm_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_w)));
@@ -498,9 +500,20 @@ void nes_vt02_vt03_soc_device::chr_w(offs_t offset, u8 data)
 
 
 
+// The timer is clocked by PPU A12 (TSYNEN = $410B bit 7 = 0: "the number of AD12 switching high low", NESdev VT02+
+// Registers) or by HSYNC (1). A PPU that draws dot by dot reports A12's rising edges, filtered as for an MMC3 (with the
+// sprites at $1000 near dot 260, so a split's IRQ handler writes in hblank); for a PPU with the scanline renderer, which
+// does not, A12 is approximated by the start of the line as before.
 void nes_vt02_vt03_soc_device::scanline_irq(int scanline, bool vblank, bool blanked)
 {
-	video_irq(false, scanline, vblank, blanked);
+	if (!m_ppu->dot_renderer())
+		video_irq(false, scanline, vblank, blanked);
+}
+
+void nes_vt02_vt03_soc_device::a12_irq()
+{
+	const int scanline = m_ppu->get_current_scanline();
+	video_irq(false, scanline, scanline >= 240, false);
 }
 
 void nes_vt02_vt03_soc_device::hblank_irq(int scanline, bool vblank, bool blanked)
@@ -517,7 +530,14 @@ void nes_vt02_vt03_soc_device::video_irq(bool hblank, int scanline, bool vblank,
 
 		//logerror("scanline_irq %d\n", scanline);
 
-		if (m_timer_running && scanline < 0xe0)
+		// HSYNC mode also counts the pre-render line's HSYNC (not a vblank line, past the visible ones): a timer loaded
+		// in vblank gets its first count there. Not documented (NESdev's VT02+ pages say only what clocks the timer); TV
+		// Pump Active needs it: its frame's first split comes from a timer loaded in vblank and is one line late
+		// without it, while the later splits, reloaded from the IRQ handler, are right either way, and the handler
+		// waits until hblank to switch the CHR banks (owner's check of the picture against the hardware). The same one
+		// line is what the raster timing hack below takes off a reload made in vblank.
+		const bool prerender = hblank && !vblank && (scanline >= 0xf0);
+		if (m_timer_running && ((scanline < 0xe0) || prerender))
 		{
 			m_timer_val--;
 

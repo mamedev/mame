@@ -284,6 +284,73 @@ void ppu_sh6578_device::draw_sprites(uint8_t* line_priority)
 }
 */
 
+// Dot renderer hooks, from the scanline renderer's draw_background/draw_tile above: each tile is two bytes in the
+// name table (tile number bits 0-7, then a colour byte with tile number bits 8-11 in its low nibble and the tile's
+// palette in its high nibble), 64 bytes a row, at $0000-$1FFF or (Color Select bit 0) $2000-$27FF; the pattern address
+// is the 12-bit tile number * 16 plus fine Y, plane 1 at +8 and, in 4bpp mode (bit 7), planes 2-3 at +16 and +24 (read
+// with the tile's other planes; the SH6578's fetch timing for them is not documented). A pixel is transparent when its
+// palette entry's low five bits are all set.
+u16 ppu_sh6578_device::dot_nt_addr() const
+{
+	const u16 v = m_refresh_data;
+	int index = ((v & 0x0c00) << 1) + ((v >> 5) & 0x1f) * 64 + (v & 0x1f) * 2;
+	if (m_colsel_pntstart & 1)
+		index = (index & 0x7ff) + 0x2000;
+	else
+		index &= 0x1fff;
+	return u16(index);
+}
+
+u8 ppu_sh6578_device::dot_at_decode(u8 data)
+{
+	m_next_tile_hi = data;
+	const u8 color = (data >> 4) & 0x0f;
+	return BIT(m_colsel_pntstart, 7) ? (color & 0x0c) : color;
+}
+
+u16 ppu_sh6578_device::dot_pattern_addr(bool high) const
+{
+	return u16((((m_bg_next_nt | (m_next_tile_hi << 8)) & 0x0fff) << 4) + ((m_refresh_data >> 12) & 7) + (high ? 8 : 0));
+}
+
+u8 ppu_sh6578_device::dot_bg_pattern(u16 addr, bool high, u8 bus_data, u8 attr, u8 &extra)
+{
+	const u16 full = dot_pattern_addr(high);   // all 16 bits; the 2C02 bus model keeps 14
+	extra = (m_colsel_pntstart & 0x80) ? readbyte(full + 16) : 0;
+	return readbyte(full);
+}
+
+u8 ppu_sh6578_device::dot_sp_pattern(u16 addr, bool high, u8 bus_data, u8 attr, u8 &extra)
+{
+	// sprite pattern page from Color Select bits 2-3 (apply_sprite_pattern_page, read_sprite_plane_data)
+	extra = 0;
+	return readbyte((addr + ((m_colsel_pntstart >> 2) & 3) * 0x1000) & 0x3fff);
+}
+
+u8 ppu_sh6578_device::dot_bg_index(u8 bg_pix, u8 bg_pal) const
+{
+	// planes 2-3 come from the dot renderer in pixel bits 5-6; here they are bits 2-3
+	const u8 pix = (bg_pix & 0x03) | ((bg_pix >> 3) & 0x0c);
+	return (pix | (bg_pal << 2)) & 0x3f;
+}
+
+bool ppu_sh6578_device::dot_bg_opaque(u8 bg_pix, u8 bg_pal) const
+{
+	return (m_palette_ram[dot_bg_index(bg_pix, bg_pal)] & 0x1f) != 0x1f;
+}
+
+bool ppu_sh6578_device::dot_pixel_rgb(int x, u8 bg_pix, u8 bg_pal, bool bg_opaque, u8 sp_pix, u8 sp_pal, bool sprite_wins, u32 *dest)
+{
+	// an opaque background pixel may have all four bits clear: opacity comes from its palette entry (bg_opaque)
+	if (sprite_wins)
+		*dest = pen_color(m_palette_ram[(sp_pix | (sp_pal << 2)) & 0x3f] & 0x3f);
+	else if (bg_opaque)
+		*dest = pen_color(m_palette_ram[dot_bg_index(bg_pix, bg_pal)] & 0x3f);
+	else
+		*dest = pen_color(m_palette_ram[0] & 0x3f);
+	return true;
+}
+
 void ppu_sh6578_device::write_extended(offs_t offset, uint8_t data)
 {
 	LOGMASKED(LOG_PPU_EXTRA, "%s: ppu_sh6578_device::write : Color Select & PNT Start Address : %02x\n", machine().describe_context(), data);

@@ -5,6 +5,8 @@
 
  NES/Famicom cartridge emulation for Action 53
 
+ iNES mappers: 28
+
 
  Here we emulate the Multi-Discrete PCB designed by Tepples for
  this homebrew multicart [mapper 28]
@@ -48,6 +50,11 @@ void nes_action53_device::device_start()
 
 void nes_action53_device::pcb_start(running_machine &machine, u8 *ciram_ptr, bool cart_mounted)
 {
+	// the board carries 32 KiB of CHR-RAM (4 x 8 KiB, selected by $00 bits 1-0), but iNES 1.0
+	// headers cannot express that and the loader defaults to 16 KiB: allocate the real amount
+	if (!m_vrom_size && m_vram.size() < 0x8000)
+		vram_alloc(0x8000);
+
 	device_nes_cart_interface::pcb_start(machine, ciram_ptr, cart_mounted);
 	// at power on last 16K of ROM is mapped to $C000-$FFFF
 	m_reg[0] = m_reg[1] = m_reg[2] = 0;
@@ -161,37 +168,36 @@ void nes_action53_device::write_h(offs_t offset, u8 data)
 {
 	LOG("action 53 write_h, offset: %04x, data: %02x\n", offset, data);
 
-	if (m_reg[m_sel] != data)
-	{
-		m_reg[m_sel] = data;
+	// every write reaches the register, even when the value is unchanged (e.g. a repeated
+	// $00/$01 write must re-apply D4 to 1-screen mirroring after $80 changed it)
+	m_reg[m_sel] = data;
 
-		switch (m_sel)
-		{
-			case 0:
-				if (!BIT(m_reg[2],1))
-				{
-					m_reg[2] &= 0xfe;
-					m_reg[2] |= BIT(data,4);
-					update_mirr();
-				}
-				chr8(m_reg[0] & 0x03, m_chr_source);
-				break;
-			case 1:
-				if (!BIT(m_reg[2],1))
-				{
-					m_reg[2] &= 0xfe;
-					m_reg[2] |= BIT(data,4);
-					update_mirr();
-				}
-				update_prg();
-				break;
-			case 2:
-				update_prg();
+	switch (m_sel)
+	{
+		case 0:
+			if (!BIT(m_reg[2],1))
+			{
+				m_reg[2] &= 0xfe;
+				m_reg[2] |= BIT(data,4);
 				update_mirr();
-				break;
-			case 3:
-				update_prg();
-				break;
-		}
+			}
+			chr8(m_reg[0] & 0x03, m_chr_source);
+			break;
+		case 1:
+			if (!BIT(m_reg[2],1))
+			{
+				m_reg[2] &= 0xfe;
+				m_reg[2] |= BIT(data,4);
+				update_mirr();
+			}
+			update_prg();
+			break;
+		case 2:
+			update_prg();
+			update_mirr();
+			break;
+		case 3:
+			update_prg();
+			break;
 	}
 }

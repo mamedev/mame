@@ -26,6 +26,19 @@ protected:
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	// draws with the dot renderer through its addressing, pattern and pixel hooks; its timing still follows the screen
+	// (with the 2C02's own timing the SH6578 multicarts show a grey screen) and PPUDATA has no 2C02 pipeline
+	virtual bool keeps_own_timing() const override { return false; }
+	virtual bool has_data_pipeline() const override { return false; }
+	virtual u16 dot_nt_addr() const override;
+	virtual u16 dot_at_addr() const override { return dot_nt_addr() + 1; }
+	virtual u8 dot_at_decode(u8 data) override;
+	virtual u16 dot_pattern_addr(bool high) const override;
+	virtual u8 dot_bg_pattern(u16 addr, bool high, u8 bus_data, u8 attr, u8 &extra) override;
+	virtual u8 dot_sp_pattern(u16 addr, bool high, u8 bus_data, u8 attr, u8 &extra) override;
+	virtual bool dot_bg_opaque(u8 bg_pix, u8 bg_pal) const override;
+	virtual bool dot_pixel_rgb(int x, u8 bg_pix, u8 bg_pal, bool bg_opaque, u8 sp_pix, u8 sp_pal, bool sprite_wins, u32 *dest) override;
+	u8 dot_bg_index(u8 bg_pix, u8 bg_pal) const;
 
 	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap) override;
 	//virtual void draw_sprites(uint8_t *line_priority) override;
@@ -43,6 +56,7 @@ private:
 
 	uint8_t m_extplanebuf[2];
 	uint8_t m_colsel_pntstart;
+	uint8_t m_next_tile_hi = 0;     // dot renderer: the colour byte of the tile being fetched (tile number bits 8-11)
 };
 
 class ppu_sh6578pal_device : public ppu_sh6578_device

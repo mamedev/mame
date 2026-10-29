@@ -25,6 +25,9 @@ static INPUT_PORTS_START( nes_zapper )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_MINMAX(0, 255)
 	PORT_START("GUN_Y")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_MINMAX(0, 239)
+	PORT_START("GUN_OFF")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Lightgun Offscreen")
+
 	PORT_START("GUN_T")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Lightgun Trigger") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nes_zapper_device::trigger), 0)
 INPUT_PORTS_END
@@ -68,6 +71,7 @@ nes_zapper_device::nes_zapper_device(const machine_config &mconfig, const char *
 	, m_sensor(*this, "sensor")
 	, m_lightx(*this, "GUN_X")
 	, m_lighty(*this, "GUN_Y")
+	, m_offscreen(*this, "GUN_OFF")
 {
 }
 
@@ -90,7 +94,11 @@ u8 nes_zapper_device::read_bit34()
 {
 	u8 ret = m_trigger->enabled() ? 0x10 : 0;
 
-	if (!m_sensor->detect_light(m_lightx->read(), m_lighty->read()))
+	// always sample the sensor so the screen is brought up to date whether or not the gun is pointed away
+	const bool light = m_sensor->detect_light(m_lightx->read(), m_lighty->read());
+
+	// with the gun pointed away from the screen (reloading in some games) the photodiode sees no light
+	if (BIT(m_offscreen->read(), 0) || !light)
 		ret |= 0x08;
 
 	return ret;

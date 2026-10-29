@@ -17,7 +17,6 @@ public:
 	nes_rex_dbz5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual uint8_t read_l(offs_t offset) override;
-	virtual uint8_t read_m(offs_t offset) override { return read_l(offset); }
 	virtual void write_l(offs_t offset, uint8_t data) override;
 	virtual void chr_cb(int start, int bank, int source) override;
 
@@ -42,6 +41,8 @@ public:
 
 	virtual void write_h(offs_t offset, u8 data) override;
 	virtual void chr_cb(int start, int bank, int source) override;
+	virtual void ppu_a12_rise() override;
+	virtual void hblank_irq(int scanline, bool vblank, bool blanked) override;
 
 	virtual void pcb_reset() override;
 

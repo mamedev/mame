@@ -1,9 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli,Brian H. Gilbert
 /***********************************************************************************************************
 
 
  NES/Famicom cartridge emulation for Namcot PCBs
+
+ iNES mappers: 19, 76, 88, 95, 154, 206, 210
 
 
  Here we emulate the following PCBs
@@ -14,9 +16,6 @@
  * Namcot 163 [mapper 19]
  * Namcot 175 [mapper 210]
  * Namcot 340 [mapper 210]
-
- TODO:
- - Quinty is not working (same issue of Mendel Palace on TxROM boards, of course)
 
  ***********************************************************************************************************/
 
@@ -67,7 +66,7 @@ nes_namcot3425_device::nes_namcot3425_device(const machine_config &mconfig, cons
 }
 
 nes_namcot340_device::nes_namcot340_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0)
 {
 }
 
@@ -77,12 +76,12 @@ nes_namcot340_device::nes_namcot340_device(const machine_config &mconfig, const 
 }
 
 nes_namcot175_device::nes_namcot175_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_namcot340_device(mconfig, NES_NAMCOT175, tag, owner, clock), m_wram_protect(0)
+	: nes_namcot340_device(mconfig, NES_NAMCOT175, tag, owner, clock), m_wram_enable(0)
 {
 }
 
 nes_namcot163_device::nes_namcot163_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_namcot340_device(mconfig, NES_NAMCOT163, tag, owner, clock), m_wram_protect(0), m_latch(0), m_chr_bank(0), m_namco163snd(*this, "n163")
+	: nes_namcot340_device(mconfig, NES_NAMCOT163, tag, owner, clock), m_wram_protect(0), m_latch(0), m_namco163snd(*this, "n163")
 {
 }
 
@@ -132,21 +131,16 @@ void nes_namcot3425_device::pcb_reset()
 	chr8(0, m_chr_source);
 
 	m_latch = 0;
-	memset(m_reg, 0, sizeof(m_reg));
+	m_reg[0] = m_reg[1] = 0;
+	update_nt();
 }
 
 void nes_namcot340_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(FUNC(nes_namcot340_device::irq_timer_tick), this);
-	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
-	save_item(NAME(m_n163_ram));
-
-	m_mapper_sram_size = 0x2000;
-	m_mapper_sram = m_n163_ram;
 }
 
 void nes_namcot340_device::pcb_reset()
@@ -163,16 +157,10 @@ void nes_namcot340_device::pcb_reset()
 void nes_namcot175_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(FUNC(nes_namcot175_device::irq_timer_tick), this);
-	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
-	save_item(NAME(m_wram_protect));
-	save_item(NAME(m_n163_ram));
-
-	m_mapper_sram_size = 0x2000;
-	m_mapper_sram = m_n163_ram;
+	save_item(NAME(m_wram_enable));
 }
 
 void nes_namcot175_device::pcb_reset()
@@ -184,41 +172,40 @@ void nes_namcot175_device::pcb_reset()
 
 	m_irq_enable = 0;
 	m_irq_count = 0;
-	m_wram_protect = 0;
+	m_wram_enable = 0;
 }
 
 void nes_namcot163_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(FUNC(nes_namcot163_device::irq_timer_tick), this);
-	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_wram_protect));
 	save_item(NAME(m_latch));
-	save_item(NAME(m_chr_bank));
-	save_item(NAME(m_n163_ram));
+	save_item(NAME(m_chr_regs));
 
-	m_mapper_sram_size = 0x2000;
-	m_mapper_sram = m_n163_ram;
+	// battery-backed save RAM is the chip's own 128 bytes (sized by the loader only when the board has a battery)
+	m_mapper_sram_size = namco_163_sound_device::INTERNAL_RAM_SIZE;
+	m_mapper_sram = m_namco163snd->internal_ram();
 
-	// TODO : Measure actual volume
+	// Gains set from a measurement (nes-audio-tests db_n163: full-volume N163 square vs APU square is +16.3 dB at gain
+	// 1.0 in this mix) to the middle of each NESdev submapper range
 	if (m_n163_vol == 2) // Submapper 2 - No expansion sound
 	{
 		m_namco163snd->set_output_gain(ALL_OUTPUTS, 0.0f);
 	}
 	else if (m_n163_vol == 3) // Submapper 3 - N163 expansion sound: 11.0-13.0 dB louder than NES APU
 	{
-		m_namco163snd->set_output_gain(ALL_OUTPUTS, 1.125f);
+		m_namco163snd->set_output_gain(ALL_OUTPUTS, 0.62f);   // +12.0 dB
 	}
 	else if (m_n163_vol == 4) // Submapper 4 - N163 expansion sound: 16.0-17.0 dB louder than NES APU
 	{
-		m_namco163snd->set_output_gain(ALL_OUTPUTS, 1.17f);
+		m_namco163snd->set_output_gain(ALL_OUTPUTS, 1.02f);   // +16.5 dB
 	}
 	else if (m_n163_vol == 5) // Submapper 5 - N163 expansion sound: 18.0-19.5 dB louder than NES APU
 	{
-		m_namco163snd->set_output_gain(ALL_OUTPUTS, 1.19f);
+		m_namco163snd->set_output_gain(ALL_OUTPUTS, 1.33f);   // +18.75 dB
 	}
 }
 
@@ -233,7 +220,7 @@ void nes_namcot163_device::pcb_reset()
 	m_irq_count = 0;
 	m_wram_protect = 0;
 	m_latch = 0;
-	m_chr_bank = 0;
+	std::fill(std::begin(m_chr_regs), std::end(m_chr_regs), 0);
 }
 
 
@@ -261,7 +248,9 @@ void nes_namcot3433_device::dxrom_write(offs_t offset, uint8_t data)
 {
 	LOG("dxrom_write, offset: %04x, data: %02x\n", offset, data);
 
-	if (!(offset & 1) && m_pcb_ctrl_mirror)
+	// mapper 154: the one-screen mirroring bit is decoded over the whole $8000-$FFFF range, odd and even addresses alike
+	// (NESdev INES Mapper 154)
+	if (m_pcb_ctrl_mirror)
 		set_nt_mirroring(BIT(data, 6) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 
 	if (offset >= 0x2000)
@@ -272,8 +261,9 @@ void nes_namcot3433_device::dxrom_write(offs_t offset, uint8_t data)
 		case 1:
 			switch (m_latch & 0x07)
 			{
-				case 0: chr2_0(data >> 1, CHRROM); break;
-				case 1: chr2_2(data >> 1, CHRROM); break;
+				// mapper 88/154: CHR A16 follows PPU A12, so R0/R1 ($0xxx) see the first 64K and R2-R5 ($1xxx) the second
+				case 0: chr2_0((data & 0x3f) >> 1, CHRROM); break;
+				case 1: chr2_2((data & 0x3f) >> 1, CHRROM); break;
 				case 2: chr1_4(data | 0x40, CHRROM); break;
 				case 3: chr1_5(data | 0x40, CHRROM); break;
 				case 4: chr1_6(data | 0x40, CHRROM); break;
@@ -336,6 +326,14 @@ void nes_namcot3446_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
+void nes_namcot3425_device::update_nt()
+{
+	set_nt_page(0, CIRAM, m_reg[0], 1);
+	set_nt_page(1, CIRAM, m_reg[0], 1);
+	set_nt_page(2, CIRAM, m_reg[1], 1);
+	set_nt_page(3, CIRAM, m_reg[1], 1);
+}
+
 void nes_namcot3425_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t mode;
@@ -349,27 +347,23 @@ void nes_namcot3425_device::write_h(offs_t offset, uint8_t data)
 			mode = m_latch & 0x07;
 			switch (mode)
 			{
-				case 0: chr2_0(data >> 1, CHRROM); break;
-				case 1: chr2_2(data >> 1, CHRROM); break;
+				case 0:
+				case 1:
+					// CHR A15 (bit 5) of R0/R1 also drives CIRAM A10: nametable fetches have PPU A12 = 0, so R0 selects the
+					// nametable for $2000-$27FF and R1 for $2800-$2FFF (NESdev INES Mapper 095)
+					chr2_x(mode * 2, data >> 1, CHRROM);
+					m_reg[mode] = BIT(data, 5);
+					update_nt();
+					break;
 				case 2:
 				case 3:
 				case 4:
 				case 5:
 					chr1_x(2 + mode, data, CHRROM);
-					m_reg[mode - 2] = BIT(data, 5);
-					if (!BIT(m_latch, 7))
-					{
-						set_nt_page(0, CIRAM, m_reg[0], 1);
-						set_nt_page(1, CIRAM, m_reg[1], 1);
-						set_nt_page(2, CIRAM, m_reg[2], 1);
-						set_nt_page(3, CIRAM, m_reg[3], 1);
-					}
-					else
-						set_nt_mirroring(PPU_MIRROR_HORZ);
 					break;
 				case 6: prg8_89(data); break;
 				case 7: prg8_ab(data); break;
-		}
+			}
 			break;
 		case 0:
 			m_latch = data;
@@ -385,7 +379,8 @@ void nes_namcot3425_device::write_h(offs_t offset, uint8_t data)
         Wagyan Land 2 & 3
 
  This (and Namcot-175 below) is a cut-down version
- of the Namcot-163 chip, without the sound capabilities.
+ of the Namcot-163 chip, without the sound capabilities,
+ the IRQ counter or the internal RAM.
  They also cannot use NTRAM as VRAM and differ for
  the mirroring handling
 
@@ -395,7 +390,7 @@ void nes_namcot3425_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER(nes_namcot340_device::irq_timer_tick)
+void nes_namcot340_device::irq_clock()
 {
 	if (m_irq_enable)
 	{
@@ -432,14 +427,11 @@ uint8_t nes_namcot340_device::n340_loread(offs_t offset)
 
 	switch (offset & 0x1800)
 	{
+		// reading the counter does not acknowledge the IRQ: only writes to $5000/$5800 do (NESdev INES Mapper 019)
 		case 0x1000:
 			return m_irq_count & 0xff;
-			set_irq_line(CLEAR_LINE); // FIXME: unreachable
-			[[fallthrough]];
 		case 0x1800:
-			return m_irq_count >> 8;
-			set_irq_line(CLEAR_LINE); // FIXME: unreachable
-			[[fallthrough]];
+			return (m_irq_count >> 8) | (m_irq_enable ? 0x80 : 0x00);   // NESdev: bit 7 reads back the IRQ enable
 		default:
 			return 0x00;
 	}
@@ -508,9 +500,9 @@ void nes_namcot340_device::n340_hiwrite(offs_t offset, uint8_t data)
 
 uint8_t nes_namcot175_device::read_m(offs_t offset)
 {
-	// the only game supporting this is Family Circuit '91, and it has 2KB of battery
-	// but it's mirrored up to 8KB (see Sprint Race -> Back Up menu breakage if not)
-	if (!m_battery.empty() && !m_wram_protect)
+	// Family Circuit '91 has 2KB of battery RAM mirrored up to 8KB (see Sprint Race -> Back Up menu breakage if not);
+	// $C000 bit 0 = 1 enables it (NESdev INES Mapper 210)
+	if (!m_battery.empty() && m_wram_enable)
 		return m_battery[offset & (m_battery.size() - 1)];
 
 	return get_open_bus();
@@ -518,9 +510,7 @@ uint8_t nes_namcot175_device::read_m(offs_t offset)
 
 void nes_namcot175_device::write_m(offs_t offset, uint8_t data)
 {
-	// the only game supporting this is Family Circuit '91, and it has 2KB of battery
-	// but it's mirrored up to 8KB (see Sprint Race -> Back Up menu breakage if not)
-	if (!m_battery.empty() && !m_wram_protect)
+	if (!m_battery.empty() && m_wram_enable)
 		m_battery[offset & (m_battery.size() - 1)] = data;
 }
 
@@ -531,7 +521,7 @@ void nes_namcot175_device::write_h(offs_t offset, uint8_t data)
 	switch (offset & 0x7800)
 	{
 		case 0x4000:
-			m_wram_protect = data & 1;
+			m_wram_enable = BIT(data, 0);
 			break;
 		case 0x6000:
 			prg8_89(data & 0x3f);
@@ -559,33 +549,30 @@ void nes_namcot175_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
+// NESdev N163: each CHR register $E0-$FF selects nametable RAM (CIRAM page = bit 0) instead of CHR-ROM, unless disabled by
+// $E800 bit 6 (registers for $0000-$0FFF) or bit 7 (registers for $1000-$1FFF)
+uint8_t *nes_namcot163_device::chr_ciram_ptr(offs_t offset)
+{
+	const int bank = (offset >> 10) & 7;
+	const uint8_t reg = m_chr_regs[bank];
+	if (reg < 0xe0 || (m_latch & (bank < 4 ? 0x40 : 0x80)))
+		return nullptr;
+	return get_ciram_base() + (reg & 0x01) * 0x400 + (offset & 0x3ff);
+}
+
 void nes_namcot163_device::chr_w(offs_t offset, uint8_t data)
 {
-	int bank = offset >> 10;
-
-	if (!(m_latch & 0x40) && m_chr_bank >= 0xe0)
-	{
-		// CIRAM!!!
-		logerror("CIRAM mapped to VRAM!\n");
-
-		if (!m_nt_writable[bank & 0x03])
-			return;
-		m_nt_access[bank & 0x03][offset & 0x3ff] = data;
-	}
+	if (uint8_t *p = chr_ciram_ptr(offset))
+		*p = data;
 	// or ROM, so no write
 }
 
 uint8_t nes_namcot163_device::chr_r(offs_t offset)
 {
-	int bank = offset >> 10;
-	if (!(m_latch & 0x40) && m_chr_bank >= 0xe0)
-	{
-		// CIRAM!!!
-		logerror("CIRAM mapped to VRAM!\n");
-		return m_nt_access[bank & 0x03][offset & 0x3ff];
-	}
+	if (const uint8_t *p = chr_ciram_ptr(offset))
+		return *p;
 	// or ROM, accessed as usual
-	return m_chr_access[bank][offset & 0x3ff];
+	return m_chr_access[offset >> 10][offset & 0x3ff];
 }
 
 
@@ -600,8 +587,9 @@ uint8_t nes_namcot163_device::read_m(offs_t offset)
 void nes_namcot163_device::write_m(offs_t offset, uint8_t data)
 {
 	// the pcb can separately protect each 2KB chunk of the external wram from writes
+	// NESdev N163 $F800: writes need the upper nybble to be 0100 ($40-$4E) and the 2KB window's protect bit clear
 	int bank = BIT(offset, 11, 2);
-	if (!m_battery.empty() && !BIT(m_wram_protect, bank))
+	if (!m_battery.empty() && (m_wram_protect & 0xf0) == 0x40 && !BIT(m_wram_protect, bank))
 		m_battery[offset & (m_battery.size() - 1)] = data;
 }
 
@@ -653,8 +641,8 @@ void nes_namcot163_device::write_h(offs_t offset, uint8_t data)
 		case 0x1000: case 0x1800:
 		case 0x2000: case 0x2800:
 		case 0x3000: case 0x3800:
-			m_chr_bank = data;
-			chr1_x(offset >> 11, m_chr_bank, CHRROM);
+			m_chr_regs[(offset >> 11) & 7] = data;
+			chr1_x(offset >> 11, data, CHRROM);
 			break;
 		case 0x4000:
 		case 0x4800:
@@ -672,7 +660,7 @@ void nes_namcot163_device::write_h(offs_t offset, uint8_t data)
 			break;
 		case 0x7800:
 			// the lower 4 bits work *BOTH* as WRAM write protect *AND* as sound address!
-			m_wram_protect = data & 0x0f;
+			m_wram_protect = data;    // full value: the upper nybble gates writes (NESdev)
 			m_namco163snd->addr_w(data);
 			break;
 		default:
@@ -687,9 +675,9 @@ void nes_namcot163_device::write_h(offs_t offset, uint8_t data)
 
 void nes_namcot163_device::device_add_mconfig(machine_config &config)
 {
-	// additional sound hardware
-	SPEAKER(config, "addon").front_center();
+	// additional sound hardware, mixed into the console audio through the cartridge connector
 
-	// TODO: Correct clock input / divider?
-	NAMCO_163(config, m_namco163snd, XTAL(21'477'272)/12).add_route(ALL_OUTPUTS, "addon", 0.5);
+	// the N163 runs off M2, the NTSC CPU clock (21.477272 MHz / 12), and updates one channel every 15 cycles, which the
+	// sound device models with its clock / 15 sample rate; all N163 games are NTSC-only Famicom releases
+	NAMCO_163(config, m_namco163snd, XTAL(21'477'272)/12).add_route(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.5);
 }

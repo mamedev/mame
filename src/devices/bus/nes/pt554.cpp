@@ -85,11 +85,10 @@ static const char *const pt554_sample_names[] =
 
 void nes_bandai_pt554_device::device_add_mconfig(machine_config &config)
 {
-	// additional sound hardware
-	SPEAKER(config, "addon").front_center();
+	// additional sound hardware, mixed into the console audio through the cartridge connector
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(8);
 	m_samples->set_samples_names(pt554_sample_names);
-	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+	m_samples->add_route(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50);
 }

@@ -53,13 +53,14 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 
-	TIMER_CALLBACK_MEMBER(irq_timer_tick);
+	// the IRQ counter is clocked by M2: it is counted at the M2 rise, before that cycle's CPU access
+	virtual bool wants_m2() override { return true; }
+	virtual void m2_w(int state, offs_t address, bool write) override { if (state) irq_clock(); }
+	void irq_clock();
 
 private:
 	uint16_t m_irq_count;
 	int m_irq_enable, m_irq_toggle;
-
-	emu_timer *irq_timer;
 };
 
 
@@ -114,13 +115,14 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 
-	TIMER_CALLBACK_MEMBER(irq_timer_tick);
+	// the IRQ counter is clocked by M2: it is counted at the M2 rise, before that cycle's CPU access
+	virtual bool wants_m2() override { return true; }
+	virtual void m2_w(int state, offs_t address, bool write) override { if (state) irq_clock(); }
+	void irq_clock();
 
 private:
 	uint16_t m_irq_count;
 	int m_irq_enable;
-
-	emu_timer *irq_timer;
 
 	uint8_t m_latch;
 	uint8_t m_wram_bank;

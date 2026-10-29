@@ -5,6 +5,8 @@
 
  NES/Famicom cartridge emulation for Bandai Datach PCBs
 
+ iNES mappers: 157
+
 
  Here we emulate the Bandai Datach Joint ROM System [mapper 157].
  The base unit features: a Bandai LZ93D50 + 24C02 EEPROM PCB
@@ -24,6 +26,10 @@
 #endif
 #include "logmacro.h"
 
+#define EEPROM_INTERNAL 0
+#define EEPROM_EXTERNAL 1
+
+#define TEST_EEPROM 0
 
 //--------------------------------
 //
@@ -198,7 +204,7 @@ uint8_t *nes_datach_rom_device::get_cart_base()
 
 void nes_datach_24c01_device::device_add_mconfig(machine_config &config)
 {
-	I2C_X24C01(config, m_i2cmem);
+	I2C_24C01(config, m_i2cmem);
 }
 
 
@@ -213,11 +219,11 @@ DEFINE_DEVICE_TYPE(NES_DATACH, nes_datach_device, "nes_datach", "NES Cart Bandai
 
 nes_datach_device::nes_datach_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_lz93d50_device(mconfig, NES_DATACH, tag, owner, clock)
-	, m_i2cmem(*this, "i2cmem")
 	, m_datach_latch(0)
+	, m_i2cmem(*this, "i2cmem")
 	, m_reader(*this, "datach")
 	, m_subslot(*this, "datach_slot")
-	, m_i2c_dir(0)
+	, m_i2c_dir(0), m_i2c_in_use(0)
 	, serial_timer(nullptr)
 {
 }
@@ -226,13 +232,12 @@ nes_datach_device::nes_datach_device(const machine_config &mconfig, const char *
 void nes_datach_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(FUNC(nes_datach_device::irq_timer_tick), this);
 	serial_timer = timer_alloc(FUNC(nes_datach_device::serial_tick), this);
-	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 	serial_timer->adjust(attotime::zero, 0, clocks_to_attotime(1000));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
+	save_item(NAME(m_irq_latch));
 	save_item(NAME(m_datach_latch));
 }
 
@@ -244,7 +249,9 @@ void nes_datach_device::pcb_reset()
 
 	m_irq_enable = 0;
 	m_irq_count = 0;
+	m_irq_latch = 0;
 	m_datach_latch = 0;
+	m_i2c_in_use = EEPROM_INTERNAL;
 }
 
 
@@ -281,16 +288,17 @@ uint8_t nes_datach_device::read_m(offs_t offset)
 {
 	LOG("Datach read_m, offset: %04x\n", offset);
 	uint8_t i2c_val = 0;
+#if TEST_EEPROM
 	if (m_i2c_dir)
 	{
-		int sda = m_i2cmem->read_sda();
-		if (m_subslot->m_cart && m_subslot->m_cart->m_i2cmem)
-			sda &= m_subslot->m_cart->m_i2cmem->read_sda();
-		i2c_val = (sda & 1) << 4;
+		if (m_i2c_in_use == EEPROM_INTERNAL)
+			i2c_val = (m_i2cmem->read_sda() & 1) << 4;
+		if (m_i2c_in_use == EEPROM_EXTERNAL && m_subslot->m_cart && m_subslot->m_cart->m_i2cmem)
+			i2c_val = (m_subslot->m_cart->m_i2cmem->read_sda() & 1) << 4;
 	}
+#endif
 	return m_datach_latch | i2c_val;
 }
-
 
 
 uint8_t nes_datach_device::read_h(offs_t offset)
@@ -312,27 +320,38 @@ void nes_datach_device::write_h(offs_t offset, uint8_t data)
 	switch (offset & 0x0f)
 	{
 		case 0: case 1: case 2: case 3:
-			// writes here and below don't switch CHR bank (if you try this, both Battle Rush and SD Gundam Wars will have glitches!)
-			// in $8000-$8003, bit3 goes to SCL of the external EEPROM (and we use write=1 to enable reading from this EEPROM)
-			// docs from naruko don't specify the bit, our choice comes from observation of writes performed by Battle Rush
-			if (m_subslot->m_cart && m_subslot->m_cart->m_i2cmem)
-				m_subslot->m_cart->m_i2cmem->write_scl(BIT(data, 3));
 		case 4: case 5: case 6: case 7:
+			// these don't switch CHR bank (if you try this, both Battle Rush and SD Gundam Wars will have glitches!)
+			// bit3 goes to SCL of the external EEPROM (and we use write=1 to enable reading from this EEPROM)
+			// docs from naruko don't specify the bit, our choice comes from observation of writes performed by Battle Rush
+#if TEST_EEPROM
+			if (m_subslot->m_cart && m_subslot->m_cart->m_i2cmem)
+			{
+				if (BIT(data, 3))
+					m_i2c_in_use = EEPROM_EXTERNAL;
+				m_subslot->m_cart->m_i2cmem->write_scl(BIT(data, 3));
+			}
+#endif
 			break;
 		case 0x08:
 			m_subslot->write_prg_bank(data & 0x0f);
+			prg16_89ab(data & 0x0f);   // used when the game is loaded as a mapper 157 image instead of a Datach ROM
 			break;
 		case 0x0d:
+#if TEST_EEPROM
 			// bit7, select SDA direction LZ93D50P -> EEPROM or EEPROM -> LZ93D50P
 			m_i2c_dir = BIT(data, 7);
 
 			// bit6 goes to SDA line, which is in common with the 2nd EEPROM, if present
-			m_i2cmem->write_sda(m_i2c_dir ? 1 : BIT(data, 6));
+			m_i2cmem->write_sda(BIT(data, 6));
 			if (m_subslot->m_cart && m_subslot->m_cart->m_i2cmem)
-				m_subslot->m_cart->m_i2cmem->write_sda(m_i2c_dir ? 1 : BIT(data, 6));
+				m_subslot->m_cart->m_i2cmem->write_sda(BIT(data, 6));
 
-			// bit5 goes to SCL of the internal EEPROM
+			// bit5 goes to SCL of the internal EEPROM (and we use write=1 to enable reading from this EEPROM)
+			if (BIT(data, 5))
+				m_i2c_in_use = EEPROM_INTERNAL;
 			m_i2cmem->write_scl(BIT(data, 5));
+#endif
 			break;
 		default:
 			fcg_write(offset & 0x0f, data);
@@ -358,30 +377,6 @@ void nes_datach_device::device_add_mconfig(machine_config &config)
 	I2C_24C02(config, m_i2cmem);
 }
 
-
-//-------------------------------------------------
-//  irq_timer_tick - handle IRQ timer
-//-------------------------------------------------
-
-TIMER_CALLBACK_MEMBER(nes_datach_device::irq_timer_tick)
-{
-	if (m_irq_enable)
-	{
-		// 16bit counter, IRQ fired when the counter goes from 1 to 0
-		// after firing, the counter is *not* reloaded, but next clock
-		// counter wraps around from 0 to 0xffff
-		if (!m_irq_count)
-			m_irq_count = 0xffff;
-		else
-			m_irq_count--;
-
-		if (!m_irq_count)
-		{
-			set_irq_line(ASSERT_LINE);
-			m_irq_enable = 0;
-		}
-	}
-}
 
 //-------------------------------------------------
 //  serial_tick - tick in a serial bit

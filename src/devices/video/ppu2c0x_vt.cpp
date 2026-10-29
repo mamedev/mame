@@ -28,6 +28,62 @@ DEFINE_DEVICE_TYPE(PPU_VT32PAL, ppu_vt32pal_device, "ppu_vt32pal", "VT32 PPU (PA
 
 DEFINE_DEVICE_TYPE(PPU_VT3XX, ppu_vt3xx_device, "ppu_vt3xx", "VT3XX PPU (NTSC)")
 
+// The NTSC VT03 family runs a 2C02's frame on a 2A03 core's clock, so it keeps the 2C02's own dot timing (VBL on dot 1,
+// /NMI as a signal sampled by the 2A03 core); the PAL variants run at the PAL clock, whose dot grid is only known for the
+// 2C07, so they keep following the screen
+// Dot renderer hooks. The VT03 reads its patterns from CHR buses of its own (read_bg/read_sp), not the PPU bus, 16 bits
+// wide: a 4bpp fetch gets planes 0-1 and, from the same address with A13 set, planes 2-3 in one access, so the extra
+// planes need no fetch slots of their own. In extended mode (bit 4) the tile's attribute bits become CHR address bits
+// (m_read_bg4_bg3), and a sprite's attribute bits 2-4 select its CHR bank (m_extra_sprite_bits), both read by the CHR
+// bus callbacks, as the scanline renderer did per tile and per sprite.
+u8 ppu_vt03_device::dot_bg_pattern(u16 addr, bool high, u8 bus_data, u8 attr, u8 &extra)
+{
+	m_read_bg4_bg3 = (m_extended_modes_enable & 0x10) ? attr : 0;
+	const u8 data = m_read_bg(addr & 0x1fff);
+	extra = BIT(m_extended_modes_enable, 1) ? m_read_bg((addr & 0x1fff) | 0x2000) : 0;
+	return data;
+}
+
+u8 ppu_vt03_device::dot_sp_pattern(u16 addr, bool high, u8 bus_data, u8 attr, u8 &extra)
+{
+	m_extra_sprite_bits = (attr & 0x1c) >> 2;
+	const u8 data = m_read_sp(addr & 0x1fff);
+	extra = BIT(m_extended_modes_enable, 2) ? m_read_sp((addr & 0x1fff) | 0x2000) : 0;
+	return data;
+}
+
+// A 4bpp pixel (planes 2-3 in bits 5-6, as the VT03's palette RAM is arranged) or, with the extended palette (bit 7),
+// the backdrop gets its colour from the VT palette; 2bpp pixels in normal palette mode take the 2C02's path
+bool ppu_vt03_device::dot_pixel_rgb(int x, u8 bg_pix, u8 bg_pal, bool bg_opaque, u8 sp_pix, u8 sp_pal, bool sprite_wins, u32 *dest)
+{
+	if (sprite_wins)
+	{
+		if (!BIT(m_extended_modes_enable, 2))
+			return false;
+		draw_tile_pixel_inner(sp_pix + 4 * sp_pal, dest);
+		return true;
+	}
+	if (bg_opaque)
+	{
+		if (!BIT(m_extended_modes_enable, 1))
+			return false;
+		const int basepen = (m_extended_modes_enable & 0x10) ? 0 : (4 * bg_pal);
+		draw_tile_pixel_inner(bg_pix + basepen, dest);
+		return true;
+	}
+	if (m_extended_modes_enable & 0x80)
+	{
+		draw_tile_pixel_inner(0, dest);
+		return true;
+	}
+	return false;
+}
+
+bool ppu_vt03_device::keeps_own_timing() const
+{
+	return (type() != PPU_VT03PAL) && (type() != PPU_VT32PAL);
+}
+
 ppu_vt03_device::ppu_vt03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	ppu2c0x_device(mconfig, type, tag, owner, clock),
 	m_is_pal(false),
@@ -681,6 +737,20 @@ ppu_vt3xx_device::ppu_vt3xx_device(const machine_config &mconfig, const char *ta
 	ppu_vt03_device(mconfig, PPU_VT3XX, tag, owner, clock)
 {
 	m_spriteramsize = 0x200;
+}
+
+// The VT3xx's extended video engine (draw_background/draw_sprites below) draws a whole line from v as it is at the
+// line's first tile; nothing documents its fetch timing (NESdev's VT369 pages give its registers), so it keeps
+// drawing whole lines, now at the end of each line (register writes made during the line are seen) instead of at its
+// start. v for this line is m_line_v (dot 320 of the previous line).
+void ppu_vt3xx_device::dot_line_done()
+{
+	if (!is_v3xx_extended_mode())
+		return;
+	const u16 v = m_refresh_data;
+	m_refresh_data = m_line_v;
+	render_scanline();
+	m_refresh_data = v;
 }
 
 void ppu_vt3xx_device::device_start()

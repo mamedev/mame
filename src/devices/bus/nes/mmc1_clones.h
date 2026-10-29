@@ -32,6 +32,21 @@ private:
 };
 
 
+// ======================> nes_bmc_621_device
+
+class nes_bmc_621_device : public nes_sxrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_621_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_m(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+};
+
+
 // ======================> nes_bmc_jy820845c_device
 
 class nes_bmc_jy820845c_device : public nes_sxrom_device
@@ -49,8 +64,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 
-	virtual void set_prg() override { nes_sxrom_device::set_prg(0x18, 0x07); }
-	virtual void set_chr() override { nes_sxrom_device::set_chr(0x18, 0x07); }
+	// PRG A18 comes from the PAL's outer register, not from an MMC1 CHR bit (no SUROM-style PPU A12 switching)
+	virtual bool chr_bits_drive_prg() const override { return false; }
+	virtual void set_prg() override;
+	virtual void set_chr() override;
 
 private:
 	void update_banks();
@@ -181,5 +198,6 @@ DECLARE_DEVICE_TYPE(NES_NINJARYU,      nes_ninjaryu_device)
 DECLARE_DEVICE_TYPE(NES_RESETSXROM,    nes_resetsxrom_device)
 DECLARE_DEVICE_TYPE(NES_SRPG_5IN1,     nes_srpg5in1_device)
 DECLARE_DEVICE_TYPE(NES_TXC_22110,     nes_txc_22110_device)
+DECLARE_DEVICE_TYPE(NES_BMC_621,       nes_bmc_621_device)
 
 #endif // MAME_BUS_NES_MMC1_CLONES_H

@@ -24,6 +24,15 @@ enum vtxx_pal_mode {
 
 class ppu_vt03_device : public ppu2c0x_device {
 public:
+	// the VT03 and VT32 draw with the dot renderer, through its pattern and pixel hooks (the VT3xx, with a background
+	// engine of its own, keeps the scanline renderer)
+	virtual bool keeps_own_timing() const override;
+	virtual u8 dot_bg_pattern(u16 addr, bool high, u8 bus_data, u8 attr, u8 &extra) override;
+	virtual u8 dot_sp_pattern(u16 addr, bool high, u8 bus_data, u8 attr, u8 &extra) override;
+	virtual bool dot_sprite_16px() const override { return BIT(m_extended_modes_enable, 2) && BIT(m_extended_modes_enable, 0); }
+	virtual bool dot_pixel_rgb(int x, u8 bg_pix, u8 bg_pal, bool bg_opaque, u8 sp_pix, u8 sp_pal, bool sprite_wins, u32 *dest) override;
+	virtual u8 oam_attr_mask() const override { return 0xff; }
+	virtual bool has_data_pipeline() const override { return false; }
 	ppu_vt03_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	ppu_vt03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
@@ -175,6 +184,11 @@ public:
 
 
 class ppu_vt3xx_device : public ppu_vt03_device {
+protected:
+	// NES-compatible modes draw through the VT03's dot renderer hooks; with extended video ($201E non-zero: packed
+	// 4/8bpp and 16x16 tiles, the high-resolution sprite engine) its own engine redraws each line after its last pixel
+	virtual void dot_line_done() override;
+
 public:
 	ppu_vt3xx_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 

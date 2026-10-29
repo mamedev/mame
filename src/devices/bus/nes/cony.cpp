@@ -5,6 +5,8 @@
 
  NES/Famicom cartridge emulation for Cony/Yoko PCBs
 
+ iNES mappers: 83, 264
+
 
  Here we emulate the following PCBs
 
@@ -36,7 +38,7 @@ DEFINE_DEVICE_TYPE(NES_YOKO,   nes_yoko_device,   "nes_yoko",   "NES Cart Yoko P
 
 
 nes_cony_device::nes_cony_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 extra_addr, u8 mask)
-	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr), m_extra_addr(extra_addr), m_mask(mask), m_mode_reg(0), m_outer_reg(0)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0), m_extra_addr(extra_addr), m_mask(mask), m_mode_reg(0), m_outer_reg(0)
 {
 }
 
@@ -61,8 +63,6 @@ nes_yoko_device::nes_yoko_device(const machine_config &mconfig, const char *tag,
 void nes_cony_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(FUNC(nes_cony_device::irq_timer_tick), this);
-	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));

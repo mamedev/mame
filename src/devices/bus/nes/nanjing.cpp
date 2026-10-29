@@ -1,12 +1,16 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli,Brian H. Gilbert
 /***********************************************************************************************************
 
 
  NES/Famicom cartridge emulation for Nanjing PCBs
 
- TODO:
- - Emulate the variants often assigned to mapper 162/164 (and investigate connection with Waixing FS-304)!
+ iNES mappers: 163
+
+ Mappers 162 and 164 are emulated by the Waixing FS-304 and FFV boards (waixing.cpp). NESdev lists three Nanjing
+ games under mapper 162 on a compatible board, and this board shares the FS-304's automatic 4 KiB CHR-RAM switch.
+
+ VERIFY: the feedback register ($5100/$5500) has not been exercised by any game.
 
  ***********************************************************************************************************/
 
@@ -34,16 +38,10 @@ DEFINE_DEVICE_TYPE(NES_NANJING, nes_nanjing_device, "nes_nanjing", "NES Cart Nan
 
 nes_nanjing_device::nes_nanjing_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_NANJING, tag, owner, clock)
-	, m_count(0)
-	, m_latch1(0)
-	, m_latch2(0)
-	, m_ppu(*this, ":ppu") // FIXME: this dependency should not exist
+	, m_reg5000(0), m_reg5200(0), m_mode(0), m_feedback(0), m_last_nt(false), m_chr_a12(0)
 {
 }
 
-nes_nanjing_device::~nes_nanjing_device()
-{
-}
 
 
 
@@ -51,133 +49,114 @@ nes_nanjing_device::~nes_nanjing_device()
 void nes_nanjing_device::device_start()
 {
 	common_start();
-	save_item(NAME(m_count));
-	save_item(NAME(m_latch1));
-	save_item(NAME(m_latch2));
-	save_item(NAME(m_reg));
+	save_item(NAME(m_reg5000));
+	save_item(NAME(m_reg5200));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_feedback));
+	save_item(NAME(m_last_nt));
+	save_item(NAME(m_chr_a12));
 }
 
+// NESdev mapper 163: all registers are cleared on reset, so games boot in 32 KiB PRG-ROM bank #3 (A15/A16 forced to 1)
 void nes_nanjing_device::pcb_reset()
 {
-	prg16_89ab(m_prg_chunks - 2);
-	prg16_cdef(m_prg_chunks - 1);
+	m_reg5000 = m_reg5200 = m_mode = m_feedback = 0;
+	m_last_nt = false;
+	m_chr_a12 = 0;
 	chr8(0, m_chr_source);
-
-	m_count = 0xff;
-	m_latch1 = 0;
-	m_latch2 = 0;
-	m_reg[0] = 0xff;
-	m_reg[1] = 0;
+	update_prg();
 }
 
-
-
-
-
-/*-------------------------------------------------
- mapper specific handlers
- -------------------------------------------------*/
-
 /*-------------------------------------------------
 
- Bootleg Board by Nanjing
-
- Games: A lot of pirate originals
-
- iNES: mapper 163
-
- In MAME: Unsupported.
+ Nanjing FC-001 board (iNES mapper 163), per NESdev:
+ $5000: C... PPPP  C = automatic 4 KiB CHR-RAM switch, PPPP = PRG A18..A15
+ $5200: .... ..PP  PRG A20..A19
+ $5300: .... .A.B  A = PRG A15/A16 from $5000 (0: forced to 11b), B = swap D0/D1 on writes to $5000-$5200
+ $5100/$5101 (mask $FF01): feedback latch; read back inverted in bit 2 at $5500 (mask $F300)
 
  -------------------------------------------------*/
 
-void nes_nanjing_device::hblank_irq(int scanline, bool vblank, bool blanked)
+void nes_nanjing_device::update_prg()
 {
-	if (BIT(m_reg[0], 7))
-	{
-		if (scanline == 127)
-		{
-			chr4_0(1, CHRRAM);
-			chr4_4(1, CHRRAM);
-		}
-
-		if (scanline == 239)
-		{
-			chr4_0(0, CHRRAM);
-			chr4_4(0, CHRRAM);
-		}
-	}
-
+	uint8_t low = m_reg5000 & 0x0f;
+	if (!BIT(m_mode, 2))
+		low |= 0x03;
+	uint8_t high = m_reg5200 & 0x03;
+	// NESdev: 1 MiB games connect both ASIC PRG A19 and A20 outputs to ROM A19, exempting this register from the bit-swap
+	if (m_prg_chunks <= 0x40 && high)
+		high = 1;
+	prg32(low | (high << 4));
 }
 
 void nes_nanjing_device::write_l(offs_t offset, uint8_t data)
 {
-	LOG("nanjing write_l, offset: %04x, data: %02x\n", offset, data);
-
 	offset += 0x100;
-
-	if (offset < 0x1000)
+	if ((offset & 0xf000) != 0x1000)
 		return;
 
-	if (offset == 0x1100)   // 0x5100
+	const uint8_t swapped = BIT(m_mode, 0) ? bitswap<8>(data, 7, 6, 5, 4, 3, 2, 0, 1) : data;
+	switch (offset & 0x0f00)
 	{
-		if (data == 6)
-			prg32(3);
-		return;
-	}
-
-	if (offset == 0x1101)   // 0x5101
-	{
-		uint8_t temp = m_count;
-		m_count = data;
-
-		if ((temp & ~data) & 1)
-		{
-			m_latch2 ^= 0xff;
-		}
-	}
-
-	switch (offset & 0x300)
-	{
-		case 0x000:
-		case 0x200:
-			m_reg[BIT(offset, 9)] = data;
-			if (!BIT(m_reg[0], 7) && m_ppu->get_current_scanline() <= 127)
-				chr8(0, CHRRAM);
+		case 0x000:   // $5000
+			m_reg5000 = swapped;
+			update_prg();
 			break;
-		case 0x300:
-			m_latch1 = data;
+		case 0x100:   // $5100/$5101: A0=0 latches F and E; A0=1 flips the latched F when E (D0) is set
+			if (!BIT(offset, 0))
+				m_feedback = swapped & 0x05;
+			else if (BIT(swapped, 0))
+				m_feedback ^= 0x04;
+			break;
+		case 0x200:   // $5200
+			m_reg5200 = swapped;
+			update_prg();
+			break;
+		case 0x300:   // $5300, not subject to the swap
+			m_mode = data;
+			update_prg();
 			break;
 	}
-
-	prg32((m_reg[0] & 0x0f) | ((m_reg[1] & 0x0f) << 4));
 }
 
 uint8_t nes_nanjing_device::read_l(offs_t offset)
 {
-	uint8_t value = 0;
-	LOG("nanjing read_l, offset: %04x\n", offset);
-
 	offset += 0x100;
+	if ((offset & 0xf300) == 0x1100)   // $5100/$5500/... (mask $F300): inverted F in bit 2
+		return (get_open_bus() & ~0x04) | (BIT(m_feedback, 2) ? 0x00 : 0x04);
+	return get_open_bus();
+}
 
-	if (offset < 0x1000)
-		return 0;
+// automatic 4 KiB CHR-RAM switch ($5000.7), as on mapper 162: CHR A12 = PPU A9 latched on the last rise of PPU A13
+uint8_t nes_nanjing_device::nt_r(offs_t offset)
+{
+	if (!m_last_nt)
+		m_chr_a12 = BIT(offset, 9);
+	m_last_nt = true;
+	return nes_nrom_device::nt_r(offset);
+}
 
-	switch (offset & 0x700)
-	{
-		case 0x100:
-			value = m_latch1;
-			break;
-		case 0x500:
-			value = m_latch2 & m_latch1;
-			break;
-		case 0x000:
-		case 0x200:
-		case 0x300:
-		case 0x400:
-		case 0x600:
-		case 0x700:
-			value = 4;
-			break;
-	}
-	return value;
+void nes_nanjing_device::nt_w(offs_t offset, uint8_t data)
+{
+	if (!m_last_nt)
+		m_chr_a12 = BIT(offset, 9);
+	m_last_nt = true;
+	nes_nrom_device::nt_w(offset, data);
+}
+
+uint8_t nes_nanjing_device::chr_r(offs_t offset)
+{
+	m_last_nt = false;
+	if (BIT(m_reg5000, 7) && !m_vram.empty())
+		return m_vram[((m_chr_a12 << 12) | (offset & 0x0fff)) & (m_vram.size() - 1)];
+	return nes_nrom_device::chr_r(offset);
+}
+
+void nes_nanjing_device::chr_w(offs_t offset, uint8_t data)
+{
+	m_last_nt = false;
+	if (BIT(m_reg5000, 7) && !m_vram.empty())
+		m_vram[((m_chr_a12 << 12) | (offset & 0x0fff)) & (m_vram.size() - 1)] = data;
+	else
+		nes_nrom_device::chr_w(offset, data);
 }
