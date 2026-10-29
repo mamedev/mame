@@ -1495,7 +1495,7 @@ int segas32_state::draw_one_sprite(uint16_t const *data, int xoffs, int yoffs, c
 		goto bail;
 
 	// sprite group modes 0-3 take the top group bit from palette bit 15, the other modes use pixel bit 15 for shadows
-	if ((m_mixer_control[(m_is_multi32 && BIT(data[3], 11)) ? 1 : 0][0x4c/2] & 0x0c) == 0)
+	if ((m_mixer_control[(m_is_multi32 && BIT(data[3], 11))][0x4c/2] & 0x0c) == 0)
 		color |= data[7] & 0x8000;
 	else
 		color |= 0x8000;
