@@ -730,37 +730,21 @@ TIMER_CALLBACK_MEMBER(mcd251_device::frame_period_tick)
 	// and only in synchronous mode.
 	const bool synchronous = BIT(m_fmv_sysscr, 2);
 
-	// display_dts_desync = dclk[20:6] - dts[21:7], both at 703.125 Hz.
-	// It is a signed 15 bit value, so the subtraction wraps
-	// into +/-16384 rather than spanning the full 15 bit range.
-	const auto front_desync = [this] ()
+	if (!m_dts_fifo.empty())
 	{
+		// display_dts_desync = dclk[20:6] - dts[21:7], both at 703.125 Hz.
+		// It is a signed 15 bit value, so the subtraction wraps
+		// into +/-16384 rather than spanning the full 15 bit range.
 		int32_t desync = int32_t((fmv_dclk() >> 6) & 0x7fff)
 				- int32_t((m_dts_fifo.front() >> 7) & 0x7fff);
 		if (desync >= 0x4000)
 			desync -= 0x8000;
 		else if (desync < -0x4000)
 			desync += 0x8000;
-		return desync;
-	};
-
-	if (!m_dts_fifo.empty())
-	{
-		int32_t desync = front_desync();
 
 		// Correct the frame period rather than skipping a picture: the queue
 		// empties faster than the disc fills it, and the NDAT that follows
 		// makes the driver pause, which ends playback.
-		if (synchronous && m_syscr_written)
-		{
-			while (desync > LATE_DROP_DESYNC && m_picture_fifo.size() > 1 && m_dts_fifo.front())
-			{
-				m_picture_fifo.pop_front();
-				m_dts_fifo.pop_front();
-				desync = front_desync();
-			}
-		}
-
 		const bool valid_dts = m_dts_fifo.front() != 0;
 		if (!synchronous || !valid_dts || desync > -30)
 			m_desync_satisfied = true;

@@ -289,7 +289,6 @@ private:
 	fixed_fifo<int64_t, 1024> m_dts_fifo;
 
 	static constexpr size_t MAX_PICTURES = 8;
-	static constexpr int32_t LATE_DROP_DESYNC = 64;
 	static constexpr size_t PICTURE_SLOTS = MAX_PICTURES + 2;
 	picture m_pictures[PICTURE_SLOTS];
 	fixed_fifo<uint8_t, PICTURE_SLOTS> m_picture_fifo;
