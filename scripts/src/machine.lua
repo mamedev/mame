@@ -2958,6 +2958,19 @@ if MACHINES["NSCSI"] then
 end
 
 ---------------------------------------------------
+-- Novatek NT3580F sound controller
+--@src/devices/machine/nt3580.h,MACHINES["NT3580"] = true
+---------------------------------------------------
+
+if MACHINES["NT3580"] then
+	files {
+		MAME_DIR .. "src/devices/machine/nt3580.cpp",
+		MAME_DIR .. "src/devices/machine/nt3580.h",
+	}
+end
+
+
+---------------------------------------------------
 --
 --@src/devices/machine/pcf8573.h,MACHINES["PCF8573"] = true
 ---------------------------------------------------
