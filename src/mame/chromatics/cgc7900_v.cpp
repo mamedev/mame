@@ -258,7 +258,7 @@ void cgc7900_state::draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		offs_t const row = ((pan_y() + y / zoom_v + bitmap_roll()) & 0x3ff) << 6;
 		u32 *const dest = &bitmap.pix(y);
 		offs_t cached = ~offs_t(0);
-		u16 data[8];
+		u16 data[8] = { };
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
