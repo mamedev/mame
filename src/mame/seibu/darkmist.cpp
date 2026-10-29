@@ -122,6 +122,8 @@ private:
 	tilemap_t *m_bgtilemap = nullptr;
 	tilemap_t *m_fgtilemap = nullptr;
 	tilemap_t *m_txtilemap = nullptr;
+
+	uint8_t m_irq_vector = 0;
 };
 
 
@@ -307,6 +309,7 @@ void darkmist_state::tx_vram_w(offs_t offset, uint8_t data)
 void darkmist_state::machine_start()
 {
 	m_rombank->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
+	save_item(NAME(m_irq_vector));
 }
 
 void darkmist_state::hw_w(uint8_t data)
@@ -498,14 +501,22 @@ GFXDECODE_END
 TIMER_DEVICE_CALLBACK_MEMBER(darkmist_state::scanline)
 {
 	if (param == 240) // vblank-out irq
+	{
+		// RST 10h
+		m_irq_vector = 0xd7;
 		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
 	else if (param == 0) // vblank-in irq
+	{
+		// RST 08h
+		m_irq_vector = 0xcf;
 		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
 }
 
 IRQ_CALLBACK_MEMBER(darkmist_state::cpu_acknowledge_irq)
 {
-	return (m_screen->vpos() >= 240) ? 0xd7 : 0xcf; // RST 10h / RST 08h
+	return m_irq_vector;
 }
 
 

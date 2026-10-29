@@ -173,7 +173,7 @@ void nwb_512_device::device_add_mconfig(machine_config &config)
 	// TODO: measure or find documentation for video timing
 	// The board has a 70.7 MHz crystal
 	// 1066 total lines guessed based on SXGA 1280*1024 mode
-	// 1106 total horizontal clocks calculated to give ~59.57 Hz refresh
+	// 1106 total horizontal clocks calculated to give ~59.97 Hz refresh
 	SCREEN(config, m_nwp_512d);
 	m_nwp_512d->set_raw(70.7_MHz_XTAL,
 			1106, 0, HORIZONTAL,

@@ -73,6 +73,7 @@ private:
 	int            m_dive_bomb_b_select = 0;
 
 	/* misc */
+	uint8_t        m_irq_vector;
 	optional_ioport_array<4> m_in_ports;
 	optional_ioport m_dsw;
 

@@ -155,8 +155,8 @@ namespace {
 class galivan_state : public driver_device
 {
 public:
-	galivan_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag)
+	galivan_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_videoram(*this, "videoram")
 		, m_spriteram(*this, "spriteram")
@@ -172,13 +172,9 @@ public:
 		, m_sprpalbank(*this, "sprpalbank_prom")
 	{ }
 
-	void galivan(machine_config &config);
+	void galivan(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
-
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<buffered_spriteram8_device> m_spriteram;
@@ -196,8 +192,11 @@ protected:
 	// video-related
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_tx_tilemap = nullptr;
-	uint8_t m_shift_scroll = 0U; //youmab
 	uint32_t m_shift_val = 0U;
+
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void sound_command_w(uint8_t data);
 
@@ -206,7 +205,7 @@ protected:
 
 	void io_map(address_map &map) ATTR_COLD;
 
-	void common(machine_config &config);
+	void common(machine_config &config) ATTR_COLD;
 
 private:
 	uint8_t m_scrollx[2]{}, m_scrolly[2]{};
@@ -230,12 +229,12 @@ private:
 class dangarj_state : public galivan_state
 {
 public:
-	dangarj_state(const machine_config &mconfig, device_type type, const char *tag) :
-		galivan_state(mconfig, type, tag),
-		m_prot(*this, "prot_chip")
+	dangarj_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galivan_state(mconfig, type, tag)
+		, m_prot(*this, "prot_chip")
 	{ }
 
-	void dangarj(machine_config &config);
+	void dangarj(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<nb1412m2_device> m_prot;
@@ -246,21 +245,21 @@ private:
 class ninjemak_state : public galivan_state
 {
 public:
-	ninjemak_state(const machine_config &mconfig, device_type type, const char *tag) :
-		galivan_state(mconfig, type, tag)
+	ninjemak_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galivan_state(mconfig, type, tag)
 		, m_nb1414m4(*this, "nb1414m4")
 	{ }
 
-	void ninjemak(machine_config &config);
+	void ninjemak(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
-
 	uint16_t m_scrollx = 0U;
 	uint16_t m_scrolly = 0U;
 	uint8_t m_dispdisable = 0U;
+
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void palette(palette_device &palette) const ATTR_COLD;
@@ -281,8 +280,8 @@ private:
 class youmat_state : public ninjemak_state
 {
 public:
-	youmat_state(const machine_config &mconfig, device_type type, const char *tag) :
-		ninjemak_state(mconfig, type, tag)
+	youmat_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ninjemak_state(mconfig, type, tag)
 	{ }
 
 	void youmat(machine_config &config) ATTR_COLD;
@@ -306,18 +305,20 @@ private:
 class youmab_state : public ninjemak_state
 {
 public:
-	youmab_state(const machine_config &mconfig, device_type type, const char *tag) :
-		ninjemak_state(mconfig, type, tag)
+	youmab_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ninjemak_state(mconfig, type, tag)
 		, m_extra_rombank(*this, "extra_rombank")
 	{ }
 
-	void youmab(machine_config &config);
+	void youmab(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_memory_bank m_extra_rombank;
+
+	uint8_t m_shift_scroll = 0U;
 
 	void extra_bank_w(uint8_t data);
 	uint8_t _8a_r();
@@ -592,8 +593,8 @@ void galivan_state::videoram_w(offs_t offset, uint8_t data)
 void galivan_state::gfxbank_w(uint8_t data)
 {
 	// bits 0 and 1 coin counters
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	machine().bookkeeping().coin_counter_w(1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 
 	// bit 2 flip screen
 	flip_screen_set(data & 0x04);
@@ -601,14 +602,14 @@ void galivan_state::gfxbank_w(uint8_t data)
 	// bit 7 selects one of two ROM banks for c000-dfff
 	m_rombank->set_entry((data & 0x80) >> 7);
 
-	//  logerror("%s port 40 = %02x\n", machine().describe_context(), data);
+	//logerror("%s port 40 = %02x\n", machine().describe_context(), data);
 }
 
 void ninjemak_state::gfxbank_w(uint8_t data)
 {
 	// bits 0 and 1 coin counters
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	machine().bookkeeping().coin_counter_w(1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 
 	// bit 2 flip screen
 	flip_screen_set(data & 0x04);
@@ -627,9 +628,8 @@ void ninjemak_state::gfxbank_w(uint8_t data)
 	{
 		char mess[80];
 		int btz[8];
-		int offs;
 
-		for (offs = 0; offs < 8; offs++) btz[offs] = (((data >> offs) & 0x01) ? 1 : 0);
+		for (int offs = 0; offs < 8; offs++) btz[offs] = BIT(data, offs);
 
 		sprintf(mess, "BK:%01X%01X S:%01X B:%01X T:%01X FF:%01X C2:%01X C1:%01X", btz[7], btz[6], btz[5], btz[4], btz[3], btz[2], btz[1], btz[0]);
 		popmessage(mess);
@@ -640,8 +640,8 @@ void ninjemak_state::gfxbank_w(uint8_t data)
 void youmat_state::gfxbank_w(uint8_t data)
 {
 	// bits 0 and 1 coin counters
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	machine().bookkeeping().coin_counter_w(1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 
 	// bit 2 flip screen
 	flip_screen_set(data & 0x04);
@@ -1272,6 +1272,8 @@ void youmab_state::machine_start()
 
 	m_extra_rombank->configure_entries(0, 2, memregion("extra_banked_rom")->base(), 0x4000);
 	m_extra_rombank->set_entry(0);
+
+	save_item(NAME(m_shift_scroll));
 }
 
 void galivan_state::machine_reset()

@@ -4,7 +4,7 @@
 
     National Semiconductor DP8350 Series CRT Controllers
 
-    These dedicated CRTC devices are “programmable” by specifying a
+    These dedicated CRTC devices are “programmable” by specifying a
     long list of mask parameters. Since the dot clock is generated
     internally, these parameters determine the character field size
     (16 x 16 maximum) as well as the number of characters displayed

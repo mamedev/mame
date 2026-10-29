@@ -90,6 +90,8 @@ public:
 	void init_ghunter() ATTR_COLD;
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	required_shared_ptr<uint16_t> m_scroll_ram;
@@ -106,6 +108,9 @@ protected:
 	optional_device_array<seibu_adpcm_device, 2> m_adpcm;
 
 	optional_ioport_array<2> m_track;
+
+	uint8_t m_main_irq_vector = 0;
+	uint8_t m_sub_irq_vector = 0;
 
 	uint8_t m_tilebank = 0;
 	uint8_t m_oldtilebank = 0;
@@ -132,6 +137,7 @@ protected:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(main_scanline);
 	IRQ_CALLBACK_MEMBER(maincpu_acknowledge_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(sub_scanline);
 	IRQ_CALLBACK_MEMBER(subcpu_acknowledge_irq);
 
 	void main_map(address_map &map) ATTR_COLD;
@@ -234,6 +240,18 @@ TILE_GET_INFO_MEMBER(deadang_state::get_text_tile_info)
 	int const color = (m_videoram[tile_index] >> 8) & 0xf;
 
 	tileinfo.set(0, tile, color, 0);
+}
+
+void deadang_state::machine_start()
+{
+	save_item(NAME(m_main_irq_vector));
+	save_item(NAME(m_sub_irq_vector));
+}
+
+void deadang_state::machine_reset()
+{
+	m_main_irq_vector = 0;
+	m_sub_irq_vector = 0;
 }
 
 void deadang_state::video_start()
@@ -763,24 +781,38 @@ TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::main_scanline)
 {
 	if (param == 240) // vblank-out irq
 	{
+		m_main_irq_vector = 0xc4 / 4;
 		m_maincpu->set_input_line(0, HOLD_LINE);
-		m_subcpu->set_input_line(0, HOLD_LINE);
 	}
 	else if (param == 0) // vblank-in irq
 	{
+		m_main_irq_vector = 0xc8 / 4;
 		m_maincpu->set_input_line(0, HOLD_LINE);
-		m_subcpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
 IRQ_CALLBACK_MEMBER(deadang_state::maincpu_acknowledge_irq)
 {
-	return (m_screen->vpos() >= 240) ? (0xc4 / 4) : (0xc8 / 4);
+	return m_main_irq_vector;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::sub_scanline)
+{
+	if (param == 240) // vblank-out irq
+	{
+		m_sub_irq_vector = 0xc4 / 4;
+		m_subcpu->set_input_line(0, HOLD_LINE);
+	}
+	else if (param == 0) // vblank-in irq
+	{
+		m_sub_irq_vector = 0xc8 / 4;
+		m_subcpu->set_input_line(0, HOLD_LINE);
+	}
 }
 
 IRQ_CALLBACK_MEMBER(deadang_state::subcpu_acknowledge_irq)
 {
-	return (m_screen->vpos() >= 240) ? (0xc4 / 4) : (0xc8 / 4);
+	return m_sub_irq_vector;
 }
 
 
@@ -791,11 +823,12 @@ void deadang_state::deadang(machine_config &config)
 	// basic machine hardware
 	V30(config, m_maincpu, XTAL(16'000'000) / 2); // Sony 8623h9 CXQ70116D-8 (V30 compatible)
 	m_maincpu->set_addrmap(AS_PROGRAM, &deadang_state::main_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(deadang_state::main_scanline), "screen", 0, 1);
+	TIMER(config, "scantimer1").configure_scanline(FUNC(deadang_state::main_scanline), "screen", 0, 1);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(deadang_state::maincpu_acknowledge_irq));
 
 	V30(config, m_subcpu, XTAL(16'000'000) / 2); // Sony 8623h9 CXQ70116D-8 (V30 compatible)
 	m_subcpu->set_addrmap(AS_PROGRAM, &deadang_state::sub_map);
+	TIMER(config, "scantimer2").configure_scanline(FUNC(deadang_state::sub_scanline), "screen", 0, 1);
 	m_subcpu->set_irq_acknowledge_callback(FUNC(deadang_state::subcpu_acknowledge_irq));
 
 	Z80(config, m_audiocpu, XTAL(14'318'181) / 4);

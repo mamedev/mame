@@ -795,6 +795,8 @@ void cosmic_state::machine_start()
 
 	save_item(NAME(m_background_enable));
 	save_item(NAME(m_color_registers));
+
+	save_item(NAME(m_irq_vector));
 }
 
 void cosmic_state::machine_reset()
@@ -803,6 +805,7 @@ void cosmic_state::machine_reset()
 	m_color_registers[0] = 0;
 	m_color_registers[1] = 0;
 	m_color_registers[2] = 0;
+	m_irq_vector = 0xcf; // Z80 - RST 08h
 }
 
 void cosmic_state::cosmic(machine_config &config)
@@ -819,13 +822,16 @@ void cosmic_state::cosmic(machine_config &config)
 TIMER_DEVICE_CALLBACK_MEMBER(cosmic_state::panic_scanline)
 {
 	if (param == 224 || param == 0) // vblank-out/vblank-in irqs
+	{
+		m_irq_vector = (param == 224 ? 0xd7 : 0xcf); // Z80 - RST 10h/08h
 		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
 }
 
 IRQ_CALLBACK_MEMBER(cosmic_state::cpu_acknowledge_irq)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
-	return (m_screen->vpos() >= 224) ? 0xd7 : 0xcf; // Z80 - RST 10h/08h
+	return m_irq_vector;
 }
 
 void cosmic_state::panic(machine_config &config)
