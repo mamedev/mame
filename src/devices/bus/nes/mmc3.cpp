@@ -203,10 +203,11 @@ void nes_zz_device::pcb_reset()
 
  -------------------------------------------------*/
 
-/* Here, IRQ counter decrements every scanline. */
 void nes_txrom_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
-	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
+	// The IRQ counter decrements on visible lines *and* on the pre-render line
+	// but only while rendering is enabled.
+	if (!vblank && !blanked)
 	{
 		int prior_count = m_irq_count;
 		if ((m_irq_count == 0) || m_irq_clear)
@@ -214,13 +215,13 @@ void nes_txrom_device::hblank_irq(int scanline, bool vblank, bool blanked)
 		else
 			m_irq_count--;
 
-		if (m_irq_enable && !blanked && (m_irq_count == 0) && (prior_count || m_irq_clear /*|| !m_mmc3_alt_irq*/)) // according to blargg the latter should be present as well, but it breaks Rampart and Joe & Mac US: they probably use the alt irq!
+		if (m_irq_enable && (m_irq_count == 0) && (prior_count || m_irq_clear /*|| !m_mmc3_alt_irq*/)) // according to blargg the latter should be present as well, but it breaks Rampart and Joe & Mac US: they probably use the alt irq!
 		{
 			LOG("irq fired, scanline: %d\n", scanline);
 			set_irq_line(ASSERT_LINE);
 		}
+		m_irq_clear = 0;
 	}
-	m_irq_clear = 0;
 }
 
 // base MMC3 simply calls prg8_x
