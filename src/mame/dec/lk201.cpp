@@ -548,6 +548,7 @@ void lk201_device::device_reset()
 	m_count->adjust(attotime::from_hz(1200), 0, attotime::from_hz(1200));
 	memset(m_timer.regs, 0, sizeof(m_timer.regs));
 
+	sci_ctl2 = 0;
 	sci_status = (SCSR_TC | SCSR_TDRE);
 	sci_tdr = 0;
 	sci_tdr_full = false;
@@ -566,6 +567,9 @@ void lk201_device::device_reset()
 	m_led_compose = 0; // led9
 	m_led_lock = 0;    // led10
 	m_led_hold = 0;    // led11
+
+	update_interrupts();
+	update_timer_interrupt();
 }
 
 TIMER_CALLBACK_MEMBER(lk201_device::timer_irq)
