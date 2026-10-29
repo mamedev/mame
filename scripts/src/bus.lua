@@ -4962,6 +4962,21 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/pmd85/gpio.h,BUSES["PMD85"] = true
+---------------------------------------------------
+
+if BUSES["PMD85"] then
+	files {
+		MAME_DIR .. "src/devices/bus/pmd85/gpio.cpp",
+		MAME_DIR .. "src/devices/bus/pmd85/gpio.h",
+		MAME_DIR .. "src/devices/bus/pmd85/pmd32.cpp",
+		MAME_DIR .. "src/devices/bus/pmd85/pmd32.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/pofo/exp.h,BUSES["POFO"] = true
 ---------------------------------------------------
 
