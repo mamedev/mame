@@ -294,6 +294,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ncr53c810.h,MACHINES["NCR53C810"] = true
+---------------------------------------------------
+
+if MACHINES["NCR53C810"] then
+	MACHINES["NSCSI"] = true
+	files {
+		MAME_DIR .. "src/devices/machine/ncr53c810.cpp",
+		MAME_DIR .. "src/devices/machine/ncr53c810.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ncr5385.h,MACHINES["NCR5385"] = true
 ---------------------------------------------------
 
@@ -314,19 +327,6 @@ if MACHINES["NEO_ZMC"] then
 	files {
 		MAME_DIR .. "src/devices/machine/neo_zmc.cpp",
 		MAME_DIR .. "src/devices/machine/neo_zmc.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/53c810.h,MACHINES["LSI53C810"] = true
----------------------------------------------------
-
-if MACHINES["LSI53C810"] then
-	MACHINES["SCSI"] = true
-	files {
-		MAME_DIR .. "src/devices/machine/53c810.cpp",
-		MAME_DIR .. "src/devices/machine/53c810.h",
 	}
 end
 
@@ -2359,6 +2359,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/max186.h,MACHINES["MAX186"] = true
+---------------------------------------------------
+
+if MACHINES["MAX186"] then
+	files {
+		MAME_DIR .. "src/devices/machine/max186.cpp",
+		MAME_DIR .. "src/devices/machine/max186.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/gmboard.h,MACHINES["MB_GMBOARD"] = true
 ---------------------------------------------------
 
@@ -3098,8 +3110,12 @@ if MACHINES["PCI"] then
 		MAME_DIR .. "src/devices/machine/lpc-rtc.h",
 		MAME_DIR .. "src/devices/machine/lpc-pit.cpp",
 		MAME_DIR .. "src/devices/machine/lpc-pit.h",
+		MAME_DIR .. "src/devices/machine/mpc105.cpp",
+		MAME_DIR .. "src/devices/machine/mpc105.h",
 		MAME_DIR .. "src/devices/machine/mpc106.cpp",
 		MAME_DIR .. "src/devices/machine/mpc106.h",
+		MAME_DIR .. "src/devices/machine/mpc10x.cpp",
+		MAME_DIR .. "src/devices/machine/mpc10x.h",
 		MAME_DIR .. "src/devices/machine/mv6436x.cpp",
 		MAME_DIR .. "src/devices/machine/mv6436x.h",
 		MAME_DIR .. "src/devices/machine/vrc4373.cpp",

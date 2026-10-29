@@ -234,6 +234,11 @@ void ppc_device::execute_run()
 {
 	int execute_result;
 
+	// Other CPUs or DMA may have written the reserved granule while we
+	// yielded to the scheduler.  Without bus snooping, conservatively lose
+	// the reservation across a timeslice (including same-value writes).
+	m_core->reserve = 0;
+
 	// reset the cache if dirty
 	if (m_cache_dirty)
 		code_flush_cache();
@@ -1054,12 +1059,26 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
 		if (exception == EXCEPTION_EI)
 		{
 			uml::code_label not_decrementer;
+			uml::code_label const selected = label++;
+
+			// 603-family SMI is level-sensitive and takes priority over INT
+			// and the decrementer. The common entry already tests MSR[EE].
+			if (m_cap & PPCCAP_603_MMU)
+			{
+				uml::code_label const not_smi = label++;
+				UML_TEST(block, mem(&m_core->irq_pending), 0x04);
+				UML_JMPc(block, COND_Z, not_smi);
+				UML_MOV(block, I3, EXCEPTION_SMI << 8);
+				UML_JMP(block, selected);
+				UML_LABEL(block, not_smi);
+			}
 
 			UML_TEST(block, mem(&m_core->irq_pending), 0x01);                              // test    [irq_pending],0x01
 			UML_JMPc(block, COND_NZ, not_decrementer = label++);                                // jmp     not_decrementer,nz
 			UML_MOV(block, I3, EXCEPTION_DECREMENT << 8);                           // mov     i3,EXCEPTION_DECREMENT << 8
 			UML_AND(block, mem(&m_core->irq_pending), mem(&m_core->irq_pending), ~0x02);      // and     [irq_pending],[irq_pending],~0x02
 			UML_LABEL(block, not_decrementer);                                          // not_decrementer:
+			UML_LABEL(block, selected);
 		}
 
 		// exception PC goes into SRR0
@@ -1067,6 +1086,14 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
 
 		// MSR bits go into SRR1, along with some exception-specific data
 		UML_AND(block, SPR32(SPROEA_SRR1), MSR32, 0x87c0ffff);                          // and     [srr1],[msr],0x87c0ffff
+		if (exception == EXCEPTION_EI && (m_cap & PPCCAP_603_MMU))
+		{
+			uml::code_label const not_smi = label++;
+			UML_CMP(block, I3, EXCEPTION_SMI << 8);
+			UML_JMPc(block, COND_NE, not_smi);
+			UML_AND(block, SPR32(SPROEA_SRR1), SPR32(SPROEA_SRR1), 0x0000ffff);
+			UML_LABEL(block, not_smi);
+		}
 
 		// an ISI (reason flags) and a PROGRAM exception both carry their SRR1 status in the exception parameter
 		if (exception == EXCEPTION_ISI || exception == EXCEPTION_PROGRAM)

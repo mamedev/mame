@@ -2647,6 +2647,11 @@ void ppc_device::execute_set_input(int inputnum, int state)
 		case PPC_IRQ:
 			m_core->irq_pending = (m_core->irq_pending & ~1) | ((state != CLEAR_LINE) ? 1 : 0);
 			break;
+
+		case PPC_SMI:
+			if (m_cap & PPCCAP_603_MMU)
+				m_core->irq_pending = (m_core->irq_pending & ~4) | ((state != CLEAR_LINE) ? 4 : 0);
+			break;
 	}
 }
 

@@ -26,7 +26,7 @@
     lostwsga - works
     vs215 - works, can hang during gameplay (verify, may be fixed with scan timer rollover fix)
     lemans24 - works
-    vs29815 - massive memory trashing and page faults
+    vs29815 - reaches attract, graphics glitches
 
     vs2 - works
     harley - works
@@ -727,7 +727,9 @@ JP4/5/6/7 - Jumpers to configure ROMs
 #include "315_5296.h"
 #include "machine/clock.h"
 #include "machine/eepromser.h"
-#include "machine/53c810.h"
+#include "bus/pci/ncr53c810.h"
+#include "machine/mpc105.h"
+#include "machine/mpc106.h"
 #include "machine/nvram.h"
 #include "m3comm.h"
 #include "speaker.h"
@@ -740,7 +742,6 @@ void model3_state::update_irq_state()
 	{
 //      printf("IRQ set: state %x enable %x scsi %x\n", m_irq_state, m_irq_enable, m_scsi_irq_state);
 		m_maincpu->set_input_line(PPC_IRQ, ASSERT_LINE);
-		m_scsi_irq_state = 0;
 	}
 	else
 	{
@@ -759,506 +760,24 @@ void model3_state::set_irq_line(uint8_t bit, int line)
 }
 
 
-/*****************************************************************************/
-/* Motorola MPC105 PCI Bridge/Memory Controller */
-
-
-uint32_t model3_state::pci_device_get_reg()
+// Both PCI DMA sources share the board's SCSI interrupt input.
+int model3_state::map_pci_pin(int pin)
 {
-	int device = m_pci_device;
-	int reg = m_pci_reg;
-
-	switch(device)
-	{
-		case 11:        /* ??? */
-			switch(reg)
-			{
-				case 0x14:  return 0;       /* ??? */
-				default:
-					logerror("pci_device_get_reg: Device 11, unknown reg %02X", reg);
-					break;
-			}
-			[[fallthrough]]; // FIXME: really?
-
-		case 13:        /* Real3D Controller chip */
-			switch(reg)
-			{
-				case 0:     return m_real3d_device_id;  /* PCI Vendor ID & Device ID */
-				default:
-					logerror("pci_device_get_reg: Real3D controller, unknown reg %02X", reg);
-					break;
-			}
-			break;
-
-		case 14:        /* NCR 53C810 SCSI Controller */
-			switch(reg)
-			{
-				case 0:     return 0x00011000;      /* PCI Vendor ID (0x1000 = LSI Logic) */
-				default:
-					logerror("pci_device_get_reg: SCSI Controller, unknown reg %02X", reg);
-					break;
-			}
-			break;
-		case 16:        /* ??? (Used by Daytona 2) */
-			switch(reg)
-			{
-				case 0:     return 0x182711db;      /* PCI Vendor ID & Device ID, 315-6183 ??? */
-				default:
-					logerror("pci_device_get_reg: Device 16, unknown reg %02X", reg);
-					break;
-			}
-			break;
-
-		default:
-			logerror("pci_device_get_reg: Unknown device %d, reg %02X", device, reg);
-			break;
-	}
-
-	return 0;
+	return pin;
 }
 
-void model3_state::pci_device_set_reg(uint32_t value)
-{
-	int device = m_pci_device;
-	int reg = m_pci_reg;
-
-	switch(device)
-	{
-		case 11:        /* Unknown device for now !!! */
-			switch(reg)
-			{
-				case 0x01:      /* ??? */
-					break;
-				case 0x04:      /* ??? */
-					break;
-				case 0x10:      /* ??? */
-					break;
-				case 0x11:
-					break;
-				case 0x14:      /* ??? */
-					break;
-				default:
-					logerror("pci_device_set_reg: Unknown device (11), unknown reg %02X %08X", reg, value);
-					break;
-			}
-			break;
-
-		case 13:        /* Real3D Controller chip */
-			switch(reg)
-			{
-				case 0x01:      /* ??? */
-					break;
-				case 0x03:
-					break;
-				case 0x04:      /* ??? */
-					break;
-				default:
-					logerror("pci_device_set_reg: Real3D controller, unknown reg %02X %08X", reg, value);
-					break;
-			}
-			break;
-
-		case 14:        /* NCR 53C810 SCSI Controller */
-			switch(reg)
-			{
-				case 0x04/4:    /* Status / Command */
-					break;
-				case 0x0c/4:    /* Header Type / Latency Timer / Cache Line Size */
-					break;
-				case 0x14/4:    /* Base Address One (Memory) */
-					break;
-				default:
-					logerror("pci_device_set_reg: SCSI Controller, unknown reg %02X, %08X", reg, value);
-					break;
-			}
-			break;
-
-		case 16:        /* ??? (Used by Daytona 2) */
-			switch(reg)
-			{
-				case 4:         /* Base address ? (set to 0xC3000000) */
-					break;
-				default:
-					logerror("pci_device_set_reg: Device 16, unknown reg %02X, %08X", reg, value);
-					break;
-			}
-			break;
-
-		default:
-			logerror("pci_device_set_reg: Unknown device %d, reg %02X, %08X", device, reg, value);
-			break;
-	}
-}
-
-uint64_t model3_state::mpc105_addr_r(offs_t offset, uint64_t mem_mask)
-{
-	if (ACCESSING_BITS_32_63)
-	{
-		return (uint64_t)m_mpc105_addr << 32;
-	}
-	return 0;
-}
-
-void model3_state::mpc105_addr_w(offs_t offset, uint64_t data, uint64_t mem_mask)
-{
-	if (ACCESSING_BITS_32_63)
-	{
-		uint32_t d = swapendian_int32((uint32_t)(data >> 32));
-		m_mpc105_addr = data >> 32;
-
-		m_pci_bus = (d >> 16) & 0xff;
-		m_pci_device = (d >> 11) & 0x1f;
-		m_pci_function = (d >> 8) & 0x7;
-		m_pci_reg = (d >> 2) & 0x3f;
-	}
-}
-
-uint64_t model3_state::mpc105_data_r()
-{
-	if(m_pci_device == 0) {
-		return ((uint64_t)(swapendian_int32(m_mpc105_regs[(m_pci_reg/2)+1])) << 32) |
-				((uint64_t)(swapendian_int32(m_mpc105_regs[(m_pci_reg/2)+0])));
-	}
-	return swapendian_int32(pci_device_get_reg());
-}
-
-void model3_state::mpc105_data_w(offs_t offset, uint64_t data, uint64_t mem_mask)
-{
-	if(m_pci_device == 0) {
-		m_mpc105_regs[(m_pci_reg/2)+1] = swapendian_int32((uint32_t)(data >> 32));
-		m_mpc105_regs[(m_pci_reg/2)+0] = swapendian_int32((uint32_t)(data));
-		return;
-	}
-	if (ACCESSING_BITS_0_31)
-	{
-		pci_device_set_reg(swapendian_int32((uint32_t)data));
-	}
-}
-
-uint64_t model3_state::mpc105_reg_r(offs_t offset)
-{
-	return ((uint64_t)(m_mpc105_regs[(offset*2)+0]) << 32) |
-			(uint64_t)(m_mpc105_regs[(offset*2)+1]);
-}
-
-void model3_state::mpc105_reg_w(offs_t offset, uint64_t data)
-{
-	m_mpc105_regs[(offset*2)+0] = (uint32_t)(data >> 32);
-	m_mpc105_regs[(offset*2)+1] = (uint32_t)data;
-}
-
-void model3_state::mpc105_init()
-{
-	/* set reset values */
-	memset(m_mpc105_regs, 0, sizeof(m_mpc105_regs));
-	m_mpc105_regs[0x00/4] = 0x00011057;      /* Vendor ID & Device ID */
-	m_mpc105_regs[0x04/4] = 0x00800006;      /* PCI Command & PCI Status */
-	m_mpc105_regs[0x08/4] = 0x00060000;      /* Class code */
-	m_mpc105_regs[0xa8/4] = 0x0010ff00;      /* Processor interface configuration 1 */
-	m_mpc105_regs[0xac/4] = 0x060c000c;      /* Processor interface configuration 2 */
-	m_mpc105_regs[0xb8/4] = 0x04000000;
-	m_mpc105_regs[0xf0/4] = 0x0000ff02;      /* Memory control configuration 1 */
-	m_mpc105_regs[0xf4/4] = 0x00030000;      /* Memory control configuration 2 */
-	m_mpc105_regs[0xfc/4] = 0x00000010;      /* Memory control configuration 4 */
-}
-
-/*****************************************************************************/
-/* Motorola MPC106 PCI Bridge/Memory Controller */
-
-
-uint64_t model3_state::mpc106_addr_r(offs_t offset, uint64_t mem_mask)
-{
-	if (ACCESSING_BITS_32_63)
-	{
-		return (uint64_t)m_mpc106_addr << 32;
-	}
-	return 0;
-}
-
-void model3_state::mpc106_addr_w(offs_t offset, uint64_t data, uint64_t mem_mask)
-{
-	if (ACCESSING_BITS_32_63)
-	{
-		uint32_t d = swapendian_int32((uint32_t)(data >> 32));
-
-		if (((d >> 8) & 0xffffff) == 0x800000)
-		{
-			m_mpc106_addr = d & 0xff;
-		}
-		else
-		{
-			m_mpc106_addr = data >> 32;
-
-			m_pci_bus = (d >> 16) & 0xff;
-			m_pci_device = (d >> 11) & 0x1f;
-			m_pci_function = (d >> 8) & 0x7;
-			m_pci_reg = (d >> 2) & 0x3f;
-		}
-	}
-}
-
-uint64_t model3_state::mpc106_data_r(offs_t offset, uint64_t mem_mask)
-{
-	if(m_pci_device == 0) {
-		return ((uint64_t)(swapendian_int32(m_mpc106_regs[(m_pci_reg/2)+1])) << 32) |
-				((uint64_t)(swapendian_int32(m_mpc106_regs[(m_pci_reg/2)+0])));
-	}
-	if (ACCESSING_BITS_32_63)
-	{
-		return (uint64_t)(swapendian_int32(pci_device_get_reg())) << 32;
-	}
-	else
-	{
-		return (uint64_t)(swapendian_int32(pci_device_get_reg()));
-	}
-}
-
-void model3_state::mpc106_data_w(offs_t offset, uint64_t data, uint64_t mem_mask)
-{
-	if(m_pci_device == 0) {
-		m_mpc106_regs[(m_pci_reg/2)+1] = swapendian_int32((uint32_t)(data >> 32));
-		m_mpc106_regs[(m_pci_reg/2)+0] = swapendian_int32((uint32_t)(data));
-		return;
-	}
-	if (ACCESSING_BITS_0_31)
-	{
-		pci_device_set_reg(swapendian_int32((uint32_t)data));
-	}
-}
-
-uint64_t model3_state::mpc106_reg_r(offs_t offset)
-{
-	return ((uint64_t)(m_mpc106_regs[(offset*2)+0]) << 32) |
-			(uint64_t)(m_mpc106_regs[(offset*2)+1]);
-}
-
-void model3_state::mpc106_reg_w(offs_t offset, uint64_t data)
-{
-	m_mpc106_regs[(offset*2)+0] = (uint32_t)(data >> 32);
-	m_mpc106_regs[(offset*2)+1] = (uint32_t)data;
-}
-
-void model3_state::mpc106_init()
-{
-	/* set reset values */
-	memset(m_mpc106_regs, 0, sizeof(m_mpc106_regs));
-	m_mpc106_regs[0x00/4] = 0x00021057;      /* Vendor ID & Device ID */
-	m_mpc106_regs[0x04/4] = 0x00800006;      /* PCI Command & PCI Status */
-	m_mpc106_regs[0x08/4] = 0x00060000;      /* Class code */
-	m_mpc106_regs[0x0c/4] = 0x00000800;      /* Cache line size */
-	m_mpc106_regs[0x70/4] = 0x00cd0000;      /* Output driver control */
-	m_mpc106_regs[0xa8/4] = 0x0010ff00;      /* Processor interface configuration 1 */
-	m_mpc106_regs[0xac/4] = 0x060c000c;      /* Processor interface configuration 2 */
-	m_mpc106_regs[0xb8/4] = 0x04000000;
-	m_mpc106_regs[0xc0/4] = 0x00000100;      /* Error enabling 1 */
-	m_mpc106_regs[0xe0/4] = 0x00420fff;      /* Emulation support configuration 1 */
-	m_mpc106_regs[0xe8/4] = 0x00200000;      /* Emulation support configuration 2 */
-	m_mpc106_regs[0xf0/4] = 0x0000ff02;      /* Memory control configuration 1 */
-	m_mpc106_regs[0xf4/4] = 0x00030000;      /* Memory control configuration 2 */
-	m_mpc106_regs[0xfc/4] = 0x00000010;      /* Memory control configuration 4 */
-}
-
-/*****************************************************************************/
-
-uint64_t model3_state::scsi_r(offs_t offset, uint64_t mem_mask)
-{
-	int reg = offset*8;
-	uint64_t r = 0;
-	if (ACCESSING_BITS_56_63) {
-		r |= (uint64_t)m_lsi53c810->reg_r(reg+0) << 56;
-	}
-	if (ACCESSING_BITS_48_55) {
-		r |= (uint64_t)m_lsi53c810->reg_r(reg+1) << 48;
-	}
-	if (ACCESSING_BITS_40_47) {
-		r |= (uint64_t)m_lsi53c810->reg_r(reg+2) << 40;
-	}
-	if (ACCESSING_BITS_32_39) {
-		r |= (uint64_t)m_lsi53c810->reg_r(reg+3) << 32;
-	}
-	if (ACCESSING_BITS_24_31) {
-		r |= (uint64_t)m_lsi53c810->reg_r(reg+4) << 24;
-	}
-	if (ACCESSING_BITS_16_23) {
-		r |= (uint64_t)m_lsi53c810->reg_r(reg+5) << 16;
-	}
-	if (ACCESSING_BITS_8_15) {
-		r |= (uint64_t)m_lsi53c810->reg_r(reg+6) << 8;
-	}
-	if (ACCESSING_BITS_0_7) {
-		r |= (uint64_t)m_lsi53c810->reg_r(reg+7) << 0;
-	}
-
-	return r;
-}
-
-void model3_state::scsi_w(offs_t offset, uint64_t data, uint64_t mem_mask)
-{
-	int reg = offset*8;
-	if (ACCESSING_BITS_56_63) {
-		m_lsi53c810->reg_w(reg+0, data >> 56);
-	}
-	if (ACCESSING_BITS_48_55) {
-		m_lsi53c810->reg_w(reg+1, data >> 48);
-	}
-	if (ACCESSING_BITS_40_47) {
-		m_lsi53c810->reg_w(reg+2, data >> 40);
-	}
-	if (ACCESSING_BITS_32_39) {
-		m_lsi53c810->reg_w(reg+3, data >> 32);
-	}
-	if (ACCESSING_BITS_24_31) {
-		m_lsi53c810->reg_w(reg+4, data >> 24);
-	}
-	if (ACCESSING_BITS_16_23) {
-		m_lsi53c810->reg_w(reg+5, data >> 16);
-	}
-	if (ACCESSING_BITS_8_15) {
-		m_lsi53c810->reg_w(reg+6, data >> 8);
-	}
-	if (ACCESSING_BITS_0_7) {
-		m_lsi53c810->reg_w(reg+7, data >> 0);
-	}
-}
-
-uint32_t model3_state::scsi_fetch(uint32_t dsp)
-{
-	const uint32_t result = m_maincpu->space(AS_PROGRAM).read_dword(dsp);
-	return swapendian_int32(result);
-}
-
-void model3_state::scsi_irq_callback(int state)
+void model3_state::pci_irq(int line, int state)
 {
 	m_scsi_irq_state = state;
 	update_irq_state();
 }
 
-/*****************************************************************************/
-/* Real3D DMA */
-
-
-uint64_t model3_state::real3d_dma_r(offs_t offset, uint64_t mem_mask)
-{
-	switch(offset)
-	{
-		case 1:
-			return (m_dma_irq << 24) | (m_dma_endian << 8) | m_dma_busy;
-		case 2:
-			if(ACCESSING_BITS_0_31) {
-				return m_dma_data;
-			}
-			break;
-	}
-	osd_printf_debug("real3d_dma_r: %08X, %016X\n", offset, mem_mask);
-	return 0;
-}
-
-void model3_state::real3d_dma_w(offs_t offset, uint64_t data, uint64_t mem_mask)
-{
-	switch(offset)
-	{
-		case 0:
-			if(ACCESSING_BITS_32_63) {      /* DMA source address */
-				m_dma_source = swapendian_int32((uint32_t)(data >> 32));
-				return;
-			}
-			if(ACCESSING_BITS_0_31) {       /* DMA destination address */
-				m_dma_dest = swapendian_int32((uint32_t)(data));
-				return;
-			}
-			break;
-		case 1:
-			if(ACCESSING_BITS_32_63)        /* DMA length */
-			{
-				int length = swapendian_int32((uint32_t)(data >> 32)) * 4;
-				if (m_dma_endian & 0x80)
-				{
-					real3d_dma_callback(m_dma_source, m_dma_dest, length, 0);
-				}
-				else
-				{
-					real3d_dma_callback(m_dma_source, m_dma_dest, length, 1);
-				}
-				m_dma_irq |= 0x01;
-				scsi_irq_callback(1);
-				return;
-			}
-			else if(ACCESSING_BITS_16_23)
-			{
-				if(data & 0x10000) {
-					m_dma_irq &= ~0x1;
-					scsi_irq_callback(0);
-				}
-				return;
-			}
-			else if(ACCESSING_BITS_8_15)
-			{
-				m_dma_endian = (data >> 8) & 0xff;
-				return;
-			}
-			break;
-		case 2:
-			if(ACCESSING_BITS_32_63) {      /* DMA command */
-				uint32_t cmd = swapendian_int32((uint32_t)(data >> 32));
-				if(cmd & 0x20000000) {
-					m_dma_data = swapendian_int32(m_real3d_device_id);  /* (PCI Vendor & Device ID) */
-				}
-				else if(cmd & 0x80000000) {
-					m_dma_status ^= 0xffffffff;
-					m_dma_data = m_dma_status;
-				}
-				m_dma_busy = 0x80000000;
-				m_real3d_dma_timer->adjust(attotime::from_nsec(50000));
-				return;
-			}
-			if(ACCESSING_BITS_0_31) {       /* ??? */
-				m_dma_data = 0xffffffff;
-				return;
-			}
-			return;
-	}
-	logerror("real3d_dma_w: %08X, %08X%08X, %08X%08X", offset, (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
-}
-
-void model3_state::real3d_dma_callback(uint32_t src, uint32_t dst, int length, int byteswap)
-{
-	switch(dst >> 24)
-	{
-		case 0x88:      /* Display List End Trigger */
-			real3d_display_list_end();
-			break;
-		case 0x8c:      /* Display List RAM 2 */
-			real3d_display_list2_dma(src, dst, length, byteswap);
-			break;
-		case 0x8e:      /* Display List RAM 1 */
-			real3d_display_list1_dma(src, dst, length, byteswap);
-			break;
-		case 0x90:      /* VROM Texture Download */
-			real3d_vrom_texture_dma(src, dst, length, byteswap);
-			break;
-		case 0x94:      /* Texture FIFO */
-			real3d_texture_fifo_dma(src, length, byteswap);
-			break;
-		case 0x98:      /* Polygon RAM */
-			real3d_polygon_ram_dma(src, dst, length, byteswap);
-			break;
-		case 0x9c:      /* Unknown */
-			break;
-		default:
-			logerror("%s dma_callback: %08X, %08X, %d at %08X", machine().describe_context(), src, dst, length);
-			break;
-	}
-}
-
-/*****************************************************************************/
-
-void model3_state::configure_fast_ram()
+void model3_state::configure_cpu()
 {
 	/* set conservative DRC options */
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
-	/* configure fast RAM regions for DRC */
-	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x007fffff, false, m_work_ram);
+	// RAM is decoded by the MPC10x, so no DRC fast RAM
 }
 
 TIMER_CALLBACK_MEMBER(model3_state::model3_sound_timer_tick)
@@ -1269,10 +788,6 @@ TIMER_CALLBACK_MEMBER(model3_state::model3_sound_timer_tick)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(model3_state::real3d_dma_timer_callback)
-{
-	m_dma_busy = 0;
-}
 
 /* IRQs */
 /*
@@ -1309,37 +824,38 @@ TIMER_CALLBACK_MEMBER(model3_state::scan_timer_tick)
 	m_scan_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
-MACHINE_START_MEMBER(model3_state,model3_10)
+void model3_state::machine_start()
 {
-	configure_fast_ram();
+	configure_cpu();
+	m_host->set_ram_info(reinterpret_cast<u8 *>(&m_work_ram[0]), 0x800000);
+
+	// board devices take priority over the host's PCI windows
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	space.install_device(0, 0xffffffff, *this, &model3_state::model3_board_mem);
+	if (subdevice("comm_board"))
+	{
+		space.install_device(0xc0000000, 0xc003ffff, *subdevice<m3comm_device>("comm_board"), &m3comm_device::m3_map);
+	}
+	if (m_cryptdevice)
+	{
+		space.install_device(0, 0xffffffff, *this, &model3_state::model3_crypt_mem);
+	}
+
+	// 16 CROM banks follow the fixed 8 MiB
+	memory_region *const crom = memregion("user1");
+	if (crom->bytes() < 0x800000 * 17)
+	{
+		throw emu_fatalerror("user1 region must hold 17 banks of 8 MiB");
+	}
+	m_bank_crom->configure_entries(0, 16, crom->base() + 0x800000, 0x800000);
 
 	m_sound_timer = timer_alloc(FUNC(model3_state::model3_sound_timer_tick), this);
-	m_real3d_dma_timer = timer_alloc(FUNC(model3_state::real3d_dma_timer_callback), this);
 	m_scan_timer = timer_alloc(FUNC(model3_state::scan_timer_tick), this);
-}
-MACHINE_START_MEMBER(model3_state,model3_15)
-{
-	configure_fast_ram();
-
-	m_sound_timer = timer_alloc(FUNC(model3_state::model3_sound_timer_tick), this);
-	m_real3d_dma_timer = timer_alloc(FUNC(model3_state::real3d_dma_timer_callback), this);
-	m_scan_timer = timer_alloc(FUNC(model3_state::scan_timer_tick), this);
-}
-MACHINE_START_MEMBER(model3_state,model3_20)
-{
-	configure_fast_ram();
-
-	m_sound_timer = timer_alloc(FUNC(model3_state::model3_sound_timer_tick), this);
-	m_real3d_dma_timer = timer_alloc(FUNC(model3_state::real3d_dma_timer_callback), this);
-	m_scan_timer = timer_alloc(FUNC(model3_state::scan_timer_tick), this);
-}
-MACHINE_START_MEMBER(model3_state,model3_21)
-{
-	configure_fast_ram();
-
-	m_sound_timer = timer_alloc(FUNC(model3_state::model3_sound_timer_tick), this);
-	m_real3d_dma_timer = timer_alloc(FUNC(model3_state::real3d_dma_timer_callback), this);
-	m_scan_timer = timer_alloc(FUNC(model3_state::scan_timer_tick), this);
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_scsi_irq_state));
+	save_item(NAME(m_real3d_status));
+	save_item(NAME(m_dma_status));
 }
 
 void model3_state::model3_init(int step)
@@ -1352,18 +868,12 @@ void model3_state::model3_init(int step)
 	m_sound_timer->adjust(attotime::never);
 
 	m_irq_enable = 0;
+	m_irq_state = 0;
 
-	m_pci_bus = 0;
-	m_pci_device = 0;
-	m_pci_function = 0;
-	m_pci_reg = 0;
+	m_real3d_status = 0;
+	m_dma_status = 0;
 
-	m_dma_busy = 0;
-	m_dma_irq = 0;
-	m_dma_endian = 0;
-	m_real3d_dma_timer->adjust(attotime::never);
-
-	m_bank_crom->set_base(memregion( "user1" )->base() + 0x800000 ); /* banked CROM */
+	m_bank_crom->set_entry(0); /* banked CROM */
 
 	auto const samples_region = memregion("samples");
 	assert(samples_region);
@@ -1381,32 +891,6 @@ void model3_state::model3_init(int step)
 	m_m3_step = step; // step = BCD hardware rev.  0x10 for 1.0, 0x15 for 1.5, 0x20 for 2.0, etc.
 	tap_reset();
 
-	if (step < 0x20)
-	{
-		if (m_step15_with_mpc106)
-		{
-			mpc106_init();
-		}
-		else
-		{
-			mpc105_init();
-		}
-		m_real3d_device_id = 0x16c311db; /* PCI Vendor ID (11db = SEGA), Device ID (16c3 = 315-5827) */
-	}
-	else
-	{
-		mpc106_init();
-		// some step 2+ games need the older PCI ID (obvious symptom:
-		// vbl is enabled briefly then disabled so the game hangs)
-		if (m_step20_with_old_real3d)
-		{
-			m_real3d_device_id = 0x16c311db; /* PCI Vendor ID (11db = SEGA), Device ID (16c3 = 315-5827) */
-		}
-		else
-		{
-			m_real3d_device_id = 0x178611db; /* PCI Vendor ID (11db = SEGA), Device ID (1786 = 315-6022) */
-		}
-	}
 }
 
 //void model3_state::reset_model3_10() { model3_init(0x10); }
@@ -1550,7 +1034,7 @@ void model3_state::model3_sys_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 				data >>= 56;
 				data = (~data) & 0xf;
 
-				m_bank_crom->set_base(memregion( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
+				m_bank_crom->set_entry(data); /* banked CROM */
 			}
 			if (ACCESSING_BITS_24_31)
 			{
@@ -1587,18 +1071,32 @@ void model3_state::model3_rtc_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 	}
 }
 
-uint64_t model3_state::real3d_status_r(offs_t offset)
+u32 model3_state::real3d_status_r(offs_t offset)
 {
-	m_real3d_status ^= 0xffffffffffffffffU;
+	if (!machine().side_effects_disabled())
+	{
+		m_real3d_status ^= 0xffffffff;
+	}
+	u32 result = m_real3d_status;
 	if (offset == 0)
 	{
 		/* pretty sure this is VBLANK */
-		m_real3d_status &= ~0x0000000200000000U;
+		result &= ~0x02000000;
 		if (m_screen->vblank())
-			m_real3d_status |= 0x0000000200000000U;
-		return m_real3d_status;
+		{
+			result |= 0x02000000;
+		}
 	}
-	return m_real3d_status;
+	return result;
+}
+
+u32 model3_state::real3d_dma_status_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_dma_status ^= 0xffffffff;
+	}
+	return m_dma_status;
 }
 
 /* SCSP interface */
@@ -1634,26 +1132,19 @@ void model3_state::model3_sound_w(offs_t offset, uint8_t data)
 	}
 }
 
-void model3_state::daytona2_rombank_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+void model3_state::daytona2_rombank_w(u8 bank)
 {
-	if (ACCESSING_BITS_56_63)
-	{
-		data >>= 56;
-		data = (~data) & 0xf;
-		m_bank_crom->set_base(memregion( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
-		m_bank2->set_base(memregion( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
-	}
+	m_bank_crom->set_entry(bank);
 }
 
 void model3_state::model3_10_mem(address_map &map)
 {
-	map(0x00000000, 0x007fffff).ram().share("work_ram");    /* work RAM */
+	map(0x00000000, 0x007fffff).ram().share("work_ram");
+	model3_board_mem(map);
+}
 
-	map(0x84000000, 0x8400003f).r(FUNC(model3_state::real3d_status_r));
-	map(0x88000000, 0x88000007).w(FUNC(model3_state::real3d_cmd_w));
-	map(0x8e000000, 0x8e0fffff).w(FUNC(model3_state::real3d_display_list_w));
-	map(0x98000000, 0x980fffff).w(FUNC(model3_state::real3d_polygon_ram_w));
-
+void model3_state::model3_board_mem(address_map &map)
+{
 	map(0xf0040000, 0xf004003f).mirror(0x0e000000).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask64(0xff000000ff000000);
 	map(0xf0080000, 0xf008ffff).mirror(0x0e000000).r(m_uart, FUNC(i8251_device::read)).w(FUNC(model3_state::model3_sound_w));
 	map(0xf00c0000, 0xf00dffff).mirror(0x0e000000).ram().share("backup");    /* backup SRAM */
@@ -1666,6 +1157,7 @@ void model3_state::model3_10_mem(address_map &map)
 	map(0xf1180000, 0xf11800ff).rw(FUNC(model3_state::model3_vid_reg_r), FUNC(model3_state::model3_vid_reg_w));
 
 	map(0xff800000, 0xffffffff).rom().region("user1", 0);
+	map(0xff000000, 0xff7fffff).bankr(m_bank_crom);
 }
 
 void model3_state::model3_mem(address_map &map)
@@ -1677,7 +1169,12 @@ void model3_state::model3_mem(address_map &map)
 void model3_state::model3_5881_mem(address_map &map)
 {
 	model3_mem(map);
-	map(0xf0180000, 0xf019ffff).mirror(0x0e000000).ram();
+	model3_crypt_mem(map);
+}
+
+void model3_state::model3_crypt_mem(address_map &map)
+{
+	map(0xf0180000, 0xf019ffff).mirror(0x0e000000).ram().share("crypt_ram");
 	map(0xf01a0000, 0xf01a003f).mirror(0x0e000000).m(m_cryptdevice, FUNC(sega_315_5881_crypt_device::iomap_64be));
 }
 
@@ -6380,15 +5877,33 @@ void model3_state::add_base_devices(machine_config &config)
 	config.set_default_layout(layout_segabill);
 }
 
-void model3_state::add_scsi_devices(machine_config &config)
+void model3_state::add_pci_devices(machine_config &config, model3_real3d_pci_device::step step)
 {
-	SCSI_PORT(config, "scsi");
-
-	LSI53C810(config, m_lsi53c810);
-	m_lsi53c810->set_irq_callback(FUNC(model3_state::scsi_irq_callback));
-	m_lsi53c810->set_dma_callback(FUNC(model3_state::real3d_dma_callback));
-	m_lsi53c810->set_fetch_callback(FUNC(model3_state::scsi_fetch));
-	m_lsi53c810->set_scsi_port("scsi");
+	auto &root = PCI_ROOT(config, "pci");
+	root.set_pin_mapper(pci_pin_mapper(*this, FUNC(model3_state::map_pci_pin)));
+	root.set_irq_handler(pci_irq_handler(*this, FUNC(model3_state::pci_irq)));
+	if (step < model3_real3d_pci_device::step::STEP_2_0)
+	{
+		MPC105(config, m_host, mpc10x_host_device::MAP_TYPE_B, m_maincpu, nullptr);
+		NCR53C810_PCI(config, "pci:0e.0", 33'000'000).set_irq_map(0);
+		MODEL3_REAL3D_PCI(config, m_graphics);
+	}
+	else
+	{
+		MPC106(config, m_host, mpc10x_host_device::MAP_TYPE_B, m_maincpu, nullptr);
+		auto &dma = MODEL3_REAL3D_DMA_PCI(config, "pci:0d.0");
+		dma.set_irq_map(0);
+		dma.status_query_callback().set(FUNC(model3_state::real3d_dma_status_r));
+		m_graphics.set_tag(dma.graphics());
+		m_graphics = dma.graphics();
+	}
+	m_graphics->set_step(step);
+	m_graphics->status_callback().set(FUNC(model3_state::real3d_status_r));
+	MODEL3_REAL3D_RENDERER(config, m_render_adapter);
+	m_render_adapter->set_graphics(*m_graphics);
+	m_render_adapter->set_sync_callback(FUNC(model3_state::real3d_sync));
+	m_render_adapter->set_invalidate_callback(FUNC(model3_state::real3d_invalidate));
+	m_render_adapter->set_submit_callback(FUNC(model3_state::real3d_submit));
 }
 
 void model3_state::add_crypt_devices(machine_config &config)
@@ -6403,11 +5918,10 @@ void model3_state::model3_10(machine_config &config)
 {
 	add_cpu_66mhz(config);
 	add_base_devices(config);
-	add_scsi_devices(config);
+	add_pci_devices(config, model3_real3d_pci_device::step::STEP_1_0);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_10)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_10)
 }
 
@@ -6449,9 +5963,8 @@ void model3_state::model3_15(machine_config &config)
 {
 	add_cpu_100mhz(config);
 	add_base_devices(config);
-	add_scsi_devices(config);
+	add_pci_devices(config, model3_real3d_pci_device::step::STEP_1_5);
 
-	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_15)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_15)
 
 	M3COMM(config, "comm_board");
@@ -6485,8 +5998,8 @@ void model3_state::model3_20(machine_config &config)
 {
 	add_cpu_166mhz(config);
 	add_base_devices(config);
+	add_pci_devices(config, model3_real3d_pci_device::step::STEP_2_0);
 
-	MCFG_MACHINE_START_OVERRIDE(model3_state, model3_20)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state, model3_20)
 
 	M3COMM(config, "comm_board");
@@ -6508,8 +6021,8 @@ void model3_state::model3_21(machine_config &config)
 {
 	add_cpu_166mhz(config);
 	add_base_devices(config);
+	add_pci_devices(config, model3_real3d_pci_device::step::STEP_2_1);
 
-	MCFG_MACHINE_START_OVERRIDE(model3_state, model3_21)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state, model3_21)
 
 	M3COMM(config, "comm_board");
@@ -6531,6 +6044,10 @@ void model3_state::daytona2(machine_config &config)
 {
 	model3_21_5881(config);
 	dsb2_config(config);
+
+	model3_rom_pci_device &rom = MODEL3_ROM_PCI(config, "pci:10.0");
+	rom.set_rom_tag("user1");
+	rom.bank_callback().set(FUNC(model3_state::daytona2_rombank_w));
 }
 
 void model3_state::spikeout(machine_config &config)
@@ -6579,44 +6096,22 @@ void model3_state::interleave_vroms()
 			vrom[i + x + 8] = vrom2[(j + x) ^ 1];
 		}
 	}
+	m_graphics->set_vrom({m_vrom.get(), 0x4000000 / 4});
 }
-
 
 void model3_state::init_model3_10()
 {
 	interleave_vroms();
-
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc0000000, 0xc00000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
-
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, m_bank_crom);
-
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64s_delegate(*this, FUNC(model3_state::mpc105_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc105_addr_w)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf0c00cf8, 0xf0c00cff, read64smo_delegate(*this, FUNC(model3_state::mpc105_data_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf0c00cf8, 0xf0c00cff, write64s_delegate(*this, FUNC(model3_state::mpc105_data_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64sm_delegate(*this, FUNC(model3_state::mpc105_reg_r)), write64sm_delegate(*this, FUNC(model3_state::mpc105_reg_w)));
 }
 
 void model3_state::init_model3_15()
 {
 	interleave_vroms();
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, m_bank_crom);
-
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64s_delegate(*this, FUNC(model3_state::mpc105_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc105_addr_w)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf0c00cf8, 0xf0c00cff, read64smo_delegate(*this, FUNC(model3_state::mpc105_data_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf0c00cf8, 0xf0c00cff, write64s_delegate(*this, FUNC(model3_state::mpc105_data_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64sm_delegate(*this, FUNC(model3_state::mpc105_reg_r)), write64sm_delegate(*this, FUNC(model3_state::mpc105_reg_w)));
 }
 
 void model3_state::init_model3_20()
 {
 	interleave_vroms();
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, m_bank_crom);
-
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc2000000, 0xc20000ff, read64s_delegate(*this, FUNC(model3_state::real3d_dma_r)), write64s_delegate(*this, FUNC(model3_state::real3d_dma_w)));
-
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64s_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64s_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_data_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64sm_delegate(*this, FUNC(model3_state::mpc106_reg_r)), write64sm_delegate(*this, FUNC(model3_state::mpc106_reg_w)));
 }
 
 void model3_state::init_lostwsga()
@@ -6624,7 +6119,6 @@ void model3_state::init_lostwsga()
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 
 	init_model3_15();
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 
 	// HACK: get rid of this
 	// This seems to be an actual bug in the original code (? -AS)
@@ -6635,7 +6129,6 @@ void model3_state::init_scud()
 {
 	init_model3_15();
 	/* TODO: network device at 0xC0000000 - FF */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 
 //  uint32_t *rom = (uint32_t*)memregion("user1")->base();
 //  rom[(0x799de8^4)/4] = 0x00050208;       // secret debug menu
@@ -6644,20 +6137,16 @@ void model3_state::init_scud()
 void model3_state::init_scudplus()
 {
 	init_model3_15();
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 }
 
 void model3_state::init_scudplusa()
 {
 	init_model3_15();
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 }
 
 void model3_state::init_lemans24()
 {
 	init_model3_15();
-
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 
 //  rom[(0x73fe38^4)/4] = 0x38840004;       /* This seems to be an actual bug in the original code */
 }
@@ -6677,60 +6166,16 @@ void model3_state::init_vf3()
 	*/
 }
 
-void model3_state::init_vs215()
-{
-	m_step15_with_mpc106 = true;
-
-	interleave_vroms();
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, m_bank_crom );
-
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
-
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64s_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64s_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64s_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_data_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64s_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_data_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64sm_delegate(*this, FUNC(model3_state::mpc106_reg_r)), write64sm_delegate(*this, FUNC(model3_state::mpc106_reg_w)));
-}
-
 void model3_state::init_vs29815()
 {
-	m_step15_with_mpc106 = true;
-
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 
 	// HACK: what's this for?
 	rom[(0x6028ec^4)/4] = 0x60000000;
 	rom[(0x60290c^4)/4] = 0x60000000;
 
-	interleave_vroms();
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, m_bank_crom );
-
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
-
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64s_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64s_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64s_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_data_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64s_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_data_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64sm_delegate(*this, FUNC(model3_state::mpc106_reg_r)), write64sm_delegate(*this, FUNC(model3_state::mpc106_reg_w)));
+	init_model3_15();
 }
-
-void model3_state::init_bass()
-{
-	m_step15_with_mpc106 = true;
-
-	interleave_vroms();
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, m_bank_crom );
-
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
-
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64s_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec00000, 0xfedfffff, read64s_delegate(*this, FUNC(model3_state::mpc106_addr_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_addr_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0c00cf8, 0xf0c00cff, read64s_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_data_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfee00000, 0xfeffffff, read64s_delegate(*this, FUNC(model3_state::mpc106_data_r)), write64s_delegate(*this, FUNC(model3_state::mpc106_data_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64sm_delegate(*this, FUNC(model3_state::mpc106_reg_r)), write64sm_delegate(*this, FUNC(model3_state::mpc106_reg_w)));
-}
-
 
 void model3_state::init_vs2()
 {
@@ -6828,51 +6273,6 @@ void model3_state::init_swtrilgyp()
 	rom[(0x02998^4)/4] = 0x60000000;
 }
 
-void model3_state::init_von2()
-{
-	m_step20_with_old_real3d = true;
-
-	init_model3_20();
-}
-
-void model3_state::init_dirtdvls()
-{
-	m_step20_with_old_real3d = true;
-
-	init_model3_20();
-}
-
-void model3_state::init_daytona2()
-{
-//  uint32_t *rom = (uint32_t*)memregion("user1")->base();
-	init_model3_20();
-
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc3800000, 0xc3800007, write64s_delegate(*this, FUNC(model3_state::daytona2_rombank_w)));
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc3000000, 0xc37fffff, m_bank2);
-
-	// TODO: what's this for?
-	//rom[(0x68468c^4)/4] = 0x60000000;
-	//rom[(0x6063c4^4)/4] = 0x60000000;
-	//rom[(0x616434^4)/4] = 0x60000000;
-	//rom[(0x69f4e4^4)/4] = 0x60000000;
-}
-
-void model3_state::init_dayto2pe()
-{
-//  uint32_t *rom = (uint32_t*)memregion("user1")->base();
-	init_model3_20();
-
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc3800000, 0xc3800007, write64s_delegate(*this, FUNC(model3_state::daytona2_rombank_w)));
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc3000000, 0xc37fffff, m_bank2);
-
-	// TODO: what's this for?
-//  rom[(0x606784^4)/4] = 0x60000000;
-//  rom[(0x69a3fc^4)/4] = 0x60000000;       // jump to encrypted code
-//  rom[(0x618b28^4)/4] = 0x60000000;       // jump to encrypted code
-
-//  rom[(0x64ca34^4)/4] = 0x60000000;       // dec
-}
-
 void model3_state::init_spikeout()
 {
 	init_model3_20();
@@ -6922,30 +6322,15 @@ void model3_state::init_oceanhun()
 	//rom[(0x57995c^4)/4] = 0x60000000;   // decrementer
 }
 
-void model3_state::init_magtruck()
-{
-	m_step20_with_old_real3d = true;
-
-	init_model3_20();
-}
-
-void model3_state::init_lamachin()
-{
-	m_step20_with_old_real3d = true;
-
-	init_model3_20();
-}
-
-
 /* Model 3 Step 1.0 */
 GAME( 1996, vf3,        0,        model3_10,      model3,   model3_state, init_vf3,       ROT0, "Sega", "Virtua Fighter 3 (Revision D)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, U.S.A., Export, Asia
 GAME( 1996, vf3c,       vf3,      model3_10,      model3,   model3_state, init_vf3,       ROT0, "Sega", "Virtua Fighter 3 (Revision C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, U.S.A., Export, Asia
 GAME( 1996, vf3a,       vf3,      model3_10,      model3,   model3_state, init_vf3,       ROT0, "Sega", "Virtua Fighter 3 (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, U.S.A., Export
 GAME( 1996, vf3tb,      vf3,      model3_10,      model3,   model3_state, init_model3_10, ROT0, "Sega", "Virtua Fighter 3 Team Battle", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, U.S.A., Export, Asia
-GAME( 1997, bassdx,     0,        model3_10,      bass,     model3_state, init_bass,      ROT0, "Sega", "Sega Bass Fishing Deluxe", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, getbassdx,  bassdx,   model3_10,      bass,     model3_state, init_bass,      ROT0, "Sega", "Get Bass: Sega Bass Fishing Deluxe", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, getbassur,  bassdx,   model3_10,      bass,     model3_state, init_bass,      ROT0, "Sega", "Get Bass: Sega Bass Fishing Upright", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, getbass,    bassdx,   getbass,        bass,     model3_state, init_bass,      ROT0, "Sega", "Get Bass: Sega Bass Fishing", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, bassdx,     0,        model3_10,      bass,     model3_state, init_model3_10, ROT0, "Sega", "Sega Bass Fishing Deluxe", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, getbassdx,  bassdx,   model3_10,      bass,     model3_state, init_model3_10, ROT0, "Sega", "Get Bass: Sega Bass Fishing Deluxe", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, getbassur,  bassdx,   model3_10,      bass,     model3_state, init_model3_10, ROT0, "Sega", "Get Bass: Sega Bass Fishing Upright", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, getbass,    bassdx,   getbass,        bass,     model3_state, init_model3_10, ROT0, "Sega", "Get Bass: Sega Bass Fishing", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* Model 3 Step 1.5 */
 GAME( 1996, scud,       0,        scud,           scud,     model3_state, init_scud,      ROT0, "Sega", "Scud Race / Sega Super GT - Twin/DX", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export
@@ -6956,19 +6341,19 @@ GAME( 1997, scudplus,   scud,     scud,           scud,     model3_state, init_s
 GAME( 1997, scudplusa,  scud,     scud,           scud,     model3_state, init_scudplusa, ROT0, "Sega", "Scud Race Plus / Sega Super GT Plus - Twin/DX", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export
 GAME( 1997, lostwsga,   0,        lostwsga,       lostwsga, model3_state, init_lostwsga,  ROT0, "Sega", "The Lost World: Jurassic Park (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, lostwsgp,   lostwsga, lostwsga,       lostwsga, model3_state, init_lostwsga,  ROT0, "Sega", "The Lost World: Jurassic Park (location test)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Export, Koala
-GAME( 1997, vs215,      vs2,      model3_15,      model3,   model3_state, init_vs215,     ROT0, "Sega", "Virtua Striker 2 (Step 1.5, Export, USA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, vs215o,     vs2,      model3_15,      model3,   model3_state, init_vs215,     ROT0, "Sega", "Virtua Striker 2 (Step 1.5, Japan, test/debug?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // test/debug version with render/CPU data displayed on screen
+GAME( 1997, vs215,      vs2,      model3_15,      model3,   model3_state, init_model3_15, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, Export, USA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, vs215o,     vs2,      model3_15,      model3,   model3_state, init_model3_15, ROT0, "Sega", "Virtua Striker 2 (Step 1.5, Japan, test/debug?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // test/debug version with render/CPU data displayed on screen
 GAME( 1997, lemans24,   0,        model3_15,      scud,     model3_state, init_lemans24,  ROT0, "Sega", "Le Mans 24 (Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, vs29815,    vs298,    model3_15,      model3,   model3_state, init_vs29815,   ROT0, "Sega", "Virtua Striker 2 '98 (Step 1.5)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, vs29915,    vs2v991,  model3_15,      model3,   model3_state, init_vs215,     ROT0, "Sega", "Virtua Striker 2 '99.1 (Step 1.5, Export, USA, Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows Virtua Striker 2 Version '99.1 icon during demo
-GAME( 1998, vs29915a,   vs2v991,  model3_15,      model3,   model3_state, init_vs215,     ROT0, "Sega", "Virtua Striker 2 '99 (Step 1.5, Export, USA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, vs29915j,   vs2v991,  model3_15,      model3,   model3_state, init_vs215,     ROT0, "Sega", "Virtua Striker 2 '99.1 (Step 1.5, Japan, Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows Virtua Striker 2 Version '99.1 icon during demo
+GAME( 1998, vs29915,    vs2v991,  model3_15,      model3,   model3_state, init_model3_15, ROT0, "Sega", "Virtua Striker 2 '99.1 (Step 1.5, Export, USA, Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows Virtua Striker 2 Version '99.1 icon during demo
+GAME( 1998, vs29915a,   vs2v991,  model3_15,      model3,   model3_state, init_model3_15, ROT0, "Sega", "Virtua Striker 2 '99 (Step 1.5, Export, USA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, vs29915j,   vs2v991,  model3_15,      model3,   model3_state, init_model3_15, ROT0, "Sega", "Virtua Striker 2 '99.1 (Step 1.5, Japan, Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows Virtua Striker 2 Version '99.1 icon during demo
 
 /* Model 3 Step 2.0 */
 GAME( 1997, vs2,        0,        model3_20,      model3,   model3_state, init_vs2,       ROT0, "Sega", "Virtua Striker 2 (Step 2.0, Export, USA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, harley,     0,        model3_20,      harley,   model3_state, init_harley,    ROT0, "Sega", "Harley-Davidson and L.A. Riders (Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, harleya,    harley,   model3_20,      harley,   model3_state, init_harleya,   ROT0, "Sega", "Harley-Davidson and L.A. Riders (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, lamachin,   0,        model3_20_5881, model3,   model3_state, init_lamachin,  ROT0, "Sega", "L.A. Machineguns", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, lamachin,   0,        model3_20_5881, model3,   model3_state, init_model3_20, ROT0, "Sega", "L.A. Machineguns", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, oceanhun,   0,        model3_20_5881, model3,   model3_state, init_oceanhun,  ROT0, "Sega", "The Ocean Hunter (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, oceanhuna,  oceanhun, model3_20_5881, model3,   model3_state, init_oceanhun,  ROT0, "Sega", "The Ocean Hunter", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, skichamp,   0,        model3_20,      skichamp, model3_state, init_skichamp,  ROT0, "Sega", "Ski Champ", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -6976,10 +6361,10 @@ GAME( 1998, srally2,    0,        srally2,        scud,     model3_state, init_s
 GAME( 1998, srally2p,   srally2,  srally2,        scud,     model3_state, init_model3_20, ROT0, "Sega", "Sega Rally 2: Sega Rally Championship (prototype, 29 Dec 1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need specific JTAG access patches
 GAME( 1998, srally2pa,  srally2,  srally2,        scud,     model3_state, init_model3_20, ROT0, "Sega", "Sega Rally 2: Sega Rally Championship (prototype, 8 Dec 1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need specific JTAG access patches
 GAME( 1998, srally2dx,  srally2,  model3_20,      scud,     model3_state, init_model3_20, ROT0, "Sega", "Sega Rally 2: Sega Rally Championship Deluxe", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need specific JTAG access patches
-GAME( 1998, von2,       0,        model3_20_5881, von2,     model3_state, init_von2,      ROT0, "Sega", "Cyber Troopers Virtual-On: Oratorio Tangram (Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // No region specified or selectable
-GAME( 1998, von2a,      von2,     model3_20_5881, von2,     model3_state, init_von2,      ROT0, "Sega", "Cyber Troopers Virtual-On: Oratorio Tangram (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // No region specified or selectable
-GAME( 1998, von2o,      von2,     model3_20_5881, von2,     model3_state, init_von2,      ROT0, "Sega", "Cyber Troopers Virtual-On: Oratorio Tangram", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // No region specified or selectable
-GAME( 1998, von254g,    von2,     model3_20_5881, von2,     model3_state, init_von2,      ROT0, "Sega", "Cyber Troopers Virtual-On: Oratorio Tangram M.S.B.S. ver 5.4", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // No region specified or selectable
+GAME( 1998, von2,       0,        model3_20_5881, von2,     model3_state, init_model3_20, ROT0, "Sega", "Cyber Troopers Virtual-On: Oratorio Tangram (Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // No region specified or selectable
+GAME( 1998, von2a,      von2,     model3_20_5881, von2,     model3_state, init_model3_20, ROT0, "Sega", "Cyber Troopers Virtual-On: Oratorio Tangram (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // No region specified or selectable
+GAME( 1998, von2o,      von2,     model3_20_5881, von2,     model3_state, init_model3_20, ROT0, "Sega", "Cyber Troopers Virtual-On: Oratorio Tangram", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // No region specified or selectable
+GAME( 1998, von254g,    von2,     model3_20_5881, von2,     model3_state, init_model3_20, ROT0, "Sega", "Cyber Troopers Virtual-On: Oratorio Tangram M.S.B.S. ver 5.4", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // No region specified or selectable
 GAME( 1998, fvipers2,   0,        model3_20_5881, model3,   model3_state, init_vs299,     ROT0, "Sega", "Fighting Vipers 2 (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, fvipers2o,  fvipers2, model3_20_5881, model3,   model3_state, init_vs299,     ROT0, "Sega", "Fighting Vipers 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, vs298,      0,        model3_20_5881, model3,   model3_state, init_vs298,     ROT0, "Sega", "Virtua Striker 2 '98 (Step 2.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -6989,19 +6374,19 @@ GAME( 1998, vs299,      vs2v991,  model3_20_5881, model3,   model3_state, init_v
 GAME( 1998, vs299j,     vs2v991,  model3_20_5881, model3,   model3_state, init_vs299,     ROT0, "Sega", "Virtua Striker 2 '99.1 (Japan, Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows Virtua Striker 2 Version '99.1 icon during demo
 
 /* Model 3 Step 2.1 */
-GAME( 1998, daytona2,   0,        daytona2,       daytona2, model3_state, init_daytona2,  ROT0, "Sega", "Daytona USA 2: Battle on the Edge (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, dayto2pe,   0,        daytona2,       daytona2, model3_state, init_dayto2pe,  ROT0, "Sega", "Daytona USA 2: Power Edition", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, dirtdvls,   0,        model3_21_5881, scud,     model3_state, init_dirtdvls,  ROT0, "Sega", "Dirt Devils (Export, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, dirtdvlsu,  dirtdvls, model3_21_5881, scud,     model3_state, init_dirtdvls,  ROT0, "Sega", "Dirt Devils (USA, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, dirtdvlsau, dirtdvls, model3_21_5881, scud,     model3_state, init_dirtdvls,  ROT0, "Sega", "Dirt Devils (Australia, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, dirtdvlsj,  dirtdvls, model3_21_5881, scud,     model3_state, init_dirtdvls,  ROT0, "Sega", "Dirt Devils (Japan, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, dirtdvlsg,  dirtdvls, model3_21_5881, scud,     model3_state, init_dirtdvls,  ROT0, "Sega", "Dirt Devils (Export, Ver. G?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Game Assignments shows EXPORT
+GAME( 1998, daytona2,   0,        daytona2,       daytona2, model3_state, init_model3_20, ROT0, "Sega", "Daytona USA 2: Battle on the Edge (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, dayto2pe,   0,        daytona2,       daytona2, model3_state, init_model3_20, ROT0, "Sega", "Daytona USA 2: Power Edition", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, dirtdvls,   0,        model3_21_5881, scud,     model3_state, init_model3_20, ROT0, "Sega", "Dirt Devils (Export, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, dirtdvlsu,  dirtdvls, model3_21_5881, scud,     model3_state, init_model3_20, ROT0, "Sega", "Dirt Devils (USA, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, dirtdvlsau, dirtdvls, model3_21_5881, scud,     model3_state, init_model3_20, ROT0, "Sega", "Dirt Devils (Australia, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, dirtdvlsj,  dirtdvls, model3_21_5881, scud,     model3_state, init_model3_20, ROT0, "Sega", "Dirt Devils (Japan, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, dirtdvlsg,  dirtdvls, model3_21_5881, scud,     model3_state, init_model3_20, ROT0, "Sega", "Dirt Devils (Export, Ver. G?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Game Assignments shows EXPORT
 GAME( 1998, swtrilgy,   0,        swtrilgy,       swtrilgy, model3_state, init_swtrilgy,  ROT0, "Sega / LucasArts", "Star Wars Trilogy Arcade (Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, swtrilgya,  swtrilgy, swtrilgy,       swtrilgy, model3_state, init_swtrilga,  ROT0, "Sega / LucasArts", "Star Wars Trilogy Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, swtrilgyp,  swtrilgy, swtrilgyp,      swtrilgy, model3_state, init_swtrilgyp, ROT0, "Sega / LucasArts", "Star Wars Trilogy Arcade (location test, 16.09.98)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Australia, Korea, Export
 GAME( 1998, spikeout,   0,        spikeout,       model3,   model3_state, init_spikeout,  ROT0, "Sega", "Spikeout (Revision C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, spikeofe,   0,        spikeout,       model3,   model3_state, init_spikeofe,  ROT0, "Sega", "Spikeout Final Edition", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, magtruck,   0,        model3_21_5881, eca,      model3_state, init_magtruck,  ROT0, "Sega", "Magical Truck Adventure (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, magtruck,   0,        model3_21_5881, eca,      model3_state, init_model3_20, ROT0, "Sega", "Magical Truck Adventure (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, eca,        0,        model3_21_5881, eca,      model3_state, init_eca,       ROT0, "Sega", "Emergency Call Ambulance (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, ecaj,       eca,      model3_21_5881, eca,      model3_state, init_eca,       ROT0, "Sega", "Emergency Call Ambulance (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, ecau,       eca,      model3_21_5881, eca,      model3_state, init_eca,       ROT0, "Sega", "Emergency Call Ambulance (USA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

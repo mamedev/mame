@@ -34,6 +34,7 @@
 
 // interrupt types
 #define PPC_IRQ                 0       /* external IRQ */
+#define PPC_SMI                 1       /* (603 family) system management interrupt */
 #define PPC_IRQ_LINE_0          0       /* (4XX) external IRQ0 */
 #define PPC_IRQ_LINE_1          1       /* (4XX) external IRQ1 */
 #define PPC_IRQ_LINE_2          2       /* (4XX) external IRQ2 */
@@ -328,6 +329,7 @@ protected:
 		EXCEPTION_ITLBMISS      = 16,       // PPCCAP_603_MMU
 		EXCEPTION_DTLBMISSL     = 17,       // PPCCAP_603_MMU
 		EXCEPTION_DTLBMISSS     = 18,       // PPCCAP_603_MMU
+		EXCEPTION_SMI           = 20,       // 603 family
 		EXCEPTION_COUNT
 	};
 

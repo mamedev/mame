@@ -3425,8 +3425,6 @@ if BUSES["LPCI"] then
 		MAME_DIR .. "src/devices/bus/lpci/northbridge.h",
 		MAME_DIR .. "src/devices/bus/lpci/southbridge.cpp",
 		MAME_DIR .. "src/devices/bus/lpci/southbridge.h",
-		MAME_DIR .. "src/devices/bus/lpci/mpc105.cpp",
-		MAME_DIR .. "src/devices/bus/lpci/mpc105.h",
 		MAME_DIR .. "src/devices/bus/lpci/vt82c505.cpp",
 		MAME_DIR .. "src/devices/bus/lpci/vt82c505.h",
 	}
@@ -4780,6 +4778,8 @@ if BUSES["PCI"] then
 		MAME_DIR .. "src/devices/bus/pci/geforce.h",
 		MAME_DIR .. "src/devices/bus/pci/mga2064w.cpp",
 		MAME_DIR .. "src/devices/bus/pci/mga2064w.h",
+		MAME_DIR .. "src/devices/bus/pci/ncr53c810.cpp",
+		MAME_DIR .. "src/devices/bus/pci/ncr53c810.h",
 		MAME_DIR .. "src/devices/bus/pci/ncr53c825.cpp",
 		MAME_DIR .. "src/devices/bus/pci/ncr53c825.h",
 		MAME_DIR .. "src/devices/bus/pci/neon250.cpp",
