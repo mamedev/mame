@@ -2288,7 +2288,7 @@ void tms320c3x_device::mpyi_imm(uint32_t op)
 	if (!OVM() || !OVERFLOW_SUB(0,src,_res))                        \
 		IREG(dreg) = _res;                                          \
 	else                                                            \
-		IREG(dreg) = ((int32_t)src < 0) ? 0x80000000 : 0x7fffffff;    \
+		IREG(dreg) = ((int32_t)src < 0) ? 0x7fffffff : 0x80000000;    \
 	if (dreg < 8)                                                   \
 	{                                                               \
 		uint32_t tempc = IREG(TMR_ST) & CFLAG;                        \
@@ -2368,7 +2368,7 @@ void tms320c3x_device::negf_imm(uint32_t op)
 	if (!OVM() || !OVERFLOW_SUB(0,src,_res))                        \
 		IREG(dreg) = _res;                                          \
 	else                                                            \
-		IREG(dreg) = ((int32_t)src < 0) ? 0x80000000 : 0x7fffffff;    \
+		IREG(dreg) = ((int32_t)src < 0) ? 0x7fffffff : 0x80000000;    \
 	if (dreg < 8)                                                   \
 	{                                                               \
 		CLR_NZCVUF();                                               \
