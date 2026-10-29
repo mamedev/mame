@@ -372,7 +372,8 @@ void vt220_state::set_columns()
 	const int htotal = (m_132col ? 164 : 99) * width;
 	const int hstart = (m_132col ? 22 : 12) * width; // horizontal delay as programmed
 	const int hvis = (m_132col ? 132 : 80) * width;
-	m_screen->configure(htotal, 260, rectangle(hstart, hstart + hvis - 1, 0, 240 - 1), attotime::from_ticks(htotal * 260, dot));
+	const int vstart = 16; // vertical delay as programmed (R05 - 1), then 24 rows of 10 scan lines
+	m_screen->configure(htotal, 260, rectangle(hstart, hstart + hvis - 1, vstart, vstart + 240 - 1), attotime::from_ticks(htotal * 260, dot));
 	m_crtc->set_unscaled_clock(dot / width);
 	m_crtc->set_character_width(width);
 }
@@ -524,7 +525,7 @@ void vt220_state::vt220a(machine_config &config)
 	m_crtc->set_addrmap(0, &vt220_state::vt220a_vram);
 	m_crtc->set_character_width(10);
 	m_crtc->set_screen(m_screen);
-	m_screen->set_raw(15.288_MHz_XTAL, 990, 120, 920, 260, 0, 240);
+	m_screen->set_raw(15.288_MHz_XTAL, 990, 120, 920, 260, 16, 256);
 	m_crtc->vs_callback().set_inputline(m_maincpu, MCS51_T0_LINE);
 	m_crtc->hs_callback().set_inputline(m_maincpu, MCS51_T1_LINE);
 	m_crtc->drb_callback().set(FUNC(vt220_state::drb_w));
