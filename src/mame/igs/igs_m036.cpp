@@ -354,7 +354,7 @@ ROM_END
 ROM_START( qhzb ) // PCB-0701-01-IU
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "qhzb_igs036", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "qhzb_igs036.bin", 0x00000, 0x4000, CRC(b294079b) SHA1(5f1e63e302497fd8c9144fbc5c128cac215b28ec) ) // same of slqzsp, but both were dumped from the correct game
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v100cn_u18.u18", 0x000000, 0x200000, CRC(8c2733b7) SHA1(226768eead8d7754b2468384e5e691812d0ac96d) )
@@ -978,7 +978,7 @@ GAME( 201?, hyleyuan, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<hyl
 
 GAME( 201?, xcjnh,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<xcjnh_key>,    ROT0, "IGS",           "Xiaochou Jianianhua (S100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 201?, hlqqq,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036,          ROT0, "IGS",           "Huanle Qiao Qiao Qiao (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 201?, hlqqq,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<hlqqq_key>,    ROT0, "IGS",           "Huanle Qiao Qiao Qiao (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 201?, qiaojidm, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036,          ROT0, "IGS",           "Qiaoji Da Maoxian (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
