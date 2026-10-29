@@ -23,13 +23,11 @@ TODO:
   (to access the bonus round take out the targets on the middle-left then hit
    the ball into one of the portals at the top left)
 
-
 - dump color PROM
 - some unknown DSW and inputs
 - hopper
 - unknown writes
 - measure clocks
-
 
 *****************************************************************************************/
 
@@ -164,7 +162,7 @@ uint32_t superwng_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		m_tilemap[1]->draw(screen, bitmap, tmp, 0, 0);
 	}
 
-	//sprites
+	// sprites
 	for (int i = 0x3e; i >= 0; i -= 2)
 	{
 		/*      76543210
@@ -446,10 +444,10 @@ void superwng_state::superwng(machine_config &config)
 	static constexpr XTAL MASTER_CLOCK = 18.432_MHz_XTAL;
 
 	// basic machine hardware
-	Z80(config, m_maincpu, MASTER_CLOCK / 4);
+	Z80(config, m_maincpu, MASTER_CLOCK / 6); // LH0080A
 	m_maincpu->set_addrmap(AS_PROGRAM, &superwng_state::main_map);
 
-	Z80(config, m_audiocpu, MASTER_CLOCK / 4);
+	Z80(config, m_audiocpu, MASTER_CLOCK / 12); // LH0080
 	m_audiocpu->set_addrmap(AS_PROGRAM, &superwng_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(superwng_state::sound_nmi_assert), attotime::from_hz(4 * 60));
 
@@ -469,6 +467,7 @@ void superwng_state::superwng(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(superwng_state::palette), 0x40);
 
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	ay8910_device &ay1(AY8910(config, "ay1", MASTER_CLOCK / 12));
