@@ -397,6 +397,7 @@ std::string expression_error::code_string() const
 		case SRCDBG_UNAVAILABLE:            return "source-level debugging information is unavailable; '" OPTION_SRCDBGINFO "' option required";
 		case SRCDBG_FILE_UNAVAILABLE:       return "specified file path does not uniquely identify a source path from the source-level debugging information";
 		case SRCDBG_FILE_LINE_UNAVAILABLE:  return "specified file path was found, but no address is attributed to specified line number";
+		case SRCDBG_VAR_UNAVAILABLE:        return "specified source-level variable is out of scope or its debugging information is disabled";
 		default:                            return "unknown error";
 	}
 }

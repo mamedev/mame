@@ -41,7 +41,7 @@ std::error_condition line_indexed_file::open(const char * file_path, int spaces_
 	}
 
 	unsigned int cur_line_start = 0;
-	for (unsigned int i = 0; i < m_data.size() - 1; i++)                 // Ignore final char, enable [i+1] in body
+	for (unsigned int i = 0; i + 1 < m_data.size(); i++)                 // Ignore final char, enable [i+1] in body
 	{
 		// Replace tabs with spaces for more consistent alignment
 		if (m_data[i] == '\t')

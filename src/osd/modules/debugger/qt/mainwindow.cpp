@@ -628,6 +628,11 @@ void SrcdbgDockWidget::populateSrcdbgCombo()
 	m_srcdbgCombo->clear();
 	const debug_view_sourcecode *dvSource = downcast<debug_view_sourcecode*>(m_srcdbgView->view());
 	const srcdbg_info * debugInfo = dvSource->get_srcdbg_info();
+	if (debugInfo == nullptr)
+	{
+		return;
+	}
+
 	std::size_t numFiles = debugInfo->num_files();
 	for (std::size_t i = 0; i < numFiles; i++)
 	{

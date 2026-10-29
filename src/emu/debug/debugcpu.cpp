@@ -42,6 +42,18 @@
 
 const size_t debugger_cpu::NUM_TEMP_VARIABLES = 10;
 
+// Common validation code for the stepping methods
+#define REQUIRE_SRCDBG_FOR_SOURCE_STEPPING()    \
+	do \
+	{ \
+		if (source_stepping && m_device.machine().debugger().get_srcdbg_info() == nullptr) \
+		{ \
+			m_device.machine().debugger().console().printf("Source-level debugging is not active.\nSpecify option '" OPTION_SRCDBGINFO "' to enable.\n"); \
+			return; \
+		} \
+	} while(0)
+
+
 /*-------------------------------------------------
     constructor - initialize the CPU
     information for debugging
@@ -1215,6 +1227,8 @@ void device_debug::single_step(int numsteps, bool source_stepping)
 {
 	assert(m_exec != nullptr);
 
+	REQUIRE_SRCDBG_FOR_SOURCE_STEPPING();
+
 	m_device.machine().rewind_capture();
 	m_stepsleft = numsteps;
 	m_delay_steps = 0;
@@ -1237,6 +1251,8 @@ void device_debug::single_step_over(int numsteps, bool source_stepping)
 {
 	assert(m_exec != nullptr);
 
+	REQUIRE_SRCDBG_FOR_SOURCE_STEPPING();
+
 	m_device.machine().rewind_capture();
 	m_stepsleft = numsteps;
 	m_delay_steps = 0;
@@ -1258,6 +1274,8 @@ void device_debug::single_step_over(int numsteps, bool source_stepping)
 void device_debug::single_step_out(bool source_stepping)
 {
 	assert(m_exec != nullptr);
+
+	REQUIRE_SRCDBG_FOR_SOURCE_STEPPING();
 
 	m_device.machine().rewind_capture();
 	m_stop_condition.reset();

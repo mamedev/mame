@@ -122,9 +122,7 @@ u64 srcdbg_info::get_global_fixed_sym_value(const char * name) const
 		return pg.m_sp.c_provider()->get_global_fixed_sym_value(pg.m_global_idx);
 	}
 
-	// is_in_scope gates the calling of this function
-	assert (false && "get_global_fixed_sym_value called for disabled global");
-	return 0;
+	throw expression_error(expression_error::SRCDBG_VAR_UNAVAILABLE);
 }
 
 
@@ -196,9 +194,7 @@ u64 srcdbg_info::get_local_sym_value(const char * name, symbol_table & symtable)
 		}
 	}
 
-	// is_in_scope gates the calling of this function
-	assert (false && "get_local_sym_value called when out of scope");
-	return 0;
+	throw expression_error(expression_error::SRCDBG_VAR_UNAVAILABLE);
 }
 
 

@@ -376,6 +376,13 @@ void debug_view_sourcecode::print_line(u32 row, std::optional<u32> line_number, 
 	const char LINE_NUMBER_PADDING[] = "     ";
 	const s32 LINE_NUMBER_WIDTH = sizeof(LINE_NUMBER_PADDING)-1;
 
+	if (row >= m_visible.y)
+	{
+		// Prevent diagnostic messages with hard-coded length from
+		// overwriting size of m_viewdata
+		return;
+	}
+
 	// Left side shows line number (or space padding)
 	std::string line_str =  (line_number.has_value()) ? std::to_string(line_number.value()) : LINE_NUMBER_PADDING;
 	for(s32 visible_col=m_topleft.x; visible_col < m_topleft.x + std::min(LINE_NUMBER_WIDTH, m_visible.x); visible_col++)

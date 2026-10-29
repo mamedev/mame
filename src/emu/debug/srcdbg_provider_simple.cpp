@@ -534,7 +534,7 @@ bool srcdbg_provider_simple::is_local_fixed_sym_in_scope(u32 local_fixed_idx) co
 	u64 pc = state->state_find_entry(STATE_GENPC)->value();
 	for (const local_fixed_address_range & val : m_local_fixed_symbols[local_fixed_idx].ranges())
 	{
-		if (val.range.address_first <= pc && pc <= val.range.address_last)
+		if (addr_in_range(pc, val.range.address_first, val.range.address_last))
 		{
 			return true;
 		}
@@ -553,7 +553,7 @@ u64 srcdbg_provider_simple::get_local_fixed_sym_value(u32 local_fixed_idx) const
 	u64 pc = state->state_find_entry(STATE_GENPC)->value();
 	for (const local_fixed_address_range & val : m_local_fixed_symbols[local_fixed_idx].ranges())
 	{
-		if (val.range.address_first <= pc && pc <= val.range.address_last)
+		if (addr_in_range(pc, val.range.address_first, val.range.address_last))
 		{
 			// Apply offset to symbol when appropriate
 			offs_t value = val.symbol_value;
@@ -580,7 +580,7 @@ bool srcdbg_provider_simple::is_local_relative_sym_in_scope(u32 m_local_relative
 	u64 pc = state->state_find_entry(STATE_GENPC)->value();
 	for (const local_relative_eval_rule & val : m_local_relative_symbols[m_local_relative_idx].eval_rules())
 	{
-		if (val.range.address_first <= pc && pc <= val.range.address_last)
+		if (addr_in_range(pc, val.range.address_first, val.range.address_last))
 		{
 			return true;
 		}
@@ -598,7 +598,7 @@ u64 srcdbg_provider_simple::get_local_relative_sym_value(u32 local_relative_idx,
 	u64 pc = state->state_find_entry(STATE_GENPC)->value();
 	for (const local_relative_eval_rule & val : m_local_relative_symbols[local_relative_idx].eval_rules())
 	{
-		if (val.range.address_first <= pc && pc <= val.range.address_last)
+		if (addr_in_range(pc, val.range.address_first, val.range.address_last))
 		{
 			return evaluate_local_relative_rule(
 				state,

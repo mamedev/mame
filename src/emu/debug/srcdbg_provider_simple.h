@@ -52,6 +52,10 @@ private:
 
 	s32 get_offset() const;
 	u64 evaluate_local_relative_rule(const device_state_interface * state, const char * name, const local_relative_eval_rule & val, symbol_table & symtable) const;
+	bool addr_in_range(u64 addr, u16 address_first, u16 address_last) const
+	{
+		return (address_first + get_offset() <= addr && addr <= address_last + get_offset());
+	}
 
 	const running_machine& m_machine;
 	std::vector<source_file_path>               m_source_file_paths;      // Starting points for source file path strings
