@@ -105,6 +105,7 @@ private:
 	inline void update_curs_timer(bool state);
 	inline void update_drb_timer(bool state);
 	inline void update_dma_timer();
+	void start_single_row_data();
 
 	inline void recompute_cursor();
 	inline void recompute_parameters();

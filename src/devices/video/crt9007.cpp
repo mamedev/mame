@@ -183,7 +183,7 @@ enum
 {
 	OPERATION_MODE_REPETITIVE_MEMORY_ADDRESSING = 0,    // not implemented
 	OPERATION_MODE_DOUBLE_ROW_BUFFER = 1,
-	OPERATION_MODE_SINGLE_ROW_BUFFER = 4,               // not implemented
+	OPERATION_MODE_SINGLE_ROW_BUFFER = 4,               // data row timing only
 	OPERATION_MODE_ATTRIBUTE_ASSEMBLE = 7               // not implemented
 };
 
@@ -724,6 +724,14 @@ TIMER_CALLBACK_MEMBER(crt9007_device::drb_update)
 			// the first row buffer transfer of the frame starts at the top of the display
 			m_dma_addr = TABLE_START;
 			m_table_addr = TABLE_START;
+
+			// a single row buffer loads each row on its own top scan line, so the extra
+			// DRB in vertical retrace transfers nothing
+			if (OPERATION_MODE == OPERATION_MODE_SINGLE_ROW_BUFFER)
+			{
+				update_drb_timer(m_drb);
+				return;
+			}
 		}
 
 		if (ADDRESS_MODE == ADDRESS_MODE_CONTIGUOUS_ROW_TABLE)
@@ -747,12 +755,32 @@ TIMER_CALLBACK_MEMBER(crt9007_device::drb_update)
 		LOG("CRT9007 DMAR 1\n");
 		m_write_dmar(ASSERT_LINE);
 
-		// the characters are transferred half a character time before the row
-		// buffer write clock, so that each one is latched by the following edge
-		m_dma_timer->adjust(clocks_to_attotime(1) / 2);
+		if (m_table_count || OPERATION_MODE != OPERATION_MODE_SINGLE_ROW_BUFFER)
+		{
+			// the characters are transferred half a character time before the row
+			// buffer write clock, so that each one is latched by the following edge
+			m_dma_timer->adjust(clocks_to_attotime(1) / 2);
+		}
+		else
+		{
+			start_single_row_data();
+		}
 	}
 
 	update_drb_timer(m_drb);
+}
+
+//-------------------------------------------------
+//  start_single_row_data - with a single row
+//  buffer, the data row is addressed at the
+//  painting rate during the visible line time of
+//  its top scan line, which follows the row
+//  boundary retrace
+//-------------------------------------------------
+
+void crt9007_device::start_single_row_data()
+{
+	m_dma_timer->adjust(screen().time_until_pos((screen().vpos() + 1) % SCAN_LINES_PER_FRAME, m_vlt_start));
 }
 
 TIMER_CALLBACK_MEMBER(crt9007_device::dma_update)
@@ -776,6 +804,12 @@ TIMER_CALLBACK_MEMBER(crt9007_device::dma_update)
 			m_dma_addr = m_row_addr & 0x3fff;
 
 			LOG("CRT9007 Data Row Address: %04x\n", m_dma_addr);
+
+			if (OPERATION_MODE == OPERATION_MODE_SINGLE_ROW_BUFFER)
+			{
+				start_single_row_data();
+				return;
+			}
 		}
 
 		update_dma_timer();
