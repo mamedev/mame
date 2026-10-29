@@ -521,13 +521,6 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 	uint32_t vsr = get_vsr<Path>();
 	uint32_t vsr2 = get_vsr<!Path>();
 
-	if (!icm || !vsr)
-	{
-		std::fill_n(pixels, get_screen_width(), s_4bpp_color[0]);
-		std::fill_n(transparent, get_screen_width(), (tp_ctrl == TCR_ALWAYS));
-		return;
-	}
-
 	const uint32_t decodingMode = m_ddr[Path] & DDR_FT;
 
 	const uint8_t mosaic_enable = get_mosaic_enable<Path>();
@@ -550,6 +543,21 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 	const bool use_matte_flag = (tp_ctrl_type >= TCR_MF0 && tp_ctrl_type <= TCR_MF1_KEY1);
 	const bool is_dyuv_rgb = (icm == ICM_DYUV) || ((icm == ICM_RGB555) && (Path == 1)); // DYUV and RGB do not have access to color key.
 	const bool use_color_key = !is_dyuv_rgb && ((tp_ctrl_type == TCR_KEY) || (tp_ctrl_type == TCR_MF0_KEY1) || (tp_ctrl_type == TCR_MF1_KEY1));
+
+	if (!icm || !vsr)
+	{
+		std::fill_n(pixels, width, s_4bpp_color[0]);
+		if (icm && use_matte_flag && !tp_always)
+		{
+			for (int x = 0; x < width; x++)
+				transparent[x] = (matte_flags[x] == tp_check_parity);
+		}
+		else
+		{
+			std::fill_n(transparent, width, (tp_ctrl == TCR_ALWAYS));
+		}
+		return;
+	}
 
 	LOGMASKED(LOG_VSR, "Scanline %d: VSR Path %d, ICM (%02x), VSR (%08x)\n", screen().vpos(), Path, icm, vsr);
 
