@@ -10,15 +10,15 @@
 
     TODO:
 
-    - CTC interrupts
-    - DAC output to the sound summer
-    - user port and centronics interrupts
+    - user data bus connector
     - multiprocessing mode
 
 */
 
 #include "emu.h"
 #include "eim.h"
+
+#include "speaker.h"
 
 
 
@@ -30,6 +30,7 @@
 #define ADC0809_TAG     "427"
 #define Z80CTC_TAG      "458"
 #define RS232_TAG       "rs232"
+#define CENTRONICS_TAG  "centronics"
 
 
 
@@ -105,8 +106,8 @@ void newbrain_eim_device::device_add_mconfig(machine_config &config)
 {
 	// devices
 	Z80CTC(config, m_ctc, XTAL(16'000'000)/8);
-	m_ctc->zc_callback<0>().set(m_acia, FUNC(acia6850_device::write_rxc));
-	m_ctc->zc_callback<1>().set(m_acia, FUNC(acia6850_device::write_txc));
+	m_ctc->zc_callback<0>().set(FUNC(newbrain_eim_device::ctc_z0_w));
+	m_ctc->zc_callback<1>().set(FUNC(newbrain_eim_device::ctc_z1_w));
 	m_ctc->zc_callback<2>().set(FUNC(newbrain_eim_device::ctc_z2_w));
 
 	ADC0809(config, m_adc, 500000);
@@ -128,8 +129,20 @@ void newbrain_eim_device::device_add_mconfig(machine_config &config)
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
 
+	CENTRONICS(config, m_centronics, centronics_devices, nullptr);
+	m_centronics->ack_handler().set(FUNC(newbrain_eim_device::centronics_ack_w));
+
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
+
+	SPEAKER(config, "snd").front_center();
+	MC1408(config, m_dac).add_route(ALL_OUTPUTS, "snd", 0.5);
+	DAC_1BIT(config, m_tone[0]).add_route(ALL_OUTPUTS, "snd", 0.125);
+	DAC_1BIT(config, m_tone[1]).add_route(ALL_OUTPUTS, "snd", 0.125);
+
 	NEWBRAIN_EXPANSION_SLOT(config, m_exp, XTAL(16'000'000)/8, newbrain_expansion_cards, "fdc");
 	m_exp->int_callback().set(FUNC(newbrain_eim_device::exp_int_w));
+	m_exp->busrq_callback().set([this] (int state) { m_slot->busrq_w(state); });
 	m_exp->host_mreq_r_callback().set([this] (offs_t offset) { return m_slot->host_mreq_r(offset); });
 	m_exp->host_mreq_w_callback().set([this] (offs_t offset, uint8_t data) { m_slot->host_mreq_w(offset, data); });
 	m_exp->host_main_r_callback().set([this] (offs_t offset) { return m_slot->host_main_r(offset); });
@@ -158,16 +171,22 @@ newbrain_eim_device::newbrain_eim_device(const machine_config &mconfig, const ch
 	m_acia(*this, MC6850_TAG),
 	m_adc(*this, ADC0809_TAG),
 	m_exp(*this, "exp"),
+	m_centronics(*this, CENTRONICS_TAG),
+	m_cent_data_out(*this, "cent_data_out"),
+	m_dac(*this, "dac"),
+	m_tone(*this, "tone%u", 0U),
 	m_rom(*this, "eim"),
 	m_ram(*this, RAM_TAG),
 	m_sw(*this, "SW"),
 	m_psr(0),
 	m_enrg2(0),
-	m_user(0),
-	m_dac(0),
+	m_anout(0),
 	m_aciaint(0),
 	m_anint(0),
-	m_expint(false)
+	m_expint(false),
+	m_centint(false),
+	m_rck(false),
+	m_tck(false)
 {
 }
 
@@ -186,11 +205,13 @@ void newbrain_eim_device::device_start()
 	save_item(NAME(m_pr));
 	save_item(NAME(m_psr));
 	save_item(NAME(m_enrg2));
-	save_item(NAME(m_user));
-	save_item(NAME(m_dac));
+	save_item(NAME(m_anout));
 	save_item(NAME(m_aciaint));
 	save_item(NAME(m_anint));
 	save_item(NAME(m_expint));
+	save_item(NAME(m_centint));
+	save_item(NAME(m_rck));
+	save_item(NAME(m_tck));
 }
 
 
@@ -202,13 +223,12 @@ void newbrain_eim_device::device_reset()
 {
 	m_psr = 0;
 	m_enrg2 = 0;
+	m_centint = false;
 
 	// page register lookup in the address path stretches every opcode fetch
 	m_slot->m1_wait_w(1);
 
-	update_ctc_clock();
-
-	update_interrupt();
+	update_enrg2();
 }
 
 
@@ -382,21 +402,23 @@ uint8_t newbrain_eim_device::iorq_r(offs_t offset, uint8_t data, bool &prtov)
 		if (!machine().side_effects_disabled())
 		{
 			m_enrg2 = 0xff;
-			update_ctc_clock();
-			update_interrupt();
+			update_enrg2();
 		}
 		break;
 
 	case 0x03:
 		prtov = true;
 		if (!machine().side_effects_disabled())
-			m_user = 0xff;
+			user_w(0xff);
 		break;
 
 	case 0x05:
 		prtov = true;
 		if (!machine().side_effects_disabled())
-			m_dac = 0xff;
+		{
+			m_anout = 0xff;
+			update_dac();
+		}
 		break;
 
 	case 0x10: case 0x11: case 0x12: case 0x13:
@@ -405,8 +427,9 @@ uint8_t newbrain_eim_device::iorq_r(offs_t offset, uint8_t data, bool &prtov)
 		break;
 
 	case 0x14:
-		data &= ~0x40;
+		data &= ~0x48;
 		data |= (m_anint && BIT(m_enrg2, 1)) << 2;
+		data |= !m_centint << 3;
 		data |= !m_aciaint << 6;
 		break;
 
@@ -468,8 +491,7 @@ void newbrain_eim_device::iorq_w(offs_t offset, uint8_t data, bool &prtov)
 	case 0x01:
 		prtov = true;
 		m_enrg2 = data;
-		update_ctc_clock();
-		update_interrupt();
+		update_enrg2();
 		break;
 
 	case 0x02:
@@ -479,12 +501,13 @@ void newbrain_eim_device::iorq_w(offs_t offset, uint8_t data, bool &prtov)
 
 	case 0x03:
 		prtov = true;
-		m_user = data;
+		user_w(data);
 		break;
 
 	case 0x05:
 		prtov = true;
-		m_dac = data;
+		m_anout = data;
+		update_dac();
 		break;
 
 	case 0x10: case 0x11: case 0x12: case 0x13:
@@ -514,12 +537,22 @@ void newbrain_eim_device::iorq_w(offs_t offset, uint8_t data, bool &prtov)
 
 
 //-------------------------------------------------
+//  busak_w - bus acknowledge
+//-------------------------------------------------
+
+void newbrain_eim_device::busak_w(int state)
+{
+	m_exp->busak_w(state);
+}
+
+
+//-------------------------------------------------
 //  update_interrupt -
 //-------------------------------------------------
 
 void newbrain_eim_device::update_interrupt()
 {
-	m_slot->int_w(m_aciaint || (m_anint && BIT(m_enrg2, 1)) || m_expint);
+	m_slot->int_w(m_aciaint || (m_anint && BIT(m_enrg2, 1)) || (m_centint && !BIT(m_enrg2, 0)) || m_expint);
 }
 
 
@@ -553,6 +586,108 @@ void newbrain_eim_device::exp_int_w(int state)
 {
 	m_expint = state;
 	update_interrupt();
+}
+
+
+//-------------------------------------------------
+//  update_enrg2 - apply the second enable register
+//-------------------------------------------------
+
+void newbrain_eim_device::update_enrg2()
+{
+	if (BIT(m_enrg2, 5))
+	{
+		m_rck = false;
+		m_tck = false;
+	}
+
+	m_centronics->write_strobe(BIT(m_enrg2, 7));
+
+	update_ctc_clock();
+	update_sound();
+	update_interrupt();
+}
+
+
+//-------------------------------------------------
+//  user_w - latched parallel output
+//-------------------------------------------------
+
+void newbrain_eim_device::user_w(uint8_t data)
+{
+	m_cent_data_out->write(data);
+
+	m_centint = false;
+	update_interrupt();
+}
+
+
+//-------------------------------------------------
+//  centronics_ack_w -
+//-------------------------------------------------
+
+void newbrain_eim_device::centronics_ack_w(int state)
+{
+	if (!state)
+	{
+		m_centint = true;
+		update_interrupt();
+	}
+}
+
+
+//-------------------------------------------------
+//  update_dac - multiplying DAC
+//-------------------------------------------------
+
+void newbrain_eim_device::update_dac()
+{
+	m_dac->write((!BIT(m_enrg2, 2) || m_rck) ? m_anout : 0);
+}
+
+
+//-------------------------------------------------
+//  update_sound - sound output summer
+//-------------------------------------------------
+
+void newbrain_eim_device::update_sound()
+{
+	m_tone[0]->write(BIT(m_enrg2, 4) && m_rck);
+	m_tone[1]->write(BIT(m_enrg2, 6) && m_tck);
+
+	update_dac();
+}
+
+
+//-------------------------------------------------
+//  ctc_z0_w - receive clock
+//-------------------------------------------------
+
+void newbrain_eim_device::ctc_z0_w(int state)
+{
+	m_acia->write_rxc(state);
+
+	if (state && !BIT(m_enrg2, 5))
+	{
+		m_rck = !m_rck;
+		update_sound();
+	}
+}
+
+
+//-------------------------------------------------
+//  ctc_z1_w - transmit clock
+//-------------------------------------------------
+
+void newbrain_eim_device::ctc_z1_w(int state)
+{
+	m_acia->write_txc(state);
+
+	if (state && !BIT(m_enrg2, 5))
+	{
+		m_tck = !m_tck;
+		update_sound();
+	}
 }
 
 

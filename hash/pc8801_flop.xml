@@ -19904,7 +19904,7 @@ Optional [redbook] audio CD on PC-8801MC
 	<software name="labyrint">
 		<description>Labyrinth</description>
 		<year>1987</year>
-		<publisher>パックインビデオ (Pack-in Video)</publisher>
+		<publisher>パックインビデオ (Pack-in-Video)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198707xx"/>
 		<info name="alt_title" value="ラビリンス"/>
@@ -22144,7 +22144,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 	<software name="majusenk">
 		<description>Majuu Senki Guardian</description>
 		<year>1988</year>
-		<publisher>パックインビデオ (Pack-in Video)</publisher>
+		<publisher>パックインビデオ (Pack-in-Video)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198807xx"/>
 		<info name="alt_title" value="魔獣戦記ガーディアン"/>
@@ -25278,13 +25278,10 @@ ExtractDisk  [02]"DISK_2          " -> "oji binbin monogatari(a)_02.d88"
 		</part>
 	</software>
 
-	<software name="okhotsk" supported="partial">
-		<description>Hokkaidou Rensa Satsujin - Okhotsk ni Shouyu!!</description>
+	<software name="okhotsk">
+		<description>Hokkaidou Rensa Satsujin: Okhotsk ni Kiyu</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
-		<notes><![CDATA[
-Should be supported by [PC8001mkIISR] too
-]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="オホーツクに消ゆ"/>
@@ -25307,13 +25304,10 @@ Should be supported by [PC8001mkIISR] too
 		</part>
 	</software>
 
-	<software name="okhotska" cloneof="okhotsk" supported="partial">
-		<description>Hokkaidou Rensa Satsujin - Okhotsk ni Shouyu!! (alt Disk 1)</description>
+	<software name="okhotska" cloneof="okhotsk">
+		<description>Hokkaidou Rensa Satsujin: Okhotsk ni Kiyu (alt Disk 1)</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
-		<notes><![CDATA[
-Should be supported by [PC8001mkIISR] too
-]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="オホーツクに消ゆ"/>
@@ -25336,13 +25330,10 @@ Should be supported by [PC8001mkIISR] too
 		</part>
 	</software>
 
-	<software name="okhotskb" cloneof="okhotsk" supported="partial">
-		<description>Hokkaidou Rensa Satsujin - Okhotsk ni Shouyu!! (alt 2?)</description>
+	<software name="okhotskb" cloneof="okhotsk">
+		<description>Hokkaidou Rensa Satsujin: Okhotsk ni Kiyu (alt 2?)</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
-		<notes><![CDATA[
-Should be supported by [PC8001mkIISR] too
-]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="オホーツクに消ゆ"/>
@@ -33821,7 +33812,7 @@ ExtractDisk  [03]"ﾃﾞｰﾀﾃﾞｨｽｸ      " -> "super daisenryaku_03.d8
 	<software name="srambo" supported="no">
 		<description>Super Rambo</description>
 		<year>1986</year>
-		<publisher>パックインビデオ (Pack-in Video)</publisher>
+		<publisher>パックインビデオ (Pack-in-Video)</publisher>
 		<notes><![CDATA[
 black screen
 FDC stalls [Tries to read a missing CHRN=(00 00 f7 01)]
@@ -56849,7 +56840,7 @@ ExtractDisk  [02]"ﾃﾞｰﾀ          " -> "kaseijin_02.d88"
 		<!-- Title from boot -->
 		<description>Kasei-Jin</description>
 		<year>1988</year>
-		<publisher>パックインビデオ (Pack-in Video)</publisher>
+		<publisher>パックインビデオ (Pack-in-Video)</publisher>
 		<notes><![CDATA[
 Hangs when selecting mic option on top right "User Voice", loops on [OPNA] EOS status that never goes high, then waits for RAM $6c54 != 0x02
 Gives random "Disk I/O" errors when accessing files (last option on top), loads fine when trying again

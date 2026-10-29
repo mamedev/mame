@@ -75,6 +75,7 @@ public:
 
 private:
 	int irq_toggle = 0;
+	uint8_t m_irq_vector = 0;
 	int m_optic_pattern = 0;
 
 	uint8_t port09_value = 0;
@@ -116,6 +117,7 @@ private:
 
 	virtual void machine_reset() override ATTR_COLD;
 	TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_irq_timer);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
 	uint8_t m_banksel = 0;
 	uint8_t m_credsel = 0;
@@ -150,14 +152,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_state::ecoinfr_irq_timer)
 
 	if (irq_toggle==0)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe4); // Z80
+		m_irq_vector = 0xe4;
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 	else
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0); // Z80
+		m_irq_vector = 0xe0;
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
+}
 
-
+IRQ_CALLBACK_MEMBER(ecoinfr_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 
@@ -766,6 +773,7 @@ void ecoinfr_state::machine_reset()
 	port17_value = 0x00;
 
 	irq_toggle = 0;
+	m_irq_vector = 0;
 
 	m_banksel = 0xff;
 	m_credsel = 0xff;
@@ -780,6 +788,7 @@ void ecoinfr_state::ecoinfr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ecoinfr_state::memmap);
 	m_maincpu->set_addrmap(AS_IO, &ecoinfr_state::portmap);
 	TIMER(config , "ectimer").configure_periodic(FUNC(ecoinfr_state::ecoinfr_irq_timer), attotime::from_hz(250));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(ecoinfr_state::cpu_acknowledge_irq));
 
 	config.set_default_layout(layout_ecoinfr);
 

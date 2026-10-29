@@ -250,7 +250,7 @@ ROM_END
 ROM_START( cjddzsp )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "cjddzsp_igs036", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "cjddzsp_igs036.bin", 0x00000, 0x4000, CRC(1146d5f4) SHA1(910662ac3c1d3f3f94abdf0f654a2fb5d96b7b97) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "cjddzsp_s122cn.u18",  0x000000, 0x200000, CRC(4a42aad6) SHA1(96805e5bfbd50686177fe50020229ea8787ade17) )
@@ -336,7 +336,7 @@ Notes:
 ROM_START( lhtb ) // PCB-0799-02-IU-1, every ROM label starts with 龍虎特別版
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "cn1012_igs036", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "cn1012_igs036.bin", 0x00000, 0x4000, CRC(b321b813) SHA1(55a5e6898920acf2a7a4afb581a974c77ecaba2f) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "s-101cn.u18",  0x000000, 0x200000, CRC(1020f4b5) SHA1(953bb776a804738c624a1dca336e42beb10238f7) )
@@ -354,7 +354,7 @@ ROM_END
 ROM_START( qhzb ) // PCB-0701-01-IU
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "qhzb_igs036", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "qhzb_igs036.bin", 0x00000, 0x4000, CRC(b294079b) SHA1(5f1e63e302497fd8c9144fbc5c128cac215b28ec) ) // same of slqzsp, but both were dumped from the correct game
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v100cn_u18.u18", 0x000000, 0x200000, CRC(8c2733b7) SHA1(226768eead8d7754b2468384e5e691812d0ac96d) )
@@ -437,7 +437,7 @@ ROM_END
 ROM_START( lhfy )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "lhfy_igs036", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "lhfy_igs036.bin", 0x00000, 0x4000, CRC(09694d46) SHA1(bf05bafd31cfe389b689da4ff3a5a14de3ba30b1) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v-206cn.u11", 0x000000, 0x200000, CRC(45bd9c9f) SHA1(3a9b06bf9c66520136522d67ed12f800569580f5) )
@@ -458,7 +458,7 @@ ROM_END
 ROM_START( hlddz )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "hlddz_igs036", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "hlddz_igs036.bin", 0x00000, 0x4000, CRC(5e24cfb4) SHA1(40d1fae77c316b7367d046d3936b615405ad8a33) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v-104cn.u11", 0x000000, 0x200000, CRC(abc11224) SHA1(cf8119ac6bb75e63da716d643d89619f8f6cd017) )
@@ -479,7 +479,7 @@ ROM_END
 ROM_START( zjddz )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "zjddz_igs036", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "zjddz_igs036.bin", 0x00000, 0x4000, CRC(a804a1c4) SHA1(5f3b496086b82abdf84c41c693bbe614e050dd07) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v-204cn.u11", 0x000000, 0x200000, CRC(c6043975) SHA1(5b7a867e0e3023b831abf35f84f3f60b9ae0e41c) )
@@ -549,7 +549,7 @@ ROM_END
 ROM_START( jhzb )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "jhzb_igs036", 0x0000, 0x4000, NO_DUMP ) // stickered K7
+	ROM_LOAD( "jhzb_igs036.bin", 0x0000, 0x4000, CRC(5436812e) SHA1(f579044b3984598013648a637611e6041cd6055e) ) // stickered K7
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
 	ROM_LOAD( "xa", 0x00000, 0x10000, NO_DUMP )
@@ -570,7 +570,7 @@ ROM_END
 ROM_START( jxry )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "jhzb_igs036", 0x0000, 0x4000, NO_DUMP ) // stickered A3
+	ROM_LOAD( "jxry_igs036.bin", 0x0000, 0x4000, CRC(cb1d4974) SHA1(c1a29330f2f844d514841d1e30eeec9a28743084) ) // stickered A3
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) stickered IL U14
 	ROM_LOAD( "xa", 0x00000, 0x10000, NO_DUMP )
@@ -591,7 +591,7 @@ ROM_END
 ROM_START( slqzsp )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "jhzb_igs036", 0x0000, 0x4000, NO_DUMP ) // stickered F8
+	ROM_LOAD( "slqzsp_igs036.bin", 0x0000, 0x4000, CRC(b294079b) SHA1(5f1e63e302497fd8c9144fbc5c128cac215b28ec) ) // stickered F8
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) stickered IU U23
 	ROM_LOAD( "xa", 0x00000, 0x10000, NO_DUMP )
@@ -612,7 +612,7 @@ ROM_END
 ROM_START( sydh ) // PCB-0802-03-JL
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "jhzb_igs036", 0x0000, 0x4000, NO_DUMP ) // stickered C3
+	ROM_LOAD( "sydh_igs036.bin", 0x0000, 0x4000, CRC(2f581a7a) SHA1(783ddb2876e56f096288ec6a1166949299fa4bc5) ) // stickered C3
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
 	ROM_LOAD( "xa", 0x00000, 0x10000, NO_DUMP )
@@ -633,7 +633,7 @@ ROM_END
 ROM_START( xyddz )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "jhzb_igs036", 0x0000, 0x4000, NO_DUMP ) // stickered K8
+	ROM_LOAD( "xyddz_igs036.bin", 0x0000, 0x4000, CRC(865e7daf) SHA1(1fc1c43f94394a5a03b268a1113c0af03d8f9a44) ) // stickered K8
 
 	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
 	ROM_LOAD( "xa", 0x00000, 0x10000, NO_DUMP )
@@ -654,7 +654,7 @@ ROM_END
 ROM_START( cjbq )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "k9_igs036", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "cjbq_igs036.bin", 0x00000, 0x4000, CRC(90c88f38) SHA1(717eb05b5d1699e725810e9f5abc4b28d275920f) ) // stickered K9
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v205cn.u18",  0x000000, 0x200000, CRC(c6904007) SHA1(c5bc81e6e03ecd1dd22926cee77723a5ab7ff71a) )
@@ -690,7 +690,7 @@ ROM_END
 ROM_START( cjgdy )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "y11_igs036", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "cjgdy_igs036.bin", 0x00000, 0x4000, CRC(9f11d926) SHA1(8dc7491fb0794daed630cb3427763a77fd5704ec) ) // stickered Y11
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v110cn.u18",  0x000000, 0x200000, CRC(63be1ddd) SHA1(0293bfb16f2c75f56685fe99eec2e29076ed3a61) )
@@ -726,7 +726,7 @@ ROM_END
 ROM_START( mjzhizun ) // PCB-0918-02-JV. Has a Xilinx XC9536XL
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "v21.igs036", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "mjzhizun_igs036.bin", 0x00000, 0x4000, CRC(6c84b00e) SHA1(161c98f7c76e24d0bbf09be616efc1e431d33b45) ) // stickered V21
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "s100cn.u40",  0x000000, 0x200000, CRC(4593e1de) SHA1(d50bb4de47cb6f01ba73c72749712c17f241f8ff) )
@@ -744,7 +744,7 @@ ROM_END
 ROM_START( dahuaxy )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "igs036", 0x0000, 0x4000, NO_DUMP )
+	ROM_LOAD( "dahuaxy_igs036.bin", 0x0000, 0x4000, CRC(55ba469a) SHA1(df83645ae59ac3678aaef250b90ca0cbc5c9e1a8) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "s201.u18", 0x000000, 0x200000, CRC(82e4d309) SHA1(23faf921b4a7bd386b0d737fb96f36b0502f113a) )
@@ -762,10 +762,10 @@ ROM_END
 ROM_START( huoqilin )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "igs036", 0x0000, 0x4000, NO_DUMP )
+	ROM_LOAD( "huoqilin_igs036.bin", 0x0000, 0x4000, CRC(6474b1d3) SHA1(3d6d778ac0fc37bac5ef7767efd98414e5d738b9) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
-	ROM_LOAD( "v116cn.u20", 0x000000, 0x200000, CRC(06cbfa94) SHA1(860ccdb3d362804293767a54724610f2546ab9c9) )
+	ROM_LOAD( "v116cn.u20", 0x000000, 0x200000, CRC(9139ec5e) SHA1(46d7da21bfa047649c09cc6ce569eefba665ac9d) )
 
 	ROM_REGION( 0x200000, "oki", 0 ) // samples
 	ROM_LOAD( "v103cn.u18", 0x000000, 0x200000, CRC(edcf49d4) SHA1(ac3ad0a62a8b88417a6d6bf6f8498cd2a138b1f6) )
@@ -781,7 +781,7 @@ ROM_END
 ROM_START( hyleyuan )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "igs036", 0x0000, 0x4000, NO_DUMP )
+	ROM_LOAD( "hyleyuan_igs036.bin", 0x0000, 0x4000, CRC(ea7cd4da) SHA1(cec3c04be1fdc15a7e11ca86bb98f73cbb8e6ebd) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "s_103cn.u24", 0x000000, 0x200000, CRC(248aa7e3) SHA1(d24ef32021dc03d9ae875f53767d742c91dd7d78) )
@@ -813,6 +813,47 @@ ROM_START( xcjnh )
 	ROM_LOAD( "xcjnh_s100cn_cg.u2", 0x2000000, 0x2000000, CRC(094ba5e1) SHA1(f71b0f8f6ffe90bc7a0773636cc5812245eb33a5) )
 	ROM_LOAD( "xcjnh_s100cn_cg.u3", 0x4000000, 0x2000000, CRC(f479a413) SHA1(ca7436ea4ba39f1fe27cc246ebebda3c818ed368) )
 	ROM_LOAD( "xcjnh_s100cn_cg.u4", 0x6000000, 0x2000000, CRC(b94e2565) SHA1(24168183c84012c3ef12e82ae076ee8ca2e4d4e6) )
+ROM_END
+
+// 欢乐敲敲敲 (Huānlè Qiāo Qiāo Qiāo)
+// KO-0999-02
+ROM_START( hlqqq )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "igs036", 0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "hlqqq_v100cn.u26", 0x000000, 0x200000, CRC(39fb6a4c) SHA1(fc391b74910c26c6b46c218dc387ca539fc4949f) )
+
+	ROM_REGION( 0x1000000, "oki", 0 ) // samples
+	ROM_LOAD( "hlqqq_sp.u17", 0x000000, 0x800000, CRC(55d24d28) SHA1(b467fcc485e6748300a59928f6689439952b70b4) )
+	ROM_LOAD( "hlqqq_sp.u18", 0x000000, 0x800000, CRC(69addcf2) SHA1(216e8a14dae32a8cd8547215132b183dc0d12fe1) )
+
+	ROM_REGION( 0x8000000, "gfx", 0 )
+	ROM_LOAD( "hlqqq_cg_v100cn.u1", 0x0000000, 0x2000000, NO_DUMP )
+	ROM_LOAD( "hlqqq_cg_v100cn.u2", 0x2000000, 0x2000000, NO_DUMP )
+	ROM_LOAD( "hlqqq_cg_v100cn.u3", 0x4000000, 0x2000000, NO_DUMP )
+	ROM_LOAD( "hlqqq_cg_v100cn.u4", 0x6000000, 0x2000000, NO_DUMP )
+ROM_END
+
+// 敲击大冒险 (Qiāojī Dà Màoxiǎn)
+// PCB-0670-02-IE
+ROM_START( qiaojidm )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "igs036", 0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "qiaojidm_v100cn.u33", 0x000000, 0x200000, CRC(7eb744cd) SHA1(25976322f84001c56e053cf7d925b8a01184b50a) )
+
+	ROM_REGION( 0x800000, "oki", 0 ) // samples
+	ROM_LOAD( "qiaojidm_sp.u31", 0x000000, 0x800000, CRC(b4f76f8f) SHA1(4cd0a94cb09ae4d040091637bdf97a2ed2e94c3d) )
+
+	ROM_REGION( 0x8000000, "gfx", 0 )
+	ROM_LOAD( "qiaojidm_v-100cn.u1", 0x0000000, 0x2000000, NO_DUMP )
+	ROM_LOAD( "qiaojidm_v-100cn.u2", 0x2000000, 0x2000000, NO_DUMP )
+	ROM_LOAD( "qiaojidm_v-100cn.u3", 0x4000000, 0x2000000, NO_DUMP )
+	ROM_LOAD( "qiaojidm_v-100cn.u4", 0x6000000, 0x2000000, NO_DUMP )
 ROM_END
 
 
@@ -936,5 +977,9 @@ GAME( 2010, lhzbgqb,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<lhz
 GAME( 201?, hyleyuan, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<hyleyuan_key>, ROT0, "IGS",           "Hou Ye Leyuan (S103CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 201?, xcjnh,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<xcjnh_key>,    ROT0, "IGS",           "Xiaochou Jianianhua (S100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+GAME( 201?, hlqqq,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<hlqqq_key>,    ROT0, "IGS",           "Huanle Qiao Qiao Qiao (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+GAME( 201?, qiaojidm, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036,          ROT0, "IGS",           "Qiaoji Da Maoxian (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 2015, mghammer, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_mghammer,          ROT0, "IGS / Enheart", "Medal Get Hammer (V100JP)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // but has S033CN strings?

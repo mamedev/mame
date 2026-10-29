@@ -752,7 +752,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<software name="ideyumj">
 		<description>Ide Yousuke Meijin no Jissen Mahjong (Japan)</description>
 		<year>1988</year>
-		<publisher>Pack-In Video</publisher>
+		<publisher>Pack-In-Video</publisher>
 		<info name="alt_title" value="井出洋介名人の実戦麻雀" />
 		<info name="serial" value="MS-18"/>
 		<info name="gtin" value="04988110800184"/>
@@ -2630,7 +2630,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<software name="labyrint">
 		<description>Labyrinth (Japan)</description>
 		<year>1987</year>
-		<publisher>Pack-In Video</publisher>
+		<publisher>Pack-In-Video</publisher>
 		<info name="alt_title" value="ラビリンス" />
 		<info name="serial" value="MS-10"/>
 		<info name="gtin" value="04988110800108"/>
@@ -2647,7 +2647,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<software name="labyrinta" cloneof="labyrint">
 		<description>Labyrinth (Japan, alt)</description>
 		<year>1987</year>
-		<publisher>Pack-In Video</publisher>
+		<publisher>Pack-In-Video</publisher>
 		<info name="alt_title" value="ラビリンス" />
 		<info name="serial" value="MS-10"/>
 		<info name="gtin" value="04988110800108"/>
@@ -3053,7 +3053,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<software name="predator">
 		<description>Predator (Japan)</description>
 		<year>1988</year>
-		<publisher>Pack-In Video</publisher>
+		<publisher>Pack-In-Video</publisher>
 		<info name="alt_title" value="プレデター" />
 		<info name="serial" value="MS-17"/>
 		<part name="cart" interface="msx_cart">
@@ -3223,7 +3223,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<software name="srambosp">
 		<description>Super Rambo Special (Japan)</description>
 		<year>1986</year>
-		<publisher>Pack-In Video</publisher>
+		<publisher>Pack-In-Video</publisher>
 		<info name="alt_title" value="スーパーランボースペシャル" />
 		<info name="serial" value="MS-5"/>
 		<info name="gtin" value="04988110800054"/>

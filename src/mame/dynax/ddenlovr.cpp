@@ -770,6 +770,7 @@ private:
 	uint8_t funkyfig_coin_r();
 	uint8_t funkyfig_key_r();
 	void funkyfig_lockout_w(uint8_t data);
+	IRQ_CALLBACK_MEMBER(mmpanic_acknowledge_irq);
 
 	void mmpanic_update_leds();
 
@@ -787,6 +788,7 @@ private:
 
 	uint16_t m_mmpanic_leds = 0;  // A LED for each of the 9 buttons
 	uint8_t m_funkyfig_lockout = 0;
+	uint8_t m_mmpanic_irq_vector = 0;
 };
 
 class hanakanz_state : public ddenlovr_state
@@ -2747,7 +2749,10 @@ void mmpanic_state::mmpanic_blitter2_w(offs_t offset, uint8_t data)
 void mmpanic_state::mmpanic_blitter_irq(int state)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf);    // Z80 - RST 18
+	{
+		m_mmpanic_irq_vector = 0xdf; // Z80 - RST 18
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
 }
 
 void mmpanic_state::mmpanic_update_leds()
@@ -2893,7 +2898,10 @@ void mmpanic_state::funkyfig_blitter_w(offs_t offset, uint8_t data)
 void mmpanic_state::funkyfig_blitter_irq(int state)
 {
 	if (0) // this vector looks wrong
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0);  // Z80
+	{
+		m_mmpanic_irq_vector = 0xe0;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
 }
 
 void mmpanic_state::funkyfig_rombank_w(uint8_t data)
@@ -9649,6 +9657,7 @@ MACHINE_START_MEMBER(mmpanic_state,mmpanic)
 	membank("bank1")->configure_entries(0, 8, &rom[0x10000], 0x8000);
 
 	save_item(NAME(m_mmpanic_leds));
+	save_item(NAME(m_mmpanic_irq_vector));
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
@@ -9669,6 +9678,7 @@ MACHINE_RESET_MEMBER(mmpanic_state,mmpanic)
 {
 	m_mmpanic_leds = 0;
 	m_funkyfig_lockout = 0;
+	m_mmpanic_irq_vector = 0;
 
 	MACHINE_RESET_CALL_MEMBER(ddenlovr);
 }
@@ -9943,7 +9953,8 @@ void mmpanic_state::mmpanic_irq(int state)
 	//if (downcast<cpu_device *>(m_maincpu)->input_line_state(0))
 	//  return;
 
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 08, vblank
+	m_mmpanic_irq_vector = 0xcf; // Z80 - RST 08, vblank
+	m_maincpu->set_input_line(0, HOLD_LINE);
 	m_soundcpu->set_input_line(0, HOLD_LINE);   // Z80 - NMI by main cpu
 }
 
@@ -9951,7 +9962,15 @@ void mmpanic_state::mmpanic_irq(int state)
 void mmpanic_state::mmpanic_rtc_irq(int state)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf); // Z80 - RST 18, clock
+	{
+		m_mmpanic_irq_vector = 0xdf; // Z80 - RST 18, clock
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+}
+
+IRQ_CALLBACK_MEMBER(mmpanic_state::mmpanic_acknowledge_irq)
+{
+	return m_mmpanic_irq_vector;
 }
 
 void mmpanic_state::mmpanic(machine_config &config)
@@ -9960,6 +9979,7 @@ void mmpanic_state::mmpanic(machine_config &config)
 	Z80(config, m_maincpu, 16_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmpanic_state::mmpanic_map);
 	m_maincpu->set_addrmap(AS_IO, &mmpanic_state::mmpanic_portmap);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(mmpanic_state::mmpanic_acknowledge_irq));
 
 	Z80(config, m_soundcpu, 14.318181_MHz_XTAL / 4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &mmpanic_state::mmpanic_sound_map);

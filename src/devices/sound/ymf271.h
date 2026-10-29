@@ -20,13 +20,6 @@ public:
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
-	struct opx_alg
-	{
-		uint8_t mods[4];
-		uint8_t car;
-		uint8_t fbsrc;
-	};
-
 protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -45,6 +38,13 @@ protected:
 private:
 	static constexpr int NUM_SLOTS = 48;
 	static constexpr int NUM_GROUPS = 12;
+
+	struct opx_alg
+	{
+		uint8_t mods[4];
+		uint8_t car;
+		uint8_t fbsrc;
+	};
 
 	struct opx_slot
 	{
@@ -106,8 +106,10 @@ private:
 		uint8_t dirty;
 	};
 
-	void init_tables();
-	void init_state();
+	struct alg_tables;
+
+	void init_tables() ATTR_COLD;
+	void init_state() ATTR_COLD;
 
 	bool is_keyon_slot(int bank, int group) const;
 	int voice_slots(int bank, int group, int *slots) const;

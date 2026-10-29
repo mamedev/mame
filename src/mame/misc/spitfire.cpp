@@ -20,7 +20,7 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	void spitfire(machine_config &config);
+	void spitfire(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

@@ -62,8 +62,11 @@ active-high (active == true).
 #include "machine/quadmouse.h"
 #include "machine/rescap.h"
 #include "machine/timer.h"
+#include "sound/va_vco.h"
 #include "video/pwm.h"
 #include "corefloat.h"
+
+#include "speaker.h"
 
 #include <algorithm>
 #include <array>
@@ -78,6 +81,7 @@ active-high (active == true).
 #define LOG_BANKING     (1U << 5)
 #define LOG_GATE_IN     (1U << 6)
 #define LOG_LEVER       (1U << 7)
+#define LOG_VOLUME      (1U << 8)
 
 #define VERBOSE (0)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -110,9 +114,17 @@ public:
 	void xpander_common(machine_config &config) ATTR_COLD;
 
 	virtual DECLARE_INPUT_CHANGED_MEMBER(memory_protect_changed) { }
+	DECLARE_INPUT_CHANGED_MEMBER(volume_changed) { update_volume(); }
 
 protected:
+	// The values in sound streams are voltages or currents, as per the real
+	// hardware. This scaler converts the final voltage to audio within the
+	// range [-1, 1].
+	// TODO: Adjust when more of the audio chain is implemented.
+	static inline constexpr double VOLTAGE_TO_AUDIO_SCALE = 1.0;
+
 	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 	u8 gate_r();
 	u8 switch_r(offs_t offset);
@@ -124,6 +136,8 @@ protected:
 	u8 adc_r(offs_t offset);
 	void adc_w(offs_t offset, u8 data);
 
+	double volume_gain(double r_voice_out) const;
+
 	void display_w(offs_t offset, u8 data);
 	void display_clear();
 
@@ -133,6 +147,7 @@ protected:
 	u8 selected_cv_in() const { return m_selected_cv_in; }
 	bool inhibit_cv_in() const { return m_inhibit_cv_in; }
 	mc6809_device *maincpu() { return m_maincpu.target(); }
+	device_sound_interface *noise() { return m_noise.target(); }
 
 private:
 	void encoder_moved(int encoder);
@@ -141,6 +156,8 @@ private:
 	virtual std::pair<double, double> pedal_pull(int pedal) const = 0;
 	virtual u8 gate_inputs() const = 0;
 	virtual u8 cv_in_r() = 0;
+
+	virtual void update_volume() = 0;
 
 	virtual void maincpu_map(address_map &map) ATTR_COLD = 0;
 
@@ -156,6 +173,8 @@ private:
 	required_device_array<pwm_display_device, 3> m_vfd_devices;
 	output_finder<3, 40> m_vfd_chars;
 	output_finder<3, 40> m_vfd_lines;
+	required_device<va_noise_device> m_noise;
+	required_ioport m_volume;
 
 	u8 m_selected_cv_in;  // MUX A-C inputs.
 	bool m_inhibit_cv_in;  // MUX INHibit input.
@@ -176,6 +195,8 @@ xpander_state_base::xpander_state_base(const machine_config &mconfig, device_typ
 	, m_vfd_devices(*this, "vfd_%u", 1U)
 	, m_vfd_chars(*this, "vfd_%u_char_%u", 1U, 1U)
 	, m_vfd_lines(*this, "vfd_%u_line_%u", 1U, 1U)
+	, m_noise(*this, "noise")
+	, m_volume(*this, "volume_knob")
 	, m_selected_cv_in(0x07)  // Pulled high.
 	, m_inhibit_cv_in(true)  // Pulled high.
 	, m_vfd_anode_masks({0, 0, 0})
@@ -298,6 +319,20 @@ void xpander_state_base::adc_w(offs_t offset, u8 data)
 	// b) U20 on Pot Board (ADC0804).
 	m_adc->write(data);
 	LOGMASKED(LOG_CV_IN, "ADC Write: %02x - %02x\n", offset, data);
+}
+
+double xpander_state_base::volume_gain(double r_voice_out) const
+{
+	constexpr double R_VOL_MAX = RES_K(50);
+
+	const double vol = map_port_range(m_volume, 0, 1);
+	const double r_vol_bottom = R_VOL_MAX * RES_AUDIO_POT_LAW(vol);
+	const double r_vol_top = R_VOL_MAX - r_vol_bottom;
+
+	const double gain = RES_VOLTAGE_DIVIDER(r_voice_out + r_vol_top, r_vol_bottom);
+	LOGMASKED(LOG_VOLUME, "Volume: %f, gain: %f\n", vol, gain);
+
+	return gain;
 }
 
 void xpander_state_base::display_w(offs_t offset, u8 data)
@@ -458,6 +493,14 @@ void xpander_state_base::machine_start()
 	save_item(NAME(m_vfd_anode_masks));
 }
 
+void xpander_state_base::machine_reset()
+{
+	update_volume();
+
+	// Annotated as 100mV peak-to-peak ([-50, 50] mV) in the schematic.
+	m_noise->set_output_gain(0, 0.05);
+}
+
 void xpander_state_base::xpander_common(machine_config &config)
 {
 	// Component designations refer to the processor board unless otherwise noted.
@@ -521,6 +564,9 @@ void xpander_state_base::xpander_common(machine_config &config)
 		m_vfd_devices[i]->set_segmask(0xffffffffff, 0xffff);
 		m_vfd_devices[i]->output_digit().set([this, i] (offs_t offset, u32 data) { display_output_w(i, offset, data); });
 	}
+
+	// A single noise generator is located on the processor board.
+	VA_NOISE(config, m_noise);
 }
 
 
@@ -551,6 +597,7 @@ private:
 	void pull_w(u8 data);
 
 	void update_banking();
+	void update_volume() override;
 
 	void maincpu_map(address_map &map) override ATTR_COLD;
 
@@ -698,6 +745,14 @@ void xpander_state::update_banking()
 			  *m_ram01_view.entry(), *m_rom0_view.entry());
 }
 
+void xpander_state::update_volume()
+{
+	constexpr double R_VOICE_OUT = 0;  // No resistor at the voice output.
+	const double gain = volume_gain(R_VOICE_OUT);
+	m_voiceboard->set_output_gain(xpandervb_device::OUTPUT_LEFT, gain);
+	m_voiceboard->set_output_gain(xpandervb_device::OUTPUT_RIGHT, gain);
+}
+
 void xpander_state::machine_start()
 {
 	xpander_state_base::machine_start();
@@ -770,9 +825,6 @@ void xpander_state::xpander(machine_config &config)
 
 	TIMER(config, m_firq_timer).configure_generic(FUNC(xpander_state::firq_timer_elapsed));  // U12 (40103)
 
-	XPANDER_VOICEBOARD(config, m_voiceboard);
-	m_voiceboard->haltack_cb().set([this] (int state) { update_banking(); });
-
 	// U25 (74LS374), CLK <- HALTSET*
 	auto &haltset = OUTPUT_LATCH(config, "latch_haltset");
 	haltset.bit_handler<0>().set(m_voiceboard, FUNC(xpandervb_device::haltreq_w)).invert();  // HALTREQ0*
@@ -785,6 +837,13 @@ void xpander_state::xpander(machine_config &config)
 	haltset.bit_handler<7>().set_output("cassout");  // CASSOUT
 
 	config.set_default_layout(layout_oberheim_xpander);
+
+	XPANDER_VOICEBOARD(config, m_voiceboard, noise())
+		.add_route(xpandervb_device::OUTPUT_LEFT, "audio_out", VOLTAGE_TO_AUDIO_SCALE, 0)
+		.add_route(xpandervb_device::OUTPUT_RIGHT, "audio_out", VOLTAGE_TO_AUDIO_SCALE, 1);
+	m_voiceboard->haltack_cb().set([this] (int state) { update_banking(); });
+
+	SPEAKER(config, "audio_out", 2).front();
 }
 
 
@@ -817,6 +876,7 @@ private:
 
 	void pit_out2_changed(int state);
 	void update_banking();
+	void update_volume() override;
 
 	void maincpu_map(address_map &map) override ATTR_COLD;
 
@@ -1067,6 +1127,17 @@ void matrix12_state::update_banking()
 			  *m_mem_view.entry(), m_bsel, haltack0, haltack1, *m_voiceram_view.entry());
 }
 
+void matrix12_state::update_volume()
+{
+	constexpr double R_VOICE_OUT = RES_K(2.2);  // R101, R102, R103, R104
+	const double gain = volume_gain(R_VOICE_OUT);
+	for (int i = 0; i < m_voiceboard.size(); ++i)
+	{
+		m_voiceboard[i]->set_output_gain(xpandervb_device::OUTPUT_LEFT, gain);
+		m_voiceboard[i]->set_output_gain(xpandervb_device::OUTPUT_RIGHT, gain);
+	}
+}
+
 void matrix12_state::machine_start()
 {
 	xpander_state_base::machine_start();
@@ -1167,12 +1238,6 @@ void matrix12_state::matrix12(machine_config &config)
 
 	MATRIX12_KBD(config, m_kbd, 16_MHz_XTAL / 16);  // 1 MHz
 
-	for (int i = 0; i < m_voiceboard.size(); ++i)
-	{
-		XPANDER_VOICEBOARD(config, m_voiceboard[i]);
-		m_voiceboard[i]->haltack_cb().set([this] (int state) { update_banking(); });
-	}
-
 	// U33 (74LS374), /CLK <- HALTSET*
 	auto &haltset = OUTPUT_LATCH(config, "latch_haltset");
 	haltset.bit_handler<0>().set(m_voiceboard[0], FUNC(xpandervb_device::haltreq_w)).invert();  // HALTREQ0*
@@ -1195,6 +1260,16 @@ void matrix12_state::matrix12(machine_config &config)
 	// Bit 7 not connected.
 
 	config.set_default_layout(layout_oberheim_matrix12);
+
+	for (int i = 0; i < m_voiceboard.size(); ++i)
+	{
+		XPANDER_VOICEBOARD(config, m_voiceboard[i], noise())
+			.add_route(xpandervb_device::OUTPUT_LEFT, "audio_out", VOLTAGE_TO_AUDIO_SCALE, 0)
+			.add_route(xpandervb_device::OUTPUT_RIGHT, "audio_out", VOLTAGE_TO_AUDIO_SCALE, 1);
+		m_voiceboard[i]->haltack_cb().set([this] (int state) { update_banking(); });
+	}
+
+	SPEAKER(config, "audio_out", 2).front();
 }
 
 INPUT_PORTS_START(xpander_base)
@@ -1277,6 +1352,7 @@ INPUT_PORTS_START(xpander_base)
 
 	PORT_START("volume_knob")  // 50K dual-gang potentiometer.
 	PORT_ADJUSTER(90, "VOLUME")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xpander_state_base::volume_changed), 0)
 
 	PORT_START("pedal_1")
 	PORT_BIT(0xff, 0x00, IPT_PEDAL1) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)

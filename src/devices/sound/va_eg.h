@@ -195,8 +195,14 @@ private:
 // A smoothing sample & hold circuit. Used in synthesizers to smoothen control
 // voltages (CV) updates from the firmware.
 //
-// When Vin is being sampled, Cl (Clarge) reaches the target voltage immediately,
-// while Cs (Csmall) (dis)charges towards Vin via R. See sample().
+// The device has 3 states, and corresponding functions to enter them: SAMPLE,
+// SAMPLE_FAST and HOLD.
+//
+//
+// SAMPLE
+//
+// Vin is being sampled by Cl (Clarge). Cl reaches the target voltage
+// immediately, while Cs (Csmall) (dis)charges towards Vin via R. See sample().
 //
 // Vin ---+--- R ---+--- Vout
 //        |         |
@@ -204,8 +210,25 @@ private:
 //        |         |
 //       GND       GND
 //
-// When Vin is not being sampled, Cs and Cl will (dis)charge towards the same
-// target voltage. See hold().
+//
+// SAMPLE_FAST
+//
+// Vin is being sampled by both Cl and Cs. Vout instantly matches Vin. See
+// sample_fast().
+//
+//  +---------------+
+//  |               |
+// Vin ---+--- R ---+--- Vout
+//        |         |
+//        Cl        Cs
+//        |         |
+//       GND       GND
+//
+//
+// HOLD
+//
+// Vin is not being sampled. Cs and Cl will (dis)charge towards the same target
+// voltage. See hold().
 //
 //       +--- R ---+--- Vout
 //       |         |
@@ -222,6 +245,7 @@ public:
 	va_smooth_sh_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
 
 	void sample(float v_in);
+	void sample_fast(float v_in);
 	void hold();
 
 protected:
@@ -231,13 +255,20 @@ protected:
 	void sound_stream_update(sound_stream &stream) override;
 
 private:
+	enum state
+	{
+		STATE_HOLD = 0,
+		STATE_SAMPLE,
+		STATE_SAMPLE_FAST,
+	};
+
 	const float m_r;
 	const float m_c_large;
 	const float m_c_small;
 	const float m_c_series;
 
-	required_device<va_rc_eg_device> m_rc;
-	bool m_sampling;
+	required_device<va_rc_eg_device> m_rc;  // Tracks voltage at Cs.
+	u8 m_state;
 };
 
 #endif  // MAME_SOUND_VA_EG_H

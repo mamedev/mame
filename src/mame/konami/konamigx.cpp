@@ -150,7 +150,6 @@
    00000006
    000e0002
    002e0080
- - Tokimeki Memorial: wrong horizontal flip for mode select arrows;
  */
 
 namespace {
@@ -210,7 +209,7 @@ void konamigx_state::eeprom_w(offs_t offset, u32 data, u32 mem_mask)
 		odata = data >> 24;
 		/*
 		  bit 7: afr, a watchdog timer bit
-		  bit 6: objscan
+		  bit 6: sprite bank
 		  bit 5: background color select: 0 = 338 solid color, 1 = 5^5 gradient
 		  bit 4: coin counter 2
 		  bit 3: coin counter 1
@@ -1567,6 +1566,7 @@ void konamigx_esc_state::add_esc(machine_config &config, u16 key, u8 cfg, u32 fe
 	m_esc->set_fetch_scramble(fetch_xor, fetch_lanes);
 	m_esc->set_host_space(m_maincpu, AS_PROGRAM);
 	m_esc->irq_cb().set(FUNC(konamigx_esc_state::esc_irq_w));
+	m_type2_spritebank_enable = true;
 }
 
 void konamigx_esc_state::daiskiss(machine_config &config)

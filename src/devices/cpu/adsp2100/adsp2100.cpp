@@ -109,6 +109,7 @@
 #include "adsp2100.h"
 #include "2100dasm.h"
 
+#include <algorithm>
 #include <bit>
 
 
@@ -129,10 +130,10 @@ DEFINE_DEVICE_TYPE(ADSP2181, adsp2181_device, "adsp2181", "Analog Devices ADSP-2
 //  adsp21xx_device - constructor
 //-------------------------------------------------
 
-adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype) :
+adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype, address_map_constructor internal_data) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_LITTLE, 32, 14, -2),
-	m_data_config("data", ENDIANNESS_LITTLE, 16, 14, -1),
+	m_data_config("data", ENDIANNESS_LITTLE, 16, 14, -1, internal_data),
 	m_chip_type(chiptype),
 	m_pc(0),
 	m_ppc(0),
@@ -285,8 +286,28 @@ adsp2115_device::adsp2115_device(const machine_config &mconfig, const char *tag,
 { }
 
 adsp2181_device::adsp2181_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: adsp21xx_device(mconfig, ADSP2181, tag, owner, clock, CHIP_TYPE_ADSP2181)
+	: adsp21xx_device(mconfig, ADSP2181, tag, owner, clock, CHIP_TYPE_ADSP2181, address_map_constructor(FUNC(adsp2181_device::internal_data_map), this))
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 11, -1)
+	, m_bdma_read_cb(*this, 0xff)
+	, m_bdma_write_cb(*this)
+	, m_pf_in_cb(*this, 0xff)
+	, m_pf_out_cb(*this)
+	, m_sport_tfs_cb(*this)
+	, m_sport_dt_cb(*this)
+	, m_internal_peripherals(false)
+	, m_control{}
+	, m_bdma_timer(nullptr)
+	, m_timer(nullptr)
+	, m_sport_timer{ nullptr, nullptr }
+	, m_bdma_hold(false)
+	, m_timer_enabled(false)
+	, m_pf_out(0)
+	, m_pf_out_mask(0)
+	, m_sport_tx{}
+	, m_sport_tx_full{}
+	, m_sport_shift{}
+	, m_sport_busy{}
+	, m_sport_tail{}
 { }
 
 
@@ -1185,6 +1206,12 @@ void adsp21xx_device::execute_run()
 	const bool check_debugger = debugger_enabled();
 
 	check_irqs();
+	if (m_idle)
+	{
+		debugger_wait_hook();
+		m_icount = 0;
+		return;
+	}
 
 	do
 	{
@@ -1918,4 +1945,373 @@ void adsp21xx_device::execute_run()
 
 		m_icount--;
 	} while (m_icount > 0);
+}
+
+
+
+/***************************************************************************
+    ADSP-2181 ON-CHIP PERIPHERALS
+***************************************************************************/
+
+void adsp21xx_device::timer_enable_changed(bool state)
+{
+}
+
+void adsp21xx_device::sport_tx_written(int port, uint16_t data)
+{
+}
+
+void adsp2181_device::internal_data_map(address_map &map)
+{
+	if (m_internal_peripherals)
+		map(0x3fe0, 0x3fff).rw(FUNC(adsp2181_device::control_r), FUNC(adsp2181_device::control_w));
+}
+
+void adsp2181_device::device_start()
+{
+	adsp21xx_device::device_start();
+
+	if (!m_internal_peripherals)
+		return;
+
+	m_bdma_timer = timer_alloc(FUNC(adsp2181_device::bdma_tick), this);
+	m_timer = timer_alloc(FUNC(adsp2181_device::timer_tick), this);
+	for (auto &timer : m_sport_timer)
+		timer = timer_alloc(FUNC(adsp2181_device::sport_tick), this);
+
+	save_item(NAME(m_control));
+	save_item(NAME(m_bdma_hold));
+	save_item(NAME(m_timer_enabled));
+	save_item(NAME(m_pf_out));
+	save_item(NAME(m_pf_out_mask));
+	save_item(NAME(m_sport_tx));
+	save_item(NAME(m_sport_tx_full));
+	save_item(NAME(m_sport_shift));
+	save_item(NAME(m_sport_busy));
+	save_item(NAME(m_sport_tail));
+}
+
+void adsp2181_device::device_reset()
+{
+	adsp21xx_device::device_reset();
+
+	if (!m_internal_peripherals)
+		return;
+
+	// table 9.6 reset values; registers it lists as undefined keep their contents
+	m_idma_addr = 0;
+	m_control[BDMA_INT] = 0;
+	m_control[BDMA_EXT] = 0;
+	m_control[PF_CONTROL] = 0x7b00;
+	m_control[SPORT1_AUTOBUF] &= ~3;
+	m_control[SPORT1_CONTROL] = 0;
+	m_control[SPORT0_AUTOBUF] &= ~3;
+	m_control[SPORT0_CONTROL] = 0;
+	m_control[WAIT_CONTROL] = 0x7fff;
+	m_control[SYSTEM_CONTROL] = 0x0407;
+	update_pf_out();
+
+	m_timer_enabled = false;
+	m_timer->adjust(attotime::never);
+	for (int port = 0; port < 2; port++)
+	{
+		m_sport_timer[port]->adjust(attotime::never);
+		m_sport_tx_full[port] = false;
+		m_sport_busy[port] = false;
+	}
+
+	// MMAP = 0, BMODE = 0: BDMA loads 32 program words, then the DSP runs from PM 0
+	m_control[BDMA_CONTROL] = 0x0008;
+	m_control[BDMA_COUNT] = 0x20;
+	bdma_start();
+}
+
+void adsp2181_device::execute_run()
+{
+	if (m_bdma_hold)
+	{
+		debugger_wait_hook();
+		m_icount = 0;
+		return;
+	}
+
+	adsp21xx_device::execute_run();
+}
+
+uint16_t adsp2181_device::control_r(offs_t offset)
+{
+	switch (offset)
+	{
+		case IDMA_CONTROL:
+			return idma_addr_r();
+
+		case PF_DATA:
+		{
+			const uint8_t outputs = m_control[PF_CONTROL] & 0xff;
+			return (m_control[PF_DATA] & outputs) | (m_pf_in_cb() & ~outputs & 0xff);
+		}
+
+		case TIMER_COUNT:
+			return timer_count();
+
+		default:
+			return m_control[offset];
+	}
+}
+
+void adsp2181_device::control_w(offs_t offset, uint16_t data)
+{
+	switch (offset)
+	{
+		case IDMA_CONTROL:
+			idma_addr_w(data);
+			break;
+
+		case BDMA_INT:
+		case BDMA_EXT:
+		case BDMA_COUNT:
+			data &= 0x3fff;
+			break;
+
+		case BDMA_CONTROL:
+			data &= 0xff0f;
+			break;
+
+		case TIMER_SCALE:
+			m_control[TIMER_COUNT] = timer_count();
+			data &= 0x00ff;
+			break;
+	}
+	m_control[offset] = data;
+
+	switch (offset)
+	{
+		case BDMA_COUNT:
+			bdma_start();
+			break;
+
+		case PF_DATA:
+		case PF_CONTROL:
+			update_pf_out();
+			break;
+
+		case SPORT0_AUTOBUF:
+		case SPORT1_AUTOBUF:
+			if (data & 3)
+				logerror("%s: SPORT%d autobuffering is not emulated\n", machine().describe_context(), (offset == SPORT1_AUTOBUF) ? 1 : 0);
+			break;
+
+		case SPORT0_CONTROL:
+		case SPORT1_CONTROL:
+			// ISCLK and ITFS set, no companding
+			if ((data & 0x4230) != 0x4200 || ((offset == SPORT0_CONTROL) && BIT(data, 15)))
+				logerror("%s: SPORT%d control %04x: only internally clocked and framed transmit is emulated\n", machine().describe_context(), (offset == SPORT1_CONTROL) ? 1 : 0, data);
+			break;
+
+		case TIMER_SCALE:
+		case TIMER_COUNT:
+			timer_update();
+			break;
+
+		case SYSTEM_CONTROL:
+			for (int port = 0; port < 2; port++)
+			{
+				if (!sport_enabled(port))
+				{
+					m_sport_timer[port]->adjust(attotime::never);
+					m_sport_tx_full[port] = false;
+					m_sport_busy[port] = false;
+				}
+			}
+			break;
+	}
+}
+
+void adsp2181_device::bdma_start()
+{
+	// with BCR set the processor waits for the transfer, then reboots
+	const bool hold = m_control[BDMA_COUNT] && BIT(m_control[BDMA_CONTROL], 3);
+	if (hold && !m_bdma_hold)
+		abort_timeslice();
+	m_bdma_hold = hold;
+
+	if (m_control[BDMA_COUNT])
+	{
+		const uint32_t type = m_control[BDMA_CONTROL] & 3;
+		const uint32_t bytes = (type == 0) ? 3 : (type == 1) ? 2 : 1;
+		const uint32_t waits = BIT(m_control[PF_CONTROL], 12, 3);
+		m_bdma_timer->adjust(cycles_to_attotime(bytes * (waits + 1) + 1));
+	}
+	else
+	{
+		m_bdma_timer->adjust(attotime::never);
+	}
+}
+
+void adsp2181_device::bdma_context_reset()
+{
+	// software reboot: MSTAT, overlays, flags and peripherals are kept
+	m_pc = m_ppc = 0;
+	m_loop = 0xffff;
+	m_loop_condition = 0;
+	m_astat = 0;
+	m_sstat = 0x55;
+	m_idle = 0;
+	m_pc_sp = m_cntr_sp = m_stat_sp = m_loop_sp = 0;
+	m_imask = m_ifc = 0;
+	std::fill(std::begin(m_irq_latch), std::end(m_irq_latch), CLEAR_LINE);
+	m_control[SPORT0_AUTOBUF] &= ~3;
+	m_control[SPORT1_AUTOBUF] &= ~3;
+}
+
+TIMER_CALLBACK_MEMBER(adsp2181_device::bdma_tick)
+{
+	// each word steals one processor cycle
+	if (!m_bdma_hold)
+		spin_until_time(cycles_to_attotime(1));
+
+	const uint16_t control = m_control[BDMA_CONTROL];
+	const uint32_t type = control & 3;
+	const uint32_t bytes = (type == 0) ? 3 : (type == 1) ? 2 : 1;
+	uint32_t address = (uint32_t(control >> 8) << 14) | m_control[BDMA_EXT];
+	const uint16_t internal = m_control[BDMA_INT];
+
+	if (!BIT(control, 2))
+	{
+		uint32_t value = 0;
+		for (uint32_t i = 0; i < bytes; i++)
+			value = (value << 8) | m_bdma_read_cb((address + i) & 0x3fffff);
+		if (type == 0)
+			program_write(internal, value);
+		else
+			data_write(internal, (type == 2) ? (value << 8) : value);
+	}
+	else
+	{
+		uint32_t value = (type == 0) ? program_read(internal) : data_read(internal);
+		if (type == 2)
+			value >>= 8;
+		for (uint32_t i = 0; i < bytes; i++)
+			m_bdma_write_cb((address + i) & 0x3fffff, uint8_t(value >> (8 * (bytes - 1 - i))));
+	}
+
+	address = (address + bytes) & 0x3fffff;
+	m_control[BDMA_INT] = (internal + 1) & 0x3fff;
+	m_control[BDMA_EXT] = address & 0x3fff;
+	m_control[BDMA_CONTROL] = (control & 0x000f) | ((address >> 14) << 8);
+	if (--m_control[BDMA_COUNT])
+	{
+		bdma_start();
+	}
+	else
+	{
+		if (m_bdma_hold)
+		{
+			bdma_context_reset();
+			m_bdma_hold = false;
+		}
+		m_irq_latch[ADSP2181_BDMA] = 1;
+	}
+}
+
+uint16_t adsp2181_device::timer_count() const
+{
+	if (!m_timer_enabled)
+		return m_control[TIMER_COUNT];
+
+	const uint64_t elapsed = m_timer->elapsed().as_ticks(clock()) / (m_control[TIMER_SCALE] + 1);
+	return m_control[TIMER_COUNT] - std::min<uint64_t>(elapsed, m_control[TIMER_COUNT]);
+}
+
+void adsp2181_device::timer_update()
+{
+	if (m_timer_enabled)
+		m_timer->adjust(cycles_to_attotime((uint32_t(m_control[TIMER_COUNT]) + 1) * (m_control[TIMER_SCALE] + 1)));
+	else
+		m_timer->adjust(attotime::never);
+}
+
+void adsp2181_device::timer_enable_changed(bool state)
+{
+	if (!m_internal_peripherals)
+		return;
+
+	m_control[TIMER_COUNT] = timer_count();
+	m_timer_enabled = state;
+	timer_update();
+}
+
+TIMER_CALLBACK_MEMBER(adsp2181_device::timer_tick)
+{
+	m_control[TIMER_COUNT] = m_control[TIMER_PERIOD];
+	timer_update();
+	m_irq_latch[ADSP2181_TIMER] = 1;
+}
+
+void adsp2181_device::update_pf_out()
+{
+	const uint8_t mask = m_control[PF_CONTROL] & 0xff;
+	const uint8_t data = m_control[PF_DATA] & mask;
+	if (data != m_pf_out || mask != m_pf_out_mask)
+	{
+		m_pf_out = data;
+		m_pf_out_mask = mask;
+		m_pf_out_cb(0, data, mask);
+	}
+}
+
+bool adsp2181_device::sport_enabled(int port) const
+{
+	// SPORT1 must also be configured as a serial port rather than as flags and interrupts
+	const uint16_t control = m_control[SYSTEM_CONTROL];
+	return port ? (BIT(control, 11) && BIT(control, 10)) : BIT(control, 12);
+}
+
+void adsp2181_device::sport_tx_written(int port, uint16_t data)
+{
+	if (!m_internal_peripherals || !sport_enabled(port))
+		return;
+
+	m_sport_tx[port] = data;
+	m_sport_tx_full[port] = true;
+	if (!m_sport_busy[port])
+		sport_start(port);
+}
+
+void adsp2181_device::sport_start(int port)
+{
+	const uint16_t control = m_control[port ? SPORT1_CONTROL : SPORT0_CONTROL];
+	m_sport_shift[port] = m_sport_tx[port];
+	m_sport_tx_full[port] = false;
+	m_sport_busy[port] = true;
+
+	if (BIT(control, 11))
+	{
+		const int active = BIT(control, 7) ? 0 : 1;
+		m_sport_tfs_cb[port](active);
+		m_sport_tfs_cb[port](active ^ 1);
+	}
+
+	// the TX interrupt comes during the second bit, when the TX register is free again
+	const uint32_t bits = (control & 15) + 1;
+	const uint32_t divider = 2 * (m_control[port ? SPORT1_CLKDIV : SPORT0_CLKDIV] + 1);
+	const uint32_t interrupt_bits = std::min<uint32_t>(bits, 2);
+	m_sport_tail[port] = (bits - interrupt_bits) * divider;
+	m_sport_timer[port]->adjust(cycles_to_attotime(interrupt_bits * divider), port | 2);
+}
+
+TIMER_CALLBACK_MEMBER(adsp2181_device::sport_tick)
+{
+	const int port = param & 1;
+	if (BIT(param, 1))
+	{
+		m_irq_latch[port ? ADSP2181_SPORT1_TX : ADSP2181_SPORT0_TX] = 1;
+		m_sport_timer[port]->adjust(cycles_to_attotime(m_sport_tail[port]), port);
+		return;
+	}
+
+	m_sport_busy[port] = false;
+	m_sport_dt_cb[port](m_sport_shift[port]);
+	if (m_sport_tx_full[port])
+		sport_start(port);
 }

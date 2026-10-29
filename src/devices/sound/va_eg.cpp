@@ -372,7 +372,7 @@ va_smooth_sh_device::va_smooth_sh_device(const machine_config &mconfig, const ch
 	, m_c_small(c_small)
 	, m_c_series((m_c_large * m_c_small) / (m_c_large + m_c_small))
 	, m_rc(*this, "rc")
-	, m_sampling(false)
+	, m_state(STATE_HOLD)
 {
 }
 
@@ -383,7 +383,7 @@ va_smooth_sh_device::va_smooth_sh_device(const machine_config &mconfig, const ch
 
 void va_smooth_sh_device::sample(float v_in)
 {
-	// When Vin is being sampled, Cl (Clarge) reaches the target voltage
+	// Vin is being sampled by Cl (Clarge). Cl reaches the target voltage
 	// immediately, while Cs (Csmall) (dis)charges towards Vin via R. The
 	// voltage at Vout is that of an RC circuit with C = Cs.
 	//
@@ -393,22 +393,42 @@ void va_smooth_sh_device::sample(float v_in)
 	//        |         |
 	//       GND       GND
 
-	if (!m_sampling)
+	if (m_state != STATE_SAMPLE)
 	{
 		m_rc->set_c(m_c_small);
-		m_sampling = true;
+		m_state = STATE_SAMPLE;
 	}
 	m_rc->set_target_v(v_in);
+}
+
+void va_smooth_sh_device::sample_fast(float v_in)
+{
+	// Vin is being sampled by both Cl and Cs. Vout instantly matches Vin.
+	//
+	//  +---------------+
+	//  |               |
+	// Vin ---+--- R ---+--- Vout
+	//        |         |
+	//        Cl        Cs
+	//        |         |
+	//       GND       GND
+
+	if (m_state != STATE_SAMPLE_FAST)
+	{
+		m_rc->set_c(m_c_small);
+		m_state = STATE_SAMPLE_FAST;
+	}
+	m_rc->set_instant_v(v_in);
 }
 
 void va_smooth_sh_device::hold()
 {
 	// The calculations below need to happen at the instant sampling is disabled.
 	// If sampling was disabled earlier, they must be skipped.
-	if (!m_sampling)
+	if (m_state == STATE_HOLD)
 		return;
 
-	m_sampling = false;
+	m_state = STATE_HOLD;
 
 	// When not sampling:
 	//
@@ -423,6 +443,8 @@ void va_smooth_sh_device::hold()
 	// At the instant sampling is disabled, we have:
 	const float vl = m_rc->get_target_v();
 	const float vs = m_rc->get_v();
+
+	// If transitioning from STATE_SAMPLE_FAST, vl == vs.
 
 	// The two capacitors will (dis)charge towards the same target voltage.
 	m_rc->set_target_v((m_c_large * vl + m_c_small * vs) / (m_c_large + m_c_small));
@@ -440,7 +462,7 @@ void va_smooth_sh_device::device_add_mconfig(machine_config &config)
 void va_smooth_sh_device::device_start()
 {
 	stream_alloc(1, 1, machine().sample_rate());
-	save_item(NAME(m_sampling));
+	save_item(NAME(m_state));
 }
 
 void va_smooth_sh_device::sound_stream_update(sound_stream &stream)

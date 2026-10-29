@@ -42,14 +42,30 @@ public:
 private:
 	required_device<tc0091lvc_device> m_maincpu;
 
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 	void screen_vblank(int state);
 
 	void output_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 	void main_map(address_map &map) ATTR_COLD;
 	void tc0091lvc_map(address_map &map) ATTR_COLD;
+
+	uint8_t m_irq_vector;
 };
+
+void dfruit_state::machine_start()
+{
+	save_item(NAME(m_irq_vector));
+}
+
+void dfruit_state::machine_reset()
+{
+	m_irq_vector = 0;
+}
 
 void dfruit_state::screen_vblank(int state)
 {
@@ -259,18 +275,26 @@ TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::scanline_cb)
 
 	if (scanline == 240 && (m_maincpu->irq_enable() & 4))
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_maincpu->irq_vector(2)); // TC0091LVC
+		m_irq_vector = m_maincpu->irq_vector(2);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 
 	if (scanline == 0 && (m_maincpu->irq_enable() & 2))
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_maincpu->irq_vector(1)); // TC0091LVC
+		m_irq_vector = m_maincpu->irq_vector(1);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 
 	if (scanline == 196 && (m_maincpu->irq_enable() & 1))
 	{
-		//m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_maincpu->irq_vector(0)); // TC0091LVC
+		//m_irq_vector = m_maincpu->irq_vector(0);
+		//m_maincpu->set_input_line(0, HOLD_LINE);
 	}
+}
+
+IRQ_CALLBACK_MEMBER(dfruit_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 void dfruit_state::output_w(uint8_t data)
@@ -288,6 +312,7 @@ void dfruit_state::dfruit(machine_config &config)
 	// basic machine hardware
 	TC0091LVC(config, m_maincpu, MASTER_CLOCK / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dfruit_state::main_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(dfruit_state::cpu_acknowledge_irq));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(dfruit_state::scanline_cb), "screen", 0, 1);
 

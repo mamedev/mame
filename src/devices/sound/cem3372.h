@@ -52,6 +52,10 @@ public:
 	cem3372_vcf_device(const machine_config &mconfig, const char *tag, device_t *owner, const stream_inputs &inputs) ATTR_COLD;
 	cem3372_vcf_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) ATTR_COLD;
 
+	// Configures the voltage divider at the resonance input (pin 11).
+	// Does not need to be called if the recommended 22K-1K divider is in use.
+	cem3372_vcf_device &configure_res_in_divider(float r_in, float r_gnd) ATTR_COLD;
+
 	// Sets the capacitor values for each stage. Must be called for each stage
 	// during configuration. Can be called at runtime as needed.
 	// In a standard configuration, c1 = c2 = c3 and c4 = c3 / 100.
@@ -82,7 +86,10 @@ private:
 
 	void update_freq_scale();
 
+	// configuration
 	const stream_inputs m_inputs;
+	float m_ext_res_gain;
+
 	sound_stream *m_stream;
 
 	required_device<va_vca_device> m_input_a_vca;

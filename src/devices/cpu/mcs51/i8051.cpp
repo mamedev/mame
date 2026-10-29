@@ -734,10 +734,8 @@ void mcs51_cpu_device::update_timer_t0(int cycles)
 		// taken, reset
 		m_t0_cnt = 0;
 
-		/* TODO: Not sure about IE0. The manual specifies INT0=high,
-		 * which in turn means CLEAR_LINE.
-		 * IE0 may be edge triggered depending on IT0 */
-		if (BIT(m_tmod, TMOD_GATE0) && !BIT(m_tcon, TCON_IE0))
+		// INT0 is active low; GATE uses its pin level, independently of IE0.
+		if (BIT(m_tmod, TMOD_GATE0) && BIT(m_last_line_state, MCS51_INT0_LINE))
 			delta = 0;
 
 		switch (mode)
@@ -828,10 +826,8 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 			// taken, reset
 			m_t1_cnt = 0;
 
-			/* TODO: Not sure about IE0. The manual specifies INT0=high,
-			 * which in turn means CLEAR_LINE. Change to access last_state?
-			 * IE0 may be edge triggered depending on IT0 */
-			if (BIT(m_tmod, TMOD_GATE1) && !BIT(m_tcon, TCON_IE1))
+			// INT1 is active low; GATE uses its pin level, independently of IE1.
+			if (BIT(m_tmod, TMOD_GATE1) && BIT(m_last_line_state, MCS51_INT1_LINE))
 				delta = 0;
 
 			switch (mode)
@@ -1139,12 +1135,14 @@ void mcs51_cpu_device::handle_irq(int irqline, int state, u32 new_state, u32 tr_
 			break;
 
 		case MCS51_T0_LINE:
-			if (BIT(tr_state, MCS51_T0_LINE) && BIT(m_tcon, TCON_TR0))
+			if (BIT(tr_state, MCS51_T0_LINE) && BIT(m_tcon, TCON_TR0)
+				&& (!BIT(m_tmod, TMOD_GATE0) || !BIT(m_last_line_state, MCS51_INT0_LINE)))
 				m_t0_cnt++;
 			break;
 
 		case MCS51_T1_LINE:
-			if (BIT(tr_state, MCS51_T1_LINE) && BIT(m_tcon, TCON_TR1))
+			if (BIT(tr_state, MCS51_T1_LINE) && BIT(m_tcon, TCON_TR1)
+				&& (!BIT(m_tmod, TMOD_GATE1) || !BIT(m_last_line_state, MCS51_INT1_LINE)))
 				m_t1_cnt++;
 			break;
 	}

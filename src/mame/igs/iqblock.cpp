@@ -12,16 +12,8 @@ TODO:
 
 - Coin 2 doesn't work? DIP switch setting?
 
-- Protection:
-  I can see it reading things like the R register here and there, so it might
-  be cycle-dependant or something.
-
-  'Crash 1' checks I was able to see:
-  PC = $52FA
-  PC = $507F
-
-  'Crash 2' checks I was able to see:
-  PC = $54E6
+- Protection is emulated from the game code only (see prot_a_r / prot_b_r),
+  verify it on real hardware
 
 Stephh's notes :
 
@@ -72,7 +64,6 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_rambase(*this, "rambase"),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_fgvideoram(*this, "fgvideoram")
 	{ }
@@ -83,23 +74,27 @@ public:
 	void init_iqblock();
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	required_shared_ptr<uint8_t> m_rambase;
 	required_shared_ptr<uint8_t> m_bgvideoram;
 	required_shared_ptr<uint8_t> m_fgvideoram;
 
 	uint8_t m_videoenable = 0;
 	uint8_t m_video_type = 0;
+	uint8_t m_prot_a = 0;
+	uint8_t m_prot_a_mode = 0;
+	uint8_t m_prot_b = 0;
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fg_tilemap = nullptr;
 
-	void iqblock_prot_w(uint8_t data);
-	void grndtour_prot_w(uint8_t data);
+	uint8_t prot_a_r(offs_t offset);
+	uint8_t prot_b_r(offs_t offset);
 	void irqack_w(uint8_t data);
 	void fgvideoram_w(offs_t offset, uint8_t data);
 	void bgvideoram_w(offs_t offset, uint8_t data);
@@ -203,18 +198,103 @@ uint32_t iqblock_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-void iqblock_state::iqblock_prot_w(uint8_t data)
+/*
+  Protection, derived from the game code only (not verified on the PCB).
+  The program ROM has 64-byte blocks filled with "call xxxx / ret" and zeros
+  that are never executed; the games read some of them and keep a copy in RAM
+  of the state of two devices, comparing it with the value read back.
+
+  Device A, 0x1fc0-0x1fff, 0x3fc0-0x3fff, 0x5fc0-0x5fff: 4-bit register plus
+  a mode flag, operation selected by A5-A3 (different in the two modes).
+  Device B, 0x4dc0-0x4dff, 0xa1c0-0xa1ff, 0xddc0-0xddff: 4-bit register,
+  operation selected by A5-A4.
+  Only the bits checked by the games are known.
+*/
+uint8_t iqblock_state::prot_a_r(offs_t offset)
 {
-	m_rambase[0xe26] = data;
-	m_rambase[0xe27] = data;
-	m_rambase[0xe1c] = data;
+	uint8_t const c = m_prot_a;
+	uint8_t op = offset & 0x38;
+
+	// remap mode 1 operations to the mode 0 offsets
+	if (m_prot_a_mode)
+	{
+		switch (op)
+		{
+			case 0x38: op = 0x00; break; // check
+			case 0x20: op = 0x08; break; // increment
+			case 0x08: op = 0x10; break; // decrement
+			case 0x18: op = 0x20; break; // load
+			case 0x30: break;            // mode toggle
+			default:   op = 0x28; break; // nothing known
+		}
+	}
+
+	switch (op)
+	{
+		case 0x00: // D0 = c3 | c0, D1 = c2 ^ c1
+			return 0xfc | ((BIT(c, 3) | BIT(c, 0)) << 0) | ((BIT(c, 2) ^ BIT(c, 1)) << 1);
+
+		case 0x08:
+			if (!machine().side_effects_disabled())
+				m_prot_a = (c + 1) & 0x0f;
+			break;
+
+		case 0x10:
+			if (!machine().side_effects_disabled())
+				m_prot_a = (c - 1) & 0x0f;
+			break;
+
+		case 0x20: // c = { !c3 & !c2, c3 | c0, c2 ^ c1, c1 & c0 }
+			if (!machine().side_effects_disabled())
+				m_prot_a = ((!BIT(c, 3) && !BIT(c, 2)) << 3) | ((BIT(c, 3) | BIT(c, 0)) << 2) | ((BIT(c, 2) ^ BIT(c, 1)) << 1) | (BIT(c, 1) & BIT(c, 0));
+			break;
+
+		case 0x30:
+			if (!machine().side_effects_disabled())
+				m_prot_a_mode ^= 1;
+			break;
+	}
+
+	return 0xff; // value ignored by the games
 }
 
-void iqblock_state::grndtour_prot_w(uint8_t data)
+uint8_t iqblock_state::prot_b_r(offs_t offset)
 {
-	m_rambase[0xe39] = data;
-	m_rambase[0xe3a] = data;
-	m_rambase[0xe2f] = data;
+	uint8_t const c = m_prot_b;
+
+	switch (offset & 0x30)
+	{
+		case 0x00:
+			if (!machine().side_effects_disabled())
+				m_prot_b = (c + 1) & 0x0f;
+			break;
+
+		case 0x10: // c = { c2 ^ c0, c1, c0, c3 }
+			if (!machine().side_effects_disabled())
+				m_prot_b = ((BIT(c, 2) ^ BIT(c, 0)) << 3) | (BIT(c, 1) << 2) | (BIT(c, 0) << 1) | BIT(c, 3);
+			break;
+
+		case 0x30: // D5 = !c0 & c3
+			return (!BIT(c, 0) && BIT(c, 3)) ? 0xff : 0xdf;
+	}
+
+	return 0xff; // value ignored by the games
+}
+
+
+void iqblock_state::machine_start()
+{
+	save_item(NAME(m_prot_a));
+	save_item(NAME(m_prot_a_mode));
+	save_item(NAME(m_prot_b));
+}
+
+void iqblock_state::machine_reset()
+{
+	// the games clear their copy of the protection state at boot
+	m_prot_a = 0;
+	m_prot_a_mode = 0;
+	m_prot_b = 0;
 }
 
 
@@ -254,7 +334,13 @@ void iqblock_state::port_c_w(uint8_t data)
 void iqblock_state::program_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xffff).ram().share(m_rambase);
+	map(0x1fc0, 0x1fff).r(FUNC(iqblock_state::prot_a_r));
+	map(0x3fc0, 0x3fff).r(FUNC(iqblock_state::prot_a_r));
+	map(0x4dc0, 0x4dff).r(FUNC(iqblock_state::prot_b_r));
+	map(0x5fc0, 0x5fff).r(FUNC(iqblock_state::prot_a_r));
+	map(0xa1c0, 0xa1ff).r(FUNC(iqblock_state::prot_b_r));
+	map(0xddc0, 0xddff).r(FUNC(iqblock_state::prot_b_r));
+	map(0xf000, 0xffff).ram();
 }
 
 
@@ -629,7 +715,6 @@ void iqblock_state::init_iqblock()
 		if ((i & 0x0090) == 0x0010) rom[i] ^= 0x20;
 	}
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xfe26, 0xfe26, write8smo_delegate(*this, FUNC(iqblock_state::iqblock_prot_w)));
 	m_video_type = 1;
 }
 
@@ -644,7 +729,6 @@ void iqblock_state::init_grndtour()
 		if ((i & 0x0060) == 0x0040) rom[i] ^= 0x20;
 	}
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xfe39, 0xfe39, write8smo_delegate(*this, FUNC(iqblock_state::grndtour_prot_w)));
 	m_video_type = 0;
 }
 

@@ -23,6 +23,7 @@
 #include "machine/gen_latch.h"
 #include "machine/msm6253.h"
 #include "machine/nvram.h"
+#include "machine/quadmouse.h"
 #include "machine/upd4701.h"
 #include "sound/dac.h"
 #include "sound/upd7759.h"
@@ -334,6 +335,30 @@ public:
 private:
 	required_ioport m_accel;
 	required_ioport m_steer;
+};
+
+class wfishing_state : public segas16b_state
+{
+public:
+	// construction/destruction
+	wfishing_state(const machine_config &mconfig, device_type type, const char *tag)
+		: segas16b_state(mconfig, type, tag)
+		, m_handle_encoder(*this, "handle")
+		, m_handle_dir(0)
+	{ }
+
+	void wfishing(machine_config &config);
+
+	ioport_value handle_r();
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	void handle_pulse_w(int state);
+
+	required_device<quadencoder_device> m_handle_encoder;
+	uint8_t m_handle_dir;
 };
 
 #endif // MAME_SEGA_SEGAS16B_H

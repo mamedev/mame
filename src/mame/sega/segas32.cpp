@@ -671,6 +671,7 @@ void segas32_state::device_reset()
 
 	/* clear IRQ lines */
 	m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_sound_irq_vector = 0;
 }
 
 
@@ -920,7 +921,8 @@ void segas32_state::update_sound_irq_state()
 	for (vector = 0; vector < 3; vector++)
 		if (BIT(effirq, vector))
 		{
-			m_soundcpu->set_input_line_and_vector(0, ASSERT_LINE, 2 * vector); // Z80
+			m_sound_irq_vector = 2 * vector;
+			m_soundcpu->set_input_line(0, ASSERT_LINE);
 			break;
 		}
 
@@ -946,6 +948,12 @@ void segas32_state::clear_sound_irq(int which)
 		if (m_sound_irq_control[i] == which)
 			m_sound_irq_input &= ~(1 << i);
 	update_sound_irq_state();
+}
+
+
+IRQ_CALLBACK_MEMBER(segas32_state::soundcpu_acknowledge_irq)
+{
+	return m_sound_irq_vector;
 }
 
 
@@ -2259,6 +2267,7 @@ void segas32_state::device_add_mconfig(machine_config &config)
 	Z80(config, m_soundcpu, MAIN_CLOCK/4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segas32_state::system32_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &segas32_state::system32_sound_portmap);
+	m_soundcpu->set_irq_acknowledge_callback(FUNC(segas32_state::soundcpu_acknowledge_irq));
 
 	sega_315_5296_device &io_chip(SEGA_315_5296(config, "io_chip", MAIN_CLOCK/4));
 	io_chip.in_pa_callback().set_ioport("P1_A");

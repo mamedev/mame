@@ -131,6 +131,9 @@ protected:
 	tilemap_t *m_fg_tilemap = nullptr;
 	uint8_t m_scroll[4]{};
 
+	// interrupt-related
+	uint8_t m_irq_vector;
+
 	// misc
 	void bankswitch_w(uint8_t data);
 	void bg_videoram_w(offs_t offset, uint8_t data);
@@ -142,6 +145,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
 	void base_map(address_map &map) ATTR_COLD;
 	void gundealr_main_map(address_map &map) ATTR_COLD;
@@ -559,6 +563,7 @@ GFXDECODE_END
 
 void gundealr_state::machine_start()
 {
+	save_item(NAME(m_irq_vector));
 	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
 }
 
@@ -568,16 +573,27 @@ void gundealr_state::machine_reset()
 	m_scroll[1] = 0;
 	m_scroll[2] = 0;
 	m_scroll[3] = 0;
+	m_irq_vector = 0;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::scanline)
 {
-	const int scanline = param;
+	if (param == 240) // vblank-out irq
+	{
+		m_irq_vector = 0xd7; // Z80 - RST 10h
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
+	else if (param == 0 || param == 120) // timer irq
+	{
+		m_irq_vector = 0xcf; // Z80 - RST 08h
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
+}
 
-	if (scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80 - RST 10h
-	else if ((scanline == 0) || (scanline == 120) ) //timer irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 08h
+IRQ_CALLBACK_MEMBER(gundealr_state::cpu_acknowledge_irq)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+	return m_irq_vector;
 }
 
 void gundealr_state::gundealr(machine_config &config)
@@ -586,6 +602,7 @@ void gundealr_state::gundealr(machine_config &config)
 	Z80(config, m_maincpu, XTAL(12'000'000) / 2);   // 6 MHz verified for Yam! Yam!?
 	m_maincpu->set_addrmap(AS_PROGRAM, &gundealr_state::gundealr_main_map);
 	m_maincpu->set_addrmap(AS_IO, &gundealr_state::main_portmap);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(gundealr_state::cpu_acknowledge_irq));
 	TIMER(config, "scantimer").configure_scanline(FUNC(gundealr_state::scanline), "screen", 0, 1);
 
 	// video hardware

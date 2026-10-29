@@ -210,7 +210,7 @@ protected:
 	};
 
 	// construction/destruction
-	adsp21xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype);
+	adsp21xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype, address_map_constructor internal_data = address_map_constructor());
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -293,6 +293,10 @@ protected:
 	// interrupts
 	virtual bool generate_irq(int which, int indx = 0) = 0;
 	virtual void check_irqs() = 0;
+
+	// on-chip peripheral hooks
+	virtual void timer_enable_changed(bool state);
+	virtual void sport_tx_written(int port, uint16_t data);
 
 	// internal state
 	static const int PC_STACK_DEPTH     = 16;
@@ -513,6 +517,16 @@ public:
 	// construction/destruction
 	adsp2181_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// the control registers at DM 0x3fe0-0x3fff, BDMA (including the reset boot), timer and SPORT transmit;
+	// boards that still emulate these themselves leave this off
+	void set_internal_peripherals(bool enable) { m_internal_peripherals = enable; }
+	auto bdma_read() { return m_bdma_read_cb.bind(); }
+	auto bdma_write() { return m_bdma_write_cb.bind(); }
+	auto pf_in() { return m_pf_in_cb.bind(); }
+	auto pf_out() { return m_pf_out_cb.bind(); }
+	template <int N> auto sport_tfs() { return m_sport_tfs_cb[N].bind(); }
+	template <int N> auto sport_dt() { return m_sport_dt_cb[N].bind(); }
+
 	// public interfaces
 	void idma_addr_w(uint16_t data);
 	uint16_t idma_addr_r();
@@ -520,15 +534,76 @@ public:
 	uint16_t idma_data_r();
 
 protected:
-	// device_memory_interface overrides
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// device_execute_interface implementation
+	virtual void execute_run() override;
+
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
 	// interrupts
 	virtual bool generate_irq(int which, int indx) override;
 	virtual void check_irqs() override;
 
+	// on-chip peripheral hooks
+	virtual void timer_enable_changed(bool state) override;
+	virtual void sport_tx_written(int port, uint16_t data) override;
+
+private:
+	// control register offsets from DM 0x3fe0
+	enum : uint32_t
+	{
+		IDMA_CONTROL = 0x00, BDMA_INT = 0x01, BDMA_EXT = 0x02, BDMA_CONTROL = 0x03, BDMA_COUNT = 0x04,
+		PF_DATA = 0x05, PF_CONTROL = 0x06,
+		SPORT1_AUTOBUF = 0x0f, SPORT1_RFSDIV = 0x10, SPORT1_CLKDIV = 0x11, SPORT1_CONTROL = 0x12,
+		SPORT0_AUTOBUF = 0x13, SPORT0_RFSDIV = 0x14, SPORT0_CLKDIV = 0x15, SPORT0_CONTROL = 0x16,
+		TIMER_SCALE = 0x1b, TIMER_COUNT = 0x1c, TIMER_PERIOD = 0x1d,
+		WAIT_CONTROL = 0x1e, SYSTEM_CONTROL = 0x1f
+	};
+
+	void internal_data_map(address_map &map) ATTR_COLD;
+	uint16_t control_r(offs_t offset);
+	void control_w(offs_t offset, uint16_t data);
+
+	void bdma_start();
+	void bdma_context_reset();
+	TIMER_CALLBACK_MEMBER(bdma_tick);
+	uint16_t timer_count() const;
+	void timer_update();
+	TIMER_CALLBACK_MEMBER(timer_tick);
+	void update_pf_out();
+	bool sport_enabled(int port) const;
+	void sport_start(int port);
+	TIMER_CALLBACK_MEMBER(sport_tick);
+
 	// address spaces
 	const address_space_config      m_io_config;
+
+	// on-chip peripherals
+	devcb_read8                     m_bdma_read_cb;
+	devcb_write8                    m_bdma_write_cb;
+	devcb_read8                     m_pf_in_cb;
+	devcb_write8                    m_pf_out_cb;
+	devcb_write_line::array<2>      m_sport_tfs_cb;
+	devcb_write16::array<2>         m_sport_dt_cb;
+
+	bool                            m_internal_peripherals;
+	uint16_t                        m_control[32];
+	emu_timer *                     m_bdma_timer;
+	emu_timer *                     m_timer;
+	emu_timer *                     m_sport_timer[2];
+	bool                            m_bdma_hold;
+	bool                            m_timer_enabled;
+	uint8_t                         m_pf_out;
+	uint8_t                         m_pf_out_mask;
+	uint16_t                        m_sport_tx[2];
+	bool                            m_sport_tx_full[2];
+	uint16_t                        m_sport_shift[2];
+	bool                            m_sport_busy[2];
+	uint32_t                        m_sport_tail[2];
 };
 
 
