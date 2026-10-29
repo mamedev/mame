@@ -62,6 +62,7 @@ protected:
 
 	tilemap_t*             m_bg_tilemap = nullptr;
 	uint8_t                m_kidniki_background_bank = 0;
+	int32_t                m_m62_background_hscroll = 0;
 
 	void m62_flipscreen_w(uint8_t data);
 	void m62_hscroll_low_w(uint8_t data);
@@ -71,6 +72,7 @@ protected:
 	void m62_start(tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2);
 
 	void kungfum_io_map(address_map &map) ATTR_COLD;
+	void draw_sprites(bitmap_rgb32& bitmap, const rectangle& cliprect, int colormask, int prioritymask, int priority);
 
 private:
 	/* memory pointers */
@@ -87,7 +89,6 @@ private:
 	required_region_ptr<uint8_t> m_sprite_color_proms;
 	required_region_ptr<uint8_t> m_chr_color_proms;
 	optional_region_ptr<uint8_t> m_fg_color_proms;
-	int32_t                m_m62_background_hscroll = 0;
 	int32_t                m_m62_background_vscroll = 0;
 	int32_t                m_kidniki_text_vscroll = 0;
 	int                  m_ldrun3_topbottom_mask = 0;
@@ -163,7 +164,6 @@ private:
 	uint32_t screen_update_horizon(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void m62_amplify_contrast(bool include_fg);
 	void register_savestate();
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int colormask, int prioritymask, int priority);
 	void m62_textlayer(tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2);
 	optional_device<gfxdecode_device> m_fg_decode;
 	required_device<gfxdecode_device> m_spr_decode;
