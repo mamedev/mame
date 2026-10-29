@@ -37,7 +37,7 @@
 #include "machine/mc68681.h"
 #include "machine/ram.h"
 //#include "machine/x2212.h"
-//#include "video/crt9007.h"
+#include "video/crt9007.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -51,6 +51,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
+		m_crtc(*this, "crtc"),
+		m_screen(*this, "screen"),
 		m_chargen(*this, "chargen")
 	{ }
 
@@ -64,17 +66,21 @@ private:
 	uint32_t screen_update_vt220(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<i8051_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	optional_device<crt9007_device> m_crtc;
+	required_device<screen_device> m_screen;
 	required_region_ptr<u8> m_chargen;
 	u8 m_p1 = 0xff;
 	u8 m_char_addr = 0;
 	u8 m_conf = 0;
 	u8 m_lba = 0;
 	u8 m_lbf_bank = 0;
+	bool m_132col = false;
 	std::unique_ptr<u8[]> m_softchar;
 	std::unique_ptr<u8[]> m_lbf;
 	void p1_w(u8 data);
 	void conf_w(u8 data);
 	void duart_out_w(u8 data);
+	void set_columns();
 	void char_addr_w(u8 data);
 	offs_t lbf_addr() const;
 	u8 char_code() const;
@@ -84,6 +90,7 @@ private:
 	void vt220_mem(address_map &map) ATTR_COLD;
 	void vt220a_data(address_map &map) ATTR_COLD;
 	void vt220a_mem(address_map &map) ATTR_COLD;
+	void vt220a_vram(address_map &map) ATTR_COLD;
 };
 
 
@@ -112,6 +119,7 @@ void vt220_state::vt220a_data(address_map &map)
 	map(0x8000, 0x8fff).mirror(0x4000).ram().share("attr_ram"); // attribute RAM 0/1
 	map(0x0800, 0x0800).mirror(0x47ff).w(FUNC(vt220_state::char_addr_w)); // 0FFF
 	map(0x0000, 0x0000).mirror(0x47ff).w(FUNC(vt220_state::conf_w)); // 07FF
+	map(0x1000, 0x103f).mirror(0x47c0).rw(m_crtc, FUNC(crt9007_device::read), FUNC(crt9007_device::write)); // 1700-17FF
 	map(0x9800, 0x980f).mirror(0x47f0).rw(FUNC(vt220_state::chargen_r), FUNC(vt220_state::chargen_w)); // 9FF0-9FFF
 }
 
@@ -128,11 +136,20 @@ u8 vt220_state::char_code() const
 	return BIT(m_p1, 3) ? m_char_addr : m_lbf[lbf_addr()];
 }
 
+void vt220_state::vt220a_vram(address_map &map)
+{
+	// CRT9007 VA0-VA13 drive the CPU address bus during DMA
+	map(0x2000, 0x2fff).ram().share("screen_ram");
+}
+
 void vt220_state::p1_w(u8 data)
 {
 	// DMA L (P1.0) falling edge loads the character address latch into the line buffer
 	if (BIT(m_p1, 0) && !BIT(data, 0) && !BIT(data, 3))
 		m_lbf[lbf_addr()] = m_char_addr;
+	// RESET CRT L (P1.6)
+	if (m_crtc && BIT(m_p1, 6) && !BIT(data, 6))
+		m_crtc->reset();
 	m_p1 = data;
 }
 
@@ -155,6 +172,24 @@ void vt220_state::conf_w(u8 data)
 void vt220_state::duart_out_w(u8 data)
 {
 	m_lbf_bank = (data >> 5) & 3; // OP5/OP6 BNK S0/S1
+	if (m_crtc && BIT(data, 4) != m_132col)
+	{
+		m_132col = BIT(data, 4); // OP4 132 COL H
+		set_columns();
+	}
+}
+
+void vt220_state::set_columns()
+{
+	// dot clock 22.896 MHz (Y4) at 9 dots per character for 132 columns, 15.288 MHz (Y3) at 10 for 80;
+	// horizontal totals are as the firmware programs the CRT9007
+	const XTAL dot = m_132col ? 22.896_MHz_XTAL : 15.288_MHz_XTAL;
+	const int width = m_132col ? 9 : 10;
+	const int htotal = (m_132col ? 164 : 99) * width;
+	const int hvis = (m_132col ? 132 : 80) * width;
+	m_screen->configure(htotal, 260, rectangle(0, hvis - 1, 0, 240 - 1), attotime::from_ticks(htotal * 260, dot));
+	m_crtc->set_unscaled_clock(dot / width);
+	m_crtc->set_character_width(width);
 }
 
 void vt220_state::char_addr_w(u8 data)
@@ -190,6 +225,9 @@ void vt220_state::machine_start()
 	save_item(NAME(m_conf));
 	save_item(NAME(m_lba));
 	save_item(NAME(m_lbf_bank));
+	save_item(NAME(m_132col));
+	if (m_crtc)
+		machine().save().register_postload(save_prepost_delegate(FUNC(vt220_state::set_columns), this));
 	save_pointer(NAME(m_softchar), 0x800);
 	save_pointer(NAME(m_lbf), 0x800);
 }
@@ -223,7 +261,7 @@ void vt220_state::vt220(machine_config &config)
 	duart.outport_cb().set(FUNC(vt220_state::duart_out_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen"));
+	screen_device &screen(SCREEN(config, m_screen));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 480);
@@ -242,6 +280,16 @@ void vt220_state::vt220a(machine_config &config)
 	vt220(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt220_state::vt220a_mem);
 	m_maincpu->set_addrmap(AS_DATA, &vt220_state::vt220a_data);
+
+	// T5 character clock: 15.288 MHz (Y3) / 10 dots at 80 columns; 22.896 MHz (Y4) / 9 at 132 not yet switched
+	CRT9007(config, m_crtc, 15.288_MHz_XTAL / 10);
+	m_crtc->set_addrmap(0, &vt220_state::vt220a_vram);
+	m_crtc->set_character_width(10);
+	m_crtc->set_screen(m_screen);
+	m_screen->set_raw(15.288_MHz_XTAL, 990, 0, 800, 260, 0, 240);
+	m_crtc->vs_callback().set_inputline(m_maincpu, MCS51_T0_LINE);
+	m_crtc->hs_callback().set_inputline(m_maincpu, MCS51_T1_LINE);
+	m_crtc->drb_callback().set_inputline(m_maincpu, MCS51_INT0_LINE); // DMA REQ L
 }
 
 /* ROM definitions */
