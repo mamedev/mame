@@ -1766,6 +1766,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/pmd32_dsk.h,FORMATS["PMD32_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "PMD32_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/pmd32_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/pmd32_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/pmd_cas.h,FORMATS["PMD_CAS"] = true
 --------------------------------------------------
 
