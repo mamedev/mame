@@ -17,22 +17,24 @@
     - Battery
 
     TODO:
-    - Hook up keyboard
     - Hook up RS232 ports
     - Improve rendering (attributes, double height, etc.)
     - Verify RAM ranges
     - Implement HM82C11C and hookup printer
-    - Save RAM
     - Beeper
 
     Notes:
     - No exact model number in the firmware, might be a different model
+    - Use Shift+NumpadMinus to enter setup
 
 ***************************************************************************/
 
 #include "emu.h"
+#include "bus/pc_kbd/keyboards.h"
+#include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
+#include "machine/nvram.h"
 #include "video/bt47x.h"
 #include "video/scn2674.h"
 #include "screen.h"
@@ -54,16 +56,23 @@ public:
 		m_ramdac(*this, "ramdac"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_chargen(*this, "chargen"),
-		m_vram(*this, "vram")
+		m_vram(*this, "vram"),
+		m_kbdc(*this, "kbdc"),
+		m_nvram(*this, "nvram", 0x80, ENDIANNESS_BIG)
 	{ }
 
 	void tr175(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	void mem_map(address_map &map) ATTR_COLD;
 
-	uint8_t fff400_r();
-	void fff000_w(uint8_t data);
+	uint8_t keyboard_r();
+	void keyboard_w(uint8_t data);
+	void kbd_clk_w(int state);
+	void kbd_rxd_w(int state);
 
 	void charram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
@@ -79,11 +88,16 @@ private:
 
 	void ffec01_w(uint8_t data);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_device> m_maincpu;
 	required_device<bt476_device> m_ramdac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint16_t> m_chargen;
 	required_shared_ptr<uint16_t> m_vram;
+	required_device<pc_kbdc_device> m_kbdc;
+	memory_share_creator<uint8_t> m_nvram;
+
+	bool m_kbd_clk = true;
+	bool m_kbd_rxd = true;
 };
 
 
@@ -95,16 +109,18 @@ void tr175_state::mem_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom().region("maincpu", 0);
 	map(0xfe8000, 0xfebfff).ram().w(FUNC(tr175_state::charram_w)).share(m_chargen);
-	map(0xfefe00, 0xfefedd).ram(); // 8-bit; cleared at startup
-	map(0xff0000, 0xffbfff).ram().share("vram");
+	map(0xfefe00, 0xfefeff).lrw8(
+		[this](offs_t offset) { return m_nvram[offset]; }, "nvram_r",
+		[this](offs_t offset, uint8_t data) { m_nvram[offset] = data; }, "nvram_w").umask16(0x00ff);
+	map(0xff0000, 0xffbfff).ram().share(m_vram);
 	map(0xffe000, 0xffe01f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0xff00);
 	map(0xffe400, 0xffe40f).rw("avdc", FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0xff00);
 	map(0xffe800, 0xffe805).unmaprw(); //.rw("pai", FUNC(um82c11_device::read), FUNC(um82c11_device::write)).umask16(0xff00);
 	map(0xffec01, 0xffec01).w(FUNC(tr175_state::ffec01_w));
-	map(0xfff000, 0xfff000).w(FUNC(tr175_state::fff000_w));
-	map(0xfff400, 0xfff400).r(FUNC(tr175_state::fff400_r));
-	map(0xfff800, 0xfff807).r("ramdac", FUNC(bt476_device::read)).umask16(0x00ff);
-	map(0xfffc00, 0xfffc07).w("ramdac", FUNC(bt476_device::write)).umask16(0x00ff);
+	map(0xfff000, 0xfff000).w(FUNC(tr175_state::keyboard_w));
+	map(0xfff400, 0xfff400).r(FUNC(tr175_state::keyboard_r));
+	map(0xfff800, 0xfff807).r(m_ramdac, FUNC(bt476_device::read)).umask16(0x00ff);
+	map(0xfffc00, 0xfffc07).w(m_ramdac, FUNC(bt476_device::write)).umask16(0x00ff);
 }
 
 
@@ -115,14 +131,46 @@ void tr175_state::mem_map(address_map &map)
 static INPUT_PORTS_START( tr175 )
 INPUT_PORTS_END
 
-uint8_t tr175_state::fff400_r()
+uint8_t tr175_state::keyboard_r()
 {
-	return 0;
+	// 765432--  unknown
+	// ------1-  keyboard serial data
+	// -------0  keyboard serial clock
+
+	uint8_t data = 0;
+
+	data |= m_kbd_rxd << 1;
+	data |= m_kbd_clk << 0;
+
+	// reading the state clears the interrupt
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(M68K_IRQ_IPL2, CLEAR_LINE);
+
+	return data;
 }
 
-void tr175_state::fff000_w(uint8_t data)
+void tr175_state::keyboard_w(uint8_t data)
 {
-	logerror("%s: Writing %02X to FFF000\n", machine().describe_context(), data);
+	// 765432--  unknown
+	// ------1-  serial data to keyboard
+	// -------0  serial clock to keyboard
+
+	m_kbdc->data_write_from_mb(BIT(data, 1));
+	m_kbdc->clock_write_from_mb(BIT(data, 0));
+}
+
+void tr175_state::kbd_clk_w(int state)
+{
+	// falling edge causes an interrupt
+	if (m_kbd_clk && !state)
+		m_maincpu->set_input_line(M68K_IRQ_IPL2, ASSERT_LINE);
+
+	m_kbd_clk = state;
+}
+
+void tr175_state::kbd_rxd_w(int state)
+{
+	m_kbd_rxd = state;
 }
 
 
@@ -228,6 +276,18 @@ GFXDECODE_END
 //  MACHINE EMULATION
 //**************************************************************************
 
+void tr175_state::machine_start()
+{
+	// VRAM with all zeros appears as valid nvram checksum
+	// overwrite it so that NVRAM is properly initialized
+	m_vram[0xb6da / 2] = 0xffff;
+	m_vram[0xb6dc / 2] = 0xffff;
+
+	// register for save states
+	save_item(NAME(m_kbd_clk));
+	save_item(NAME(m_kbd_rxd));
+}
+
 void tr175_state::ffec01_w(uint8_t data)
 {
 	logerror("%s: Writing %02X to FFEC01\n", machine().describe_context(), data);
@@ -241,7 +301,10 @@ void tr175_state::ffec01_w(uint8_t data)
 void tr175_state::tr175(machine_config &config)
 {
 	M68000(config, m_maincpu, 12'000'000);
+	m_maincpu->set_interrupt_mixer(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tr175_state::mem_map);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(28.322_MHz_XTAL, 900, 0, 720, 449, 0, 416); // guess
@@ -250,7 +313,7 @@ void tr175_state::tr175(machine_config &config)
 	BT476(config, m_ramdac); // KDA0476BCN-66
 
 	scn2674_device &avdc(SCN2674(config, "avdc", 28.322_MHz_XTAL / 18)); // guess
-	avdc.intr_callback().set_inputline("maincpu", M68K_IRQ_2);
+	avdc.intr_callback().set_inputline(m_maincpu, M68K_IRQ_IPL1);
 	avdc.set_character_width(18); // guess
 	avdc.set_display_callback(FUNC(tr175_state::draw_character));
 	avdc.set_addrmap(0, &tr175_state::char_map);
@@ -260,7 +323,11 @@ void tr175_state::tr175(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_ramdac, gfxdecode);
 
 	scn2681_device &duart(SCN2681(config, "duart", 11.0592_MHz_XTAL / 3)); // is this the right clock?
-	duart.irq_cb().set_inputline("maincpu", M68K_IRQ_1);
+	duart.irq_cb().set_inputline(m_maincpu, M68K_IRQ_IPL0);
+
+	PC_KBDC(config, m_kbdc, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
+	m_kbdc->out_clock_cb().set(FUNC(tr175_state::kbd_clk_w));
+	m_kbdc->out_data_cb().set(FUNC(tr175_state::kbd_rxd_w));
 }
 
 
@@ -283,4 +350,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY    FULLNAME     FLAGS
-COMP( 1994, tr175, 0,      0,      tr175,   tr175, tr175_state, empty_init, "Relisys", "TR-175 II", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1994, tr175, 0,      0,      tr175,   tr175, tr175_state, empty_init, "Relisys", "TR-175 II", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
