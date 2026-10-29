@@ -83,9 +83,11 @@ private:
 	u8 m_char_addr = 0;
 	u8 m_atr_latch = 0;
 	u8 m_duart_op = 0xff;
-	u8 m_video_lba = 0;
 	int m_row_y = 0;
-	bool m_wben = false;
+	int m_vlt_x = 0;
+	bool m_vlt = false;
+	bool m_drb = true;
+	bool m_row_loading = false;
 	bool m_cblank = true;
 	u8 m_conf = 0;
 	u8 m_lba = 0;
@@ -103,7 +105,9 @@ private:
 	u8 dot(int col, int dot, int line, bool &bold, bool &blink) const;
 	u8 duart_r(offs_t offset);
 	u8 vram_r(offs_t offset);
-	void wben_w(int state);
+	void vlt_w(int state);
+	void drb_w(int state);
+	int video_col(int x) const;
 	void cblank_w(int state);
 	u8 chargen_r(offs_t offset);
 	void chargen_w(offs_t offset, u8 data);
@@ -164,29 +168,50 @@ void vt220_state::vt220a_vram(address_map &map)
 	map(0x0000, 0x3fff).r(FUNC(vt220_state::vram_r));
 }
 
+int vt220_state::video_col(int x) const
+{
+	// the line buffer address counter is cleared by VLT and clocked by T5
+	return (x - m_vlt_x) / (m_132col ? 9 : 10);
+}
+
 u8 vt220_state::vram_r(offs_t offset)
 {
-	// screen and attribute RAM see the same address; row data (not the row table) goes to the line buffer
+	// screen and attribute RAM see the same address; during VLT of a data row's top scan line the
+	// row goes into the line buffer, if the CPU has granted the bus (DMA L, P1.0, drives TSC high)
 	const u8 chr = m_screen_ram[offset & 0x0fff];
-	if (m_wben && !BIT(m_conf, 2) && !BIT(m_p1, 3))
+	if (m_vlt && !BIT(m_p1, 0) && !BIT(m_p1, 3) && !BIT(m_conf, 2))
 	{
-		m_lbf[lbf_addr(true, m_video_lba)] = chr;
-		m_lbf[lbf_addr(false, m_video_lba)] = m_attr_ram[offset & 0x0fff];
-		m_video_lba++;
+		const int col = video_col(m_screen->hpos());
+		if (!m_drb && !m_row_loading)
+		{
+			// top scan line of a data row: it is painted live as the line buffer loads
+			m_screen->update_partial(m_screen->vpos() - 1);
+			m_row_y = m_screen->vpos();
+			m_row_loading = true;
+		}
+		if (col >= 0 && col < 0x100)
+		{
+			m_lbf[lbf_addr(true, col)] = chr;
+			m_lbf[lbf_addr(false, col)] = m_attr_ram[offset & 0x0fff];
+		}
 	}
 	return chr;
 }
 
-void vt220_state::wben_w(int state)
+void vt220_state::vlt_w(int state)
 {
-	if (state && !m_wben)
-	{
-		// the row loaded now is displayed from the next scan line
-		m_screen->update_partial(m_screen->vpos());
-		m_video_lba = 0;
-		m_row_y = m_screen->vpos() + 1;
-	}
-	m_wben = state;
+	if (state && !m_vlt)
+		m_vlt_x = m_screen->hpos();
+	m_vlt = state;
+}
+
+void vt220_state::drb_w(int state)
+{
+	// DRB is active low for the scan line that loads a data row, and drives DMA REQ L on INT0
+	m_drb = state;
+	if (state)
+		m_row_loading = false;
+	m_maincpu->set_input_line(MCS51_INT0_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void vt220_state::cblank_w(int state)
@@ -227,11 +252,10 @@ u8 vt220_state::duart_r(offs_t offset)
 		// self-test status taps on the video output (sheet 5): TBLK on IP4 is low while blanked
 		// (CBLANK or DIS VIDEO), TVB H on IP3 is E45 NOR of the video and the two intensity lines
 		const int x = m_screen->hpos(), y = m_screen->vpos();
-		const int width = m_132col ? 9 : 10;
 		const bool blank = m_cblank || BIT(m_duart_op, 7); // OP7 DIS VIDEO H
 		bool bold = false, blink = false, video = false;
 		if (!blank)
-			video = dot(x / width, x % width, y - m_row_y, bold, blink);
+			video = dot(video_col(x), (x - m_vlt_x) % (m_132col ? 9 : 10), y - m_row_y, bold, blink);
 		m_duart->ip3_w(!(video || bold || blink));
 		m_duart->ip4_w(!blank);
 	}
@@ -296,8 +320,9 @@ void vt220_state::set_columns()
 	const XTAL dot = m_132col ? 22.896_MHz_XTAL : 15.288_MHz_XTAL;
 	const int width = m_132col ? 9 : 10;
 	const int htotal = (m_132col ? 164 : 99) * width;
+	const int hstart = (m_132col ? 22 : 12) * width; // horizontal delay as programmed
 	const int hvis = (m_132col ? 132 : 80) * width;
-	m_screen->configure(htotal, 260, rectangle(0, hvis - 1, 0, 240 - 1), attotime::from_ticks(htotal * 260, dot));
+	m_screen->configure(htotal, 260, rectangle(hstart, hstart + hvis - 1, 0, 240 - 1), attotime::from_ticks(htotal * 260, dot));
 	m_crtc->set_unscaled_clock(dot / width);
 	m_crtc->set_character_width(width);
 }
@@ -340,9 +365,11 @@ void vt220_state::machine_start()
 	save_item(NAME(m_132col));
 	save_item(NAME(m_atr_latch));
 	save_item(NAME(m_duart_op));
-	save_item(NAME(m_video_lba));
 	save_item(NAME(m_row_y));
-	save_item(NAME(m_wben));
+	save_item(NAME(m_vlt_x));
+	save_item(NAME(m_vlt));
+	save_item(NAME(m_drb));
+	save_item(NAME(m_row_loading));
 	save_item(NAME(m_cblank));
 	if (m_crtc)
 		machine().save().register_postload(save_prepost_delegate(FUNC(vt220_state::set_columns), this));
@@ -367,6 +394,7 @@ uint32_t vt220_state::screen_update_vt220(screen_device &screen, bitmap_ind16 &b
 uint32_t vt220_state::screen_update_vt220a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const int width = m_132col ? 9 : 10;
+	const int cols = m_132col ? 132 : 80;
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		u16 *const pix = &bitmap.pix(y);
@@ -374,7 +402,8 @@ uint32_t vt220_state::screen_update_vt220a(screen_device &screen, bitmap_ind16 &
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			bool bold, blink;
-			if (line < 0 || BIT(m_duart_op, 7) || !dot(x / width, x % width, line, bold, blink))
+			const int col = video_col(x);
+			if (line < 0 || col < 0 || col >= cols || BIT(m_duart_op, 7) || !dot(col, (x - m_vlt_x) % width, line, bold, blink))
 				pix[x] = 0;
 			else
 				pix[x] = 1 + blink + (bold << 1);
@@ -436,13 +465,13 @@ void vt220_state::vt220a(machine_config &config)
 	m_crtc->set_addrmap(0, &vt220_state::vt220a_vram);
 	m_crtc->set_character_width(10);
 	m_crtc->set_screen(m_screen);
-	m_screen->set_raw(15.288_MHz_XTAL, 990, 0, 800, 260, 0, 240);
+	m_screen->set_raw(15.288_MHz_XTAL, 990, 120, 920, 260, 0, 240);
 	m_crtc->vs_callback().set_inputline(m_maincpu, MCS51_T0_LINE);
 	m_crtc->hs_callback().set_inputline(m_maincpu, MCS51_T1_LINE);
-	m_crtc->drb_callback().set_inputline(m_maincpu, MCS51_INT0_LINE).invert(); // DRB is active low, as is DMA REQ L
+	m_crtc->drb_callback().set(FUNC(vt220_state::drb_w));
+	m_crtc->vlt_callback().set(FUNC(vt220_state::vlt_w));
 	X2212(config, m_nvr); // E17
 
-	m_crtc->wben_callback().set(FUNC(vt220_state::wben_w));
 	m_crtc->cblank_callback().set(FUNC(vt220_state::cblank_w));
 	m_screen->set_screen_update(FUNC(vt220_state::screen_update_vt220a));
 	m_screen->set_palette("palette_a");
