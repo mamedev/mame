@@ -469,8 +469,8 @@ uint32_t vt220_state::screen_update_vt220a(screen_device &screen, bitmap_ind16 &
 
 void vt220_state::vt220a_palette(palette_device &palette) const
 {
-	// E49 open-collector gates into R17 1.8K (video), R15 2.7K and R16 2K (blink and bold lines;
-	// which is which is unverified); intensity taken as the summed conductance
+	// E49 open-collector NANDs of the video with TBLK L into R17 1.8K, with BLINK ATR into R15 2.7K and
+	// with BOLD ATR into R16 2K (sheet 5); intensity taken as the summed conductance
 	const double g[4] = { 1 / 1.8, 1 / 1.8 + 1 / 2.7, 1 / 1.8 + 1 / 2.0, 1 / 1.8 + 1 / 2.7 + 1 / 2.0 };
 	palette.set_pen_color(0, rgb_t::black());
 	for (int i = 0; i < 4; i++)
