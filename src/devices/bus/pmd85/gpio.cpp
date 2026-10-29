@@ -10,6 +10,7 @@
 #include "gpio.h"
 
 #include "pmd32.h"
+#include "pmd32sd.h"
 
 
 DEFINE_DEVICE_TYPE(PMD85_GPIO_SLOT, pmd85_gpio_slot_device, "pmd85_gpio", "Tesla PMD 85 GPIO/0 connector")
@@ -73,4 +74,5 @@ void device_pmd85_gpio_interface::acknowledge_host()
 void pmd85_gpio_devices(device_slot_interface &device)
 {
 	device.option_add("pmd32", PMD32);
+	device.option_add("pmd32sd", PMD32SD);
 }

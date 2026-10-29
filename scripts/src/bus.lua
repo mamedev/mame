@@ -4971,6 +4971,8 @@ if BUSES["PMD85"] then
 		MAME_DIR .. "src/devices/bus/pmd85/gpio.h",
 		MAME_DIR .. "src/devices/bus/pmd85/pmd32.cpp",
 		MAME_DIR .. "src/devices/bus/pmd85/pmd32.h",
+		MAME_DIR .. "src/devices/bus/pmd85/pmd32sd.cpp",
+		MAME_DIR .. "src/devices/bus/pmd85/pmd32sd.h",
 	}
 end
 
