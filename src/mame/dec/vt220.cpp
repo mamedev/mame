@@ -53,7 +53,10 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_crtc(*this, "crtc"),
 		m_screen(*this, "screen"),
-		m_chargen(*this, "chargen")
+		m_duart(*this, "duart"),
+		m_chargen(*this, "chargen"),
+		m_screen_ram(*this, "screen_ram"),
+		m_attr_ram(*this, "attr_ram")
 	{ }
 
 	void vt220(machine_config &config);
@@ -64,13 +67,24 @@ private:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_vt220(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vt220a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void vt220a_palette(palette_device &palette) const;
 	required_device<i8051_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	optional_device<crt9007_device> m_crtc;
 	required_device<screen_device> m_screen;
+	required_device<scn2681_device> m_duart;
 	required_region_ptr<u8> m_chargen;
+	optional_shared_ptr<u8> m_screen_ram;
+	optional_shared_ptr<u8> m_attr_ram;
 	u8 m_p1 = 0xff;
 	u8 m_char_addr = 0;
+	u8 m_atr_latch = 0;
+	u8 m_duart_op = 0xff;
+	u8 m_video_lba = 0;
+	int m_row_y = 0;
+	bool m_wben = false;
+	bool m_cblank = true;
 	u8 m_conf = 0;
 	u8 m_lba = 0;
 	u8 m_lbf_bank = 0;
@@ -82,8 +96,13 @@ private:
 	void duart_out_w(u8 data);
 	void set_columns();
 	void char_addr_w(u8 data);
-	offs_t lbf_addr() const;
+	offs_t lbf_addr(bool chr, u8 lba) const;
 	u8 char_code() const;
+	u8 dot(int col, int dot, int line, bool &bold, bool &blink) const;
+	u8 duart_r(offs_t offset);
+	u8 vram_r(offs_t offset);
+	void wben_w(int state);
+	void cblank_w(int state);
 	u8 chargen_r(offs_t offset);
 	void chargen_w(offs_t offset, u8 data);
 	void vt220_data(address_map &map) ATTR_COLD;
@@ -115,7 +134,7 @@ void vt220_state::vt220a_data(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x2000, 0x2fff).mirror(0xc000).ram().share("screen_ram"); // RAM 0/1 (A000-AFFF in the technical manual)
-	map(0x3000, 0x300f).mirror(0xc7f0).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)); // B7F0-B7FF
+	map(0x3000, 0x300f).mirror(0xc7f0).r(FUNC(vt220_state::duart_r)).w(m_duart, FUNC(scn2681_device::write)); // B7F0-B7FF
 	map(0x8000, 0x8fff).mirror(0x4000).ram().share("attr_ram"); // attribute RAM 0/1
 	map(0x0800, 0x0800).mirror(0x47ff).w(FUNC(vt220_state::char_addr_w)); // 0FFF
 	map(0x0000, 0x0000).mirror(0x47ff).w(FUNC(vt220_state::conf_w)); // 07FF
@@ -123,30 +142,107 @@ void vt220_state::vt220a_data(address_map &map)
 	map(0x9800, 0x980f).mirror(0x47f0).rw(FUNC(vt220_state::chargen_r), FUNC(vt220_state::chargen_w)); // 9FF0-9FFF
 }
 
-offs_t vt220_state::lbf_addr() const
+offs_t vt220_state::lbf_addr(bool chr, u8 lba) const
 {
 	// E14 (2016): A10/A9 BNKS1/BNKS0, A8 ATR/CHR (high for character), A7-A0 LBA
-	return (m_lbf_bank << 9) | 0x100 | m_lba;
+	return (m_lbf_bank << 9) | (chr ? 0x100 : 0) | lba;
 }
 
 u8 vt220_state::char_code() const
 {
 	// CHRG LATCH2 (E20) takes the character address latch (E19) while LBF DISABLE H (P1.3) is high,
 	// otherwise the line buffer output
-	return BIT(m_p1, 3) ? m_char_addr : m_lbf[lbf_addr()];
+	return BIT(m_p1, 3) ? m_char_addr : m_lbf[lbf_addr(true, m_lba)];
 }
 
 void vt220_state::vt220a_vram(address_map &map)
 {
 	// CRT9007 VA0-VA13 drive the CPU address bus during DMA
-	map(0x2000, 0x2fff).ram().share("screen_ram");
+	map(0x0000, 0x3fff).r(FUNC(vt220_state::vram_r));
+}
+
+u8 vt220_state::vram_r(offs_t offset)
+{
+	// screen and attribute RAM see the same address; row data (not the row table) goes to the line buffer
+	const u8 chr = m_screen_ram[offset & 0x0fff];
+	if (m_wben && !BIT(m_conf, 2) && !BIT(m_p1, 3))
+	{
+		m_lbf[lbf_addr(true, m_video_lba)] = chr;
+		m_lbf[lbf_addr(false, m_video_lba)] = m_attr_ram[offset & 0x0fff];
+		m_video_lba++;
+	}
+	return chr;
+}
+
+void vt220_state::wben_w(int state)
+{
+	if (state && !m_wben)
+	{
+		// the row loaded now is displayed from the next scan line
+		m_screen->update_partial(m_screen->vpos());
+		m_video_lba = 0;
+		m_row_y = m_screen->vpos() + 1;
+	}
+	m_wben = state;
+}
+
+void vt220_state::cblank_w(int state)
+{
+	m_cblank = state;
+}
+
+u8 vt220_state::dot(int col, int x, int line, bool &bold, bool &blink) const
+{
+	// one dot of the video stream: E30 gives the CPU the line buffer address and ALT SEL while
+	// EN CHR GEN RW H is set, otherwise the video side walks the row
+	const bool cpu = BIT(m_conf, 2);
+	const u8 lba = cpu ? m_lba : u8(col);
+	const u8 chr = BIT(m_p1, 3) ? m_char_addr : m_lbf[lbf_addr(true, lba)];
+	const u8 atr = BIT(m_p1, 3) ? m_atr_latch : m_lbf[lbf_addr(false, lba)];
+	const bool alt = cpu ? BIT(m_conf, 3) : BIT(atr, 3);
+
+	// AD7 BLINK (E38 NAND with DUART BLINK H), AD6 BOLD, AD5 REV (low for reverse), AD4 UL, AD3 ALT SEL
+	bold = BIT(atr, 6);
+	blink = !(BIT(m_duart_op, 3) && BIT(atr, 7));
+
+	if (line >= 10)
+		return 0;
+	const u8 bits = alt ? m_softchar[((chr & 0x7f) << 4) | line] : m_chargen[(BIT(m_p1, 5) << 12) | (chr << 4) | line];
+
+	// MSB first; each lit dot is stretched into the next (TM 6.2.4), so a lit dot 7 lights the first fill dot
+	bool on = (x < 8 && BIT(bits, 7 - x)) || (x > 0 && x <= 8 && BIT(bits, 8 - x));
+	if (BIT(atr, 4) && line >= 8) // UL ATR gated with SC3: scan lines 9 and 10
+		on = true;
+	// reverse: NORM FIELD H XOR REV ATR (E46)
+	return on ^ BIT(m_conf, 0) ^ !BIT(atr, 5);
+}
+
+u8 vt220_state::duart_r(offs_t offset)
+{
+	if (offset == 0x0d && !machine().side_effects_disabled())
+	{
+		// self-test status taps on the video output (sheet 5): TBLK on IP4 is low while blanked
+		// (CBLANK or DIS VIDEO), TVB H on IP3 is E45 NOR of the video and the two intensity lines
+		const int x = m_screen->hpos(), y = m_screen->vpos();
+		const int width = m_132col ? 9 : 10;
+		const bool blank = m_cblank || BIT(m_duart_op, 7); // OP7 DIS VIDEO H
+		bool bold = false, blink = false, video = false;
+		if (!blank)
+			video = dot(x / width, x % width, y - m_row_y, bold, blink);
+		m_duart->ip3_w(!(video || bold || blink));
+		m_duart->ip4_w(!blank);
+	}
+	return m_duart->read(offset);
 }
 
 void vt220_state::p1_w(u8 data)
 {
 	// DMA L (P1.0) falling edge loads the character address latch into the line buffer
 	if (BIT(m_p1, 0) && !BIT(data, 0) && !BIT(data, 3))
-		m_lbf[lbf_addr()] = m_char_addr;
+	{
+		m_lbf[lbf_addr(true, m_lba)] = m_char_addr;
+		m_lbf[lbf_addr(false, m_lba)] = m_atr_latch;
+	}
 	// RESET CRT L (P1.6)
 	if (m_crtc && BIT(m_p1, 6) && !BIT(data, 6))
 		m_crtc->reset();
@@ -166,11 +262,16 @@ void vt220_state::conf_w(u8 data)
 		else if (BIT(m_conf, 5) && !BIT(data, 5))
 			m_lba++;
 	}
+	if (m_crtc)
+		m_screen->update_partial(m_screen->vpos());
 	m_conf = data;
 }
 
 void vt220_state::duart_out_w(u8 data)
 {
+	if (m_crtc)
+		m_screen->update_partial(m_screen->vpos());
+	m_duart_op = data;
 	m_lbf_bank = (data >> 5) & 3; // OP5/OP6 BNK S0/S1
 	if (m_crtc && BIT(data, 4) != m_132col)
 	{
@@ -194,7 +295,9 @@ void vt220_state::set_columns()
 
 void vt220_state::char_addr_w(u8 data)
 {
+	// E19 latches the character address from BAD0-7 and E21 the attribute from AD3-7
 	m_char_addr = data;
+	m_atr_latch = data & 0xf8;
 }
 
 u8 vt220_state::chargen_r(offs_t offset)
@@ -226,6 +329,12 @@ void vt220_state::machine_start()
 	save_item(NAME(m_lba));
 	save_item(NAME(m_lbf_bank));
 	save_item(NAME(m_132col));
+	save_item(NAME(m_atr_latch));
+	save_item(NAME(m_duart_op));
+	save_item(NAME(m_video_lba));
+	save_item(NAME(m_row_y));
+	save_item(NAME(m_wben));
+	save_item(NAME(m_cblank));
 	if (m_crtc)
 		machine().save().register_postload(save_prepost_delegate(FUNC(vt220_state::set_columns), this));
 	save_pointer(NAME(m_softchar), 0x800);
@@ -244,6 +353,38 @@ void vt220_state::video_start()
 uint32_t vt220_state::screen_update_vt220(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
+}
+
+uint32_t vt220_state::screen_update_vt220a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const int width = m_132col ? 9 : 10;
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		u16 *const pix = &bitmap.pix(y);
+		const int line = y - m_row_y;
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			bool bold, blink;
+			if (line < 0 || BIT(m_duart_op, 7) || !dot(x / width, x % width, line, bold, blink))
+				pix[x] = 0;
+			else
+				pix[x] = 1 + blink + (bold << 1);
+		}
+	}
+	return 0;
+}
+
+void vt220_state::vt220a_palette(palette_device &palette) const
+{
+	// E49 open-collector gates into R17 1.8K (video), R15 2.7K and R16 2K (blink and bold lines;
+	// which is which is unverified); intensity taken as the summed conductance
+	const double g[4] = { 1 / 1.8, 1 / 1.8 + 1 / 2.7, 1 / 1.8 + 1 / 2.0, 1 / 1.8 + 1 / 2.7 + 1 / 2.0 };
+	palette.set_pen_color(0, rgb_t::black());
+	for (int i = 0; i < 4; i++)
+	{
+		const u8 v = u8(255 * g[i] / g[3]);
+		palette.set_pen_color(1 + i, rgb_t(v, v, v));
+	}
 }
 
 
@@ -290,6 +431,11 @@ void vt220_state::vt220a(machine_config &config)
 	m_crtc->vs_callback().set_inputline(m_maincpu, MCS51_T0_LINE);
 	m_crtc->hs_callback().set_inputline(m_maincpu, MCS51_T1_LINE);
 	m_crtc->drb_callback().set_inputline(m_maincpu, MCS51_INT0_LINE); // DMA REQ L
+	m_crtc->wben_callback().set(FUNC(vt220_state::wben_w));
+	m_crtc->cblank_callback().set(FUNC(vt220_state::cblank_w));
+	m_screen->set_screen_update(FUNC(vt220_state::screen_update_vt220a));
+	m_screen->set_palette("palette_a");
+	PALETTE(config, "palette_a", FUNC(vt220_state::vt220a_palette), 5);
 }
 
 /* ROM definitions */
