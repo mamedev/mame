@@ -226,11 +226,14 @@ Some software items will crash MAME, for example "bdash".
 Disks
 -----
 The I/O board's GPIO/0 connector (slot gpio0) takes the PMD 32 floppy unit
-(pmd32).
+(pmd32) or the PMD 32-SD (pmd32sd).
 - pmd853 : the PMD 32 is fitted; at power-on the monitor boots the disk in its
   drive A (-flop1).
 - c2717pmd : the PMD 32 is fitted (-flop1, -flop2).  Its disk driver reads 26
   sectors per track, the 8" layout (.img images of 26 x 128-byte sectors).
+- c2717sd : the PMD 32-SD is fitted (-flop1 to -flop4) and boots DZ8 images.
+  The floppy PMD 32 boots them too when given 80-cylinder drives
+  (-gpio0 pmd32 -gpio0:pmd32:fdc:0 525qd).
 
 *******************************************************************************************************************/
 
@@ -852,6 +855,14 @@ void pmd85_state::c2717pmd(machine_config &config)
 	m_gpio->set_default_option("pmd32");
 }
 
+void pmd85_state::c2717sd(machine_config &config)
+{
+	c2717(config);
+	m_gpio->set_default_option("pmd32sd");
+
+	SOFTWARE_LIST(config, "flop_list").set_original("c2717_flop");
+}
+
 
 ROM_START(pmd851)
 	ROM_REGION(0x1000,"maincpu",0)
@@ -927,14 +938,21 @@ ROM_START(c2717pmd)
 	ROM_LOAD( "c2717-pmd32.rom", 0x00000, 0x4000, CRC(cbdd323c) SHA1(ee9fea11be8bd4f945c583b0ae5684269906d0ce))
 ROM_END
 
+// 603.513/32 disk driver for the PMD 32-SD; boot records are signed "C2717S"
+ROM_START(c2717sd)
+	ROM_REGION(0x4000,"maincpu",0)
+	ROM_LOAD("c2717-pmd32sd.rom", 0x0000, 0x4000, CRC(9baab764) SHA1(0276babe96a562d58835a70e065edaad67fb0779))
+ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT          COMPANY             FULLNAME                     FLAGS
-COMP( 1985, pmd851,   0,      0,      pmd851,  alfa,  pmd85_state, init_pmd851,  "Tesla",            "PMD-85.1",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1985, pmd852,   pmd851, 0,      pmd851,  pmd85, pmd85_state, init_pmd852,  "Tesla",            "PMD-85.2",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1985, pmd852a,  pmd851, 0,      pmd852a, pmd85, pmd85_state, init_pmd852a, "Tesla",            "PMD-85.2A",                 MACHINE_SUPPORTS_SAVE )
-COMP( 1985, pmd852b,  pmd851, 0,      pmd852a, pmd85, pmd85_state, init_pmd852a, "Tesla",            "PMD-85.2B",                 MACHINE_SUPPORTS_SAVE )
-COMP( 1988, pmd853,   pmd851, 0,      pmd853,  pmd85, pmd85_state, init_pmd853,  "Tesla",            "PMD-85.3",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1986, alfa,     pmd851, 0,      alfa,    alfa,  pmd85_state, init_alfa,    "Didaktik Skalica", "Didaktik Alfa",             MACHINE_SUPPORTS_SAVE )
-COMP( 1985, mato,     pmd851, 0,      mato,    mato,  pmd85_state, init_mato,    "Statny",           "Mato",                      MACHINE_SUPPORTS_SAVE )
-COMP( 1989, c2717,    pmd851, 0,      c2717,   pmd85, pmd85_state, init_c2717,   "Zbrojovka Brno",   "Consul 2717",               MACHINE_SUPPORTS_SAVE )
-COMP( 1989, c2717pmd, pmd851, 0,      c2717pmd, pmd85, pmd85_state, init_c2717,   "Zbrojovka Brno",   "Consul 2717 (with PMD 32)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT          COMPANY                     FULLNAME                        FLAGS
+COMP( 1985, pmd851,   0,      0,      pmd851,   alfa,  pmd85_state, init_pmd851,  "Tesla",                    "PMD-85.1",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1985, pmd852,   pmd851, 0,      pmd851,   pmd85, pmd85_state, init_pmd852,  "Tesla",                    "PMD-85.2",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1985, pmd852a,  pmd851, 0,      pmd852a,  pmd85, pmd85_state, init_pmd852a, "Tesla",                    "PMD-85.2A",                    MACHINE_SUPPORTS_SAVE )
+COMP( 1985, pmd852b,  pmd851, 0,      pmd852a,  pmd85, pmd85_state, init_pmd852a, "Tesla",                    "PMD-85.2B",                    MACHINE_SUPPORTS_SAVE )
+COMP( 1988, pmd853,   pmd851, 0,      pmd853,   pmd85, pmd85_state, init_pmd853,  "Tesla",                    "PMD-85.3",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1986, alfa,     pmd851, 0,      alfa,     alfa,  pmd85_state, init_alfa,    "Didaktik Skalica",         "Didaktik Alfa",                MACHINE_SUPPORTS_SAVE )
+COMP( 1985, mato,     pmd851, 0,      mato,     mato,  pmd85_state, init_mato,    "Statny",                   "Mato",                         MACHINE_SUPPORTS_SAVE )
+COMP( 1989, c2717,    pmd851, 0,      c2717,    pmd85, pmd85_state, init_c2717,   "Zbrojovka Brno",           "Consul 2717",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1989, c2717pmd, pmd851, 0,      c2717pmd, pmd85, pmd85_state, init_c2717,   "Zbrojovka Brno",           "Consul 2717 (with PMD 32)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 2012, c2717sd,  pmd851, 0,      c2717sd,  pmd85, pmd85_state, init_c2717,   "Zbrojovka Brno / RM-TEAM", "Consul 2717 (with PMD 32-SD)", MACHINE_SUPPORTS_SAVE )

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+Consul 2717 PMD 32 disks: DZ8 images, 154 logical tracks of 26 x 128-byte
+sectors, for the PMD 32-SD with the 603.513/32 disk driver (c2717sd).
+-->
+<softwarelist name="c2717_flop" description="Consul 2717 PMD 32 disks">
+
+	<!-- the emulated SD card has no directories: CD.COM only shows and ejects the inserted images -->
+	<software name="cd" supported="partial">
+		<description>CD v2.0 / v3.0 (disk image utility)</description>
+		<year>2021</year>
+		<publisher>RM-TEAM</publisher>
+		<info name="usage" value="Type CD at the A&gt; prompt"/>
+		<part name="flop1" interface="pmd32sd_disk">
+			<dataarea name="flop" size="512512">
+				<rom name="cd.dz8" size="512512" crc="afab8776" sha1="19c3d70eb4bb99d9c34622a9cddba58eb89a8c41"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- DIR stops after the first entry with this disc's 2012 BIOS -->
+	<software name="rmtgames" supported="partial">
+		<description>Spindizzy / Highway Encounter</description>
+		<year>2016</year>
+		<publisher>RM-TEAM</publisher>
+		<info name="usage" value="Type SPINDZ or HIGHENC at the A&gt; prompt"/>
+		<part name="flop1" interface="pmd32sd_disk">
+			<dataarea name="flop" size="512512">
+				<rom name="games-rm-team.dz8" size="512512" crc="dfd179af" sha1="89613eb8ca5053d073eb56fc39355c9128881db0"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

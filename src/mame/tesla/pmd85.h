@@ -54,6 +54,7 @@ public:
 	void alfa(machine_config &config);
 	void c2717(machine_config &config);
 	void c2717pmd(machine_config &config) ATTR_COLD;
+	void c2717sd(machine_config &config) ATTR_COLD;
 	void mato(machine_config &config);
 
 	void init_mato();
