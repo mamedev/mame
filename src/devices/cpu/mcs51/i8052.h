@@ -59,6 +59,9 @@ protected:
 	void rcap2_w(offs_t offset, u8 data);
 	u8 t2_r(offs_t offset);
 	void t2_w(offs_t offset, u8 data);
+
+private:
+	void increment_timer_t2(u32 delta);
 };
 
 class i8032_device : public i8052_device
