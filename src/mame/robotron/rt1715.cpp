@@ -872,7 +872,12 @@ ROM_START( rt1715lc )
 	ROM_LOAD("s605.a25.1", 0x0800, 0x0800, CRC(38062024) SHA1(798f62d4adeb7098b7dcbfe6caf28302853ee97d))
 
 	ROM_REGION(0x0800, "keyboard", 0)
-	ROM_LOAD("s642.ic8", 0x0000, 0x0800, NO_DUMP) // CCITT 962e
+	// Both layout variants were found on EPROMs labelled S642.
+	ROM_DEFAULT_BIOS("jcuken")
+	ROM_SYSTEM_BIOS(0, "jcuken", "Keyboard: JCUKEN (Latin/Cyrillic)")
+	ROMX_LOAD("s642.ic8", 0x0000, 0x0800, CRC(5c9ca8dc) SHA1(73800997e8fe6410d63573330126d4e12feb7267), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "qwerty", "Keyboard: QWERTY (Latin/Cyrillic)")
+	ROMX_LOAD("s642-qwerty.bin", 0x0000, 0x0800, CRC(1cdfa673) SHA1(40bfa73bab31ac7156750e38bdba5e6f2588752f), ROM_BIOS(1))
 
 	ROM_REGION(0x0800, "floppy", 0)
 	ROM_LOAD("068.a8.2", 0x0000, 0x0400, CRC(5306d57b) SHA1(a12d025717b039a8a760eb9961365402f1f501f5)) // "read rom"
