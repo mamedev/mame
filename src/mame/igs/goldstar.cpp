@@ -829,6 +829,7 @@ public:
 	void init_cb3e() ATTR_COLD;
 	void init_cb3f() ATTR_COLD;
 	void init_cb3g() ATTR_COLD;
+	void init_cb3k() ATTR_COLD;
 	void init_cherrys() ATTR_COLD;
 	void init_chry10() ATTR_COLD;
 	void init_chrygld() ATTR_COLD;
@@ -18062,6 +18063,36 @@ ROM_START( cb3j )
 	ROM_LOAD( "dm74s288.12d", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
+// main PCB + CPU sub board
+ROM_START( cb3k )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sub.u6", 0x0000, 0x8000, CRC(7c08a31a) SHA1(5dad56adad1401e51936eeea27e72477fc4a2b67) )
+	ROM_CONTINUE(       0xc000, 0x4000 )
+	ROM_CONTINUE(       0x8000, 0x4000 )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "5.h5", 0x00000, 0x08000, CRC(83650a94) SHA1(e79420ab559d3f74013708767ca3f238fd333fb7) )
+	ROM_LOAD( "6.h6", 0x08000, 0x08000, CRC(2f46a3f5) SHA1(3e6022ee8f84039e48f41aea5e68ee28aabdc556) )
+	ROM_LOAD( "7.h7", 0x10000, 0x08000, CRC(dcf97517) SHA1(0a29696e0464c8878c499b1786a17080fd088a72) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.h1", 0x00000, 0x02000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) )
+	ROM_LOAD( "2.h2", 0x02000, 0x02000, CRC(e73ea4e3) SHA1(c9fd56461f6986d6bc170403d298fcc408a524e9) )
+	ROM_LOAD( "3.h3", 0x04000, 0x02000, CRC(91162010) SHA1(3acc21e7074602b247f2f392eb181802092d2f21) )
+	ROM_LOAD( "4.h4", 0x06000, 0x02000, CRC(cbcc6bfb) SHA1(5bafc934fef1f50d8c182c39d3a7ce795c89d175) )
+
+	ROM_REGION( 0x0200, "proms", ROMREGION_ERASE00 )
+	ROM_LOAD_NIB_LOW(  "n82s129.g13",  0x0000, 0x0100, CRC(59ac98e4) SHA1(5fc0f1a48c49c956cdb8826e20663dc57a9175e4) )  // 1st bank colors, low 4 bits.
+	ROM_LOAD_NIB_HIGH( "n82s129.g14",  0x0000, 0x0100, CRC(0d8f35bd) SHA1(0c2a0145cdaaf9beabdce241731a36b0c65f18a2) )  // 1st bank colors, high 4 bits.
+	ROM_LOAD(          "dm74s288.d13", 0x0080, 0x0020, CRC(77a85e21) SHA1(3b41e0ab7cc55c5d78914d23e8289383f5bd5654) )  // 2nd bank colors
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "82s129.f3", 0x0000, 0x0100, CRC(fcfe6831) SHA1(e8ce4ec7a1afc3efb5012fe9e63e3a7184ab3eea) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "dm74s288.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
 /*
   Original Wing W4 PCB + Dyna D9005 subboard with Z80,
   ROM, RAM and Xilinx. Dumper says GFX ROMs are identical
@@ -33308,6 +33339,14 @@ void cb3_state::init_cb3g()
 		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 13, 12, 14, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
 }
 
+void cb3_state::init_cb3k()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x10000; i++)
+		rom[i] ^= 0xa8;
+}
+
 void unkch_state::init_unkch1()
 {
 	// HACK: remove this patch
@@ -34100,6 +34139,7 @@ GAMEL( 199?, cb3g,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3g
 GAMEL( 199?, cb3h,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 7)",          0,                   layout_cherryb3 )
 GAMEL( 1992, cb3i,       ncb3,     ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.3.0)",                  0,                   layout_cherryb3 ) // dated 1992 when Dyna CB3 seems to be from 1996 approx.
 GAMEL( 199?, cb3j,       ncb3,     ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.2.20)",                 0,                   layout_cherryb3 ) // dated 1992 when Dyna CB3 seems to be from 1996 approx.
+GAMEL( 199?, cb3k,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3k,      ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 8)",          0,                   layout_cherryb3 )
 GAMEL( 199?, cb3s51,     ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3g,      ROT0, "Dyna",              "Cherry Bonus III (ver.5.1)",                  0,                   layout_cherryb3 )
 GAMEL( 199?, chryglda,   ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                   layout_chrygld )  // Runs in CB3e hardware.
 GAME(  1994, chryangla,  ncb3,     chryangla,ncb3,     cb3_state,      init_chryangla, ROT0, "bootleg (G.C.I.)",  "Cherry Angel (encrypted, W-4 hardware)",      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // DYNA CB3  V1.40 string, playable, but still has protections
