@@ -223,6 +223,7 @@ void ds5002fp_device::pcon_ds_w(u8 data)
 void ds5002fp_device::ip_ds_w(u8 data)
 {
 	ds_protected(m_ip, data, 0x7f, 0xff);
+	m_irq_delayed = 0xff;
 }
 
 u8 ds5002fp_device::crcr_r()

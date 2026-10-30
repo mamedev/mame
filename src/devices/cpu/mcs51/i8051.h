@@ -171,7 +171,7 @@ protected:
 	int m_cur_irq_prio;    // Holds value of the current IRQ Priority Level; -1 if no irq
 	u8 m_irq_active;       // mask which irq levels are serviced
 	u8 m_irq_prio[8];      // interrupt priority
-	u8 m_irq_delayed;      // flags set in an instruction's last cycle, polled after the next one
+	u8 m_irq_delayed;      // interrupt sources excluded from the next poll
 
 	u8 m_forced_inputs[4]; // allow read even if configured as output
 
