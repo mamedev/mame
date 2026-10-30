@@ -258,6 +258,9 @@ void tmp94c241_device::device_reset()
 	m_port_function[PORT_Z] = 0x00;
 
 	std::fill_n(&m_port_control[0], NUM_PORTS, 0x00);
+	// ports A and B have no control register: their pins are outputs, so they read back the output latch
+	m_port_control[PORT_A] = 0xff;
+	m_port_control[PORT_B] = 0xff;
 	std::fill_n(&m_timer_flipflops[0], 12, 0x00);
 	m_t8run = 0x00;
 	m_trdc = 0x00;
@@ -1353,7 +1356,7 @@ void tmp94c241_device::tlcs900_check_irqs()
 		// data.
 		if (irq_vector_map[irq].reg == INTE0AD &&
 			irq_vector_map[irq].iff == 0x08 &&
-			!(m_iimc & 0x02) &&
+			BIT(m_iimc, 1) &&
 			m_level[TLCS900_INT0] == ASSERT_LINE)
 		{
 			bool hdma_steals_int0 = false;
@@ -1618,7 +1621,8 @@ void tmp94c241_device::execute_set_input(int input, int level)
 			break;
 
 		case TLCS900_INT0:
-			if (m_iimc & 0x02)
+			// IIMC bit 1 (I0LE) set selects level detection
+			if (!BIT(m_iimc, 1))
 			{
 				// Rising edge detect
 				if (level != m_level[TLCS900_INT0] && level == ASSERT_LINE)

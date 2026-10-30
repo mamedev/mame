@@ -149,7 +149,32 @@ private:
 
 	void maincpu_mem(address_map &map) ATTR_COLD;
 	void subcpu_mem(address_map &map) ATTR_COLD;
+
+	void to_subcpu_w(u8 data);
+	void to_maincpu_w(u8 data);
 };
+
+// Each write to an inter-CPU latch raises a fresh /INT0 on the receiving CPU,
+// even if the previous byte was not read: the receivers decline to read while
+// their MSTAT/SSTAT handshake says so.  The writer then yields, so that the
+// receiver's micro-DMA can take the byte before the next one is written.
+void kn5000_state::to_subcpu_w(u8 data)
+{
+	machine().scheduler().perfect_quantum(attotime::from_usec(100));
+	if (m_subcpu_latch->pending_r())
+		m_subcpu_latch->acknowledge_w(0);
+	m_subcpu_latch->write(data);
+	m_maincpu->abort_timeslice();
+}
+
+void kn5000_state::to_maincpu_w(u8 data)
+{
+	machine().scheduler().perfect_quantum(attotime::from_usec(100));
+	if (m_maincpu_latch->pending_r())
+		m_maincpu_latch->acknowledge_w(0);
+	m_maincpu_latch->write(data);
+	m_subcpu->abort_timeslice();
+}
 
 void kn5000_state::maincpu_mem(address_map &map)
 {
@@ -167,7 +192,7 @@ void kn5000_state::maincpu_mem(address_map &map)
 	map(0x11000a, 0x11000a).rw(m_fdc, FUNC(upd72067_device::fifo_r), FUNC(upd72067_device::fifo_w));
 	map(0x120000, 0x12ffff).rw(m_fdc, FUNC(upd72067_device::dma_r), FUNC(upd72067_device::dma_w)); // Floppy DMA Acknowledge
 	map(0x140000, 0x14ffff).r(m_maincpu_latch, FUNC(generic_latch_8_device::read)); // @ IC23
-	map(0x140000, 0x14ffff).w(m_subcpu_latch, FUNC(generic_latch_8_device::write)); // @ IC22
+	map(0x140000, 0x14ffff).w(FUNC(kn5000_state::to_subcpu_w)); // @ IC22
 	map(0x1703b0, 0x1703df).m("vga", FUNC(mn89304_vga_device::io_map)); // LCD controller @ IC206
 	map(0x1a0000, 0x1dffff).rw("vga", FUNC(mn89304_vga_device::mem_linear_r), FUNC(mn89304_vga_device::mem_linear_w));
 	map(0x1e0000, 0x1fffff).ram().share("nvram"); // 1Mbit SRAM @ IC21 (CS0)
@@ -184,7 +209,7 @@ void kn5000_state::subcpu_mem(address_map &map)
 	map(0x100000, 0x100003).noprw(); // Tone generator @ IC303 (stub)
 	map(0x110000, 0x110003).noprw(); // Tone generator keybed data/status (stub)
 	map(0x120000, 0x12ffff).r(m_subcpu_latch, FUNC(generic_latch_8_device::read)); // @ IC22
-	map(0x120000, 0x12ffff).w(m_maincpu_latch, FUNC(generic_latch_8_device::write)); // @ IC23
+	map(0x120000, 0x12ffff).w(FUNC(kn5000_state::to_maincpu_w)); // @ IC23
 	map(0x130000, 0x130003).noprw(); // DSP1 @ IC311 (stub)
 	map(0x1e0000, 0x1effff).noprw(); // Waveform/sample RAM (stub)
 	map(0xfe0000, 0xffffff).rom().region("subcpu", 0); // 1Mbit MASK ROM @ IC30
