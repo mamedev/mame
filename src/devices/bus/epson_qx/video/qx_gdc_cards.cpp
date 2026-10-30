@@ -134,6 +134,7 @@ void qx_gdc_card_device::zoom_map(address_map &map)
 UPD7220_DRAW_TEXT_LINE_MEMBER(qx_gdc_card_device::hgdc_draw_text)
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	const bool blink_off = m_screen->frame_number() & 0x10;
 	addr &= 0xffff;
 
 	for (int x = 0; x < pitch; x++)
@@ -153,7 +154,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER(qx_gdc_card_device::hgdc_draw_text)
 			if (cursor_on && cursor_addr == addr + x)
 				tile_data ^= 0xff;
 
-			if (attr & 0x80 && m_screen->frame_number() & 0x10)
+			if ((attr & 0x80) && blink_off)
 				tile_data = 0;
 
 			for (int xi = 0; xi < 8; xi++)
@@ -210,6 +211,7 @@ void qx_gdc_mono_card_device::upd7220_map(address_map &map)
 UPD7220_DISPLAY_PIXELS_MEMBER(qx_gdc_mono_card_device::hgdc_display_pixels)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	const rectangle &visible = m_screen->visible_area();
 	address &= 0xffff;
 	int gfx = m_vram[address];
 
@@ -219,7 +221,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER(qx_gdc_mono_card_device::hgdc_display_pixels)
 		for (int z = 0; z <= m_zoom; ++z)
 		{
 			int xval = ((x + xi) * (m_zoom + 1)) + z;
-			if (xval >= bitmap.cliprect().width() * 2)
+			if (!visible.contains(xval, y))
 				continue;
 			bitmap.pix(y, xval) = palette[pen];
 		}
@@ -291,6 +293,7 @@ void qx_gdc_color_card_device::bank_map(address_map &map)
 UPD7220_DISPLAY_PIXELS_MEMBER(qx_gdc_color_card_device::hgdc_display_pixels)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	const rectangle &visible = m_screen->visible_area();
 	int gfx[3];
 	address &= 0xffff;
 	gfx[0] = m_vram[address + 0x00000];
@@ -306,7 +309,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER(qx_gdc_color_card_device::hgdc_display_pixels)
 		for (int z = 0; z <= m_zoom; ++z)
 		{
 			int xval = ((x + xi) * (m_zoom + 1)) + z;
-			if (xval >= bitmap.cliprect().width() * 2)
+			if (!visible.contains(xval, y))
 				continue;
 			bitmap.pix(y, xval) = palette[pen];
 		}
