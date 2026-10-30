@@ -33692,6 +33692,9 @@ tomsadvs
 toratora
 toratorab
 
+@source:misc/tr175.cpp
+tr175
+
 @source:misc/triton.cpp
 triton41
 triton51
@@ -44732,9 +44735,6 @@ tk635
 
 @source:skeleton/tnshc08.cpp
 tnshc08
-
-@source:skeleton/tr175.cpp
-tr175
 
 @source:skeleton/tsispch.cpp
 prose2k
