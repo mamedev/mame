@@ -14,7 +14,7 @@
     f1gp:
     - gfxctrl register not understood - handling of fg/sprite priority to fix
       "continue" screen is just a kludge.
-     f1gpb:
+    f1gpb:
     - supposedly supports only steering wheel, but the emulation doesn't seem
       to work.
     f1gp2:
@@ -65,15 +65,6 @@ class f1gp_state : public driver_device
 public:
 	f1gp_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_sharedram(*this, "sharedram"),
-		m_sprvram(*this, "spr%uvram", 1U),
-		m_sprcgram(*this, "spr%ucgram", 1U),
-		m_fgvideoram(*this, "fgvideoram"),
-		m_rozvideoram(*this, "rozvideoram"),
-		m_spriteram(*this, "spriteram"),
-		m_fgregs(*this, "fgregs"),
-		m_rozregs(*this, "rozregs"),
-		m_z80bank(*this, "z80bank"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_audiocpu(*this, "audiocpu"),
@@ -83,34 +74,23 @@ public:
 		m_acia(*this, "acia"),
 		m_rs232_out(*this, "com_out"),
 		m_rs232_in(*this, "com_in"),
-		m_rozgfxram(*this, "rozgfxram"),
-		m_spr_old(*this, "vsystem_spr_old%u", 1U)
+		m_sharedram(*this, "sharedram"),
+		m_sprvram(*this, "spr%uvram", 1U),
+		m_sprcgram(*this, "spr%ucgram", 1U),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_rozvideoram(*this, "rozvideoram"),
+		m_spriteram(*this, "spriteram"),
+		m_fgregs(*this, "fgregs"),
+		m_rozregs(*this, "rozregs"),
+		m_z80bank(*this, "z80bank"),
+		m_spr_old(*this, "vsystem_spr_old%u", 1U),
+		m_rozgfxram(*this, "rozgfxram")
 	{ }
 
 	void f1gpbl(machine_config &config);
 	void f1gp(machine_config &config);
 
 protected:
-	// memory pointers
-	required_shared_ptr<uint16_t> m_sharedram;
-	optional_shared_ptr_array<uint16_t, 2> m_sprvram;
-	optional_shared_ptr_array<uint16_t, 2> m_sprcgram;
-	required_shared_ptr<uint16_t> m_fgvideoram;
-	required_shared_ptr<uint16_t> m_rozvideoram;
-	optional_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_fgregs;
-	optional_shared_ptr<uint16_t> m_rozregs;
-
-	optional_memory_bank m_z80bank;
-
-	// video-related
-	tilemap_t *m_fg_tilemap = nullptr;
-	tilemap_t *m_roz_tilemap = nullptr;
-	uint8_t m_flipscreen = 0;
-	uint8_t m_gfxctrl = 0;
-	uint16_t m_scroll[2]{};
-	template <int Chip> uint32_t tile_callback(uint32_t code);
-
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -122,9 +102,29 @@ protected:
 	required_device<rs232_port_device> m_rs232_out;
 	required_device<rs232_port_device> m_rs232_in;
 
+	// memory pointers
+	required_shared_ptr<uint16_t> m_sharedram;
+	optional_shared_ptr_array<uint16_t, 2> m_sprvram;
+	optional_shared_ptr_array<uint16_t, 2> m_sprcgram;
+	required_shared_ptr<uint16_t> m_fgvideoram;
+	required_shared_ptr<uint16_t> m_rozvideoram;
+	optional_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_fgregs;
+	optional_shared_ptr<uint16_t> m_rozregs;
+	optional_memory_bank m_z80bank;
+
+	// variables
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_roz_tilemap = nullptr;
+	uint8_t m_flipscreen = 0;
+	uint8_t m_gfxctrl = 0;
+	uint16_t m_scroll[2]{};
+	bool m_z80_sync = false;
+
+	template <int Chip> uint32_t tile_callback(uint32_t code);
+
 	void sh_bankswitch_w(uint8_t data);
 	uint8_t soundlatch_pending_r();
-	void soundlatch_pending_w(int state);
 	void rozvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void fgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void fgscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -140,11 +140,11 @@ protected:
 	void sound_map(address_map &map) ATTR_COLD;
 
 private:
-	// memory pointers
-	optional_shared_ptr<uint16_t> m_rozgfxram;
-
 	// devices
 	optional_device_array<vsystem_spr2_device, 2> m_spr_old; // f1gp
+
+	// memory pointers
+	optional_shared_ptr<uint16_t> m_rozgfxram;
 
 	void f1gpbl_misc_w(uint16_t data);
 	void rozgfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -173,11 +173,11 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	// video-related
-	uint8_t m_roz_bank = 0;
-
 	// devices
 	optional_device<vsystem_spr_device> m_spr; // f1gp2
+
+	// video-related
+	uint8_t m_roz_bank = 0;
 
 	void rozbank_w(uint8_t data);
 
@@ -228,6 +228,10 @@ void f1gp_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(f1gp_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_fg_tilemap->set_transparent_pen(0xff);
+
+	// flipped-side dx/dy measured from the game's own scroll compensation
+	m_fg_tilemap->set_scrolldx(0, 160);
+	m_fg_tilemap->set_scrolldy(0, 10);
 
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_gfxctrl));
@@ -289,6 +293,10 @@ void f1gp_state::gfxctrl_w(uint8_t data)
 {
 	m_flipscreen = data & 0x20;
 	m_gfxctrl = data & 0xdf;
+
+	// the ROZ layer is not flipped here: the game mirrors the 053936 matrix itself
+	m_fg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_k053936->set_flip(m_flipscreen != 0);
 }
 
 void f1gp2_state::rozbank_w(uint8_t data)
@@ -319,13 +327,13 @@ uint32_t f1gp_state::screen_update_f1gp(screen_device &screen, bitmap_ind16 &bit
 	// quick kludge for "continue" screen priority
 	if (m_gfxctrl == 0x00)
 	{
-		m_spr_old[0]->draw_sprites(m_sprvram[0], m_sprvram[0].bytes(), 0, bitmap, cliprect, screen.priority(), 0x02);
-		m_spr_old[1]->draw_sprites(m_sprvram[1], m_sprvram[1].bytes(), 0, bitmap, cliprect, screen.priority(), 0x02);
+		m_spr_old[0]->draw_sprites(m_sprvram[0], m_sprvram[0].bytes(), 0, bitmap, cliprect, screen.priority(), 0x02, m_flipscreen);
+		m_spr_old[1]->draw_sprites(m_sprvram[1], m_sprvram[1].bytes(), 0, bitmap, cliprect, screen.priority(), 0x02, m_flipscreen);
 	}
 	else
 	{
-		m_spr_old[0]->draw_sprites(m_sprvram[0], m_sprvram[0].bytes(), 0, bitmap, cliprect, screen.priority(), 0x00);
-		m_spr_old[1]->draw_sprites(m_sprvram[1], m_sprvram[1].bytes(), 0, bitmap, cliprect, screen.priority(), 0x02);
+		m_spr_old[0]->draw_sprites(m_sprvram[0], m_sprvram[0].bytes(), 0, bitmap, cliprect, screen.priority(), 0x00, m_flipscreen);
+		m_spr_old[1]->draw_sprites(m_sprvram[1], m_sprvram[1].bytes(), 0, bitmap, cliprect, screen.priority(), 0x02, m_flipscreen);
 	}
 	return 0;
 }
@@ -467,17 +475,16 @@ void f1gp_state::sh_bankswitch_w(uint8_t data)
 
 uint8_t f1gp_state::soundlatch_pending_r()
 {
+	if (!machine().side_effects_disabled())
+	{
+		// retry_access() forces the z80 to catch up before maincpu does the read
+		if (!m_z80_sync)
+			m_maincpu->retry_access();
+
+		m_z80_sync = !m_z80_sync;
+	}
+
 	return (m_soundlatch->pending_r() ? 0xff : 0);
-}
-
-void f1gp_state::soundlatch_pending_w(int state)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
-
-	// sound comms is 2-way (see soundlatch_pending_r),
-	// NMI routine is very short, so briefly set perfect_quantum to make sure that the timing is right
-	if (state)
-		machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 
@@ -794,6 +801,8 @@ void f1gp_state::machine_start()
 
 	m_acia->write_cts(0);
 	m_acia->write_dcd(0);
+
+	save_item(NAME(m_z80_sync));
 }
 
 void f1gp_state::machine_reset()
@@ -802,6 +811,7 @@ void f1gp_state::machine_reset()
 	m_gfxctrl = 0;
 	m_scroll[0] = 0;
 	m_scroll[1] = 0;
+	m_z80_sync = false;
 }
 
 void f1gp2_state::machine_reset()
@@ -823,17 +833,17 @@ void f1gp_state::f1gp(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &f1gp_state::f1gp_cpu1_map);
 	m_maincpu->set_vblank_int("screen", FUNC(f1gp_state::irq1_line_hold));
 
-	m68000_device &sub(M68000(config, "sub", XTAL(20'000'000) / 2));    // verified on PCB
+	m68000_device &sub(M68000(config, "sub", XTAL(20'000'000) / 2)); // verified on PCB
 	sub.set_addrmap(AS_PROGRAM, &f1gp_state::f1gp_cpu2_map);
 	sub.set_vblank_int("screen", FUNC(f1gp_state::irq1_line_hold));
 
-	Z80(config, m_audiocpu, XTAL(20'000'000) / 4);  // verified on PCB
+	Z80(config, m_audiocpu, XTAL(20'000'000) / 4); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &f1gp_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &f1gp_state::sound_io_map);
 
-	config.set_maximum_quantum(attotime::from_hz(6'000)); // 100 CPU slices per frame
+	config.set_maximum_quantum(attotime::from_hz(6000)); // 100 CPU slices per frame
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->irq_handler().set_inputline("sub", M68K_IRQ_3);
 	m_acia->txd_handler().set("com_out", FUNC(rs232_port_device::write_txd));
 
@@ -851,7 +861,7 @@ void f1gp_state::f1gp(machine_config &config)
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
@@ -863,23 +873,26 @@ void f1gp_state::f1gp(machine_config &config)
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	VSYSTEM_SPR2(config, m_spr_old[0], 0, m_palette, gfx_f1gp_spr1);
+	VSYSTEM_SPR2(config, m_spr_old[0], m_palette, gfx_f1gp_spr1);
 	m_spr_old[0]->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<0>));
 	m_spr_old[0]->set_pritype(2);
+	m_spr_old[0]->set_flip_offsets(305, 232);
 
-	VSYSTEM_SPR2(config, m_spr_old[1], 0, m_palette, gfx_f1gp_spr2);
+	VSYSTEM_SPR2(config, m_spr_old[1], m_palette, gfx_f1gp_spr2);
 	m_spr_old[1]->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<1>));
 	m_spr_old[1]->set_pritype(2);
+	m_spr_old[1]->set_flip_offsets(305, 232);
 
-	K053936(config, m_k053936, 0);
+	K053936(config, m_k053936);
 	m_k053936->set_wrap(1);
 	m_k053936->set_offsets(-58, -2);
+	m_k053936->set_flip_offsets(-58, -3);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set(FUNC(f1gp_state::soundlatch_pending_w));
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(8'000'000)));
@@ -897,14 +910,14 @@ void f1gp_state::f1gpbl(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &f1gp_state::f1gpbl_cpu1_map);
 	m_maincpu->set_vblank_int("screen", FUNC(f1gp_state::irq1_line_hold));
 
-	m68000_device &sub(M68000(config, "sub", 10'000'000));    // 10 MHz ???
+	m68000_device &sub(M68000(config, "sub", 10'000'000)); // 10 MHz ???
 	sub.set_addrmap(AS_PROGRAM, &f1gp_state::f1gpbl_cpu2_map);
 	sub.set_vblank_int("screen", FUNC(f1gp_state::irq1_line_hold));
 
 	// NO sound CPU
-	config.set_maximum_quantum(attotime::from_hz(6'000)); // 100 CPU slices per frame
+	config.set_maximum_quantum(attotime::from_hz(6000)); // 100 CPU slices per frame
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->irq_handler().set_inputline("sub", M68K_IRQ_3);
 	m_acia->txd_handler().set("com_out", FUNC(rs232_port_device::write_txd));
 
@@ -921,9 +934,8 @@ void f1gp_state::f1gpbl(machine_config &config)
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
-
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
@@ -933,7 +945,7 @@ void f1gp_state::f1gpbl(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_f1gpbl);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	//VSYSTEM_GGA(config, "gga", 0);
+	//VSYSTEM_GGA(config, "gga");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -959,7 +971,7 @@ void f1gp2_state::f1gp2(machine_config &config)
 	config.device_remove("vsystem_spr_old1");
 	config.device_remove("vsystem_spr_old2");
 
-	VSYSTEM_SPR(config, m_spr, 0, m_palette, gfx_f1gp2_spr);
+	VSYSTEM_SPR(config, m_spr, m_palette, gfx_f1gp2_spr);
 	m_spr->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<0>));
 
 	m_k053936->set_offsets(-48, -21);
@@ -1127,17 +1139,9 @@ ROM_START( f1gpbl )
 	ROM_LOAD( "15.ic153", 0x100000, 0x080000, CRC(c2867d7f) SHA1(86b1be9672cf9f610e1d7efff90d6a73dc1cdb90) )
 	ROM_LOAD( "14.ic154", 0x180000, 0x080000, CRC(0cd20423) SHA1(cddad02247b898c0a5a2fe061c41f68ecdf04d5c) )
 
-	/*
-	Roms 20 and 21 were missing from the PCB, however the others match perfectly (just with a different data layout)
-	I've reconstructed what should be the correct data for this bootleg.
-
-	Note, the bootleg combines 2 GFX regions into a single set of 4-way interleaved ROMs, so we load them in a user
-	region and use ROM_COPY.
-	*/
-
 	ROM_REGION( 0x200000, "user3", 0 )
-	ROM_LOAD32_BYTE( "rom21",    0x000003, 0x80000, CRC(7a08c3b7) SHA1(369123348a88513c066c239ed6aa4db5ae4ef0ac) )
-	ROM_LOAD32_BYTE( "rom20",    0x000001, 0x80000, CRC(bd1273d0) SHA1(cc7caee231fe3bd87d8403d34059e1292c7f7a00) )
+	ROM_LOAD32_BYTE( "21.ic143", 0x000003, 0x80000, CRC(7a08c3b7) SHA1(369123348a88513c066c239ed6aa4db5ae4ef0ac) )
+	ROM_LOAD32_BYTE( "20.ic142", 0x000001, 0x80000, CRC(bd1273d0) SHA1(cc7caee231fe3bd87d8403d34059e1292c7f7a00) )
 	ROM_LOAD32_BYTE( "19.ic141", 0x000002, 0x80000, CRC(aa4ebdfe) SHA1(ed117e6a84554c5ed2ad4379b834898a4c40d51e) )
 	ROM_LOAD32_BYTE( "18.ic140", 0x000000, 0x80000, CRC(9b2a4325) SHA1(b2020e08251366686c4c0045f3fd523fa327badf) )
 
@@ -1148,7 +1152,10 @@ ROM_START( f1gpbl )
 	ROM_COPY("user3", 0x100000, 0, 0x80000)
 
 	ROM_REGION( 0x90000, "oki", 0 )
-	ROM_LOAD( "6.ic13", 0x00000, 0x030000, CRC(6e83ffd8) SHA1(618fd6cd6c0844a4be96f77ff22cd41364718d16) ) // a second dump has 0x40 instead of 0x44 at 0x54cbc. Which one is bad?
+	// 0x40 instead at 0x54cbc has been confirmed by multiple dumps from different PCBs.
+	// there is a dump with 0x44 but given it was on only one PCB and with the only difference a single bit of a single byte,
+	// it is almost surely a bad read
+	ROM_LOAD( "6.ic13", 0x00000, 0x030000, CRC(469f3ee1) SHA1(9d5f0cd6463abf82e74bf4641fc1bcf478084c16) )
 	ROM_CONTINUE(       0x40000, 0x050000 )
 ROM_END
 
@@ -1190,9 +1197,9 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1991, f1gp,   0,    f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 1)",            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // censored banners, US McO'River release?
-GAME( 1991, f1gpa,  f1gp, f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 2)",            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, f1gpb,  f1gp, f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 3)",            MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // supposed to be the earliest version dumped and only work with steering wheel
+GAME( 1991, f1gp,   0,    f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 1)",            MACHINE_SUPPORTS_SAVE ) // censored banners, US McO'River release?
+GAME( 1991, f1gpa,  f1gp, f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1991, f1gpb,  f1gp, f1gp,   f1gp,  f1gp_state,  empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix (set 3)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // supposed to be the earliest version dumped and only work with steering wheel
 GAME( 1991, f1gpbl, f1gp, f1gpbl, f1gp,  f1gp_state,  empty_init, ROT90, "bootleg (Playmark)", "F-1 Grand Prix (Playmark bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // PCB marked 'Super Formula II', manufactured by Playmark.
 
 GAME( 1992, f1gp2,  0,    f1gp2,  f1gp2, f1gp2_state, empty_init, ROT90, "Video System Co.",   "F-1 Grand Prix Part II",            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

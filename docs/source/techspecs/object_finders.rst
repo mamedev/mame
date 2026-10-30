@@ -936,11 +936,7 @@ they’re used in a similar way.  There are a number of important differences to
 be aware of:
 
 * Output finders always create outputs if they do not exist.
-* Output finders must be manually resolved, they are not automatically resolved.
-* Output finders cannot have their target changed after construction.
 * Output finders are array-like, and support an arbitrary number of dimensions.
-* Output names are global, the base device has no influence.  (This will change
-  in the future.)
 
 Output finders take a variable number of template arguments corresponding to the
 number of array dimensions you want.  Let’s look at an example that uses zero-,
@@ -990,21 +986,21 @@ finder ``m_p`` will find the outputs ``p0_0``, ``p0_1``, … ``p0_7`` for the
 first row, ``p1_0``, ``p1_1``, … ``p1_7`` for the second row, and ``p2_0``,
 ``p2_1``, … ``p2_7`` for the third row.
 
-You must call ``resolve`` on each output finder before it can be used.  This
-should be done at start time for the output values to be included in save
-states:
+The output names may also be specified by providing an array of strings with
+the same dimensions as the output finder (i.e. a one-dimensional output finder
+requires a one-dimensional array of strings, a two-dimensional output finder
+requires a two-dimensional array of strings,
 
-.. code-block:: C++
+The names may be changed during machine configuration by calling ``set_name``
+for a zero-dimensional output finder or ``set_names`` for any other kind of
+output finder.  Names are specified the same way as during construction, i.e.
+as a format string and an index offset for each dimension, or as an array of
+strings with the same dimensions as the output finder.  Names will be
+interpreted relative to the device currently being configured.
 
-    void mmd2_state::machine_start()
-    {
-        m_digits.resolve();
-        m_p.resolve();
-        m_led_halt.resolve();
-        m_led_hold.resolve();
-
-        save_item(NAME(m_digit));
-    }
+Note that output finders *do not* copy name format strings or arrays of output
+names.  The caller must ensure that the name format string or array of names
+remains valid until after validation and/or object resolution is complete.
 
 Output finders provide operators allowing them to be assigned from or cast to
 32-bit signed integers.  The assignment operator will send a notification if the

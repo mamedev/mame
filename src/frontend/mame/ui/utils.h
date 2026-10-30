@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <iosfwd>
 #include <limits>
 #include <memory>
 #include <string>
@@ -30,7 +31,7 @@
 
 
 class mame_ui_manager;
-class render_container;
+class render_target;
 
 
 // TODO: namespace these things
@@ -141,7 +142,7 @@ public:
 
 	virtual bool apply(Entry const &info) const = 0;
 
-	virtual void show_ui(mame_ui_manager &mui, render_container &container, std::function<void (Impl &)> &&handler) = 0;
+	virtual void show_ui(mame_ui_manager &mui, render_target &target, std::function<void (Impl &)> &&handler) = 0;
 
 	virtual bool wants_adjuster() const = 0;
 	virtual char const *adjust_text() const = 0;
@@ -149,7 +150,7 @@ public:
 	virtual bool adjust_left() = 0;
 	virtual bool adjust_right() = 0;
 
-	virtual void save_ini(util::core_file &file, unsigned indent) const = 0;
+	virtual void save_ini(std::ostream &file, unsigned indent) const = 0;
 
 	template <typename InputIt, class OutputIt>
 	void apply(InputIt first, InputIt last, OutputIt dest) const

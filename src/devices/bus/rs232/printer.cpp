@@ -35,7 +35,7 @@ serial_printer_device::serial_printer_device(const machine_config &mconfig, devi
 
 void serial_printer_device::device_add_mconfig(machine_config &config)
 {
-	PRINTER(config, m_printer, 0);
+	PRINTER(config, m_printer);
 	m_printer->online_callback().set(FUNC(serial_printer_device::printer_online));
 }
 
@@ -69,9 +69,7 @@ void serial_printer_device::update_serial(int state)
 
 	// TODO: make this configurable
 	output_rxd(m_initial_rx_state);
-	output_dcd(0);
-	output_dsr(0);
-	output_cts(0);
+	printer_online(m_printer->is_ready());
 }
 
 void serial_printer_device::device_reset()
@@ -81,7 +79,10 @@ void serial_printer_device::device_reset()
 
 void serial_printer_device::printer_online(int state)
 {
-	/// TODO: ?
+	// Without an output image the endpoint cannot accept printed bytes.
+	output_dcd(state ? 0 : 1);
+	output_dsr(state ? 0 : 1);
+	output_cts(state ? 0 : 1);
 }
 
 void serial_printer_device::rcv_complete()

@@ -95,8 +95,6 @@ void rtpc_kbd_device::device_start()
 	save_item(NAME(m_p1));
 	save_item(NAME(m_p2));
 
-	m_leds.resolve();
-
 	m_t1 = true;
 	m_bus = 0xff;
 	m_p1 = 0xff;

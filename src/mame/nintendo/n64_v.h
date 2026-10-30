@@ -6,6 +6,8 @@
 #include "video/poly.h"
 #include "pin64.h"
 
+#include "endianness.h"
+
 #include <algorithm>
 
 /*****************************************************************************/

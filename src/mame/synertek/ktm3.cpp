@@ -271,7 +271,7 @@ void ktm3_state::ktm3(machine_config &config)
 	M6502(config, m_vcpu, 14.745_MHz_XTAL / 15); // SY6502 at U1; divider not verified
 	m_vcpu->set_addrmap(AS_PROGRAM, &ktm3_state::vcpu_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(14.745_MHz_XTAL, 930, 0, 600, 262, 0, 240); // parameters guessed
 	screen.set_screen_update(FUNC(ktm3_state::screen_update));
 

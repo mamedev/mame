@@ -215,8 +215,13 @@ public:
 	{
 		set_tia_tag(std::forward<T>(tia_tag));
 	}
+	template <typename T> tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&tia_tag)
+		: tia_pal_video_device(mconfig, tag, owner, 0, std::forward<T>(tia_tag))
+	{
+		set_tia_tag(std::forward<T>(tia_tag));
+	}
 
-	tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void init_palette() override;
@@ -230,8 +235,13 @@ public:
 	{
 		set_tia_tag(std::forward<T>(tia_tag));
 	}
+	template <typename T> tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&tia_tag)
+		: tia_ntsc_video_device(mconfig, tag, owner, 0, std::forward<T>(tia_tag))
+	{
+		set_tia_tag(std::forward<T>(tia_tag));
+	}
 
-	tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void init_palette() override;

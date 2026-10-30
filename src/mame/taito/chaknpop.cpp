@@ -247,10 +247,9 @@ void chaknpop_state::palette(palette_device &palette) const
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// blue component
-		bit0 = 0;
-		bit1 = BIT(col, 6);
-		bit2 = BIT(col, 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(col, 6);
+		bit1 = BIT(col, 7);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -691,7 +690,7 @@ void chaknpop_state::chaknpop(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));  // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1828);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
@@ -750,5 +749,5 @@ ROM_END
 } // anonymous namespace
 
 
-//  ( YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY              FULLNAME       FLAGS )
-GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, chaknpop_state, empty_init, ROT0,    "Taito Corporation", "Chack'n Pop", MACHINE_SUPPORTS_SAVE )
+//  ( YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT        MONITOR  COMPANY  FULLNAME       FLAGS )
+GAME( 1983, chaknpop, 0,        chaknpop, chaknpop, chaknpop_state, empty_init, ROT0,    "Taito", "Chack'n Pop", MACHINE_SUPPORTS_SAVE )

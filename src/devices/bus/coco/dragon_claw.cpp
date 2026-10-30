@@ -123,22 +123,35 @@ void dragon_claw_device::device_add_mconfig(machine_config &config)
 	m_slot->halt_callback().set([this](int state) { set_line_value(line::HALT, state); });
 }
 
+//-------------------------------------------------
+//  add_sound_route
+//-------------------------------------------------
+
+void dragon_claw_device::add_sound_route(device_sound_interface &sound_device, int output_index, double gain)
+{
+	device_cococart_interface::add_sound_route(sound_device, output_index, gain);
+}
+
+
+//-------------------------------------------------
+//  set_sound_gain
+//-------------------------------------------------
+
+void dragon_claw_device::set_sound_gain(device_sound_interface &sound_device, int output_index, double gain)
+{
+	device_cococart_interface::set_sound_gain(sound_device, output_index, gain);
+}
+
+//-------------------------------------------------
+//  irq_w
+//-------------------------------------------------
+
 void dragon_claw_device::irq_w(int state)
 {
 	if (m_links->read() & 0x04)
 		set_line_value(line::CART, state);
 	else
 		set_line_value(line::NMI, state);
-}
-
-
-//-------------------------------------------------
-//  set_sound_enable
-//-------------------------------------------------
-
-void dragon_claw_device::set_sound_enable(bool sound_enable)
-{
-	m_slot->set_line_value(line::SOUND_ENABLE, sound_enable ? line_value::ASSERT : line_value::CLEAR);
 }
 
 

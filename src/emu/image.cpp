@@ -20,10 +20,12 @@
 
 // lib/util
 #include "corestr.h"
+#include "ioprocsstream.h"
 #include "xmlfile.h"
 #include "zippath.h"
 
 #include <cctype>
+#include <locale>
 
 
 //**************************************************************************
@@ -70,7 +72,7 @@ image_manager::image_manager(running_machine &machine)
 				result = image.load(startup_image);
 
 				// failing that, try creating it (if appropriate)
-				if (result.first == std::errc::no_such_file_or_directory && image.support_command_line_image_creation())
+				if (result.first && image.support_command_line_image_creation())
 				{
 					osd_printf_verbose("%s: attempting to create media image %s\n", image.device().tag(), startup_image);
 					result = image.create(startup_image);
@@ -139,7 +141,7 @@ void image_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 			{
 				for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 				{
-					if (!strcmp(dev_instance, image.instance_name().c_str()))
+					if (image.instance_name() == dev_instance)
 					{
 						const char *const working_directory = node->get_attribute_string("directory", nullptr);
 						if (working_directory != nullptr)
@@ -196,7 +198,19 @@ int image_manager::write_config(emu_options &options, const char *filename, cons
 	if (filerr)
 		return 1;
 
-	file.puts(options.output_ini());
+	try
+	{
+		util::owritestream str(file);
+		str.imbue(std::locale::classic());
+		options.output_ini(str);
+		str << std::flush;
+		if (file.flush() || !str)
+			return 1;
+	}
+	catch (std::bad_alloc const &)
+	{
+		return 1;
+	}
 	return 0;
 }
 
@@ -300,7 +314,7 @@ bool image_manager::try_change_working_directory(std::string &working_directory,
 		bool done = false;
 		while (!done && (entry = directory->read()) != nullptr)
 		{
-			if (!core_stricmp(subdir.c_str(), entry->name))
+			if (!core_stricmp(subdir, entry->name))
 			{
 				done = true;
 				success = entry->type == osd::directory::entry::entry_type::DIR;

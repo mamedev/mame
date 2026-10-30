@@ -39,8 +39,8 @@ TODO:
 
 #include "emu.h"
 
-#include "mmboard.h"
-#include "mmdisplay1.h"
+#include "mboard.h"
+#include "mdisplay1.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"

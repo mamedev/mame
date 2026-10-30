@@ -162,6 +162,7 @@ Colscroll effects?
 
 #include "emupal.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "layout/generic.h"
@@ -591,7 +592,7 @@ void warriorb_state::darius2d(machine_config &config)
 	z80_device &audiocpu(Z80(config, "audiocpu", 16_MHz_XTAL / 4));  // 4 MHz (16 MHz XTAL / 4)
 	audiocpu.set_addrmap(AS_PROGRAM, &warriorb_state::z80_sound_map);
 
-	tc0220ioc_device & tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
+	tc0220ioc_device & tc0220ioc(TC0220IOC(config, "tc0220ioc"));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
 	tc0220ioc.read_1_callback().set_ioport("DSWB");
 	tc0220ioc.read_2_callback().set_ioport("IN0");
@@ -605,7 +606,7 @@ void warriorb_state::darius2d(machine_config &config)
 
 	config.set_default_layout(layout_dualhsxs);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(60);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	lscreen.set_size(40*8, 32*8);
@@ -613,15 +614,15 @@ void warriorb_state::darius2d(machine_config &config)
 	lscreen.set_screen_update(FUNC(warriorb_state::screen_update<0>));
 	lscreen.set_palette(m_tc0110pcr[0]);
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(4, 0);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr[0]);
 
-	TC0110PCR(config, m_tc0110pcr[0], 0);
+	TC0110PCR(config, m_tc0110pcr[0]);
 	m_tc0110pcr[0]->set_shift(0);
 	m_tc0110pcr[0]->set_color_callback(FUNC(warriorb_state::color_xbgr555));
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(60);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	rscreen.set_size(40*8, 32*8);
@@ -629,12 +630,12 @@ void warriorb_state::darius2d(machine_config &config)
 	rscreen.set_screen_update(FUNC(warriorb_state::screen_update<1>));
 	rscreen.set_palette(m_tc0110pcr[1]);
 
-	TC0100SCN(config, m_tc0100scn[1], 0);
+	TC0100SCN(config, m_tc0100scn[1]);
 	m_tc0100scn[1]->set_offsets(4, 0);
 	m_tc0100scn[1]->set_multiscr_hack(1);
 	m_tc0100scn[1]->set_palette(m_tc0110pcr[1]);
 
-	TC0110PCR(config, m_tc0110pcr[1], 0);
+	TC0110PCR(config, m_tc0110pcr[1]);
 	m_tc0110pcr[1]->set_shift(0);
 	m_tc0110pcr[1]->set_color_callback(FUNC(warriorb_state::color_xbgr555));
 
@@ -655,7 +656,7 @@ void warriorb_state::darius2d(machine_config &config)
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 }
@@ -670,7 +671,7 @@ void warriorb_state::warriorb(machine_config &config)
 	z80_device &audiocpu(Z80(config, "audiocpu", 16_MHz_XTAL / 4));  // 4 MHz (16 MHz XTAL / 4)
 	audiocpu.set_addrmap(AS_PROGRAM, &warriorb_state::z80_sound_map);
 
-	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio"));
 	tc0510nio.read_0_callback().set_ioport("DSWA");
 	tc0510nio.read_1_callback().set_ioport("DSWB");
 	tc0510nio.read_2_callback().set_ioport("IN0");
@@ -684,7 +685,7 @@ void warriorb_state::warriorb(machine_config &config)
 
 	config.set_default_layout(layout_dualhsxs);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(60);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	lscreen.set_size(40*8, 32*8);
@@ -692,15 +693,15 @@ void warriorb_state::warriorb(machine_config &config)
 	lscreen.set_screen_update(FUNC(warriorb_state::screen_update<0>));
 	lscreen.set_palette(m_tc0110pcr[0]);
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(4, 0);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr[0]);
 
-	TC0110PCR(config, m_tc0110pcr[0], 0);
+	TC0110PCR(config, m_tc0110pcr[0]);
 	m_tc0110pcr[0]->set_shift(0);
 	m_tc0110pcr[0]->set_color_callback(FUNC(warriorb_state::color_xbgr555));
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(60);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	rscreen.set_size(40*8, 32*8);
@@ -708,13 +709,13 @@ void warriorb_state::warriorb(machine_config &config)
 	rscreen.set_screen_update(FUNC(warriorb_state::screen_update<1>));
 	rscreen.set_palette(m_tc0110pcr[1]);
 
-	TC0100SCN(config, m_tc0100scn[1], 0);
+	TC0100SCN(config, m_tc0100scn[1]);
 	m_tc0100scn[1]->set_offsets(4, 0);
 	m_tc0100scn[1]->set_multiscr_xoffs(1);
 	m_tc0100scn[1]->set_multiscr_hack(1);
 	m_tc0100scn[1]->set_palette(m_tc0110pcr[1]);
 
-	TC0110PCR(config, m_tc0110pcr[1], 0);
+	TC0110PCR(config, m_tc0110pcr[1]);
 	m_tc0110pcr[1]->set_shift(0);
 	m_tc0110pcr[1]->set_color_callback(FUNC(warriorb_state::color_xbgr555));
 
@@ -736,7 +737,7 @@ void warriorb_state::warriorb(machine_config &config)
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 }
@@ -913,8 +914,8 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR, NAME,      PARENT,  MACHINE,  INPUT,    STATE,          INIT,       MONITOR,COMPANY,FULLNAME,          FLAGS
-GAME( 1989, sagaia,    darius2, darius2d, sagaia,   warriorb_state, empty_init, ROT0,   "Taito Corporation Japan", "Sagaia (dual screen) (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, darius2d,  darius2, darius2d, darius2d, warriorb_state, empty_init, ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, darius2do, darius2, darius2d, darius2d, warriorb_state, empty_init, ROT0,   "Taito Corporation",       "Darius II (dual screen) (Japan, Rev 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1991, warriorb,  0,       warriorb, warriorb, warriorb_state, empty_init, ROT0,   "Taito Corporation",       "Warrior Blade - Rastan Saga Episode III (Japan)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT   MACHINE   INPUT     STATE           INIT        MONITOR COMPANY  FULLNAME                                           FLAGS
+GAME( 1989, sagaia,    darius2, darius2d, sagaia,   warriorb_state, empty_init, ROT0,   "Taito", "Sagaia (dual screen) (World)",                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, darius2d,  darius2, darius2d, darius2d, warriorb_state, empty_init, ROT0,   "Taito", "Darius II (dual screen) (Japan, Rev 2)",          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, darius2do, darius2, darius2d, darius2d, warriorb_state, empty_init, ROT0,   "Taito", "Darius II (dual screen) (Japan, Rev 1)",          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1991, warriorb,  0,       warriorb, warriorb, warriorb_state, empty_init, ROT0,   "Taito", "Warrior Blade - Rastan Saga Episode III (Japan)", MACHINE_SUPPORTS_SAVE )

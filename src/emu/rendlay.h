@@ -281,7 +281,7 @@ public:
 	// getters
 	std::string const &id() const { return m_id; }
 	layout_element *element() const { return m_element; }
-	screen_device *screen() const { return m_screen; }
+	device_video_output_interface *screen() const { return m_screen; }
 	bool bounds_animated() const { return m_bounds.size() > 1U; }
 	bool color_animated() const { return m_color.size() > 1U; }
 	render_bounds bounds() const { return m_get_bounds(); }
@@ -324,7 +324,7 @@ public:
 	void set_scroll_pos_y_callback(scroll_pos_delegate &&handler);
 
 	// resolve tags, if any
-	void resolve_tags();
+	void resolve_tags(device_t &device);
 
 private:
 	using bounds_vector = emu::render::detail::bounds_vector;
@@ -370,10 +370,10 @@ private:
 	scroll_size_delegate    m_get_scroll_size_y;    // resolved vertical scroll window size function
 	scroll_pos_delegate     m_get_scroll_pos_x;     // resolved horizontal scroll position function
 	scroll_pos_delegate     m_get_scroll_pos_y;     // resolved vertical scroll position function
-	output_finder<>         m_output;               // associated output
-	output_finder<>         m_animoutput;           // associated output for animation if different
-	output_finder<>         m_scrollxoutput;        // associated output for horizontal scroll position
-	output_finder<>         m_scrollyoutput;        // associated output for vertical scroll position
+	output_proxy            m_output;               // associated output
+	output_proxy            m_animoutput;           // associated output for animation if different
+	output_proxy            m_scrollxoutput;        // associated output for horizontal scroll position
+	output_proxy            m_scrollyoutput;        // associated output for vertical scroll position
 	ioport_port *           m_animinput_port;       // input port used for animation
 	ioport_port *           m_scrollxinput_port;    // input port used for horizontal scrolling
 	ioport_port *           m_scrollyinput_port;    // input port used for vertical scrolling
@@ -399,7 +399,7 @@ private:
 	ioport_value const      m_input_mask;           // input mask of this item
 	u8 const                m_input_shift;          // input mask rightshift for raw (trailing 0s)
 	bool                    m_clickthrough;         // should click pass through to lower elements
-	screen_device *         m_screen;               // pointer to screen
+	device_video_output_interface *         m_screen;               // pointer to screen
 	int const               m_orientation;          // orientation of this item
 	bounds_vector           m_bounds;               // bounds of the item
 	color_vector const      m_color;                // color of the item
@@ -413,11 +413,11 @@ private:
 	std::string const       m_scrollxinput_tag;     // tag of input port for horizontal scroll position
 	std::string const       m_scrollyinput_tag;     // tag of input port for vertical scroll position
 	bounds_vector const     m_rawbounds;            // raw (original) bounds of the item
-	bool const              m_have_output;          // whether we actually have an output
+	std::string const       m_output_name;          // configured output name
+	std::string const       m_animoutput_name;      // configured output name for animation
+	std::string const       m_scrollxoutput_name;   // configured output name for horizontal scroll
+	std::string const       m_scrollyoutput_name;   // configured output name for vertical scroll
 	bool const              m_input_raw;            // get raw data from input port
-	bool const              m_have_animoutput;      // whether we actually have an output for animation
-	bool const              m_have_scrollxoutput;   // whether we actually have an output for horizontal scroll
-	bool const              m_have_scrollyoutput;   // whether we actually have an output for vertical scroll
 	bool const              m_has_clickthrough;     // whether clickthrough was explicitly configured
 };
 
@@ -434,7 +434,7 @@ public:
 	using view_environment = emu::render::detail::view_environment;
 	using element_map = layout_view_item::element_map;
 	using group_map = std::unordered_map<std::string, layout_group>;
-	using screen_ref_vector = std::vector<std::reference_wrapper<screen_device const>>;
+	using screen_ref_vector = std::vector<std::reference_wrapper<device_video_output_interface const>>;
 	using prepare_items_delegate = delegate<void ()>;
 	using preload_delegate = delegate<void ()>;
 	using recomputed_delegate = delegate<void ()>;
@@ -511,13 +511,13 @@ public:
 	// getters
 	item *get_item(std::string const &id);
 	item_list &items() { return m_items; }
-	bool has_screen(screen_device const &screen) const;
+	bool has_screen(device_video_output_interface const &screen) const;
 	const std::string &name() const { return m_name; }
 	const std::string &unqualified_name() const { return m_unqualified_name; }
 	size_t visible_screen_count() const { return m_screens.size(); }
 	float effective_aspect() const { return m_effaspect; }
 	const render_bounds &bounds() const { return m_bounds; }
-	bool has_visible_screen(screen_device const &screen) const;
+	bool has_visible_screen(device_video_output_interface const &screen) const;
 	const item_ref_vector &visible_items() const { return m_visible_items; }
 	const item_ref_vector &visible_screen_items() const { return m_screen_items; }
 	const item_ref_vector &interactive_items() const { return m_interactive_items; }
@@ -549,7 +549,7 @@ public:
 	void preload();
 
 	// resolve tags, if any
-	void resolve_tags();
+	void resolve_tags(device_t &device);
 
 	// pointer input
 	void pointer_updated(osd::ui_event_handler::pointer type, u16 ptrid, u16 device, float x, float y, u32 buttons, u32 pressed, u32 released, s16 clicks)

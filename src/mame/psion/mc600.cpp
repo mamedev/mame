@@ -134,12 +134,6 @@ private:
 
 void mc600_state::machine_start()
 {
-	m_caps_lock.resolve();
-	m_num_lock.resolve();
-	m_scroll_lock.resolve();
-	m_low_battery.resolve();
-	m_standby.resolve();
-
 	m_rambank->configure_entries(0, 2, m_ram->pointer() + 0x80000, 0x20000);
 	m_rambank->set_entry(0);
 
@@ -443,7 +437,7 @@ void mc600_state::mc600(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mc600_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback(m_82c100, FUNC(f82c100_device::inta_cb));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_size(640, 200);
 	screen.set_visarea_full();
 	screen.set_refresh_hz(56);

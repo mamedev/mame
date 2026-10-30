@@ -25,7 +25,7 @@ class pce220_serial_device :    public device_t,
 {
 public:
 	// construction/destruction
-	pce220_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pce220_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~pce220_serial_device();
 
 	// device_image_interface implementation

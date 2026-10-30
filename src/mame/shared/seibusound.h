@@ -44,7 +44,7 @@ protected:
 class seibu_sound_device : public device_t
 {
 public:
-	seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 	~seibu_sound_device() { }
 
 	//  configuration

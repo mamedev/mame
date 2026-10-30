@@ -3,26 +3,35 @@
 // thanks-to:Berger, Sean Riddle
 /*******************************************************************************
 
-Fidelity CC10 / Fidelity ACR
-
-TODO:
-- What is cc10 8255 PB.7 for? When set, maximum levels is 3, like in CC3. But
-  there is no CC3 with 16 buttons, and things get glitchy in this mode.
-
-================================================================================
-
 Fidelity Chess Challenger 10 (CCX)
 ----------------------------------
 3 versions are known to exist: A,B,C. Strangely, version C(UCC10) has an 8080
 instead of Z80 and no beeper, it's on CC1-based hardware (see cc1.cpp).
 
-Z80A CPU @ 4MHz, NEC D8255C
-4KB ROM(NEC 2332A), 2*256 bytes RAM(4*NEC 2111AL-4)
-The beeper is via a 556 timer, fixed-frequency at around 1300-1400Hz.
+Hardware notes:
+- Z80A CPU @ 4MHz, NEC D8255C
+- 4KB ROM(NEC 2332A), 2*256 bytes RAM(4*NEC 2111AL-4)
+- The beeper is via a 556 timer, fixed-frequency at around 1300-1400Hz.
 
 Checker Challenger (ACR) is on the same PCB, twice less RAM and the beeper gone.
 In the 1980s, Fidelity started naming it Checker Challenger "4" in some of their
 advertisements, but box and manual still simply name it Checker Challenger.
+
+CC10 (version A) was also bootlegged by Cassia (later known as Newcrest) as
+"Chess Mate", with the same ROM contents, though running twice slower (2MHz).
+See below for an anecdote from Ron Nelson about Cassia trying to release the
+bootleg in the USA.
+
+"When Eric White copied my CC10 ROM bit for bit and started selling CC10's in
+the States made in Hong Kong, I grew a dislike for him. He was stupid enough
+however to buy them from our Stateside ROM vendor. I called them and said, look
+they are buying a copy of the ROM you make for us. They looked, they compared
+and that was the end of Eric White's CC10 in a plastic housing. He didn't care,
+it got him into the business."
+
+TODO:
+- What is cc10 8255 PB.7 for? When set, maximum levels is 3, like in CC3. But
+  there is no CC3 with 16 buttons, and things get glitchy in this mode.
 
 *******************************************************************************/
 

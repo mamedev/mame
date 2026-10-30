@@ -2,28 +2,29 @@
 // copyright-holders:Patrick Mackinlay
 
 /*
- * Sony 0266 DMA Controller gate array.
+ * Sony 0266 WSC-ICKDMAC DMA Controller gate array.
  *
- * This device is a single-channel DMA controller for the CXD1180 SCSI chip
- * (NCR5380 derivative) in Sony NEWS NWS-1[2457]x0 workstations.
+ * This device is a single-channel DMA controller for the SCSI chips (CXD1180/1185)
+ * in Sony NEWS NWS-1[2457]x0 workstations.
  *
  * Sources:
  *  - https://github.com/NetBSD/src/blob/trunk/sys/arch/news68k/dev/dmac_0266.h
  *  - https://github.com/NetBSD/src/blob/trunk/sys/arch/news68k/dev/si.c
  *
  * TODO:
- *  - find the real solution to the short transfer issue
+ *  - find the real solution to the short transfer issue (or proof ICKDMAC always autopads transactions)
  */
 
 #include "emu.h"
 #include "dmac_0266.h"
 
 #define LOG_DATA    (1U << 1)
+#define LOG_AUTOPAD (1U << 2)
 
-//#define VERBOSE (LOG_GENERAL)
+// #define VERBOSE (LOG_GENERAL|LOG_AUTOPAD)
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(DMAC_0266, dmac_0266_device, "dmac_0266", "Sony 0266 DMA Controller")
+DEFINE_DEVICE_TYPE(DMAC_0266, dmac_0266_device, "dmac_0266", "Sony 0266 WSC-ICKDMAC DMA Controller")
 
 dmac_0266_device::dmac_0266_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, DMAC_0266, tag, owner, clock)
@@ -39,8 +40,8 @@ void dmac_0266_device::map(address_map &map)
 	map(0x04, 0x07).r(FUNC(dmac_0266_device::status_r));
 	map(0x08, 0x0b).rw(FUNC(dmac_0266_device::tcount_r), FUNC(dmac_0266_device::tcount_w));
 	map(0x0c, 0x0f).w(FUNC(dmac_0266_device::tag_w));
-	map(0x10, 0x13).w(FUNC(dmac_0266_device::offset_w));
-	map(0x14, 0x17).w(FUNC(dmac_0266_device::entry_w));
+	map(0x10, 0x13).rw(FUNC(dmac_0266_device::offset_r), FUNC(dmac_0266_device::offset_w));
+	map(0x14, 0x17).rw(FUNC(dmac_0266_device::entry_r), FUNC(dmac_0266_device::entry_w));
 }
 
 void dmac_0266_device::device_start()
@@ -105,7 +106,8 @@ void dmac_0266_device::control_w(u32 data)
 		{
 			if (data & ENABLE)
 			{
-				LOG("transfer started address 0x%08x count 0x%x\n",
+				LOG("%s transfer started address 0x%08x count 0x%x\n",
+					m_control & DIRECTION ? "read" : "write",
 					(m_map[m_tag & 0x7f] << 12) | (m_offset & 0xfff), m_tcount);
 
 				m_dma_check->adjust(attotime::zero);
@@ -140,13 +142,28 @@ void dmac_0266_device::dma_check(s32 param)
 		 * It's not clear how the real hardware works - for now this hack
 		 * continues to read and discard data from the device, or write
 		 * arbitrary zero bytes to it until it asserts EOP (driven by IRQ).
+		 * Future NEWS DMACs (ICKDMAC2, DMAC3, etc.) implement this as an optional
+		 * feature, so it is likely that the original ICKDMAC had this always enabled.
+		 * If that is the case, then this isn't actually a hack.
 		 */
 		if (!(m_status & INTERRUPT))
 		{
 			if (m_control & DIRECTION)
-				m_dma_r();
+			{
+				[[maybe_unused]] const u8 pad = m_dma_r();
+				LOGMASKED(LOG_AUTOPAD, "DMA pad byte r 0x%x\n", pad);
+			}
 			else
+			{
+				LOGMASKED(LOG_AUTOPAD, "DMA pad byte w 0x0\n");
 				m_dma_w(0);
+			}
+		}
+
+		if (!(m_status & INTERRUPT))
+		{
+			// EOP not set, which means we need to keep going
+			m_dma_check->adjust(attotime::zero);
 		}
 
 		return;
@@ -195,6 +212,10 @@ void dmac_0266_device::dma_check(s32 param)
 		//m_control &= ~ENABLE;
 		m_status |= TCZERO;
 	}
-	else
+
+	if (!(m_status & INTERRUPT))
+	{
+		// Even though the TC can be zero here, we will need to autopad if the operation hasn't completed.
 		m_dma_check->adjust(attotime::zero);
+	}
 }

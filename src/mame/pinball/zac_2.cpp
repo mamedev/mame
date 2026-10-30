@@ -68,8 +68,12 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void zac_2(machine_config &config);
-	void init_1() { m_game = 1; }  // 7 digits
+	void zac_2(machine_config &config) ATTR_COLD;
+	void init_1() ATTR_COLD { m_game = 1; }  // 7 digits
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 ctrl_r();
@@ -88,8 +92,6 @@ private:
 	u8 m_t_c = 0U;
 	u8 m_out_offs = 0U;
 	u8 m_game = 0U;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void machine_start() override ATTR_COLD;
 	required_device<s2650_device> m_maincpu;
 	required_shared_ptr<u8> m_p_ram;
 	required_ioport_array<8> m_io_keyboard;
@@ -249,9 +251,6 @@ void zac_2_state::serial_w(int state)
 
 void zac_2_state::machine_start()
 {
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_row));
 	save_item(NAME(m_t_c));
 	save_item(NAME(m_out_offs));

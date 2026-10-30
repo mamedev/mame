@@ -16,9 +16,11 @@
 #include "wdlfft/fft.h"
 
 #include <cmath>
+#include <numbers>
 
 constexpr int vgmviz_device::SCREEN_HEIGHT;
 
+// TODO: determine whether C++20's std::lerp can be used in place of this function
 constexpr float lerp(float a, float b, float f)
 {
 	return (b - a) * f + a;
@@ -89,7 +91,7 @@ void vgmviz_device::device_start()
 
 void vgmviz_device::fill_window()
 {
-	float window_pos_delta = (M_PI * 2) / FFT_LENGTH;
+	float window_pos_delta = (std::numbers::pi_v<float> * 2) / FFT_LENGTH;
 	float power = 0;
 	for (int i = 0; i < (FFT_LENGTH / 2) + 1; i++)
 	{
@@ -472,7 +474,7 @@ void vgmviz_device::init_palette(palette_device &palette) const
 
 void vgmviz_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(SCREEN_WIDTH, SCREEN_HEIGHT);

@@ -471,7 +471,7 @@ void suprgolf_state::suprgolf(machine_config &config)
 	ppi1.out_pc_callback().set(FUNC(suprgolf_state::vregs_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(256, 256);
@@ -665,6 +665,7 @@ void suprgolf_state::init_suprgolf()
 {
 	uint8_t *ROM = memregion("user2")->base();
 
+	// HACK: stuff not understood with the RMW plane
 	ROM[0x74f4-0x4000] = 0x00;
 	ROM[0x74f5-0x4000] = 0x00;
 	ROM[0x74fa+(0x4000*3)-0x4000] = 0x20; // patch ROM check
@@ -674,6 +675,7 @@ void suprgolf_state::init_suprgolfj()
 {
 	uint8_t *ROM = memregion("user2")->base();
 
+	// HACK: stuff not understood with the RMW plane
 	ROM[0x74f4-0x4000] = 0x00;
 	ROM[0x74f5-0x4000] = 0x00;
 	ROM[0x6d72+(0x4000*3)-0x4000] = 0x20; // patch ROM check

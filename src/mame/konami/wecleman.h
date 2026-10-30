@@ -46,7 +46,6 @@ public:
 	int hotchase_sound_status_r();
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 

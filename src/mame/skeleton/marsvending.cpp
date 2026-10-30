@@ -93,9 +93,9 @@ void marsvending_state::marsvending(machine_config &config)
 
 	PCF8583(config, "clock", 32.768_kHz_XTAL); // PCF8583P
 
-	I2C_24C04(config, "i2cmem", 0); // X24C04P
+	I2C_24C04(config, "i2cmem"); // X24C04P
 
-	ROC10957(config, "display", 0); // Rockwell 10957P-40 or compatible, 10 digits, 16 segments per digit (character with decimal point and comma tail)
+	ROC10957(config, "display"); // Rockwell 10957P-40 or compatible, 10 digits, 16 segments per digit (character with decimal point and comma tail)
 
 	SPEAKER(config, "mono").front_center();
 }

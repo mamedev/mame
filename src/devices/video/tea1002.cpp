@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "tea1002.h"
 
+#include "corefloat.h"
+
 
 namespace {
 
@@ -80,8 +82,8 @@ rgb_t tea1002_device::color(int index)
 {
 	// calculate yuv
 	double y = s_luminance[index] / 100;
-	double u = cos((s_phase[index] + s_tint) * M_PI / 180) * s_amplitude[index] / 100;
-	double v = sin((s_phase[index] + s_tint) * M_PI / 180) * s_amplitude[index] / 100;
+	double u = cos(DEGREE_TO_RADIAN<double>(s_phase[index] + s_tint)) * s_amplitude[index] / 100;
+	double v = sin(DEGREE_TO_RADIAN<double>(s_phase[index] + s_tint)) * s_amplitude[index] / 100;
 
 	// and convert to rgb
 	double r = y + v * 1.14;

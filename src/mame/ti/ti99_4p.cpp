@@ -174,9 +174,11 @@ public:
 		m_rom6_upper(false)
 	{ }
 
-	void ti99_4p_60hz(machine_config &config);
-	void driver_start() override;
-	void driver_reset() override;
+	void ti99_4p_60hz(machine_config &config) ATTR_COLD;
+
+protected:
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
 	void ready_line(int state);
@@ -943,7 +945,7 @@ void ti99_4p_state::external_operation(offs_t offset, uint8_t data)
 
 /*****************************************************************************/
 
-void ti99_4p_state::driver_start()
+void ti99_4p_state::machine_start()
 {
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
@@ -986,7 +988,7 @@ void ti99_4p_state::video_interrupt_in(int state)
 /*
     Reset the machine.
 */
-void ti99_4p_state::driver_reset()
+void ti99_4p_state::machine_reset()
 {
 	m_cpu->set_ready(ASSERT_LINE);
 	m_cpu->set_hold(CLEAR_LINE);
@@ -1020,7 +1022,7 @@ void ti99_4p_state::ti99_4p_60hz(machine_config& config)
 	m_cpu->clkout_cb().set(FUNC(ti99_4p_state::clock_out));
 
 	// tms9901
-	TMS9901(config, m_tms9901, 0);
+	TMS9901(config, m_tms9901);
 	m_tms9901->read_cb().set(FUNC(ti99_4p_state::psi_input));
 	m_tms9901->p_out_cb(2).set(FUNC(ti99_4p_state::keyC0));
 	m_tms9901->p_out_cb(3).set(FUNC(ti99_4p_state::keyC1));
@@ -1032,7 +1034,7 @@ void ti99_4p_state::ti99_4p_60hz(machine_config& config)
 	m_tms9901->intreq_cb().set(FUNC(ti99_4p_state::tms9901_interrupt));
 
 	// Peripheral expansion box (SGCPU composition)
-	TI99_PERIBOX_SG(config, m_peribox, 0);
+	TI99_PERIBOX_SG(config, m_peribox);
 	m_peribox->inta_cb().set(FUNC(ti99_4p_state::extint));
 	m_peribox->intb_cb().set(FUNC(ti99_4p_state::notconnected));
 	m_peribox->ready_cb().set(FUNC(ti99_4p_state::ready_line));
@@ -1048,10 +1050,10 @@ void ti99_4p_state::ti99_4p_60hz(machine_config& config)
 
 	// Cassette drives
 	SPEAKER(config, "cass_out").front_center();
-	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "cass_out", 0.25);
+	CASSETTE(config, "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// Joystick port
-	TI99_JOYPORT(config, m_joyport, 0, ti99_joyport_options_plain, "twinjoy");
+	TI99_JOYPORT(config, m_joyport, ti99_joyport_options_plain, "twinjoy");
 }
 
 ROM_START(ti99_4p)

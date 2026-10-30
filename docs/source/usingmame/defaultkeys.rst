@@ -259,6 +259,8 @@ the standard keyboard configuration.
     Usually a tilt switch or shock sensor that will end the current game, reset
     credits and/or reset the machine if the machine is knocked excessively hard
     or moved.  Most commonly found on pinball machines.
+**O**
+    Door Interlock (A coin door for example)
 **-** *(not numeric keypad)*
     Volume Down
 
@@ -620,8 +622,6 @@ buttons.
     High/big
 **S**
     Low/small
-**O**
-    Door
 
 
 .. _default-blackjack-keys:

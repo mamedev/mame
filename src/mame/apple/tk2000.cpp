@@ -6,10 +6,15 @@
 
     Driver by R. Belmont
 
-    This system is only vaguely Apple II compatible.
-    The keyboard works entirely differently, which is a big deal.
+    This system is only vaguely Apple II compatible. The only video mode is
+    hi-res graphics (other Apple II modes are simulated), the keyboard and
+    joystick work entirely differently, and a lot of other I/O bits are
+    moved to different addresses.
 
     TODO: emulate expansion connector (not wholly Apple II compatible)
+    TODO: emulate joystick port (wired to KBIN and KBOUT)
+    TODO: emulate cassette MOTOR softswitch
+    TODO: correct PAL-M colors and XTAL
 
     $C05A - banks RAM from c100-ffff
     $C05B - banks ROM from c100-ffff
@@ -34,8 +39,6 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
-#include "utf8.h"
 
 
 namespace {
@@ -67,6 +70,9 @@ public:
 
 	void tk2000(machine_config &config);
 
+	INPUT_CHANGED_MEMBER(tk2000_reset);
+	void reset_w(int state);
+
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -76,7 +82,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<screen_device> m_screen;
 	required_device<a2_video_device_composite> m_video;
-	required_ioport_array<8> m_row;
+	required_ioport_array<9> m_row;
 	required_ioport m_kbspecial;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
@@ -107,7 +113,6 @@ private:
 	uint8_t snd_r();
 	void snd_w(uint8_t data);
 	uint8_t switches_r(offs_t offset);
-	uint8_t cassette_r();
 	void color_w(int state);
 	void motor_a_w(int state);
 	void motor_b_w(int state);
@@ -147,8 +152,9 @@ void tk2000_state::machine_start()
 	save_item(NAME(m_ctrl_key));
 
 	// setup video pointers
-	m_video->set_ram_pointers(m_ram_ptr, m_ram_ptr);
+	m_video->set_ram_pointers(m_ram_ptr, nullptr);
 	m_video->set_char_pointer(nullptr, 0);  // no text modes on this machine
+	m_video->set_hgr2(0xa000);
 }
 
 void tk2000_state::machine_reset()
@@ -196,13 +202,19 @@ uint8_t tk2000_state::kbin_r()
 {
 	uint8_t kbin = 0;
 	for (int i = 0; i < 8; i++)
+	{
 		if (BIT(m_kbout, i))
+		{
 			kbin |= m_row[i]->read();
+			if (i == 7)
+				kbin |= m_kbspecial->read() & 0x10;
+		}
+	}
 
 	if (m_ctrl_key)
-		kbin |= m_kbspecial->read();
+		kbin |= m_row[8]->read();
 
-	return kbin | (m_printer_busy ? 0x40 : 0);
+	return kbin | (m_printer_busy ? 0x40 : 0) | (m_cassette->input() > 0.0 ? 0x80 : 0);
 }
 
 uint8_t tk2000_state::casout_r()
@@ -239,14 +251,10 @@ uint8_t tk2000_state::switches_r(offs_t offset)
 	return uFloatingBus;
 }
 
-uint8_t tk2000_state::cassette_r()
-{
-	return (m_cassette->input() > 0.0 ? 0x80 : 0) | (read_floatingbus() & 0x7f);
-}
-
 void tk2000_state::color_w(int state)
 {
 	// 0 = color, 1 = black/white
+	m_video->monohgr_w(state);
 }
 
 void tk2000_state::motor_a_w(int state)
@@ -287,134 +295,30 @@ void tk2000_state::c100_w(offs_t offset, uint8_t data)
 	m_ram_ptr[offset + 0xc100] = data;
 }
 
-// floating bus code from old machine/apple2: needs to be reworked based on real beam position to enable e.g. Bob Bishop's screen splitter
 uint8_t tk2000_state::read_floatingbus()
 {
-	enum
-	{
-		// scanner types
-		kScannerNone = 0, kScannerApple2, kScannerApple2e,
+	int h_clock = m_screen->hpos() / 14 + 25; // adjust for set_raw
+	if (h_clock >= 65)
+		h_clock -= 65;
 
-		// scanner constants
-		kHBurstClock      =    53, // clock when Color Burst starts
-		kHBurstClocks     =     4, // clocks per Color Burst duration
-		kHClock0State     =  0x18, // H[543210] = 011000
-		kHClocks          =    65, // clocks per horizontal scan (including HBL)
-		kHPEClock         =    40, // clock when HPE (horizontal preset enable) goes low
-		kHPresetClock     =    41, // clock when H state presets
-		kHSyncClock       =    49, // clock when HSync starts
-		kHSyncClocks      =     4, // clocks per HSync duration
-		kNTSCScanLines    =   262, // total scan lines including VBL (NTSC)
-		kNTSCVSyncLine    =   224, // line when VSync starts (NTSC)
-		kPALScanLines     =   312, // total scan lines including VBL (PAL)
-		kPALVSyncLine     =   264, // line when VSync starts (PAL)
-		kVLine0State      = 0x100, // V[543210CBA] = 100000000
-		kVPresetLine      =   256, // line when V state presets
-		kVSyncLines       =     4, // lines per VSync duration
-		kClocksPerVSync   = kHClocks * kNTSCScanLines // FIX: NTSC only?
-	};
+	int v_clock = m_screen->vpos() + (h_clock < 25); // adjust for hpos wrap
+	if (v_clock >= m_screen->height())
+		v_clock -= m_screen->height();
 
-	// vars
-	//
-	int i, Hires, Mixed, Page2, _80Store, ScanLines, /* VSyncLine, ScanCycles,*/
-		h_clock, h_state, h_0, h_1, h_2, h_3, h_4, h_5,
-		v_line, v_state, v_A, v_B, v_C, v_0, v_1, v_2, v_3, v_4, /* v_5, */
-		_hires, addend0, addend1, addend2, sum, address;
+	const u16 address = m_video->scanner_address(h_clock, v_clock);
+	return ram_r(address);
+}
 
-	// video scanner data
-	//
-	i = m_maincpu->total_cycles() % kClocksPerVSync; // cycles into this VSync
+INPUT_CHANGED_MEMBER(tk2000_state::tk2000_reset)
+{
+	reset_w((m_kbspecial->read() & 3) != 3);
+}
 
-	// machine state switches
-	//
-	Hires    = 1;
-	Mixed    = 0;
-	Page2 = m_video->get_page2() ? 1 : 0;
-	_80Store = 0;
-
-	// calculate video parameters according to display standard
-	//
-	ScanLines  = 1 ? kNTSCScanLines : kPALScanLines; // FIX: NTSC only?
-	// VSyncLine  = 1 ? kNTSCVSyncLine : kPALVSyncLine; // FIX: NTSC only?
-	// ScanCycles = ScanLines * kHClocks;
-
-	// calculate horizontal scanning state
-	//
-	h_clock = (i + kHPEClock) % kHClocks; // which horizontal scanning clock
-	h_state = kHClock0State + h_clock; // H state bits
-	if (h_clock >= kHPresetClock) // check for horizontal preset
-	{
-		h_state -= 1; // correct for state preset (two 0 states)
-	}
-	h_0 = (h_state >> 0) & 1; // get horizontal state bits
-	h_1 = (h_state >> 1) & 1;
-	h_2 = (h_state >> 2) & 1;
-	h_3 = (h_state >> 3) & 1;
-	h_4 = (h_state >> 4) & 1;
-	h_5 = (h_state >> 5) & 1;
-
-	// calculate vertical scanning state
-	//
-	v_line  = i / kHClocks; // which vertical scanning line
-	v_state = kVLine0State + v_line; // V state bits
-	if ((v_line >= kVPresetLine)) // check for previous vertical state preset
-	{
-		v_state -= ScanLines; // compensate for preset
-	}
-	v_A = (v_state >> 0) & 1; // get vertical state bits
-	v_B = (v_state >> 1) & 1;
-	v_C = (v_state >> 2) & 1;
-	v_0 = (v_state >> 3) & 1;
-	v_1 = (v_state >> 4) & 1;
-	v_2 = (v_state >> 5) & 1;
-	v_3 = (v_state >> 6) & 1;
-	v_4 = (v_state >> 7) & 1;
-	//v_5 = (v_state >> 8) & 1;
-
-	// calculate scanning memory address
-	//
-	_hires = Hires;
-	if (Hires && Mixed && (v_4 & v_2))
-	{
-		_hires = 0; // (address is in text memory)
-	}
-
-	addend0 = 0x68; // 1            1            0            1
-	addend1 =              (h_5 << 5) | (h_4 << 4) | (h_3 << 3);
-	addend2 = (v_4 << 6) | (v_3 << 5) | (v_4 << 4) | (v_3 << 3);
-	sum     = (addend0 + addend1 + addend2) & (0x0F << 3);
-
-	address = 0;
-	address |= h_0 << 0; // a0
-	address |= h_1 << 1; // a1
-	address |= h_2 << 2; // a2
-	address |= sum;      // a3 - aa6
-	address |= v_0 << 7; // a7
-	address |= v_1 << 8; // a8
-	address |= v_2 << 9; // a9
-	address |= ((_hires) ? v_A : (1 ^ (Page2 & (1 ^ _80Store)))) << 10; // a10
-	address |= ((_hires) ? v_B : (Page2 & (1 ^ _80Store))) << 11; // a11
-	if (_hires) // hires?
-	{
-		// Y: insert hires only address bits
-		//
-		address |= v_C << 12; // a12
-		address |= (1 ^ (Page2 & (1 ^ _80Store))) << 13; // a13
-		address |= (Page2 & (1 ^ _80Store)) << 14; // a14
-	}
-	else
-	{
-		// N: text, so no higher address bits unless Apple ][, not Apple //e
-		//
-		if ((1) && // Apple ][? // FIX: check for Apple ][? (FB is most useful in old games)
-			(kHPEClock <= h_clock) && // Y: HBL?
-			(h_clock <= (kHClocks - 1)))
-		{
-			address |= 1 << 12; // Y: a12 (add $1000 to address!)
-		}
-	}
-
-	return m_ram_ptr[address % m_ram_size]; // FIX: this seems to work, but is it right!?
+void tk2000_state::reset_w(int state)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+	if (!state)
+		m_softlatch->reset();
 }
 
 /***************************************************************************
@@ -447,7 +351,6 @@ void tk2000_state::apple2_map(address_map &map)
 	map(0xc020, 0xc020).rw(FUNC(tk2000_state::casout_r), FUNC(tk2000_state::casout_w));
 	map(0xc030, 0xc030).rw(FUNC(tk2000_state::snd_r), FUNC(tk2000_state::snd_w));
 	map(0xc050, 0xc05f).r(FUNC(tk2000_state::switches_r)).w(m_softlatch, FUNC(addressable_latch_device::write_a0));
-	map(0xc060, 0xc060).mirror(8).r(FUNC(tk2000_state::cassette_r));
 	map(0xc080, 0xc0ff).rw(FUNC(tk2000_state::c080_r), FUNC(tk2000_state::c080_w));
 	map(0xc100, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
 }
@@ -482,84 +385,103 @@ void tk2000_state::inhbank_map(address_map &map)
 */
 static INPUT_PORTS_START( tk2000 )
 	PORT_START("ROW0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift")        PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)      PORT_CHAR('B')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)      PORT_CHAR('V')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)      PORT_CHAR('C')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)      PORT_CHAR('X')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)      PORT_CHAR('Z')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift")        PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B  GOSUB")     PORT_CODE(KEYCODE_B)      PORT_CHAR('B')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V  THEN")      PORT_CODE(KEYCODE_V)      PORT_CHAR('V')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C  IF")        PORT_CODE(KEYCODE_C)      PORT_CHAR('C')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("X  FN")        PORT_CODE(KEYCODE_X)      PORT_CHAR('X')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z  DEF")       PORT_CODE(KEYCODE_Z)      PORT_CHAR('Z')
 
 	PORT_START("ROW1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)      PORT_CHAR('G')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)      PORT_CHAR('F')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)      PORT_CHAR('D')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)      PORT_CHAR('S')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)      PORT_CHAR('A')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G  GOTO")      PORT_CODE(KEYCODE_G)      PORT_CHAR('G')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F  FOR")       PORT_CODE(KEYCODE_F)      PORT_CHAR('F')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D  DATA")      PORT_CODE(KEYCODE_D)      PORT_CHAR('D')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("S  DIM")       PORT_CODE(KEYCODE_S)      PORT_CHAR('S')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A  AT")        PORT_CODE(KEYCODE_A)      PORT_CHAR('A')
 
 	PORT_START("ROW2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)      PORT_CHAR('T')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)      PORT_CHAR('R')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)      PORT_CHAR('E')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)      PORT_CHAR('W')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)      PORT_CHAR('Q')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Space  TEXT")  PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("T  TO")        PORT_CODE(KEYCODE_T)      PORT_CHAR('T')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R  READ")      PORT_CODE(KEYCODE_R)      PORT_CHAR('R')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E  REM")       PORT_CODE(KEYCODE_E)      PORT_CHAR('E')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("W  RESTORE")   PORT_CODE(KEYCODE_W)      PORT_CHAR('W')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Q  INVERSE")   PORT_CODE(KEYCODE_Q)      PORT_CHAR('Q')
 
 	PORT_START("ROW3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)      PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)      PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)      PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)      PORT_CHAR('2') PORT_CHAR('"')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)      PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2190  HTAB") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT), 8) // ←
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5  %  RUN")    PORT_CODE(KEYCODE_5)      PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4  $  LOAD")   PORT_CODE(KEYCODE_4)      PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3  #  SAVE")   PORT_CODE(KEYCODE_3)      PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2  \"  CONT")  PORT_CODE(KEYCODE_2)      PORT_CHAR('2') PORT_CHAR('"')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1  !  STOP")   PORT_CODE(KEYCODE_1)      PORT_CHAR('1') PORT_CHAR('!')
 
 	PORT_START("ROW4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)     PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)      PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)      PORT_CHAR('7') PORT_CHAR('\'')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)      PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)      PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)      PORT_CHAR('0') PORT_CHAR('*')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2192  HLIN") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT), 21) // →
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6  &  LIST")   PORT_CODE(KEYCODE_6)      PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7  '  MOTOR/TK2000") PORT_CODE(KEYCODE_7)  PORT_CHAR('7') PORT_CHAR('\'')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8  (  LM")     PORT_CODE(KEYCODE_8)      PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9  )  DEL")    PORT_CODE(KEYCODE_9)      PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0  *  NEW")    PORT_CODE(KEYCODE_0)      PORT_CHAR('0') PORT_CHAR('*')
 
 	PORT_START("ROW5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN)      PORT_CODE(KEYCODE_DOWN)     PORT_CHAR(10)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)      PORT_CHAR('Y')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)      PORT_CHAR('U')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)      PORT_CHAR('I') PORT_CHAR('-')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)      PORT_CHAR('O') PORT_CHAR('=')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)      PORT_CHAR('P') PORT_CHAR('+')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2193  VTAB") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) // ↓
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y  STEP")      PORT_CODE(KEYCODE_Y)      PORT_CHAR('Y')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("U  RETURN")    PORT_CODE(KEYCODE_U)      PORT_CHAR('U')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("I  -  INPUT")  PORT_CODE(KEYCODE_I)      PORT_CHAR('I') PORT_CHAR('-')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("O  =  ON")     PORT_CODE(KEYCODE_O)      PORT_CHAR('O') PORT_CHAR('=')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P  +  PRINT")  PORT_CODE(KEYCODE_P)      PORT_CHAR('P') PORT_CHAR('+')
 
 	PORT_START("ROW6")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)        PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)      PORT_CHAR('H')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)      PORT_CHAR('J')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)      PORT_CHAR('K') PORT_CHAR('^')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)      PORT_CHAR('L') PORT_CHAR('@')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)  PORT_CHAR(':') PORT_CHAR(';')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2191  VLIN") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) // ↑
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H  HOME")      PORT_CODE(KEYCODE_H)      PORT_CHAR('H')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J  HPLOT")     PORT_CODE(KEYCODE_J)      PORT_CHAR('J')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K  ^  HCOLOR") PORT_CODE(KEYCODE_K)      PORT_CHAR('K') PORT_CHAR('^')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L  @  HGR")    PORT_CODE(KEYCODE_L)      PORT_CHAR('L') PORT_CHAR('@')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(":  ;  PEEK")   PORT_CODE(KEYCODE_COLON)  PORT_CHAR(':') PORT_CHAR(';')
 
 	PORT_START("ROW7")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return")       PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(13)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)      PORT_CHAR('N')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)      PORT_CHAR('M')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)  PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)   PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)  PORT_CHAR('?') PORT_CHAR('/')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return  NORMAL") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N  NEXT")      PORT_CODE(KEYCODE_N)      PORT_CHAR('N')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M  PLOT")      PORT_CODE(KEYCODE_M)      PORT_CHAR('M')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(",  <  COLOR")  PORT_CODE(KEYCODE_COMMA)  PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".  >  GR")     PORT_CODE(KEYCODE_STOP)   PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("?  /  POKE")   PORT_CODE(KEYCODE_SLASH)  PORT_CHAR('?') PORT_CHAR('/')
+
+	PORT_START("ROW8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")     PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("keyb_special")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")     PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset (direito)") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tk2000_state::tk2000_reset), 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset (esquerdo)") PORT_CODE(KEYCODE_TILDE) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tk2000_state::tk2000_reset), 0)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Fire")         PORT_CODE(KEYCODE_TAB)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mpf2 )
+	PORT_INCLUDE(tk2000)
+
+	PORT_MODIFY("ROW4")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7  '  PRT ON/OFF") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8  (  HC")     PORT_CODE(KEYCODE_8)      PORT_CHAR('8') PORT_CHAR('(')
+
+	PORT_MODIFY("ROW8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ctrl")         PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+
+	PORT_MODIFY("keyb_special")
+	// MPF-II has a single Reset key
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("Reset")        PORT_CODE(KEYCODE_F12)    PORT_WRITE_LINE_MEMBER(FUNC(tk2000_state::reset_w))
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 void tk2000_state::tk2000(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 1021800);     /* close to actual CPU frequency of 1.020484 MHz */
+	M6502(config, m_maincpu, 1021800); // FIXME 14.30244 MHz XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &tk2000_state::apple2_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(tk2000_state::apple2_interrupt), "screen", 0, 1);
@@ -567,12 +489,9 @@ void tk2000_state::tk2000(machine_config &config)
 
 	APPLE2_VIDEO_COMPOSITE(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(280*2, 262);
-	m_screen->set_visarea(0, (280*2)-1,0,192-1);
-	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, false, false>)));
+	SCREEN(config, m_screen);
+	m_screen->set_raw(1021800 * 14, 65 * 14, 0, 40 * 14, 262, 0, 192);
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, true, true>)));
 	m_screen->set_palette(m_video);
 
 	/* sound hardware */
@@ -619,6 +538,6 @@ ROM_END
 } // anonymous namespace
 
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY         FULLNAME */
-COMP( 1984, tk2000, 0,      0,      tk2000,  tk2000, tk2000_state, empty_init, "Microdigital", "TK2000 Color Computer", MACHINE_NOT_WORKING )
-COMP( 1982, mpf2,   tk2000, 0,      tk2000,  tk2000, tk2000_state, empty_init, "Multitech",    "Microprofessor II",     MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                 FULLNAME */
+COMP( 1984, tk2000, 0,      0,      tk2000,  tk2000, tk2000_state, empty_init, "Microdigital",         "TK2000 Color Computer", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, mpf2,   tk2000, 0,      tk2000,  mpf2,   tk2000_state, empty_init, "Multitech Industrial", "Microprofessor MPF-II", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

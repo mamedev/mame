@@ -495,7 +495,7 @@ void corcomp_fdc_device::common_config(machine_config& config)
 	m_wdc->drq_wr_callback().set(FUNC(corcomp_fdc_device::fdc_drq_w));
 	m_wdc->hld_wr_callback().set(FUNC(corcomp_fdc_device::fdc_hld_w));
 
-	TMS9901(config, m_tms9901, 0);
+	TMS9901(config, m_tms9901);
 	m_tms9901->read_cb().set(FUNC(corcomp_fdc_device::tms9901_input));
 
 	// Outputs
@@ -524,7 +524,7 @@ void corcomp_fdc_device::common_config(machine_config& config)
 	m_tms9901->p_out_cb(11).set(FUNC(corcomp_fdc_device::select_bank));
 
 	// Motor monoflop
-	TTL74123(config, m_motormf, 0);
+	TTL74123(config, m_motormf);
 	m_motormf->set_connection_type(TTL74123_GROUNDED);
 	m_motormf->set_resistor_value(RES_K(100));
 	m_motormf->set_capacitor_value(CAP_U(47));
@@ -533,10 +533,10 @@ void corcomp_fdc_device::common_config(machine_config& config)
 	m_motormf->set_clear_pin_value(1);
 	m_motormf->out_cb().set(FUNC(corcomp_fdc_device::motor_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy[0], ccfdc_floppies, "525dd", corcomp_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[1], ccfdc_floppies, "525dd", corcomp_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[2], ccfdc_floppies, nullptr, corcomp_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[3], ccfdc_floppies, nullptr, corcomp_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], ccfdc_floppies, "525dd", corcomp_fdc_device::floppy_formats).enable_sound("ti99_peb_dsk1");
+	FLOPPY_CONNECTOR(config, m_floppy[1], ccfdc_floppies, "525dd", corcomp_fdc_device::floppy_formats).enable_sound("ti99_peb_dsk2");
+	FLOPPY_CONNECTOR(config, m_floppy[2], ccfdc_floppies, nullptr, corcomp_fdc_device::floppy_formats).enable_sound("ti99_peb_dsk3");
+	FLOPPY_CONNECTOR(config, m_floppy[3], ccfdc_floppies, nullptr, corcomp_fdc_device::floppy_formats).enable_sound("ti99_peb_dsk4");
 
 	// SRAM 2114 1Kx4
 	RAM(config, BUFFER).set_default_size("1k").set_default_value(0);

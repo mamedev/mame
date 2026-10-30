@@ -142,7 +142,7 @@ void decodmd_type3_device::device_add_mconfig(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(decodmd_type3_device::dmd_irq), attotime::from_hz(150));
+	TIMER(config, "irq_timer").configure_periodic(FUNC(decodmd_type3_device::dmd_irq), attotime::from_hz(150));
 
 	MC6845(config, m_mc6845, XTAL(12'000'000) / 4);  // TODO: confirm clock speed
 	m_mc6845->set_screen(nullptr);
@@ -150,7 +150,7 @@ void decodmd_type3_device::device_add_mconfig(machine_config &config)
 	m_mc6845->set_char_width(16);
 	m_mc6845->set_update_row_callback(FUNC(decodmd_type3_device::crtc_update_row));
 
-	screen_device &screen(SCREEN(config, "dmd", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "dmd"));
 	screen.set_native_aspect();
 	screen.set_size(192, 64);
 	screen.set_visarea(0, 192-1, 0, 64-1);

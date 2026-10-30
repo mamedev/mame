@@ -53,16 +53,7 @@ private:
 	u8 m_ext_reg;
 };
 
-
 // device type definition
 DECLARE_DEVICE_TYPE(PC9801_118, pc9801_118_device)
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-
 
 #endif // MAME_BUS_PC98_CBUS_PC9801_118_H

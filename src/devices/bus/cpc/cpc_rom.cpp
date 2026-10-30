@@ -23,14 +23,14 @@ void cpc_exp_cards(device_slot_interface &device);
 // device machine config
 void cpc_rom_device::device_add_mconfig(machine_config &config)
 {
-	CPC_ROMSLOT(config, m_rom[0], 0);
-	CPC_ROMSLOT(config, m_rom[1], 0);
-	CPC_ROMSLOT(config, m_rom[2], 0);
-	CPC_ROMSLOT(config, m_rom[3], 0);
-	CPC_ROMSLOT(config, m_rom[4], 0);
-	CPC_ROMSLOT(config, m_rom[5], 0);
-	CPC_ROMSLOT(config, m_rom[6], 0);
-	CPC_ROMSLOT(config, m_rom[7], 0);
+	CPC_ROMSLOT(config, m_rom[0]);
+	CPC_ROMSLOT(config, m_rom[1]);
+	CPC_ROMSLOT(config, m_rom[2]);
+	CPC_ROMSLOT(config, m_rom[3]);
+	CPC_ROMSLOT(config, m_rom[4]);
+	CPC_ROMSLOT(config, m_rom[5]);
+	CPC_ROMSLOT(config, m_rom[6]);
+	CPC_ROMSLOT(config, m_rom[7]);
 
 	// pass-through
 	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", DERIVED_CLOCK(1, 1), cpc_exp_cards, nullptr));

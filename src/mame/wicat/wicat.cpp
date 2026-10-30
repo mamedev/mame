@@ -479,7 +479,7 @@ void wicat_state::wicat(machine_config &config)
 	m_via->writepb_handler().set(FUNC(wicat_state::via_b_w));
 	m_via->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
 
-	MM58174(config, m_rtc, 0);
+	MM58174(config, m_rtc);
 
 	// internal terminal
 	SCN2661C(config, m_uart[0], 5.0688_MHz_XTAL);  // connected to terminal board
@@ -573,7 +573,7 @@ void wicat_state::wicat(machine_config &config)
 
 	X2210(config, "vsram");  // XD2210
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_raw(19.6608_MHz_XTAL, 1020, 0, 800, 324, 0, 300);
 	screen.set_screen_update("video", FUNC(i8275_device::screen_update));

@@ -35,6 +35,7 @@ einstein_userport_device::einstein_userport_device(const machine_config &mconfig
 	m_card(nullptr),
 	m_bstb_handler(*this)
 {
+	set_options(einstein_userport_cards, nullptr, false);
 }
 
 //-------------------------------------------------

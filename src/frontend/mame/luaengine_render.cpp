@@ -1191,7 +1191,9 @@ void lua_engine::initialize_render(sol::table &emu)
 						msg,
 						x, y, (1.0f - x),
 						justify, ui::text_layout::word_wrapping::WORD,
-						mame_ui_manager::OPAQUE_, *fgcolor, *bgcolor);
+						mame_ui_manager::OPAQUE_, *fgcolor, *bgcolor,
+						nullptr, nullptr,
+						ui.get_line_height(ui.machine().render().ui_target())); // FIXME: line height quantisation assumes text is displayed on default UI target
 			});
 	render_container_type["user_settings"] = sol::property(&render_container::get_user_settings, &render_container::set_user_settings);
 	render_container_type["orientation"] = sol::property(

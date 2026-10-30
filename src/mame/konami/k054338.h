@@ -31,8 +31,14 @@ public:
 	{
 		m_k055555.set_tag(std::forward<T>(mixer_tag));
 	}
+	template <typename T, std::enable_if_t<!std::is_integral_v<std::remove_reference_t<T>>, int> = 0>
+	k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&mixer_tag) :
+		k054338_device(mconfig, tag, owner, 0, std::forward<T>(mixer_tag))
+	{
+		m_k055555.set_tag(std::forward<T>(mixer_tag));
+	}
 
-	k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	void set_alpha_invert(int alpha_inv) { m_alpha_inv = alpha_inv; }

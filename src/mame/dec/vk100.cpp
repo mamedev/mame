@@ -927,14 +927,6 @@ INPUT_PORTS_END
 
 void vk100_state::machine_start()
 {
-	m_online_led.resolve();
-	m_local_led.resolve();
-	m_noscroll_led.resolve();
-	m_basic_led.resolve();
-	m_hardcopy_led.resolve();
-	m_l1_led.resolve();
-	m_l2_led.resolve();
-
 	m_online_led = 1;
 	m_local_led = 0;
 	m_noscroll_led = 1;
@@ -1041,7 +1033,7 @@ void vk100_state::vk100(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &vk100_state::vk100_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(45'619'200)/3, 882, 0, 720, 370, 0, 350 ); // fake screen timings for startup until 6845 sets real ones
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
@@ -1053,7 +1045,7 @@ void vk100_state::vk100(machine_config &config)
 	m_crtc->out_vsync_callback().set(FUNC(vk100_state::crtc_vsync));
 
 	/* i8251 uart */
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	m_uart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	m_uart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));

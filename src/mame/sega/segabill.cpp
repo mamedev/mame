@@ -188,10 +188,6 @@ sega_billboard_device::sega_billboard_device(const machine_config &mconfig, cons
 
 void sega_billboard_device::device_start()
 {
-	// resolve output finders
-	m_digits.resolve();
-	m_leds.resolve();
-
 	// register for save states
 	save_item(NAME(m_cmd));
 }

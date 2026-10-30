@@ -144,12 +144,12 @@ void killcom_state::video_start()
 
 uint32_t killcom_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-		{
-			bitmap.pix(y, x) = m_videoram[y << 8 | x] & 0x07;
-		}
+		auto *const dst = &bitmap.pix(y);
+		auto const *const src = &m_videoram[(y << 8) & 0xff00];
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+			dst[x] = src[x & 0xff] & 0x07;
 	}
 
 	return 0;
@@ -1089,7 +1089,7 @@ INPUT_PORTS_END
 
 void killcom_state::killcom_video(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(11.6688_MHz_XTAL / 2, 352, 0, 256, 280, 0, 256);
 	m_screen->set_screen_update(FUNC(killcom_state::screen_update));
 	m_screen->screen_vblank().set(m_via[0], FUNC(via6522_device::write_ca1)); // VBLANK is connected to CA1

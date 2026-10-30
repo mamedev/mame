@@ -102,10 +102,10 @@ void i80130_device::io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void i80130_device::device_add_mconfig(machine_config &config)
 {
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set(FUNC(i80130_device::irq_w));
 
-	PIT8254(config, m_pit, 0);
+	PIT8254(config, m_pit);
 	m_pit->set_clk<0>(0);
 	m_pit->out_handler<0>().set(FUNC(i80130_device::systick_w));
 	m_pit->set_clk<1>(0);

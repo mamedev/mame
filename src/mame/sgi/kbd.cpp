@@ -161,8 +161,6 @@ void sgi_kbd_device::device_start()
 	save_item(NAME(m_col));
 	save_item(NAME(m_row));
 	save_item(NAME(m_p3));
-
-	m_led.resolve();
 }
 
 void sgi_kbd_device::scan_matrix(int state)

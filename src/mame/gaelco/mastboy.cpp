@@ -591,7 +591,7 @@ void mastboy_state::machine_reset()
 
 void mastboy_state::mastboy(machine_config &config)
 {
-	HD647180X(config, m_maincpu, 24_MHz_XTAL / 2);   // HD647180X0CP6-1M1R
+	HD647180X(config, m_maincpu, 24_MHz_XTAL / 2); // HD647180X0CP6-1M1R
 	m_maincpu->set_addrmap(AS_PROGRAM, &mastboy_state::mastboy_map);
 	m_maincpu->set_addrmap(AS_IO, &mastboy_state::mastboy_io_map);
 
@@ -599,15 +599,15 @@ void mastboy_state::mastboy(machine_config &config)
 
 	LS259(config, m_outlatch); // IC17
 	m_outlatch->q_out_cb<0>().set(FUNC(mastboy_state::irq0_ack_w));
-	m_outlatch->q_out_cb<1>().set("msm", FUNC(msm5205_device::s2_w));
-	m_outlatch->q_out_cb<2>().set("msm", FUNC(msm5205_device::s1_w));
+	m_outlatch->q_out_cb<1>().set("msm", FUNC(msm5205_device::s1_w));
+	m_outlatch->q_out_cb<2>().set("msm", FUNC(msm5205_device::s2_w));
 	m_outlatch->q_out_cb<3>().set("msm", FUNC(msm5205_device::reset_w));
 	m_outlatch->q_out_cb<4>().set("earom", FUNC(eeprom_parallel_28xx_device::oe_w));
 
 	ADDRESS_MAP_BANK(config, m_bank_c000).set_map(&mastboy_state::bank_c000_map).set_options(ENDIANNESS_LITTLE, 8, 22, 0x4000);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(6000000.0 / 384.0 / 282.0);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(256, 256);
@@ -625,8 +625,8 @@ void mastboy_state::mastboy(machine_config &config)
 	SAA1099(config, "saa", 6000000).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MSM5205(config, m_msm, 384000);
-	m_msm->vck_legacy_callback().set(FUNC(mastboy_state::adpcm_int));  // interrupt function
-	m_msm->set_prescaler_selector(msm5205_device::SEX_4B);      // 4KHz 4-bit
+	m_msm->vck_legacy_callback().set(FUNC(mastboy_state::adpcm_int)); // interrupt function
+	m_msm->set_prescaler_selector(msm5205_device::SEX_4B); // 4KHz 4-bit
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 

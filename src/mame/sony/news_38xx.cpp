@@ -28,7 +28,6 @@
  *
  * TODO:
  *   - slots (I/O and UBUS expansion slots)
- *   - graphics
  *   - sound
  *   - AST
  *   - Something in the format/install flow is iffy: you have to manually write the disklabel before the installer works
@@ -39,33 +38,27 @@
 
 #include "emu.h"
 
-#include "cpu/mips/mips1.h"
-#include "cpu/m68000/m68030.h"
-
-// memory
-#include "machine/ram.h"
-
-// various hardware
-#include "machine/msm6242.h"
-#include "machine/z80scc.h"
-#include "machine/am79c90.h"
-#include "machine/upd765.h"
 #include "dmac_0266.h"
 #include "news_hid.h"
-#include "machine/ncr5380.h"
+#include "nwb_512.h"
 
-// video
-#include "screen.h"
-
-// busses and connectors
-#include "machine/nscsi_bus.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
 #include "bus/nscsi/tape.h"
 #include "bus/rs232/rs232.h"
-
+#include "cpu/m68000/m68030.h"
+#include "cpu/mips/mips1.h"
 #include "imagedev/floppy.h"
+#include "machine/am79c90.h"
+#include "machine/msm6242.h"
+#include "machine/ncr5380.h"
+#include "machine/nscsi_bus.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
+#include "machine/z80scc.h"
+
+#include "screen.h"
 
 #define LOG_INTERRUPT (1U << 1)
 #define LOG_TIMER (1U << 2)
@@ -88,8 +81,6 @@ constexpr auto DISABLED = "disabled";
 class news_38xx_state : public driver_device
 {
 public:
-	static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }
-
 	news_38xx_state(machine_config const &mconfig, device_type type, char const *tag) :
 		driver_device(mconfig, type, tag),
 		m_cpu(*this, "cpu"),
@@ -101,12 +92,13 @@ public:
 		m_net(*this, "net"),
 		m_fdc(*this, "fdc"),
 		m_hid(*this, "hid"),
-		m_scsi(*this, "scsi%u:7:cxd1180", 0U),
+		m_scsi(*this, "cxd1180_%u", 0U),
 		m_serial(*this, "serial%u", 0U),
 		m_scsibus(*this, "scsi%u", 0U),
 		m_parallel(*this, "parallel"),
 		m_parallel_data(*this, "parallel_data"),
 		m_eprom(*this, "eprom"),
+		m_fb(*this, "nwb512"),
 		m_led(*this, "led%u", 0U)
 	{
 	}
@@ -145,6 +137,8 @@ protected:
 	};
 	static constexpr u32 IOP_NMI_MASK = 1 << u32(iop_irq::FDCDRQ) |
 										1 << u32(iop_irq::SCC) |
+										1 << u32(iop_irq::KEYBOARD) |
+										1 << u32(iop_irq::MOUSE) |
 										1 << u32(iop_irq::SCSI0) |
 										1 << u32(iop_irq::SCSI1) |
 										1 << u32(iop_irq::LANCE) |
@@ -255,8 +249,9 @@ protected:
 	required_device_array<nscsi_bus_device, 2> m_scsibus;
 	required_device<centronics_device> m_parallel;
 	optional_device<output_latch_device> m_parallel_data;
-
 	required_region_ptr<u32> m_eprom;
+	required_device<nwb_512_device> m_fb;
+
 	output_finder<4> m_led;
 	std::unique_ptr<u16[]> m_net_ram;
 
@@ -285,7 +280,6 @@ protected:
 
 void news_38xx_state::machine_start()
 {
-	m_led.resolve();
 	m_cpu->space(AS_PROGRAM).specific(m_memory_access);
 	m_timer = timer_alloc(FUNC(news_38xx_state::timer), this);
 	m_net_ram = std::make_unique<u16[]>(8192);
@@ -423,7 +417,11 @@ void news_38xx_state::iop_map(address_map &map)
 	map(0x2c000000, 0x2c0000ff).rom().region("idrom", 0);
 	map(0x2c000100, 0x2c000103).portr("SW1");
 
-	map(0x2e000000, 0x2effffff).r(FUNC(news_38xx_state::iop_bus_error_r)).mirror(0x10000000); // Expansion I/O
+	// Expansion I/O
+	map(0x2e000000, 0x2eefffff).mirror(0x10000000).r(FUNC(news_38xx_state::iop_bus_error_r));
+
+	// NWB-512 Monochrome Framebuffer (in Expansion I/O space)
+	map(0x2ef00000, 0x2effffff).mirror(0x10000000).m(m_fb, FUNC(nwb_512_device::map));
 }
 
 void news_38xx_state::iop_vector_map(address_map &map)
@@ -851,8 +849,8 @@ void news_38xx_state::reset_cpu_registers()
 void news_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add("cdrom", NSCSI_CDROM);
-	device.option_add("tape", NSCSI_TAPE);
+	device.option_add("cdrom", NSCSI_CDROM_NEWS);
+	device.option_add("tape", NSCSI_TAPE_NEWS);
 }
 
 void news_38xx_state::common(machine_config &config)
@@ -875,10 +873,10 @@ void news_38xx_state::common(machine_config &config)
 
 	RTC62421(config, m_rtc, 32.768_kHz_XTAL);
 
-	DMAC_0266(config, m_dma[0], 0);
+	DMAC_0266(config, m_dma[0]);
 	m_dma[0]->set_bus(m_iop, 0);
 
-	DMAC_0266(config, m_dma[1], 0);
+	DMAC_0266(config, m_dma[1]);
 	m_dma[1]->set_bus(m_iop, 0);
 
 	SCC85C30(config, m_scc, 4.9152_MHz_XTAL);
@@ -889,7 +887,7 @@ void news_38xx_state::common(machine_config &config)
 		});
 
 	// scc channel A
-	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
+	RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);
 	m_serial[0]->cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 	m_serial[0]->dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
 	m_serial[0]->rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
@@ -928,18 +926,14 @@ void news_38xx_state::common(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi0:6", news_scsi_devices, nullptr);
 
 	// scsi bus 0 host adapter
-	NSCSI_CONNECTOR(config, "scsi0:7").option_set("cxd1180", CXD1180).machine_config(
-		[this](device_t *device) {
-			auto &adapter = downcast<cxd1180_device &>(*device);
-			adapter.set_clock(20_MHz_XTAL / 2);
+	CXD1180(config, m_scsi[0], 20_MHz_XTAL / 2);
+	m_scsibus[0]->set_external_device(7, m_scsi[0]);
+	m_scsi[0]->irq_handler().set(DEVICE_SELF, FUNC(news_38xx_state::irq_w<iop_irq::SCSI0>));
+	m_scsi[0]->irq_handler().append(m_dma[0], FUNC(dmac_0266_device::eop_w));
+	m_scsi[0]->drq_handler().set(m_dma[0], FUNC(dmac_0266_device::req_w));
 
-			adapter.irq_handler().set(*this, FUNC(news_38xx_state::irq_w<iop_irq::SCSI0>));
-			adapter.irq_handler().append(m_dma[0], FUNC(dmac_0266_device::eop_w));
-			adapter.drq_handler().set(m_dma[0], FUNC(dmac_0266_device::req_w));
-
-			subdevice<dmac_0266_device>(":dma0")->dma_r_cb().set(adapter, FUNC(cxd1180_device::dma_r));
-			subdevice<dmac_0266_device>(":dma0")->dma_w_cb().set(adapter, FUNC(cxd1180_device::dma_w));
-		});
+	m_dma[0]->dma_r_cb().set(m_scsi[0], FUNC(cxd1180_device::dma_r));
+	m_dma[0]->dma_w_cb().set(m_scsi[0], FUNC(cxd1180_device::dma_w));
 
 	// scsi bus 1 and devices
 	NSCSI_BUS(config, m_scsibus[1]);
@@ -952,18 +946,14 @@ void news_38xx_state::common(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi1:6", news_scsi_devices, nullptr);
 
 	// scsi bus 1 host adapter
-	NSCSI_CONNECTOR(config, "scsi1:7").option_set("cxd1180", CXD1180).machine_config(
-		[this](device_t *device) {
-			auto &adapter = downcast<cxd1180_device &>(*device);
-			adapter.set_clock(20_MHz_XTAL / 2);
+	CXD1180(config, m_scsi[1], 20_MHz_XTAL / 2);
+	m_scsibus[1]->set_external_device(7, m_scsi[1]);
+	m_scsi[1]->irq_handler().set(DEVICE_SELF, FUNC(news_38xx_state::irq_w<iop_irq::SCSI1>));
+	m_scsi[1]->irq_handler().append(m_dma[1], FUNC(dmac_0266_device::eop_w));
+	m_scsi[1]->drq_handler().set(m_dma[1], FUNC(dmac_0266_device::req_w));
 
-			adapter.irq_handler().set(*this, FUNC(news_38xx_state::irq_w<iop_irq::SCSI1>));
-			adapter.irq_handler().append(m_dma[1], FUNC(dmac_0266_device::eop_w));
-			adapter.drq_handler().set(m_dma[1], FUNC(dmac_0266_device::req_w));
-
-			subdevice<dmac_0266_device>(":dma1")->dma_r_cb().set(adapter, FUNC(cxd1180_device::dma_r));
-			subdevice<dmac_0266_device>(":dma1")->dma_w_cb().set(adapter, FUNC(cxd1180_device::dma_w));
-		});
+	m_dma[1]->dma_r_cb().set(m_scsi[1], FUNC(cxd1180_device::dma_r));
+	m_dma[1]->dma_w_cb().set(m_scsi[1], FUNC(cxd1180_device::dma_w));
 
 	CENTRONICS(config, m_parallel, centronics_devices, nullptr);
 	// Note: printing works, but I'm not sure how accurate triggering the IRQ on each edge is.
@@ -994,6 +984,9 @@ void news_38xx_state::common(machine_config &config)
 	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(*this, FUNC(news_38xx_state::irq_w<iop_irq::KEYBOARD>));
 	m_hid->irq_out<news_hid_hle_device::MOUSE>().set(*this, FUNC(news_38xx_state::irq_w<iop_irq::MOUSE>));
 
+	// NWB-512 monochrome framebuffer + NWP-512D 15" Monochrome Display (816x1024)
+	NWB_512(config, m_fb);
+
 	SOFTWARE_LIST(config, "software_list").set_original("sony_news").set_filter("RISC,NWS3000");
 }
 
@@ -1013,10 +1006,10 @@ ROM_END
 
 INPUT_PORTS_START(nws3860)
 	PORT_START("SW1")
-	PORT_DIPNAME(0x07000000, 0x07000000, "Display") PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME(0x07000000, 0x03000000, "Display") PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(0x07000000, "Console")
-	PORT_DIPSETTING(0x06000000, "NWB-512")
-	PORT_DIPSETTING(0x03000000, "NWB-225A")
+	PORT_DIPSETTING(0x06000000, "NWB-225A")
+	PORT_DIPSETTING(0x03000000, "NWB-512")
 	PORT_DIPSETTING(0x00000000, "Autoselect")
 
 	PORT_DIPNAME(0x08000000, 0x08000000, "Boot Device") PORT_DIPLOCATION("SW1:4")
@@ -1039,4 +1032,4 @@ INPUT_PORTS_END
 
 
 /*   YEAR  NAME     P  C  MACHINE  INPUT    CLASS            INIT         COMPANY  FULLNAME   FLAGS */
-COMP(1989, nws3860, 0, 0, nws3860, nws3860, news_38xx_state, init_common, "Sony", "NWS-3860", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1989, nws3860, 0, 0, nws3860, nws3860, news_38xx_state, init_common, "Sony", "NWS-3860", MACHINE_NO_SOUND)

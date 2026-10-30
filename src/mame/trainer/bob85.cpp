@@ -43,9 +43,12 @@ public:
 		, m_line1(*this, "LINE1")
 		, m_line2(*this, "LINE2")
 		, m_digits(*this, "digit%u", 0U)
-		{ }
+	{ }
 
-	void bob85(machine_config &config);
+	void bob85(machine_config &config) ATTR_COLD;
+
+protected:
+	void machine_start() override ATTR_COLD;
 
 private:
 	void io_map(address_map &map) ATTR_COLD;
@@ -55,11 +58,11 @@ private:
 	void sod_w(int state);
 	int sid_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
+
 	uint8_t m_prev_key = 0;
 	uint8_t m_count_key = 0;
 	u16 m_casscnt = 0;
 	bool m_cassold = false, m_cassbit = false;
-	void machine_start() override ATTR_COLD;
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_ioport m_line0;
@@ -194,7 +197,6 @@ INPUT_PORTS_END
 
 void bob85_state::machine_start()
 {
-	m_digits.resolve();
 	save_item(NAME(m_prev_key));
 	save_item(NAME(m_count_key));
 	save_item(NAME(m_casscnt));

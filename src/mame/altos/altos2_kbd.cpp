@@ -39,14 +39,6 @@ altos2_keyboard_device::altos2_keyboard_device(const machine_config &mconfig, co
 {
 }
 
-void altos2_keyboard_device::device_resolve_objects()
-{
-	m_caps_led.resolve();
-	m_insline_led.resolve();
-	m_inschar_led.resolve();
-	m_calc_led.resolve();
-}
-
 void altos2_keyboard_device::device_start()
 {
 	save_item(NAME(m_key_row));

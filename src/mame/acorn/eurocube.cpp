@@ -309,7 +309,7 @@ void eurocube_state::eurocube65(machine_config &config)
 	via6522_device &via(MOS6522(config, "via", 4_MHz_XTAL / 4));
 	via.irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 
-	mos6551_device &acia(MOS6551(config, "acia", 0));
+	mos6551_device &acia(MOS6551(config, "acia"));
 	acia.set_xtal(1.8432_MHz_XTAL);
 	acia.irq_handler().set("irqs", FUNC(input_merger_device::in_w<1>));
 	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -374,7 +374,7 @@ void eurocube_state::eurocube09(machine_config &config)
 	via6522_device &via(MOS6522(config, "via", 4_MHz_XTAL / 4));
 	via.irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 
-	mos6551_device &acia(MOS6551(config, "acia", 0));
+	mos6551_device &acia(MOS6551(config, "acia"));
 	acia.set_xtal(1.8432_MHz_XTAL);
 	acia.irq_handler().set("irqs", FUNC(input_merger_device::in_w<1>));
 	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));

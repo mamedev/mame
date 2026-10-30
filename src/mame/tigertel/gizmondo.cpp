@@ -182,14 +182,14 @@ void gizmondo_state::gizmondo(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(32768);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(320, 240);
 	screen.set_visarea_full();
 	screen.set_screen_update("gf4500", FUNC(gf4500_device::screen_update));
 
-	GF4500(config, m_gf4500, 0);
+	GF4500(config, m_gf4500);
 
 	S3C2440(config, m_s3c2440, 12000000);
 	m_s3c2440->set_palette_tag("palette");

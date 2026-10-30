@@ -53,15 +53,12 @@ class nes_datach_slot_device : public device_t,
 public:
 	// construction/destruction
 	template <typename T>
-	nes_datach_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&opts)
-		: nes_datach_slot_device(mconfig, tag, owner, clock)
+	nes_datach_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts)
+		: nes_datach_slot_device(mconfig, tag, owner)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(nullptr);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), nullptr, false);
 	}
-	nes_datach_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_datach_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~nes_datach_slot_device();
 
 	// device_image_interface implementation

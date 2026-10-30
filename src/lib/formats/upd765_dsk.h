@@ -46,7 +46,7 @@ public:
 
 protected:
 	floppy_image_format_t::desc_e* get_desc_fm(const format &f, int &current_size, int &end_gap_index) const;
-	floppy_image_format_t::desc_e* get_desc_mfm(const format &f, int &current_size, int &end_gap_index) const;
+	virtual floppy_image_format_t::desc_e* get_desc_mfm(const format &f, int &current_size, int &end_gap_index) const;
 	int find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const;
 	int compute_track_size(const format &f) const;
 	virtual void build_sector_description(const format &d, uint8_t *sectdata, desc_s *sectors, int track, int head) const;

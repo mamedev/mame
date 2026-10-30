@@ -110,7 +110,6 @@ void sdk85_state::machine_reset()
 
 void sdk85_state::machine_start()
 {
-	m_digits.resolve();
 	save_item(NAME(m_digit));
 }
 

@@ -65,7 +65,7 @@ const int mos6551_device::transmitter_controls[4][3] =
 
 void mos6551_device::device_add_mconfig(machine_config &config)
 {
-	CLOCK(config, m_internal_clock, 0);
+	CLOCK(config, m_internal_clock);
 	m_internal_clock->signal_handler().set(FUNC(mos6551_device::internal_clock));
 }
 

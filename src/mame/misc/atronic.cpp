@@ -602,12 +602,12 @@ void atronic_state::atronic(machine_config &config)
 
 	SCC85C30(config, "scc", 5000000);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(40_MHz_XTAL / 2, 640, 0, 512, 257, 0, 224); // ??
 	m_screen->set_screen_update("tms", FUNC(tms34020_device::tms340x0_rgb32));
 
 	PALETTE(config, "palette").set_entries(256);
-	RAMDAC(config, m_ramdac, 0, m_palette);
+	RAMDAC(config, m_ramdac, m_palette);
 	m_ramdac->set_addrmap(0, &atronic_state::ramdac_map);
 
 	TMS34020(config, m_videocpu, 40_MHz_XTAL);

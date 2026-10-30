@@ -273,13 +273,13 @@ void akazukin_state::akazukin(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch[1]).data_pending_callback().set_inputline(m_maincpu, 0);
 
 	// video hardware
-	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device& screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60.58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 
-	VASTAR_VIDEO_DEVICE(config, m_vasvid, 0);
+	VASTAR_VIDEO_DEVICE(config, m_vasvid);
 	m_vasvid->set_screen("screen");
 	m_vasvid->set_bg_bases(0x000, 0x800, 0x400);
 	m_vasvid->set_fg_bases(0x000, 0x400, 0x800);

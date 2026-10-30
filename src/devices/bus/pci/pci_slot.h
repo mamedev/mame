@@ -22,10 +22,7 @@ public:
 	pci_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, u8 slot, u8 irqa, u8 irqb, u8 irqc, u8 irqd, const char *dflt)
 		: pci_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 		m_slot = slot;
 		m_irq[0] = irqa;
 		m_irq[1] = irqb;

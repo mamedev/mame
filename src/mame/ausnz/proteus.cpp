@@ -375,7 +375,7 @@ void proteus_state::proteus(machine_config &config)
 	parallel.set_output_latch(cent_data_out);
 
 	/* terminal port */
-	ACIA6850(config, m_acia[0], 0);
+	ACIA6850(config, m_acia[0]);
 	m_acia[0]->txd_handler().set("terminal", FUNC(rs232_port_device::write_txd));
 	m_acia[0]->rts_handler().set("terminal", FUNC(rs232_port_device::write_rts));
 	m_acia[0]->irq_handler().set("irqs", FUNC(input_merger_device::in_w<4>));
@@ -389,7 +389,7 @@ void proteus_state::proteus(machine_config &config)
 	acia0_clock.signal_handler().append(m_acia[0], FUNC(acia6850_device::write_rxc));
 
 	/* printer port */
-	ACIA6850(config, m_acia[1], 0);
+	ACIA6850(config, m_acia[1]);
 	m_acia[1]->txd_handler().set("printer", FUNC(rs232_port_device::write_txd));
 	m_acia[1]->rts_handler().set("printer", FUNC(rs232_port_device::write_rts));
 	m_acia[1]->irq_handler().set("irqs", FUNC(input_merger_device::in_w<5>));
@@ -403,7 +403,7 @@ void proteus_state::proteus(machine_config &config)
 	acia1_clock.signal_handler().append(m_acia[1], FUNC(acia6850_device::write_rxc));
 
 	/* modem port */
-	ACIA6850(config, m_acia[2], 0);
+	ACIA6850(config, m_acia[2]);
 	m_acia[2]->txd_handler().set("modem", FUNC(rs232_port_device::write_txd));
 	m_acia[2]->rts_handler().set("modem", FUNC(rs232_port_device::write_rts));
 	m_acia[2]->irq_handler().set("irqs", FUNC(input_merger_device::in_w<6>));

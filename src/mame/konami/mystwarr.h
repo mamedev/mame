@@ -2,14 +2,16 @@
 // copyright-holders:R. Belmont, Phil Stroffolino, Acho A. Tang, Nicola Salmoria
 
 #include "konamigx.h"
-#include "k053246_k053247_k055673.h"
 
-#include "sound/k054539.h"
-#include "machine/k053252.h"
-#include "k055555.h"
+#include "k053246_k053247_k055673.h"
 #include "k054000.h"
-#include "machine/k054321.h"
+#include "k055555.h"
+
+#include "machine/k053252.h"
 #include "machine/timer.h"
+#include "sound/k054321.h"
+#include "sound/k054539.h"
+
 #include "tilemap.h"
 
 class mystwarr_state : public konamigx_state
@@ -51,7 +53,6 @@ private:
 	int32_t m_roz_rombank = 0;
 	tilemap_t *m_ult_936_tilemap = nullptr;
 	uint16_t m_clip = 0;
-	uint8_t m_last_alpha_tile_mix_code = 0;
 
 	uint8_t m_sound_ctrl = 0;
 	uint8_t m_sound_nmi_clk = 0;

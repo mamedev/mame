@@ -11,7 +11,7 @@
 class elan_eu3a05vid_device : public elan_eu3a05commonvid_device, public device_memory_interface
 {
 public:
-	elan_eu3a05vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	elan_eu3a05vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 
@@ -20,7 +20,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	elan_eu3a05vid_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	elan_eu3a05vid_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -103,7 +103,7 @@ protected:
 class elan_ep3a19avid_device : public elan_eu3a13vid_device
 {
 public:
-	elan_ep3a19avid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	elan_ep3a19avid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_VID, elan_eu3a05vid_device)

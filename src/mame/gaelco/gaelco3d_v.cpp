@@ -11,16 +11,17 @@
 #include "emu.h"
 #include "gaelco3d.h"
 
-#include "cpu/tms32031/tms32031.h"
+#include "cpu/tms320c3x/tms320c3x.h"
 
-#include "video/rgbutil.h"
+#include "video.h"
+
+#include <iterator>
 
 
 static constexpr unsigned MAX_POLYGONS = 4096;
 static constexpr unsigned MAX_POLYDATA = MAX_POLYGONS * 21;
 static constexpr unsigned MAX_VERTICES = 32;
 
-#define DISPLAY_TEXTURE     0
 #define LOG_POLYGONS        0
 #define DISPLAY_STATS       0
 
@@ -116,16 +117,16 @@ void gaelco3d_state::gaelco3d_renderer::render_poly(screen_device &screen, uint3
 {
 	float const midx = screen.width() / 2;
 	float const midy = screen.height() / 2;
-	float const z0 = tms3203x_device::fp_to_float(polydata[0]);
-	float const voz_dy = tms3203x_device::fp_to_float(polydata[1]) * 256.0f;
-	float const voz_dx = tms3203x_device::fp_to_float(polydata[2]) * 256.0f;
-	float const ooz_dy = tms3203x_device::fp_to_float(polydata[3]);
-	float const ooz_dx = tms3203x_device::fp_to_float(polydata[4]);
-	float const uoz_dy = tms3203x_device::fp_to_float(polydata[5]) * 256.0f;
-	float const uoz_dx = tms3203x_device::fp_to_float(polydata[6]) * 256.0f;
-	float const voz_base = tms3203x_device::fp_to_float(polydata[7]) * 256.0f - midx * voz_dx - midy * voz_dy;
-	float const ooz_base = tms3203x_device::fp_to_float(polydata[8]) - midx * ooz_dx - midy * ooz_dy;
-	float const uoz_base = tms3203x_device::fp_to_float(polydata[9]) * 256.0f - midx * uoz_dx - midy * uoz_dy;
+	float const z0 = tms320c3x_device::fp_to_float(polydata[0]);
+	float const voz_dy = tms320c3x_device::fp_to_float(polydata[1]) * 256.0f;
+	float const voz_dx = tms320c3x_device::fp_to_float(polydata[2]) * 256.0f;
+	float const ooz_dy = tms320c3x_device::fp_to_float(polydata[3]);
+	float const ooz_dx = tms320c3x_device::fp_to_float(polydata[4]);
+	float const uoz_dy = tms320c3x_device::fp_to_float(polydata[5]) * 256.0f;
+	float const uoz_dx = tms320c3x_device::fp_to_float(polydata[6]) * 256.0f;
+	float const voz_base = tms320c3x_device::fp_to_float(polydata[7]) * 256.0f - midx * voz_dx - midy * voz_dy;
+	float const ooz_base = tms320c3x_device::fp_to_float(polydata[8]) - midx * ooz_dx - midy * ooz_dy;
+	float const uoz_base = tms320c3x_device::fp_to_float(polydata[9]) * 256.0f - midx * uoz_dx - midy * uoz_dy;
 	gaelco3d_object_data &object = object_data().next();
 	int const color = (polydata[10] & 0x7f) << 8;
 	vertex_t vert[MAX_VERTICES];
@@ -134,23 +135,23 @@ void gaelco3d_state::gaelco3d_renderer::render_poly(screen_device &screen, uint3
 	{
 		int t;
 		m_state.logerror("poly: %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %08X %08X (%4d,%4d) %08X",
-				(double)tms3203x_device::fp_to_float(polydata[0]),
-				(double)tms3203x_device::fp_to_float(polydata[1]),
-				(double)tms3203x_device::fp_to_float(polydata[2]),
-				(double)tms3203x_device::fp_to_float(polydata[3]),
-				(double)tms3203x_device::fp_to_float(polydata[4]),
-				(double)tms3203x_device::fp_to_float(polydata[5]),
-				(double)tms3203x_device::fp_to_float(polydata[6]),
-				(double)tms3203x_device::fp_to_float(polydata[7]),
-				(double)tms3203x_device::fp_to_float(polydata[8]),
-				(double)tms3203x_device::fp_to_float(polydata[9]),
+				double(tms320c3x_device::fp_to_float(polydata[0])),
+				double(tms320c3x_device::fp_to_float(polydata[1])),
+				double(tms320c3x_device::fp_to_float(polydata[2])),
+				double(tms320c3x_device::fp_to_float(polydata[3])),
+				double(tms320c3x_device::fp_to_float(polydata[4])),
+				double(tms320c3x_device::fp_to_float(polydata[5])),
+				double(tms320c3x_device::fp_to_float(polydata[6])),
+				double(tms320c3x_device::fp_to_float(polydata[7])),
+				double(tms320c3x_device::fp_to_float(polydata[8])),
+				double(tms320c3x_device::fp_to_float(polydata[9])),
 				polydata[10],
 				polydata[11],
-				(int16_t)(polydata[12] >> 16), (int16_t)(polydata[12] << 2) >> 2, polydata[12]);
+				int16_t(polydata[12] >> 16), int16_t(polydata[12] << 2) >> 2, polydata[12]);
 
-		m_state.logerror(" (%4d,%4d) %08X %08X", (int16_t)(polydata[13] >> 16), (int16_t)(polydata[13] << 2) >> 2, polydata[13], polydata[14]);
+		m_state.logerror(" (%4d,%4d) %08X %08X", int16_t(polydata[13] >> 16), int16_t(polydata[13] << 2) >> 2, polydata[13], polydata[14]);
 		for (t = 15; !IS_POLYEND(polydata[t - 2]); t += 2)
-			m_state.logerror(" (%4d,%4d) %08X %08X", (int16_t)(polydata[t] >> 16), (int16_t)(polydata[t] << 2) >> 2, polydata[t], polydata[t+1]);
+			m_state.logerror(" (%4d,%4d) %08X %08X", int16_t(polydata[t] >> 16), int16_t(polydata[t] << 2) >> 2, polydata[t], polydata[t+1]);
 		m_state.logerror("\n");
 	}
 
@@ -182,6 +183,17 @@ void gaelco3d_state::gaelco3d_renderer::render_poly(screen_device &screen, uint3
 	/* if we have a valid number of verts, render them */
 	if (vertnum >= 3)
 	{
+		/* Prevent poly.h down-rounding from discarding the outermost vert coord */
+		float const maxx = float(screen.width());
+		float const maxy = float(screen.height());
+		for (int i = 0; i < vertnum; i++)
+		{
+			if (vert[i].x > maxx - 1.0f && vert[i].x < maxx)
+				vert[i].x = maxx;
+			if (vert[i].y > maxy - 1.0f && vert[i].y < maxy)
+				vert[i].y = maxy;
+		}
+
 		const rectangle &visarea = screen.visible_area();
 
 		/* special case: no Z buffering and no perspective correction */
@@ -202,16 +214,37 @@ void gaelco3d_state::gaelco3d_renderer::render_poly(screen_device &screen, uint3
 
 
 
+// COLOR3D (Actel A1280XL) bilinear filter: 4-bit fractions, 8-bit output per channel
+uint32_t gaelco3d_state::gaelco3d_renderer::color3d_filter(uint32_t rgb00, uint32_t rgb01, uint32_t rgb10, uint32_t rgb11, uint8_t u, uint8_t v)
+{
+	// FIXME: assumes the fraction inputs are the upper four bits of u and v
+	unsigned const uf = u >> 4;
+	unsigned const vf = v >> 4;
+	uint32_t const texels[4] = { rgb00, rgb01, rgb10, rgb11 };
+	unsigned const weights[4] = { (16 - uf) * (16 - vf), uf * (16 - vf), (16 - uf) * vf, uf * vf };
+	unsigned r = 0, g = 0, b = 0;
+	for (unsigned i = 0; i < std::size(texels); i++)
+	{
+		r += BIT(texels[i], 16, 5) * weights[i];
+		g += BIT(texels[i], 11, 5) * weights[i];
+		b += BIT(texels[i], 0, 5) * weights[i];
+	}
+
+	// FIXME: external DAC scaling unknown, full scale gives 248
+	return rgb_t(r >> 5, g >> 5, b >> 5);
+}
+
+
 void gaelco3d_state::gaelco3d_renderer::render_noz_noperspective(int32_t scanline, const extent_t &extent, const gaelco3d_object_data &object, int threadid)
 {
-	float const zbase = recip_approx(object.ooz_base);
+	float const zbase = 1.0f / object.ooz_base;
 	float const uoz_step = object.uoz_dx * zbase;
 	float const voz_step = object.voz_dx * zbase;
 	int const zbufval = (int)(-object.z0 * zbase);
 	offs_t const endmask = m_texture_size - 1;
 	const rgb_t *const palsource = m_state.m_palette.get() + object.color;
 	uint32_t const tex = object.tex;
-	uint16_t *const dest = &m_screenbits.pix(scanline);
+	uint32_t *const dest = &m_screenbits.pix(scanline);
 	uint16_t *const zbuf = &m_zbuffer.pix(scanline);
 	int const startx = extent.startx;
 	float uoz = (object.uoz_base + scanline * object.uoz_dy + startx * object.uoz_dx) * zbase;
@@ -228,8 +261,7 @@ void gaelco3d_state::gaelco3d_renderer::render_noz_noperspective(int32_t scanlin
 			uint32_t rgb01 = palsource[m_texture[(pixeloffs + 1) & endmask]];
 			uint32_t rgb10 = palsource[m_texture[(pixeloffs + 4096) & endmask]];
 			uint32_t rgb11 = palsource[m_texture[(pixeloffs + 4097) & endmask]];
-			const uint32_t filtered = rgbaint_t::bilinear_filter(rgb00, rgb01, rgb10, rgb11, u, v);
-			dest[x] = (filtered & 0x1f) | ((filtered & 0x1ff800) >> 6);
+			dest[x] = color3d_filter(rgb00, rgb01, rgb10, rgb11, u, v);
 			zbuf[x] = zbufval;
 		}
 
@@ -249,7 +281,7 @@ void gaelco3d_state::gaelco3d_renderer::render_normal(int32_t scanline, const ex
 	const rgb_t *const palsource = m_state.m_palette.get() + object.color;
 	uint32_t const tex = object.tex;
 	float const z0 = object.z0;
-	uint16_t *const dest = &m_screenbits.pix(scanline);
+	uint32_t *const dest = &m_screenbits.pix(scanline);
 	uint16_t *const zbuf = &m_zbuffer.pix(scanline);
 	int const startx = extent.startx;
 	float ooz = object.ooz_base + scanline * object.ooz_dy + startx * ooz_dx;
@@ -261,7 +293,7 @@ void gaelco3d_state::gaelco3d_renderer::render_normal(int32_t scanline, const ex
 		if (ooz > 0)
 		{
 			/* compute Z and check the Z buffer value first */
-			float const z = recip_approx(ooz);
+			float const z = 1.0f / ooz;
 			int zbufval = (int)(z0 * z);
 			if (zbufval < zbuf[x])
 			{
@@ -274,8 +306,7 @@ void gaelco3d_state::gaelco3d_renderer::render_normal(int32_t scanline, const ex
 					uint32_t rgb01 = palsource[m_texture[(pixeloffs + 1) & endmask]];
 					uint32_t rgb10 = palsource[m_texture[(pixeloffs + 4096) & endmask]];
 					uint32_t rgb11 = palsource[m_texture[(pixeloffs + 4097) & endmask]];
-					const uint32_t filtered = rgbaint_t::bilinear_filter(rgb00, rgb01, rgb10, rgb11, u, v);
-					dest[x] = (filtered & 0x1f) | ((filtered & 0x1ff800) >> 6);
+					dest[x] = color3d_filter(rgb00, rgb01, rgb10, rgb11, u, v);
 					zbuf[x] = (zbufval < 0) ? -zbufval : zbufval;
 				}
 			}
@@ -298,7 +329,7 @@ void gaelco3d_state::gaelco3d_renderer::render_alphablend(int32_t scanline, cons
 	const rgb_t *const palsource = m_state.m_palette.get() + object.color;
 	uint32_t const tex = object.tex;
 	float const z0 = object.z0;
-	uint16_t *const dest = &m_screenbits.pix(scanline);
+	uint32_t *const dest = &m_screenbits.pix(scanline);
 	uint16_t *const zbuf = &m_zbuffer.pix(scanline);
 	int const startx = extent.startx;
 	float ooz = object.ooz_base + object.ooz_dy * scanline + startx * ooz_dx;
@@ -310,7 +341,7 @@ void gaelco3d_state::gaelco3d_renderer::render_alphablend(int32_t scanline, cons
 		if (ooz > 0)
 		{
 			/* compute Z and check the Z buffer value first */
-			float const z = recip_approx(ooz);
+			float const z = 1.0f / ooz;
 			int const zbufval = (int)(z0 * z);
 			if (zbufval < zbuf[x])
 			{
@@ -323,8 +354,8 @@ void gaelco3d_state::gaelco3d_renderer::render_alphablend(int32_t scanline, cons
 					uint32_t rgb01 = palsource[m_texture[(pixeloffs + 1) & endmask]];
 					uint32_t rgb10 = palsource[m_texture[(pixeloffs + 4096) & endmask]];
 					uint32_t rgb11 = palsource[m_texture[(pixeloffs + 4097) & endmask]];
-					const uint32_t filtered = rgbaint_t::bilinear_filter(rgb00, rgb01, rgb10, rgb11, u, v) >> 1;
-					dest[x] = ((filtered & 0x0f) | ((filtered & 0x0f7800) >> 6)) + ((dest[x] >> 1) & 0x3def);
+					uint32_t const filtered = color3d_filter(rgb00, rgb01, rgb10, rgb11, u, v);
+					dest[x] = 0xff000000 | (((filtered & 0x00fefefe) >> 1) + ((dest[x] & 0x00fefefe) >> 1));
 					zbuf[x] = (zbufval < 0) ? -zbufval : zbufval;
 				}
 			}
@@ -423,54 +454,13 @@ void gaelco3d_state::paletteram_020_w(offs_t offset, uint32_t data, uint32_t mem
  *
  *************************************/
 
-uint32_t gaelco3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gaelco3d_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int ret = 0;
+	if (!m_video_changed)
+		return UPDATE_HAS_NOT_CHANGED;
 
-/*
-    if (DISPLAY_TEXTURE && (machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed(KEYCODE_X)))
-    {
-        static int xv = 0, yv = 0x1000;
-        uint8_t *base = m_texture;
-        int length = m_texture_size;
-
-        if (machine().input().code_pressed(KEYCODE_X))
-        {
-            base = m_texmask;
-            length = m_texmask_size;
-        }
-
-        if (machine().input().code_pressed(KEYCODE_LEFT) && xv >= 4)
-            xv -= 4;
-        if (machine().input().code_pressed(KEYCODE_RIGHT) && xv < 4096 - 4)
-            xv += 4;
-
-        if (machine().input().code_pressed(KEYCODE_UP) && yv >= 4)
-            yv -= 4;
-        if (machine().input().code_pressed(KEYCODE_DOWN) && yv < 0x40000)
-            yv += 4;
-
-        for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-        {
-            uint16_t *dest = &bitmap.pix(y);
-            for (x = cliprect.min_x; x <= cliprect.max_x; x++)
-            {
-                int offs = (yv + y - cliprect.min_y) * 4096 + xv + x - cliprect.min_x;
-                if (offs < length)
-                    dest[x] = base[offs];
-                else
-                    dest[x] = 0;
-            }
-        }
-        popmessage("(%04X,%04X)", xv, yv);
-    }
-    else*/
-	{
-		if (m_video_changed)
-			copybitmap(bitmap, m_poly->screenbits(), 0,1, 0,0, cliprect);
-		ret = m_video_changed ? 1 : 0;
-		m_video_changed = false;
-	}
-
-	return (!ret);
+	m_poly->wait("Screen update");
+	copybitmap(bitmap, m_poly->screenbits(), 0, 1, 0, 0, cliprect);
+	m_video_changed = false;
+	return 0;
 }

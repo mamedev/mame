@@ -95,10 +95,6 @@ public:
 	void check_irqs();
 	void interrupt_cb(int scanline, int irq6);
 
-	void sh2_main_map(address_map &map) ATTR_COLD;
-	void sh2_slave_map(address_map &map) ATTR_COLD;
-	void sh2_common_map(address_map &map) ATTR_COLD;
-
 protected:
 	sega_32x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -148,6 +144,10 @@ protected:
 	uint16_t get_hposition(void);
 
 	emu_timer *m_32x_pwm_timer = nullptr;
+
+	void sh2_main_map(address_map &map) ATTR_COLD;
+	void sh2_slave_map(address_map &map) ATTR_COLD;
+	void sh2_common_map(address_map &map) ATTR_COLD;
 
 private:
 
@@ -208,11 +208,7 @@ public:
 		m_scan_timer.set_tag(std::forward<U>(timer_tag));
 	}
 
-	sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-
+	sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class sega_32x_pal_device : public sega_32x_device
@@ -227,9 +223,6 @@ public:
 	}
 
 	sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 

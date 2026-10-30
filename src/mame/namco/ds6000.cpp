@@ -92,8 +92,8 @@ It also has a Plextor PX-40TSi SCSI CD-ROM drive
 #include "cpu/m68000/m68020.h"
 #include "cpu/m68000/tmp68301.h"
 #include "machine/eeprompar.h"
-#include "machine/mb87078.h"
 #include "sound/c352.h"
+#include "sound/mb87077.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -159,7 +159,7 @@ void ds6000_state::ds6000(machine_config &config)
 
 	// TODO: Namco customs
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);

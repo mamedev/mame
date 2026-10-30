@@ -53,14 +53,11 @@ private:
 
 	void index_callback(floppy_image_device *floppy, int state);
 	void update_latching_inverter();
-	void flush_writes(bool keep_margin = false);
 
 	uint8_t m_latch, m_shifter;
 	bool m_latching_inverter;
 	int m_current_cyl;
 	attotime m_last_latching_inverter_update_time;
-	attotime m_write_start_time, m_write_buffer[32];
-	int m_write_position;
 };
 
 // device type definition

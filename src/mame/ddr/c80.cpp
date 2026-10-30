@@ -303,7 +303,6 @@ static const z80_daisy_config c80_daisy_chain[] =
 
 void c80_state::machine_start()
 {
-	m_digits.resolve();
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_digit));

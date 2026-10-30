@@ -3,6 +3,11 @@
 # Roger B. Dannenberg
 # Sep 2009
 
+# NOTE: PortMidi is currently built and tested with CMake.
+# This makefile is probably broken, but if you want to
+# directly use make, start here, and please contribute any 
+# fixes.
+
 # NOTE: you can use
 #     make -f pm_mac/Makefile.osx configuration=Release
 # to override the default Debug configuration
@@ -117,15 +122,4 @@ endif
 	xcodebuild -project pm_mac/pm_mac.xcodeproj \
             -configuration Release -target PmDefaults
 	echo "pmdefaults java application is made"
-
-###### test plist reader #######
-PLHDR = pm_mac/readbinaryplist.h
-PLSRC = pm_mac/plisttest.c pm_mac/readbinaryplist.c
-pm_mac/plisttest: $(PLHDR) $(PLSRC)
-	cc $(VFLAGS) -Ipm_mac \
-	    -I/Developer/Headers/FlatCarbon \
-	    -I/System/Library/Frameworks/CoreFoundation.framework/Headers \
-	    -I/System/Library/Frameworks/CoreServices.framework/Headers \
-	    $(PLSRC) -o pm_mac/$(CONFIG)/plisttest \
-	    -framework CoreFoundation -framework CoreServices
 

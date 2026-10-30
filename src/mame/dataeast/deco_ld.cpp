@@ -368,7 +368,7 @@ static INPUT_PORTS_START( begas )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(deco_ld_state::begas_vblank_r)) // TODO: IPT_VBLANK doesn't seem to work fine?
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(deco_ld_state::begas_vblank_r)) // TODO: IPT_VBLANK a.k.a. screen_device::vblank doesn't seem to work fine?
 
 	PORT_START("DSW1")
 	// should be coinage
@@ -481,7 +481,7 @@ void deco_ld_state::rblaster(machine_config &config)
 
 //  config.set_maximum_quantum(attotime::from_hz(6000));
 
-	SONY_LDP1000(config, m_laserdisc, 0);
+	SONY_LDP1000(config, m_laserdisc);
 	m_laserdisc->set_overlay(256, 256, FUNC(deco_ld_state::screen_update));
 	//m_laserdisc->set_overlay_clip(0, 256-1, 8, 240-1);
 	m_laserdisc->add_route(0, "speaker", 1.0, 0);
@@ -492,7 +492,7 @@ void deco_ld_state::rblaster(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rblaster);
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 0x800);
 
-	//ACIA6850(config, m_acia, 0);
+	//ACIA6850(config, m_acia);
 	//m_acia->txd_handler().set("laserdisc", FUNC(sony_ldp1000_device::write));
 	//m_acia->rxd_handler().set("laserdisc", FUNC(sony_ldp1000_device::read));
 

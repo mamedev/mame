@@ -4,132 +4,132 @@
 
 phy_imp
 	read_pc();
-	write_stack(SP, Y);
+	write_stack(m_SP, m_Y);
 	dec_SP();
 	prefetch();
 
 phx_imp
 	read_pc();
-	write_stack(SP, X);
+	write_stack(m_SP, m_X);
 	dec_SP();
 	prefetch();
 
 plx_imp
 	read_pc();
-	read_stack(SP);
+	read_stack(m_SP);
 	inc_SP();
-	X = read_stack(SP);
-	set_nz(X);
+	m_X = read_stack(m_SP);
+	set_nz(m_X);
 	prefetch();
 
 ply_imp
 	read_pc();
-	read_stack(SP);
+	read_stack(m_SP);
 	inc_SP();
-	Y = read_stack(SP);
-	set_nz(Y);
+	m_Y = read_stack(m_SP);
+	set_nz(m_Y);
 	prefetch();
 
 clr_acc
 	read_pc();
-	A = 0;
-	set_nz(A);
+	m_A = 0;
+	set_nz(m_A);
 	prefetch();
 
 dec_acc
 	read_pc();
-	A--;
-	set_nz(A);
+	m_A--;
+	set_nz(m_A);
 	prefetch();
 
 not_acc
 	read_pc();
-	A = A ^ 0xff;
-	set_nz(A);
+	m_A = m_A ^ 0xff;
+	set_nz(m_A);
 	prefetch();
 
 inc_acc
 	read_pc();
-	A++;
-	set_nz(A);
+	m_A++;
+	set_nz(m_A);
 	prefetch();
 
 neg_acc
 	read_pc();
-	A = (0x00 - A) & 0xff;
-	set_nz(A);
+	m_A = (0x00 - m_A) & 0xff;
+	set_nz(m_A);
 	prefetch();
 
 oraj_imp
 	read_pc();
-	A |= m_j;
-	set_nz(A);
+	m_A |= m_j;
+	set_nz(m_A);
 	prefetch();
 
 orak_imp
 	read_pc();
-	A |= m_k;
-	set_nz(A);
+	m_A |= m_k;
+	set_nz(m_A);
 	prefetch();
 
 oral_imp
 	read_pc();
-	A |= m_l;
-	set_nz(A);
+	m_A |= m_l;
+	set_nz(m_A);
 	prefetch();
 
 oram_imp
 	read_pc();
-	A |= m_m;
-	set_nz(A);
+	m_A |= m_m;
+	set_nz(m_A);
 	prefetch();
 
 andj_imp
 	read_pc();
-	A &= m_j;
-	set_nz(A);
+	m_A &= m_j;
+	set_nz(m_A);
 	prefetch();
 
 andk_imp
 	read_pc();
-	A &= m_k;
-	set_nz(A);
+	m_A &= m_k;
+	set_nz(m_A);
 	prefetch();
 
 andl_imp
 	read_pc();
-	A &= m_l;
-	set_nz(A);
+	m_A &= m_l;
+	set_nz(m_A);
 	prefetch();
 
 andm_imp
 	read_pc();
-	A &= m_m;
-	set_nz(A);
+	m_A &= m_m;
+	set_nz(m_A);
 	prefetch();
 
 eorj_imp
 	read_pc();
-	A ^= m_j;
-	set_nz(A);
+	m_A ^= m_j;
+	set_nz(m_A);
 	prefetch();
 
 eork_imp
 	read_pc();
-	A ^= m_k;
-	set_nz(A);
+	m_A ^= m_k;
+	set_nz(m_A);
 	prefetch();
 
 eorl_imp
 	read_pc();
-	A ^= m_l;
-	set_nz(A);
+	m_A ^= m_l;
+	set_nz(m_A);
 	prefetch();
 
 eorm_imp
 	read_pc();
-	A ^= m_m;
-	set_nz(A);
+	m_A ^= m_m;
+	set_nz(m_A);
 	prefetch();
 
 adcj_imp
@@ -154,66 +154,66 @@ adcm_imp
 
 staj_imp
 	read_pc();
-	m_j = A;
+	m_j = m_A;
 	prefetch();
 
 stak_imp
 	read_pc();
-	m_k = A;
+	m_k = m_A;
 	prefetch();
 
 stal_imp
 	read_pc();
-	m_l = A;
+	m_l = m_A;
 	prefetch();
 
 stam_imp
 	read_pc();
-	m_m = A;
+	m_m = m_A;
 	prefetch();
 
 ldaj_imp
 	read_pc();
-	A = m_j;
-	set_nz(A);
+	m_A = m_j;
+	set_nz(m_A);
 	prefetch();
 
 ldak_imp
 	read_pc();
-	A = m_k;
-	set_nz(A);
+	m_A = m_k;
+	set_nz(m_A);
 	prefetch();
 
 ldal_imp
 	read_pc();
-	A = m_l;
-	set_nz(A);
+	m_A = m_l;
+	set_nz(m_A);
 	prefetch();
 
 ldam_imp
 	read_pc();
-	A = m_m;
-	set_nz(A);
+	m_A = m_m;
+	set_nz(m_A);
 	prefetch();
 
 cmpj_imp
 	read_pc();
-	do_cmp(A, m_j);
+	do_cmp(m_A, m_j);
 	prefetch();
 
 cmpk_imp
 	read_pc();
-	do_cmp(A, m_k);
+	do_cmp(m_A, m_k);
 	prefetch();
 
 cmpl_imp
 	read_pc();
-	do_cmp(A, m_l);
+	do_cmp(m_A, m_l);
 	prefetch();
 
 cmpm_imp
 	read_pc();
-	do_cmp(A, m_m);
+	do_cmp(m_A, m_m);
 	prefetch();
 
 sbcj_imp
@@ -238,68 +238,68 @@ sbcm_imp
 
 spa0_imp
 	read_pc();
-	m_pa = (m_pa & 0xffff00) | A;
+	m_pa = (m_pa & 0xffff00) | m_A;
 	prefetch();
 
 lpa0_imp
 	read_pc();
-	A = (m_pa & 0x0000ff) >> 0;
-	set_nz(A);
+	m_A = (m_pa & 0x0000ff) >> 0;
+	set_nz(m_A);
 	prefetch();
 
 spa1_imp
 	read_pc();
-	m_pa = (m_pa & 0xff00ff) | (A << 8);
+	m_pa = (m_pa & 0xff00ff) | (m_A << 8);
 	prefetch();
 
 lpa1_imp
 	read_pc();
-	A = (m_pa & 0x00ff00) >> 8;
-	set_nz(A);
+	m_A = (m_pa & 0x00ff00) >> 8;
+	set_nz(m_A);
 	prefetch();
 
 spa2_imp
 	read_pc();
-	m_pa = (m_pa & 0x00ffff) | (A << 16);
+	m_pa = (m_pa & 0x00ffff) | (m_A << 16);
 	prefetch();
 
 lpa2_imp
 	read_pc();
-	A = (m_pa & 0xff0000) >> 16;
-	set_nz(A);
+	m_A = (m_pa & 0xff0000) >> 16;
+	set_nz(m_A);
 	prefetch();
 
 spb0_imp
 	read_pc();
-	m_pb = (m_pb & 0xffff00) | A;
+	m_pb = (m_pb & 0xffff00) | m_A;
 	prefetch();
 
 lpb0_imp
 	read_pc();
-	A = (m_pb & 0x0000ff) >> 0;
-	set_nz(A);
+	m_A = (m_pb & 0x0000ff) >> 0;
+	set_nz(m_A);
 	prefetch();
 
 spb1_imp
 	read_pc();
-	m_pb = (m_pb & 0xff00ff) | (A << 8);
+	m_pb = (m_pb & 0xff00ff) | (m_A << 8);
 	prefetch();
 
 lpb1_imp
 	read_pc();
-	A = (m_pb & 0x00ff00) >> 8;
-	set_nz(A);
+	m_A = (m_pb & 0x00ff00) >> 8;
+	set_nz(m_A);
 	prefetch();
 
 spb2_imp
 	read_pc();
-	m_pb = (m_pb & 0x00ffff) | (A << 16);
+	m_pb = (m_pb & 0x00ffff) | (m_A << 16);
 	prefetch();
 
 lpb2_imp
 	read_pc();
-	A = (m_pb & 0xff0000) >> 16;
-	set_nz(A);
+	m_A = (m_pb & 0xff0000) >> 16;
+	set_nz(m_A);
 	prefetch();
 
 incpa_imp
@@ -328,23 +328,23 @@ decpb_imp
 
 orapa_imp
 	read_pc();
-	TMP = read_full_data(m_pa);
-	A |= TMP;
-	set_nz(A);
+	m_TMP = read_full_data(m_pa);
+	m_A |= m_TMP;
+	set_nz(m_A);
 	prefetch();
 
 andpa_imp
 	read_pc();
-	TMP = read_full_data(m_pa);
-	A &= TMP;
-	set_nz(A);
+	m_TMP = read_full_data(m_pa);
+	m_A &= m_TMP;
+	set_nz(m_A);
 	prefetch();
 
 eorpa_imp
 	read_pc();
-	TMP = read_full_data(m_pa);
-	A ^= TMP;
-	set_nz(A);
+	m_TMP = read_full_data(m_pa);
+	m_A ^= m_TMP;
+	set_nz(m_A);
 	prefetch();
 
 adcpa_imp
@@ -352,17 +352,17 @@ adcpa_imp
 	prefetch();
 
 stapa_imp
-	write_full_data(m_pa, A);
+	write_full_data(m_pa, m_A);
 	prefetch();
 
 ldapa_imp
-	A = read_full_data(m_pa);
-	set_nz(A);
+	m_A = read_full_data(m_pa);
+	set_nz(m_A);
 	prefetch();
 
 cmppa_imp
-	TMP = read_full_data(m_pa);
-	do_cmp(A, TMP);
+	m_TMP = read_full_data(m_pa);
+	do_cmp(m_A, m_TMP);
 	prefetch();
 
 sbcpa_imp
@@ -371,23 +371,23 @@ sbcpa_imp
 
 orapb_imp
 	read_pc();
-	TMP = read_full_data(m_pb);
-	A |= TMP;
-	set_nz(A);
+	m_TMP = read_full_data(m_pb);
+	m_A |= m_TMP;
+	set_nz(m_A);
 	prefetch();
 
 andpb_imp
 	read_pc();
-	TMP = read_full_data(m_pb);
-	A &= TMP;
-	set_nz(A);
+	m_TMP = read_full_data(m_pb);
+	m_A &= m_TMP;
+	set_nz(m_A);
 	prefetch();
 
 eorpb_imp
 	read_pc();
-	TMP = read_full_data(m_pb);
-	A ^= TMP;
-	set_nz(A);
+	m_TMP = read_full_data(m_pb);
+	m_A ^= m_TMP;
+	set_nz(m_A);
 	prefetch();
 
 adcpb_imp
@@ -395,16 +395,16 @@ adcpb_imp
 	prefetch();
 
 stapb_imp
-	write_full_data(m_pb, A);
+	write_full_data(m_pb, m_A);
 	prefetch();
 
 ldapb_imp
-	A = read_full_data(m_pb);
-	set_nz(A);
+	m_A = read_full_data(m_pb);
+	set_nz(m_A);
 	prefetch();
 
 cmppb_imp
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, m_PPC, m_inst_state);
 	read_pc();
 	prefetch();
 
@@ -413,123 +413,123 @@ sbcpb_imp
 	prefetch();
 
 stx_aby
-	TMP = read_pc();
-	PC++;
-	TMP = set_h(TMP, read_pc());
-	PC++;
-	write(TMP+Y, X);
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	write(m_TMP+m_Y, m_X);
 	prefetch();
 
 sty_abx
-	TMP = read_pc();
-	PC++;
-	TMP = set_h(TMP, read_pc());
-	PC++;
-	write(TMP+X, Y);
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	write(m_TMP+m_X, m_Y);
 	prefetch();
 
 stz_xav_zpg
-	TMP = read_pc();
-	PC++;
-	write_zeropage(TMP, 0x00);
+	m_TMP = read_pc();
+	m_PC++;
+	write_zeropage(m_TMP, 0x00);
 	prefetch();
 
 stz_aba
-	TMP = read_pc();
-	PC++;
-	TMP = set_h(TMP, read_pc());
-	PC++;
-	write(TMP, 0x00);
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	write(m_TMP, 0x00);
 	prefetch();
 
 bit_xav_zpx
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
+	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, m_PPC, m_inst_state);
 	read_pc();
 	prefetch();
 
 bit_abx
-	TMP = read_pc();
-	PC++;
-	TMP = set_h(TMP, read_pc());
-	PC++;
-	TMP += X;
-	TMP2 = read(TMP);
-	do_bit(TMP2);
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	m_TMP += m_X;
+	m_TMP2 = read(m_TMP);
+	do_bit(m_TMP2);
 	prefetch();
 
 bit_imm
-	TMP = read_pc();
-	PC++;
-	do_bit(TMP);
+	m_TMP = read_pc();
+	m_PC++;
+	do_bit(m_TMP);
 	prefetch();
 
 asr_xav_zpg
-	TMP = read_pc(); // TODO: verify this, should it write back or set A?
-	PC++;
-	TMP2 = read_zeropage(TMP);
-	do_asr(TMP2);
-	write_zeropage(TMP,TMP2);
+	m_TMP = read_pc(); // TODO: verify this, should it write back or set m_A?
+	m_PC++;
+	m_TMP2 = read_zeropage(m_TMP);
+	do_asr(m_TMP2);
+	write_zeropage(m_TMP,m_TMP2);
 	prefetch();
 
 asr_aba
-	TMP = read_pc();
-	PC++;
-	TMP = set_h(TMP, read_pc());
-	PC++;
-	TMP2 = read(TMP);
-	write(TMP, TMP2);
-	TMP2 = do_asr(TMP2); // used by xavbox, see 14e8
-	write(TMP, TMP2);
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	write(m_TMP, m_TMP2);
+	m_TMP2 = do_asr(m_TMP2); // used by xavbox, see 14e8
+	write(m_TMP, m_TMP2);
 	prefetch();
 
 asr_xav_zpx
-	TMP = read_pc();
+	m_TMP = read_pc();
 	read_pc();
-	PC++;
-	TMP = uint8_t(TMP+X);
-	TMP2 = read_zeropage(TMP);
-	read_zeropage((TMP+1) & 0xff);
-	TMP2 = do_asr(TMP2);
-	write_zeropage(TMP, TMP2);
+	m_PC++;
+	m_TMP = uint8_t(m_TMP+m_X);
+	m_TMP2 = read_zeropage(m_TMP);
+	read_zeropage((m_TMP+1) & 0xff);
+	m_TMP2 = do_asr(m_TMP2);
+	write_zeropage(m_TMP, m_TMP2);
 	prefetch();
 
 asr_acc
-	A = do_asr(A);
+	m_A = do_asr(m_A);
 	prefetch();
 
 asr_abx
-	TMP = read_pc();
-	PC++;
-	TMP = set_h(TMP, read_pc());
-	PC++;
-	read(set_l(TMP, TMP+X));
-	TMP += X;
-	TMP2 = read(TMP);
-	read(TMP);
-	TMP2 = do_asr(TMP2);
-	write(TMP, TMP2);
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	read(set_l(m_TMP, m_TMP+m_X));
+	m_TMP += m_X;
+	m_TMP2 = read(m_TMP);
+	read(m_TMP);
+	m_TMP2 = do_asr(m_TMP2);
+	write(m_TMP, m_TMP2);
 	prefetch();
 
 cmc_imp
 	read_pc();
-	TMP = P & F_C;
-	P &= ~F_C;
-	TMP = ~TMP;
-	P |= TMP & F_C;
+	m_TMP = m_P & F_C;
+	m_P &= ~F_C;
+	m_TMP = ~m_TMP;
+	m_P |= m_TMP & F_C;
 	prefetch();
 
 sev_imp
 	read_pc();
-	P |= F_V;
+	m_P |= F_V;
 	prefetch();
 
 jmpf_ind
-	TMP = read_pc();
-	PC++;
-	TMP = set_h(TMP, read_pc());
-	PC++;
-	PC = read(TMP);
-	PC = set_h(PC, read(set_l(TMP, TMP+1)));
-	TMP2 = read(TMP+2);
-	set_codebank(TMP2);
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	m_PC = read(m_TMP);
+	m_PC = set_h(m_PC, read(set_l(m_TMP, m_TMP+1)));
+	m_TMP2 = read(m_TMP+2);
+	set_codebank(m_TMP2);
 	prefetch();

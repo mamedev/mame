@@ -62,7 +62,7 @@ hp98032_io_card_device::~hp98032_io_card_device()
 
 void hp98032_io_card_device::device_add_mconfig(machine_config &config)
 {
-	HP98032_GPIO_SLOT(config , m_gpio , 0);
+	HP98032_GPIO_SLOT(config , m_gpio);
 	m_gpio->pflg_cb().set(FUNC(hp98032_io_card_device::pflg_w));
 	m_gpio->psts_cb().set(FUNC(hp98032_io_card_device::psts_w));
 	m_gpio->eir_cb().set(FUNC(hp98032_io_card_device::eir_w));

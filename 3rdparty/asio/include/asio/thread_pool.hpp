@@ -2,7 +2,7 @@
 // thread_pool.hpp
 // ~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -25,6 +25,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
   struct thread_pool_bits
   {
@@ -40,6 +41,17 @@ namespace detail {
 /**
  * The thread pool class is an execution context where functions are permitted
  * to run on one of a fixed number of threads.
+ *
+ * @par Thread Safety
+ * @e Distinct @e objects: Safe.@n
+ * @e Shared @e objects: Safe, with the specific exceptions of the join()
+ * wait() and notify_fork() functions. The join() and wait() functions must not
+ * be called at the same time as other calls to join() or wait() on the same
+ * pool. The notify_fork() function should not be called while any thread_pool
+ * function, or any function on an I/O object that is associated with the
+ * thread_pool, is being called in another thread. (In effect, this means that
+ * notify_fork() is safe only on a thread pool that has no internal or attached
+ * threads at the time.)
  *
  * @par Submitting tasks to the pool
  *
@@ -87,10 +99,64 @@ public:
 #if !defined(ASIO_NO_TS_EXECUTORS)
   /// Constructs a pool with an automatically determined number of threads.
   ASIO_DECL thread_pool();
+
+  /// Constructs a pool with an automatically determined number of threads.
+  /**
+   * @param a An allocator that will be used for allocating objects that are
+   * associated with the execution context, such as services and internal state
+   * for I/O objects.
+   */
+  template <typename Allocator>
+  thread_pool(allocator_arg_t, const Allocator& a);
 #endif // !defined(ASIO_NO_TS_EXECUTORS)
 
   /// Constructs a pool with a specified number of threads.
-  ASIO_DECL thread_pool(std::size_t num_threads);
+  /**
+   * @param num_threads The number of threads required.
+   */
+  ASIO_DECL explicit thread_pool(std::size_t num_threads);
+
+  /// Constructs a pool with a specified number of threads.
+  /**
+   * @param num_threads The number of threads required.
+   *
+   * @param a An allocator that will be used for allocating objects that are
+   * associated with the execution context, such as services and internal state
+   * for I/O objects.
+   */
+  template <typename Allocator>
+  thread_pool(allocator_arg_t, const Allocator& a, std::size_t num_threads);
+
+  /// Constructs a pool with a specified number of threads.
+  /**
+   * Construct with a service maker, to create an initial set of services that
+   * will be installed into the execution context at construction time.
+   *
+   * @param num_threads The number of threads required.
+   *
+   * @param initial_services Used to create the initial services. The @c make
+   * function will be called once at the end of execution_context construction.
+   */
+  ASIO_DECL thread_pool(std::size_t num_threads,
+      const execution_context::service_maker& initial_services);
+
+  /// Constructs a pool with a specified number of threads.
+  /**
+   * Construct with a service maker, to create an initial set of services that
+   * will be installed into the execution context at construction time.
+   *
+   * @param a An allocator that will be used for allocating objects that are
+   * associated with the execution context, such as services and internal state
+   * for I/O objects.
+   *
+   * @param num_threads The number of threads required.
+   *
+   * @param initial_services Used to create the initial services. The @c make
+   * function will be called once at the end of execution_context construction.
+   */
+  template <typename Allocator>
+  thread_pool(allocator_arg_t, const Allocator& a, std::size_t num_threads,
+      const execution_context::service_maker& initial_services);
 
   /// Destructor.
   /**
@@ -132,6 +198,8 @@ public:
    * This function blocks until the threads in the pool have completed. If @c
    * stop() is not called prior to @c wait(), the @c wait() call will wait
    * until the pool has no more outstanding work.
+   *
+   * @note @c wait() is synonymous with @c join().
    */
   ASIO_DECL void wait();
 
@@ -141,17 +209,28 @@ private:
 
   struct thread_function;
 
-  // Helper function to create the underlying scheduler.
-  ASIO_DECL detail::scheduler& add_scheduler(detail::scheduler* s);
+#if !defined(ASIO_NO_TS_EXECUTORS)
+  // Helper function to calculate the default number of threads in the pool.
+  ASIO_DECL static long default_thread_pool_size();
+#endif // !defined(ASIO_NO_TS_EXECUTORS)
+
+  // Helper function to ensure the thread pool size is not out of range.
+  ASIO_DECL static long clamp_thread_pool_size(std::size_t n);
+
+  // Helper function to start all threads in the pool.
+  ASIO_DECL void start();
 
   // The underlying scheduler.
   detail::scheduler& scheduler_;
 
   // The threads in the pool.
-  detail::thread_group threads_;
+  detail::thread_group<allocator<void>> threads_;
 
   // The current number of threads in the pool.
   detail::atomic_count num_threads_;
+
+  // Whether a join call will have any effect.
+  bool joinable_;
 };
 
 /// Executor implementation type used to submit functions to a thread pool.
@@ -196,8 +275,8 @@ public:
 
 #if !defined(GENERATING_DOCUMENTATION)
 private:
-  friend struct asio_require_fn::impl;
-  friend struct asio_prefer_fn::impl;
+  friend struct ASIO_VERSIONED_NAME(require_fn)::impl;
+  friend struct ASIO_VERSIONED_NAME(prefer_fn)::impl;
 #endif // !defined(GENERATING_DOCUMENTATION)
 
   /// Obtain an executor with the @c blocking.possibly property.
@@ -361,8 +440,9 @@ private:
 
 #if !defined(GENERATING_DOCUMENTATION)
 private:
-  friend struct asio_query_fn::impl;
+  friend struct ASIO_VERSIONED_NAME(query_fn)::impl;
   friend struct asio::execution::detail::mapping_t<0>;
+  friend struct asio::execution::detail::inline_exception_handling_t<0>;
   friend struct asio::execution::detail::outstanding_work_t<0>;
 #endif // !defined(GENERATING_DOCUMENTATION)
 
@@ -380,6 +460,24 @@ private:
   static constexpr execution::mapping_t query(execution::mapping_t) noexcept
   {
     return execution::mapping.thread;
+  }
+
+  /// Query the current value of the @c inline_exception_handling property.
+  /**
+   * Do not call this function directly. It is intended for use with the
+   * asio::query customisation point.
+   *
+   * For example:
+   * @code auto ex = my_thread_pool.get_executor();
+   * if (asio::query(ex,
+   *       asio::execution::inline_exception_handling)
+   *     == asio::execution::inline_exception_handling.terminate)
+   *   ... @endcode
+   */
+  static constexpr execution::inline_exception_handling_t query(
+      execution::inline_exception_handling_t) noexcept
+  {
+    return execution::inline_exception_handling.terminate;
   }
 
   /// Query the current value of the @c context property.
@@ -854,6 +952,29 @@ struct query_static_constexpr_member<
   }
 };
 
+template <typename Allocator, unsigned int Bits, typename Property>
+struct query_static_constexpr_member<
+    asio::thread_pool::basic_executor_type<Allocator, Bits>,
+    Property,
+    typename asio::enable_if<
+      asio::is_convertible<
+        Property,
+        asio::execution::inline_exception_handling_t
+      >::value
+    >::type
+  >
+{
+  static constexpr bool is_valid = true;
+  static constexpr bool is_noexcept = true;
+  typedef asio::execution::inline_exception_handling_t::terminate_t
+    result_type;
+
+  static constexpr result_type value() noexcept
+  {
+    return result_type();
+  }
+};
+
 #endif // !defined(ASIO_HAS_DEDUCED_QUERY_STATIC_CONSTEXPR_MEMBER_TRAIT)
 
 #if !defined(ASIO_HAS_DEDUCED_QUERY_MEMBER_TRAIT)
@@ -951,6 +1072,7 @@ struct is_executor<thread_pool> : false_type
 
 #endif // !defined(GENERATING_DOCUMENTATION)
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

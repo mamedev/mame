@@ -18,7 +18,7 @@
 #include "bus/isa/ide.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
-#include "bus/isa/vga.h"
+#include "bus/isa/svga_paradise.h"
 #include "machine/mc68901.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
@@ -84,7 +84,8 @@ void indiana_isa_cards(device_slot_interface &device)
 	// 8-bit
 	device.option_add("fdc_at", ISA8_FDC_AT);
 	device.option_add("comat", ISA8_COM_AT);
-	device.option_add("vga", ISA8_VGA);
+	// unspecified ISA8 Paradise VGA card used
+	device.option_add("vga", ISA8_WD90C90_JK);
 
 	// 16-bit
 	device.option_add("ide", ISA16_IDE);
@@ -112,6 +113,7 @@ void indiana_state::indiana(machine_config &config)
 	isa.irq14_callback().set("mfp", FUNC(mc68901_device::i3_w));
 	isa.irq15_callback().set("mfp", FUNC(mc68901_device::i2_w));
 
+	// FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "isa1", 0, ISABUS_TAG, indiana_isa_cards, "vga", false);
 	ISA16_SLOT(config, "isa2", 0, ISABUS_TAG, indiana_isa_cards, "fdc_at", false);
 	ISA16_SLOT(config, "isa3", 0, ISABUS_TAG, indiana_isa_cards, "comat", false);

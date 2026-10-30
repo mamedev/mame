@@ -4,7 +4,7 @@
 
     formats/c3040_dsk.h
 
-    Commodore 3040 sector disk image format
+    Commodore 2040/3040 sector disk image format
 
 *********************************************************************/
 #ifndef MAME_FORMATS_C3040_DSK_H
@@ -27,6 +27,7 @@ protected:
 	virtual floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int sector_count, uint8_t id1, uint8_t id2, int gap_2) const override;
 	virtual int get_gap2(const format &f, int head, int track) const override { return c3040_gap2[track]; }
 	virtual void fix_end_gap(floppy_image_format_t::desc_e* desc, int remaining_size) const override;
+	virtual uint32_t get_track_skew(const format &f, int head, int track, uint32_t skew, int current_size, int gap2, int total_size) const override;
 
 	static const format file_formats[];
 

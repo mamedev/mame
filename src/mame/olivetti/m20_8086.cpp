@@ -23,6 +23,9 @@ void m20_8086_device::device_start()
 	membank("vram")->set_base(ram);
 	membank("vram2")->set_base(ram);
 
+	save_item(NAME(m_8086_halt));
+	save_item(NAME(m_nvi));
+	save_item(NAME(m_vi));
 }
 
 void m20_8086_device::device_reset()

@@ -394,6 +394,12 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 	if ((!(m_msr & MSR_TU) && user) || (!(m_msr & MSR_TS) && !user))
 		return COMPLETE;
 
+	// interrupt-acknowledge and end-of-interrupt cycles address the
+	// interrupt controller at a fixed physical address and are not
+	// translated
+	if (st >= ns32000::ST_IAM && st <= ns32000::ST_EIC)
+		return COMPLETE;
+
 	// treat WRVAL as write
 	write |= m_state == WRVAL;
 
@@ -487,7 +493,7 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 	if ((!(pte2 & PTE_R) || (write && !(pte2 & PTE_M))) && !suppress)
 		space.write_word(pte2_address, u16(pte2 | (write ? PTE_M : 0) | PTE_R));
 
-	address = ((pte1 & PTE_MS) >> 7) | (pte2 & PTE_PFN) | (address & VA_OFFSET);
+	address = ((pte2 & PTE_MS) >> 7) | (pte2 & PTE_PFN) | (address & VA_OFFSET);
 	LOGMASKED(LOG_TRANSLATE, "translate complete 0x%08x\n", address);
 
 	if (m_state == RDVAL || m_state == WRVAL)

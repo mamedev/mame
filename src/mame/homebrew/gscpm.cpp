@@ -75,12 +75,12 @@ void gscpm_state::gscpm_io(address_map &map)
 
 uint8_t gscpm_state::cflash_r(offs_t offset)
 {
-	return m_ide->cs0_r(offset, 0xff);
+	return m_ide->cs0_r(offset);
 }
 
 void gscpm_state::cflash_w(offs_t offset, uint8_t data)
 {
-	m_ide->cs0_w(offset, data, 0xff);
+	m_ide->cs0_w(offset, data);
 }
 
 uint8_t gscpm_state::sio_r(offs_t offset)
@@ -160,7 +160,7 @@ void gscpm_state::gscpm(machine_config &config)
 
 	RAM(config, m_ram).set_default_size("16K"); // This shadows the ROM
 
-	Z80SIO(config, m_sio, 0);
+	Z80SIO(config, m_sio);
 	m_sio->out_txdb_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_sio->out_rtsb_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_sio->out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0); // Connect interrupt pin to our Z80 INT line

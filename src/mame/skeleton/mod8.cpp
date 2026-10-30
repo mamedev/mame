@@ -163,7 +163,7 @@ void mod8_state::mod8(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(mod8_state::mod8_irq_callback));
 
 	/* video hardware */
-	TELEPRINTER(config, m_teleprinter, 0);
+	TELEPRINTER(config, m_teleprinter);
 	m_teleprinter->set_keyboard_callback(FUNC(mod8_state::kbd_put));
 }
 

@@ -22,11 +22,14 @@
 #include "fileio.h"
 #include "main.h"
 #include "screen.h"
+#include "sound.h"
 #include "uiinput.h"
 
 #include "corestr.h"
 #include "osdepend.h"
 #include "xmlfile.h"
+
+#include <cstdio>
 
 
 const size_t debugger_cpu::NUM_TEMP_VARIABLES = 10;
@@ -301,7 +304,7 @@ void debugger_cpu::start_hook(device_t *device, bool stop_on_vblank)
 		m_execution_state = exec_state::RUNNING;
 	}
 	// if we're a new device, stop now
-	else if (m_stop_when_not_device != nullptr && m_stop_when_not_device != device && device->debug()->observing())
+	else if (m_stop_when_not_device != nullptr && m_stop_when_not_device != device && device->debug()->observing() && dynamic_cast<device_state_interface *>(device) != nullptr)
 	{
 		m_stop_when_not_device = nullptr;
 		m_execution_state = exec_state::STOPPED;
@@ -488,7 +491,7 @@ device_debug::device_debug(device_t &device)
 	, m_state(nullptr)
 	, m_disasm(nullptr)
 	, m_flags(0)
-	, m_symtable(std::make_unique<symbol_table>(device.machine(), symbol_table::CPU_STATE, &device.machine().debugger().cpu().global_symtable(), &device))
+	, m_symtable(nullptr)
 	, m_stepaddr(0)
 	, m_stepsleft(0)
 	, m_delay_steps(0)
@@ -542,35 +545,40 @@ device_debug::device_debug(device_t &device)
 		// add global symbol for cycles and totalcycles
 		if (m_exec != nullptr)
 		{
+			m_symtable = std::make_unique<symbol_table>(device.machine(), symbol_table::CPU_STATE, &device.machine().debugger().cpu().global_symtable(), &device);
+
 			m_symtable->add("cycles", [this]() { return m_exec->cycles_remaining(); });
 			m_symtable->add("totalcycles", symbol_table::READ_ONLY, &m_total_cycles);
 			m_symtable->add("lastinstructioncycles", [this]() { return m_total_cycles - m_last_total_cycles; });
+
+			// add entries to enable/disable unmap reporting for each space
+			if (m_memory != nullptr)
+			{
+				if (m_memory->has_space(AS_PROGRAM))
+					m_symtable->add(
+							"logunmap",
+							[&space = m_memory->space(AS_PROGRAM)] () { return space.log_unmap(); },
+							[&space = m_memory->space(AS_PROGRAM)] (u64 value) { return space.set_log_unmap(bool(value)); });
+				if (m_memory->has_space(AS_DATA))
+					m_symtable->add(
+							"logunmap",
+							[&space = m_memory->space(AS_DATA)] () { return space.log_unmap(); },
+							[&space = m_memory->space(AS_DATA)] (u64 value) { return space.set_log_unmap(bool(value)); });
+				if (m_memory->has_space(AS_IO))
+					m_symtable->add(
+							"logunmap",
+							[&space = m_memory->space(AS_IO)] () { return space.log_unmap(); },
+							[&space = m_memory->space(AS_IO)] (u64 value) { return space.set_log_unmap(bool(value)); });
+				if (m_memory->has_space(AS_OPCODES))
+					m_symtable->add(
+							"logunmap",
+							[&space = m_memory->space(AS_OPCODES)] () { return space.log_unmap(); },
+							[&space = m_memory->space(AS_OPCODES)] (u64 value) { return space.set_log_unmap(bool(value)); });
+			}
 		}
 
-		// add entries to enable/disable unmap reporting for each space
-		if (m_memory != nullptr)
-		{
-			if (m_memory->has_space(AS_PROGRAM))
-				m_symtable->add(
-						"logunmap",
-						[&space = m_memory->space(AS_PROGRAM)] () { return space.log_unmap(); },
-						[&space = m_memory->space(AS_PROGRAM)] (u64 value) { return space.set_log_unmap(bool(value)); });
-			if (m_memory->has_space(AS_DATA))
-				m_symtable->add(
-						"logunmap",
-						[&space = m_memory->space(AS_DATA)] () { return space.log_unmap(); },
-						[&space = m_memory->space(AS_DATA)] (u64 value) { return space.set_log_unmap(bool(value)); });
-			if (m_memory->has_space(AS_IO))
-				m_symtable->add(
-						"logunmap",
-						[&space = m_memory->space(AS_IO)] () { return space.log_unmap(); },
-						[&space = m_memory->space(AS_IO)] (u64 value) { return space.set_log_unmap(bool(value)); });
-			if (m_memory->has_space(AS_OPCODES))
-				m_symtable->add(
-						"logunmap",
-						[&space = m_memory->space(AS_OPCODES)] () { return space.log_unmap(); },
-						[&space = m_memory->space(AS_OPCODES)] (u64 value) { return space.set_log_unmap(bool(value)); });
-		}
+		// Use own table for CPU and the global for others
+		symbol_table *symtable = m_symtable != nullptr ? m_symtable.get() : &device.machine().debugger().cpu().global_symtable();
 
 		// add all registers into it
 		for (const auto &entry : m_state->state_entries())
@@ -580,7 +588,7 @@ device_debug::device_debug(device_t &device)
 			{
 				using namespace std::placeholders;
 				std::string tempstr(strmakelower(entry->symbol()));
-				m_symtable->add(
+				symtable->add(
 						tempstr.c_str(),
 						std::bind(&device_state_entry::value, entry.get()),
 						entry->writeable() ? std::bind(&device_state_entry::set_value, entry.get(), _1) : symbol_table::setter_func(nullptr),
@@ -714,11 +722,11 @@ void device_debug::interrupt_hook(int irqline, offs_t pc)
 	if ((m_flags & DEBUG_FLAG_STOP_INTERRUPT) != 0 && (m_stopirq == -1 || m_stopirq == irqline))
 	{
 		m_device.machine().debugger().cpu().set_execution_stopped();
-		const address_space &space = m_memory->space(AS_PROGRAM);
-		if (space.is_octal())
-			m_device.machine().debugger().console().printf("Stopped on interrupt (CPU '%s', IRQ %d, PC=%0*o)\n", m_device.tag(), irqline, (space.logaddr_width() + 2) / 3, pc);
+		const address_space_config *config = m_memory->logical_space_config(AS_PROGRAM);
+		if (config->is_octal())
+			m_device.machine().debugger().console().printf("Stopped on interrupt (CPU '%s', IRQ %d, PC=%0*o)\n", m_device.tag(), irqline, config->logaddrchars(), pc);
 		else
-			m_device.machine().debugger().console().printf("Stopped on interrupt (CPU '%s', IRQ %d, PC=%0*X)\n", m_device.tag(), irqline, space.logaddrchars(), pc);
+			m_device.machine().debugger().console().printf("Stopped on interrupt (CPU '%s', IRQ %d, PC=%0*X)\n", m_device.tag(), irqline, config->logaddrchars(), pc);
 		compute_debug_flags();
 	}
 
@@ -1959,9 +1967,11 @@ void device_debug::breakpoint_update_flags()
 		}
 	}
 
-	// push the flags out globally
-	if (m_device.machine().debugger().cpu().live_cpu() != nullptr)
-		m_device.machine().debugger().cpu().live_cpu()->debug()->compute_debug_flags();
+	// push the flags out globally; a fatal error thrown while a CPU executes leaves it live,
+	// and once that CPU's device_debug is being destroyed its debug() is null
+	device_t *const livecpu = m_device.machine().debugger().cpu().live_cpu();
+	if (livecpu != nullptr && livecpu->debug() != nullptr)
+		livecpu->debug()->compute_debug_flags();
 }
 
 

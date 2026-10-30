@@ -96,7 +96,7 @@ void jakks_gamekey_rom_i2c_base_device::write_cart_seeprom(offs_t offset, uint16
 
 void jakks_gamekey_rom_i2c_24lc04_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C04(config, "i2cmem", 0); // 24LC04
+	I2C_24C04(config, "i2cmem"); // 24LC04
 }
 
 

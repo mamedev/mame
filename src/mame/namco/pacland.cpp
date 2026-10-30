@@ -602,7 +602,7 @@ void pacland_state::draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const r
 	m_tilemap[0]->draw(screen, m_fg_bitmap, cliprect, priority, 0);
 
 	// now copy the fg_bitmap to the destination wherever the sprite pixel allows
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint8_t const *const pri = &screen.priority().pix(y);
 		uint16_t *const src = &m_fg_bitmap.pix(y);
@@ -610,7 +610,7 @@ void pacland_state::draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 		/* only copy if the priority bitmap is 0 (no high priority sprite) and the
 		   source pixel is not the invalid pen; also clear to 0xffff when finished */
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint16_t pix = src[x];
 			if (pix != 0xffff)
@@ -650,11 +650,11 @@ uint32_t pacland_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	// draw sprite pixels in a temporary bitmap with colortable values >= 0xf0
 	m_sprite_bitmap.fill(0, cliprect);
 	draw_sprites(screen, m_sprite_bitmap, cliprect, flip, 2);
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t *const spr = &m_sprite_bitmap.pix(y);
 		uint16_t const *const bmp = &bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			/* clear to 0 if "m_sprite_bitmap" and "bitmap" are different,
 			   because not redraw pixels that are not visible in "bitmap"
@@ -677,8 +677,6 @@ uint32_t pacland_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 // machine
 void pacland_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_mainbank->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x2000);
 
 	save_item(NAME(m_main_irq_mask));
@@ -748,7 +746,7 @@ void pacland_state::main_map(address_map &map)
 	map(0x3a00, 0x3a01).w(FUNC(pacland_state::scroll_w<1>));
 	map(0x3c00, 0x3c00).w(FUNC(pacland_state::bankswitch_w));
 	map(0x4000, 0x5fff).bankr(m_mainbank);
-	map(0x6800, 0x6bff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));      // PSG device, shared RAM
+	map(0x6800, 0x6bff).m(m_cus30, FUNC(namco_cus30_device::amap));      // PSG device, shared RAM
 	map(0x7000, 0x7fff).w(FUNC(pacland_state::maincpu_irq_ctrl_w));
 	map(0x7800, 0x7fff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0x8000, 0xffff).rom();
@@ -758,7 +756,7 @@ void pacland_state::main_map(address_map &map)
 
 void pacland_state::mcu_map(address_map &map)
 {
-	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));      // PSG device, shared RAM
+	map(0x1000, 0x13ff).m(m_cus30, FUNC(namco_cus30_device::amap));      // PSG device, shared RAM
 	map(0x2000, 0x3fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));     // watchdog?
 	map(0x4000, 0x7fff).w(FUNC(pacland_state::mcu_irq_ctrl_w));
 	map(0x8000, 0x9fff).rom().region("mcusub", 0);
@@ -906,7 +904,7 @@ void pacland_state::pacland(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(49'152'000) / 8, 384, 3*8, 39*8, 264, 2*8, 30*8);
 	m_screen->set_screen_update(FUNC(pacland_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -919,7 +917,6 @@ void pacland_state::pacland(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	NAMCO_CUS30(config, m_cus30, XTAL(49'152'000) / 2 / 1024);
-	m_cus30->set_voices(8);
 	m_cus30->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

@@ -1,37 +1,7 @@
-# pm_java/CMakeLists.txt -- builds pmjni and pmdefaults program
+# pm_java/CMakeLists.txt -- builds pmjni
 
 find_package(Java)
 message(STATUS "Java_JAVA_EXECUTABLE is " ${Java_JAVA_EXECUTABLE})
-
-if(BUILD_PMDEFAULTS)
-  # Since pmdefaults and pmdefaults.bat are in the source tree and look
-  # for libpmjni in the same tree, out-of-source build will not create
-  # a working pmdefaults (without more work):
-  if(NOT (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR}))
-    message(WARNING "PmDefaults only works when run in the pm_java/pmdefaults directory after an in-source build. This is an out-of-source build, so [probably] libpmjni will be built out-of-source, pmdefaults.jar will be built in-source, and the pmdefaults[.bat] script remains in-source. Rebuild in-source to use PmDefaults or adjust the file locations and scripts to suit yourself.")
-  endif()
-
-  set(JPORTMIDICLASS JPortMidi.class JPortMidiException.class
-                     JPortMidiApi.class)
-  set(PMDEFAULTSCLASS PmDefaultsFrame.class PmDefaults.class)
-  prepend_path(JPORTMIDIPATH jportmidi/ ${JPORTMIDICLASS})
-  prepend_path(PMDEFAULTSPATH pmdefaults/ ${PMDEFAULTSCLASS})
-  set(PMDEFAULTS_ALL ${JPORTMIDIPATH} ${PMDEFAULTSPATH})
-
-  project(pmdefaults NONE)
-  include(UseJava)
-  add_jar(pmdefaults
-          SOURCES pmdefaults/PmDefaults.java pmdefaults/PmDefaultsFrame.java
-                  jportmidi/JPortMidi.java jportmidi/JPortMidiApi.java
-                  jportmidi/JPortMidiException.java
-          RESOURCES NAMESPACE "." pmdefaults/portmusic_logo.png
-          MANIFEST pmdefaults/manifest.txt
-          OUTPUT_DIR pmdefaults)
-  if(WIN32)
-    set(JAVAVM_LIB ${JAVA_INCLUDE_PATH}/../jre/lib/i386/client/libjvm.so)
-  endif()
-  add_dependencies(pmdefaults pmjni)
-endif(BUILD_PMDEFAULTS)
 
 # Build pmjni
 # this CMakeLists.txt is only loaded if BUILD_JAVA_NATIVE_INTERFACE

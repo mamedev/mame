@@ -92,9 +92,9 @@ public:
 		m_lcd_colon(*this, "lc%u", 0U)
 	{ }
 
-	void compan3(machine_config &config);
-	void turbo16k(machine_config &config);
-	void t1850(machine_config &config);
+	void compan3(machine_config &config) ATTR_COLD;
+	void turbo16k(machine_config &config) ATTR_COLD;
+	void t1850(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
@@ -133,9 +133,6 @@ protected:
 
 void turbo16k_state::machine_start()
 {
-	m_lcd_digits.resolve();
-	m_lcd_colon.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));

@@ -16,6 +16,7 @@ TODO:
 #include "mc68hc11.h"
 #include "hc11dasm.h"
 
+#include <bit>
 #include <tuple>
 
 #define LOG_IRQ (1U << 1)
@@ -1153,12 +1154,20 @@ void mc68hc11_cpu_device::check_irq_lines()
 		}
 	}
 
+	// A masked XIRQ wakes STOP without interrupt service or a pending request.
+	// State 2 lets the STOP handler advance to the following instruction.
+	if (m_stop_state == 1 && (m_ccr & CC_X) && (m_irq_state & 0x04000000))
+	{
+		m_stop_state = 2;
+		set_irq_state(0x05, false);
+	}
+
 	uint32_t irq_state = m_irq_state;
 	if (m_ccr & CC_X)
 		irq_state &= ~0x04000000; // mask XIRQ out
 	if (irq_state != 0 && (!(m_ccr & CC_I) || (irq_state >= 0x04000000)))
 	{
-		int level = count_leading_zeros_32(irq_state); // TODO: respect HPRIO setting
+		int level = std::countl_zero(irq_state); // TODO: respect HPRIO setting
 		standard_irq_callback(level, m_pc);
 
 		if(m_wait_state == 0)

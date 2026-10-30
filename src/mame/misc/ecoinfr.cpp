@@ -40,7 +40,6 @@
 
 #include "emu.h"
 
-#include "awpvid.h" // drawing reels
 
 #include "cpu/z80/z80.h"
 #include "machine/i8251.h"
@@ -57,18 +56,18 @@
 class ecoinfr_state : public driver_device
 {
 public:
-	ecoinfr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ecoinfr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_reel(*this, "reel%u", 0U),
+		m_reel(*this, "reel%u", 1U),
 		m_digits(*this, "digit%u", 0U)
-		{ }
+	{ }
 
-	void ecoinfr(machine_config &config);
+	void ecoinfr(machine_config &config) ATTR_COLD;
 
-	void init_ecoinfrbr();
-	void init_ecoinfr();
-	void init_ecoinfrmab();
+	void init_ecoinfrbr() ATTR_COLD;
+	void init_ecoinfr() ATTR_COLD;
+	void init_ecoinfrmab() ATTR_COLD;
 
 	int reel1_opto_r();
 	int reel2_opto_r();
@@ -76,6 +75,7 @@ public:
 
 private:
 	int irq_toggle = 0;
+	uint8_t m_irq_vector = 0;
 	int m_optic_pattern = 0;
 
 	uint8_t port09_value = 0;
@@ -116,8 +116,8 @@ private:
 	void ec_port18_out_w(uint8_t data);
 
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_irq_timer);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
 	uint8_t m_banksel = 0;
 	uint8_t m_credsel = 0;
@@ -152,14 +152,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_state::ecoinfr_irq_timer)
 
 	if (irq_toggle==0)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe4); // Z80
+		m_irq_vector = 0xe4;
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 	else
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0); // Z80
+		m_irq_vector = 0xe0;
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
+}
 
-
+IRQ_CALLBACK_MEMBER(ecoinfr_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 
@@ -172,7 +177,7 @@ void ecoinfr_state::ec_port00_out_w(uint8_t data)
 
 	m_reel[0]->update(data&0x0f);
 
-	awp_draw_reel(machine(),"reel1", *m_reel[0]);
+	m_reel[0]->draw();
 }
 
 void ecoinfr_state::ec_port01_out_w(uint8_t data)
@@ -184,7 +189,7 @@ void ecoinfr_state::ec_port01_out_w(uint8_t data)
 
 	m_reel[1]->update(data&0x0f);
 
-	awp_draw_reel(machine(),"reel2", *m_reel[1]);
+	m_reel[1]->draw();
 }
 
 void ecoinfr_state::ec_port02_out_w(uint8_t data)
@@ -196,7 +201,7 @@ void ecoinfr_state::ec_port02_out_w(uint8_t data)
 
 	m_reel[2]->update(data&0x0f);
 
-	awp_draw_reel(machine(),"reel3", *m_reel[2]);
+	m_reel[2]->draw();
 }
 
 
@@ -768,6 +773,7 @@ void ecoinfr_state::machine_reset()
 	port17_value = 0x00;
 
 	irq_toggle = 0;
+	m_irq_vector = 0;
 
 	m_banksel = 0xff;
 	m_credsel = 0xff;
@@ -781,11 +787,12 @@ void ecoinfr_state::ecoinfr(machine_config &config)
 	Z80(config, m_maincpu, 4000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ecoinfr_state::memmap);
 	m_maincpu->set_addrmap(AS_IO, &ecoinfr_state::portmap);
-	TIMER(config , "ectimer" , 0).configure_periodic(FUNC(ecoinfr_state::ecoinfr_irq_timer), attotime::from_hz(250));
+	TIMER(config , "ectimer").configure_periodic(FUNC(ecoinfr_state::ecoinfr_irq_timer), attotime::from_hz(250));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(ecoinfr_state::cpu_acknowledge_irq));
 
 	config.set_default_layout(layout_ecoinfr);
 
-	I8251(config, UPD8251_TAG, 0);
+	I8251(config, UPD8251_TAG);
 
 	REEL(config, m_reel[0], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
 	m_reel[0]->optic_handler().set(FUNC(ecoinfr_state::reel_optic_cb<0>));

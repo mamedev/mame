@@ -447,19 +447,19 @@ void hcastle_state::hcastle(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(hcastle_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(hcastle_state::palette)).set_format(palette_device::xBGR_555, 2*8*16*16, 128);
 
-	K007121(config, m_k007121[0], 0, gfx_hcastle_1, m_palette, "screen");
+	K007121(config, m_k007121[0], gfx_hcastle_1, m_palette, "screen");
 	m_k007121[0]->set_irq_cb().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 	m_k007121[0]->set_flipscreen_cb().set(FUNC(hcastle_state::flipscreen_w<0>));
 	m_k007121[0]->set_sprite_callback(FUNC(hcastle_state::sprite_callback<0>));
 
-	K007121(config, m_k007121[1], 0, gfx_hcastle_2, m_palette, "screen");
+	K007121(config, m_k007121[1], gfx_hcastle_2, m_palette, "screen");
 	m_k007121[1]->set_flipscreen_cb().set(FUNC(hcastle_state::flipscreen_w<1>));
 	m_k007121[1]->set_sprite_callback(FUNC(hcastle_state::sprite_callback<1>));
 

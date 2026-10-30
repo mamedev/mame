@@ -11,15 +11,15 @@
 class nes_vt32_soc_device : public nes_vt09_soc_device
 {
 public:
-	nes_vt32_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+	nes_vt32_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	nes_vt32_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock);
+	nes_vt32_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void nes_vt32_soc_map(address_map &map) ATTR_COLD;
 
@@ -61,12 +61,12 @@ private:
 class nes_vt32_soc_pal_device : public nes_vt32_soc_device
 {
 public:
-	nes_vt32_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+	nes_vt32_soc_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual void do_pal_timings_and_ppu_replacement(machine_config& config) override;
+	virtual void do_pal_timings_and_ppu_replacement(machine_config &config) override;
 };
 
 

@@ -31,6 +31,7 @@
 #include "mea8000.h"
 
 #include <cmath>
+#include <numbers>
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -194,9 +195,9 @@ void mea8000_device::init_tables()
 	for (int i = 0; i < TABLE_LEN; i++)
 	{
 		double f = (double)i / F0;
-		m_cos_table[i]  = 2. * cos(2. * M_PI * f) * QUANT;
-		m_exp_table[i]  = exp(-M_PI * f) * QUANT;
-		m_exp2_table[i] = exp(-2 * M_PI * f) * QUANT;
+		m_cos_table[i]  = 2. * cos(2. * std::numbers::pi * f) * QUANT;
+		m_exp_table[i]  = exp(-std::numbers::pi * f) * QUANT;
+		m_exp2_table[i] = exp(-2 * std::numbers::pi * f) * QUANT;
 	}
 	for (auto & elem : m_noise_table)
 		elem = (machine().rand() % (2 * QUANT)) - QUANT;
@@ -290,8 +291,8 @@ double mea8000_device::filter_step(int i, double input)
 {
 	double fm = interp(m_f[i].last_fm, m_f[i].fm);
 	double bw = interp(m_f[i].last_bw, m_f[i].bw);
-	double b = 2. * cos(2. * M_PI * fm / F0);
-	double c = -exp(-M_PI * bw / F0);
+	double b = 2. * cos(2. * std::numbers::pi * fm / F0);
+	double c = -exp(-std::numbers::pi * bw / F0);
 	double next_output = input - c * (b * m_f[i].output + c * m_f[i].last_output);
 	m_f[i].last_output = m_f[i].output;
 	m_f[i].output = next_output;

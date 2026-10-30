@@ -47,8 +47,8 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void atari_s2(machine_config &config);
-	void atari_s3(machine_config &config);
+	void atari_s2(machine_config &config) ATTR_COLD;
+	void atari_s3(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -484,9 +484,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_s2_state::irq )
 void atari_s2_state::machine_start()
 {
 	genpin_class::machine_start();
-
-	m_digits.resolve();
-	m_io_outputs.resolve();
 
 	save_item(NAME(m_timer_sb));
 	save_item(NAME(m_timer_s));

@@ -156,8 +156,8 @@ Apparently two PCB revisions, one is red coated.
 
 **************************************************************************************************/
 
-
 #include "emu.h"
+
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 
@@ -202,7 +202,7 @@ void aristmk7_state::aristmk7(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &aristmk7_state::aristmk7_map);
 	m_maincpu->set_addrmap(AS_IO, &aristmk7_state::aristmk7_io);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 

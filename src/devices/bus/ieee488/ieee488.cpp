@@ -10,16 +10,19 @@
 #include "emu.h"
 #include "ieee488.h"
 
+#include <algorithm>
+
+#define VERBOSE 0
+#include "logmacro.h"
+
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 0
 
-
-static const char *const SIGNAL_NAME[] = { "EOI", "DAV", "NRFD", "NDAC", "IFC", "SRQ", "ATN", "REN" };
+static const char *const SIGNAL_NAME[] = { "EOI", "DAV", "NRFD", "NDAC", "IFC", "SRQ", "ATN", "REN", "DIO" };
 
 
 
@@ -95,7 +98,7 @@ void ieee488_slot_device::device_start()
 
 void ieee488_slot_device::add_cbm_slot(machine_config &config, const char *_tag, int _address, const char *_def_slot)
 {
-	ieee488_slot_device &slot(IEEE488_SLOT(config, _tag, 0));
+	ieee488_slot_device &slot(IEEE488_SLOT(config, _tag));
 	cbm_ieee488_devices(slot);
 	slot.set_default_option(_def_slot);
 	slot.set_address(_address);
@@ -120,12 +123,9 @@ ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, d
 	m_write_atn(*this),
 	m_write_ren(*this),
 	m_write_dio(*this),
-	m_dio(0xff)
+	m_update_timer(nullptr)
 {
-	for (auto & elem : m_line)
-	{
-		elem = 1;
-	}
+	m_lines.reset();
 }
 
 
@@ -135,6 +135,17 @@ ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, d
 
 void ieee488_device::device_start()
 {
+	m_update_timer = timer_alloc(FUNC(ieee488_device::update_tick), this);
+
+	// a bus hosted by a cartridge has its host CPU outside the bus owner
+	for (device_execute_interface &exec : execute_interface_enumerator(machine().root_device()))
+		m_execs.push_back(&exec);
+
+	save_item(NAME(m_lines.m_time));
+	save_item(NAME(m_lines.m_state));
+	save_item(NAME(m_lines.m_count));
+	save_item(NAME(m_lines.m_line));
+	save_item(NAME(m_lines.m_exec_index));
 }
 
 
@@ -145,6 +156,41 @@ void ieee488_device::device_start()
 void ieee488_device::device_stop()
 {
 	m_device_list.reset();
+}
+
+
+//-------------------------------------------------
+//  device_pre_save -
+//-------------------------------------------------
+
+void ieee488_device::device_pre_save()
+{
+	auto const save_exec = [this] (source_lines &lines)
+	{
+		auto const it = std::find(m_execs.begin(), m_execs.end(), lines.m_exec);
+		lines.m_exec_index = (it != m_execs.end()) ? (it - m_execs.begin()) : -1;
+	};
+
+	save_exec(m_lines);
+	for (daisy_entry *entry = m_device_list.first(); entry; entry = entry->next())
+		save_exec(entry->m_lines);
+}
+
+
+//-------------------------------------------------
+//  device_post_load -
+//-------------------------------------------------
+
+void ieee488_device::device_post_load()
+{
+	auto const load_exec = [this] (source_lines &lines)
+	{
+		lines.m_exec = (lines.m_exec_index >= 0) ? m_execs[lines.m_exec_index] : nullptr;
+	};
+
+	load_exec(m_lines);
+	for (daisy_entry *entry = m_device_list.first(); entry; entry = entry->next())
+		load_exec(entry->m_lines);
 }
 
 
@@ -160,6 +206,11 @@ void ieee488_device::add_device(ieee488_slot_device *slot, device_t *target)
 	entry->m_interface->m_slot = slot;
 
 	m_device_list.append(*entry);
+	save_item(NAME(entry->m_lines.m_time), m_device_list.count());
+	save_item(NAME(entry->m_lines.m_state), m_device_list.count());
+	save_item(NAME(entry->m_lines.m_count), m_device_list.count());
+	save_item(NAME(entry->m_lines.m_line), m_device_list.count());
+	save_item(NAME(entry->m_lines.m_exec_index), m_device_list.count());
 }
 
 
@@ -170,15 +221,29 @@ void ieee488_device::add_device(ieee488_slot_device *slot, device_t *target)
 ieee488_device::daisy_entry::daisy_entry(device_t *device)
 	: m_next(nullptr),
 		m_device(device),
-		m_interface(nullptr),
-		m_dio(0xff)
+		m_interface(nullptr)
 {
-	for (auto & elem : m_line)
-	{
-		elem = 1;
-	}
+	m_lines.reset();
 
 	device->interface(m_interface);
+}
+
+
+//-------------------------------------------------
+//  source_lines::reset -
+//-------------------------------------------------
+
+void ieee488_device::source_lines::reset()
+{
+	for (int signal = 0; signal < SIGNAL_COUNT; signal++)
+	{
+		std::fill(std::begin(m_time[signal]), std::end(m_time[signal]), attotime::zero);
+		std::fill(std::begin(m_state[signal]), std::end(m_state[signal]), (signal == DIO) ? 0xff : 1);
+		m_count[signal] = 1;
+		m_line[signal] = (signal == DIO) ? 0xff : 1;
+	}
+	m_exec = nullptr;
+	m_exec_index = -1;
 }
 
 
@@ -186,105 +251,241 @@ ieee488_device::daisy_entry::daisy_entry(device_t *device)
 //  set_signal -
 //-------------------------------------------------
 
-void ieee488_device::set_signal(device_t *device, int signal, int state)
+void ieee488_device::set_signal(device_t *device, int signal, u8 state)
 {
-	bool changed = false;
-	int old_state = get_signal(signal);
+	source_lines *lines = &m_lines;
+	daisy_entry *entry = nullptr;
 
-	if (device == this)
+	if (device != this)
 	{
-		if (m_line[signal] != state)
-		{
-			if (LOG) logerror("%s IEEE488: '%s' %s %u\n", machine().describe_context(), tag(), SIGNAL_NAME[signal], state);
-			m_line[signal] = state;
-			changed = true;
-		}
+		entry = m_device_list.first();
+		while (entry && entry->m_device != device)
+			entry = entry->next();
+		if (!entry)
+			return;
+		lines = &entry->m_lines;
+	}
+
+	if (signal != DIO)
+		state = state ? 1 : 0;
+	u8 &count = lines->m_count[signal];
+	attotime *const times = lines->m_time[signal];
+	u8 *const states = lines->m_state[signal];
+	if (states[count - 1] == state)
+		return;
+
+	// port outputs change after the write cycle, half a cycle after reads sample their inputs
+	attotime const now = machine().time();
+	attotime time = now;
+	device_execute_interface *const exec = machine().scheduler().currently_executing();
+	if (exec)
+	{
+		attotime const cycle = exec->cycles_to_attotime(1);
+		if (!cycle.is_never())
+			time += cycle / 2;
+	}
+	time = std::max(time, times[count - 1]);
+
+	LOG("%s '%s' %s %02x at %s\n", machine().describe_context(), device->tag(), SIGNAL_NAME[signal], state, time.as_string());
+
+	if (times[count - 1] == time)
+	{
+		if (count > 1 && states[count - 2] == state)
+			count--;
+		else
+			states[count - 1] = state;
 	}
 	else
 	{
-		daisy_entry *entry = m_device_list.first();
-
-		while (entry)
+		if (count == EDGE_COUNT)
 		{
-			if (!strcmp(entry->m_device->tag(), device->tag()))
-			{
-				if (entry->m_line[signal] != state)
-				{
-					if (LOG) logerror("%s IEEE488: '%s' %s %u\n", machine().describe_context(), device->tag(), SIGNAL_NAME[signal], state);
-					entry->m_line[signal] = state;
-					changed = true;
-				}
-			}
-
-			entry = entry->next();
+			std::copy(times + 1, times + count, times);
+			std::copy(states + 1, states + count, states);
+			count--;
 		}
+		times[count] = time;
+		states[count] = state;
+		count++;
 	}
 
-	if (!changed) {
-		return;
+	if (time <= now)
+	{
+		update_lines();
 	}
+	else
+	{
+		// a source's own receivers see its outputs without the write delay
+		lines->m_exec = exec;
+		update_lines(*lines, entry);
 
-	state = get_signal(signal);
+		if (!m_update_timer->enabled() || m_update_timer->expire() > time)
+			m_update_timer->adjust(time - now);
+	}
+}
 
-	if (old_state != state) {
-		switch (signal)
-		{
-		case EOI:   m_write_eoi(state);  break;
-		case DAV:   m_write_dav(state);  break;
-		case NRFD:  m_write_nrfd(state); break;
-		case NDAC:  m_write_ndac(state); break;
-		case IFC:   m_write_ifc(state);  break;
-		case SRQ:   m_write_srq(state);  break;
-		case ATN:   m_write_atn(state);  break;
-		case REN:   m_write_ren(state);  break;
-		}
 
-		daisy_entry *entry = m_device_list.first();
+//-------------------------------------------------
+//  update_lines - notify one source of resolved
+//  line changes up to the current time
+//-------------------------------------------------
 
-		while (entry)
+void ieee488_device::update_lines(source_lines &lines, daisy_entry *entry)
+{
+	attotime const now = machine().time();
+
+	for (int signal = 0; signal < SIGNAL_COUNT; signal++)
+	{
+		u8 const state = get_signal(signal, now, &lines);
+		if (lines.m_line[signal] == state)
+			continue;
+
+		lines.m_line[signal] = state;
+
+		if (!entry)
 		{
 			switch (signal)
 			{
-			case EOI:
-				entry->m_interface->ieee488_eoi(state);
-				break;
-
-			case DAV:
-				entry->m_interface->ieee488_dav(state);
-				break;
-
-			case NRFD:
-				entry->m_interface->ieee488_nrfd(state);
-				break;
-
-			case NDAC:
-				entry->m_interface->ieee488_ndac(state);
-				break;
-
-			case IFC:
-				entry->m_interface->ieee488_ifc(state);
-				break;
-
-			case SRQ:
-				entry->m_interface->ieee488_srq(state);
-				break;
-
-			case ATN:
-				entry->m_interface->ieee488_atn(state);
-				break;
-
-			case REN:
-				entry->m_interface->ieee488_ren(state);
-				break;
+			case EOI:   m_write_eoi(state);  break;
+			case DAV:   m_write_dav(state);  break;
+			case NRFD:  m_write_nrfd(state); break;
+			case NDAC:  m_write_ndac(state); break;
+			case IFC:   m_write_ifc(state);  break;
+			case SRQ:   m_write_srq(state);  break;
+			case ATN:   m_write_atn(state);  break;
+			case REN:   m_write_ren(state);  break;
+			case DIO:   m_write_dio(state);  break;
 			}
 
-			entry = entry->next();
+			LOG("EOI %u DAV %u NRFD %u NDAC %u IFC %u SRQ %u ATN %u REN %u DIO %02x\n",
+				lines.m_line[EOI], lines.m_line[DAV], lines.m_line[NRFD], lines.m_line[NDAC],
+				lines.m_line[IFC], lines.m_line[SRQ], lines.m_line[ATN], lines.m_line[REN], lines.m_line[DIO]);
 		}
-
-		if (LOG) logerror("IEEE488: EOI %u DAV %u NRFD %u NDAC %u IFC %u SRQ %u ATN %u REN %u DIO %02x\n",
-			get_signal(EOI), get_signal(DAV), get_signal(NRFD), get_signal(NDAC),
-			get_signal(IFC), get_signal(SRQ), get_signal(ATN), get_signal(REN), get_data());
+		else
+		{
+			switch (signal)
+			{
+			case EOI:   entry->m_interface->ieee488_eoi(state);  break;
+			case DAV:   entry->m_interface->ieee488_dav(state);  break;
+			case NRFD:  entry->m_interface->ieee488_nrfd(state); break;
+			case NDAC:  entry->m_interface->ieee488_ndac(state); break;
+			case IFC:   entry->m_interface->ieee488_ifc(state);  break;
+			case SRQ:   entry->m_interface->ieee488_srq(state);  break;
+			case ATN:   entry->m_interface->ieee488_atn(state);  break;
+			case REN:   entry->m_interface->ieee488_ren(state);  break;
+			}
+		}
 	}
+}
+
+
+//-------------------------------------------------
+//  update_lines - notify every source
+//-------------------------------------------------
+
+void ieee488_device::update_lines()
+{
+	update_lines(m_lines, nullptr);
+
+	for (daisy_entry *entry = m_device_list.first(); entry; entry = entry->next())
+		update_lines(entry->m_lines, entry);
+}
+
+
+//-------------------------------------------------
+//  update_tick -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(ieee488_device::update_tick)
+{
+	update_lines();
+
+	attotime const now = machine().time();
+	attotime next = attotime::never;
+	auto const find_next = [&now, &next] (source_lines const &lines)
+	{
+		for (int signal = 0; signal < SIGNAL_COUNT; signal++)
+			for (int i = lines.m_count[signal] - 1; (i >= 0) && (lines.m_time[signal][i] > now); i--)
+				next = std::min(next, lines.m_time[signal][i]);
+	};
+
+	find_next(m_lines);
+	for (daisy_entry *entry = m_device_list.first(); entry; entry = entry->next())
+		find_next(entry->m_lines);
+
+	if (next.is_never())
+		m_update_timer->reset();
+	else
+		m_update_timer->adjust(next - now);
+}
+
+
+//-------------------------------------------------
+//  sample_ready - hold a CPU's bus sample until
+//  every other device has passed the point where
+//  its outputs could still change the result
+//-------------------------------------------------
+
+bool ieee488_device::sample_ready(cpu_device &cpu)
+{
+	if (!cpu.executing() || machine().side_effects_disabled())
+		return true;
+
+	attotime const time = cpu.local_time();
+	bool ready = !m_update_timer->enabled() || (m_update_timer->expire() > time);
+	attotime stalled = attotime::never;
+
+	for (device_execute_interface *const exec : m_execs)
+	{
+		if (!ready)
+			break;
+
+		if ((&exec->device() == &cpu) || exec->suspended(SUSPEND_ANY_REASON & ~SUSPEND_REASON_TIMESLICE))
+			continue;
+
+		attotime const cycle = exec->cycles_to_attotime(1);
+		if (!cycle.is_never())
+		{
+			ready = (exec->local_time() + (cycle / 2)) > time;
+			if (!ready && ((exec->local_time() + cycle) > time))
+				stalled = cycle;
+		}
+	}
+
+	if (!ready)
+	{
+		// a device less than a cycle behind can only run once this slice ends
+		if (!stalled.is_never())
+		{
+			cpu.yield();
+			machine().scheduler().perfect_quantum(stalled);
+		}
+		cpu.retry_access();
+	}
+
+	return ready;
+}
+
+
+//-------------------------------------------------
+//  read_signal - sample the bus, seeing the
+//  pending outputs of the executing device
+//-------------------------------------------------
+
+u8 ieee488_device::read_signal(int signal)
+{
+	source_lines const *own = nullptr;
+	device_execute_interface *const exec = machine().scheduler().currently_executing();
+
+	if (exec)
+	{
+		if (m_lines.m_exec == exec)
+			own = &m_lines;
+		for (daisy_entry *entry = m_device_list.first(); !own && entry; entry = entry->next())
+			if (entry->m_lines.m_exec == exec)
+				own = &entry->m_lines;
+	}
+
+	return get_signal(signal, machine().time(), own);
 }
 
 
@@ -292,93 +493,22 @@ void ieee488_device::set_signal(device_t *device, int signal, int state)
 //  get_signal -
 //-------------------------------------------------
 
-int ieee488_device::get_signal(int signal)
+u8 ieee488_device::get_signal(int signal, const attotime &time, source_lines const *own)
 {
-	int state = m_line[signal];
+	auto const source_state = [signal, &time, own] (source_lines const &lines)
+	{
+		int i = lines.m_count[signal] - 1;
+		while ((&lines != own) && (i > 0) && (lines.m_time[signal][i] > time))
+			i--;
+		return lines.m_state[signal][i];
+	};
 
-	daisy_entry *entry = m_device_list.first();
+	u8 state = source_state(m_lines);
 
-	while (state && entry)
-		{
-			if (!entry->m_line[signal])
-				{
-					state = 0;
-					break;
-				}
-
-			entry = entry->next();
-		}
+	for (daisy_entry *entry = m_device_list.first(); state && entry; entry = entry->next())
+		state &= source_state(entry->m_lines);
 
 	return state;
-}
-
-
-//-------------------------------------------------
-//  set_data -
-//-------------------------------------------------
-
-void ieee488_device::set_data(device_t *device, uint8_t data)
-{
-	bool changed = false;
-	uint8_t old_state = get_data();
-
-	if (device == this)
-	{
-		if (LOG) logerror("%s IEEE488: '%s' DIO %02x\n", machine().describe_context(), tag(), data);
-		if (m_dio != data) {
-			m_dio = data;
-			changed = true;
-		}
-	}
-	else
-	{
-		daisy_entry *entry = m_device_list.first();
-
-		while (entry)
-		{
-			if (!strcmp(entry->m_device->tag(), device->tag()))
-			{
-				if (entry->m_dio != data)
-				{
-					if (LOG) logerror("%s IEEE488: '%s' DIO %02x\n", machine().describe_context(), device->tag(), data);
-					entry->m_dio = data;
-					changed = true;
-				}
-			}
-
-			entry = entry->next();
-		}
-	}
-
-	if (!changed) {
-		return;
-	}
-
-	uint8_t new_state = get_data();
-	if (old_state != new_state) {
-		m_write_dio(new_state);
-	}
-}
-
-
-//-------------------------------------------------
-//  get_data -
-//-------------------------------------------------
-
-uint8_t ieee488_device::get_data()
-{
-	uint8_t data = m_dio;
-
-	daisy_entry *entry = m_device_list.first();
-
-	while (data && entry)
-	{
-		data &= entry->m_dio;
-
-		entry = entry->next();
-	}
-
-	return data;
 }
 
 
@@ -388,8 +518,14 @@ uint8_t ieee488_device::get_data()
 
 // slot devices
 #include "bus/cbmiec/c1526.h"
+#include "bus/cbmiec/msdsd.h"
 #include "c2031.h"
 #include "c2040.h"
+#include "c3022.h"
+#include "c4022.h"
+#include "c6400.h"
+#include "c8023p.h"
+#include "c8028.h"
 #include "c8050.h"
 #include "c8280.h"
 #include "d9060.h"
@@ -399,20 +535,27 @@ uint8_t ieee488_device::get_data()
 
 void cbm_ieee488_devices(device_slot_interface &device)
 {
-	device.option_add("c2040", C2040);
-	device.option_add("c3040", C3040);
-	device.option_add("c4040", C4040);
-	device.option_add("c8050", C8050);
-	device.option_add("c8250", C8250);
-	device.option_add("sfd1001", SFD1001);
-	device.option_add("c2031", C2031);
-	device.option_add("c8280", C8280);
-	device.option_add("d9060", D9060);
-	device.option_add("d9090", D9090);
-	device.option_add("softbox", SOFTBOX);
-	device.option_add("hardbox", HARDBOX);
-	device.option_add("shark", MSHARK);
-	device.option_add("c4023", C4023);
+	device.option_add("c2040", GPIB_C2040);
+	device.option_add("c3040", GPIB_C3040);
+	device.option_add("c4040", GPIB_C4040);
+	device.option_add("c8050", GPIB_C8050);
+	device.option_add("c8250", GPIB_C8250);
+	device.option_add("sfd1001", GPIB_SFD1001);
+	device.option_add("c2031", GPIB_C2031);
+	device.option_add("c8280", GPIB_C8280);
+	device.option_add("d9060", GPIB_D9060);
+	device.option_add("d9090", GPIB_D9090);
+	device.option_add("softbox", GPIB_SOFTBOX);
+	device.option_add("hardbox", GPIB_HARDBOX);
+	device.option_add("msdsd1", GPIB_MSD_SD1);
+	device.option_add("msdsd2", GPIB_MSD_SD2);
+	device.option_add("shark", GPIB_MSHARK);
+	device.option_add("c3022", GPIB_C3022);
+	device.option_add("c4022", GPIB_C4022);
+	device.option_add("c4023", GPIB_C4023);
+	device.option_add("c6400", GPIB_C6400);
+	device.option_add("c8023p", GPIB_C8023P);
+	device.option_add("c8028", GPIB_C8028);
 }
 
 //-------------------------------------------------
@@ -426,9 +569,9 @@ void cbm_ieee488_devices(device_slot_interface &device)
 
 void hp_ieee488_devices(device_slot_interface &device)
 {
-	device.option_add("hp9122c", HP9122C);
-	device.option_add("hp9133", HP9133);
-	device.option_add("hp9895", HP9895);
+	device.option_add("hp9122c", GPIB_HP9122C);
+	device.option_add("hp9133", GPIB_HP9133);
+	device.option_add("hp9895", GPIB_HP9895);
 }
 
 //-------------------------------------------------
@@ -440,7 +583,7 @@ void hp_ieee488_devices(device_slot_interface &device)
 
 void remote488_devices(device_slot_interface &device)
 {
-	device.option_add("remote488", REMOTE488);
+	device.option_add("remote488", GPIB_REMOTE488);
 }
 
 
@@ -453,7 +596,7 @@ void remote488_devices(device_slot_interface &device)
 
 void grid_ieee488_devices(device_slot_interface &device)
 {
-	device.option_add("grid2102", GRID2102).clock(XTAL(4'000'000));
-	device.option_add("grid2101_floppy", GRID2101_FLOPPY).clock(XTAL(4'000'000));
-	device.option_add("grid2101_hdd", GRID2101_HDD).clock(XTAL(4'000'000));
+	device.option_add("grid2102", GPIB_GRID2102).clock(XTAL(4'000'000));
+	device.option_add("grid2101_floppy", GPIB_GRID2101_FLOPPY).clock(XTAL(4'000'000));
+	device.option_add("grid2101_hdd", GPIB_GRID2101_HDD).clock(XTAL(4'000'000));
 }

@@ -295,6 +295,7 @@ void s3virge_vga_device::crtc_map(address_map &map)
 			return res;
 		})
 	);
+	map(0x50, 0x50).unmaprw(); // doesn't have CR50
 	map(0x53, 0x53).lrw8(
 		NAME([this] (offs_t offset) {
 			return s3.cr53;
@@ -789,6 +790,15 @@ uint32_t s3virge_vga_device::GetROP(uint8_t rop, uint32_t src, uint32_t dst, uin
 			break;
 		case 0x88:  // DSa
 			ret = dst & src;
+			break;
+		case 0xa0:  // DPa (win98se help tooltip borders)
+			ret = dst & pat;
+			break;
+		case 0xa5:  // PDxn (moving kana drawing window in jp win98se, keyboard 3rd option)
+			ret = ~(pat ^ dst);
+			break;
+		case 0xaa:  // D
+			ret = dst;
 			break;
 		case 0xb8:  // PSDPxax
 			ret = ((dst ^ pat) & src) ^ pat;

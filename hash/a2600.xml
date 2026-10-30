@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -13030,6 +13030,18 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="readriot">
+		<description>Read RIOT</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL,NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="readriot.a2600.bin" size="4096" crc="b404ac55" sha1="866ae2d0da147e7aff25b53c0249ffe1b9b6b0c2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="redvsblu">
 		<description>Red Vs. Blue - Football (prototype)</description>
 		<year>1981</year>
@@ -17030,6 +17042,18 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="target practice (carnival) (aka carnival) (1983) (cce) (c-833) [a].bin" size="4096" crc="5436d567" sha1="2f6114e022bf57ff58450d765e60d2f3e3910432"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tarzan">
+		<description>Tarzan (prototype)</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
+		<part name="cart" interface="a2600_cart">
+			<feature name="slot" value="a26_f0" />
+			<dataarea name="rom" size="16384">
+				<rom name="atari_tarzan_42a3.bin" size="16384" crc="15e22f06" sha1="a6d9a3375f9ca62123353760d0c78d05717de7d2"/>
 			</dataarea>
 		</part>
 	</software>

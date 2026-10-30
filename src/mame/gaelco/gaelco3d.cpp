@@ -151,7 +151,6 @@ REF. 970429
 #include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68020.h"
 
-#include "emupal.h"
 #include "speaker.h"
 
 #include "speedup.lh"
@@ -217,7 +216,7 @@ MACHINE_RESET_MEMBER(gaelco3d_state,common)
 
 	m_adsp_bank->set_entry(0);
 
-	// Keep the TMS32031 halted until the code is ready to go
+	// Keep the TMS320C31 halted until the code is ready to go
 	m_tms->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
@@ -381,7 +380,7 @@ void gaelco3d_state::fp_analog_clock_w(int state)
 
 /*************************************
  *
- *  TMS32031 interface
+ *  TMS320C31 interface
  *
  *************************************/
 
@@ -419,7 +418,7 @@ void gaelco3d_state::tms_iack_w(offs_t offset, uint8_t data)
 
 /*************************************
  *
- *  TMS32031 control
+ *  TMS320C31 control
  *
  *************************************/
 
@@ -452,6 +451,7 @@ void gaelco3d_state::tms_control3_w(int state)
  *
  *************************************/
 
+// TODO: convert to device
 // These are some of the control registers. We don't use them all
 enum
 {
@@ -906,16 +906,16 @@ INPUT_PORTS_END
 void gaelco3d_state::gaelco3d(machine_config &config)
 {
 	// Basic machine hardware
-	M68000(config, m_maincpu, 15000000);
+	M68000(config, m_maincpu, 15'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco3d_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gaelco3d_state::vblank_gen));
 
-	TMS32031(config, m_tms, 60000000);
+	TMS320C31(config, m_tms, 60'000'000);
 	m_tms->set_addrmap(AS_PROGRAM, &gaelco3d_state::tms_map);
 	m_tms->set_mcbl_mode(true);
 	m_tms->iack().set(FUNC(gaelco3d_state::tms_iack_w));
 
-	ADSP2115(config, m_adsp, 16000000);
+	ADSP2115(config, m_adsp, 16'000'000);
 	m_adsp->sport_tx().set(FUNC(gaelco3d_state::adsp_tx_callback));
 	m_adsp->set_addrmap(AS_PROGRAM, &gaelco3d_state::adsp_program_map);
 	m_adsp->set_addrmap(AS_DATA, &gaelco3d_state::adsp_data_map);
@@ -926,7 +926,7 @@ void gaelco3d_state::gaelco3d(machine_config &config)
 
 	TIMER(config, m_adsp_autobuffer_timer).configure_generic(FUNC(gaelco3d_state::adsp_autobuffer_irq));
 
-	GAELCO_SERIAL(config, m_serial, 0);
+	GAELCO_SERIAL(config, m_serial);
 	m_serial->irq_handler().set(FUNC(gaelco3d_state::ser_irq));
 
 	LS259(config, m_mainlatch); // IC5 on bottom board next to EEPROM
@@ -940,9 +940,12 @@ void gaelco3d_state::gaelco3d(machine_config &config)
 	m_mainlatch->q_out_cb<7>().set(FUNC(gaelco3d_state::unknown_13a_w));
 
 	LS259(config, m_outlatch); // IC2 on top board near edge connector
+	// TODO: speedup should have a second coin counter according to schematics
+	// this LS259 is connected to a ULM2064, that controls both coin counters and lamps
+	m_outlatch->q_out_cb<0>().set([this] (int state) { machine().bookkeeping().coin_counter_w(0, state); });
 	m_outlatch->q_out_cb<1>().set(FUNC(gaelco3d_state::tms_control3_w));
 	m_outlatch->q_out_cb<2>().set_output("Start_lamp"); // START LAMP
-	m_outlatch->q_out_cb<3>().set(FUNC(gaelco3d_state::unknown_137_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(gaelco3d_state::unknown_137_w)); // leader lamp?
 	m_outlatch->q_out_cb<4>().set(m_serial, FUNC(gaelco_serial_device::irq_enable));
 	m_outlatch->q_out_cb<5>().set(FUNC(gaelco3d_state::analog_port_clock_w));
 	m_outlatch->q_out_cb<6>().set(FUNC(gaelco3d_state::analog_port_latch_w));
@@ -951,36 +954,49 @@ void gaelco3d_state::gaelco3d(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set_inputline(m_adsp, ADSP2115_IRQ2);
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // Not accurate
 	m_screen->set_size(576, 432);
 	m_screen->set_visarea(0, 575, 0, 431);
 	m_screen->set_screen_update(FUNC(gaelco3d_state::screen_update));
-	m_screen->set_palette("palette");
-
-	PALETTE(config, "palette", palette_device::RGB_555);
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, "mono", 0.45);  // speedup: front mono
-	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "mono", 0.45);  // speedup: left rear
-	DMADAC(config, m_dmadac[2]).add_route(ALL_OUTPUTS, "mono", 0.45);  // speedup: right rear
-	DMADAC(config, m_dmadac[3]).add_route(ALL_OUTPUTS, "mono", 0.45);  // speedup: seat speaker
+	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, "mono", 0.45);
+	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "mono", 0.45);
+	DMADAC(config, m_dmadac[2]).add_route(ALL_OUTPUTS, "mono", 0.45);
+	DMADAC(config, m_dmadac[3]).add_route(ALL_OUTPUTS, "mono", 0.45);
 }
 
+void gaelco3d_state::speedup(machine_config &config)
+{
+	gaelco3d(config);
+
+	config.device_remove("mono");
+	// speedup has 5 speakers, cfr. sound test diagram
+	SPEAKER(config, "mono").front_center();
+	SPEAKER(config, "rear", 2).rear();
+	// TODO: confirm positioning
+	SPEAKER(config, "seat_floor").set_position(0, 0.0, 0.5, 1.0);
+
+	DMADAC(config.replace(), m_dmadac[0]).add_route(ALL_OUTPUTS, "rear", 1.00, 0);  // left rear
+	DMADAC(config.replace(), m_dmadac[1]).add_route(ALL_OUTPUTS, "rear", 1.00, 1);  // right rear
+	DMADAC(config.replace(), m_dmadac[2]).add_route(ALL_OUTPUTS, "seat_floor", 1.00);  // seat speaker
+	DMADAC(config.replace(), m_dmadac[3]).add_route(ALL_OUTPUTS, "mono", 1.00 );  // front mono
+}
 
 void gaelco3d_state::gaelco3d2(machine_config &config)
 {
 	gaelco3d(config);
 
 	// Basic machine hardware
-	M68EC020(config.replace(), m_maincpu, 25000000);
+	M68EC020(config.replace(), m_maincpu, 25'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco3d_state::main020_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gaelco3d_state::vblank_gen));
 
-	m_tms->set_clock(50000000);
+	m_tms->set_clock(50'000'000);
 
 	MCFG_MACHINE_RESET_OVERRIDE(gaelco3d_state,gaelco3d2)
 }
@@ -1665,13 +1681,18 @@ ROM_START( footbpow ) // Version 4.6
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) )
 
-	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
-	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
-	       Oscillator =  High Speed
-	       Watchdog Timer = Enabled
-	       Power-Up Timer = Disabled
-	       Brown Out = Enabled */
-	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+	ROM_REGION16_LE( 0x4010, "io", 0 )
+	ROM_LOAD( "fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+	ROM_FILL( 0x4000, 0x01, 0xff )
+	ROM_FILL( 0x4001, 0x01, 0x3f ) // user_id0: 0x3fff
+	ROM_FILL( 0x4002, 0x01, 0xff )
+	ROM_FILL( 0x4003, 0x01, 0x3f ) // user_id1: 0x3fff
+	ROM_FILL( 0x4004, 0x01, 0xff )
+	ROM_FILL( 0x4005, 0x01, 0x3f ) // user_id2: 0x3fff
+	ROM_FILL( 0x4006, 0x01, 0xff )
+	ROM_FILL( 0x4007, 0x01, 0x3f ) // user_id3: 0x3fff
+	ROM_FILL( 0x400e, 0x01, 0xfe )
+	ROM_FILL( 0x400f, 0x01, 0x3f ) // configuration: 0x3ffe (HS oscillator, WDT enabled, PWRT disabled, BOR enabled)
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
@@ -1710,13 +1731,18 @@ ROM_START( footbpow14 ) // Version 1.4
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) )
 
-	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
-	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
-	       Oscillator =  High Speed
-	       Watchdog Timer = Enabled
-	       Power-Up Timer = Disabled
-	       Brown Out = Enabled */
-	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+	ROM_REGION16_LE( 0x4010, "io", 0 )
+	ROM_LOAD( "fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+	ROM_FILL( 0x4000, 0x01, 0xff )
+	ROM_FILL( 0x4001, 0x01, 0x3f ) // user_id0: 0x3fff
+	ROM_FILL( 0x4002, 0x01, 0xff )
+	ROM_FILL( 0x4003, 0x01, 0x3f ) // user_id1: 0x3fff
+	ROM_FILL( 0x4004, 0x01, 0xff )
+	ROM_FILL( 0x4005, 0x01, 0x3f ) // user_id2: 0x3fff
+	ROM_FILL( 0x4006, 0x01, 0xff )
+	ROM_FILL( 0x4007, 0x01, 0x3f ) // user_id3: 0x3fff
+	ROM_FILL( 0x400e, 0x01, 0xfe )
+	ROM_FILL( 0x400f, 0x01, 0x3f ) // configuration: 0x3ffe (HS oscillator, WDT enabled, PWRT disabled, BOR enabled)
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
@@ -1755,13 +1781,18 @@ ROM_START( footbpow12 ) // Version 1.2 - REF. 000208 ROM board
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) ) // labeled FOP 26 in IC36 on the PCB
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) ) // labeled FOP 27 in IC37 on the PCB
 
-	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
-	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
-	       Oscillator =  High Speed
-	       Watchdog Timer = Enabled
-	       Power-Up Timer = Disabled
-	       Brown Out = Enabled */
-	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+	ROM_REGION16_LE( 0x4010, "io", 0 )
+	ROM_LOAD( "fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+	ROM_FILL( 0x4000, 0x01, 0xff )
+	ROM_FILL( 0x4001, 0x01, 0x3f ) // user_id0: 0x3fff
+	ROM_FILL( 0x4002, 0x01, 0xff )
+	ROM_FILL( 0x4003, 0x01, 0x3f ) // user_id1: 0x3fff
+	ROM_FILL( 0x4004, 0x01, 0xff )
+	ROM_FILL( 0x4005, 0x01, 0x3f ) // user_id2: 0x3fff
+	ROM_FILL( 0x4006, 0x01, 0xff )
+	ROM_FILL( 0x4007, 0x01, 0x3f ) // user_id3: 0x3fff
+	ROM_FILL( 0x400e, 0x01, 0xfe )
+	ROM_FILL( 0x400f, 0x01, 0x3f ) // configuration: 0x3ffe (HS oscillator, WDT enabled, PWRT disabled, BOR enabled)
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
@@ -1800,13 +1831,18 @@ ROM_START( footbpow11 ) // Version 1.1 - REF. 000208 ROM board
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) ) // labeled FOP 26 in IC36 on the PCB
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) ) // labeled FOP 27 in IC37 on the PCB
 
-	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
-	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
-	       Oscillator =  High Speed
-	       Watchdog Timer = Enabled
-	       Power-Up Timer = Disabled
-	       Brown Out = Enabled */
-	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+	ROM_REGION16_LE( 0x4010, "io", 0 )
+	ROM_LOAD( "fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+	ROM_FILL( 0x4000, 0x01, 0xff )
+	ROM_FILL( 0x4001, 0x01, 0x3f ) // user_id0: 0x3fff
+	ROM_FILL( 0x4002, 0x01, 0xff )
+	ROM_FILL( 0x4003, 0x01, 0x3f ) // user_id1: 0x3fff
+	ROM_FILL( 0x4004, 0x01, 0xff )
+	ROM_FILL( 0x4005, 0x01, 0x3f ) // user_id2: 0x3fff
+	ROM_FILL( 0x4006, 0x01, 0xff )
+	ROM_FILL( 0x4007, 0x01, 0x3f ) // user_id3: 0x3fff
+	ROM_FILL( 0x400e, 0x01, 0xfe )
+	ROM_FILL( 0x400f, 0x01, 0x3f ) // configuration: 0x3ffe (HS oscillator, WDT enabled, PWRT disabled, BOR enabled)
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
@@ -1821,12 +1857,12 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1996, speedup,    0,        gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.20, checksum 2037)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 11/Mar
-GAMEL( 1996, speedup21,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.10, checksum 9536)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 05/Mar
-GAMEL( 1996, speedup20,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.00, checksum E145)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 18/Feb
-GAMEL( 1996, speedup20a, speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.00, checksum 491B)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 17/Feb
-GAMEL( 1996, speedup12,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.20, checksum 6851)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 10/Oct
-GAMEL( 1996, speedup10,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.00, checksum 31A9)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
+GAMEL( 1996, speedup,    0,        speedup,   speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.20, checksum 2037)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 11/Mar
+GAMEL( 1996, speedup21,  speedup,  speedup,   speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.10, checksum 9536)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 05/Mar
+GAMEL( 1996, speedup20,  speedup,  speedup,   speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.00, checksum E145)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 18/Feb
+GAMEL( 1996, speedup20a, speedup,  speedup,   speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.00, checksum 491B)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 17/Feb
+GAMEL( 1996, speedup12,  speedup,  speedup,   speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.20, checksum 6851)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 10/Oct
+GAMEL( 1996, speedup10,  speedup,  speedup,   speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.00, checksum 31A9)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
 
 GAME( 1997, surfplnt,    0,        gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (version 4.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 GAME( 1997, surfplnt40,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (version 4.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)

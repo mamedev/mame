@@ -220,8 +220,6 @@ private:
 
 void highvdeo_state::machine_start()
 {
-	m_lamps.resolve();
-
 	if (m_mainbank.found()) /*bankaddress might be incorrect at brasil/fasion/grancapi/magicbom*/
 	{
 		uint32_t max = memregion("maincpu")->bytes() / 0x40000;
@@ -1228,7 +1226,7 @@ void highvdeo_state::tv_vcf(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(400, 300);
@@ -1237,7 +1235,7 @@ void highvdeo_state::tv_vcf(machine_config &config)
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 
 	PALETTE(config, m_palette).set_entries(0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &highvdeo_state::ramdac_map);
 
 	/* sound hardware */
@@ -1309,7 +1307,7 @@ void highvdeo_state::brasil(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(400, 300);
@@ -1340,7 +1338,7 @@ void highvdeo_state::grancapi(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(400, 300);
@@ -1379,7 +1377,7 @@ void highvdeo_state::magicbom(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(400, 300);
@@ -1390,7 +1388,7 @@ void highvdeo_state::magicbom(machine_config &config)
 	PALETTE(config, m_palette).set_entries(0x100);
 	m_palette->set_format(palette_device::RGB_565, 0x100);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &highvdeo_state::ramdac_map);
 
 	/* sound hardware */
@@ -1509,12 +1507,15 @@ ROM_END
 ROM_START( galeone )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* V30 Code */
 	ROM_LOAD16_BYTE( "model.a8-vers.1.0.ic8", 0x00001, 0x40000, CRC(b9e1e7ce) SHA1(4e036285b26dc0a313e76259b7e67c8d55322c84) )
-	ROM_RELOAD(0x80001,0x40000)
+	ROM_RELOAD(                               0x80001, 0x40000 )
 	ROM_LOAD16_BYTE( "model.a7-vers.1.0.ic7", 0x00000, 0x40000, CRC(1940b738) SHA1(81e40de8df4dc838342bf966658110989a233731) )
-	ROM_RELOAD(0x80000,0x40000)
+	ROM_RELOAD(                               0x80000, 0x40000 )
 
 	ROM_REGION( 0x080000, "oki", 0 ) /* M6376 Samples */
 	ROM_LOAD( "model.ga-vers.1.ic25", 0x00000, 0x80000, CRC(4c2c2cc1) SHA1(20da29b2f1dd1f86ec23d9dbdaa9470878e900e2) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "palce16v8-25-pat24.ic14", 0x000, 0x117, CRC(d1ae134b) SHA1(d2df61ca7faed4a54ea6d28a8d429b52404482ee) )
 ROM_END
 
 /*

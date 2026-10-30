@@ -39,7 +39,7 @@
   - The MCU manages some RTC, for protection purposes (not emulated, nor simulated).
   - Some game settings are available from amusement mode with BUTTON1+PAYOUT buttons via code: 4545.
   - General settings normally driven through DIP switches are hardcoded in NVRAM.
-  - To enter Gambling Mode get access with BUTTON1+PAYOUT buttons and set code: 1965.
+  - To enter Gambling Mode get access with BUTTON1+PAYOUT buttons and set code: 1965.
 
 
   Procedure to enter the codes:
@@ -505,7 +505,7 @@ void ncarrera_state::ncarrera(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea_full();

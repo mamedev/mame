@@ -234,9 +234,9 @@ uint32_t cheekyms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_cm_tilemap->draw(screen, *m_bitmap_buffer, cliprect, 0, 0);
 
 	// draw the tilemap to the final bitmap applying the scroll to the man character
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int in_man_area;
 
@@ -372,7 +372,7 @@ void cheekyms_state::cheekyms(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &cheekyms_state::io_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(10.816_MHz_XTAL / 2, 352, 0, 256, 262, 32, 224);
 	m_screen->set_screen_update(FUNC(cheekyms_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -382,7 +382,7 @@ void cheekyms_state::cheekyms(machine_config &config)
 	PALETTE(config, m_palette, FUNC(cheekyms_state::palette), 0xc0);
 
 	// audio hardware
-	CHEEKY_MOUSE_AUDIO(config, m_sound_board, 0);
+	CHEEKY_MOUSE_AUDIO(config, m_sound_board);
 }
 
 

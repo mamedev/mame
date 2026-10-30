@@ -371,8 +371,6 @@ private:
 
 void subsino_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_tiles_offset));
 	save_item(NAME(m_out_c));
 }
@@ -1325,7 +1323,7 @@ static INPUT_PORTS_START( victor21 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )          PORT_IMPULSE(3) // coin 2
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )          PORT_IMPULSE(3) // coin 3
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                            PORT_NAME("Stats")  // Bookkeeping.
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )                         PORT_NAME("Settings")   // Game Rate.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )                               PORT_NAME("Settings")   // Game Rate.
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // no payout?
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  // key out
 
@@ -1433,7 +1431,7 @@ static INPUT_PORTS_START( victor5 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                            PORT_NAME("Stats")  // Bookkeeping.
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )                         PORT_NAME("Settings")   // Game Rate & others.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )                               PORT_NAME("Settings")   // Game Rate & others.
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // payout
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  // key out
 
@@ -1569,7 +1567,7 @@ static INPUT_PORTS_START( tisub )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                            PORT_NAME("Stats / Test")   // Bookkeeping.
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )                         PORT_NAME("Settings")       // Current settings.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )                               PORT_NAME("Settings")       // Current settings.
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // payout
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  // key out
 
@@ -1744,7 +1742,7 @@ static INPUT_PORTS_START( stbsub )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                            PORT_NAME("Stats / Test")   // Bookkeeping.
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )                         PORT_NAME("Settings")       // Current settings.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )                               PORT_NAME("Settings")       // Current settings.
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // payout
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  // key out
 
@@ -1880,7 +1878,7 @@ static INPUT_PORTS_START( tesorone )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                            PORT_NAME("Stats / Test")   // Bookkeeping.
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )                         PORT_NAME("Settings")       // Current settings.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )                               PORT_NAME("Settings")       // Current settings.
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // payout
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  // key out
 
@@ -2015,7 +2013,7 @@ static INPUT_PORTS_START( crsbingo )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                            PORT_NAME("Stats")      // Bookkeeping.
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )                         PORT_NAME("Settings")   // Game Rate & others.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )                               PORT_NAME("Settings")   // Game Rate & others.
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // payout
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  // key out
 
@@ -2107,7 +2105,7 @@ static INPUT_PORTS_START( sharkpy )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                            PORT_NAME("Stats / Test")   // Bookkeeping.
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )                         PORT_NAME("Settings")   // Game Rate & others.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )                               PORT_NAME("Settings")   // Game Rate & others.
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // payout?
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  // key out?
 
@@ -2215,7 +2213,7 @@ static INPUT_PORTS_START( sharkpye )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                            PORT_NAME("Stats / Test")   // Bookkeeping.
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )                         PORT_NAME("Settings")   // Game Rate & others.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )                               PORT_NAME("Settings")   // Game Rate & others.
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
@@ -2311,7 +2309,7 @@ static INPUT_PORTS_START( smoto16 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                            PORT_NAME("Stats / Test")   // Bookkeeping.
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )                         PORT_NAME("Settings")   // Game Rate & others.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )                               PORT_NAME("Settings")   // Game Rate & others.
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // payout
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  // key out?
 
@@ -2407,7 +2405,7 @@ static INPUT_PORTS_START( smoto20 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                            PORT_NAME("Stats / Test")   // Bookkeeping.
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )                         PORT_NAME("Settings")   // Game Rate & others.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )                               PORT_NAME("Settings")   // Game Rate & others.
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // payout
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  // key out?
 
@@ -2515,7 +2513,7 @@ static INPUT_PORTS_START( victor6 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                            PORT_NAME("Stats / Test")   // Bookkeeping.
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )                         PORT_NAME("Settings")   // Game Rate & others.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )                               PORT_NAME("Settings")   // Game Rate & others.
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
@@ -2623,7 +2621,7 @@ static INPUT_PORTS_START( victor6a )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                            PORT_NAME("Stats / Test")   // Bookkeeping.
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )                         PORT_NAME("Settings")   // Game Rate & others.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )                               PORT_NAME("Settings")   // Game Rate & others.
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
@@ -2731,7 +2729,7 @@ static INPUT_PORTS_START( victor6b )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                            PORT_NAME("Stats / Test")   // Bookkeeping.
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )                         PORT_NAME("Settings")   // Game Rate & others.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )                               PORT_NAME("Settings")   // Game Rate & others.
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 
@@ -2847,7 +2845,7 @@ void subsino_state::victor21(machine_config &config)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -2889,7 +2887,7 @@ void subsino_state::crsbingo(machine_config &config)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -2930,7 +2928,7 @@ void subsino_state::srider(machine_config &config)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -2969,7 +2967,7 @@ void subsino_state::dinofmly(machine_config &config)
 
 	PALETTE(config.replace(), m_palette).set_entries(0x100);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &subsino_state::ramdac_map);
 }
 
@@ -2993,7 +2991,7 @@ void subsino_state::tisub(machine_config &config)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -3051,7 +3049,7 @@ void subsino_state::stbsub(machine_config &config)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -3064,7 +3062,7 @@ void subsino_state::stbsub(machine_config &config)
 	PALETTE(config, m_palette).set_entries(0x100);
 	//PALETTE(config, m_palette, FUNC(subsino_state::_3proms_palette), 0x100);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &subsino_state::ramdac_map);
 
 	MCFG_VIDEO_START_OVERRIDE(subsino_state,stbsub)
@@ -3962,7 +3960,8 @@ ROM_END
 void subsino_state::init_smoto16()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
-	rom[0x12d0] = 0x20; // "ERROR 951010"
+	// HACK: "ERROR 951010"
+	rom[0x12d0] = 0x20;
 }
 
 /***************************************************************************
@@ -4438,13 +4437,15 @@ void subsino_state::init_sharkpye()
 void subsino_state::init_smoto20()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
-	rom[0x12e1] = 0x20; // "ERROR 951010"
+	// HACK: "ERROR 951010"
+	rom[0x12e1] = 0x20;
 }
 
 void subsino_state::init_smoto13()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
-	rom[0x1308] = 0x20; // "ERROR 951010"
+	// HACK: "ERROR 951010"
+	rom[0x1308] = 0x20;
 }
 
 void subsino_state::init_tisub()
@@ -4475,9 +4476,10 @@ void subsino_state::init_stbsub()
 {
 #if 1
 	uint8_t *rom = memregion( "maincpu" )->base();
-	rom[0x1005] = 0x1d; //patch protection check
-	rom[0x7ab] = 0x18; //patch "winning protection" check
-	rom[0x957] = 0x18; //patch "losing protection" check
+	// HACK: patch protection checks
+	rom[0x1005] = 0x1d; // patch protection check
+	rom[0x07ab] = 0x18; // patch "winning protection" check
+	rom[0x0957] = 0x18; // patch "losing protection" check
 #endif
 
 	for (uint8_t reel = 0; reel < 3; reel++)
@@ -4490,11 +4492,14 @@ void subsino_state::init_stbsub()
 
 void subsino_state::init_stisub()
 {
+#if 1
 	uint8_t *rom = memregion( "maincpu" )->base();
+	// HACK: patch protection checks
 	rom[0xfa0] = 0x28;
 	rom[0xfa1] = 0x1d; //patch protection check
 	rom[0x7ed] = 0x18; //patch "winning protection" check
 	rom[0x9bb] = 0x18; //patch "losing protection" check
+#endif
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
@@ -4508,10 +4513,11 @@ void subsino_state::init_tesorone()
 {
 #if 1
 	uint8_t *rom = memregion( "maincpu" )->base();
-	rom[0x10a4] = 0x18; //patch protection check ("ERROR 08073"):
+	// HACK: patch protection checks
+	rom[0x10a4] = 0x18; // patch protection check ("ERROR 08073"):
 	rom[0x10a5] = 0x11;
-	rom[0x8b6] = 0x18; //patch "winning protection" check
-	rom[0xa84] = 0x18; //patch "losing protection" check
+	rom[0x08b6] = 0x18; // patch "winning protection" check
+	rom[0x0a84] = 0x18; // patch "losing protection" check
 #endif
 
 	for (uint8_t reel = 0; reel < 3; reel++)
@@ -4525,11 +4531,12 @@ void subsino_state::init_tesorone()
 void subsino_state::init_tesorone230()
 {
 #if 1
-	uint8_t *rom = memregion( "maincpu" )->base();            //check this patch!!!!
-	rom[0x10a8] = 0x18; //patch protection check ("ERROR 08073"):
+	uint8_t *rom = memregion( "maincpu" )->base();
+	// HACK: patch protection checks
+	rom[0x10a8] = 0x18; // patch protection check ("ERROR 08073"):
 	rom[0x10a9] = 0x11;
-	rom[0x8ba] = 0x18; //patch "winning protection" check
-	rom[0xa88] = 0x18; //patch "losing protection" check
+	rom[0x08ba] = 0x18; // patch "winning protection" check
+	rom[0x0a88] = 0x18; // patch "losing protection" check
 #endif
 
 	for (uint8_t reel = 0; reel < 3; reel++)
@@ -4544,10 +4551,11 @@ void subsino_state::init_grndprix()
 {
 #if 1
 	uint8_t *rom = memregion( "maincpu" )->base();
-	rom[0x1464] = 0x18; //patch protection check
+	// HACK: patch protection checks
+	rom[0x1464] = 0x18; // patch protection check
 	rom[0x1465] = 0x11;
-	rom[0x7ab] = 0x18; //patch "winning protection" check
-	rom[0x96f] = 0x18; //patch "losing protection" check
+	rom[0x07ab] = 0x18; // patch "winning protection" check
+	rom[0x096f] = 0x18; // patch "losing protection" check
 #endif
 
 	for (uint8_t reel = 0; reel < 3; reel++)
@@ -4571,13 +4579,15 @@ void subsino_state::init_mtrainnv()
 template <offs_t Offset>
 void subsino_state::init_trsocean()
 {
-
+#if 1
 	uint8_t *rom = memregion( "maincpu" )->base();
-	rom[Offset] = 0x00; //patch protection check ("ERROR 08073")
+	// HACK: patch protection check ("ERROR 08073")
+	rom[Offset] = 0x00;
 
 	//TODO:
 	//rom[0x7ab] = 0x18; //patch "winning protection" check
 	//rom[0x96f] = 0x18; //patch "losing protection" check
+#endif
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{

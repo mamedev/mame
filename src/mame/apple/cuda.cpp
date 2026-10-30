@@ -102,6 +102,7 @@ cuda_device::cuda_device(const machine_config &mconfig, device_type type, const 
 	: device_t(mconfig, type, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	macseconds_interface(),
+	write_poweroff(*this),
 	write_reset(*this),
 	write_nmi(*this),
 	write_linechange(*this),
@@ -114,18 +115,27 @@ cuda_device::cuda_device(const machine_config &mconfig, device_type type, const 
 	m_default_nvram(*this, "defaultnv"),
 	m_treq(0), m_byteack(0), m_tip(0), m_via_data(0), m_last_adb(0),
 	m_iic_sda(1), m_last_adb_time(0), m_cuda_controls_power(false), m_adb_in(false), m_adb_power(false),
-	m_reset_line(0), m_nmi_line(0), m_adb_dtime(0), m_pram_loaded(false)
+	m_reset_line(0), m_nmi_line(0), m_adb_dtime(0), m_pram_loaded(false),
+	m_zero_default_pram(false)
 {
 	std::fill(std::begin(m_disk_pram), std::end(m_disk_pram), 0);
 }
 
 void cuda_device::device_start()
 {
+	save_item(NAME(m_power_data));
+	save_item(NAME(m_power_direction));
+	save_item(NAME(m_power_request));
+	save_item(NAME(m_host_running));
 	save_item(NAME(m_treq));
 	save_item(NAME(m_byteack));
 	save_item(NAME(m_tip));
 	save_item(NAME(m_via_data));
 	save_item(NAME(m_adb_in));
+	save_item(NAME(m_adb_power));
+	save_item(NAME(m_last_adb));
+	save_item(NAME(m_last_adb_time));
+	save_item(NAME(m_iic_sda));
 	save_item(NAME(m_reset_line));
 	save_item(NAME(m_nmi_line));
 	save_item(NAME(m_adb_dtime));
@@ -142,8 +152,23 @@ void cuda_device::device_start()
 	});
 #endif
 
-	m_maincpu->space().install_write_tap(4, 4, 0, "cudapfw", [](offs_t offset, u8 &data, u8 mem_mask)
+	m_maincpu->space().install_write_tap(0, 0, 0, "cudapower", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
+		if (!machine().side_effects_disabled())
+		{
+			m_power_data = BIT(data, 0);
+			update_power_request();
+		}
+	});
+
+	m_maincpu->space().install_write_tap(4, 4, 0, "cudapfw", [this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+		{
+			m_power_direction = BIT(data, 0);
+			update_power_request();
+		}
+
 		// Intercept DDR write for port A to make PFW (bit 0) always an input.  The way the Cuda firmware is written
 		// would not work on a stock 68HC05E1, so it's likely the actual part was lightly customized in this manner.
 		data &= ~0x01;
@@ -153,7 +178,31 @@ void cuda_device::device_start()
 
 void cuda_device::device_reset()
 {
+	if (m_pram_loaded)
+	{
+		for (int byte = 0; byte < 256; byte++)
+		{
+			m_disk_pram[byte] = m_maincpu->read_internal_ram(0x70 + byte);
+		}
+		m_pram_loaded = false;
+	}
+
 	m_last_adb_time = m_maincpu->total_cycles();
+	m_power_data = false;
+	m_power_direction = false;
+	m_power_request = false;
+	m_host_running = false;
+}
+
+void cuda_device::update_power_request()
+{
+	// the firmware drives PFW low during its own startup, before it releases the host
+	const bool request = m_host_running && m_power_direction && !m_power_data;
+	if (request != m_power_request)
+	{
+		m_power_request = request;
+		write_poweroff(request);
+	}
 }
 
 void cuda_device::pa_w(u8 data)
@@ -203,33 +252,32 @@ void cuda_device::pc_w(u8 data)
 	if (BIT(data, 3) != m_reset_line)
 	{
 		LOGMASKED(LOG_HOSTCOMM, "680x0 reset: %d -> %d (PC=%x)\n", m_reset_line, BIT(data, 3), m_maincpu->pc());
-		// falling edge, should reset the machine too
-		if (!m_reset_line && BIT(data, 3))
+		m_reset_line = BIT(data, 3);
+
+		// The firmware pulses this line high to reset the system, both at power-on and for the
+		// RESET_SYSTEM command, so track the level rather than latching the first rising edge.
+		write_reset(m_reset_line ? ASSERT_LINE : CLEAR_LINE);
+		m_host_running = !m_reset_line;
+
+		// if PRAM's waiting to be loaded, transfer it now
+		if (m_reset_line && !m_pram_loaded)
 		{
-			write_reset(ASSERT_LINE);
-			write_reset(CLEAR_LINE);
-			m_reset_line = BIT(data, 3);
-
-			// if PRAM's waiting to be loaded, transfer it now
-			if (!m_pram_loaded)
+			for (int byte = 0; byte < 256; byte++)
 			{
-				for (int byte = 0; byte < 256; byte++)
-				{
-					m_maincpu->write_internal_ram(0x70 + byte, m_disk_pram[byte]);
-				}
-
-				system_time systime;
-				machine().current_datetime(systime);
-				u32 seconds = get_local_seconds(systime);
-
-				m_maincpu->write_internal_ram(0xae - 0x90, seconds & 0xff);
-				m_maincpu->write_internal_ram(0xad - 0x90, (seconds >> 8) & 0xff);
-				m_maincpu->write_internal_ram(0xac - 0x90, (seconds >> 16) & 0xff);
-				m_maincpu->write_internal_ram(0xab - 0x90, (seconds >> 24) & 0xff);
-
-				LOGMASKED(LOG_PRAM, "Syncing PRAM to saved/default and RTC to current date/time %08x\n", seconds);
-				m_pram_loaded = true;
+				m_maincpu->write_internal_ram(0x70 + byte, m_disk_pram[byte]);
 			}
+
+			system_time systime;
+			machine().current_datetime(systime);
+			u32 seconds = get_local_seconds(systime);
+
+			m_maincpu->write_internal_ram(0xae - 0x90, seconds & 0xff);
+			m_maincpu->write_internal_ram(0xad - 0x90, (seconds >> 8) & 0xff);
+			m_maincpu->write_internal_ram(0xac - 0x90, (seconds >> 16) & 0xff);
+			m_maincpu->write_internal_ram(0xab - 0x90, (seconds >> 24) & 0xff);
+
+			LOGMASKED(LOG_PRAM, "Syncing PRAM to saved/default and RTC to current date/time %08x\n", seconds);
+			m_pram_loaded = true;
 		}
 	}
 
@@ -293,8 +341,16 @@ u8 cuda_device::pc_r()
 // once Cuda starts the host processor.
 void cuda_device::nvram_default()
 {
-	LOGMASKED(LOG_PRAM, "Using default PRAM\n");
-	memcpy(m_disk_pram, m_default_nvram, 256);
+	if (m_zero_default_pram)
+	{
+		LOGMASKED(LOG_PRAM, "Using zeroed PRAM\n");
+		memset(m_disk_pram, 0, 256);
+	}
+	else
+	{
+		LOGMASKED(LOG_PRAM, "Using default PRAM\n");
+		memcpy(m_disk_pram, m_default_nvram, 256);
+	}
 	m_pram_loaded = false;
 }
 

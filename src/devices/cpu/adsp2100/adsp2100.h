@@ -210,7 +210,7 @@ protected:
 	};
 
 	// construction/destruction
-	adsp21xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype);
+	adsp21xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype, address_map_constructor internal_data = address_map_constructor());
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -294,6 +294,10 @@ protected:
 	virtual bool generate_irq(int which, int indx = 0) = 0;
 	virtual void check_irqs() = 0;
 
+	// on-chip peripheral hooks
+	virtual void timer_enable_changed(bool state);
+	virtual void sport_tx_written(int port, uint16_t data);
+
 	// internal state
 	static const int PC_STACK_DEPTH     = 16;
 	static const int CNTR_STACK_DEPTH   = 4;
@@ -359,62 +363,62 @@ protected:
 	// configuration
 	const address_space_config      m_program_config;
 	const address_space_config      m_data_config;
-	uint32_t                          m_chip_type;
+	uint32_t                        m_chip_type;
 
 	// other CPU registers
-	uint32_t              m_pc;
-	uint32_t              m_ppc;
-	uint32_t              m_loop;
-	uint32_t              m_loop_condition;
-	uint32_t              m_cntr;
+	uint32_t            m_pc;
+	uint32_t            m_ppc;
+	uint32_t            m_loop;
+	uint32_t            m_loop_condition;
+	uint32_t            m_cntr;
 
 	// status registers
-	uint32_t              m_astat;
-	uint32_t              m_sstat;
-	uint32_t              m_mstat;
-	uint32_t              m_mstat_prev;
-	uint32_t              m_astat_clear;
-	uint32_t              m_idle;
+	uint32_t            m_astat;
+	uint32_t            m_sstat;
+	uint32_t            m_mstat;
+	uint32_t            m_mstat_prev;
+	uint32_t            m_astat_clear;
+	uint32_t            m_idle;
 
 	// live set of core registers
 	adsp_core           m_core;
 
 	// memory addressing registers
-	uint32_t              m_i[8];
-	int32_t               m_m[8];
-	uint32_t              m_l[8];
-	uint32_t              m_lmask[8];
-	uint32_t              m_base[8];
-	uint8_t               m_px;
-	uint32_t              m_pmovlay; // External Program Space overlay
-	uint32_t              m_dmovlay; // External Data Space overlay
+	uint32_t            m_i[8];
+	int32_t             m_m[8];
+	uint32_t            m_l[8];
+	uint32_t            m_lmask[8];
+	uint32_t            m_base[8];
+	uint8_t             m_px;
+	uint32_t            m_pmovlay; // External Program Space overlay
+	uint32_t            m_dmovlay; // External Data Space overlay
 
 	// stacks
-	uint32_t              m_loop_stack[LOOP_STACK_DEPTH];
-	uint32_t              m_cntr_stack[CNTR_STACK_DEPTH];
-	uint32_t              m_pc_stack[PC_STACK_DEPTH];
-	uint16_t              m_stat_stack[STAT_STACK_DEPTH][3];
-	int32_t               m_pc_sp;
-	int32_t               m_cntr_sp;
-	int32_t               m_stat_sp;
-	int32_t               m_loop_sp;
+	uint32_t            m_loop_stack[LOOP_STACK_DEPTH];
+	uint32_t            m_cntr_stack[CNTR_STACK_DEPTH];
+	uint32_t            m_pc_stack[PC_STACK_DEPTH];
+	uint16_t            m_stat_stack[STAT_STACK_DEPTH][3];
+	int32_t             m_pc_sp;
+	int32_t             m_cntr_sp;
+	int32_t             m_stat_sp;
+	int32_t             m_loop_sp;
 
 	// external I/O
-	uint8_t               m_flagout;
-	uint8_t               m_flagin;
-	uint8_t               m_fl0;
-	uint8_t               m_fl1;
-	uint8_t               m_fl2;
-	uint16_t              m_idma_addr;
-	uint16_t              m_idma_cache;
-	uint8_t               m_idma_offs;
+	uint8_t             m_flagout;
+	uint8_t             m_flagin;
+	uint8_t             m_fl0;
+	uint8_t             m_fl1;
+	uint8_t             m_fl2;
+	uint16_t            m_idma_addr;
+	uint16_t            m_idma_cache;
+	uint8_t             m_idma_offs;
 
 	// interrupt handling
-	uint16_t              m_imask;
-	uint8_t               m_icntl;
-	uint16_t              m_ifc;
-	uint8_t               m_irq_state[10];
-	uint8_t               m_irq_latch[10];
+	uint16_t            m_imask;
+	uint8_t             m_icntl;
+	uint16_t            m_ifc;
+	uint8_t             m_irq_state[10];
+	uint8_t             m_irq_latch[10];
 
 	// other internal states
 	int                 m_icount;
@@ -422,9 +426,9 @@ protected:
 	int                 m_imask_mask;
 
 	// register maps
-	int16_t *             m_read0_ptr[16];
-	uint32_t *            m_read1_ptr[16];
-	uint32_t *            m_read2_ptr[16];
+	int16_t *           m_read0_ptr[16];
+	uint32_t *          m_read1_ptr[16];
+	uint32_t *          m_read2_ptr[16];
 	void *              m_alu_xregs[8];
 	void *              m_alu_yregs[4];
 	void *              m_mac_xregs[8];
@@ -445,10 +449,10 @@ protected:
 	uint16_t              m_mask_table[0x4000];
 	uint16_t              m_reverse_table[0x4000];
 
-	devcb_read32            m_sport_rx_cb;    // callback for serial receive
-	devcb_write32           m_sport_tx_cb;    // callback for serial transmit
-	devcb_write_line        m_timer_fired_cb; // callback for timer fired
-	devcb_write32           m_dmovlay_cb;     // callback for DMOVLAY instruction
+	devcb_read32          m_sport_rx_cb;    // callback for serial receive
+	devcb_write32         m_sport_tx_cb;    // callback for serial transmit
+	devcb_write_line      m_timer_fired_cb; // callback for timer fired
+	devcb_write32         m_dmovlay_cb;     // callback for DMOVLAY instruction
 
 	// debugging
 #if ADSP_TRACK_HOTSPOTS
@@ -513,23 +517,93 @@ public:
 	// construction/destruction
 	adsp2181_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// the control registers at DM 0x3fe0-0x3fff, BDMA (including the reset boot), timer and SPORT transmit;
+	// boards that still emulate these themselves leave this off
+	void set_internal_peripherals(bool enable) { m_internal_peripherals = enable; }
+	auto bdma_read() { return m_bdma_read_cb.bind(); }
+	auto bdma_write() { return m_bdma_write_cb.bind(); }
+	auto pf_in() { return m_pf_in_cb.bind(); }
+	auto pf_out() { return m_pf_out_cb.bind(); }
+	template <int N> auto sport_tfs() { return m_sport_tfs_cb[N].bind(); }
+	template <int N> auto sport_dt() { return m_sport_dt_cb[N].bind(); }
+
+	// public interfaces
+	void idma_addr_w(uint16_t data);
+	uint16_t idma_addr_r();
+	void idma_data_w(uint16_t data);
+	uint16_t idma_data_r();
+
 protected:
-	// device_memory_interface overrides
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// device_execute_interface implementation
+	virtual void execute_run() override;
+
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
 	// interrupts
 	virtual bool generate_irq(int which, int indx) override;
 	virtual void check_irqs() override;
 
+	// on-chip peripheral hooks
+	virtual void timer_enable_changed(bool state) override;
+	virtual void sport_tx_written(int port, uint16_t data) override;
+
+private:
+	// control register offsets from DM 0x3fe0
+	enum : uint32_t
+	{
+		IDMA_CONTROL = 0x00, BDMA_INT = 0x01, BDMA_EXT = 0x02, BDMA_CONTROL = 0x03, BDMA_COUNT = 0x04,
+		PF_DATA = 0x05, PF_CONTROL = 0x06,
+		SPORT1_AUTOBUF = 0x0f, SPORT1_RFSDIV = 0x10, SPORT1_CLKDIV = 0x11, SPORT1_CONTROL = 0x12,
+		SPORT0_AUTOBUF = 0x13, SPORT0_RFSDIV = 0x14, SPORT0_CLKDIV = 0x15, SPORT0_CONTROL = 0x16,
+		TIMER_SCALE = 0x1b, TIMER_COUNT = 0x1c, TIMER_PERIOD = 0x1d,
+		WAIT_CONTROL = 0x1e, SYSTEM_CONTROL = 0x1f
+	};
+
+	void internal_data_map(address_map &map) ATTR_COLD;
+	uint16_t control_r(offs_t offset);
+	void control_w(offs_t offset, uint16_t data);
+
+	void bdma_start();
+	void bdma_context_reset();
+	TIMER_CALLBACK_MEMBER(bdma_tick);
+	uint16_t timer_count() const;
+	void timer_update();
+	TIMER_CALLBACK_MEMBER(timer_tick);
+	void update_pf_out();
+	bool sport_enabled(int port) const;
+	void sport_start(int port);
+	TIMER_CALLBACK_MEMBER(sport_tick);
+
 	// address spaces
 	const address_space_config      m_io_config;
 
-public:
-	// public interfaces
-	void idma_addr_w(uint16_t data);
-	uint16_t idma_addr_r();
-	void idma_data_w(uint16_t data);
-	uint16_t idma_data_r();
+	// on-chip peripherals
+	devcb_read8                     m_bdma_read_cb;
+	devcb_write8                    m_bdma_write_cb;
+	devcb_read8                     m_pf_in_cb;
+	devcb_write8                    m_pf_out_cb;
+	devcb_write_line::array<2>      m_sport_tfs_cb;
+	devcb_write16::array<2>         m_sport_dt_cb;
+
+	bool                            m_internal_peripherals;
+	uint16_t                        m_control[32];
+	emu_timer *                     m_bdma_timer;
+	emu_timer *                     m_timer;
+	emu_timer *                     m_sport_timer[2];
+	bool                            m_bdma_hold;
+	bool                            m_timer_enabled;
+	uint8_t                         m_pf_out;
+	uint8_t                         m_pf_out_mask;
+	uint16_t                        m_sport_tx[2];
+	bool                            m_sport_tx_full[2];
+	uint16_t                        m_sport_shift[2];
+	bool                            m_sport_busy[2];
+	uint32_t                        m_sport_tail[2];
 };
 
 

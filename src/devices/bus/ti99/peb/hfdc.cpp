@@ -1052,7 +1052,7 @@ ROM_END
 
 void myarc_hfdc_device::device_add_mconfig(machine_config& config)
 {
-	HDC9234(config, m_hdc9234, 0);
+	HDC9234(config, m_hdc9234);
 	m_hdc9234->intrq_cb().set(FUNC(myarc_hfdc_device::intrq_w));
 	m_hdc9234->dmarq_cb().set(FUNC(myarc_hfdc_device::dmarq_w));
 	m_hdc9234->dip_cb().set(FUNC(myarc_hfdc_device::dip_w));
@@ -1061,17 +1061,17 @@ void myarc_hfdc_device::device_add_mconfig(machine_config& config)
 	m_hdc9234->dmaout_cb().set(FUNC(myarc_hfdc_device::write_buffer));
 
 	// First two floppy drives shall be connected by default
-	FLOPPY_CONNECTOR(config, m_floppy[0], hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[1], hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[2], hfdc_floppies, nullptr, myarc_hfdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[3], hfdc_floppies, nullptr, myarc_hfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats).enable_sound("ti99_peb_dsk1");
+	FLOPPY_CONNECTOR(config, m_floppy[1], hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats).enable_sound("ti99_peb_dsk2");
+	FLOPPY_CONNECTOR(config, m_floppy[2], hfdc_floppies, nullptr, myarc_hfdc_device::floppy_formats).enable_sound("ti99_peb_dsk3");
+	FLOPPY_CONNECTOR(config, m_floppy[3], hfdc_floppies, nullptr, myarc_hfdc_device::floppy_formats).enable_sound("ti99_peb_dsk4");
 
 	// Hard disks don't go without image (other than floppy drives)
 	MFM_HD_CONNECTOR(config, m_harddisk[0], hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
 	MFM_HD_CONNECTOR(config, m_harddisk[1], hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
 	MFM_HD_CONNECTOR(config, m_harddisk[2], hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
 
-	MM58274C(config, CLOCK_TAG, 0).set_mode_and_day(1, 0); // 24h, sunday
+	MM58274C(config, CLOCK_TAG).set_mode_and_day(1, 0); // 24h, sunday
 
 	RAM(config, BUFFER).set_default_size("32K").set_default_value(0);
 }

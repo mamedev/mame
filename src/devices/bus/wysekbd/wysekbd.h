@@ -30,10 +30,7 @@ public:
 	wyse_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: wyse_keyboard_port_device(mconfig, tag, owner, 0U)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 
 	// line handlers
@@ -41,7 +38,7 @@ public:
 	int data_r();
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_config_complete() override;
 	virtual void device_start() override ATTR_COLD;
 
@@ -65,7 +62,7 @@ protected:
 	virtual void wysekbd_write_cmd(bool state) = 0;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(WYSE_KEYBOARD, wyse_keyboard_port_device)
 
 // standard options

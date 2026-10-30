@@ -18,7 +18,7 @@ fatfury2_prot_device::fatfury2_prot_device(const machine_config &mconfig, const 
 
 void fatfury2_prot_device::device_add_mconfig(machine_config &config)
 {
-	ALPHA_8921(config, m_pro_ct0, 0); // PRO-CT0 or SNK-9201
+	ALPHA_8921(config, m_pro_ct0); // PRO-CT0 or SNK-9201
 }
 
 void fatfury2_prot_device::device_start()

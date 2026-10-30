@@ -29,7 +29,7 @@ class victor_9000_fdc_device :  public device_t
 {
 public:
 	// construction/destruction
-	victor_9000_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	victor_9000_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto irq_wr_callback() { return m_irq_cb.bind(); }
 	auto syn_wr_callback() { return m_syn_cb.bind(); }
@@ -164,7 +164,7 @@ private:
 	floppy_image_device* get_floppy();
 	void live_start();
 	void pll_reset(const attotime &when);
-	void pll_start_writing(const attotime &tm);
+	void pll_start_writing(const attotime &tm, floppy_image_device *floppy);
 	void pll_commit(floppy_image_device *floppy, const attotime &tm);
 	void pll_stop_writing(floppy_image_device *floppy, const attotime &tm);
 	int pll_get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit);

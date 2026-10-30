@@ -22,7 +22,7 @@ class dynax_blitter_rev2_device : public device_t, public device_rom_interface<2
 {
 public:
 	// construction/destruction
-	dynax_blitter_rev2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	dynax_blitter_rev2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// static configuration
 	auto vram_out_cb() { return m_vram_out_cb.bind(); }
@@ -57,12 +57,12 @@ protected:
 	devcb_write_line m_ready_cb;
 
 	// internal registers
-	u8 m_blit_pen = 0;
-	u8 m_blit_wrap_enable = 0;
-	u8 m_blit_x = 0;
-	u8 m_blit_y = 0;
-	u8 m_blit_flags = 0;
-	u32 m_blit_src = 0;
+	u8 m_blit_pen;
+	u8 m_blit_wrap_enable;
+	u8 m_blit_x;
+	u8 m_blit_y;
+	u8 m_blit_flags;
+	u32 m_blit_src;
 };
 
 // ======================> cdracula_blitter_device
@@ -71,7 +71,7 @@ class cdracula_blitter_device : public dynax_blitter_rev2_device
 {
 public:
 	// construction/destruction
-	cdracula_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cdracula_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto blit_dest_cb() { return m_blit_dest_cb.bind(); }
 

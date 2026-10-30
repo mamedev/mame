@@ -12,6 +12,7 @@
 
 // MAME headers
 #include "emu.h"
+#include "input.h"
 
 #include "input_windows.h"
 

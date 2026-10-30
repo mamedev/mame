@@ -48,6 +48,7 @@
 #include "bus/heathzenith/h89/cdr_fdc_880h.h"
 #include "bus/heathzenith/h89/h_88_3.h"
 #include "bus/heathzenith/h89/h_88_5.h"
+#include "bus/heathzenith/h89/h17_fdc.h"
 #include "bus/heathzenith/h89/mms77316_fdc.h"
 #include "bus/heathzenith/h89/sigmasoft_parallel_port.h"
 #include "bus/heathzenith/h89/sigmasoft_sound.h"
@@ -973,6 +974,7 @@ void h89_base_state::h89_right_cards_mms(device_slot_interface &device)
 
 void h89_base_state::h89_right_p506_cards(device_slot_interface &device)
 {
+	device.option_add("h17fdc",    H89BUS_H_17_FDC);
 	device.option_add("h_88_3",    H89BUS_H_88_3);
 	device.option_add("ha_88_3",   H89BUS_HA_88_3);
 	device.option_add("ss_snd",    H89BUS_SIGMASOFT_SND);
@@ -1018,7 +1020,7 @@ void h89_base_state::h89_base(machine_config &config)
 
 	m_tlbc->reset_cb().set(FUNC(h89_base_state::reset_line));
 
-	H89BUS(config, m_h89bus, 0);
+	H89BUS(config, m_h89bus);
 	m_h89bus->set_program_space(m_maincpu, AS_PROGRAM);
 	m_h89bus->set_io_space(m_maincpu, AS_IO);
 	m_h89bus->out_int3_callback().set(FUNC(h89_base_state::slot_irq<3>));
@@ -1034,7 +1036,7 @@ void h89_base_state::h89_base(machine_config &config)
 	H89BUS_RIGHT_SLOT(config, "p506", "h89bus", [this](device_slot_interface &device) { h89_right_p506_cards(device); }, "we_pullup").set_p506_signalling(true);
 
 	// H89 interrupt interval is 2mSec
-	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(h89_base_state::h89_irq_timer), attotime::from_msec(2));
+	TIMER(config, "irq_timer").configure_periodic(FUNC(h89_base_state::h89_irq_timer), attotime::from_msec(2));
 }
 
 void h88_state::h88(machine_config &config)
@@ -1114,6 +1116,10 @@ void h89_mms_state::h89_mms(machine_config &config)
 		ROM_SYSTEM_BIOS(x, "mtrhex_4k", "Ultimeth 4k ROM") \
 		ROMX_LOAD("2732_mtrhex_4k.u518",      0x0000, 0x1000, CRC(e26b29a9) SHA1(ba13d6c9deef682a9a8262bc910d46b577929a13), ROM_BIOS(x))
 
+#define ROM_ETS_4K(x) \
+		ROM_SYSTEM_BIOS(x, "ets_4k", "Extended Technology Systems (ETS) 4k ROM based on Ultimeth") \
+		ROMX_LOAD("2732_ets_4k.u518",         0x0000, 0x1000, CRC(ed8bdbe9) SHA1(3b0d0e337dfe4c2b622ec0afc8511b2e5f2f9779), ROM_BIOS(x))
+
 #define ROM_MTR90_444_84(x) \
 		ROM_SYSTEM_BIOS(x, "mtr90-84", "Zenith Data Systems MTR-90 (444-84 - Superseded by 444-142)") \
 		ROMX_LOAD("2732_444-84_mtr90.u518",   0x0000, 0x1000, CRC(f10fca03) SHA1(c4a978153af0f2dfcc9ba05be4c1033d33fee30b), ROM_BIOS(x))
@@ -1181,6 +1187,8 @@ ROM_START( h89 )
 	ROM_CDR_8390(10)
 
 	ROM_CDR_80B2(11)
+
+	ROM_ETS_4K(12)
 ROM_END
 
 ROM_START( h89_cdr )
@@ -1196,6 +1204,8 @@ ROM_START( h89_cdr )
 	ROM_KMR_100(2)
 
 	ROM_ULTIMETH_4K(3)
+
+	ROM_ETS_4K(4)
 ROM_END
 
 ROM_START( h89_mms )
@@ -1213,6 +1223,8 @@ ROM_START( h89_mms )
 	ROM_MMS_444_84A(3)
 
 	ROM_ULTIMETH_2K(4)
+
+	ROM_ETS_4K(5)
 ROM_END
 
 ROM_START( z90 )
@@ -1240,6 +1252,8 @@ ROM_START( z90 )
 	ROM_CDR_8390(8)
 
 	ROM_CDR_80B2(9)
+
+	ROM_ETS_4K(10)
 ROM_END
 
 } // anonymous namespace

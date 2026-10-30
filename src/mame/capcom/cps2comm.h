@@ -11,7 +11,8 @@
 class cps2_comm_device : public device_t
 {
 public:
-	cps2_comm_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	cps2_comm_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	~cps2_comm_device();
 
 	u16 usart_data_r(offs_t offset, u16 mem_mask);
 	u16 usart_status_r(offs_t offset, u16 mem_mask);
@@ -22,6 +23,12 @@ public:
 	bool comm_enabled() const { return bool(m_context); }
 
 protected:
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+private:
 	enum
 	{
 		CTRL_MODE,
@@ -31,11 +38,6 @@ protected:
 	};
 
 	class context;
-
-	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_stop() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 	void start_comm() ATTR_COLD;
 

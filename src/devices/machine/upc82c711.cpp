@@ -156,7 +156,7 @@ u16 upc82c711_device::io_r(offs_t offset, u16 mem_mask)
 			data = m_fdc->fifo_r();
 			break;
 		case 7:
-			data = m_fdc->dir_r() | (m_ide->cs1_r(7) & 0x7f);
+			data = dir_r() | (m_ide->cs1_r(7) & 0x7f);
 			break;
 		}
 		LOGMASKED(LOG_FDC, "FDC read %04x -> %02x\n", offset, data);
@@ -295,6 +295,16 @@ void upc82c711_device::tc_w(bool state)
 	m_fdc->tc_w(state);
 }
 
+
+u8 upc82c711_device::dir_r()
+{
+	int const fid = dor & 3;
+
+	if (!BIT(dor, 4 + fid) || !floppy[fid])
+		return 0x00;
+
+	return floppy[fid]->dskchg_r() ? 0x00 : 0x80;
+}
 
 void upc82c711_device::dor_w(uint8_t data)
 {

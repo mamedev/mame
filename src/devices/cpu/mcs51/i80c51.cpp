@@ -52,9 +52,10 @@ u8 i80c51_device::slave_mask_r()
 
 bool i80c51_device::manage_idle_on_interrupt(u8 ints)
 {
-	/* any interrupt terminates idle mode */
+	// any interrupt terminates idle mode
 	set_idl(0);
-	/* external interrupt wakes up */
+
+	// external interrupt wakes up
 	if (ints & (BIT(m_tcon, TCON_IE0) | BIT(m_tcon, TCON_IE1)))
 		set_pd(0);
 	return BIT(m_pcon, PCON_PD);

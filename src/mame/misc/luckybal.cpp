@@ -343,8 +343,6 @@ private:
 
 void luckybal_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_csio_in));
 	save_item(NAME(m_csio_out));
 	save_item(NAME(m_csio_txs));
@@ -619,11 +617,11 @@ void luckybal_state::luckybal(machine_config &config)
 	m_ppi->in_pc_callback().set(FUNC(luckybal_state::input_port_c_r));
 	m_ppi->out_pc_callback().set(FUNC(luckybal_state::output_port_c_w));
 
-	CD4099(config, "latch1", 0);
+	CD4099(config, "latch1");
 
-	CD4099(config, "latch2", 0);
+	CD4099(config, "latch2");
 
-	CD4099(config, "latch3", 0);
+	CD4099(config, "latch3");
 
 	// nvram
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -633,7 +631,7 @@ void luckybal_state::luckybal(machine_config &config)
 	v9938.set_screen_ntsc("screen");
 	v9938.set_vram_size(VDP_MEM);
 	v9938.int_cb().set_inputline("maincpu", 0);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();

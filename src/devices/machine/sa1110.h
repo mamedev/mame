@@ -18,7 +18,10 @@
 
 #include "diserial.h"
 
-class sa1110_periphs_device : public device_t, public device_serial_interface
+class sa1110_periphs_device : public device_t,
+	public device_serial_interface,
+	public device_palette_interface,
+	public device_video_interface
 {
 public:
 	template <typename T>
@@ -31,14 +34,10 @@ public:
 	sa1110_periphs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	template <typename T> void set_codec_tag(T &&tag) { m_codec.set_tag(std::forward<T>(tag)); }
-
-	// device_serial overrides
-	virtual void rcv_complete() override;    // Rx completed receiving byte
-	virtual void tra_complete() override;    // Tx completed sending byte
-	virtual void tra_callback() override;    // Tx send bit
-
 	template <unsigned Line> void gpio_in(int state) { gpio_in(Line, state); }
 	template <unsigned Line> auto gpio_out() { return m_gpio_out[Line].bind(); }
+
+	void set_screen_origin(u16 x_offset, u16 y_offset) { m_lcd_x_offset = x_offset; m_lcd_y_offset = y_offset; }
 
 	void ssp_in(u16 data) { ssp_rx_fifo_push(data); }
 	auto ssp_out() { return m_ssp_out.bind(); }
@@ -47,11 +46,22 @@ public:
 
 	void map(address_map &map) ATTR_COLD;
 
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+	// device_serial_interface overrides
+	virtual void rcv_complete() override;    // Rx completed receiving byte
+	virtual void tra_complete() override;    // Tx completed sending byte
+	virtual void tra_callback() override;    // Tx send bit
+
+	// device_palette_interface overrides
+	virtual u32 palette_entries() const noexcept override { return 256; }
+
+private:
 	static constexpr u32 INTERNAL_OSC = 3686400;
 
 	TIMER_CALLBACK_MEMBER(icp_rx_callback);
@@ -315,6 +325,15 @@ protected:
 	template <int Channel> void dma_dbsb_w(offs_t offset, u32 data, u32 mem_mask);
 	template <int Channel> u32 dma_dbtb_r(offs_t offset, u32 mem_mask);
 	template <int Channel> void dma_dbtb_w(offs_t offset, u32 data, u32 mem_mask);
+
+	template <int Register> u32 lcd_lccr_r(offs_t offset, u32 mem_mask);
+	template <int Register> void lcd_lccr_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 lcd_lcsr_r(offs_t offset, u32 mem_mask);
+	void lcd_lcsr_w(offs_t offset, u32 data, u32 mem_mask);
+	template <int Channel> u32 lcd_dbar_r(offs_t offset, u32 mem_mask);
+	template <int Channel> void lcd_dbar_w(offs_t offset, u32 data, u32 mem_mask);
+	template <int Channel> u32 lcd_dcar_r(offs_t offset, u32 mem_mask);
+	template <int Channel> void lcd_dcar_w(offs_t offset, u32 data, u32 mem_mask);
 
 	// register offsets
 	enum
@@ -878,6 +897,14 @@ protected:
 		u32 dbt[2];
 	};
 
+	struct lcd_regs
+	{
+		u32 lccr[4];
+		u32 lcsr;
+		u32 dbar[2];
+		u32 dcar[2];
+	};
+
 	udc_regs        m_udc_regs;
 	uart_regs       m_uart_regs;
 	icp_regs        m_icp_regs;
@@ -891,9 +918,13 @@ protected:
 	intc_regs       m_intc_regs;
 	ppc_regs        m_ppc_regs;
 	dma_regs        m_dma_regs[6];
+	lcd_regs        m_lcd_regs;
 	u8              m_dma_active_mask;
 
-	required_device<sa1110_cpu_device> m_maincpu;
+	u16 m_lcd_x_offset = 0;
+	u16 m_lcd_y_offset = 0;
+
+	required_device<arm7_cpu_device> m_maincpu;
 	required_device<input_merger_device> m_uart3_irqs;
 	required_device<input_merger_device> m_mcp_irqs;
 	optional_device<ucb1200_device> m_codec;

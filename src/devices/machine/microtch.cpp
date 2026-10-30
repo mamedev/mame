@@ -34,9 +34,9 @@ _________________________________________________________________
 
 JP1 = ADDRESS / INTERRUPT (A1, A2, A3, A4, A5, A6, I2, I3, I4, I5, I10, I11, I12, I15)
 JP2 = TEST (T1, T2, T3, T4, T5, T6)
-Y1 = XTAL R11APB18
+Y1 = XTAL R11APB18 maked A11.059 on some boards
 U3 = MicroTouch Excalibur
-U4 = 80C32
+U4 = 80C32 (SAB80C32, P80C32EBAA, etc.)
 U11 = 93C46S Serial EEPROM
 P1 = RS-232
 
@@ -56,6 +56,8 @@ COM8 3F0-3F7 ON  : ON  :  : ON
 
 #include "emu.h"
 #include "microtch.h"
+
+#include "cpu/mcs51/i8052.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -387,7 +389,7 @@ INPUT_CHANGED_MEMBER(microtouch_device::touch)
 
 // BIOS not hooked up
 ROM_START(microtouch)
-	ROM_REGION(0x10000, "bios", 0)
+	ROM_REGION(0x10000, "u1", 0)
 	ROM_SYSTEM_BIOS(0, "microtouch_5_6", "MicroTouch Rev.5.6") // "Excalibur", ISA card
 	ROMX_LOAD("microtouch_5604010_rev_5.6.u1", 0x0000, 0x10000, CRC(d19ee080) SHA1(c695405ec8c2ac4408a63bacfc68a5a4b878928c), ROM_BIOS(0)) // 27c512
 	ROM_SYSTEM_BIOS(1, "microtouch_5_5", "MicroTouch Rev.5.5") // "Kahuna", daughterboard integrated on monitor
@@ -408,6 +410,18 @@ INPUT_PORTS_END
 ioport_constructor microtouch_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(microtouch);
+}
+
+void microtouch_device::device_add_mconfig(machine_config &config)
+{
+	auto &mcu(I8032(config, "u4", 11.0592_MHz_XTAL)); // REV5.6 card has a crystal marked A11.059 - assume it's the common type
+	mcu.set_addrmap(AS_PROGRAM, &microtouch_device::u4_program);
+	mcu.set_disable();
+}
+
+void microtouch_device::u4_program(address_map &map)
+{
+	map(0x0000, 0xffff).rom().region("u1", 0);
 }
 
 void microtouch_device::tra_callback()

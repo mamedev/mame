@@ -82,6 +82,7 @@
 #include "bus/ti99/peb/peribox.h"
 #include "bus/ti99/sidecar/arcturus.h"
 #include "bus/ti99/sidecar/speechsyn.h"
+#include "bus/ti99/sidecar/thermal.h"
 
 DEFINE_DEVICE_TYPE(TI99_IOPORT, bus::ti99::internal::ioport_device, "ti99_ioport", "TI-99 I/O Port")
 
@@ -186,6 +187,7 @@ void ti99_ioport_options_plain(device_slot_interface &device)
 	device.option_add("splitter", TI99_IOSPLIT);
 	device.option_add("arcturus", TI99_ARCTURUS);
 	device.option_add("speechsyn", TI99_SPEECHSYN);
+	device.option_add("thermal", TI99_THERMAL);
 }
 
 void ti99_ioport_options_evpc(device_slot_interface &device)
@@ -194,6 +196,7 @@ void ti99_ioport_options_evpc(device_slot_interface &device)
 	device.option_add("splitter", TI99_IOSPLIT);
 	device.option_add("arcturus", TI99_ARCTURUS);
 	device.option_add("speechsyn", TI99_SPEECHSYN);
+	device.option_add("thermal", TI99_THERMAL);
 }
 
 // Used for the splitter (to avoid getting multiple EVPCs in the system)

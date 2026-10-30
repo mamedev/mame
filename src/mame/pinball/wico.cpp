@@ -58,7 +58,11 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void wico(machine_config &config);
+	void wico(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 lampst_r();
@@ -84,8 +88,6 @@ private:
 	bool m_diag_on = false;
 	u8 m_firqtimer = 0U;
 	u8 m_diag_segments = 0U;
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_ccpu;
 	required_device<cpu_device> m_hcpu;
 	required_shared_ptr<u8> m_shared_ram;
@@ -459,9 +461,6 @@ void wico_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_zcen));
 	save_item(NAME(m_gten));
 	save_item(NAME(m_disp_on));
@@ -473,6 +472,7 @@ void wico_state::machine_start()
 void wico_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 

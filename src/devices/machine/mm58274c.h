@@ -12,7 +12,7 @@
 class mm58274c_device : public device_t, public device_rtc_interface
 {
 public:
-	mm58274c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mm58274c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_mode24(int mode) { m_mode24 = mode; }
 	void set_day1(int day) { m_day1 = day; }

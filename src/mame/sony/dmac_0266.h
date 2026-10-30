@@ -9,7 +9,7 @@
 class dmac_0266_device : public device_t
 {
 public:
-	dmac_0266_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	dmac_0266_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	// configuration
 	template <typename T> void set_bus(T &&tag, int spacenum) { m_bus.set_tag(std::forward<T>(tag), spacenum); }
@@ -35,7 +35,9 @@ protected:
 	void control_w(u32 data);
 	void tcount_w(u32 data) { m_tcount = data; }
 	void tag_w(u32 data)    { m_tag = data; }
+	u32 offset_r() { return m_offset; }
 	void offset_w(u32 data) { m_offset = data; }
+	u32 entry_r() { return m_map[m_tag & 0x7f]; }
 	void entry_w(u32 data)  { m_map[m_tag & 0x7f] = data & 0x7fff; }
 
 	// dma logic

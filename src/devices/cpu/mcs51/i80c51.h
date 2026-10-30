@@ -4,6 +4,8 @@
 #ifndef MAME_CPU_MCS51_I80C51_H
 #define MAME_CPU_MCS51_I80C51_H
 
+#pragma once
+
 #include "i8051.h"
 
 // cmos variants

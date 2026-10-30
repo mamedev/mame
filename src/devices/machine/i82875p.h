@@ -97,7 +97,7 @@ private:
 
 class i82875p_agp_device : public agp_bridge_device {
 public:
-	i82875p_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82875p_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_start() override ATTR_COLD;

@@ -46,7 +46,7 @@ private:
 	class iterator_compare
 	{
 	public:
-		typedef std::true_type is_transparent;
+		using is_transparent = void;
 		iterator_compare(Compare const &comp) : m_comp(comp) { }
 		iterator_compare(iterator_compare const &that) = default;
 		iterator_compare(iterator_compare &&that) = default;
@@ -218,7 +218,7 @@ public:
 		return std::pair<iterator, bool>(inserted, true);
 	}
 	template <typename P>
-	std::enable_if_t<std::is_constructible<value_type, P>::value, std::pair<iterator, bool> > insert(P &&value)
+	std::pair<iterator, bool> insert(P &&value) requires std::is_constructible_v<value_type, P>
 	{
 		return emplace(std::forward<P>(value));
 	}

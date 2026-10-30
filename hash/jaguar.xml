@@ -1,7 +1,10 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
+
+TODO:
+- supported="partial" by default because we don't yet have a proper cart bus slot.
 
 Undumped:
   CD Diagnostic Cartridge
@@ -117,11 +120,11 @@ Unreleased (possibly no prototypes exist):
 		<publisher>ICD</publisher>
 		<notes><![CDATA[
 Gameplay graphics are in shades of blue, pause message gets cut off
-Randomly hangs after few seconds of gameplay
 Access [cart] EEPROM
 Optionally uses [UART] JagLink
 ]]></notes>
 
+		<info name="developer" value="Midnite Entertainment Group" />
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
 				<!-- The original dump, released in a custom .j01 format, was the following one
@@ -140,11 +143,10 @@ Optionally uses [UART] JagLink
 		<year>1994</year>
 		<publisher>Midnite Entertainment Group</publisher>
 		<notes><![CDATA[
-Gameplay graphics are in shades of blue, pause message gets cut off
-Access [cart] EEPROM
-Optionally uses [UART] JagLink
+(same as aircars)
 ]]></notes>
 
+		<info name="developer" value="Midnite Entertainment Group" />
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="0x200000" width="32" endianness="big">
 				<rom name="aircars94.u1" size="0x100000" crc="bbd4c4bd" sha1="4f9c914b43208eb100fb25b8be87dec370fd205d" offset="0x000002" loadflag="load32_word_swap"/>
@@ -158,13 +160,15 @@ Optionally uses [UART] JagLink
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Several HUD elements have wrong pitch, HUD blending looks ugly
-HUD automap draws garbage [blitter]
+[blitter] phrase mode: several HUD elements have wrong pitch
+HUD automap draws garbage
+HUD blending looks ugly
 No sound (fixed, serial clock)
-Randomly crashes during gameplay
+Randomly crashes during gameplay (verify, may be fixed)
 Access [cart] EEPROM
 ]]></notes>
 
+		<info name="developer" value="Rebellion" />
 		<info name="serial" value="J9008E 800108-022"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -179,14 +183,14 @@ Access [cart] EEPROM
 		<year>2006</year>
 		<publisher>B&amp;C Computervision</publisher>
 		<notes><![CDATA[
-Orange screen due of [DSP] running (regression)
-Heavy color issues
-Randomly crashes by going in main menu again after pressing A button
+[object] Heavy color issues in gameplay
+Cutoff joystick in pause menu (press pause then option in gameplay)
 No sound (fixed, serial clock)
-No SFXs/voices
-Runs too fast?
+[DSP] No SFXs/voices
+Runs too fast (depends on waitstates)
 ]]></notes>
 
+		<info name="developer" value="V-Real Interactive"/>
 		<info name="serial" value="J9003E 800108-006"/>
 		<part name="cart" interface="jaguar_cart">
 			<!-- 4MB Alpine ROM with Universal Header -->
@@ -201,14 +205,14 @@ Runs too fast?
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Gameplay graphics have clipping/alignment issues, black strip on left side
+Black strip on left side, [Tom] pixel width?
 Playfield on any track has garbage GFXs on borders
-No sound (fixed, DSP JPIT)
-BGMs are a bit out of octaves
+[DSP] BGMs are a bit out of octaves
 Access [cart] EEPROM
 Uses [GPU] irq 3
 ]]></notes>
 
+		<info name="developer" value="Miracle Designs" />
 		<info name="serial" value="J9091E 705091-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -222,13 +226,12 @@ Uses [GPU] irq 3
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Title screen foreground layer not drawn properly ([object] pitch = 3 in scaled mode) (fixed)
 Main menu text flickers, [object] timings?
-No sound (fixed)
 Access [cart] EEPROM
 Uses [GPU] irq 3
 ]]></notes>
 
+		<info name="developer" value="Sunrise Games"/>
 		<info name="serial" value="J9072E 705072-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -242,14 +245,12 @@ Uses [GPU] irq 3
 		<year>2002</year>
 		<publisher>B&amp;C Computervision</publisher>
 		<notes><![CDATA[
-No sound (fixed, [DSP] irq priority)
-Bad BGM on title screen
-Runs at extremely fast speed
-Can randomly black screen after loading a stage/during gameplay
+Runs too fast
 Access [cart] EEPROM
 Title screen has black dots of garbage on top (btanb)
 ]]></notes>
 
+		<info name="developer" value="Accolade"/>
 		<info name="serial" value="J9018E 705018-001"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -264,9 +265,10 @@ Title screen has black dots of garbage on top (btanb)
 		<publisher>ScatoLOGIC</publisher>
 		<notes><![CDATA[
 4 Play logo has [blitter] SRCSHADE bug on rolling section (red-ish, should be same-ish color as logo)
-Heavy GFX corruptions after 4 Play logo ([object] pitch = 3 16bpp)
-Black screen after selecting a mode, both 68k and [GPU] stalls on sharedram
-No sound (fixed, 68k JPIT irqs)
+Has CRY color bugs on main menu (uses [blitter] !TOPBEN)
+[blitter] phrase mode issues in briefing and gameplay
+Black screen after selecting a mode, both 68k and [GPU] stalls on sharedram (worked around, details in machine_start)
+Missing graphics during gameplay, logic also seems busted (verify, may be fixed)
 Access [cart] EEPROM
 Access [paddle] interface
 ]]></notes>
@@ -284,7 +286,8 @@ Access [paddle] interface
 		<year>2002</year>
 		<publisher>ScatoLOGIC</publisher>
 		<notes><![CDATA[
-Same as battlesp
+(same as battlesp)
+Boot looks timing sensitive, fails to boot after 68k waitstate handling without skipping Jaguar BIOS
 ]]></notes>
 
 		<info name="serial" value="J0201G"/>
@@ -295,16 +298,15 @@ Same as battlesp
 		</part>
 	</software>
 
-	<software name="breakout" supported="no">
+	<software name="breakout" supported="partial">
 		<description>Breakout 2000</description>
 		<year>1996</year>
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
-Has severe RMW issues in both versions of the game when breaking blocks (fixed, [blitter] pitch)
-No sound (fixed, [DSP] irq priority)
 Access [cart] EEPROM
 ]]></notes>
 
+		<info name="developer" value="MP Games"/>
 		<info name="serial" value="J9093E"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -319,12 +321,12 @@ Access [cart] EEPROM
 		<year>2004</year>
 		<publisher>B&amp;C Computervision</publisher>
 		<notes><![CDATA[
-Randomly crashes between DynaCam logo and gameplay (partial workaround: skip with B button)
-Heavy graphic glitches on gameplay
-No sound (fixed, serial clock)
+[object] flickers during gameplay
+[blitter] phrase mode for goal GFXs
 Access [cart] EEPROM
 ]]></notes>
 
+		<info name="developer" value="Accolade"/>
 		<info name="serial" value="J9021E 705021-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -333,16 +335,17 @@ Access [cart] EEPROM
 		</part>
 	</software>
 
-	<software name="brutalsp" supported="no">
+	<software name="brutalsp" supported="partial">
 		<description>Brutal Sports Series: Football</description>
 		<year>1994</year>
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
 Switching items in main menu causes a glitch on the text
-Rightmost column of gameplay has odd "overscan" area, visible on horizontal scrolls
+Strips of uneven mask in right overscan for gameplay
 ]]></notes>
 		<!-- cover title, NOTE: different than all the other versions -->
 		<info name="alt_title" value="Brutal Sports Football" />
+		<info name="developer" value="Millennium Teque"/>
 		<info name="serial" value="JA100"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -351,16 +354,16 @@ Rightmost column of gameplay has odd "overscan" area, visible on horizontal scro
 		</part>
 	</software>
 
-	<software name="bubsy" supported="no">
+	<software name="bubsy" supported="partial">
 		<description>Bubsy in Fractured Furry Tales</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-[GPU] can sometimes do an in-flight PC change (fatalerror)
-Randomly crashes on title screen animation
+[GPU] can sometimes do an in-flight PC change
 Access [cart] EEPROM
 Uses [GPU] irq 3
 ]]></notes>
+		<info name="developer" value="Accolade"/>
 		<info name="serial" value="J9020E 700720-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -374,9 +377,11 @@ Uses [GPU] irq 3
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
 		<notes><![CDATA[
-Selecting Hi-Res in options menu causes cutoff GFXs
+Selecting Hi-Res in options menu causes pixel width overstretch
 Access [cart] EEPROM
 ]]></notes>
+		<info name="developer" value="Sensible Software"/>
+		<info name="developer" value="The Dome"/>
 		<info name="serial" value="02763-00162"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -390,11 +395,8 @@ Access [cart] EEPROM
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Has serious 3D GFX pitch issues ([object] pitch = 2 16bpp) (fixed)
-No sound (fixed, serial clock)
 [blitter] needs GOURZ (noticeable with main default car)
-Missing map display during gameplay
-Randomly crashes in [DSP] during gameplay (particularly when crashing a bit too much)
+[GPU] or [DSP] logic bug makes cars to stop abruptly, including on goal line (verify)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -412,12 +414,11 @@ Access [cart] EEPROM
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-[DSP] always do an in-flight PC change at startup
-No sound (check [DSP] serial/JPIT)
+Overstretched pixel width on title screen and on name entry
+[blitter] in main menu needs proper phrase mode
+Check blending for game over drawing
+May run too fast
 Reads [Jerry] ASISTAT
-Title screen cuts off background (triggers unhandled [object] pitch = 0 16bpp)
-Gameplay GFX pop-ups
-Eventually black screens/crashes
 ]]></notes>
 
 		<info name="serial" value="J9003E 800103-002"/>
@@ -433,12 +434,10 @@ Eventually black screens/crashes
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Access [cart] EEPROM
-Huge GFX issues ([object] pitch = 4 16bpp) (fixed)
-Corrupted text chars
+[blitter] corrupted text chars, needs proper phrase mode
 Offset HUD elements in gameplay
-Submerged 3d elements in playfield, wants [blitter] GOURZ?
-No sound (fixed, DSP JPIT irqs)
+Submerged 3d elements in playfield, wants [blitter] GOURZ? (fixed, mostly)
+Access [cart] EEPROM
 ]]></notes>
 
 		<info name="serial" value="J9000E 700700-3"/>
@@ -454,7 +453,7 @@ No sound (fixed, DSP JPIT irqs)
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Same as cybermor
+(same as cybermor)
 ]]></notes>
 
 		<info name="serial" value="J9000E 700700-2"/>
@@ -465,18 +464,18 @@ Same as cybermor
 		</part>
 	</software>
 
-	<software name="defender" supported="no">
+	<software name="defender" supported="partial">
 		<description>Defender 2000</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Defender 2000 and Defender Plus both crashes after some few seconds in gameplay.
-Defender 2000 have misplaced GFX portions.
-"paused" GFX upper part incorrectly placed in Defender Classic
+Defender 2000: draws in overscan area, should be masked
+"paused" GFX upper part incorrectly placed in Defender Classic (verify, it now draws on top rather than middle?)
 Access [cart] EEPROM
 Uses [GPU] irqs 0 and 3
 ]]></notes>
 
+		<info name="developer" value="Electronic Games"/>
 		<info name="serial" value="J9041E 705041-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -490,10 +489,8 @@ Uses [GPU] irqs 0 and 3
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-GPU/DSP crashes after few seconds
-GFX status bar is stretched in horizontal direction (screen mode changes mid-frame)
-Automap becomes blue a few frames after being called
-Sound farts
+Automap single color to blue a few frames after being called (press keypad 9)
+Runs too fast
 Access [cart] EEPROM
 Uses [GPU] irq 3
 ]]></notes>
@@ -511,7 +508,7 @@ Uses [GPU] irq 3
 		<year>1995</year>
 		<publisher>Tradewest</publisher>
 		<notes><![CDATA[
-No sound (fixed, serial clock)
+Extra overscan to the left
 Access [cart] EEPROM
 ]]></notes>
 
@@ -528,7 +525,7 @@ Access [cart] EEPROM
 		<year>1994</year>
 		<publisher>Virgin Interactibe</publisher>
 		<notes><![CDATA[
-Gameplay backgrounds are missing or garbled, bus hog on 68k irqs? (cfr. INT2)
+Strips of uneven mask in right overscan for gameplay
 Access [cart] EEPROM, doesn't initialize properly i.e. needs to reset it if any other game is loaded
 ]]></notes>
 
@@ -557,14 +554,13 @@ Access [cart] EEPROM (but game has passwords?)
 		</part>
 	</software>
 
-	<software name="feverpit" supported="no">
+	<software name="feverpit" supported="partial">
 		<description>Fever Pitch Soccer</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Not extensively tested
-"licensed by Atari" then black screen (fixed, DSP JPIT irqs)
-TODO: check EEPROM access (by logic it should have one)
+[DSP] BGM stay silent after coming from gameplay to main menu
+Overscan bug on rightmost side of playfield
 ]]></notes>
 
 		<info name="serial" value="J9106E 705106-002"/>
@@ -580,11 +576,8 @@ TODO: check EEPROM access (by logic it should have one)
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Heavy pitch GFX issues ([object] pitch = 3 16bpp) (fixed)
-No sound (fixed, serial clock)
 Flickering [object] sprites on main menu
 Runs too fast
-Randomly crashes during gameplay
 Access [cart] EEPROM
 ]]></notes>
 
@@ -618,7 +611,7 @@ RSoD on Jaguar logo (bad dump?)
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
 [DSP] do an in-flight PC change on title screen (ignored)
-Gameplay area is cut off to the right (especially noticeable when pausing game)
+Overstretched pixel width (cfr. initial logo, gameplay pause)
 No color fill for cutscenes (fixed, DSP running correctly)
 No sound (fixed, serial clock)
 Access [cart] EEPROM
@@ -637,16 +630,20 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-"Another Great Game" then black screen. Known to require tight [GPU] pipeline timings
+Known to require tight [GPU] pipeline timings (?)
+Dots at left side of screen, [object] processor?
+Runs too fast
 ]]></notes>
 
 		<info name="serial" value="J9040E 700740-002"/>
 		<part name="cart" interface="jaguar_cart">
-			<dataarea name="rom" size="2097152" width="32" endianness="big">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
 				<!-- below dump was mirrored
 				<rom name="flip out (world).j64" size="4194304" crc="fae31dd0" sha1="61d4db841c090ae3104eb20b6087160ff80e7a12" offset="000000" />
 				-->
-				<rom name="flip out (world).j64" size="2097152" crc="892bc67c" sha1="886cbbaa434d6e1e7fc4401bb6d176c2788c4d19" offset="000000" />
+				<rom name="flip out (world).j64" size="0x200000" crc="892bc67c" sha1="886cbbaa434d6e1e7fc4401bb6d176c2788c4d19" offset="000000" />
+				<!-- assert program flow against $a02000 pointer at PC=11eeaa, needs mirror -->
+				<rom offset="0x200000" size="0x200000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
@@ -656,12 +653,9 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Bad background RMW colors on difficulty select screen (press A after title)
-Huge GFX issues on gameplay ([object] pitch = 0 4bpp and pitch = 3 16bpp)
 Text is solid squares [blitter] BCOMPEN?
-No sound (fixed)
-No SFXs during gameplay
 Missing objects during gameplay, [blitter] GOURZ?
+[blitter] phrase mode for some OSD elements in gameplay
 ]]></notes>
 
 		<info name="serial" value="J9009E 700709-002"/>
@@ -693,7 +687,7 @@ Reload after saving doesn't work, access [cart] EEPROM (verify, should be fixed)
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Has heavy pitch GFX issues (unhandled [object] pitch = 4 16bpp) (fixed)
+Has [object] or [blitter] pitch issues in ship select transitions
 Uses a mix of [blitter] BCOMPEN and GOURD + GOURZ, zooming transitions are off
 Uses [GPU] irq 3
 Access [cart] EEPROM
@@ -714,9 +708,8 @@ Has Z clipping issues during gameplay [blitter]
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
+Black screen after briefing, or by selecting demo mode, sometimes forgets to change BGM too
 No sound (fixed, serial clock)
-Bad pitch GFXs on attract mode, after title ([object] pitch = 4 24bpp) (fixed)
-Black screen after briefing, or by selecting demo mode
 ]]></notes>
 
 		<info name="serial" value="J9026E 700726-002"/>
@@ -733,9 +726,7 @@ Black screen after briefing, or by selecting demo mode
 		<year>1997</year>
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
-No sound (fixed, [DSP] irq priority)
-Stretched title screen pixel width (fixed)
-Several pitch issues (title logo on main menu [object] pitch = 3 16bpp) (fixed)
+Stretched title screen pixel width
 Hangs after selecting weapon, heavy sound serial reads in [DSP]
 Uses [GPU] irqs 0,2,3
 Access [cart] EEPROM
@@ -749,15 +740,11 @@ Access [cart] EEPROM
 		</part>
 	</software>
 
-	<software name="kasumi" supported="no">
+	<software name="kasumi" supported="partial">
 		<description>Kasumi Ninja</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen, [GPU] reads bad pointer in irq 0 stack bp f030f0,1,{r30=0;g} (fixed)
-BGM doesn't work in some stages
-Cutoff gameplay area on bottom
-Reads back [object] processor data during gameplay
 Access [cart] EEPROM
 Uses [GPU] irqs 0,4
 ]]></notes>
@@ -776,7 +763,7 @@ Uses [GPU] irqs 0,4
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Jaguar CD cartridge for saving, requires its own [cart] scheme (with atmel_29c010_device or unknown AMD intelfsh)
-Uses [blitter] BCOMPEN
+Uses [blitter] BCOMPEN, missing text
 Draws an incorrect pitch GFX, doesn't do much else ([object] pitch = 2 16bpp)
 ]]></notes>
 
@@ -793,8 +780,7 @@ Draws an incorrect pitch GFX, doesn't do much else ([object] pitch = 2 16bpp)
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Text GFXs are solid filled, enables [blitter] BCOMPEN (fixed)
-Background pitch issue on gameplay
+[blitter] phrase mode: background pitch issue in gameplay
 [DSP] sound test produces no sound, can potentially crash on multiple triggers
 Virtual mode has same GFX bugs as missilvr
 No BGMs (fixed, [DSP] irq 0)
@@ -808,13 +794,13 @@ No BGMs (fixed, [DSP] irq 0)
 		</part>
 	</software>
 
-	<software name="nbajamte" supported="no">
+	<software name="nbajamte" supported="partial">
 		<description>NBA Jam T.E. - Tournament Edition</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Exception on non-debug, [GPU] in-flight? On debug gameplay sports no sprite GFXs
-Minor glitch on team box when selecting one ([blitter] not filling properly)
+Strips of uneven overscan masks during gameplay (verify, looks the same on some refs)
+Access [cart] EEPROM
 Uses [GPU] irqs 0 and 4
 ]]></notes>
 
@@ -831,11 +817,11 @@ Uses [GPU] irqs 0 and 4
 		<year>2002</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
+Sometimes hangs on main menu or before entering gameplay
 "Enter Combat" has ground textures with black, uses [blitter] GOURZ
 "Enter Network" causes a black screen after loading (JagLink), 68k trash DSP memory at PC=73CCC
 Reads error bit 15 in [Jerry] ASISTAT
-Sometimes hangs on main menu
-Main menu background is cutoff to the right
+Main menu background is cutoff to the right (fixed, [blitter] CLIP_A1)
 Unemulated [object] scaled blend mode (pillar in the center) (fixed)
 BGM randomly don't work on title and main menu
 Uses [GPU] irq 0
@@ -853,7 +839,6 @@ Uses [GPU] irq 0
 		<year>1995</year>
 		<publisher>21st Century Entertainment</publisher>
 		<notes><![CDATA[
-No sound (fixed)
 Access [cart] EEPROM (options saves)
 ]]></notes>
 
@@ -870,8 +855,8 @@ Access [cart] EEPROM (options saves)
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Hangs after few seconds of gameplay/intro
-Can crash with [PIT] setup
+[object]s disappears when backtracking, making game non functional
+Pitfall A2600: works (down, C x26, down on title screen)
 Access [cart] EEPROM
 Uses [GPU] irq 0
 ]]></notes>
@@ -889,9 +874,10 @@ Uses [GPU] irq 0
 		<year>1995</year>
 		<publisher>Time Warner Interactive</publisher>
 		<notes><![CDATA[
-Crashes in scanline_update during initial logos (regression, actually bus priority?)
-Water background in stage 1 is in black and white, eventually crashes if bumping into road edges
-No sound (fixed)
+Triggers [object] unhandled scaled bitmap depth = 7 on new game transition, after initials
+[blitter] doesn't clear text when selecting a car, uses BUSHI (bit 29) on all blits
+Logic is flawed, never decreases time during gameplay
+Has overstretched pixel width bug on car repair screen
 Access [cart] EEPROM
 Uses [GPU] irq 3
 ]]></notes>
@@ -904,13 +890,12 @@ Uses [GPU] irq 3
 		</part>
 	</software>
 
-	<software name="protect" supported="no">
+	<software name="protect" supported="partial">
 		<description>Protector</description>
 		<year>1999</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
-[GPU] Black screen, does an unaligned write to border color regs (fixed)
-[GPU] Enables bus hog
+[GPU] Enables bus hog (seems non-fatal)
 No sound (fixed, DSP JPIT irqs)
 ]]></notes>
 
@@ -922,13 +907,12 @@ No sound (fixed, DSP JPIT irqs)
 		</part>
 	</software>
 
-	<software name="protctse" supported="no">
+	<software name="protctse" supported="partial">
 		<description>Protector - Special Edition</description>
 		<year>2002</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
-[GPU] Black screen, does an unaligned write to border color regs (fixed)
-[GPU] Enables bus hog
+[GPU] Enables bus hog (seems non-fatal)
 No sound (fixed, DSP JPIT irqs)
 ]]></notes>
 
@@ -945,10 +929,10 @@ No sound (fixed, DSP JPIT irqs)
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Ranking screen cuts off text on 9th and 10th places (fixed)
 Access [cart] EEPROM
 ]]></notes>
 
+		<info name="developer" value="Imagitec Design"/>
 		<info name="serial" value="J9005E 700705-2"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -962,10 +946,10 @@ Access [cart] EEPROM
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Ranking screen cuts off text on 9th and 10th places (fixed)
 Access [cart] EEPROM
 ]]></notes>
 
+		<info name="developer" value="Imagitec Design"/>
 		<info name="serial" value="J9005 700705-1"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -979,9 +963,7 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Ubisoft</publisher>
 		<notes><![CDATA[
-No sound (fixed, serial clock)
 Transitions reads the currently selected line buffer in [Tom]
-No SFXs
 Saves reports error, access [cart] EEPROM (verify, should be fixed)
 ]]></notes>
 
@@ -999,7 +981,9 @@ Saves reports error, access [cart] EEPROM (verify, should be fixed)
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 [DSP] in-flight PC write (fatalerror)
-Black screen, 68k reads [GPU] PC
+Black screen, 68k reads [GPU] PC (fixed)
+Overstretched pixel width before starting a table
+Plenty of [blitter] phrase mode glitches during gameplay
 ]]></notes>
 
 		<info name="serial" value="J9061 7005061-001"/>
@@ -1010,18 +994,18 @@ Black screen, 68k reads [GPU] PC
 		</part>
 	</software>
 
-	<software name="sensible" supported="no">
-		<description>Sensible Soccer - International Edition</description>
+	<software name="sensible" supported="partial">
+		<description>Sensible Soccer: International Edition</description>
 		<year>1995</year>
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
 No sound (fixed, serial clock)
-No ball touch SFXs
-[DSP] sound crashes during gameplay (3rd match at 28 minute on clear EEPROM)
 Access [cart] EEPROM
 ]]></notes>
 
 		<info name="alt_title" value="International Sensible Soccer (box, cart); Soccer (manual)"/>
+		<info name="developer" value="Renegade"/>
+		<info name="developer" value="Sensible Software"/>
 		<info name="serial" value="JA250"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -1030,16 +1014,16 @@ Access [cart] EEPROM
 		</part>
 	</software>
 
-	<software name="skyhamm" supported="no">
+	<software name="skyhamm" supported="partial">
 		<description>Skyhammer</description>
 		<year>2000</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
-Not extensively tested
-Hangs after loading a stage, no sound (fixed, [DSP] irq priority)
+[DSP] BGM hiccups during gameplay (verify)
 Access [cart] EEPROM
 ]]></notes>
 
+		<info name="developer" value="Rebellion"/>
 		<info name="serial" value="CF3001"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -1048,7 +1032,7 @@ Access [cart] EEPROM
 		</part>
 	</software>
 
-	<software name="soccerkd">
+	<software name="soccerkd" supported="partial">
 		<description>Soccer Kid</description>
 		<year>1996</year>
 		<publisher>ReadySoft</publisher>
@@ -1080,7 +1064,7 @@ RSoD on Jaguar logo
 		</part>
 	</software>
 
-	<software name="soccerkd1h" cloneof="soccerkd">
+	<software name="soccerkd1h" cloneof="soccerkd" supported="partial">
 		<!-- uses universal header, only way to boot this at moment -->
 		<description>Soccer Kid (re-release, hacked)</description>
 		<year>2000</year>
@@ -1098,11 +1082,13 @@ RSoD on Jaguar logo
 		<year>2001</year>
 		<publisher>B&amp;C Computervisions</publisher>
 		<notes><![CDATA[
-Gets to title screen (with [object] pitch = 2 16bpp) (fixed)
-Corrupted limits on rotating attract logo
-[object] or 68k crashes after a bit of attract ([blitter]? waitstates?)
-No sound (fixed, serial clock)
-Access [cart] EEPROM
+[blitter] or [object] blackened B button projectiles
+Can hang by changing options after one game (tested changing sun in arena options)
+Weapon shop doesn't seem to do anything except showing a cabinet (verify)
+Some items in options overruns text drawing (drone option "too many enemies")
+Non functional inputs when getting an high score
+Access [cart] EEPROM, can crash with an invalid one and accessing high scores
+Crashes by soft reset (F3)
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1117,7 +1103,7 @@ Access [cart] EEPROM
 		<year>19??</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Same as spacewar
+(same as spacewar)
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1130,15 +1116,15 @@ Same as spacewar
 		</part>
 	</software>
 
-	<!-- TODO: Arcade game, not a real Jaguar cart -->
+	<!-- TODO: Arcade game in a Jaguar cart, consider moving or duplicating in driver -->
 	<!-- version in service mode -->
 	<software name="speedst2" supported="no">
 		<description>Speedster II (6.02C)</description>
-		<year>1995?</year>
+		<year>1996</year>
 		<publisher>Carousel Entertainment</publisher>
 		<notes><![CDATA[
 Does a [DSP] in-flight PC change (btanb?)
-No engine sound (serial sampled?)
+No overscan mask for sprites
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1153,8 +1139,9 @@ No engine sound (serial sampled?)
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-[GPU] fatal endian setup 00050005, requires pixel organization swaps (in [blitter]?)
-Draws a cutted off Super Burnout copyright text, a blue strip then crashes
+[GPU] fatal endian setup 00050005, requires pixel organization swaps (in [blitter]? Ignored, seems to work fine)
+[object] text looks cut off on first line
+During gameplay has a "branch if 400 < vc", off by 25 lines
 Plays [DSP] sound on right speaker only (?)
 ]]></notes>
 
@@ -1171,9 +1158,8 @@ Plays [DSP] sound on right speaker only (?)
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-[GPU] in-flight PC write (fatalerror)
-[DSP] jump off the weeds at PC=F1B898, also reads $fffffc (?)
-Gets to title screen (with wrong GFX width) then hangs ([GPU] core bug?)
+[GPU] in-flight PC write (ignored)
+Overstretched pixel width
 Access [cart] EEPROM
 ]]></notes>
 
@@ -1191,7 +1177,7 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-OSD full of pitch imperfections (name entry chars)
+OSD full of pitch imperfections (name entry chars) needs proper [blitter] phrase mode rounding
 ]]></notes>
 
 		<info name="serial" value="L8002-SYNJAG"/>
@@ -1207,8 +1193,9 @@ OSD full of pitch imperfections (name entry chars)
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Not extensively tested
 Incorrect gouraud fills on playfield
+Tempest 2k: flickers on later levels
+Tempest Duel: draws bullets with off by one zoom errors (verify)
 Access [cart] EEPROM
 ]]></notes>
 		<info name="serial" value="J9010E 700710-000"/>
@@ -1224,7 +1211,7 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-Background has pitch glitch
+Background has pitch glitch, needs proper [blitter] phrase mode rounding
 Access [cart] EEPROM
 ]]></notes>
 
@@ -1258,8 +1245,7 @@ no sound (btanb)
 		<year>2005</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
-Heavy GFX issues, [blitter]?
-black screen if left on title screen ("Invalid branch!")
+Heavy GFX issues, needs proper [blitter] phrase mode rounding
 Hangs after few seconds of gameplay
 ]]></notes>
 
@@ -1297,9 +1283,7 @@ Gameplay screen flickers
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 [GPU] in-flight PC write (fatalerror)
-No sound (?)
-GFXs missing on gameplay and title screen, uses [blitter] BCOMPEN extensively
-Randomly has more or less severe GFX glitches
+Overstretched pixel width
 ]]></notes>
 
 		<info name="serial" value="J9001E 700701-2"/>
@@ -1315,10 +1299,7 @@ Randomly has more or less severe GFX glitches
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-[GPU] in-flight PC write (fatalerror)
-Hang after BIOS after fixing PIT frequency (regression)
-No sound (?)
-GFXs missing on gameplay and title screen
+(same as trevmcfr)
 ]]></notes>
 
 		<info name="serial" value="J9001E 700701"/>
@@ -1329,15 +1310,13 @@ GFXs missing on gameplay and title screen
 		</part>
 	</software>
 
-	<software name="troyaik" supported="no">
+	<software name="troyaik" supported="partial">
 		<description>Troy Aikman NFL Football</description>
 		<year>1995</year>
 		<publisher>Williams Entertainment</publisher>
 		<notes><![CDATA[
-No sound (fixed, serial clock)
-Has minor GFX pitch issue when action summary message pops up after a play
-[DSP] randomly crashes on main menu
-Overscan bug with sprites
+Sprites doesn't mask with overscan area
+Dubious CPU AI logic even at max difficulty (verify, playbook selection, missing easy snaps on field goals)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -1349,16 +1328,15 @@ Access [cart] EEPROM
 		</part>
 	</software>
 
-	<software name="ultravor" supported="no">
+	<software name="ultravor" supported="partial">
 		<description>Ultra Vortek</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Not extensively tested
-Black screen (fixed, [DSP] irq priority)
+[blitter] zoom transitions on main menu with wrong blue shadow color
 Access [cart] EEPROM
 ]]></notes>
-
+		<info name="developer" value="Beyond Games"/>
 		<info name="serial" value="J9082E 700782-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -1388,15 +1366,14 @@ RSoD on Jaguar logo
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Sound farts (fixed?)
-Missing/wrong GFXs on menus
-Heavy flickering on gameplay
-Triggers [object] pitch = 0 8bpp at start of gameplay
+Overstretched pixel width
+Garbage effect at "out of time" during gameplay, reads the line buffer for a zoom effect while keeping [object] stalled
 Reads back [object] processor data during gameplay
 Access [cart] EEPROM
 Uses [GPU] irq 3
 ]]></notes>
 
+		<info name="developer" value="Virtual Studio"/>
 		<info name="serial" value="J9060E 700760-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -1410,9 +1387,8 @@ Uses [GPU] irq 3
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Triggers [object] pitch = 2 8bpp at Trimark logo
-Heavy GFX glitches in gameplay, [object] timings?
-No sound (fixed, [DSP] irq priority)
+Has [blitter] phrase mode alignment issues during gameplay
+Occasional flickering during gameplay
 ]]></notes>
 
 		<info name="serial" value="J9070E 700770-002"/>
@@ -1428,8 +1404,11 @@ No sound (fixed, [DSP] irq priority)
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen with buzz, regression regarding [DSP] serial irqs triggers
-Playfield fills with black stripes, probably missing [object] pitch drawing
+No sound, regression regarding [DSP] serial irqs triggers
+Also cfr. delay slot hack note in CPU core. Sometimes just crashes with high noise.
+Playfield fills with black stripes
+Reads [blitter] $f02234 A2_STEP
+Overstretched pixel width in gameplay
 Access [cart] EEPROM
 ]]></notes>
 
@@ -1463,7 +1442,7 @@ Layers are slightly cut off
 		<year>1997</year>
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
-Minor GFX pitch issues
+Minor [blitter] phrase mode alignment issues (verify)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -1480,8 +1459,6 @@ Access [cart] EEPROM
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Sound metrics menu has glitchy bars (pause menu then press 'B', [object] pitch = 0 16bpp) (fixed)
-Main sprite flickers
 Access [cart] EEPROM
 Uses [GPU] irq 0
 ]]></notes>
@@ -1499,8 +1476,8 @@ Uses [GPU] irq 0
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-"licensed by Atari" screen then resets to Jaguar logo (PC=8062CA, jumps to unpopulated sharedram)
-"Warning: ROMHI = 0"
+Requires [blitter] phrase mode alignment for proper gameplay
+"Warning: ROMHI = 0" (verify, may have been red herring)
 ]]></notes>
 
 		<info name="serial" value="J9109E 705109-002"/>
@@ -1520,7 +1497,7 @@ These have been converted to j64 format with the universal header -->
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Same as parent set
+(same as atarikrt)
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1535,7 +1512,7 @@ Same as parent set
 		<year>1994</year>
 		<publisher>Accolade</publisher>
 		<notes><![CDATA[
-Cutoff ball sprite on main menu
+Cutoff ball sprite on main menu (fixed)
 No sound
 Either crashes or returns to player selection after stage select
 Has timing sensitive color bugs
@@ -1553,7 +1530,7 @@ Has timing sensitive color bugs
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Same as parent set
+(same as bretth)
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1568,7 +1545,7 @@ Same as parent set
 		<year>1996</year>
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
-Same as parent set
+(same as breakout)
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1593,12 +1570,12 @@ Same(-ish) as parent set
 		</part>
 	</software>
 
-	<software name="cybrgolf" supported="no">
+	<software name="cybrgolf" supported="partial">
 		<description>Jack Nicklaus Cyber Golf examples (prototype, v0.01, 19940704)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen, [GPU] crashes
+Slightly later rev than the other two sets, still a PoC
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1608,12 +1585,12 @@ Black screen, [GPU] crashes
 		</part>
 	</software>
 
-	<software name="cybrgolfa" cloneof="cybrgolf" supported="no">
+	<software name="cybrgolfa" cloneof="cybrgolf" supported="partial">
 		<description>Cyber Golf (prototype)</description>
 		<year>199?</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen, [GPU] crashes
+Just a PoC, not even a game
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1623,12 +1600,12 @@ Black screen, [GPU] crashes
 		</part>
 	</software>
 
-	<software name="cybrgolfb" cloneof="cybrgolf" supported="no">
+	<software name="cybrgolfb" cloneof="cybrgolf" supported="partial">
 		<description>Cyber Golf (prototype, alt)</description>
 		<year>199?</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen, [GPU] crashes
+Just a PoC, not even a game
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1643,7 +1620,7 @@ Black screen, [GPU] crashes
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Same as parent set
+(same as defender)
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1658,7 +1635,7 @@ Same as parent set
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Same as parent set
+(same as fforlife)
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1673,7 +1650,7 @@ Same as parent set
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Same as parent set
+(same as fforlife)
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1688,7 +1665,8 @@ Same as parent set
 		<year>2008</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-Black screen, 68k jumps to lalaland
+[DSP] no sound, eventually throws random gibberish to its endian port (i.e. 0x22001861) when pressing 'C'
+Probably wants own [cart] scheme, looks an ICE debugger break
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1720,7 +1698,7 @@ GFXs are cut off during gameplay
 		<year>1995</year>
 		<publisher>Ubisoft</publisher>
 		<notes><![CDATA[
-All sprites are cutoff, wants prototype [Tom] semantics?
+All sprites are cutoff, wants prototype [Tom] semantics? (fixed)
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1730,12 +1708,11 @@ All sprites are cutoff, wants prototype [Tom] semantics?
 		</part>
 	</software>
 
-	<software name="therealf" supported="no">
+	<software name="therealf" supported="partial">
 		<description>Thea Realm Fighters (prototype, v2)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Not extensively tested
 Allows 2 players gameplay only
 No BGMs, samples can get cut off (verify)
 ]]></notes>
@@ -1747,15 +1724,14 @@ No BGMs, samples can get cut off (verify)
 		</part>
 	</software>
 
-	<software name="therealfa" cloneof="therealf" supported="no">
+	<software name="therealfa" cloneof="therealf" supported="partial">
 		<description>Thea Realm Fighters (prototype, v1)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Not extensively tested
-Allows 1 or 2 players gameplay, but looks earlier revision than the other one
+Allows 1 or 2 players gameplay, but looks earlier revision than the other set
 No sound (verify)
-GFX pitch bugs (verify)
+Various video bugs (verify)
 ]]></notes>
 		<info name="developer" value="High Voltage" />
 		<part name="cart" interface="jaguar_cart">
@@ -1801,14 +1777,13 @@ Black screen, attempts to write in [cart] space, DRAM?
 
 <!-- !Homebrews -->
 
-	<software name="beebris" supported="no">
+	<software name="beebris" supported="partial">
 		<description>Beebris</description>
 		<!-- "25 years of fun", from the original '88 Tetris release? -->
 		<year>2013?</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<notes><![CDATA[
-Not extensively tested
-Bit of cutoff on bottom
+Few lines cutoff on bottom of title/gameplay
 ]]></notes>
 		<info name="developer" value="Reboot" />
 		<part name="cart" interface="jaguar_cart">
@@ -1823,8 +1798,7 @@ Bit of cutoff on bottom
 		<year>2012</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<notes><![CDATA[
-Not extensively tested
-Bit of cutoff on top
+[object] or [blitter] black border covering top of screen playfield in gameplay, eventually becomes relevant in section 4/5
 ]]></notes>
 		<info name="developer" value="Reboot" />
 		<part name="cart" interface="jaguar_cart">
@@ -1834,13 +1808,10 @@ Bit of cutoff on top
 		</part>
 	</software>
 
-	<software name="downfall" supported="no">
+	<software name="downfall" supported="partial">
 		<description>Downfall</description>
 		<year>2011</year>
 		<publisher>&lt;homebrew&gt;</publisher>
-		<notes><![CDATA[
-Not extensively tested
-]]></notes>
 		<info name="developer" value="Reboot" />
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="0x200000" width="32" endianness="big">
@@ -1849,13 +1820,10 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="expway" supported="no">
+	<software name="expway" supported="partial">
 		<description>Expressway</description>
 		<year>2013</year>
 		<publisher>&lt;homebrew&gt;</publisher>
-		<notes><![CDATA[
-Not extensively tested
-]]></notes>
 		<info name="developer" value="Reboot" />
 		<info name="usage" value="4 players game, p2 and p4 uses buttons A and C of p1 and p3" />
 		<part name="cart" interface="jaguar_cart">
@@ -1866,13 +1834,12 @@ Not extensively tested
 	</software>
 
 	<!-- Good Old Games retail version known to exist -->
-	<software name="fcrock" supported="no">
+	<software name="fcrock" supported="partial">
 		<description>Full Circle: Rocketeer</description>
 		<year>2013</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<notes><![CDATA[
-Not extensively tested
-Bit of overscan clipping with shots on left side
+Bit of overscan not masking shots on left side
 ]]></notes>
 		<info name="developer" value="Reboot" />
 		<part name="cart" interface="jaguar_cart">
@@ -1887,7 +1854,7 @@ Bit of overscan clipping with shots on left side
 		<year>2009</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<notes><![CDATA[
-Not extensively tested
+Currently hardlocks after title screen, [68k] tight loops (regression)
 ]]></notes>
 		<info name="developer" value="Reboot" />
 		<part name="cart" interface="jaguar_cart">
@@ -1902,7 +1869,7 @@ Not extensively tested
 		<year>2012</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<notes><![CDATA[
-Not extensively tested
+Offset [object] or [blitter] background
 ]]></notes>
 		<info name="developer" value="Reboot" />
 		<part name="cart" interface="jaguar_cart">

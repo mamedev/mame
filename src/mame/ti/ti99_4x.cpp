@@ -106,23 +106,25 @@ public:
 	{ }
 
 	// Configurations
-	void ti99_4_common(machine_config &config);
-	void ti99_4(machine_config &config);
-	void ti99_4_50hz(machine_config &config);
-	void ti99_4ev_60hz(machine_config &config);
-	void ti99_4qi(machine_config &config);
-	void ti99_4qi_60hz(machine_config &config);
-	void ti99_4a_50hz(machine_config &config);
-	void ti99_4a_60hz(machine_config &config);
-	void ti99_4a(machine_config &config);
-	void ti99_4_60hz(machine_config &config);
-
-	// Lifecycle
-	void driver_start() override;
-	void driver_reset() override;
+	void ti99_4_50hz(machine_config &config) ATTR_COLD;
+	void ti99_4ev_60hz(machine_config &config) ATTR_COLD;
+	void ti99_4qi_60hz(machine_config &config) ATTR_COLD;
+	void ti99_4a_50hz(machine_config &config) ATTR_COLD;
+	void ti99_4a_60hz(machine_config &config) ATTR_COLD;
+	void ti99_4_60hz(machine_config &config) ATTR_COLD;
 
 	// Interrupt triggers
 	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
+
+protected:
+	// Lifecycle
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
+
+	void ti99_4_common(machine_config &config) ATTR_COLD;
+	void ti99_4(machine_config &config) ATTR_COLD;
+	void ti99_4a(machine_config &config) ATTR_COLD;
+	void ti99_4qi(machine_config &config) ATTR_COLD;
 
 private:
 	// Processor connections with the main board
@@ -863,7 +865,7 @@ void ti99_4x_state::notconnected(int state)
     Machine definitions
 ******************************************************************************/
 
-void ti99_4x_state::driver_start()
+void ti99_4x_state::machine_start()
 {
 	m_nready_combined = 0;
 	// Removing the TMS9928a requires to add a replacement for the GROMCLK.
@@ -881,7 +883,7 @@ void ti99_4x_state::driver_start()
 	save_item(NAME(m_int12));
 }
 
-void ti99_4x_state::driver_reset()
+void ti99_4x_state::machine_reset()
 {
 	m_cpu->set_ready(ASSERT_LINE);
 	m_cpu->set_hold(CLEAR_LINE);
@@ -907,7 +909,7 @@ void ti99_4x_state::ti99_4_common(machine_config& config)
 	m_cpu->clkout_cb().set(FUNC(ti99_4x_state::clock_out));
 
 	// Programmable system interface (driven by CLKOUT)
-	TMS9901(config, m_tms9901, 0);
+	TMS9901(config, m_tms9901);
 	m_tms9901->p_out_cb(2).set(FUNC(ti99_4x_state::keyC0));
 	m_tms9901->p_out_cb(3).set(FUNC(ti99_4x_state::keyC1));
 	m_tms9901->p_out_cb(4).set(FUNC(ti99_4x_state::keyC2));
@@ -918,10 +920,10 @@ void ti99_4x_state::ti99_4_common(machine_config& config)
 	m_tms9901->intreq_cb().set(FUNC(ti99_4x_state::tms9901_interrupt));
 
 	// Databus multiplexer
-	TI99_DATAMUX(config, m_datamux, 0).ready_cb().set(FUNC(ti99_4x_state::console_ready_dmux));
+	TI99_DATAMUX(config, m_datamux).ready_cb().set(FUNC(ti99_4x_state::console_ready_dmux));
 
 	// Cartridge port (aka GROMport)
-	TI99_GROMPORT(config, m_gromport, 0, ti99_gromport_options, "single");
+	TI99_GROMPORT(config, m_gromport, ti99_gromport_options, "single");
 	m_gromport->ready_cb().set(FUNC(ti99_4x_state::console_ready_cart));
 	m_gromport->reset_cb().set(FUNC(ti99_4x_state::console_reset));
 
@@ -936,8 +938,8 @@ void ti99_4x_state::ti99_4_common(machine_config& config)
 
 	// Cassette drives. Second drive is record-only.
 	SPEAKER(config, "cass_out").front_center();
-	CASSETTE(config, "cassette1", 0).add_route(ALL_OUTPUTS, "cass_out", 0.25);
-	CASSETTE(config, "cassette2", 0);
+	CASSETTE(config, "cassette1").add_route(ALL_OUTPUTS, "cass_out", 0.25);
+	CASSETTE(config, "cassette2");
 
 	// GROM devices
 	TMC0430(config, TI99_GROM0_TAG, TI99_CONSOLEGROM, 0x0000, 0).ready_cb().set(FUNC(ti99_4x_state::console_ready_grom));
@@ -961,7 +963,7 @@ void ti99_4x_state::ti99_4(machine_config& config)
 	m_tms9901->read_cb().set(FUNC(ti99_4x_state::psi_input_4)); // use a separate one for 99/4
 
 	// Input/output port: normal config
-	TI99_IOPORT(config, m_ioport, 0, ti99_ioport_options_plain, nullptr);
+	TI99_IOPORT(config, m_ioport, ti99_ioport_options_plain, nullptr);
 	m_ioport->extint_cb().set(FUNC(ti99_4x_state::extint));
 	m_ioport->ready_cb().set(TI99_DATAMUX_TAG, FUNC(bus::ti99::internal::datamux_device::ready_line));
 
@@ -972,7 +974,7 @@ void ti99_4x_state::ti99_4(machine_config& config)
 	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
 	// Joystick port. We can connect a joyport mouse or a handset (99/4-specific).
-	TI99_JOYPORT(config, m_joyport, 0, ti99_joyport_options_994, "twinjoy");
+	TI99_JOYPORT(config, m_joyport, ti99_joyport_options_994, "twinjoy");
 	m_joyport->int_cb().set(FUNC(ti99_4x_state::handset_interrupt_in));
 }
 
@@ -988,7 +990,7 @@ void ti99_4x_state::ti99_4_60hz(machine_config &config)
 	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
 	m_video->set_screen(TI99_SCREEN_TAG);
 
-	SCREEN(config, TI99_SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, TI99_SCREEN_TAG);
 }
 
 /*
@@ -1003,7 +1005,7 @@ void ti99_4x_state::ti99_4_50hz(machine_config &config)
 	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
 	m_video->set_screen(TI99_SCREEN_TAG);
 
-	SCREEN(config, TI99_SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, TI99_SCREEN_TAG);
 }
 
 /**********************************************************************
@@ -1022,7 +1024,7 @@ void ti99_4x_state::ti99_4a(machine_config& config)
 	m_tms9901->read_cb().set(FUNC(ti99_4x_state::psi_input_4a));
 
 	// Input/output port: Normal config
-	TI99_IOPORT(config, m_ioport, 0, ti99_ioport_options_plain, nullptr);
+	TI99_IOPORT(config, m_ioport, ti99_ioport_options_plain, nullptr);
 	m_ioport->extint_cb().set(FUNC(ti99_4x_state::extint));
 	m_ioport->ready_cb().set(TI99_DATAMUX_TAG, FUNC(bus::ti99::internal::datamux_device::ready_line));
 
@@ -1033,7 +1035,7 @@ void ti99_4x_state::ti99_4a(machine_config& config)
 	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
 	// Joystick port
-	TI99_JOYPORT(config, m_joyport, 0, ti99_joyport_options_mouse, "twinjoy");
+	TI99_JOYPORT(config, m_joyport, ti99_joyport_options_mouse, "twinjoy");
 }
 
 /*
@@ -1048,7 +1050,7 @@ void ti99_4x_state::ti99_4a_60hz(machine_config &config)
 	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
 	m_video->set_screen(TI99_SCREEN_TAG);
 
-	SCREEN(config, TI99_SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, TI99_SCREEN_TAG);
 }
 
 /*
@@ -1063,7 +1065,7 @@ void ti99_4x_state::ti99_4a_50hz(machine_config &config)
 	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
 	m_video->set_screen(TI99_SCREEN_TAG);
 
-	SCREEN(config, TI99_SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, TI99_SCREEN_TAG);
 }
 
 /************************************************************************
@@ -1090,7 +1092,7 @@ void ti99_4x_state::ti99_4qi_60hz(machine_config &config)
 	m_video->gromclk_callback().set(FUNC(ti99_4x_state::gromclk_in));
 	m_video->set_screen(TI99_SCREEN_TAG);
 
-	SCREEN(config, TI99_SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, TI99_SCREEN_TAG);
 }
 
 /************************************************************************
@@ -1115,16 +1117,16 @@ void ti99_4x_state::ti99_4ev_60hz(machine_config& config)
 	// EVPC connector
 	// This is needed for delivering the video interrupt from the
 	// EVPC expansion card into the console, after the video processor has been removed
-	TI99_EVPCCONN(config, TI99_EVPC_CONN_TAG, 0).vdpint_cb().set(FUNC(ti99_4x_state::video_interrupt_evpc_in));
+	TI99_EVPCCONN(config, TI99_EVPC_CONN_TAG).vdpint_cb().set(FUNC(ti99_4x_state::video_interrupt_evpc_in));
 
 	// Input/output port: Configure for EVPC
-	TI99_IOPORT(config, m_ioport, 0, ti99_ioport_options_evpc, "peb");
+	TI99_IOPORT(config, m_ioport, ti99_ioport_options_evpc, "peb");
 	m_ioport->extint_cb().set(FUNC(ti99_4x_state::extint));
 	m_ioport->ready_cb().set(TI99_DATAMUX_TAG, FUNC(bus::ti99::internal::datamux_device::ready_line));
 
 	// Joystick port
 	// No joyport mouse, since we have a bus mouse with the EVPC
-	TI99_JOYPORT(config, m_joyport, 0, ti99_joyport_options_plain, "twinjoy");
+	TI99_JOYPORT(config, m_joyport, ti99_joyport_options_plain, "twinjoy");
 }
 
 /*****************************************************************************

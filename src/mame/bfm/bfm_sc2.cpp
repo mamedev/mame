@@ -148,7 +148,6 @@ Adder hardware:
 #include "bfm_comn.h"
 #include "bfm_dm01.h"
 
-#include "awpvid.h"
 
 #include "cpu/m6809/m6809.h"
 
@@ -178,7 +177,7 @@ Adder hardware:
 
 #include "sc2_vfd.lh"
 #include "sc2_dmd.lh"
-#include "drwho.lh"
+#include "sc2drwho.lh"
 
 #include "sc2ptytm1.lh"
 #include "sc2cpe.lh"
@@ -346,13 +345,14 @@ class bfm_sc2_vid_state : public bfm_sc2_state
 public:
 	using bfm_sc2_state::bfm_sc2_state;
 
-	void init_quintoon();
-	void init_adder_dutch();
-	void init_pyramid();
-	void init_sltsbelg();
-	void init_gldncrwn();
-	void scorpion2_vid(machine_config &config);
-	void scorpion2_vidm(machine_config &config);
+	void init_quintoon() ATTR_COLD;
+	void init_adder_dutch() ATTR_COLD;
+	void init_pyramid() ATTR_COLD;
+	void init_sltsbelg() ATTR_COLD;
+	void init_gldncrwn() ATTR_COLD;
+
+	void scorpion2_vid(machine_config &config) ATTR_COLD;
+	void scorpion2_vidm(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -370,10 +370,10 @@ public:
 	bfm_sc2_novid_state(const machine_config &mconfig, device_type type, const char *tag)
 		: bfm_sc2_state(mconfig, type, tag)
 		, m_dm01(*this, "dm01")
-		, m_reel(*this, "reel%u", 0)
+		, m_reel(*this, "reel%u", 1)
 	{ }
 
-	void init_drwho();
+	void init_drwho() ATTR_COLD;
 
 protected:
 	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
@@ -403,12 +403,13 @@ class bfm_sc2_awp_state : public bfm_sc2_novid_state
 public:
 	using bfm_sc2_novid_state::bfm_sc2_novid_state;
 
-	void init_bbrkfst();
-	void init_drwhon();
-	void init_focus();
-	void init_bfmcgslm();
-	void scorpion3(machine_config &config);
-	void scorpion2(machine_config &config);
+	void init_bbrkfst() ATTR_COLD;
+	void init_drwhon() ATTR_COLD;
+	void init_focus() ATTR_COLD;
+	void init_bfmcgslm() ATTR_COLD;
+
+	void scorpion3(machine_config &config) ATTR_COLD;
+	void scorpion2(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -420,13 +421,14 @@ class bfm_sc2_dmd_state : public bfm_sc2_novid_state
 public:
 	using bfm_sc2_novid_state::bfm_sc2_novid_state;
 
-	void init_luvjub();
-	void init_cpeno1();
-	void init_ofah();
-	void init_prom();
-	void scorpion2_dm01(machine_config &config);
-	void scorpion2_dm01_5m(machine_config &config);
-	void scorpion2_dm01_3m(machine_config &config);
+	void init_luvjub() ATTR_COLD;
+	void init_cpeno1() ATTR_COLD;
+	void init_ofah() ATTR_COLD;
+	void init_prom() ATTR_COLD;
+
+	void scorpion2_dm01(machine_config &config) ATTR_COLD;
+	void scorpion2_dm01_5m(machine_config &config) ATTR_COLD;
+	void scorpion2_dm01_3m(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -642,8 +644,8 @@ void bfm_sc2_novid_state::reel12_w(uint8_t data)
 	m_reel[0]->update( data    &0x0f);
 	m_reel[1]->update((data>>4)&0x0f);
 
-	awp_draw_reel(machine(),"reel1", *m_reel[0]);
-	awp_draw_reel(machine(),"reel2", *m_reel[1]);
+	m_reel[0]->draw();
+	m_reel[1]->draw();
 }
 
 void bfm_sc2_novid_state::reel34_w(uint8_t data)
@@ -653,8 +655,8 @@ void bfm_sc2_novid_state::reel34_w(uint8_t data)
 	m_reel[2]->update( data    &0x0f);
 	m_reel[3]->update((data>>4)&0x0f);
 
-	awp_draw_reel(machine(),"reel3", *m_reel[2]);
-	awp_draw_reel(machine(),"reel4", *m_reel[3]);
+	m_reel[2]->draw();
+	m_reel[3]->draw();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -666,8 +668,8 @@ void bfm_sc2_novid_state::reel56_w(uint8_t data)
 	m_reel[4]->update( data    &0x0f);
 	m_reel[5]->update((data>>4)&0x0f);
 
-	awp_draw_reel(machine(),"reel5", *m_reel[4]);
-	awp_draw_reel(machine(),"reel6", *m_reel[5]);
+	m_reel[4]->draw();
+	m_reel[5]->draw();
 }
 
 
@@ -1646,9 +1648,9 @@ static INPUT_PORTS_START( pyramid )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("STROBE4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_INTERLOCK) PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_INTERLOCK) PORT_NAME("Front Door") PORT_CODE(KEYCODE_W) PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER)     PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_DOOR )  PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_DOOR )  PORT_NAME("Front Door") PORT_CODE(KEYCODE_W) PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -2239,17 +2241,17 @@ INPUT_PORTS_END
 
 void bfm_sc2_state::_3meters(machine_config &config)
 {
-	METERS(config, m_meters, 0).set_number(3);
+	METERS(config, m_meters).set_number(3);
 }
 
 void bfm_sc2_state::_5meters(machine_config &config)
 {
-	METERS(config, m_meters, 0).set_number(5);
+	METERS(config, m_meters).set_number(5);
 }
 
 void bfm_sc2_state::_8meters(machine_config &config)
 {
-	METERS(config, m_meters, 0).set_number(8);
+	METERS(config, m_meters).set_number(8);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -2258,7 +2260,6 @@ void bfm_sc2_state::_8meters(machine_config &config)
 
 void bfm_sc2_state::machine_start()
 {
-	m_lamps.resolve();
 	nvram_device *e2ram = subdevice<nvram_device>("e2ram");
 	if (e2ram != nullptr)
 		e2ram->set_base(m_e2ram, sizeof(m_e2ram));
@@ -2282,7 +2283,7 @@ void bfm_sc2_vid_state::scorpion2_vid(machine_config &config)
 	NVRAM(config, "e2ram").set_custom_handler(FUNC(bfm_sc2_vid_state::e2ram_init));
 	config.set_default_layout(layout_sc2_vid);
 
-	BFM_ADDER2(config, "adder2", 0);
+	BFM_ADDER2(config, "adder2");
 
 	SPEAKER(config, "mono").front_center();
 	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -2877,9 +2878,9 @@ static INPUT_PORTS_START( bbrkfst )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("STROBE4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_INTERLOCK)  PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_INTERLOCK)  PORT_NAME("Front Door") PORT_CODE(KEYCODE_W) PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )     PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_DOOR   ) PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_DOOR   ) PORT_NAME("Front Door") PORT_CODE(KEYCODE_W) PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -3018,9 +3019,9 @@ static INPUT_PORTS_START( drwho )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("STROBE3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_INTERLOCK)PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_INTERLOCK)PORT_NAME("Front Door") PORT_CODE(KEYCODE_W) PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER  )  PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_DOOR   ) PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_DOOR   ) PORT_NAME("Front Door") PORT_CODE(KEYCODE_W) PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -3175,9 +3176,9 @@ static INPUT_PORTS_START( cpeno1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("STROBE3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_INTERLOCK) PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Front Door") PORT_CODE(KEYCODE_W) PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER  )   PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_DOOR   ) PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_DOOR   ) PORT_NAME("Front Door") PORT_CODE(KEYCODE_W) PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -3329,11 +3330,11 @@ static INPUT_PORTS_START( luvjub )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("STROBE3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_INTERLOCK) PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_INTERLOCK) PORT_NAME("Front Door") PORT_CODE(KEYCODE_W) PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER  )   PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_DOOR   ) PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_DOOR   ) PORT_NAME("Front Door") PORT_CODE(KEYCODE_W) PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON9)   PORT_NAME("Answer the phone")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_NAME("Answer the phone")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -3485,9 +3486,9 @@ static INPUT_PORTS_START( bfmcgslm )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("STROBE3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_INTERLOCK) PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_INTERLOCK) PORT_NAME("Front Door") PORT_CODE(KEYCODE_W) PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER)     PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_DOOR   ) PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_DOOR   ) PORT_NAME("Front Door") PORT_CODE(KEYCODE_W) PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -3641,9 +3642,9 @@ static INPUT_PORTS_START( scorpion3 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("STROBE3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_INTERLOCK) PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Front Door") PORT_CODE(KEYCODE_W) PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER  )   PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_DOOR   ) PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_DOOR   ) PORT_NAME("Front Door") PORT_CODE(KEYCODE_W) PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -3847,7 +3848,7 @@ void bfm_sc2_dmd_state::scorpion2_dm01(machine_config &config)
 
 	/* video hardware */
 	config.set_default_layout(layout_sc2_dmd);
-	BFM_DM01(config, m_dm01, 0);
+	BFM_DM01(config, m_dm01);
 	m_dm01->busy_callback().set(FUNC(bfm_sc2_dmd_state::bfmdm01_busy));
 
 	REEL(config, m_reel[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
@@ -8633,38 +8634,38 @@ GAMEL( 1997, gldncrwnhop, gldncrwn, scorpion2_vid,  gldncrwn, bfm_sc2_vid_state,
 ********************************************************************************************************************************************************************************************************************/
 
 // PROJECT NUMBER 6305  DR WHO TIMELORD - 28-SEP-1994 11:14:58
-GAMEL( 1994, sc2drwho,    0,        scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 1, UK, Single Site) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-288
-GAMEL( 1994, sc2drwhou,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwhon, 0, "BFM",         "Dr.Who The Timelord (set 1, UK, Single Site) (Scorpion 2/3) (not encrypted)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) //  GAME No 95-750-288 (unencrypted bootleg?)
-GAMEL( 1994, sc2drwhop,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 1, UK, Single Site Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-288
+GAMEL( 1994, sc2drwho,    0,        scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 1, UK, Single Site) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-750-288
+GAMEL( 1994, sc2drwhou,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwhon, 0, "BFM",         "Dr.Who The Timelord (set 1, UK, Single Site) (Scorpion 2/3) (not encrypted)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) //  GAME No 95-750-288 (unencrypted bootleg?)
+GAMEL( 1994, sc2drwhop,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 1, UK, Single Site Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-751-288
 // PROJECT NUMBER 6305  DR WHO TIMELORD IRISH ALL CASH   - 28-SEP-1994 11:20:17
-GAMEL( 1994, sc2drwho1,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 2, UK, Arcade) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-290
-GAMEL( 1994, sc2drwho1p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 2, UK, Arcade, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-290
+GAMEL( 1994, sc2drwho1,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 2, UK, Arcade) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-750-290
+GAMEL( 1994, sc2drwho1p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 2, UK, Arcade, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-751-290
 // PROJECT NUMBER 6305  DR WHO TIMELORD NO JP SPIN - 17-NOV-1994 09:34:50
-GAMEL( 1994, sc2drwho2,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 3, UK, no Jackpot spin) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-309
-GAMEL( 1994, sc2drwho2p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 3, UK, no Jackpot spin, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-309
+GAMEL( 1994, sc2drwho2,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 3, UK, no Jackpot spin) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-750-309
+GAMEL( 1994, sc2drwho2p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 3, UK, no Jackpot spin, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-751-309
 // PROJECT NUMBER 6305  DR WHO TIMELORD ARCADE - 24-OCT-1995 16:12:44
-GAMEL( 1994, sc2drwho3,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 4, UK, Arcade) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-536
-GAMEL( 1994, sc2drwho3p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 4, UK, Arcade, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-536
+GAMEL( 1994, sc2drwho3,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 4, UK, Arcade) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-750-536
+GAMEL( 1994, sc2drwho3p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 4, UK, Arcade, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-751-536
 // PROJECT NUMBER 6305  DR WHO TIMELORD 4/8 - 24-OCT-1995 16:14:30
-GAMEL( 1994, sc2drwho4,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 5, UK) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-535
-GAMEL( 1994, sc2drwho4p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 5, UK, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-535
+GAMEL( 1994, sc2drwho4,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 5, UK) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-750-535
+GAMEL( 1994, sc2drwho4p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 5, UK, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-751-535
 // PROJECT NUMBER 6305  DR WHO TIMELORD IRISH ALL CASH 4/8 - 25-OCT-1995 09:50:12
-GAMEL( 1994, sc2drwho5,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 6, UK, Arcade, 8GBP Jackpot) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-531
-GAMEL( 1994, sc2drwho5p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 6, UK, Arcade, 8GBP Jackpot, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-531
+GAMEL( 1994, sc2drwho5,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 6, UK, Arcade, 8GBP Jackpot) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-750-531
+GAMEL( 1994, sc2drwho5p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 6, UK, Arcade, 8GBP Jackpot, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-751-531
 // PROJECT NUMBER 6305  TIMELORD ARCADE 10P PLAY 4/8 - 25-OCT-1995 09:53:06
-GAMEL( 1994, sc2drwho6,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 7, UK, Arcade) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-533
-GAMEL( 1994, sc2drwho6p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 7, UK, Arcade, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-533
+GAMEL( 1994, sc2drwho6,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 7, UK, Arcade) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-750-533
+GAMEL( 1994, sc2drwho6p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 7, UK, Arcade, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-751-533
 // PROJECT NUMBER 6305  DR WHO TIMELORD 10 POUNDS - 28-MAR-1996 13:21:58
-GAMEL( 1994, sc2drwho7,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 8, UK, Arcade, 10GBP Jackpot) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-661
-GAMEL( 1994, sc2drwho7p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 8, UK, Arcade, 10GBP Jackpot, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-751-661
+GAMEL( 1994, sc2drwho7,   sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 8, UK, Arcade, 10GBP Jackpot) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-750-661
+GAMEL( 1994, sc2drwho7p,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord (set 8, UK, Arcade, 10GBP Jackpot, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-751-661
 // PROJECT NUMBER 6419  DR WHO TIMELORD DELUXE - 8-MAR-1995 15:37:53
-GAMEL( 1994, sc2drwhodx,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord Deluxe (set 1) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-370
+GAMEL( 1994, sc2drwhodx,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord Deluxe (set 1) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-750-370
 // PROJECT NUMBER 6419  TIMELORD DELUXE MULTI-SITE ALL CASH - 4-DEC-1995 10:48:34
-GAMEL( 1994, sc2drwhodx1, sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord Deluxe (set 2) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_drwho) // GAME No 95-750-572
+GAMEL( 1994, sc2drwhodx1, sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM",         "Dr.Who The Timelord Deluxe (set 2) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL,layout_sc2drwho) // GAME No 95-750-572
 // PROJECT NUMBER 6999  TIMELORD AT PLAYMAKER 5P/10p  500P - 15-SEP-1997 10:02:47
-GAMEL( 1994, sc2drwhomz,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM/Mazooma", "Dr.Who The Timelord (Mazooma) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL | MACHINE_NOT_WORKING,layout_drwho) // GAME No TLVMAZ12_N, error 99
+GAMEL( 1994, sc2drwhomz,  sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM/Mazooma", "Dr.Who The Timelord (Mazooma) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL | MACHINE_NOT_WORKING,layout_sc2drwho) // GAME No TLVMAZ12_N, error 99
 // PROJECT NUMBER TLP12  TIMELORD AT PLAYMAKER 5P/10p  500P - 15-SEP-1997 10:03:49
-GAMEL( 1994, sc2drwhomzp, sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM/Mazooma", "Dr.Who The Timelord (Mazooma, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL | MACHINE_NOT_WORKING,layout_drwho) // GAME No TLVMAZ12_P,  error 99
+GAMEL( 1994, sc2drwhomzp, sc2drwho, scorpion2, drwho, bfm_sc2_awp_state, init_drwho,  0, "BFM/Mazooma", "Dr.Who The Timelord (Mazooma, Protocol) (Scorpion 2/3)", MACHINE_SUPPORTS_SAVE|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL | MACHINE_NOT_WORKING,layout_sc2drwho) // GAME No TLVMAZ12_P,  error 99
 
 /********************************************************************************************************************************************************************************************************************
  The Big Breakfast

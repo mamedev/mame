@@ -49,7 +49,7 @@ public:
 		, m_key{ { *this, "P1_KEY%u", 0U }, { *this, "P2_KEY%u", 0U } }
 	{ }
 
-	void lastbank(machine_config &config);
+	void lastbank(machine_config &config) ATTR_COLD;
 
 	ioport_value sound_status_r();
 
@@ -71,6 +71,7 @@ private:
 
 	uint8_t m_key_select = 0;
 	uint8_t m_sound_flags = 0;
+	uint8_t m_irq_vector = 0;
 
 	void screen_vblank(int state);
 
@@ -80,6 +81,7 @@ private:
 	void key_select_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 	virtual void audio_map(address_map &map) ATTR_COLD;
 	void tc0091lvc_map(address_map &map) ATTR_COLD;
 };
@@ -112,6 +114,7 @@ void lastbank_state::machine_start()
 {
 	save_item(NAME(m_key_select));
 	save_item(NAME(m_sound_flags));
+	save_item(NAME(m_irq_vector));
 }
 
 void lastbank_state::screen_vblank(int state)
@@ -257,7 +260,7 @@ static INPUT_PORTS_START( lastbank )
 
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_DIPNAME( 0x08, 0x08, "Hopper Empty" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
@@ -796,20 +799,34 @@ static INPUT_PORTS_START( goldstrk )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sparkle )
+	PORT_INCLUDE( goldstrk )
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x20, 0x20, "Vendor" ) PORT_DIPLOCATION("DSW4:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::scanline_cb)
 {
-	int const scanline = param;
-
-	if (scanline == 240 && (m_maincpu->irq_enable() & 4))
+	if (param == 240 && (m_maincpu->irq_enable() & 4))
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_maincpu->irq_vector(2)); // TC0091LVC
+		m_irq_vector = m_maincpu->irq_vector(2);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 
-	if (scanline == 0 && (m_maincpu->irq_enable() & 2))
+	if (param == 0 && (m_maincpu->irq_enable() & 2))
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_maincpu->irq_vector(1)); // TC0091LVC
+		m_irq_vector = m_maincpu->irq_vector(1);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
+}
+
+IRQ_CALLBACK_MEMBER(lastbank_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 void lastbank_state::lastbank(machine_config &config)
@@ -820,6 +837,7 @@ void lastbank_state::lastbank(machine_config &config)
 	TC0091LVC(config, m_maincpu, MASTER_CLOCK / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lastbank_state::main_map);
 	m_maincpu->set_tilemap_xoffs(0,192); // TODO: correct?
+	m_maincpu->set_irq_acknowledge_callback(FUNC(lastbank_state::cpu_acknowledge_irq));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(lastbank_state::scanline_cb), "screen", 0, 1);
 
@@ -834,7 +852,7 @@ void lastbank_state::lastbank(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(64*8, 32*8);
@@ -851,7 +869,7 @@ void lastbank_state::lastbank(machine_config &config)
 
 	OKIM6295(config, m_oki, 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	ES8712(config, m_essnd, 0);
+	ES8712(config, m_essnd);
 	m_essnd->msm_write_handler().set("msm", FUNC(msm6585_device::data_w));
 	m_essnd->set_msm_tag("msm");
 
@@ -874,6 +892,24 @@ void lastbank_state::lastbank(machine_config &config)
 ROM_START( lastbank )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "3.u9", 0x00000, 0x40000, CRC(f430e1f0) SHA1(dd5b697f5c2250d98911f4c7d3e7d4cc16b0b40f) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "8.u48", 0x00000, 0x10000, CRC(3a7bfe10) SHA1(7dc543e11d3c0b9872fcc622339ade25383a1eb3) )
+
+	ROM_REGION( 0x200000, "maincpu:gfx", ROMREGION_ERASEFF )
+	ROM_LOAD( "u11",   0x000000, 0x100000, CRC(2588d82d) SHA1(426f6821862d54123e53410e2776586ddf6b21e7) )
+	ROM_LOAD( "5.u10", 0x100000, 0x020000, CRC(51f3c5a7) SHA1(73d4c8817fe96d75be32c43e816e93c52b5d2b27) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "6.u55", 0x00000, 0x40000, CRC(9e78e234) SHA1(031f93e4bc338d0257fa673da7ce656bb1cda5fb) )
+
+	ROM_REGION( 0x80000, "essnd", 0 ) // Samples
+	ROM_LOAD( "7.u60", 0x00000, 0x80000, CRC(41be7146) SHA1(00f1c0d5809efccf888e27518a2a5876c4b633d8) )
+ROM_END
+
+ROM_START( lastbank130j ) // ES-9402
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "last_bank_ver1.30j.u9", 0x00000, 0x40000, CRC(7ffdeecf) SHA1(6df378bc475088b8ebd38ad22e842a820bd194b2) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "8.u48", 0x00000, 0x10000, CRC(3a7bfe10) SHA1(7dc543e11d3c0b9872fcc622339ade25383a1eb3) )
@@ -1003,6 +1039,25 @@ ROM_START( goldstrk )
 ROM_END
 
 // ES-9402 PCB
+ROM_START( sparkle )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "7.gsoh.u9", 0x00000, 0x40000, CRC(9185fe0a) SHA1(5ac85cd5ab5b612261551c74a79edcd9e12fb28f) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	// this is almost empty and thus gives no sound? probably bad chip, because the reads are consistent
+	ROM_LOAD( "3.u48", 0x00000, 0x10000, CRC(ac28168b) SHA1(b33334bac178cdbcc92a407ebbb7c91973994395) BAD_DUMP  ) // 111111xxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "maincpu:gfx", ROMREGION_ERASEFF )
+	ROM_LOAD( "1.gschr.u11", 0x000000, 0x080000, CRC(e054cf39) SHA1(74bdbf80413e381fda688bda8942df8981d96755) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "epr4.u55", 0x00000, 0x40000, CRC(0eb850ba) SHA1(0b9a704188e3b8a50e54fc29fc8e4dad2e3e8397) ) // same as goldstrk
+
+	ROM_REGION( 0x80000, "essnd", 0 ) // Samples
+	ROM_LOAD( "epr5.u60", 0x00000, 0x80000, CRC(04952e51) SHA1(272283306d9ec951baa85cb8e2d8952da7a98894) ) // same as goldstrk
+ROM_END
+
+// ES-9402 PCB
 ROM_START( lpierrot )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "6.u9", 0x00000, 0x40000, CRC(13565453) SHA1(3b0e9b1435ae6cbcb93874c14d3c9413878188d7) )
@@ -1026,11 +1081,13 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1994, lastbank, 0,       lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)",                                   MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fever13,  0,       lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",                              MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1995, ukiyobox, fever13, lastbank, ukiyobox, fever13_state,  empty_init, ROT0, "Excellent System", "Ukiyo Box (Japan, v1.3.7)",                           MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1996, mir7hg,   0,       lastbank, mir7hg,   fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate (Japan, v1.0.2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1996, mir7hgt,  0,       lastbank, mir7hgt,  fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate Turbo (Japan, v2.0.0)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 199?, wcircus,  0,       lastbank, wcircus,  wcircus_state,  empty_init, ROT0, "Cobra",            "Wonder Circus (Japan, v1.1.1)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 199?, lpierrot, 0,       lastbank, lpierrot, wcircus_state,  empty_init, ROT0, "Cobra",            "Lucky Pierrot (Japan, v1.1.0B)",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 199?, goldstrk, 0,       lastbank, goldstrk, wcircus_state,  empty_init, ROT0, "Cobra",            "Gold Strike (Japan, v1.1.1 - location test)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1994, lastbank,     0,        lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)",                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastbank130j, lastbank, lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (Japan, v1.30J)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fever13,      0,        lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",                              MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1995, ukiyobox,     fever13,  lastbank, ukiyobox, fever13_state,  empty_init, ROT0, "Excellent System", "Ukiyo Box (Japan, v1.3.7)",                           MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, mir7hg,       0,        lastbank, mir7hg,   fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate (Japan, v1.0.2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, mir7hgt,      0,        lastbank, mir7hgt,  fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate Turbo (Japan, v2.0.0)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 199?, wcircus,      0,        lastbank, wcircus,  wcircus_state,  empty_init, ROT0, "Cobra",            "Wonder Circus (Japan, v1.1.1)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 199?, lpierrot,     0,        lastbank, lpierrot, wcircus_state,  empty_init, ROT0, "Cobra",            "Lucky Pierrot (Japan, v1.1.0B)",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 199?, goldstrk,     0,        lastbank, goldstrk, wcircus_state,  empty_init, ROT0, "Cobra",            "Gold Strike (Japan, v1.1.1 - location test)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 199?, sparkle,      goldstrk, lastbank, sparkle,  fever13_state,  empty_init, ROT0, "Cobra",            "Sparkle (v1.1.3)",                                    MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

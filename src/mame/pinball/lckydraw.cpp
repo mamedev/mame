@@ -43,9 +43,13 @@ public:
 		, m_io_keyboard(*this, "X%d", 0U)
 		, m_digits(*this, "digit%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
-		{ }
+	{ }
 
-	void lckydraw(machine_config &config);
+	void lckydraw(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void mem_map(address_map &map) ATTR_COLD;
@@ -60,8 +64,6 @@ private:
 	u8 m_segment[3]{};
 	u8 m_p1 = 0U;
 	u8 m_p2 = 0U;
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	required_device<i8035_device> m_maincpu;
 	required_ioport_array<4> m_io_dips;
 	required_ioport_array<8> m_io_keyboard;
@@ -371,9 +373,6 @@ INPUT_PORTS_END
 void lckydraw_state::machine_start()
 {
 	genpin_class::machine_start();
-
-	m_digits.resolve();
-	m_io_outputs.resolve();
 
 	save_item(NAME(m_p1));
 	save_item(NAME(m_p2));

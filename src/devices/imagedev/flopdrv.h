@@ -86,13 +86,14 @@ class legacy_floppy_image_device :  public device_t,
 {
 public:
 	// construction/destruction
-	legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const floppy_interface *config)
-		: legacy_floppy_image_device(mconfig, tag, owner, clock)
+	template <typename T>
+	legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&config) requires (std::is_convertible_v<T, const floppy_interface *>)
+		: legacy_floppy_image_device(mconfig, tag, owner, 0U)
 	{
-		set_floppy_config(config);
+		set_floppy_config(std::forward<T>(config));
 	}
 
-	legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	~legacy_floppy_image_device();
 
 	void set_floppy_config(const floppy_interface *config) { m_config = config; }
@@ -147,7 +148,7 @@ protected:
 	legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_config_complete() override;
+	virtual void device_config_complete() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
 	// device_image_interface implementation

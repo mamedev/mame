@@ -652,7 +652,7 @@ void ti992_expram_device::write(offs_t offset, uint8_t value)
 
 void ti992_expram_device::device_add_mconfig(machine_config &config)
 {
-	RAM(config, m_ram, 0);
+	RAM(config, m_ram);
 	m_ram->set_default_size("32k");
 	m_ram->set_default_value(0);
 }

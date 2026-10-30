@@ -6,26 +6,32 @@
 #include "bus/nscsi/applecd.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/cdd2000.h"
+#include "bus/nscsi/cdr52.h"
 #include "bus/nscsi/cdrn820s.h"
 #include "bus/nscsi/cdu75s.h"
 #include "bus/nscsi/cdu415.h"
 #include "bus/nscsi/cdu561.h"
 #include "bus/nscsi/cfp1080s.h"
+#include "bus/nscsi/cr504.h"
 #include "bus/nscsi/crd254sh.h"
 #include "bus/nscsi/cw7501.h"
 #include "bus/nscsi/dtc510.h"
+#include "bus/nscsi/e01_hd.h"
 #include "bus/nscsi/hd.h"
 #include "bus/nscsi/pc98_hd.h"
 #include "bus/nscsi/s1410.h"
+#include "bus/nscsi/sa1403d.h"
 #include "bus/nscsi/smoc501.h"
 #include "bus/nscsi/tape.h"
 
 void default_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("cdrom_2x", NSCSI_CDROM_2X);
 	device.option_add("harddisk", NSCSI_HARDDISK);
 	device.option_add("tape", NSCSI_TAPE);
 	device.option_add("s1410", NSCSI_S1410);
+	device.option_add("sa1403d", NSCSI_SA1403D);
 	device.option_add("dtc510", NSCSI_DTC510);
 	device.option_add("cw7501", CW7501);
 	device.option_add("cdr4210", CDR4210);
@@ -34,13 +40,16 @@ void default_scsi_devices(device_slot_interface &device)
 	device.option_add("cdu75s", CDU75S);
 	device.option_add("cdu415", CDU415);
 	device.option_add("cdu561_25", CDU561_25);
+	device.option_add("cr504", CR504);
 	device.option_add("crd254sh", CRD254SH);
 	device.option_add("smoc501", SMOC501);
 	device.option_add("aplcd150", APPLECD150);
 	device.option_add("aplcdsc", NSCSI_CDROM_APPLE);
 	device.option_add("aplcdsc_ext", NSCSI_CDROM_APPLE_EXT);
 	device.option_add("cfp1080s", CFP1080S);
+	device.option_add("cdr52", NSCSI_CDR52);
 	device.option_add("pc98_hd", NSCSI_PC98_HD);
+	device.option_add("e01_hd", NSCSI_E01);
 }
 
 void mac_scsi_devices(device_slot_interface &device)

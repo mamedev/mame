@@ -405,10 +405,10 @@ void klax_state::klax_base(machine_config &config)
 	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 60, 32);
 	m_playfield_tilemap->set_info_callback(FUNC(klax_state::get_playfield_tile_info));
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, klax_state::s_mob_config);
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, klax_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived
 	   the board uses an SOS-2 chip to generate video signals */

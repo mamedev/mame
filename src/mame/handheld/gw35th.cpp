@@ -61,7 +61,7 @@ void gw35th_state::gw35th(machine_config &config)
 	ARM9(config, m_maincpu, 480000000); // STM32H780
 	m_maincpu->set_addrmap(AS_PROGRAM, &gw35th_state::arm_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
@@ -75,6 +75,12 @@ ROM_START( gwsmb35 )
 	ROM_LOAD( "mx25u8035e.bin", 0x000000, 0x100000, CRC(e261a5bf) SHA1(4ce600f725f166e9f0dfd9e3b2f61ef95fa6383c) )
 ROM_END
 
+ROM_START( gwzeldan )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "mx25u3232.bin", 0x000000, 0x400000, CRC(53d58c63) SHA1(8101d200c89ed5e4ff3addd5b1a22d195d290892) )
+ROM_END
+
 } // anonymous namespace
 
 CONS( 2020, gwsmb35,      0,              0,      gw35th, gw35th, gw35th_state, empty_init, "Nintendo", "Game & Watch: Super Mario Bros. 35th Anniversary", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2020, gwzeldan,     0,              0,      gw35th, gw35th, gw35th_state, empty_init, "Nintendo", "Game & Watch: The Legend of Zelda Anniversary", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

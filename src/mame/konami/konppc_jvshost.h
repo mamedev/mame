@@ -11,7 +11,7 @@ class konppc_jvs_host_device : public jvs_host
 {
 public:
 	// construction/destruction
-	konppc_jvs_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	konppc_jvs_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	auto output_callback() { return output_cb.bind(); }

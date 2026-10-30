@@ -266,7 +266,7 @@ void gamecom_state::gamecom(machine_config &config)
 	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(59.732155);
 	m_screen->set_vblank_time(500);
 	m_screen->set_screen_update(FUNC(gamecom_state::screen_update));

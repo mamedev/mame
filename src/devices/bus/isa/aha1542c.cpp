@@ -101,9 +101,9 @@ http://download.adaptec.com/pdfs/installation_guides/aha1540cf_ig.pdf
 
 /*
 Adaptec QFP ASICs
-— AHA-1540/42C: AIC-???? (covered by sticker)
-— AHA-1540/42CP: AIC-7970Q
-— AHA-1540/42CF: AIC-3370P, AIC-???? (covered by sticker)
+— AHA-1540/42C: AIC-???? (covered by sticker)
+— AHA-1540/42CP: AIC-7970Q
+— AHA-1540/42CF: AIC-3370P, AIC-???? (covered by sticker)
 */
 
 #include "emu.h"

@@ -9,7 +9,7 @@
 class umc6650_device : public device_t, public device_memory_interface
 {
 public:
-	umc6650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	umc6650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);

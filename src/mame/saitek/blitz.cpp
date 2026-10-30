@@ -44,8 +44,10 @@ TODO:
 #include "sound/dac.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
+
+#include <bit>
 
 // internal artwork
 #include "saitek_blitz.lh"
@@ -67,7 +69,7 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
-	void blitz(machine_config &config);
+	void blitz(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_off) { m_power = false; }
 
@@ -124,8 +126,6 @@ private:
 
 void blitz_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_sensor_strength));
@@ -187,7 +187,7 @@ void blitz_state::update_lcd()
 	for (int i = 0; i < 4; i++)
 	{
 		// LCD common is analog (voltage level)
-		const u8 com = population_count_32(m_lcd_com >> (i * 2) & 3);
+		const u8 com = std::popcount(m_lcd_com >> (i * 2) & 3U);
 		const u32 data = (com == 0) ? lcd_segs : (com == 2) ? ~lcd_segs : 0;
 		m_lcd_pwm->write_row(i, data);
 	}
@@ -328,10 +328,9 @@ void blitz_state::blitz(machine_config &config)
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(4, 22);
 	m_lcd_pwm->output_x().set(FUNC(blitz_state::lcd_pwm_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/5, 406/5);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(8, 8);
 	m_led_pwm->set_bri_levels(0.25);

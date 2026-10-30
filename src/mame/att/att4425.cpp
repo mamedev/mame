@@ -236,7 +236,7 @@ void att4425_state::att4425(machine_config &config)
 	m_maincpu->set_daisy_config(att4425_daisy_chain);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(config, m_screen).set_color(rgb_t::green());
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_screen_update(FUNC(att4425_state::screen_update));
@@ -275,7 +275,7 @@ void att4425_state::att4425(machine_config &config)
 	clock_device &line_clock(CLOCK(config, "line_clock", 9600 * 64));
 	line_clock.signal_handler().set(FUNC(att4425_state::write_line_clock));
 
-	I8251(config, m_i8251, 0);
+	I8251(config, m_i8251);
 	m_i8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_i8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_i8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));

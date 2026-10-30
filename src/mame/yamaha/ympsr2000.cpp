@@ -54,7 +54,7 @@ void psr2000_state::psr2000(machine_config &config)
 
 	auto &palette = PALETTE(config, "palette", FUNC(psr2000_state::palette_init), 2);
 
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_LCD);
+	auto &screen = SCREEN(config, "screen").set_lcd();
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(m_lcdc, FUNC(sed1330_device::screen_update));
 	screen.set_size(320, 240);
@@ -109,4 +109,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST( 2001, psr2000, 0, 0, psr2000, psr2000, psr2000_state, empty_init, "Yamaha", "PSR-2000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+SYST( 2001, psr2000, 0, 0, psr2000, psr2000, psr2000_state, empty_init, "Yamaha", "PortaTone PSR-2000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

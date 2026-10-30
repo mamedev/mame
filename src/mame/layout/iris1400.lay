@@ -22,6 +22,14 @@ Silicon Graphics IRIS 1400.
 			<color red="1.0" green="0.0" blue="0.0" />
 		</disk>
 	</element>
+	<element name="kbd_led" defstate="0">
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
 	<view name="Graphics">
 		<screen index="0">
 			<bounds x="0" y="0" width="1024" height="768" />
@@ -32,5 +40,15 @@ Silicon Graphics IRIS 1400.
 		<element name="CR2" ref="green_led">
 			<bounds x="984" y="768" width="10" height="10" />
 		</element>
+
+		<element name="LED1" ref="kbd_led"><bounds x="20" y="768" width="10" height="10" /></element>
+		<element name="LED2" ref="kbd_led"><bounds x="30" y="768" width="10" height="10" /></element>
+		<element name="LED3" ref="kbd_led"><bounds x="40" y="768" width="10" height="10" /></element>
+		<element name="LED4" ref="kbd_led"><bounds x="50" y="768" width="10" height="10" /></element>
+		<element name="LED5" ref="kbd_led"><bounds x="60" y="768" width="10" height="10" /></element>
+		<element name="LED6" ref="kbd_led"><bounds x="70" y="768" width="10" height="10" /></element>
+		<element name="LED7" ref="kbd_led"><bounds x="80" y="768" width="10" height="10" /></element>
+		<element name="LED8" ref="kbd_led"><bounds x="90" y="768" width="10" height="10" /></element> <!-- CAPS -->
+
 	</view>
 </mamelayout>

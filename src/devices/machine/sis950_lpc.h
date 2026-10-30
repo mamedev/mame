@@ -10,7 +10,7 @@
 
 #include "bus/ata/ataintf.h"
 #include "bus/isa/isa.h"
-#include "lpc-acpi.h"
+#include "sis950_acpi.h"
 #include "sis950_smbus.h"
 
 #include "cpu/i386/i386.h"
@@ -64,7 +64,12 @@ public:
 	void pc_irq14_w(int state);
 	void pc_irq15_w(int state);
 
+	// IDE Primary/Secondary Channel interrupts
+	void pc_iirqa_w(int state);
+	void pc_iirqb_w(int state);
+
 protected:
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_config_complete() override;
@@ -95,7 +100,7 @@ private:
 	required_device<ds12885ext_device> m_rtc;
 	required_device<pc_kbdc_device> m_ps2_con;
 	required_device<pc_kbdc_device> m_aux_con;
-	required_device<lpc_acpi_device> m_acpi;
+	required_device<sis950_acpi_device> m_acpi;
 	required_device<sis950_smbus_device> m_smbus;
 
 	devcb_write_line m_fast_reset_cb;
@@ -142,6 +147,11 @@ private:
 		IRQ_SWDOG
 	};
 	u8 m_irq_remap[9]{};
+
+	void redirect_irq(int irq, int state);
+
+	int pin_mapper(int pin);
+	void irq_handler(int line, int state);
 
 	// LPC vendor specific, verify if it's common for all
 	u8 lpc_fast_init_r();

@@ -200,7 +200,7 @@ void hp2620_state::hp2622(machine_config &config)
 
 	INPUT_MERGER_ALL_HIGH(config, m_nmigate).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(FUNC(hp2620_state::screen_update));
 
 	DP8367(config, m_crtc, 25.7715_MHz_XTAL).set_screen("screen");
@@ -208,7 +208,7 @@ void hp2620_state::hp2622(machine_config &config)
 	m_crtc->hsync_callback().set(m_bellctr, FUNC(ripple_counter_device::clock_w)).invert();
 	m_crtc->lrc_callback().set(FUNC(hp2620_state::nlrc_w)).invert();
 
-	mos6551_device &acia(MOS6551(config, "acia", 0)); // SY6551
+	mos6551_device &acia(MOS6551(config, "acia")); // SY6551
 	acia.set_xtal(25.7715_MHz_XTAL / 14); // 1.84 MHz
 	acia.irq_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
 	acia.rts_handler().set(m_datacomm, FUNC(rs232_port_device::write_rts)); // RS (J6-22)

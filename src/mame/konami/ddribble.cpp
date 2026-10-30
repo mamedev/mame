@@ -236,12 +236,16 @@ void ddribble_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	{
 		int number = source[0] | ((source[1] & 0x07) << 8);       // sprite number
 		int const attr = source[4];                               // attributes
-		int sx = source[3] | ((attr & 0x01) << 8);                // vertical position
-		int sy = source[2];                                       // horizontal position
+		int sx = source[3] | ((attr & 0x01) << 8);                // sprite X position
+		int sy = source[2];                                       // sprite Y position
 		int flipx = attr & 0x20;                                  // flip x
 		int flipy = attr & 0x40;                                  // flip y
 		int const color = (source[1] & 0xf0) >> 4;                // color
 		int width, height;
+
+		// sprites wrap back at the start after px 255
+		if (sx & 0x100)
+			sx -= 0x200;
 
 		if (flipscreen)
 		{
@@ -349,8 +353,7 @@ uint8_t ddribble_state::vlm5030_busy_r()
 	return machine().rand(); // patch
 	// FIXME: remove ?
 #if 0
-	if (m_vlm->bsy()) return 1;
-	else return 0;
+	return m_vlm->bsy_r();
 #endif
 }
 
@@ -359,13 +362,13 @@ void ddribble_state::vlm5030_ctrl_w(uint8_t data)
 	// b7 : vlm data bus OE
 
 	// b6 : VLM5030-RST
-	m_vlm->rst(BIT(data, 6));
+	m_vlm->rst_w(BIT(data, 6));
 
 	// b5 : VLM5030-ST
-	m_vlm->st(BIT(data, 5));
+	m_vlm->st_w(BIT(data, 5));
 
 	// b4 : VLM5300-VCU
-	m_vlm->vcu(BIT(data, 4));
+	m_vlm->vcu_w(BIT(data, 4));
 
 	// b3 : ROM bank select
 	m_vlmbank->set_entry(BIT(data, 3));
@@ -546,7 +549,7 @@ void ddribble_state::ddribble(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

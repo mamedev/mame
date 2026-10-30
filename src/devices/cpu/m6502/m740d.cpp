@@ -12,11 +12,11 @@
 #include "m740d.h"
 #include "cpu/m6502/m740d.hxx"
 
-m740_disassembler::m740_disassembler(config *_conf) : m6502_base_disassembler(disasm_entries), conf(_conf)
+m740_disassembler::m740_disassembler(config *_conf) : m6502_base_disassembler(disasm_entries), m_conf(_conf)
 {
 }
 
 u32 m740_disassembler::get_instruction_bank() const
 {
-	return conf->get_state_base();
+	return m_conf->get_state_base();
 }

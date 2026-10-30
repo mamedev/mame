@@ -615,9 +615,9 @@ void tbowl_state::tbowl(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024*2).set_endianness(ENDIANNESS_BIG);
 	config.set_default_layout(layout_dualhsxs);
 
-	TECMO_SPRITE(config, m_sprgen, 0, m_palette, gfx_tbowl_spr);
+	TECMO_SPRITE(config, m_sprgen, m_palette, gfx_tbowl_spr);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(60);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	lscreen.set_size(32*8, 32*8);
@@ -625,7 +625,7 @@ void tbowl_state::tbowl(machine_config &config)
 	lscreen.set_screen_update(FUNC(tbowl_state::screen_update_left));
 	lscreen.set_palette(m_palette);
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(60);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	rscreen.set_size(32*8, 32*8);

@@ -311,7 +311,7 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void notechan(machine_config &config);
+	void notechan(machine_config &config) ATTR_COLD;
 
 private:
 	void out_f8_w(uint8_t data);
@@ -320,8 +320,6 @@ private:
 	void out_ff_w(uint8_t data);
 	void notechan_map(address_map &map) ATTR_COLD;
 	void notechan_port_map(address_map &map) ATTR_COLD;
-
-	virtual void machine_start() override { m_lamps.resolve(); }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;

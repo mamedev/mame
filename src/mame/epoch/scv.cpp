@@ -86,7 +86,7 @@ const u8 scv_state::s_spr_2col_lut1[16] = {0,  1,  8, 11,  2,  3, 10, 9, 4, 5, 1
 
 void scv_state::scv_mem(address_map &map)
 {
-	map(0x0000, 0x0fff).rom();   // BIOS
+	// 0000 - 0fff - CPU internal ROM
 
 	map(0x2000, 0x3403).ram().share(m_videoram);  // VRAM + 4 registers
 	map(0x3600, 0x3600).lw8(NAME([this] (u8 data) {
@@ -563,7 +563,7 @@ void scv_state::scv(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	// Video chip is EPOCH TV-1
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(14'318'181)/2, 456, 24, 24+192, 262, 23, 23+222);  // Clock verified. TODO: Verify rest of the parameters
 	m_screen->set_screen_update(FUNC(scv_state::screen_update_scv));
 	m_screen->set_palette("palette");

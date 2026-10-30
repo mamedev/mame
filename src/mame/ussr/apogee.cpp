@@ -252,7 +252,7 @@ void apogee_state::apogee(machine_config &config)
 	I8080(config, m_maincpu, XTAL(16'000'000) / 9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apogee_state::mem_map);
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	pit.set_clk<0>(XTAL(16'000'000)/9);
 	pit.out_handler<0>().set(FUNC(apogee_state::pit8253_out0_changed));
 	pit.set_clk<1>(XTAL(16'000'000)/9);
@@ -274,7 +274,7 @@ void apogee_state::apogee(machine_config &config)
 	i8275.drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 	screen.set_refresh_hz(50);
 	screen.set_size(78*6, 30*10);

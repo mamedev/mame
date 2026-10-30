@@ -62,7 +62,7 @@ private:
 class m62_audio_device : public irem_audio_device
 {
 public:
-	m62_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m62_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -71,7 +71,7 @@ protected:
 class m52_soundc_audio_device : public irem_audio_device
 {
 public:
-	m52_soundc_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m52_soundc_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -80,7 +80,7 @@ protected:
 class m52_large_audio_device : public irem_audio_device
 {
 public:
-	m52_large_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m52_large_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

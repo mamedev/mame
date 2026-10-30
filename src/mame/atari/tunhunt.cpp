@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Phil Stroffolino, David Haywood
+// copyright-holders:Phil Stroffolino
 
 /***************************************************************************
 
@@ -78,10 +78,9 @@ public:
 		m_led(*this, "led0")
 	{ }
 
-	void tunhunt(machine_config &config);
+	void tunhunt(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override { m_led.resolve(); }
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
@@ -492,8 +491,8 @@ uint32_t tunhunt_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		m_control & 0x10); // hstretch
 
 	rectangle cr = cliprect;
-	if (cr.min_x < 192)
-		cr.min_x = 192;
+	if (cr.left() < 192)
+		cr.setx(192, cr.right());
 
 	m_fg_tilemap->draw(screen, bitmap, cr, 0, 0);
 	return 0;
@@ -747,7 +746,7 @@ void tunhunt_state::tunhunt(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(tunhunt_state::irq0_line_hold), attotime::from_hz(4*60));  // 48V, 112V, 176V, 240V
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(256, 256-16);

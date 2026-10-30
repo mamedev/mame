@@ -65,7 +65,7 @@ void yes_state::yes(machine_config &config)
 	//m_fdc->intrq_wr_callback().set(m_uart, FUNC(i8256_device::ir));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16_MHz_XTAL, 1016, 0, 640, 314, 0, 240);
 	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 

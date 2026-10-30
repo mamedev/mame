@@ -9,6 +9,7 @@
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/namco.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -38,7 +39,51 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
+		, m_dsw(*this, "DSW%u", 1)
 	{ }
+
+	void birdiy(machine_config &config) ATTR_COLD;
+	void cannonbp(machine_config &config) ATTR_COLD;
+	void rocktrv2(machine_config &config) ATTR_COLD;
+	void mspacman(machine_config &config) ATTR_COLD;
+	void dremshpr(machine_config &config) ATTR_COLD;
+	void mspacii(machine_config &config) ATTR_COLD;
+	void nmouse(machine_config &config) ATTR_COLD;
+	void vanvan(machine_config &config) ATTR_COLD;
+	void s2650games(machine_config &config) ATTR_COLD;
+	void woodpek(machine_config &config) ATTR_COLD;
+	void woodpek_rbg(machine_config &config) ATTR_COLD;
+	void crushs(machine_config &config) ATTR_COLD;
+	void superabc(machine_config &config) ATTR_COLD;
+	void numcrash(machine_config &config) ATTR_COLD;
+	void crush4(machine_config &config) ATTR_COLD;
+	void bigbucks(machine_config &config) ATTR_COLD;
+	void porky(machine_config &config) ATTR_COLD;
+	void pacman(machine_config &config) ATTR_COLD;
+	void _8bpm(machine_config &config) ATTR_COLD;
+	void crush2(machine_config &config) ATTR_COLD;
+	void korosuke(machine_config &config) ATTR_COLD;
+	void drivfrcp(machine_config &config) ATTR_COLD;
+	void pengojpm(machine_config &config) ATTR_COLD;
+	void piranha(machine_config &config) ATTR_COLD;
+
+	void init_maketrax() ATTR_COLD;
+	void init_drivfrcp() ATTR_COLD;
+	void init_mspacmbe() ATTR_COLD;
+	void init_mspackpls() ATTR_COLD;
+	void init_ponpoko() ATTR_COLD;
+	void init_eyes() ATTR_COLD;
+	void init_woodpek() ATTR_COLD;
+	void init_jumpshot() ATTR_COLD;
+	void init_mspacii() ATTR_COLD;
+	void init_pacplus() ATTR_COLD;
+	void init_rocktrv2() ATTR_COLD;
+	void init_superabc() ATTR_COLD;
+	void init_8bpm() ATTR_COLD;
+	void init_porky() ATTR_COLD;
+	void init_mspacman() ATTR_COLD;
+	void init_mbrush() ATTR_COLD;
+	void init_pengomc1() ATTR_COLD;
 
 protected:
 	void _8bpm_portmap(address_map &map) ATTR_COLD;
@@ -52,8 +97,6 @@ protected:
 	void dremshpr_portmap(address_map &map) ATTR_COLD;
 	void drivfrcp_portmap(address_map &map) ATTR_COLD;
 	void mspacii_portmap(address_map &map) ATTR_COLD;
-	void mschamp_map(address_map &map) ATTR_COLD;
-	void mschamp_portmap(address_map &map) ATTR_COLD;
 	void mspacman_map(address_map &map) ATTR_COLD;
 	void nmouse_portmap(address_map &map) ATTR_COLD;
 	void numcrash_map(address_map &map) ATTR_COLD;
@@ -71,7 +114,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<ls259_device> m_mainlatch;
-	optional_device<namco_device> m_namco_sound;
+	optional_device<namco_wsg_device> m_namco_sound;
 	required_device<watchdog_timer_device> m_watchdog;
 	optional_shared_ptr<uint8_t> m_spriteram;
 	optional_shared_ptr<uint8_t> m_spriteram2;
@@ -83,6 +126,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	optional_ioport_array<2> m_dsw;
 
 	uint8_t m_cannonb_bit_to_read = 0;
 	uint8_t m_counter = 0;
@@ -115,7 +159,6 @@ protected:
 	uint8_t mbrush_prot_r(offs_t offset);
 	uint8_t maketrax_special_port2_r(offs_t offset);
 	uint8_t maketrax_special_port3_r(offs_t offset);
-	uint8_t mschamp_kludge_r();
 	void bigbucks_bank_w(uint8_t data);
 	uint8_t bigbucks_question_r(offs_t offset);
 	void porky_banking_w(uint8_t data);
@@ -155,27 +198,6 @@ protected:
 	void jrpacman_bgpriority_w(int state);
 	void superabc_bank_w(uint8_t data);
 
-public:
-	void init_maketrax();
-	void init_drivfrcp();
-	void init_mspacmbe();
-	void init_mspackpls();
-	void init_ponpoko();
-	void init_eyes();
-	void init_woodpek();
-	void init_jumpshot();
-	void init_mspacii();
-	void init_pacplus();
-	void init_rocktrv2();
-	void init_superabc();
-	void init_8bpm();
-	void init_porky();
-	void init_mspacman();
-	void init_mschamp();
-	void init_mbrush();
-	void init_pengomc1();
-
-protected:
 	TILEMAP_MAPPER_MEMBER(pacman_scan_rows);
 	TILE_GET_INFO_MEMBER(pacman_get_tile_info);
 	TILE_GET_INFO_MEMBER(s2650_get_tile_info);
@@ -186,7 +208,6 @@ protected:
 	void pacman_rbg_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(birdiy);
 	DECLARE_VIDEO_START(s2650games);
-	DECLARE_MACHINE_RESET(mschamp);
 	DECLARE_MACHINE_RESET(superabc);
 	DECLARE_MACHINE_RESET(maketrax);
 	DECLARE_VIDEO_START(pengo);
@@ -204,42 +225,6 @@ private:
 	void jrpacman_mark_tile_dirty( int offset );
 	void eyes_decode(uint8_t *data);
 	void mspacman_install_patches(uint8_t *ROM);
-
-public:
-	void birdiy(machine_config &config);
-	void cannonbp(machine_config &config);
-	void rocktrv2(machine_config &config);
-	void mspacman(machine_config &config);
-	void dremshpr(machine_config &config);
-	void mspacii(machine_config &config);
-	void mschamp(machine_config &config);
-	void nmouse(machine_config &config);
-	void vanvan(machine_config &config);
-	void s2650games(machine_config &config);
-	void woodpek(machine_config &config);
-	void woodpek_rbg(machine_config &config);
-	void crushs(machine_config &config);
-	void superabc(machine_config &config);
-	void numcrash(machine_config &config);
-	void crush4(machine_config &config);
-	void bigbucks(machine_config &config);
-	void porky(machine_config &config);
-	void pacman(machine_config &config, bool latch = true);
-	void _8bpm(machine_config &config);
-	void crush2(machine_config &config);
-	void korosuke(machine_config &config);
-	void drivfrcp(machine_config &config);
-	void pengojpm(machine_config &config);
-	void piranha(machine_config &config);
-
-private:
-	// pacplus.cpp
-	uint8_t pacplus_decrypt(int addr, uint8_t e);
-	void pacplus_decode();
-
-	// jumpshot.cpp
-	uint8_t jumpshot_decrypt(int addr, uint8_t e);
-	void jumpshot_decode();
 };
 
 
@@ -250,9 +235,9 @@ public:
 		: pacman_state(mconfig, type, tag)
 	{ }
 
-	void alibaba(machine_config &config);
+	void alibaba(machine_config &config) ATTR_COLD;
 
-	void init_alibaba();
+	void init_alibaba() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -281,11 +266,11 @@ public:
 		: pacman_state(mconfig, type, tag)
 	{ }
 
-	void acitya(machine_config &config);
-	void theglobp(machine_config &config);
-	void eeekkp(machine_config &config);
+	void acitya(machine_config &config) ATTR_COLD;
+	void theglobp(machine_config &config) ATTR_COLD;
+	void eeekkp(machine_config &config) ATTR_COLD;
 
-	void init_sprglobp2();
+	void init_sprglobp2() ATTR_COLD;
 
 private:
 	uint8_t epos_decryption_w(offs_t offset);
@@ -309,11 +294,11 @@ public:
 		, m_players(*this, "P%u", 1)
 	{ }
 
-	void clubpacm(machine_config &config);
+	void clubpacm(machine_config &config) ATTR_COLD;
 
 	ioport_value clubpacm_input_r();
 
-	void init_clubpacma();
+	void init_clubpacma() ATTR_COLD;
 
 protected:
 	void clubpacm_map(address_map &map) ATTR_COLD;
@@ -331,9 +316,9 @@ public:
 		, m_decrypted_opcodes_high(*this, "decrypted_opcodes_high")
 	{ }
 
-	void mspactwin(machine_config &config);
+	void mspactwin(machine_config &config) ATTR_COLD;
 
-	void init_mspactwin();
+	void init_mspactwin() ATTR_COLD;
 
 	void flipscreen_w(int state);
 
@@ -347,5 +332,28 @@ protected:
 	required_shared_ptr<uint8_t> m_decrypted_opcodes_high;
 };
 
+class mschamp_state : public pacman_state
+{
+public:
+	mschamp_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pacman_state(mconfig, type, tag)
+	{ }
+
+	void mschamp(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	void mschamp_map(address_map &map) ATTR_COLD;
+	void mschamp_portmap(address_map &map) ATTR_COLD;
+
+private:
+	uint8_t mux_r();
+	void mux_w(offs_t offset, uint8_t data);
+
+	uint8_t m_mux = 1;
+	uint8_t m_mux_data = 0xff;
+};
 
 #endif // MAME_PACMAN_PACMAN_H

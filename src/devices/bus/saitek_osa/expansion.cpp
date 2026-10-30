@@ -11,6 +11,7 @@ Used by Saitek(SciSys) chess computers Leonardo, Galileo, Renaissance.
 #include "emu.h"
 #include "expansion.h"
 
+#include "bruteforce.h"
 #include "maestro.h"
 #include "maestroa.h"
 #include "sparc.h"
@@ -69,7 +70,7 @@ void saitekosa_expansion_device::device_start()
 void saitekosa_expansion_device::device_add_mconfig(machine_config &config)
 {
 	// optional embedded screen
-	auto &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	auto &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_size(6 * 16 + 3, 16);
 	screen.set_visarea_full();
@@ -161,6 +162,7 @@ device_saitekosa_expansion_interface::~device_saitekosa_expansion_interface()
 void saitekosa_expansion_modules(device_slot_interface &device)
 {
 	device.option_add("analyst", OSA_ANALYST);
+	device.option_add("bforce", OSA_BFORCE);
 	device.option_add("maestro", OSA_MAESTRO);
 	device.option_add("maestroa", OSA_MAESTROA);
 	device.option_add("sparc", OSA_SPARC);

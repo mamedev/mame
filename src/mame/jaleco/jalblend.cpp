@@ -93,11 +93,10 @@ rgb_t jaleco_blend_device::func(rgb_t dest, rgb_t addMe, u8 alpha)
 }
 
 template<class BitmapClass>
-void jaleco_blend_device::drawgfx_common(palette_device &palette,BitmapClass &dest_bmp,const rectangle &clip,gfx_element *gfx,
-		u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
-		u8 transparent_color)
+void jaleco_blend_device::drawgfx_common(palette_device &palette,BitmapClass &dest_bmp, const rectangle &clip, gfx_element *gfx,
+		u32 code, u32 color, bool flipx, bool flipy, int offsx, int offsy, u8 transparent_color)
 {
-	/* Start drawing */
+	// Start drawing
 	const pen_t *pal = &palette.pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 	const u8 *source_base = gfx->get_data(code % gfx->elements());
 
@@ -115,31 +114,34 @@ void jaleco_blend_device::drawgfx_common(palette_device &palette,BitmapClass &de
 	int ex = sx + gfx->width();
 	int ey = sy + gfx->height();
 
-	if (sx < clip.min_x)
-	{ // clip left
-		int pixels = clip.min_x - sx;
+	if (sx < clip.left())
+	{
+		// clip left
+		int pixels = clip.left() - sx;
 		sx += pixels;
 		x_index_base += xinc * pixels;
 	}
-	if (sy < clip.min_y)
-	{ // clip top
-		int pixels = clip.min_y - sy;
+	if (sy < clip.top())
+	{
+		// clip top
+		int pixels = clip.top() - sy;
 		sy += pixels;
 		y_index += yinc * pixels;
 	}
-	// NS 980211 - fixed incorrect clipping
-	if (ex > clip.max_x + 1)
-	{ // clip right
-		ex = clip.max_x + 1;
+	if (ex > clip.right() + 1)
+	{
+		// clip right
+		ex = clip.right() + 1;
 	}
-	if (ey > clip.max_y + 1)
-	{ // clip bottom
-		ey = clip.max_y + 1;
+	if (ey > clip.bottom() + 1)
+	{
+		// clip bottom
+		ey = clip.bottom() + 1;
 	}
 
+	// skip if inner loop doesn't draw anything
 	if (ex > sx)
-	{ // skip if inner loop doesn't draw anything
-
+	{
 		// taken from case : TRANSPARENCY_ALPHARANGE
 		for (int y = sy; y < ey; y++)
 		{

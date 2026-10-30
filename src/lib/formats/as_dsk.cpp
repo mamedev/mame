@@ -8,7 +8,7 @@
 #include "ioprocs.h"
 #include "multibyte.h"
 
-#include <string.h>
+#include <cstring>
 
 
 namespace {

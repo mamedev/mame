@@ -284,9 +284,6 @@ void vd_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_segment));
 	save_item(NAME(m_t_c));
 	save_item(NAME(m_game));

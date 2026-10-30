@@ -78,10 +78,7 @@ public:
 	amiga_cpuslot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt) :
 		amiga_cpuslot_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 
 	amiga_cpuslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -95,6 +92,7 @@ public:
 	auto int2_cb() { return m_int2_cb.bind(); }
 	auto int6_cb() { return m_int6_cb.bind(); }
 	auto ipl7_cb() { return m_ipl7_cb.bind(); }
+	auto fc_cb() { return m_fc_cb.bind(); }
 
 	// from host
 	void cfgin_w(int state);
@@ -106,6 +104,7 @@ public:
 	void ovr_w(int state) { m_ovr_cb(state); }
 	void cfgout_w(int state) { m_cfgout_cb(state); }
 	void ipl7_w(int state) { m_ipl7_cb(state); }
+	uint8_t fc_r() { return m_fc_cb(); }
 
 	address_space &space() const { return *m_space; }
 
@@ -122,6 +121,7 @@ private:
 	devcb_write_line m_int2_cb;
 	devcb_write_line m_int6_cb;
 	devcb_write_line m_ipl7_cb;
+	devcb_read8 m_fc_cb;
 };
 
 

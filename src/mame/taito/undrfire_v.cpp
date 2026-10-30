@@ -2,7 +2,10 @@
 // copyright-holders:Bryan McPhail, David Graves
 #include "emu.h"
 #include "undrfire.h"
+
+#include "input.h" // for video debug keys
 #include "screen.h"
+
 
 /******************************************************************/
 

@@ -189,9 +189,6 @@
 
 void turbo_base_state::machine_start()
 {
-	m_digits.resolve();
-	m_lamp.resolve();
-
 	save_item(NAME(m_i8279_scanlines));
 	save_item(NAME(m_sound_state));
 }
@@ -217,8 +214,6 @@ void subroc3d_state::machine_start()
 {
 	turbo_base_state::machine_start();
 
-	m_shutter.resolve();
-
 	save_item(NAME(m_col));
 	save_item(NAME(m_ply));
 	save_item(NAME(m_flip));
@@ -235,9 +230,6 @@ void subroc3d_state::machine_start()
 void turbo_state::machine_start()
 {
 	turbo_base_state::machine_start();
-
-	m_tachometer.resolve();
-	m_speed.resolve();
 
 	save_item(NAME(m_osel));
 	save_item(NAME(m_bsel));
@@ -962,7 +954,7 @@ void turbo_state::turbo(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_turbo);
 	PALETTE(config, "palette", FUNC(turbo_state::palette), 256);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(turbo_state::screen_update));
@@ -1006,7 +998,7 @@ void subroc3d_state::subroc3d(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_turbo);
 	PALETTE(config, "palette", FUNC(subroc3d_state::palette), 256);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(subroc3d_state::screen_update));
@@ -1057,7 +1049,7 @@ void buckrog_state::buckrog(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_turbo);
 	PALETTE(config, "palette", FUNC(buckrog_state::palette), 1024);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(buckrog_state::screen_update));

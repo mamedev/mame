@@ -67,10 +67,10 @@ DEFINE_DEVICE_TYPE(EI68C153,        ei68c153_device,  "ei68c153",         "EPIC 
 
 void bim68153_device::device_add_mconfig(machine_config &config)
 {
-	MC68153_CHANNEL(config, m_chn[0], 0);
-	MC68153_CHANNEL(config, m_chn[1], 0);
-	MC68153_CHANNEL(config, m_chn[2], 0);
-	MC68153_CHANNEL(config, m_chn[3], 0);
+	MC68153_CHANNEL(config, m_chn[0]);
+	MC68153_CHANNEL(config, m_chn[1]);
+	MC68153_CHANNEL(config, m_chn[2]);
+	MC68153_CHANNEL(config, m_chn[3]);
 }
 
 //**************************************************************************

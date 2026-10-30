@@ -238,7 +238,6 @@ void llc1_state::machine_reset()
 
 void llc1_state::machine_start()
 {
-	m_digits.resolve();
 	save_item(NAME(m_porta));
 	save_item(NAME(m_term_data));
 }
@@ -312,7 +311,7 @@ void llc1_state::llc1(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &llc1_state::io_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*8, 16*8);
@@ -341,7 +340,7 @@ void llc1_state::llc1(machine_config &config)
 	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 	m_ctc->zc_callback<1>().set(m_ctc, FUNC(z80ctc_device::trg2));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(llc1_state::kbd_put));
 }
 

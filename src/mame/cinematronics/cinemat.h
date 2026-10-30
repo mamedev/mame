@@ -16,8 +16,7 @@
 #include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
-#include "video/vector.h"
-#include "screen.h"
+#include "vector.h"
 
 class cinemat_state : public driver_device
 {
@@ -28,7 +27,6 @@ public:
 		, m_ay1(*this, "ay1")
 		, m_outlatch(*this, "outlatch")
 		, m_vector(*this, "vector")
-		, m_screen(*this, "screen")
 		, m_rambase(*this, "rambase")
 		, m_inputs(*this, "INPUTS")
 		, m_switches(*this, "SWITCHES")
@@ -44,7 +42,6 @@ public:
 	optional_device<ay8910_device> m_ay1;
 	required_device<ls259_device> m_outlatch;
 	required_device<vector_device> m_vector;
-	required_device<screen_device> m_screen;
 	optional_shared_ptr<s16> m_rambase;
 
 	required_ioport m_inputs;
@@ -76,8 +73,7 @@ public:
 	u8 joystick_read();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	void init_speedfrk();
-	u32 screen_update_cinemat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	u32 screen_update_spacewar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_configuration();
 	void cinemat_vector_callback(s16 sx, s16 sy, s16 ex, s16 ey, u8 shift);
 	void ripoff(machine_config &config);
 	void wotw(machine_config &config);

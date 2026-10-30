@@ -448,7 +448,7 @@ void nichild_state::nichild(machine_config &config)
 	m_v9938->set_vram_size(0x40000);
 	m_v9938->int_cb().set(m_maincpu, FUNC(tmpz84c011_device::trg3)).invert();
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	// TODO: mixing with LD player
 	SPEAKER(config, "speaker").front_center();

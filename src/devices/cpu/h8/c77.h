@@ -69,6 +69,7 @@ protected:
 	virtual void update_irq_filter() override;
 	virtual void interrupt_taken() override;
 	virtual void internal_update(uint64_t current_time) override;
+	using h8_device::internal_update;
 	virtual void notify_standby(int state) override;
 
 	void map(address_map &map) ATTR_COLD;

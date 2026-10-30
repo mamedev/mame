@@ -522,7 +522,7 @@ void sliver_state::sliver(machine_config &config)
 	m_audiocpu->set_addrmap(AS_DATA, &sliver_state::soundmem_data);
 	m_audiocpu->port_out_cb<1>().set(FUNC(sliver_state::oki_setbank));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(64*8, 32*8);
@@ -531,7 +531,7 @@ void sliver_state::sliver(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(0x100);
 	// AT76C176
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", "palette"));
 	ramdac.set_addrmap(0, &sliver_state::ramdac_map);
 
 	SPEAKER(config, "speaker", 2).front();

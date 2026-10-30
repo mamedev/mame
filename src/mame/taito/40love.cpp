@@ -269,6 +269,7 @@ void fortyl_state::driver_init()
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
 
+	// TODO: belongs to video_start
 	m_pix_color[0] = 0x000;
 	m_pix_color[1] = 0x1e3;
 	m_pix_color[2] = 0x16c;
@@ -655,7 +656,7 @@ void fortyl_state::common(machine_config &config)
 	MB14241(config, "mb14241");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
@@ -899,8 +900,8 @@ ROM_START( undoukai )
 	ROM_LOAD( "a17-18.23v", 0x0c00, 0x0400, CRC(3023a1da) SHA1(08ce4c6e99d04b358d66f0588852311d07183619) )  /* ??? */
 ROM_END
 
-GAME( 1984, 40love,   0,        _40love,   40love,   fortyl_state, driver_init, ROT0, "Taito Corporation", "Forty-Love (World)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, 40lovej,  40love,   _40love,   40love,   fortyl_state, driver_init, ROT0, "Taito Corporation", "Forty-Love (Japan)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // several ROMs needs double checking
-GAME( 1984, 40lovebl, 40love,   _40lovebl, 40love,   fortyl_state, driver_init, ROT0, "bootleg",           "Forty-Love (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, fieldday, 0,        undoukai,  undoukai, fortyl_state, driver_init, ROT0, "Taito Corporation", "Field Day",            MACHINE_SUPPORTS_SAVE )
-GAME( 1984, undoukai, fieldday, undoukai,  undoukai, fortyl_state, driver_init, ROT0, "Taito Corporation", "The Undoukai (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 40love,   0,        _40love,   40love,   fortyl_state, driver_init, ROT0, "Taito",   "Forty-Love (World)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, 40lovej,  40love,   _40love,   40love,   fortyl_state, driver_init, ROT0, "Taito",   "Forty-Love (Japan)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // several ROMs needs double checking
+GAME( 1984, 40lovebl, 40love,   _40lovebl, 40love,   fortyl_state, driver_init, ROT0, "bootleg", "Forty-Love (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, fieldday, 0,        undoukai,  undoukai, fortyl_state, driver_init, ROT0, "Taito",   "Field Day",            MACHINE_SUPPORTS_SAVE )
+GAME( 1984, undoukai, fieldday, undoukai,  undoukai, fortyl_state, driver_init, ROT0, "Taito",   "The Undoukai (Japan)", MACHINE_SUPPORTS_SAVE )

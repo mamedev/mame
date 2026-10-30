@@ -654,7 +654,7 @@ void mirderby_state::mirderby(machine_config &config)
 	m_coin_ppi->out_pb_callback().set(m_coinlatch, FUNC(generic_latch_8_device::write));
 	m_coin_ppi->in_pc_callback().set_ioport("SUB_COIN1");
 
-	PIT8253(config, m_coin_pit, 0);
+	PIT8253(config, m_coin_pit);
 	m_coin_pit->set_clk<0>(XTAL(16'000'000) / 8);
 	m_coin_pit->out_handler<0>().set_inputline(m_x70coincpu, INPUT_LINE_NMI);
 //  m_coin_pit->set_clk<1>(XTAL(16'000'000) / 8);
@@ -664,7 +664,7 @@ void mirderby_state::mirderby(machine_config &config)
 //  config.set_maximum_quantum(attotime::from_hz(6000));
 	config.set_perfect_quantum("maincpu");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(59);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(64*8, 32*8);

@@ -82,8 +82,6 @@ public:
 	o2_testpl_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_start() override ATTR_COLD;
-
 	virtual void io_write(offs_t offset, u8 data) override;
 
 private:
@@ -94,13 +92,6 @@ o2_testpl_device::o2_testpl_device(const machine_config &mconfig, const char *ta
 	o2_rally_device(mconfig, O2_ROM_TESTPL, tag, owner, clock),
 	m_digit_out(*this, "tc_digit%u", 0U)
 { }
-
-void o2_testpl_device::device_start()
-{
-	o2_rally_device::device_start();
-
-	m_digit_out.resolve();
-}
 
 
 //-------------------------------------------------

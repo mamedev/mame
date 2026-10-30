@@ -81,8 +81,6 @@ bfm_dm01_device::bfm_dm01_device(const machine_config &mconfig, const char *tag,
 
 void bfm_dm01_device::device_start()
 {
-	m_dotmatrix.resolve();
-
 	save_item(NAME(m_data_avail));
 	save_item(NAME(m_control));
 	save_item(NAME(m_xcounter));

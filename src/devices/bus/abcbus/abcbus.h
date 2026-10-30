@@ -117,8 +117,8 @@ public:
 	virtual void abcbus_cs(uint8_t data) = 0;
 
 	// optional operation overrides
-	virtual uint8_t abcbus_inp() { return 0xff; }
-	virtual void abcbus_out(uint8_t data) { }
+	virtual uint8_t abcbus_inp(offs_t offset) { return 0xff; }
+	virtual void abcbus_out(offs_t offset, uint8_t data) { }
 	virtual uint8_t abcbus_stat() { return 0xff; }
 	virtual void abcbus_c1(uint8_t data) { }
 	virtual void abcbus_c2(uint8_t data) { }
@@ -163,10 +163,7 @@ public:
 	abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
 		: abcbus_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 
 	auto irq_callback() { return m_write_irq.bind(); }
@@ -183,8 +180,8 @@ public:
 	// computer interface
 	void write_cs(uint8_t data) { if (m_card) m_card->abcbus_cs(data); }
 	uint8_t read_rst() { device_reset(); return 0xff; }
-	uint8_t read_inp() { return m_card ? m_card->abcbus_inp() : 0xff; }
-	void write_out(uint8_t data) { if (m_card) m_card->abcbus_out(data); }
+	uint8_t read_inp(offs_t offset) { return m_card ? m_card->abcbus_inp(offset) : 0xff; }
+	void write_out(offs_t offset, uint8_t data) { if (m_card) m_card->abcbus_out(offset, data); }
 	uint8_t read_stat() { return m_card ? m_card->abcbus_stat() : 0xff; }
 	void write_c1(uint8_t data) { if (m_card) m_card->abcbus_c1(data); }
 	void write_c2(uint8_t data) { if (m_card) m_card->abcbus_c2(data); }
@@ -205,8 +202,8 @@ public:
 
 	void cs_w(uint8_t data) { write_cs(data); }
 	uint8_t rst_r() { return read_rst(); }
-	uint8_t inp_r() { return read_inp(); }
-	void out_w(uint8_t data) { write_out(data); }
+	uint8_t inp_r(offs_t offset) { return read_inp(offset); }
+	void out_w(offs_t offset, uint8_t data) { write_out(offset, data); }
 	uint8_t stat_r() { return read_stat(); }
 	void c1_w(uint8_t data) { write_c1(data); }
 	void c2_w(uint8_t data) { write_c2(data); }
@@ -235,7 +232,7 @@ public:
 	void xint5_w(int state) { m_xint5 = state; m_write_xint5(state); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -263,7 +260,7 @@ protected:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(ABCBUS_SLOT, abcbus_slot_device)
 
 

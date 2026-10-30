@@ -526,11 +526,6 @@ void lk201_device::device_start()
 	m_count = timer_alloc(FUNC(lk201_device::timer_irq), this);
 
 	m_beeper = timer_alloc(FUNC(lk201_device::beeper_off), this);
-
-	m_led_wait.resolve();
-	m_led_compose.resolve();
-	m_led_lock.resolve();
-	m_led_hold.resolve();
 }
 
 

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
+// copyright-holders:R. Belmont, Olivier Galibert
 #ifndef MAME_CPU_M6502_M5074X_H
 #define MAME_CPU_M6502_M5074X_H
 
@@ -38,9 +38,9 @@ public:
 
 	const address_space_config m_program_config;
 
-	template <std::size_t Bit> auto read_p() { return m_read_p[Bit].bind(); }
-	template <std::size_t Bit> auto write_p() { return m_write_p[Bit].bind(); }
-	template <std::size_t Bit> void set_pullups(u8 mask) { m_pullups[Bit] = mask; }
+	template <std::size_t Port> auto read_p() { return m_read_p[Port].bind(); }
+	template <std::size_t Port> auto write_p() { return m_write_p[Port].bind(); }
+	template <std::size_t Port> void set_pullups(u8 mask) { m_pullups[Port] = mask; }
 
 	uint8_t ports_r(offs_t offset);
 	void ports_w(offs_t offset, uint8_t data);
@@ -122,7 +122,7 @@ public:
 		M50753_INT2_LINE = INPUT_LINE_IRQ1
 	};
 
-	template <std::size_t Bit> auto ad_in() { return m_ad_in[Bit].bind(); }
+	template <std::size_t Port> auto ad_in() { return m_ad_in[Port].bind(); }
 
 	auto read_in_p() { return m_in_p.bind(); }
 

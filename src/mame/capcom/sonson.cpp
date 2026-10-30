@@ -434,7 +434,7 @@ void sonson_state::sonson(machine_config &config)
 	mainlatch.q_out_cb<7>().set(FUNC(sonson_state::coin_counter_w<0>));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(55.40);
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(1*8, 31*8-1, 1*8, 31*8-1);

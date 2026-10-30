@@ -90,14 +90,14 @@ const tiny_rom_entry *atom_vdu80_device::device_rom_region() const
 
 void atom_vdu80_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12_MHz_XTAL, 768, 0, 492, 312, 0, 270);
 	screen.set_screen_update("ef9345", FUNC(ef9345_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_atom_vdu80);
 	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
-	EF9345(config, m_ef9345, 0);
+	EF9345(config, m_ef9345);
 	m_ef9345->set_screen("screen");
 	m_ef9345->set_palette_tag("palette");
 

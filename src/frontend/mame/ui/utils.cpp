@@ -30,6 +30,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iterator>
+#include <ostream>
 #include <unordered_set>
 #include <utility>
 
@@ -75,6 +76,8 @@ constexpr std::pair<char const *, char const *> SOFTWARE_INFO_NAMES[] = {
 		{ "pcb",                N_p("swlist-info", "PCB")                       },
 		{ "programmer",         N_p("swlist-info", "Programmer")                },
 		{ "release",            N_p("swlist-info", "Release Date")              },
+		{ "required_os",        N_p("swlist-info", "Required Operating System") },
+		{ "required_ram",       N_p("swlist-info", "Required System RAM")       },
 		{ "serial",             N_p("swlist-info", "Serial Number")             },
 		{ "usage",              N_p("swlist-info", "Usage Instructions")        },
 		{ "version",            N_p("swlist-info", "Version")                   } };
@@ -157,7 +160,7 @@ public:
 	virtual char const *display_name() const override { return Base::display_name(Type); }
 	virtual char const *filter_text() const override { return nullptr; }
 
-	virtual void show_ui(mame_ui_manager &mui, render_container &container, std::function<void (Base &)> &&handler) override
+	virtual void show_ui(mame_ui_manager &mui, render_target &target, std::function<void (Base &)> &&handler) override
 	{
 		handler(*this);
 	}
@@ -168,9 +171,9 @@ public:
 	virtual bool adjust_left() override { return false; }
 	virtual bool adjust_right() override { return false; }
 
-	virtual void save_ini(util::core_file &file, unsigned indent) const override
+	virtual void save_ini(std::ostream &file, unsigned indent) const override
 	{
-		file.puts(util::string_format("%2$*1$s%3$s = 1\n", 2 * indent, "", config_name()));
+		util::stream_format(file, "%2$*1$s%3$s = 1\n", 2 * indent, "", config_name());
 	}
 
 	virtual typename Base::type get_type() const override { return Type; }
@@ -203,10 +206,10 @@ class choice_filter_impl_base : public simple_filter_impl_base<Base, Type>
 public:
 	virtual char const *filter_text() const override { return selection_valid() ? selection_text().c_str() : nullptr; }
 
-	virtual void show_ui(mame_ui_manager &mui, render_container &container, std::function<void (Base &)> &&handler) override
+	virtual void show_ui(mame_ui_manager &mui, render_target &target, std::function<void (Base &)> &&handler) override
 	{
 		menu::stack_push<menu_selector>(
-				mui, container,
+				mui, target,
 				_("Filter"), // TODO: get localised name of filter in here somehow
 				std::vector<std::string>(m_choices), // ouch, a vector copy!
 				m_selection,
@@ -240,10 +243,10 @@ public:
 		return true;
 	}
 
-	virtual void save_ini(util::core_file &file, unsigned indent) const override
+	virtual void save_ini(std::ostream &file, unsigned indent) const override
 	{
 		char const *const text(filter_text());
-		file.puts(util::string_format("%2$*1$s%3$s = %4$s\n", 2 * indent, "", this->config_name(), text ? text : ""));
+		util::stream_format(file, "%2$*1$s%3$s = %4$s\n", 2 * indent, "", this->config_name(), text ? text : "");
 	}
 
 protected:
@@ -282,15 +285,15 @@ template <class Impl, class Base, typename Base::type Type>
 class composite_filter_impl_base : public simple_filter_impl_base<Base, Type>
 {
 public:
-	virtual void show_ui(mame_ui_manager &mui, render_container &container, std::function<void (Base &)> &&handler) override;
+	virtual void show_ui(mame_ui_manager &mui, render_target &target, std::function<void (Base &)> &&handler) override;
 
 	virtual bool wants_adjuster() const override { return true; }
 	virtual char const *adjust_text() const override { return _("<set up filters>"); }
 
-	virtual void save_ini(util::core_file &file, unsigned indent) const override
+	virtual void save_ini(std::ostream &file, unsigned indent) const override
 	{
 		auto const tail(std::find_if(std::begin(m_filters), std::end(m_filters), [] (typename Base::ptr const &flt) { return !flt; }));
-		file.puts(util::string_format("%2$*1$s%3$s = %4$d\n", 2 * indent, "", this->config_name(), std::distance(std::begin(m_filters), tail)));
+		util::stream_format(file, "%2$*1$s%3$s = %4$d\n", 2 * indent, "", this->config_name(), std::distance(std::begin(m_filters), tail));
 		for (auto it = std::begin(m_filters); tail != it; ++it)
 			(*it)->save_ini(file, indent + 1);
 	}
@@ -374,10 +377,10 @@ private:
 	public:
 		menu_configure(
 				mame_ui_manager &mui,
-				render_container &container,
+				render_target &target,
 				Impl &parent,
 				std::function<void (Base &filter)> &&handler)
-			: menu(mui, container)
+			: menu(mui, target)
 			, m_parent(parent)
 			, m_handler(std::move(handler))
 			, m_added(false)
@@ -517,10 +520,10 @@ private:
 template <class Impl, class Base, typename Base::type Type>
 void composite_filter_impl_base<Impl, Base, Type>::show_ui(
 		mame_ui_manager &mui,
-		render_container &container,
+		render_target &target,
 		std::function<void (Base &filter)> &&handler)
 {
-	menu::stack_push<menu_configure>(mui, container, static_cast<Impl &>(*this), std::move(handler));
+	menu::stack_push<menu_configure>(mui, target, static_cast<Impl &>(*this), std::move(handler));
 }
 
 
@@ -625,7 +628,7 @@ bool composite_filter_impl_base<Impl, Base, Type>::menu_configure::handle(event 
 			}
 			menu::stack_push<menu_selector>(
 					ui(),
-					container(),
+					target(),
 					std::string(ev->item->text()),
 					std::move(names),
 					sel,
@@ -638,7 +641,7 @@ bool composite_filter_impl_base<Impl, Base, Type>::menu_configure::handle(event 
 		else if ((ADJUST_FIRST <= ref) && (ADJUST_LAST >= ref))
 		{
 			// show selected filter's UI
-			m_parent.m_filters[ref - ADJUST_FIRST]->show_ui(ui(), container(), [this] (Base &filter) { reset(reset_options::REMEMBER_REF); });
+			m_parent.m_filters[ref - ADJUST_FIRST]->show_ui(ui(), target(), [this] (Base &filter) { reset(reset_options::REMEMBER_REF); });
 		}
 		else if (REMOVE_FILTER == ref)
 		{
@@ -919,15 +922,15 @@ public:
 		return ((mgr.get_file_count() > m_ini) && (mgr.get_category_count(m_ini) > m_group)) ? m_adjust_text.c_str() : nullptr;
 	}
 
-	virtual void show_ui(mame_ui_manager &mui, render_container &container, std::function<void (machine_filter &)> &&handler) override;
+	virtual void show_ui(mame_ui_manager &mui, render_target &target, std::function<void (machine_filter &)> &&handler) override;
 
 	virtual bool wants_adjuster() const override { return mame_machine_manager::instance()->inifile().get_file_count(); }
 	virtual char const *adjust_text() const override { return m_adjust_text.c_str(); }
 
-	virtual void save_ini(util::core_file &file, unsigned indent) const override
+	virtual void save_ini(std::ostream &file, unsigned indent) const override
 	{
 		char const *const text(filter_text());
-		file.puts(util::string_format("%2$*1$s%3$s = %4$s\n", 2 * indent, "", this->config_name(), text ? text : ""));
+		util::stream_format(file, "%2$*1$s%3$s = %4$s\n", 2 * indent, "", this->config_name(), text ? text : "");
 	}
 
 	virtual bool apply(ui_system_info const &system) const override
@@ -960,17 +963,17 @@ private:
 	public:
 		menu_configure(
 				mame_ui_manager &mui,
-				render_container &container,
+				render_target &target,
 				category_machine_filter &parent,
 				std::function<void (machine_filter &filter)> &&handler)
-			: menu(mui, container)
+			: menu(mui, target)
 			, m_parent(parent)
 			, m_handler(std::move(handler))
 			, m_state(std::make_unique<std::pair<unsigned, bool> []>(mame_machine_manager::instance()->inifile().get_file_count()))
 			, m_ini(parent.m_ini)
 		{
 			set_process_flags(PROCESS_LR_REPEAT);
-			set_heading("Select Category");
+			set_heading(_("Select Category"));
 
 			inifile_manager const &mgr(mame_machine_manager::instance()->inifile());
 			for (size_t i = 0; mgr.get_file_count() > i; ++i)
@@ -1050,9 +1053,9 @@ private:
 	mutable bool m_cache_valid;
 };
 
-void category_machine_filter::show_ui(mame_ui_manager &mui, render_container &container, std::function<void (machine_filter &)> &&handler)
+void category_machine_filter::show_ui(mame_ui_manager &mui, render_target &target, std::function<void (machine_filter &)> &&handler)
 {
-	menu::stack_push<menu_configure>(mui, container, *this, std::move(handler));
+	menu::stack_push<menu_configure>(mui, target, *this, std::move(handler));
 }
 
 
@@ -1137,7 +1140,7 @@ bool category_machine_filter::menu_configure::handle(event const *ev)
 				choices.emplace_back(mgr.get_file_name(i));
 			menu::stack_push<menu_selector>(
 					ui(),
-					container(),
+					target(),
 					_("Category File"),
 					std::move(choices),
 					m_ini,
@@ -1158,7 +1161,7 @@ bool category_machine_filter::menu_configure::handle(event const *ev)
 				choices.emplace_back(mgr.get_category_name(m_ini, i));
 			menu::stack_push<menu_selector>(
 					ui(),
-					container(),
+					target(),
 					_("Group"),
 					std::move(choices),
 					m_state[m_ini].first,

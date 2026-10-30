@@ -246,8 +246,6 @@ private:
 
 void merit_state::machine_start()
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_lscnblk));
 	save_item(NAME(m_extra_video_bank_bit));
 }
@@ -1558,7 +1556,7 @@ void merit_state::pitboss(machine_config &config)
 	ppi1.out_pc_callback().set(FUNC(merit_state::misc_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256);   // temporary, CRTC will configure screen
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
@@ -1626,7 +1624,7 @@ void merit_state::mosdraw(machine_config &config)
 	riviera(config);
 
 	// TODO: hook up RTC and printer
-	MM58274C(config, "rtc", 0);  // actually an MM58174AN, but should be compatible according to other drivers
+	MM58274C(config, "rtc");  // actually an MM58174AN, but should be compatible according to other drivers
 }
 
 void merit_state::couple(machine_config &config)
@@ -2187,8 +2185,8 @@ ROM_END
 
 ROM_START( trvwz )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "6221-00_u5.u5", 0x0000, 0x2000, CRC(731fd5b1) SHA1(1074780321029446da0e6765b9e036b06b067a48) )
-	ROM_LOAD( "6221-00_u6.u6", 0x2000, 0x2000, CRC(af6886c0) SHA1(48005b921d7ce33ffc0ba160be82053a26382a9d) )
+	ROM_LOAD( "6221-03_u5.u5", 0x0000, 0x2000, CRC(0e0356a4) SHA1(2287f0c0bd7e524b9641e35e4174c9f52d81b072) )
+	ROM_LOAD( "6221-03_u6.u6", 0x2000, 0x2000, CRC(46ba5c85) SHA1(f339b2445202048abd5867e751663066b75c4220) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "triv_1_u39.u39", 0x0000, 0x2000, CRC(f8a5f5fb) SHA1(a511e1a2b5e887ef00dc919e9e664ccec2d36cfa) )
@@ -2198,17 +2196,19 @@ ROM_START( trvwz )
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "triv_1_u40.u40", 0x0000, 0x2000, CRC(cea7319f) SHA1(663cd18a4699dfd5ad1d3357094eff247e9b4a47) )
 
-	ROM_REGION( 0xa0000, "questions", ROMREGION_ERASEFF )
+	ROM_REGION( 0xa0000, "questions", ROMREGION_ERASEFF ) // Mixture of rev A & B questions
 	ROM_LOAD( "ent-001_01a",  0x08000, 0x8000, CRC(ff45d92b) SHA1(10356bc6a04b2c53ecaf76cb0cba3ec70b4ba612) ) // This set verified as all found on the same question board
 	ROM_LOAD( "ent-001_02a",  0x18000, 0x8000, CRC(902e26f7) SHA1(f13b816bfc507fb429fb3f44531de346a82c780d) )
-	ROM_LOAD( "gen-001_01a",  0x28000, 0x8000, CRC(1d8d353f) SHA1(6bd0cc5c67da81a48737f32bc49cbf235648c4c6) )
-	ROM_LOAD( "gen-001_02a",  0x3c000, 0x4000, CRC(2000e3c3) SHA1(21737fde3d1a1b22da4590476e4e52ee1bab026f) ) // 27128 EPROM, others are 27256
+	ROM_LOAD( "gen-001_01b",  0x28000, 0x8000, CRC(ded7e124) SHA1(7e6e04ae79dceba70d83ccfde4f9d0ccc0737c78) ) // Rev B questions
+	ROM_LOAD( "gen-001_02b",  0x3c000, 0x4000, CRC(2000e3c3) SHA1(21737fde3d1a1b22da4590476e4e52ee1bab026f) ) // Rev B questions -  27128 EPROM, others are 27256
 	ROM_LOAD( "spo-001_01a",  0x48000, 0x8000, CRC(ae111429) SHA1(ff551d7ac7ad367338e908805aeb78c59a747919) )
-	ROM_LOAD( "spo-001_02a",  0x58000, 0x8000, CRC(ee9263b3) SHA1(1644ab01f17e3af1e193e509d64dcbb243d3eb80) )
+	ROM_LOAD( "spo-001_02a",  0x58000, 0x8000, CRC(ee9263b3) SHA1(1644ab01f17e3af1e193e509d64dcbb243d3eb80) ) // Rev B ROM known to exist - NOT dumped
 	ROM_LOAD( "spo-001_03a",  0x68000, 0x8000, CRC(64181d34) SHA1(f84e28fc589b86ca6a596815871ed26602bcc095) )
+	ROM_LOAD( "sex-001_01a",  0x78000, 0x8000, CRC(32519098) SHA1(d070e02bb10e04964893903599a69a8943f9ac8a) ) // These were on the question board but program doesn't seem to
+	ROM_LOAD( "sex-001_02a",  0x88000, 0x8000, CRC(0be4ef9a) SHA1(c80080f1c853e1043bf7e47bea322540a8ac9195) ) //  see them or use them - but include them anyways
 
 	ROM_REGION( 0x0100, "prom", 0 ) // BPROM on Question ROM board used as KEY to decode questions
-	ROM_LOAD( "sc-001", 0x00000, 0x0100, NO_DUMP ) // 74S287 (==N82S129N) BPROM
+	ROM_LOAD( "sc-001", 0x00000, 0x0100, CRC(c3ba24aa) SHA1(46bb1aa3b2d3696cbe09184e58b7342cb165d0b6) ) // 74S287 (==N82S129N) BPROM
 ROM_END
 
 ROM_START( trvwza )
@@ -2224,19 +2224,19 @@ ROM_START( trvwza )
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "triv_1_u40.u40", 0x0000, 0x2000, CRC(cea7319f) SHA1(663cd18a4699dfd5ad1d3357094eff247e9b4a47) )
 
-	ROM_REGION( 0xa0000, "questions", ROMREGION_ERASEFF )
+	ROM_REGION( 0xa0000, "questions", ROMREGION_ERASEFF ) // Rev A questions
 	ROM_LOAD( "ent-001_01a",  0x08000, 0x8000, CRC(ff45d92b) SHA1(10356bc6a04b2c53ecaf76cb0cba3ec70b4ba612) )
 	ROM_LOAD( "ent-001_02a",  0x18000, 0x8000, CRC(902e26f7) SHA1(f13b816bfc507fb429fb3f44531de346a82c780d) )
 	ROM_LOAD( "gen-001_01a",  0x28000, 0x8000, CRC(1d8d353f) SHA1(6bd0cc5c67da81a48737f32bc49cbf235648c4c6) )
 	ROM_LOAD( "gen-001_02a",  0x3c000, 0x4000, CRC(2000e3c3) SHA1(21737fde3d1a1b22da4590476e4e52ee1bab026f) ) // 27128 EPROM, others are 27256
-	ROM_LOAD( "sex-001_01a",  0x48000, 0x8000, CRC(32519098) SHA1(d070e02bb10e04964893903599a69a8943f9ac8a) )
-	ROM_LOAD( "sex-001_02a",  0x88000, 0x8000, CRC(0be4ef9a) SHA1(c80080f1c853e1043bf7e47bea322540a8ac9195) )
+	ROM_LOAD( "spo-001_01a",  0x48000, 0x8000, CRC(ae111429) SHA1(ff551d7ac7ad367338e908805aeb78c59a747919) )
+	ROM_LOAD( "spo-001_02a",  0x58000, 0x8000, CRC(ee9263b3) SHA1(1644ab01f17e3af1e193e509d64dcbb243d3eb80) )
+	ROM_LOAD( "spo-001_03a",  0x68000, 0x8000, CRC(64181d34) SHA1(f84e28fc589b86ca6a596815871ed26602bcc095) )
 
 	ROM_REGION( 0x0100, "prom", 0 ) // BPROM on Question ROM board used as KEY to decode questions
-	ROM_LOAD( "sc-001", 0x00000, 0x0100, NO_DUMP ) // 74S287 (==N82S129N) BPROM
+	ROM_LOAD( "sc-001", 0x00000, 0x0100, CRC(c3ba24aa) SHA1(46bb1aa3b2d3696cbe09184e58b7342cb165d0b6) ) // 74S287 (==N82S129N) BPROM
 ROM_END
 
-// question board only - this contained a variety of ROMs from the 'trvwz' and 'trvwza' sets as well as 2 unique general knowledge ones
 ROM_START( trvwzb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "6221-00_u5.u5", 0x0000, 0x2000, CRC(731fd5b1) SHA1(1074780321029446da0e6765b9e036b06b067a48) )
@@ -2250,20 +2250,45 @@ ROM_START( trvwzb )
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "triv_1_u40.u40",   0x0000, 0x2000, CRC(cea7319f) SHA1(663cd18a4699dfd5ad1d3357094eff247e9b4a47) )
 
-	ROM_REGION( 0xa0000, "questions", ROMREGION_ERASEFF )
-	ROM_LOAD( "ent-001_01a",  0x08000, 0x8000, CRC(ff45d92b) SHA1(10356bc6a04b2c53ecaf76cb0cba3ec70b4ba612) )
-	ROM_LOAD( "ent-001_02a",  0x18000, 0x8000, CRC(902e26f7) SHA1(f13b816bfc507fb429fb3f44531de346a82c780d) )
-	ROM_LOAD( "merit2_6.1",   0x28000, 0x8000, CRC(8a4bcde3) SHA1(528ae9d3ff0b98201f89fd6b93a712cd7f0e9ab4) ) // alt General Trivia - Need correct ROM label
-	ROM_LOAD( "merit2_6.2",   0x38000, 0x8000, CRC(ded7e124) SHA1(7e6e04ae79dceba70d83ccfde4f9d0ccc0737c78) ) // alt General Trivia - Need correct ROM label
-	ROM_LOAD( "spo-001_01a",  0x48000, 0x8000, CRC(ae111429) SHA1(ff551d7ac7ad367338e908805aeb78c59a747919) )
-	ROM_LOAD( "spo-001_02a",  0x58000, 0x8000, CRC(ee9263b3) SHA1(1644ab01f17e3af1e193e509d64dcbb243d3eb80) )
-	ROM_LOAD( "spo-001_03a",  0x68000, 0x8000, CRC(64181d34) SHA1(f84e28fc589b86ca6a596815871ed26602bcc095) )
+	ROM_REGION( 0xa0000, "questions", ROMREGION_ERASEFF ) // Original rev questions
+	ROM_LOAD( "ent-001_01",  0x08000, 0x8000, CRC(c68ce954) SHA1(bf70fe64f095d5cfcf5347d83651b78c6c8bf05f) )
+	ROM_LOAD( "ent-001_02",  0x18000, 0x8000, CRC(aac4ff63) SHA1(d68c4408b4dad976e317a33f2a4eaee39d90dbed) )
+	ROM_LOAD( "gen-001_01",  0x28000, 0x8000, CRC(5deb1900) SHA1(b7e9407c37481ef8953e8283d45949d951302e92) )
+	ROM_LOAD( "gen-001_02",  0x3c000, 0x4000, CRC(d2b53b6a) SHA1(f75334e47885086e277682daf018818a02ce1026) ) // 27128 EPROM, others are 27256
+	ROM_LOAD( "spo-001_01",  0x48000, 0x8000, CRC(7b56315d) SHA1(4c8c63b80176bfac9594958a7043627012baada3) )
+	ROM_LOAD( "spo-001_02",  0x58000, 0x8000, CRC(148b63ee) SHA1(9f3b222d979f23b313f379cbc06cc00d88d08c56) )
+	ROM_LOAD( "spo-001_03",  0x68000, 0x8000, CRC(a6af8e41) SHA1(64f672bfa5fb2c0575103614986e53e238c5984f) )
 
 	ROM_REGION( 0x0100, "prom", 0 ) // BPROM on Question ROM board used as KEY to decode questions
-	ROM_LOAD( "sc-001", 0x00000, 0x0100, NO_DUMP ) // 74S287 (==N82S129N) BPROM
+	ROM_LOAD( "sc-001", 0x00000, 0x0100, CRC(c3ba24aa) SHA1(46bb1aa3b2d3696cbe09184e58b7342cb165d0b6) ) // 74S287 (==N82S129N) BPROM
 ROM_END
 
-ROM_START( trvwzv )
+ROM_START( trvwzs )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "6221-00_u5.u5", 0x0000, 0x2000, CRC(731fd5b1) SHA1(1074780321029446da0e6765b9e036b06b067a48) )
+	ROM_LOAD( "6221-00_u6.u6", 0x2000, 0x2000, CRC(af6886c0) SHA1(48005b921d7ce33ffc0ba160be82053a26382a9d) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "triv_1_u39.u39", 0x0000, 0x2000, CRC(f8a5f5fb) SHA1(a511e1a2b5e887ef00dc919e9e664ccec2d36cfa) )
+	ROM_LOAD( "triv_1_u38.u38", 0x2000, 0x2000, CRC(27621e52) SHA1(a7e88d329e2e774fef9bd8c5cefb4d8f1cfcba4c) )
+	ROM_LOAD( "triv_1_u37.u37", 0x4000, 0x2000, CRC(f739b5dc) SHA1(fbf469b7f4cab50e06ec2def9344e3b9801a275e) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "triv_1_u40.u40", 0x0000, 0x2000, CRC(cea7319f) SHA1(663cd18a4699dfd5ad1d3357094eff247e9b4a47) )
+
+	ROM_REGION( 0xa0000, "questions", ROMREGION_ERASEFF ) // Rev A questions
+	ROM_LOAD( "ent-001_01a",  0x08000, 0x8000, CRC(ff45d92b) SHA1(10356bc6a04b2c53ecaf76cb0cba3ec70b4ba612) )
+	ROM_LOAD( "ent-001_02a",  0x18000, 0x8000, CRC(902e26f7) SHA1(f13b816bfc507fb429fb3f44531de346a82c780d) )
+	ROM_LOAD( "gen-001_01a",  0x28000, 0x8000, CRC(1d8d353f) SHA1(6bd0cc5c67da81a48737f32bc49cbf235648c4c6) )
+	ROM_LOAD( "gen-001_02a",  0x3c000, 0x4000, CRC(2000e3c3) SHA1(21737fde3d1a1b22da4590476e4e52ee1bab026f) ) // 27128 EPROM, others are 27256
+	ROM_LOAD( "sex-001_01a",  0x48000, 0x8000, CRC(32519098) SHA1(d070e02bb10e04964893903599a69a8943f9ac8a) )
+	ROM_LOAD( "sex-001_02a",  0x58000, 0x8000, CRC(0be4ef9a) SHA1(c80080f1c853e1043bf7e47bea322540a8ac9195) )
+
+	ROM_REGION( 0x0100, "prom", 0 ) // BPROM on Question ROM board used as KEY to decode questions
+	ROM_LOAD( "sc-001", 0x00000, 0x0100, CRC(c3ba24aa) SHA1(46bb1aa3b2d3696cbe09184e58b7342cb165d0b6) ) // 74S287 (==N82S129N) BPROM
+ROM_END
+
+ROM_START( trvwzv ) // Explicitly found with original version question ROMs, the program ROMs will work with Rev A & B question ROMs
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "6221-02_u5.u5", 0x0000, 0x2000, CRC(fd3531ac) SHA1(d11573df65676e704b28cc2d99fb004b48a358a4) )
 	ROM_LOAD( "6221-02_u6.u6", 0x2000, 0x2000, CRC(29e43d0e) SHA1(ad610748fe37436880648078f5d1a305cb147c5d) )
@@ -2286,7 +2311,7 @@ ROM_START( trvwzv )
 	ROM_LOAD( "spo-001_03",  0x68000, 0x8000, CRC(a6af8e41) SHA1(64f672bfa5fb2c0575103614986e53e238c5984f) )
 
 	ROM_REGION( 0x0100, "prom", 0 ) // BPROM on Question ROM board used as KEY to decode questions
-	ROM_LOAD( "sc-001", 0x00000, 0x0100, NO_DUMP ) // 74S287 (==N82S129N) BPROM
+	ROM_LOAD( "sc-001", 0x00000, 0x0100, CRC(c3ba24aa) SHA1(46bb1aa3b2d3696cbe09184e58b7342cb165d0b6) ) // 74S287 (==N82S129N) BPROM
 ROM_END
 
 ROM_START( trvwz2 )
@@ -2302,7 +2327,7 @@ ROM_START( trvwz2 )
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "trvs_u40a.u40", 0x0000, 0x2000, CRC(fbfae092) SHA1(b8569819952a5c805f11b6854d64b3ae9c857f97) )
 
-	ROM_REGION( 0xa0000, "questions", ROMREGION_ERASEFF )
+	ROM_REGION( 0xa0000, "questions", ROMREGION_ERASEFF ) // Rev A questions
 	ROM_LOAD( "ent-101.01a",  0x08000, 0x8000, CRC(3825ac47) SHA1(d0da047c4d30a26f496b3663cfda77c229279be8) ) // This set verified as all found on the same question board
 	ROM_LOAD( "ent-101.02a",  0x18000, 0x8000, CRC(a0153407) SHA1(e669957a5d4775bfa2c16960a2a909a3505c078b) )
 	ROM_LOAD( "ent-101.03a",  0x28000, 0x8000, CRC(755b16ab) SHA1(277ea4110479ecdb2c772299ea04f4918cf7f561) )
@@ -2340,8 +2365,8 @@ ROM_START( trvwz2a )
 	ROM_LOAD( "spo-101.01a",  0x58000, 0x8000, CRC(9dc4ba98) SHA1(4ce2bbbd7436a0ba8140879d5d8614bddbd5a8ec) )
 	ROM_LOAD( "spo-101.02a",  0x68000, 0x8000, CRC(9c106ad9) SHA1(1d1a5c91152283e3937a2df17cd57b8fe04072b7) )
 	ROM_LOAD( "spo-101.03a",  0x78000, 0x8000, CRC(3d69c3a3) SHA1(9f16d45660f3cb15e44e9fc0d940a7b2b12819e8) )
-	ROM_LOAD( "merit2_4.0",   0x88000, 0x8000, CRC(069b59a3) SHA1(e3d75edd3a9271df73bf51f409f066547025abbe) ) // alt Sex Trivia - Need correct ROM label
-	ROM_LOAD( "merit2_4.1",   0x98000, 0x8000, CRC(938d319f) SHA1(5b5841692666c31f2c09cb318f7e106942fffea7) ) // alt Sex Trivia - Need correct ROM label
+	ROM_LOAD( "sex-101.01",   0x88000, 0x8000, CRC(069b59a3) SHA1(e3d75edd3a9271df73bf51f409f066547025abbe) ) // non "A" rev - verified
+	ROM_LOAD( "sex-101.02",   0x98000, 0x8000, CRC(938d319f) SHA1(5b5841692666c31f2c09cb318f7e106942fffea7) ) // non "A" rev - verified
 
 	ROM_REGION( 0x0100, "prom", 0 ) // BPROM on Question ROM board used as KEY to decode questions
 	ROM_LOAD( "sc-002", 0x00000, 0x0100, CRC(94a8da8a) SHA1(8bdaee436481418425c36de24477c96ec0787916) ) // N82S129N BPROM
@@ -2753,6 +2778,34 @@ ROM_START( tictaca )
 	ROM_LOAD( "sc-004", 0x00000, 0x0100, NO_DUMP ) // 74S287 (==N82S129N) BPROM
 ROM_END
 
+ROM_START( tictacb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "6221-20_u5-0b.u5", 0x00000, 0x8000, CRC(22e7789c) SHA1(c298b9c6da36abbb784c356c1417a27867b70f88) ) // 6221-20 U5-0B 11/17/85
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "ttt1_u39.u39", 0x00000, 0x2000, CRC(dd79e824) SHA1(d65ee1c758293ddf8a5f4913878a2867ba526e68) )
+	ROM_LOAD( "ttt1_u38.u38", 0x02000, 0x2000, CRC(e1bf0fab) SHA1(291261ea817c42d6e8a19c17a2d3706fed7d78c4) )
+	ROM_LOAD( "ttt1_u37.u37", 0x04000, 0x2000, CRC(94f9c7f8) SHA1(494389983fb62fe2d772c276e659b6b20c531933) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "ttt1_u40b.u40",    0x00000, 0x2000, CRC(ab0088eb) SHA1(23a05a4dc11a8497f4fc7e4a76085af15ff89cea) )
+
+	ROM_REGION( 0xa0000, "questions", ROMREGION_ERASEFF )
+	ROM_LOAD( "spo-004_01a.1", 0x08000, 0x8000, CRC(71b398a9) SHA1(5ea07c409afd52c7d08592b30ff0ff3b72c3f8c3) ) // Trivia categories are:
+	ROM_LOAD( "spo-004_02a.2", 0x18000, 0x8000, CRC(eb34672f) SHA1(c472fc4445fc434029a2740dfc1d9ab9b1ef9f87) ) // Sports, Entertainment, General Interest & Sex Trivia III
+	ROM_LOAD( "spo-004_03a.3", 0x28000, 0x8000, CRC(8eea30b9) SHA1(fe1d0332106631f56bc6c57a888da9e4e63fa52f) )
+	ROM_LOAD( "ent-004_01.4",  0x38000, 0x8000, CRC(3f45064d) SHA1(de109ac0b19fd1cd7f0020cc174c2da21708108c) )
+	ROM_LOAD( "ent-004_02a.5", 0x48000, 0x8000, CRC(f1c446cd) SHA1(9a6f18defbb64e202ae12e1a59502b8f2d6a58a6) )
+	ROM_LOAD( "ent-004_03.6",  0x58000, 0x8000, CRC(206cfc0d) SHA1(78f6b684713459a617096aa3ffe6e9e62583938c) )
+	ROM_LOAD( "gen-004_01a.7", 0x68000, 0x8000, CRC(d1584173) SHA1(7a2190203f478f446cc70c473c345e7cc332e049) )
+	ROM_LOAD( "gen-004_02a.8", 0x78000, 0x8000, CRC(d00ab1fd) SHA1(c94269c8a478e88f71aeca94c6f20fc05a9c62bd) )
+	ROM_LOAD( "sex-004_01a.9", 0x88000, 0x8000, CRC(9333dbca) SHA1(dd87e6f69d60580fdb6f979398edbeb1a51be355) )
+	ROM_LOAD( "sex-004_02a.a", 0x98000, 0x8000, CRC(6eda81f4) SHA1(6d64344691e3e52035a7d30fb3e762f0bd397db7) )
+
+	ROM_REGION( 0x0100, "prom", 0 ) // BPROM on Question ROM board used as KEY to decode questions
+	ROM_LOAD( "sc-004", 0x00000, 0x0100, NO_DUMP ) // 74S287 (==N82S129N) BPROM
+ROM_END
+
 
 ROM_START( tictacuk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3133,13 +3186,14 @@ GAME( 1989, msupstar,   0,        no_u40,  msupstar,  merit_state,        init_c
 
 // Trivia and Word games
 
-GAME( 1985, trvwz,      0,        trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz (6221-00)",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwza,     trvwz,    trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz (6221-00, with Sex trivia)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwzb,     trvwz,    trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz (6221-00, alt Gen trivia)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwzv,     trvwz,    trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT90, "Merit", "Trivia ? Whiz (6221-02, Vertical)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz,      0,        trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz (6221-03, U5-0, Rev B question ROMs)",       MACHINE_SUPPORTS_SAVE ) // Mixture of rev A & B question ROMs
+GAME( 1985, trvwza,     trvwz,    trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz (6221-00, Rev A question ROMs)",             MACHINE_SUPPORTS_SAVE ) // All rev A question ROMs
+GAME( 1985, trvwzb,     trvwz,    trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz (6221-00, Original rev question ROMs)",      MACHINE_SUPPORTS_SAVE ) // Original rev question ROMs
+GAME( 1985, trvwzs,     trvwz,    trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz (6221-00, with Sex trivia)",                 MACHINE_SUPPORTS_SAVE ) // All rev A question ROMs
+GAME( 1985, trvwzv,     trvwz,    trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT90, "Merit", "Trivia ? Whiz (6221-02, Vertical)",                        MACHINE_SUPPORTS_SAVE ) // Found with original rev question ROMs
 
-GAME( 1985, trvwz2,     0,        trvwhiz,  trivia,   merit_quiz_state,   init_key<2>,  ROT90, "Merit", "Trivia ? Whiz Edition 2 (6221-05)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, trvwz2a,    trvwz2,   trvwhiz,  trivia,   merit_quiz_state,   init_key<2>,  ROT90, "Merit", "Trivia ? Whiz Edition 2 (6221-05, alt Sex trivia)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz2,     0,        trvwhiz,  trivia,   merit_quiz_state,   init_key<2>,  ROT90, "Merit", "Trivia ? Whiz Edition 2 (6221-05, Rev A question ROMs)",   MACHINE_SUPPORTS_SAVE ) // All rev A question ROMs
+GAME( 1985, trvwz2a,    trvwz2,   trvwhiz,  trivia,   merit_quiz_state,   init_key<2>,  ROT90, "Merit", "Trivia ? Whiz Edition 2 (6221-05, Original rev Sex trivia ROMs)", MACHINE_SUPPORTS_SAVE ) // Original rev Sex trivia ROMs
 
 GAME( 1985, trvwz3,     0,        trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz Edition 3 (6221-05, U5-0D)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1985, trvwz3a,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT0,  "Merit", "Trivia ? Whiz Edition 3 (6221-05, U5-0C)",                 MACHINE_SUPPORTS_SAVE )
@@ -3153,6 +3207,7 @@ GAME( 1985, trvwz4va,   trvwz4,   trvwhziv, trvwhziv, merit_quiz_state,   init_k
 
 GAME( 1985, tictac,     0,        tictac,   tictac,   merit_quiz_state,   init_key<8>,  ROT0,  "Merit", "Tic Tac Trivia (6221-23, U5-0C, 07/07/86)",                MACHINE_SUPPORTS_SAVE ) // all new trivia categories
 GAME( 1985, tictaca,    tictac,   tictac,   tictac,   merit_quiz_state,   init_key<4>,  ROT0,  "Merit", "Tic Tac Trivia (6221-23, U5-0C, 02/11/86)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tictacb,    tictac,   tictac,   tictac,   merit_quiz_state,   init_key<4>,  ROT0,  "Merit", "Tic Tac Trivia (6221-20, U5-0B, 11/17/85)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1985, tictacuk,   tictac,   tictac,   tictac,   merit_quiz_state,   init_key<6>,  ROT0,  "Merit / Barcrest", "Tic Tac Trivia (6221-25, U5-0E, 05/08/86, UK)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different trivia categories
 GAME( 1985, tictacv,    tictac,   tictac,   tictac,   merit_quiz_state,   init_key<4>,  ROT90, "Merit", "Tic Tac Trivia (6221-22, U5-0, vertical)",                 MACHINE_SUPPORTS_SAVE )
 

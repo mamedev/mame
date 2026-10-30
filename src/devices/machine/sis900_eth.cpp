@@ -19,7 +19,7 @@
 #define LOG_PMC    (1U << 4) // log PMC access
 
 #define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO | LOG_MAP | LOG_PMC)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 

@@ -22,7 +22,7 @@ namespace ui {
 class menu_audio_effect_filter : public menu
 {
 public:
-	menu_audio_effect_filter(mame_ui_manager &mui, render_container &container, u16 chain, u16 entry, audio_effect *effect);
+	menu_audio_effect_filter(mame_ui_manager &mui, render_target &target, u16 chain, u16 entry, audio_effect *effect);
 	virtual ~menu_audio_effect_filter() override;
 
 protected:

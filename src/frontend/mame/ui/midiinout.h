@@ -15,25 +15,29 @@
 
 #include "ui/menu.h"
 
+#include <functional>
+#include <string>
+#include <vector>
+
 
 namespace ui {
 
 class menu_midi_inout : public menu
 {
 public:
-	menu_midi_inout(mame_ui_manager &mui, render_container &container, bool is_input, std::string *channel);
+	using handler_function = std::function<void (std::string const &)>;
+
+	menu_midi_inout(
+			mame_ui_manager &mui,
+			render_target &target,
+			bool is_input,
+			handler_function &&handler);
 	virtual ~menu_midi_inout() override;
 
-protected:
-	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
-	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
-	virtual void menu_activated() override;
-	virtual void menu_deactivated() override;
-
 private:
-	std::vector<std::string> m_port_names;
-	std::string *m_channel;
-	bool m_is_input;
+	handler_function const      m_handler;
+	std::vector<std::string>    m_port_names;
+	bool const                  m_is_input;
 
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;

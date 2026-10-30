@@ -128,7 +128,7 @@ INPUT_PORTS_END
 class apollo_config_device : public device_t
 {
 public:
-	apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apollo_config_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -577,7 +577,7 @@ u16 apollo_state::apollo_pic_get_vector()
 			apollo_csr_set_status_register(APOLLO_CSR_SR_INTERRUPT_PENDING, 0);
 		} else {
 			// clear bit Interrupt Pending in Cache Status Register
-			apollo_set_cache_status_register(this,0x10, 0x00);
+			apollo_set_cache_status_register(this, 0x10, 0x00);
 		}
 	}
 	return vector;
@@ -607,7 +607,7 @@ void apollo_state::apollo_pic8259_master_set_int_line(int state) {
 				state ? APOLLO_CSR_SR_INTERRUPT_PENDING : 0);
 	} else {
 		// set bit Interrupt Pending in Cache Status Register
-		apollo_set_cache_status_register(this,0x10, state ? 0x10 : 0x00);
+		apollo_set_cache_status_register(this, 0x10, state ? 0x10 : 0x00);
 	}
 
 	m_maincpu->set_input_line(M68K_IRQ_6,state ? ASSERT_LINE : CLEAR_LINE);
@@ -634,14 +634,14 @@ void apollo_state::apollo_ptm_timer_tick(int state)
 {
 	if ((state) && (m_ptm->started()))
 	{
-		ptm_counter++;
+		m_ptm_counter++;
 		m_ptm->set_c1( 1);
 		m_ptm->set_c1( 0);
-		m_ptm->set_c2(ptm_counter & 1);
+		m_ptm->set_c2(m_ptm_counter & 1);
 
-		if ((ptm_counter & 1) == 0)
+		if ((m_ptm_counter & 1) == 0)
 		{
-			m_ptm->set_c3((ptm_counter >> 1) & 1);
+			m_ptm->set_c3((m_ptm_counter >> 1) & 1);
 		}
 	}
 }
@@ -799,7 +799,7 @@ void apollo_state::sio_output(uint8_t data)
 {
 //  CLOG2(("apollo_sio - sio_output %02x", data));
 
-	if ((data & 0x80) != (sio_output_data & 0x80))
+	if ((data & 0x80) != (m_sio_output_data & 0x80))
 	{
 		apollo_pic_set_irq_line(APOLLO_IRQ_DIAG, (data & 0x80) ? 1 : 0);
 	}
@@ -808,12 +808,12 @@ void apollo_state::sio_output(uint8_t data)
 	// This is set up in the timer mode to produce a square wave output on output OP3.
 	// The period of the output is 15 microseconds.
 
-	if ((data & 0x08) != (sio_output_data & 0x08))
+	if ((data & 0x08) != (m_sio_output_data & 0x08))
 	{
 		m_sio->ip0_w((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
-	sio_output_data = data;
+	m_sio_output_data = data;
 }
 
 //##########################################################################
@@ -1055,7 +1055,7 @@ static void apollo_isa_cards(device_slot_interface &device)
 void apollo_state::common(machine_config &config)
 {
 	// configuration MUST be reset first !
-	APOLLO_CONF(config, APOLLO_CONF_TAG, 0);
+	APOLLO_CONF(config, APOLLO_CONF_TAG);
 
 	AM9517A(config, m_dma8237_1, 14.318181_MHz_XTAL / 3);
 	m_dma8237_1->out_hreq_callback().set(FUNC(apollo_state::apollo_dma_1_hrq_changed));
@@ -1090,16 +1090,16 @@ void apollo_state::common(machine_config &config)
 	m_dma8237_2->out_dack_callback<2>().set(FUNC(apollo_state::pc_dack6_w));
 	m_dma8237_2->out_dack_callback<3>().set(FUNC(apollo_state::pc_dack7_w));
 
-	PIC8259(config, m_pic8259_master, 0);
+	PIC8259(config, m_pic8259_master);
 	m_pic8259_master->out_int_callback().set(FUNC(apollo_state::apollo_pic8259_master_set_int_line));
 	m_pic8259_master->in_sp_callback().set_constant(1);
 	m_pic8259_master->read_slave_ack_callback().set(FUNC(apollo_state::apollo_pic8259_get_slave_ack));
 
-	PIC8259(config, m_pic8259_slave, 0);
+	PIC8259(config, m_pic8259_slave);
 	m_pic8259_slave->out_int_callback().set(FUNC(apollo_state::apollo_pic8259_slave_set_int_line));
 	m_pic8259_slave->in_sp_callback().set_constant(0);
 
-	PTM6840(config, m_ptm, 0);
+	PTM6840(config, m_ptm);
 	m_ptm->set_external_clocks(250000, 125000, 62500);
 	m_ptm->irq_callback().set(FUNC(apollo_state::apollo_ptm_irq_function));
 
@@ -1114,12 +1114,12 @@ void apollo_state::common(machine_config &config)
 	m_rtc->set_24hrs(false);
 	m_rtc->set_epoch(0);
 
-	APOLLO_NI(config, m_node_id, 0);
+	APOLLO_NI(config, m_node_id);
 
 	APOLLO_SIO(config, m_sio2, 3.6864_MHz_XTAL);
 	m_sio2->irq_cb().set(FUNC(apollo_state::sio2_irq_handler));
 
-	ISA16(config, m_isa, 0);
+	ISA16(config, m_isa);
 	m_isa->set_custom_spaces();
 	m_isa->irq2_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir1_w)); // in place of irq 2 on at irq 9 is used
 	m_isa->irq3_callback().set(m_pic8259_master, FUNC(pic8259_device::ir3_w));
@@ -1140,13 +1140,13 @@ void apollo_state::common(machine_config &config)
 	m_isa->drq6_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq2_w));
 	m_isa->drq7_callback().set(m_dma8237_2, FUNC(am9517a_device::dreq3_w));
 
-	ISA16_SLOT(config, "isa1", 0, APOLLO_ISA_TAG, apollo_isa_cards, "wdc", false); // FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "isa2", 0, APOLLO_ISA_TAG, apollo_isa_cards, "ctape", false);
-	ISA16_SLOT(config, "isa3", 0, APOLLO_ISA_TAG, apollo_isa_cards, "3c505", false);
-	ISA16_SLOT(config, "isa4", 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false);
-	ISA16_SLOT(config, "isa6", 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false);
-	ISA16_SLOT(config, "isa7", 0, APOLLO_ISA_TAG, apollo_isa_cards, nullptr, false);
+	ISA16_SLOT(config, "isa1", 0, m_isa, apollo_isa_cards, "wdc", false); // FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "isa2", 0, m_isa, apollo_isa_cards, "ctape", false);
+	ISA16_SLOT(config, "isa3", 0, m_isa, apollo_isa_cards, "3c505", false);
+	ISA16_SLOT(config, "isa4", 0, m_isa, apollo_isa_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, m_isa, apollo_isa_cards, nullptr, false);
+	ISA16_SLOT(config, "isa6", 0, m_isa, apollo_isa_cards, nullptr, false);
+	ISA16_SLOT(config, "isa7", 0, m_isa, apollo_isa_cards, nullptr, false);
 
 	SOFTWARE_LIST(config, "ctape_list").set_original("apollo_ctape");
 }
@@ -1198,9 +1198,6 @@ MACHINE_START_MEMBER(apollo_state,apollo)
 
 	m_dma_channel = -1;
 	m_cur_eop = false;
-
-	m_internal_leds.resolve();
-	m_external_leds.resolve();
 }
 
 MACHINE_RESET_MEMBER(apollo_state,apollo)
@@ -1230,8 +1227,8 @@ MACHINE_RESET_MEMBER(apollo_state,apollo)
 		apollo_rtc_w(9, year);
 	}
 
-	ptm_counter = 0;
-	sio_output_data = 0xff;
+	m_ptm_counter = 0;
+	m_sio_output_data = 0xff;
 }
 
 #ifdef APOLLO_XXL

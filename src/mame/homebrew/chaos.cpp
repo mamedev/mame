@@ -169,7 +169,7 @@ void chaos_state::chaos(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &chaos_state::data_map);
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(chaos_state::kbd_put));
 }
 

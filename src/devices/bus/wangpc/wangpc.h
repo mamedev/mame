@@ -37,10 +37,7 @@ public:
 	wangpcbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus, U &&opts, char const *dflt, int sid)
 		: wangpcbus_slot_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 		set_bus(std::forward<T>(bus));
 		set_bus_slot(sid);
 	}
@@ -61,7 +58,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(WANGPC_BUS_SLOT, wangpcbus_slot_device)
 
 
@@ -142,7 +139,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(WANGPC_BUS, wangpcbus_device)
 
 
@@ -155,11 +152,13 @@ class device_wangpcbus_card_interface : public device_interface
 
 public:
 	// memory access
-	virtual uint16_t wangpcbus_mrdc_r(offs_t offset, uint16_t mem_mask) { return 0; }
+	// the bus ANDs all card responses, so cards that do not respond must
+	// return 0xffff to leave the data lines released
+	virtual uint16_t wangpcbus_mrdc_r(offs_t offset, uint16_t mem_mask) { return 0xffff; }
 	virtual void wangpcbus_amwc_w(offs_t offset, uint16_t mem_mask, uint16_t data) { }
 
 	// I/O access
-	virtual uint16_t wangpcbus_iorc_r(offs_t offset, uint16_t mem_mask) { return 0; }
+	virtual uint16_t wangpcbus_iorc_r(offs_t offset, uint16_t mem_mask) { return 0xffff; }
 	virtual void wangpcbus_aiowc_w(offs_t offset, uint16_t mem_mask, uint16_t data) { }
 	bool sad(offs_t offset) const { return (offset & 0xf80) == (0x800 | (m_sid << 7)); }
 

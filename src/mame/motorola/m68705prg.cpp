@@ -93,9 +93,6 @@ protected:
 
 	virtual void machine_start() override
 	{
-		m_digits.resolve();
-		m_leds.resolve();
-
 		save_item(NAME(m_addr));
 		save_item(NAME(m_pb_val));
 

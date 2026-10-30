@@ -288,7 +288,6 @@ void decocpu_type1_device::device_start()
 
 	m_cpu->space(AS_PROGRAM).install_rom(0x4000, 0xffff, &m_rom[0x4000]);
 
-	m_io_outputs.resolve();
 	save_item(NAME(m_lamp_data));
 }
 

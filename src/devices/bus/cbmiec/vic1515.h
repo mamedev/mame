@@ -13,6 +13,7 @@
 
 #include "cbmiec.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/unihammer.h"
 
 
 
@@ -22,7 +23,8 @@
 
 // ======================> vic1515_device
 
-class vic1515_device : public device_t, public device_cbm_iec_interface
+class vic1515_device : public device_t,
+					   public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
@@ -31,7 +33,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
@@ -44,8 +45,20 @@ protected:
 	void cbm_iec_reset(int state) override;
 
 private:
-	void vic1515_io(address_map &map) ATTR_COLD;
-	void vic1515_mem(address_map &map) ATTR_COLD;
+	required_device<mb8881_device> m_maincpu;
+	required_device<unihammer_printer_device> m_printer;
+	required_ioport m_sds;
+
+	void mem_map(address_map &map) ATTR_COLD;
+
+	void p1_w(uint8_t data);
+	uint8_t p2_r();
+	int t0_r();
+
+	void update_iec();
+
+	bool m_er = 1;
+	bool m_data_ff = 0;
 };
 
 

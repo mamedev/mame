@@ -209,10 +209,6 @@ bfm_gu96x8m_k657c2_device::bfm_gu96x8m_k657c2_device(const machine_config &mconf
 
 void bfm_gu96x8m_k657c2_device::device_start()
 {
-	m_vfd_background.resolve();
-	m_dotmatrix.resolve();
-	m_duty.resolve();
-
 	m_frame_timer = timer_alloc(FUNC(bfm_gu96x8m_k657c2_device::frame_update_callback), this);
 
 	save_item(NAME(m_cursor_pos));
@@ -306,14 +302,14 @@ void bfm_gu96x8m_k657c2_device::update_display()
 {
 	if(m_led_flash_enabled && m_led_flash_blank)
 	{
-		m_vfd_background[0] = 0;
+		m_vfd_background = 0;
 	}
 	else
 	{
-		m_vfd_background[0] = m_led_colour;
+		m_vfd_background = m_led_colour;
 	}
 
-	for(int pos = 0;pos < 16;pos++)
+	for(int pos = 0; pos < 16; pos++)
 	{
 		uint8_t const *char_data;
 		bool dp = false;

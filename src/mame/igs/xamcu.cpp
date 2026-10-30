@@ -179,7 +179,7 @@ void igs_xa_mcu_ics_sound_device::device_add_mconfig(machine_config &config)
 
 	ICS2115(config, m_ics, 33.8688_MHz_XTAL); // TODO: Correct?
 	m_ics->irq().set_inputline(m_mcu, XA_EXT_IRQ2);
-	m_ics->add_route(ALL_OUTPUTS, "mono", 5.0);
+	m_ics->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void igs_xa_mcu_ics_sound_device::device_start()

@@ -149,16 +149,16 @@ public:
 
 	{ }
 
-	enum { STEPS_PER_SYMBOL = 1 };
-
-	void add_em_reels(machine_config &config, int symbols, attotime period);
-
-	void rf53_3297(machine_config &config);
+	void rf53_3297(machine_config &config) ATTR_COLD;
 
 	int reel_opto_r();
 
 protected:
+	enum { STEPS_PER_SYMBOL = 1 };
+
 	virtual void machine_start() override ATTR_COLD;
+
+	void add_em_reels(machine_config &config, int symbols, attotime period) ATTR_COLD;
 
 private:
 	void main_io_map(address_map &map) ATTR_COLD;
@@ -227,7 +227,7 @@ private:
 
 void rfslots8085_state::machine_start()
 {
-	m_lamps.resolve();
+	// TODO: savestates
 }
 
 
@@ -737,7 +737,7 @@ void rfslots8085_state::add_em_reels(machine_config &config, int symbols, attoti
 	for(int i = 0; i < symbols; i++)
 		detents.insert(i * STEPS_PER_SYMBOL);
 
-	EM_REEL(config, m_reel, symbols * STEPS_PER_SYMBOL, detents, period);
+	EM_REEL(config, m_reel, m_reel.finder_tag(), symbols * STEPS_PER_SYMBOL, detents, period);
 	m_reel->set_direction(em_reel_device::dir::FORWARD);
 }
 
@@ -779,7 +779,7 @@ static INPUT_PORTS_START(rf53_3297)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )       PORT_NAME("sw bingo roller")         PORT_READ_LINE_MEMBER(FUNC(rfslots8085_state::reel_opto_r)) // bingo roller
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("sw hopper load 100 Pts.") PORT_TOGGLE  PORT_CODE(KEYCODE_J)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("sw hopper load 25 Pts.")  PORT_TOGGLE  PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR ) PORT_NAME("Door & hopper out")       PORT_TOGGLE
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_DOOR )        PORT_NAME("Door & hopper out")       PORT_TOGGLE
 
 	PORT_START("DSW") // 1 x 6-dips bank
 	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown))  PORT_DIPLOCATION("DSW:1")

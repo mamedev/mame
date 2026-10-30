@@ -68,9 +68,9 @@
 #include "cpu/m68000/m68020.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
-#include "machine/k054321.h"
 #include "machine/k056230.h"
 #include "machine/watchdog.h"
+#include "sound/k054321.h"
 #include "sound/k054539.h"
 #include "video/k053936.h"
 
@@ -78,6 +78,8 @@
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+
+#include "endianness.h"
 
 #define LOG_DSP_AB0         (1U << 1)
 #define LOG_DSP_A6          (1U << 2)
@@ -1062,7 +1064,7 @@ void polygonet_state::plygonet(machine_config &config)
 	m_k056230->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
 
 	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -1073,7 +1075,7 @@ void polygonet_state::plygonet(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 32768);
 
-	K053936(config, m_k053936, 0);
+	K053936(config, m_k053936);
 	m_k053936->set_wrap(true);
 
 	// Sound hardware

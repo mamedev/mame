@@ -13,6 +13,8 @@
 #include "cpu/m6800/m6801.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/74157.h"
+#include "machine/input_merger.h"
+#include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "sound/namco.h"
 
@@ -33,6 +35,8 @@ public:
 		m_spritegen(*this, "spritegen"),
 		m_c123tmap(*this, "c123tmap"),
 		m_dac(*this, "dac%u", 0U),
+		m_watchdog_input(*this, "watchdog_input"),
+		m_watchdog(*this, "watchdog"),
 		m_triram(*this, "triram"),
 		m_rom(*this, "mainrom"),
 		m_soundbank(*this, "soundbank"),
@@ -83,6 +87,8 @@ protected:
 	required_device<namcos1_sprite_device> m_spritegen;
 	required_device<namco_c123tmap_device> m_c123tmap;
 	required_device_array<dac_8bit_r2r_device, 2> m_dac;
+	required_device<input_merger_all_high_device> m_watchdog_input;
+	required_device<watchdog_timer_device> m_watchdog;
 
 	required_shared_ptr<u8> m_triram;
 	required_region_ptr<u8> m_rom;
@@ -95,13 +101,13 @@ protected:
 	required_ioport m_io_dipsw;
 	required_device<ls157_device> m_dsw_sel;
 
-	int m_key_id = 0;
-	int m_key_reg = 0;
-	int m_key_rng = 0;
-	int m_key_swap4_arg = 0;
-	int m_key_swap4 = 0;
-	int m_key_bottom4 = 0;
-	int m_key_top4 = 0;
+	s32 m_key_id = 0;
+	s32 m_key_reg = 0;
+	s32 m_key_rng = 0;
+	s32 m_key_swap4_arg = 0;
+	s32 m_key_swap4 = 0;
+	s32 m_key_bottom4 = 0;
+	s32 m_key_top4 = 0;
 	u32 m_key_quotient = 0;
 	u32 m_key_reminder = 0;
 	u32 m_key_numerator_high_word = 0;
@@ -114,6 +120,8 @@ protected:
 	u8 m_stored_input[2]{};
 	u8 m_drawmode_table[16]{};
 
+	void watchdog_cb(int state);
+	void kick_watchdog_w(u8 data);
 	void subres_w(int state);
 	void audiocpu_irq_ack_w(u8 data);
 	void mcu_irq_ack_w(u8 data);

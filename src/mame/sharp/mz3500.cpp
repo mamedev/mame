@@ -526,7 +526,7 @@ void mz3500_state::io_w(offs_t offset, u8 data)
 	switch(offset)
 	{
 		case 0:
-			m_slave->set_input_line(Z80_INPUT_LINE_BUSRQ, data & 2 ? ASSERT_LINE : CLEAR_LINE);
+			m_slave->set_input_line(Z80_INPUT_LINE_BUSREQ, data & 2 ? ASSERT_LINE : CLEAR_LINE);
 			break;
 		case 1:
 			if (!BIT(m_old_sres, 7) && BIT(data, 7))
@@ -879,7 +879,7 @@ void mz3500_state::mz3500(machine_config &config)
 	m_hgdc2->set_display_pixels(FUNC(mz3500_state::hgdc_display_pixels));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_screen_update(FUNC(mz3500_state::screen_update));

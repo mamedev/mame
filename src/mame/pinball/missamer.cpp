@@ -61,7 +61,7 @@ public:
 		m_scan(0)
 	{ }
 
-	void missamer(machine_config &config);
+	void missamer(machine_config &config) ATTR_COLD;
 
 protected:
 	void machine_start() override ATTR_COLD;
@@ -493,10 +493,6 @@ void missamer_state::ramio2_pc_w(uint8_t data)
 
 void missamer_state::machine_start()
 {
-	// resolve artwork outputs
-	m_lamps.resolve();
-	m_digits.resolve();
-
 	// register for save states
 	save_item(NAME(m_dy));
 	save_item(NAME(m_scan));
@@ -524,7 +520,7 @@ void missamer_state::missamer(machine_config &config)
 	m_ramio[0]->out_pb_callback().set(FUNC(missamer_state::ramio0_pb_w));
 	m_ramio[0]->out_pc_callback().set(FUNC(missamer_state::ramio0_pc_w));
 
-	I8155(config, m_ramio[1], 0); // CLK from 8085
+	I8155(config, m_ramio[1]); // CLK from 8085
 	// timer output: UART
 	m_ramio[1]->in_pa_callback().set(FUNC(missamer_state::ramio1_pa_r));
 	m_ramio[1]->in_pb_callback().set(FUNC(missamer_state::ramio1_pb_r));

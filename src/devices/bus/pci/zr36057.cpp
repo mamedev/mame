@@ -106,6 +106,7 @@ void zr36057_device::device_start()
 
 	// INTA#
 	intr_pin = 1;
+	intr_line = 0x0a;
 }
 
 void zr36057_device::device_reset()
@@ -116,8 +117,10 @@ void zr36057_device::device_reset()
 	command = 0x0000;
 	command_mask = 0x0006;
 	status = 0x0000;
-	intr_line = 0x0a;
-	// TODO: PCI regs 0x3e/0x3f max_lat = 0x10 (4 usec), min_gnt = 0x02 (0.5 usec)
+
+	// min_gnt = 0.5 usec, max_lat = 4 usec
+	minimum_grant = 0x02;
+	maximum_latency = 0x10;
 
 	remap_cb();
 

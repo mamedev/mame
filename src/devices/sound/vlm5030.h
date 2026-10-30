@@ -13,19 +13,19 @@ public:
 	vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	/* get BSY pin level */
-	int bsy();
+	int bsy_r();
 
 	/* latch contoll data */
 	void data_w(uint8_t data);
 
 	/* set RST pin level : reset / set table address A8-A15 */
-	void rst(int state);
+	void rst_w(int state);
 
 	/* set VCU pin level : ?? unknown */
-	void vcu(int state);
+	void vcu_w(int state);
 
 	/* set ST pin level  : set table address A0-A7 / start speech */
-	void st(int state);
+	void st_w(int state);
 
 protected:
 	// device-level overrides
@@ -88,11 +88,9 @@ private:
 
 	int32_t m_x[10];
 
-	int get_bits(int sbit,int bits);
+	int get_bits(int sbit, int bits);
 	int parse_frame();
-	void update();
 	void setup_parameter(uint8_t param);
-	void restore_state();
 };
 
 DECLARE_DEVICE_TYPE(VLM5030, vlm5030_device)

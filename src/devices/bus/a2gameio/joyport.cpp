@@ -38,6 +38,8 @@ protected:
 	virtual int sw2_r() override;
 	virtual void an0_w(int state) override;
 	virtual void an1_w(int state) override;
+	virtual bool has_sw0() const override { return true; }
+	virtual bool has_sw1() const override { return true; }
 
 private:
 	// input ports

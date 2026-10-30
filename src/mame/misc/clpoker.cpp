@@ -270,7 +270,7 @@ void clpoker_state::clpoker(machine_config &config)
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(60));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60); // wrong
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));  // wrong
 	screen.set_size(64*8, 32*8); // wrong
@@ -280,7 +280,7 @@ void clpoker_state::clpoker(machine_config &config)
 	screen.screen_vblank().set(FUNC(clpoker_state::vblank_w));
 
 	PALETTE(config, "palette").set_entries(0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette")); // HM86171
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", "palette")); // HM86171
 	ramdac.set_addrmap(0, &clpoker_state::ramdac_map);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_clpoker);

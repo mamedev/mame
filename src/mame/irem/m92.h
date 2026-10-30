@@ -19,13 +19,6 @@
 #include "screen.h"
 #include "tilemap.h"
 
-struct M92_pf_layer_info
-{
-	tilemap_t *tmap = nullptr;
-	tilemap_t *wide_tmap = nullptr;
-	u16 vram_base = 0;
-	u16 control[4]{};
-};
 
 class m92_state : public driver_device
 {
@@ -47,30 +40,38 @@ public:
 		m_dsw(*this, "DSW")
 	{ }
 
-	void m92(machine_config &config);
-	void m92_banked(machine_config &config);
-	void inthunt(machine_config &config);
-	void lethalth(machine_config &config);
-	void hook(machine_config &config);
-	void psoldier(machine_config &config);
-	void rtypeleo(machine_config &config);
-	void gunforc2(machine_config &config);
-	void geostorma(machine_config &config);
-	void bmaster(machine_config &config);
-	void nbbatman(machine_config &config);
-	void uccops(machine_config &config);
-	void dsoccr94j(machine_config &config);
-	void gunforce(machine_config &config);
-	void majtitl2(machine_config &config);
-	void majtitl2a(machine_config &config);
-	void mysticri(machine_config &config);
-	void leaguemna(machine_config &config);
+	void m92(machine_config &config) ATTR_COLD;
+	void m92_banked(machine_config &config) ATTR_COLD;
+	void inthunt(machine_config &config) ATTR_COLD;
+	void lethalth(machine_config &config) ATTR_COLD;
+	void hook(machine_config &config) ATTR_COLD;
+	void psoldier(machine_config &config) ATTR_COLD;
+	void rtypeleo(machine_config &config) ATTR_COLD;
+	void gunforc2(machine_config &config) ATTR_COLD;
+	void geostorma(machine_config &config) ATTR_COLD;
+	void bmaster(machine_config &config) ATTR_COLD;
+	void nbbatman(machine_config &config) ATTR_COLD;
+	void uccops(machine_config &config) ATTR_COLD;
+	void dsoccr94j(machine_config &config) ATTR_COLD;
+	void gunforce(machine_config &config) ATTR_COLD;
+	void majtitl2(machine_config &config) ATTR_COLD;
+	void majtitl2a(machine_config &config) ATTR_COLD;
+	void mysticri(machine_config &config) ATTR_COLD;
+	void leaguemna(machine_config &config) ATTR_COLD;
 
-	void init_bank();
+	void init_bank() ATTR_COLD;
 
 	int dma_busy_r() { return m_dma_busy; }
 
 protected:
+	struct M92_pf_layer_info
+	{
+		tilemap_t *tmap = nullptr;
+		tilemap_t *wide_tmap = nullptr;
+		u16 vram_base = 0;
+		u16 control[4]{};
+	};
+
 	virtual void video_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD { m_dma_busy = 1; }
 
@@ -139,7 +140,7 @@ public:
 		m_oki(*this, "oki")
 	{ }
 
-	void ppan(machine_config &config);
+	void ppan(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -162,7 +163,7 @@ public:
 		m92_state(mconfig, type, tag)
 	{ }
 
-	void nbbatman2bl(machine_config &config);
+	void nbbatman2bl(machine_config &config) ATTR_COLD;
 
 private:
 	void nbbatman2bl_map(address_map &map) ATTR_COLD;

@@ -17,7 +17,7 @@ class dc7085_channel
 public:
 	auto tx_cb() { return m_tx_cb.bind(); }
 
-	dc7085_channel(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	dc7085_channel(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	// device_t overrides

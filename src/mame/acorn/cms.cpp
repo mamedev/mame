@@ -161,7 +161,7 @@ void cms_state::cms6502(machine_config &config)
 	M3002(config, "rtc", 32.768_kHz_XTAL);
 
 	/* 7 Slot Backplane */
-	ACORN_BUS(config, m_bus, 0);
+	ACORN_BUS(config, m_bus);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set_inputline(m_maincpu, M6502_NMI_LINE);
 	ACORN_BUS_SLOT(config, "bus1", m_bus, cms_bus_devices, "4080term");

@@ -269,8 +269,7 @@ private:
 
 void kas89_state::machine_start()
 {
-	m_lamps.resolve();
-	m_lamps[37] = 0;   // turning off the operator led
+	m_lamps[37] = 0;   // turning off the operator LED
 
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_main_nmi_enable));
@@ -761,7 +760,7 @@ void kas89_state::kas89(machine_config &config)
 	v9938.set_screen_ntsc("screen");
 	v9938.set_vram_size(VDP_MEM);
 	v9938.int_cb().set_inputline("maincpu", 0);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -238,6 +238,12 @@ void s100_vector_dualmode_device::start_of_sector()
 		// op completed
 		m_byte_timer->enable(false);
 		m_busy = false;
+		if(m_fdd_writing) {
+			floppy_image_device *floppy = m_floppy[m_drive]->get_device();
+			if(floppy)
+				floppy->write_end(machine().time());
+			m_fdd_writing = false;
+		}
 		if (m_read)
 			m_ram[274] = 0; // Ignore ECC
 		return;
@@ -258,6 +264,10 @@ void s100_vector_dualmode_device::start_of_sector()
 				m_byte_timer->adjust(tm - machine().time());
 			}
 		} else {
+			floppy_image_device *floppy = m_floppy[m_drive]->get_device();
+			if(floppy)
+				floppy->write_start(machine().time());
+			m_fdd_writing = true;
 			m_pending_size = 0;
 			m_byte_timer->adjust(attotime::zero);
 		}
@@ -277,18 +287,16 @@ TIMER_CALLBACK_MEMBER(s100_vector_dualmode_device::byte_cb)
 		m_byte_timer->adjust(tm - machine().time());
 	} else {
 		if (m_pending_size == 16) {
-			attotime start_time = machine().time() - half_bitcell_size*m_pending_size;
-			attotime tm = start_time + attotime::from_usec(1);
-			attotime buf[8];
-			int pos = 0;
-			while (m_pending_size) {
-				if (m_pending_byte & (1 << --m_pending_size))
-					buf[pos++] = tm;
-				tm += half_bitcell_size;
-			}
+			attotime tm = machine().time() - half_bitcell_size*m_pending_size + attotime::from_usec(1);
 			floppy_image_device *floppy = m_floppy[m_drive]->get_device();
-			if (floppy)
-				floppy->write_flux(start_time, machine().time(), pos, buf);
+			if(floppy) {
+				while (m_pending_size) {
+					if (m_pending_byte & (1 << --m_pending_size))
+						floppy->write_flux_change(tm);
+					tm += half_bitcell_size;
+				}
+			} else
+				m_pending_size = 0;
 		}
 		uint8_t last = m_cmar ? m_ram[m_cmar-1] : 0;
 		m_pending_byte = mfm_byte(m_ram[m_cmar++], last);
@@ -314,6 +322,7 @@ void s100_vector_dualmode_device::device_start()
 	save_item(NAME(m_sector));
 	save_item(NAME(m_fdd_sector_counter));
 	save_item(NAME(m_read));
+	save_item(NAME(m_fdd_writing));
 	save_item(NAME(m_busy));
 	save_item(NAME(m_last_sector_pulse));
 	save_item(NAME(m_pending_byte));
@@ -328,6 +337,7 @@ void s100_vector_dualmode_device::device_reset()
 	// U18
 	m_sector = 0;
 	m_read = false;
+	m_fdd_writing = false;
 	// U60
 	m_motor_on_timer->enable(false);
 }

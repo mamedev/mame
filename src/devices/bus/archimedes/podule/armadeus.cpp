@@ -73,7 +73,7 @@ void arc_armadeus_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	ZN428E(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	//ZN448(config, "zn448", 0);
+	//ZN448(config, "zn448");
 }
 
 

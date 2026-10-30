@@ -112,7 +112,17 @@ u8 hi08_device::read(offs_t offset)
 	case 6:
 	return m_htx >> 8;
 	case 7:
-	return m_htx >> (m_icr & ICR_HLEND ? 16 : 0);
+	{
+		// Reading the trigger byte (offset 7) consumes the word the DSP
+		// queued via HTX: clear RXDF so the DSP sees HTDE asserted again.
+		u8 const result = m_htx >> (m_icr & ICR_HLEND ? 16 : 0);
+		if (!machine().side_effects_disabled())
+		{
+			m_isr &= ~ISR_RXDF;
+			machine().scheduler().synchronize();
+		}
+		return result;
+	}
 	}
 	return 0;
 }
@@ -187,4 +197,9 @@ u32 hi08_device::hrx_r()
 void hi08_device::htx_w(u32 data)
 {
 	logerror("htx_w %06x (%s)\n", data, machine().describe_context());
+	m_htx = data & 0xffffff;
+	// The DSP has loaded HTX with a word for the host; expose it on the
+	// host-side RX bus and assert HRDF/clear HTDE via ISR_RXDF.
+	m_isr |= ISR_RXDF;
+	machine().scheduler().synchronize();
 }

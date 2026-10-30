@@ -101,9 +101,13 @@ class imds2_state : public driver_device
 public:
 	imds2_state(const machine_config &mconfig, device_type type, const char *tag);
 
-	void imds2(machine_config &config);
+	void imds2(machine_config &config) ATTR_COLD;
 
 	void xack(int state);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t ipc_mem_read(offs_t offset);
@@ -114,9 +118,6 @@ private:
 	uint8_t ipclocpic_r(offs_t offset);
 	void ipcsyspic_w(offs_t offset, uint8_t data);
 	void ipclocpic_w(offs_t offset, uint8_t data);
-
-	virtual void driver_start() override;
-	virtual void driver_reset() override;
 
 	void ipc_io_map(address_map &map) ATTR_COLD;
 	void ipc_mem_map(address_map &map) ATTR_COLD;
@@ -232,13 +233,13 @@ void imds2_state::ipclocpic_w(offs_t offset, uint8_t data)
 	m_ipclocpic->write(!BIT(offset, 0), data);
 }
 
-void imds2_state::driver_start()
+void imds2_state::machine_start()
 {
 	// share local RAM on Multibus
 	m_bus->space(AS_PROGRAM).install_ram(0x0000, 0xffff, m_ram.target());
 }
 
-void imds2_state::driver_reset()
+void imds2_state::machine_reset()
 {
 	m_boot.select(0);
 }
@@ -262,15 +263,15 @@ void imds2_state::imds2(machine_config &config)
 	m_ipccpu->in_inta_func().set("ipcsyspic", FUNC(pic8259_device::acknowledge));
 	//config.set_maximum_quantum(attotime::from_hz(100));
 
-	PIC8259(config, m_ipcsyspic, 0);
+	PIC8259(config, m_ipcsyspic);
 	m_ipcsyspic->out_int_callback().set(FUNC(imds2_state::ipc_intr_w));
 	m_ipcsyspic->in_sp_callback().set_constant(1);
 
-	PIC8259(config, m_ipclocpic, 0);
+	PIC8259(config, m_ipclocpic);
 	m_ipclocpic->out_int_callback().set(m_ipcsyspic, FUNC(pic8259_device::ir7_w));
 	m_ipclocpic->in_sp_callback().set_constant(0);
 
-	PIT8253(config, m_ipctimer, 0);
+	PIT8253(config, m_ipctimer);
 	m_ipctimer->set_clk<0>(IPC_XTAL_Y1 / 16);
 	m_ipctimer->set_clk<1>(IPC_XTAL_Y1 / 16);
 	m_ipctimer->set_clk<2>(IPC_XTAL_Y1 / 16);

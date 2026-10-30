@@ -22,7 +22,7 @@ class inder_sb_device :  public device_t,
 {
 public:
 	// construction/destruction
-	inder_sb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	inder_sb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint8_t megaphx_sound_sent_r();
 	uint8_t megaphx_sound_cmd_r();

@@ -69,6 +69,9 @@ public:
 	/* update a motor */
 	int update(uint8_t pattern);
 
+	/* update the reel position/scroll outputs */
+	void draw();
+
 	/* get current position in half steps */
 	int get_position()          { return m_step_pos; }
 	/* get current absolute position in half steps */
@@ -101,6 +104,9 @@ protected:
 	void update_optic();
 	virtual void advance_phase();
 	devcb_write_line m_optic_cb;
+
+	output_finder<> m_output_pos;
+	output_finder<> m_output_scroll;
 };
 
 class reel_device : public stepper_device

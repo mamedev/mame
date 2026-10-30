@@ -23,7 +23,8 @@
 DEFINE_DEVICE_TYPE(CFP1080S, cfp1080s_device, "cfp1080s", "Conner CFP1080S")
 
 cfp1080s_device::cfp1080s_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nscsi_device(mconfig, CFP1080S, tag, owner, clock)
+	: device_t(mconfig, CFP1080S, tag, owner, clock)
+	, nscsi_device_interface(mconfig, *this)
 	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 	, m_hdcpu(*this, "hdcpu")
 	, m_addrptr(0)

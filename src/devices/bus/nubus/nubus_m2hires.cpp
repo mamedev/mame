@@ -26,6 +26,8 @@
 
 #include "screen.h"
 
+#include "endianness.h"
+
 #include <algorithm>
 
 #define LOG_REGISTERS (1U << 1)
@@ -118,11 +120,11 @@ ROM_END
 
 void nubus_m2hires_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(nubus_m2hires_device::screen_update));
 	m_screen->set_raw(30.24_MHz_XTAL, 896, 0, 640, 525, 0, 480);
 
-	BT453(config, m_ramdac, 0);
+	BT453(config, m_ramdac);
 }
 
 const tiny_rom_entry *nubus_m2hires_device::device_rom_region() const
@@ -321,7 +323,7 @@ void nubus_m2hires_device::registers_w(offs_t offset, u32 data, u32 mem_mask)
 		LOGMASKED(LOG_CRTC, "htotal %d vtotal %d hres %d vres %d\n", m_htotal, m_vtotal, m_hres, m_vres);
 
 		rectangle visarea(0, m_hres - 1, 0, m_vres - 1);
-		m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pclock).as_attoseconds());
+		m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pclock));
 	}
 }
 
@@ -400,12 +402,12 @@ private:
 
 void nubus_portrait_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(nubus_portrait_device::screen_update));
 	m_screen->set_raw(57.2832_MHz_XTAL, 832, 0, 640, 918, 0, 832);
 	m_screen->set_physical_aspect(3, 4);
 
-	BT454(config, m_ramdac, 0);
+	BT454(config, m_ramdac);
 }
 
 ROM_START(wsportrait)
@@ -499,11 +501,11 @@ ROM_END
 
 void nubus_workstation_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(nubus_workstation_device::screen_update));
 	m_screen->set_raw(100_MHz_XTAL, 1448, 0, 1152, 913, 0, 832);
 
-	BT454(config, m_ramdac, 0);
+	BT454(config, m_ramdac);
 }
 
 void nubus_workstation_device::device_start()

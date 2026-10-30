@@ -141,7 +141,6 @@ void patgen_state::ch23_w(uint8_t data)
 
 void patgen_state::machine_start()
 {
-	m_leds.resolve();
 	m_port1 = 0x00;
 }
 

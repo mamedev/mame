@@ -109,7 +109,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void ss50_mps_device::device_add_mconfig(machine_config &config)
 {
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	//m_acia->rts_handler().set(FUNC(ss50_mps_device::reader_control_w));
 	m_acia->irq_handler().set(FUNC(ss50_mps_device::acia_irq_w));

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+license:CC0-1.0
+
+Digitiser overlay for Oregon Scientific Osaris (English)
+-->
+
+<mamelayout version="2">
+
+	<element name="overlay_left">
+		<rect>
+			<bounds x="0" y="0" width="70" height="200" />
+			<color red="0.90" green="0.89" blue="0.85" />
+		</rect>
+
+		<rect>
+			<bounds x="5" y="3" width="60" height="34" />
+			<color red="0.74" green="0.69" blue="0.68" />
+		</rect>
+		<text string="WORD" align="1">
+			<bounds x="10" y="24" width="40" height="10" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+
+		<rect>
+			<bounds x="5" y="43" width="60" height="34" />
+			<color red="0.74" green="0.69" blue="0.68" />
+		</rect>
+		<text string="SHEET" align="1">
+			<bounds x="10" y="64" width="40" height="10" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+
+		<rect>
+			<bounds x="5" y="83" width="60" height="34" />
+			<color red="0.74" green="0.69" blue="0.68" />
+		</rect>
+		<text string="DATA" align="1">
+			<bounds x="10" y="104" width="40" height="10" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+
+		<rect>
+			<bounds x="5" y="123" width="60" height="34" />
+			<color red="0.74" green="0.69" blue="0.68" />
+		</rect>
+		<text string="AGENDA" align="1">
+			<bounds x="10" y="144" width="40" height="10" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+
+		<rect>
+			<bounds x="5" y="163" width="60" height="34" />
+			<color red="0.74" green="0.69" blue="0.68" />
+		</rect>
+		<text string="EXTRAS" align="1">
+			<bounds x="10" y="184" width="40" height="10" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="overlay_right">
+		<rect>
+			<bounds x="0" y="0" width="70" height="200" />
+			<color red="0.90" green="0.89" blue="0.85" />
+		</rect>
+
+		<rect>
+			<bounds x="5" y="3" width="60" height="34" />
+			<color red="0.74" green="0.69" blue="0.68" />
+		</rect>
+		<text string="epoc">
+			<bounds x="15" y="24" width="40" height="10" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+
+		<rect>
+			<bounds x="5" y="43" width="60" height="34" />
+			<color red="0.74" green="0.69" blue="0.68" />
+		</rect>
+		<text string="MAIN" align="1">
+			<bounds x="10" y="56" width="40" height="8" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="MENU" align="1">
+			<bounds x="10" y="65" width="40" height="8" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+
+		<rect>
+			<bounds x="5" y="83" width="60" height="34" />
+			<color red="0.74" green="0.69" blue="0.68" />
+		</rect>
+		<text string="COPY" align="1">
+			<bounds x="10" y="96" width="40" height="8" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="PASTE" align="1">
+			<bounds x="10" y="105" width="40" height="8" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+
+		<rect>
+			<bounds x="5" y="123" width="60" height="34" />
+			<color red="0.74" green="0.69" blue="0.68" />
+		</rect>
+		<text string="ZOOM IN" align="1">
+			<bounds x="10" y="144" width="40" height="10" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+
+		<rect>
+			<bounds x="5" y="163" width="60" height="34" />
+			<color red="0.74" green="0.69" blue="0.68" />
+		</rect>
+		<text string="ZOOM OUT" align="1">
+			<bounds x="10" y="184" width="40" height="10" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<view name="Digitiser Overlay (no icons)">
+		<bounds left="0" right="528" top="0" bottom="200" />
+		<screen index="0">
+			<bounds left="0" right="528" top="0" bottom="200" />
+		</screen>
+
+		<element ref="overlay_left">
+			<bounds x="0" y="0" width="70" height="200" />
+		</element>
+
+		<element ref="overlay_right">
+			<bounds x="458" y="0" width="70" height="200" />
+		</element>
+	</view>
+
+	<view name="LCD Panel">
+		<bounds x="60" width="320" y="0" height="200" />
+		<screen index="0">
+			<bounds left="0" right="440" top="0" bottom="200" />
+		</screen>
+	</view>
+
+</mamelayout>

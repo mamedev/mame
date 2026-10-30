@@ -34,6 +34,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_wangpcbus_card_interface overrides
 	virtual uint16_t wangpcbus_mrdc_r(offs_t offset, uint16_t mem_mask) override;
@@ -47,12 +48,20 @@ private:
 
 	inline void set_irq(int state);
 
+	inline bool ibm_ram_enabled() const;
+	inline offs_t ibm_ram_base() const;
+	inline uint8_t ibm_attribute(uint8_t attr) const;
+
 	required_device<mc6845_device> m_crtc;
 	memory_share_creator<uint16_t> m_video_ram;
 	memory_share_creator<uint16_t> m_char_ram;
 	memory_share_creator<uint16_t> m_bitmap_ram;
+	memory_share_creator<uint16_t> m_ibm_ram;
+	required_ioport m_sw;
 
 	uint8_t m_option;
+	uint8_t m_ibm_option;
+	uint8_t m_ibm_enable;
 	int m_irq;
 };
 

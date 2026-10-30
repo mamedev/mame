@@ -20,7 +20,7 @@
 #endif
 #define THREAD_IMPORTANCE 63
 
-// QOS headers are available as of macOS 10.10
+/* QOS headers are available as of macOS 10.10 */
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= 101000
 #include "sys/qos.h"
 #define HAVE_APPLE_QOS 1
@@ -67,30 +67,31 @@ static void *Pt_CallbackProc(void *p)
         mach_error("Couldn't set thread precedence policy", error);
     }
     
-    // Most important, set real-time constraints.
-    
-    // Define the guaranteed and max fraction of time for the audio thread.
-    // These "duty cycle" values can range from 0 to 1.  A value of 0.5
-    // means the scheduler would give half the time to the thread.
-    // These values have empirically been found to yield good behavior.
-    // Good means that audio performance is high and other threads won't starve.
+    /* Most important, set real-time constraints.
+       Define the guaranteed and max fraction of time for the audio thread.
+       These "duty cycle" values can range from 0 to 1.  A value of 0.5
+       means the scheduler would give half the time to the thread.
+       These values have empirically been found to yield good behavior.
+       Good means that audio performance is high and other threads won't starve.
+    */
     const double kGuaranteedAudioDutyCycle = 0.75;
     const double kMaxAudioDutyCycle = 0.85;
     
-    // Define constants determining how much time the audio thread can
-    // use in a given time quantum.  All times are in milliseconds.
-    
-    // About 128 frames @44.1KHz
+    /* Define constants determining how much time the audio thread can
+       use in a given time quantum.  All times are in milliseconds.
+    */
+    /* About 128 frames @44.1KHz */
     const double kTimeQuantum = 2.9;
     
-    // Time guaranteed each quantum.
+    /* Time guaranteed each quantum. */
     const double kAudioTimeNeeded = kGuaranteedAudioDutyCycle * kTimeQuantum;
     
-    // Maximum time each quantum.
+    /* Maximum time each quantum. */
     const double kMaxTimeAllowed = kMaxAudioDutyCycle * kTimeQuantum;
     
-    // Get the conversion factor from milliseconds to absolute time
-    // which is what the time-constraints call needs.
+    /* Get the conversion factor from milliseconds to absolute time
+       which is what the time-constraints call needs.
+    */
     mach_timebase_info_data_t tb_info;
     mach_timebase_info(&tb_info);
     double ms_to_abs_time =

@@ -882,10 +882,10 @@ void eprom_state::eprom(machine_config &config)
 	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(eprom_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 31, 0).set_info_callback(FUNC(eprom_state::get_alpha_tile_info));
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, eprom_state::s_mob_config);
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, eprom_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived
 	// the board uses a SYNGEN chip to generate video signals
@@ -898,7 +898,7 @@ void eprom_state::eprom(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ATARI_JSA_I(config, m_jsa, 0);
+	ATARI_JSA_I(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("260010").bit(1);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 0.4);
@@ -927,10 +927,10 @@ void eprom_state::klaxp(machine_config &config)
 	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(eprom_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 31, 0).set_info_callback(FUNC(eprom_state::get_alpha_tile_info));
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, eprom_state::s_mob_config);
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, eprom_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived
 	// the board uses a SYNGEN chip to generate video signals
@@ -942,7 +942,7 @@ void eprom_state::klaxp(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ATARI_JSA_II(config, m_jsa, 0);
+	ATARI_JSA_II(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("260010").bit(1);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -976,10 +976,10 @@ void eprom_state::guts(machine_config &config)
 	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(eprom_state::guts_get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 31, 0).set_info_callback(FUNC(eprom_state::get_alpha_tile_info));
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, eprom_state::s_guts_mob_config);
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, eprom_state::s_guts_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived
 	// the board uses a SYNGEN chip to generate video signals
@@ -991,7 +991,7 @@ void eprom_state::guts(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ATARI_JSA_II(config, m_jsa, 0);
+	ATARI_JSA_II(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("260010").bit(1);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);

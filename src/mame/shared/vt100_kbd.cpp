@@ -236,11 +236,6 @@ void vt100_keyboard_device::device_start()
 	m_uart->write_cs(1);
 	m_uart->write_swe(0);
 
-	m_online_led.resolve();
-	m_local_led.resolve();
-	m_locked_led.resolve();
-	m_ln_led.resolve();
-
 	m_online_led = 0;
 	m_local_led = 1;
 	m_locked_led = 1;

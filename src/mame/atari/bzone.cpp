@@ -8,10 +8,13 @@
         * Battlezone
         * Bradley Trainer
         * Red Baron
-        * Desert Wars (Spanish bootleg of Battle Zone)
+        * Desert Wars (Spanish bootleg of Battlezone)
 
     Known bugs:
-        * None at this time on the Atari sets (Desert Wars isn't working)
+        * None at this time on the Atari sets
+	
+	TODO:
+        * Desert Wars: AY-3-8910 clock and random number counter clock aren't verified
 
 ****************************************************************************
 
@@ -213,7 +216,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
 #include "video/avgdvg.h"
-#include "video/vector.h"
+#include "vector.h"
 #include "sound/ay8910.h" // for Desert Wars
 #include "sound/pokey.h"
 
@@ -232,19 +235,21 @@
 void bzone_state::machine_start()
 {
 	save_item(NAME(m_analog_data));
-	m_startled.resolve();
 }
 
 
 void redbaron_state::machine_start()
 {
 	bzone_state::machine_start();
+
 	save_item(NAME(m_rb_input_select));
 }
 
 
 void redbaron_state::machine_reset()
 {
+	bzone_state::machine_reset();
+
 	earom_control_w(0);
 }
 
@@ -363,28 +368,6 @@ void bzone_state::bradley_map(address_map &map)
 	map(0x1809, 0x1809).portr("1809");
 	map(0x180a, 0x180a).r(FUNC(bzone_state::analog_data_r));
 	map(0x1848, 0x1850).w(FUNC(bzone_state::analog_select_w));
-}
-
-//TODO: AY8910 hook-up isn't correct. Are there discrete sounds, too?
-void bzone_state::dsrtwars_map(address_map &map)
-{
-	map(0x0000, 0x03ff).ram();
-	map(0x0800, 0x0800).portr("IN0");
-	map(0x0a00, 0x0a00).portr("DSW0");
-	map(0x0c00, 0x0c00).portr("DSW1");
-	map(0x1000, 0x1000).w(FUNC(bzone_state::bzone_coin_counter_w));
-	map(0x1200, 0x1200).w("avg", FUNC(avg_device::go_w));
-	map(0x1400, 0x1400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x1600, 0x1600).w("avg", FUNC(avg_device::reset_w));
-	map(0x1800, 0x1800).r(m_mathbox, FUNC(mathbox_device::status_r));
-	map(0x1810, 0x1810).r(m_mathbox, FUNC(mathbox_device::lo_r));
-	map(0x1818, 0x1818).r(m_mathbox, FUNC(mathbox_device::hi_r));
-	map(0x1820, 0x1821).w("aysnd", FUNC(ay8910_device::data_address_w)); // TODO: this is more complicated
-	map(0x1828, 0x1828).portr("IN3");
-	map(0x1860, 0x187f).w(m_mathbox, FUNC(mathbox_device::go_w));
-	map(0x2000, 0x2fff).ram();
-	map(0x3000, 0x7fff).rom();
-	map(0xf800, 0xffff).rom().region("maincpu", 0x8000);
 }
 
 void redbaron_state::redbaron_map(address_map &map)
@@ -613,19 +596,16 @@ void bzone_state::bzone_base(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	VECTOR(config, "vector");
-	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
-	m_screen->set_refresh_hz(BZONE_CLOCK_3KHZ / 12 / 6);
-	m_screen->set_size(400, 300);
-	m_screen->set_visarea(0, 580, 0, 400);
-	m_screen->set_screen_update("vector", FUNC(vector_device::screen_update));
+	VECTOR(config, m_vector);
+	m_vector->set_refresh_hz(BZONE_CLOCK_3KHZ / 12 / 6);
+	m_vector->set_visarea(0, 580, 0, 400);
 
-	avg_device &avg(AVG_BZONE(config, "avg", 0));
-	avg.set_vector("vector");
+	avg_device &avg(AVG_BZONE(config, "avg"));
+	avg.set_vector(m_vector);
 	avg.set_memory(m_maincpu, AS_PROGRAM, 0x2000);
 
 	// Drivers
-	MATHBOX(config, m_mathbox, 0);
+	MATHBOX(config, m_mathbox);
 }
 
 void bzone_state::bzone(machine_config &config)
@@ -642,19 +622,6 @@ void bzone_state::bradley(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bzone_state::bradley_map);
 }
 
-void bzone_state::dsrtwars(machine_config &config)
-{
-	bzone_base(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &bzone_state::dsrtwars_map);
-
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1'000'000)); // unknown clock
-	aysnd.add_route(ALL_OUTPUTS, "mono", 0.85);
-	aysnd.port_a_read_callback().set_ioport("IN3");
-}
-
 void redbaron_state::redbaron(machine_config &config)
 {
 	bzone_base(config);
@@ -665,8 +632,8 @@ void redbaron_state::redbaron(machine_config &config)
 	ER2055(config, m_earom);
 
 	// video hardware
-	m_screen->set_refresh_hz(BZONE_CLOCK_3KHZ / 12 / 4);
-	m_screen->set_visarea(0, 520, 0, 400);
+	m_vector->set_refresh_hz(BZONE_CLOCK_3KHZ / 12 / 4);
+	m_vector->set_visarea(0, 520, 0, 400);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -675,9 +642,113 @@ void redbaron_state::redbaron(machine_config &config)
 	pokey.allpot_r().set(FUNC(redbaron_state::redbaron_joy_r));
 	pokey.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	REDBARON(config, m_redbaronsound, 0);
+	REDBARON(config, m_redbaronsound);
 	m_redbaronsound->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
+
+
+
+/*************************************
+ *
+ *  Desert Wars
+ *
+ *************************************/
+
+namespace {
+
+class dsrtwars_state : public bzone_state
+{
+public:
+	dsrtwars_state(const machine_config &mconfig, device_type type, const char *tag) :
+		bzone_state(mconfig, type, tag),
+		m_ay(*this, "ay"),
+		m_random_rom(*this, "random")
+	{ }
+
+	void dsrtwars(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	void ay_w(offs_t offset, uint8_t data);
+	void ay_latch_w(uint8_t data);
+	uint8_t random_r();
+
+	void dsrtwars_map(address_map &map) ATTR_COLD;
+
+	required_device<ay8910_device> m_ay;
+	required_region_ptr<uint8_t> m_random_rom;
+	uint8_t m_ay_latch = 0U;
+};
+
+
+void dsrtwars_state::machine_start()
+{
+	bzone_state::machine_start();
+
+	save_item(NAME(m_ay_latch));
+}
+
+
+void dsrtwars_state::ay_w(offs_t offset, uint8_t data)
+{
+	// BC1 = A0, the AY-3-8910 bus is driven by the latch instead of the CPU data bus
+	m_ay->data_address_w(offset, m_ay_latch);
+}
+
+void dsrtwars_state::ay_latch_w(uint8_t data)
+{
+	m_ay_latch = data;
+}
+
+uint8_t dsrtwars_state::random_r()
+{
+	// the 2716 is filled with random data and addressed by a free-running CD4040
+	// TODO: counter clock assumed to be the CPU clock divided by 2
+	return m_random_rom[(m_maincpu->total_cycles() >> 1) & 0x7ff];
+}
+
+
+void dsrtwars_state::dsrtwars_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0800, 0x0800).portr("IN0");
+	map(0x0a00, 0x0a00).portr("DSW0");
+	map(0x0c00, 0x0c00).portr("DSW1");
+	map(0x1000, 0x1000).w(FUNC(dsrtwars_state::bzone_coin_counter_w));
+	map(0x1200, 0x1200).w("avg", FUNC(avg_device::go_w));
+	map(0x1400, 0x1400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x1600, 0x1600).w("avg", FUNC(avg_device::reset_w));
+	map(0x1800, 0x1800).r(m_mathbox, FUNC(mathbox_device::status_r));
+	map(0x1810, 0x1810).r(m_mathbox, FUNC(mathbox_device::lo_r));
+	map(0x1818, 0x1818).r(m_mathbox, FUNC(mathbox_device::hi_r));
+	// 300900-A sound board, plugged into the POKEY socket
+	map(0x1820, 0x1821).w(FUNC(dsrtwars_state::ay_w));
+	map(0x1822, 0x1822).w(FUNC(dsrtwars_state::ay_latch_w));
+	map(0x1828, 0x1828).portr("IN3");
+	map(0x182a, 0x182a).r(FUNC(dsrtwars_state::random_r));
+	map(0x1840, 0x1840).w(FUNC(dsrtwars_state::bzone_sounds_w));
+	map(0x1860, 0x187f).w(m_mathbox, FUNC(mathbox_device::go_w));
+	map(0x2000, 0x2fff).ram();
+	map(0x3000, 0x7fff).rom();
+	map(0xf800, 0xffff).rom().region("maincpu", 0x8000); // A15 selects the upper half of the 2532 at N1
+}
+
+
+void dsrtwars_state::dsrtwars(machine_config &config)
+{
+	bzone_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dsrtwars_state::dsrtwars_map);
+
+	// sound hardware, the 300900-A board replaces the POKEY
+	bzone_discrete_audio(config);
+
+	AY8910(config, m_ay, BZONE_MASTER_CLOCK / 16); // TODO: verify clock, assumed to be the CPU clock divided by 2
+	m_ay->add_route(ALL_OUTPUTS, m_discrete, 1.0, 0);
+}
+
+} // anonymous namespace
 
 
 
@@ -687,7 +758,7 @@ void redbaron_state::redbaron(machine_config &config)
  *
  *************************************/
 
-/* Battle Zone
+/* Battlezone
 
 For the Analog Vec Gen A035742 PCB:
 
@@ -853,6 +924,16 @@ ROM_END
   |                                                           |
   |___________________________________________________________|
 
+   The sound board plugs into the POKEY socket on the main PCB through a ribbon cable.
+   The program ROMs were patched to call new code (upper half of the 2532 at N1, seen at
+   0xf800-0xffff) instead of writing to the POKEY sound registers:
+   - 0x1822 write: data latch (2x 74LS175)
+   - 0x1821 write: AY-3-8910 address strobe, using the latched data
+   - 0x1820 write: AY-3-8910 data strobe, using the latched data
+   - 0x1828 read:  switch inputs through the 74LS240 (replaces POKEY ALLPOT)
+   - 0x182a read:  2716 filled with random data, addressed by the CD4040 (replaces POKEY RANDOM)
+   The discrete sounds at 0x1840 are still driven like on Battlezone.
+
    Also, it uses a blue overlay instead of the usual green.
 */
 ROM_START( dsrtwars ) // Desert Wars
@@ -883,8 +964,9 @@ ROM_START( dsrtwars ) // Desert Wars
 	ROMX_LOAD( "300800_b_74s287.h1", 2, 0x100, CRC(823b61ae) SHA1(d99a839874b45f64e14dae92a036e47a53705d16), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
 	ROMX_LOAD( "300800_b_74s287.f1", 2, 0x100, CRC(276eadd5) SHA1(55718cd8ec4bcf75076d5ef0ee1ed2551e19d9ba), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
 
-	ROM_REGION( 0x800, "music", 0 )
-	ROM_LOAD( "300900_b_am27s19.b1", 0x000, 0x800, CRC(1b6e9f6f) SHA1(1ced9958021b29400e4681fbcb76228fd1b74ab9) ) // TODO: where's this mapped?
+	// Random number table on the sound board
+	ROM_REGION( 0x800, "random", 0 )
+	ROM_LOAD( "300900_b_am27s19.b1", 0x000, 0x800, CRC(1b6e9f6f) SHA1(1ced9958021b29400e4681fbcb76228fd1b74ab9) )
 ROM_END
 
 
@@ -1007,13 +1089,14 @@ void bzone_state::analog_select_w(offs_t offset, uint8_t data)
  *  Game drivers
  *
  *************************************/
+
 //    YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT        ROT   COMPANY  FULLNAME                        FLAGS                                        LAYOUT
-GAMEL(1980, bzone,     0,        bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battle Zone (rev 2)",          MACHINE_SUPPORTS_SAVE,                       layout_bzone )
-GAMEL(1980, bzonea,    bzone,    bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battle Zone (rev 1)",          MACHINE_SUPPORTS_SAVE,                       layout_bzone )
-GAMEL(1980, bzonec,    bzone,    bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battle Zone (cocktail)",       MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL, layout_bzone )
+GAMEL(1980, bzone,     0,        bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battlezone (rev 2)",           MACHINE_SUPPORTS_SAVE,                       layout_bzone ) // "Battle Zone" on titlescreen
+GAMEL(1980, bzonea,    bzone,    bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battlezone (rev 1)",           MACHINE_SUPPORTS_SAVE,                       layout_bzone )
+GAMEL(1980, bzonec,    bzone,    bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battlezone (cocktail)",        MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL, layout_bzone )
 GAME( 1980, bradley,   0,        bradley,  bradley,  bzone_state,    empty_init, ROT0, "Atari", "Bradley Trainer",              MACHINE_SUPPORTS_SAVE )
 GAMEL(1980, redbaron,  0,        redbaron, redbaron, redbaron_state, empty_init, ROT0, "Atari", "Red Baron (revised hardware)", MACHINE_SUPPORTS_SAVE,                       layout_redbaron )
 GAMEL(1980, redbarona, redbaron, redbaron, redbaron, redbaron_state, empty_init, ROT0, "Atari", "Red Baron",                    MACHINE_SUPPORTS_SAVE,                       layout_redbaron )
 
 // Not from Atari
-GAMEL(1981, dsrtwars,  bzone,    dsrtwars, bzone,    bzone_state,    empty_init, ROT0, "bootleg (Andra S.A.)", "Desert Wars (bootleg of Battle Zone)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_bzone )
+GAMEL(1981, dsrtwars,  bzone,    dsrtwars, bzone,    dsrtwars_state, empty_init, ROT0, "bootleg (Andra S.A.)", "Desert Wars (bootleg of Battlezone)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_bzone )

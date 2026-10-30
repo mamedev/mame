@@ -289,7 +289,7 @@ void design6_state::design6(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &design6_state::io_map);
 	m_maincpu->port_out_cb<1>().set(FUNC(design6_state::port1_w));
 
-	ADDRESS_MAP_BANK(config, m_iobank, 0);
+	ADDRESS_MAP_BANK(config, m_iobank);
 	m_iobank->set_map(&design6_state::iobanked_map);
 	m_iobank->set_addr_width(17);
 	m_iobank->set_data_width(8);
@@ -342,16 +342,16 @@ ROM_START( design6 )
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("1.bin", 0x0000, 0x8000, CRC(1155999c) SHA1(2896af89011c496f905ed0e57d7035a3b612c718))
 
-	ROM_REGION(0x4000, "coinsel", 0)
-	ROM_LOAD("pic16x76_l56s-l66s.bin", 0x0000, 0x4000, NO_DUMP)
+	ROM_REGION16_LE(0x4010, "coinsel", ROMREGION_ERASEFF)
+	ROM_LOAD("pic16x76_l56s-l66s.bin", 0x0000, 0x4010, NO_DUMP)
 ROM_END
 
 ROM_START( designe )
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("designe.bin", 0x0000, 0x8000, CRC(693d40bd) SHA1(9596bbf9c367bc919393923460da15563d9447ca))
 
-	ROM_REGION(0x4000, "coinsel", 0)
-	ROM_LOAD("pic16x76_l56s-l66s.bin", 0x0000, 0x4000, NO_DUMP)
+	ROM_REGION16_LE(0x4010, "coinsel", ROMREGION_ERASEFF)
+	ROM_LOAD("pic16x76_l56s-l66s.bin", 0x0000, 0x4010, NO_DUMP)
 ROM_END
 
 

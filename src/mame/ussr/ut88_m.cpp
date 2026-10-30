@@ -161,7 +161,6 @@ void ut88mini_state::led_w(offs_t offset, uint8_t data)
 
 void ut88mini_state::machine_start()
 {
-	m_digits.resolve();
 	save_item(NAME(m_lcd_digit));
 }
 

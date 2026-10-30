@@ -48,7 +48,7 @@ public:
 		m_start_output(*this, "start")
 	{ }
 
-	void icecold(machine_config &config);
+	void icecold(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER( test_switch_press );
 	ioport_value motors_limit_r();
@@ -174,7 +174,7 @@ static INPUT_PORTS_START( icecold )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Ball Gate")  PORT_CODE(KEYCODE_0)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_TILT1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_TILT)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME(DEF_STR( Free_Play )) PORT_CODE(KEYCODE_3)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Hopper cycle sensor")    PORT_CODE(KEYCODE_6)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Hopper empty")   PORT_CODE(KEYCODE_7)
@@ -203,15 +203,7 @@ INPUT_PORTS_END
 
 void icecold_state::machine_start()
 {
-	m_digit_outputs.resolve();
-	m_lamp_outputs.resolve();
-	m_lmotor_output.resolve();
-	m_rmotor_output.resolve();
-	m_in_play.resolve();
-	m_good_game.resolve();
-	m_game_over.resolve();
-	m_tilt_output.resolve();
-	m_start_output.resolve();
+	// TODO: savestates
 }
 
 void icecold_state::machine_reset()
@@ -404,10 +396,10 @@ void icecold_state::icecold(machine_config &config)
 	kbdc.in_rl_callback().set(FUNC(icecold_state::kbd_r));              // kbd RL lines
 
 	// 30Hz signal from CH-C of ay0
-	TIMER(config, "sint_timer", 0).configure_periodic(FUNC(icecold_state::icecold_sint_timer), attotime::from_hz(30));
+	TIMER(config, "sint_timer").configure_periodic(FUNC(icecold_state::icecold_sint_timer), attotime::from_hz(30));
 
 	// for update motors position
-	TIMER(config, "motors_timer", 0).configure_periodic(FUNC(icecold_state::icecold_motors_timer), attotime::from_msec(50));
+	TIMER(config, "motors_timer").configure_periodic(FUNC(icecold_state::icecold_motors_timer), attotime::from_msec(50));
 
 	// video hardware
 	config.set_default_layout(layout_icecold);

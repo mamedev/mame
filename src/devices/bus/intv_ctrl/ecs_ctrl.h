@@ -49,10 +49,7 @@ public:
 	intvecs_control_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: intvecs_control_port_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 
 	intvecs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -63,14 +60,14 @@ public:
 	void porta_w(uint8_t data) { if (m_device) m_device->write_portA(data); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	device_intvecs_control_port_interface *m_device;
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(INTVECS_CONTROL_PORT, intvecs_control_port_device)
 
 
@@ -91,7 +88,7 @@ public:
 	intvecs_ctrls_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -119,7 +116,7 @@ public:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -144,7 +141,7 @@ public:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -157,7 +154,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(ECS_CTRLS, intvecs_ctrls_device)
 DECLARE_DEVICE_TYPE(ECS_KEYBD, intvecs_keybd_device)
 DECLARE_DEVICE_TYPE(ECS_SYNTH, intvecs_synth_device)

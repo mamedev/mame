@@ -61,10 +61,7 @@ public:
 	tatung_pipe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
 		: tatung_pipe_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	virtual ~tatung_pipe_device();
 
@@ -85,7 +82,7 @@ public:
 	void reset_w(int state) { m_reset_handler(state); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_config_complete() override;
 	virtual void device_start() override ATTR_COLD;
 
@@ -118,7 +115,7 @@ protected:
 	tatung_pipe_device *m_slot;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(TATUNG_PIPE, tatung_pipe_device)
 
 // supported devices

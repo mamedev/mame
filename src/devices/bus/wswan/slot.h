@@ -137,10 +137,7 @@ public:
 	ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&opts, const char *dflt)
 		: ws_cart_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	virtual ~ws_cart_slot_device();

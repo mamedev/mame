@@ -421,7 +421,7 @@ void hunter2_state::hunter2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &hunter2_state::hunter2_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(80);
 	screen.set_screen_update("lcdc", FUNC(hd61830_device::screen_update));
 	screen.set_size(240, 128);
@@ -442,7 +442,7 @@ void hunter2_state::hunter2(machine_config &config)
 	rtc.set_mode24(0); // 12 hour
 	rtc.set_day1(1);   // monday
 
-	nsc810_device &iotimer(NSC810(config, "iotimer", 0, 8_MHz_XTAL / 2, 8_MHz_XTAL / 2));
+	nsc810_device &iotimer(NSC810(config, "iotimer", 8_MHz_XTAL / 2, 8_MHz_XTAL / 2));
 	iotimer.portA_read_callback().set(FUNC(hunter2_state::keyboard_r));
 	iotimer.portB_read_callback().set(FUNC(hunter2_state::portb_r));
 	iotimer.portB_write_callback().set(FUNC(hunter2_state::keyboard_w));

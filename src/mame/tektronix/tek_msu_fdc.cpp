@@ -26,7 +26,8 @@
 DEFINE_DEVICE_TYPE(TEK_MSU_FDC, tek_msu_fdc_device, "tek_msu_fdc", "Tektronix 4404 Mass Storage Unit Floppy Drive Controller")
 
 tek_msu_fdc_device::tek_msu_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nscsi_device(mconfig, TEK_MSU_FDC, tag, owner, clock)
+	: device_t(mconfig, TEK_MSU_FDC, tag, owner, clock)
+	, nscsi_device_interface(mconfig, *this)
 	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 	, m_cpu(*this, "cpu")
 	, m_fdc(*this, "fdc")
@@ -36,8 +37,6 @@ tek_msu_fdc_device::tek_msu_fdc_device(const machine_config &mconfig, const char
 
 void tek_msu_fdc_device::device_start()
 {
-	nscsi_device::device_start();
-
 	save_item(NAME(m_minisel));
 
 	m_motor = timer_alloc(FUNC(tek_msu_fdc_device::motor), this);
@@ -45,25 +44,23 @@ void tek_msu_fdc_device::device_start()
 
 void tek_msu_fdc_device::device_reset()
 {
-	nscsi_device::device_reset();
-
 	// monitor SCSI reset
-	scsi_bus->ctrl_wait(scsi_refid, S_RST, S_RST);
+	m_scsi_bus->ctrl_wait(m_scsi_refid, S_RST, S_RST);
 
 	m_minisel = true;
 }
 
 void tek_msu_fdc_device::scsi_ctrl_changed()
 {
-	bool const reset = scsi_bus->ctrl_r() & S_RST;
+	bool const reset = m_scsi_bus->ctrl_r() & S_RST;
 
 	LOG("scsi reset %d\n", reset);
 
 	if (reset)
 	{
 		// release the SCSI bus
-		scsi_bus->data_w(scsi_refid, 0);
-		scsi_bus->ctrl_w(scsi_refid, 0, S_REQ | S_BSY | S_MSG | S_CTL | S_INP);
+		m_scsi_bus->data_w(m_scsi_refid, 0);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_REQ | S_BSY | S_MSG | S_CTL | S_INP);
 
 		m_minisel = true;
 	}
@@ -123,7 +120,7 @@ const tiny_rom_entry *tek_msu_fdc_device::device_rom_region() const
 
 u8 tek_msu_fdc_device::status_r()
 {
-	u32 const ctrl = scsi_bus->ctrl_r();
+	u32 const ctrl = m_scsi_bus->ctrl_r();
 
 	// bit  function
 	//  7   SCSI ACK
@@ -141,14 +138,14 @@ u8 tek_msu_fdc_device::status_r()
 		((ctrl & S_SEL) ? 0x20 : 0) |
 		((ctrl & S_BSY) ? 0x10 : 0) |
 		(m_motor->elapsed() > attotime::from_msec(500) ? 0x08 : 0) |
-		scsi_id;
+		m_scsi_id;
 
 	return data;
 }
 
 u8 tek_msu_fdc_device::data_r()
 {
-	return scsi_bus->data_r();
+	return m_scsi_bus->data_r();
 }
 
 void tek_msu_fdc_device::control_w(u8 data)
@@ -176,7 +173,7 @@ void tek_msu_fdc_device::control_w(u8 data)
 			(BIT(data, 4) ? S_MSG : 0) |
 			(BIT(data, 3) ? S_BSY : 0);
 
-	scsi_bus->ctrl_w(scsi_refid, ctrl, S_REQ | S_BSY | S_MSG | S_CTL | S_INP);
+	m_scsi_bus->ctrl_w(m_scsi_refid, ctrl, S_REQ | S_BSY | S_MSG | S_CTL | S_INP);
 
 	// bit 0 is motor enable (active low)
 	m_minisel = !BIT(data, 0);
@@ -187,7 +184,7 @@ void tek_msu_fdc_device::control_w(u8 data)
 
 void tek_msu_fdc_device::data_w(u8 data)
 {
-	scsi_bus->data_w(scsi_refid, data);
+	m_scsi_bus->data_w(m_scsi_refid, data);
 }
 
 u8 tek_msu_fdc_device::fdc_r(offs_t offset)

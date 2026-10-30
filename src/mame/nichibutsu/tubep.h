@@ -54,7 +54,7 @@ protected:
 	void main_cpu_irq_line_clear_w(uint8_t data);
 	void second_cpu_irq_line_clear_w(uint8_t data);
 	uint8_t tubep_soundlatch_r();
-	uint8_t tubep_sound_irq_ack();
+	uint8_t tubep_sound_irq_ack_r();
 	void tubep_textram_w(offs_t offset, uint8_t data);
 	void screen_flip_w(int state);
 	void background_romselect_w(int state);

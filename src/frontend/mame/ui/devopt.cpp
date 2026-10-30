@@ -31,10 +31,10 @@ namespace ui {
 
 menu_device_config::menu_device_config(
 		mame_ui_manager &mui,
-		render_container &container,
+		render_target &target,
 		device_slot_interface *slot,
 		device_slot_interface::slot_option const *option)
-	: menu_textbox(mui, container)
+	: menu_textbox(mui, target)
 	, m_option(option)
 	, m_mounted(machine().root_device().subdevice(slot->device().subtag(option->name())) != nullptr)
 {
@@ -54,10 +54,12 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 
 		machine_config &mconfig(const_cast<machine_config &>(machine().config()));
 		machine_config::token const tok(mconfig.begin_configuration(mconfig.root_device()));
-		device_t *const dev = mconfig.device_add(m_option->name(), m_option->devtype(), 0);
+		device_t *const dev = mconfig.device_add(std::string(m_option->name()).c_str(), m_option->devtype(), 0); // TODO: support string_view tags
 		for (device_t &d : device_enumerator(*dev))
+		{
 			if (!d.configured())
 				d.config_complete();
+		}
 
 		// get decimal separator
 		std::string point;
@@ -115,7 +117,7 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 						util::string_format(
 							(count > 1)
 								? ((clock != 0) ? u8"  %1$d×%2$s %3$s\u00a0%4$s\n" : u8"  %1$d×%2$s\n")
-								: ((clock != 0) ? u8"  %2$s %3$s\u00a0%4$s\n" : "  %2$s\n"),
+								: ((clock != 0) ? u8"  %2$s %3$s\u00a0%4$s\n" : u8"  %2$s\n"),
 							count, name, hz,
 							(d == 9) ? _("GHz") : (d == 6) ? _("MHz") : (d == 3) ? _("kHz") : _("Hz")),
 						color);
@@ -123,15 +125,15 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 		}
 
 		// display screen information
-		screen_device_enumerator scriter(*dev);
+		video_output_interface_enumerator scriter(*dev);
 		if (scriter.count() > 0)
 		{
 			layout->add_text(_("* Video:\n"), color);
-			for (screen_device &screen : scriter)
+			for (device_video_output_interface &screen : scriter)
 			{
-				if (screen.screen_type() == SCREEN_TYPE_VECTOR)
+				if (screen.is_vector())
 				{
-					layout->add_text(util::string_format(_("  Screen '%1$s': Vector\n"), screen.tag()), color);
+					layout->add_text(util::string_format(_("  Screen '%1$s': Vector\n"), screen.device().tag()), color);
 				}
 				else
 				{
@@ -152,7 +154,7 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 								(screen.orientation() & ORIENTATION_SWAP_XY)
 									? _(u8"  Screen '%1$s': %2$d × %3$d (V) %4$s\u00a0Hz\n")
 									: _(u8"  Screen '%1$s': %2$d × %3$d (H) %4$s\u00a0Hz\n"),
-								screen.tag(),
+								screen.device().tag(),
 								visarea.width(),
 								visarea.height(),
 								hz),
@@ -210,7 +212,7 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 						util::string_format(
 							(count > 1)
 								? ((clock != 0) ? u8"  %1$d×%2$s %3$s\u00a0%4$s" : u8"  %1$d×%2$s")
-								: ((clock != 0) ? u8"  %2$s %3$s\u00a0%4$s" : "  %2$s"),
+								: ((clock != 0) ? u8"  %2$s %3$s\u00a0%4$s" : u8"  %2$s"),
 							count, sound.device().name(), hz,
 							(d == 9) ? _("GHz") : (d == 6) ? _("MHz") : (d == 3) ? _("kHz") : _("Hz")),
 						color);
@@ -393,7 +395,7 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 				+ input + input_mj + input_hana + input_gamble + input_analog + input_adjust + input_keypad + input_keyboard) == 0)
 			layout->add_text(_("[None]\n"), color);
 
-		mconfig.device_remove(m_option->name());
+		mconfig.device_remove(std::string(m_option->name()).c_str()); // TODO: support string_view tags
 		lines = layout->lines();
 	}
 	width = layout->actual_width();

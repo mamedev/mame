@@ -85,7 +85,10 @@ inline void adsp21xx_device::update_mstat()
 		m_alt = temp;
 	}
 	if ((m_mstat ^ m_mstat_prev) & MSTAT_TIMER)
+	{
 		m_timer_fired_cb((m_mstat & MSTAT_TIMER) != 0);
+		timer_enable_changed((m_mstat & MSTAT_TIMER) != 0);
+	}
 	if (m_mstat & MSTAT_STICKYV)
 		m_astat_clear = ~(CFLAG | NFLAG | ZFLAG);
 	else
@@ -359,11 +362,11 @@ void adsp21xx_device::write_reg0(int regnum, int32_t val)
 		case 0x06:  m_core.my0.s = val;                 break;
 		case 0x07:  m_core.my1.s = val;                 break;
 		case 0x08:  m_core.si.s = val;                  break;
-		case 0x09:  m_core.se.s = (int8_t)val;            break;
+		case 0x09:  m_core.se.s = (int8_t)val;          break;
 		case 0x0a:  m_core.ar.s = val;                  break;
 		case 0x0b:  m_core.mr.mrx.mr0.s = val;          break;
 		case 0x0c:  m_core.mr.mrx.mr1.s = val; m_core.mr.mrx.mr2.s = (int16_t)val >> 15;  break;
-		case 0x0d:  m_core.mr.mrx.mr2.s = (int8_t)val;    break;
+		case 0x0d:  m_core.mr.mrx.mr2.s = (int8_t)val;  break;
 		case 0x0e:  m_core.sr.srx.sr0.s = val;          break;
 		case 0x0f:  m_core.sr.srx.sr1.s = val;          break;
 	}
@@ -448,8 +451,8 @@ void adsp21xx_device::write_reg3(int regnum, int32_t val)
 		case 0x05:  cntr_stack_push(); m_cntr = val & 0x3fff;       break;
 		case 0x06:  m_core.sb.s = util::sext(val, 5);               break;
 		case 0x07:  m_px = val;                                     break;
-		case 0x09:  m_sport_tx_cb(0, val, 0xffff);                  break;
-		case 0x0b:  m_sport_tx_cb(1, val, 0xffff);                  break;
+		case 0x09:  m_sport_tx_cb(0, val, 0xffff); sport_tx_written(0, val);    break;
+		case 0x0b:  m_sport_tx_cb(1, val, 0xffff); sport_tx_written(1, val);    break;
 		case 0x0c:
 			m_ifc = val;
 			if (m_chip_type >= CHIP_TYPE_ADSP2181)
@@ -2097,12 +2100,12 @@ void adsp21xx_device::shift_op(uint32_t op)
 			if (xop < 0)
 			{
 				SET_SS;
-				res = count_leading_ones_32(xop) - 16 - 1;
+				res = std::countl_one(u32(xop)) - 16 - 1;
 			}
 			else
 			{
 				CLR_SS;
-				res = count_leading_zeros_32(xop) - 16 - 1;
+				res = std::countl_zero(u32(xop)) - 16 - 1;
 			}
 			m_core.se.s = -res;
 			break;
@@ -2120,12 +2123,12 @@ void adsp21xx_device::shift_op(uint32_t op)
 				if (xop < 0)
 				{
 					SET_SS;
-					res = count_leading_ones_32(xop) - 16 - 1;
+					res = std::countl_one(u32(xop)) - 16 - 1;
 				}
 				else
 				{
 					CLR_SS;
-					res = count_leading_zeros_32(xop) - 16 - 1;
+					res = std::countl_zero(u32(xop)) - 16 - 1;
 				}
 				m_core.se.s = -res;
 			}
@@ -2135,14 +2138,14 @@ void adsp21xx_device::shift_op(uint32_t op)
 			if (m_core.se.s == -15)
 			{
 				xop = SHIFT_GETXREG_SIGNED(xop);
-				res = count_leading_zeros_32((GET_SS ? ~xop : xop) & 0xffff) - 1;
+				res = std::countl_zero(u32((GET_SS ? ~xop : xop) & 0xffff)) - 1;
 				m_core.se.s = -res;
 			}
 			break;
 		case 0x0f:
 			// EXPADJ
 			xop = SHIFT_GETXREG_SIGNED(xop);
-			res = count_leading_zeros_32((xop < 0) ? ~xop : xop) - 16 - 1;
+			res = std::countl_zero(u32((xop < 0) ? ~xop : xop)) - 16 - 1;
 			if (res < -m_core.sb.s)
 				m_core.sb.s = -res;
 			break;

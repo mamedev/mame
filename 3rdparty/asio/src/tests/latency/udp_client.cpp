@@ -2,7 +2,7 @@
 // udp_client.cpp
 // ~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 
     asio::error_code ec;
     socket.send_to(asio::buffer(write_buf), target, 0, ec);
-    
+
     do socket.receive(asio::buffer(read_buf), 0, ec);
     while (ec == asio::error::would_block);
 

@@ -452,7 +452,7 @@ void intv_state::intv(machine_config &config)
 	STIC(config, m_stic, XTAL(3'579'545));
 	m_stic->set_screen("screen");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.92);
 	//screen.set_vblank_time(ATTOSECONDS_IN_USEC(2400)); /* not accurate */
 	screen.set_screen_update(FUNC(intv_state::screen_update_intv));
@@ -492,7 +492,7 @@ void intv_state::intvoice(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &intv_state::intvoice_mem);
 
 	config.device_remove("cartslot");
-	INTV_ROM_VOICE(config, "voice", 0);
+	INTV_ROM_VOICE(config, "voice");
 }
 
 void intv_state::intvecs(machine_config &config)
@@ -501,7 +501,7 @@ void intv_state::intvecs(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &intv_state::intvecs_mem);
 
 	config.device_remove("cartslot");
-	INTV_ROM_ECS(config, "ecs", 0);
+	INTV_ROM_ECS(config, "ecs");
 
 	sp0256_device &speech(SP0256(config, "speech", 3120000));
 	/* The Intellivoice uses a speaker with its own volume control so the relative volumes to use are subjective */

@@ -145,8 +145,6 @@ public:
 	void gaplus(machine_config &config);
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-
 	void out_lamps0(uint8_t data);
 	void out_lamps1(uint8_t data);
 

@@ -2,7 +2,7 @@
 // socket_base.cpp
 // ~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -330,7 +330,11 @@ void test()
   ASIO_CHECK_MESSAGE(ec == asio::error::no_protocol_option,
       ec.value() << ", " << ec.message());
 #else // defined(ASIO_WINDOWS) && defined(UNDER_CE)
-  ASIO_CHECK_MESSAGE(!ec, ec.value() << ", " << ec.message());
+  // Some platforms (e.g. OpenBSD) do not support the SO_DONTROUTE option.
+  bool do_not_route_unsupported =
+    (ec == asio::error::operation_not_supported);
+  ASIO_CHECK_MESSAGE(!ec || do_not_route_unsupported,
+      ec.value() << ", " << ec.message());
 #endif // defined(ASIO_WINDOWS) && defined(UNDER_CE)
 
   socket_base::do_not_route do_not_route2;
@@ -340,10 +344,11 @@ void test()
   ASIO_CHECK_MESSAGE(ec == asio::error::no_protocol_option,
       ec.value() << ", " << ec.message());
 #else // defined(ASIO_WINDOWS) && defined(UNDER_CE)
-  ASIO_CHECK_MESSAGE(!ec, ec.value() << ", " << ec.message());
-  ASIO_CHECK(do_not_route2.value());
-  ASIO_CHECK(static_cast<bool>(do_not_route2));
-  ASIO_CHECK(!!do_not_route2);
+  ASIO_CHECK_MESSAGE(!ec || do_not_route_unsupported,
+      ec.value() << ", " << ec.message());
+  ASIO_CHECK(do_not_route2.value() || do_not_route_unsupported);
+  ASIO_CHECK(static_cast<bool>(do_not_route2) || do_not_route_unsupported);
+  ASIO_CHECK(!!do_not_route2 || do_not_route_unsupported);
 #endif // defined(ASIO_WINDOWS) && defined(UNDER_CE)
 
   socket_base::do_not_route do_not_route3(false);
@@ -356,7 +361,8 @@ void test()
   ASIO_CHECK_MESSAGE(ec == asio::error::no_protocol_option,
       ec.value() << ", " << ec.message());
 #else // defined(ASIO_WINDOWS) && defined(UNDER_CE)
-  ASIO_CHECK_MESSAGE(!ec, ec.value() << ", " << ec.message());
+  ASIO_CHECK_MESSAGE(!ec || do_not_route_unsupported,
+      ec.value() << ", " << ec.message());
 #endif // defined(ASIO_WINDOWS) && defined(UNDER_CE)
 
   socket_base::do_not_route do_not_route4;
@@ -366,10 +372,11 @@ void test()
   ASIO_CHECK_MESSAGE(ec == asio::error::no_protocol_option,
       ec.value() << ", " << ec.message());
 #else // defined(ASIO_WINDOWS) && defined(UNDER_CE)
-  ASIO_CHECK_MESSAGE(!ec, ec.value() << ", " << ec.message());
-  ASIO_CHECK(!do_not_route4.value());
-  ASIO_CHECK(!static_cast<bool>(do_not_route4));
-  ASIO_CHECK(!do_not_route4);
+  ASIO_CHECK_MESSAGE(!ec || do_not_route_unsupported,
+      ec.value() << ", " << ec.message());
+  ASIO_CHECK(!do_not_route4.value() || do_not_route_unsupported);
+  ASIO_CHECK(!static_cast<bool>(do_not_route4) || do_not_route_unsupported);
+  ASIO_CHECK(!do_not_route4 || do_not_route_unsupported);
 #endif // defined(ASIO_WINDOWS) && defined(UNDER_CE)
 
   // keep_alive class.

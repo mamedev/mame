@@ -14,7 +14,7 @@ class pc98_kbd_device : public device_t
 						, protected device_matrix_keyboard_interface<16>
 {
 public:
-	pc98_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc98_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 

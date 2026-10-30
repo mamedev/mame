@@ -82,8 +82,6 @@ private:
 
 void bridgeb_state::machine_start()
 {
-	m_digits.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 }

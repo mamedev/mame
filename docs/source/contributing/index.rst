@@ -49,7 +49,7 @@ Things that are helpful to include:
   video output bugs, note your video hardware (GPU), driver version, and
   the MAME video output module you’re using.  For input handling bugs,
   include the input peripherals and MAME input modules you’re using.
-* The exact version of MAME you’re using, including a git commit digest
+* The exact version of MAME you’re using, including a Git commit digest
   if it isn’t a tagged release version, and any non-standard build
   options.
 * The exact system and software being emulated (may not be applicable
@@ -79,7 +79,7 @@ source code.  The source code also includes:
   `reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html>`_
   markup.
 * The supplied :ref:`plugins <plugins>`, written in
-  `Lua 5.3 <https://www.lua.org/manual/5.3/>`_.
+  `Lua 5.4 <https://www.lua.org/manual/5.4/>`_.
 * Internal layouts for emulated machines that need to display more than
   a simple video screen.  These are an XML application
   :ref:`described here <layfile>`.
@@ -93,8 +93,8 @@ Our primary source code repository is
 `hosted on GitHub <https://github.com/mamedev/mame/>`_.  We prefer to
 receive source code contributions in the form of
 `pull requests <https://github.com/mamedev/mame/pulls>`_.  You’ll need
-to learn the basics of git distributed version control and familiarise
-yourself with the git tools.  The basic process for creating a pull
+to learn the basics of Git distributed version control and familiarise
+yourself with the Git tools.  The basic process for creating a pull
 request is as follows:
 
 * Sign up for an account on GitHub.
@@ -137,13 +137,14 @@ to all kinds of changes):
 * If your submission is a computer or other device such as a synthesizer
   or sampler which requires a disk, tape, cartridge, or other media to
   start up and run, please consider creating a software list containing
-  at least one example of that media.  This helps everyone making changes
-  to shared MAME components to easily verify if the changes negatively
-  impact your code.
+  at least one example of that media.  This helps everyone making
+  changes to shared MAME components to easily verify if the changes
+  negatively impact your code.
 * When submitting any new non-arcade machine, but especially a machine
   which does not auto-boot and requires some interaction to start up
   and be usable, consider adding usage instructions to the
-  `System-Specific Setup and Information <https://wiki.mamedev.org/index.php/System-Specific_Setup_and_Information>`_
+  `System-Specific Setup and Information
+  <https://wiki.mamedev.org/index.php/System-Specific_Setup_and_Information>`_
   page of the `MAME Wiki <https://wiki.mamedev.org>`_.  Anyone can edit
   the wiki after creating an account, and sub-pages for your system
   which discuss technical details of the system are also welcome.
@@ -155,3 +156,23 @@ We have guidelines for specific parts of the source:
 
 	cxx
 	softlist
+
+
+.. _contributing-ai:
+
+Use of AI
+---------
+
+Use of AI for assistance by team members is to be mentioned in the
+relevant commit message when committing directly.
+
+All pull requests using AI assistance, for both team members and other
+contributors, must mention it as part of the initial pull request
+description.  This must include the model and version used.
+
+The use of AI for assistance will not be used to reject a pull request
+or a change out-of-hand, however it must be mentioned so that additional
+scrutiny can be given to the change or changes.
+
+As the contributor, you are responsible for understanding and describing
+your changes.

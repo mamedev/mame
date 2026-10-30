@@ -16,8 +16,8 @@
 
 namespace ui {
 
-menu_pty_info::menu_pty_info(mame_ui_manager &mui, render_container &container) :
-	menu(mui, container)
+menu_pty_info::menu_pty_info(mame_ui_manager &mui, render_target &target) :
+	menu(mui, target)
 {
 	set_heading(_("Pseudo Terminals"));
 }

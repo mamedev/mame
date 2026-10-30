@@ -393,7 +393,7 @@ void dcheese_state::dcheese(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(360, 262);  /* guess, need to see what the games write to the vid registers */
 	m_screen->set_visarea(0, 319, 0, 239);

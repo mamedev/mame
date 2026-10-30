@@ -52,7 +52,7 @@
 *      * OP0 is RTS
 *      * OP2 is DTR
 *  * <DONE> Figure out why the v1.8 dectalk firmware clips/screeches like hell (it requires the older dsp code to work properly)
-*  * <DONE> Figure out why the older -165/-166 and newer -409/-410 tms32010 dsp firmwares don't produce any sound, while the middle -204/-205 one does (fifo implementations were busted)
+*  * <DONE> Figure out why the older -165/-166 and newer -409/-410 TMS32010 DSP firmwares don't produce any sound, while the middle -204/-205 one does (fifo implementations were busted)
 *  * <DONE> Actually store the X2212 nvram's eeprom data to disk rather than throwing it out on exit
 *    * Get setup mode with the serial BREAK int working enough to actually properly save the default nvram back to the chip in emulation, and get rid of the (currently unused) nvram default image in the rom definitions
 *  * emulate/simulate the MT8860 DTMF decoder and MT8865 DTMF filter as a 16-key input device? or hook it to some simple fft code? Francois Jalbert's fftmorse code ran full speed on a 12mhz 80286, maybe use that?
@@ -241,7 +241,7 @@ dgc (dg(no!spam)cx@mac.com)
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/tms32010/tms32010.h"
+#include "cpu/tms320c1x/tms320c1x.h"
 #include "machine/mc68681.h"
 #include "machine/x2212.h"
 #include "sound/dac.h"
@@ -253,8 +253,8 @@ namespace {
 class dectalk_state : public driver_device
 {
 public:
-	dectalk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dectalk_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dsp(*this, "dsp"),
 		m_duart(*this, "duart"),
@@ -266,12 +266,12 @@ public:
 	void dectalk(machine_config &config);
 
 private:
-	// input fifo, between m68k and tms32010
+	// input fifo, between m68k and TMS32010
 	uint16_t m_infifo[32]{}; // technically eight 74LS224 4bit*16stage FIFO chips, arranged as a 32 stage, 16-bit wide fifo
 	uint8_t m_infifo_count = 0;
 	uint8_t m_infifo_tail_ptr = 0;
 	uint8_t m_infifo_head_ptr = 0;
-	// output fifo, between tms32010 and 10khz sample latch for dac
+	// output fifo, between TMS32010 and 10kHz sample latch for DAC
 	uint16_t m_outfifo[16]{}; // technically three 74LS224 4bit*16stage FIFO chips, arranged as a 16 stage, 12-bit wide fifo
 	uint8_t m_outfifo_count = 0;
 	uint8_t m_outfifo_tail_ptr = 0;
@@ -289,7 +289,7 @@ private:
 	bool m_hack_self_test_is_second_read = false; // temp variable for hack below
 
 	required_device<m68000_base_device> m_maincpu;
-	required_device<tms32010_device> m_dsp;
+	required_device<tms320c10_device> m_dsp;
 	required_device<scn2681_device> m_duart;
 	required_device<x2212_device> m_nvram;
 	required_device<dac_word_interface> m_dac;
@@ -431,9 +431,9 @@ void dectalk_state::dectalk_reset(int state)
 	m_duart->reset(); // reset the DUART
 	// stuff that is INDIRECTLY affected by the RESET line
 	clear_all_fifos(); // speech reset clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
-	dsp_semaphore_w(false); // on the original DECtalk DTC-01 pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
+	dsp_semaphore_w(false); // on the original DECtalk DTC-01 pcb revision, this is a semaphore for the INPUT FIFO, later DEC hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
 	m_spc_error_latch = false; // spc error latch is cleared on /reset
-	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
+	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the TMS32010
 	m_tlc_tonedetect = false; // TODO, needed for selftest pass
 	m_tlc_ringdetect = false; // TODO
 	m_tlc_dtmf = 0; // TODO
@@ -543,14 +543,14 @@ void dectalk_state::m68k_spcflags_w(uint16_t data)// 68k write to the speech fla
 	logerror("m68k: SPC flags written with %04X, only storing %04X\n",data, data&0x41);
 #endif
 	m_m68k_spcflags_latch = data&0x41; // ONLY store bits 6 and 0!
-	// d0: initialize speech flag (reset tms32010 and clear infifo and outfifo if high)
+	// d0: initialize speech flag (reset TMS32010 and clear infifo and outfifo if high)
 	if ((data&0x1) == 0x1) // bit 0
 	{
 #ifdef SPC_LOG_68K
 		logerror(" | 0x01: initialize speech: fifos reset, clear error+semaphore latches and dsp reset\n");
 #endif
 		clear_all_fifos();
-		m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
+		m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the TMS32010
 		// clear the two speech side latches
 		m_spc_error_latch = false;
 		dsp_semaphore_w(false);
@@ -560,7 +560,7 @@ void dectalk_state::m68k_spcflags_w(uint16_t data)// 68k write to the speech fla
 #ifdef SPC_LOG_68K
 		logerror(" | 0x01 = 0: initialize speech off, dsp running\n");
 #endif
-		m_dsp->set_input_line(INPUT_LINE_RESET, CLEAR_LINE); // speech reset deassert clears the CLR line on the tms32010
+		m_dsp->set_input_line(INPUT_LINE_RESET, CLEAR_LINE); // speech reset deassert clears the CLR line on the TMS32010
 	}
 	if ((data&0x2) == 0x2) // bit 1 - clear error and semaphore latches
 	{
@@ -678,7 +678,7 @@ uint16_t dectalk_state::m68k_tlc_dtmf_r()// dtmf chip read
 }
 /* End 68k i/o handlers */
 
-/* Begin tms32010 i/o handlers */
+/* Begin TMS32010 I/O handlers */
 void dectalk_state::spc_latch_outfifo_error_stats(uint16_t data)// latch 74ls74 @ E64 upper and lower halves with d0 and 1 respectively
 {
 #ifdef USE_LOOSE_TIMING
@@ -738,7 +738,7 @@ int dectalk_state::spc_semaphore_r()// Return state of d-latch 74ls74 @ E64 'low
 #endif
 	return m_infifo_semaphore;
 }
-/* end tms32010 i/o handlers */
+/* end TMS32010 I/O handlers */
 
 
 /******************************************************************************
@@ -851,14 +851,14 @@ void dectalk_state::dectalk(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dectalk_state::m68k_mem);
 	m_maincpu->reset_cb().set(FUNC(dectalk_state::dectalk_reset));
 
-	SCN2681(config, m_duart, XTAL(3'686'400)); // MC2681 DUART ; Y3 3.6864MHz xtal */
+	SCN2681(config, m_duart, XTAL(3'686'400)); // MC2681 DUART ; Y3 3.6864MHz xtal
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_duart->a_tx_cb().set(FUNC(dectalk_state::duart_txa));
 	m_duart->b_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_duart->inport_cb().set(FUNC(dectalk_state::duart_input));
 	m_duart->outport_cb().set(FUNC(dectalk_state::duart_output));
 
-	TMS32010(config, m_dsp, XTAL(20'000'000)); /* Y1 20MHz xtal */
+	TMS320C10(config, m_dsp, XTAL(20'000'000)); /* Y1 20MHz xtal */
 	m_dsp->set_addrmap(AS_PROGRAM, &dectalk_state::tms32010_mem);
 	m_dsp->set_addrmap(AS_IO, &dectalk_state::tms32010_io);
 	m_dsp->bio().set(FUNC(dectalk_state::spc_semaphore_r)); //read infifo-has-data-in-it fifo readable status

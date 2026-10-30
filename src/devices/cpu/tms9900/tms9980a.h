@@ -20,7 +20,7 @@ enum
 	INT_9980A_LEVEL2 = 4,
 	INT_9980A_LEVEL3 = 5,
 	INT_9980A_LEVEL4 = 6,
-	INT_9980A_CLEAR= 7
+	INT_9980A_CLEAR = 7
 };
 
 class tms9980a_device : public tms99xx_device

@@ -20,8 +20,8 @@ Hardware notes:
 
 #include "emu.h"
 
-#include "mmboard.h"
-#include "mmdisplay2.h"
+#include "mboard.h"
+#include "mdisplay2.h"
 
 #include "cpu/m6502/g65sc02.h"
 #include "machine/74259.h"

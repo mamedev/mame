@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "sound/samples.h"
+#include "sound/drivesound.h"
 
 // forward declarations
 class floppy_image;
@@ -21,8 +21,6 @@ namespace fs {
 	class manager_t;
 	class meta_data;
 };
-
-class floppy_sound_device;
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -92,6 +90,7 @@ public:
 	void set_rpm(float rpm);
 	void set_sectoring_type(uint32_t sectoring_type);
 	uint32_t get_sectoring_type();
+	void set_media_change_time(const attotime &time) { m_media_change_time = time; }
 
 	void init_fs(const fs_info *fs, const fs::meta_data &meta);
 
@@ -147,7 +146,10 @@ public:
 
 	attotime time_next_index();
 	attotime get_next_transition(const attotime &from_when);
-	void write_flux(const attotime &start, const attotime &end, int transition_count, const attotime *transitions);
+	void write_start(const attotime &when);
+	void write_flux_change(const attotime &when);
+	void write_end(const attotime &when);
+	void write_flush(const attotime &when);
 	void set_write_splice(const attotime &when);
 	int get_sides() { return m_sides; }
 	uint32_t get_form_factor() const;
@@ -156,9 +158,6 @@ public:
 	static void default_fm_floppy_formats(format_registration &fr);
 	static void default_mfm_floppy_formats(format_registration &fr);
 	static void default_pc_floppy_formats(format_registration &fr);
-
-	// Enable sound
-	void    enable_sound(bool doit) { m_make_sound = doit; }
 
 protected:
 	struct fs_enum;
@@ -175,11 +174,13 @@ protected:
 	virtual const software_list_loader &get_software_list_loader() const override;
 
 	TIMER_CALLBACK_MEMBER(index_resync);
+	TIMER_CALLBACK_MEMBER(media_change_done);
 
 	virtual void track_changed();
 	virtual void setup_characteristics() = 0;
 
 	void init_floppy_load(bool write_supported);
+	void change_media(bool wpt);
 
 	std::function<void (format_registration &fr)> m_format_registration_cb;
 	const floppy_image_format_t *m_input_format;
@@ -191,6 +192,7 @@ protected:
 	std::vector<fs_info>  m_fs;
 	std::vector<const fs::manager_t *> m_fs_managers;
 	emu_timer             *m_index_timer;
+	emu_timer             *m_media_change_timer;
 
 	/* Physical characteristics, filled by setup_characteristics */
 	int m_tracks; /* addressable tracks */
@@ -200,6 +202,7 @@ protected:
 	bool m_motor_always_on;
 	bool m_dskchg_writable;
 	bool m_has_trk00_sensor;
+	attotime m_media_change_time;
 
 	int m_drive_index;
 
@@ -219,6 +222,8 @@ protected:
 	int m_rdy;  /* ready */
 	int m_dskchg;     /* disk changed */
 	bool m_ready;
+	bool m_media_changing;
+	bool m_media_change_wpt;
 
 	/* rotation per minute => gives index pulse frequency */
 	float m_rpm;
@@ -227,6 +232,7 @@ protected:
 
 	attotime m_revolution_start_time, m_rev_time;
 	uint32_t m_revolution_count;
+	uint32_t m_stopped_position;
 	int m_cyl, m_subcyl;
 	/* Current floppy zone cache */
 	attotime m_cache_start_time, m_cache_end_time, m_cache_weak_start;
@@ -236,6 +242,10 @@ protected:
 	bool m_cache_weak;
 
 	bool m_image_dirty, m_track_dirty;
+	bool m_writing;
+	int m_write_cyl, m_write_ss, m_write_subcyl;
+	attotime m_write_start_time;
+	std::vector<attotime> m_write_transition_times;
 	int m_ready_counter;
 
 	load_cb m_cur_load_cb;
@@ -265,6 +275,7 @@ protected:
 	attotime position_to_time(const attotime &base, int position) const;
 
 	void commit_image();
+	void write_do_flush(const attotime &when);
 
 	u32 hash32(u32 val) const;
 
@@ -273,9 +284,10 @@ protected:
 	void cache_fill(const attotime &when);
 	void cache_weakness_setup();
 
-	// Sound
-	bool    m_make_sound;
-	floppy_sound_device* m_sound_out;
+	// Sound support
+	bool m_make_sound;
+	const floppy_sound_samples *m_samples;
+	required_device<floppy_sound_device> m_sound_out;
 };
 
 #define DECLARE_FLOPPY_IMAGE_DEVICE(Type, Name, Interface) \
@@ -294,6 +306,7 @@ DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_3_DSSD,       floppy_3_dssd,       "floppy_3"
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_3_SSDD,       floppy_3_ssdd,       "floppy_3")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_3_DSDD,       floppy_3_dsdd,       "floppy_3")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_3_DSQD,       floppy_3_dsqd,       "floppy_3")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_SSSD,      floppy_35_sssd,      "floppy_3_5")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_SSDD,      floppy_35_ssdd,      "floppy_3_5")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_DD,        floppy_35_dd,        "floppy_3_5")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_HD,        floppy_35_hd,        "floppy_3_5")
@@ -301,6 +314,7 @@ DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_ED,        floppy_35_ed,        "floppy_3_
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSSD_35T, floppy_525_sssd_35t, "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SD_35T,   floppy_525_sd_35t,   "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_VTECH,    floppy_525_vtech,    "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_COMPUCOLOR, floppy_525_compucolor, "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSSD,     floppy_525_sssd,     "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SD,       floppy_525_sd,       "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSDD,     floppy_525_ssdd,     "floppy_5_25")
@@ -328,8 +342,7 @@ DECLARE_FLOPPY_IMAGE_DEVICE(TEAC_FD_55F,         teac_fd_55f,         "floppy_5_
 DECLARE_FLOPPY_IMAGE_DEVICE(TEAC_FD_55G,         teac_fd_55g,         "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(ALPS_3255190X,       alps_3255190x,       "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(IBM_6360,            ibm_6360,            "floppy_8")
-
-DECLARE_DEVICE_TYPE(FLOPPYSOUND, floppy_sound_device)
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_TWIGGY,       floppy_twiggy,       "floppy_twiggy")
 
 class mac_floppy_device : public floppy_image_device {
 public:
@@ -395,46 +408,6 @@ DECLARE_DEVICE_TYPE(OAD34V, oa_d34v_device)
 DECLARE_DEVICE_TYPE(MFD51W, mfd51w_device)
 DECLARE_DEVICE_TYPE(MFD75W, mfd75w_device)
 
-
-/*
-    Floppy drive sound
-*/
-
-class floppy_sound_device : public samples_device
-{
-public:
-	floppy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void motor(bool on, bool withdisk);
-	void step(int track);
-	bool samples_loaded() { return m_loaded; }
-	void register_for_save_states();
-
-protected:
-	void device_start() override ATTR_COLD;
-
-private:
-	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream) override;
-	sound_stream*   m_sound;
-
-	int         m_step_base;
-	int         m_spin_samples;
-	int         m_step_samples;
-	int         m_spin_samplepos;
-	int         m_step_samplepos;
-	int         m_seek_sound_timeout;
-	int         m_zones;
-	int         m_spin_playback_sample;
-	int         m_step_playback_sample;
-	int         m_seek_playback_sample;
-	bool        m_motor_on;
-	bool        m_with_disk;
-	bool        m_loaded;
-	double      m_seek_pitch;
-	double      m_seek_samplepos;
-};
-
-
 class floppy_connector: public device_t,
 						public device_slot_interface
 {
@@ -444,10 +417,7 @@ public:
 	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, U &&formats, bool fixed = false)
 		: floppy_connector(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<T>(opts), dflt, fixed);
 		set_formats(std::forward<U>(formats));
 	}
 
@@ -467,10 +437,17 @@ public:
 	virtual ~floppy_connector();
 
 	template <typename T> void set_formats(T &&_formats) { formats = std::forward<T>(_formats); }
-	void enable_sound(bool doit) { m_enable_sound = doit; }
+
 	void set_sectoring_type(uint32_t sectoring_type) { m_sectoring_type = sectoring_type; }
+	void set_media_change_time(const attotime &time) { m_media_change_time = time; }
 
 	floppy_image_device *get_device();
+
+	// Sound support
+	bool use_sound() { return m_use_sound; }
+	void enable_sound(bool doit = true);
+	void enable_sound(const char *sampleset);
+	const char *get_samples_name() { return m_sample_set; }
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -478,8 +455,12 @@ protected:
 
 private:
 	std::function<void (format_registration &fr)> formats;
-	bool m_enable_sound;
+
+	bool m_use_sound;
+	const char* m_sample_set;
+
 	uint32_t m_sectoring_type;
+	attotime m_media_change_time;
 };
 
 

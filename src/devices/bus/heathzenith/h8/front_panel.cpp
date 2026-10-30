@@ -298,12 +298,6 @@ INPUT_CHANGED_MEMBER(front_panel_device::button_0)
 
 void front_panel_device::device_start()
 {
-	m_digits.resolve();
-	m_mon_led.resolve();
-	m_pwr_led.resolve();
-	m_ion_led.resolve();
-	m_run_led.resolve();
-
 	m_digit   = 0;
 	m_segment = 0;
 

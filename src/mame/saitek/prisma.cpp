@@ -35,7 +35,7 @@ TODO:
 #include "video/pwm.h"
 #include "video/sed1500.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -59,7 +59,7 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
-	void prisma(machine_config &config);
+	void prisma(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
@@ -84,6 +84,7 @@ private:
 	u8 m_inp_mux = 0;
 	u8 m_led_select = 0;
 	u8 m_led_direct = 0;
+	u8 m_port1 = 0xff;
 
 	// I/O handlers
 	void lcd_pwm_w(offs_t offset, u8 data);
@@ -105,8 +106,6 @@ private:
 
 void prisma_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_lcd_data));
 	save_item(NAME(m_lcd_address));
@@ -114,6 +113,7 @@ void prisma_state::machine_start()
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_led_direct));
+	save_item(NAME(m_port1));
 }
 
 INPUT_CHANGED_MEMBER(prisma_state::change_cpu_freq)
@@ -146,7 +146,7 @@ void prisma_state::standby(int state)
 
 INPUT_CHANGED_MEMBER(prisma_state::go_button)
 {
-	if (newval && m_maincpu->standby())
+	if (newval && BIT(m_port1, 7))
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
@@ -183,6 +183,8 @@ void prisma_state::p1_w(u8 data)
 	m_dac->write(BIT(data, 4));
 
 	// P16: ext power (no need to emulate it)
+	// P17: enable Go button
+	m_port1 = data;
 }
 
 void prisma_state::p2_w(u8 data)
@@ -340,10 +342,9 @@ void prisma_state::prisma(machine_config &config)
 	m_lcd_pwm->set_refresh(attotime::from_hz(30));
 	m_lcd_pwm->output_x().set(FUNC(prisma_state::lcd_pwm_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(873/2, 1080/2);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(2+1, 8);
 	config.set_default_layout(layout_saitek_prisma);

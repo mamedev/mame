@@ -36,14 +36,23 @@ void z80n_device::execute_run()
 	#include "cpu/z80/z80n.hxx"
 }
 
+void z80n_device::nmi_stackless_w(bool data)
+{
+	if (!data)
+		m_stackless_retn_en = false;
+	m_stackless = data;
+}
+
 void z80n_device::device_start()
 {
 	z80_device::device_start();
 	save_item(NAME(m_stackless));
+	save_item(NAME(m_stackless_retn_en));
 }
 
 void z80n_device::device_reset()
 {
 	z80_device::device_reset();
-	m_stackless = 0;
+	m_stackless = false;
+	m_stackless_retn_en = false;
 }

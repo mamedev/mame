@@ -34,8 +34,8 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_barcode_reader::menu_barcode_reader(mame_ui_manager &mui, render_container &container, barcode_reader_device *device)
-	: menu_device_control<barcode_reader_device>(mui, container, device)
+menu_barcode_reader::menu_barcode_reader(mame_ui_manager &mui, render_target &target, barcode_reader_device *device)
+	: menu_device_control<barcode_reader_device>(mui, target, device)
 {
 	set_heading(_("Barcode Reader"));
 	set_process_flags(PROCESS_LR_REPEAT);

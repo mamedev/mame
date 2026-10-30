@@ -102,7 +102,7 @@ vtech_floppy_controller_device::vtech_floppy_controller_device(const machine_con
 	vtech_memexp_device(mconfig, VTECH_FLOPPY_CONTROLLER, tag, owner, clock),
 	m_memexp(*this, "mem"),
 	m_floppy(*this, "%u", 0U),
-	m_selected_floppy(nullptr), m_latch(0), m_shifter(0), m_latching_inverter(false), m_current_cyl(0), m_write_position(0)
+	m_selected_floppy(nullptr), m_latch(0), m_shifter(0), m_latching_inverter(false), m_current_cyl(0)
 {
 }
 
@@ -120,10 +120,8 @@ void vtech_floppy_controller_device::device_start()
 	save_item(NAME(m_latching_inverter));
 	save_item(NAME(m_current_cyl));
 	save_item(NAME(m_last_latching_inverter_update_time));
-	save_item(NAME(m_write_start_time));
-	save_item(NAME(m_write_position));
 
-	// TODO: save m_write_buffer and rebuild m_selected_floppy after load
+	// TODO: rebuild m_selected_floppy after load
 
 	// Obvious bugs... must have worked by sheer luck and very subtle
 	// timings.  Our current z80 is not subtle enough.
@@ -144,9 +142,6 @@ void vtech_floppy_controller_device::device_reset()
 	m_shifter = 0x00;
 	m_latching_inverter = false;
 	m_last_latching_inverter_update_time = machine().time();
-	m_write_start_time = attotime::never;
-	m_write_position = 0;
-	std::fill(std::begin(m_write_buffer), std::end(m_write_buffer), attotime::zero);
 }
 
 
@@ -173,8 +168,8 @@ void vtech_floppy_controller_device::latch_w(uint8_t data)
 
 	if(newflop != m_selected_floppy) {
 		update_latching_inverter();
-		flush_writes();
 		if(m_selected_floppy) {
+			m_selected_floppy->write_end(machine().time());
 			m_selected_floppy->mon_w(1);
 			m_selected_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
 		}
@@ -205,23 +200,19 @@ void vtech_floppy_controller_device::latch_w(uint8_t data)
 
 	if(diff & 0x40) {
 		if(!(m_latch & 0x40)) {
-			m_write_start_time = machine().time();
-			m_write_position = 0;
-			if(m_selected_floppy)
-				m_selected_floppy->set_write_splice(m_write_start_time);
-
+			if(m_selected_floppy) {
+				m_selected_floppy->write_start(machine().time());
+				m_selected_floppy->set_write_splice(machine().time());
+			}
 		} else {
 			update_latching_inverter();
-			flush_writes();
-			m_write_start_time = attotime::never;
+			if(m_selected_floppy)
+				m_selected_floppy->write_end(machine().time());
 		}
 	}
 	if(!(m_latch & 0x40) && (diff & 0x20)) {
-		if(m_write_position == std::size(m_write_buffer)) {
-			update_latching_inverter();
-			flush_writes(true);
-		}
-		m_write_buffer[m_write_position++] = machine().time();
+		if(m_selected_floppy)
+			m_selected_floppy->write_flux_change(machine().time());
 	}
 }
 
@@ -282,43 +273,6 @@ void vtech_floppy_controller_device::update_latching_inverter()
 void vtech_floppy_controller_device::index_callback(floppy_image_device *floppy, int state)
 {
 	update_latching_inverter();
-	flush_writes(true);
-}
-
-void vtech_floppy_controller_device::flush_writes(bool keep_margin)
-{
-	if(!m_selected_floppy || m_write_start_time == attotime::never)
-		return;
-
-	// Beware of time travel.  Index pulse callback (which flushes)
-	// can be called with a machine().time() inferior to the last
-	// m_write_buffer value if the calling cpu instructions are not
-	// suspendable.
-
-	attotime limit = machine().time();
-	int kept_pos = m_write_position;
-	int kept_count = 0;
-	while(kept_pos > 0 && m_write_buffer[kept_pos-1] >= limit) {
-		kept_pos--;
-		kept_count++;
-	}
-
-	if(keep_margin) {
-		attotime last = kept_pos ? m_write_buffer[kept_pos-1] : m_write_start_time;
-		attotime delta = limit-last;
-		delta = delta / 2;
-		limit = limit - delta;
-	}
-	m_write_position -= kept_count;
-	if(m_write_position && m_write_buffer[0] == m_write_start_time) {
-		if(m_write_position)
-			std::copy_n(m_write_buffer + 1, m_write_position - 1, m_write_buffer);
-		m_write_position--;
-	}
-	m_selected_floppy->write_flux(m_write_start_time, limit, m_write_position, m_write_buffer);
-	m_write_start_time = limit;
-
-	if(kept_count != 0)
-		std::copy_n(m_write_buffer + kept_pos, kept_count, m_write_buffer);
-	m_write_position = kept_count;
+	if(m_selected_floppy)
+		m_selected_floppy->write_flush(machine().time());
 }

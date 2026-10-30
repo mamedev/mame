@@ -675,7 +675,7 @@ void tecmo16_state::base(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(59.17);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1000)); // not accurate
 	m_screen->set_size(32*8, 32*8);
@@ -687,9 +687,9 @@ void tecmo16_state::base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tecmo16);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_444, 4096);
 
-	TECMO_SPRITE(config, m_sprgen, 0, m_palette, gfx_tecmo16_spr);
+	TECMO_SPRITE(config, m_sprgen, m_palette, gfx_tecmo16_spr);
 
-	TECMO_MIXER(config, m_mixer, 0);
+	TECMO_MIXER(config, m_mixer);
 	m_mixer->set_mixer_shifts(10, 9, 4);
 	m_mixer->set_blendcols(   0x0400 + 0x300, 0x0400 + 0x200, 0x0400 + 0x100, 0x0400 + 0x000 );
 	m_mixer->set_regularcols( 0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 );

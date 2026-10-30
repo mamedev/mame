@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(gx400_base_state::get_tile_info)
 }
 
 
-void gx400_state::gfx_flipx_w(int state)
+void gx400_base_state::gfx_flipx_w(int state)
 {
 	m_flipscreen = state;
 
@@ -70,7 +70,7 @@ void gx400_state::gfx_flipx_w(int state)
 	machine().tilemap().set_flip_all(m_tilemap_flip);
 }
 
-void gx400_state::gfx_flipy_w(int state)
+void gx400_base_state::gfx_flipy_w(int state)
 {
 	if (state)
 		m_tilemap_flip |= TILEMAP_FLIPY;
@@ -80,51 +80,6 @@ void gx400_state::gfx_flipy_w(int state)
 	machine().tilemap().set_flip_all(m_tilemap_flip);
 }
 
-
-void salamand_state::control_port_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		uint8_t const accessing_bits = data ^ m_irq_port_last;
-
-		m_irq_on = BIT(data, 0);
-		m_irq2_on = BIT(data, 1);
-		m_flipscreen = BIT(data, 2);
-
-		if (BIT(data, 2))
-			m_tilemap_flip |= TILEMAP_FLIPX;
-		else
-			m_tilemap_flip &= ~TILEMAP_FLIPX;
-
-		if (BIT(data, 3))
-			m_tilemap_flip |= TILEMAP_FLIPY;
-		else
-			m_tilemap_flip &= ~TILEMAP_FLIPY;
-
-		if (accessing_bits & 0x0c)
-			machine().tilemap().set_flip_all(m_tilemap_flip);
-
-		m_irq_port_last = data;
-	}
-
-	if (ACCESSING_BITS_8_15)
-	{
-		machine().bookkeeping().coin_lockout_w(0, BIT(data, 9));
-		machine().bookkeeping().coin_lockout_w(1, BIT(data, 10));
-
-		if (BIT(data, 11))
-			m_audiocpu->set_input_line(0, HOLD_LINE);
-	}
-}
-
-void hcrash_state::citybomb_control_port_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	control_port_word_w(offset, data, mem_mask);
-	if (ACCESSING_BITS_8_15)
-	{
-		m_selected_ip = BIT(~data, 12);     /* citybomb steering & accel */
-	}
-}
 
 void gx400_state::create_palette_lookups()
 {

@@ -3,113 +3,113 @@
 # deco 16 opcodes
 brk_16_imp
 	// The 6502 bug when a nmi occurs in a brk is reproduced (case !irq_taken && nmi_pending)
-	if(irq_taken) {
+	if(m_irq_taken) {
 		read_pc();
 	} else {
 		read_pc();
-		PC++;
+		m_PC++;
 	}
-	write(SP, PC >> 8);
+	write(m_SP, m_PC >> 8);
 	dec_SP();
-	write(SP, PC);
+	write(m_SP, m_PC);
 	dec_SP();
-	write(SP, irq_taken ? P & ~F_B : P);
+	write(m_SP, m_irq_taken ? m_P & ~F_B : m_P);
 	dec_SP();
-	if(nmi_pending) {
-		standard_irq_callback(NMI_LINE, PC);
-		PC = read_arg(0xfff7);
-		PC = set_h(PC, read_arg(0xfff6));
-		nmi_pending = false;
+	if(m_nmi_pending) {
+		standard_irq_callback(NMI_LINE, m_PC);
+		m_PC = read_arg(0xfff7);
+		m_PC = set_h(m_PC, read_arg(0xfff6));
+		m_nmi_pending = false;
 	} else {
-		if(irq_taken)
-			standard_irq_callback(IRQ_LINE, PC);
-		PC = read_arg(0xfff3);
-		PC = set_h(PC, read_arg(0xfff2));
+		if(m_irq_taken)
+			standard_irq_callback(IRQ_LINE, m_PC);
+		m_PC = read_arg(0xfff3);
+		m_PC = set_h(m_PC, read_arg(0xfff2));
 	}
-	irq_taken = false;
-	P |= F_I; // Do *not* move after the prefetch
+	m_irq_taken = false;
+	m_P |= F_I; // Do *not* move after the prefetch
 	prefetch();
-	inst_state = -1;
+	m_inst_state = -1;
 
 ill_non
-	logerror("%s: Unimplemented instruction %02x\n", tag(), inst_state);
+	logerror("%s: Unimplemented instruction %02x\n", tag(), m_inst_state);
 	prefetch();
 
 u0B_zpg
-	TMP2 = read_pc();
-	PC++;
+	m_TMP2 = read_pc();
+	m_PC++;
 	if(DECO16_VERBOSE)
-		logerror("%s: OP0B %02x (%04x)\n", tag(), NPC, TMP2);
+		logerror("%s: OP0B %02x (%04x)\n", tag(), m_NPC, m_TMP2);
 	prefetch();
 
 u13_zpg
-	TMP2 = read_pc();
-	PC++;
+	m_TMP2 = read_pc();
+	m_PC++;
 	if(DECO16_VERBOSE)
-		logerror("%s: OP13 %02x (%04x)\n", tag(), NPC, TMP2);
+		logerror("%s: OP13 %02x (%04x)\n", tag(), m_NPC, m_TMP2);
 	prefetch();
 
 u23_zpg
-	TMP2 = read_pc();
-	PC++;
+	m_TMP2 = read_pc();
+	m_PC++;
 	if(DECO16_VERBOSE)
-		logerror("%s: OP23 %02x (%04x)\n", tag(), NPC, TMP2);
+		logerror("%s: OP23 %02x (%04x)\n", tag(), m_NPC, m_TMP2);
 	prefetch();
 
 u3F_zpg
-	TMP2 = read_pc();
-	PC++;
+	m_TMP2 = read_pc();
+	m_PC++;
 	if(DECO16_VERBOSE)
-		logerror("%s: OPBB %02x (%04x)\n", tag(), NPC, TMP2);
+		logerror("%s: OPBB %02x (%04x)\n", tag(), m_NPC, m_TMP2);
 	prefetch();
 
 u4B_zpg
-	TMP2 = read_pc();
-	PC++;
-	A = io->read_byte(1);
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_A = m_io->read_byte(1);
 	prefetch();
 
 u87_zpg
-	TMP2 = read_pc();
-	PC++;
+	m_TMP2 = read_pc();
+	m_PC++;
 	if(DECO16_VERBOSE)
-		logerror("%s: OP87 %02x (%04x)\n", tag(), NPC, TMP2);
+		logerror("%s: OP87 %02x (%04x)\n", tag(), m_NPC, m_TMP2);
 	prefetch();
 
 u8F_zpg
-	TMP2 = read_pc();
-	PC++;
+	m_TMP2 = read_pc();
+	m_PC++;
 	if(DECO16_VERBOSE)
-		logerror("%s: OP8F (BANK) %02x (%04x)\n", tag(), NPC, TMP2);
-	io->write_byte(0, TMP2);
+		logerror("%s: OP8F (BANK) %02x (%04x)\n", tag(), m_NPC, m_TMP2);
+	m_io->write_byte(0, m_TMP2);
 	prefetch();
 
 uA3_zpg
-	TMP2 = read_pc();
-	PC++;
+	m_TMP2 = read_pc();
+	m_PC++;
 	if(DECO16_VERBOSE)
-		logerror("%s: OPA3 %02x (%04x)\n", tag(), NPC, TMP2);
+		logerror("%s: OPA3 %02x (%04x)\n", tag(), m_NPC, m_TMP2);
 	prefetch();
 
 uBB_zpg
-	TMP2 = read_pc();
-	PC++;
+	m_TMP2 = read_pc();
+	m_PC++;
 	if(DECO16_VERBOSE)
-		logerror("%s: OPBB %02x (%04x)\n", tag(), NPC, TMP2);
+		logerror("%s: OPBB %02x (%04x)\n", tag(), m_NPC, m_TMP2);
 	prefetch();
 
 vbl_zpg
-	TMP2 = read_pc();
-	PC++;
-	A = io->read_byte(0);
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_A = m_io->read_byte(0);
 	//if(DECO16_VERBOSE)
-	//  logerror("%s: VBL %02x (%04x)\n", tag(), NPC, TMP2);
+	//  logerror("%s: VBL %02x (%04x)\n", tag(), m_NPC, m_TMP2);
 	prefetch();
 
 #   exceptions
 reset_16
-	P |= F_I;
-	PC = read_arg(0xfff1);
-	PC = set_h(PC, read_arg(0xfff0));
+	m_P |= F_I;
+	m_PC = read_arg(0xfff1);
+	m_PC = set_h(m_PC, read_arg(0xfff0));
 	prefetch();
-	inst_state = -1;
+	m_inst_state = -1;

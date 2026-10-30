@@ -450,10 +450,9 @@ void btime_state::btime_palette(palette_device &palette) const
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// blue component
-		bit0 = 0;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -495,10 +494,9 @@ void btime_state::lnc_palette(palette_device &palette) const
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// blue component
-		bit0 = 0;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 0) & 0x01;
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 1) & 0x01;
+		bit1 = (color_prom[i] >> 0) & 0x01;
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -688,10 +686,7 @@ void btime_state::draw_sprites(
 		uint8_t sprite_y_adjust, uint8_t sprite_y_adjust_flip_screen,
 		uint8_t const *sprite_ram, offs_t interleave)
 {
-	int i;
-	offs_t offs;
-
-	for (i = 0, offs = 0; i < 8; i++, offs += 4 * interleave)
+	for (int i = 0, offs = 0; i < 8; i++, offs += 4 * interleave)
 	{
 		if (!(sprite_ram[offs + 0] & 0x01)) continue;
 
@@ -1338,8 +1333,8 @@ static INPUT_PORTS_START( btime )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )  // should be OFF according to the manual
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( btime3 ) // Used for btime3 and btimem
-		PORT_INCLUDE( btime )
+static INPUT_PORTS_START( btimem )
+	PORT_INCLUDE( btime )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x30, 0x30, "Test Mode" )     PORT_DIPLOCATION("SW1:5,6")
@@ -1347,6 +1342,10 @@ static INPUT_PORTS_START( btime3 ) // Used for btime3 and btimem
 	PORT_DIPSETTING(    0x00, "Sound Test Only" )
 	PORT_DIPSETTING(    0x10, "Cross Hatch Only" )
 	PORT_DIPSETTING(    0x20, "Normal Test" )  // Use Coin A to advance the tests
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( btime3 )
+	PORT_INCLUDE( btimem )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:2,3")
@@ -2312,7 +2311,7 @@ void btime_state::btime(machine_config &config)
 	INPUT_MERGER_ALL_HIGH(config, "audionmi").output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12_MHz_XTAL / 2, 384, 8, 248, 272, 8, 248);
 	m_screen->set_screen_update(FUNC(btime_state::screen_update_btime));
 	m_screen->set_palette(m_palette);
@@ -2500,7 +2499,7 @@ void scregg_state::dommy(machine_config &config)
 	TIMER(config, "irq").configure_scanline(FUNC(scregg_state::scregg_interrupt), "screen", 0, 8);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12_MHz_XTAL / 2, 384, 8, 248, 272, 8, 248);
 	m_screen->set_screen_update(FUNC(scregg_state::screen_update_eggs));
 	m_screen->set_palette(m_palette);
@@ -2525,7 +2524,7 @@ void scregg_state::scregg(machine_config &config)
 	TIMER(config, "irq").configure_scanline(FUNC(scregg_state::scregg_interrupt), "screen", 0, 8);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12_MHz_XTAL / 2, 384, 8, 248, 272, 8, 248);
 	m_screen->set_screen_update(FUNC(scregg_state::screen_update_eggs));
 	m_screen->set_palette(m_palette);
@@ -3274,7 +3273,7 @@ void scregg_state::init_rockduck()
 GAME( 1982, btime,    0,       btime,    btime,    btime_state,   init_btime,    ROT270, "Data East Corporation",                 "Burger Time (Data East set 1)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1982, btime2,   btime,   btime,    btime,    btime_state,   init_btime,    ROT270, "Data East Corporation",                 "Burger Time (Data East set 2)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1982, btime3,   btime,   btime,    btime3,   btime_state,   init_btime,    ROT270, "Data East USA Inc.",                    "Burger Time (Data East USA)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1982, btimem,   btime,   btime,    btime3,   btime_state,   init_btime,    ROT270, "Data East (Bally Midway license)",      "Burger Time (Midway)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, btimem,   btime,   btime,    btimem,   btime_state,   init_btime,    ROT270, "Data East (Bally Midway license)",      "Burger Time (Midway)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1982, cookrace, btime,   cookrace, cookrace, btime_state,   init_cookrace, ROT270, "bootleg",                               "Cook Race",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1981, tisland,  0,       tisland,  btime,    btime_state,   init_tisland,  ROT270, "Data East Corporation",                 "Treasure Island (Data East)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, lnc,      0,       lnc,      lnc,      btime_state,   init_lnc,      ROT270, "Data East Corporation",                 "Lock'n'Chase",                   MACHINE_SUPPORTS_SAVE )

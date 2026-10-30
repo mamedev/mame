@@ -30,7 +30,7 @@ public:
 		m_lscreen(*this, "lscreen"),
 		m_rscreen(*this, "rscreen"),
 		m_system(*this, "SYSTEM"),
-		m_keys(*this, "KEY.%u", 0)
+		m_keys{ { *this, "KEY%u", 0 }, { *this, "KEY%u", 5 } }
 	{ }
 
 	void ps4big(machine_config &config);
@@ -64,7 +64,7 @@ private:
 	required_device<screen_device> m_lscreen;
 	required_device<screen_device> m_rscreen;
 	optional_ioport m_system;
-	optional_ioport_array<8> m_keys;
+	optional_ioport_array<4> m_keys[2];
 
 	void paletteram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	template<int Screen> void bgpen_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

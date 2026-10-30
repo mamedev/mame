@@ -93,7 +93,7 @@ void epson_lx800_device::device_add_mconfig(machine_config &config)
 	m_beep->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* gate array */
-	e05a03_device &ic3b(E05A03(config, "ic3b", 0));
+	e05a03_device &ic3b(E05A03(config, "ic3b"));
 	ic3b.pe_lp_wr_callback().set_output("paperout_led");
 	ic3b.reso_wr_callback().set(FUNC(epson_lx800_device::reset_w));
 	ic3b.pe_wr_callback().set(FUNC(epson_lx800_device::centronics_pe_w));
@@ -191,19 +191,9 @@ epson_lx800_device::epson_lx800_device(const machine_config &mconfig, device_typ
 }
 
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
 void epson_lx800_device::device_start()
 {
-	m_online_led.resolve();
 }
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
 
 void epson_lx800_device::device_reset()
 {

@@ -203,14 +203,14 @@ void hp82939_io_card_device::device_add_mconfig(machine_config &config)
 	m_cpu->p1_out_cb().set(FUNC(hp82939_io_card_device::p1_w));
 	m_cpu->p2_in_cb().set(FUNC(hp82939_io_card_device::p2_r));
 
-	HP_1MB5(config, m_translator, 0);
+	HP_1MB5(config, m_translator);
 	m_translator->irl_handler().set(FUNC(hp82939_io_card_device::irl_w));
 	m_translator->halt_handler().set(FUNC(hp82939_io_card_device::halt_w));
 	m_translator->reset_handler().set_inputline(m_cpu , INPUT_LINE_RESET);
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
-	INS8250(config , m_uart , 0);
+	INS8250(config , m_uart);
 	m_uart->out_int_callback().set_inputline(m_cpu , MCS48_INPUT_IRQ);
 	m_uart->out_tx_callback().set(m_rs232 , FUNC(rs232_port_device::write_txd));
 	m_uart->out_dtr_callback().set(m_rs232 , FUNC(rs232_port_device::write_dtr));

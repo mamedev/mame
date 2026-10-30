@@ -296,9 +296,20 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 	gouraud_inten[1] = m_blitter_regs[B_I2] & 0xffffff;
 	gouraud_inten[0] = m_blitter_regs[B_I3] & 0xffffff;
 
+	// TODO: gouraud color increments (bits 31-24, battlesp only?)
 	int gouraud_iinc = m_blitter_regs[B_IINC] & 0xffffff;
 	if (gouraud_iinc & 0x800000)
 		gouraud_iinc |= 0xff000000;
+
+	u32 z_index[4];
+	z_index[3] = m_blitter_regs[B_Z0];
+	z_index[2] = m_blitter_regs[B_Z1];
+	z_index[1] = m_blitter_regs[B_Z2];
+	z_index[0] = m_blitter_regs[B_Z3];
+	s32 z_inc = m_blitter_regs[B_ZINC];
+
+	u16 a1_clipx = m_blitter_regs[A1_CLIP] & 0x7fff;
+	u16 a1_clipy = (m_blitter_regs[A1_CLIP] >> 16) & 0x7fff;
 
 	LOGMASKED(LOG_BLITS, "%s:Blit!\n", machine().describe_context());
 	LOGMASKED(LOG_BLITS, "  a1_base  = %08X\n", a1_base);
@@ -328,7 +339,8 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 
 	/* check for unhandled command bits */
 	// NOTE: disabled check for GOURZ (it's pretty obvious everywhere is used)
-	if (COMMAND & 0x24000000)
+	// NOTE: SRCENX also unhandled (command & 4)
+	if (COMMAND & 0x24000080)
 		LOGMASKED(LOG_UNHANDLED_BLITS, "Blitter unhandled: these command bits: %08X\n", COMMAND & 0x24000000);
 
 	/* top of the outer loop */
@@ -383,28 +395,45 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 				}
 
 				/* handle clipping (CLIP_A1) */
-				// TODO: shouldn't this apply to A1 only?
-				// - will cause glitches in atarikrt gameplay, maybe an HW bug is in effect?
+				// NOTE: we need to rollback from the *updated* A1 value target
+				// - BIOS spinning cube
+				// - atarikrt track borders
+				// - spacewar intro
+				// - missil3d (uses both clipping types)
+				// - chekflag map display
+				// - whitemen gameplay
 				if (COMMAND & 0x00000040)
 				{
-					if (adest_x < 0 || adest_y < 0 ||
-						(adest_x >> 16) >= (m_blitter_regs[A1_CLIP] & 0x7fff) ||
-						(adest_y >> 16) >= ((m_blitter_regs[A1_CLIP] >> 16) & 0x7fff))
+					s32 target_x = COMMAND & 0x00000800 ? asrc_x : adest_x;
+					s32 target_y = COMMAND & 0x00000800 ? asrc_y : adest_y;
+					if (target_x < 0 || target_y < 0 ||
+						(target_x >> 16) >= a1_clipx ||
+						(target_y >> 16) >= a1_clipy)
 						inhibit = 1;
 				}
 
-				/* apply Z comparator */
-				if (COMMAND & 0x00040000)
-					if (srczdata < dstzdata) inhibit = 1;
-				if (COMMAND & 0x00080000)
-					if (srczdata == dstzdata) inhibit = 1;
-				if (COMMAND & 0x00100000)
-					if (srczdata > dstzdata) inhibit = 1;
+				// (GOURZ)
+				// cybermor and others
+				// TODO: iwar still cuts badly (just in a different way compared to before)
+				if (COMMAND & 0x00001000)
+				{
+					int p = asrc_phrase_mode ? (asrc_x & 3) : 3;
+					srczdata = z_index[p] >> 16;
+				}
+
+				/* apply Z comparator (ZMODE) */
+				if (COMMAND & 0x00040000 && srczdata < dstzdata)
+					inhibit = 1;
+				if (COMMAND & 0x00080000 && srczdata == dstzdata)
+					inhibit = 1;
+				if (COMMAND & 0x00100000 && srczdata > dstzdata)
+					inhibit = 1;
 
 				// apply bit comparator (BCOMPEN)
 				// - missil3d, clubdriv, avsp score/automap, trevmcfr
 				if (COMMAND & 0x04000000)
 				{
+					// TODO: should really shift by 1bpp
 					if (srcdata == 0)
 						inhibit = 1;
 				}
@@ -429,20 +458,36 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 				if (!inhibit)
 				{
 					/* handle patterns/additive/LFU */
+					// (PATDSEL)
 					if (COMMAND & 0x00010000)
 						writedata = READ_RDATA(B_PATD_H, adest, adestflags, adest_phrase_mode);
-					else if (COMMAND & 0x00020000)
+					else if (COMMAND & 0x00020000) // (ADDDSEL)
 					{
 						writedata = (srcdata & 0xff) + (dstdata & 0xff);
-						if (!(COMMAND & 0x00004000) && writedata > 0xff)
-							writedata = 0xff;
+
+						// !(TOPBEN)
+						// - battlesp/battlesg main menu
+						// - hstrike difficulty select (dim in background)
+						if (!(COMMAND & 0x00004000))
+						{
+							s16 s = util::sext(srcdata & 0xff, 8);
+							s16 d = dstdata & 0xff;
+							s16 sum = s + d;
+
+							writedata = (u32)std::clamp(sum, (s16)0, (s16)0xff);
+						}
 						writedata |= (srcdata & 0xf00) + (dstdata & 0xf00);
+
+						// !(TOPNEN)
 						if (!(COMMAND & 0x00008000) && writedata > 0xfff)
-							writedata = 0xfff;
+						{
+							writedata &= 0xfff;
+						}
 						writedata |= (srcdata & 0xf000) + (dstdata & 0xf000);
 					}
 					else
 					{
+						// (LFUFUNC), default mode
 						if (COMMAND & 0x00200000)
 							writedata |= ~srcdata & ~dstdata;
 						if (COMMAND & 0x00400000)
@@ -471,6 +516,7 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 						int p = asrc_phrase_mode ? (asrc_x & 3) : 3;
 						writedata = ((gouraud_inten[p] >> 16) & 0xff) | gouraud_color[p];
 
+						// TODO: this may not be the right place for the increment
 						int intensity = gouraud_inten[p];
 						intensity += gouraud_iinc;
 						if (intensity < 0) intensity = 0;
@@ -482,7 +528,7 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 				{
 					writedata = dstdata;
 					// TODO: verify me
-					//srczdata = dstzdata;
+					srczdata = dstzdata;
 				}
 
 			// (BKGWREN)
@@ -495,14 +541,22 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 					WRITE_ZDATA(adestflags, srczdata);
 			}
 
-				/* update X/Y */
+			/* update X/Y */
 			asrc_x = (asrc_x + asrc_xadd) & asrc_xmask;
 			asrc_y = (asrc_y + asrc_yadd) & asrc_ymask;
 			adest_x = (adest_x + adest_xadd) & adest_xmask;
 			adest_y = (adest_y + adest_yadd) & adest_ymask;
+
+			// GOURZ increments
+			if (COMMAND & 0x00001000)
+			{
+				int p = asrc_phrase_mode ? (asrc_x & 3) : 3;
+				z_index[p] += z_inc;
+			}
 		}
 
 		/* adjust for phrase mode */
+		// TODO: clearly wrong in places (depends on current pixel mode)
 		if (asrc_phrase_mode)
 		{
 			if (asrc_xadd > 0)

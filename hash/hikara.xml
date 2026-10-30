@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -71,7 +71,7 @@ license:CC0-1.0
 	    Dream Fighter                   Perfume                     Dream Fighter                   Perfume
 	    ポリリズム                      Perfume                     Polyrhythm                      Perfume -->
 	<software name="user5" supported="no">
-		<description>Hi-kara 5-song capacity user cartridge (used, with 5 songs) (Japan)</description>
+		<description>Hi-kara 5-song capacity user cartridge (used, with 5 songs, set 1) (Japan)</description>
 		<year>2008</year>
 		<publisher>Takara Tomy</publisher>
 		<part name="cart" interface="ekara_cart">
@@ -128,6 +128,24 @@ license:CC0-1.0
 	</software>
 
 	<!-- this one has some songs programmed into it:
+	    言葉より大切なもの              嵐                              Kotoba Yori Taisetsu na Mono    ARASHI
+	    時代（ジダイ）                  嵐                              Jidai                           ARASHI
+	    PIKA☆☆NCHI DOUBLE               嵐                              PIKA☆☆NCHI DOUBLE               ARASHI
+	    Believe                         嵐                              Believe                         ARASHI
+	    Love so sweet                   嵐                              Love so sweet                   ARASHI -->
+	<software name="user5d" supported="no">
+		<description>Hi-kara 5-song capacity user cartridge (used, with 5 songs, set 2) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="usercart_5_3.bin" size="0x100000" crc="c4d75e61" sha1="225d5be516ca54393ad5ce7e46b6a445d51d0c35"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!-- this one has some songs programmed into it:
 	    雫                              スキマスイッチ                  Shizuku                         Sukima Switch
 	    鐘を鳴らして                    BONNIE PINK                     Kane o Narashite                BONNIE PINK
 	    ホウキ雲                        RYTHEM                          Houkigumo                       RYTHEM
@@ -166,6 +184,27 @@ license:CC0-1.0
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="usercart_10.u1" size="0x200000" crc="51e64d8e" sha1="90e5592446101807f47772b0868ce3de5d78b9f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this one has some songs programmed into it:
+	    君をのせて                          井上あずみ      Kimi o Nosete                                   Inoue Azumi
+	    陽は、また昇る                      アラジン        Hi wa, Mata Noboru                              aladdin
+	    タッチ                              岩崎良美        TOUCH                                           Iwasaki Yoshimi
+	    ハッピー♥ラッキー~お願いミルモ~     Kaede-chan      Happy♥Lucky (Onegai Mirumo)                     Kaede-chan
+	    こころのたまご                      Buono!          Kokoro no Tamago                                Buono!
+	    遥か                                GReeeeN         Haruka                                          GReeeeN
+	    Love yourself ~君が嫌いな君が好き~  KAT-TUN         Love yourself (Kimi ga Kiraina Kimi ga Suki)    KAT-TUN
+	    Butterfly                           木村カエラ      Butterfly                                       Kimura Kaela
+	    さくらんぼ                          大塚愛          Sakuranbo                                       Ōtsuka Ai -->
+	<software name="user10b" cloneof="user10" supported="no">
+		<description>Hi-kara 10-song capacity user cartridge (used, with 9 songs) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="usercart10.bin" size="0x200000" crc="48bac1fc" sha1="87c26fe1ada9940bf2712ae86dffa207dbeb2123"/>
 			</dataarea>
 		</part>
 	</software>

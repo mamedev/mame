@@ -33,6 +33,8 @@
 
 #include "speaker.h"
 
+#include <bit>
+
 // Debugging
 #define VERBOSE 0
 #include "logmacro.h"
@@ -247,7 +249,7 @@ void hp98x6_upi_device::device_add_mconfig(machine_config &config)
 {
 	// Beep
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
+	BEEP(config, m_beep).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	TIMER(config, m_10ms_timer).configure_periodic(FUNC(hp98x6_upi_device::ten_ms), clocks_to_attotime(CLOCKS_PER_10MS));
 	TIMER(config, m_delay_timer).configure_generic(FUNC(hp98x6_upi_device::delay));
@@ -935,7 +937,7 @@ void hp98x6_upi_device::acquire_keys(ioport_value input[4])
 		input[i] = m_keys[i]->read();
 		auto w = input[i];
 		while (w) {
-			auto mask = BIT_MASK<ioport_value>(31 - count_leading_zeros_32(w));
+			auto mask = BIT_MASK<ioport_value>(std::bit_width(w) - 1);
 			auto len = m_keys[i]->field(mask)->seq().length();
 			if (len > max_len) {
 				max_len = len;
@@ -949,7 +951,7 @@ void hp98x6_upi_device::acquire_keys(ioport_value input[4])
 		for (unsigned i = 0; i < 4; i++) {
 			auto w = input[i];
 			while (w) {
-				auto mask = BIT_MASK<ioport_value>(31 - count_leading_zeros_32(w));
+				auto mask = BIT_MASK<ioport_value>(std::bit_width(w) - 1);
 				auto len = m_keys[i]->field(mask)->seq().length();
 				if (len < max_len) {
 					input[i] &= ~mask;

@@ -93,16 +93,16 @@ void sis85c496_host_device::device_add_mconfig(machine_config &config)
 	m_dma8237_2->out_dack_callback<2>().set(FUNC(sis85c496_host_device::pc_dack6_w));
 	m_dma8237_2->out_dack_callback<3>().set(FUNC(sis85c496_host_device::pc_dack7_w));
 
-	PIC8259(config, m_pic8259_master, 0);
+	PIC8259(config, m_pic8259_master);
 	m_pic8259_master->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic8259_master->in_sp_callback().set_constant(1);
 	m_pic8259_master->read_slave_ack_callback().set(FUNC(sis85c496_host_device::get_slave_ack));
 
-	PIC8259(config, m_pic8259_slave, 0);
+	PIC8259(config, m_pic8259_slave);
 	m_pic8259_slave->out_int_callback().set(m_pic8259_master, FUNC(pic8259_device::ir2_w));
 	m_pic8259_slave->in_sp_callback().set_constant(0);
 
-	PIT8254(config, m_pit8254, 0);
+	PIT8254(config, m_pit8254);
 	m_pit8254->set_clk<0>(4772720/4); // heartbeat IRQ
 	m_pit8254->out_handler<0>().set(m_pic8259_master, FUNC(pic8259_device::ir0_w));
 	m_pit8254->set_clk<1>(4772720/4); // DRAM refresh
@@ -127,7 +127,7 @@ void sis85c496_host_device::device_add_mconfig(machine_config &config)
 	m_ds12885->set_century_index(0x32);
 
 	// TODO: ISA bus clock, irqs
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
 	m_isabus->set_iospace(m_maincpu, AS_IO);
 	m_isabus->irq3_callback().set(FUNC(sis85c496_host_device::pc_irq3_w));

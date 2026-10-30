@@ -20,10 +20,8 @@
 
     TODO:
 
-    - winchester hard disk
     - analog/digital I/O
     - light pen
-    - 8088 CPU card
 
 */
 
@@ -497,11 +495,11 @@ uint32_t tiki100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	for (int vaddr = cliprect.min_y; vaddr <= cliprect.max_y; vaddr++)
+	for (int vaddr = cliprect.top(); vaddr <= cliprect.bottom(); vaddr++)
 	{
 		// This is at the start of a line
-		int haddr = (cliprect.min_x>>4);
-		int const haddr_end = (cliprect.max_x>>4);
+		int haddr = cliprect.left() >> 4;
+		int const haddr_end = cliprect.right() >> 4;
 		for (; haddr <= haddr_end; haddr++)
 		{
 			// This is at the start of a 16-dot cluster. Changes in m_scroll and m_video_ram come into effect here.
@@ -675,7 +673,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( tiki100_state::tape_tick )
 void tiki100_state::busrq_w(int state)
 {
 	// since our Z80 has no support for BUSACK, we assume it is granted immediately
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, state);
 	m_exp->busak_w(state);
 }
 
@@ -683,8 +681,6 @@ void tiki100_state::busrq_w(int state)
 
 void tiki100_state::machine_start()
 {
-	m_leds.resolve();
-
 	/* register for state saving */
 	save_item(NAME(m_rome));
 	save_item(NAME(m_vire));
@@ -717,17 +713,19 @@ void tiki100_state::tiki100(machine_config &config)
 
 	/* video hardware */
 	TIMER(config, "scantimer").configure_scanline(FUNC(tiki100_state::scanline_start), "screen", 0, 1);
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(20_MHz_XTAL, 1280, 0, 1024, 312, 0, 256);
 	m_screen->set_screen_update(FUNC(tiki100_state::screen_update));
 	PALETTE(config, m_palette).set_entries(16);
 
-	TIKI100_BUS(config, m_exp, 0);
+	TIKI100_BUS(config, m_exp);
 	m_exp->irq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp->nmi_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_exp->busrq_wr_callback().set(FUNC(tiki100_state::busrq_w));
 	m_exp->mrq_rd_callback().set(FUNC(tiki100_state::mrq_r));
 	m_exp->mrq_wr_callback().set(FUNC(tiki100_state::mrq_w));
+	m_exp->iorq_rd_callback().set(FUNC(tiki100_state::iorq_r));
+	m_exp->iorq_wr_callback().set(FUNC(tiki100_state::iorq_w));
 	TIKI100_BUS_SLOT(config, "slot1", m_exp, tiki100_cards, "8088");
 	TIKI100_BUS_SLOT(config, "slot2", m_exp, tiki100_cards, "hdc");
 	TIKI100_BUS_SLOT(config, "slot3", m_exp, tiki100_cards, nullptr);
@@ -795,7 +793,7 @@ void tiki100_state::tiki100(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software list
-	SOFTWARE_LIST(config, "flop_list").set_original("tiki100");
+	SOFTWARE_LIST(config, "flop_list").set_original("tiki100_flop");
 }
 
 /* ROMs */

@@ -225,9 +225,6 @@ pc1512_keyboard_device::pc1512_keyboard_device(const machine_config &mconfig, co
 
 void pc1512_keyboard_device::device_start()
 {
-	// resolve outputs
-	m_leds.resolve();
-
 	// allocate timers
 	m_reset_timer = timer_alloc(FUNC(pc1512_keyboard_device::reset_timer_tick), this);
 

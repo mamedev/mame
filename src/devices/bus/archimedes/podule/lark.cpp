@@ -122,7 +122,7 @@ const tiny_rom_entry *arc_lark_device::device_rom_region() const
 
 void arc_lark_device::device_add_mconfig(machine_config &config)
 {
-	AD1848(config, m_ad1848, 0);
+	AD1848(config, m_ad1848);
 	//m_ad1848->irq().set([this](int state) { set_irq(IRQ_AD1848, state); }); // not used/connected?
 	m_ad1848->drq().set(FUNC(arc_lark_device::playback_drq));
 

@@ -144,9 +144,6 @@ INPUT_PORTS_END
 
 void amerihok_state::machine_start()
 {
-	m_digits.resolve();
-	m_lamp.resolve();
-
 	std::fill(std::begin(m_outputs), std::end(m_outputs), 0);
 	m_old_p2 = 0xff;
 

@@ -61,9 +61,6 @@ paula_fdc_device::paula_fdc_device(const machine_config &mconfig, const char *ta
 
 void paula_fdc_device::device_start()
 {
-	m_leds.resolve();
-	m_fdc_led.resolve();
-
 	static char const *const names[] = { "0", "1", "2", "3" };
 	for(int i=0; i != 4; i++) {
 		floppy_connector *con = subdevice<floppy_connector>(names[i]);
@@ -380,9 +377,25 @@ void paula_fdc_device::dma_check()
 	if(was_writing && !(dskbyt & 0x2000))
 		cur_live.pll.stop_writing(floppy, cur_live.tm);
 	if(!was_writing && (dskbyt & 0x2000))
-		cur_live.pll.start_writing(cur_live.tm);
+		cur_live.pll.start_writing(cur_live.tm, floppy);
 }
 
+/*
+ * x--- ---- ---- ---- SET/CLR
+ * -xx- ---- ---- ---- PRECOMP
+ * -00- ---- ---- ---- no precompensation
+ * -01- ---- ---- ---- 140 nsec
+ * -10- ---- ---- ---- 240 nsec
+ * -11- ---- ---- ---- 560 nsec
+ * ---x ---- ---- ---- MFMPREC (1) MFM (0) GCR
+ * ---- x--- ---- ---- UARTBRK (1) force UART break (TXD low)
+ * ---- -x-- ---- ---- WORDSYNC (1) enables DSKSYNC synchronization
+ * ---- --x- ---- ---- MSB (1) enable disk read sync on MSB
+ * ---- ---x ---- ---- FAST data clock rate control (1) fast 2 usec (0) slow 4 usec
+ * ---- ---- **** **** <Paula modulation regs>
+ *
+ * Usual settings are either 0x1500 (most games) or 0x1100 (workbench floppy loading)
+ */
 void paula_fdc_device::adkcon_set(uint16_t data)
 {
 	live_sync();
@@ -519,7 +532,10 @@ void paula_fdc_device::ciaaprb_w(uint8_t data)
 		m_fdc_led = BIT(data, 7); // LED directly connected to FDC motor
 	}
 
-	if(floppy) {
+	// the dma engine needs to keep running even with no drive attached
+	bool const drive_selected = (data & 0x78) != 0x78;
+
+	if(drive_selected) {
 		if(cur_live.state == IDLE)
 			live_start();
 	} else
@@ -647,25 +663,20 @@ int paula_fdc_device::pll_t::get_next_bit(attotime &tm, floppy_image_device *flo
 	return bit;
 }
 
-void paula_fdc_device::pll_t::start_writing(const attotime & tm)
+void paula_fdc_device::pll_t::start_writing(const attotime & tm, floppy_image_device *floppy)
 {
-	write_start_time = tm;
-	write_position = 0;
+	if(floppy)
+		floppy->write_start(tm);
 }
 
 void paula_fdc_device::pll_t::stop_writing(floppy_image_device *floppy, const attotime &tm)
 {
-	commit(floppy, tm);
-	write_start_time = attotime::never;
+	if(floppy)
+		floppy->write_end(tm);
 }
 
 bool paula_fdc_device::pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, const attotime &limit)
 {
-	if(write_start_time.is_never()) {
-		write_start_time = ctime;
-		write_position = 0;
-	}
-
 	for(;;) {
 		attotime etime = ctime+delays[slot];
 		if(etime > limit)
@@ -673,8 +684,8 @@ bool paula_fdc_device::pll_t::write_next_bit(bool bit, attotime &tm, floppy_imag
 		uint16_t pre_counter = counter;
 		counter += increment;
 		if(bit && !(pre_counter & 0x400) && (counter & 0x400))
-			if(write_position < std::size(write_buffer))
-				write_buffer[write_position++] = etime;
+			if(floppy)
+				floppy->write_flux_change(etime);
 		slot++;
 		tm = etime;
 		if(counter & 0x800)
@@ -692,11 +703,6 @@ bool paula_fdc_device::pll_t::write_next_bit(bool bit, attotime &tm, floppy_imag
 
 void paula_fdc_device::pll_t::commit(floppy_image_device *floppy, const attotime &tm)
 {
-	if(write_start_time.is_never() || tm == write_start_time)
-		return;
-
 	if(floppy)
-		floppy->write_flux(write_start_time, tm, write_position, write_buffer);
-	write_start_time = tm;
-	write_position = 0;
+		floppy->write_flush(tm);
 }

@@ -9,8 +9,12 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "video/poly.h"
 #include "taitojc.h"
+
+#include "video/poly.h"
+
+#include "endianness.h"
+
 
 static const gfx_layout char_layout =
 {
@@ -136,35 +140,29 @@ void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	int y2 = y + height;
 
 	// trivial rejection
-	if (x1 > cliprect.max_x || x2 < cliprect.min_x || y1 > cliprect.max_y || y2 < cliprect.min_y)
+	if (!cliprect.overlaps(rectangle(x1, x2 - 1, y1, y2 - 1)))
 	{
 		return;
 	}
 
-//  osd_printf_debug("draw_object: %08X %08X, X: %d, Y: %d, W: %d, H: %d\n", w1, w2, x, y, width, height);
+	//osd_printf_debug("draw_object: %08X %08X, X: %d, Y: %d, W: %d, H: %d\n", w1, w2, x, y, width, height);
 
 	int ix = 0;
 	int iy = 0;
 
 	// clip
-	if (x1 < cliprect.min_x)
+	if (x1 < cliprect.left())
 	{
-		ix = abs(cliprect.min_x - x1);
-		x1 = cliprect.min_x;
+		ix = abs(cliprect.left() - x1);
+		x1 = cliprect.left();
 	}
-	if (x2 > cliprect.max_x)
+	x2 = std::min<int>(x2, cliprect.right() + 1);
+	if (y1 < cliprect.top())
 	{
-		x2 = cliprect.max_x;
+		iy = abs(cliprect.top() - y1);
+		y1 = cliprect.top();
 	}
-	if (y1 < cliprect.min_y)
-	{
-		iy = abs(cliprect.min_y - y1);
-		y1 = cliprect.min_y;
-	}
-	if (y2 > cliprect.max_y)
-	{
-		y2 = cliprect.max_y;
-	}
+	y2 = std::min<int>(y2, cliprect.bottom() + 1);
 
 	/* this bit seems to set up border at left/right of screen (reads at 0xffc00) */
 	if (mask_screen)
@@ -291,28 +289,4 @@ uint32_t taitojc_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
-}
-
-uint32_t dendego_state::screen_update_dendego(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	// update controller state in artwork
-	static const uint8_t mascon_table[6] = { 0x76, 0x67, 0x75, 0x57, 0x73, 0x37 };
-	static const uint8_t brake_table[11] = { 0x00, 0x05, 0x1d, 0x35, 0x4d, 0x65, 0x7d, 0x95, 0xad, 0xc5, 0xd4 };
-
-	uint8_t btn = (m_io_buttons->read() & 0x77);
-	int level;
-	for (level = 5; level > 0; level--)
-		if (btn == mascon_table[level]) break;
-
-	if (level != m_counters[0])
-		m_counters[0] = level;
-
-	btn = m_analog_ports[0]->read() & 0xff;
-	for (level = 10; level > 0; level--)
-		if (btn >= brake_table[level]) break;
-
-	if (level != m_counters[1])
-		m_counters[1] = level;
-
-	return screen_update(screen, bitmap, cliprect);
 }

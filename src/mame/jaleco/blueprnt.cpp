@@ -596,7 +596,7 @@ void blueprnt_state::blueprnt(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(10_MHz_XTAL / 2, 320, 0, 256, 264, 16, 240); // verified from Midway schematics
 	screen.set_screen_update(FUNC(blueprnt_state::screen_update));
 	screen.set_palette(m_palette);

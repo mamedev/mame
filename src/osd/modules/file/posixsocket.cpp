@@ -112,12 +112,22 @@ public:
 
 	virtual std::error_condition write(void const *buffer, std::uint64_t offset, std::uint32_t count, std::uint32_t &actual) noexcept override
 	{
-		ssize_t const result = ::write(m_sock, buffer, count);
-		if (result < 0)
-			return std::error_condition(errno, std::generic_category());
+		if (!m_listening)
+		{
+			// connected socket
+			ssize_t const result = ::write(m_sock, buffer, count);
+			if (result < 0)
+				return std::error_condition(errno, std::generic_category());
 
-		actual = std::uint32_t(size_t(result));
-		return std::error_condition();
+			actual = std::uint32_t(size_t(result));
+			return std::error_condition();
+		}
+		else
+		{
+			// listening socket - writing may raise SIGPIPE
+			actual = 0;
+			return std::errc::not_connected;
+		}
 	}
 
 	virtual std::error_condition truncate(std::uint64_t offset) noexcept override

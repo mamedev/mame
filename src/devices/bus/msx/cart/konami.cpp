@@ -840,14 +840,14 @@ uint8_t msx_cart_keyboard_master_device::read_vlm(offs_t offset)
 
 void msx_cart_keyboard_master_device::io_20_w(uint8_t data)
 {
-	m_vlm5030->rst(BIT(data, 0) ? 1 : 0);
-	m_vlm5030->vcu(BIT(data, 2) ? 1 : 0);
-	m_vlm5030->st(BIT(data, 1) ? 1 : 0);
+	m_vlm5030->rst_w(BIT(data, 0));
+	m_vlm5030->vcu_w(BIT(data, 2));
+	m_vlm5030->st_w(BIT(data, 1));
 }
 
 uint8_t msx_cart_keyboard_master_device::io_00_r()
 {
-	return m_vlm5030->bsy() ? 0x10 : 0x00;
+	return m_vlm5030->bsy_r() ? 0x10 : 0x00;
 }
 
 

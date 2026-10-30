@@ -305,13 +305,13 @@ private:
 class smc91c94_device : public smc91c9x_device
 {
 public:
-	smc91c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	smc91c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class smc91c96_device : public smc91c9x_device
 {
 public:
-	smc91c96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	smc91c96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 

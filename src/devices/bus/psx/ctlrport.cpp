@@ -30,7 +30,7 @@ void psx_controller_port_device::device_config_complete()
 
 void psx_controller_port_device::device_add_mconfig(machine_config &config)
 {
-	PSXCARD(config, m_card, 0);
+	PSXCARD(config, m_card);
 }
 
 void psx_controller_port_device::disable_card(bool state)

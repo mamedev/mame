@@ -80,7 +80,6 @@ uint32_t hitme_state::screen_update_hitme(screen_device &screen, bitmap_ind16 &b
 	double dot_freq = 15750 * 336;
 	/* the number of pixels is the duration times the frequency */
 	int width_pixels = width_duration * dot_freq;
-	offs_t offs = 0;
 
 	/* start by drawing the tilemap */
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -90,7 +89,7 @@ uint32_t hitme_state::screen_update_hitme(screen_device &screen, bitmap_ind16 &b
 	{
 		int dy = bitmap.rowpixels();
 		int inv = 0;
-		for (int x = 0; x < 40; x++, offs++)
+		for (int x = 0; x < 40; x++)
 		{
 			/* if the high bit is set, reset the oneshot */
 			if (m_videoram[y * 40 + x] & 0x80)
@@ -312,7 +311,7 @@ void hitme_state::hitme(machine_config &config)
 
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(40*8, 19*10);

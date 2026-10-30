@@ -364,7 +364,7 @@ void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, const cha
 		uint8_t *dest = machine().root_device().memregion("isa")->base() + start - 0xc0000;
 		memcpy(dest,src, end - start + 1);
 	} else {
-		m_memspace->install_rom(start, end, machine().root_device().memregion(dev->subtag(region).c_str())->base());
+		m_memspace->install_rom(start, end, dev->memregion(region)->base());
 		m_memspace->unmap_write(start, end);
 	}
 }

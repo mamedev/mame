@@ -179,7 +179,7 @@ uint32_t terak_v_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void terak_v_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_screen_update(FUNC(terak_v_device::screen_update));
 	m_screen->set_palette("palette");
@@ -192,7 +192,7 @@ void terak_v_device::device_add_mconfig(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(terak_v_device::kbd_put));
 
 	// built-in piezo

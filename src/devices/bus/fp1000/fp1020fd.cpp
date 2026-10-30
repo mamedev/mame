@@ -22,7 +22,7 @@ void fp1020fd_device::io_map(address_map &map)
 	map(0x0000, 0x0000).mirror(0xfef9).unmapr().lw8(
 		NAME([this](offs_t offset, u8 data) {
 			(void)data;
-			for (auto floppy : m_floppy)
+			for (auto &floppy : m_floppy)
 			{
 				floppy_image_device *fl = floppy->get_device();
 				fl->mon_w(0);
@@ -86,7 +86,7 @@ void fp1020fd_device::device_reset()
 
 TIMER_CALLBACK_MEMBER(fp1020fd_device::motor_timeout_cb)
 {
-	for (auto floppy : m_floppy)
+	for (auto &floppy : m_floppy)
 	{
 		floppy_image_device *fl = floppy->get_device();
 		fl->mon_w(1);

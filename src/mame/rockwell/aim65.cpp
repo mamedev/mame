@@ -146,7 +146,7 @@ static INPUT_PORTS_START( aim65 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1")          PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(UCHAR_MAMEKEY(F1))
 
 	PORT_START("switches")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RST") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(aim65_state::reset_button), 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("RST") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(aim65_state::reset_button), 0)
 	PORT_DIPNAME(0x08, 0x08, "KB/TTY") PORT_DIPLOCATION("S3:1")
 	PORT_DIPSETTING(0x00, "TTY")
 	PORT_DIPSETTING(0x08, "KB")
@@ -231,7 +231,7 @@ void aim65_state::aim65(machine_config &config)
 	m_ds[4]->update().set(FUNC(aim65_state::update_ds<5>));
 
 	// pseudo-"screen" for the thermal printer. Index 0.
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_screen_update(FUNC(aim65_state::screen_update));

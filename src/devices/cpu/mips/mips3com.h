@@ -14,6 +14,8 @@
 
 #include "mips3.h"
 
+#include "endianness.h"
+
 
 /***************************************************************************
     DEBUGGING
@@ -101,6 +103,8 @@
 #define COP0_PRId               15
 #define COP0_Config             16
 #define COP0_LLAddr             17
+#define COP0_WatchLo            18
+#define COP0_WatchHi            19
 #define COP0_XContext           20
 #define COP0_ECC                26
 #define COP0_CacheErr           27

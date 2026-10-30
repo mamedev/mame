@@ -567,7 +567,7 @@ void fp_state::fp(machine_config &config)
 	/* video hardware */
 	config.set_default_layout(layout_apricotp);
 
-	screen_device &screen_lcd(SCREEN(config, SCREEN_LCD_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen_lcd(SCREEN(config, SCREEN_LCD_TAG));
 	screen_lcd.set_refresh_hz(50);
 	screen_lcd.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen_lcd.set_screen_update(FUNC(fp_state::screen_update));
@@ -575,7 +575,7 @@ void fp_state::fp(machine_config &config)
 	screen_lcd.set_visarea_full();
 	screen_lcd.set_palette("palette");
 
-	screen_device &screen_crt(SCREEN(config, SCREEN_CRT_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen_crt(SCREEN(config, SCREEN_CRT_TAG));
 	screen_crt.set_refresh_hz(50);
 	screen_crt.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen_crt.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
@@ -596,17 +596,17 @@ void fp_state::fp(machine_config &config)
 	SN76489A(config, SN76489AN_TAG, 2000000).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* Devices */
-	APRICOT_KEYBOARD(config, APRICOT_KEYBOARD_TAG, 0);
+	APRICOT_KEYBOARD(config, APRICOT_KEYBOARD_TAG);
 
 	AM9517A(config, m_dmac, 250000);
 	m_dmac->out_eop_callback().set(m_pic, FUNC(pic8259_device::ir7_w));
 	m_dmac->in_ior_callback<1>().set(m_fdc, FUNC(wd2797_device::data_r));
 	m_dmac->out_iow_callback<1>().set(m_fdc, FUNC(wd2797_device::data_w));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(2000000);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
 	m_pit->set_clk<1>(2000000);

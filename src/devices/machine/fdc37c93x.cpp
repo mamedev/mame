@@ -558,7 +558,7 @@ void fdc37c93x_device::unmap_fdc_addresses()
 
 void fdc37c93x_device::map_lpt(address_map &map)
 {
-	map(0x0, 0x3).rw(pc_lpt_lptdev, FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write));
+	map(0x0, 0x3).m(pc_lpt_lptdev, FUNC(pc_lpt_device::isa_map));
 }
 
 void fdc37c93x_device::map_lpt_addresses()
@@ -988,13 +988,15 @@ void fdc37c93x_device::device_start()
 	m_isa->set_dma_channel(2, this, true);
 	m_isa->set_dma_channel(3, this, true);
 	remap(AS_IO, 0, 0x400);
+
+	save_item(NAME(enabled_logical));
 }
 
 void fdc37c93x_device::device_reset()
 {
 }
 
-// 'M707 is mostly same except no IDE ports and extra power management regs
+// 'M707 is mostly same except no IDE ports, no RTC and extra power management regs
 DEFINE_DEVICE_TYPE(FDC37M707, fdc37m707_device, "fdc37m707", "SMSC FDC37M707 Super I/O")
 
 

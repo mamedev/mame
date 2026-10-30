@@ -102,9 +102,9 @@ void ym2149_sound_card_device::device_reset()
 
 void ym2149_sound_card_device::map(address_map &map)
 {
-	map(0x01, 0x01).r(m_ssg, FUNC(ym2149_device::data_r));
-	map(0x00, 0x01).w(m_ssg, FUNC(ym2149_device::address_data_w));
-	map(0x02, 0x03).rw(m_mpu401, FUNC(mpu401_device::mpu_r), FUNC(mpu401_device::mpu_w));
+	map(0x01, 0x01).mirror(0xff00).r(m_ssg, FUNC(ym2149_device::data_r));
+	map(0x00, 0x01).mirror(0xff00).w(m_ssg, FUNC(ym2149_device::address_data_w));
+	map(0x02, 0x03).mirror(0xff00).rw(m_mpu401, FUNC(mpu401_device::mpu_r), FUNC(mpu401_device::mpu_w));
 }
 
 void ym2149_sound_card_device::mpu_irq_out(int state)

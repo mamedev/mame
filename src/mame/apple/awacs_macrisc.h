@@ -53,6 +53,7 @@ protected:
 	sound_stream *m_stream;
 
 	u32 m_registers[16];
+	u32 m_snd_control;
 	u8 m_active;
 	u16 m_phase;
 };

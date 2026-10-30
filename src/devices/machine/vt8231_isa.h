@@ -24,7 +24,7 @@
 class vt8231_isa_device : public pci_device
 {
 public:
-	vt8231_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vt8231_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto com1_txd_cb() { return m_com1_txd_cb.bind(); }
 	auto com1_dtr_cb() { return m_com1_dtr_cb.bind(); }

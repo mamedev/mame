@@ -12,12 +12,14 @@ function dat.check(set, softlist)
 	if not status or not data then
 		return nil
 	end
+	local str_gsub = string.gsub
+	local table_ins = table.insert
 	local lines = {}
-	data = data:gsub('MAMESCORE records : ([^\n]+)', 'MAMESCORE records :\t\n%1', 1)
-	for line in data:gmatch('[^\n]*') do
+	data = str_gsub(data, 'MAMESCORE records : ([^\n]+)', 'MAMESCORE records :\t\n%1', 1)
+	for line in string.gmatch(data, '[^\n]*') do
 		if (line ~= '') or ((#lines ~= 0) and (lines[#lines] ~= '')) then
-			line = line:gsub('^(.-)_+([0-9.]+)$', '%1\t%2')
-			table.insert(lines, line)
+			local reformatted = str_gsub(line, '^(.-)_+([0-9.]+)$', '%1\t%2')
+			table_ins(lines, reformatted)
 		end
 	end
 	info = '#j2\n' .. table.concat(lines, '\n')

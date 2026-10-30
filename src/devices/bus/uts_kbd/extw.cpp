@@ -52,8 +52,6 @@ uts_extw_keyboard_device::uts_extw_keyboard_device(const machine_config &mconfig
 
 void uts_extw_keyboard_device::device_start()
 {
-	m_shift_led.resolve();
-
 	save_item(NAME(m_p1_output));
 	save_item(NAME(m_p2_output));
 	save_item(NAME(m_shift_register));

@@ -438,7 +438,7 @@ void discoboy_state::discoboy(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &discoboy_state::sound_prg_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -458,7 +458,7 @@ void discoboy_state::discoboy(machine_config &config)
 	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.6, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.6, 1);
 
-	LS157(config, m_adpcm_select, 0);
+	LS157(config, m_adpcm_select);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
 	MSM5205(config, m_msm, XTAL(400'000));

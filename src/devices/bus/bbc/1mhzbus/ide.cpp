@@ -117,7 +117,7 @@ uint8_t bbc_ide8_device::fred_r(offs_t offset)
 	switch (offset & 0xf8)
 	{
 	case 0x40:
-		data = m_ide->cs0_r(offset & 0x07, 0xff);
+		data = m_ide->cs0_r(offset & 0x07);
 		break;
 	}
 
@@ -129,7 +129,7 @@ void bbc_ide8_device::fred_w(offs_t offset, uint8_t data)
 	switch (offset & 0xf8)
 	{
 	case 0x40:
-		m_ide->cs0_w(offset & 0x07, data, 0xff);
+		m_ide->cs0_w(offset & 0x07, data);
 		break;
 	}
 }
@@ -146,7 +146,7 @@ uint8_t bbc_beebide_device::fred_r(offs_t offset)
 		case 0x40:
 			if (offset & 0x07)
 			{
-				data = m_ide->cs0_r(offset & 0x07, 0xff);
+				data = m_ide->cs0_r(offset & 0x07);
 			}
 			else
 			{
@@ -157,7 +157,7 @@ uint8_t bbc_beebide_device::fred_r(offs_t offset)
 		case 0x48:
 			if (offset & 0x04)
 			{
-				data = m_ide->cs1_r(offset & 0x07, 0xff);
+				data = m_ide->cs1_r(offset & 0x07);
 			}
 			else
 			{
@@ -181,7 +181,7 @@ void bbc_beebide_device::fred_w(offs_t offset, uint8_t data)
 		case 0x40:
 			if (offset & 0x07)
 			{
-				m_ide->cs0_w(offset & 0x07, data, 0xff);
+				m_ide->cs0_w(offset & 0x07, data);
 			}
 			else
 			{
@@ -192,7 +192,7 @@ void bbc_beebide_device::fred_w(offs_t offset, uint8_t data)
 		case 0x48:
 			if (offset & 0x04)
 			{
-				m_ide->cs1_w(offset & 0x07, data, 0xff);
+				m_ide->cs1_w(offset & 0x07, data);
 			}
 			else
 			{

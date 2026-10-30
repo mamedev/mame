@@ -76,15 +76,16 @@ bool dip_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 			for (int i = 0; i < spt; i++)
 			{
-				sects[i].track       = track;
-				sects[i].head        = head;
-				sects[i].sector      = i + 1;
-				sects[i].size        = ssize;
-				sects[i].actual_size = bps;
-				sects[i].deleted     = false;
+				sects[i].track        = track;
+				sects[i].head         = head;
+				sects[i].sector       = i + 1;
+				sects[i].size         = ssize;
+				sects[i].actual_size  = bps;
+				sects[i].deleted      = false;
 				sects[i].bad_data_crc = false;
 				sects[i].bad_addr_crc = false;
-				sects[i].data        = sect_data + i * bps;
+				sects[i].weak         = false;
+				sects[i].data         = sect_data + i * bps;
 			}
 
 			build_pc_track_mfm(track, head, image, cell_count, spt, sects, calc_default_pc_gap3_size(form_factor, bps));

@@ -27,7 +27,7 @@ namespace ui {
 class menu_directory : public menu
 {
 public:
-	menu_directory(mame_ui_manager &mui, render_container &container);
+	menu_directory(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_directory() override;
 
 private:

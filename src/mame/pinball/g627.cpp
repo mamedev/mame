@@ -63,10 +63,10 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void g627(machine_config &config);
+	void g627(machine_config &config) ATTR_COLD;
 
-	void init_v115();
-	void init_v117();
+	void init_v115() ATTR_COLD;
+	void init_v117() ATTR_COLD;
 
 private:
 	u8 porta_r();
@@ -327,8 +327,6 @@ void g627_state::lamp_w(offs_t offset, u8 data)
 void g627_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_digits.resolve();
-	m_io_outputs.resolve();
 
 	save_item(NAME(m_seg));
 	save_item(NAME(m_portc));

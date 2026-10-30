@@ -336,7 +336,7 @@ void ad_59mc07_device::device_add_mconfig(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &ad_59mc07_device::sound_portmap);
 	m_audiocpu->set_clk_out(m_audio8155, FUNC(i8155_device::set_unscaled_clock_int));
 
-	I8155(config, m_audio8155, 0);
+	I8155(config, m_audio8155);
 	m_audio8155->out_pa_callback().set(FUNC(ad_59mc07_device::i8155_porta_w));
 	m_audio8155->out_pb_callback().set(FUNC(ad_59mc07_device::i8155_portb_w));
 	m_audio8155->out_pc_callback().set(FUNC(ad_59mc07_device::i8155_portc_w));

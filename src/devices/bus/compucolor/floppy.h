@@ -42,10 +42,7 @@ public:
 	compucolor_floppy_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: rs232_port_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	compucolor_floppy_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -54,7 +51,7 @@ public:
 	void select_w(int state) { if (m_dev) m_dev->select_w(state); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_config_complete() override;
 
@@ -72,14 +69,16 @@ public:
 	compucolor_floppy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
+	compucolor_floppy_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool four_phase);
+
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	// device_serial_port_interface overrides
-	virtual void tx(uint8_t state);
+	// device_rs232_port_interface overrides
+	virtual void input_txd(int state) override;
 
 	// device_compucolor_floppy_port_interface overrides
 	virtual void rw_w(int state) override;
@@ -90,26 +89,46 @@ private:
 	static void floppy_formats(format_registration &fr);
 
 	required_device<floppy_connector> m_floppy;
+	bool const m_four_phase;
 
 	TIMER_CALLBACK_MEMBER(rxd_tick);
-	bool read_bit();
-	void write_bit(bool bit);
+	TIMER_CALLBACK_MEMBER(motor_off);
+	void read_sync();
+	void update_gates();
 
 	int m_rw;
-	int m_stp;
+	uint8_t m_stp;
+	uint8_t m_step;
 	int m_sel;
+	bool m_txd;
+	bool m_rxd;
+	bool m_writing;
+	attotime m_last_edge;
+	attotime m_pos;
 
 	attotime m_period;
 
 	compucolor_floppy_port_device *m_owner;
 
 	emu_timer *m_timer;
+	emu_timer *m_motor_timer;
 };
 
 
-// device type definition
+// ======================> compucolor_floppy_4ph_device
+
+class compucolor_floppy_4ph_device : public compucolor_floppy_device
+{
+public:
+	// construction/destruction
+	compucolor_floppy_4ph_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+// device type declaration
 DECLARE_DEVICE_TYPE(COMPUCOLOR_FLOPPY_PORT, compucolor_floppy_port_device)
 DECLARE_DEVICE_TYPE(COMPUCOLOR_FLOPPY,      compucolor_floppy_device)
+DECLARE_DEVICE_TYPE(COMPUCOLOR_FLOPPY_4PH,  compucolor_floppy_4ph_device)
 
 
 // slot devices

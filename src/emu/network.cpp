@@ -17,6 +17,7 @@
 #include "xmlfile.h"
 
 #include <cctype>
+#include <cstdio>
 
 //**************************************************************************
 //  NETWORK MANAGER

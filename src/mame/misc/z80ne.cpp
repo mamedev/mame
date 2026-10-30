@@ -218,8 +218,8 @@ public:
 		m_mram(*this, "mainram")
 	{ }
 
-	void z80ne(machine_config &config);
-	void init_z80ne();
+	void z80ne(machine_config &config) ATTR_COLD;
+	void init_z80ne() ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(z80ne_reset);
 
@@ -228,9 +228,8 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	void base_reset();
-	void save_state_vars();
 
-	static void floppy_formats(format_registration &fr);
+	static void floppy_formats(format_registration &fr) ATTR_COLD;
 
 	uint8_t m_lx383_scan_counter = 0;
 	uint8_t m_lx383_key[LX383_KEYS]{};
@@ -292,8 +291,8 @@ public:
 	{
 	}
 
-	void lx387(machine_config &config);
-	void z80net(machine_config &config);
+	void lx387(machine_config &config) ATTR_COLD;
+	void z80net(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(z80net_nmi);
 
@@ -328,7 +327,7 @@ public:
 	{
 	}
 
-	void z80netb(machine_config &config);
+	void z80netb(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -349,13 +348,13 @@ public:
 	{
 	}
 
-	void z80netf(machine_config &config);
+	void z80netf(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void driver_start() override;
 
+private:
 	struct wd17xx_state_t
 	{
 		int drq = 0;
@@ -430,22 +429,9 @@ TIMER_CALLBACK_MEMBER(z80ne_state::cassette_tc)
 	}
 }
 
-void z80ne_state::save_state_vars()
+void z80netf_state::machine_start()
 {
-	save_item(NAME(m_lx383_scan_counter));
-	save_item(NAME(m_lx383_key));
-	save_item(NAME(m_lx383_downsampler));
-	save_item(NAME(m_lx385_ctrl));
-}
-
-void z80ne_state::init_z80ne()
-{
-	save_state_vars();
-}
-
-void z80netf_state::driver_start()
-{
-	save_state_vars();
+	z80netb_state::machine_start();
 
 	/* first two entries point to rom on reset */
 	u8 *r = m_ram->pointer();
@@ -462,7 +448,6 @@ void z80netf_state::driver_start()
 
 	m_bank4->configure_entry(0, r+0x5000); /* RAM   at 0xF000 */
 	m_bank4->configure_entries(1, 3, m_rom+0x4400, 0x0400); /* ep390, ep1390, ep2390 at 0xF000 */
-
 }
 
 TIMER_CALLBACK_MEMBER(z80ne_state::kbd_scan)
@@ -659,7 +644,7 @@ void z80netf_state::machine_reset()
 	base_reset();
 	reset_lx387();
 
-	// basic roms are exempt from memory tap
+	// basic ROMs are exempt from memory tap
 	if ((m_io_config->read() & 0x07) != 2)
 	{
 		address_space &program = m_maincpu->space(AS_PROGRAM);
@@ -686,7 +671,7 @@ INPUT_CHANGED_MEMBER(z80ne_state::z80ne_reset)
 {
 	uint8_t rst = m_io_rst->read();
 
-	if ( ! BIT(rst, 0))
+	if (!BIT(rst, 0))
 		machine().schedule_soft_reset();
 }
 
@@ -694,7 +679,7 @@ INPUT_CHANGED_MEMBER(z80net_state::z80net_nmi)
 {
 	uint8_t nmi = m_io_lx387_brk->read();
 
-	if ( ! BIT(nmi, 0))
+	if (!BIT(nmi, 0))
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -702,18 +687,15 @@ void z80ne_state::machine_start()
 {
 	m_timer_nmi = timer_alloc(FUNC(z80ne_state::pulse_nmi), this);
 
-	m_lx383_digits.resolve();
-
 	m_lx385_ctrl = 0x1f;
 	m_cassette_timer = timer_alloc(FUNC(z80ne_state::cassette_tc), this);
 	m_kbd_timer = timer_alloc(FUNC(z80ne_state::kbd_scan), this);
 	m_kbd_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
-}
 
-void z80netf_state::machine_start()
-{
-	z80ne_state::machine_start();
-	m_drv_led.resolve();
+	save_item(NAME(m_lx383_scan_counter));
+	save_item(NAME(m_lx383_key));
+	save_item(NAME(m_lx383_downsampler));
+	save_item(NAME(m_lx385_ctrl));
 }
 
 
@@ -1415,7 +1397,9 @@ void z80net_state::z80net(machine_config &config)
 	lx387(config);
 
 	/* video hardware */
-	SCREEN(config, "lx388", SCREEN_TYPE_RASTER);
+	screen_device &screen(SCREEN(config, "lx388"));
+	screen.set_raw(XTAL(4'433'619) * 2, 456, 0, 372, 312, 0, 293);
+	screen.set_screen_update(m_vdg, FUNC(mc6847_base_device::screen_update));
 
 	MC6847(config, m_vdg, 4.433619_MHz_XTAL, true);
 	m_vdg->set_screen("lx388");
@@ -1456,7 +1440,9 @@ void z80netb_state::z80netb(machine_config &config)
 	lx387(config);
 
 	/* video hardware */
-	SCREEN(config, "lx388", SCREEN_TYPE_RASTER);
+	screen_device &screen(SCREEN(config, "lx388"));
+	screen.set_raw(XTAL(4'433'619) * 2, 456, 0, 372, 312, 0, 293);
+	screen.set_screen_update(m_vdg, FUNC(mc6847_base_device::screen_update));
 
 	MC6847(config, m_vdg, 4.433619_MHz_XTAL, true);
 	m_vdg->set_screen("lx388");
@@ -1498,7 +1484,9 @@ void z80netf_state::z80netf(machine_config &config)
 	lx387(config);
 
 	/* video hardware */
-	SCREEN(config, "lx388", SCREEN_TYPE_RASTER);
+	screen_device &screen(SCREEN(config, "lx388"));
+	screen.set_raw(XTAL(4'433'619) * 2, 456, 0, 372, 312, 0, 293);
+	screen.set_screen_update(m_vdg, FUNC(mc6847_base_device::screen_update));
 
 	MC6847(config, m_vdg, 4.433619_MHz_XTAL, true);
 	m_vdg->set_screen("lx388");
@@ -1576,7 +1564,7 @@ ROM_END
 
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY               FULLNAME                      FLAGS
-COMP( 1980, z80ne,   0,      0,      z80ne,   z80ne,   z80ne_state,   init_z80ne, "Nuova Elettronica",  "Z80NE",                      MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
-COMP( 1980, z80net,  z80ne,  0,      z80net,  z80net,  z80net_state,  init_z80ne, "Nuova Elettronica",  "Z80NE + LX.388",             MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
-COMP( 1980, z80netb, z80ne,  0,      z80netb, z80net,  z80netb_state, init_z80ne, "Nuova Elettronica",  "Z80NE + LX.388 + Basic 16k", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, z80ne,   0,      0,      z80ne,   z80ne,   z80ne_state,   empty_init, "Nuova Elettronica",  "Z80NE",                      MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, z80net,  z80ne,  0,      z80net,  z80net,  z80net_state,  empty_init, "Nuova Elettronica",  "Z80NE + LX.388",             MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, z80netb, z80ne,  0,      z80netb, z80net,  z80netb_state, empty_init, "Nuova Elettronica",  "Z80NE + LX.388 + Basic 16k", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, z80netf, z80ne,  0,      z80netf, z80netf, z80netf_state, empty_init, "Nuova Elettronica",  "Z80NE + LX.388 + LX.390",    MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

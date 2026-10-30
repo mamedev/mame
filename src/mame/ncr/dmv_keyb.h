@@ -23,7 +23,7 @@ class dmv_keyboard_device : public device_t
 {
 public:
 	// construction/destruction
-	dmv_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dmv_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void sd_poll_w(int state);
 	int sd_poll_r();

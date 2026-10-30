@@ -44,8 +44,6 @@ uts_400_keyboard_device::uts_400_keyboard_device(const machine_config &mconfig, 
 
 void uts_400_keyboard_device::device_start()
 {
-	m_shift_led.resolve();
-
 	save_item(NAME(m_p2_output));
 	save_item(NAME(m_input_select));
 	save_item(NAME(m_ready_line));

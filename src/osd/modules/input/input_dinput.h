@@ -171,6 +171,14 @@ public:
 	void configure(input_device &device) override;
 
 private:
+	enum
+	{
+		POVDIR_LEFT = 0,
+		POVDIR_RIGHT,
+		POVDIR_UP,
+		POVDIR_DOWN
+	};
+
 	// state information for a joystick; DirectInput state must be first element
 	struct dinput_joystick_state
 	{

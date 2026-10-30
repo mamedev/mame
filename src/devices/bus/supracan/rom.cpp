@@ -51,7 +51,7 @@ std::error_condition superacan_rom_device::load()
 		m_nvram_base = reinterpret_cast<u8 *>(nvramregion->base());
 		m_nvram_size = nvramregion->bytes();
 
-		if (m_nvram_size & (m_nvram_size - 1))
+		if (!std::has_single_bit(m_nvram_size))
 			return image_error::BADSOFTWARE;
 
 		save_pointer(NAME(m_nvram_base), m_nvram_size);

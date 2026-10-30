@@ -248,7 +248,7 @@ void llc2_state::llc2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &llc2_state::io_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
@@ -284,7 +284,7 @@ void llc2_state::llc2(machine_config &config)
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	K7659_KEYBOARD(config, K7659_KEYBOARD_TAG, 0);
+	K7659_KEYBOARD(config, K7659_KEYBOARD_TAG);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

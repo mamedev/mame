@@ -50,6 +50,8 @@
 
 #include <cfloat>
 #include <cmath>
+#include <locale>
+#include <sstream>
 
 
 // This array *must* stay in order, it's binary-searched
@@ -176,6 +178,7 @@ const double XTAL::known_xtals[] = {
 	  9'600'000, // 9.6_MHz_XTAL           WD37C65 second clock (for 300 KB/sec rate)
 	  9'732'000, // 9.732_MHz_XTAL         CTA Invader
 	  9'828'000, // 9.828_MHz_XTAL         Universal PCBs
+	  9'830'000, // 9.83_MHz_XTAL          Luna 68k timer/serial
 	  9'830'400, // 9.8304_MHz_XTAL        Epson PX-8
 	  9'832'000, // 9.832_MHz_XTAL         Robotron A7150
 	  9'877'680, // 9.87768_MHz_XTAL       Microterm 420
@@ -219,6 +222,7 @@ const double XTAL::known_xtals[] = {
 	 12'292'000, // 12.292_MHz_XTAL        Northwest Digitial Systems GP-19
 	 12'324'000, // 12.324_MHz_XTAL        Otrona Attache
 	 12'335'600, // 12.3356_MHz_XTAL       RasterOps ColorBoard 264 (~784x NTSC line rate)
+	 12'440'000, // 12.44_MHz_XTAL         Status casino / trivia games
 	 12'472'500, // 12.4725_MHz_XTAL       Bonanza's Mini Boy 7
 	 12'480'000, // 12.48_MHz_XTAL         TRS-80 Model II
 	 12'500'000, // 12.5_MHz_XTAL          Red Alert audio board
@@ -226,6 +230,7 @@ const double XTAL::known_xtals[] = {
 	 12'672'000, // 12.672_MHz_XTAL        TRS-80 Model 4 80*24 video
 	 12'800'000, // 12.8_MHz_XTAL          Cave CV1000
 	 12'854'400, // 12.8544_MHz_XTAL       Alphatronic P3
+	 12'875'000, // 12.875_MHz_XTAL        EACA Genie III video board
 	 12'936'000, // 12.936_MHz_XTAL        CDC 721
 	 12'979'200, // 12.9792_MHz_XTAL       Exidy 440
 	 13'000'000, // 13_MHz_XTAL            STM Pied Piper dot clock
@@ -248,6 +253,7 @@ const double XTAL::known_xtals[] = {
 	 14'250'000, // 14.250_MHz_XTAL        Hector HRX
 	 14'250'450, // 14.25045_MHz_XTAL      Apple II Europlus
 	 14'300'000, // 14.3_MHz_XTAL          Agat-7
+	 14'302'446, // 14.302446_MHz_XTAL     TK2000 (4x PAL-M subcarrier)
 	 14'314'000, // 14.314_MHz_XTAL        Taito TTL Board
 	 14'318'181, // 14.318181_MHz_XTAL     Extremely common, used on 100's of PCBs (4x NTSC subcarrier)
 	 14'349'600, // 14.3496_MHz_XTAL       Roland S-50 VDP
@@ -438,7 +444,7 @@ const double XTAL::known_xtals[] = {
 	 32'317'400, // 32.3174_MHz_XTAL       DEC VT330, VT340
 	 32'530'470, // 32.53047_MHz_XTAL      Seta 2
 	 32'640'000, // 32.64_MHz_XTAL         Vector 4
-	 32'768'000, // 32.768_MHz_XTAL        Roland D-50 audio clock
+	 32'768'000, // 32.768_MHz_XTAL        Roland D-50/U-220 audio clock
 	 33'000'000, // 33_MHz_XTAL            Sega Model 3 video board
 	 33'264'000, // 33.264_MHz_XTAL        Hazeltine 1500 terminal
 	 33'330'000, // 33.33_MHz_XTAL         Sharp X68000 XVI
@@ -448,6 +454,7 @@ const double XTAL::known_xtals[] = {
 	 33'868'800, // 33.8688_MHz_XTAL       Usually used to drive 90's Yamaha OPL/FM chips with /2 divider
 	 34'000'000, // 34_MHz_XTAL            Gaelco PCBs
 	 34'291'712, // 34.291712_MHz_XTAL     Fairlight CMI master card
+	 34'816'000, // 34.816_MHz_XTAL        Roland U-110 audio clock
 	 34'846'000, // 34.846_MHz_XTAL        Visual 550
 	 35'452'500, // 35.4525_MHz_XTAL       Nokia MikroMikko 2
 	 35'469'000, // 35.469_MHz_XTAL        ZX Spectrum +2/+3 (~8x PAL subcarrier)
@@ -458,12 +465,14 @@ const double XTAL::known_xtals[] = {
 	 36'000'000, // 36_MHz_XTAL            Sega Model 1 video board
 	 36'864'000, // 36.864_MHz_XTAL        Unidesa Cirsa Rock 'n' Roll
 	 37'980'000, // 37.98_MHz_XTAL         Falco 5220
-	 38'769'220, // 38.76922_MHz_XTAL      Namco System 21 video board
+	 38'769'220, // 38.76922_MHz_XTAL      Namco System 21 video board (C67 / Driver's Eyes)
+	 38'808'000, // 38.808_MHz_XTAL        Namco System 21 video board (Winning Run)
 	 38'863'630, // 38.86363_MHz_XTAL      Sharp X68000 15.98kHz video
 	 39'321'600, // 39.3216_MHz_XTAL       Sun 2/120
 	 39'710'000, // 39.71_MHz_XTAL         Wyse WY-60 132-column display clock
 	 40'000'000, // 40_MHz_XTAL            -
 	 40'210'000, // 40.21_MHz_XTAL         Fairlight CMI IIx
+	 40'960'000, // 40.96_MHz_XTAL         Roland DEP-5 / RE-3 reverb DSP
 	 41'539'000, // 41.539_MHz_XTAL        IBM PS/2 132-column text mode
 	 42'000'000, // 42_MHz_XTAL            BMC A-00211 - Popo Bear
 	 42'105'200, // 42.1052_MHz_XTAL       NEC PC-88xx
@@ -472,6 +481,7 @@ const double XTAL::known_xtals[] = {
 	 44'000'000, // 44_MHz_XTAL            VGame slots
 	 44'100'000, // 44.1_MHz_XTAL          Subsino's Bishou Jan
 	 44'236'800, // 44.2368_MHz_XTAL       ReCo6502, Fortune 32:16
+	 44'444'000, // 44.444_MHz_XTAL        Zilog System 8000 CPU boards
 	 44'452'800, // 44.4528_MHz_XTAL       TeleVideo 965
 	 44'900'000, // 44.9_MHz_XTAL          IBM 8514 1024x768 43.5Hz graphics
 	 45'000'000, // 45_MHz_XTAL            Eolith with Hyperstone CPUs
@@ -500,8 +510,10 @@ const double XTAL::known_xtals[] = {
 	 53'203'424, // 53.203424_MHz_XTAL     Master System, Mega Drive PAL (12x PAL subcarrier)
 	 53'693'175, // 53.693175_MHz_XTAL     PSX-based h/w, Sony ZN1-2-based (15x NTSC subcarrier)
 	 54'000'000, // 54_MHz_XTAL            Taito JC
+	 54'285'700, // 54.2857_MHz_XTAL       Qume QVT-82
 	 55'000'000, // 55_MHz_XTAL            Eolith Vega
 	 56'000'000, // 56_MHz_XTAL            ARM7500 based Belatra slot machines
+	 57'242'400, // 57.2424_MHz_XTAL       Gunpey
 	 57'272'727, // 57.272727_MHz_XTAL     Psikyo SH2 with /2 divider (16x NTSC subcarrier)
 	 57'283'200, // 57.2832_MHz_XTAL       Macintosh IIci RBV, 15-inch portrait display
 	 58'000'000, // 58_MHz_XTAL            Magic Reel (Play System)
@@ -517,6 +529,7 @@ const double XTAL::known_xtals[] = {
 	 68'850'000, // 68.85_MHz_XTAL         Wyse WY-50
 	 69'196'800, // 69.1968_MHz_XTAL       DEC VCB0x/VAXstation dot clock
 	 69'551'990, // 69.55199_MHz_XTAL      Sharp X68000 31.5kHz video
+	 70'700'000, // 70.7_MHz_XTAL          Sony NWB-512 Framebuffer
 	 72'000'000, // 72_MHz_XTAL            Aristocrat MKV
 	 72'576'000, // 72.576_MHz_XTAL        Centipede, Millipede, Missile Command, Let's Go Bowling "Multipede"
 	 73'728'000, // 73.728_MHz_XTAL        Ms. Pac-Man/Galaga 20th Anniversary
@@ -595,25 +608,21 @@ bool XTAL::validate(double base_clock)
 	return false;
 }
 
-void XTAL::validate(const char *message) const
+void XTAL::validate(std::string_view message) const
 {
 	if(!validate(m_base_clock))
 		fail(m_base_clock, message);
 }
 
-void XTAL::validate(const std::string &message) const
+void XTAL::fail(double base_clock, std::string_view message)
 {
-	if(!validate(m_base_clock))
-		fail(m_base_clock, message);
-}
-
-void XTAL::fail(double base_clock, const std::string &message)
-{
-	std::string full_message = util::string_format("Unknown crystal value %.0f. ", base_clock);
+	std::ostringstream full_message;
+	full_message.imbue(std::locale::classic());
+	util::stream_format(full_message, "Unknown crystal value %.0f. ", base_clock);
 	if(xtal_error_low && xtal_error_high)
-		full_message += util::string_format(" Did you mean %.0f or %.0f?", xtal_error_low, xtal_error_high);
+		util::stream_format(full_message, " Did you mean %.0f or %.0f?", xtal_error_low, xtal_error_high);
 	else
-		full_message += util::string_format(" Did you mean %.0f?", xtal_error_low ? xtal_error_low : xtal_error_high);
-	full_message += util::string_format(" Context: %s\n", message);
-	fatalerror("%s\n", full_message);
+		util::stream_format(full_message, " Did you mean %.0f?", xtal_error_low ? xtal_error_low : xtal_error_high);
+	util::stream_format(full_message, " Context: %s\n", message);
+	fatalerror("%s", std::move(full_message).str());
 }

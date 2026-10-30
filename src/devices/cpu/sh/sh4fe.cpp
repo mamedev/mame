@@ -9,21 +9,23 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "sh4.h"
+#include "sh4fe.h"
+
 #include "sh4comn.h"
-#include "cpu/drcfe.h"
+
+// FIXME: if the code generation is to be improved, this needs to actually describe the instructions
 
 
 /***************************************************************************
     INSTRUCTION PARSERS
 ***************************************************************************/
 
-sh4_frontend::sh4_frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
-	: sh_frontend(device, window_start, window_end, max_sequence)
+sh34_base_device::sh4_frontend::sh4_frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
+	: frontend(device, window_start, window_end, max_sequence)
 {
 }
 
-uint16_t sh4_frontend::read_word(opcode_desc &desc)
+uint16_t sh34_base_device::sh4_frontend::read_word(opcode_desc &desc)
 {
 	if (desc.physpc >= 0xe0000000)
 		return m_sh->m_pr16(desc.physpc);
@@ -33,13 +35,13 @@ uint16_t sh4_frontend::read_word(opcode_desc &desc)
 }
 
 
-bool sh4_frontend::describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
+bool sh34_base_device::sh4_frontend::describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
 	switch (opcode & 0xff)
 	{
 	default:
 		// fall through to SH2 handlers
-		return sh_frontend::describe_group_0(desc, prev, opcode);
+		return frontend::describe_group_0(desc, prev, opcode);
 
 	case 0x52:
 	case 0x62:
@@ -105,14 +107,14 @@ bool sh4_frontend::describe_group_0(opcode_desc &desc, const opcode_desc *prev, 
 }
 
 
-bool sh4_frontend::describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
+bool sh34_base_device::sh4_frontend::describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
 	switch (opcode & 0xff)
 	{
 
 	default: // LDCMSR (0x0e) has sh2/4 flag difference
 		// fall through to SH2 handlers
-		return sh_frontend::describe_group_4(desc, prev, opcode);
+		return frontend::describe_group_4(desc, prev, opcode);
 
 	case 0x42:
 	case 0x46:
@@ -231,7 +233,7 @@ bool sh4_frontend::describe_group_4(opcode_desc &desc, const opcode_desc *prev, 
 }
 
 // SH4 only (FPU ops)
-bool sh4_frontend::describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
+bool sh34_base_device::sh4_frontend::describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
 	switch (opcode & 0x0f)
 	{
@@ -258,7 +260,7 @@ bool sh4_frontend::describe_group_15(opcode_desc &desc, const opcode_desc *prev,
 	return false;
 }
 
-bool sh4_frontend::describe_op1111_0x13(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
+bool sh34_base_device::sh4_frontend::describe_op1111_0x13(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
 	switch ((opcode >> 4) & 0x0f)
 	{
@@ -282,7 +284,7 @@ bool sh4_frontend::describe_op1111_0x13(opcode_desc &desc, const opcode_desc *pr
 	return false;
 }
 
-bool sh4_frontend::describe_op1111_0xf13(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
+bool sh34_base_device::sh4_frontend::describe_op1111_0xf13(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {
 	if (opcode & 0x100)
 	{

@@ -71,7 +71,7 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void videosaa(machine_config &config);
+	void videosaa(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -380,8 +380,6 @@ void videosaa_state::machine_start()
 
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(videosaa_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_lamps.resolve();
-
 	// register for savestates
 	save_pointer(NAME(m_vram0), 0x800);
 	save_pointer(NAME(m_vram1), 0x800);
@@ -411,7 +409,7 @@ void videosaa_state::videosaa(machine_config &config)
 	m_maincpu->portd_r().set(FUNC(videosaa_state::maincpu_portd_r));
 
 	// video hardware
-	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device& screen(SCREEN(config, "screen"));
 	screen.set_raw(10_MHz_XTAL / 2, 320, 0, 256, 312, 0, 256); // 5 MHz?
 	screen.set_screen_update(FUNC(videosaa_state::screen_update));
 
@@ -469,7 +467,7 @@ ROM_START( ladygum )
 	ROM_LOAD( "ladygum-msg0.5a", 0x00000, 0x10000, CRC(c1f23f58) SHA1(c89579e53545291638be66e51512458b67251f67) ) // 27512
 
 	ROM_REGION( 0x200, "plds", 0 )
-	ROM_LOAD( "st16as15hb1.9c", 0x000, 0x117, CRC(a76721d4) SHA1(c9f14107eceeeed9fa788916e3c40c9dd2fe5c41) )
+	ROM_LOAD( "st16as15hb1.9c", 0x000, 0x117, CRC(a76721d4) SHA1(c9f14107eceeeed9fa788916e3c40c9dd2fe5c41) BAD_DUMP ) // locked
 ROM_END
 
 ROM_START( paradar )

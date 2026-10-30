@@ -19,6 +19,10 @@ project "formats"
 		"ArchiveSplit",
 	}
 
+	defines {
+		"ZLIB_CONST",
+	}
+
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/lib",
@@ -36,6 +40,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/imageutl.cpp",
 		MAME_DIR .. "src/lib/formats/imageutl.h",
 
+		MAME_DIR .. "src/lib/formats/aiffile.cpp",
+		MAME_DIR .. "src/lib/formats/aiffile.h",
 		MAME_DIR .. "src/lib/formats/cassimg.cpp",
 		MAME_DIR .. "src/lib/formats/cassimg.h",
 		MAME_DIR .. "src/lib/formats/flacfile.cpp",
@@ -72,7 +78,6 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/d88_dsk.h",
 		MAME_DIR .. "src/lib/formats/dfi_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/dfi_dsk.h",
-		MAME_DIR .. "src/lib/formats/fdi_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/rpk.cpp",
 		MAME_DIR .. "src/lib/formats/rpk.h",
 		MAME_DIR .. "src/lib/formats/86f_dsk.cpp",
@@ -82,6 +87,7 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/fsmgr.cpp",
 		MAME_DIR .. "src/lib/formats/fsblk.h",
 		MAME_DIR .. "src/lib/formats/fsblk.cpp",
+		MAME_DIR .. "src/lib/formats/fsblk_multi.h",
 		MAME_DIR .. "src/lib/formats/fsblk_vec.h",
 		MAME_DIR .. "src/lib/formats/fsblk_vec.cpp",
 		MAME_DIR .. "src/lib/formats/fs_unformatted.h",
@@ -332,6 +338,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/apricotpc_dsk.h,FORMATS["APRICOTPC_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "APRICOTPC_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/apricotpc_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/apricotpc_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/apridisk.h,FORMATS["APRIDISK"] = true
 --------------------------------------------------
 
@@ -488,6 +506,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/c1571_dsk.h,FORMATS["C1571_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "C1571_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/c1571_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/c1571_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/c4040_dsk.h,FORMATS["C4040_DSK"] = true
 --------------------------------------------------
 
@@ -596,6 +626,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/clipper_dsk.h,FORMATS["CLIPPER_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "CLIPPER_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/clipper_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/clipper_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/coco_cas.h,FORMATS["COCO_CAS"] = true
 --------------------------------------------------
 
@@ -644,13 +686,37 @@ end
 
 --------------------------------------------------
 --
---@src/lib/formats/coupedsk.h,FORMATS["COUPEDSK"] = true
+--@src/lib/formats/coupe_mgt.h,FORMATS["COUPE_MGT"] = true
 --------------------------------------------------
 
-if opt_tool(FORMATS, "COUPEDSK") then
+if opt_tool(FORMATS, "COUPE_MGT") then
 	files {
-		MAME_DIR.. "src/lib/formats/coupedsk.cpp",
-		MAME_DIR.. "src/lib/formats/coupedsk.h",
+		MAME_DIR.. "src/lib/formats/coupe_mgt.cpp",
+		MAME_DIR.. "src/lib/formats/coupe_mgt.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/coupe_sad.h,FORMATS["COUPE_SAD"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "COUPE_SAD") then
+	files {
+		MAME_DIR.. "src/lib/formats/coupe_sad.cpp",
+		MAME_DIR.. "src/lib/formats/coupe_sad.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/coupe_sdf.h,FORMATS["COUPE_SDF"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "COUPE_SDF") then
+	files {
+		MAME_DIR.. "src/lib/formats/coupe_sdf.cpp",
+		MAME_DIR.. "src/lib/formats/coupe_sdf.h",
 	}
 end
 
@@ -728,6 +794,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/d2m_dsk.h,FORMATS["D2M_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "D2M_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/d2m_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/d2m_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/d82_dsk.h,FORMATS["D82_DSK"] = true
 --------------------------------------------------
 
@@ -779,7 +857,7 @@ end
 --@src/lib/formats/dmk_dsk.h,FORMATS["DMK_DSK"] = true
 --------------------------------------------------
 
-if opt_tool(FORMATS, "DMK_DSK") then
+if opt_tool(FORMATS, "DMK_DSK") or opt_tool(FORMATS, "SDF_DSK") then
 	files {
 		MAME_DIR.. "src/lib/formats/dmk_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/dmk_dsk.h",
@@ -819,6 +897,18 @@ if opt_tool(FORMATS, "EP64_DSK") then
 	files {
 		MAME_DIR.. "src/lib/formats/ep64_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/ep64_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/ep64_tap.h,FORMATS["EP64_TAP"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "EP64_TAP") then
+	files {
+		MAME_DIR.. "src/lib/formats/ep64_tap.cpp",
+		MAME_DIR.. "src/lib/formats/ep64_tap.h",
 	}
 end
 
@@ -1602,19 +1692,6 @@ if opt_tool(FORMATS, "P2000T_CAS") then
 	}
 end
 
-
---------------------------------------------------
---
---@src/lib/formats/p6001_cas.h,FORMATS["P6001_CAS"] = true
---------------------------------------------------
-
-if opt_tool(FORMATS, "P6001_CAS") then
-	files {
-		MAME_DIR.. "src/lib/formats/p6001_cas.cpp",
-		MAME_DIR.. "src/lib/formats/p6001_cas.h",
-	}
-end
-
 --------------------------------------------------
 --
 --@src/lib/formats/pasti_dsk.h,FORMATS["PASTI_DSK"] = true
@@ -1625,6 +1702,18 @@ if opt_tool(FORMATS, "PASTI_DSK") then
 		MAME_DIR.. "src/lib/formats/pasti_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/pasti_dsk.h",
 	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/pc88_t88.h,FORMATS["PC88_T88"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "PC88_T88") then
+       files {
+               MAME_DIR.. "src/lib/formats/pc88_t88.cpp",
+               MAME_DIR.. "src/lib/formats/pc88_t88.h",
+       }
 end
 
 --------------------------------------------------
@@ -1809,6 +1898,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/s900_dsk.h,FORMATS["S900_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "S900_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/s900_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/s900_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/sap_dsk.h,FORMATS["SAP_DSK"] = true
 --------------------------------------------------
 
@@ -1828,6 +1929,18 @@ if opt_tool(FORMATS, "SC3000_BIT") then
 	files {
 		MAME_DIR.. "src/lib/formats/sc3000_bit.cpp",
 		MAME_DIR.. "src/lib/formats/sc3000_bit.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/scl_dsk.h,FORMATS["SCL_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "SCL_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/scl_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/scl_dsk.h",
 	}
 end
 
@@ -2416,6 +2529,18 @@ if opt_tool(FORMATS, "FS_HP98X5") then
 	files {
 		MAME_DIR.. "src/lib/formats/fs_hp98x5.cpp",
 		MAME_DIR.. "src/lib/formats/fs_hp98x5.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/fs_adam_eos.h,FORMATS["FS_ADAM_EOS"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_ADAM_EOS") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_adam_eos.cpp",
+		MAME_DIR.. "src/lib/formats/fs_adam_eos.h",
 	}
 end
 

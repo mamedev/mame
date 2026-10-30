@@ -13,6 +13,9 @@
 
 #include "machine/sensorboard.h"
 
+#include <optional>
+
+
 class tasc_sb30_device : public device_t
 {
 public:
@@ -28,14 +31,15 @@ public:
 	int data_r() { return m_output; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
+	virtual void device_config_complete() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	required_device<sensorboard_device> m_board;
-	output_finder<8, 8> m_out_leds;
+	std::optional<output_finder<8, 8> > m_out_leds;
 	required_ioport m_conf;
 
 	devcb_write_line m_data_out;

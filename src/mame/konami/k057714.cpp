@@ -7,6 +7,8 @@
 #include "k057714.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 
 #define DUMP_VRAM 0
 
@@ -156,7 +158,7 @@ inline void k057714_device::crtc_set_screen_params()
 	auto vtotal = m_display_v_visarea + m_display_v_frontporch + m_display_v_backporch + m_display_v_syncpulse;
 
 	rectangle visarea(0, m_display_h_visarea - 1, 0, m_display_v_visarea - 1);
-	screen().configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(m_pixclock) * htotal * vtotal);
+	screen().configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, m_pixclock));
 }
 
 uint32_t k057714_device::read(offs_t offset)
@@ -488,10 +490,10 @@ void k057714_device::draw_frame(int frame, bitmap_ind16 &bitmap, const rectangle
 
 	uint16_t trans_value = inverse_trans ? 0x8000 : 0x0000;
 
-	if (m_frame[frame].y + height > cliprect.max_y)
-		height = cliprect.max_y - m_frame[frame].y;
-	if (m_frame[frame].x + width > cliprect.max_x)
-		width = cliprect.max_x - m_frame[frame].x;
+	if (m_frame[frame].y + height > cliprect.bottom())
+		height = cliprect.bottom() - m_frame[frame].y;
+	if (m_frame[frame].x + width > cliprect.right())
+		width = cliprect.right() - m_frame[frame].x;
 
 	for (int j = 0; j <= height; j++)
 	{
@@ -528,7 +530,7 @@ void k057714_device::vblank_w(int state)
 	}
 }
 
-int k057714_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t k057714_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 

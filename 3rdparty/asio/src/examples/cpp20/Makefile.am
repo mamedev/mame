@@ -36,7 +36,8 @@ noinst_PROGRAMS += \
 	coroutines/echo_server_with_as_single_default \
 	coroutines/echo_server_with_as_tuple_default \
 	coroutines/refactored_echo_server \
-	coroutines/timeout \
+	coroutines/timeout_watchdog \
+	coroutines/timeout_cancel_after \
 	type_erasure/type_erasure
 endif
 
@@ -66,7 +67,8 @@ coroutines_echo_server_with_deferred_default_SOURCES = coroutines/echo_server_wi
 coroutines_echo_server_with_as_single_default_SOURCES = coroutines/echo_server_with_as_single_default.cpp
 coroutines_echo_server_with_as_tuple_default_SOURCES = coroutines/echo_server_with_as_tuple_default.cpp
 coroutines_refactored_echo_server_SOURCES = coroutines/refactored_echo_server.cpp
-coroutines_timeout_SOURCES = coroutines/timeout.cpp
+coroutines_timeout_watchdog_SOURCES = coroutines/timeout_watchdog.cpp
+coroutines_timeout_cancel_after_SOURCES = coroutines/timeout_cancel_after.cpp
 type_erasure_type_erasure_SOURCES = type_erasure/main.cpp type_erasure/stdin_line_reader.cpp type_erasure/sleep.cpp
 endif
 

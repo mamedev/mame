@@ -6,7 +6,7 @@
 	local premake = premake
 	premake.xcode15 = { }
 
-	local xcode  = premake.xcode
+	local xcode   = premake.xcode
 	local xcode10 = premake.xcode10
 	local xcode11 = premake.xcode11
 	local xcode14 = premake.xcode14
@@ -104,7 +104,7 @@
 		end,
 
 		onproject = function(prj)
-			premake.generate(prj, "%%.xcodeproj/project.pbxproj", xcode14.project)
+			premake.generate(prj, "%%.xcodeproj/project.pbxproj", xcode15.project)
 			xcode.generate_schemes(prj, "%%.xcodeproj/xcshareddata/xcschemes")
 		end,
 

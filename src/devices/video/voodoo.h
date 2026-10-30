@@ -724,7 +724,7 @@ inline u32 voodoo::register_table_entry::write(voodoo_1_device &device, u32 chip
 		if (regnum < voodoo_regs::reg_fvertexAx || regnum > voodoo_regs::reg_fdWdY)
 			device.logerror("VOODOO.REG:%s(%d) write = %08X\n", m_name, chipmask, data);
 		else
-			device.logerror("VOODOO.REG:%s(%d) write = %f\n", m_name, chipmask, double(u2f(data)));
+			device.logerror("VOODOO.REG:%s(%d) write = %f\n", m_name, chipmask, std::bit_cast<float>(data));
 	}
 	return m_write(chipmask & m_chipmask_flags, regnum, data & m_mask);
 }

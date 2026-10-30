@@ -375,6 +375,8 @@ void nmk16_state::bg_update(screen_device &screen, bitmap_ind16 &bitmap, const r
 {
 	if (m_gunnail_scrollram && m_gunnail_scrollramy)
 	{
+		m_bg_tilemap[layer]->set_scroll_rows(512);
+
 		// the hardware supports per-scanline X *and* Y scroll which isn't
 		// supported by tilemaps so we have to draw the tilemap one line at a time
 		int i = 16;
@@ -386,8 +388,6 @@ void nmk16_state::bg_update(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 			bgclip.min_y = y1;
 			bgclip.max_y = y1;
-
-			m_bg_tilemap[layer]->set_scroll_rows(512);
 
 			m_bg_tilemap[layer]->set_scrolly(0, yscroll);
 			m_bg_tilemap[layer]->set_scrollx((i + yscroll) & 0x1ff, m_gunnail_scrollram[0] + m_gunnail_scrollram[i]);

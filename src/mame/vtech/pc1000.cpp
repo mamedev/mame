@@ -447,7 +447,7 @@ void pc1000_state::misterx(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(pc1000_state::irq0_line_hold), attotime::from_hz(10));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_screen_update(FUNC(pc1000_state::sed1200_screen_update));
@@ -455,7 +455,7 @@ void pc1000_state::misterx(machine_config &config)
 	m_screen->set_visarea(0, 120-1, 0, 9-1);
 	m_screen->set_palette("palette");
 
-	SED1200D0B(config, m_lcdc, 0); // packaging variant not verified
+	SED1200D0B(config, m_lcdc); // packaging variant not verified
 
 	PALETTE(config, "palette", FUNC(pc1000_state::pc1000_palette), 2);
 

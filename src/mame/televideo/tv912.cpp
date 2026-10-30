@@ -921,7 +921,7 @@ void tv912_state::tv912(machine_config &config)
 	maincpu.t1_in_cb().set(m_crtc, FUNC(tms9927_device::bl_r)).invert();
 	maincpu.prog_out_cb().set(m_uart, FUNC(ay51013_device::write_xr)).invert();
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(23.814_MHz_XTAL, 105 * TV912_CH_WIDTH, 0, 80 * TV912_CH_WIDTH, 270, 0, 240);
 	screen.set_screen_update(FUNC(tv912_state::screen_update));
 

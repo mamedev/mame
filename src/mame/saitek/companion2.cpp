@@ -4,7 +4,7 @@
 /*******************************************************************************
 
 SciSys Chess Companion II family
-CXG Enterprise "S" family
+Newcrest CXG Enterprise "S" family
 
 The chess engine is LogiChess (ported from Z80 to 6801), by Kaare Danielsen,
 after founding the company LogiSoft ApS.
@@ -53,8 +53,8 @@ The Tandy clones run at a lower clock frequency, 3MHz and 6MHz respectively.
 
 ================================================================================
 
-CXG Enterprise "S" / Star Chess is on very similar hardware, so it's emulated
-in this driver too.
+Newcrest CXG Enterprise "S" / Star Chess is on very similar hardware, so it's
+emulated in this driver too.
 
 Hardware notes:
 - Hitachi HD6301V1P (HD6301V1C42P), 7.15909MHz XTAL
@@ -416,4 +416,4 @@ ROM_END
 SYST( 1983, compan2,  0,       0,      compan2,  compan2,  compan2_state, empty_init, "SciSys / LogiSoft", "Chess Companion II", MACHINE_SUPPORTS_SAVE )
 SYST( 1983, expchess, compan2, 0,      expchess, expchess, compan2_state, empty_init, "SciSys / LogiSoft", "Explorer Chess", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1984, enterp,   0,       0,      enterp,   enterp,   compan2_state, empty_init, "CXG Systems / Newcrest Technology / LogiSoft", "Enterprise \"S\"", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, enterp,   0,       0,      enterp,   enterp,   compan2_state, empty_init, "Newcrest Technology / CXG Systems / LogiSoft", "Enterprise \"S\"", MACHINE_SUPPORTS_SAVE )

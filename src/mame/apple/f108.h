@@ -29,7 +29,11 @@ public:
 	virtual void map(address_map &map) ATTR_COLD;
 
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
-	template <typename... T> void set_primetimeii_tag(T &&... args) { m_primetimeii.set_tag(std::forward<T>(args)...); }
+	template <typename... T> void set_primetimeii_tag(T &&... args) {
+		m_primetimeii.set_tag(std::forward<T>(args)...);
+		m_ncr1.lookup()->irq_handler_cb().set(m_primetimeii, FUNC(primetime_device::scsi_irq_w));
+		m_ncr1.lookup()->drq_handler_cb().set(m_primetimeii, FUNC(primetime_device::scsi_drq_w));
+	}
 	template <typename... T> void set_rom_tag(T &&... args) { m_rom.set_tag(std::forward<T>(args)...); }
 	void set_ram_info(u32 *ram, u32 size);
 
@@ -45,6 +49,8 @@ protected:
 
 private:
 	void ata_irq_w(int state);
+	u8 ata_timing_r(offs_t offset);
+	void ata_timing_w(offs_t offset, u8 data);
 	u32 ata_data_r(offs_t offset, u32 mem_mask);
 	void ata_data_w(offs_t offset, u32 data, u32 mem_mask);
 	u16 scc_r(offs_t offset);
@@ -57,11 +63,12 @@ private:
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<ncr53c96_device> m_ncr1;
 	required_device<z80scc_device> m_scc;
-	required_region_ptr<u32> m_rom;
+	optional_region_ptr<u32> m_rom;
 
 	devcb_write_line m_ata_irq;
 
 	bool m_overlay;
+	u8 m_ata_active, m_ata_recovery;
 	u32 *m_ram_ptr, *m_rom_ptr;
 	u32 m_ram_size, m_rom_size;
 };

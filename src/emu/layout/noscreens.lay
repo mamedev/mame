@@ -3,15 +3,28 @@
 license:CC0-1.0
 -->
 <mamelayout version="2">
-	<element name="warning">
-		<text string="No screens attached to the system">
-			<color red="1.0" green="0.5" blue="0.5" />
-		</text>
+
+	<element name="warning"><text string="No visual output."></text></element>
+	<element name="footnote"><text string="No available internal or external artwork, and/or no screens attached to the system."><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="background">
+		<rect>
+			<bounds xc="0" yc="0" width="10" height="10" />
+			<color red="1" green="1" blue="1" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="10" height="9" />
+			<color red="0.5" green="0.05" blue="0.05" />
+		</rect>
 	</element>
-	<view name="No screens attached">
+
+	<view name="None">
 		<bounds left="0" top="0" right="400" bottom="300" />
-		<element name="warning_txt" ref="warning">
-			<bounds xc="200" yc="150" width="400" height="25" />
-		</element>
+		<collection name="Warning Message">
+			<element ref="background"><bounds xc="200" yc="150" width="2000" height="32" /></element>
+			<element ref="warning"><bounds xc="200" yc="150" width="390" height="24" /></element>
+			<element ref="footnote"><bounds xc="200" y="280" width="390" height="10" /></element>
+		</collection>
 	</view>
+
 </mamelayout>

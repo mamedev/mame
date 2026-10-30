@@ -46,7 +46,7 @@ class msm6242_device : public device_t, public device_rtc_interface
 {
 public:
 	// construction/destruction
-	msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto out_int_handler() { return m_out_int_handler.bind(); }
 
@@ -54,14 +54,17 @@ public:
 	void write(offs_t offset, u8 data);
 	u8 read(offs_t offset);
 
+	// configuration
+	msm6242_device &set_default_24h(bool default_24h);
+
 protected:
 	msm6242_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void device_pre_save() override;
-	virtual void device_post_load() override;
+	virtual void device_pre_save() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 	// rtc overrides
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
@@ -79,9 +82,10 @@ private:
 	u8                          m_irq_flag;
 	u8                          m_irq_type;
 	u16                         m_tick;
+	bool                        m_default_24h;
 
 	// incidentals
-	devcb_write_line m_out_int_handler;
+	devcb_write_line            m_out_int_handler;
 	emu_timer *                 m_timer;
 	emu_timer *                 m_timer_irq_clear;
 	u64                         m_last_update_time; // last update time, in clock cycles
@@ -114,7 +118,7 @@ class rtc62423_device : public msm6242_device
 {
 public:
 	// construction/destruction
-	rtc62423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rtc62423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // ======================> rtc72421_device
@@ -136,12 +140,11 @@ public:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(MSM6242,  msm6242_device)
 DECLARE_DEVICE_TYPE(RTC62421, rtc62421_device)
 DECLARE_DEVICE_TYPE(RTC62423, rtc62423_device)
 DECLARE_DEVICE_TYPE(RTC72421, rtc72421_device)
 DECLARE_DEVICE_TYPE(RTC72423, rtc72423_device)
-
 
 #endif // MAME_MACHINE_MSM6242_H

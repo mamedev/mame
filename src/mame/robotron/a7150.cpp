@@ -171,7 +171,7 @@ void a7150_state::a7150(machine_config &config)
 	i8087.irq().set(m_pic8259, FUNC(pic8259_device::ir0_w));
 	i8087.busy().set_inputline("maincpu", INPUT_LINE_TEST);
 
-	PIC8259(config, m_pic8259, 0);
+	PIC8259(config, m_pic8259);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// IFSP port (IRQ 4)
@@ -180,7 +180,7 @@ void a7150_state::a7150(machine_config &config)
 //  ppi.out_pb_callback().set("cent_data_out", output_latch_device::write));
 	ppi.out_pc_callback().set(FUNC(a7150_state::ppi_c_w));
 
-	PIT8253(config, m_pit8253, 0);
+	PIT8253(config, m_pit8253);
 	m_pit8253->set_clk<0>(14.7456_MHz_XTAL / 4);
 	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir2_w));
 	m_pit8253->set_clk<1>(14.7456_MHz_XTAL / 4);
@@ -188,7 +188,7 @@ void a7150_state::a7150(machine_config &config)
 	m_pit8253->out_handler<2>().set([this] (bool state) { m_uart8251->write_rxc(state); m_uart8251->write_txc(state); });
 
 	// IFSS port -- keyboard runs at 28800 8N2
-	I8251(config, m_uart8251, 0);
+	I8251(config, m_uart8251);
 	m_uart8251->txd_handler().set([this] (bool state) { if (m_ifss_loopback) m_uart8251->write_rxd(state); else m_rs232->write_txd(state); });
 	m_uart8251->dtr_handler().set([this] (bool state) { if (m_ifss_loopback) m_uart8251->write_dsr(state); else m_rs232->write_dtr(state); });
 	m_uart8251->rts_handler().set([this] (bool state) { m_ifss_loopback = !state; });

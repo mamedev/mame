@@ -480,11 +480,13 @@ void vtech1_base_state::vtech1(machine_config &config)
 	MC6847(config, m_crtc, XTAL(4'433'619), true);
 	m_crtc->set_screen("screen");
 	m_crtc->fsync_wr_callback().set_inputline(m_maincpu, 0).invert();
-	m_crtc->set_get_fixed_mode(mc6847_device::MODE_GM1);
+	m_crtc->set_fixed_mode(mc6847_device::MODE_GM1);
 	// GM2 = GND, GM0 = GND, INTEXT = GND
 	// other lines not connected
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(XTAL(4'433'619) * 2, 456, 0, 372, 312, 0, 293);
+	screen.set_screen_update(m_crtc, FUNC(mc6847_base_device::screen_update));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -554,7 +556,7 @@ void laser310h_state::laser310h(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &laser310h_state::vtech1_shrg_io);
 
 	m_crtc->input_callback().set(FUNC(laser310h_state::mc6847_videoram_r));
-	m_crtc->set_get_fixed_mode(mc6847_device::MODE_GM1);
+	m_crtc->set_fixed_mode(mc6847_device::MODE_GM1);
 	// INTEXT = GND
 	// other lines not connected
 }

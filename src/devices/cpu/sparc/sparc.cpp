@@ -12,7 +12,7 @@
 //        is currently no use made of it, and it is unlikely to
 //        ever be.
 //
-//  To-Do:
+//  TODO:
 //      - Test: SPARCv8 ops are untested
 //      - Extended-precision FPU support
 //      - Coprocessor support
@@ -386,16 +386,16 @@ void sparc_base_device::device_start()
 	state_add(SPARC_CWP,        "CWP",      m_cwp).formatstr("%2d");
 
 	for (int i = 0; i < 8; i++)
-		state_add(SPARC_G0 + i, util::string_format("g%d", i).c_str(), m_r[i]).formatstr("%08X");
+		state_add(SPARC_G0 + i, util::string_format("g%d", i), m_r[i]).formatstr("%08X");
 
 	for (int i = 0; i < 8; i++)
-		state_add(SPARC_O0 + i, util::string_format("o%d", i).c_str(), m_dbgregs[i]).formatstr("%08X");
+		state_add(SPARC_O0 + i, util::string_format("o%d", i), m_dbgregs[i]).formatstr("%08X");
 
 	for (int i = 0; i < 8; i++)
-		state_add(SPARC_L0 + i, util::string_format("l%d", i).c_str(), m_dbgregs[8+i]).formatstr("%08X");
+		state_add(SPARC_L0 + i, util::string_format("l%d", i), m_dbgregs[8+i]).formatstr("%08X");
 
 	for (int i = 0; i < 8; i++)
-		state_add(SPARC_I0 + i, util::string_format("i%d", i).c_str(), m_dbgregs[16+i]).formatstr("%08X");
+		state_add(SPARC_I0 + i, util::string_format("i%d", i), m_dbgregs[16+i]).formatstr("%08X");
 
 	state_add(SPARC_EC,     "EC",       m_ec).formatstr("%1u");
 	state_add(SPARC_EF,     "EF",       m_ef).formatstr("%1u");
@@ -406,10 +406,10 @@ void sparc_base_device::device_start()
 	state_add(SPARC_FSR,    "FSR",      m_fsr).formatstr("%08X");
 
 	for (int i = 0; i < 32; i++)
-		state_add(SPARC_F0 + i, util::string_format("f%d", i).c_str(), m_fpr[i]);
+		state_add(SPARC_F0 + i, util::string_format("f%d", i), m_fpr[i]);
 
 	for (int i = 0; i < 136; i++)
-		state_add(SPARC_R0 + i, util::string_format("r%d", i).c_str(), m_r[i]).formatstr("%08X");
+		state_add(SPARC_R0 + i, util::string_format("r%d", i), m_r[i]).formatstr("%08X");
 
 	save_item(NAME(m_r));
 	save_item(NAME(m_fpr));
@@ -3392,12 +3392,12 @@ bool sparc_base_device::evaluate_condition(uint32_t op)
 	// bneg     bpos
 	// bvs      bvc
 
-	switch(COND)
+	switch (COND)
 	{
 		case 0:     return false;
 		case 1:     return ICC_Z_SET;
-		case 2:     return ICC_Z_SET || (ICC_N != ICC_Z);
-		case 3:     return (ICC_N != ICC_V);
+		case 2:     return ICC_Z_SET || (ICC_N != ICC_V);
+		case 3:     return ICC_N != ICC_V;
 		case 4:     return ICC_C_SET || ICC_Z_SET;
 		case 5:     return ICC_C_SET;
 		case 6:     return ICC_N_SET;
@@ -3405,8 +3405,8 @@ bool sparc_base_device::evaluate_condition(uint32_t op)
 
 		case 8:     return true;
 		case 9:     return ICC_Z_CLEAR;
-		case 10:    return ICC_Z_CLEAR && ICC_N_CLEAR;
-		case 11:    return (ICC_N == ICC_V);
+		case 10:    return ICC_Z_CLEAR && (ICC_N == ICC_V);
+		case 11:    return ICC_N == ICC_V;
 		case 12:    return ICC_C_CLEAR && ICC_Z_CLEAR;
 		case 13:    return ICC_C_CLEAR;
 		case 14:    return ICC_N_CLEAR;

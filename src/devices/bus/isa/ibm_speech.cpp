@@ -124,7 +124,7 @@ void isa8_ibm_speech_device::device_add_mconfig(machine_config &config)
 	// breakout box
 	SPEAKER(config, m_speaker);
 
-	PIT8254(config, m_pit, 0);
+	PIT8254(config, m_pit);
 	// Channel 0: CVSD CLOCK.
 	//            Rising edge goes to the MC3418's clock pin.
 	//            Rising edge inverted goes to the shift register clock.
@@ -152,7 +152,7 @@ void isa8_ibm_speech_device::device_add_mconfig(machine_config &config)
 	m_lpc->irq_cb().set(FUNC(isa8_ibm_speech_device::lpc_interrupt_w));
 
 	// MC3418 CVSD
-	MC3418(config, m_cvsd, 0);
+	MC3418(config, m_cvsd);
 	m_cvsd->add_route(ALL_OUTPUTS, m_speaker, 1.0);
 
 	// PIT CH2

@@ -13,7 +13,7 @@
 #pragma once
 
 #include "cpu/adsp2100/adsp2100.h"
-#include "cpu/tms32031/tms32031.h"
+#include "cpu/tms320c3x/tms320c3x.h"
 #include "machine/74259.h"
 #include "machine/eepromser.h"
 #include "gaelco3d_m.h"
@@ -54,6 +54,7 @@ public:
 	void footbpow(machine_config &config);
 	void gaelco3d2(machine_config &config);
 	void gaelco3d(machine_config &config);
+	void speedup(machine_config &config);
 
 	template <int N> int analog_bit_r();
 	template <int N> int fp_analog_bit_r();
@@ -81,7 +82,7 @@ private:
 		gaelco3d_renderer(gaelco3d_state &state);
 		~gaelco3d_renderer() {}
 
-		bitmap_ind16 &screenbits() { return m_screenbits; }
+		bitmap_rgb32 &screenbits() { return m_screenbits; }
 		uint32_t polygons() { uint32_t result = m_polygons; m_polygons = 0; return result; }
 
 		void render_poly(screen_device &screen, uint32_t *polydata);
@@ -90,13 +91,15 @@ private:
 		gaelco3d_state &m_state;
 
 	private:
-		bitmap_ind16 m_screenbits;
+		bitmap_rgb32 m_screenbits;
 		bitmap_ind16 m_zbuffer;
 		uint32_t m_polygons = 0;
 		offs_t m_texture_size = 0;
 		offs_t m_texmask_size = 0;
 		std::unique_ptr<uint8_t[]> m_texture;
 		std::unique_ptr<uint8_t[]> m_texmask;
+
+		static uint32_t color3d_filter(uint32_t rgb00, uint32_t rgb01, uint32_t rgb10, uint32_t rgb11, uint8_t u, uint8_t v);
 
 		void render_noz_noperspective(int32_t scanline, const extent_t &extent, const gaelco3d_object_data &extra, int threadid);
 		void render_normal(int32_t scanline, const extent_t &extent, const gaelco3d_object_data &extra, int threadid);
@@ -111,7 +114,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<adsp21xx_device> m_adsp;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<tms32031_device> m_tms;
+	required_device<tms320c31_device> m_tms;
 	required_device_array<dmadac_sound_device, SOUND_CHANNELS> m_dmadac;
 	required_device<gaelco_serial_device> m_serial;
 	required_device<screen_device> m_screen;
@@ -165,7 +168,7 @@ private:
 
 	DECLARE_MACHINE_RESET(gaelco3d2);
 	DECLARE_MACHINE_RESET(common);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(adsp_autobuffer_irq);
 	void gaelco3d_render(screen_device &screen);

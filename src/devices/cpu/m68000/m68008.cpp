@@ -41,15 +41,31 @@ m68008_device::m68008_device(const machine_config &mconfig, device_type type, co
 	m_disable_specifics = true;
 }
 
+void m68008_device::enable_mmu8(bool disable_spaces)
+{
+	m_mmu8 = &m_mmu8_disabled;
+	m_disable_spaces = disable_spaces;
+}
+
+void m68008_device::set_current_mmu8(mmu8 *mmu)
+{
+	m_mmu8 = mmu;
+
+	if(m_mmu8)
+		m_mmu8->set_super(m_sr & SR_S);
+}
+
 void m68008_device::device_start()
 {
 	m68000_device::device_start();
 
-	m_s_program->specific(m_r_program8);
-	m_s_opcodes->specific(m_r_opcodes8);
-	m_s_uprogram->specific(m_r_uprogram8);
-	m_s_uopcodes->specific(m_r_uopcodes8);
-	m_s_cpu_space->specific(m_cpu_space8);
+	if(!m_disable_spaces) {
+		m_s_program->specific(m_r_program8);
+		m_s_opcodes->specific(m_r_opcodes8);
+		m_s_uprogram->specific(m_r_uprogram8);
+		m_s_uopcodes->specific(m_r_uopcodes8);
+		m_s_cpu_space->specific(m_cpu_space8);
+	}
 
 	// Theoretically UB, in practice works, the alternative (putting
 	// everything in m68000_device) is annoying
@@ -78,6 +94,14 @@ void m68008_device::update_user_super()
 		if(m_mmu8)
 			m_mmu8->set_super(false);
 	}
+}
+
+bool m68008_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
+{
+	if(m_mmu8)
+		return m_mmu8->translate(spacenum, intention, address, target_space);
+	else
+		return device_memory_interface::memory_translate(spacenum, intention, address, target_space);
 }
 
 

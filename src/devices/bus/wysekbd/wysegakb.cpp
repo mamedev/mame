@@ -544,15 +544,6 @@ wyse_at_keyboard_device::wyse_at_keyboard_device(const machine_config &mconfig, 
 {
 }
 
-void wyse_at_keyboard_device::device_resolve_objects()
-{
-	wyse_gate_array_keyboard_device::device_resolve_objects();
-
-	m_caps_led.resolve();
-	m_num_led.resolve();
-	m_scroll_led.resolve();
-}
-
 static INPUT_PORTS_START(wyse_at_keyboard)
 	PORT_START("R0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Keypad 1  End") PORT_CHAR(UCHAR_MAMEKEY(1_PAD), UCHAR_MAMEKEY(END)) PORT_CODE(KEYCODE_1_PAD)

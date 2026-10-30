@@ -20,17 +20,21 @@
 #include "fileio.h"
 #include "http.h"
 #include "image.h"
+#include "input.h"
 #include "main.h"
 #include "natkeyboard.h"
 #include "network.h"
 #include "render.h"
 #include "romload.h"
+#include "sound.h"
 #include "tilemap.h"
 #include "uiinput.h"
+#include "video.h"
 
 #include "ui/uimain.h"
 
 #include "corestr.h"
+#include "ioprocsstream.h"
 #include "unzip.h"
 
 #include "osdepend.h"
@@ -39,10 +43,32 @@
 #include <rapidjson/stringbuffer.h>
 
 #include <ctime>
+#include <locale>
 
 #if defined(__EMSCRIPTEN__)
 #include <emscripten.h>
 #endif
+
+
+
+class running_machine::log_file_helper
+{
+private:
+	util::core_file::ptr m_file;
+	util::owritestream m_stream;
+
+public:
+	log_file_helper(util::core_file::ptr &&file) : m_file(std::move(file)), m_stream(*m_file)
+	{
+		m_stream.imbue(std::locale::classic());
+	}
+
+	void puts(std::string_view s)
+	{
+		m_stream << s << std::flush;
+		m_file->flush();
+	}
+};
 
 
 
@@ -54,6 +80,13 @@ osd_interface &running_machine::osd() const
 {
 	return m_manager.osd();
 }
+
+ui_input_manager &running_machine::ui_input() const noexcept
+{
+	assert(m_ui_input);
+	return m_ui_input->input_manager();
+}
+
 
 //-------------------------------------------------
 //  running_machine - constructor
@@ -119,8 +152,10 @@ std::string running_machine::describe_context() const
 		cpu_device *cpu = dynamic_cast<cpu_device *>(&executing->device());
 		if (cpu != nullptr)
 		{
-			address_space &prg = cpu->space(AS_PROGRAM);
-			return string_format(prg.is_octal() ? "'%s' (%0*o)" :  "'%s' (%0*X)", cpu->tag(), prg.logaddrchars(), cpu->pc());
+			address_space *tspace;
+			offs_t address = cpu->pc();
+			bool ok = cpu->translate(AS_PROGRAM, device_memory_interface::TR_READ, address, tspace);
+			return string_format((ok && tspace->is_octal()) ? "'%s' (%0*o)" :  "'%s' (%0*X)", cpu->tag(), ok ? tspace->logaddrchars() : 1, cpu->pc());
 		}
 	}
 
@@ -139,16 +174,14 @@ void running_machine::start()
 {
 	// initialize basic can't-fail systems here
 	m_configuration = std::make_unique<configuration_manager>(*this);
+	m_ui_input = std::make_unique<ui_input_manager_impl>(*this);
 	m_input = std::make_unique<input_manager>(*this);
 	m_output = std::make_unique<output_manager>(*this);
-	m_render = std::make_unique<render_manager>(*this);
+	m_render = std::make_unique<render_manager>(*this, m_ui_input->event_sink());
 	m_bookkeeping = std::make_unique<bookkeeping_manager>(*this);
 
 	// allocate a soft_reset timer
 	m_soft_reset_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::soft_reset), this));
-
-	// initialize UI input
-	m_ui_input = std::make_unique<ui_input_manager>(*this);
 
 	// init the OSD layer
 	m_manager.osd().init(*this);
@@ -166,7 +199,67 @@ void running_machine::start()
 	// callbacks based on input port tags
 	time_t newbase = m_ioport.initialize();
 	if (newbase != 0)
+	{
 		m_base_time = newbase;
+
+		std::string rtc_str = options().rtc_time();
+		if (!rtc_str.empty() && rtc_str != "0")
+		{
+			osd_printf_warning("RTC: Input playback is active. Ignoring -rtc command line option.\n");
+		}
+	}
+	// if no playback file is active, look for the command-line override
+	else
+	{
+		std::string rtc_str = options().rtc_time();
+		if (!rtc_str.empty() && rtc_str != "0")
+		{
+			time_t old_base = m_base_time;
+			bool parsed_successfully = false;
+
+			// validate format: exactly 14 digits (YYYYMMDDhhmmss)
+			if (rtc_str.length() == 14 && rtc_str.find_first_not_of("0123456789") == std::string::npos)
+			{
+				int year = 0, month = 0, day = 0, hour = 0, min = 0, sec = 0;
+				if (sscanf(rtc_str.c_str(), "%4d%2d%2d%2d%2d%2d",
+					&year, &month, &day, &hour, &min, &sec) == 6)
+				{
+					struct tm t;
+					std::memset(&t, 0, sizeof(t));
+
+					t.tm_year = year - 1900;
+					t.tm_mon  = month - 1;
+					t.tm_mday = day;
+					t.tm_hour = hour;
+					t.tm_min  = min;
+					t.tm_sec  = sec;
+					t.tm_isdst = -1;
+
+					time_t parsed_time = mktime(&t);
+					if (parsed_time != (time_t)-1)
+					{
+						m_base_time = parsed_time;
+						osd_printf_verbose("RTC Override: Parsed '%s' successfully.\n", rtc_str.c_str());
+						parsed_successfully = true;
+					}
+				}
+			}
+
+			if (!parsed_successfully)
+			{
+				osd_printf_error("RTC Override Error: '%s' is not a valid YYYYMMDDhhmmss string.\n", rtc_str.c_str());
+			}
+
+			// print the final result to confirm it changed
+			if (m_base_time != old_base)
+			{
+				struct tm *final_tm = std::localtime(&m_base_time);
+				char time_buffer[64];
+				std::strftime(time_buffer, sizeof(time_buffer), "%Y-%m-%d %H:%M:%S", final_tm);
+				osd_printf_verbose("RTC Override Success: Base time set to %lld (%s)\n", (long long)m_base_time, time_buffer);
+			}
+		}
+	}
 
 	// initialize natural keyboard support after ports have been initialized
 	m_natkeyboard = std::make_unique<natural_keyboard>(*this);
@@ -280,13 +373,13 @@ int running_machine::run(bool quiet)
 		// if we have a logfile, set up the callback
 		if (options().log() && !quiet)
 		{
-			m_logfile = std::make_unique<emu_file>(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			std::error_condition const filerr = m_logfile->open("error.log");
+			util::core_file::ptr logfile;
+			std::error_condition const filerr = util::core_file::open("error.log", OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, logfile);
 			if (filerr)
 				throw emu_fatalerror("running_machine::run: unable to open error.log file");
 
-			using namespace std::placeholders;
-			add_logerror_callback(std::bind(&running_machine::logfile_callback, this, _1));
+			m_logfile = std::make_unique<log_file_helper>(std::move(logfile));
+			add_logerror_callback([this] (char const *buffer) { if (m_logfile) m_logfile->puts(buffer); });
 		}
 
 		if (options().debug() && options().debuglog())
@@ -974,21 +1067,6 @@ void running_machine::soft_reset(s32 param)
 
 	// now we're running
 	m_current_phase = machine_phase::RUNNING;
-}
-
-
-//-------------------------------------------------
-//  logfile_callback - callback for logging to
-//  logfile
-//-------------------------------------------------
-
-void running_machine::logfile_callback(const char *buffer)
-{
-	if (m_logfile != nullptr)
-	{
-		m_logfile->puts(buffer);
-		m_logfile->flush();
-	}
 }
 
 

@@ -106,14 +106,14 @@ public:
 		, m_vram(*this, "vram")
 	{ }
 
-	void alvg(machine_config &config);
-	void group1(machine_config &config);
-	void group2(machine_config &config);
-	void group3(machine_config &config);
-	void pca002(machine_config &config);  // Gen 1 sound board
-	void pca003(machine_config &config);  // Alphanumeric display
-	void pca008(machine_config &config);  // Gen 2 sound board
-	void pca020(machine_config &config);  // DMD controller
+	void alvg(machine_config &config) ATTR_COLD;
+	void group1(machine_config &config) ATTR_COLD;
+	void group2(machine_config &config) ATTR_COLD;
+	void group3(machine_config &config) ATTR_COLD;
+	void pca002(machine_config &config) ATTR_COLD;  // Gen 1 sound board
+	void pca003(machine_config &config) ATTR_COLD;  // Alphanumeric display
+	void pca008(machine_config &config) ATTR_COLD;  // Gen 2 sound board
+	void pca020(machine_config &config) ATTR_COLD;  // DMD controller
 
 private:
 	void main_map(address_map &map) ATTR_COLD;
@@ -487,9 +487,6 @@ void alvg_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_row));
 	save_item(NAME(m_lamp_data));
 	save_item(NAME(m_strobe));
@@ -580,7 +577,7 @@ void alvg_state::pca020(machine_config &config)
 	m_dmdcpu->port_out_cb<3>().set(FUNC(alvg_state::dmd_port3_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD, rgb_t::amber()));
+	screen_device &screen(SCREEN(config, "screen").set_lcd().set_color(rgb_t::amber()));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(128, 32);

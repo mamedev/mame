@@ -141,6 +141,7 @@ private:
 	void machine_reset() override ATTR_COLD;
 	void machine_start() override ATTR_COLD;
 	void do_int();
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
 	u8 m_port04 = 0U;
 	u8 m_port06 = 0U;
@@ -239,10 +240,15 @@ void amust_state::do_int()
 		|| (BIT(m_port0a, 5) && m_drq))        // when reading from floppy, only do it when DRQ is high.
 	{
 		//printf("%X,%X,%X ",m_port0a,sync,m_drq);
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0x00); // Z80
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE); // Z80
 	}
 	else
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(amust_state::cpu_acknowledge_irq)
+{
+	return 0x00;
 }
 
 void amust_state::drq_w(int state)
@@ -463,9 +469,10 @@ void amust_state::amust(machine_config &config)
 	Z80(config, m_maincpu, XTAL(16'000'000) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &amust_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &amust_state::io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(amust_state::cpu_acknowledge_irq));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 480);
@@ -498,7 +505,7 @@ void amust_state::amust(machine_config &config)
 	uart_clock.signal_handler().set("uart1", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart1", FUNC(i8251_device::write_rxc));
 
-	i8251_device &uart1(I8251(config, "uart1", 0));
+	i8251_device &uart1(I8251(config, "uart1"));
 	uart1.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	uart1.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart1.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -508,12 +515,12 @@ void amust_state::amust(machine_config &config)
 	rs232.cts_handler().set("uart1", FUNC(i8251_device::write_cts));
 	rs232.dsr_handler().set("uart1", FUNC(i8251_device::write_dsr));
 
-	I8251(config, "uart2", 0);
+	I8251(config, "uart2");
 	//uart2.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	//uart2.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	//uart2.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	PIT8253(config, "pit", 0);
+	PIT8253(config, "pit");
 
 	i8255_device &ppi1(I8255A(config, "ppi1"));
 	ppi1.in_pa_callback().set(FUNC(amust_state::port04_r));

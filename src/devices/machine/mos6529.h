@@ -37,7 +37,7 @@ class mos6529_device :  public device_t
 {
 public:
 	// construction/destruction
-	mos6529_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mos6529_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <std::size_t Bit> auto p_handler() { return m_p_handler[Bit].bind(); }
 
@@ -58,6 +58,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	uint8_t m_input;
+	uint8_t m_output;
 
 	devcb_write_line::array<8> m_p_handler;
 };

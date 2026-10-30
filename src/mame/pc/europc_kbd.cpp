@@ -45,11 +45,6 @@ europc_keyboard_device::europc_keyboard_device(const machine_config &mconfig, co
 {
 }
 
-void europc_keyboard_device::device_resolve_objects()
-{
-	m_leds.resolve();
-}
-
 void europc_keyboard_device::device_start()
 {
 	save_item(NAME(m_column_strobe));

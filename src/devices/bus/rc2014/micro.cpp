@@ -122,7 +122,7 @@ void rc2014_micro::device_add_mconfig(machine_config &config)
 	clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_txc));
 	clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->txd_handler().append(FUNC(rc2014_micro::tx_w));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));

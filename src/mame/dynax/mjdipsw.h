@@ -39,6 +39,13 @@
 		PORT_DIPSETTING(             0x01 << shift, "1 2 3 5 10 25 50 100" ) \
 		PORT_DIPSETTING(             0x02 << shift, "1 2 3 5 10 50 100 200" )
 
+#define MAHJONG_ODDS_RATE_NS(shift, loc) \
+		PORT_DIPNAME( 0x03 << shift, 0x00 << shift, "Odds Rate" ) PORT_DIPLOCATION(loc) \
+		PORT_DIPSETTING(             0x03 << shift, "1 2 4 8 12 16 24 32" ) \
+		PORT_DIPSETTING(             0x00 << shift, "1 2 3 5 8 15 30 50" ) \
+		PORT_DIPSETTING(             0x02 << shift, "2 3 6 8 12 15 30 50" ) \
+		PORT_DIPSETTING(             0x01 << shift, "1 2 3 5 10 25 50 100" )
+
 #define MAHJONG_COINAGE(shift, loc) \
 		PORT_DIPNAME( 0x03 << shift, 0x03 << shift, DEF_STR(Coinage) ) PORT_DIPLOCATION(loc) /* ＣＯＩＮ　ＲＡＴＥ   */ \
 		PORT_DIPSETTING(             0x03 << shift, DEF_STR(1C_1C) )                         /* １コイン　　１プレイ */ \

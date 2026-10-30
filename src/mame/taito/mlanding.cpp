@@ -51,7 +51,7 @@
 #include "taitosnd.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/tms32025/tms32025.h"
+#include "cpu/tms320c2x/tms320c2x.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "taitoio_yoke.h"
@@ -61,6 +61,8 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "endianness.h"
 
 
 namespace {
@@ -245,12 +247,12 @@ u32 mlanding_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 {
 	pen_t const *const pens = m_palette->pens();
 
-	for (u32 y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (u32 y = cliprect.top(); y <= cliprect.bottom(); ++y)
 	{
-		u16 const *src = &m_g_ram[(112 + y) * 512 + cliprect.min_x];
-		u16 *dst = &bitmap.pix(y, cliprect.min_x);
+		u16 const *src = &m_g_ram[(112 + y) * 512 + cliprect.left()];
+		u16 *dst = &bitmap.pix(y, cliprect.left());
 
-		for (u32 x = cliprect.min_x; x <= cliprect.max_x; ++x)
+		for (u32 x = cliprect.left(); x <= cliprect.right(); ++x)
 		{
 			*dst++ = pens[*src++ & 0x3fff];
 		}
@@ -963,16 +965,16 @@ void mlanding_state::mlanding(machine_config &config)
 	Z80CTC(config, m_ctc, 16_MHz_XTAL / 4);
 	m_ctc->zc_callback<0>().set(FUNC(mlanding_state::z80ctc_to0));
 
-	pc060ha_device& ciu(PC060HA(config, "ciu", 0));
+	pc060ha_device& ciu(PC060HA(config, "ciu"));
 	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TAITOIO_YOKE(config, m_yoke, 0);
+	TAITOIO_YOKE(config, m_yoke);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16_MHz_XTAL, 640, 0, 512, 462, 0, 400); // Estimated
 	screen.set_screen_update(FUNC(mlanding_state::screen_update));
 	screen.set_palette(m_palette);
@@ -1075,5 +1077,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, mlanding,  0,        mlanding, mlanding,  mlanding_state, empty_init, ROT0, "Taito America Corporation", "Midnight Landing (Germany)",      MACHINE_SUPPORTS_SAVE ) // Japanese or German selectable via dip-switch. Copyright changes accordingly.
-GAME( 1987, mlandingj, mlanding, mlanding, mlandingj, mlanding_state, empty_init, ROT0, "Taito Corporation",         "Midnight Landing (Japan, rev 3)", MACHINE_SUPPORTS_SAVE ) // Japanese or English selectable via dip-switch. Copyright changes accordingly.
+GAME( 1987, mlanding,  0,        mlanding, mlanding,  mlanding_state, empty_init, ROT0, "Taito America", "Midnight Landing (Germany)",      MACHINE_SUPPORTS_SAVE ) // Japanese or German selectable via dip-switch. Copyright changes accordingly.
+GAME( 1987, mlandingj, mlanding, mlanding, mlandingj, mlanding_state, empty_init, ROT0, "Taito",         "Midnight Landing (Japan, rev 3)", MACHINE_SUPPORTS_SAVE ) // Japanese or English selectable via dip-switch. Copyright changes accordingly.

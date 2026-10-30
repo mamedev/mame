@@ -9,7 +9,7 @@
 class k005849_device : public device_t, public device_video_interface
 {
 public:
-	k005849_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k005849_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto set_irq_cb() { return m_irq_cb.bind(); }
 	auto set_firq_cb() { return m_firq_cb.bind(); }

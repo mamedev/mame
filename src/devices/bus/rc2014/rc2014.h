@@ -79,7 +79,7 @@ class rc2014_bus_device : public device_t
 {
 public:
 	// construction/destruction
-	rc2014_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rc2014_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~rc2014_bus_device();
 
 	void clk_w(int state);
@@ -153,10 +153,7 @@ public:
 		: rc2014_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1,1))
 	{
 		m_bus.set_tag(std::forward<T>(bus_tag));
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(fixed);
+		set_options(std::forward<U>(slot_options), default_option, fixed);
 	}
 
 protected:
@@ -180,7 +177,7 @@ class rc2014_ext_bus_device : public rc2014_bus_device
 {
 public:
 	// construction/destruction
-	rc2014_ext_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rc2014_ext_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void clk2_w(int state);
 	void page_w(int state);
@@ -239,10 +236,7 @@ public:
 		: rc2014_ext_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1,1))
 	{
 		m_bus.set_tag(std::forward<T>(bus_tag));
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(fixed);
+		set_options(std::forward<U>(slot_options), default_option, fixed);
 	}
 
 protected:
@@ -264,7 +258,7 @@ class rc2014_rc80_bus_device : public rc2014_ext_bus_device
 {
 public:
 	// construction/destruction
-	rc2014_rc80_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rc2014_rc80_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void add_card(device_rc2014_rc80_card_interface &card);
 
@@ -304,10 +298,7 @@ public:
 		: rc2014_rc80_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1,1))
 	{
 		m_bus.set_tag(std::forward<T>(bus_tag));
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(fixed);
+		set_options(std::forward<U>(slot_options), default_option, fixed);
 	}
 
 protected:

@@ -84,9 +84,13 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void pve500(machine_config &config);
+	void pve500(machine_config &config) ATTR_COLD;
 
-	void init_pve500();
+	void init_pve500() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void mb8421_intl(int state);
@@ -107,8 +111,6 @@ private:
 	void subcpu_io(address_map &map) ATTR_COLD;
 	void subcpu_prg(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	required_device<tmpz84c015_device> m_maincpu;
 	required_device<tmpz84c015_device> m_subcpu;
 	required_device<cxd1095_device> m_cxdio;
@@ -268,7 +270,6 @@ void pve500_state::machine_start()
 	io_LE = 0;
 	io_SEL = 0;
 	io_KY = 0;
-	m_digits.resolve();
 }
 
 void pve500_state::machine_reset()
@@ -409,7 +410,8 @@ void pve500_state::pve500(machine_config &config)
 	/* The EEPROM stores the setup data */
 	EEPROM_MSM16911_8BIT(config, "eeprom");
 
-	/* FIX-ME: These are actually RS422 ports (except EDL IN/OUT which is indeed an RS232 port)*/
+	// FIXME: These are actually RS422 ports
+	// (except EDL IN/OUT which is indeed an RS232 port)
 	rs232_port_device &recorder(RS232_PORT(config, "recorder", default_rs232_devices, nullptr));
 	recorder.rxd_handler().set(m_maincpu, FUNC(tmpz84c015_device::rxa_w));
 

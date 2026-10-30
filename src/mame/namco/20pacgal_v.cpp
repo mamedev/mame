@@ -10,13 +10,6 @@
 
 #include "emu.h"
 #include "20pacgal.h"
-#include "screen.h"
-
-
-#define SCREEN_HEIGHT   (224)
-#define SCREEN_WIDTH    (288)
-#define NUM_PENS        (0x1000)
-#define NUM_STAR_PENS   (64)
 
 
 /*************************************
@@ -28,9 +21,9 @@
 void _20pacgal_state::get_pens()
 {
 	// TODO: Accurate palette when prom doesn't exist
-	uint8_t const *color_prom = m_proms->base() + (NUM_PENS * m_game_selected);
+	uint8_t const *color_prom = m_proms->base() + (0x1000 * m_game_selected);
 
-	for (offs_t offs = 0; offs < NUM_PENS; offs++)
+	for (offs_t offs = 0; offs < 0x1000; offs++)
 	{
 		int bit0, bit1, bit2;
 
@@ -60,8 +53,6 @@ void _20pacgal_state::get_pens()
 
 void _20pacgal_state::starpal_init(palette_device &palette) const
 {
-	// Star field
-
 	// palette for the stars
 	for (offs_t offs = 0; offs < 64; offs++)
 	{
@@ -71,20 +62,9 @@ void _20pacgal_state::starpal_init(palette_device &palette) const
 		int const g = map[(offs >> 2) & 0x03];
 		int const b = map[(offs >> 4) & 0x03];
 
-		palette.set_pen_color(NUM_PENS + offs, rgb_t(r, g, b));
+		palette.set_pen_color(0x1000 + offs, rgb_t(r, g, b));
 	}
 }
-
-
-void _20pacgal_state::do_pen_lookup(bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	const pen_t *pen = m_palette->pens();
-
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
-			bitmap.pix(y, x) = pen[bitmap.pix(y, x)];
-}
-
 
 
 /*************************************
@@ -93,11 +73,9 @@ void _20pacgal_state::do_pen_lookup(bitmap_rgb32 &bitmap, const rectangle &clipr
  *
  *************************************/
 
-void _20pacgal_state::draw_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int y, int x,
-						uint8_t code, uint8_t color, int flip_y, int flip_x)
+void _20pacgal_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x,
+		uint8_t code, uint8_t color, int flip_y, int flip_x)
 {
-	int sy;
-
 	offs_t pen_base = (color & 0x1f) << 2;
 	pen_base += m_sprite_pal_base;
 
@@ -107,28 +85,25 @@ void _20pacgal_state::draw_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	if (flip_x)
 		x = x + 0x0f;
 
-	/* for each row in the sprite */
-	for (sy = 0; sy < 0x10; sy++)
+	// for each row in the sprite
+	for (int sy = 0; sy < 0x10; sy++)
 	{
 		int x_sav = x;
 
 		if ((y >= cliprect.min_y) && (y <= cliprect.max_y))
 		{
-			int sx;
-			uint32_t data;
-
 			offs_t gfx_offs = ((code & 0x7f) << 6) | (sy << 2);
 
-			/* address mangling */
+			// address mangling
 			gfx_offs = (gfx_offs & 0x1f83) | ((gfx_offs & 0x003c) << 1) | ((gfx_offs & 0x0040) >> 4);
 
-			data = (m_sprite_gfx_ram[gfx_offs + 0] << 24) |
+			uint32_t data = (m_sprite_gfx_ram[gfx_offs + 0] << 24) |
 					(m_sprite_gfx_ram[gfx_offs + 1] << 16) |
 					(m_sprite_gfx_ram[gfx_offs + 2] << 8) |
 					(m_sprite_gfx_ram[gfx_offs + 3] << 0);
 
-			/* for each pixel in the row */
-			for (sx = 0; sx < 0x10; sx++)
+			// for each pixel in the row
+			for (int sx = 0; sx < 0x10; sx++)
 			{
 				if ((x >= cliprect.min_x) && (x <= cliprect.max_x))
 				{
@@ -137,12 +112,12 @@ void _20pacgal_state::draw_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 					col = m_sprite_color_lookup[pen_base | pen] & 0x0f;
 
-					/* pen bits A0-A3 */
+					// pen bits A0-A3
 					if (col)
 						bitmap.pix(y, x) = (bitmap.pix(y, x) & 0xff0) | col;
 				}
 
-				/* next pixel */
+				// next pixel
 				if (flip_x)
 					x = x - 1;
 				else
@@ -152,7 +127,7 @@ void _20pacgal_state::draw_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprec
 			}
 		}
 
-		/* next row */
+		// next row
 		if (flip_y)
 			y = y - 1;
 		else
@@ -163,18 +138,15 @@ void _20pacgal_state::draw_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprec
 }
 
 
-void _20pacgal_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void _20pacgal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
-
-	for (offs = 0x80 - 2; offs >= 0; offs -= 2)
+	for (int offs = 0x80 - 2; offs >= 0; offs -= 2)
 	{
 		static const int code_offs[2][2] =
 		{
 			{ 0, 1 },
 			{ 2, 3 }
 		};
-		int x, y;
 
 		uint8_t code = m_sprite_ram[offs + 0x000];
 		uint8_t color = m_sprite_ram[offs + 0x001];
@@ -188,22 +160,23 @@ void _20pacgal_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &clipre
 		int size_y = (m_sprite_ram[offs + 0x100] & 0x08) >> 3;
 
 		sy = sy - (16 * size_y);
-		sy = (sy & 0xff) - 32;  /* fix wraparound */
+		sy = (sy & 0xff) - 32; // fix wraparound
 
-		/* only Galaga appears to be effected by the global flip state */
+		// only Galaga appears to be effected by the global flip state
 		if (m_game_selected && (m_flip[0] & 0x01))
 		{
 			flip_x = !flip_x;
 			flip_y = !flip_y;
 		}
 
-		for (y = 0; y <= size_y; y++)
-			for (x = 0; x <= size_x; x++)
+		for (int y = 0; y <= size_y; y++)
+			for (int x = 0; x <= size_x; x++)
+			{
 				draw_sprite(bitmap, cliprect,
-							sy + (16 * y), sx + (16 * x),
-							code + code_offs[y ^ (size_y * flip_y)][x ^ (size_x * flip_x)],
-							color,
-							flip_y, flip_x);
+						sy + (16 * y), sx + (16 * x),
+						code + code_offs[y ^ (size_y * flip_y)][x ^ (size_x * flip_x)],
+						color, flip_y, flip_x);
+			}
 	}
 }
 
@@ -215,22 +188,19 @@ void _20pacgal_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &clipre
  *
  *************************************/
 
-void _20pacgal_state::draw_chars(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void _20pacgal_state::draw_chars(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	offs_t offs;
-
 	int flip = m_flip[0] & 0x01;
 
-	/* for each byte in the video RAM */
-	for (offs = 0; offs < 0x400; offs++)
+	// for each byte in the video RAM
+	for (int offs = 0; offs < 0x400; offs++)
 	{
-		int sy;
 		int y, x;
 
 		uint8_t *gfx = &m_char_gfx_ram.target()[m_video_ram[0x0000 | offs] << 4];
 		uint32_t color_base = (m_video_ram[0x0400 | offs] & 0x3f) << 2;
 
-		/* map the offset to (x, y) character coordinates */
+		// map the offset to (x, y) character coordinates
 		if ((offs & 0x03c0) == 0)
 		{
 			y = (offs & 0x1f) - 2;
@@ -247,40 +217,40 @@ void _20pacgal_state::draw_chars(bitmap_rgb32 &bitmap, const rectangle &cliprect
 			x = (offs & 0x1f) + 2;
 		}
 
-		if ((y < 0) || (y > 27)) continue;
+		if ((y < 0) || (y > 27))
+			continue;
 
-		/* conver to pixel coordinates */
+		// convert to pixel coordinates
 		y = y << 3;
 		x = x << 3;
 
 		if (flip)
 		{
-			y = SCREEN_HEIGHT - 1 - y;
-			x = SCREEN_WIDTH - 1 - x;
+			y = 224 - 1 - y;
+			x = 288 - 1 - x;
 		}
 
-		/* for each row in the character */
-		for (sy = 0; sy < 8; sy++)
+		// for each row in the character
+		for (int sy = 0; sy < 8; sy++)
 		{
-			int sx;
 			int x_sav = x;
 
 			if ((y >= cliprect.min_y) && (y <= cliprect.max_y))
 			{
 				uint16_t data = (gfx[8] << 8) | gfx[0];
 
-				/* for each pixel in the row */
-				for (sx = 0; sx < 8; sx++)
+				// for each pixel in the row
+				for (int sx = 0; sx < 8; sx++)
 				{
 					if ((x >= cliprect.min_x) && (x <= cliprect.max_x))
 					{
 						uint32_t col = ((data & 0x8000) >> 14) | ((data & 0x0800) >> 11);
 
-						/* pen bits A4-A11 */
+						// pen bits A4-A11
 						if ( col != 0 )
 							bitmap.pix(y, x) = (color_base | col) << 4;
 
-						/* next pixel */
+						// next pixel
 						if (flip)
 							x = x - 1;
 						else
@@ -294,7 +264,7 @@ void _20pacgal_state::draw_chars(bitmap_rgb32 &bitmap, const rectangle &cliprect
 				}
 			}
 
-			/* next row */
+			// next row
 			if (flip)
 				y = y - 1;
 			else
@@ -306,6 +276,7 @@ void _20pacgal_state::draw_chars(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		}
 	}
 }
+
 
 /*************************************
  *
@@ -355,28 +326,23 @@ void _20pacgal_state::draw_chars(bitmap_rgb32 &bitmap, const rectangle &cliprect
  *
  */
 
-void _20pacgal_state::draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect )
+void _20pacgal_state::draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	if ( (m_stars_ctrl[0] >> 5) & 1 )
+	if (BIT(m_stars_ctrl[0], 5))
 	{
-		int clock;
 		uint16_t lfsr =   m_stars_seed[0] + m_stars_seed[1]*256;
 		uint8_t feedback = (m_stars_ctrl[0] >> 6) & 1;
 		uint16_t star_seta = (m_stars_ctrl[0] >> 3) & 0x01;
 		uint16_t star_setb = (m_stars_ctrl[0] >> 3) & 0x02;
 
-		/* This is a guess based on galaga star sets */
+		// This is a guess based on galaga star sets
 		star_seta = 0x3fc0 | (star_seta << 14);
 		star_setb = 0x3fc0 | (star_setb << 14);
 
-
-		for (clock=0; clock < 288*224; clock++)
+		for (int clock = 0; clock < 288*224; clock++)
 		{
-			int x, y;
-			int carryout;
-
-			x = clock % 288;
-			y = clock / 288;
+			int x = clock % 288;
+			int y = clock / 288;
 
 			/* code at d616 translates into:
 			 * carryout = lfsr & 1;
@@ -389,15 +355,15 @@ void _20pacgal_state::draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect
 			 *
 			 */
 
-			/* code at d648 */
-			carryout = ((lfsr >> 4) ^ feedback ^ 1) & 1;
+			// code at d648
+			int carryout = ((lfsr >> 4) ^ feedback ^ 1) & 1;
 			feedback = (lfsr >> 15) & 1;
 			lfsr = (lfsr << 1) | carryout;
 
 			if (((lfsr & 0xffc0) == star_seta) || ((lfsr & 0xffc0) == star_setb))
 			{
 				if (y >= cliprect.min_y && y <= cliprect.max_y)
-					bitmap.pix(y, x) = NUM_PENS + (lfsr & 0x3f);
+					bitmap.pix(y, x) = 0x1000 + (lfsr & 0x3f);
 			}
 		}
 	}
@@ -410,13 +376,12 @@ void _20pacgal_state::draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect
  *
  *************************************/
 
-uint32_t _20pacgal_state::screen_update_20pacgal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t _20pacgal_state::screen_update_20pacgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	draw_stars(bitmap,cliprect);
+	draw_stars(bitmap, cliprect);
 	draw_chars(bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);
-	do_pen_lookup(bitmap, cliprect);
 
 	return 0;
 }
@@ -434,24 +399,4 @@ void _20pacgal_state::video_start()
 
 	if (m_proms != nullptr)
 		get_pens();
-}
-
-
-/*************************************
- *
- *  Machine driver
- *
- *************************************/
-
-void _20pacgal_state::_20pacgal_video(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(SCREEN_WIDTH, SCREEN_HEIGHT);
-	screen.set_visarea(0, SCREEN_WIDTH - 1, 0, SCREEN_HEIGHT - 1);
-	screen.set_screen_update(FUNC(_20pacgal_state::screen_update_20pacgal));
-	screen.screen_vblank().set(FUNC(_20pacgal_state::vblank_irq));
-
-	PALETTE(config, m_palette, FUNC(_20pacgal_state::starpal_init), NUM_PENS + NUM_PENS);
 }

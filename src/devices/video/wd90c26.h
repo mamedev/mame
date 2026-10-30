@@ -11,7 +11,7 @@
 class wd90c26_vga_device : public wd90c11a_vga_device
 {
 public:
-	wd90c26_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	wd90c26_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void crtc_map(address_map &map) override ATTR_COLD;

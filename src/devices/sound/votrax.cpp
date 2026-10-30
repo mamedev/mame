@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    votrax.c
+    votrax.cpp
 
     Votrax SC01A simulation
 
@@ -24,6 +24,8 @@ tp1 = phi clock (tied to f2q rom access)
 
 #include "emu.h"
 #include "votrax.h"
+
+#include <numbers>
 
 #define LOG_PHONE  (1U << 1)
 #define LOG_COMMIT (1U << 2)
@@ -421,7 +423,7 @@ void votrax_sc01_device::phone_commit()
 
 			// That does not happen in the sc01(a) rom, but let's
 			// cover our behind.
-			if(m_rom_cld == 0)
+			if(m_rom_vd == 0)
 				m_cur_closure = m_rom_closure;
 
 			return;
@@ -448,7 +450,14 @@ void votrax_sc01_device::chip_update()
 		if(m_phonetick == ((m_rom_duration << 2) | 1)) {
 			m_phonetick = 0;
 			m_ticks++;
-			if(m_ticks == m_rom_cld)
+			// The closure latches on the same delay that gates the
+			// noise amplitude (m_rom_vd here).  US 4,433,210 gives the
+			// closure and the fricative amplitude one shared delay and
+			// the vocal amplitude a delay of its own; latching on
+			// m_rom_cld, the field that gates the voice amplitude, kept
+			// a stop's closure on well into the next phone, after its
+			// noise had decayed, so P, T and K lost their release burst.
+			if(m_ticks == m_rom_vd)
 				m_cur_closure = m_rom_closure;
 		}
 	}
@@ -468,7 +477,7 @@ void votrax_sc01_device::chip_update()
 	// noise volumes are zero.
 	if(tick_208 && (!m_rom_pause || !(m_filt_fa || m_filt_va))) {
 		// interpolate(m_cur_va,  m_rom_va);
-		interpolate(m_cur_fc,  m_rom_fc);
+		// fc moves with fa, below
 		interpolate(m_cur_f1,  m_rom_f1);
 		interpolate(m_cur_f2,  m_rom_f2);
 		interpolate(m_cur_f2q, m_rom_f2q);
@@ -478,8 +487,14 @@ void votrax_sc01_device::chip_update()
 
 	// Non-formant update. Same bug there, va should be updated, not fc.
 	if(tick_625) {
-		if(m_ticks >= m_rom_vd)
+		if(m_ticks >= m_rom_vd) {
 			interpolate(m_cur_fa, m_rom_fa);
+			// fc routes the noise, so it moves with the noise amplitude:
+			// fast and on the same delay.  On the slow formant update a
+			// stop's fc was still drifting toward its own value when the
+			// stop released, so its noise took the wrong path.
+			interpolate(m_cur_fc, m_rom_fc);
+		}
 		if(m_ticks >= m_rom_cld) {
 			// interpolate(m_cur_fc, m_rom_fc);
 			interpolate(m_cur_va, m_rom_va);
@@ -618,8 +633,9 @@ sound_stream::sample_t votrax_sc01_device::analog_calc()
 
 	// Noise-only path
 	// 5. Pick up the noise pitch.  Amplitude is linear.  Base
-	// intensity should be checked w.r.t the voice.
-	double n = 1e4 * ((m_pitch & 0x40 ? m_cur_noise : false) ? 1 : -1);
+	// intensity checked against line-in SC-01-A recordings: with the
+	// second insertion below corrected, half the previous level.
+	double n = 5e3 * ((m_pitch & 0x40 ? m_cur_noise : false) ? 1 : -1);
 	n = n * m_filt_fa / 15.0;
 	shift_hist(n, m_noise_1);
 
@@ -644,8 +660,12 @@ sound_stream::sample_t votrax_sc01_device::analog_calc()
 	vn = apply_filter(m_vn_1, m_vn_2, m_f3_a, m_f3_b);
 	shift_hist(vn, m_vn_2);
 
-	// 11. Second noise insertion
-	vn += n * (5 + (15^m_filt_fc))/20.0;
+	// 11. Second noise insertion, complementary to the f2 injection
+	// (step 7): fc=15 phones (P, SH, CH) send their noise through f2
+	// only, fc=0 phones (S, Z, T) through here.  The previous
+	// (5 + (15^fc))/20 put a quarter of every phone's noise here, which
+	// made a P's release as loud and bright as a T's.
+	vn += n * (15^m_filt_fc)/15.0;
 	shift_hist(vn, m_vn_3);
 
 	// 12. Apply the f4 filter
@@ -854,6 +874,8 @@ void votrax_sc01_device::build_standard_filter(double *a, double *b,
 											   double c3,  // Cap between the two op-amps
 											   double c4)  // Cap over second op-amp
 {
+	constexpr double PI = std::numbers::pi;
+
 	// First compute the three coefficients of H(s).  One can note
 	// that there is as many capacitor values on both sides of the
 	// division, which confirms that the capacity-per-surface-area
@@ -863,10 +885,10 @@ void votrax_sc01_device::build_standard_filter(double *a, double *b,
 	double k2 = c4 * c2b / (m_cclock * m_cclock * c1b * c3);
 
 	// Estimate the filter cutoff frequency
-	double fpeak = sqrt(fabs(k0*k1 - k2))/(2*M_PI*k2);
+	double fpeak = sqrt(fabs(k0*k1 - k2))/(2*PI*k2);
 
 	// Turn that into a warp multiplier
-	double zc = 2*M_PI*fpeak/tan(M_PI*fpeak / m_sclock);
+	double zc = 2*PI*fpeak/tan(PI*fpeak / m_sclock);
 
 	// Finally compute the result of the z-transform
 	double m0 = zc*k0;
@@ -905,6 +927,8 @@ void votrax_sc01_device::build_lowpass_filter(double *a, double *b,
 											  double c1t, // Unswitched cap, over amp-op, top
 											  double c1b) // Switched cap, over amp-op, bottom
 {
+	constexpr double PI = std::numbers::pi;
+
 	// The caps values puts the cutoff at around 150Hz, put that's no good.
 	// Recordings shows we want it around 4K, so fuzz it.
 
@@ -912,10 +936,10 @@ void votrax_sc01_device::build_lowpass_filter(double *a, double *b,
 	double k = c1b / (m_cclock * c1t) * (150.0/4000.0);
 
 	// Compute the filter cutoff frequency
-	double fpeak = 1/(2*M_PI*k);
+	double fpeak = 1/(2*PI*k);
 
 	// Turn that into a warp multiplier
-	double zc = 2*M_PI*fpeak/tan(M_PI*fpeak / m_sclock);
+	double zc = 2*PI*fpeak/tan(PI*fpeak / m_sclock);
 
 	// Finally compute the result of the z-transform
 	double m = zc*k;
@@ -961,16 +985,18 @@ void votrax_sc01_device::build_noise_shaper_filter(double *a, double *b,
 												   double c3,  // Cap over second amp-op
 												   double c4)  // Switched cap after second amp-op
 {
+	constexpr double PI = std::numbers::pi;
+
 	// Coefficients of H(s) = k1*s / (1 + k2*s + k3*s^2)
 	double k0 = c2t*c3*c2b/c4;
 	double k1 = c2t*(m_cclock * c2b);
 	double k2 = c1*c2t*c3/(m_cclock * c4);
 
 	// Estimate the filter cutoff frequency
-	double fpeak = sqrt(1/k2)/(2*M_PI);
+	double fpeak = sqrt(1/k2)/(2*PI);
 
 	// Turn that into a warp multiplier
-	double zc = 2*M_PI*fpeak/tan(M_PI*fpeak / m_sclock);
+	double zc = 2*PI*fpeak/tan(PI*fpeak / m_sclock);
 
 	// Finally compute the result of the z-transform
 	double m0 = zc*k0;
@@ -1015,9 +1041,9 @@ void votrax_sc01_device::build_injection_filter(double *a, double *b,
 												double c3,  // Cap between the two op-amps
 												double c4)  // Cap over second op-amp
 {
-	// First compute the three coefficients of H(s) = (k0 + k2*s)/(k1 - k2*s)
+	// First compute the three coefficients of H(s) = (k0 + k2*s)/(k1 + k2*s)
 	double k0 = m_cclock * c2t;
-	double k1 = m_cclock * (c1b * c3 / c2t - c2t);
+	double k1 = m_cclock * (c1b * c3 / c2t + c2t);
 	double k2 = c2b;
 
 	// Don't pre-warp
@@ -1028,12 +1054,6 @@ void votrax_sc01_device::build_injection_filter(double *a, double *b,
 
 	a[0] = k0 + m;
 	a[1] = k0 - m;
-	b[0] = k1 - m;
-	b[1] = k1 + m;
-
-	// That ends up in a numerically unstable filter.  Neutralize it for now.
-	a[0] = 0;
-	a[1] = 0;
-	b[0] = 1;
-	b[1] = 0;
+	b[0] = k1 + m;
+	b[1] = k1 - m;
 }

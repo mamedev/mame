@@ -95,7 +95,7 @@ void novadesitec_fr009_state::fr009(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &novadesitec_fr009_state::main_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: all wrong
+	screen_device &screen(SCREEN(config, "screen")); // TODO: all wrong
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(640, 480);

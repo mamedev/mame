@@ -82,11 +82,11 @@ const tiny_rom_entry *isa16_pvga1a_device::device_rom_region() const
 
 void isa16_pvga1a_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(pvga1a_vga_device::screen_update));
 
-	PVGA1A(config, m_vga, 0);
+	PVGA1A(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x100000);
 }
@@ -172,12 +172,12 @@ const tiny_rom_entry *isa16_pvga1a_jk_device::device_rom_region() const
 
 void isa16_pvga1a_jk_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(pvga1a_vga_device::screen_update));
 
 	// TODO: is there any real difference between PVGA1A and PVGA1A-JK VGA controller wise?
-	PVGA1A(config, m_vga, 0);
+	PVGA1A(config, m_vga);
 	m_vga->set_screen("screen");
 	// 256kB to 1MB
 	m_vga->set_vram_size(0x100000);
@@ -238,11 +238,11 @@ const tiny_rom_entry *isa8_wd90c90_jk_device::device_rom_region() const
 
 void isa8_wd90c90_jk_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(pvga1a_vga_device::screen_update));
 
-	PVGA1A(config, m_vga, 0);
+	PVGA1A(config, m_vga);
 	m_vga->set_screen("screen");
 	// 256kB to 1MB
 	m_vga->set_vram_size(0x100000);
@@ -309,7 +309,7 @@ const tiny_rom_entry *isa16_wd90c00_jk_device::device_rom_region() const
 
 void isa16_wd90c00_jk_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(wd90c00_vga_device::screen_update));
 
@@ -380,7 +380,7 @@ const tiny_rom_entry *isa16_wd90c11_lr_device::device_rom_region() const
 
 void isa16_wd90c11_lr_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(wd90c11a_vga_device::screen_update));
 
@@ -456,7 +456,7 @@ const tiny_rom_entry *isa16_wd90c30_lr_device::device_rom_region() const
 
 void isa16_wd90c30_lr_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(wd90c30_vga_device::screen_update));
 
@@ -521,11 +521,11 @@ const tiny_rom_entry *isa16_wd90c31_lr_device::device_rom_region() const
 
 void isa16_wd90c31_lr_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(wd90c30_vga_device::screen_update));
 
-	WD90C31(config, m_vga, 0);
+	WD90C31(config, m_vga);
 	m_vga->set_screen("screen");
 	// 512KB, 1MB
 	m_vga->set_vram_size(0x100000);
@@ -592,11 +592,11 @@ const tiny_rom_entry *isa16_wd90c31a_lr_device::device_rom_region() const
 
 void isa16_wd90c31a_lr_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(wd90c00_vga_device::screen_update));
 
-	WD90C31(config, m_vga, 0); // WD90C31A
+	WD90C31(config, m_vga); // WD90C31A
 	m_vga->set_screen("screen");
 	// 512KB, 1MB
 	m_vga->set_vram_size(0x100000);
@@ -660,11 +660,11 @@ const tiny_rom_entry *isa16_wd90c31a_zs_device::device_rom_region() const
 
 void isa16_wd90c31a_zs_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(wd90c00_vga_device::screen_update));
 
-	WD90C31(config, m_vga, 0); // WD90C31A
+	WD90C31(config, m_vga); // WD90C31A
 	m_vga->set_screen("screen");
 	// 512KB, 1MB
 	m_vga->set_vram_size(0x100000);
@@ -729,11 +729,11 @@ const tiny_rom_entry *isa16_wd90c33_zz_device::device_rom_region() const
 
 void isa16_wd90c33_zz_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(wd90c33_vga_device::screen_update));
 
-	WD90C33(config, m_vga, 0);
+	WD90C33(config, m_vga);
 	m_vga->set_screen("screen");
 	// 1MB, 2MB
 	m_vga->set_vram_size(0x100000);

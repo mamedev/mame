@@ -379,7 +379,7 @@ void istellar_state::istellar(machine_config &config)
 	latch2.data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
 	latch2.set_separate_acknowledge(true);
 
-	PIONEER_LDV1000(config, m_laserdisc, 0);
+	PIONEER_LDV1000(config, m_laserdisc);
 	m_laserdisc->set_overlay(256, 256, FUNC(istellar_state::screen_update));
 	m_laserdisc->add_route(0, "speaker", 1.0, 0);
 	m_laserdisc->add_route(1, "speaker", 1.0, 1);
@@ -486,6 +486,7 @@ void istellar_state::init_istellar()
 {
 	//m_z80_2_nmi_enable = 0;
 
+	// TODO: what's this for, a way to skip no LD available?
 	#if 0
 	{
 		uint8_t *ROM = memregion("maincpu")->base();

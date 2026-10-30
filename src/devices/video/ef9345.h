@@ -28,7 +28,7 @@ class ef9345_device :   public device_t,
 {
 public:
 	// construction/destruction
-	ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ef9345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
@@ -149,7 +149,7 @@ protected:
 class ts9347_device : public ef9345_device
 {
 public:
-	ts9347_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ts9347_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual char_mode_t parse_video_mode() const override;

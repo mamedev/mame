@@ -6,12 +6,23 @@
 //
 //====================================================================
 
-#include "emu.h"
 #include "diagnostics_module.h"
 
-#include "corestr.h"
-
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
+
+#include "modules/lib/osdlib.h"
+
+#include "windows/winutil.h"
+
+#include "corestr.h"
+#include "strformat.h"
+
+#include <cassert>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
 
 // standard windows headers
 #include <windows.h>
@@ -21,13 +32,6 @@
 #include <psapi.h>
 #include <dbghelp.h>
 
-#include <memory>
-#include <vector>
-#include <utility>
-
-#include "modules/lib/osdlib.h"
-
-#include <windows/winutil.h>
 
 // Typedefs for dynamically loaded functions
 typedef BOOL (WINAPI *StackWalk64_fn)(DWORD, HANDLE, HANDLE, LPSTACKFRAME64, PVOID, PREAD_PROCESS_MEMORY_ROUTINE64, PFUNCTION_TABLE_ACCESS_ROUTINE64, PGET_MODULE_BASE_ROUTINE64, PTRANSLATE_ADDRESS_ROUTINE64);
@@ -326,7 +330,7 @@ symbol_manager::symbol_manager(const char *argv0) :
 #endif
 
 	// expand the buffer to be decently large up front
-	m_buffer = string_format("%500s", "");
+	m_buffer = util::string_format("%500s", "");
 
 	m_dbghelp_dll = osd::dynamic_module::open({ "dbghelp.dll" });
 
@@ -605,13 +609,13 @@ bool symbol_manager::parse_map_line(const char *line, uintptr_t &address, std::s
 void symbol_manager::format_symbol(const char *name, uint32_t displacement, const char *filename, int linenumber)
 {
 	// start with the address and offset
-	m_buffer = string_format(" (%s", name);
+	m_buffer = util::string_format(" (%s", name);
 	if (displacement != 0)
-		m_buffer.append(string_format("+0x%04x", (uint32_t)displacement));
+		m_buffer.append(util::string_format("+0x%04x", (uint32_t)displacement));
 
 	// append file/line if present
 	if (filename != nullptr)
-		m_buffer.append(string_format(", %s:%d", filename, linenumber));
+		m_buffer.append(util::string_format(", %s:%d", filename, linenumber));
 
 	// close up the string
 	m_buffer.append(")");
@@ -700,7 +704,7 @@ void sampling_profiler::start()
 			GetCurrentProcess(), &m_target_thread,
 			THREAD_GET_CONTEXT | THREAD_SUSPEND_RESUME | THREAD_QUERY_INFORMATION, FALSE, 0);
 	if (!result)
-		throw emu_fatalerror("sampling_profiler::start: Failed to get thread handle for main thread");
+		throw std::runtime_error("sampling_profiler::start: Failed to get thread handle for main thread");
 
 	// reset the exit flag
 	m_thread_exit = false;
@@ -708,7 +712,7 @@ void sampling_profiler::start()
 	// start the thread
 	m_thread = CreateThread(nullptr, 0, thread_entry, (LPVOID)this, 0, &m_thread_id);
 	if (!m_thread)
-		throw emu_fatalerror("sampling_profiler::start: Failed to create profiler thread");
+		throw std::runtime_error("sampling_profiler::start: Failed to create profiler thread");
 
 	// max out the priority
 	SetThreadPriority(m_thread, THREAD_PRIORITY_TIME_CRITICAL);
@@ -996,7 +1000,8 @@ private:
 		// print the exception type and address
 		fprintf(stderr, "\n-----------------------------------------------------\n");
 
-		auto diagnostics = downcast<diagnostics_win32 *>(get_instance());
+		auto diagnostics = dynamic_cast<diagnostics_win32 *>(get_instance());
+		assert(diagnostics);
 
 		fprintf(stderr, "Exception at EIP=%p%s: %s\n", info->ExceptionRecord->ExceptionAddress,
 			diagnostics->m_symbols->symbol_for_address((uintptr_t)info->ExceptionRecord->ExceptionAddress), exception_table[i].string);
@@ -1131,8 +1136,8 @@ private:
 			size_t len = GetModuleFileNameA(nullptr, exe_path, sizeof(exe_path));
 			if (len == 0)
 			{
-				osd_printf_error("Failed to get the executable path.\n");
-				fatalerror("Failed to get the executable path.");
+				fprintf(stderr, "Failed to get the executable path.\n");
+				throw std::runtime_error("Failed to get the executable path.");
 			}
 
 			exe_path[len] = '\0';
@@ -1141,7 +1146,7 @@ private:
 
 		if (m_symbols == nullptr)
 		{
-			fatalerror("Could not initialize symbols.");
+			throw std::runtime_error("Could not initialize symbols.");
 		}
 	}
 };
@@ -1153,4 +1158,4 @@ diagnostics_module * diagnostics_module::get_instance()
 	return &s_instance;
 }
 
-#endif
+#endif // defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)

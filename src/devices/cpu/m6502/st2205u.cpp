@@ -103,26 +103,24 @@ st2302u_device::st2302u_device(const machine_config &mconfig, const char *tag, d
 
 void st2205u_base_device::sound_stream_update(sound_stream &stream)
 {
-	int samples = stream.samples();
-	int outpos = 0;
-	while (samples-- != 0)
+	constexpr int OUTPUT_SCALE = 0x200 * 0x3f * 4;
+	sound_stream::sample_t output = 0.0F;
+	for (int channel = 0; channel < 4; channel++)
+		if (!BIT(m_psgc, 0) && BIT(m_psgc, channel + 4))
+			output += sound_stream::sample_t(double(m_psg_output[channel] * (m_psg_vol[channel] & 0x3f)) / OUTPUT_SCALE);
+
+	// The four channels are mixed internally and output mode 3 selects the current DAC rather than PWM.
+	const bool current_dac = BIT(m_psgc, 1, 2) == 3;
+	for (int sample = 0; sample < stream.samples(); sample++)
 	{
-		for (int channel = 0; channel < 4; channel++)
-		{
-			s16 adpcm_contribution = m_adpcm_level[channel];
-			stream.add_int(channel, outpos, adpcm_contribution * 0x10, 32768);
-
-			auto psg_contribution = std::sin((double)m_psg_freqcntr[channel]/4096.0f);
-			stream.add_int(channel, outpos, psg_contribution * m_psg_amplitude[channel]*0x80,32768);
-		}
-
-		outpos++;
+		stream.put(PSG_OUTPUT_PWM, sample, current_dac ? 0.0F : output);
+		stream.put(PSG_OUTPUT_CURRENT_DAC, sample, current_dac ? output : 0.0F);
 	}
 }
 
 void st2205u_base_device::base_init(std::unique_ptr<mi_st2xxx> &&intf)
 {
-	m_stream = stream_alloc(0, 4, 48000);
+	m_stream = stream_alloc(0, PSG_OUTPUT_COUNT, 48000);
 
 	m_timer_12bit[0] = timer_alloc(FUNC(st2205u_device::t0_interrupt), this);
 	m_timer_12bit[1] = timer_alloc(FUNC(st2205u_device::t1_interrupt), this);
@@ -158,9 +156,9 @@ void st2205u_base_device::base_init(std::unique_ptr<mi_st2xxx> &&intf)
 
 	save_item(NAME(m_adpcm_level));
 	save_item(NAME(m_psg_amplitude));
-	save_item(NAME(m_psg_freqcntr));
+	save_item(NAME(m_psg_output));
 
-	mintf = std::move(intf);
+	m_mintf = std::move(intf);
 	save_common_registers();
 	init();
 }
@@ -168,38 +166,38 @@ void st2205u_base_device::base_init(std::unique_ptr<mi_st2xxx> &&intf)
 void st2205u_device::device_start()
 {
 	std::unique_ptr<mi_st2205u> intf = std::make_unique<mi_st2205u>();
-	space(AS_DATA).specific(intf->data);
-	space(AS_DATA).cache(intf->dcache);
-	intf->irr_enable = false;
-	intf->irr = 0;
-	intf->prr = 0;
-	intf->drr = 0;
-	intf->brr = 0;
-	intf->irq_service = false;
-	intf->ram = make_unique_clear<u8[]>(0x8000);
+	space(AS_DATA).specific(intf->m_data);
+	intf->m_dcache = intf->m_data;
+	intf->m_irr_enable = false;
+	intf->m_irr = 0;
+	intf->m_prr = 0;
+	intf->m_drr = 0;
+	intf->m_brr = 0;
+	intf->m_irq_service = false;
+	intf->m_ram = make_unique_clear<u8[]>(0x8000);
 
 	save_item(NAME(m_lbuf));
 	save_item(NAME(m_lpal_index));
 	save_item(NAME(m_gray_levels));
-	save_item(NAME(intf->brr));
-	save_pointer(NAME(intf->ram), 0x8000);
+	save_item(NAME(intf->m_brr));
+	save_pointer(NAME(intf->m_ram), 0x8000);
 
 	base_init(std::move(intf));
 
-	state_add(ST_IRR, "IRR", downcast<mi_st2205u &>(*mintf).irr).mask(0x8fff);
-	state_add(ST_PRR, "PRR", downcast<mi_st2205u &>(*mintf).prr).mask(0x8fff);
-	state_add(ST_DRR, "DRR", downcast<mi_st2205u &>(*mintf).drr).mask(0x87ff);
-	state_add(ST_BRR, "BRR", downcast<mi_st2205u &>(*mintf).brr).mask(0x9fff);
+	state_add(ST_IRR, "IRR", downcast<mi_st2205u &>(*m_mintf).m_irr).mask(0x8fff);
+	state_add(ST_PRR, "PRR", downcast<mi_st2205u &>(*m_mintf).m_prr).mask(0x8fff);
+	state_add(ST_DRR, "DRR", downcast<mi_st2205u &>(*m_mintf).m_drr).mask(0x87ff);
+	state_add(ST_BRR, "BRR", downcast<mi_st2205u &>(*m_mintf).m_brr).mask(0x9fff);
 	state_add(ST_IREQ, "IREQ", m_ireq, [this](u16 data) { m_ireq = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
 	state_add(ST_IENA, "IENA", m_iena, [this](u16 data) { m_iena = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
 	for (int i = 0; i < 6; i++)
 	{
-		state_add(ST_PAOUT + i, string_format("P%cOUT", 'A' + i).c_str(), m_pdata[i]);
-		state_add(ST_PCA + i, string_format("PC%c", 'A' + i).c_str(), m_pctrl[i]);
+		state_add(ST_PAOUT + i, string_format("P%cOUT", 'A' + i), m_pdata[i]);
+		state_add(ST_PCA + i, string_format("PC%c", 'A' + i), m_pctrl[i]);
 		if (i == 2 || i == 4)
-			state_add(ST_PSA + i, string_format("PS%c", 'A' + i).c_str(), m_psel[i]);
+			state_add(ST_PSA + i, string_format("PS%c", 'A' + i), m_psel[i]);
 		if (i == 2 || i == 3)
-			state_add(ST_PFC + i - 2, string_format("PF%c", 'A' + i).c_str(), m_pfun[i - 2]).mask(i == 2 ? 0xfe : 0xff);
+			state_add(ST_PFC + i - 2, string_format("PF%c", 'A' + i), m_pfun[i - 2]).mask(i == 2 ? 0xfe : 0xff);
 	}
 	state_add(ST_PLOUT, "PLOUT", m_pdata[6]);
 	state_add(ST_PCL, "PCL", m_pctrl[6]);
@@ -211,15 +209,15 @@ void st2205u_device::device_start()
 	state_add(ST_BTSR, "BTREQ", m_btsr);
 	state_add(ST_BTC, "BTC", m_btc);
 	for (int i = 0; i < 4; i++)
-		state_add(ST_T0C + i, string_format("T%dC", i).c_str(), m_tc_12bit[i]);
+		state_add(ST_T0C + i, string_format("T%dC", i), m_tc_12bit[i]);
 	state_add(ST_T4C, "T4C", m_t4c);
 	state_add(ST_TIEN, "TIEN", m_tien);
 	for (int i = 0; i < 4; i++)
-		state_add(ST_FIFOS0 + i, string_format("FIFOS%d", i).c_str(), m_fifo_filled[i]).mask(0x1f);
+		state_add(ST_FIFOS0 + i, string_format("FIFOS%d", i), m_fifo_filled[i]).mask(0x1f);
 	state_add(ST_PSGC, "PSGC", m_psgc);
 	state_add(ST_PSGM, "PSGM", m_psgm);
 	for (int i = 0; i < 4; i++)
-		state_add(ST_VOL0 + i, string_format("VOL%d", i).c_str(), m_psg_vol[i]).mask(0xbf);
+		state_add(ST_VOL0 + i, string_format("VOL%d", i), m_psg_vol[i]).mask(0xbf);
 	state_add(ST_VOLM0, "VOLM0", m_psg_volm[0]).mask(0x3f);
 	state_add(ST_VOLM1, "VOLM1", m_psg_volm[1]).mask(0x7f);
 	state_add(ST_MUL, "MUL", m_mul);
@@ -248,12 +246,12 @@ void st2205u_device::device_start()
 	state_add(ST_USBIEN, "USBIEN", m_usbien).mask(0xbf);
 	for (int i = 0; i < 2; i++)
 	{
-		state_add(ST_DMS0 + i, string_format("DMS%d", i).c_str(), m_dptr[i * 2]).mask(0x7fff);
-		state_add(ST_DMD0 + i, string_format("DMD%d", i).c_str(), m_dptr[i * 2 + 1]).mask(0x7fff);
-		state_add(ST_DBKS0 + i, string_format("DBKS%d", i).c_str(), m_dbkr[i * 2]).mask(0x87ff);
-		state_add(ST_DBKD0 + i, string_format("DBKD%d", i).c_str(), m_dbkr[i * 2 + 1]).mask(0x87ff);
-		state_add(ST_DCNT0 + i, string_format("DCNT%d", i).c_str(), m_dcnt[i]).mask(0x7fff);
-		state_add(ST_DMOD0 + i, string_format("DMOD%d", i).c_str(), m_dmod[i]).mask(0x3f);
+		state_add(ST_DMS0 + i, string_format("DMS%d", i), m_dptr[i * 2]).mask(0x7fff);
+		state_add(ST_DMD0 + i, string_format("DMD%d", i), m_dptr[i * 2 + 1]).mask(0x7fff);
+		state_add(ST_DBKS0 + i, string_format("DBKS%d", i), m_dbkr[i * 2]).mask(0x87ff);
+		state_add(ST_DBKD0 + i, string_format("DBKD%d", i), m_dbkr[i * 2 + 1]).mask(0x87ff);
+		state_add(ST_DCNT0 + i, string_format("DCNT%d", i), m_dcnt[i]).mask(0x7fff);
+		state_add(ST_DMOD0 + i, string_format("DMOD%d", i), m_dmod[i]).mask(0x3f);
 	}
 	state_add(ST_DCTR, "DCTR", m_dctr).mask(0x03);
 	state_add(ST_RCTR, "RCTR", m_rctr).mask(0xef);
@@ -263,29 +261,29 @@ void st2205u_device::device_start()
 void st2302u_device::device_start()
 {
 	std::unique_ptr<mi_st2302u> intf = std::make_unique<mi_st2302u>();
-	space(AS_DATA).specific(intf->data);
-	space(AS_DATA).cache(intf->dcache);
-	intf->irr_enable = false;
-	intf->irr = 0;
-	intf->prr = 0;
-	intf->drr = 0;
-	intf->irq_service = false;
+	space(AS_DATA).specific(intf->m_data);
+	intf->m_dcache = intf->m_data;
+	intf->m_irr_enable = false;
+	intf->m_irr = 0;
+	intf->m_prr = 0;
+	intf->m_drr = 0;
+	intf->m_irq_service = false;
 
 	base_init(std::move(intf));
 
-	state_add(ST_IRR, "IRR", downcast<mi_st2302u &>(*mintf).irr).mask(0x0fff);
-	state_add(ST_PRR, "PRR", downcast<mi_st2302u &>(*mintf).prr).mask(0x0fff);
-	state_add(ST_DRR, "DRR", downcast<mi_st2302u &>(*mintf).drr).mask(0x07ff);
+	state_add(ST_IRR, "IRR", downcast<mi_st2302u &>(*m_mintf).m_irr).mask(0x0fff);
+	state_add(ST_PRR, "PRR", downcast<mi_st2302u &>(*m_mintf).m_prr).mask(0x0fff);
+	state_add(ST_DRR, "DRR", downcast<mi_st2302u &>(*m_mintf).m_drr).mask(0x07ff);
 	state_add(ST_IREQ, "IREQ", m_ireq, [this](u16 data) { m_ireq = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
 	state_add(ST_IENA, "IENA", m_iena, [this](u16 data) { m_iena = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
 	for (int i = 0; i < 6; i++)
 	{
-		state_add(ST_PAOUT + i, string_format("P%cOUT", 'A' + i).c_str(), m_pdata[i]);
-		state_add(ST_PCA + i, string_format("PC%c", 'A' + i).c_str(), m_pctrl[i]);
+		state_add(ST_PAOUT + i, string_format("P%cOUT", 'A' + i), m_pdata[i]);
+		state_add(ST_PCA + i, string_format("PC%c", 'A' + i), m_pctrl[i]);
 		if (i == 2 || i == 4)
-			state_add(ST_PSA + i, string_format("PS%c", 'A' + i).c_str(), m_psel[i]);
+			state_add(ST_PSA + i, string_format("PS%c", 'A' + i), m_psel[i]);
 		if (i == 2 || i == 3)
-			state_add(ST_PFC + i - 2, string_format("PF%c", 'A' + i).c_str(), m_pfun[i - 2]).mask(i == 2 ? 0xfe : 0xff);
+			state_add(ST_PFC + i - 2, string_format("PF%c", 'A' + i), m_pfun[i - 2]).mask(i == 2 ? 0xfe : 0xff);
 	}
 	state_add(ST_PMCR, "PMCR", m_pmcr);
 	state_add(ST_MISC, "MISC", m_misc).mask(st2xxx_misc_mask());
@@ -295,15 +293,15 @@ void st2302u_device::device_start()
 	state_add(ST_BTSR, "BTREQ", m_btsr);
 	state_add(ST_BTC, "BTC", m_btc);
 	for (int i = 0; i < 4; i++)
-		state_add(ST_T0C + i, string_format("T%dC", i).c_str(), m_tc_12bit[i]);
+		state_add(ST_T0C + i, string_format("T%dC", i), m_tc_12bit[i]);
 	state_add(ST_T4C, "T4C", m_t4c);
 	state_add(ST_TIEN, "TIEN", m_tien);
 	for (int i = 0; i < 4; i++)
-		state_add(ST_FIFOS0 + i, string_format("FIFOS%d", i).c_str(), m_fifo_filled[i]).mask(0x1f);
+		state_add(ST_FIFOS0 + i, string_format("FIFOS%d", i), m_fifo_filled[i]).mask(0x1f);
 	state_add(ST_PSGC, "PSGC", m_psgc);
 	state_add(ST_PSGM, "PSGM", m_psgm);
 	for (int i = 0; i < 4; i++)
-		state_add(ST_VOL0 + i, string_format("VOL%d", i).c_str(), m_psg_vol[i]).mask(0xbf);
+		state_add(ST_VOL0 + i, string_format("VOL%d", i), m_psg_vol[i]).mask(0xbf);
 	state_add(ST_VOLM0, "VOLM0", m_psg_volm[0]).mask(0x3f);
 	state_add(ST_VOLM1, "VOLM1", m_psg_volm[1]).mask(0x7f);
 	state_add(ST_MUL, "MUL", m_mul);
@@ -313,12 +311,12 @@ void st2302u_device::device_start()
 	state_add(ST_SMOD, "SMOD", m_smod).mask(0x0f);
 	for (int i = 0; i < 2; i++)
 	{
-		state_add(ST_DMS0 + i, string_format("DMS%d", i).c_str(), m_dptr[i * 2]).mask(0x7fff);
-		state_add(ST_DMD0 + i, string_format("DMD%d", i).c_str(), m_dptr[i * 2 + 1]).mask(0x7fff);
-		state_add(ST_DBKS0 + i, string_format("DBKS%d", i).c_str(), m_dbkr[i * 2]).mask(0x87ff);
-		state_add(ST_DBKD0 + i, string_format("DBKD%d", i).c_str(), m_dbkr[i * 2 + 1]).mask(0x87ff);
-		state_add(ST_DCNT0 + i, string_format("DCNT%d", i).c_str(), m_dcnt[i]).mask(0x7fff);
-		state_add(ST_DMOD0 + i, string_format("DMOD%d", i).c_str(), m_dmod[i]).mask(0x3f);
+		state_add(ST_DMS0 + i, string_format("DMS%d", i), m_dptr[i * 2]).mask(0x7fff);
+		state_add(ST_DMD0 + i, string_format("DMD%d", i), m_dptr[i * 2 + 1]).mask(0x7fff);
+		state_add(ST_DBKS0 + i, string_format("DBKS%d", i), m_dbkr[i * 2]).mask(0x87ff);
+		state_add(ST_DBKD0 + i, string_format("DBKD%d", i), m_dbkr[i * 2 + 1]).mask(0x87ff);
+		state_add(ST_DCNT0 + i, string_format("DCNT%d", i), m_dcnt[i]).mask(0x7fff);
+		state_add(ST_DMOD0 + i, string_format("DMOD%d", i), m_dmod[i]).mask(0x3f);
 	}
 	state_add(ST_DCTR, "DCTR", m_dctr).mask(0x03);
 	state_add(ST_RCTR, "RCTR", m_rctr).mask(0xef);
@@ -362,14 +360,14 @@ void st2205u_base_device::device_reset()
 
 	std::fill(std::begin(m_adpcm_level), std::end(m_adpcm_level), 0);
 	std::fill(std::begin(m_psg_amplitude), std::end(m_psg_amplitude), 0);
-	std::fill(std::begin(m_psg_freqcntr), std::end(m_psg_freqcntr), 0);
+	std::fill(std::begin(m_psg_output), std::end(m_psg_output), 0);
 }
 
 void st2205u_device::device_reset()
 {
 	st2205u_base_device::device_reset();
 
-	downcast<mi_st2205u &>(*mintf).brr = 0;
+	downcast<mi_st2205u &>(*m_mintf).m_brr = 0;
 
 	m_lbuf = 0;
 	m_lpal_index = 0;
@@ -421,125 +419,125 @@ const char *st2302u_device::st2xxx_irq_name(int i) const
 
 u8 st2205u_device::mi_st2205u::pread(u16 adr)
 {
-	u16 bank = irq_service && irr_enable ? irr : prr;
+	u16 bank = m_irq_service && m_irr_enable ? m_irr : m_prr;
 	if (BIT(bank, 15))
-		return ram[0x4000 | (adr & 0x3fff)];
+		return m_ram[0x4000 | (adr & 0x3fff)];
 	else
-		return data.read_byte(u32(bank) << 14 | (adr & 0x3fff));
+		return m_data.read_interruptible(u32(bank) << 14 | (adr & 0x3fff));
 }
 
 u8 st2205u_device::mi_st2205u::preadc(u16 adr)
 {
-	u16 bank = irq_service && irr_enable ? irr : prr;
+	u16 bank = m_irq_service && m_irr_enable ? m_irr : m_prr;
 	if (BIT(bank, 15))
-		return ram[0x4000 | (adr & 0x3fff)];
+		return m_ram[0x4000 | (adr & 0x3fff)];
 	else
-		return dcache.read_byte(u32(bank) << 14 | (adr & 0x3fff));
+		return m_dcache.read_interruptible(u32(bank) << 14 | (adr & 0x3fff));
 }
 
 void st2205u_device::mi_st2205u::pwrite(u16 adr, u8 val)
 {
-	u16 bank = irq_service && irr_enable ? irr : prr;
+	u16 bank = m_irq_service && m_irr_enable ? m_irr : m_prr;
 	if (BIT(bank, 15))
-		ram[0x4000 | (adr & 0x3fff)] = val;
+		m_ram[0x4000 | (adr & 0x3fff)] = val;
 	else
-		data.write_byte(u32(bank) << 14 | (adr & 0x3fff), val);
+		m_data.write_interruptible(u32(bank) << 14 | (adr & 0x3fff), val);
 }
 
 u8 st2205u_device::mi_st2205u::dread(u16 adr)
 {
-	if (BIT(drr, 15))
-		return ram[adr & 0x7fff];
+	if (BIT(m_drr, 15))
+		return m_ram[adr & 0x7fff];
 	else
-		return data.read_byte(u32(drr) << 15 | (adr & 0x7fff));
+		return m_data.read_interruptible(u32(m_drr) << 15 | (adr & 0x7fff));
 }
 
 u8 st2205u_device::mi_st2205u::dreadc(u16 adr)
 {
-	if (BIT(drr, 15))
-		return ram[adr & 0x7fff];
+	if (BIT(m_drr, 15))
+		return m_ram[adr & 0x7fff];
 	else
-		return dcache.read_byte(u32(drr) << 15 | (adr & 0x7fff));
+		return m_dcache.read_interruptible(u32(m_drr) << 15 | (adr & 0x7fff));
 }
 
 void st2205u_device::mi_st2205u::dwrite(u16 adr, u8 val)
 {
-	if (BIT(drr, 15))
-		ram[adr & 0x7fff] = val;
+	if (BIT(m_drr, 15))
+		m_ram[adr & 0x7fff] = val;
 	else
-		data.write_byte(u32(drr) << 15 | (adr & 0x7fff), val);
+		m_data.write_interruptible(u32(m_drr) << 15 | (adr & 0x7fff), val);
 }
 
 u8 st2205u_device::mi_st2205u::bread(u16 adr)
 {
-	if (BIT(brr, 15))
-		return ram[0x2000 | (adr & 0x1fff)];
+	if (BIT(m_brr, 15))
+		return m_ram[0x2000 | (adr & 0x1fff)];
 	else
-		return data.read_byte(u32(brr) << 13 | (adr & 0x1fff));
+		return m_data.read_interruptible(u32(m_brr) << 13 | (adr & 0x1fff));
 }
 
 u8 st2205u_device::mi_st2205u::breadc(u16 adr)
 {
-	if (BIT(brr, 15))
-		return ram[0x2000 | (adr & 0x1fff)];
+	if (BIT(m_brr, 15))
+		return m_ram[0x2000 | (adr & 0x1fff)];
 	else
-		return dcache.read_byte(u32(brr) << 13 | (adr & 0x1fff));
+		return m_dcache.read_interruptible(u32(m_brr) << 13 | (adr & 0x1fff));
 }
 
 void st2205u_device::mi_st2205u::bwrite(u16 adr, u8 val)
 {
-	if (BIT(brr, 15))
-		ram[0x2000 | (adr & 0x1fff)] = val;
+	if (BIT(m_brr, 15))
+		m_ram[0x2000 | (adr & 0x1fff)] = val;
 	else
-		data.write_byte(u32(brr) << 13 | (adr & 0x1fff), val);
+		m_data.write_interruptible(u32(m_brr) << 13 | (adr & 0x1fff), val);
 }
 
 u8 st2302u_device::mi_st2302u::pread(u16 adr)
 {
-	u16 bank = irq_service && irr_enable ? irr : prr;
-	return data.read_byte(u32(bank) << 14 | (adr & 0x3fff));
+	u16 bank = m_irq_service && m_irr_enable ? m_irr : m_prr;
+	return m_data.read_interruptible(u32(bank) << 14 | (adr & 0x3fff));
 }
 
 u8 st2302u_device::mi_st2302u::preadc(u16 adr)
 {
-	u16 bank = irq_service && irr_enable ? irr : prr;
-	return dcache.read_byte(u32(bank) << 14 | (adr & 0x3fff));
+	u16 bank = m_irq_service && m_irr_enable ? m_irr : m_prr;
+	return m_dcache.read_interruptible(u32(bank) << 14 | (adr & 0x3fff));
 }
 
 void st2302u_device::mi_st2302u::pwrite(u16 adr, u8 val)
 {
-	u16 bank = irq_service && irr_enable ? irr : prr;
-	data.write_byte(u32(bank) << 14 | (adr & 0x3fff), val);
+	u16 bank = m_irq_service && m_irr_enable ? m_irr : m_prr;
+	m_data.write_interruptible(u32(bank) << 14 | (adr & 0x3fff), val);
 }
 
 u8 st2302u_device::mi_st2302u::dread(u16 adr)
 {
-	return data.read_byte(u32(drr) << 15 | (adr & 0x7fff));
+	return m_data.read_interruptible(u32(m_drr) << 15 | (adr & 0x7fff));
 }
 
 u8 st2302u_device::mi_st2302u::dreadc(u16 adr)
 {
-	return dcache.read_byte(u32(drr) << 15 | (adr & 0x7fff));
+	return m_dcache.read_interruptible(u32(m_drr) << 15 | (adr & 0x7fff));
 }
 
 void st2302u_device::mi_st2302u::dwrite(u16 adr, u8 val)
 {
-	data.write_byte(u32(drr) << 15 | (adr & 0x7fff), val);
+	m_data.write_interruptible(u32(m_drr) << 15 | (adr & 0x7fff), val);
 }
 
 u8 st2205u_device::mi_st2205u::read(u16 adr)
 {
-	return program.read_byte(adr);
+	return m_program.read_interruptible(adr);
 }
 
 u8 st2205u_device::mi_st2205u::read_sync(u16 adr)
 {
-	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : BIT(adr, 13) ? breadc(adr) : cprogram.read_byte(adr);
+	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : BIT(adr, 13) ? breadc(adr) : m_cprogram.read_interruptible(adr);
 }
 
 u8 st2205u_device::mi_st2205u::read_arg(u16 adr)
 {
-	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : BIT(adr, 13) ? breadc(adr) : cprogram.read_byte(adr);
+	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : BIT(adr, 13) ? breadc(adr) : m_cprogram.read_interruptible(adr);
 }
 
 u8 st2205u_device::mi_st2205u::read_vector(u16 adr)
@@ -549,22 +547,22 @@ u8 st2205u_device::mi_st2205u::read_vector(u16 adr)
 
 void st2205u_device::mi_st2205u::write(u16 adr, u8 val)
 {
-	program.write_byte(adr, val);
+	m_program.write_interruptible(adr, val);
 }
 
 u8 st2302u_device::mi_st2302u::read(u16 adr)
 {
-	return program.read_byte(adr);
+	return m_program.read_interruptible(adr);
 }
 
 u8 st2302u_device::mi_st2302u::read_sync(u16 adr)
 {
-	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : cprogram.read_byte(adr);
+	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : m_cprogram.read_interruptible(adr);
 }
 
 u8 st2302u_device::mi_st2302u::read_arg(u16 adr)
 {
-	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : cprogram.read_byte(adr);
+	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : m_cprogram.read_interruptible(adr);
 }
 
 u8 st2302u_device::mi_st2302u::read_vector(u16 adr)
@@ -574,28 +572,28 @@ u8 st2302u_device::mi_st2302u::read_vector(u16 adr)
 
 void st2302u_device::mi_st2302u::write(u16 adr, u8 val)
 {
-	program.write_byte(adr, val);
+	m_program.write_interruptible(adr, val);
 }
 
 u8 st2205u_device::brrl_r()
 {
-	return downcast<mi_st2205u &>(*mintf).brr & 0xff;
+	return downcast<mi_st2205u &>(*m_mintf).m_brr & 0xff;
 }
 
 void st2205u_device::brrl_w(u8 data)
 {
-	u16 &brr = downcast<mi_st2205u &>(*mintf).brr;
+	u16 &brr = downcast<mi_st2205u &>(*m_mintf).m_brr;
 	brr = data | (brr & 0x9f00);
 }
 
 u8 st2205u_device::brrh_r()
 {
-	return downcast<mi_st2205u &>(*mintf).brr >> 8;
+	return downcast<mi_st2205u &>(*m_mintf).m_brr >> 8;
 }
 
 void st2205u_device::brrh_w(u8 data)
 {
-	u16 &brr = downcast<mi_st2205u &>(*mintf).brr;
+	u16 &brr = downcast<mi_st2205u &>(*m_mintf).m_brr;
 	brr = (data & 0x9f) << 8 | (brr & 0x00ff);
 }
 
@@ -656,6 +654,17 @@ u8 st2205u_base_device::psgc_r()
 
 void st2205u_base_device::psgc_w(u8 data)
 {
+	m_stream->update();
+	const u8 disabled = ((m_psgc & ~data) >> 4) & 0x0f;
+	for (int channel = 0; channel < 4; channel++)
+	{
+		if (BIT(disabled, channel))
+		{
+			m_adpcm_level[channel] = 0;
+			m_psg_amplitude[channel] = 0;
+			m_psg_output[channel] = 0;
+		}
+	}
 	m_psgc = data;
 	m_psg_on &= (data & 0xf0) >> 4;
 }
@@ -667,6 +676,7 @@ u8 st2205u_base_device::psgm_r()
 
 void st2205u_base_device::psgm_w(u8 data)
 {
+	m_stream->update();
 	m_psgm = data;
 }
 
@@ -677,6 +687,7 @@ u8 st2205u_base_device::vol_r(offs_t offset)
 
 void st2205u_base_device::vol_w(offs_t offset, u8 data)
 {
+	m_stream->update();
 	m_psg_vol[offset] = data & 0xbf;
 }
 
@@ -687,6 +698,7 @@ u8 st2205u_base_device::volm_r(offs_t offset)
 
 void st2205u_base_device::volm_w(offs_t offset, u8 data)
 {
+	m_stream->update();
 	m_psg_volm[offset] = data & (offset == 1 ? 0x7f : 0x3f);
 }
 
@@ -712,11 +724,7 @@ void st2205u_base_device::st2xxx_tclk_stop()
 u32 st2205u_base_device::tclk_pres_div(u8 mode) const
 {
 	assert(mode < 6);
-
-	// dphh8630 game 17 "Gang Nam Style" uses mode 0 for ADPCM music and if a 32Mhz clock is used, requires a divider of 1
-	// alternatively the divider can remain as 2 if the code in timer_12bit_process processes the FIFO every call instead
-	// of toggling it with m_psg_on, which is correct?
-	const int divtable[8] = { 1, 4, 8, 32, 1024, 4096, 4096, 4096 };
+	static constexpr u16 divtable[6] = { 2, 4, 8, 32, 1024, 4096 };
 
 	return divtable[mode];
 }
@@ -741,52 +749,50 @@ TIMER_CALLBACK_MEMBER(st2205u_base_device::t3_interrupt)
 	timer_12bit_process(3);
 }
 
-void st2205u_base_device::push_adpcm_value(int channel, u16 psg_data)
-{
-	// the ADPCM often ends up off-center before samples are played
-	// is the FIFO hookup causing non-ADPCM data to be processed as ADPCM
-	// if mode changes in m_psgm aren't in sync with the FIFO output?
-
-	m_stream->update();
-
-	if (BIT(psg_data, 8))
-		m_adpcm_level[channel] -= psg_data & 0xff;
-	else
-		m_adpcm_level[channel] += psg_data & 0xff;
-
-	LOGDAC("Playing ADPCM sample %c%02X on channel %d (new level is %04x)\n", BIT(psg_data, 8) ? '-' : '+', psg_data & 0xff, channel, m_adpcm_level[channel]);
-}
-
-void st2205u_base_device::reset_adpcm_value(int channel)
-{
-	m_stream->update();
-
-	m_adpcm_level[channel] = 0;
-}
-
 void st2205u_base_device::timer_12bit_process(int t)
 {
 	if (BIT(m_psgc, t + 4))
 	{
-		if (BIT(m_psg_on, t))
-			m_psg_on &= ~(1 << t);
+		const u8 mode = (m_psgm >> (2 * t)) & 3;
+		if (mode == 1)
+		{
+			// Tone data is an unsigned amplitude, and the timer toggles at twice the output frequency.
+			m_stream->update();
+			m_psg_on ^= 1 << t;
+			if (m_fifo_filled[t] != 0)
+			{
+				const u16 psg_data = m_dac_fifo[t][m_fifo_pos[t]];
+				m_adpcm_level[t] = 0;
+				m_psg_amplitude[t] = psg_data & 0xff;
+				LOGDAC("Playing tone sample %02X on channel %d\n", psg_data & 0xff, t);
+				--m_fifo_filled[t];
+				m_fifo_pos[t] = (m_fifo_pos[t] + 1) & 15;
+			}
+			m_psg_output[t] = (BIT(m_psg_on, t) ? 2 : -2) * m_psg_amplitude[t];
+		}
 		else if (m_fifo_filled[t] != 0)
 		{
-			m_psg_on |= 1 << t;
+			m_stream->update();
+			m_psg_on &= ~(1 << t);
 
-			u16 psg_data = m_dac_fifo[t][m_fifo_pos[t]];
-			if (BIT(m_psgm, 2 * t + 1))
+			const u16 psg_data = m_dac_fifo[t][m_fifo_pos[t]];
+			if (mode == 3)
 			{
-				push_adpcm_value(t, psg_data);
+				// The ninth FIFO bit selects subtraction from the signed, 10-bit ADPCM accumulator.
+				const int delta = psg_data & 0xff;
+				m_adpcm_level[t] = std::clamp(m_adpcm_level[t] + (BIT(psg_data, 8) ? -delta : delta), -0x200, 0x1ff);
+				m_psg_output[t] = m_adpcm_level[t];
+				LOGDAC("Playing ADPCM sample %c%02X on channel %d (new level is %04x)\n", BIT(psg_data, 8) ? '-' : '+', delta, t, m_adpcm_level[t]);
+			}
+			else if (mode == 0)
+			{
+				// PCM data is signed and expanded to the same 10-bit range as the other modes.
+				m_adpcm_level[t] = 0;
+				m_psg_output[t] = s8(psg_data & 0xff) * 4;
+				LOGDAC("Playing DAC sample %02X on channel %d\n", psg_data & 0xff, t);
 			}
 			else
-			{
-				reset_adpcm_value(t);
-				LOGDAC("Playing %s sample %02X on channel %d\n", BIT(m_psgm, 2 * t) ? "tone" : "DAC", psg_data & 0xff, t);
-
-				m_psg_amplitude[t] = psg_data & 0xff; // amplitude is controller by the data writes
-				m_psg_freqcntr[t] += 0x80; // the frequency is determined by the timer speed (there must be a better way to do this?)
-			}
+				m_psg_output[t] = 0;
 
 			--m_fifo_filled[t];
 			m_fifo_pos[t] = (m_fifo_pos[t] + 1) & 15;
@@ -1022,9 +1028,9 @@ void st2205u_base_device::dcnth_w(u8 data)
 	{
 		uint8_t data;
 		if (BIT(srcb, 15))
-			data = mintf->cprogram.read_byte(srcp); // FIXME: 0080-7FFF should be all RAM on ST2205U
+			data = m_mintf->m_cprogram.read_interruptible(srcp); // FIXME: 0080-7FFF should be all RAM on ST2205U
 		else
-			data = downcast<mi_st2xxx &>(*mintf).dcache.read_byte(srcp | u32(srcb << 15));
+			data = downcast<mi_st2xxx &>(*m_mintf).m_dcache.read_interruptible(srcp | u32(srcb << 15));
 		if (!BIT(mode, 1))
 		{
 			if (srcp++ == 0x7fff)
@@ -1036,9 +1042,9 @@ void st2205u_base_device::dcnth_w(u8 data)
 
 		// TODO: XOR/OR/AND logic for DMA0 three-cycle modes (different on ST23XX?)
 		if (BIT(dstb, 15))
-			mintf->cprogram.write_byte(dstp, data); // FIXME: 0080-7FFF should be all RAM on ST2205U
+			m_mintf->m_cprogram.write_interruptible(dstp, data); // FIXME: 0080-7FFF should be all RAM on ST2205U
 		else
-			downcast<mi_st2xxx &>(*mintf).dcache.write_byte(dstp | u32(dstb << 15), data);
+			downcast<mi_st2xxx &>(*m_mintf).m_dcache.write_interruptible(dstp | u32(dstb << 15), data);
 		if (!BIT(mode, 3))
 		{
 			if (dstp++ == 0x7fff)
@@ -1189,62 +1195,62 @@ void st2302u_device::unk7f_w(u8 data)
 
 u8 st2205u_device::ram_r(offs_t offset)
 {
-	return downcast<mi_st2205u &>(*mintf).ram[0x0080 + offset];
+	return downcast<mi_st2205u &>(*m_mintf).m_ram[0x0080 + offset];
 }
 
 void st2205u_device::ram_w(offs_t offset, u8 data)
 {
-	downcast<mi_st2205u &>(*mintf).ram[0x0080 + offset] = data;
+	downcast<mi_st2205u &>(*m_mintf).m_ram[0x0080 + offset] = data;
 }
 
 u8 st2205u_device::pmem_r(offs_t offset)
 {
-	return downcast<mi_st2205u &>(*mintf).pread(offset);
+	return downcast<mi_st2205u &>(*m_mintf).pread(offset);
 }
 
 void st2205u_device::pmem_w(offs_t offset, u8 data)
 {
-	downcast<mi_st2205u &>(*mintf).pwrite(offset, data);
+	downcast<mi_st2205u &>(*m_mintf).pwrite(offset, data);
 }
 
 u8 st2205u_device::dmem_r(offs_t offset)
 {
-	return downcast<mi_st2205u &>(*mintf).dread(offset);
+	return downcast<mi_st2205u &>(*m_mintf).dread(offset);
 }
 
 void st2205u_device::dmem_w(offs_t offset, u8 data)
 {
-	downcast<mi_st2205u &>(*mintf).dwrite(offset, data);
+	downcast<mi_st2205u &>(*m_mintf).dwrite(offset, data);
 }
 
 u8 st2205u_device::bmem_r(offs_t offset)
 {
-	return downcast<mi_st2205u &>(*mintf).bread(offset);
+	return downcast<mi_st2205u &>(*m_mintf).bread(offset);
 }
 
 void st2205u_device::bmem_w(offs_t offset, u8 data)
 {
-	downcast<mi_st2205u &>(*mintf).bwrite(offset, data);
+	downcast<mi_st2205u &>(*m_mintf).bwrite(offset, data);
 }
 
 u8 st2302u_device::pmem_r(offs_t offset)
 {
-	return downcast<mi_st2302u &>(*mintf).pread(offset);
+	return downcast<mi_st2302u &>(*m_mintf).pread(offset);
 }
 
 void st2302u_device::pmem_w(offs_t offset, u8 data)
 {
-	downcast<mi_st2302u &>(*mintf).pwrite(offset, data);
+	downcast<mi_st2302u &>(*m_mintf).pwrite(offset, data);
 }
 
 u8 st2302u_device::dmem_r(offs_t offset)
 {
-	return downcast<mi_st2302u &>(*mintf).dread(offset);
+	return downcast<mi_st2302u &>(*m_mintf).dread(offset);
 }
 
 void st2302u_device::dmem_w(offs_t offset, u8 data)
 {
-	downcast<mi_st2302u &>(*mintf).dwrite(offset, data);
+	downcast<mi_st2302u &>(*m_mintf).dwrite(offset, data);
 }
 
 void st2205u_base_device::base_map(address_map &map)
@@ -1313,6 +1319,8 @@ void st2205u_device::int_map(address_map &map)
 	map(0x004c, 0x004c).w(FUNC(st2205u_device::lpal_w));
 	map(0x004e, 0x004e).rw(FUNC(st2205u_device::pl_r), FUNC(st2205u_device::pl_w));
 	map(0x004f, 0x004f).rw(FUNC(st2205u_device::pcl_r), FUNC(st2205u_device::pcl_w));
+	map(0x0050, 0x0050).rw(FUNC(st2205u_device::sdatal_r), FUNC(st2205u_device::sdatal_w));
+	map(0x0051, 0x0051).rw(FUNC(st2205u_device::sdatah_r), FUNC(st2205u_device::sdatah_w));
 	map(0x0052, 0x0052).rw(FUNC(st2205u_device::sctr_r), FUNC(st2205u_device::sctr_w));
 	map(0x0053, 0x0053).rw(FUNC(st2205u_device::sckr_r), FUNC(st2205u_device::sckr_w));
 	map(0x0054, 0x0054).rw(FUNC(st2205u_device::ssr_r), FUNC(st2205u_device::ssr_w));
@@ -1341,6 +1349,8 @@ void st2302u_device::int_map(address_map &map)
 	map(0x0008, 0x000d).rw(FUNC(st2302u_device::pctrl_r), FUNC(st2302u_device::pctrl_w));
 	map(0x000e, 0x000e).rw(FUNC(st2302u_device::pfc_r), FUNC(st2302u_device::pfc_w));
 	map(0x000f, 0x000f).rw(FUNC(st2302u_device::pfd_r), FUNC(st2302u_device::pfd_w));
+	map(0x0010, 0x0010).rw(FUNC(st2302u_device::sdatal_r), FUNC(st2302u_device::sdatal_w));
+	map(0x0011, 0x0011).rw(FUNC(st2302u_device::sdatah_r), FUNC(st2302u_device::sdatah_w));
 	map(0x0012, 0x0012).rw(FUNC(st2302u_device::sctr_r), FUNC(st2302u_device::sctr_w));
 	map(0x0013, 0x0013).rw(FUNC(st2302u_device::sckr_r), FUNC(st2302u_device::sckr_w));
 	map(0x0014, 0x0014).rw(FUNC(st2302u_device::ssr_r), FUNC(st2302u_device::ssr_w));

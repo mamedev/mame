@@ -67,7 +67,7 @@ class hp98032_gpio_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	hp98032_gpio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp98032_gpio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~hp98032_gpio_slot_device();
 
 	// Bits in jumper configuration

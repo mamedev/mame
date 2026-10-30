@@ -17,6 +17,7 @@ BUGS:
 #include "emu.h"
 #include "beta_m.h"
 
+#include "formats/scl_dsk.h"
 #include "formats/trd_dsk.h"
 
 
@@ -27,6 +28,7 @@ void floppy_formats(format_registration &fr)
 	fr.add_mfm_containers();
 	fr.add_pc_formats();
 	fr.add(FLOPPY_TRD_FORMAT);
+	fr.add(FLOPPY_SCL_FORMAT);
 }
 
 void beta_disk_floppies(device_slot_interface &device)
@@ -67,8 +69,6 @@ void beta_disk_device::device_start()
 	save_item(NAME(m_betadisk_active));
 	save_item(NAME(m_control));
 	save_item(NAME(m_motor_active));
-
-	m_floppy_led.resolve();
 }
 
 //-------------------------------------------------

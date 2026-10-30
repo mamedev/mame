@@ -53,7 +53,7 @@ class dac76_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
-	dac76_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dac76_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// By default, the control current (Iref) is treated as normalized ([0, 1],
 	// defaults to 1), and the sound output is normalized to [-1, 1].

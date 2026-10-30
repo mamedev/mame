@@ -16,10 +16,7 @@ public:
 	interpro_mouse_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, const char *default_option)
 		: interpro_mouse_port_device(mconfig, tag, owner)
 	{
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(false);
+		set_options(std::forward<T>(slot_options), default_option, false);
 	}
 
 	interpro_mouse_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
@@ -28,9 +25,9 @@ public:
 	auto state_func() { return m_state_func.bind(); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_config_complete() override;
+	virtual void device_config_complete() override ATTR_COLD;
 
 private:
 	devcb_write32 m_state_func;
@@ -73,7 +70,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_y);
 
 protected:
-	// device overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 

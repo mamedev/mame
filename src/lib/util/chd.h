@@ -227,6 +227,8 @@ constexpr chd_metadata_tag CDROM_TRACK_METADATA_TAG = CHD_MAKE_TAG('C','H','T','
 extern const char *CDROM_TRACK_METADATA_FORMAT;
 constexpr chd_metadata_tag CDROM_TRACK_METADATA2_TAG = CHD_MAKE_TAG('C','H','T','2');
 extern const char *CDROM_TRACK_METADATA2_FORMAT;
+constexpr chd_metadata_tag CDROM_SESSION_METADATA_TAG = CHD_MAKE_TAG('C','H','S','E');
+extern const char *CDROM_SESSION_METADATA_FORMAT;
 constexpr chd_metadata_tag GDROM_OLD_METADATA_TAG = CHD_MAKE_TAG('C','H','G','T');
 constexpr chd_metadata_tag GDROM_TRACK_METADATA_TAG = CHD_MAKE_TAG('C', 'H', 'G', 'D');
 extern const char *GDROM_TRACK_METADATA_FORMAT;
@@ -322,12 +324,15 @@ public:
 
 	// file create
 	std::error_condition create(std::string_view filename, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, const chd_codec_type (&compression)[4]);
+	std::error_condition create(util::random_read_write &file, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, const chd_codec_type (&compression)[4]);
 	std::error_condition create(util::random_read_write::ptr &&file, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, const chd_codec_type (&compression)[4]);
 	std::error_condition create(std::string_view filename, uint64_t logicalbytes, uint32_t hunkbytes, const chd_codec_type (&compression)[4], chd_file &parent);
+	std::error_condition create(util::random_read_write &file, uint64_t logicalbytes, uint32_t hunkbytes, const chd_codec_type (&compression)[4], chd_file &parent);
 	std::error_condition create(util::random_read_write::ptr &&file, uint64_t logicalbytes, uint32_t hunkbytes, const chd_codec_type (&compression)[4], chd_file &parent);
 
 	// file open
 	std::error_condition open(std::string_view filename, bool writeable = false, chd_file *parent = nullptr, const open_parent_func &open_parent = nullptr);
+	std::error_condition open(util::random_read_write &file, bool writeable = false, chd_file *parent = nullptr, const open_parent_func &open_parent = nullptr);
 	std::error_condition open(util::random_read_write::ptr &&file, bool writeable = false, chd_file *parent = nullptr, const open_parent_func &open_parent = nullptr);
 
 	// file close
@@ -344,12 +349,13 @@ public:
 
 	// metadata management
 	std::error_condition read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::string &output);
+	std::error_condition read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::string &output, uint32_t &index);
 	std::error_condition read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::vector<uint8_t> &output);
 	std::error_condition read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, void *output, uint32_t outputlen, uint32_t &resultlen);
 	std::error_condition read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::vector<uint8_t> &output, chd_metadata_tag &resulttag, uint8_t &resultflags);
 	std::error_condition write_metadata(chd_metadata_tag metatag, uint32_t metaindex, const void *inputbuf, uint32_t inputlen, uint8_t flags = CHD_MDFLAGS_CHECKSUM);
 	std::error_condition write_metadata(chd_metadata_tag metatag, uint32_t metaindex, const std::string &input, uint8_t flags = CHD_MDFLAGS_CHECKSUM) { return write_metadata(metatag, metaindex, input.c_str(), input.length() + 1, flags); }
-	std::error_condition write_metadata(chd_metadata_tag metatag, uint32_t metaindex, const std::vector<uint8_t> &input, uint8_t flags = CHD_MDFLAGS_CHECKSUM) { return write_metadata(metatag, metaindex, &input[0], input.size(), flags); }
+	std::error_condition write_metadata(chd_metadata_tag metatag, uint32_t metaindex, const std::vector<uint8_t> &input, uint8_t flags = CHD_MDFLAGS_CHECKSUM) { return write_metadata(metatag, metaindex, input.data(), input.size(), flags); }
 	std::error_condition delete_metadata(chd_metadata_tag metatag, uint32_t metaindex);
 	std::error_condition clone_all_metadata(chd_file &source);
 
@@ -376,7 +382,6 @@ private:
 	std::error_condition file_read(uint64_t offset, void *dest, uint32_t length) const noexcept;
 	std::error_condition file_write(uint64_t offset, const void *source, uint32_t length) noexcept;
 	uint64_t file_append(const void *source, uint32_t length, uint32_t alignment = 0);
-	static uint8_t bits_for_value(uint64_t value) noexcept;
 
 	// internal helpers
 	uint32_t guess_unitbytes();
@@ -395,10 +400,10 @@ private:
 	std::error_condition metadata_find(chd_metadata_tag metatag, int32_t metaindex, metadata_entry &metaentry, bool resume = false) const noexcept;
 	std::error_condition metadata_set_previous_next(uint64_t prevoffset, uint64_t nextoffset) noexcept;
 	void metadata_update_hash();
-	static int CLIB_DECL metadata_hash_compare(const void *elem1, const void *elem2);
 
 	// file characteristics
-	util::random_read_write::ptr m_file;        // handle to the open core file
+	util::random_read_write::ptr m_owned_file;  // open file if we own it
+	util::random_read_write *m_file;            // handle to the open file
 	bool                    m_allow_reads;      // permit reads from this CHD?
 	bool                    m_allow_writes;     // permit writes to this CHD?
 
@@ -412,7 +417,7 @@ private:
 	uint32_t                m_unitbytes;        // size of each unit in bytes
 	uint64_t                m_unitcount;        // number of units represented
 	chd_codec_type          m_compression[4];   // array of compression types used
-	std::shared_ptr<chd_file> m_parent;           // pointer to parent file, or nullptr if none
+	std::shared_ptr<chd_file> m_parent;         // pointer to parent file, or nullptr if none
 	bool                    m_parent_missing;   // are we missing our parent?
 
 	// key offsets within the header

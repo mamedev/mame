@@ -17,6 +17,8 @@
 #include "multibyte.h"
 #include "opresolv.h"
 
+#include <cstring>
+
 #define FAT_SECLEN              512
 
 

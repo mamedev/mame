@@ -28,6 +28,7 @@ Notes:
 
 #include "machine/nvram.h"
 
+#include "speaker.h"
 
 void nbmj9195_state::machine_start()
 {
@@ -1689,7 +1690,7 @@ void nbmj9195_state::nbmjtype1(machine_config &config)
 	m_dsw_shifter[1]->qh_callback().set([this](int state) { m_dsw_data = state; });
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(1024, 512);     /* no way this is correct */
@@ -1701,7 +1702,10 @@ void nbmj9195_state::nbmjtype1(machine_config &config)
 	PALETTE(config, m_palette).set_entries(256);
 
 	// sound hardware
-	NICHISND(config, "nichisnd", 0);
+	SPEAKER(config, "speaker").front_center();
+
+	nichisnd_device &nichisnd(NICHISND(config, "nichisnd"));
+	nichisnd.add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void nbmj9195_state::nbmjtype2(machine_config &config)
@@ -1718,7 +1722,7 @@ void nbmj9195_state::nbmjtype2(machine_config &config)
 	m_maincpu->out_pe_callback().set(FUNC(nbmj9195_state::gfxflag2_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(1024, 512);     /* no way this is correct */
@@ -1732,7 +1736,10 @@ void nbmj9195_state::nbmjtype2(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(nbmj9195_state, nb22090)
 
 	// sound hardware
-	NICHISND(config, "nichisnd", 0);
+	SPEAKER(config, "speaker").front_center();
+
+	nichisnd_device &nichisnd(NICHISND(config, "nichisnd"));
+	nichisnd.add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void nbmj9195_state::mjuraden(machine_config &config)

@@ -16,7 +16,6 @@
 
     TODO:
 
-    - floppy loading
     - TMS9914 IEEE-488 controller
     - board 2 (4x 2651 USART)
     - Winchester controller
@@ -185,7 +184,7 @@ void sage2_state::ppi0_pc_w(uint8_t data)
 	m_fdc->tc_w(BIT(data, 0));
 
 	// floppy ready
-	m_fdc->ready_w(BIT(data, 1));
+	m_fdc->ready_w(!BIT(data, 1));
 
 	// floppy interrupt enable
 	m_fdie = BIT(data, 2);
@@ -203,7 +202,7 @@ void sage2_state::ppi0_pc_w(uint8_t data)
 	if (m_floppy) m_floppy->mon_w(BIT(data, 5));
 
 	// FDC reset
-	if(BIT(data, 7)) m_fdc->reset();
+	m_fdc->reset_w(BIT(data, 7));
 }
 
 
@@ -259,10 +258,10 @@ uint8_t sage2_state::ppi1_pb_r()
 	uint8_t data = 0;
 
 	// floppy interrupt
-	data = m_fdc->get_irq();
+	data |= m_fdc->get_irq();
 
 	// floppy write protected
-	data = (m_floppy ? m_floppy->wpt_r() : 1) << 1;
+	data |= (m_floppy ? m_floppy->wpt_r() : 1) << 1;
 
 	// RS-232 ring indicator
 
@@ -359,7 +358,7 @@ void sage2_state::fdc_irq(int state)
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_19200 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_19200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
@@ -376,7 +375,6 @@ DEVICE_INPUT_DEFAULTS_END
 
 void sage2_state::machine_start()
 {
-	m_led.resolve();
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_rom(0x000000, 0x001fff, 0x07e000, m_rom->base()); // Avoid the 68000 reading from lalaland in its reset handler
 }
@@ -413,7 +411,7 @@ void sage2_state::sage2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sage2_state::sage2_mem);
 
 	// devices
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, M68K_IRQ_1);
 
 	i8255_device &ppi0(I8255A(config, I8255A_0_TAG));
@@ -426,7 +424,7 @@ void sage2_state::sage2(machine_config &config)
 	ppi1.in_pb_callback().set(FUNC(sage2_state::ppi1_pb_r));
 	ppi1.out_pc_callback().set(FUNC(sage2_state::ppi1_pc_w));
 
-	pit8253_device &i8253_0(PIT8253(config, I8253_0_TAG, 0));
+	pit8253_device &i8253_0(PIT8253(config, I8253_0_TAG));
 	i8253_0.set_clk<0>(0); // from U75 OUT0
 	i8253_0.out_handler<0>().set(m_pic, FUNC(pic8259_device::ir6_w));
 	i8253_0.set_clk<1>(XTAL(16'000'000)/2/125);
@@ -434,7 +432,7 @@ void sage2_state::sage2(machine_config &config)
 	i8253_0.set_clk<2>(0); // from OUT2
 	i8253_0.out_handler<2>().set(m_pic, FUNC(pic8259_device::ir0_w));
 
-	pit8253_device &i8253_1(PIT8253(config, I8253_1_TAG, 0));
+	pit8253_device &i8253_1(PIT8253(config, I8253_1_TAG));
 	i8253_1.set_clk<0>(XTAL(16'000'000)/2/125);
 	i8253_1.out_handler<0>().set(I8253_0_TAG, FUNC(pit8253_device::write_clk0));
 	i8253_1.set_clk<1>(XTAL(16'000'000)/2/13);
@@ -442,7 +440,7 @@ void sage2_state::sage2(machine_config &config)
 	i8253_1.set_clk<2>(XTAL(16'000'000)/2/13);
 	i8253_1.out_handler<2>().set(FUNC(sage2_state::br2_w));
 
-	I8251(config, m_usart0, 0);
+	I8251(config, m_usart0);
 	m_usart0->txd_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
 	m_usart0->dtr_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
 	m_usart0->rts_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
@@ -455,7 +453,7 @@ void sage2_state::sage2(machine_config &config)
 	rs232a.cts_handler().set(m_usart0, FUNC(i8251_device::write_cts));
 	rs232a.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	I8251(config, m_usart1, 0);
+	I8251(config, m_usart1);
 	m_usart1->txd_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
 	m_usart1->dtr_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
 	m_usart1->rts_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
@@ -510,22 +508,8 @@ ROM_END
 
 
 //**************************************************************************
-//  DRIVER INITIALIZATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  DRIVER_INIT( sage2 )
-//-------------------------------------------------
-
-void sage2_state::init_sage2()
-{
-}
-
-
-
-//**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY            FULLNAME   FLAGS
-COMP( 1982, sage2,  0,      0,      sage2,   sage2, sage2_state, init_sage2, "Sage Technology", "Sage II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, sage2,  0,      0,      sage2,   sage2, sage2_state, empty_init, "Sage Technology", "Sage II", MACHINE_NO_SOUND )

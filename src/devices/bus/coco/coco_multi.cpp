@@ -92,6 +92,7 @@ namespace
 		: public device_t
 		, public device_cococart_interface
 		, public device_cococart_host_interface
+		, public device_sound_interface
 	{
 	public:
 		// construction/destruction
@@ -105,11 +106,12 @@ namespace
 		// device-level overrides
 		virtual void device_start() override ATTR_COLD;
 		virtual void device_reset() override ATTR_COLD;
+		virtual void sound_stream_update(sound_stream &stream) override ATTR_COLD;
+		virtual void device_resolve_objects() override ATTR_COLD;
 		virtual u8 cts_read(offs_t offset) override;
 		virtual void cts_write(offs_t offset, u8 data) override;
 		virtual u8 scs_read(offs_t offset) override;
 		virtual void scs_write(offs_t offset, u8 data) override;
-		virtual void set_sound_enable(bool sound_enable) override;
 
 		// optional information overrides
 		virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -118,6 +120,8 @@ namespace
 		virtual u32 get_cart_size() override;
 
 		virtual address_space &cartridge_space() override;
+		virtual void add_sound_route(device_sound_interface &sound_device, int output_index, double gain) override;
+		virtual void set_sound_gain(device_sound_interface &sound_device, int output_index, double gain) override;
 		virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 		// device references
@@ -127,6 +131,7 @@ namespace
 
 	private:
 		// internal state
+		sound_stream *m_mixer_stream;
 		u8 m_select;
 		u8 m_block;
 
@@ -251,6 +256,42 @@ DEFINE_DEVICE_TYPE_PRIVATE(DRAGON_MULTIPAK, device_cococart_interface, dragon_mu
 //**************************************************************************
 
 //-------------------------------------------------
+//  device_resolve_objects
+//-------------------------------------------------
+
+void coco_multipak_device::device_resolve_objects()
+{
+	device_cococart_interface::add_sound_route(*this, 0, 1.0);
+}
+
+//-------------------------------------------------
+//  add_sound_route
+//-------------------------------------------------
+
+void coco_multipak_device::add_sound_route(device_sound_interface &sound_device, int output_index, double gain)
+{
+	sound_device.add_route(output_index, *this, gain, 0);
+}
+
+//-------------------------------------------------
+//  add_sound_route
+//-------------------------------------------------
+
+void coco_multipak_device::set_sound_gain(device_sound_interface &sound_device, int output_index, double gain)
+{
+	sound_device.set_route_gain(output_index, this, 0, gain);
+}
+
+//-------------------------------------------------
+//  sound_stream_update
+//-------------------------------------------------
+
+void coco_multipak_device::sound_stream_update(sound_stream &stream)
+{
+	stream.copy(0, 0);
+}
+
+//-------------------------------------------------
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
@@ -266,6 +307,7 @@ ioport_constructor coco_multipak_device::device_input_ports() const
 coco_multipak_device::coco_multipak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this)
+	, device_sound_interface(mconfig, *this)
 	, m_slots(*this, "slot%u", 1), m_select(0), m_block(0)
 {
 }
@@ -287,11 +329,13 @@ dragon_multipak_device::dragon_multipak_device(const machine_config &mconfig, co
 void coco_multipak_device::device_start()
 {
 	// install $FF7F handler
-	install_readwrite_handler(0xFF7F, 0xFF7F, read8smo_delegate(*this, FUNC(coco_multipak_device::ff7f_read)), write8smo_delegate(*this, FUNC(coco_multipak_device::ff7f_write)));
+	install_readwrite_handler(0xff7f, 0xff7f, read8smo_delegate(*this, FUNC(coco_multipak_device::ff7f_read)), write8smo_delegate(*this, FUNC(coco_multipak_device::ff7f_write)));
 
 	// initial state
-	m_select = 0xFF;
+	m_select = 0xff;
 	m_block = 0;
+
+	m_mixer_stream = stream_alloc(1, 1, machine().sample_rate());
 
 	// save state
 	save_item(NAME(m_select));
@@ -456,18 +500,6 @@ void coco_multipak_device::update_line(int slot_number, line ln)
 
 	if (propagate)
 		owning_slot().set_line_value(ln, slot(slot_number).get_line_value(ln));
-}
-
-
-//-------------------------------------------------
-//  set_sound_enable
-//-------------------------------------------------
-
-void coco_multipak_device::set_sound_enable(bool sound_enable)
-{
-	// the SOUND_ENABLE (SNDEN) line is different; it is controlled by the CPU
-	for (cococart_slot_device *slot : m_slots)
-		slot->set_line_value(line::SOUND_ENABLE, sound_enable ? line_value::ASSERT : line_value::CLEAR);
 }
 
 

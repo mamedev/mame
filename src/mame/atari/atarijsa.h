@@ -54,7 +54,7 @@ class atari_jsa_base_device :   public device_t,
 {
 protected:
 	// construction/destruction
-	atari_jsa_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock);
+	atari_jsa_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock = 0);
 
 public:
 	// configuration
@@ -125,14 +125,14 @@ class atari_jsa_oki_base_device : public atari_jsa_base_device
 {
 protected:
 	// derived construction/destruction
-	atari_jsa_oki_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock);
+	atari_jsa_oki_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock = 0);
 
 public:
 	// read/write handlers
 	uint8_t oki_r(offs_t offset);
 	void oki_w(offs_t offset, uint8_t data);
-	void wrio_w(uint8_t data);
-	void mix_w(uint8_t data);
+	virtual void wrio_w(uint8_t data);
+	virtual void mix_w(uint8_t data);
 	void overall_volume_w(uint8_t data);
 
 protected:
@@ -147,16 +147,6 @@ protected:
 	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;    // JSA IIIs only
 
-	// memory regions
-	optional_memory_region m_oki1_region;
-	optional_memory_region m_oki2_region;
-
-	// memory banks
-	optional_memory_bank m_oki1_banklo;         // JSA III(s) only
-	optional_memory_bank m_oki1_bankhi;         // JSA III(s)
-	optional_memory_bank m_oki2_banklo;         // JSA IIIs only
-	optional_memory_bank m_oki2_bankhi;         // JSA IIIs only
-
 	// internal state
 	double              m_oki6295_volume;
 	double              m_overall_volume;       // JSA III(s) only
@@ -169,12 +159,12 @@ class atari_jsa_i_device : public atari_jsa_base_device
 {
 public:
 	// construction/destruction
-	atari_jsa_i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_jsa_i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// read/write handlers
 	uint8_t rdio_r();
-	void wrio_w(uint8_t data);
-	void mix_w(uint8_t data);
+	virtual void wrio_w(uint8_t data);
+	virtual void mix_w(uint8_t data);
 	void tms5220_voice(uint8_t data);
 	uint8_t pokey_r(offs_t offset);
 	void pokey_w(offs_t offset, uint8_t data);
@@ -207,7 +197,7 @@ class atari_jsa_ii_device : public atari_jsa_oki_base_device
 {
 public:
 	// construction/destruction
-	atari_jsa_ii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_jsa_ii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// read/write handlers
 	uint8_t rdio_r();
@@ -228,13 +218,19 @@ class atari_jsa_iii_device : public atari_jsa_oki_base_device
 {
 public:
 	// construction/destruction
-	atari_jsa_iii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_jsa_iii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void atarijsa3_map(address_map &map) ATTR_COLD;
 	void jsa3_oki1_map(address_map &map) ATTR_COLD;
+	void set_larger_bank() { m_larger_bank = true; }
+
+	template <typename... T> void set_oki_bankregion(T &&... args) { m_oki_bankregion.set_tag(std::forward<T>(args)...); }
+
 protected:
 	// derived construction/destruction
 	atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override ATTR_COLD;
 
 public:
 	// read/write handlers
@@ -244,8 +240,22 @@ protected:
 	// device level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void wrio_w(uint8_t data) override;
+	virtual void mix_w(uint8_t data) override;
+	void configue_banks(memory_bank *lobank, memory_bank *hibank);
+	void set_bank(memory_bank *lobank, memory_bank *hibank, int bank);
 
 	required_ioport m_jsaiii;
+
+	// memory regions - optional because offtwall removes the oki
+	optional_memory_region m_oki_bankregion;
+
+	// memory banks - optional because offtwall removes the oki
+	optional_memory_bank m_oki1_banklo;         // JSA III(s) only
+	optional_memory_bank m_oki1_bankhi;         // JSA III(s)
+
+	bool m_larger_bank;
+
 };
 
 
@@ -255,12 +265,17 @@ class atari_jsa_iiis_device : public atari_jsa_iii_device
 {
 public:
 	// construction/destruction
-	atari_jsa_iiis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_jsa_iiis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void jsa3_oki2_map(address_map &map) ATTR_COLD;
 protected:
 	// device level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void mix_w(uint8_t data) override;
+
+	required_memory_bank m_oki2_banklo;         // JSA IIIs only
+	required_memory_bank m_oki2_bankhi;         // JSA IIIs only
 };
 
 

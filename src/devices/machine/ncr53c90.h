@@ -7,7 +7,7 @@
 
 #include "machine/nscsi_bus.h"
 
-class ncr53c90_device : public nscsi_device, public nscsi_slot_card_interface
+class ncr53c90_device : public device_t, public nscsi_device_interface
 {
 public:
 	ncr53c90_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -359,6 +359,12 @@ public:
 protected:
 	ncr53cf94_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	// 53cf94 has additional features attached to bit 6 of config2
+	enum conf2_mask : u8
+	{
+		ENF = 0x40, // features enable
+	};
+
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -368,6 +374,7 @@ private:
 	u8 config4;
 	u8 family_id;
 	u8 revision_level;
+	bool tcount_hi2_loaded;
 };
 
 class ncr53cf96_device : public ncr53cf94_device

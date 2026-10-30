@@ -615,7 +615,7 @@ void istrebiteli_state::istreb(machine_config &config)
 	ppi1.in_pc_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(8'000'000) / 2, 256, 64, 256, 312, 0, 256);
 	screen.set_screen_update(FUNC(istrebiteli_state::screen_update));
 	screen.set_palette("palette");
@@ -645,7 +645,7 @@ void istrebiteli_state::motogonki(machine_config &config)
 	ppi1.in_pc_callback().set_ioport("IN1");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(8'000'000) / 2, 256, 64, 256, 312, 0, 256);
 	screen.set_screen_update(FUNC(istrebiteli_state::moto_screen_update));
 	screen.set_palette("palette");

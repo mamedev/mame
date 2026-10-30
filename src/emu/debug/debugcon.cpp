@@ -24,6 +24,7 @@
 #include <cctype>
 #include <fstream>
 #include <iterator>
+#include <locale>
 #include <regex>
 
 
@@ -489,6 +490,7 @@ void debugger_console::source_script(const char *file)
 		}
 		else
 		{
+			source_file->imbue(std::locale::classic());
 			m_source_file = std::move(source_file);
 		}
 	}
@@ -554,7 +556,7 @@ std::string debugger_console::cmderr_to_string(CMDERR error)
 		case CMDERR::UNBALANCED_QUOTES:     return "unbalanced quotes";
 		case CMDERR::NOT_ENOUGH_PARAMS:     return "not enough parameters for command";
 		case CMDERR::TOO_MANY_PARAMS:       return "too many parameters for command";
-		case CMDERR::EXPRESSION_ERROR:      return string_format("error in assignment expression: %s",
+		case CMDERR::EXPRESSION_ERROR:      return string_format(std::locale::classic(), "error in assignment expression: %s",
 																 expression_error(static_cast<expression_error::error_code>(offset)).code_string());
 		default:                            return "unknown error";
 	}
@@ -655,6 +657,14 @@ bool debugger_console::validate_number_parameter(std::string_view param, u64 &re
 		printf("%s\n", error.code_string());
 		return false;
 	}
+}
+
+bool debugger_console::validate_number_parameter(std::string_view param, offs_t &result)
+{
+	u64 res;
+	bool ret = validate_number_parameter(param, res);
+	result = res;
+	return ret;
 }
 
 
@@ -764,14 +774,14 @@ bool debugger_console::validate_cpu_parameter(std::string_view param, device_t *
 /// default address space number is negative, the first address space
 /// exposed by the device will be used as the default.
 /// \param [in] The parameter string.
-/// \param [in] spacenum The default address space index.  If negative,
+/// \param [inout] spacenum The default address space index.  If negative,
 ///   the first address space exposed by the device (i.e. the address
-///   space with the lowest index) will be used as the default.
-/// \param [out] result The addresfs space on success, or unchanged on
-///   failure.
+///   space with the lowest index) will be used as the default and
+///   returned
+/// \param [out] mintf Memory interface of the device when found
 /// \return true if the parameter refers to an address space in the
 ///   current system, or false otherwise.
-bool debugger_console::validate_device_space_parameter(std::string_view param, int spacenum, address_space *&result)
+bool debugger_console::validate_device_space_parameter(std::string_view param, int &spacenum, device_memory_interface *&mintf)
 {
 	device_t *device;
 	std::string spacename;
@@ -837,8 +847,7 @@ bool debugger_console::validate_device_space_parameter(std::string_view param, i
 	}
 
 	// ensure the device implements the memory interface
-	device_memory_interface *memory;
-	if (!device->interface(memory))
+	if (!device->interface(mintf))
 	{
 		printf("No memory interface found for device %s\n", device->name());
 		return false;
@@ -847,11 +856,8 @@ bool debugger_console::validate_device_space_parameter(std::string_view param, i
 	// fall back to supplied default space if appropriate
 	if (spacename.empty() && (0 <= spacenum))
 	{
-		if (memory->has_space(spacenum))
-		{
-			result = &memory->space(spacenum);
+		if (mintf->has_logical_space(spacenum))
 			return true;
-		}
 		else
 		{
 			printf("No matching memory space found for device '%s'\n", device->tag());
@@ -860,11 +866,11 @@ bool debugger_console::validate_device_space_parameter(std::string_view param, i
 	}
 
 	// otherwise find the specified space or fall back to the first populated space
-	for (int i = 0; memory->max_space_count() > i; ++i)
+	for (int i = 0; mintf->max_space_count() > i; ++i)
 	{
-		if (memory->has_space(i) && (spacename.empty() || (memory->space(i).name() == spacename)))
+		if (mintf->has_logical_space(i) && (spacename.empty() || (mintf->logical_space_config(i)->name() == spacename)))
 		{
-			result = &memory->space(i);
+			spacenum = i;
 			return true;
 		}
 	}
@@ -894,7 +900,7 @@ bool debugger_console::validate_device_space_parameter(std::string_view param, i
 /// \param [out] addr The address on success, or unchanged on failure.
 /// \return true if the address is a valid expression evaluating to a
 ///   number and the address space is found, or false otherwise.
-bool debugger_console::validate_target_address_parameter(std::string_view param, int spacenum, address_space *&space, u64 &addr)
+bool debugger_console::validate_target_address_parameter(std::string_view param, int &spacenum, device_memory_interface *&mintf, u64 &addr)
 {
 	// check for the device delimiter
 	std::string_view::size_type const devdelim = find_delimiter(param, [] (char ch) { return ':' == ch; });
@@ -903,15 +909,15 @@ bool debugger_console::validate_target_address_parameter(std::string_view param,
 		device = param.substr(devdelim + 1);
 
 	// parse the address first
-	u64 addrval;
+	offs_t addrval;
 	if (!validate_number_parameter(param.substr(0, devdelim), addrval))
 		return false;
 
-	// find the address space
-	if (!validate_device_space_parameter(device, spacenum, space))
+	// find the logical space
+	if (!validate_device_space_parameter(device, spacenum, mintf))
 		return false;
 
-	// set the address now that we have the space
+	// set the address now that we have the interface
 	addr = addrval;
 	return true;
 }
@@ -1151,7 +1157,7 @@ void debugger_console::print_core_wrap(std::string_view text, int wrapcol)
 
 void debugger_console::vprintf(util::format_argument_pack<char> const &args)
 {
-	print_core(util::string_format(args));
+	print_core(util::string_format(std::locale::classic(), args));
 
 	// force an update of any console views
 	m_machine.debug_view().update_all(DVT_CONSOLE);
@@ -1159,7 +1165,7 @@ void debugger_console::vprintf(util::format_argument_pack<char> const &args)
 
 void debugger_console::vprintf(util::format_argument_pack<char> &&args)
 {
-	print_core(util::string_format(std::move(args)));
+	print_core(util::string_format(std::locale::classic(), std::move(args)));
 
 	// force an update of any console views
 	m_machine.debug_view().update_all(DVT_CONSOLE);
@@ -1173,7 +1179,7 @@ void debugger_console::vprintf(util::format_argument_pack<char> &&args)
 
 void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<char> const &args)
 {
-	print_core_wrap(util::string_format(args), wrapcol);
+	print_core_wrap(util::string_format(std::locale::classic(), args), wrapcol);
 
 	// force an update of any console views
 	m_machine.debug_view().update_all(DVT_CONSOLE);
@@ -1181,7 +1187,7 @@ void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<char
 
 void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<char> &&args)
 {
-	print_core_wrap(util::string_format(std::move(args)), wrapcol);
+	print_core_wrap(util::string_format(std::locale::classic(), std::move(args)), wrapcol);
 
 	// force an update of any console views
 	m_machine.debug_view().update_all(DVT_CONSOLE);

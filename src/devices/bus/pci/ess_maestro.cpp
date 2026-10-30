@@ -74,7 +74,9 @@ void es1946_solo1e_device::device_reset()
 	command = 0x0000;
 	// ACPI capable, Fast back-to-back, medium DEVSEL#
 	status = 0x0290;
-	// TODO: min_gnt 0x02, max_lat = 0x18
+	// min_gnt = 0.5 usec, max_lat = 6 usec
+	minimum_grant = 0x02;
+	maximum_latency = 0x18;
 
 	remap_cb();
 }

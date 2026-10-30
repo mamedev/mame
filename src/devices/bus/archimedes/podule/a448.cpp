@@ -100,7 +100,7 @@ const tiny_rom_entry *arc_a448b_device::device_rom_region() const
 
 void arc_a448_device::device_add_mconfig(machine_config &config)
 {
-	//ZN448(config, "zn448", 0);
+	//ZN448(config, "zn448");
 }
 
 void arc_a448b_device::device_add_mconfig(machine_config &config)

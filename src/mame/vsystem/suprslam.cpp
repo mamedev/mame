@@ -422,7 +422,7 @@ void suprslam_state::suprslam(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &suprslam_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &suprslam_state::sound_io_map);
 
-	vs9209_device &io(VS9209(config, "io", 0));
+	vs9209_device &io(VS9209(config, "io"));
 	io.porta_input_cb().set_ioport("P1");
 	io.portb_input_cb().set_ioport("P2");
 	io.portc_input_cb().set_ioport("SYSTEM");
@@ -432,7 +432,7 @@ void suprslam_state::suprslam(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_suprslam);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2300)); // hand-tuned
@@ -443,10 +443,10 @@ void suprslam_state::suprslam(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xGBR_555, 0x800);
 
-	VSYSTEM_SPR(config, m_spr, 0, m_palette, gfx_suprslam_spr);
+	VSYSTEM_SPR(config, m_spr, m_palette, gfx_suprslam_spr);
 	m_spr->set_tile_indirect_cb(FUNC(suprslam_state::tile_callback));
 
-	K053936(config, m_k053936, 0);
+	K053936(config, m_k053936);
 	m_k053936->set_wrap(1);
 	m_k053936->set_offsets(-45, -21);
 

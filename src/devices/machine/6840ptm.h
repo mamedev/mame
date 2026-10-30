@@ -24,7 +24,7 @@ class ptm6840_device : public device_t
 {
 public:
 	// construction/destruction
-	ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_external_clocks(double clock0, double clock1, double clock2) { m_external_clock[0] = clock0; m_external_clock[1] = clock1; m_external_clock[2] = clock2; }
 	void set_external_clocks(const XTAL &clock0, const XTAL &clock1, const XTAL &clock2) { set_external_clocks(clock0.dvalue(), clock1.dvalue(), clock2.dvalue()); }

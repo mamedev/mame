@@ -96,7 +96,7 @@ const tiny_rom_entry *bsmt2000_device::device_rom_region() const
 
 void bsmt2000_device::device_add_mconfig(machine_config &config)
 {
-	tms32015_device &tms(TMS32015(config, "bsmt2000", DERIVED_CLOCK(1,1)));
+	tms320c15_device &tms(TMS320C15(config, "bsmt2000", DERIVED_CLOCK(1,1)));
 	tms.set_addrmap(AS_PROGRAM, &bsmt2000_device::tms_program_map);
 	// data map is internal to the CPU
 	tms.set_addrmap(AS_IO, &bsmt2000_device::tms_io_map);
@@ -327,7 +327,7 @@ void bsmt2000_device::tms_right_w(uint16_t data)
 //-------------------------------------------------
 //  tms_write_pending_r - return whether a write
 //  is pending; this data is fed into the BIO line
-//  on the TMS32015
+//  on the TMS320C15
 //-------------------------------------------------
 
 int bsmt2000_device::tms_write_pending_r()

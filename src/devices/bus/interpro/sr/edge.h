@@ -7,12 +7,14 @@
 
 #include "sr.h"
 
-#include "screen.h"
-#include "machine/ram.h"
-#include "cpu/tms32031/tms32031.h"
-#include "video/bt45x.h"
-#include "machine/z80scc.h"
 #include "bus/interpro/keyboard/keyboard.h"
+#include "cpu/tms320c3x/tms320c3x.h"
+#include "machine/ram.h"
+#include "machine/z80scc.h"
+#include "video/bt45x.h"
+
+#include "screen.h"
+
 
 class edge1_device_base : public device_t, public device_srx_card_interface
 {
@@ -55,7 +57,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<ram_device> m_sram;
 	required_device<ram_device> m_vram;
-	required_device<tms3203x_device> m_dsp;
+	required_device<tms320c3x_device> m_dsp;
 	required_device<bt458_device> m_ramdac;
 	required_device<z80scc_device> m_scc;
 
@@ -98,7 +100,7 @@ class edge2plus_processor_device_base : public device_t, public device_srx_card_
 {
 public:
 	void register_screen(screen_device *screen, ram_device *ram) { m_screen = screen; m_sram = ram; }
-	required_device<tms3203x_device> m_dsp1;
+	required_device<tms320c3x_device> m_dsp1;
 
 protected:
 	edge2plus_processor_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

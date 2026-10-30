@@ -8,14 +8,15 @@ Excalibur Ivan The Terrible (model 701E, H8/3256 version)
 This is the first version, see ivant.cpp for the newer version. It was produced
 in a factory owned by Eric White's company (ex-CXG), hence it's not that strange
 that the LCD is the same as the one in CXG Sphinx Legend and Krypton Challenge.
-Ron Nelson was reluctant about it, since Eric White was the same person that
-bootlegged his Fidelity Chess Challenger 10.
+
+Ron Nelson (Excalibur) was reluctant about letting Eric White manufacture it,
+since he was the same person that bootlegged Ron's Fidelity Chess Challenger 10.
 
 Hardware notes:
 - PCB label: EXCALIBUR ELECTRONICS, INC. 6/28/96, IVANT
 - Hitachi H8/3256 MCU (mode 1), 20MHz XTAL
 - 8-bit DAC (8L503 resistor array), KA8602 amplifier, 1MB ROM (custom label)
-- LCD with 5 7segs and custom segments
+- LCD with 5 7segs and custom segments (same as CXG Sphinx Legend)
 - no LEDs, button sensors chessboard
 
 The MCU used here is a HD6433256A33P from Excalibur Mirage, the internal ROM
@@ -40,7 +41,7 @@ BTANB:
 #include "sound/dac.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -106,7 +107,6 @@ private:
 
 void ivanto_state::machine_start()
 {
-	m_out_lcd.resolve();
 	m_rombank->configure_entries(0, 64, memregion("rombank")->base(), 0x4000);
 
 	// periodically check for interrupts
@@ -183,15 +183,15 @@ u8 ivanto_state::read_inputs()
 {
 	u8 data = 0;
 
-	// read buttons
-	for (int i = 0; i < 2; i++)
-		if (BIT(m_inp_mux, i + 8))
-			data |= m_inputs[i]->read();
-
 	// read chessboard
 	for (int i = 0; i < 8; i++)
 		if (BIT(m_inp_mux, i))
 			data |= m_board->read_file(i, true);
+
+	// read buttons
+	for (int i = 0; i < 2; i++)
+		if (BIT(m_inp_mux, i + 8))
+			data |= m_inputs[i]->read();
 
 	// P64-P66 are also IRQ pins (the ON button is IRQ0)
 	if (!machine().side_effects_disabled())
@@ -307,10 +307,9 @@ void ivanto_state::ivanto(machine_config &config)
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(2, 24);
 	m_lcd_pwm->output_x().set(FUNC(ivanto_state::lcd_pwm_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/5, 697/5);
-	screen.set_visarea_full();
 
 	config.set_default_layout(layout_excal_ivanto);
 
@@ -333,7 +332,7 @@ ROM_START( ivanto )
 	ROM_LOAD("1996_701e_excalibur_ivan_t.ic2", 0x000000, 0x100000, CRC(f7c386a1) SHA1(357ca0b0c0b1409d33876b6fa00c5ad74b2643fc) )
 
 	ROM_REGION( 109652, "screen", 0 )
-	ROM_LOAD("kchal.svg", 0, 109652, CRC(6840c49e) SHA1(a9c91143c5bea5ab41fe323e719da4a46ab9d631) )
+	ROM_LOAD("slegend.svg", 0, 109652, CRC(6840c49e) SHA1(a9c91143c5bea5ab41fe323e719da4a46ab9d631) )
 ROM_END
 
 } // anonymous namespace

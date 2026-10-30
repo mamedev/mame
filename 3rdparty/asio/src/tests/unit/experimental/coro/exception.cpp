@@ -61,7 +61,10 @@ asio::experimental::coro<int> throwing_generator(
 
   int i = 0;
   while (i < 3)
-    co_yield last = ++i;
+  {
+    last = ++i;
+    co_yield last;
+  }
 
   throw std::runtime_error("throwing-generator");
 }

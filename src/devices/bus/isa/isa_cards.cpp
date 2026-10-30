@@ -19,11 +19,13 @@
 #include "mda.h"
 #include "num9rev.h"
 #include "pgc.h"
+#include "proga.h"
 #include "svga_cirrus.h"
 #include "svga_paradise.h"
 #include "svga_s3.h"
 #include "svga_trident.h"
 #include "svga_tseng.h"
+#include "tiga_spea.h"
 #include "vga.h"
 #include "vga_ati.h"
 
@@ -34,9 +36,13 @@
 // storage (MFM/RLL/ESDI)
 #include "acb2072.h"
 #include "cl_sh260.h"
+#include "dsi32.h"
+#include "fddda.h"
 #include "hdc.h"
 #include "lrk330.h"
 #include "omti8621.h"
+#include "opus_pm.h"
+#include "pd32.h"
 #include "ultra12f.h"
 #include "wd1002a_wx1.h"
 #include "wd1007a.h"
@@ -49,11 +55,13 @@
 #include "asc88.h"
 #include "bt54x.h"
 #include "dcb.h"
+#include "ncr53c400.h"
 #include "tekram_dc820.h"
 #include "ultra14f.h"
 #include "ultra24f.h"
 
 // storage (IDE/XT-IDE)
+#include "eidemax.h"
 #include "ide.h"
 #include "side116.h"
 #include "xtide.h"
@@ -61,6 +69,7 @@
 // storage (miscellaneous)
 #include "lbaenhancer.h"
 #include "mcd.h"
+#include "stda.h"
 
 // sound
 #include "adlib.h"
@@ -76,6 +85,7 @@
 #include "sblaster.h"
 #include "ssi2001.h"
 #include "stereo_fx.h"
+#include "wss.h"
 
 // network
 #include "3c503.h"
@@ -100,7 +110,6 @@
 #include "chessmsr.h"
 #include "finalchs.h"
 #include "hpblp.h"
-#include "opus100pm.h"
 #include "pcat512me.h"
 #include "zxbus_adapter.h"
 
@@ -131,10 +140,15 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("fdc_ps2", ISA8_FDC_PS2);
 	device.option_add("fdc344", ISA8_FDC344);
 	device.option_add("fdcmag", ISA8_FDCMAG);
+	device.option_add("dsi32", ISA8_DSI32);
+	device.option_add("hdc", ISA8_HDC);
+	device.option_add("opus_pm100", ISA8_OPUS_PM100);
+	device.option_add("opus_pm110", ISA8_OPUS_PM110);
+	device.option_add("pd32", ISA8_PD32);
+	device.option_add("rt1000b", ISA8_RT1000B);
+	device.option_add("side116", ISA8_SIDE116);
 	device.option_add("wdxt_gen", ISA8_WDXT_GEN);
 	device.option_add("xtide", ISA8_XTIDE);
-	device.option_add("side116", ISA8_SIDE116);
-	device.option_add("hdc", ISA8_HDC);
 	device.option_add("adlib", ISA8_ADLIB);
 	device.option_add("hercules", ISA8_HERCULES);
 	device.option_add("gblaster", ISA8_GAME_BLASTER);
@@ -162,10 +176,10 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("babyblue2", ISA8_BABYBLUE2);
 	device.option_add("acb2072", ACB2072);
 	device.option_add("3xtwin", ISA8_3XTWIN);
-	device.option_add("opus108pm", ISA8_OPUS108PM);
 	device.option_add("ibm_speech", ISA8_IBM_SPEECH);
 	device.option_add("zxbus_adapter", ISA8_ZXBUS);
 	device.option_add("ubpnic", ISA8_UBPNIC);
+	device.option_add("proga", ISA8_PROGA);
 }
 
 void pc_isa16_cards(device_slot_interface &device)
@@ -189,9 +203,11 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("gus", ISA16_GUS);
 	device.option_add("pcat512me", ISA16_PCAT512ME);
 	device.option_add("sblaster_16", ISA16_SOUND_BLASTER_16);
+	device.option_add("stda", ISA16_STDA);
 	device.option_add("svga_s3", ISA16_SVGA_S3);
-	device.option_add("svga_dm", ISA16_SVGA_CIRRUS);
+	device.option_add("avga1", ISA16_AVGA1_CIRRUS_GD5401);
 	device.option_add("clgd542x", ISA16_SVGA_CIRRUS_GD542X);
+	device.option_add("svga_dm", ISA16_SVGA_CIRRUS_GD5430);
 	device.option_add("gfxultra", ISA16_VGA_GFXULTRA);
 	device.option_add("gfxultrap", ISA16_SVGA_GFXULTRAPRO);
 	device.option_add("tvga9000", ISA16_SVGA_TVGA9000);
@@ -210,6 +226,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("wd90c33_zz", ISA16_WD90C33_ZZ);
 	device.option_add("3c505", ISA16_3C505);
 	device.option_add("mach64", ISA16_SVGA_MACH64);
+	device.option_add("fga_4he", ISA16_FGA4HE);
 	device.option_add("sb16_lle", ISA16_SB16);
 	device.option_add("mcd", ISA16_MCD);
 	device.option_add("sad8852", ISA16_SAD8852);
@@ -228,6 +245,8 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("omti8621", ISA16_OMTI8621);
 	device.option_add("lrk331", LRK331);
 	device.option_add("hpblp", HPBLP);
+	device.option_add("wss", ISA16_WSS);
+	device.option_add("eidemax", ISA16_EIDEMAX);
 
 	// EISA cards
 	// TODO: move to own block

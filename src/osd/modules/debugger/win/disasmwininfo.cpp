@@ -42,7 +42,7 @@ disasmwin_info::disasmwin_info(debugger_windows_interface &debugger) :
 	recompute_children();
 
 	// position the window and recompute children again
-	debugger.stagger_window(window(), maxwidth(), 200);
+	debugger.stagger_window(window(), maxwidth(), (metrics().debug_font_ascent() * 16) + metrics().hscroll_height());
 	recompute_children();
 
 	// mark the edit box as the default focus and set it
@@ -55,14 +55,21 @@ disasmwin_info::~disasmwin_info()
 }
 
 
+void disasmwin_info::update_dpi()
+{
+	disasmbasewin_info::update_dpi();
+	m_views[0]->recompute_source_combobox(m_combownd);
+}
+
+
 void disasmwin_info::recompute_children()
 {
 	// compute a client rect
 	RECT bounds;
 	bounds.top = bounds.left = 0;
 	bounds.right = m_views[expression_view_index()]->prefwidth() + (2 * EDGE_WIDTH);
-	bounds.bottom = 200;
-	AdjustWindowRectEx(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX);
+	bounds.bottom = (metrics().debug_font_ascent() * 16) + metrics().hscroll_height();
+	AdjustWindowRectExForDpi(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX, metrics().dpi());
 
 	// clamp the min/max size
 	set_maxwidth(bounds.right - bounds.left);

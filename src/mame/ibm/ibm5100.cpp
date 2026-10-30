@@ -29,6 +29,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
@@ -290,7 +292,7 @@ void ibm5100_state::common(machine_config &config)
 	 * pixels with 8x12 driven from character ROS data. The last two horizontal
 	 * pixels of each character cell line and every other scan line are blank.
 	 */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(15'091'200, 64*10+15, 0, 64*10, 16*12*2, 0, 16*12*2);
 	m_screen->set_screen_update(FUNC(ibm5100_state::screen_update));
 }
@@ -380,7 +382,7 @@ u32 ibm5100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, re
 	for (unsigned char_y = 0; char_y < 16; char_y++)
 	{
 		// every alternate scan line is blank
-		int const y = screen.visible_area().min_y + char_y * 12 * 2;
+		int const y = screen.visible_area().top() + char_y * 12 * 2;
 
 		// compute offset into rws for each row
 		offs_t offset = 0x200 + char_y * 64 + r32;
@@ -391,7 +393,7 @@ u32 ibm5100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, re
 			if (!n64 && (char_x & 1))
 				continue;
 
-			int const x = screen.visible_area().min_x + char_x * 10;
+			int const x = screen.visible_area().left() + char_x * 10;
 
 			// read next character
 			u8 const char_data = rws[offset++];

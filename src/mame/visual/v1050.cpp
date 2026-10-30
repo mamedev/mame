@@ -138,17 +138,6 @@ Notes:
 
 */
 
-/*
-
-    TODO:
-
-    - floppy 1 is broken
-    - write to banked RAM at 0x0000-0x1fff when ROM is active
-    - real keyboard w/i8049
-    - keyboard beeper (NE555 wired in strange mix of astable/monostable modes)
-
-*/
-
 #include "emu.h"
 #include "v1050.h"
 
@@ -177,37 +166,12 @@ void v1050_state::set_interrupt(int line, int state)
 
 void v1050_state::bankswitch()
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	int bank = (m_bank >> 1) & 0x03;
+	m_bank_view.select((m_bank >> 1) & 0x03);
 
 	if (BIT(m_bank, 0))
-	{
-		program.install_readwrite_bank(0x0000, 0x1fff, membank("bank1"));
-		membank("bank1")->set_entry(bank);
-	}
+		m_rom_view.disable();
 	else
-	{
-		program.install_read_bank(0x0000, 0x1fff, membank("bank1"));
-		program.unmap_write(0x0000, 0x1fff);
-		membank("bank1")->set_entry(3);
-	}
-
-	membank("bank2")->set_entry(bank);
-
-	if (bank == 2)
-	{
-		program.unmap_readwrite(0x4000, 0xbfff);
-	}
-	else
-	{
-		program.install_readwrite_bank(0x4000, 0x7fff, membank("bank3"));
-		program.install_readwrite_bank(0x8000, 0xbfff, membank("bank4"));
-		membank("bank3")->set_entry(bank);
-		membank("bank4")->set_entry(bank);
-	}
-
-	membank("bank5")->set_entry(bank);
+		m_rom_view.select(0);
 }
 
 // Keyboard HACK
@@ -472,11 +436,10 @@ void v1050_state::sasi_ctrl_w(uint8_t data)
 void v1050_state::v1050_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).bankrw("bank1");
-	map(0x2000, 0x3fff).bankrw("bank2");
-	map(0x4000, 0x7fff).bankrw("bank3");
-	map(0x8000, 0xbfff).bankrw("bank4");
-	map(0xc000, 0xffff).bankrw("bank5");
+	map(0x0000, 0xbfff).view(m_bank_view);
+	map(0x0000, 0x1fff).view(m_rom_view);
+	// the ROM only overrides reads; writes fall through to the RAM banked in underneath
+	m_rom_view[0](0x0000, 0x1fff).rom().region(m_rom, 0);
 }
 
 void v1050_state::v1050_io(address_map &map)
@@ -656,14 +619,28 @@ void v1050_state::pic_int_w(int state)
 
 void v1050_state::disp_ppi_pc_w(uint8_t data)
 {
-	m_ppi_6502->pc2_w(BIT(data, 6));
-	m_ppi_6502->pc4_w(BIT(data, 7));
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(v1050_state::disp_ppi_pc_sync), this), data);
+}
+
+TIMER_CALLBACK_MEMBER(v1050_state::disp_ppi_pc_sync)
+{
+	machine().scheduler().perfect_quantum(attotime::from_usec(50));
+
+	m_ppi_6502->pc2_w(BIT(param, 6));
+	m_ppi_6502->pc4_w(BIT(param, 7));
 }
 
 void v1050_state::m6502_ppi_pc_w(uint8_t data)
 {
-	m_ppi_disp->pc2_w(BIT(data, 7));
-	m_ppi_disp->pc4_w(BIT(data, 6));
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(v1050_state::m6502_ppi_pc_sync), this), data);
+}
+
+TIMER_CALLBACK_MEMBER(v1050_state::m6502_ppi_pc_sync)
+{
+	machine().scheduler().perfect_quantum(attotime::from_usec(50));
+
+	m_ppi_disp->pc2_w(BIT(param, 7));
+	m_ppi_disp->pc4_w(BIT(param, 6));
 }
 
 // Miscellanous 8255A Interface
@@ -688,18 +665,22 @@ void v1050_state::misc_ppi_pa_w(uint8_t data)
 	// floppy drive select
 	floppy_image_device *floppy = nullptr;
 
-	if (!BIT(data, 0)) floppy = m_floppy0->get_device();
-	if (!BIT(data, 1)) floppy = m_floppy1->get_device();
-	if (!BIT(data, 2)) floppy = m_floppy2->get_device();
-	if (!BIT(data, 3)) floppy = m_floppy3->get_device();
+	for (int i = 0; i < 4; i++)
+		if (!BIT(data, i)) floppy = m_floppy[i]->get_device();
 
 	m_fdc->set_floppy(floppy);
 
-	// floppy side select
-	if (floppy) floppy->ss_w(BIT(data, 4));
+	// side select and motor are bussed to every drive, so an unselected drive keeps spinning
+	for (auto &connector : m_floppy)
+	{
+		floppy_image_device *drive = connector->get_device();
 
-	// floppy motor
-	if (floppy) floppy->mon_w(BIT(data, 6));
+		if (drive)
+		{
+			drive->ss_w(BIT(data, 4));
+			drive->mon_w(BIT(data, 6));
+		}
+	}
 
 	// density select
 	m_fdc->dden_w(BIT(data, 7));
@@ -978,22 +959,17 @@ void v1050_state::machine_start()
 	// setup memory banking
 	uint8_t *ram = m_ram->pointer();
 
-	membank("bank1")->configure_entries(0, 2, ram, 0x10000);
-	membank("bank1")->configure_entry(2, ram + 0x1c000);
-	membank("bank1")->configure_entry(3, m_rom->base());
+	// the top 16K is common to every bank
+	program.install_ram(0xc000, 0xffff, ram + 0xc000);
 
-	program.install_readwrite_bank(0x2000, 0x3fff, membank("bank2"));
-	membank("bank2")->configure_entries(0, 2, ram + 0x2000, 0x10000);
-	membank("bank2")->configure_entry(2, ram + 0x1e000);
+	m_bank_view[0].install_ram(0x0000, 0xbfff, ram);
+	m_bank_view[1].install_ram(0x0000, 0xbfff, ram + 0x10000);
 
-	program.install_readwrite_bank(0x4000, 0x7fff, membank("bank3"));
-	membank("bank3")->configure_entries(0, 2, ram + 0x4000, 0x10000);
+	// bank 2 exposes the last 16K of the second 64K, which bank 1 cannot reach through the common area
+	m_bank_view[2].install_ram(0x0000, 0x3fff, ram + 0x1c000);
 
-	program.install_readwrite_bank(0x8000, 0xbfff, membank("bank4"));
-	membank("bank4")->configure_entries(0, 2, ram + 0x8000, 0x10000);
-
-	program.install_readwrite_bank(0xc000, 0xffff, membank("bank5"));
-	membank("bank5")->configure_entries(0, 3, ram + 0xc000, 0);
+	// bank 3 is not decoded
+	m_bank_view[3].unmap_readwrite(0x0000, 0xbfff);
 
 	bankswitch();
 
@@ -1035,7 +1011,6 @@ void v1050_state::v1050(machine_config &config)
 
 	M6502(config, m_subcpu, 15.36_MHz_XTAL/16);
 	m_subcpu->set_addrmap(AS_PROGRAM, &v1050_state::v1050_crt_mem);
-	config.set_perfect_quantum(m_subcpu);
 
 	// keyboard HACK
 	TIMER(config, "keyboard").configure_periodic(FUNC(v1050_state::v1050_keyboard_tick), attotime::from_hz(60));
@@ -1083,7 +1058,7 @@ void v1050_state::v1050(machine_config &config)
 	clock_kb.signal_handler().set(FUNC(v1050_state::write_keyboard_clock));
 
 	// keyboard
-	v1050_keyboard_device &keyboard(V1050_KEYBOARD(config, V1050_KEYBOARD_TAG, 0));
+	v1050_keyboard_device &keyboard(V1050_KEYBOARD(config, V1050_KEYBOARD_TAG));
 	keyboard.out_tx_handler().set(m_uart_kb, FUNC(i8251_device::write_rxd));
 
 	I8251(config, m_uart_sio, 0/*16_MHz_XTAL/8,*/);
@@ -1109,7 +1084,7 @@ void v1050_state::v1050(machine_config &config)
 	FLOPPY_CONNECTOR(config, MB8877_TAG":3", v1050_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	// SASI bus
-	SCSI_PORT(config, m_sasibus, 0);
+	SCSI_PORT(config, m_sasibus);
 	m_sasibus->set_data_input_buffer(m_sasi_data_in);
 	m_sasibus->req_handler().set(m_sasi_ctrl_in, FUNC(input_buffer_device::write_bit0)).exor(1);
 	m_sasibus->bsy_handler().set(m_sasi_ctrl_in, FUNC(input_buffer_device::write_bit1));
@@ -1155,4 +1130,4 @@ ROM_END
 // System Drivers
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                  FULLNAME       FLAGS
-COMP( 1983, v1050, 0,      0,      v1050,   v1050, v1050_state, empty_init, "Visual Technology Inc", "Visual 1050", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1983, v1050, 0,      0,      v1050,   v1050, v1050_state, empty_init, "Visual Technology Inc", "Visual 1050", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

@@ -678,12 +678,12 @@ INPUT_PORTS_END
 void hx5102_device::device_add_mconfig(machine_config& config)
 {
 	// Hexbus controller
-	IBC(config, m_hexbus_ctrl, 0);
+	IBC(config, m_hexbus_ctrl);
 	m_hexbus_ctrl->hexbus_cb().set(FUNC(hx5102_device::hexbus_out));
 	m_hexbus_ctrl->hsklatch_cb().set(FUNC(hx5102_device::hsklatch_out));
 
 	// Outgoing socket for downstream devices
-	HEXBUS(config, "hexbus", 0, hexbus_options, nullptr);
+	HEXBUS(config, "hexbus", hexbus_options, nullptr);
 
 	// TMS9995 CPU @ 12.0 MHz
 	TMS9995(config, m_flopcpu, 12_MHz_XTAL);
@@ -700,8 +700,8 @@ void hx5102_device::device_add_mconfig(machine_config& config)
 	m_floppy_ctrl->intrq_wr_callback().set(FUNC(hx5102_device::fdc_irq_w));
 	m_floppy_ctrl->drq_wr_callback().set(FUNC(hx5102_device::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, m_flopcon0, hx5102_drive, "525dd", hx5102_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_flopcon1, hx5102_drive, nullptr, hx5102_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_flopcon0, hx5102_drive, "525dd", hx5102_device::floppy_formats).enable_sound("hx5102");
+	FLOPPY_CONNECTOR(config, m_flopcon1, hx5102_drive, nullptr, hx5102_device::floppy_formats).enable_sound("hx5102e");
 
 	// Addressable latches
 	LS259(config, m_crulatch[0]); // U18
@@ -737,7 +737,7 @@ void hx5102_device::device_add_mconfig(machine_config& config)
 	m_speedmf->out_cb().set(FUNC(hx5102_device::mspeed_w));
 
 	// READY flipflop
-	TTL7474(config, m_readyff, 0);
+	TTL7474(config, m_readyff);
 	m_readyff->comp_output_cb().set(FUNC(hx5102_device::board_ready));
 
 	// RAM

@@ -32,7 +32,7 @@ assumed to be an unlicensed clone.
 #include "cpu/mcs48/mcs48.h"
 #include "video/hlcd0515.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 
 // internal artwork
 #include "mchess.lh"
@@ -77,8 +77,6 @@ private:
 
 void mchess_state::machine_start()
 {
-	m_out_x.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_lcd_control));
@@ -213,10 +211,9 @@ void mchess_state::mchess(machine_config &config)
 	m_lcd[1]->write_cols().set(FUNC(mchess_state::lcd_output_w<1>));
 	m_lcd[1]->nvram_enable_backup(true);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(977, 1080);
-	screen.set_visarea_full();
 
 	config.set_default_layout(layout_mchess);
 }

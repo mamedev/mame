@@ -24,7 +24,7 @@ public:
 protected:
 	class mi_6509 : public memory_interface {
 	public:
-		m6509_device *base;
+		m6509_device *m_base;
 
 		mi_6509(m6509_device *base);
 		virtual ~mi_6509() {}
@@ -40,15 +40,15 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual offs_t pc_to_external(u16 pc) override;
 
-	uint8_t bank_i, bank_y;
+	uint8_t m_bank_i, m_bank_y;
 
-	uint8_t bank_i_r() { return bank_i; }
-	uint8_t bank_y_r() { return bank_y; }
-	void bank_i_w(uint8_t data) { bank_i = data; }
-	void bank_y_w(uint8_t data) { bank_y = data; }
+	uint8_t bank_i_r() { return m_bank_i; }
+	uint8_t bank_y_r() { return m_bank_y; }
+	void bank_i_w(uint8_t data) { m_bank_i = data; }
+	void bank_y_w(uint8_t data) { m_bank_y = data; }
 
-	uint32_t adr_in_bank_i(uint16_t adr) { return adr | ((bank_i & 0xf) << 16); }
-	uint32_t adr_in_bank_y(uint16_t adr) { return adr | ((bank_y & 0xf) << 16); }
+	uint32_t adr_in_bank_i(uint16_t adr) { return adr | ((m_bank_i & 0xf) << 16); }
+	uint32_t adr_in_bank_y(uint16_t adr) { return adr | ((m_bank_y & 0xf) << 16); }
 
 #define O(o) void o ## _full(); void o ## _partial()
 

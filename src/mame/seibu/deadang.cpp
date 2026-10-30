@@ -3,7 +3,7 @@
 
 /***************************************************************************
 
-    Pop'N Run                       (c) 1987 Seibu Kaihatsu & Yukai Tsukai
+    Pop'N Run (aka Yukai Tsukai)    (c) 1987 Seibu Kaihatsu
     Dead Angle                      (c) 1988 Seibu Kaihatsu
     Gang Hunter                     (c) 1988 Seibu Kaihatsu
 
@@ -11,12 +11,11 @@
 
 /*
 
-    TODO:
-
-    - ghunter trackball input is broken
-    - coin lockouts
-    - popnrun: inputs, can't coin it up, needs gfxs dumped and sorted out
-      (SIP modules like airraid);
+TODO:
+- ghunter trackball input is broken
+- coin lockouts
+- popnrun: inputs, can't coin it up, needs gfxs dumped and sorted out
+  (SIP modules like airraid);
 
 
 Lead Angle
@@ -47,7 +46,6 @@ Dip locations and factory settings verified with US manual
 #include "emu.h"
 
 #include "sei80bu.h"
-
 #include "seibusound.h"
 
 #include "cpu/nec/nec.h"
@@ -85,13 +83,15 @@ public:
 		m_track(*this, "TRACK%c", 'X')
 	{ }
 
-	void deadang(machine_config &config);
-	void ghunter(machine_config &config);
+	void deadang(machine_config &config) ATTR_COLD;
+	void ghunter(machine_config &config) ATTR_COLD;
 
-	void init_adpcm();
-	void init_ghunter();
+	void init_adpcm() ATTR_COLD;
+	void init_ghunter() ATTR_COLD;
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	required_shared_ptr<uint16_t> m_scroll_ram;
@@ -108,6 +108,9 @@ protected:
 	optional_device_array<seibu_adpcm_device, 2> m_adpcm;
 
 	optional_ioport_array<2> m_track;
+
+	uint8_t m_main_irq_vector = 0;
+	uint8_t m_sub_irq_vector = 0;
 
 	uint8_t m_tilebank = 0;
 	uint8_t m_oldtilebank = 0;
@@ -133,7 +136,9 @@ protected:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(main_scanline);
+	IRQ_CALLBACK_MEMBER(maincpu_acknowledge_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(sub_scanline);
+	IRQ_CALLBACK_MEMBER(subcpu_acknowledge_irq);
 
 	void main_map(address_map &map) ATTR_COLD;
 	void ghunter_main_map(address_map &map) ATTR_COLD;
@@ -235,6 +240,18 @@ TILE_GET_INFO_MEMBER(deadang_state::get_text_tile_info)
 	int const color = (m_videoram[tile_index] >> 8) & 0xf;
 
 	tileinfo.set(0, tile, color, 0);
+}
+
+void deadang_state::machine_start()
+{
+	save_item(NAME(m_main_irq_vector));
+	save_item(NAME(m_sub_irq_vector));
+}
+
+void deadang_state::machine_reset()
+{
+	m_main_irq_vector = 0;
+	m_sub_irq_vector = 0;
 }
 
 void deadang_state::video_start()
@@ -762,24 +779,40 @@ GFXDECODE_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::main_scanline)
 {
-	int const scanline = param;
+	if (param == 240) // vblank-out irq
+	{
+		m_main_irq_vector = 0xc4 / 4;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+	else if (param == 0) // vblank-in irq
+	{
+		m_main_irq_vector = 0xc8 / 4;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+}
 
-	if (scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc4 / 4); // V30
-
-	if (scanline == 0) // vblank-in irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8 / 4); // V30
+IRQ_CALLBACK_MEMBER(deadang_state::maincpu_acknowledge_irq)
+{
+	return m_main_irq_vector;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::sub_scanline)
 {
-	int const scanline = param;
+	if (param == 240) // vblank-out irq
+	{
+		m_sub_irq_vector = 0xc4 / 4;
+		m_subcpu->set_input_line(0, HOLD_LINE);
+	}
+	else if (param == 0) // vblank-in irq
+	{
+		m_sub_irq_vector = 0xc8 / 4;
+		m_subcpu->set_input_line(0, HOLD_LINE);
+	}
+}
 
-	if (scanline == 240) // vblank-out irq
-		m_subcpu->set_input_line_and_vector(0, HOLD_LINE, 0xc4 / 4); // V30
-
-	if (scanline == 0) // vblank-in irq
-		m_subcpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8 / 4); // V30
+IRQ_CALLBACK_MEMBER(deadang_state::subcpu_acknowledge_irq)
+{
+	return m_sub_irq_vector;
 }
 
 
@@ -791,10 +824,12 @@ void deadang_state::deadang(machine_config &config)
 	V30(config, m_maincpu, XTAL(16'000'000) / 2); // Sony 8623h9 CXQ70116D-8 (V30 compatible)
 	m_maincpu->set_addrmap(AS_PROGRAM, &deadang_state::main_map);
 	TIMER(config, "scantimer1").configure_scanline(FUNC(deadang_state::main_scanline), "screen", 0, 1);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(deadang_state::maincpu_acknowledge_irq));
 
 	V30(config, m_subcpu, XTAL(16'000'000) / 2); // Sony 8623h9 CXQ70116D-8 (V30 compatible)
 	m_subcpu->set_addrmap(AS_PROGRAM, &deadang_state::sub_map);
 	TIMER(config, "scantimer2").configure_scanline(FUNC(deadang_state::sub_scanline), "screen", 0, 1);
+	m_subcpu->set_irq_acknowledge_callback(FUNC(deadang_state::subcpu_acknowledge_irq));
 
 	Z80(config, m_audiocpu, XTAL(14'318'181) / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &deadang_state::sound_map);
@@ -803,12 +838,10 @@ void deadang_state::deadang(machine_config &config)
 
 	SEI80BU(config, "sei80bu", XTAL(14'318'181) / 4).set_device_rom_tag("audiocpu");
 
-	config.set_maximum_quantum(attotime::from_hz(60)); // the game stops working with higher interleave rates..
-
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(32*8, 32*8);
@@ -822,7 +855,7 @@ void deadang_state::deadang(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SEIBU_SOUND(config, m_seibu_sound, 0);
+	SEIBU_SOUND(config, m_seibu_sound);
 	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
 	m_seibu_sound->coin_io_callback().set_ioport("COIN");
 	m_seibu_sound->set_rom_tag("audiocpu");
@@ -862,6 +895,7 @@ void popnrun_state::popnrun(machine_config &config)
 {
 	deadang(config);
 
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &popnrun_state::main_map);
 
 	m_subcpu->set_addrmap(AS_PROGRAM, &popnrun_state::sub_map);
@@ -869,12 +903,14 @@ void popnrun_state::popnrun(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &popnrun_state::sound_map);
 	m_audiocpu->set_addrmap(AS_OPCODES, &popnrun_state::sound_decrypted_opcodes_map);
 
-	m_screen->set_screen_update(FUNC(popnrun_state::screen_update));
-
 	config.device_remove("watchdog");
+
+	// video hardware
+	m_screen->set_screen_update(FUNC(popnrun_state::screen_update));
 
 	m_gfxdecode->set_info(gfx_popnrun);
 
+	// sound hardware
 	config.device_remove("ym1");
 	config.device_remove("ym2");
 	config.device_remove("msm1");
@@ -1180,10 +1216,10 @@ void deadang_state::init_adpcm()
 
 // Game Drivers
 
-GAME( 1987, popnrun,  0,       popnrun, deadang, popnrun_state, empty_init, ROT0, "Seibu Kaihatsu / Yukai Tsukai",           "Pop'n Run - The Videogame (set 1)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, popnruna, popnrun, popnrun, deadang, popnrun_state, empty_init, ROT0, "Seibu Kaihatsu / Yukai Tsukai",           "Pop'n Run - The Videogame (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, popnrun,  0,       popnrun, deadang, popnrun_state, empty_init, ROT0, "Seibu Kaihatsu", "Pop'n Run: The Video Game (set 1)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, popnruna, popnrun, popnrun, deadang, popnrun_state, empty_init, ROT0, "Seibu Kaihatsu", "Pop'n Run: The Video Game (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, deadang,  0,       deadang, deadang, deadang_state, init_adpcm, ROT0, "Seibu Kaihatsu",                          "Dead Angle",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, leadang,  deadang, deadang, deadang, deadang_state, init_adpcm, ROT0, "Seibu Kaihatsu",                          "Lead Angle (Japan)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ghunter,  deadang, ghunter, ghunter, deadang_state, init_adpcm, ROT0, "Seibu Kaihatsu",                          "Gang Hunter / Dead Angle",          MACHINE_SUPPORTS_SAVE ) // Title is 'Gang Hunter' or 'Dead Angle' depending on control method dipswitch
-GAME( 1988, ghunters, deadang, ghunter, ghunter, deadang_state, init_adpcm, ROT0, "Seibu Kaihatsu (SegaSA / Sonic license)", "Gang Hunter / Dead Angle (Spain)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, deadang,  0,       deadang, deadang, deadang_state, init_adpcm, ROT0, "Seibu Kaihatsu", "Dead Angle",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1988, leadang,  deadang, deadang, deadang, deadang_state, init_adpcm, ROT0, "Seibu Kaihatsu", "Lead Angle (Japan)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ghunter,  deadang, ghunter, ghunter, deadang_state, init_adpcm, ROT0, "Seibu Kaihatsu", "Gang Hunter / Dead Angle",           MACHINE_SUPPORTS_SAVE ) // Title is 'Gang Hunter' or 'Dead Angle' depending on control method dipswitch
+GAME( 1988, ghunters, deadang, ghunter, ghunter, deadang_state, init_adpcm, ROT0, "Seibu Kaihatsu (SegaSA / Sonic license)", "Gang Hunter / Dead Angle (Spain)", MACHINE_SUPPORTS_SAVE )

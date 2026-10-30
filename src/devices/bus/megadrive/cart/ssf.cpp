@@ -23,14 +23,14 @@ megadrive_hb_ssf_device::megadrive_hb_ssf_device(const machine_config &mconfig, 
 {
 }
 
-// NOTE: same as Sega mapper (Demons of Asteborg wants it this way)
+// NOTE: same as Sega mapper (asteborg wants it this way)
 void megadrive_hb_ssf_device::time_f0_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (BIT(data, 1))
-		m_sram_view.disable();
-	else
+	if (BIT(data, 0))
 		m_sram_view.select(0);
-	m_nvram_write_protect = !!BIT(data, 0);
+	else
+		m_sram_view.disable();
+	m_nvram_write_protect = !!BIT(data, 1);
 }
 
 

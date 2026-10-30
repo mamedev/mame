@@ -36,7 +36,7 @@ private:
 
 	required_ioport m_addr;
 	required_ioport_array<4> m_jp;
-	required_device<upd765a_device> m_fdc;
+	required_device<fdc9266_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 };
 
@@ -58,8 +58,8 @@ void rc2014_fdc9266_device::device_reset()
 {
 	uint8_t base = m_addr->read() << 5; // SV1
 	// A15-A8 and A1 not connected
-	m_bus->installer(AS_IO)->install_read_handler(base+0x10, base+0x10, 0, 0xff02, 0, read8smo_delegate(m_fdc, FUNC(upd765a_device::msr_r)));
-	m_bus->installer(AS_IO)->install_readwrite_handler(base+0x11, base+0x11, 0, 0xff02, 0, read8smo_delegate(m_fdc, FUNC(upd765a_device::fifo_r)), write8smo_delegate(m_fdc, FUNC(upd765a_device::fifo_w)));
+	m_bus->installer(AS_IO)->install_read_handler(base+0x10, base+0x10, 0, 0xff02, 0, read8smo_delegate(m_fdc, FUNC(fdc9266_device::msr_r)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(base+0x11, base+0x11, 0, 0xff02, 0, read8smo_delegate(m_fdc, FUNC(fdc9266_device::fifo_r)), write8smo_delegate(m_fdc, FUNC(fdc9266_device::fifo_w)));
 	m_bus->installer(AS_IO)->install_write_handler(base+0x18, base+0x18, 0, 0xff02, 0, write8sm_delegate(*this, FUNC(rc2014_fdc9266_device::control_w)));
 	// TODO: Use jumpers
 }
@@ -92,7 +92,7 @@ static void rc2014_floppies(device_slot_interface &device)
 void rc2014_fdc9266_device::device_add_mconfig(machine_config &config)
 {
 	// FDC9266
-	UPD765A(config, m_fdc, XTAL(8'000'000), true, true);
+	FDC9266(config, m_fdc, XTAL(8'000'000), true, true);
 
 	// floppy drives
 	FLOPPY_CONNECTOR(config, m_floppy[0], rc2014_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);
@@ -156,7 +156,7 @@ protected:
 private:
 	required_ioport m_addr;
 	required_ioport_array<2> m_jp;
-	required_device<wd37c65c_device> m_fdc;
+	required_device<wd37c65_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 };
 
@@ -178,19 +178,19 @@ void rc2014_wd37c65_device::device_reset()
 {
 	uint8_t base = m_addr->read() << 5; // SV1
 	// A15-A8 and A1 not connected
-	m_bus->installer(AS_IO)->install_read_handler(base+0x10, base+0x10, 0, 0xff02, 0, read8smo_delegate(m_fdc, FUNC(wd37c65c_device::msr_r)));
-	m_bus->installer(AS_IO)->install_readwrite_handler(base+0x11, base+0x11, 0, 0xff02, 0, read8smo_delegate(m_fdc, FUNC(wd37c65c_device::fifo_r)), write8smo_delegate(m_fdc, FUNC(wd37c65c_device::fifo_w)));
+	m_bus->installer(AS_IO)->install_read_handler(base+0x10, base+0x10, 0, 0xff02, 0, read8smo_delegate(m_fdc, FUNC(wd37c65_device::msr_r)));
+	m_bus->installer(AS_IO)->install_readwrite_handler(base+0x11, base+0x11, 0, 0xff02, 0, read8smo_delegate(m_fdc, FUNC(wd37c65_device::fifo_r)), write8smo_delegate(m_fdc, FUNC(wd37c65_device::fifo_w)));
 
 	// A15-A8 and A0 and A1 not connected
-	m_bus->installer(AS_IO)->install_write_handler(base+0x08, base+0x08, 0, 0xff06, 0, write8smo_delegate(m_fdc, FUNC(wd37c65c_device::ccr_w)));
-	m_bus->installer(AS_IO)->install_write_handler(base+0x18, base+0x18, 0, 0xff06, 0, write8smo_delegate(m_fdc, FUNC(wd37c65c_device::dor_w)));
+	m_bus->installer(AS_IO)->install_write_handler(base+0x08, base+0x08, 0, 0xff06, 0, write8smo_delegate(m_fdc, FUNC(wd37c65_device::ccr_w)));
+	m_bus->installer(AS_IO)->install_write_handler(base+0x18, base+0x18, 0, 0xff06, 0, write8smo_delegate(m_fdc, FUNC(wd37c65_device::dor_w)));
 	m_bus->installer(AS_IO)->install_read_handler(base+0x18, base+0x18, 0, 0xff06, 0, read8m_delegate(*this, FUNC(rc2014_wd37c65_device::dack_r)));
 	// TODO: Use jumpers
 }
 
 void rc2014_wd37c65_device::device_add_mconfig(machine_config &config)
 {
-	WD37C65C(config, m_fdc, 16_MHz_XTAL);
+	WD37C65(config, m_fdc, 16_MHz_XTAL); // WD37C65-PL
 
 	// floppy drives
 	FLOPPY_CONNECTOR(config, m_floppy[0], rc2014_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);

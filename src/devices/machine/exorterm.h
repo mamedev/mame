@@ -30,7 +30,7 @@ INPUT_PORTS_EXTERN(exorterm155);
 class exorterm155_device : public device_t
 {
 public:
-	exorterm155_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	exorterm155_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// Interface to a RS232 connection.
 	auto rs232_conn_txd_handler() { return m_rs232_conn_txd_handler.bind(); }

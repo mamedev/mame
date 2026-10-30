@@ -78,7 +78,7 @@ const folders_entry f_folders[] =
 class menu_remove_folder : public menu
 {
 public:
-	menu_remove_folder(mame_ui_manager &mui, render_container &container, int ref);
+	menu_remove_folder(mame_ui_manager &mui, render_target &target, int ref);
 
 private:
 	virtual void populate() override;
@@ -93,8 +93,8 @@ private:
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_remove_folder::menu_remove_folder(mame_ui_manager &mui, render_container &container, int ref)
-	: menu(mui, container)
+menu_remove_folder::menu_remove_folder(mame_ui_manager &mui, render_target &target, int ref)
+	: menu(mui, target)
 	, m_ref(ref)
 {
 	set_heading(util::string_format(_("Remove %1$s Folder"), _("path-option", f_folders[m_ref].name)));
@@ -161,7 +161,7 @@ void menu_remove_folder::populate()
 class menu_add_change_folder : public menu
 {
 public:
-	menu_add_change_folder(mame_ui_manager &mui, render_container &container, int ref, bool multipath);
+	menu_add_change_folder(mame_ui_manager &mui, render_target &target, int ref, bool multipath);
 
 protected:
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
@@ -186,8 +186,8 @@ private:
 //  ctor
 //-------------------------------------------------
 
-menu_add_change_folder::menu_add_change_folder(mame_ui_manager &mui, render_container &container, int ref, bool multipath)
-	: menu(mui, container)
+menu_add_change_folder::menu_add_change_folder(mame_ui_manager &mui, render_target &target, int ref, bool multipath)
+	: menu(mui, target)
 	, m_ref(ref)
 	, m_multipath(multipath)
 {
@@ -437,8 +437,8 @@ void menu_add_change_folder::update_search()
 class menu_display_actual : public menu
 {
 public:
-	menu_display_actual(mame_ui_manager &mui, render_container &container, int selectedref)
-		: menu(mui, container)
+	menu_display_actual(mame_ui_manager &mui, render_target &target, int selectedref)
+		: menu(mui, target)
 		, m_ref(selectedref)
 		, m_multipath(is_multipath(f_folders[selectedref].option))
 		, m_heading{ util::string_format(m_multipath ? _("%1$s Folders") : _("%1$s Folder"), _("path-option", f_folders[selectedref].name)) }
@@ -493,11 +493,11 @@ bool menu_display_actual::handle(event const *ev)
 		switch ((uintptr_t)ev->itemref)
 		{
 		case REMOVE:
-			menu::stack_push<menu_remove_folder>(ui(), container(), m_ref);
+			menu::stack_push<menu_remove_folder>(ui(), target(), m_ref);
 			break;
 
 		case ADD_CHANGE:
-			menu::stack_push<menu_add_change_folder>(ui(), container(), m_ref, m_multipath);
+			menu::stack_push<menu_add_change_folder>(ui(), target(), m_ref, m_multipath);
 			break;
 		}
 	}
@@ -581,7 +581,7 @@ void menu_display_actual::custom_render(uint32_t flags, void *selectedref, float
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_directory::menu_directory(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+menu_directory::menu_directory(mame_ui_manager &mui, render_target &target) : menu(mui, target)
 {
 	set_heading(_("Configure Folders"));
 }
@@ -599,7 +599,7 @@ menu_directory::~menu_directory()
 bool menu_directory::handle(event const *ev)
 {
 	if (ev && ev->itemref && ev->iptkey == IPT_UI_SELECT)
-		menu::stack_push<menu_display_actual>(ui(), container(), selected_index());
+		menu::stack_push<menu_display_actual>(ui(), target(), selected_index());
 
 	return false;
 }

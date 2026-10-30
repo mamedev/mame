@@ -1049,7 +1049,7 @@ static INPUT_PORTS_START( merit3xx )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_DOOR ) PORT_TOGGLE
 	PORT_DIPNAME( 0x02, 0x00, "IN2.2" ) // shows last hand during gameplay, needs to be switched on to avoid game malfunction message
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1182,7 +1182,7 @@ void merit3xx_state::crt307(machine_config &config)
 	i8255_device &ppi1(I8255(config, "ppi1"));
 	ppi1.out_pa_callback().set(FUNC(merit3xx_state::crt307_rombank_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(10_MHz_XTAL, 616, 0, 512, 270, 0, 256);
 	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 

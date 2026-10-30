@@ -396,11 +396,11 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void miniboy7(machine_config &config);
-	void sminiboy(machine_config &config);
-	void bejpoker(machine_config &config);
+	void miniboy7(machine_config &config) ATTR_COLD;
+	void sminiboy(machine_config &config) ATTR_COLD;
+	void bejpoker(machine_config &config) ATTR_COLD;
 
-	void init_smini();
+	void init_smini() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -538,8 +538,6 @@ void miniboy7_state::miniboy7_palette(palette_device &palette) const
 
 void miniboy7_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_ay_pa));
 	save_item(NAME(m_ay_pb));
 	save_item(NAME(m_gpri));
@@ -896,7 +894,7 @@ void miniboy7_state::miniboy7(machine_config &config)
 	pia.irqb_handler().set_inputline("maincpu", 0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size((47+1)*8, (39+1)*8);             // taken from MC6845, registers 00 & 04 (normally programmed with value - 1).
@@ -1076,7 +1074,7 @@ ROM_END
   The card backs have the Bonanza Enterprises logo
   Bets of 3 to 5 coins adds 1 Joker to the deck.
   Bets of 6 to 10 coins adds 1 more Joker to the deck.
-  Max bet limitted to 10 coins
+  Max bet limited to 10 coins
   There is some type of Bonus for 3's or 7's
 
 */
@@ -1102,6 +1100,7 @@ ROM_END
 
 void miniboy7_state::init_smini()
 {
+	// HACK: what are these for?
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xa0f0] = 0x0e;

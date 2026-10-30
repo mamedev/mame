@@ -263,8 +263,8 @@ void hd647180x_device::device_start()
 	state_add(HD647180X_DERA, "DERA", m_dera);
 	for (int i = 0; i < 6; i++)
 	{
-		state_add(HD647180X_ODRA + i, string_format("ODR%c", i + 'A').c_str(), m_odr[i]);
-		state_add(HD647180X_DDRA + i, string_format("DDR%c", i + 'A').c_str(), m_ddr[i]);
+		state_add(HD647180X_ODRA + i, string_format("ODR%c", i + 'A'), m_odr[i]);
+		state_add(HD647180X_DDRA + i, string_format("DDR%c", i + 'A'), m_ddr[i]);
 	}
 
 	save_item(NAME(m_t2frc.w));

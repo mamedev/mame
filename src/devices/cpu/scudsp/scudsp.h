@@ -47,6 +47,8 @@ public:
 	auto out_irq_callback() { return m_out_irq_cb.bind(); }
 	auto in_dma_callback() { return m_in_dma_cb.bind(); }
 	auto out_dma_callback() { return m_out_dma_cb.bind(); }
+	auto out_ddwt_callback() { return m_out_ddwt_cb.bind(); }
+	auto out_ddmv_callback() { return m_out_ddmv_cb.bind(); }
 
 	/* port 0 */
 	uint32_t program_control_r();
@@ -84,8 +86,24 @@ protected:
 	devcb_write_line     m_out_irq_cb;
 	devcb_read16         m_in_dma_cb;
 	devcb_write16        m_out_dma_cb;
+	devcb_write_line     m_out_ddwt_cb;
+	devcb_write_line     m_out_ddmv_cb;
 
 private:
+	enum {
+		LEF = 15, // 0000'8000 program counter transfer enable
+		EXF,      // 0001'0000 program execute control flag
+		ESF,      // 0002'0000 step execute control
+		EF,       // 0004'0000 program end interrupt
+		VF,       // 0008'0000 oVerflow flag
+		CF,       // 0010'0000 Carry flag
+		ZF,       // 0020'0000 Zero flag
+		SF,       // 0040'0000 Sign flag
+		T0F,      // 0080'0000 D0-Bus DMA execution flag
+		EPF = 25, // 0200'0000 Execute pause flag
+		PRF       // 0400'0000 Execute Pause Reset flag
+	};
+
 	union SCUDSPREG32 {
 		int32_t  si;
 		uint32_t ui;
@@ -125,22 +143,31 @@ private:
 	int m_icount;
 	uint8_t m_update_mul;
 
-	uint32_t scudsp_get_source_mem_reg_value( uint32_t mode );
-	uint32_t scudsp_get_source_mem_value(uint8_t mode);
-	void scudsp_set_dest_mem_reg( uint32_t mode, uint32_t value );
-	void scudsp_set_dest_mem_reg_2( uint32_t mode, uint32_t value );
-	uint32_t scudsp_compute_condition( uint32_t condition );
-	uint32_t scudsp_get_mem_source_dma( uint32_t memcode, uint32_t counter );
-	void scudsp_set_dest_dma_mem( uint32_t memcode, uint32_t value, uint32_t counter );
+	emu_timer *m_dma_timer;
+	enum dma_state_t : uint8_t {
+		DMA_STATE_IDLE = 0,
+		DMA_STATE_WAIT,
+		DMA_STATE_MOVE
+	};
+	dma_state_t m_dma_state;
+	TIMER_CALLBACK_MEMBER(dma_tick_cb);
 
-	void scudsp_illegal(uint32_t opcode);
-	void scudsp_operation(uint32_t opcode);
-	void scudsp_move_immediate(uint32_t opcode);
-	void scudsp_dma(uint32_t opcode);
-	void scudsp_jump(uint32_t opcode);
-	void scudsp_loop(uint32_t opcode);
-	void scudsp_end(uint32_t opcode);
-	void scudsp_exec_dma();
+	uint32_t get_source_mem_reg_value( uint32_t mode );
+	uint32_t get_source_mem_value(uint8_t mode);
+	void set_dest_mem_reg( uint32_t mode, uint32_t value );
+	void set_dest_mem_reg_2( uint32_t mode, uint32_t value );
+	uint32_t compute_condition( uint32_t condition );
+	uint32_t get_mem_source_dma( uint32_t memcode );
+	void set_dest_dma_mem( uint32_t memcode, uint32_t value );
+
+	void op_illegal(uint32_t opcode);
+	void op_alu(uint32_t opcode);
+	void op_move_immediate(uint32_t opcode);
+	void op_dma(uint32_t opcode);
+	void op_jump(uint32_t opcode);
+	void op_loop(uint32_t opcode);
+	void op_end(uint32_t opcode);
+	void exec_dma();
 };
 
 

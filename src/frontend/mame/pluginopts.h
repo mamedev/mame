@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include <iosfwd>
 #include <list>
 #include <string>
 
@@ -44,7 +45,7 @@ public:
 
 	// INI functionality
 	void parse_ini_file(util::core_file &inifile);
-	std::string output_ini() const;
+	void output_ini(std::ostream &str) const;
 
 private:
 	std::list<plugin> m_plugins;

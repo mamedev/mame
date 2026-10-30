@@ -611,7 +611,7 @@ void metlclsh_state::metlclsh(machine_config &config)
 	// IRQ by CPU #1, NMI by coin insertion
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// assume standard DECO video CRTC, unverified
 	screen.set_raw(XTAL(12'000'000)/2,384,0,256,272,8,248);
 	screen.set_screen_update(FUNC(metlclsh_state::screen_update));

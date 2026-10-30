@@ -75,7 +75,7 @@ bool ti99_single_cart_conn_device::is_grom_idle()
 
 void ti99_single_cart_conn_device::device_add_mconfig(machine_config &config)
 {
-	TI99_CART(config, m_cartridge, 0);
+	TI99_CART(config, m_cartridge);
 	m_cartridge->set_connector(this);
 }
 

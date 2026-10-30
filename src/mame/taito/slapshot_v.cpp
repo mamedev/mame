@@ -2,7 +2,10 @@
 // copyright-holders:David Graves
 #include "emu.h"
 #include "slapshot.h"
+
+#include "input.h" // for video debug keys
 #include "screen.h"
+
 
 /**********************************************************/
 

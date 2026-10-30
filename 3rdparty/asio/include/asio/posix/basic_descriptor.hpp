@@ -2,7 +2,7 @@
 // posix/basic_descriptor.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -40,7 +40,17 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace posix {
+
+#if !defined(ASIO_POSIX_BASIC_DESCRIPTOR_FWD_DECL)
+#define ASIO_POSIX_BASIC_DESCRIPTOR_FWD_DECL
+
+// Forward declaration with defaulted arguments.
+template <typename Executor = any_io_executor>
+class basic_descriptor;
+
+#endif // !defined(ASIO_POSIX_BASIC_DESCRIPTOR_FWD_DECL)
 
 /// Provides POSIX descriptor functionality.
 /**
@@ -51,7 +61,7 @@ namespace posix {
  * @e Distinct @e objects: Safe.@n
  * @e Shared @e objects: Unsafe.
  */
-template <typename Executor = any_io_executor>
+template <typename Executor>
 class basic_descriptor
   : public descriptor_base
 {
@@ -412,9 +422,8 @@ public:
    *
    * @throws asio::system_error Thrown on failure.
    *
-   * @sa IoControlCommand @n
-   * asio::posix::descriptor_base::bytes_readable @n
-   * asio::posix::descriptor_base::non_blocking_io
+   * @sa
+   * @li asio::posix::descriptor_base::bytes_readable
    *
    * @par Example
    * Getting the number of bytes ready to read:
@@ -442,9 +451,8 @@ public:
    *
    * @param ec Set to indicate what error occurred, if any.
    *
-   * @sa IoControlCommand @n
-   * asio::posix::descriptor_base::bytes_readable @n
-   * asio::posix::descriptor_base::non_blocking_io
+   * @sa
+   * @li asio::posix::descriptor_base::bytes_readable
    *
    * @par Example
    * Getting the number of bytes ready to read:
@@ -660,7 +668,7 @@ public:
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using asio::async_immediate().
    *
    * @par Completion Signature
    * @code void(asio::error_code) @endcode
@@ -763,6 +771,7 @@ private:
 };
 
 } // namespace posix
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

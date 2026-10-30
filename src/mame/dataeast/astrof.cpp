@@ -922,7 +922,7 @@ void astrof_state::base(machine_config &config)
 	TIMER(config, "vblank").configure_scanline(FUNC(astrof_state::irq_callback), "screen", VBSTART, 0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 }
 

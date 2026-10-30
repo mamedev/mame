@@ -216,7 +216,7 @@ void datum_state::datum(machine_config &config)
 	m_pia2->irqa_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 	m_pia2->irqb_handler().set_inputline("maincpu", M6802_IRQ_LINE);
 
-	ACIA6850(config, m_acia, 0); // rs232
+	ACIA6850(config, m_acia); // rs232
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));

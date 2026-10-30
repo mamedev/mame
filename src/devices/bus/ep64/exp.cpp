@@ -53,6 +53,7 @@ ep64_expansion_bus_slot_device::ep64_expansion_bus_slot_device(const machine_con
 	, m_io_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_card(nullptr)
 {
+	set_options(ep64_expansion_bus_cards, nullptr, false);
 }
 
 

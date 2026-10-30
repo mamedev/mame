@@ -83,9 +83,9 @@ void i80c52_device::device_reset()
 void i80c52_device::sfr_map(address_map &map)
 {
 	i8052_device::sfr_map(map);
-	map(0xa9, 0xa9).rw(FUNC(i80c52_device::saddr_r ), FUNC(i80c52_device::saddr_w ));
-	map(0xb7, 0xb7).rw(FUNC(i80c52_device::iph_r   ), FUNC(i80c52_device::iph_w   ));
-	map(0xb9, 0xb9).rw(FUNC(i80c52_device::saden_r ), FUNC(i80c52_device::saden_w ));
+	map(0xa9, 0xa9).rw(FUNC(i80c52_device::saddr_r), FUNC(i80c52_device::saddr_w));
+	map(0xb7, 0xb7).rw(FUNC(i80c52_device::iph_r  ), FUNC(i80c52_device::iph_w  ));
+	map(0xb9, 0xb9).rw(FUNC(i80c52_device::saden_r), FUNC(i80c52_device::saden_w));
 
 /* Philips 80C52 */
 /* ============= */
@@ -104,33 +104,33 @@ void i80c52_device::sfr_map(address_map &map)
 	map(0xa2, 0xa2); // AUXR1
 }
 
-u8   i80c52_device::iph_r ()
+u8 i80c52_device::iph_r()
 {
 	return m_iph;
 }
 
-void i80c52_device::iph_w (u8 data)
+void i80c52_device::iph_w(u8 data)
 {
 	m_iph = data;
 	update_irq_prio();
 }
 
-u8   i80c52_device::saddr_r ()
+u8 i80c52_device::saddr_r()
 {
 	return m_saddr;
 }
 
-void i80c52_device::saddr_w (u8 data)
+void i80c52_device::saddr_w(u8 data)
 {
 	m_saddr = data;
 }
 
-u8   i80c52_device::saden_r ()
+u8 i80c52_device::saden_r()
 {
 	return m_saden;
 }
 
-void i80c52_device::saden_w (u8 data)
+void i80c52_device::saden_w(u8 data)
 {
 	m_saden = data;
 }
@@ -154,4 +154,3 @@ std::unique_ptr<util::disasm_interface> ds80c320_device::create_disassembler()
 {
 	return std::make_unique<ds80c320_disassembler>();
 }
-

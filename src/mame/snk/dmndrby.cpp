@@ -88,6 +88,8 @@ public:
 	void dderby(machine_config &config);
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	virtual void main_map(address_map &map) ATTR_COLD;
@@ -104,6 +106,8 @@ private:
 	required_shared_ptr<uint8_t> m_fix_attr;
 	required_region_ptr<uint8_t> m_racetrack_tilemap_rom;
 
+	uint8_t m_irq_vector = 0;
+
 	tilemap_t *m_fix_tilemap = nullptr;
 	tilemap_t *m_racetrack_tilemap = nullptr;
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
@@ -115,6 +119,7 @@ private:
 	void palette_init(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
 	void output_w(offs_t offset, uint8_t data);
 
@@ -192,6 +197,16 @@ void dmndrby_state::palette_init(palette_device &palette) const
 	}
 }
 
+void dmndrby_state::machine_start()
+{
+	save_item(NAME(m_irq_vector));
+}
+
+void dmndrby_state::machine_reset()
+{
+	m_irq_vector = 0;
+}
+
 void dmndrby_state::video_start()
 {
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dmndrby_state::get_fix_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -258,8 +273,9 @@ uint32_t dmndrby_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	const bool fix_enable = BIT(m_scroll_ram[4], 0);
 	// Track layer has a narrower window drawing, there's no text tilemap attribute that would
 	// suggest otherwise.
-	rectangle overlay_rect;
-	overlay_rect.set(cliprect.min_x, cliprect.max_x, std::max(40, cliprect.min_y), std::min(215, cliprect.max_y));
+	rectangle overlay_rect(
+			cliprect.left(), cliprect.right(),
+			std::max(40, cliprect.top()), std::min(215, cliprect.bottom()));
 
 	m_racetrack_tilemap->set_scrollx(0, m_scroll_ram[0] + m_scroll_ram[1] * 0x100);
 	m_racetrack_tilemap->set_scrolly(0, m_scroll_ram[2] + m_scroll_ram[3] * 0x100);
@@ -761,15 +777,21 @@ GFXDECODE_END
 // Main Z80 is IM0, HW-latched irqs
 TIMER_DEVICE_CALLBACK_MEMBER(dmndrby_state::scanline_cb)
 {
-	int scanline = param;
+	if(param == 224) // vblank irq
+	{
+		m_irq_vector = 0xd7; // RST 10h
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+	else if(param == 32) // timer irq, will throw token error if fired at wrong time
+	{
+		m_irq_vector = 0xcf; // RST 08h
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+}
 
-	// vblank irq
-	if(scanline == 224)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80 - RST 10h
-
-	// timer irq, will throw token error if fired at wrong time
-	if(scanline == 32)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 08h
+IRQ_CALLBACK_MEMBER(dmndrby_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 void dmndrby_state::dderby(machine_config &config)
@@ -777,6 +799,7 @@ void dmndrby_state::dderby(machine_config &config)
 	Z80(config, m_maincpu, 4'000'000);         // ? MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &dmndrby_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(dmndrby_state::scanline_cb), "screen", 0, 1);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(dmndrby_state::cpu_acknowledge_irq));
 
 	Z80(config, m_audiocpu, 4'000'000);  // verified on schematics
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dmndrby_state::sound_map);
@@ -785,7 +808,7 @@ void dmndrby_state::dderby(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(256, 256);

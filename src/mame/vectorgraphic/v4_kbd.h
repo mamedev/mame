@@ -28,8 +28,7 @@ public:
 	void write_rxd(int state);
 
 protected:
-	// device-level overrides
-	void device_resolve_objects() override;
+	// device_t implementation
 	void device_start() override ATTR_COLD;
 	ioport_constructor device_input_ports() const override;
 	void device_add_mconfig(machine_config &config) override ATTR_COLD;

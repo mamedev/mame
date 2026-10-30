@@ -521,7 +521,7 @@ void mz2500_state::crtc_reconfigure_screen()
 
 	//popmessage("%d %d %d %d %02x",vs,ve,hs,he,m_cg_reg[0x0e]);
 
-	m_screen->configure(720, 480, visarea, m_screen->frame_period().attoseconds());
+	m_screen->configure(720, 480, visarea, m_screen->frame_period());
 
 	/* calculate CG window parameters here */
 	m_cg_vs = m_cg_reg[0x08] | (BIT(m_cg_reg[0x09], 0)<<8);
@@ -1560,8 +1560,7 @@ INTERRUPT_GEN_MEMBER(mz2500_state::vblank_cb)
 
 IRQ_CALLBACK_MEMBER(mz2500_state::irq_ack_cb)
 {
-	int i;
-	for(i=0;i<4;i++)
+	for(int i = 0; i < 4; i++)
 	{
 		if(m_irq_mask[i] && m_irq_pending[i])
 		{
@@ -1745,7 +1744,11 @@ void mz2500_state::rtc_alarm_irq(int state)
 {
 	// TODO: doesn't work yet
 //  if(m_irq_mask[3] && state & 1)
-//      m_maincpu->set_input_line_and_vector(0, HOLD_LINE,drvm_irq_vector[3]); // Z80
+//  {
+//      m_irq_pending[3] = 1;
+//      m_maincpu->set_input_line(0, ASSERT_LINE);
+//  }
+
 }
 
 
@@ -1837,7 +1840,7 @@ void mz2500_state::mz2500(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:2", mz2500_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", mz2500_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(42.954545_MHz_XTAL / 2, 640+108, 0, 640, 480, 0, 200); //unknown clock / divider
 	m_screen->set_screen_update(FUNC(mz2500_state::screen_update));
 	m_screen->set_palette(m_palette);

@@ -19,7 +19,7 @@ INPUT_PORTS_EXTERN(swtpc8212);
 class swtpc8212_device : public device_t
 {
 public:
-	swtpc8212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	swtpc8212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_INPUT_CHANGED_MEMBER(keypad_changed);
 

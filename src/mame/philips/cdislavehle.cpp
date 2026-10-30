@@ -33,6 +33,20 @@ TODO:
 // device type definition
 DEFINE_DEVICE_TYPE(CDI_SLAVE_HLE, cdislave_hle_device, "cdislavehle", "CD-i Mono-I Slave HLE")
 
+namespace {
+
+const u8 s_attenuation_table[46] =
+{
+	0xff, 0xe4, 0xcb, 0xb5, 0xa2, 0x90, 0x80, 0x72,
+	0x66, 0x5b, 0x51, 0x48, 0x40, 0x39, 0x33, 0x2e,
+	0x29, 0x24, 0x20, 0x1d, 0x1a, 0x17, 0x14, 0x12,
+	0x10, 0x0e, 0x0d, 0x0b, 0x0a, 0x09, 0x08, 0x07,
+	0x06, 0x06, 0x05, 0x05, 0x04, 0x04, 0x03, 0x03,
+	0x03, 0x02, 0x02, 0x02, 0x02, 0x01,
+};
+
+}
+
 
 //**************************************************************************
 //  MEMBER FUNCTIONS
@@ -77,14 +91,11 @@ TIMER_CALLBACK_MEMBER( cdislave_hle_device::poll_inputs )
 	m_device_mouse_x = std::clamp(m_device_mouse_x + deltax, 0, 767);
 	m_device_mouse_y = std::clamp(m_device_mouse_y + deltay, 0, 559);
 
-	if (m_polling_active)
-	{
-		const uint8_t byte3 = ((m_device_mouse_x & 0x380) >> 7) | (button_bits << 3);
-		const uint8_t byte2 = m_device_mouse_x & 0x7f;
-		const uint8_t byte1 = (m_device_mouse_y & 0x380) >> 7;
-		const uint8_t byte0 = m_device_mouse_y & 0x7f;
-		prepare_readback(attotime::zero, 0, 4, byte3, byte2, byte1, byte0, 0xf7);
-	}
+	const uint8_t byte3 = ((m_device_mouse_x & 0x380) >> 7) | (button_bits << 3);
+	const uint8_t byte2 = m_device_mouse_x & 0x7f;
+	const uint8_t byte1 = (m_device_mouse_y & 0x380) >> 7;
+	const uint8_t byte0 = m_device_mouse_y & 0x7f;
+	prepare_readback(attotime::zero, 0, 4, byte3, byte2, byte1, byte0, 0xf7);
 }
 
 void cdislave_hle_device::prepare_readback(const attotime &delay, uint8_t channel, uint8_t count, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t cmd)
@@ -135,6 +146,20 @@ uint16_t cdislave_hle_device::slave_r(offs_t offset)
 	return 0xff;
 }
 
+uint8_t cdislave_hle_device::disc_type()
+{
+	if (!m_cdrom->exists())
+		return 0x00;
+
+	const cdrom_file::toc &toc = m_cdrom->get_toc();
+	for (uint32_t i = 0; i < toc.numtrks; i++)
+	{
+		if (toc.tracks[i].trktype != cdrom_file::CD_TRACK_AUDIO)
+			return 0x02;
+	}
+	return 0x01;
+}
+
 void cdislave_hle_device::set_mouse_position()
 {
 	m_device_mouse_x = ((m_in_buf[1] & 0x70) << 3) | (m_in_buf[2] & 0x7f);
@@ -143,18 +168,17 @@ void cdislave_hle_device::set_mouse_position()
 
 void cdislave_hle_device::slave_w_mouse(offs_t offset, uint16_t data)
 {
-	m_in_buf[m_in_index] = data & 0x00ff;
 	bool set_mouse = m_in_buf[0] >= 0xc0;
 	if (set_mouse)
 	{
-		if (m_in_index == 0)
+		if (m_in_index == 1)
 		{
 			LOGMASKED(LOG_COMMANDS, "slave_w: Channel %d: Update Mouse Position (0x%02x)\n", offset, data & 0x00ff);
 			m_in_count = 3;
 		}
 		else
 		{
-			if (m_in_index == m_in_count - 1)
+			if (m_in_index == m_in_count)
 			{
 				// Update Mouse Position
 				set_mouse_position();
@@ -168,66 +192,77 @@ void cdislave_hle_device::slave_w_mouse(offs_t offset, uint16_t data)
 	else
 	{
 		LOGMASKED(LOG_COMMANDS | LOG_UNKNOWNS, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff);
-		if (m_in_index == 0){
+		if (m_in_index == 1)
+		{
+			m_in_index = 0;
 			return;
 		}
 	}
-	m_in_index++;
 }
 
 void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 {
 	LOGMASKED(LOG_WRITES, "slave_w: Channel %d: %d = %02x\n", offset, m_in_index, data & 0x00ff);
+	if (offset == 1 && m_in_index == 0)
+	{
+		LOGMASKED(LOG_COMMANDS | LOG_UNKNOWNS, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff);
+		memset(m_in_buf, 0, 17);
+		m_in_index = 0;
+		m_in_count = 0;
+		return;
+	}
+
+	m_in_buf[m_in_index] = data & 0x00ff;
+	m_in_index++;
 	switch (offset)
 	{
 		case 0:
 			slave_w_mouse(offset, data);
 			break;
 		case 1:
-			if (m_in_index)
+			if (m_in_index > 1)
 			{
-				m_in_buf[m_in_index] = data & 0x00ff;
-				m_in_index++;
 				if (m_in_index == m_in_count)
 				{
 					switch (m_in_buf[0])
 					{
 						case 0xf0: // Set Front Panel LCD
-							memcpy(m_lcd_state, m_in_buf + 1, 16);
-							memset(m_in_buf, 0, 17);
-							m_in_index = 0;
-							m_in_count = 0;
+							for (uint8_t i = 0; i < 16; i++)
+								m_lcd_w(i, m_in_buf[i + 1]);
 							break;
 						default:
-							memset(m_in_buf, 0, 17);
-							m_in_index = 0;
-							m_in_count = 0;
 							break;
 					}
-				}
-			}
-			else
-			{
-				switch (data & 0x00ff)
-				{
-					default:
-						LOGMASKED(LOG_COMMANDS | LOG_UNKNOWNS, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff);
-						memset(m_in_buf, 0, 17);
-						m_in_index = 0;
-						m_in_count = 0;
-						break;
+					memset(m_in_buf, 0, 17);
+					m_in_index = 0;
+					m_in_count = 0;
 				}
 			}
 			break;
 		case 2:
-			if (m_in_index)
+			if (m_in_index > 1)
 			{
-				m_in_buf[m_in_index] = data & 0x00ff;
-				m_in_index++;
 				if (m_in_index == m_in_count)
 				{
 					switch (m_in_buf[0])
 					{
+						case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
+						case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
+						{
+							u32 gains = 0;
+							for (int i = 1; i <= 4; i++)
+							{
+								gains <<= 8;
+								if (m_in_buf[i] < std::size(s_attenuation_table))
+								{
+									gains |= s_attenuation_table[m_in_buf[i]];
+								}
+							}
+							m_atten_w(gains);
+							m_in_index = 0;
+							m_in_count = 0;
+							break;
+						}
 						case 0xf0: // Set Front Panel LCD
 							memset(m_in_buf + 1, 0, 16);
 							m_in_count = 17;
@@ -242,8 +277,6 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 			}
 			else
 			{
-				m_in_buf[m_in_index] = data & 0x00ff;
-				m_in_index++;
 				switch (data & 0x00ff)
 				{
 					case 0x82: // Mute Audio
@@ -265,6 +298,17 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 						m_in_count = 0;
 						break;
 					}
+					case 0x8a: // Reset System
+						LOGMASKED(LOG_COMMANDS, "slave_w: Channel %d: Reset System (0x8a)\n", offset);
+						m_in_index = 0;
+						m_in_count = 0;
+						machine().schedule_soft_reset();
+						break;
+					case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
+					case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
+						LOGMASKED(LOG_COMMANDS, "slave_w: Channel %d: Set Attenuation Audio\n", offset);
+						m_in_count = 5;
+						break;
 					case 0xf0: // Set Front Panel LCD
 						LOGMASKED(LOG_COMMANDS, "slave_w: Channel %d: Set Front Panel LCD (0xf0)\n", offset);
 						m_in_count = 17;
@@ -279,40 +323,38 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 			}
 			break;
 		case 3:
-			if (m_in_index)
+			if (m_in_index > 1)
 			{
-				m_in_buf[m_in_index] = data & 0x00ff;
-				m_in_index++;
 				if (m_in_index == m_in_count)
 				{
 					switch (m_in_buf[0])
 					{
 						case 0xb0: // Request Disc Status
-							memset(m_in_buf, 0, 17);
-							m_in_index = 0;
-							m_in_count = 0;
-							prepare_readback(attotime::from_hz(4), 3, 4, 0xb0, 0x00, 0x02, 0x15, 0xb0);
+							prepare_readback(attotime::from_hz(4), 3, 4, 0xb0, 0x00, disc_type(), 0x15, 0xb0);
 							break;
 						//case 0xb1: // Request Disc Base
-							//memset(m_in_buf, 0, 17);
-							//m_in_index = 0;
-							//m_in_count = 0;
 							//prepare_readback(attotime::from_hz(10000), 3, 4, 0xb1, 0x00, 0x00, 0x00, 0xb1);
 							//break;
 						default:
-							memset(m_in_buf, 0, 17);
-							m_in_index = 0;
-							m_in_count = 0;
 							break;
 					}
+					memset(m_in_buf, 0, 17);
+					m_in_index = 0;
+					m_in_count = 0;
 				}
 			}
 			else
 			{
-				m_in_buf[m_in_index] = data & 0x00ff;
-				m_in_index++;
 				switch (data & 0x00ff)
 				{
+					case 0x80: // TODO: Set some memory. 
+						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: Set UNKWN memory (0x80). Unimplemented\n", offset);
+						m_in_count = 4;
+						break;
+					case 0x81: // TODO: Unset some memory.
+						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: Unset UNKWN memory (0x81). Unimplemented\n", offset);
+						m_in_count = 4;
+						break;
 					case 0xb0: // Request Disc Status
 						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: Request Disc Status (0xb0)\n", offset);
 						m_in_count = 4;
@@ -334,21 +376,28 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 					case 0xf4: // Request Test Plug Status
 						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: Request Test Plug Status (0xf4)\n", offset);
 						m_in_index = 0;
-						prepare_readback(attotime::from_hz(10000), 2, 2, 0xf4, 0, 0, 0, 0xf4);
+						prepare_readback(attotime::from_hz(10000), 2, 2, 0xf4, m_testplug_cb() ? 1 : 0, 0, 0, 0xf4);
 						break;
 					case 0xf6: // Request NTSC/PAL Status
 						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: Request NTSC/PAL Status (0xf6)\n", offset);
-						prepare_readback(attotime::never, 2, 2, 0xf6, 2, 0, 0, 0xf6);
+						// the real slave answers 01 for NTSC, 02 for PAL;
+						// cdimono1n ties ntsc_callback to 1
+						prepare_readback(attotime::never, 2, 2, 0xf6, m_ntsc_cb() ? 1 : 2, 0, 0, 0xf6);
 						m_in_index = 0;
 						break;
-					case 0xf7: // Enable Input Polling
-						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: Activate Input Polling (0xf7)\n", offset);
-						m_polling_active = 1;
+					case 0xf7: // TODO: Arm Developer Mode
+						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: TODO: Unimplemented (0xf7)\n", offset);
+						m_debug_mode = 1;
 						m_in_index = 0;
 						break;
 					case 0xfa: // Enable X-Bus Interrupts
 						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: X-Bus Interrupt Enable (0xfa)\n", offset);
 						m_xbus_interrupt_enable = 1;
+						m_in_index = 0;
+						break;
+					case 0xfe: // TODO: Disrm Developer Mode
+						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: TODO: Unimplemeneted (0xfe)\n", offset);
+						m_debug_mode = 0;
 						m_in_index = 0;
 						break;
 					default:
@@ -378,6 +427,11 @@ cdislave_hle_device::cdislave_hle_device(const machine_config &mconfig, const ch
 	, m_read_mousey(*this, 0x0000)
 	, m_read_mousebtn(*this, 0x00)
 	, m_dmadac(*this, ":dac%u", 1U)
+	, m_atten_w(*this)
+	, m_lcd_w(*this)
+	, m_testplug_cb(*this, 0)
+	, m_ntsc_cb(*this, 0)
+	, m_cdrom(*this, ":cdrom")
 {
 }
 
@@ -420,11 +474,9 @@ void cdislave_hle_device::device_start()
 	save_item(NAME(m_in_index));
 	save_item(NAME(m_in_count));
 
-	save_item(NAME(m_polling_active));
+	save_item(NAME(m_debug_mode));
 
 	save_item(NAME(m_xbus_interrupt_enable));
-
-	save_item(NAME(m_lcd_state));
 
 	save_item(NAME(m_input_mouse_x));
 	save_item(NAME(m_input_mouse_y));
@@ -460,11 +512,9 @@ void cdislave_hle_device::device_reset()
 	m_in_index = 0;
 	m_in_count = 0;
 
-	m_polling_active = 0;
+	m_debug_mode = 0;
 
 	m_xbus_interrupt_enable = 0;
-
-	memset(m_lcd_state, 0, 16);
 
 	m_input_mouse_x = 0xffff;
 	m_input_mouse_y = 0xffff;

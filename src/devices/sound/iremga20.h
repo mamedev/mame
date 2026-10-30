@@ -30,7 +30,7 @@ public:
 	uint8_t read(offs_t offset);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;

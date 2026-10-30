@@ -107,6 +107,7 @@ private:
 } // namespace bus::sunkbd
 
 
+DECLARE_DEVICE_TYPE_NS(SUN_TYPE2_HLE_KEYBOARD,    bus::sunkbd, hle_device_base)
 DECLARE_DEVICE_TYPE_NS(SUN_TYPE3_HLE_KEYBOARD,    bus::sunkbd, hle_device_base)
 DECLARE_DEVICE_TYPE_NS(SUN_TYPE4_HLE_KEYBOARD,    bus::sunkbd, hle_device_base)
 DECLARE_DEVICE_TYPE_NS(SUN_TYPE5_HLE_KEYBOARD,    bus::sunkbd, hle_device_base)

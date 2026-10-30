@@ -249,11 +249,7 @@ public:
 		m_sw1_4->write((newval>>3) & 1);
 	}
 
-	void breakout(machine_config &config);
-protected:
-
-	// driver_device overrides
-	virtual void machine_start() override { m_serve_led_output.resolve(); m_lamp_credit_output.resolve(); }
+	void breakout(machine_config &config) ATTR_COLD;
 
 private:
 	output_finder<> m_serve_led_output;
@@ -287,12 +283,7 @@ public:
 		machine().bookkeeping().coin_counter_w(0, (data < 1.0));
 	}
 
-	void rebound(machine_config &config);
-
-protected:
-
-	// driver_device overrides
-	virtual void machine_start() override { m_credit_led.resolve(); }
+	void rebound(machine_config &config) ATTR_COLD;
 
 private:
 	output_finder<> m_credit_led;
@@ -458,12 +449,11 @@ void pong_state::pong(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "maincpu:coinsw", "coinsw.POS", 0);
 	NETLIST_LOGIC_INPUT(config, "maincpu:antenna", "antenna.IN", 0);
 
-	NETLIST_LOGIC_OUTPUT(config, "maincpu:snd0", 0).set_params("sound", FUNC(pong_state::sound_cb_logic));
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("videomix", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
+	NETLIST_LOGIC_OUTPUT(config, "maincpu:snd0").set_params("sound", FUNC(pong_state::sound_cb_logic));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
-	//SCREEN(config, "screen", SCREEN_TYPE_VECTOR);
+	SCREEN(config, "screen");
 	FIXFREQ(config, m_video)
 		.set_monitor_clock(MASTER_CLOCK_PONG)
 		.set_horz_params(H_TOTAL_PONG-66,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG)
@@ -501,22 +491,21 @@ void breakout_state::breakout(machine_config &config)
 
 	NETLIST_LOGIC_INPUT(config, "maincpu:antenna", "antenna.IN", 0);
 
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:snd0", 0).set_params("sound", FUNC(breakout_state::sound_cb_analog));
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("videomix", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:snd0").set_params("sound", FUNC(breakout_state::sound_cb_analog));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 
 	// Leds and lamps
 
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:led_serve", 0).set_params("CON_P", FUNC(breakout_state::serve_cb));
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:lamp_credit1", 0).set_params("CON_CREDIT1", FUNC(breakout_state::credit_cb<0>));
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:lamp_credit2", 0).set_params("CON_CREDIT2", FUNC(breakout_state::credit_cb<1>));
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:coin_counter", 0).set_params("CON_T", FUNC(breakout_state::coin_counter_cb));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:led_serve").set_params("CON_P", FUNC(breakout_state::serve_cb));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:lamp_credit1").set_params("CON_CREDIT1", FUNC(breakout_state::credit_cb<0>));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:lamp_credit2").set_params("CON_CREDIT2", FUNC(breakout_state::credit_cb<1>));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:coin_counter").set_params("CON_T", FUNC(breakout_state::coin_counter_cb));
 
 	/* video hardware */
 	/* The Pixel width is a 2,1,2,1,2,1,1,1 repeating pattern
 	 * Thus we must use double resolution horizontally
 	 */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
-	//SCREEN(config, "screen", SCREEN_TYPE_VECTOR);
+	SCREEN(config, "screen");
 	FIXFREQ(config, m_video)
 		.set_monitor_clock(MASTER_CLOCK_BREAKOUT)
 		.set_horz_params((H_TOTAL_BREAKOUT-176),(H_TOTAL_BREAKOUT-144),(H_TOTAL_BREAKOUT-80),  (H_TOTAL_BREAKOUT))
@@ -550,11 +539,11 @@ void pong_state::pongd(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "maincpu:antenna", "antenna.IN", 0, 0x01)
 #endif
 
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:snd0", 0).set_params("AUDIO", FUNC(pong_state::sound_cb_analog));
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("videomix", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:snd0").set_params("AUDIO", FUNC(pong_state::sound_cb_analog));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 	FIXFREQ(config, m_video)
 		.set_monitor_clock(MASTER_CLOCK_PONG)
 		.set_horz_params(H_TOTAL_PONG-76,H_TOTAL_PONG-56,H_TOTAL_PONG-8,H_TOTAL_PONG)
@@ -586,14 +575,14 @@ void rebound_state::rebound(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "maincpu:dsw1b", "DSW1b.POS", 0);
 	NETLIST_LOGIC_INPUT(config, "maincpu:dsw2", "DSW2.POS", 0);
 
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:snd0", 0).set_params("sound", FUNC(rebound_state::sound_cb_analog));
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("videomix", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:snd0").set_params("sound", FUNC(rebound_state::sound_cb_analog));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("videomix", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:led_credit", 0).set_params("CON11", FUNC(rebound_state::led_credit_cb));
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:coin_counter", 0).set_params("CON10", FUNC(rebound_state::coin_counter_cb));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:led_credit").set_params("CON11", FUNC(rebound_state::led_credit_cb));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:coin_counter").set_params("CON10", FUNC(rebound_state::coin_counter_cb));
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 	FIXFREQ(config, m_video)
 		.set_monitor_clock(MASTER_CLOCK_PONG)
 		.set_horz_params(H_TOTAL_PONG-66,H_TOTAL_PONG-56,H_TOTAL_PONG-8,H_TOTAL_PONG)

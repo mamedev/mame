@@ -483,13 +483,11 @@ void ltcasin2_state::init_mv4in1()
 void ltcasino_state::machine_start()
 {
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ltcasino_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_lamps.resolve();
 }
 
 void ltcasin2_state::machine_start()
 {
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ltcasin2_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_lamps.resolve();
 }
 
 uint8_t ltcasino_state::input_s_r()
@@ -571,7 +569,7 @@ void ltcasino_state::ltcasino(machine_config &config)
 	m_vtc->set_visarea(48, 463, 0, 255);
 	m_vtc->vsyn_callback().set(m_pia[0], FUNC(pia6821_device::cb2_w)).invert(); // ? (CA1, CA2 also enabled)
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(18_MHz_XTAL / 2, 560, 48, 464, 268, 0, 256);
 	m_screen->set_screen_update(FUNC(ltcasino_state::screen_update));
 	m_screen->set_palette("palette");

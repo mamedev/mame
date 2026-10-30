@@ -44,12 +44,12 @@ public:
 	}
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD
 	{
 		return ROM_NAME( teletex800 );
 	}
 
-	virtual void device_add_mconfig(machine_config &config) override
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD
 	{
 		config.set_default_layout(layout_teletex800);
 
@@ -70,30 +70,12 @@ protected:
 		PIA6821(config, m_pia_cp);
 	}
 
-	virtual ioport_constructor device_input_ports() const override
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD
 	{
 		return INPUT_PORTS_NAME( teletex800 );
 	}
 
-	virtual void device_start() override
-	{
-		m_bat_led.resolve();
-		m_pr_led.resolve();
-		m_telex_led.resolve();
-		m_mem_led.resolve();
-		m_obs_led.resolve();
-		m_write_led.resolve();
-		m_log_led.resolve();
-		m_queue_led.resolve();
-		m_all_led.resolve();
-		m_time_led.resolve();
-		m_date_led.resolve();
-		m_year_led.resolve();
-		m_rx_digits.resolve();
-		m_tx_digits.resolve();
-	}
-
-	virtual void device_reset() override
+	virtual void device_start() override ATTR_COLD
 	{
 	}
 
@@ -120,12 +102,12 @@ private:
 	output_finder<2> m_rx_digits;
 	output_finder<2> m_tx_digits;
 
-	void program_map(address_map &map)
+	void program_map(address_map &map) ATTR_COLD
 	{
 		map(0x0000, 0x0fff).rom().region("z80", 0);
 	}
 
-	void io_map(address_map &map)
+	void io_map(address_map &map) ATTR_COLD
 	{
 	}
 
@@ -134,7 +116,7 @@ private:
 		{ nullptr }
 	};
 
-	static void printer_devices(device_slot_interface &device)
+	static void printer_devices(device_slot_interface &device) ATTR_COLD
 	{
 		device.option_add("printer", SERIAL_PRINTER);
 	}

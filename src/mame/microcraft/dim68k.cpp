@@ -417,7 +417,7 @@ void dim68k_state::dim68k(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dim68k_state::mem_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(14.318181_MHz_XTAL, 896, 0, 640, 279, 0, 224);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	PALETTE(config, m_palette, FUNC(dim68k_state::dim68k_palette), 16);

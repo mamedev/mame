@@ -691,7 +691,7 @@ INPUT_PORTS_END
 
 void tipi_card_device::device_add_mconfig(machine_config &config)
 {
-	TI99_TIPI_RPI(config, m_rpi, 0);
+	TI99_TIPI_RPI(config, m_rpi);
 }
 
 ROM_START( tipi )

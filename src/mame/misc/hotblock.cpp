@@ -198,12 +198,12 @@ void hotblock_state::hotblock(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hotblock_state::hotblock_map);
 	m_maincpu->set_addrmap(AS_IO, &hotblock_state::hotblock_io);
 
-	I2C_24C02(config, "i2cmem", 0); // 24C02B1 // Some boards may use a 24C04, but using just half its capacity
+	I2C_24C02(config, "i2cmem"); // 24C02B1 // Some boards may use a 24C04, but using just half its capacity
 
 	ADDRESS_MAP_BANK(config, m_video_bank).set_map(&hotblock_state::banked_video_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x10000);
 
 	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 3, 512, 0, 320, 312, 0, 200); // 15.625 kHz horizontal???
 	screen.set_screen_update(FUNC(hotblock_state::screen_update));
 	screen.set_palette(m_palette);

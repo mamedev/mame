@@ -132,7 +132,7 @@ static imgtoolerr_t vzdos_read_sector_data(imgtool::image &img, int track, int s
 	if (ret) return (imgtoolerr_t)ret;
 
 	/* verify sector checksums */
-	if (get_u16le(&buffer[DATA_SIZE + 2]) != util::sum16_creator::simple(buffer, DATA_SIZE + 2))
+	if (get_u16le(&buffer[DATA_SIZE + 2]) != uint16_t(util::sum16_creator::simple(buffer, DATA_SIZE + 2)))
 		return IMGTOOLERR_CORRUPTFILE;
 
 	memcpy(data, &buffer, DATA_SIZE + 2);

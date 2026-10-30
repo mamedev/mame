@@ -158,7 +158,7 @@ void rollerg_state::ext_enable_w(uint8_t data)
 
 void rollerg_state::soundirq_w(uint8_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 void rollerg_state::sound_arm_nmi_w(uint8_t data)
@@ -334,7 +334,6 @@ void rollerg_state::machine_reset()
 {
 	// Z80 _NMI goes low at same time as reset
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 
@@ -352,7 +351,7 @@ void rollerg_state::rollerg(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240); // from CCU
 	screen.set_screen_update(FUNC(rollerg_state::screen_update));
 	screen.set_palette("palette");

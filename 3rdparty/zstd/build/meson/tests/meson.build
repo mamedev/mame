@@ -29,6 +29,7 @@ DECODECORPUS_TESTTIME = '-T30'
 test_includes = [ include_directories(join_paths(zstd_rootdir, 'programs')) ]
 
 testcommon_sources = [join_paths(zstd_rootdir, 'programs/datagen.c'),
+  join_paths(zstd_rootdir, 'programs/lorem.c'),
   join_paths(zstd_rootdir, 'programs/util.c'),
   join_paths(zstd_rootdir, 'programs/timefn.c'),
   join_paths(zstd_rootdir, 'programs/benchfn.c'),
@@ -43,7 +44,8 @@ testcommon_dep = declare_dependency(link_with: testcommon,
   dependencies: libzstd_deps,
   include_directories: libzstd_includes)
 
-datagen_sources = [join_paths(zstd_rootdir, 'tests/datagencli.c')]
+datagen_sources = [join_paths(zstd_rootdir, 'tests/datagencli.c'),
+  join_paths(zstd_rootdir, 'tests/loremOut.c')]
 datagen = executable('datagen',
   datagen_sources,
   c_args: [ '-DNDEBUG' ],
@@ -91,7 +93,7 @@ roundTripCrash = executable('roundTripCrash',
 longmatch_sources = [join_paths(zstd_rootdir, 'tests/longmatch.c')]
 longmatch = executable('longmatch',
   longmatch_sources,
-  dependencies: [ libzstd_dep ],
+  dependencies: [ libzstd_internal_dep ],
   install: false)
 
 invalidDictionaries_sources = [join_paths(zstd_rootdir, 'tests/invalidDictionaries.c')]

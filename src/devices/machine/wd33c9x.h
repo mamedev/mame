@@ -11,7 +11,7 @@
 
 #include "machine/nscsi_bus.h"
 
-class wd33c9x_base_device : public nscsi_device, public nscsi_slot_card_interface
+class wd33c9x_base_device : public device_t, public nscsi_device_interface
 {
 public:
 	auto irq_cb() { return m_irq_cb.bind(); }
@@ -104,7 +104,6 @@ private:
 	bool m_drq_state;
 
 	void delay(uint32_t cycles);
-	void delay_cycles(uint32_t cycles);
 	emu_timer *m_timer;
 
 	bool set_command_length(const uint8_t cc);

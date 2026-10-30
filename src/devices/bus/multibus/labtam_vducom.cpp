@@ -328,7 +328,7 @@ void labtam_vducom_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(labtam_vducom_device::palette_init), 4);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16_MHz_XTAL / 16, 62 * 16, 2 * 16, 52 * 16, 78 * 4, 3 * 4, 75 * 4);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 
@@ -389,7 +389,7 @@ void labtam_vducom_device::palette_init(palette_device &palette)
 // interlace: one plane 800x600, 64k, (black, normal)
 MC6845_UPDATE_ROW(labtam_vducom_device::update_row)
 {
-	required_shared_ptr<u16> const ram = m_ram[BIT(u7(), 2)];
+	auto const &ram = m_ram[BIT(u7(), 2)];
 	offs_t const offset = (start() >> 1) + ma * 4 + ra * 50;
 
 	for (unsigned x = 0; x < x_count; x++)

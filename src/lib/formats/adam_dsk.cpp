@@ -201,6 +201,7 @@ bool adam_format::load(util::random_read &io, uint32_t form_factor, const std::v
 			sector_desc[sector].deleted = false;
 			sector_desc[sector].bad_data_crc = false;
 			sector_desc[sector].bad_addr_crc = false;
+			sector_desc[sector].weak = false;
 		}
 
 		// For double-sided 5.25" images, read one side after the other
@@ -239,6 +240,7 @@ bool adam_format::load(util::random_read &io, uint32_t form_factor, const std::v
 			sector_desc[sector].deleted = false;
 			sector_desc[sector].bad_data_crc = false;
 			sector_desc[sector].bad_addr_crc = false;
+			sector_desc[sector].weak = false;
 		}
 
 		// For 3.5" images, tracks are interleaved between sides

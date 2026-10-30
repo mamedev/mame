@@ -130,7 +130,6 @@ public:
 	int hopper_r();
 
 protected:
-	virtual void machine_start() override ATTR_COLD { m_led.resolve(); m_lamps.resolve(); }
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
@@ -427,8 +426,9 @@ void _1layer_state::custom_io_w(uint8_t data)
 
 int _1layer_state::hopper_r()
 {
+	// FIXME: use a hopper device
 	if (m_hopper) return !(m_screen->frame_number() % 10);
-	return machine().input().code_pressed(KEYCODE_H);
+	else return 0;
 }
 
 void _1layer_state::program_map(address_map &map)
@@ -1978,7 +1978,7 @@ void _1layer_state::base(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8); // TODO: wrong screen size!
@@ -2500,7 +2500,7 @@ void _2layers_state::init_igs_ncs2()
 
 }
 
-ROM_START( igs_ncs2 )
+ROM_START( igs_ncs2 ) // IGS PCB N0-0204-3
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "ncs_v100n.u20", 0x00000, 0x10000, CRC(2bb91de5) SHA1(b0b7b3b9cee1ce4da10cf78ef1c8079f3d9cafbf) )
 	ROM_LOAD( "ncs_v100n.u21", 0x10000, 0x10000, CRC(678e412c) SHA1(dba031d3576d098d314d6589dd1aeda44d17c650) )
@@ -2662,6 +2662,9 @@ ROM_START( chleaguexa )
 	ROM_LOAD( "23.u9",  0x40000, 0x20000, CRC(4ac8cc41) SHA1(e4bfd63408511e7d21f140d315493af7fdeba373) )
 
 	ROM_REGION( 0x30000, "gfx2", ROMREGION_ERASE00 )
+
+	ROM_REGION16_LE( 0x4010, "pic", ROMREGION_ERASEFF )
+	ROM_LOAD( "pic16c65a.u1", 0x0000, 0x4010, NO_DUMP )
 ROM_END
 
 
@@ -2722,6 +2725,9 @@ ROM_START( chleaguexb )
 	ROM_LOAD( "23.u9",  0x40000, 0x20000, CRC(2206fbbb) SHA1(c11e5f6fc460045ae93e44fba9662d8ac613581f) )
 
 	ROM_REGION( 0x30000, "gfx2", ROMREGION_ERASE00 )
+
+	ROM_REGION16_LE( 0x4010, "pic", ROMREGION_ERASEFF )
+	ROM_LOAD( "pic16c65a.u1", 0x0000, 0x4010, NO_DUMP )
 ROM_END
 
 

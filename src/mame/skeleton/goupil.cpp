@@ -520,12 +520,12 @@ void goupil_base_state::base(machine_config &config)
 {
 	M6808(config, m_maincpu, CPU_CLOCK);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 
 	// TODO: sound hardware
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 
 	// TODO: Is this specific to the G1?
 	MOS6522(config, m_via_video, CPU_CLOCK / 4);

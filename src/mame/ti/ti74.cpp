@@ -100,8 +100,8 @@ public:
 		m_segs(*this, "seg%u", 0U)
 	{ }
 
-	void ti74(machine_config &config);
-	void ti95(machine_config &config);
+	void ti74(machine_config &config) ATTR_COLD;
+	void ti95(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(battery_status_changed);
 
@@ -142,8 +142,6 @@ private:
 
 void ti74_state::machine_start()
 {
-	m_segs.resolve();
-
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
@@ -524,7 +522,7 @@ void ti74_state::ti74(machine_config &config)
 	NVRAM(config, "sysram.ic3", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60); // arbitrary
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(6*31+1, 9*1+1+1);
@@ -557,7 +555,7 @@ void ti74_state::ti95(machine_config &config)
 	NVRAM(config, "sysram.ic3", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60); // arbitrary
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(200, 20);

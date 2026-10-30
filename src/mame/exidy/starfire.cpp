@@ -403,7 +403,7 @@ void starfire_base_state::base_config(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &starfire_base_state::main_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(STARFIRE_PIXEL_CLOCK, STARFIRE_HTOTAL, STARFIRE_HBEND, STARFIRE_HBSTART, STARFIRE_VTOTAL, STARFIRE_VBEND, STARFIRE_VBSTART);
 	m_screen->set_screen_update(FUNC(starfire_base_state::screen_update));
 }
@@ -476,9 +476,9 @@ void starfire_state::starfire(machine_config &config)
 	NETLIST_ANALOG_INPUT(config, "sound_nl:lohvol", "R15.DIAL");
 	NETLIST_ANALOG_INPUT(config, "sound_nl:mainvol", "R21.DIAL");
 
-	NETLIST_ANALOG_OUTPUT(config, "sound_nl:tieon1", 0).set_params("TIEON1", FUNC(starfire_state::tieon1_cb));
-	NETLIST_ANALOG_OUTPUT(config, "sound_nl:laseron1", 0).set_params("LASERON1", FUNC(starfire_state::laseron1_cb));
-	NETLIST_ANALOG_OUTPUT(config, "sound_nl:output", 0).set_params("OUTPUT", FUNC(starfire_state::sound_out_cb));
+	NETLIST_ANALOG_OUTPUT(config, "sound_nl:tieon1").set_params("TIEON1", FUNC(starfire_state::tieon1_cb));
+	NETLIST_ANALOG_OUTPUT(config, "sound_nl:laseron1").set_params("LASERON1", FUNC(starfire_state::laseron1_cb));
+	NETLIST_ANALOG_OUTPUT(config, "sound_nl:output").set_params("OUTPUT", FUNC(starfire_state::sound_out_cb));
 
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.5); // Not actually a DAC, just here to receive output.
 }

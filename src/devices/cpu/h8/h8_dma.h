@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "h8.h"
+#include "h8_cpu_base.h"
 #include "h8_intc.h"
 
 struct h8_dma_state {
@@ -73,7 +73,7 @@ public:
 	void start_stop_test();
 
 protected:
-	required_device<h8_device> m_cpu;
+	required_device<h8_cpu_base> m_cpu;
 	optional_device_array<h8gen_dma_channel_device, 4> m_dmach;
 
 	virtual void device_start() override ATTR_COLD;
@@ -184,8 +184,8 @@ public:
 	void abort(int submodule) { dma_done(submodule); }
 
 protected:
-	required_device<h8_device> m_cpu;
-	required_device<h8_intc_device> m_intc;
+	required_device<h8_cpu_base> m_cpu;
+	required_device<h8_intc_base> m_intc;
 	int m_irq_base;
 	u32 m_ioar_mask; // ff0000 for h8s, ffff00 for h8h
 

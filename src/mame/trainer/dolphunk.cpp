@@ -277,9 +277,9 @@ ROM_START( dauphin )
 	// Cassette rom
 	ROM_LOAD( "dolphin_moni.rom", 0x0100, 0x0100, NO_DUMP )
 
-	//ROM_LOAD_OPTIONAL( "dolphin_mona.rom", 0x0c00, 0x0400, NO_DUMP )
+	//ROM_LOAD( "dolphin_mona.rom", 0x0c00, 0x0400, NO_DUMP )
 	// This rom is a bugfixed and relocated version of the game found on the Amigan site
-	ROM_LOAD_OPTIONAL( "reflexes.bin", 0x0c00, 0x0400, CRC(14a1557d) SHA1(789d10551f1bb3472057901fa3cee0c6bfe220ac) )
+	ROM_LOAD( "reflexes.bin", 0x0c00, 0x0400, CRC(14a1557d) SHA1(789d10551f1bb3472057901fa3cee0c6bfe220ac) )
 	// This the original
 	//ROM_LOAD( "reflexes.bin", 0x0c00, 0x0072, CRC(c4bed94b) SHA1(cf525755a1dbce6a4681353be692ddf0346f323b) )
 ROM_END

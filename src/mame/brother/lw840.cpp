@@ -85,7 +85,7 @@ Emulation Status:
 class gm82c765b_device : public upd765_family_device
 {
 public:
-	gm82c765b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gm82c765b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void map(address_map& map) override ATTR_COLD
 	{
@@ -348,7 +348,7 @@ void lw840_state::lw840(machine_config &config)
 	TIMER(config, "2khz").configure_periodic(FUNC(lw840_state::int2_timer_callback), attotime::from_hz(2*1000));
 
 	// video hardware
-	SCREEN(config, screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, screen);
 	screen->set_color(rgb_t::white());
 	screen->set_physical_aspect(640, 400);
 	screen->set_screen_update(FUNC(lw840_state::screen_update));
@@ -356,7 +356,7 @@ void lw840_state::lw840(machine_config &config)
 	screen->set_size(640, 400);
 
 	// floppy
-	GM82C765B(config, fdc, 0);
+	GM82C765B(config, fdc);
 	fdc->intrq_wr_callback().set(FUNC(lw840_state::fdc_interrupt));
 	fdc->drq_wr_callback().set(FUNC(lw840_state::fdc_drq));
 	FLOPPY_CONNECTOR(config, "fdc:0", lw840_floppies, "35hd", lw840_state::floppy_formats);

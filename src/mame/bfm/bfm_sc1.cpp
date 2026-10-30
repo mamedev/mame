@@ -93,7 +93,6 @@ Optional (on expansion card) (Viper)
 #include "bfm_bd1.h" // vfd
 #include "bfm_comn.h"
 
-#include "awpvid.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
@@ -131,23 +130,24 @@ public:
 	bfm_sc1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_reels(*this, "reel%u", 0U),
+		m_reels(*this, "reel%u", 1U),
 		m_upd7759(*this, "upd"),
 		m_vfd0(*this, "vfd0"),
 		m_meters(*this, "meters"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void init_toppoker();
-	void init_lotse_bank0();
-	void init_nocrypt_bank0();
-	void init_lotse();
-	void init_clatt();
-	void init_rou029();
-	void init_nocrypt();
-	void scorpion1_adder2(machine_config &config);
-	void scorpion1(machine_config &config);
-	void scorpion1_viper(machine_config &config);
+	void init_toppoker() ATTR_COLD;
+	void init_lotse_bank0() ATTR_COLD;
+	void init_nocrypt_bank0() ATTR_COLD;
+	void init_lotse() ATTR_COLD;
+	void init_clatt() ATTR_COLD;
+	void init_rou029() ATTR_COLD;
+	void init_nocrypt() ATTR_COLD;
+
+	void scorpion1_adder2(machine_config &config) ATTR_COLD;
+	void scorpion1(machine_config &config) ATTR_COLD;
+	void scorpion1_viper(machine_config &config) ATTR_COLD;
 
 protected:
 	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
@@ -183,7 +183,6 @@ protected:
 
 	void save_state();
 
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void machine_reset() override ATTR_COLD;
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	void sc1_common_init(int reels, int decrypt, int defaultbank);
@@ -320,8 +319,8 @@ void bfm_sc1_state::reel12_w(uint8_t data)
 		m_reels[0]->update((data>>4)&0x0f);
 		m_reels[1]->update( data    &0x0f);
 	}
-	awp_draw_reel(machine(),"reel1", *m_reels[0]);
-	awp_draw_reel(machine(),"reel2", *m_reels[1]);
+	m_reels[0]->draw();
+	m_reels[1]->draw();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -337,8 +336,8 @@ void bfm_sc1_state::reel34_w(uint8_t data)
 		m_reels[2]->update((data>>4)&0x0f);
 		m_reels[3]->update( data    &0x0f);
 	}
-	awp_draw_reel(machine(),"reel3", *m_reels[2]);
-	awp_draw_reel(machine(),"reel4", *m_reels[3]);
+	m_reels[2]->draw();
+	m_reels[3]->draw();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -348,8 +347,8 @@ void bfm_sc1_state::reel56_w(uint8_t data)
 	m_reels[4]->update((data>>4)&0x0f);
 	m_reels[5]->update( data    &0x0f);
 
-	awp_draw_reel(machine(),"reel5", *m_reels[4]);
-	awp_draw_reel(machine(),"reel6", *m_reels[5]);
+	m_reels[4]->draw();
+	m_reels[5]->draw();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -873,11 +872,11 @@ static INPUT_PORTS_START( clatt )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("STROBE2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 )   PORT_NAME("Stop/Gamble")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1  )   PORT_NAME("Start")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_INTERLOCK ) PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE )   PORT_NAME("Refill Key")   PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_INTERLOCK ) PORT_NAME("Front Door")   PORT_CODE(KEYCODE_W) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Stop/Gamble")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1  ) PORT_NAME("Start")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_DOOR )    PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Refill Key")   PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_DOOR )    PORT_NAME("Front Door")   PORT_CODE(KEYCODE_W) PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -995,7 +994,7 @@ static INPUT_PORTS_START( toppoker )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("STROBE3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_INTERLOCK)PORT_NAME("Back Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_DOOR)    PORT_NAME("Back Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Slide Dump") PORT_CODE(KEYCODE_W) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Meter Key") PORT_CODE(KEYCODE_E) PORT_TOGGLE
@@ -1009,7 +1008,7 @@ static INPUT_PORTS_START( toppoker )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON13) PORT_NAME("Vast Monitor 2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON14) PORT_NAME("Vast Monitor 3")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON15) PORT_NAME("Vast Monitor 4")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_INTERLOCK)PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_W) PORT_TOGGLE
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_DOOR)     PORT_NAME("Cashbox Door") PORT_CODE(KEYCODE_W) PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON16) PORT_NAME("Vast Monitor 5")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1109,7 +1108,7 @@ void bfm_sc1_state::scorpion1(machine_config &config)
 	REEL(config, m_reels[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reels[5]->optic_handler().set(FUNC(bfm_sc1_state::reel_optic_cb<5>));
 
-	METERS(config, m_meters, 0).set_number(8);
+	METERS(config, m_meters).set_number(8);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1124,7 +1123,7 @@ void bfm_sc1_state::scorpion1_adder2(machine_config &config)
 
 	config.set_default_layout(layout_sc1_vid);
 
-	BFM_ADDER2(config, "adder2", 0);
+	BFM_ADDER2(config, "adder2");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

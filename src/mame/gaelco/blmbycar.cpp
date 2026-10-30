@@ -595,7 +595,7 @@ void base_state::base(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(blmbycar_state::irq1_line_hold));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(0x180, 0x100);
 	screen.set_screen_update(FUNC(blmbycar_state::screen_update));
@@ -603,7 +603,7 @@ void base_state::base(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x2000);
 
-	BLMBYCAR_SPRITES(config, m_sprites, 0, m_palette, gfx_blmbycar);
+	BLMBYCAR_SPRITES(config, m_sprites, m_palette, gfx_blmbycar);
 	m_sprites->set_screen("screen");
 
 	// sound hardware

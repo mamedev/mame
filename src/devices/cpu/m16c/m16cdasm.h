@@ -18,24 +18,8 @@ protected:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:
-	// static tables
-	static const char *const s_regs[2][6];
-	static const char *const s_cregs[8];
-	static const char *const s_byte_ops[8];
-	static const char *const s_bit_ops[14];
-	static const char *const s_cnds[16];
-	static const char *const s_imm76_ops[2][9];
-	static const char *const s_nibmov_ops[4];
-	static const char *const s_decimal_ops[2][4];
-
-	// formatting helpers
-	void format_imm8(std::ostream &stream, u8 imm) const;
-	void format_imm16(std::ostream &stream, u16 imm) const;
-	void format_label(std::ostream &stream, u32 label) const;
-	void format_imm_signed(std::ostream &stream, s16 imm) const;
-	void format_relative(std::ostream &stream, const char *reg, s32 disp) const;
-
 	// internal helpers
+	void dasm_reg32(std::ostream &stream, u8 mode) const;
 	void dasm_ea(std::ostream &stream, offs_t &pc, const data_buffer &opcodes, u8 mode, bool size) const;
 	void dasm_general(std::ostream &stream, offs_t &pc, const data_buffer &opcodes, bool size) const;
 	void dasm_quick(std::ostream &stream, offs_t &pc, const data_buffer &opcodes, bool size) const;

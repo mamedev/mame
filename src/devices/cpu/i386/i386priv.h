@@ -7,6 +7,8 @@
 
 #include "i386dasm.h"
 
+#include "endianness.h"
+
 //#define DEBUG_MISSING_OPCODE
 
 #define I386OP(XX)      i386_##XX
@@ -324,7 +326,7 @@ extern int i386_parity_table[256];
 #define SetSZPF16(x)        {m_ZF = ((uint16_t)(x)==0);  m_SF = ((x)&0x8000) ? 1 : 0; m_PF = i386_parity_table[x & 0xFF]; }
 #define SetSZPF32(x)        {m_ZF = ((uint32_t)(x)==0);  m_SF = ((x)&0x80000000) ? 1 : 0; m_PF = i386_parity_table[x & 0xFF]; }
 
-#define MMX(n)              (*((MMX_REG *)(&m_x87_reg[(n)].low)))
+#define MMX(n)              (*((MMX_REG *)(&m_x87_reg[(n)].signif)))
 #define XMM(n)              m_sse_reg[(n)]
 
 #define FLAG_DIRTY          0x100 // VTLB flag

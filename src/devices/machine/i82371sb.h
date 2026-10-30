@@ -7,21 +7,21 @@
 #pragma once
 
 #include "pci.h"
-#include "machine/pci-ide.h"
 
 #include "bus/ata/ataintf.h"
 #include "bus/isa/isa.h"
 
-#include "machine/ins8250.h"
+#include "machine/am9517a.h"
 #include "machine/ds128x.h"
+#include "machine/idectrl.h"
+#include "machine/ins8250.h"
+#include "machine/nvram.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "machine/ram.h"
 
 #include "sound/spkrdev.h"
-#include "machine/ram.h"
-#include "machine/nvram.h"
 
-#include "machine/am9517a.h"
 
 class i82371sb_isa_device : public pci_device
 {
@@ -32,8 +32,14 @@ public:
 	{
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
+	template <typename T>
+	i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: i82371sb_isa_device(mconfig, tag, owner)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
 
-	i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto smi() { return m_smi_callback.bind(); }
 	auto nmi() { return m_nmi_callback.bind(); }
@@ -190,7 +196,10 @@ private:
 	// southbridge
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259_master;
+	// protected because needed by EB
+protected:
 	required_device<pic8259_device> m_pic8259_slave;
+private:
 	required_device<am9517a_device> m_dma8237_1;
 	required_device<am9517a_device> m_dma8237_2;
 	required_device<pit8254_device> m_pit8254;
@@ -210,7 +219,9 @@ private:
 	void at_speaker_set_spkrdata(uint8_t data);
 
 	uint8_t m_channel_check;
+protected:
 	uint8_t m_nmi_enabled;
+private:
 
 	void pc_select_dma_channel(int channel, bool state);
 	void redirect_irq(int irq, int state);
@@ -230,8 +241,14 @@ public:
 	{
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
+	template <typename T>
+	i82371sb_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: i82371sb_ide_device(mconfig, tag, owner)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
 
-	i82371sb_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i82371sb_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto irq_pri() { return m_irq_pri_callback.bind(); }
 	auto irq_sec() { return m_irq_sec_callback.bind(); }

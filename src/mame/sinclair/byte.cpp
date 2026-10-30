@@ -244,7 +244,7 @@ void byte_state::byte(machine_config &config)
 {
 	spectrum_state::spectrum_clone(config);
 
-	PIT8253(config, m_pit, 0); // КР580ВИ53
+	PIT8253(config, m_pit); // КР580ВИ53
 	m_pit->set_clk<0>(20_MHz_XTAL / 10);
 	m_pit->out_handler<0>().set([this](int state) { m_speaker->level_w(state); });
 	m_pit->set_clk<1>(20_MHz_XTAL / 10);

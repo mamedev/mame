@@ -17,6 +17,8 @@
 
 #include "emuopts.h"
 
+#include <bit>
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -58,7 +60,49 @@ void dspp_device::code_map(address_map &map)
 	map(0x000, 0x3ff).ram();
 }
 
-void dspp_device::data_map(address_map &map)
+// TODO: quickie and incomplete
+void dspp_device::data_clio_map(address_map &map)
+{
+	map(0x000, 0x06f).ram().share("eimem"); // EI (read only by DSPP)
+	// quick reads from FIFO head, without removing them from the queue (host clears them through EI writes)
+	map(0x070, 0x07e).rw(FUNC(dspp_device::fifo_peek_r), FUNC(dspp_device::fifo_head_w));
+	map(0x080, 0x0cf).ram(); // TODO: really a mirror of EI?
+	// EIFIFO status words
+	map(0x0d0, 0x0de).r(FUNC(dspp_device::fifo_status_r));
+	// EOFIFO status words
+	map(0x0e0, 0x0e3).r(FUNC(dspp_device::outfifo_status_r));
+	map(0x0ea, 0x0ea).r(FUNC(dspp_device::noise_r));
+//  map(0x0eb, 0x0eb) audio output status read
+	map(0x0ec, 0x0ec).r(FUNC(dspp_device::semaphore_status_r));
+	map(0x0ed, 0x0ed).r(FUNC(dspp_device::semaphore_data_r));
+	map(0x0ee, 0x0ee).rw(FUNC(dspp_device::pc_r), FUNC(dspp_device::pc_w));
+	map(0x0ef, 0x0ef).rw(FUNC(dspp_device::clock_r), FUNC(dspp_device::clock_w));
+	// input FIFOs (reading pops a sample)
+	map(0x0f0, 0x0fe).r(FUNC(dspp_device::fifo_pop_r));
+	map(0x100, 0x1ff).ram().share("imem");
+	map(0x200, 0x2ff).ram().share("imem");
+	map(0x300, 0x3ea).ram().share("eomem"); // write only by DSPP
+//  map(0x300, 0x30f) quick-out latches
+//  map(0x3eb, 0x3eb) write AUDLOCK, MSB in this version
+	map(0x3eb, 0x3eb).lw16(
+		NAME([this] (offs_t offset, u16 data) {
+			m_core->m_flag_audlock = BIT(data, 15);
+		})
+	);
+	map(0x3ec, 0x3ec).w(FUNC(dspp_device::semaphore_ack_w));
+	map(0x3ed, 0x3ed).w(FUNC(dspp_device::semaphore_data_w));
+	// host CPU irq, the word is the audio folio tick counter (read back by the host at $3fb8)
+	map(0x3ee, 0x3ee).rw(FUNC(dspp_device::tick_r), FUNC(dspp_device::tick_w));
+	// clock reload: instruments write $4000 at the top of the frame and read back $0ef
+	// to meter how many cycles the frame took
+	map(0x3ef, 0x3ef).w(FUNC(dspp_device::clock_w));
+	// output FIFOs, for audio reverb or data streams
+	map(0x3f0, 0x3f3).w(FUNC(dspp_device::outfifo_w));
+//  map(0x3fd, 0x3fd) flush output FIFO
+	map(0x3fe, 0x3ff).w(FUNC(dspp_device::output_w));
+}
+
+void dspp_bulldog_device::data_bulldog_map(address_map &map)
 {
 	map(0x000, 0x2df).ram();
 	map(0x2f0, 0x2f1).r(FUNC(dspp_device::input_r));
@@ -82,7 +126,8 @@ void dspp_device::data_map(address_map &map)
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(DSPP, dspp_device, "dspp", "3DO DSPP")
+DEFINE_DEVICE_TYPE(DSPP, dspp_device, "dspp", "3DO DSPP (Green chipset)")
+DEFINE_DEVICE_TYPE(DSPP_BULLDOG, dspp_bulldog_device, "dspp_bulldog", "3DO DSPP (Bulldog chipset)")
 
 //-------------------------------------------------
 //  dspp_device - constructor
@@ -90,15 +135,33 @@ DEFINE_DEVICE_TYPE(DSPP, dspp_device, "dspp", "3DO DSPP")
 
 dspp_device::dspp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	dspp_device(mconfig, DSPP, tag, owner, clock, address_map_constructor(FUNC(dspp_device::code_map), this),
-	address_map_constructor(FUNC(dspp_device::data_map), this))
+	address_map_constructor(FUNC(dspp_device::data_clio_map), this))
 {
 }
 
-dspp_device::dspp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor code_map_ctor, address_map_constructor data_map_ctor) :
+dspp_bulldog_device::dspp_bulldog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	dspp_device(mconfig, DSPP_BULLDOG, tag, owner, clock, address_map_constructor(FUNC(dspp_bulldog_device::code_map), this),
+	address_map_constructor(FUNC(dspp_bulldog_device::data_bulldog_map), this))
+{
+}
+
+dspp_device::dspp_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock,
+		address_map_constructor code_map_ctor,
+		address_map_constructor data_map_ctor) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_int_handler(*this),
 	m_dma_read_handler(*this, 0),
 	m_dma_write_handler(*this),
+	m_dma_rollover_handler(*this),
+	m_frame_period(568),
+	m_frame_counter(568),
+	m_frame_sync(false),
+	m_tick(0),
 	m_code_config("code", ENDIANNESS_BIG, 16, 10, -1, code_map_ctor),
 	m_data_config("data", ENDIANNESS_BIG, 16, 10, -1, data_map_ctor),
 	m_output_fifo_start(0),
@@ -136,6 +199,10 @@ dspp_device::dspp_device(const machine_config &mconfig, device_type type, const 
 #endif
 }
 
+dspp_device::~dspp_device()
+{
+}
+
 
 //-------------------------------------------------
 //  device_start - start up the device
@@ -151,9 +218,9 @@ void dspp_device::device_start()
 		m_core = m_cache.alloc_near<dspp_internal_state>();
 
 		uint32_t flags = 0;
-		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 1, 16, 0);
+		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 1, 16, 0, COMPILE_FORWARDS_BYTES);
 
-		m_drcfe = std::make_unique<dspp_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+		m_drcfe = std::make_unique<frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 	}
 	else
 	{
@@ -184,6 +251,8 @@ void dspp_device::device_start()
 	save_item(NAME(m_core->m_stack));
 	save_item(NAME(m_core->m_stack_ptr));
 	save_item(NAME(m_core->m_rbase));
+	save_item(NAME(m_core->m_rmap));
+	save_item(NAME(m_core->m_rbase_xor));
 	save_item(NAME(m_core->m_acc));
 	save_item(NAME(m_core->m_tclock));
 
@@ -194,6 +263,13 @@ void dspp_device::device_start()
 	save_item(NAME(m_core->m_flag_exact));
 	save_item(NAME(m_core->m_flag_audlock));
 	save_item(NAME(m_core->m_flag_sleep));
+	save_item(NAME(m_frame_period));
+	save_item(NAME(m_frame_counter));
+	save_item(NAME(m_frame_sync));
+	save_item(NAME(m_tick));
+
+	save_item(NAME(m_semaphore_data));
+	save_item(NAME(m_semaphore_status));
 
 	save_item(NAME(m_outputs));
 	save_item(NAME(m_output_fifo_start));
@@ -245,6 +321,7 @@ void dspp_device::device_start()
 	set_icountptr(m_core->m_icount);
 
 	m_cache_dirty = true;
+
 }
 
 
@@ -259,12 +336,16 @@ void dspp_device::device_reset()
 	m_core->m_stack_ptr = 0;
 	m_output_fifo_start = 0;
 	m_output_fifo_count = 0;
+	m_semaphore_status = 0;
+	m_semaphore_data = 0;
 
 	m_core->m_flag_audlock = 0;
 	m_core->m_flag_sleep = 0;
 	m_core->m_stack_ptr = 0;
 	m_core->m_writeback = ~1; // TODO
-	set_rbase(0, 0);
+	m_frame_counter = m_frame_period;
+	m_frame_sync = false;
+	set_rmap(0, 0);
 
 	// TODO: CLEAR DMA CHANNELS
 
@@ -273,6 +354,14 @@ void dspp_device::device_reset()
 	update_host_interrupt();
 
 	m_cache_dirty = true;
+}
+
+void dspp_bulldog_device::device_reset()
+{
+	dspp_device::device_reset();
+
+	// the register bases are plain addresses here
+	set_rbase(0, 0);
 }
 
 
@@ -540,12 +629,12 @@ void dspp_device::parse_operands(uint32_t numops)
 uint16_t dspp_device::read_next_operand()
 {
 	int32_t value = m_core->m_operands[m_core->m_opidx].value;
-	//if (m_core->m_op == 0x46a0) printf("Value is %08x\n", value);
+	//if (m_core->m_op == 0x46a0) logerror("Value is %08x\n", value);
 
 	if (value < 0)
 	{
 		value = read_data(m_core->m_operands[m_core->m_opidx].addr);
-		//if (m_core->m_op == 0x46a0) printf("New value is %08x from %08x\n", value, m_core->m_operands[m_core->m_opidx].addr);
+		//if (m_core->m_op == 0x46a0) logerror("New value is %08x from %08x\n", value, m_core->m_operands[m_core->m_opidx].addr);
 	}
 
 	// Next operand
@@ -626,6 +715,38 @@ inline void dspp_device::set_rbase(uint32_t base, uint32_t addr)
 
 
 //-------------------------------------------------
+//  set_rmap - Set register address map and base
+//-------------------------------------------------
+
+// Rather than Bulldog's four bases, this version builds a register address out of the register number:
+// bit 9 is register bit 3, bit 8 is picked from register bits 3 and 2 by RMAP, bits 2-0 are register
+// bits 2-0, and RBASE is XORed over bits 7-2.  RMAP 0, the only mode the audio folio uses, puts R0-R3
+// in EI memory, R4-R11 in I memory and R12-R15 in EO memory.
+void dspp_device::set_rmap(uint32_t rmap, uint32_t rbase)
+{
+	m_core->m_rmap = rmap;
+	m_core->m_rbase_xor = rbase;
+
+	for (uint32_t group = 0; group < 4; group++)
+	{
+		const bool x = BIT(group, 0);
+		const bool y = BIT(group, 1);
+		bool sel;
+
+		switch (rmap)
+		{
+			case 4:  sel = y; break;
+			case 5:  sel = !y; break;
+			case 6:  sel = x && y; break;
+			case 7:  sel = x || y; break;
+			default: sel = x; break;
+		}
+		m_core->m_rbase[group] = ((y << 9) | (sel << 8) | (x << 2)) ^ rbase;
+	}
+}
+
+
+//-------------------------------------------------
 //  translate_reg - Translate register address
 //-------------------------------------------------
 
@@ -667,6 +788,30 @@ uint32_t dspp_device::execute_max_cycles() const noexcept
 //  execute_run - core execution loop
 //-------------------------------------------------
 
+inline void dspp_device::execute_one(bool check_debugger)
+{
+	// Only run if enabled
+	if (m_core->m_dspx_control & DSPX_CONTROL_GWILLING)
+	{
+		if (check_debugger)
+			debugger_instruction_hook(m_core->m_pc);
+
+		m_core->m_op = read_op(m_core->m_pc);
+		//logerror("%04x: %04x\n", (uint16_t)m_core->m_pc, (uint16_t)m_core->m_op);
+		update_pc();
+
+		// Decode and execute
+		if (m_core->m_op & 0x8000)
+			exec_control();
+		else
+			exec_arithmetic();
+	}
+}
+
+// The complete program executes once per frame and then sleeps,
+// in typical audio DSP fashion.
+// If AUDLOCK is set the frame is restarted by the DAC clock,
+// otherwise the clock counter reload does it.
 void dspp_device::execute_run()
 {
 	if (m_isdrc)
@@ -691,26 +836,52 @@ void dspp_device::execute_run()
 
 	do
 	{
+		const int32_t start = m_core->m_icount;
 		update_ticks();
 		update_fifo_dma();
 
-		// Only run if enabled
-		if (m_core->m_dspx_control & DSPX_CONTROL_GWILLING)
+		if (!m_core->m_flag_sleep)
 		{
-			if (check_debugger)
-				debugger_instruction_hook(m_core->m_pc);
-
-			m_core->m_op = read_op(m_core->m_pc);
-			//printf("%04x: %04x\n", (uint16_t)m_core->m_pc, (uint16_t)m_core->m_op);
-			update_pc();
-
-			// Decode and execute
-			if (m_core->m_op & 0x8000)
-				exec_control();
-			else
-				exec_arithmetic();
+			execute_one(check_debugger);
 		}
 
+		m_frame_counter -= start - m_core->m_icount;
+
+		if (m_frame_sync || (!m_core->m_flag_audlock && m_frame_counter <= 0))
+		{
+			new_frame();
+		}
+	} while (m_core->m_icount > 0);
+}
+
+// Bulldog follows a typical free-running CPU model vs. the original DSPP's
+// "complete program once per frame".
+void dspp_bulldog_device::execute_run()
+{
+	if (m_isdrc)
+	{
+		do
+		{
+			if (m_core->m_dspx_control & DSPX_CONTROL_GWILLING)
+			{
+				execute_run_drc();
+			}
+			else
+			{
+				update_ticks();
+				update_fifo_dma();
+			}
+		} while (m_core->m_icount > 0);
+		return;
+	}
+
+	const bool check_debugger = debugger_enabled();
+
+	do
+	{
+		update_ticks();
+		update_fifo_dma();
+		execute_one(check_debugger);
 	} while (m_core->m_icount > 0);
 }
 
@@ -736,6 +907,16 @@ inline void dspp_device::exec_super_special()
 			m_core->m_pc = m_core->m_acc >> 4;
 			break;
 		}
+		case 2: // RBASE (not on Bulldog, which has the special op instead)
+		{
+			set_rmap(m_core->m_rmap, (m_core->m_op & 0x3f) << 2);
+			break;
+		}
+		case 3: // RMAP (not on Bulldog)
+		{
+			set_rmap(m_core->m_op & 7, m_core->m_rbase_xor);
+			break;
+		}
 		case 4: // RTS
 		{
 			m_core->m_pc = pop_pc();
@@ -756,9 +937,7 @@ inline void dspp_device::exec_super_special()
 		}
 
 		case 0: // NOP
-		case 2: // Unused
-		case 3:
-		case 6:
+		case 6: // Unused
 			break;
 	}
 }
@@ -836,7 +1015,7 @@ inline void dspp_device::exec_special()
 //  exec_branch - Execute a branch control op
 //-------------------------------------------------
 
-void dspp_device::exec_branch()
+inline void dspp_device::exec_branch()
 {
 	uint32_t mode = (m_core->m_op >> 13) & 3;
 	uint32_t select = (m_core->m_op >> 12) & 1;
@@ -863,7 +1042,7 @@ void dspp_device::exec_branch()
 	if (mode == 2)
 		branch = !branch;
 
-	//printf("Branch: %d %d %d %d %d\n", branch ? 1 : 0, flag0 ? 1 : 0, mask0 ? 1 : 0, flag1 ? 1 : 0, mask1 ? 1 : 0);
+	//logerror("Branch: %d %d %d %d %d\n", branch ? 1 : 0, flag0 ? 1 : 0, mask0 ? 1 : 0, flag1 ? 1 : 0, mask1 ? 1 : 0);
 
 	if (branch)
 		m_core->m_pc = m_core->m_op & 0x3ff;
@@ -998,7 +1177,7 @@ inline void dspp_device::exec_arithmetic()
 	int32_t alu_a, alu_b;
 
 	//if (m_core->m_op == 0x46a0)
-		//printf("Arithmetic: numops:%d, muxa:%d, muxb:%d, alu_op:%d, barrel_code:%d\n", numops, muxa, muxb, alu_op, barrel_code);
+		//logerror("Arithmetic: numops:%d, muxa:%d, muxb:%d, alu_op:%d, barrel_code:%d\n", numops, muxa, muxb, alu_op, barrel_code);
 
 	switch (muxa)
 	{
@@ -1011,7 +1190,7 @@ inline void dspp_device::exec_arithmetic()
 		{
 			alu_a = read_next_operand() << 4;
 			//if (m_core->m_op == 0x46a0)
-				//printf("Arithmetic: Next operand: %04x\n", alu_a >> 4);
+				//logerror("Arithmetic: Next operand: %04x\n", alu_a >> 4);
 			break;
 		}
 		case 3:
@@ -1418,6 +1597,7 @@ void dspp_device::process_next_dma(int32_t channel)
 			m_dspx_channel_complete &= ~chmask;
 			m_dspx_dmanext_int |= chmask;
 			update_host_interrupt();
+			m_dma_rollover_handler(channel, 1);
 		}
 		else
 		{
@@ -1514,7 +1694,7 @@ void dspp_device::service_input_dma(int32_t channel)
 
 			if (isSQXD)
 			{
-				printf("SQXD NOT TESTED!");
+				logerror("SQXD NOT TESTED!");
 
 				sample = decode_sqxd(curbyte, dma.m_prev_value);
 				dma.m_prev_value = sample;
@@ -1556,7 +1736,7 @@ void dspp_device::update_fifo_dma()
 
 	while (mask != 0)
 	{
-		uint32_t channel = 31 - count_leading_zeros_32(mask);
+		uint32_t channel = std::bit_width(mask) - 1;
 
 		const fifo_dma & dma = m_fifo_dma[channel];
 
@@ -1900,11 +2080,232 @@ uint16_t dspp_device::noise_r()
 	return machine().rand();
 }
 
+//-------------------------------------------------
+//  semaphore section
+//-------------------------------------------------
 
+uint16_t dspp_device::semaphore_status_r()
+{
+	return m_semaphore_status;
+}
+
+uint16_t dspp_device::semaphore_data_r()
+{
+	return m_semaphore_data;
+}
+
+template <unsigned N> void dspp_device::semaphore_delayed_write(s32 param)
+{
+	m_semaphore_status = 1 << (3 - N);
+	m_semaphore_data = param & 0xffff;
+}
+
+void dspp_device::host_semaphore_w(uint32_t data)
+{
+	machine().scheduler().synchronize(
+		timer_expired_delegate(FUNC(dspp_device::semaphore_delayed_write<0>), this),
+			unsigned(data & 0xffff));
+}
+
+void dspp_device::host_semaphore_ack_w(uint16_t data)
+{
+	 m_semaphore_status |= 1 << 1;
+}
+
+void dspp_device::semaphore_data_w(uint16_t data)
+{
+	machine().scheduler().synchronize(
+		timer_expired_delegate(FUNC(dspp_device::semaphore_delayed_write<1>), this),
+			unsigned(data & 0xffff));
+}
+
+void dspp_device::semaphore_ack_w(uint16_t data)
+{
+	m_semaphore_status |= 1 << 0;
+}
 
 //**************************************************************************
 //  EXTERNAL INTERFACE AND CONTROL REGISTERS
 //**************************************************************************
+
+//-------------------------------------------------
+// host CPU accesses for 3DO
+//-------------------------------------------------
+
+void dspp_device::host_n_write(offs_t offset, u16 data)
+{
+	m_code.write_word(offset, data);
+}
+
+u16 dspp_device::host_eo_read(offs_t offset)
+{
+	// EO memory sits at 0x300 in DSPP data space
+	return m_data.read_word(0x300 + offset);
+}
+
+void dspp_device::host_ei_write(offs_t offset, u16 data)
+{
+	m_data.write_word(offset, data);
+}
+
+// TODO: remaining bits
+void dspp_device::host_gw_control_write(offs_t offset, u16 data)
+{
+	// ---- x--- DSPPError, ---- -x-- DSPPReset, ---- --x- DSPPSleep, ---- ---x DSPPGW
+	if (BIT(data, 2))
+		device_reset();
+	m_core->m_dspx_control = BIT(data, 0) ? DSPX_CONTROL_GWILLING : 0;
+	if (data & ~5)
+		logerror("host_gw_control_write: %02x\n", data);
+}
+
+//-------------------------------------------------
+// Audio frame model and host DMA interface
+//-------------------------------------------------
+
+void dspp_device::new_frame()
+{
+	// a DAC sync or a host restart starts a full count, the clock counter carries its overshoot into the next frame
+	m_frame_counter = (m_frame_sync || m_frame_counter > 0) ? m_frame_period : m_frame_counter + m_frame_period;
+	m_frame_sync = false;
+	m_core->m_pc = 0;
+	m_core->m_flag_sleep = 0;
+
+	if (m_output_fifo_count == OUTPUT_FIFO_DEPTH)
+		m_output_fifo_start = (m_output_fifo_start + 2) & OUTPUT_FIFO_MASK;
+	else
+		m_output_fifo_count += 2;
+	const uint32_t end = (m_output_fifo_start + m_output_fifo_count - 2) & OUTPUT_FIFO_MASK;
+	m_output_fifo[(end + 0) & OUTPUT_FIFO_MASK] = m_outputs[0];
+	m_output_fifo[(end + 1) & OUTPUT_FIFO_MASK] = m_outputs[1];
+}
+
+void dspp_device::frame_sync()
+{
+	if (m_core->m_flag_audlock)
+	{
+		m_frame_sync = true;
+	}
+}
+
+void dspp_device::host_tick_reset(bool default_period)
+{
+	if (default_period)
+		m_frame_period = 568;
+	new_frame();
+}
+
+uint16_t dspp_device::tick_r()
+{
+	return m_tick;
+}
+
+void dspp_device::tick_w(uint16_t data)
+{
+	m_tick = data;
+	m_int_handler(1);
+	m_int_handler(0);
+}
+
+uint16_t dspp_device::fifo_peek_r(offs_t offset)
+{
+	fifo_dma &dma = m_fifo_dma[offset];
+	if (dma.m_depth == 0)
+		return dma.m_prev_current;
+	return dma.m_fifo[dma.m_dspi_ptr];
+}
+
+void dspp_device::fifo_head_w(offs_t offset, uint16_t data)
+{
+	m_fifo_dma[offset].m_prev_current = data;
+}
+
+uint16_t dspp_device::fifo_status_r(offs_t offset)
+{
+	// TODO: flags in the upper bits
+	return m_fifo_dma[offset].m_depth;
+}
+
+uint16_t dspp_device::outfifo_status_r(offs_t offset)
+{
+	return m_fifo_dma[16 + offset].m_depth;
+}
+
+uint16_t dspp_device::fifo_pop_r(offs_t offset)
+{
+	if (machine().side_effects_disabled())
+		return fifo_peek_r(offset);
+	fifo_dma &dma = m_fifo_dma[offset];
+	const uint16_t data = read_fifo_to_dspp(offset);
+	dma.m_prev_current = data;
+	return data;
+}
+
+void dspp_device::outfifo_w(offs_t offset, uint16_t data)
+{
+	fifo_dma &dma = m_fifo_dma[16 + offset];
+	if (dma.m_depth < DMA_FIFO_DEPTH)
+		write_dspp_to_fifo(16 + offset, data);
+}
+
+uint16_t dspp_device::host_fifo_status_r(int channel)
+{
+	return m_fifo_dma[channel & 31].m_depth;
+}
+
+void dspp_device::host_fifo_init_w(uint32_t mask)
+{
+	for (int channel = 0; channel < NUM_DMA_CHANNELS; channel++)
+	{
+		if (BIT(mask, channel))
+		{
+			fifo_dma &dma = m_fifo_dma[channel];
+			dma.m_dma_ptr = 0;
+			dma.m_dspi_ptr = 0;
+			dma.m_depth = 0;
+			dma.m_prev_current = 0;
+		}
+	}
+}
+
+/*
+ * Madam DMA stack: address, length, next address, next length.
+ * Lengths are in bytes minus 4, the DSPP side counts 16-bit samples.
+ * Next stays valid once written (a silence buffer loops forever without host intervention).
+ */
+void dspp_device::host_dma_w(int channel, int reg, uint32_t data)
+{
+	fifo_dma &dma = m_fifo_dma[channel & 31];
+	switch (reg & 3)
+	{
+		case 0: dma.m_current_addr = data; break;
+		case 1: dma.m_current_count = (data + 4) >> 1; break;
+		case 2: dma.m_next_addr = data; dma.m_next_valid = 1; dma.m_go_forever = 1; break;
+		case 3: dma.m_next_count = (data + 4) >> 1; dma.m_next_valid = 1; dma.m_go_forever = 1; break;
+	}
+}
+
+uint32_t dspp_device::host_dma_r(int channel, int reg)
+{
+	fifo_dma &dma = m_fifo_dma[channel & 31];
+	switch (reg & 3)
+	{
+		case 0: return dma.m_current_addr;
+		case 1: return (dma.m_current_count << 1) - 4;
+		case 2: return dma.m_next_addr;
+		case 3: return (dma.m_next_count << 1) - 4;
+	}
+	return 0;
+}
+
+void dspp_device::host_channel_enable_w(uint32_t set_mask, uint32_t clr_mask)
+{
+	m_dspx_channel_enable = (m_dspx_channel_enable | set_mask) & ~clr_mask;
+	m_dspx_channel_complete &= ~set_mask;
+	// channels 16-19 are DSPP -> RAM
+	m_dspx_channel_direction = 0x000f0000;
+}
+
 
 //-------------------------------------------------
 //  read_ext_control -
@@ -2057,7 +2458,7 @@ uint32_t dspp_device::read_ext_control(offs_t offset)
 		}
 		default:
 		{
-			printf("DSPP: Unhandled external control read (%.4x)\n", offset << 2);
+			logerror("DSPP: Unhandled external control read (%.4x)\n", offset << 2);
 			break;
 		}
 	}
@@ -2292,18 +2693,17 @@ void dspp_device::write_ext_control(offs_t offset, uint32_t data)
 		}
 		default:
 		{
-			printf("DSPP: Unhandled external control write (%.4x with %.8x)\n", offset << 2, data);
+			logerror("DSPP: Unhandled external control write (%.4x with %.8x)\n", offset << 2, data);
 			break;
 		}
 	}
 }
 
-
 //-------------------------------------------------
 //  read - host CPU read from DSPP internals
 //-------------------------------------------------
 
-uint32_t dspp_device::read(offs_t offset)
+uint32_t dspp_bulldog_device::host_read(offs_t offset)
 {
 	if (offset < 0x1000/4)
 	{
@@ -2464,7 +2864,7 @@ void dspp_device::write_dma_stack(offs_t offset, uint32_t data)
 //  write - host CPU write to DSPP internals
 //-------------------------------------------------
 
-void dspp_device::write(offs_t offset, uint32_t data)
+void dspp_bulldog_device::host_write(offs_t offset, uint32_t data)
 {
 	if (offset < 0x1000/4)
 	{
@@ -2519,7 +2919,7 @@ uint16_t dspp_device::read_output_fifo()
 
 // DEBUG!
 
-char * GetBinary(char * buffer, uint32_t val, uint32_t bits)
+inline char *GetBinary(char *buffer, uint32_t val, uint32_t bits)
 {
 	uint32_t i;
 
@@ -2531,33 +2931,33 @@ char * GetBinary(char * buffer, uint32_t val, uint32_t bits)
 	return buffer;
 }
 
-void dspp_device::dump_state()
+void dspp_device::dump_state(std::ostream &str)
 {
 	// DMA
 	for (uint32_t i = 0; i < NUM_DMA_CHANNELS; ++i)
 	{
-		printf("\n=== CHANNEL %02X ===\n", i);
-		printf("CURR_ADDRESS: %08X\n", m_fifo_dma[i].m_current_addr);
-		printf("CURR_COUNT:   %08X\n", m_fifo_dma[i].m_current_count);
-		printf("NEXT_ADDR:    %08X\n", m_fifo_dma[i].m_next_addr);
-		printf("NEXT_COUNT:   %08X\n", m_fifo_dma[i].m_next_count);
-		printf("PREV_VALUE:   %08X\n", m_fifo_dma[i].m_prev_value);
-		printf("PREV_CURRENT: %08X\n", m_fifo_dma[i].m_prev_current);
-		printf("GO_FOREVER:   %X\n", m_fifo_dma[i].m_go_forever);
-		printf("NEXT_VALID:   %X\n", m_fifo_dma[i].m_next_valid);
+		util::stream_format(str, "\n=== CHANNEL %02X ===\n", i);
+		util::stream_format(str, "CURR_ADDRESS: %08X\n", m_fifo_dma[i].m_current_addr);
+		util::stream_format(str, "CURR_COUNT:   %08X\n", m_fifo_dma[i].m_current_count);
+		util::stream_format(str, "NEXT_ADDR:    %08X\n", m_fifo_dma[i].m_next_addr);
+		util::stream_format(str, "NEXT_COUNT:   %08X\n", m_fifo_dma[i].m_next_count);
+		util::stream_format(str, "PREV_VALUE:   %08X\n", m_fifo_dma[i].m_prev_value);
+		util::stream_format(str, "PREV_CURRENT: %08X\n", m_fifo_dma[i].m_prev_current);
+		util::stream_format(str, "GO_FOREVER:   %X\n", m_fifo_dma[i].m_go_forever);
+		util::stream_format(str, "NEXT_VALID:   %X\n", m_fifo_dma[i].m_next_valid);
 	}
 
 	char buffer[64];
 
-	printf("\n=== GLOBAL REGISTER===\n");
-	printf("DSPX_CONTROL:           %08X\n", m_core->m_dspx_control);
-	printf("DSPX_RESET:             %08X\n", m_dspx_reset);
-	printf("DSPX_INT_ENABLE:        %08X\n", m_dspx_int_enable);
-	printf("DSPX_CHANNEL_ENABLE:    %08X %s\n", m_dspx_channel_enable, GetBinary(buffer, m_dspx_channel_enable, 32));
-	printf("DSPX_CHANNEL_COMPLETE:  %08X %s\n", m_dspx_channel_complete, GetBinary(buffer, m_dspx_channel_complete, 32));
-	printf("DSPX_CHANNEL_DIRECTION: %08X %s\n", m_dspx_channel_direction, GetBinary(buffer, m_dspx_channel_direction, 32));
-	printf("DSPX_CHANNEL_8BIT:      %08X %s\n", m_dspx_channel_8bit, GetBinary(buffer, m_dspx_channel_8bit, 32));
-	printf("DSPX_CHANNEL_SQXD:      %08X %s\n", m_dspx_channel_sqxd, GetBinary(buffer, m_dspx_channel_sqxd, 32));
+	util::stream_format(str, "\n=== GLOBAL REGISTER===\n");
+	util::stream_format(str, "DSPX_CONTROL:           %08X\n", m_core->m_dspx_control);
+	util::stream_format(str, "DSPX_RESET:             %08X\n", m_dspx_reset);
+	util::stream_format(str, "DSPX_INT_ENABLE:        %08X\n", m_dspx_int_enable);
+	util::stream_format(str, "DSPX_CHANNEL_ENABLE:    %08X %s\n", m_dspx_channel_enable, GetBinary(buffer, m_dspx_channel_enable, 32));
+	util::stream_format(str, "DSPX_CHANNEL_COMPLETE:  %08X %s\n", m_dspx_channel_complete, GetBinary(buffer, m_dspx_channel_complete, 32));
+	util::stream_format(str, "DSPX_CHANNEL_DIRECTION: %08X %s\n", m_dspx_channel_direction, GetBinary(buffer, m_dspx_channel_direction, 32));
+	util::stream_format(str, "DSPX_CHANNEL_8BIT:      %08X %s\n", m_dspx_channel_8bit, GetBinary(buffer, m_dspx_channel_8bit, 32));
+	util::stream_format(str, "DSPX_CHANNEL_SQXD:      %08X %s\n", m_dspx_channel_sqxd, GetBinary(buffer, m_dspx_channel_sqxd, 32));
 
 #if 0
 	uint32_t    m_dspx_shadow_current_addr;

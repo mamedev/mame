@@ -2,7 +2,7 @@
 // write_at.cpp
 // ~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -3026,6 +3026,17 @@ void test_4_arg_const_buffer_async_write_at()
   ioc.restart();
   ioc.run();
   ASIO_CHECK(s.check_buffers(0, buffers, sizeof(write_data)));
+
+  s.reset();
+  s.next_write_length(10);
+  called = false;
+  asio::async_write_at(s, 0, buffers)(
+      bindns::bind(async_write_handler,
+        _1, _2, sizeof(write_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(s.check_buffers(0, buffers, sizeof(write_data)));
 }
 
 void test_4_arg_mutable_buffer_async_write_at()
@@ -3121,6 +3132,17 @@ void test_4_arg_mutable_buffer_async_write_at()
   ioc.restart();
   ioc.run();
   ASIO_CHECK(s.check_buffers(0, buffers, sizeof(write_data)));
+
+  s.reset();
+  s.next_write_length(10);
+  called = false;
+  asio::async_write_at(s, 0, buffers)(
+      bindns::bind(async_write_handler,
+        _1, _2, sizeof(mutable_write_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(s.check_buffers(0, buffers, sizeof(mutable_write_data)));
 }
 
 void test_4_arg_boost_array_buffers_async_write_at()
@@ -3217,6 +3239,17 @@ void test_4_arg_boost_array_buffers_async_write_at()
   ASIO_CHECK(i == 42);
   ioc.restart();
   ioc.run();
+  ASIO_CHECK(s.check_buffers(0, buffers, sizeof(write_data)));
+
+  s.reset();
+  s.next_write_length(10);
+  called = false;
+  asio::async_write_at(s, 0, buffers)(
+      bindns::bind(async_write_handler,
+        _1, _2, sizeof(write_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
   ASIO_CHECK(s.check_buffers(0, buffers, sizeof(write_data)));
 #endif // defined(ASIO_HAS_BOOST_ARRAY)
 }
@@ -3315,6 +3348,17 @@ void test_4_arg_std_array_buffers_async_write_at()
   ioc.restart();
   ioc.run();
   ASIO_CHECK(s.check_buffers(0, buffers, sizeof(write_data)));
+
+  s.reset();
+  s.next_write_length(10);
+  called = false;
+  asio::async_write_at(s, 0, buffers)(
+      bindns::bind(async_write_handler,
+        _1, _2, sizeof(write_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(s.check_buffers(0, buffers, sizeof(write_data)));
 }
 
 void test_4_arg_vector_buffers_async_write_at()
@@ -3410,6 +3454,17 @@ void test_4_arg_vector_buffers_async_write_at()
   ASIO_CHECK(i == 42);
   ioc.restart();
   ioc.run();
+  ASIO_CHECK(s.check_buffers(0, buffers, sizeof(write_data)));
+
+  s.reset();
+  s.next_write_length(10);
+  called = false;
+  asio::async_write_at(s, 0, buffers)(
+      bindns::bind(async_write_handler,
+        _1, _2, sizeof(write_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
   ASIO_CHECK(s.check_buffers(0, buffers, sizeof(write_data)));
 }
 
@@ -3522,6 +3577,19 @@ void test_4_arg_streambuf_async_write_at()
   ASIO_CHECK(i == 42);
   ioc.restart();
   ioc.run();
+  ASIO_CHECK(s.check_buffers(0, buffers, sizeof(write_data)));
+
+  s.reset();
+  sb.consume(sb.size());
+  sb.sputn(write_data, sizeof(write_data));
+  s.next_write_length(10);
+  called = false;
+  asio::async_write_at(s, 0, sb)(
+      bindns::bind(async_write_handler,
+        _1, _2, sizeof(write_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
   ASIO_CHECK(s.check_buffers(0, buffers, sizeof(write_data)));
 }
 
@@ -4161,6 +4229,17 @@ void test_5_arg_const_buffer_async_write_at()
   ioc.restart();
   ioc.run();
   ASIO_CHECK(s.check_buffers(0, buffers, sizeof(write_data)));
+
+  s.reset();
+  s.next_write_length(10);
+  called = false;
+  asio::async_write_at(s, 1234, buffers, short_transfer())(
+      bindns::bind(async_write_handler,
+        _1, _2, sizeof(write_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(s.check_buffers(1234, buffers, sizeof(write_data)));
 }
 
 void test_5_arg_mutable_buffer_async_write_at()
@@ -4799,6 +4878,17 @@ void test_5_arg_mutable_buffer_async_write_at()
   ioc.restart();
   ioc.run();
   ASIO_CHECK(s.check_buffers(0, buffers, sizeof(write_data)));
+
+  s.reset();
+  s.next_write_length(10);
+  called = false;
+  asio::async_write_at(s, 1234, buffers, short_transfer())(
+      bindns::bind(async_write_handler,
+        _1, _2, sizeof(mutable_write_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(s.check_buffers(1234, buffers, sizeof(mutable_write_data)));
 }
 
 void test_5_arg_boost_array_buffers_async_write_at()
@@ -5439,6 +5529,17 @@ void test_5_arg_boost_array_buffers_async_write_at()
   ioc.restart();
   ioc.run();
   ASIO_CHECK(s.check_buffers(0, buffers, sizeof(write_data)));
+
+  s.reset();
+  s.next_write_length(10);
+  called = false;
+  asio::async_write_at(s, 1234, buffers, short_transfer())(
+      bindns::bind(async_write_handler,
+        _1, _2, sizeof(write_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(s.check_buffers(1234, buffers, sizeof(write_data)));
 #endif // defined(ASIO_HAS_BOOST_ARRAY)
 }
 
@@ -6079,6 +6180,17 @@ void test_5_arg_std_array_buffers_async_write_at()
   ioc.restart();
   ioc.run();
   ASIO_CHECK(s.check_buffers(0, buffers, sizeof(write_data)));
+
+  s.reset();
+  s.next_write_length(10);
+  called = false;
+  asio::async_write_at(s, 1234, buffers, short_transfer())(
+      bindns::bind(async_write_handler,
+        _1, _2, sizeof(write_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(s.check_buffers(1234, buffers, sizeof(write_data)));
 }
 
 void test_5_arg_vector_buffers_async_write_at()
@@ -6718,6 +6830,17 @@ void test_5_arg_vector_buffers_async_write_at()
   ioc.restart();
   ioc.run();
   ASIO_CHECK(s.check_buffers(0, buffers, sizeof(write_data)));
+
+  s.reset();
+  s.next_write_length(10);
+  called = false;
+  asio::async_write_at(s, 1234, buffers, short_transfer())(
+      bindns::bind(async_write_handler,
+        _1, _2, sizeof(write_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(s.check_buffers(1234, buffers, sizeof(write_data)));
 }
 
 void test_5_arg_streambuf_async_write_at()
@@ -7467,6 +7590,19 @@ void test_5_arg_streambuf_async_write_at()
   ioc.restart();
   ioc.run();
   ASIO_CHECK(s.check_buffers(0, buffers, sizeof(write_data)));
+
+  s.reset();
+  sb.consume(sb.size());
+  sb.sputn(write_data, sizeof(write_data));
+  s.next_write_length(10);
+  called = false;
+  asio::async_write_at(s, 1234, sb, short_transfer())(
+      bindns::bind(async_write_handler,
+        _1, _2, sizeof(write_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(s.check_buffers(1234, buffers, sizeof(write_data)));
 }
 
 ASIO_TEST_SUITE

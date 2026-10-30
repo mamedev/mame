@@ -128,10 +128,9 @@ void drmicro_state::palette(palette_device &palette) const
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// blue component
-		bit0 = 0;
-		bit1 = BIT(color_prom[i], 6);
-		bit2 = BIT(color_prom[i], 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -436,7 +435,7 @@ void drmicro_state::drmicro(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(drmicro_state::interrupt));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);

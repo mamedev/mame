@@ -526,10 +526,10 @@ static INPUT_PORTS_START( taotaido6 )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("P4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
+	PORT_BIT( 0x88, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x08, 0x08, "Debug Info 1" )
@@ -567,7 +567,7 @@ void taotaido_state::taotaido(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taotaido_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &taotaido_state::sound_port_map); // IRQs are triggered by the YM2610
 
-	vs9209_device &io1(VS9209(config, "io1", 0));
+	vs9209_device &io1(VS9209(config, "io1"));
 	io1.porta_input_cb().set_ioport("P1");
 	io1.portb_input_cb().set_ioport("P2");
 	io1.portc_input_cb().set_ioport("SYSTEM");
@@ -577,15 +577,15 @@ void taotaido_state::taotaido(machine_config &config)
 	io1.portg_output_cb().set(FUNC(taotaido_state::unknown_output_w));
 	io1.porth_input_cb().set_ioport("JP");
 
-	vs9209_device &io2(VS9209(config, "io2", 0));
+	vs9209_device &io2(VS9209(config, "io2"));
 	io2.porta_input_cb().set_ioport("P3"); // used only by taotaida
 	io2.portb_input_cb().set_ioport("P4"); // used only by taotaida
 
-	MB3773(config, m_watchdog, 0);
+	MB3773(config, m_watchdog);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taotaido);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -596,7 +596,7 @@ void taotaido_state::taotaido(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x800);
 
-	VSYSTEM_SPR(config, m_spr, 0, "palette", gfx_taotaido_spr);
+	VSYSTEM_SPR(config, m_spr, "palette", gfx_taotaido_spr);
 	m_spr->set_tile_indirect_cb(FUNC(taotaido_state::tile_callback));
 
 	// sound hardware

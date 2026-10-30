@@ -9,8 +9,17 @@
 #include "emu.h"
 #include "irobot.h"
 
-#define BITMAP_WIDTH    256
+#include <algorithm>
 
+#define LOG_VG    (1 << 1)
+
+#define VERBOSE (0)
+
+#include "logmacro.h"
+
+#define LOGVG(...)    LOGMASKED(LOG_VG, __VA_ARGS__)
+
+static constexpr u32 BITMAP_WIDTH = 256;
 
 /***************************************************************************
 
@@ -39,9 +48,9 @@
 
 ***************************************************************************/
 
-void irobot_state::irobot_palette(palette_device &palette) const
+void irobot_state::palette(palette_device &palette) const
 {
-	uint8_t const *const color_prom = memregion("proms")->base();
+	u8 const *const color_prom = memregion("proms")->base();
 
 	// convert the color prom for the text palette
 	for (unsigned i = 0; i < 32; i++)
@@ -59,33 +68,31 @@ void irobot_state::irobot_palette(palette_device &palette) const
 }
 
 
-void irobot_state::irobot_paletteram_w(offs_t offset, uint8_t data)
+void irobot_state::paletteram_w(offs_t offset, u8 data)
 {
-	int r,g,b;
-	int bits,intensity;
-	uint32_t color;
+	int bits;
 
-	color = ((data << 1) | (offset & 0x01)) ^ 0x1ff;
-	intensity = color & 0x07;
+	u32 const color = ((data << 1) | (offset & 0x01)) ^ 0x1ff;
+	int const intensity = color & 0x07;
 	bits = (color >> 3) & 0x03;
-	b = 12 * bits * intensity;
+	int const b = 12 * bits * intensity;
 	bits = (color >> 5) & 0x03;
-	g = 12 * bits * intensity;
+	int const g = 12 * bits * intensity;
 	bits = (color >> 7) & 0x03;
-	r = 12 * bits * intensity;
-	m_palette->set_pen_color((offset >> 1) & 0x3F,rgb_t(r,g,b));
+	int const r = 12 * bits * intensity;
+	m_palette->set_pen_color((offset >> 1) & 0x3f, rgb_t(r, g, b));
 }
 
 
-void irobot_state::irobot_poly_clear(uint8_t *bitmap_base)
+void irobot_state::poly_clear(u8 *bitmap_base)
 {
 	memset(bitmap_base, 0, BITMAP_WIDTH * m_screen->height());
 }
 
-void irobot_state::irobot_poly_clear()
+void irobot_state::poly_clear()
 {
-	uint8_t *bitmap_base = m_bufsel ? m_polybitmap2.get() : m_polybitmap1.get();
-	irobot_poly_clear(bitmap_base);
+	u8 *bitmap_base = m_polybitmap[m_bufsel].get();
+	poly_clear(bitmap_base);
 }
 
 
@@ -97,13 +104,23 @@ void irobot_state::irobot_poly_clear()
 void irobot_state::video_start()
 {
 	/* Setup 2 bitmaps for the polygon generator */
-	int height = m_screen->height();
-	m_polybitmap1 = std::make_unique<uint8_t[]>(BITMAP_WIDTH * height);
-	m_polybitmap2 = std::make_unique<uint8_t[]>(BITMAP_WIDTH * height);
+	int const height = m_screen->height();
+	for (int i = 0; i < 2; i++)
+	{
+		m_polybitmap[i] = std::make_unique<u8[]>(BITMAP_WIDTH * height);
 
-	/* clear the bitmaps so we start with valid palette look-up values for drawing */
-	irobot_poly_clear(m_polybitmap1.get());
-	irobot_poly_clear(m_polybitmap2.get());
+		/* clear the bitmaps so we start with valid palette look-up values for drawing */
+		poly_clear(m_polybitmap[i].get());
+
+		save_pointer(NAME(m_polybitmap[i]), BITMAP_WIDTH * height, i);
+	}
+
+	// set tilemap
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode,
+			tilemap_get_info_delegate(*this, FUNC(irobot_state::get_tile_info)),
+			TILEMAP_SCAN_ROWS,
+			8, 8, 32, 32);
+	m_tilemap->set_transparent_pen(0);
 
 	/* Set clipping */
 	m_ir_xmin = m_ir_ymin = 0;
@@ -111,6 +128,25 @@ void irobot_state::video_start()
 	m_ir_ymax = m_screen->height();
 }
 
+/***************************************************************************
+
+    Alphanumeric tilemap layer generator
+
+***************************************************************************/
+
+void irobot_state::videoram_w(offs_t offset, u8 data)
+{
+	m_videoram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
+}
+
+TILE_GET_INFO_MEMBER(irobot_state::get_tile_info)
+{
+	u8 const data = m_videoram[tile_index];
+	u16 const code = data & 0x3f;
+	u16 const color = ((data & 0xc0) >> 6) | (m_alphamap >> 3); // (m_alphamap >> 4)?
+	tileinfo.set(0, code, color, 0);
+}
 
 /***************************************************************************
 
@@ -153,8 +189,13 @@ void irobot_state::video_start()
 
 ***************************************************************************/
 
-#define draw_pixel(x,y,c)       polybitmap[(y) * BITMAP_WIDTH + (x)] = (c)
-#define fill_hline(x1,x2,y,c)   memset(&polybitmap[(y) * BITMAP_WIDTH + (x1)], (c), (x2) - (x1) + 1)
+constexpr offs_t get_bitmap_addr(int x, int y)
+{
+	return (y << 8) + x;
+}
+
+#define DRAW_PIXEL(x,y,c)       polybitmap[get_bitmap_addr((x), (y))] = (c)
+#define FILL_HLINE(x1,x2,y,c)   memset(&polybitmap[get_bitmap_addr((x1), (y))], (c), (x2) - (x1) + 1)
 
 
 /*
@@ -162,23 +203,21 @@ void irobot_state::video_start()
      modified from a routine written by Andrew Caldwell
  */
 
-void irobot_state::draw_line(uint8_t *polybitmap, int x1, int y1, int x2, int y2, int col)
+void irobot_state::draw_line(u8 *polybitmap, int x1, int y1, int x2, int y2, int col)
 {
-	int dx, dy, sx, sy, cx, cy;
-
-	dx = abs(x1 - x2);
-	dy = abs(y1 - y2);
-	sx = (x1 <= x2) ? 1: -1;
-	sy = (y1 <= y2) ? 1: -1;
-	cx = dx / 2;
-	cy = dy / 2;
+	int const dx = abs(x1 - x2);
+	int const dy = abs(y1 - y2);
+	int const sx = (x1 <= x2) ? 1: -1;
+	int const sy = (y1 <= y2) ? 1: -1;
+	int cx = dx / 2;
+	int cy = dy / 2;
 
 	if (dx >= dy)
 	{
 		for (;;)
 		{
 			if (x1 >= m_ir_xmin && x1 < m_ir_xmax && y1 >= m_ir_ymin && y1 < m_ir_ymax)
-				draw_pixel (x1, y1, col);
+				DRAW_PIXEL(x1, y1, col);
 			if (x1 == x2) break;
 			x1 += sx;
 			cx -= dy;
@@ -194,7 +233,7 @@ void irobot_state::draw_line(uint8_t *polybitmap, int x1, int y1, int x2, int y2
 		for (;;)
 		{
 			if (x1 >= m_ir_xmin && x1 < m_ir_xmax && y1 >= m_ir_ymin && y1 < m_ir_ymax)
-				draw_pixel (x1, y1, col);
+				DRAW_PIXEL(x1, y1, col);
 			if (y1 == y2) break;
 			y1 += sy;
 			cy -= dx;
@@ -208,47 +247,37 @@ void irobot_state::draw_line(uint8_t *polybitmap, int x1, int y1, int x2, int y2
 }
 
 
-#define ROUND_TO_PIXEL(x)   ((x >> 7) - 128)
+constexpr int ROUND_TO_PIXEL(int x) { return (x >> 7) - 128; }
 
-void irobot_state::irobot_run_video()
+void irobot_state::run_video()
 {
-	uint8_t *polybitmap;
-	uint16_t *combase16 = (uint16_t *)m_combase;
-	int sx, sy, ex, ey, sx2, ey2;
-	int color;
-	uint32_t d1;
-	int lpnt, spnt, spnt2;
-	int shp;
-	int32_t word1, word2;
+	u16 const *const combase16 = (u16 *)(m_commram[m_commbank].target());
 
-	logerror("Starting Polygon Generator, Clear=%d\n", m_vg_clear);
+	LOGVG("Starting Polygon Generator, Clear=%d\n", m_vg_clear);
 
-	if (m_bufsel)
-		polybitmap = m_polybitmap2.get();
-	else
-		polybitmap = m_polybitmap1.get();
+	u8 *polybitmap = m_polybitmap[m_bufsel].get();
 
-	lpnt = 0;
+	int lpnt = 0;
 	while (lpnt < 0x7ff)
 	{
-		d1 = combase16[lpnt++];
+		u32 const d1 = combase16[lpnt++];
 		if (d1 == 0xffff) break;
-		spnt = d1 & 0x07ff;
-		shp = (d1 & 0xf000) >> 12;
+		int spnt = d1 & 0x07ff;
+		int const shp = (d1 & 0xf000) >> 12;
 
 		/* pixel */
 		if (shp == 0x8)
 		{
 			while (spnt < 0x7ff)
 			{
-				sx = combase16[spnt];
+				int sx = combase16[spnt];
 				if (sx == 0xffff) break;
-				sy = combase16[spnt + 1];
-				color = sy & 0x3f;
+				int sy = combase16[spnt + 1];
+				int const color = sy & 0x3f;
 				sx = ROUND_TO_PIXEL(sx);
 				sy = ROUND_TO_PIXEL(sy);
 				if (sx >= m_ir_xmin && sx < m_ir_xmax && sy >= m_ir_ymin && sy < m_ir_ymax)
-					draw_pixel(sx, sy, color);
+					DRAW_PIXEL(sx, sy, color);
 				spnt += 2;
 			} // while object
 		} // if point
@@ -258,15 +287,15 @@ void irobot_state::irobot_run_video()
 		{
 			while (spnt < 0x7ff)
 			{
-				ey = combase16[spnt];
+				int ey = combase16[spnt];
 				if (ey == 0xffff) break;
 				ey = ROUND_TO_PIXEL(ey);
-				sy = combase16[spnt + 1];
-				color = sy & 0x3f;
+				int sy = combase16[spnt + 1];
+				int const color = sy & 0x3f;
 				sy = ROUND_TO_PIXEL(sy);
-				sx = combase16[spnt + 3];
-				word1 = (int16_t)combase16[spnt + 2];
-				ex = sx + word1 * (ey - sy + 1);
+				int const sx = combase16[spnt + 3];
+				s32 word1 = s16(combase16[spnt + 2]);
+				int const ex = sx + word1 * (ey - sy + 1);
 				draw_line(polybitmap, ROUND_TO_PIXEL(sx), sy, ROUND_TO_PIXEL(ex), ey, color);
 				spnt += 4;
 			} // while object
@@ -275,25 +304,25 @@ void irobot_state::irobot_run_video()
 		/* polygon */
 		if (shp == 0x4)
 		{
-			spnt2 = combase16[spnt] & 0x7ff;
+			int spnt2 = combase16[spnt] & 0x7ff;
 
-			sx = combase16[spnt + 1];
-			sx2 = combase16[spnt + 2];
-			sy = combase16[spnt + 3];
-			color = sy & 0x3f;
+			int sx = combase16[spnt + 1];
+			int sx2 = combase16[spnt + 2];
+			int sy = combase16[spnt + 3];
+			int const color = sy & 0x3f;
 			sy = ROUND_TO_PIXEL(sy);
 			spnt += 4;
 
-			word1 = (int16_t)combase16[spnt];
-			ey = combase16[spnt + 1];
+			s32 word1 = s16(combase16[spnt]);
+			int ey = combase16[spnt + 1];
 			if (word1 != -1 || ey != 0xffff)
 			{
 				ey = ROUND_TO_PIXEL(ey);
 				spnt += 2;
 				//sx += word1;
 
-				word2 = (int16_t)combase16[spnt2];
-				ey2 = ROUND_TO_PIXEL(combase16[spnt2 + 1]);
+				s32 word2 = s16(combase16[spnt2]);
+				int ey2 = ROUND_TO_PIXEL(combase16[spnt2 + 1]);
 				spnt2 += 2;
 				//sx2 += word2;
 
@@ -303,19 +332,18 @@ void irobot_state::irobot_run_video()
 					{
 						int x1 = ROUND_TO_PIXEL(sx);
 						int x2 = ROUND_TO_PIXEL(sx2);
-						int temp;
 
-						if (x1 > x2) temp = x1, x1 = x2, x2 = temp;
+						if (x1 > x2) std::swap(x1, x2);
 						if (x1 < m_ir_xmin) x1 = m_ir_xmin;
 						if (x2 >= m_ir_xmax) x2 = m_ir_xmax - 1;
 						if (x1 < x2)
-							fill_hline(x1 + 1, x2, sy, color);
+							FILL_HLINE(x1 + 1, x2, sy, color);
 					}
 					sy++;
 
 					if (sy > ey)
 					{
-						word1 = (int16_t)combase16[spnt];
+						word1 = s16(combase16[spnt]);
 						ey = combase16[spnt + 1];
 						if (word1 == -1 && ey == 0xffff)
 							break;
@@ -327,7 +355,7 @@ void irobot_state::irobot_run_video()
 
 					if (sy > ey2)
 					{
-						word2 = (int16_t)combase16[spnt2];
+						word2 = s16(combase16[spnt2]);
 						ey2 = ROUND_TO_PIXEL(combase16[spnt2 + 1]);
 						spnt2 += 2;
 					}
@@ -342,23 +370,16 @@ void irobot_state::irobot_run_video()
 
 
 
-uint32_t irobot_state::screen_update_irobot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 irobot_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *bitmap_base = m_bufsel ? m_polybitmap1.get() : m_polybitmap2.get();
+	u8 *bitmap_base = m_polybitmap[m_bufsel ^ 1].get();
 
 	/* copy the polygon bitmap */
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		draw_scanline8(bitmap, 0, y, BITMAP_WIDTH, &bitmap_base[y * BITMAP_WIDTH], nullptr);
 
 	/* redraw the non-zero characters in the alpha layer */
-	for (int y = 0, offs = 0; y < 32; y++)
-		for (int x = 0; x < 32; x++, offs++)
-		{
-			int code = m_videoram[offs] & 0x3f;
-			int color = ((m_videoram[offs] & 0xc0) >> 6) | (m_alphamap >> 3);
-
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, code, color, 0, 0, 8 * x, 8 * y, 0);
-		}
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

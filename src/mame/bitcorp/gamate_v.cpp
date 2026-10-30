@@ -307,7 +307,7 @@ void gamate_video_device::gamate_palette(palette_device &palette) const
 
 void gamate_video_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60.8093);
 	screen.set_size(160, 150);
 	screen.set_visarea(0, 160-1, 0, 150-1);

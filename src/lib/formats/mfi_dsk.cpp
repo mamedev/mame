@@ -3,11 +3,15 @@
 #include "mfi_dsk.h"
 
 #include "ioprocs.h"
+#include "strformat.h"
 
 #include <zlib.h>
 
 #include <cstring>
 #include <functional>
+#include <iostream>
+#include <map>
+#include <sstream>
 #include <tuple>
 
 

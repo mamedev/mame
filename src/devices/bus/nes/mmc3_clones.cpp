@@ -14,6 +14,9 @@
 #include "emu.h"
 #include "mmc3_clones.h"
 
+#include <bit>
+#include <cassert>
+
 #define LOG_HIFREQ (1U << 1)
 
 #ifdef NES_PCB_DEBUG
@@ -760,11 +763,14 @@ void nes_resettxrom_device::device_start()
 
 void nes_resettxrom_device::pcb_reset()
 {
+	assert(std::has_single_bit(m_outer_prg_size));
+	assert(std::has_single_bit(m_outer_chr_size));
+
 	mmc3_common_initialize((m_outer_prg_size >> 3) - 1, m_outer_chr_size - 1, 0);
 
 	m_count = (m_count + 1) & 3;
-	m_prg_base = m_count << (31 - count_leading_zeros_32(m_outer_prg_size) - 3);  // << std::countr_zero(m_outer_prg_size) - 3; in C++20
-	m_chr_base = m_count << (31 - count_leading_zeros_32(m_outer_chr_size));  // << std::countr_zero(m_outer_chr_size); in C++20
+	m_prg_base = m_count << (std::countr_zero(m_outer_prg_size) - 3);
+	m_chr_base = m_count << std::countr_zero(m_outer_chr_size);
 	set_prg(m_prg_base, m_prg_mask);
 	set_chr(m_chr_source, m_chr_base, m_chr_mask);
 }
@@ -2979,8 +2985,10 @@ void nes_bmc_el86xc_device::write_m(offs_t offset, u8 data)
 	LOG("bmc_el86xc write_m, offset: %04x, data: %02x\n", offset, data);
 	if (!(offset & 0x1000))    // game only banks via 0x6000, this mask is a guess
 	{
+		assert(std::has_single_bit(m_outer_prg_size));
+
 		int outer = bitswap<3>(data, 5, 2, 1);
-		m_prg_base = outer << (31 - count_leading_zeros_32(m_outer_prg_size) - 3);  // << std::countr_zero(m_outer_prg_size) - 3; in C++20
+		m_prg_base = outer << (std::countr_zero(m_outer_prg_size) - 3);
 		set_prg(m_prg_base, m_prg_mask);
 		m_chr_base = outer << 7;
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);

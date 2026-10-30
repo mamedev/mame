@@ -41,7 +41,7 @@
 #define LOGTODO(...)      LOGMASKED(LOG_TODO,   __VA_ARGS__)
 #define LOGCRTC(...)      LOGMASKED(LOG_CRTC,   __VA_ARGS__)
 
-DEFINE_DEVICE_TYPE(TRIDENT_VGA,  tgui9860_device, "trident_vga",  "Trident TGUI9860 VGA i/f")
+DEFINE_DEVICE_TYPE(TGUI9680_VGA, tgui9680_device, "tgui9680_vga", "Trident TGUI9860 VGA i/f")
 DEFINE_DEVICE_TYPE(TVGA9000_VGA, tvga9000_device, "tvga9000_vga", "Trident TVGA9000 VGA i/f")
 
 trident_vga_device::trident_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -53,8 +53,8 @@ trident_vga_device::trident_vga_device(const machine_config &mconfig, device_typ
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(trident_vga_device::sequencer_map), this));
 }
 
-tgui9860_device::tgui9860_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: trident_vga_device(mconfig, TRIDENT_VGA, tag, owner, clock)
+tgui9680_device::tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: trident_vga_device(mconfig, TGUI9680_VGA, tag, owner, clock)
 {
 	m_version = 0xd3;   // 0xd3 identifies at TGUI9660XGi (set to 0xe3 to identify at TGUI9440AGi)
 }

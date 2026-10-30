@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -13,17 +13,14 @@ license:CC0-1.0
     - Turbo Master CPU (R65C02P4 @ 4.09 MHz)
     - Turbo Process Accelerator (65C816P-4  @ 50kHz-4MHz)
     - Flash 8 (65816 @ 8 MHz, 4/8 MB RAM)
-    - CMD SuperCPU 64 (65C816S, 64 KB RAM)
     - Data 20 Z-80 Video Pak (Z80, 80 column video)
 
     Serial I/O:
     - HART (8251)
 
     RAM expansions:
-    - CMD RAMLink
     - CMD RAMDrive
     - CMD REU 1750XL
-    - Commodore REU 1700/1750/1764
     - Rex RAM-Floppy 256K
     - Rex Goliath 1MB
     - RAM-Cart
@@ -152,10 +149,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="epyxfast">
+	<software name="epyxfast" supported="no">
 		<description>Fast Load Cartridge v2</description>
 		<year>1984</year>
 		<publisher>Epyx</publisher>
+		<notes><![CDATA[
+Random corruption on any disk loaded with FASTLOAD enabled
+]]></notes>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="epyxfastload" />
@@ -168,10 +168,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="epyxfast1" cloneof="epyxfast">
+	<software name="epyxfast1" cloneof="epyxfast" supported="no">
 		<description>Fast Load Cartridge v1</description>
 		<year>1984</year>
 		<publisher>Epyx</publisher>
+		<notes><![CDATA[
+Random corruption on any disk loaded with FASTLOAD enabled
+]]></notes>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="epyxfastload" />
@@ -184,15 +187,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ps64" supported="no">
+	<software name="ps64">
 		<description>PS-64 puhemoduli v1.0 (Finland)</description>
 		<year>1988</year>
 		<publisher>Koulun erityispalvelu</publisher>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ps64" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
 				<rom name="ps-64.bin" size="0x2000" crc="0613bd98" sha1="a255e3a42d65ffffe835d9ac06034caf371d6994"/>
@@ -200,15 +201,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ps64v2" cloneof="ps64" supported="no">
+	<software name="ps64v2" cloneof="ps64">
 		<description>PS-64 puhemoduli v2.0 (Finland)</description>
 		<year>1988</year>
 		<publisher>Koulun erityispalvelu</publisher>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ps64" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
 				<rom name="unlabeled" size="0x2000" crc="793ced42" sha1="8f66fde8ec8ed6fd8fb597df39d2867ecc58d7e1"/>
@@ -359,28 +358,6 @@ license:CC0-1.0
 				<rom name="shelp.ba1" size="0x1000" crc="ecfeda87" sha1="dfebb9daf59a5e848f7500f11f3e7ed6ee877dcb"/>
 				<rom size="0x1000" offset="0x1000" loadflag="reload" />
 			</dataarea>
-		</part>
-	</software>
-
-	<software name="multiscr" supported="no">
-		<description>Multiscreen (Australia)</description>
-		<year>1987</year>
-		<publisher>Multiscreen Pty</publisher>
-
-		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="multiscreen" />
-			<feature name="game" value="0" />
-			<feature name="exrom" value="0" />
-			<feature name="battery" value="CR2325" />
-
-			<dataarea name="roml" size="0x34000">
-				<rom name="cart-1.bin" size="0x4000" crc="a0dc670c" sha1="bbee117340477a7416bba2e9abc2b8debd940cd4" offset="0x00000" />
-				<rom name="cart-2.bin" size="0x8000" crc="2abaad8e" sha1="897f98e954418e2e9313f219cd64b100c60c68b1" offset="0x04000" />
-				<rom name="cart-3.bin" size="0x8000" crc="ecddbbfc" sha1="70c72b77dc3981be8bcbec9ba0cc38d9aa5936fd" offset="0x0c000" />
-				<rom name="cart-4.bin" size="0x8000" crc="042678ef" sha1="ff2582c617f72bf57be7d76bcf8270665144f924" offset="0x14000" />
-			</dataarea>
-
-			<dataarea name="nvram" size="0x2000" />
 		</part>
 	</software>
 
@@ -636,7 +613,7 @@ Black screen, self modifies code in the 0x100-0x14f range
 		</part>
 	</software>
 
-	<software name="magicvce" supported="partial">
+	<software name="magicvce">
 		<description>Magic Voice</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
@@ -888,113 +865,6 @@ Black screen, self modifies code in the 0x100-0x14f range
 
 			<dataarea name="roml" size="0x2000">
 				<rom name="bi80.bin" size="0x1000" crc="6bd582c7" sha1="0d9eecbaaad06aa95e8907379dea62d89bf8254a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ramlink" supported="no">
-		<description>RAMLink</description>
-		<year>1990</year>
-		<publisher>Creative Micro Designs</publisher>
-
-		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ramlink" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
-
-			<dataarea name="rom" size="0x10000">
-				<rom name="ramlink1.bin" size="0x8000" crc="da953716" sha1="adde7308c7155fc1942c98b674189e89f4965f91" offset="0x0000" />
-				<rom name="ramlink2.bin" size="0x8000" crc="ab8b6dda" sha1="e35e776387bd8b9ab16bacff70c2a3f3ef9b65bd" offset="0x8000" />
-			</dataarea>
-		</part>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="ramlink-1.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ramlink140" cloneof="ramlink" supported="no">
-		<description>RAMLink v1.40</description>
-		<year>1990</year>
-		<publisher>Creative Micro Designs</publisher>
-
-		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ramlink" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
-
-			<dataarea name="rom" size="0x10000">
-				<rom name="cmd_ramlink_dos_v140.bin" size="0x10000" crc="31d1c877" sha1="fe536cb7a14c8ecbac55ef2799267855f1447d9f" />
-			</dataarea>
-		</part>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="ramlink-1.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ramlink201" cloneof="ramlink" supported="no">
-		<description>RAMLink v2.01</description>
-		<year>1990</year>
-		<publisher>Creative Micro Designs</publisher>
-
-		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ramlink" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
-
-			<dataarea name="rom" size="0x10000">
-				<rom name="cmd_ramlink_dosv201.bin" size="0x10000" crc="9810f48d" sha1="aafb1c66ea6f7d131675f6c948461ca1dc56c1e7"/>
-			</dataarea>
-		</part>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="ramlink-1.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="supercpu" supported="no">
-		<description>SuperCPU</description>
-		<year>1997</year>
-		<publisher>Creative Micro Designs</publisher>
-
-		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="supercpu" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="1" />
-
-			<dataarea name="roml" size="0x20000">
-				<rom name="supercpu_dos_204.bin" size="0x20000" crc="f4151454" sha1="6aa529a7b1b6de53e8979e407a77b4d5657727f5" />
-			</dataarea>
-		</part>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="cmdscpuu.d64" size="174848" crc="caad286d" sha1="2c1258505148763f13ab2fcdaf247138a933817e" />
 			</dataarea>
 		</part>
 	</software>
@@ -1428,7 +1298,7 @@ Black screen, self modifies code in the 0x100-0x14f range
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 
-			<dataarea name="roml" size="0xa0000">
+			<dataarea name="roml" size="0x100000">
 				<rom name="rom-menu.bin" size="0xa0000" crc="a3842c0d" sha1="a147584a959034c8a5679e72c183c82f7e876fd6" />
 			</dataarea>
 		</part>
@@ -1716,7 +1586,7 @@ Black screen, self modifies code in the 0x100-0x14f range
 		<year>1983</year>
 		<publisher>Spinnaker Software</publisher>
 		<info name="serial" value="ABZ-C6" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -1812,7 +1682,7 @@ Black screen, self modifies code in the 0x100-0x14f range
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-001-04" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -2185,7 +2055,7 @@ Cannot select (s)ingle or (a)ll events, no key press recognized
 		<description>Donkey Kong</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -2226,7 +2096,7 @@ Cannot select (s)ingle or (a)ll events, no key press recognized
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64???" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -2710,7 +2580,7 @@ Some erratic chars in playfield [VIC] GFXMODE=1, fixes on soft reset
 Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fear"
 ]]></notes>
 		<info name="serial" value="C-64613" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3168,7 +3038,7 @@ Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fe
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-104-04" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3223,7 +3093,7 @@ Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fe
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-007-04" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3252,7 +3122,7 @@ Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fe
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-002-04" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
@@ -3270,7 +3140,7 @@ Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fe
 Blue strips on title screen in place of tyres, mixes [VIC] GFXMODE=2 and 3
 Broken gameplay gfx, [VIC] GFXMODE=3
 ]]></notes>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3284,7 +3154,7 @@ Broken gameplay gfx, [VIC] GFXMODE=3
 		<description>Pitstop (alt)</description>
 		<year>1983</year>
 		<publisher>Epyx</publisher>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3299,7 +3169,7 @@ Broken gameplay gfx, [VIC] GFXMODE=3
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 		<info name="serial" value="RX8536" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3313,7 +3183,7 @@ Broken gameplay gfx, [VIC] GFXMODE=3
 		<description>Popeye</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3553,7 +3423,7 @@ Broken gameplay gfx, [VIC] GFXMODE=3
 		<notes><![CDATA[
 Glitchy [VIC] status bar GFXMODE switches on gameplay
 ]]></notes>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
@@ -4210,7 +4080,7 @@ Starts a 2 players game even if 1p is chosen?
 Erratic [VIC] collsion detection, warps and invincibility bonuses can kill player instead.
 ]]></notes>
 		<info name="serial" value="DC-101-04" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -4407,6 +4277,9 @@ Erratic [VIC] collsion detection, warps and invincibility bonuses can kill playe
 		<description>Kung-Fu Master</description>
 		<year>1985</year>
 		<publisher>Data East</publisher>
+		<notes><![CDATA[
+Randomly crashes on life losses
+]]></notes>
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="magic_desk" />
 			<feature name="exrom" value="0" />
@@ -4502,10 +4375,13 @@ Erratic [VIC] collsion detection, warps and invincibility bonuses can kill playe
 		</part>
 	</software>
 
-	<software name="pang">
+	<software name="pang" supported="no">
 		<description>Pang</description>
 		<year>1991</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+https://mametesters.org/view.php?id=8755
+]]></notes>
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ocean" />
 			<feature name="exrom" value="0" />
@@ -4858,10 +4734,13 @@ Erratic [VIC] collsion detection, warps and invincibility bonuses can kill playe
 		</part>
 	</software>
 
-	<software name="c64diag">
+	<software name="c64diag" supported="partial">
 		<description>C-64 Diagnostic (rev 586220)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Fails [MOS6526], [SID] and [cassette] checks
+]]></notes>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
@@ -5729,285 +5608,247 @@ Erratic [VIC] collsion detection, warps and invincibility bonuses can kill playe
 		</part>
 	</software>
 
-	<software name="ar41" supported="no">
+	<software name="ar41">
 		<description>Action Replay v4.1</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ar4x" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="slot" value="ar4x" />
 			<dataarea name="roml" size="0x8000">
 				<rom name="action_replay_v4.1_4.1_1988_pal.bin" size="0x8000" crc="9da71744" sha1="4fe322fb280333e009be146383b1d13c21536f58"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ar42" cloneof="ar41" supported="no">
+	<software name="ar42" cloneof="ar41">
 		<description>Action Replay v4.2 (v1)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ar4x" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="slot" value="ar4x" />
 			<dataarea name="roml" size="0x8000">
 				<rom name="action_replay_v4.2_4.0_1988_pal_v1.bin" size="0x8000" crc="befdaf75" sha1="477f5eebe4f3313256649bfc20c5cd52e5c6b059"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ar42v2" cloneof="ar41" supported="no">
+	<software name="ar42v2" cloneof="ar41">
 		<description>Action Replay v4.2 (v2)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ar4x" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="slot" value="ar4x" />
 			<dataarea name="roml" size="0x8000">
 				<rom name="action_replay_v4.2_4.0_1988_pal_v2.bin" size="0x8000" crc="27c242f4" sha1="e05a57850f4031e0a0dc17e56bbb75573980d38a"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ar4250" cloneof="ar41" supported="no">
+	<software name="ar4250" cloneof="ar41">
 		<description>Action Replay v4.2 (v5.0 v1)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ar4x" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="slot" value="ar4x" />
 			<dataarea name="roml" size="0x8000">
 				<rom name="action_replay_v4.2_5.0_1988_pal_v1.bin" size="0x8000" crc="4b2e7d3a" sha1="6c384308290febf5ca4eedaf326d646f15a13c51"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ar4250v2" cloneof="ar41" supported="no">
+	<software name="ar4250v2" cloneof="ar41">
 		<description>Action Replay v4.2 (v5.0 v2)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ar4x" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="slot" value="ar4x" />
 			<dataarea name="roml" size="0x8000">
 				<rom name="action_replay_v4.2_5.0_1988_pal_v2.bin" size="0x8000" crc="8a314329" sha1="5cd20a8cd30074da68d29df4a04ddd3add16a17a"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="acp53" cloneof="ar41" supported="no">
+	<software name="acp53" cloneof="ar41">
 		<description>Action Cartridge Plus 5 (Germany)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ar4x" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="slot" value="ar4x" />
 			<dataarea name="roml" size="0x8000">
 				<rom name="action_cartridge_plus_5___5.3_german_1988_pal.bin" size="0x8000" crc="746b3f5a" sha1="68a5f7d5c8d68b574cdb48c718836e604949cee8" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="acp6" cloneof="ar41" supported="no">
+	<software name="acp6" cloneof="ar41">
 		<description>Action Cartridge Plus 6.0</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ar4x" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="slot" value="ar4x" />
 			<dataarea name="roml" size="0x8000">
 				<rom name="action_cartridge_plus_6.0_tkit25_german_pal.bin" size="0x8000" crc="5a0d146d" sha1="c9c037f630b7ec74f2b36c1e23396b0e1e14ecd4" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="acp6g" cloneof="ar41" supported="no">
+	<software name="acp6g" cloneof="ar41">
 		<description>Action Cartridge Plus 6.0 (Germany)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ar4x" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="slot" value="ar4x" />
 			<dataarea name="roml" size="0x8000">
 				<rom name="action_cartridge_plus_6.0_tkit25_german_pal_aus.bin" size="0x8000" crc="080278e7" sha1="c57ce1d3d5bf13c8adad5dc803cdf163fdddaf6a" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ar73" cloneof="ar41" supported="no">
+	<software name="ar73" cloneof="ar41">
 		<description>Action Replay v7.3</description>
 		<year>1991</year>
 		<publisher>Atrax</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ar4x" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="slot" value="ar4x" />
 			<dataarea name="roml" size="0x8000">
 				<rom name="action_replay_v7.3_20x_atrax_1991_pal.bin" size="0x8000" crc="4d59d964" sha1="662c4d579907b0ebc4123910537be600ad50dc08" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ar5" supported="no">
+	<software name="ar5">
 		<description>Action Replay v5.0</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ar4x" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="slot" value="ar4x" />
 			<dataarea name="roml" size="0x8000">
 				<rom name="action_replay_v5.0_5.0_1988_pal.bin" size="0x8000" crc="55efec24" sha1="7ed920b9fa3865e2dc72ab1aac233e88a9dac439"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ar5n" cloneof="ar5" supported="no">
+	<software name="ar5n" cloneof="ar5">
 		<description>Action Replay v5.0 (NTSC)</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ar4x" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="slot" value="ar4x" />
 			<dataarea name="roml" size="0x8000">
 				<rom name="action_replay_v5.0_5.0_1988_ntsc.bin" size="0x8000" crc="b08bed2a" sha1="894ab49f13e70203987e54b87f60b047ef910845"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ar51" cloneof="ar5" supported="no">
+	<software name="ar51" cloneof="ar5">
 		<description>Action Replay v5.1a</description>
 		<year>1988</year>
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ar4x" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="slot" value="ar4x" />
 			<dataarea name="roml" size="0x8000">
 				<rom name="action_replay_v5.0_5.1a_pal_1988.bin" size="0x8000" crc="6c916f80" sha1="7ef39f320987d4bfddb499708795dfe8aebbce3b"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="acp7" cloneof="ar5" supported="no">
+	<software name="acp7" cloneof="ar5">
 		<description>Action Cartridge Plus v7.0 (Derko)</description>
 		<year>1991</year>
 		<publisher>Derko</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ar4x" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="slot" value="ar4x" />
 			<dataarea name="roml" size="0x8000">
 				<rom name="action_cartridge_plus_v7.0_tkit90-derko_1991_pal.bin" size="0x8000" crc="2939b479" sha1="81a939c6e26e07fc6dd65080415d91fb9017bc6e"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="acp7t" cloneof="ar5" supported="no">
+	<software name="acp7t" cloneof="ar5">
 		<description>Action Cartridge Plus v7.0 (Triumwyrat)</description>
 		<year>1990</year>
 		<publisher>Triumwyrat</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ar4x" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="slot" value="ar4x" />
 			<dataarea name="roml" size="0x8000">
 				<rom name="action_cartridge_plus_v7.0_tkit90-triumwyrat_1990_pal.bin" size="0x8000" crc="9103b894" sha1="3a778f256197cc0450357e2c5c11f90854515572"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ar75" cloneof="ar5" supported="no">
+	<software name="ar75" cloneof="ar5">
 		<description>Action Replay v7.5</description>
 		<year>1989</year>
 		<publisher>Triumwyrat</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ar4x" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="slot" value="ar4x" />
 			<dataarea name="roml" size="0x8000">
 				<rom name="action_replay_v7.5_7.5_1989_pal.bin" size="0x8000" crc="2fdc011f" sha1="564952475b92f0a452c5b58acd6a03ae85342297"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ar84" cloneof="ar5" supported="no">
+	<software name="ar84" cloneof="ar5">
 		<description>Action Replay v8.4</description>
 		<year>1990</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ar4x" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="slot" value="ar4x" />
 			<dataarea name="roml" size="0x8000">
 				<rom name="action_replay_v8.4_8.4_1990_pal.bin" size="0x8000" crc="ddc38bfc" sha1="431b46bd6303b3dc75714eb539a346bc25906cb5"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ar5flt" cloneof="ar5" supported="no">
+	<software name="ar5flt" cloneof="ar5">
 		<description>The Fairlight Cracking Cartridge</description>
 		<year>1990</year>
 		<publisher>Fairlight</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ar4x" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="slot" value="ar4x" />
 			<dataarea name="roml" size="0x8000">
 				<rom name="action_replay_v5.0_bacchus_flt_1989_pal.bin" size="0x8000" crc="c37e1781" sha1="6b8b02eef0cfca2b1b470355b5614cceb9632cff"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ar6t" cloneof="ar5" supported="no">
+	<software name="ar6t" cloneof="ar5">
 		<description>Action Replay v6.0 (Triad)</description>
 		<year>1993</year>
 		<publisher>Triad</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ar4x" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="slot" value="ar4x" />
 			<dataarea name="roml" size="0x8000">
 				<rom name="action_replay_v6.0_triad_1993_pal.bin" size="0x8000" crc="795b50c4" sha1="4541bc60c04930c9de53ffb99e355c5cf0dbc5cb"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ar6" supported="no">
+	<software name="ar6">
 		<description>Action Replay v6.0</description>
 		<year>1989</year>
 		<publisher>Datel Electronics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ar4x" />
-			<feature name="exrom" value="0" />
-			<feature name="game" value="0" />
+			<feature name="slot" value="ar4x" />
 			<dataarea name="roml" size="0x8000">
 				<rom name="action_replay_v6.0_6.0_1989_pal.bin" size="0x8000" crc="44a30413" sha1="fca6f0c4c164c67a01abc4a58fc83814a9b15e96"/>
 			</dataarea>
@@ -6835,23 +6676,6 @@ Erratic [VIC] collsion detection, warps and invincibility bonuses can kill playe
 		</part>
 	</software>
 
-	<software name="ide64">
-		<description>IDE64 (v4.1, IDEDOS v0.90)</description>
-		<year>2011</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-
-		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ide64" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="1" />
-
-			<dataarea name="ide64:u3" size="0x20000">
-				<rom name="u3" size="0x20000" crc="a52ff8fa" sha1="65fb2dc7d6bc6e96c4d60aca7eb103e7d1e58412" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pop">
 		<description>Prince of Persia (v1.1)</description>
 		<year>2011</year>
@@ -7186,36 +7010,6 @@ Erratic [VIC] collsion detection, warps and invincibility bonuses can kill playe
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
 				<rom name="koalapainter" size="0x4000" crc="cc75a06d" sha1="4707fe57b0575415a2c258392355941c130fcc80"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tibdd001">
-		<description>Disc Drive DD-001 (v1.1)</description>
-		<year>1991</year>
-		<publisher>TIB</publisher>
-		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="tibdd001" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
-
-			<dataarea name="roml" size="0x2000">
-				<rom name="rom_dd001_v1.1.bin" size="0x2000" crc="d266b628" sha1="24d178560dad3d955ebbe15f4274d966e031142d"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tibdd001a" cloneof="tibdd001">
-		<description>Disc Drive DD-001 (v1.0)</description>
-		<year>1991</year>
-		<publisher>TIB</publisher>
-		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="tibdd001" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
-
-			<dataarea name="roml" size="0x2000">
-				<rom name="rom_dd001_v1.0.bin" size="0x2000" crc="58f83983" sha1="f18cfb42c8e2c9152e18b129d01408f702271363"/>
 			</dataarea>
 		</part>
 	</software>

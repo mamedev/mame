@@ -17,8 +17,7 @@ they run fine on the older B&W video hardware. For example, doing a ROM swap
 on the older Space Fever.
 
 TODO:
-- spacefev sound pitch for laser fire and enemy explosion is wrong, see:
-  https://www.youtube.com/watch?v=mGMUPNqlyuw
+- spacefev sound pitch for laser fire and enemy explosion is wrong
 
 ----------------------------------------------------------------------------
 
@@ -180,6 +179,7 @@ protected:
 	void n8080_palette(palette_device &palette) const ATTR_COLD;
 	TIMER_DEVICE_CALLBACK_MEMBER(rst1_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(rst2_tick);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 	TIMER_CALLBACK_MEMBER(stop_mono_flop_callback);
 	TIMER_CALLBACK_MEMBER(delayed_sound_1_callback);
 	TIMER_CALLBACK_MEMBER(delayed_sound_2_callback);
@@ -199,6 +199,7 @@ protected:
 	unsigned m_shift_data;
 	u8 m_shift_bits;
 	bool m_inte;
+	u8 m_irq_vector;
 
 	/* devices */
 	required_device<i8080a_cpu_device> m_maincpu;
@@ -1038,18 +1039,21 @@ INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst1_tick)
 {
-	int state = m_inte ? ASSERT_LINE : CLEAR_LINE;
-
 	// V7 = 1, V6 = 0
-	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xcf); // I8080
+	m_irq_vector = 0xcf;
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_inte ? ASSERT_LINE : CLEAR_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst2_tick)
 {
-	int state = m_inte ? ASSERT_LINE : CLEAR_LINE;
-
 	// vblank
-	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xd7); // I8080
+	m_irq_vector = 0xd7;
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_inte ? ASSERT_LINE : CLEAR_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(n8080_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 void n8080_state::n8080_inte_callback(int state)
@@ -1074,6 +1078,7 @@ void n8080_state::machine_start()
 	save_item(NAME(m_shift_data));
 	save_item(NAME(m_shift_bits));
 	save_item(NAME(m_inte));
+	save_item(NAME(m_irq_vector));
 }
 
 void n8080_state::machine_reset()
@@ -1081,6 +1086,7 @@ void n8080_state::machine_reset()
 	m_shift_data = 0;
 	m_shift_bits = 0;
 	m_inte = false;
+	m_irq_vector = 0;
 
 	delayed_sound_1(0);
 	delayed_sound_2(0);
@@ -1167,9 +1173,10 @@ void spacefev_state::spacefev(machine_config &config)
 	m_maincpu->out_inte_func().set(FUNC(spacefev_state::n8080_inte_callback));
 	m_maincpu->set_addrmap(AS_PROGRAM, &spacefev_state::main_cpu_map);
 	m_maincpu->set_addrmap(AS_IO, &spacefev_state::main_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(spacefev_state::cpu_acknowledge_irq));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(20.160_MHz_XTAL / 4, 320, 0, 256, 256, 16, 240);
 	m_screen->set_screen_update(FUNC(spacefev_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1191,9 +1198,10 @@ void sheriff_state::sheriff(machine_config &config)
 	m_maincpu->out_inte_func().set(FUNC(sheriff_state::n8080_inte_callback));
 	m_maincpu->set_addrmap(AS_PROGRAM, &sheriff_state::main_cpu_map);
 	m_maincpu->set_addrmap(AS_IO, &sheriff_state::main_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(sheriff_state::cpu_acknowledge_irq));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(20.160_MHz_XTAL / 4, 320, 0, 256, 256, 16, 240);
 	m_screen->set_screen_update(FUNC(sheriff_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1224,9 +1232,10 @@ void helifire_state::helifire(machine_config &config)
 	m_maincpu->out_inte_func().set(FUNC(helifire_state::n8080_inte_callback));
 	m_maincpu->set_addrmap(AS_PROGRAM, &helifire_state::main_cpu_map);
 	m_maincpu->set_addrmap(AS_IO, &helifire_state::main_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(helifire_state::cpu_acknowledge_irq));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(20.160_MHz_XTAL / 4, 320, 0, 256, 256, 16, 240);
 	m_screen->set_screen_update(FUNC(helifire_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(helifire_state::screen_vblank));

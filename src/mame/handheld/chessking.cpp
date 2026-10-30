@@ -91,6 +91,7 @@ private:
 	void beeper_enable_w(uint8_t data);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 	void irq_clear_w(uint8_t data);
 	void unk_1f_w(uint8_t data);
 	void unk_2f_w(uint8_t data);
@@ -118,12 +119,12 @@ void chessking_state::machine_start()
 uint32_t chessking_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// quickly draw from memory (should be handled by LCDC?)
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		int offset = y * 256 / 8;
 
 		uint32_t *dst = &bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			// 2 256x256 images (160x160 area used) one at c000, one at e000 to form 2bpp graphics
 			uint8_t data = m_videoram[0x4000 + offset + x/8];
@@ -211,7 +212,12 @@ void chessking_state::cart_bank_w(uint8_t data)
 
 INTERRUPT_GEN_MEMBER(chessking_state::interrupt)
 {
-	device.execute().set_input_line_and_vector(0, ASSERT_LINE, 0x20/4);
+	device.execute().set_input_line(0, ASSERT_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(chessking_state::cpu_acknowledge_irq)
+{
+	return 0x20/4;
 }
 
 void chessking_state::irq_clear_w(uint8_t data)
@@ -320,11 +326,12 @@ void chessking_state::chesskng(machine_config &config)
 
 	attotime irq_freq = attotime::from_hz(9.6_MHz_XTAL / 0x10000); // gives approximate seconds on timer
 	m_maincpu->set_periodic_int(FUNC(chessking_state::interrupt), irq_freq);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(chessking_state::cpu_acknowledge_irq));
 
 	NVRAM(config, "mainram", nvram_device::DEFAULT_ALL_0);
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(160, 160);
 	m_screen->set_visarea_full();
@@ -333,7 +340,7 @@ void chessking_state::chesskng(machine_config &config)
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	BEEP(config, m_beeper, 0);
+	BEEP(config, m_beeper);
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// Cartridge

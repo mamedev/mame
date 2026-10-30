@@ -164,8 +164,7 @@ const uint8_t i80286_cpu_device::m_i80286_timing[] =
 	13,             /* (80186) BOUND */
 };
 
-// Effective Address calculation takes one extra clock if offset calculation
-// requires summing 3 elements.
+// Effective Address calculation takes one extra clock if offset calculation requires summing 3 elements.
 const uint8_t i80286_cpu_device::m_i80286_ea_timing[] =
 {
 	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -1892,10 +1891,10 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 
 					switch (next)
 					{
-						case 0x6c:  CLK(OVERRIDE); if (c) do { i_insb();  c--; } while (c>0 && m_icount>0);          m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-						case 0x6d:  CLK(OVERRIDE); if (c) do { i_insw();  c--; } while (c>0 && m_icount>0);          m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-						case 0x6e:  CLK(OVERRIDE); if (c) do { i_outsb(); c--; } while (c>0 && m_icount>0);          m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-						case 0x6f:  CLK(OVERRIDE); if (c) do { i_outsw(); c--; } while (c>0 && m_icount>0);          m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+						case 0x6c:  CLK(OVERRIDE); if (c) do { i_insb();  if (m_io_stall) { m_io_stall = false; break; } c--; } while (c>0 && m_icount>0);          m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+						case 0x6d:  CLK(OVERRIDE); if (c) do { i_insw();  if (m_io_stall) { m_io_stall = false; break; } c--; } while (c>0 && m_icount>0);          m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+						case 0x6e:  CLK(OVERRIDE); if (c) do { i_outsb(); if (m_io_stall) { m_io_stall = false; break; } c--; } while (c>0 && m_icount>0);          m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+						case 0x6f:  CLK(OVERRIDE); if (c) do { i_outsw(); if (m_io_stall) { m_io_stall = false; break; } c--; } while (c>0 && m_icount>0);          m_regs.w[CX]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 						default:
 							// Decrement IP and pass on
 							m_ip -= 1 + (m_seg_prefix_next ? 1 : 0);

@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "harddriv.h"
 
+#include "input.h" // for video debug keys
+
 
 /*************************************
  *
@@ -36,10 +38,6 @@
 
 void harddriv_state::device_start()
 {
-	m_lamps.resolve();
-	m_sel.resolve();
-	m_wheel.resolve();
-
 	/* predetermine memory regions */
 	m_adsp_pgm_memory_word = (uint16_t *)(reinterpret_cast<uint8_t *>(m_adsp_pgm_memory.target()) + 1);
 
@@ -270,10 +268,6 @@ uint16_t harddriv_state::hdc68k_wheel_r()
 {
 	/* grab the new wheel value */
 	uint16_t new_wheel = m_12badc[0].read_safe(0xffff);
-
-	/* hack to display the wheel position */
-	if (machine().input().code_pressed(KEYCODE_LSHIFT))
-		popmessage("%04X", new_wheel);
 
 	/* if we crossed the center line, latch the edge bit */
 	if ((m_hdc68k_last_wheel / 0xf00) != (new_wheel / 0xf00))

@@ -6,22 +6,55 @@
 #pragma once
 
 #include "unsp.h"
+
 #include "cpu/drcfe.h"
 
-class unsp_frontend : public drc_frontend
+#include <algorithm>
+
+
+class unsp_device::opcode_desc : public opcode_desc_base<opcode_desc, 16>
 {
 public:
-	unsp_frontend(unsp_device *unsp, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
-	void flush();
+	uint16_t        opptr[2];               // copy of opcode
 
-protected:
-	// required overrides
-	virtual bool describe(opcode_desc &desc, const opcode_desc *prev) override;
+	uint32_t        cycles;                 // number of cycles needed to execute
+
+	void set_reads_memory() { m_reads_memory = true; }
+	void set_writes_memory() { m_writes_memory = true; }
+
+	bool reads_memory() const { return m_reads_memory; }
+	bool writes_memory() const { return m_writes_memory; }
+
+	void reset(offs_t curpc, bool in_delay_slot)
+	{
+		opcode_desc_base::reset(curpc, in_delay_slot);
+
+		std::fill(std::begin(opptr), std::end(opptr), 0);
+		cycles = 0;
+		m_reads_memory = false;
+		m_writes_memory = false;
+	}
 
 private:
-	inline uint16_t read_op_word(opcode_desc &desc, int offset);
+	bool m_reads_memory;
+	bool m_writes_memory;
+};
+
+
+class unsp_device::frontend : public drc_frontend_base<opcode_desc>
+{
+public:
+	frontend(unsp_device *unsp, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
+	~frontend();
+
+	opcode_desc const *describe_code(offs_t startpc);
+
+private:
+	bool describe(opcode_desc &desc, const opcode_desc *prev);
+
+	uint16_t read_op_word(opcode_desc &desc, int offset);
 
 	unsp_device *m_cpu;
 };
 
-#endif /* MAME_CPU_UNSP_UNSPFE_H */
+#endif // MAME_CPU_UNSP_UNSPFE_H

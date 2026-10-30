@@ -267,9 +267,6 @@ public:
 
 	void nightstr(machine_config &config);
 
-protected:
-	virtual void machine_start() override ATTR_COLD;
-
 private:
 	void nightstr_motor_w(offs_t offset, u16 data);
 	void nightstr_lamps_w(u8 data);
@@ -296,9 +293,6 @@ public:
 	}
 
 	void spacegun(machine_config &config);
-
-protected:
-	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void spacegun_eeprom_w(u8 data);

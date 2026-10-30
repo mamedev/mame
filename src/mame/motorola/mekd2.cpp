@@ -104,7 +104,10 @@ public:
 		, m_keyboard(*this, "X%d", 0U)
 	{ }
 
-	void mekd2(machine_config &config);
+	void mekd2(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	int key40_r();
@@ -125,7 +128,7 @@ private:
 	uint8_t m_keydata = 0U;
 	bool m_cassbit = 0;
 	bool m_cassold = 0;
-	virtual void machine_start() override ATTR_COLD;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_s;
 	required_device<pia6821_device> m_pia_u;
@@ -352,8 +355,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::kansas_r)
 
 void mekd2_state::machine_start()
 {
-	m_digits.resolve();
+	// TODO: savestates
 }
+
 
 /***********************************************************
 
@@ -389,7 +393,7 @@ void mekd2_state::mekd2(machine_config &config)
 	m_pia_u->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 	m_pia_u->irqb_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set([this] (bool state) { m_cassbit = state; });
 
 	clock_device &acia_tx_clock(CLOCK(config, "acia_tx_clock", XTAL_MEKD2 / 256)); // 4800Hz

@@ -37,11 +37,10 @@ public:
 		m_wheel_vibration(*this, "Wheel_vibration")
 	{ }
 
-	void undrfire(machine_config &config);
-	void cbombers(machine_config &config);
+	void undrfire(machine_config &config) ATTR_COLD;
+	void cbombers(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:

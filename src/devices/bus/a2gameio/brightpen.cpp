@@ -39,6 +39,7 @@ protected:
 
 	// device_a2gameio_interface implementation
 	virtual int sw0_r() override;
+	virtual bool has_sw0() const override { return true; }
 
 private:
 	// input ports

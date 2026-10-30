@@ -64,8 +64,8 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void init_rr() { m_game = 1; }
-	void s9(machine_config &config);
+	void init_rr() ATTR_COLD { m_game = 1; }
+	void s9(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 
@@ -331,8 +331,6 @@ TIMER_CALLBACK_MEMBER(s9_state::irq_timer)
 void s9_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_io_outputs.resolve();
-	m_digits.resolve();
 
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_row));
@@ -348,6 +346,7 @@ void s9_state::machine_start()
 void s9_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 }
@@ -401,7 +400,7 @@ void s9_state::s9(machine_config &config)
 
 	/* Add the soundcard */
 	SPEAKER(config, "mono").front_center();
-	WILLIAMS_S9_SOUND(config, m_s9sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	WILLIAMS_S9_SOUND(config, m_s9sound).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

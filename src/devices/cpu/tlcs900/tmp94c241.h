@@ -12,6 +12,7 @@
 #pragma once
 
 #include "tlcs900.h"
+#include "tmp94c241_serial.h"
 
 
 //**************************************************************************
@@ -105,12 +106,27 @@ public:
 	auto portz_read()  { return m_port_read[PORT_Z].bind(); }
 	auto portz_write() { return m_port_write[PORT_Z].bind(); }
 
+	auto txd0()      { return m_serial[0].lookup()->txd(); }
+	auto sclk0_in()  { return m_serial[0].lookup()->sclk_in(); }
+	auto sclk0_out() { return m_serial[0].lookup()->sclk_out(); }
+	auto tx0_start() { return m_serial[0].lookup()->tx_start(); }
+	auto txd1()      { return m_serial[1].lookup()->txd(); }
+	auto sclk1_in()  { return m_serial[1].lookup()->sclk_in(); }
+	auto sclk1_out() { return m_serial[1].lookup()->sclk_out(); }
+	auto tx1_start() { return m_serial[1].lookup()->tx_start(); }
+
+	void rxd0(int state) { m_serial[0]->rxd(state); }
+	void sioclk0(int state) { m_serial[0]->sioclk(state); }
+	void rxd1(int state) { m_serial[1]->rxd(state); }
+	void sioclk1(int state) { m_serial[1]->sioclk(state); }
+
 protected:
 	// device_t implementation
 	virtual void device_config_complete() override ATTR_COLD;
 	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -125,6 +141,17 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
+	struct irq_vector_entry
+	{
+		uint8_t reg;
+		uint8_t iff;
+		uint8_t vector;
+		uint8_t dma_start_vector;
+	};
+	static const irq_vector_entry irq_vector_map[];
+
+	int tlcs900_process_hdma(int channel);
+	void tlcs900_process_software_dma(int channel);
 	void change_timer_flipflop(uint8_t flipflop, uint8_t operation);
 
 	// Ports
@@ -142,14 +169,6 @@ private:
 	template <uint8_t N> void msar_w(uint8_t data);
 	template <uint8_t Timer> void treg_8_w(uint8_t data);
 	template <uint8_t Timer> void treg_16_w(uint16_t data);
-	template <uint8_t Channel> uint8_t scNbuf_r();
-	template <uint8_t Channel> void scNbuf_w(uint8_t data);
-	template <uint8_t Channel> uint8_t scNcr_r();
-	template <uint8_t Channel> void scNcr_w(uint8_t data);
-	template <uint8_t Channel> uint8_t scNmod_r();
-	template <uint8_t Channel> void scNmod_w(uint8_t data);
-	template <uint8_t Channel> uint8_t brNcr_r();
-	template <uint8_t Channel> void brNcr_w(uint8_t data);
 	uint8_t t8run_r();
 	void t8run_w(uint8_t data);
 	uint8_t t01mod_r();
@@ -195,6 +214,7 @@ private:
 	void iimc_w(uint8_t data);
 	void intclr_w(uint8_t data);
 	void dmav_w(offs_t offset, uint8_t data);
+	void dmar_w(uint8_t data);
 	uint8_t drefcr1_r();
 	void drefcr1_w(uint8_t data);
 	uint8_t dmemcr1_r();
@@ -208,6 +228,10 @@ private:
 	void dareg_w(offs_t offset, uint8_t data);
 
 	void internal_mem(address_map &map);
+
+	template <uint8_t IntReg> void set_intreg(uint8_t data);
+
+	required_device_array<tmp94c241_serial_device, 2> m_serial;
 
 	// analogue inputs, sampled at 10 bits
 	devcb_read16::array<8> m_an_read;
@@ -243,10 +267,7 @@ private:
 	// Watchdog Timer
 	uint8_t m_watchdog_mode;
 
-	// Serial Channel
-	uint8_t m_serial_control[2];
-	uint8_t m_serial_mode[2];
-	uint8_t m_baud_rate[2];
+	// I/O Control
 	uint8_t m_od_enable;
 
 	// A/D Converter Control

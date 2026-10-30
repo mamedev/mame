@@ -3493,8 +3493,7 @@ static TRUTH_TABLE(TTL_74368_GATE, 5, 4, "")
 	TT_FAMILY("74XX")
 }
 
-static TRUTH_TABLE(TTL_9312, 12, 2,
-				   "+A,+B,+C,+G,+D0,+D1,+D2,+D3,+D4,+D5,+D6,+D7,@VCC,@GND")
+static TRUTH_TABLE(TTL_9312, 12, 2, "+A,+B,+C,+G,+D0,+D1,+D2,+D3,+D4,+D5,+D6,+D7,@VCC,@GND")
 {
 	TT_HEAD(" C, B, A, G,D0,D1,D2,D3,D4,D5,D6,D7| Y,YQ")
 	TT_LINE(" X, X, X, 1, X, X, X, X, X, X, X, X| 0, 1|33,19")

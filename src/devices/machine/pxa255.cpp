@@ -256,7 +256,7 @@ void pxa255_periphs_device::device_add_mconfig(machine_config &config)
 {
 	// TODO: should be SCREEN_TYPE_LCD, but that dislikes dynamic configure
 	// will stay stuck at 296x480 aspect ratio.
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(1024, 1024);
@@ -430,10 +430,11 @@ void pxa255_periphs_device::dma_load_descriptor_and_start(int channel)
 	switch (channel)
 	{
 		case 3:
-			m_dma_regs.timer[channel]->adjust(attotime::from_hz((147600000 / m_i2s_regs.sadiv) / (4 * 64)) * (m_dma_regs.dcmd[channel] & 0x00001fff), channel);
+			m_dma_regs.timer[channel]->adjust(attotime::from_hz((147600000 / m_i2s_regs.sadiv) / (4 * 64)) * std::max<u32>(1, m_dma_regs.dcmd[channel] & 0x00001fff), channel);
 			break;
 		default:
-			m_dma_regs.timer[channel]->adjust(attotime::from_hz(100000000) * (m_dma_regs.dcmd[channel] & 0x00001fff), channel);
+			// a zero-length descriptor still costs a fetch, otherwise a chain of them would stall the scheduler
+			m_dma_regs.timer[channel]->adjust(attotime::from_hz(100000000) * std::max<u32>(1, m_dma_regs.dcmd[channel] & 0x00001fff), channel);
 			break;
 	}
 
@@ -557,6 +558,17 @@ void pxa255_periphs_device::dma_dcsr_w(offs_t offset, u32 data, u32 mem_mask)
 			return;
 		}
 
+		if (m_dma_regs.ddadr[offset] & DDADR_STOP)
+		{
+			// Nothing to fetch: the channel goes straight to the stopped state. Linux parks every
+			// channel this way (DDADR = 1, then RUN) at boot, and descriptor 0 must not be fetched from address 0.
+			LOGMASKED(LOG_DMA, "%s:             Descriptor STOP bit set, channel %d stopped without a fetch.\n", machine().describe_context(), offset);
+			m_dma_regs.dcsr[offset] &= ~DCSR_RUN;
+			m_dma_regs.dcsr[offset] |= DCSR_STOPSTATE;
+			dma_irq_check();
+			return;
+		}
+
 		dma_load_descriptor_and_start(offset);
 	}
 	else if (!(data & DCSR_RUN))
@@ -605,7 +617,7 @@ template <int Which>
 void pxa255_periphs_device::dma_ddadr_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_DMA, "%s: dma_ddadr_w: DMA Descriptor Address Register %d = %08x & %08x\n", machine().describe_context(), offset, data, mem_mask);
-	m_dma_regs.ddadr[offset] = data & 0xfffffff1;
+	m_dma_regs.ddadr[Which] = data & 0xfffffff1;
 }
 
 template <int Which>
@@ -620,7 +632,7 @@ template <int Which>
 void pxa255_periphs_device::dma_dsadr_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_DMA, "%s: dma_dsadr_w: DMA Source Address Register %d = %08x & %08x\n", machine().describe_context(), offset, data, mem_mask);
-	m_dma_regs.dsadr[offset] = data & 0xfffffffc;
+	m_dma_regs.dsadr[Which] = data & 0xfffffffc;
 }
 
 template <int Which>
@@ -650,7 +662,7 @@ template <int Which>
 void pxa255_periphs_device::dma_dcmd_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_DMA, "%s: dma_dcmd_w: DMA Command Register %d: %08x & %08x\n", machine().describe_context(), Which, data, mem_mask);
-	m_dma_regs.dcmd[offset] = data & 0xf067dfff;
+	m_dma_regs.dcmd[Which] = data & 0xf067dfff;
 }
 
 
@@ -756,15 +768,18 @@ void pxa255_periphs_device::rtc_rttr_w(offs_t offset, u32 data, u32 mem_mask)
 void pxa255_periphs_device::ostimer_irq_check()
 {
 	set_irq_line(INT_OSTIMER0, (m_ostimer_regs.oier & OIER_E0) ? ((m_ostimer_regs.ossr & OSSR_M0) ? 1 : 0) : 0);
-	//set_irq_line(INT_OSTIMER1, (m_ostimer_regs.oier & OIER_E1) ? ((m_ostimer_regs.ossr & OSSR_M1) ? 1 : 0) : 0);
-	//set_irq_line(INT_OSTIMER2, (m_ostimer_regs.oier & OIER_E2) ? ((m_ostimer_regs.ossr & OSSR_M2) ? 1 : 0) : 0);
+	set_irq_line(INT_OSTIMER1, (m_ostimer_regs.oier & OIER_E1) ? ((m_ostimer_regs.ossr & OSSR_M1) ? 1 : 0) : 0);
+	set_irq_line(INT_OSTIMER2, (m_ostimer_regs.oier & OIER_E2) ? ((m_ostimer_regs.ossr & OSSR_M2) ? 1 : 0) : 0);
 	//set_irq_line(INT_OSTIMER3, (m_ostimer_regs.oier & OIER_E3) ? ((m_ostimer_regs.ossr & OSSR_M3) ? 1 : 0) : 0);
 }
 
 TIMER_CALLBACK_MEMBER(pxa255_periphs_device::ostimer_match_tick)
 {
-	m_ostimer_regs.ossr |= (1 << param);
+	// The count has just reached the match value, so resynchronise on it here
+	// rather than letting the next OSCR read add the elapsed time a second time.
 	m_ostimer_regs.oscr = m_ostimer_regs.osmr[param];
+	m_ostimer_regs.last_count_sync = machine().time();
+	m_ostimer_regs.ossr |= (1 << param);
 	ostimer_irq_check();
 }
 
@@ -773,7 +788,16 @@ void pxa255_periphs_device::ostimer_update_interrupts()
 {
 	if ((m_ostimer_regs.oier & (OIER_E0 << Which)) && Which != 3)
 	{
-		m_ostimer_regs.timer[Which]->adjust(attotime::from_hz(3846400) * (m_ostimer_regs.osmr[Which] - m_ostimer_regs.oscr), Which);
+		// A match happens when the count increments to equal the match register,
+		// so a register that already equals the count is a full wrap away.
+		const u32 delta = m_ostimer_regs.osmr[Which] - m_ostimer_regs.oscr;
+		const attotime match = m_ostimer_regs.last_count_sync + attotime::from_ticks(delta ? u64(delta) : 0x100000000ULL, INTERNAL_OSC);
+		const attotime now = machine().time();
+		m_ostimer_regs.timer[Which]->adjust((match > now) ? (match - now) : attotime::zero, Which);
+	}
+	else
+	{
+		m_ostimer_regs.timer[Which]->adjust(attotime::never);
 	}
 }
 
@@ -784,13 +808,9 @@ void pxa255_periphs_device::ostimer_update_count()
 	if (ticks_elapsed == 0ULL) // Accrue time until we can tick at least once
 		return;
 
-	const uint32_t wrapped_ticks = (uint32_t)ticks_elapsed;
-	m_ostimer_regs.oscr += wrapped_ticks;
-	m_ostimer_regs.last_count_sync = machine().time();
-	ostimer_update_interrupts<0>();
-	ostimer_update_interrupts<1>();
-	ostimer_update_interrupts<2>();
-	ostimer_update_interrupts<3>();
+	m_ostimer_regs.oscr += (uint32_t)ticks_elapsed;
+	// Advance the sync point by whole ticks only so the fraction is kept
+	m_ostimer_regs.last_count_sync += attotime::from_ticks(ticks_elapsed, INTERNAL_OSC);
 }
 
 template <int Which>
@@ -807,7 +827,6 @@ void pxa255_periphs_device::tmr_osmr_w(offs_t offset, u32 data, u32 mem_mask)
 	LOGMASKED(LOG_OSTIMER, "%s: pxa255_ostimer_w: OS Timer Match Register %d = %08x & %08x\n", machine().describe_context(), Which, data, mem_mask);
 	ostimer_update_count();
 	m_ostimer_regs.osmr[Which] = data;
-	ostimer_update_count();
 	ostimer_update_interrupts<Which>();
 }
 
@@ -824,6 +843,20 @@ void pxa255_periphs_device::tmr_oscr_w(offs_t offset, u32 data, u32 mem_mask)
 	LOGMASKED(LOG_OSTIMER, "%s: tmr_oscr_w: OS Timer Count Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	m_ostimer_regs.oscr = data;
 	m_ostimer_regs.last_count_sync = machine().time();
+	ostimer_update_interrupts<0>();
+	ostimer_update_interrupts<1>();
+	ostimer_update_interrupts<2>();
+	ostimer_update_interrupts<3>();
+
+	// PXA255 Developer's Manual 4.4.2.1/4.4.2.4: the counter increments on each rising edge and
+	// the match registers are compared against it after the edge, so a match register written
+	// equal to the current count is a full wrap away (handled above).  A written count is the
+	// exception: the edge on which it lands loads the counter instead of incrementing it.
+	for (int which = 0; which < 3; which++)
+	{
+		if ((m_ostimer_regs.oier & (OIER_E0 << which)) && m_ostimer_regs.osmr[which] == data)
+			m_ostimer_regs.timer[which]->adjust(attotime::from_ticks(1, INTERNAL_OSC), which);
+	}
 }
 
 u32 pxa255_periphs_device::tmr_ossr_r(offs_t offset, u32 mem_mask)
@@ -863,7 +896,13 @@ u32 pxa255_periphs_device::tmr_oier_r(offs_t offset, u32 mem_mask)
 void pxa255_periphs_device::tmr_oier_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_OSTIMER, "%s: tmr_oier_w: OS Timer Interrupt Enable Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	ostimer_update_count();
 	m_ostimer_regs.oier = data & 0x0000000f;
+	ostimer_update_interrupts<0>();
+	ostimer_update_interrupts<1>();
+	ostimer_update_interrupts<2>();
+	ostimer_update_interrupts<3>();
+	ostimer_irq_check();
 }
 
 
@@ -913,6 +952,7 @@ void pxa255_periphs_device::intc_icmr_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_INTC, "%s: intc_icmr_w: Interrupt Controller Mask Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	m_intc_regs.icmr = data & 0xfffe7f00;
+	update_interrupts(); // ICIP/ICFP follow the mask immediately, so masking a pending source must drop the IRQ line
 }
 
 u32 pxa255_periphs_device::intc_iclr_r(offs_t offset, u32 mem_mask)
@@ -926,6 +966,7 @@ void pxa255_periphs_device::intc_iclr_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_INTC, "%s: intc_iclr_w: Interrupt Controller Level Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	m_intc_regs.iclr = data & 0xfffe7f00;
+	update_interrupts();
 }
 
 u32 pxa255_periphs_device::intc_icfp_r(offs_t offset, u32 mem_mask)
@@ -1336,12 +1377,34 @@ void pxa255_periphs_device::gpio_gafru_w(offs_t offset, u32 data, u32 mem_mask)
 
 u32 pxa255_periphs_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int y = 0; y <= (m_lcd_regs.lccr[2] & LCCR2_LPP); y++)
+	const u32 ppl = (m_lcd_regs.lccr[1] & LCCR1_PPL) + 1;
+	const u32 lpp = (m_lcd_regs.lccr[2] & LCCR2_LPP) + 1;
+
+	// LCCR3 BPP selects 1, 2, 4 or 8bpp palettised (0 through 3) or direct 16bpp RGB 5:6:5 (4).
+	// The packed sub-byte modes are not implemented and fall through to the 8bpp path.
+	if (((m_lcd_regs.lccr[3] & LCCR3_BPP) >> 24) == 4)
 	{
-		u32 *dst = &bitmap.pix(y);
-		for (int x = 0; x <= (m_lcd_regs.lccr[1] & LCCR1_PPL); x++)
+		for (u32 y = 0; y < lpp; y++)
 		{
-			*dst++ = m_lcd_palette[m_lcd_framebuffer[y * ((m_lcd_regs.lccr[1] & LCCR1_PPL) + 1) + x]];
+			const u8 *src = &m_lcd_framebuffer[y * ppl * 2];
+			u32 *dst = &bitmap.pix(y);
+			for (u32 x = 0; x < ppl; x++, src += 2)
+			{
+				const u16 color = src[0] | (src[1] << 8);
+				*dst++ = rgb_t(pal5bit(color >> 11), pal6bit(color >> 5), pal5bit(color));
+			}
+		}
+	}
+	else
+	{
+		for (u32 y = 0; y < lpp; y++)
+		{
+			const u8 *src = &m_lcd_framebuffer[y * ppl];
+			u32 *dst = &bitmap.pix(y);
+			for (u32 x = 0; x < ppl; x++)
+			{
+				*dst++ = m_lcd_palette[*src++];
+			}
 		}
 	}
 	return 0;
@@ -1449,6 +1512,13 @@ void pxa255_periphs_device::lcd_check_load_next_branch(int channel)
 	else
 	{
 		LOGMASKED(LOG_LCD_DMA, "lcd_check_load_next_branch: Not taking branch\n" );
+
+		// A self-linked descriptor keeps refreshing the panel from one buffer.
+		if ((m_lcd_regs.lccr[0] & LCCR0_ENB) && (m_lcd_regs.dma[channel].ldcmd & 0x000fffff))
+		{
+			lcd_load_dma_descriptor(m_lcd_regs.dma[channel].fdadr & 0xfffffff0, channel);
+			lcd_dma_kickoff(channel);
+		}
 	}
 }
 
@@ -1466,7 +1536,20 @@ void pxa255_periphs_device::lcd_lccr_w(offs_t offset, u32 data, u32 mem_mask)
 	LOGMASKED(LOG_LCD, "%s: lcd_lccr_w: LCD Control Register %d = %08x & %08x\n", machine().describe_context(), Which, data, mem_mask);
 
 	if (Which == 0)
-		m_lcd_regs.lccr[Which] = data & 0x00fffeff;
+	{
+		const u32 old = m_lcd_regs.lccr[0];
+		m_lcd_regs.lccr[0] = data & 0x00fffeff;
+
+		// enabling the controller starts fetching from the descriptor FDADR already points at
+		if ((m_lcd_regs.lccr[0] & ~old) & LCCR0_ENB)
+		{
+			for (int channel = 0; channel < 2; channel++)
+			{
+				if (!m_lcd_regs.dma[channel].eof->enabled())
+					lcd_dma_kickoff(channel);
+			}
+		}
+	}
 	else
 	{
 		m_lcd_regs.lccr[Which] = data;
@@ -1478,7 +1561,7 @@ void pxa255_periphs_device::lcd_lccr_w(offs_t offset, u32 data, u32 mem_mask)
 			if (lpp && ppl)
 			{
 				rectangle rect(0, ppl, 0, lpp);
-				m_screen->configure(1024, 1024, rect, HZ_TO_ATTOSECONDS(60));
+				m_screen->configure(1024, 1024, rect, attotime::from_hz(60));
 			}
 		}
 	}

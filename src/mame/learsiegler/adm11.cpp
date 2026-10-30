@@ -170,7 +170,7 @@ void adm11_state::adm12(machine_config &config)
 
 	EEPROM_2804(config, "eeprom"); // X2804AP
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_raw(15.93_MHz_XTAL, 900, 0, 720, 295, 0, 275); // 17.7 kHz horizontal
 	screen.set_screen_update("avdc", FUNC(scn2674_device::screen_update));

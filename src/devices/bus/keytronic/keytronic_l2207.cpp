@@ -96,7 +96,6 @@ protected:
 	keytronic_l2207_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
-	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -170,12 +169,6 @@ keytronic_l2207_device::keytronic_l2207_device(const machine_config &mconfig, co
 kayproii_keyboard_device::kayproii_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: keytronic_l2207_device(mconfig, KAYPROII_KEYBOARD, tag, owner, clock)
 {
-}
-
-void keytronic_l2207_device::device_resolve_objects()
-{
-	m_leds.resolve();
-	m_all_caps.resolve();
 }
 
 void keytronic_l2207_device::device_start()

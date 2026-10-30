@@ -44,7 +44,7 @@ class device_state_entry
 {
 public:
 	// construction/destruction
-	device_state_entry(int index, const char *symbol, u8 size, u64 sizemask, u8 flags, device_state_interface *dev);
+	device_state_entry(int index, std::string &&symbol, u8 size, u64 sizemask, u8 flags, device_state_interface *dev);
 	device_state_entry(int index, device_state_interface *dev);
 	virtual ~device_state_entry();
 
@@ -52,7 +52,7 @@ public:
 	// post-construction modifiers
 	device_state_entry &mask(u64 _mask) { m_datamask = _mask; format_from_mask(); return *this; }
 	device_state_entry &signed_mask(u64 _mask) { m_datamask = _mask; m_flags |= DSF_IMPORT_SEXT; format_from_mask(); return *this; }
-	device_state_entry &formatstr(const char *_format);
+	device_state_entry &formatstr(std::string &&_format);
 	device_state_entry &callimport() { m_flags |= DSF_IMPORT; return *this; }
 	device_state_entry &callexport() { m_flags |= DSF_EXPORT; return *this; }
 	device_state_entry &noshow() { m_flags |= DSF_NOSHOW; return *this; }
@@ -63,12 +63,12 @@ public:
 	void *dataptr() const { return entry_baseptr(); }
 	u64 datamask() const { return m_datamask; }
 	u8 datasize() const { return m_datasize; }
-	const char *symbol() const { return m_symbol.c_str(); }
+	const std::string &symbol() const { return m_symbol; }
 	bool visible() const { return ((m_flags & DSF_NOSHOW) == 0); }
 	bool writeable() const { return ((m_flags & DSF_READONLY) == 0); }
 	bool divider() const { return m_flags & DSF_DIVIDER; }
 	bool is_float() const { return m_flags & DSF_FLOATING_POINT; }
-	device_state_interface *parent_state() const {return m_device_state;}
+	device_state_interface *parent_state() const { return m_device_state; }
 	const std::string &format_string() const { return m_format; }
 
 	// return the current value
@@ -94,7 +94,7 @@ protected:
 	static constexpr u8 DSF_READONLY        = 0x40; // set if this entry does not permit writes
 	static constexpr u8 DSF_FLOATING_POINT  = 0x80; // set if this entry represents a floating-point value
 
-	// overrides
+	// overridables
 	virtual void *entry_baseptr() const;
 	virtual u64 entry_value() const;
 	virtual void entry_set_value(u64 value) const;
@@ -124,14 +124,14 @@ private:
 // ======================> device_state_register
 
 // class template representing a state register of a specific width
-template<class ItemType>
+template <typename ItemType>
 class device_state_register : public device_state_entry
 {
 public:
 	// construction/destruction
-	device_state_register(int index, const char *symbol, ItemType &data, device_state_interface *dev)
-		: device_state_entry(index, symbol, sizeof(ItemType), std::numeric_limits<typename std::make_unsigned<ItemType>::type>::max(), 0, dev),
-			m_data(data)
+	device_state_register(int index, std::string &&symbol, ItemType &data, device_state_interface *dev)
+		: device_state_entry(index, std::move(symbol), sizeof(ItemType), std::numeric_limits<typename std::make_unsigned<ItemType>::type>::max(), 0, dev)
+		, m_data(data)
 	{
 		static_assert(std::is_integral<ItemType>().value, "Registration of non-integer types is not currently supported");
 	}
@@ -147,14 +147,14 @@ private:
 };
 
 // class template representing a boolean state register
-template<>
+template <>
 class device_state_register<bool> : public device_state_entry
 {
 public:
 	// construction/destruction
-	device_state_register(int index, const char *symbol, bool &data, device_state_interface *dev)
-		: device_state_entry(index, symbol, sizeof(bool), 1, 0, dev),
-			m_data(data)
+	device_state_register(int index, std::string &&symbol, bool &data, device_state_interface *dev)
+		: device_state_entry(index, std::move(symbol), sizeof(bool), 1, 0, dev)
+		, m_data(data)
 	{
 	}
 
@@ -169,14 +169,14 @@ private:
 };
 
 // class template representing a floating-point state register
-template<>
+template <>
 class device_state_register<double> : public device_state_entry
 {
 public:
 	// construction/destruction
-	device_state_register(int index, const char *symbol, double &data, device_state_interface *dev)
-		: device_state_entry(index, symbol, sizeof(double), ~u64(0), DSF_FLOATING_POINT, dev),
-			m_data(data)
+	device_state_register(int index, std::string &&symbol, double &data, device_state_interface *dev)
+		: device_state_entry(index, std::move(symbol), sizeof(double), ~u64(0), DSF_FLOATING_POINT, dev)
+		, m_data(data)
 	{
 	}
 
@@ -196,17 +196,17 @@ private:
 // ======================> device_latched_functional_state_register
 
 // class template representing a state register of a specific width
-template<class ItemType>
+template <typename ItemType>
 class device_latched_functional_state_register : public device_state_entry
 {
 public:
-	typedef typename std::function<void (ItemType)> setter_func;
+	using setter_func = std::function<void (ItemType)>;
 
 	// construction/destruction
-	device_latched_functional_state_register(int index, const char *symbol, ItemType &data, setter_func &&setter, device_state_interface *dev)
-		: device_state_entry(index, symbol, sizeof(ItemType), std::numeric_limits<ItemType>::max(), 0, dev),
-			m_data(data),
-			m_setter(std::move(setter))
+	device_latched_functional_state_register(int index, std::string &&symbol, ItemType &data, setter_func &&setter, device_state_interface *dev)
+		: device_state_entry(index, std::move(symbol), sizeof(ItemType), std::numeric_limits<ItemType>::max(), 0, dev)
+		, m_data(data)
+		, m_setter(std::move(setter))
 	{
 	}
 
@@ -225,18 +225,18 @@ private:
 // ======================> device_functional_state_register
 
 // class template representing a state register of a specific width
-template<class ItemType>
+template <typename ItemType>
 class device_functional_state_register : public device_state_entry
 {
 public:
-	typedef typename std::function<ItemType ()> getter_func;
-	typedef typename std::function<void (ItemType)> setter_func;
+	using getter_func = std::function<ItemType ()>;
+	using setter_func = std::function<void (ItemType)>;
 
 	// construction/destruction
-	device_functional_state_register(int index, const char *symbol, getter_func &&getter, setter_func &&setter, device_state_interface *dev)
-		: device_state_entry(index, symbol, sizeof(ItemType), std::numeric_limits<ItemType>::max(), 0, dev),
-			m_getter(std::move(getter)),
-			m_setter(std::move(setter))
+	device_functional_state_register(int index, std::string &&symbol, getter_func &&getter, setter_func &&setter, device_state_interface *dev)
+		: device_state_entry(index, std::move(symbol), sizeof(ItemType), std::numeric_limits<ItemType>::max(), 0, dev)
+		, m_getter(std::move(getter))
+		, m_setter(std::move(setter))
 	{
 	}
 
@@ -250,18 +250,18 @@ private:
 	setter_func             m_setter;               // function to store the data
 };
 
-template<>
+template <>
 class device_functional_state_register<double> : public device_state_entry
 {
 public:
-	typedef typename std::function<double ()> getter_func;
-	typedef typename std::function<void (double)> setter_func;
+	using getter_func = std::function<double ()>;
+	using setter_func = std::function<void (double)>;
 
 	// construction/destruction
-	device_functional_state_register(int index, const char *symbol, getter_func &&getter, setter_func &&setter, device_state_interface *dev)
-		: device_state_entry(index, symbol, sizeof(double), ~u64(0), DSF_FLOATING_POINT, dev),
-			m_getter(std::move(getter)),
-			m_setter(std::move(setter))
+	device_functional_state_register(int index, std::string &&symbol, getter_func &&getter, setter_func &&setter, device_state_interface *dev)
+		: device_state_entry(index, std::move(symbol), sizeof(double), ~u64(0), DSF_FLOATING_POINT, dev)
+		, m_getter(std::move(getter))
+		, m_setter(std::move(setter))
 	{
 	}
 
@@ -312,44 +312,32 @@ public:
 public: // protected eventually
 
 	// add a new state register item
-	template<class ItemType> device_state_entry &state_add(int index, const char *symbol, ItemType &data)
-	{
-		assert(symbol != nullptr);
-		return state_add(std::make_unique<device_state_register<ItemType>>(index, symbol, data, this));
-	}
+	template <typename ItemType, typename T>
+	device_state_entry &state_add(int index, T &&symbol, ItemType &data);
 
 	// add a new state register item using functional setter
-	template<class ItemType> device_state_entry &state_add(int index, const char *symbol, ItemType &data,
-					typename device_latched_functional_state_register<ItemType>::setter_func &&setter)
-	{
-		assert(symbol != nullptr);
-		return state_add(std::make_unique<device_latched_functional_state_register<ItemType>>(index, symbol, data, std::move(setter), this));
-	}
+	template <typename ItemType, typename T>
+	device_state_entry &state_add(int index, T &&symbol, ItemType &data,
+					typename device_latched_functional_state_register<ItemType>::setter_func &&setter);
 
 	// add a new state register item using functional getter and setter (template argument must be explicit)
-	template<class ItemType> device_state_entry &state_add(int index, const char *symbol,
+	template <typename ItemType, typename T>
+	device_state_entry &state_add(int index, T &&symbol,
 					typename device_functional_state_register<ItemType>::getter_func &&getter,
-					typename device_functional_state_register<ItemType>::setter_func &&setter)
-	{
-		assert(symbol != nullptr);
-		return state_add(std::make_unique<device_functional_state_register<ItemType>>(index, symbol, std::move(getter), std::move(setter), this));
-	}
+					typename device_functional_state_register<ItemType>::setter_func &&setter);
 
 	// add a new read-only state register item using functional getter (template argument must be explicit)
-	template<class ItemType> device_state_entry &state_add(int index, const char *symbol,
-					typename device_functional_state_register<ItemType>::getter_func &&getter)
-	{
-		assert(symbol != nullptr);
-		return state_add(std::make_unique<device_functional_state_register<ItemType>>(index, symbol, std::move(getter), [](ItemType){}, this)).readonly();
-	}
+	template <typename ItemType, typename T>
+	device_state_entry &state_add(int index, T &&symbol,
+					typename device_functional_state_register<ItemType>::getter_func &&getter);
 
 	device_state_entry &state_add(std::unique_ptr<device_state_entry> &&entry);
 
 	// add a new divider entry
-	device_state_entry &state_add_divider(int index) { return state_add(std::make_unique<device_state_entry>(index, this)); }
+	device_state_entry &state_add_divider(int index);
 
 protected:
-	// derived class overrides
+	// derived class hooks
 	virtual void state_import(const device_state_entry &entry);
 	virtual void state_export(const device_state_entry &entry);
 	virtual void state_string_import(const device_state_entry &entry, std::string &str);
@@ -368,8 +356,47 @@ protected:
 };
 
 // iterator
-typedef device_interface_enumerator<device_state_interface> state_interface_enumerator;
+using state_interface_enumerator = device_interface_enumerator<device_state_interface>;
 
+
+
+//**************************************************************************
+//  FUNCTION TEMPLATES
+//**************************************************************************
+
+template <typename ItemType, typename T>
+device_state_entry &device_state_interface::state_add(int index, T &&symbol, ItemType &data)
+{
+	return state_add(std::make_unique<device_state_register<ItemType> >(index, std::forward<T>(symbol), data, this));
+}
+
+// add a new state register item using functional setter
+template <typename ItemType, typename T>
+device_state_entry &device_state_interface::state_add(
+		int index, T &&symbol, ItemType &data,
+		typename device_latched_functional_state_register<ItemType>::setter_func &&setter)
+{
+	return state_add(std::make_unique<device_latched_functional_state_register<ItemType> >(index, std::forward<T>(symbol), data, std::move(setter), this));
+}
+
+// add a new state register item using functional getter and setter (template argument must be explicit)
+template <typename ItemType, typename T>
+device_state_entry &device_state_interface::state_add(
+		int index, T &&symbol,
+		typename device_functional_state_register<ItemType>::getter_func &&getter,
+		typename device_functional_state_register<ItemType>::setter_func &&setter)
+{
+	return state_add(std::make_unique<device_functional_state_register<ItemType> >(index, std::forward<T>(symbol), std::move(getter), std::move(setter), this));
+}
+
+// add a new read-only state register item using functional getter (template argument must be explicit)
+template <typename ItemType, typename T>
+device_state_entry &device_state_interface::state_add(
+		int index, T &&symbol,
+		typename device_functional_state_register<ItemType>::getter_func &&getter)
+{
+	return state_add(std::make_unique<device_functional_state_register<ItemType> >(index, std::forward<T>(symbol), std::move(getter), [](ItemType){}, this)).readonly();
+}
 
 
 //**************************************************************************
@@ -396,4 +423,22 @@ inline const device_state_entry *device_state_interface::state_find_entry(int in
 	return nullptr;
 }
 
-#endif  /* MAME_EMU_DISTATE_H */
+
+//**************************************************************************
+//  EXTERNAL TEMPLATES
+//**************************************************************************
+
+extern template class device_state_register<u8>;
+extern template class device_state_register<u16>;
+extern template class device_state_register<u32>;
+extern template class device_state_register<u64>;
+extern template class device_latched_functional_state_register<u8>;
+extern template class device_latched_functional_state_register<u16>;
+extern template class device_latched_functional_state_register<u32>;
+extern template class device_latched_functional_state_register<u64>;
+extern template class device_functional_state_register<u8>;
+extern template class device_functional_state_register<u16>;
+extern template class device_functional_state_register<u32>;
+extern template class device_functional_state_register<u64>;
+
+#endif // MAME_EMU_DISTATE_H

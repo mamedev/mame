@@ -177,7 +177,7 @@ void robotron_k7070_device::device_add_mconfig(machine_config &config)
 	RS232_PORT(config, m_serial[1], default_rs232_devices, "loopback");
 	m_serial[1]->rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_raw(XTAL(16'000'000), 737, 0, 640, 431, 0, 400);
 	screen.set_screen_update(FUNC(robotron_k7070_device::screen_update_k7072));

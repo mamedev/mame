@@ -1,3 +1,4 @@
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/log_base.hpp>
 #include <glm/gtc/vec1.hpp>
 #include <glm/gtc/epsilon.hpp>
@@ -5,7 +6,7 @@
 
 namespace test_log
 {
-	int run()
+	static int run()
 	{
 		int Error = 0;
 

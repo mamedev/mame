@@ -29,6 +29,7 @@ Happy Farm (IN.01.02B)             11    P1                        ASTRO V102PX-
 Happy Farm (US.01.02B)             07    _P_ROHS                   ASTRO V102PX-008   ASTRO V07      ASTRO ROHS BA21C00009 M835KK01             Encrypted, also seen on ASTRO _P CS350P071
 Keno 21                            02?   T-3802A                   ASTRO V102PX-001   ASTRO V05      ASTRO F02 2003-04-14                       Encrypted
 Little Witch (EN.01A)              06    P1                        ASTRO V102PX-016   ASTRO V07      ASTRO ROHS BA21C00009 JF13022              Encrypted
+Lucky Spin 1999                    99    B50-4001A                 MC68HC000FN16      ASTRO V01      pLSI1016-60LJ, ASTRO 0006B MCU? (28 pins)
 Magic Bomb (A3.0)                        None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
 Magic Bomb (A3.1A)                       None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
 Magic Bomb (A3.6A)                       None                      ASTRO V03          ASTRO V02      pLSI1016                                   Encrypted
@@ -101,19 +102,20 @@ TODO:
 - MCU on showhand/showhandc PCB, what does it do? Games run fine and there appears to be no interaction...
 - Protection in magibomb sets with simpler encryption (writes to $a0101x, $a11100, etc.). Some sets appear to work fine regardless, others freeze.
 - Find source of level 2 interrupt (sprite DMA end?).
-- magibomb_br44, westvent: need a redump of one of the program ROMs.
+- magibomb_br44: needs a redump of one of the program ROMs.
 - hacher, winbingo_gm051: need a redump of the sprite ROMs.
 - gostopac: needs verifying of outputs and layout. Sound doesn't seem 100% correct (Oki banking problem?)
 - monkeyl and clones: need verifying of inputs, outputs and layout.
 - speedmst and clones: need verifying of inputs, outputs and layout.
 - cptshark: needs verifying of inputs and layout
 - wwitch, lwitch: need verifying of inputs, outputs and layout.
-- hapfarm and clone: need verifying of inputs, outputs and layout.
+- hapfarm and clones: need verifying of inputs, outputs and layout.
 - zulu: needs verifying of inputs, outputs and layout.
 - westvent and clones: needs verifying of inputs, outputs and layout.
 - keno21: doesn't manage to read the CPU code. bp 1160,1,{D5=0x2188;g} for now to go further.
 - crzcircus: needs verifying of inputs, outputs and layout.
 - foxyruby: needs verifying of inputs, outputs and layout.
+- luckys99: needs verifying of inputs, outputs and layout creation.
 
 magibomb sets Q/A as of 18.07.2025:
 MAGIC BOMB\A3.0 (magibomb_a30 run protected)
@@ -198,6 +200,17 @@ winbingo: Win Win Bingo
 | 6          | 5693  | 7          | 2110  |            |       |
 +------------+-------+------------+-------+------------+-------+
 
+***List of some CGA missing games***
+HOT RUNNER      - Car racing game for single player
+JOKER FIRE      - 5 cards poker game with 2 Jokers
+MAGIC HAMMER    - 4 reels slot game
+ONE TOUCH       - 8in1 Multigame includes: Openseason, Sleepy Monk, Wrestling, Funny Hammer, Merry Christmas,go! Fishing, Air Heroes, Gogonight.
+POKER & LINER   - 2in1 combination with multi-liner Dino-Dino and poker game
+POKER 106       - 5 cards poker game
+POKER MATCH     - Lamp game with poker card GFX
+SMART HOLDER    - Poker game with fruits GFX
+TEXAS CHAMPION  - Texas Hold'em poker game
+UR DEALER       - Three traditional poker games. The player plays the role of Dealer
 *************************************************************************************************************/
 
 #include "emu.h"
@@ -233,7 +246,7 @@ winbingo: Win Win Bingo
 class astro_cpucode_device : public device_t
 {
 public:
-	astro_cpucode_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	astro_cpucode_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// read handlers
 	int do_read();              // DO
@@ -326,6 +339,7 @@ public:
 	{ }
 
 	void luckycoin(machine_config &config) ATTR_COLD;
+	void luckys99(machine_config &config) ATTR_COLD;
 	void showhandc(machine_config &config) ATTR_COLD;
 	void showhand(machine_config &config) ATTR_COLD;
 	void skilldrp(machine_config &config) ATTR_COLD;
@@ -381,6 +395,7 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void luckycoin_map(address_map &map) ATTR_COLD;
+	void luckys99_map(address_map &map) ATTR_COLD;
 	void showhandc_map(address_map &map) ATTR_COLD;
 	void showhand_map(address_map &map) ATTR_COLD;
 	void skilldrp_map(address_map &map) ATTR_COLD;
@@ -875,6 +890,23 @@ void astrocorp_state::luckycoin_map(address_map &map)
 	map(0x500000, 0x500001).nopr().w(FUNC(astrocorp_state::screen_enable_w)).umask16(0x00ff);
 	map(0x580001, 0x580001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x600001, 0x600001).w(FUNC(astrocorp_state::oki_bank_w));
+}
+
+void astrocorp_state::luckys99_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x040000, 0x043fff).ram().share("nvram"); // battery
+	map(0x060000, 0x060fff).ram().share(m_spriteram);
+	map(0x062000, 0x062001).nopr().w(FUNC(astrocorp_state::draw_sprites_w));
+	map(0x064000, 0x064001).portr("INPUTS");
+	map(0x068001, 0x068001).w(FUNC(astrocorp_state::eeprom_w));
+	map(0x06a000, 0x06a001).w(FUNC(astrocorp_state::showhandc_outputs_w));
+	map(0x06e000, 0x06e001).portr("EEPROM_IN");
+	map(0x070000, 0x070001).r(FUNC(astrocorp_state::unk_r));
+	map(0x070000, 0x070000).w(m_oki, FUNC(okim6295_device::write));
+	map(0x080000, 0x080000).w(FUNC(astrocorp_state::oki_bank_w)); // always writes 0x00 as ROM is only 0x40000
+	map(0x090000, 0x090001).nopr().w(FUNC(astrocorp_state::screen_enable_w)).umask16(0x00ff);
+	map(0x0a0000, 0x0a01ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 
 void astrocorp_state::speeddrp_map(address_map &map)
@@ -1466,6 +1498,28 @@ static INPUT_PORTS_START( skilldrp )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( luckys99 )
+	PORT_INCLUDE( showhand )
+
+	PORT_MODIFY("INPUTS")    // 64000
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1         ) PORT_IMPULSE(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYOUT ) // press with memory_reset to reset settings
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_SLOT_STOP_ALL ) PORT_NAME("Stop All Reels / Take")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_GAMBLE_D_UP   )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_BUTTON2       ) PORT_PLAYER(4)
+	PORT_SERVICE_NO_TOGGLE( 0x0020,   IP_ACTIVE_LOW     )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_SLOT_STOP4    ) PORT_NAME("Stop Reel 4 / Start")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_BUTTON3       ) PORT_PLAYER(4)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_SLOT_STOP1    )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_SLOT_STOP2    )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SLOT_STOP3    ) PORT_NAME("Stop Reel 3 / Bet")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_MEMORY_RESET  ) // press with keyout to reset settings
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_BUTTON4       ) PORT_PLAYER(4)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( magibomb )
 	PORT_INCLUDE( skilldrp )
 
@@ -1547,7 +1601,7 @@ static INPUT_PORTS_START( astoneag )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_SLOT_STOP3    ) PORT_NAME("Take")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_SLOT_STOP1    ) PORT_NAME("Auto Play")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_GAMBLE_DOOR   )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_DOOR          )
 	PORT_SERVICE_NO_TOGGLE( 0x0020,   IP_ACTIVE_LOW     )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_START         ) PORT_NAME("Start / Stop")
@@ -1638,7 +1692,6 @@ GFXDECODE_END
 
 void astrocorp_state::machine_start()
 {
-	m_lamps.resolve();
 	m_screen_enable = 0;
 }
 
@@ -1656,7 +1709,7 @@ void astrocorp_state::showhand(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(26.601712_MHz_XTAL / 4, 433, 0, 320, 261, 0, 240); // ~15.354kHz Hsync, ~58.846Hz Vsync
 	m_screen->set_screen_update(FUNC(astrocorp_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1676,11 +1729,17 @@ void astrocorp_state::showhandc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &astrocorp_state::showhandc_map);
 }
 
+void astrocorp_state::luckys99(machine_config &config)
+{
+	showhand(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &astrocorp_state::luckys99_map);
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(astrocorp_state::irq_2_4_scanline_cb)
 {
 	int scanline = param;
 
-	if (scanline == m_screen->visible_area().max_y + 1) // vblank-in?
+	if (scanline == m_screen->visible_area().bottom() + 1) // vblank-in?
 		m_maincpu->set_input_line(4, HOLD_LINE); // sprites, sound, i/o
 
 	if (scanline == 0) // vblank-out?
@@ -1701,7 +1760,7 @@ void astrocorp_state::skilldrp(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// TODO: verify H/VSync & pixel clock for this type of HW
 	// (most likely different to compensate for the higher HRes)
 	m_screen->set_raw(24_MHz_XTAL / 2, 781, 0, 512, 261, 0, 240); // double horizontal resolution
@@ -1758,7 +1817,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zoo_state::irq_1_2_scanline_cb)
 	// NOTE: in astoneag title screen, if the IRQ levels are swapped, a timing issue causes the SP to overwrite the palette data
 	//       before it's written to the RAMDAC, causing corrupt colors
 
-	if (scanline == m_screen->visible_area().max_y + 1) // vblank-in?
+	if (scanline == m_screen->visible_area().bottom() + 1) // vblank-in?
 		m_maincpu->set_input_line(1, HOLD_LINE); // palette
 
 	if (scanline == 0) // vblank-out?
@@ -1783,7 +1842,7 @@ void zoo_state::zoo(machine_config &config)
 
 	m_screen->set_raw(26.824_MHz_XTAL / 4, 437, 0, 320, 261, 0, 240); // ??? ~15.345kHz Hsync, ??? ~58.795Hz Vsync
 
-	ASTRO_CPUCODE(config, m_cpucode, 0);
+	ASTRO_CPUCODE(config, m_cpucode);
 }
 
 void zoo_state::zulu(machine_config &config)
@@ -1947,7 +2006,7 @@ void astoneag_state::astoneag(machine_config &config)
 
 	// Adds RAMDAC
 	PALETTE(config.replace(), m_palette).set_entries(256);
-	RAMDAC(config, m_ramdac, 0, m_palette);
+	RAMDAC(config, m_ramdac, m_palette);
 	m_ramdac->set_addrmap(0, &astoneag_state::ramdac_map);
 
 	// Tiles are double size vertically
@@ -1957,6 +2016,26 @@ void astoneag_state::astoneag(machine_config &config)
 /***************************************************************************
                                 ROMs Loading
 ***************************************************************************/
+
+// B50-4001A
+// program ROM labels say A.3 but test mode shows A.1
+// similarly to other games, it's possible to enter a test mode with more choices by doing bpset 1230,1,{PC=1236;g}
+// however none of the added choices seems to work
+ROM_START( luckys99 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rom_1_lucky_a.3.even.u16", 0x00000, 0x10000, CRC(5a9a4c57) SHA1(51358f41056e59ee32b7f2e8afd58a968ff8a4ba) ) // 1xxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "rom_2_lucky_a.3.odd.u17",  0x00001, 0x10000, CRC(a339faae) SHA1(c4bd132f095856514cd1049acb5d69ef5e8862b7) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "rom_4_lucky_3.1.even.u26", 0x00000, 0x80000, CRC(05547ef1) SHA1(4730fd4e5843f1eed53d64e24f04f720162ebf7f) )
+	ROM_LOAD16_BYTE( "rom_3_lucky_3.1.odd.u27",  0x00001, 0x80000, CRC(87e1f125) SHA1(cd765c12a9945ddc11678cca765195c0eab464ee) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "rom_5_lucky1", 0x00000, 0x40000, CRC(2b3bece9) SHA1(421a8b9dc314a00304fc3c94f5428bde52c21531) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u9", 0x00, 0x80, CRC(91245bbd) SHA1(e2b677bfd45840a7bcfde6d057a396ad9fbf2d62) ) // factory default
+ROM_END
 
 /***************************************************************************
 
@@ -2112,9 +2191,7 @@ RAM1 are SEC KM681000BLG-7L RAM chips
 ***************************************************************************/
 
 ROM_START( skilldrp )
-	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "7-skill_drop_g1.01s.u100", 0x00000, 0x40000, CRC(8867df18) SHA1(19ad0104647b6f5c8b6c06749c24defdcacfd54d) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
@@ -2128,9 +2205,7 @@ ROM_START( skilldrp )
 ROM_END
 
 ROM_START( skilldrp_g10s )
-	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "7-skill_drop_g1.0s.u100", 0x00000, 0x40000, CRC(f968b783) SHA1(1d693b1d460e659ca94aae8625ea26e120053f84) )
 
 	ROM_REGION( 0x200000, "sprites", 0 )
@@ -2144,9 +2219,7 @@ ROM_START( skilldrp_g10s )
 ROM_END
 
 ROM_START( luckycoin )
-	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "u100", 0x00000, 0x40000, CRC(77bbeebc) SHA1(45f5a18694e2a93d9c299dc1f405df32c9773ce6) ) // label was peeled off
 
 	ROM_REGION( 0x200000, "sprites", 0 )
@@ -2948,7 +3021,7 @@ Western Venture
 
 ASTRO V07 0709
 ASTRO F01 2007-06-03
-ASTRO ??? (V102?)
+ASTRO ??? (V102PX-007)
 AD-65?
 93C46 EEPROM
 
@@ -2968,19 +3041,19 @@ ROM_START( westvent )
 	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
 
 	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
-	ROM_LOAD16_BYTE( "1_w.v.aa.02.d.bin", 0x00000, 0x20000, CRC(5e208192) SHA1(5a35a419fe95513b68423d4eb6c77fdd375667f3) )  // good?
-	ROM_LOAD16_BYTE( "2_w.v.aa.02.d.bin", 0x00001, 0x20000, BAD_DUMP CRC(f56d3ead) SHA1(2cf8960eab221cfce1c7ac6a20d002c4b05d8cc6) ) // FIXED BITS (xxxxxx0xxxxxxxxx)
+	ROM_LOAD16_BYTE( "1_w.v.aa.02.d.u26", 0x00000, 0x20000, CRC(65235ebc) SHA1(78650e46e5ac741bfed8c13064d45c4149f577e8) )
+	ROM_LOAD16_BYTE( "2_w.v.aa.02.d.u25", 0x00001, 0x20000, CRC(020a84bd) SHA1(2c83ebb495e821f1c27f18cfdf47aa927095f5d4) )
 
 	ROM_REGION( 0x1800000, "sprites", ROMREGION_ERASE00 )
-	ROM_LOAD( "mx29f1610mc_middle.u51", 0x0000000, 0x200000, CRC(7348fd37) SHA1(b5ec0994afb5bceae5627c37f1b35c7abcfd2f0a) )
-	ROM_LOAD( "mx29f1610mc_top.u30",    0x0800000, 0x200000, CRC(75bbaae0) SHA1(ef35775dd481ff343df1ee071ccd52b024d084b7) )
-	ROM_LOAD( "mx29f1610mc_bottom.bin", 0x1000000, 0x200000, CRC(e2dd58d5) SHA1(9ab881cfb2ee6cbc48aa28ba28529adb00803e44) ) // no U location on the PCB
+	ROM_LOAD( "mx29f1610mc_middle.u51",  0x0000000, 0x200000, CRC(7348fd37) SHA1(b5ec0994afb5bceae5627c37f1b35c7abcfd2f0a) )
+	ROM_LOAD( "mx29f1610mc_top.u30",     0x0800000, 0x200000, CRC(75bbaae0) SHA1(ef35775dd481ff343df1ee071ccd52b024d084b7) )
+	ROM_LOAD( "mx29f1610mc_bottom.rom7", 0x1000000, 0x200000, CRC(e2dd58d5) SHA1(9ab881cfb2ee6cbc48aa28ba28529adb00803e44) ) // no U location on the PCB
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "5.bin", 0x00000, 0x80000, CRC(92dc09d1) SHA1(6b448b3372e78047d054c5e42fcfcff7f75ff9b9) )
+	ROM_LOAD( "5_western_venture.rom5", 0x00000, 0x80000, CRC(92dc09d1) SHA1(6b448b3372e78047d054c5e42fcfcff7f75ff9b9) )
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "at93c46.bin", 0x00, 0x80, CRC(fd961d46) SHA1(e238da65e8769575f17b4464fb00f5c4813bafab) ) // TODO: factory reset if the program ROMs get redumped
+	ROM_LOAD( "at93c46.u13", 0x00, 0x80, CRC(acd6a834) SHA1(9f7019e59267d31bff3bfde588a2e114d0799c64) ) // factory default but with demo sounds on
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
 	ROM_LOAD( "westvent_cpucode.key", 0x00, 0x02, CRC(34a0ddfb) SHA1(36cc99917d43f0ee966e85a67eb89cc60b3ca02a) )
@@ -3887,6 +3960,7 @@ ROM_START( wwitch )
 	ROM_REGION( 0x1800000, "sprites", ROMREGION_ERASE00 )
 	ROM_LOAD( "mx29f1610mc.u51", 0x0000000, 0x200000, CRC(05bc898d) SHA1(c88c14e4858943b2ea719abe0cc9ac0738d682dd) ) // silkscreened 'ROM # 3' on PCB under the chip
 	ROM_LOAD( "mx29f1610mc.u30", 0x0800000, 0x200000, CRC(d4e7b00d) SHA1(2689d19fcdd828d0d47265362f6625377a90c1e4) ) // silkscreened 'ROM # 4' on PCB under the chip
+	ROM_RELOAD(                  0x0200000, 0x200000 ) // expects to read a part of the pumpkin reel sprites from here
 	ROM_LOAD( "mx29f1610mc.bin", 0x1000000, 0x200000, CRC(8dad2fc0) SHA1(88c4bda8e247839029a8c9a84d3bd598892b1775) ) // no U location on the PCB, silkscreened 'ROM # 7' on PCB under the chip
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3909,6 +3983,7 @@ ROM_START( lwitch )
 	ROM_REGION( 0x18000000, "sprites", ROMREGION_ERASE00 )
 	ROM_LOAD( "mx29f1610mc.rom3.u51", 0x0000000, 0x200000, CRC(05bc898d) SHA1(c88c14e4858943b2ea719abe0cc9ac0738d682dd) ) // same as wwitch
 	ROM_LOAD( "mx29f1610mc.rom4.u30", 0x0800000, 0x200000, CRC(cdedc2fc) SHA1(fb4f36a923db3b49e96aa8dde28c862c2ac063e3) )
+	ROM_RELOAD(                       0x0200000, 0x200000 ) // expects to read a part of the pumpkin reel sprites from here
 	ROM_LOAD( "mx29f1610mc.rom7",     0x1000000, 0x200000, CRC(5ac66b7d) SHA1(c5acba5a600e3f6b3b592451fd3897c275bb1851) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3972,6 +4047,28 @@ ROM_START( hapfarm_in0102b )
 	ROM_LOAD( "hapfarm_in0102b_cpucode.key", 0x00, 0x02, CRC(3e92abb0) SHA1(8e0eb6b43a45a4a4d402d06c32a25b64c7503f0c) ) // TODO: is this needed? game doesn't seem to check it
 ROM_END
 
+ROM_START( hapfarm_in0101a )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_LOAD16_BYTE( "1_happy_farm_in.01.01.a.u26", 0x00000, 0x20000, CRC(335514b6) SHA1(7207955a8a40b6704b26e533af9e9f9b6d733fd1) )
+	ROM_LOAD16_BYTE( "2_happy_farm_in.01.01.a.u25", 0x00001, 0x20000, CRC(f4663851) SHA1(d2472d0ef50fa3558d1c30952a7041d2206ec4cf) )
+
+	ROM_REGION( 0x1800000, "sprites", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx29f1610mc.rom3.u51", 0x0000000, 0x200000, CRC(8cd1274e) SHA1(308f4de0e7f9addbbbfd9526abc8b3c55167c856) )
+	ROM_LOAD( "mx29f1610mc.rom4.u30", 0x0800000, 0x200000, CRC(ff9d27b0) SHA1(9f34d8feb9570f8cc8812669315151e586cf9816) )
+	ROM_LOAD( "mx29f1610mc.rom7",     0x1000000, 0x200000, CRC(b44439d2) SHA1(15b48111c37aac145d1f6cce62df0e8c6638cdbd) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_happy_farm.rom5", 0x00000, 0x80000, CRC(f6b7cc89) SHA1(3a5863a643b9259db95522e1a7f1b1eea457d28a) )
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(99219840) SHA1(c0df22c2423d23b73edcbbeecd4964f78042e5c2) ) // factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "hapfarm_in0101a_cpucode.key", 0x00, 0x02, CRC(3e92abb0) SHA1(8e0eb6b43a45a4a4d402d06c32a25b64c7503f0c) )
+ROM_END
+
 /***************************************************************************
 
 Crazy Circus
@@ -4018,6 +4115,7 @@ ROM_START( foxyruby )
 	ROM_REGION( 0x1000000, "sprites", ROMREGION_ERASE00 )
 	ROM_LOAD( "mx29f1610mc.u51", 0x0000000, 0x200000, CRC(f116c767) SHA1(a05abd89d0015831a2953bbf0a7b95178f9ca6e4) ) // silkscreened 'ROM # 3' on PCB under the chip
 	ROM_LOAD( "mx29f1610mc.u30", 0x0800000, 0x200000, CRC(820fa9f6) SHA1(ae7fb4f9f4b6321f5c67f3bb563c8622446ef732) ) // silkscreened 'ROM # 4' on PCB under the chip
+	ROM_RELOAD(                  0x0200000, 0x200000 ) // odds table screen expects to read some data from here, too
 	// rom 7 not populated
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -4528,6 +4626,7 @@ void astoneag_state::interleave_sprites_16x32()
 //     YEAR   NAME             PARENT    MACHINE          INPUTS          STATE            INIT            ROT   COMPANY                         FULLNAME                                        FLAGS                                                                               LAYOUT
 
 // unencrypted
+GAME(  1999,  luckys99,        0,        luckys99,        luckys99,       astrocorp_state, init_showhand,  ROT0, "Astro Corp.",                  "Lucky Spin 1999 (Ver. A.1)",                   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAMEL( 2000,  showhand,        0,        showhand,        showhand,       astrocorp_state, init_showhand,  ROT0, "Astro Corp.",                  "Show Hand (Italy)",                            MACHINE_SUPPORTS_SAVE,                                                              layout_showhand  )
 GAMEL( 2000,  showhandc,       showhand, showhandc,       showhandc,      astrocorp_state, init_showhandc, ROT0, "Astro Corp.",                  "Wangpai Duijue (China)",                       MACHINE_SUPPORTS_SAVE,                                                              layout_showhandc  )
 GAMEL( 2002,  skilldrp,        0,        skilldrp,        skilldrp,       astrocorp_state, empty_init,     ROT0, "Astro Corp.",                  "Skill Drop Georgia (Ver. G1.01S, Oct 1 2002)", MACHINE_SUPPORTS_SAVE,                                                              layout_skilldrp  ) // Oct  1 2002 09:42:32
@@ -4567,6 +4666,7 @@ GAMEL( 2005,  dinodino,        0,        dinodino,        dinodino,       zoo_st
 GAME ( 2009,  foxyruby,        0,        foxyruby,        magibomb_aa72d, zoo_state,       init_px002,     ROT0, "Astro Corp.",                  "Foxy Ruby (Ver. US.01.01.A)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2009/06/17
 GAME(  2004,  gostopac,        0,        gostopac,        gostopac,       zoo_state,       init_gostopac,  ROT0, "Astro Corp.",                  "Go & Stop (Ver. EN1.10)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME ( 2008,  hapfarm,         0,        hapfarm,         magibomb_aa72d, zoo_state,       init_px008,     ROT0, "Astro Corp.",                  "Happy Farm (Ver. US.01.02.B)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2008/10/16
+GAME ( 2008,  hapfarm_in0101a, hapfarm,  hapfarm_in0102b, magibomb_aa72d, zoo_state,       init_px008,     ROT0, "Astro Corp.",                  "Happy Farm (Ver. IN.01.01.A)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2008/10/27
 GAME ( 2011,  hapfarm_in0102b, hapfarm,  hapfarm_in0102b, magibomb_aa72d, zoo_state,       init_px008,     ROT0, "Astro Corp.",                  "Happy Farm (Ver. IN.01.02.B)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2011/06/02
 GAME(  200?,  keno21,          0,        keno21,          keno21,         zoo_state,       init_px001,     ROT0, "Astro Corp.",                  "Keno 21 (Ver. A-2.30)",                        MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAMEL( 2004,  magibomb_aa71a,  magibomb, magibomb_aa72d,  magibomb_aa72d, zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AA.71.A, 30/04/04)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a ) // 30/04/04 10:55
@@ -4592,7 +4692,7 @@ GAME(  2013,  monkeyl_en20b,   monkeyl,  monkeyl_en20b,   magibomb_aa72d, zoo_st
 GAMEL( 2004,  speedmst,        0,        speedmst,        dinodino,       zoo_state,       init_px005,     ROT0, "D2 Enterprises",               "Speed Master (D2.01.C, Apr 29 2004)",          MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_magibomb ) // Apr 29 2004 16:29:35
 GAMEL( 2003,  speedmst_d14,    speedmst, speedmst,        dinodino,       zoo_state,       init_px005,     ROT0, "D2 Enterprises",               "Speed Master (D1.4, May 23 2003)",             MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_magibomb ) // May 23 2003 16:38:02
 GAMEL( 2003,  speedmst_d201ca, speedmst, speedmst,        dinodino,       zoo_state,       init_px005,     ROT0, "D2 Enterprises",               "Speed Master (D2.01.C, Apr 28 2004)",          MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_magibomb ) // Apr 28 2004 17:21:26
-GAME ( 2007?, westvent,        0,        westvent,        winbingo,       zoo_state,       init_px007,     ROT0, "Astro Corp.",                  "Western Venture (Ver. AA.02.D)",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // One bad program ROM
+GAME ( 2008,  westvent,        0,        westvent,        winbingo,       zoo_state,       init_px007,     ROT0, "Astro Corp.",                  "Western Venture (Ver. AA.02.D)",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 2008/1/21
 GAME ( 2006,  westvent_aa01b,  westvent, westvent,        winbingo,       zoo_state,       init_px007,     ROT0, "Astro Corp.",                  "Western Venture (Ver. AA.01.B)",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 2006/8/15
 GAME ( 2008,  westvent_aa02e,  westvent, westvent,        winbingo,       zoo_state,       init_px007,     ROT0, "Astro Corp.",                  "Western Venture (Ver. AA.02.E)",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 2008/9/8
 GAMEL( 2006,  winbingo,        0,        winbingo,        winbingo,       zoo_state,       init_px006,     ROT0, "Astro Corp.",                  "Win Win Bingo (Ver. GM.03.3, Feb 23 2006)",    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION,                              layout_winbingo ) // 15:47:48 Feb 23 2006

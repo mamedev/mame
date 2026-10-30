@@ -102,11 +102,11 @@ public:
 		m_out_count(*this, "count%u_ui%u", 1U, 0U)
 	{ }
 
-	void electrio(machine_config &config);
-	void pchess(machine_config &config);
-	void pcheckers(machine_config &config);
-	void mk12(machine_config &config);
-	void pplus(machine_config &config);
+	void electrio(machine_config &config) ATTR_COLD;
+	void pchess(machine_config &config) ATTR_COLD;
+	void pcheckers(machine_config &config) ATTR_COLD;
+	void mk12(machine_config &config) ATTR_COLD;
+	void pplus(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -136,11 +136,6 @@ private:
 
 void electrio_state::machine_start()
 {
-	// resolve outputs (electrio)
-	m_out_piece.resolve();
-	m_out_pui.resolve();
-	m_out_count.resolve();
-
 	save_item(NAME(m_inp_mux));
 }
 

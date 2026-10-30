@@ -113,17 +113,17 @@ void tanbus_tug8082_device::device_add_mconfig(machine_config &config)
 	M6502(config, m_maincpu, DERIVED_CLOCK(1, 4));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tanbus_tug8082_device::vid8082_map);
 
-	I8212(config, m_iop[0], 0);
+	I8212(config, m_iop[0]);
 	//m_iop[0]->md_rd_callback().set(CONSTANT(0));
 	m_iop[0]->int_wr_callback().set(FUNC(tanbus_tug8082_device::bus_irq_w));
 	//m_iop->do_wr_callback().set(FUNC(tanbus_tug8082_device::write));
 
-	I8212(config, m_iop[1], 0);
+	I8212(config, m_iop[1]);
 	//m_iop[1]->md_rd_callback().set(CONSTANT(0));
 	m_iop[1]->int_wr_callback().set(FUNC(tanbus_tug8082_device::vdu_irq_w));
 	//m_iop->di_rd_callback().set(FUNC(tanbus_tug8082_device::read));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(512, 256);

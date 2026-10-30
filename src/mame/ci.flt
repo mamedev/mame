@@ -1,4 +1,6 @@
 atari/akkaarrh.cpp
+bally/astrocde.cpp
+bally/gridlee.cpp
 exidy/carpolo.cpp
 exidy/circus.cpp
 exidy/exidy.cpp
@@ -8,10 +10,8 @@ exidy/victory.cpp
 gaelco/gaelco.cpp
 gaelco/gaelcrpt.cpp
 gaelco/wrally.cpp
-midway/astrocde.cpp
-midway/gridlee.cpp
-midway/williams.cpp
 misc/goldnpkr.cpp
 rare/kinst.cpp
 videogames/looping.cpp
 videogames/supertnk.cpp
+williams/williams.cpp

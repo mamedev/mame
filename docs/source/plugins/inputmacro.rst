@@ -20,13 +20,13 @@ the running events in Track & Field, or the eating minigame in Daisu-Kiss.
 To configure the input macro plugin, activate the main menu (press **Tab**
 during emulation by default), select **Plugin Options**, and then select **Input
 Macros**.  Configured input macros for the current system are listed, along with
-their activation sequences (initially there will be no input macros configured).
-Select a macro to edit it, or choose **Add macro** to set up a new input macro.
-See :ref:`plugins-inputmacro-settings` for details on editing input macros.  You
-can delete an input macro by highlighting it in the menu and pressing the UI
-Clear key (Del/Delete/Forward Delete on the keyboard by default).  You can also
-delete a macro by selecting the macro to edit it and then selecting **Delete
-macro** from the menu.
+their activation combinations (initially there will be no input macros
+configured).  Select a macro to edit it, or choose **Add macro** to set up a new
+input macro.  See :ref:`plugins-inputmacro-settings` for details on editing
+input macros.  You can delete an input macro by highlighting it in the menu and
+pressing the UI Clear key (Del/Delete/Forward Delete on the keyboard by
+default).  You can also delete a macro by selecting the macro to edit it and
+then selecting **Delete macro** from the menu.
 
 Input macros are saved in the **inputmacro** folder in the plugin data folder
 (see the :ref:`homepath option <mame-commandline-homepath>`).  A file is created
@@ -46,7 +46,7 @@ The options for editing input macros are the same whether you’re creating a ne
 macro or editing an existing macro.  Input macros consist of a sequence of
 *steps*.  Each step optionally waits for a configurable delay, then activates
 one or more emulated inputs for a specified duration.  You can choose what
-should happen if the activation sequence is still held when the final step of
+should happen if the activation combination is still held when the final step of
 the macro completes: the emulated inputs can be released, the final step can be
 prolonged, or the macro can loop back to any step in the sequence.
 
@@ -63,21 +63,21 @@ whole:
   controls) you want to use to activate the macro.  Keep in mind that regular
   input assignments still apply, so you will probably want to use a combination
   that isn’t being used for any other emulated input in the system.
-* Set **On release** to specify what should happen if the activation sequence is
-  released before the macro completes.  When set to *Stop immediately*, any
+* Set **On release** to specify what should happen if the activation combination
+  is released before the macro completes.  When set to *Stop immediately*, any
   emulated inputs activated by the macro will be released immediately, and no
   further steps will be processed; when set to *Complete macro*, the macro will
   continue to be processed until the end of the final step.
-* Set **When held** to specify what should happen if the activation sequence is
-  held after the final step of the macro completes.  When set to *Release*, any
-  inputs activated by the macro will be released, and the macro will not be
-  reactivated until the activation sequence is released and pressed again; when
-  set to *Prolong step <n>* where *<n>* is the number of the final step of the
-  macro, the emulated inputs activated by the final step of the macro will
-  remain active until the activation sequence is released; when set to *Loop to
-  step <n>* where *<n>* is a step number, macro processing will return to that
-  step, including its delay, if the activation sequence is held after the final
-  step completes.
+* Set **When held** to specify what should happen if the activation combination
+  is held after the final step of the macro completes.  When set to *Release*,
+  any inputs activated by the macro will be released, and the macro will not be
+  reactivated until the activation combination is released and pressed again;
+  when set to *Prolong step <n>* where *<n>* is the number of the final step of
+  the macro, the emulated inputs activated by the final step of the macro will
+  remain active until the activation combination is released; when set to *Loop
+  to step <n>* where *<n>* is a step number, macro processing will return to
+  that step, including its delay, if the activation combination is held after
+  the final step completes.
 
 Each step has delay, duration and input settings:
 
@@ -116,12 +116,12 @@ item will only appear after you set the first input for the initially created
 step when creating a new macro.
 
 When creating a new macro, there is a **Cancel** option that changes to
-**Create** after you set the activation sequence and the first input for the
+**Create** after you set the activation combination and the first input for the
 initially created step.  Select **Create** to finish creating the macro and
 return to the list of input macros.  The new macro will be added at the end of
 the list.  Press the UI Back key, or select **Cancel** before setting the
-activation sequence/input, to return to the previous menu without creating the
-new macro.
+activation combination/input, to return to the previous menu without creating
+the new macro.
 
 When editing an existing macro, select **Done** or press the UI Back key to
 return to the list of input macros.  Changes take effect immediately.
@@ -238,9 +238,9 @@ pressing a single key:
   * **Input 1**: P1 Jab Punch
 
 This macro involves steps that activate multiple inputs.  The macro will
-complete if the activation sequence is released early, allowing you to tap the
-key momentarily to perform the move.  Holding the activation sequence holds down
-the attack button.
+complete if the activation combination is released early, allowing you to tap
+the key momentarily to perform the move.  Holding the activation sequence holds
+down the attack button.
 
 Virtua Cop Aim Off-Screen
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -262,3 +262,35 @@ the screen:
   * **Value (36-425)**: 36
 
 This macro involves setting analog input values.
+
+Invasion: The Abductors Reload
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order to reload, this game requires the lightgun to be pointed away from the
+screen for about a tenth of a second before pulling the trigger, and it requires
+the trigger to be held for a similar duration.  This makes it unsuitable for use
+with the :ref:`Off-Screen Reload Helper plugin <plugins-offscreenreload>`.
+However, you can use a two-step macro to produce the required actions when
+pressing a key or button:
+
+* **Name**: 1P Reload
+* **Activation combination**: Kbd Shift
+* **On release**: Complete macro
+* **When held**: Prolong step 2
+* **Step 1**:
+
+  * **Delay (frames)**: 0
+  * **Duration (frames)**: 6
+  * **Input 1**: Lightgun X
+  * **Value (0-255)**: 255
+* **Step 2**:
+
+  * **Delay (frames)**: 0
+  * **Duration (frames)**: 6
+  * **Input 1**: Lightgun X
+  * **Value (0-255)**: 255
+  * **Input 2**: P1 Button 1
+
+This macro involves multiple steps, setting analog input values, activating
+multiple inputs simultaneously, and completing the macro even if the activation
+combination is only pressed momentarily.

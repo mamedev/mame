@@ -32,6 +32,8 @@
 #include "emu.h"
 #include "sc16is741.h"
 
+#include <bit>
+
 //#define VERBOSE 1
 #include "logmacro.h"
 
@@ -969,10 +971,10 @@ inline bool sc16is741a_device::check_tx()
 		switch (m_parity)
 		{
 		case parity::ODD:
-			m_shift_reg[1] |= BIT(~population_count_32(data), 0) << (m_word_length + 1);
+			m_shift_reg[1] |= BIT(~std::popcount(data), 0) << (m_word_length + 1);
 			break;
 		case parity::EVEN:
-			m_shift_reg[1] |= BIT(population_count_32(data), 0) << (m_word_length + 1);
+			m_shift_reg[1] |= BIT(std::popcount(data), 0) << (m_word_length + 1);
 			break;
 		case parity::MARK:
 			m_shift_reg[1] |= u16(1) << (m_word_length + 1);
@@ -1099,10 +1101,10 @@ TIMER_CALLBACK_MEMBER(sc16is741a_device::rx_shift)
 		case parity::NONE:
 			break;
 		case parity::ODD:
-			lsr |= BIT(population_count_32(data) ^ BIT(~m_shift_reg[0], 14), 0) << 2;
+			lsr |= BIT(std::popcount(data) ^ BIT(~m_shift_reg[0], 14), 0) << 2;
 			break;
 		case parity::EVEN:
-			lsr |= BIT(population_count_32(data) ^ BIT(m_shift_reg[0], 14), 0) << 2;
+			lsr |= BIT(std::popcount(data) ^ BIT(m_shift_reg[0], 14), 0) << 2;
 			break;
 		case parity::MARK:
 			lsr |= BIT(~m_shift_reg[0], 14) << 2;

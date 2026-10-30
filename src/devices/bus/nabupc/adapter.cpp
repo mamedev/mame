@@ -31,17 +31,13 @@ namespace bus::nabupc {
 //**************************************************************************
 
 // Load segment file from disk
-std::error_condition network_adapter::segment_file::read_archive(util::core_file &stream, uint32_t segment_id)
+std::error_condition network_adapter::segment_file::read_archive(util::random_read &stream, uint32_t segment_id)
 {
 	segment_id &= 0xffffff;
 
-	util::core_file::ptr proxy;
-	std::error_condition err = util::core_file::open_proxy(stream, proxy);
-	if (err)
-		return err;
-
+	std::error_condition err;
 	util::archive_file::ptr zipfile;
-	err = util::archive_file::open_zip(std::move(proxy), zipfile);
+	err = util::archive_file::open_zip(stream, zipfile);
 	if (err)
 		return err;
 

@@ -48,9 +48,6 @@ Year + Game                       PCB           Video  Sub CPU  Sound         Is
 96  Bang Bang Ball                -             I4220   -       YMF278B       GFX ROM data lines swapped
 99  Battle Bubble v2.00           LM2D-Y        I4220   -       YMF278B       GFX ROM data lines swapped
 
-94  Blazing Tornado               HUM-002-A-(B) I4220  Z80      YM2610        Konami 053936 PSAC2
-96  Grand Striker 2               HUM-003(A)    I4220  Z80      YM2610        Konami 053936 PSAC2
-
 95  Varia Metal                   ES-9309B-B    I4220   -       ES8712+M6295+M6585
 
 95  Mahjong Doukyuusei            VG330-B       I4300   -       YM2413+M6295
@@ -75,7 +72,7 @@ To Do:
     causes scrolling glitches in some games.  Test cases Mouse Go Go
     title screen, GunMaster title screen.  Changing it can cause
     excessive slowdown in said games however.
--   karatour, ladykill, 3kokushi: understand what the irq source 5 is really tied to.
+-   karatour, ladykill, 3kokushi: understand what the IRQ source 5 is really tied to.
     All these games also have a vblank delay check outside irq routine,
     cfr. PC=1322 in karatour;
 -   vmetal: ES8712 actually controls a M6585 and an unknown logic selector chip.
@@ -84,11 +81,11 @@ To Do:
 
 Notes:
 
--   To enter service mode in ladykill, 3kokushi: toggle the dip switch and reset
+-   To enter service mode in ladykill, 3kokushi: toggle the DIP switch and reset
     keeping start 2 pressed.
 -   Sprite zoom in Mouja at the end of a match looks wrong, but it's been verified
     to be the same on the original board
--   vmetal: has Sega and Taito logos in the roms ?!
+-   vmetal: has Sega and Taito logos in the ROMs?!
 
 driver modified by Hau
 ***************************************************************************/
@@ -96,11 +93,13 @@ driver modified by Hau
 #include "emu.h"
 #include "metro.h"
 
-#include "cpu/z80/z80.h"
+#include "mahjong.h"
+
+#include "cpu/h8/h83006.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/upd7810/upd7810.h"
-#include "cpu/h8/h83006.h"
 #include "cpu/z8/z8.h"
+#include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/msm5205.h"
 #include "sound/ymopl.h"
@@ -160,12 +159,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(metro_state::bangball_scanline)
 	int const scanline = param;
 
 	// vblank irq
-	if(scanline == 224)
+	if (scanline == 224)
 	{
 		m_vdp2->set_irq(4); // ???
 		m_vdp2->screen_eof(ASSERT_LINE);
 	}
-	else if(scanline < 224 && (m_vdp2->irq_enable() & 2) == 0)
+	else if (scanline < 224 && (m_vdp2->irq_enable() & 2) == 0)
 	{
 		// pretty likely hblank irq (pressing a button when clearing a stage)
 		m_vdp2->set_irq(1);
@@ -269,7 +268,7 @@ void metro_upd7810_state::soundstatus_w(u8 data)
 	m_soundstatus = data & 0x01;
 }
 
-template<int Mask>
+template <int Mask>
 void metro_upd7810_state::upd7810_rombank_w(u8 data)
 {
 	m_audiobank->set_entry((data >> 4) & Mask);
@@ -404,7 +403,7 @@ void metro_state::coin_lockout_1word_w(u8 data)
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 
-	if (data & ~3)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", m_maincpu->pc(), data);
+	if (data & ~3) logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", m_maincpu->pc(), data);
 }
 
 // value written doesn't matter, also each counted coin gets reported after one full second.
@@ -414,7 +413,7 @@ void metro_state::coin_lockout_4words_w(offs_t offset, u16 data)
 	machine().bookkeeping().coin_counter_w((offset >> 1) & 1, offset & 1);
 //  machine().bookkeeping().coin_lockout_w((offset >> 1) & 1, offset & 1);
 
-	if (data & ~1)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", m_maincpu->pc(), data);
+	if (data & ~1) logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", m_maincpu->pc(), data);
 }
 
 /***************************************************************************
@@ -434,9 +433,9 @@ void metro_state::coin_lockout_4words_w(offs_t offset, u16 data)
 
 void metro_upd7810_state::upd7810_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom();         // External ROM
-	map(0x4000, 0x7fff).bankr(m_audiobank);    // External ROM (Banked)
-	map(0x8000, 0x87ff).ram();         // External RAM
+	map(0x0000, 0x3fff).rom();              // External ROM
+	map(0x4000, 0x7fff).bankr(m_audiobank); // External ROM (Banked)
+	map(0x8000, 0x87ff).ram();              // External RAM
 }
 
 /*****************/
@@ -547,16 +546,16 @@ void metro_state::batlbubl_map(address_map &map)
 
 void metro_state::msgogo_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                                             // ROM
+	map(0x000000, 0x07ffff).rom();                                                 // ROM
 	map(0x100000, 0x17ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0x200000, 0x200001).portr("COINS");                              // Inputs
-	map(0x200002, 0x200003).portr("JOYS");                               //
-	map(0x200006, 0x200007).nopr();                                         //
-	map(0x200002, 0x200009).w(FUNC(metro_state::coin_lockout_4words_w));              // Coin Lockout
-	map(0x300000, 0x31ffff).r(FUNC(metro_state::balcube_dsw_r));                             // 3 x DSW
-	map(0x400001, 0x400001).r("ymf", FUNC(ymf278b_device::read));   // Sound
+	map(0x200000, 0x200001).portr("COINS");                                        // Inputs
+	map(0x200002, 0x200003).portr("JOYS");                                         //
+	map(0x200006, 0x200007).nopr();                                                //
+	map(0x200002, 0x200009).w(FUNC(metro_state::coin_lockout_4words_w));           // Coin Lockout
+	map(0x300000, 0x31ffff).r(FUNC(metro_state::balcube_dsw_r));                   // 3 x DSW
+	map(0x400001, 0x400001).r("ymf", FUNC(ymf278b_device::read));                  // Sound
 	map(0x400000, 0x40000b).w("ymf", FUNC(ymf278b_device::write)).umask16(0x00ff); //
-	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
+	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                                // RAM (mirrored)
 }
 
 /***************************************************************************
@@ -565,16 +564,16 @@ void metro_state::msgogo_map(address_map &map)
 
 void metro_upd7810_state::daitorid_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                                             // ROM
+	map(0x000000, 0x03ffff).rom();                                               // ROM
 	map(0x400000, 0x47ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0x4788a9, 0x4788a9).w(FUNC(metro_upd7810_state::sound_data_w));                       // To Sound CPU
-	map(0x800000, 0x80ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
+	map(0x4788a9, 0x4788a9).w(FUNC(metro_upd7810_state::sound_data_w));          // To Sound CPU
+	map(0x800000, 0x80ffff).ram().mirror(0x0f0000);                              // RAM (mirrored)
 	map(0xc00000, 0xc00001).portr("IN0");
-	map(0xc00001, 0xc00001).w(FUNC(metro_upd7810_state::soundstatus_w));  // To Sound CPU
-	map(0xc00002, 0xc00003).portr("IN1");                                //
-	map(0xc00004, 0xc00005).portr("DSW0");                               //
-	map(0xc00006, 0xc00007).portr("IN2");                                //
-	map(0xc00002, 0xc00009).w(FUNC(metro_upd7810_state::coin_lockout_4words_w));              // Coin Lockout
+	map(0xc00001, 0xc00001).w(FUNC(metro_upd7810_state::soundstatus_w));         // To Sound CPU
+	map(0xc00002, 0xc00003).portr("IN1");                                        //
+	map(0xc00004, 0xc00005).portr("DSW0");                                       //
+	map(0xc00006, 0xc00007).portr("IN2");                                        //
+	map(0xc00002, 0xc00009).w(FUNC(metro_upd7810_state::coin_lockout_4words_w)); // Coin Lockout
 }
 
 
@@ -584,16 +583,16 @@ void metro_upd7810_state::daitorid_map(address_map &map)
 
 void metro_upd7810_state::dharma_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                                             // ROM
-	map(0x400000, 0x40ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
+	map(0x000000, 0x03ffff).rom();                                               // ROM
+	map(0x400000, 0x40ffff).ram().mirror(0x0f0000);                              // RAM (mirrored)
 	map(0x800000, 0x87ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0x8788a9, 0x8788a9).w(FUNC(metro_upd7810_state::sound_data_w));                       // To Sound CPU
+	map(0x8788a9, 0x8788a9).w(FUNC(metro_upd7810_state::sound_data_w));          // To Sound CPU
 	map(0xc00000, 0xc00001).portr("IN0");
-	map(0xc00001, 0xc00001).w(FUNC(metro_upd7810_state::soundstatus_w));  // To Sound CPU
-	map(0xc00002, 0xc00003).portr("IN1");                                //
-	map(0xc00004, 0xc00005).portr("DSW0");                               //
-	map(0xc00006, 0xc00007).portr("IN2");                                //
-	map(0xc00002, 0xc00009).w(FUNC(metro_upd7810_state::coin_lockout_4words_w));              // Coin Lockout
+	map(0xc00001, 0xc00001).w(FUNC(metro_upd7810_state::soundstatus_w));         // To Sound CPU
+	map(0xc00002, 0xc00003).portr("IN1");                                        //
+	map(0xc00004, 0xc00005).portr("DSW0");                                       //
+	map(0xc00006, 0xc00007).portr("IN2");                                        //
+	map(0xc00002, 0xc00009).w(FUNC(metro_upd7810_state::coin_lockout_4words_w)); // Coin Lockout
 }
 
 
@@ -702,14 +701,14 @@ void gakusai_state::oki_bank_lo_w(u8 data)
 u16 gakusai_state::input_r()
 {
 	u16 const input_sel = *m_input_sel;
-	u16 result = 0xffff;
+	u16 result = 0x003f;
 	// Bit 0 ??
 	if (!BIT(input_sel, 1)) result &= m_io_key[0]->read();
 	if (!BIT(input_sel, 2)) result &= m_io_key[1]->read();
 	if (!BIT(input_sel, 3)) result &= m_io_key[2]->read();
 	if (!BIT(input_sel, 4)) result &= m_io_key[3]->read();
 	if (!BIT(input_sel, 5)) result &= m_io_key[4]->read();
-	return result;
+	return (result << 1) | 0xff81;
 }
 
 u8 gakusai_state::gakusai_eeprom_r()
@@ -941,49 +940,6 @@ void metro_upd7810_state::toride2g_map(address_map &map)
 
 
 /***************************************************************************
-                            Blazing Tornado
-***************************************************************************/
-
-void blzntrnd_state::audiobank_w(u8 data)
-{
-	m_audiobank->set_entry(data & 0x07);
-}
-
-void blzntrnd_state::sound_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr(m_audiobank);
-	map(0xe000, 0xffff).ram();
-}
-
-void blzntrnd_state::sound_io_map(address_map &map)
-{
-	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(blzntrnd_state::audiobank_w));
-	map(0x40, 0x40).r(m_soundlatch, FUNC(generic_latch_8_device::read)).nopw();
-	map(0x80, 0x83).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
-}
-
-void blzntrnd_state::main_map(address_map &map)
-{
-	map(0x000000, 0x1fffff).rom();                                             // ROM
-	map(0x200000, 0x27ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-
-	map(0x400000, 0x43ffff).ram().w(FUNC(blzntrnd_state::k053936_w)).share("k053936_ram");  // 053936
-	map(0x500000, 0x500fff).w(m_k053936, FUNC(k053936_device::linectrl_w));      // 053936 line control
-	map(0x600000, 0x60001f).w(m_k053936, FUNC(k053936_device::ctrl_w));          // 053936 control
-
-	map(0xe00000, 0xe00001).portr("DSW0").nopw();                   // Inputs
-	map(0xe00002, 0xe00003).portr("DSW1");                               //
-	map(0xe00002, 0xe00003).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0xff00).cswidth(16); // To Sound CPU
-	map(0xe00004, 0xe00005).portr("IN0");                                //
-	map(0xe00006, 0xe00007).portr("IN1");                                //
-	map(0xe00008, 0xe00009).portr("IN2");                                //
-	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
-}
-
-
-/***************************************************************************
                                     Mouja
 ***************************************************************************/
 
@@ -1063,7 +1019,7 @@ void vmetal_state::vmetal_control_w(u8 data)
 	/* Lower nibble is the coin control bits shown in
 	   service mode, but in game mode they're different */
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
-	machine().bookkeeping().coin_counter_w(1, BIT(data, 3));  // 2nd coin schute activates coin 0 counter in game mode??
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 3));  // 2nd coin chute activates coin 0 counter in game mode??
 //  machine().bookkeeping().coin_lockout_w(0, BIT(data, 0));  // always on in game mode??
 	machine().bookkeeping().coin_lockout_w(1, BIT(data, 1));  // never activated in game mode??
 
@@ -1443,245 +1399,6 @@ static INPUT_PORTS_START( msgogo )
 INPUT_PORTS_END
 
 /***************************************************************************
-                            Blazing Tornado
-***************************************************************************/
-
-static INPUT_PORTS_START( blzntrnd )
-	PORT_START("DSW0")
-	PORT_DIPNAME( 0x0007, 0x0004, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW3:1,2,3")
-	PORT_DIPSETTING(      0x0007, "Beginner" )
-	PORT_DIPSETTING(      0x0006, DEF_STR( Easiest ) )
-	PORT_DIPSETTING(      0x0005, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0003, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Hardest ) )
-	PORT_DIPSETTING(      0x0001, "Expert" )
-	PORT_DIPSETTING(      0x0000, "Master" )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW3:4")
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW3:5")
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW3:6")
-	PORT_DIPSETTING(      0x0020, DEF_STR( No ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x00c0, 0x0000, "Control Panel" )         PORT_DIPLOCATION("SW3:7,8")
-	PORT_DIPSETTING(      0x0000, "4 Players" )
-//  PORT_DIPSETTING(      0x0040, "4 Players" )
-	PORT_DIPSETTING(      0x0080, "1P & 2P Tag only" )
-	PORT_DIPSETTING(      0x00c0, "1P & 2P vs only" )
-	PORT_DIPNAME( 0x0300, 0x0300, "Half Continue" )         PORT_DIPLOCATION("SW4:1,2")
-	PORT_DIPSETTING(      0x0000, "6C to start, 3C to continue" )
-	PORT_DIPSETTING(      0x0100, "4C to start, 2C to continue" )
-	PORT_DIPSETTING(      0x0200, "2C to start, 1C to continue" )
-	PORT_DIPSETTING(      0x0300, "Disabled" )
-	PORT_DIPUNUSED_DIPLOC( 0x0400, 0x0400, "SW4:3" ) // Not read in Service Mode
-	PORT_DIPUNUSED_DIPLOC( 0x0800, 0x0800, "SW4:4" ) // Not read in Service Mode
-	PORT_DIPUNUSED_DIPLOC( 0x1000, 0x1000, "SW4:5" ) // Not read in Service Mode
-	PORT_DIPUNUSED_DIPLOC( 0x2000, 0x2000, "SW4:6" ) // Not read in Service Mode
-	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW4:7" ) // Not read in Service Mode
-	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW4:8" ) // Not read in Service Mode
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:1,2,3")
-	PORT_DIPSETTING(      0x0004, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:4,5,6")
-	PORT_DIPSETTING(      0x0020, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0028, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0030, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0038, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play ) )        PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW1:8" )
-	PORT_DIPNAME( 0x0300, 0x0300, "CP Single" )         PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(      0x0300, "2:00" )
-	PORT_DIPSETTING(      0x0200, "2:30" )
-	PORT_DIPSETTING(      0x0100, "3:00" )
-	PORT_DIPSETTING(      0x0000, "3:30" )
-	PORT_DIPNAME( 0x0c00, 0x0c00, "CP Tag" )            PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(      0x0c00, "2:00" )
-	PORT_DIPSETTING(      0x0800, "2:30" )
-	PORT_DIPSETTING(      0x0400, "3:00" )
-	PORT_DIPSETTING(      0x0000, "3:30" )
-	PORT_DIPNAME( 0x3000, 0x3000, "Vs Single" )         PORT_DIPLOCATION("SW2:5,6")
-	PORT_DIPSETTING(      0x3000, "2:30" )
-	PORT_DIPSETTING(      0x2000, "3:00" )
-	PORT_DIPSETTING(      0x1000, "4:00" )
-	PORT_DIPSETTING(      0x0000, "5:00" )
-	PORT_DIPNAME( 0xc000, 0xc000, "Vs Tag" )            PORT_DIPLOCATION("SW2:7,8")
-	PORT_DIPSETTING(      0xc000, "2:30" )
-	PORT_DIPSETTING(      0x8000, "3:00" )
-	PORT_DIPSETTING(      0x4000, "4:00" )
-	PORT_DIPSETTING(      0x0000, "5:00" )
-
-	PORT_START("IN0")
-	JOY_LSB(1, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
-	JOY_MSB(2, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
-
-	PORT_START("IN1")
-	JOY_LSB(3, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
-	JOY_MSB(4, BUTTON1, BUTTON2, BUTTON3, BUTTON4)
-
-	PORT_START("IN2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE_NO_TOGGLE(0x0002, IP_ACTIVE_LOW)
-	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
-	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START4 )
-INPUT_PORTS_END
-
-
-/***************************************************************************
-                            Grand Striker 2
-***************************************************************************/
-
-static INPUT_PORTS_START( gstrik2 )
-	PORT_START("DSW0")
-	PORT_DIPNAME( 0x0003, 0x0003, "Player Vs Com" )         PORT_DIPLOCATION("SW3:1,2")
-	PORT_DIPSETTING(      0x0003, "1:00" )
-	PORT_DIPSETTING(      0x0002, "1:30" )
-	PORT_DIPSETTING(      0x0001, "2:00" )
-	PORT_DIPSETTING(      0x0000, "2:30" )
-	PORT_DIPNAME( 0x000c, 0x000c, "1P Vs 2P" )          PORT_DIPLOCATION("SW3:3,4")
-	PORT_DIPSETTING(      0x000c, "0:45" )
-	PORT_DIPSETTING(      0x0008, "1:00" )
-	PORT_DIPSETTING(      0x0004, "1:30" )
-	PORT_DIPSETTING(      0x0000, "2:00" )
-	PORT_DIPNAME( 0x0030, 0x0030, "Extra Time" )            PORT_DIPLOCATION("SW3:5,6")
-	PORT_DIPSETTING(      0x0030, "0:30" )
-	PORT_DIPSETTING(      0x0020, "0:45" )
-	PORT_DIPSETTING(      0x0010, "1:00" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:7") // Does not in Service Mode
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Time Period" )           PORT_DIPLOCATION("SW3:8")
-	PORT_DIPSETTING(      0x0080, "Sudden Death" )
-	PORT_DIPSETTING(      0x0000, "Full" )
-	PORT_DIPNAME( 0x0700, 0x0400, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW4:1,2,3")
-	PORT_DIPSETTING(      0x0700, DEF_STR( Very_Easy) )
-	PORT_DIPSETTING(      0x0600, DEF_STR( Easier ) )
-	PORT_DIPSETTING(      0x0500, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0300, DEF_STR( Medium ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Hardest ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW4:4")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:5") // Does not in Service Mode
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW4:6") // Does not in Service Mode
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW4:7")
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW4:8" )      // Does not in Service Mode
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x001f, 0x001f, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:1,2,3,4,5")
-	PORT_DIPSETTING(      0x001c, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x001d, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0018, DEF_STR( 4C_2C ) )
-	PORT_DIPSETTING(      0x001e, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0019, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(      0x0014, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 4C_4C ) )
-	PORT_DIPSETTING(      0x0015, DEF_STR( 3C_3C ) )
-	PORT_DIPSETTING(      0x001a, DEF_STR( 2C_2C ) )
-	PORT_DIPSETTING(      0x001f, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x000c, DEF_STR( 4C_5C ) )
-	PORT_DIPSETTING(      0x0011, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(      0x0008, "4 Coins/6 Credits" )
-	PORT_DIPSETTING(      0x0016, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(      0x000d, DEF_STR( 3C_5C ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( 4C_7C ) )
-	PORT_DIPSETTING(      0x0000, "4 Coins/8 Credits" )
-	PORT_DIPSETTING(      0x0009, "3 Coins/6 Credits" )
-	PORT_DIPSETTING(      0x0012, DEF_STR( 2C_4C ) )
-	PORT_DIPSETTING(      0x001b, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0005, "3 Coins/7 Credits" )
-	PORT_DIPSETTING(      0x000e, DEF_STR( 2C_5C ) )
-	PORT_DIPSETTING(      0x0001, "3 Coins/8 Credits" )
-	PORT_DIPSETTING(      0x000a, DEF_STR( 2C_6C ) )
-	PORT_DIPSETTING(      0x0017, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_7C ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_8C ) )
-	PORT_DIPSETTING(      0x0013, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x000f, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x000b, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_8C ) )
-	PORT_DIPNAME( 0x00e0, 0x00e0, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:6,7,8")
-	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x00a0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(      0x00e0, "Same as Coin A" )
-	PORT_DIPNAME( 0x0300, 0x0300, "Credits to Start" )      PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(      0x0300, "1" )
-	PORT_DIPSETTING(      0x0200, "2" )
-	PORT_DIPSETTING(      0x0100, "3" )
-	PORT_DIPSETTING(      0x0000, "4" )
-	PORT_DIPNAME( 0x0c00, 0x0c00, "Credits to Continue" )       PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(      0x0c00, "1" )
-	PORT_DIPSETTING(      0x0800, "2" )
-	PORT_DIPSETTING(      0x0400, "3" )
-	PORT_DIPSETTING(      0x0000, "4" )
-	PORT_DIPNAME( 0x1000, 0x1000, "Continue" )          PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:6") // Does not in Service Mode
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Playmode" )          PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(      0x4000, "1 Credit for 1 Player" )
-	PORT_DIPSETTING(      0x0000, "1 Credit for 2 Players" )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Free_Play ) )        PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_START("IN0")
-	JOY_LSB(1, BUTTON1, BUTTON2, BUTTON3, UNUSED)
-	JOY_MSB(2, BUTTON1, BUTTON2, BUTTON3, UNUSED)
-
-	PORT_START("IN1")
-	// Not Used
-
-	PORT_START("IN2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE_NO_TOGGLE(0x0002, IP_ACTIVE_LOW )
-	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
-	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
-
-/***************************************************************************
                                 Daitoride
 ***************************************************************************/
 
@@ -1934,10 +1651,10 @@ static INPUT_PORTS_START( lastfort )
 	COINS
 
 	PORT_START("IN1")   /*$c00006*/
-	JOY_LSB(1, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)      // BUTTON2 and BUTTON3 in "test mode" only*/
+	JOY_LSB(1, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)      // BUTTON2 and BUTTON3 in "test mode" only
 
 	PORT_START("IN2")   /*$c00008*/
-	JOY_LSB(2, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)      /*BUTTON2 and BUTTON3 in "test mode" only*/
+	JOY_LSB(2, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)      // BUTTON2 and BUTTON3 in "test mode" only
 
 	PORT_START("DSW0")  /*$c0000a*/
 	COINAGE_SERVICE_LOC(SW1)
@@ -1994,56 +1711,13 @@ INPUT_PORTS_END
 
 
 /***************************************************************************
-                            Mahjong Doukyuusei
+                        Mahjong Gakuensai 1 & 2
 ***************************************************************************/
 
-static INPUT_PORTS_START( mj_panel )
-	PORT_START("KEY0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START1  )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+// Same as dokyusei, without the DSWs (these games have an EEPROM)
 
-	PORT_START("KEY1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY4")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+static INPUT_PORTS_START( gakusai )
+	PORT_INCLUDE( mahjong_matrix_1p )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2057,8 +1731,15 @@ static INPUT_PORTS_START( mj_panel )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+
+/***************************************************************************
+                            Mahjong Doukyuusei
+***************************************************************************/
+
+// Same as gakusai, with DSWs (these games have no EEPROM)
+
 static INPUT_PORTS_START( dokyusei )
-	PORT_INCLUDE( mj_panel )
+	PORT_INCLUDE( gakusai )
 
 	PORT_START("DSW0")  // $478884.w
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:1,2")
@@ -2108,19 +1789,6 @@ static INPUT_PORTS_START( dokyusei )
 	PORT_DIPNAME( 0x8000, 0x8000, "Unknown 2-8" )           PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-INPUT_PORTS_END
-
-
-/***************************************************************************
-                        Mahjong Gakuensai 1 & 2
-***************************************************************************/
-
-// Same as dokyusei, without the DSWs (these games have an eeprom)
-
-static INPUT_PORTS_START( gakusai )
-
-	PORT_INCLUDE( mj_panel )
-
 INPUT_PORTS_END
 
 
@@ -2730,36 +2398,6 @@ static INPUT_PORTS_START( vmetal )
 INPUT_PORTS_END
 
 
-
-/***************************************************************************
-
-
-                            Graphics Layouts
-
-
-***************************************************************************/
-
-
-static const gfx_layout layout_053936_16 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{ STEP8(0,1) },
-	{ STEP8(0,8),STEP8(8*8*8*1,8) },
-	{ STEP8(0,8*8),STEP8(8*8*8*2,8*8) },
-	8*8*8*4
-};
-
-static GFXDECODE_START( gfx_blzntrnd )
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x8_raw,    0x0, 0x10 ) // [0] 053936 Tiles
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_gstrik2 )
-	GFXDECODE_ENTRY( "gfx2", 0, layout_053936_16, 0x0, 0x10 ) // [0] 053936 Tiles
-GFXDECODE_END
-
-
 /***************************************************************************
 
 
@@ -2814,21 +2452,13 @@ void mouja_state::machine_start()
 	m_okibank->configure_entries(0, 8, memregion("oki")->base(), 0x20000);
 }
 
-void blzntrnd_state::machine_start()
-{
-	metro_state::machine_start();
-
-	m_audiobank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
-	save_item(NAME(m_ext_irq_enable));
-}
-
 void metro_state::i4100_config(machine_config &config)
 {
 	I4100(config, m_vdp, 24_MHz_XTAL);
 	m_vdp->set_vblank_irq_level(0);
 	m_vdp->set_blit_irq_level(2);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1500));
 	m_screen->set_size(392, 263);
@@ -2842,7 +2472,7 @@ void metro_state::i4220_config(machine_config &config)
 	m_vdp2->set_vblank_irq_level(0);
 	m_vdp2->set_blit_irq_level(2);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1500));
 	m_screen->set_size(392, 263);
@@ -2856,7 +2486,7 @@ void metro_state::i4300_config(machine_config &config)
 	m_vdp3->set_vblank_irq_level(1);
 	m_vdp3->set_blit_irq_level(2);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1500));
 	m_screen->set_size(392, 263);
@@ -3303,7 +2933,7 @@ void metro_upd7810_state::poitto(machine_config &config)
 void metro_upd7810_state::pururun(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 24_MHz_XTAL/2); // Not confirmed
+	M68000(config, m_maincpu, 24_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &metro_upd7810_state::pururun_map);
 	m_maincpu->set_periodic_int(FUNC(metro_upd7810_state::periodic_interrupt), attotime::from_hz(8*60)); // ?
 
@@ -3322,7 +2952,7 @@ void metro_upd7810_state::pururun(machine_config &config)
 	ymsnd.irq_handler().set_inputline(m_audiocpu, UPD7810_INTF2);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	OKIM6295(config, m_oki, 3.579545_MHz_XTAL/3, okim6295_device::PIN7_HIGH); // sample rate =  M6295 clock / 132
+	OKIM6295(config, m_oki, 24_MHz_XTAL/20, okim6295_device::PIN7_HIGH); // sample rate =  M6295 clock / 132
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
@@ -3431,7 +3061,7 @@ void vmetal_state::vmetal(machine_config &config)
 
 	OKIM6295(config, m_oki, 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	ES8712(config, m_essnd, 0);
+	ES8712(config, m_essnd);
 	m_essnd->reset_handler().set(FUNC(vmetal_state::es8712_irq));
 	m_essnd->msm_write_handler().set("msm", FUNC(msm6585_device::data_w));
 	m_essnd->set_msm_tag("msm");
@@ -3440,77 +3070,6 @@ void vmetal_state::vmetal(machine_config &config)
 	msm.vck_legacy_callback().set("essnd", FUNC(es8712_device::msm_int));
 	msm.set_prescaler_selector(msm6585_device::S40); // Not verified, value from docs
 	msm.add_route(ALL_OUTPUTS, "mono", 1.0);
-}
-
-void blzntrnd_state::blzntrnd(machine_config &config)
-{
-	// basic machine hardware
-	M68000(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &blzntrnd_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(blzntrnd_state::periodic_interrupt), attotime::from_hz(8*60)); // ?
-
-	Z80(config, m_audiocpu, 16_MHz_XTAL/2);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &blzntrnd_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &blzntrnd_state::sound_io_map);
-
-	// video hardware
-	I4220(config, m_vdp2, 26.666_MHz_XTAL);
-	m_vdp2->irq_cb().set_inputline(m_maincpu, M68K_IRQ_1);
-	m_vdp2->set_vblank_irq_level(0);
-	m_vdp2->set_blit_irq_level(3);
-	m_vdp2->set_spriteram_buffered(true); // sprites are 1 frame delayed
-	m_vdp2->ext_ctrl_0_cb().set(FUNC(blzntrnd_state::ext_irq5_enable_w));
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1500));
-	m_screen->set_size(392, 263);
-	m_screen->set_visarea(0, 304-1, 0, 224-1);
-	m_screen->set_screen_update(FUNC(blzntrnd_state::screen_update));
-	m_screen->screen_vblank().set(FUNC(blzntrnd_state::karatour_vblank_irq));
-
-	MCFG_VIDEO_START_OVERRIDE(blzntrnd_state,blzntrnd)
-
-	GFXDECODE(config, m_gfxdecode, "vdp2:palette", gfx_blzntrnd);
-
-	K053936(config, m_k053936, 0);
-	m_k053936->set_offsets(-77, -21);
-
-	// sound hardware
-	// HUM-002 PCB Configuration : Stereo output with second speaker connector
-	SPEAKER(config, "speaker", 2).front();
-
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
-
-	ym2610_device &ymsnd(YM2610(config, m_ymsnd, 16_MHz_XTAL/2));
-	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "speaker", 0.75, 0);
-	ymsnd.add_route(0, "speaker", 0.75, 1);
-	ymsnd.add_route(1, "speaker", 1.0, 0);
-	ymsnd.add_route(2, "speaker", 1.0, 1);
-}
-
-void blzntrnd_state::gstrik2(machine_config &config)
-{
-	blzntrnd(config);
-	m_gfxdecode->set_info(gfx_gstrik2);
-
-	MCFG_VIDEO_START_OVERRIDE(blzntrnd_state,gstrik2)
-
-	m_k053936->set_offsets(-77, -19);
-
-	m_vdp2->set_tmap_xoffsets(0,8,0);
-
-	// HUM-003 PCB Configuration : Mono output only
-	config.device_remove("speaker");
-	SPEAKER(config, "mono").front_center();
-
-	ym2610_device &ymsnd(YM2610(config.replace(), m_ymsnd, 16_MHz_XTAL/2));
-	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "mono", 0.75);
-	ymsnd.add_route(1, "mono", 0.25);
-	ymsnd.add_route(2, "mono", 0.25);
 }
 
 
@@ -3696,184 +3255,6 @@ ROM_START( batlbubl )
 	ROM_REGION( 0x280000, "ymf", 0 )
 	ROM_LOAD( "lm-08.u40", 0x000000, 0x200000, CRC(2a9d8d43) SHA1(32760893ce06dbe3930627755ba065cc3d8ec6ca) ) // PCB labeled YRM801, Sticker says lm-08
 	ROM_LOAD( "lm-03.u42", 0x200000, 0x080000, CRC(04cc91a9) SHA1(e5cf6055a0803f4ad44919090cd147702e805d88) )
-ROM_END
-
-/***************************************************************************
-
-Blazing Tornado
-(c)1994 Human
-
-CPU:    68000-16
-Sound:  Z80-8
-    YMF286K (YM2610 compatible)
-OSC:    16.0000MHz
-    26.666MHz
-Chips:  Imagetek I4220 071
-    Konami 053936 (PSAC2)
-
-***************************************************************************/
-
-ROM_START( blzntrnd )
-	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000
-	ROM_LOAD16_BYTE( "1k.bin", 0x000000, 0x80000, CRC(b007893b) SHA1(609363449c0218b8a38de72d37c66e6f3bb4f8cd) )
-	ROM_LOAD16_BYTE( "2k.bin", 0x000001, 0x80000, CRC(ec173252) SHA1(652d70055d2799442beede1ae68e54551931068f) )
-	ROM_LOAD16_BYTE( "3k.bin", 0x100000, 0x80000, CRC(1e230ba2) SHA1(ca96c82d57a6b5bacc1bfd2f7965503c2a6e162f) )
-	ROM_LOAD16_BYTE( "4k.bin", 0x100001, 0x80000, CRC(e98ca99e) SHA1(9346fc0d419add23eaceb5843c505f3ffa69e495) )
-
-	ROM_REGION( 0x20000, "audiocpu", 0 )    // Z80
-	ROM_LOAD( "rom5.bin", 0x00000, 0x20000, CRC(7e90b774) SHA1(abd0eda9eababa1f7ab17a2f60534dcebda33c9c) )
-
-	ROM_REGION( 0x1800000, "vdp2", 0 )  // Gfx + Data (Addressable by CPU & Blitter)
-	ROM_LOAD64_WORD( "rom142.bin", 0x0000000, 0x200000, CRC(a7200598) SHA1(f8168a94abc380308901303a69cbd15097019797) )
-	ROM_LOAD64_WORD( "rom186.bin", 0x0000002, 0x200000, CRC(6ee28ea7) SHA1(b33bcbf16423999135d96a62bf25c6ff23031f2a) )
-	ROM_LOAD64_WORD( "rom131.bin", 0x0000004, 0x200000, CRC(c77e75d3) SHA1(8ad716d4e37d6efe478a8e49feb4e68283310890) )
-	ROM_LOAD64_WORD( "rom175.bin", 0x0000006, 0x200000, CRC(04a84f9b) SHA1(83aabbc1c7ab06b351168153335f3c2f91fba0e9) )
-	ROM_LOAD64_WORD( "rom242.bin", 0x0800000, 0x200000, CRC(1182463f) SHA1(6fa2a0b3186a3542b43926e3f37714b78a890542) )
-	ROM_LOAD64_WORD( "rom286.bin", 0x0800002, 0x200000, CRC(384424fc) SHA1(f89d43756bd38515a223fe4ffbed3a44c673ae28) )
-	ROM_LOAD64_WORD( "rom231.bin", 0x0800004, 0x200000, CRC(f0812362) SHA1(9f8be51f60f7baf72f9de8352e4e13d730f85903) )
-	ROM_LOAD64_WORD( "rom275.bin", 0x0800006, 0x200000, CRC(184cb129) SHA1(8ffb3cdc7e0d227b6f0a7962bc6d853c6b84c8d2) )
-	ROM_LOAD64_WORD( "rom342.bin", 0x1000000, 0x200000, CRC(e527fee5) SHA1(e5de1e134d95aa7a48695183189924061482e3a3) )
-	ROM_LOAD64_WORD( "rom386.bin", 0x1000002, 0x200000, CRC(d10b1401) SHA1(0eb75a283000a8b19a14177461b6f335c9d9dec2) )
-	ROM_LOAD64_WORD( "rom331.bin", 0x1000004, 0x200000, CRC(4d909c28) SHA1(fb9bb824e518f67713799ed2c0159a7bd70f35c4) )
-	ROM_LOAD64_WORD( "rom375.bin", 0x1000006, 0x200000, CRC(6eb4f97c) SHA1(c7f006230cbf10e706b0362eeed34655a3aef1a5) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 )   // 053936 gfx data
-	ROM_LOAD( "rom9.bin", 0x000000, 0x200000, CRC(37ca3570) SHA1(3374c586bf84583fa33f2793c4e8f2f61a0cab1c) )
-
-	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   // Samples
-	ROM_LOAD( "rom8.bin", 0x000000, 0x080000, CRC(565a4086) SHA1(bd5780acfa5affa8705acbfccb0af16bac8ed298) )
-
-	ROM_REGION( 0x400000, "ymsnd:adpcma", 0 )  // Samples
-	ROM_LOAD( "rom6.bin", 0x000000, 0x200000, CRC(8b8819fc) SHA1(5fd9d2b5088cb676c11d32cac7ba8c5c18e31b64) )
-	ROM_LOAD( "rom7.bin", 0x200000, 0x200000, CRC(0089a52b) SHA1(d643ac122d62557de27f06ba1413ef757a45a927) )
-ROM_END
-
-/*
-
-Grand Striker 2
-Human Entertainment, 1996
-
-PCB Layout
-----------
-
-HUM-003-(A)
-|-----------------------------------------------------------------------|
-|           YM3016 ROM8.22  ROM342.88  ROM386.87  ROM331.86  ROM375.85  |
-|                                                                       |
-| 6264  YM2610         ROM142.80  ROM186.79  ROM131.78  ROM175.77       |
-|                                                                       |
-|                  ROM7.27  ROM442.92  ROM486.91  ROM431.90  ROM475.89  |
-|                                                                       |
-|          PAL         ROM242.84  ROM286.83  ROM231.82  ROM275.81       |
-|  SPRG.30                                                              |
-|  PAL     Z80     ROM6.23                                              |
-|                                                                       |
-|J                                                                      |
-|A                                                                      |
-|M                                               |--------|             |
-|M                   PRG2  PRG3                  |IMAGETEK|   6264      |
-|A                                               |I4220   |             |
-|                    PRG0  PRG1                  |--------|             |
-|     16MHz  68000   62256  62256    26.666MHz                          |
-|                                                                       |
-|     DSW1                                                              |
-|     DSW2   EPM7032         |------|  62256  62256                     |
-|     DSW3            6116   |053936|  62256  62256                     |
-|     DSW4            6116   |PSAC2 |                   PAL             |
-|                            |------|                          ROM9.60  |
-|-----------------------------------------------------------------------|
-
-Notes:
-       68000 clock: 16.000MHz
-         Z80 clock: 8.000MHz
-      YM2610 clock: 8.000MHz
-             VSync: 58Hz
-             HSync: 15.11kHz
-
-TODO:
-    HUM-002-A-(B) PCB set is also exists, but not dumped. it's blazing tornado conversion?
-*/
-
-
-// The MASK roms weren't dumped from this set, but it's safe to assume they're the same in this case
-ROM_START( gstrik2 )
-	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000
-	ROM_LOAD16_BYTE( "hum_003_g2f.rom1.u107", 0x000000, 0x80000, CRC(2712d9ca) SHA1(efa967de931728534a663fa1529e92003afbb3e9) )
-	ROM_LOAD16_BYTE( "hum_003_g2f.rom2.u108", 0x000001, 0x80000, CRC(86785c64) SHA1(ef172d6e859a68eb80f7c127b61883d50eefb0fe) )
-	ROM_LOAD16_BYTE( "prg2.109", 0x100000, 0x80000, CRC(ead86919) SHA1(eb9b68dff4e08d90ac90043c7f3021914caa007d) )
-	ROM_LOAD16_BYTE( "prg3.110", 0x100001, 0x80000, CRC(e0b026e3) SHA1(05f75c0432efda3dec0372199382e310bb268fba) )
-
-	ROM_REGION( 0x20000, "audiocpu", 0 )    // Z80
-	ROM_LOAD( "sprg.30", 0x00000, 0x20000, CRC(aeef6045) SHA1(61b8c89ca495d3aac79e53413a85dd203db816f3) )
-
-	ROM_REGION( 0x1000000, "vdp2", 0 )  // Gfx + Data (Addressable by CPU & Blitter)
-	ROM_LOAD64_WORD( "chr0.80", 0x0000000, 0x200000, CRC(f63a52a9) SHA1(1ad52bb3a051eaffe8fb6ba49d4fc1d0b6144156) )
-	ROM_LOAD64_WORD( "chr1.79", 0x0000002, 0x200000, CRC(4110c184) SHA1(90ccb3d50eff7a655336cfa9c072f7213589e64c) )
-	ROM_LOAD64_WORD( "chr2.78", 0x0000004, 0x200000, CRC(ddb4b9ee) SHA1(0e2c151c3690b9c3d298dda8842e283660d37386) )
-	ROM_LOAD64_WORD( "chr3.77", 0x0000006, 0x200000, CRC(5ab367db) SHA1(adf8749451f4583f8e9e00ab61f3408d804a7265) )
-	ROM_LOAD64_WORD( "chr4.84", 0x0800000, 0x200000, CRC(77d7ef99) SHA1(8f5cf72f5919fe9363e7549e0bb1b3ee633cec3b) )
-	ROM_LOAD64_WORD( "chr5.83", 0x0800002, 0x200000, CRC(a4d49e95) SHA1(9789bacba7876100e0f0293f54c81def545ed068) )
-	ROM_LOAD64_WORD( "chr6.82", 0x0800004, 0x200000, CRC(32eb33b0) SHA1(2ea06484ca326b44a35ee470343147a9d91d5626) )
-	ROM_LOAD64_WORD( "chr7.81", 0x0800006, 0x200000, CRC(2d30a21e) SHA1(749e86b7935ef71556eaee4caf6f954634e9bcbf) )
-	// not populated
-//  ROM_LOAD64_WORD( "chr8.88", 0x1000000, 0x200000, NO_DUMP )
-//  ROM_LOAD64_WORD( "chr9.87", 0x1000002, 0x200000, NO_DUMP )
-//  ROM_LOAD64_WORD( "chr10.86", 0x1000004, 0x200000, NO_DUMP )
-//  ROM_LOAD64_WORD( "chr11.85", 0x1000006, 0x200000, NO_DUMP )
-//  ROM_LOAD64_WORD( "chr12.92", 0x1800000, 0x200000, NO_DUMP )
-//  ROM_LOAD64_WORD( "chr13.91", 0x1800002, 0x200000, NO_DUMP )
-//  ROM_LOAD64_WORD( "chr14.90", 0x1800004, 0x200000, NO_DUMP )
-//  ROM_LOAD64_WORD( "chr15.89", 0x1800006, 0x200000, NO_DUMP )
-
-	ROM_REGION( 0x200000, "gfx2", 0 )   // 053936 gfx data
-	ROM_LOAD( "psacrom.60", 0x000000, 0x200000,  CRC(73f1f279) SHA1(1135b2b1eb4c52249bc12ee178340bbb202a94c8) )
-
-	ROM_REGION( 0x200000, "ymsnd:adpcmb", 0 )   // Samples
-	ROM_LOAD( "sndpcm-b.22", 0x000000, 0x200000, CRC(a5d844d2) SHA1(18d644545f0844e66aa53775b67b0a29c7b7c31b) )
-
-	ROM_REGION( 0x400000, "ymsnd:adpcma", 0 )  // Samples
-	ROM_LOAD( "sndpcm-a.23", 0x000000, 0x200000, CRC(e6d32373) SHA1(8a79d4ea8b27d785fffd80e38d5ae73b7cea7304) )
-	// ROM7.27 not populated?
-ROM_END
-
-ROM_START( gstrik2j )
-	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000
-	ROM_LOAD16_BYTE( "prg0.107", 0x000000, 0x80000, CRC(e60a8c19) SHA1(19be6cfcb60ede6fd4eb2e14914b174107c4b52d) )
-	ROM_LOAD16_BYTE( "prg1.108", 0x000001, 0x80000, CRC(853f6f7c) SHA1(8fb9d7cd0390f620560a1669bb13f2033eed7c81) )
-	ROM_LOAD16_BYTE( "prg2.109", 0x100000, 0x80000, CRC(ead86919) SHA1(eb9b68dff4e08d90ac90043c7f3021914caa007d) )
-	ROM_LOAD16_BYTE( "prg3.110", 0x100001, 0x80000, CRC(e0b026e3) SHA1(05f75c0432efda3dec0372199382e310bb268fba) )
-
-	ROM_REGION( 0x20000, "audiocpu", 0 )    // Z80
-	ROM_LOAD( "sprg.30", 0x00000, 0x20000, CRC(aeef6045) SHA1(61b8c89ca495d3aac79e53413a85dd203db816f3) )
-
-	ROM_REGION( 0x1000000, "vdp2", 0 )  // Gfx + Data (Addressable by CPU & Blitter)
-	ROM_LOAD64_WORD( "chr0.80", 0x0000000, 0x200000, CRC(f63a52a9) SHA1(1ad52bb3a051eaffe8fb6ba49d4fc1d0b6144156) )
-	ROM_LOAD64_WORD( "chr1.79", 0x0000002, 0x200000, CRC(4110c184) SHA1(90ccb3d50eff7a655336cfa9c072f7213589e64c) )
-	ROM_LOAD64_WORD( "chr2.78", 0x0000004, 0x200000, CRC(ddb4b9ee) SHA1(0e2c151c3690b9c3d298dda8842e283660d37386) )
-	ROM_LOAD64_WORD( "chr3.77", 0x0000006, 0x200000, CRC(5ab367db) SHA1(adf8749451f4583f8e9e00ab61f3408d804a7265) )
-	ROM_LOAD64_WORD( "chr4.84", 0x0800000, 0x200000, CRC(77d7ef99) SHA1(8f5cf72f5919fe9363e7549e0bb1b3ee633cec3b) )
-	ROM_LOAD64_WORD( "chr5.83", 0x0800002, 0x200000, CRC(a4d49e95) SHA1(9789bacba7876100e0f0293f54c81def545ed068) )
-	ROM_LOAD64_WORD( "chr6.82", 0x0800004, 0x200000, CRC(32eb33b0) SHA1(2ea06484ca326b44a35ee470343147a9d91d5626) )
-	ROM_LOAD64_WORD( "chr7.81", 0x0800006, 0x200000, CRC(2d30a21e) SHA1(749e86b7935ef71556eaee4caf6f954634e9bcbf) )
-	// not populated
-//  ROM_LOAD64_WORD( "chr8.88", 0x1000000, 0x200000, NO_DUMP )
-//  ROM_LOAD64_WORD( "chr9.87", 0x1000002, 0x200000, NO_DUMP )
-//  ROM_LOAD64_WORD( "chr10.86", 0x1000004, 0x200000, NO_DUMP )
-//  ROM_LOAD64_WORD( "chr11.85", 0x1000006, 0x200000, NO_DUMP )
-//  ROM_LOAD64_WORD( "chr12.92", 0x1800000, 0x200000, NO_DUMP )
-//  ROM_LOAD64_WORD( "chr13.91", 0x1800002, 0x200000, NO_DUMP )
-//  ROM_LOAD64_WORD( "chr14.90", 0x1800004, 0x200000, NO_DUMP )
-//  ROM_LOAD64_WORD( "chr15.89", 0x1800006, 0x200000, NO_DUMP )
-
-	ROM_REGION( 0x200000, "gfx2", 0 )   // 053936 gfx data
-	ROM_LOAD( "psacrom.60", 0x000000, 0x200000,  CRC(73f1f279) SHA1(1135b2b1eb4c52249bc12ee178340bbb202a94c8) )
-
-	ROM_REGION( 0x200000, "ymsnd:adpcmb", 0 )   // Samples
-	ROM_LOAD( "sndpcm-b.22", 0x000000, 0x200000, CRC(a5d844d2) SHA1(18d644545f0844e66aa53775b67b0a29c7b7c31b) )
-
-	ROM_REGION( 0x400000, "ymsnd:adpcma", 0 )  // Samples
-	ROM_LOAD( "sndpcm-a.23", 0x000000, 0x200000, CRC(e6d32373) SHA1(8a79d4ea8b27d785fffd80e38d5ae73b7cea7304) )
-	// ROM7.27 not populated?
 ROM_END
 
 
@@ -4107,9 +3488,9 @@ Notes:
       68000 clock     - 12.000MHz [24/2]
       D78C10 clock    - 12.000MHz [24/2]
       YM2151 clock    - 3.579545MHz
-      Oki M6295 clock - 1.200MHz [24/20], sample rate = 1200000 / 132
-      VSync - 60Hz
-      HSync - 15.55kHz
+      Oki M6295 clock - 1.200MHz [24/20] (from the MACH110 CPLD), sample rate = 1200000 / 132 (pin 7 high)
+      VSync - 59.3517Hz
+      HSync - 15.4235kHz
 
 RAM - CY7C199 (x2), 6164 (x2), LH5168 (x2), 6116 (x1)
 ROMs 5+6 = Main Prg
@@ -4717,7 +4098,7 @@ Video: Imagetek I4220 071 9430WK440
 
 SW3 - Not Populated
 
-ms_ja-1.1    tms27c240 <-- Is there an undumped MS_WA1 World rom??
+ms_ja-1.1    tms27c240 <-- Is there an undumped MS_WA1 World ROM??
 ms_wa-2.2    tms27c240
 ms_wa-3.3    tms27c240
 ms_wa-4.4    tms27c240
@@ -5442,6 +4823,7 @@ void metro_state::init_karatour()
 }
 
 
+// TODO: emulate this at device level
 // Unscramble the GFX ROMs
 void metro_state::init_balcube()
 {
@@ -5487,52 +4869,52 @@ GAME( 1992, pangpomsn, pangpoms, pangpoms,  pangpoms,   metro_upd7810_state, emp
 GAME( 1992, skyalert,  0,        skyalert,  skyalert,   metro_upd7810_state, empty_init,    ROT270, "Metro",                                           "Sky Alert", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ladykill,  0,        karatour,  ladykill,   metro_upd7810_state, init_karatour, ROT90,  "Yanyaka (Mitchell license)",                      "Lady Killer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, moegonta,  ladykill, karatour,  moegonta,   metro_upd7810_state, init_karatour, ROT90,  "Yanyaka",                                         "Moeyo Gonta!! (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+// Japanese subtitle in Japanese set, English otherwise; Kanji title is the same regardless region
 GAME( 1994, lastfort,  0,        lastfort,  lastfort,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Last Fortress - Toride (Japan, VG420 PCB)", MACHINE_SUPPORTS_SAVE ) // VG420 PCB
 GAME( 1994, lastforte, lastfort, lastfort,  lastfero,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Last Fortress - Toride (China, Rev C)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, lastfortea,lastfort, lastfort,  lastfero,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Last Fortress - Toride (China, Rev A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastfortk, lastfort, lastfort,  lastfero,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Last Fortress - Toride (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastfortk, lastfort, lastfort,  lastfero,   metro_upd7810_state, empty_init,    ROT0,   "Metro (Grand Computer license)",                  "Last Fortress - Toride (Korea)", MACHINE_SUPPORTS_SAVE ) // distributor name is Korean (그랜드컴퓨터)
 GAME( 1994, lastfortj, lastfort, lastforg,  ladykill,   metro_upd7810_state, init_karatour, ROT0,   "Metro",                                           "Last Fortress - Toride (Japan, VG460 PCB)", MACHINE_SUPPORTS_SAVE ) // VG460-(A) PCB
-GAME( 1994, lastfortg, lastfort, lastforg,  ladykill,   metro_upd7810_state, init_karatour, ROT0,   "Metro",                                           "Last Fortress - Toride (Germany)", MACHINE_SUPPORTS_SAVE ) // VG460-(A) PCB
+// Germany set has Mah-Jong subtitle
+GAME( 1994, lastfortg, lastfort, lastforg,  ladykill,   metro_upd7810_state, init_karatour, ROT0,   "Metro",                                           "Last Fortress - Toride: Mah-jong (Germany)", MACHINE_SUPPORTS_SAVE ) // VG460-(A) PCB
 
 // MTR5260 / MTR527
-GAME( 1993, poitto,    0,        poitto,    poitto,     metro_upd7810_state, empty_init,    ROT0,   "Metro / Able Corp.",                              "Poitto! (revision D)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, poitto,    0,        poitto,    poitto,     metro_upd7810_state, empty_init,    ROT0,   "Metro / Able Corp.",                              "Poitto! (Japan revision D)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, poittoc,   poitto,   poitto,    poitto,     metro_upd7810_state, empty_init,    ROT0,   "Metro / Able Corp.",                              "Poitto! (revision C)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing 1 program ROM
+// All set except Korean region has "DHARMA" subtitle
 GAME( 1994, dharma,    0,        dharma,    dharma,     metro_upd7810_state, init_dharmak,  ROT0,   "Metro",                                           "Dharma Doujou", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, dharmag,   dharma,   dharma,    dharma,     metro_upd7810_state, init_dharmak,  ROT0,   "Metro",                                           "Dharma Doujou (Germany)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, dharmaj,   dharma,   dharma,    dharma,     metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Dharma Doujou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, dharmak,   dharma,   dharma,    dharma,     metro_upd7810_state, init_dharmak,  ROT0,   "Metro",                                           "Dharma Doujou (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, toride2g,  0,        toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, toride2gg, toride2g, toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden (German)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dharmak,   dharma,   dharma,    dharma,     metro_upd7810_state, init_dharmak,  ROT0,   "Metro",                                           "Dharma Dojang - Mangchi Man (Korea)", MACHINE_SUPPORTS_SAVE ) // 다루마 도장: 망치맨
+// Toride II Adauchi Gaiden set: Same title screen regardless region
+GAME( 1994, toride2g,  0,        toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, toride2gk, toride2g, toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II Bok Su Oi Jeon Adauchi Gaiden (Korea)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+// Toride II set (non - Adauchi Gaiden revision)
+GAME( 1994, toride2gg, toride2g, toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II (German)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, toride2j,  toride2g, toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II (Japan, revision K)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, toride2ji, toride2g, toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II (Japan, revision I)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, gunmast,   0,        pururun,   gunmast,    metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Gun Master", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, daitorid,  0,        daitorid,  daitorid,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Daitoride", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, pururun,   0,        pururun,   pururun,    metro_upd7810_state, empty_init,    ROT0,   "Metro / Banpresto",                               "Pururun (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, pururuna,  pururun,  pururun,   pururun,    metro_upd7810_state, empty_init,    ROT0,   "Metro / Banpresto",                               "Pururun (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, puzzli,    0,        puzzli,    puzzli,     metro_upd7810_state, empty_init,    ROT0,   "Metro / Banpresto",                               "Puzzli (revision B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, puzzlia,   puzzli,   puzzlia,   puzzli,     metro_upd7810_state, empty_init,    ROT0,   "Metro / Banpresto",                               "Puzzli (revision A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, daitorid,  0,        daitorid,  daitorid,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Daitoride (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, pururun,   0,        pururun,   pururun,    metro_upd7810_state, empty_init,    ROT0,   "Metro / Banpresto",                               "Pururun (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, pururuna,  pururun,  pururun,   pururun,    metro_upd7810_state, empty_init,    ROT0,   "Metro / Banpresto",                               "Pururun (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, puzzli,    0,        puzzli,    puzzli,     metro_upd7810_state, empty_init,    ROT0,   "Metro / Banpresto",                               "Puzzli (Japan revision B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, puzzlia,   puzzli,   puzzlia,   puzzli,     metro_upd7810_state, empty_init,    ROT0,   "Metro / Banpresto",                               "Puzzli (Japan revision A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, 3kokushi,  0,        sankokushi,sankokushi, metro_upd7810_state, init_karatour, ROT0,   "Mitchell",                                        "Sankokushi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // ? with additional gfx data scramble (probably MTR5260 based)
-GAME( 1995, msgogo,    0,        msgogo,    msgogo,     metro_state,         init_balcube,  ROT0,   "Metro",                                           "Mouse Shooter GoGo", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, daitorida, daitorid, daitoa,    daitoa,     metro_state,         init_balcube,  ROT0,   "Metro",                                           "Daitoride (YMF278B version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, balcube,   0,        balcube,   balcube,    metro_state,         init_balcube,  ROT0,   "Metro",                                           "Bal Cube", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bangball,  0,        bangball,  bangball,   metro_state,         init_balcube,  ROT0,   "Banpresto / Kunihiko Tashiro+Goodhouse",          "Bang Bang Ball (v1.05)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, msgogo,    0,        msgogo,    msgogo,     metro_state,         init_balcube,  ROT0,   "Metro",                                           "Mouse Shooter GoGo", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // Either English or Japanese
+GAME( 1996, daitorida, daitorid, daitoa,    daitoa,     metro_state,         init_balcube,  ROT0,   "Metro",                                           "Daitoride (Japan, YMF278B version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, balcube,   0,        balcube,   balcube,    metro_state,         init_balcube,  ROT0,   "Metro",                                           "Bal Cube (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bangball,  0,        bangball,  bangball,   metro_state,         init_balcube,  ROT0,   "Banpresto / Kunihiko Tashiro+Goodhouse",          "Bang Bang Ball (v1.05)", MACHINE_SUPPORTS_SAVE ) // Either English or Japanese
 GAME( 1999, batlbubl,  bangball, batlbubl,  batlbubl,   metro_state,         init_balcube,  ROT0,   "Banpresto (Limenko license?)",                    "Battle Bubble (v2.00)", MACHINE_SUPPORTS_SAVE ) // or bootleg?
 
 // VG330 / VG340 / VG410
-GAME( 1995, dokyusei,  0,        dokyusei,  dokyusei,   gakusai_state,       empty_init,    ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, dokyusp,   0,        dokyusp,   gakusai,    gakusai_state,       empty_init,    ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei Special", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, dokyusei,  0,        dokyusei,  dokyusei,   gakusai_state,       empty_init,    ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, dokyusp,   0,        dokyusp,   gakusai,    gakusai_state,       empty_init,    ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei Special (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, mouja,     0,        mouja,     mouja,      mouja_state,         empty_init,    ROT0,   "Etona",                                           "Mouja (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, gakusai,   0,        gakusai,   gakusai,    gakusai_state,       empty_init,    ROT0,   "MakeSoft",                                        "Mahjong Gakuensai (Japan, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, gakusaia,  gakusai,  gakusai,   gakusai,    gakusai_state,       empty_init,    ROT0,   "MakeSoft",                                        "Mahjong Gakuensai (Japan, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, gakusai2,  0,        gakusai2,  gakusai,    gakusai_state,       empty_init,    ROT0,   "MakeSoft",                                        "Mahjong Gakuensai 2 (Japan)", MACHINE_SUPPORTS_SAVE )
-
-// HUM-002 / HUM-003
-GAME( 1994, blzntrnd,  0,        blzntrnd,  blzntrnd,   blzntrnd_state,      empty_init,    ROT0,   "Human Amusement",                                 "Blazing Tornado", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1996, gstrik2,   0,        gstrik2,   gstrik2,    blzntrnd_state,      empty_init,    ROT0,   "Human Amusement",                                 "Grand Striker 2 (Europe and Oceania)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1996, gstrik2j,  gstrik2,  gstrik2,   gstrik2,    blzntrnd_state,      empty_init,    ROT0,   "Human Amusement",                                 "Grand Striker 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // priority between rounds
 
 // ES-9309B-B
 GAME( 1995, vmetal,    0,        vmetal,    vmetal,     vmetal_state,        empty_init,    ROT90,  "Excellent System",                                "Varia Metal", MACHINE_SUPPORTS_SAVE )

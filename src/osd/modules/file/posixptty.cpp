@@ -29,10 +29,6 @@
 #include <pty.h>
 #elif defined(__HAIKU__)
 #include <bsd/pty.h>
-#elif defined(__sun)
-#include <sys/types.h>
-#include <stropts.h>
-#include <sys/conf.h>
 #endif
 
 
@@ -113,46 +109,6 @@ std::error_condition posix_open_ptty(std::uint32_t openflags, osd_file::ptr &fil
 #if defined(__ANDROID__)
 	return std::errc::not_supported; // TODO: revisit this error code
 #else // defined(__ANDROID__)
-	// TODO: handling of the slave path is insecure - should use ptsname_r/ttyname_r in a loop
-#if (defined(sun) || defined(__sun)) && (defined(__SVR4) || defined(__svr4__))
-	int access = O_NOCTTY;
-	if (openflags & OPEN_FLAG_WRITE)
-		access |= (openflags & OPEN_FLAG_READ) ? O_RDWR : O_WRONLY;
-	else if (openflags & OPEN_FLAG_READ)
-		access |= O_RDONLY;
-	else
-		return std::errc::invalid_argument;
-
-	int const masterfd = ::posix_openpt(access);
-	if (masterfd < 0)
-		return std::error_condition(errno, std::generic_category());
-
-	// grant access to slave device and check that it can be opened
-	char const *slavepath;
-	int slavefd;
-	if ((::grantpt(masterfd) < 0) ||
-		(::unlockpt(masterfd) < 0) ||
-		((slavepath = ::ptsname(masterfd)) == nullptr) ||
-		((slavefd = ::open(slavepath, O_RDWR | O_NOCTTY)) < 0))
-	{
-		std::error_condition err(errno, std::generic_category());
-		::close(masterfd);
-		return err;
-	}
-
-	// check that it's possible to stack BSD-compatibility STREAMS modules
-	if ((::ioctl(slavefd, I_PUSH, "ptem") < 0) ||
-		(::ioctl(slavefd, I_PUSH, "ldterm") < 0) ||
-		(::ioctl(slavefd, I_PUSH, "ttcompat") < 0))
-	{
-		std::error_condition err(errno, std::generic_category());
-		::close(slavefd);
-		::close(masterfd);
-		return err;
-	}
-
-	::close(slavefd);
-#else // (defined(sun) || defined(__sun)) && (defined(__SVR4) || defined(__svr4__))
 	struct termios tios;
 	std::memset(&tios, 0, sizeof(tios));
 	tios.c_iflag = 0;
@@ -199,7 +155,7 @@ std::error_condition posix_open_ptty(std::uint32_t openflags, osd_file::ptr &fil
 				slavepath_storage.resize(PATH_MAX);
 			else
 				slavepath_storage.resize(slavepath_storage.size() * 2);
-			result = ptsname_r(masterfd, slavepath_storage.data(), slavepath_storage.size());
+			result = ::ptsname_r(masterfd, slavepath_storage.data(), slavepath_storage.size());
 			if (result == -1)
 				result = errno; // pre-standard ptsname_r returns -1 and sets errno
 		}
@@ -228,7 +184,6 @@ std::error_condition posix_open_ptty(std::uint32_t openflags, osd_file::ptr &fil
 
 	::close(slavefd);
 #endif
-#endif // (defined(sun) || defined(__sun)) && (defined(__SVR4) || defined(__svr4__))
 
 	int const oldflags = ::fcntl(masterfd, F_GETFL, 0);
 	if (oldflags < 0)

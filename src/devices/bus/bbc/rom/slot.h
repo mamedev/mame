@@ -74,10 +74,7 @@ public:
 	bbc_romslot16_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, char const *default_option)
 		: bbc_romslot16_device(mconfig, tag, owner)
 	{
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(false);
+		set_options(std::forward<T>(slot_options), default_option, false);
 		m_slot_size = 0x4000;
 	}
 
@@ -94,10 +91,7 @@ public:
 	bbc_romslot32_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, char const *default_option)
 		: bbc_romslot32_device(mconfig, tag, owner)
 	{
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(false);
+		set_options(std::forward<T>(slot_options), default_option, false);
 		m_slot_size = 0x8000;
 	}
 
@@ -147,7 +141,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(BBC_ROMSLOT16, bbc_romslot16_device)
 DECLARE_DEVICE_TYPE(BBC_ROMSLOT32, bbc_romslot32_device)
 

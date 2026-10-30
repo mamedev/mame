@@ -9,7 +9,7 @@
 class elan_eu3a05sys_device : public elan_eu3a05commonsys_device, public device_memory_interface
 {
 public:
-	elan_eu3a05sys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	elan_eu3a05sys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint8_t elan_eu3a05_dmatrg_r();
 	void elan_eu3a05_dmatrg_w(uint8_t data);
@@ -20,7 +20,7 @@ public:
 	virtual void map(address_map &map) override ATTR_COLD;
 
 protected:
-	elan_eu3a05sys_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	elan_eu3a05sys_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

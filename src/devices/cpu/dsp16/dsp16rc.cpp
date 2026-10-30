@@ -43,7 +43,7 @@ dsp16_device_base::recompiler::recompiler(dsp16_device_base &host, u32 flags)
 	: m_host(host)
 	, m_core(*host.m_core)
 	, m_frontend(host, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, COMPILE_MAX_SEQUENCE)
-	, m_uml(host, host.m_drc_cache, flags, 2, 16, 0)
+	, m_uml(host, host.m_drc_cache, flags, 2, 16, 0, COMPILE_FORWARDS_BYTES)
 {
 	m_uml.symbol_add(&m_core.xaau_pc, sizeof(m_core.xaau_pc), "pc");
 	m_uml.symbol_add(&m_core.xaau_pt, sizeof(m_core.xaau_pt), "pt");

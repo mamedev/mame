@@ -224,8 +224,8 @@ void dps1_state::dps1(machine_config &config)
 	rs232.dsr_handler().set(uart, FUNC(scn2651_device::dsr_w));
 	rs232.cts_handler().set(uart, FUNC(scn2651_device::cts_w));
 
-	AM9519(config, "am9519a", 0);
-	AM9519(config, "am9519b", 0);
+	AM9519(config, "am9519a");
+	AM9519(config, "am9519b");
 
 	// floppy
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, false, true);

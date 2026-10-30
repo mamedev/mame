@@ -399,9 +399,9 @@ void ti_fdc_device::device_add_mconfig(machine_config& config)
 	m_fd1771->drq_wr_callback().set(FUNC(ti_fdc_device::fdc_drq_w));
 	m_fd1771->hld_wr_callback().set(FUNC(ti_fdc_device::fdc_hld_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy[0], tifdc_floppies, "525dd", ti_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[1], tifdc_floppies, "525dd", ti_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[2], tifdc_floppies, nullptr, ti_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], tifdc_floppies, "525dd", ti_fdc_device::floppy_formats).enable_sound("ti99_peb_dsk1");
+	FLOPPY_CONNECTOR(config, m_floppy[1], tifdc_floppies, "525dd", ti_fdc_device::floppy_formats).enable_sound("ti99_peb_dsk2");
+	FLOPPY_CONNECTOR(config, m_floppy[2], tifdc_floppies, nullptr, ti_fdc_device::floppy_formats).enable_sound("ti99_peb_dsk3");
 
 	LS259(config, m_crulatch); // U23
 	m_crulatch->q_out_cb<0>().set(FUNC(ti_fdc_device::dskpgena_w));
@@ -413,7 +413,7 @@ void ti_fdc_device::device_add_mconfig(machine_config& config)
 	m_crulatch->q_out_cb<6>().set(FUNC(ti_fdc_device::dsel3_w));
 	m_crulatch->q_out_cb<7>().set(FUNC(ti_fdc_device::sidsel_w));
 
-	TTL74123(config, m_motormf, 0);
+	TTL74123(config, m_motormf);
 	m_motormf->out_cb().set(FUNC(ti_fdc_device::dvena_w));
 	m_motormf->set_connection_type(TTL74123_GROUNDED);
 	m_motormf->set_resistor_value(RES_K(200));

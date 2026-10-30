@@ -10,9 +10,15 @@ typedef device_delegate<uint32_t (uint32_t)> vsystem_tile2_indirection_delegate;
 class vsystem_spr2_device : public device_t, public device_gfx_interface
 {
 public:
-	vsystem_spr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vsystem_spr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	template <typename T> vsystem_spr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
 		: vsystem_spr2_device(mconfig, tag, owner, clock)
+	{
+		set_info(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
+	}
+	template <typename T> vsystem_spr2_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: vsystem_spr2_device(mconfig, tag, owner, 0, std::forward<T>(palette_tag), gfxinfo)
 	{
 		set_info(gfxinfo);
 		set_palette(std::forward<T>(palette_tag));
@@ -25,6 +31,12 @@ public:
 	{
 		m_xoffs = xoffs;
 		m_yoffs = yoffs;
+	}
+	// mirror constants for flip_screen, from the game's raster geometry
+	void set_flip_offsets(int xoffs, int yoffs)
+	{
+		m_flip_xoffs = xoffs;
+		m_flip_yoffs = yoffs;
 	}
 
 	void draw_sprites(uint16_t const *spriteram3,  int spriteram3_bytes,  int spritepalettebank, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param, bool flip_screen = false);
@@ -62,6 +74,7 @@ private:
 	vsystem_tile2_indirection_delegate m_newtilecb;
 	int m_pritype;
 	int m_xoffs, m_yoffs;
+	int m_flip_xoffs, m_flip_yoffs;
 
 	sprite_attributes m_curr_sprite;
 };

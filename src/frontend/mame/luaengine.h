@@ -27,6 +27,7 @@
 #define SOL_ALL_SAFETIES_ON 1
 #else
 #define SOL_SAFE_USERTYPE 1
+#define SOL_SAFE_NUMERICS 1
 #endif
 #include "sol/sol.hpp"
 
@@ -39,7 +40,6 @@ public:
 	template <typename T> struct devenum;
 	template <typename T> struct simple_list_wrapper;
 	template <typename T> struct tag_object_ptr_map;
-	template <typename T> using standard_tag_object_ptr_map = tag_object_ptr_map<std::unordered_map<std::string, std::unique_ptr<T> > >;
 	template <typename T> struct immutable_container_helper;
 	template <typename T, typename C, typename I = typename C::iterator> struct immutable_collection_helper;
 	template <typename T, typename C, typename I = typename C::iterator> struct immutable_sequence_helper;
@@ -64,6 +64,7 @@ public:
 	void on_sound_update(const std::map<std::string, std::vector<std::pair<const sound_stream::sample_t *, int>>> &sound);
 	void on_periodic();
 	bool on_missing_mandatory_image(const std::string &instance_name);
+	void on_machine_before_startup_screens();
 	void on_machine_before_load_settings();
 
 	template <typename T, typename U>
@@ -180,6 +181,8 @@ private:
 	std::vector<int> m_update_tasks;
 	std::vector<int> m_frame_tasks;
 
+	template <typename T>
+	static auto make_tag_object_ptr_map(T &map);
 	template <typename... T>
 	auto make_notifier_adder(util::notifier<T...> &notifier, const char *desc);
 	template <typename T, typename D, typename R, typename... A>

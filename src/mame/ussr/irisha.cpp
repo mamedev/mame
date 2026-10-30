@@ -385,7 +385,7 @@ void irisha_state::irisha(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &irisha_state::io_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(320, 200);
@@ -401,9 +401,9 @@ void irisha_state::irisha(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	I8251(config, "uart", 0);
+	I8251(config, "uart");
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(16_MHz_XTAL / 9);
 	m_pit->out_handler<0>().set("pic", FUNC(pic8259_device::ir0_w));
 	m_pit->set_clk<1>(16_MHz_XTAL / 9 / 8 / 8);
@@ -419,7 +419,7 @@ void irisha_state::irisha(machine_config &config)
 	ppi.in_pc_callback().set(FUNC(irisha_state::portc_r));
 	ppi.out_pc_callback().set(FUNC(irisha_state::portc_w));
 
-	pic8259_device &pic8259(PIC8259(config, "pic", 0));
+	pic8259_device &pic8259(PIC8259(config, "pic"));
 	pic8259.out_int_callback().set_inputline(m_maincpu, 0);
 }
 

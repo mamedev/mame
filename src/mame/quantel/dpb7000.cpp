@@ -45,6 +45,7 @@
 #include "emupal.h"
 
 #include <algorithm>
+#include <bit>
 #include <deque>
 
 #define LOG_UNKNOWN         (1U << 1)
@@ -3276,7 +3277,7 @@ TIMER_CALLBACK_MEMBER(dpb7000_state::tablet_hle_tick)
 
 		for (int i = 0; i < 5; i++)
 		{
-			data[i] |= (population_count_32(data[i]) & 1) ? 0x80 : 0x00;
+			data[i] |= (std::popcount(data[i]) & 1) ? 0x80 : 0x00;
 			m_tablet_hle_tx_bits.push_back(0);
 			for (int bit = 0; bit < 8; bit++)
 			{
@@ -3681,16 +3682,16 @@ void dpb7000_state::dpb7000(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, m_p_int).output_handler().set_inputline(m_maincpu, 3);
 
-	ACIA6850(config, m_acia[0], 0);
+	ACIA6850(config, m_acia[0]);
 	m_acia[0]->txd_handler().set(m_rs232[0], FUNC(rs232_port_device::write_txd));
 	m_acia[0]->rts_handler().set(m_rs232[0], FUNC(rs232_port_device::write_rts));
 	m_acia[0]->irq_handler().set_inputline(m_maincpu, 6);
 
-	ACIA6850(config, m_acia[1], 0);
+	ACIA6850(config, m_acia[1]);
 	m_acia[1]->txd_handler().set(m_tds_duart, FUNC(scn2681_device::rx_a_w));
 	m_acia[1]->irq_handler().set(m_p_int, FUNC(input_merger_device::in_w<0>));
 
-	ACIA6850(config, m_acia[2], 0);
+	ACIA6850(config, m_acia[2]);
 	m_acia[2]->txd_handler().set(m_rs232[1], FUNC(rs232_port_device::write_txd));
 	m_acia[2]->rts_handler().set(m_rs232[1], FUNC(rs232_port_device::write_rts));
 	m_acia[2]->irq_handler().set(m_p_int, FUNC(input_merger_device::in_w<1>));
@@ -3713,13 +3714,13 @@ void dpb7000_state::dpb7000(machine_config &config)
 	m_brg->ft_handler().append(m_acia[2], FUNC(acia6850_device::write_txc));
 	m_brg->ft_handler().append(m_acia[2], FUNC(acia6850_device::write_rxc));
 
-	screen_device &combined_screen(SCREEN(config, "combined_screen", SCREEN_TYPE_RASTER));
+	screen_device &combined_screen(SCREEN(config, "combined_screen"));
 	combined_screen.set_refresh_hz(50);
 	combined_screen.set_size(800, 625);
 	combined_screen.set_visarea(0, 709, 0, 574);
 	combined_screen.set_screen_update(FUNC(dpb7000_state::combined_screen_update));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_size(696, 276);
 	screen.set_visarea(56, 695, 36, 275);
@@ -3727,25 +3728,25 @@ void dpb7000_state::dpb7000(machine_config &config)
 
 	if (0)
 	{
-		screen_device &store_screen1(SCREEN(config, "store_screen1", SCREEN_TYPE_RASTER));
+		screen_device &store_screen1(SCREEN(config, "store_screen1"));
 		store_screen1.set_refresh_hz(50);
 		store_screen1.set_size(800, 768);
 		store_screen1.set_visarea(0, 799, 0, 767);
 		store_screen1.set_screen_update(FUNC(dpb7000_state::store_debug_screen_update<0>));
 
-		screen_device &store_screen2(SCREEN(config, "store_screen2", SCREEN_TYPE_RASTER));
+		screen_device &store_screen2(SCREEN(config, "store_screen2"));
 		store_screen2.set_refresh_hz(50);
 		store_screen2.set_size(800, 768);
 		store_screen2.set_visarea(0, 799, 0, 767);
 		store_screen2.set_screen_update(FUNC(dpb7000_state::store_debug_screen_update<1>));
 
-		screen_device &ext_screen(SCREEN(config, "ext_screen", SCREEN_TYPE_RASTER));
+		screen_device &ext_screen(SCREEN(config, "ext_screen"));
 		ext_screen.set_refresh_hz(50);
 		ext_screen.set_size(800, 768);
 		ext_screen.set_visarea(0, 799, 0, 767);
 		ext_screen.set_screen_update(FUNC(dpb7000_state::stencil_debug_screen_update));
 
-		screen_device &brush_screen(SCREEN(config, "brush_screen", SCREEN_TYPE_RASTER));
+		screen_device &brush_screen(SCREEN(config, "brush_screen"));
 		brush_screen.set_refresh_hz(50);
 		brush_screen.set_size(512, 512);
 		brush_screen.set_visarea(0, 511, 0, 511);

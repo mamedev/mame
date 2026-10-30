@@ -16,6 +16,7 @@
 #include "utilfwd.h"
 
 #include <memory>
+#include <string_view>
 #include <vector>
 
 #include <cassert>
@@ -93,7 +94,7 @@ public:
 	//! This checks if the file has the proper extension for this format.
 	//! @param file_name
 	//! @returns true if file matches the extension.
-	bool extension_matches(const char *file_name) const;
+	bool extension_matches(std::string_view file_name) const noexcept;
 
 protected:
 	//! Input for convert_to_edge
@@ -332,6 +333,7 @@ protected:
 		bool deleted;
 		bool bad_data_crc;
 		bool bad_addr_crc;
+		bool weak;
 	};
 
 	struct desc_gcr_sector
@@ -346,6 +348,7 @@ protected:
 	static void build_wd_track_mfm(int track, int head, floppy_image &image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_1, int gap_2=22);
 	static void build_pc_track_fm(int track, int head, floppy_image &image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_4a=40, int gap_1=26, int gap_2=11);
 	static void build_pc_track_mfm(int track, int head, floppy_image &image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_4a=80, int gap_1=50, int gap_2=22);
+	static void build_apple_16sect_track_gcr(int track, int head, floppy_image &image, const desc_gcr_sector *sects);
 	static void build_mac_track_gcr(int track, int head, floppy_image &image, const desc_gcr_sector *sects);
 
 	//! @brief Extract standard sectors from a regenerated bitstream.
@@ -363,6 +366,9 @@ protected:
 	//! Victor 9000 type sectors with GCR5 encoding
 	static std::vector<std::vector<uint8_t>> extract_sectors_from_bitstream_victor_gcr5(const std::vector<bool> &bitstream);
 
+	//! Apple II type sectors with GCR6 encoding
+	static std::vector<std::vector<uint8_t>> extract_sectors_from_track_apple_16sect_gcr6(const std::vector<bool> &bitstream, uint8_t &vl);
+
 	//! Mac type sectors with GCR6 encoding
 	static std::vector<std::vector<uint8_t>> extract_sectors_from_track_mac_gcr6(int head, int track, const floppy_image &image);
 
@@ -376,6 +382,8 @@ protected:
 
 
 	//!  Regenerate the data for a full track.
+	//!  PC-type sectors with MFM encoding and fixed-size, with explicit start and end sectors.
+	static void get_track_data_mfm_pc_sectors(int track, int head, const floppy_image &image, int cell_size, int sector_size, int start_sector, int end_sector, uint8_t *sectdata);
 	//!  PC-type sectors with MFM encoding and fixed-size.
 	static void get_track_data_mfm_pc(int track, int head, const floppy_image &image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata);
 
@@ -424,6 +432,8 @@ protected:
 	enum { DUMP_THRESHOLD = 2 };
 
 private:
+	static bool find_gcr5_data_block(const uint32_t *hblk, uint32_t hblk_count, const uint32_t *dblk, uint32_t dblk_count, uint32_t index, uint32_t track_size, uint32_t &pos);
+
 	enum { CRC_NONE, CRC_AMIGA, CRC_CBM, CRC_CCITT, CRC_CCITT_FM, CRC_MACHEAD, CRC_FCS, CRC_VICTOR_HDR, CRC_VICTOR_DATA };
 	enum { MAX_CRC_COUNT = 64 };
 
@@ -521,7 +531,8 @@ public:
 		FF_3        = 0x20202033, //!< "3   " 3 inch disk
 		FF_35       = 0x20203533, //!< "35  " 3.5 inch disk
 		FF_525      = 0x20353235, //!< "525 " 5.25 inch disk
-		FF_8        = 0x20202038  //!< "8   " 8 inch disk
+		FF_8        = 0x20202038, //!< "8   " 8 inch disk
+		FF_TWIG     = 0x47495754, //!< "TWIG" 5.25 twiggy
 	};
 
 	//! Variants

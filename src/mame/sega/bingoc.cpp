@@ -203,10 +203,10 @@ void bingoc_state::bingoc(machine_config &config)
 	I8251(config, "uart7", 4000000); // unknown
 	I8251(config, "uart8", 4000000); // unknown
 
-	SEGA_315_5338A(config, "io", 0); // ?
+	SEGA_315_5338A(config, "io"); // ?
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);

@@ -7,6 +7,7 @@
 
 #include "unspdasm.h"
 
+#include <bit>
 #include <climits>
 
 #define LOG_UNSP_MULS            (1U << 1)
@@ -394,11 +395,11 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 
 		if (r4 & 0x8000)
 		{
-			m_core->m_r[REG_R2] = count_leading_ones_32(0xffff0000 | r4) - 17;
+			m_core->m_r[REG_R2] = std::countl_one(r4) - 1;
 		}
 		else
 		{
-			m_core->m_r[REG_R2] = count_leading_zeros_32(r4) - 17; // -17 because count_leading_zeros_32 works with 32-bit values
+			m_core->m_r[REG_R2] = std::countl_zero(r4) - 1;
 		}
 
 		return;

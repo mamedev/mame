@@ -135,7 +135,7 @@ const char *const upd7810_base_disassembler::dasm_s::token_names[] =
 	"GTAX",
 	"GTI",
 	"GTIW",
-	"HALT",
+	"HLT",
 	"IN",   /* 7801 */
 	"INR",
 	"INRW",
@@ -1133,7 +1133,7 @@ const upd7810_base_disassembler::dasm_s upd7810_disassembler::d48_7810[256] =
 	{RLD,    nullptr   }, // 38: 0100 1000 0011 1000
 	{RRD,    nullptr   }, // 39: 0100 1000 0011 1001
 	{NEGA,   nullptr   }, // 3a: 0100 1000 0011 1010
-	{HALT,   nullptr   }, // 3b: 0100 1000 0011 1011
+	{HLT,    nullptr   }, // 3b: 0100 1000 0011 1011
 	{                  }, // 3c: 0100 1000 0011 1100
 	{DIV,    "A"       }, // 3d: 0100 1000 0011 1101
 	{DIV,    "B"       }, // 3e: 0100 1000 0011 1110
@@ -2517,7 +2517,7 @@ const upd7810_base_disassembler::dasm_s upd7807_disassembler::d48_7807[256] =
 	{RLD,    nullptr   }, // 38: 0100 1000 0011 1000
 	{RRD,    nullptr   }, // 39: 0100 1000 0011 1001
 	{NEGA,   nullptr   }, // 3a: 0100 1000 0011 1010
-	{HALT,   nullptr   }, // 3b: 0100 1000 0011 1011
+	{HLT,    nullptr   }, // 3b: 0100 1000 0011 1011
 	{                  }, // 3c: 0100 1000 0011 1100
 	{DIV,    "A"       }, // 3d: 0100 1000 0011 1101
 	{DIV,    "B"       }, // 3e: 0100 1000 0011 1110
@@ -3921,67 +3921,67 @@ const upd7810_base_disassembler::dasm_s upd7801_disassembler::d48_7801[256] = {
 
 const upd7810_base_disassembler::dasm_s upd7801_disassembler::d4C_7801[256] = {
 	// 0x00 - 0x3F
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
 
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
 
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
 
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
 
 	// 0x40 - 0x7F
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
 
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
 
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
 
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
 
 	// 0x80 - 0xBF
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
 
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
 
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
 
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
-	{ IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr }, { IN,      nullptr },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
+	{ IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    }, { IN,      "%A"    },
 
 	// 0xC0 - 0xFF
 	{ MOV,     "A,PA"  }, { MOV,     "A,PB"  }, { MOV,     "A,PC"  }, { MOV,     "A,MK"  },
@@ -4007,67 +4007,67 @@ const upd7810_base_disassembler::dasm_s upd7801_disassembler::d4C_7801[256] = {
 
 const upd7810_base_disassembler::dasm_s upd7801_disassembler::d4D_7801[256] = {
 	// 0x00 - 0x3F
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
 
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
 
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
 
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
 
 	// 0x40 - 0x7F
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
 
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
 
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
 
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
 
 	// 0x80 - 0xBF
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
 
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
 
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
 
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
-	{ OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr }, { OUT,     nullptr },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
+	{ OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    }, { OUT,     "%A"    },
 
 	// 0xC0 - 0xFF
 	{ MOV,     "PA,A"  }, { MOV,     "PB,A"  }, { MOV,    "PC,A"   }, { MOV,     "MK,A"  },
@@ -4437,7 +4437,7 @@ const upd7810_base_disassembler::dasm_s upd7801_disassembler::d74_7801[256] = {
 
 const upd7810_base_disassembler::dasm_s upd7801_disassembler::XX_7801[256] = {
 	// 0x00 - 0x3F
-	{ NOP,     nullptr }, { HALT,    nullptr }, { INX,     "SP"    }, { DCX,     "SP"    },
+	{ NOP,     nullptr }, { HLT,     nullptr }, { INX,     "SP"    }, { DCX,     "SP"    },
 	{ LXI,     "SP,%w" }, { ANIW,    "%a,%b" }, {                  }, { ANI,     "A,%b"  },
 	{ RET,     nullptr }, { SIO,     nullptr }, { MOV,     "A,B"   }, { MOV,     "A,C"   },
 	{ MOV,     "A,D"   }, { MOV,     "A,E"   }, { MOV,     "A,H"   }, { MOV,     "A,L"   },
@@ -5131,7 +5131,7 @@ const upd7810_base_disassembler::dasm_s upd78c05_disassembler::d74_78c05[256] = 
 
 const upd7810_base_disassembler::dasm_s upd78c05_disassembler::XX_78c05[256] = {
 	// 0x00 - 0x3F
-	{ NOP,     nullptr }, { HALT,    nullptr }, { INX,     "SP"    }, { DCX,     "SP"    },
+	{ NOP,     nullptr }, { HLT,     nullptr }, { INX,     "SP"    }, { DCX,     "SP"    },
 	{ LXI,     "SP,%w" }, { ANIW,    "%a,%b" }, {                  }, { ANI,     "A,%b"  },
 	{ RET,     nullptr }, { SIO,     nullptr }, { MOV,     "A,B"   }, { MOV,     "A,C"   },
 	{ MOV,     "A,D"   }, { MOV,     "A,E"   }, { MOV,     "A,H"   }, { MOV,     "A,L"   },
@@ -5232,10 +5232,13 @@ const char *const upd7810_base_disassembler::regname[32] =
 offs_t upd7810_base_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	offs_t idx = pc;
-	const uint8_t op = opcodes.r8(idx++);
+	uint8_t op = opcodes.r8(idx++);
 	const dasm_s *desc = &m_dasmXX[op];
 	if (desc->is_prefix())
-		desc = &desc->prefix_get(opcodes.r8(idx++));
+	{
+		op = opcodes.r8(idx++);
+		desc = &desc->prefix_get(op);
+	}
 
 	util::stream_format(stream, "%-8.8s", desc->name());
 
@@ -5254,6 +5257,9 @@ offs_t upd7810_base_disassembler::disassemble(std::ostream &stream, offs_t pc, c
 			case 'a':   /* address V * 256 + offset */
 				op2 = params.r8(idx++);
 				util::stream_format(stream, "VV:%02X", op2);
+				break;
+			case 'A':   /* I/O address (7801) */
+				util::stream_format(stream, "$%02X", op);
 				break;
 			case 'b':   /* immediate byte */
 				util::stream_format(stream, "$%02X", params.r8(idx++));

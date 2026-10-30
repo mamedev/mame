@@ -146,21 +146,24 @@ void shootoutj_state::palette(palette_device &palette) const
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
+		int bit0, bit1, bit2;
+
 		// red component
-		int bit0 = BIT(color_prom[i], 0);
-		int bit1 = BIT(color_prom[i], 1);
-		int bit2 = BIT(color_prom[i], 2);
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
 		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		// blue component
-		bit0 = 0;
-		bit1 = BIT(color_prom[i], 6);
-		bit2 = BIT(color_prom[i], 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -547,7 +550,7 @@ void shootout_state::shootout(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &shootout_state::audio_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// Guessed parameters based on the 12 MHz XTAL, but they seem reasonable (TODO: Real PCB measurements)
 	screen.set_raw(XTAL(12'000'000) / 2, 384, 0, 256, 262, 8, 248);
 	screen.set_screen_update(FUNC(shootout_state::screen_update));
@@ -574,7 +577,7 @@ void shootoutj_state::shootoutj(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &shootoutj_state::main_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// Guessed parameters based on the 12 MHz XTAL, but they seem reasonable (TODO: Real PCB measurements)
 	screen.set_raw (XTAL(12'000'000) / 2, 384, 0, 256, 262, 8, 248);
 	screen.set_screen_update(FUNC(shootoutj_state::screen_update));

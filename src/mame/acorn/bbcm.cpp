@@ -18,7 +18,10 @@
 
 #include "bus/bbc/modem/modem.h"
 #include "cpu/m6502/g65sc02.h"
+#include "machine/74123.h"
+#include "machine/input_merger.h"
 #include "machine/mc146818.h"
+#include "machine/rescap.h"
 #include "machine/wd_fdc.h"
 
 #include "formats/uef_cas.h"
@@ -45,9 +48,11 @@ public:
 		, m_kbd(*this, "kbd")
 		, m_sn(*this, "sn")
 		, m_rtc(*this, "rtc")
-		, m_wdfdc(*this, "wdfdc")
 		, m_adlc(*this, "mc6854")
 		, m_modem(*this, "modem")
+		, m_wdfdc(*this, "wdfdc")
+		, m_floppy(*this, "wdfdc:%u", 0U)
+		, m_floppy_leds(*this, "floppy%u_led", 0U)
 		, m_power_led(*this, "power_led")
 	{ }
 
@@ -76,18 +81,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	memory_view m_view_lynne;
-	memory_view m_view_hazel;
-	memory_view m_view_andy;
-	memory_view m_view_1mhz;
-	memory_view m_view_tst;
-	required_device<bbc_kbd_device> m_kbd;
-	optional_device<sn76489a_device> m_sn;
-	required_device<mc146818_device> m_rtc;
-	optional_device<wd1770_device> m_wdfdc;
-	required_device<mc6854_device> m_adlc;
-	optional_device<bbc_modem_slot_device> m_modem;
-	output_finder<> m_power_led;
+	template<int floppy> void floppy_led_cb(floppy_image_device *, int state);
 
 	void bbcm_fetch(address_map &map) ATTR_COLD;
 	void bbcm_base(address_map &map) ATTR_COLD;
@@ -119,6 +113,21 @@ private:
 	uint8_t sysvia_pb_r();
 	void sysvia_pb_w(uint8_t data);
 
+	memory_view m_view_lynne;
+	memory_view m_view_hazel;
+	memory_view m_view_andy;
+	memory_view m_view_1mhz;
+	memory_view m_view_tst;
+	required_device<bbc_kbd_device> m_kbd;
+	optional_device<sn76489a_device> m_sn;
+	required_device<mc146818_device> m_rtc;
+	required_device<mc6854_device> m_adlc;
+	optional_device<bbc_modem_slot_device> m_modem;
+	optional_device<wd1770_device> m_wdfdc;
+	optional_device_array<floppy_connector, 2> m_floppy;
+	output_finder<2> m_floppy_leds;
+	output_finder<> m_power_led;
+
 	int m_mc146818_as = 0;
 	int m_mc146818_ce = 0;
 
@@ -139,11 +148,20 @@ private:
 };
 
 
+template<int floppy> void bbcm_state::floppy_led_cb(floppy_image_device *, int state)
+{
+	m_floppy_leds[floppy] = state;
+}
+
+
 void bbcm_state::machine_start()
 {
 	bbc_state::machine_start();
 
-	m_power_led.resolve();
+	if (m_floppy[0] && m_floppy[0]->get_device())
+		m_floppy[0]->get_device()->setup_led_cb(floppy_image_device::led_cb(&bbcm_state::floppy_led_cb<0>, this));
+	if (m_floppy[1] && m_floppy[1]->get_device())
+		m_floppy[1]->get_device()->setup_led_cb(floppy_image_device::led_cb(&bbcm_state::floppy_led_cb<1>, this));
 
 	save_item(NAME(m_acccon));
 	save_item(NAME(m_sdb));
@@ -576,11 +594,21 @@ void bbcm_state::drive_control_w(uint8_t data)
 	//  1        Drive select 1
 	//  0        Drive select 0
 
+	int ds = -1;
+
 	floppy_image_device *floppy = nullptr;
 
 	// bit 0, 1, 3: drive select
-	if (BIT(data, 0)) floppy = m_wdfdc->subdevice<floppy_connector>("0")->get_device();
-	if (BIT(data, 1)) floppy = m_wdfdc->subdevice<floppy_connector>("1")->get_device();
+	if (BIT(data, 0)) ds = 0;
+	if (BIT(data, 1)) ds = 1;
+
+	for (auto &conn : m_floppy)
+	{
+		floppy = conn->get_device();
+		if (floppy)
+			floppy->ds_w(ds);
+	}
+	floppy = (ds != -1) ? m_floppy[ds]->get_device() : nullptr;
 	m_wdfdc->set_floppy(floppy);
 
 	// bit 4: side select
@@ -667,7 +695,7 @@ void bbcm_state::bbcmet(machine_config &config)
 
 	RAM(config, m_ram).set_default_size("128K");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
 	m_screen->set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
@@ -712,14 +740,29 @@ void bbcm_state::bbcmet(machine_config &config)
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(m_irqs, FUNC(input_merger_device::in_w<7>));
 
+	ttl74123_device &txen(TTL74123(config, "txen", RES_K(220), CAP_U(47)));
+	txen.set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	txen.set_a_pin_value(0);
+	txen.set_b_pin_value(1);
+	txen.set_clear_pin_value(0);
+	txen.out_cb().set("network", FUNC(econet_device::host_rts_w));
+
 	MC6854(config, m_adlc);
 	m_adlc->out_txd_cb().set("network", FUNC(econet_device::host_data_w));
 	m_adlc->out_irq_cb().set(FUNC(bbcm_state::adlc_irq_w));
+	m_adlc->out_rts_cb().set(txen, FUNC(ttl74123_device::clear_w));
+	m_adlc->out_rts_cb().append(m_adlc, FUNC(mc6854_device::set_cts)).invert();
 
-	econet_device &econet(ECONET(config, "network", 0));
+	ttl74123_device &clkdet(TTL74123(config, "clkdet", RES_K(39), CAP_N(2.2)));
+	clkdet.set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	clkdet.set_b_pin_value(1);
+	clkdet.set_clear_pin_value(1);
+	clkdet.out_cb().set(m_adlc, FUNC(mc6854_device::set_dcd)).invert();
+
+	econet_device &econet(ECONET(config, "network"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
-	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::set_cts)).invert();
+	econet.clk_wr_callback().append(clkdet, FUNC(ttl74123_device::a_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
 	ECONET_SLOT(config, "econet", "network", econet_devices);
 
@@ -798,8 +841,8 @@ void bbcm_state::bbcm(machine_config &config)
 	m_wdfdc->intrq_wr_callback().set(FUNC(bbcm_state::fdc_intrq_w));
 	m_wdfdc->drq_wr_callback().set(FUNC(bbcm_state::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, "wdfdc:0", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "wdfdc:1", bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], bbc_floppies, "525qd", bbc_state::floppy_formats).enable_sound(true);
 
 	BBC_1MHZBUS_SLOT(config, m_1mhzbus, 16_MHz_XTAL / 16, bbcm_1mhzbus_devices, nullptr);
 	m_1mhzbus->add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -888,8 +931,8 @@ void bbcm_state::cfa3000(machine_config &config)
 {
 	bbcm(config);
 
-	m_wdfdc->subdevice<floppy_connector>("0")->set_default_option(nullptr);
-	m_wdfdc->subdevice<floppy_connector>("1")->set_default_option(nullptr);
+	m_floppy[0]->set_default_option(nullptr);
+	m_floppy[1]->set_default_option(nullptr);
 
 	// LK18 and LK19 are set to enable rom, disabling ram
 	m_rom[0x04]->set_default_option("rom").set_fixed(true);

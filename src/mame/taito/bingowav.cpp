@@ -134,7 +134,7 @@ void bingowav_state::bingowav(machine_config &config)
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
 	tc0140syt.nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
 	tc0140syt.reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 

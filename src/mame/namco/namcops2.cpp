@@ -26,8 +26,9 @@ Games on System 246/256/S256 include.....
                                                                                Media Type             Game ID &
 Name from title screen                           System   Media ID            (HDD/CD/DVD)  Cart ID   Revision               Company/Year                  Notes
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Battle Gear 3 (Japan)........................... XX34XXX  M9005793A VER.2.04J  HDD (20GB)   NM00010   B3900065A              Taito 2002                    \  HDD: Western Digital WD200EB
-Battle Gear 3 (Export).......................... XX34XXX  M9005793A VER.2.04J  HDD (20GB)   NM00010  *B3900068A(?)           Taito 2002                     | All require Taito JVS Universal I/O board K91X0951A otherwise no boot-up; dongle selects region using same HDDs
+Battle Gear 3 (Japan)........................... XX34XXX  M9005793A VER.2.04J  HDD (20GB)   NM00010   B3900065A              Taito 2002                    \  HDD: Western Digital WD200EB; all require Taito JVS Universal I/O board K91X0951A otherwise no boot-up
+Battle Gear 3 (Export).......................... XX34XXX  M9005793A VER.2.04J  HDD (20GB)   NM00010  *B3900065B/C(?)         Taito 2002                     | Dongle selects region (J/O) using same HDDs
+Battle Gear 3 (Export, Offline)................. XX34XXX  M900????A VER.2.0xE? HDD (20GB)   NM00010? *B3900071A              Taito 2002                     | No online service (NESYS) support, instead having local leaderboards
 Battle Gear 3 (US).............................. ------X  M9005951A VER.2.00A  HDD (30GB)   NM00010?  B3900068A              Taito 2002                     | 2004 Betson release; contrary to flyer, does *not* remove Honda cars (contrast sidebs2u/batlgear)
 Battle Gear 3 Tuned (Japan)..................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015  *B3900074B              Taito 2003                     | HDD: Maxtor Fireball 3 30GB 2F030L0
 Battle Gear 3 Tuned (Export).................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015   B3900074C              Taito 2003                     |
@@ -944,7 +945,7 @@ void namcops2_state::system246(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcops2_state::ps2_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(namcops2_state::screen_update));
 	screen.set_size(640, 480);
@@ -1454,11 +1455,14 @@ ROM_START( rrvac )
 	ROM_LOAD( "rrv3vera.ic002", 0x000000, 0x800000, CRC(dd20c4a2) SHA1(07bddaac958ac62d9fc29671fc83bd1e3b27f4b8) )
 	ROM_LOAD( "rrv3vera_spr.ic002", 0x800000, 0x040000, CRC(712e0e9a) SHA1(d396aaf918036ff7f909a84daefe8f651fdf9b05) )
 
-	ROM_REGION(0xc000, "jvsio", 0)  // Namco "FCA" JVS I/O board PIC16F84 code (see namcos23.cpp for FCA details)
-	ROM_LOAD( "fcap11.ic2",   0x000000, 0x004010, CRC(1b2592ce) SHA1(a1a487361053af564f6ec67e545413e370a3b38c) )
+	// Namco "FCA" JVS I/O board PIC16F84 code (see namcos23.cpp for FCA details)
+	ROM_REGION16_LE(0x4280, "jvsio_pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "fcap11.ic2", 0x0000, 0x4010, CRC(1b2592ce) SHA1(a1a487361053af564f6ec67e545413e370a3b38c) )
+
 	// Fujitsu MB90F574 code, partial dumps, only last 48KB of 256KB flash was extracted
-	ROM_LOAD( "fcaf11.ic4",     0x000000, 0x00c000, BAD_DUMP CRC(9794f16b) SHA1(94e1c036a6d23d39b2ad69dd1ad2cfa6163287e0) ) // almost good dump, all JVS related code and data is in place
-	ROM_LOAD( "fcb1_io-0b.ic4", 0x000000, 0x00c000, BAD_DUMP CRC(5e25b73f) SHA1(fa805a422ff8793989b0ce901cc868ec1a87c7ac) ) // most JVS handling code is in undumped area
+	ROM_REGION(0xc000, "jvsio_mb", 0)
+	ROM_LOAD( "fcaf11.ic4",     0x0000, 0xc000, BAD_DUMP CRC(9794f16b) SHA1(94e1c036a6d23d39b2ad69dd1ad2cfa6163287e0) ) // almost good dump, all JVS related code and data is in place
+	ROM_LOAD( "fcb1_io-0b.ic4", 0x0000, 0xc000, BAD_DUMP CRC(5e25b73f) SHA1(fa805a422ff8793989b0ce901cc868ec1a87c7ac) ) // most JVS handling code is in undumped area
 
 	ROM_REGION(0x80000, "steering", 0)  // Steering I/O board MB90242A code (see namcos23.cpp for steering board details)
 	ROM_LOAD( "rrv3_str-0a.ic16", 0x000000, 0x080000, CRC(df8b6cac) SHA1(d45e150678218084925673e1d77edefc04135035) )
@@ -1475,9 +1479,12 @@ ROM_START( rrvac2 )
 	ROM_LOAD( "rrv2vera.ic002", 0x000000, 0x800000, CRC(4666f6b5) SHA1(974ed4f6c5869ecf879c0d3540db6ea576225c04) )
 	ROM_LOAD( "rrv2vera_spr.ic002", 0x800000, 0x040000, CRC(8d98ef04) SHA1(3f33046a8283b918226301fcf5538729be84bfbe) )
 
-	ROM_REGION(0xc000, "jvsio", 0)  // Namco "FCA" JVS I/O board PIC16F84 code (see namcos23.cpp for FCA details)
-	ROM_LOAD( "fcap11.ic2",   0x000000, 0x004010, CRC(1b2592ce) SHA1(a1a487361053af564f6ec67e545413e370a3b38c) )
+	// Namco "FCA" JVS I/O board PIC16F84 code (see namcos23.cpp for FCA details)
+	ROM_REGION16_LE(0x4280, "jvsio_pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "fcap11.ic2", 0x0000, 0x4010, CRC(1b2592ce) SHA1(a1a487361053af564f6ec67e545413e370a3b38c) )
+
 	// Fujitsu MB90F574 code, partial dumps, only last 48KB of 256KB flash was extracted
+	ROM_REGION(0xc000, "jvsio_mb", 0)
 	ROM_LOAD( "fcaf11.ic4",     0x000000, 0x00c000, BAD_DUMP CRC(9794f16b) SHA1(94e1c036a6d23d39b2ad69dd1ad2cfa6163287e0) ) // almost good dump, all JVS related code and data is in place
 	ROM_LOAD( "fcb1_io-0b.ic4", 0x000000, 0x00c000, BAD_DUMP CRC(5e25b73f) SHA1(fa805a422ff8793989b0ce901cc868ec1a87c7ac) ) // most JVS handling code is in undumped area
 
@@ -1497,9 +1504,12 @@ ROM_START( rrvac1 )
 	ROM_LOAD( "rrv1vera.ic002", 0x000000, 0x800000, CRC(e28bb0be) SHA1(9683ddc228e9aedd338cf2eb4d4373faeaea5b75) )
 	ROM_LOAD( "rrv1vera_spr.ic002", 0x800000, 0x040000, CRC(81c370b7) SHA1(7693c03b544c79fa3b6e536abb32ad34cf14dfbf) )
 
-	ROM_REGION(0xc000, "jvsio", 0)  // Namco "FCA" JVS I/O board PIC16F84 code (see namcos23.cpp for FCA details)
-	ROM_LOAD( "fcap11.ic2",   0x000000, 0x004010, CRC(1b2592ce) SHA1(a1a487361053af564f6ec67e545413e370a3b38c) )
+	// Namco "FCA" JVS I/O board PIC16F84 code (see namcos23.cpp for FCA details)
+	ROM_REGION16_LE(0x4280, "jvsio_pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "fcap11.ic2", 0x0000, 0x4010, CRC(1b2592ce) SHA1(a1a487361053af564f6ec67e545413e370a3b38c) )
+
 	// Fujitsu MB90F574 code, partial dumps, only last 48KB of 256KB flash was extracted
+	ROM_REGION(0xc000, "jvsio_mb", 0)
 	ROM_LOAD( "fcaf11.ic4",     0x000000, 0x00c000, BAD_DUMP CRC(9794f16b) SHA1(94e1c036a6d23d39b2ad69dd1ad2cfa6163287e0) ) // almost good dump, all JVS related code and data is in place
 	ROM_LOAD( "fcb1_io-0b.ic4", 0x000000, 0x00c000, BAD_DUMP CRC(5e25b73f) SHA1(fa805a422ff8793989b0ce901cc868ec1a87c7ac) ) // most JVS handling code is in undumped area
 

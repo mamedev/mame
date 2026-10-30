@@ -12,12 +12,15 @@ Acorn BBC Micro - ARM Co-Processor discs
 
 <softwarelist name="bbc_flop_arm" description="Acorn ARM Co-Processor discs">
 
+	<!-- ARM Evaluation System -->
+
 	<software name="armevals">
 		<description>ARM Evaluation System Discs</description>
 		<year>1986</year>
 		<publisher>Acorn Computers</publisher>
 		<info name="format" value="ADFS" />
 		<info name="usage" value="Requires ARM co-processor" />
+		<sharedfeat name="compatibility" value="ARM"/>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disc 1: TWIN and ASSEMBLER"/>
 			<dataarea name="flop" size="655360">
@@ -52,6 +55,231 @@ Acorn BBC Micro - ARM Co-Processor discs
 			<feature name="part_id" value="Disc 6: FORTRAN 77"/>
 			<dataarea name="flop" size="655360">
 				<rom name="armevaluationsystem-disc6.adl" size="655360" crc="3545ff34" sha1="88a74bfe6eb864574be41e09a6f338f5895bc980"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="armc">
+		<description>ARM C Compiler</description>
+		<year>1986</year>
+		<publisher>Acorn Computers</publisher>
+		<info name="format" value="ADFS"/>
+		<info name="usage" value="Requires ARM co-processor"/>
+		<sharedfeat name="compatibility" value="ARM"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="ARM C Compiler"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ARM_C_Compiler.adl" size="655360" crc="10b30ee9" sha1="1a94241f7fbdc69c0c8031fb8a36bbb2641b9e2e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Kit for making ARM C language extension libraries"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ARM_C_ExtLib.adl" size="655360" crc="ef185f8b" sha1="bfb699b07d6cc1125afe62936045e404787b6648"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bcpl">
+		<description>ARM BCPL</description>
+		<year>1986</year>
+		<publisher>Acorn Computers</publisher>
+		<info name="format" value="ADFS"/>
+		<info name="usage" value="Requires ARM co-processor"/>
+		<sharedfeat name="compatibility" value="ARM"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="ARM_BCPL.adl" size="655360" crc="e4c76291" sha1="9a915ed7173770b80d6c272eb25badbce4341d76"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="modula2">
+		<description>ARM Modula-2</description>
+		<year>1986</year>
+		<publisher>Acorn Computers</publisher>
+		<info name="format" value="ADFS"/>
+		<info name="usage" value="Requires ARM co-processor"/>
+		<sharedfeat name="compatibility" value="ARM"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 1: m2c, m2l v420"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ARM_Modula-2_Disc1.adl" size="655360" crc="56adc44a" sha1="ac6becac0f0cfff3f7753f68f7beef2485017cfe"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 2: m2db, m2db-split v420 B-release"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ARM_Modula-2_Disc2.adl" size="655360" crc="5309d78e" sha1="fd0bc837d75e288696f0db78bd17e1ccd0b0bd93"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 3: appm2db v420, appm2db v430"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ARM_Modula-2_Disc3.adl" size="655360" crc="3b953872" sha1="b80530604d396fd3131da4eb3516e1879be65db5"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 4: m2db, m2db-split, appm2db v430"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ARM_Modula-2_Disc4.adl" size="655360" crc="63b76822" sha1="38cdc89da30ac4824c7456fd91e45a1e9f96baa9"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 5: m2db, m2db-split v430 A-test"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ARM_Modula-2_Disc5.adl" size="655360" crc="b3e7e3ca" sha1="711e21f5457a886299ef960d57538cdb2c0fffca"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 6: m2c v215, m2l v186A, rm v103"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ARM_Modula-2_Disc6.adl" size="655360" crc="0de91f8e" sha1="46b9c64795e0605f742f2f17985f86640abdf441"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="32K versions of compactcf, libfile, m2dep, m2make, mergecf, objlib, parallel"/>
+			<dataarea name="flop" size="655360">
+				<rom name="ARM_Modula-2_32k.adl" size="655360" crc="b498659c" sha1="fb1dd24d2d5e20e6e5ad158e3416d18a1719d405"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ncroftc">
+		<description>ARM Norcroft C Compiler v0.15</description>
+		<year>1986</year>
+		<publisher>Acorn Computers</publisher>
+		<info name="format" value="ADFS"/>
+		<info name="usage" value="Requires ARM co-processor"/>
+		<sharedfeat name="compatibility" value="ARM"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="ARM_Norcroft_C_v0.15.adl" size="655360" crc="68c2e8c3" sha1="6234bd798ed127bce6afdd1d7caa572fd67859fb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- A500 2nd processor -->
+
+	<software name="arthurc" supported="no">
+		<description>Arthur C Compiler</description>
+		<year>1987</year>
+		<publisher>Acorn Computers</publisher>
+		<info name="format" value="ADFS"/>
+		<info name="usage" value="Requires A500 2nd processor"/>
+		<sharedfeat name="compatibility" value="A500"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="Arthur_C.adl" size="655360" crc="cf571a6b" sha1="77b321b2ca2a984a25db409af61f8e9133d6b650"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arthurr3" supported="no">
+		<description>Arthur Release 3</description>
+		<year>1987</year>
+		<publisher>Acorn Computers</publisher>
+		<info name="format" value="ADFS"/>
+		<info name="usage" value="Requires A500 2nd processor"/>
+		<sharedfeat name="compatibility" value="A500"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 1"/>
+			<dataarea name="flop" size="655360">
+				<rom name="Arthur_Rel3_Disc1.adl" size="655360" crc="a2a3f4ed" sha1="3459f8b0232dde367381d963d39a5f4f5de1ca80"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 2"/>
+			<dataarea name="flop" size="655360">
+				<rom name="Arthur_Rel3_Disc2.adl" size="655360" crc="8ac315b2" sha1="584f48724c77fa237df66040a2efada80d79ac59"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disc 3"/>
+			<dataarea name="flop" size="655360">
+				<rom name="Arthur_Rel3_Disc3.adl" size="655360" crc="c55af2ea" sha1="4cc946b9ddbcaa71175fd51d4caf2d7bb8d608ac"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Supplement 1"/>
+			<dataarea name="flop" size="655360">
+				<rom name="Arthur_Rel3_Supp1.adl" size="655360" crc="a1a8c2e0" sha1="621a763f38d5e52a8cb6a17e3ab6233f7438d11d"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Supplement 1a WIMP/Font"/>
+			<dataarea name="flop" size="655360">
+				<rom name="Arthur_Rel3_Supp1a.adl" size="655360" crc="2800de6f" sha1="cc74188e1fbb37d02ff11f71b0c84d5a6b00bf10"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- ARM7TDMI 2nd processor -->
+
+	<software name="beeb35">
+		<description>Beeb@35 Demo</description>
+		<year>2017</year>
+		<publisher>Greg Cook</publisher>
+		<info name="format" value="DFS"/>
+		<info name="usage" value="Requires ARM7TDMI co-processor"/>
+		<sharedfeat name="compatibility" value="ARM7"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="6656">
+				<rom name="Beeb35.ssd" size="6656" crc="9ba48456" sha1="be41cd9aa38b6c16b779bf6134c912e9bdcafc7b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elitetnk">
+		<description>Elite - The New Kind</description>
+		<year>2021</year>
+		<publisher>DudleySoft</publisher>
+		<info name="format" value="ADFS"/>
+		<info name="usage" value="Requires ARM7TDMI co-processor"/>
+		<sharedfeat name="compatibility" value="ARM7"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="Elite-TNK.adl" size="655360" crc="8413fdbe" sha1="33a54aa8df0e349c18cea8298a9e7485afcc3a38"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rickd">
+		<description>Rick Dangerous (MODE1)</description>
+		<year>2021</year>
+		<publisher>DudleySoft</publisher>
+		<info name="usage" value="Requires ARM7TDMI co-processor"/>
+		<sharedfeat name="compatibility" value="ARM7"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="Rick_Dangerous_Mode1.ssd" size="204800" crc="3a9d9500" sha1="474495477eba00ad7b65ebedb8cd9b0b88adce40"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rickd2" cloneof="rickd">
+		<description>Rick Dangerous (MODE2)</description>
+		<year>2021</year>
+		<publisher>DudleySoft</publisher>
+		<info name="usage" value="Requires ARM7TDMI co-processor"/>
+		<sharedfeat name="compatibility" value="ARM7"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="Rick_Dangerous_Mode2.adf" size="327680" crc="dd422c3b" sha1="2692aa6f869d4574f32ffc33622f905e4cd64d19"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tge">
+		<description>The Great Escape</description>
+		<year>2021</year>
+		<publisher>DudleySoft</publisher>
+		<info name="format" value="DFS"/>
+		<info name="usage" value="Requires ARM7TDMI co-processor"/>
+		<sharedfeat name="compatibility" value="ARM7"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="The_Great_Escape.ssd" size="204800" crc="8840c061" sha1="e1e1c62a6beb463021cb84f3faf170cae8fb3f44"/>
 			</dataarea>
 		</part>
 	</software>

@@ -8,7 +8,11 @@
 
 #include "emu.h"
 #include "turbo.h"
+
 #include "video/resnet.h"
+
+#include <bit>
+
 
 static constexpr uint32_t sprite_expand[16] =
 {
@@ -357,7 +361,7 @@ uint32_t turbo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	uint8_t const *const pr1123 = &m_proms[0xc00];
 
 	// loop over rows
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t const *const fore = &fgpixmap.pix(y);
 		uint16_t *const dest = &bitmap.pix(y);
@@ -375,7 +379,7 @@ uint32_t turbo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		prepare_sprites(y);
 
 		// loop over columns
-		for (int x = 0; x <= cliprect.max_x; x += TURBO_X_SCALE)
+		for (int x = 0; x <= cliprect.right(); x += TURBO_X_SCALE)
 		{
 			int xx = x / TURBO_X_SCALE;
 
@@ -703,7 +707,7 @@ uint32_t subroc3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	uint8_t const *const pr1454 = &m_proms[0x920];
 
 	// loop over rows
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t const *const fore = &fgpixmap.pix(y);
 		uint16_t *const dest = &bitmap.pix(y);
@@ -713,7 +717,7 @@ uint32_t subroc3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		prepare_sprites(y);
 
 		// loop over columns
-		for (int x = 0; x <= cliprect.max_x; x += TURBO_X_SCALE)
+		for (int x = 0; x <= cliprect.right(); x += TURBO_X_SCALE)
 		{
 			uint8_t xx = x / TURBO_X_SCALE;
 
@@ -917,7 +921,7 @@ uint32_t buckrog_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	uint8_t const *const pr5199 = &m_proms[0x700];
 
 	// loop over rows
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t const *const fore = &fgpixmap.pix(y);
 		uint16_t *const dest = &bitmap.pix(y);
@@ -927,7 +931,7 @@ uint32_t buckrog_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		prepare_sprites(y);
 
 		// loop over columns
-		for (int x = 0; x <= cliprect.max_x; x += TURBO_X_SCALE)
+		for (int x = 0; x <= cliprect.right(); x += TURBO_X_SCALE)
 		{
 			uint8_t xx = x / TURBO_X_SCALE;
 			int offs;
@@ -962,7 +966,7 @@ uint32_t buckrog_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 				uint32_t sprbits = get_sprite_bits(&plb);
 
 				// the PLB bits go into an LS148 8-to-3 decoder and become MUX0-3 (PROM board SH 2/10)
-				uint8_t mux = count_leading_zeros_32(bitswap<8>(plb,0,1,2,3,4,5,6,7)) - 24;
+				uint8_t mux = std::countl_zero(bitswap<8>(plb,0,1,2,3,4,5,6,7));
 				if (mux == 8) mux = 0xf;
 
 				// MUX then selects one of the sprites and selects CD0-3

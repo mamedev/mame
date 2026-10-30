@@ -204,9 +204,6 @@ INPUT_PORTS_END
 
 void sitcom_state::machine_start()
 {
-	m_digits.resolve();
-	m_leds.resolve();
-
 	save_item(NAME(m_rxd));
 
 	m_rxd = true;
@@ -302,9 +299,6 @@ TIMER_CALLBACK_MEMBER(sitcom_timer_state::shutter_tick)
 void sitcom_timer_state::machine_start()
 {
 	sitcom_state::machine_start();
-
-	m_test_led.resolve();
-	m_dac.resolve();
 
 	m_shutter_timer = timer_alloc(FUNC(sitcom_timer_state::shutter_tick), this);
 

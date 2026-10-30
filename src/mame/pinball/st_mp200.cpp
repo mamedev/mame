@@ -92,13 +92,13 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void st_mp201(machine_config &config);
-	void st_mp200(machine_config &config);
-	void st_sam4(machine_config &config);
+	void st_mp201(machine_config &config) ATTR_COLD;
+	void st_mp200(machine_config &config) ATTR_COLD;
+	void st_sam4(machine_config &config) ATTR_COLD;
 
-	void init_st_mp200();
-	void init_st_mp201();
-	void init_st_mp202();
+	void init_st_mp200() ATTR_COLD;
+	void init_st_mp201() ATTR_COLD;
+	void init_st_mp202() ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
@@ -568,9 +568,6 @@ void st_mp200_state::u11_b_w(u8 data)
 void st_mp200_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_digits.resolve();
-	m_io_leds.resolve();
-	m_io_outputs.resolve();
 
 	save_item(NAME(m_u10a));
 	save_item(NAME(m_u10b));

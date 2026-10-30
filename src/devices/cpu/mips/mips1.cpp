@@ -58,24 +58,21 @@ enum exception : u32
 	EXCEPTION_BADCOP3   = 0x3000002c,
 };
 
-enum cop0_reg : u8
-{
-	COP0_Index    = 0,
-	COP0_Random   = 1,
-	COP0_EntryLo  = 2,
-	COP0_BusCtrl  = 2,  // r3041 only
-	COP0_Config   = 3,  // r3041/r3071/r3081 only
-	COP0_Context  = 4,
-	COP0_BadVAddr = 8,
-	COP0_Count    = 9,  // r3041 only
-	COP0_EntryHi  = 10,
-	COP0_PortSize = 10, // r3041 only
-	COP0_Compare  = 11, // r3041 only
-	COP0_Status   = 12,
-	COP0_Cause    = 13,
-	COP0_EPC      = 14,
-	COP0_PRId     = 15,
-};
+constexpr u8 COP0_Index    = 0;
+constexpr u8 COP0_Random   = 1;
+constexpr u8 COP0_EntryLo  = 2;
+constexpr u8 COP0_BusCtrl  = 2;  // r3041 only
+constexpr u8 COP0_Config   = 3;  // r3041/r3071/r3081 only
+constexpr u8 COP0_Context  = 4;
+constexpr u8 COP0_BadVAddr = 8;
+constexpr u8 COP0_Count    = 9;  // r3041 only
+constexpr u8 COP0_EntryHi  = 10;
+constexpr u8 COP0_PortSize = 10; // r3041 only
+constexpr u8 COP0_Compare  = 11; // r3041 only
+constexpr u8 COP0_Status   = 12;
+constexpr u8 COP0_Cause    = 13;
+constexpr u8 COP0_EPC      = 14;
+constexpr u8 COP0_PRId     = 15;
 
 enum sr_mask : u32
 {
@@ -291,6 +288,18 @@ iop_device::iop_device(machine_config const &mconfig, char const *tag, device_t 
 	m_endianness = ENDIANNESS_LITTLE;
 }
 
+mips1core_device_base::translate_result iop_device::translate(int intention, offs_t &address, bool debug)
+{
+	// kuseg maps 1:1 without the IDT base-part offset, and the only data cache is the scratchpad
+	if (BIT(address, 31))
+	{
+		translate_result const result = mips1core_device_base::translate(intention, address, debug);
+		return (result == ERROR) ? ERROR : UNCACHED;
+	}
+
+	return UNCACHED;
+}
+
 void mips1core_device_base::device_start()
 {
 	// set our instruction counter
@@ -304,7 +313,7 @@ void mips1core_device_base::device_start()
 	state_add(MIPS1_COP0 + COP0_Status,   "SR",        m_cop0[COP0_Status]);
 
 	for (unsigned i = 0; i < std::size(m_r); i++)
-		state_add(MIPS1_R0 + i, util::string_format("R%d", i).c_str(), m_r[i]);
+		state_add(MIPS1_R0 + i, util::string_format("R%d", i), m_r[i]);
 
 	state_add(MIPS1_HI, "HI", m_hi);
 	state_add(MIPS1_LO, "LO", m_lo);
@@ -1117,7 +1126,8 @@ std::tuple<struct mips1core_device_base::cache::line &, bool> mips1core_device_b
 }
 
 // compute bit position of sub-unit within a word given endianness and address
-template <typename T> unsigned mips1core_device_base::shift_factor(u32 address) const
+template <typename T>
+unsigned mips1core_device_base::shift_factor(u32 address) const
 {
 	if constexpr (sizeof(T) == 1)
 		return ((m_endianness == ENDIANNESS_BIG) ? (address & 3) ^ 3 : (address & 3)) * 8;
@@ -1127,7 +1137,8 @@ template <typename T> unsigned mips1core_device_base::shift_factor(u32 address) 
 		return 0;
 }
 
-template <typename T, bool Aligned, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, void> mips1core_device_base::load(u32 address, U &&apply)
+template <typename T, bool Aligned, typename U>
+std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, void> mips1core_device_base::load(offs_t address, U &&apply)
 {
 	// alignment error
 	if (Aligned && (address & (sizeof(T) - 1)))
@@ -1204,7 +1215,8 @@ template <typename T, bool Aligned, typename U> std::enable_if_t<std::is_convert
 	apply(data);
 }
 
-template <typename T, bool Aligned> void mips1core_device_base::store(u32 address, T data, T mem_mask)
+template <typename T, bool Aligned>
+void mips1core_device_base::store(offs_t address, T data, T mem_mask)
 {
 	// alignment error
 	if (Aligned && (address & (sizeof(T) - 1)))
@@ -1274,7 +1286,7 @@ template <typename T, bool Aligned> void mips1core_device_base::store(u32 addres
 	}
 }
 
-void mips1core_device_base::fetch(u32 address, std::function<void(u32)> &&apply)
+void mips1core_device_base::fetch(offs_t address, std::function<void(u32)> &&apply)
 {
 	// alignment error
 	if (address & 3)
@@ -1339,7 +1351,7 @@ void mips1_device_base::device_start()
 	{
 		state_add(MIPS1_FCR31, "FCSR", m_fcr31);
 		for (unsigned i = 0; i < std::size(m_f); i++)
-			state_add(MIPS1_F0 + i, util::string_format("F%d", i * 2).c_str(), m_f[i]);
+			state_add(MIPS1_F0 + i, util::string_format("F%d", i * 2), m_f[i]);
 	}
 
 	save_item(NAME(m_reset_time));

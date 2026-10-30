@@ -189,7 +189,7 @@
 
 #include "emu.h"
 #include "cpu/pic16c5x/pic16c5x.h"
-#include "cpu/pic16x8x/pic16x8x.h"
+#include "cpu/pic16_mid/pic16_mid.h"
 #include "machine/ds1207.h"
 #include "machine/ds2401.h"
 #include "machine/i2cmem.h"
@@ -197,11 +197,10 @@
 #include "machine/nvram.h"
 #include "machine/scc66470.h"
 #include "machine/scc68070.h"
-#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/saa1099.h"
-#include "video/ramdac.h"
-#include "emupal.h"
+#include "video/bt47x.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -225,27 +224,24 @@ enum
 
 class magicard_base_state : public driver_device
 {
-public:
+protected:
 	magicard_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		, m_palette(*this, "palette")
+		, m_ramdac(*this, "ramdac")
 		, m_scc66470(*this,"scc66470")
 		, m_i2cmem(*this, "sereeprom")
 		, m_lamps(*this, "lamp%u", 1U)
 
 	{ }
 
-	void magicard_base(machine_config &config);
+	void magicard_base(machine_config &config) ATTR_COLD;
 
-protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	void ramdac_map(address_map &map) ATTR_COLD;
 
 	void dram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t dram_r(offs_t offset, uint16_t mem_mask);
@@ -267,7 +263,7 @@ protected:
 
 	required_device<scc68070_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	required_device<bt476_device> m_ramdac;
 	required_device<scc66470_device> m_scc66470;
 	required_device<i2cmem_device> m_i2cmem;
 
@@ -292,11 +288,11 @@ public:
 		, m_ds1207(*this, "ds1207")
 	{ }
 
-	void magicard_pic54(machine_config &config);
-	void magicard(machine_config &config);
-	void magicard_pic56(machine_config &config);
+	void magicard_pic54(machine_config &config) ATTR_COLD;
+	void magicard(machine_config &config) ATTR_COLD;
+	void magicard_pic56(machine_config &config) ATTR_COLD;
 
-	void init_dallaspk();
+	void init_dallaspk() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -324,12 +320,12 @@ public:
 		, m_rtc(*this, "rtc")
 	{ }
 
-	void hotslots_base(machine_config &config);
-	void hotslots(machine_config &config);
-	void hotslots_pic54(machine_config &config);
-	void magicle(machine_config &config);
-	void puzzleme(machine_config &config);
-	void simpbest(machine_config &config);
+	void hotslots_base(machine_config &config) ATTR_COLD;
+	void hotslots(machine_config &config) ATTR_COLD;
+	void hotslots_pic54(machine_config &config) ATTR_COLD;
+	void magicle(machine_config &config) ATTR_COLD;
+	void puzzleme(machine_config &config) ATTR_COLD;
+	void simpbest(machine_config &config) ATTR_COLD;
 
 private:
 	void hotslots_map_base(address_map &map) ATTR_COLD;
@@ -351,7 +347,6 @@ private:
 
 void magicard_base_state::machine_start()
 {
-	m_lamps.resolve();
 	m_dram = make_unique_clear<uint16_t []>(0x80000 / 2);
 	save_pointer(NAME(m_dram), 0x80000 / 2);
 	save_item(NAME(m_sda_state));
@@ -418,7 +413,7 @@ uint32_t magicard_base_state::screen_update_magicard(screen_device &screen, bitm
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			*dest++ = m_palette->pen(buffer[ x ]);
+			*dest++ = m_ramdac->pen(buffer[ x ]);
 		}
 	}
 	return 0;
@@ -522,9 +517,7 @@ void magicard_state::magicard_map(address_map &map)
 	map(0x001ffc00, 0x001ffc01).portr("IN0");
 	map(0x001ffc40, 0x001ffc41).portr("IN1");
 	map(0x001ffc80, 0x001ffc81).w( FUNC(magicard_state::output_w));
-	map(0x001ffd01, 0x001ffd01).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x001ffd03, 0x001ffd03).w("ramdac", FUNC(ramdac_device::pal_w));
-	map(0x001ffd05, 0x001ffd05).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x001ffd00, 0x001ffd07).w(m_ramdac, FUNC(bt476_device::write)).umask16(0x00ff);
 	map(0x001ffd40, 0x001ffd43).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
 	map(0x001ffd80, 0x001ffd81).rw(FUNC(magicard_state::read_ds1207), FUNC(magicard_state::write_ds1207)).umask16(0x00ff);
 	map(0x001fff80, 0x001fffbf).ram(); //DRAM I/O, not accessed by this game, CD buffer?
@@ -545,11 +538,8 @@ void hotslots_state::hotslots_map_base(address_map &map)
 	map(0x00411000, 0x00411001).portr("IN0");
 	map(0x00412346, 0x00412347).portr("IN1");
 	map(0x00413000, 0x00413001).w( FUNC(hotslots_state::output_w));
-	map(0x00414001, 0x00414001).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x00414003, 0x00414003).w("ramdac", FUNC(ramdac_device::pal_w));
-	map(0x00414005, 0x00414005).w("ramdac", FUNC(ramdac_device::mask_w));
-	map(0x00414007, 0x00414007).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x00415003, 0x00415003).r("ramdac", FUNC(ramdac_device::pal_r));
+	map(0x00414000, 0x00414007).w(m_ramdac, FUNC(bt476_device::write)).umask16(0x00ff);
+	map(0x00415000, 0x00415007).r(m_ramdac, FUNC(bt476_device::read)).umask16(0x00ff);
 	map(0x00416001, 0x00416001).w("ssg", FUNC(ymz284_device::data_w));
 	map(0x00417001, 0x00417001).w("ssg", FUNC(ymz284_device::address_w));
 	map(0x00418000, 0x00418020).rw("rtc", FUNC(rtc72421_device::read), FUNC(rtc72421_device::write)).umask16(0x00ff);
@@ -573,27 +563,17 @@ void hotslots_state::simpbest_map(address_map &map)
 	map(0x00000000, 0x001fffff).m(m_scc66470, FUNC(scc66470_device::map));
 	map(0x00000000, 0x0017ffff).rw(FUNC(hotslots_state::mcu_dram_r), FUNC(hotslots_state::mcu_dram_w));
 	map(0x001fff80, 0x001fffbf).ram(); //DRAM I/O
-
 	map(0x00200000, 0x003fffff).rw(m_scc66470, FUNC(scc66470_device::ipa_r), FUNC(scc66470_device::ipa_w));
 	map(0x00600000, 0x0067ffff).rom().region("maincpu", 0); // boot vectors point here
-
 	map(0x00400000, 0x00400001).portr("IN0");
 	map(0x00401000, 0x00401001).portr("IN1");
 	map(0x00402000, 0x00402001).w( FUNC(hotslots_state::output_w));
-
-	map(0x00403001, 0x00403001).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x00403003, 0x00403003).w("ramdac", FUNC(ramdac_device::pal_w));
-	map(0x00403005, 0x00403005).w("ramdac", FUNC(ramdac_device::mask_w));
-	map(0x00403007, 0x00403007).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x00404003, 0x00404003).r("ramdac", FUNC(ramdac_device::pal_r));
-
+	map(0x00403000, 0x00403007).w(m_ramdac, FUNC(bt476_device::write)).umask16(0x00ff);
+	map(0x00404000, 0x00404007).r(m_ramdac, FUNC(bt476_device::read)).umask16(0x00ff);
 	map(0x00405003, 0x00405003).w("ssg", FUNC(ymz284_device::data_w));
 	map(0x00406001, 0x00406001).w("ssg", FUNC(ymz284_device::address_w));
-
 	map(0x00407000, 0x00407020).rw("rtc", FUNC(rtc72421_device::read), FUNC(rtc72421_device::write)).umask16(0x00ff);
-
 	map(0x00500000, 0x0050ffff).ram().share("nvram");
-
 }
 
 
@@ -648,13 +628,13 @@ static INPUT_PORTS_START( magicard )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_NAME("Door Switch")
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 5")    PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 6")    PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 7")    PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 8")    PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 9")    PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Hopper Full")     PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_DOOR )        PORT_NAME("Door Switch")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("Reserve In 5")    PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("Reserve In 6")    PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("Reserve In 7")    PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("Reserve In 8")    PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("Reserve In 9")    PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("Hopper Full")     PORT_CODE(KEYCODE_R)
 
 INPUT_PORTS_END
 
@@ -850,13 +830,13 @@ static INPUT_PORTS_START( pokeri )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_NAME("Door Switch")
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 5")    PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 6")    PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 7")    PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 8")    PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Reserve In 9")    PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Hopper Full")     PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_DOOR )  PORT_NAME("Door Switch")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reserve In 5")    PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reserve In 6")    PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reserve In 7")    PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reserve In 8")    PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reserve In 9")    PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Full")     PORT_CODE(KEYCODE_R)
 
 INPUT_PORTS_END
 
@@ -909,13 +889,13 @@ static INPUT_PORTS_START( simpbest )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Clear Credits")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_NAME("Door Switch")
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Coin Card")      PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Not used")       PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Not used")       PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Counter Check")  PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Key Alarm")      PORT_CODE(KEYCODE_G)  // "A L A R A M" in the I/O test.
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Hopper Full")    PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_DOOR )          PORT_NAME("Door Switch")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER )         PORT_NAME("Coin Card")      PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER )         PORT_NAME("Not used")       PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER )         PORT_NAME("Not used")       PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER )         PORT_NAME("Counter Check")  PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER )         PORT_NAME("Key Alarm")      PORT_CODE(KEYCODE_G)  // "A L A R A M" in the I/O test.
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER )         PORT_NAME("Hopper Full")    PORT_CODE(KEYCODE_R)
 
 INPUT_PORTS_END
 
@@ -949,11 +929,6 @@ void magicard_base_state::cpu_int1(int state)
 void hotslots_state::cpu_int1(int state)
 {
 	m_maincpu->int1_w(state);
-}
-
-void magicard_base_state::ramdac_map(address_map &map)
-{
-	map(0x0000, 0x03ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
 void magicard_base_state::update_scl(uint8_t device, uint8_t state)
@@ -1005,7 +980,7 @@ void magicard_base_state::magicard_base(machine_config &config)
 	m_maincpu->i2c_sda_w().set(FUNC(magicard_base_state::cpu_i2c_sda_write));
 	m_maincpu->i2c_sda_r().set(FUNC(magicard_base_state::cpu_i2c_sda_read));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw( CLOCK_A/2, 960, 0, 768, 312, 32, 312);
 	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	m_screen->set_screen_update(FUNC(magicard_base_state::screen_update_magicard));
@@ -1015,9 +990,7 @@ void magicard_base_state::magicard_base(machine_config &config)
 	m_scc66470->set_screen("screen");
 	m_scc66470->irq().set(FUNC(magicard_base_state::scc66470_irq));
 
-	PALETTE(config, m_palette).set_entries(0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
-	ramdac.set_addrmap(0, &magicard_state::ramdac_map);
+	BT476(config, m_ramdac);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1104,7 +1077,6 @@ void hotslots_state::magicle(machine_config &config)
 	hotslots_base(config);
 
 	pic16f84_device &pic(PIC16F84(config, "pic16f84", 4000000));
-	pic.set_config(0x3ffa); // No protect - No Watchdog - HS Clock
 	pic.read_b().set(FUNC(hotslots_state::pic_portb_r));
 	pic.write_b().set(FUNC(hotslots_state::pic_portb_w));
 
@@ -1294,7 +1266,7 @@ ROM_START( magicrdja )
 	ROM_LOAD16_WORD_SWAP( "27c4002.ic21", 0x00000, 0x80000, CRC(ab2ed583) SHA1(a2d7148b785a8dfce8cff3b15ada293d65561c98) ) // sldh
 
 	ROM_REGION16_LE( 0x4280, "pic16f84", 0 )  // decapped and dumped
-	ROM_LOAD("magicardj_4.01_pic16f84_code.bin",   0x0000, 0x0800, CRC(c6502436) SHA1(85c4126251bd60ec1f4e28615ec7f948ef8c088f) )
+	ROM_LOAD("magicardj_4.01_pic16f84_code.bin", 0x0000, 0x0800, CRC(c6502436) SHA1(85c4126251bd60ec1f4e28615ec7f948ef8c088f) )
 	/*
 	{
 	"conf_word": 0,
@@ -1305,19 +1277,17 @@ ROM_START( magicrdja )
 	"user_id3": 16264
 	}
 	*/
-	// ID locations:
 	ROM_FILL( 0x4000, 0x01, 0x80 )
-	ROM_FILL( 0x4001, 0x01, 0x3f )
+	ROM_FILL( 0x4001, 0x01, 0x3f ) // user_id0: 0x3f80
 	ROM_FILL( 0x4002, 0x01, 0x86 )
-	ROM_FILL( 0x4003, 0x01, 0x3f )
+	ROM_FILL( 0x4003, 0x01, 0x3f ) // user_id1: 0x3f86
 	ROM_FILL( 0x4004, 0x01, 0x89 )
-	ROM_FILL( 0x4005, 0x01, 0x3f )
+	ROM_FILL( 0x4005, 0x01, 0x3f ) // user_id2: 0x3f89
 	ROM_FILL( 0x4006, 0x01, 0x88 )
-	ROM_FILL( 0x4007, 0x01, 0x3f )
-	// configuration word: all 0
-	ROM_FILL( 0x400e, 0x01, 0x00 )
-	ROM_FILL( 0x400f, 0x01, 0x00 )
-	ROM_LOAD("magicardj_4.01_pic16f84_data.bin",   0x4200, 0x0080, CRC(40961fef) SHA1(8617ef78d50842ea89d81d4db3728b3f799d7530) )
+	ROM_FILL( 0x4007, 0x01, 0x3f ) // user_id3: 0x3f88
+	ROM_FILL( 0x400e, 0x01, 0xfa )
+	ROM_FILL( 0x400f, 0x01, 0x3f ) // configuration: 0x3ffa (was supposed to be 0 but that can't be right)
+	ROM_LOAD("magicardj_4.01_pic16f84_data.bin", 0x4200, 0x0080, CRC(40961fef) SHA1(8617ef78d50842ea89d81d4db3728b3f799d7530) )
 
 	ROM_REGION( 0x200000, "other", 0 )  // unknown contents
 	ROM_LOAD("29f1610mc.ic30",  0x000000, 0x200000, NO_DUMP )
@@ -1519,8 +1489,8 @@ ROM_START( magicle )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "27c4002.ic21", 0x00000, 0x80000, CRC(73328346) SHA1(fca5f8a93f25377e659c2b291674d706ca37400e) )
 
-	ROM_REGION16_LE( 0x4280, "pic16f84", 0 )  // decapped and dumped
-	ROM_LOAD("magicle_5.03_pic16f84_code.bin",   0x0000, 0x0800, CRC(22965864) SHA1(c421a9e9fac7c9c5dc01adda620dc8f5f16d94ba) )
+	ROM_REGION16_LE( 0x4280, "pic16f84", ROMREGION_ERASEFF )  // decapped and dumped
+	ROM_LOAD("magicle_5.03_pic16f84_code.bin", 0x0000, 0x0800, CRC(22965864) SHA1(c421a9e9fac7c9c5dc01adda620dc8f5f16d94ba) )
 	/*
 {
 	"conf_word": 0,
@@ -1531,19 +1501,17 @@ ROM_START( magicle )
 	"user_id3": 16265
 }
 	*/
-	// ID locations:
 	ROM_FILL( 0x4000, 0x01, 0x80 )
-	ROM_FILL( 0x4001, 0x01, 0x3f )
+	ROM_FILL( 0x4001, 0x01, 0x3f ) // user_id0: 0x3f80
 	ROM_FILL( 0x4002, 0x01, 0x87 )
-	ROM_FILL( 0x4003, 0x01, 0x3f )
+	ROM_FILL( 0x4003, 0x01, 0x3f ) // user_id1: 0x3f87
 	ROM_FILL( 0x4004, 0x01, 0x89 )
-	ROM_FILL( 0x4005, 0x01, 0x3f )
+	ROM_FILL( 0x4005, 0x01, 0x3f ) // user_id2: 0x3f89
 	ROM_FILL( 0x4006, 0x01, 0x89 )
-	ROM_FILL( 0x4007, 0x01, 0x3f )
-	// configuration word: all 0
-	ROM_FILL( 0x400e, 0x01, 0x00 )
-	ROM_FILL( 0x400f, 0x01, 0x00 )
-	ROM_LOAD("magicle_5.03_pic16f84_data.bin",   0x4200, 0x0080, CRC(b3cdf90f) SHA1(0afec6f78320e5fe653073769cdeb32918da061b) )
+	ROM_FILL( 0x4007, 0x01, 0x3f ) // user_id3: 0x3f89
+	ROM_FILL( 0x400e, 0x01, 0xfa )
+	ROM_FILL( 0x400f, 0x01, 0x3f ) // configuration: 0x3ffa (was supposed to be 0 but that can't be right)
+	ROM_LOAD("magicle_5.03_pic16f84_data.bin", 0x4200, 0x0080, CRC(b3cdf90f) SHA1(0afec6f78320e5fe653073769cdeb32918da061b) )
 
 	ROM_REGION( 0x200000, "other", 0 )  // unknown contents
 	ROM_LOAD("29f1610mc.ic30",  0x000000, 0x200000, NO_DUMP )
@@ -1911,6 +1879,20 @@ ROM_START( puzzleme )
 
 	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD("x24c02p.ic26",    0x0000, 0x0100, CRC(bc940f53) SHA1(6b870019752ba5c446a5ad5155e4a81dfbf6e523) )
+ROM_END
+
+ROM_START( libertyc ) // seems the same PCB as puzzleme
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "liberty_card_export_94_v1.02.ic21", 0x00000, 0x80000, CRC(f5bb5dd0) SHA1(9c49ef4b5f42ddc689993d5129653efbfc57bce6) )
+
+	ROM_REGION( 0x1fff, "pic16c54", 0 )
+	ROM_LOAD( "pic16c54.ic29", 0x0000, 0x1fff, CRC(6dd2bd8e) SHA1(380f6b952ddd3183e9ab5404866c30be015b3773) BAD_DUMP ) // from puzzleme, seems to work, but a dump is needed
+
+	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
+	ROM_LOAD( "x24c02p.ic26", 0x0000, 0x0100, CRC(54145712) SHA1(e2ddeb155c4422c54b621fd5acf4c2b8a4808c62) )
+
+	ROM_REGION( 0x10000, "nvram", 0 ) // pre-initialized
+	ROM_LOAD( "nvram", 0x00000, 0x10000, CRC(7b8150f8) SHA1(58a56401843f9b27ed1b6a4c2f786c20ecc0e3ab) )
 ROM_END
 
 
@@ -2449,8 +2431,7 @@ ROM_END
 
 void magicard_state::init_dallaspk()
 {
-//  Dallas Poker...
-//  NOP'ing to avoid the 68070 UART stuck...
+	// HACK: NOP'ing to avoid the 68070 UART stuck...
 	uint8_t *rom = memregion("maincpu")->base();
 
 	rom[0x00482e] = 0x18;
@@ -2484,6 +2465,7 @@ GAME(  1999, quingo,     0,        magicle,        hotslots,  hotslots_state, em
 GAME(  1999, belslots,   0,        magicle,        hotslots,  hotslots_state, empty_init,    ROT0,  "Impera",               "Bel Slots Export (5.01)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME(  2001, bigdeal0,   0,        magicle,        magicard,  hotslots_state, empty_init,    ROT0,  "Impera",               "Big Deal Belgien (5.04)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME(  199?, puzzleme,   0,        puzzleme,       puzzleme,  hotslots_state, empty_init,    ROT0,  "Impera",               "Puzzle Me!",                                 MACHINE_SUPPORTS_SAVE )
+GAME(  1994, libertyc,   0,        puzzleme,       magicrde,  hotslots_state, empty_init,    ROT0,  "NovoPlay",             "Liberty Card (v1.02)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 GAME(  1991, lucky7i,    0,        magicard,       lucky7i,   magicard_state, empty_init,    ROT0,  "Impera",               "Lucky 7 (Impera, V04/91a, set 1)",           MACHINE_SUPPORTS_SAVE )
 GAME(  1991, lucky7x,    lucky7i,  magicard,       lucky7i,   magicard_state, empty_init,    ROT0,  "Impera",               "Lucky 7 (Impera, V04/91a, set 2)",           MACHINE_SUPPORTS_SAVE )

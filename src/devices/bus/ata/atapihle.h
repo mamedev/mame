@@ -16,7 +16,9 @@
 #include "machine/atahle.h"
 #include "machine/t10spc.h"
 
-class atapi_hle_device : public ata_hle_device_base, public virtual t10spc
+class atapi_hle_device : public device_t,
+	public device_ata_hle_interface,
+	public virtual t10spc
 {
 public:
 	enum atapi_features_flag_t
@@ -61,6 +63,8 @@ protected:
 	virtual void signature() override;
 	virtual void process_command() override;
 	virtual void finished_command() override;
+	virtual bool is_packet_device() override { return true; }
+	virtual bool always_respond() override { return false; }
 
 	virtual void identify_packet_device() = 0;
 

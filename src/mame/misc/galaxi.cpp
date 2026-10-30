@@ -166,29 +166,12 @@ uint32_t galaxi_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	m_bg_tmap[2]->set_scrollx(m_bg3_xscroll);
 	m_bg_tmap[2]->set_scrolly(m_bg3_yscroll);
 
-	int layers_ctrl = -1;
+	m_bg_tmap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_bg_tmap[1]->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tmap[2]->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tmap[3]->draw(screen, bitmap, cliprect, 0, 0);
 
-#ifdef MAME_DEBUG
-	if (machine().input().code_pressed(KEYCODE_R))  // remapped due to inputs changes.
-	{
-		int msk = 0;
-		if (machine().input().code_pressed(KEYCODE_T))  msk |= 1;
-		if (machine().input().code_pressed(KEYCODE_Y))  msk |= 2;
-		if (machine().input().code_pressed(KEYCODE_U))  msk |= 4;
-		if (machine().input().code_pressed(KEYCODE_I))  msk |= 8;
-		if (machine().input().code_pressed(KEYCODE_O))  msk |= 16;
-		if (msk != 0) layers_ctrl &= msk;
-	}
-#endif
-
-
-	if (layers_ctrl & 1)    m_bg_tmap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	else                    bitmap.fill(m_palette->black_pen(), cliprect);
-	if (layers_ctrl & 2)    m_bg_tmap[1]->draw(screen, bitmap, cliprect, 0, 0);
-	if (layers_ctrl & 4)    m_bg_tmap[2]->draw(screen, bitmap, cliprect, 0, 0);
-	if (layers_ctrl & 8)    m_bg_tmap[3]->draw(screen, bitmap, cliprect, 0, 0);
-
-	if (layers_ctrl & 16)   m_fg_tmap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tmap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -360,8 +343,6 @@ void galaxi_state::machine_start()
 {
 	save_item(NAME(m_bg3_xscroll));
 	save_item(NAME(m_bg3_yscroll));
-
-	m_lamps.resolve();
 }
 
 void galaxi_state::machine_reset()
@@ -387,7 +368,7 @@ void galaxi_state::galaxi(machine_config &config)
 	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(50));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);

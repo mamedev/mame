@@ -34,7 +34,7 @@ centronics_printer_device::centronics_printer_device(const machine_config &mconf
 
 void centronics_printer_device::device_add_mconfig(machine_config &config)
 {
-	PRINTER(config, m_printer, 0);
+	PRINTER(config, m_printer);
 	m_printer->online_callback().set(FUNC(centronics_printer_device::printer_online));
 }
 

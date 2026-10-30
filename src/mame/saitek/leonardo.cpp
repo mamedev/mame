@@ -51,11 +51,12 @@ Known expansion modules:
 - Brute Force (H8, Frans Morsch)
 - Sparc (SPARClite, Spracklen's)
 
-The H8 Brute Force module doesn't work with the 1st program version of Leonardo,
-this is mentioned in the repair manual and it says it requires an EPROM upgrade.
-The Sparc module doesn't appear to work with it either. Moreover, the Sparc module
-manual mentions that for it to work properly on Leonardo, the chesscomputer needs
-to be upgraded with an EMI PCB (power supply related, meaningless for emulation).
+The H8 Brute Force module doesn't work with the 1st program version of Leonardo
+(setting skill level doesn't work), this is mentioned in the repair manual and
+it says it requires an EPROM upgrade. The Sparc module doesn't appear to work with
+it either. Moreover, the Sparc module manual mentions that for it to work properly
+on Leonardo, the chesscomputer needs to be upgraded with an EMI PCB (power supply
+related, meaningless for emulation).
 
 *******************************************************************************/
 
@@ -127,6 +128,7 @@ private:
 	void leds_w(u8 data);
 	u8 p1_r();
 	void p1_w(u8 data);
+	void update_ack();
 	void exp_rts_w(int state);
 
 	u8 p2_r();
@@ -206,12 +208,17 @@ void leo_state::p1_w(u8 data)
 	// ? " (toggles bit 0)
 }
 
+void leo_state::update_ack()
+{
+	if (m_rts_state != m_ack_state)
+		m_expansion->ack_w(!m_ack_state);
+}
+
 void leo_state::exp_rts_w(int state)
 {
-	// recursive NAND with ACK-P
-	if (state && m_ack_state)
-		m_expansion->ack_w(m_ack_state);
+	// SR latch to ACK-P
 	m_rts_state = state;
+	update_ack();
 }
 
 
@@ -255,11 +262,9 @@ void leo_state::p5_w(u8 data)
 	// P53: NAND with STB-P
 	m_stb->in_w<1>(BIT(data, 3));
 
-	// P55: expansion ACK-P (recursive NAND with RTS-P)
-	int ack_state = BIT(data, 5);
-	if (m_rts_state || !ack_state)
-		m_expansion->ack_w(ack_state);
-	m_ack_state = ack_state;
+	// P55: expansion ACK-P (SR latch with RTS-P)
+	m_ack_state = BIT(data, 5);
+	update_ack();
 
 	// P56,P57: chessboard led row data
 	m_led_data[0] = (m_led_data[0] & 3) | (~data >> 4 & 0xc);

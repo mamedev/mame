@@ -189,7 +189,7 @@ void msx_cart_msx_audio_nms1205_device::device_add_mconfig(machine_config &confi
 	MSX_AUDIO_KBDC_PORT(config, "kbdc", msx_audio_keyboards, nullptr);
 
 	// There is a 2 MHz crystal on the PCB, the 6850 TX and RX clocks are derived from it
-	ACIA6850(config, m_acia6850, 0);
+	ACIA6850(config, m_acia6850);
 	m_acia6850->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(FUNC(msx_cart_msx_audio_nms1205_device::midi_in));

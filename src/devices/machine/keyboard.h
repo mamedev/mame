@@ -59,7 +59,11 @@ private:
 
 	emu_timer       *m_scan_timer;
 	emu_timer       *m_typematic_timer;
+	// NOTE: protected for pc88va_kbd due of reading in direct form
+	// (an exception not the norm)
+protected:
 	required_ioport m_key_rows[ROW_COUNT];
+private:
 	ioport_value    m_key_states[ROW_COUNT];
 	u8              m_next_row;
 	u8              m_processing;
@@ -77,7 +81,7 @@ public:
 			const machine_config &mconfig,
 			const char *tag,
 			device_t *owner,
-			u32 clock);
+			u32 clock = 0);
 	virtual ~generic_keyboard_device();
 
 	template <typename... T>

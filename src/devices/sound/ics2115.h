@@ -29,8 +29,7 @@ public:
 	// 16-bit read / write handlers (when /IOCS16 is low)
 	u16 word_r(offs_t offset, u16 mem_mask);
 	void word_w(offs_t offset, u16 data, u16 mem_mask);
-	TIMER_CALLBACK_MEMBER(timer_cb_0);
-	TIMER_CALLBACK_MEMBER(timer_cb_1);
+	TIMER_CALLBACK_MEMBER(timer_cb);
 
 protected:
 	// device-level overrides
@@ -54,14 +53,14 @@ private:
 			s32 left;
 			u32 acc, start, end; // address counters (20.9 fixed point)
 			u16 fc;              // frequency (6.9 fixed point)
-			u8 ctl, saddr;
+			u8 saddr;
 		} osc;
 
 		struct {
 			s32 left;
-			u32 add;
-			u32 start, end;
-			u32 acc;
+			s32 add;
+			s32 start, end;
+			s32 acc;
 			u16 regacc;
 			u8 incr;
 			u8 pan, mode;
@@ -69,9 +68,19 @@ private:
 
 		union {
 			struct {
+				u8 done       : 1;   // done flag
+				u8 stop       : 1;   // stop flag
+				u8            : 6;   // padding
+				// IRQ on variable?
+			} bitflags;
+			u8 value;
+		} osc_ctrl;
+
+		union {
+			struct {
 				u8 ulaw       : 1;   // compressed sample format
-				u8 stop       : 1;   // stops wave + vol envelope
-				u8 eightbit   : 1;   // 8 bit sample format
+				u8 sixteenbit : 1;   // 16-bit sample format (ignored for u-law)
+				u8            : 1;   // unused
 				u8 loop       : 1;   // loop enable
 				u8 loop_bidir : 1;   // bi-directional loop enable
 				u8 irq        : 1;   // enable IRQ generation
@@ -97,18 +106,16 @@ private:
 			u8 value;
 		} vol_ctrl;
 
-		// Possibly redundant state. => improvements of wavetable logic
-		// may lead to its elimination.
-		struct {
-			bool on;
-			int ramp;       // 100 0000 = 0x40 maximum
-		} state;
-
 		u16 regs[0x20]; // channel registers
 		bool playing();
 		int update_volume_envelope();
 		int update_oscillator();
-		void update_ramp();
+	};
+
+	struct ics2115_timer {
+		u8 scale, preset;
+		emu_timer *timer;
+		u64 period;  /* in nsec */
 	};
 
 	// internal register helper functions
@@ -133,14 +140,10 @@ private:
 	s16 m_ulaw[256];
 	u16 m_volume[4096];
 	u16 m_panlaw[256];
-	static const int volume_bits = 15;
+	u32 m_volinc_frac[32];
 
 	ics2115_voice m_voice[32];
-	struct {
-		u8 scale, preset;
-		emu_timer *timer;
-		u64 period;  /* in nsec */
-	} m_timer[2];
+	ics2115_timer m_timer[2];
 
 	u8 m_active_osc;
 	u8 m_osc_select;
@@ -149,12 +152,6 @@ private:
 	bool m_irq_on;
 
 	u16 m_regs[0x40]; // global registers
-
-	/*
-	    Unknown variable, seems to be effected by 0x12. Further investigation
-	    Required.
-	*/
-	u8 m_vmode;
 };
 
 

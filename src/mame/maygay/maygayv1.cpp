@@ -128,7 +128,6 @@ Find lamps/reels after UPD changes.
 
 #include "emu.h"
 
-#include "awpvid.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/i8052.h"
@@ -822,7 +821,6 @@ void maygayv1_state::b_writ(uint8_t data)
 
 void maygayv1_state::machine_start()
 {
-	m_lamp.resolve();
 	m_i82716.dram = std::make_unique<uint16_t[]>(0x80000/2);   // ???
 	m_i82716.line_buf = std::make_unique<uint8_t[]>(512);
 
@@ -863,7 +861,7 @@ void maygayv1_state::maygayv1(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* TODO: Use real video timings */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(640, 300);

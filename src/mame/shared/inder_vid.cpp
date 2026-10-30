@@ -13,24 +13,37 @@ DEFINE_DEVICE_TYPE(INDER_VIDEO, inder_vid_device, "indervd", "Inder / Dinamic TM
 
 inder_vid_device::inder_vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, INDER_VIDEO, tag, owner, clock),
-/*  device_video_interface(mconfig, *this, false), */
 		m_vram(*this, "vram"),
-		m_palette(*this, "palette"),
-		m_tms(*this, "tms"),
-		m_bpp_mode(8)
+		m_ramdac(*this, "ramdac"),
+		m_tms(*this, "tms")
 {
 }
 
 void inder_vid_device::megaphx_tms_map(address_map &map)
 {
-
 	map(0x00000000, 0x003fffff).ram().share(m_vram); // vram?
-
-	map(0x04000000, 0x0400000f).w("ramdac", FUNC(ramdac_device::index_w)).umask16(0x00ff);
-	map(0x04000010, 0x0400001f).rw("ramdac", FUNC(ramdac_device::pal_r), FUNC(ramdac_device::pal_w)).umask16(0x00ff);
-	map(0x04000030, 0x0400003f).w("ramdac", FUNC(ramdac_device::index_r_w)).umask16(0x00ff);
-	map(0x04000090, 0x0400009f).nopw();
+	map(0x04000000, 0x0400007f).m(m_ramdac, FUNC(bt478_device::map)).umask16(0x00ff);
+	map(0x04000080, 0x0400008f).w(FUNC(inder_vid_device::mode_w)).umask16(0x00ff);
+	map(0x04000090, 0x0400009f).w(FUNC(inder_vid_device::hscroll_w)).umask16(0x00ff);
 	map(0x7fc00000, 0x7fffffff).ram().mirror(0x80000000);
+}
+
+
+void inder_vid_device::mode_w(uint8_t data)
+{
+	// 7654----  not used?
+	// ----3---  4/8 bpp?
+	// -----21-  not used?
+	// -------0  4/8 bpp?
+
+	// games write 0x08 for 4 bpp and 0x01 for 8 bpp
+	m_8bpp_mode = BIT(data, 0);
+}
+
+
+void inder_vid_device::hscroll_w(uint8_t data)
+{
+	m_hscroll = data;
 }
 
 
@@ -39,33 +52,27 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(inder_vid_device::scanline)
 	uint16_t const *const vram = &m_vram[(params->rowaddr << 8) & 0x3ff00];
 	uint32_t *const dest = &bitmap.pix(scanline);
 
-	const pen_t *paldata = m_palette->pens();
+	const pen_t *paldata = m_ramdac->pens();
 
-	int coladdr = params->coladdr;
-
-	if (m_bpp_mode == 8)
+	if (m_8bpp_mode)
 	{
-		for (int x = params->heblnk; x < params->hsblnk; x += 2)
+		int pixaddr = (params->coladdr << 1) + ((m_hscroll - 1) & 1);
+		for (int x = params->heblnk; x < params->hsblnk; x++)
 		{
-			uint16_t pixels = vram[coladdr++ & 0xff];
-			dest[x + 0] = paldata[pixels & 0xff];
-			dest[x + 1] = paldata[pixels >> 8];
-		}
-	}
-	else if (m_bpp_mode == 4)
-	{
-		for (int x = params->heblnk; x < params->hsblnk; x += 4)
-		{
-			uint16_t pixels = vram[coladdr++ & 0xff];
-			dest[x + 3] = paldata[((pixels & 0xf000) >> 12)];
-			dest[x + 2] = paldata[((pixels & 0x0f00) >> 8)];
-			dest[x + 1] = paldata[((pixels & 0x00f0) >> 4)];
-			dest[x + 0] = paldata[((pixels & 0x000f) >> 0)];
+			uint16_t pixels = vram[(pixaddr >> 1) & 0xff];
+			dest[x] = paldata[(pixels >> ((pixaddr & 1) * 8)) & 0xff];
+			pixaddr++;
 		}
 	}
 	else
 	{
-		fatalerror("inder_vid_device unsupported mode, not 4bpp or 8bpp");
+		int pixaddr = (params->coladdr << 2) + ((m_hscroll - 2) & 3);
+		for (int x = params->heblnk; x < params->hsblnk; x++)
+		{
+			uint16_t pixels = vram[(pixaddr >> 2) & 0xff];
+			dest[x] = paldata[(pixels >> ((pixaddr & 3) * 4)) & 0x0f];
+			pixaddr++;
+		}
 	}
 }
 
@@ -90,10 +97,6 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(inder_vid_device::from_shiftreg)
 	m_shiftfull = 0;
 }
 
-void inder_vid_device::ramdac_map(address_map &map)
-{
-	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb888_w));
-}
 
 void inder_vid_device::device_add_mconfig(machine_config &config)
 {
@@ -107,21 +110,19 @@ void inder_vid_device::device_add_mconfig(machine_config &config)
 	m_tms->set_shiftreg_in_callback(FUNC(inder_vid_device::to_shiftreg));
 	m_tms->set_shiftreg_out_callback(FUNC(inder_vid_device::from_shiftreg));
 
-	screen_device &screen(SCREEN(config, "inder_screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "inder_screen"));
 	screen.set_raw(XTAL(40'000'000)/12, 424, 0, 338, 262, 0, 246);
 	screen.set_screen_update("tms", FUNC(tms34010_device::tms340x0_rgb32));
 
-	PALETTE(config, m_palette).set_entries(256);
-
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
-	ramdac.set_addrmap(0, &inder_vid_device::ramdac_map);
-	ramdac.set_split_read(1);
+	BT478(config, m_ramdac);
 }
 
 
 void inder_vid_device::device_start()
 {
 	save_item(NAME(m_shiftfull));
+	save_item(NAME(m_8bpp_mode));
+	save_item(NAME(m_hscroll));
 }
 
 void inder_vid_device::device_reset()

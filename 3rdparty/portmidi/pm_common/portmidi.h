@@ -1,5 +1,6 @@
-#ifndef PORT_MIDI_H
-#define PORT_MIDI_H
+#ifndef PORTMIDI_PORTMIDI_H
+#define PORTMIDI_PORTMIDI_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -93,7 +94,7 @@ extern "C" {
     #define TRUE 1
 #endif
 
-/* default size of buffers for sysex transmission: */
+/** default size of buffers for sysex transmission: */
 #define PM_DEFAULT_SYSEX_BUFFER_SIZE 1024
 
 
@@ -104,7 +105,8 @@ typedef enum {
                    * indicate data is available.
                    */
     pmGotData = 1, /**< A "no error" return also indicating data available. */
-    pmHostError = -10000,
+    pmHostError = -10000,  /**< error was returned from the system level below
+                                PortMidi. See ##Pm_GetHostErrorText() */
     pmInvalidDeviceId, /**< Out of range or 
                         * output device when input is requested or 
                         * input device when output is requested or
@@ -112,7 +114,7 @@ typedef enum {
                         */
     pmInsufficientMemory,
     pmBufferTooSmall,
-    pmBufferOverflow,
+    pmBufferOverflow, /**< buffer overflow (see #Pm_Read) */
     pmBadPtr, /**< #PortMidiStream parameter is NULL or
                * stream is not opened or
                * stream is output when input is required or
@@ -122,7 +124,8 @@ typedef enum {
     pmBufferMaxSize, /**< Buffer is already as large as it can be. */
     pmNotImplemented, /**< The function is not implemented, nothing was done. */
     pmInterfaceNotSupported, /**< The requested interface is not supported. */
-    pmNameConflict /**< Cannot create virtual device because name is taken. */
+    pmNameConflict, /**< Cannot create virtual device because name is taken. */
+    pmDeviceRemoved  /**< Output attempted after (USB) device was removed. */
     /* NOTE: If you add a new error type, you must update Pm_GetErrorText(). */
 } PmError; /**< @brief @enum PmError PortMidi error code; a common return type. 
             * No error is indicated by zero; errors are indicated by < 0.
@@ -175,8 +178,8 @@ typedef void PortMidiStream;
     errors can occur asynchronously where the client does not
     explicitly call a function, and therefore cannot receive an error
     code.  The client can test for a pending error using
-    Pm_HasHostError(). If true, the error can be accessed by calling
-    Pm_GetHostErrorText().  Pm_Poll() is similar to Pm_HasHostError(),
+    #Pm_HasHostError(). If true, the error can be accessed by calling
+    #Pm_GetHostErrorText().  Pm_Poll() is similar to Pm_HasHostError(),
     but if there is no error, it will return TRUE (1) if there is a
     pending input message.
 */
@@ -214,7 +217,6 @@ typedef int PmDeviceID;
 /** MIDI device information is returned in this structure, which is
     owned by PortMidi and read-only to applications. See Pm_GetDeviceInfo().
 */
-#define PM_DEVICEINFO_VERS 200
 typedef struct {
     int structVersion; /**< @brief this internal structure version */ 
     const char *interf; /**< @brief underlying MIDI API, e.g. 
@@ -225,6 +227,56 @@ typedef struct {
     int opened; /**< @brief used by generic PortMidi for error checking */
     int is_virtual; /**< @brief true iff this is/was a virtual device */
 } PmDeviceInfo;
+#define PM_DEVICEINFO_VERS 200
+
+/** Version number of PmDeviceInfo, stored in #PmDeviceInfo::structVersion 
+    field */
+#define PM_DEVICEINFO_VERS 200
+
+/** MIDI system-dependent device or driver info is passed in this
+    structure, which is owned by the caller.
+*/
+enum PmSysDepPropertyKey {
+    pmKeyNone = 0,  /**< a "noop" key value */
+    /** CoreMIDI Manufacturer name, value is string */
+    pmKeyCoreMidiManufacturer = 1,
+    /** Linux ALSA snd_seq_port_info_set_name, value is a string. Can be 
+        passed in PmSysDepInfo to Pm_OpenInput or Pm_OpenOutput when opening
+        a device. The created port will be named accordingly and will be 
+        visible for externally made connections (subscriptions). (Linux ALSA
+        ports are always enabled for this, but only get application-specific
+        names if you give it one.) This key/value is ignored when opening
+        virtual ports, which are named when they are created.) */
+    pmKeyAlsaPortName = 2,
+    /** Linux ALSA snd_seq_set_client_name, value is a string.
+        Can be passed in PmSysDepInfo to Pm_OpenInput or Pm_OpenOutput.
+        Pm_CreateVirtualInput or Pm_CreateVirtualOutput. Will override
+        any previously set client name and applies to all ports. */
+    pmKeyAlsaClientName = 3
+    /* if system-dependent code introduces more options, register
+       the key here to avoid conflicts. */
+};
+#define PM_SYSDEPINFO_VERS 210
+
+/** System-dependent information can be passed when creating and opening
+    ports using this data structure, which stores alternating keys and
+    values (addresses). See `pm_test/sendvirtual.c`, `pm_test/recvvirtual.c`,
+    and `pm_test/testio.c` for examples.
+ */
+typedef struct {
+    int structVersion;  /**< this structure version */
+    int length;  /**< number of properties in this structure */
+    struct {
+        enum PmSysDepPropertyKey key;
+        const void *value;
+    } properties[];  /**< array of key/value pairs */
+} PmSysDepInfo;
+
+/** Version number of PmSysDepInfo, stored in #PmSysDepInfo::structVersion
+    field */
+#define PM_SYSDEPINFO_VERS 210
+
+
 
 /** Get devices count, ids range from 0 to Pm_CountDevices()-1. */
 PMEXPORT int Pm_CountDevices(void);
@@ -236,32 +288,20 @@ PMEXPORT int Pm_CountDevices(void);
     The use of these functions is not recommended. There is no natural
     "default device" on any system, so defaults must be set by users.
     (Currently, PortMidi just returns the first device it finds as
-    "default".)  The (unsolved) problem is how to implement simple
-    preferences for a cross-platform library. (More notes follow, but
-    you can stop reading here.)
+    "default", so if there *is* a default, implementors should use
+    pm_add_device to add system default input and output devices
+    first.)
 
-    To implement preferences, you need (1) a standard place to put
-    them, (2) a representation for the preferences, (3) a graphical
-    interface to test and set preferences, (4) a "natural" way to
-    invoke the preference-setting program. To solve (3), PortMidi
-    originally chose to use Java and Swing to implement a
-    cross-platform GUI program called "pmdefaults." Java's Preferences
-    class already provide a location (problem 1) and representation
-    (problem 2). However, this solution was complex, requiring
-    PortMidi to parse binary Java preference files and requiring users
-    to install and invoke Java programs. It did not seem possible to
-    integrate pmdefaults into the system preference subsystems on
-    macOS, Windows, and Linux, so the user had to install and run
-    pmdefaults as an application. Moreover, Java is falling out of
-    favor.
-
-    A simpler solution is pass the burden to applications. It is easy
-    to scan devices with PortMidi and build a device menu, and to save
-    menu selections in application preferences for next time. This is
-    my recommendation for any GUI program. For simple command-line
-    applications and utilities, see pm_test where all the test
-    programs now accept device numbers on the command line and/or
+    The recommended solution is pass the burden to applications. It is
+    easy to scan devices with PortMidi and build a device menu, and to
+    save menu selections in application preferences for next
+    time. This is my recommendation for any GUI program. For simple
+    command-line applications and utilities, see pm_test where all the
+    test programs now accept device numbers on the command line and/or
     prompt for their entry.
+
+    On linux, you can create virtual ports and use an external program
+    to set up inter-application and device connections.
 
     Some advice for preferences: MIDI devices used to be built-in or
     plug-in cards, so the numbers rarely changed. Now MIDI devices are
@@ -275,66 +315,50 @@ PMEXPORT int Pm_CountDevices(void);
     in, preferences should record *names* of devices rather than
     device numbers. It is simple enough to use string matching to find
     a prefered device, so PortMidi does not provide any built-in
-    lookup function. See below for details of the Java preferences API.
-
-    In the future, I would like to remove the legacy code that parses
-    Java preference data (macOS plist, linux prefs.xml, Windows
-    registry entries) and replace it with something more useful. Maybe
-    something really simple: $HOME/.portmidi? Or maybe a new
-    pmdefaults written with PyGame? Or use QT? If applications write
-    their own preferences, maybe a minimal command line preference
-    setter is all that's needed? Or maybe command line application
-    users are happy without a preference system? Comments and
-    proposals are welcome.
-
-    For completeness, here is a description of the original use of
-    Java for preference setting: The default device can be specified
-    using a small application named pmdefaults that is part of the
-    PortMidi distribution. This program in turn uses the Java
-    Preferences object created by
-    java.util.prefs.Preferences.userRoot().node("/PortMidi"); the
-    preference is set by calling
-    prefs.put("PM_RECOMMENDED_OUTPUT_DEVICE", prefName); or
-    prefs.put("PM_RECOMMENDED_INPUT_DEVICE", prefName);
-    
-    In the statements above, prefName is a string describing the
-    MIDI device in the form "interf, name" where interf identifies
-    the underlying software system or API used by PortMdi to access
-    devices and name is the name of the device. These correspond to 
-    the interf and name fields of a PmDeviceInfo. (Currently supported
-    interfaces are "MMSystem" for Win32, "ALSA" for Linux, and 
-    "CoreMIDI" for OS X, so in fact, there is no choice of interface.)
-    In "interf, name", the strings are actually substrings of 
-    the full interface and name strings. For example, the preference 
-    "Core, Sport" will match a device with interface "CoreMIDI"
-    and name "In USB MidiSport 1x1". It will also match "CoreMIDI"
-    and "In USB MidiSport 2x2". The devices are enumerated in device
-    ID order, so the lowest device ID that matches the pattern becomes
-    the default device. Finally, if the comma-space (", ") separator
-    between interface and name parts of the preference is not found,
-    the entire preference string is interpreted as a name, and the
-    interface part is the empty string, which matches anything.
-
-    On the MAC, preferences are stored in
-    /Users/$NAME/Library/Preferences/com.apple.java.util.prefs.plist
-    which is a binary file. In addition to the pmdefaults program,
-    there are utilities that can read and edit this preference file.
-    On Windows, the Registry is used. On Linux, preferences are in an
-    XML file.
+    lookup function.
 */
 PMEXPORT PmDeviceID Pm_GetDefaultInputDeviceID(void);
 
 /** @brief see PmDeviceID Pm_GetDefaultInputDeviceID() */
 PMEXPORT PmDeviceID Pm_GetDefaultOutputDeviceID(void);
 
+/** Find a device that matches a pattern. 
+
+    @param pattern a substring of the device name, or if the pattern
+    contains the two-character separator ", ", then the first part of
+    the pattern represents a device interface substring and the second
+    part after the separator represents a device name substring. 
+
+    @param is_input restricts the search to an input when true, or an
+    output when false.
+
+    @return the number of the first device whose device interface
+    contains the interface pattern (if any), whose device name
+    contains the name pattern, and whose direction (input or output)
+    matches the \p is_input parameter. If no match is found, #pmNoDevice
+    (-1) is returned.
+*/
+PMEXPORT PmDeviceID Pm_FindDevice(char *pattern, int is_input);
+
+
 /** Represents a millisecond clock with arbitrary start time. 
     This type is used for all MIDI timestamps and clocks.
 */
 typedef int32_t PmTimestamp;
+
+/** @brief function pointer to retrieve the time in milliseconds.
+    This is the time used in all PortMidi timestamps. The use of
+    a function pointer allows the user to derive time from an audio
+    sample count to synchronize MIDI to audio, or from a remote
+    machine through clock synchronization protocols to synchronize
+    MIDI across multiple machine. The time is independent of the
+    internal system timestamps (e.g., MacOS CoreMIDI uses its own
+    clock and timestamp representation, and PortMidi translates
+    between different clocks, which need not be synchronized.) */
 typedef PmTimestamp (*PmTimeProcPtr)(void *time_info);
 
 /** TRUE if t1 before t2 */
-#define PmBefore(t1,t2) ((t1-t2) < 0)
+#define PmBefore(t1,t2) (((t1)-(t2)) < 0)
 /** @} */
 /** 
     \defgroup grp_device Input/Output Devices Handling
@@ -360,13 +384,16 @@ PMEXPORT const PmDeviceInfo *Pm_GetDeviceInfo(PmDeviceID id);
 
     @param inputDevice the ID of the device to be opened (see #PmDeviceID).
 
-    @param inputDriverInfo a pointer to an optional driver-specific
-    data structure containing additional information for device setup
-    or handle processing. This parameter is never required for correct
-    operation. If not used, specify NULL.
+    @param inputSysDepInfo a pointer to an optional system-dependent
+    data structure (a #PmSysDepInfo struct) containing additional
+    information for device setup or handle processing. This parameter
+    is never required for correct operation. If not used, specify
+    NULL.  Declared `void *` here for backward compatibility. Note that
+    with Linux ALSA, you can use this parameter to specify a client name
+    and port name.
 
     @param bufferSize the number of input events to be buffered
-    waiting to be read using Pm_Read(). Messages will be lost if the
+    waiting to be read using #Pm_Read(). Messages will be lost if the
     number of unread messages exceeds this value.
 
     @param time_proc (address of) a procedure that returns time in
@@ -386,7 +413,7 @@ PMEXPORT const PmDeviceInfo *Pm_GetDeviceInfo(PmDeviceID id);
 
     @return #pmNoError and places a pointer to a valid
     #PortMidiStream in the stream argument.  If the open operation
-    fails, a nonzero error code is returned (see #PMError) and
+    fails, a nonzero error code is returned (see #PmError) and
     the value of stream is invalid.
 
     Any stream that is successfully opened should eventually be closed
@@ -394,7 +421,7 @@ PMEXPORT const PmDeviceInfo *Pm_GetDeviceInfo(PmDeviceID id);
 */
 PMEXPORT PmError Pm_OpenInput(PortMidiStream** stream,
                 PmDeviceID inputDevice,
-                void *inputDriverInfo,
+                void *inputSysDepInfo,
                 int32_t bufferSize,
                 PmTimeProcPtr time_proc,
                 void *time_info);
@@ -406,10 +433,13 @@ PMEXPORT PmError Pm_OpenInput(PortMidiStream** stream,
 
     @param outputDevice the ID of the device to be opened (see #PmDeviceID).
 
-    @param outputDriverInfo a pointer to an optional driver-specific
-    data structure containing additional information for device setup
-    or handle processing. This parameter is never required for correct
-    operation. If not used, specify NULL.
+    @param outputSysDepInfo a pointer to an optional system-specific
+    data structure (a #PmSysDepInfo struct) containing additional
+    information for device setup or handle processing. This parameter
+    is never required for correct operation. If not used, specify
+    NULL. Declared `void *` here for backward compatibility. Note that
+    with Linux ALSA, you can use this parameter to specify a client name
+    and port name.
 
     @param bufferSize the number of output events to be buffered
     waiting for output. In some cases -- see below -- PortMidi does
@@ -495,7 +525,7 @@ PMEXPORT PmError Pm_OpenInput(PortMidiStream** stream,
 */
 PMEXPORT PmError Pm_OpenOutput(PortMidiStream** stream,
                 PmDeviceID outputDevice,
-                void *outputDriverInfo,
+                void *outputSysDepInfo,
                 int32_t bufferSize,
                 PmTimeProcPtr time_proc,
                 void *time_info,
@@ -511,9 +541,10 @@ PMEXPORT PmError Pm_OpenOutput(PortMidiStream** stream,
     "ALSA". Currently, these are the only ones implemented, but future
     implementations could support DirectMusic, Jack, sndio, or others.
 
-    @param deviceInfo contains interface-dependent additional
-    information, e.g., hints or options. There are none at present, and
-    NULL is the recommended value.
+    @param sysDepInfo contains interface-dependent additional
+    information (a #PmSysDepInfo struct), e.g., hints or options. This
+    parameter is never required for correct operation. If not used,
+    specify NULL. Declared `void *` here for backward compatibility.
 
     @return a device ID or #pmNameConflict (\p name is invalid or
     already exists) or #pmInterfaceNotSupported (\p interf is does not
@@ -528,7 +559,7 @@ PMEXPORT PmError Pm_OpenOutput(PortMidiStream** stream,
 */
 PMEXPORT PmError Pm_CreateVirtualInput(const char *name,
                                        const char *interf,
-                                       void *deviceInfo);
+                                       void *sysDepInfo);
 
 /** Create a virtual output device.
 
@@ -540,9 +571,10 @@ PMEXPORT PmError Pm_CreateVirtualInput(const char *name,
     "ALSA". Currently, these are the only ones implemented, but future
     implementations could support DirectMusic, Jack, sndio, or others.
 
-    @param deviceInfo contains interface-dependent additional
-    information, e.g., hints or options. There are none at present, and
-    NULL is the recommended value.
+    @param sysDepInfo contains interface-dependent additional
+    information (a #PmSysDepInfo struct), e.g., hints or options. This
+    parameter is never required for correct operation. If not used,
+    specify NULL. Declared `void *` here for backward compatibility.
 
     @return a device ID or #pmInvalidDeviceId (\p name is invalid or
     already exists) or #pmInterfaceNotSupported (\p interf is does not
@@ -557,7 +589,7 @@ PMEXPORT PmError Pm_CreateVirtualInput(const char *name,
 */
 PMEXPORT PmError Pm_CreateVirtualOutput(const char *name,
                                         const char *interf,
-                                        void *deviceInfo);
+                                        void *sysDepInfo);
 
 /** Remove a virtual device.
 
@@ -631,7 +663,7 @@ PMEXPORT PmError Pm_DeleteVirtualDevice(PmDeviceID device);
                               PM_FILT_SONG_SELECT | PM_FILT_TUNE)
 
 
-/*  Set filters on an open input stream to drop selected input types.
+/** Set filters on an open input stream to drop selected input types.
     
     @param stream an open MIDI input stream.
 
@@ -826,8 +858,8 @@ typedef uint32_t PmMessage; /**< @brief see #PmEvent */
    non-decreasing.
  */
 typedef struct {
-    PmMessage      message;
-    PmTimestamp    timestamp;
+    PmMessage      message;    /**< up to 4 bytes of MIDI data */
+    PmTimestamp    timestamp;  /**< PortMidi time of message */
 } PmEvent;
 
 /** @} */
@@ -838,6 +870,10 @@ typedef struct {
 /** Retrieve midi data into a buffer. 
 
     @param stream the open input stream.
+
+    @param buffer input data is stored here
+
+    @param length the length of buffer (number of #PmEvent, not bytes)
 
     @return the number of events read, or, if the result is negative,
     a #PmError value will be returned.
@@ -857,7 +893,7 @@ typedef struct {
     operation.
 
     Solution: the entire buffer managed by PortMidi will be flushed
-    when an overflow occurs. The consumer (Pm_Read()) gets an error
+    when an overflow occurs. The consumer (#Pm_Read()) gets an error
     message (#pmBufferOverflow) and ordinary processing resumes as
     soon as a new message arrives. The remainder of a partial sysex
     message is not considered to be a "new message" and will be
@@ -891,7 +927,11 @@ PMEXPORT PmError Pm_Poll(PortMidiStream *stream);
 
     @param length the length of the \p buffer.
 
-    @return TRUE, FALSE, or an error value.
+    @return #pmNoError, #pmBadPtr (if \p stream is not valid and opened),
+        #pmDeviceRemoved (if the MIDI device no longer exists),
+        #pmBadData (if \p buffer data does not represent valid MIDI, e.g.,
+        nested SYSEX messages, or #pmHostError (error returned from API's
+        MIDI write operation, see #Pm_GetHostErrorText). 
 
     \b buffer may contain:
         - short messages 
@@ -926,7 +966,11 @@ PMEXPORT PmError Pm_Write(PortMidiStream *stream, PmEvent *buffer,
 
     @param msg the data for the event.
 
-    @result #pmNoError or an error code.
+    @return #pmNoError, #pmBadPtr (if \p stream is not valid and opened),
+        #pmDeviceRemoved (if the MIDI device no longer exists),
+        #pmBadData (if \p buffer data does not represent valid MIDI, e.g.,
+        nested SYSEX messages, or #pmHostError (error returned from API's
+        MIDI write operation, see #Pm_GetHostErrorText). 
 
     Messages are delivered in order, and timestamps must be
     non-decreasing. (But timestamps are ignored if the stream was
@@ -944,7 +988,11 @@ PMEXPORT PmError Pm_WriteShort(PortMidiStream *stream, PmTimestamp when,
 
     @param msg the sysex message, terminated with an EOX status byte.
 
-    @result #pmNoError or an error code.
+    @return #pmNoError, #pmBadPtr (if \p stream is not valid and opened),
+        #pmDeviceRemoved (if the MIDI device no longer exists),
+        #pmBadData (if \p buffer data does not represent valid MIDI, e.g.,
+        nested SYSEX messages, or #pmHostError (error returned from API's
+        MIDI write operation, see #Pm_GetHostErrorText). 
 
     \p msg is managed by the caller and may be destroyed when this
     call returns.
@@ -957,4 +1005,5 @@ PMEXPORT PmError Pm_WriteSysEx(PortMidiStream *stream, PmTimestamp when,
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* PORT_MIDI_H */
+
+#endif /* PORTMIDI_PORTMIDI_H */

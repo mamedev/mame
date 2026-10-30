@@ -133,11 +133,11 @@ void DebuggerView::paintEvent(QPaintEvent *event)
 
 			if ((textAttr & DCA_SELECTED) && (textAttr & DCA_CURRENT))
 			{
-				#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-					bgColor.setRgb(palette.color(QPalette::Accent).rgb());
-				#else
-					bgColor.setRgb(0xff,0xc0,0x80);
-				#endif
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
+				bgColor.setRgb(palette.color(QPalette::Accent).rgb());
+#else
+				bgColor.setRgb(0xff,0xc0,0x80);
+#endif
 			}
 
 			if (textAttr & DCA_CHANGED)
@@ -317,11 +317,7 @@ void DebuggerView::mousePressEvent(QMouseEvent *event)
 	debug_view_xy const topLeft = m_view->visible_position();
 	debug_view_xy const visibleCharDims = m_view->visible_size();
 	debug_view_xy clickViewPosition;
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 	const QPointF mousePosition = event->position();
-#else
-	const QPointF mousePosition = event->localPos();
-#endif
 	clickViewPosition.x = (std::min)(int(topLeft.x + (mousePosition.x() / fontWidth)), topLeft.x + visibleCharDims.x - 1);
 	clickViewPosition.y = (std::min)(int(topLeft.y + (mousePosition.y() / fontHeight)), topLeft.y + visibleCharDims.y - 1);
 

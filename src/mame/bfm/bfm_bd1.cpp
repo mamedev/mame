@@ -105,16 +105,12 @@ static const uint16_t BD1charset[]=
 
 bfm_bd1_device::bfm_bd1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BFM_BD1, tag, owner, clock)
-	, m_outputs()
-	, m_port_val(0)
+	, m_outputs(*this, "vfd%u", 0U)
 {
 }
 
 void bfm_bd1_device::device_start()
 {
-	m_outputs = std::make_unique<output_finder<16> >(*this, "vfd%u", unsigned(m_port_val) << 4);
-	m_outputs->resolve();
-
 	save_item(NAME(m_cursor_pos));
 	save_item(NAME(m_window_start));        // display window start pos 0-15
 	save_item(NAME(m_window_end));      // display window end   pos 0-15
@@ -230,7 +226,7 @@ void bfm_bd1_device::update_display()
 	}
 
 	for (int i = 0; i < 16; i++)
-		(*m_outputs)[i] = (m_attrs[i] == AT_NORMAL) ? set_display(m_chars[i]) : 0;
+		m_outputs[i] = (m_attrs[i] == AT_NORMAL) ? set_display(m_chars[i]) : 0;
 }
 ///////////////////////////////////////////////////////////////////////////
 void bfm_bd1_device::blank(int data)

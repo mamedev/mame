@@ -12,9 +12,10 @@
     digital pulses by a NE558 quad timer on the main board. The
     connector also provides several digital switch inputs and
     "annunciator" outputs, all LS/TTL compatible. Apple joysticks
-    provide active high switches (though at least one third-party
-    product treats them as active low) and Apple main boards have no
-    pullups on these inputs, which thus read 0 if disconnected.
+    provide active high switches, though at least one third-party
+    product treats them as active low; small pull-down devices must
+    be provided for these to counteract the tendency for LS/TTL inputs
+    to float high (or weak pull-up devices on some motherboards).
 
     While pins 9 and 16 are unconnected on the Apple II, they provide
     additional digital output and input pins respectively on the Sanyo
@@ -50,6 +51,7 @@
 
 #include "emu.h"
 #include "bus/a2gameio/gameio.h"
+
 #include "bus/a2gameio/brightpen.h"
 #include "bus/a2gameio/joystick.h"
 #include "bus/a2gameio/joyport.h"
@@ -58,6 +60,8 @@
 #include "bus/a2gameio/paddles.h"
 #include "bus/a2gameio/gizmo.h"
 #include "bus/a2gameio/wico_joystick.h"
+#include "bus/a2gameio/serial.h"
+#include "bus/a2gameio/organ.h"
 
 //**************************************************************************
 //  CONNECTOR DEVICE IMPLEMENTATION
@@ -71,7 +75,6 @@ apple2_gameio_device::apple2_gameio_device(const machine_config &mconfig, const 
 	, device_single_card_slot_interface<device_a2gameio_interface>(mconfig, *this)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_intf(nullptr)
-	, m_sw_pullups(false)
 {
 }
 
@@ -85,6 +88,8 @@ void apple2_gameio_device::iiandplus_options(device_slot_interface &slot)
 	slot.option_add("compeyes", APPLE2_COMPUTEREYES);
 	slot.option_add("wicojoy", APPLE2_WICO_JOYSTICK);
 	slot.option_add("brightpen", APPLE2_BRIGHTPEN);
+	slot.option_add("serial", APPLE2_GAMEIO_SERIAL);
+	slot.option_add("organ", APPLE_ORGAN);
 }
 
 void apple2_gameio_device::default_options(device_slot_interface &slot)
@@ -93,6 +98,8 @@ void apple2_gameio_device::default_options(device_slot_interface &slot)
 	slot.option_add("paddles", APPLE2_PADDLES);
 	slot.option_add("gizmo", APPLE2_GIZMO);
 	slot.option_add("compeyes", APPLE2_COMPUTEREYES);
+	slot.option_add("serial", APPLE2_GAMEIO_SERIAL);
+	slot.option_add("organ", APPLE_ORGAN);
 }
 
 void apple2_gameio_device::joystick_options(device_slot_interface &slot)
@@ -160,7 +167,7 @@ int apple2_gameio_device::sw0_r()
 	if (m_intf != nullptr)
 		return m_intf->sw0_r();
 
-	return m_sw_pullups ? 1 : 0;
+	return 1;
 }
 
 int apple2_gameio_device::sw1_r()
@@ -168,7 +175,7 @@ int apple2_gameio_device::sw1_r()
 	if (m_intf != nullptr)
 		return m_intf->sw1_r();
 
-	return m_sw_pullups ? 1 : 0;
+	return 1;
 }
 
 int apple2_gameio_device::sw2_r()
@@ -176,7 +183,7 @@ int apple2_gameio_device::sw2_r()
 	if (m_intf != nullptr)
 		return m_intf->sw2_r();
 
-	return m_sw_pullups ? 1 : 0;
+	return 1;
 }
 
 int apple2_gameio_device::sw3_r()
@@ -184,7 +191,23 @@ int apple2_gameio_device::sw3_r()
 	if (m_intf != nullptr)
 		return m_intf->sw3_r();
 
-	return m_sw_pullups ? 1 : 0;
+	return 1;
+}
+
+bool apple2_gameio_device::has_sw0() const
+{
+	if (m_intf != nullptr)
+		return m_intf->has_sw0();
+
+	return false;
+}
+
+bool apple2_gameio_device::has_sw1() const
+{
+	if (m_intf != nullptr)
+		return m_intf->has_sw1();
+
+	return false;
 }
 
 void apple2_gameio_device::an0_w(int state)

@@ -198,15 +198,16 @@ void e100_state::machine_start()
 uint32_t e100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	LOGSCREEN("%s()\n", FUNCNAME);
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t vram_addr = (y >> 3) * 32;
+		auto *const dst = &bitmap.pix(y);
 
 		for (int col = 0; col < 32 * 6; col += 6)
 		{
 			for (int x = 0; x < 6; x++)
 			{
-				bitmap.pix(y, col + x) = BIT(m_chargen[(m_vram[vram_addr] << 3) | (y & 7)], x);
+				dst[col + x] = BIT(m_chargen[(m_vram[vram_addr] << 3) | (y & 7)], x);
 			}
 			vram_addr++;
 		}
@@ -488,7 +489,7 @@ void e100_state::e100(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &e100_state::e100_map);
 
 	/* Devices */
-	TTL74145(config, m_kbd_74145, 0);
+	TTL74145(config, m_kbd_74145);
 
 	/* --PIA inits----------------------- */
 	/* 0xF883 0xC818 (PIA1 DDR A)     = 0x00 - Port A all inputs */
@@ -536,7 +537,7 @@ void e100_state::e100(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* screen TODO: simplify the screen config, look at zx.cpp */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(4_MHz_XTAL, 265, 0, 256, 265, 0, 256);
 	screen.set_screen_update(FUNC(e100_state::screen_update));
 	screen.set_palette("palette");

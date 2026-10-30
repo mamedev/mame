@@ -10,7 +10,7 @@
 class jaleco_blend_device : public device_t
 {
 public:
-	jaleco_blend_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	jaleco_blend_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 	~jaleco_blend_device() {}
 
 	rgb_t func(rgb_t dest, rgb_t addMe);
@@ -35,9 +35,8 @@ protected:
 
 private:
 	template<class BitmapClass>
-	void drawgfx_common(palette_device &palette,BitmapClass &dest_bmp,const rectangle &clip,gfx_element *gfx,
-			u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
-			u8 transparent_color);
+	void drawgfx_common(palette_device &palette, BitmapClass &dest_bmp, const rectangle &clip, gfx_element *gfx,
+			u32 code, u32 color, bool flipx, bool flipy, int offsx, int offsy, u8 transparent_color);
 };
 
 DECLARE_DEVICE_TYPE(JALECO_BLEND, jaleco_blend_device)

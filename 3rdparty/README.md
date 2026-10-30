@@ -1,6 +1,6 @@
 # **3rdparty** #
 
-aescbc - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
+aes128cbc, aes128ecb, aes192cbc, aes192ecb, aes256cbc, aes256ecb - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 asio - [Boost Software License](http://www.boost.org/LICENSE_1_0.txt)
 
@@ -58,7 +58,7 @@ pugixml - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 rapidjson - [The MIT License (MIT)](http://opensource.org/licenses/MIT), [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause) (msinttypes), JSON license (JSON_checker)
 
-softfloat - ["Softfloat 2b" U.C. Berkeley modified license](https://github.com/mamedev/mame/blob/master/3rdparty/softfloat/README.txt) MIT compatible
+residfp - [The GNU General Public License, version 2 or later](https://opensource.org/licenses/GPL-2.0)
 
 softfloat3 - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 

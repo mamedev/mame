@@ -150,7 +150,7 @@ void korgtriton_state::korgtriton(machine_config &config)
 	m_maincpu->write_porte().set(FUNC(korgtriton_state::pe_w));
 
 	// 320x240 screen, should be a simple framebuffer at LCDCIO
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(SCREEN_WIDTH, SCREEN_HEIGHT);

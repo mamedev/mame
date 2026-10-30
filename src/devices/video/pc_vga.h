@@ -29,7 +29,7 @@ class vga_device : public device_t
 
 public:
 	// construction/destruction
-	vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void zero();
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -186,6 +186,7 @@ protected:
 			struct
 			{
 				uint8_t A, B;
+				u32 base[2];
 			}char_sel;
 		} sequencer;
 
@@ -325,7 +326,7 @@ class svga_device :  public vga_device
 public:
 	virtual void zero() override;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
-	uint8_t get_video_depth();
+	virtual uint8_t get_video_depth();
 
 protected:
 	// construction/destruction
@@ -353,13 +354,6 @@ protected:
 };
 
 
-/*
-  pega notes (paradise)
-  build in amstrad pc1640
-
-  ROM_LOAD("40100", 0xc0000, 0x8000, CRC(d2d1f1ae) SHA1(98302006ee38a17c09bd75504cc18c0649174e33) )
-
-*/
 
 /*
   oak vga (oti 037 chip)

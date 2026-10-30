@@ -20,9 +20,9 @@
 static constexpr u32 C7M  = 7833600;
 static constexpr u32 C15M = (C7M * 2);
 
-[[maybe_unused]] static constexpr u8 SOUND_POWER = 0; // 0 = DFAC power off, 1 = DFAC power on
+static constexpr u8 SOUND_POWER     = 0;    // 0 = turn DFAC power off, 1 = turn DFAC power on
 static constexpr u8 SOUND_BUSY      = 6;    // 1 = ASC FIFO accessed since last read of this register
-[[maybe_unused]] static constexpr u8 SOUND_LATCH = 7; // 1 = DFAC is powered up
+static constexpr u8 SOUND_LATCH     = 7;    // 1 = DFAC is powered up
 
 DEFINE_DEVICE_TYPE(MSC, msc_device, "msc", "Apple MSC system ASIC")
 DEFINE_DEVICE_TYPE(MSC_VIA, mscvia_device, "mscvia", "Apple MSC integrated VIA")
@@ -32,7 +32,7 @@ void msc_device::map(address_map &map)
 	map(0x00000000, 0x000fffff).r(FUNC(msc_device::rom_switch_r)).mirror(0x0ff00000);
 
 	map(0x10f00000, 0x10f01fff).rw(FUNC(msc_device::via_r), FUNC(msc_device::via_w));
-	map(0x10f14000, 0x10f15fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
+	map(0x10f14000, 0x10f15fff).rw(m_asc, FUNC(asc_msc_device::read), FUNC(asc_msc_device::write));
 	map(0x10f26000, 0x10f27fff).rw(FUNC(msc_device::via2_r), FUNC(msc_device::via2_w));
 	map(0x10fa0000, 0x10fa0003).w(FUNC(msc_device::power_cycle_w));
 }
@@ -51,7 +51,7 @@ void msc_device::device_add_mconfig(machine_config &config)
 	m_via1->cb2_handler().set(FUNC(msc_device::via_out_cb2));
 	m_via1->irq_handler().set(FUNC(msc_device::via1_irq));
 
-	APPLE_PSEUDOVIA(config, m_pseudovia, C15M);
+	APPLE_MSC_PSEUDOVIA(config, m_pseudovia, C15M);
 	m_pseudovia->irq_callback().set(FUNC(msc_device::via2_irq));
 	m_pseudovia->readpa_handler().set(FUNC(msc_device::via2_in_a));
 	m_pseudovia->readpb_handler().set(FUNC(msc_device::via2_in_b));
@@ -62,14 +62,15 @@ void msc_device::device_add_mconfig(machine_config &config)
 	m_pseudovia->readvideo_handler().set(FUNC(msc_device::msc_config_r));
 	m_pseudovia->writevideo_handler().set(FUNC(msc_device::msc_config_w));
 
-	ASC(config, m_asc, C15M, asc_device::asc_type::EASC);
+	ASC_MSC(config, m_asc, C15M);
 	m_asc->add_route(0, tag(), 1.0, 0);
 	m_asc->add_route(1, tag(), 1.0, 1);
-	m_asc->irqf_callback().set(m_pseudovia, FUNC(pseudovia_device::asc_irq_w));
+	m_asc->irqf_callback().set(m_pseudovia, FUNC(msc_pseudovia_device::asc_irq_w));
 }
 
 mscvia_device::mscvia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: via6522_device(mconfig, MSC_VIA, tag, owner, clock)
+	: via6522_device(mconfig, MSC_VIA, tag, owner, clock),
+	  m_pmu_int_state(CLEAR_LINE)
 {
 }
 
@@ -129,7 +130,7 @@ void msc_device::device_start()
 	// power management needs to know if the user is idle but sound is playing, so as not to put the machine to sleep
 	m_maincpu->space(AS_PROGRAM).install_write_tap(0x50f14000, 0x50f15fff, "snd_latch_mon", [this](offs_t offset, u32 &data, u32 mem_mask)
 	{
-		this->m_msc_sound_ctrl |= (1 << SOUND_BUSY);
+		this->m_msc_sound_ctrl |= (1 << SOUND_BUSY) | (1 << SOUND_POWER) | (1 << SOUND_LATCH);
 	});
 }
 
@@ -144,6 +145,9 @@ void msc_device::device_reset()
 
 	m_via_interrupt = m_via2_interrupt = m_scc_interrupt = 0;
 	m_last_taken_interrupt = -1;
+
+	// The PMU holds us in reset at power-on, and sound is unpowered until it lets go.
+	m_msc_sound_ctrl = 0;
 
 	// main cpu shouldn't start until PMU wakes it up
 	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -360,8 +364,15 @@ void msc_device::pmu_ack_w(int state)
 	}
 }
 
+int msc_device::dfac_power()
+{
+	return BIT(m_msc_sound_ctrl, SOUND_POWER);
+}
+
 void msc_device::pmu_reset_w(int state)
 {
+	m_msc_sound_ctrl &= ~((1 << SOUND_POWER) | (1 << SOUND_LATCH));
+
 	if (!state)
 	{
 		// put ROM mirror at 0 for reset
@@ -481,7 +492,7 @@ void msc_device::via_w(offs_t offset, u16 data, u16 mem_mask)
 	data >>= 8;
 
 	via_sync();
-	m_via1->write(offset, data & 0xff);
+	m_via1->write_msc(offset, data & 0xff);
 }
 
 void msc_device::via_sync()

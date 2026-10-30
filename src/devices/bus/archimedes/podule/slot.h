@@ -2,7 +2,7 @@
 // copyright-holders:Nigel Barnes
 /**********************************************************************
 
-    Acorn Archimedes Expansion Bus emulation
+    Acorn Archimedes/Risc PC Expansion Bus emulation
 
 **********************************************************************/
 
@@ -35,10 +35,7 @@ public:
 	archimedes_podule_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&bus_tag, U &&opts, const char *dflt)
 		: archimedes_podule_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1, 1))
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 		m_exp.set_tag(std::forward<T>(bus_tag));
 	}
 	archimedes_podule_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -51,7 +48,7 @@ protected:
 	required_device<archimedes_exp_device> m_exp;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(ARCHIMEDES_PODULE_SLOT, archimedes_podule_slot_device)
 
 
@@ -69,12 +66,21 @@ public:
 	auto out_irq_callback() { return m_out_pirq_cb.bind(); }
 	auto out_fiq_callback() { return m_out_pfiq_cb.bind(); }
 
+	// MEMC and IOC handlers
 	u16 ps4_r(offs_t offset, u16 mem_mask = ~0);
 	void ps4_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 ps6_r(offs_t offset, u16 mem_mask = ~0);
 	void ps6_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 ms_r(offs_t offset, u16 mem_mask = ~0);
-	void ms_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 ps7_r(offs_t offset, u16 mem_mask = ~0);
+	void ps7_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 ms0_r(offs_t offset, u16 mem_mask = ~0);
+	void ms0_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 ms3_r(offs_t offset, u16 mem_mask = ~0);
+	void ms3_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	// DEBI and EASI handlers
+	u32 eas_r(offs_t offset, u32 mem_mask = ~0);
+	void eas_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	template<typename T> void install_ioc_map(int slot, T &device, void (T::*map)(class address_map &map))
 	{
@@ -85,6 +91,12 @@ public:
 	{
 		offs_t base = slot << 14;
 		m_memc->install_device(base, base + 0x3fff, device, map);
+	}
+
+	template<typename T> void install_easi_map(int slot, T &device, void (T::*map)(class address_map &map))
+	{
+		offs_t base = slot << 24;
+		m_easi->install_device(base, base + 0xffffff, device, map);
 	}
 
 	void pirq_w(int state, int slot);
@@ -99,8 +111,13 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 private:
+	void ioc_map(address_map &map) ATTR_COLD;
+	void memc_map(address_map &map) ATTR_COLD;
+	void easi_map(address_map &map) ATTR_COLD;
+
 	address_space_config m_ioc_config;
 	address_space_config m_memc_config;
+	address_space_config m_easi_config;
 
 	devcb_write_line m_out_pirq_cb;
 	devcb_write_line m_out_pfiq_cb;
@@ -110,13 +127,11 @@ private:
 
 	address_space *m_ioc;
 	address_space *m_memc;
-
-	void ioc_map(address_map &map) ATTR_COLD;
-	void memc_map(address_map &map) ATTR_COLD;
+	address_space *m_easi;
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(ARCHIMEDES_EXPANSION_BUS, archimedes_exp_device)
 
 
@@ -144,6 +159,7 @@ protected:
 
 	virtual void ioc_map(address_map &map) { }
 	virtual void memc_map(address_map &map) { }
+	virtual void easi_map(address_map &map) { }
 
 	archimedes_exp_device *m_exp;
 	const char *m_exp_slottag;
@@ -153,6 +169,8 @@ protected:
 
 void archimedes_exp_devices(device_slot_interface &device);
 void archimedes_mini_exp_devices(device_slot_interface &device);
+void riscpc_debi_exp_devices(device_slot_interface &device);
+void riscpc_easi_exp_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_ARCHIMEDES_PODULE_SLOT_H

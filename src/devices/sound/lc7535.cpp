@@ -117,14 +117,14 @@ void lc7535_device::clk_w(int state)
 				if (++m_count == 16)
 				{
 					// left channel
-					int att_l = m_1db[(m_data >> 12) & 0x07];
+					int att_l = s_1db[(m_data >> 12) & 0x07];
 					if (att_l != MAX)
-						att_l += m_5db[(m_data >> 8) & 0x0f];
+						att_l += s_5db[(m_data >> 8) & 0x0f];
 
 					// right channel
-					int att_r = m_1db[(m_data >> 4) & 0x07];
+					int att_r = s_1db[(m_data >> 4) & 0x07];
 					if (att_r != MAX)
-						att_r += m_5db[(m_data >> 0) & 0x0f];
+						att_r += s_5db[(m_data >> 0) & 0x0f];
 
 					m_loudness = bool(BIT(m_data, 7));
 					m_volume[0] = attenuation_to_gain(att_l);

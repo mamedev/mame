@@ -127,24 +127,37 @@ void superxavix_state::bmp_palram_l_w(offs_t offset, uint8_t data)
 }
 
 
+void xavix_state::spriteram_set_high_x(offs_t offset, uint8_t data)
+{
+	offset &= 0xff;
+	m_fragment_sprite[0x000 + offset] = (m_fragment_sprite[0x000 + offset] & 0xfe) | (data ? 1 : 0);
+	m_fragment_sprite[0x400 + offset] = data ? 1 : 0;
+}
+
 void xavix_state::spriteram_w(offs_t offset, uint8_t data)
 {
-	if (offset < 0x100)
+	if (offset < 0x100) // 0x000 - 0x0ff
+	{
+		m_fragment_sprite[offset] = data & 0xfe;
+		spriteram_set_high_x(offset, data & 0x01);
+	}
+	else if (offset < 0x300) // 0x100-0x2ff
 	{
 		m_fragment_sprite[offset] = data;
-		m_fragment_sprite[offset + 0x400] = data & 0x01;
 	}
-	else if (offset < 0x400)
+	else if (offset < 0x400) // 0x300-0x3ff
 	{
+		// copy sprite x bit 7 into bit 8 (which is stored at 0x4xx, and can also be seen in the low bit of 0x0xx)
+		// pl1000 has explicit codepaths where it doesn't bother to set the 0x400-0x4ff range if it isn't needed
+		// and we can't be using old values from there
 		m_fragment_sprite[offset] = data;
+		spriteram_set_high_x(offset, data & 0x80);
 	}
-	else if (offset < 0x500)
+	else if (offset < 0x500) // 0x400-0x4ff
 	{
-		m_fragment_sprite[offset] = data & 1;
-		m_fragment_sprite[offset - 0x400] = (m_fragment_sprite[offset - 0x400] & 0xfe) | (data & 0x01);
-		m_sprite_xhigh_ignore_hack = false; // still doesn't help monster truck test mode case, which writes here, but still expects values to be ignored
+		spriteram_set_high_x(offset, data & 0x01);
 	}
-	else
+	else // 0x500-0x7ff
 	{
 		m_fragment_sprite[offset] = data;
 	}
@@ -653,7 +666,7 @@ void xavix_state::update_pen(int pen, uint8_t shval, uint8_t lval)
 
 void xavix_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		draw_tilemap_line(screen, bitmap, cliprect, which, y);
 	}
@@ -975,12 +988,29 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap,
 			// Addressing Mode 2 (plus Inline Header)
 
 			//if (debug_packets) LOG("for tile %04x (at %d %d): ", tile, (((x * 16) + scrollx) & 0xff), (((y * 16) + scrolly) & 0xff));
+			if (tileregs[0x7] == 0x94)
+			{
+				// multiplt uses this for the '3d' driving sections
+				const offs_t realaddress = (tileregs[0x2] << 8) + count;
+				uint8_t extraattr;
 
-			basereg = (tile & 0xf000) >> 12;
-			tile &= 0x0fff;
-			gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
+				if (m_disable_memory_bypass)
+					extraattr = m_maincpu->space(AS_PROGRAM).read_byte(realaddress);
+				else
+					extraattr = read_full_data_sp_bypass(realaddress);
 
-			tile += gfxbase;
+				tile += extraattr << 16;
+			}
+			else // tileregs[0x7] == 0x93
+			{
+				// rad_mtrk uses this
+				basereg = (tile & 0xf000) >> 12;
+				tile &= 0x0fff;
+				gfxbase = (m_segment_regs[(basereg * 2) + 1] << 16) | (m_segment_regs[(basereg * 2)] << 8);
+
+				tile += gfxbase;
+			}
+
 			set_data_address(tile, 0);
 
 			decode_inline_header(flipx, flipy, test, pal, debug_packets);
@@ -1000,7 +1030,7 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap,
 
 void xavix_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		draw_sprites_line(screen, bitmap, cliprect, y);
 	}
@@ -1146,59 +1176,17 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 		{
 			int drawline = line - spritelowy;
 
-
-			/* coordinates are signed, based on screen position 0,0 being at the center of the screen
-			   tile addressing likewise, point 0,0 is center of tile?
-			   this makes the calculation a bit more annoying in terms of knowing when to apply offsets, when to wrap etc.
-			   this is likely still incorrect
-
-			   -- NOTE! HACK!
-
-			   Use of additional x-bit is very confusing rad_snow, taitons1 (ingame) etc. clearly need to use it
-			   but the taitons1 xavix logo doesn't even initialize the RAM for it and behavior conflicts with ingame?
-			   maybe only works with certain tile sizes?
-
-			   some code even suggests this should be bit 0 of attr0, but it never gets set there
-			   (I'm mirroring the bits in the write handler at the moment)
-
-			   there must be a register somewhere (or a side-effect of another mode) that enables / disables this
-			   behavior, as we need to make use of xposh for the left side in cases that need it, but that
-			   completely breaks the games that never set it at all (monster truck, xavix logo on taitons1)
-
-			   monster truck hidden service mode ends up writing to the RAM, breaking the 'clock' display if
-			   we use the values for anything.. again suggesting there must be a way to ignore it entirely?
-
-			 */
+			// There's also an oddity with pl1000, where you can shoot cars that have
+			// wrapped around to the edge before they vanish, previously these were
+			// visible (incorrectly) now they are not visible, but you can still shoot
+			// them (maybe BTNAB)
 
 			int xposh = spr_xposh[i] & 1;
 
-			if (xpos & 0x80) // left side of center
-			{
-				xpos &= 0x7f;
-				xpos = -0x80 + xpos;
-
-				// this also breaks the epoch logo on suprtvpc, although some ingame elements need it
-				if (!m_sprite_xhigh_ignore_hack)
-					if (!xposh)
-						xpos -= 0x80;
-
-			}
-			else // right side of center
-			{
-				xpos &= 0x7f;
-
-				if (!m_sprite_xhigh_ignore_hack)
-					if (xposh)
-						xpos += 0x80;
-			}
-
-			xpos += 128;
-
+			xpos |= xposh << 8;
+			xpos ^= 0x100;
 			xpos += xpos_adjust;
-
-			// galplus phalanx beam (sprite wraparound)
-			if (xpos<-0x80)
-				xpos += 256+128;
+			xpos -= 0x80;
 
 			int bpp = 1;
 
@@ -1286,71 +1274,68 @@ void superxavix_state::get_tile_pixel_dat(uint8_t &dat, int bpp)
 
 void xavix_state::draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line)
 {
+	if (!cliprect.containsy(ypos))
+		return;
+
+	if (!cliprect.overlapsx(xpos * m_video_hres_multiplier, ((xpos + drawwidth) * m_video_hres_multiplier) - 1))
+		return;
+
 	const pen_t *paldata = m_palette->pens();
-	if (ypos > cliprect.max_y || ypos < cliprect.min_y)
-		return;
 
-	if (((xpos * m_video_hres_multiplier) > cliprect.max_x) || (((xpos * m_video_hres_multiplier) + drawwidth * m_video_hres_multiplier) < cliprect.min_x))
-		return;
+	// if bpp>4 then ignore unaligned palette selects bits based on bpp
+	// ttv_lotr uses 5bpp graphics (so 32 colour alignment) but sets palette 0xf (a 16 colour boundary) when it expects palette 0xe
+	if (bpp>4)
+		pal &= (0xf<<(bpp-4));
 
-	if ((ypos >= cliprect.min_y && ypos <= cliprect.max_y))
+	int bits_per_tileline = drawwidth * bpp;
+
+	// set the address here so we can increment in bits in the draw function
+	set_data_address(tile, 0);
+
+	if (flipy)
+		line = (drawheight - 1) - line;
+
+	m_tmp_dataaddress = m_tmp_dataaddress + ((line * bits_per_tileline) / 8);
+	m_tmp_databit = (line * bits_per_tileline) % 8;
+
+	for (int x = 0; x < drawwidth; x++)
 	{
-		// if bpp>4 then ignore unaligned palette selects bits based on bpp
-		// ttv_lotr uses 5bpp graphics (so 32 colour alignment) but sets palette 0xf (a 16 colour boundary) when it expects palette 0xe
-		if (bpp>4)
-			pal &= (0xf<<(bpp-4));
-
-		int bits_per_tileline = drawwidth * bpp;
-
-		// set the address here so we can increment in bits in the draw function
-		set_data_address(tile, 0);
-
-		if (flipy)
-			line = (drawheight - 1) - line;
-
-		m_tmp_dataaddress = m_tmp_dataaddress + ((line * bits_per_tileline) / 8);
-		m_tmp_databit = (line * bits_per_tileline) % 8;
-
-		for (int x = 0; x < drawwidth; x++)
+		int col;
+		if (flipx)
 		{
-			int col;
+			col = xpos + (drawwidth - 1) - x;
+		}
+		else
+		{
+			col = xpos + x;
+		}
 
-			if (flipx)
+		uint8_t dat = 0;
+
+		get_tile_pixel_dat(dat, bpp);
+
+		col = col * m_video_hres_multiplier;
+
+		if (cliprect.containsx(col))
+		{
+			uint16_t *const zyposptr = &m_zbuffer.pix(ypos);
+
+			if (zval >= zyposptr[col])
 			{
-				col = xpos + (drawwidth - 1) - x;
-			}
-			else
-			{
-				col = xpos + x;
-			}
+				int pen = (dat + (pal << 4)) & 0xff;
 
-			uint8_t dat = 0;
-
-			get_tile_pixel_dat(dat, bpp);
-
-			col = col * m_video_hres_multiplier;
-
-			if ((col >= cliprect.min_x && col <= cliprect.max_x))
-			{
-				uint16_t *const zyposptr = &m_zbuffer.pix(ypos);
-
-				if (zval >= zyposptr[col])
+				if ((m_palram_sh[pen] & 0x1f) < 24) // hue values 24-31 are transparent
 				{
-					int pen = (dat + (pal << 4)) & 0xff;
+					uint32_t *const yposptr = &bitmap.pix(ypos);
+					yposptr[col] = paldata[pen];
+					if (m_video_hres_multiplier == 2)
+						yposptr[col+1] = paldata[pen];
 
-					if ((m_palram_sh[pen] & 0x1f) < 24) // hue values 24-31 are transparent
-					{
-						uint32_t *const yposptr = &bitmap.pix(ypos);
-						yposptr[col] = paldata[pen];
-						if (m_video_hres_multiplier == 2)
-							yposptr[col+1] = paldata[pen];
+					zyposptr[col] = zval;
 
-						zyposptr[col] = zval;
+					if (m_video_hres_multiplier == 2)
+						zyposptr[col+1] = zval;
 
-						if (m_video_hres_multiplier == 2)
-							zyposptr[col+1] = zval;
-
-					}
 				}
 			}
 		}
@@ -1363,11 +1348,6 @@ rectangle xavix_state::do_arena(screen_device &screen, bitmap_rgb32 &bitmap, con
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	rectangle clip = cliprect;
-
-	clip.min_y = cliprect.min_y;
-	clip.max_y = cliprect.max_y;
-	clip.min_x = cliprect.min_x;
-	clip.max_x = cliprect.max_x;
 
 	if (m_arena_control & 0x01)
 	{
@@ -1382,14 +1362,11 @@ rectangle xavix_state::do_arena(screen_device &screen, bitmap_rgb32 &bitmap, con
 		*/
 		if (((m_arena_start != 0x00) && (m_arena_end != 0x00)) && ((m_arena_start != 0xff) && (m_arena_end != 0xff)))
 		{
-			clip.max_x = (m_arena_start - 3) * m_video_hres_multiplier; // must be -3 to hide garbage on the right hand side of snowboarder
-			clip.min_x = (m_arena_end - 2) * m_video_hres_multiplier; // must be -2 to render a single pixel line of the left border on Mappy remix (verified to render), although this creates a single pixel gap on the left of snowboarder status bar (need to verify)
+			clip.setx(
+					(m_arena_end - 2) * m_video_hres_multiplier, // must be -2 to render a single pixel line of the left border on Mappy remix (verified to render), although this creates a single pixel gap on the left of snowboarder status bar (need to verify)
+					(m_arena_start - 3) * m_video_hres_multiplier); // must be -3 to hide garbage on the right hand side of snowboarder
 
-			if (clip.min_x < cliprect.min_x)
-				clip.min_x = cliprect.min_x;
-
-			if (clip.max_x > cliprect.max_x)
-				clip.max_x = cliprect.max_x;
+			clip &= cliprect;
 		}
 	}
 
@@ -1503,7 +1480,7 @@ void superxavix_state::draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bi
 			top += vpostadjust;
 			bot += vpostadjust;
 
-			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+			for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 			{
 				int line = y - top;
 
@@ -1541,7 +1518,7 @@ void superxavix_state::draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bi
 						if (!is_highres)
 							realx *= 2;
 
-						if (((realx <= cliprect.max_x) && (realx >= cliprect.min_x)) && ((y <= cliprect.max_y) && (y >= cliprect.min_y)))
+						if (cliprect.contains(realx, y))
 						{
 							if ((m_bmp_palram_sh[dat] & 0x1f) < 24) // same transparency logic as everything else? (baseball title)
 							{
@@ -1557,7 +1534,7 @@ void superxavix_state::draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bi
 						if (!is_highres)
 							realx += 1;
 
-						if (((realx <= cliprect.max_x) && (realx >= cliprect.min_x)) && ((y <= cliprect.max_y) && (y >= cliprect.min_y)))
+						if (cliprect.contains(realx, y))
 						{
 							if ((m_bmp_palram_sh[dat] & 0x1f) < 24) // same transparency logic as everything else? (baseball title)
 							{

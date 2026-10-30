@@ -351,7 +351,7 @@ void pdp11_state::pdp11(machine_config &config)
 	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal");
 	m_rs232->rxd_handler().set(m_dl11, FUNC(dl11_device::rx_w));
 
-	RX01(config, "rx01", 0);
+	RX01(config, "rx01");
 	QBUS(config, m_qbus, 0);
 	m_qbus->set_space(m_maincpu, AS_PROGRAM);
 	m_qbus->birq4().set_inputline(m_maincpu, t11_device::CP0_LINE);

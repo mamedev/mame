@@ -33,7 +33,7 @@ private:
 
 	emu_timer *m_frame_timer;
 
-	output_finder<1> m_vfd_background;
+	output_finder<> m_vfd_background;
 	output_finder<96 * 8> m_dotmatrix;
 	output_finder<1> m_duty;
 

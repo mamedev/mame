@@ -308,16 +308,12 @@ void suna16_state::bestbest_sound_map(address_map &map)
 
 MACHINE_START_MEMBER(suna16_state, bssoccer)
 {
-	m_leds.resolve();
-
 	m_bank1->configure_entries(0, 8, memregion("pcm1")->base() + 0x1000, 0x10000);
 	m_bank2->configure_entries(0, 8, memregion("pcm2")->base() + 0x1000, 0x10000);
 }
 
 MACHINE_START_MEMBER(suna16_state, sunaq)
 {
-	m_leds.resolve();
-
 	m_bank1->configure_entries(0, 8, memregion("pcm1")->base() + 0x1000, 0x10000);
 }
 
@@ -407,8 +403,6 @@ void suna16_state::uballoon_pcm_1_io_map(address_map &map)
 MACHINE_START_MEMBER(suna16_state,uballoon)
 {
 	m_bank1->configure_entries(0, 2, memregion("pcm1")->base() + 0x400, 0x10000);
-
-	m_leds.resolve();
 
 	save_item(NAME(m_prot));
 }
@@ -844,7 +838,7 @@ void suna16_state::bssoccer(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(suna16_state,bssoccer)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);
@@ -899,7 +893,7 @@ void suna16_state::uballoon(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(suna16_state,uballoon)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);
@@ -950,7 +944,7 @@ void suna16_state::sunaq(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(suna16_state, sunaq)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);
@@ -1006,7 +1000,7 @@ void suna16_state::bestbest(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(suna16_state, bestbest)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(59.1734);    // measured on pcb (15.6218kHz HSync)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);

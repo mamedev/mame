@@ -44,10 +44,7 @@ public:
 	neogeo_control_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, bool const fixed)
 		: neogeo_control_port_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<T>(opts), dflt, fixed);
 	}
 	neogeo_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~neogeo_control_port_device();
@@ -57,7 +54,7 @@ public:
 	void write_ctrlsel(uint8_t data);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	device_neogeo_control_port_interface *m_device;
@@ -90,10 +87,7 @@ public:
 	neogeo_ctrl_edge_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, bool const fixed)
 		: neogeo_ctrl_edge_port_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<T>(opts), dflt, fixed);
 	}
 	neogeo_ctrl_edge_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~neogeo_ctrl_edge_port_device();
@@ -104,7 +98,7 @@ public:
 	void write_ctrlsel(uint8_t data);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	device_neogeo_ctrl_edge_interface *m_device;

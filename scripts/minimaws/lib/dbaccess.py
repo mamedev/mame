@@ -774,14 +774,6 @@ class QueryCursor(object):
                 'WHERE slot.machine = ?',
                 (machine, ))
 
-    def get_ram_options(self, machine):
-        return self.dbcurs.execute(
-                'SELECT ramoption.name AS name, ramoption.size AS size, COUNT(ramdefault.machine) AS isdefault ' \
-                'FROM ramoption LEFT JOIN ramdefault USING (machine, size) WHERE ramoption.machine = ? ' \
-                'GROUP BY ramoption.machine, ramoption.size ' \
-                'ORDER BY ramoption.size',
-                (machine, ))
-
     def get_machine_softwarelists(self, machine):
         return self.dbcurs.execute(
                 'SELECT machinesoftwarelist.tag AS tag, machinesoftwareliststatustype.value AS status, softwarelist.shortname AS shortname, softwarelist.description AS description, COUNT(software.id) AS total, COUNT(CASE software.supported WHEN 0 THEN 1 ELSE NULL END) AS supported, COUNT(CASE software.supported WHEN 1 THEN 1 ELSE NULL END) AS partiallysupported, COUNT(CASE software.supported WHEN 2 THEN 1 ELSE NULL END) AS unsupported ' \

@@ -678,10 +678,10 @@ void squale_state::squale(machine_config &config)
 	m_ay8910->port_b_read_callback().set(FUNC(squale_state::ay_portb_r));
 	m_ay8910->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 
 	/* screen */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_screen_update("ef9365", FUNC(ef9365_device::screen_update));
 	screen.set_size(256, 256);

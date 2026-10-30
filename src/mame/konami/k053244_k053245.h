@@ -19,7 +19,7 @@ class k053244_device : public device_t, public device_gfx_interface
 public:
 	using sprite_delegate = device_delegate<void (int &code, int &color, int &priority)>;
 
-	k053244_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	k053244_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration
 	void set_bpp(int bpp);

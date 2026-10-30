@@ -99,7 +99,7 @@ void k573kara_device::device_add_mconfig(machine_config &config)
 	DS2401(config, digital_id);
 
 	// The PC Helper RS232 and the PC16552D are right next to each other but they may possibly be separate.
-	PC16552D(config, m_duart_com, 0);
+	PC16552D(config, m_duart_com);
 	auto& duart_chan0(NS16550(config, "duart_com:chan0", clock() / 2));
 	auto& rs232_chan0(RS232_PORT(config, "rs232_chan0", default_rs232_devices, nullptr));
 	rs232_chan0.rxd_handler().set("duart_com:chan0", FUNC(ins8250_uart_device::rx_w));

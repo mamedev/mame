@@ -141,12 +141,12 @@ void pcat_base_state::pcat32_io_common(address_map &map)
 
 void pcat_base_state::pcat_common_nokeyboard(machine_config &config)
 {
-	PIC8259(config, m_pic8259_1, 0);
+	PIC8259(config, m_pic8259_1);
 	m_pic8259_1->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic8259_1->in_sp_callback().set_constant(1);
 	m_pic8259_1->read_slave_ack_callback().set(FUNC(pcat_base_state::get_slave_ack));
 
-	PIC8259(config, m_pic8259_2, 0);
+	PIC8259(config, m_pic8259_2);
 	m_pic8259_2->out_int_callback().set(m_pic8259_1, FUNC(pic8259_device::ir2_w));
 	m_pic8259_2->in_sp_callback().set_constant(0);
 
@@ -161,7 +161,7 @@ void pcat_base_state::pcat_common_nokeyboard(machine_config &config)
 
 	AM9517A(config, m_dma8237_2, 14.318181_MHz_XTAL / 3);
 
-	PIT8254(config, m_pit8254, 0);
+	PIT8254(config, m_pit8254);
 	m_pit8254->set_clk<0>(4772720/4); // heartbeat IRQ
 	m_pit8254->out_handler<0>().set(m_pic8259_1, FUNC(pic8259_device::ir0_w));
 	m_pit8254->set_clk<1>(4772720/4); // DRAM refresh
@@ -172,7 +172,7 @@ void pcat_base_state::pcat_common_nokeyboard(machine_config &config)
 	m_mc146818->irq().set(m_pic8259_2, FUNC(pic8259_device::ir0_w));
 	m_mc146818->set_century_index(0x32);
 
-	KBDC8042(config, m_kbdc, 0);
+	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	m_kbdc->system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
 	m_kbdc->gate_a20_callback().set_inputline(m_maincpu, INPUT_LINE_A20);

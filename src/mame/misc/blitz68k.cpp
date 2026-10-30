@@ -64,6 +64,8 @@ To Do:
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 // configurable logging
 #define LOG_MCU     (1U << 1)
 #define LOG_BLITTER (1U << 2)
@@ -133,9 +135,6 @@ public:
 	void ramdac_config(machine_config &config) ATTR_COLD;
 	void steaser(machine_config &config) ATTR_COLD;
 	void texasrls(machine_config &config) ATTR_COLD;
-
-protected:
-	virtual void machine_start() override { m_leds.resolve(); }
 
 private:
 	void blit_copy_w(uint16_t data);
@@ -1428,11 +1427,11 @@ static INPUT_PORTS_START( cjffruit )
 	PORT_START("IN2")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_POKER_HOLD4 ) // hold 4
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_POKER_HOLD5 ) // hold 5
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_CUSTOM     ) // hopper coin
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_GAMBLE_DOOR ) PORT_NAME("Cash Door") PORT_CODE(KEYCODE_D) PORT_TOGGLE
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM     ) // blitter busy
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM     ) // 5] 0 = mcu response ready
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM     ) // 6] 0 = mcu busy
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_CUSTOM      ) // hopper coin
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_DOOR        ) PORT_NAME("Cash Door") PORT_CODE(KEYCODE_D) PORT_TOGGLE
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM      ) // blitter busy
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM      ) // 5] 0 = mcu response ready
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM      ) // 6] 0 = mcu busy
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_SERVICE3    ) PORT_NAME("Call Attendant")
 
 	PORT_START("DSW")
@@ -1448,11 +1447,11 @@ static INPUT_PORTS_START( cjffruit )
 	PORT_DIPSETTING(      0x0400, "PMMG" )
 	PORT_DIPSETTING(      0x0200, "Invalid #1" )
 	PORT_DIPSETTING(      0x0000, "Invalid #2" )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Logic Door") PORT_CODE(KEYCODE_L) PORT_TOGGLE
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Logic Door") PORT_CODE(KEYCODE_L) PORT_TOGGLE
 	PORT_DIPNAME( 0x2000, 0x2000, "Factory Default" )       PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Main Door") PORT_CODE(KEYCODE_O) PORT_TOGGLE
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Main Door") PORT_CODE(KEYCODE_O) PORT_TOGGLE
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -1515,19 +1514,19 @@ static INPUT_PORTS_START( deucesw2 )
 	PORT_START("IN2")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_POKER_HOLD4 ) // hold 4
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_POKER_HOLD5 ) // hold 5
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_CUSTOM     ) // hopper coin
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_GAMBLE_DOOR ) PORT_NAME("Cash Door") PORT_CODE(KEYCODE_D) PORT_TOGGLE
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM     ) // blitter busy
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM     ) // 5] 0 = mcu response ready
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM     ) // 6] 0 = mcu busy
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_CUSTOM      ) // hopper coin
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_DOOR        ) PORT_NAME("Cash Door") PORT_CODE(KEYCODE_D) PORT_TOGGLE
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM      ) // blitter busy
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM      ) // 5] 0 = mcu response ready
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM      ) // 6] 0 = mcu busy
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_SERVICE3    ) PORT_NAME("Call Attendant")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0100, 0x0100, "Screen Refresh" )        PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0000, "50 Hz" )
 	PORT_DIPSETTING(      0x0100, "60 Hz" )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Logic Door") PORT_CODE(KEYCODE_L) PORT_TOGGLE
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Main Door")  PORT_CODE(KEYCODE_O) PORT_TOGGLE
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_DOOR) PORT_NAME("Logic Door") PORT_CODE(KEYCODE_L) PORT_TOGGLE
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Main Door") PORT_CODE(KEYCODE_O) PORT_TOGGLE
 	PORT_DIPNAME( 0x3800, 0x2000, "Pinout" )                PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(      0x3800, "8L6 (Cherry Master)" )
 	PORT_DIPSETTING(      0x3000, "8L7"   )
@@ -1796,7 +1795,7 @@ void blitz68k_state::ramdac_map(address_map &map)
 void blitz68k_state::ramdac_config(machine_config &config)
 {
 	PALETTE(config, m_palette).set_entries(0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &blitz68k_state::ramdac_map);
 }
 
@@ -1806,7 +1805,7 @@ void blitz68k_state::ilpag(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::ilpag_map);
 	m_maincpu->set_vblank_int("screen", FUNC(blitz68k_state::irq4_line_hold)); //3 & 6 used, mcu comms?
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -1876,7 +1875,7 @@ void blitz68k_state::cjffruit(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -1916,7 +1915,7 @@ void blitz68k_state::bankrob(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -1947,7 +1946,7 @@ void blitz68k_state::bankroba(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -1977,7 +1976,7 @@ void blitz68k_state::deucesw2(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -2009,7 +2008,7 @@ void blitz68k_state::dualgame(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -2039,7 +2038,7 @@ void blitz68k_state::hermit(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -2073,7 +2072,7 @@ void blitz68k_state::maxidbl(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -3124,6 +3123,7 @@ ROM_END
 void blitz68k_state::init_bankrob()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+    // HACK: patch protection
 
 	// WRONG C8 #1
 	rom[0xb5e0/2] = 0x6028;
@@ -3139,6 +3139,7 @@ void blitz68k_state::init_bankrob()
 void blitz68k_state::init_bankroba()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+    // HACK: patch protection
 
 	// WRONG C8 #1
 	rom[0x11e4e/2] = 0x6028;
@@ -3154,6 +3155,7 @@ void blitz68k_state::init_bankroba()
 void blitz68k_state::init_bankrobb()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+    // HACK: patch protection
 
 	// loop
 	rom[0x1dae/2] = 0x4e71;
@@ -3164,6 +3166,7 @@ void blitz68k_state::init_bankrobb()
 void blitz68k_state::init_cj3play()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+    // HACK: patch protection
 
 	// WRONG C8 #1
 	rom[0x7064/2] = 0x6028;
@@ -3180,6 +3183,7 @@ void blitz68k_state::init_cj3play()
 void blitz68k_state::init_cjffruit()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+    // HACK: patch protection
 
 	// WRONG C8 #1
 	rom[0xf564/2] = 0x6028;
@@ -3191,6 +3195,7 @@ void blitz68k_state::init_cjffruit()
 void blitz68k_state::init_texasrls()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+    // HACK: patch protection
 
 	// WRONG C8 #1
 	rom[0x11f3a/2] = 0x6028; // TODO: the dump is available, hook up the MCU properly (it would give sound to the driver, too).
@@ -3202,6 +3207,7 @@ void blitz68k_state::init_texasrls()
 void blitz68k_state::init_surpr5()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+    // HACK: patch protection
 
 	// WRONG C8 #1
 	rom[0x105ce/2] = 0x6028;
@@ -3213,6 +3219,7 @@ void blitz68k_state::init_surpr5()
 void blitz68k_state::init_super97()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+    // HACK: patch protection
 
 	// WRONG C8 #1
 	rom[0x9e9c/2] = 0x6028;
@@ -3224,6 +3231,7 @@ void blitz68k_state::init_super97()
 void blitz68k_state::init_cjplus()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+    // HACK: patch protection
 
 	// WRONG C8 #1
 	rom[0x7116/2] = 0x6028;
@@ -3236,6 +3244,7 @@ void blitz68k_state::init_cjplus()
 void blitz68k_state::init_cjbj()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+    // HACK: patch protection
 
 	// WRONG C8 #1
 	rom[0xb17a/2] = 0x6028;
@@ -3247,6 +3256,7 @@ void blitz68k_state::init_cjbj()
 void blitz68k_state::init_cjbj122()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+    // HACK: patch protection
 
 	// WRONG C8 #1
 	rom[0xaf0e/2] = 0x6028;
@@ -3259,6 +3269,7 @@ void blitz68k_state::init_cjbj122()
 void blitz68k_state::init_deucesw2()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+    // HACK: patch protection
 
 	// WRONG C8 #1
 	rom[0x8fe4/2] = 0x6020;
@@ -3270,6 +3281,7 @@ void blitz68k_state::init_deucesw2()
 void blitz68k_state::init_dualgame()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+    // HACK: patch protection
 
 	// WRONG C8 #1
 	rom[0xa518/2] = 0x6024;
@@ -3281,6 +3293,7 @@ void blitz68k_state::init_dualgame()
 void blitz68k_state::init_hermit()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+    // HACK: patch protection
 
 	// WRONG C8 #1
 	rom[0xdeba/2] = 0x602e;
@@ -3298,6 +3311,7 @@ void blitz68k_state::init_hermit()
 void blitz68k_state::init_maxidbl()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+    // HACK: patch protection
 
 	// WRONG C8 #1
 	rom[0xb384/2] = 0x6036;
@@ -3309,6 +3323,7 @@ void blitz68k_state::init_maxidbl()
 void blitz68k_state::init_megadblj()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+    // HACK: patch protection
 
 	// WRONG C8 #1
 	rom[0xe21c/2] = 0x6040;
@@ -3320,6 +3335,7 @@ void blitz68k_state::init_megadblj()
 void blitz68k_state::init_megadble()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+    // HACK: patch protection
 
 	// WRONG C8 #1
 	rom[0xcfc2/2] = 0x4e71;
@@ -3331,6 +3347,7 @@ void blitz68k_state::init_megadble()
 void blitz68k_state::init_megastrp()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+    // HACK: patch protection
 
 	// skip loops until the MCUs are dumped and the hardware better understood
 	rom[0x1678/2] = 0x4e71;
@@ -3341,6 +3358,7 @@ void blitz68k_state::init_megastrp()
 void blitz68k_state::init_mpokerdx()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+    // HACK: patch protection
 
 	// WRONG C8 #1
 	rom[0xda46/2] = 0x6024;
@@ -3358,6 +3376,7 @@ void blitz68k_state::init_mpokerdx()
 void blitz68k_state::init_mpokerdx109()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+    // HACK: patch protection
 
 	// WRONG C8 #1
 	rom[0xe012/2] = 0x6024;

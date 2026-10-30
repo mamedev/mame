@@ -1506,78 +1506,66 @@ void tlcs90_device::execute_run()
 //              break;
 
 			case LDI:
-#define _LDI                                            \
-				WM8( m_de.w.l, RM8(m_hl.w.l) );     \
-				m_de.w.l++;                         \
-				m_hl.w.l++;                         \
-				m_bc.w.l--;                         \
-				F &= SF | ZF | IF | XCF | CF;           \
-				if ( m_bc.w.l ) F |= VF;
-
-				_LDI
-				Cyc();
-				break;
 			case LDIR:
-				_LDI
-				if ( m_bc.w.l )
-				{
-					m_pc.w.l -= 2;
-					Cyc();
-				}
-				else    Cyc_f();
-				break;
-
 			case LDD:
-#define _LDD                                            \
-				WM8( m_de.w.l, RM8(m_hl.w.l) );     \
-				m_de.w.l--;                         \
-				m_hl.w.l--;                         \
-				m_bc.w.l--;                         \
-				F &= SF | ZF | IF | XCF | CF;           \
-				if ( m_bc.w.l ) F |= VF;
-
-				_LDD
-				Cyc();
-				break;
 			case LDDR:
-				_LDD
-				if ( m_bc.w.l )
+				WM8( m_de.w.l, RM8(m_hl.w.l) );
+
+				if ( m_op == LDI || m_op == LDIR )
 				{
-					m_pc.w.l -= 2;
-					Cyc();
+					m_de.w.l++;
+					m_hl.w.l++;
 				}
-				else    Cyc_f();
+				else
+				{
+					m_de.w.l--;
+					m_hl.w.l--;
+				}
+				m_bc.w.l--;
+				F &= SF | ZF | IF | XCF | CF;
+				if ( m_bc.w.l ) F |= VF;
+
+				if ( m_op == LDI || m_op == LDD )
+					Cyc();
+				else
+				{
+					if ( m_bc.w.l )
+					{
+						m_pc.w.l -= 2;
+						Cyc();
+					}
+					else
+						Cyc_f();
+				}
 				break;
 
-
-//          case CPD:
-//              Cyc();
-//              break;
-//          case CPDR:
-//              Cyc();
-//              break;
 			case CPI:
+			case CPIR:
+			case CPD:
+			case CPDR:
 				a8 = RM8(m_hl.w.l);
 				b8 = m_af.b.h - a8;
-				m_hl.w.l++;
+
+				if ( m_op == CPI || m_op == CPIR )
+					m_hl.w.l++;
+				else
+					m_hl.w.l--;
 				m_bc.w.l--;
 				F = (F & (IF | CF)) | SZ[b8] | ((m_af.b.h^a8^b8)&HF) | NF;
 				if ( m_bc.w.l ) F |= VF;
-				Cyc();
-				break;
-			case CPIR:
-				a8 = RM8(m_hl.w.l);
-				b8 = m_af.b.h - a8;
-				m_hl.w.l++;
-				m_bc.w.l--;
-				F = (F & (IF | CF)) | SZ[b8] | ((m_af.b.h^a8^b8)&HF) | NF;
-				if ( m_bc.w.l )
-				{
-					F |= VF;
-					m_pc.w.l -= 2;
+
+				if ( m_op == CPI || m_op == CPD )
 					Cyc();
+				else
+				{
+					if ( m_bc.w.l && b8 != 0 )
+					{
+						m_pc.w.l -= 2;
+						Cyc();
+					}
+					else
+						Cyc_f();
 				}
-				else    Cyc_f();
 				break;
 
 			case PUSH:
@@ -1613,7 +1601,6 @@ void tlcs90_device::execute_run()
 				}
 				else    Cyc_f();
 				break;
-
 
 			case CALL:
 				if ( Test( Read1_8() ) )
@@ -1700,10 +1687,10 @@ void tlcs90_device::execute_run()
 				F = SZP[A] | (F & (IF | NF));
 				if (cf || (lo <= 9 ? hi >= 10 : hi >= 9)) F |= XCF | CF;
 				if (nf ? hf && lo <= 5 : lo >= 10)  F |= HF;
-			}
+
 				Cyc();
 				break;
-
+			}
 
 			case CPL:
 				m_af.b.h ^= 0xff;
@@ -1792,7 +1779,6 @@ void tlcs90_device::execute_run()
 				if ((a16 ^ a32 ^ 1) & 0x1000)   F |= HF;    //??
 				Cyc();
 				break;
-
 
 			case DEC:
 				a8 = Read1_8() - 1;

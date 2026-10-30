@@ -130,7 +130,7 @@ void rmnimbus_state::nimbus(machine_config &config)
 	m_iocpu->port_out_cb<3>().set(FUNC(rmnimbus_state::nimbus_pc8031_port3_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(4.433619_MHz_XTAL * 2, 650, 0, 640, 260, 0, 250);
 	m_screen->set_screen_update(FUNC(rmnimbus_state::screen_update_nimbus));
 	//m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);

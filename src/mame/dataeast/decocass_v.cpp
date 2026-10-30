@@ -698,10 +698,10 @@ void decocass_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_bg_tilemap_l_clip = m_screen->visible_area();
-	m_bg_tilemap_l_clip.max_y = 256 / 2 - 1;
+	m_bg_tilemap_l_clip.sety(m_bg_tilemap_l_clip.top(), 256 / 2 - 1);
 
 	m_bg_tilemap_r_clip = m_screen->visible_area();
-	m_bg_tilemap_r_clip.min_y = 256 / 2;
+	m_bg_tilemap_r_clip.sety(256 / 2, m_bg_tilemap_r_clip.bottom());
 
 	/* background videoram bits D0-D3 are shared with the tileram */
 	m_bgvideoram = m_tileram;
@@ -718,25 +718,6 @@ void decocass_state::video_start()
 
 uint32_t decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-#ifdef MAME_DEBUG
-	{
-		if (machine().input().code_pressed_once(KEYCODE_I))
-			m_showmsg ^= 1;
-		if (m_showmsg)
-			popmessage("mode:$%02x cm:$%02x ccb:$%02x h:$%02x vl:$%02x vr:$%02x ph:$%02x pv:$%02x ch:$%02x cv:$%02x",
-				m_mode_set,
-				m_color_missiles,
-				m_color_center_bot,
-				m_back_h_shift,
-				m_back_vl_shift,
-				m_back_vr_shift,
-				m_part_h_shift,
-				m_part_v_shift,
-				m_center_h_shift_space,
-				m_center_v_shift);
-	}
-#endif
-
 	// flip screen flag only has effect if cocktail dsw is on
 	flip_screen_set(m_watchdog_flip & BIT(m_dsw[0]->read(), 6));
 

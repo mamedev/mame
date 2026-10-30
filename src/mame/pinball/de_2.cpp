@@ -245,9 +245,6 @@ void de_2_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_digits.resolve();
-	m_diag_digit.resolve();
-
 	save_item(NAME(m_sound_data));
 	save_item(NAME(m_diag));
 	save_item(NAME(m_segment1));

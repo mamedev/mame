@@ -17,10 +17,10 @@
 
 namespace ui {
 
-class menu_confirm_quit : public autopause_menu<>
+class menu_confirm_quit : public menu
 {
 public:
-	menu_confirm_quit(mame_ui_manager &mui, render_container &container);
+	menu_confirm_quit(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_confirm_quit();
 
 private:

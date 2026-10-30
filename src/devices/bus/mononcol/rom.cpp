@@ -30,7 +30,7 @@ mononcol_rom_plain_device::mononcol_rom_plain_device(const machine_config &mconf
 
 void mononcol_rom_plain_device::device_add_mconfig(machine_config &config)
 {
-	GENERIC_SPI_FLASH(config, m_spi, 0);
+	GENERIC_SPI_FLASH(config, m_spi);
 }
 
 void mononcol_rom_plain_device::device_start()

@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<!--
+license: CC0-1.0
+copyright-holders: Angelo Salese
+
+Trap Shoot Classic layout
+
+-->
+<mamelayout version="2">
+	<element name="temp_color">
+		<rect>
+			<color red="0.0" green="0.05" blue="0.0"/>
+		</rect>
+	</element>
+
+	<element name="ledmatrixdot">
+		<rect>
+			<color red="0" green="0" blue="0" />
+			<bounds left="-0.05" top="-0.05" right="1.05" bottom="1.05" />
+		</rect>
+		<disk>
+			<color state="0" red="0.125" green="0.125" blue="0.125" />
+			<color state="1" red="0.125" green="1.0" blue="0.125" />
+			<color state="2" red="1.0" green="0.125" blue="0.125" />
+			<color state="3" red="1.0" green="1.0" blue="0.125" />
+		</disk>
+	</element>
+
+	<group name="led_lscore">
+		<repeat count="10">
+			<param name="s" start="0" increment="8" />
+			<param name="x" start="0" increment="1" />
+			<repeat count="8">
+				<param name="n" start="~s~" increment="1" />
+				<param name="y" start="0" increment="1" />
+				<element name="ledmatrix~n~" ref="ledmatrixdot" state="0">
+					<bounds x="~x~" y="~y~" width="1" height="1" />
+					<color red="1.0" green="1.0" blue="1.0" />
+				</element>
+			</repeat>
+		</repeat>
+	</group>
+
+	<group name="led_ltrophy">
+		<repeat count="10">
+			<param name="s" start="80" increment="8" />
+			<param name="x" start="0" increment="1" />
+			<repeat count="8">
+				<param name="n" start="~s~" increment="1" />
+				<param name="y" start="0" increment="1" />
+				<element name="ledmatrix~n~" ref="ledmatrixdot" state="0">
+					<bounds x="~x~" y="~y~" width="1" height="1" />
+					<color red="1.0" green="1.0" blue="1.0" />
+				</element>
+			</repeat>
+		</repeat>
+	</group>
+
+	<group name="led_rscore">
+		<repeat count="10">
+			<param name="s" start="200" increment="8" />
+			<param name="x" start="0" increment="1" />
+			<repeat count="8">
+				<param name="n" start="~s~" increment="1" />
+				<param name="y" start="0" increment="1" />
+				<element name="ledmatrix~n~" ref="ledmatrixdot" state="0">
+					<bounds x="~x~" y="~y~" width="1" height="1" />
+					<color red="1.0" green="1.0" blue="1.0" />
+				</element>
+			</repeat>
+		</repeat>
+	</group>
+
+	<group name="led_rtrophy">
+		<repeat count="10">
+			<param name="s" start="280" increment="8" />
+			<param name="x" start="0" increment="1" />
+			<repeat count="8">
+				<param name="n" start="~s~" increment="1" />
+				<param name="y" start="0" increment="1" />
+				<element name="ledmatrix~n~" ref="ledmatrixdot" state="0">
+					<bounds x="~x~" y="~y~" width="1" height="1" />
+					<color red="1.0" green="1.0" blue="1.0" />
+				</element>
+			</repeat>
+		</repeat>
+	</group>
+
+	<view name="Wall Layout">
+		<element ref="temp_color">
+			<bounds x="0" y="0" width="594" height="300"/>
+		</element>
+
+		<group ref="led_lscore">
+			<bounds x="47" y="186" width="32" height="28" />
+		</group>
+
+		<group ref="led_ltrophy">
+			<bounds x="47" y="217" width="32" height="28" />
+		</group>
+
+		<group ref="led_rscore">
+			<bounds x="526" y="186" width="32" height="28" />
+		</group>
+
+		<group ref="led_rtrophy">
+			<bounds x="526" y="217" width="32" height="28" />
+		</group>
+
+		<screen index="0">
+			<bounds x="176" y="204" width="128" height="64" />
+		</screen>
+	</view>
+</mamelayout>

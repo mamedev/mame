@@ -1,10 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:
 /*
-    New Canasta, pinball with PC-based electronics, from the Spanish company Marsaplay.
+New Canasta, pinball with PC-based electronics, from the Spanish company Marsaplay.
 
-    AsRock Conroe 1333-d677 Pressler P4FSB1333-650 motherboard.
-    USB-DIO-96 (96 channel digital I/O module from "Access I/O Products, Inc.".
+AsRock ConRoe 1333-d677 Pressler P4FSB1333-650 motherboard.
+USB-DIO-96 (96 channel digital I/O module from "Access I/O Products, Inc.".
+
+Intel 945GC + ICH7 + ALC888 + RTL8101E
+Winbond W83627EHC Super I/O
+2x PCI slots
+1x PCIe x1
+1x PCIe x16
+1x "ASRock HDMR"
+
 */
 
 #include "emu.h"
@@ -50,7 +58,7 @@ void newcanasta_state::newcanasta(machine_config &config)
 	PENTIUM4(config, m_maincpu, 100'000'000); // 775-pin LGA "Socket T" CPU, exact model unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &newcanasta_state::newcanasta_map);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 
 	// I/O board

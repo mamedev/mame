@@ -24,11 +24,11 @@ namespace ui {
 class simple_menu_select_game : public menu
 {
 public:
-	simple_menu_select_game(mame_ui_manager &mui, render_container &container, const char *gamename);
+	simple_menu_select_game(mame_ui_manager &mui, render_target &target, const char *gamename);
 	virtual ~simple_menu_select_game();
 
 	// force game select menu
-	static void force_game_select(mame_ui_manager &mui, render_container &container);
+	static void force_game_select(mame_ui_manager &mui, render_target &target);
 
 protected:
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;

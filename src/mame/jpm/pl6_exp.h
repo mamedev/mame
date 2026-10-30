@@ -21,7 +21,7 @@ class pluto6_expansion_slot_device : public device_t, public device_single_card_
 	friend class pluto6_expansion_card_interface;
 
 public:
-	pluto6_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pluto6_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -50,10 +50,10 @@ DECLARE_DEVICE_TYPE(HEBER_CALYPSO_GPU, pluto6_calypso32_device)
 class pluto6_calypso32_device : public device_t, public pluto6_expansion_card_interface
 {
 public:
-	pluto6_calypso32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pluto6_calypso32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	pluto6_calypso32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	pluto6_calypso32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void device_start() override ATTR_COLD {};
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

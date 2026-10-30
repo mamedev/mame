@@ -41,8 +41,8 @@ press INFO, C, then Right 3 times.
 
 #include "emu.h"
 
-#include "mmboard.h"
-#include "mmdisplay1.h"
+#include "mboard.h"
+#include "mdisplay1.h"
 
 #include "cpu/m68000/m68000.h"
 #include "sound/dac.h"

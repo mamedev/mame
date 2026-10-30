@@ -354,8 +354,10 @@ ExternalEntityRefHandler(XML_Parser parser, const XML_Char *context,
   if (g_external_entity) {
     XML_Parser ext_parser
         = XML_ExternalEntityParserCreate(parser, context, g_encoding);
-    rc = Parse(ext_parser, g_external_entity, g_external_entity_size, 1);
-    XML_ParserFree(ext_parser);
+    if (ext_parser != NULL) {
+      rc = Parse(ext_parser, g_external_entity, g_external_entity_size, 1);
+      XML_ParserFree(ext_parser);
+    }
   }
 
   return rc;

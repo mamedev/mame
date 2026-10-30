@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "cpu/g65816/g65816.h"
+#include "cpu/m6502/w65816.h"
 
 // ======================> apple2_common_device
 
@@ -33,13 +33,15 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 private:
-	optional_device<g65816_device> m_GScpu;
+	optional_device<w65816_device> m_GScpu;
 
 	double m_x_calibration = 0, m_y_calibration = 0;
 	double m_joystick_x1_time = 0;
 	double m_joystick_y1_time = 0;
 	double m_joystick_x2_time = 0;
 	double m_joystick_y2_time = 0;
+
+	template <typename T> const T* find_symbol(const T* symbols, const T* end, decltype(T{}.addr) address);
 
 	offs_t com_2byte_op(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname);
 	offs_t com_3byte_op(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname);

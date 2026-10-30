@@ -17,9 +17,9 @@ class m6502_base_disassembler : public util::disasm_interface
 {
 public:
 	struct disasm_entry {
-		const char *opcode;
-		int mode;
-		offs_t flags;
+		const char *m_opcode;
+		int m_mode;
+		offs_t m_flags;
 	};
 
 	m6502_base_disassembler(const disasm_entry *table);
@@ -64,13 +64,22 @@ protected:
 		DASM_bzr,    /* bit, zero page, relative offset (M740) */
 		DASM_bar,    /* bit, accumulator, relative offset (M740) */
 		DASM_bac,    /* bit, accumulator (M740) */
-		DASM_xa3     /* unknown XaviX opcode, 24-bit ROM pointer? */
+		DASM_xa3,    /* unknown XaviX opcode, 24-bit ROM pointer? */
+		DASM_imm16,  /* immediate word, M/X dependent (65816) */
+		DASM_abl,    /* absolute long (65816) */
+		DASM_alx,    /* absolute long + X (65816) */
+		DASM_ds,     /* stack relative (65816) */
+		DASM_dsy,    /* stack relative indirect + Y (65816) */
+		DASM_zil,    /* direct page indirect long (65816) */
+		DASM_ziy,    /* direct page indirect long + Y (65816) */
+		DASM_dbf,    /* source/destination bank pair, MVN/MVP (65816) */
+		DASM_rell    /* 16-bit relative (65816) */
 	};
 
 	virtual u32 get_instruction_bank() const;
 
 private:
-	const disasm_entry *table;
+	const disasm_entry *m_table;
 };
 
 class m6502_disassembler : public m6502_base_disassembler

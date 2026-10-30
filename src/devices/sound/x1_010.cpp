@@ -23,7 +23,7 @@ Registers:
 
     0       7--- ----   Frequency divider flag (only downtown seems to set this)
             -654 3---
-            ---- -2--   PCM/Waveform repeat flag (0:Once 1:Repeat) (*1)
+            ---- -2--   Waveform repeat flag (0:Repeat 1:Once) (*1)
             ---- --1-   Sound out select (0:PCM 1:Waveform)
             ---- ---0   Key on / off
 

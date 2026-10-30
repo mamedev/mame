@@ -48,13 +48,14 @@ public:
 	debug_view_disasm_source(std::string &&name, device_t &device);
 
 	// getters
-	address_space &space() const { return m_space; }
-	offs_t pcbase() const { return m_pcbase != nullptr ? m_pcbase->value() & m_space.logaddrmask() : 0; }
+	std::pair<device_memory_interface *, int> space() const { return std::make_pair(m_dev, m_space); }
+	offs_t pcbase() const { return m_pcbase != nullptr ? m_pcbase->value() & m_dev->logical_space_config(m_space)->logaddrmask() : 0; }
 
 private:
 	// internal state
-	address_space &     m_space;                // address space to display
-	address_space &     m_decrypted_space;      // address space to display for decrypted opcodes
+	device_memory_interface *m_dev;                  // Mmeory interface the spaces are in
+	int                      m_space;                // address space index to display
+	int                      m_decrypted_space;      // address space index to display for decrypted opcodes
 	const device_state_entry *m_pcbase;
 };
 

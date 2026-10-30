@@ -55,7 +55,6 @@ nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag,
 
 void nb1413m3_device::device_start()
 {
-	m_led.resolve();
 	m_timer_cb = timer_alloc(FUNC(nb1413m3_device::timer_callback), this);
 	m_timer_cb->adjust(attotime::zero);
 

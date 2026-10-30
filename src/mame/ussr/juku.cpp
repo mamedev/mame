@@ -65,9 +65,9 @@
 namespace {
 
 static constexpr int DEFAULT_WIDTH = 320;
-static constexpr int DEFAULT_HEIGHT = 240;
+static constexpr int DEFAULT_HEIGHT = 241;
 static constexpr int VERT_FRONT_PORCH = 25;
-static constexpr int VERT_BACK_PORCH = 1+72-VERT_FRONT_PORCH;
+static constexpr int VERT_BACK_PORCH = 72-VERT_FRONT_PORCH;
 static constexpr int HORIZ_FRONT_PORCH = 8*8;
 static constexpr int HORIZ_BACK_PORCH = 24*8-HORIZ_FRONT_PORCH;
 
@@ -448,7 +448,7 @@ void juku_state::screen_vblank_period(uint8_t data)
 	if (m_vblank_period_lsb == -1) {
 		m_vblank_period_lsb = (int)data;
 	} else {
-		m_height = m_screen->height()-bcd_value(((uint16_t)data<<8) + (uint8_t)m_vblank_period_lsb) - 1;
+		m_height = m_screen->height()-bcd_value(((uint16_t)data<<8) + (uint8_t)m_vblank_period_lsb);
 		m_vblank_period_lsb = -1;
 		adjust_monitor_params(0b0001'0000);
 	}
@@ -696,11 +696,11 @@ void juku_state::juku(machine_config &config)
 	m_maincpu->in_inta_func().set(m_pic, FUNC(pic8259_device::acknowledge));
 
 	// КР580ВН59
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// КР580ВИ53 #1
-	PIT8253(config, m_pit[0], 0);
+	PIT8253(config, m_pit[0]);
 	m_pit[0]->set_clk<0>(16_MHz_XTAL/16); // РК171 16000kHz variations on board
 	m_pit[0]->set_clk<1>(16_MHz_XTAL/16); // РК170ББ-14ГC 16000kHz in specs
 	m_pit[0]->set_clk<2>(16_MHz_XTAL/16);
@@ -710,7 +710,7 @@ void juku_state::juku(machine_config &config)
 	//m_pit[0]->out_handler<1>().set(?, ?); // HOR RTR
 
 	// КР580ВИ53 #2
-	PIT8253(config, m_pit[1], 0);
+	PIT8253(config, m_pit[1]);
 	m_pit[0]->out_handler<2>().set(m_pit[1], FUNC(pit8253_device::write_clk1)); // HOR SYNC DSL
 	m_pit[0]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk2));
 	m_pit[1]->out_handler<0>().append(m_pit[1], FUNC(pit8253_device::write_gate1));
@@ -720,7 +720,7 @@ void juku_state::juku(machine_config &config)
 	//m_pit[1]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk2));
 
 	// КР580ВИ53 #3
-	PIT8253(config, m_pit[2], 0);
+	PIT8253(config, m_pit[2]);
 	m_pit[2]->set_clk<0>(16_MHz_XTAL/13); // 1.23 MHz
 	m_pit[2]->set_clk<1>(16_MHz_XTAL/8); // 2 MHz
 	m_pit[1]->out_handler<1>().append(m_pit[2], FUNC(pit8253_device::write_clk2)); // ~49.92 Hz
@@ -738,17 +738,17 @@ void juku_state::juku(machine_config &config)
 	I8255A(config, m_pio[1]);
 
 	// КР580ВВ51A
-	I8251(config, m_sio[0], 0);
+	I8251(config, m_sio[0]);
 	m_sio[0]->rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir2_w));
 	m_sio[0]->txrdy_handler().set(m_pic, FUNC(pic8259_device::ir3_w));
 
 	// КР580ВВ51A (instead of FDC?)
-	I8251(config, m_sio[1], 0);
+	I8251(config, m_sio[1]);
 	m_sio[1]->rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir0_w));
 	m_sio[1]->txrdy_handler().set(m_pic, FUNC(pic8259_device::ir1_w));
 
 	// Электроника МС 6105.1 "Колокольчик" (DEC VR201 analog)
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16_MHz_XTAL/16, HORIZ_PERIOD/8, HORIZ_BACK_PORCH, HORIZ_BACK_PORCH+DEFAULT_WIDTH, VERT_PERIOD, VERT_BACK_PORCH, VERT_BACK_PORCH+DEFAULT_HEIGHT);
 	m_screen->set_size(HORIZ_PERIOD, VERT_PERIOD);
 	m_screen->set_screen_update(FUNC(juku_state::screen_update));
@@ -758,7 +758,7 @@ void juku_state::juku(machine_config &config)
 	m_speaker->set_levels(3, SPEAKER_LEVELS);
 
 	// К155ИВ1
-	TTL74148(config, m_key_encoder, 0);
+	TTL74148(config, m_key_encoder);
 
 	// E4701 (joystick like mouse device)
 	JUKU_MOUSE(config, m_mouse);
@@ -792,36 +792,42 @@ ROM_START( juku )
 	ROM_SYSTEM_BIOS(1, "3.42_24", "Disk/Net \\w JUSS keyb (3.42 #0024)")
 	ROMX_LOAD("ekta24.bin", 0x0000, 0x4000, CRC(6ce7ee3b) SHA1(a7185d747c94cd519868692ed3d10fade90dd6d5), ROM_BIOS(1))
 
+	// RomBios 3.43m with with Janet 1.2/Bootstrap 4.1
+	// Id: "EktaSoft '88  Serial #0031"
+	ROM_SYSTEM_BIOS(2, "3.43_31", "Disk/Net (3.43 #0031)")
+	ROMX_LOAD("ekta31.bin", 0x0000, 0x4000, CRC(761cfa16) SHA1(73d62c032be1de06c0dd5618f4abccd4d0f3a329), ROM_BIOS(2))
+
 	// RomBios 2.43m with TapeBios/Bootstrap 4.1, screen 53x24 (true E5101?)
 	// Id: "EktaSoft '88  Serial #0032"
-	ROM_SYSTEM_BIOS(2, "2.43m_32", "Tape/Disk (2.43m #0032)")
-	ROMX_LOAD("ekta32.bin", 0x0000, 0x4000, CRC(72c0da53) SHA1(57311d53f6fe1e87e0755990f400253caccd4795), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "2.43_32", "Tape/Disk (2.43 #0032)")
+	ROMX_LOAD("ekta32.bin", 0x0000, 0x4000, CRC(72c0da53) SHA1(57311d53f6fe1e87e0755990f400253caccd4795), ROM_BIOS(3))
 
 	// RomBios 3.43m with Janet 1.2/Bootstrap 4.1, screen 53x24 from Juss prototype (E5103?)
 	// Id: "EktaSoft '88  Serial #0035"
-	ROM_SYSTEM_BIOS(3, "3.43m_35", "Disk/Net \\w JUSS keyb (3.43m #0035)")
-	ROMX_LOAD("ekta35.bin", 0x0000, 0x4000, CRC(85a017bc) SHA1(7aa03497d88cfab9315aa3987765bc06ecb70013), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(4, "3.43m_35", "Disk/Net \\w JUSS keyb (3.43m #0035)")
+	ROMX_LOAD("ekta35.bin", 0x0000, 0x4000, CRC(85a017bc) SHA1(7aa03497d88cfab9315aa3987765bc06ecb70013), ROM_BIOS(4))
 
 	// RomBios 3.43m with Janet 1.2/Bootstrap 4.1 from widespread Baltijets batch (E5104)
 	// Id: "EktaSoft '88  Serial #0037"
-	ROM_SYSTEM_BIOS(4, "3.43m_37", "Disk/Net (3.43m #0037)")
-	ROMX_LOAD("ekta37.bin", 0x0000, 0x4000, CRC(2c1c9cad) SHA1(29366d74c0e27129f2484a973f7a6de659b90cf4), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(5, "3.43m_37", "Disk/Net (3.43m #0037)")
+	ROMX_LOAD("ekta37.bin", 0x0000, 0x4000, CRC(2c1c9cad) SHA1(29366d74c0e27129f2484a973f7a6de659b90cf4), ROM_BIOS(5))
 
 	// RomBios 2.43m with TapeBios/Bootstrap 4.1, screen 53x24, modified for IBM AT keyboard (homebrew)
 	// Id: "EktaSoft '90  Serial #0043"
-	ROM_SYSTEM_BIOS(5, "2.43m_43", "Tape/Disk \\w AT keyb (2.43m #0043)")
-	ROMX_LOAD("ekta43.bin", 0x0000, 0x4000, CRC(05678f9f) SHA1(a7419bfd8249871cc7dbf5c6ea85022d6963fc9a), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(6, "2.43m_43", "Tape/Disk \\w AT keyb (2.43m #0043)")
+	ROMX_LOAD("ekta43.bin", 0x0000, 0x4000, CRC(05678f9f) SHA1(a7419bfd8249871cc7dbf5c6ea85022d6963fc9a), ROM_BIOS(6))
 
 	ROM_REGION(0x8000, "expcart", 0)
 
-	// EKTA JBASIC cartridge (buggy) seems similar to v1.1 from 14.09.1987.
+	// EKTA JBASIC cartridge seems similar to v1.1 from 14.09.1987.
 	// There is also a version with additional HEX$ directive for EKDOS.
 	// Initial E5101 had JBASIC onboard with early RomBios/Monitor versions.
-	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(1))
-	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(2))
-	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(3))
-	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(4))
-	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(5))
+	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(078259dc) SHA1(27e40395e8b49e2f9febf2b23773fbfe251befcf), ROM_BIOS(1))
+	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(078259dc) SHA1(27e40395e8b49e2f9febf2b23773fbfe251befcf), ROM_BIOS(2))
+	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(078259dc) SHA1(27e40395e8b49e2f9febf2b23773fbfe251befcf), ROM_BIOS(3))
+	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(078259dc) SHA1(27e40395e8b49e2f9febf2b23773fbfe251befcf), ROM_BIOS(4))
+	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(078259dc) SHA1(27e40395e8b49e2f9febf2b23773fbfe251befcf), ROM_BIOS(5))
+	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(078259dc) SHA1(27e40395e8b49e2f9febf2b23773fbfe251befcf), ROM_BIOS(6))
 ROM_END
 
 } // anonymous namespace

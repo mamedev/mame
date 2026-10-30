@@ -257,7 +257,7 @@ void luxor_55_21056_device::device_add_mconfig(machine_config &config)
 	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	Z80DMA(config, m_dma, XTAL(8'000'000)/2);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dma->in_mreq_callback().set(FUNC(luxor_55_21056_device::memory_read_byte));
 	m_dma->out_mreq_callback().set(FUNC(luxor_55_21056_device::memory_write_byte));
@@ -431,7 +431,7 @@ uint8_t luxor_55_21056_device::abcbus_stat()
 //  abcbus_inp -
 //-------------------------------------------------
 
-uint8_t luxor_55_21056_device::abcbus_inp()
+uint8_t luxor_55_21056_device::abcbus_inp(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -450,7 +450,7 @@ uint8_t luxor_55_21056_device::abcbus_inp()
 //  abcbus_out -
 //-------------------------------------------------
 
-void luxor_55_21056_device::abcbus_out(uint8_t data)
+void luxor_55_21056_device::abcbus_out(offs_t offset, uint8_t data)
 {
 	if (m_cs)
 	{

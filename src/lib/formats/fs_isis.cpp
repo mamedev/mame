@@ -1029,8 +1029,8 @@ std::vector<meta_description> isis_image::volume_meta_description() const
 {
 	std::vector<meta_description> res;
 
-	res.emplace_back(meta_description(meta_name::name, "UNTITLED", false, [](const meta_value &m) { return m.as_string().size() <= 9; }, "Volume name, up to 9 characters"));
-	res.emplace_back(meta_description(meta_name::os_version, 41, false, [](const meta_value &m) { return m.as_number() <= 99; }, "O/S version, 0..99"));
+	res.emplace_back(meta_name::name, "UNTITLED", false, [](const meta_value &m) { return m.as_string().size() <= 9; }, "Volume name, up to 9 characters");
+	res.emplace_back(meta_name::os_version, 41, false, [](const meta_value &m) { return m.as_number() <= 99; }, "O/S version, 0..99");
 
 	return res;
 }
@@ -1039,9 +1039,9 @@ std::vector<meta_description> isis_image::file_meta_description() const
 {
 	std::vector<meta_description> res;
 
-	res.emplace_back(meta_description(meta_name::name, "Empty", false, [](const meta_value &m) { return m.as_string().size() <= 9; }, "File name, up to 9 characters"));
-	res.emplace_back(meta_description(meta_name::length, 0, true, nullptr, "File size"));
-	res.emplace_back(meta_description(meta_name::attributes, "", true, nullptr, "File attributes"));
+	res.emplace_back(meta_name::name, "Empty", false, [](const meta_value &m) { return m.as_string().size() <= 9; }, "File name, up to 9 characters");
+	res.emplace_back(meta_name::length, 0, true, nullptr, "File size");
+	res.emplace_back(meta_name::attributes, "", true, nullptr, "File attributes");
 
 	return res;
 }

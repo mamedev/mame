@@ -32,7 +32,7 @@ protected:
 	virtual void vram_aperture_map(address_map &map) ATTR_COLD;
 private:
 	required_device<cirrus_gd5446_vga_device> m_vga;
-	required_memory_region m_vga_rom;
+	required_memory_region m_bios;
 
 	u8 vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);

@@ -79,11 +79,12 @@ static constexpr u8  ADCSR_START_CONV           = 5;                    // ADC s
 static constexpr u8  ADCSR_CHANNEL_MASK         = 0x0f;                 // ADC channel mask for ADCSR
 
 static constexpr u8  ADBXR_TDRE                 = 7;                    // ADB transmitter empty
-static constexpr u8  ADBXR_TC                   = 6;                    // ADB transmit complete
-static constexpr u8  ADBXR_SRQ                  = 5;                    // ADB got a Service ReQuest
+static constexpr u8  ADBXR_TC                   = 6;                    // ADB transaction complete
+static constexpr u8  ADBXR_OVFL                 = 5;                    // ADB receive overflow or malformed data
+static constexpr u8  ADBXR_SRQ                  = 4;                    // ADB got a Service ReQuest
 static constexpr u8  ADBXR_RDRF                 = 3;                    // ADB receiver full
 static constexpr u8  ADBXR_BRST                 = 0;                    // ADB send reset
-static constexpr u8  ADBXR_IRQS = ((1 << ADBXR_TDRE) | (1 << ADBXR_TC) | (1 << ADBXR_SRQ) | (1 << ADBXR_RDRF));
+static constexpr u8  ADBXR_IRQS = ((1 << ADBXR_TDRE) | (1 << ADBXR_TC) | (1 << ADBXR_OVFL) | (1 << ADBXR_SRQ) | (1 << ADBXR_RDRF));
 
 static constexpr u8  KCSR_SR0                   = 0;                    // Scan rate bits
 static constexpr u8  KCSR_SR1                   = 1;                    // %010 = 4 uSec, assume (1 << rate) microseconds.
@@ -106,6 +107,7 @@ m68hc05pge_device::m68hc05pge_device(const machine_config &mconfig, device_type 
 	m6805_base_device(mconfig, tag, owner, clock, type, {s_hc_b_ops, s_hc_cycles, 16, 0x00ff, 0x0040, 0xfffc}),
 	device_nvram_interface(mconfig, *this),
 	macseconds_interface(),
+	adb_hle_host_interface(mconfig, *this),
 	m_program_config("program", ENDIANNESS_BIG, 8, addrbits, 0, internal_map),
 	m_internal_ram(*this, "internal_ram"),
 	m_introm(*this, "bankfe00"),
@@ -118,6 +120,7 @@ m68hc05pge_device::m68hc05pge_device(const machine_config &mconfig, device_type 
 	m_pwm_out(*this),
 	write_spi_mosi(*this),
 	write_spi_clock(*this),
+	m_adb_linechange(*this),
 	m_pll_ctrl(0), m_timer_ctrl(0), m_onesec(0),
 	m_option(OPTION_RESET),
 	m_cscr(CSCR_RESET),
@@ -179,7 +182,6 @@ void m68hc05pge_device::device_start()
 	m_seconds_timer = timer_alloc(FUNC(m68hc05pge_device::seconds_tick), this);
 	m_cpi_timer = timer_alloc(FUNC(m68hc05pge_device::cpi_tick), this);
 	m_spi_timer = timer_alloc(FUNC(m68hc05pge_device::spi_tick), this);
-	m_adb_timer = timer_alloc(FUNC(m68hc05pge_device::adb_tick), this);
 	m_keyscan_timer = timer_alloc(FUNC(m68hc05pge_device::keyscan_tick), this);
 
 	system_time systime;
@@ -198,8 +200,10 @@ void m68hc05pge_device::device_reset()
 	memset(m_ports, 0, sizeof(m_ports));
 	memset(m_ddrs, 0, sizeof(m_ddrs));
 
-	// on reset the transmitter is empty
+	m_adbcr = 0;
 	m_adbsr = (1 << ADBXR_TDRE);
+	m_adbdr = 0;
+	adb_update_irq();
 
 	// start the 1 second timer
 	m_seconds_timer->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
@@ -621,7 +625,11 @@ u8 m68hc05pge_device::adb_r(offs_t offset)
 			return m_adbsr;
 
 		case 2:
-			return m_adbdr;
+		{
+			const u8 data = m_adbdr;
+			adb_clear_status(1 << ADBXR_RDRF);
+			return data;
+		}
 	}
 
 	return 0;
@@ -629,74 +637,108 @@ u8 m68hc05pge_device::adb_r(offs_t offset)
 
 void m68hc05pge_device::adb_w(offs_t offset, u8 data)
 {
-	//printf("%02x to ADB @ %d\n", data, offset);
 	switch (offset)
 	{
 		case 0:
-			//printf("%02x to ADBCR, previous %02x\n", data, m_adbcr);
-			// if we're clearing transmit complete, set transmitter empty
-			if (BIT(m_adbcr, ADBXR_TC) && !BIT(data, ADBXR_TC))
-			{
-				//printf("ADB enabling transmitter empty\n");
-				m_adbsr |= (1 << ADBXR_TDRE);
-			}
-
-			// if we're clearing transmitter empty, kick the timer for transmitter complete
-			if (BIT(m_adbcr, ADBXR_TDRE) && !BIT(data, ADBXR_TDRE))
-			{
-				//printf("ADB setting completion timer\n");
-				m_adb_timer->adjust(attotime::from_usec(50), 1);
-			}
-
+		{
+			bool const start_reset = BIT(data, ADBXR_BRST) && !BIT(m_adbcr, ADBXR_BRST);
 			m_adbcr = data;
-			if (m_adbsr & m_adbcr & ADBXR_IRQS)
+			if (start_reset)
 			{
-				set_input_line(M68HC05PGE_INT_ADB, ASSERT_LINE);
+				adb_host_reset();
 			}
 			else
 			{
-				set_input_line(M68HC05PGE_INT_ADB, CLEAR_LINE);
+				adb_update_irq();
 			}
 			break;
+		}
 
 		case 1:
-			m_adbsr = data;
-			if (m_adbsr & m_adbcr & ADBXR_IRQS)
-			{
-				set_input_line(M68HC05PGE_INT_ADB, ASSERT_LINE);
-			}
-			else
-			{
-				set_input_line(M68HC05PGE_INT_ADB, CLEAR_LINE);
-			}
+			m_adbsr &= data;
+			adb_update_irq();
 			break;
 
 		case 2:
 			m_adbdr = data;
-			LOGMASKED(LOG_ADB, "ADB sending %02x\n", data);
-			m_adbsr &= ~((1 << ADBXR_TDRE) | (1 << ADBXR_TC));
-			m_adb_timer->adjust(attotime::from_usec(1200), 0);
+			adb_clear_status((1 << ADBXR_TDRE) | (1 << ADBXR_TC));
+			if (adb_host_idle())
+			{
+				adb_host_command(data);
+			}
+			else if (!adb_host_listen_data_w(data))
+			{
+				LOGMASKED(LOG_ADB, "ADB transmit data overrun writing %02x\n", data);
+				adb_set_status(1 << ADBXR_OVFL);
+			}
 			break;
 	}
 }
 
-TIMER_CALLBACK_MEMBER(m68hc05pge_device::adb_tick)
+void m68hc05pge_device::adb_update_irq()
 {
-	switch (param)
-	{
-		case 0:         // byte transmitted, trigger transmitter empty
-			m_adbsr |= (1 << ADBXR_TDRE);
-			break;
+	set_input_line(M68HC05PGE_INT_ADB, (m_adbsr & m_adbcr & ADBXR_IRQS) ? ASSERT_LINE : CLEAR_LINE);
+}
 
-		case 1:
-			m_adbsr |= (1 << ADBXR_TC);
-			break;
+void m68hc05pge_device::adb_set_status(u8 mask)
+{
+	m_adbsr |= mask;
+	adb_update_irq();
+}
+
+void m68hc05pge_device::adb_clear_status(u8 mask)
+{
+	m_adbsr &= ~mask;
+	adb_update_irq();
+}
+
+void m68hc05pge_device::adb_host_drive_line(int state)
+{
+	m_adb_linechange(state);
+}
+
+void m68hc05pge_device::adb_host_tx_empty()
+{
+	adb_set_status(1 << ADBXR_TDRE);
+}
+
+bool m68hc05pge_device::adb_host_listen_more() const
+{
+	// the firmware clears the TDRE interrupt enable once the last data byte is in the shifter
+	return BIT(m_adbcr, ADBXR_TDRE);
+}
+
+void m68hc05pge_device::adb_host_command_sent(bool srq)
+{
+	if (srq)
+	{
+		adb_set_status(1 << ADBXR_SRQ);
+	}
+}
+
+bool m68hc05pge_device::adb_host_rx_byte(u8 data)
+{
+	if (BIT(m_adbsr, ADBXR_RDRF))
+	{
+		LOGMASKED(LOG_ADB, "ADB receive data overrun\n");
+		return false;
 	}
 
-	if (m_adbsr & m_adbcr & ADBXR_IRQS)
-	{
-		set_input_line(M68HC05PGE_INT_ADB, ASSERT_LINE);
-	}
+	m_adbdr = data;
+	adb_set_status(1 << ADBXR_RDRF);
+	return true;
+}
+
+void m68hc05pge_device::adb_host_transaction_done(adb_host_status status)
+{
+	// no response and bad data are both OVFL to the firmware
+	adb_set_status((status == adb_host_status::OK) ? (1 << ADBXR_TC) : (1 << ADBXR_OVFL));
+}
+
+void m68hc05pge_device::adb_host_reset_done()
+{
+	m_adbcr &= ~(1 << ADBXR_BRST);
+	adb_update_irq();
 }
 
 u8 m68hc05pge_device::option_r()

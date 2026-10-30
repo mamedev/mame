@@ -45,7 +45,12 @@ public:
 		set_screen_tag(std::forward<T>(screen_tag));
 		set_irq_info(std::forward<U>(cpu_tag), irq_num, serial_num);
 	}
-	iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T, typename U>
+	iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&screen_tag, U &&cpu_tag, int irq_num, int serial_num)
+		: iteagle_fpga_device(mconfig, tag, owner, 0, std::forward<T>(screen_tag), std::forward<U>(cpu_tag), irq_num, serial_num)
+	{
+	}
+	iteagle_fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_init_info(int version, int seq_init) {m_version=version; m_seq_init=seq_init;}
 	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
@@ -124,7 +129,7 @@ private:
 
 class iteagle_eeprom_device : public pci_device {
 public:
-	iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	// optional information overrides
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
@@ -153,7 +158,7 @@ private:
 // Mimic Cypress CY82C693 Peripheral Controller
 class iteagle_periph_device : public pci_device {
 public:
-	iteagle_periph_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	iteagle_periph_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void device_start() override ATTR_COLD;

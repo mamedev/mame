@@ -15,7 +15,7 @@
 class specimx_sound_device : public device_t, public device_sound_interface
 {
 public:
-	specimx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	specimx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_input_ch0(int state);
 	void set_input_ch1(int state);

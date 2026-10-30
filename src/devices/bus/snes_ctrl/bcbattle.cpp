@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(SNES_BARCODE_BATTLER, snes_bcbattle_device, "snes_bcbattle", 
 
 void snes_bcbattle_device::device_add_mconfig(machine_config &config)
 {
-	BARCODE_READER(config, "battler", 0);
+	BARCODE_READER(config, "battler");
 }
 
 

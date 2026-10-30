@@ -6,14 +6,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - pia6821 port A DDR needs to reset to 0xff or this won't boot
-
-*/
-
 #include "emu.h"
 #include "magic_formel.h"
 
@@ -87,7 +79,7 @@ void c64_magic_formel_cartridge_device::pia_cb2_w(int state)
 {
 	if (!state)
 	{
-		m_u9b = 1;
+		m_u9b = 0;
 	}
 }
 
@@ -99,6 +91,7 @@ void c64_magic_formel_cartridge_device::pia_cb2_w(int state)
 void c64_magic_formel_cartridge_device::device_add_mconfig(machine_config &config)
 {
 	PIA6821(config, m_pia);
+	m_pia->readpa_handler().set_constant(0);
 	m_pia->writepa_handler().set(FUNC(c64_magic_formel_cartridge_device::pia_pa_w));
 	m_pia->writepb_handler().set(FUNC(c64_magic_formel_cartridge_device::pia_pb_w));
 	m_pia->cb2_handler().set(FUNC(c64_magic_formel_cartridge_device::pia_cb2_w));
@@ -185,10 +178,10 @@ void c64_magic_formel_cartridge_device::device_start()
 
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
+//  device_reset_after_children - device-specific reset
 //-------------------------------------------------
 
-void c64_magic_formel_cartridge_device::device_reset()
+void c64_magic_formel_cartridge_device::device_reset_after_children()
 {
 	m_rom_bank = 0;
 	m_ram_bank = 0;
@@ -251,5 +244,5 @@ void c64_magic_formel_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, in
 
 int c64_magic_formel_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw)
 {
-	return !(ba && rw && ((offset & 0xe000) == 0xe000) && !(!m_pb7 && !m_u9b));
+	return !(ba && rw && ((offset & 0xe000) == 0xe000) && (m_u9b || (m_pb7 && m_slot->hiram())));
 }

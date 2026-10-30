@@ -151,7 +151,7 @@ void mes_state::mes(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mes_state::io_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(mes_state::screen_update));
@@ -161,11 +161,11 @@ void mes_state::mes(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	Z80CTC(config, "ctc", 0);
-	Z80PIO(config, "pio", 0);
-	Z80SIO(config, "sio", 0);
+	Z80CTC(config, "ctc");
+	Z80PIO(config, "pio");
+	Z80SIO(config, "sio");
 
-	generic_keyboard_device &keybd(GENERIC_KEYBOARD(config, "keybd", 0));
+	generic_keyboard_device &keybd(GENERIC_KEYBOARD(config, "keybd"));
 	keybd.set_keyboard_callback(FUNC(mes_state::kbd_put));
 }
 

@@ -55,7 +55,7 @@ public:
 	{
 	}
 
-	void fsa1st(machine_config &config);
+	void fsa1st(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -147,8 +147,6 @@ void msxtr_state::setup_slot_spaces(msx_internal_slot_interface &device)
 void msxtr_state::machine_start()
 {
 	msx2p_base_state::machine_start();
-	m_pause_led.resolve();
-	m_r800_led.resolve();
 
 	save_item(NAME(m_pcm_last_sample));
 	save_item(NAME(m_pcm_held_sample));

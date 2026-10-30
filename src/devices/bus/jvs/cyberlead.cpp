@@ -316,7 +316,7 @@ void namco_cyberlead_led_device::device_add_mconfig(machine_config &config)
 
 	ATMEL_29C020(config, m_flash);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_native_aspect();
 	m_screen->set_size(96 * 8, 16 * 8);
 	m_screen->set_visarea(0, (96 * 8) - 1, 0, (16 * 8) - 1);

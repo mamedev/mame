@@ -63,9 +63,6 @@ protected:
 
 void hh_smc1k_state::machine_start()
 {
-	// resolve outputs
-	m_out_x.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 }

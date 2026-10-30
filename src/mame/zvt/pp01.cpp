@@ -176,7 +176,7 @@ void pp01_state::pp01(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pp01_state::io_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(256, 256);
@@ -196,7 +196,7 @@ void pp01_state::pp01(machine_config &config)
 	m_uart->txempty_handler().set([this] (bool state) { m_txe = state; });
 	m_uart->rts_handler().set([this] (bool state) { m_rts = state; });
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<2>(2000000);
 	m_pit->out_handler<2>().set(FUNC(pp01_state::z2_w));
 

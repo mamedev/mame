@@ -43,6 +43,7 @@
 #include "ioprocs.h"
 #include "multibyte.h"
 
+#include <cstring>
 #include <tuple>
 
 

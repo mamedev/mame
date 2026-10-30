@@ -473,12 +473,12 @@ u32 cmi_state::screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bitmap, 
 	u8 y_scroll = m_q219_pia->a_output();
 	u8 invert = BIT(~m_q219_pia->b_output(), 3);
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); ++y)
 	{
 		u8 *src = &m_video_ram[(512/8) * ((y + y_scroll) & 0xff)];
-		u32 *dest = &bitmap.pix(y, cliprect.min_x);
+		u32 *dest = &bitmap.pix(y, cliprect.left());
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
+		for (int x = cliprect.left(); x <= cliprect.right(); x += 8)
 		{
 			u8 data = *src++;
 
@@ -2017,7 +2017,7 @@ void cmi_state::cmi2x(machine_config &config)
 	m_cmi07cpu->set_addrmap(AS_PROGRAM, &cmi_state::cmi07cpu_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(config, m_screen).set_color(rgb_t::green());
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBLANK_END, HBLANK_START, VTOTAL, VBLANK_END, VBLANK_START);
 	m_screen->set_screen_update(FUNC(cmi_state::screen_update_cmi2x));
 	m_screen->screen_vblank().set(FUNC(cmi_state::cmi_iix_vblank));
@@ -2110,13 +2110,13 @@ void cmi_state::cmi2x(machine_config &config)
 	PTM6840(config, m_cmi07_ptm, 2000000); // ptm_cmi07_config
 	m_cmi07_ptm->irq_callback().set(FUNC(cmi_state::cmi07_irq));
 
-	PTM6840(config, m_midi_ptm[0], 0);
+	PTM6840(config, m_midi_ptm[0]);
 	m_midi_ptm[0]->set_external_clocks(0, 384000, 0); // C1 is 0, C2 is 384kHz per schematic block diagram, C3 is CLICK SYNC IN
 	//m_midi_ptm[0]->o1_callback().set(FUNC(cmi_state::midi_ptm0_c1_w)); // TIMER 1A O/P per schematic
 	//m_midi_ptm[0]->o2_callback().set(FUNC(cmi_state::midi_ptm0_c2_w)); // CLK 2 per schematic
 	m_midi_ptm[0]->o3_callback().set(FUNC(cmi_state::midi_ptm0_c3_w));
 
-	PTM6840(config, m_midi_ptm[1], 0); // entirely clocked by PTM 0
+	PTM6840(config, m_midi_ptm[1]); // entirely clocked by PTM 0
 	//m_midi_ptm[1]->o1_callback().set(FUNC(cmi_state::midi_sync_out_1_w)); // SYNC OUT 1 per schematic
 	//m_midi_ptm[1]->o2_callback().set(FUNC(cmi_state::midi_sync_out_2_w)); // SYNC OUT 2 per schematic
 	//m_midi_ptm[1]->o3_callback().set(FUNC(cmi_state::midi_sync_out_3_w)); // SYNC OUT 3 per schematic

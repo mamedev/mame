@@ -143,13 +143,13 @@ void imsai_state::imsai(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &imsai_state::io_map);
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(imsai_state::kbd_put));
 
 	/* Devices */
-	I8251(config, "uart", 0);
+	I8251(config, "uart");
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(6_MHz_XTAL / 3); // Timer 0: baud rate gen for 8251
 	m_pit->out_handler<0>().set("uart", FUNC(i8251_device::write_txc));
 	m_pit->out_handler<0>().append("uart", FUNC(i8251_device::write_rxc));

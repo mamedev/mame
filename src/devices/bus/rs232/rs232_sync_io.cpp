@@ -108,7 +108,7 @@ ioport_constructor rs232_sync_io_device::device_input_ports() const
 
 void rs232_sync_io_device::device_add_mconfig(machine_config &config)
 {
-	BITBANGER(config , m_stream , 0);
+	BITBANGER(config , m_stream);
 }
 
 void rs232_sync_io_device::device_start()

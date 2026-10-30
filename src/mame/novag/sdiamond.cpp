@@ -7,7 +7,8 @@ Novag (Perfect Technology*) Star Diamond (model 1004)
 
 *: Novag Industries dissolved in 2000. The Novag brand continued for a few years
 under Perfect Technology, Ltd., established by the daughter of Novag's founder.
-The main programmer (David Kittinger) also moved to the new company.
+The chief engineer (Wayne Chow) and the chess programmer (David Kittinger) also
+moved to the new company.
 
 Although there may be newer Novag products with (old) software by David Kittinger,
 Star Diamond was the last chess computer that he personally worked on.
@@ -39,7 +40,7 @@ TODO:
 #include "sound/dac.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -63,7 +64,7 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
-	void sdiamond(machine_config &config);
+	void sdiamond(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_switch);
 
@@ -108,8 +109,6 @@ private:
 
 void sdiamond_state::machine_start()
 {
-	m_out_lcd.resolve();
-
 	// register for savestates
 	save_item(NAME(m_power));
 	save_item(NAME(m_inp_mux));
@@ -333,10 +332,9 @@ void sdiamond_state::sdiamond(machine_config &config)
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(4, 16);
 	m_lcd_pwm->output_x().set(FUNC(sdiamond_state::lcd_pwm_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/5, 671/5);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);
 	config.set_default_layout(layout_novag_sdiamond);

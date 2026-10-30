@@ -10,12 +10,12 @@
 
 // --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
 
-class esq2x16_sq1_device : public esqvfd_device {
+class esq2x16_sq1_device : public device_t {
 public:
 	esq2x16_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void write_char(uint8_t data) override;
-	virtual void update_display() override;
+	virtual void write_char(uint8_t data);
+	virtual void update_display();
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

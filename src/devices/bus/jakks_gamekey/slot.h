@@ -54,16 +54,13 @@ class jakks_gamekey_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	jakks_gamekey_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	jakks_gamekey_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T>
-	jakks_gamekey_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
-		: jakks_gamekey_slot_device(mconfig, tag, owner, clock)
+	jakks_gamekey_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: jakks_gamekey_slot_device(mconfig, tag, owner)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 
 	virtual ~jakks_gamekey_slot_device();

@@ -20,7 +20,7 @@ namespace {
 class nes_vt42xx_base_state : public driver_device
 {
 public:
-	nes_vt42xx_base_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt42xx_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_io0(*this, "IO0"),
 		m_io1(*this, "IO1"),
@@ -52,10 +52,7 @@ protected:
 
 	required_region_ptr<uint8_t> m_prgrom;
 
-	uint8_t vt_rom_r(offs_t offset);
-	[[maybe_unused]] void vtspace_w(offs_t offset, uint8_t data);
-
-	void configure_soc(nes_vt02_vt03_soc_device* soc);
+	void configure_soc(nes_vt02_vt03_soc_device *soc);
 
 	uint8_t upper_412c_r();
 	uint8_t upper_412d_r();
@@ -69,7 +66,7 @@ private:
 class nes_vt42xx_state : public nes_vt42xx_base_state
 {
 public:
-	nes_vt42xx_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt42xx_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_vt42xx_base_state(mconfig, type, tag),
 		m_soc(*this, "soc")
 	{ }
@@ -80,17 +77,18 @@ public:
 	void vt_external_space_map_8mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_16mbyte(address_map &map) ATTR_COLD;
 
-	void nes_vt42xx(machine_config& config);
-	void nes_vt42xx_1mb(machine_config& config);
-	void nes_vt42xx_2mb(machine_config& config);
-	void nes_vt42xx_4mb(machine_config& config);
-	void nes_vt42xx_8mb(machine_config& config);
-	void nes_vt42xx_16mb(machine_config& config);
+	void nes_vt42xx(machine_config &config) ATTR_COLD;
+	void nes_vt42xx_1mb(machine_config &config) ATTR_COLD;
+	void nes_vt42xx_2mb(machine_config &config) ATTR_COLD;
+	void nes_vt42xx_4mb(machine_config &config) ATTR_COLD;
+	void nes_vt42xx_8mb(machine_config &config) ATTR_COLD;
+	void nes_vt42xx_16mb(machine_config &config) ATTR_COLD;
 
 	void init_rfcp168();
 	void init_g9_666();
 	void init_hhgc319();
 	void init_bl339();
+	void init_jjfun365();
 
 protected:
 	uint8_t vt_rom_banked_r(offs_t offset);
@@ -101,12 +99,12 @@ protected:
 class nes_vt42xx_bitboy_state : public nes_vt42xx_state
 {
 public:
-	nes_vt42xx_bitboy_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt42xx_bitboy_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_vt42xx_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt42xx_bitboy_2x16mb(machine_config& config);
-	void nes_vt42xx_gprnrs16_2x16mb(machine_config& config);
+	void nes_vt42xx_bitboy_2x16mb(machine_config &config) ATTR_COLD;
+	void nes_vt42xx_gprnrs16_2x16mb(machine_config &config) ATTR_COLD;
 
 	void vt_external_space_map_bitboy_2x16mbyte(address_map &map) ATTR_COLD;
 
@@ -118,11 +116,11 @@ private:
 class nes_vt42xx_fapocket_state : public nes_vt42xx_state
 {
 public:
-	nes_vt42xx_fapocket_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt42xx_fapocket_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_vt42xx_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt42xx_fa(machine_config& config);
+	void nes_vt42xx_fa(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -134,40 +132,30 @@ private:
 	void fapocket_412c_w(u8 data);
 };
 
-uint8_t nes_vt42xx_base_state::vt_rom_r(offs_t offset)
-{
-	return m_prgrom[offset];
-}
-
-void nes_vt42xx_base_state::vtspace_w(offs_t offset, uint8_t data)
-{
-	logerror("%s: vtspace_w %08x : %02x", machine().describe_context(), offset, data);
-}
-
 // use maps with mirroring in depending on ROM size (this SoC can only access 16MB without banking?)
 void nes_vt42xx_state::vt_external_space_map_1mbyte(address_map &map)
 {
-	map(0x0000000, 0x00fffff).mirror(0x1f00000).r(FUNC(nes_vt42xx_state::vt_rom_r));
+	map(0x0000000, 0x00fffff).mirror(0x1f00000).rom().region("mainrom", 0);
 }
 
 void nes_vt42xx_state::vt_external_space_map_2mbyte(address_map &map)
 {
-	map(0x0000000, 0x01fffff).mirror(0x1e00000).r(FUNC(nes_vt42xx_state::vt_rom_r));
+	map(0x0000000, 0x01fffff).mirror(0x1e00000).rom().region("mainrom", 0);
 }
 
 void nes_vt42xx_state::vt_external_space_map_4mbyte(address_map &map)
 {
-	map(0x0000000, 0x03fffff).mirror(0x1c00000).r(FUNC(nes_vt42xx_state::vt_rom_r));
+	map(0x0000000, 0x03fffff).mirror(0x1c00000).rom().region("mainrom", 0);
 }
 
 void nes_vt42xx_state::vt_external_space_map_8mbyte(address_map &map)
 {
-	map(0x0000000, 0x07fffff).mirror(0x1800000).r(FUNC(nes_vt42xx_state::vt_rom_r));
+	map(0x0000000, 0x07fffff).mirror(0x1800000).rom().region("mainrom", 0);
 }
 
 void nes_vt42xx_state::vt_external_space_map_16mbyte(address_map &map)
 {
-	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt42xx_state::vt_rom_r));
+	map(0x0000000, 0x0ffffff).mirror(0x1000000).rom().region("mainrom", 0);
 }
 
 
@@ -262,7 +250,7 @@ void nes_vt42xx_fapocket_state::machine_reset()
 	m_ahigh = 0;
 }
 
-void nes_vt42xx_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
+void nes_vt42xx_base_state::configure_soc(nes_vt02_vt03_soc_device *soc)
 {
 	soc->set_addrmap(AS_PROGRAM, &nes_vt42xx_state::vt_external_space_map_16mbyte);
 	soc->read_0_callback().set(FUNC(nes_vt42xx_base_state::in0_r));
@@ -317,31 +305,31 @@ void nes_vt42xx_state::nes_vt42xx(machine_config &config)
 	m_soc->force_bad_dma();
 }
 
-void nes_vt42xx_state::nes_vt42xx_1mb(machine_config& config)
+void nes_vt42xx_state::nes_vt42xx_1mb(machine_config &config)
 {
 	nes_vt42xx(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt42xx_state::vt_external_space_map_1mbyte);
 }
 
-void nes_vt42xx_state::nes_vt42xx_2mb(machine_config& config)
+void nes_vt42xx_state::nes_vt42xx_2mb(machine_config &config)
 {
 	nes_vt42xx(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt42xx_state::vt_external_space_map_2mbyte);
 }
 
-void nes_vt42xx_state::nes_vt42xx_4mb(machine_config& config)
+void nes_vt42xx_state::nes_vt42xx_4mb(machine_config &config)
 {
 	nes_vt42xx(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt42xx_state::vt_external_space_map_4mbyte);
 }
 
-void nes_vt42xx_state::nes_vt42xx_8mb(machine_config& config)
+void nes_vt42xx_state::nes_vt42xx_8mb(machine_config &config)
 {
 	nes_vt42xx(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt42xx_state::vt_external_space_map_8mbyte);
 }
 
-void nes_vt42xx_state::nes_vt42xx_16mb(machine_config& config)
+void nes_vt42xx_state::nes_vt42xx_16mb(machine_config &config)
 {
 	nes_vt42xx(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt42xx_state::vt_external_space_map_16mbyte);
@@ -361,7 +349,7 @@ void nes_vt42xx_bitboy_state::gprnrs16_412c_w(u8 data)
 	m_ahigh = (data & 0x02) ? (1 << 24) : 0x0;
 }
 
-void nes_vt42xx_bitboy_state::nes_vt42xx_bitboy_2x16mb(machine_config& config)
+void nes_vt42xx_bitboy_state::nes_vt42xx_bitboy_2x16mb(machine_config &config)
 {
 	nes_vt42xx(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt42xx_bitboy_state::vt_external_space_map_bitboy_2x16mbyte);
@@ -369,7 +357,7 @@ void nes_vt42xx_bitboy_state::nes_vt42xx_bitboy_2x16mb(machine_config& config)
 	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt42xx_bitboy_state::bittboy_412c_w));
 }
 
-void nes_vt42xx_bitboy_state::nes_vt42xx_gprnrs16_2x16mb(machine_config& config)
+void nes_vt42xx_bitboy_state::nes_vt42xx_gprnrs16_2x16mb(machine_config &config)
 {
 	nes_vt42xx(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt42xx_bitboy_state::vt_external_space_map_bitboy_2x16mbyte);
@@ -395,7 +383,7 @@ void nes_vt42xx_fapocket_state::fapocket_412c_w(u8 data)
 	m_ahigh |= (data & 0x02) ? (1 << 24) : 0x0;
 }
 
-void nes_vt42xx_fapocket_state::nes_vt42xx_fa(machine_config& config)
+void nes_vt42xx_fapocket_state::nes_vt42xx_fa(machine_config &config)
 {
 	nes_vt42xx(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt42xx_fapocket_state::vt_external_space_map_fa_4x16mbyte);
@@ -524,6 +512,11 @@ ROM_START( g3_800 )
 	ROM_LOAD( "g3_800in1.bin", 0x00000, 0x4000000, CRC(df326924) SHA1(38c26ea96fbf3ba80526072d07209f19b04812e9) )
 ROM_END
 
+ROM_START( jjfun365 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl128p10tfi01.u1", 0x00000, 0x1000000, CRC(d2744949) SHA1(72af5d644d700ebfbabd37c862a81058c4c9c2f3) )
+ROM_END
+
 void nes_vt42xx_state::init_rfcp168()
 {
 	uint8_t *romdata = memregion("mainrom")->base();
@@ -584,11 +577,26 @@ void nes_vt42xx_state::init_bl339()
 		put_u16le(&romdata[i], bitswap<16>(get_u16le(&romdata[i]), 15, 7, 13, 4, 3, 10, 2, 1, 14, 6, 5, 12, 11, 9, 8, 0));
 }
 
+void nes_vt42xx_state::init_jjfun365()
+{
+	init_g9_666();
+	init_rfcp168();
+
+	uint8_t *romdata = memregion("mainrom")->base();
+	for (offs_t i = 0; i < 0x800000; i += 0x20000)
+	{
+		// Swap A16 with A23
+		std::swap_ranges(&romdata[i + 0x10000], &romdata[i + 0x20000], &romdata[i + 0x800000]);
+	}
+}
+
 } // anonymous namespace
 
 
 CONS( 201?, rfcp168,  0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_rfcp168, "<unknown>", "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"
 
+// 060-91011011V8.0 SUPER-FC280 on PCB
+CONS( 2022, jjfun365, 0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_jjfun365,   "JJFun", "Retro FC Game Box 365-in-1",  MACHINE_NOT_WORKING )
 
 // these share the same bitswap, many duplicates, real game counts to be confirmed, graphical issues in some games
 CONS( 201?, g5_500,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_g9_666, "<unknown>", "G5 500 in 1 Handheld", MACHINE_NOT_WORKING )

@@ -1823,10 +1823,10 @@ void galaxold_state::galaxold_base(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state,galaxold)
 
-	TTL7474(config, m_7474_9m_1, 0);
+	TTL7474(config, m_7474_9m_1);
 	m_7474_9m_1->output_cb().set(FUNC(galaxold_state::galaxold_7474_9m_1_callback));
 
-	TTL7474(config, m_7474_9m_2, 0);
+	TTL7474(config, m_7474_9m_2);
 	m_7474_9m_2->comp_output_cb().set(FUNC(galaxold_state::galaxold_7474_9m_2_q_callback));
 
 	TIMER(config, "int_timer").configure_generic(FUNC(galaxold_state::galaxold_interrupt_timer));
@@ -1837,7 +1837,7 @@ void galaxold_state::galaxold_base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxian);
 	PALETTE(config, m_palette, FUNC(galaxold_state::galaxold_palette), 32+2+64); // 32 for the characters, 2 for the bullets, 64 for the stars
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(galaxold_state::screen_update_galaxold));
 	m_screen->set_palette(m_palette);
@@ -1850,12 +1850,12 @@ void galaxold_state::galaxold_base(machine_config &config)
 
 void galaxold_state::galaxian_audio(machine_config &config)
 {
-	GALAXIAN_SOUND(config, "cust", 0);
+	GALAXIAN_SOUND(config, "cust");
 }
 
 void galaxold_state::mooncrst_audio(machine_config &config)
 {
-	MOONCRST_SOUND(config, "cust", 0);
+	MOONCRST_SOUND(config, "cust");
 }
 
 
@@ -2055,7 +2055,7 @@ void galaxold_state::drivfrcg(machine_config &config)
 	maincpu.intack_handler().set(FUNC(galaxold_state::hunchbkg_intack));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(16000.0/132/2);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(32*8, 32*8);
@@ -2139,7 +2139,7 @@ void galaxold_state::racknrol(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxian);
 	PALETTE(config, m_palette, FUNC(galaxold_state::s2650_palette), 32);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(galaxold_state::screen_update_galaxold));
 	m_screen->set_palette(m_palette);
@@ -2166,7 +2166,7 @@ void galaxold_state::hexpoola(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxian);
 	PALETTE(config, m_palette, FUNC(galaxold_state::s2650_palette), 32);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(galaxold_state::screen_update_galaxold));
 	m_screen->set_palette(m_palette);

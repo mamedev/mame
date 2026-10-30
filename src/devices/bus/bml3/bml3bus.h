@@ -34,10 +34,7 @@ public:
 	bml3bus_slot_device(machine_config const &mconfig, const char *tag, device_t *owner, T &&nbtag, U &&opts, const char *dflt)
 		: bml3bus_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 		set_bml3bus_slot(std::forward<T>(nbtag), tag);
 	}
 
@@ -72,7 +69,7 @@ class bml3bus_device : public device_t
 	friend class device_bml3bus_card_interface;
 public:
 	// construction/destruction
-	bml3bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bml3bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration
 	auto nmi_callback() { return m_out_nmi_cb.bind(); }

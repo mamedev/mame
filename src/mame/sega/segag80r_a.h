@@ -25,7 +25,7 @@
 class sega005_sound_device : public device_t, public device_sound_interface
 {
 public:
-	sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T> void set_sound_region(T &&tag) { m_sound_region.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_proms_region(T &&tag) { m_proms_region.set_tag(std::forward<T>(tag)); }

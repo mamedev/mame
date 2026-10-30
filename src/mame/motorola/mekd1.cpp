@@ -434,7 +434,7 @@ void mekd1_state::mekd1(machine_config &config)
 	// User ACIA. Available at P2.
 	// /CTS is pulled low, but may be driven.
 	// /DCD is pulled low, but may be driven.
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
 	// Off-board clock for the on-board MC6850.

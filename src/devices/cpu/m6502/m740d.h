@@ -31,7 +31,7 @@ protected:
 
 private:
 	static const disasm_entry disasm_entries[0x200];
-	config *conf;
+	config *m_conf;
 };
 
 #endif

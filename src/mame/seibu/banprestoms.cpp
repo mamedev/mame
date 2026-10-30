@@ -28,13 +28,16 @@ The audio section also has unpopulated spaces marked for a Z80, a YM2203 and a S
 
 
 TODO:
-- fix printer or hopper emulation (passes check at start but then fails when giving out tickets at game end for marioun,
-  when coining up for tvdenwad)
-- the GFX emulation was adapted from other drivers using the Seibu customs, it might need more adjustments
-- verify Oki banking (needs someone who understands Japanese to check if speech makes sense when it gets called)
-- lamps
-- controls / dips need to be completed and better arranged
-- identify and hookup RTC
+- the GFX emulation was adapted from other drivers using the Seibu customs,
+  it might need more adjustments;
+- lamps;
+- controls / dips need to be completed and better arranged;
+- identify and hookup RTC;
+- hopper emulation not 100% correct;
+- tvdenwad: the way we hookup keypad 0 breaks gameplay i.e. you have to hold 0 then make a selection
+  to work around it;
+- tvdenwam: scroll X jerkiness in attract mode, warrants copying video RAM buffers like godzilla?
+
 */
 
 #include "emu.h"
@@ -65,6 +68,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_spritegen(*this, "spritegen")
+		, m_crtc(*this, "crtc")
 		, m_ticket(*this, "ticket")
 		, m_rtc(*this, "rtc")
 		, m_vram(*this, "vram%u", 0U)
@@ -72,19 +76,23 @@ public:
 		, m_okibank(*this, "okibank")
 	{ }
 
-	void banprestoms(machine_config &config);
+	void banprestoms(machine_config &config) ATTR_COLD;
+	void tvdenwam(machine_config &config) ATTR_COLD;
 
-	void init_oki();
+	void init_oki() ATTR_COLD;
+
+	int card_pay_r();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<sei0211_device> m_spritegen;
+	required_device<seibu_crtc_device> m_crtc;
+private:
 	required_device<ticket_dispenser_device> m_ticket;
 	required_device<lh5045_device> m_rtc;
 
@@ -93,12 +101,15 @@ private:
 
 	required_memory_bank m_okibank;
 
-	tilemap_t *m_tilemap[4];
+	tilemap_t *m_tilemap[4] {};
 
-	uint16_t m_layer_en;
-	uint16_t m_scrollram[6];
+	uint16_t m_layer_en = 0;
+	uint16_t m_scrollram[6] {};
+
+	uint8_t m_card_motor = 0;
 
 	void okibank_w(uint16_t data);
+	void outputs_w(uint16_t data);
 
 	template <uint8_t Which> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void layer_en_w(uint16_t data);
@@ -114,12 +125,6 @@ private:
 };
 
 
-void banprestoms_state::machine_start()
-{
-	m_okibank->configure_entries(0, 4, memregion("oki")->base(), 0x40000);
-	m_okibank->set_entry(0);
-}
-
 void banprestoms_state::video_start()
 {
 	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(banprestoms_state::tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -130,9 +135,6 @@ void banprestoms_state::video_start()
 	m_tilemap[1]->set_transparent_pen(15);
 	m_tilemap[2]->set_transparent_pen(15);
 	m_tilemap[3]->set_transparent_pen(15);
-
-	save_item(NAME(m_layer_en));
-	save_item(NAME(m_scrollram));
 }
 
 
@@ -146,8 +148,8 @@ void banprestoms_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 template <uint8_t Which>
 TILE_GET_INFO_MEMBER(banprestoms_state::tile_info)
 {
-	int tile = m_vram[Which][tile_index] & 0xfff;
-	int color = (m_vram[Which][tile_index] >> 12) & 0x0f;
+	int const tile = m_vram[Which][tile_index] & 0xfff;
+	int const color = (m_vram[Which][tile_index] >> 12) & 0x0f;
 	tileinfo.set(Which, tile, color, 0);
 }
 
@@ -196,13 +198,64 @@ void banprestoms_state::layer_scroll_w(offs_t offset, uint16_t data, uint16_t me
 	COMBINE_DATA(&m_scrollram[offset]);
 }
 
+
+void banprestoms_state::machine_start()
+{
+	m_okibank->configure_entries(0, 4, memregion("oki")->base(), 0x40000);
+	m_okibank->set_entry(0);
+
+	save_item(NAME(m_layer_en));
+	save_item(NAME(m_scrollram));
+	save_item(NAME(m_card_motor));
+}
+
+int banprestoms_state::card_pay_r()
+{
+	// read while phase B is active
+
+	return m_card_motor == 0x10;
+}
+
 void banprestoms_state::okibank_w(uint16_t data)
 {
 	m_okibank->set_entry(data & 0x03);
 
-	m_ticket->motor_w(BIT(data, 4)); // bit 3 is suspect, too
-	// TODO: what do the other bits do?
+	// bit 2 appears hook sensor related
+
+	// ticket dispenser handling:
+	// bits 3 and 4 are:
+	// 0x00: motor off
+	// 0x08: phase A (probably card pulled to the pay sensor)
+	// 0x10: phase B (probably card pushed to exit)
+	// 0x18: brake / end sequence
+
+	uint8_t const motor = data & 0x18;
+
+	if (motor != m_card_motor)
+	{
+		m_ticket->motor_w(motor == 0x08 || motor == 0x10);
+		m_card_motor = motor;
+	}
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
+
+	if (data & 0xc0)
+		logerror("%s okibank_w: unknown bits written %02x\n", machine().describe_context(), data);
 }
+
+void banprestoms_state::outputs_w(uint16_t data)
+{
+	// bit 0 is related to the CRT Relay Check in test mode
+
+	// bit 2 is related to the Lockout Check in test mode
+	machine().bookkeeping().coin_lockout_w(0, !BIT(data, 2));
+
+	// bit 3 is the start up lamp in marioun's test mode
+
+	if (data & 0xfa)
+		logerror("%s outputs_w: unknown bits written %02x\n", machine().describe_context(), data);
+}
+
 
 void banprestoms_state::prg_map(address_map &map)
 {
@@ -215,17 +268,17 @@ void banprestoms_state::prg_map(address_map &map)
 	map(0x083000, 0x0837ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x083800, 0x083fff).ram().share(m_spriteram);
 	map(0x0a0001, 0x0a0001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x0c0000, 0x0c004f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
+	map(0x0c0000, 0x0c004f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x0c0080, 0x0c0081).nopw(); // CRTC related ?
 	map(0x0c00c0, 0x0c00c1).nopw(); // CRTC related ?
 	map(0x0c0100, 0x0c0101).w(FUNC(banprestoms_state::okibank_w));
-//  map(0x0c0140, 0x0c0141).nopw(); // in marioun bit 3 is lamp according to test mode
+	map(0x0c0140, 0x0c0141).w(FUNC(banprestoms_state::outputs_w));
 	map(0x0e0000, 0x0e0001).portr("DSW1");
 	map(0x0e0002, 0x0e0003).portr("IN1");
 	map(0x0e0004, 0x0e0005).portr("IN2");
 
 	// Expects a '1' when entering RTC test (RTC /BSY line?)
-	map(0x0e0006, 0x0e0007).lr8(NAME([](offs_t offset) { return 1; }));
+	map(0x0e0006, 0x0e0007).lr8(NAME([] (offs_t offset) { return 1; }));
 	map(0x100000, 0x10001f).rw(m_rtc, FUNC(lh5045_device::read), FUNC(lh5045_device::write)).umask16(0x00ff);
 }
 
@@ -257,15 +310,14 @@ static INPUT_PORTS_START( tvdenwad )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) // Card Emp
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_CUSTOM ) // Card Pos
-	// TODO: should be IP_ACTIVE_HIGH but that breaks tvdenwad boot
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r)) // Card Pay
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Card Empty Sensor") // Card Emp - in current emulation there's an infinite supply of cards
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r)) // Card Pos
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(banprestoms_state::card_pay_r)) // Card Pay
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x0020, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) // Hook
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hook")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -301,7 +353,8 @@ static INPUT_PORTS_START( tvdenwad )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( marioun ) // inputs defined as IPT_UNKNOWN don't show any effect in switch test in test mode
+// inputs defined as IPT_UNKNOWN don't show any effect in switch test in test mode
+static INPUT_PORTS_START( marioun )
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) // upper space on the feet platform
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) // right space on the feet platform
@@ -321,9 +374,9 @@ static INPUT_PORTS_START( marioun ) // inputs defined as IPT_UNKNOWN don't show 
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON7 ) // Card Emp
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON8 ) // Card Pos
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r)) // Card Pay
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Card Empty Sensor") // Card Emp - in current emulation there's an infinite supply of cards
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r)) // Card Pos
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(banprestoms_state::card_pay_r)) // Card Pay
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -344,7 +397,9 @@ static INPUT_PORTS_START( marioun ) // inputs defined as IPT_UNKNOWN don't show 
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:3") // some of these are difficulty (i.e. see Bowser being quicker or slower in the 100m dash)
+	// TODO: some of these are difficulty
+	// (i.e. see Bowser being quicker or slower in the 100m dash)
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:4")
@@ -409,22 +464,20 @@ void banprestoms_state::banprestoms(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(banprestoms_state::irq4_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100)); // TODO: period is guessed
+	// TODO: this is trial and error, not verified
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(40));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: copied from other drivers using the same CRTC
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0, 320-1, 16, 240-1);
+	// TODO: copied from other drivers using the same CRTC
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(14318180 / 2, 455, 0, 320, 258, 16, 240); // ~61 Hz, 15.734 kHz
 	screen.set_screen_update(FUNC(banprestoms_state::screen_update));
 	screen.set_palette(m_palette);
 
-	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
-	crtc.layer_en_callback().set(FUNC(banprestoms_state::layer_en_w));
-	crtc.layer_scroll_callback().set(FUNC(banprestoms_state::layer_scroll_w));
-	crtc.layer_scroll_base_callback().set([this] (offs_t offset, u16 data, u16 mem_mask) {
+	SEIBU_CRTC(config, m_crtc);
+	m_crtc->layer_en_callback().set(FUNC(banprestoms_state::layer_en_w));
+	m_crtc->layer_scroll_callback().set(FUNC(banprestoms_state::layer_scroll_w));
+	m_crtc->layer_scroll_base_callback().set([this] (offs_t offset, u16 data, u16 mem_mask) {
 		const u8 layer_n = offset >> 1;
 		if (!BIT(offset, 0))
 			m_tilemap[layer_n]->set_scrolldx((0x1c0 - data) & 0x1ff, (0x1c0 - data) & 0x1ff);
@@ -443,11 +496,32 @@ void banprestoms_state::banprestoms(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH)); // TODO: check frequency and pin 7.
+	okim6295_device &oki(OKIM6295(config, "oki", 1'000'000, okim6295_device::PIN7_HIGH)); // TODO: check frequency and pin 7.
 	oki.set_addrmap(0, &banprestoms_state::oki_map);
-	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
+void banprestoms_state::tvdenwam(machine_config &config)
+{
+	banprestoms_state::banprestoms(config);
+	// tvdenwam routes flipy at byte 3 bit 15 unlike any other SEI021x SW.
+	// notice that all games on this HW may have the same hookup, they just never use flipy afaik
+	m_spritegen->set_flipy_location(3, 15);
+
+	// TODO: tvdenwam wants a Y shift of +16 pixels
+	// This comes from the CRTC register $42, it's not static
+    m_spritegen->set_offset(0, +16);
+
+	// TODO: need to adjust by 0x1c1 rather than 0x1c0 in X direction
+	// needed for sprite & tilemap to stay aligned, cfr. coin in.
+	m_crtc->layer_scroll_base_callback().set([this] (offs_t offset, u16 data, u16 mem_mask) {
+		const u8 layer_n = offset >> 1;
+		if (!BIT(offset, 0))
+			m_tilemap[layer_n]->set_scrolldx((0x1c1 - data) & 0x1ff, (0x1c1 - data) & 0x1ff);
+		else
+			m_tilemap[layer_n]->set_scrolldy((0x1ff - data) & 0x1ff, (0x1ff - data) & 0x1ff);
+	});
+}
 
 ROM_START( tvdenwad )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -458,7 +532,7 @@ ROM_START( tvdenwad )
 	ROM_LOAD( "s82_a05.u119", 0x00000, 0x80000, CRC(980be413) SHA1(d35cb6bb2299fc34226c59c3c97f8789dd1f71ce) )
 
 	ROM_REGION( 0x80000, "gfx_tiles", 0 )
-	ROM_LOAD( "s82_a04.u18", 0x00000, 0x80000, CRC(55f31697) SHA1(58011800b2e2c6cac55a3881a9970bbd325d74ad) ) // TODO: are all of the following used? in attract it seems only fg_gfx and tx_gfx are used
+	ROM_LOAD( "s82_a04.u18", 0x00000, 0x80000, CRC(55f31697) SHA1(58011800b2e2c6cac55a3881a9970bbd325d74ad) )
 
 	ROM_REGION( 0x80000, "bg_gfx", 0 )
 	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
@@ -560,7 +634,7 @@ ROM_START( marioun )
 	ROM_LOAD( "s98_a05.u119", 0x00000, 0x80000, CRC(b8317dd8) SHA1(37f0be38607e40d7925faf9731b95577cbd56bb0) )
 
 	ROM_REGION( 0x80000, "gfx_tiles", 0 )
-	ROM_LOAD( "s98_a04.u18", 0x00000, 0x80000, CRC(b107c5a0) SHA1(d4e7ef71bfb9a10e72b6292405d0378c95ebba25) ) // TODO: are all of the following used? in attract it seems only fg_gfx and tx_gfx are used
+	ROM_LOAD( "s98_a04.u18", 0x00000, 0x80000, CRC(b107c5a0) SHA1(d4e7ef71bfb9a10e72b6292405d0378c95ebba25) )
 
 	ROM_REGION( 0x80000, "bg_gfx", 0 )
 	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
@@ -616,10 +690,10 @@ void banprestoms_state::init_oki() // The Oki mask ROM is in an unusual format, 
 		okirom[(i - 1) / 2 + 0x80000] = buffer[i];
 }
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
-GAME( 1991, tvdenwad, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Doraemon",                            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, tvdenwam, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Super Mario World",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, tvdenwat, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Thomas the Tank Engine and Friends",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, marioun,  0, banprestoms, marioun,  banprestoms_state, init_oki, ROT0, "Banpresto", "Super Mario World - Mario Undoukai",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tvdenwad, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Doraemon (Japan)",                            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, tvdenwam, 0, tvdenwam,    tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Super Mario World (Japan)",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, tvdenwat, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Thomas the Tank Engine and Friends (Japan)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, marioun,  0, banprestoms, marioun,  banprestoms_state, init_oki, ROT0, "Banpresto", "Super Mario World - Mario Undoukai (Japan)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -59,6 +59,8 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 #include "emu.h"
 #include "psikyo.h"
 
+#include "endianness.h"
+
 
 /***************************************************************************
 

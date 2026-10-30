@@ -8,7 +8,9 @@
 
 #include "emu.h"
 #include "floppy.h"
-#include "formats/coupedsk.h"
+#include "formats/coupe_mgt.h"
+#include "formats/coupe_sad.h"
+#include "formats/coupe_sdf.h"
 
 
 //**************************************************************************
@@ -20,7 +22,9 @@ DEFINE_DEVICE_TYPE(SAM_FLOPPY, sam_floppy_device, "sam_floppy", u8"SAM Coupé In
 void sam_floppy_device::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
-	fr.add(FLOPPY_MGT_FORMAT);
+	fr.add(FLOPPY_COUPE_MGT_FORMAT);
+	fr.add(FLOPPY_COUPE_SAD_FORMAT);
+	fr.add(FLOPPY_COUPE_SDF_FORMAT);
 }
 
 static void samcoupe_floppies(device_slot_interface &device)

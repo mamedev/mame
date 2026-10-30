@@ -38,7 +38,7 @@ class apollo_kbd_device : public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
-	apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto tx_cb() { return m_tx_w.bind(); }
 	auto german_cb() { return m_german_r.bind(); }
@@ -60,8 +60,6 @@ private:
 	TIMER_CALLBACK_MEMBER( kbd_scan_timer );
 
 	std::string cpu_context() const;
-	template <typename Format, typename... Params>
-	void logerror(Format &&fmt, Params &&... args) const;
 
 	void kgetchar(uint8_t data);
 

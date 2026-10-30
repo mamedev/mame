@@ -2228,7 +2228,7 @@ def generate_source_from_code(code, gen_mode):
                         source.append("\t}")
                     if not (gen_mode & GEN.full):
                         source.append("\t[[fallthrough]]; case %d:" % (cid+1))
-                    if ci[10]:
+                    if ci[10] and (access_steps == 1 or access_step == 1):
                         source.append("\tm_sr = m_new_sr;")
                         source.append("\tupdate_user_super();")
                         source.append("\tupdate_interrupt();")

@@ -394,9 +394,6 @@ void midi2cv8_state::external_memory_map(address_map &map)
 
 void midi2cv8_state::machine_start()
 {
-	m_cv_display_integer.resolve();
-	m_cv_display_fractional.resolve();
-
 	save_item(NAME(m_inhibit_output_mux));
 	save_item(NAME(m_selected_output_mux));
 	save_item(NAME(m_dac_value));

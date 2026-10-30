@@ -56,8 +56,8 @@ public:
 private:
 	void ctk2000_map(address_map &map) ATTR_COLD;
 
-	virtual void driver_start() override;
-	virtual void driver_reset() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	HD44780_PIXEL_UPDATE(lcd_update);
 	void palette_init(palette_device &palette);
@@ -90,11 +90,11 @@ void ctk2000_state::ctk2000_map(address_map &map)
 	map(0x00000000, 0x001fffff).rom().mirror(0x18e00000);
 }
 
-void ctk2000_state::driver_start()
+void ctk2000_state::machine_start()
 {
 }
 
-void ctk2000_state::driver_reset()
+void ctk2000_state::machine_reset()
 {
 }
 
@@ -119,7 +119,7 @@ void ctk2000_state::ctk2000(machine_config &config)
 
 	// screen (for testing only)
 	// TODO: the actual LCD with custom segments
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));

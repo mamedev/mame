@@ -17,22 +17,14 @@
 
 #pragma once
 
-#include "cpu/drcfe.h"
-#include "cpu/drcuml.h"
-#include "cpu/drcumlsh.h"
 #include "unspdefs.h"
+
+#include "cpu/drcuml.h"
+
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
-
-/* map variables */
-#define MAPVAR_PC               M0
-#define MAPVAR_CYCLES           M1
-
-#define SINGLE_INSTRUCTION_MODE (0)
-
-#define ENABLE_UNSP_DRC         (0)
 
 #define UNSP_LOG_OPCODES        (0)
 #define UNSP_LOG_REGS           (0)
@@ -40,8 +32,6 @@
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-class unsp_frontend;
 
 // ======================> unsp_device
 
@@ -100,6 +90,7 @@ public:
 	virtual ~unsp_device();
 
 	void set_vectorbase(uint16_t vector) { m_vectorbase = vector; }
+	void set_bootvectorbase(uint16_t vector) { m_bootvectorbase = vector; }
 
 	uint8_t get_csb();
 
@@ -141,11 +132,12 @@ protected:
 	/* internal compiler state */
 	struct compiler_state
 	{
+		compiler_state() = default;
 		compiler_state(compiler_state const&) = delete;
 		compiler_state& operator=(compiler_state const&) = delete;
 
-		uint32_t m_cycles;          /* accumulated cycles */
-		uml::code_label m_labelnum; /* index for local labels */
+		uint32_t m_cycles = 0;          /* accumulated cycles */
+		uml::code_label m_labelnum = 0; /* index for local labels */
 	};
 
 	struct internal_unsp_state
@@ -176,6 +168,10 @@ protected:
 
 		int m_icount;
 	};
+
+	class frontend;
+	class opcode_desc;
+
 
 	unsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal);
 
@@ -300,7 +296,7 @@ private:
 
 	drc_cache m_drccache;
 	std::unique_ptr<drcuml_state> m_drcuml;
-	std::unique_ptr<unsp_frontend> m_drcfe;
+	std::unique_ptr<frontend> m_drcfe;
 	uint32_t m_drcoptions;
 	uint8_t m_cache_dirty;
 
@@ -317,6 +313,7 @@ private:
 
 	bool m_enable_drc;
 	uint16_t m_vectorbase;
+	uint16_t m_bootvectorbase;
 	internal_unsp_state m_local_core; // for non-DRC mode
 
 	void execute_run_drc();

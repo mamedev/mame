@@ -634,8 +634,8 @@ void z80_device::device_validity_check(validity_checker &valid) const
 
 	if (4 > m_m1_cycles)
 		osd_printf_error("M1 cycles %u is less than minimum 4\n", m_m1_cycles);
-	if (3 > m_memrq_cycles)
-		osd_printf_error("MEMRQ cycles %u is less than minimum 3\n", m_memrq_cycles);
+	if (3 > m_mreq_cycles)
+		osd_printf_error("MREQ cycles %u is less than minimum 3\n", m_mreq_cycles);
 	if (4 > m_iorq_cycles)
 		osd_printf_error("IORQ cycles %u is less than minimum 4\n", m_iorq_cycles);
 }
@@ -668,14 +668,14 @@ void z80_device::device_start()
 	save_item(NAME(m_nmi_state));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_wait_state));
-	save_item(NAME(m_busrq_state));
+	save_item(NAME(m_busreq_state));
 	save_item(NAME(m_busack_state));
 	save_item(NAME(m_ea));
 	save_item(NAME(m_service_attention));
 	save_item(NAME(m_tmp_irq_vector));
 	save_item(NAME(m_shared_data.w));
 	save_item(NAME(m_shared_data2.w));
-	save_item(NAME(m_rtemp));
+	save_item(NAME(m_irtmp.w));
 	save_item(NAME(m_ref));
 
 	// Reset registers to their initial values
@@ -706,11 +706,11 @@ void z80_device::device_start()
 	m_nmi_state = 0;
 	m_irq_state = 0;
 	m_wait_state = 0;
-	m_busrq_state = 0;
+	m_busreq_state = 0;
 	m_busack_state = 0;
 	m_ea = 0;
 	m_service_attention = 0;
-	m_rtemp = 0;
+	m_irtmp.w = 0;
 
 	space(AS_PROGRAM).cache(m_args);
 	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_opcodes);
@@ -744,8 +744,9 @@ void z80_device::device_start()
 	state_add(Z80_DE2,         "DE2",       m_de2.w);
 	state_add(Z80_HL2,         "HL2",       m_hl2.w);
 	state_add(Z80_WZ,          "WZ",        WZ);
-	state_add(Z80_R,           "R",         m_rtemp).callimport().callexport();
+	state_add(Z80_R,           "R",         m_irtmp.b.l).callimport().callexport();
 	state_add(Z80_I,           "I",         m_i);
+	state_add(Z80_IR,          "IR",        m_irtmp.w).noshow().callimport().callexport();
 	state_add(Z80_IM,          "IM",        m_im).mask(0x3);
 	state_add(Z80_IFF1,        "IFF1",      m_iff1).mask(0x1);
 	state_add(Z80_IFF2,        "IFF2",      m_iff2).mask(0x1);
@@ -788,15 +789,15 @@ void z80_device::execute_set_input(int inputnum, int state)
 {
 	switch (inputnum)
 	{
-	case Z80_INPUT_LINE_BUSRQ:
-		if (m_busrq_state == CLEAR_LINE && state != CLEAR_LINE)
-			set_service_attention<SA_BUSRQ, 1>();
-		m_busrq_state = state;
+	case Z80_INPUT_LINE_BUSREQ:
+		if (m_busreq_state == CLEAR_LINE && state != CLEAR_LINE)
+			set_service_attention<SA_BUSREQ, 1>();
+		m_busreq_state = state;
 		break;
 
 	case INPUT_LINE_NMI:
-		// mark an NMI pending on the rising edge
-		if (m_nmi_state == CLEAR_LINE && state != CLEAR_LINE)
+		// mark an NMI pending on the rising edge (not at the same time RESET is cleared)
+		if (m_nmi_state == CLEAR_LINE && state != CLEAR_LINE && total_cycles())
 			set_service_attention<SA_NMI_PENDING, 1>();
 		m_nmi_state = state;
 		break;
@@ -844,9 +845,12 @@ void z80_device::state_import(const device_state_entry &entry)
 	case Z80_F: case Z80_AF:
 		set_f(F);
 		break;
+	case Z80_IR:
+		m_i = m_irtmp.b.h;
+		[[fallthrough]];
 	case Z80_R:
-		m_r = m_rtemp & 0x7f;
-		m_r2 = m_rtemp & 0x80;
+		m_r = m_irtmp.b.l & 0x7f;
+		m_r2 = m_irtmp.b.l & 0x80;
 		break;
 
 	default:
@@ -861,8 +865,8 @@ void z80_device::state_export(const device_state_entry &entry)
 	case Z80_F: case Z80_AF:
 		F = get_f();
 		break;
-	case Z80_R:
-		m_rtemp = (m_r & 0x7f) | (m_r2 & 0x80);
+	case Z80_IR: case Z80_R:
+		m_irtmp.w = (m_i << 8) | ((m_r & 0x7f) | (m_r2 & 0x80));
 		break;
 
 	default:
@@ -915,7 +919,7 @@ z80_device::z80_device(const machine_config &mconfig, device_type type, const ch
 	m_halt_cb(*this),
 	m_busack_cb(*this),
 	m_m1_cycles(4),
-	m_memrq_cycles(3),
+	m_mreq_cycles(3),
 	m_iorq_cycles(4)
 {
 }

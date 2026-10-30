@@ -7,19 +7,19 @@
     15-pin slot "PIO"
 
     STB-P    <
-    D0       <>
-    D1       <>
-    D2       <>
-    D3       <>
-    D4       <>
-    D5       <>
-    D6       <>
-    D7       <>
+    DC0      <>
+    DC1      <>
+    DC2      <>
+    DC3      <>
+    DC4      <>
+    DC5      <>
+    DC6      <>
+    DC7      <>
     ACK-P     >
     RTS-P    <
     PW        >
     GND       >
-    NMI-P     >
+    /NMI-P    >
     V+        >
 
 *******************************************************************************/
@@ -50,10 +50,7 @@ public:
 	saitekosa_expansion_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts) :
 		saitekosa_expansion_device(mconfig, tag, owner, u32(0))
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(nullptr);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), nullptr, false);
 	}
 
 	saitekosa_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

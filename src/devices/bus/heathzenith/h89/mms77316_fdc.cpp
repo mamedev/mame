@@ -86,7 +86,7 @@ void mms77316_fdc_device::ctrl_w(u8 val)
 
 	for (int i = 4; i < 8; i++)
 	{
-		auto elem = m_floppies[i];
+		auto &elem = m_floppies[i];
 		if (elem)
 		{
 			floppy_image_device *floppy = elem->get_device();
@@ -250,7 +250,7 @@ void mms77316_fdc_device::device_reset()
 
 	for (int i = 0; i < 4; i++)
 	{
-		auto elem = m_floppies[i];
+		auto &elem = m_floppies[i];
 		if (elem)
 		{
 			floppy_image_device *floppy = elem->get_device();

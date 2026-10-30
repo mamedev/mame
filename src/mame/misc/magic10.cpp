@@ -231,8 +231,6 @@ public:
 	void init_soccer10() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD { m_lamps.resolve(); }
-
 	required_device<ticket_dispenser_device> m_ticket;
 	required_device<ticket_dispenser_device> m_hopper;
 
@@ -691,8 +689,8 @@ static INPUT_PORTS_START( musicsrt )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4 / Tails")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Half Gamble")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Play (Bet / Take)")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )   PORT_NAME("Door") PORT_TOGGLE
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_NAME("Play (Bet / Take)")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_DOOR )  PORT_NAME("Door") PORT_TOGGLE
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Aux A")
@@ -747,7 +745,7 @@ static INPUT_PORTS_START( hotslot )
 	PORT_SERVICE_NO_TOGGLE( 0x0010, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME("Note D") PORT_CODE(KEYCODE_9)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_DOOR )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
@@ -960,7 +958,7 @@ void magic10_base_state::base(machine_config &config)
 	// 1FILL is required by vanilla magic10 at least (otherwise gameplay won't work properly)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);
@@ -1998,7 +1996,7 @@ void magic102_state::init_altaten()
 	m_layer2_offset[0] = 8;
 	m_layer2_offset[1] = 16;
 
-	// patching the boot protection...
+	// HACK: patch the boot protection
 	uint8_t *rom = memregion("maincpu")->base();
 
 	rom[0x7668] = 0x71;
@@ -2010,7 +2008,7 @@ void magic102_state::init_spccomp()
 	m_layer2_offset[0] = 8;
 	m_layer2_offset[1] = 16;
 
-	// patching the boot protection...
+	// HACK: patch the boot protection
 	uint8_t *rom = memregion("maincpu")->base();
 
 	rom[0x7684] = 0x71;

@@ -9,7 +9,7 @@
 class sis950_smbus_device : public device_t {
 public:
 
-	sis950_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sis950_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void map(address_map &map) ATTR_COLD;
 

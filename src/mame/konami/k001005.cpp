@@ -4,6 +4,8 @@
 #include "k001005.h"
 #include "screen.h"
 
+#include "corefloat.h"
+
 /*****************************************************************************/
 /* Konami K001005 Polygon Renderer (KS10071) */
 

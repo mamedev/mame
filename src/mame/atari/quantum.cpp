@@ -56,7 +56,7 @@ NOTE: The Atari 136002-125 PROM in the sets below wasn't dumped from an actual
 #include "sound/discrete.h"
 #include "sound/pokey.h"
 #include "video/avgdvg.h"
-#include "video/vector.h"
+#include "vector.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -75,10 +75,7 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	void quantum(machine_config &config);
-
-protected:
-	virtual void machine_start() override { m_leds.resolve(); }
+	void quantum(machine_config &config) ATTR_COLD;
 
 private:
 	uint16_t trackball_r();
@@ -303,14 +300,11 @@ void quantum_state::quantum(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	VECTOR(config, "vector");
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
-	screen.set_refresh_hz(60);
-	screen.set_size(400, 300);
-	screen.set_visarea(0, 900, 0, 600);
-	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
+	vector_device &vector(VECTOR(config, "vector"));
+	vector.set_refresh_hz(60);
+	vector.set_visarea(0, 900, 0, 600);
 
-	AVG_QUANTUM(config, m_avg, 0);
+	AVG_QUANTUM(config, m_avg);
 	m_avg->set_vector("vector");
 	m_avg->set_memory(m_maincpu, AS_PROGRAM, 0x800000);
 

@@ -108,9 +108,9 @@ public:
 	///
 	/// Provided as a convenience for systems that have no additional
 	/// initialisation tasks.
-	void empty_init();
+	void empty_init() ATTR_COLD;
 
-	// output heler
+	// output helper
 	output_manager &output() const { return machine().output(); }
 
 	void nmi_line_pulse(device_t &device);
@@ -144,23 +144,21 @@ public:
 
 protected:
 	// helpers called at startup
-	virtual void driver_start();
 	virtual void machine_start();
 	virtual void sound_start();
 	virtual void video_start();
 
 	// helpers called at reset
-	virtual void driver_reset();
 	virtual void machine_reset();
 	virtual void sound_reset();
 	virtual void video_reset();
 
-	// device-level overrides
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset_after_children() override;
+	// device_t implementation
+	virtual const tiny_rom_entry *device_rom_region() const override final ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override final ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override final ATTR_COLD;
+	virtual void device_start() override final ATTR_COLD;
+	virtual void device_reset_after_children() override final;
 
 	// generic video
 	void flip_screen_set(int state);

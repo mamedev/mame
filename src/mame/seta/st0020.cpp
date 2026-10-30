@@ -8,7 +8,7 @@
 
   The tilemaps are used by jclub2, while gdfs uses its own tilemap.
 
-  To do:
+  TODO:
 
   - fix visible area in jclub2 under non-wide monitor setting.
 
@@ -17,6 +17,7 @@
 #include "emu.h"
 #include "st0020.h"
 
+#include "input.h" // for video debug keys
 #include "screen.h"
 
 #define LOG_UNKNOWN (1 << 1)

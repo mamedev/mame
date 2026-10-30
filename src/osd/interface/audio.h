@@ -101,6 +101,10 @@ struct audio_info {
 		uint32_t m_node;
 		std::vector<float> m_volumes;
 
+		template <typename... T>
+		stream_info(uint32_t id, uint32_t node, T &&... volumes) : m_id(id), m_node(node), m_volumes(std::forward<T>(volumes)...)
+		{ }
+
 		stream_info() = default;
 		stream_info(const stream_info &) = default;
 		stream_info(stream_info &&) = default;

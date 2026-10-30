@@ -7,7 +7,7 @@ WaterMelon T-5740
 https://segaretro.org/Pier_Solar_and_the_Great_Architects
 
 TODO:
-- several unknowns in TIME io range;
+- several unknowns in TIME I/O range;
 
 **************************************************************************************************/
 
@@ -28,7 +28,7 @@ megadrive_hb_psolar_device::megadrive_hb_psolar_device(const machine_config &mco
 
 void megadrive_hb_psolar_device::device_add_mconfig(machine_config &config)
 {
-	M95320_EEPROM(config, m_spi_eeprom, 0);
+	M95320_EEPROM(config, m_spi_eeprom);
 }
 
 void megadrive_hb_psolar_device::device_start()

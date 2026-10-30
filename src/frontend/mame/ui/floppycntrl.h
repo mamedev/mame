@@ -15,6 +15,8 @@
 #include "imagedev/floppy.h"
 
 #include <memory>
+#include <string>
+#include <string_view>
 
 
 namespace ui {
@@ -22,22 +24,23 @@ namespace ui {
 class menu_control_floppy_image : public menu_control_device_image
 {
 public:
-	menu_control_floppy_image(mame_ui_manager &ui, render_container &container, device_image_interface &image);
+	menu_control_floppy_image(mame_ui_manager &ui, render_target &target, device_image_interface &image);
 	virtual ~menu_control_floppy_image() override;
 
-protected:
-	virtual void menu_activated() override;
-
 private:
-	enum { SELECT_FORMAT = LAST_ID, SELECT_MEDIA, SELECT_INIT };
+	floppy_image_device &m_fd;
+	const floppy_image_format_t *m_input_format, *m_output_format;
+	const floppy_image_device::fs_info *m_create_fs;
+	std::string m_input_filename, m_output_filename;
 
-	floppy_image_device &fd;
-	const floppy_image_format_t *input_format, *output_format;
-	const floppy_image_device::fs_info *create_fs;
-	std::string input_filename, output_filename;
+	virtual bool hook_load(const std::string &filename) override;
+	virtual bool hook_create(std::string_view path) override;
 
-	void do_load_create();
-	virtual void hook_load(const std::string &filename) override;
+	void create_format_selected(std::string_view path, floppy_image_format_t const &format);
+	void output_format_selected(std::string_view path, floppy_image_format_t const &format);
+	void create_write_other(std::string const &name);
+	bool do_load_create();
+
 	static bool can_format(const floppy_image_device::fs_info &fs);
 };
 

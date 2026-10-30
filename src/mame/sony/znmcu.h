@@ -8,7 +8,7 @@
 class znmcu_device : public device_t
 {
 public:
-	znmcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	znmcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template<unsigned N> auto analog() { return m_analog_cb[N].bind(); }
 	template<unsigned N> auto trackball() { return m_trackball_cb[N].bind(); }

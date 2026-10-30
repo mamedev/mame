@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
-/******************************************************************************
+/*
 
 Tasc SmartBoard SB30 (analog)
 
@@ -18,7 +18,7 @@ SB20 and the newer SB30 are not emulated. They're on different hardware, with
 embedded CPU to reduce I/O overhead. Note, those are not compatible with old
 versions of Tasc R30.
 
-******************************************************************************/
+*/
 
 #include "emu.h"
 #include "smartboard.h"
@@ -70,11 +70,22 @@ DEFINE_DEVICE_TYPE(TASC_SB30, tasc_sb30_device, "tasc_sb30", "Tasc SmartBoard SB
 tasc_sb30_device::tasc_sb30_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TASC_SB30, tag, owner, clock)
 	, m_board(*this, "board")
-	, m_out_leds(*this, "sb30_led_%u.%u", 0U, 0U)
+	, m_out_leds()
 	, m_conf(*this, "CONF")
 	, m_data_out(*this)
 	, m_led_out(*this)
 { }
+
+
+//-------------------------------------------------
+//  device_config_complete
+//-------------------------------------------------
+
+void tasc_sb30_device::device_config_complete()
+{
+	if (m_led_out.isunset())
+		m_out_leds.emplace(*this, "sb30_led_%u.%u", 0U, 0U);
+}
 
 
 //-------------------------------------------------
@@ -83,9 +94,6 @@ tasc_sb30_device::tasc_sb30_device(const machine_config &mconfig, const char *ta
 
 void tasc_sb30_device::device_start()
 {
-	if (m_led_out.isunset())
-		m_out_leds.resolve();
-
 	// zerofill
 	m_data0 = 0;
 	m_data1 = 0;
@@ -128,8 +136,7 @@ ioport_constructor tasc_sb30_device::device_input_ports() const
 
 void tasc_sb30_device::device_add_mconfig(machine_config &config)
 {
-	SENSORBOARD(config, m_board);
-	m_board->set_type(sensorboard_device::INDUCTIVE);
+	SENSORBOARD(config, m_board).set_type(sensorboard_device::INDUCTIVE);
 	m_board->set_max_id(32);
 	m_board->init_cb().set(FUNC(tasc_sb30_device::init_cb));
 	m_board->spawn_cb().set(FUNC(tasc_sb30_device::spawn_cb));
@@ -302,7 +309,7 @@ void tasc_sb30_device::data0_w(int state)
 		{
 			// output board led(s)
 			if (m_led_out.isunset())
-				m_out_leds[m_pos & 7][m_pos >> 3 & 7] = m_data1;
+				(*m_out_leds)[m_pos & 7][m_pos >> 3 & 7] = m_data1;
 			else
 				m_led_out(m_pos & 0x3f, m_data1);
 		}

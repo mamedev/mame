@@ -391,7 +391,7 @@ void anoworld_state::anoworld(machine_config &config)
 	ctc0.intr_callback().set_inputline("maincpu", 0);
 
 	Z80DMA(config, m_dma, 4_MHz_XTAL);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma->out_int_callback().set_inputline("maincpu", 0);
 	m_dma->in_mreq_callback().set(FUNC(anoworld_state::dma_memory_r));
 	m_dma->out_mreq_callback().set(FUNC(anoworld_state::dma_memory_w));
@@ -452,7 +452,7 @@ void anoworld_state::anoworld(machine_config &config)
 	msm6242_device &rtc(MSM6242(config, "rtc", 32.768_kHz_XTAL));
 	rtc.out_int_handler().set("ctc0", FUNC(z80ctc_device::trg3)); // source guessed
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

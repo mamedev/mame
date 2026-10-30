@@ -26,10 +26,10 @@ public:
 	void spi_mosi_w(int state) { m_in_bit = state; }
 
 	bool get_card_present() { return m_image->exists(); }
+	bool get_card_readonly() { return m_image->is_readonly(); }
+	auto card_present_callback() { return m_exists_cb.bind(); }
 
 	devcb_write_line write_miso;
-
-	void set_delays_ext(u16 seek, u16 data);
 
 protected:
 	spi_sdcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -83,9 +83,7 @@ private:
 	bool m_crc_off;
 	bool m_bACMD;
 
-	// Extra delays. Allows to configure fine tuned timings for different vendors.
-	u16 m_delay_seek;
-	u16 m_delay_data;
+	devcb_write_line m_exists_cb;
 };
 
 DECLARE_DEVICE_TYPE(SPI_SDCARD, spi_sdcard_device)

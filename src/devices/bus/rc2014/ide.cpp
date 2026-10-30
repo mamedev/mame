@@ -56,7 +56,7 @@ void rc2014_ide_base::device_start()
 
 void rc2014_ide_base::device_add_mconfig(machine_config &config)
 {
-	I8255(config, m_ppi, 0);
+	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(rc2014_ide_base::ppi_pa_r));
 	m_ppi->in_pb_callback().set(FUNC(rc2014_ide_base::ppi_pb_r));
 	m_ppi->out_pa_callback().set(FUNC(rc2014_ide_base::ppi_pa_w));

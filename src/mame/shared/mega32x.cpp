@@ -417,13 +417,15 @@ uint16_t sega_32x_device::dreq_common_r(address_space &space, offs_t offset)
 		case 0x0a/2: // a15112 / 4012
 			if (&space == &_68kspace)
 			{
-				logerror("attempting to READ FIFO with 68k!\n");
+				if (!machine().side_effects_disabled())
+					logerror("attempting to READ FIFO with 68k!\n");
 				return 0xffff;
 			}
 
 			if (m_fifo[m_fifo_read_block].empty())
 			{
-				logerror("Attempt to read FIFO while empty %c!\n", m_fifo_read_block ? 'B' : 'A');
+				if (!machine().side_effects_disabled())
+					logerror("Attempt to read FIFO while empty %c!\n", m_fifo_read_block ? 'B' : 'A');
 				return 0xffff;
 			}
 
@@ -846,7 +848,8 @@ uint16_t sega_32x_device::pwm_r(offs_t offset)
 		case 0x08/2: return m_lch_fifo_state & m_rch_fifo_state; // mono ch
 	}
 
-	logerror("Read at undefined PWM register %02x\n",offset);
+	if (!machine().side_effects_disabled())
+		logerror("Read at undefined PWM register %02x\n",offset);
 	return 0xffff;
 }
 
@@ -1659,11 +1662,13 @@ void sega_32x_device::device_add_mconfig(machine_config &config)
 {
 	// HD6417095
 	SH7604(config, m_master_cpu, DERIVED_CLOCK(1, 1));
+	m_master_cpu->set_addrmap(AS_PROGRAM, &sega_32x_device::sh2_main_map);
 	m_master_cpu->set_is_slave(0);
 	m_master_cpu->set_dma_fifo_data_available_callback(FUNC(sega_32x_device::_32x_fifo_available_callback));
 
 	// HD6417095
 	SH7604(config, m_slave_cpu, DERIVED_CLOCK(1, 1));
+	m_slave_cpu->set_addrmap(AS_PROGRAM, &sega_32x_device::sh2_slave_map);
 	m_slave_cpu->set_is_slave(1);
 	m_slave_cpu->set_dma_fifo_data_available_callback(FUNC(sega_32x_device::_32x_fifo_available_callback));
 
@@ -1678,30 +1683,10 @@ void sega_32x_device::device_add_mconfig(machine_config &config)
 	const unsigned quantum_hz = this->clock() / 128;
 	config.set_maximum_quantum(attotime::from_hz(quantum_hz));
 //  config.set_maximum_quantum(attotime::from_hz(1800000));
-}
-
-void sega_32x_ntsc_device::device_add_mconfig(machine_config &config)
-{
-	sega_32x_device::device_add_mconfig(config);
-
-	m_master_cpu->set_addrmap(AS_PROGRAM, &sega_32x_ntsc_device::sh2_main_map);
-	m_slave_cpu->set_addrmap(AS_PROGRAM, &sega_32x_ntsc_device::sh2_slave_map);
 
 	DAC_12BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, *this, 0.4, 0); // unknown DAC
 	DAC_12BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, *this, 0.4, 1); // unknown DAC
 }
-
-void sega_32x_pal_device::device_add_mconfig(machine_config &config)
-{
-	sega_32x_device::device_add_mconfig(config);
-
-	m_master_cpu->set_addrmap(AS_PROGRAM, &sega_32x_pal_device::sh2_main_map);
-	m_slave_cpu->set_addrmap(AS_PROGRAM, &sega_32x_pal_device::sh2_slave_map);
-
-	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, *this, 0.4, 0); // unknown DAC
-	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, *this, 0.4, 1); // unknown DAC
-}
-
 
 void sega_32x_device::device_start()
 {

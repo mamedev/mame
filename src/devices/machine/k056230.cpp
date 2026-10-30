@@ -19,8 +19,9 @@ TODO:
 **************************************************************************************************/
 
 #include "emu.h"
-
 #include "k056230.h"
+
+#include "endianness.h"
 
 #define LOG_REG_READS   (1U << 1)
 #define LOG_REG_WRITES  (1U << 2)

@@ -412,7 +412,6 @@ GFXDECODE_END
 void copsnrob_state::machine_start()
 {
 	save_item(NAME(m_misc));
-	m_leds.resolve();
 }
 
 void copsnrob_state::machine_reset()
@@ -428,7 +427,7 @@ void copsnrob_state::copsnrob(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &copsnrob_state::main_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(14.318181_MHz_XTAL / 2, 457, 0, 256, 261, 0, 200);
 	// H RESET (synchronous) = 256H & 8H & 64H & 128H
 	// V RESET (synchronous) = 256V & 4V

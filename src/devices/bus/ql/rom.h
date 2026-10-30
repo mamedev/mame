@@ -78,10 +78,7 @@ public:
 	ql_rom_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: ql_rom_cartridge_slot_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	ql_rom_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
@@ -109,7 +106,7 @@ protected:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(QL_ROM_CARTRIDGE_SLOT, ql_rom_cartridge_slot_device)
 
 void ql_rom_cartridge_cards(device_slot_interface &device);

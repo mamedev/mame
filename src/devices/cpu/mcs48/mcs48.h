@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <numbers>
+
 
 /***************************************************************************
     CONSTANTS
@@ -59,7 +61,7 @@ enum
 ***************************************************************************/
 
 #define MCS48_LC_CLOCK(_L, _C) \
-	(1 / (2 * M_PI * sqrt(_L * _C)))
+	(1 / (2 * std::numbers::pi * sqrt(_L * _C)))
 
 #define MCS48_ALE_CLOCK(_clock) \
 	attotime::from_hz(_clock/(3*5))
@@ -95,6 +97,7 @@ DECLARE_DEVICE_TYPE(I8742AH, i8742ah_device)  // 2k internal UV EPROM, 256 bytes
 // Clones
 DECLARE_DEVICE_TYPE(MB8884,  mb8884_device)   // 8035 clone
 DECLARE_DEVICE_TYPE(UPD7751, upd7751_device)  // 8048 clone
+DECLARE_DEVICE_TYPE(MB8881,  mb8881_device)   // 8039 clone
 DECLARE_DEVICE_TYPE(M58715,  m58715_device)   // 8049 clone
 
 
@@ -239,8 +242,8 @@ protected:
 	// ports are mapped to AS_IO and callbacks
 	u8 ext_r(offs_t a)          { return m_io.read_byte(a); }
 	void ext_w(offs_t a, u8 v)  { m_io.write_byte(a, v); }
-	u8 port_r(offs_t a)         { return m_port_in_cb[a - 1](); }
-	void port_w(offs_t a, u8 v) { m_port_out_cb[a - 1](v); }
+	virtual u8 port_r(offs_t a)         { return m_port_in_cb[a - 1](); }
+	virtual void port_w(offs_t a, u8 v) { m_port_out_cb[a - 1](v); }
 	int test_r(offs_t a)        { return m_test_in_cb[a](); }
 	u8 bus_r()                  { return m_bus_in_cb(); }
 	void bus_w(u8 v)            { m_bus_out_cb(v); }
@@ -610,6 +613,13 @@ public:
 	upd7751_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
+class mb8881_device : public mcs48_cpu_device
+{
+public:
+	// construction/destruction
+	mb8881_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
 class m58715_device : public mcs48_cpu_device
 {
 public:
@@ -629,6 +639,10 @@ protected:
 	// construction/destruction
 	upi41_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int rom_size, int ram_size);
 
+	virtual u8 port_r(offs_t a) override;
+	virtual void port_w(offs_t a, u8 v) override;
+
+	u8 p2_output(u8 data) const;
 	TIMER_CALLBACK_MEMBER(master_callback);
 };
 

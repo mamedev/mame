@@ -106,7 +106,7 @@ void pcd_video_device::device_add_mconfig(machine_config &config)
 	mcu.t1_in_cb().set(FUNC(pcd_video_device::t1_r));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16_MHz_XTAL, 832, 0, 640, 381, 0, 350);
 	screen.set_screen_update("crtc", FUNC(scn2674_device::screen_update));
 
@@ -155,7 +155,7 @@ void pcx_video_device::device_add_mconfig(machine_config &config)
 	gfx.port_out_cb<3>().set(FUNC(pcx_video_device::p3_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL, 1272, 0, 960, 381, 0, 350);
 	screen.set_screen_update("crtc", FUNC(scn2672_device::screen_update));
 

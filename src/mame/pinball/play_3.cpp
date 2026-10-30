@@ -95,12 +95,16 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void play_3(machine_config &config);
-	void spain82(machine_config &config);
-	void flashman(machine_config &config);
-	void megaaton(machine_config &config);
-	void sklflite(machine_config &config);
-	void terrlake(machine_config &config);
+	void play_3(machine_config &config) ATTR_COLD;
+	void spain82(machine_config &config) ATTR_COLD;
+	void flashman(machine_config &config) ATTR_COLD;
+	void megaaton(machine_config &config) ATTR_COLD;
+	void sklflite(machine_config &config) ATTR_COLD;
+	void terrlake(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void port01_w(u8 data);
@@ -143,8 +147,6 @@ private:
 	u8 m_kbdrow = 0U;
 	u8 m_segment[5]{};
 	bool m_disp_sw = false;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void machine_start() override ATTR_COLD;
 	required_device<cosmac_device> m_maincpu;
 	optional_device<cosmac_device> m_audiocpu;
 	required_device<ttl7474_device> m_4013a;
@@ -320,9 +322,6 @@ void play_3_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_resetcnt_a));
 	save_item(NAME(m_port03_old));
 	save_item(NAME(m_a_irqset));
@@ -337,6 +336,7 @@ void play_3_state::machine_start()
 void play_3_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 
@@ -575,11 +575,11 @@ void play_3_state::play_3(machine_config &config)
 	xpoint.signal_handler().set(FUNC(play_3_state::clock2_w));
 
 	// This is actually a 4013 chip (has 2 RS flipflops)
-	TTL7474(config, m_4013a, 0);
+	TTL7474(config, m_4013a);
 	m_4013a->comp_output_cb().set(m_4013a, FUNC(ttl7474_device::d_w));
 	m_4013a->output_cb().set(m_4020, FUNC(ripple_counter_device::reset_w));
 
-	TTL7474(config, m_4013b, 0);
+	TTL7474(config, m_4013b);
 	m_4013b->output_cb().set(m_maincpu, FUNC(cosmac_device::ef2_w)).invert(); // inverted
 	m_4013b->comp_output_cb().set(m_maincpu, FUNC(cosmac_device::int_w)).invert(); // inverted
 

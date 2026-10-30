@@ -120,7 +120,6 @@
 #include "deco104.h"
 #include "deco146.h"
 #include "deco16ic.h"
-#include "decocomn.h"
 #include "decocrpt.h"
 #include "decospr.h"
 
@@ -148,12 +147,12 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_palette(*this, "palette"),
 		m_ioprot(*this, "ioprot"),
-		m_decocomn(*this, "deco_common"),
-		m_deco_tilegen(*this, "tilegen%u", 1),
+		m_tilegen(*this, "tilegen%u", 1),
 		m_oki(*this, "oki%u", 1),
 		m_spriteram(*this, "spriteram%u", 1),
 		m_sprgen(*this, "spritegen%u", 1),
-		m_pf_rowscroll(*this, "pf%u_rowscroll", 1)
+		m_paletteram(*this, "paletteram"),
+		m_rowscroll(*this, "rowscroll_%u", 1)
 	{ }
 
 	void wizdfire(machine_config &config) ATTR_COLD;
@@ -168,22 +167,32 @@ public:
 	void init_hangzo() ATTR_COLD;
 	void init_rohga() ATTR_COLD;
 
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
 	required_device<palette_device> m_palette;
 	required_device<deco_146_base_device> m_ioprot;
-	required_device<decocomn_device> m_decocomn;
-	required_device_array<deco16ic_device, 2> m_deco_tilegen;
+	required_device_array<deco16ic_device, 2> m_tilegen;
 	required_device_array<okim6295_device, 2> m_oki;
 	optional_device_array<buffered_spriteram16_device, 2> m_spriteram;
 	optional_device_array<decospr_device, 2> m_sprgen;
 
-	optional_shared_ptr_array<u16, 4> m_pf_rowscroll;
+	required_shared_ptr<u16> m_paletteram;
+	optional_shared_ptr_array<u16, 4> m_rowscroll;
+
+	std::unique_ptr<u8[]> m_dirty_palette{};
+	u16 m_priority = 0;
 
 	u16 irq_ack_r();
 	void irq_ack_w(u16 data);
 	void rohga_buffer_spriteram16_w(u16 data);
+	void buffered_palette_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void palette_dma_w(u16 data = 0);
+	void priority_w(u16 data);
 	void sound_bankswitch_w(u8 data);
 
 	DECLARE_VIDEO_START(wizdfire);
@@ -192,7 +201,7 @@ private:
 	u32 screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, u16 pri, u16 primask);
 	void mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	int bank_callback(int bank);
 	DECOSPR_PRIORITY_CB_MEMBER(rohga_pri_callback);
 	DECOSPR_COLOUR_CB_MEMBER(rohga_col_callback);
 	DECOSPR_COLOUR_CB_MEMBER(schmeisr_col_callback);
@@ -212,6 +221,21 @@ private:
 	void sound_map(address_map &map) ATTR_COLD;
 };
 
+/******************************************************************************/
+
+void rohga_state::machine_reset()
+{
+	m_priority = 0;
+}
+
+void rohga_state::video_start()
+{
+	const int entry = m_palette->entries();
+	m_dirty_palette = make_unique_clear<u8[]>(entry);
+
+	save_item(NAME(m_priority));
+	save_pointer(NAME(m_dirty_palette), entry);
+}
 
 void rohga_state::rohga_buffer_spriteram16_w(u16 data)
 {
@@ -220,55 +244,85 @@ void rohga_state::rohga_buffer_spriteram16_w(u16 data)
 	m_spriteram[0]->copy();
 }
 
+void rohga_state::buffered_palette_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_paletteram[offset]);
+
+	m_dirty_palette[offset / 2] = 1;
+}
+
+void rohga_state::palette_dma_w(u16 data)
+{
+	const int m = m_palette->entries();
+
+	for (int i = 0; i < m; i++)
+	{
+		if (m_dirty_palette[i])
+		{
+			m_dirty_palette[i] = 0;
+
+			const u8 b = (m_paletteram[i * 2] >> 0) & 0xff;
+			const u8 g = (m_paletteram[i * 2 + 1] >> 8) & 0xff;
+			const u8 r = (m_paletteram[i * 2 + 1] >> 0) & 0xff;
+
+			m_palette->set_pen_color(i, rgb_t(r, g, b));
+		}
+	}
+}
+
+void rohga_state::priority_w(u16 data)
+{
+	m_priority = data;
+}
+
 /******************************************************************************/
 
 u32 rohga_state::screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const u16 flip = m_deco_tilegen[0]->pf_control_r(0);
-	const u16 priority = m_decocomn->priority_r();
+	const u16 flip = m_tilegen[0]->control_r(0);
 
 	// sprites are flipped relative to tilemaps
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen[0]->set_flip_screen(!BIT(flip, 7));
 
 	// Update playfields
-	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
-	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2], m_pf_rowscroll[3]);
+	m_tilegen[0]->update(m_rowscroll[0], m_rowscroll[1]);
+	m_tilegen[1]->update(m_rowscroll[2], m_rowscroll[3]);
 
 	// Draw playfields
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(768), cliprect);
 
-	switch (priority & 3)
+	switch (m_priority & 3)
 	{
 	case 0:
-		if (priority & 4)
+		if (m_priority & 4)
 		{
 			// Draw as 1 8BPP layer
-			m_deco_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 3);
+			m_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 3);
 		}
 		else
 		{
 			// Draw as 2 4BPP layers
-			m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-			m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
+			m_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+			m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
 		}
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
+		m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
 		break;
 	case 1:
-		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
+		m_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
+		m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+		m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 		break;
 	case 2:
-		m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0/*TILEMAP_DRAW_OPAQUE*/, 1);
-		m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
+		m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0/*TILEMAP_DRAW_OPAQUE*/, 1);
+		m_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+		m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 		break;
 	}
 
 	m_sprgen[0]->draw_sprites(bitmap, cliprect, m_spriteram[0]->buffer(), 0x400);
-	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -277,6 +331,7 @@ u32 rohga_state::screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap
 
 VIDEO_START_MEMBER(rohga_state, wizdfire)
 {
+	rohga_state::video_start();
 	m_sprgen[0]->alloc_sprite_bitmap();
 	m_sprgen[1]->alloc_sprite_bitmap();
 }
@@ -322,8 +377,7 @@ void rohga_state::mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 u32 rohga_state::screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const u16 flip = m_deco_tilegen[0]->pf_control_r(0);
-	const u16 priority = m_decocomn->priority_r();
+	const u16 flip = m_tilegen[0]->control_r(0);
 
 	// sprites are flipped relative to tilemaps
 	flip_screen_set(BIT(flip, 7));
@@ -335,34 +389,33 @@ u32 rohga_state::screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bit
 	m_sprgen[0]->draw_sprites(bitmap, cliprect, m_spriteram[0]->buffer(), 0x400);
 
 	// Update playfields
-	m_deco_tilegen[0]->pf_update(nullptr, nullptr);
-	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2], m_pf_rowscroll[3]);
+	m_tilegen[0]->update(nullptr, nullptr);
+	m_tilegen[1]->update(m_rowscroll[2], m_rowscroll[3]);
 
 	// Draw playfields - Palette of 2nd playfield chip visible if playfields turned off
 	bitmap.fill(m_palette->pen(512), cliprect);
 
-	m_deco_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	m_sprgen[0]->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0600, 0x0600, 0x400, 0x1ff);
-	m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 	m_sprgen[0]->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0400, 0x0600, 0x400, 0x1ff);
 
-	if ((priority & 0x1f) == 0x1f) // Wizdfire has bit 0x40 always set, Dark Seal 2 doesn't?!
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, TILEMAP_DRAW_ALPHA(0x80), 0);
+	if ((m_priority & 0x1f) == 0x1f) // Wizdfire has bit 0x40 always set, Dark Seal 2 doesn't?!
+		m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, TILEMAP_DRAW_ALPHA(0x80), 0);
 	else
-		m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+		m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 
 	m_sprgen[0]->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0400, 0x400, 0x1ff); // 0x000 and 0x200 of 0x600
 
 	mixwizdfirelayer(bitmap, cliprect, 0x000, 0x000);
 
-	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *paldata = &m_palette->pen(0);
-	const u16 priority = m_decocomn->priority_r();
 
 	bitmap_ind16 *sprite_bitmap1 = &m_sprgen[0]->get_sprite_temp_bitmap();
 	bitmap_ind16 *sprite_bitmap2 = &m_sprgen[1]->get_sprite_temp_bitmap();
@@ -389,7 +442,7 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 			int pri1, pri2;
 
 			// pix1 sprite vs playfield
-			switch (priority) // TODO : Verify this from real PCB
+			switch (m_priority) // TODO : Verify this from real PCB
 			{
 				case 0x00:
 				default:
@@ -460,7 +513,7 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 			// pix2 sprite vs pix1 sprite
 			pri2 = 0x080;
-			switch (priority)
+			switch (m_priority)
 			{
 				case 0x00:
 				default:
@@ -516,45 +569,42 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 u32 rohga_state::screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const u16 flip = m_deco_tilegen[0]->pf_control_r(0);
-	const u16 priority = m_decocomn->priority_r();
+	const u16 flip = m_tilegen[0]->control_r(0);
 
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen[0]->set_flip_screen(BIT(flip, 7));
 	m_sprgen[1]->set_flip_screen(BIT(flip, 7));
 
 	// draw sprite gfx to temp bitmaps
-	m_sprgen[0]->set_alt_format(true);
-	m_sprgen[1]->set_alt_format(true);
 	m_sprgen[1]->draw_sprites(bitmap, cliprect, m_spriteram[1]->buffer(), 0x400);
 	m_sprgen[0]->draw_sprites(bitmap, cliprect, m_spriteram[0]->buffer(), 0x400);
 
 	// Update playfields
-	m_deco_tilegen[0]->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
-	m_deco_tilegen[1]->pf_update(m_pf_rowscroll[2], m_pf_rowscroll[3]);
+	m_tilegen[0]->update(m_rowscroll[0], m_rowscroll[1]);
+	m_tilegen[1]->update(m_rowscroll[2], m_rowscroll[3]);
 
 	// Draw playfields - Palette of 2nd playfield chip visible if playfields turned off
 	bitmap.fill(m_palette->pen(512), cliprect);
 	screen.priority().fill(0);
 
 	// pf3 and pf4 are combined into a single 8bpp bitmap
-	m_deco_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
-	switch (priority)
+	switch (m_priority)
 	{
 		case 0:
 		default:
-			m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0x008);
+			m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0x008);
 			break;
 		case 0x20:
-			m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0x040);
+			m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0x040);
 			break;
 	}
 
 	// TODO verify priorities + mixing / alpha
-	mixnitroballlayer(screen,bitmap,cliprect);
+	mixnitroballlayer(screen, bitmap, cliprect);
 
-	m_deco_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -598,32 +648,32 @@ void rohga_state::rohga_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 
-	map(0x200000, 0x20000f).w(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_w));
-	map(0x240000, 0x24000f).w(m_deco_tilegen[1], FUNC(deco16ic_device::pf_control_w));
+	map(0x200000, 0x20000f).w(m_tilegen[0], FUNC(deco16ic_device::control_w));
+	map(0x240000, 0x24000f).w(m_tilegen[1], FUNC(deco16ic_device::control_w));
 
-	map(0x280000, 0x283fff).rw(FUNC(rohga_state::ioprot_r), FUNC(rohga_state::ioprot_w)).share("prot16ram"); // Protection device
+	map(0x280000, 0x283fff).rw(FUNC(rohga_state::ioprot_r), FUNC(rohga_state::ioprot_w)); // Protection device
 
 	map(0x2c0000, 0x2c0001).portr("DSW3");
 
 	map(0x300000, 0x300001).w(FUNC(rohga_state::rohga_buffer_spriteram16_w)); // write 1 for sprite DMA
 	map(0x310000, 0x310009).nopw(); // Palette control?
-	map(0x31000a, 0x31000b).w(m_decocomn, FUNC(decocomn_device::palette_dma_w)); // Write 1111 for DMA?  (Or any value?)
+	map(0x31000a, 0x31000b).w(FUNC(rohga_state::palette_dma_w)); // Write 1111 for DMA?  (Or any value?)
 	map(0x320000, 0x320001).nopw(); // ?
-	map(0x322000, 0x322001).w(m_decocomn, FUNC(decocomn_device::priority_w));
+	map(0x322000, 0x322001).w(FUNC(rohga_state::priority_w));
 	map(0x321100, 0x321101).r(FUNC(rohga_state::irq_ack_r)); // IRQ ack?  Value not used
 
-	map(0x3c0000, 0x3c1fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x3c2000, 0x3c2fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x3c4000, 0x3c4fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x3c6000, 0x3c6fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x3c0000, 0x3c1fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x3c2000, 0x3c2fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x3c4000, 0x3c4fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x3c6000, 0x3c6fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
 
-	map(0x3c8000, 0x3c9fff).ram().share(m_pf_rowscroll[0]);
-	map(0x3ca000, 0x3cafff).mirror(0x1000).ram().share(m_pf_rowscroll[1]);
-	map(0x3cc000, 0x3ccfff).mirror(0x1000).ram().share(m_pf_rowscroll[2]);
-	map(0x3ce000, 0x3cefff).mirror(0x1000).ram().share(m_pf_rowscroll[3]);
+	map(0x3c8000, 0x3c9fff).ram().share(m_rowscroll[0]);
+	map(0x3ca000, 0x3cafff).mirror(0x1000).ram().share(m_rowscroll[1]);
+	map(0x3cc000, 0x3ccfff).mirror(0x1000).ram().share(m_rowscroll[2]);
+	map(0x3ce000, 0x3cefff).mirror(0x1000).ram().share(m_rowscroll[3]);
 
 	map(0x3d0000, 0x3d07ff).ram().share("spriteram1");
-	map(0x3e0000, 0x3e1fff).ram().w(m_decocomn, FUNC(decocomn_device::buffered_palette_w)).share("paletteram");
+	map(0x3e0000, 0x3e1fff).ram().w(FUNC(rohga_state::buffered_palette_w)).share(m_paletteram);
 	map(0x3f0000, 0x3f3fff).ram(); // Main RAM
 }
 
@@ -632,32 +682,32 @@ void rohga_state::wizdfire_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 
-	map(0x200000, 0x200fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x202000, 0x202fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x208000, 0x208fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x20a000, 0x20afff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x200000, 0x200fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x202000, 0x202fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x208000, 0x208fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x20a000, 0x20afff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
 
 	map(0x20b000, 0x20b3ff).nopw(); // ? Always 0 written
-	map(0x20c000, 0x20c7ff).ram().share(m_pf_rowscroll[2]);
-	map(0x20e000, 0x20e7ff).ram().share(m_pf_rowscroll[3]);
+	map(0x20c000, 0x20c7ff).ram().share(m_rowscroll[2]);
+	map(0x20e000, 0x20e7ff).ram().share(m_rowscroll[3]);
 
-	map(0x300000, 0x30000f).w(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_w));
-	map(0x310000, 0x31000f).w(m_deco_tilegen[1], FUNC(deco16ic_device::pf_control_w));
+	map(0x300000, 0x30000f).w(m_tilegen[0], FUNC(deco16ic_device::control_w));
+	map(0x310000, 0x31000f).w(m_tilegen[1], FUNC(deco16ic_device::control_w));
 
-	map(0x320000, 0x320001).w(m_decocomn, FUNC(decocomn_device::priority_w)); // Priority
+	map(0x320000, 0x320001).w(FUNC(rohga_state::priority_w)); // Priority
 	map(0x320002, 0x320003).nopw(); // ?
 	map(0x320004, 0x320005).w(FUNC(rohga_state::irq_ack_w)); // VBL IRQ ack
 
 	map(0x340000, 0x3407ff).ram().share("spriteram1");
-	map(0x350000, 0x350001).w("spriteram1", FUNC(buffered_spriteram16_device::write)); // Triggers DMA for spriteram
+	map(0x350000, 0x350001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)); // Triggers DMA for spriteram
 	map(0x360000, 0x3607ff).ram().share("spriteram2");
-	map(0x370000, 0x370001).w("spriteram2", FUNC(buffered_spriteram16_device::write)); // Triggers DMA for spriteram
+	map(0x370000, 0x370001).w(m_spriteram[1], FUNC(buffered_spriteram16_device::write)); // Triggers DMA for spriteram
 
-	map(0x380000, 0x381fff).ram().w(m_decocomn, FUNC(decocomn_device::buffered_palette_w)).share("paletteram");
-	map(0x390008, 0x390009).w(m_decocomn, FUNC(decocomn_device::palette_dma_w));
+	map(0x380000, 0x381fff).ram().w(FUNC(rohga_state::buffered_palette_w)).share(m_paletteram);
+	map(0x390008, 0x390009).w(FUNC(rohga_state::palette_dma_w));
 
 	map(0xfdc000, 0xfe3fff).ram();
-	map(0xfe4000, 0xfe7fff).rw(FUNC(rohga_state::ioprot_r), FUNC(rohga_state::ioprot_w)).share("prot16ram"); // Protection device
+	map(0xfe4000, 0xfe7fff).rw(FUNC(rohga_state::ioprot_r), FUNC(rohga_state::ioprot_w)); // Protection device
 	map(0xfe8000, 0xffffff).ram();
 }
 
@@ -666,33 +716,33 @@ void rohga_state::nitrobal_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 
-	map(0x200000, 0x200fff).mirror(0x1000).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x202000, 0x2027ff).mirror(0x800).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x208000, 0x2087ff).mirror(0x800).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x20a000, 0x20a7ff).mirror(0x800).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x200000, 0x200fff).mirror(0x1000).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x202000, 0x2027ff).mirror(0x800).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x208000, 0x2087ff).mirror(0x800).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x20a000, 0x20a7ff).mirror(0x800).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
 
-	map(0x204000, 0x2047ff).ram().share(m_pf_rowscroll[0]);
-	map(0x206000, 0x2067ff).ram().share(m_pf_rowscroll[1]);
-	map(0x20c000, 0x20c7ff).ram().share(m_pf_rowscroll[2]);
-	map(0x20e000, 0x20e7ff).ram().share(m_pf_rowscroll[3]);
+	map(0x204000, 0x2047ff).ram().share(m_rowscroll[0]);
+	map(0x206000, 0x2067ff).ram().share(m_rowscroll[1]);
+	map(0x20c000, 0x20c7ff).ram().share(m_rowscroll[2]);
+	map(0x20e000, 0x20e7ff).ram().share(m_rowscroll[3]);
 
-	map(0x300000, 0x30000f).w(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_w));
-	map(0x310000, 0x31000f).w(m_deco_tilegen[1], FUNC(deco16ic_device::pf_control_w));
+	map(0x300000, 0x30000f).w(m_tilegen[0], FUNC(deco16ic_device::control_w));
+	map(0x310000, 0x31000f).w(m_tilegen[1], FUNC(deco16ic_device::control_w));
 
-	map(0x320000, 0x320001).portr("DSW3").w(m_decocomn, FUNC(decocomn_device::priority_w)); // Priority
+	map(0x320000, 0x320001).portr("DSW3").w(FUNC(rohga_state::priority_w)); // Priority
 	map(0x320002, 0x320003).nopw(); // ?
 	map(0x320004, 0x320005).w(FUNC(rohga_state::irq_ack_w)); // VBL IRQ ack
 
 	map(0x340000, 0x3407ff).ram().share("spriteram1");
-	map(0x350000, 0x350001).w("spriteram1", FUNC(buffered_spriteram16_device::write)); // Triggers DMA for spriteram
+	map(0x350000, 0x350001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)); // Triggers DMA for spriteram
 	map(0x360000, 0x3607ff).ram().share("spriteram2");
-	map(0x370000, 0x370001).w("spriteram2", FUNC(buffered_spriteram16_device::write)); // Triggers DMA for spriteram
+	map(0x370000, 0x370001).w(m_spriteram[1], FUNC(buffered_spriteram16_device::write)); // Triggers DMA for spriteram
 
-	map(0x380000, 0x381fff).ram().w(m_decocomn, FUNC(decocomn_device::buffered_palette_w)).share("paletteram");
-	map(0x390008, 0x390009).w(m_decocomn, FUNC(decocomn_device::palette_dma_w));
+	map(0x380000, 0x381fff).ram().w(FUNC(rohga_state::buffered_palette_w)).share(m_paletteram);
+	map(0x390008, 0x390009).w(FUNC(rohga_state::palette_dma_w));
 
 	map(0xfec000, 0xff3fff).ram();
-	map(0xff4000, 0xff7fff).rw(FUNC(rohga_state::ioprot_r), FUNC(rohga_state::ioprot_w)).share("prot16ram"); // Protection device
+	map(0xff4000, 0xff7fff).rw(FUNC(rohga_state::ioprot_r), FUNC(rohga_state::ioprot_w)); // Protection device
 
 	map(0xff8000, 0xffffff).ram();
 }
@@ -701,30 +751,30 @@ void rohga_state::nitrobal_map(address_map &map)
 void rohga_state::hotb_base_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x200000, 0x20000f).w(m_deco_tilegen[0], FUNC(deco16ic_device::pf_control_w));
-	map(0x240000, 0x24000f).w(m_deco_tilegen[1], FUNC(deco16ic_device::pf_control_w));
-	map(0x280000, 0x283fff).rw(FUNC(rohga_state::ioprot_r), FUNC(rohga_state::ioprot_w)).share("prot16ram"); // Protection device
+	map(0x200000, 0x20000f).w(m_tilegen[0], FUNC(deco16ic_device::control_w));
+	map(0x240000, 0x24000f).w(m_tilegen[1], FUNC(deco16ic_device::control_w));
+	map(0x280000, 0x283fff).rw(FUNC(rohga_state::ioprot_r), FUNC(rohga_state::ioprot_w)); // Protection device
 
 	map(0x2c0000, 0x2c0001).portr("DSW3");
 	map(0x300000, 0x300001).portr("DSW3").w(FUNC(rohga_state::rohga_buffer_spriteram16_w)); // write 1 for sprite DMA
 	map(0x310002, 0x310003).portr("SYSTEM");
 	map(0x310000, 0x310009).nopw(); // Palette control?
-	map(0x31000a, 0x31000b).w(m_decocomn, FUNC(decocomn_device::palette_dma_w)); // Write 1111 for DMA?  (Or any value?)
+	map(0x31000a, 0x31000b).w(FUNC(rohga_state::palette_dma_w)); // Write 1111 for DMA?  (Or any value?)
 	map(0x320000, 0x320001).nopw(); // bit 4: cleared on IRQ routine start, set on end
-	map(0x322000, 0x322001).w(m_decocomn, FUNC(decocomn_device::priority_w));
+	map(0x322000, 0x322001).w(FUNC(rohga_state::priority_w));
 	map(0x321100, 0x321101).w(FUNC(rohga_state::irq_ack_w));  // IRQ ack?  Value not used
 
-	map(0x3c0000, 0x3c1fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x3c2000, 0x3c2fff).rw(m_deco_tilegen[0], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x3c4000, 0x3c4fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x3c6000, 0x3c6fff).rw(m_deco_tilegen[1], FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
-	map(0x3c8000, 0x3c9fff).ram().share(m_pf_rowscroll[0]);
-	map(0x3ca000, 0x3cafff).mirror(0x1000).ram().share(m_pf_rowscroll[1]);
-	map(0x3cc000, 0x3ccfff).mirror(0x1000).ram().share(m_pf_rowscroll[2]);
-	map(0x3ce000, 0x3cefff).mirror(0x1000).ram().share(m_pf_rowscroll[3]);
+	map(0x3c0000, 0x3c1fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x3c2000, 0x3c2fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x3c4000, 0x3c4fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
+	map(0x3c6000, 0x3c6fff).rw(m_tilegen[1], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
+	map(0x3c8000, 0x3c9fff).ram().share(m_rowscroll[0]);
+	map(0x3ca000, 0x3cafff).mirror(0x1000).ram().share(m_rowscroll[1]);
+	map(0x3cc000, 0x3ccfff).mirror(0x1000).ram().share(m_rowscroll[2]);
+	map(0x3ce000, 0x3cefff).mirror(0x1000).ram().share(m_rowscroll[3]);
 
 	map(0x3d0000, 0x3d07ff).ram().share("spriteram1");
-	map(0x3e0000, 0x3e1fff).mirror(0x2000).ram().w(m_decocomn, FUNC(decocomn_device::buffered_palette_w)).share("paletteram");
+	map(0x3e0000, 0x3e1fff).mirror(0x2000).ram().w(FUNC(rohga_state::buffered_palette_w)).share(m_paletteram);
 }
 
 void rohga_state::schmeisr_map(address_map &map)
@@ -1264,9 +1314,9 @@ void rohga_state::sound_bankswitch_w(u8 data)
 
 /**********************************************************************************/
 
-DECO16IC_BANK_CB_MEMBER(rohga_state::bank_callback)
+int rohga_state::bank_callback(int bank)
 {
-	return ((bank >> 4) & 0x3) << 12;
+	return (bank & 0x30) << 8;
 }
 
 DECOSPR_PRIORITY_CB_MEMBER(rohga_state::rohga_pri_callback)
@@ -1310,7 +1360,7 @@ void rohga_state::rohga_base(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
 	screen.set_size(40*8, 32*8);
@@ -1318,38 +1368,35 @@ void rohga_state::rohga_base(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(2048);
 
-	DECOCOMN(config, m_decocomn, 0);
-	m_decocomn->set_palette_tag(m_palette);
+	DECO16IC(config, m_tilegen[0]);
+	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x64);
+	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_col_bank<0>(0x00);
+	m_tilegen[0]->set_col_bank<1>(0x10);
+	m_tilegen[0]->set_col_mask<0>(0x0f);
+	m_tilegen[0]->set_col_mask<1>(0x0f);
+	m_tilegen[0]->set_bank_callback<0>(FUNC(rohga_state::bank_callback));
+	m_tilegen[0]->set_bank_callback<1>(FUNC(rohga_state::bank_callback));
+	m_tilegen[0]->set_8x8_bank(0);
+	m_tilegen[0]->set_16x16_bank(1);
+	m_tilegen[0]->set_gfxdecode_tag("gfxdecode");
 
-	DECO16IC(config, m_deco_tilegen[0], 0);
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x64);
-	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
-	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(rohga_state::bank_callback));
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(rohga_state::bank_callback));
-	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
-	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
-
-	DECO16IC(config, m_deco_tilegen[1], 0);
-	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
-	m_deco_tilegen[1]->set_pf1_col_bank(0x00);
-	m_deco_tilegen[1]->set_pf2_col_bank(0x10);
-	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
-	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(rohga_state::bank_callback));
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(rohga_state::bank_callback));
-	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
-	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
-	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
+	DECO16IC(config, m_tilegen[1]);
+	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen[1]->set_col_bank<0>(0x00);
+	m_tilegen[1]->set_col_bank<1>(0x10);
+	m_tilegen[1]->set_col_mask<0>(0x0f);
+	m_tilegen[1]->set_col_mask<1>(0x0f);
+	m_tilegen[1]->set_bank_callback<0>(FUNC(rohga_state::bank_callback));
+	m_tilegen[1]->set_bank_callback<1>(FUNC(rohga_state::bank_callback));
+	m_tilegen[1]->set_8x8_bank(0);
+	m_tilegen[1]->set_16x16_bank(2);
+	m_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_rohga);
 
-	DECO104PROT(config, m_ioprot, 0);
+	DECO104PROT(config, m_ioprot);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
 	m_ioprot->port_b_cb().set_ioport("SYSTEM");
 	m_ioprot->port_c_cb().set_ioport("DSW");
@@ -1384,7 +1431,7 @@ void rohga_state::rohga(machine_config &config)
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(rohga_state::screen_update_rohga));
 	subdevice<screen_device>("screen")->set_palette(m_palette);
 
-	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_rohga_spr);
+	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_rohga_spr);
 	m_sprgen[0]->set_pri_callback(FUNC(rohga_state::rohga_pri_callback));
 	m_sprgen[0]->set_col_callback(FUNC(rohga_state::rohga_col_callback));
 }
@@ -1401,10 +1448,10 @@ void rohga_state::wizdfire(machine_config &config)
 
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(rohga_state::screen_update_wizdfire));
 
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
+	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
 
-	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_wizdfire_spr1);
-	DECO_SPRITE(config, m_sprgen[1], 0, m_palette, gfx_wizdfire_spr2);
+	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_wizdfire_spr1);
+	DECO_SPRITE(config, m_sprgen[1], m_palette, gfx_wizdfire_spr2);
 
 	m_ioprot->set_interface_scramble_reverse();
 
@@ -1423,18 +1470,21 @@ void rohga_state::nitrobal(machine_config &config)
 
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(rohga_state::screen_update_nitrobal));
 
-	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
-	m_deco_tilegen[0]->set_pf2_size(DECO_32x32);
+	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_32x32);
 
-	m_deco_tilegen[1]->set_pf1_size(DECO_32x32);
-	m_deco_tilegen[1]->set_pf2_size(DECO_32x32);
-	m_deco_tilegen[1]->set_pf1_col_bank(0);
-	m_deco_tilegen[1]->set_pf2_col_bank(0);
-	m_deco_tilegen[1]->set_pf1_col_mask(0);
-	m_deco_tilegen[1]->set_pf2_col_mask(0);
+	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_32x32);
+	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_32x32);
+	m_tilegen[1]->set_col_bank<0>(0);
+	m_tilegen[1]->set_col_bank<1>(0);
+	m_tilegen[1]->set_col_mask<0>(0);
+	m_tilegen[1]->set_col_mask<1>(0);
 
-	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_wizdfire_spr1);
-	DECO_SPRITE(config, m_sprgen[1], 0, m_palette, gfx_wizdfire_spr2);
+	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_wizdfire_spr1);
+	m_sprgen[0]->set_alt_format(true);
+
+	DECO_SPRITE(config, m_sprgen[1], m_palette, gfx_wizdfire_spr2);
+	m_sprgen[1]->set_alt_format(true);
 
 	MCFG_VIDEO_START_OVERRIDE(rohga_state, wizdfire)
 
@@ -1458,7 +1508,7 @@ void rohga_state::schmeisr(machine_config &config)
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(rohga_state::screen_update_rohga));
 	subdevice<screen_device>("screen")->set_palette(m_palette);
 
-	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_schmeisr_spr);
+	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_schmeisr_spr);
 	m_sprgen[0]->set_pri_callback(FUNC(rohga_state::rohga_pri_callback));
 	m_sprgen[0]->set_col_callback(FUNC(rohga_state::schmeisr_col_callback)); // wire mods on PCB...
 }
@@ -2139,7 +2189,7 @@ ROM_END
 
 
 ROM_START( hangzo ) // Found on a Data East DE-0353-3 PCB
-	ROM_REGION(0x200000, "maincpu", 0 ) // 68000 code
+	ROM_REGION(0x100000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "pro0h 12.18.2a.27c1001", 0x000000, 0x20000, CRC(ac8087db) SHA1(518193372cde6024fda96c6ed1862245e0bfb465) )
 	ROM_LOAD16_BYTE( "pro0h 12.18.2d.27c1001", 0x000001, 0x20000, CRC(a6b7f4f4) SHA1(1b3a00ef124d130317171d9042018fbb30662fec) )
 	ROM_LOAD16_BYTE( "pro1h 12.10.4a.27c010",  0x040000, 0x20000, CRC(0d04f43d) SHA1(167b595450f6f9b842dc909f6c61a96fa34b7991) )
@@ -2170,7 +2220,7 @@ ROM_START( hangzo ) // Found on a Data East DE-0353-3 PCB
 	ROM_REGION(0x80000, "oki2", 0 ) // samples
 	ROM_LOAD( "pcm16k 11.5.14p.574000", 0x00000,  0x80000,  CRC(5b95c6c7) SHA1(587e7f87d085af3a5d24f317fffc1716c8027e43) )
 
-	ROM_REGION(0x80000, "oki1", 0 ) // samples
+	ROM_REGION(0x40000, "oki1", 0 ) // samples
 	ROM_LOAD( "pcm8k 11.5.15p.27c020", 0x00000,  0x40000,  CRC(02682a9a) SHA1(914ffc7c16e90c1ac28a228df415a956684f8192) )
 
 	ROM_REGION( 0x200, "proms", ROMREGION_ERASEFF )
@@ -2238,5 +2288,5 @@ GAME( 1992, nitrobala, nitrobal, nitrobal, nitrobal, rohga_state, init_nitrobal,
 GAME( 1992, nitrobalb, nitrobal, nitrobal, nitrobal, rohga_state, init_nitrobal, ROT270, "Data East Corporation", "Nitro Ball (World, set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, gunball,   nitrobal, nitrobal, nitrobal, rohga_state, init_nitrobal, ROT270, "Data East Corporation", "Gun Ball (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, schmeisr,  0,        schmeisr, schmeisr, rohga_state, init_schmeisr, ROT0,   "Hot-B",                 "Schmeiser Robo (Japan)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, hangzo,    0,        hangzo,   hangzo,   rohga_state, init_hangzo,   ROT0,   "Hot-B",                 "Hangzo (Japan, prototype)", MACHINE_SUPPORTS_SAVE ) // ROM contains a '(c)1992 Data East Corporation' string, but other sources indicate the game is by Hot-B
+GAME( 1993, schmeisr,  0,        schmeisr, schmeisr, rohga_state, init_schmeisr, ROT0,   "Hot-B Co.",             "Schmeiser Robo (Japan)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, hangzo,    0,        hangzo,   hangzo,   rohga_state, init_hangzo,   ROT0,   "Hot-B Co.",             "Hangzo (Japan, prototype)", MACHINE_SUPPORTS_SAVE ) // ROM contains a '(c)1992 Data East Corporation' string, but other sources indicate the game is by Hot-B

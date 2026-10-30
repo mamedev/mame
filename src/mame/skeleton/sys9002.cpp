@@ -126,7 +126,7 @@ void sys9002_state::sys9002(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &sys9002_state::io_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not correct
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
@@ -148,7 +148,7 @@ void sys9002_state::sys9002(machine_config &config)
 	uart_clock.signal_handler().append("uart2", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart2", FUNC(i8251_device::write_rxc));
 
-	i8251_device &uart1(I8251(config, "uart1", 0)); // sync
+	i8251_device &uart1(I8251(config, "uart1")); // sync
 	uart1.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
 	uart1.dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	uart1.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
@@ -158,7 +158,7 @@ void sys9002_state::sys9002(machine_config &config)
 	rs232a.dsr_handler().set("uart1", FUNC(i8251_device::write_dsr));
 	rs232a.cts_handler().set("uart1", FUNC(i8251_device::write_cts));
 
-	i8251_device &uart2(I8251(config, "uart2", 0)); // sync
+	i8251_device &uart2(I8251(config, "uart2")); // sync
 	uart2.txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
 	uart2.dtr_handler().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	uart2.rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));

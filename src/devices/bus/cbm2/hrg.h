@@ -14,6 +14,8 @@
 #include "exp.h"
 #include "video/ef9365.h"
 
+#include "screen.h"
+
 
 
 //**************************************************************************
@@ -31,20 +33,35 @@ public:
 
 protected:
 	// construction/destruction
-	cbm2_hrg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	cbm2_hrg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, offs_t page_mask);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	// device_cbm2_expansion_card_interface overrides
-	virtual uint8_t cbm2_bd_r(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) override;
-	virtual void cbm2_bd_w(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) override;
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
+	void msl_w(uint8_t data) { m_msl = data; }
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<ef9365_device> m_gdc;
+	required_device<palette_device> m_palette;
 
 private:
+	void control_w(uint8_t data);
+	uint8_t readback_r();
+
+	offs_t page_offset(int bit) const { return (BIT(m_control, bit) * 0x4000) & m_page_mask; }
+
 	required_memory_region m_bank3;
+
+	offs_t const m_page_mask;
+
+	std::unique_ptr<uint8_t[]> m_ram;
+	uint8_t m_control;
+	uint8_t m_readback;
+	uint8_t m_msl;
 };
 
 

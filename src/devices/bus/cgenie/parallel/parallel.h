@@ -37,15 +37,7 @@ class cg_parallel_slot_device : public device_t, public device_single_card_slot_
 {
 public:
 	// construction/destruction
-	cg_parallel_slot_device(machine_config const &mconfig, char const *tag, device_t *owner)
-		: cg_parallel_slot_device(mconfig, tag, owner, (uint32_t)0)
-	{
-		option_reset();
-		cg_parallel_slot_carts(*this);
-		set_default_option(nullptr);
-		set_fixed(false);
-	}
-	cg_parallel_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cg_parallel_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~cg_parallel_slot_device();
 
 	// IOA
@@ -57,7 +49,7 @@ public:
 	void pb_w(uint8_t data);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	device_cg_parallel_interface *m_cart;
@@ -82,7 +74,7 @@ protected:
 	cg_parallel_slot_device *m_slot;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(CG_PARALLEL_SLOT, cg_parallel_slot_device)
 
 #endif // MAME_BUS_CGENIE_PARALLEL_PARALLEL_H

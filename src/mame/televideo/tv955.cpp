@@ -157,7 +157,7 @@ void tv955_state::tv955(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // HM6116LP-4 + 3.2V battery
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_raw(19.3396_MHz_XTAL, 846, 0, 720, 381, 0, 364);
 	//screen.set_raw(31.684_MHz_XTAL, 1386, 0, 1188, 381, 0, 364);
@@ -173,19 +173,19 @@ void tv955_state::tv955(machine_config &config)
 	m_crtc->intr_callback().set_inputline(m_maincpu, m6502_device::NMI_LINE);
 	m_crtc->set_screen("screen");
 
-	MOS6551(config, m_hostuart, 0);
+	MOS6551(config, m_hostuart);
 	m_hostuart->set_xtal(3.6864_MHz_XTAL);
 	m_hostuart->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_hostuart->txd_handler().set(m_mainport, FUNC(rs232_port_device::write_txd));
 	m_hostuart->rts_handler().set(m_mainport, FUNC(rs232_port_device::write_rts));
 	m_hostuart->dtr_handler().set(m_mainport, FUNC(rs232_port_device::write_dtr));
 
-	MOS6551(config, m_printuart, 0);
+	MOS6551(config, m_printuart);
 	m_printuart->set_xtal(3.6864_MHz_XTAL / 2);
 	m_printuart->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 	m_printuart->txd_handler().set(m_printer, FUNC(rs232_port_device::write_txd));
 
-	MOS6551(config, m_keybuart, 0);
+	MOS6551(config, m_keybuart);
 	m_keybuart->set_xtal(3.6864_MHz_XTAL / 2);
 	m_keybuart->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 	m_keybuart->txd_handler().set("keyboard", FUNC(tv955kb_device::write_rxd));

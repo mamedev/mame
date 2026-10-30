@@ -63,6 +63,7 @@ public:
 	// the SC3000 has I/OR, I/OW lines connected
 	virtual uint8_t read_io(offs_t offset) { return 0xff; }
 	virtual void write_io(offs_t offset, uint8_t data) { }
+	virtual bool dsram() const { return false; }
 
 	void rom_alloc(uint32_t size);
 	void ram_alloc(uint32_t size);
@@ -145,6 +146,7 @@ public:
 	void write_ram(offs_t offset, uint8_t data);
 	uint8_t read_io(offs_t offset);
 	void write_io(offs_t offset, uint8_t data);
+	bool dsram() const { return m_cart && m_cart->dsram(); }
 
 	int get_lphaser_xoffs() { return m_cart ? m_cart->get_lphaser_xoffs() : -1; }
 	int get_sms_mode() { return m_cart->get_sms_mode(); }
@@ -186,10 +188,7 @@ public:
 	sg1000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: sg1000_cart_slot_device(mconfig, tag, owner, u32(0))
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	sg1000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const noexcept override { return "sg1000_cart"; }
@@ -206,10 +205,7 @@ public:
 	omv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: omv_cart_slot_device(mconfig, tag, owner, u32(0))
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	omv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const noexcept override { return "sg1000_cart"; }
@@ -226,10 +222,7 @@ public:
 	sc3000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: sc3000_cart_slot_device(mconfig, tag, owner, u32(0))
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	sc3000_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const noexcept override { return "sg1000_cart"; }
@@ -246,10 +239,7 @@ public:
 	sg1000mk3_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: sg1000mk3_cart_slot_device(mconfig, tag, owner, u32(0))
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	sg1000mk3_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const noexcept override { return "sms_cart,sg1000_cart"; }
@@ -266,10 +256,7 @@ public:
 	sms_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: sms_cart_slot_device(mconfig, tag, owner, u32(0))
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	sms_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const noexcept override { return "sms_cart"; }
@@ -286,10 +273,7 @@ public:
 	gamegear_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: gamegear_cart_slot_device(mconfig, tag, owner, u32(0))
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	gamegear_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const noexcept override { return "gamegear_cart"; }
@@ -307,10 +291,7 @@ public:
 	sms_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: sms_card_slot_device(mconfig, tag, owner, u32(0))
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	sms_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const noexcept override { return "sms_card"; }
@@ -327,10 +308,7 @@ public:
 	sg1000_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: sg1000_card_slot_device(mconfig, tag, owner, u32(0))
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	sg1000_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const noexcept override { return "sg1000_cart"; }
@@ -349,6 +327,7 @@ DECLARE_DEVICE_TYPE(SG1000_CARD_SLOT,    sg1000_card_slot_device)
 
 // slot interfaces
 void sg1000_cart(device_slot_interface &device);
+void sc3000_cart(device_slot_interface &device);
 void sg1000mk3_cart(device_slot_interface &device);
 void sms_cart(device_slot_interface &device);
 void gg_cart(device_slot_interface &device);

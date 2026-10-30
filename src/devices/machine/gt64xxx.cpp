@@ -267,6 +267,11 @@ void gt64xxx_device::device_reset()
 {
 	pci_device::device_reset();
 
+	// clear the whole register file first; the chip powers up with everything
+	// cleared and software relies on that when it read-modify-writes registers
+	// it never fully initializes (e.g. interrupt mask, timer control)
+	std::fill(std::begin(m_reg), std::end(m_reg), 0);
+
 	// Configuration register defaults
 	m_reg[GREG_CPU_CONFIG] = m_be ? 0 : (1<<12);
 	m_reg[GREG_R1_0_LO] = 0x0;
@@ -315,6 +320,14 @@ void gt64xxx_device::device_reset()
 	m_retry_count = 0;
 	m_pci_cpu_stalled = 0;
 	m_stall_windex = 0;
+
+	// stop the countdown timers
+	for (galileo_timer &timer : m_timer)
+	{
+		timer.count = 0;
+		timer.active = 0;
+		timer.timer->adjust(attotime::never);
+	}
 
 	m_dma_active = 0;
 	m_dma_timer->adjust(attotime::never);
@@ -945,7 +958,7 @@ TIMER_CALLBACK_MEMBER(gt64xxx_device::timer_callback)
  *  Galileo DMA handler
  *
  *************************************/
-address_space* gt64xxx_device::dma_decode_address(uint32_t &addr)
+address_space* gt64xxx_device::dma_decode_address(offs_t &addr)
 {
 	for (size_t index = 0; index < proc_addr_bank::ADDR_NUM; ++index)
 	{

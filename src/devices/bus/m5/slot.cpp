@@ -44,11 +44,11 @@ device_m5_cart_interface::~device_m5_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_m5_cart_interface::rom_alloc(uint32_t size, const char *tag)
+void device_m5_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(M5SLOT_ROM_REGION_TAG), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(device().subtag("rom"), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -112,7 +112,7 @@ struct m5_slot
 // Here, we take the feature attribute from .xml (i.e. the PCB name) and we assign a unique ID to it
 static const m5_slot slot_list[] =
 {
-	{EM_5,"em-5"},
+	{EM_5,"em_5"},
 	{MEM64KBI,"64kbi"},
 	{MEM64KBF,"64kbf"},
 	{MEM64KRX,"64krx"}
@@ -160,22 +160,27 @@ std::pair<std::error_condition, std::string> m5_cart_slot_device::call_load()
 				m_type=M5_STD; //standard cart(no feature line in xml)
 		}
 
+		uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+
+		if (size > 0x5000 && m_type == M5_STD)
+			return std::make_pair(image_error::INVALIDLENGTH, "Image file exceeds the expected size for an M5 cart (20K)");
+
 		if (m_type == M5_STD || m_type>2) //carts with roms
 		{
-			uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+			if (loaded_through_softlist())
+			{
+				m_cart->set_rom_base(get_software_region("rom"));
+				m_cart->set_rom_size(size);
 
-			if (size > 0x5000 && m_type == M5_STD)
-				return std::make_pair(image_error::INVALIDLENGTH, "Image file exceeds the expected size for an M5 cart (20K)");
-
-			m_cart->rom_alloc(size, tag());
-
-			if (!loaded_through_softlist())
-				fread(m_cart->get_rom_base(), size);
+			}
 			else
-				memcpy(m_cart->get_rom_base(), get_software_region("rom"), size);
-
+			{
+				m_cart->rom_alloc(size);
+				fread(m_cart->get_rom_base(), size);
+			}
 		}
-		if (!M5_STD)
+
+		if (loaded_through_softlist()) //even rom cart can have ram
 			if (get_software_region("ram"))
 				m_cart->ram_alloc(get_software_region_length("ram"));
 

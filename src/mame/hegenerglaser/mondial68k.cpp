@@ -51,7 +51,7 @@ public:
 		m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void mondial68k(machine_config &config);
+	void mondial68k(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -79,8 +79,6 @@ private:
 
 void mondial68k_state::machine_start()
 {
-	m_digits.resolve();
-
 	save_item(NAME(m_input_mux));
 	save_item(NAME(m_board_mux));
 }

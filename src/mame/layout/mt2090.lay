@@ -1,0 +1,256 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="blackd"><disk><color red="0" green="0" blue="0" /></disk></element>
+	<element name="gray"><rect><color red="0.66" green="0.66" blue="0.68" /></rect></element>
+
+	<element name="text_g"><text string="G"><color red="0.66" green="0.66" blue="0.68" /></text></element>
+	<element name="text_h"><text string="H"><color red="0.66" green="0.66" blue="0.68" /></text></element>
+	<element name="text_reset"><text string="Reset"><color red="0.66" green="0.66" blue="0.68" /></text></element>
+
+	<element name="butr" defstate="0">
+		<rect state="0"><color red="0.8" green="0.1" blue="0.1" /></rect>
+		<rect state="1"><color red="0.8" green="0.1" blue="0.1" alpha="0.75" /></rect>
+	</element>
+
+	<element name="butg" defstate="0">
+		<rect state="0"><color red="0.1" green="0.6" blue="0.2" /></rect>
+		<rect state="1"><color red="0.1" green="0.6" blue="0.2" alpha="0.7" /></rect>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="0.125" green="0.012" blue="0.019" /></disk>
+	</element>
+
+
+<!-- i/o panel -->
+
+	<element name="text_1"><text string="1"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_2"><text string="2"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_3"><text string="3"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_4"><text string="4"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+
+	<element name="text_l1"><text string="Ausgänge/Outputs"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_l2"><text string="Eingänge/Inputs"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_l3"><text string="Takt/Clock"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_l4"><text string="1 Hz"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+
+	<element name="switch_output" defstate="0">
+		<disk><color red="0" green="0" blue="0" /></disk>
+		<text state="0x00" string="-"><color red="0.9" green="0.9" blue="0.2" /></text>
+		<text state="0x01" string="P"><color red="0.9" green="0.9" blue="0.2" /></text>
+	</element>
+
+	<element name="switch_input" defstate="0">
+		<disk><color red="0" green="0" blue="0" /></disk>
+		<text state="0x00" string="-"><color red="0.9" green="0.9" blue="0.2" /></text>
+		<text state="0x01" string="+"><color red="0.9" green="0.9" blue="0.2" /></text>
+		<text state="0x02" string="G"><color red="0.9" green="0.9" blue="0.2" /></text>
+		<text state="0x03" string="H"><color red="0.9" green="0.9" blue="0.2" /></text>
+		<text state="0x04" string="1"><color red="0.9" green="0.9" blue="0.2" /></text>
+		<text state="0x05" string="2"><color red="0.9" green="0.9" blue="0.2" /></text>
+		<text state="0x06" string="3"><color red="0.9" green="0.9" blue="0.2" /></text>
+		<text state="0x07" string="4"><color red="0.9" green="0.9" blue="0.2" /></text>
+		<text state="0x08" string="C"><color red="0.9" green="0.9" blue="0.2" /></text>
+		<text state="0x09" string="?"><color red="0.9" green="0.9" blue="0.2" /></text>
+	</element>
+
+	<group name="io">
+		<bounds x="0" y="1.4" width="35.3" height="4" />
+
+		<element ref="gray"><bounds x="0" y="1.4" width="35.3" height="4" /></element>
+
+		<!-- text labels -->
+		<repeat count="4">
+			<param name="x1" start="2" increment="3" />
+			<param name="x2" start="17" increment="3" />
+			<param name="i" start="1" increment="1" />
+
+			<element ref="text_~i~"><bounds xc="~x1~" y="2.8" width="2" height="1" /></element>
+			<element ref="text_~i~"><bounds xc="~x2~" y="2.8" width="2" height="1" /></element>
+		</repeat>
+
+		<element ref="text_l1"><bounds x="1.5" y="1.6" width="10" height="1" /></element>
+		<element ref="text_l2"><bounds x="16.5" y="1.6" width="10" height="1" /></element>
+		<element ref="text_l3"><bounds xc="32" y="1.6" width="6" height="1" /></element>
+		<element ref="text_l4"><bounds xc="32" y="2.8" width="5" height="1" /></element>
+
+		<!-- i/o plugs -->
+		<element ref="switch_output" inputtag="IN.7" inputmask="0x01" inputraw="yes"><bounds xc="2" y="4" width="1" height="1" /></element>
+		<element ref="switch_output" inputtag="IN.7" inputmask="0x02" inputraw="yes"><bounds xc="5" y="4" width="1" height="1" /></element>
+		<element ref="switch_output" inputtag="IN.7" inputmask="0x04" inputraw="yes"><bounds xc="8" y="4" width="1" height="1" /></element>
+		<element ref="switch_output" inputtag="IN.7" inputmask="0x08" inputraw="yes"><bounds xc="11" y="4" width="1" height="1" /></element>
+
+		<element ref="switch_input" inputtag="IN.8" inputmask="0x000f" inputraw="yes"><bounds xc="17" y="4" width="1" height="1" /></element>
+		<element ref="switch_input" inputtag="IN.8" inputmask="0x00f0" inputraw="yes"><bounds xc="20" y="4" width="1" height="1" /></element>
+		<element ref="switch_input" inputtag="IN.8" inputmask="0x0f00" inputraw="yes"><bounds xc="23" y="4" width="1" height="1" /></element>
+		<element ref="switch_input" inputtag="IN.8" inputmask="0xf000" inputraw="yes"><bounds xc="26" y="4" width="1" height="1" /></element>
+
+		<element ref="blackd"><bounds xc="32" y="4" width="1" height="1" /></element>
+
+		<!-- pcb leds -->
+		<element name="7.0" ref="led"><bounds xc="2" y="5.8" width="1" height="1" /></element>
+		<element name="7.1" ref="led"><bounds xc="5" y="5.8" width="1" height="1" /></element>
+		<element name="7.2" ref="led"><bounds xc="8" y="5.8" width="1" height="1" /></element>
+		<element name="7.3" ref="led"><bounds xc="11" y="5.8" width="1" height="1" /></element>
+
+		<element name="7.4" ref="led"><bounds xc="32" y="5.8" width="1" height="1" /></element>
+	</group>
+
+
+<!-- display panel -->
+
+	<element name="text_c"><text string="C"><color red="0.66" green="0.66" blue="0.68" /></text></element>
+	<element name="text_z"><text string="Z"><color red="0.66" green="0.66" blue="0.68" /></text></element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+	<group name="display">
+		<bounds x="0" y="0" width="16" height="3" />
+
+		<element ref="text_c"><bounds x="1.25" y="0" width="1" height="1" /></element>
+		<element ref="text_z"><bounds x="1.25" y="2" width="1" height="1" /></element>
+
+		<element name="6.0" ref="led"><bounds x="2.5" y="0" width="1" height="1" /></element>
+		<element name="6.1" ref="led"><bounds x="2.5" y="2" width="1" height="1" /></element>
+
+		<element name="digit5" ref="digit"><bounds x="4"  y="0" width="2" height="3" /></element>
+		<element name="digit4" ref="digit"><bounds x="6"  y="0" width="2" height="3" /></element>
+		<element name="digit3" ref="digit"><bounds x="8"  y="0" width="2" height="3" /></element>
+		<element name="digit2" ref="digit"><bounds x="10" y="0" width="2" height="3" /></element>
+		<element name="digit1" ref="digit"><bounds x="12" y="0" width="2" height="3" /></element>
+		<element name="digit0" ref="digit"><bounds x="14" y="0" width="2" height="3" /></element>
+	</group>
+
+
+<!-- button panel -->
+
+	<element name="text_b11"><text string="C"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b12"><text string="D"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b13"><text string="E"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b14"><text string="F"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b15"><text string="NEXT"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b16"><text string="REG"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+
+	<element name="text_b21"><text string="8"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b22"><text string="9"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b23"><text string="A"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b24"><text string="B"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b25"><text string="BKP"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b26"><text string="STEP"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+
+	<element name="text_b31"><text string="4"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b32"><text string="5"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b33"><text string="6"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b34"><text string="7"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b35"><text string="RUN"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b36"><text string="HALT"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+
+	<element name="text_b41"><text string="0"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b42"><text string="1"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b43"><text string="2"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b44"><text string="3"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b45"><text string="C/CE"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_b46"><text string="PGM"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+
+	<element name="but" defstate="0">
+		<rect state="0"><color red="0.15" green="0.15" blue="0.15" /></rect>
+		<rect state="1"><color red="0.25" green="0.25" blue="0.25" /></rect>
+	</element>
+
+	<group name="buttons">
+		<bounds x="0" y="-1" width="19.3" height="12" />
+
+		<element ref="gray"><bounds x="0" y="-1" width="19.3" height="12" /></element>
+
+		<repeat count="4">
+			<param name="y" start="0.25" increment="2.5" />
+			<element ref="blackb"><bounds x="1" y="~y~" width="17.3" height="0.05" /><color alpha="0.3" /></element>
+		</repeat>
+
+		<element ref="gray"><bounds xc="12.5" y="-1" width="1" height="12" /></element>
+		<element ref="blackb"><bounds xc="12.5" y="-1" width="0.1" height="12" /></element>
+
+		<!-- button labels -->
+		<repeat count="4">
+			<param name="y" start="0.85" increment="2.5" />
+			<param name="i1" start="1" increment="1" />
+
+			<repeat count="4">
+				<param name="x" start="2" increment="3" />
+				<param name="i2" start="1" increment="1" />
+
+				<element ref="text_b~i1~~i2~"><bounds xc="~x~" yc="~y~" width="2.5" height="1" /></element>
+			</repeat>
+		</repeat>
+
+		<repeat count="4">
+			<param name="y" start="0.85" increment="2.5" />
+			<param name="i1" start="1" increment="1" />
+
+			<repeat count="2">
+				<param name="x" start="14.15" increment="3" />
+				<param name="i2" start="5" increment="1" />
+
+				<element ref="text_b~i1~~i2~"><bounds xc="~x~" yc="~y~" width="2.5" height="1" /></element>
+			</repeat>
+		</repeat>
+
+		<!-- actual buttons -->
+		<repeat count="4">
+			<param name="y" start="2" increment="2.5" />
+			<param name="mask" start="0x08" rshift="1" />
+
+			<repeat count="4">
+				<param name="x" start="2" increment="3" />
+				<param name="i" start="0" increment="1" />
+
+				<element ref="blackb"><bounds xc="~x~" yc="~y~" width="2" height="1" /></element>
+				<element ref="but" inputtag="IN.~i~" inputmask="~mask~"><bounds xc="~x~" yc="~y~" width="1.85" height="0.85" /></element>
+			</repeat>
+		</repeat>
+
+		<repeat count="4">
+			<param name="y" start="2" increment="2.5" />
+			<param name="mask" start="0x08" rshift="1" />
+
+			<repeat count="2">
+				<param name="x" start="14.15" increment="3" />
+				<param name="i" start="4" increment="1" />
+
+				<element ref="blackb"><bounds xc="~x~" yc="~y~" width="2.3" height="1" /></element>
+				<element ref="but" inputtag="IN.~i~" inputmask="~mask~"><bounds xc="~x~" yc="~y~" width="2.15" height="0.85" /></element>
+			</repeat>
+		</repeat>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="35.3" top="0" bottom="17.8" />
+
+		<group ref="io"><bounds x="0" y="0" width="35.3" height="4" /></group>
+		<group ref="display"><bounds x="-1" y="8.2" width="16" height="3" /></group>
+		<group ref="buttons"><bounds x="16" y="5.8" width="19.3" height="12" /></group>
+
+		<element ref="text_g"><bounds xc="4" y="13.6" width="2" height="1" /></element>
+		<element ref="text_h"><bounds xc="8" y="13.6" width="2" height="1" /></element>
+		<element ref="text_reset"><bounds xc="12" y="13.6" width="5" height="1" /></element>
+
+		<element ref="butr" inputtag="IN.6" inputmask="0x01"><bounds xc="4" y="14.8" width="2" height="2" /></element>
+		<element ref="butr" inputtag="IN.6" inputmask="0x02"><bounds xc="8" y="14.8" width="2" height="2" /></element>
+		<element ref="butg" inputtag="RESET" inputmask="0x01"><bounds xc="12" y="14.8" width="2" height="2" /></element>
+	</view>
+
+</mamelayout>

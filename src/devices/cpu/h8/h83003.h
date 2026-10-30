@@ -8,7 +8,6 @@
 
     H8/300H-based mcus.
 
-
 ***************************************************************************/
 
 #ifndef MAME_CPU_H8_H83003_H
@@ -21,6 +20,7 @@
 #include "h8_dma.h"
 #include "h8_port.h"
 #include "h8_intc.h"
+#include "h8_refresh.h"
 #include "h8_timer16.h"
 #include "h8_sci.h"
 #include "h8_watchdog.h"
@@ -58,9 +58,6 @@ public:
 	u8 syscr_r();
 	void syscr_w(u8 data);
 
-	u8 rtmcsr_r();
-	void rtmcsr_w(u8 data);
-
 protected:
 	required_device<h8h_intc_device> m_intc;
 	required_device<h8_adc_device> m_adc;
@@ -85,17 +82,18 @@ protected:
 	required_device<h8h_timer16_channel_device> m_timer16_3;
 	required_device<h8h_timer16_channel_device> m_timer16_4;
 	required_device<h8_watchdog_device> m_watchdog;
+	required_device<h8_refresh_device> m_refresh;
 
 	devcb_write_line::array<4> m_tend_cb;
 
 	u8 m_syscr;
-	u8 m_rtmcsr;
 
 	virtual void update_irq_filter() override;
 	virtual void interrupt_taken() override;
 	virtual int trapa_setup() override;
 	virtual void irq_setup() override;
 	virtual void internal_update(u64 current_time) override;
+	using h8_device::internal_update;
 	virtual void notify_standby(int state) override;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	void map(address_map &map) ATTR_COLD;

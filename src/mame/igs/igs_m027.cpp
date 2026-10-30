@@ -83,7 +83,8 @@
  TODO:
  * Communication for games that support linked mode
  * IGS025 protection for Chess Challenge II
- * Emulate necessary peripherals for Extra Draw (might not belong here)
+ * Extra Draw and Xingyun Xiaochou hang cause of IRQ problems
+ * Emulate necessary peripherals for Extra Draw
  * I/O for remaining games
  * tshs101 has IGS3590 + NT3570F instead of Oki
 */
@@ -98,6 +99,7 @@
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "machine/timekpr.h"
 #include "machine/timer.h"
 
 #include "sound/okim6295.h"
@@ -168,6 +170,7 @@ public:
 	void extradrw(machine_config &config) ATTR_COLD;
 	void chessc2(machine_config &config) ATTR_COLD;
 	void tshs101(machine_config &config) ATTR_COLD;
+	void xyxcxysj(machine_config &config) ATTR_COLD;
 
 	void init_sdwx() ATTR_COLD;
 	void init_lhzb4() ATTR_COLD;
@@ -197,6 +200,7 @@ public:
 	void init_tct2p() ATTR_COLD;
 	void init_xypdk() ATTR_COLD;
 	void init_ccly() ATTR_COLD;
+	void init_tswx() ATTR_COLD;
 	void init_tswxp() ATTR_COLD;
 	void init_royal5p() ATTR_COLD;
 	void init_jhg3d() ATTR_COLD;
@@ -204,6 +208,7 @@ public:
 	void init_mgfx() ATTR_COLD;
 	void init_tarzan2() ATTR_COLD;
 	void init_magtree() ATTR_COLD;
+	void init_xyxcxysj() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -272,14 +277,13 @@ private:
 	void tripslot_map(address_map &map) ATTR_COLD;
 	void ccly_map(address_map &map) ATTR_COLD;
 	void tshs101_map(address_map &map) ATTR_COLD;
+	void xyxcxysj_map(address_map &map) ATTR_COLD;
 
 	void oki_128k_map(address_map &map) ATTR_COLD;
 };
 
 void igs_m027_state::machine_start()
 {
-	m_out_lamps.resolve();
-
 	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
 	std::fill(std::begin(m_io_select), std::end(m_io_select), 0xff);
 	m_first_start = true;
@@ -376,6 +380,13 @@ void igs_m027_state::ccly_map(address_map &map)
 	m027_1ppi_map<true>(map);
 
 	map(0x3800'c000, 0x3800'c003).umask32(0x0000'00ff).w(FUNC(igs_m027_state::ccly_okibank_w));
+}
+
+void igs_m027_state::xyxcxysj_map(address_map &map)
+{
+	m027_1ppi_map<true>(map);
+
+	map(0x4800'0000, 0x4800'1fff).rw("rtc", FUNC(ds1643_device::read), FUNC(ds1643_device::write)); // M48T18?
 }
 
 void igs_m027_state::tshs101_map(address_map &map)
@@ -2539,7 +2550,7 @@ void igs_m027_state::m027_noppi(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
@@ -2549,7 +2560,7 @@ void igs_m027_state::m027_noppi(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs_m027_state::interrupt), "screen", 0, 1);
 
-	IGS017_IGS031(config, m_igs017_igs031, 0);
+	IGS017_IGS031(config, m_igs017_igs031);
 	m_igs017_igs031->set_text_reverse_bits(true);
 	m_igs017_igs031->in_pa_callback().set(NAME((&igs_m027_state::dsw_r<1, 0, 0>)));
 	m_igs017_igs031->in_pb_callback().set_ioport("PORTB");
@@ -2870,6 +2881,14 @@ void igs_m027_state::chessc2(machine_config &config)
 	m_maincpu->in_port().set_ioport("PLAYER");
 }
 
+void igs_m027_state::xyxcxysj(machine_config &config)
+{
+	m027_1ppi<true>(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::xyxcxysj_map);
+
+	DS1643(config, "rtc"); // should be fully compatible with M48T18
+}
 
 /***************************************************************************
 
@@ -3395,6 +3414,24 @@ ROM_START( lhzb3106c5m )
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "igs_s2402.u26", 0x000000, 0x200000, CRC(84bc2f3e) SHA1(49dcf5eaa39accd5c6bf01782fd4221298cb43ed) ) // 1ST AND 2ND HALF IDENTICAL
+ROM_END
+
+ROM_START( lhzb3p ) // IGS PCB N0-0241
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "d9_igs027a.u13", 0x0000, 0x4000, CRC(19df9d4f) SHA1(d7e5be300220674ea6244242e06fb1929cbbb54f) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "lhzb3jqb_v_200c5m.u9", 0x00000, 0x80000, CRC(024b910b) SHA1(8406a0bbd615f728aaa55a160de9427059ada195) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "igs_m2403_image_v101.u17", 0x000000, 0x80000,CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "m2401.u18", 0x000000, 0x400000,  CRC(81428f18) SHA1(9fb19c8a79cc3443642f4b044e04735df2cb45be) )
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "igs_s2402_speech_v100.u14", 0x000000, 0x100000, CRC(56083fe2) SHA1(62afd651809bf5e639bfda6e5579dbf4b903b664) )
 ROM_END
 
 // This board is a bit different to the others. Main OSC is 22.1184MHz.
@@ -4016,6 +4053,26 @@ ROM_START( cjddzp )
 	ROM_LOAD( "cjddzp_sp-1.u4", 0x00000, 0x200000, CRC(7ef65d95) SHA1(345c587cd449d6d06908e9687480be76b2cb2d28) )
 ROM_END
 
+ROM_START( cjddzp206cn ) // IGS PCB-0489-16-FM-1
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "e9_igs027a.rom", 0x0000, 0x4000, CRC(6cf26c3d) SHA1(c74d4ff71ff07c38449242e7e067e956a5c441be) ) // wasn't dumped for this set, but seems to work fine
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "cjddzp_s206cn.u17", 0x000000, 0x080000, CRC(4f828edc) SHA1(114c96b1c8c66682a1691d7c7f27d091e7955562) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_IGNORE(                              0x180000 )
+
+	ROM_REGION( 0x200000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "cjddzp_text.u27", 0x000000, 0x200000, CRC(c4daedd6) SHA1(1c06e9b8f8c9849d808e12d81588f8d5603941d1) )
+
+	ROM_REGION( 0x600000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "cjddzp_anicg.u28", 0x000000, 0x400000, CRC(72487508) SHA1(9f4bbc858960ddaae403e4a3330b2345f6fd6cb3) )
+	ROM_LOAD( "cjddzp_extcg.u29", 0x400000, 0x200000, CRC(b0447269) SHA1(bf639abc135b52781340a24820e402db497d8d09) )
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "cjddzp_sp-1.u4", 0x00000, 0x200000, CRC(7ef65d95) SHA1(345c587cd449d6d06908e9687480be76b2cb2d28) )
+ROM_END
+
 /*
 Chaoji Dou Dizhu (V302CN) (hard version)
 IGS, 2007
@@ -4158,6 +4215,26 @@ ROM_START( cjddzlf )
 	ROM_LOAD( "igs_l2404.u5", 0x00000, 0x200000, CRC(55f6dfac) SHA1(876bec8db5aa3dfd10869ecdcd98bccb2ef860ef) )
 ROM_END
 
+// 超级拖拉机 (Chāojí Tuōlājī)
+ROM_START( cjtlj ) // PCB-0489-05-FM-1
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "b3_igs027a", 0x0000, 0x4000, CRC(351d8658) SHA1(10d3aac884c43a2f9c58550887cd055576a354cd) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "igs_m2403.u17", 0x00000, 0x80000, CRC(476404fa) SHA1(bd4c389e1d0040a85016e2ac37beb0e25b732f4d) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "igs_m2401.u27", 0x00000, 0x80000, CRC(cee7af42) SHA1(cb0921d0bcd3eedc30ac772e790a5c52833b9dfd) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_s2402.u28", 0x000000, 0x400000, CRC(bd021a7c) SHA1(11bd0d6b5b5e4bb6899b6284452b5d109454a78e) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+
+	// OKI, sample tables are every 0x20000 starting at 0x140000
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "igs_l2404.u4", 0x000000, 0x200000, CRC(de294c8d) SHA1(7ee145a68533a90dac91f34422934b7be939fdd5) )
+ROM_END
+
 // 超级拖拉机 加强版 (Chāojí Tuōlājī Jiāqiáng Bǎn)
 ROM_START( cjtljp )
 	ROM_REGION( 0x04000, "maincpu", 0 )
@@ -4287,6 +4364,26 @@ ROM_START( tct2p )
 	ROM_REGION( 0x480000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "a4202.u28", 0x000000, 0x400000, CRC(97a68f85) SHA1(177c8c23fd0d585b24a71359ede005ac9a2e4d4d) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
 	ROM_LOAD( "cg.u31",    0x400000, 0x080000, CRC(808b38d1) SHA1(60cc441d863d26c44c0353770367f2b2ef7c8de7) ) // FIXED BITS (xxxxxxxx0xxxxxxx) 1xxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "sp.u5", 0x000000, 0x200000, CRC(4b04e89e) SHA1(4c29381cd272daaa3a3fb627024d25609f8b5f8a) ) // BADADDR   --xxxxxxxxxxxxxxxxxxx
+ROM_END
+
+ROM_START( tct2pa )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A type G ARM based MCU
+	ROM_LOAD( "t8_027a.bin", 0x0000, 0x4000, CRC(a5f0be90) SHA1(f2318cf324749831d8e1b766ae5646dcfdd955c6) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v-306cn.u17", 0x00000, 0x80000, CRC(c479e5ac) SHA1(4d8273f7425cdc3293c5b43219e021303c53cbad) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "text.u27", 0x00000, 0x80000, CRC(d0e20214) SHA1(90f9b2d7ab0f2c0f99277df7c9ff24ea54b65709) )
+
+	ROM_REGION( 0x480000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "a4202.u28", 0x000000, 0x400000, CRC(97a68f85) SHA1(177c8c23fd0d585b24a71359ede005ac9a2e4d4d) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+	ROM_LOAD( "cg.u31",    0x400000, 0x080000, CRC(c3f18d6c) SHA1(eeb9fe0ba3b96727e850ac32248ca9517674a0cd) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_IGNORE(                      0x180000 )
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "sp.u5", 0x000000, 0x200000, CRC(4b04e89e) SHA1(4c29381cd272daaa3a3fb627024d25609f8b5f8a) ) // BADADDR   --xxxxxxxxxxxxxxxxxxx
@@ -4462,6 +4559,26 @@ ROM_START( jhg3d ) // IGS PCB-0376-01-FS. 3 banks of 8 switches. 1 PPI.
 	ROM_LOAD( "v-445cn.u20", 0x00000, 0x40000, CRC(e6aac74d) SHA1(b8f88b894383cd3eab4b00a20b74ee84dea61672) )
 ROM_END
 
+// 泰山五线 (Tàishān Wǔxiàn)
+ROM_START( tswx ) // IGS PCB-0489-10-FM-1. 3 banks of 8 switches. 1 PPI.
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal rom of IGS027A ARM based MCU
+	ROM_LOAD( "m3_027a.u20", 0x0000, 0x4000, CRC(e9189b53) SHA1(6129450a3c03a4218e672f43d9e9c2a1a51551fc) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "u17", 0x00000, 0x80000, CRC(ddfb4cbb) SHA1(e1a435f7d6a08bdf81f4e523f8dcb7082a907db8) )
+
+	ROM_REGION( 0x200000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "text.u27", 0x000000, 0x200000, CRC(18fe9b5e) SHA1(dbcc6bf7a649dd07bad68add9b63a39a92e9f363) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "u29", 0x000000, 0x200000, CRC(d2b6358a) SHA1(e24aef98a06ea3bb8ce23ced2027de82a58e8a15) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+	ROM_RELOAD(      0x200000, 0x200000 ) // game expects to read the ROM at this offset? Gameplay doesn't show missing GFX, so may be right size anyway
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "sp.u4", 0x000000, 0x200000, CRC(3976780a) SHA1(3229e58f096e298ce9545e1e85bbf7f067f10699) )
+ROM_END
+
 // 泰山五线 加强版 (Tàishān Wǔxiàn Jiāqiáng Bǎn)
 ROM_START( tswxp ) // IGS PCB-0489-17-FM-1. 2 banks of 8 switches (1 unpopulated). 1 PPI.
 	ROM_REGION( 0x4000, "maincpu", 0 )
@@ -4480,6 +4597,29 @@ ROM_START( tswxp ) // IGS PCB-0489-17-FM-1. 2 banks of 8 switches (1 unpopulated
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "u4", 0x000000, 0x200000, CRC(2e392e51) SHA1(5ff901f8ab877674f3b68e38497babc0a7369a85) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
+ROM_END
+
+// 幸运小丑 / 幸运手机 (Xìngyùn Xiǎochǒu / Xìngyùn Shǒujī).
+// At first boot the following password is required to initialize RTC NVRAM: 312746545908452995882136421362
+ROM_START( xyxcxysj ) // IGS PCB-0417-01-GF. 3 banks of 8 switches. 1 PPI. ST M48T18-100PC1 RTC / NVRAM.
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal rom of IGS027A ARM based MCU
+	ROM_LOAD( "u5_027a.u20", 0x0000, 0x4000, CRC(06bf82c2) SHA1(d9e0fc4a472f8934279f022deec47d27c04b1519) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v-233cn.u19", 0x00000, 0x80000, CRC(d805a388) SHA1(aa0aa0227e6762c9de10943cf4ac898479512039) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "text.u13", 0x00000, 0x80000, CRC(881ff61a) SHA1(6b4a31c7e0fc57392d2495a540d271b662e4b649) ) // 1xxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "cg.u23", 0x000000, 0x200000, CRC(9431f1d5) SHA1(c090933a6f377bc18722aff10df2b76a634a6d0e) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "sp.u3", 0x00000, 0x80000, CRC(cb62e464) SHA1(6191fd40e58cb22e88395fa794a7b9540432436c) )
+
+	ROM_REGION( 0x2000, "rtc", 0 ) // pre-initialized
+	ROM_LOAD( "m48t18.u30", 0x0000, 0x2000, CRC(9c84a94a) SHA1(ff2cff054f8d635babebb06fc961b2268b687619) )
 ROM_END
 
 
@@ -4596,9 +4736,9 @@ void igs_m027_state::init_gonefsh2()
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 
-	// bypass IGS025 'version' check
+	// HACK: bypass IGS025 'version' check
 	m_external_rom[0x1f894/4] ^= 0x00000100;
-	// bypass external ROM checksum
+	// HACK: bypass external ROM checksum
 	u32 *ROM2 = &memregion("maincpu")->as_u32();
 	ROM2[(0x168/4)] ^= 0x10000000;
 }
@@ -4703,9 +4843,9 @@ void igs_m027_state::init_chessc2()
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 
-	// bypass IGS025 'version' check
+	// HACK: bypass IGS025 'version' check
 	m_external_rom[0x207d8/4] ^= 0x00000100;
-	// bypass external ROM checksum
+	// HACK: bypass external ROM checksum
 	u32 *ROM2 = &memregion("maincpu")->as_u32();
 	ROM2[(0x168/4)] ^= 0x10000000;
 }
@@ -4780,6 +4920,21 @@ void igs_m027_state::init_magtree()
 	pgm_create_dummy_internal_arm_region();
 }
 
+void igs_m027_state::init_xyxcxysj()
+{
+	mgzz_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+	m_igs017_igs031->set_text_reverse_bits(true);
+}
+
+void igs_m027_state::init_tswx()
+{
+	tswx_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+}
+
 } // anonymous namespace
 
 
@@ -4798,6 +4953,7 @@ GAME(  1999, lhdmgp200c3m,  lhdmgp,   lhdmg,        lhdmg,         igs_m027_stat
 GAME(  1999, lhzb3,         0,        lhdmg,        lhzb3,         igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Zhengba III (V400CN)", 0 )
 GAME(  1999, lhzb3106c5m,   lhzb3,    lhzb3106c5m,  lhzb3,         igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Zhengba III (V106C5M)", 0 )
 GAME(  1999, lhzb3sjb,      0,        lhzb3sjb,     lhzb3sjb,      igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Zhengba III Shengji Ban (V300C5)", 0 )
+GAME(  1999, lhzb3p,        0,        lhzb3106c5m,  lhzb3,         igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Zhengba III Jiaqiang Ban (V200C5M)", MACHINE_NOT_WORKING )
 GAME(  2004, lhzb4,         0,        lhzb4,        lhzb4,         igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4 (V104CN)", 0 )
 GAME(  2004, lhzb4dhb,      0,        lhzb4,        lhzb4,         igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4 Dui Hua Ban (V203CN)", 0 )
 GAME(  1999, lthyp,         0,        lthyp,        lthyp,         igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Teng Hu Yao Duizhan Jiaqiang Ban (S104CN)", MACHINE_NODEVICE_LAN )
@@ -4806,6 +4962,7 @@ GAMEL( 2001, jking02,       0,        jking02,      jking02,       igs_m027_stat
 GAME(  2001, klxyj104cn,    jking02,  tct2p,        klxyj,         igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuaile Xiyou Ji (V104CN)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
 GAME(  2001, klxyj102cn,    jking02,  tct2p,        klxyj,         igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuaile Xiyou Ji (V102CN)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
 GAME(  2003, tct2p,         0,        tct2p,        tct2p,         igs_m027_state, init_tct2p,    ROT0, "IGS", "Tarzan Chuang Tian Guan 2 Jiaqiang Ban (V306CN)", 0 )
+GAME(  2003, tct2pa,        tct2p,    tct2p,        tct2p,         igs_m027_state, init_tct2p,    ROT0, "IGS", "Tarzan Chuang Tian Guan 2 Jiaqiang Ban (V306CN, alternate GFX)", 0 )
 GAME(  2003, mgzz,          0,        mgzz,         mgzz101cn,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Manguan Zhizun (V101CN)", 0 )
 GAME(  2003, mgzz100cn,     mgzz,     mgzz,         mgzz100cn,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Manguan Zhizun (V100CN)", 0 )
 GAME(  2007, mgcs3,         0,        lhzb4,        mgcs3,         igs_m027_state, init_mgcs3,    ROT0, "IGS", "Manguan Caishen 3 (V101CN)", 0 )
@@ -4819,7 +4976,9 @@ GAME(  2004, cjddz217cn,    cjddz,    cjddz,        cjddz,         igs_m027_stat
 GAME(  2004, cjddz215cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V215CN)", 0 ) // 2004 date in internal ROM
 GAME(  2004, cjddz213cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V213CN)", MACHINE_NOT_WORKING ) // missing external program ROM. 2004 date in internal ROM
 GAME(  2004, cjddzp,        0,        cjddz,        cjddzp,        igs_m027_state, init_cjddzp,   ROT0, "IGS", "Chaoji Dou Dizhu Jiaqiang Ban (S300CN)", MACHINE_NODEVICE_LAN ) // 2004 date in internal ROM
+GAME(  2004, cjddzp206cn,   cjddzp,   cjddz,        cjddzp,        igs_m027_state, init_cjddzp,   ROT0, "IGS", "Chaoji Dou Dizhu Jiaqiang Ban (S206CN)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN ) // stuck at linking
 GAME(  2005, cjddzlf,       0,        cjddz,        cjddz,         igs_m027_state, init_cjddzlf,  ROT0, "IGS", "Chaoji Dou Dizhu Liang Fu Pai (V109CN)", 0 ) // 2005 date in internal ROM
+GAME(  2005, cjtlj,         0,        xypdk,        lhzb4,         igs_m027_state, init_cjtljp,   ROT0, "IGS", "Chaoji Tuolaji (V112CN)", MACHINE_NOT_WORKING )
 GAME(  2005, cjtljp,        0,        xypdk,        lhzb4,         igs_m027_state, init_cjtljp,   ROT0, "IGS", "Chaoji Tuolaji Jiaqiang Ban (V206CN)", 0 ) // 2005 date in internal ROM
 GAME(  2005, xypdk,         0,        xypdk,        lhzb4,         igs_m027_state, init_xypdk,    ROT0, "IGS", "Xingyun Pao De Kuai (V106CN)", 0 )
 GAMEL( 2005, royal5p,       0,        royal5p,      royal5p,       igs_m027_state, init_royal5p,  ROT0, "IGS", "Royal 5+ / X'mas 5 (V101US)", 0, layout_royal5p )
@@ -4828,10 +4987,12 @@ GAMEL( 2005, ccly,          crzybugs, ccly,         ccly,          igs_m027_stat
 GAME(  2001, cjsxp,         0,        cjsxp,        cjsxp,         igs_m027_state, init_klxyj,    ROT0, "IGS", "Huangpai Zuqiu Plus / Chaoji Shuangxing Plus (V103CN)", 0 )
 GAME(  2000, tshs,          0,        zhongguo,     tshs,          igs_m027_state, init_slqz3,    ROT0, "IGS", "Tiansheng Haoshou (V201CN)", 0 )
 GAME(  2000, tshs101,       tshs,     tshs101,      tshs101,       igs_m027_state, init_slqz3,    ROT0, "IGS", "Tiansheng Haoshou (V101CN)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // unemulated sound chips
+GAME(  2004, tswx,          0,        tct2p,        tswxp,         igs_m027_state, init_tswx,     ROT0, "IGS", "Taishan Wuxian (V309CN)", MACHINE_NOT_WORKING )
 GAME(  2006, tswxp,         0,        tct2p,        tswxp,         igs_m027_state, init_tswxp,    ROT0, "IGS", "Taishan Wuxian Jiaqiang Ban (V101CN)", 0 )
 GAME(  2000, mgfx,          0,        mgzz,         mgfx,          igs_m027_state, init_mgfx,     ROT0, "IGS", "Manguan Fuxing (V104T)", 0 )
+GAME(  2004, xyxcxysj,      0,        xyxcxysj,     base,          igs_m027_state, init_xyxcxysj, ROT0, "IGS", "Xingyun Xiaochou / Xingyun Shouji (V233CN)", MACHINE_NOT_WORKING ) // IRQ problems
 // this has a 2nd 8255
-GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
+GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING ) // IRQ problems
 // these have an IGS025 protection device instead of the 8255
 GAME(  2002, chessc2,       0,        chessc2,      gonefsh,       igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME(  2002, gonefsh2,      0,        chessc2,      gonefsh,       igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2 (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

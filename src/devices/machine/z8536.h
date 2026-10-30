@@ -110,7 +110,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	TIMER_CALLBACK_MEMBER(advance_counters);
+	TIMER_CALLBACK_MEMBER(counter_timer);
 
 	bool is_reset() const { return (m_register[MASTER_INTERRUPT_CONTROL] & MICR_RESET) != 0; }
 
@@ -362,7 +362,23 @@ protected:
 		DCS_DO_NOT_USE
 	};
 
-	void get_interrupt_vector();
+
+	// interrupt priority
+	static constexpr int PRIORITY[] =
+	{
+		COUNTER_TIMER_3_COMMAND_AND_STATUS,
+		PORT_A_COMMAND_AND_STATUS,
+		COUNTER_TIMER_2_COMMAND_AND_STATUS,
+		PORT_B_COMMAND_AND_STATUS,
+		COUNTER_TIMER_1_COMMAND_AND_STATUS
+	};
+
+
+	u8 get_port_a_vector(bool status);
+	u8 get_port_b_vector(bool status);
+	u8 get_timer_vector(bool status);
+	u8 get_current_vector();
+	u8 acknowledge_interrupt();
 	void check_interrupt();
 
 	u8 read_register(offs_t offset);
@@ -376,6 +392,11 @@ protected:
 	bool counter_external_trigger(int id);
 	bool counter_external_gate(int id);
 	bool counter_gated(int id);
+	bool counter_running(int id);
+	u32 counter_ticks(int id);
+	void advance_counters();
+	void sync_counters();
+	void update_counter_timer();
 	void count(int id);
 	void trigger(int id);
 	void gate(int id, int state);
@@ -395,6 +416,7 @@ protected:
 
 	// interrupt state
 	int m_irq;
+	int m_ius_level;    // interrupt under service level, gates the daisy chain
 
 	// register state
 	u8 m_register[48];
@@ -407,7 +429,10 @@ protected:
 
 	// timers
 	emu_timer *m_timer;
+	u64 m_tick;
 	u16 m_counter[3];
+	bool m_counter_error[3];
+	bool m_load_pending[3];
 };
 
 // ======================> z8036_device

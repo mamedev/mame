@@ -41,8 +41,8 @@
 
     Color Register:
 
-                fedc ba98 ---- ----       Source Pen (Pen Replacement Mode)
-                ---- ---- 7654 3210       Palette (0-f) / Destination Pen (Pen Replacement Mode)
+                fedc ba98 ---- ----       Destination Pen (Pen Replacement Mode)
+                ---- ---- 7654 3210       Palette (0-f) / Source Pen (Pen Replacement Mode)
 
     A write to the source address (mid) triggers the blit.
     A the end of the blit, an IRQ is issued.
@@ -75,7 +75,8 @@ cesblit_device::cesblit_device(const machine_config &mconfig, const char *tag, d
 	device_video_interface(mconfig, *this),
 	device_memory_interface(mconfig, *this),
 	m_space_config("blitter_space", ENDIANNESS_BIG, 16, 23),
-	m_blit_irq_cb(*this)
+	m_blit_irq_cb(*this),
+	m_extended_palette(false)
 {
 }
 
@@ -205,7 +206,7 @@ void cesblit_device::do_blit()
 	if (flipy)  { y0 = sh-1;    y1 = -1;    dy = -1;    sy -= sh-1; }
 	else        { y0 = 0;       y1 = sh;    dy = +1;    }
 
-	int color = (m_color & 0x0f) << 8;
+	int color = m_extended_palette ? ((m_color & 0x0f) << 8) : 0;
 
 	// Draw
 
@@ -232,7 +233,7 @@ void cesblit_device::do_blit()
 							pen = dst_pen;
 
 						if (pen != 0xff)
-							bitmap.pix((sy + y) & 0x1ff, (sx + x) & 0x1ff) = pen + color;
+							bitmap.pix((sy + y) & 0x1ff, (sx + x) & 0x1ff) = pen;
 
 						++addr;
 					}
@@ -278,20 +279,8 @@ void cesblit_device::do_blit()
 
 uint32_t cesblit_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int layers_ctrl = -1;
-
-#ifdef MAME_DEBUG
-	if (machine().input().code_pressed(KEYCODE_Z))
-	{
-		int mask = 0;
-		if (machine().input().code_pressed(KEYCODE_Q))  mask |= 1;
-		if (machine().input().code_pressed(KEYCODE_W))  mask |= 2;
-		if (mask != 0) layers_ctrl &= mask;
-	}
-#endif
-
-	if (layers_ctrl & 1)    copybitmap_trans(bitmap, m_bitmap[0][(m_regs[0x02/2]>>8)&1], 0,0,0,0, cliprect, 0xff);
-	if (layers_ctrl & 2)    copybitmap_trans(bitmap, m_bitmap[1][(m_regs[0x02/2]>>9)&1], 0,0,0,0, cliprect, 0xff);
+	copybitmap_trans(bitmap, m_bitmap[0][BIT(m_regs[0x02/2], 8)], 0,0,0,0, cliprect, 0xff);
+	copybitmap_trans(bitmap, m_bitmap[1][BIT(m_regs[0x02/2], 9)], 0,0,0,0, cliprect, 0xff);
 
 	return 0;
 }

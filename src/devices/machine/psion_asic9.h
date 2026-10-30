@@ -34,6 +34,8 @@ public:
 	auto col_cb() { return m_col_cb.bind(); }
 	auto port_ab_r() { return m_port_ab_r.bind(); }
 	auto port_ab_w() { return m_port_ab_w.bind(); }
+	auto port_cd_r() { return m_port_cd_r.bind(); }
+	auto port_cd_w() { return m_port_cd_w.bind(); }
 	auto pcm_in() { return m_pcm_in.bind(); }
 	auto pcm_out() { return m_pcm_out.bind(); }
 
@@ -125,9 +127,10 @@ private:
 	bool m_a9_protection_mode;
 	uint32_t m_a9_protection_upper;
 	uint32_t m_a9_protection_lower;
+	uint16_t m_a9_port_ab_data;
+	uint16_t m_a9_port_cd_data;
 	uint16_t m_a9_port_ab_ddr;
-	uint8_t m_a9_port_c_ddr;
-	uint8_t m_a9_port_d_ddr;
+	uint16_t m_a9_port_cd_ddr;
 	uint8_t m_a9_psel_6000;
 	uint8_t m_a9_psel_7000;
 	uint8_t m_a9_psel_8000;
@@ -144,6 +147,8 @@ private:
 	devcb_write8 m_col_cb;
 	devcb_read16 m_port_ab_r;
 	devcb_write16 m_port_ab_w;
+	devcb_read16 m_port_cd_r;
+	devcb_write16 m_port_cd_w;
 	devcb_read8 m_pcm_in;
 	devcb_write8 m_pcm_out;
 

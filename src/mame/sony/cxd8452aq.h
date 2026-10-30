@@ -19,7 +19,7 @@
 class cxd8452aq_device : public device_t, public device_memory_interface
 {
 public:
-	cxd8452aq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cxd8452aq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void map(address_map &map) ATTR_COLD;
 

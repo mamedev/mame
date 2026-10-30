@@ -129,8 +129,8 @@ protected:
 	{
 	}
 
-	virtual void driver_start() override;
-	virtual void driver_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void intellec4_program_banks(address_map &map) ATTR_COLD;
 	void intellec4_rom_port_banks(address_map &map) ATTR_COLD;
@@ -637,20 +637,9 @@ INPUT_CHANGED_MEMBER(intellec4_state::sw_do_enable)
   driver_device implementation
 ----------------------------------*/
 
-void intellec4_state::driver_start()
+void intellec4_state::machine_start()
 {
 	m_reset_timer = timer_alloc(FUNC(intellec4_state::reset_expired), this);
-
-	m_led_address.resolve();
-	m_led_instruction.resolve();
-	m_led_active_bank.resolve();
-	m_led_execution.resolve();
-	m_led_last_ptr.resolve();
-	m_led_status_ptr_valid.resolve();
-	m_led_status_search.resolve();
-	m_led_mode_mon.resolve();
-	m_led_mode_ram.resolve();
-	m_led_mode_prom.resolve();
 
 	save_item(NAME(m_ram_page));
 	save_item(NAME(m_ram_data));
@@ -689,7 +678,7 @@ void intellec4_state::driver_start()
 	m_ff_prg_mode[1] = m_ff_prg_mode[2] = false;
 };
 
-void intellec4_state::driver_reset()
+void intellec4_state::machine_reset()
 {
 	// set stuff according to initial state of front panel
 	ioport_value const sw_mode(m_sw_mode->read()), sw_control(m_sw_control->read());
@@ -844,21 +833,21 @@ DEVICE_INPUT_DEFAULTS_END
 
 void intellec4_state::intellec4(machine_config &config)
 {
-	ADDRESS_MAP_BANK(config, m_program_banks, 0);
+	ADDRESS_MAP_BANK(config, m_program_banks);
 	m_program_banks->set_map(&intellec4_state::intellec4_program_banks);
 	m_program_banks->set_endianness(ENDIANNESS_LITTLE);
 	m_program_banks->set_data_width(8);
 	m_program_banks->set_addr_width(14);
 	m_program_banks->set_stride(0x1000);
 
-	ADDRESS_MAP_BANK(config, m_rom_port_banks, 0);
+	ADDRESS_MAP_BANK(config, m_rom_port_banks);
 	m_rom_port_banks->set_map(&intellec4_state::intellec4_rom_port_banks);
 	m_rom_port_banks->set_endianness(ENDIANNESS_LITTLE);
 	m_rom_port_banks->set_data_width(8);
 	m_rom_port_banks->set_addr_width(14);
 	m_rom_port_banks->set_stride(0x1000);
 
-	INTEL_IMM6_76(config, m_prom_programmer, 0);
+	INTEL_IMM6_76(config, m_prom_programmer);
 
 	RS232_PORT(config, m_tty, default_rs232_devices, "terminal");
 	m_tty->set_option_device_input_defaults("terminal",   DEVICE_INPUT_DEFAULTS_NAME(terminal));
@@ -1057,8 +1046,8 @@ public:
 	void mod4(machine_config &config);
 
 protected:
-	virtual void driver_start() override;
-	virtual void driver_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	enum
@@ -1174,11 +1163,9 @@ void mod4_state::mod4(machine_config &config)
   driver_device implementation
 ----------------------------------*/
 
-void mod4_state::driver_start()
+void mod4_state::machine_start()
 {
-	intellec4_state::driver_start();
-
-	m_led_status_cpu.resolve();
+	intellec4_state::machine_start();
 
 	m_one_shot_timer = timer_alloc(FUNC(mod4_state::one_shot_expired), this);
 
@@ -1191,9 +1178,9 @@ void mod4_state::driver_start()
 	m_one_shot = false;
 }
 
-void mod4_state::driver_reset()
+void mod4_state::machine_reset()
 {
-	intellec4_state::driver_reset();
+	intellec4_state::machine_reset();
 
 	// set stuff according to initial state of front panel
 	m_sw_hold = BIT(~m_sw_mode->read(), BIT_SW_HOLD);
@@ -1253,8 +1240,8 @@ public:
 	void mod40(machine_config &config);
 
 protected:
-	virtual void driver_start() override;
-	virtual void driver_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	enum
@@ -1404,11 +1391,9 @@ void mod40_state::mod40(machine_config &config)
   driver_device implementation
 ----------------------------------*/
 
-void mod40_state::driver_start()
+void mod40_state::machine_start()
 {
-	intellec4_state::driver_start();
-
-	m_led_status_run.resolve();
+	intellec4_state::machine_start();
 
 	m_single_step_timer = timer_alloc(FUNC(mod40_state::single_step_expired), this);
 
@@ -1422,9 +1407,9 @@ void mod40_state::driver_start()
 	m_stp_ack = m_single_step = false;
 }
 
-void mod40_state::driver_reset()
+void mod40_state::machine_reset()
 {
-	intellec4_state::driver_reset();
+	intellec4_state::machine_reset();
 
 	// set stuff according to initial state of front panel
 	m_sw_stop = BIT(~m_sw_mode->read(), BIT_SW_STOP);

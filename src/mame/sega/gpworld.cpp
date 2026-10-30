@@ -65,11 +65,10 @@ public:
 	{
 	}
 
-	void gpworld(machine_config &config);
+	void gpworld(machine_config &config) ATTR_COLD;
 
 private:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void driver_start() override;
 
 	void mainmem(address_map &map) ATTR_COLD;
 	void mainport(address_map &map) ATTR_COLD;
@@ -259,6 +258,11 @@ uint32_t gpworld_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 void gpworld_state::machine_start()
 {
 	m_irq_stop_timer = timer_alloc(FUNC(gpworld_state::irq_stop), this);
+
+	m_nmi_enable = 0;
+	m_start_lamp = 0;
+	m_brake_gas = 0;
+	m_ldp_write_latch = m_ldp_read_latch = 0;
 }
 
 
@@ -493,7 +497,7 @@ void gpworld_state::gpworld(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(gpworld_state::vblank_callback));
 
 
-	PIONEER_LDV1000(config, m_laserdisc, 0);
+	PIONEER_LDV1000(config, m_laserdisc);
 	m_laserdisc->set_overlay(512, 256, FUNC(gpworld_state::screen_update));
 	m_laserdisc->add_route(0, "speaker", 1.0, 0);
 	m_laserdisc->add_route(1, "speaker", 1.0, 1);
@@ -543,15 +547,6 @@ ROM_START( gpworld )
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "gpworld", 0, NO_DUMP )
 ROM_END
-
-
-void gpworld_state::driver_start()
-{
-	m_nmi_enable = 0;
-	m_start_lamp = 0;
-	m_brake_gas = 0;
-	m_ldp_write_latch = m_ldp_read_latch = 0;
-}
 
 } // anonymous namespace
 

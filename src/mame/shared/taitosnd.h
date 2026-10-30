@@ -13,7 +13,7 @@
 class tc0140syt_device : public device_t
 {
 public:
-	tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto nmi_callback() { return m_nmi_cb.bind(); }
 	auto reset_callback() { return m_reset_cb.bind(); }
@@ -29,7 +29,7 @@ public:
 	void slave_comm_w(u8 data);
 
 protected:
-	tc0140syt_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	tc0140syt_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -54,7 +54,7 @@ private:
 class pc060ha_device : public tc0140syt_device
 {
 public:
-	pc060ha_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pc060ha_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 DECLARE_DEVICE_TYPE(TC0140SYT, tc0140syt_device)

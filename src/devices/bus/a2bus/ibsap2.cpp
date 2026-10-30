@@ -95,7 +95,10 @@ u8 ibsap2_device::read_cnxx(u8 offset)
 
 u8 ibsap2_device::read_c800(u16 offset)
 {
-	return m_eprom[offset];
+	if (offset >= 0x700)
+		return get_open_bus(); // TODO: deselect card
+	else
+		return m_eprom[offset];
 }
 
 bool ibsap2_device::take_c800() const
@@ -150,7 +153,7 @@ ioport_constructor ibsap2_device::device_input_ports() const
 
 void ibsap2_device::device_add_mconfig(machine_config &config)
 {
-	MOS6551(config, m_acia, 0);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(1.8432_MHz_XTAL);
 	m_acia->irq_handler().set(FUNC(ibsap2_device::acia_irq_w));
 	m_acia->rts_handler().set("v24", FUNC(rs232_port_device::write_rts));

@@ -482,19 +482,21 @@ void spc1000_state::spc1000(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &spc1000_state::io_map);
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(XTAL(3'579'545) * 2, 456, 0, 372, 262, 0, 243);
+	screen.set_screen_update(m_vdg, FUNC(mc6847_base_device::screen_update));
 
 	MC6847(config, m_vdg, XTAL(3'579'545));
 	m_vdg->set_screen("screen");
 	m_vdg->fsync_wr_callback().set(FUNC(spc1000_state::irq_w));
 	m_vdg->input_callback().set(FUNC(spc1000_state::mc6847_videoram_r));
 	m_vdg->set_get_char_rom(FUNC(spc1000_state::get_char_rom));
-	m_vdg->set_get_fixed_mode(mc6847_device::MODE_GM2);
+	m_vdg->set_fixed_mode(mc6847_device::MODE_GM2);
 	// other lines not connected
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &ay8910(AY8910(config, "ay8910", XTAL(4'000'000) / 1));
+	ay8910_device &ay8910(AY8910(config, "ay8910", XTAL(4'000'000) / 2));
 	ay8910.port_a_read_callback().set(FUNC(spc1000_state::porta_r));
 	ay8910.port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	ay8910.add_route(ALL_OUTPUTS, "mono", 1.00);

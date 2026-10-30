@@ -96,15 +96,17 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void p0(machine_config &config);  // base config
-	void p3(machine_config &config);  // no schematic available
-	void p4(machine_config &config);  // same as r2 but bigger roms, no speech
-	void p5(machine_config &config);  // same as p4 + YM2151
-	void p6(machine_config &config);  // bonebusters
-	void r2(machine_config &config);  // r2 (2x ay, spo250, dac)
-	void master(machine_config &config);
-	DECLARE_INPUT_CHANGED_MEMBER(slam_w);
-	void init_s80c() { m_slam_low = true; }
+	void p0(machine_config &config) ATTR_COLD;  // base config
+	void p3(machine_config &config) ATTR_COLD;  // no schematic available
+	void p4(machine_config &config) ATTR_COLD;  // same as r2 but bigger ROMs, no speech
+	void p5(machine_config &config) ATTR_COLD;  // same as p4 + YM2151
+	void p6(machine_config &config) ATTR_COLD;  // bonebusters
+	void r2(machine_config &config) ATTR_COLD;  // r2 (2x ay, spo250, DAC)
+	void master(machine_config &config) ATTR_COLD;
+
+	void init_s80c() ATTR_COLD { m_slam_low = true; }
+
+	DECLARE_INPUT_CHANGED_MEMBER(slam_w) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -576,9 +578,6 @@ void gts80b_state::port3b_w(u8 data)
 
 void gts80b_state::machine_start()
 {
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_lamprow));
 	save_item(NAME(m_swrow));
 	save_item(NAME(m_segment));

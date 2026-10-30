@@ -173,262 +173,256 @@ protected:
 		LFRCM_XMOD              = 0xf0,
 	};
 
-	enum : u16
-	{
-		GRPBASE_VALID           = 0x0001,
-		GRPBASE_BASE_ADDR       = 0xfff0,
+	static constexpr u16 GRPBASE_VALID           = 0x0001;
+	static constexpr u16 GRPBASE_BASE_ADDR       = 0xfff0;
 
-		GRPMASK_BASE_MASK       = 0xfff0,
+	static constexpr u16 GRPMASK_BASE_MASK       = 0xfff0;
 
-		PLLCR_DISPLL            = 0x0008,
-		PLLCR_CLKEN             = 0x0010,
-		PLLCR_SYSCLK_SEL_DIV2   = 0x0000,
-		PLLCR_SYSCLK_SEL_DIV4   = 0x0100,
-		PLLCR_SYSCLK_SEL_DIV8   = 0x0200,
-		PLLCR_SYSCLK_SEL_DIV16  = 0x0300,
-		PLLCR_SYSCLK_SEL_DIV1_0 = 0x0400,
-		PLLCR_SYSCLK_SEL_DIV1_1 = 0x0500,
-		PLLCR_SYSCLK_SEL_DIV1_2 = 0x0600,
-		PLLCR_SYSCLK_SEL_DIV1_3 = 0x0700,
-		PLLCR_SYSCLK_SEL        = 0x0700,
-		PLLCR_SYSCLK_SHIFT      = 8,
-		PLLCR_PIXCLK_SEL_DIV2   = 0x0000,
-		PLLCR_PIXCLK_SEL_DIV4   = 0x0800,
-		PLLCR_PIXCLK_SEL_DIV8   = 0x1000,
-		PLLCR_PIXCLK_SEL_DIV16  = 0x1800,
-		PLLCR_PIXCLK_SEL_DIV1_0 = 0x2000,
-		PLLCR_PIXCLK_SEL_DIV1_1 = 0x2800,
-		PLLCR_PIXCLK_SEL_DIV1_2 = 0x3000,
-		PLLCR_PIXCLK_SEL_DIV1_3 = 0x3800,
-		PLLCR_PIXCLK_SEL        = 0x3800,
-		PLLCR_PIXCLK_SHIFT      = 11,
+	static constexpr u16 PLLCR_DISPLL            = 0x0008;
+	static constexpr u16 PLLCR_CLKEN             = 0x0010;
+	static constexpr u16 PLLCR_SYSCLK_SEL_DIV2   = 0x0000;
+	static constexpr u16 PLLCR_SYSCLK_SEL_DIV4   = 0x0100;
+	static constexpr u16 PLLCR_SYSCLK_SEL_DIV8   = 0x0200;
+	static constexpr u16 PLLCR_SYSCLK_SEL_DIV16  = 0x0300;
+	static constexpr u16 PLLCR_SYSCLK_SEL_DIV1_0 = 0x0400;
+	static constexpr u16 PLLCR_SYSCLK_SEL_DIV1_1 = 0x0500;
+	static constexpr u16 PLLCR_SYSCLK_SEL_DIV1_2 = 0x0600;
+	static constexpr u16 PLLCR_SYSCLK_SEL_DIV1_3 = 0x0700;
+	static constexpr u16 PLLCR_SYSCLK_SEL        = 0x0700;
+	static constexpr u16 PLLCR_SYSCLK_SHIFT      = 8;
+	static constexpr u16 PLLCR_PIXCLK_SEL_DIV2   = 0x0000;
+	static constexpr u16 PLLCR_PIXCLK_SEL_DIV4   = 0x0800;
+	static constexpr u16 PLLCR_PIXCLK_SEL_DIV8   = 0x1000;
+	static constexpr u16 PLLCR_PIXCLK_SEL_DIV16  = 0x1800;
+	static constexpr u16 PLLCR_PIXCLK_SEL_DIV1_0 = 0x2000;
+	static constexpr u16 PLLCR_PIXCLK_SEL_DIV1_1 = 0x2800;
+	static constexpr u16 PLLCR_PIXCLK_SEL_DIV1_2 = 0x3000;
+	static constexpr u16 PLLCR_PIXCLK_SEL_DIV1_3 = 0x3800;
+	static constexpr u16 PLLCR_PIXCLK_SEL        = 0x3800;
+	static constexpr u16 PLLCR_PIXCLK_SHIFT      = 11;
 
-		PLLFSR_PCNT             = 0x00ff,
-		PLLFSR_QCNT             = 0x0f00,
-		PLLFSR_PROT             = 0x4000,
-		PLLFSR_CLK32            = 0x8000,
+	static constexpr u16 PLLFSR_PCNT             = 0x00ff;
+	static constexpr u16 PLLFSR_QCNT             = 0x0f00;
+	static constexpr u16 PLLFSR_PROT             = 0x4000;
+	static constexpr u16 PLLFSR_CLK32            = 0x8000;
 
-		ICR_ET6                 = 0x0100,
-		ICR_ET3                 = 0x0200,
-		ICR_ET2                 = 0x0400,
-		ICR_ET1                 = 0x0800,
-		ICR_POL6                = 0x1000,
-		ICR_POL3                = 0x2000,
-		ICR_POL2                = 0x4000,
-		ICR_POL1                = 0x8000,
+	static constexpr u16 ICR_ET6                 = 0x0100;
+	static constexpr u16 ICR_ET3                 = 0x0200;
+	static constexpr u16 ICR_ET2                 = 0x0400;
+	static constexpr u16 ICR_ET1                 = 0x0800;
+	static constexpr u16 ICR_POL6                = 0x1000;
+	static constexpr u16 ICR_POL3                = 0x2000;
+	static constexpr u16 ICR_POL2                = 0x4000;
+	static constexpr u16 ICR_POL1                = 0x8000;
 
-		PWMC_CLKSEL             = 0x0007,
-		PWMC_EN                 = 0x0010,
-		PWMC_POL                = 0x0040,
-		PWMC_PIN                = 0x0080,
-		PWMC_LOAD               = 0x0100,
-		PWMC_IRQ_EN             = 0x4000,
-		PWMC_IRQ                = 0x8000,
+	static constexpr u16 PWMC_CLKSEL             = 0x0007;
+	static constexpr u16 PWMC_EN                 = 0x0010;
+	static constexpr u16 PWMC_POL                = 0x0040;
+	static constexpr u16 PWMC_PIN                = 0x0080;
+	static constexpr u16 PWMC_LOAD               = 0x0100;
+	static constexpr u16 PWMC_IRQ_EN             = 0x4000;
+	static constexpr u16 PWMC_IRQ                = 0x8000;
 
-		TCTL_TEN                = 0x0001,
-		TCTL_TEN_ENABLE         = 0x0001,
-		TCTL_TEN_BIT            = 0,
-		TCTL_CLKSOURCE          = 0x000e,
-		TCTL_CLKSOURCE_STOP     = 0x0000,
-		TCTL_CLKSOURCE_SYSCLK   = 0x0002,
-		TCTL_CLKSOURCE_SYSCLK16 = 0x0004,
-		TCTL_CLKSOURCE_TIN      = 0x0006,
-		TCTL_CLKSOURCE_32KHZ4   = 0x0008,
-		TCTL_CLKSOURCE_32KHZ5   = 0x000a,
-		TCTL_CLKSOURCE_32KHZ6   = 0x000c,
-		TCTL_CLKSOURCE_32KHZ7   = 0x000e,
-		TCTL_IRQEN              = 0x0010,
-		TCTL_IRQEN_ENABLE       = 0x0010,
-		TCTL_OM                 = 0x0020,
-		TCTL_OM_ACTIVELOW       = 0x0000,
-		TCTL_OM_TOGGLE          = 0x0020,
-		TCTL_CAPTURE            = 0x00c0,
-		TCTL_CAPTURE_NOINT      = 0x0000,
-		TCTL_CAPTURE_RISING     = 0x0040,
-		TCTL_CAPTURE_FALLING    = 0x0080,
-		TCTL_CAPTURE_BOTH       = 0x00c0,
-		TCTL_FRR                = 0x0100,
-		TCTL_FRR_RESTART        = 0x0000,
-		TCTL_FRR_FREERUN        = 0x0100,
+	static constexpr u16 TCTL_TEN                = 0x0001;
+	static constexpr u16 TCTL_TEN_ENABLE         = 0x0001;
+	static constexpr u16 TCTL_TEN_BIT            = 0;
+	static constexpr u16 TCTL_CLKSOURCE          = 0x000e;
+	static constexpr u16 TCTL_CLKSOURCE_STOP     = 0x0000;
+	static constexpr u16 TCTL_CLKSOURCE_SYSCLK   = 0x0002;
+	static constexpr u16 TCTL_CLKSOURCE_SYSCLK16 = 0x0004;
+	static constexpr u16 TCTL_CLKSOURCE_TIN      = 0x0006;
+	static constexpr u16 TCTL_CLKSOURCE_32KHZ4   = 0x0008;
+	static constexpr u16 TCTL_CLKSOURCE_32KHZ5   = 0x000a;
+	static constexpr u16 TCTL_CLKSOURCE_32KHZ6   = 0x000c;
+	static constexpr u16 TCTL_CLKSOURCE_32KHZ7   = 0x000e;
+	static constexpr u16 TCTL_IRQEN              = 0x0010;
+	static constexpr u16 TCTL_IRQEN_ENABLE       = 0x0010;
+	static constexpr u16 TCTL_OM                 = 0x0020;
+	static constexpr u16 TCTL_OM_ACTIVELOW       = 0x0000;
+	static constexpr u16 TCTL_OM_TOGGLE          = 0x0020;
+	static constexpr u16 TCTL_CAPTURE            = 0x00c0;
+	static constexpr u16 TCTL_CAPTURE_NOINT      = 0x0000;
+	static constexpr u16 TCTL_CAPTURE_RISING     = 0x0040;
+	static constexpr u16 TCTL_CAPTURE_FALLING    = 0x0080;
+	static constexpr u16 TCTL_CAPTURE_BOTH       = 0x00c0;
+	static constexpr u16 TCTL_FRR                = 0x0100;
+	static constexpr u16 TCTL_FRR_RESTART        = 0x0000;
+	static constexpr u16 TCTL_FRR_FREERUN        = 0x0100;
 
-		TSTAT_COMP              = 0x0001,
-		TSTAT_CAPT              = 0x0002,
+	static constexpr u16 TSTAT_COMP              = 0x0001;
+	static constexpr u16 TSTAT_CAPT              = 0x0002;
 
-		SPIS_SPISEN             = 0x0100,
-		SPIS_POL                = 0x0200,
-		SPIS_PHA                = 0x0400,
-		SPIS_OVRWR              = 0x0800,
-		SPIS_DATA_RDY           = 0x1000,
-		SPIS_ENPOL              = 0x2000,
-		SPIS_IRQEN              = 0x4000,
-		SPIS_SPIS_IRQ           = 0x8000,
+	static constexpr u16 SPIS_SPISEN             = 0x0100;
+	static constexpr u16 SPIS_POL                = 0x0200;
+	static constexpr u16 SPIS_PHA                = 0x0400;
+	static constexpr u16 SPIS_OVRWR              = 0x0800;
+	static constexpr u16 SPIS_DATA_RDY           = 0x1000;
+	static constexpr u16 SPIS_ENPOL              = 0x2000;
+	static constexpr u16 SPIS_IRQEN              = 0x4000;
+	static constexpr u16 SPIS_SPIS_IRQ           = 0x8000;
 
-		SPIM_BIT_COUNT          = 0x000f,
-		SPIM_POL_BIT            = 4,
-		SPIM_PHA_BIT            = 5,
-		SPIM_IRQEN_BIT          = 6,
-		SPIM_SPIMIRQ_BIT        = 7,
-		SPIM_XCH_BIT            = 8,
-		SPIM_SPMEN_BIT          = 9,
-		SPIM_RATE_MASK          = 0xe000,
-		SPIM_RATE_SHIFT         = 13,
+	static constexpr u16 SPIM_BIT_COUNT          = 0x000f;
+	static constexpr u16 SPIM_POL_BIT            = 4;
+	static constexpr u16 SPIM_PHA_BIT            = 5;
+	static constexpr u16 SPIM_IRQEN_BIT          = 6;
+	static constexpr u16 SPIM_SPIMIRQ_BIT        = 7;
+	static constexpr u16 SPIM_XCH_BIT            = 8;
+	static constexpr u16 SPIM_SPMEN_BIT          = 9;
+	static constexpr u16 SPIM_RATE_MASK          = 0xe000;
+	static constexpr u16 SPIM_RATE_SHIFT         = 13;
 
-		USTCNT_TX_AVAIL_EN      = 0x0001,
-		USTCNT_TX_HALF_EN       = 0x0002,
-		USTCNT_TX_EMPTY_EN      = 0x0004,
-		USTCNT_RX_RDY_EN        = 0x0008,
-		USTCNT_RX_HALF_EN       = 0x0010,
-		USTCNT_RX_FULL_EN       = 0x0020,
-		USTCNT_CTS_DELTA_EN     = 0x0040,
-		USTCNT_GPIO_DELTA_EN    = 0x0080,
-		USTCNT_8_7              = 0x0100,
-		USTCNT_STOP_BITS        = 0x0200,
-		USTCNT_ODD_EVEN         = 0x0400,
-		USTCNT_PARITY_EN        = 0x0800,
-		USTCNT_RX_CLK_CONT      = 0x1000,
-		USTCNT_TX_EN            = 0x2000,
-		USTCNT_RX_EN            = 0x4000,
-		USTCNT_UART_EN          = 0x8000,
+	static constexpr u16 USTCNT_TX_AVAIL_EN      = 0x0001;
+	static constexpr u16 USTCNT_TX_HALF_EN       = 0x0002;
+	static constexpr u16 USTCNT_TX_EMPTY_EN      = 0x0004;
+	static constexpr u16 USTCNT_RX_RDY_EN        = 0x0008;
+	static constexpr u16 USTCNT_RX_HALF_EN       = 0x0010;
+	static constexpr u16 USTCNT_RX_FULL_EN       = 0x0020;
+	static constexpr u16 USTCNT_CTS_DELTA_EN     = 0x0040;
+	static constexpr u16 USTCNT_GPIO_DELTA_EN    = 0x0080;
+	static constexpr u16 USTCNT_8_7              = 0x0100;
+	static constexpr u16 USTCNT_STOP_BITS        = 0x0200;
+	static constexpr u16 USTCNT_ODD_EVEN         = 0x0400;
+	static constexpr u16 USTCNT_PARITY_EN        = 0x0800;
+	static constexpr u16 USTCNT_RX_CLK_CONT      = 0x1000;
+	static constexpr u16 USTCNT_TX_EN            = 0x2000;
+	static constexpr u16 USTCNT_RX_EN            = 0x4000;
+	static constexpr u16 USTCNT_UART_EN          = 0x8000;
 
-		UBAUD_PRESCALER         = 0x00ff,
-		UBAUD_DIVIDE            = 0x0700,
-		UBAUD_DIVIDE_1          = 0x0000,
-		UBAUD_DIVIDE_2          = 0x0100,
-		UBAUD_DIVIDE_4          = 0x0200,
-		UBAUD_DIVIDE_8          = 0x0300,
-		UBAUD_DIVIDE_16         = 0x0400,
-		UBAUD_DIVIDE_32         = 0x0500,
-		UBAUD_DIVIDE_64         = 0x0600,
-		UBAUD_DIVIDE_128        = 0x0700,
-		UBAUD_BAUD_SRC          = 0x0800,
-		UBAUD_GPIO_SRC          = 0x1000,
-		UBAUD_GPIO_DIR          = 0x2000,
-		UBAUD_GPIO              = 0x4000,
-		UBAUD_GPIO_DELTA        = 0x8000,
+	static constexpr u16 UBAUD_PRESCALER         = 0x00ff;
+	static constexpr u16 UBAUD_DIVIDE            = 0x0700;
+	static constexpr u16 UBAUD_DIVIDE_1          = 0x0000;
+	static constexpr u16 UBAUD_DIVIDE_2          = 0x0100;
+	static constexpr u16 UBAUD_DIVIDE_4          = 0x0200;
+	static constexpr u16 UBAUD_DIVIDE_8          = 0x0300;
+	static constexpr u16 UBAUD_DIVIDE_16         = 0x0400;
+	static constexpr u16 UBAUD_DIVIDE_32         = 0x0500;
+	static constexpr u16 UBAUD_DIVIDE_64         = 0x0600;
+	static constexpr u16 UBAUD_DIVIDE_128        = 0x0700;
+	static constexpr u16 UBAUD_BAUD_SRC          = 0x0800;
+	static constexpr u16 UBAUD_GPIO_SRC          = 0x1000;
+	static constexpr u16 UBAUD_GPIO_DIR          = 0x2000;
+	static constexpr u16 UBAUD_GPIO              = 0x4000;
+	static constexpr u16 UBAUD_GPIO_DELTA        = 0x8000;
 
-		URX_PARITY_ERROR        = 0x0100,
-		URX_BREAK               = 0x0200,
-		URX_FRAME_ERROR         = 0x0400,
-		URX_OVRUN               = 0x0800,
-		URX_DATA_READY          = 0x2000,
-		URX_FIFO_HALF           = 0x4000,
-		URX_FIFO_FULL           = 0x8000,
+	static constexpr u16 URX_PARITY_ERROR        = 0x0100;
+	static constexpr u16 URX_BREAK               = 0x0200;
+	static constexpr u16 URX_FRAME_ERROR         = 0x0400;
+	static constexpr u16 URX_OVRUN               = 0x0800;
+	static constexpr u16 URX_DATA_READY          = 0x2000;
+	static constexpr u16 URX_FIFO_HALF           = 0x4000;
+	static constexpr u16 URX_FIFO_FULL           = 0x8000;
 
-		UTX_CTS_DELTA           = 0x0100,
-		UTX_CTS_STATUS          = 0x0200,
-		UTX_IGNORE_CTS          = 0x0800,
-		UTX_SEND_BREAK          = 0x1000,
-		UTX_TX_AVAIL            = 0x2000,
-		UTX_FIFO_HALF           = 0x4000,
-		UTX_FIFO_EMPTY          = 0x8000,
+	static constexpr u16 UTX_CTS_DELTA           = 0x0100;
+	static constexpr u16 UTX_CTS_STATUS          = 0x0200;
+	static constexpr u16 UTX_IGNORE_CTS          = 0x0800;
+	static constexpr u16 UTX_SEND_BREAK          = 0x1000;
+	static constexpr u16 UTX_TX_AVAIL            = 0x2000;
+	static constexpr u16 UTX_FIFO_HALF           = 0x4000;
+	static constexpr u16 UTX_FIFO_EMPTY          = 0x8000;
 
-		UMISC_IRDA_LOOP         = 0x0010,
-		UMISC_IRDA_ENABLE       = 0x0020,
-		UMISC_RTS               = 0x0040,
-		UMISC_RTS_CONT          = 0x0080,
-		UMISC_LOOP              = 0x1000,
-		UMISC_FORCE_PERR        = 0x2000,
-		UMISC_CLK_SRC           = 0x4000,
+	static constexpr u16 UMISC_IRDA_LOOP         = 0x0010;
+	static constexpr u16 UMISC_IRDA_ENABLE       = 0x0020;
+	static constexpr u16 UMISC_RTS               = 0x0040;
+	static constexpr u16 UMISC_RTS_CONT          = 0x0080;
+	static constexpr u16 UMISC_LOOP              = 0x1000;
+	static constexpr u16 UMISC_FORCE_PERR        = 0x2000;
+	static constexpr u16 UMISC_CLK_SRC           = 0x4000;
 
-		CXP_MASK                = 0x03ff,
-		CXP_CC                  = 0xc000,
-		CXP_CC_XLU              = 0x0000,
-		CXP_CC_BLACK            = 0x4000,
-		CXP_CC_INVERSE          = 0x8000,
-		CXP_CC_INVALID          = 0xc000,
+	static constexpr u16 CXP_MASK                = 0x03ff;
+	static constexpr u16 CXP_CC                  = 0xc000;
+	static constexpr u16 CXP_CC_XLU              = 0x0000;
+	static constexpr u16 CXP_CC_BLACK            = 0x4000;
+	static constexpr u16 CXP_CC_INVERSE          = 0x8000;
+	static constexpr u16 CXP_CC_INVALID          = 0xc000;
 
-		CYP_MASK                = 0x01ff,
+	static constexpr u16 CYP_MASK                = 0x01ff;
 
-		CWCH_CH                 = 0x001f,
-		CWCH_CW                 = 0x1f00,
+	static constexpr u16 CWCH_CH                 = 0x001f;
+	static constexpr u16 CWCH_CW                 = 0x1f00;
 
-		LXMAX_MASK              = 0x03ff,
+	static constexpr u16 LXMAX_MASK              = 0x03ff;
 
-		LYMAX_MASK              = 0x03ff,
+	static constexpr u16 LYMAX_MASK              = 0x03ff;
 
-		RTCCTL_38_4_BIT         = 5,
-		RTCCTL_ENABLE_BIT       = 7,
-		RTCCTL_MASK             = 0x00a0,
+	static constexpr u16 RTCCTL_38_4_BIT         = 5;
+	static constexpr u16 RTCCTL_ENABLE_BIT       = 7;
+	static constexpr u16 RTCCTL_MASK             = 0x00a0;
 
-		RTCINT_STOPWATCH        = 0x0001,
-		RTCINT_MINUTE           = 0x0002,
-		RTCINT_ALARM            = 0x0004,
-		RTCINT_DAY              = 0x0008,
-		RTCINT_SECOND           = 0x0010,
+	static constexpr u16 RTCINT_STOPWATCH        = 0x0001;
+	static constexpr u16 RTCINT_MINUTE           = 0x0002;
+	static constexpr u16 RTCINT_ALARM            = 0x0004;
+	static constexpr u16 RTCINT_DAY              = 0x0008;
+	static constexpr u16 RTCINT_SECOND           = 0x0010;
 
-		RTCSTPWTCH_MASK         = 0x003f,
-	};
+	static constexpr u16 RTCSTPWTCH_MASK         = 0x003f;
 
-	enum : u32
-	{
-		CSAB_WAIT               = 0x00000007,
-		CSAB_RO                 = 0x00000008,
-		CSAB_MASK               = 0x0000ff00,
-		CSAB_BSW                = 0x00010000,
-		CSAB_COMPARE            = 0xff000000,
+	static constexpr u32 CSAB_WAIT               = 0x00000007;
+	static constexpr u32 CSAB_RO                 = 0x00000008;
+	static constexpr u32 CSAB_MASK               = 0x0000ff00;
+	static constexpr u32 CSAB_BSW                = 0x00010000;
+	static constexpr u32 CSAB_COMPARE            = 0xff000000;
 
-		CSCD_WAIT               = 0x00000007,
-		CSCD_RO                 = 0x00000008,
-		CSCD_MASK               = 0x0000fff0,
-		CSCD_BSW                = 0x00010000,
-		CSCD_COMPARE            = 0xfff00000,
+	static constexpr u32 CSCD_WAIT               = 0x00000007;
+	static constexpr u32 CSCD_RO                 = 0x00000008;
+	static constexpr u32 CSCD_MASK               = 0x0000fff0;
+	static constexpr u32 CSCD_BSW                = 0x00010000;
+	static constexpr u32 CSCD_COMPARE            = 0xfff00000;
 
-		INT_SPIM                = 0,
-		INT_SPIM_MASK           = (1 << INT_SPIM),
-		INT_TIMER2              = 1,
-		INT_TIMER2_MASK         = (1 << INT_TIMER2),
-		INT_UART                = 2,
-		INT_UART_MASK           = (1 << INT_UART),
-		INT_WDT                 = 3,
-		INT_WDT_MASK            = (1 << INT_WDT),
-		INT_RTC                 = 4,
-		INT_RTC_MASK            = (1 << INT_RTC),
-		INT_KB                  = 6,
-		INT_KB_MASK             = (1 << INT_KB),
-		INT_PWM                 = 7,
-		INT_PWM_MASK            = (1 << INT_PWM),
-		INT_INT0                = 8,
-		INT_INT0_MASK           = (1 << INT_INT0),
-		INT_INT1                = 9,
-		INT_INT1_MASK           = (1 << INT_INT1),
-		INT_INT2                = 10,
-		INT_INT2_MASK           = (1 << INT_INT2),
-		INT_INT3                = 11,
-		INT_INT3_MASK           = (1 << INT_INT3),
-		INT_INT4                = 12,
-		INT_INT4_MASK           = (1 << INT_INT4),
-		INT_INT5                = 13,
-		INT_INT5_MASK           = (1 << INT_INT5),
-		INT_INT6                = 14,
-		INT_INT6_MASK           = (1 << INT_INT6),
-		INT_INT7                = 15,
-		INT_INT7_MASK           = (1 << INT_INT7),
-		INT_KBDINTS             = 8,
-		INT_KBDINTS_MASK        = (1 << INT_KBDINTS),
-		INT_IRQ1                = 16,
-		INT_IRQ1_MASK           = (1 << INT_IRQ1),
-		INT_IRQ2                = 17,
-		INT_IRQ2_MASK           = (1 << INT_IRQ2),
-		INT_IRQ3                = 18,
-		INT_IRQ3_MASK           = (1 << INT_IRQ3),
-		INT_IRQ6                = 19,
-		INT_IRQ6_MASK           = (1 << INT_IRQ6),
-		INT_IRQ5                = 20,
-		INT_IRQ5_MASK           = (1 << INT_IRQ5),
-		INT_SPIS                = 21,
-		INT_SPIS_MASK           = (1 << INT_SPIS),
-		INT_TIMER1              = 22,
-		INT_TIMER1_MASK         = (1 << INT_TIMER1),
-		INT_IRQ7                = 23,
-		INT_IRQ7_MASK           = (1 << INT_IRQ7),
+	static constexpr u32 INT_SPIM                = 0;
+	static constexpr u32 INT_SPIM_MASK           = 1 << INT_SPIM;
+	static constexpr u32 INT_TIMER2              = 1;
+	static constexpr u32 INT_TIMER2_MASK         = 1 << INT_TIMER2;
+	static constexpr u32 INT_UART                = 2;
+	static constexpr u32 INT_UART_MASK           = 1 << INT_UART;
+	static constexpr u32 INT_WDT                 = 3;
+	static constexpr u32 INT_WDT_MASK            = 1 << INT_WDT;
+	static constexpr u32 INT_RTC                 = 4;
+	static constexpr u32 INT_RTC_MASK            = 1 << INT_RTC;
+	static constexpr u32 INT_KB                  = 6;
+	static constexpr u32 INT_KB_MASK             = 1 << INT_KB;
+	static constexpr u32 INT_PWM                 = 7;
+	static constexpr u32 INT_PWM_MASK            = 1 << INT_PWM;
+	static constexpr u32 INT_INT0                = 8;
+	static constexpr u32 INT_INT0_MASK           = 1 << INT_INT0;
+	static constexpr u32 INT_INT1                = 9;
+	static constexpr u32 INT_INT1_MASK           = 1 << INT_INT1;
+	static constexpr u32 INT_INT2                = 10;
+	static constexpr u32 INT_INT2_MASK           = 1 << INT_INT2;
+	static constexpr u32 INT_INT3                = 11;
+	static constexpr u32 INT_INT3_MASK           = 1 << INT_INT3;
+	static constexpr u32 INT_INT4                = 12;
+	static constexpr u32 INT_INT4_MASK           = 1 << INT_INT4;
+	static constexpr u32 INT_INT5                = 13;
+	static constexpr u32 INT_INT5_MASK           = 1 << INT_INT5;
+	static constexpr u32 INT_INT6                = 14;
+	static constexpr u32 INT_INT6_MASK           = 1 << INT_INT6;
+	static constexpr u32 INT_INT7                = 15;
+	static constexpr u32 INT_INT7_MASK           = 1 << INT_INT7;
+	static constexpr u32 INT_KBDINTS             = 8;
+	static constexpr u32 INT_KBDINTS_MASK        = 1 << INT_KBDINTS;
+	static constexpr u32 INT_IRQ1                = 16;
+	static constexpr u32 INT_IRQ1_MASK           = 1 << INT_IRQ1;
+	static constexpr u32 INT_IRQ2                = 17;
+	static constexpr u32 INT_IRQ2_MASK           = 1 << INT_IRQ2;
+	static constexpr u32 INT_IRQ3                = 18;
+	static constexpr u32 INT_IRQ3_MASK           = 1 << INT_IRQ3;
+	static constexpr u32 INT_IRQ6                = 19;
+	static constexpr u32 INT_IRQ6_MASK           = 1 << INT_IRQ6;
+	static constexpr u32 INT_IRQ5                = 20;
+	static constexpr u32 INT_IRQ5_MASK           = 1 << INT_IRQ5;
+	static constexpr u32 INT_SPIS                = 21;
+	static constexpr u32 INT_SPIS_MASK           = 1 << INT_SPIS;
+	static constexpr u32 INT_TIMER1              = 22;
+	static constexpr u32 INT_TIMER1_MASK         = 1 << INT_TIMER1;
+	static constexpr u32 INT_IRQ7                = 23;
+	static constexpr u32 INT_IRQ7_MASK           = 1 << INT_IRQ7;
 
-		RTCHMSR_SECONDS         = 0x0000003f,
-		RTCHMSR_SECONDS_SHIFT   = 0,
-		RTCHMSR_MINUTES         = 0x003f0000,
-		RTCHMSR_MINUTES_SHIFT   = 16,
-		RTCHMSR_HOURS           = 0x1f000000,
-		RTCHMSR_HOURS_SHIFT     = 24,
-	};
+	static constexpr u32 RTCHMSR_SECONDS         = 0x0000003f;
+	static constexpr u32 RTCHMSR_SECONDS_SHIFT   = 0;
+	static constexpr u32 RTCHMSR_MINUTES         = 0x003f0000;
+	static constexpr u32 RTCHMSR_MINUTES_SHIFT   = 16;
+	static constexpr u32 RTCHMSR_HOURS           = 0x1f000000;
+	static constexpr u32 RTCHMSR_HOURS_SHIFT     = 24;
 
 	virtual void scr_w(u8 data);
 
@@ -850,28 +844,25 @@ private:
 		LCKCON_LCDON_BIT        = 7,
 	};
 
-	enum : u16
-	{
-		PWMC_CLKSEL             = 0x0007,
-		PWMC_PWMEN              = 0x0010,
-		PWMC_POL                = 0x0040,
-		PWMC_PIN                = 0x0080,
-		PWMC_LOAD               = 0x0100,
-		PWMC_IRQEN              = 0x4000,
-		PWMC_PWMIRQ             = 0x8000,
+	static constexpr u16 PWMC_CLKSEL             = 0x0007;
+	static constexpr u16 PWMC_PWMEN              = 0x0010;
+	static constexpr u16 PWMC_POL                = 0x0040;
+	static constexpr u16 PWMC_PIN                = 0x0080;
+	static constexpr u16 PWMC_LOAD               = 0x0100;
+	static constexpr u16 PWMC_IRQEN              = 0x4000;
+	static constexpr u16 PWMC_PWMIRQ             = 0x8000;
 
-		LGPMR_PAL2              = 0x0007,
-		LGPMR_PAL3              = 0x0070,
-		LGPMR_PAL0              = 0x0700,
-		LGPMR_PAL1              = 0x7000,
+	static constexpr u16 LGPMR_PAL2              = 0x0007;
+	static constexpr u16 LGPMR_PAL3              = 0x0070;
+	static constexpr u16 LGPMR_PAL0              = 0x0700;
+	static constexpr u16 LGPMR_PAL1              = 0x7000;
 
-		WCTLR_WDRST             = 0x0008,
-		WCTLR_LOCK              = 0x0004,
-		WCTLR_FI                = 0x0002,
-		WCTLR_WDEN              = 0x0001,
+	static constexpr u16 WCTLR_WDRST             = 0x0008;
+	static constexpr u16 WCTLR_LOCK              = 0x0004;
+	static constexpr u16 WCTLR_FI                = 0x0002;
+	static constexpr u16 WCTLR_WDEN              = 0x0001;
 
-		RTCIENR_MASK            = 0x001f,
-	};
+	static constexpr u16 RTCIENR_MASK            = 0x001f;
 
 	void grpmaska_w(u16 data);
 	void grpmaskb_w(u16 data);
@@ -1078,70 +1069,64 @@ private:
 		LCKCON_LCDON_BIT        = 7,
 	};
 
-	enum : u16
-	{
-		CSA_MASK                = 0x81ff,
-		CSB_MASK                = 0xf9ff,
-		CSC_MASK                = 0xf9ff,
-		CSD_MASK                = 0xffff,
-		EMUCS_MASK              = 0x0070,
-		CS_EN_BIT               = 0,
-		CS_SIZ_MASK             = 0x000e,
-		CS_SIZ_SHIFT            = 1,
-		CS_WS_MASK              = 0x0070,
-		CS_WS_SHIFT             = 4,
-		CS_BSW_BIT              = 7,
-		CS_FLASH_BIT            = 8,
-		CS_DRAM_BIT             = 9,
-		CS_COMB_BIT             = 10,
-		CS_UPSIZ_MASK           = 0x1800,
-		CS_UPSIZ_SHIFT          = 11,
-		CS_ROP_BIT              = 13,
-		CS_SOP_BIT              = 14,
-		CS_RO_BIT               = 15,
+	static constexpr u16 CSA_MASK                = 0x81ff;
+	static constexpr u16 CSB_MASK                = 0xf9ff;
+	static constexpr u16 CSC_MASK                = 0xf9ff;
+	static constexpr u16 CSD_MASK                = 0xffff;
+	static constexpr u16 EMUCS_MASK              = 0x0070;
+	static constexpr u16 CS_EN_BIT               = 0;
+	static constexpr u16 CS_SIZ_MASK             = 0x000e;
+	static constexpr u16 CS_SIZ_SHIFT            = 1;
+	static constexpr u16 CS_WS_MASK              = 0x0070;
+	static constexpr u16 CS_WS_SHIFT             = 4;
+	static constexpr u16 CS_BSW_BIT              = 7;
+	static constexpr u16 CS_FLASH_BIT            = 8;
+	static constexpr u16 CS_DRAM_BIT             = 9;
+	static constexpr u16 CS_COMB_BIT             = 10;
+	static constexpr u16 CS_UPSIZ_MASK           = 0x1800;
+	static constexpr u16 CS_UPSIZ_SHIFT          = 11;
+	static constexpr u16 CS_ROP_BIT              = 13;
+	static constexpr u16 CS_SOP_BIT              = 14;
+	static constexpr u16 CS_RO_BIT               = 15;
 
-		PWMC_CLKSEL             = 0x0003,
-		PWMC_REPEAT             = 0x000c,
-		PWMC_REPEAT_SHIFT       = 2,
-		PWMC_EN                 = 0x0010,
-		PWMC_FIFO_AV            = 0x0020,
-		PWMC_IRQ_EN             = 0x0040,
-		PWMC_IRQ                = 0x0080,
-		PWMC_IRQ_BIT            = 7,
-		PWMC_PRESCALE           = 0x7f00,
-		PWMC_PRESCALE_SHIFT     = 8,
-		PWMC_CLK_SRC            = 0x8000,
-		PWMC_RECALC_MASK        = PWMC_CLK_SRC | PWMC_PRESCALE | PWMC_CLKSEL | PWMC_EN,
+	static constexpr u16 PWMC_CLKSEL             = 0x0003;
+	static constexpr u16 PWMC_REPEAT             = 0x000c;
+	static constexpr u16 PWMC_REPEAT_SHIFT       = 2;
+	static constexpr u16 PWMC_EN                 = 0x0010;
+	static constexpr u16 PWMC_FIFO_AV            = 0x0020;
+	static constexpr u16 PWMC_IRQ_EN             = 0x0040;
+	static constexpr u16 PWMC_IRQ                = 0x0080;
+	static constexpr u16 PWMC_IRQ_BIT            = 7;
+	static constexpr u16 PWMC_PRESCALE           = 0x7f00;
+	static constexpr u16 PWMC_PRESCALE_SHIFT     = 8;
+	static constexpr u16 PWMC_CLK_SRC            = 0x8000;
+	static constexpr u16 PWMC_RECALC_MASK        = PWMC_CLK_SRC | PWMC_PRESCALE | PWMC_CLKSEL | PWMC_EN;
 
-		WATCHDOG_MASK           = 0x0083,
-		WATCHDOG_EN_BIT         = 0,
-		WATCHDOG_ISEL_BIT       = 1,
-		WATCHDOG_INTF           = 0x0080,
-		WATCHDOG_INTF_BIT       = 7,
-		WATCHDOG_CNT_MASK       = 0x0300,
-		WATCHDOG_CNT_SHIFT      = 8,
+	static constexpr u16 WATCHDOG_MASK           = 0x0083;
+	static constexpr u16 WATCHDOG_EN_BIT         = 0;
+	static constexpr u16 WATCHDOG_ISEL_BIT       = 1;
+	static constexpr u16 WATCHDOG_INTF           = 0x0080;
+	static constexpr u16 WATCHDOG_INTF_BIT       = 7;
+	static constexpr u16 WATCHDOG_CNT_MASK       = 0x0300;
+	static constexpr u16 WATCHDOG_CNT_SHIFT      = 8;
 
-		RTCINT_HOUR             = 0x0020,
-		RTCINT_SAM0             = 0x0100,
-		RTCINT_SAM1             = 0x0200,
-		RTCINT_SAM2             = 0x0400,
-		RTCINT_SAM3             = 0x0800,
-		RTCINT_SAM4             = 0x1000,
-		RTCINT_SAM5             = 0x2000,
-		RTCINT_SAM6             = 0x4000,
-		RTCINT_SAM7             = 0x8000,
-		RTCINT_RTCIRQ_MASK      = 0x00ff,
+	static constexpr u16 RTCINT_HOUR             = 0x0020;
+	static constexpr u16 RTCINT_SAM0             = 0x0100;
+	static constexpr u16 RTCINT_SAM1             = 0x0200;
+	static constexpr u16 RTCINT_SAM2             = 0x0400;
+	static constexpr u16 RTCINT_SAM3             = 0x0800;
+	static constexpr u16 RTCINT_SAM4             = 0x1000;
+	static constexpr u16 RTCINT_SAM5             = 0x2000;
+	static constexpr u16 RTCINT_SAM6             = 0x4000;
+	static constexpr u16 RTCINT_SAM7             = 0x8000;
+	static constexpr u16 RTCINT_RTCIRQ_MASK      = 0x00ff;
 
-		RTC_DAYS_MASK           = 0x01ff,
-	};
+	static constexpr u16 RTC_DAYS_MASK           = 0x01ff;
 
-	enum : u32
-	{
-		INT_MSAM                = 22,
-		INT_MSAM_MASK           = (1 << INT_MSAM),
-		INT_MEMIQ               = 23,
-		INT_MEMIQ_MASK          = (1 << INT_MEMIQ),
-	};
+	static constexpr u32 INT_MSAM                = 22;
+	static constexpr u32 INT_MSAM_MASK           = 1 << INT_MSAM;
+	static constexpr u32 INT_MEMIQ               = 23;
+	static constexpr u32 INT_MEMIQ_MASK          = 1 << INT_MEMIQ;
 
 	virtual void scr_w(u8 data) override;
 

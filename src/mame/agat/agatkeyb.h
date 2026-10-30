@@ -27,7 +27,7 @@ public:
 		const machine_config &mconfig,
 		const char *tag,
 		device_t *owner,
-		u32 clock);
+		u32 clock = 0);
 
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 

@@ -99,24 +99,9 @@ public:
 		, m_char_device(*this, "pwm_char_device")
 		, m_chars(*this, "char_%d", 1U)
 		, m_led_matrix_device(*this, "pwm_led_matrix_device")
-		, m_leds(8)
+		, m_leds(*this, LED_NAMES)
 		, m_cv(NUM_CVS, -1)
 	{
-		for (int i = 0; i < 8; ++i)
-		{
-			for (int j = 0; j < 4; ++j)
-			{
-				m_leds[i].push_back(
-					output_finder<>(
-						*this, std::string("led_") + BOARD_6_LED_NAMES[i][j]));
-			}
-			for (int j = 0; j < 4; ++j)
-			{
-				m_leds[i].push_back(
-					output_finder<>(
-						*this, std::string("led_") + BOARD_7_LED_NAMES[i][j]));
-			}
-		}
 	}
 
 	void memorymoog(machine_config &config) ATTR_COLD;
@@ -187,33 +172,21 @@ private:
 	u16 m_char_led_source = 0x3fff;
 
 	required_device<pwm_display_device> m_led_matrix_device;
-	std::vector<std::vector<output_finder<>>> m_leds;
+	output_finder<8, 8> m_leds;
 
 	std::vector<float> m_cv; // Control voltages. See CV_NAMES below.
 
-	// When these strings get converted to output names, they will include
-	// the "led_" prefix.
-	static constexpr const char *BOARD_6_LED_NAMES[8][4] =
+	static constexpr const char *LED_NAMES[8][8] =
 	{
-		{"osc1_2'", "osc1_4'", "osc1_8'", "osc1_16'"},
-		{"osc2_2'", "osc2_4'", "osc2_8'", "osc2_16'"},
-		{"osc3_2'", "osc3_4'", "osc3_8'", "osc3_16'"},
-		{"kybd_control", "sync_2to1", "NOT_CONNECTED_1", "low"},
-		{"osc3_ramp", "osc3_pulse", "osc3_tri", "release"},
-		{"osc2_ramp", "osc2_pulse", "osc2_tri", "uncond_cont"},
-		{"osc1_ramp", "osc1_pulse", "osc1_tri", "return_to_zero"},
-		{"2/3_kybd_trk", "NOT_CONNECTED_2", "1/3_kybd_trk", "kybd_follow"},
-	};
-	static constexpr const char *BOARD_7_LED_NAMES[8][4] =
-	{
-		{"saw_lfo", "osc2_freq_lfo", "hold", "kybd_mode"},
-		{"tri_lfo", "osc1_freq_lfo", "kybd_out", "mono"},
-		{"ramp_lfo", "osc3_freq_lfo", "arpeggiator", "glide"},
-		{"square_lfo", "pw1_lfo", "NOT_CONNECTED_3", "mult_trig"},
-		{"filter_lfo", "pw3_lfo", "fp2_osc2", "vm_freq1"},
-		{"sh_lfo", "pw2_lfo", "fp1_filter", "fp2_mod"},
-		{"osc3_amt", "fp1_pitch", "vm_pw2", "vm_filter"},
-		{"invert", "fp1_volume", "vm_pw1", "vm_freq2"},
+		// board 6                                                                               board 7
+		{"led_osc1_2'",      "led_osc1_4'",         "led_osc1_8'",         "led_osc1_16'",       "led_saw_lfo",    "led_osc2_freq_lfo", "led_hold",            "led_kybd_mode"},
+		{"led_osc2_2'",      "led_osc2_4'",         "led_osc2_8'",         "led_osc2_16'",       "led_tri_lfo",    "led_osc1_freq_lfo", "led_kybd_out",        "led_mono"},
+		{"led_osc3_2'",      "led_osc3_4'",         "led_osc3_8'",         "led_osc3_16'",       "led_ramp_lfo",   "led_osc3_freq_lfo", "led_arpeggiator",     "led_glide"},
+		{"led_kybd_control", "led_sync_2to1",       "led_NOT_CONNECTED_1", "led_low",            "led_square_lfo", "led_pw1_lfo",       "led_NOT_CONNECTED_3", "led_mult_trig"},
+		{"led_osc3_ramp",    "led_osc3_pulse",      "led_osc3_tri",        "led_release",        "led_filter_lfo", "led_pw3_lfo",       "led_fp2_osc2",        "led_vm_freq1"},
+		{"led_osc2_ramp",    "led_osc2_pulse",      "led_osc2_tri",        "led_uncond_cont",    "led_sh_lfo",     "led_pw2_lfo",       "led_fp1_filter",      "led_fp2_mod"},
+		{"led_osc1_ramp",    "led_osc1_pulse",      "led_osc1_tri",        "led_return_to_zero", "led_osc3_amt",   "led_fp1_pitch",     "led_vm_pw2",          "led_vm_filter"},
+		{"led_2/3_kybd_trk", "led_NOT_CONNECTED_2", "led_1/3_kybd_trk",    "led_kybd_follow",    "led_invert",     "led_fp1_volume",    "led_vm_pw1",          "led_vm_freq2"},
 	};
 
 	static constexpr const int NUM_CVS = 64;
@@ -639,14 +612,6 @@ void memorymoog_state::io_map(address_map &map)
 
 void memorymoog_state::machine_start()
 {
-	m_digits.resolve();
-	m_chars.resolve();
-	m_octave_minus_1_led.resolve();
-	m_octave_0_led.resolve();
-	for (std::vector<output_finder<>> &led_row : m_leds)
-		for (output_finder<> &led_output : led_row)
-			led_output.resolve();
-
 	save_item(NAME(m_keyboard_columns));
 	save_item(NAME(m_switch_rows));
 	save_item(NAME(m_dac_latch));

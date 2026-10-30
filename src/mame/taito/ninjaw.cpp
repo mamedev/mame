@@ -330,6 +330,7 @@ rumbling on a subwoofer in the cabinet.)
 
 #include "emupal.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "ninjaw.lh"
@@ -916,7 +917,7 @@ void ninjaw_state::ninjaw(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(16000000/1024));  /* CPU slices */
 	//config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
+	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc"));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
 	tc0040ioc.read_1_callback().set_ioport("DSWB");
 	tc0040ioc.read_2_callback().set_ioport("IN0");
@@ -931,7 +932,7 @@ void ninjaw_state::ninjaw(machine_config &config)
 
 	config.set_default_layout(layout_ninjaw);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(60);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	lscreen.set_size(36*8, 32*8);
@@ -939,7 +940,7 @@ void ninjaw_state::ninjaw(machine_config &config)
 	lscreen.set_screen_update(FUNC(ninjaw_state::screen_update_left));
 	lscreen.set_palette(m_tc0110pcr[0]);
 
-	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
+	screen_device &mscreen(SCREEN(config, "mscreen"));
 	mscreen.set_refresh_hz(60);
 	mscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	mscreen.set_size(36*8, 32*8);
@@ -947,7 +948,7 @@ void ninjaw_state::ninjaw(machine_config &config)
 	mscreen.set_screen_update(FUNC(ninjaw_state::screen_update_middle));
 	mscreen.set_palette(m_tc0110pcr[1]);
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(60);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	rscreen.set_size(36*8, 32*8);
@@ -955,33 +956,33 @@ void ninjaw_state::ninjaw(machine_config &config)
 	rscreen.set_screen_update(FUNC(ninjaw_state::screen_update_right));
 	rscreen.set_palette(m_tc0110pcr[2]);
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(22, 0);
 	m_tc0100scn[0]->set_multiscr_xoffs(0);
 	m_tc0100scn[0]->set_multiscr_hack(0);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr[0]);
 
-	TC0110PCR(config, m_tc0110pcr[0], 0);
+	TC0110PCR(config, m_tc0110pcr[0]);
 	m_tc0110pcr[0]->set_shift(0);
 	m_tc0110pcr[0]->set_color_callback(FUNC(ninjaw_state::color_xbgr555));
 
-	TC0100SCN(config, m_tc0100scn[1], 0);
+	TC0100SCN(config, m_tc0100scn[1]);
 	m_tc0100scn[1]->set_offsets(22, 0);
 	m_tc0100scn[1]->set_multiscr_xoffs(2);
 	m_tc0100scn[1]->set_multiscr_hack(1);
 	m_tc0100scn[1]->set_palette(m_tc0110pcr[1]);
 
-	TC0110PCR(config, m_tc0110pcr[1], 0);
+	TC0110PCR(config, m_tc0110pcr[1]);
 	m_tc0110pcr[1]->set_shift(0);
 	m_tc0110pcr[1]->set_color_callback(FUNC(ninjaw_state::color_xbgr555));
 
-	TC0100SCN(config, m_tc0100scn[2], 0);
+	TC0100SCN(config, m_tc0100scn[2]);
 	m_tc0100scn[2]->set_offsets(22, 0);
 	m_tc0100scn[2]->set_multiscr_xoffs(4);
 	m_tc0100scn[2]->set_multiscr_hack(1);
 	m_tc0100scn[2]->set_palette(m_tc0110pcr[2]);
 
-	TC0110PCR(config, m_tc0110pcr[2], 0);
+	TC0110PCR(config, m_tc0110pcr[2]);
 	m_tc0110pcr[2]->set_shift(0);
 	m_tc0110pcr[2]->set_color_callback(FUNC(ninjaw_state::color_xbgr555));
 
@@ -1002,9 +1003,9 @@ void ninjaw_state::ninjaw(machine_config &config)
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-//  SUBWOOFER(config, "subwoofer", 0);
+//  SUBWOOFER(config, "subwoofer");
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 }
@@ -1027,7 +1028,7 @@ void ninjaw_state::darius2(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(16000000/1024));  /* CPU slices */
 	//config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
+	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc"));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
 	tc0040ioc.read_1_callback().set_ioport("DSWB");
 	tc0040ioc.read_2_callback().set_ioport("IN0");
@@ -1042,7 +1043,7 @@ void ninjaw_state::darius2(machine_config &config)
 
 	config.set_default_layout(layout_ninjaw);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(60);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	lscreen.set_size(36*8, 32*8);
@@ -1050,7 +1051,7 @@ void ninjaw_state::darius2(machine_config &config)
 	lscreen.set_screen_update(FUNC(ninjaw_state::screen_update_left));
 	lscreen.set_palette(m_tc0110pcr[0]);
 
-	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
+	screen_device &mscreen(SCREEN(config, "mscreen"));
 	mscreen.set_refresh_hz(60);
 	mscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	mscreen.set_size(36*8, 32*8);
@@ -1058,7 +1059,7 @@ void ninjaw_state::darius2(machine_config &config)
 	mscreen.set_screen_update(FUNC(ninjaw_state::screen_update_middle));
 	mscreen.set_palette(m_tc0110pcr[1]);
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(60);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	rscreen.set_size(36*8, 32*8);
@@ -1066,33 +1067,33 @@ void ninjaw_state::darius2(machine_config &config)
 	rscreen.set_screen_update(FUNC(ninjaw_state::screen_update_right));
 	rscreen.set_palette(m_tc0110pcr[2]);
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(22, 0);
 	m_tc0100scn[0]->set_multiscr_xoffs(0);
 	m_tc0100scn[0]->set_multiscr_hack(0);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr[0]);
 
-	TC0110PCR(config, m_tc0110pcr[0], 0);
+	TC0110PCR(config, m_tc0110pcr[0]);
 	m_tc0110pcr[0]->set_shift(0);
 	m_tc0110pcr[0]->set_color_callback(FUNC(ninjaw_state::color_xbgr555));
 
-	TC0100SCN(config, m_tc0100scn[1], 0);
+	TC0100SCN(config, m_tc0100scn[1]);
 	m_tc0100scn[1]->set_offsets(22, 0);
 	m_tc0100scn[1]->set_multiscr_xoffs(2);
 	m_tc0100scn[1]->set_multiscr_hack(1);
 	m_tc0100scn[1]->set_palette(m_tc0110pcr[1]);
 
-	TC0110PCR(config, m_tc0110pcr[1], 0);
+	TC0110PCR(config, m_tc0110pcr[1]);
 	m_tc0110pcr[1]->set_shift(0);
 	m_tc0110pcr[1]->set_color_callback(FUNC(ninjaw_state::color_xbgr555));
 
-	TC0100SCN(config, m_tc0100scn[2], 0);
+	TC0100SCN(config, m_tc0100scn[2]);
 	m_tc0100scn[2]->set_offsets(22, 0);
 	m_tc0100scn[2]->set_multiscr_xoffs(4);
 	m_tc0100scn[2]->set_multiscr_hack(1);
 	m_tc0100scn[2]->set_palette(m_tc0110pcr[2]);
 
-	TC0110PCR(config, m_tc0110pcr[2], 0);
+	TC0110PCR(config, m_tc0110pcr[2]);
 	m_tc0110pcr[2]->set_shift(0);
 	m_tc0110pcr[2]->set_color_callback(FUNC(ninjaw_state::color_xbgr555));
 
@@ -1113,9 +1114,9 @@ void ninjaw_state::darius2(machine_config &config)
 	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-//  SUBWOOFER(config, "subwoofer", 0);
+//  SUBWOOFER(config, "subwoofer");
 
-	TC0140SYT(config, m_tc0140syt, 0);
+	TC0140SYT(config, m_tc0140syt);
 	m_tc0140syt->nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
 	m_tc0140syt->reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 }
@@ -1394,9 +1395,9 @@ ROM_END
         DRIVERS
 *******************************************************************************/
 
-//    YEAR, NAME,     PARENT, MACHINE, INPUT,   CLASS,        INIT,       MONITOR, COMPANY,                     FULLNAME, FLAGS
-GAME( 1987, ninjaw,   0,      ninjaw,  ninjaw,  ninjaw_state, empty_init, ROT0,    "Taito Corporation Japan",   "The Ninja Warriors (World, later version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, ninjaw1,  ninjaw, ninjaw,  ninjaw,  ninjaw_state, empty_init, ROT0,    "Taito Corporation Japan",   "The Ninja Warriors (World, earlier version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, ninjawj,  ninjaw, ninjaw,  ninjawj, ninjaw_state, empty_init, ROT0,    "Taito Corporation",         "The Ninja Warriors (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, ninjawu,  ninjaw, ninjaw,  ninjawj, ninjaw_state, empty_init, ROT0,    "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US, Romstar license)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) /* Uses same coinage as World, see notes */
-GAME( 1989, darius2,  0,      darius2, darius2, ninjaw_state, empty_init, ROT0,    "Taito Corporation",         "Darius II (triple screen) (Japan, rev 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+//    YEAR, NAME,     PARENT, MACHINE, INPUT,   CLASS,        INIT,       MONITOR, COMPANY,                           FULLNAME,                                      FLAGS
+GAME( 1987, ninjaw,   0,      ninjaw,  ninjaw,  ninjaw_state, empty_init, ROT0,    "Taito",                           "The Ninja Warriors (World, later version)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, ninjaw1,  ninjaw, ninjaw,  ninjaw,  ninjaw_state, empty_init, ROT0,    "Taito",                           "The Ninja Warriors (World, earlier version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, ninjawj,  ninjaw, ninjaw,  ninjawj, ninjaw_state, empty_init, ROT0,    "Taito",                           "The Ninja Warriors (Japan)",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, ninjawu,  ninjaw, ninjaw,  ninjawj, ninjaw_state, empty_init, ROT0,    "Taito America (Romstar license)", "The Ninja Warriors (US)",                     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // Uses same coinage as World, see notes
+GAME( 1989, darius2,  0,      darius2, darius2, ninjaw_state, empty_init, ROT0,    "Taito",                           "Darius II (triple screen) (Japan, rev 1)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

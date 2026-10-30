@@ -313,11 +313,11 @@ void hds200_state::hds200(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	Z80DMA(config, m_dma, 8_MHz_XTAL / 2); // divider not verified
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma->in_mreq_callback().set(FUNC(hds200_state::dma_mreq_r));
 	m_dma->out_mreq_callback().set(FUNC(hds200_state::dma_mreq_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::amber());
 	m_screen->set_raw(22.680_MHz_XTAL, 1008, 0, 720, 375, 0, 350); // 80-column mode
 	m_screen->set_screen_update(m_avdc, FUNC(scn2674_device::screen_update));

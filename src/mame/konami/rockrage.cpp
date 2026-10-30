@@ -219,14 +219,14 @@ void rockrage_state::bankswitch_w(uint8_t data)
 
 uint8_t rockrage_state::vlm5030_busy_r()
 {
-	return (m_vlm->bsy() ? 1 : 0);
+	return m_vlm->bsy_r();
 }
 
 void rockrage_state::speech_w(uint8_t data)
 {
 	// bit2 = data bus enable
-	m_vlm->rst((data >> 1) & 0x01);
-	m_vlm->st((data >> 0) & 0x01);
+	m_vlm->rst_w(BIT(data, 1));
+	m_vlm->st_w(BIT(data, 0));
 }
 
 void rockrage_state::main_map(address_map &map)
@@ -377,7 +377,7 @@ void rockrage_state::rockrage(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(rockrage_state::screen_update));
 	screen.set_palette(m_palette);

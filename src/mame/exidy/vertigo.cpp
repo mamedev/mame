@@ -125,14 +125,14 @@ void vertigo_state::vertigo(machine_config &config)
 	m_custom->add_route(0, "speaker", 1.0, 0);
 	m_custom->add_route(1, "speaker", 1.0, 1);
 
-	pit8254_device &pit(PIT8254(config, "pit", 0));
+	pit8254_device &pit(PIT8254(config, "pit"));
 	pit.set_clk<0>(24_MHz_XTAL / 100);
 	pit.out_handler<0>().set(FUNC(vertigo_state::v_irq4_w));
 	pit.set_clk<1>(24_MHz_XTAL / 100);
 	pit.out_handler<1>().set(FUNC(vertigo_state::v_irq3_w));
 	pit.set_clk<2>(24_MHz_XTAL / 100);
 
-	TTL74148(config, m_ttl74148, 0);
+	TTL74148(config, m_ttl74148);
 	m_ttl74148->out_cb().set(FUNC(vertigo_state::update_irq));
 
 	/* motor controller */
@@ -141,12 +141,9 @@ void vertigo_state::vertigo(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	VECTOR(config, m_vector, 0);
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
-	screen.set_refresh_hz(60);
-	screen.set_size(400, 300);
-	screen.set_visarea(0, 510, 0, 400);
-	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
+	VECTOR(config, m_vector);
+	m_vector->set_refresh_hz(60);
+	m_vector->set_visarea(0, 510, 0, 400);
 }
 
 

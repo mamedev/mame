@@ -44,14 +44,15 @@
 
 DEFINE_DEVICE_TYPE(DS5002FP, ds5002fp_device, "ds5002fp", "Dallas DS5002FP")
 
-/* program width field is set to 0 because technically the SRAM isn't internal */
+// program width field is set to 0 because technically the SRAM isn't internal
 ds5002fp_device::ds5002fp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: mcs51_cpu_device(mconfig, DS5002FP, tag, owner, clock, 0, 7)
 	, device_nvram_interface(mconfig, *this)
 	, m_region(*this, "internal")
 {
 	m_has_pd = true;
-	m_data_config.m_addr_width = 18;
+	m_num_interrupts = 6; // power fail warning
+	m_xdata_config.m_addr_width = 18;
 }
 
 void ds5002fp_device::device_start()
@@ -62,6 +63,13 @@ void ds5002fp_device::device_start()
 	save_item(NAME(m_ta_window));
 	save_item(NAME(m_range));
 	save_item(NAME(m_rnr_delay));
+	save_item(NAME(m_crc));
+	save_item(NAME(m_crcr));
+	save_item(NAME(m_mcon));
+	save_item(NAME(m_ta));
+	save_item(NAME(m_rnr));
+	save_item(NAME(m_rpctl));
+	save_item(NAME(m_rps));
 }
 
 void ds5002fp_device::device_reset()
@@ -74,6 +82,7 @@ void ds5002fp_device::device_reset()
 	m_rnr = 0;
 	m_crc = 0;
 	m_ta = 0;
+	m_rpctl &= 1 << RPCTL_RG0; // EXBS, AE, IBI, DMA and RPCON are cleared by all resets
 
 	// set internal CPU state
 	m_previous_ta = 0;
@@ -105,23 +114,23 @@ void ds5002fp_device::device_reset()
 
 offs_t ds5002fp_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
 {
-	/* Memory Range (RG1 and RG0 @ m_mcon and m_rpctl registers) */
+	// Memory Range (RG1 and RG0 @ m_mcon and m_rpctl registers)
 	static const u16 ds5002fp_ranges[4] = { 0x1fff, 0x3fff, 0x7fff, 0xffff };
-	/* Memory Partition Table (RG1 & RG0 @ m_mcon & m_rpctl registers) */
+	// Memory Partition Table (RG1 & RG0 @ m_mcon & m_rpctl registers)
 	static const u32 ds5002fp_partitions[16] =
 	{
 		0x0000, 0x1000, 0x2000, 0x3000, 0x4000, 0x5000, 0x6000,  0x7000,
 		0x8000, 0x9000, 0xa000, 0xb000, 0xc000, 0xd000, 0xe000, 0x10000
 	};
 
-	/* adjust offset based on the bus */
+	// adjust offset based on the bus
 	if (BIT(m_mcon, MCON_PES))
 		offset += 0x20000;
 	else if (!BIT(m_mcon, MCON_PM))
 	{
 		if (!BIT(m_rpctl, RPCTL_EXBS))
 		{
-			if ((offset >= ds5002fp_partitions[BIT(m_mcon, MCON_PA)]) && (offset <= ds5002fp_ranges[m_range]))
+			if ((offset >= ds5002fp_partitions[BIT(m_mcon, MCON_PA, 4)]) && (offset <= ds5002fp_ranges[m_range]))
 				offset += 0x10000;
 		}
 	}
@@ -131,8 +140,8 @@ offs_t ds5002fp_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
 void ds5002fp_device::irqs_complete_and_mask(u8 &ints, u8 int_mask)
 {
 	ints |= BIT(m_pcon, PCON_PFW) << 5;
-	m_irq_prio[6] = 3; /* force highest priority */
-	/* mask out interrupts not enabled */
+	m_irq_prio[5] = 3; // force highest priority
+	// mask out interrupts not enabled
 	ints &= ((int_mask & 0x1f) | ((BIT(m_pcon, PCON_EPFW)) << 5));
 }
 
@@ -142,9 +151,7 @@ void ds5002fp_device::ds_protected(u8 &val, u8 data, u8 ta_mask, u8 mask)
 
 	is_timed_access = (m_ta_window > 0) && (m_ta == 0x55);
 	if (is_timed_access)
-	{
 		ta_mask = 0xff;
-	}
 	data = (val & (~ta_mask)) | (data & ta_mask);
 	val = (val & (~mask)) | (data & mask);
 }
@@ -174,7 +181,7 @@ void ds5002fp_device::handle_ta_window()
 
 bool ds5002fp_device::manage_idle_on_interrupt(u8 ints)
 {
-	/* any interrupt terminates idle mode */
+	// any interrupt terminates idle mode
 	set_idl(0);
 	return BIT(m_pcon, PCON_PD);
 }
@@ -184,19 +191,28 @@ void ds5002fp_device::handle_irq(int irqline, int state, u32 new_state, u32 tr_s
 {
 	switch (irqline)
 	{
-		/* Power Fail Interrupt */
+		// Power Fail Interrupt
 		case DS5002FP_PFI_LINE:
-			/* Need cleared->active line transition? (Logical 1-0 Pulse on the line) - CLEAR->ASSERT Transition since INT1 active lo! */
-			if (BIT(tr_state, MCS51_INT1_LINE))
+			// PFW is set for as long as the power fail line is active
+			if (state != CLEAR_LINE)
 				set_pfw(1);
+			break;
+
+		default:
+			mcs51_cpu_device::handle_irq(irqline, state, new_state, tr_state);
 			break;
 	}
 }
 
 u8 ds5002fp_device::pcon_ds_r()
 {
-	set_pfw(0);
-	return m_pcon;
+	u8 const data = m_pcon;
+
+	// a read clears PFW, but it's set again at once if the power fail line is still active
+	if (!machine().side_effects_disabled())
+		set_pfw(BIT(m_last_line_state, DS5002FP_PFI_LINE));
+
+	return data;
 }
 
 void ds5002fp_device::pcon_ds_w(u8 data)
@@ -254,10 +270,10 @@ u8 ds5002fp_device::ta_r()
 void ds5002fp_device::ta_w(u8 data)
 {
 	m_previous_ta = m_ta;
-	/*  init the time window after having wrote 0xaa */
+	// init the time window after having wrote 0xaa
 	if ((data == 0xaa) && (m_ta_window == 0))
 	{
-		m_ta_window = 6; /* 4*12 + 2*12 */
+		m_ta_window = 6; // 4*12 + 2*12
 		LOG("ta window initiated at 0x%04x\n", m_pc);
 	}
 	m_ta = data;
@@ -277,14 +293,14 @@ void ds5002fp_device::rnr_w(u8 data)
 
 u8 ds5002fp_device::rpctl_r()
 {
-	logerror("rpctl read (%s)\n", machine().describe_context());
-	return m_rnr_delay <= 0 ? 0x80 : 0x00;
+	// bit 7 (RNR) is the read-only random number ready flag, bit 6 isn't implemented
+	return (m_rpctl & 0x3f) | ((m_rnr_delay <= 0) ? 0x80 : 0x00);
 }
 
 void ds5002fp_device::rpctl_w(u8 data)
 {
-	ds_protected(m_rpctl, data, 0xef, 0xfe);
-	logerror("rpctl write %02x -> %02x (%s)\n", data, m_rpctl, machine().describe_context());
+	ds_protected(m_rpctl, data, 0xef, 0x3e);
+	LOG("rpctl write %02x -> %02x (%s)\n", data, m_rpctl, machine().describe_context());
 }
 
 

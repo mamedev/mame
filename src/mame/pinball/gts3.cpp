@@ -88,9 +88,10 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void p0(machine_config &config);  // no sound card assigned yet
-	void p5(machine_config &config);  // p5 sound card
-	void p7(machine_config &config);  // p7 sound card
+	void p0(machine_config &config) ATTR_COLD;  // no sound card assigned yet
+	void p5(machine_config &config) ATTR_COLD;  // p5 sound card
+	void p7(machine_config &config) ATTR_COLD;  // p7 sound card
+
 	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
 
 protected:
@@ -313,16 +314,12 @@ void gts3_state::u5a_w(u8 data)
 {
 	if (m_p5_sound)
 		m_p5_sound->write(data);
-	else
-	if (m_p7_sound)
+	else if (m_p7_sound)
 		m_p7_sound->write(data);
 }
 
 void gts3_state::machine_start()
 {
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_dispclk));
 	save_item(NAME(m_lampclk));
 	save_item(NAME(m_segment));

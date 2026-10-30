@@ -20,7 +20,7 @@
 #define LOG_CS      (1U << 9)
 
 #define VERBOSE  (LOG_PIT)
-#define LOG_OUTPUT_FUNC printf // Needs always to be enabled as the default value 'logerror' is not available here
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -494,12 +494,29 @@ void m68340_cpu_device::start_68340_sim()
 		logerror("Unknown Clock mode, check schematics and/or the source code\n");
 	}
 	LOGCLOCK( " - Clock: %d [0x%08x]\n", clock(), clock());
+
+	save_item(NAME(sim.m_am));
+	save_item(NAME(sim.m_ba));
+	save_item(NAME(sim.m_porta));
+	save_item(NAME(sim.m_ddra));
+	save_item(NAME(sim.m_ppara1));
+	save_item(NAME(sim.m_ppara2));
+	save_item(NAME(sim.m_portb));
+	save_item(NAME(sim.m_ddrb));
+	save_item(NAME(sim.m_pparb));
+	save_item(NAME(sim.m_mcr));
+	save_item(NAME(sim.m_syncr));
+	save_item(NAME(sim.m_avr_rsr));
+	save_item(NAME(sim.m_swiv_sypcr));
+	save_item(NAME(sim.m_picr));
+	save_item(NAME(sim.m_pitr));
+	save_item(NAME(sim.m_swsr));
+	save_item(NAME(sim.m_pit_counter));
+	save_item(NAME(sim.m_pit_irq));
 }
 
 void m68340_sim::reset()
 {
-	LOG("%s\n", FUNCNAME);
-
 	// Ports - only setup those that are affected by reset
 	m_ddra   = 0x00;
 	m_ppara1 = 0xff;

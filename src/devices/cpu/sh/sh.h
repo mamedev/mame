@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
+
 
 /***************************************************************************
     DEBUGGING
@@ -63,22 +63,16 @@
 
 #define SH_FLAGS   (SH_M|SH_Q|SH_I|SH_S|SH_T)
 
+// Special meanings for the delay slot PC value.  Odd numbers were chosen because they're not valid otherwise.
+#define SH_OVRPC_NONE       0xffffffff  // We aren't in a delay slot, use desc->pc
+#define SH_OVRPC_DYNAMIC    0xfffffffd  // In the delay slot of a register-indirect branch, base is runtime m_sh2_state->target
+
 /* SR shift values */
 #define T_SHIFT 0
 #define S_SHIFT 1
 #define I_SHIFT 4
 #define Q_SHIFT 8
 #define M_SHIFT 9
-
-#define REGFLAG_R(n)                    (1 << (n))
-
-/* register flags 1 */
-#define REGFLAG_PR                      (1 << 0)
-#define REGFLAG_MACL                    (1 << 1)
-#define REGFLAG_MACH                    (1 << 2)
-#define REGFLAG_GBR                     (1 << 3)
-#define REGFLAG_VBR                     (1 << 4)
-#define REGFLAG_SR                      (1 << 5)
 
 /***************************************************************************
     MACROS
@@ -143,6 +137,14 @@ public:
 		uint32_t  m_fpul;
 		uint32_t  m_dbr;
 
+		// SH3/4 floating point constants the generated code refers to by address
+		double  m_ftrc_dmin;         // FTRC double-precision range check
+		double  m_ftrc_dmax;
+		float   m_ftrc_smin;         // FTRC single-precision range check
+		float   m_ftrc_smax;
+		float   m_fsca_unit;         // what one unit of the FSCA table is worth
+		uint8_t m_fpmode[4];         // FPSCR.RM -> UML rounding mode
+
 		int     m_frt_input;
 		int     m_fpu_sz;
 		int     m_fpu_pr;
@@ -185,6 +187,26 @@ protected:
 		EXECUTE_UNMAPPED_CODE       = 2,
 		EXECUTE_RESET_CACHE         = 3
 	};
+
+	class frontend;
+
+	// instructions that change the PC; in a delay slot they raise a slot illegal instruction
+	// exception instead of executing (SH-1/SH-2, vector 6)
+	// groups 0 and 4 are matched on the low six bits like the decoder does, so every encoding
+	// it treats as a delayed branch is caught
+	static constexpr bool is_slot_illegal(uint16_t opcode)
+	{
+		switch (opcode >> 12)
+		{
+		case 0x0: return ((opcode & 0x3f) == 0x03) || ((opcode & 0x3f) == 0x0b) || ((opcode & 0x3f) == 0x23) || ((opcode & 0x3f) == 0x2b); // BSRF, RTS, BRAF, RTE
+		case 0x4: return ((opcode & 0x3f) == 0x0b) || ((opcode & 0x3f) == 0x2b); // JSR, JMP
+		case 0x8: return BIT(opcode, 8) && BIT(opcode, 11); // BT, BF, BT/S, BF/S (0x89, 0x8b, 0x8d, 0x8f)
+		case 0xa: case 0xb: return true; // BRA, BSR
+		case 0xc: return ((opcode >> 8) & 0xf) == 0x3; // TRAPA
+		default: return false;
+		}
+	}
+	class opcode_desc;
 
 	sh_common_execution(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal);
 
@@ -415,7 +437,7 @@ public:
 	virtual bool generate_group_12_TRAPA(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
 
 
-	bool generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t ovrpc);
+	virtual bool generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t ovrpc);
 	virtual bool generate_group_0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
 	bool generate_group_2(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc);
 	bool generate_group_3(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, uint32_t ovrpc);
@@ -427,6 +449,7 @@ public:
 
 	void func_printf_probe();
 	void func_unimplemented();
+	void func_slot_illegal();
 	void func_MAC_W();
 	void func_MAC_L();
 	void func_DIV1();
@@ -448,8 +471,6 @@ public:
 	void alloc_handle(uml::code_handle *&handleptr, const char *name);
 	void load_fast_iregs(drcuml_block &block);
 	void save_fast_iregs(drcuml_block &block);
-	const char *log_desc_flags_to_string(uint32_t flags);
-	void log_register_list(const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
 	void log_opcode_desc(const opcode_desc *desclist, int indent);
 	void log_add_disasm_comment(drcuml_block &block, uint32_t pc, uint32_t op);
 	void generate_delay_slot(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t ovrpc);
@@ -463,32 +484,8 @@ public:
 
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
-};
-
-class sh_frontend : public drc_frontend
-{
-public:
-	sh_frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
-
-protected:
-	virtual uint16_t read_word(opcode_desc &desc);
-	virtual bool describe(opcode_desc &desc, const opcode_desc *prev) override;
-
-private:
-	bool describe_group_2(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_3(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_6(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_8(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	bool describe_group_12(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-
-protected:
-	virtual bool describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	virtual bool describe_group_4(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode);
-	virtual bool describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) = 0;
-
-	sh_common_execution *m_sh;
 };
 
 #endif // MAME_CPU_SH_SH_H

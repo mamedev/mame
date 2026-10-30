@@ -11,22 +11,17 @@
 #ifndef MAME_BE_BEBOX_H
 #define MAME_BE_BEBOX_H
 
+#include "bus/isa/isa.h"
 #include "cpu/powerpc/ppc.h"
-
-#include "imagedev/floppy.h"
-#include "machine/53c810.h"
-#include "machine/am9517a.h"
+#include "machine/8042kbdc.h"
+#include "machine/i82378zb_sio.h"
 #include "machine/idectrl.h"
 #include "machine/ins8250.h"
-#include "machine/pic8259.h"
-#include "machine/pit8253.h"
-#include "machine/ram.h"
-#include "machine/upd765.h"
 #include "machine/intelfsh.h"
-#include "video/pc_vga.h"
-
-#include "bus/lpci/pci.h"
-
+#include "machine/max186.h"
+#include "machine/mc146818.h"
+#include "machine/mpc105.h"
+#include "machine/ram.h"
 
 class bebox_state : public driver_device
 {
@@ -34,15 +29,18 @@ public:
 	bebox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_ppc(*this, "ppc%u", 1U)
-		, m_lsi53c810(*this, "lsi53c810")
-		, m_dma8237(*this, "dma8237_%u", 1U)
-		, m_pic8259(*this, "pic8259_%u", 1U)
-		, m_pit8254(*this, "pit8254")
+		, m_sio(*this, "pci:0b.0")
+		, m_isabus(*this, "pci:0b.0:isabus")
 		, m_ram(*this, RAM_TAG)
-		, m_smc37c78(*this, "smc37c78")
 		, m_flash(*this, "flash")
-		, m_pcibus(*this, "pcibus")
-		, m_vga(*this, "vga")
+		, m_mpc105(*this, "pci:00.0")
+		, m_adc(*this, "adc")
+		, m_kbdc(*this, "kbdc")
+		, m_uart(*this, "ns16550_%u", 2U)
+		, m_rtc(*this, "rtc")
+		, m_ide(*this, "ide")
+		, m_joy_axes(*this, "joyport:JOY%u", 0U)
+		, m_joy_buttons(*this, "joyport:JOYBUTTONS")
 	{
 	}
 
@@ -53,86 +51,68 @@ public:
 
 	void init_bebox();
 
-	int m_dma_channel = 0; // TODO: move to private once possible
-
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device_array<ppc_device, 2> m_ppc;
-	required_device<lsi53c810_device> m_lsi53c810;
-	required_device_array<am9517a_device, 2> m_dma8237;
-	required_device_array<pic8259_device, 2> m_pic8259;
-	required_device<pit8254_device> m_pit8254;
+	required_device<i82378zb_sio_device> m_sio;
+	required_device<isa16_device> m_isabus;
 	required_device<ram_device> m_ram;
-	required_device<smc37c78_device> m_smc37c78;
 	required_device<fujitsu_29f016a_device> m_flash;
-	required_device<pci_bus_device> m_pcibus;
-	required_device<vga_device> m_vga;
+	required_device<mpc105_host_device> m_mpc105;
+	required_device<max186_device> m_adc;
+	required_device<kbdc8042_device> m_kbdc;
+	required_device_array<ns16550_device, 2> m_uart;
+	required_device<mc146818_device> m_rtc;
+	required_device<ide_controller_device> m_ide;
+	required_ioport_array<8> m_joy_axes;
+	required_ioport m_joy_buttons;
+
+	emu_timer *m_adc_timer = nullptr;
+	u16 m_adc_control = 0;
+	u16 m_adc_result = 0;
+	u16 m_adc_shift = 0;
+	u16 m_joy_mux = 0;
+	u8 m_adc_cycle = 0;
+	bool m_adc_done = false;
 	uint32_t m_cpu_imask[2]{};
 	uint32_t m_interrupts = 0U;
 	uint32_t m_crossproc_interrupts = 0U;
-	uint16_t m_dma_offset[2][4]{};
-	uint8_t m_at_pages[0x10]{};
-	uint32_t m_scsi53c810_data[0x100 / 4]{};
-	void bebox_pic8259_master_set_int_line(int state);
-	void bebox_pic8259_slave_set_int_line(int state);
-	void bebox_dma_hrq_changed(int state);
-	void bebox_dma8237_out_eop(int state);
-	void pc_dack0_w(int state);
-	void pc_dack1_w(int state);
-	void pc_dack2_w(int state);
-	void pc_dack3_w(int state);
-	void bebox_timer0_w(int state);
+
+	u8 joy_buttons_r() { return m_joy_buttons->read(); }
+	u16 adc_control_r();
+	void adc_control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 adc_data_r() { return m_adc_result; }
+	u16 joy_mux_r() { return m_joy_mux; }
+	void joy_mux_w(offs_t offset, u16 data, u16 mem_mask = ~0) { COMBINE_DATA(&m_joy_mux); }
+	double adc_input(u8 channel);
+	TIMER_CALLBACK_MEMBER(adc_tick);
+
 	uint64_t bebox_cpu0_imask_r();
 	uint64_t bebox_cpu1_imask_r();
 	uint64_t bebox_interrupt_sources_r();
 	uint64_t bebox_crossproc_interrupts_r(address_space &space);
 	uint64_t bebox_interrupt_ack_r();
-	uint8_t bebox_page_r(offs_t offset);
-	uint8_t bebox_80000480_r();
 	uint8_t bebox_flash_r(offs_t offset);
 
 	void bebox_cpu0_imask_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	void bebox_cpu1_imask_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	void bebox_crossproc_interrupts_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	void bebox_processor_resets_w(uint64_t data);
-	void bebox_page_w(offs_t offset, uint8_t data);
-	void bebox_80000480_w(offs_t offset, uint8_t data);
 	void bebox_flash_w(offs_t offset, uint8_t data);
-	uint8_t at_dma8237_1_r(offs_t offset);
-	void at_dma8237_1_w(offs_t offset, uint8_t data);
-	uint8_t bebox_dma_read_byte(offs_t offset);
-	void bebox_dma_write_byte(offs_t offset, uint8_t data);
-	inline void set_dma_channel(int channel, int state);
-	uint64_t scsi53c810_r(offs_t offset, uint64_t mem_mask = ~0);
-	void scsi53c810_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	uint64_t bb_slave_64be_r(offs_t offset, uint64_t mem_mask = ~0);
-
-	void bebox_ide_interrupt(int state);
 
 	void bebox_keyboard_interrupt(int state);
 
-	void fdc_interrupt(int state);
-
-	uint32_t scsi_fetch(uint32_t dsp);
-	void scsi_irq_callback(int state);
-	void scsi_dma_callback(uint32_t src, uint32_t dst, int length, int byteswap);
+	int map_pci_pin(int pin) { return pin; }
+	void pci_irq_w(int line, int state) { bebox_set_irq_bit(line, state); }
 
 	void bebox_set_irq_bit(unsigned int interrupt_bit, int val);
 	void bebox_update_interrupts();
 
-	void mpc105_config(device_t *device);
-	void cirrus_config(device_t *device);
-
-	pci_connector_device & add_pci_slot(machine_config &config, const char *tag, size_t index, const char *default_tag);
-
 	void main_mem(address_map &map) ATTR_COLD;
-	void slave_mem(address_map &map) ATTR_COLD;
-
-	[[maybe_unused]] uint32_t scsi53c810_pci_read(int function, int offset, uint32_t mem_mask);
-	[[maybe_unused]] void scsi53c810_pci_write(int function, int offset, uint32_t data, uint32_t mem_mask);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 

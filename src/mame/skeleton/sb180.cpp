@@ -36,7 +36,7 @@ private:
 	void sb180_mem(address_map &map) ATTR_COLD;
 
 	required_device<z180_device> m_maincpu;
-	required_device<upd765a_device> m_fdc;
+	required_device<fdc9266_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;
 };
 
@@ -52,8 +52,8 @@ void sb180_state::sb180_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0x00, 0x7f).ram(); /* Z180 internal registers */
-	map(0x80, 0x81).m(m_fdc, FUNC(upd765a_device::map));
-	map(0xa0, 0xa0).rw(m_fdc, FUNC(upd765a_device::dma_r), FUNC(upd765a_device::dma_w));
+	map(0x80, 0x81).m(m_fdc, FUNC(fdc9266_device::map));
+	map(0xa0, 0xa0).rw(m_fdc, FUNC(fdc9266_device::dma_r), FUNC(fdc9266_device::dma_w));
 }
 
 /* Input ports */
@@ -93,7 +93,7 @@ void sb180_state::sb180(machine_config &config)
 	m_maincpu->txa1_wr_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 
 	// FDC9266 location U24
-	UPD765A(config, m_fdc, XTAL(8'000'000));
+	FDC9266(config, m_fdc, XTAL(8'000'000));
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 	m_fdc->drq_wr_callback().set_inputline(m_maincpu, Z180_INPUT_LINE_DREQ1);
 

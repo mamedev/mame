@@ -39,7 +39,7 @@ void megadrive_hb_everdrive_device::device_add_mconfig(machine_config &config)
 	// exact type is guessed by photo manipulation
 	ST_M29W640FT(config, m_flash);
 
-	SPI_SDCARD(config, m_sdcard, 0);
+	SPI_SDCARD(config, m_sdcard);
 	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set([this](int state) { m_in_bit = state; });
 }

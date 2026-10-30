@@ -400,7 +400,7 @@ void laserbas_state::laserbas(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &laserbas_state::laserbas_io);
 	TIMER(config, "scantimer").configure_scanline(FUNC(laserbas_state::laserbas_scanline), "screen", 0, 1);
 
-	pit8253_device &pit0(PIT8253(config, "pit0", 0));
+	pit8253_device &pit0(PIT8253(config, "pit0"));
 	pit0.set_clk<0>(PIT_CLOCK);
 	pit0.set_clk<1>(PIT_CLOCK);
 	pit0.set_clk<2>(PIT_CLOCK);
@@ -408,7 +408,7 @@ void laserbas_state::laserbas(machine_config &config)
 	pit0.out_handler<1>().set(FUNC(laserbas_state::pit_out_w<1>));
 	pit0.out_handler<2>().set(FUNC(laserbas_state::pit_out_w<2>));
 
-	pit8253_device &pit1(PIT8253(config, "pit1", 0));
+	pit8253_device &pit1(PIT8253(config, "pit1"));
 	pit1.set_clk<0>(PIT_CLOCK);
 	pit1.set_clk<1>(PIT_CLOCK);
 	pit1.set_clk<2>(PIT_CLOCK);
@@ -417,7 +417,7 @@ void laserbas_state::laserbas(machine_config &config)
 	pit1.out_handler<2>().set(FUNC(laserbas_state::pit_out_w<5>));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(PIXEL_CLOCK, 360, 0, 256, 274, 0, 224);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

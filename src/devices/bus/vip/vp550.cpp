@@ -4,8 +4,6 @@
 
     RCA VIP Super Sound System VP550 emulation
 
-    TODO: Implement VP551 variant
-
 **********************************************************************/
 
 #include "emu.h"
@@ -32,11 +30,11 @@ void vp550_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 
-	CDP1863(config, m_pfg[0], 0);
+	CDP1863(config, m_pfg[0]);
 	m_pfg[0]->set_clock2(0);
 	m_pfg[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	CDP1863(config, m_pfg[1], 0);
+	CDP1863(config, m_pfg[1]);
 	m_pfg[1]->set_clock2(0);
 	m_pfg[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
 }

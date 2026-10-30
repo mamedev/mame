@@ -175,7 +175,7 @@ void h_88_5_device::device_reset()
 
 void h_88_5_device::device_add_mconfig(machine_config &config)
 {
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->txd_handler().set([this] (bool state) { m_cassbit = state; });
 	m_uart->rts_handler().set(FUNC(h_88_5_device::uart_rts));
 	m_uart->txempty_handler().set(FUNC(h_88_5_device::uart_tx_empty));

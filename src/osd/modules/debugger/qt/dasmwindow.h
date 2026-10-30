@@ -28,6 +28,8 @@ public:
 	virtual void restoreConfiguration(util::xml::data_node const &node) override;
 
 protected:
+	virtual void debugActOpenDasm() override;
+
 	virtual void saveConfigurationToNode(util::xml::data_node &node) override;
 
 	// Used to intercept the user hitting the up arrow in the input widget

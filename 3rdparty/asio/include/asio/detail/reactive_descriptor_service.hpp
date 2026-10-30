@@ -2,7 +2,7 @@
 // detail/reactive_descriptor_service.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -19,7 +19,7 @@
 
 #if !defined(ASIO_WINDOWS) \
   && !defined(ASIO_WINDOWS_RUNTIME) \
-  && !defined(__CYGWIN__) \
+  && !defined(ASIO_CYGWIN_W32_SOCKETS) \
   && !defined(ASIO_HAS_IO_URING_AS_DEFAULT)
 
 #include "asio/associated_cancellation_slot.hpp"
@@ -43,6 +43,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 class reactive_descriptor_service :
@@ -210,7 +211,7 @@ public:
       Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      asio_handler_cont_helpers::is_continuation(handler);
+      ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(handler);
 
     associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
@@ -239,7 +240,7 @@ public:
     default:
       p.p->ec_ = asio::error::invalid_argument;
       start_op(impl, reactor::read_op, p.p,
-          is_continuation, false, true, &io_ex, 0);
+          is_continuation, false, true, false, &io_ex, 0);
       p.v = p.p = 0;
       return;
     }
@@ -252,7 +253,8 @@ public:
             &reactor_, &impl.reactor_data_, impl.descriptor_, op_type);
     }
 
-    start_op(impl, op_type, p.p, is_continuation, false, false, &io_ex, 0);
+    start_op(impl, op_type, p.p, is_continuation,
+        false, false, false, &io_ex, 0);
     p.v = p.p = 0;
   }
 
@@ -301,7 +303,7 @@ public:
       const IoExecutor& io_ex)
   {
     bool is_continuation =
-      asio_handler_cont_helpers::is_continuation(handler);
+      ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(handler);
 
     associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
@@ -326,7 +328,7 @@ public:
 
     start_op(impl, reactor::write_op, p.p, is_continuation, true,
         buffer_sequence_adapter<asio::const_buffer,
-          ConstBufferSequence>::all_empty(buffers), &io_ex, 0);
+          ConstBufferSequence>::all_empty(buffers), true, &io_ex, 0);
     p.v = p.p = 0;
   }
 
@@ -336,7 +338,7 @@ public:
       const null_buffers&, Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      asio_handler_cont_helpers::is_continuation(handler);
+      ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(handler);
 
     associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
@@ -360,7 +362,7 @@ public:
           &impl, impl.descriptor_, "async_write_some(null_buffers)"));
 
     start_op(impl, reactor::write_op, p.p,
-        is_continuation, false, false, &io_ex, 0);
+        is_continuation, false, false, false, &io_ex, 0);
     p.v = p.p = 0;
   }
 
@@ -410,7 +412,7 @@ public:
       Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      asio_handler_cont_helpers::is_continuation(handler);
+      ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(handler);
 
     associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
@@ -435,7 +437,7 @@ public:
 
     start_op(impl, reactor::read_op, p.p, is_continuation, true,
         buffer_sequence_adapter<asio::mutable_buffer,
-          MutableBufferSequence>::all_empty(buffers), &io_ex, 0);
+          MutableBufferSequence>::all_empty(buffers), true, &io_ex, 0);
     p.v = p.p = 0;
   }
 
@@ -445,7 +447,7 @@ public:
       const null_buffers&, Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      asio_handler_cont_helpers::is_continuation(handler);
+      ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(handler);
 
     associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
@@ -469,14 +471,15 @@ public:
           &impl, impl.descriptor_, "async_read_some(null_buffers)"));
 
     start_op(impl, reactor::read_op, p.p,
-        is_continuation, false, false, &io_ex, 0);
+        is_continuation, false, false, false, &io_ex, 0);
     p.v = p.p = 0;
   }
 
 private:
   // Start the asynchronous operation.
-  ASIO_DECL void do_start_op(implementation_type& impl, int op_type,
-      reactor_op* op, bool is_continuation, bool is_non_blocking, bool noop,
+  ASIO_DECL void do_start_op(implementation_type& impl,
+      int op_type, reactor_op* op, bool is_continuation,
+      bool allow_speculative, bool noop, bool needs_non_blocking,
       void (*on_immediate)(operation* op, bool, const void*),
       const void* immediate_arg);
 
@@ -484,18 +487,19 @@ private:
   // immediate completion.
   template <typename Op>
   void start_op(implementation_type& impl, int op_type, Op* op,
-      bool is_continuation, bool is_non_blocking, bool noop,
-      const void* io_ex, ...)
+      bool is_continuation, bool allow_speculative, bool noop,
+      bool needs_non_blocking, const void* io_ex, ...)
   {
-    return do_start_op(impl, op_type, op, is_continuation,
-        is_non_blocking, noop, &Op::do_immediate, io_ex);
+    return do_start_op(impl, op_type, op, is_continuation, allow_speculative,
+        noop, needs_non_blocking, &Op::do_immediate, io_ex);
   }
 
   // Start the asynchronous operation for handlers that are not specialised for
   // immediate completion.
   template <typename Op>
-  void start_op(implementation_type& impl, int op_type, Op* op,
-      bool is_continuation, bool is_non_blocking, bool noop, const void*,
+  void start_op(implementation_type& impl, int op_type,
+      Op* op, bool is_continuation, bool allow_speculative,
+      bool noop, bool needs_non_blocking, const void*,
       enable_if_t<
         is_same<
           typename associated_immediate_executor<
@@ -506,8 +510,9 @@ private:
         >::value
       >*)
   {
-    return do_start_op(impl, op_type, op, is_continuation, is_non_blocking,
-        noop, &reactor::call_post_immediate_completion, &reactor_);
+    return do_start_op(impl, op_type, op, is_continuation,
+        allow_speculative, noop, needs_non_blocking,
+        &reactor::call_post_immediate_completion, &reactor_);
   }
 
   // Helper class used to implement per-operation cancellation
@@ -550,6 +555,7 @@ private:
 };
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"
@@ -560,7 +566,7 @@ private:
 
 #endif // !defined(ASIO_WINDOWS)
        //   && !defined(ASIO_WINDOWS_RUNTIME)
-       //   && !defined(__CYGWIN__)
+       //   && !defined(ASIO_CYGWIN_W32_SOCKETS)
        //   && !defined(ASIO_HAS_IO_URING_AS_DEFAULT)
 
 #endif // ASIO_DETAIL_REACTIVE_DESCRIPTOR_SERVICE_HPP

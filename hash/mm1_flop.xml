@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -40,6 +40,9 @@ It's unknown if this is a disk or emulation problem.
 		<description>Nokia CP/M 2.2 (M6)</description>
 		<year>1981</year>
 		<publisher>Nokia Data</publisher>
+		<notes><![CDATA[
+MOVCPM.COM serial (8B 16 09 00 0D 57) does not match the system's (8B 16 09 00 0F 0D) which leads to synchronization error when running MOVCPM * *
+]]></notes>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Käyttöjärjestelmä"/>

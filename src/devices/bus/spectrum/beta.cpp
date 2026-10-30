@@ -313,7 +313,7 @@ void spectrum_gamma_device::device_add_mconfig(machine_config& config)
 	m_centronics->busy_handler().set([this](u8 data) { m_centronics_busy = data; });
 	m_centronics->set_output_latch(cent_data_out);
 
-	ACIA6850(config, m_acia, 0); // schematics missing, wiring unknown
+	ACIA6850(config, m_acia); // schematics missing, wiring unknown
 }
 
 const tiny_rom_entry *spectrum_betav2_device::device_rom_region() const

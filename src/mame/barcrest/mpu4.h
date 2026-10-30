@@ -141,7 +141,7 @@ public:
 		, m_aux1_port(*this, "AUX1")
 		, m_aux2_port(*this, "AUX2")
 		, m_bank1(*this, "bank1")
-		, m_reel(*this, "reel%u", 0U)
+		, m_reel(*this, "reel%u", 1U)
 		, m_meters(*this, "meters")
 		, m_ay8913(*this, "ay8913")
 		, m_alarmdac(*this, "alarmdac")
@@ -163,42 +163,40 @@ public:
 
 	 { }
 
-	void init_m4();
-	void init_m4big();
-	void init_m4big_low();
+	void init_m4() ATTR_COLD;
+	void init_m4big() ATTR_COLD;
+	void init_m4big_low() ATTR_COLD;
 
-	void mpu4_reels(machine_config &config, uint8_t NumberOfReels, int16_t start_index, int16_t end_index);
-
-	void tr_r4(machine_config &config);
-	void tr_r5(machine_config &config);
-	void tr_r5r(machine_config &config);
-	void tr_r5a(machine_config &config);
-	void tr_r6(machine_config &config);
-	void tr_r6a(machine_config &config);
-	void tr_r7(machine_config &config);
-	void tr_r8(machine_config &config);
-	void tr_rt1(machine_config &config);
-	void tr_rt2(machine_config &config);
-	void tr_rt3(machine_config &config);
-	void tr_lps(machine_config &config);
-	void tr_lpla(machine_config &config);
-	void tr_lplb(machine_config &config);
-	void tr_lplc(machine_config &config);
-	void tr_lds(machine_config &config);
-	void tr_lda(machine_config &config);
-	void tr_ldb(machine_config &config);
-	void tr_ldc(machine_config &config);
-	void tr_ht(machine_config &config);
-	void tr_hda(machine_config &config);
-	void tr_hdb(machine_config &config);
-	void tr_hdc(machine_config &config);
-	void tr_hna(machine_config &config);
-	void tr_hnb(machine_config &config);
-	void tr_htw(machine_config &config);
-	void tr_over(machine_config &config);
-	void tr_lvdoff(machine_config &config);
-	void tr_p4l(machine_config &config);
-	void tr_scardl(machine_config &config);
+	void tr_r4(machine_config &config) ATTR_COLD;
+	void tr_r5(machine_config &config) ATTR_COLD;
+	void tr_r5r(machine_config &config) ATTR_COLD;
+	void tr_r5a(machine_config &config) ATTR_COLD;
+	void tr_r6(machine_config &config) ATTR_COLD;
+	void tr_r6a(machine_config &config) ATTR_COLD;
+	void tr_r7(machine_config &config) ATTR_COLD;
+	void tr_r8(machine_config &config) ATTR_COLD;
+	void tr_rt1(machine_config &config) ATTR_COLD;
+	void tr_rt2(machine_config &config) ATTR_COLD;
+	void tr_rt3(machine_config &config) ATTR_COLD;
+	void tr_lps(machine_config &config) ATTR_COLD;
+	void tr_lpla(machine_config &config) ATTR_COLD;
+	void tr_lplb(machine_config &config) ATTR_COLD;
+	void tr_lplc(machine_config &config) ATTR_COLD;
+	void tr_lds(machine_config &config) ATTR_COLD;
+	void tr_lda(machine_config &config) ATTR_COLD;
+	void tr_ldb(machine_config &config) ATTR_COLD;
+	void tr_ldc(machine_config &config) ATTR_COLD;
+	void tr_ht(machine_config &config) ATTR_COLD;
+	void tr_hda(machine_config &config) ATTR_COLD;
+	void tr_hdb(machine_config &config) ATTR_COLD;
+	void tr_hdc(machine_config &config) ATTR_COLD;
+	void tr_hna(machine_config &config) ATTR_COLD;
+	void tr_hnb(machine_config &config) ATTR_COLD;
+	void tr_htw(machine_config &config) ATTR_COLD;
+	void tr_over(machine_config &config) ATTR_COLD;
+	void tr_lvdoff(machine_config &config) ATTR_COLD;
+	void tr_p4l(machine_config &config) ATTR_COLD;
+	void tr_scardl(machine_config &config) ATTR_COLD;
 
 	template <typename Class, unsigned Count>
 	struct trait_wrapper_impl
@@ -334,13 +332,15 @@ public:
 	}
 
 
-	void mpu4_common(machine_config &config);
-	void mpu4base(machine_config &config);
-	void mpu4_bacta(machine_config &config);
+	void mpu4_common(machine_config &config) ATTR_COLD;
+	void mpu4base(machine_config &config) ATTR_COLD;
+	void mpu4_bacta(machine_config &config) ATTR_COLD;
 
 	void pia_gb_cb2_w(int state);
 
 protected:
+	void mpu4_reels(machine_config &config, uint8_t NumberOfReels, int16_t start_index, int16_t end_index) ATTR_COLD;
+
 	void setup_rom_banks();
 
 	TIMER_CALLBACK_MEMBER(update_ic24);

@@ -20,7 +20,7 @@
 class rgbaint_t
 {
 public:
-#if defined(__SSE2__) || defined(_M_X64) || (defined(_M_IX86_FP) && (_M_IX86_FP >= 2)) || defined(__ALTIVEC__)
+#if defined(__SSE2__) || defined(_M_X64) || (defined(_M_IX86_FP) && (_M_IX86_FP >= 2))
 	static inline constexpr unsigned FILTER_SHIFT_INNER = 0;
 	static inline constexpr unsigned FILTER_SHIFT_OUTER = 1;
 #elif defined(__ARM_NEON)

@@ -27,6 +27,7 @@ public:
 	virtual void restore_configuration_from_node(util::xml::data_node const &node) override;
 
 protected:
+	virtual void update_dpi() override;
 	virtual void recompute_children() override;
 	virtual void update_menu() override;
 	virtual bool handle_command(WPARAM wparam, LPARAM lparam) override;

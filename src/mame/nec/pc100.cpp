@@ -658,11 +658,11 @@ void pc100_state::pc100(machine_config &config)
 	ppi2.out_pb_callback().set(FUNC(pc100_state::upper_mask_w));
 	ppi2.out_pc_callback().set(FUNC(pc100_state::crtc_bank_w));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic->in_sp_callback().set_constant(0); // ???
 
-	i8251_device &i8251(I8251(config, "uart8251", 0));
+	i8251_device &i8251(I8251(config, "uart8251"));
 	//i8251.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	//i8251.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	//i8251.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -684,7 +684,7 @@ void pc100_state::pc100(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:3", pc100_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	/* TODO: Unknown Pixel Clock and CRTC is dynamic */
 	screen.set_raw(MASTER_CLOCK*4, 1024, 0, 768, 264*2, 0, 512);
 	screen.set_screen_update(FUNC(pc100_state::screen_update_pc100));

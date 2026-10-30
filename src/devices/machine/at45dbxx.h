@@ -24,7 +24,7 @@ class at45db041_device : public device_t,
 							public device_nvram_interface
 {
 public:
-	at45db041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	at45db041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void cs_w(int state);
 	void sck_w(int state);
@@ -101,7 +101,7 @@ protected:
 class at45db081_device : public at45db041_device
 {
 public:
-	at45db081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	at45db081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual int num_pages() const override { return 4096; }
@@ -116,7 +116,7 @@ protected:
 class at45db161_device : public at45db041_device
 {
 public:
-	at45db161_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	at45db161_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual int num_pages() const override { return 4096; }

@@ -52,8 +52,12 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void mephisto(machine_config &config);
-	void sport2k(machine_config &config);
+	void mephisto(machine_config &config) ATTR_COLD;
+	void sport2k(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void shift_load_w(u8 data);
@@ -63,6 +67,7 @@ private:
 	void ay8910_columns_w(u8 data);
 	u8 ay8910_inputs_r();
 	void sound_rombank_w(u8 data);
+	void ay8910_update();
 
 	void mephisto_8051_data(address_map &map) ATTR_COLD;
 	void mephisto_8051_map(address_map &map) ATTR_COLD;
@@ -73,9 +78,7 @@ private:
 	u8 m_ay8910_data = 0U;
 	bool m_ay8910_bdir = false;
 	bool m_ay8910_bc1 = false;
-	void ay8910_update();
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<i8256_device> m_uart;
 	required_device<ay8910_device> m_aysnd;
@@ -184,9 +187,6 @@ INPUT_PORTS_END
 void mephisto_state::machine_start()
 {
 	genpin_class::machine_start();
-
-	m_digits.resolve();
-	m_io_outputs.resolve();
 
 	m_soundbank->configure_entries(0, 16, memregion("sound1")->base(), 0x8000);
 	m_soundbank->set_entry(0);

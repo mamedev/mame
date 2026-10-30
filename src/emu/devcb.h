@@ -50,8 +50,8 @@ typedef device_delegate<void (int)> write_line_delegate;
 
 namespace emu::detail {
 
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read_line_delegate, std::remove_reference_t<T> > > > { using type = read_line_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
-template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write_line_delegate, std::remove_reference_t<T> > > > { using type = write_line_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <suitable_member_func<read_line_delegate> T> struct rw_delegate_type<T> { using type = read_line_delegate; using device_class = mfp_device_class_t<type, T>; };
+template <suitable_member_func<write_line_delegate> T> struct rw_delegate_type<T> { using type = write_line_delegate; using device_class = mfp_device_class_t<type, T>; };
 
 } // namespace emu::detail
 
@@ -67,14 +67,10 @@ template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write_
 class devcb_base : protected device_resolver_base
 {
 protected:
-	// This is in C++17 but not C++14
-	template <typename... T> struct void_wrapper { using type = void; };
-	template <typename... T> using void_t = typename void_wrapper<T...>::type;
-
 	// Intermediate is larger of input and output, mask is forced to unsigned
-	template <typename T, typename U, typename Enable = void> struct intermediate;
-	template <typename T, typename U> struct intermediate<T, U, std::enable_if_t<sizeof(T) >= sizeof(U)> > { using type = T; };
-	template <typename T, typename U> struct intermediate<T, U, std::enable_if_t<sizeof(T) < sizeof(U)> > { using type = U; };
+	template <typename T, typename U> struct intermediate;
+	template <typename T, typename U> requires (sizeof(T) >= sizeof(U)) struct intermediate<T, U> { using type = T; };
+	template <typename T, typename U> requires (sizeof(T) < sizeof(U)) struct intermediate<T, U> { using type = U; };
 	template <typename T, typename U> using intermediate_t = typename intermediate<T, U>::type;
 	template <typename T, typename U> using mask_t = std::make_unsigned_t<intermediate_t<T, U> >;
 
@@ -85,10 +81,10 @@ protected:
 	template <typename Input, typename Result, typename Func> using is_transform = std::bool_constant<is_transform_form3<Input, Result, Func>::value || is_transform_form4<Input, Result, Func>::value || is_transform_form6<Input, Result, Func>::value>;
 
 	// Determining the result type of a transform function
-	template <typename Input, typename Result, typename Func, typename Enable = void> struct transform_result;
-	template <typename Input, typename Result, typename Func> struct transform_result<Input, Result, Func, std::enable_if_t<is_transform_form3<Input, Result, Func>::value> > { using type = std::invoke_result_t<Func, offs_t &, Input, std::make_unsigned_t<Input> &>; };
-	template <typename Input, typename Result, typename Func> struct transform_result<Input, Result, Func, std::enable_if_t<is_transform_form4<Input, Result, Func>::value> > { using type = std::invoke_result_t<Func, offs_t &, Input>; };
-	template <typename Input, typename Result, typename Func> struct transform_result<Input, Result, Func, std::enable_if_t<is_transform_form6<Input, Result, Func>::value> > { using type = std::invoke_result_t<Func, Input>; };
+	template <typename Input, typename Result, typename Func> struct transform_result;
+	template <typename Input, typename Result, typename Func> requires is_transform_form3<Input, Result, Func>::value struct transform_result<Input, Result, Func> { using type = std::invoke_result_t<Func, offs_t &, Input, std::make_unsigned_t<Input> &>; };
+	template <typename Input, typename Result, typename Func> requires is_transform_form4<Input, Result, Func>::value struct transform_result<Input, Result, Func> { using type = std::invoke_result_t<Func, offs_t &, Input>; };
+	template <typename Input, typename Result, typename Func> requires is_transform_form6<Input, Result, Func>::value struct transform_result<Input, Result, Func> { using type = std::invoke_result_t<Func, Input>; };
 	template <typename Input, typename Result, typename Func> using transform_result_t = typename transform_result<Input, Result, Func>::type;
 
 	// Mapping method types to delegate types
@@ -96,13 +92,13 @@ protected:
 	template <typename T> using delegate_device_class_t = emu::detail::rw_delegate_device_class_t<T>;
 
 	// Invoking transform callbacks
-	template <typename Input, typename Result, typename T> static std::enable_if_t<is_transform_form3<Input, Result, T>::value, mask_t<transform_result_t<Input, Result, T>, Result> > invoke_transform(T const &cb, offs_t &offset, Input data, std::make_unsigned_t<Input> &mem_mask) { return std::make_unsigned_t<transform_result_t<Input, Result, T> >(cb(offset, data, mem_mask)); }
-	template <typename Input, typename Result, typename T> static std::enable_if_t<is_transform_form4<Input, Result, T>::value, mask_t<transform_result_t<Input, Result, T>, Result> > invoke_transform(T const &cb, offs_t &offset, Input data, std::make_unsigned_t<Input> &mem_mask) { return std::make_unsigned_t<transform_result_t<Input, Result, T> >(cb(offset, data)); }
-	template <typename Input, typename Result, typename T> static std::enable_if_t<is_transform_form6<Input, Result, T>::value, mask_t<transform_result_t<Input, Result, T>, Result> > invoke_transform(T const &cb, offs_t &offset, Input data, std::make_unsigned_t<Input> &mem_mask) { return std::make_unsigned_t<transform_result_t<Input, Result, T> >(cb(data)); }
+	template <typename Input, typename Result, typename T> static mask_t<transform_result_t<Input, Result, T>, Result> invoke_transform(T const &cb, offs_t &offset, Input data, std::make_unsigned_t<Input> &mem_mask) requires is_transform_form3<Input, Result, T>::value { return std::make_unsigned_t<transform_result_t<Input, Result, T> >(cb(offset, data, mem_mask)); }
+	template <typename Input, typename Result, typename T> static mask_t<transform_result_t<Input, Result, T>, Result> invoke_transform(T const &cb, offs_t &offset, Input data, std::make_unsigned_t<Input> &mem_mask) requires is_transform_form4<Input, Result, T>::value { return std::make_unsigned_t<transform_result_t<Input, Result, T> >(cb(offset, data)); }
+	template <typename Input, typename Result, typename T> static mask_t<transform_result_t<Input, Result, T>, Result> invoke_transform(T const &cb, offs_t &offset, Input data, std::make_unsigned_t<Input> &mem_mask) requires is_transform_form6<Input, Result, T>::value { return std::make_unsigned_t<transform_result_t<Input, Result, T> >(cb(data)); }
 
 	// Working with devices and interfaces
-	template <typename T> static std::enable_if_t<emu::detail::is_device_implementation<T>::value, const char *> get_tag(T &obj) { return obj.tag(); }
-	template <typename T> static std::enable_if_t<emu::detail::is_device_interface<T>::value, const char *> get_tag(T &obj) { return obj.device().tag(); }
+	template <emu::detail::device_implementation_class T> static const char *get_tag(T const &obj) { return obj.tag(); }
+	template <emu::detail::device_interface_class T> static const char *get_tag(T const &obj) { return obj.device().tag(); }
 	template <typename T, typename U> static T &cast_reference(U &obj)
 	{
 		if constexpr (std::is_convertible_v<std::add_pointer_t<U>, std::add_pointer_t<T> >)
@@ -212,32 +208,32 @@ protected:
 	template <typename Result, typename Func> using is_read = std::bool_constant<is_read_form1<Result, Func>::value || is_read_form2<Result, Func>::value || is_read_form3<Result, Func>::value>;
 
 	// Determining the result type of a read function
-	template <typename Result, typename Func, typename Enable = void> struct read_result;
-	template <typename Result, typename Func> struct read_result<Result, Func, std::enable_if_t<is_read_form1<Result, Func>::value> > { using type = std::invoke_result_t<Func, offs_t, std::make_unsigned_t<Result>>; };
-	template <typename Result, typename Func> struct read_result<Result, Func, std::enable_if_t<is_read_form2<Result, Func>::value> > { using type = std::invoke_result_t<Func, offs_t>; };
-	template <typename Result, typename Func> struct read_result<Result, Func, std::enable_if_t<is_read_form3<Result, Func>::value> > { using type = std::invoke_result_t<Func>; };
+	template <typename Result, typename Func> struct read_result;
+	template <typename Result, typename Func> requires is_read_form1<Result, Func>::value struct read_result<Result, Func> { using type = std::invoke_result_t<Func, offs_t, std::make_unsigned_t<Result>>; };
+	template <typename Result, typename Func> requires is_read_form2<Result, Func>::value struct read_result<Result, Func> { using type = std::invoke_result_t<Func, offs_t>; };
+	template <typename Result, typename Func> requires is_read_form3<Result, Func>::value struct read_result<Result, Func> { using type = std::invoke_result_t<Func>; };
 	template <typename Result, typename Func> using read_result_t = typename read_result<Result, Func>::type;
 
 	// Detecting candidates for read delegates
-	template <typename T, typename Enable = void> struct is_read_method : public std::false_type { };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read8s_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read16s_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read32s_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read64s_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read8sm_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read16sm_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read32sm_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read64sm_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read8smo_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read16smo_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read32smo_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read64smo_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_read_method<T, void_t<emu::detail::rw_device_class_t<read_line_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_read_method : public std::false_type { };
+	template <emu::detail::suitable_member_func<read8s_delegate> T> struct is_read_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<read16s_delegate> T> struct is_read_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<read32s_delegate> T> struct is_read_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<read64s_delegate> T> struct is_read_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<read8sm_delegate> T> struct is_read_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<read16sm_delegate> T> struct is_read_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<read32sm_delegate> T> struct is_read_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<read64sm_delegate> T> struct is_read_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<read8smo_delegate> T> struct is_read_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<read16smo_delegate> T> struct is_read_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<read32smo_delegate> T> struct is_read_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<read64smo_delegate> T> struct is_read_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<read_line_delegate> T> struct is_read_method<T> : public std::true_type { };
 
 	// Invoking read callbacks
-	template <typename Result, typename T> static std::enable_if_t<is_read_form1<Result, T>::value, mask_t<read_result_t<Result, T>, Result> > invoke_read(T const &cb, offs_t offset, std::make_unsigned_t<Result> mem_mask) { return std::make_unsigned_t<read_result_t<Result, T> >(cb(offset, mem_mask)); }
-	template <typename Result, typename T> static std::enable_if_t<is_read_form2<Result, T>::value, mask_t<read_result_t<Result, T>, Result> > invoke_read(T const &cb, offs_t offset, std::make_unsigned_t<Result> mem_mask) { return std::make_unsigned_t<read_result_t<Result, T> >(cb(offset)); }
-	template <typename Result, typename T> static std::enable_if_t<is_read_form3<Result, T>::value, mask_t<read_result_t<Result, T>, Result> > invoke_read(T const &cb, offs_t offset, std::make_unsigned_t<Result> mem_mask) { return std::make_unsigned_t<read_result_t<Result, T> >(cb()); }
+	template <typename Result, typename T> static mask_t<read_result_t<Result, T>, Result> invoke_read(T const &cb, offs_t offset, std::make_unsigned_t<Result> mem_mask) requires is_read_form1<Result, T>::value { return std::make_unsigned_t<read_result_t<Result, T> >(cb(offset, mem_mask)); }
+	template <typename Result, typename T> static mask_t<read_result_t<Result, T>, Result> invoke_read(T const &cb, offs_t offset, std::make_unsigned_t<Result> mem_mask) requires is_read_form2<Result, T>::value { return std::make_unsigned_t<read_result_t<Result, T> >(cb(offset)); }
+	template <typename Result, typename T> static mask_t<read_result_t<Result, T>, Result> invoke_read(T const &cb, offs_t offset, std::make_unsigned_t<Result> mem_mask) requires is_read_form3<Result, T>::value { return std::make_unsigned_t<read_result_t<Result, T> >(cb()); }
 
 	// Delegate characteristics
 	template <typename T, typename Dummy = void> struct delegate_traits;
@@ -273,25 +269,25 @@ protected:
 	template <typename Input, typename Func> using is_write = std::bool_constant<is_write_form1<Input, Func>::value || is_write_form2<Input, Func>::value || is_write_form3<Input, Func>::value>;
 
 	// Detecting candidates for write delegates
-	template <typename T, typename Enable = void> struct is_write_method : public std::false_type { };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write8s_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write16s_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write32s_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write64s_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write8sm_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write16sm_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write32sm_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write64sm_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write8smo_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write16smo_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write32smo_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write64smo_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
-	template <typename T> struct is_write_method<T, void_t<emu::detail::rw_device_class_t<write_line_delegate, std::remove_reference_t<T> > > > : public std::true_type { };
+	template <typename T> struct is_write_method : public std::false_type { };
+	template <emu::detail::suitable_member_func<write8s_delegate> T> struct is_write_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<write16s_delegate> T> struct is_write_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<write32s_delegate> T> struct is_write_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<write64s_delegate> T> struct is_write_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<write8sm_delegate> T> struct is_write_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<write16sm_delegate> T> struct is_write_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<write32sm_delegate> T> struct is_write_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<write64sm_delegate> T> struct is_write_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<write8smo_delegate> T> struct is_write_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<write16smo_delegate> T> struct is_write_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<write32smo_delegate> T> struct is_write_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<write64smo_delegate> T> struct is_write_method<T> : public std::true_type { };
+	template <emu::detail::suitable_member_func<write_line_delegate> T> struct is_write_method<T> : public std::true_type { };
 
 	// Invoking write callbacks
-	template <typename Input, typename T> static std::enable_if_t<is_write_form1<Input, T>::value> invoke_write(T const &cb, offs_t &offset, Input data, std::make_unsigned_t<Input> mem_mask) { return cb(offset, data, mem_mask); }
-	template <typename Input, typename T> static std::enable_if_t<is_write_form2<Input, T>::value> invoke_write(T const &cb, offs_t &offset, Input data, std::make_unsigned_t<Input> mem_mask) { return cb(offset, data); }
-	template <typename Input, typename T> static std::enable_if_t<is_write_form3<Input, T>::value> invoke_write(T const &cb, offs_t &offset, Input data, std::make_unsigned_t<Input> mem_mask) { return cb(data); }
+	template <typename Input, typename T> static void invoke_write(T const &cb, offs_t &offset, Input data, std::make_unsigned_t<Input> mem_mask) requires is_write_form1<Input, T>::value { return cb(offset, data, mem_mask); }
+	template <typename Input, typename T> static void invoke_write(T const &cb, offs_t &offset, Input data, std::make_unsigned_t<Input> mem_mask) requires is_write_form2<Input, T>::value { return cb(offset, data); }
+	template <typename Input, typename T> static void invoke_write(T const &cb, offs_t &offset, Input data, std::make_unsigned_t<Input> mem_mask) requires is_write_form3<Input, T>::value { return cb(data); }
 
 	// Delegate characteristics
 	template <typename T, typename Dummy = void> struct delegate_traits;
@@ -432,7 +428,7 @@ private:
 		~transform_builder() { this->template register_creator<transform_builder>(); }
 
 		template <typename T>
-		std::enable_if_t<is_transform<output_t, Result, T>::value, transform_builder<transform_builder, std::remove_reference_t<T> > > transform(T &&cb)
+		transform_builder<transform_builder, std::remove_reference_t<T> > transform(T &&cb) requires is_transform<output_t, Result, T>::value
 		{
 			output_t const m(this->mask());
 			if (this->inherited_mask())
@@ -500,7 +496,7 @@ private:
 		~functoid_builder() { this->template register_creator<functoid_builder>(); }
 
 		template <typename T>
-		std::enable_if_t<is_transform<output_t, Result, T>::value, transform_builder<functoid_builder, std::remove_reference_t<T> > > transform(T &&cb)
+		transform_builder<functoid_builder, std::remove_reference_t<T> > transform(T &&cb) requires is_transform<output_t, Result, T>::value
 		{
 			output_t const m(this->mask());
 			if (this->inherited_mask())
@@ -560,7 +556,7 @@ private:
 		~delegate_builder() { this->template register_creator<delegate_builder>(); }
 
 		template <typename T>
-		std::enable_if_t<is_transform<output_t, Result, T>::value, transform_builder<delegate_builder, std::remove_reference_t<T> > > transform(T &&cb)
+		transform_builder<delegate_builder, std::remove_reference_t<T> > transform(T &&cb) requires is_transform<output_t, Result, T>::value
 		{
 			output_t const m(this->mask());
 			if (this->inherited_mask())
@@ -624,7 +620,7 @@ private:
 		~ioport_builder() { this->template register_creator<ioport_builder>(); }
 
 		template <typename T>
-		std::enable_if_t<is_transform<output_t, Result, T>::value, transform_builder<ioport_builder, std::remove_reference_t<T> > > transform(T &&cb)
+		transform_builder<ioport_builder, std::remove_reference_t<T> > transform(T &&cb) requires is_transform<output_t, Result, T>::value
 		{
 			output_t const m(this->mask());
 			if (this->inherited_mask())
@@ -666,42 +662,42 @@ private:
 		binder &operator=(binder &&) = delete;
 
 		template <typename T>
-		std::enable_if_t<is_read<Result, T>::value, functoid_builder<std::remove_reference_t<T> > > set(T &&cb)
+		functoid_builder<std::remove_reference_t<T> > set(T &&cb) requires is_read<Result, T>::value
 		{
 			set_used();
 			return functoid_builder<std::remove_reference_t<T> >(m_target, m_append, std::forward<T>(cb));
 		}
 
 		template <typename T>
-		std::enable_if_t<is_read_method<T>::value, delegate_builder<delegate_type_t<T> > > set(T &&func, char const *name)
+		delegate_builder<delegate_type_t<T> > set(T &&func, char const *name) requires is_read_method<T>::value
 		{
 			set_used();
 			return delegate_builder<delegate_type_t<T> >(m_target, m_append, m_target.owner().mconfig().current_device(), DEVICE_SELF, std::forward<T>(func), name);
 		}
 
 		template <typename T>
-		std::enable_if_t<is_read_method<T>::value, delegate_builder<delegate_type_t<T> > > set(char const *tag, T &&func, char const *name)
+		delegate_builder<delegate_type_t<T> > set(char const *tag, T &&func, char const *name) requires is_read_method<T>::value
 		{
 			set_used();
 			return delegate_builder<delegate_type_t<T> >(m_target, m_append, m_target.owner().mconfig().current_device(), tag, std::forward<T>(func), name);
 		}
 
 		template <typename T, typename U>
-		std::enable_if_t<is_read_method<T>::value, delegate_builder<delegate_type_t<T> > > set(U &obj, T &&func, char const *name)
+		delegate_builder<delegate_type_t<T> > set(U &obj, T &&func, char const *name) requires is_read_method<T>::value
 		{
 			set_used();
 			return delegate_builder<delegate_type_t<T> >(m_target, m_append, m_target.owner(), devcb_read::cast_reference<delegate_device_class_t<T> >(obj), std::forward<T>(func), name);
 		}
 
 		template <typename T>
-		std::enable_if_t<is_read_method<T>::value, delegate_builder<delegate_type_t<T> > > set(device_t &devbase, char const *tag, T &&func, char const *name)
+		delegate_builder<delegate_type_t<T> > set(device_t &devbase, char const *tag, T &&func, char const *name) requires is_read_method<T>::value
 		{
 			set_used();
 			return delegate_builder<delegate_type_t<T> >(m_target, m_append, devbase, tag, std::forward<T>(func), name);
 		}
 
 		template <typename T, typename U, bool R>
-		std::enable_if_t<is_read_method<T>::value, delegate_builder<delegate_type_t<T> > > set(device_finder<U, R> &finder, T &&func, char const *name)
+		delegate_builder<delegate_type_t<T> > set(device_finder<U, R> &finder, T &&func, char const *name) requires is_read_method<T>::value
 		{
 			set_used();
 			std::pair<device_t &, char const *> const target(finder.finder_target());
@@ -709,7 +705,7 @@ private:
 		}
 
 		template <typename T, typename U, bool R>
-		std::enable_if_t<is_read_method<T>::value, delegate_builder<delegate_type_t<T> > > set(device_finder<U, R> const &finder, T &&func, char const *name)
+		delegate_builder<delegate_type_t<T> > set(device_finder<U, R> const &finder, T &&func, char const *name) requires is_read_method<T>::value
 		{
 			set_used();
 			std::pair<device_t &, char const *> const target(finder.finder_target());
@@ -1004,7 +1000,7 @@ private:
 		~transform_builder() { this->template register_creator<transform_builder>(); }
 
 		template <typename T>
-		std::enable_if_t<is_transform<output_t, output_t, T>::value, transform_builder<transform_builder, std::remove_reference_t<T> > > transform(T &&cb)
+		transform_builder<transform_builder, std::remove_reference_t<T> > transform(T &&cb) requires is_transform<output_t, output_t, T>::value
 		{
 			output_t const m(this->mask());
 			if (this->inherited_mask())
@@ -1085,7 +1081,7 @@ private:
 		bool validity_check(validity_checker &valid) const { return m_sink.validity_check(valid); }
 
 		template <typename T>
-		std::enable_if_t<is_transform<output_t, output_t, T>::value, transform_builder<first_transform_builder, std::remove_reference_t<T> > > transform(T &&cb)
+		transform_builder<first_transform_builder, std::remove_reference_t<T> > transform(T &&cb) requires is_transform<output_t, output_t, T>::value
 		{
 			output_t const m(this->mask());
 			if (this->inherited_mask())
@@ -1194,7 +1190,7 @@ private:
 		~functoid_builder() { this->template register_creator<functoid_builder>(); }
 
 		template <typename T>
-		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
+		first_transform_builder<wrapped_builder, std::remove_reference_t<T> > transform(T &&cb) requires is_transform<input_t, input_t, T>::value
 		{
 			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
@@ -1300,7 +1296,7 @@ private:
 		~delegate_builder() { this->template register_creator<delegate_builder>(); }
 
 		template <typename T>
-		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
+		first_transform_builder<wrapped_builder, std::remove_reference_t<T> > transform(T &&cb) requires is_transform<input_t, input_t, T>::value
 		{
 			std::make_unsigned_t<Input> const in_mask(this->inherited_mask() ? DefaultMask : this->mask());
 			mask_t<Input, typename delegate_traits<Delegate>::input_t> const out_mask(DefaultMask & delegate_traits<Delegate>::default_mask);
@@ -1452,7 +1448,7 @@ private:
 		~inputline_builder() { this->template register_creator<inputline_builder>(); }
 
 		template <typename T>
-		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
+		first_transform_builder<wrapped_builder, std::remove_reference_t<T> > transform(T &&cb) requires is_transform<input_t, input_t, T>::value
 		{
 			std::make_unsigned_t<Input> const in_mask(this->inherited_mask() ? DefaultMask : this->mask());
 			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), in_mask, 1U);
@@ -1626,7 +1622,7 @@ private:
 		~latched_inputline_builder() { this->template register_creator<latched_inputline_builder>(); }
 
 		template <typename T>
-		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
+		first_transform_builder<wrapped_builder, std::remove_reference_t<T> > transform(T &&cb) requires is_transform<input_t, input_t, T>::value
 		{
 			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
@@ -1749,7 +1745,7 @@ private:
 		~ioport_builder() { this->template register_creator<ioport_builder>(); }
 
 		template <typename T>
-		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
+		first_transform_builder<wrapped_builder, std::remove_reference_t<T> > transform(T &&cb) requires is_transform<input_t, input_t, T>::value
 		{
 			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
@@ -1849,7 +1845,7 @@ private:
 		~membank_builder() { this->template register_creator<membank_builder>(); }
 
 		template <typename T>
-		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
+		first_transform_builder<wrapped_builder, std::remove_reference_t<T> > transform(T &&cb) requires is_transform<input_t, input_t, T>::value
 		{
 			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
@@ -1896,14 +1892,17 @@ private:
 				that.built();
 			}
 
-			bool validity_check(validity_checker &valid) const { return true; }
+			bool validity_check(validity_checker &valid) const
+			{
+				return output_manager::validate_name(m_devbase, m_tag);
+			}
 
 			auto build()
 			{
 				assert(this->m_consumed);
 				this->built();
 				return
-						[&item = m_devbase.machine().output().find_or_create_item(m_tag, 0)] (offs_t offset, input_t data, std::make_unsigned_t<input_t> mem_mask)
+						[&item = m_devbase.machine().output().find_or_create_item(m_devbase, m_tag)] (offs_t offset, input_t data, std::make_unsigned_t<input_t> mem_mask)
 						{ item.set(data); };
 			}
 
@@ -1946,19 +1945,22 @@ private:
 		~output_builder() { this->template register_creator<output_builder>(); }
 
 		template <typename T>
-		std::enable_if_t<is_transform<input_t, input_t, T>::value, first_transform_builder<wrapped_builder, std::remove_reference_t<T> > > transform(T &&cb)
+		first_transform_builder<wrapped_builder, std::remove_reference_t<T> > transform(T &&cb) requires is_transform<input_t, input_t, T>::value
 		{
 			return first_transform_builder<wrapped_builder, std::remove_reference_t<T> >(this->m_target, this->m_append, wrapped_builder(std::move(*this)), std::forward<T>(cb), this->exor(), this->mask(), DefaultMask);
 		}
 
-		bool validity_check(validity_checker &valid) const { return true; }
+		bool validity_check(validity_checker &valid) const
+		{
+			return output_manager::validate_name(m_devbase, m_tag);
+		}
 
 		auto build()
 		{
 			assert(this->m_consumed);
 			this->built();
 			return
-					[&item = m_devbase.machine().output().find_or_create_item(m_tag, 0), exor = this->exor(), mask = this->mask()] (offs_t offset, input_t data, std::make_unsigned_t<input_t> mem_mask)
+					[&item = m_devbase.machine().output().find_or_create_item(m_devbase, m_tag), exor = this->exor(), mask = this->mask()] (offs_t offset, input_t data, std::make_unsigned_t<input_t> mem_mask)
 					{ item.set((data ^ exor) & mask); };
 		}
 	};
@@ -1973,42 +1975,42 @@ private:
 		binder &operator=(binder &&) = delete;
 
 		template <typename T>
-		std::enable_if_t<is_write<Input, T>::value, functoid_builder<std::remove_reference_t<T> > > set(T &&cb)
+		functoid_builder<std::remove_reference_t<T> > set(T &&cb) requires is_write<Input, T>::value
 		{
 			set_used();
 			return functoid_builder<std::remove_reference_t<T> >(m_target, m_append, std::forward<T>(cb));
 		}
 
 		template <typename T>
-		std::enable_if_t<is_write_method<T>::value, delegate_builder<delegate_type_t<T> > > set(T &&func, char const *name)
+		delegate_builder<delegate_type_t<T> > set(T &&func, char const *name) requires is_write_method<T>::value
 		{
 			set_used();
 			return delegate_builder<delegate_type_t<T> >(m_target, m_append, m_target.owner().mconfig().current_device(), DEVICE_SELF, std::forward<T>(func), name);
 		}
 
 		template <typename T>
-		std::enable_if_t<is_write_method<T>::value, delegate_builder<delegate_type_t<T> > > set(char const *tag, T &&func, char const *name)
+		delegate_builder<delegate_type_t<T> > set(char const *tag, T &&func, char const *name) requires is_write_method<T>::value
 		{
 			set_used();
 			return delegate_builder<delegate_type_t<T> >(m_target, m_append, m_target.owner().mconfig().current_device(), tag, std::forward<T>(func), name);
 		}
 
 		template <typename T, typename U>
-		std::enable_if_t<is_write_method<T>::value, delegate_builder<delegate_type_t<T> > > set(U &obj, T &&func, char const *name)
+		delegate_builder<delegate_type_t<T> > set(U &obj, T &&func, char const *name) requires is_write_method<T>::value
 		{
 			set_used();
 			return delegate_builder<delegate_type_t<T> >(m_target, m_append, m_target.owner(), devcb_write::cast_reference<delegate_device_class_t<T> >(obj), std::forward<T>(func), name);
 		}
 
 		template <typename T>
-		std::enable_if_t<is_write_method<T>::value, delegate_builder<delegate_type_t<T> > > set(device_t &devbase, char const *tag, T &&func, char const *name)
+		delegate_builder<delegate_type_t<T> > set(device_t &devbase, char const *tag, T &&func, char const *name) requires is_write_method<T>::value
 		{
 			set_used();
 			return delegate_builder<delegate_type_t<T> >(m_target, m_append, devbase, tag, std::forward<T>(func), name);
 		}
 
 		template <typename T, typename U, bool R>
-		std::enable_if_t<is_write_method<T>::value, delegate_builder<delegate_type_t<T> > > set(device_finder<U, R> &finder, T &&func, char const *name)
+		delegate_builder<delegate_type_t<T> > set(device_finder<U, R> &finder, T &&func, char const *name) requires is_write_method<T>::value
 		{
 			set_used();
 			std::pair<device_t &, char const *> const target(finder.finder_target());
@@ -2016,7 +2018,7 @@ private:
 		}
 
 		template <typename T, typename U, bool R>
-		std::enable_if_t<is_write_method<T>::value, delegate_builder<delegate_type_t<T> > > set(device_finder<U, R> const &finder, T &&func, char const *name)
+		delegate_builder<delegate_type_t<T> > set(device_finder<U, R> const &finder, T &&func, char const *name) requires is_write_method<T>::value
 		{
 			set_used();
 			std::pair<device_t &, char const *> const target(finder.finder_target());

@@ -175,8 +175,13 @@ Notes:
 
 #include "emu.h"
 #include "namcona1.h"
+
 #include "cpu/m68000/m68000.h"
+
 #include "speaker.h"
+
+#include <bit>
+
 
 #define MASTER_CLOCK    XTAL(50'113'000)
 
@@ -280,8 +285,8 @@ u16 namcona1_state::custom_key_r(offs_t offset)
 			if (!machine().side_effects_disabled())
 			{
 				m_keyval >>= 1;
-//              printf("popcount(%08X) = %d\n", m_keyval & 0x58000c00, population_count_32(m_keyval & 0x58000c00));
-				if ((!m_keyval) || (population_count_32(m_keyval & 0x58000c00) & 1))
+//              printf("popcount(%08X) = %d\n", m_keyval & 0x58000c00, std::popcount(m_keyval & 0x58000c00));
+				if ((!m_keyval) || (std::popcount(m_keyval & 0x58000c00) & 1))
 					m_keyval ^= 0x80000000;
 			}
 			return res;
@@ -1053,7 +1058,7 @@ void namcona1_state::namcona_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcona1_state::namcona1_main_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(40*8, 32*8);

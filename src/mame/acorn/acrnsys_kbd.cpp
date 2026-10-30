@@ -38,10 +38,6 @@ acrnsys_keyboard_device::acrnsys_keyboard_device(const machine_config &mconfig, 
 
 void acrnsys_keyboard_device::device_start()
 {
-	m_caps_led.resolve();
-	m_shift_lock_led.resolve();
-	m_power_led.resolve();
-
 	m_repeat_timer = timer_alloc(FUNC(acrnsys_keyboard_device::repeat), this);
 
 	save_item(NAME(m_strobe));

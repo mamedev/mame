@@ -21,16 +21,17 @@
 class mediagx_cs5530_bridge_device : public pci_device
 {
 public:
+
 	template <typename T, typename U>
-	mediagx_cs5530_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&ide_tag)
-		: mediagx_cs5530_bridge_device(mconfig, tag, owner, clock)
+	mediagx_cs5530_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&ide_tag)
+		: mediagx_cs5530_bridge_device(mconfig, tag, owner)
 	{
 		set_ids(0x10780100, 0x00, 0x060100, 0x00000000);
 		set_cpu_tag(std::forward<T>(cpu_tag));
 		set_ide_tag(std::forward<U>(ide_tag));
 	}
 
-	mediagx_cs5530_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mediagx_cs5530_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto boot_state_hook() { return m_boot_state_hook.bind(); }
 	auto rtcale() { return m_rtcale.bind(); }

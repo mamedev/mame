@@ -42,14 +42,9 @@ public:
 			const std::shared_ptr<osd_monitor_info> &a_monitor,
 			const osd_window_config *config);
 
-	~sdl_window_info();
-
-	int window_init();
+	virtual ~sdl_window_info();
 
 	void update() override;
-	void toggle_full_screen();
-	void modify_prescale(int dir);
-	void resize(int32_t width, int32_t height);
 	void complete_destroy() override;
 
 	void capture_pointer() override;
@@ -57,9 +52,14 @@ public:
 	void show_pointer() override;
 	void hide_pointer() override;
 
-	void notify_changed();
+	virtual osd_dim get_size() override;
 
-	osd_dim get_size() override;
+	int window_init();
+
+	void toggle_full_screen();
+	void modify_prescale(int dir);
+	void resize(int32_t width, int32_t height);
+	void notify_changed();
 
 	int xy_to_render_target(int x, int y, int *xt, int *yt);
 

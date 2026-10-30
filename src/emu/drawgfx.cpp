@@ -2038,7 +2038,7 @@ void primask_copybitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int f
 
 
 /*-------------------------------------------------
-    copybitmap_transalphpa - copy from one bitmap
+    copybitmap_transalpha - copy from one bitmap
     to another, copying all unclipped pixels except
     those with an alpha value of zero
 -------------------------------------------------*/

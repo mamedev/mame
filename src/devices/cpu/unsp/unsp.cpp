@@ -26,6 +26,12 @@
 
 #include <climits>
 
+
+#define SINGLE_INSTRUCTION_MODE (0)
+
+#define ENABLE_UNSP_DRC         (0)
+
+
 DEFINE_DEVICE_TYPE(UNSP,    unsp_device,    "unsp",    "SunPlus u'nSP (ISA 1.0)")
 // 1.1 is just 1.0 with better CPI?
 DEFINE_DEVICE_TYPE(UNSP_11, unsp_11_device, "unsp_11", "SunPlus u'nSP (ISA 1.1)")
@@ -60,6 +66,7 @@ unsp_device::unsp_device(const machine_config &mconfig, device_type type, const 
 	, m_mem_write(nullptr)
 	, m_enable_drc(false)
 	, m_vectorbase(0xfff0)
+	, m_bootvectorbase(0xfff0)
 {
 	m_iso = 10;
 	m_numregs = 8;
@@ -225,7 +232,7 @@ void unsp_device::device_start()
 	if (m_enable_drc)
 	{
 		uint32_t umlflags = 0;
-		m_drcuml = std::make_unique<drcuml_state>(*this, m_drccache, umlflags, 1, 23, 0);
+		m_drcuml = std::make_unique<drcuml_state>(*this, m_drccache, umlflags, 1, 23, 0, COMPILE_FORWARDS_BYTES);
 
 		// add UML symbols-
 		m_drcuml->symbol_add(&m_core->m_r[REG_SP], sizeof(uint32_t), "SP");
@@ -248,7 +255,7 @@ void unsp_device::device_start()
 		m_drcuml->symbol_add(&m_core->m_icount, sizeof(m_core->m_icount), "icount");
 
 		/* initialize the front-end helper */
-		m_drcfe = std::make_unique<unsp_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+		m_drcfe = std::make_unique<frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 
 		/* mark the cache dirty so it is updated on next execute */
 		m_cache_dirty = true;
@@ -329,7 +336,7 @@ void unsp_device::device_reset()
 			m_core->m_r[i] = 0xdeadbeef;
 	}
 
-	m_core->m_r[REG_PC] = read16(m_vectorbase + 0x7);
+	m_core->m_r[REG_PC] = read16(m_bootvectorbase + 0x7);
 	m_core->m_enable_irq = 0;
 	m_core->m_enable_fiq = 0;
 	m_core->m_fir_move = 1;

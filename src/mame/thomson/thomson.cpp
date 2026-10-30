@@ -516,7 +516,7 @@ void thomson_state::to7_base(machine_config &config, bool is_mo)
 	}
 
 /* video */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER).set_palette("palette");
+	SCREEN(config, "screen").set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(thomson_state::thom_palette), 4097); // 12-bit color + transparency
 

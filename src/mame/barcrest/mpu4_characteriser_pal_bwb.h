@@ -15,7 +15,7 @@ class mpu4_characteriser_pal_bwb : public device_t
 {
 public:
 	// construction/destruction
-	mpu4_characteriser_pal_bwb(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpu4_characteriser_pal_bwb(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_common_key(uint8_t commonkey)
 	{

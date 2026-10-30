@@ -2,7 +2,7 @@
 // ip/basic_resolver_results.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -29,6 +29,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace ip {
 
 /// A range of entries produced by a resolver.
@@ -48,11 +49,7 @@ namespace ip {
  */
 template <typename InternetProtocol>
 class basic_resolver_results
-#if !defined(ASIO_NO_DEPRECATED)
-  : public basic_resolver_iterator<InternetProtocol>
-#else // !defined(ASIO_NO_DEPRECATED)
   : private basic_resolver_iterator<InternetProtocol>
-#endif // !defined(ASIO_NO_DEPRECATED)
 {
 public:
   /// The protocol type associated with the results.
@@ -136,14 +133,20 @@ public:
       if (address_info->ai_family == ASIO_OS_DEF(AF_INET)
           || address_info->ai_family == ASIO_OS_DEF(AF_INET6))
       {
-        using namespace std; // For memcpy.
-        typename InternetProtocol::endpoint endpoint;
-        endpoint.resize(static_cast<std::size_t>(address_info->ai_addrlen));
-        memcpy(endpoint.data(), address_info->ai_addr,
-            address_info->ai_addrlen);
-        results.values_->push_back(
-            basic_resolver_entry<InternetProtocol>(endpoint,
-              actual_host_name, service_name));
+        const std::size_t expected_size =
+          address_info->ai_family == ASIO_OS_DEF(AF_INET)
+            ? sizeof(asio::detail::sockaddr_in4_type)
+            : sizeof(asio::detail::sockaddr_in6_type);
+        if (static_cast<std::size_t>(address_info->ai_addrlen) >= expected_size)
+        {
+          using namespace std; // For memcpy.
+          typename InternetProtocol::endpoint endpoint;
+          endpoint.resize(expected_size);
+          memcpy(endpoint.data(), address_info->ai_addr, expected_size);
+          results.values_->push_back(
+              basic_resolver_entry<InternetProtocol>(endpoint,
+                actual_host_name, service_name));
+        }
       }
       address_info = address_info->ai_next;
     }
@@ -300,6 +303,7 @@ private:
 };
 
 } // namespace ip
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

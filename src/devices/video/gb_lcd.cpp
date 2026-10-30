@@ -1262,9 +1262,9 @@ void dmg_ppu_device::update_scanline(uint32_t cycles_to_go)
 			{
 				if (m_current_line < 144)
 				{
-					const rectangle &r = screen().visible_area();
-					rectangle r1(r.min_x, r.max_x, m_current_line, m_current_line);
-					m_bitmap.fill(0, r1);
+					rectangle r = screen().visible_area();
+					r.sety(m_current_line, m_current_line);
+					m_bitmap.fill(0, r);
 				}
 				m_previous_line = m_current_line;
 			}
@@ -1879,9 +1879,9 @@ void cgb_ppu_device::update_scanline(uint32_t cycles_to_go)
 			{
 				if (m_current_line < 144)
 				{
-					const rectangle &r1 = screen().visible_area();
-					rectangle r(r1.min_x, r1.max_x, m_current_line, m_current_line);
-					m_bitmap.fill((!m_gbc_mode) ? 0 : 32767 , r);
+					rectangle r = screen().visible_area();
+					r.sety(m_current_line, m_current_line);
+					m_bitmap.fill(!m_gbc_mode ? 0 : 32767 , r);
 				}
 				m_previous_line = m_current_line;
 			}
@@ -2336,7 +2336,7 @@ void dmg_ppu_device::update_state()
 			}
 			assert(state_cycles > 0);
 
-			if (m_state == GB_LCD_STATE_LYXX_M3 || m_state == GB_LCD_STATE_LYXX_M3_2 || m_state == GB_LCD_STATE_LYXX_M0 || m_state == GB_LCD_STATE_LYXX_M0)
+			if (m_state == GB_LCD_STATE_LYXX_M3 || m_state == GB_LCD_STATE_LYXX_M3_2 || m_state == GB_LCD_STATE_LYXX_M0 || m_state == GB_LCD_STATE_LYXX_M0_2)
 			{
 				// Execute <cycles> M3 cycles
 				if (m_enable_experimental_engine)

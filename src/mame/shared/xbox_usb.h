@@ -475,10 +475,7 @@ public:
 	ohci_usb_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, bool fixed)
 		: ohci_usb_connector(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<T>(opts), dflt, fixed);
 	}
 
 	ohci_usb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -499,7 +496,7 @@ DECLARE_DEVICE_TYPE(OHCI_GAME_CONTROLLER, ohci_game_controller_device)
 class ohci_game_controller_device : public device_t, public device_usb_ohci_function_interface
 {
 public:
-	ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	void initialize() override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 	int handle_interrupt_pid(int endpoint, int pid, uint8_t *buffer, int size) override;

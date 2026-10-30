@@ -13,6 +13,8 @@
 #include "mdec.h"
 #include "dma.h"
 
+#include "endianness.h"
+
 #define LOG_DMA     (1U << 1)
 #define LOG_COMMAND (1U << 2)
 

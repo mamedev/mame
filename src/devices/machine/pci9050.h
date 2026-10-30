@@ -18,7 +18,7 @@
 class pci9050_device : public pci_device
 {
 public:
-	pci9050_device(const machine_config &mconfig, const char *tag, device_t *device, uint32_t clock);
+	pci9050_device(const machine_config &mconfig, const char *tag, device_t *device, uint32_t clock = 0);
 
 	auto user_input_callback() { return m_user_input_handler.bind(); }
 	auto user_output_callback() { return m_user_output_handler.bind(); }

@@ -84,7 +84,7 @@ private:
 class rf5c164_device : public rf5c68_device
 {
 public:
-	rf5c164_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rf5c164_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void rf5c164_map(address_map &map) ATTR_COLD;
 };

@@ -70,7 +70,7 @@ public:
 	};
 
 	// construction/destruction
-	ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration helpers
 	void set_flags(int flags) { m_flags = flags; }
@@ -374,7 +374,7 @@ DECLARE_DEVICE_TYPE(AY8930, ay8930_device)
 class ym2149_device : public ay8910_device
 {
 public:
-	ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 DECLARE_DEVICE_TYPE(YM2149, ym2149_device)

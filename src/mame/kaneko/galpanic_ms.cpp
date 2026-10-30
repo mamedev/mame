@@ -451,7 +451,7 @@ void galspanic_ms_state::newquiz(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(galspanic_ms_state::irq6_line_hold)); // changed from original
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(256, 256);

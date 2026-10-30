@@ -472,15 +472,6 @@ void ie15_device::kbd_sdv(int state)
 
 void ie15_device::device_start()
 {
-	m_lat_led.resolve();
-	m_nr_led.resolve();
-	m_pch_led.resolve();
-	m_dup_led.resolve();
-	m_lin_led.resolve();
-	m_red_led.resolve();
-	m_sdv_led.resolve();
-	m_prd_led.resolve();
-
 	m_hblank_timer = timer_alloc(FUNC(ie15_device::hblank_onoff_tick), this);
 	m_hblank_timer->adjust(attotime::never);
 
@@ -672,7 +663,7 @@ void ie15_device::ie15core(machine_config &config)
 	config.set_default_layout(layout_ie15);
 
 	/* Devices */
-	IE15_KEYBOARD(config, m_keyboard, 0);
+	IE15_KEYBOARD(config, m_keyboard);
 	m_keyboard->keyboard_cb().set(FUNC(ie15_device::kbd_put));
 	m_keyboard->sdv_cb().set(FUNC(ie15_device::kbd_sdv));
 
@@ -698,7 +689,7 @@ ROM_END
 
 void ie15_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_screen_update(FUNC(ie15_device::screen_update));
 	m_screen->set_raw(XTAL(30'800'000)/2,

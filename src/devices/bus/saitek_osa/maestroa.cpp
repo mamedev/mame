@@ -3,7 +3,7 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-Saitek OSA Module: Kasparov Maestro A (SciSys, 1986)
+Saitek OSA: Kasparov Maestro A Module (SciSys, 1986)
 
 The chess engine revision is in-between Kaplan's Stratos and Turbostar.
 
@@ -83,6 +83,7 @@ void saitekosa_maestroa_device::device_start()
 
 void saitekosa_maestroa_device::device_reset()
 {
+	m_expansion->rts_w(1);
 	control_w(0);
 }
 
@@ -104,7 +105,7 @@ u8 saitekosa_maestroa_device::data_r()
 
 void saitekosa_maestroa_device::nmi_w(int state)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, !state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void saitekosa_maestroa_device::ack_w(int state)
@@ -123,8 +124,8 @@ u8 saitekosa_maestroa_device::rts_r()
 	if (!machine().side_effects_disabled())
 	{
 		// strobe RTS-P
-		m_expansion->rts_w(1);
 		m_expansion->rts_w(0);
+		m_expansion->rts_w(1);
 	}
 
 	return 0xff;
@@ -153,7 +154,7 @@ void saitekosa_maestroa_device::control_w(u8 data)
 u8 saitekosa_maestroa_device::ack_r()
 {
 	// d7: ACK-P
-	return m_expansion->ack_state() ? 0x80 : 0;
+	return m_expansion->ack_state() ? 0 : 0x80;
 }
 
 void saitekosa_maestroa_device::main_map(address_map &map)
@@ -227,4 +228,4 @@ const tiny_rom_entry *saitekosa_maestroa_device::device_rom_region() const
 } // anonymous namespace
 
 
-DEFINE_DEVICE_TYPE_PRIVATE(OSA_MAESTROA, device_saitekosa_expansion_interface, saitekosa_maestroa_device, "osa_maestroa", "Saitek OSA Maestro A")
+DEFINE_DEVICE_TYPE_PRIVATE(OSA_MAESTROA, device_saitekosa_expansion_interface, saitekosa_maestroa_device, "osa_maestroa", "Saitek OSA: Kasparov Maestro A Module")

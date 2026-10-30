@@ -21,7 +21,7 @@ namespace ui {
 class menu_sliders : public menu
 {
 public:
-	menu_sliders(mame_ui_manager &mui, render_container &container, bool menuless_mode = false);
+	menu_sliders(mame_ui_manager &mui, render_target &target, bool menuless_mode = false);
 	virtual ~menu_sliders() override;
 
 protected:

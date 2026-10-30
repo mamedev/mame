@@ -20,6 +20,9 @@ To Do:
 
 Notes:
 
+- v1.71 program ROMs were preproduction ROMs and there are known issue with memory management. Using v1.71 with StarPak carts
+  will produce freezing and possible stability issues.
+
 - 4 known game carts where produced, these are:
 
     Star Pak 1: Seek the Peaks, 21 Thunder, Solar Solitaire, Prism Poker, Pharaoh's Tomb, Magic Black Jack,
@@ -34,6 +37,8 @@ Notes:
 - Early flyers show "Star Pak 1" titled as Cardmania!
 - Early flyers show "Star Pak 2" titled as Galaxy Games Volume 2
 - There is an early flyer showing a Cardmania! cartridge in front of a partialy blocked cartridge labeled Casino
+   According to a developer: "The casino cart was just a concept. We did a version that was in a small standup cabinet and
+   put it on test in bars as potential grey area gaming device with some of the card games but it never went anywhere"
 
 ***************************************************************************/
 
@@ -45,10 +50,10 @@ Notes:
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
+#include "video/bt48x.h"
 #include "video/cesblit.h"
 
 #include "dirom.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -238,7 +243,7 @@ class galgames_slot_device : public device_t, public device_memory_interface
 {
 public:
 	// construction/destruction
-	galgames_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	galgames_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void slot_map(address_map &map) ATTR_COLD;
 
@@ -735,20 +740,31 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
+		m_ramdac(*this, "ramdac"),
 		m_blitter(*this, "blitter"),
 		m_oki(*this, "oki"),
 		m_slot(*this, "slot"),
 		m_okiram(*this, "okiram")
 	{ }
 
+	void galgames_base(machine_config &config) ATTR_COLD;
+	void galgbase(machine_config &config) ATTR_COLD;
+	void galgame2(machine_config &config) ATTR_COLD;
+	void galgame3(machine_config &config) ATTR_COLD;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<bt481_device> m_ramdac;
+	required_device<cesblit_device> m_blitter;
+	required_device<okim6295_device> m_oki;
+	required_device<galgames_slot_device> m_slot;
+	required_shared_ptr<u8> m_okiram;
+
 	void blitter_irq_callback(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void palette_offset_w(u8 data);
-	void palette_data_w(u8 data);
 
 	u8 okiram_r(offs_t offset);
 	void okiram_w(offs_t offset, u8 data);
@@ -756,28 +772,9 @@ public:
 	u16 fpga_status_r();
 	void outputs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	void galgames_base(machine_config &config);
-	void galgbios(machine_config &config);
-	void galgame2(machine_config &config);
-	void galgame3(machine_config &config);
 	void blitter_map(address_map &map) ATTR_COLD;
 	void galgames_map(address_map &map) ATTR_COLD;
 	void oki_map(address_map &map) ATTR_COLD;
-
-protected:
-	virtual void video_start() override ATTR_COLD;
-
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_device<cesblit_device> m_blitter;
-	required_device<okim6295_device> m_oki;
-	required_device<galgames_slot_device> m_slot;
-	required_shared_ptr<u8> m_okiram;
-
-	u8 m_palette_offset = 0;
-	u8 m_palette_index = 0;
-	u8 m_palette_data[3]{};
 };
 
 void galgames_state::blitter_irq_callback(int state)
@@ -794,35 +791,8 @@ void galgames_state::blitter_irq_callback(int state)
 
 u32 galgames_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(m_ramdac->black_pen(), cliprect);
 	return m_blitter->screen_update(screen, bitmap, cliprect);
-}
-
-// BT481A Palette RAMDAC
-
-void galgames_state::palette_offset_w(u8 data)
-{
-	m_palette_offset = data & 0xff;
-	m_palette_index = 0;
-}
-
-void galgames_state::palette_data_w(u8 data)
-{
-	m_palette_data[m_palette_index] = data & 0xff;
-	if (++m_palette_index == 3)
-	{
-		for (int palette_base = 0; palette_base < 0x1000; palette_base += 0x100)
-			m_palette->set_pen_color(m_palette_offset + palette_base, rgb_t(m_palette_data[0], m_palette_data[1], m_palette_data[2]));
-		m_palette_index = 0;
-		m_palette_offset++;
-	}
-}
-
-void galgames_state::video_start()
-{
-	save_item(NAME(m_palette_offset));
-	save_item(NAME(m_palette_index));
-	save_item(NAME(m_palette_data));
 }
 
 /***************************************************************************
@@ -889,8 +859,7 @@ void galgames_state::galgames_map(address_map &map)
 	map(0xa00001, 0xa00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xb00000, 0xb7ffff).rw(FUNC(galgames_state::okiram_r), FUNC(galgames_state::okiram_w)).umask16(0x00ff); // (only low bytes tested) 4x N341024SJ-15
 
-	map(0xc00001, 0xc00001).w(FUNC(galgames_state::palette_offset_w));
-	map(0xc00003, 0xc00003).w(FUNC(galgames_state::palette_data_w));
+	map(0xc00000, 0xc0000f).m(m_ramdac, FUNC(bt481_device::map)).umask16(0x00ff);
 
 	map(0xd00000, 0xd00001).portr("TRACKBALL_1_X");
 	map(0xd00000, 0xd00001).nopw();  // bit 0: FPGA programming serial in (lsb first)
@@ -1001,24 +970,25 @@ void galgames_state::galgames_base(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(galgames_state::scanline_interrupt), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
-	GALGAMES_SLOT(config, m_slot, 0);
+	GALGAMES_SLOT(config, m_slot);
 	GALGAMES_BIOS_CART(config, "cart0", 0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(400, 256);
 	m_screen->set_visarea(0, 400-1, 0, 256-1);
 	m_screen->set_screen_update(FUNC(galgames_state::screen_update));
-	m_screen->set_palette(m_palette);
+	m_screen->set_palette(m_ramdac);
 
 	CESBLIT(config, m_blitter, XTAL(24'000'000), m_screen);
 	m_blitter->set_addrmap(AS_PROGRAM, &galgames_state::blitter_map);
 	m_blitter->set_compute_addr(galgames_compute_addr);
 	m_blitter->irq_callback().set(FUNC(galgames_state::blitter_irq_callback));
+	m_blitter->set_extended_palette(false);
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x1000); // only 0x100 used
+	BT481(config, m_ramdac);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1027,7 +997,7 @@ void galgames_state::galgames_base(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void galgames_state::galgbios(machine_config &config)
+void galgames_state::galgbase(machine_config &config)
 {
 	galgames_base(config);
 	GALGAMES_CART(config, "cart1", 1);
@@ -1079,9 +1049,11 @@ Board silkscreened  237-0211-00
 
 Cartridge based mother board
 Holds up to 4 cartridges
-Chips labeled
+Most recent chips labeled
     GALAXY U1 V1.90 12/1/98
     GALAXY U2 V1.90 12/1/98
+
+NOTE: PCB labels the program ROMs as CARTRIDGE0
 
 Motorola MC68HC000FN12
 24 MHz oscillator
@@ -1111,7 +1083,11 @@ Copyright notice in rom states: Creative Electronics & Software Written by Keith
 	\
 	ROM_SYSTEM_BIOS( 1, "1.80",   "v1.80 10/05/98" ) \
 	ROM_LOAD16_BYTE_BIOS( 1, "galaxy_u2__v1.80_10-15-98.u2", 0x000000, 0x100000, CRC(73cff284) SHA1(e6f7d92999cdb478c21c3b65a04eade84299ac12) ) \
-	ROM_LOAD16_BYTE_BIOS( 1, "galaxy_u1__v1.80_10-15-98.u1", 0x000001, 0x100000, CRC(e3ae423c) SHA1(66d1964845a99a5ed4b19b4135b55cde6b5fe295) )
+	ROM_LOAD16_BYTE_BIOS( 1, "galaxy_u1__v1.80_10-15-98.u1", 0x000001, 0x100000, CRC(e3ae423c) SHA1(66d1964845a99a5ed4b19b4135b55cde6b5fe295) ) \
+	\
+	ROM_SYSTEM_BIOS( 2, "1.71",   "v1.71 07/08/98" ) \
+	ROM_LOAD16_BYTE_BIOS( 2, "galaxy_u2__v1.71_7-8-98.u2", 0x000000, 0x100000, CRC(d1c3dbb3) SHA1(ebe74ed7f2d8c4abcd6743b9d9c77cc347efc444) ) \
+	ROM_LOAD16_BYTE_BIOS( 2, "galaxy_u1__v1.71_7-8-98.u1", 0x000001, 0x100000, CRC(604415c8) SHA1(6c67c3be1aca03d009b6244e3bd911caaa2ca666) )
 
 #define GALGAMES_MB_PALS \
 	ROM_REGION( 0xa00, "pals", 0 ) \
@@ -1121,7 +1097,7 @@ Copyright notice in rom states: Creative Electronics & Software Written by Keith
 	ROM_LOAD( "16v8h-green.u27",   0x600, 0x117, NO_DUMP) \
 	ROM_LOAD( "16v8h-red.u45",     0x800, 0x117, NO_DUMP)
 
-ROM_START( galgbios )
+ROM_START( galgames )
 	ROM_REGION16_BE( 0x200000, "cart0", 0 )
 	GALGAMES_BIOS_ROMS
 
@@ -1285,8 +1261,8 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1998, galgbios,  0,        galgbios, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games BIOS",                  MACHINE_IS_BIOS_ROOT)
-GAME(1998, galgame2,  galgbios, galgame2, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software / Namco", "Galaxy Games StarPak 2",             0)
-GAME(1998, galgame3,  galgbios, galgame3, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software / Atari", "Galaxy Games StarPak 3",             0)
-GAME(1998, galgame4,  galgbios, galgame3, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games StarPak 4",             0)
-GAME(1998, galgame4p, galgame4, galgame3, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games StarPak 4 (prototype)", MACHINE_IMPERFECT_GRAPHICS)
+GAME(1998, galgames,  0,        galgbase, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games",                                 MACHINE_IS_BIOS_ROOT)
+GAME(1998, galgame2,  galgames, galgame2, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software / Namco", "Galaxy Games + StarPak 2 cartridge",           0)
+GAME(1998, galgame3,  galgames, galgame3, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software / Atari", "Galaxy Games + StarPak 3 cartridge",           0)
+GAME(1998, galgame4,  galgames, galgame3, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games + StarPak 4 cartridge",           0)
+GAME(1998, galgame4p, galgame4, galgame3, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games + prototype StarPak 4 cartridge", MACHINE_IMPERFECT_GRAPHICS)

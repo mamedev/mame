@@ -27,9 +27,8 @@
 #include "cpu/z180/z180.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "video/ramdac.h"
+#include "video/bt47x.h"
 
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -45,7 +44,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_gfxdecode(*this, "gfxdecode")
-		, m_palette(*this, "palette")
+		, m_ramdac(*this, "ramdac")
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
@@ -58,7 +57,6 @@ public:
 	void init_losttrea();
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -69,7 +67,7 @@ private:
 
 	required_device<z180_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	required_device<bt476_device> m_ramdac;
 	output_finder<7> m_lamps;
 
 	void vram_w(offs_t offset, uint8_t data);
@@ -237,9 +235,7 @@ void chsuper_state::losttrea_portmap(address_map &map)
 	map(0x00ed, 0x00ed).nopw(); // mirror of EFh, but with bit0 active...
 	map(0x00ee, 0x00ee).w(FUNC(chsuper_state::outporta_w));
 	map(0x00ef, 0x00ef).w(FUNC(chsuper_state::outportb_w));
-	map(0x00fc, 0x00fc).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x00fd, 0x00fd).w("ramdac", FUNC(ramdac_device::pal_w));
-	map(0x00fe, 0x00fe).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x00fc, 0x00ff).w(m_ramdac, FUNC(bt476_device::write));
 	map(0x8300, 0x8300).portr("IN2");  // valid input port present in test mode.
 	map(0xff20, 0xff3f).w("dac", FUNC(dac_byte_interface::data_w)); // unk writes
 }
@@ -249,11 +245,6 @@ void chsuper_state::portmap(address_map &map)
 	losttrea_portmap(map);
 
 	map(0x00ea, 0x00ea).portr("DSW");
-}
-
-void chsuper_state::ramdac_map(address_map &map)
-{
-	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
 
@@ -419,21 +410,19 @@ void chsuper_state::chsuper(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(chsuper_state::irq0_line_hold));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(57);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_screen_update(FUNC(chsuper_state::screen_update));
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea(0*8, 48*8-1, 0, 30*8-1);
-	screen.set_palette(m_palette);
+	screen.set_palette(m_ramdac);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_chsuper);
-	PALETTE(config, m_palette).set_entries(0x100);
+	GFXDECODE(config, m_gfxdecode, m_ramdac, gfx_chsuper);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // ADV476KP50
-	ramdac.set_addrmap(0, &chsuper_state::ramdac_map);
+	BT476(config, m_ramdac); // ADV476KP50
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();

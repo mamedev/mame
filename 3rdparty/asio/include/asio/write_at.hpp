@@ -2,7 +2,7 @@
 // write_at.hpp
 // ~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -29,6 +29,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 template <typename> class initiate_async_write_at;
@@ -187,7 +188,10 @@ template <typename SyncRandomAccessWriteDevice, typename ConstBufferSequence,
     typename CompletionCondition>
 std::size_t write_at(SyncRandomAccessWriteDevice& d,
     uint64_t offset, const ConstBufferSequence& buffers,
-    CompletionCondition completion_condition);
+    CompletionCondition completion_condition,
+    constraint_t<
+      is_completion_condition<CompletionCondition>::value
+    > = 0);
 
 /// Write a certain amount of data at a specified offset before returning.
 /**
@@ -235,7 +239,10 @@ template <typename SyncRandomAccessWriteDevice, typename ConstBufferSequence,
     typename CompletionCondition>
 std::size_t write_at(SyncRandomAccessWriteDevice& d,
     uint64_t offset, const ConstBufferSequence& buffers,
-    CompletionCondition completion_condition, asio::error_code& ec);
+    CompletionCondition completion_condition, asio::error_code& ec,
+    constraint_t<
+      is_completion_condition<CompletionCondition>::value
+    > = 0);
 
 #if !defined(ASIO_NO_EXTENSIONS)
 #if !defined(ASIO_NO_IOSTREAM)
@@ -348,7 +355,10 @@ std::size_t write_at(SyncRandomAccessWriteDevice& d,
 template <typename SyncRandomAccessWriteDevice, typename Allocator,
     typename CompletionCondition>
 std::size_t write_at(SyncRandomAccessWriteDevice& d, uint64_t offset,
-    basic_streambuf<Allocator>& b, CompletionCondition completion_condition);
+    basic_streambuf<Allocator>& b, CompletionCondition completion_condition,
+    constraint_t<
+      is_completion_condition<CompletionCondition>::value
+    > = 0);
 
 /// Write a certain amount of data at a specified offset before returning.
 /**
@@ -391,9 +401,12 @@ std::size_t write_at(SyncRandomAccessWriteDevice& d, uint64_t offset,
  */
 template <typename SyncRandomAccessWriteDevice, typename Allocator,
     typename CompletionCondition>
-std::size_t write_at(SyncRandomAccessWriteDevice& d, uint64_t offset,
-    basic_streambuf<Allocator>& b, CompletionCondition completion_condition,
-    asio::error_code& ec);
+std::size_t write_at(SyncRandomAccessWriteDevice& d,
+    uint64_t offset, basic_streambuf<Allocator>& b,
+    CompletionCondition completion_condition, asio::error_code& ec,
+    constraint_t<
+      is_completion_condition<CompletionCondition>::value
+    > = 0);
 
 #endif // !defined(ASIO_NO_IOSTREAM)
 #endif // !defined(ASIO_NO_EXTENSIONS)
@@ -456,7 +469,7 @@ std::size_t write_at(SyncRandomAccessWriteDevice& d, uint64_t offset,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the completion handler will not be invoked from within this function.
  * On immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using asio::post().
+ * manner equivalent to using asio::async_immediate().
  *
  * @par Completion Signature
  * @code void(asio::error_code, std::size_t) @endcode
@@ -485,16 +498,25 @@ template <typename AsyncRandomAccessWriteDevice, typename ConstBufferSequence,
     ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
       std::size_t)) WriteToken = default_completion_token_t<
         typename AsyncRandomAccessWriteDevice::executor_type>>
-auto async_write_at(AsyncRandomAccessWriteDevice& d,
+inline auto async_write_at(AsyncRandomAccessWriteDevice& d,
     uint64_t offset, const ConstBufferSequence& buffers,
     WriteToken&& token = default_completion_token_t<
-      typename AsyncRandomAccessWriteDevice::executor_type>())
+      typename AsyncRandomAccessWriteDevice::executor_type>(),
+    constraint_t<
+      !is_completion_condition<WriteToken>::value
+    > = 0)
   -> decltype(
     async_initiate<WriteToken,
       void (asio::error_code, std::size_t)>(
         declval<detail::initiate_async_write_at<
           AsyncRandomAccessWriteDevice>>(),
-        token, offset, buffers, transfer_all()));
+        token, offset, buffers, transfer_all()))
+{
+  return async_initiate<WriteToken,
+    void (asio::error_code, std::size_t)>(
+      detail::initiate_async_write_at<AsyncRandomAccessWriteDevice>(d),
+      token, offset, buffers, transfer_all());
+}
 
 /// Start an asynchronous operation to write a certain amount of data at the
 /// specified offset.
@@ -558,7 +580,7 @@ auto async_write_at(AsyncRandomAccessWriteDevice& d,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the completion handler will not be invoked from within this function.
  * On immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using asio::post().
+ * manner equivalent to using asio::async_immediate().
  *
  * @par Completion Signature
  * @code void(asio::error_code, std::size_t) @endcode
@@ -589,18 +611,28 @@ template <typename AsyncRandomAccessWriteDevice,
     ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
       std::size_t)) WriteToken = default_completion_token_t<
         typename AsyncRandomAccessWriteDevice::executor_type>>
-auto async_write_at(AsyncRandomAccessWriteDevice& d,
+inline auto async_write_at(AsyncRandomAccessWriteDevice& d,
     uint64_t offset, const ConstBufferSequence& buffers,
     CompletionCondition completion_condition,
     WriteToken&& token = default_completion_token_t<
-      typename AsyncRandomAccessWriteDevice::executor_type>())
+      typename AsyncRandomAccessWriteDevice::executor_type>(),
+    constraint_t<
+      is_completion_condition<CompletionCondition>::value
+    > = 0)
   -> decltype(
     async_initiate<WriteToken,
       void (asio::error_code, std::size_t)>(
         declval<detail::initiate_async_write_at<
           AsyncRandomAccessWriteDevice>>(),
         token, offset, buffers,
-        static_cast<CompletionCondition&&>(completion_condition)));
+        static_cast<CompletionCondition&&>(completion_condition)))
+{
+  return async_initiate<WriteToken,
+    void (asio::error_code, std::size_t)>(
+      detail::initiate_async_write_at<AsyncRandomAccessWriteDevice>(d),
+      token, offset, buffers,
+      static_cast<CompletionCondition&&>(completion_condition));
+}
 
 #if !defined(ASIO_NO_EXTENSIONS)
 #if !defined(ASIO_NO_IOSTREAM)
@@ -651,7 +683,7 @@ auto async_write_at(AsyncRandomAccessWriteDevice& d,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the completion handler will not be invoked from within this function.
  * On immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using asio::post().
+ * manner equivalent to using asio::async_immediate().
  *
  * @par Completion Signature
  * @code void(asio::error_code, std::size_t) @endcode
@@ -671,16 +703,26 @@ template <typename AsyncRandomAccessWriteDevice, typename Allocator,
     ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
       std::size_t)) WriteToken = default_completion_token_t<
         typename AsyncRandomAccessWriteDevice::executor_type>>
-auto async_write_at(AsyncRandomAccessWriteDevice& d,
+inline auto async_write_at(AsyncRandomAccessWriteDevice& d,
     uint64_t offset, basic_streambuf<Allocator>& b,
     WriteToken&& token = default_completion_token_t<
-      typename AsyncRandomAccessWriteDevice::executor_type>())
+      typename AsyncRandomAccessWriteDevice::executor_type>(),
+    constraint_t<
+      !is_completion_condition<WriteToken>::value
+    > = 0)
   -> decltype(
     async_initiate<WriteToken,
       void (asio::error_code, std::size_t)>(
         declval<detail::initiate_async_write_at_streambuf<
           AsyncRandomAccessWriteDevice>>(),
-        token, offset, &b, transfer_all()));
+        token, offset, &b, transfer_all()))
+{
+  return async_initiate<WriteToken,
+    void (asio::error_code, std::size_t)>(
+      detail::initiate_async_write_at_streambuf<
+        AsyncRandomAccessWriteDevice>(d),
+      token, offset, &b, transfer_all());
+}
 
 /// Start an asynchronous operation to write a certain amount of data at the
 /// specified offset.
@@ -742,7 +784,7 @@ auto async_write_at(AsyncRandomAccessWriteDevice& d,
  * Regardless of whether the asynchronous operation completes immediately or
  * not, the completion handler will not be invoked from within this function.
  * On immediate completion, invocation of the handler will be performed in a
- * manner equivalent to using asio::post().
+ * manner equivalent to using asio::async_immediate().
  *
  * @par Completion Signature
  * @code void(asio::error_code, std::size_t) @endcode
@@ -763,23 +805,35 @@ template <typename AsyncRandomAccessWriteDevice,
     ASIO_COMPLETION_TOKEN_FOR(void (asio::error_code,
       std::size_t)) WriteToken = default_completion_token_t<
         typename AsyncRandomAccessWriteDevice::executor_type>>
-auto async_write_at(AsyncRandomAccessWriteDevice& d, uint64_t offset,
+inline auto async_write_at(AsyncRandomAccessWriteDevice& d, uint64_t offset,
     basic_streambuf<Allocator>& b, CompletionCondition completion_condition,
     WriteToken&& token = default_completion_token_t<
-      typename AsyncRandomAccessWriteDevice::executor_type>())
+      typename AsyncRandomAccessWriteDevice::executor_type>(),
+    constraint_t<
+      is_completion_condition<CompletionCondition>::value
+    > = 0)
   -> decltype(
     async_initiate<WriteToken,
       void (asio::error_code, std::size_t)>(
         declval<detail::initiate_async_write_at_streambuf<
           AsyncRandomAccessWriteDevice>>(),
         token, offset, &b,
-        static_cast<CompletionCondition&&>(completion_condition)));
+        static_cast<CompletionCondition&&>(completion_condition)))
+{
+  return async_initiate<WriteToken,
+    void (asio::error_code, std::size_t)>(
+      detail::initiate_async_write_at_streambuf<
+        AsyncRandomAccessWriteDevice>(d),
+      token, offset, &b,
+      static_cast<CompletionCondition&&>(completion_condition));
+}
 
 #endif // !defined(ASIO_NO_IOSTREAM)
 #endif // !defined(ASIO_NO_EXTENSIONS)
 
 /*@}*/
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

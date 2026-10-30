@@ -119,7 +119,7 @@ TIMER_CALLBACK_MEMBER(mm58167_device::clock_tick)
 		if ((m_regs[R_CTL_IRQCONTROL] & 0x80) && m_regs[R_CNT_MONTH]      != old_month)         set_irq(7); // every month
 	}
 
-	m_regs[R_CNT_MILLISECONDS] = time_helper::make_bcd(m_milliseconds % 10);
+	m_regs[R_CNT_MILLISECONDS] = time_helper::make_bcd(m_milliseconds % 10) << 4;
 	m_regs[R_CNT_HUNDTENTHS] = time_helper::make_bcd(m_milliseconds / 10);
 
 	// 10Hz IRQ

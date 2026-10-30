@@ -73,7 +73,7 @@
     09  GND
 
     TODO:
-    - Move DSP internal functions into tms32031.cpp
+    - Move DSP internal functions into tms320c3x.cpp
     - Further support for variable sound output channel
     - Support subwoofer output
 
@@ -84,7 +84,7 @@
 #include "cage.h"
 
 #define LOG_COMM            (1U << 1)
-#define LOG_32031_IOPORTS   (1U << 2)
+#define LOG_320C31_IOPORTS  (1U << 2)
 #define LOG_WARNINGS        (1U << 3)
 
 #define VERBOSE (LOG_WARNINGS)
@@ -130,9 +130,9 @@
 
 static const char *const register_names[] =
 {
-	"TMS32031-DMA global control", nullptr, nullptr, nullptr,
-	"TMS32031-DMA source address", nullptr, "TMS32031-DMA destination address", nullptr,
-	"TMS32031-DMA transfer counter", nullptr, nullptr, nullptr,
+	"TMS320C31-DMA global control", nullptr, nullptr, nullptr,
+	"TMS320C31-DMA source address", nullptr, "TMS320C31-DMA destination address", nullptr,
+	"TMS320C31-DMA transfer counter", nullptr, nullptr, nullptr,
 	nullptr, nullptr, nullptr, nullptr,
 
 	nullptr, nullptr, nullptr, nullptr,
@@ -140,20 +140,20 @@ static const char *const register_names[] =
 	nullptr, nullptr, nullptr, nullptr,
 	nullptr, nullptr, nullptr, nullptr,
 
-	"TMS32031-Timer 0 global control", nullptr, nullptr, nullptr,
-	"TMS32031-Timer 0 counter", nullptr, nullptr, nullptr,
-	"TMS32031-Timer 0 period", nullptr, nullptr, nullptr,
+	"TMS320C31-Timer 0 global control", nullptr, nullptr, nullptr,
+	"TMS320C31-Timer 0 counter", nullptr, nullptr, nullptr,
+	"TMS320C31-Timer 0 period", nullptr, nullptr, nullptr,
 	nullptr, nullptr, nullptr, nullptr,
 
-	"TMS32031-Timer 1 global control", nullptr, nullptr, nullptr,
-	"TMS32031-Timer 1 counter", nullptr, nullptr, nullptr,
-	"TMS32031-Timer 1 period", nullptr, nullptr, nullptr,
+	"TMS320C31-Timer 1 global control", nullptr, nullptr, nullptr,
+	"TMS320C31-Timer 1 counter", nullptr, nullptr, nullptr,
+	"TMS320C31-Timer 1 period", nullptr, nullptr, nullptr,
 	nullptr, nullptr, nullptr, nullptr,
 
-	"TMS32031-Serial port global control", nullptr, "TMS32031-Serial port TX control", "TMS32031-Serial port RX control",
-	"TMS32031-Serial port timer control", "TMS32031-Serial port timer counter", "TMS32031-Serial port timer period", nullptr,
-	"TMS32031-Serial port data TX", nullptr, nullptr, nullptr,
-	"TMS32031-Serial port data RX", nullptr, nullptr, nullptr,
+	"TMS320C31-Serial port global control", nullptr, "TMS320C31-Serial port TX control", "TMS320C31-Serial port RX control",
+	"TMS320C31-Serial port timer control", "TMS320C31-Serial port timer counter", "TMS320C31-Serial port timer period", nullptr,
+	"TMS320C31-Serial port data TX", nullptr, nullptr, nullptr,
+	"TMS320C31-Serial port data RX", nullptr, nullptr, nullptr,
 
 	nullptr, nullptr, nullptr, nullptr,
 	nullptr, nullptr, nullptr, nullptr,
@@ -161,7 +161,7 @@ static const char *const register_names[] =
 	nullptr, nullptr, nullptr, nullptr,
 
 	nullptr, nullptr, nullptr, nullptr,
-	"TMS32031-Primary bus control", nullptr, nullptr, nullptr,
+	"TMS320C31-Primary bus control", nullptr, nullptr, nullptr,
 	nullptr, nullptr, nullptr, nullptr,
 	nullptr, nullptr, nullptr, nullptr,
 
@@ -236,7 +236,7 @@ void atari_cage_device::device_start()
 	save_item(NAME(m_timer_enabled));
 	save_item(NAME(m_from_main));
 	save_item(NAME(m_control));
-	save_item(NAME(m_tms32031_io_regs));
+	save_item(NAME(m_tms320c31_io_regs));
 }
 
 
@@ -269,11 +269,11 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_cage_device::dma_timer_callback )
 	}
 
 	/* set the final count to 0 and the source address to the final address */
-	m_tms32031_io_regs[DMA_TRANSFER_COUNT] = 0;
-	m_tms32031_io_regs[DMA_SOURCE_ADDR] = param;
+	m_tms320c31_io_regs[DMA_TRANSFER_COUNT] = 0;
+	m_tms320c31_io_regs[DMA_SOURCE_ADDR] = param;
 
 	/* set the interrupt */
-	m_cpu->set_input_line(TMS3203X_DINT0, ASSERT_LINE);
+	m_cpu->set_input_line(TMS320C3X_DINT0, ASSERT_LINE);
 	m_dma_enabled = 0;
 }
 
@@ -281,7 +281,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_cage_device::dma_timer_callback )
 void atari_cage_device::update_dma_state()
 {
 	/* determine the new enabled state */
-	int enabled = ((m_tms32031_io_regs[DMA_GLOBAL_CTL] & 3) == 3) && (m_tms32031_io_regs[DMA_TRANSFER_COUNT] != 0);
+	int enabled = ((m_tms320c31_io_regs[DMA_GLOBAL_CTL] & 3) == 3) && (m_tms320c31_io_regs[DMA_TRANSFER_COUNT] != 0);
 
 	/* see if we turned on */
 	if (enabled && !m_dma_enabled)
@@ -291,15 +291,15 @@ void atari_cage_device::update_dma_state()
 		int i;
 
 		/* make sure our assumptions are correct */
-		if (m_tms32031_io_regs[DMA_DEST_ADDR] != 0x808048)
-			LOGMASKED(LOG_WARNINGS, "CAGE DMA: unexpected dest address %08X!\n", m_tms32031_io_regs[DMA_DEST_ADDR]);
-		if ((m_tms32031_io_regs[DMA_GLOBAL_CTL] & 0xfef) != 0xe03)
-			LOGMASKED(LOG_WARNINGS, "CAGE DMA: unexpected transfer params %08X!\n", m_tms32031_io_regs[DMA_GLOBAL_CTL]);
+		if (m_tms320c31_io_regs[DMA_DEST_ADDR] != 0x808048)
+			LOGMASKED(LOG_WARNINGS, "CAGE DMA: unexpected dest address %08X!\n", m_tms320c31_io_regs[DMA_DEST_ADDR]);
+		if ((m_tms320c31_io_regs[DMA_GLOBAL_CTL] & 0xfef) != 0xe03)
+			LOGMASKED(LOG_WARNINGS, "CAGE DMA: unexpected transfer params %08X!\n", m_tms320c31_io_regs[DMA_GLOBAL_CTL]);
 
 		/* do the DMA up front */
-		addr = m_tms32031_io_regs[DMA_SOURCE_ADDR];
-		inc = (m_tms32031_io_regs[DMA_GLOBAL_CTL] >> 4) & 1;
-		for (i = 0; i < m_tms32031_io_regs[DMA_TRANSFER_COUNT]; i++)
+		addr = m_tms320c31_io_regs[DMA_SOURCE_ADDR];
+		inc = (m_tms320c31_io_regs[DMA_GLOBAL_CTL] >> 4) & 1;
+		for (i = 0; i < m_tms320c31_io_regs[DMA_TRANSFER_COUNT]; i++)
 		{
 			sound_data[i % STACK_SOUND_BUFSIZE] = m_cpu->space(AS_PROGRAM).read_dword(addr);
 			addr += inc;
@@ -307,14 +307,14 @@ void atari_cage_device::update_dma_state()
 				for (int j = 0; j < DAC_BUFFER_CHANNELS; j++)
 					m_dmadac[j]->transfer(j, 1, DAC_BUFFER_CHANNELS, STACK_SOUND_BUFSIZE / DAC_BUFFER_CHANNELS, sound_data);
 		}
-		if (m_tms32031_io_regs[DMA_TRANSFER_COUNT] % STACK_SOUND_BUFSIZE != 0)
+		if (m_tms320c31_io_regs[DMA_TRANSFER_COUNT] % STACK_SOUND_BUFSIZE != 0)
 			for (int j = 0; j < DAC_BUFFER_CHANNELS; j++)
-				m_dmadac[j]->transfer(j, 1, DAC_BUFFER_CHANNELS, (m_tms32031_io_regs[DMA_TRANSFER_COUNT] % STACK_SOUND_BUFSIZE) / DAC_BUFFER_CHANNELS, sound_data);
+				m_dmadac[j]->transfer(j, 1, DAC_BUFFER_CHANNELS, (m_tms320c31_io_regs[DMA_TRANSFER_COUNT] % STACK_SOUND_BUFSIZE) / DAC_BUFFER_CHANNELS, sound_data);
 
 		/* compute the time of the interrupt and set the timer */
 		if (!m_dma_timer_enabled)
 		{
-			attotime period = m_serial_period_per_word * m_tms32031_io_regs[DMA_TRANSFER_COUNT];
+			attotime period = m_serial_period_per_word * m_tms320c31_io_regs[DMA_TRANSFER_COUNT];
 			m_dma_timer->adjust(period, addr, period);
 			m_dma_timer_enabled = 1;
 		}
@@ -343,7 +343,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_cage_device::cage_timer_callback )
 {
 	int which = param;
 	/* set the interrupt */
-	m_cpu->set_input_line(TMS3203X_TINT0 + which, ASSERT_LINE);
+	m_cpu->set_input_line(TMS320C3X_TINT0 + which, ASSERT_LINE);
 	m_timer_enabled[which] = 0;
 	update_timer(which);
 }
@@ -353,16 +353,16 @@ void atari_cage_device::update_timer(int which)
 {
 	/* determine the new enabled state */
 	int base = 0x10 * which;
-	int enabled = ((m_tms32031_io_regs[base + TIMER0_GLOBAL_CTL] & 0xc0) == 0xc0);
+	int enabled = ((m_tms320c31_io_regs[base + TIMER0_GLOBAL_CTL] & 0xc0) == 0xc0);
 
 	/* see if we turned on */
 	if (enabled && !m_timer_enabled[which])
 	{
-		attotime period = m_cpu_h1_clock_period * (2 * m_tms32031_io_regs[base + TIMER0_PERIOD]);
+		attotime period = m_cpu_h1_clock_period * (2 * m_tms320c31_io_regs[base + TIMER0_PERIOD]);
 
 		/* make sure our assumptions are correct */
-		if (m_tms32031_io_regs[base + TIMER0_GLOBAL_CTL] != 0x2c1)
-			LOGMASKED(LOG_WARNINGS, "CAGE TIMER%d: unexpected timer config %08X!\n", which, m_tms32031_io_regs[base + TIMER0_GLOBAL_CTL]);
+		if (m_tms320c31_io_regs[base + TIMER0_GLOBAL_CTL] != 0x2c1)
+			LOGMASKED(LOG_WARNINGS, "CAGE TIMER%d: unexpected timer config %08X!\n", which, m_tms320c31_io_regs[base + TIMER0_GLOBAL_CTL]);
 
 		m_timer[which]->adjust(period, which);
 	}
@@ -394,17 +394,17 @@ void atari_cage_device::update_serial()
 	serial_clock_period = m_cpu_h1_clock_period * 2;
 
 	/* if we're in clock mode, muliply by another factor of 2 */
-	if (m_tms32031_io_regs[SPORT_GLOBAL_CTL] & 4)
+	if (m_tms320c31_io_regs[SPORT_GLOBAL_CTL] & 4)
 		serial_clock_period *= 2;
 
 	/* now multiply by the timer period */
-	if ((m_tms32031_io_regs[SPORT_TIMER_PERIOD] & 0xffff) == 0)
-		bit_clock_period = (m_tms32031_io_regs[SPORT_GLOBAL_CTL] & 4) ? serial_clock_period : attotime::never;
+	if ((m_tms320c31_io_regs[SPORT_TIMER_PERIOD] & 0xffff) == 0)
+		bit_clock_period = (m_tms320c31_io_regs[SPORT_GLOBAL_CTL] & 4) ? serial_clock_period : attotime::never;
 	else
-		bit_clock_period = serial_clock_period * (m_tms32031_io_regs[SPORT_TIMER_PERIOD] & 0xffff);
+		bit_clock_period = serial_clock_period * (m_tms320c31_io_regs[SPORT_TIMER_PERIOD] & 0xffff);
 
 	/* and times the number of bits per sample */
-	m_serial_period_per_word = bit_clock_period * (8 * (((m_tms32031_io_regs[SPORT_GLOBAL_CTL] >> 18) & 3) + 1));
+	m_serial_period_per_word = bit_clock_period * (8 * (((m_tms320c31_io_regs[SPORT_GLOBAL_CTL] >> 18) & 3) + 1));
 
 	/* compute the step value to stretch this to the sample_rate */
 	freq = m_serial_period_per_word.as_hz() / DAC_BUFFER_CHANNELS;
@@ -426,9 +426,9 @@ void atari_cage_device::update_serial()
  *
  *************************************/
 
-uint32_t atari_cage_device::tms32031_io_r(offs_t offset)
+uint32_t atari_cage_device::tms320c31_io_r(offs_t offset)
 {
-	uint16_t result = m_tms32031_io_regs[offset];
+	uint16_t result = m_tms320c31_io_regs[offset];
 
 	switch (offset)
 	{
@@ -437,16 +437,16 @@ uint32_t atari_cage_device::tms32031_io_r(offs_t offset)
 			break;
 	}
 
-	LOGMASKED(LOG_32031_IOPORTS, "%s CAGE:%s read -> %08X\n", machine().describe_context(), register_names[offset & 0x7f], result);
+	LOGMASKED(LOG_320C31_IOPORTS, "%s CAGE:%s read -> %08X\n", machine().describe_context(), register_names[offset & 0x7f], result);
 	return result;
 }
 
 
-void atari_cage_device::tms32031_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void atari_cage_device::tms320c31_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&m_tms32031_io_regs[offset]);
+	COMBINE_DATA(&m_tms320c31_io_regs[offset]);
 
-	LOGMASKED(LOG_32031_IOPORTS, "%s CAGE:%s write = %08X\n", machine().describe_context(), register_names[offset & 0x7f], m_tms32031_io_regs[offset]);
+	LOGMASKED(LOG_320C31_IOPORTS, "%s CAGE:%s write = %08X\n", machine().describe_context(), register_names[offset & 0x7f], m_tms320c31_io_regs[offset]);
 
 	switch (offset)
 	{
@@ -477,8 +477,8 @@ void atari_cage_device::tms32031_io_w(offs_t offset, uint32_t data, uint32_t mem
 
 		case SPORT_DATA_TX:
 #if (DAC_BUFFER_CHANNELS == 4)
-			if (int(m_serial_period_per_word.as_hz()) == 22050*4 && (m_tms32031_io_regs[SPORT_RX_CTL] & 0xff) == 0x62)
-				m_tms32031_io_regs[SPORT_RX_CTL] ^= 0x800;
+			if (int(m_serial_period_per_word.as_hz()) == 22050*4 && (m_tms320c31_io_regs[SPORT_RX_CTL] & 0xff) == 0x62)
+				m_tms320c31_io_regs[SPORT_RX_CTL] ^= 0x800;
 #endif
 			break;
 
@@ -512,11 +512,11 @@ void atari_cage_device::update_control_lines()
 
 	m_irqhandler(0, reason);
 	/* set the IOF input lines */
-	val = m_cpu->state_int(TMS3203X_IOF);
+	val = m_cpu->state_int(TMS320C3X_IOF);
 	val &= ~0x88;
 	if (m_cpu_to_cage_ready) val |= 0x08;
 	if (m_cage_to_cpu_ready) val |= 0x80;
-	m_cpu->set_state_int(TMS3203X_IOF, val);
+	m_cpu->set_state_int(TMS320C3X_IOF, val);
 }
 
 
@@ -525,7 +525,7 @@ uint32_t atari_cage_device::cage_from_main_r()
 	LOGMASKED(LOG_COMM, "%s CAGE read command = %04X\n", machine().describe_context(), m_from_main);
 	m_cpu_to_cage_ready = 0;
 	update_control_lines();
-	m_cpu->set_input_line(TMS3203X_IRQ0, CLEAR_LINE);
+	m_cpu->set_input_line(TMS320C3X_IRQ0, CLEAR_LINE);
 	return m_from_main;
 }
 
@@ -570,7 +570,7 @@ TIMER_CALLBACK_MEMBER( atari_cage_device::cage_deferred_w )
 	m_from_main = param;
 	m_cpu_to_cage_ready = 1;
 	update_control_lines();
-	m_cpu->set_input_line(TMS3203X_IRQ0, ASSERT_LINE);
+	m_cpu->set_input_line(TMS320C3X_IRQ0, ASSERT_LINE);
 }
 
 
@@ -602,7 +602,7 @@ void atari_cage_device::control_w(uint16_t data)
 	if (!(m_control & 3))
 	{
 		m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-		m_cpu->set_input_line(TMS3203X_IRQ1, ASSERT_LINE);
+		m_cpu->set_input_line(TMS320C3X_IRQ1, ASSERT_LINE);
 
 		m_dma_enabled = 0;
 		m_dma_timer_enabled = 0;
@@ -613,7 +613,7 @@ void atari_cage_device::control_w(uint16_t data)
 		m_timer[0]->reset();
 		m_timer[1]->reset();
 
-		memset(m_tms32031_io_regs, 0, 0x60 * 4);
+		memset(m_tms320c31_io_regs, 0, 0x60 * 4);
 
 		m_cpu_to_cage_ready = 0;
 		m_cage_to_cpu_ready = 0;
@@ -621,7 +621,7 @@ void atari_cage_device::control_w(uint16_t data)
 	else
 	{
 		m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		m_cpu->set_input_line(TMS3203X_IRQ1, CLEAR_LINE);
+		m_cpu->set_input_line(TMS320C3X_IRQ1, CLEAR_LINE);
 	}
 
 	/* update the control state */
@@ -655,7 +655,7 @@ void atari_cage_device::cage_map(address_map &map)
 	map(0x000000, 0x00ffff).ram().share("cageram");
 	map(0x200000, 0x200000).nopw();
 	map(0x400000, 0x47ffff).bankr("bootbank");
-	map(0x808000, 0x8080ff).rw(FUNC(atari_cage_device::tms32031_io_r), FUNC(atari_cage_device::tms32031_io_w));
+	map(0x808000, 0x8080ff).rw(FUNC(atari_cage_device::tms320c31_io_r), FUNC(atari_cage_device::tms320c31_io_w));
 	map(0xa00000, 0xa00000).rw(FUNC(atari_cage_device::cage_from_main_r), FUNC(atari_cage_device::cage_to_main_w));
 	map(0xc00000, 0xffffff).bankr("mainbank");
 }
@@ -666,7 +666,7 @@ void atari_cage_seattle_device::cage_map_seattle(address_map &map)
 	map(0x000000, 0x00ffff).ram().share("cageram");
 	map(0x200000, 0x200000).nopw();
 	map(0x400000, 0x47ffff).bankr("bootbank");
-	map(0x808000, 0x8080ff).rw(FUNC(atari_cage_seattle_device::tms32031_io_r), FUNC(atari_cage_seattle_device::tms32031_io_w));
+	map(0x808000, 0x8080ff).rw(FUNC(atari_cage_seattle_device::tms320c31_io_r), FUNC(atari_cage_seattle_device::tms320c31_io_w));
 	map(0xa00000, 0xa00000).rw(FUNC(atari_cage_seattle_device::cage_from_main_r), FUNC(atari_cage_seattle_device::cage_from_main_ack_w));
 	map(0xa00001, 0xa00001).w(FUNC(atari_cage_seattle_device::cage_to_main_w));
 	map(0xa00003, 0xa00003).r(FUNC(atari_cage_seattle_device::cage_io_status_r));
@@ -681,7 +681,7 @@ void atari_cage_seattle_device::cage_map_seattle(address_map &map)
 void atari_cage_device::device_add_mconfig(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS32031(config, m_cpu, XTAL(33'868'800));
+	TMS320C31(config, m_cpu, XTAL(33'868'800));
 	m_cpu->set_addrmap(AS_PROGRAM, &atari_cage_device::cage_map);
 	m_cpu->set_mcbl_mode(true);
 

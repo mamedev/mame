@@ -104,8 +104,8 @@ public:
 		m_int(0)
 	{}
 
-	void einstein(machine_config &config);
-	void einst256(machine_config &config);
+	void einstein(machine_config &config) ATTR_COLD;
+	void einst256(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(joystick_button);
 
@@ -465,8 +465,6 @@ void einstein_state::reset_w(uint8_t data)
 
 void einstein_state::machine_start()
 {
-	m_alpha_lock_led.resolve();
-
 	// initialize memory mapping
 	m_bank1->configure_entry(0, m_ram->pointer());
 	m_bank1->configure_entry(1, m_bios->base());
@@ -924,7 +922,7 @@ void einstein_state::einstein(machine_config &config)
 	tms9129_device &vdp(TMS9129(config, "vdp", 10.738635_MHz_XTAL));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000); // 16k RAM, provided by IC i040 and i041
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

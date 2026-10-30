@@ -8,7 +8,7 @@ Presumably for stvbios "hold F2 at boot -> System Configuration" cart dev mode.
 
 ALi/ACER FINALi 486 PCI motherboard
 M1489 A1 (northbridge) + M1487 B1 (southbridge)
-M5113 (super i/o, sorta compatible with FDC37C665 as per PSC-586VGA single board)
+M5113 (super I/O, sorta compatible with FDC37C665 as per PSC-586VGA single board)
 DP8432V-33
 CAK0003UA
 2x Altera EPM7032LC44-10 near northbridge
@@ -32,7 +32,7 @@ public:
 	{ }
 
 
-	void stvdev(machine_config &config);
+	void stvdev(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -52,9 +52,6 @@ void stvdev_state::stvdev_io(address_map &map)
 {
 }
 
-static INPUT_PORTS_START(stvdev)
-INPUT_PORTS_END
-
 void stvdev_state::stvdev(machine_config &config)
 {
 	// TODO: two other clocks, one at 36 MHz near CAK chip and another at 14.318 MHz near 486 socket
@@ -62,7 +59,7 @@ void stvdev_state::stvdev(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &stvdev_state::stvdev_map);
 	m_maincpu->set_addrmap(AS_IO, &stvdev_state::stvdev_io);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 
@@ -76,4 +73,4 @@ ROM_END
 
 
 // NOTE: stvbios mentions HP and SUN archs being supported, "PC" suffix comes from there
-COMP(1998, stvdev, 0, 0, stvdev, stvdev, stvdev_state, empty_init, "Sega / ALi", "ST-V 486 dev box PC", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP(1998, stvdev, 0, 0, stvdev, 0, stvdev_state, empty_init, "Sega / ALi", "ST-V 486 dev box PC", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

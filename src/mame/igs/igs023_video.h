@@ -7,21 +7,24 @@
 
 #include "tilemap.h"
 
-class igs023_video_device : public device_t, public device_gfx_interface
+class igs023_video_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
-	igs023_video_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	// A nonzero clock enables timed sprite DMA; zero retains vblank copying.
+	igs023_video_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto read_spriteram_callback() { return m_readspriteram_cb.bind(); }
-
-	u16 videoram_r(offs_t offset);
-	void videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 videoregs_r(offs_t offset);
-	void videoregs_w(offs_t offset, u16 data, u16 mem_mask);
+	auto irq4_callback() { return m_irq4_cb.bind(); }
+	auto irq6_callback() { return m_irq6_cb.bind(); }
+	auto dma_callback() { return m_dma_cb.bind(); }
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void get_sprites();
+	void vblank(int state);
+
+	void videoram_map(address_map &map) ATTR_COLD;
+	void videoregs_map(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -43,7 +46,29 @@ private:
 	required_region_ptr<u16> m_adata;
 	required_region_ptr<u16> m_bdata;
 
+	memory_share_creator<u16> m_bg_videoram;
+	memory_share_creator<u16> m_tx_videoram;
+	memory_share_creator<u16> m_rowscrollram;
+	memory_share_creator<u16> m_spritebuffer;
+	memory_share_creator<u16> m_zoomram;
+
 	devcb_read16 m_readspriteram_cb; // for reading spritelist from mainram
+	devcb_write_line m_irq4_cb;
+	devcb_write_line m_irq6_cb;
+	devcb_write_line m_dma_cb;
+	emu_timer *m_irq4_timer = nullptr;
+	bool m_irq4_pending = false;
+	bool m_irq6_pending = false;
+	void update_irqs();
+	TIMER_CALLBACK_MEMBER(irq4_tick);
+	emu_timer *m_dma_start_timer = nullptr;
+	emu_timer *m_dma_timer = nullptr;
+	u16 m_dma_words = 0;
+	bool m_dma_active = false;
+	bool m_dma_finishing = false;
+	void restore_dma();
+	TIMER_CALLBACK_MEMBER(dma_start);
+	TIMER_CALLBACK_MEMBER(dma_tick);
 
 	std::unique_ptr<sprite_t[]> m_spritelist;
 	sprite_t *m_sprite_ptr_pre;
@@ -54,26 +79,47 @@ private:
 	u8 m_abit;
 	u32 m_boffset;
 
-	std::unique_ptr<uint16_t []> m_videoregs;
-	std::unique_ptr<uint16_t []> m_videoram;
-
-	// working variables, don't need saving
-	u16 *m_bg_videoram = nullptr;
-	u16 *m_tx_videoram = nullptr;
-	u16 *m_rowscrollram = nullptr;
+	// video register
+	u16 m_bg_yscroll;
+	u16 m_bg_xscroll;
+	u16 m_bg_scale;
+	u16 m_tx_yscroll;
+	u16 m_tx_xscroll;
+	u16 m_ctrl;
 
 	void pgm_draw_pix(int xdrawpos, int pri, u16 *dest, u8 *destpri, const rectangle &cliprect, u16 srcdat);
-	void pgm_draw_pix_nopri(int xdrawpos, u16 *dest, u8 *destpri, const rectangle &cliprect, u16 srcdat);
-	void pgm_draw_pix_pri(int xdrawpos, u16 *dest, u8 *destpri, const rectangle &cliprect, u16 srcdat);
 	u8 get_sprite_pix();
+	void draw_sprite_pixel(int &xdrawpos, int &xcntdraw, u16 *dest, u8 *destpri, const rectangle &cliprect, int xpos, int flip, int pri, int realxsize, u16 srcdat);
 	void draw_sprite_line(int wide, u16 *dest, u8 *destpri, const rectangle &cliprect, int xzoom, bool xgrow, int flip, int xpos, int pri, int realxsize, int palt, bool draw);
 	void draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, u32 xzoom, bool xgrow, u32 yzoom, bool ygrow, int pri);
 	void draw_sprite_line_basic(int wide, u16 *dest, u8 *destpri, const rectangle &cliprect, int flip, int xpos, int pri, int realxsize, int palt, bool draw);
 	void draw_sprite_new_basic(int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri);
 	void draw_sprites(bitmap_ind16& spritebitmap, const rectangle &cliprect, bitmap_ind8& priority_bitmap);
 
+	u16 tx_videoram_r(offs_t offset);
 	void tx_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 bg_videoram_r(offs_t offset);
 	void bg_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 rowscrollram_r(offs_t offset);
+	void rowscrollram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	u16 spritebuffer_r(offs_t offset);
+	void spritebuffer_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void zoomram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 bg_yscroll_r();
+	void bg_yscroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 bg_xscroll_r();
+	void bg_xscroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 bg_scale_r();
+	void bg_scale_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 tx_yscroll_r();
+	void tx_yscroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 tx_xscroll_r();
+	void tx_xscroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 ctrl_r();
+	void ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	bool sprite_dma();
 
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

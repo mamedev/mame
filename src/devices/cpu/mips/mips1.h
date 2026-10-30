@@ -59,9 +59,9 @@ protected:
 	// memory
 	enum translate_result : unsigned { ERROR, UNCACHED, CACHED };
 	virtual translate_result translate(int intention, offs_t &address, bool debug);
-	template <typename T, bool Aligned = true, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, void> load(u32 address, U &&apply);
-	template <typename T, bool Aligned = true> void store(u32 address, T data, T mem_mask = ~T(0));
-	void fetch(u32 address, std::function<void(u32)> &&apply);
+	template <typename T, bool Aligned = true, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, void> load(offs_t address, U &&apply);
+	template <typename T, bool Aligned = true> void store(offs_t address, T data, T mem_mask = ~T(0));
+	void fetch(offs_t address, std::function<void(u32)> &&apply);
 
 	// cache
 	template <typename T> unsigned shift_factor(u32 address) const;
@@ -253,6 +253,9 @@ class iop_device : public mips1core_device_base
 {
 public:
 	iop_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual translate_result translate(int intention, offs_t &address, bool debug) override;
 };
 
 DECLARE_DEVICE_TYPE(R2000,       r2000_device)

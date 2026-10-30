@@ -118,7 +118,7 @@ protected:
 
 void nubus_mac8390_device::device_add_mconfig(machine_config &config)
 {
-	DP8390D(config, m_dp83902, 0);
+	DP8390D(config, m_dp83902);
 	m_dp83902->irq_callback().set(FUNC(nubus_mac8390_device::dp_irq_w));
 	m_dp83902->mem_read_callback().set(FUNC(nubus_mac8390_device::dp_mem_read));
 	m_dp83902->mem_write_callback().set(FUNC(nubus_mac8390_device::dp_mem_write));

@@ -1,13 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders: Allard van der Bas
-
 /***************************************************************************
-                Wiping
-                (C) 1982 Nichibutsu
 
-                    driver by
-
-            Allard van der Bas (allard@mindless.com)
+Wiping (C) 1982 Nichibutsu
+driver by Allard van der Bas (allard@mindless.com)
 
 1 x Z80 CPU main game, 1 x Z80 with ???? sound hardware.
 
@@ -15,7 +11,8 @@ Given the similarities with clshroad.cpp this was probably developed by
 Masao Suzuki, who later left Nichibutsu to form Woodplace Inc.
 
 ----------------------------------------------------------------------------
-Main processor :
+
+Main processor:
 
 0xA800 - 0xA807 : 64 bits of input and dipswitches.
 
@@ -491,7 +488,7 @@ void wiping_state::wiping(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MASTER_CLOCK / 3, 384, 0, 288, 264, 0, 224); // unknown, single XTAL on PCB & 288x224 suggests 60.606060 Hz like Galaxian HW
 	screen.set_screen_update(FUNC(wiping_state::screen_update));
 	screen.set_palette(m_palette);

@@ -31,8 +31,8 @@ protected:
 
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
-	required_device<oak_oti111_vga_device> m_svga;
-	required_memory_region m_vga_rom;
+	required_device<oak_oti111_vga_device> m_vga;
+	required_memory_region m_bios;
 private:
 	void mmio_map(address_map &map) ATTR_COLD;
 	void vram_aperture_map(address_map &map) ATTR_COLD;

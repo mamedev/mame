@@ -12,7 +12,7 @@ m37640_device::m37640_device(const machine_config &mconfig, const char *tag, dev
 	m740_device(mconfig, M37640, tag, owner, clock),
 	m_mode(mode)
 {
-	program_config.m_internal_map = address_map_constructor(FUNC(m37640_device::map), this);
+	m_program_config.m_internal_map = address_map_constructor(FUNC(m37640_device::map), this);
 }
 
 void m37640_device::device_start()

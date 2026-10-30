@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /*******************************************************************************
 
-    Saitek OSA Module: Kasparov Maestro A
+    Saitek OSA: Kasparov Maestro A Module
 
 *******************************************************************************/
 

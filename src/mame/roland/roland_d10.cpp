@@ -18,12 +18,15 @@
 */
 
 #include "emu.h"
+
+#include "mb63h149.h"
+
 #include "cpu/mcs96/i8x9x.h"
 #include "machine/bankdev.h"
-#include "mb63h149.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "video/msm6222b.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -69,8 +72,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void d10(machine_config &config);
-	void d110(machine_config &config);
+	void d10(machine_config &config) ATTR_COLD;
+	void d110(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -88,7 +91,7 @@ private:
 	uint8_t port0_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
-	void d10_palette(palette_device &palette) const;
+	void d10_palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void d10_map(address_map &map) ATTR_COLD;
@@ -198,7 +201,7 @@ void roland_d10_state::midi_w(uint8_t data)
 
 TIMER_DEVICE_CALLBACK_MEMBER(roland_d10_state::midi_timer_cb)
 {
-	const static uint8_t midi_data[3] = { 0x91, 0x40, 0x7f };
+	constexpr uint8_t midi_data[3] = { 0x91, 0x40, 0x7f };
 	m_midi = midi_data[m_midi_pos++];
 	logerror("midi_in %02x\n", m_midi);
 	m_maincpu->serial_w(m_midi);
@@ -297,7 +300,7 @@ void roland_d10_state::d10(machine_config &config)
 	mb63h149_device &keyscan(MB63H149(config, "keyscan", 16.384_MHz_XTAL));
 	keyscan.int_callback().set_inputline(m_maincpu, i8x9x_device::HSI0_LINE);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(FUNC(roland_d10_state::screen_update));
 //  screen.set_size(20*6-1, 2*9-1);
@@ -307,7 +310,7 @@ void roland_d10_state::d10(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(roland_d10_state::d10_palette), 2);
 
-	MSM6222B_01(config, m_lcd, 0);
+	MSM6222B_01(config, m_lcd);
 
 	TIMER(config, m_midi_timer).configure_generic(FUNC(roland_d10_state::midi_timer_cb));
 
@@ -352,12 +355,16 @@ ROM_END
 ROM_START( d110 )
 	ROM_REGION( 0x10000, "firmware", 0 )
 	ROM_DEFAULT_BIOS( "110" )
+	// Firmware version info can be found at offset 0x2206.
 
-	ROM_SYSTEM_BIOS( 0, "106", "Firmware 1.06" )
-	ROMX_LOAD( "d-110.v1.06.ic19.bin",         0,   0x8000, CRC(3dd5b6e9) SHA1(73b155fb0a8adc2362e73cb0803dafba9ccfb508), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 0, "101", "Firmware 1.01" )	// D-110  ver1.01   Mar. 22, 1988
+	ROMX_LOAD( "d-110.v1.01.ic19.bin",         0,   0x8000, CRC(35d84088) SHA1(91c282caafcfa09062651f7066ece4daeea816f5), ROM_BIOS(0) )
 
-	ROM_SYSTEM_BIOS( 1, "110", "Firmware 1.10" )
-	ROMX_LOAD( "d-110.v1.10.ic19.bin",         0,   0x8000, CRC(3ae68187) SHA1(28635510f30d6c1fb88e00da03e5b4e045c380cb), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "106", "Firmware 1.06" )	// D-110  ver1.06   Apr.  5, 1988
+	ROMX_LOAD( "d-110.v1.06.ic19.bin",         0,   0x8000, CRC(3dd5b6e9) SHA1(73b155fb0a8adc2362e73cb0803dafba9ccfb508), ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS( 2, "110", "Firmware 1.10" )	// D-110  ver1.10   Aug. 30, 1988
+	ROMX_LOAD( "d-110.v1.10.ic19.bin",         0,   0x8000, CRC(3ae68187) SHA1(28635510f30d6c1fb88e00da03e5b4e045c380cb), ROM_BIOS(2) )
 
 	ROM_REGION( 0x20000, "presets", 0 )
 	ROM_LOAD(  "r15179873-lh5310-97.ic12.bin", 0,  0x20000, CRC(580a8f9e) SHA1(05587a0542b01625dcde37de5bb339880e47eb93) )

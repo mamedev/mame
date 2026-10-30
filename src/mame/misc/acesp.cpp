@@ -47,15 +47,13 @@ public:
 		, m_reelctrl(*this, "reelctrl")
 	{ }
 
-	void ace_sp(machine_config &config);
-	void ace_sp_pcp(machine_config &config);
+	void ace_sp(machine_config &config) ATTR_COLD;
+	void ace_sp_pcp(machine_config &config) ATTR_COLD;
 
-	void init_ace_sp();
-	void init_ace_cr();
+	void init_ace_sp() ATTR_COLD;
+	void init_ace_cr() ATTR_COLD;
 
 private:
-	void machine_start() override ATTR_COLD;
-
 	TIMER_DEVICE_CALLBACK_MEMBER(gen_fixfreq);
 
 	void ace_sp_map(address_map &map) ATTR_COLD;
@@ -77,11 +75,6 @@ private:
 };
 
 
-
-void ace_sp_state::machine_start()
-{
-	m_dmd.resolve();
-}
 
 void ace_sp_state::dmd_w(offs_t offset, uint8_t data)
 {

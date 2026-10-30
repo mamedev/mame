@@ -76,6 +76,8 @@ protected:
 	uint8_t rm380z_porthi_r();
 	void rm380z_porthi_w(offs_t offset, uint8_t data);
 
+	void z80_m1_w(uint8_t data);
+
 	void disk_0_control(uint8_t data);
 
 	void keyboard_put(u8 data);
@@ -87,12 +89,13 @@ protected:
 	void rm380z_io(address_map &map) ATTR_COLD;
 	void rm380z_mem(address_map &map) ATTR_COLD;
 
+	int m_nmi_counter = 0;
 	uint8_t m_port0 = 0;
 	uint8_t m_port0_kbd = 0;
 	uint8_t m_port1 = 0;
 	uint8_t m_fbfe = 0;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<ram_device> m_messram;

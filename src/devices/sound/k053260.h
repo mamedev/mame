@@ -36,7 +36,7 @@ public:
 	auto tim2_cb() { return m_tim2_cb.bind(); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 	virtual void device_reset() override ATTR_COLD;

@@ -424,11 +424,11 @@ void vg5k_state::vg5k(machine_config &config)
 
 	TIMER(config, "irq_timer").configure_periodic(FUNC(vg5k_state::z80_irq), attotime::from_msec(20));
 
-	EF9345(config, m_ef9345, 0);
+	EF9345(config, m_ef9345);
 	m_ef9345->set_palette_tag("palette");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("ef9345", FUNC(ef9345_device::screen_update));
@@ -450,7 +450,7 @@ void vg5k_state::vg5k(machine_config &config)
 	m_cassette->set_interface("vg5k_cass");
 
 	/* printer */
-	PRINTER(config, m_printer, 0);
+	PRINTER(config, m_printer);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K,48K");

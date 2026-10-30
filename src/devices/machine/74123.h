@@ -67,7 +67,7 @@ class ttl74123_device :  public device_t
 {
 public:
 	// construction/destruction
-	ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, double res, double cap)
 		: ttl74123_device(mconfig, tag, owner, 0U)
 	{

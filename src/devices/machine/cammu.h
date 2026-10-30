@@ -598,18 +598,14 @@ private:
 		CNTL_UST  = 0x00000030, // unmapped system tag
 		CNTL_CV   = 0x00000100, // clear valid
 		CNTL_ATE  = 0x00000200, // alignment trap enable
-		CNTL_CID  = 0xff000000  // cammu id
-	};
-	enum control_ust_mask : u32
-	{
-		UST_0 = 0x00000000, // private, write-through, main memory space
-		UST_1 = 0x00000010, // shared, write-through, main memory space
-		UST_2 = 0x00000020, // private, copy-back, main memory space
-		UST_3 = 0x00000030  // noncacheable, main memory space
-	};
-	enum control_cid_mask : u32
-	{
-		CID_C3 = 0x00000000 // unknown
+		CNTL_CID  = 0xff000000, // cammu id
+
+		UST_0     = 0x00000000, // private, write-through, main memory space
+		UST_1     = 0x00000010, // shared, write-through, main memory space
+		UST_2     = 0x00000020, // private, copy-back, main memory space
+		UST_3     = 0x00000030, // noncacheable, main memory space
+
+		CID_C3    = 0x00000000  // unknown
 	};
 
 	enum reset_mask : u32

@@ -301,7 +301,7 @@ void microbx2_state::microbx2(machine_config &config)
 	MC6809E(config, m_maincpu, 16_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &microbx2_state::mem_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16_MHz_XTAL / 3, 1024, 0, 768, 674, 31, 607);
 	screen.set_screen_update("gdc", FUNC(upd7220a_device::screen_update));
 
@@ -327,7 +327,7 @@ void microbx2_state::microbx2(machine_config &config)
 	m_pia1->writepb_handler().set(FUNC(microbx2_state::pia1_pb_w));
 	m_pia1->cb2_handler().set("centronics", FUNC(centronics_device::write_strobe));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(microbx2_state::kbd_w));
 
 	centronics_device &centronics(CENTRONICS(config, "centronics", centronics_devices, "printer"));

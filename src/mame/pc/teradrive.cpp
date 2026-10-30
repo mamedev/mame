@@ -33,7 +33,7 @@ NOTES (MD side):
 - 16 KiB of Z80 RAM (vs. 8 of stock)
 - 128 KiB of VDP RAM (vs. 64)
 - 68k can switch between native 7.67 MHz or 10 MHz
-- has discrete YM3438 in place of YM2612
+- has discrete YM3438 in place of YM2612 (same as Mega Drive 2)
 - Mega CD expansion port working with DIY extension cable, 32x needs at least a passive cart adapter
 - focus 3 in debugger is the current default for MD side
 - bp ff0122,1,{fill 0xff8100,4,"SEGA";g} to bypass TMSS loading for games without a valid header
@@ -50,10 +50,11 @@ TODO:
 - dual boot not yet handled;
 
 TODO (MD side):
-- some games (orunnersj, timekillu, rhythmld and late SGDK games) fails on Z80 bus request stuff;
+- some games (orunnersj, rhythmld and late SGDK games) fails on Z80 bus request stuff (fixed);
+- Needs proper open bus behaviour for Z80 busack in timekillu and others;
 - dashdes: is a flickerfest during gameplay (fixed?);
 - sonic2/combatca: no interlace support in 2-players mode;
-- dheadj: scrolling issues in stage 4-1 (blocks overflowing with );
+- dheadj: scrolling issues in stage 4-1 (tile blocks overflows when scrolling);
 - skitchin: one line off during gameplay;
 - caesar: no sound;
 - gynougj: stray tile on top-left of title screen;
@@ -376,8 +377,8 @@ isa16_wd90c10_romless_device::isa16_wd90c10_romless_device(const machine_config 
 void isa16_wd90c10_romless_device::device_add_mconfig(machine_config &config)
 {
 	isa16_wd90c11_lr_device::device_add_mconfig(config);
-	// unknown source, assume standard NTSC (divided internally)
-	// tested in Video mode
+	// clocked thru WD90C61-JE dual clock generator, assume standard NTSC (divided internally)
+	// tested in Video mode DIP
 	m_vga->set_vclk2(14'318'181);
 }
 
@@ -408,8 +409,8 @@ public:
 		, m_md_ioports(*this, "md_ioport%u", 1U)
 	{ }
 
-	void teradrive(machine_config &config);
-	void at_softlists(machine_config &config);
+	void teradrive(machine_config &config) ATTR_COLD;
+	void at_softlists(machine_config &config) ATTR_COLD;
 
 protected:
 	void machine_start() override ATTR_COLD;
@@ -491,7 +492,7 @@ private:
 	std::unique_ptr<u8[]> m_sound_program;
 
 	bool m_z80_reset = false;
-	bool m_z80_busrq = false;
+	bool m_z80_busreq = false;
 	u32 m_z80_main_address = 0;
 
 	void flush_z80_state();
@@ -564,25 +565,29 @@ void teradrive_state::md_68k_map(address_map &map)
 	map(0xa11100, 0xa11101).lrw16(
 		NAME([this] (offs_t offset, u16 mem_mask) {
 			address_space &space = m_md68kcpu->space(AS_PROGRAM);
-			// TODO: enough for all edge cases but timekill
+			// TODO: enough for all edge cases but timekillu/telebrad/arkagis
+			// - ddragon, beast, superoff, indyheat depends on this
+			// - timekillu is very erratic
+			// - telebrad reads to byte $a11'101 while Z80 is held in reset (should be open bus so 0xfeff mask)
+			// - arkagis does a bad branch displacement when looping for busack (PC=1796 and other places)
 			u16 open_bus = space.read_word(m_md68kcpu->pc() - 2) & 0xfefe;
 			// printf("%06x -> %04x\n", m_md68kcpu->pc() - 2, open_bus);
-			u16 res = (!m_z80_busrq || m_z80_reset) ^ 1;
+			u16 res = (m_mdz80cpu->busack_r() && !m_z80_reset) ^ 1;
 			return (res << 8) | (res) | open_bus;
 		}),
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
 			//printf("%04x %04x\n", data, mem_mask);
 			if (!ACCESSING_BITS_0_7)
 			{
-				m_z80_busrq = !!BIT(~data, 8);
+				m_z80_busreq = !!BIT(~data, 8);
 			}
 			else if (!ACCESSING_BITS_8_15)
 			{
-				m_z80_busrq = !!BIT(~data, 0);
+				m_z80_busreq = !!BIT(~data, 0);
 			}
 			else // word access
 			{
-				m_z80_busrq = !!BIT(~data, 8);
+				m_z80_busreq = !!BIT(~data, 8);
 			}
 			flush_z80_state();
 		})
@@ -691,10 +696,10 @@ void teradrive_state::md_cpu_space_map(address_map &map)
 void teradrive_state::flush_z80_state()
 {
 	m_mdz80cpu->set_input_line(INPUT_LINE_RESET, m_z80_reset ? ASSERT_LINE : CLEAR_LINE);
-	m_mdz80cpu->set_input_line(Z80_INPUT_LINE_BUSRQ, m_z80_busrq ? CLEAR_LINE : ASSERT_LINE);
+	m_mdz80cpu->set_input_line(Z80_INPUT_LINE_BUSREQ, m_z80_busreq ? CLEAR_LINE : ASSERT_LINE);
 	if (m_z80_reset)
 		m_opn->reset();
-	if (m_z80_reset || !m_z80_busrq)
+	if (m_z80_reset || !m_z80_busreq)
 		m_md_68k_sound_view.select(0);
 	else
 		m_md_68k_sound_view.disable();
@@ -745,7 +750,6 @@ void teradrive_state::md_z80_map(address_map &map)
 			address_space &space68k = m_md68kcpu->space();
 			u8 ret = space68k.read_byte(m_z80_main_address + offset);
 			return ret;
-
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			address_space &space68k = m_md68kcpu->space();
@@ -858,7 +862,7 @@ void teradrive_state::machine_start()
 	save_pointer(NAME(m_sound_program), 0x4000);
 
 	save_item(NAME(m_z80_reset));
-	save_item(NAME(m_z80_busrq));
+	save_item(NAME(m_z80_busreq));
 	save_item(NAME(m_z80_main_address));
 }
 
@@ -917,7 +921,7 @@ void teradrive_state::teradrive(machine_config &config)
 	m_chipset->spkr_callback().set(FUNC(teradrive_state::wd7600_spkr));
 
 	// on board devices
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->set_memspace(m_x86cpu, AS_PROGRAM);
 	m_isabus->set_iospace(m_x86cpu, AS_IO);
 	m_isabus->iochck_callback().set(m_chipset, FUNC(wd7600_device::iochck_w));
@@ -989,7 +993,7 @@ void teradrive_state::teradrive(machine_config &config)
 	m_mdz80cpu->set_addrmap(AS_PROGRAM, &teradrive_state::md_z80_map);
 	m_mdz80cpu->set_addrmap(AS_IO, &teradrive_state::md_z80_io);
 
-	SCREEN(config, m_mdscreen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_mdscreen);
 	// NOTE: PAL is 423x312
 	m_mdscreen->set_raw(md_master_xtal / 8, 427, 0, 320, 262, 0, 224);
 	m_mdscreen->set_screen_update(FUNC(teradrive_state::md_screen_update));
@@ -1018,13 +1022,13 @@ void teradrive_state::teradrive(machine_config &config)
 	// TODO: gated thru VDP
 	hl.output_handler().set_inputline(m_md68kcpu, 2);
 
-	MEGADRIVE_IO_PORT(config, m_md_ioports[0], 0);
+	MEGADRIVE_IO_PORT(config, m_md_ioports[0]);
 	m_md_ioports[0]->hl_handler().set("hl", FUNC(input_merger_device::in_w<0>));
 
-	MEGADRIVE_IO_PORT(config, m_md_ioports[1], 0);
+	MEGADRIVE_IO_PORT(config, m_md_ioports[1]);
 	m_md_ioports[1]->hl_handler().set("hl", FUNC(input_merger_device::in_w<1>));
 
-	MEGADRIVE_IO_PORT(config, m_md_ioports[2], 0);
+	MEGADRIVE_IO_PORT(config, m_md_ioports[2]);
 	m_md_ioports[2]->hl_handler().set("hl", FUNC(input_merger_device::in_w<2>));
 
 	for (int N = 0; N < 3; N++)
@@ -1050,7 +1054,7 @@ void teradrive_state::teradrive(machine_config &config)
 
 	SPEAKER(config, "md_speaker", 2).front();
 
-	YM2612(config, m_opn, md_master_xtal / 7);
+	YM3438(config, m_opn, md_master_xtal / 7);
 	m_opn->add_route(0, "md_speaker", 0.50, 0);
 	m_opn->add_route(1, "md_speaker", 0.50, 1);
 }

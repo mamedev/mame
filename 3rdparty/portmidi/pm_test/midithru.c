@@ -362,7 +362,7 @@ void initialize(int input, int output, int virtual)
 }
 
 
-void finalize()
+void finalize(void)
 {
     /* the timer thread could be in the middle of accessing PortMidi stuff */
     /* to detect that it is done, we first clear process_midi_exit_flag and

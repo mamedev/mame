@@ -27,6 +27,9 @@
     L7A0906 L6029 DFL - "second digital filter"
     L7A1414 L6038 DFX - digital multi-effects processor (S3200, optional add-on for S2000 and S3000)
 
+    The chip uses 8-point windowed sinc interpolation (up from 4 on the S1000).  A good read about
+    how that works is at https://www.dsprelated.com/freebooks/pasp/Windowed_Sinc_Interpolation.html
+
     The DSP takes 16 bytes of space (8 16-bit words) in the CPU memory map
     0  ---- rrrr ---v vvvv
         v = voice (0-31)
@@ -58,8 +61,7 @@
 
     0  ffffffffssssaaaa   aaaaaaaaaaaaaaaa   aaaa------------
         f = flags?  always 01
-        s = sample format, 0 = 16 bits, 1 = 8 bits.
-            also 0 = RAM address space, 1 = ROM address space
+        s = 0 for RAM address space, 1 for ROM address space
         a = sample start address (24 bits, 16 MiB addressable)
 
         For DMA, this is set to the DMA start address on channel 0
@@ -90,7 +92,7 @@
         A = loop start address, bits 23-20
 
     3  ----------------   vvvvvvvvvvvvvvvv   ----------------
-        v = volume envelope starting value (16 bit, maaaaybe signed?)
+        v = volume envelope starting value (16 bit unsigned)
 
     4  ----------------   vvvvvvvvvvvvvvvv   rrrrrrrrrrrrrrrr
         v = volume envelope target value
@@ -126,6 +128,7 @@
 
     TODO:
     - How does the delay effect work?
+    - Verify interpolation coefficients, precision, and start/loop padding against hardware.
 
     Delay effect notes from the S3000's editor page.
     All of these writes are register A, the voice number seems to be
@@ -144,6 +147,10 @@
 #include "l7a1045_l6028_dsp_a.h"
 #include "debugger.h"
 
+#include <array>
+#include <cmath>
+#include <numbers>
+
 #define LOG_REGISTERS           (1U << 1)
 #define LOG_READBACK_POSITION   (1U << 2)
 #define LOG_READBACK_VOL        (1U << 3)
@@ -153,7 +160,7 @@
 
 #define VERBOSE (0)
 
-// #define LOG_OUTPUT_FUNC osd_printf_info
+#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 enum
@@ -176,6 +183,52 @@ DEFINE_DEVICE_TYPE(L7A1045, l7a1045_sound_device, "l7a1045", "L7A1045 L6028 DSP-
 // channel mapping is weird
 static constexpr int channel_remap[8] = { 3, 1, 7, 5, 2, 0, 6, 4 };
 
+namespace {
+
+// Windowed sinc interpolator.  Coefficients are textbook; they may differ on the
+// L6028 but would likely require a decap to recover.
+// Tap k is sinc(f-k) * (1 + cos(pi*(f-k)/4))/2, k = -3..4, normalized per phase.
+const std::array<std::array<int32_t, 8>, 0x1000> interpolation_coefficients = []
+{
+	std::array<std::array<int32_t, 8>, 0x1000> result{};
+	result[0][3] = 1 << 30;
+	for (int phase = 1; phase <= 0x800; phase++)
+	{
+		std::array<double, 8> weights;
+		double total = 0;
+		for (int tap = 0; tap < 8; tap++)
+		{
+			const double x = std::numbers::pi * (double(phase) / 0x1000 - (tap - 3));
+			weights[tap] = (std::sin(x) / x) * (1.0 + std::cos(x / 4.0)) / 2.0;
+			total += weights[tap];
+		}
+
+		int32_t residual = 1 << 30;
+		for (int tap = 0; tap < 8; tap++)
+		{
+			result[phase][tap] = (phase == 0x800 && tap >= 4)
+				? result[phase][7 - tap]
+				: int32_t(std::lround(weights[tap] * (1 << 30) / total));
+			residual -= result[phase][tap];
+		}
+
+		if (phase == 0x800)
+		{
+			result[phase][3] += residual / 2;
+			result[phase][4] += residual / 2;
+		}
+		else
+		{
+			result[phase][3] += residual;
+			for (int tap = 0; tap < 8; tap++)
+				result[0x1000 - phase][7 - tap] = result[phase][tap];
+		}
+	}
+	return result;
+}();
+
+} // anonymous namespace
+
 l7a1045_sound_device::l7a1045_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, L7A1045, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
@@ -183,6 +236,11 @@ l7a1045_sound_device::l7a1045_sound_device(const machine_config &mconfig, const 
 	  m_drq_handler(*this),
 	  m_stream(nullptr),
 	  m_key(0),
+	  m_control(0),
+	  m_dma_timer(nullptr),
+	  m_cur_channel(0),
+	  m_cur_register(0),
+	  m_sample_rate(44100.0),
 	  m_mem_config("l6028", ENDIANNESS_LITTLE, 16, 25),
 	  m_rom_config("l6028_rom", ENDIANNESS_LITTLE, 16, 25)
 {
@@ -214,12 +272,16 @@ void l7a1045_sound_device::device_start()
 	m_sample_rate = clock() / 768.0f;
 	m_stream = stream_alloc(0, 10, m_sample_rate);
 
+	m_dma_timer = timer_alloc(FUNC(l7a1045_sound_device::dma_timer_callback), this);
+
 	save_item(STRUCT_MEMBER(m_voice, loop_start));
 	save_item(STRUCT_MEMBER(m_voice, start));
 	save_item(STRUCT_MEMBER(m_voice, end));
 	save_item(STRUCT_MEMBER(m_voice, step));
 	save_item(STRUCT_MEMBER(m_voice, pos));
 	save_item(STRUCT_MEMBER(m_voice, frac));
+	save_item(STRUCT_MEMBER(m_voice, sample_history));
+	save_item(STRUCT_MEMBER(m_voice, history_count));
 	save_item(STRUCT_MEMBER(m_voice, l_volume));
 	save_item(STRUCT_MEMBER(m_voice, r_volume));
 	save_item(STRUCT_MEMBER(m_voice, env_volume));
@@ -245,6 +307,91 @@ void l7a1045_sound_device::device_start()
 void l7a1045_sound_device::device_reset()
 {
 	m_key = 0;
+	for (auto &voice : m_voice)
+	{
+		voice.history_count = 0;
+	}
+}
+
+void l7a1045_sound_device::advance_history(l7a1045_voice &voice, uint32_t address, uint32_t count)
+{
+	// Record source samples crossed, not the previous output samples.  Only the
+	// final three addresses matter even when the pitch skips many source samples.
+	if (count >= 3)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			voice.sample_history[i] = address + count - 1 - i;
+		}
+		voice.history_count = 3;
+	}
+	else
+	{
+		for (uint32_t i = 0; i < count; i++)
+		{
+			voice.sample_history[2] = voice.sample_history[1];
+			voice.sample_history[1] = voice.sample_history[0];
+			voice.sample_history[0] = address + i;
+			voice.history_count = std::min<int>(voice.history_count + 1, 3);
+		}
+	}
+}
+
+int32_t l7a1045_sound_device::read_sample(uint8_t sample_type, uint32_t address)
+{
+	if (sample_type == 0) // 16-bit linear, little-endian RAM
+	{
+		return int16_t(m_cache.read_word(address << 1));
+	}
+
+	// 12-bit non-linear ROM, encoded into 8 bits.  Expand before interpolation.
+	const uint8_t data = m_rom_cache.read_byte(address);
+	const int32_t mantissa = (data >> 2) - (BIT(data, 7) ? 0x40 : 0);
+	return mantissa * (1 << (4 + 2 * (~data & 3)));
+}
+
+int32_t l7a1045_sound_device::interpolated_sample(const l7a1045_voice &voice, uint32_t address, uint32_t frac)
+{
+	if (voice.sample_type > 1)
+	{
+		logerror("l7a1045: unknown sample type %d\n", voice.sample_type);
+		return 0;
+	}
+
+	const int32_t sample = read_sample(voice.sample_type, address);
+	if (!frac)
+	{
+		return sample;
+	}
+
+	// loop_start actually holds a length.
+	const uint32_t loop_length = voice.loop_start;
+	const bool valid_loop = (voice.end > voice.start) && loop_length && (loop_length <= voice.end - voice.start);
+	if (address < voice.start || address >= voice.end || (!valid_loop && (voice.end - address <= 4)))
+	{
+		return sample;
+	}
+
+	const auto &coefficients = interpolation_coefficients[frac];
+	int64_t result = int64_t(sample) * coefficients[3];
+	for (int i = 0; i < voice.history_count; i++)
+	{
+		result += int64_t(read_sample(voice.sample_type, voice.sample_history[i])) * coefficients[2 - i];
+	}
+
+	// Missing history at a restart is zero.  Lookahead follows the logical loop;
+	// whether the chip instead reads firmware-supplied guard samples needs testing.
+	for (int i = 4; i < 8; i++)
+	{
+		if (++address == voice.end)
+		{
+			address = voice.end - loop_length;
+		}
+		result += int64_t(read_sample(voice.sample_type, address)) * coefficients[i];
+	}
+
+	// Round symmetrically, with headroom for sinc overshoot at the filter input.
+	return (result < 0) ? -((-result + (int64_t(1) << 29)) >> 30) : ((result + (int64_t(1) << 29)) >> 30);
 }
 
 void l7a1045_sound_device::sound_stream_update(sound_stream &stream)
@@ -264,40 +411,31 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream)
 
 			for (int j = 0; j < stream.samples(); j++)
 			{
-				uint32_t address;
-				int32_t sample;
-				uint8_t data;
-
-				pos += (frac >> 12);
+				const uint32_t previous_address = start + pos;
+				const uint32_t advance = frac >> 12;
+				pos += advance;
 				frac &= 0xfff;
 
 				if ((end > start) && ((start + pos) >= end))
 				{
+					if (previous_address < end)
+					{
+						advance_history(*vptr, previous_address, end - previous_address);
+					}
+					else
+					{
+						vptr->history_count = 0;
+					}
+
+					// Preserve the existing transport's discarded integer overshoot.
 					pos = (vptr->end - vptr->start) - vptr->loop_start;
 				}
-
-				switch (vptr->sample_type)
+				else
 				{
-					case 0: // 16-bit linear, little-endian
-						address = ((start << 1) + (pos << 1));
-						sample = (int16_t)m_cache.read_word(address);
-						break;
-
-					case 1: // 12-bit non-linear, encoded into 8 bits
-						address = (start + pos);
-						data = m_rom_cache.read_byte(address);
-						sample = (data & 0xfc) >> 2;
-						if (sample & 0x20)
-							sample -= 0x40;
-						sample <<= 4 + 2 * (~data & 3);
-						break;
-
-					default:
-						logerror("l7a1045: unknown sample type %d\n", vptr->sample_type);
-						sample = 0;
-						break;
+					advance_history(*vptr, previous_address, advance);
 				}
 
+				const int32_t sample = interpolated_sample(*vptr, start + pos, frac);
 				frac += step;
 
 				// volume envelope processing
@@ -342,9 +480,9 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream)
 				//    y0 = L'
 				// (fwiw, if you want notch it's H' + L)
 
-				const int32_t h = sample - vptr->l - vptr->b + ((vptr->flt_resonance * vptr->b) >> 4);
+				const int64_t h = int64_t(sample) - vptr->l - vptr->b + ((int64_t(vptr->flt_resonance) * vptr->b) >> 4);
 				vptr->b += (vptr->flt_freq * h) >> 15;
-				vptr->l += (vptr->flt_freq * vptr->b) >> 15;
+				vptr->l += (int64_t(vptr->flt_freq) * vptr->b) >> 15;
 
 				const int32_t fout = vptr->l;
 				const int64_t left = (fout * (uint64_t(vptr->l_volume) * uint64_t(vptr->env_volume))) >> 24;
@@ -417,20 +555,20 @@ uint16_t l7a1045_sound_device::voiceregs_r(offs_t offset)
 		m_regs[0][m_cur_channel] |= (uint64_t(current_addr) << 12);
 		m_regs[0][m_cur_channel] |= vptr->frac & 0x0fff;
 
-		LOGMASKED(LOG_READBACK_POSITION, "ch %d cur pos %08x final %012llx (%s)\n", m_cur_channel, current_addr, m_regs[0][m_cur_channel], machine().describe_context());
+		LOGMASKED(LOG_READBACK_POSITION, "ch %d cur pos %08x final %012llx (%s)\n", m_cur_channel, current_addr, m_regs[L6028_Start][m_cur_channel], machine().describe_context());
 	}
 	break;
 
 	case L6028_Volume_Env:
-		m_regs[3][m_cur_channel] &= 0xffff'0000'ffff;
-		m_regs[3][m_cur_channel] |= (uint64_t(vptr->env_volume) << 16);
-		LOGMASKED(LOG_READBACK_VOL, "ch %d read env vol %x => %012llx (%s)\n", m_cur_channel, vptr->env_volume, m_regs[3][m_cur_channel], machine().describe_context());
+		m_regs[L6028_Volume_Env][m_cur_channel] &= 0xffff'0000'ffff;
+		m_regs[L6028_Volume_Env][m_cur_channel] |= (uint64_t(vptr->env_volume) << 16);
+		LOGMASKED(LOG_READBACK_VOL, "ch %d read env vol %x => %012llx (%s)\n", m_cur_channel, vptr->env_volume, m_regs[L6028_Volume_Env][m_cur_channel], machine().describe_context());
 		break;
 
 	case L6028_Filter_Env:
-		m_regs[5][m_cur_channel] &= 0xffff'0000'ffff;
-		m_regs[5][m_cur_channel] |= (uint64_t(vptr->flt_freq) << 16);
-		LOGMASKED(LOG_READBACK_FILTER, "ch %d read filter cutoff %x => %012llx\n", m_cur_channel, vptr->env_volume, m_regs[3][m_cur_channel]);
+		m_regs[L6028_Filter_Env][m_cur_channel] &= 0xffff'0000'ffff;
+		m_regs[L6028_Filter_Env][m_cur_channel] |= (uint64_t(vptr->flt_freq) << 16);
+		LOGMASKED(LOG_READBACK_FILTER, "ch %d read filter cutoff %x => %012llx\n", m_cur_channel, vptr->flt_freq, m_regs[L6028_Filter_Env][m_cur_channel]);
 		break;
 	}
 
@@ -459,6 +597,8 @@ void l7a1045_sound_device::voiceregs_w(offs_t offset, uint16_t data)
 			// clear the pos on start writes (required for DMA tests on MPC3000, and HNG64 likes to leave voices keyed on and just write new parameters)
 			vptr->pos = 0;
 			vptr->frac = 0;
+			vptr->history_count = 0;
+			vptr->env_pos = 0;
 			// clear the filter state too
 			vptr->flt_pos = 0;
 			vptr->l = vptr->b = 0;
@@ -501,7 +641,6 @@ void l7a1045_sound_device::voiceregs_w(offs_t offset, uint16_t data)
 		case L6028_Volume_Env_Target:
 			vptr->env_target = (m_regs[L6028_Volume_Env_Target][m_cur_channel] & 0xffff'0000) >> 16;
 			vptr->env_step = m_regs[L6028_Volume_Env_Target][m_cur_channel] & 0xffff;
-			LOGMASKED(LOG_REGISTERS, "ch %d env target %04x step %04x\n", m_cur_channel, vptr->env_target, vptr->env_step);
 			break;
 
 		// reg 5 = starting lowpass cutoff frequency
@@ -547,14 +686,14 @@ void l7a1045_sound_device::recalc_loop_start(l7a1045_voice *vptr)
 	else
 	{
 		const uint32_t multiplier = (((m_regs[L6028_Loop_Start][m_cur_channel] & 0xffff'0000) >> 16) ^ 0xffff) + 1;
-		const uint32_t base = m_regs[2][m_cur_channel] & 0xffff;
+		const uint32_t base = m_regs[L6028_Loop_Start][m_cur_channel] & 0xffff;
 		vptr->loop_start = (base * multiplier) >> 12;
 	}
 }
 
 uint16_t l7a1045_sound_device::control_r()
 {
-	return 0;
+	return m_control;
 }
 // bit 0 = set for wave DMA transfers
 // bit 1 = set for wave DMA transfers
@@ -572,12 +711,18 @@ void l7a1045_sound_device::control_w(uint16_t data)
 
 	LOGMASKED(LOG_REGISTERS, "%s: %04x to control (ch %d)\n", tag(), data, m_cur_channel);
 
+	m_control = data;
+
 	if (BIT(data, CONTROL_KEY_ON))
 	{
 		l7a1045_voice* const vptr = &m_voice[m_cur_channel];
 
 		vptr->frac = 0;
 		vptr->pos = 0;
+		vptr->history_count = 0;
+		vptr->flt_pos = 0;
+		vptr->l = vptr->b = 0;
+		vptr->env_pos = 0;
 		m_key |= 1 << m_cur_channel;
 
 		recalc_loop_start(vptr);
@@ -588,7 +733,16 @@ void l7a1045_sound_device::control_w(uint16_t data)
 		LOGMASKED(LOG_KEYON, "      raw 6 %012llx 7 %012llx\n", m_regs[6][m_cur_channel], m_regs[7][m_cur_channel]);
 	}
 
-	m_drq_handler(BIT(data, CONTROL_DMA_START));
+	if (BIT(m_control, CONTROL_DMA_START))
+	{
+		// 8x the sample period
+		const auto time = attotime::from_ticks(64, clock());
+		m_dma_timer->adjust(time, 0, time);
+	}
+	else
+	{
+		m_dma_timer->adjust(attotime::never);
+	}
 }
 
 void l7a1045_sound_device::atomic_w(uint16_t data)
@@ -601,7 +755,11 @@ uint16_t l7a1045_sound_device::dma_r16_cb()
 {
 	const offs_t byteoffs = (m_voice[0].start << 1) + (m_voice[0].pos << 1);
 
+	m_drq_handler(CLEAR_LINE);
+
 	m_voice[0].pos++;
+	// DMA shares voice 0's cursor, but obviously is not interpolated
+	m_voice[0].history_count = 0;
 	if (m_voice[0].sample_type == 1)
 	{
 		LOGMASKED(LOG_DMA, "%s DMA read ROM @ %08x\n", tag(), byteoffs);
@@ -616,6 +774,8 @@ void l7a1045_sound_device::dma_w16_cb(uint16_t data)
 {
 	const offs_t byteoffs = (m_voice[0].start << 1) + (m_voice[0].pos << 1);
 
+	m_drq_handler(CLEAR_LINE);
+
 	if (m_voice[0].sample_type == 1)
 	{
 		m_rom_cache.write_word(byteoffs, data);
@@ -628,4 +788,10 @@ void l7a1045_sound_device::dma_w16_cb(uint16_t data)
 	}
 
 	m_voice[0].pos++;
+	m_voice[0].history_count = 0;
+}
+
+TIMER_CALLBACK_MEMBER(l7a1045_sound_device::dma_timer_callback)
+{
+	m_drq_handler(ASSERT_LINE);
 }

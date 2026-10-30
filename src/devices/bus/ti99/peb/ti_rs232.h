@@ -131,7 +131,7 @@ private:
 class ti_rs232_attached_device : public device_t, public device_image_interface
 {
 public:
-	ti_rs232_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ti_rs232_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	bool is_readable()  const noexcept override           { return true; }
 	bool is_writeable() const noexcept override           { return true; }
@@ -161,7 +161,7 @@ class ti_pio_attached_device : public device_t, public device_image_interface
 {
 	friend class ti_rs232_pio_device;
 public:
-	ti_pio_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ti_pio_attached_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	bool is_readable()  const noexcept override           { return true; }
 	bool is_writeable() const noexcept override           { return true; }

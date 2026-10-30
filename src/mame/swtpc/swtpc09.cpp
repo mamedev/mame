@@ -462,7 +462,7 @@ void swtpc09_state::swtpc09_base(machine_config &config)
 	MC6809(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &swtpc09_state::mp09_mem);
 
-	ADDRESS_MAP_BANK(config, m_bankdev, 0);
+	ADDRESS_MAP_BANK(config, m_bankdev);
 	m_bankdev->set_endianness(ENDIANNESS_BIG);
 	m_bankdev->set_data_width(8);
 	m_bankdev->set_addr_width(20);

@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "osdepend.h"
+#include "video.h"
 #include "debug/debugcpu.h"
 #include "debug/debugcmd.h"
 #include "debug/debugcon.h"

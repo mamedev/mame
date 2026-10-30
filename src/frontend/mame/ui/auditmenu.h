@@ -25,7 +25,7 @@ namespace ui {
 class menu_audit : public menu
 {
 public:
-	menu_audit(mame_ui_manager &mui, render_container &container);
+	menu_audit(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_audit() override;
 
 protected:

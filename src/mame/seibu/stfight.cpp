@@ -345,6 +345,7 @@ private:
 	uint16_t m_adpcm_data_offs = 0;
 
 	emu_timer *m_int1_timer = nullptr;
+	uint8_t m_irq_vector = 0;
 
 	void adpcm_int(int state);
 
@@ -359,7 +360,8 @@ private:
 	uint8_t fm_r();
 
 	INTERRUPT_GEN_MEMBER(vb_interrupt);
-	TIMER_CALLBACK_MEMBER(rst08_tick);
+	TIMER_CALLBACK_MEMBER(rst10_tick);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
 	// MCU specifics
 	uint8_t _68705_port_b_r();
@@ -380,7 +382,7 @@ void stfight_state::machine_start()
 	m_main_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 	m_main_bank->set_entry(0);
 
-	m_int1_timer = timer_alloc(FUNC(stfight_state::rst08_tick), this);
+	m_int1_timer = timer_alloc(FUNC(stfight_state::rst10_tick), this);
 
 	save_item(NAME(m_coin_state));
 	save_item(NAME(m_fm_data));
@@ -389,6 +391,8 @@ void stfight_state::machine_start()
 	save_item(NAME(m_cpu_to_mcu_data));
 	save_item(NAME(m_port_a_out));
 	save_item(NAME(m_port_c_out));
+
+	save_item(NAME(m_irq_vector));
 
 	save_item(NAME(m_vck2));
 	save_item(NAME(m_adpcm_reset));
@@ -404,6 +408,8 @@ void stfight_state::machine_reset()
 
 	// Coin signals are active low
 	m_coin_state = 3;
+
+	m_irq_vector = 0;
 }
 
 // It's entirely possible that this bank is never switched out
@@ -417,16 +423,22 @@ void stfight_state::cshooter_bank_w(uint8_t data)
  *      CPU 1 timed interrupt - 60Hz???
  */
 
-TIMER_CALLBACK_MEMBER(stfight_state::rst08_tick)
+TIMER_CALLBACK_MEMBER(stfight_state::rst10_tick)
 {
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80
+	m_irq_vector = 0xd7; // RST 10h
+	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(stfight_state::vb_interrupt)
 {
-	// Do a RST10
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80
+	m_irq_vector = 0xcf; // RST 08h
+	m_maincpu->set_input_line(0, HOLD_LINE);
 	m_int1_timer->adjust(attotime::from_hz(120));
+}
+
+IRQ_CALLBACK_MEMBER(stfight_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 /*
@@ -744,6 +756,7 @@ void stfight_state::stfight_base(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, 12_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &stfight_state::cpu1_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(stfight_state::cpu_acknowledge_irq));
 
 	Z80(config, m_audiocpu, 12_MHz_XTAL / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &stfight_state::cpu2_map);
@@ -787,14 +800,14 @@ void stfight_state::stfight(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &stfight_state::decrypted_opcodes_map);
 	m_maincpu->set_vblank_int("stfight_vid:screen", FUNC(stfight_state::vb_interrupt));
 
-	STFIGHT_VIDEO(config, "stfight_vid", 0);
+	STFIGHT_VIDEO(config, "stfight_vid");
 }
 
 void stfight_state::empcityubl(machine_config &config)
 {
 	stfight(config);
 
-	m_maincpu->set_addrmap(AS_OPCODES, address_map_constructor());
+	m_maincpu->remove_addrmap(AS_OPCODES);
 }
 
 void stfight_state::cshooter(machine_config &config)
@@ -803,7 +816,7 @@ void stfight_state::cshooter(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &stfight_state::cshooter_cpu1_map);
 	m_maincpu->set_vblank_int("airraid_vid:screen", FUNC(stfight_state::vb_interrupt));
 
-	AIRRAID_VIDEO(config, "airraid_vid", 0);
+	AIRRAID_VIDEO(config, "airraid_vid");
 }
 
 
@@ -1549,7 +1562,7 @@ GAME( 1986, empcityu,   empcity, stfight,    stfight,  stfight_state, init_stfig
 GAME( 1986, empcityj,   empcity, stfight,    stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Taito license)",           "Empire City: 1931 (Japan)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, empcityi,   empcity, stfight,    stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, empcityfr,  empcity, stfight,    stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Norad license)",           "Empire City: 1931 (France)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, empcityubl, empcity, empcityubl, stfight,  stfight_state, init_ymhack,   ROT0,   "Seibu Kaihatsu",                           "Empire City: 1931 (US, bootleg)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, empcityubl, empcity, empcityubl, stfight,  stfight_state, init_ymhack,   ROT0,   "bootleg",                                  "Empire City: 1931 (US, bootleg)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, stfight,    empcity, stfight,    stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, stfighta,   empcity, stfight,    stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu",                           "Street Fight (bootleg?)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, stfightgb,  empcity, stfight,    stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany - Benelux)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

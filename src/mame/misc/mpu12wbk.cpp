@@ -464,13 +464,12 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void mpu12wbk(machine_config &config);
+	void mpu12wbk(machine_config &config) ATTR_COLD;
 
-	void init_mpu12wbk();
+	void init_mpu12wbk() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
-	virtual void machine_start() override { m_lamps.resolve(); }
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -965,7 +964,7 @@ void mpu12wbk_state::mpu12wbk(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 

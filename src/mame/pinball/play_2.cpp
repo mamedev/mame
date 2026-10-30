@@ -77,10 +77,13 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void play_2(machine_config &config);
-	void sound3(machine_config &config);
+	void play_2(machine_config &config) ATTR_COLD;
+	void sound3(machine_config &config) ATTR_COLD;
 
 protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+
 	void port01_w(u8 data);
 	void port02_w(u8 data);
 	u8 port04_r();
@@ -105,8 +108,6 @@ protected:
 	u8 m_old_solenoids[8]{};
 	u8 m_soundlatch = 0U;
 	bool m_snd_on = false;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void machine_start() override ATTR_COLD;
 	required_device<cosmac_device> m_maincpu;
 	required_device<ttl7474_device> m_4013a;
 	required_device<ttl7474_device> m_4013b;
@@ -127,8 +128,8 @@ public:
 		, m_ay(*this, "ay")
 	{ }
 
-	void zira(machine_config &config);
-	void init_zira();
+	void zira(machine_config &config) ATTR_COLD;
+	void init_zira() ATTR_COLD;
 
 private:
 	void zira_sound_map(address_map &map) ATTR_COLD;
@@ -243,9 +244,6 @@ void play_2_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_segment));
 	save_item(NAME(m_resetcnt));
 	save_item(NAME(m_disp_sw));
@@ -259,6 +257,7 @@ void play_2_state::machine_start()
 void play_2_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 
@@ -461,11 +460,11 @@ void play_2_state::play_2(machine_config &config)
 	CLOCK(config, "xpoint", 60).signal_handler().set(FUNC(play_2_state::clock2_w)); // crossing-point detector
 
 	// This is actually a 4013 chip (has 2 RS flipflops)
-	TTL7474(config, m_4013a, 0);
+	TTL7474(config, m_4013a);
 	m_4013a->comp_output_cb().set(m_4013a, FUNC(ttl7474_device::d_w));
 	m_4013a->output_cb().set(m_4020, FUNC(ripple_counter_device::reset_w)); // TODO: also CKD for display
 
-	TTL7474(config, m_4013b, 0);
+	TTL7474(config, m_4013b);
 	m_4013b->output_cb().set(m_maincpu, FUNC(cosmac_device::ef2_w));
 	m_4013b->comp_output_cb().set(m_maincpu, FUNC(cosmac_device::int_w)).invert(); // int is reversed in mame
 
@@ -477,7 +476,7 @@ void play_2_state::play_2(machine_config &config)
 	genpin_audio(config);
 
 	SPEAKER(config, "mono").front_center();
-	CDP1863(config, m_1863, 0);
+	CDP1863(config, m_1863);
 	m_1863->set_clock2(2.95_MHz_XTAL / 8);
 	m_1863->add_route(ALL_OUTPUTS, "mono", 0.75);
 	TIMER(config, m_snd_off).configure_generic(FUNC(play_2_state::snd_off_callback));

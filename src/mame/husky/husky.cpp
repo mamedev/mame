@@ -489,7 +489,7 @@ void husky_state::husky(machine_config &config)
 	outlatch.q_out_cb<7>().set(FUNC(husky_state::paga18_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(FUNC(husky_state::screen_update));
 	screen.set_size(192, 48);
@@ -507,7 +507,7 @@ void husky_state::husky(machine_config &config)
 	/* Devices */
 	MM58174(config, "rtc", 32.768_kHz_XTAL); // MM58174A
 
-	nsc810_device &iotimer(NSC810(config, "iotimer", 0, 2_MHz_XTAL / 2, 2_MHz_XTAL / 2));
+	nsc810_device &iotimer(NSC810(config, "iotimer", 2_MHz_XTAL / 2, 2_MHz_XTAL / 2));
 	iotimer.portA_read_callback().set(FUNC(husky_state::porta_r));
 	iotimer.portA_write_callback().set(FUNC(husky_state::porta_w));
 	iotimer.portB_read_callback().set(FUNC(husky_state::portb_r));

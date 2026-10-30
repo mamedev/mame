@@ -226,18 +226,27 @@ chd_file *device_image_interface::current_preset_image_chd() const
 
 void device_image_interface::switch_preset_image(int id)
 {
-	for (unsigned int i = 0; i != m_preset_images.size(); i++)
+	for (unsigned i = 0; i != m_preset_images.size(); i++)
+	{
 		if (m_preset_images[i])
 		{
-			if(!id)
+			if (!id)
 			{
-				call_unload();
+				if (is_loaded() || loaded_through_softlist())
+				{
+					call_unload();
+					clear();
+					m_media_change_notifier(media_change_event::UNLOADED);
+				}
 				m_current_region = i;
-				call_load();
+				auto const err = call_load();
+				if (!err.first)
+					m_media_change_notifier(media_change_event::LOADED);
 				break;
 			}
 			id--;
 		}
+	}
 
 	return;
 }
@@ -627,10 +636,8 @@ std::error_condition device_image_interface::load_image_by_path(u32 open_flags, 
 		osd_printf_verbose("%s: error opening image file %s with flags=%08X (%s:%d %s)\n", device().tag(), path, open_flags, filerr.category().name(), filerr.value(), filerr.message());
 		return filerr;
 	}
-	else
-	{
-		osd_printf_verbose("%s: opened image file %s with flags=%08X\n", device().tag(), path, open_flags);
-	}
+
+	osd_printf_verbose("%s: opened image file %s with flags=%08X\n", device().tag(), path, open_flags);
 
 	m_readonly = (open_flags & OPEN_FLAG_WRITE) ? 0 : 1;
 	m_created = (open_flags & OPEN_FLAG_CREATE) ? 1 : 0;
@@ -749,7 +756,7 @@ std::error_condition device_image_interface::load_software(software_list_device 
 			// handle files
 			if (ROMENTRY_ISFILE(romp))
 			{
-				const software_info *const swinfo = swlist.find(std::string(swname));
+				const software_info *const swinfo = swlist.find(swname);
 				if (!swinfo)
 					return image_error::NOSOFTWARE;
 
@@ -1093,9 +1100,8 @@ void device_image_interface::clear() noexcept
 
 void device_image_interface::unload()
 {
-	if (is_loaded() || loaded_through_softlist())
+	if (is_loaded() || loaded_through_softlist() || exists())
 	{
-		m_sequence_counter++;
 		call_unload();
 		clear();
 		m_media_change_notifier(media_change_event::UNLOADED);

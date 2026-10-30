@@ -38,8 +38,6 @@ private:
 	void control_w(u8 data);
 	u8 eeprom_r();
 
-	void scsic_config(device_t *device);
-
 	required_device<ncr5380_device> m_scsic;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_ioport m_baseaddr;

@@ -1,9 +1,34 @@
 // license:BSD-3-Clause
 // copyright-holders:Quench
-/* Toaplan Sprite Controller 'SCU'
- used by twincobr_v.cpp (including wardner)
- and rallybik in toaplan1.cpp
-*/
+/***************************************************************************
+
+Toaplan Sprite Controller 'SCU'
+
+Up to 512 sprites, 16x16 fixed tile size
+
+ used at
+ - toaplan/twincobr.cpp
+ - toaplan/wardner.cpp
+ - toaplan/rallybik.cpp
+
+Sprite RAM format: (4 16 bit word per sprite)
+
+Word Bit                 Description
+     0000 0000 0000 0000
+     fedc ba98 7654 3210
+0    ---- -xxx xxxx xxxx Tile index
+1    ---- xx-- ---- ---- Priority*
+     ---- --x- ---- ---- Flip Y
+     ---- ---x ---- ---- Flip X
+     ---- ---- --xx xxxx Color index**
+2    xxxx xxxx x--- ---- X position
+3    xxxx xxxx x--- ---- Y position
+
+* 0...3 = backmost to frontmost
+** 16 color unit
+*** Unmarked bits are unused/unknown
+
+***************************************************************************/
 
 
 #include "emu.h"
@@ -31,14 +56,20 @@ GFXDECODE_END
 
 toaplan_scu_device::toaplan_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TOAPLAN_SCU, tag, owner, clock)
-	, device_gfx_interface(mconfig, *this, gfxinfo)
+	, device_gfx_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
 	, m_pri_cb(*this)
+	, m_xoffs(0)
+	, m_xoffs_flipped(0)
+	, m_colbase(0)
 {
 }
 
 void toaplan_scu_device::device_start()
 {
+	decode_gfx(gfxinfo);
+	gfx(0)->set_colorbase(m_colbase);
+
 	m_pri_cb.resolve();
 }
 
@@ -70,11 +101,11 @@ void toaplan_scu_device::draw_sprites_common(BitmapClass &bitmap, const rectangl
 			if (!m_pri_cb.isnull())
 				m_pri_cb(priority, pri_mask);
 
-			int sx          = spriteram[offs + 2] >> 7;
-			const int flipx = attribute & 0x100;
-			if (flipx) sx  -= m_xoffs_flipped;
+			int sx           = spriteram[offs + 2] >> 7;
+			const bool flipx = BIT(attribute, 8);
+			if (flipx) sx   -= m_xoffs_flipped;
 
-			const int flipy = attribute & 0x200;
+			const bool flipy = BIT(attribute, 9);
 			gfx(0)->prio_transpen(bitmap, cliprect,
 				sprite,
 				color,

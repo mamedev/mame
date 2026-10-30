@@ -74,20 +74,27 @@ we currently simulate this as the PIC is read protected.
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 
 class ttchamp_state : public driver_device
 {
 public:
-	ttchamp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ttchamp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_mainram(*this, "mainram"),
+		m_rom16(*this, "maincpu")
+	{ }
 
-	void ttchamp(machine_config &config);
+	void ttchamp(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<uint16_t> m_mainram;
+	required_region_ptr<uint16_t> m_rom16;
 
 	uint16_t m_paloff = 0;
 	uint16_t m_port10 = 0;
@@ -113,13 +120,9 @@ private:
 
 	std::unique_ptr<uint8_t[]> m_bakram;
 
-	uint16_t m_mainram[0x10000 / 2];
-
 	int m_spritesinit = 0;
 	int m_spriteswidth = 0;
 	int m_spritesaddr = 0;
-	uint16_t* m_rom16 = nullptr;
-	uint8_t* m_rom8 = nullptr;
 
 	void paloff_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void paldat_w(uint16_t data);
@@ -129,14 +132,14 @@ private:
 	void port20_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void port62_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	uint16_t port1e_r();
+	uint16_t port1e_r(address_space &space);
 
 	uint16_t pic_r(offs_t offset, uint16_t mem_mask = ~0);
 	void pic_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	uint16_t blit_start_r();
+	uint16_t blit_start_r(address_space &space);
 
-	uint16_t mem_r(offs_t offset);
+	uint16_t vram_r(offs_t offset);
 	void mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	virtual void machine_start() override ATTR_COLD;
@@ -154,9 +157,6 @@ ALLOW_SAVE_TYPE(ttchamp_state::picmode);
 
 void ttchamp_state::machine_start()
 {
-	m_rom16 = (uint16_t*)memregion("maincpu")->base();
-	m_rom8 = memregion("maincpu")->base();
-
 	m_picmodex = picmode::IDLE;
 
 	m_bakram = std::make_unique<uint8_t[]>(0x100);
@@ -172,7 +172,6 @@ void ttchamp_state::machine_start()
 	save_item(NAME(m_pic_writeaddr));
 	save_item(NAME(m_pic_latched));
 	save_item(NAME(m_pic_writelatched));
-	save_item(NAME(m_mainram));
 	save_item(NAME(m_spritesinit));
 	save_item(NAME(m_spriteswidth));
 	save_item(NAME(m_spritesaddr));
@@ -186,69 +185,46 @@ void ttchamp_state::video_start()
 uint32_t ttchamp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	logerror("update\n");
-	int count;
 
-	static const int xxx=320,yyy=204;
+	constexpr int xxx = 320, yyy = 204;
 
 	bitmap.fill(m_palette->black_pen());
-	uint8_t const *const videoramfg = (uint8_t*)m_videoram2;
-	uint8_t const *const videorambg = (uint8_t*)m_videoram0;
 
-	count=0;
-
-	for (int y=0;y<yyy;y++)
+	auto const videorambg = util::little_endian_cast<uint8_t const>(m_videoram0);
+	//auto const videoram = util::little_endian_cast<uint8_t const>(m_videoram1);
+	auto const videoramfg = util::little_endian_cast<uint8_t const>(m_videoram2);
+	int count = 0;
+	for (int y = 0; y < yyy; y++)
 	{
-		for(int x=0;x<xxx;x++)
+		auto const dst = &bitmap.pix(y);
+		for (int x = 0; x < xxx; x++)
 		{
-			bitmap.pix(y, x) = videorambg[BYTE_XOR_LE(count)]+0x300;
-			count++;
-		}
-	}
+			//uint8_t const pix = videoram[count];
+			//if (pix) dst[x] = pix + 0x200;
 
-#if 0
-	count=0;
-	videoram = (uint8_t*)m_videoram1;
-	for (int y=0;y<yyy;y++)
-	{
-		for (int x=0;x<xxx;x++)
-		{
-			uint8_t pix = videoram[BYTE_XOR_LE(count)];
-			if (pix) bitmap.pix(y, x) = pix+0x200;
-			count++;
-		}
-	}
-#endif
-
-	count=0;
-	for (int y=0;y<yyy;y++)
-	{
-		for(int x=0;x<xxx;x++)
-		{
-			uint8_t pix = videoramfg[BYTE_XOR_LE(count)];
-			if (pix)
+			// first pen values seem to be special
+			// see char select and shadows in-game
+			// pen 0 = transparent
+			// pen 1 = blend 1
+			// pen 2 = blend 2
+			// pen 3 = ??
+			uint16_t const bg = videorambg[count];
+			uint16_t const fg = videoramfg[count];
+			switch (fg)
 			{
-				// first pen values seem to be special
-				// see char select and shadows ingame
-				// pen 0 = transparent
-				// pen 1 = blend 1
-				// pen 2 = blend 2
-				// pen 3 = ??
-
-				if (pix == 0x01) // blend mode 1
-				{
-					uint8_t pix = videorambg[BYTE_XOR_LE(count)];
-					bitmap.pix(y, x) = pix + 0x200;
-				}
-				else if (pix == 0x02) // blend mode 2
-				{
-					uint8_t pix = videorambg[BYTE_XOR_LE(count)];
-					bitmap.pix(y, x) = pix + 0x100;
-				}
-				else
-				{
-					bitmap.pix(y, x) = pix + 0x000;
-				}
+			case 0x00:
+				dst[x] = bg + 0x300;
+				break;
+			case 0x01: // blend mode 1
+				dst[x] = bg + 0x200;
+				break;
+			case 0x02: // blend mode 2
+				dst[x] = bg + 0x100;
+				break;
+			default:
+				dst[x] = fg;
 			}
+
 			count++;
 		}
 	}
@@ -260,8 +236,8 @@ uint32_t ttchamp_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		// I think it actually does more blit operations with
 		// different bits of m_port10 set to redraw the backgrounds using the video ram data as a source rather than ROM - notice the garbage you see behind 'sprites' right now
 		// this method also removes the text layer, which we don't want
-	//  m_videoram1[i] = 0x0000;
-	//  m_videoram2[i] = 0x0000;
+		//m_videoram1[i] = 0x0000;
+		//m_videoram2[i] = 0x0000;
 	}
 #endif
 
@@ -283,10 +259,10 @@ void ttchamp_state::paldat_w(uint16_t data)
 
 uint16_t ttchamp_state::pic_r(offs_t offset, uint16_t mem_mask)
 {
-//  printf("%06x: read from PIC (%04x)\n", m_maincpu->pc(),mem_mask);
+//  logerror("%06x: read from PIC (%04x)\n", m_maincpu->pc(),mem_mask);
 	if (m_picmodex == picmode::SET_READLATCH)
 	{
-//      printf("read data %02x from %02x\n", m_pic_latched, m_pic_readaddr);
+//      logerror("read data %02x from %02x\n", m_pic_latched, m_pic_readaddr);
 		m_picmodex = picmode::IDLE;
 
 		return m_pic_latched << 8;
@@ -298,29 +274,29 @@ uint16_t ttchamp_state::pic_r(offs_t offset, uint16_t mem_mask)
 
 void ttchamp_state::pic_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-//  printf("%06x: write to PIC %04x (%04x) (%d)\n", m_maincpu->pc(),data,mem_mask, m_picmodex);
+//  logerror("%06x: write to PIC %04x (%04x) (%d)\n", m_maincpu->pc(),data,mem_mask, m_picmodex);
 	if (m_picmodex == picmode::IDLE)
 	{
 		if (data == 0x11)
 		{
 			m_picmodex = picmode::SET_READADDRESS;
-//          printf("state = SET_READADDRESS\n");
+//          logerror("state = SET_READADDRESS\n");
 		}
 		else if (data == 0x12)
 		{
 			m_picmodex = picmode::SET_WRITELATCH;
-//          printf("latch write data.. \n" );
+//          logerror("latch write data.. \n" );
 		}
 		else if (data == 0x20)
 		{
 			m_picmodex = picmode::SET_WRITEADDRESS;
-//          printf("state = picmode::SET_WRITEADDRESS\n");
+//          logerror("state = picmode::SET_WRITEADDRESS\n");
 		}
 		else if (data == 0x21) // write latched data
 		{
 			m_picmodex = picmode::IDLE;
 			m_bakram[m_pic_writeaddr] = m_pic_writelatched;
-	//      printf("wrote %02x to %02x\n", m_pic_writelatched, m_pic_writeaddr);
+	//      logerror("wrote %02x to %02x\n", m_pic_writelatched, m_pic_writeaddr);
 		}
 		else if (data == 0x22) // next data to latch
 		{
@@ -328,12 +304,12 @@ void ttchamp_state::pic_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			// address by 1 to give correct results? maybe it can read 'previous' data' too?
 			m_pic_latched = m_bakram[m_pic_readaddr>>1];
 
-//          printf("latch read data %02x from %02x\n",m_pic_latched, m_pic_readaddr );
+//          logerror("latch read data %02x from %02x\n",m_pic_latched, m_pic_readaddr );
 			m_picmodex = picmode::SET_READLATCH; // waiting to read...
 		}
 		else
 		{
-//          printf("unknown\n");
+//          logerror("unknown\n");
 		}
 	}
 	else if (m_picmodex == picmode::SET_READADDRESS)
@@ -355,7 +331,7 @@ void ttchamp_state::pic_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 }
 
 
-uint16_t ttchamp_state::mem_r(offs_t offset)
+uint16_t ttchamp_state::vram_r(offs_t offset)
 {
 	// bits 0xf0 are used too, so this is likely wrong.
 
@@ -368,23 +344,11 @@ uint16_t ttchamp_state::mem_r(offs_t offset)
 		vram = m_videoram2;
 	else
 	{
-		printf("unhandled video bank %02x\n", m_port10);
+		logerror("unhandled video bank %02x\n", m_port10);
 		vram = m_videoram2;
 	}
 
-	if (offset < 0x10000 / 2)
-	{
-		return m_mainram[offset&0x7fff];
-	}
-	else if (offset < 0x20000 / 2)
-	{
-		return vram[offset&0x7fff];
-	}
-	else
-	{
-		uint16_t *src = m_rom16 + (0x100000/2); // can the CPU ever see the lower bank?
-		return src[offset];
-	}
+	return vram[offset&0x7fff];
 }
 
 void ttchamp_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -403,14 +367,14 @@ void ttchamp_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		vram = m_videoram2;
 	else
 	{
-		printf("unhandled video bank %02x\n", m_port10);
+		logerror("unhandled video bank %02x\n", m_port10);
 		vram = m_videoram2;
 	}
 
 
 	if (m_spritesinit == 1)
 	{
-	//  printf("%06x: spider_blitter_w %08x %04x %04x (init?) (base?)\n", m_maincpu->pc(), offset * 2, data, mem_mask);
+	//  logerror("%06x: spider_blitter_w %08x %04x %04x (init?) (base?)\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 
 		m_spritesinit = 2;
 		m_spritesaddr = offset;
@@ -418,9 +382,9 @@ void ttchamp_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 	else if (m_spritesinit == 2)
 	{
-	//  printf("%06x: spider_blitter_w %08x %04x %04x (init2) (width?)\n", m_maincpu->pc(), offset * 2, data, mem_mask);
+	//  logerror("%06x: spider_blitter_w %08x %04x %04x (init2) (width?)\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 		m_spriteswidth = offset & 0xff;
-		//printf("%08x\n",(offset*2) & 0xfff00);
+		//logerror("%08x\n",(offset*2) & 0xfff00);
 
 		m_spritesinit = 3;
 	}
@@ -438,7 +402,7 @@ void ttchamp_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		{
 			if(m_spritesinit != 3)
 			{
-				printf("blitter bus write but blitter unselected? %08x %04x\n",offset*2,data);
+				logerror("blitter bus write but blitter unselected? %08x %04x\n",offset*2,data);
 				return;
 			}
 
@@ -447,12 +411,9 @@ void ttchamp_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			// 0x30000-0x3ffff used, on Spider it's 0x20000-0x2ffff
 			offset &= 0x7fff;
 
-			uint8_t *src = m_rom8;
+			auto const src = util::little_endian_cast<uint8_t const>(&m_rom16[m_rombank ? (0x100000 >> 1) : 0]);
 
-			if (m_rombank)
-				src += 0x100000;
-
-		//  printf("%06x: spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", m_maincpu->pc(), offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
+		//  logerror("%06x: spider_blitter_w %08x %04x %04x (previous data width %d address %08x)\n", m_maincpu->pc(), offset * 2, data, mem_mask, m_spriteswidth, m_spritesaddr);
 			offset &= 0x7fff;
 
 			for (int i = 0; i < m_spriteswidth; i++)
@@ -476,13 +437,13 @@ void ttchamp_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 					data = (src[(m_spritesaddr * 2) + 1]);
 					//data |= vram[offset] >> 8;
 
-					/* bit 1 actually enables transparent pen */
-					if (data || (m_port10 & 2) == 0)
+					// bit 1 actually enables transparent pen
+					if (data || !BIT(m_port10, 1))
 						vram[offset] = (vram[offset] & 0x00ff) | data << 8;
 
 					data = src[(m_spritesaddr * 2)];
 
-					if (data || (m_port10 & 2) == 0)
+					if (data || !BIT(m_port10, 1))
 						vram[offset] = (vram[offset] & 0xff00) | data;
 
 
@@ -496,7 +457,7 @@ void ttchamp_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		else
 		{
 			// sometimes happens, why? special meanings? wrong interpretation of something else?
-			printf("%06x: spider_blitter_w unhandled RAM access %08x %04x %04x\n", m_maincpu->pc(), offset * 2, data, mem_mask);
+			logerror("%06x: spider_blitter_w unhandled RAM access %08x %04x %04x\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 		}
 	}
 }
@@ -505,20 +466,26 @@ void ttchamp_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void ttchamp_state::ttchamp_map(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(FUNC(ttchamp_state::mem_r), FUNC(ttchamp_state::mem_w));
+	map(0x00000, 0x0ffff).ram().share(m_mainram);
+	map(0x10000, 0x1ffff).r(FUNC(ttchamp_state::vram_r));
+	map(0x20000, 0xfffff).rom().region("maincpu", 0x120000); // can the CPU ever see the lower bank?
+
+	map(0x00000, 0xfffff).w(FUNC(ttchamp_state::mem_w));
 }
 
 /* Re-use same parameters as before (one-shot) */
-uint16_t ttchamp_state::port1e_r()
+uint16_t ttchamp_state::port1e_r(address_space &space)
 {
-	m_spritesinit = 3;
-	return 0xff;
+	if (!machine().side_effects_disabled())
+		m_spritesinit = 3;
+	return space.unmap();
 }
 
-uint16_t ttchamp_state::blit_start_r()
+uint16_t ttchamp_state::blit_start_r(address_space &space)
 {
-	m_spritesinit = 1;
-	return 0xff;
+	if (!machine().side_effects_disabled())
+		m_spritesinit = 1;
+	return space.unmap();
 }
 
 /* blitter mode select */
@@ -535,20 +502,22 @@ void ttchamp_state::port10_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 /* selects upper bank for the blitter */
 void ttchamp_state::port20_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	//printf("%06x: port20_w %04x %04x\n", m_maincpu->pc(), data, mem_mask);
+	//logerror("%06x: port20_w %04x %04x\n", m_maincpu->pc(), data, mem_mask);
 	m_rombank = 1;
 }
 
 /* selects lower bank for the blitter */
 void ttchamp_state::port62_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	//printf("%06x: port62_w %04x %04x\n", m_maincpu->pc(), data, mem_mask);
+	//logerror("%06x: port62_w %04x %04x\n", m_maincpu->pc(), data, mem_mask);
 	m_rombank = 0;
 }
 
 void ttchamp_state::ttchamp_io(address_map &map)
 {
-	map(0x0000, 0x0001).nopw(); // startup only, nmi enable?
+	map.unmap_value_high();
+
+	map(0x0000, 0x0001).nopw(); // startup only, NMI enable?
 
 	map(0x0002, 0x0003).portr("SYSTEM");
 	map(0x0004, 0x0005).portr("P1_P2");
@@ -652,7 +621,7 @@ void ttchamp_state::ttchamp(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(ttchamp_state::irq));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(1024,1024);
@@ -675,8 +644,8 @@ ROM_START( ttchamp )
 	ROM_LOAD16_BYTE( "4.bin", 0x100000, 0x080000,  CRC(4388dead) SHA1(1965e4b84452b244e32c8d218aace8d287c67ec2) )
 	ROM_LOAD16_BYTE( "5.bin", 0x100001, 0x080000,  CRC(fdbf9b28) SHA1(2d260555586097c8a396f65111f55ace801c7a5d) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 ) // read protected, only half the data is valid
-	ROM_LOAD( "pic16c84.rom", 0x000000, 0x4280,  BAD_DUMP CRC(900f2ef8) SHA1(08f206fe52f413437436e4b0d2b4ec310767446c) )
+	ROM_REGION16_LE( 0x4280, "cpu1", 0 ) // read protected, only half the data is valid
+	ROM_LOAD( "pic16c84.rom", 0x0000, 0x4280, BAD_DUMP CRC(900f2ef8) SHA1(08f206fe52f413437436e4b0d2b4ec310767446c) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "27c020.1", 0x000000, 0x040000,  CRC(e2c4fe95) SHA1(da349035cc348db220a1e12b4c2a6021e2168425) )
@@ -689,8 +658,8 @@ ROM_START( ttchampa )
 	ROM_LOAD16_BYTE( "4.bin", 0x100000, 0x080000,  CRC(4388dead) SHA1(1965e4b84452b244e32c8d218aace8d287c67ec2) )
 	ROM_LOAD16_BYTE( "5.bin", 0x100001, 0x080000,  CRC(fdbf9b28) SHA1(2d260555586097c8a396f65111f55ace801c7a5d) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 ) // read protected, only half the data is valid
-	ROM_LOAD( "pic16c84.rom", 0x000000, 0x4280, BAD_DUMP CRC(900f2ef8) SHA1(08f206fe52f413437436e4b0d2b4ec310767446c) )
+	ROM_REGION16_LE( 0x4280, "cpu1", 0 ) // read protected, only half the data is valid
+	ROM_LOAD( "pic16c84.rom", 0x0000, 0x4280, BAD_DUMP CRC(900f2ef8) SHA1(08f206fe52f413437436e4b0d2b4ec310767446c) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "27c020.1", 0x000000, 0x040000,  CRC(e2c4fe95) SHA1(da349035cc348db220a1e12b4c2a6021e2168425) )

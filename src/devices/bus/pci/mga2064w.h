@@ -12,6 +12,9 @@
 
 class mga2064w_device : public pci_card_device, public device_memory_interface {
 public:
+	// BitBlt non-functional
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
 	mga2064w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void legacy_memory_map(address_map &map) ATTR_COLD;
@@ -38,8 +41,8 @@ protected:
 	u32 dmawin_idump_r(offs_t offset, u32 mem_mask = ~0);
 	void dmawin_iload_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	required_device<matrox_vga_device> m_svga;
-	required_memory_region m_vga_rom;
+	required_device<matrox_vga_device> m_vga;
+	required_memory_region m_bios;
 private:
 	u8 vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);

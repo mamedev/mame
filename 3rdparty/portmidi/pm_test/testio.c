@@ -7,7 +7,6 @@
 
 #define INPUT_BUFFER_SIZE 100
 #define OUTPUT_BUFFER_SIZE 0
-#define DRIVER_INFO NULL
 #define TIME_PROC ((int32_t (*)(void *)) Pt_Time)
 #define TIME_INFO NULL
 #define TIME_START Pt_Start(1, 0, 0) /* timer started w/millisecond accuracy */
@@ -16,19 +15,20 @@
 
 int32_t latency = 0;
 int verbose = FALSE;
+PmSysDepInfo *sysdepinfo = NULL;
 
 /* crash the program to test whether midi ports are closed */
 /**/
-void doSomethingReallyStupid() {
-	int * tmp = NULL;
-	*tmp = 5;
+void doSomethingReallyStupid(void) {
+    int * tmp = NULL;
+    *tmp = 5;
 }
 
 
 /* exit the program without any explicit cleanup */
 /**/
-void doSomethingStupid() {
-	assert(0);
+void doSomethingStupid(void) {
+    assert(0);
 }
 
 
@@ -43,6 +43,31 @@ int get_number(const char *prompt)
         WAIT_FOR_ENTER
     }
     return i;
+}
+
+
+static void set_sysdepinfo(char m_or_p, const char *name)
+{
+    if (!sysdepinfo) {
+        // allocate some space we will alias with open-ended PmDriverInfo:
+        // there is space for 4 parameters:
+        static char dimem[sizeof(PmSysDepInfo) + sizeof(void *) * 8];
+        sysdepinfo = (PmSysDepInfo *) dimem;
+        // build the driver info structure:
+        sysdepinfo->structVersion = PM_SYSDEPINFO_VERS;
+        sysdepinfo->length = 0;
+    }
+    if (sysdepinfo->length > 1) {
+        printf("Error: sysdepinfo was allocated to hold 2 parameters\n");
+        exit(1);
+    }
+    int i = sysdepinfo->length++;
+    enum PmSysDepPropertyKey k = pmKeyNone;
+    if (m_or_p == 'm') k = pmKeyCoreMidiManufacturer;
+    else if (m_or_p == 'p') k = pmKeyAlsaPortName;
+    else if (m_or_p == 'c') k = pmKeyAlsaClientName;
+    sysdepinfo->properties[i].key = k;
+    sysdepinfo->properties[i].value = name;
 }
 
 
@@ -65,7 +90,7 @@ void main_test_input(unsigned int somethingStupid) {
     /* open input device */
     Pm_OpenInput(&midi, 
                  i,
-                 DRIVER_INFO, 
+                 sysdepinfo,
                  INPUT_BUFFER_SIZE, 
                  TIME_PROC, 
                  TIME_INFO);
@@ -133,7 +158,7 @@ void main_test_output(int isochronous_test)
        we will crash, so this test will tell us something. */
     Pm_OpenOutput(&midi, 
                   i, 
-                  DRIVER_INFO,
+                  sysdepinfo,
                   OUTPUT_BUFFER_SIZE, 
                   (latency == 0 ? NULL : TIME_PROC),
                   (latency == 0 ? NULL : TIME_INFO), 
@@ -183,16 +208,33 @@ void main_test_output(int isochronous_test)
         }
         printf("Done sending 80 notes at 4 notes per second.\n");
     } else {
+        PmError err = 0;
         printf("ready to note-on... (type ENTER):");
         WAIT_FOR_ENTER
         buffer[0].timestamp = Pt_Time();
         buffer[0].message = Pm_Message(0x90, 60, 100);
-        Pm_Write(midi, buffer, 1);
+        if ((err = Pm_Write(midi, buffer, 1))) {
+            printf("Pm_Write returns error: %d (%s)\n", 
+                   err, Pm_GetErrorText(err));
+            if (err == pmHostError) {
+                char errmsg[128];
+                Pm_GetHostErrorText(errmsg, 127);
+                printf("    Host error: %s\n", errmsg);
+            }
+        }
         printf("ready to note-off... (type ENTER):");
         WAIT_FOR_ENTER
         buffer[0].timestamp = Pt_Time();
         buffer[0].message = Pm_Message(0x90, 60, 0);
-        Pm_Write(midi, buffer, 1);
+        if ((err = Pm_Write(midi, buffer, 1))) {
+            printf("Pm_Write returns error: %d (%s)\n",
+                err, Pm_GetErrorText(err));
+            if (err == pmHostError) {
+                char errmsg[128];
+                Pm_GetHostErrorText(errmsg, 127);
+                printf("    Host error: %s\n", errmsg);
+            }
+        }
 
         /* output short note on/off w/latency offset; hold until user prompts */
         printf("ready to note-on (short form)... (type ENTER):");
@@ -223,8 +265,13 @@ void main_test_output(int isochronous_test)
         Pm_Write(midi, buffer, chord_size);
 
         off_time = timestamp + 1000 + chord_size * 1000; 
-        while (Pt_Time() < off_time) 
-            Pt_Sleep(10);  /* wait */
+        while (Pt_Time() < off_time)
+            /* There was a report that Pm_Write with zero length sent last
+             * message again, so call Pm_Write here to see if note repeats
+             */
+            Pm_Write(midi, buffer, 0);
+            Pt_Sleep(20);  /* wait */
+        
         for (i = 0; i < chord_size; i++) {
             buffer[i].timestamp = timestamp + 1000 * i;
             buffer[i].message = Pm_Message(0x90, chord[i], 0);
@@ -242,7 +289,7 @@ void main_test_output(int isochronous_test)
 }
 
 
-void main_test_both()
+void main_test_both(void)
 {
     int i = 0;
     int in, out;
@@ -259,7 +306,7 @@ void main_test_both()
 
     Pm_OpenOutput(&midiOut, 
                   out, 
-                  DRIVER_INFO,
+                  sysdepinfo,
                   OUTPUT_BUFFER_SIZE, 
                   TIME_PROC,
                   TIME_INFO, 
@@ -268,7 +315,7 @@ void main_test_both()
     /* open input device */
     Pm_OpenInput(&midi, 
                  in,
-                 DRIVER_INFO, 
+                 sysdepinfo,
                  INPUT_BUFFER_SIZE, 
                  TIME_PROC, 
                  TIME_INFO);
@@ -315,7 +362,7 @@ void main_test_both()
    things happen when messages are not always sent in advance,
    this function allows us to exercise the system and test it.
  */
-void main_test_stream() {
+void main_test_stream(void) {
     PmStream * midi;
     PmEvent buffer[16];
 
@@ -331,7 +378,7 @@ void main_test_stream() {
     /* open output device */
     Pm_OpenOutput(&midi, 
                   i, 
-                  DRIVER_INFO,
+                  sysdepinfo,
                   OUTPUT_BUFFER_SIZE, 
                   TIME_PROC,
                   TIME_INFO, 
@@ -405,11 +452,14 @@ void main_test_stream() {
 }
 
 
-void show_usage()
+void show_usage(void)
 {
-    printf("Usage: test [-h] [-l latency-in-ms] [-v]\n"
+    printf("Usage: test [-h] [-l latency-in-ms] [-c clientname] "
+           "[-p portname] [-v]\n"
            "    -h for this help message (only)\n"
            "    -l for latency\n"
+           "    -c name designates a client name (linux only),\n"
+           "    -p name designates a port name (linux only),\n"
            "    -v for verbose (enables more output)\n");
 }
 
@@ -432,6 +482,15 @@ int main(int argc, char *argv[])
     for (i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-h") == 0) {
             exit(0);
+        } else if (strcmp(argv[i], "-p") == 0 && (i + 1 < argc)) {
+            i = i + 1;
+            const char *port_name = argv[i];
+            set_sysdepinfo('p', port_name);
+            printf("Port name will be %s\n", port_name);
+        } else if (strcmp(argv[i], "-c") == 0 && (i + 1 < argc)) {
+            i = i + 1;
+            set_sysdepinfo('c', argv[i]);
+            printf("Client name will be %s\n", argv[i]);
         } else if (strcmp(argv[i], "-l") == 0 && (i + 1 < argc)) {
             i = i + 1;
             latency = atoi(argv[i]);

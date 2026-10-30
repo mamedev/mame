@@ -67,7 +67,7 @@ public:
 		, m_lamp(*this, "lamp0")
 	{ }
 
-	void kopunch(machine_config &config);
+	void kopunch(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
@@ -210,7 +210,7 @@ uint32_t kopunch_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	// background does not wrap around horizontally
 	rectangle bg_clip = cliprect;
-	bg_clip.max_x = m_scrollx ^ 0xff;
+	bg_clip.setx(bg_clip.left(), m_scrollx ^ 0xff);
 
 	m_bg_tilemap->draw(screen, bitmap, bg_clip, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -399,8 +399,6 @@ GFXDECODE_END
 
 void kopunch_state::machine_start()
 {
-	m_lamp.resolve();
-
 	// zerofill
 	m_gfxbank = 0;
 	m_scrollx = 0;
@@ -443,7 +441,7 @@ void kopunch_state::kopunch(machine_config &config)
 	ppi3.out_pc_callback().set(FUNC(kopunch_state::gfxbank_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

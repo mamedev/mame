@@ -11,17 +11,22 @@
 
 #pragma once
 
-#include "machine/eeprompar.h"
-#include "machine/mb87078.h"
 #include "namcomcu.h"
+
+#include "bus/snes_ctrl/ctrl.h"
+
+#include "machine/eeprompar.h"
 #include "machine/timer.h"
 #include "sound/c352.h"
+#include "sound/mb87077.h"
 #include "video/rgbutil.h"
 #include "video/poly.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
+#include "endianness.h"
 
 class namcos22_state;
 
@@ -132,9 +137,6 @@ struct namcos22_object_data
 	rgbaint_t fadecolor;
 	int fadefactor;
 	bool pfade_enabled;
-	bool zfog_enabled;
-	int cz_sdelta;
-	const u8 *czram;
 	bool alpha_enabled;
 	int alpha;
 
@@ -175,6 +177,9 @@ private:
 	void free_scenenode(struct namcos22_scenenode *node);
 	struct namcos22_scenenode *alloc_scenenode(running_machine &machine, struct namcos22_scenenode *node);
 
+	using scanline_func = void (namcos22_renderer::*)(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
+
+	void dispatch_scanline_poly(scanline_func callback, int clipverts, vertex_t const *clipv);
 	void renderscanline_poly(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
 	void renderscanline_poly_ss22(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
 	void renderscanline_sprite(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid);
@@ -222,7 +227,7 @@ public:
 		m_screen(*this, "screen"),
 		m_adc_ports(*this, "ADC.%u", 0),
 		m_inputs(*this, "INPUTS"),
-		m_custom(*this, "CUSTOM.%u", 0),
+		m_devpad(*this, "devpad%u", 0),
 		m_opt(*this, "OPT.%u", 0),
 		m_mcu_out(*this, "mcuout%u", 0U),
 		m_cpuled_out(*this, "cpuled%u", 0U),
@@ -295,8 +300,8 @@ protected:
 	void point_address_w(u16 data);
 	void point_loword_iw(u16 data);
 	void point_hiword_w(u16 data);
-	u16 point_loword_r();
-	u16 point_hiword_ir();
+	u16 point_loword_ir();
+	u16 point_hiword_r();
 	void dsp_unk2_w(u16 data);
 	u16 dsp_unk_port3_r();
 	void upload_code_to_slave_dsp_w(u16 data);
@@ -324,8 +329,8 @@ protected:
 	void namcos22_shared_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 namcos22_keycus_r(offs_t offset);
 	void namcos22_keycus_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 namcos22_portbit_r(offs_t offset);
-	void namcos22_portbit_w(offs_t offset, u16 data);
+	u16 namcos22_devpad_r(offs_t offset);
+	void namcos22_devpad_w(offs_t offset, u16 data);
 	void namcos22_cpuleds_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u8 mcu_port4_s22_r();
 	u8 iomcu_port4_s22_r();
@@ -435,7 +440,7 @@ protected:
 	required_device<screen_device> m_screen;
 	optional_ioport_array<8> m_adc_ports;
 	required_ioport m_inputs;
-	optional_ioport_array<2> m_custom;
+	required_device_array<snes_control_port_device, 2> m_devpad;
 	optional_ioport_array<2> m_opt;
 	output_finder<16> m_mcu_out;
 	output_finder<8> m_cpuled_out;
@@ -454,7 +459,6 @@ protected:
 	u16 m_SerialDataSlaveToMasterCurrent = 0;
 	int m_RenderBufSize = 0;
 	u16 m_RenderBufData[NAMCOS22_MAX_RENDER_CMD_SEQ] = { };
-	u16 m_portbits[2] = { };
 	int m_irq_state = 0;
 	int m_irq_enabled = 0;
 	namcos22_dsp_upload_state m_dsp_upload_state;
@@ -476,9 +480,12 @@ protected:
 	u8 m_reflection = 0;
 	bool m_cullflip = false;
 	u8 m_LitSurfaceInfo[NAMCOS22_MAX_LIT_SURFACES] = { };
-	int m_SurfaceNormalFormat = 0;
 	unsigned m_LitSurfaceCount = 0;
 	unsigned m_LitSurfaceIndex = 0;
+	int m_LitSurfaceWidth = 0;
+	int m_LitSurfaceIntensity = 0;
+	bool m_LitSurfaceGouraud = false;
+	bool m_LitSurfaceTriangles = false;
 	int m_pointrom_size = 0;
 	std::unique_ptr<s32[]> m_pointrom;
 	std::unique_ptr<u8[]> m_dirtypal;

@@ -24,7 +24,7 @@ private:
 	static constexpr unsigned MAX_VOICES = 8;
 
 	// this structure defines the parameters for a channel
-	struct wp_sound_channel
+	struct sound_channel
 	{
 		int frequency;
 		int counter;
@@ -34,17 +34,13 @@ private:
 		int oneshotplaying;
 	};
 
-	// internal state
-
 	// data about the sound system
-	wp_sound_channel m_channel_list[MAX_VOICES];
-	wp_sound_channel *m_last_channel;
+	sound_channel m_channel_list[MAX_VOICES];
+	sound_channel *m_last_channel;
 
 	// global sound parameters
 	required_region_ptr<uint8_t> m_sound_prom;
 	required_region_ptr<uint8_t> m_sound_rom;
-	int m_num_voices;
-	int m_sound_enable;
 	sound_stream *m_stream;
 
 	// mixer tables and internal buffers

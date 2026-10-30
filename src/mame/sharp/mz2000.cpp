@@ -116,10 +116,10 @@ protected:
 	bitmap_ind16 m_text_bitmap;
 	bitmap_ind16 m_graphic_bitmap;
 
+	required_device<cassette_image_device> m_cassette;
+
 private:
 	static void floppy_formats(format_registration &fr);
-
-	required_device<cassette_image_device> m_cassette;
 	required_device<mb8877_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -268,12 +268,12 @@ void mz80b_state::draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cli
 	const u8 layer1_mask = BIT(m_gvram_mask, 0) * 0xff;
 	const u8 layer2_mask = BIT(m_gvram_mask, 1) * 0xff;
 
-	for (unsigned y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (unsigned y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		const u16 gfx_offset = y * 40;
 		auto *const dst = &bitmap.pix(y);
 
-		for (unsigned x = cliprect.min_x; x <= cliprect.max_x; x += 16)
+		for (unsigned x = cliprect.left(); x <= cliprect.right(); x += 16)
 		{
 			const u8 x_offset = x >> 4;
 			const u8 gfx_1 = m_gvram[gfx_offset + x_offset + 0x0000] & layer1_mask;
@@ -293,12 +293,12 @@ void mz80b_state::draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cli
 
 void mz2000_state::draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (unsigned y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (unsigned y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		const u16 gfx_offset = y * 80;
 		auto *const dst = &bitmap.pix(y);
 
-		for (unsigned x = cliprect.min_x; x <= cliprect.max_x; x += 8)
+		for (unsigned x = cliprect.left(); x <= cliprect.right(); x += 8)
 		{
 			const u8 x_offset = x >> 3;
 			const u8 gfx_b = m_gvram[gfx_offset + x_offset + 0x4000];
@@ -323,12 +323,12 @@ void mz80b_state::draw_text_layer(bitmap_ind16 &bitmap, const rectangle &cliprec
 	const u8 x_shift = m_width80 ? 0 : 1;
 	u8 *gfx_data = m_region_chargen->base();
 
-	for (unsigned y = cliprect.min_y; y <= cliprect.max_y; y ++)
+	for (unsigned y = cliprect.top(); y <= cliprect.bottom(); y ++)
 	{
 		const u16 tile_offset = (y >> 3) * x_size;
 		auto *const dst = &bitmap.pix(y);
 
-		for (unsigned x = cliprect.min_x; x <= cliprect.max_x; x += x_inc)
+		for (unsigned x = cliprect.left(); x <= cliprect.right(); x += x_inc)
 		{
 			const u8 x_offset = x >> (3 + x_shift);
 			const u8 tile = m_tvram[tile_offset + x_offset];
@@ -350,12 +350,12 @@ void mz80b_state::draw_text_layer(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 void mz2200_state::draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (unsigned y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (unsigned y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		const u16 gfx_offset = y * 80;
 		auto *const dst = &bitmap.pix(y);
 
-		for (unsigned x = cliprect.min_x; x <= cliprect.max_x; x += 8)
+		for (unsigned x = cliprect.left(); x <= cliprect.right(); x += 8)
 		{
 			const u8 x_offset = x >> 3;
 			const u8 gfx_b = m_gvram[gfx_offset + x_offset + 0x4000];
@@ -380,12 +380,12 @@ void mz2200_state::draw_text_layer(bitmap_ind16 &bitmap, const rectangle &clipre
 	const u8 x_shift = m_width80 ? 0 : 1;
 	u8 *gfx_data = m_region_chargen->base();
 
-	for (unsigned y = cliprect.min_y; y <= cliprect.max_y; y ++)
+	for (unsigned y = cliprect.top(); y <= cliprect.bottom(); y ++)
 	{
 		const u16 tile_offset = (y >> 3) * x_size;
 		auto *const dst = &bitmap.pix(y);
 
-		for (unsigned x = cliprect.min_x; x <= cliprect.max_x; x += x_inc)
+		for (unsigned x = cliprect.left(); x <= cliprect.right(); x += x_inc)
 		{
 			const u8 x_offset = x >> (3 + x_shift);
 			const u8 tile = m_tvram[tile_offset + x_offset];
@@ -863,7 +863,11 @@ u8 mz80b_state::ppi_portb_r()
 
 	if (m_cassette->get_image() != nullptr)
 	{
-		res |= (m_cassette->input() > 0.0038) ? 0x40 : 0x00;
+		// Bit 6: Tape data - gate with motor state. When motor stops, real hardware
+		// fades to 0V (Low); MAME freezes the waveform, so force Low to allow
+		// the loader's "wait for silence" loop (e.g. at $04BD) to succeed.
+		bool motor_active = (m_cassette->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED;
+		res |= (motor_active && m_cassette->input() > 0.0038) ? 0x40 : 0x00;
 		res |= ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x10 : 0x30;
 		res |= (m_cassette->get_position() >= m_cassette->get_length()) ? 0x08 : 0x00;
 	}
@@ -1377,7 +1381,7 @@ void mz80b_state::mz80b(machine_config &config)
 	pio.out_pa_callback().set(FUNC(mz80b_state::pio_porta_w));
 	pio.in_pb_callback().set(FUNC(mz80b_state::pio_portb_r));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(MASTER_CLOCK / 128); // 31'250
 	// 1 sec, needed by mz2000_flop:gfxedit/mz2000_cass:vosque2k
 	m_pit->out_handler<0>().set(m_pit, FUNC(pit8253_device::write_clk1));
@@ -1397,13 +1401,13 @@ void mz80b_state::mz80b(machine_config &config)
 
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_formats(mz700_cassette_formats);
+	m_cassette->set_formats(mz80b_cassette_formats);  // MZ-80B uses 1800 baud (vs MZ-700's 1200)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("mz_cass");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// TODO: unverified, 60 Hz/15.75 kHz according to MZ-80B service manual
 	m_screen->set_raw(XTAL(14'318'181), 910, 0, 640, 262, 0, 200);
 	m_screen->set_screen_update(FUNC(mz80b_state::screen_update));
@@ -1426,6 +1430,7 @@ void mz80b_state::mz80b(machine_config &config)
 void mz2000_state::mz2000(machine_config &config)
 {
 	mz80b(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &mz2000_state::mz2000_map);
 	m_maincpu->set_addrmap(AS_IO, &mz2000_state::mz2000_io);
 

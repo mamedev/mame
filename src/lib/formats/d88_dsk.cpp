@@ -479,6 +479,12 @@ bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 	int img_tracks, img_heads;
 	image.get_maximal_geometry(img_tracks, img_heads);
+	// HACK: smc777 .1dd files uses 0x30 as header but really expects SSQD format, override here
+	if (img_tracks >= 70 && h[0x1b] == 0x30)
+	{
+		track_count = 82;
+		image.set_variant(floppy_image::SSQD);
+	}
 	if (track_count > img_tracks)
 		osd_printf_warning("d88: Floppy disk has too many tracks for this drive (floppy tracks=%d, drive tracks=%d).\n", track_count, img_tracks);
 
@@ -525,14 +531,15 @@ bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					density = hs[6];
 				}
 
-				sects[i].track       = hs[0];
-				sects[i].head        = hs[1];
-				sects[i].sector      = hs[2];
-				sects[i].size        = hs[3];
-				sects[i].actual_size = size;
-				sects[i].deleted     = hs[7] != 0;
+				sects[i].track        = hs[0];
+				sects[i].head         = hs[1];
+				sects[i].sector       = hs[2];
+				sects[i].size         = hs[3];
+				sects[i].actual_size  = size;
+				sects[i].deleted      = hs[7] != 0;
 				sects[i].bad_data_crc = hs[8] == 0xb0;  // according to hxc
 				sects[i].bad_addr_crc = hs[8] == 0xa0;
+				sects[i].weak         = false;
 
 				if(size) {
 					sects[i].data    = sect_data + sdatapos;

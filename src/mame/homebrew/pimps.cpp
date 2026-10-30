@@ -162,7 +162,7 @@ void pimps_state::pimps(machine_config &config)
 	uart_clock.signal_handler().append("uart2", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart2", FUNC(i8251_device::write_rxc));
 
-	i8251_device &uart1(I8251(config, "uart1", 0));
+	i8251_device &uart1(I8251(config, "uart1"));
 	uart1.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
 	uart1.dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	uart1.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
@@ -173,7 +173,7 @@ void pimps_state::pimps(machine_config &config)
 	rs232a.cts_handler().set("uart1", FUNC(i8251_device::write_cts));
 	rs232a.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal)); // must be exactly here
 
-	i8251_device &uart2(I8251(config, "uart2", 0));
+	i8251_device &uart2(I8251(config, "uart2"));
 	uart2.txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
 	uart2.dtr_handler().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	uart2.rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));

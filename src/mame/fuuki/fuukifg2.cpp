@@ -492,7 +492,7 @@ void fuuki16_state::fuuki16(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &fuuki16_state::sound_io_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 256);
 	m_screen->set_visarea(0, 320-1, 0, 256-16-1);
@@ -502,13 +502,13 @@ void fuuki16_state::fuuki16(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fuuki16);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xRGB_555, 0x4000 / 2);
 
-	FUUKI_SPRITE(config, m_fuukispr, 0);
+	FUUKI_SPRITE(config, m_fuukispr);
 	m_fuukispr->set_palette(m_palette);
 	m_fuukispr->set_color_base(0x400*2);
 	m_fuukispr->set_color_num(0x40);
 	m_fuukispr->set_colpri_callback(FUNC(fuuki16_state::colpri_cb));
 
-	FUUKI_TILEMAP(config, m_fuukitmap, 0, m_palette, gfx_fuuki16);
+	FUUKI_TILEMAP(config, m_fuukitmap, m_palette, gfx_fuuki16);
 	m_fuukitmap->set_screen(m_screen);
 	m_fuukitmap->level_1_irq_callback().set_inputline(m_maincpu, 1, HOLD_LINE);
 	m_fuukitmap->vblank_irq_callback().set_inputline(m_maincpu, 3, HOLD_LINE);

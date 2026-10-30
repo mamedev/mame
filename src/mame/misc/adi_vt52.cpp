@@ -246,7 +246,7 @@ void adi_vt52_state::adi_vt52(machine_config &config)
 	m_riot->pa_rd_callback().set_ioport("dip1");
 	m_riot->pb_rd_callback().set_ioport("dip2");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_raw(16.5888_MHz_XTAL, 800, 0, 640, 307, 0, 288);
 	screen.set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));

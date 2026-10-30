@@ -7,17 +7,13 @@
 #include "modules/osdmodule.h"
 #include "modules/font/font_module.h"
 
+#include <cstring>
+
 //============================================================
 //  Defines
 //============================================================
 
 #define MACOPTION_INIPATH               "inipath"
-
-#define MACOPTVAL_OPENGL                "opengl"
-#define MACOPTVAL_BGFX                  "bgfx"
-#define MACOPTVAL_METAL                 "metal"
-
-#define MACOPTVAL_GLLIB                 "/System/Library/Frameworks/OpenGL.framework/Libraries/libGL.dylib"
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -50,8 +46,6 @@ public:
 	// input overridables
 	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) override;
 
-	virtual void video_register();
-
 	virtual bool video_init() override;
 	virtual bool window_init() override;
 
@@ -65,6 +59,10 @@ public:
 	void release_keys();
 	bool should_hide_mouse();
 	void process_events_buf();
+
+	// -video none runs behind a window that is never shown, so the menu bar
+	// and the Dock can still quit MAME without it ever taking focus
+	bool headless() const { return strcmp(m_options.video(), OSDOPTVAL_NONE) == 0; }
 
 	virtual mac_options &options() override { return m_options; }
 

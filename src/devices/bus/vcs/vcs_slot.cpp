@@ -50,6 +50,7 @@ enum
 	A26_CM,
 	A26_X07,
 	A26_HARMONY,
+	A26_F0,
 };
 
 //-------------------------------------------------
@@ -175,6 +176,7 @@ static const vcs_slot slot_list[] =
 	{ A26_32IN1, "a26_32in1" },
 	{ A26_X07, "a26_x07" },
 	{ A26_HARMONY, "a26_harmony" },
+	{ A26_F0, "a26_f0" },
 };
 
 static int vcs_get_pcb_id(const char *slot)

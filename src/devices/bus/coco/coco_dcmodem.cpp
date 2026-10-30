@@ -92,7 +92,7 @@ namespace
 
 void coco_dc_modem_device::device_add_mconfig(machine_config &config)
 {
-	MOS6551(config, m_uart, 0);
+	MOS6551(config, m_uart);
 	m_uart->set_xtal(1.8432_MHz_XTAL);
 	m_uart->irq_handler().set(FUNC(coco_dc_modem_device::uart_irq_w));
 	m_uart->txd_handler().set(PORT_TAG, FUNC(rs232_port_device::write_txd));

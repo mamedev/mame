@@ -279,7 +279,7 @@ void efo_zsu_device::device_add_mconfig(machine_config &config)
 	aysnd1.port_a_write_callback().set(FUNC(efo_zsu_device::ay1_porta_w));
 	aysnd1.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	CD40105(config, m_fifo, 0);
+	CD40105(config, m_fifo);
 	m_fifo->out_ready_cb().set(FUNC(efo_zsu_device::fifo_dor_w));
 	m_fifo->out_cb().set(m_adpcm, FUNC(msm5205_device::data_w));
 

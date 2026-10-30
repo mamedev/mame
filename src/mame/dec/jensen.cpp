@@ -215,7 +215,7 @@ void jensen_state::jensen(machine_config &config)
 	serial1.ri_handler().set(m_ace[1], FUNC(ns16550_device::ri_w));
 	serial1.rxd_handler().set(m_ace[1], FUNC(ns16550_device::rx_w));
 
-	PC_LPT(config, m_lpt, 0);
+	PC_LPT(config, m_lpt);
 	m_lpt->irq_handler().set(m_mct_adr, FUNC(jazz_mct_adr_device::irq<0>));
 #endif
 

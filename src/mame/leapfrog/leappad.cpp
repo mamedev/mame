@@ -94,8 +94,8 @@
 
 #include "emu.h"
 
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/mcs51/i8052.h"
 
 #include "screen.h"
@@ -115,9 +115,9 @@ public:
 		, m_cart_region(nullptr)
 	{ }
 
-	void leapfrog_leappad(machine_config &config);
-	void leapfrog_mfleappad(machine_config &config);
-	void leapfrog_ltleappad(machine_config &config);
+	void leapfrog_leappad(machine_config &config) ATTR_COLD;
+	void leapfrog_mfleappad(machine_config &config) ATTR_COLD;
+	void leapfrog_ltleappad(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -174,7 +174,7 @@ INPUT_PORTS_END
 
 void leapfrog_leappad_state::leapfrog_leappad(machine_config &config)
 {
-	I8032(config, m_maincpu, 96000000/10); //  LeapPad Leapfrog 05-9-01 FS80A363  (which exact type is it?)
+	I8032(config, m_maincpu, 96'000'000 / 10); //  LeapPad Leapfrog 05-9-01 FS80A363  (which exact type is it?)
 	m_maincpu->set_addrmap(AS_PROGRAM, &leapfrog_leappad_state::prog_map);
 	m_maincpu->set_addrmap(AS_DATA, &leapfrog_leappad_state::ext_map);
 
@@ -189,7 +189,7 @@ void leapfrog_leappad_state::leapfrog_leappad(machine_config &config)
 
 void leapfrog_leappad_state::leapfrog_mfleappad(machine_config &config)
 {
-	I8032(config, m_maincpu, 96000000/10); //  LeapPad Leapfrog 05-9-01 FS80A363  (which exact type is it?)
+	I8032(config, m_maincpu, 96'000'000 / 10); //  LeapPad Leapfrog 05-9-01 FS80A363  (which exact type is it?)
 	m_maincpu->set_addrmap(AS_PROGRAM, &leapfrog_leappad_state::prog_map);
 	m_maincpu->set_addrmap(AS_DATA, &leapfrog_leappad_state::ext_map);
 
@@ -204,7 +204,7 @@ void leapfrog_leappad_state::leapfrog_mfleappad(machine_config &config)
 
 void leapfrog_leappad_state::leapfrog_ltleappad(machine_config &config)
 {
-	I8032(config, m_maincpu, 96000000/10); // (which exact type is it?)
+	I8032(config, m_maincpu, 96'000'000 / 10); // (which exact type is it?)
 	m_maincpu->set_addrmap(AS_PROGRAM, &leapfrog_leappad_state::prog_map);
 	m_maincpu->set_addrmap(AS_DATA, &leapfrog_leappad_state::ext_map);
 
@@ -227,6 +227,16 @@ ROM_START( leappad )
 	ROMX_LOAD( "leappadbios.bin",       0x000000, 0x100000, CRC(c886cddc) SHA1(f8a83b156feb28315d2321758678e141600a0d4e), ROM_BIOS(0) ) // contains "Aug 06 2001.16:33:16.155-00450.LeapPad ILA2 Universal Base ROM" and "Copyright (c) 1998-2001 Knowledge Kids Enterprises, Inc."
 	ROM_SYSTEM_BIOS( 1, "2mb_canada_full", "Canada" )
 	ROMX_LOAD( "leappadbioscanada.bin", 0x000000, 0x200000, CRC(cc12e3db) SHA1(adf52232adcfd4de5d8e31c0e0c09be61718a9d4), ROM_BIOS(1) ) // contains "Jan 23 2004 11:28:40 152-10620 2MB Canada Full Base ROM" and "Copyright (c) 2000-2004 LeapFrog Enterprises, Inc."
+
+	ROM_REGION( 0x8000, "bootloader", 0) // Main MCU (LeapFrog FS80A363) internal ROM (exact size unknown)
+	ROM_LOAD( "fs80a363.u4", 0x0000, 0x8000, NO_DUMP )
+ROM_END
+
+ROM_START( leappadw )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS("uk")
+	ROM_SYSTEM_BIOS( 0, "uk",  "United Kingdom" )
+	ROMX_LOAD( "lpwriting.u5",       0x000000, 0x200000, CRC(78fb0f39) SHA1(b3faa8f24b9fae9911c3c088cbc8bd8919a2dfaa), ROM_BIOS(0) ) // "ToolPad V2.3.6 LeapPad FullBase V1.1.7 W2K-L0314" "Jun 24 2004 10:49:50 152-10774 2MB UK LPPW Full Base ROM: UK Library"
 
 	ROM_REGION( 0x8000, "bootloader", 0) // Main MCU (LeapFrog FS80A363) internal ROM (exact size unknown)
 	ROM_LOAD( "fs80a363.u4", 0x0000, 0x8000, NO_DUMP )
@@ -276,6 +286,13 @@ ROM_END
 
 //    year, name,       parent, compat, machine,            input,            class,                  init,       company,    fullname,                  flags
 CONS( 2001, leappad,    0,      0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2002, mfleappad,  0,      0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2004, leappadw,   0,      0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad Plus Writing",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Compatible with regular LeapPad carts, but also has system specific carts
 CONS( 2004, leappadmic, 0,      0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad Plus Microphone", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Compatible with regular LeapPad carts
+// "LeapPad Read Aloud" (alt name for LeapPad Plus Microphone?)
+// "LeapPad Plus Writing & Microphone"
+// "QuantumPad" (has unique carts)
+
+// a 'Microphone Upgrade Kit' cartridge exists (gives regular units Microphone support?)
+
+CONS( 2002, mfleappad,  0,      0,      leapfrog_mfleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "My First LeapPad",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2005, ltleappad,  0,      0,      leapfrog_ltleappad, leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "Little Touch LeapPad",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

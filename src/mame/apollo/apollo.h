@@ -88,11 +88,6 @@ int apollo_is_dsp3x00(void);
 // get the ram configuration byte
 uint8_t apollo_get_ram_config_byte(void);
 
-//apollo_get_node_id - get the node id
-uint32_t apollo_get_node_id(void);
-
-void apollo_set_cache_status_register(device_t *device,uint8_t mask, uint8_t data);
-
 /*----------- machine/apollo.cpp -----------*/
 
 #define APOLLO_CONF_TAG "conf"
@@ -142,26 +137,26 @@ public:
 		m_external_leds(*this, "external_led_%c", unsigned('a'))
 	{ }
 
-	void dn3500(machine_config &config);
-	void dn5500_19i(machine_config &config);
-	void dn3000(machine_config &config);
-	void dn3000_15i(machine_config &config);
-	void dn3000_19i(machine_config &config);
-	void dn3500_15i(machine_config &config);
-	void dsp3000(machine_config &config);
-	void dsp3500(machine_config &config);
-	void dsp5500(machine_config &config);
-	void dn5500(machine_config &config);
-	void dn5500_15i(machine_config &config);
-	void dn3500_19i(machine_config &config);
+	void dn3500(machine_config &config) ATTR_COLD;
+	void dn5500_19i(machine_config &config) ATTR_COLD;
+	void dn3000(machine_config &config) ATTR_COLD;
+	void dn3000_15i(machine_config &config) ATTR_COLD;
+	void dn3000_19i(machine_config &config) ATTR_COLD;
+	void dn3500_15i(machine_config &config) ATTR_COLD;
+	void dsp3000(machine_config &config) ATTR_COLD;
+	void dsp3500(machine_config &config) ATTR_COLD;
+	void dsp5500(machine_config &config) ATTR_COLD;
+	void dn5500(machine_config &config) ATTR_COLD;
+	void dn5500_15i(machine_config &config) ATTR_COLD;
+	void dn3500_19i(machine_config &config) ATTR_COLD;
 
-	void init_dsp3000();
-	void init_dsp5500();
-	void init_dn3500();
-	void init_dn3000();
-	void init_dsp3500();
-	void init_dn5500();
-	void init_apollo();
+	void init_dsp3000() ATTR_COLD;
+	void init_dsp5500() ATTR_COLD;
+	void init_dn3500() ATTR_COLD;
+	void init_dn3000() ATTR_COLD;
+	void init_dsp3500() ATTR_COLD;
+	void init_dn5500() ATTR_COLD;
+	void init_apollo() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -207,6 +202,7 @@ private:
 	uint8_t apollo_rtc_r(offs_t offset);
 	void cache_control_register_w(offs_t offset, uint8_t data);
 	uint8_t cache_status_register_r(offs_t offset);
+	void apollo_set_cache_status_register(device_t *device, uint8_t mask, uint8_t data);
 	void task_alias_register_w(offs_t offset, uint8_t data);
 	uint8_t task_alias_register_r(offs_t offset);
 	void latch_page_on_parity_error_register_w(offs_t offset, uint16_t data);
@@ -284,9 +280,9 @@ private:
 
 	void apollo_reset_instr_callback(int state);
 
-	void common(machine_config &config);
-	void apollo(machine_config &config);
-	void apollo_terminal(machine_config &config);
+	void common(machine_config &config) ATTR_COLD;
+	void apollo(machine_config &config) ATTR_COLD;
+	void apollo_terminal(machine_config &config) ATTR_COLD;
 
 	void dn3000_map(address_map &map) ATTR_COLD;
 	void dn3500_map(address_map &map) ATTR_COLD;
@@ -295,8 +291,24 @@ private:
 	void dsp3500_map(address_map &map) ATTR_COLD;
 	void dsp5500_map(address_map &map) ATTR_COLD;
 
-	uint32_t ptm_counter = 0U;
-	uint8_t sio_output_data = 0U;
+	uint8_t m_cache_control_register = 0x00;
+	uint8_t m_cache_status_register = 0xff;
+
+	uint8_t m_task_alias_register = 0x00;
+
+	offs_t m_parity_error_offset = 0;
+	uint16_t m_parity_error_byte_mask = 0;
+	int m_parity_error_handler_is_installed = 0;
+	int m_parity_error_handler_install_counter = 0;
+
+	uint16_t m_latch_page_on_parity_error_register = 0x0000;
+	uint16_t m_master_req_register = 0x0000;
+
+	uint32_t m_ram_base_address = 0;
+	uint32_t m_ram_end_address = 0;
+
+	uint32_t m_ptm_counter = 0U;
+	uint8_t m_sio_output_data = 0U;
 	int m_dma_channel = 0;
 	bool m_cur_eop = false;
 };
@@ -353,7 +365,7 @@ void apollo_csr_set_status_register(uint16_t mask, uint16_t data);
 class apollo_sio: public duart_base_device
 {
 public:
-	apollo_sio(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apollo_sio(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
@@ -376,10 +388,10 @@ class apollo_ni: public device_t, public device_image_interface
 {
 public:
 	// construction/destruction
-	apollo_ni(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apollo_ni(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~apollo_ni();
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return true; }
@@ -399,7 +411,7 @@ public:
 	void set_node_id_from_disk();
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -409,7 +421,7 @@ private:
 	uint32_t m_node_id = 0U;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(APOLLO_NI, apollo_ni)
 
 /*----------- video/apollo.cpp -----------*/
@@ -417,7 +429,7 @@ DECLARE_DEVICE_TYPE(APOLLO_NI, apollo_ni)
 class apollo_graphics_15i : public device_t
 {
 public:
-	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	~apollo_graphics_15i();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -449,7 +461,7 @@ protected:
 
 	apollo_graphics_15i(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -655,15 +667,12 @@ DECLARE_DEVICE_TYPE(APOLLO_GRAPHICS, apollo_graphics_15i)
 class apollo_graphics_19i : public apollo_graphics_15i
 {
 public:
-	apollo_graphics_19i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apollo_graphics_19i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-
-private:
-	// internal state
 };
 
 DECLARE_DEVICE_TYPE(APOLLO_MONO19I, apollo_graphics_19i)
@@ -684,16 +693,16 @@ class apollo_stdio_device: public device_t, public device_serial_interface
 public:
 	// construction/destruction
 	apollo_stdio_device(const machine_config &mconfig, const char *tag,
-			device_t *owner, uint32_t clock);
+			device_t *owner, uint32_t clock = 0);
 
 	auto tx_cb() { return m_tx_w.bind(); }
 
 private:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	// serial overrides
+	// device_serial_interface implementation
 	virtual void rcv_complete() override; // Rx completed receiving byte
 	virtual void tra_complete() override; // Tx completed sending byte
 	virtual void tra_callback() override; // Tx send bit
@@ -712,7 +721,7 @@ private:
 	devcb_write_line m_tx_w;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(APOLLO_STDIO, apollo_stdio_device)
 #endif /* APOLLO_XXL */
 

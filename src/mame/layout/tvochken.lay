@@ -21,7 +21,7 @@ license:CC0-1.0
 		file:set_resolve_tags_callback(
 				function ()
 					-- get card slot device and card display element
-					local card_device = emu.image_enumerator(file.device)['card']
+					local card_device = emu.image_enumerator(file.device)['cardslot']
 					local card_element = file.elements['card']
 
 					-- invalidate the card display on media change

@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(ASC88, asc88_device, "asc88", "ASC-88 SCSI Adapter")
 asc88_device::asc88_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, ASC88, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
-	, m_scsic(*this, "scsi:7:scsic")
+	, m_scsic(*this, "scsic")
 	, m_eeprom(*this, "eeprom")
 	, m_baseaddr(*this, "BASEADDR")
 	, m_control(0)
@@ -150,15 +150,9 @@ ioport_constructor asc88_device::device_input_ports() const
 	return INPUT_PORTS_NAME(asc88);
 }
 
-void asc88_device::scsic_config(device_t *device)
-{
-	downcast<ncr5380_device &>(*device).irq_handler().set("^^", FUNC(asc88_device::irq_w));
-	downcast<ncr5380_device &>(*device).drq_handler().set("^^", FUNC(asc88_device::drq_w));
-}
-
 void asc88_device::device_add_mconfig(machine_config &config)
 {
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
@@ -166,9 +160,11 @@ void asc88_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7", default_scsi_devices, "scsic", true)
-		.option_add_internal("scsic", NCR5380)
-		.machine_config([this] (device_t *device) { scsic_config(device); });
+
+	NCR5380(config, m_scsic);
+	scsi.set_external_device(7, m_scsic);
+	m_scsic->irq_handler().set(DEVICE_SELF, FUNC(asc88_device::irq_w));
+	m_scsic->drq_handler().set(DEVICE_SELF, FUNC(asc88_device::drq_w));
 
 	EEPROM_93C06_16BIT(config, m_eeprom); // NMC9306N
 }

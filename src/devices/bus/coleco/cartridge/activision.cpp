@@ -51,12 +51,12 @@ colecovision_activision_32k_cartridge_device::colecovision_activision_32k_cartri
 
 void colecovision_activision_256b_cartridge_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C02(config, m_eeprom, 0);
+	I2C_24C02(config, m_eeprom);
 }
 
 void colecovision_activision_32k_cartridge_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C256(config, m_eeprom, 0);
+	I2C_24C256(config, m_eeprom);
 }
 
 

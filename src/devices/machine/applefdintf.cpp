@@ -22,6 +22,7 @@ void applefdintf_device::formats_525(format_registration &fr)
 	fr.add(FLOPPY_EDD_FORMAT);
 	fr.add(FLOPPY_WOZ_FORMAT);
 	fr.add(FLOPPY_NIB_FORMAT);
+	fr.add(FLOPPY_APPLE_2MG_FORMAT);
 
 	fr.add(fs::PRODOS);
 }
@@ -38,6 +39,15 @@ void applefdintf_device::formats_35(format_registration &fr)
 	fr.add(fs::PRODOS);
 }
 
+void applefdintf_device::formats_twiggy(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_DC42_FORMAT);
+	fr.add(FLOPPY_MOOF_FORMAT);
+
+	fr.add(fs::PRODOS);
+}
+
 void applefdintf_device::floppies_525(device_slot_interface &device)
 {
 	device.option_add("525", FLOPPY_525_SD);
@@ -48,6 +58,11 @@ void applefdintf_device::floppies_35(device_slot_interface &device)
 	device.option_add("35sd", OAD34V);
 	device.option_add("35dd", MFD51W);
 	device.option_add("35hd", MFD75W);
+}
+
+void applefdintf_device::floppies_twiggy(device_slot_interface &device)
+{
+	device.option_add("tw", FLOPPY_TWIGGY);
 }
 
 applefdintf_device::applefdintf_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :

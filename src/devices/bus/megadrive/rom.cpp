@@ -45,7 +45,6 @@ DEFINE_DEVICE_TYPE(MD_ROM_CJMJCLUB, md_rom_cjmjclub_device, "md_rom_cjmjclub", "
 DEFINE_DEVICE_TYPE(MD_ROM_KOF98,    md_rom_kof98_device,    "md_rom_kof98",    "MD KOF 98")
 DEFINE_DEVICE_TYPE(MD_ROM_KOF99,    md_rom_kof99_device,    "md_rom_kof99",    "MD KOF 99") // and others
 DEFINE_DEVICE_TYPE(MD_ROM_SOULB,    md_rom_soulb_device,    "md_rom_soulb",    "MD Soul Blade")
-DEFINE_DEVICE_TYPE(MD_ROM_CHINF3,   md_rom_chinf3_device,   "md_rom_chinf3",   "MD Chinese Fighter 3")
 DEFINE_DEVICE_TYPE(MD_ROM_16MJ2,    md_rom_16mj2_device,    "md_rom_16mj2",    "MD 16 Majong Tiles II")
 DEFINE_DEVICE_TYPE(MD_ROM_ELFWOR,   md_rom_elfwor_device,   "md_rom_elfwor",   "MD Linghuan Daoshi Super Magician / Elf Wor")
 DEFINE_DEVICE_TYPE(MD_ROM_YASECH,   md_rom_yasech_device,   "md_rom_yasech",   "MD Ya Se Chuan Shuo")
@@ -164,11 +163,6 @@ md_rom_kof99_device::md_rom_kof99_device(const machine_config &mconfig, const ch
 
 md_rom_soulb_device::md_rom_soulb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: md_std_rom_device(mconfig, MD_ROM_SOULB, tag, owner, clock)
-{
-}
-
-md_rom_chinf3_device::md_rom_chinf3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: md_std_rom_device(mconfig, MD_ROM_CHINF3, tag, owner, clock), m_bank(0)
 {
 }
 
@@ -291,16 +285,6 @@ void md_rom_mcpirate_device::device_start()
 void md_rom_mcpirate_device::device_reset()
 {
 	m_bank = 0;
-}
-
-void md_rom_chinf3_device::device_start()
-{
-	m_bank = 0;
-	save_item(NAME(m_bank));
-}
-
-void md_rom_chinf3_device::device_reset()
-{
 }
 
 void md_rom_lion2_device::device_start()
@@ -587,99 +571,6 @@ uint16_t md_rom_bugslife_device::read_a13(offs_t offset)
 	if (offset == 0x02/2)   return 0x01;
 	if (offset == 0x3e/2)   return 0x1f;
 	else    return 0xffff;
-}
-
-/*-------------------------------------------------
- CHINESE FIGHTER 3
- -------------------------------------------------*/
-
-uint16_t md_rom_chinf3_device::read(offs_t offset)
-{
-	if (offset < 0x100000/2)
-	{
-		if (!m_bank)
-			return m_rom[offset & 0xfffff/2];
-		else
-			return m_rom[(offset & 0xffff/2) + (m_bank * 0x10000)/2];
-	}
-
-	// PROTECTION in 0x400000 - 0x4fffff
-	/* not 100% correct, there may be some relationship between the reads here
-	 and the writes made at the start of the game.. */
-	if (offset >= 0x400000/2 && offset < 0x500000/2)
-	{
-		uint32_t retdat;
-		/*
-		 04dc10 chifi3, prot_r? 2800
-		 04cefa chifi3, prot_r? 65262
-		 */
-		if (machine().device<cpu_device>("maincpu")->pc() == 0x01782) // makes 'VS' screen appear
-		{
-			retdat = machine().device<cpu_device>("maincpu")->state_int(M68K_D3) & 0xff;
-			retdat <<= 8;
-			return retdat;
-		}
-		else if (machine().device<cpu_device>("maincpu")->pc() == 0x1c24) // background gfx etc.
-		{
-			retdat = machine().device<cpu_device>("maincpu")->state_int(M68K_D3) & 0xff;
-			retdat <<= 8;
-			return retdat;
-		}
-		else if (machine().device<cpu_device>("maincpu")->pc() == 0x10c4a) // unknown
-		{
-			return machine().rand();
-		}
-		else if (machine().device<cpu_device>("maincpu")->pc() == 0x10c50) // unknown
-		{
-			return machine().rand();
-		}
-		else if (machine().device<cpu_device>("maincpu")->pc() == 0x10c52) // relates to the game speed..
-		{
-			retdat = machine().device<cpu_device>("maincpu")->state_int(M68K_D4) & 0xff;
-			retdat <<= 8;
-			return retdat;
-		}
-		else if (machine().device<cpu_device>("maincpu")->pc() == 0x061ae)
-		{
-			retdat = machine().device<cpu_device>("maincpu")->state_int(M68K_D3) & 0xff;
-			retdat <<= 8;
-			return retdat;
-		}
-		else if (machine().device<cpu_device>("maincpu")->pc() == 0x061b0)
-		{
-			retdat = machine().device<cpu_device>("maincpu")->state_int(M68K_D3) & 0xff;
-			retdat <<= 8;
-			return retdat;
-		}
-		else
-		{
-			logerror("%06x chifi3, prot_r? %04x\n", machine().device<cpu_device>("maincpu")->pc(), offset);
-		}
-		return 0;
-	}
-
-	// non-protection accesses
-	if (offset < 0x400000/2)
-		return m_rom[MD_ADDR(offset)];
-	else
-		return 0xffff;
-}
-
-void md_rom_chinf3_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (offset >= 0x600000/2 && offset < 0x700000/2)
-	{
-		if (data == 0xf100) // *hit player
-			m_bank = 1;
-		else if (data == 0xd700) // title screen..
-			m_bank = 7;
-		else if (data == 0xd300) // character hits floor
-			m_bank = 3;
-		else if (data == 0x0000)
-			m_bank = 0;
-		else
-			logerror("%06x chifi3, bankw? %04x %04x\n", machine().device<cpu_device>("maincpu")->pc(), offset, data);
-	}
 }
 
 /*-------------------------------------------------

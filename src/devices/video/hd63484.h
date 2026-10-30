@@ -20,10 +20,10 @@ class hd63484_device :  public device_t,
 						public device_video_interface
 {
 public:
-	typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data)> display_delegate;
+	typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data, int screen_n)> display_delegate;
 
 	// construction/destruction
-	hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename... T> void set_display_callback(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
 	void set_auto_configure_screen(bool auto_configure_screen) { m_auto_configure_screen = auto_configure_screen; }
@@ -61,6 +61,7 @@ private:
 	inline void command_end_seq();
 	void calc_offset(int16_t x, int16_t y, uint32_t &offset, uint8_t &bit_pos);
 	int get_bpp();
+	int get_ppmc();
 	uint16_t get_dot(int16_t x, int16_t y);
 	bool set_dot(int16_t x, int16_t y, int16_t px, int16_t py);
 	bool set_dot(int16_t x, int16_t y, uint16_t color);
@@ -71,6 +72,7 @@ private:
 	void command_wpr_exec();
 	uint16_t command_rpr_exec();
 	void command_clr_exec();
+	bool command_dma_write_exec(uint16_t data, bool modify);
 	void command_cpy_exec();
 	void command_rct_exec();
 	void command_line_exec();
@@ -131,6 +133,7 @@ private:
 
 	uint16_t m_pram[0x10];
 	uint8_t m_dn;
+	int16_t m_dma_d0, m_dma_d1;
 
 	uint16_t m_ccr;
 	uint16_t m_omr;

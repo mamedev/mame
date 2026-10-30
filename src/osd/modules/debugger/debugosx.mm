@@ -122,6 +122,7 @@ void debugger_osx::exit()
 void debugger_osx::init_debugger(running_machine &machine)
 {
 	m_machine = &machine;
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&debugger_osx::exit, this));
 	machine.configuration().config_register(
 			"debugger",
 			configuration_manager::load_delegate(&debugger_osx::config_load, this),
@@ -206,8 +207,17 @@ void debugger_osx::build_menus()
 	{
 		NSMenuItem *item;
 
+		NSMenu *const editMenu = [[NSMenu alloc] initWithTitle:@"Edit"];
+		item = [[NSApp mainMenu] insertItemWithTitle:@"Edit" action:NULL keyEquivalent:@"" atIndex:1];
+		[item setSubmenu:editMenu];
+		[editMenu release];
+
+		[editMenu addItemWithTitle:@"Cut" action:@selector(cut:) keyEquivalent:@"x"];
+		[editMenu addItemWithTitle:@"Copy" action:@selector(copy:) keyEquivalent:@"c"];
+		[editMenu addItemWithTitle:@"Paste" action:@selector(paste:) keyEquivalent:@"v"];
+
 		NSMenu *const debugMenu = [[NSMenu alloc] initWithTitle:@"Debug"];
-		item = [[NSApp mainMenu] insertItemWithTitle:@"Debug" action:NULL keyEquivalent:@"" atIndex:1];
+		item = [[NSApp mainMenu] insertItemWithTitle:@"Debug" action:NULL keyEquivalent:@"" atIndex:2];
 		[item setSubmenu:debugMenu];
 		[debugMenu release];
 

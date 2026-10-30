@@ -1,0 +1,30 @@
+C Changes\sprovided\sby\sluau-project\sto\ssupport\slua-5.5
+D 2026-04-11T18:09:36.549
+F HISTORY 49af7334a3461c83360c0e4b26c56f8665062a23
+F Makefile f8eb6bc6d368c4243753536e7a91d089b208cff6
+F README 2899b58d0d7f59474f69f3543e255ec9f6cf4f6e
+F doc/lsqlite3.wiki 3532fd77e06e628e7d982248aadead5508c53b4f x
+F examples/aggregate.lua e0399ff84e65778b4877f784df7080050c624e46
+F examples/function.lua fbea9481d0b49960ac057a7e4802ab49f4fe5ecb
+F examples/hooks_advanced.lua 8157f16fa6bd6d20407ce01feeee4667bd52c08b
+F examples/order.lua 915b3aef65c6dbb9d8850af08a18c73cc8449a36
+F examples/simple.lua 0c08de88e066ef2d6cf59c4be3d7ce2aa7df32c9
+F examples/smart.lua 745804127355d8dfc8577f5436bc6b097e1bd891
+F examples/statement.lua eeed9ed71ac485f96a8df162020ff6c20441fbcc
+F examples/tracing.lua 1b9878cabda8e831356db1bb0406717e28415966
+F examples/update_hook.lua 932c321667c7f4bccd99c5de35962a38e34e7aed
+F extras/Makefile 5414faf72bbdf394628ff6493787222b4786e043
+F extras/extension-functions.c c68fa706d6d9ff98608044c00212473f9c14892f
+F extras/installpath.lua 275a080000cb44dcc23b5170f7095d22a233ec6c
+F lsqlite3-0.9.7-1.rockspec 9890be77cf98a8cd5b1ed4894b315ff567b68794
+F lsqlite3.c 5bf7301fd0a0d8d6f7dc30f05b29e9316089db5c
+F lsqlite3complete-0.9.7-1.rockspec 52e51caf3f9aa283c2bbdb4e2a06282ed352ea9f
+F sqlite3.c be0cd816f96a242dc504657fcb2f3eff7d1f4370
+F sqlite3.h 278589bb18a7f42c08bb9e6f77adc571004a0b5a
+F test/test-dyld.lua cb94256b0dd652615d4d8c790deed02c9f395075
+F test/test.lua 23cd81a88ffd3f11667131dbf56a8bfad3b75d9b
+F test/tests-sqlite3.lua e0bbea0b3fc0aa9a904e8cb70fc06e38378cecf5
+P fc2c936875fe1cfae3c0d07015f69eb37feb4343
+R 982af8ffff7d40e4e7a0d0b34a70ead6
+U e
+Z 393480e574dfb16584b1bbdbfa09f522

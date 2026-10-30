@@ -74,7 +74,11 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void gp_2(machine_config &config);
+	void gp_2(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void porta_w(u8 data);
@@ -86,8 +90,6 @@ private:
 	u8 m_digit = 0U;
 	u8 m_segment[16]{};
 	u8 m_last_solenoid = 15U;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void machine_start() override ATTR_COLD;
 	required_device<z80_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
 	required_device<z80ctc_device> m_ctc;
@@ -529,10 +531,6 @@ void gp_2_state::portc_w(u8 data)
 
 void gp_2_state::machine_start()
 {
-	m_digits.resolve();
-	m_io_leds.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_u14));
 	save_item(NAME(m_digit));
 	save_item(NAME(m_segment));

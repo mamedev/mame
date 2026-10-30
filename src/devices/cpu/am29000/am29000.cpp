@@ -18,6 +18,8 @@
 #include "am29000.h"
 #include "am29dasm.h"
 
+#include <bit>
+
 
 DEFINE_DEVICE_TYPE(AM29000, am29000_cpu_device, "am29000", "AMC Am29000")
 

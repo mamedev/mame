@@ -88,7 +88,7 @@ void cit101xl_state::cit101xl(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5564APL-15 + battery?
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24.27_MHz_XTAL, 980, 0, 820, 413, 0, 364);
 	screen.set_screen_update(m_avdc, FUNC(scn2674_device::screen_update));
 

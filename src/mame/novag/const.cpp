@@ -97,6 +97,7 @@ public:
 	const_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_irq_clock(*this, "irq_clock"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_beeper(*this, "beeper"),
@@ -122,6 +123,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
+	required_device<clock_device> m_irq_clock;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<beep_device> m_beeper;
@@ -361,9 +363,9 @@ void const_state::nconst(machine_config &config)
 	M6502(config, m_maincpu, 2_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::const_map);
 
-	auto &irq_clock(CLOCK(config, "irq_clock", 2_MHz_XTAL / 0x2000)); // through 4020 IC, ~244Hz
-	irq_clock.set_pulse_width(attotime::from_nsec(17200)); // active for ~17.2us
-	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
+	CLOCK(config, m_irq_clock).set_period(attotime::from_ticks(0x2000, 2_MHz_XTAL)); // through 4020 IC, ~244Hz
+	m_irq_clock->set_pulse_width(attotime::from_nsec(17200)); // active for ~17.2us
+	m_irq_clock->signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -386,7 +388,7 @@ void const_state::ssensor4(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::ssensor4_map);
 
-	subdevice<clock_device>("irq_clock")->set_pulse_width(attotime::from_usec(39)); // irq active for 39us
+	m_irq_clock->set_pulse_width(attotime::from_usec(39)); // irq active for 39us
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 	m_board->set_nvram_enable(true);
@@ -406,7 +408,7 @@ void const_state::nconst36(machine_config &config)
 	G65SC02(config.replace(), m_maincpu, 7.2_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::const_map);
 
-	subdevice<clock_device>("irq_clock")->set_clock(7.2_MHz_XTAL/2 / 0x2000); // ~439Hz (pulse width same as nconst)
+	m_irq_clock->set_period(attotime::from_ticks(0x2000, 7.2_MHz_XTAL/2)); // ~439Hz (pulse width same as nconst)
 
 	m_board->set_delay(attotime::from_msec(200));
 
@@ -438,7 +440,7 @@ void const_state::nconstq(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_clock(8_MHz_XTAL/2);
 
-	subdevice<clock_device>("irq_clock")->set_clock(8_MHz_XTAL/4 / 0x1000); // ~488Hz (pulse width same as nconst)
+	m_irq_clock->set_period(attotime::from_ticks(0x1000, 8_MHz_XTAL/4)); // ~488Hz (pulse width same as nconst)
 
 	config.set_default_layout(layout_novag_constq);
 
@@ -455,7 +457,7 @@ void const_state::sconst(machine_config &config)
 	M6502(config.replace(), m_maincpu, 8_MHz_XTAL/2); // UM6502C
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::sconst_map);
 
-	subdevice<clock_device>("irq_clock")->set_pulse_width(attotime::from_nsec(10200)); // irq active for 10.2us
+	m_irq_clock->set_pulse_width(attotime::from_nsec(10200)); // irq active for 10.2us
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 	m_board->set_nvram_enable(true);

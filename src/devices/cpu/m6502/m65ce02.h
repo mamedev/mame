@@ -25,9 +25,9 @@ public:
 protected:
 	m65ce02_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	uint16_t  TMP3;                   /* temporary internal values */
-	uint8_t   Z;                      /* Z index register */
-	uint16_t  B;                      /* Zero page base address (always xx00) */
+	uint16_t  m_TMP3;                   /* temporary internal values */
+	uint8_t   m_Z;                      /* Z index register */
+	uint16_t  m_B;                      /* Zero page base address (always xx00) */
 
 	virtual void init() override;
 	virtual void device_start() override ATTR_COLD;
@@ -35,8 +35,8 @@ protected:
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	inline void dec_SP_ce() { if(P & F_E) SP = set_l(SP, SP-1); else SP--; }
-	inline void inc_SP_ce() { if(P & F_E) SP = set_l(SP, SP+1); else SP++; }
+	inline void dec_SP_ce() { if(m_P & F_E) m_SP = set_l(m_SP, m_SP-1); else m_SP--; }
+	inline void inc_SP_ce() { if(m_P & F_E) m_SP = set_l(m_SP, m_SP+1); else m_SP++; }
 
 #define O(o) void o ## _full(); void o ## _partial()
 

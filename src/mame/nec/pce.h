@@ -25,21 +25,21 @@ class pce_state : public driver_device
 {
 public:
 	pce_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_huc6260(*this, "huc6260"),
-		m_cartslot(*this, "cartslot"),
-		m_cd(*this, "pce_cd"),
-		m_port_ctrl(*this, "ctrl")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_huc6260(*this, "huc6260")
+		, m_cartslot(*this, "cartslot")
+		, m_cd(*this, "pce_cd")
+		, m_port_ctrl(*this, "ctrl")
 	{ }
 
-	void init_tg16();
-	void init_pce();
+	void init_tg16() ATTR_COLD;
+	void init_pce() ATTR_COLD;
 
-	void pce_common(machine_config &config);
-	void pce(machine_config &config);
-	void tg16(machine_config &config);
-	void sgx(machine_config &config);
+	void pce_common(machine_config &config) ATTR_COLD;
+	void pce(machine_config &config) ATTR_COLD;
+	void tg16(machine_config &config) ATTR_COLD;
+	void sgx(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -57,7 +57,6 @@ private:
 	u8 controller_r();
 	void cd_intf_w(offs_t offset, u8 data);
 	u8 cd_intf_r(offs_t offset);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void pce_io(address_map &map) ATTR_COLD;
 	void pce_mem(address_map &map) ATTR_COLD;
 	void sgx_io(address_map &map) ATTR_COLD;

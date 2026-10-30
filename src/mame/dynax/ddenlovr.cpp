@@ -118,6 +118,17 @@ TODO:
 - jongoh: a lightning effect during transitions in attract mode doesn't seem to be rendered correctly
   (hw reference: https://www.youtube.com/watch?v=ytJiqOvHKgM)
 
+- hginga: how are the 2P Start and 2P Bet buttons read for the hanaroku panel?
+
+- hgokou: joystick controls are incomplete
+
+- daichuka: needs a redump of the program ROM
+
+- daichukaa: setting of time to next inspection doesn't stick, even without resetting, so the game is always
+  stuck with the 'inspection needed' message
+
+- rselect: seems to sometimes get stuck in a state where the roulette won't stop, needs control panel lamps and proper hopper
+
 Notes:
 
 - all games using black as default palette is trusted from a real rongrong PCB;
@@ -129,7 +140,6 @@ Notes:
 #include "emu.h"
 
 #include "dynax_blitter_rev2.h"
-#include "hanafuda.h"
 #include "mjdipsw.h"
 
 #include "mahjong.h"
@@ -149,6 +159,7 @@ Notes:
 #include "sound/ymopl.h"
 
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 
@@ -163,7 +174,111 @@ Notes:
 #define LOGBLIT(...)     LOGMASKED(LOG_BLIT,     __VA_ARGS__)
 
 
+DECLARE_DEVICE_TYPE(HGOKOU_JOYSTICK, device_mahjong_panel_interface)
+DECLARE_DEVICE_TYPE(RSELECT_PANEL,   device_mahjong_panel_interface)
+
 namespace {
+
+INPUT_PORTS_START(hgokou_joystick)
+	PORT_START("IN")
+	PORT_BIT(0x03, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)        PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)       PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)              PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START)                PORT_PLAYER(1)
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START(rselect_panel)
+	PORT_START("KEY0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A)           PORT_PLAYER(1)  PORT_NAME("%p Seven")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E)           PORT_PLAYER(1)  PORT_NAME("%p Apple")
+	PORT_BIT(0x0c, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP)    PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B)           PORT_PLAYER(1)  PORT_NAME("%p Bell")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F)           PORT_PLAYER(1)  PORT_NAME("%p Plum")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_START)                PORT_PLAYER(1)
+	PORT_BIT(0x38, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C)           PORT_PLAYER(1)  PORT_NAME("%p Watermelon")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G)           PORT_PLAYER(1)  PORT_NAME("%p Orange")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL)        PORT_PLAYER(1)
+	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D)           PORT_PLAYER(1)  PORT_NAME("%p Pineapple")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H)           PORT_PLAYER(1)  PORT_NAME("%p Cherry")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_BIG)          PORT_PLAYER(1)
+	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("KEY4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE)        PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1)              PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON2)              PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP)    PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON3)              PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON4)              PORT_PLAYER(1)
+
+	PORT_START("KEY5")
+	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
+
+
+class hgokou_joystick_device : public device_t, public device_mahjong_panel_interface
+{
+public:
+	hgokou_joystick_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			u32 clock) :
+		device_t(mconfig, HGOKOU_JOYSTICK, tag, owner, clock),
+		device_mahjong_panel_interface(mconfig, *this),
+		m_in(*this, "IN")
+	{
+	}
+
+	virtual u8 read(u8 select) override { return m_in->read(); }
+
+protected:
+	ioport_constructor device_input_ports() const override ATTR_COLD
+	{
+		return INPUT_PORTS_NAME(hgokou_joystick);
+	}
+
+	virtual void device_start() override ATTR_COLD { }
+
+private:
+	required_ioport m_in;
+};
+
+
+class rselect_panel_device : public mahjong_panel_device_base
+{
+public:
+	rselect_panel_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			u32 clock) :
+		mahjong_panel_device_base(mconfig, RSELECT_PANEL, tag, owner, clock)
+	{
+	}
+
+protected:
+	ioport_constructor device_input_ports() const override ATTR_COLD
+	{
+		return INPUT_PORTS_NAME(rselect_panel);
+	}
+};
+
+
 
 /***************************************************************************
 
@@ -200,6 +315,31 @@ static const int hanakanz_commands[8]   = { BLIT_NEXT,    BLIT_CHANGE_PEN, BLIT_
 static const int mjflove_commands[8]    = { BLIT_STOP,    BLIT_CHANGE_PEN, BLIT_CHANGE_NUM, BLIT_UNKNOWN,
 											BLIT_SKIP,    BLIT_COPY,       BLIT_LINE,       BLIT_NEXT   };
 
+void mahjong_medal_panel(device_slot_interface &device)
+{
+	device.option_add("mj",   MAHJONG_MEDAL_PANEL);
+}
+
+void hginga_panels(device_slot_interface &device)
+{
+	mahjong_panel_connector_device::medal_panels(device);
+	device.option_add("hr",   HANAROKU_PANEL);
+}
+
+void hgokou_panels(device_slot_interface &device)
+{
+	mahjong_panel_connector_device::standard_panels(device);
+	device.option_add("hr",   HANAROKU_PANEL);
+	device.option_add("joy",  HGOKOU_JOYSTICK);
+}
+
+void rselect_panels(device_slot_interface &device)
+{
+	device.option_add("mj",   MAHJONG_MEDAL_PANEL);
+	device.option_add("rs",   RSELECT_PANEL);
+}
+
+
 class ddenlovr_state : public driver_device
 {
 public:
@@ -209,12 +349,12 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_mainlatch(*this, "mainlatch")
+		, m_key_matrix(*this, "panel%u", 1U)
 		, m_hopper(*this, "hopper")
 		, m_blitter_irq_handler(*this)
 		, m_oki(*this, "oki")
 		, m_protection1(*this, "protection1")
 		, m_protection2(*this, "protection2")
-		, m_io_key{ { *this, "KEY%u", 0U }, { *this, "KEY%u", 5U } }
 		, m_io_fake(*this, "FAKE")
 	{ }
 
@@ -228,8 +368,11 @@ public:
 	void mjmywrldt(machine_config &config) ATTR_COLD;
 	void dtoyoken(machine_config &config) ATTR_COLD;
 	void hgokou(machine_config &config) ATTR_COLD;
+	void rselect(machine_config &config) ATTR_COLD;
 	void seljan2(machine_config &config) ATTR_COLD;
 	void jongoh(machine_config &config) ATTR_COLD;
+	void daichuka(machine_config &config) ATTR_COLD;
+	void daichukaa(machine_config &config) ATTR_COLD;
 	void janshinp(machine_config &config) ATTR_COLD;
 	void ultrchmp(machine_config &config) ATTR_COLD;
 	void rongrong(machine_config &config) ATTR_COLD;
@@ -242,6 +385,7 @@ public:
 	void hgokbang(machine_config &config) ATTR_COLD;
 	void quiz365(machine_config &config) ATTR_COLD;
 	void mjschuka(machine_config &config) ATTR_COLD;
+	void daichukab(machine_config &config) ATTR_COLD;
 	void mjmyorntr(machine_config &config) ATTR_COLD;
 	void ddenlovj(machine_config &config) ATTR_COLD;
 
@@ -336,8 +480,8 @@ private:
 	uint8_t mjmyster_keyb_r();
 	uint8_t mjmyster_dsw_r();
 	void mjmyster_coincounter_w(uint8_t data);
-	void hginga_rombank_w(uint8_t data);
-	uint8_t hginga_protection_r();
+	template <uint8_t Mask> void hginga_rombank_w(uint8_t data);
+	template <uint8_t Mask> uint8_t hginga_protection_r();
 	void hginga_input_w(uint8_t data);
 	uint8_t hginga_coins_r();
 	void hginga_80_w(uint8_t data);
@@ -393,7 +537,7 @@ private:
 	uint8_t hginga_dsw_r();
 	void mjflove_okibank_w(uint8_t data);
 	uint8_t seljan2_dsw_r();
-	uint8_t hgokou_player_r( int player );
+	uint8_t hgokou_player_r(int player);
 
 protected:
 	void ddenlovr_flipscreen_w(uint8_t data);
@@ -413,6 +557,9 @@ private:
 	void copylayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer);
 
 	void akamaru_map(address_map &map) ATTR_COLD;
+	void daichuka_portmap(address_map &map) ATTR_COLD;
+	void daichukaa_portmap(address_map &map) ATTR_COLD;
+	void daichukab_portmap(address_map &map) ATTR_COLD;
 	void ddenlovj_map(address_map &map) ATTR_COLD;
 	void ddenlovr_map(address_map &map) ATTR_COLD;
 	void ddenlovrk_map(address_map &map) ATTR_COLD;
@@ -439,6 +586,7 @@ private:
 	void quizchq_portmap(address_map &map) ATTR_COLD;
 	void rongrong_map(address_map &map) ATTR_COLD;
 	void rongrong_portmap(address_map &map) ATTR_COLD;
+	void rselect_map(address_map &map) ATTR_COLD;
 	void seljan2_map(address_map &map) ATTR_COLD;
 	void seljan2_portmap(address_map &map) ATTR_COLD;
 	void sryudens_map(address_map &map) ATTR_COLD;
@@ -450,6 +598,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<ls259_device> m_mainlatch;
+	optional_device_array<mahjong_panel_connector_device, 2> m_key_matrix;
 	optional_device<hopper_device> m_hopper;
 
 	devcb_write_line m_blitter_irq_handler;
@@ -458,9 +607,6 @@ protected:
 private:
 	optional_shared_ptr<uint16_t> m_protection1;
 	optional_shared_ptr<uint16_t> m_protection2;
-protected:
-	optional_ioport_array<5> m_io_key[2];
-private:
 	optional_ioport m_io_fake;
 protected:
 	std::unique_ptr<uint8_t[]>  m_ddenlovr_pixmap[8];
@@ -624,6 +770,7 @@ private:
 	uint8_t funkyfig_coin_r();
 	uint8_t funkyfig_key_r();
 	void funkyfig_lockout_w(uint8_t data);
+	IRQ_CALLBACK_MEMBER(mmpanic_acknowledge_irq);
 
 	void mmpanic_update_leds();
 
@@ -641,6 +788,7 @@ private:
 
 	uint16_t m_mmpanic_leds = 0;  // A LED for each of the 9 buttons
 	uint8_t m_funkyfig_lockout = 0;
+	uint8_t m_mmpanic_irq_vector = 0;
 };
 
 class hanakanz_state : public ddenlovr_state
@@ -660,6 +808,7 @@ public:
 	void hanakanz(machine_config &config) ATTR_COLD;
 	void jongtei(machine_config &config) ATTR_COLD;
 	void jongteia(machine_config &config) ATTR_COLD;
+	void htsubaki(machine_config &config) ATTR_COLD;
 	void mjchuuka(machine_config &config) ATTR_COLD;
 	void mjreach1(machine_config &config) ATTR_COLD;
 	void daimyojn(machine_config &config) ATTR_COLD;
@@ -668,6 +817,8 @@ public:
 	void kotbinyo(machine_config &config) ATTR_COLD;
 	void daireach(machine_config &config) ATTR_COLD;
 	void hnrose(machine_config &config) ATTR_COLD;
+	void mjswacads(machine_config &config) ATTR_COLD;
+	void mjtktrdx(machine_config &config) ATTR_COLD;
 
 private:
 	DECLARE_MACHINE_START(hanakanz);
@@ -722,6 +873,8 @@ private:
 	void mjgnight_portmap(address_map &map) ATTR_COLD;
 	void mjnigiri_portmap(address_map &map) ATTR_COLD;
 	void mjreach1_portmap(address_map &map) ATTR_COLD;
+	void mjswacads_portmap(address_map &map) ATTR_COLD;
+	void mjtktrdx_portmap(address_map &map) ATTR_COLD;
 	void momotaro_portmap(address_map &map) ATTR_COLD;
 
 	memory_share_creator<uint8_t> m_banked_nvram;
@@ -842,8 +995,6 @@ VIDEO_START_MEMBER(hanakanz_state,hanakanz)
 
 	m_ddenlovr_blit_rom_bits = 16;
 	m_ddenlovr_blit_commands = hanakanz_commands;
-
-	m_led.resolve();
 
 	save_item(NAME(m_romdata));
 	save_item(NAME(m_palette_index));
@@ -2072,13 +2223,7 @@ void ddenlovr_state::keyboard_select_w(uint8_t data)
 template <int Which>
 uint8_t ddenlovr_state::keyb_r()
 {
-	uint8_t result = 0x3f;
-
-	for (int i = 0; i < 5; i++)
-		if (!BIT(m_keyb, i))
-			result &= m_io_key[Which][i]->read();
-
-	return result;
+	return m_key_matrix[Which]->read(m_keyb);
 }
 
 uint8_t ddenlovr_state::rongrong_input2_r()
@@ -2152,7 +2297,7 @@ void ddenlovr_state::quiz365_map(address_map &map)
 {
 	map(0x000000, 0x17ffff).rom();                                                 // ROM
 
-	map(0x200000, 0x2003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
+	map(0x200000, 0x2003ff).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 
 	map(0x200c02, 0x200c03).r(FUNC(ddenlovr_state::quiz365_protection_r));                          // Protection
 	map(0x200e0a, 0x200e0d).w(FUNC(ddenlovr_state::quiz365_protection_w));                          // Protection
@@ -2162,23 +2307,23 @@ void ddenlovr_state::quiz365_map(address_map &map)
 	map(0x300203, 0x300203).w(FUNC(ddenlovr_state::quiz365_coincounter_w));                         // Coin Counters + more stuff written on startup
 	map(0x300204, 0x300207).r(FUNC(ddenlovr_state::quiz365_input2_r));                              //
 
-	map(0x300240, 0x300247).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
-	map(0x300248, 0x30024f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
-	map(0x300250, 0x300257).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w)).umask16(0x00ff);
-	map(0x300258, 0x30025f).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w)).umask16(0x00ff);
+	map(0x300240, 0x300247).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x300248, 0x30024f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x300250, 0x300257).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x300258, 0x30025f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
 	map(0x300269, 0x300269).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0x30026b, 0x30026b).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0x30026d, 0x30026d).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0x300271, 0x300271).r(FUNC(ddenlovr_state::unk_r));                                         // ? must be 78 on startup (not necessary in ddlover)
-	map(0x300280, 0x300283).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
+	map(0x300280, 0x300283).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
 	map(0x300287, 0x300287).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                             // Video Chip
 
 	map(0x3002c1, 0x3002c1).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // Sound
-	map(0x300300, 0x300303).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0x300340, 0x30035f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0x300380, 0x300383).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0x300300, 0x300303).umask16(0x00ff).w("ym2413", FUNC(ym2413_device::write));
+	map(0x300340, 0x30035f).umask16(0x00ff).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x300380, 0x300383).umask16(0x00ff).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x300385, 0x300385).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x3003c0, 0x3003cf).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x3003c0, 0x3003cf).umask16(0x00ff).w(m_mainlatch, FUNC(ls259_device::write_d0));
 
 	map(0xff0000, 0xffffff).ram();                                                 // RAM
 }
@@ -2209,22 +2354,22 @@ void ddenlovr_state::ddenlovj_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom(); // ROM
 
-	map(0x200000, 0x2003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
+	map(0x200000, 0x2003ff).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 //  map(0x201000, 0x2017ff).nopq();                                      // ? B0 on startup, then 00
 
-	map(0x300040, 0x300047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
-	map(0x300048, 0x30004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
-	map(0x300050, 0x300057).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w)).umask16(0x00ff);
-	map(0x300058, 0x30005f).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w)).umask16(0x00ff);
+	map(0x300040, 0x300047).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x300048, 0x30004f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x300050, 0x300057).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x300058, 0x30005f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
 	map(0x300069, 0x300069).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0x30006b, 0x30006b).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0x30006d, 0x30006d).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0x300071, 0x300071).r(FUNC(ddenlovr_state::unk_r));                                         // ? must be 78 on startup (not necessary in ddlover)
-	map(0x300080, 0x300083).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
+	map(0x300080, 0x300083).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
 	map(0x300087, 0x300087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                             // Video Chip
-	map(0x3000c0, 0x3000c3).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0x300100, 0x30011f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0x300140, 0x300143).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0x3000c0, 0x3000c3).umask16(0x00ff).w("ym2413", FUNC(ym2413_device::write));
+	map(0x300100, 0x30011f).umask16(0x00ff).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x300140, 0x300143).umask16(0x00ff).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x300180, 0x300181).portr("P1");
 	map(0x300182, 0x300183).portr("P2");
 	map(0x300184, 0x300185).portr("SYSTEM");
@@ -2232,7 +2377,7 @@ void ddenlovr_state::ddenlovj_map(address_map &map)
 	map(0x300189, 0x300189).w(FUNC(ddenlovr_state::ddenlovj_coincounter_w));
 	map(0x30018b, 0x30018b).w(FUNC(ddenlovr_state::ddenlovr_select_w));                             // DSW select
 	map(0x30018d, 0x30018d).w(FUNC(ddenlovr_state::ddenlovr_oki_bank_w));
-	map(0x3001c0, 0x3001cf).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x3001c0, 0x3001cf).umask16(0x00ff).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x300241, 0x300241).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // Sound
 	map(0xff0000, 0xffffff).ram();                                                 // RAM
 }
@@ -2268,28 +2413,28 @@ void ddenlovr_state::ddenlovrk_map(address_map &map)
 	map(0x100000, 0x100001).ram().r(FUNC(ddenlovr_state::ddenlovrk_protection1_r)).share("protection1");
 	map(0x200000, 0x200001).rw(FUNC(ddenlovr_state::ddenlovrk_protection2_r), FUNC(ddenlovr_state::ddenlovrk_protection2_w)).share("protection2");
 
-	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
+	map(0xd00000, 0xd003ff).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 //  map(0xd01000, 0xd017ff).ram();                                                    // ? B0 on startup, then 00
 
-	map(0xe00040, 0xe00047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
-	map(0xe00048, 0xe0004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
-	map(0xe00050, 0xe00057).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w)).umask16(0x00ff);
-	map(0xe00058, 0xe0005f).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w)).umask16(0x00ff);
+	map(0xe00040, 0xe00047).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0xe00048, 0xe0004f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0xe00050, 0xe00057).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0xe00058, 0xe0005f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
 	map(0xe00069, 0xe00069).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0xe0006b, 0xe0006b).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0xe0006d, 0xe0006d).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0xe00070, 0xe00071).nopr();
-	map(0xe00080, 0xe00083).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
+	map(0xe00080, 0xe00083).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
 	map(0xe00087, 0xe00087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                             // Video Chip
 
 	map(0xe00100, 0xe00101).portr("P1");
 	map(0xe00102, 0xe00103).portr("P2");
 	map(0xe00104, 0xe00105).portr("SYSTEM");
 	map(0xe00200, 0xe00201).portr("DSW");
-	map(0xe00300, 0xe0030f).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);
-	map(0xe00400, 0xe00403).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0xe00500, 0xe0051f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0xe00600, 0xe00603).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0xe00300, 0xe0030f).umask16(0x00ff).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0xe00400, 0xe00403).umask16(0x00ff).w("ym2413", FUNC(ym2413_device::write));
+	map(0xe00500, 0xe0051f).umask16(0x00ff).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0xe00600, 0xe00603).umask16(0x00ff).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xe00605, 0xe00605).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xe00701, 0xe00701).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // Sound
 	map(0xff0000, 0xffffff).ram();                                                     // RAM
@@ -2304,28 +2449,28 @@ void ddenlovr_state::ddenlovr_map(address_map &map)
 
 	map(0x300001, 0x300001).w(FUNC(ddenlovr_state::ddenlovr_oki_bank_w));
 
-	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
+	map(0xd00000, 0xd003ff).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 //  map(0xd01000, 0xd017ff).ram();                                                   // ? B0 on startup, then 00
 
-	map(0xe00040, 0xe00047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
-	map(0xe00048, 0xe0004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
-	map(0xe00050, 0xe00057).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w)).umask16(0x00ff);
-	map(0xe00058, 0xe0005f).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w)).umask16(0x00ff);
+	map(0xe00040, 0xe00047).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0xe00048, 0xe0004f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0xe00050, 0xe00057).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0xe00058, 0xe0005f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
 	map(0xe00069, 0xe00069).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0xe0006b, 0xe0006b).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0xe0006d, 0xe0006d).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0xe00071, 0xe00071).r(FUNC(ddenlovr_state::unk_r));                                             // ? must be 78 on startup (not necessary in ddlover)
-	map(0xe00080, 0xe00083).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
+	map(0xe00080, 0xe00083).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
 	map(0xe00087, 0xe00087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                                 // Video Chip
 
 	map(0xe00100, 0xe00101).portr("P1");
 	map(0xe00102, 0xe00103).portr("P2");
 	map(0xe00104, 0xe00105).portr("SYSTEM");
 	map(0xe00200, 0xe00201).portr("DSW");
-	map(0xe00300, 0xe0030f).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);
-	map(0xe00400, 0xe00403).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0xe00500, 0xe0051f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0xe00600, 0xe00603).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0xe00300, 0xe0030f).umask16(0x00ff).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0xe00400, 0xe00403).umask16(0x00ff).w("ym2413", FUNC(ym2413_device::write));
+	map(0xe00500, 0xe0051f).umask16(0x00ff).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0xe00600, 0xe00603).umask16(0x00ff).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xe00605, 0xe00605).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xe00701, 0xe00701).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
 	map(0xff0000, 0xffffff).ram();                                                     // RAM
@@ -2377,24 +2522,24 @@ void ddenlovr_state::nettoqc_map(address_map &map)
 {
 	map(0x000000, 0x17ffff).rom();                                                     // ROM
 
-	map(0x200000, 0x2003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
+	map(0x200000, 0x2003ff).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 	map(0x200c02, 0x200c03).r(FUNC(ddenlovr_state::nettoqc_protection1_r));                             // Protection 1
 	map(0x200e0a, 0x200e0d).writeonly().share("protection1");                       // ""
 	map(0x201000, 0x2017ff).nopw();                                               // ?
 
-	map(0x300040, 0x300047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
-	map(0x300048, 0x30004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
-	map(0x300050, 0x300057).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w)).umask16(0x00ff);
-	map(0x300058, 0x30005f).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w)).umask16(0x00ff);
+	map(0x300040, 0x300047).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x300048, 0x30004f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x300050, 0x300057).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x300058, 0x30005f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
 	map(0x300069, 0x300069).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0x30006b, 0x30006b).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0x30006d, 0x30006d).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0x300071, 0x300071).r(FUNC(ddenlovr_state::unk_r));                                             // ? must be 78 on startup (not necessary in ddlover)
-	map(0x300080, 0x300083).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
+	map(0x300080, 0x300083).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
 	map(0x300087, 0x300087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                                 // Video Chip
-	map(0x3000c0, 0x3000c3).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0x300100, 0x30011f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0x300140, 0x300143).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0x3000c0, 0x3000c3).umask16(0x00ff).w("ym2413", FUNC(ym2413_device::write));
+	map(0x300100, 0x30011f).umask16(0x00ff).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x300140, 0x300143).umask16(0x00ff).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x300180, 0x300181).portr("P1");
 	map(0x300182, 0x300183).portr("P2");
 	map(0x300184, 0x300185).portr("SYSTEM");
@@ -2402,7 +2547,7 @@ void ddenlovr_state::nettoqc_map(address_map &map)
 	map(0x300189, 0x300189).w(FUNC(ddenlovr_state::nettoqc_coincounter_w));
 	map(0x30018b, 0x30018b).w(FUNC(ddenlovr_state::ddenlovr_select_w));
 	map(0x30018d, 0x30018d).w(FUNC(ddenlovr_state::nettoqc_oki_bank_w));
-	map(0x3001c0, 0x3001cf).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x3001c0, 0x3001cf).umask16(0x00ff).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x300241, 0x300241).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
 	map(0xff0000, 0xffffff).ram();                                                     // RAM
 }
@@ -2430,32 +2575,32 @@ void ddenlovr_state::ultrchmp_map(address_map &map)
 	map(0x224680, 0x224681).ram().r(FUNC(ddenlovr_state::ultrchmp_protection2_r)).share("protection2");    // Protection 2
 	map(0x313570, 0x313571).w(FUNC(ddenlovr_state::ultrchmp_protection2_w));                               // "" + OKI bank
 
-	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
+	map(0xd00000, 0xd003ff).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 
 	map(0xd00c02, 0xd00c03).r(FUNC(ddenlovr_state::nettoqc_protection1_r));                             // Protection 1
 	map(0xd00e0a, 0xd00e0d).writeonly().share("protection1");                       // ""
 
 	map(0xd01000, 0xd017ff).nopw();                                               // ?
 
-	map(0xe00040, 0xe00047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
-	map(0xe00048, 0xe0004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
-	map(0xe00050, 0xe00057).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w)).umask16(0x00ff);
-	map(0xe00058, 0xe0005f).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w)).umask16(0x00ff);
+	map(0xe00040, 0xe00047).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0xe00048, 0xe0004f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0xe00050, 0xe00057).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0xe00058, 0xe0005f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
 	map(0xe00069, 0xe00069).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0xe0006b, 0xe0006b).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0xe0006d, 0xe0006d).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0xe00070, 0xe00071).nopr();
-	map(0xe00080, 0xe00083).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
+	map(0xe00080, 0xe00083).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
 	map(0xe00087, 0xe00087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                                 // Video Chip
 
 	map(0xe00100, 0xe00101).portr("P1");
 	map(0xe00102, 0xe00103).portr("P2");
 	map(0xe00104, 0xe00105).portr("SYSTEM");
 	map(0xe00200, 0xe00201).portr("DSW");
-	map(0xe00300, 0xe0030f).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);
-	map(0xe00400, 0xe00403).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0xe00500, 0xe0051f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0xe00600, 0xe00603).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0xe00300, 0xe0030f).umask16(0x00ff).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0xe00400, 0xe00403).umask16(0x00ff).w("ym2413", FUNC(ym2413_device::write));
+	map(0xe00500, 0xe0051f).umask16(0x00ff).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0xe00600, 0xe00603).umask16(0x00ff).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xe00605, 0xe00605).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xe00701, 0xe00701).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
 	map(0xff0000, 0xffffff).ram().share("nvram");                                       // RAM (Battey-backed)
@@ -2604,7 +2749,10 @@ void mmpanic_state::mmpanic_blitter2_w(offs_t offset, uint8_t data)
 void mmpanic_state::mmpanic_blitter_irq(int state)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf);    // Z80 - RST 18
+	{
+		m_mmpanic_irq_vector = 0xdf; // Z80 - RST 18
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
 }
 
 void mmpanic_state::mmpanic_update_leds()
@@ -2750,7 +2898,10 @@ void mmpanic_state::funkyfig_blitter_w(offs_t offset, uint8_t data)
 void mmpanic_state::funkyfig_blitter_irq(int state)
 {
 	if (0) // this vector looks wrong
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0);  // Z80
+	{
+		m_mmpanic_irq_vector = 0xe0;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
 }
 
 void mmpanic_state::funkyfig_rombank_w(uint8_t data)
@@ -3244,6 +3395,42 @@ void ddenlovr_state::mjschuka_portmap(address_map &map)
 	map(0x78, 0x79).w("ym2413", FUNC(ym2413_device::write));
 }
 
+void ddenlovr_state::daichukab_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+
+	map(0x00, 0x0f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+
+	map(0x20, 0x23).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x24, 0x27).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x28, 0x2b).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x2c, 0x2f).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x34, 0x34).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x35, 0x35).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x36, 0x36).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x38, 0x38).nopr();         // ? ack or watchdog
+	map(0x40, 0x41).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x43, 0x43).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
+	map(0x50, 0x50).w(FUNC(ddenlovr_state::mjflove_okibank_w));
+
+	map(0x54, 0x54).rw(FUNC(ddenlovr_state::mjschuka_protection_r), FUNC(ddenlovr_state::protection_w));
+	// 58 writes ? (0/1)
+	map(0x5c, 0x5c).r(FUNC(ddenlovr_state::hanakanz_rand_r));
+
+	map(0x60, 0x60).portr("DSW1");
+	map(0x61, 0x61).portr("DSW2");
+	map(0x62, 0x62).portr("DSW3");
+	map(0x63, 0x63).portr("DSW4");
+	map(0x64, 0x64).portr("DSW5");     // DSW 1-4 high bits
+	map(0x68, 0x68).w(FUNC(ddenlovr_state::sryudens_coincounter_w));
+	map(0x69, 0x69).w(FUNC(ddenlovr_state::keyboard_select_w));
+	map(0x6a, 0x6a).portr("SYSTEM");
+	map(0x6b, 0x6c).r(FUNC(ddenlovr_state::sryudens_keyb_r));
+
+	map(0x70, 0x71).w("ym2413", FUNC(ym2413_device::write));
+	map(0x74, 0x75).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x78, 0x78).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 void ddenlovr_state::mjmyorntr_portmap(address_map &map)
 {
@@ -3335,7 +3522,7 @@ uint8_t ddenlovr_state::mjmyster_keyb_r()
 
 	if (m_keyb < 5)
 	{
-		ret = m_io_key[BIT(m_input_sel, 0)][m_keyb]->read();
+		ret = m_key_matrix[BIT(m_input_sel, 0)]->read(~(uint8_t(1) << m_keyb));
 		if (!machine().side_effects_disabled())
 			++m_keyb;
 	}
@@ -3409,20 +3596,22 @@ void ddenlovr_state::mjmyster_portmap(address_map &map)
                             Hanafuda Hana Ginga
 ***************************************************************************/
 
+template <uint8_t Mask>
 void ddenlovr_state::hginga_rombank_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data & 0x7);
+	membank("bank1")->set_entry(data & Mask);
 	m_hginga_rombank = data;
 }
 
 // similar to rongrong
+template <uint8_t Mask>
 uint8_t ddenlovr_state::hginga_protection_r()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
 	if (m_hginga_rombank & 0x10)
 		return hanakanz_rand_r();
-	return rom[0x10000 + 0x8000 * (m_hginga_rombank & 0x7) + 0xf601 - 0x8000];
+	return rom[0x10000 + 0x8000 * (m_hginga_rombank & Mask) + 0xf601 - 0x8000];
 }
 
 void ddenlovr_state::hginga_map(address_map &map)
@@ -3431,9 +3620,16 @@ void ddenlovr_state::hginga_map(address_map &map)
 	map(0x6000, 0x6fff).ram();                     // RAM
 	map(0x7000, 0x7fff).bankrw("bank2");           // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");            // ROM/RAM (Banked)
-	map(0xf601, 0xf601).r(FUNC(ddenlovr_state::hginga_protection_r));
+	map(0xf601, 0xf601).r(FUNC(ddenlovr_state::hginga_protection_r<0x07>));
 	map(0xf000, 0xf1ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));   // RAM enabled by bit 4 of rombank
 	map(0xf700, 0xf706).nopw();
+}
+
+void ddenlovr_state::rselect_map(address_map &map)
+{
+	hginga_map(map);
+
+	map(0xf601, 0xf601).r(FUNC(ddenlovr_state::hginga_protection_r<0x0f>));
 }
 
 uint8_t ddenlovr_state::hginga_dsw_r()
@@ -3508,9 +3704,9 @@ uint8_t ddenlovr_state::hginga_input_r()
 
 	case 0xa1: // player 1
 	case 0xa2: // player 2
-		if (m_keyb < 5)
+		if (m_keyb < 6)
 		{
-			result = m_io_key[BIT(~m_input_sel, 1)][m_keyb]->read();
+			result = m_key_matrix[BIT(~m_input_sel, 1)]->read(~(uint8_t(1) << m_keyb));
 			if (!machine().side_effects_disabled())
 				++m_keyb;
 		}
@@ -3587,13 +3783,7 @@ uint8_t ddenlovr_state::hgokou_player_r(int player)
 {
 	uint8_t hopper_bit = ((m_hopper && !(m_screen->frame_number() % 10)) ? 0 : (1 << 6));
 
-	if (!BIT(m_input_sel, 0))   return ioport(player ? "KEY5" : "KEY0")->read() | hopper_bit;
-	if (!BIT(m_input_sel, 1))   return ioport(player ? "KEY6" : "KEY1")->read() | hopper_bit;
-	if (!BIT(m_input_sel, 2))   return ioport(player ? "KEY7" : "KEY2")->read() | hopper_bit;
-	if (!BIT(m_input_sel, 3))   return ioport(player ? "KEY8" : "KEY3")->read() | hopper_bit;
-	if (!BIT(m_input_sel, 4))   return ioport(player ? "KEY9" : "KEY4")->read() | hopper_bit;
-
-	return 0x7f;    // bit 7 = blitter busy, bit 6 = hopper
+	return m_key_matrix[player]->read(m_input_sel) | hopper_bit; // bit 7 = blitter busy, bit 6 = hopper
 }
 
 void ddenlovr_state::hgokou_dsw_sel_w(uint8_t data)
@@ -3937,19 +4127,19 @@ void ddenlovr_state::akamaru_map(address_map &map)
 	map(0x213570, 0x213571).w(FUNC(ddenlovr_state::akamaru_protection1_w));                // OKI bank
 	map(0x624680, 0x624681).r(FUNC(ddenlovr_state::akamaru_protection1_r));
 
-	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
+	map(0xd00000, 0xd003ff).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 	map(0xd00e00, 0xd00e09).nopw();
 	map(0xd01000, 0xd017ff).nopw();                                          // 0
 
-	map(0xe00040, 0xe00047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
-	map(0xe00048, 0xe0004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
-	map(0xe00050, 0xe00057).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w)).umask16(0x00ff);
-	map(0xe00058, 0xe0005f).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w)).umask16(0x00ff);
+	map(0xe00040, 0xe00047).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0xe00048, 0xe0004f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0xe00050, 0xe00057).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0xe00058, 0xe0005f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
 	map(0xe00069, 0xe00069).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0xe0006b, 0xe0006b).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0xe0006d, 0xe0006d).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0xe00071, 0xe00071).r(FUNC(ddenlovr_state::unk_r));                                   // ? must be 78 on startup (not necessary in ddlover)
-	map(0xe00080, 0xe00083).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
+	map(0xe00080, 0xe00083).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
 	map(0xe00087, 0xe00087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                       // Video Chip
 
 	map(0xe00100, 0xe00101).portr("P1");
@@ -3964,10 +4154,10 @@ void ddenlovr_state::akamaru_map(address_map &map)
 
 	map(0xe00204, 0xe00205).r(FUNC(ddenlovr_state::akamaru_blitter_r));                       // Blitter Busy & IRQ
 
-	map(0xe00300, 0xe0030f).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff).nopr();
-	map(0xe00400, 0xe00403).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0xe00500, 0xe0051f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0xe00600, 0xe00603).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0xe00300, 0xe0030f).umask16(0x00ff).w(m_mainlatch, FUNC(ls259_device::write_d0)).nopr();
+	map(0xe00400, 0xe00403).umask16(0x00ff).w("ym2413", FUNC(ym2413_device::write));
+	map(0xe00500, 0xe0051f).umask16(0x00ff).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0xe00600, 0xe00603).umask16(0x00ff).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xe00605, 0xe00605).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xe00701, 0xe00701).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
 	map(0xff0000, 0xffffff).ram();                                                     // RAM
@@ -4025,15 +4215,15 @@ void ddenlovr_state::mjflove_portmap(address_map &map)
 	map(0x0035, 0x0035).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0x0036, 0x0036).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0x0038, 0x0038).nopr();         // ? ack or watchdog
-	map(0x0040, 0x0041).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).mirror(0xff00);
+	map(0x0040, 0x0041).mirror(0xff00).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
 	map(0x0043, 0x0043).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
 	map(0x0080, 0x0080).r(FUNC(ddenlovr_state::keyb_r<0>));
 	map(0x0081, 0x0081).r(FUNC(ddenlovr_state::keyb_r<1>));
 	map(0x0082, 0x0082).portr("SYSTEM");
-	map(0x00da, 0x00da).r(FUNC(ddenlovr_state::mjflove_protection_r)).mirror(0xff00);
-	map(0x00f2, 0x00f2).w(FUNC(ddenlovr_state::mjmyster_rambank_w)).mirror(0xff00);
-	map(0x00f8, 0x00f8).w(FUNC(ddenlovr_state::mjflove_rombank_w)).mirror(0xff00);
-	map(0x00fa, 0x00fa).w(FUNC(ddenlovr_state::mjflove_okibank_w));
+	map(0x00da, 0x00da).r(FUNC(ddenlovr_state::mjflove_protection_r));
+	map(0x00f2, 0x00f2).mirror(0xff00).w(FUNC(ddenlovr_state::mjmyster_rambank_w));
+	map(0x00f8, 0x00f8).mirror(0xff00).w(FUNC(ddenlovr_state::mjflove_rombank_w));
+	map(0x00fa, 0x00fa).mirror(0xff00).w(FUNC(ddenlovr_state::mjflove_okibank_w));
 	map(0x0100, 0x0100).portr("DSW1");
 	map(0x0181, 0x0181).nopw();                        // ? int. enable
 	map(0x0184, 0x0184).w(FUNC(ddenlovr_state::mjflove_coincounter_w));
@@ -4372,8 +4562,32 @@ void ddenlovr_state::jongoh_portmap(address_map &map)
 	map(0x70, 0x70).nopr().w(FUNC(ddenlovr_state::sryudens_rambank_w));    // ? ack on RTC int
 	map(0x80, 0x80).unmapw();
 	map(0xb0, 0xb0).r(FUNC(ddenlovr_state::technotop_protection_r<0x06>));
-	map(0xe4, 0xe4).w(FUNC(hanakanz_state::seljan2_palette_enab_w));
+	map(0xe4, 0xe4).w(FUNC(ddenlovr_state::seljan2_palette_enab_w));
 	map(0xe8, 0xe8).w(FUNC(ddenlovr_state::protection_w));
+}
+
+void ddenlovr_state::daichuka_portmap(address_map &map)
+{
+	seljan2_portmap(map);
+
+	map(0x60, 0x60).w(FUNC(ddenlovr_state::seljan2_rombank_w));
+	map(0x70, 0x70).nopr().w(FUNC(ddenlovr_state::sryudens_rambank_w));
+	map(0x80, 0x80).unmapw();
+	map(0xb0, 0xb0).r(FUNC(ddenlovr_state::technotop_protection_r<0x07>));
+	map(0xd4, 0xd4).w(FUNC(ddenlovr_state::seljan2_palette_enab_w));
+	map(0xdc, 0xdc).w(FUNC(ddenlovr_state::protection_w));
+}
+
+void ddenlovr_state::daichukaa_portmap(address_map &map)
+{
+	seljan2_portmap(map);
+
+	map(0x60, 0x60).w(FUNC(ddenlovr_state::seljan2_rombank_w));
+	map(0x70, 0x70).nopr().w(FUNC(ddenlovr_state::sryudens_rambank_w));    // ? ack on RTC int
+	map(0x80, 0x80).unmapw();
+	map(0xb0, 0xb0).r(FUNC(ddenlovr_state::technotop_protection_r<0x05>));
+	map(0xd8, 0xd8).w(FUNC(ddenlovr_state::seljan2_palette_enab_w));
+	map(0xdc, 0xdc).w(FUNC(ddenlovr_state::protection_w));
 }
 
 /***************************************************************************
@@ -4531,7 +4745,7 @@ uint8_t htengoku_state::htengoku_input_r()
 	case 0x82:
 		if (m_keyb < 5)
 		{
-			result = m_io_key[BIT(m_input_sel, 0)][m_keyb]->read();
+			result = m_key_matrix[BIT(m_input_sel, 0)]->read(~(uint8_t(1) << m_keyb));
 			if (!machine().side_effects_disabled())
 				++m_keyb;
 		}
@@ -4665,7 +4879,7 @@ void htengoku_state::htengoku(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	RST_POS_BUFFER(config, "mainirq", 0).int_callback().set_inputline(m_maincpu, 0);
+	RST_POS_BUFFER(config, "mainirq").int_callback().set_inputline(m_maincpu, 0);
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<0>().set(FUNC(htengoku_state::flipscreen_w));
@@ -4673,10 +4887,13 @@ void htengoku_state::htengoku(machine_config &config)
 	m_mainlatch->q_out_cb<2>().set(FUNC(htengoku_state::layer_half2_w));  //
 	m_mainlatch->q_out_cb<5>().set(FUNC(htengoku_state::blitter_ack_w));  // Blitter IRQ Ack
 
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], mahjong_panel_connector_device::medal_panels, "hf", false);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_panel_connector_device::medal_panels, "hf", false);
+
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
@@ -4685,7 +4902,7 @@ void htengoku_state::htengoku(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->screen_vblank().set(FUNC(htengoku_state::vblank_w));
 
-	DYNAX_BLITTER_REV2(config, m_blitter, 0);
+	DYNAX_BLITTER_REV2(config, m_blitter);
 	m_blitter->vram_out_cb().set(FUNC(htengoku_state::blit_pixel_w));
 	m_blitter->scrollx_cb().set(FUNC(htengoku_state::blit_scrollx_w));
 	m_blitter->scrolly_cb().set(FUNC(htengoku_state::blit_scrolly_w));
@@ -4792,6 +5009,13 @@ void hanakanz_state::mjnigiri_portmap(address_map &map)
 	map(0xe0, 0xe0).r(FUNC(hanakanz_state::technotop_protection_r<0xf2>));
 }
 
+void hanakanz_state::mjswacads_portmap(address_map &map)
+{
+	daimyojn_portmap(map);
+
+	map(0xe0, 0xe0).r(FUNC(hanakanz_state::technotop_protection_r<0x0a>));
+}
+
 
 /***************************************************************************
                             Mahjong Dai-Reach
@@ -4812,7 +5036,7 @@ void hanakanz_state::daireach_portmap(address_map &map)
 	map(0x38, 0x38).nopr();         // ? ack or watchdog
 	map(0x40, 0x41).w(FUNC(hanakanz_state::ddenlovr_blitter_w));
 	map(0x43, 0x43).r(FUNC(hanakanz_state::ddenlovr_gfxrom_r));
-	map(0x60, 0x60).rw("aysnd", FUNC(ay8910_device::data_r),FUNC(ay8910_device::address_w));   // dsw
+	map(0x60, 0x60).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));   // dsw
 	map(0x62, 0x62).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x64, 0x65).w("ym2413", FUNC(ym2413_device::write));
 	map(0x66, 0x66).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -4825,6 +5049,36 @@ void hanakanz_state::daireach_portmap(address_map &map)
 	map(0x74, 0x74).r(FUNC(hanakanz_state::daimyojn_keyb2_r));
 	map(0x78, 0x78).w(FUNC(hanakanz_state::mjchuuka_oki_bank_w));
 	map(0x7e, 0x7e).w(FUNC(hanakanz_state::seljan2_palette_enab_w));    // writes: 1 = palette RAM at b000, 0 = ROM
+}
+
+void hanakanz_state::mjtktrdx_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x0f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x20, 0x23).w(FUNC(hanakanz_state::ddenlovr_palette_base_w));
+	map(0x24, 0x27).w(FUNC(hanakanz_state::ddenlovr_palette_mask_w));
+	map(0x28, 0x2b).w(FUNC(hanakanz_state::ddenlovr_transparency_pen_w));
+	map(0x2c, 0x2f).w(FUNC(hanakanz_state::ddenlovr_transparency_mask_w));
+	map(0x34, 0x34).w(FUNC(hanakanz_state::ddenlovr_bgcolor_w));
+	map(0x35, 0x35).w(FUNC(hanakanz_state::ddenlovr_priority_w));
+	map(0x36, 0x36).w(FUNC(hanakanz_state::ddenlovr_layer_enable_w));
+	map(0x38, 0x38).nopr();         // ? ack or watchdog
+	map(0x40, 0x41).w(FUNC(hanakanz_state::ddenlovr_blitter_w));
+	map(0x43, 0x43).r(FUNC(hanakanz_state::ddenlovr_gfxrom_r));
+	map(0x58, 0x58).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x5c, 0x5c).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x50, 0x51).w("ym2413", FUNC(ym2413_device::write));
+	map(0x54, 0x54).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x60, 0x60).w(FUNC(hanakanz_state::mjflove_rombank_w));
+	map(0x70, 0x70).nopr().w(FUNC(hanakanz_state::sryudens_rambank_w));
+	map(0xa0, 0xa0).r(FUNC(hanakanz_state::hanakanz_rand_r));
+	map(0xb0, 0xb0).r(FUNC(hanakanz_state::technotop_protection_r<0x10>)),
+	map(0xec, 0xec).w(FUNC(hanakanz_state::protection_w));
+	map(0x80, 0x80).portr("SYSTEM");
+	map(0x84, 0x84).r(FUNC(hanakanz_state::daimyojn_keyb1_r));
+	map(0x88, 0x88).r(FUNC(hanakanz_state::daimyojn_keyb2_r));
+	map(0x90, 0x90).w(FUNC(hanakanz_state::mjchuuka_oki_bank_w));
+	map(0xe8, 0xe8).w(FUNC(hanakanz_state::seljan2_palette_enab_w));    // writes: 1 = palette RAM at b000, 0 = ROM
 }
 
 /***************************************************************************
@@ -5025,8 +5279,6 @@ static INPUT_PORTS_START( mjxysl )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )          // note
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
-
-	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
 
 	PORT_START("DSW1")
 	MAHJONG_PAYOUT_RATE(0, "DIP1:1,2,3,4")
@@ -5272,8 +5524,6 @@ static INPUT_PORTS_START( htengoku )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   // key-in
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_INCLUDE(dynax_hanafuda_keys_bet)
 
 	PORT_START("DSW0")  // IN11 - DSW1
 	PORT_DIPNAME( 0x01, 0x01, "Show Gals" )                         PORT_DIPLOCATION("SW 1:1")           // ギャル表示
@@ -5859,8 +6109,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hanakanz )
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_CONDITION("BET",0x40,EQUALS,0x00)  // pay
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )       PORT_CONDITION("BET",0x40,EQUALS,0x40)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // pay (only in 6-card medal modes)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR(Test))   // Test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    // analyzer
@@ -5868,20 +6117,6 @@ static INPUT_PORTS_START( hanakanz )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   // key-in
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
-
-	PORT_INCLUDE(dynax_hanafuda_keys_bet)
-
-	PORT_MODIFY("KEY2")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G )
-
-	PORT_MODIFY("KEY3")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H )
-
-	PORT_MODIFY("KEY7")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G ) PORT_PLAYER(2)
-
-	PORT_MODIFY("KEY8")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H ) PORT_PLAYER(2)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, "Unknown 1-0&1&2" )
@@ -6038,8 +6273,6 @@ static INPUT_PORTS_START( hkagerou )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   // key-in
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
-
-	PORT_INCLUDE(dynax_hanafuda_keys_bet)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x04, "Hanafuda Game Payout Rate" )         PORT_DIPLOCATION("SW1:1,2,3")        // 花札　ゲーム　配当率
@@ -6419,8 +6652,6 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
-
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
 	PORT_DIPSETTING(    0x00, "50" )
@@ -6574,59 +6805,45 @@ static INPUT_PORTS_START( jongtei )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
-
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
-	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPSETTING(    0x01, "53" )
-	PORT_DIPSETTING(    0x02, "56" )
-	PORT_DIPSETTING(    0x03, "59" )
-	PORT_DIPSETTING(    0x04, "62" )
-	PORT_DIPSETTING(    0x05, "65" )
-	PORT_DIPSETTING(    0x06, "68" )
-	PORT_DIPSETTING(    0x07, "71" )
-	PORT_DIPSETTING(    0x08, "75" )
-	PORT_DIPSETTING(    0x09, "78" )
-	PORT_DIPSETTING(    0x0a, "81" )
-	PORT_DIPSETTING(    0x0b, "84" )
-	PORT_DIPSETTING(    0x0c, "87" )
-	PORT_DIPSETTING(    0x0d, "90" )
-	PORT_DIPSETTING(    0x0e, "93" )
-	PORT_DIPSETTING(    0x0f, "96" )
-	PORT_DIPNAME( 0x30, 0x30, "Odds Rate" )
-	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
-	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
-	PORT_DIPSETTING(    0x20, "2 3 6 8 12 15 30 50" )
-	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Max Rate" )
+	MAHJONG_PAYOUT_RATE(0, "DIP1:1,2,3,4")
+	MAHJONG_ODDS_RATE_NS(4, "DIP1:5,6")
+	PORT_DIPNAME( 0xc0, 0x40, "Maximum Bet" )                        PORT_DIPLOCATION("DIP1:7,8")
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Min Rate To Play" )
+	MAHJONG_COINAGE(0, "DIP2:1,2")
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )                        PORT_DIPLOCATION("DIP2:3,4")
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x30, 0x30, "Payout" )
-	PORT_DIPSETTING(    0x30, "300" )
-	PORT_DIPSETTING(    0x20, "500" )
-	PORT_DIPSETTING(    0x10, "700" )
-	PORT_DIPSETTING(    0x00, "1000" )
-	PORT_DIPNAME( 0x40, 0x40, "W-BET" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Last Chance" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, "Credit Limit" )                       PORT_DIPLOCATION("DIP2:5,6")
+	PORT_DIPSETTING(    0x30, "300" )     PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03 )                      //  300
+	PORT_DIPSETTING(    0x30, "600" )     PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02 )
+	PORT_DIPSETTING(    0x30, "1500" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01 )
+	PORT_DIPSETTING(    0x30, "3000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00 )
+	PORT_DIPSETTING(    0x20, "500" )     PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03 )                      //  500
+	PORT_DIPSETTING(    0x20, "1000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02 )
+	PORT_DIPSETTING(    0x20, "2500" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01 )
+	PORT_DIPSETTING(    0x20, "5000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00 )
+	PORT_DIPSETTING(    0x10, "700" )     PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03 )                      //  700
+	PORT_DIPSETTING(    0x10, "1400" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02 )
+	PORT_DIPSETTING(    0x10, "3500" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01 )
+	PORT_DIPSETTING(    0x10, "7000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00 )
+	PORT_DIPSETTING(    0x00, "1000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03 )                      // 1000
+	PORT_DIPSETTING(    0x00, "2000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02 )
+	PORT_DIPSETTING(    0x00, "5000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01 )
+	PORT_DIPSETTING(    0x00, "10000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00 )
+	PORT_DIPNAME( 0x40, 0x00, "Double Bet" )                         PORT_DIPLOCATION("DIP2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x80, 0x00, "Last Chance" )                        PORT_DIPLOCATION("DIP2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x07, 0x07, "YAKUMAN Bonus" )
@@ -6657,7 +6874,7 @@ static INPUT_PORTS_START( jongtei )
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "In Game Music" )
+	PORT_DIPNAME( 0x02, 0x00, "In-Game Music" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x00, "Girls" )
@@ -6721,15 +6938,10 @@ static INPUT_PORTS_START( mjgnight )
 	PORT_INCLUDE(jongtei)
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )                   PORT_DIPLOCATION("DIP2:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x38, 0x38, "Min Rate To Play" )
+	PORT_DIPNAME( 0x38, 0x38, "Minimum Bet" )                        PORT_DIPLOCATION("DIP2:4,5,6")
 	PORT_DIPSETTING(    0x38, "1" )
 	PORT_DIPSETTING(    0x30, "2" )
 	PORT_DIPSETTING(    0x28, "3" )
@@ -6738,19 +6950,25 @@ static INPUT_PORTS_START( mjgnight )
 	PORT_DIPSETTING(    0x10, "6" )
 	PORT_DIPSETTING(    0x08, "7" )
 	PORT_DIPSETTING(    0x00, "8" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Payout" )
-	PORT_DIPSETTING(    0xc0, "300" )
-	PORT_DIPSETTING(    0x80, "500" )
-	PORT_DIPSETTING(    0x40, "700" )
-	PORT_DIPSETTING(    0x00, "1000" )
+	PORT_DIPNAME( 0xc0, 0x00, "Credit Limit" )                       PORT_DIPLOCATION("DIP2:7,8")
+	PORT_DIPSETTING(    0xc0, "300" )     PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03 )                      //  300
+	PORT_DIPSETTING(    0xc0, "600" )     PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02 )
+	PORT_DIPSETTING(    0xc0, "1500" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01 )
+	PORT_DIPSETTING(    0xc0, "3000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00 )
+	PORT_DIPSETTING(    0x80, "500" )     PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03 )                      //  500
+	PORT_DIPSETTING(    0x80, "1000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02 )
+	PORT_DIPSETTING(    0x80, "2500" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01 )
+	PORT_DIPSETTING(    0x80, "5000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00 )
+	PORT_DIPSETTING(    0x40, "700" )     PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03 )                      //  700
+	PORT_DIPSETTING(    0x40, "1400" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02 )
+	PORT_DIPSETTING(    0x40, "3500" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01 )
+	PORT_DIPSETTING(    0x40, "7000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00 )
+	PORT_DIPSETTING(    0x00, "1000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03 )                      // 1000
+	PORT_DIPSETTING(    0x00, "2000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02 )
+	PORT_DIPSETTING(    0x00, "5000" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01 )
+	PORT_DIPSETTING(    0x00, "10000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00 )
 
 	PORT_MODIFY("DSW4")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "In Game Music" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -6783,8 +7001,6 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )  // note
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
-
-	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
@@ -6938,8 +7154,6 @@ static INPUT_PORTS_START( mjschuka )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )  // note
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
-
-	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
@@ -7185,12 +7399,18 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( mjmyster )
-	// The manual provides three sets of standard settings:
+	// The Mahjong the Mysterious World manual provides three sets of standard settings:
 	//       標準設定　シングル向け                        標準設定　メダルコーナー向け                 標準設定　アミューズコーナー向け
 	// SW 1  Off Off Off  On  On  On Off  On  On Off       Off Off Off  On  On  On Off  On  On Off        On Off Off  On Off Off  On Off  On Off
 	// SW 2  Off Off Off Off  On  On Off  On  On Off       Off Off Off Off Off Off  On  On  On Off       Off Off Off Off Off Off Off Off Off Off
 	// SW 3  Off Off Off  On  On  On  On  On  On  On       Off Off Off  On  On  On  On  On  On Off       Off  On Off  On  On  On  On  On  On Off
 	// SW 4  Off  On  On  On  On Off Off Off Off Off        On  On  On  On  On Off Off Off Off Off        On  On  On  On  On Off Off Off Off Off
+
+	// The Mahjong the Mysterious Universe manual provides two sets of standard settings, but unfortunately the Chinese text in the scans is illegible:
+	// SW 1  Off Off Off  On  On  On Off  On  On Off        On Off Off  On Off Off  On Off  On Off
+	// SW 2  Off Off Off Off  On  On Off  On  On Off       Off Off Off Off Off Off Off Off Off Off
+	// SW 3  Off Off Off  On  On  On  On  On  On Off       Off  On Off  On  On  On  On  On  On Off
+	// SW 4  Off  On  On  On  On Off Off   On On Off        On  On  On  On  On Off Off  On  On Off
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW3", 0x03, EQUALS, 0x02) // pay
@@ -7204,15 +7424,9 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
-
 	PORT_START("DSW1")
 	MAHJONG_PAYOUT_RATE(0, "SW1:1,2,3,4")                                                         // PAY-OUT 管理
-	PORT_DIPNAME( 0x30, 0x00, "Odds Rate" )                     PORT_DIPLOCATION("SW1:5,6")       // ODDS 設定
-	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
-	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
-	PORT_DIPSETTING(    0x20, "2 3 6 8 12 15 30 50" )
-	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
+	MAHJONG_ODDS_RATE_NS(4, "SW1:5,6")                                                            // ODDS 設定
 	PORT_DIPNAME( 0xc0, 0x40, "Maximum Bet" )                   PORT_DIPLOCATION("SW1:7,8")       // BET-MAX
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
@@ -7352,10 +7566,8 @@ static INPUT_PORTS_START( hginga )
 	// SW 3  OFF OFF OFF OFF  ON OFF OFF OFF OFF OFF       OFF OFF OFF OFF  ON OFF OFF OFF OFF OFF       OFF  ON OFF OFF  ON OFF OFF OFF OFF OFF
 	// SW 4   ON OFF OFF OFF OFF OFF OFF OFF OFF OFF       OFF OFF OFF OFF OFF OFF OFF OFF OFF OFF       OFF OFF OFF OFF OFF OFF OFF OFF OFF OFF
 
-	// TODO: are separate 2P Start and Bet buttons supported with a hanaroku panel?
-
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW3", 0x03, EQUALS, 0x02) // pay
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW3", 0x03, EQUALS, 0x02) // FIXME: this is keyout with hanaroku panel selected
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_CONDITION("DSW3", 0x03, EQUALS, 0x03)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         PORT_CONDITION("DSW3", 0x02, EQUALS, 0x00)
 //  PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -7365,144 +7577,6 @@ static INPUT_PORTS_START( hginga )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   // key-in
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)
 //  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES )        PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )         PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_B )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_C )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_D )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )                  PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00) // only a single Flip Flop, corresponding 2P input
-
-	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO )         PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )       PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )         PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_E )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_NO )         PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_YES )        PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_F )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x3e, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )         PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )         PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_BET )         PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x38, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D )          PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x3e, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )           PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )         PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_B )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_C )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_D )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-
-	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )       PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )   PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )   PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )         PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )       PORT_PLAYER(1) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_E )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_NO )         PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_YES )        PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_F )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-
-	PORT_START("KEY5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES )        PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )         PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-
-	PORT_START("KEY6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO )         PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )       PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )         PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-
-	PORT_START("KEY7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x3e, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )         PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )         PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-
-	PORT_START("KEY8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D )          PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x3e, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )           PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )         PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
-
-	PORT_START("KEY9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x03, EQUALS, 0x03)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x03, EQUALS, 0x02)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )       PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )   PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )   PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )         PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )       PORT_PLAYER(2) PORT_CONDITION("FAKE", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )                             PORT_CONDITION("FAKE", 0x02, EQUALS, 0x00)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x04, "Hanafuda Game Payout Rate" )         PORT_DIPLOCATION("SW1:1,2,3")        // 花札　ゲーム　配当率
@@ -7567,22 +7641,22 @@ static INPUT_PORTS_START( hginga )
 	PORT_DIPSETTING(    0x04, "Active Low" )                                                             // Low Active
 	PORT_DIPSETTING(    0x00, "Active High" )                                                            // High Active
 	PORT_DIPNAME( 0x18, 0x08, "Credit Limit" )                      PORT_DIPLOCATION("SW3:4,5")          // クレジット・リミット
-	PORT_DIPSETTING(    0x18, "1000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)                      // 1000クレジット
-	PORT_DIPSETTING(    0x18, "2000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
-	PORT_DIPSETTING(    0x18, "5000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
-	PORT_DIPSETTING(    0x18, "10000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x10, "2000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)                      // 2000クレジット
-	PORT_DIPSETTING(    0x10, "4000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
-	PORT_DIPSETTING(    0x10, "10000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
-	PORT_DIPSETTING(    0x10, "20000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x08, "3000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)                      // 3000クレジット
-	PORT_DIPSETTING(    0x08, "6000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
-	PORT_DIPSETTING(    0x08, "15000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
-	PORT_DIPSETTING(    0x08, "30000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, "5000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)                      // 5000クレジット
-	PORT_DIPSETTING(    0x00, "10000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
-	PORT_DIPSETTING(    0x00, "25000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
-	PORT_DIPSETTING(    0x00, "50000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x18, "1,000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)                      // 1000クレジット
+	PORT_DIPSETTING(    0x18, "2,000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x18, "5,000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x18, "10,000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, "2,000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)                      // 2000クレジット
+	PORT_DIPSETTING(    0x10, "4,000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x10, "10,000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x10, "20,000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x08, "3,000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)                      // 3000クレジット
+	PORT_DIPSETTING(    0x08, "6,000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x08, "15,000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x08, "30,000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "5,000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)                      // 5000クレジット
+	PORT_DIPSETTING(    0x00, "10,000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, "25,000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x00, "50,000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
 	PORT_DIPNAME( 0x20, 0x20, "Hanaroku Hopper" )                   PORT_DIPLOCATION("SW3:6")            // 花六ホッパー
 	PORT_DIPSETTING(    0x20, "Manual" )                                                                 // 手動
 	PORT_DIPSETTING(    0x00, "Automatic" )                                                              // 自動
@@ -7639,7 +7713,7 @@ static INPUT_PORTS_START( hginga )
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Controls) )                   PORT_DIPLOCATION("SW4:8,9")
 	PORT_DIPSETTING(    0x03, "Hanafuda Panel" )                                                         // 花札パネル
 	PORT_DIPSETTING(    0x02, "Mahjong Panel" )                                                          // 麻雀パネル
-	PORT_DIPSETTING(    0x01, "Hanaroku Panel" )                                                         // 花六パネル                          (not supported)
+	PORT_DIPSETTING(    0x01, "Hanaroku Panel" )                                                         // 花六パネル                          (not fully supported)
 	//PORT_DIPSETTING(    0x00, "Hanaroku Panel" )
 
 	PORT_START("BET")
@@ -7663,7 +7737,8 @@ static INPUT_PORTS_START( hgokou )
 	//       * クレジットタイマー設定は、１コイン２プレイ又は５プレイをおすすめします。
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // pay
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("FAKE", 0x07, NOTEQUALS, 0x05)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_CONDITION("FAKE", 0x07, EQUALS, 0x05)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR(Test))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   // analyzer
@@ -7671,8 +7746,6 @@ static INPUT_PORTS_START( hgokou )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_INCLUDE( dynax_hanafuda_keys_bet )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x04, "Hanafuda Game Payout Rate" )          PORT_DIPLOCATION("SW1:1,2,3")  // 花札　ゲーム配当率
@@ -7683,7 +7756,7 @@ static INPUT_PORTS_START( hgokou )
 	PORT_DIPSETTING(    0x04, "4" )                                                                 // 　　　4
 	PORT_DIPSETTING(    0x05, "3" )                                                                 // 　　　3
 	PORT_DIPSETTING(    0x06, "2" )                                                                 // 　　　2
-	PORT_DIPSETTING(    0x07, "1 (high)" )                                                          // 低い　1
+	PORT_DIPSETTING(    0x07, "1 (high)" )                                                          // 高い　1
 	PORT_DIPNAME( 0x08, 0x00, "Payout Variation" )                   PORT_DIPLOCATION("SW1:4")      // 配当の波
 	PORT_DIPSETTING(    0x00, "Small" )                                                             // 小さい
 	PORT_DIPSETTING(    0x08, "Large" )                                                             // 大きい
@@ -7810,11 +7883,12 @@ static INPUT_PORTS_START( hgokou )
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR(Controls) )                    PORT_DIPLOCATION("SW4:7,8,9")  // 花札パネル
 	PORT_DIPSETTING(    0x07, "Hanafuda Panel" )                                                    // 花札パネル                            (numbers)
 	PORT_DIPSETTING(    0x06, "Mahjong Panel" )                                                     // 麻雀パネル                            (letters)
-	PORT_DIPSETTING(    0x05, "Hanaroku Panel" )                                                    // 花六パネル                            (not supported)
+	PORT_DIPSETTING(    0x05, "Hanaroku Panel" )                                                    // 花六パネル                            (numbers, minimal buttons)
 	PORT_DIPSETTING(    0x04, "Mahjong Amusement" )                                                 // 麻雀アミューズメント                  (letters, doesn't use take/w-up/big/small)
 	PORT_DIPSETTING(    0x03, DEF_STR(Joystick) )                                                   // 十字レバー                            (not supported)
 	PORT_DIPSETTING(    0x02, "Hanafuda Amusement" )                                                // 当社華札アミューズメントパネルシール  (numbers, doesn't use take/w-up/big/small)
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( mjmyornt )
 	// The manual provides three sets of standard settings:
@@ -7834,15 +7908,9 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
-
 	PORT_START("DSW1")
 	MAHJONG_PAYOUT_RATE(0, "SW 1:1,2,3,4")                                                        // ＰＡＹ－ＯＵＴ　管理
-	PORT_DIPNAME( 0x30, 0x00, "Odds Rate" )                     PORT_DIPLOCATION("SW 1:5,6")      // ＯＤＤＳ　設定
-	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
-	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
-	PORT_DIPSETTING(    0x20, "2 3 6 8 12 15 30 50" )
-	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
+	MAHJONG_ODDS_RATE_NS(4, "SW 1:5,6")                                                           // ＯＤＤＳ　設定
 	PORT_DIPNAME( 0xc0, 0x40, "Maximum Bet" )                   PORT_DIPLOCATION("SW 1:7,8")      // ＢＥＴ－ＭＡＸ
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
@@ -8083,8 +8151,6 @@ static INPUT_PORTS_START( mjflove )
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(ddenlovr_state::mjflove_blitter_r))  // RTC (bit 5) & blitter irq flag (bit 6)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
 
-	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
-
 	PORT_START("DSW2")  // IN12 - DSW2
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coinage) )      PORT_DIPLOCATION("SW1:1,2")     // コインレート
 	PORT_DIPSETTING(    0x00, DEF_STR(3C_1C) )                                        // ３コイン　　１クレジット
@@ -8282,6 +8348,145 @@ static INPUT_PORTS_START( hparadis )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( rselect )
+	// The manual provides two sets of standard settings:
+	//       標準設定コインプールタイプ                    標準設定メダルタイプ
+	// SW 1  OFF  ON OFF OFF  ON  ON OFF  ON OFF OFF       OFF OFF OFF OFF  ON OFF OFF OFF OFF OFF
+	// SW 2   ON  ON  ON  ON  ON  ON  ON  ON OFF OFF        ON  ON  ON  ON  ON  ON  ON  ON OFF OFF
+	// SW 3  OFF OFF OFF OFF OFF OFF OFF OFF OFF OFF       OFF OFF OFF OFF OFF OFF OFF OFF OFF OFF
+	// SW 4  OFF  ON  ON  ON OFF OFF OFF OFF OFF OFF        ON  ON  ON  ON OFF OFF OFF OFF OFF OFF
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR(Test))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   // analyzer
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // data clear
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x05, "Payout Rate" )                        PORT_DIPLOCATION("DIP-SW1:1,2,3")  // PAY OUT RATE 配当率
+	PORT_DIPSETTING(    0x00, "8 (low)" )                                                               // 低　(8)
+	PORT_DIPSETTING(    0x01, "7" )                                                                     // 　　(7)
+	PORT_DIPSETTING(    0x02, "6" )                                                                     // 　　(6)
+	PORT_DIPSETTING(    0x03, "5" )                                                                     // 　　(5)
+	PORT_DIPSETTING(    0x04, "4" )                                                                     // 　　(4)
+	PORT_DIPSETTING(    0x05, "3" )                                                                     // 　　(3)
+	PORT_DIPSETTING(    0x06, "2" )                                                                     // 　　(2)
+	PORT_DIPSETTING(    0x07, "1 (high)" )                                                              // 高　(1)
+	PORT_DIPNAME( 0x18, 0x08, "Maximum Bet (per symbol)" )           PORT_DIPLOCATION("DIP-SW1:4,5")    // BET MAX (各アイテムに毎に)
+	PORT_DIPSETTING(    0x18, "1" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPSETTING(    0x08, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0xe0, 0x40, DEF_STR(Coinage) )                     PORT_DIPLOCATION("DIP-SW1:6,7,8")  // COIN RATE
+	PORT_DIPSETTING(    0xe0, DEF_STR(1C_1C) )                                                          // １コイン 1クレジット
+	PORT_DIPSETTING(    0xc0, DEF_STR(1C_2C) )                                                          // １コイン 2クレジット
+	PORT_DIPSETTING(    0xa0, DEF_STR(1C_4C) )                                                          // １コイン 4クレジット
+	PORT_DIPSETTING(    0x80, DEF_STR(1C_5C) )                                                          // １コイン 5クレジット
+	PORT_DIPSETTING(    0x60, DEF_STR(1C_8C) )                                                          // １コイン 8クレジット
+	PORT_DIPSETTING(    0x40, DEF_STR(1C_10C) )                                                         // １コイン10クレジット
+	PORT_DIPSETTING(    0x20, DEF_STR(1C_20C) )                                                         // １コイン20クレジット
+	PORT_DIPSETTING(    0x00, DEF_STR(1C_50C) )                                                         // １コイン50クレジット
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x07, 0x00, "Coin Limit" )                         PORT_DIPLOCATION("DIP-SW2:1,2,3")  // COIN LIMIT
+	PORT_DIPSETTING(    0x07, "150" )                                                                   //  150
+	PORT_DIPSETTING(    0x06, "300" )                                                                   //  300
+	PORT_DIPSETTING(    0x05, "500" )                                                                   //  500
+	PORT_DIPSETTING(    0x04, "1,000" )                                                                 // 1000
+	PORT_DIPSETTING(    0x03, "1,500" )                                                                 // 1500
+	PORT_DIPSETTING(    0x02, "2,000" )                                                                 // 2000
+	PORT_DIPSETTING(    0x01, "5,000" )                                                                 // 5000
+	PORT_DIPSETTING(    0x00, "Unlimited" )                                                             // FREE
+	PORT_DIPNAME( 0x18, 0x00, "Note Limit" )                         PORT_DIPLOCATION("DIP-SW2:4,5")    // NOTE LIMIT
+	PORT_DIPSETTING(    0x18, "300" )                                                                   //  300
+	PORT_DIPSETTING(    0x10, "1,000" )                                                                 // 1000
+	PORT_DIPSETTING(    0x08, "3,000" )                                                                 // 3000
+	PORT_DIPSETTING(    0x00, "Unlimited" )                                                             // FREE
+	PORT_DIPNAME( 0xe0, 0x00, "Credit Limit" )                       PORT_DIPLOCATION("DIP-SW2:6,7,8")  // CREDIT LIMIT
+	PORT_DIPSETTING(    0xe0, "500" )                                                                   //   500
+	PORT_DIPSETTING(    0xc0, "1,000" )                                                                 //  1000
+	PORT_DIPSETTING(    0xa0, "2,000" )                                                                 //  2000
+	PORT_DIPSETTING(    0x80, "3,000" )                                                                 //  3000
+	PORT_DIPSETTING(    0x60, "5,000" )                                                                 //  5000
+	PORT_DIPSETTING(    0x40, "10,000" )                                                                // 10000
+	PORT_DIPSETTING(    0x20, "20,000" )                                                                // 20000
+	PORT_DIPSETTING(    0x00, "Unlimited" )                                                             // FREE
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, "Game Type" )                          PORT_DIPLOCATION("DIP-SW3:1")      // ゲーム・タイプ
+	PORT_DIPSETTING(    0x01, "Credit Type" )                                                           // クレジット式
+	PORT_DIPSETTING(    0x00, "Hopper Type" )                                                           // ホッパー式
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DIP-SW3:2" )                                                   // OFF固定
+	PORT_DIPNAME( 0x04, 0x04, "Hopper Polarity" )                    PORT_DIPLOCATION("DIP-SW3:3")      // ホッパーアクティブ
+	PORT_DIPSETTING(    0x04, DEF_STR(Normal) )                                                         // 通常
+	PORT_DIPSETTING(    0x00, "Inverted" )                                                              // 反転
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIP-SW3:4" )                                                   // OFF固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIP-SW3:5" )                                                   // OFF固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIP-SW3:6" )                                                   // OFF固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIP-SW3:7" )                                                   // OFF固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DIP-SW3:8" )                                                   // OFF固定
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR(Demo_Sounds) )                 PORT_DIPLOCATION("DIP-SW4:1")      // デモサ・ウンド
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )                                                            // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                             // 有
+	PORT_DIPNAME( 0x02, 0x00, "In-Game Music" )                      PORT_DIPLOCATION("DIP-SW4:2")      // ゲーム・サウンド
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )                                                            // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                             // 有
+	PORT_DIPNAME( 0x04, 0x00, "Double Up Game" )                     PORT_DIPLOCATION("DIP-SW4:3")      // W-UP
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )                                                            // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                             // 有
+	PORT_DIPNAME( 0x08, 0x00, "Quiz/Coin Toss" )                     PORT_DIPLOCATION("DIP-SW4:4")      // クイズとコイントス
+	PORT_DIPSETTING(    0x08, "Quiz" )                                                                  // クイズ
+	PORT_DIPSETTING(    0x00, "Coin Toss" )                                                             // コイントス
+	PORT_DIPNAME( 0x10, 0x00, "Panel Lamps" )                        PORT_DIPLOCATION("DIP-SW4:5")      // パネルランプ
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )                                                            // 不使用
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                             // 使用
+	PORT_DIPNAME( 0x20, 0x20, "Clock Set" )                          PORT_DIPLOCATION("DIP-SW4:6")      // 時計セット
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )                                                            // 通常
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                             // セット
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Service_Mode) )                PORT_DIPLOCATION("DIP-SW4:7")      // ハードテスト
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )                                                            // 通常
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                             // ハードテスト
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DIP-SW4:8" )                                                   // OFF固定
+
+	PORT_START("DSW5")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DIP-SW4:9" )                                                   // OFF固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DIP-SW4:10" )                                                  // OFF固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DIP-SW3:9" )                                                   // OFF固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIP-SW3:10" )                                                  // OFF固定
+	PORT_DIPNAME( 0x10, 0x10, "Bonus Game Difficulty" )              PORT_DIPLOCATION("DIP-SW2:9")      // ボーナスゲームの難易度
+	PORT_DIPSETTING(    0x00, DEF_STR(Easy) )                                                           // やや易しい
+	PORT_DIPSETTING(    0x10, DEF_STR(Normal) )                                                         // 普通
+	PORT_DIPNAME( 0x20, 0x20, "Fever Odds" )                         PORT_DIPLOCATION("DIP-SW2:10")     // フィーバーに当たる率
+	PORT_DIPSETTING(    0x00, DEF_STR(Low) )                                                            // やや低しい
+	PORT_DIPSETTING(    0x20, DEF_STR(Normal) )                                                         // 普通
+	PORT_DIPNAME( 0x40, 0x40, "Credits Per Note" )                   PORT_DIPLOCATION("DIP-SW1:9")      // NOTE RATE、COIN RATE
+	PORT_DIPSETTING(    0x00, "5" )       PORT_CONDITION("DSW1", 0xe0, EQUALS, 0xe0)                    //  5倍
+	PORT_DIPSETTING(    0x00, "10" )      PORT_CONDITION("DSW1", 0xe0, EQUALS, 0xc0)
+	PORT_DIPSETTING(    0x00, "20" )      PORT_CONDITION("DSW1", 0xe0, EQUALS, 0xa0)
+	PORT_DIPSETTING(    0x00, "25" )      PORT_CONDITION("DSW1", 0xe0, EQUALS, 0x80)
+	PORT_DIPSETTING(    0x00, "40" )      PORT_CONDITION("DSW1", 0xe0, EQUALS, 0x60)
+	PORT_DIPSETTING(    0x00, "50" )      PORT_CONDITION("DSW1", 0xe0, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x00, "100" )     PORT_CONDITION("DSW1", 0xe0, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, "250" )     PORT_CONDITION("DSW1", 0xe0, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, "10" )      PORT_CONDITION("DSW1", 0xe0, EQUALS, 0xe0)                    // 10倍
+	PORT_DIPSETTING(    0x40, "20" )      PORT_CONDITION("DSW1", 0xe0, EQUALS, 0xc0)
+	PORT_DIPSETTING(    0x40, "40" )      PORT_CONDITION("DSW1", 0xe0, EQUALS, 0xa0)
+	PORT_DIPSETTING(    0x40, "50" )      PORT_CONDITION("DSW1", 0xe0, EQUALS, 0x80)
+	PORT_DIPSETTING(    0x40, "80" )      PORT_CONDITION("DSW1", 0xe0, EQUALS, 0x60)
+	PORT_DIPSETTING(    0x40, "100" )     PORT_CONDITION("DSW1", 0xe0, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x40, "200" )     PORT_CONDITION("DSW1", 0xe0, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x40, "500" )     PORT_CONDITION("DSW1", 0xe0, EQUALS, 0x00)
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Flip_Screen) )                 PORT_DIPLOCATION("DIP-SW1:10")     // モニター画面反転
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                            // 通常
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                             // 反転
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( sryudens )
 
 	PORT_START("SYSTEM")
@@ -8293,8 +8498,6 @@ static INPUT_PORTS_START( sryudens )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )      // note
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )      // note2
-
-	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
@@ -8455,15 +8658,9 @@ static INPUT_PORTS_START( seljan2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )      // note2
 
-	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
-
 	PORT_START("DSW1")
 	MAHJONG_PAYOUT_RATE(0, "DIP-SW1:1,2,3,4")                                                              // PAY OUT RATE
-	PORT_DIPNAME( 0x30, 0x00, "Odds Rate" )                          PORT_DIPLOCATION("DIP-SW1:5,6")       // ODDS RATE
-	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
-	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
-	PORT_DIPSETTING(    0x20, "2 3 6 8 12 15 30 50" )
-	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
+	MAHJONG_ODDS_RATE_NS(4, "DIP-SW1:5,6")                                                                 // ODDS RATE
 	PORT_DIPNAME( 0xc0, 0x40, "Maximum Bet" )                        PORT_DIPLOCATION("DIP-SW1:7,8")       // BET-MAX
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
@@ -8665,73 +8862,59 @@ static INPUT_PORTS_START( janshinp )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // data clear
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )      // note
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )      // service coin (test mode)
-
-	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )      // service coin (test mode)
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
-	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPSETTING(    0x01, "53" )
-	PORT_DIPSETTING(    0x02, "56" )
-	PORT_DIPSETTING(    0x03, "59" )
-	PORT_DIPSETTING(    0x04, "62" )
-	PORT_DIPSETTING(    0x05, "65" )
-	PORT_DIPSETTING(    0x06, "68" )
-	PORT_DIPSETTING(    0x07, "71" )
-	PORT_DIPSETTING(    0x08, "75" )
-	PORT_DIPSETTING(    0x09, "78" )
-	PORT_DIPSETTING(    0x0a, "81" )
-	PORT_DIPSETTING(    0x0b, "84" )
-	PORT_DIPSETTING(    0x0c, "87" )
-	PORT_DIPSETTING(    0x0d, "90" )
-	PORT_DIPSETTING(    0x0e, "93" )
-	PORT_DIPSETTING(    0x0f, "96" )
-	PORT_DIPNAME( 0x30, 0x00, "Odds Rate" )
-	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
-	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
-	PORT_DIPSETTING(    0x20, "2 3 6 8 12 15 30 50" )
-	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
-	PORT_DIPNAME( 0xc0, 0x40, "Max Rate" )
+	MAHJONG_PAYOUT_RATE(0, "DIP1:1,2,3,4")
+	MAHJONG_ODDS_RATE_NS(4, "DIP1:5,6")
+	PORT_DIPNAME( 0xc0, 0x40, "Maximum Bet" )                    PORT_DIPLOCATION("DIP1:7,8")
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Min Rate To Play" )
+	MAHJONG_COINAGE(0, "DIP2:1,2")
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )                    PORT_DIPLOCATION("DIP2:3,4")
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x30, 0x00, "Payout" )
-	PORT_DIPSETTING(    0x30, "300" )
-	PORT_DIPSETTING(    0x20, "500" )
-	PORT_DIPSETTING(    0x10, "700" )
-	PORT_DIPSETTING(    0x00, "1000" )
-	PORT_DIPNAME( 0x40, 0x00, "W-Bet" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Last Chance" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x10, "Credit Limit" )                   PORT_DIPLOCATION("DIP2:5,6")
+	PORT_DIPSETTING(    0x30, "300" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)
+	PORT_DIPSETTING(    0x30, "600" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x30, "1500" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x30, "3000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x20, "500" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)
+	PORT_DIPSETTING(    0x20, "1000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x20, "2500" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x20, "5000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, "700" )    PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)
+	PORT_DIPSETTING(    0x10, "1400" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x10, "3500" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x10, "7000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "1000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x03)
+	PORT_DIPSETTING(    0x00, "2000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, "5000" )   PORT_CONDITION("DSW2", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x00, "10000" )  PORT_CONDITION("DSW2", 0x03, EQUALS, 0x00)
+	PORT_DIPNAME( 0x40, 0x00, "Double Bet" )                     PORT_DIPLOCATION("DIP2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x80, 0x00, "Last Chance" )                    PORT_DIPLOCATION("DIP2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x07, 0x07, "YAKUMAN Bonus" )
-	PORT_DIPSETTING(    0x07, "Cut" )
-	PORT_DIPSETTING(    0x06, "1 T" )
-	PORT_DIPSETTING(    0x05, "300" )
-	PORT_DIPSETTING(    0x04, "500" )
-	PORT_DIPSETTING(    0x03, "700" )
-	PORT_DIPSETTING(    0x02, "1000" )
-//  PORT_DIPSETTING(    0x01, "1000" )
-//  PORT_DIPSETTING(    0x00, "1000" )
-	PORT_DIPNAME( 0x08, 0x00, "YAKUMAN Times" )
+	PORT_DIPNAME( 0x07, 0x02, "Yakuman Chance Cycle" )           PORT_DIPLOCATION("DIP3:1,2,3")
+	PORT_DIPSETTING(    0x07, "None" )
+	PORT_DIPSETTING(    0x06, "First time only" )
+	PORT_DIPSETTING(    0x05, "Every 300 coins" )
+	PORT_DIPSETTING(    0x04, "Every 500 coins" )
+	PORT_DIPSETTING(    0x03, "Every 700 coins" )
+	PORT_DIPSETTING(    0x02, "Every 1000 coins" )
+//  PORT_DIPSETTING(    0x01, "Every 1000 coins" )
+//  PORT_DIPSETTING(    0x00, "Every 1000 coins" )
+	PORT_DIPNAME( 0x08, 0x08, "Yakuman Chances Per Cycle" )      PORT_DIPLOCATION("DIP3:4")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPNAME( 0x30, 0x00, "Fever Chance" )
@@ -8739,26 +8922,26 @@ static INPUT_PORTS_START( janshinp )
 	PORT_DIPSETTING(    0x20, "None?" )
 	PORT_DIPSETTING(    0x10, "Many?" )
 	PORT_DIPSETTING(    0x00, "Only One?" )
-	PORT_DIPNAME( 0x40, 0x40, "Auto Tsumo" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DonDen Key" )
+	PORT_DIPNAME( 0x40, 0x00, "Auto Reach" )                     PORT_DIPLOCATION("DIP3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x80, 0x00, "Don Den Button" )                 PORT_DIPLOCATION("DIP3:8")
 	PORT_DIPSETTING(    0x80, "Start" )
 	PORT_DIPSETTING(    0x00, "Flip Flop" )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "In Game Music" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR(Demo_Sounds) )             PORT_DIPLOCATION("DIP4:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x02, 0x00, "In-Game Music" )                  PORT_DIPLOCATION("DIP4:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 	PORT_DIPNAME( 0x04, 0x00, "Girls In Demo Mode" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Select Girl" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "Gal Select" )                     PORT_DIPLOCATION("DIP4:4")
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -8825,17 +9008,11 @@ static INPUT_PORTS_START( dtoyoken )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // data clear
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )      // note
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )      // service coin (test mode)
-
-	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )      // service coin (test mode)
 
 	PORT_START("DSW1")
 	MAHJONG_PAYOUT_RATE(0, "DIP-SW1:1,2,3,4")                                                       // PAY OUT RATE
-	PORT_DIPNAME( 0x30, 0x00, "Odds Rate" )                      PORT_DIPLOCATION("DIP-SW1:5,6")    // ODDS RATE
-	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
-	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
-	PORT_DIPSETTING(    0x20, "2 3 6 8 12 15 30 50" )
-	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
+	MAHJONG_ODDS_RATE_NS(4, "DIP-SW1:5,6")                                                          // ODDS RATE
 	PORT_DIPNAME( 0xc0, 0x40, "Maximum Bet" )                    PORT_DIPLOCATION("DIP-SW1:7,8")    // BET-MAX
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
@@ -8968,15 +9145,9 @@ static INPUT_PORTS_START( daimyojn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )      // note2
 
-	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
-
 	PORT_START("DSW1")
 	MAHJONG_PAYOUT_RATE(0, "DIP-SW1:1,2,3,4")                                                              // ＰＡＹ　ＯＵＴ　ＲＡＴＥ
-	PORT_DIPNAME( 0x30, 0x00, "Odds Rate" )                          PORT_DIPLOCATION("DIP-SW1:5,6")       // ＯＤＤＳ　ＲＡＴＥ         no effect in "Credit timer" mode, always uses 1 2 4 8 12 16 24 32
-	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
-	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
-	PORT_DIPSETTING(    0x20, "2 3 6 8 12 15 30 50" )
-	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
+	MAHJONG_ODDS_RATE_NS(4, "DIP-SW1:5,6")                                                                 // ＯＤＤＳ　ＲＡＴＥ         no effect in "Credit timer" mode, always uses 1 2 4 8 12 16 24 32
 	PORT_DIPNAME( 0xc0, 0x40, "Maximum Bet" )                        PORT_DIPLOCATION("DIP-SW1:7,8")       // ＢＥＴ　ＭＡＸ
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
@@ -9109,15 +9280,9 @@ static INPUT_PORTS_START( mjnigiri )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )      // note2
 
-	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
-
 	PORT_START("DSW1")
 	MAHJONG_PAYOUT_RATE_DFLT(0, 0x06, "DIP-SW1:1,2,3,4")                                                   // PAY OUT RATE
-	PORT_DIPNAME( 0x30, 0x00, "Odds Rate" )                          PORT_DIPLOCATION("DIP-SW1:5,6")       // ODDS RATE                       no effect in "Credit timer" mode, always uses 1 2 4 8 12 16 24 32
-	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
-	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
-	PORT_DIPSETTING(    0x20, "2 3 6 8 12 15 30 50" )
-	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
+	MAHJONG_ODDS_RATE_NS(4, "DIP-SW1:5,6")                                                                 // ODDS RATE                       no effect in "Credit timer" mode, always uses 1 2 4 8 12 16 24 32
 	PORT_DIPNAME( 0xc0, 0x40, "Maximum Bet" )                        PORT_DIPLOCATION("DIP-SW1:7,8")       // BET-MAX
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
@@ -9282,8 +9447,6 @@ static INPUT_PORTS_START( hnrose )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BILL1 ) PORT_CODE(KEYCODE_6)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_INCLUDE( dynax_hanafuda_keys_bet )
 
 	// Note the PCB has 4x 10-position DIP switches and SW5 is a 4-position DIP switch.
 	// SW5 is marked as Unused and 'leave all off' in the manual
@@ -9490,20 +9653,17 @@ MACHINE_START_MEMBER(ddenlovr_state,rongrong)
 
 MACHINE_START_MEMBER(mmpanic_state,mmpanic)
 {
-	m_leds.resolve();
-
 	uint8_t *rom = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &rom[0x10000], 0x8000);
 
 	save_item(NAME(m_mmpanic_leds));
+	save_item(NAME(m_mmpanic_irq_vector));
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
 MACHINE_START_MEMBER(mmpanic_state,funkyfig)
 {
-	m_leds.resolve();
-
 	uint8_t *rom = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 0x10, &rom[0x10000], 0x8000);
 	membank("bank2")->configure_entries(0, 8,    &rom[0x90000], 0x1000);
@@ -9518,6 +9678,7 @@ MACHINE_RESET_MEMBER(mmpanic_state,mmpanic)
 {
 	m_mmpanic_leds = 0;
 	m_funkyfig_lockout = 0;
+	m_mmpanic_irq_vector = 0;
 
 	MACHINE_RESET_CALL_MEMBER(ddenlovr);
 }
@@ -9605,7 +9766,7 @@ void ddenlovr_state::ddenlovr(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256);
@@ -9728,7 +9889,7 @@ void ddenlovr_state::quizchq(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -9792,7 +9953,8 @@ void mmpanic_state::mmpanic_irq(int state)
 	//if (downcast<cpu_device *>(m_maincpu)->input_line_state(0))
 	//  return;
 
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 08, vblank
+	m_mmpanic_irq_vector = 0xcf; // Z80 - RST 08, vblank
+	m_maincpu->set_input_line(0, HOLD_LINE);
 	m_soundcpu->set_input_line(0, HOLD_LINE);   // Z80 - NMI by main cpu
 }
 
@@ -9800,7 +9962,15 @@ void mmpanic_state::mmpanic_irq(int state)
 void mmpanic_state::mmpanic_rtc_irq(int state)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf); // Z80 - RST 18, clock
+	{
+		m_mmpanic_irq_vector = 0xdf; // Z80 - RST 18, clock
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+}
+
+IRQ_CALLBACK_MEMBER(mmpanic_state::mmpanic_acknowledge_irq)
+{
+	return m_mmpanic_irq_vector;
 }
 
 void mmpanic_state::mmpanic(machine_config &config)
@@ -9809,6 +9979,7 @@ void mmpanic_state::mmpanic(machine_config &config)
 	Z80(config, m_maincpu, 16_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmpanic_state::mmpanic_map);
 	m_maincpu->set_addrmap(AS_IO, &mmpanic_state::mmpanic_portmap);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(mmpanic_state::mmpanic_acknowledge_irq));
 
 	Z80(config, m_soundcpu, 14.318181_MHz_XTAL / 4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &mmpanic_state::mmpanic_sound_map);
@@ -9818,7 +9989,7 @@ void mmpanic_state::mmpanic(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(mmpanic_state,mmpanic)
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -9882,8 +10053,11 @@ void hanakanz_state::hanakanz(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], mahjong_panel_connector_device::standard_panels, "hf", false);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_panel_connector_device::standard_panels, "hf", false);
+
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -9936,7 +10110,7 @@ void hanakanz_state::kotbinyo(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.1656);   // HSync 15.1015kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -9973,6 +10147,9 @@ void hanakanz_state::mjreach1(machine_config &config)
 {
 	hanakanz(config);
 
+	m_key_matrix[0]->set_options(mahjong_medal_panel, "mj", true);
+	m_key_matrix[1]->set_options(mahjong_medal_panel, "mj", false);
+
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::mjreach1_portmap);
 }
@@ -9998,6 +10175,9 @@ void hanakanz_state::mjchuuka(machine_config &config)
 	tmpz.set_addrmap(AS_IO, &hanakanz_state::mjchuuka_portmap);
 	tmpz.out_pa_callback().set(FUNC(hanakanz_state::hanakanz_rombank_w));
 	tmpz.out_pb_callback().set(FUNC(hanakanz_state::mjchuuka_oki_bank_w));
+
+	m_key_matrix[0]->set_options(mahjong_medal_panel, "mj", true);
+	m_key_matrix[1]->set_options(mahjong_medal_panel, "mj", false);
 
 	m_screen->screen_vblank().set("maincpu", FUNC(tmpz84c015_device::trg0));
 
@@ -10053,8 +10233,11 @@ void ddenlovr_state::mjschuka(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,sryudens)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], mahjong_medal_panel, "mj", true);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
+
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -10082,6 +10265,13 @@ void ddenlovr_state::mjschuka(machine_config &config)
 
 	// devices
 	RTC62421(config, "rtc", 32.768_kHz_XTAL).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::pa7_w)).invert(); // internal oscillator
+}
+
+void ddenlovr_state::daichukab(machine_config &config)
+{
+	mjschuka(config);
+
+	subdevice<tmpz84c015_device>("maincpu")->set_addrmap(AS_IO, &ddenlovr_state::daichukab_portmap);
 }
 
 void ddenlovr_state::mjmyorntr(machine_config &config)
@@ -10129,6 +10319,9 @@ void ddenlovr_state::mjmyster(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], mahjong_medal_panel, "mj", true);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
+
 	ay8910_device &aysnd(AY8910(config, "aysnd", 3579545));
 	aysnd.port_b_write_callback().set(FUNC(ddenlovr_state::ddenlovr_select_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
@@ -10155,7 +10348,10 @@ void ddenlovr_state::hginga(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::hginga_portmap);
 	maincpu.in_pa_callback().set_constant(0);
 	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::mjmyster_rambank_w));
-	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::hginga_rombank_w));
+	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::hginga_rombank_w<0x07>));
+
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], hginga_panels, "hf", false);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_panel_connector_device::medal_panels, "hf", false);
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
@@ -10184,11 +10380,14 @@ void ddenlovr_state::hgokou(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::hgokou_portmap);
 	maincpu.in_pa_callback().set_constant(0);
 	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::mjmyster_rambank_w));
-	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::hginga_rombank_w));
+	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::hginga_rombank_w<0x07>));
 
 	m_screen->screen_vblank().set("maincpu", FUNC(tmpz84c015_device::trg0));
 
 	subdevice<msm6242_device>("rtc")->out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::pa7_w)).invert();
+
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], hgokou_panels, "hf", false);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_panel_connector_device::standard_panels, "hf", false);
 
 	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg1));
 	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg2));
@@ -10209,6 +10408,20 @@ void ddenlovr_state::hgokbang(machine_config &config)
 	subdevice<tmpz84c015_device>("maincpu")->set_addrmap(AS_IO, &ddenlovr_state::hgokbang_portmap);
 }
 
+void ddenlovr_state::rselect(machine_config &config)
+{
+	hgokou(config);
+
+	// basic machine hardware
+	subdevice<tmpz84c015_device>("maincpu")->set_addrmap(AS_PROGRAM, &ddenlovr_state::rselect_map);
+	subdevice<tmpz84c015_device>("maincpu")->out_pb_callback().set(FUNC(ddenlovr_state::hginga_rombank_w<0x0f>));
+
+	m_key_matrix[0]->set_options(rselect_panels, "rs", false);
+	m_key_matrix[1]->set_options(rselect_panels, "rs", false);
+
+	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjflove)
+}
+
 void ddenlovr_state::mjmywrld(machine_config &config)
 {
 	mjmyster(config);
@@ -10218,7 +10431,7 @@ void ddenlovr_state::mjmywrld(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &ddenlovr_state::hginga_map);
 	maincpu.set_addrmap(AS_IO, &ddenlovr_state::mjmywrld_portmap);
 	maincpu.out_pa_callback().set(FUNC(ddenlovr_state::mjmyster_rambank_w));
-	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::hginga_rombank_w));
+	maincpu.out_pb_callback().set(FUNC(ddenlovr_state::hginga_rombank_w<0x07>));
 }
 
 void ddenlovr_state::mjmyuniv(machine_config &config)
@@ -10238,6 +10451,9 @@ void ddenlovr_state::mjmyuniv(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
 	subdevice<msm6242_device>("rtc")->out_int_handler().set_inputline("maincpu", INPUT_LINE_NMI);
+
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], mahjong_medal_panel, "mj", true);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
 
 	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg1));
 	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg2));
@@ -10272,6 +10488,9 @@ void ddenlovr_state::mjmyornt(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
 	subdevice<msm6242_device>("rtc")->out_int_handler().set_inputline("maincpu", INPUT_LINE_NMI);
+
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], mahjong_medal_panel, "mj", true);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
 
 	blitter_irq().set("maincpu", FUNC(tmpz84c015_device::trg1));
 	blitter_irq().append("maincpu", FUNC(tmpz84c015_device::trg2));
@@ -10320,6 +10539,9 @@ void ddenlovr_state::mjflove(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjflove)
 
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], mahjong_medal_panel, "mj", true);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
+
 	m_screen->screen_vblank().set(FUNC(ddenlovr_state::mjflove_irq));
 	m_screen->screen_vblank().append(m_maincpu, FUNC(tmpz84c015_device::trg0)); // frame counter?
 
@@ -10367,8 +10589,11 @@ void hanakanz_state::jongtei(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], mahjong_medal_panel, "mj", true);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
+
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256);
@@ -10413,6 +10638,14 @@ void hanakanz_state::mjgnight(machine_config &config)
 	m_screen->set_visarea(0, 336-1, 5-4, 256-11-1-4);
 }
 
+void hanakanz_state::htsubaki(machine_config &config)
+{
+	jongtei(config);
+
+	m_key_matrix[0]->set_options(mahjong_panel_connector_device::medal_panels, "hf", false);
+	m_key_matrix[1]->set_options(mahjong_panel_connector_device::medal_panels, "hf", false);
+}
+
 /***************************************************************************
                             Mahjong Seiryu Densetsu
 ***************************************************************************/
@@ -10429,8 +10662,11 @@ void ddenlovr_state::sryudens(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,sryudens)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], mahjong_medal_panel, "mj", true);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
+
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.8532);   // VSync 60.8532Hz, HSync 15.2790kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -10475,8 +10711,11 @@ void ddenlovr_state::janshinp(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,sryudens)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], mahjong_medal_panel, "mj", true);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
+
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.8532);   // VSync 60.8532Hz, HSync 15.2790kHz ?
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -10543,8 +10782,11 @@ void ddenlovr_state::seljan2(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,seljan2)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
 
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], mahjong_medal_panel, "mj", true);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
+
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.8532);   // VSync 60.8532Hz, HSync 15.2790kHz ?
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -10582,6 +10824,20 @@ void ddenlovr_state::jongoh(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::jongoh_portmap);
 }
 
+void ddenlovr_state::daichuka(machine_config &config)
+{
+	seljan2(config);
+
+	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::daichuka_portmap);
+}
+
+void ddenlovr_state::daichukaa(machine_config &config)
+{
+	seljan2(config);
+
+	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::daichukaa_portmap);
+}
+
 void hanakanz_state::daireach(machine_config &config)
 {
 	seljan2(config);
@@ -10591,6 +10847,13 @@ void hanakanz_state::daireach(machine_config &config)
 	maincpu.out_pb_callback().set(FUNC(hanakanz_state::mjchuuka_coincounter_w));
 
 	MCFG_VIDEO_START_OVERRIDE(hanakanz_state, ddenlovr)
+}
+
+void hanakanz_state::mjtktrdx(machine_config &config)
+{
+	seljan2(config);
+
+	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::mjtktrdx_portmap);
 }
 
 /***************************************************************************
@@ -10615,8 +10878,11 @@ void hanakanz_state::daimyojn(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[0], mahjong_medal_panel, "mj", true);
+	MAHJONG_PANEL_CONNECTOR(config, m_key_matrix[1], mahjong_medal_panel, "mj", false);
+
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(59.7922);   // HSync 15.4248kHz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(336, 256+22);
@@ -10654,11 +10920,21 @@ void hanakanz_state::mjnigiri(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::mjnigiri_portmap);
 }
 
+void hanakanz_state::mjswacads(machine_config &config)
+{
+	daimyojn(config);
+
+	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::mjswacads_portmap);
+}
+
 void hanakanz_state::hnrose(machine_config &config)
 {
 	daimyojn(config);
 
 	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::hnrose_portmap);
+
+	m_key_matrix[0]->set_options(mahjong_panel_connector_device::standard_panels, "hf", false);
+	m_key_matrix[1]->set_options(mahjong_panel_connector_device::standard_panels, "hf", false);
 }
 
 /***************************************************************************
@@ -11764,6 +12040,22 @@ ROM_START( mjchuuka )
 	ROM_LOAD( "d12101.1b", 0x00000, 0x80000, CRC(9759c65e) SHA1(cf098c07616b6d2a2ba10ff6ae0006442b675326) )
 ROM_END
 
+ROM_START( mjchuukac ) // Dynax D1200415 PCB. All labels peeled off.
+	ROM_REGION( 0x80000, "maincpu", 0 )  // Z80 Code
+	ROM_LOAD( "rom.4b", 0x00000, 0x80000, NO_DUMP ) // no consistent read
+
+	ROM_REGION( 0x300000, "blitter", ROMREGION_ERASEFF ) // all dumped ROMs same as mjchuuka
+	ROM_LOAD16_BYTE( "rom.9c",  0x000000, 0x080000, CRC(83bfc841) SHA1(36547e737244f95004c598adeb46cebce9ab3231) )
+	ROM_LOAD16_BYTE( "rom.9a",  0x000001, 0x080000, CRC(1bf6220a) SHA1(ea18fdf6e1298a3b4c91fbf6219b1edcfecaeca3) )
+	ROM_LOAD16_BYTE( "rom.10c", 0x100000, 0x080000, CRC(3424c8ac) SHA1(ee48622b478d39c6bdb5a18cab204e14f7d54f7a) )
+	ROM_LOAD16_BYTE( "rom.10a", 0x100001, 0x080000, CRC(9052bd09) SHA1(3e8e32dea6c0cea895b7f16883e500e487689e72) )
+	ROM_LOAD(        "rom.11c", 0x280000, 0x040000, NO_DUMP ) // damaged
+	// flying wire from 11c to 11a empty socket (possibly 11c is already interleaved)
+
+	ROM_REGION( 0x80000, "oki", 0 )  // samples
+	ROM_LOAD( "rom.1b", 0x00000, 0x80000, CRC(8d0bace1) SHA1(b84588c9503f718f165445e3a639962024d221e8) )
+ROM_END
+
 
 /***************************************************************************
 
@@ -11916,6 +12208,19 @@ ROM_START( mjschuka )
 	ROM_RELOAD(          0x1c0000, 0x20000 )
 ROM_END
 
+ROM_START( daichukab ) // D11005018L1 PCB
+	ROM_REGION( 0x90000+0x8000+16*0x1000, "maincpu", 0 )
+	ROM_LOAD( "1102_1.5b", 0x00000, 0x40000, CRC(a4db66af) SHA1(f11c796c19551579301dbefdb7e6a094ac3f3119) )
+	ROM_RELOAD(            0x10000, 0x40000 )
+
+	ROM_REGION( 0x600000, "blitter", 0 )
+	ROM_LOAD( "1103.a11", 0x00000, 0x80000, CRC(6d33dc52) SHA1(2215ae3cb4a7bbec03574ecdebc55173c2764e2f) )
+	ROM_LOAD( "1103.a12", 0x80000, 0x80000, CRC(f594797c) SHA1(611b6482d7a691525425d8ce0b77f64d63e78c62) )
+	ROM_LOAD( "1103.a12", 0x80000, 0x80000, CRC(f594797c) SHA1(611b6482d7a691525425d8ce0b77f64d63e78c62) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "1101.2b", 0x00000, 0x80000, CRC(7630a71c) SHA1(c6de6c1c631dc8c5479455db01a3d949941642dd) )
+ROM_END
 
 /***************************************************************************
 
@@ -12719,6 +13024,21 @@ ROM_START( hgokou )
 	ROM_LOAD( "1081.2d",  0x00000, 0x40000, CRC(74dede40) SHA1(d148f9ab9223b4c0b2f457a6f0e7fa3d173ab12b) )
 ROM_END
 
+// /DYNA D8306158L1 (almost identical to hgokou's N83061581L1)
+ROM_START( rselect )
+	ROM_REGION( 0x90000+8*0x1000, "maincpu", 0 )   // Z80 Code
+	ROM_LOAD( "8302.2b", 0x00000, 0x80000, CRC(941df21e) SHA1(50dadbea5989176e77c2eddb63753d65411fb061) )
+	ROM_RELOAD(          0x10000, 0x80000 )
+
+	ROM_REGION( 0x200000, "blitter", 0 )
+	ROM_LOAD( "8303.9a",  0x000000, 0x100000, CRC(5e22b02f) SHA1(58d0ddfeca878532d227e001264bfe26307b3b08) )
+	ROM_LOAD( "8304.10a", 0x100000, 0x080000, CRC(39b9dc72) SHA1(fb614c3f76f1e5c35aac2f979b60c4c8c46a7229) )
+	// 11a, 12a and 14a not populated
+
+	ROM_REGION( 0x40000, "oki", 0 )  // samples
+	ROM_LOAD( "8301.2d", 0x00000, 0x40000, CRC(428e3c15) SHA1(d3ac2eb00b01d72322722501eda5ecef1e8ec994) )
+ROM_END
+
 /***************************************************************************
 
 Hanafuda Hana Gokou Bangaihen
@@ -12899,6 +13219,20 @@ ROM_START( daireach )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "01201.1c", 0x00000, 0x80000, CRC(9a638bc8) SHA1(c584ea5f8fcfc03fd8e04a5da182388d8a707df1) )
+ROM_END
+
+// 麻雀竹取伝説Deluxe
+ROM_START( mjtktrdx )
+	ROM_REGION( 0x90000+0x8000+16*0x1000, "maincpu", 0 )  // Z80 Code
+	ROM_LOAD( "p0222m4.4c", 0x00000, 0x80000, CRC(b19d1658) SHA1(e8d3e15a54775b4fad9e5228c2333fa3aff93832) )
+	ROM_RELOAD(             0x10000, 0x80000 )
+
+	ROM_REGION( 0x600000, "blitter", 0 )
+	ROM_LOAD( "t02231.11c", 0x000000, 0x200000, CRC(b4384b4e) SHA1(a9c418b2fcf02448559c37f68536b7b381197802) )
+	ROM_LOAD( "t0224.sub",  0x200000, 0x200000, CRC(939b4d96) SHA1(8b601b3887ee250821efe37d36d3a2248fc6753b) ) // on sub board
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "t0221.1c", 0x000000, 0x100000, CRC(d008e519) SHA1(3f9b953533b56c909ebf766187bfb36496906bd0) ) // 1ST AND 2ND HALF IDENTICAL
 ROM_END
 
 /***************************************************************************
@@ -13201,6 +13535,32 @@ ROM_START( jongoh )
 	ROM_LOAD( "t8031.1c", 0x000000, 0x80000, CRC(5a8cd45c) SHA1(25ca573b8ba226fb3f2de48c57b5ced6884eaa63) )  // same as sryudens, seljan2
 ROM_END
 
+ROM_START( daichuka ) // NM504-2 PCB
+	ROM_REGION( 0x90000+0x8000+16*0x1000, "maincpu", 0 )
+	// despite various attempts with different programmers, has 0xff at 0x92 and 0xa2 for every block of 0x100
+	ROM_LOAD( "3062a5.4c", 0x00000, 0x80000, CRC(40fbf627) SHA1(b7d49ec96f5163062c66763a52c2823bea146dd5) BAD_DUMP )
+	ROM_RELOAD(            0x10000, 0x80000 )
+
+	ROM_REGION( 0x600000, "blitter", 0 )
+	ROM_LOAD( "t83063.11c",   0x000000, 0x200000, CRC(2c0a7cf6) SHA1(7e726212355af30e0b85f74b77e3d9c6b65863f7) )
+	ROM_LOAD( "83604_2.sub",  0x400000, 0x200000, CRC(0faeaf86) SHA1(b1cfe32c622b41bdb96f2556daf4f616f6e8d25f) ) // 0xxxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "t83061.1c", 0x00000, 0x80000, CRC(52666107) SHA1(1e1c17b1da7ded5fc52422c7e569ef02af1ee11d) )
+ROM_END
+
+ROM_START( daichukaa ) // NM504-2 PCB
+	ROM_REGION( 0x90000+0x8000+16*0x1000, "maincpu", 0 )
+	ROM_LOAD( "p3042a4.4c", 0x00000, 0x80000, CRC(04155ff0) SHA1(97080dcdac6f7bcb183681ff72fe233797a1a303) )
+	ROM_RELOAD(             0x10000, 0x80000 )
+
+	ROM_REGION( 0x600000, "blitter", 0 )
+	ROM_LOAD( "83043_2.sub", 0x400000, 0x200000, CRC(7d1cdaf4) SHA1(4c3f84abecc7caf52a52ac88a7d178ad33538cb4) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "t83041.1c", 0x00000, 0x80000, CRC(c92065a9) SHA1(65c38c3a31d3f4b8240a16fdcdf376acdf5c17d2) ) // same as mjschuka
+ROM_END
+
 /***************************************************************************
 
 Hanafuda Hana Tengoku
@@ -13346,7 +13706,37 @@ ROM_START( mjswacad )
 	ROM_LOAD( "01001.2b", 0x000000, 0x200000, CRC(4b84f45c) SHA1(2ad92b15986d88d4c9254f43ce251a0ebd90a48b) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
+
+/***************************************************************************
+
+Mahjong Sweet Academy Special
+
+Techno-Top, Limited
+
+TTL.0103 sticker
+
+Has 4 banks of 10 DIP switches
+
+***************************************************************************/
+
+ROM_START( mjswacads )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "p0102y5.5b", 0x00000, 0x80000, CRC(8ae679ad) SHA1(f47cdf6c8d8ec71e5c36369ad68447471bfc48f9) ) // different from mjswacad
+
+	ROM_REGION( 0x800000, "blitter", 0 )
+	ROM_LOAD( "01003.7b",     0x000000, 0x200000, CRC(1df7a355) SHA1(3122570a845bb046936e8296423636281b39cc4a) )
+	ROM_LOAD( "01004.8b",     0x200000, 0x200000, CRC(198904d4) SHA1(d34a297cd08c227767808dfa695573ef596022c9) )
+	ROM_LOAD( "01005.9b",     0x400000, 0x200000, CRC(4dbcf7cf) SHA1(8bf4eaff1a280b2d5bf1221dc516647936e146d7) )
+	ROM_LOAD( "01006_2.11b",  0x600000, 0x200000, CRC(7c646f5c) SHA1(d911f497b2b4b10da1693308a2bfab9f70d2e34a) ) // only different one from mjswacad
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "01001.2b", 0x000000, 0x100000, CRC(ee30d20a) SHA1(14689196486bc4eab4a174fe880b425fa544cd25) ) // same as mjswacad but half size (no empty half)
+ROM_END
+
 } // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(HGOKOU_JOYSTICK, device_mahjong_panel_interface, hgokou_joystick_device, "hgokou_joystick", "Hanafuda Hana Gokou joystick")
+DEFINE_DEVICE_TYPE_PRIVATE(RSELECT_PANEL,   device_mahjong_panel_interface, rselect_panel_device,   "rselect_panel",   "Royal Selection panel")
 
 
 GAME( 1992, htengoku,    0,        htengoku,  htengoku,   htengoku_state, empty_init,    ROT180, "Dynax",                                     "Hanafuda Hana Tengoku (Japan)",                                  0 )
@@ -13387,12 +13777,15 @@ GAME( 1994, rongrongg,   rongrong, rongrong,  rongrong,   ddenlovr_state, init_r
 
 GAME( 1994, hparadis,    0,        hparadis,  hparadis,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Super Hana Paradise (Japan)",                                    MACHINE_NO_COCKTAIL  )
 
+GAME( 1994, rselect,     0,        rselect,   rselect,    ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Royal Selection (Japan, ver. 1.01)",                             MACHINE_NO_COCKTAIL  | MACHINE_NOT_WORKING )
+
 GAME( 1995, hgokou,      0,        hgokou,    hgokou,     ddenlovr_state, empty_init,    ROT0, "Dynax (Alba license)",                        "Hanafuda Hana Gokou (Japan, ver. B)",                            MACHINE_NO_COCKTAIL  | MACHINE_NOT_WORKING )
 GAME( 1995, hgokoua,     hgokou,   hgokbang,  hgokou,     ddenlovr_state, empty_init,    ROT0, "Dynax (Alba license)",                        "Hanafuda Hana Gokou (Japan, ver. A)",                            MACHINE_NO_COCKTAIL  | MACHINE_NOT_WORKING )
 GAME( 1995, hgokbang,    hgokou,   hgokbang,  hgokou,     ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Gokou Bangaihen (Japan)",                          MACHINE_NO_COCKTAIL  | MACHINE_NOT_WORKING )
 
 GAME( 1995, mjdchuka,    0,        mjchuuka,  mjchuuka,   hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Maque Da Zhonghua Quan (Taiwan, D111)",                          MACHINE_NO_COCKTAIL  )
 
+GAME( 1995, daichukab,   daichuka, daichukab, mjschuka,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Dai Chuuka Ken (Japan, D110)",                           MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL ) // needs inputs / DIPs check
 GAME( 1995, mjschuka,    0,        mjschuka,  mjschuka,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Super Dai Chuuka Ken (Japan, D115)",                     MACHINE_NO_COCKTAIL  )
 
 GAME( 1995, nettoqc,     0,        nettoqc,   nettoqc,    ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Nettoh Quiz Champion (Japan)",                                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
@@ -13432,6 +13825,7 @@ GAME( 1997, mjmysterr,   0,        mjmyorntr, mjschuka,   ddenlovr_state, empty_
 GAME( 1997, hkagerou,    0,        hkagerou,  hkagerou,   hanakanz_state, empty_init,    ROT0, "Nakanihon / Dynax",                           "Hana Kagerou (Japan)",                                           MACHINE_NO_COCKTAIL  )
 
 GAME( 1998, mjchuuka,    0,        mjchuuka,  mjchuuka,   hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Maque Zhonghua Ernu (Taiwan)",                                   MACHINE_NO_COCKTAIL  )
+GAME( 1998, mjchuukac,   mjchuuka, mjchuuka,  mjchuuka,   hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Chuuka Ken (China?)",                                    MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL  ) // one bad ROM
 
 GAME( 1998, mjreach1,    0,        mjreach1,  mjreach1,   hanakanz_state, empty_init,    ROT0, "Nihon System",                                "Mahjong Reach Ippatsu (Japan, NM526-NSI)",                       MACHINE_NO_COCKTAIL  )
 GAME( 1998, mjreach1a,   mjreach1, mjreach1,  mjreach1,   hanakanz_state, empty_init,    ROT0, "Nihon System",                                "Mahjong Reach Ippatsu (Japan, NM526-01)",                        MACHINE_NO_COCKTAIL  )
@@ -13439,7 +13833,7 @@ GAME( 1998, mjreach1a,   mjreach1, mjreach1,  mjreach1,   hanakanz_state, empty_
 GAME( 1999, jongtei,     0,        jongtei,   jongtei,    hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Jong-Tei (Japan, NM532-01)",                             MACHINE_NO_COCKTAIL  )
 GAME( 2000, jongteia,    jongtei,  jongteia,  jongtei,    hanakanz_state, empty_init,    ROT0, "Dynax (Techno-Top license)",                  "Mahjong Jong-Tei (Japan, Techno-Top license)",                   MACHINE_NO_COCKTAIL  )
 
-GAME( 1999, htsubaki,    0,        jongtei,   hnrose,     hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Tsubaki (Japan)",                                  MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL  ) // need inputs /DSW
+GAME( 1999, htsubaki,    0,        htsubaki,  hnrose,     hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Hanafuda Hana Tsubaki (Japan)",                                  MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL  ) // need inputs /DSW
 
 GAME( 2000, mjgnight,    0,        mjgnight,  mjgnight,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Gorgeous Night (Japan, TSM003-01)",                      MACHINE_NO_COCKTAIL  )
 
@@ -13451,9 +13845,16 @@ GAME( 2000, jongoh,      0,        jongoh,    jongoh,     ddenlovr_state, empty_
 
 GAME( 2001, daireach,    0,        daireach,  seljan2,    hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Dai-Reach (Japan, TSM012-C01)",                          MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL )
 
+GAME( 2002, daichuka,    0,        daichuka,  jongoh,     ddenlovr_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Dai Chuuka Ken (Japan, P830 006A-005)",                  MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL ) // bad dump
+GAME( 2002, daichukaa,   daichuka, daichukaa, jongoh,     ddenlovr_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Dai Chuuka Ken (Japan, P830-004A-004)",                  MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL ) // stuck at the operator control check, needs correct NVRAM support
+
 GAME( 2002, daimyojn,    0,        daimyojn,  daimyojn,   hanakanz_state, empty_init,    ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin (Japan, T017-PB-00)",                          MACHINE_NO_COCKTAIL  )
 
-GAME( 2002, mjtenho,     0,        daimyojn,  daimyojn,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Tenho (Japan, P016B-000)",                               MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL  )
+GAME( 2002, mjswacads,   0,        mjswacads, daimyojn,   hanakanz_state, empty_init,    ROT0, "Techno-Top / Long Stone",                     "Mahjong Sweet Academy Special (Japan, P010B-Y05)",               MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL ) // needs verifying of inputs, outputs
+
+GAME( 2002, mjtenho,     0,        daimyojn,  daimyojn,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Tenho (Japan, P016B-000)",                               MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL )
+
+GAME( 2003, mjtktrdx,    0,        mjtktrdx,  seljan2,    hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Taketori Densetsu Deluxe (Japan, T022-PC-004)",          MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL ) // stuck at the operator control check, needs correct NVRAM support
 
 GAME( 2004, momotaro,    0,        momotaro,  daimyojn,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Momotarou (Japan, T027-RB-01)",                          MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 

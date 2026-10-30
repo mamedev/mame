@@ -13,7 +13,7 @@ TODO:
 #include "mediagx_cs5530_ide.h"
 
 #define VERBOSE (LOG_GENERAL)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 

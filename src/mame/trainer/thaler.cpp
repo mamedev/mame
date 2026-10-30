@@ -29,7 +29,7 @@ public:
 		, m_keycol(0)
 	{ }
 
-	void mps65(machine_config &config);
+	void mps65(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_changed);
 
@@ -37,15 +37,15 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_maincpu;
-	required_ioport_array<6> m_keypad;
-	output_finder<6> m_digit;
-
 	void mps65_map(address_map &map) ATTR_COLD;
 
 	uint8_t pa_r();
 	void pa_w(uint8_t data);
 	void pb_w(uint8_t data);
+
+	required_device<cpu_device> m_maincpu;
+	required_ioport_array<6> m_keypad;
+	output_finder<6> m_digit;
 
 	uint8_t m_keycol;
 };
@@ -53,8 +53,6 @@ private:
 
 void mps65_state::machine_start()
 {
-	m_digit.resolve();
-
 	save_item(NAME(m_keycol));
 }
 

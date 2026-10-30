@@ -85,12 +85,13 @@ protected:
 	void base_di_write(int state);
 	int base_do_read();
 	int base_ready_read();
+	TIMER_CALLBACK_MEMBER(ready_timer_expired);
 
 	// subclass overrides
 	virtual void handle_event(eeprom_event event);
 	virtual void parse_command_and_address() = 0;
 	virtual void execute_command();
-
+	virtual int do_line_for_state() const;
 
 	// configuration state
 	uint8_t         m_command_address_bits;     // number of address bits in a command
@@ -100,6 +101,7 @@ protected:
 	devcb_write_line m_do_cb;                   // callback to push state of DO line
 
 	// runtime state
+	emu_timer *     m_ready_timer;              // fires when an internal write cycle ends
 	eeprom_state    m_state;                    // current internal state
 	uint8_t         m_cs_state;                 // state of the CS line
 	attotime        m_last_cs_rising_edge_time; // time of the last CS rising edge
@@ -135,6 +137,7 @@ protected:
 
 	// subclass overrides
 	virtual void parse_command_and_address() override;
+	virtual int do_line_for_state() const override;
 };
 
 
@@ -175,8 +178,8 @@ protected:
 
 class eeprom_serial_x24c44_device : public eeprom_serial_base_device
 {
-		//async recall not implemented
-		//async store not implemented
+	//async recall not implemented
+	//async store not implemented
 public:
 	// read handlers
 	int do_read();          // DO
@@ -211,12 +214,15 @@ protected:
 //**************************************************************************
 
 // macro for declaring a new device class
+// protected method is for nec/pc88_sdip (an exception for reading the internal data)
 #define DECLARE_SERIAL_EEPROM_DEVICE(_baseclass, _lowercase, _uppercase, _bits) \
 class eeprom_serial_##_lowercase##_##_bits##bit_device : public eeprom_serial_##_baseclass##_device \
 { \
 public: \
 	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, eeprom_serial_streaming enable_streaming = eeprom_serial_streaming::DISABLE); \
 	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock); \
+protected: \
+	eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock); \
 }; \
 DECLARE_DEVICE_TYPE(EEPROM_##_uppercase##_##_bits##BIT, eeprom_serial_##_lowercase##_##_bits##bit_device)
 

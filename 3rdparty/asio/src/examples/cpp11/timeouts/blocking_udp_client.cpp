@@ -2,7 +2,7 @@
 // blocking_udp_client.cpp
 // ~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
 
       if (error)
       {
-        std::cout << "Receive error: " << error.message() << "\n"; 
+        std::cout << "Receive error: " << error.message() << "\n";
       }
       else
       {

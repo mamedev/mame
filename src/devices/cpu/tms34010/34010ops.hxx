@@ -2259,7 +2259,7 @@ void tms34020_device::cvdxyl_b(uint16_t op)
 	DADDR() = result;
 
 	// Handle cycles related to pitch:
-	switch (population_count_32(dptch))
+	switch (std::popcount(uint32_t(dptch)))
 	{
 		// power of 2: 2 clocks
 		case 1:
@@ -2441,21 +2441,20 @@ void tms34020_device::setcdp(uint16_t op)
 	// Check whether we're dealing with an even number
 	if ((dptch & 1) == 0)
 	{
-		switch (population_count_32(dptch))
+		switch (std::popcount(uint32_t(dptch)))
 		{
 			// .. only single bit set, pitch is power of two!
 			case 1:
 			{
-				m_convdp = 32 - count_leading_zeros_32(dptch);
+				m_convdp = std::bit_width(uint32_t(dptch));
 				COUNT_CYCLES(4);
 				return;
 			}
 			// .. two bits, we can decompose it to sum of two power of two numbers
 			case 2:
 			{
-				uint8_t first_one = count_leading_zeros_32(dptch);
-				uint8_t v1 = 32 - first_one;
-				uint8_t v2 = 32 - count_leading_zeros_32(dptch & ~(1 << (first_one - 1)));
+				uint16_t v1 = std::bit_width(uint32_t(dptch));
+				uint16_t v2 = std::bit_width(uint32_t(dptch) & ~(uint32_t(1) << (v1 - 1)));
 
 				m_convdp = v2 | (v1 << 8);
 				COUNT_CYCLES(6);

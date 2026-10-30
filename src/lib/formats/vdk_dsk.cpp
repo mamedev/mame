@@ -80,6 +80,7 @@ bool vdk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				sectors[i].deleted = false;
 				sectors[i].bad_data_crc = false;
 				sectors[i].bad_addr_crc = false;
+				sectors[i].weak = false;
 				sectors[i].data = &sector_data[sector_offset];
 
 				read(io, sectors[i].data, SECTOR_SIZE); // FIXME: check for errors and premature EOF

@@ -447,8 +447,6 @@ void electronsp_state::io_w(offs_t offset, uint8_t data)
 
 void electron_state::machine_start()
 {
-	m_capslock_led.resolve();
-
 	/* set ULA RAM/ROM pointers */
 	m_ula->set_ram(m_ram->pointer());
 	m_ula->set_rom(m_region_mos->base());
@@ -632,7 +630,7 @@ void electron_state::electron(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
 	m_screen->set_screen_update(m_ula, FUNC(electron_ula_device::screen_update));
 	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);

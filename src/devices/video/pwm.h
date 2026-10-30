@@ -11,6 +11,9 @@
 
 #pragma once
 
+#include <optional>
+
+
 class pwm_display_device : public device_t
 {
 public:
@@ -70,15 +73,17 @@ public:
 	bool row_on(u8 y) { return element_on(y, m_width); }
 
 protected:
-	// device-level overrides
+	// device_t implementation
+	virtual void device_config_complete() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	output_finder<0x40, 0x40> m_out_x;
-	output_finder<0x40> m_out_a;
-	output_finder<0x40, 0x40> m_out_multi;
-	output_finder<0x40> m_out_digit;
+	// TODO: should this really be allocating over 8000 outputs?
+	std::optional<output_finder<0x40, 0x40> > m_out_x;
+	std::optional<output_finder<0x40> > m_out_a;
+	std::optional<output_finder<0x40, 0x40> > m_out_multi;
+	std::optional<output_finder<0x40> > m_out_digit;
 
 	devcb_write8 m_output_x_cb;
 	devcb_write8 m_output_a_cb;

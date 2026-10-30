@@ -460,7 +460,7 @@ void lemmings_state::lemmings(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 	BUFFERED_SPRITERAM16(config, m_spriteram[1]);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
 	screen.set_size(40*8, 32*8);
@@ -471,10 +471,10 @@ void lemmings_state::lemmings(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lemmings);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 1024);
 
-	DECO_SPRITE(config, m_sprgen[0], 0, m_palette, gfx_lemmings_spr2);
-	DECO_SPRITE(config, m_sprgen[1], 0, m_palette, gfx_lemmings_spr1);
+	DECO_SPRITE(config, m_sprgen[0], m_palette, gfx_lemmings_spr2);
+	DECO_SPRITE(config, m_sprgen[1], m_palette, gfx_lemmings_spr1);
 
-	DECO146PROT(config, m_deco146, 0);
+	DECO146PROT(config, m_deco146);
 	m_deco146->port_a_cb().set_ioport("INPUTS");
 	m_deco146->port_b_cb().set_ioport("SYSTEM");
 	m_deco146->port_c_cb().set_ioport("DSW");

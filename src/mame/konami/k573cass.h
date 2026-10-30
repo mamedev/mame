@@ -26,7 +26,7 @@ class konami573_cassette_slot_device : public device_t, public device_single_car
 	friend class konami573_cassette_interface;
 
 public:
-	konami573_cassette_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	konami573_cassette_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto dsr_handler() { return m_dsr_handler.bind(); }
 

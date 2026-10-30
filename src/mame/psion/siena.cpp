@@ -33,12 +33,13 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_palette(*this, "palette")
 		, m_keyboard(*this, "COL%u", 0U)
-		, m_speaker(*this, "speaker")
+		, m_buzzer(*this, "buzzer")
 		, m_condor(*this, "condor")
 		, m_honda(*this, "honda")
 	{ }
 
-	void siena(machine_config &config);
+	void siena(machine_config &config) ATTR_COLD;
+	void siena_us(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(wakeup);
 
@@ -47,18 +48,18 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	void palette_init(palette_device &palette);
+
+	uint16_t kbd_r();
+
 	required_device<psion_asic9_device> m_asic9;
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_nvram;
 	required_device<palette_device> m_palette;
 	required_ioport_array<8> m_keyboard;
-	required_device<speaker_sound_device> m_speaker;
+	required_device<speaker_sound_device> m_buzzer;
 	required_device<psion_condor_device> m_condor;
 	required_device<psion_honda_slot_device> m_honda;
-
-	void palette_init(palette_device &palette);
-
-	uint16_t kbd_r();
 
 	uint8_t m_key_col = 0;
 };
@@ -67,6 +68,8 @@ private:
 void siena_state::machine_start()
 {
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
+
+	save_item(NAME(m_key_col));
 }
 
 void siena_state::machine_reset()
@@ -86,7 +89,7 @@ static INPUT_PORTS_START( siena )
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1')                  PORT_NAME("1 Min")
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0')
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME)                                                       PORT_NAME("On/CE")           PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(siena_state::wakeup), 0)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNKNOWN) // Reset ?
 
 	PORT_START("COL1")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)          PORT_CHAR('w')  PORT_CHAR('W') PORT_CHAR('"')
@@ -278,10 +281,11 @@ void siena_state::siena(machine_config &config)
 	m_asic9->set_screen("screen");
 	m_asic9->set_ram_rom("ram", "rom");
 	m_asic9->port_ab_r().set(FUNC(siena_state::kbd_r));
-	m_asic9->buz_cb().set(m_speaker, FUNC(speaker_sound_device::level_w));
+	m_asic9->port_cd_r().set([]() { return 0x00; });
+	m_asic9->buz_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_asic9->col_cb().set([this](uint8_t data) { m_key_col = data; });
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_size(240, 160);
 	screen.set_visarea_full();
 	screen.set_refresh_hz(66);
@@ -290,7 +294,7 @@ void siena_state::siena(machine_config &config)
 	PALETTE(config, "palette", FUNC(siena_state::palette_init), 3);
 
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00); // Piezo buzzer
+	SPEAKER_SOUND(config, m_buzzer).add_route(ALL_OUTPUTS, "mono", 1.00); // Piezo buzzer
 
 	RAM(config, m_ram).set_default_size("512K").set_extra_options("1M");
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
@@ -315,12 +319,27 @@ void siena_state::siena(machine_config &config)
 	//SOFTWARE_LIST(config, "flop_list").set_original("psion_flop").set_filter("SIENA");
 }
 
+void siena_state::siena_us(machine_config &config)
+{
+	siena(config);
+	// locale on port C:
+	// 00 - English
+	// 01 - Swedish
+	// 02 - USA
+	// 03 - Spanish
+	m_asic9->port_cd_r().set_constant(0x02); // USA
+}
+
 
 ROM_START(siena)
 	ROM_REGION16_LE(0x100000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "420f", "V4.20F/ENG")
 	ROMX_LOAD("vine_v4.20f_eng.bin", 0x00000, 0x100000, CRC(641f8e7c) SHA1(fe0e46540e0aac5aabb2dd1b96689da41e8f55fb), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "408f", "V4.08F/ENG")
+	ROMX_LOAD("vine_v4.08f_eng.bin", 0x00000, 0x100000, CRC(222a7fd4) SHA1(250f43d327fbd5eea0b6ac4a7d7f514072b738f4), ROM_BIOS(1))
 ROM_END
+
+#define rom_siena_us rom_siena
 
 ROM_START(siena_fr)
 	ROM_REGION16_LE(0x100000, "rom", 0)
@@ -334,3 +353,4 @@ ROM_END
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT      CLASS          INIT         COMPANY   FULLNAME           FLAGS
 COMP( 1996, siena,    0,      0,      siena,    siena,     siena_state,   empty_init,  "Psion",  "Siena",           MACHINE_SUPPORTS_SAVE )
 COMP( 1996, siena_fr, siena,  0,      siena,    siena_fr,  siena_state,   empty_init,  "Psion",  "Siena (French)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1996, siena_us, siena,  0,      siena_us, siena,     siena_state,   empty_init,  "Psion",  "Siena (US)",      MACHINE_SUPPORTS_SAVE )

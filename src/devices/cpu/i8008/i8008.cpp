@@ -92,7 +92,7 @@ void i8008_device::device_start()
 	state_add(I8008_L,        "L",        m_L);
 
 	for (int addrnum = 0; addrnum < 8; addrnum++)
-		state_add(I8008_ADDR1 + addrnum, string_format("ADDR%d", addrnum + 1).c_str(), m_ADDR[addrnum].w.l).mask(0xfff);
+		state_add(I8008_ADDR1 + addrnum, string_format("ADDR%d", addrnum + 1), m_ADDR[addrnum].w.l).mask(0xfff);
 
 	init_tables();
 }

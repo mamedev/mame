@@ -108,10 +108,10 @@ public:
 			m_disk_bios_share(*this, "disk_bios")
 	{ }
 
-	void bonanza(machine_config &config);
-	void pcat_nit(machine_config &config);
+	void bonanza(machine_config &config) ATTR_COLD;
+	void pcat_nit(machine_config &config) ATTR_COLD;
 
-	void init_pcat_nit();
+	void init_pcat_nit() ATTR_COLD;
 
 private:
 	std::unique_ptr<uint8_t[]> m_banked_nvram;
@@ -252,11 +252,11 @@ void pcat_nit_state::pcat_nit(machine_config &config)
 
 	/* video hardware */
 	// TODO: map to ISA bus, pinpoint what BIOS this refers to
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
 
-	vga_device &vga(VGA(config, "vga", 0));
+	vga_device &vga(VGA(config, "vga"));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x100000);
 
@@ -281,11 +281,11 @@ void pcat_nit_state::bonanza(machine_config &config)
 
 	/* video hardware */
 	// TODO: map to ISA bus
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(cirrus_gd5428_vga_device::screen_update));
 
-	cirrus_gd5428_vga_device &vga(CIRRUS_GD5428_VGA(config, "vga", 0));
+	cirrus_gd5428_vga_device &vga(CIRRUS_GD5428_VGA(config, "vga"));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x200000);
 

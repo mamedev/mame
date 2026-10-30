@@ -978,7 +978,7 @@ void hnayayoi_state::hnayayoi(machine_config &config)
 	m_mainlatch->q_out_cb<4>().set(FUNC(hnayayoi_state::nmi_enable_w)).invert();
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(20_MHz_XTAL / 2, 632, 0, 512, 263, 0, 243);
 	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
@@ -1012,10 +1012,9 @@ void hnayayoi_state::hnfubuki(machine_config &config)
 {
 	hnayayoi(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hnayayoi_state::hnfubuki_map);
-	m_maincpu->set_addrmap(AS_IO, address_map_constructor());
+	m_maincpu->remove_addrmap(AS_IO);
 
-	// D5
-	m_mainlatch->q_out_cb<4>().set(FUNC(hnayayoi_state::nmi_enable_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(hnayayoi_state::nmi_enable_w)); // D5
 }
 
 void untoucha_state::untoucha(machine_config &config)

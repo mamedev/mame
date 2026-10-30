@@ -50,7 +50,7 @@ TODO:
 #include "video/hlcd0538.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -77,8 +77,8 @@ public:
 	{ }
 
 	// machine configs
-	void mark5(machine_config &config);
-	void mark6(machine_config &config);
+	void mark5(machine_config &config) ATTR_COLD;
+	void mark6(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(cb_enable) { if (!newval) m_display[3]->clear(); }
 
@@ -141,7 +141,6 @@ private:
 
 void mark5_state::machine_start()
 {
-	m_out_x.resolve();
 	m_irqtimer = timer_alloc(FUNC(mark5_state::interrupt), this);
 
 	// register for savestates
@@ -448,10 +447,9 @@ void mark5_state::mark5(machine_config &config)
 	for (int i = 0; i < 3; i++)
 		m_display[i]->set_bri_maximum(0.1);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(942/1.5, 1080/1.5);
-	screen.set_visarea_full();
 
 	config.set_default_layout(layout_saitek_mark5);
 

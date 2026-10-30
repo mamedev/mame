@@ -494,7 +494,7 @@ void beezer_state::beezer(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12_MHz_XTAL / 2, 384, 16, 304, 260, 0, 240); // 288 x 240, correct?
 	m_screen->set_screen_update(FUNC(beezer_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -529,7 +529,7 @@ void beezer_state::beezer(machine_config &config)
 	noise.output_callback().set(FUNC(beezer_state::noise_w));
 
 	SPEAKER(config, "speaker").front_center();
-	DAC76(config, m_dac, 0);
+	DAC76(config, m_dac);
 	m_dac->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 

@@ -230,11 +230,11 @@ void c64_buscard_device::device_add_mconfig(machine_config &config)
 	m_ppi->in_pc_callback().set(FUNC(c64_buscard_device::ppi_pc_r));
 	m_ppi->out_pc_callback().set(FUNC(c64_buscard_device::ppi_pc_w));
 
-	DS75160A(config, m_ieee1, 0);
+	DS75160A(config, m_ieee1);
 	m_ieee1->read_callback().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_ieee1->write_callback().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
 
-	DS75161A(config, m_ieee2, 0);
+	DS75161A(config, m_ieee2);
 	m_ieee2->in_ren().set(IEEE488_TAG, FUNC(ieee488_device::ren_r));
 	m_ieee2->in_ifc().set(IEEE488_TAG, FUNC(ieee488_device::ifc_r));
 	m_ieee2->in_ndac().set(IEEE488_TAG, FUNC(ieee488_device::ndac_r));
@@ -252,7 +252,7 @@ void c64_buscard_device::device_add_mconfig(machine_config &config)
 	m_ieee2->out_atn().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
 	m_ieee2->out_srq().set(IEEE488_TAG, FUNC(ieee488_device::host_srq_w));
 
-	IEEE488(config, m_bus, 0);
+	IEEE488(config, m_bus);
 	ieee488_slot_device::add_cbm_defaults(config, nullptr);
 
 	CENTRONICS(config, m_centronics, centronics_devices, nullptr);

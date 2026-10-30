@@ -72,7 +72,7 @@ void dio16_98624_device::device_add_mconfig(machine_config &config)
 	gpib.int_write_cb().set(FUNC(dio16_98624_device::gpib_irq));
 	gpib.accrq_write_cb().set(FUNC(dio16_98624_device::gpib_dreq));
 
-	ieee488_device &ieee488(IEEE488(config, IEEE488_TAG, 0));
+	ieee488_device &ieee488(IEEE488(config, IEEE488_TAG));
 	ieee488.eoi_callback().set(m_tms9914, FUNC(tms9914_device::eoi_w));
 	ieee488.dav_callback().set(m_tms9914, FUNC(tms9914_device::dav_w));
 	ieee488.nrfd_callback().set(m_tms9914, FUNC(tms9914_device::nrfd_w));
@@ -82,7 +82,7 @@ void dio16_98624_device::device_add_mconfig(machine_config &config)
 	ieee488.atn_callback().set(m_tms9914, FUNC(tms9914_device::atn_w));
 	ieee488.ren_callback().set(m_tms9914, FUNC(tms9914_device::ren_w));
 
-	ieee488_slot_device &slot0(IEEE488_SLOT(config, "ieee0", 0));
+	ieee488_slot_device &slot0(IEEE488_SLOT(config, "ieee0"));
 	hp_ieee488_devices(slot0);
 }
 

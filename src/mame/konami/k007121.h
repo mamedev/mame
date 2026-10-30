@@ -21,7 +21,15 @@ public:
 		set_palette(std::forward<T>(palette_tag));
 		set_screen(std::forward<U>(screen_tag));
 	}
-	k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template<typename T, typename U>
+	k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, const gfx_decode_entry *gfxinfo, T &&palette_tag, U &&screen_tag)
+		: k007121_device(mconfig, tag, owner, 0, gfxinfo, std::forward<T>(palette_tag), std::forward<U>(screen_tag))
+	{
+		set_info(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
+		set_screen(std::forward<U>(screen_tag));
+	}
+	k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	void set_sprite_offsets(int dx, int flip_dx)

@@ -436,6 +436,7 @@ upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, 
 	, m_pf_out_cb(*this)
 	, m_pt_in_cb(*this, 0) // TODO: uPD7807 only
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, internal_map)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_ram_view(*this, "ram_view")
 	, m_pa_pullups(0xff)
 	, m_pb_pullups(0xff)
@@ -518,7 +519,7 @@ void upd7801_device::configure_ops()
 }
 
 upd7801_device::upd7801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd7810_device(mconfig, UPD7801, tag, owner, clock, address_map_constructor(FUNC(upd7801_device::upd_internal_128_ram_map), this))
+	: upd7810_device(mconfig, UPD7801, tag, owner, clock, address_map_constructor(FUNC(upd7801_device::upd_internal_4096_rom_128_ram_map), this))
 {
 }
 
@@ -565,6 +566,14 @@ device_memory_interface::space_config_vector upd7810_device::memory_space_config
 {
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
+device_memory_interface::space_config_vector upd7801_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO, &m_io_config)
 	};
 }
 
@@ -710,9 +719,11 @@ uint8_t upd7810_device::read_pc()
 
 uint8_t upd7801_device::read_pc()
 {
+	const u8 inputs = 0x84 | (m_mc & 0x03);
+
 	if ((m_mc & 0x87) && !m_pc_in_cb.isunset())  // NS20031301 no need to read if the port is set as output
-		m_pc_in = m_pc_in_cb(0, 0x84 | (m_mc & 0x03));
-	uint8_t data = (m_pc_in & 0x87) | (m_pc_out & ~0x87);
+		m_pc_in = m_pc_in_cb(0, inputs);
+	uint8_t data = (m_pc_in & inputs) | (m_pc_out & ~inputs);
 	if (!BIT(m_mc, 2))  /* TODO PC2 = -SCS input */
 		data = (data & ~0x04) | 0x04;
 	if (!BIT(m_mc, 7))  /* TODO PC7 = HOLD input */
@@ -801,12 +812,14 @@ void upd7810_device::write_pc(uint8_t data)
 
 void upd7801_device::write_pc(uint8_t data)
 {
-	data = (data & 0x78) | (m_pc_pullups & ~0x78);
+	const u8 inputs = 0x84 | (m_mc & 0x03);
+
+	data = (data & ~inputs) | (m_pc_pullups & inputs);
 	if (!BIT(m_mc, 3))  /* TODO PC3 = SAK output */
 		data = (data & ~0x08);
 	if (!BIT(m_mc, 4))  /* PC4 = TO output */
 		data = (data & ~0x10) | (m_to & 1 ? 0x10 : 0x00);
-	if (!BIT(m_mc, 5))  /* TODO PC5 = IO/-M input */
+	if (!BIT(m_mc, 5))  /* TODO PC5 = IO/-M output */
 		data = (data & ~0x20);
 	if (!BIT(m_mc, 6))  /* TODO PC6 = HLDA output */
 		data = (data & ~0x40);
@@ -822,11 +835,8 @@ void upd7810_device::write_smh(uint8_t data)
 void upd7810_device::upd7810_take_irq()
 {
 	uint16_t vector = 0;
+	uint16_t irr_mask = 0;
 	int irqline = 0;
-
-	/* global interrupt disable? */
-	if (0 == IFF && !(IRR & INTFNMI))
-		return;
 
 	/* check the interrupts in priority sequence */
 	if (IRR & INTFNMI)
@@ -834,21 +844,21 @@ void upd7810_device::upd7810_take_irq()
 		/* Nonmaskable interrupt */
 		irqline = INPUT_LINE_NMI;
 		vector = 0x0004;
-		IRR &= ~INTFNMI;
+		irr_mask = INTFNMI;
 	}
 	else
 	if ((IRR & INTFT0)  && 0 == (MKL & 0x02))
 	{
 		vector = 0x0008;
 		if (0 != (MKL & 0x04))
-			IRR&=~INTFT0;
+			irr_mask = INTFT0;
 	}
 	else
 	if ((IRR & INTFT1)  && 0 == (MKL & 0x04))
 	{
 		vector = 0x0008;
 		if (0 != (MKL & 0x02))
-			IRR&=~INTFT1;
+			irr_mask = INTFT1;
 	}
 	else
 	if ((IRR & INTF1)   && 0 == (MKL & 0x08))
@@ -856,7 +866,7 @@ void upd7810_device::upd7810_take_irq()
 		irqline = UPD7810_INTF1;
 		vector = 0x0010;
 		if (0 != (MKL & 0x10))
-			IRR&=~INTF1;
+			irr_mask = INTF1;
 	}
 	else
 	if ((IRR & INTF2)   && 0 == (MKL & 0x10))
@@ -864,53 +874,60 @@ void upd7810_device::upd7810_take_irq()
 		irqline = UPD7810_INTF2;
 		vector = 0x0010;
 		if (0 != (MKL & 0x08))
-			IRR&=~INTF2;
+			irr_mask = INTF2;
 	}
 	else
 	if ((IRR & INTFE0)  && 0 == (MKL & 0x20))
 	{
 		vector = 0x0018;
 		if (0 != (MKL & 0x40))
-			IRR&=~INTFE0;
+			irr_mask = INTFE0;
 	}
 	else
 	if ((IRR & INTFE1)  && 0 == (MKL & 0x40))
 	{
 		vector = 0x0018;
 		if (0 != (MKL & 0x20))
-			IRR&=~INTFE1;
+			irr_mask = INTFE1;
 	}
 	else
 	if ((IRR & INTFEIN) && 0 == (MKL & 0x80))
 	{
 		vector = 0x0020;
 		if (0 != (MKH & 0x01))
-			IRR&=~INTFEIN;
+			irr_mask = INTFEIN;
 	}
 	else
 	if ((IRR & INTFAD)  && 0 == (MKH & 0x01))
 	{
 		vector = 0x0020;
 		if (0 != (MKL & 0x80))
-			IRR&=~INTFAD;
+			irr_mask = INTFAD;
 	}
 	else
 	if ((IRR & INTFSR)  && 0 == (MKH & 0x02))
 	{
 		vector = 0x0028;
 		if (0 != (MKH & 0x04))
-			IRR&=~INTFSR;
+			irr_mask = INTFSR;
 	}
 	else
 	if ((IRR & INTFST)  && 0 == (MKH & 0x04))
 	{
 		vector = 0x0028;
 		if (0 != (MKH & 0x02))
-			IRR&=~INTFST;
+			irr_mask = INTFST;
 	}
 
 	if (vector)
 	{
+		// release halt on any non-masked interrupt even when IFF = 0
+		m_halt = 0;
+
+		/* global interrupt disable? */
+		if (0 == IFF && !(IRR & INTFNMI))
+			return;
+
 		/* acknowledge external IRQ */
 		if (irqline)
 			standard_irq_callback(irqline, PC);
@@ -921,6 +938,7 @@ void upd7810_device::upd7810_take_irq()
 		SP--;
 		WM( SP, PCL );
 		IFF = m_iff_pending = 0;
+		IRR &= ~irr_mask;
 		PSW &= ~(SK|L0|L1);
 		PC = vector;
 	}
@@ -929,11 +947,8 @@ void upd7810_device::upd7810_take_irq()
 void upd7801_device::upd7810_take_irq()
 {
 	uint16_t vector = 0;
+	uint16_t irr_mask = 0;
 	int irqline = 0;
-
-	/* global interrupt disable? */
-	if (0 == IFF)
-		return;
 
 	/* 1 - SOFTI - vector at 0x0060 */
 	/* 2 - INT0 - Masked by MK0 bit */
@@ -941,37 +956,43 @@ void upd7801_device::upd7810_take_irq()
 	{
 		irqline = UPD7810_INTF0;
 		vector = 0x0004;
-		IRR &= ~INTF0;
 	}
 	/* 3 - INTT - Masked by MKT bit */
 	if ( IRR & INTFT0 && 0 == ( MKL & 0x02 ) )
 	{
 		vector = 0x0008;
-		IRR &= ~INTFT0;
+		irr_mask = INTFT0;
 	}
 	/* 4 - INT1 - Masked by MK1 bit */
 	if ( IRR & INTF1 && 0 == ( MKL & 0x04 ) )
 	{
 		irqline = UPD7810_INTF1;
 		vector = 0x0010;
-		IRR &= ~INTF1;
+		irr_mask = INTF1;
 	}
 	/* 5 - INT2 - Masked by MK2 bit */
 	if ( IRR & INTF2 && 0 == ( MKL & 0x08 ) )
 	{
 		irqline = UPD7810_INTF2;
 		vector = 0x0020;
-		IRR &= ~INTF2;
+		irr_mask = INTF2;
 	}
 	/* 6 - INTS - Masked by MKS bit */
 	if ( IRR & INTFST && 0 == ( MKL & 0x10 ) )
 	{
 		vector = 0x0040;
-		IRR &= ~INTFST;
+		irr_mask = INTFST;
 	}
 
 	if (vector)
 	{
+		// release halt on any non-masked interrupt even when IFF = 0
+		m_halt = 0;
+
+		/* global interrupt disable? */
+		if (0 == IFF)
+			return;
+
 		/* acknowledge external IRQ */
 		if (irqline)
 			standard_irq_callback(irqline, PC);
@@ -982,6 +1003,7 @@ void upd7801_device::upd7810_take_irq()
 		SP--;
 		WM( SP, PCL );
 		IFF = m_iff_pending = 0;
+		IRR &= ~irr_mask;
 		PSW &= ~(SK|L0|L1);
 		PC = vector;
 	}
@@ -1670,6 +1692,8 @@ void upd7810_device::base_device_start()
 {
 	space(AS_PROGRAM).specific(m_program);
 	space(AS_PROGRAM).cache(m_opcodes);
+	if (has_space(AS_IO))
+		space(AS_IO).specific(m_io);
 
 	configure_ops();
 
@@ -1740,6 +1764,7 @@ void upd7810_device::base_device_start()
 	save_item(NAME(m_nmi));
 	save_item(NAME(m_int1));
 	save_item(NAME(m_int2));
+	save_item(NAME(m_halt));
 
 	save_item(NAME(m_txs));
 	save_item(NAME(m_rxs));
@@ -1773,6 +1798,7 @@ void upd7810_device::device_start()
 	state_add( UPD7810_PC,   "PC",   m_pc.w.l).formatstr("%04X");
 	state_add( UPD7810_SP,   "SP",   m_sp.w.l).formatstr("%04X");
 	state_add( UPD7810_PSW,  "PSW",  m_psw).formatstr("%02X");
+	state_add( UPD7810_IFF,  "IFF",  m_iff).formatstr("%1u");
 	state_add( UPD7810_A,    "A",    m_va.b.l).formatstr("%02X");
 	state_add( UPD7810_V,    "V",    m_va.b.h).formatstr("%02X");
 	state_add( UPD7810_EA,   "EA",   m_ea.w.l).formatstr("%04X");
@@ -1837,17 +1863,23 @@ void upd7801_device::device_start()
 	state_add( UPD7810_PC,   "PC",   m_pc.w.l).formatstr("%04X");
 	state_add( UPD7810_SP,   "SP",   m_sp.w.l).formatstr("%04X");
 	state_add( UPD7810_PSW,  "PSW",  m_psw).formatstr("%02X");
+	state_add( UPD7810_IFF,  "IFF",  m_iff).formatstr("%1u");
 	state_add( UPD7810_A,    "A",    m_va.b.l).formatstr("%02X");
 	state_add( UPD7810_V,    "V",    m_va.b.h).formatstr("%02X");
-	state_add( UPD7810_EA,   "EA",   m_ea.w.l).formatstr("%04X");
 	state_add( UPD7810_BC,   "BC",   m_bc.w.l).formatstr("%04X");
 	state_add( UPD7810_DE,   "DE",   m_de.w.l).formatstr("%04X");
 	state_add( UPD7810_HL,   "HL",   m_hl.w.l).formatstr("%04X");
+	state_add( UPD7810_A2,   "A'",   m_va2.b.l).formatstr("%02X");
+	state_add( UPD7810_V2,   "V'",   m_va2.b.h).formatstr("%02X");
+	state_add( UPD7810_BC2,  "BC'",  m_bc2.w.l).formatstr("%04X");
+	state_add( UPD7810_DE2,  "DE'",  m_de2.w.l).formatstr("%04X");
+	state_add( UPD7810_HL2,  "HL'",  m_hl2.w.l).formatstr("%04X");
 	state_add( UPD7810_CNT0, "CNT0", m_cnt.b.l).formatstr("%02X");
 	state_add( UPD7810_CNT1, "CNT1", m_cnt.b.h).formatstr("%02X");
 	state_add( UPD7810_TM0,  "TM0",  m_tm.b.l).formatstr("%02X");
 	state_add( UPD7810_TM1,  "TM1",  m_tm.b.h).formatstr("%02X");
 	state_add( UPD7810_MB,   "MB",   m_mb).formatstr("%02X");
+	state_add( UPD7810_MC,   "MC",   m_mc).formatstr("%02X");
 	state_add( UPD7810_MKL,  "MKL",  m_mkl).formatstr("%02X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc.w.l ).formatstr("%04X").noshow();
@@ -1862,9 +1894,8 @@ void upd78c05_device::device_start()
 	state_add( UPD7810_PC,   "PC",   m_pc.w.l).formatstr("%04X");
 	state_add( UPD7810_SP,   "SP",   m_sp.w.l).formatstr("%04X");
 	state_add( UPD7810_PSW,  "PSW",  m_psw).formatstr("%02X");
+	state_add( UPD7810_IFF,  "IFF",  m_iff).formatstr("%1u");
 	state_add( UPD7810_A,    "A",    m_va.b.l).formatstr("%02X");
-	state_add( UPD7810_V,    "V",    m_va.b.h).formatstr("%02X");
-	state_add( UPD7810_EA,   "EA",   m_ea.w.l).formatstr("%04X");
 	state_add( UPD7810_BC,   "BC",   m_bc.w.l).formatstr("%04X");
 	state_add( UPD7810_DE,   "DE",   m_de.w.l).formatstr("%04X");
 	state_add( UPD7810_HL,   "HL",   m_hl.w.l).formatstr("%04X");
@@ -1973,6 +2004,7 @@ void upd7810_device::device_reset()
 	m_nmi = 0;
 	m_int1 = 0;
 	m_int2 = 1; // physical (inverted) INT2 line state
+	m_halt = 0;
 
 	m_txs = 0;
 	m_rxs = ~0;
@@ -2016,6 +2048,16 @@ void upd7810_device::execute_run()
 {
 	do
 	{
+		if (m_halt)
+		{
+			debugger_wait_hook();
+			// continue running peripherals until a pending (internal or external) interrupt
+			m_icount--;
+			handle_timers(1);
+			upd7810_take_irq();
+			continue;
+		}
+
 		int cc;
 
 		PPC = PC;
@@ -2100,7 +2142,7 @@ void upd7801_device::execute_set_input(int irqline, int state)
 		if ( state == ASSERT_LINE )
 			IRR |= INTF0;
 		else
-			IRR &= INTF0;
+			IRR &= ~INTF0;
 		break;
 
 	case UPD7810_INTF1:

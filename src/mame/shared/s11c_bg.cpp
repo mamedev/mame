@@ -401,7 +401,7 @@ void s11c_bg_device::s11_bg_cvsd(machine_config &config)
 	FILTER_BIQUAD(config, m_cvsd_filter2).opamp_mfb_lowpass_setup(RES_K(27), RES_K(15), RES_K(27), CAP_P(4700), CAP_P(1200));
 	FILTER_BIQUAD(config, m_cvsd_filter).opamp_mfb_lowpass_setup(RES_K(43), RES_K(36), RES_K(180), CAP_P(0), CAP_P(180)); // note the first capacitor is 0pf meaning it doesn't exist
 	m_cvsd_filter->add_route(ALL_OUTPUTS, m_cvsd_filter2, 1.0);
-	HC55516(config, m_cvsd, 0).add_route(ALL_OUTPUTS, m_cvsd_filter, 1.0/4.0); // to prevent massive clipping issues, we divide the signal by 4 here before going into the filters, then multiply it by 4 after it comes out the other end
+	HC55516(config, m_cvsd).add_route(ALL_OUTPUTS, m_cvsd_filter, 1.0/4.0); // to prevent massive clipping issues, we divide the signal by 4 here before going into the filters, then multiply it by 4 after it comes out the other end
 }
 
 

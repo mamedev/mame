@@ -5,55 +5,16 @@
     Atmel 8-bit AVR simulator
 
     - Notes -
-      Cycle counts are generally considered to be 100% accurate per-instruction, does not support mid-instruction
-      interrupts although no software has been encountered yet that requires it. Evidence of cycle accuracy is given
-      in the form of the demoscene 'wild' demo, Craft, by [lft], which uses an ATmega88 to write video out a 6-bit
-      RGB DAC pixel-by-pixel, synchronously with the frame timing. Intentionally modifying the timing of any of
+      Cycle counts are generally considered to be 100% accurate per-instruction. External interrupt sources
+      (pin-change and INT0/INT1) may be triggered mid-instruction by an arbitrary external context; these are
+      latched into PCIFR/EIFR immediately and the actual interrupt is taken at the next execute_run() instruction
+      boundary. Evidence of cycle accuracy is given in the form of the demoscene 'wild' demo, Craft, by [lft],
+      which uses an ATmega88 to write video out a 6-bit RGB DAC pixel-by-pixel, synchronously with the frame
+      timing. Intentionally modifying the timing of any of
       the existing opcodes has been shown to wildly corrupt the video output in Craft, so one can assume that the
       existing timing is 100% correct.
 
-      Unimplemented opcodes: SPM, SPM Z+, SLEEP, BREAK, WDR, EICALL
-
-    - Changelist -
-      05 Jul. 2015 [Felipe Sanches]
-      - Implemented EIJMP instruction
-
-      29 Dec. 2013 [Felipe Sanches]
-      - Added crude boilerplate code for Timer/Counter #4
-
-      25 Dec. 2013 [Felipe Sanches]
-      - Updated AVR8_REGIDX_* enum based on ATMEGA640/1280/2560 datasheet
-
-      24 Dec. 2013 [Felipe Sanches]
-      - update data memory mapping so that all 0x200 register addresses are accessible
-
-      23 Dec. 2013 [Felipe Sanches]
-      - Added ELPM instructions
-      - Added fuse bits macros
-      - Added reset logic to decide initial program counter based on fuse bits configuration
-      - Added initial support for ATMEGA1280 and ATMEGA2560
-      - Use register names in the disassembly of IN and OUT instructions
-
-      23 Dec. 2012 [Sandro Ronco]
-      - Added CPSE, LD Z+, ST -Z/-Y/-X and ICALL opcodes
-      - Fixed Z flag in CPC, SBC and SBCI opcodes
-      - Fixed V and C flags in SBIW opcode
-
-      30 Oct. 2012
-      - Added FMUL, FMULS, FMULSU opcodes [Ryan Holtz]
-      - Fixed incorrect flag calculation in ROR opcode [Ryan Holtz]
-      - Fixed incorrect bit testing in SBIC/SBIS opcodes [Ryan Holtz]
-
-      25 Oct. 2012
-      - Added MULS, ANDI, STI Z+, LD -Z, LD -Y, LD -X, LD Y+q, LD Z+q, SWAP, ASR, ROR and SBIS opcodes [Ryan Holtz]
-      - Corrected cycle counts for LD and ST opcodes [Ryan Holtz]
-      - Moved opcycles init into inner while loop, fixes 2-cycle and 3-cycle opcodes effectively forcing
-        all subsequent 1-cycle opcodes to be 2 or 3 cycles [Ryan Holtz]
-      - Fixed register behavior in MULSU, LD -Z, and LD -Y opcodes [Ryan Holtz]
-
-      18 Oct. 2012
-      - Added OR, SBCI, ORI, ST Y+, ADIQ opcodes [Ryan Holtz]
-      - Fixed COM, NEG, LSR opcodes [Ryan Holtz]
+      Unimplemented opcodes: SPM, SPM Z+, BREAK, WDR, EICALL
 
 */
 
@@ -88,10 +49,12 @@
 #define LOG_ASYNC           (1U << 25)
 #define LOG_TWI             (1U << 26)
 #define LOG_UART            (1U << 27)
+#define LOG_INTERRUPTS      (1U << 28)
 #define LOG_TIMERS          (LOG_TIMER0 | LOG_TIMER1 | LOG_TIMER2 | LOG_TIMER3 | LOG_TIMER4 | LOG_TIMER5)
 #define LOG_TIMER_TICKS     (LOG_TIMER0_TICK | LOG_TIMER1_TICK | LOG_TIMER2_TICK | LOG_TIMER3_TICK | LOG_TIMER4_TICK | LOG_TIMER5_TICK)
 #define LOG_ALL             (LOG_UNKNOWN | LOG_BOOT | LOG_TIMERS | LOG_EEPROM | LOG_GPIO | LOG_WDOG | LOG_CLOCK | LOG_POWER \
-							 | LOG_OSC | LOG_PINCHG | LOG_EXTMEM | LOG_ADC | LOG_DIGINPUT | LOG_ASYNC | LOG_TWI | LOG_UART)
+							 | LOG_OSC | LOG_PINCHG | LOG_EXTMEM | LOG_ADC | LOG_DIGINPUT | LOG_ASYNC | LOG_TWI | LOG_UART \
+							 | LOG_INTERRUPTS)
 
 #define VERBOSE             (0)
 //#define LOG_OUTPUT_FUNC     osd_printf_info
@@ -322,6 +285,25 @@ enum
 #define TIFR2_OCF2B_MASK    0x04
 #define TIFR2_MASK          (TIFR2_TOV2_MASK | TIFR2_OCF2B_MASK | TIFR2_OCF2A_MASK)
 
+#define PCICR_PCIE0_MASK    (1 << 0)
+#define PCICR_PCIE1_MASK    (1 << 1)
+#define PCICR_PCIE2_MASK    (1 << 2)
+
+#define PCIFR_PCIF0_MASK    (1 << 0)
+#define PCIFR_PCIF1_MASK    (1 << 1)
+#define PCIFR_PCIF2_MASK    (1 << 2)
+
+#define EIMSK_INT0_MASK     (1 << 0)
+#define EIMSK_INT1_MASK     (1 << 1)
+
+#define EIFR_INTF0_MASK     (1 << 0)
+#define EIFR_INTF1_MASK     (1 << 1)
+
+#define EICRA_ISC0_SHIFT    0
+#define EICRA_ISC0_MASK     0x03
+#define EICRA_ISC1_SHIFT    2
+#define EICRA_ISC1_MASK     0x0c
+
 #define TIMSK3_TOIE3_BIT    0
 #define TIMSK3_OCIE3A_BIT   1
 #define TIMSK3_OCIE3B_BIT   2
@@ -478,8 +460,6 @@ enum
 
 #define SPI_RATE            ((SPSR_SPR2X << 2) | SPCR_SPR)
 
-#define PORTB_MOSI          0x08
-
 #define EECR_MASK           0x3f
 #define EECR_EERE_BIT       0
 #define EECR_EEPE_BIT       1
@@ -524,7 +504,6 @@ enum
 #define ADCSRA_ADSC         ((m_r[ADCSRA] & ADCSRA_ADSC_MASK) >> 6)
 #define ADCSRA_ADEN         ((m_r[ADCSRA] & ADCSRA_ADEN_MASK) >> 7)
 
-
 //**************************************************************************
 //  DEVICE INTERFACE
 //**************************************************************************
@@ -532,10 +511,11 @@ enum
 DEFINE_DEVICE_TYPE(ATMEGA88,   atmega88_device,   "atmega88",   "Atmel ATmega88")
 DEFINE_DEVICE_TYPE(ATMEGA168,  atmega168_device,  "atmega168",  "Atmel ATmega168")
 DEFINE_DEVICE_TYPE(ATMEGA328,  atmega328_device,  "atmega328",  "Atmel ATmega328")
+DEFINE_DEVICE_TYPE(ATMEGA32U4, atmega32u4_device, "atmega32u4", "Atmel ATmega32U4")
 DEFINE_DEVICE_TYPE(ATMEGA644,  atmega644_device,  "atmega644",  "Atmel ATmega644")
+DEFINE_DEVICE_TYPE(ATMEGA1284, atmega1284_device, "atmega1284", "Atmel ATmega1284")
 DEFINE_DEVICE_TYPE(ATMEGA1280, atmega1280_device, "atmega1280", "Atmel ATmega1280")
 DEFINE_DEVICE_TYPE(ATMEGA2560, atmega2560_device, "atmega2560", "Atmel ATmega2560")
-DEFINE_DEVICE_TYPE(ATTINY15,   attiny15_device,   "attiny15",   "Atmel ATtiny15")
 
 //**************************************************************************
 //  INTERNAL ADDRESS MAP
@@ -546,22 +526,31 @@ void avr8_device<NumTimers>::base_internal_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram().share(m_r);
 	map(0x0020, 0x0020).r(FUNC(avr8_device::pin_r<0>));
+	map(0x0021, 0x0021).w(FUNC(avr8_device::ddr_w<GPIOA>));
 	map(0x0022, 0x0022).rw(FUNC(avr8_device::gpio_r<GPIOA>), FUNC(avr8_device::port_w<GPIOA>));
 	map(0x0023, 0x0023).r(FUNC(avr8_device::pin_r<1>));
+	map(0x0024, 0x0024).w(FUNC(avr8_device::ddr_w<GPIOB>));
 	map(0x0025, 0x0025).rw(FUNC(avr8_device::gpio_r<GPIOB>), FUNC(avr8_device::port_w<GPIOB>));
 	map(0x0026, 0x0026).r(FUNC(avr8_device::pin_r<2>));
+	map(0x0027, 0x0027).w(FUNC(avr8_device::ddr_w<GPIOC>));
 	map(0x0028, 0x0028).rw(FUNC(avr8_device::gpio_r<GPIOC>), FUNC(avr8_device::port_w<GPIOC>));
 	map(0x0029, 0x0029).r(FUNC(avr8_device::pin_r<3>));
+	map(0x002a, 0x002a).w(FUNC(avr8_device::ddr_w<GPIOD>));
 	map(0x002b, 0x002b).rw(FUNC(avr8_device::gpio_r<GPIOD>), FUNC(avr8_device::port_w<GPIOD>));
 	map(0x002c, 0x002c).r(FUNC(avr8_device::pin_r<4>));
+	map(0x002d, 0x002d).w(FUNC(avr8_device::ddr_w<GPIOE>));
 	map(0x002e, 0x002e).rw(FUNC(avr8_device::gpio_r<GPIOE>), FUNC(avr8_device::port_w<GPIOE>));
 	map(0x002f, 0x002f).r(FUNC(avr8_device::pin_r<5>));
+	map(0x0030, 0x0030).w(FUNC(avr8_device::ddr_w<GPIOF>));
 	map(0x0031, 0x0031).rw(FUNC(avr8_device::gpio_r<GPIOF>), FUNC(avr8_device::port_w<GPIOF>));
 	map(0x0032, 0x0032).r(FUNC(avr8_device::pin_r<6>));
+	map(0x0033, 0x0033).w(FUNC(avr8_device::ddr_w<GPIOG>));
 	map(0x0034, 0x0034).rw(FUNC(avr8_device::gpio_r<GPIOG>), FUNC(avr8_device::port_w<GPIOG>));
 	map(0x0035, 0x0035).w(FUNC(avr8_device::tifr0_w));
 	map(0x0036, 0x0036).w(FUNC(avr8_device::tifr1_w));
 	map(0x0037, 0x0037).w(FUNC(avr8_device::tifr2_w));
+	map(0x003b, 0x003b).w(FUNC(avr8_device::pcifr_w));
+	map(0x003c, 0x003c).w(FUNC(avr8_device::eifr_w));
 	map(0x003e, 0x003e).w(FUNC(avr8_device::gpior0_w));
 	map(0x003f, 0x003f).w(FUNC(avr8_device::eecr_w));
 	map(0x0043, 0x0043).w(FUNC(avr8_device::gtccr_w));
@@ -668,7 +657,20 @@ void atmega328_device::atmega328_internal_map(address_map &map)
 	avr8_device::base_internal_map(map);
 }
 
+void atmega32u4_device::atmega32u4_internal_map(address_map &map)
+{
+	avr8_device::base_internal_map(map);
+
+	// fake USB PLL lock so that code that reads it is satisfied
+	map(0x0049, 0x0049).lr8(NAME([this] { return m_r[0x49] | 1; }));
+}
+
 void atmega644_device::atmega644_internal_map(address_map &map)
+{
+	avr8_device::base_internal_map(map);
+}
+
+void atmega1284_device::atmega1284_internal_map(address_map &map)
 {
 	avr8_device::base_internal_map(map);
 }
@@ -677,12 +679,16 @@ void atmega1280_device::atmega1280_internal_map(address_map &map)
 {
 	avr8_device::base_internal_map(map);
 	map(0x0100, 0x0100).r(FUNC(atmega1280_device::pin_r<7>));
+	map(0x0101, 0x0101).w(FUNC(atmega1280_device::ddr_w<GPIOH>));
 	map(0x0102, 0x0102).rw(FUNC(atmega1280_device::gpio_r<GPIOH>), FUNC(atmega1280_device::port_w<GPIOH>));
 	map(0x0103, 0x0103).r(FUNC(atmega1280_device::pin_r<8>));
+	map(0x0104, 0x0104).w(FUNC(atmega1280_device::ddr_w<GPIOJ>));
 	map(0x0105, 0x0105).rw(FUNC(atmega1280_device::gpio_r<GPIOJ>),FUNC(atmega1280_device::port_w<GPIOJ>));
 	map(0x0106, 0x0106).r(FUNC(atmega1280_device::pin_r<9>));
+	map(0x0107, 0x0107).w(FUNC(atmega1280_device::ddr_w<GPIOK>));
 	map(0x0108, 0x0108).rw(FUNC(atmega1280_device::gpio_r<GPIOK>),FUNC(atmega1280_device::port_w<GPIOK>));
 	map(0x0109, 0x0109).r(FUNC(atmega1280_device::pin_r<10>));
+	map(0x010a, 0x010a).w(FUNC(atmega1280_device::ddr_w<GPIOL>));
 	map(0x010b, 0x010b).rw(FUNC(atmega1280_device::gpio_r<GPIOL>),FUNC(atmega1280_device::port_w<GPIOL>));
 	map(0x0120, 0x0120).w(FUNC(atmega1280_device::tccr5a_w));
 	map(0x0121, 0x0121).w(FUNC(atmega1280_device::tccr5b_w));
@@ -692,21 +698,21 @@ void atmega2560_device::atmega2560_internal_map(address_map &map)
 {
 	avr8_device::base_internal_map(map);
 	map(0x0100, 0x0100).r(FUNC(atmega2560_device::pin_r<7>));
+	map(0x0101, 0x0101).w(FUNC(atmega2560_device::ddr_w<GPIOH>));
 	map(0x0102, 0x0102).rw(FUNC(atmega2560_device::gpio_r<GPIOH>), FUNC(atmega2560_device::port_w<GPIOH>));
 	map(0x0103, 0x0103).r(FUNC(atmega2560_device::pin_r<8>));
+	map(0x0104, 0x0104).w(FUNC(atmega2560_device::ddr_w<GPIOJ>));
 	map(0x0105, 0x0105).rw(FUNC(atmega2560_device::gpio_r<GPIOJ>),FUNC(atmega2560_device::port_w<GPIOJ>));
 	map(0x0106, 0x0106).r(FUNC(atmega2560_device::pin_r<9>));
+	map(0x0107, 0x0107).w(FUNC(atmega2560_device::ddr_w<GPIOK>));
 	map(0x0108, 0x0108).rw(FUNC(atmega2560_device::gpio_r<GPIOK>),FUNC(atmega2560_device::port_w<GPIOK>));
 	map(0x0109, 0x0109).r(FUNC(atmega2560_device::pin_r<10>));
+	map(0x010a, 0x010a).w(FUNC(atmega2560_device::ddr_w<GPIOL>));
 	map(0x010b, 0x010b).rw(FUNC(atmega2560_device::gpio_r<GPIOL>),FUNC(atmega2560_device::port_w<GPIOL>));
 	map(0x0120, 0x0120).w(FUNC(atmega2560_device::tccr5a_w));
 	map(0x0121, 0x0121).w(FUNC(atmega2560_device::tccr5b_w));
 }
 
-void attiny15_device::attiny15_internal_map(address_map &map)
-{
-	avr8_device::base_internal_map(map);
-}
 
 //-------------------------------------------------
 //  atmega88_device - constructor
@@ -715,6 +721,17 @@ void attiny15_device::attiny15_internal_map(address_map &map)
 atmega88_device::atmega88_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA88, 0x0fff, address_map_constructor(FUNC(atmega88_device::atmega88_internal_map), this))
 {
+}
+
+bool atmega88_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const
+{
+	switch (port)
+	{
+	case GPIOB: pcmsk_reg = PCMSK0; group = 0; return true;
+	case GPIOC: pcmsk_reg = PCMSK1; group = 1; return true;
+	case GPIOD: pcmsk_reg = PCMSK2; group = 2; return true;
+	default: return false;
+	}
 }
 
 //-------------------------------------------------
@@ -736,11 +753,30 @@ atmega328_device::atmega328_device(const machine_config &mconfig, const char *ta
 }
 
 //-------------------------------------------------
+//  atmega32u4_device - constructor
+//-------------------------------------------------
+
+atmega32u4_device::atmega32u4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: avr8_device<4>(mconfig, tag, owner, clock, ATMEGA32U4, 0x3fff, address_map_constructor(FUNC(atmega32u4_device::atmega32u4_internal_map), this))
+{
+}
+
+
+//-------------------------------------------------
 //  atmega644_device - constructor
 //-------------------------------------------------
 
 atmega644_device::atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA644, 0x7fff, address_map_constructor(FUNC(atmega644_device::atmega644_internal_map), this))
+{
+}
+
+//-------------------------------------------------
+//  atmega1284_device - constructor
+//-------------------------------------------------
+
+atmega1284_device::atmega1284_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA1284, 0xffff, address_map_constructor(FUNC(atmega1284_device::atmega1284_internal_map), this))
 {
 }
 
@@ -763,15 +799,6 @@ atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *
 }
 
 //-------------------------------------------------
-//  attiny15_device - constructor
-//-------------------------------------------------
-
-attiny15_device::attiny15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<2>(mconfig, tag, owner, clock, ATTINY15, 0x01ff, address_map_constructor(FUNC(attiny15_device::attiny15_internal_map), this))
-{
-}
-
-//-------------------------------------------------
 //  avr8_base_device - constructor
 //-------------------------------------------------
 
@@ -787,7 +814,8 @@ avr8_base_device::avr8_base_device(const machine_config &mconfig, const char *ta
 	, m_r(*this, "regs")
 	, m_pc(0)
 	, m_addr_mask((addr_mask << 1) | 1)
-	, m_interrupt_pending(false)
+	, m_sleeping(false)
+	, m_sei_delay_pending(false)
 {
 }
 
@@ -801,6 +829,7 @@ avr8_device<NumTimers>::avr8_device(const machine_config &mconfig, const char *t
 	, m_spi_active(false)
 	, m_spi_prescale(0)
 	, m_spi_prescale_count(0)
+	, m_spi_rx_shift(0)
 {
 	// Fill in default callbacks
 	for (int i = 0; i < 8*4; i++)
@@ -815,7 +844,7 @@ avr8_device<NumTimers>::avr8_device(const machine_config &mconfig, const char *t
 	// Fill in the mode-specific callbacks
 	for (int i = 0; i < 8; i++)
 	{
-		for (int j = 1; j < 4; j++)
+		for (int j = 0; j < 4; j++)
 		{
 			switch (i)
 			{
@@ -962,7 +991,7 @@ void avr8_base_device::set_lock_bits(const uint8_t byte)
 }
 
 //-------------------------------------------------
-//  unimplemented_opcode - bail on unspuported
+//  unimplemented_opcode - bail on unsupported
 //  instruction
 //-------------------------------------------------
 
@@ -1062,7 +1091,8 @@ void avr8_base_device::device_start()
 
 	// Misc.
 	save_item(NAME(m_addr_mask));
-	save_item(NAME(m_interrupt_pending));
+	save_item(NAME(m_sleeping));
+	save_item(NAME(m_sei_delay_pending));
 	save_item(NAME(m_opcycles));
 
 	// set our instruction counter
@@ -1082,6 +1112,10 @@ void avr8_base_device::device_start()
 	populate_sbc_flag_cache();
 	populate_bool_flag_cache();
 	populate_shift_flag_cache();
+
+	populate_interrupt_condition_table();
+	std::fill_n(m_int_statuses, INTIDX_COUNT, 0);
+	save_item(NAME(m_int_statuses));
 }
 
 template <int NumTimers>
@@ -1090,6 +1124,10 @@ void avr8_device<NumTimers>::device_start()
 	avr8_base_device::device_start();
 
 	m_adc_timer = timer_alloc(FUNC(avr8_device<NumTimers>::adc_conversion_complete), this);
+
+	// GPIO
+	save_item(NAME(m_gpio_in));
+	save_item(NAME(m_pcint_last));
 
 	// Timers
 	save_item(NAME(m_timer_top));
@@ -1110,6 +1148,7 @@ void avr8_device<NumTimers>::device_start()
 	save_item(NAME(m_spi_prescale));
 	save_item(NAME(m_spi_prescale_count));
 	save_item(NAME(m_spi_prescale_countdown));
+	save_item(NAME(m_spi_rx_shift));
 }
 
 //-------------------------------------------------
@@ -1163,12 +1202,22 @@ void avr8_base_device::device_reset()
 		m_r[i] = 0;
 	}
 
-	m_interrupt_pending = false;
+	m_sleeping = false;
+	m_sei_delay_pending = false;
+
+	// clear any pending interrupts (the register zero loop above will have already
+	// acknowledged any pending and disabled any that could have fired)
+	for (int i = 0; i < INTIDX_COUNT; i++)
+	{
+		m_int_statuses[i] = 0;
+	}
 }
 
 template <int NumTimers>
 void avr8_device<NumTimers>::device_reset()
 {
+	avr8_base_device::device_reset();
+
 	m_adc_sample = 0;
 	m_adc_result = 0;
 	m_adc_data = 0;
@@ -1178,6 +1227,7 @@ void avr8_device<NumTimers>::device_reset()
 	m_spi_active = false;
 	m_spi_prescale = 0;
 	m_spi_prescale_count = 0;
+	m_spi_rx_shift = 0;
 
 	for (int t = 0; t < NumTimers; t++)
 	{
@@ -1268,169 +1318,339 @@ inline uint8_t avr8_base_device::pop()
 //  IRQ HANDLING
 //**************************************************************************
 
-void avr8_base_device::set_irq_line(uint16_t vector, int state)
+
+const avr8_base_device::interrupt_condition avr8_base_device::s_int_conditions[] =
 {
-	if (state)
+	// irq id        vector            irq reg    irq reg mask        flag reg  flag reg mask
+	{ INTIDX_SPI,    AVR8_INT_SPI_STC, SPCR,      SPCR_SPIE_MASK,     SPSR,     SPSR_SPIF_MASK   },
+	{ INTIDX_OCF0B,  AVR8_INT_T0COMPB, TIMSK0,    TIMSK0_OCIE0B_MASK, TIFR0,    TIFR0_OCF0B_MASK },
+	{ INTIDX_OCF0A,  AVR8_INT_T0COMPA, TIMSK0,    TIMSK0_OCIE0A_MASK, TIFR0,    TIFR0_OCF0A_MASK },
+	{ INTIDX_TOV0,   AVR8_INT_T0OVF,   TIMSK0,    TIMSK0_TOIE0_MASK,  TIFR0,    TIFR0_TOV0_MASK  },
+	{ INTIDX_ICF1,   AVR8_INT_T1CAPT,  TIMSK1,    TIMSK1_ICIE1_MASK,  TIFR1,    TIFR1_ICF1_MASK  },
+	{ INTIDX_OCF1B,  AVR8_INT_T1COMPB, TIMSK1,    TIMSK1_OCIE1B_MASK, TIFR1,    TIFR1_OCF1B_MASK },
+	{ INTIDX_OCF1A,  AVR8_INT_T1COMPA, TIMSK1,    TIMSK1_OCIE1A_MASK, TIFR1,    TIFR1_OCF1A_MASK },
+	{ INTIDX_TOV1,   AVR8_INT_T1OVF,   TIMSK1,    TIMSK1_TOIE1_MASK,  TIFR1,    TIFR1_TOV1_MASK  },
+	{ INTIDX_OCF2B,  AVR8_INT_T2COMPB, TIMSK2,    TIMSK2_OCIE2B_MASK, TIFR2,    TIFR2_OCF2B_MASK },
+	{ INTIDX_OCF2A,  AVR8_INT_T2COMPA, TIMSK2,    TIMSK2_OCIE2A_MASK, TIFR2,    TIFR2_OCF2A_MASK },
+	{ INTIDX_TOV2,   AVR8_INT_T2OVF,   TIMSK2,    TIMSK2_TOIE2_MASK,  TIFR2,    TIFR2_TOV2_MASK  },
+	{ INTIDX_PCINT0, AVR8_INT_PCINT0,  PCICR,     PCICR_PCIE0_MASK,   PCIFR,    PCIFR_PCIF0_MASK },
+	{ INTIDX_PCINT1, AVR8_INT_PCINT1,  PCICR,     PCICR_PCIE1_MASK,   PCIFR,    PCIFR_PCIF1_MASK },
+	{ INTIDX_PCINT2, AVR8_INT_PCINT2,  PCICR,     PCICR_PCIE2_MASK,   PCIFR,    PCIFR_PCIF2_MASK },
+	{ INTIDX_INT0,   AVR8_INT_INT0,    EIMSK,     EIMSK_INT0_MASK,    EIFR,     EIFR_INTF0_MASK  },
+	{ INTIDX_INT1,   AVR8_INT_INT1,    EIMSK,     EIMSK_INT1_MASK,    EIFR,     EIFR_INTF1_MASK  },
+	{ 0,             0,                0,         0,                  0,        0, 				 } // end of list
+};
+
+void avr8_base_device::update_interrupt(uint8_t intidx)
+{
+	// it's preferred you go through set_interrupt() or clear_interrupt() directly
+	// when that's the only operation that will be performed in that context.
+	// failure to do this might lead to unwanted side effects.
+	interrupt_condition condition = m_int_conditions_table[intidx];
+	if (!(0 <= condition.m_intidx && condition.m_intidx < INTIDX_COUNT))
 	{
-		if (BIT(m_r[SREG], SREG_I))
+		fatalerror("tried to update unmapped interrupt %d\n", intidx);
+	}
+
+	if (m_r[condition.m_regindex] & condition.m_regmask)
+	{
+		set_interrupt(intidx);
+	}
+	else
+	{
+		clear_interrupt(intidx);
+	}
+}
+
+void avr8_base_device::set_interrupt(uint8_t intidx)
+{
+	interrupt_condition condition = m_int_conditions_table[intidx];
+	if (!(0 <= condition.m_intidx && condition.m_intidx < INTIDX_COUNT))
+	{
+		fatalerror("tried to set unmapped interrupt %d\n", intidx);
+	}
+
+	m_r[condition.m_regindex] |= condition.m_regmask;
+	if (m_r[condition.m_intreg] & condition.m_intmask)
+	{
+		m_int_statuses[intidx] = 1;
+	}
+}
+
+void avr8_base_device::clear_interrupt(uint8_t intidx)
+{
+	interrupt_condition condition = m_int_conditions_table[intidx];
+	if (!(0 <= condition.m_intidx && condition.m_intidx < INTIDX_COUNT))
+	{
+		fatalerror("tried to clear unmapped interrupt %d\n", intidx);
+	}
+
+	// Clear event flag that raised the interrupt.
+	// This will either happen because the MCU took the interrupt (if interrupts on),
+	// or if the interrupt was manually acknowledged (if interrupts off).
+	m_r[condition.m_regindex] &= ~condition.m_regmask;
+
+	m_int_statuses[intidx] = 0;
+}
+
+void avr8_base_device::fire_interrupts()
+{
+	int interrupt_winner_idx = -1;
+	bool interrupt_firing = false;
+
+	if (BIT(m_r[SREG], SREG_I) == 0)
+	{
+		return;
+	}
+
+	// Basic rules for interrupts handling on the AVR8 series:
+	//
+	// - When multiple interrupts arrive at the same time, the one with the lowest
+	//   vector entry will win the race.
+	//
+	// - When an interrupt arrives when interrupts are disabled, it stays pending
+	//   and its flag stays 1. The interrupt stays pending until the MCU fires it,
+	//   or it's manually acknowledged (e.g., TOV0 is set to 1 by the user
+	//   while interrupts are disabled).
+	//
+	//   The same thing happens when multiple interrupts are pending, and
+	//   one or more of them loses the race; they simply get deferred until later.
+	//
+	// - The winning interrupt always clears its respective register flag
+	//   and gets acknowledged. The interrupt enable flag will stay set regardless.
+	//
+	// - There should never be a case where we need a tiebreaker, i.e., every interrupt
+	//   should be mapped to its own unique vector.
+	for (int i = 0; i < INTIDX_COUNT; i++)
+	{
+		if (!m_int_statuses[i]) continue;
+
+		interrupt_condition condition = m_int_conditions_table[i];
+		if (!(0 <= condition.m_intidx && condition.m_intidx < INTIDX_COUNT))
 		{
-			m_r[SREG] &= ~SREG_MASK_I;
-			push((m_pc >> 1) & 0x00ff);
-			push((m_pc >> 9) & 0x00ff);
-			m_pc = vector << 1;
+			fatalerror("interrupt %d set to fire, but wasn't mapped to anything", i);
+		}
+
+		if (!(m_r[condition.m_intreg] & condition.m_intmask))
+		{
+			logerror("%s: avr8 standard interrupt %d scheduled but its enable flag at %02x is cleared\n",
+					 machine().describe_context(),
+					 i,
+					 condition.m_intreg
+					 );
+			continue;
+		}
+
+		interrupt_firing = true;
+		if (interrupt_winner_idx == -1)
+		{
+			interrupt_winner_idx = i;
+		}
+		else if (condition.m_intvector >= m_int_conditions_table[interrupt_winner_idx].m_intvector)
+		{
+			LOGMASKED(LOG_INTERRUPTS, "interrupt %d already losing the race, currently winning is %d\n", i, interrupt_winner_idx);
 		}
 		else
 		{
-			m_interrupt_pending = true;
+			LOGMASKED(LOG_INTERRUPTS, "interrupt %d now losing the race, currently winning is %d\n", i, interrupt_winner_idx);
+			interrupt_winner_idx = i;
 		}
 	}
+
+	if (interrupt_firing)
+	{
+		LOGMASKED(LOG_INTERRUPTS, "interrupt %d won the race, firing it.\n", interrupt_winner_idx);
+		
+		m_r[SREG] &= ~SREG_MASK_I;
+		push((m_pc >> 1) & 0x00ff);
+		push((m_pc >> 9) & 0x00ff);
+		// TODO: 24-bit address pushes for 2560 and friends that use bigger flash space
+
+		m_pc = m_int_conditions_table[interrupt_winner_idx].m_intvector * (2 * vector_size_in_words());
+
+		m_sleeping = false;
+
+		clear_interrupt(interrupt_winner_idx);
+	}
 }
 
-const avr8_base_device::interrupt_condition avr8_base_device::s_int_conditions[avr8_base_device::INTIDX_COUNT] =
+inline bool avr8_base_device::interrupt_condition_entry_is_terminator(interrupt_condition condition)
 {
-	{ AVR8_INT_SPI_STC, SPCR,   SPCR_SPIE_MASK,     SPSR,    SPSR_SPIF_MASK },
-	{ AVR8_INT_T0COMPB, TIMSK0, TIMSK0_OCIE0B_MASK, TIFR0,   TIFR0_OCF0B_MASK },
-	{ AVR8_INT_T0COMPA, TIMSK0, TIMSK0_OCIE0A_MASK, TIFR0,   TIFR0_OCF0A_MASK },
-	{ AVR8_INT_T0OVF,   TIMSK0, TIMSK0_TOIE0_MASK,  TIFR0,   TIFR0_TOV0_MASK },
-	{ AVR8_INT_T1CAPT,  TIMSK1, TIMSK1_ICIE1_MASK,  TIFR1,   TIFR1_ICF1_MASK },
-	{ AVR8_INT_T1COMPB, TIMSK1, TIMSK1_OCIE1B_MASK, TIFR1,   TIFR1_OCF1B_MASK },
-	{ AVR8_INT_T1COMPA, TIMSK1, TIMSK1_OCIE1A_MASK, TIFR1,   TIFR1_OCF1A_MASK },
-	{ AVR8_INT_T1OVF,   TIMSK1, TIMSK1_TOIE1_MASK,  TIFR1,   TIFR1_TOV1_MASK },
-	{ AVR8_INT_T2COMPB, TIMSK2, TIMSK2_OCIE2B_MASK, TIFR2,   TIFR2_OCF2B_MASK },
-	{ AVR8_INT_T2COMPA, TIMSK2, TIMSK2_OCIE2A_MASK, TIFR2,   TIFR2_OCF2A_MASK },
-	{ AVR8_INT_T2OVF,   TIMSK2, TIMSK2_TOIE2_MASK,  TIFR2,   TIFR2_TOV2_MASK }
+	return std::all_of(
+				(uint8_t*)&condition,
+				(uint8_t*)&condition + sizeof(interrupt_condition),
+				[] (uint8_t value) { return value == 0; });
+}
+
+void avr8_base_device::populate_interrupt_condition_table()
+{
+	const avr8_base_device::interrupt_condition* int_conds = interrupt_conditions();
+	
+	m_int_conditions_table = std::make_unique<avr8_base_device::interrupt_condition[]>(INTIDX_COUNT);
+
+	for (int i = 0; i < INTIDX_COUNT; i++)
+	{
+		// unwire all vectors by default
+		m_int_conditions_table[i].m_intidx = INTIDX_COUNT;
+	}
+
+	for (int i = 0; !interrupt_condition_entry_is_terminator(int_conds[i]); i++)
+	{
+		std::memcpy(&m_int_conditions_table[int_conds[i].m_intidx], &int_conds[i], sizeof(avr8_base_device::interrupt_condition));
+	}
+}
+
+bool atmega168_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const
+{
+	switch (port)
+	{
+	case GPIOB: pcmsk_reg = PCMSK0; group = 0; return true;
+	case GPIOC: pcmsk_reg = PCMSK1; group = 1; return true;
+	case GPIOD: pcmsk_reg = PCMSK2; group = 2; return true;
+	default: return false;
+	}
+}
+
+bool atmega328_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const
+{
+	switch (port)
+	{
+	case GPIOB: pcmsk_reg = PCMSK0; group = 0; return true;
+	case GPIOC: pcmsk_reg = PCMSK1; group = 1; return true;
+	case GPIOD: pcmsk_reg = PCMSK2; group = 2; return true;
+	default: return false;
+	}
+}
+
+const avr8_base_device::interrupt_condition avr8_base_device::s_mega32u4_int_conditions[] =
+{
+	// intidx        vector                  irq reg   irq reg mask        flag reg  flag reg mask
+	{ INTIDX_SPI,    ATMEGA32U4_INT_SPI_STC, SPCR,     SPCR_SPIE_MASK,     SPSR,     SPSR_SPIF_MASK,   },
+	{ INTIDX_OCF0B,  ATMEGA32U4_INT_T0COMPB, TIMSK0,   TIMSK0_OCIE0B_MASK, TIFR0,    TIFR0_OCF0B_MASK, },
+	{ INTIDX_OCF0A,  ATMEGA32U4_INT_T0COMPA, TIMSK0,   TIMSK0_OCIE0A_MASK, TIFR0,    TIFR0_OCF0A_MASK, },
+	{ INTIDX_TOV0,   ATMEGA32U4_INT_T0OVF,   TIMSK0,   TIMSK0_TOIE0_MASK,  TIFR0,    TIFR0_TOV0_MASK, },
+	{ INTIDX_ICF1,   ATMEGA32U4_INT_T1CAPT,  TIMSK1,   TIMSK1_ICIE1_MASK,  TIFR1,    TIFR1_ICF1_MASK, },
+	{ INTIDX_OCF1B,  ATMEGA32U4_INT_T1COMPB, TIMSK1,   TIMSK1_OCIE1B_MASK, TIFR1,    TIFR1_OCF1B_MASK, },
+	{ INTIDX_OCF1A,  ATMEGA32U4_INT_T1COMPA, TIMSK1,   TIMSK1_OCIE1A_MASK, TIFR1,    TIFR1_OCF1A_MASK, },
+	{ INTIDX_TOV1,   ATMEGA32U4_INT_T1OVF,   TIMSK1,   TIMSK1_TOIE1_MASK,  TIFR1,    TIFR1_TOV1_MASK, },
+	{ INTIDX_PCINT0, ATMEGA32U4_INT_PCINT0,  PCICR,    PCICR_PCIE0_MASK,   PCIFR,    PCIFR_PCIF0_MASK, },
+	{ INTIDX_INT0,   ATMEGA32U4_INT_INT0,    EIMSK,    EIMSK_INT0_MASK,    EIFR,     EIFR_INTF0_MASK, },
+	{ INTIDX_INT1,   ATMEGA32U4_INT_INT1,    EIMSK,    EIMSK_INT1_MASK,    EIFR,     EIFR_INTF1_MASK, },
+	{ 0,             0,                      0,        0,                  0,        0, } // end of list
 };
 
-void avr8_base_device::update_interrupt(int source)
+bool atmega32u4_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const
 {
-	const interrupt_condition &condition = s_int_conditions[source];
-
-	int intstate = 0;
-	if (m_r[condition.m_intreg] & condition.m_intmask)
-		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
-
-	set_irq_line(condition.m_intindex, intstate);
-
-	if (intstate)
+	switch (port)
 	{
-		m_r[condition.m_regindex] &= ~condition.m_regmask;
+	case GPIOB: pcmsk_reg = PCMSK0; group = 0; return true;
+	case GPIOC: pcmsk_reg = PCMSK1; group = 1; return true;
+	case GPIOD: pcmsk_reg = PCMSK2; group = 2; return true;
+	default: return false;
 	}
 }
 
-//TODO: review this!
-void atmega168_device::update_interrupt(int source)
+const avr8_base_device::interrupt_condition avr8_base_device::s_mega640_int_conditions[avr8_base_device::INTIDX_COUNT] =
 {
-	const interrupt_condition &condition = s_int_conditions[source];
-
-	int intstate = 0;
-	if (m_r[condition.m_intreg] & condition.m_intmask)
-		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
-
-	set_irq_line(condition.m_intindex << 1, intstate);
-
-	if (intstate)
-	{
-		m_r[condition.m_regindex] &= ~condition.m_regmask;
-	}
-}
-
-void atmega328_device::update_interrupt(int source)
-{
-	const interrupt_condition &condition = s_int_conditions[source];
-
-	int intstate = 0;
-	if (m_r[condition.m_intreg] & condition.m_intmask)
-		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
-
-	set_irq_line(condition.m_intindex << 1, intstate);
-
-	if (intstate)
-	{
-		m_r[condition.m_regindex] &= ~condition.m_regmask;
-	}
-}
+	// irq id        vector                  irq reg   irq reg mask        flag reg  flag reg mask
+	{ INTIDX_SPI,  	 ATMEGA640_INT_SPI_STC,  SPCR,     SPCR_SPIE_MASK,     SPSR,     SPSR_SPIF_MASK },
+	{ INTIDX_OCF0B,  ATMEGA640_INT_T0COMPB,  TIMSK0,   TIMSK0_OCIE0B_MASK, TIFR0,    TIFR0_OCF0B_MASK },
+	{ INTIDX_OCF0A,  ATMEGA640_INT_T0COMPA,  TIMSK0,   TIMSK0_OCIE0A_MASK, TIFR0,    TIFR0_OCF0A_MASK },
+	{ INTIDX_TOV0,   ATMEGA640_INT_T0OVF,  	 TIMSK0,   TIMSK0_TOIE0_MASK,  TIFR0,    TIFR0_TOV0_MASK },
+	{ INTIDX_ICF1, 	 ATMEGA640_INT_T1CAPT,   TIMSK1,   TIMSK1_ICIE1_MASK,  TIFR1,    TIFR1_ICF1_MASK },
+	{ INTIDX_OCF1B,  ATMEGA640_INT_T1COMPB,  TIMSK1,   TIMSK1_OCIE1B_MASK, TIFR1,    TIFR1_OCF1B_MASK },
+	{ INTIDX_OCF1A,  ATMEGA640_INT_T1COMPA,  TIMSK1,   TIMSK1_OCIE1A_MASK, TIFR1,    TIFR1_OCF1A_MASK },
+	{ INTIDX_TOV1,   ATMEGA640_INT_T1OVF,    TIMSK1,   TIMSK1_TOIE1_MASK,  TIFR1,    TIFR1_TOV1_MASK },
+	{ INTIDX_OCF2B,  ATMEGA640_INT_T2COMPB,  TIMSK2,   TIMSK2_OCIE2B_MASK, TIFR2,    TIFR2_OCF2B_MASK },
+	{ INTIDX_OCF2A,  ATMEGA640_INT_T2COMPA,  TIMSK2,   TIMSK2_OCIE2A_MASK, TIFR2,    TIFR2_OCF2A_MASK },
+	{ INTIDX_TOV2,   ATMEGA640_INT_T2OVF,    TIMSK2,   TIMSK2_TOIE2_MASK,  TIFR2,    TIFR2_TOV2_MASK },
+	{ INTIDX_PCINT0, ATMEGA640_INT_PCINT0,   PCICR,    PCICR_PCIE0_MASK,   PCIFR,    PCIFR_PCIF0_MASK },
+	{ INTIDX_PCINT1, ATMEGA640_INT_PCINT1,   PCICR,    PCICR_PCIE1_MASK,   PCIFR,    PCIFR_PCIF1_MASK },
+	{ INTIDX_PCINT2, ATMEGA640_INT_PCINT2,   PCICR,    PCICR_PCIE2_MASK,   PCIFR,    PCIFR_PCIF2_MASK },
+	{ INTIDX_INT0,   ATMEGA640_INT_INT0,     EIMSK,    EIMSK_INT0_MASK,    EIFR,     EIFR_INTF0_MASK },
+	{ INTIDX_INT1,   ATMEGA640_INT_INT1,     EIMSK,    EIMSK_INT1_MASK,    EIFR,     EIFR_INTF1_MASK },
+	{ 0,             0,                      0,        0,                  0,        0, } // end of list
+};
 
 const avr8_base_device::interrupt_condition avr8_base_device::s_mega644_int_conditions[avr8_base_device::INTIDX_COUNT] =
 {
-	{ ATMEGA644_INT_SPI_STC, SPCR,   SPCR_SPIE_MASK,     SPSR,    SPSR_SPIF_MASK },
-	{ ATMEGA644_INT_T0COMPB, TIMSK0, TIMSK0_OCIE0B_MASK, TIFR0,   TIFR0_OCF0B_MASK },
-	{ ATMEGA644_INT_T0COMPA, TIMSK0, TIMSK0_OCIE0A_MASK, TIFR0,   TIFR0_OCF0A_MASK },
-	{ ATMEGA644_INT_T0OVF,   TIMSK0, TIMSK0_TOIE0_MASK,  TIFR0,   TIFR0_TOV0_MASK },
-	{ ATMEGA644_INT_T1CAPT,  TIMSK1, TIMSK1_ICIE1_MASK,  TIFR1,   TIFR1_ICF1_MASK },
-	{ ATMEGA644_INT_T1COMPB, TIMSK1, TIMSK1_OCIE1B_MASK, TIFR1,   TIFR1_OCF1B_MASK },
-	{ ATMEGA644_INT_T1COMPA, TIMSK1, TIMSK1_OCIE1A_MASK, TIFR1,   TIFR1_OCF1A_MASK },
-	{ ATMEGA644_INT_T1OVF,   TIMSK1, TIMSK1_TOIE1_MASK,  TIFR1,   TIFR1_TOV1_MASK },
-	{ ATMEGA644_INT_T2COMPB, TIMSK2, TIMSK2_OCIE2B_MASK, TIFR2,   TIFR2_OCF2B_MASK },
-	{ ATMEGA644_INT_T2COMPA, TIMSK2, TIMSK2_OCIE2A_MASK, TIFR2,   TIFR2_OCF2A_MASK },
-	{ ATMEGA644_INT_T2OVF,   TIMSK2, TIMSK2_TOIE2_MASK,  TIFR2,   TIFR2_TOV2_MASK }
+	//  irq id        vector                  irq reg   irq reg mask        flag reg  flag reg mask
+	{ INTIDX_SPI,     ATMEGA644_INT_SPI_STC,  SPCR,     SPCR_SPIE_MASK,     SPSR,     SPSR_SPIF_MASK },
+	{ INTIDX_OCF0B,   ATMEGA644_INT_T0COMPB,  TIMSK0,   TIMSK0_OCIE0B_MASK, TIFR0,    TIFR0_OCF0B_MASK },
+	{ INTIDX_OCF0A,   ATMEGA644_INT_T0COMPA,  TIMSK0,   TIMSK0_OCIE0A_MASK, TIFR0,    TIFR0_OCF0A_MASK },
+	{ INTIDX_TOV0,    ATMEGA644_INT_T0OVF,    TIMSK0,   TIMSK0_TOIE0_MASK,  TIFR0,    TIFR0_TOV0_MASK },
+	{ INTIDX_ICF1,    ATMEGA644_INT_T1CAPT,   TIMSK1,   TIMSK1_ICIE1_MASK,  TIFR1,    TIFR1_ICF1_MASK },
+	{ INTIDX_OCF1B,   ATMEGA644_INT_T1COMPB,  TIMSK1,   TIMSK1_OCIE1B_MASK, TIFR1,    TIFR1_OCF1B_MASK },
+	{ INTIDX_OCF1A,   ATMEGA644_INT_T1COMPA,  TIMSK1,   TIMSK1_OCIE1A_MASK, TIFR1,    TIFR1_OCF1A_MASK },
+	{ INTIDX_TOV1,    ATMEGA644_INT_T1OVF,    TIMSK1,   TIMSK1_TOIE1_MASK,  TIFR1,    TIFR1_TOV1_MASK },
+	{ INTIDX_OCF2B,   ATMEGA644_INT_T2COMPB,  TIMSK2,   TIMSK2_OCIE2B_MASK, TIFR2,    TIFR2_OCF2B_MASK },
+	{ INTIDX_OCF2A,   ATMEGA644_INT_T2COMPA,  TIMSK2,   TIMSK2_OCIE2A_MASK, TIFR2,    TIFR2_OCF2A_MASK },
+	{ INTIDX_TOV2,    ATMEGA644_INT_T2OVF,    TIMSK2,   TIMSK2_TOIE2_MASK,  TIFR2,    TIFR2_TOV2_MASK },
+	{ INTIDX_PCINT0,  ATMEGA644_INT_PCINT0,   PCICR,    PCICR_PCIE0_MASK,   PCIFR,    PCIFR_PCIF0_MASK },
+	{ INTIDX_PCINT1,  ATMEGA644_INT_PCINT1,   PCICR,    PCICR_PCIE1_MASK,   PCIFR,    PCIFR_PCIF1_MASK },
+	{ INTIDX_PCINT2,  ATMEGA644_INT_PCINT2,   PCICR,    PCICR_PCIE2_MASK,   PCIFR,    PCIFR_PCIF2_MASK },
+	{ INTIDX_INT0,    ATMEGA644_INT_INT0,     EIMSK,    EIMSK_INT0_MASK,    EIFR,     EIFR_INTF0_MASK },
+	{ INTIDX_INT1,    ATMEGA644_INT_INT1,     EIMSK,    EIMSK_INT1_MASK,    EIFR,     EIFR_INTF1_MASK },
+	{ 0,              0,                      0,        0,                  0,        0, } // end of list
 };
 
-void atmega644_device::update_interrupt(int source)
+bool atmega644_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const
 {
-	const interrupt_condition &condition = s_mega644_int_conditions[source];
-
-	int intstate = 0;
-	if (m_r[condition.m_intreg] & condition.m_intmask)
-		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
-
-	set_irq_line(condition.m_intindex << 1, intstate);
-
-	if (intstate)
+	switch (port)
 	{
-		m_r[condition.m_regindex] &= ~condition.m_regmask;
+	case GPIOA: pcmsk_reg = PCMSK0; group = 0; return true;
+	case GPIOB: pcmsk_reg = PCMSK1; group = 1; return true;
+	case GPIOC: pcmsk_reg = PCMSK2; group = 2; return true;
+	default: return false;
 	}
 }
 
-//TODO: review this!
-void atmega1280_device::update_interrupt(int source)
+bool atmega1284_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const
 {
-	const interrupt_condition &condition = s_mega644_int_conditions[source];
-
-	int intstate = 0;
-	if (m_r[condition.m_intreg] & condition.m_intmask)
-		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
-
-	if (intstate) logerror("interrupt %d is 1\n", source);
-	set_irq_line(condition.m_intindex << 1, intstate);
-
-	if (intstate)
+	switch (port)
 	{
-		m_r[condition.m_regindex] &= ~condition.m_regmask;
+	case GPIOA: pcmsk_reg = PCMSK0; group = 0; return true;
+	case GPIOB: pcmsk_reg = PCMSK1; group = 1; return true;
+	case GPIOC: pcmsk_reg = PCMSK2; group = 2; return true;
+	default: return false;
 	}
 }
-
-//TODO: review this!
-void atmega2560_device::update_interrupt(int source)
-{
-	const interrupt_condition &condition = s_mega644_int_conditions[source];
-
-	int intstate = 0;
-	if (m_r[condition.m_intreg] & condition.m_intmask)
-		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
-
-	if (intstate) logerror("interrupt %d is 1\n", source);
-	set_irq_line(condition.m_intindex << 1, intstate);
-
-	if (intstate)
-	{
-		m_r[condition.m_regindex] &= ~condition.m_regmask;
-	}
-}
-
 
 //**************************************************************************
 //  PERIPHERAL HANDLING
 //**************************************************************************
 
+// Master-mode SPI Mode 0 only (CPOL=0/CPHA=0)
 template <int NumTimers>
 void avr8_device<NumTimers>::spi_tick()
 {
-	const uint8_t out_bit = (m_r[SPDR] & (1 << m_spi_prescale_countdown)) >> m_spi_prescale_countdown;
-	m_spi_prescale_countdown--;
-	const uint8_t data = (m_r[PORTB] &~ PORTB_MOSI) | (out_bit ? PORTB_MOSI : 0);
+	uint8_t mosi_mask, miso_mask, sck_mask;
+	spi_pins(mosi_mask, miso_mask, sck_mask);
+
+	const int bit_index = SPCR_DORD ? (7 - m_spi_prescale_countdown) : m_spi_prescale_countdown;
+	const uint8_t out_bit = BIT(m_r[SPDR], bit_index);
+
+	// SCK rising edge: MOSI is sampled by the slave
+	uint8_t data = (m_r[PORTB] & ~(mosi_mask | sck_mask)) | (out_bit ? mosi_mask : 0) | sck_mask;
 	m_r[PORTB] = data;
 	m_gpio_out_cb[GPIOB](data);
-	m_r[PORTB] = (m_r[PORTB] &~ PORTB_MOSI) | (out_bit ? PORTB_MOSI : 0);
+
+	const uint8_t in_bit = (m_gpio_in_cb[GPIOB]() & miso_mask) ? 1 : 0;
+	m_spi_rx_shift = (m_spi_rx_shift << 1) | in_bit;
+
+	// SCK falling edge: the slave shifts out its next MISO bit
+	data &= ~sck_mask;
+	m_r[PORTB] = data;
+	m_gpio_out_cb[GPIOB](data);
+
+	m_spi_prescale_countdown--;
+
+	if (m_spi_prescale_countdown < 0)
+	{
+		m_r[SPDR] = m_spi_rx_shift;
+		set_interrupt(INTIDX_SPI);
+		m_spi_active = false;
+	}
 }
 
 // Timer 0 Handling
@@ -1438,8 +1658,15 @@ void avr8_device<NumTimers>::spi_tick()
 template <int NumTimers>
 void avr8_device<NumTimers>::timer0_tick_norm()
 {
-	LOGMASKED(LOG_TIMER0, "%s: WGM02_NORMAL: Unimplemented timer#0 waveform generation mode\n", machine().describe_context());
-	m_r[TCNT0]++;
+	if (m_r[TCNT0] == 0xff)
+	{
+		m_r[TCNT0] = 0;
+		set_interrupt(INTIDX_TOV0);
+	}
+	else
+	{
+		m_r[TCNT0]++;
+	}
 	m_timer_prescale_count[0] -= m_timer_prescale[0];
 }
 
@@ -1459,14 +1686,13 @@ void avr8_device<NumTimers>::timer0_tick_ctc_norm()
 
 	if (m_r[TCNT0] == m_r[OCR0A] - 1)
 	{
-		m_r[TIFR0] |= s_ocf0[AVR8_REG_A];
-		update_interrupt(s_int0[AVR8_REG_A]);
+		set_interrupt(s_int0[AVR8_REG_A]);
 		m_r[TCNT0] = 0;
 	}
 	else if (m_r[TCNT0] == m_r[OCR0B] - 1)
 	{
 		m_r[TIFR0] |= s_ocf0[AVR8_REG_B];
-		update_interrupt(s_int0[AVR8_REG_B]);
+		set_interrupt(s_int0[AVR8_REG_B]);
 		m_r[TCNT0]++;
 	}
 	else
@@ -1521,8 +1747,29 @@ void avr8_device<NumTimers>::timer0_tick_ctc_set()
 template <int NumTimers>
 void avr8_device<NumTimers>::timer0_tick_fast_pwm()
 {
-	LOGMASKED(LOG_TIMER0 | LOG_UNKNOWN, "%s: WGM02_FAST_PWM: Unimplemented timer0 waveform generation mode\n", machine().describe_context());
-	m_r[TCNT0]++;
+	// FIXME: OC0x values are supposed to be latched when TCNT0 is zero.
+	if (m_r[TCNT0] == m_r[OCR0A] - 1)
+	{
+		// TODO: set 0C0A
+	}
+	else if (m_r[TCNT0] == m_r[OCR0B] - 1)
+	{
+		// TODO: set 0C0B
+	}
+
+	if (m_r[TCNT0] == 0xff)
+	{
+		set_interrupt(INTIDX_TOV0);
+
+		m_r[TCNT0] = 0;
+
+		// TODO: clear both OC0x values here
+	}
+	else
+	{
+		m_r[TCNT0]++;
+	}
+
 	m_timer_prescale_count[0] -= m_timer_prescale[0];
 }
 
@@ -1581,8 +1828,7 @@ inline void avr8_device<NumTimers>::timer1_tick()
 		if (timer1_count == 0xffff)
 		{
 			LOGMASKED(LOG_TIMER1_TICK, "%s: timer1 WGM1 CTC_OCR, TOP, new count %04x, OCR1A/B %04x/%04x, ICR1 %04x\n", machine().describe_context(), timer1_count, m_ocr1[AVR8_REG_A], m_ocr1[AVR8_REG_B], icr1);
-			m_r[TIFR1] |= TIFR1_TOV1_MASK;
-			update_interrupt(INTIDX_TOV1);
+			set_interrupt(INTIDX_TOV1);
 			timer1_count = 0;
 			increment = 0;
 		}
@@ -1623,8 +1869,7 @@ inline void avr8_device<NumTimers>::timer1_tick()
 		else if (timer1_count == 0)
 		{
 			LOGMASKED(LOG_TIMER1_TICK, "%s: timer1 WGM1 CTC_OCR, BOTTOM, new count %04x, OCR1A/B %04x/%04x, ICR1 %04x\n", machine().describe_context(), timer1_count, m_ocr1[AVR8_REG_A], m_ocr1[AVR8_REG_B], icr1);
-			m_r[TIFR1] &= ~TIFR1_TOV1_MASK;
-			update_interrupt(INTIDX_TOV1);
+			clear_interrupt(INTIDX_TOV1);
 		}
 
 		if (timer1_count == m_ocr1[AVR8_REG_B])
@@ -1658,8 +1903,7 @@ inline void avr8_device<NumTimers>::timer1_tick()
 		if (timer1_count == m_ocr1[AVR8_REG_A])
 		{
 			LOGMASKED(LOG_TIMER1_TICK, "%s: timer1 WGM1 FAST_PWM_OCR, OCR1A, new count %04x, OCR1A/B %04x/%04x, ICR1 %04x\n", machine().describe_context(), timer1_count, m_ocr1[AVR8_REG_A], m_ocr1[AVR8_REG_B], icr1);
-			m_r[TIFR1] |= TIFR1_TOV1_MASK;
-			update_interrupt(INTIDX_TOV1);
+			set_interrupt(INTIDX_TOV1);
 			timer1_count = 0;
 			increment = 0;
 
@@ -1693,8 +1937,7 @@ inline void avr8_device<NumTimers>::timer1_tick()
 		else if (timer1_count == 0)
 		{
 			LOGMASKED(LOG_TIMER1_TICK, "%s: timer1 WGM1 FAST_PWM_OCR, BOTTOM A, new count %04x, OCR1A/B %04x/%04x, ICR1 %04x\n", machine().describe_context(), timer1_count, m_ocr1[AVR8_REG_A], m_ocr1[AVR8_REG_B], icr1);
-			m_r[TIFR1] &= ~TIFR1_TOV1_MASK;
-			update_interrupt(INTIDX_TOV1);
+			clear_interrupt(INTIDX_TOV1);
 
 			switch (ChannelModeA)
 			{
@@ -1804,8 +2047,7 @@ inline void avr8_device<NumTimers>::timer1_tick()
 		else if (timer1_count == 0)
 		{
 			LOGMASKED(LOG_TIMER1_TICK, "%s: timer1 WGM1 FAST_PWM_ICR, BOTTOM A, new count %04x, OCR1A/B %04x/%04x, ICR1 %04x\n", machine().describe_context(), timer1_count, m_ocr1[AVR8_REG_A], m_ocr1[AVR8_REG_B], icr1);
-			m_r[TIFR1] &= ~TIFR1_TOV1_MASK;
-			update_interrupt(INTIDX_TOV1);
+			clear_interrupt(INTIDX_TOV1);
 
 			switch (ChannelModeA)
 			{
@@ -1880,8 +2122,7 @@ inline void avr8_device<NumTimers>::timer1_tick()
 
 		if (timer1_count == icr1)
 		{
-			m_r[TIFR1] |= TIFR1_TOV1_MASK;
-			update_interrupt(INTIDX_TOV1);
+			set_interrupt(INTIDX_TOV1);
 			timer1_count = 0;
 			increment = 0;
 		}
@@ -2003,10 +2244,13 @@ void avr8_device<NumTimers>::timer2_tick_norm()
 	LOGMASKED(LOG_TIMER2, "%s: timer2_tick_norm; WGM02_NORMAL\n", machine().describe_context());
 	if (m_r[TCNT2] == 0xff)
 	{
-		m_r[TIFR2] |= TIFR2_TOV2_MASK;
+		set_interrupt(INTIDX_TOV2);
+	}
+	else
+	{
+		clear_interrupt(INTIDX_TOV2);
 	}
 	m_r[TCNT2]++;
-	update_interrupt(INTIDX_TOV2);
 	m_timer_prescale_count[2] -= m_timer_prescale[2];
 }
 
@@ -2057,6 +2301,7 @@ void avr8_device<NumTimers>::timer2_tick_fast_pwm_cmp()
 	else if (count == 0)
 	{
 		m_r[TIFR2] &= ~TIFR2_TOV2_MASK;
+		clear_interrupt(INTIDX_TOV2);
 	}
 
 	if (count == m_r[OCR2B])
@@ -2155,8 +2400,7 @@ void avr8_device<NumTimers>::timer4_tick()
 		LOGMASKED(LOG_TIMER4, "%s: timer4: tick WGM4_CTC_OCR: %d\n", machine().describe_context(), count);
 		if (count == 0xffff)
 		{
-			m_r[TIFR4] |= TIFR4_TOV4_MASK;
-			update_interrupt(INTIDX_TOV4);
+			set_interrupt(INTIDX_TOV4);
 			count = 0;
 			increment = 0;
 		}
@@ -2362,7 +2606,7 @@ void avr8_device<NumTimers>::enable_spi()
 template <int NumTimers>
 void avr8_device<NumTimers>::disable_spi()
 {
-	// TODO
+	m_spi_active = false;
 }
 
 template <int NumTimers>
@@ -2488,9 +2732,16 @@ uint8_t avr8_device<NumTimers>::pin_r()
 {
 	static constexpr char PORT_CHARS[GPIO_COUNT] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L' };
 	// TODO: account for DDRH
-	const uint8_t data = m_gpio_in_cb[Port]();
+	const uint8_t data = sample_port<Port>();
 	LOGMASKED(LOG_GPIO, "%s: PIN%c(%d) Read: %02x\n", machine().describe_context(), PORT_CHARS[Port], Port, data);
 	return data;
+}
+
+template <int NumTimers>
+template <int Port>
+uint8_t avr8_device<NumTimers>::sample_port()
+{
+	return m_gpio_in_cb[Port].isunset() ? m_gpio_in[Port] : m_gpio_in_cb[Port]();
 }
 
 template <int NumTimers>
@@ -2515,8 +2766,38 @@ void avr8_device<NumTimers>::port_w(uint8_t data)
 
 	LOGMASKED(LOG_GPIO, "%s: PORT%c Write: %02x\n", machine().describe_context(), PORT_CHARS[Port], data);
 	m_r[PORT_TO_REG[Port]] = data;
-	LOGMASKED(LOG_GPIO, "%s: PORT%c Write, XYZ m_r[%d[%d]] = %02x\n", machine().describe_context(), PORT_CHARS[Port], PORT_TO_REG[Port], Port, data);
-	m_gpio_out_cb[Port](data);
+
+	// pins configured as inputs (DDR bit clear) are not actively driven, so they never pull the line low
+	const uint8_t ddr = m_r[PORT_TO_REG[Port] - 1];
+	m_gpio_out_cb[Port](data | ~ddr);
+}
+
+template <int NumTimers>
+template <int Port>
+void avr8_device<NumTimers>::ddr_w(uint8_t data)
+{
+	static constexpr char PORT_CHARS[GPIO_COUNT] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L' };
+	static constexpr uint16_t PORT_TO_REG[11] =
+	{
+		PORTA,
+		PORTB,
+		PORTC,
+		PORTD,
+		PORTE,
+		PORTF,
+		PORTG,
+		PORTH,
+		PORTJ,
+		PORTK,
+		PORTL
+	};
+
+	LOGMASKED(LOG_GPIO, "%s: DDR%c Write: %02x\n", machine().describe_context(), PORT_CHARS[Port], data);
+	m_r[PORT_TO_REG[Port] - 1] = data;
+
+	// switching a pin between input and output changes what it drives even without a PORT write
+	const uint8_t port = m_r[PORT_TO_REG[Port]];
+	m_gpio_out_cb[Port](port | ~data);
 }
 
 template <int NumTimers>
@@ -2590,31 +2871,31 @@ template <int NumTimers>
 void avr8_device<NumTimers>::tifr0_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER0, "%s: TIFR0 = %02x\n", machine().describe_context(), data);
-	m_r[TIFR0] &= ~(data & TIFR0_MASK);
-	update_interrupt(INTIDX_OCF0A);
-	update_interrupt(INTIDX_OCF0B);
-	update_interrupt(INTIDX_TOV0);
+	
+	if (data & TIFR0_OCF0A_MASK) clear_interrupt(INTIDX_OCF0A);
+	if (data & TIFR0_OCF0B_MASK) clear_interrupt(INTIDX_OCF0B);
+	if (data & TIFR0_TOV0_MASK) clear_interrupt(INTIDX_TOV0);
 }
 
 template <int NumTimers>
 void avr8_device<NumTimers>::tifr1_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER1, "%s: TIFR1 = %02x\n", machine().describe_context(), data);
-	m_r[TIFR1] &= ~(data & TIFR1_MASK);
-	update_interrupt(INTIDX_ICF1);
-	update_interrupt(INTIDX_OCF1A);
-	update_interrupt(INTIDX_OCF1B);
-	update_interrupt(INTIDX_TOV1);
+
+	if (data & TIFR1_ICF1_MASK) clear_interrupt(INTIDX_ICF1);
+	if (data & TIFR1_OCF1A_MASK) clear_interrupt(INTIDX_OCF1A);
+	if (data & TIFR1_OCF1B_MASK) clear_interrupt(INTIDX_OCF1B);
+	if (data & TIFR1_TOV1_MASK) clear_interrupt(INTIDX_TOV1);
 }
 
 template <int NumTimers>
 void avr8_device<NumTimers>::tifr2_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER2, "%s: TIFR2 = %02x\n", machine().describe_context(), data);
-	m_r[TIFR2] &= ~(data & TIFR2_MASK);
-	update_interrupt(INTIDX_OCF2A);
-	update_interrupt(INTIDX_OCF2B);
-	update_interrupt(INTIDX_TOV2);
+	
+	if (m_r[TIFR2] & TIFR2_OCF2A_MASK) clear_interrupt(INTIDX_OCF2A);
+	if (m_r[TIFR2] & TIFR2_OCF2B_MASK) clear_interrupt(INTIDX_OCF2B);
+	if (m_r[TIFR2] & TIFR2_TOV2_MASK) clear_interrupt(INTIDX_TOV2);
 }
 
 template <int NumTimers>
@@ -2634,14 +2915,14 @@ void avr8_device<NumTimers>::eecr_w(uint8_t data)
 
 	if (data & EECR_EERE_MASK)
 	{
-		uint16_t addr = (m_r[EEARH] & EEARH_MASK) << 8;
+		uint16_t addr = (m_r[EEARH] & eearh_mask()) << 8;
 		addr |= m_r[EEARL];
 		m_r[EEDR] = m_eeprom[addr];
 		LOGMASKED(LOG_EEPROM, "%s: EEPROM read @ %04x data = %02x\n", machine().describe_context(), addr, m_eeprom[addr]);
 	}
 	if ((data & EECR_EEPE_MASK) && (data & EECR_EEMPE_MASK))
 	{
-		uint16_t addr = (m_r[EEARH] & EEARH_MASK) << 8;
+		uint16_t addr = (m_r[EEARH] & eearh_mask()) << 8;
 		addr |= m_r[EEARL];
 		m_eeprom[addr] = m_r[EEDR];
 		LOGMASKED(LOG_EEPROM, "%s: EEPROM write @ %04x data = %02x ('%c')\n", machine().describe_context(), addr, m_eeprom[addr], m_eeprom[addr] >= 0x21 ? m_eeprom[addr] : ' ');
@@ -2689,6 +2970,8 @@ template <int NumTimers>
 void avr8_device<NumTimers>::spdr_w(uint8_t data)
 {
 	m_r[SPDR] = data;
+	m_r[SPSR] &= ~SPSR_SPIF_MASK; // note: can't clear this flag by writing 1 there
+	m_spi_rx_shift = 0;
 	m_spi_active = true;
 	m_spi_prescale_countdown = 7;
 	m_spi_prescale_count = 0;
@@ -2727,13 +3010,31 @@ void avr8_device<NumTimers>::osccal_w(uint8_t data)
 template <int NumTimers>
 void avr8_device<NumTimers>::pcicr_w(uint8_t data)
 {
-	LOGMASKED(LOG_POWER, "%s: (not yet implemented) PCICR = %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_PINCHG, "%s: PCICR = %02x\n", machine().describe_context(), data);
+	m_r[PCICR] = data;
+}
+
+template <int NumTimers>
+void avr8_device<NumTimers>::pcifr_w(uint8_t data)
+{
+	// PCIFR is write-one-to-clear: writing a 1 to a PCIFn bit clears it, it does not request an interrupt
+	LOGMASKED(LOG_PINCHG, "%s: PCIFR = %02x\n", machine().describe_context(), data);
+	m_r[PCIFR] &= ~(data & (PCIFR_PCIF0_MASK | PCIFR_PCIF1_MASK | PCIFR_PCIF2_MASK));
 }
 
 template <int NumTimers>
 void avr8_device<NumTimers>::eicra_w(uint8_t data)
 {
-	LOGMASKED(LOG_POWER, "%s: (not yet implemented) EICRA = %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_PINCHG, "%s: EICRA = %02x\n", machine().describe_context(), data);
+	m_r[EICRA] = data;
+}
+
+template <int NumTimers>
+void avr8_device<NumTimers>::eifr_w(uint8_t data)
+{
+	// EIFR is write-one-to-clear: writing a 1 to an INTFn bit clears it, it does not request an interrupt
+	LOGMASKED(LOG_PINCHG, "%s: EIFR = %02x\n", machine().describe_context(), data);
+	m_r[EIFR] &= ~(data & (EIFR_INTF0_MASK | EIFR_INTF1_MASK));
 }
 
 template <int NumTimers>
@@ -2745,19 +3046,90 @@ void avr8_device<NumTimers>::eicrb_w(uint8_t data)
 template <int NumTimers>
 void avr8_device<NumTimers>::pcmsk0_w(uint8_t data)
 {
-	LOGMASKED(LOG_POWER, "%s: (not yet implemented) PCMSK0 = %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_PINCHG, "%s: PCMSK0 = %02x\n", machine().describe_context(), data);
+	m_r[PCMSK0] = data;
 }
 
 template <int NumTimers>
 void avr8_device<NumTimers>::pcmsk1_w(uint8_t data)
 {
-	LOGMASKED(LOG_POWER, "%s: (not yet implemented) PCMSK1 = %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_PINCHG, "%s: PCMSK1 = %02x\n", machine().describe_context(), data);
+	m_r[PCMSK1] = data;
 }
 
 template <int NumTimers>
 void avr8_device<NumTimers>::pcmsk2_w(uint8_t data)
 {
-	LOGMASKED(LOG_POWER, "%s: (not yet implemented) PCMSK2 = %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_PINCHG, "%s: PCMSK2 = %02x\n", machine().describe_context(), data);
+	m_r[PCMSK2] = data;
+}
+
+template <int NumTimers>
+void avr8_device<NumTimers>::check_extint(int line, uint8_t prev, uint8_t state)
+{
+	const int bit = 2 + line; // INT0 = PD2, INT1 = PD3
+	if (!(m_r[EIMSK] & (1 << line)))
+		return;
+
+	const int isc = (m_r[EICRA] >> (line * 2)) & 0x03;
+	bool fire;
+	switch (isc)
+	{
+		case 0: fire = !BIT(state, bit); break;                          // low level
+		case 1: fire = BIT(prev, bit) != BIT(state, bit); break;         // any logical change
+		case 2: fire = BIT(prev, bit) && !BIT(state, bit); break;        // falling edge
+		default: fire = !BIT(prev, bit) && BIT(state, bit); break;       // rising edge
+	}
+
+	if (fire)
+	{
+		LOGMASKED(LOG_PINCHG, "%s: INT%d triggered (ISC=%d)\n", machine().describe_context(), line, isc);
+		m_r[EIFR] |= (1 << line);
+	}
+}
+
+template <int NumTimers>
+template <int Port>
+void avr8_device<NumTimers>::latch_pin_change(uint8_t state)
+{
+	const uint8_t prev = m_pcint_last[Port];
+	const uint8_t changed = state ^ prev;
+	m_pcint_last[Port] = state;
+	if (!changed)
+		return;
+
+	// only latch flags here: this can be called from an arbitrary, possibly mid-instruction
+	// context (another device driving this port), so the actual interrupt-take (which pushes the
+	// return PC) must wait for execute_run()'s instruction boundary, not happen synchronously here
+	uint8_t pcmsk_reg = 0;
+	int group = 0;
+	if (pcint_group(gpio_t(Port), pcmsk_reg, group) && (changed & m_r[pcmsk_reg]))
+	{
+		static constexpr char PORT_CHARS[GPIO_COUNT] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L' };
+		LOGMASKED(LOG_PINCHG, "%s: PCINT%c pins changed: %02x\n", machine().describe_context(), PORT_CHARS[Port], changed);
+		m_r[PCIFR] |= (1 << group);
+	}
+
+	// INT0 (PD2) / INT1 (PD3) share the same fixed pins across every supported chip
+	if (Port == GPIOD)
+	{
+		if (BIT(changed, 2))
+			check_extint(0, prev, state);
+		if (BIT(changed, 3))
+			check_extint(1, prev, state);
+	}
+}
+
+template <int NumTimers>
+template <int Port>
+void avr8_device<NumTimers>::pin_w(int bit, int state)
+{
+	if (state)
+		m_gpio_in[Port] |= (1 << bit);
+	else
+		m_gpio_in[Port] &= ~(1 << bit);
+
+	latch_pin_change<Port>(sample_port<Port>());
 }
 
 template <int NumTimers>
@@ -2765,6 +3137,7 @@ void avr8_device<NumTimers>::timsk0_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER0, "%s: TIMSK0 = %02x\n", machine().describe_context(), data);
 	m_r[TIMSK0] = data;
+	
 	update_interrupt(INTIDX_OCF0A);
 	update_interrupt(INTIDX_OCF0B);
 	update_interrupt(INTIDX_TOV0);
@@ -2786,6 +3159,7 @@ void avr8_device<NumTimers>::timsk2_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER2, "%s: TIMSK2 = %02x\n", machine().describe_context(), data);
 	m_r[TIMSK2] = data;
+
 	update_interrupt(INTIDX_OCF2A);
 	update_interrupt(INTIDX_OCF2B);
 	update_interrupt(INTIDX_TOV2);
@@ -2796,9 +3170,12 @@ void avr8_device<NumTimers>::timsk3_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER3, "%s: TIMSK3 = %02x\n", machine().describe_context(), data);
 	m_r[TIMSK3] = data;
-	update_interrupt(INTIDX_OCF3A);
-	update_interrupt(INTIDX_OCF3B);
-	update_interrupt(INTIDX_TOV3);
+
+	// TODO: implement timer 3. trying to fire these interrupts will crash arduboy games!
+
+	// update_interrupt(INTIDX_OCF3A);
+	// update_interrupt(INTIDX_OCF3B);
+	// update_interrupt(INTIDX_TOV3);
 }
 
 template <int NumTimers>
@@ -2806,9 +3183,12 @@ void avr8_device<NumTimers>::timsk4_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER4, "%s: TIMSK4 = %02x\n", machine().describe_context(), data);
 	m_r[TIMSK4] = data;
-	update_interrupt(INTIDX_OCF4A);
-	update_interrupt(INTIDX_OCF4B);
-	update_interrupt(INTIDX_TOV4);
+
+	// TODO: implement timer 4. trying to fire these interrupts will crash arduboy games!
+
+	// update_interrupt(INTIDX_OCF4A);
+	// update_interrupt(INTIDX_OCF4B);
+	// update_interrupt(INTIDX_TOV4);
 }
 
 template <int NumTimers>
@@ -2816,9 +3196,12 @@ void avr8_device<NumTimers>::timsk5_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER5, "%s: TIMSK5 = %02x\n", machine().describe_context(), data);
 	m_r[TIMSK5] = data;
-	update_interrupt(INTIDX_OCF5A);
-	update_interrupt(INTIDX_OCF5B);
-	update_interrupt(INTIDX_TOV5);
+
+	// TODO: implement timer 5
+
+	// update_interrupt(INTIDX_OCF5A);
+	// update_interrupt(INTIDX_OCF5B);
+	// update_interrupt(INTIDX_TOV5);
 }
 
 template <int NumTimers>
@@ -3454,13 +3837,37 @@ void avr8_device<NumTimers>::execute_run()
 {
 	while (m_icount > 0)
 	{
-		m_pc &= m_addr_mask;
-		debugger_instruction_hook(m_pc);
+		if (m_sleeping)
+		{
+			debugger_wait_hook();
+			m_opcycles = 1;
+		}
+		else
+		{
+			m_pc &= m_addr_mask;
+			debugger_instruction_hook(m_pc);
 
-		const uint16_t op = (uint32_t)m_program->read_word(m_pc);
-		m_opcycles = m_op_cycles[op];
-		((this)->*(m_op_funcs[op]))(op);
-		m_pc += 2;
+			const uint16_t op = (uint32_t)m_program->read_word(m_pc);
+			m_opcycles = m_op_cycles[op];
+			((this)->*(m_op_funcs[op]))(op);
+			m_pc += 2;
+			m_sei_delay_pending = false;
+		}
+
+		// pin_w() may have latched a PCIFR/EIFR flag from an arbitrary (possibly mid-instruction)
+		// external context; only take the actual interrupt here, at a safe instruction boundary
+		if (m_r[PCIFR])
+		{
+			update_interrupt(INTIDX_PCINT0);
+			update_interrupt(INTIDX_PCINT1);
+			update_interrupt(INTIDX_PCINT2);
+		}
+
+		if (m_r[EIFR])
+		{
+			update_interrupt(INTIDX_INT0);
+			update_interrupt(INTIDX_INT1);
+		}
 
 		m_icount -= m_opcycles;
 
@@ -3514,6 +3921,11 @@ void avr8_device<NumTimers>::execute_run()
 					m_timer_prescale_count[5] -= m_timer_prescale[5];
 				}
 			}
+
+			if (!m_sei_delay_pending)
+			{
+				fire_interrupts();
+			}
 		}
 	}
 }
@@ -3521,3 +3933,12 @@ void avr8_device<NumTimers>::execute_run()
 template class avr8_device<2>;
 template class avr8_device<3>;
 template class avr8_device<6>;
+
+// explicit instantiations so external devices can call pin_w<Port>() to report input pin changes
+template void avr8_device<3>::pin_w<avr8_base_device::GPIOA>(int, int);
+template void avr8_device<3>::pin_w<avr8_base_device::GPIOB>(int, int);
+template void avr8_device<3>::pin_w<avr8_base_device::GPIOC>(int, int);
+template void avr8_device<3>::pin_w<avr8_base_device::GPIOD>(int, int);
+template void avr8_device<3>::pin_w<avr8_base_device::GPIOE>(int, int);
+template void avr8_device<3>::pin_w<avr8_base_device::GPIOF>(int, int);
+template void avr8_device<3>::pin_w<avr8_base_device::GPIOG>(int, int);

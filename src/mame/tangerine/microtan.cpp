@@ -161,7 +161,7 @@ void microtan_state::mt65(machine_config &config)
 	m_keyboard->reset_handler().set(FUNC(microtan_state::trigger_reset));
 
 	/* video hardware - include overscan */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(6_MHz_XTAL, 384, 0, 32*8, 312, 0, 16*16);
 	screen.set_screen_update(FUNC(microtan_state::screen_update));
 	screen.set_palette("palette");
@@ -230,7 +230,7 @@ void microtan_state::spinveti(machine_config &config)
 	m_keyboard->reset_handler().set(FUNC(microtan_state::trigger_reset));
 
 	/* video hardware - include overscan */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(6_MHz_XTAL, 384, 0, 32*8, 312, 0, 16*16);
 	screen.set_screen_update(FUNC(microtan_state::screen_update));
 	screen.set_palette("palette");

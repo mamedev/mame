@@ -626,9 +626,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( allied_state::timer_a )
 void allied_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_digits.resolve();
-	m_leds.resolve();
-	m_io_outputs.resolve();
 
 	save_item(NAME(m_player_score));
 	save_item(NAME(m_display));

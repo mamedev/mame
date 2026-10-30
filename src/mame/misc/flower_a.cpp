@@ -44,15 +44,15 @@ void flower_sound_device::regs_map(address_map &map)
 //  flower_sound_device - constructor
 //-------------------------------------------------
 
-flower_sound_device::flower_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, FLOWER_CUSTOM, tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  device_memory_interface(mconfig, *this),
-	  m_io_space_config("io", ENDIANNESS_LITTLE, 8, 7, 0, address_map_constructor(FUNC(flower_sound_device::regs_map), this)),
-	  m_stream(nullptr),
-	  m_mixer_lookup(nullptr),
-	  m_sample_rom(*this, "samples"),
-	  m_volume_rom(*this, "soundvol")
+flower_sound_device::flower_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, FLOWER_CUSTOM, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	device_memory_interface(mconfig, *this),
+	m_io_space_config("io", ENDIANNESS_LITTLE, 8, 7, 0, address_map_constructor(FUNC(flower_sound_device::regs_map), this)),
+	m_stream(nullptr),
+	m_mixer_lookup(nullptr),
+	m_sample_rom(*this, "samples"),
+	m_volume_rom(*this, "soundvol")
 {
 }
 

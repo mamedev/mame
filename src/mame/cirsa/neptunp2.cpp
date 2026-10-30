@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders: Tomasz Slanina
+
 /***************************************************************************
 
     Unidesa/Cirsa "960606-5" hardware.
@@ -12,6 +13,7 @@ The "960606-5" PCB is used at least on the following games:
   Unidesa/Cirsa Blue Swamp Land
   Unidesa/Cirsa Corsarios
   Unidesa/Cirsa Dinópolis
+  Unidesa/Cirsa El Tesoro del Faraón
   Unidesa/Cirsa Euro Bingo 7 (1000)
   Unidesa/Cirsa Euro Bingo 7
   Unidesa/Cirsa Euro Lucky
@@ -116,7 +118,7 @@ It's just a small PCB with a SEEPROM:
  |:                    ·|
  |______________________|
 
-According with fhe Spanish laws (at that time) for slot machines, it was mandatory to destroy
+According to the Spanish laws (at that time) for slot machines, it was mandatory to destroy
 the program ROMs and the security counters module for retiring the machines from service. That's
 the reason why most games on this driver are missing these ROMs.
 
@@ -161,11 +163,16 @@ connected to P8:
 */
 
 #include "emu.h"
+
 #include "cpu/i86/i186.h"
+#include "machine/i2cmem.h"
+#include "machine/pcf8583.h"
+#include "sound/okim6376.h"
+
 #include "emupal.h"
 #include "screen.h"
-#include "sound/okim6376.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 namespace {
@@ -173,32 +180,115 @@ namespace {
 class neptunp2_state : public driver_device
 {
 public:
-	neptunp2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_okim6376(*this, "oki")
+	neptunp2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_okim6376(*this, "oki")
 	{ }
 
-	void neptunp2_video(machine_config &config);
-	void neptunp2_no_video(machine_config &config);
+	void no_video(machine_config &config) ATTR_COLD;
 
 protected:
-	// driver_device overrides
+	required_device<cpu_device> m_maincpu;
+
+	void no_video_program_map(address_map &map) ATTR_COLD;
+
+private:
+	required_device<okim6376_device> m_okim6376;
+
+	void io_map(address_map &map) ATTR_COLD;
+};
+
+class neptunp2_video_state : public neptunp2_state
+{
+public:
+	neptunp2_video_state(const machine_config &mconfig, device_type type, const char *tag) :
+		neptunp2_state(mconfig, type, tag),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_tileram(*this, "tileram")
+	{ }
+
+	void video(machine_config &config) ATTR_COLD;
+
+protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	uint8_t test_r();
+	required_device<gfxdecode_device> m_gfxdecode;
+
+	required_shared_ptr<uint8_t> m_tileram;
+
+	tilemap_t *m_tilemap = nullptr;
+
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	void tileram_w(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void neptunp2_io(address_map &map) ATTR_COLD;
-	void neptunp2_video_map(address_map &map) ATTR_COLD;
-	void neptunp2_no_video_map(address_map &map) ATTR_COLD;
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<okim6376_device> m_okim6376;
+	void video_program_map(address_map &map) ATTR_COLD;
 };
+
+
+void neptunp2_video_state::video_start()
+{
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(neptunp2_video_state::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 56, 32);
+}
+
+TILE_GET_INFO_MEMBER(neptunp2_video_state::get_tile_info)
+{
+	uint16_t const tile = m_tileram[tile_index]; // TODO: incomplete, RAM is 8 bit but tiles are much more
+
+	tileinfo.set(0, tile, 0, 0);
+}
+
+void neptunp2_video_state::tileram_w(offs_t offset, uint8_t data)
+{
+	m_tileram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
+}
+
+uint32_t neptunp2_video_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+void neptunp2_state::no_video_program_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0xbffff).rom();
+	map(0xe0000, 0xeffff).ram();
+
+	map(0xdb004, 0xdb007).ram();
+	map(0xdb00c, 0xdb00f).ram();
+
+	//map(0xff806, 0xff806).lr8(NAME([this] () -> uint8_t { return machine().rand(); }));
+	//map(0xff810, 0xff810).lr8(NAME([this] () -> uint8_t { return machine().rand(); }));
+	//map(0xff812, 0xff812).lr8(NAME([this] () -> uint8_t { return machine().rand(); }));
+
+	map(0xff980, 0xff980).nopw();
+
+	map(0xffff0, 0xfffff).rom();
+}
+
+void neptunp2_video_state::video_program_map(address_map &map)
+{
+	no_video_program_map(map);
+
+	// map(0xc0000, 0xcffff).bankr(m_rombank); // ??
+	map(0xd0000, 0xd7fff).ram();
+	map(0xd8000, 0xd87ff).ram().w(FUNC(neptunp2_video_state::tileram_w)).share(m_tileram);
+	map(0xd8800, 0xdffff).ram(); // more gfx
+}
+
+void neptunp2_state::io_map(address_map &map)
+{
+}
+
+
+static INPUT_PORTS_START( neptunp2 )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START(c960606)
 	PORT_START("DSW1")
@@ -222,97 +312,46 @@ static INPUT_PORTS_START(c960606)
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:8")
 INPUT_PORTS_END
 
-void neptunp2_state::video_start()
-{
-}
-
-uint32_t neptunp2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
-
-uint8_t neptunp2_state::test_r()
-{
-	return machine().rand();
-}
-
-void neptunp2_state::neptunp2_no_video_map(address_map &map)
-{
-	map(0x00000, 0xbffff).rom();
-	map(0xe0000, 0xeffff).ram();
-
-	map(0xdb004, 0xdb007).ram();
-	map(0xdb00c, 0xdb00f).ram();
-
-	map(0xff806, 0xff806).r(FUNC(neptunp2_state::test_r));
-	map(0xff810, 0xff810).r(FUNC(neptunp2_state::test_r));
-	map(0xff812, 0xff812).r(FUNC(neptunp2_state::test_r));
-
-	map(0xff980, 0xff980).nopw();
-
-	map(0xffff0, 0xfffff).rom();
-}
-
-void neptunp2_state::neptunp2_video_map(address_map &map)
-{
-	neptunp2_no_video_map(map);
-
-	map(0xd0000, 0xd7fff).ram(); //videoram
-}
-
-void neptunp2_state::neptunp2_io(address_map &map)
-{
-}
-
-
-static INPUT_PORTS_START( neptunp2 )
-INPUT_PORTS_END
-
-#if 0
-static const gfx_layout charlayout =
-{
-	8,8,    // 8*8 characters
-	RGN_FRAC(1,3),  // 1024 characters
-	3,  // 3 bits per pixel
-	{ RGN_FRAC(1,3), RGN_FRAC(2,3), RGN_FRAC(0,3) },    // The bitplanes are separated
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 // Every char takes 8 consecutive bytes
-};
-#endif
 
 static GFXDECODE_START( gfx_neptunp2 )
-//  GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "gfx", 0, gfx_16x16x8_raw, 0, 16 ) // TODO: not 100% correct
 GFXDECODE_END
 
-void neptunp2_state::neptunp2_no_video(machine_config &config)
+
+void neptunp2_state::no_video(machine_config &config)
 {
 	// Basic machine hardware
 	I80188(config, m_maincpu, 36.864_MHz_XTAL); // N80C188-20 AMD
-	m_maincpu->set_addrmap(AS_PROGRAM, &neptunp2_state::neptunp2_no_video_map);
-	m_maincpu->set_addrmap(AS_IO, &neptunp2_state::neptunp2_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &neptunp2_state::no_video_program_map);
+	m_maincpu->set_addrmap(AS_IO, &neptunp2_state::io_map);
+
+	PCF8583(config, "rtc", 32.768_kHz_XTAL);
+
+	I2C_24C16(config, "i2cmem");
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6376(config, "oki", 36.864_MHz_XTAL/32).add_route(ALL_OUTPUTS, "mono", 1.0); // Frequency divisor is a guess
+	OKIM6376(config, "oki", 36.864_MHz_XTAL / 32).add_route(ALL_OUTPUTS, "mono", 1.0); // Frequency divisor is a guess
 }
 
-void neptunp2_state::neptunp2_video(machine_config &config)
+void neptunp2_video_state::video(machine_config &config)
 {
-	neptunp2_no_video(config);
+	no_video(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &neptunp2_state::neptunp2_video_map);
-	m_maincpu->set_vblank_int("screen", FUNC(neptunp2_state::irq0_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &neptunp2_video_state::video_program_map);
+	m_maincpu->set_vblank_int("screen", FUNC(neptunp2_video_state::nmi_line_pulse)); // TODO: find origin
 
 	// Video hardware (probably wrong values, as the video board outputs VGA resolution)
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_screen_update(FUNC(neptunp2_state::screen_update));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(neptunp2_video_state::screen_update));
+	screen.set_size(64*16, 32*16);
+	screen.set_visarea(0*16, 56*16-1, 0*16, 32*16-1);
 	screen.set_palette("palette");
+
+	// TODO: ADV7123 RAMDAC
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_neptunp2);
 	PALETTE(config, "palette").set_entries(512);
@@ -333,7 +372,7 @@ ROM_START( neptunp2 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "u2.bin",   0x000000, 0x100000, CRC(4fbb06d1) SHA1(6490cd3b96b3b61f48fcb843772bd787605ab76f) )
 
-	ROM_REGION( 0x100000, "prg_data", 0 ) //dunno how this maps ...
+	ROM_REGION( 0x100000, "prg_data", 0 ) // dunno how this maps ...
 	ROM_LOAD( "u3.bin",   0x000000, 0x100000, CRC(3c1746e2) SHA1(a7fd59f5397ce1653848e15f16399b537f3a1ea7) )
 
 	ROM_REGION( 0x200000, "oki", 0 )
@@ -368,19 +407,23 @@ ROM_START( perlacrb )
 	ROM_LOAD( "s-436_otp.u14", 0x000000, 0x100000, CRC(52c08401) SHA1(2cd5110bb433996f6afdf48e68c65554d393dd14) )
 	ROM_LOAD( "s-437_otp.u15", 0x100000, 0x100000, CRC(23cc1ab1) SHA1(d1fddb8c742a356703993cee35dc3f5d6ee3d6ea) )
 
-	ROM_REGION( 0x8000400, "gfx", 0 )
+	ROM_REGION( 0x8000000, "gfx", 0 )
 	// SIMM 0, "Window B", not present
 	// SIMM 1, "Window A", dated 15/May/2008
-	ROM_LOAD( "la_perla_del_caribe_bq_graf.-es_w1-1-2_v_g-1f019.u1",  0x0000000, 0x2000100, CRC(1e613ecf) SHA1(7036855b29f796a936aac5084acd6a49bc614dd8) )
-	ROM_LOAD( "la_perla_del_caribe_bq_graf.-es_w1-1-2_v_g-1f019.u2",  0x2000100, 0x2000100, CRC(229c83e3) SHA1(647c11b55ded105ec21bc57aad7b65575966ff9c) )
+	ROM_LOAD16_BYTE( "la_perla_del_caribe_bq_graf.-es_w1-1-2_v_g-1f019.u1",  0x0000000, 0x2000000, CRC(1e613ecf) SHA1(7036855b29f796a936aac5084acd6a49bc614dd8) )
+	ROM_IGNORE(                                                                         0x0000100 )
+	ROM_LOAD16_BYTE( "la_perla_del_caribe_bq_graf.-es_w1-1-2_v_g-1f019.u2",  0x0000001, 0x2000000, CRC(229c83e3) SHA1(647c11b55ded105ec21bc57aad7b65575966ff9c) )
+	ROM_IGNORE(                                                                         0x0000100 )
 	// SIMM 2, "Background B", not present
 	// SIMM 3, "Background A", dated 15/May/2008
-	ROM_LOAD( "la_perla_del_caribe_bq_graf.-es_bg1-2-2_v_g-3f019.u1", 0x4000200, 0x2000100, CRC(2dd9db7f) SHA1(a6fc4ebaf536933bc901699c21d65ad1eb7baaad) )
-	ROM_LOAD( "la_perla_del_caribe_bq_graf.-es_bg1-2-2_v_g-3f019.u2", 0x6000300, 0x2000100, CRC(c391c42c) SHA1(a3416f6ed0de7898cf7205fc88499cc27eb9471d) )
+	ROM_LOAD16_BYTE( "la_perla_del_caribe_bq_graf.-es_bg1-2-2_v_g-3f019.u1", 0x4000000, 0x2000000, CRC(2dd9db7f) SHA1(a6fc4ebaf536933bc901699c21d65ad1eb7baaad) )
+	ROM_IGNORE(                                                                         0x0000100 )
+	ROM_LOAD16_BYTE( "la_perla_del_caribe_bq_graf.-es_bg1-2-2_v_g-3f019.u2", 0x4000001, 0x2000000, CRC(c391c42c) SHA1(a3416f6ed0de7898cf7205fc88499cc27eb9471d) )
+	ROM_IGNORE(                                                                         0x0000100 )
 
 	// Reels PCB 2000401-3
-	ROM_REGION( 0x2000, "reels", 0 )
-	ROM_LOAD( "pic16f76.u11", 0x0000, 0x2000, NO_DUMP ) // 8KB internal ROM, undumped
+	ROM_REGION16_LE( 0x4010, "reels", ROMREGION_ERASEFF )
+	ROM_LOAD( "pic16f76.u11", 0x0000, 0x4010, NO_DUMP )
 
 	ROM_REGION( 0x800, "eeprom", 0 )
 	ROM_LOAD( "24lc16b.u10", 0x000, 0x800, CRC(554805fa) SHA1(a79a1617c70e02d8100e6f38062a9aa15141c73c) )
@@ -388,8 +431,8 @@ ROM_START( perlacrb )
 	ROM_REGION( 0x800, "counters", 0 )
 	ROM_LOAD( "cirsa_cs-4_st24c16.bin", 0x000, 0x800, CRC(16fb7d4f) SHA1(e795731d041bbfd21270d774f3c1d7d4e91c4a15) ) // Probably contains operator data
 
-	ROM_REGION( 0x104, "plds", 0 )
-	ROM_LOAD( "pat063-1_gal16v8d.u6", 0x000, 0x104, NO_DUMP ) // "PAT-063/1", protected
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "pat_063-1.u6", 0x000, 0x117, BAD_DUMP CRC(39e107c6) SHA1(bb151d9085d81233854a91b1a95c4abae9bd597b) ) // "PAT-063/1", protected, dump from "eurbingo7"
 ROM_END
 
 
@@ -450,8 +493,49 @@ ROM_START( charles )
 	ROM_REGION( 0x800, "counters", 0 )
 	ROM_LOAD( "cirsa_cs-4.bin", 0x000, 0x800, NO_DUMP )
 
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "pat_063-1.u6", 0x000, 0x117, BAD_DUMP CRC(39e107c6) SHA1(bb151d9085d81233854a91b1a95c4abae9bd597b) ) // "PAT 063/1", protected, dump from "eurbingo7"
+ROM_END
+
+// '960606-3A*' PCB and 'CB1 (CS4)' security counters module.
+ROM_START( eltesorof )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "c._el_tesoro_del_f._b-hm0007_v1.1cat.u16", 0x000000, 0x080000, CRC(f1cf40d8) SHA1(11f6732de05c3191807ac9766032b31735ca8f8c) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "c._el_tesoro_del_f._b-hm0007_s104_1.0.u15", 0x000000, 0x080000, CRC(b1164183) SHA1(2b3fb69bb8bea77727be2cc97818baa43d286a99) )
+	ROM_LOAD( "c._el_tesoro_del_f._b-hm0007_s105_1.0.u14", 0x080000, 0x080000, CRC(62673bbe) SHA1(08890ac4247c97fea7794fd56e2f27b377ce4e27) )
+
+	ROM_REGION( 0x800, "eeprom", 0 )
+	ROM_LOAD( "24c16.u10", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x800, "counters", 0 )
+	ROM_LOAD( "cs4.bin", 0x000, 0x800, NO_DUMP)
+
 	ROM_REGION( 0x104, "plds", 0 )
-	ROM_LOAD( "pat_063_tibpal16l8-25cn.u6", 0x000, 0x104, NO_DUMP ) // "PAT 063/1", protected
+	ROM_LOAD( "pat_058.u6", 0x000, 0x104, NO_DUMP ) // "PAT 058", protected
+ROM_END
+
+/* '61509960606-5 PCB (exactly the same as '960606-5', but with better quality connectors).
+   CPLD labeled as 'PD18'. There's a sticker on the PCB with the date '17/07/2010'.
+   Manuals with schematics:  https://www.recreativas.org/cirsa-euro-bingo-7-7172-unidesa-cirsa  */
+ROM_START( eurbingo7 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "cirsa_euro_bingo_b-00-2193-a_v8.0_caa_02e02c5f_checksum_cl-000929_unidesa.u2", 0x000000, 0x100000, CRC(79c1bbcb) SHA1(2b3b8eacec5233c5ba71a7894710936653a5addd) )
+	// U3 not used
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "s-576_otp.u14", 0x000000, 0x100000, CRC(56198e16) SHA1(27835ee69cd57c125bf27fa45009f28b0416f2fd) )
+	// U15 not used
+
+	ROM_REGION( 0x800, "eeprom", 0 )
+	ROM_LOAD( "24lc16.u10", 0x000, 0x800, CRC(9ebb9996) SHA1(d025b59261181ec0a64570915b62fa9a4bb7bb87) )
+
+	ROM_REGION( 0x800, "counters", 0 )
+	ROM_LOAD( "cirsa_cs-4_24lc16b.bin", 0x000, 0x800, CRC(7b7844a8) SHA1(6ab1b13500a2012257f2f529fb7db3316951bfed) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "pat_063-1.u6", 0x000, 0x117, CRC(39e107c6) SHA1(bb151d9085d81233854a91b1a95c4abae9bd597b) )
 ROM_END
 
 /* '960606-5 PCB and 'CB1 (CS4)' security counters module. CPLD labeled as 'PD18'. This is mechanical.
@@ -470,17 +554,19 @@ ROM_START( gladiador )
 	ROM_REGION( 0x800, "counters", 0 )
 	ROM_LOAD( "225c_b-h240891_cs4_24c16w.bin", 0x000, 0x800, CRC(fd418bd7) SHA1(c257b11288aa70ae986fcf8cbdfcbc4bc83dbd45) ) // Dump for machine with serial 09-01000 (the SEEPROM is probably tied to the serial number)
 
-	ROM_REGION( 0x104, "plds", 0 )
-	ROM_LOAD( "pat_063_tibpal16l8-25cn.u6", 0x000, 0x104, NO_DUMP ) // "PAT 063/1", protected
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "pat_063-1.u6", 0x000, 0x117, BAD_DUMP CRC(39e107c6) SHA1(bb151d9085d81233854a91b1a95c4abae9bd597b) ) // "PAT-063/1", protected, dump from "eurbingo7"
 
 	// Two reels PCBs 615092000401-3
-	ROM_REGION( 0x2000, "reels", 0)
-	ROM_LOAD( "pic16f76_lower.u11", 0x000, 0x2000, NO_DUMP ) // 8KB internal ROM, undumped
-	ROM_LOAD( "pic16f76_upper.u11", 0x000, 0x2000, NO_DUMP ) // 8KB internal ROM, undumped
+	ROM_REGION16_LE( 0x4010, "reels1", ROMREGION_ERASEFF )
+	ROM_LOAD( "reels1_pic16f76.u11", 0x0000, 0x4010, NO_DUMP )
+
+	ROM_REGION16_LE( 0x4010, "reels2", ROMREGION_ERASEFF )
+	ROM_LOAD( "reels2_pic16f76.u11", 0x0000, 0x4010, NO_DUMP )
 
 	// "Lower Additional Game" PCB 615032060623-2
-	ROM_REGION( 0x4000, "lower", 0)
-	ROM_LOAD( "pic16f630.u11", 0x000, 0x4000, NO_DUMP ) // 16KB internal ROM, undumped
+	ROM_REGION16_LE( 0x4300, "lower", ROMREGION_ERASEFF )
+	ROM_LOAD( "pic16f630.u11", 0x000, 0x4300, NO_DUMP )
 ROM_END
 
 /* '61509960606-5 PCB (exactly the same as '960606-5', but with better quality connectors) and 'CB1 (CS4)' security counters module.
@@ -548,6 +634,27 @@ ROM_START( unk960606 )
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "pal16l8.u6", 0x000, 0x104, NO_DUMP )
+ROM_END
+
+ROM_START( unk960606a )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "m27c801.u2", 0x000000, 0x100000, CRC(db7b9e6e) SHA1(442dd4c5b601c327e372e66ff330b35f927dba8b) )
+
+	ROM_REGION( 0x100000, "prg_data", 0 )
+	ROM_LOAD( "u3", 0x000000, 0x100000, NO_DUMP ) // it's also possible it wasn't ever populated
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "u14", 0x000000, 0x100000, NO_DUMP )
+	ROM_LOAD( "u15", 0x100000, 0x100000, NO_DUMP ) // it's also possible it wasn't ever populated
+
+	ROM_REGION( 0x800, "eeprom", 0 )
+	ROM_LOAD( "24lc16.u10", 0x000, 0x800, CRC(e2c0e3c5) SHA1(ec48d243bee97508147ab0b32e69e9c822cb3246) )
+
+	ROM_REGION( 0x800, "counters", 0 )
+	ROM_LOAD( "counters.bin", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "pat.u6", 0x000, 0x104, NO_DUMP )
 ROM_END
 
 /* '960606-5 PCB and 'CB1 (CS4)' security counters module. CPLD labeled as 'PD18'.
@@ -662,26 +769,29 @@ ROM_START( bg_maxa )
 	ROM_LOAD( "pat.u6", 0x000, 0x104, NO_DUMP )
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 // Video games on Cirsa "960606-5" CPU PCB + "IS040302-3" VGA SOC-Legacy PCB (or similar video PCB)
-GAME( 2003,  neptunp2,   0,         neptunp2_video,    neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Neptune's Pearls 2",                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Year from legal registry date
-GAME( 2008,  perlacrb,   0,         neptunp2_video,    neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "La Perla del Caribe (V1.0, Catalonia)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2003,  neptunp2,   0,         video,    neptunp2, neptunp2_video_state, empty_init, ROT0, "Unidesa/Cirsa",         "Neptune's Pearls 2",                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Year from legal registry date
+GAME( 2008,  perlacrb,   0,         video,    neptunp2, neptunp2_video_state, empty_init, ROT0, "Unidesa/Cirsa",         "La Perla del Caribe (V1.0, Catalonia)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-// Screenless games on Cirsa "960606-5" CPU PCB
-GAME( 1999,  ccorsario,  0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Corsarios (Cirsa slot machine, V6.0D)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
-GAME( 1999,  ccorsarioa, ccorsario, neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Corsarios (Cirsa slot machine, V5.10D, Catalonia)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
-GAME( 2002?, charles,    0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/Europea", "Charleston (V2.1, Catalonia)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
-GAME( 2008,  gladiador,  0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Gladiadores (V1.0, CAA)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from manual
-GAME( 2006,  mltpoints,  0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Multi Points (V1.0, CAA)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from manual
-GAME( 1999,  rockroll,   0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "Rock 'n' Roll",                                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from parts' manual and sticker on PCB
-GAME( 2001?, unk960606,  0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa",         "unknown 960606-5 based machine (set 1)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
-GAME( 2001?, unk960606b, 0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/Europea", "unknown 960606-5 based machine (set 2)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
+// Screenless games on Cirsa "960606" CPU PCB
+GAME( 1999,  ccorsario,  0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "Corsarios (Cirsa slot machine, V6.0D)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
+GAME( 1999,  ccorsarioa, ccorsario, no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "Corsarios (Cirsa slot machine, V5.10D, Catalonia)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
+GAME( 2002?, charles,    0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa/Europea", "Charleston (V2.1, Catalonia)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
+GAME( 1998,  eltesorof,  0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         u8"El Tesoro del Faraón (V1.1, Catalonia)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
+GAME( 2010,  eurbingo7,  0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "Euro Bingo 7 (V8.0, CAA)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from parts' manual and sticker on PCB
+GAME( 2008,  gladiador,  0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "Gladiadores (V1.0, CAA)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from manual
+GAME( 2006,  mltpoints,  0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "Multi Points (V1.0, CAA)",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from manual
+GAME( 1999,  rockroll,   0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "Rock 'n' Roll",                                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from parts' manual and sticker on PCB
+GAME( 2001?, unk960606,  0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "unknown 960606-5 based machine (set 1)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
+GAME( ????,  unk960606a, 0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa",         "unknown 960606-5 based machine (set 2)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 2001?, unk960606b, 0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa/Europea", "unknown 960606-5 based machine (set 3)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // Year taken from sticker on PCB
 
 // B. Gaming Technology Ltd. (BGT) fruit machines on Cirsa "960606-5" CPU PCB
-GAME( 1997,  bg_barmy,   0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Barmy Army",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 2000,  bg_dbells,  0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Dancing Bells",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1999,  bg_ddb,     0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Ding Dong Bells (B Gaming Technology)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 2000,  bg_max,     0,         neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Max A Million (set 1)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 2000,  bg_maxa,    bg_max,    neptunp2_no_video, c960606,  neptunp2_state, empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Max A Million (set 2)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1997,  bg_barmy,   0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Barmy Army",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 2000,  bg_dbells,  0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Dancing Bells",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1999,  bg_ddb,     0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Ding Dong Bells (B Gaming Technology)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 2000,  bg_max,     0,         no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Max A Million (set 1)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 2000,  bg_maxa,    bg_max,    no_video, c960606,  neptunp2_state,       empty_init, ROT0, "Unidesa/Cirsa/B. Gaming Technology", "Max A Million (set 2)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

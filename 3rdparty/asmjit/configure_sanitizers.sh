@@ -1,15 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 
-BUILD_OPTIONS="-DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DASMJIT_TEST=1"
-
-echo "== [Configuring Build - Release_ASAN] =="
-eval cmake . -B build/Release_ASAN ${BUILD_OPTIONS} -DCMAKE_BUILD_TYPE=Release -DASMJIT_SANITIZE=address "$@"
+echo "== [configure release-asan] =="
+cmake --preset release-asan "$@"
 echo ""
 
-echo "== [Configuring Build - Release_MSAN] =="
-eval cmake . -B build/Release_MSAN ${BUILD_OPTIONS} -DCMAKE_BUILD_TYPE=Release -DASMJIT_SANITIZE=memory "$@"
+echo "== [configure release-msan] =="
+cmake --preset release-msan "$@"
 echo ""
 
-echo "== [Configuring Build - Release_UBSAN] =="
-eval cmake . -B build/Release_UBSAN ${BUILD_OPTIONS} -DCMAKE_BUILD_TYPE=Release -DASMJIT_SANITIZE=undefined "$@"
+echo "== [configure release-ubsan] =="
+cmake --preset release-ubsan "$@"
 echo ""

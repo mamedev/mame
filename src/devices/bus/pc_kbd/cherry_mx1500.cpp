@@ -36,8 +36,6 @@ cherry_g80_1500_device::cherry_g80_1500_device(const machine_config &mconfig, co
 
 void cherry_g80_1500_device::device_start()
 {
-	m_leds.resolve();
-
 	set_pc_kbdc_device();
 
 	save_item(NAME(m_p1));

@@ -156,11 +156,6 @@ private:
 		return m_cart->read();
 	}
 
-	void spidir_w(int state)
-	{
-		m_cart->dir_w(state);
-	}
-
 	void spibuf_w(uint8_t data)
 	{
 		m_cart->write(data);
@@ -944,7 +939,6 @@ void monon_color_state::monon_color(machine_config &config)
 	m_maincpu->port_out_cb<4>().set(FUNC(monon_color_state::out4_w));
 	m_maincpu->spi_in_cb().set(FUNC(monon_color_state::spibuf_r));
 	m_maincpu->spi_out_cb().set(FUNC(monon_color_state::spibuf_w));
-	m_maincpu->spi_out_dir_cb().set(FUNC(monon_color_state::spidir_w));
 	m_maincpu->dac_out_cb<0>().set(FUNC(monon_color_state::dacout0_w));
 	m_maincpu->dac_out_cb<1>().set(FUNC(monon_color_state::dacout1_w));
 
@@ -955,7 +949,7 @@ void monon_color_state::monon_color(machine_config &config)
 
 	// is this a 3:4 (true vertical) 240x320 screen rotated on its side?
 	// the scan direction for drawing is highly unusual
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(120);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_screen_update(FUNC(monon_color_state::screen_update));

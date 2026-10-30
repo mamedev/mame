@@ -438,8 +438,8 @@ void peplus_state::handle_lightpen()
 	int y_val = m_touch_y.read_safe(0x00);
 	const rectangle &vis_area = m_screen->visible_area();
 
-	int xt = x_val * vis_area.width() / 1024 + vis_area.min_x;
-	int yt = y_val * vis_area.height() / 1024 + vis_area.min_y;
+	int xt = x_val * vis_area.width() / 1024 + vis_area.left();
+	int yt = y_val * vis_area.height() / 1024 + vis_area.top();
 
 	m_assert_lp_timer->adjust(m_screen->time_until_pos(yt, xt), 0);
 }
@@ -1377,10 +1377,6 @@ INPUT_PORTS_END
 
 void peplus_state::machine_start()
 {
-	m_bnka.resolve();
-	m_bnkb.resolve();
-	m_bnkc.resolve();
-
 	m_assert_lp_timer = timer_alloc(FUNC(peplus_state::assert_lp), this);
 
 	save_item(NAME(m_last_cycles));
@@ -1422,7 +1418,7 @@ void peplus_state::peplus(machine_config &config)
 	NVRAM(config, "cmos", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size((52+1)*8, (31+1)*8);
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 25*8-1);

@@ -566,7 +566,7 @@ void wc90_state::wc90(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.17);         // verified on PCB
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
@@ -577,7 +577,7 @@ void wc90_state::wc90(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wc90);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024).set_endianness(ENDIANNESS_BIG);
 
-	TECMO_SPRITE(config, m_sprgen, 0, m_palette, gfx_wc90_spr);
+	TECMO_SPRITE(config, m_sprgen, m_palette, gfx_wc90_spr);
 	m_sprgen->set_pri_callback(FUNC(wc90_state::pri_cb));
 
 	// sound hardware

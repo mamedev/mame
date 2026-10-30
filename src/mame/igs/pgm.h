@@ -62,8 +62,6 @@ protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
 
-	int m_irq4_disabled = 0; // hack
-
 	void pgm_base_mem(address_map &map) ATTR_COLD;
 	void pgm_mem(address_map &map) ATTR_COLD;
 
@@ -91,7 +89,6 @@ private:
 	void z80_latch3_w(u8 data);
 
 	void screen_vblank(int state);
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	u16 sprites_r(offs_t offset);
 
 	void pgm_basic_mem(address_map &map) ATTR_COLD;

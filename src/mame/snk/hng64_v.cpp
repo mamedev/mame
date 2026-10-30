@@ -137,7 +137,7 @@ void hng64_state::tilemap_draw_roz_core_line(
 		screen_device &screen, bitmap_rgb32 &destbitmap, const rectangle &cliprect, tilemap_t *tmap,
 		int wraparound, u8 drawformat, u8 alpha, u8 mosaic, u8 tm, int splitside)
 {
-	int source_line_to_use = cliprect.min_y;
+	int source_line_to_use = cliprect.top();
 	source_line_to_use = (source_line_to_use / (mosaic+1)) * (mosaic+1);
 
 	int xinc, xinc2, yinc, yinc2;
@@ -291,18 +291,27 @@ void hng64_state::tilemap_draw_roz_core_line(
 			u16 line = source_line_to_use;
 			xtopleft = (m_videoram[(0x40000 + (scrollbase << 4)) / 4]);
 			xmiddle = (m_videoram[(0x40004 + (scrollbase << 4)) / 4]); // middle screen point
+			ytopleft = (m_videoram[(0x40008 + (scrollbase << 4)) / 4]);
+			ymiddle = (m_videoram[(0x4000c + (scrollbase << 4)) / 4]); // middle screen point
 
 			u32 xtopleft2 = (m_videoram[(0x40000 + (line * 0x10) + (scrollbase << 4)) / 4]);
 			u32 xmiddle2 = (m_videoram[(0x40004 + (line * 0x10) + (scrollbase << 4)) / 4]); // middle screen point
+			u32 ytopleft2 = (m_videoram[(0x40008 + (line * 0x10) + (scrollbase << 4)) / 4]);
+			u32 ymiddle2 = (m_videoram[(0x4000c + (line * 0x10) + (scrollbase << 4)) / 4]); // middle screen point
 
-			if ((xtopleft2 & 0xff) == 0x00)// set to 0x00 if we should use the line data?
-				xtopleft = xtopleft2;
+			// A line value with a zero low byte is an absolute scroll position (the fatfurwa and buriki
+			// floors).  Any other low byte marks an offset to the first line's position instead, applied
+			// on top of the layer scrolling one source row per line (the xrally mist in the tunnel).
+			// TODO: verify the flag and the per-line step against hardware
+			auto const apply_line = [] (u32 base, u32 value, u32 step) -> u32
+			{
+				return ((value & 0xff) == 0x00) ? value : (base + (value & ~u32(0xff)) + step);
+			};
 
-			if ((xmiddle2 & 0xff) == 0x00) // also set to 0x00 if we should use the line data?
-				xmiddle = xmiddle2;
-
-			ytopleft = (m_videoram[(0x40008 + (line * 0x10) + (scrollbase << 4)) / 4]);
-			ymiddle = (m_videoram[(0x4000c + (line * 0x10) + (scrollbase << 4)) / 4]); // middle screen point
+			xtopleft = apply_line(xtopleft, xtopleft2, 0);
+			xmiddle = apply_line(xmiddle, xmiddle2, 0);
+			ytopleft = apply_line(ytopleft, ytopleft2, u32(line) << 16);
+			ymiddle = apply_line(ymiddle, ymiddle2, u32(line) << 16);
 		}
 
 		if (global_alt_scroll_register_format) // globally selects alt scroll register layout???
@@ -365,13 +374,13 @@ void hng64_state::tilemap_draw_roz_core_line(
 	u8 value = 0x10;
 
 	/* pre-advance based on the cliprect */
-	startx += cliprect.min_x * incxx + source_line_to_use * incyx;
-	starty += cliprect.min_x * incxy + source_line_to_use * incyy;
+	startx += cliprect.left() * incxx + source_line_to_use * incyx;
+	starty += cliprect.left() * incxy + source_line_to_use * incyy;
 
 	/* extract start/end points */
-	int sx = cliprect.min_x;
-	int sy = cliprect.min_y;
-	int ex = cliprect.max_x;
+	int sx = cliprect.left();
+	int sy = cliprect.top();
+	int ex = cliprect.right();
 
 	if (incxy == 0 && incyx == 0 && !wraparound)
 	{
@@ -654,7 +663,7 @@ void hng64_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	}
 
 	rectangle clip = cliprect;
-	clip.min_y = clip.max_y = line;
+	clip.sety(line, line);
 
 	auto profile = g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
 	/* get the full pixmap for the tilemap */
@@ -668,11 +677,9 @@ void hng64_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, cons
 
 	if (global_split_format)
 	{
-		clip.min_x = 256;
-		clip.max_x = 512;
+		clip.setx(256, 512);
 		tilemap_draw_roz_core_line(screen, bitmap, clip, tilemap, wrap, get_blend_mode(tm), 0x80, mosaic, tm, 1);
-		clip.min_x = 0;
-		clip.max_x = 256;
+		clip.setx(0, 256);
 		tilemap_draw_roz_core_line(screen, bitmap, clip, tilemap, wrap, get_blend_mode(tm), 0x80, mosaic, tm, 2);
 
 	}
@@ -693,15 +700,16 @@ void hng64_state::mixsprites_test(screen_device& screen, bitmap_rgb32& bitmap, c
 	//u8 spriteblendtype = (m_tcram[0x10 / 4] >> 16) & 0x10;
 
 	// would be an odd place for it, after the 'vblank' flag but...
+	// also selects the 3D palette half, see screen_update
 	const u8 spriteblendtype = BIT(m_tcram[0x4c / 4], 16);
 	pen_t const* const spriteclut = &m_palette->pen(0);
 
 	if (true)
 	{
-		const u16 *spritesrc = &m_sprite_bitmap.pix(y, cliprect.min_x);
-		u32 *spritedst = &bitmap.pix(y, cliprect.min_x);
+		const u16 *spritesrc = &m_sprite_bitmap.pix(y, cliprect.left());
+		u32 *spritedst = &bitmap.pix(y, cliprect.left());
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			const u16 srcpix = *spritesrc;
 			if (srcpix & 0x0fff)
@@ -837,7 +845,7 @@ u32 hng64_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	// it could also be a unique mixing case
 
 	// tilemaps with 'priority' 0x10 - 0x1f are always behind the 3d?
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		for (int i = 0x1f; i >= 0x10; i--)
 		{
@@ -866,15 +874,11 @@ u32 hng64_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	*/
 
 	// 3d gets drawn next
-	u16 palbase = 0x000;
-	if (BIT(m_fbcontrol[2], 5))
-	{
-		if (!m_roadedge_3d_hack)
-			palbase = 0x800;
-	}
+	// 3D palette half, same bit as spriteblendtype
+	const u16 palbase = BIT(m_tcram[0x4c / 4], 16) ? 0x800 : 0x000;
 
 	rectangle visarea = m_screen->visible_area();
-	const int ysize = visarea.max_y - visarea.min_y;
+	const int ysize = visarea.bottom() - visarea.top();
 
 	if (ysize)
 	{
@@ -892,16 +896,16 @@ u32 hng64_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 			xscroll += 256;
 
 			// Blit the color buffer into the primary bitmap
-			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+			for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 			{
-				const int realy = (((y-visarea.min_y) * yinc) >> 16);
+				const int realy = (((y-visarea.top()) * yinc) >> 16);
 
 				const u16 *src = &m_poly_renderer->colorBuffer3d()[((realy) & 0x1ff) * 512];
-				u32 *dst = &bitmap.pix(y, cliprect.min_x);
+				u32 *dst = &bitmap.pix(y, cliprect.left());
 
-				for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+				for (int x = cliprect.left(); x <= cliprect.right(); x++)
 				{
-					const u16 srcpix = src[((cliprect.min_x + x) + xscroll) & 0x1ff];
+					const u16 srcpix = src[((cliprect.left() + x) + xscroll) & 0x1ff];
 					if (srcpix & 0x07ff)
 					{
 						// format in our framebuffer is llll appp pppp pppp
@@ -924,7 +928,7 @@ u32 hng64_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	}
 
 	// tilemaps with 'priority' 0x00 - 0x0f are always above the 3d? - could bit 0x10 really be a 'relative to 3d' bit, rather than a 'relative to other tilemaps' bit?
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		for (int i = 0x0f; i >= 0x00; i--)
 		{
@@ -1122,7 +1126,7 @@ u32 hng64_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 
 
 			m_tcram[0x48 / 4], // this is where the 'vblank' thing lives
-			m_tcram[0x4c / 4], // 0001 0000 or 0000 0000 - works(?) as blend type selection for sprite mixing?
+			m_tcram[0x4c / 4], // 0001 0000 or 0000 0000 - works(?) as blend type selection for sprite mixing? also the 3D palette half
 			m_tcram[0x50 / 4],
 			m_tcram[0x54 / 4],
 			m_tcram[0x58 / 4],
@@ -1406,11 +1410,11 @@ void hng64_state::tcram_w(offs_t offset, u32 data, u32 mem_mask)
 		visarea.set(min_x, min_x + max_x - 1, min_y, min_y + max_y - 1);
 
 		// TODO: properly calculate this from screen params
-		attoseconds_t period;
+		attotime period;
 		if (max_y == 448)
-			period = HZ_TO_ATTOSECONDS(59.430077); // everything apart from fatfurwa uses a 512x448 resolution, and 59.43hz appears to sync with hardware
+			period = attotime::from_hz(59.430077); // everything apart from fatfurwa uses a 512x448 resolution, and 59.43hz appears to sync with hardware
 		else
-			period = HZ_TO_ATTOSECONDS(61.651673); // fatfurwa uses 512x432, sync frequency not verified
+			period = attotime::from_hz(61.651673); // fatfurwa uses 512x432, sync frequency not verified
 
 		m_screen->configure(HTOTAL, VTOTAL, visarea, period);
 	}

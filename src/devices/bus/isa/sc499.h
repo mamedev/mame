@@ -28,7 +28,7 @@ class sc499_ctape_image_device : public microtape_image_device
 {
 public:
 	// construction/destruction
-	sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_image_interface implementation
 	virtual std::pair<std::error_condition, std::string> call_load() override;

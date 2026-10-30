@@ -47,25 +47,26 @@ private:
 	void mmio_map(address_map &map) ATTR_COLD;
 
 	// speed register
-	uint16_t speed_r(offs_t offset, uint16_t mem_mask = ~0);
-	void speed_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t speed_r(offs_t offset, uint16_t mem_mask);
+	void speed_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	// ide register
-	uint16_t ide_0_cs0_r(offs_t offset, uint16_t mem_mask = ~0);
-	void ide_0_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t ide_0_cs1_r(offs_t offset, uint16_t mem_mask = ~0);
-	void ide_0_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t ide_1_cs0_r(offs_t offset, uint16_t mem_mask = ~0);
-	void ide_1_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t ide_1_cs1_r(offs_t offset, uint16_t mem_mask = ~0);
-	void ide_1_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ide_0_cs0_r(offs_t offset, uint16_t mem_mask);
+	void ide_0_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ide_0_cs1_r(offs_t offset, uint16_t mem_mask);
+	void ide_0_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ide_1_cs0_r(offs_t offset, uint16_t mem_mask);
+	void ide_1_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ide_1_cs1_r(offs_t offset, uint16_t mem_mask);
+	void ide_1_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	// interrupt register
-	uint16_t ide_0_interrupt_r(offs_t offset, uint16_t mem_mask = ~0);
-	uint16_t ide_1_interrupt_r(offs_t offset, uint16_t mem_mask = ~0);
-	void ide_interrupt_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void update_interrupts();
 	void ide_0_interrupt_w(int state);
 	void ide_1_interrupt_w(int state);
+	uint16_t ide_0_interrupt_r(offs_t offset, uint16_t mem_mask);
+	uint16_t ide_1_interrupt_r(offs_t offset, uint16_t mem_mask);
+	void ide_interrupt_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	uint8_t rom_r(offs_t offset);
 

@@ -143,11 +143,6 @@ void vector4_keyboard_device::device_start()
 	save_item(NAME(m_p24));
 }
 
-void vector4_keyboard_device::device_resolve_objects()
-{
-	m_led.resolve();
-}
-
 void vector4_keyboard_device::write_rxd(int state)
 {
 	m_mcu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);

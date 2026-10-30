@@ -27,12 +27,14 @@
 #include "luaengine.h"
 
 #include "corestr.h"
+#include "ioprocsstream.h"
 #include "path.h"
 #include "unicode.h"
 
 #include <algorithm>
 #include <iterator>
 #include <functional>
+#include <locale>
 #include <thread>
 #include <locale>
 
@@ -380,8 +382,8 @@ private:
 //  ctor
 //-------------------------------------------------
 
-menu_select_software::menu_select_software(mame_ui_manager &mui, render_container &container, ui_system_info const &system)
-	: menu_select_launch(mui, container, true)
+menu_select_software::menu_select_software(mame_ui_manager &mui, render_target &target, ui_system_info const &system)
+	: menu_select_launch(mui, target, true)
 	, m_icon_paths()
 	, m_system(system)
 	, m_displaylist()
@@ -573,7 +575,7 @@ void menu_select_software::populate()
 
 		item_append(
 				m_displaylist[curitem].get().longname, m_displaylist[curitem].get().devicetype,
-				m_displaylist[curitem].get().parentname.empty() ? 0 : FLAG_INVERT, (void *)&m_displaylist[curitem].get());
+				m_displaylist[curitem].get().parentname.empty() ? 0 : FLAG_DEEMPHASIZE, (void *)&m_displaylist[curitem].get());
 	}
 
 	m_skip_main_items = 0;
@@ -714,7 +716,7 @@ void menu_select_software::get_selection(ui_software_info const *&software, ui_s
 
 void menu_select_software::show_config_menu(int index)
 {
-	menu::stack_push<menu_machine_configure>(ui(), container(), m_system, nullptr);
+	menu::stack_push<menu_machine_configure>(ui(), target(), m_system, nullptr);
 }
 
 
@@ -747,7 +749,7 @@ void menu_select_software::filter_selected(int index)
 
 	m_data->get_filter(software_filter::type(index)).show_ui(
 			ui(),
-			container(),
+			target(),
 			[this] (software_filter &filter)
 			{
 				software_filter::type const new_type(filter.get_type());
@@ -756,7 +758,13 @@ void menu_select_software::filter_selected(int index)
 					emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 					if (!file.open(util::string_format("custom_%s_filter.ini", m_system.driver->name)))
 					{
-						filter.save_ini(file, 0);
+						{
+							util::owritestream str(file);
+							str.imbue(std::locale::classic());
+
+							filter.save_ini(str, 0);
+							str << std::flush;
+						}
 						file.close();
 					}
 				}

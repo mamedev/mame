@@ -25,7 +25,7 @@ namespace ui {
 class menu_about : public menu_textbox
 {
 public:
-	menu_about(mame_ui_manager &mui, render_container &container);
+	menu_about(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_about() override;
 
 protected:

@@ -365,7 +365,7 @@ void trs80dt1_state::trs80dt1(machine_config &config)
 	m_maincpu->port_in_cb<3>().set(FUNC(trs80dt1_state::port3_r));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update("crtc", FUNC(i8276_device::screen_update));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
@@ -387,7 +387,7 @@ void trs80dt1_state::trs80dt1(machine_config &config)
 
 	X2210(config, "nvram");
 
-	TTL7474(config, m_7474, 0);
+	TTL7474(config, m_7474);
 	m_7474->comp_output_cb().set_inputline(m_maincpu, MCS51_INT1_LINE).invert(); // /Q connects directly to /INT1, so we need to invert
 
 	/* sound hardware */

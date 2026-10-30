@@ -33,7 +33,7 @@ class t6963c_device : public device_t, public device_memory_interface
 
 public:
 	// construction/destruction
-	t6963c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	t6963c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// CPU read/write access
 	u8 read(offs_t offset);

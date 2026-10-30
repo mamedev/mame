@@ -18,9 +18,7 @@ public:
 	auto out_retn_seen_cb() { return m_out_retn_seen_cb.bind(); }
 
 	bool nmi_stackless_r() { return m_stackless; }
-	void nmi_stackless_w(bool data) { m_stackless = data; }
-
-	void nmi() { set_service_attention<SA_NMI_PENDING, 1>(); }
+	void nmi_stackless_w(bool data);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -37,6 +35,7 @@ protected:
 
 private:
 	bool m_stackless;
+	bool m_stackless_retn_en;
 
 };
 

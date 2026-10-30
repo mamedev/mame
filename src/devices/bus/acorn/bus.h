@@ -34,10 +34,7 @@ public:
 	acorn_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&bus_tag, U &&opts, const char *dflt)
 		: acorn_bus_slot_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 		m_bus.set_tag(std::forward<T>(bus_tag));
 	}
 	acorn_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -52,7 +49,7 @@ private:
 	device_acorn_bus_interface *m_card;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(ACORN_BUS_SLOT, acorn_bus_slot_device)
 
 
@@ -118,7 +115,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(ACORN_BUS, acorn_bus_device)
 
 // ======================> device_acorn_bus_interface

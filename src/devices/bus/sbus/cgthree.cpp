@@ -10,6 +10,8 @@
 #include "cgthree.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 DEFINE_DEVICE_TYPE(SBUS_CGTHREE, sbus_cgthree_device, "cgthree", "Sun cgthree SBus Video")
 
 void sbus_cgthree_device::mem_map(address_map &map)
@@ -34,11 +36,11 @@ const tiny_rom_entry *sbus_cgthree_device::device_rom_region() const
 
 void sbus_cgthree_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(sbus_cgthree_device::screen_update));
 	m_screen->set_raw(92.9405_MHz_XTAL, 1504, 0, 1152, 937, 0, 900);
 
-	BT458(config, m_ramdac, 0);
+	BT458(config, m_ramdac);
 }
 
 sbus_cgthree_device::sbus_cgthree_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

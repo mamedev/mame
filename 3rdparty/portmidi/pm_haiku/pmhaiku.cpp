@@ -12,12 +12,6 @@
 #include "pmutil.h"
 #include "pminternal.h"
 
-// as long as Java on Haiku uses ~/.java/... to store user preferences, we can directly reuse the Linux version
-// (it shouldn't, see https://github.com/haikuports/haikuports/issues/7119)
-extern "C" {
-#include "../pm_linux/finddefault.h"
-}
-
 namespace {
     struct PmInputConsumer : BMidiLocalConsumer {
         PmInputConsumer(PmInternal *midi) :
@@ -179,26 +173,6 @@ namespace {
     }
 
 
-    // copied from the macOS implementation
-    size_t midi_length(uchar status)
-    {
-        int high, low;
-        static size_t high_lengths[] = {
-            1, 1, 1, 1, 1, 1, 1, 1,         /* 0x00 through 0x70 */
-            3, 3, 3, 3, 2, 2, 3, 1          /* 0x80 through 0xf0 */
-        };
-        static size_t low_lengths[] = {
-            1, 2, 3, 2, 1, 1, 1, 1,         /* 0xf0 through 0xf8 */
-            1, 1, 1, 1, 1, 1, 1, 1          /* 0xf9 through 0xff */
-        };
-
-        high = status >> 4;
-        low = status & 15;
-
-        return (high != 0xF) ? high_lengths[high] : low_lengths[low];
-    }
-
-
     PmError write_short(PmInternal *midi, PmEvent *buffer)
     {
         PmOutputInfo *info = (PmOutputInfo*)midi->api_info;
@@ -206,7 +180,7 @@ namespace {
         data[0] = Pm_MessageStatus(buffer->message);
         data[1] = Pm_MessageData1(buffer->message);
         data[2] = Pm_MessageData2(buffer->message);
-        size_t length = midi_length(data[0]);
+        size_t length = pm_midi_length(data[0]);
 
         info->producer->SprayData(data, length, true, buffer->timestamp * 1000);
 
@@ -436,9 +410,6 @@ namespace {
         }
         return pmNoError;
     }
-
-    PmDeviceID pm_default_input_device_id = -1;
-    PmDeviceID pm_default_output_device_id = -1;
 }
 
 extern "C" {
@@ -456,18 +427,6 @@ extern "C" {
             pm_add_device(const_cast<char*>("Haiku MIDI kit"), endpoint->Name(), isInput, FALSE, (void*)(intptr_t)id, isInput ? &pm_in_dictionary : &pm_out_dictionary);
             endpoint->Release();
         }
-
-        // the following (default device handling) is copied from the Linux implementation
-
-        // this is set when we return to Pm_Initialize, but we need it
-        // now in order to (successfully) call Pm_CountDevices()
-        pm_initialized = TRUE;
-        pm_default_input_device_id = find_default_device(
-            const_cast<char*>("/PortMidi/PM_RECOMMENDED_INPUT_DEVICE"), TRUE,
-            pm_default_input_device_id);
-        pm_default_output_device_id = find_default_device(
-            const_cast<char*>("/PortMidi/PM_RECOMMENDED_OUTPUT_DEVICE"), FALSE,
-            pm_default_output_device_id);
     }
 
 

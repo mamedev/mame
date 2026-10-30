@@ -333,15 +333,13 @@ authors:hap, Carl
 									{ 47.5, { 0, 10, 20, 30, 40, 50, 60, 70 } },
 									{ 57.5, { 0, 10, 20, 30, 40, 50, 60, 70 } },
 									{ 67.5, { 0, 10, 20, 30, 40, 50, 60, 70 } } }
+					local coloutputs = { { }, { }, { }, { }, { }, { }, { } }
+					local rowoutputs = { { }, { }, { }, { }, { }, { }, { } }
 
 					for num, col in pairs(walls) do
 						for num2, wall in pairs(col[2]) do
-							machine.output:set_indexed_value("colwall", (num * 10) + num2, 0)
-						end
-					end
-					for num, row in pairs(walls) do
-						for num2, wall in pairs(row[2]) do
-							machine.output:set_indexed_value("rowwall", (num * 10) + num2, 0)
+							table.insert(coloutputs[num], file.device:output(string.format("colwall%u%u", num, num2)))
+							table.insert(rowoutputs[num], file.device:output(string.format("rowwall%u%u", num, num2)))
 						end
 					end
 
@@ -365,8 +363,8 @@ authors:hap, Carl
 										if col[1] < x and (col[1] + 2.5) > x then
 											for num2, wall in pairs(col[2]) do
 												if wall < y and (wall + 7.5) > y then
-													local state = machine.output:get_indexed_value("colwall", (num * 10) + num2)
-													machine.output:set_indexed_value("colwall", (num * 10) + num2, (~state) & 1)
+													local output = coloutputs[num][num2]
+													output:set(~output:get() & 1)
 													return
 												end
 											end
@@ -376,8 +374,8 @@ authors:hap, Carl
 										if row[1] < y and (row[1] + 2.5) > y then
 											for num2, wall in pairs(row[2]) do
 												if wall < x and (wall + 7.5) > x then
-													local state = machine.output:get_indexed_value("rowwall", (num * 10) + num2)
-													machine.output:set_indexed_value("rowwall", (num * 10) + num2, (~state) & 1)
+													local output = rowoutputs[num][num2]
+													output:set(~output:get() & 1)
 													return
 												end
 											end

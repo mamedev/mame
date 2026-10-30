@@ -118,6 +118,8 @@ BG0 palette intensity ( $C47F, $C4FF )
 #include "emu.h"
 #include "argus.h"
 
+#include "input.h" // for video debug keys
+
 
 /***************************************************************************
   Callbacks for the tilemap code
@@ -237,6 +239,7 @@ void argus_common_state::reset_common()
 	m_bg_status = 0x01;
 	m_flipscreen = 0;
 	m_palette_intensity = 0;
+	m_irq_vector = 0;
 }
 
 void argus_state::video_start()

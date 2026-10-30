@@ -29,22 +29,21 @@
 #include <iostream>
 
 #ifdef _WIN32
-#include <io.h>
-#include <fcntl.h>
+#include <windows.h>
 #endif
 
 // ----------------------------------------------------------------------
 
-static void writeusage(std::wostream &output, bool write_word_usage, const struct command *c, char *argv[])
+static void writeusage(std::ostream &output, bool write_word_usage, const struct command *c, char *argv[])
 {
 	std::string cmdname(core_filename_extract_base(argv[0]));
 
 	util::stream_format(output,
-		L"%s %s %s %s\n",
-		(write_word_usage ? L"Usage:" : L"      "),
-		wstring_from_utf8(cmdname),
-		wstring_from_utf8(c->name),
-		c->usage ? wstring_from_utf8(c->usage) : std::wstring());
+		"%s %s %s %s\n",
+		write_word_usage ? "Usage:" : "      ",
+		cmdname,
+		c->name,
+		c->usage ? c->usage : "");
 }
 
 
@@ -140,15 +139,15 @@ static int parse_options(int argc, char *argv[], int minunnamed, int maxunnamed,
 	return lastunnamed;
 
 filternotfound:
-	util::stream_format(std::wcerr, L"%s: Unknown filter type\n", wstring_from_utf8(value));
+	util::stream_format(std::cerr, "%s: Unknown filter type\n", value);
 	return -1;
 
 optionalreadyspecified:
-	util::stream_format(std::wcerr, L"Cannot specify multiple %ss\n", wstring_from_utf8(name));
+	util::stream_format(std::cerr, "Cannot specify multiple %ss\n", name);
 	return -1;
 
 error:
-	util::stream_format(std::wcerr, L"%s: Unrecognized option\n", wstring_from_utf8(argv[i]));
+	util::stream_format(std::cerr, "%s: Unrecognized option\n", argv[i]);
 	return -1;
 }
 
@@ -184,7 +183,7 @@ void reporterror(imgtoolerr_t err, const struct command *c, const char *format, 
 
 	if (!src)
 		src = c->name;
-	util::stream_format(std::wcerr, L"%s: %s\n", wstring_from_utf8(src), wstring_from_utf8(err_name));
+	util::stream_format(std::cerr, "%s: %s\n", src, err_name);
 }
 
 
@@ -246,19 +245,19 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	total_count = 0;
 	total_size = 0;
 
-	util::stream_format(std::wcout, L"Contents of %s:%s\n", wstring_from_utf8(argv[1]), wstring_from_utf8(path));
+	util::stream_format(std::cout, "Contents of %s:%s\n", argv[1], path);
 
 	info = image->info();
 	if (!info.empty())
-		util::stream_format(std::wcout, L"%s\n", wstring_from_utf8(info));
+		util::stream_format(std::cout, "%s\n", info);
 
-	util::stream_format(std::wcout, L"%s\n", wstring_from_utf8(separator));
+	util::stream_format(std::cout, "%s\n", separator);
 
 	while (((err = imgenum->get_next(ent)) == 0) && !ent.eof)
 	{
 		std::string filesize_string = ent.directory
 			? "<DIR>"
-			: util::string_format("%u", (unsigned int) ent.filesize);
+			: util::string_format("%u", ent.filesize);
 
 		if (!ent.lastmodified_time.empty())
 		{
@@ -269,18 +268,18 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 		if (ent.hardlink)
 			strcat(ent.filename, " <hl>");
 
-		util::stream_format(std::wcout,
-			L"%*s %*s %*s %*s\n",
-			-columnwidth_filename, wstring_from_utf8(ent.filename),
-			columnwidth_filesize, wstring_from_utf8(filesize_string),
-			columnwidth_attributes, wstring_from_utf8(ent.attr),
-			columnwidth_lastmodified, wstring_from_utf8(last_modified));
+		util::stream_format(std::cout,
+			"%*s %*s %*s %*s\n",
+			-columnwidth_filename, ent.filename,
+			columnwidth_filesize, filesize_string,
+			columnwidth_attributes, ent.attr,
+			columnwidth_lastmodified, last_modified);
 
 		if (ent.softlink[0] != '\0')
-			util::stream_format(std::wcout, L"-> %s\n", wstring_from_utf8(ent.softlink));
+			util::stream_format(std::cout, "-> %s\n", ent.softlink);
 
 		if (ent.comment[0] != '\0')
-			util::stream_format(std::wcout, L": %s\n", wstring_from_utf8(ent.comment));
+			util::stream_format(std::cout, ": %s\n", ent.comment);
 
 		total_count++;
 		total_size += ent.filesize;
@@ -293,12 +292,12 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	if (err)
 		goto done;
 
-	util::stream_format(std::wcout, L"%s\n", wstring_from_utf8(separator));
-	util::stream_format(std::wcout, L"%8i File(s)        %8i bytes", total_count, total_size);
+	util::stream_format(std::cout, "%s\n", separator);
+	util::stream_format(std::cout, "%8i File(s)        %8i bytes", total_count, total_size);
 	if (!freespace_err)
-		util::stream_format(std::wcout, L"                        %8u bytes free\n", (unsigned int)freespace);
+		util::stream_format(std::cout, "                        %8u bytes free\n", freespace);
 	else
-		util::stream_format(std::wcout, L"\n");
+		util::stream_format(std::cout, "\n");
 
 done:
 	if (err)
@@ -418,7 +417,7 @@ static int cmd_put(const struct command *c, int argc, char *argv[])
 	for (int i = 0; i < filename_count; i++)
 	{
 		filename = filename_list[i];
-		util::stream_format(std::wcout, L"Putting file '%s'...\n", wstring_from_utf8(filename));
+		util::stream_format(std::cout, "Putting file '%s'...\n", filename);
 		err = partition->put_file(new_filename, fork, filename, resolution.get(), filter);
 		if (err)
 			goto done;
@@ -469,7 +468,7 @@ static int cmd_getall(const struct command *c, int argc, char *argv[])
 
 	while (((err = imgenum->get_next(ent)) == 0) && !ent.eof)
 	{
-		util::stream_format(std::wcout, L"Retrieving %s (%u bytes)\n", wstring_from_utf8(ent.filename), (unsigned int)ent.filesize);
+		util::stream_format(std::cout, "Retrieving %s (%u bytes)\n", ent.filename, ent.filesize);
 
 		err = partition->get_file(ent.filename, nullptr, nullptr, filter);
 		if (err)
@@ -581,7 +580,7 @@ static int cmd_identify(const struct command *c, int argc, char *argv[])
 	{
 		for (i = 0; modules[i]; i++)
 		{
-			util::stream_format(std::wcout, L"%.16s %s\n", wstring_from_utf8(modules[i]->name), wstring_from_utf8(modules[i]->description));
+			util::stream_format(std::cout, "%.16s %s\n", modules[i]->name, modules[i]->description);
 		}
 
 		return 0;
@@ -714,11 +713,11 @@ done:
 
 static int cmd_listformats(const struct command *c, int argc, char *argv[])
 {
-	util::stream_format(std::wcout, L"Image formats supported by imgtool:\n\n");
+	util::stream_format(std::cout, "Image formats supported by imgtool:\n\n");
 
 	for (const auto &module : imgtool_get_modules())
 	{
-		util::stream_format(std::wcout, L"  %-25s%s\n", wstring_from_utf8(module->name), wstring_from_utf8(module->description));
+		util::stream_format(std::cout, "  %-25s%s\n", module->name, module->description);
 	}
 
 	return 0;
@@ -728,15 +727,13 @@ static int cmd_listformats(const struct command *c, int argc, char *argv[])
 
 static int cmd_listfilters(const struct command *c, int argc, char *argv[])
 {
-	int i;
+	util::stream_format(std::cout, "Filters supported by imgtool:\n\n");
 
-	util::stream_format(std::wcout, L"Filters supported by imgtool:\n\n");
-
-	for (i = 0; filters[i]; i++)
+	for (int i = 0; filters[i]; i++)
 	{
-		util::stream_format(std::wcout, L"  %-11s%s\n",
-			wstring_from_utf8(filter_get_info_string(filters[i], FILTINFO_STR_NAME)),
-			wstring_from_utf8(filter_get_info_string(filters[i], FILTINFO_STR_HUMANNAME)));
+		util::stream_format(std::cout, "  %-11s%s\n",
+			filter_get_info_string(filters[i], FILTINFO_STR_NAME),
+			filter_get_info_string(filters[i], FILTINFO_STR_HUMANNAME));
 	}
 
 	return 0;
@@ -747,8 +744,8 @@ static void listoptions(const util::option_guide &opt_guide, const char *opt_spe
 	util::option_resolution resolution(opt_guide);
 	resolution.set_specification(opt_spec);
 
-	util::stream_format(std::wcout, L"Option           Allowed values                 Description\n");
-	util::stream_format(std::wcout, L"---------------- ------------------------------ -----------\n");
+	util::stream_format(std::cout, "Option           Allowed values                 Description\n");
+	util::stream_format(std::cout, "---------------- ------------------------------ -----------\n");
 
 	for (auto iter = resolution.entries_begin(); iter != resolution.entries_end(); iter++)
 	{
@@ -795,10 +792,10 @@ static void listoptions(const util::option_guide &opt_guide, const char *opt_spe
 			break;
 		}
 
-		util::stream_format(std::wcout, L"%16s %-30s %s\n",
-			wstring_from_utf8(opt_name),
-			wstring_from_utf8(description_buffer.str()),
-			wstring_from_utf8(opt_desc));
+		util::stream_format(std::cout, "%16s %-30s %s\n",
+			opt_name,
+			description_buffer.str(),
+			opt_desc);
 	}
 }
 
@@ -817,33 +814,33 @@ static int cmd_listdriveroptions(const struct command *c, int argc, char *argv[]
 		return -1;
 	}
 
-	util::stream_format(std::wcout, L"Driver specific options for module '%s':\n\n", wstring_from_utf8(argv[0]));
+	util::stream_format(std::cout, "Driver specific options for module '%s':\n\n", argv[0]);
 
 	/* list write options */
 	opt_guide = (const util::option_guide *) imgtool_get_info_ptr(&mod->imgclass, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
 	opt_spec = imgtool_get_info_string(&mod->imgclass, IMGTOOLINFO_STR_WRITEFILE_OPTSPEC);
 	if (opt_guide)
 	{
-		util::stream_format(std::wcout, L"Image specific file options (usable on the 'put' command):\n\n");
+		util::stream_format(std::cout, "Image specific file options (usable on the 'put' command):\n\n");
 		listoptions(*opt_guide, opt_spec);
-		util::stream_format(std::wcout, L"\n");
+		util::stream_format(std::cout, "\n");
 	}
 	else
 	{
-		util::stream_format(std::wcout, L"No image specific file options\n\n");
+		util::stream_format(std::cout, "No image specific file options\n\n");
 	}
 
 	/* list create options */
 	opt_guide = mod->createimage_optguide;
 	if (opt_guide)
 	{
-		util::stream_format(std::wcout, L"Image specific creation options (usable on the 'create' command):\n\n");
+		util::stream_format(std::cout, "Image specific creation options (usable on the 'create' command):\n\n");
 		listoptions(*opt_guide, mod->createimage_optspec.c_str());
-		util::stream_format(std::wcout, L"\n");
+		util::stream_format(std::cout, "\n");
 	}
 	else
 	{
-		util::stream_format(std::wcout, L"No image specific creation options\n\n");
+		util::stream_format(std::cout, "No image specific creation options\n\n");
 	}
 
 	return 0;
@@ -876,15 +873,16 @@ static const struct command cmds[] =
 
 int main(int argc, char *argv[])
 {
+#ifdef _WIN32
+	SetConsoleOutputCP(CP_UTF8);
+	SetConsoleCP(CP_UTF8);
+#endif // _WIN32
+
 	int i;
 	int result;
 	const struct command *c;
 	const char *sample_format = "coco_jvc_rsdos";
 	std::string cmdname(core_filename_extract_base(argv[0]));
-
-#ifdef _WIN32
-	_setmode(_fileno(stdout), _O_U8TEXT);
-#endif // _WIN32
 
 #ifdef MAME_DEBUG
 	if (imgtool_validitychecks())
@@ -897,7 +895,7 @@ int main(int argc, char *argv[])
 	for (i = 0; i < args.size(); i++)
 		argv[i] = (char *)args[i].c_str();
 
-	util::stream_format(std::wcout, L"\n");
+	util::stream_format(std::cout, "\n");
 
 	if (argc > 1)
 	{
@@ -940,23 +938,23 @@ int main(int argc, char *argv[])
 	}
 
 	// Usage
-	util::stream_format(std::wcerr, L"imgtool - Generic image manipulation tool for use with MAME\n\n");
+	util::stream_format(std::cerr, "imgtool - Generic image manipulation tool for use with MAME\n\n");
 	for (i = 0; i < std::size(cmds); i++)
 	{
-		writeusage(std::wcerr, (i == 0), &cmds[i], argv);
+		writeusage(std::cerr, (i == 0), &cmds[i], argv);
 	}
-	util::stream_format(std::wcerr, L"\n<format> is the image format, e.g. %s\n", wstring_from_utf8(sample_format));
-	util::stream_format(std::wcerr, L"<imagename> is the image filename; can specify a ZIP file for image name\n");
+	util::stream_format(std::cerr, "\n<format> is the image format, e.g. %s\n", sample_format);
+	util::stream_format(std::cerr, "<imagename> is the image filename; can specify a ZIP file for image name\n");
 
-	util::stream_format(std::wcerr, L"\nExample usage:\n");
-	util::stream_format(std::wcerr, L"\t%s dir %s myimageinazip.zip\n", wstring_from_utf8(cmdname), wstring_from_utf8(sample_format));
-	util::stream_format(std::wcerr, L"\t%s get %s myimage.dsk myfile.bin mynewfile.txt\n", wstring_from_utf8(cmdname), wstring_from_utf8(sample_format));
-	util::stream_format(std::wcerr, L"\t%s getall %s myimage.dsk\n", wstring_from_utf8(cmdname), wstring_from_utf8(sample_format));
+	util::stream_format(std::cerr, "\nExample usage:\n");
+	util::stream_format(std::cerr, "\t%s dir %s myimageinazip.zip\n", cmdname, sample_format);
+	util::stream_format(std::cerr, "\t%s get %s myimage.dsk myfile.bin mynewfile.txt\n", cmdname, sample_format);
+	util::stream_format(std::cerr, "\t%s getall %s myimage.dsk\n", cmdname, sample_format);
 	result = 0;
 	goto done;
 
 cmderror:
-	writeusage(std::wcout, 1, &cmds[i], argv);
+	writeusage(std::cout, 1, &cmds[i], argv);
 	result = -1;
 
 done:

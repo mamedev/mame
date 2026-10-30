@@ -907,7 +907,7 @@ void dio16_98629_device::device_add_mconfig(machine_config &config)
 {
 	base_config(config);
 
-	BITBANGER(config, m_stream, 0);
+	BITBANGER(config, m_stream);
 	TIMER(config, m_timer).configure_generic(FUNC(dio16_98629_device::timer_to));
 }
 

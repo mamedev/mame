@@ -284,7 +284,7 @@ void acvirus_state::virus_common(machine_config &config)
 	midiout_slot(mdout);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &acvirus_state::prog_map);
-	m_maincpu->set_addrmap(AS_DATA,    &acvirus_state::data_map);
+	m_maincpu->set_addrmap(AS_DATA, &acvirus_state::data_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(acvirus_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(acvirus_state::p1_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(acvirus_state::p3_r));
@@ -302,7 +302,7 @@ void acvirus_state::virus_common(machine_config &config)
 	m_maincpu->an6_func().set([this] { return m_knob[4*6 + m_an_select]->read(); });
 	m_maincpu->an7_func().set([this] { return m_knob[4*7 + m_an_select]->read(); });
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
 	screen.set_size(6*16, 8*2+1);

@@ -777,7 +777,7 @@ void retofinv_state::retofinv_base(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60.58); // vsync measured at 60.58hz
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0)); // not accurate
 	screen.set_size(36*8, 28*8);
@@ -1078,7 +1078,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1985, retofinv,   0,        retofinv,         retofinv, retofinv_mcu_state, empty_init, ROT90, "Taito Corporation",    "Return of the Invaders",                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, retofinv,   0,        retofinv,         retofinv, retofinv_mcu_state, empty_init, ROT90, "Taito",                "Return of the Invaders",                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1985, retofinvb,  retofinv, retofinvb1,       retofinv, retofinv_mcu_state, empty_init, ROT90, "bootleg",              "Return of the Invaders (bootleg, with MCU)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1985, retofinvb1, retofinv, retofinvb1_nomcu, retofinv, retofinv_state,     empty_init, ROT90, "bootleg",              "Return of the Invaders (bootleg, without MCU, set 1)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1985, retofinvb2, retofinv, retofinvb1_nomcu, retofin2, retofinv_state,     empty_init, ROT90, "bootleg",              "Return of the Invaders (bootleg, without MCU, set 2)",     MACHINE_SUPPORTS_SAVE )

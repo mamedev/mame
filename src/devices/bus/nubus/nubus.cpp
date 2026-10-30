@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "nubus.h"
 
+#include "endianness.h"
+
 #include <algorithm>
 
 

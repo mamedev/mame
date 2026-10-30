@@ -85,9 +85,9 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void s4(machine_config &config);
-	void s9(machine_config &config);
-	void s11(machine_config &config);
+	void s4(machine_config &config) ATTR_COLD;
+	void s9(machine_config &config) ATTR_COLD;
+	void s11(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 
@@ -435,8 +435,6 @@ void shuffle_state::irq_w(int state)
 void shuffle_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_io_outputs.resolve();
-	m_digits.resolve();
 
 	save_item(NAME(m_irq_in_progress));
 	save_item(NAME(m_strobe));
@@ -448,6 +446,7 @@ void shuffle_state::machine_start()
 void shuffle_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 
@@ -515,7 +514,7 @@ void shuffle_state::s4(machine_config &config)
 
 	// Add the soundcard
 	SPEAKER(config, "mono").front_center();
-	WILLIAMS_S4_SOUND(config, m_s4sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	WILLIAMS_S4_SOUND(config, m_s4sound).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void shuffle_state::s9(machine_config &config)
@@ -537,7 +536,7 @@ void shuffle_state::s9(machine_config &config)
 	m_pia21->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<9>));
 	m_pia21->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<10>));
 
-	WILLIAMS_S9_SOUND(config, m_s9sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	WILLIAMS_S9_SOUND(config, m_s9sound).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void shuffle_state::s11(machine_config &config)
@@ -564,7 +563,7 @@ void shuffle_state::s11(machine_config &config)
 	m_pia34->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<13>));
 	m_pia34->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<14>));
 
-	WILLIAMS_S11_SOUND(config, m_s11sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	WILLIAMS_S11_SOUND(config, m_s11sound).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

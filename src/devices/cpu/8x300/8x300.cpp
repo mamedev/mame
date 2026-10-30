@@ -30,7 +30,7 @@
 #define SRC_LSB ((opcode & 0x0700) >> 8)
 #define DST_LSB (opcode & 0x0007)
 #define SET_PC(x)  do { m_PC = (x); m_AR = m_PC; } while (0)
-// for XEC intruction, which sets the AR, but not PC, so that after the instruction at the relative address is done, execution
+// for XEC instruction, which sets the AR, but not PC, so that after the instruction at the relative address is done, execution
 // returns back to next instruction after XEC, unless a JMP or successful NZT is there.
 #define SET_AR(x)  do { m_AR = (x); m_increment_pc = false; } while (0)
 #define SRC_LATCH  do { if(SRC_IS_RIGHT_BANK) m_IV_latch = READPORT(m_IVR+0x100); else m_IV_latch = READPORT(m_IVL); } while (0)

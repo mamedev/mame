@@ -47,7 +47,7 @@ r800_device::r800_device(const machine_config &mconfig, const char *tag, device_
 	: z80_device(mconfig, R800, tag, owner, clock)
 {
 	z80_set_m1_cycles(1);
-	z80_set_memrq_cycles(1);
+	z80_set_mreq_cycles(1);
 	z80_set_iorq_cycles(1);
 }
 

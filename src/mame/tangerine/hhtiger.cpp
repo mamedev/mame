@@ -40,6 +40,7 @@ Operating system: CP/M
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "machine/6522via.h"
+#include "machine/clock.h"
 #include "machine/mc6854.h"
 #include "machine/mos6551.h"
 #include "machine/tms9914.h"
@@ -459,7 +460,7 @@ void hhtiger_state::hhtiger(machine_config &config)
 
 	Z80DMA(config, m_dma, 16_MHz_XTAL / 4);
 	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma->in_mreq_callback().set(FUNC(hhtiger_state::memory_read_byte));
 	m_dma->out_mreq_callback().set(FUNC(hhtiger_state::memory_write_byte));
 	m_dma->in_iorq_callback().set(FUNC(hhtiger_state::io_read_byte));
@@ -493,7 +494,7 @@ void hhtiger_state::hhtiger(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(16_MHz_XTAL, 520, 0, 320, 308, 0, 240);
 	m_screen->set_screen_update("upd7220", FUNC(upd7220_device::screen_update));
@@ -530,11 +531,16 @@ void hhtiger_state::hhtiger(machine_config &config)
 	MC6854(config, m_adlc);
 	m_adlc->out_irq_cb().set("irqs", FUNC(input_merger_device::in_w<2>));
 
+	// FIXME: ADLC clock source unknown, rate of the old internal MC6854 timer used
+	clock_device &adlc_clock(CLOCK(config, "adlc_clock", 500'000));
+	adlc_clock.signal_handler().set(m_adlc, FUNC(mc6854_device::txc_w));
+	adlc_clock.signal_handler().append(m_adlc, FUNC(mc6854_device::rxc_w));
+
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	MOS6551(config, m_acia, 0);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(1.8432_MHz_XTAL);
 	m_acia->irq_handler().set("irqs", FUNC(input_merger_device::in_w<3>));
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));

@@ -82,7 +82,7 @@ public:
 		m_led(*this, "led")
 	{ }
 
-	void shtzone(machine_config &config);
+	void shtzone(machine_config &config) ATTR_COLD;
 
 	ioport_value gun_tl_p1_r();
 	ioport_value gun_tl_p2_r();
@@ -299,8 +299,6 @@ void shtzone_state::machine_start()
 {
 	sms_state::machine_start();
 
-	m_led.resolve();
-
 	save_item(NAME(m_control));
 	save_item(NAME(m_selected_cart));
 }
@@ -333,7 +331,7 @@ void shtzone_state::shtzone(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(10.738_MHz_XTAL / 2,
 			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256,
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 192);

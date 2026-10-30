@@ -4,6 +4,8 @@
 #ifndef MAME_CPU_MCS51_I80C52_H
 #define MAME_CPU_MCS51_I80C52_H
 
+#pragma once
+
 #include "i8052.h"
 
 class i80c52_device : public i8052_device
@@ -23,12 +25,12 @@ protected:
 
 	virtual void sfr_map(address_map &map) override ATTR_COLD;
 
-	u8   iph_r ();
-	void iph_w (u8 data);
-	u8   saddr_r ();
-	void saddr_w (u8 data);
-	u8   saden_r ();
-	void saden_w (u8 data);
+	u8 iph_r();
+	void iph_w(u8 data);
+	u8 saddr_r();
+	void saddr_w(u8 data);
+	u8 saden_r();
+	void saden_w(u8 data);
 };
 
 class i80c32_device : public i80c52_device

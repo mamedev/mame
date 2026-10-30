@@ -55,7 +55,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_devo(*this, "devo"),
-		m_cart(*this, "cart"),
+		m_cart(*this, "cartslot"),
 		m_inputs(*this, "COL%u", 1), // labeling from PCB silkscreen
 		m_bender(*this, "BENDER"),
 		m_led_power(*this, "led_power")
@@ -188,7 +188,6 @@ INPUT_PORTS_END
 
 void jaminator_state::machine_start()
 {
-	m_led_power.resolve();
 	m_input_sel = 0;
 	m_link_data = 0;
 

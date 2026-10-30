@@ -1046,7 +1046,7 @@ void _5clown_state::fclown(machine_config &config)
 	pia1.writepb_handler().set(FUNC(_5clown_state::mux_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(10_MHz_XTAL / 2, 320, 0, 256, 312, 0, 256);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

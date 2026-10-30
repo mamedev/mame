@@ -8,11 +8,14 @@
 
 #include "emu.h"
 #include "shark.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "imagedev/harddriv.h"
 
 
+
+namespace {
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -20,14 +23,6 @@
 
 #define I8085_TAG       "i8085"
 #define RS232_TAG       "rs232"
-
-
-
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(MSHARK, mshark_device, "mshark", "Mator SHARK")
 
 
 //-------------------------------------------------
@@ -45,6 +40,34 @@ ROM_START( mshark )
 	ROM_REGION( 0x800, "micro", 0 ) // address decoder
 	ROM_LOAD( "micro p3450 v1.3", 0x000, 0x800, CRC(0e69202e) SHA1(3b384951ff54c4b45a3a778a88966d13e2c9d57a) )
 ROM_END
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> mshark_device
+
+class mshark_device :  public device_t,
+						public device_ieee488_interface
+{
+public:
+	// construction/destruction
+	mshark_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+private:
+	required_device<cpu_device> m_maincpu;
+
+	void mshark_io(address_map &map) ATTR_COLD;
+	void mshark_mem(address_map &map) ATTR_COLD;
+};
 
 
 //-------------------------------------------------
@@ -121,7 +144,7 @@ ioport_constructor mshark_device::device_input_ports() const
 //-------------------------------------------------
 
 mshark_device::mshark_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MSHARK, tag, owner, clock)
+	: device_t(mconfig, GPIB_MSHARK, tag, owner, clock)
 	, device_ieee488_interface(mconfig, *this)
 	, m_maincpu(*this, I8085_TAG)
 {
@@ -135,3 +158,13 @@ mshark_device::mshark_device(const machine_config &mconfig, const char *tag, dev
 void mshark_device::device_start()
 {
 }
+
+} // anonymous namespace
+
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(GPIB_MSHARK, device_ieee488_interface, mshark_device, "gpib_mshark", "Mator SHARK")

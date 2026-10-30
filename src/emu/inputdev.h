@@ -15,6 +15,8 @@
 
 #include "interface/inputdev.h"
 
+#include <string>
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -51,6 +53,9 @@ public:
 	static constexpr u8 JOYSTICK_MAP_STICKY  = 0x0f;
 
 private:
+	// standard joystick maps
+	static const char map_8way[];
+
 	// internal helpers
 	void copy(const joystick_map &src)
 	{
@@ -78,8 +83,6 @@ public:
 
 	// getters
 	input_device &device() const { return m_device; }
-	input_manager &manager() const;
-	running_machine &machine() const;
 	const std::string &name() const { return m_name; }
 	void *internal() const { return m_internal; }
 	input_item_id itemid() const { return m_itemid; }
@@ -128,17 +131,11 @@ protected:
 // a logical device of a given class that can provide input
 class input_device : public osd::input_device
 {
-	friend class input_class;
-
 public:
-	// construction/destruction
-	input_device(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal);
 	virtual ~input_device();
 
 	// getters
-	input_manager &manager() const { return m_manager; }
-	running_machine &machine() const { return m_manager.machine(); }
-	input_device_class devclass() const { return device_class(); }
+	input_device_class device_class() const;
 	const std::string &name() const { return m_name; }
 	const std::string &id() const { return m_id; }
 	int devindex() const { return m_devindex; }
@@ -166,23 +163,31 @@ public:
 	bool match_device_id(std::string_view deviceid) const;
 
 protected:
+	// construction/destruction
+	input_device(
+			input_class &devclass,
+			std::string_view name,
+			std::string_view id,
+			void *internal,
+			s32 threshold,
+			bool steadykey);
+
 	// specific overrides
-	virtual input_device_class device_class() const = 0;
 	virtual s32 adjust_absolute_value(s32 value) const { return value; }
 
 private:
 	// internal state
-	input_manager &         m_manager;              // reference to input manager
-	std::string             m_name;                 // string name of device
-	std::string             m_id;                   // id of device
-	int                     m_devindex;             // device index of this device
+	input_class &               m_class;                // reference to input device class
+	std::string const           m_name;                 // string name of device
+	std::string const           m_id;                   // ID of device
+	int                         m_devindex;             // device index of this device
 	std::unique_ptr<input_device_item> m_item[ITEM_ID_ABSOLUTE_MAXIMUM+1]; // array of pointers to items
-	assignment_vector       m_default_assignments;  // additional assignments
-	input_item_id           m_maxitem;              // maximum item index
-	void *const             m_internal;             // internal callback pointer
+	assignment_vector           m_default_assignments;  // additional assignments
+	input_item_id               m_maxitem;              // maximum item index
+	void *const                 m_internal;             // internal callback pointer
 
-	s32 const               m_threshold;            // threshold for treating absolute axis as active
-	bool const              m_steadykey_enabled;    // steadykey enabled for keyboards
+	s32 const                   m_threshold;            // threshold for treating absolute axis as active
+	bool const                  m_steadykey_enabled;    // steadykey enabled for keyboards
 };
 
 
@@ -192,14 +197,16 @@ class input_device_keyboard : public input_device
 {
 public:
 	// construction/destruction
-	input_device_keyboard(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal);
+	input_device_keyboard(
+			input_class &devclass,
+			std::string_view _name,
+			std::string_view _id,
+			void *_internal,
+			s32 _threshold,
+			bool _steadykey);
 
 	// helpers
 	void apply_steadykey() const;
-
-protected:
-	// specific overrides
-	virtual input_device_class device_class() const override { return DEVICE_CLASS_KEYBOARD; }
 };
 
 
@@ -209,11 +216,12 @@ class input_device_mouse : public input_device
 {
 public:
 	// construction/destruction
-	input_device_mouse(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal);
-
-protected:
-	// specific overrides
-	virtual input_device_class device_class() const override { return DEVICE_CLASS_MOUSE; }
+	input_device_mouse(
+			input_class &devclass,
+			std::string_view _name,
+			std::string_view _id,
+			void *_internal,
+			s32 _threshold);
 };
 
 
@@ -223,11 +231,12 @@ class input_device_lightgun : public input_device
 {
 public:
 	// construction/destruction
-	input_device_lightgun(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal);
-
-protected:
-	// specific overrides
-	virtual input_device_class device_class() const override { return DEVICE_CLASS_LIGHTGUN; }
+	input_device_lightgun(
+			input_class &devclass,
+			std::string_view _name,
+			std::string_view _id,
+			void *_internal,
+			s32 _threshold);
 };
 
 
@@ -238,7 +247,15 @@ class input_device_joystick : public input_device
 {
 public:
 	// construction/destruction
-	input_device_joystick(input_manager &manager, std::string_view _name, std::string_view _id, void *_internal);
+	input_device_joystick(
+			input_class &devclass,
+			std::string_view _name,
+			std::string_view _id,
+			void *_internal,
+			s32 _threshold,
+			s32 _deadzone,
+			s32 _saturation,
+			char const *mapstring);
 
 	// getters
 	joystick_map &joymap() { return m_joymap; }
@@ -248,7 +265,6 @@ public:
 
 protected:
 	// specific overrides
-	virtual input_device_class device_class() const override { return DEVICE_CLASS_JOYSTICK; }
 	virtual s32 adjust_absolute_value(s32 value) const override;
 
 private:
@@ -266,32 +282,37 @@ private:
 class input_class
 {
 public:
-	// construction/destruction
-	input_class(input_manager &manager, input_device_class devclass, const char *name, bool enabled = false, bool multi = false);
 	virtual ~input_class();
 
 	// getters
 	input_manager &manager() const { return m_manager; }
-	running_machine &machine() const  { return m_manager.machine(); }
 	input_device *device(int index) const { return (index <= m_maxindex) ? m_device[index].get() : nullptr; }
-	input_device_class devclass() const { return m_devclass; }
-	const char *name() const { return m_name; }
+	input_device_class device_class() const { return m_devclass; }
+	char const *name() const { return m_name; }
 	int maxindex() const { return m_maxindex; }
 	bool enabled() const { return m_enabled; }
 	bool multi() const { return m_multi; }
 
 	// setters
 	void enable(bool state = true) { m_enabled = state; }
-	void set_multi(bool multi = true) { m_multi = multi; }
 
 	// device management
 	input_device &add_device(std::string_view name, std::string_view id, void *internal = nullptr);
 
 	// misc helpers
-	input_item_class standard_item_class(input_item_id itemid) const;
+	input_item_class standard_item_class(input_item_id itemid) const noexcept;
 	void remap_device_index(int oldindex, int newindex);
 
 protected:
+	// construction/destruction
+	input_class(
+			input_manager &manager,
+			input_device_class devclass,
+			char const *name,
+			input_item_class axisclass,
+			bool enabled,
+			bool multi);
+
 	// specific overrides
 	virtual std::unique_ptr<input_device> make_device(std::string_view name, std::string_view id, void *internal) = 0;
 
@@ -304,89 +325,11 @@ private:
 	input_manager &         m_manager;              // reference to our manager
 	std::unique_ptr<input_device> m_device[DEVICE_INDEX_MAXIMUM]; // array of devices in this class
 	input_device_class      m_devclass;             // our device class
-	const char *            m_name;                 // name of class (used for option settings)
+	char const * const      m_name;                 // name of class (used for option settings)
+	input_item_class const  m_axis_class;           // default class for analog axis items
 	int                     m_maxindex;             // maximum populated index
 	bool                    m_enabled;              // is this class enabled?
-	bool                    m_multi;                // are multiple instances of this class allowed?
-};
-
-
-// ======================> input_class_keyboard
-
-// class of device that provides keyboard input
-class input_class_keyboard : public input_class
-{
-public:
-	// construction/destruction
-	input_class_keyboard(input_manager &manager);
-
-protected:
-	// specific overrides
-	virtual std::unique_ptr<input_device> make_device(std::string_view name, std::string_view id, void *internal) override
-	{
-		return std::make_unique<input_device_keyboard>(manager(), name, id, internal);
-	}
-
-private:
-	// internal helpers
-	void frame_callback();
-};
-
-
-// ======================> input_class_mouse
-
-// class of device that provides mouse input
-class input_class_mouse : public input_class
-{
-public:
-	// construction/destruction
-	input_class_mouse(input_manager &manager);
-
-protected:
-	// specific overrides
-	virtual std::unique_ptr<input_device> make_device(std::string_view name, std::string_view id, void *internal) override
-	{
-		return std::make_unique<input_device_mouse>(manager(), name, id, internal);
-	}
-};
-
-
-// ======================> input_class_lightgun
-
-// class of device that provides lightgun input
-class input_class_lightgun : public input_class
-{
-public:
-	// construction/destruction
-	input_class_lightgun(input_manager &manager);
-
-protected:
-	// specific overrides
-	virtual std::unique_ptr<input_device> make_device(std::string_view name, std::string_view id, void *internal) override
-	{
-		return std::make_unique<input_device_lightgun>(manager(), name, id, internal);
-	}
-};
-
-
-// ======================> input_class_joystick
-
-// class of device that provides joystick input
-class input_class_joystick : public input_class
-{
-public:
-	// construction/destruction
-	input_class_joystick(input_manager &manager);
-
-	// standard joystick maps
-	static const char map_8way[];
-
-protected:
-	// specific overrides
-	virtual std::unique_ptr<input_device> make_device(std::string_view name, std::string_view id, void *internal) override
-	{
-		return std::make_unique<input_device_joystick>(manager(), name, id, internal);
-	}
+	bool const              m_multi;                // are multiple instances of this class allowed?
 };
 
 
@@ -394,10 +337,8 @@ protected:
 //  INLINE FUNCTIONS
 //**************************************************************************
 
-// input_device_item helpers
-inline input_manager &input_device_item::manager() const { return m_device.manager(); }
-inline running_machine &input_device_item::machine() const { return m_device.machine(); }
-inline input_code input_device_item::code() const { return input_code(m_device.devclass(), m_device.devindex(), m_itemclass, ITEM_MODIFIER_NONE, m_itemid); }
+inline input_device_class input_device::device_class() const { return m_class.device_class(); }
+inline input_code input_device_item::code() const { return input_code(m_device.device_class(), m_device.devindex(), m_itemclass, ITEM_MODIFIER_NONE, m_itemid); }
 inline s32 input_device_item::update_value() { return m_current = (*m_getstate)(m_device.internal(), m_internal); }
 
 #endif  // MAME_EMU_INPUTDEV_H

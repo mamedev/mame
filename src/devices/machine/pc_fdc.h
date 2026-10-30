@@ -54,7 +54,7 @@ private:
 
 class pc_fdc_xt_device : public pc_fdc_family_device {
 public:
-	pc_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void map(address_map &map) override ATTR_COLD;
 	void dor_fifo_w(uint8_t data);

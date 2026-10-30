@@ -244,7 +244,7 @@ void jackpot_state::jackpot(machine_config &config) // clocks not verified
 	uart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	// reset by the CRTC with 384x256, 55.93 Hz (tentative)
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

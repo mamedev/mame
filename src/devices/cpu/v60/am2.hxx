@@ -941,13 +941,13 @@ uint32_t v60_device::bam2DirectAddressDeferredIndexed()
 
 uint32_t v60_device::am2Immediate()
 {
-	// ignore LDPR
+	m_amflag = 0;
 	return am1Immediate();
 }
 
 uint32_t v60_device::am2ImmediateQuick()
 {
-	// ignore LDPR
+	m_amflag = 0;
 	return am1ImmediateQuick();
 }
 

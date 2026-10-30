@@ -37,13 +37,12 @@ public:
 		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
-	void polyplay_zre(machine_config &config);
-	void polyplay_zrepp(machine_config &config);
+	void polyplay_zre(machine_config &config) ATTR_COLD;
+	void polyplay_zrepp(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override ATTR_COLD;
 
 private:

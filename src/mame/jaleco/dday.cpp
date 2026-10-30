@@ -610,7 +610,7 @@ void dday_state::dday(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dday_state::sound_map);
 
 	I8257(config, m_dma, 12_MHz_XTAL / 4);
-	m_dma->out_hrq_cb().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_hrq_cb().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma->in_memr_cb().set(FUNC(dday_state::dma_mem_r));
 	m_dma->out_memw_cb().set(FUNC(dday_state::dma_mem_w));
 	m_dma->in_ior_cb<1>().set(FUNC(dday_state::dma_r));
@@ -620,7 +620,7 @@ void dday_state::dday(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60000)); // for I8257
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);

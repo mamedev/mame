@@ -23,29 +23,7 @@
 #include "screen.h"
 #include "cpu/z80/z80.h"
 
-/* Spectrum crystals */
-
-#define X1 14_MHz_XTAL          // Main clock (48k Spectrum)
-#define X2 XTAL(4'433'619)      // PAL color subcarrier
-
-/* Spectrum screen size in pixels */
-#define SPEC_UNSEEN_LINES  16   /* Non-visible scanlines before first border
-                                   line. Some of these may be vertical retrace. */
-#define SPEC_TOP_BORDER    48   /* Number of border lines before actual screen */
-#define SPEC_DISPLAY_YSIZE 192  /* Vertical screen resolution */
-#define SPEC_BOTTOM_BORDER 56   /* Number of border lines at bottom of screen */
-#define SPEC_SCREEN_HEIGHT (SPEC_TOP_BORDER + SPEC_DISPLAY_YSIZE + SPEC_BOTTOM_BORDER)
-
-#define SPEC_LEFT_BORDER   48   /* Number of left hand border pixels */
-#define SPEC_DISPLAY_XSIZE 256  /* Horizontal screen resolution */
-#define SPEC_RIGHT_BORDER  48   /* Number of right hand border pixels */
-#define SPEC_SCREEN_WIDTH (SPEC_LEFT_BORDER + SPEC_DISPLAY_XSIZE + SPEC_RIGHT_BORDER)
-
-#define SPEC_LEFT_BORDER_CYCLES   24   /* Cycles to display left hand border */
-#define SPEC_DISPLAY_XSIZE_CYCLES 128  /* Horizontal screen resolution */
-#define SPEC_RIGHT_BORDER_CYCLES  24   /* Cycles to display right hand border */
-#define SPEC_RETRACE_CYCLES       48   /* Cycles taken for horizontal retrace */
-#define SPEC_CYCLES_PER_LINE      224  /* Number of cycles to display a single line */
+// Spectrum crystals
 
 class spectrum_state : public driver_device
 {
@@ -88,6 +66,27 @@ public:
 	void init_spectrum();
 
 protected:
+	static inline constexpr XTAL X1 = 14_MHz_XTAL;          // Main clock (48k Spectrum)
+	static inline constexpr XTAL X2 = XTAL(4'433'619);      // PAL color subcarrier
+
+	// Spectrum screen size in pixels
+	static inline constexpr int SPEC_UNSEEN_LINES  = 16;   // Non-visible scanlines before first border line. Some of these may be vertical retrace.
+	static inline constexpr int SPEC_TOP_BORDER    = 48;   // Number of border lines before actual screen
+	static inline constexpr int SPEC_DISPLAY_YSIZE = 192;  // Vertical screen resolution
+	static inline constexpr int SPEC_BOTTOM_BORDER = 56;   // Number of border lines at bottom of screen
+	static inline constexpr int SPEC_SCREEN_HEIGHT = (SPEC_TOP_BORDER + SPEC_DISPLAY_YSIZE + SPEC_BOTTOM_BORDER);
+
+	static inline constexpr int SPEC_LEFT_BORDER   = 48;   // Number of left hand border pixels
+	static inline constexpr int SPEC_DISPLAY_XSIZE = 256;  // Horizontal screen resolution
+	static inline constexpr int SPEC_RIGHT_BORDER  = 48;   // Number of right hand border pixels
+	static inline constexpr int SPEC_SCREEN_WIDTH  = (SPEC_LEFT_BORDER + SPEC_DISPLAY_XSIZE + SPEC_RIGHT_BORDER);
+
+	static inline constexpr int SPEC_LEFT_BORDER_CYCLES   = 24;   // Cycles to display left hand border
+	static inline constexpr int SPEC_DISPLAY_XSIZE_CYCLES = 128;  // Horizontal screen resolution
+	static inline constexpr int SPEC_RIGHT_BORDER_CYCLES  = 24;   // Cycles to display right hand border
+	static inline constexpr int SPEC_RETRACE_CYCLES       = 48;   // Cycles taken for horizontal retrace
+	static inline constexpr int SPEC_CYCLES_PER_LINE      = 224;  // Number of cycles to display a single line
+
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
@@ -96,6 +95,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 	// until machine/spec_snqk.cpp gets somehow disentangled
+	virtual void bank3_set_page(u8 page) { }
 	virtual void plus3_update_memory() { }
 	virtual void spectrum_128_update_memory() { }
 	virtual void ts2068_update_memory() { }
@@ -110,12 +110,12 @@ protected:
 
 	int m_port_fe_data;
 	int m_port_7ffd_data;
-	int m_port_1ffd_data;   /* scorpion and plus3 */
-	int m_port_ff_data; /* Display enhancement control */
-	int m_port_f4_data; /* Horizontal Select Register */
+	int m_port_1ffd_data; // scorpion and plus3
+	int m_port_ff_data;   // Display enhancement control
+	int m_port_f4_data;   // Horizontal Select Register
 
-	/* video support */
-	int m_frame_invert_count; /* Used for handling FLASH 1 */
+	// video support
+	int m_frame_invert_count; // Used for handling FLASH 1
 	optional_shared_ptr<uint8_t> m_video_ram;
 	uint8_t *m_screen_location;
 
@@ -206,14 +206,14 @@ protected:
 	void setup_frz(const uint8_t *snapdata, uint32_t snapsize);
 	void z80_decompress_block(address_space &space, const uint8_t *source, uint16_t dest, uint16_t size);
 	void setup_z80(const uint8_t *snapdata, uint32_t snapsize);
-
+	void setup_spg(const u8 *snapdata, u32 snapsize);
 	// quickload helpers
 	void log_quickload(const char *type, uint32_t start, uint32_t length, uint32_t exec, const char *exec_format);
 	void setup_scr(const uint8_t *quickdata, uint32_t quicksize);
 	void setup_raw(const uint8_t *quickdata, uint32_t quicksize);
 };
 
-/*----------- defined in drivers/spectrum.cpp -----------*/
+//----------- defined in drivers/spectrum.cpp -----------
 
 INPUT_PORTS_EXTERN( spectrum );
 INPUT_PORTS_EXTERN( spec128 );

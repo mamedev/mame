@@ -111,7 +111,7 @@ void wait_until(PmTimestamp when)
 }
 
 
-void show_usage()
+void show_usage(void)
 {
     printf("Usage: virttest\n"
            "    run two instances to test virtual port create/delete\n");
@@ -165,7 +165,7 @@ void check_ports(int cnt, int in_id, char in_stat,
 }
 
 
-void devices_list()
+void devices_list(void)
 {
     int i;
     for (i = 0; i < Pm_CountDevices(); i++) {
@@ -180,7 +180,7 @@ void devices_list()
 }
 
 
-void test2()
+void test2(void)
 {
     PmStream *out = NULL;
     PmStream *in = NULL;
@@ -251,7 +251,7 @@ void test2()
 
 extern int pm_check_errors;
 
-void test()
+void test(void)
 {
     PmStream *out;
     PmStream *in;

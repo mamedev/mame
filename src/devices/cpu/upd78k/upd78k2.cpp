@@ -12,6 +12,8 @@
 #include "upd78k2.h"
 #include "upd78k2d.h"
 
+#include "endianness.h"
+
 // device type definitions
 DEFINE_DEVICE_TYPE(UPD78210, upd78210_device, "upd78210", "NEC uPD78210")
 DEFINE_DEVICE_TYPE(UPD78213, upd78213_device, "upd78213", "NEC uPD78213")

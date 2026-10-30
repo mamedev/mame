@@ -820,15 +820,16 @@ void nc200_state::display_memory_start_w(uint8_t data)
 
 uint32_t nc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int y = 0; y <= cliprect.max_y; y++)
+	for (int y = 0; y <= cliprect.bottom(); y++)
 	{
 		// 64 bytes/line
 		uint8_t const *line = reinterpret_cast<uint8_t const *>(m_ram->pointer()) + m_display_memory_start + (y << 6);
+		auto *const dst = &bitmap.pix(y);
 
-		for (int x = 0; x <= cliprect.max_x; x+= 8)
+		for (int x = 0; x <= cliprect.right(); x += 8)
 		{
 			for (int i = 0; i < 8; i++)
-				bitmap.pix(y, x + i) = BIT(*line, 7 - i) ? m_fg_color : m_bg_color;
+				dst[x + i] = BIT(*line, 7 - i) ? m_fg_color : m_bg_color;
 
 			line++;
 		}
@@ -1314,15 +1315,15 @@ void nc_state::nc_base(machine_config &config)
 	TIMER(config, "keyscan_timer").configure_periodic(FUNC(nc_state::keyscan_timer), attotime::from_msec(10));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_screen_update(FUNC(nc_state::screen_update));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper1, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
-	BEEP(config, m_beeper2, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_beeper1).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_beeper2).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	// centronics
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
@@ -1332,7 +1333,7 @@ void nc_state::nc_base(machine_config &config)
 	m_centronics->set_output_latch(cent_data_out);
 
 	// uart
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->txd_handler().set("serial", FUNC(rs232_port_device::write_txd));
 	m_uart->rts_handler().set("serial", FUNC(rs232_port_device::write_rts));
 	m_uart->dtr_handler().set("serial", FUNC(rs232_port_device::write_dtr));

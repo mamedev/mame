@@ -117,7 +117,7 @@ void i82371sb_isa_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->irq3_callback().set(FUNC(i82371sb_isa_device::pc_irq3_w));
 	m_isabus->irq4_callback().set(FUNC(i82371sb_isa_device::pc_irq4_w));
 	m_isabus->irq5_callback().set(FUNC(i82371sb_isa_device::pc_irq5_w));
@@ -263,6 +263,7 @@ void i82371sb_isa_device::xbcs_w(offs_t offset, uint16_t data, uint16_t mem_mask
 {
 	COMBINE_DATA(&xbcs);
 	logerror("xbcs = %04x\n", xbcs);
+	// TODO: likely needs a remap_cb
 }
 
 uint8_t i82371sb_isa_device::pirqrc_r(offs_t offset)
@@ -690,17 +691,17 @@ uint8_t i82371sb_isa_device::pc_dma8237_0_dack_r() { return m_isabus->dack_r(0);
 uint8_t i82371sb_isa_device::pc_dma8237_1_dack_r() { return m_isabus->dack_r(1); }
 uint8_t i82371sb_isa_device::pc_dma8237_2_dack_r() { return m_isabus->dack_r(2); }
 uint8_t i82371sb_isa_device::pc_dma8237_3_dack_r() { return m_isabus->dack_r(3); }
-uint8_t i82371sb_isa_device::pc_dma8237_5_dack_r() { return m_isabus->dack_r(5); }
-uint8_t i82371sb_isa_device::pc_dma8237_6_dack_r() { return m_isabus->dack_r(6); }
-uint8_t i82371sb_isa_device::pc_dma8237_7_dack_r() { return m_isabus->dack_r(7); }
+uint8_t i82371sb_isa_device::pc_dma8237_5_dack_r() { uint16_t ret = m_isabus->dack16_r(5); m_dma_high_byte = ret & 0xff00; return ret; }
+uint8_t i82371sb_isa_device::pc_dma8237_6_dack_r() { uint16_t ret = m_isabus->dack16_r(6); m_dma_high_byte = ret & 0xff00; return ret; }
+uint8_t i82371sb_isa_device::pc_dma8237_7_dack_r() { uint16_t ret = m_isabus->dack16_r(7); m_dma_high_byte = ret & 0xff00; return ret; }
 
 void i82371sb_isa_device::pc_dma8237_0_dack_w(uint8_t data) { m_isabus->dack_w(0, data); }
 void i82371sb_isa_device::pc_dma8237_1_dack_w(uint8_t data) { m_isabus->dack_w(1, data); }
 void i82371sb_isa_device::pc_dma8237_2_dack_w(uint8_t data) { m_isabus->dack_w(2, data); }
 void i82371sb_isa_device::pc_dma8237_3_dack_w(uint8_t data) { m_isabus->dack_w(3, data); }
-void i82371sb_isa_device::pc_dma8237_5_dack_w(uint8_t data) { m_isabus->dack_w(5, data); }
-void i82371sb_isa_device::pc_dma8237_6_dack_w(uint8_t data) { m_isabus->dack_w(6, data); }
-void i82371sb_isa_device::pc_dma8237_7_dack_w(uint8_t data) { m_isabus->dack_w(7, data); }
+void i82371sb_isa_device::pc_dma8237_5_dack_w(uint8_t data) { m_isabus->dack16_w(5, m_dma_high_byte | data); }
+void i82371sb_isa_device::pc_dma8237_6_dack_w(uint8_t data) { m_isabus->dack16_w(6, m_dma_high_byte | data); }
+void i82371sb_isa_device::pc_dma8237_7_dack_w(uint8_t data) { m_isabus->dack16_w(7, m_dma_high_byte | data); }
 
 void i82371sb_isa_device::at_dma8237_out_eop(int state)
 {

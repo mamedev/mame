@@ -1,8 +1,10 @@
 README_MAC.txt for PortMidi
 Roger Dannenberg
 20 nov 2009
+
+revised Mar 2024 to remove pmdefaults references
+revised Jan 2022 for the PortMidi/portmidi repo on github.com  
 revised 20 Sep 2010 for Xcode 4.3.2 and CMake 2.8.8
-revised Jan 2022 for the PortMidi/portmidi repo on github.com
 
 This documents how I build PortMidi for macOS. It's not the only way,
 and command-line/scripting enthusiasts will say it's not even a good
@@ -22,10 +24,7 @@ builds -- it doesn't hurt, but I don't think it is necessary.)
 Default settings should all be fine, but select options under BUILD if
 you wish:
 
-BUILD_NATIVE_JAVA_INTERFACE and BUILD_PMDEFAULTS to build a Java-based
-GUI for setting default MIDI devices. (Otherwise, calls to 
-Pm_DefaultInputDevice() and Pm_DefaultOutputDevice() will not be
-useful, but maybe you are not going to use these anyway -- up to you.)
+BUILD_NATIVE_JAVA_INTERFACE to build a Java interface (JNI) library.
 
 BUILD_PORTMIDI_TESTS to create some test programs. Of particular
 interest are test/mm, a handy command-line MIDI Input Monitor, and
@@ -63,14 +62,4 @@ need. The simplest thing is to build the ALL_BUILD target. Be careful
 to specify a Debug or Release depending on what you want. "ALL_BUILD"
 is a misnomer -- it only builds the version you select.
 
-PmDefaults is minimally supported and may be removed in 2023 unless we
-hear from users. To run it,
-(1) make sure java runs from the command line.
-(2) run the following command in an open Terminal:
-     cd portmidi/pm_java/pmdefaults
-     ./pmdefaults
-
-Feel free to write a short script that cd's to your pmdefaults
-directory and runs pmdefaults, and put that script somewhere on your
-path so you can type it anywhere.
 

@@ -138,12 +138,12 @@ bool esqimg_format::save(util::random_read_write &io, const std::vector<uint32_t
 	if(sector_count != 10)
 		sector_count = 10;
 
-	uint8_t sectdata[11*512];
+	uint8_t sectdata[10*512];
 	int track_size = sector_count*512;
 
 	for(int track=0; track < track_count; track++) {
 		for(int head=0; head < head_count; head++) {
-			get_track_data_mfm_pc(track, head, image, 2000, 512, sector_count, sectdata);
+			get_track_data_mfm_pc_sectors(track, head, image, 2000, 512, 0, 9, sectdata);
 			/*auto const [err, actual] =*/ write_at(io, (track*head_count + head)*track_size, sectdata, track_size); // FIXME: check for errors
 		}
 	}

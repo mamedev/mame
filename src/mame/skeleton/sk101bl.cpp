@@ -163,7 +163,7 @@ void sk101bl_state::sk101bl(machine_config &config)
 	m_maincpu->port_out_cb<1>().set(FUNC(sk101bl_state::p1_w));
 	m_maincpu->port_out_cb<3>().set("alarm", FUNC(speaker_sound_device::level_w)).bit(3);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
 	screen.set_size(16*6, 10);

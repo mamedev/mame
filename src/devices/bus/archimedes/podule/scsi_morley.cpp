@@ -97,7 +97,7 @@ const tiny_rom_entry *arc_scsi_morley_device::device_rom_region() const
 
 void arc_scsi_morley_device::device_add_mconfig(machine_config &config)
 {
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr, false);
@@ -105,14 +105,12 @@ void arc_scsi_morley_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("esp216", NCR53CF94).clock(24_MHz_XTAL) // ESP216
-		.machine_config([this](device_t *device)
-		{
-			ncr53c94_device &esp216(downcast<ncr53c94_device &>(*device));
-			esp216.set_busmd(ncr53c94_device::busmd_t::BUSMD_1);
-			esp216.irq_handler_cb().set([this](int state) { set_pirq(state); });
-			//esp216.drq_handler_cb().set([this](int state) { m_drq_status = state; });
-		});
+
+	NCR53CF94(config, m_esp216, 24_MHz_XTAL); // ESP216
+	scsi.set_external_device(7, m_esp216);
+	m_esp216->set_busmd(ncr53c94_device::busmd_t::BUSMD_1);
+	m_esp216->irq_handler_cb().set([this](int state) { set_pirq(state); });
+	//m_esp216->drq_handler_cb().set([this](int state) { m_drq_status = state; });
 
 	IDT7201(config, m_fifo_out);
 	//m_fifo_out->hf_handler().set([this](int state) { set_irq(IRQ_FIFO_OUT, state); });
@@ -132,7 +130,7 @@ void arc_scsi_morley_device::device_add_mconfig(machine_config &config)
 arc_scsi_morley_device::arc_scsi_morley_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, ARC_SCSI_MORLEY, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
-	, m_esp216(*this, "scsi:7:esp216")
+	, m_esp216(*this, "esp216")
 	, m_fifo_in(*this, "fifo_in")
 	, m_fifo_out(*this, "fifo_out")
 	, m_podule_rom(*this, "podule_rom")

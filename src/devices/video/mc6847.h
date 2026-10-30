@@ -27,6 +27,13 @@
 
 INPUT_PORTS_EXTERN(mc6847_artifacting);
 
+// device type declarations
+DECLARE_DEVICE_TYPE(MC6847,    mc6847_device)
+DECLARE_DEVICE_TYPE(MC6847Y,   mc6847y_device)
+DECLARE_DEVICE_TYPE(MC6847T1,  mc6847t1_device)
+DECLARE_DEVICE_TYPE(S68047,    s68047_device)
+DECLARE_DEVICE_TYPE(M5C6847P1, m5c6847p1_device)
+
 
 //**************************************************************************
 //  MC6847 CORE
@@ -59,16 +66,11 @@ public:
 
 protected:
 	mc6847_friend_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock,
-			const uint8_t *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, int divider,
-			bool supports_partial_body_scanlines, bool pal);
+			bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline,
+			int divider, bool supports_partial_body_scanlines, bool pal);
 
 	// fonts
-	static const uint8_t vdg_t1_fontdata8x12[];
-	static const uint8_t vdg_fontdata8x12[];
-	static const uint8_t semigraphics4_fontdata8x12[];
-	static const uint8_t semigraphics6_fontdata8x12[];
-	static const uint8_t s68047_fontdata8x12[];
-	static const uint8_t stripes[];
+	required_memory_region m_font_rom_region;
 
 	// pixel definitions
 	typedef uint32_t pixel_t;
@@ -88,8 +90,10 @@ protected:
 	class character_map
 	{
 	public:
-		// constructor that sets up the font data
-		character_map(const uint8_t *fontdata, bool is_mc6847t1);
+		character_map(bool is_mc6847t1);
+		void setup_font();
+		void setup_semigraphics();
+		uint8_t (*get_text_fontdata())[96][12] { return &m_text_fontdata; }
 
 		// optimized template function that emits a single character
 		template<int xscale>
@@ -141,12 +145,18 @@ protected:
 
 		// lookup table for MC6847 modes to determine font data and color
 		entry m_entries[128];
+		bool m_is_mc6847t1;
 
 		// text font data calculated on startup
+		void generate_semigraphics_font(uint8_t output[], size_t char_count, size_t row_height);
+
+		uint8_t m_text_fontdata[96][12]{};
 		uint8_t m_text_fontdata_inverse[64*12];
 		uint8_t m_text_fontdata_lower_case[64*12];
 		uint8_t m_text_fontdata_lower_case_inverse[64*12];
 		uint8_t m_stripes[128*12];
+		uint8_t m_semigraphics4_fontdata8x12[16 * 12];
+		uint8_t m_semigraphics6_fontdata8x12[64 * 12];
 
 		// optimized function that tests a single bit
 		ATTR_FORCE_INLINE pixel_t bit_test(uint8_t data, int shift, pixel_t color_0, pixel_t color_1)
@@ -164,30 +174,31 @@ protected:
 		// artifacting config
 		void setup_config(device_t *device);
 		bool poll_config();
-		void set_pal_artifacting( bool palartifacting ) { m_palartifacting = palartifacting; }
+		void set_pal_artifacting(bool palartifacting) { m_palartifacting = palartifacting; }
 		bool get_pal_artifacting() { return m_palartifacting; }
-		void create_color_blend_table( const pixel_t *palette );
+		bool get_ntsc_artifacting() const { return m_artifacting != 0 && !m_palartifacting; }
+		void create_color_blend_table(const pixel_t *palette);
 
 		// artifacting application
 		template<int xscale>
 		void process_artifacts_pal(bitmap_rgb32 &bitmap, int y, int base_x, int base_y, uint8_t mode, const pixel_t *palette)
 		{
-			if( !m_artifacting || !m_palartifacting )
+			if (!m_artifacting || !m_palartifacting)
 				return;
 
-			if( (mode & MODE_AS) || ((mode & (MODE_AG|MODE_GM0) ) == MODE_AG) )
+			if ((mode & MODE_AS) || ((mode & (MODE_AG|MODE_GM0) ) == MODE_AG))
 			{
 				pixel_t *line1 = &bitmap.pix(y + base_y, base_x);
 				pixel_t *line2 = &bitmap.pix(y + base_y + 1, base_x);
 				std::map<std::pair<pixel_t,pixel_t>,pixel_t>::const_iterator newColor;
 
-				for( int pixel = 0; pixel < bitmap.width() - (base_x * 2); ++pixel )
+				for (int pixel = 0; pixel < bitmap.width() - (base_x * 2); ++pixel)
 				{
-					if( line1[pixel] == line2[pixel] )
+					if (line1[pixel] == line2[pixel])
 						continue;
 
 					newColor = m_palcolorblendmap.find(std::pair<pixel_t,pixel_t>(line1[pixel],line2[pixel]));
-					if( newColor != m_palcolorblendmap.end() )
+					if (newColor != m_palcolorblendmap.end())
 					{
 						line1[pixel] = newColor->second;
 						line2[pixel] = newColor->second;
@@ -197,27 +208,38 @@ protected:
 		}
 
 		template<int xscale>
-		ATTR_FORCE_INLINE void process_artifacts(pixel_t *pixels, uint8_t mode, const pixel_t *palette)
+		ATTR_FORCE_INLINE void process_artifacts(pixel_t *pixels, uint8_t mode, const pixel_t *palette, const uint8_t *pixel_modes = nullptr)
 		{
-			if (((mode & (MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0)) == (MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0))
+			if ((pixel_modes || ((mode & (MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0)) == (MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0)))
 				&& (m_artifacting != 0))
 			{
-				// identify the new colors and update
-				pixel_t c0 = palette[(mode & MODE_CSS) ? 10 : 8];
-				pixel_t c1 = palette[(mode & MODE_CSS) ? 11 : 9];
-				update_colors(c0, c1);
+				// Recover each sample using its own CSS state, including across mode boundaries.
+				const auto is_set = [=](int x)
+				{
+					const uint8_t sample_mode = (pixel_modes && x >= 0 && x < 256) ? pixel_modes[x] : mode;
+					return pixels[x * xscale] == palette[(sample_mode & MODE_CSS) ? 11 : 9];
+				};
 
 				// generate the new line
 				pixel_t new_line[256];
 				int x, i;
 				for (x = 0; x < 256; x += 2)
 				{
-					uint8_t val = ((pixels[(x - 2) * xscale] == c1) ? 0x20 : 0x00)
-							| ((pixels[(x - 1) * xscale] == c1) ? 0x10 : 0x00)
-							| ((pixels[(x + 0) * xscale] == c1) ? 0x08 : 0x00)
-							| ((pixels[(x + 1) * xscale] == c1) ? 0x04 : 0x00)
-							| ((pixels[(x + 2) * xscale] == c1) ? 0x02 : 0x00)
-							| ((pixels[(x + 3) * xscale] == c1) ? 0x01 : 0x00);
+					const uint8_t pixel_mode = pixel_modes ? pixel_modes[x] : mode;
+					if ((pixel_mode & (MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0)) != (MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0))
+					{
+						new_line[x + 0] = pixels[(x + 0) * xscale];
+						new_line[x + 1] = pixels[(x + 1) * xscale];
+						continue;
+					}
+
+					update_colors(palette[(pixel_mode & MODE_CSS) ? 10 : 8], palette[(pixel_mode & MODE_CSS) ? 11 : 9]);
+					uint8_t val = (is_set(x - 2) ? 0x20 : 0x00)
+							| (is_set(x - 1) ? 0x10 : 0x00)
+							| (is_set(x + 0) ? 0x08 : 0x00)
+							| (is_set(x + 1) ? 0x04 : 0x00)
+							| (is_set(x + 2) ? 0x02 : 0x00)
+							| (is_set(x + 3) ? 0x01 : 0x00);
 
 					new_line[x + 0] = m_expanded_colors[val * 2 + 0];
 					new_line[x + 1] = m_expanded_colors[val * 2 + 1];
@@ -367,7 +389,7 @@ protected:
 		if (mode & MODE_AG)
 		{
 			/* graphics */
-			switch(mode & (MODE_GM2|MODE_GM1|MODE_GM0))
+			switch (mode & (MODE_GM2|MODE_GM1|MODE_GM0))
 			{
 			case 0:
 				emit_graphics<2, xscale * 4>(data, length, pixels, (mode & MODE_CSS) ? 4 : 0, palette);
@@ -404,7 +426,7 @@ protected:
 			/* external ROM */
 			for (int i = 0; i < length; i++)
 			{
-				uint8_t byte = m_charrom_cb(data[i], y % 12) ^ (mode & MODE_INV ? 0xFF : 0x00);
+				uint8_t byte = m_charrom_cb(data[i], y % 12) ^ (mode & MODE_INV ? 0xff : 0x00);
 				emit_extbytes<1, xscale>(&byte, 1, &pixels[i * 8], (mode & MODE_CSS) ? 14 : 12, palette);
 			}
 			result = length * 8 * xscale;
@@ -479,7 +501,7 @@ class mc6847_base_device : public mc6847_friend_device
 public:
 	auto input_callback() { return m_input_cb.bind(); }
 
-	void set_get_fixed_mode(uint8_t mode) { m_fixed_mode = mode; }
+	void set_fixed_mode(uint8_t mode) { m_fixed_mode = mode; }
 	void set_black_and_white(bool bw) { m_black_and_white = bw; }
 
 	/* updates the screen -- this will call begin_update(),
@@ -501,13 +523,13 @@ public:
 	void set_palette(const uint32_t *palette) { m_palette = (palette) ? palette : default_palette(); }
 
 protected:
-	mc6847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs, bool pal);
+	mc6847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, double tpfs, bool pal);
 
 	// device_t overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// other overrides
 	virtual void field_sync_changed(bool line) override;
@@ -559,32 +581,7 @@ private:
 	bool m_dirty;
 	video_scanline m_data[192];
 
-	void change_mode(uint8_t mode, int state)
-	{
-		// sanity check, to ensure that we're not changing fixed modes
-		assert((mode & m_fixed_mode_mask) == 0);
-
-		// calculate new mode
-		uint8_t new_mode;
-		if (state)
-			new_mode = m_mode | mode;
-		else
-			new_mode = m_mode & ~mode;
-
-		// has the mode changed?
-		if (new_mode != m_mode)
-		{
-			// it has!  check dirty flag
-			video_flush();
-			if (!m_dirty)
-			{
-				m_dirty = true;
-			}
-
-			// and set the new mode
-			m_mode = new_mode;
-		}
-	}
+	void change_mode(uint8_t mode, int state);
 
 	// setup functions
 	void setup_fixed_mode();
@@ -592,6 +589,7 @@ private:
 	// miscellaneous
 	uint8_t input(uint16_t address);
 	int32_t scanline_position_from_clock(int32_t clocks_since_hsync);
+	virtual void load_font(uint8_t (*textfont)[96][12]);
 };
 
 
@@ -609,6 +607,8 @@ class mc6847y_device : public mc6847_base_device
 {
 public:
 	mc6847y_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool pal = false);
+
+	static auto parent_rom_device_type() { return &MC6847; }
 };
 
 class mc6847t1_device : public mc6847_base_device
@@ -617,7 +617,9 @@ public:
 	mc6847t1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool pal = false);
 
 protected:
+	virtual void load_font(uint8_t (*textfont)[96][12]) override;
 	virtual uint8_t border_value(uint8_t mode) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 class s68047_device : public mc6847_base_device
@@ -626,6 +628,7 @@ public:
 	s68047_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual uint32_t emit_samples(uint8_t mode, const uint8_t *data, int length, pixel_t *RESTRICT pixels, const pixel_t *RESTRICT palette,
 			get_char_rom_delegate const &get_char_rom, int x, int y) override;
 	virtual const uint32_t* default_palette() override { return s_s68047_palette; }
@@ -641,13 +644,8 @@ class m5c6847p1_device : public mc6847_base_device
 {
 public:
 	m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool pal = false);
+
+	static auto parent_rom_device_type() { return &MC6847; }
 };
-
-
-DECLARE_DEVICE_TYPE(MC6847,    mc6847_device)
-DECLARE_DEVICE_TYPE(MC6847Y,   mc6847y_device)
-DECLARE_DEVICE_TYPE(MC6847T1,  mc6847t1_device)
-DECLARE_DEVICE_TYPE(S68047,    s68047_device)
-DECLARE_DEVICE_TYPE(M5C6847P1, m5c6847p1_device)
 
 #endif // MAME_VIDEO_MC6847_H

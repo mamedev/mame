@@ -707,10 +707,10 @@ void can09t_state::can09t(machine_config &config)
 	PIA6821(config, m_pia3); // ROM board
 	PIA6821(config, m_pia4); // ROM board
 
-	PTM6840(config, "ptm", 0);
+	PTM6840(config, "ptm");
 
 	/* RS232 usage: mame can09t -window -debug -rs232 terminal */
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
@@ -766,7 +766,7 @@ void can09_state::can09(machine_config &config)
 
 
 	/* screen - totally faked value for now */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_raw(4_MHz_XTAL / 2, 512, 0, 512, 576, 0, 576);
 	screen.set_screen_update(FUNC(can09_state::screen_update));
@@ -797,8 +797,8 @@ void can09_state::can09(machine_config &config)
 
 #if 1
 	PIA6821(config, PIA2_TAG); // CPU board
-	ACIA6850(config, "acia1", 0); // CPU board
-	ACIA6850(config, "acia2", 0); // CPU board
+	ACIA6850(config, "acia1"); // CPU board
+	ACIA6850(config, "acia2"); // CPU board
 #endif
 }
 

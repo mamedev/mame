@@ -32,6 +32,7 @@ links {
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
 	ext_lib("zstd"),
+	ext_lib("flac"),
 	ext_lib("utf8proc"),
 }
 
@@ -118,8 +119,11 @@ end
 links {
 	"utils",
 	ext_lib("expat"),
+	"7z",
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
+	ext_lib("zstd"),
+	ext_lib("flac"),
 	ext_lib("utf8proc"),
 }
 
@@ -726,52 +730,10 @@ configuration { }
 strip()
 
 --------------------------------------------------
--- aueffectutil
---------------------------------------------------
-
-if _OPTIONS["targetos"] == "macosx" then
-	project("aueffectutil")
-		uuid ("3db8316d-fad7-4f5b-b46a-99373c91550e")
-		kind "ConsoleApp"
-
-		flags {
-			"Symbols", -- always include minimum symbols for executables
-		}
-
-		if _OPTIONS["SEPARATE_BIN"]~="1" then
-			targetdir(MAME_DIR)
-		end
-
-		linkoptions {
-			"-sectcreate __TEXT __info_plist " .. _MAKE.esc(MAME_DIR) .. "src/tools/aueffectutil-Info.plist",
-		}
-
-		dependency {
-			{ "aueffectutil", MAME_DIR .. "src/tools/aueffectutil-Info.plist", true },
-		}
-
-		links {
-			"AudioUnit.framework",
-			"AudioToolbox.framework",
-			"CoreAudio.framework",
-			"CoreAudioKit.framework",
-			"CoreServices.framework",
-		}
-
-		files {
-			MAME_DIR .. "src/tools/aueffectutil.mm",
-		}
-
-		configuration { }
-
-		strip()
-end
-
---------------------------------------------------
 -- testkeys
 --------------------------------------------------
 
-if (_OPTIONS["osd"] == "sdl") then
+if (_OPTIONS["osd"] == "sdl") or (_OPTIONS["osd"] == "sdl3") then
 	project("testkeys")
 	uuid ("b3f5a5b8-3203-11e9-93e4-670b4f4e359d")
 	kind "ConsoleApp"
@@ -784,6 +746,12 @@ if (_OPTIONS["osd"] == "sdl") then
 		targetdir(MAME_DIR)
 	end
 
+	if _OPTIONS["osd"] == "sdl3" then
+		defines {
+			"SDLMAME_SDL3",
+		}
+	end
+
 	links {
 		"utils",
 		"ocore_" .. _OPTIONS["osd"],
@@ -792,14 +760,31 @@ if (_OPTIONS["osd"] == "sdl") then
 
 	if _OPTIONS["targetos"]=="windows" then
 		if _OPTIONS["USE_LIBSDL"]~="1" then
+			local libsdl
+			if _OPTIONS["osd"] == "sdl3" then
+				libsdl = "SDL3"
+			else
+				libsdl = "SDL2"
+			end
 			configuration { "mingw*"}
+				if _OPTIONS["osd"] == "sdl" then
+					links {
+						"SDL2main",
+					}
+				end
 				links {
-					"SDL2main",
-					"SDL2",
+					libsdl,
+					"gdi32",
+					"imm32",
+					"ole32",
+					"oleaut32",
+					"setupapi",
+					"uuid",
+					"version",
 				}
 			configuration { "vs*" }
 				links {
-					"SDL2",
+					libsdl,
 					"imm32",
 					"version",
 				}

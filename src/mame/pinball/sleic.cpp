@@ -70,15 +70,17 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void sleic(machine_config &config);
+	void sleic(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void main_map(address_map &map) ATTR_COLD;
 	void cpu2_map(address_map &map) ATTR_COLD;
 	void cpu2_io(address_map &map) ATTR_COLD;
 	void cpu3_map(address_map &map) ATTR_COLD;
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	u8 cpu2_in00() { return 0; }   // communications + handshake
 	u8 cpu2_in01() { return 0; }   // communications + handshake
 	u8 cpu2_in02() { u8 data = 0U; for (u8 i = 0; i < 6; i++) if (BIT(m_row, i)) data |= m_io_keyboard[i]->read(); return data; }   // contactors
@@ -241,14 +243,13 @@ void sleic_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_row));
 }
 
 void sleic_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 }

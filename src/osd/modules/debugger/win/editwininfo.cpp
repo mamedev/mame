@@ -102,6 +102,13 @@ void editwin_info::editwnd_select_all()
 }
 
 
+void editwin_info::update_dpi()
+{
+	debugwin_info::update_dpi();
+	SendMessage(m_editwnd, WM_SETFONT, WPARAM(metrics().debug_font()), LPARAM(FALSE));
+}
+
+
 void editwin_info::draw_contents(HDC dc)
 {
 	debugwin_info::draw_contents(dc);

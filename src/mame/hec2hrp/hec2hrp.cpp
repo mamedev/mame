@@ -391,7 +391,7 @@ void hec2hrp_state::interact_common(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(256, 79);
@@ -412,7 +412,7 @@ void hec2hrp_state::interact_common(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("interact");
 
 	/* printer */
-	PRINTER(config, m_printer, 0);
+	PRINTER(config, m_printer);
 }
 
 void hec2hrp_state::interact(machine_config &config)
@@ -465,7 +465,7 @@ void hec2hrp_state::hec2hr(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrp)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrp)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(400)); /* 2500 not accurate */
 	screen.set_size(512, 230);
@@ -483,7 +483,7 @@ void hec2hrp_state::hec2hr(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("interact_cass");
 
-	PRINTER(config, m_printer, 0);
+	PRINTER(config, m_printer);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("80K").set_default_value(0x00);

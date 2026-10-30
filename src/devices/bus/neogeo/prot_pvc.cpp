@@ -5,6 +5,7 @@
 #include "emu.h"
 #include "prot_pvc.h"
 
+#include "endianness.h"
 
 
 DEFINE_DEVICE_TYPE(NG_PVC_PROT, pvc_prot_device, "ng_pvc_prot", "Neo Geo PVC Protection")

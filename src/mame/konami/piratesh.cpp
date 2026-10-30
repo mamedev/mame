@@ -612,7 +612,7 @@ void piratesh_state::piratesh(machine_config &config)
 	HOPPER(config, "hopper", attotime::from_msec(200));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 //  screen.set_refresh_hz(60);
 	screen.set_raw(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223); // TODO
@@ -628,16 +628,16 @@ void piratesh_state::piratesh(machine_config &config)
 	m_k056832->set_config(K056832_BPP_4PIRATESH, 1, 0);
 	m_k056832->set_palette("palette");
 
-	K055555(config, m_k055555, 0);
+	K055555(config, m_k055555);
 
 	K053250PS(config, m_k053250, 12000000, "palette", "screen", -16, 0);
 
-	K055673(config, m_k055673, 0);
+	K055673(config, m_k055673);
 	m_k055673->set_sprite_callback(FUNC(piratesh_state::sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_PS, -60, 24);
 	m_k055673->set_palette("palette");
 
-	K054338(config, "k054338", 0, m_k055555).set_alpha_invert(1);
+	K054338(config, "k054338", m_k055555).set_alpha_invert(1);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();

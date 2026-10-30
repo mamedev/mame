@@ -59,9 +59,6 @@ void cinemat_state::machine_start()
 	save_item(NAME(m_vector_color));
 	save_item(NAME(m_lastx));
 	save_item(NAME(m_lasty));
-
-	m_led.resolve();
-	m_pressed.resolve();
 }
 
 
@@ -256,12 +253,8 @@ u8 cinemat_color_state::boxingb_dial_r(offs_t offset)
 
 u8 qb3_state::qb3_frame_r()
 {
-	attotime next_update = m_screen->time_until_update();
-	attotime frame_period = m_screen->frame_period();
-	int percent = next_update.attoseconds() / (frame_period.attoseconds() / 100);
-
-	// note this is just an approximation...
-	return (percent >= 10);
+	attotime frame_period = m_vector->frame_period();
+	return (frame_period.attoseconds() > 0) ? 1 : 0;
 }
 
 
@@ -1035,15 +1028,11 @@ void cinemat_state::cinemat_nojmi_4k(machine_config &config)
 	m_outlatch->q_out_cb<6>().set(FUNC(cinemat_state::vector_control_w));
 
 	// video hardware
-	VECTOR(config, "vector", 0);
-
-	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
-	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_screen->set_refresh_hz(19.923_MHz_XTAL/4/16/16/16/16/2);
-	m_screen->set_size(1024, 768);
-	m_screen->set_visarea_full();
-	m_screen->set_screen_update(FUNC(cinemat_state::screen_update_cinemat));
-	m_screen->screen_vblank().set(m_maincpu, FUNC(ccpu_cpu_device::wdt_trigger));
+	VECTOR(config, m_vector);
+	m_vector->set_refresh_hz(19.923_MHz_XTAL/4/16/16/16/16/2);
+	m_vector->set_visarea(0, 1023, 0, 767);
+	m_vector->screen_vblank().set(m_maincpu, FUNC(ccpu_cpu_device::wdt_trigger));
+	m_vector->screen_vblank().append([this] (int state) { if (state) m_vector->clear_list(); });
 }
 
 void cinemat_state::cinemat_jmi_4k(machine_config &config)
@@ -1090,11 +1079,9 @@ void cinemat_state::spacewar(machine_config &config)
 	cinemat_nojmi_4k(config);
 
 	SPEAKER(config, "mono").front_center();
-	SPACE_WARS_AUDIO(config, "soundboard", 0)
+	SPACE_WARS_AUDIO(config, "soundboard")
 		.configure_latch_inputs(*m_outlatch)
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	m_screen->set_screen_update(FUNC(cinemat_state::screen_update_spacewar));
 }
 
 void cinemat_state::barrier(machine_config &config)
@@ -1102,7 +1089,7 @@ void cinemat_state::barrier(machine_config &config)
 	cinemat_jmi_4k(config);
 
 	SPEAKER(config, "mono").front_center();
-	BARRIER_AUDIO(config, "soundboard", 0)
+	BARRIER_AUDIO(config, "soundboard")
 		.configure_latch_inputs(*m_outlatch)
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -1118,7 +1105,7 @@ void cinemat_state::speedfrk(machine_config &config)
 	cinemat_nojmi_8k(config);
 
 	SPEAKER(config, "mono").front_center();
-	SPEED_FREAK_AUDIO(config, "soundboard", 0)
+	SPEED_FREAK_AUDIO(config, "soundboard")
 		.configure_latch_inputs(*m_outlatch)
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 //  m_outlatch->q_out_cb<1>().set(FUNC(cinemat_state::speedfrk_start_led_w));
@@ -1129,7 +1116,7 @@ void cinemat_state::starhawk(machine_config &config)
 	cinemat_jmi_4k(config);
 
 	SPEAKER(config, "mono").front_center();
-	STAR_HAWK_AUDIO(config, "soundboard", 0)
+	STAR_HAWK_AUDIO(config, "soundboard")
 		.configure_latch_inputs(*m_outlatch)
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -1139,7 +1126,7 @@ void cinemat_16level_state::sundance(machine_config &config)
 	cinemat_jmi_8k(config);
 
 	SPEAKER(config, "mono").front_center();
-	SUNDANCE_AUDIO(config, "soundboard", 0)
+	SUNDANCE_AUDIO(config, "soundboard")
 		.configure_latch_inputs(*m_outlatch)
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -1149,7 +1136,7 @@ void cinemat_state::tailg(machine_config &config)
 	cinemat_nojmi_8k(config);
 
 	SPEAKER(config, "mono").front_center();
-	TAIL_GUNNER_AUDIO(config, "soundboard", 0)
+	TAIL_GUNNER_AUDIO(config, "soundboard")
 		.configure_latch_inputs(*m_outlatch)
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_outlatch->q_out_cb<7>().set(FUNC(cinemat_state::mux_select_w));
@@ -1160,7 +1147,7 @@ void cinemat_state::warrior(machine_config &config)
 	cinemat_jmi_8k(config);
 
 	SPEAKER(config, "mono").front_center();
-	WARRIOR_AUDIO(config, "soundboard", 0)
+	WARRIOR_AUDIO(config, "soundboard")
 		.configure_latch_inputs(*m_outlatch)
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -1170,7 +1157,7 @@ void cinemat_state::armora(machine_config &config)
 	cinemat_jmi_16k(config);
 
 	SPEAKER(config, "mono").front_center();
-	ARMOR_ATTACK_AUDIO(config, "soundboard", 0)
+	ARMOR_ATTACK_AUDIO(config, "soundboard")
 		.configure_latch_inputs(*m_outlatch)
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -1180,7 +1167,7 @@ void cinemat_state::ripoff(machine_config &config)
 	cinemat_jmi_8k(config);
 
 	SPEAKER(config, "mono").front_center();
-	RIPOFF_AUDIO(config, "soundboard", 0)
+	RIPOFF_AUDIO(config, "soundboard")
 		.configure_latch_inputs(*m_outlatch)
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -1190,7 +1177,7 @@ void cinemat_state::starcas(machine_config &config)
 	cinemat_jmi_8k(config);
 
 	SPEAKER(config, "mono").front_center();
-	STAR_CASTLE_AUDIO(config, "soundboard", 0)
+	STAR_CASTLE_AUDIO(config, "soundboard")
 		.configure_latch_inputs(*m_outlatch)
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -1200,7 +1187,7 @@ void cinemat_64level_state::solarq(machine_config &config)
 	cinemat_jmi_16k(config);
 
 	SPEAKER(config, "mono").front_center();
-	SOLAR_QUEST_AUDIO(config, "soundboard", 0)
+	SOLAR_QUEST_AUDIO(config, "soundboard")
 		.configure_latch_inputs(*m_outlatch)
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -1210,21 +1197,21 @@ void cinemat_color_state::boxingb(machine_config &config)
 	cinemat_jmi_32k(config);
 
 	SPEAKER(config, "mono").front_center();
-	BOXING_BUGS_AUDIO(config, "soundboard", 0)
+	BOXING_BUGS_AUDIO(config, "soundboard")
 		.configure_latch_inputs(*m_outlatch)
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_outlatch->q_out_cb<7>().append(FUNC(cinemat_state::mux_select_w));
 
-	m_screen->set_visarea(0, 1024, 0, 788);
+	m_vector->set_visarea(0, 1024, 0, 788);
 }
 
 void cinemat_state::wotw(machine_config &config)
 {
 	cinemat_jmi_16k(config);
-	m_screen->set_visarea(0, 1120, 0, 767);
+	m_vector->set_visarea(0, 1120, 0, 767);
 
 	SPEAKER(config, "mono").front_center();
-	WAR_OF_THE_WORLDS_AUDIO(config, "soundboard", 0)
+	WAR_OF_THE_WORLDS_AUDIO(config, "soundboard")
 		.configure_latch_inputs(*m_outlatch)
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -1234,7 +1221,7 @@ void cinemat_color_state::wotwc(machine_config &config)
 	cinemat_jmi_16k(config);
 
 	SPEAKER(config, "mono").front_center();
-	WAR_OF_THE_WORLDS_AUDIO(config, "soundboard", 0)
+	WAR_OF_THE_WORLDS_AUDIO(config, "soundboard")
 		.configure_latch_inputs(*m_outlatch)
 		.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -1243,7 +1230,7 @@ void demon_state::demon(machine_config &config)
 {
 	cinemat_jmi_16k(config);
 	demon_sound(config);
-	m_screen->set_visarea(0, 1024, 0, 805);
+	m_vector->set_visarea(0, 1024, 0, 805);
 }
 
 void qb3_state::qb3(machine_config &config)
@@ -1252,7 +1239,7 @@ void qb3_state::qb3(machine_config &config)
 	qb3_sound(config);
 	m_maincpu->set_addrmap(AS_DATA, &qb3_state::data_map_qb3);
 	m_maincpu->set_addrmap(AS_IO, &qb3_state::io_map_qb3);
-	m_screen->set_visarea(0, 1120, 0, 780);
+	m_vector->set_visarea(0, 1120, 0, 780);
 }
 
 

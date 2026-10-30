@@ -49,10 +49,10 @@ protected:
 private:
 	address_space_config m_program_config;
 
-	PAIR    m_PC;
-	PAIR    m_P1;
-	PAIR    m_P2;
-	PAIR    m_P3;
+	PAIR16  m_PC;
+	PAIR16  m_P1;
+	PAIR16  m_P2;
+	PAIR16  m_P3;
 	uint8_t m_AC;
 	uint8_t m_ER;
 	uint8_t m_SR;
@@ -75,7 +75,7 @@ private:
 	inline uint8_t RM(uint32_t a);
 	inline void WM(uint32_t a, uint8_t v);
 	inline void illegal(uint8_t opcode);
-	inline PAIR *GET_PTR_REG(int num);
+	inline PAIR16 *GET_PTR_REG(int num);
 	inline void BIN_ADD(uint8_t val);
 	inline void DEC_ADD(uint8_t val);
 	inline uint16_t GET_ADDR(uint8_t code);

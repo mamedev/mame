@@ -298,7 +298,7 @@ class OpcodeList:
         print("\treturn;", file=f)
         print("}", file=f)
         print("", file=f)
-        print("const bool nomemrq_en = !m_nomreq_cb.isunset();", file=f)
+        print("const bool nomreq_en = !m_nomreq_cb.isunset();", file=f)
         print("[[maybe_unused]] const bool refresh_en = !m_refresh_cb.isunset();", file=f)
         print("", file=f)
         print("bool interrupted = true;", file=f)

@@ -583,7 +583,7 @@ void nevada_state::nevada(machine_config &config)
 	NVRAM(config, "nvram").set_custom_handler(FUNC(nevada_state::nvram_init));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size((42+1)*8, (32+1)*8);                  /* From MC6845 init, registers 00 & 04 (programmed with value-1). */
@@ -661,7 +661,7 @@ void nevada_state::init_nevada()
 //  ROM[0xFE0086/2] = 0x4278;
 //  ROM[0xFE0088/2] = 0x0414;
 
-	// Skip PAL SECURITY
+	// HACK: skip PAL SECURITY
 	ROM[0xFE0248/2] = 0x4E71; // nop
 	ROM[0xFE05D0/2] = 0x4E71; // nop
 	ROM[0xFE05D8/2] = 0x6014; // bra

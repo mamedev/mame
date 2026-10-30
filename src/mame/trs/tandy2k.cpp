@@ -10,13 +10,18 @@
 
     TODO:
 
-    - floppy
-        - HDL is also connected to WP/TS input where TS is used to detect motor status
-        - 3 second motor off delay timer
-    - video (video RAM is at memory top - 0x1400, i.e. 0x1ec00)
+    - floppy (see Technical Reference 7.1.9.4/7.1.9.5 and main logic schematic
+      8000203A sheet 11)
+        - MTRON = HDL OR U132 (74LS123, C115 33uF/R38 270K), retriggered by the
+          falling edge of HDL, keeping the motor running for about 3 seconds
+        - MTRON is buffered onto the WP/TS input by U135 (74LS241), so ST3 TS
+          reports motor status while RW/SEEK selects seek mode, and the driver
+          skips the 250 ms spin up wait when the motor is already running
+        - both need upd765 to deassert HDL: hdl_cb(1) is asserted at command
+          start and never cleared, so there is no falling edge to work with.
+          The head unload time is already parsed into spec by C_SPECIFY but
+          unused; it should drop HDL after command_end() with data_completion
     - keyboard ROM, same as earlier tandy 1000
-    - WD1010
-    - hard disk
     - clock/mouse 8042 mcu ROM, probably same as tandy 1000 isa clock/mouse adapter
     - sab3019 rtc
 
@@ -30,7 +35,7 @@
 #include "speaker.h"
 
 
-#define LOG 1
+#define LOG 0
 
 // Read/Write Handlers
 
@@ -75,11 +80,15 @@ uint8_t tandy2k_state::char_ram_r(offs_t offset)
 
 void tandy2k_state::char_ram_w(offs_t offset, uint8_t data)
 {
+	vid_catch_up();
+
 	m_char_ram[offset] = data;
 }
 
 uint8_t tandy2k_state::videoram_r(offs_t offset)
 {
+	vid_catch_up();
+
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	offs_t addr = (m_vram_base << 15) | (offset << 1);
@@ -210,10 +219,20 @@ uint8_t tandy2k_state::kbint_clr_r()
 		m_kb->busy_w(1);
 		m_pic1->ir0_w(CLEAR_LINE);
 
-		return m_pc_keyboard->read();
+		return m_kbdin;
 	}
 
 	return 0xff;
+}
+
+void tandy2k_state::hle_keypress_w(int state)
+{
+	if (state)
+	{
+		m_kbdin = m_pc_keyboard->read();
+
+		m_pic1->ir0_w(ASSERT_LINE);
+	}
 }
 
 uint8_t tandy2k_state::clkmouse_r(offs_t offset)
@@ -330,18 +349,10 @@ void tandy2k_state::addr_ctrl_w(uint8_t data)
 
 	if (m_clkspd != clkspd || m_clkcnt != clkcnt)
 	{
-		const XTAL busdotclk = 16_MHz_XTAL * 28 / (clkspd ? 16 : 20);
-		const XTAL vidcclk = busdotclk / (clkcnt ? 8 : 10);
-
-		m_vpac->set_character_width(clkcnt ? 8 : 10);
-		m_vpac->set_unscaled_clock(vidcclk);
-
-		m_vac->set_unscaled_clock(busdotclk);
-
-		m_timer_vidldsh->adjust(attotime::from_hz(vidcclk), 0, attotime::from_hz(vidcclk));
-
 		m_clkspd = clkspd;
 		m_clkcnt = clkcnt;
+
+		set_vidldsh_timer();
 	}
 
 	// video source select
@@ -377,21 +388,20 @@ void tandy2k_state::tandy2k_io(address_map &map)
 	map(0x00052, 0x00052).mirror(0x8).r(FUNC(tandy2k_state::kbint_clr_r));
 	map(0x00060, 0x00063).mirror(0xc).rw(m_pic0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x00070, 0x00073).mirror(0xc).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x00080, 0x00080).mirror(0xe).rw(m_fdc, FUNC(i8272a_device::dma_r), FUNC(i8272a_device::dma_w));
+	map(0x00080, 0x00080).mirror(0x1e).rw(m_fdc, FUNC(i8272a_device::dma_r), FUNC(i8272a_device::dma_w));
 	map(0x00100, 0x0017f).rw(m_vpac, FUNC(crt9007_device::read), FUNC(crt9007_device::write)).umask16(0x00ff);
 	map(0x00100, 0x0017f).w(FUNC(tandy2k_state::addr_ctrl_w)).umask16(0xff00);
 	map(0x00180, 0x00180).r(FUNC(tandy2k_state::hires_status_r)).umask16(0x00ff);
-	map(0x00180, 0x0018f).mirror(0x10).w(m_colpal, FUNC(palette_device::write8)).umask16(0x00ff).share("colpal");
+	map(0x00180, 0x0018f).mirror(0x10).w(FUNC(tandy2k_state::colpal_w)).umask16(0x00ff).share("colpal");
 	map(0x001a0, 0x001a0).w(FUNC(tandy2k_state::hires_plane_w)).umask16(0x00ff);
 	map(0x002fc, 0x002ff).rw(FUNC(tandy2k_state::clkmouse_r), FUNC(tandy2k_state::clkmouse_w));
 }
 
-void tandy2k_state::tandy2k_hd_io(address_map &map)
+void tandy2k_hd_state::tandy2k_hd_io(address_map &map)
 {
 	tandy2k_io(map);
-//  map(0x000e0, 0x000ff).w(FUNC(tandy2k_state::hdc_dack_w).umask16(0x00ff));
-//  map(0x0026c, 0x0026c).rw(WD1010_TAG, FUNC(wd1010_device::hdc_reset_r), FUNC(wd1010_device::hdc_reset_w));
-//  map(0x0026e, 0x0027e).rw(WD1010_TAG, FUNC(wd1010_device::wd1010_r), FUNC(wd1010_device::wd1010_w));
+	map(0x0026c, 0x0026c).rw(m_hdc, FUNC(tandy2k_hdc_device::reset_r), FUNC(tandy2k_hdc_device::reset_w));
+	map(0x00270, 0x0027f).rw(m_hdc, FUNC(tandy2k_hdc_device::read), FUNC(tandy2k_hdc_device::write)).umask16(0x00ff);
 }
 
 void tandy2k_state::vpac_mem(address_map &map)
@@ -507,45 +517,77 @@ INPUT_CHANGED_MEMBER(tandy2k_state::input_changed)
 
 // Video
 
+// the video timing programmed by the ROM, which the VPAC does not push into the screen
+static constexpr int CHARACTERS_PER_HORIZONTAL_PERIOD = 106;
+static constexpr int SCAN_LINES_PER_FRAME = 440;
+static constexpr int CHARACTERS_PER_DATA_ROW = 80;
+static constexpr int VISIBLE_DATA_ROWS_PER_FRAME = 25;
+static constexpr int SCAN_LINES_PER_DATA_ROW = 16;
+
+void tandy2k_state::vid_catch_up()
+{
+	const attotime now = machine().time();
+
+	while (m_vid_next <= now)
+	{
+		m_vid_time = m_vid_next;
+		vidldsh_tick();
+		m_vid_next += m_vid_period;
+	}
+}
+
+void tandy2k_state::set_vidldsh_timer()
+{
+	vid_catch_up();
+
+	const XTAL busdotclk = 16_MHz_XTAL * 28 / (m_clkspd ? 16 : 20);
+	const XTAL vidcclk = busdotclk / character_width();
+
+	m_vpac->set_character_width(character_width());
+	m_vpac->set_unscaled_clock(vidcclk);
+
+	m_vac->set_unscaled_clock(busdotclk);
+
+	// the VPAC does not configure the screen, but it schedules everything from the
+	// raster position, so the screen has to follow the dots per character time
+	const int htotal = CHARACTERS_PER_HORIZONTAL_PERIOD * character_width();
+	const rectangle visarea(0, (CHARACTERS_PER_DATA_ROW * character_width()) - 1, 0, (VISIBLE_DATA_ROWS_PER_FRAME * SCAN_LINES_PER_DATA_ROW) - 1);
+
+	m_screen->configure(htotal, SCAN_LINES_PER_FRAME, visarea, attotime::from_ticks(htotal * SCAN_LINES_PER_FRAME, busdotclk));
+
+	// the character time is locked to the start of the scan line
+	m_hchar = 0;
+	m_vid_next = machine().time() + m_screen->time_until_pos(0, 0);
+	m_vid_period = attotime::from_hz(vidcclk);
+}
+
 uint32_t tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *cpen = m_colpal->pens();
-	address_space &program = m_maincpu->space(AS_PROGRAM);
+	vid_catch_up();
 
-	for (int y = 0; y < 400; y++)
+	if (m_hires_en & 2)
 	{
-		uint8_t cgra = y % 16;
+		const pen_t *cpen = m_colpal->pens();
 
-		for (int sx = 0; sx < 80; sx++)
+		for (int y = 0; y < 400; y++)
 		{
-			if (m_hires_en & 2)
+			for (int sx = 0; sx < 80; sx++)
 			{
 				uint8_t a = ((uint8_t *)m_hires_ram.target())[(y * 80) + sx];
 				uint8_t b = ((uint8_t *)m_hires_ram.target())[(y * 80) + sx + 0x8000];
 				uint8_t c = ((uint8_t *)m_hires_ram.target())[(y * 80) + sx + 0x8000 * 2];
+
 				for (int x = 0; x < 8; x++)
 				{
 					int color = BIT(a, x) | (BIT(b, x) << 1) | (BIT(c, x) << 2);
 					bitmap.pix(y, (sx * 8) + (7 - x)) = cpen[color];
 				}
 			}
-			else
-			{
-				offs_t addr = m_ram->size() - 0x1400 + (((y / 16) * 80) + sx) * 2;
-				uint16_t vidla = program.read_word(addr);
-				uint8_t attr = vidla >> 8;
-				uint8_t data = m_char_ram[((vidla & 0xff) << 4) | cgra];
-				if(attr & 0x80)
-					data = ~data;
-
-				for (int x = 0; x < 8; x++)
-				{
-					int color = 4 | (BIT(attr, 6) << 1) | BIT(data, 7);
-					bitmap.pix(y, (sx * 8) + x) = cpen[color];
-					data <<= 1;
-				}
-			}
 		}
+	}
+	else
+	{
+		copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	}
 
 	return 0;
@@ -553,6 +595,8 @@ uint32_t tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 void tandy2k_state::vpac_vlt_w(int state)
 {
+	vid_catch_up();
+
 	m_drb0->ren_w(state);
 	m_drb0->clrcnt_w(state);
 
@@ -562,23 +606,58 @@ void tandy2k_state::vpac_vlt_w(int state)
 
 void tandy2k_state::vpac_drb_w(int state)
 {
+	vid_catch_up();
+
+	m_drb = bool(state);
+
 	m_drb0->tog_w(state);
 	m_drb1->tog_w(state);
 }
 
+void tandy2k_state::vpac_vs_w(int state)
+{
+	vid_catch_up();
+
+	// the end of the vertical retrace arms the frame start, which is taken at the
+	// data row boundary of the first data row
+	if (state && !m_vs)
+		m_frame = true;
+
+	m_vs = bool(state);
+
+	m_vac->vsync_w(state);
+}
+
 void tandy2k_state::vpac_wben_w(int state)
 {
+	vid_catch_up();
+
 	m_drb0->wen1_w(state);
 	m_drb1->wen1_w(state);
 }
 
 void tandy2k_state::vpac_cblank_w(int state)
 {
+	vid_catch_up();
+
 	m_cblank = state;
 }
 
+void tandy2k_state::vpac_curs_w(int state)
+{
+	vid_catch_up();
+
+	m_curs = state;
+
+	m_vac->cursor_w(state);
+}
+
+// TODO the VPAC does not output the scan line count, so the character generator
+// row address is counted from the data row boundary signal instead
 void tandy2k_state::vpac_slg_w(int state)
 {
+	vid_catch_up();
+
 	m_slg = state;
 
 	m_vac->slg_w(state);
@@ -586,9 +665,18 @@ void tandy2k_state::vpac_slg_w(int state)
 
 void tandy2k_state::vpac_sld_w(int state)
 {
+	vid_catch_up();
+
 	m_sld = state;
 
 	m_vac->sld_w(state);
+}
+
+void tandy2k_state::colpal_w(offs_t offset, uint8_t data)
+{
+	vid_catch_up();
+
+	m_colpal->write8(offset, data);
 }
 
 void tandy2k_state::hires_plane_w(uint8_t data)
@@ -611,6 +699,8 @@ uint8_t tandy2k_state::hires_status_r()
 void tandy2k_state::vidla_w(uint8_t data)
 {
 	m_vidla = data;
+
+	m_dout = true;
 }
 
 void tandy2k_state::drb_attr_w(uint8_t data)
@@ -636,24 +726,77 @@ void tandy2k_state::drb_attr_w(uint8_t data)
 	m_vac->ms0_w(BIT(data, 3));
 	m_vac->ms1_w(BIT(data, 4));
 	m_vac->blink_w(BIT(data, 5));
+	m_int = BIT(data, 6);
 	m_vac->intin_w(BIT(data, 6));
 	m_vac->revid_w(BIT(data, 7));
 }
 
 CRT9021_DRAW_CHARACTER_MEMBER( tandy2k_state::vac_draw_character )
 {
-	const pen_t *pen = m_colpal->pens();
+	// the VPAC does not output a scan line count, so the picture is placed with the
+	// data row and column counters
+	if (!m_dout)
+		return;
 
-	for (int i = 0; i < 8; i++)
-	{
-		int color = BIT(video, 7 - i);
+	int const sx = m_col * character_width();
+	rectangle const &visarea = m_screen->visible_area();
 
-		bitmap.pix(y, x++) = pen[color];
-	}
+	if ((m_scanline < visarea.top()) || (m_scanline > visarea.bottom()) || (sx < visarea.left()) || ((sx + character_width() - 1) > visarea.right()))
+		return;
+
+	pen_t const *pen = m_colpal->pens();
+
+	// the cursor output of the VPAC is active for a whole character time, and the
+	// VAC complements the video output for it
+	// TODO the cursor blink rate is generated by the VAC
+	bool const cursor = m_curs && !BIT(m_vid_time.as_ticks(4), 0);
+
+	// the dot pattern is only 8 dots wide, so the remaining dots of the 10 dot
+	// character time are filled with the background level
+	int const color = 4 | (m_int << 1);
+	uint32_t *const dest = &m_bitmap.pix(m_scanline, sx);
+
+	for (int dot = 0; dot < 8; dot++)
+		dest[dot] = pen[color | (BIT(video, 7 - dot) ^ cursor)];
+
+	for (int dot = 8; dot < character_width(); dot++)
+		dest[dot] = pen[color | cursor];
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( tandy2k_state::vidldsh_tick )
+void tandy2k_state::vidldsh_tick()
 {
+	// the character time is locked to the raster, so the first character time of
+	// the scan line is the one at the start of the line
+	if (m_hchar == 0)
+	{
+		if (!m_drb)
+		{
+			// the row buffers are swapped for the first scan line of a new data row
+			m_cgra = 0;
+
+			if (m_frame)
+			{
+				// the first data row after the vertical retrace starts the picture
+				m_frame = false;
+				m_row = 0;
+				m_scanline = 0;
+			}
+			else
+			{
+				m_row++;
+				m_scanline++;
+			}
+		}
+		else
+		{
+			// a new scan line advances the character generator row address
+			m_cgra = (m_cgra + 1) & 0x0f;
+			m_scanline++;
+		}
+	}
+
+	m_hchar = (m_hchar + 1 == CHARACTERS_PER_HORIZONTAL_PERIOD) ? 0 : m_hchar + 1;
+
 	m_drb0->rclk_w(0);
 	m_drb0->wclk_w(0);
 	m_drb1->rclk_w(0);
@@ -673,20 +816,29 @@ TIMER_DEVICE_CALLBACK_MEMBER( tandy2k_state::vidldsh_tick )
 	m_dblank >>= 1;
 	m_dblank |= m_cblank << 2;
 
-	if (!m_slg)
-	{
-		m_cgra >>= 1;
-		m_cgra |= m_sld << 3;
-	}
-
-	uint8_t vidd = m_char_ram[(m_vidla << 4) | m_cgra];
-	m_vac->write(vidd);
+	m_dout = false;
 
 	m_drb0->rclk_w(1);
 	m_drb0->wclk_w(1);
 	m_drb1->rclk_w(1);
 	m_drb1->wclk_w(1);
+
+	// the character generator is addressed by the character the row buffer output
+	m_vac->write(m_char_ram[(m_vidla << 4) | m_cgra]);
+
 	m_vac->ld_sh_w(1);
+
+	if (m_dout)
+	{
+		// the row buffer outputs one character for each character time of the
+		// visible line time
+		m_col++;
+	}
+	else
+	{
+		// the read address counter is cleared outside of the visible line time
+		m_col = 0;
+	}
 }
 
 // Intel 8251A Interface
@@ -874,6 +1026,13 @@ void tandy2k_state::fdc_hdl_w(int state)
 	m_floppy1->mon_w(!state);
 }
 
+// Hard disk controller
+
+void tandy2k_hd_state::hdc_bdrq_w(int state)
+{
+	dma_request(3, state);
+}
+
 void tandy2k_state::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
@@ -922,13 +1081,18 @@ void tandy2k_state::machine_start()
 	uint8_t *ram = m_ram->pointer();
 	int ram_size = m_ram->size();
 
+	m_vid_next = attotime::never;
+
 	program.install_ram(0x00000, ram_size - 1, ram);
 
 	m_mouse_timer = timer_alloc(FUNC(tandy2k_state::update_mouse), this);
 	m_mcu_delay = timer_alloc(FUNC(tandy2k_state::mcu_delay_cb), this);
 
+	m_screen->register_screen_bitmap(m_bitmap);
+
 	// register for state saving
 	save_item(NAME(m_dma_mux));
+	save_item(NAME(m_busdmarq));
 	save_item(NAME(m_kbdclk));
 	save_item(NAME(m_kbddat));
 	save_item(NAME(m_kbdin));
@@ -936,29 +1100,71 @@ void tandy2k_state::machine_start()
 	save_item(NAME(m_rxrdy));
 	save_item(NAME(m_txrdy));
 	save_item(NAME(m_pb_sel));
+	save_item(NAME(m_vram_base));
 	save_item(NAME(m_vidouts));
 	save_item(NAME(m_clkspd));
 	save_item(NAME(m_clkcnt));
+	save_item(NAME(m_drb));
+	save_item(NAME(m_dout));
+	save_item(NAME(m_vs));
+	save_item(NAME(m_frame));
+	save_item(NAME(m_int));
+	save_item(NAME(m_col));
+	save_item(NAME(m_hchar));
+	save_item(NAME(m_vid_next));
+	save_item(NAME(m_vid_period));
+	save_item(NAME(m_row));
+	save_item(NAME(m_scanline));
+	save_item(NAME(m_blc));
+	save_item(NAME(m_bkc));
+	save_item(NAME(m_cblank));
+	save_item(NAME(m_dblc));
+	save_item(NAME(m_dbkc));
+	save_item(NAME(m_dblank));
+	save_item(NAME(m_slg));
+	save_item(NAME(m_sld));
+	save_item(NAME(m_curs));
+	save_item(NAME(m_cgra));
+	save_item(NAME(m_vidla));
+	save_item(NAME(m_hires_en));
 	save_item(NAME(m_outspkr));
 	save_item(NAME(m_spkrdata));
+	save_item(NAME(m_centronics_ack));
+	save_item(NAME(m_centronics_fault));
+	save_item(NAME(m_centronics_select));
+	save_item(NAME(m_centronics_perror));
+	save_item(NAME(m_centronics_busy));
 	save_item(NAME(m_clkmouse_cmd));
 	save_item(NAME(m_clkmouse_cnt));
 	save_item(NAME(m_clkmouse_irq));
 	save_item(NAME(m_mouse_x));
 	save_item(NAME(m_mouse_y));
-	save_item(NAME(m_hires_en));
 }
 
 void tandy2k_state::machine_reset()
 {
+	vid_catch_up();
+
 	m_hires_en = 0;
 	m_clkmouse_cnt = 0;
 	m_clkmouse_irq = 0;
-}
 
-void tandy2k_state::device_reset_after_children()
-{
 	m_pc_keyboard->enable(0);
+
+	m_drb = true;
+	m_dout = false;
+	m_vs = true;
+	m_frame = false;
+	m_cgra = 0;
+	m_col = 0;
+	m_row = 0;
+	m_scanline = 0;
+
+	// the mode the screen is configured for out of reset
+	m_clkspd = 0;
+	m_clkcnt = 1;
+
+	set_vidldsh_timer();
 }
 
 TIMER_CALLBACK_MEMBER(tandy2k_state::update_mouse)
@@ -1000,13 +1206,9 @@ void tandy2k_state::tandy2k(machine_config &config)
 	m_maincpu->read_slave_ack_callback().set(FUNC(tandy2k_state::irq_callback));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(640, 400);
-	screen.set_visarea(0, 640-1, 0, 400-1);
-	//screen.set_screen_update(CRT9021B_TAG, FUNC(crt9021_device::screen_update));
-	screen.set_screen_update(FUNC(tandy2k_state::screen_update));
+	SCREEN(config, m_screen);
+	m_screen->set_raw(16_MHz_XTAL * 28 / 20, CHARACTERS_PER_HORIZONTAL_PERIOD * 8, 0, CHARACTERS_PER_DATA_ROW * 8, SCAN_LINES_PER_FRAME, 0, VISIBLE_DATA_ROWS_PER_FRAME * SCAN_LINES_PER_DATA_ROW);
+	m_screen->set_screen_update(FUNC(tandy2k_state::screen_update));
 
 	PALETTE(config, m_colpal).set_format(1, &tandy2k_state::IRGB, 8);
 
@@ -1014,30 +1216,29 @@ void tandy2k_state::tandy2k(machine_config &config)
 	vpac.set_addrmap(0, &tandy2k_state::vpac_mem);
 	vpac.set_character_width(8);
 	vpac.int_callback().set(I8259A_1_TAG, FUNC(pic8259_device::ir1_w));
-	vpac.vs_callback().set(CRT9021B_TAG, FUNC(crt9021_device::vsync_w));
+	vpac.vs_callback().set(FUNC(tandy2k_state::vpac_vs_w));
 	vpac.vlt_callback().set(FUNC(tandy2k_state::vpac_vlt_w));
-	vpac.curs_callback().set(CRT9021B_TAG, FUNC(crt9021_device::cursor_w));
+	vpac.curs_callback().set(FUNC(tandy2k_state::vpac_curs_w));
 	vpac.drb_callback().set(FUNC(tandy2k_state::vpac_drb_w));
 	vpac.wben_callback().set(FUNC(tandy2k_state::vpac_wben_w));
 	vpac.cblank_callback().set(FUNC(tandy2k_state::vpac_cblank_w));
 	vpac.slg_callback().set(FUNC(tandy2k_state::vpac_slg_w));
 	vpac.sld_callback().set(FUNC(tandy2k_state::vpac_sld_w));
-	vpac.set_screen(SCREEN_TAG);
+	vpac.set_screen(m_screen);
 
-	CRT9212(config, m_drb0, 0);
+	CRT9212(config, m_drb0);
 	m_drb0->set_wen2(1);
 	m_drb0->dout().set(FUNC(tandy2k_state::vidla_w));
 
-	CRT9212(config, m_drb1, 0);
+	CRT9212(config, m_drb1);
 	m_drb1->set_wen2(1);
 	m_drb1->dout().set(FUNC(tandy2k_state::drb_attr_w));
 
 	CRT9021(config, m_vac, 16_MHz_XTAL * 28 / 20);
-	m_vac->set_screen(SCREEN_TAG);
+	m_vac->set_screen(m_screen);
+	m_vac->set_display_callback(FUNC(tandy2k_state::vac_draw_character));
 
 	ADDRESS_MAP_BANK(config, m_vrambank).set_map(&tandy2k_state::vrambank_mem).set_options(ENDIANNESS_LITTLE, 16, 17, 0x8000);
-
-	TIMER(config, "vidldsh").configure_generic(FUNC(tandy2k_state::vidldsh_tick));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1049,7 +1250,7 @@ void tandy2k_state::tandy2k(machine_config &config)
 	m_i8255a->in_pb_callback().set(FUNC(tandy2k_state::ppi_pb_r));
 	m_i8255a->out_pc_callback().set(FUNC(tandy2k_state::ppi_pc_w));
 
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_uart->dtr_handler().set(m_rs232, FUNC(rs232_port_device::write_dtr));
 	m_uart->rts_handler().set(m_rs232, FUNC(rs232_port_device::write_rts));
@@ -1062,7 +1263,7 @@ void tandy2k_state::tandy2k(machine_config &config)
 	// TODO pin 15 external transmit clock
 	// TODO pin 17 external receiver clock
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(16_MHz_XTAL / 16);
 	m_pit->out_handler<0>().set(FUNC(tandy2k_state::outspkr_w));
 	m_pit->set_clk<1>(16_MHz_XTAL / 8);
@@ -1070,10 +1271,10 @@ void tandy2k_state::tandy2k(machine_config &config)
 	//m_pit->set_clk<2>(16_MHz_XTAL / 8);
 	//m_pit->out_handler<2>().set(FUNC(tandy2k_state::rfrqpulse_w));
 
-	PIC8259(config, m_pic0, 0);
+	PIC8259(config, m_pic0);
 	m_pic0->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 
-	PIC8259(config, m_pic1, 0);
+	PIC8259(config, m_pic1);
 	m_pic1->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int1_w));
 
 	// there were two drive types shipped on the 2k, one sets ready when a disk is inserted
@@ -1097,30 +1298,34 @@ void tandy2k_state::tandy2k(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	TANDY2K_KEYBOARD(config, m_kb, 0);
+	TANDY2K_KEYBOARD(config, m_kb);
 	m_kb->clock_wr_callback().set(FUNC(tandy2k_state::kbdclk_w));
 	m_kb->data_wr_callback().set(FUNC(tandy2k_state::kbddat_w));
 
 	// temporary until the tandy keyboard has a rom dump
-	TANDY2K_HLE_KEYB(config, m_pc_keyboard, 0).keypress().set(I8259A_1_TAG, FUNC(pic8259_device::ir0_w));
+	TANDY2K_HLE_KEYB(config, m_pc_keyboard).keypress().set(FUNC(tandy2k_state::hle_keypress_w));
 
 	// software lists
-	SOFTWARE_LIST(config, "flop_list").set_original("tandy2k");
+	SOFTWARE_LIST(config, "flop_list").set_original("tandy2k_flop");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("256K,384K,512K,640K,768K,896K");
 }
 
-void tandy2k_state::tandy2k_hd(machine_config &config)
+void tandy2k_hd_state::tandy2k_hd(machine_config &config)
 {
 	tandy2k(config);
+	
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_IO, &tandy2k_state::tandy2k_hd_io);
+	m_maincpu->set_addrmap(AS_IO, &tandy2k_hd_state::tandy2k_hd_io);
 
-	// Tandon TM502 hard disk
-	HARDDISK(config, "harddisk0", 0);
-	//MCFG_WD1010_ADD(WD1010_TAG, wd1010_intf)
-	//MCFG_WD1100_11_ADD(WD1100_11_TAG, wd1100_11_intf)
+	// WD1010 (u18) and WD1100-11 (u12) hard disk controller with a Tandon TM502 drive
+	TANDY2K_HDC(config, m_hdc);
+	m_hdc->intrq_wr_callback().set(m_pic0, FUNC(pic8259_device::ir6_w));
+	m_hdc->bdrq_wr_callback().set(FUNC(tandy2k_hd_state::hdc_bdrq_w));
+
+	// software lists
+	SOFTWARE_LIST(config, "hdd_list").set_original("tandy2k_hdd");
 }
 
 // ROMs
@@ -1145,6 +1350,6 @@ ROM_END
 
 // System Drivers
 
-//    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT    CLASS          INIT        COMPANY              FULLNAME        FLAGS
-COMP( 1983, tandy2k,   0,       0,      tandy2k,    tandy2k, tandy2k_state, empty_init, "Tandy Radio Shack", "Tandy 2000",   MACHINE_NOT_WORKING )
-COMP( 1983, tandy2khd, tandy2k, 0,      tandy2k_hd, tandy2k, tandy2k_state, empty_init, "Tandy Radio Shack", "Tandy 2000HD", MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT    CLASS             INIT        COMPANY              FULLNAME        FLAGS
+COMP( 1983, tandy2k,   0,       0,      tandy2k,    tandy2k, tandy2k_state,    empty_init, "Tandy Radio Shack", "Tandy 2000",   MACHINE_SUPPORTS_SAVE )
+COMP( 1983, tandy2khd, tandy2k, 0,      tandy2k_hd, tandy2k, tandy2k_hd_state, empty_init, "Tandy Radio Shack", "Tandy 2000HD", MACHINE_SUPPORTS_SAVE )

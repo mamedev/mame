@@ -172,7 +172,7 @@ static INPUT_PORTS_START( terminal )
 	PORT_START("in1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_SERVICE)        PORT_NAME("Test")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT)  PORT_NAME("Key")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE) PORT_NAME("Service")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_SERVICE1)       PORT_NAME("Service")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_COIN1)          PORT_NAME("Coin")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM)         PORT_NAME("Hopper Pool Sensor")
@@ -222,7 +222,7 @@ void bingoct_device::device_add_mconfig(machine_config &config)
 	io.write_callback().set(FUNC(bingoct_device::output_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(10'738'635)/2,
 			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256,
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 192);

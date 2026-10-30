@@ -261,7 +261,7 @@ void falgasm89_video_state::falgasm89_video(machine_config &config)
 	tms9129_device &vdp(TMS9129(config, "vdp", 10.738635_MHz_XTAL));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x10000); // 2 x UD61464DC
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	i8155_device &i8155(I8155(config, "i8155", 6_MHz_XTAL)); // NEC D8155HC
 	i8155.in_pa_callback().set([this] () { logerror("from main (i8155 PA in)\n"); return 0x00; }); // TODO: from main? returning rand() shows inputs come from here, probably sent from the main CPU

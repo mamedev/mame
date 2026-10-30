@@ -5,12 +5,7 @@
 
 #pragma once
 
-// SoftFloat 2 lacks an include guard
-#ifndef softfloat2_h
-#define softfloat2_h 1
-#include "softfloat/milieu.h"
-#include "softfloat/softfloat.h"
-#endif
+#include "softfloat3/source/include/softfloat.h"
 
 DECLARE_DEVICE_TYPE(I8087, i8087_device)
 
@@ -41,7 +36,7 @@ private:
 	devcb_write_line m_int_handler;
 	devcb_write_line m_busy_handler;
 	emu_timer *m_timer;
-	floatx80 m_reg[8];
+	extFloat80_t m_reg[8];
 
 	u32 m_ea;
 	u32 m_pc;
@@ -72,21 +67,21 @@ private:
 	void WRITE32(offs_t ea, u32 data);
 	u64 READ64(offs_t ea);
 	void WRITE64(offs_t ea, u64 data);
-	floatx80 READ80(offs_t);
-	void WRITE80(offs_t ea, floatx80 t);
+	extFloat80_t READ80(offs_t);
+	void WRITE80(offs_t ea, extFloat80_t t);
 	void set_stack_top(int top);
 	void set_tag(int reg, int tag);
-	void write_stack(int i, floatx80 value, bool update_tag);
+	void write_stack(int i, extFloat80_t value, bool update_tag);
 	void set_stack_underflow();
 	void set_stack_overflow();
 	int inc_stack();
 	int dec_stack();
 	int check_exceptions(bool store = false);
 	void write_cw(u16 cw);
-	floatx80 add(floatx80 a, floatx80 b);
-	floatx80 sub(floatx80 a, floatx80 b);
-	floatx80 mul(floatx80 a, floatx80 b);
-	floatx80 div(floatx80 a, floatx80 b);
+	extFloat80_t add(extFloat80_t a, extFloat80_t b);
+	extFloat80_t sub(extFloat80_t a, extFloat80_t b);
+	extFloat80_t mul(extFloat80_t a, extFloat80_t b);
+	extFloat80_t div(extFloat80_t a, extFloat80_t b);
 	void fadd_m32real(u8 modrm);
 	void fadd_m64real(u8 modrm);
 	void fadd_st_sti(u8 modrm);

@@ -723,7 +723,7 @@ void sslam_state::sslam(machine_config &config)
 	m_audiocpu->set_disable(); /* Internal code is not dumped - 2 boards were protected */
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -754,7 +754,7 @@ void powerbls_state::powerbls(machine_config &config)
 	m_audiocpu->port_out_cb<3>().set(FUNC(powerbls_state::playmark_oki_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);

@@ -410,7 +410,7 @@ void xyonix_state::xyonix(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(xyonix_state::irq0_line_assert), attotime::from_hz(4*60));  // ?? controls music tempo
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16_MHz_XTAL / 2, 508, 0, 320, 256, 0, 224); // 8 MHz?
 	screen.set_screen_update(FUNC(xyonix_state::screen_update));
 //  screen.set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));

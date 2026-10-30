@@ -7,19 +7,16 @@
     Handle input from the user.
 
 ***************************************************************************/
-
-#pragma once
-
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
 #ifndef MAME_EMU_INPUT_H
 #define MAME_EMU_INPUT_H
+
+#pragma once
 
 #include "interface/inputcode.h"
 #include "interface/inputman.h"
 #include "interface/inputseq.h"
+
+#include "coretmpl.h"
 
 #include <algorithm>
 #include <array>
@@ -28,6 +25,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <utility>
 
 
@@ -35,21 +33,19 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-using osd::input_seq; // too much trouble to qualify this everywhere
-
-
-// ======================> input_manager
 
 // global machine-level information about devices
 class input_manager : public osd::input_manager
 {
 public:
+	using input_seq = osd::input_seq; // too much trouble to qualify this everywhere
+
 	// controller alias table typedef
-	using devicemap_table = std::map<std::string, std::string>;
+	using devicemap_table = util::transparent_string_map<std::string, std::string>;
 
 	// construction/destruction
 	input_manager(running_machine &machine);
-	~input_manager();
+	virtual ~input_manager();
 
 	// OSD interface
 	virtual bool class_enabled(input_device_class devclass) const override;
@@ -71,7 +67,6 @@ public:
 	std::string code_name(input_code code) const;
 	std::string code_to_token(input_code code) const;
 	input_code code_from_token(std::string_view _token);
-	const char *standard_token(input_item_id itemid) const;
 
 	// input sequence readers
 	bool seq_pressed(const input_seq &seq);
@@ -86,17 +81,19 @@ public:
 	// misc
 	bool map_device_to_controller(const devicemap_table &table);
 
+	static const char *standard_token(input_item_id itemid) noexcept;
+
 private:
 	// internal helpers
 	void reset_memory();
 
-	// internal state
 	running_machine &   m_machine;
-	input_code          m_switch_memory[64];
 
 	// classes
 	std::array<std::unique_ptr<input_class>, DEVICE_CLASS_MAXIMUM> m_class;
-};
 
+	// internal state
+	input_code m_switch_memory[64];
+};
 
 #endif  // MAME_EMU_INPUT_H

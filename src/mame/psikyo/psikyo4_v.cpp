@@ -31,6 +31,8 @@ HgKairak: 86010000 1f201918 a0000000 Large Screen
 #include "emu.h"
 #include "psikyo4.h"
 
+#include "endianness.h"
+
 
 /* --- SPRITES --- */
 void psikyo4_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t scr)
@@ -60,7 +62,7 @@ void psikyo4_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	uint16_t const listlen = 0xc00/2 - 0x04/2;
 	uint16_t listcntr = 0;
 	bool const flipscreen = BIT(m_vidregs[1], (scr == 0 ? 31 : 23));
-	uint16_t const screen_height = screen.visible_area().max_y + 1;
+	uint16_t const screen_height = screen.visible_area().bottom() + 1;
 
 	while (listcntr < listlen)
 	{
