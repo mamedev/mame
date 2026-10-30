@@ -108,6 +108,7 @@ DEFINE_DEVICE_TYPE(AMD_29LV160DT,            amd_29lv160dt_device,            "a
 DEFINE_DEVICE_TYPE(AMD_29LV200T,             amd_29lv200t_device,             "amd_29lv200t",             "AMD 29LV200T Flash")
 DEFINE_DEVICE_TYPE(FUJITSU_29F160TE,         fujitsu_29f160te_device,         "mbm29f160te",              "Fujitsu MBM29F160TE Flash")
 DEFINE_DEVICE_TYPE(FUJITSU_29F160TE_16BIT,   fujitsu_29f160te_16bit_device,   "mbm29f160te_16bit",        "Fujitsu MBM29F160TE Flash (16-bit)")
+DEFINE_DEVICE_TYPE(FUJITSU_29DL161TE_16BIT,  fujitsu_29dl161te_16bit_device,  "mbm29dl161te_16bit",       "Fujitsu MBM29DL161TE Flash (16-bit)")
 DEFINE_DEVICE_TYPE(FUJITSU_29F016A,          fujitsu_29f016a_device,          "mbm29f016a",               "Fujitsu MBM29F016A Flash")
 DEFINE_DEVICE_TYPE(FUJITSU_29DL164BD,        fujitsu_29dl164bd_device,        "mbm29dl164bd",             "Fujitsu MBM29DL164BD Flash")
 DEFINE_DEVICE_TYPE(FUJITSU_29LV002TC,        fujitsu_29lv002tc_device,        "mbm29lv002tc",             "Fujitsu MBM29LV002TC Flash")
@@ -178,6 +179,7 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_sector_is_4k(false),
 		m_sector_is_16k(false),
 		m_top_boot_sector(false),
+		m_top_boot_sector_is_8k(false),
 		m_bot_boot_sector(false),
 		m_page_size(0),
 		m_page_timeout_usec(0),
@@ -211,7 +213,10 @@ fujitsu_29f160te_device::fujitsu_29f160te_device(const machine_config &mconfig, 
 	: intelfsh8_device(mconfig, FUJITSU_29F160TE, tag, owner, clock, 0x200000, MFG_FUJITSU, 0xd2) { m_top_boot_sector = true; m_has_reset_pin = true; }
 
 fujitsu_29f160te_16bit_device::fujitsu_29f160te_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, FUJITSU_29F160TE_16BIT, tag, owner, clock, 0x200000, MFG_FUJITSU, 0xd2) { m_top_boot_sector = true; m_sector_is_4k = true; m_has_reset_pin = true; }
+	: intelfsh16_device(mconfig, FUJITSU_29F160TE_16BIT, tag, owner, clock, 0x200000, MFG_FUJITSU, 0xd2) { m_top_boot_sector = true; m_has_reset_pin = true; }
+
+fujitsu_29dl161te_16bit_device::fujitsu_29dl161te_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh16_device(mconfig, FUJITSU_29DL161TE_16BIT, tag, owner, clock, 0x200000, MFG_FUJITSU, 0x2236) { m_top_boot_sector_is_8k = true; m_has_reset_pin = true; }
 
 fujitsu_29f016a_device::fujitsu_29f016a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, FUJITSU_29F016A, tag, owner, clock, 0x200000, MFG_FUJITSU, 0xad) { m_has_reset_pin = true; }
@@ -654,11 +659,31 @@ uint32_t intelfsh_device::read_full(uint32_t address)
 		}
 		break;
 	case FM_ERASEAMD4:
-		// reads outside of the erasing sector return normal data
-		if (
-			!(m_maker_id == MFG_FUJITSU && m_device_id == 0xad) /* Firebeat: pop'n music will poll sector 0 for status updates even when clearing section 1 and beyond */
-			&& ((address < m_erase_sector) || (address >= m_erase_sector+(64*1024)))
-		)
+	{
+		// MBM29DL161TE exposes the idle bank while DQ6 toggles throughout the busy bank
+		// and DQ2 toggles only in the sector being erased.
+		bool read_array;
+		bool toggle_dq2 = true;
+		if (m_top_boot_sector_is_8k)
+		{
+			uint32_t const bytes_per_address = m_bits / 8;
+			uint32_t const bank_boundary = (m_size - 64 * 1024) / bytes_per_address;
+			bool const chip_erase = m_erase_sector < 0;
+			bool const top_bank_erase = !chip_erase && (uint32_t(m_erase_sector) >= bank_boundary);
+			read_array = !chip_erase && ((address >= bank_boundary) != top_bank_erase);
+
+			uint32_t const sector_length = (top_bank_erase ? 8 * 1024 : 64 * 1024) / bytes_per_address;
+			toggle_dq2 = chip_erase || ((address >= uint32_t(m_erase_sector)) && (address < uint32_t(m_erase_sector) + sector_length));
+		}
+		else
+		{
+			// Firebeat: pop'n music polls sector 0 for status updates while erasing later sectors.
+			read_array =
+				!(m_maker_id == MFG_FUJITSU && m_device_id == 0xad)
+				&& ((address < m_erase_sector) || (address >= m_erase_sector + (64 * 1024)));
+		}
+
+		if (read_array)
 		{
 			switch( m_bits )
 			{
@@ -672,11 +697,17 @@ uint32_t intelfsh_device::read_full(uint32_t address)
 		}
 		else
 		{
+			uint8_t status = m_status ^ (1 << 6);
+			if (toggle_dq2)
+				status ^= 1 << 2;
+			else
+				status |= 1 << 2;
 			if (!machine().side_effects_disabled())
-				m_status ^= ( 1 << 6 ) | ( 1 << 2 );
-			data = m_status;
+				m_status = status;
+			data = status;
 		}
 		break;
+	}
 	}
 
 	//if (m_flash_mode != FM_NORMAL) logerror( "intelflash_read( %08x ) %08x\n", address, data );
@@ -958,6 +989,8 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 
 			m_status = 1 << 3;
 			m_flash_mode = FM_ERASEAMD4;
+			if (m_top_boot_sector_is_8k)
+				m_erase_sector = -1;
 
 			if (m_sector_is_4k)
 			{
@@ -975,7 +1008,7 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 		else if( ( data & 0xff ) == 0x30 )
 		{
 			// sector erase
-			// clear the 4k/64k block containing the current address to all 0xffs
+			// clear the sector containing the current address to all 0xffs
 			uint32_t base = address * ((m_bits == 16) ? 2 : 1);
 			if (m_sector_is_4k)
 			{
@@ -989,15 +1022,21 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 				m_erase_sector = address & ((m_bits == 16) ? ~0x1fff : ~0x3fff);
 				m_timer->adjust( attotime::from_msec( 500 ) );
 			}
-			else if(m_top_boot_sector && address >= (m_size - 64*1024))
+			else if (m_top_boot_sector_is_8k && base >= (m_size - 64*1024))
 			{
-				if (address >= (m_size - (16*1024)))
+				memset(&m_data[base & ~0x1fff], 0xff, 8 * 1024);
+				m_erase_sector = address & ((m_bits == 16) ? ~0xfff : ~0x1fff);
+				m_timer->adjust(attotime::from_seconds(1));
+			}
+			else if(m_top_boot_sector && base >= (m_size - 64*1024))
+			{
+				if (base >= (m_size - (16*1024)))
 				{
 					memset(&m_data[base & ~0x3fff], 0xff, 16 * 1024);
 					m_erase_sector = address & ((m_bits == 16) ? ~0x1fff : ~0x3fff);
 					m_timer->adjust( attotime::from_msec( 500 ) );
 				}
-				else if (address >= (m_size - (32*1024)))
+				else if (base >= (m_size - (32*1024)))
 				{
 					memset(&m_data[base & ~0x1fff], 0xff, 8 * 1024);
 					m_erase_sector = address & ((m_bits == 16) ? ~0xfff : ~0x1fff);
@@ -1010,7 +1049,7 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 					m_timer->adjust( attotime::from_msec( 500 ) );
 				}
 			}
-			else if(m_bot_boot_sector && address < (64*1024))
+			else if(m_bot_boot_sector && base < (64*1024))
 			{
 				if (m_maker_id == MFG_ST)
 				{
@@ -1018,13 +1057,13 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 					m_erase_sector = address & ((m_bits == 16) ? ~0xfff : ~0x1fff);
 					m_timer->adjust(attotime::from_msec(250));
 				}
-				else if (address < (16*1024))
+				else if (base < (16*1024))
 				{
 					memset(&m_data[base & ~0x3fff], 0xff, 16 * 1024);
 					m_erase_sector = address & ((m_bits == 16) ? ~0x1fff : ~0x3fff);
 					m_timer->adjust( attotime::from_msec( 500 ) );
 				}
-				else if (address < (32*1024))
+				else if (base < (32*1024))
 				{
 					memset(&m_data[base & ~0x1fff], 0xff, 8 * 1024);
 					m_erase_sector = address & ((m_bits == 16) ? ~0xfff : ~0x1fff);
