@@ -94,6 +94,7 @@ laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type ty
 	, m_attospertrack(0)
 	, m_sliderupdate(attotime::zero)
 	, m_videoindex(0)
+	, m_videostale(false)
 	, m_stream(nullptr)
 	, m_audiobufsize(0)
 	, m_audiobufin(0)
@@ -290,6 +291,7 @@ void laserdisc_device::device_start()
 	save_item(STRUCT_MEMBER(m_frame, m_numfields));
 	save_item(STRUCT_MEMBER(m_frame, m_lastfield));
 	save_item(NAME(m_videoindex));
+	save_item(NAME(m_videostale));
 
 	save_item(NAME(m_audiobuffer[0]));
 	save_item(NAME(m_audiobuffer[1]));
@@ -999,9 +1001,14 @@ void laserdisc_device::read_track_data()
 		frame->m_numfields = 0;
 	}
 
-	// if we're squelched, reset the frame counter
+	// if we're squelched, reset the frame counter, and mark the frames read before
+	// the squelch as stale: get_video() shows nothing until a new frame has been
+	// read, while video_active() reports the video as on as soon as the squelch ends
 	if (m_videosquelch)
+	{
 		frame->m_numfields = 0;
+		m_videostale = true;
+	}
 
 	// remember the last field number
 	frame->m_lastfield = m_curtrack * 2 + m_fieldnum;
@@ -1090,7 +1097,8 @@ void laserdisc_device::process_track_data()
 	// count the field as read if we are successful
 	if (m_avhuff_video.valid())
 	{
-		m_frame[m_videoindex].m_numfields++;
+		if (++m_frame[m_videoindex].m_numfields >= 2)
+			m_videostale = false;
 		player_overlay(m_avhuff_video);
 	}
 
