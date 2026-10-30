@@ -23187,6 +23187,9 @@ isbc8010b
 @source:intel/isbc8030.cpp
 isbc8030
 
+@source:intel/qt960.cpp
+qt960
+
 @source:intel/rex6000.cpp
 ds2
 oz750
