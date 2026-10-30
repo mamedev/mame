@@ -17,11 +17,10 @@
     - Battery
 
     TODO:
-    - Hook up RS232 ports
-    - Improve rendering (attributes, double height, etc.)
+    - Improve rendering (need hardware references)
+    - Hook up AVDC clock changes
     - Verify RAM ranges
     - Implement HM82C11C and hookup printer
-    - Beeper
 
     Notes:
     - No exact model number in the firmware, might be a different model
@@ -32,12 +31,15 @@
 #include "emu.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
+#include "sound/spkrdev.h"
 #include "video/bt47x.h"
 #include "video/scn2674.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 namespace {
@@ -58,6 +60,10 @@ public:
 		m_chargen(*this, "chargen"),
 		m_vram(*this, "vram"),
 		m_kbdc(*this, "kbdc"),
+		m_duart(*this, "duart"),
+		m_mainport(*this, "mainport"),
+		m_auxport(*this, "auxport"),
+		m_speaker_sound(*this, "speaker_sound"),
 		m_nvram(*this, "nvram", 0x80, ENDIANNESS_BIG)
 	{ }
 
@@ -84,9 +90,13 @@ private:
 	uint8_t avdc_attr_r(offs_t offset);
 	void avdc_attr_w(offs_t offset, uint8_t data);
 
+	void video_control_w(uint8_t data);
+
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void ffec01_w(uint8_t data);
+	void volume_w(uint8_t data);
+
+	void duart_output_w(uint8_t data);
 
 	required_device<m68000_device> m_maincpu;
 	required_device<bt476_device> m_ramdac;
@@ -94,10 +104,16 @@ private:
 	required_shared_ptr<uint16_t> m_chargen;
 	required_shared_ptr<uint16_t> m_vram;
 	required_device<pc_kbdc_device> m_kbdc;
+	required_device<scn2681_device> m_duart;
+	required_device<rs232_port_device> m_mainport;
+	required_device<rs232_port_device> m_auxport;
+	required_device<speaker_sound_device> m_speaker_sound;
 	memory_share_creator<uint8_t> m_nvram;
 
 	bool m_kbd_clk = true;
 	bool m_kbd_rxd = true;
+	uint8_t m_video_control = 0;
+	uint8_t m_duart_output = 0;
 };
 
 
@@ -116,7 +132,8 @@ void tr175_state::mem_map(address_map &map)
 	map(0xffe000, 0xffe01f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0xff00);
 	map(0xffe400, 0xffe40f).rw("avdc", FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0xff00);
 	map(0xffe800, 0xffe805).unmaprw(); //.rw("pai", FUNC(um82c11_device::read), FUNC(um82c11_device::write)).umask16(0xff00);
-	map(0xffec01, 0xffec01).w(FUNC(tr175_state::ffec01_w));
+	map(0xffec00, 0xffec00).w(FUNC(tr175_state::volume_w));
+	map(0xffec01, 0xffec01).w(FUNC(tr175_state::video_control_w));
 	map(0xfff000, 0xfff000).w(FUNC(tr175_state::keyboard_w));
 	map(0xfff400, 0xfff400).r(FUNC(tr175_state::keyboard_r));
 	map(0xfff800, 0xfff807).r(m_ramdac, FUNC(bt476_device::read)).umask16(0x00ff);
@@ -221,6 +238,22 @@ void tr175_state::avdc_attr_w(offs_t offset, uint8_t data)
 	m_vram[offset] = (m_vram[offset] & 0x00ff) | (data << 8);
 }
 
+void tr175_state::video_control_w(uint8_t data)
+{
+	// 7-------  display enable
+	// -6------  unknown
+	// --5-----  unknown
+	// ---4----  132/80 column
+	// ----3---  unknown, written on startup (avdc reset?)
+	// -----2--  vga attributes: 1=blink, 0=bright bg
+	// ------1-  vga attributes: 1=underline disabled
+	// -------0  attribute format: 0=vga format
+
+	logerror("video_control_w: %02x\n", data);
+
+	m_video_control = data;
+}
+
 SCN2674_DRAW_CHARACTER_MEMBER( tr175_state::draw_character )
 {
 	const pen_t *const pen = m_ramdac->pens();
@@ -237,8 +270,33 @@ SCN2674_DRAW_CHARACTER_MEMBER( tr175_state::draw_character )
 		if ((code & 0xc0) == 0xc0)
 			data |= BIT(data, 1);
 
-		rgb_t fg = pen[0x40 | ((~attr) & 0x0f)];
-		rgb_t bg = pen[0x40 | 0x0f];
+		if (cursor && ((BIT(m_duart_output, 6) == i) || dw))
+			data = 0x1ff;
+
+		rgb_t fg;
+		rgb_t bg;
+
+		if (BIT(m_video_control, 0))
+		{
+			// ASCII/ANSI mode
+			if (ul && (BIT(attr, 2) && BIT(attr, 1)))
+				data = 0x1ff;
+
+			if (blink && BIT(attr, 7))
+				data = 0x000;
+
+			if ((BIT(attr, 6) && BIT(attr, 5) && BIT(attr, 4)))
+				data = ~data;
+
+			fg = pen[0x40 | (BIT(attr, 3) ? 0x00 : 0x08)];
+			bg = pen[0x40 | (BIT(attr, 3) ? 0x07 : 0x0f)];
+		}
+		else
+		{
+			// VGA mode
+			fg = pen[0x40 | ((~attr >> 0) & 0x0f)];
+			bg = pen[0x40 | ((~attr >> 4) & 0x0f)];
+		}
 
 		for (int p = 0; p < 9; p++)
 		{
@@ -273,6 +331,17 @@ GFXDECODE_END
 
 
 //**************************************************************************
+//  AUDIO EMULATION
+//**************************************************************************
+
+void tr175_state::volume_w(uint8_t data)
+{
+	// values written: 0xff (mute), 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0x01
+	m_speaker_sound->set_output_gain(0, (8 - std::popcount(data)) * 12.5);
+}
+
+
+//**************************************************************************
 //  MACHINE EMULATION
 //**************************************************************************
 
@@ -286,11 +355,21 @@ void tr175_state::machine_start()
 	// register for save states
 	save_item(NAME(m_kbd_clk));
 	save_item(NAME(m_kbd_rxd));
+	save_item(NAME(m_video_control));
+	save_item(NAME(m_duart_output));
 }
 
-void tr175_state::ffec01_w(uint8_t data)
+void tr175_state::duart_output_w(uint8_t data)
 {
-	logerror("%s: Writing %02X to FFEC01\n", machine().describe_context(), data);
+	// 7-------  aux port dtr
+	// -6------  cursor location bit 0
+	// --54----  video timing, selects xtal?
+	// ----3---  speaker sound
+	// -----2--  aux port rts
+	// ------1-  main port dtr
+	// -------0  main port rts
+
+	m_duart_output = data;
 }
 
 
@@ -322,8 +401,31 @@ void tr175_state::tr175(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_ramdac, gfxdecode);
 
-	scn2681_device &duart(SCN2681(config, "duart", 11.0592_MHz_XTAL / 3)); // is this the right clock?
-	duart.irq_cb().set_inputline(m_maincpu, M68K_IRQ_IPL0);
+	SCN2681(config, m_duart, 11.0592_MHz_XTAL / 3);
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_IPL0);
+	m_duart->outport_cb().set(FUNC(tr175_state::duart_output_w));
+	m_duart->outport_cb().append(m_mainport, FUNC(rs232_port_device::write_rts)).bit(0);
+	m_duart->outport_cb().append(m_mainport, FUNC(rs232_port_device::write_dtr)).bit(1);
+	m_duart->outport_cb().append(m_auxport, FUNC(rs232_port_device::write_rts)).bit(2);
+	m_duart->outport_cb().append(m_speaker_sound, FUNC(speaker_sound_device::level_w)).bit(3);
+	m_duart->outport_cb().append(m_auxport, FUNC(rs232_port_device::write_dtr)).bit(7);
+	m_duart->a_tx_cb().set(m_mainport, FUNC(rs232_port_device::write_txd));
+	m_duart->b_tx_cb().set(m_auxport, FUNC(rs232_port_device::write_txd));
+
+	RS232_PORT(config, m_mainport, default_rs232_devices, nullptr);
+	m_mainport->rxd_handler().set(m_duart, FUNC(scn2681_device::rx_a_w));
+	m_mainport->cts_handler().set(m_duart, FUNC(scn2681_device::ip0_w));
+	m_mainport->dsr_handler().set(m_duart, FUNC(scn2681_device::ip1_w));
+
+	RS232_PORT(config, m_auxport, default_rs232_devices, nullptr);
+	m_auxport->rxd_handler().set(m_duart, FUNC(scn2681_device::rx_b_w));
+	m_auxport->cts_handler().set(m_duart, FUNC(scn2681_device::ip2_w));
+	m_auxport->dsr_handler().set(m_duart, FUNC(scn2681_device::ip5_w));
+
+	SPEAKER(config, "speaker").front_center();
+
+	SPEAKER_SOUND(config, m_speaker_sound);
+	m_speaker_sound->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	PC_KBDC(config, m_kbdc, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
 	m_kbdc->out_clock_cb().set(FUNC(tr175_state::kbd_clk_w));
@@ -350,4 +452,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY    FULLNAME     FLAGS
-COMP( 1994, tr175, 0,      0,      tr175,   tr175, tr175_state, empty_init, "Relisys", "TR-175 II", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1994, tr175, 0,      0,      tr175,   tr175, tr175_state, empty_init, "Relisys", "TR-175 II", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
