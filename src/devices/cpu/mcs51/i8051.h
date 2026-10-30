@@ -330,6 +330,13 @@ protected:
 	void check_irqs();
 	void burn_cycles(int cycles);
 	u8 pending_irq_flags(u8 int_mask);
+	virtual u8 interrupt_mask();
+	virtual void interrupt_taken();
+	virtual bool instruction_enabled() const;
+	virtual void prepare_instruction(u8 op);
+	virtual void update_peripherals();
+	virtual bool timer1_split_uses_input() const { return false; }
+	bool timer_running(unsigned timer) const;
 	void acall(u8 r);
 	void set_reg(u8 r, u8 v);
 	u8 r_reg(u8 r);
