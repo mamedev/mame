@@ -54,7 +54,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-private:
+protected:
     required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device_array<ram_device, 4> m_iopage;
@@ -91,13 +91,17 @@ private:
     void program_map(address_map &map);
 	void data_map(address_map &map);
 
-	uint8_t m_mmu_reg, m_ioreg;
-	uint8_t mmu_lut[32];
+	uint8_t m_mmu_reg = 0;
+	uint8_t m_ioreg = 0;
+	uint8_t mmu_lut[32] = {};
+	bool m_core2x = false;
 	void reset_mmu();
 	u8   lut_r(offs_t offset);
 	void lut_w(offs_t offset, u8 data);
 	u8   mem_r(offs_t offset);
 	void mem_w(offs_t offset, u8 data);
+	u8 io_page_r(uint8_t page, offs_t offset);
+	void io_page_w(uint8_t page, offs_t offset, u8 data);
 
 	// screen update
 	void sof_interrupt(int state);
@@ -211,17 +215,26 @@ private:
 };
 
 /**
- *  The F256K2 is nearly identical to the F256K but it adds the following:
- *  $DD20 - $DD3F - SDCARD1 *** This one has moved ***
- *  $DD40 - $DD5F - SPLASH LCD (SPI Port)
- *  $DD60 - $DD7F - Wiznet Copper SPI Interface
- *  $DD80 - $DD9F - Wiznet WIFI UART interface (115K or 2M)
- *  $DDA0 - $DDBF - MIDI UART (Fixed @ 31,250Baud)
- *  $DDC0 - $DDDF - Master SPI Interface to Supervisor (RP2040)*
+ * F256K2 running the Core2X FPGA core: 65C816 at 12.5875 MHz, 2 MiB flat
+ * RAM addressing, six I/O pages, 128 banked sprites, MemText and line draw.
  */
-class f256k2_state : public f256k_state
+class f256k2x_state : public f256k_state
 {
 public:
-	f256k2_state(const machine_config &mconfig, device_type type, const char *tag);
+	f256k2x_state(const machine_config &mconfig, device_type type, const char *tag);
+	void f256k2x(machine_config &config);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+private:
+	void core2x_map(address_map &map);
+	u8 core2x_r(offs_t offset);
+	void core2x_w(offs_t offset, u8 data);
+	uint8_t core2x_io_page() const;
+	uint8_t core2x_ram_extension(uint8_t slot) const;
+
+	uint8_t m_mmu_ext[2] = { 0, 0 };
 };
 #endif // MAME_FOENIXRETRO_F256_H

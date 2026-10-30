@@ -3,7 +3,9 @@
 #include "emu.h"
 #include "f256.h"
 #include "f256k_rom.h"
+#include "f256k2x_rom.h"
 #include "tiny_vicky.h"
+#include "cpu/g65816/g65816.h"
 #include "cpu/m6502/w65c02s.h"
 
 /**
@@ -11,7 +13,7 @@
  * F256K - WDC65C02 Processor running at 6.25MHz
  *    512KB RAM managed with slots of 8KB in MMU located at address $0000.  Slots 0 to $3F
  *    512KB Flash                                                           Slots $40 to $7F
- *    All I/O are mapped to slot 6 ($C000-$DFFF) - there are 4 I/O maps, switched using address $0001.
+ *    All I/O are mapped to slot 6 ($C000-$DFFF).
  *    Sound Chips: OPL3, PSG, SN74689, CODEC
  *    Keyboard: mechanical switch in a matrix - controlled by VIA6522 chip.
  *    Joysticks: 2 Atari-type ports and 2 S/NES ports
@@ -76,6 +78,7 @@ void f256k_state::f256k(machine_config &config)
     m_rtc->int_handler().set(FUNC(f256k_state::rtc_interrupt_handler));
 
     TINY_VICKY(config, m_video, MASTER_CLOCK);
+    m_video->set_model(tiny_vicky_video_device::model::LEGACY);
     m_video->sof_irq_handler().set(FUNC(f256k_state::sof_interrupt));
     m_video->sol_irq_handler().set(FUNC(f256k_state::sol_interrupt));
 
@@ -258,22 +261,21 @@ u8   f256k_state::mem_r(offs_t offset)
         // Slot 6 is where I/O devices are located, when IO_DISABLE is 0
         if (slot == 6 && (m_ioreg & 0x4) == 0)
         {
-            switch (m_ioreg & 0x3)
+            switch (m_core2x ? (((m_ioreg & 0x08) >> 1) | (m_ioreg & 0x03)) : (m_ioreg & 0x03))
             {
                 case 0:
                     // here we have a number of devices to read
                     if (adj_addr >= 0xd018 && adj_addr < 0xd01c)
                     {
-                        // return Vicky's scan line and colum
-                        uint16_t line = m_screen->hpos();
-                        //uint16_t column = m_video->column();
-                        logerror("Scanline Addr: %04X, Line: %04X\n", adj_addr, line);
+                        // Return Vicky's current pixel and raster counters.
+                        uint16_t column = m_screen->hpos();
+                        uint16_t line = m_screen->vpos();
                         switch (adj_addr - 0xd018)
                         {
                             case 0:
-                                return 0; //column & 0xff;
+                                return column & 0xff;
                             case 1:
-                                return 0; // (column >> 8);
+                                return column >> 8;
                             case 2:
                                 return line & 0xff;
                             case 3:
@@ -532,6 +534,14 @@ u8   f256k_state::mem_r(offs_t offset)
                         // NES
                         return 0xff;
                     }
+                    else if (adj_addr >= 0xd180 && adj_addr < 0xd188 && m_core2x)
+                    {
+                        return m_video->linedraw_r(adj_addr - 0xd180);
+                    }
+                    else if (adj_addr >= 0xd900 && adj_addr < 0xdb00)
+                    {
+                        return m_video->sprite_r(adj_addr - 0xd900, BIT(m_ioreg, 6));
+                    }
                     else if (adj_addr >= 0xdb00 && adj_addr < 0xdb10)
                     {
                         // VIA1 - Keyboard for F256K
@@ -626,6 +636,10 @@ u8   f256k_state::mem_r(offs_t offset)
                     return m_iopage[2]->read(adj_addr - 0xc000);
                 case 3:
                     return m_iopage[3]->read(adj_addr - 0xc000);
+                case 4:
+                    return m_video->memtext_lut_r(adj_addr - 0xc000);
+                case 5:
+                    return m_video->memtext_font_r(adj_addr - 0xc000);
             }
         }
         offs_t address = (bank << 13) + low_addr;
@@ -661,7 +675,7 @@ void f256k_state::mem_w(offs_t offset, u8 data)
             // if IO_DISABLED is 1, then slot 6 is regular RAM
             if ((m_ioreg & 0x4) == 0)
             {
-                switch (m_ioreg & 0x3)
+                switch (m_core2x ? (((m_ioreg & 0x08) >> 1) | (m_ioreg & 0x03)) : (m_ioreg & 0x03))
                 {
                     case 0:
                         // here we have a number of devices to write
@@ -1106,6 +1120,14 @@ void f256k_state::mem_w(offs_t offset, u8 data)
                         {
                             // NES - only address 0xd8800 is writable
                         }
+                        else if (adj_addr >= 0xd180 && adj_addr < 0xd188 && m_core2x)
+                        {
+                            m_video->linedraw_w(adj_addr - 0xd180, data);
+                        }
+                        else if (adj_addr >= 0xd900 && adj_addr < 0xdb00)
+                        {
+                            m_video->sprite_w(adj_addr - 0xd900, data, BIT(m_ioreg, 6));
+                        }
                         else if (adj_addr >= 0xdb00 && adj_addr < 0xdc00)
                         {
                             // VIA1 - Keyboard for F256K
@@ -1183,7 +1205,6 @@ void f256k_state::mem_w(offs_t offset, u8 data)
                         else if (adj_addr >= 0xdf00 && adj_addr < 0xe000)
                         {
                             // DMA
-                            logerror("DMA Write %04X %02X\n", adj_addr, data);
                             m_iopage[0]->write(adj_addr - 0xc000, data);
                             if ((adj_addr - 0xdf00) == 0)
                             {
@@ -1237,6 +1258,12 @@ void f256k_state::mem_w(offs_t offset, u8 data)
                     case 3:
                         m_iopage[3]->write(adj_addr - 0xc000, data);
                         break;
+                    case 4:
+                        m_video->memtext_lut_w(adj_addr - 0xc000, data);
+                        break;
+                    case 5:
+                        m_video->memtext_font_w(adj_addr - 0xc000, data);
+                        break;
                 }
             }
             else
@@ -1251,12 +1278,228 @@ void f256k_state::mem_w(offs_t offset, u8 data)
             m_ram->write(address, data);
         }
     }
-    else if (bank < 0x80)
+    else if (bank < 0x80 && (!m_core2x || BIT(m_ioreg, 7)))
     {
         offs_t address = ((bank - 0x40) << 13) + low_addr;
         m_flash->write(address, data);
     }
 }
+
+u8 f256k_state::io_page_r(uint8_t page, offs_t offset)
+{
+    if (page > 5)
+        return 0;
+
+    // Reuse the page-zero device dispatch above while presenting an I/O-only
+    // window.  Core2X maps the same six pages both at $00:C000 and $F0:0000.
+    const uint8_t mmu = m_mmu_reg & 3;
+    const uint8_t saved_ioreg = m_ioreg;
+    const uint8_t saved_bank = mmu_lut[mmu * 8 + 6];
+    m_ioreg = (saved_ioreg & 0xf0) | (page & 3) | ((page & 4) << 1);
+    mmu_lut[mmu * 8 + 6] = 6;
+    const u8 result = mem_r(0xbff0 + (offset & 0x1fff));
+    mmu_lut[mmu * 8 + 6] = saved_bank;
+    m_ioreg = saved_ioreg;
+    return result;
+}
+
+void f256k_state::io_page_w(uint8_t page, offs_t offset, u8 data)
+{
+    if (page > 5)
+        return;
+
+    const uint8_t mmu = m_mmu_reg & 3;
+    const uint8_t saved_ioreg = m_ioreg;
+    const uint8_t saved_bank = mmu_lut[mmu * 8 + 6];
+    m_ioreg = (saved_ioreg & 0xf0) | (page & 3) | ((page & 4) << 1);
+    mmu_lut[mmu * 8 + 6] = 6;
+    mem_w(0xbff0 + (offset & 0x1fff), data);
+    mmu_lut[mmu * 8 + 6] = saved_bank;
+    m_ioreg = saved_ioreg;
+}
+
+f256k2x_state::f256k2x_state(const machine_config &mconfig, device_type type, const char *tag) :
+    f256k_state(mconfig, type, tag)
+{
+    m_core2x = true;
+}
+
+void f256k2x_state::f256k2x(machine_config &config)
+{
+    f256k(config);
+
+    G65816(config.replace(), m_maincpu, MASTER_CLOCK / 2);
+    m_maincpu->set_addrmap(AS_PROGRAM, &f256k2x_state::core2x_map);
+    m_ram->set_default_size("2M");
+    m_video->set_model(tiny_vicky_video_device::model::CORE2X);
+}
+
+void f256k2x_state::core2x_map(address_map &map)
+{
+    map(0x000000, 0xffffff).rw(FUNC(f256k2x_state::core2x_r), FUNC(f256k2x_state::core2x_w));
+}
+
+uint8_t f256k2x_state::core2x_io_page() const
+{
+    return ((m_ioreg & 0x08) >> 1) | (m_ioreg & 0x03);
+}
+
+uint8_t f256k2x_state::core2x_ram_extension(uint8_t slot) const
+{
+    if ((m_mmu_reg & 3) != 0)
+        return 0;
+
+    return (m_mmu_ext[slot >> 2] >> ((slot & 3) * 2)) & 3;
+}
+
+u8 f256k2x_state::core2x_r(offs_t offset)
+{
+    const uint32_t address = offset & 0xffffff;
+    const uint8_t cpu_bank = address >> 16;
+    const uint16_t bank_address = address;
+
+    if (cpu_bank == 0 && bank_address < 4)
+    {
+        if (bank_address == 2 || bank_address == 3)
+            return m_mmu_ext[bank_address - 2];
+        return lut_r(bank_address);
+    }
+    if (cpu_bank == 0 && bank_address >= 8 && bank_address < 0x10 && BIT(m_mmu_reg, 7))
+        return lut_r(bank_address);
+
+    // Extended/flat mode exposes RAM directly and can relocate both I/O and
+    // flash out of bank zero.
+    if (BIT(m_mmu_reg, 3))
+    {
+        if (BIT(m_ioreg, 4) && address >= 0xf00000 && address < 0xf0c000)
+        {
+            const uint8_t page = (address - 0xf00000) >> 13;
+            return io_page_r(page, address & 0x1fff);
+        }
+
+        if (!BIT(m_ioreg, 4) && !BIT(m_ioreg, 2) && cpu_bank == 0 && bank_address >= 0xc000 && bank_address < 0xe000)
+            return io_page_r(core2x_io_page(), bank_address - 0xc000);
+
+        if (BIT(m_ioreg, 5))
+        {
+            if (address >= 0xf80000)
+                return m_flash->read_raw(address & 0x7ffff);
+            if (address >= 0xf40000 && address < 0xf80000)
+                return 0; // Cartridge space is not implemented yet.
+        }
+        else if (cpu_bank == 0)
+        {
+            const uint8_t slot = bank_address >> 13;
+            const uint8_t entry = mmu_lut[(m_mmu_reg & 3) * 8 + slot];
+            if ((entry & 0xc0) == 0x40)
+                return m_flash->read_raw(((entry & 0x3f) << 13) | (bank_address & 0x1fff));
+            if ((entry & 0xe0) == 0x80)
+                return 0;
+        }
+
+        return address < m_ram->size() ? m_ram->read(address) : 0;
+    }
+
+    const uint8_t slot = bank_address >> 13;
+    const uint16_t low_address = bank_address & 0x1fff;
+    const uint8_t entry = mmu_lut[(m_mmu_reg & 3) * 8 + slot];
+    if (slot == 6 && !BIT(m_ioreg, 2))
+        return io_page_r(core2x_io_page(), low_address);
+    if ((entry & 0xc0) == 0)
+    {
+        const uint32_t ram_address = ((core2x_ram_extension(slot) << 6) | (entry & 0x3f)) << 13 | low_address;
+        return ram_address < m_ram->size() ? m_ram->read(ram_address) : 0;
+    }
+    if ((entry & 0xc0) == 0x40)
+        return m_flash->read_raw(((entry & 0x3f) << 13) | low_address);
+    return 0;
+}
+
+void f256k2x_state::core2x_w(offs_t offset, u8 data)
+{
+    const uint32_t address = offset & 0xffffff;
+    const uint8_t cpu_bank = address >> 16;
+    const uint16_t bank_address = address;
+
+    if (cpu_bank == 0 && bank_address < 4)
+    {
+        if (bank_address == 2 || bank_address == 3)
+            m_mmu_ext[bank_address - 2] = data;
+        else
+            lut_w(bank_address, data);
+        return;
+    }
+    if (cpu_bank == 0 && bank_address >= 8 && bank_address < 0x10 && BIT(m_mmu_reg, 7))
+    {
+        lut_w(bank_address, data);
+        return;
+    }
+
+    if (BIT(m_mmu_reg, 3))
+    {
+        if (BIT(m_ioreg, 4) && address >= 0xf00000 && address < 0xf0c000)
+        {
+            const uint8_t page = (address - 0xf00000) >> 13;
+            io_page_w(page, address & 0x1fff, data);
+            return;
+        }
+
+        if (!BIT(m_ioreg, 4) && !BIT(m_ioreg, 2) && cpu_bank == 0 && bank_address >= 0xc000 && bank_address < 0xe000)
+        {
+            io_page_w(core2x_io_page(), bank_address - 0xc000, data);
+            return;
+        }
+
+        if (BIT(m_ioreg, 5))
+        {
+            if (address >= 0xf80000)
+            {
+                if (BIT(m_ioreg, 7))
+                    m_flash->write(address & 0x7ffff, data);
+                return;
+            }
+            if (address >= 0xf40000 && address < 0xf80000)
+                return;
+        }
+        else if (cpu_bank == 0)
+        {
+            const uint8_t slot = bank_address >> 13;
+            const uint8_t entry = mmu_lut[(m_mmu_reg & 3) * 8 + slot];
+            if ((entry & 0xc0) == 0x40)
+            {
+                if (BIT(m_ioreg, 7))
+                    m_flash->write(((entry & 0x3f) << 13) | (bank_address & 0x1fff), data);
+                return;
+            }
+            if ((entry & 0xe0) == 0x80)
+                return;
+        }
+
+        if (address < m_ram->size())
+            m_ram->write(address, data);
+        return;
+    }
+
+    const uint8_t slot = bank_address >> 13;
+    const uint16_t low_address = bank_address & 0x1fff;
+    const uint8_t entry = mmu_lut[(m_mmu_reg & 3) * 8 + slot];
+    if (slot == 6 && !BIT(m_ioreg, 2))
+    {
+        io_page_w(core2x_io_page(), low_address, data);
+        return;
+    }
+    if ((entry & 0xc0) == 0)
+    {
+        const uint32_t ram_address = ((core2x_ram_extension(slot) << 6) | (entry & 0x3f)) << 13 | low_address;
+        if (ram_address < m_ram->size())
+            m_ram->write(ram_address, data);
+    }
+    else if ((entry & 0xc0) == 0x40 && BIT(m_ioreg, 7))
+    {
+        m_flash->write(((entry & 0x3f) << 13) | low_address, data);
+    }
+}
+
 void f256k_state::codec_done(s32 param)
 {
     m_codec[2] = 0;
@@ -1264,6 +1507,8 @@ void f256k_state::codec_done(s32 param)
 void f256k_state::reset_mmu()
 {
     logerror("reset_mmu\n");
+    m_mmu_reg = 0;
+    m_ioreg = 0;
     for (int i =0; i < 32; i++)
     {
         if (i % 8 == 7)
@@ -1394,55 +1639,79 @@ uint8_t f256k_state::get_random()
 //-------------------------------------------------
 void f256k_state::perform2DFillDMA()
 {
-
-    uint8_t fill_byte = m_iopage[0]->read(0xdf01 - 0xc000);
-    uint32_t dest_addr = ((m_iopage[0]->read(0xdf0a) & 0x7) << 16) + (m_iopage[0]->read(0xdf09) << 8) + m_iopage[0]->read(0xdf08);
-    uint16_t width_2D = (m_iopage[0]->read(0xdf0d - 0xc000) << 8) + m_iopage[0]->read(0xdf0c - 0xc000);
-    uint16_t height_2D = (m_iopage[0]->read(0xdf0f - 0xc000) << 8) + m_iopage[0]->read(0xdf0e - 0xc000);
-    uint16_t dest_stride = (m_iopage[0]->read(0xdf13 - 0xc000) << 8) + m_iopage[0]->read(0xdf12 - 0xc000);
+    constexpr offs_t dma_base = 0xdf00 - 0xc000;
+    const auto dma_reg = [this](offs_t reg) { return m_iopage[0]->read(dma_base + reg); };
+    const uint8_t high_mask = m_core2x ? 0xff : 0x07;
+    const uint8_t fill_byte = dma_reg(0x01);
+    const uint32_t dest_addr = ((dma_reg(0x0a) & high_mask) << 16) | (dma_reg(0x09) << 8) | dma_reg(0x08);
+    const uint16_t width_2D = (dma_reg(0x0d) << 8) | dma_reg(0x0c);
+    const uint16_t height_2D = (dma_reg(0x0f) << 8) | dma_reg(0x0e);
+    const uint16_t dest_stride = (dma_reg(0x13) << 8) | dma_reg(0x12);
     //logerror("2D Fill DMA: DEST: %X, W: %X, H: %X\n", dest_addr, width_2D, height_2D);
     for (int y = 0; y < height_2D; y++)
     {
         for (int x = 0; x < width_2D; x++)
         {
-            m_ram->write(dest_addr + x + y * dest_stride, fill_byte);
+            const uint32_t address = dest_addr + x + y * dest_stride;
+            if (address < m_ram->size())
+                m_ram->write(address, fill_byte);
         }
     }
 }
 void f256k_state::performLinearFillDMA()
 {
-    uint8_t fill_byte = m_iopage[0]->read(0xdf01 - 0xc000);
-    uint32_t dest_addr = ((m_iopage[0]->read(0xdf0a) & 0x7) << 16) + (m_iopage[0]->read(0xdf09) << 8) + m_iopage[0]->read(0xdf08);
-    uint32_t count = ((m_iopage[0]->read(0xdf0e) & 0x7) << 16) + (m_iopage[0]->read(0xdf0d) << 8) + m_iopage[0]->read(0xdf0c);
+    constexpr offs_t dma_base = 0xdf00 - 0xc000;
+    const auto dma_reg = [this](offs_t reg) { return m_iopage[0]->read(dma_base + reg); };
+    const uint8_t high_mask = m_core2x ? 0xff : 0x07;
+    const uint8_t fill_byte = dma_reg(0x01);
+    const uint32_t dest_addr = ((dma_reg(0x0a) & high_mask) << 16) | (dma_reg(0x09) << 8) | dma_reg(0x08);
+    uint32_t count = ((dma_reg(0x0e) & high_mask) << 16) | (dma_reg(0x0d) << 8) | dma_reg(0x0c);
     //logerror("Linear Fill DMA DEST: %X, LEN: %X\n", dest_addr, count);
-    memset(m_ram->pointer() + dest_addr, fill_byte, count);
+    if (dest_addr < m_ram->size())
+    {
+        count = std::min<uint32_t>(count, m_ram->size() - dest_addr);
+        memset(m_ram->pointer() + dest_addr, fill_byte, count);
+    }
 }
 void f256k_state::perform2DDMA()
 {
-    uint32_t src_addr = ((m_iopage[0]->read(0xdf06) & 0x7) << 16) + (m_iopage[0]->read(0xdf05) << 8) + m_iopage[0]->read(0xdf04);
-    uint32_t dest_addr = ((m_iopage[0]->read(0xdf0a) & 0x7) << 16) + (m_iopage[0]->read(0xdf09) << 8) + m_iopage[0]->read(0xdf08);
-    uint16_t width_2D = (m_iopage[0]->read(0xdf0d - 0xc000) << 8) + m_iopage[0]->read(0xdf0c - 0xc000);
-    uint16_t height_2D = (m_iopage[0]->read(0xdf0f - 0xc000) << 8) + m_iopage[0]->read(0xdf0e - 0xc000);
-    uint16_t src_stride = (m_iopage[0]->read(0xdf11 - 0xc000) << 8) + m_iopage[0]->read(0xdf10 - 0xc000);
-    uint16_t dest_stride = (m_iopage[0]->read(0xdf13 - 0xc000) << 8) + m_iopage[0]->read(0xdf12 - 0xc000);
+    constexpr offs_t dma_base = 0xdf00 - 0xc000;
+    const auto dma_reg = [this](offs_t reg) { return m_iopage[0]->read(dma_base + reg); };
+    const uint8_t high_mask = m_core2x ? 0xff : 0x07;
+    const uint32_t src_addr = ((dma_reg(0x06) & high_mask) << 16) | (dma_reg(0x05) << 8) | dma_reg(0x04);
+    const uint32_t dest_addr = ((dma_reg(0x0a) & high_mask) << 16) | (dma_reg(0x09) << 8) | dma_reg(0x08);
+    const uint16_t width_2D = (dma_reg(0x0d) << 8) | dma_reg(0x0c);
+    const uint16_t height_2D = (dma_reg(0x0f) << 8) | dma_reg(0x0e);
+    const uint16_t src_stride = (dma_reg(0x11) << 8) | dma_reg(0x10);
+    const uint16_t dest_stride = (dma_reg(0x13) << 8) | dma_reg(0x12);
     //logerror("2D Copy DMA, SRC: %X, DEST: %X, W: %X H: %X, SRC_STR: %X, DEST_STR: %X\n", src_addr, dest_addr,
     //    width_2D, height_2D, src_stride, dest_stride);
     for (int y = 0; y < height_2D; y++)
     {
         for (int x = 0; x < width_2D; x++)
         {
-            uint8_t src_byte = m_ram->read(src_addr + x + y * src_stride);
-            m_ram->write(dest_addr + x + y * dest_stride, src_byte);
+            const uint32_t source = src_addr + x + y * src_stride;
+            const uint32_t destination = dest_addr + x + y * dest_stride;
+            if (source < m_ram->size() && destination < m_ram->size())
+                m_ram->write(destination, m_ram->read(source));
         }
     }
 }
 void f256k_state::performLinearDMA()
 {
-    uint32_t src_addr = ((m_iopage[0]->read(0xdf06) & 0x7) << 16) + (m_iopage[0]->read(0xdf05) << 8) + m_iopage[0]->read(0xdf04);
-    uint32_t dest_addr = ((m_iopage[0]->read(0xdf0a) & 0x7) << 16) + (m_iopage[0]->read(0xdf09) << 8) + m_iopage[0]->read(0xdf08);
-    uint32_t count = ((m_iopage[0]->read(0xdf0e) & 0x7) << 16) + (m_iopage[0]->read(0xdf0d) << 8) + m_iopage[0]->read(0xdf0c);
+    constexpr offs_t dma_base = 0xdf00 - 0xc000;
+    const auto dma_reg = [this](offs_t reg) { return m_iopage[0]->read(dma_base + reg); };
+    const uint8_t high_mask = m_core2x ? 0xff : 0x07;
+    const uint32_t src_addr = ((dma_reg(0x06) & high_mask) << 16) | (dma_reg(0x05) << 8) | dma_reg(0x04);
+    const uint32_t dest_addr = ((dma_reg(0x0a) & high_mask) << 16) | (dma_reg(0x09) << 8) | dma_reg(0x08);
+    uint32_t count = ((dma_reg(0x0e) & high_mask) << 16) | (dma_reg(0x0d) << 8) | dma_reg(0x0c);
     //logerror("Linear Copy DMA SRC: %X, DEST: %X, LEN: %X\n", src_addr, dest_addr, count);
-    memcpy(m_ram->pointer() + dest_addr, m_ram->pointer() + src_addr, count);
+    if (src_addr < m_ram->size() && dest_addr < m_ram->size())
+    {
+        count = std::min<uint32_t>(count, m_ram->size() - src_addr);
+        count = std::min<uint32_t>(count, m_ram->size() - dest_addr);
+        memmove(m_ram->pointer() + dest_addr, m_ram->pointer() + src_addr, count);
+    }
 }
 
 
@@ -1453,6 +1722,9 @@ void f256k_state::device_start()
 {
 	driver_device::device_start();
     reset_mmu();
+    save_item(NAME(m_mmu_reg));
+    save_item(NAME(m_ioreg));
+    save_item(NAME(mmu_lut));
     // Copy the font from file to IO Page 1
     memcpy(m_iopage[1]->pointer(), m_font->base(), 0x800);
 
@@ -1479,7 +1751,43 @@ void f256k_state::device_start()
     memcpy(m_iopage[0]->pointer(), gamma_1_8, 256);
     memcpy(m_iopage[0]->pointer() + 0x400, gamma_1_8, 256);
     memcpy(m_iopage[0]->pointer() + 0x800, gamma_1_8, 256);
-    m_video->set_videoram(m_ram->pointer(), m_iopage[0]->pointer(), m_iopage[1]->pointer(), m_iopage[2]->pointer(), m_iopage[3]->pointer());
+    if (m_core2x)
+    {
+        // Core2X exposes MemText LUT/font RAM as extended I/O pages 4/5.
+        // Seed them with the same useful defaults as the FPGA: grayscale
+        // colors and two copies of the built-in 8x8 font.
+        for (int bank = 0; bank < 2; bank++)
+        {
+            for (int index = 0; index < 256; index++)
+            {
+                const int fg = bank * 0x400 + index * 4;
+                const int bg = 0x800 + bank * 0x400 + index * 4;
+                m_video->memtext_lut_w(fg + 0, index);
+                m_video->memtext_lut_w(fg + 1, index);
+                m_video->memtext_lut_w(fg + 2, index);
+                m_video->memtext_lut_w(fg + 3, 0);
+                m_video->memtext_lut_w(bg + 0, index);
+                m_video->memtext_lut_w(bg + 1, index);
+                m_video->memtext_lut_w(bg + 2, index);
+                m_video->memtext_lut_w(bg + 3, 0);
+            }
+            for (int offset = 0; offset < 0x800; offset++)
+                m_video->memtext_font_w(bank * 0x800 + offset, m_font->base()[offset]);
+        }
+
+        // Provide a useful synthesized 8x16 font in MemText's upper 4 KB
+        // bank. Each source scanline is doubled; software may replace it.
+        for (int character = 0; character < 256; character++)
+        {
+            for (int line = 0; line < 8; line++)
+            {
+                const uint8_t pixels = m_font->base()[character * 8 + line];
+                m_video->memtext_font_w(0x1000 + character * 16 + line * 2 + 0, pixels);
+                m_video->memtext_font_w(0x1000 + character * 16 + line * 2 + 1, pixels);
+            }
+        }
+    }
+    m_video->set_videoram(m_ram->pointer(), m_ram->size(), m_iopage[0]->pointer(), m_iopage[1]->pointer(), m_iopage[2]->pointer(), m_iopage[3]->pointer());
     m_video->start();
 
     // set the current time on the RTC device
@@ -1547,6 +1855,18 @@ void f256k_state::device_reset()
     m_timer0_val = 0;
     m_timer1_load = 0;
     m_timer1_val = 0;
+}
+
+void f256k2x_state::device_start()
+{
+    f256k_state::device_start();
+    save_item(NAME(m_mmu_ext));
+}
+
+void f256k2x_state::device_reset()
+{
+    f256k_state::device_reset();
+    std::fill(std::begin(m_mmu_ext), std::end(m_mmu_ext), 0);
 }
 
 //-------------------------------------------------
@@ -2022,27 +2342,19 @@ ROM_START(f256k)
     ROM_LOAD("f256jr_font_micah_jan25th.bin", 0x0000, 0x0800, CRC(6d66da85) SHA1(377dc27ff3a4ae2d80d740b2d16373f8e639eef6))
 ROM_END
 
-// f256k2_state::f256k2_state(const machine_config &mconfig, device_type type, const char *tag) : f256k_state(mconfig, type, tag)
-// {
+ROM_START(f256k2x)
+    ROM_REGION(0x80000, FLASH_TAG, ROMREGION_ERASEFF)
 
-// }
+    #define ROM_BLOCK(offset, filename, size, crc, sha1) \
+        ROM_LOAD(filename, (offset * 0x2000), size, crc sha1)
 
-//    YEAR  NAME   PARENT COMPAT  MACHINE    INPUT    CLASS         INIT        COMPANY              FULLNAME                        FLAGS
-COMP( 2024, f256k,    0,      0,   f256k,   f256k,   f256k_state,  empty_init, "Stefany Allaire", "F256K 8-bit Retro System",    MACHINE_UNOFFICIAL  )
-//COMP( 2024, f256k2,  f256k,   0,   f256k2,   f256k,  f256k2_state, empty_init, "Stefany Allaire", "F256K2 8-bit Retro System",   MACHINE_UNOFFICIAL  )
-// GAME_DRIVER_TRAITS(f256k2, "F256K2 8-bit Retro System")
-// 		extern game_driver const GAME_NAME(f256k2)
-// 		{
-// 			GAME_DRIVER_TYPE(f256k2, f256k2_state, MACHINE_UNOFFICIAL),
-// 			"f256k",  // parent
-// 			"2024",   // year
-// 			"Stefany Allaire",
-// 			[] (machine_config &config, device_t &owner) { downcast<f256k2_state &>(owner).f256k2(config); },
-// 			INPUT_PORTS_NAME(f256k),
-// 			[] (device_t &owner) { downcast<f256k2_state &>(owner).empty_init(); },
-// 			ROM_NAME(f256k),
-// 			0,
-// 			nullptr,
-// 			machine_flags::type(u32(ROT0 | (MACHINE_UNOFFICIAL))),
-// 			"f256k2"
-// 		};
+    F256K2X_ROM_TABLE(ROM_BLOCK)
+    #undef ROM_BLOCK
+
+    ROM_REGION(0x0800,FONT_TAG,0)
+    ROM_LOAD("f256jr_font_micah_jan25th.bin", 0x0000, 0x0800, CRC(6d66da85) SHA1(377dc27ff3a4ae2d80d740b2d16373f8e639eef6))
+ROM_END
+
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS           INIT        COMPANY              FULLNAME                               FLAGS
+COMP( 2024, f256k,   0,      0,      f256k,   f256k, f256k_state,    empty_init, "Stefany Allaire", "F256K 8-bit Retro System",           MACHINE_UNOFFICIAL )
+COMP( 2024, f256k2x, f256k,  0,      f256k2x, f256k, f256k2x_state, empty_init, "Stefany Allaire", "F256K2 Core2X 16-bit Retro System", MACHINE_UNOFFICIAL )

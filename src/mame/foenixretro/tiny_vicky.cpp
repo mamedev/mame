@@ -34,6 +34,21 @@ rgb_t tiny_vicky_video_device::get_text_lut(uint8_t color_index, bool fg, bool g
     return rgb_t(red, green, blue);
 }
 
+rgb_t tiny_vicky_video_device::get_memtext_lut(uint8_t color_index, bool fg, bool extended, bool gamma)
+{
+    const uint16_t offset = (fg ? 0x0000 : 0x0800) + (extended ? 0x0400 : 0x0000) + color_index * 4;
+    uint8_t blue = m_memtext_lut[offset + 0];
+    uint8_t green = m_memtext_lut[offset + 1];
+    uint8_t red = m_memtext_lut[offset + 2];
+    if (gamma)
+    {
+        blue = m_iopage0_ptr[blue];
+        green = m_iopage0_ptr[0x400 + green];
+        red = m_iopage0_ptr[0x800 + red];
+    }
+    return rgb_t(red, green, blue);
+}
+
 rgb_t tiny_vicky_video_device::get_lut_value(uint8_t lut_index, uint8_t pix_val, bool gamma)
 {
     int lutAddress = 0xd000 - 0xc000 + (lut_index * 256 + pix_val) * 4;
@@ -200,7 +215,14 @@ uint32_t tiny_vicky_video_device::screen_update(screen_device &screen, bitmap_rg
                         // {
                         //     m_cursor_counter = 0;
                         // }
-                        draw_text(row, mcr, enable_gamma, border_x, border_y, y, (uint16_t)640, (uint16_t)lines, screen.frame_number());
+                        if (m_model == model::CORE2X && (mcr_h & 0x40) != 0 && (m_iopage0_ptr[0x1300] & 0x01) != 0)
+                        {
+                            draw_memtext(row, mcr, enable_gamma, border_x, border_y, y, (uint16_t)640, (uint16_t)lines, screen.frame_number());
+                        }
+                        else
+                        {
+                            draw_text(row, mcr, enable_gamma, border_x, border_y, y, (uint16_t)640, (uint16_t)lines, screen.frame_number());
+                        }
                     }
                 }
                 draw_mouse(row, enable_gamma, y, (uint16_t)640, (uint16_t)lines);
@@ -318,12 +340,214 @@ void tiny_vicky_video_device::draw_text(uint32_t *row, uint8_t mcr, bool enable_
         }
     }
 }
+
+void tiny_vicky_video_device::draw_memtext(uint32_t *row, uint8_t mcr, bool enable_gamma, uint8_t brd_x, uint8_t brd_y, uint16_t line, uint16_t x_res, uint16_t y_res, u64 frame_number)
+{
+    constexpr uint16_t reg_base = 0x1300; // $D300 in the $C000-relative page
+
+    const uint8_t control = m_iopage0_ptr[reg_base + 0x00];
+    const uint8_t cursor_control = m_iopage0_ptr[reg_base + 0x01];
+    const int cell_height = (control & 0x02) != 0 ? 16 : 8;
+    const int text_line = (line - brd_y) / cell_height;
+    const int font_line = (line - brd_y) % cell_height;
+    const int text_rows = cell_height == 16 ? 30 : 60;
+    if (text_line < 0 || text_line >= text_rows)
+    {
+        return;
+    }
+
+    const uint32_t text_base =
+        m_iopage0_ptr[reg_base + 0x04] |
+        (m_iopage0_ptr[reg_base + 0x05] << 8) |
+        (m_iopage0_ptr[reg_base + 0x06] << 16);
+    const uint32_t color_base =
+        m_iopage0_ptr[reg_base + 0x08] |
+        (m_iopage0_ptr[reg_base + 0x09] << 8) |
+        (m_iopage0_ptr[reg_base + 0x0a] << 16);
+
+    const bool overlay = (mcr & 0x02) != 0;
+    const bool show_background = (m_iopage0_ptr[0x1001] & 0x80) != 0;
+    const bool font_16 = (cursor_control & 0x40) != 0;
+    const int cursor_x = m_iopage0_ptr[reg_base + 0x02];
+    const int cursor_y = m_iopage0_ptr[reg_base + 0x03];
+
+    static constexpr int flash_rates[4] = { 60, 30, 15, 12 };
+    const int cursor_rate = flash_rates[(cursor_control >> 1) & 0x03];
+    const int text_rate = flash_rates[(cursor_control >> 4) & 0x03];
+    const bool cursor_phase = (frame_number % (2 * cursor_rate)) < cursor_rate;
+    const bool text_phase = (frame_number % (2 * text_rate)) < text_rate;
+    const bool cursor_visible = (cursor_control & 0x01) != 0 && (((cursor_control & 0x08) != 0) || cursor_phase);
+    const rgb_t cursor_color(
+        m_iopage0_ptr[reg_base + 0x0f],
+        m_iopage0_ptr[reg_base + 0x0e],
+        m_iopage0_ptr[reg_base + 0x0d]);
+
+    int screen_x = brd_x;
+    for (int col = 0; col < 80; col++)
+    {
+        if (screen_x + MAME_F256_CHAR_WIDTH > x_res - brd_x)
+        {
+            break;
+        }
+
+        const uint32_t cell_offset = 2 * (80 * text_line + col);
+        if (text_base + cell_offset + 1 >= m_videoram_size || color_base + cell_offset + 1 >= m_videoram_size)
+        {
+            screen_x += MAME_F256_CHAR_WIDTH;
+            continue;
+        }
+
+        const uint8_t character = m_videoram_ptr[text_base + cell_offset];
+        const uint8_t attributes = m_videoram_ptr[text_base + cell_offset + 1];
+        const uint8_t bg_index = m_videoram_ptr[color_base + cell_offset];
+        const uint8_t fg_index = m_videoram_ptr[color_base + cell_offset + 1];
+        const rgb_t foreground = get_memtext_lut(fg_index, true, (attributes & 0x04) != 0, enable_gamma);
+        const rgb_t background = get_memtext_lut(bg_index, false, (attributes & 0x08) != 0, enable_gamma);
+
+        uint16_t font_address;
+        if (font_16)
+        {
+            font_address = ((attributes & 0x02) != 0 ? 0x1000 : 0x0000) + character * 16 + (font_line & 0x0f);
+        }
+        else
+        {
+            font_address = (attributes & 0x03) * 0x0800 + character * 8 + (font_line & 0x07);
+        }
+        uint8_t glyph = m_memtext_font[font_address & 0x1fff];
+        if ((attributes & 0x10) != 0 || ((attributes & 0x20) != 0 && text_phase))
+        {
+            glyph ^= 0xff;
+        }
+
+        const bool cursor_cell = cursor_visible && cursor_x == col && cursor_y == text_line;
+        const uint8_t cursor_glyph = m_iopage0_ptr[reg_base + 0x10 + (font_line & 0x0f)];
+        for (int bit = 0x80; bit != 0; bit >>= 1)
+        {
+            if (cursor_cell && (cursor_glyph & bit) != 0)
+            {
+                row[screen_x] = cursor_color;
+            }
+            else if ((glyph & bit) != 0)
+            {
+                row[screen_x] = foreground;
+            }
+            else if (!overlay || show_background || bg_index != 0)
+            {
+                row[screen_x] = background;
+            }
+            screen_x++;
+        }
+    }
+}
 void tiny_vicky_video_device::device_start()
 {
+    save_item(NAME(m_memtext_lut));
+    save_item(NAME(m_memtext_font));
+    save_item(NAME(m_sprite_ram));
+    save_item(NAME(m_linedraw_reg));
+    save_item(NAME(m_linedraw_complete));
 }
 void tiny_vicky_video_device::device_reset()
 {
+    std::fill(m_sprite_ram.begin(), m_sprite_ram.end(), 0);
+    std::fill(m_linedraw_reg.begin(), m_linedraw_reg.end(), 0);
+    m_linedraw_complete = false;
+}
 
+uint8_t tiny_vicky_video_device::sprite_r(offs_t offset, bool bank) const
+{
+    const offs_t bank_offset = (m_model == model::CORE2X && bank) ? 64 * 8 : 0;
+    return m_sprite_ram[bank_offset + (offset & 0x1ff)];
+}
+
+void tiny_vicky_video_device::sprite_w(offs_t offset, uint8_t data, bool bank)
+{
+    const offs_t bank_offset = (m_model == model::CORE2X && bank) ? 64 * 8 : 0;
+    m_sprite_ram[bank_offset + (offset & 0x1ff)] = data;
+}
+
+uint8_t tiny_vicky_video_device::linedraw_r(offs_t offset) const
+{
+    offset &= 0x07;
+    if (offset == 0)
+        return (m_linedraw_reg[0] & 0x7f) | (m_linedraw_complete ? 0x80 : 0x00);
+    if (offset == 2 || offset == 3)
+        return 0; // Drawing is completed synchronously, so the emulated FIFO is empty.
+    return m_linedraw_reg[offset];
+}
+
+void tiny_vicky_video_device::linedraw_w(offs_t offset, uint8_t data)
+{
+    if (m_model != model::CORE2X)
+        return;
+
+    offset &= 0x07;
+    if (offset != 0)
+    {
+        m_linedraw_reg[offset] = data;
+        return;
+    }
+
+    const bool old_go = BIT(m_linedraw_reg[0], 1);
+    const bool old_reset = BIT(m_linedraw_reg[0], 4);
+    m_linedraw_reg[0] = data & 0x7f;
+    if (BIT(data, 4) || !BIT(data, 1))
+        m_linedraw_complete = false;
+    if (!BIT(data, 4) && BIT(data, 0) && BIT(data, 1) && (!old_go || old_reset))
+    {
+        execute_linedraw();
+        m_linedraw_complete = true;
+    }
+}
+
+void tiny_vicky_video_device::execute_linedraw()
+{
+    if (!m_videoram_ptr || !m_iopage0_ptr)
+        return;
+
+    const int x0 = m_linedraw_reg[2] | ((m_linedraw_reg[3] & 0x03) << 8);
+    const int y0 = m_linedraw_reg[6];
+    const int x1 = m_linedraw_reg[4] | ((m_linedraw_reg[5] & 0x03) << 8);
+    const int y1 = m_linedraw_reg[7];
+    if (x0 >= 320 || x1 >= 320 || y0 >= 240 || y1 >= 240)
+        return;
+
+    const unsigned bitmap = (m_linedraw_reg[0] >> 2) & 0x03;
+    uint32_t base = 0x1000;
+    if (bitmap < 3)
+    {
+        const offs_t reg = 0xd101 - 0xc000 + bitmap * 8;
+        base = m_iopage0_ptr[reg] | (m_iopage0_ptr[reg + 1] << 8) | (m_iopage0_ptr[reg + 2] << 16);
+    }
+
+    int x = x0;
+    int y = y0;
+    const int dx = std::abs(x1 - x0);
+    const int sx = x0 < x1 ? 1 : -1;
+    const int dy = -std::abs(y1 - y0);
+    const int sy = y0 < y1 ? 1 : -1;
+    int error = dx + dy;
+
+    for (;;)
+    {
+        const uint32_t address = base + y * 320 + x;
+        if (address < m_videoram_size)
+            m_videoram_ptr[address] = m_linedraw_reg[1];
+        if (x == x1 && y == y1)
+            break;
+
+        const int twice_error = 2 * error;
+        if (twice_error > dy)
+        {
+            error += dy;
+            x += sx;
+        }
+        if (twice_error < dx)
+        {
+            error += dx;
+            y += sy;
+        }
+    }
 }
 void tiny_vicky_video_device::draw_bitmap(uint32_t *row, bool enable_gamma, uint8_t layer, bool bkgrnd, rgb_t bgndColor, uint8_t borderXSize, uint8_t borderYSize, uint16_t line, uint16_t width)
 {
@@ -346,7 +570,8 @@ void tiny_vicky_video_device::draw_bitmap(uint32_t *row, bool enable_gamma, uint
 
     for (int col = borderXSize; col < width - borderXSize; col += 2)
     {
-        pix_val = m_videoram_ptr[offsetAddress + col/2];
+        const uint32_t address = offsetAddress + col / 2;
+        pix_val = address < m_videoram_size ? m_videoram_ptr[address] : 0;
         if (pix_val != 0)
         {
             color_val = get_lut_value(lut_index, pix_val, enable_gamma);
@@ -359,11 +584,11 @@ void tiny_vicky_video_device::draw_bitmap(uint32_t *row, bool enable_gamma, uint
 
 void tiny_vicky_video_device::draw_sprites(uint32_t *row, bool enable_gamma, uint8_t layer, bool bkgrnd, uint8_t borderXSize, uint8_t borderYSize, uint16_t line, uint16_t width, uint16_t height)
 {
-    // There are 64 possible sprites to choose from.
-    for (int s = 63; s > -1; s--)
+    const int sprite_count = m_model == model::CORE2X ? 128 : 64;
+    for (int s = sprite_count - 1; s >= 0; s--)
     {
-        int addr_sprite = 0xd900 - 0xc000 + s * 8;
-        uint8_t reg = m_iopage0_ptr[addr_sprite];
+        const int addr_sprite = s * 8;
+        uint8_t reg = m_sprite_ram[addr_sprite];
         // if the set is not enabled, we're done.
         uint8_t sprite_layer = (reg & 0x18) >> 3;
         // if the sprite is enabled and the layer matches, then check the line
@@ -382,7 +607,7 @@ void tiny_vicky_video_device::draw_sprites(uint32_t *row, bool enable_gamma, uin
 					sprite_size = 8;
 					break;
 			}
-			int posY = m_iopage0_ptr[addr_sprite + 6] + (m_iopage0_ptr[addr_sprite + 7] << 8) - 32;
+			int posY = m_sprite_ram[addr_sprite + 6] + (m_sprite_ram[addr_sprite + 7] << 8) - 32;
 			int actualLine = line / 2;
 			if ((actualLine >= posY && actualLine < posY + sprite_size))
 			{
@@ -392,11 +617,11 @@ void tiny_vicky_video_device::draw_sprites(uint32_t *row, bool enable_gamma, uin
 				//int lut_address = 0xd000 - 0xc000 + lut_index * 0x400;
 				//bool striding = (reg & 0x80) == 0x80;
 
-				int sprite_address = (m_iopage0_ptr[addr_sprite + 1] +
-					(m_iopage0_ptr[addr_sprite + 2] << 8) +
-					(m_iopage0_ptr[addr_sprite + 3] << 16)) & 0x3f'ffff;
+				int sprite_address = (m_sprite_ram[addr_sprite + 1] +
+					(m_sprite_ram[addr_sprite + 2] << 8) +
+					(m_sprite_ram[addr_sprite + 3] << 16)) & 0x3f'ffff;
 
-				int posX = m_iopage0_ptr[addr_sprite + 4] + (m_iopage0_ptr[addr_sprite + 5] << 8) - 32;
+				int posX = m_sprite_ram[addr_sprite + 4] + (m_sprite_ram[addr_sprite + 5] << 8) - 32;
 				posX *= 2; // screen pixels
 
 				// sprite spans sprite_size source columns, but sprite_size*2 screen pixels
@@ -424,7 +649,8 @@ void tiny_vicky_video_device::draw_sprites(uint32_t *row, bool enable_gamma, uin
 
 				for (int col = startCol; col < endCol; col++)
 				{
-					uint8_t pixVal = m_videoram_ptr[sprite_address + col + sline * sprite_size];
+					const uint32_t address = sprite_address + col + sline * sprite_size;
+					uint8_t pixVal = address < m_videoram_size ? m_videoram_ptr[address] : 0;
 					if (pixVal != 0)
 					{
 						rgb_t clrVal = get_lut_value(lut_index, pixVal, enable_gamma);
@@ -491,7 +717,10 @@ void tiny_vicky_video_device::draw_tiles(uint32_t *row, bool enable_gamma, uint8
     int tilesetOffsets[tilemapItemCount];
 
     // The + 2 below is to take an FPGA bug in the F256Jr into account
-    memcpy(tiles, m_videoram_ptr + tilemapAddress + (tilemapWindowX / tileSize) * 2 + (tileRow + 0) * tilemapWidth * 2, tlmSize);
+    const uint32_t tilemap_line = tilemapAddress + (tilemapWindowX / tileSize) * 2 + tileRow * tilemapWidth * 2;
+    std::fill(std::begin(tiles), std::end(tiles), 0);
+    if (tilemap_line < m_videoram_size)
+        memcpy(tiles, m_videoram_ptr + tilemap_line, std::min<uint32_t>(tlmSize, m_videoram_size - tilemap_line));
 
     // cache of tilesetPointers
     int tilesetPointers[8];
@@ -539,7 +768,8 @@ void tiny_vicky_video_device::draw_tiles(uint32_t *row, bool enable_gamma, uint8
         //memcpy(tilepix, m_videoram_ptr + tilesetOffsets[t], tileSize);
         do
         {
-            uint8_t pixVal = m_videoram_ptr[tilesetOffsets[t] + startOffset];  // tilepix[startOffset];
+            const uint32_t address = tilesetOffsets[t] + startOffset;
+            uint8_t pixVal = address < m_videoram_size ? m_videoram_ptr[address] : 0;
             if (pixVal > 0)
             {
                 clr_val = get_lut_value(lut_index, pixVal, enable_gamma);
