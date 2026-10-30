@@ -197,6 +197,8 @@ void cdi_state::machine_start()
 	save_item(NAME(m_cdic_intreq));
 	save_item(NAME(m_dvc_intreq));
 	save_item(NAME(m_in4_owner));
+
+	m_maincpu->uart_ctsn(0);
 }
 
 void cdi_state::machine_reset()
@@ -209,9 +211,6 @@ void cdi_state::machine_reset()
 
 	// when a DVC is fitted it feeds the MCD212's external video plane
 	m_mcd212->set_ext_video_source(m_dvc_slot);
-
-	if (m_serial_port && !m_serial_port->get_card_device())
-		m_maincpu->uart_ctsn(0);
 
 	m_cdic_intreq = false;
 	m_dvc_intreq = false;
@@ -235,6 +234,7 @@ void quizard_state::machine_reset()
 	m_boot_press = false;
 	m_boot_timer->adjust(attotime::from_seconds(22), 1);
 	m_mcu_rxd = 1;
+	m_maincpu->uart_ctsn(1);
 }
 
 
@@ -450,7 +450,6 @@ void cdi_state::cdimono1_base(machine_config &config)
 	m_maincpu->out_txd_cb().set(m_serial_port, FUNC(rs232_port_device::write_txd));
 	m_maincpu->uart_rtsn_callback().set(m_serial_port, FUNC(rs232_port_device::write_rts));
 	m_serial_port->rxd_handler().set(m_maincpu, FUNC(scc68070_device::rx_w));
-	m_serial_port->cts_handler().set(m_maincpu, FUNC(scc68070_device::uart_ctsn));
 
 	m_maincpu->iack4_callback().set(FUNC(cdi_state::in4_iack_r));
 

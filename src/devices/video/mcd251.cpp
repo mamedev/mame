@@ -185,6 +185,7 @@ void mcd251_device::device_start()
 	save_item(NAME(m_pending_seq));
 	save_item(NAME(m_pending_gop));
 	save_item(NAME(m_gop_search));
+	save_item(NAME(m_seq_search));
 	save_item(NAME(m_skip_decoding));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_video_es));
@@ -268,6 +269,8 @@ void mcd251_device::device_reset()
 	m_register_update_scroll = false;
 	m_show_video = false;
 	m_stale_display = false;
+	m_display_valid = false;
+	m_display_slot = -1;
 
 	m_dclk_origin = machine().time();
 	m_fmv_dclk_offset = 0;
@@ -480,7 +483,7 @@ void mcd251_device::video_picture_header(int width, int height)
 	m_pending_seq |= m_video->picture_follows_sequence_header();
 	m_pending_gop |= m_video->picture_follows_sequence_header() || m_video->picture_follows_group();
 
-	if (m_gop_search && type == mpeg_video::picture_type::I && m_pending_gop)
+	if (m_gop_search && type == mpeg_video::picture_type::I && (m_seq_search ? m_pending_seq : m_pending_gop))
 		m_gop_search = false;
 	m_skip_decoding = m_gop_search;
 	if (m_skip_decoding)
@@ -597,14 +600,27 @@ void mcd251_device::queue_picture(const picture_store &store)
 	const uint8_t *const cb_plane = y_plane + size_t(luma_pitch) * ((height + 15) & ~15);
 	const uint8_t *const cr_plane = cb_plane + size_t(chroma_pitch) * (((height + 15) & ~15) / 2);
 
+	const int chroma_width = (width + 1) / 2;
+	const int chroma_height = (height + 1) / 2;
+	int cb_row[MAX_PICTURE_WIDTH / 2], cr_row[MAX_PICTURE_WIDTH / 2];
+
 	// ITU-R BT.601, studio range, in 16.16 fixed point
 	for (int y = 0; y < height; y++)
 	{
+		const int cy = y >> 1;
+		const int ny = std::clamp((y & 1) ? cy + 1 : cy - 1, 0, chroma_height - 1);
+		for (int i = 0; i < chroma_width; i++)
+		{
+			cb_row[i] = 3 * cb_plane[cy * chroma_pitch + i] + cb_plane[ny * chroma_pitch + i];
+			cr_row[i] = 3 * cr_plane[cy * chroma_pitch + i] + cr_plane[ny * chroma_pitch + i];
+		}
+
 		for (int x = 0; x < width; x++)
 		{
-			const int c = (y >> 1) * chroma_pitch + (x >> 1);
-			const int cr = cr_plane[c] - 128;
-			const int cb = cb_plane[c] - 128;
+			const int cx = x >> 1;
+			const int nx = std::clamp((x & 1) ? cx + 1 : cx - 1, 0, chroma_width - 1);
+			const int cr = ((3 * cr_row[cx] + cr_row[nx] + 8) >> 4) - 128;
+			const int cb = ((3 * cb_row[cx] + cb_row[nx] + 8) >> 4) - 128;
 			const int r = (cr * 104597) >> 16;
 			const int g = (cb * 25674 + cr * 53278) >> 16;
 			const int b = (cb * 132201) >> 16;
@@ -664,6 +680,7 @@ void mcd251_device::clear_video_fifo()
 	m_latch_until_vblank = false;
 	m_single_step_latch = false;
 	m_gop_search = false;
+	m_seq_search = false;
 	m_desync_satisfied = false;
 	m_display_dts_desync = 0;
 }
@@ -704,6 +721,8 @@ void mcd251_device::restart_frame_timer()
 	// The picture period less 2048 ticks per unit of DTS desync, in 24 bits:
 	// the correction has to wrap, since computing it wider let a large
 	// negative desync stretch a frame past a second and stall the display.
+	// A positive desync stops at the shortest period instead, since wrapping
+	// there would turn a display that is late into one long frame.
 	int64_t period = int64_t(m_frame_period_30mhz) - 1 - int64_t(m_display_dts_desync) * 2048;
 
 	if (m_display_dts_desync > 0 && period < 1200)
@@ -876,8 +895,7 @@ void mcd251_device::vblank_w(int state)
 //  VIDEO OUTPUT
 //**************************************************************************
 
-// x and y are the chip's own pixel coordinates, counted from the start of
-// active video.
+// y is the chip's own line number, counted from the start of active video.
 void mcd251_device::video_line(int y, uint32_t *line, int count) const
 {
 	if (!m_show_video || !m_display_valid || m_display_slot < 0)
@@ -1163,9 +1181,10 @@ void mcd251_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			}
 		}
 
-		if (data & SYSCMD_GOPSEARCH)
+		if (data & (SYSCMD_GOPSEARCH | SYSCMD_SEQSEARCH))
 		{
 			m_gop_search = true;
+			m_seq_search = (data & SYSCMD_SEQSEARCH) != 0;
 		}
 
 		if (data & SYSCMD_DEC_ON)
@@ -1215,8 +1234,11 @@ void mcd251_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			m_show_video = false;
 			m_stale_display = m_display_valid;
 		}
-		else if (data & (VIDCMD_VIDON | VIDCMD_SHOW | VIDCMD_SHOWNEXT))
+		// VMPEG driver: HIDE|VIDON at /mv init ($e51afa), VIDON alone at play start ($e5243c)
+		if ((data & (VIDCMD_SHOW | VIDCMD_SHOWNEXT)) || ((data & (VIDCMD_VIDON | VIDCMD_HIDE)) == VIDCMD_VIDON))
+		{
 			m_show_video = true;
+		}
 		break;
 
 	case 0x063: // SYS_SCR
@@ -1264,9 +1286,18 @@ void mcd251_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_fmv_frame_rate = data;
 		break;
 
-	case 0x001: m_image_width = data; break;
-	case 0x002: m_image_height = data; break;
-	case 0x003: m_image_rt = data; break;
+	case 0x001:
+		m_image_width = data;
+		m_video->set_sequence(m_image_width, m_image_height, m_image_rt & 0x0f);
+		break;
+	case 0x002:
+		m_image_height = data;
+		m_video->set_sequence(m_image_width, m_image_height, m_image_rt & 0x0f);
+		break;
+	case 0x003:
+		m_image_rt = data;
+		m_video->set_sequence(m_image_width, m_image_height, m_image_rt & 0x0f);
+		break;
 
 	case 0x062: // stream number, 0-15 per mv_selstrm()
 		LOGMASKED(LOG_FMV, "FMV stream %04x\n", data);

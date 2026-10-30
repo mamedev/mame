@@ -27,7 +27,6 @@
 #include "mpeg_audio.h"
 
 #include <memory>
-#include <vector>
 
 
 // ======================> gsc38gg307_device

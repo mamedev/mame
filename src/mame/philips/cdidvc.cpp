@@ -28,6 +28,8 @@
 #include "emu.h"
 #include "cdidvc.h"
 
+#include <algorithm>
+
 #define LOG_REGS_R    (1U << 1)
 #define LOG_REGS_W    (1U << 2)
 #define LOG_DMA       (1U << 3)
@@ -124,11 +126,6 @@ void cdi_dvc_vmpeg_device::device_reset()
 	m_slot->intreq_w(0);
 }
 
-void cdi_dvc_vmpeg_device::device_post_load()
-{
-	m_slot->intreq_w(m_intreq_state ? 1 : 0);
-}
-
 //**************************************************************************
 //  TRANSFERS
 //**************************************************************************
@@ -212,9 +209,8 @@ uint8_t cdi_dvc_vmpeg_device::intack_r()
 //  VIDEO OUTPUT
 //**************************************************************************
 
-// x is a column of the 768 pixel MCD212 line buffer, y is a display line
-// counted from the start of active video.  The decoder works in CD-i pixels,
-// of which there are 384 across the active line.
+// y is a display line counted from the start of active video.  The decoder
+// works in CD-i pixels, of which there are 384 across the active line.
 void cdi_dvc_vmpeg_device::ext_video_line(int y, uint32_t *line, int count) const
 {
 	m_fmv->video_line(y, line, count);
