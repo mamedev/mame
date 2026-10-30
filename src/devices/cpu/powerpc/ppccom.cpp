@@ -970,14 +970,7 @@ void ppc_device::device_start()
 		static_generate_entry_point();
 		static_generate_nocode_handler();
 		static_generate_out_of_cycles();
-		if (m_drcoptions & PPCDRC_BUS_RETRY)
-			static_generate_bus_retry();
 		static_generate_tlb_mismatch();
-		// 601 has a unified cache, so code can self-modify without icbi.
-		// PPCDRC_STRICT_601_SELF_MODIFY causes the write accessors to watch for stores
-		// to compiled code pages.
-		if (m_flavor == PPC_MODEL_601 && (m_drcoptions & PPCDRC_STRICT_601_SELF_MODIFY))
-			static_generate_code_write_reset();
 		if (m_cap & PPCCAP_603_MMU)
 			static_generate_swap_tgpr();
 
@@ -1004,8 +997,38 @@ void ppc_device::device_start()
 
 		// add the shared floating-point status-flag finalizer
 		static_generate_fpscr_finish();
+	}
+	catch (drcuml_block::abort_compilation &)
+	{
+		fatalerror("Error generating PPC static handlers\n");
+	}
 
-		/* add subroutines for memory accesses */
+	/* mark the cache dirty so it is updated on next execute */
+	m_cache_dirty = true;
+}
+
+/*-------------------------------------------------
+    static_generate_memory_handlers - generate the
+    memory accessor subroutines.  These bake in
+    the fast RAM regions, so they are generated at
+    the first reset, after the driver has added
+    its fast RAM regions
+-------------------------------------------------*/
+
+void ppc_device::static_generate_memory_handlers()
+{
+	try
+	{
+		// the accessors dispatch to these, so they follow the same option values
+		if (m_drcoptions & PPCDRC_BUS_RETRY)
+			static_generate_bus_retry();
+		// 601 has a unified cache, so code can self-modify without icbi.
+		// PPCDRC_STRICT_601_SELF_MODIFY causes the write accessors to watch for stores
+		// to compiled code pages.
+		if (m_flavor == PPC_MODEL_601 && (m_drcoptions & PPCDRC_STRICT_601_SELF_MODIFY))
+			static_generate_code_write_reset();
+
+		// add subroutines for memory accesses
 		for (int mode = 0; mode < 8; mode++)
 		{
 			static_generate_memory_accessor(mode, 1, false, false, false, "read8", m_read8[mode], nullptr);
@@ -1034,9 +1057,6 @@ void ppc_device::device_start()
 	{
 		fatalerror("Error generating PPC static handlers\n");
 	}
-
-	/* mark the cache dirty so it is updated on next execute */
-	m_cache_dirty = true;
 }
 
 void ppc_device::state_export(const device_state_entry &entry)
@@ -1243,6 +1263,13 @@ void ppc_device::device_stop()
 
 void ppc_device::device_reset()
 {
+	// the memory accessors are generated once, after the driver has added its fast RAM regions
+	if (!m_read8[0])
+	{
+		static_generate_memory_handlers();
+		m_cache_dirty = true;
+	}
+
 	// discard any pending retry request (this getter clears the flag)
 	access_to_be_redone();
 
