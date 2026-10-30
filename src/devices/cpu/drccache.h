@@ -54,10 +54,13 @@ public:
 	// getters
 	drccodeptr near() const { return m_near; }
 	drccodeptr top() const { return m_top; }
+	uint32_t flush_count() const { return m_flush_count; }
 
 	// pointer checking
 	bool contains_pointer(const void *ptr) const { return ((drccodeptr)ptr >= m_near && (drccodeptr)ptr < m_near + m_size); }
 	bool contains_near_pointer(const void *ptr) const { return ((drccodeptr)ptr >= m_near && (drccodeptr)ptr < m_neartop); }
+	bool contains_invariant_pointer(const void *ptr) const { return ((drccodeptr)ptr >= m_neartop) && ((drccodeptr)ptr < m_invartop); }
+	bool contains_ephemeral_pointer(const void *ptr) const { return ((drccodeptr)ptr >= m_invartop) && ((drccodeptr)ptr < m_top); }
 	bool generating_code() const { return (m_codegen != nullptr); }
 
 	// cache memory allocation
