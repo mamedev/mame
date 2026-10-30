@@ -1,68 +1,121 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, AJR
 
+// TODO:
+// properly identify LCDCs etc. for each machine
+// emulate menu protection on dphh8213 (can currently select a game, but menu isn't updating)
+// determine if cutepet requires an internal ROM, or just different peripherals
+// see if a compatible bbl338 internal ROM can be created based on class200 ROM
+
 #include "emu.h"
+
+#include "class200_lcdc.h"
+
 #include "cpu/m6502/st2205u.h"
 #include "video/st7735_lcdc.h"
+
 #include "screen.h"
 #include "speaker.h"
 
 
 namespace {
 
-class st22xx_bbl338_state : public driver_device
+class st22xx_rom_handheld_state : public driver_device
 {
-public:
-	st22xx_bbl338_state(const machine_config &mconfig, device_type type, const char *tag)
+protected:
+	st22xx_rom_handheld_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		, m_lcdc(*this, "lcdc")
-		, m_input_matrix(*this, "IN%u", 1U)
 		, m_portb(0xff)
 	{
 	}
 
-	void st22xx_bbl338(machine_config &config);
-	void st22xx_dphh8213(machine_config &config);
-	void st22xx_cutepet(machine_config &config);
-
-protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	required_device<st2205u_base_device> m_maincpu;
-
-private:
-	u8 porta_r();
 	void portb_w(u8 data);
 	void porta_w(u8 data);
 
-	void st22xx_bbl338_map(address_map &map) ATTR_COLD;
-	void st22xx_dphh8213_map(address_map &map) ATTR_COLD;
-	void st22xx_cutepet_map(address_map &map) ATTR_COLD;
-
+	required_device<st2205u_base_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<st7735_lcdc_device> m_lcdc;
-	required_ioport_array<4> m_input_matrix;
-
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	u8 m_portb;
 };
 
-class st22xx_bbl338_sim_state : public st22xx_bbl338_state
+class st22xx_cutepet_state : public st22xx_rom_handheld_state
+{
+public:
+	st22xx_cutepet_state(const machine_config &mconfig, device_type type, const char *tag)
+		: st22xx_rom_handheld_state(mconfig, type, tag)
+		, m_lcdc(*this, "lcdc")
+	{
+	}
+
+	void st22xx_cutepet(machine_config &config) ATTR_COLD;
+
+private:
+	void st22xx_cutepet_map(address_map &map) ATTR_COLD;
+
+	required_device<st7735_lcdc_device> m_lcdc;
+};
+
+class st22xx_dphh8213_state : public st22xx_rom_handheld_state
+{
+public:
+	st22xx_dphh8213_state(const machine_config &mconfig, device_type type, const char *tag)
+		: st22xx_rom_handheld_state(mconfig, type, tag)
+		, m_lcdc(*this, "lcdc")
+		, m_input_matrix(*this, "MATRIX%u", 1U)
+	{
+	}
+
+	void st22xx_dphh8213(machine_config &config) ATTR_COLD;
+
+private:
+	void st22xx_dphh8213_map(address_map &map) ATTR_COLD;
+
+	u8 porta_r();
+
+	required_device<st7735_lcdc_device> m_lcdc;
+	required_ioport_array<4> m_input_matrix;
+};
+
+class st22xx_class200_state : public st22xx_rom_handheld_state
+{
+public:
+	st22xx_class200_state(const machine_config &mconfig, device_type type, const char *tag)
+		: st22xx_rom_handheld_state(mconfig, type, tag)
+		, m_class200lcdc(*this, "class200lcdc")
+	{
+	}
+
+	void st22xx_class200(machine_config &config) ATTR_COLD;
+
+protected:
+	required_device<class200_lcdc_device> m_class200lcdc;
+
+private:
+	void st22xx_class200_map(address_map &map) ATTR_COLD;
+};
+
+class st22xx_bbl338_sim_state : public st22xx_class200_state
 {
 public:
 	st22xx_bbl338_sim_state(const machine_config& mconfig, device_type type, const char* tag)
-		: st22xx_bbl338_state(mconfig, type, tag)
+		: st22xx_class200_state(mconfig, type, tag)
 	{
 	}
+
+	void st22xx_bbl338(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	void st22xx_bbl338_map(address_map &map) ATTR_COLD;
+
 	u8 sim152_r();
 	void sim152_w(u8 data);
 	u8 m_152_dat = 0;
@@ -151,6 +204,8 @@ void st22xx_bbl338_sim_state::sim152_w(u8 data)
 
 void st22xx_bbl338_sim_state::machine_reset()
 {
+	st22xx_class200_state::machine_reset();
+
 	address_space& mainspace = m_maincpu->space(AS_PROGRAM);
 
 	mainspace.install_readwrite_handler(0x0152, 0x0152, read8smo_delegate(*this, FUNC(st22xx_bbl338_sim_state::sim152_r)), write8smo_delegate(*this, FUNC(st22xx_bbl338_sim_state::sim152_w)));
@@ -211,16 +266,21 @@ void st22xx_bbl338_sim_state::machine_reset()
 
 void st22xx_bbl338_sim_state::machine_start()
 {
-	st22xx_bbl338_state::machine_start();
+	st22xx_class200_state::machine_start();
 	save_item(NAME(m_152_dat));
 }
 
-void st22xx_bbl338_state::machine_start()
+void st22xx_rom_handheld_state::machine_start()
 {
 	save_item(NAME(m_portb));
 }
 
-void st22xx_bbl338_state::st22xx_dphh8213_map(address_map &map)
+void st22xx_rom_handheld_state::machine_reset()
+{
+	m_portb = 0xff;
+}
+
+void st22xx_dphh8213_state::st22xx_dphh8213_map(address_map &map)
 {
 	map(0x0000000, 0x01fffff).rom().region("maincpu", 0);
 
@@ -228,7 +288,7 @@ void st22xx_bbl338_state::st22xx_dphh8213_map(address_map &map)
 	map(0x0604000, 0x0604000).rw(m_lcdc, FUNC(st7735_lcdc_device::lcdc_data_r), FUNC(st7735_lcdc_device::lcdc_data_w));
 }
 
-void st22xx_bbl338_state::st22xx_cutepet_map(address_map &map)
+void st22xx_cutepet_state::st22xx_cutepet_map(address_map &map)
 {
 	map(0x0000000, 0x03fffff).rom().region("maincpu", 0);
 
@@ -236,22 +296,26 @@ void st22xx_bbl338_state::st22xx_cutepet_map(address_map &map)
 	map(0x0604100, 0x0604100).rw(m_lcdc, FUNC(st7735_lcdc_device::lcdc_data_r), FUNC(st7735_lcdc_device::lcdc_data_w));
 }
 
-
-void st22xx_bbl338_state::st22xx_bbl338_map(address_map &map)
+void st22xx_bbl338_sim_state::st22xx_bbl338_map(address_map &map)
 {
 	//map(0x0000000, 0x0003fff).rom().region("internal", 0); // not dumped, so ensure any accesses here are logged
 	map(0x1000000, 0x13fffff).rom().region("maincpu", 0);
 
-	map(0x0600000, 0x0600000).w(m_lcdc, FUNC(st7735_lcdc_device::lcdc_command_w));
-	map(0x0604000, 0x0604000).rw(m_lcdc, FUNC(st7735_lcdc_device::lcdc_data_r), FUNC(st7735_lcdc_device::lcdc_data_w));
+	map(0x0600000, 0x0600000).w(m_class200lcdc, FUNC(class200_lcdc_device::lcdc_command_w));
+	map(0x0604000, 0x0604000).rw(m_class200lcdc, FUNC(class200_lcdc_device::lcdc_data_r), FUNC(class200_lcdc_device::lcdc_data_w));
 }
 
-u32 st22xx_bbl338_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void st22xx_class200_state::st22xx_class200_map(address_map &map)
 {
-	return m_lcdc->render_to_bitmap(screen, bitmap, cliprect);
+	map(0x0000000, 0x0001fff).mirror(0x2000).rom().region("internal", 0); // mirror observed during hardware testing
+	map(0x1000000, 0x13fffff).rom().region("maincpu", 0);
+
+	map(0x0600000, 0x0600000).w(m_class200lcdc, FUNC(class200_lcdc_device::lcdc_command_w));
+	map(0x0604000, 0x0604000).rw(m_class200lcdc, FUNC(class200_lcdc_device::lcdc_data_r), FUNC(class200_lcdc_device::lcdc_data_w));
 }
 
-u8 st22xx_bbl338_state::porta_r()
+
+u8 st22xx_dphh8213_state::porta_r()
 {
 	u8 input = 0x3f;
 
@@ -262,21 +326,19 @@ u8 st22xx_bbl338_state::porta_r()
 		if (!BIT(m_portb, i * 2 - 1))
 			input &= m_input_matrix[i]->read();
 
-	// TODO: bit 7 is I/O for some bitbanged SPI device (used for the menu)
+	// TODO: bit 7 is I/O for some bitbanged SPI device (used for the menu drawing - you can still select games, just the cursor doesn't move)
 	input |= 0xc0;
-
-	logerror("%s: port a read\n", machine().describe_context());
 
 	return input;
 }
 
-void st22xx_bbl338_state::porta_w(u8 data)
+void st22xx_rom_handheld_state::porta_w(u8 data)
 {
 	// Menu control writes?
 	logerror("%s: port a write %02x\n", machine().describe_context(), data);
 }
 
-void st22xx_bbl338_state::portb_w(u8 data)
+void st22xx_rom_handheld_state::portb_w(u8 data)
 {
 //  logerror("%s: port b write %02x\n", machine().describe_context(), data);
 	m_portb = data;
@@ -286,7 +348,7 @@ void st22xx_bbl338_state::portb_w(u8 data)
 static INPUT_PORTS_START(dphh8213)
 	// P2 controls work with some of the games, but there was no obvious way to connect a 2nd pad?
 	// document them for now, but maybe comment them out later for accuracy.
-	PORT_START("IN1")
+	PORT_START("MATRIX1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("P1 A")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)
@@ -294,7 +356,7 @@ static INPUT_PORTS_START(dphh8213)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2")
+	PORT_START("MATRIX2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("P2 B")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // bbl338 - must be IP_ACTIVE_HIGH to avoid system hanging with 'wai' opcode after code turns on port interrupt if not in test mode (power off?)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
@@ -302,7 +364,7 @@ static INPUT_PORTS_START(dphh8213)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN3")
+	PORT_START("MATRIX3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("P2 A") PORT_PLAYER(2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -310,7 +372,7 @@ static INPUT_PORTS_START(dphh8213)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2)
 
-	PORT_START("IN4")
+	PORT_START("MATRIX4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("P2 B") PORT_PLAYER(2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -326,90 +388,122 @@ static INPUT_PORTS_START(dphh8213)
 	PORT_BIT(0xf6, IP_ACTIVE_LOW, IPT_UNUSED) // probably unused
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(class200)
+	PORT_START("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_POWER_ON )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("S/P")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Sound")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
+
+	PORT_START("IN2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("A")
+	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START(cutepet)
 	PORT_START("IN1")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // needed to power-up, inputs might be multiplexed here?
+	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN4")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("PORTC")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-void st22xx_bbl338_state::st22xx_dphh8213(machine_config &config)
+void st22xx_dphh8213_state::st22xx_dphh8213(machine_config &config)
 {
-	ST2302U(config, m_maincpu, 24000000);
-	m_maincpu->set_addrmap(AS_DATA, &st22xx_bbl338_state::st22xx_dphh8213_map);
-	m_maincpu->in_pa_callback().set(FUNC(st22xx_bbl338_state::porta_r));
-	m_maincpu->out_pa_callback().set(FUNC(st22xx_bbl338_state::porta_w));
-
-	m_maincpu->out_pb_callback().set(FUNC(st22xx_bbl338_state::portb_w));
+	ST2302U(config, m_maincpu, 24'000'000);
+	m_maincpu->set_addrmap(AS_DATA, &st22xx_dphh8213_state::st22xx_dphh8213_map);
+	m_maincpu->in_pa_callback().set(FUNC(st22xx_dphh8213_state::porta_r));
+	m_maincpu->out_pa_callback().set(FUNC(st22xx_dphh8213_state::porta_w));
+	m_maincpu->out_pb_callback().set(FUNC(st22xx_dphh8213_state::portb_w));
 	m_maincpu->in_pc_callback().set_ioport("PORTC");
 
 	SPEAKER(config, "mono").front_center();
 	m_maincpu->add_route(st2205u_base_device::PSG_OUTPUT_PWM, "mono", 1.00);
-	m_maincpu->add_route(st2205u_base_device::PSG_OUTPUT_CURRENT_DAC, "mono", 1.00);
-
 
 	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(160, 128);
 	m_screen->set_visarea(0, 160 - 1, 0, 128 - 1);
-	m_screen->set_screen_update(FUNC(st22xx_bbl338_state::screen_update));
+	m_screen->set_screen_update(m_lcdc, FUNC(st7735_lcdc_device::render_to_bitmap));
 
 	ST7735(config, m_lcdc);
 }
 
-void st22xx_bbl338_state::st22xx_cutepet(machine_config &config)
+void st22xx_cutepet_state::st22xx_cutepet(machine_config &config)
 {
-	st22xx_dphh8213(config);
-	m_maincpu->set_addrmap(AS_DATA, &st22xx_bbl338_state::st22xx_cutepet_map);
-}
+	ST2302U(config, m_maincpu, 24'000'000);
+	m_maincpu->set_addrmap(AS_DATA, &st22xx_cutepet_state::st22xx_cutepet_map);
+	m_maincpu->in_pa_callback().set_ioport("IN1");
+	m_maincpu->in_pb_callback().set_ioport("IN2");
+	m_maincpu->in_pc_callback().set_ioport("IN3");
 
-void st22xx_bbl338_state::st22xx_bbl338(machine_config &config)
-{
-	ST2302U(config, m_maincpu, 24000000);
-	m_maincpu->set_addrmap(AS_DATA, &st22xx_bbl338_state::st22xx_bbl338_map);
-	m_maincpu->in_pa_callback().set(FUNC(st22xx_bbl338_state::porta_r));
-	m_maincpu->out_pb_callback().set(FUNC(st22xx_bbl338_state::portb_w));
-	m_maincpu->in_pc_callback().set_ioport("PORTC");
+	SPEAKER(config, "mono").front_center();
+	m_maincpu->add_route(st2205u_base_device::PSG_OUTPUT_PWM, "mono", 1.00);
 
-	// incorrect for bbl338
+	// resolution seems to be correct, based on registers programmed
+	// but this might not be a ST7735, just something with a compatible
+	// set of commands - the output isn't currently correct
 	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(160, 128);
 	m_screen->set_visarea(0, 160 - 1, 0, 128 - 1);
-	m_screen->set_screen_update(FUNC(st22xx_bbl338_state::screen_update));
+	m_screen->set_screen_update(m_lcdc, FUNC(st7735_lcdc_device::render_to_bitmap));
 
-	// incorrect for bbl338 (or will need changes to support higher resolutions)
 	ST7735(config, m_lcdc);
 }
 
+void st22xx_class200_state::st22xx_class200(machine_config &config)
+{
+	ST2302U(config, m_maincpu, 32'000'000);
+	m_maincpu->set_addrmap(AS_DATA, &st22xx_class200_state::st22xx_class200_map);
+	m_maincpu->in_pa_callback().set_ioport("IN1");
+	m_maincpu->out_pa_callback().set(FUNC(st22xx_class200_state::porta_w));
+	m_maincpu->in_pb_callback().set_ioport("IN2");
+	m_maincpu->out_pb_callback().set(FUNC(st22xx_class200_state::portb_w));
 
-ROM_START( bbl338 )
-	ROM_REGION( 0x4000, "internal", ROMREGION_ERASEFF )
-	ROM_LOAD( "internal.rom", 0x000000, 0x4000, NO_DUMP ) // unsure of exact size for this model
+	SPEAKER(config, "mono").front_center();
+	m_maincpu->add_route(st2205u_base_device::PSG_OUTPUT_PWM, "mono", 1.00);
 
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "en29lv160ab.u1", 0x000000, 0x200000, CRC(2c73e16c) SHA1(e2c69b3534e32ef384c0c2f5618118a419326e3a) )
-ROM_END
+	SCREEN(config, m_screen).set_lcd();
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(220, 176);
+	m_screen->set_visarea(0, 219, 0, 175);
+	m_screen->set_screen_update(m_class200lcdc, FUNC(class200_lcdc_device::render_to_bitmap));
+
+	CLASS200_LCDC(config, m_class200lcdc);
+}
+
+void st22xx_bbl338_sim_state::st22xx_bbl338(machine_config &config)
+{
+	st22xx_class200_state::st22xx_class200(config);
+	m_maincpu->set_addrmap(AS_DATA, &st22xx_bbl338_sim_state::st22xx_bbl338_map);
+}
 
 ROM_START( class200 )
-	ROM_REGION( 0x4000, "internal", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "internal", ROMREGION_ERASEFF )
 	ROM_LOAD( "internal.rom", 0x0000, 0x2000, CRC(024fa502) SHA1(0aca4bbd6b98eb156187a144a274c8d3ead27d40) )
-	ROM_RELOAD( 0x2000, 0x2000 )
 
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "m29w320eb.bin", 0x000000, 0x400000, CRC(3067b5f6) SHA1(9a159b16898054a74cfb32b5c597b505132f004e) )
+ROM_END
+
+ROM_START( bbl338 )
+	ROM_REGION( 0x2000, "internal", ROMREGION_ERASEFF )
+	ROM_LOAD( "internal.rom", 0x000000, 0x2000, NO_DUMP ) // unsure of exact size for this model
+
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "en29lv160ab.u1", 0x000000, 0x200000, CRC(2c73e16c) SHA1(e2c69b3534e32ef384c0c2f5618118a419326e3a) )
 ROM_END
 
 ROM_START( dphh8213 )
@@ -421,7 +515,7 @@ ROM_START( dphh8213 )
 ROM_END
 
 ROM_START( cutepet )
-	// internal area not used?
+	// internal area not used
 
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "m29w320dt.u2", 0x00000, 0x400000, CRC(157e208f) SHA1(78069c524f214d763c0b216aa3de487b65a84034) )
@@ -431,13 +525,13 @@ ROM_END
 
 
 // this is uses a higher resolution display than the common units, but not as high as the SunPlus based ones
-COMP( 201?, bbl338,   0,      0,      st22xx_bbl338, dphh8213, st22xx_bbl338_sim_state, empty_init, "BaoBaoLong", "Portable Game Player BBL-338 (BaoBaoLong, 48-in-1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-// also appears to be the higher resolution display
-COMP( 201?, class200, 0,      0,      st22xx_bbl338, dphh8213, st22xx_bbl338_sim_state, empty_init, "<unknown>", "Color LCD Classic Game 200-in-1", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // no manufacturer name or product code anywhere
+COMP( 201?, class200, 0,      0,      st22xx_class200, class200,  st22xx_class200_state,   empty_init, "<unknown>", "Color LCD Classic Game 200-in-1", 0 ) // no manufacturer name or product code anywhere
+// also uses the higher resolution display, appears to need different internal ROM to class200 though
+COMP( 201?, bbl338,   0,      0,      st22xx_bbl338,   class200,  st22xx_bbl338_sim_state, empty_init, "BaoBaoLong", "Portable Game Player BBL-338 (BaoBaoLong, 48-in-1)", MACHINE_NOT_WORKING )
 
 // Language controlled by port bit, set at factory, low resolution
-// different menu protection compared to the st2302u_bbl_spi.cpp sets (games can be selected, but cursor doesn't update)
-COMP( 201?, dphh8213, 0,      0,      st22xx_dphh8213, dphh8213, st22xx_bbl338_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 20-in-1 - Model 8213", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+// different menu protection compared to the st2302u_bbl_spi.cpp sets, see comment in st22xx_dphh8213_state::porta_r()
+COMP( 201?, dphh8213, 0,      0,      st22xx_dphh8213, dphh8213, st22xx_dphh8213_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 20-in-1 - Model 8213", MACHINE_NOT_WORKING )
 
 // seems to be this hardware type, but different LCDC?
-COMP( 201?, cutepet,  0,      0,      st22xx_cutepet, cutepet,   st22xx_bbl338_state, empty_init, "Dream Cube", "Cute Pet Park", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 201?, cutepet,  0,      0,      st22xx_cutepet, cutepet,   st22xx_cutepet_state, empty_init, "Dream Cube", "Cute Pet Park", MACHINE_NOT_WORKING )

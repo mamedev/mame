@@ -22,6 +22,8 @@
   * Lucky Roulette Plus (6-players, Spanish, set 1),            1990, unknown manufacturer.
   * Lucky Roulette Plus (6-players, Spanish, set 2),            1990, unknown manufacturer.
   * Monte (4-players Spanish cards game. Prototype, encrypted), 1989, Miky SRL.
+  * Rula (6-players roulette, encrypted),                       1991, Miky SRL.
+
 
   Special thanks to Rob Ragon for his invaluable cooperation.
 
@@ -49,6 +51,19 @@
   (note that this one has 6 horses instead of 7).
 
   It has four independent coin slots of 10-francs each.
+
+
+  * Rula
+  Miky SRL
+
+  6-players spanish roulette. Encrypted.
+
+  This game was designed to be presented in horizontal way, with a LEDs
+  roulette at the top of the playfield.
+
+  The first boot always shows a blue screen with "Falso Arranque". This
+  is related to a fail check against the NVRAM. Just reset and the game
+  will generate a new one and start normally.
 
 
 **************************************************************************
@@ -326,6 +341,7 @@
 
 #include "re800.lh"
 #include "luckyrlt.lh"
+#include "rula_v.lh"
 
 
 namespace {
@@ -376,6 +392,9 @@ private:
 	void ball_w(uint8_t data);
 	uint8_t mux_port_r();
 	void mux_port_w(uint8_t data);
+	void rula_mux_w(uint8_t data);
+	void rula_led_col_w(uint8_t data);
+	void rula_led_row_w(uint8_t data);
 	void wc_meters_w(uint8_t data);
 	void blitter_execute(int x, int y, int color, int width, int flag);
 	void corona_palette(palette_device &palette) const;
@@ -399,6 +418,7 @@ private:
 	void winner82_sound_cpu_io_map(address_map &map) ATTR_COLD;
 	void winner82_sound_map(address_map &map) ATTR_COLD;
 	void monte_map(address_map &map) ATTR_COLD;
+	void rula_cpu_io_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_blitter_x_reg = 0;
 	uint8_t m_blitter_y_reg = 0;
@@ -408,6 +428,8 @@ private:
 	uint8_t m_lamp = 0;
 	uint8_t m_lamp_old = 0;
 	uint8_t m_input_selector = 0;
+	uint8_t m_led_col = 0;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<screen_device> m_screen;
@@ -613,7 +635,7 @@ void corona_state::mux_port_w(uint8_t data)
 {
 /*  - bits -
     7654 3210
-    --xx xxxx   Input selector.
+    --xx xxxx   Input selector (one player at a time).
     -x-- ----   Credits In counter pulse.
     x--- ----   Credits Out counter pulse.
 
@@ -627,6 +649,66 @@ void corona_state::mux_port_w(uint8_t data)
 
 //  logerror("muxsel: %02x \n", m_input_selector);
 }
+
+void corona_state::rula_mux_w(uint8_t data)
+{
+/*  Rula uses the same demux scheme as luckyrlt/re800 (port FC),
+    but the bus is not inverted:
+
+    - bits -
+    7654 3210
+    --xx xxxx   Input selector (one player at a time, active high).
+    -x-- ----   Credits In counter pulse (active high).
+    x--- ----   Credits Out counter pulse (active high).
+*/
+	mux_port_w(data ^ 0xff);
+}
+
+
+void corona_state::rula_led_col_w(uint8_t data)
+{
+/*  Roulette LEDs matrix (37 LEDs, 6 columns x 7 rows).
+
+    Port $E9: column strobe (active low, one column at a time).
+    Port $EF: row data (active high, one row at a time).
+
+    The program at $1E12 lights a single LED at a time, with
+    LED = (column * 7) + row, in the 0-36 range. The index
+    follows the position in the wheel (the number table at $B294
+    is the european wheel order).
+
+    HEX: 00 20 0F 13 04 15 02 19 11 22 06 1B 0D 24 0B 1E 08 17 0A 05 18 10 21 01 14 0E 1F 09 16 12 1D 07 1C 0C 23 03 1A
+    DEC: 00 32 15 19 04 21 02 25 17 34 06 27 13 36 11 30 08 23 10 05 24 16 33 01 20 14 31 09 22 18 29 07 28 12 35 03 26
+*/
+	m_led_col = ~data & 0x3f;
+}
+
+void corona_state::rula_led_row_w(uint8_t data)
+{
+	int col = -1;
+	int row = -1;
+
+	for (int i = 0; i < 6; i++)
+		if (BIT(m_led_col, i))
+			col = i;
+
+	for (int i = 0; i < 7; i++)
+		if (BIT(data, i))
+			row = i;
+
+	if (col >= 0 && row >= 0)
+	{
+		const uint8_t led = (col * 7) + row;
+
+		m_lamps[m_lamp_old] = 0;
+		m_lamps[led] = 1;
+		m_lamp_old = led;
+//      popmessage("LED: %02d", led);
+	}
+	else
+		m_lamps[m_lamp_old] = 0;
+}
+
 
 void corona_state::wc_meters_w(uint8_t data)
 {
@@ -844,11 +926,11 @@ void corona_state::re800_sound_cpu_io_map(address_map &map)
 }
 
 
-/* Lucky Roulette
+/* Lucky Roulette Plus
 
   Blitter: F0-F4
   Status:  F5
-  Ball:    F9
+  Ball:    F9   (inverted LED-matrix)
 
   F8       R-   DIP switches?
   FA       R-   DIP switches?
@@ -886,9 +968,9 @@ void corona_state::luckyrlt_cpu_io_map(address_map &map)
 	map(0xf4, 0xf4).w(FUNC(corona_state::blitter_unk_w));
 	map(0xf5, 0xf5).r(FUNC(corona_state::blitter_status_r));
 
-	map(0xf8, 0xf8).portr("DSW2");
+	map(0xf8, 0xf8).portr("DSW1");
 	map(0xf9, 0xf9).w(FUNC(corona_state::ball_w));
-	map(0xfa, 0xfa).portr("DSW1");
+	map(0xfa, 0xfa).portr("DSW2");
 	map(0xfc, 0xfc).w(FUNC(corona_state::mux_port_w));
 	map(0xfd, 0xfd).r(FUNC(corona_state::mux_port_r));
 	map(0xfe, 0xfe).w(FUNC(corona_state::sound_latch_w));
@@ -929,6 +1011,25 @@ void corona_state::monte_map(address_map &map)
     Now, the cards could appear facing in any direction, just as happens in a real deal,
     and all bookkeeping parameters are working properly, including the machine turning on counter.
 */
+}
+
+void corona_state::rula_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x70, 0x70).w(FUNC(corona_state::blitter_x_w));
+	map(0x71, 0x71).w(FUNC(corona_state::blitter_unk_w));
+	map(0x72, 0x72).w(FUNC(corona_state::blitter_trig_wdht_w));
+	map(0x74, 0x74).w(FUNC(corona_state::blitter_y_w));
+	map(0x75, 0x75).r(FUNC(corona_state::blitter_status_r));
+	map(0x76, 0x76).w(FUNC(corona_state::blitter_aux_w));
+
+	map(0xd8, 0xd8).w(FUNC(corona_state::rula_mux_w));          // mux selector & meters
+	map(0xdf, 0xdf).w(FUNC(corona_state::sound_latch_w));
+	map(0xe9, 0xe9).w(FUNC(corona_state::rula_led_col_w));      // roulette LEDs matrix column
+	map(0xeb, 0xeb).r(FUNC(corona_state::mux_port_r));
+	map(0xed, 0xed).portr("DSW2");
+	map(0xee, 0xee).portr("DSW1");
+	map(0xef, 0xef).w(FUNC(corona_state::rula_led_row_w));      // roulette LEDs matrix row
 }
 
 
@@ -1344,7 +1445,7 @@ static INPUT_PORTS_START( re800v3 )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( luckyrlt )
+static INPUT_PORTS_START( roulette6p )
 	PORT_START("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("Player 1 - Bet")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_RIGHT)    PORT_NAME("Player 1 - Right")
@@ -1353,7 +1454,7 @@ static INPUT_PORTS_START( luckyrlt )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_UP)       PORT_NAME("Player 1 - Up")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)        PORT_NAME("Player 1 - Credits Out")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1)        PORT_NAME("Player 1 - Credits In")
-	PORT_DIPNAME( 0x80, 0x00, "Player 1 Credits Lock" )  PORT_DIPLOCATION("DSW1:2")  // lock the credits in/out
+	PORT_DIPNAME( 0x80, 0x00, "Player 1 Credits Lock" )  PORT_DIPLOCATION("DSW2:1")  // lock the credits in/out
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -1365,7 +1466,7 @@ static INPUT_PORTS_START( luckyrlt )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Player 2 - Up")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)     PORT_NAME("Player 2 - Credits Out")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2)     PORT_NAME("Player 2 - Credits In")
-	PORT_DIPNAME( 0x80, 0x00, "Player 2 Credits Lock" )  PORT_DIPLOCATION("DSW1:3")  // lock the credits in/out
+	PORT_DIPNAME( 0x80, 0x00, "Player 2 Credits Lock" )  PORT_DIPLOCATION("DSW2:2")  // lock the credits in/out
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -1377,7 +1478,7 @@ static INPUT_PORTS_START( luckyrlt )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("Player 3 - Up")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("Player 3 - Credits Out")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("Player 3 - Credits In")
-	PORT_DIPNAME( 0x80, 0x00, "Player 3 Credits Lock" )  PORT_DIPLOCATION("DSW1:4")  // lock the credits in/out
+	PORT_DIPNAME( 0x80, 0x00, "Player 3 Credits Lock" )  PORT_DIPLOCATION("DSW2:3")  // lock the credits in/out
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -1389,7 +1490,7 @@ static INPUT_PORTS_START( luckyrlt )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("Player 4 - Up")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("Player 4 - Credits Out")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("Player 4 - Credits In")
-	PORT_DIPNAME( 0x80, 0x00, "Player 4 Credits Lock" )  PORT_DIPLOCATION("DSW1:5")  // lock the credits in/out
+	PORT_DIPNAME( 0x80, 0x00, "Player 4 Credits Lock" )  PORT_DIPLOCATION("DSW2:4")  // lock the credits in/out
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -1401,7 +1502,7 @@ static INPUT_PORTS_START( luckyrlt )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("Player 5 - Up")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("Player 5 - Credits Out")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("Player 5 - Credits In")
-	PORT_DIPNAME( 0x80, 0x00, "Player 5 Credits Lock" )  PORT_DIPLOCATION("DSW1:6")  // lock the credits in/out
+	PORT_DIPNAME( 0x80, 0x00, "Player 5 Credits Lock" )  PORT_DIPLOCATION("DSW2:5")  // lock the credits in/out
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -1413,23 +1514,22 @@ static INPUT_PORTS_START( luckyrlt )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_HOME)  PORT_NAME("Player 6 - Up")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)     PORT_NAME("Player 6 - Credits Out")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6)     PORT_NAME("Player 6 - Credits In")
-	PORT_DIPNAME( 0x80, 0x00, "Player 6 Credits Lock" )  PORT_DIPLOCATION("DSW1:7")  // lock the credits in/out
+	PORT_DIPNAME( 0x80, 0x00, "Player 6 Credits Lock" )  PORT_DIPLOCATION("DSW2:6")  // lock the credits in/out
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( luckyrlt )
+	PORT_INCLUDE( roulette6p )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Test / Bookkeeping" )    PORT_DIPLOCATION("DSW1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x81, 0x81, "Max Bet" )   PORT_DIPLOCATION("DSW2:1,8")
+	PORT_DIPNAME( 0x81, 0x81, "Max Bet" )                  PORT_DIPLOCATION("DSW1:1,8")
 	PORT_DIPSETTING(    0x00, "Plain = 10; Line = 30; Chance = 30" )
 	PORT_DIPSETTING(    0x80, "Plain = 20; Line = 40; Chance = 50" )
 	PORT_DIPSETTING(    0x01, "Plain = 30; Line = 50; Chance = 70" )
 	PORT_DIPSETTING(    0x81, "Plain = 40; Line = 70; Chance = 90" )
-	PORT_DIPNAME( 0x0e, 0x0e, "Rate (%)" )  PORT_DIPLOCATION("DSW2:2,3,4")
+	PORT_DIPNAME( 0x0e, 0x0e, "Rate (%)" )                 PORT_DIPLOCATION("DSW1:2,3,4")
 	PORT_DIPSETTING(    0x00, "3.12" )
 	PORT_DIPSETTING(    0x02, "6.25" )
 	PORT_DIPSETTING(    0x04, "9.40" )
@@ -1438,15 +1538,24 @@ static INPUT_PORTS_START( luckyrlt )
 	PORT_DIPSETTING(    0x0a, "18.7" )
 	PORT_DIPSETTING(    0x0c, "21.9" )
 	PORT_DIPSETTING(    0x0e, "25.1" )
-	PORT_DIPNAME( 0x10, 0x10, "Reset" )     PORT_DIPLOCATION("DSW2:5")  // don't know how it works
+	PORT_DIPNAME( 0x10, 0x10, "Reset" )                    PORT_DIPLOCATION("DSW1:5")  // don't know how it works
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Pago Doble (Double Pay)" )   PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "Pago Doble (Double Pay)" )  PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Pago x5 (Pay x5)" )  PORT_DIPLOCATION("DSW2:7")  // only in PLUS 1990 model
+	PORT_DIPNAME( 0x40, 0x40, "Pago x5 (Pay x5)" )         PORT_DIPLOCATION("DSW1:7")  // only in PLUS 1990 model
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Test / Bookkeeping" )       PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )         PORT_DIPLOCATION("DSW2:8")  // placeholder for diplocation
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )   
 INPUT_PORTS_END
 
 
@@ -1524,26 +1633,41 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( rula )
-	PORT_START("IN0")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
-	PORT_START("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE( roulette6p )
 
-	PORT_START("IN2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("DSW1")  // port $EE
+	PORT_DIPNAME( 0x07, 0x07, "Payout Rate (%)" )    PORT_DIPLOCATION("DSW1:1,2,3")  // reversed from table at $B28C -> ($5F68)
+	PORT_DIPSETTING(    0x00, "98" )
+	PORT_DIPSETTING(    0x01, "94" )
+	PORT_DIPSETTING(    0x02, "92" )
+	PORT_DIPSETTING(    0x03, "90" )
+	PORT_DIPSETTING(    0x04, "88" )
+	PORT_DIPSETTING(    0x05, "86" )
+	PORT_DIPSETTING(    0x06, "84" )
+	PORT_DIPSETTING(    0x07, "80" )
+	PORT_DIPNAME( 0x08, 0x08, "Erase Counters" )     PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Clear RAM (Reset)" )  PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )   PORT_DIPLOCATION("DSW1:6")  // routine at $0C8D (uses the payout rate)
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Max Bet" )            PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPSETTING(    0x40, "20" )
+	PORT_DIPSETTING(    0x80, "30" )
+	PORT_DIPSETTING(    0xc0, "40" )
 
-	PORT_START("IN3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN4")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("DSW1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("DSW2")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START("DSW2")  // port $ED
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x40, 0x40, "Test / Bookkeeping" ) PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )          PORT_DIPLOCATION("DSW2:8")  // it shows the $EE DIP switches bank)
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -1775,7 +1899,7 @@ void corona_state::rula(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &corona_state::monte_map);
-	m_maincpu->set_addrmap(AS_IO, &corona_state::winner81_cpu_io_map);
+	m_maincpu->set_addrmap(AS_IO, &corona_state::rula_cpu_io_map);
 
 	// video hardware
 	m_screen->set_visarea(0*8, 32*8-1, 1*8, 30*8-1);
@@ -2080,7 +2204,8 @@ ROM_START(monte)
 ROM_END
 
 /*
-  Rula (roulette)
+  Rula
+  LEDs roulette
   Miki SRL.
   1991.
 
@@ -2089,7 +2214,8 @@ ROM_END
   Program is encrypted.
 
   Notes:
-  blitter and inputs seems mapped as winner81.
+  This game was designed to be installed horizontally,
+  with 3 controls sets for each side of the table.
 
 */
 ROM_START(rula)
@@ -2141,4 +2267,4 @@ GAMEL( 1991, luckyrlta, luckyrlt, luckyrlta, luckyrlt, corona_state, empty_init,
 
 // Miky SRL games
 GAME(  1989, monte,     0,        monte,     monte,    corona_state, init_monte, ROT0,   "Miky SRL",                 "Monte (4-players Spanish cards game. Prototype, encrypted)", 0 )
-GAME(  1991, rula,      0,        rula,      rula,     corona_state, init_monte, ROT90,  "Miky SRL",                 "Rula (6-players roulette, encrypted)",            MACHINE_NOT_WORKING )
+GAMEL( 1991, rula,      0,        rula,      rula,     corona_state, init_monte, ROT90,  "Miky SRL",                 "Rula (6-players roulette, encrypted)",            0,                        layout_rula_v )

@@ -197,11 +197,10 @@
 #include "machine/nvram.h"
 #include "machine/scc66470.h"
 #include "machine/scc68070.h"
-#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/saa1099.h"
-#include "video/ramdac.h"
-#include "emupal.h"
+#include "video/bt47x.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -230,7 +229,7 @@ protected:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		, m_palette(*this, "palette")
+		, m_ramdac(*this, "ramdac")
 		, m_scc66470(*this,"scc66470")
 		, m_i2cmem(*this, "sereeprom")
 		, m_lamps(*this, "lamp%u", 1U)
@@ -243,8 +242,6 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	void ramdac_map(address_map &map) ATTR_COLD;
 
 	void dram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t dram_r(offs_t offset, uint16_t mem_mask);
@@ -266,7 +263,7 @@ protected:
 
 	required_device<scc68070_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	required_device<bt476_device> m_ramdac;
 	required_device<scc66470_device> m_scc66470;
 	required_device<i2cmem_device> m_i2cmem;
 
@@ -416,7 +413,7 @@ uint32_t magicard_base_state::screen_update_magicard(screen_device &screen, bitm
 
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			*dest++ = m_palette->pen(buffer[ x ]);
+			*dest++ = m_ramdac->pen(buffer[ x ]);
 		}
 	}
 	return 0;
@@ -520,9 +517,7 @@ void magicard_state::magicard_map(address_map &map)
 	map(0x001ffc00, 0x001ffc01).portr("IN0");
 	map(0x001ffc40, 0x001ffc41).portr("IN1");
 	map(0x001ffc80, 0x001ffc81).w( FUNC(magicard_state::output_w));
-	map(0x001ffd01, 0x001ffd01).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x001ffd03, 0x001ffd03).w("ramdac", FUNC(ramdac_device::pal_w));
-	map(0x001ffd05, 0x001ffd05).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x001ffd00, 0x001ffd07).w(m_ramdac, FUNC(bt476_device::write)).umask16(0x00ff);
 	map(0x001ffd40, 0x001ffd43).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
 	map(0x001ffd80, 0x001ffd81).rw(FUNC(magicard_state::read_ds1207), FUNC(magicard_state::write_ds1207)).umask16(0x00ff);
 	map(0x001fff80, 0x001fffbf).ram(); //DRAM I/O, not accessed by this game, CD buffer?
@@ -543,11 +538,8 @@ void hotslots_state::hotslots_map_base(address_map &map)
 	map(0x00411000, 0x00411001).portr("IN0");
 	map(0x00412346, 0x00412347).portr("IN1");
 	map(0x00413000, 0x00413001).w( FUNC(hotslots_state::output_w));
-	map(0x00414001, 0x00414001).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x00414003, 0x00414003).w("ramdac", FUNC(ramdac_device::pal_w));
-	map(0x00414005, 0x00414005).w("ramdac", FUNC(ramdac_device::mask_w));
-	map(0x00414007, 0x00414007).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x00415003, 0x00415003).r("ramdac", FUNC(ramdac_device::pal_r));
+	map(0x00414000, 0x00414007).w(m_ramdac, FUNC(bt476_device::write)).umask16(0x00ff);
+	map(0x00415000, 0x00415007).r(m_ramdac, FUNC(bt476_device::read)).umask16(0x00ff);
 	map(0x00416001, 0x00416001).w("ssg", FUNC(ymz284_device::data_w));
 	map(0x00417001, 0x00417001).w("ssg", FUNC(ymz284_device::address_w));
 	map(0x00418000, 0x00418020).rw("rtc", FUNC(rtc72421_device::read), FUNC(rtc72421_device::write)).umask16(0x00ff);
@@ -571,27 +563,17 @@ void hotslots_state::simpbest_map(address_map &map)
 	map(0x00000000, 0x001fffff).m(m_scc66470, FUNC(scc66470_device::map));
 	map(0x00000000, 0x0017ffff).rw(FUNC(hotslots_state::mcu_dram_r), FUNC(hotslots_state::mcu_dram_w));
 	map(0x001fff80, 0x001fffbf).ram(); //DRAM I/O
-
 	map(0x00200000, 0x003fffff).rw(m_scc66470, FUNC(scc66470_device::ipa_r), FUNC(scc66470_device::ipa_w));
 	map(0x00600000, 0x0067ffff).rom().region("maincpu", 0); // boot vectors point here
-
 	map(0x00400000, 0x00400001).portr("IN0");
 	map(0x00401000, 0x00401001).portr("IN1");
 	map(0x00402000, 0x00402001).w( FUNC(hotslots_state::output_w));
-
-	map(0x00403001, 0x00403001).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x00403003, 0x00403003).w("ramdac", FUNC(ramdac_device::pal_w));
-	map(0x00403005, 0x00403005).w("ramdac", FUNC(ramdac_device::mask_w));
-	map(0x00403007, 0x00403007).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x00404003, 0x00404003).r("ramdac", FUNC(ramdac_device::pal_r));
-
+	map(0x00403000, 0x00403007).w(m_ramdac, FUNC(bt476_device::write)).umask16(0x00ff);
+	map(0x00404000, 0x00404007).r(m_ramdac, FUNC(bt476_device::read)).umask16(0x00ff);
 	map(0x00405003, 0x00405003).w("ssg", FUNC(ymz284_device::data_w));
 	map(0x00406001, 0x00406001).w("ssg", FUNC(ymz284_device::address_w));
-
 	map(0x00407000, 0x00407020).rw("rtc", FUNC(rtc72421_device::read), FUNC(rtc72421_device::write)).umask16(0x00ff);
-
 	map(0x00500000, 0x0050ffff).ram().share("nvram");
-
 }
 
 
@@ -949,11 +931,6 @@ void hotslots_state::cpu_int1(int state)
 	m_maincpu->int1_w(state);
 }
 
-void magicard_base_state::ramdac_map(address_map &map)
-{
-	map(0x0000, 0x03ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
-}
-
 void magicard_base_state::update_scl(uint8_t device, uint8_t state)
 {
 	if(state)
@@ -1013,9 +990,7 @@ void magicard_base_state::magicard_base(machine_config &config)
 	m_scc66470->set_screen("screen");
 	m_scc66470->irq().set(FUNC(magicard_base_state::scc66470_irq));
 
-	PALETTE(config, m_palette).set_entries(0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
-	ramdac.set_addrmap(0, &magicard_state::ramdac_map);
+	BT476(config, m_ramdac);
 
 	SPEAKER(config, "mono").front_center();
 

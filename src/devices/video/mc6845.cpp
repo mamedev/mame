@@ -393,9 +393,18 @@ void mc6845_device::recompute_parameters(bool postload)
 						hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos);
 
 			m_has_valid_parameters = true;
+			m_display_off = false;
 		}
 		else
+		{
+			// Horizontal or Vertical Displayed of 0 never enables DE, so nothing is displayed but the
+			// sync timing carries on (e.g. the H19 Superset ROM screen saver sets R1 to 0). Keep the
+			// current screen configuration and let the driver draw it with DE inactive.
+			if (m_has_valid_parameters)
+				m_display_off_columns = (m_max_visible_x + 1) / m_hpixels_per_column;
+			m_display_off = ((m_horiz_disp == 0) || (m_vert_disp == 0)) && (m_has_valid_parameters || m_display_off);
 			m_has_valid_parameters = false;
+		}
 
 		m_horiz_pix_total = horiz_pix_total;
 		m_vert_pix_total = vert_pix_total;
@@ -927,6 +936,20 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		/* call the tear down function if any */
 		m_end_update_cb(bitmap, cliprect);
 	}
+	else if (m_display_off)
+	{
+		uint16_t const char_height = m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust);
+		int const vbp = std::max(m_vert_pix_total - m_vsync_off_pos, 0);
+		int const hbp = std::max(m_horiz_pix_total - m_hsync_off_pos, 0);
+
+		m_begin_update_cb(bitmap, cliprect);
+
+		/* DE is never asserted, so the driver decides what an inactive display looks like */
+		for (uint16_t y = cliprect.top(); y <= cliprect.bottom(); y++)
+			m_update_row_cb(bitmap, cliprect, m_disp_start_addr, y % char_height, y, m_display_off_columns, -1, 0, hbp, vbp);
+
+		m_end_update_cb(bitmap, cliprect);
+	}
 	else
 	{
 		if (m_display_disabled_msg_shown == false)
@@ -976,6 +999,8 @@ void mc6845_device::device_start()
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
 	m_has_valid_parameters = false;
+	m_display_off = false;
+	m_display_off_columns = 0;
 	m_display_disabled_msg_shown = false;
 	m_line_enable_ff = false;
 	m_vsync_ff = 0;
@@ -1052,6 +1077,8 @@ void mc6845_device::device_start()
 	save_item(NAME(m_line_address));
 	save_item(NAME(m_cursor_x));
 	save_item(NAME(m_has_valid_parameters));
+	save_item(NAME(m_display_off));
+	save_item(NAME(m_display_off_columns));
 }
 
 

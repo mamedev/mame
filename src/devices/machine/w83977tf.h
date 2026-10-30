@@ -9,6 +9,7 @@
 #include "imagedev/floppy.h"
 #include "machine/8042kbdc.h"
 #include "machine/ds128x.h"
+#include "machine/ins8250.h"
 #include "machine/pc_lpt.h"
 #include "machine/upd765.h"
 
@@ -27,12 +28,24 @@ public:
 	auto irq1() { return m_irq1_callback.bind(); }
 	auto irq8() { return m_irq8_callback.bind(); }
 	auto irq9() { return m_irq9_callback.bind(); }
-//  auto txd1() { return m_txd1_callback.bind(); }
-//  auto ndtr1() { return m_ndtr1_callback.bind(); }
-//  auto nrts1() { return m_nrts1_callback.bind(); }
-//  auto txd2() { return m_txd2_callback.bind(); }
-//  auto ndtr2() { return m_ndtr2_callback.bind(); }
-//  auto nrts2() { return m_nrts2_callback.bind(); }
+	auto txd1() { return m_txd1_callback.bind(); }
+	auto ndtr1() { return m_ndtr1_callback.bind(); }
+	auto nrts1() { return m_nrts1_callback.bind(); }
+	auto txd2() { return m_txd2_callback.bind(); }
+	auto ndtr2() { return m_ndtr2_callback.bind(); }
+	auto nrts2() { return m_nrts2_callback.bind(); }
+
+	// UART chip pins
+	void rxd1_w(int state) { m_uart[0]->rx_w(state); }
+	void ndcd1_w(int state) { m_uart[0]->dcd_w(state); }
+	void ndsr1_w(int state) { m_uart[0]->dsr_w(state); }
+	void nri1_w(int state) { m_uart[0]->ri_w(state); }
+	void ncts1_w(int state) { m_uart[0]->cts_w(state); }
+	void rxd2_w(int state) { m_uart[1]->rx_w(state); }
+	void ndcd2_w(int state) { m_uart[1]->dcd_w(state); }
+	void ndsr2_w(int state) { m_uart[1]->dsr_w(state); }
+	void nri2_w(int state) { m_uart[1]->ri_w(state); }
+	void ncts2_w(int state) { m_uart[1]->cts_w(state); }
 
 	auto gpio1_read() { return m_gpio1_read_cb.bind(); }
 	auto gpio1_write() { return m_gpio1_write_cb.bind(); }
@@ -42,6 +55,7 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override;
 
 	virtual space_config_vector memory_space_config() const override;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -58,6 +72,7 @@ private:
 	required_device<kbdc8042_device> m_kbdc;
 	required_device<ds12885_device> m_rtc;
 	required_device<pc_lpt_device> m_lpt;
+	required_device_array<ns16550_device, 2> m_uart;
 	memory_view m_logical_view;
 
 	devcb_write_line m_gp20_reset_callback;
@@ -65,12 +80,12 @@ private:
 	devcb_write_line m_irq1_callback;
 	devcb_write_line m_irq8_callback;
 	devcb_write_line m_irq9_callback;
-//  devcb_write_line m_txd1_callback;
-//  devcb_write_line m_ndtr1_callback;
-//  devcb_write_line m_nrts1_callback;
-//  devcb_write_line m_txd2_callback;
-//  devcb_write_line m_ndtr2_callback;
-//  devcb_write_line m_nrts2_callback;
+	devcb_write_line m_txd1_callback;
+	devcb_write_line m_ndtr1_callback;
+	devcb_write_line m_nrts1_callback;
+	devcb_write_line m_txd2_callback;
+	devcb_write_line m_ndtr2_callback;
+	devcb_write_line m_nrts2_callback;
 
 	devcb_read8 m_gpio1_read_cb;
 	devcb_write8 m_gpio1_write_cb;
@@ -97,7 +112,19 @@ private:
 	u16 m_fdc_address;
 	u16 m_keyb_address[2];
 	u16 m_lpt_address;
+	u16 m_uart_address[2]{};
+	u8 m_uart_irq_line[2]{};
+	u8 m_uart_mode[2]{};
+	u8 m_uart_int_state[2]{};
+	u8 m_uart_irq_out[2]{};
+	bool m_uart_irq_driven[2]{};
+	u16 m_uart_cached_address[2]{};
+	bool m_uart_installed[2]{};
 	u16 m_gpio1_address;
+
+	void uart_reconcile_irq(int index);
+	bool uart_line_driven(u8 line) const;
+	void uart_unmap_installed();
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, u8 data);
@@ -138,6 +165,13 @@ private:
 	void irq_mouse_w(int state);
 	void irq_rtc_w(int state);
 	void irq_parallel_w(int state);
+	template <unsigned N> void irq_uart_w(int state);
+	template <unsigned N> u8 uart_address_r(offs_t offset);
+	template <unsigned N> void uart_address_w(offs_t offset, u8 data);
+	template <unsigned N> u8 uart_irq_r(offs_t offset);
+	template <unsigned N> void uart_irq_w(offs_t offset, u8 data);
+	template <unsigned N> u8 uart_mode_r(offs_t offset);
+	template <unsigned N> void uart_mode_w(offs_t offset, u8 data);
 
 	void request_irq(int irq, int state);
 	void request_dma(int dreq, int state);

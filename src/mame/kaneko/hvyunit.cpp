@@ -112,6 +112,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -139,6 +140,7 @@ private:
 	void screen_vblank(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 	void main_io(address_map &map) ATTR_COLD;
 	void main_memory(address_map &map) ATTR_COLD;
 	void sub_io(address_map &map) ATTR_COLD;
@@ -176,6 +178,9 @@ private:
 	u16 m_scrolly = 0;
 	u16 m_port0_data = 0;
 
+	// Interrupt
+	u8 m_irq_vector = 0;
+
 	// Mermaid
 	u8 m_mermaid_p[4]{};
 
@@ -194,8 +199,16 @@ void hvyunit_state::machine_start()
 	m_subbank->configure_entries(0, 4, memregion("subcpu")->base(), 0x4000);
 	m_soundbank->configure_entries(0, 4, memregion("soundcpu")->base(), 0x4000);
 
-	std::fill_n(&m_mermaid_p[0], 4, 0xff);
 	save_item(NAME(m_mermaid_p));
+
+	save_item(NAME(m_irq_vector));
+}
+
+void hvyunit_state::machine_reset()
+{
+	std::fill_n(&m_mermaid_p[0], 4, 0xff);
+
+	m_irq_vector = 0xfd;
 }
 
 
@@ -599,15 +612,24 @@ GFXDECODE_END
 // Main Z80 uses IM2
 TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::scanline)
 {
-	int const scanline = param;
-
-	if (scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfd); // Z80
-
-	// Pandora "sprite end dma" irq? TODO: timing is likely off
-	if (scanline == 64)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	if (param == 240) // vblank-out irq
+	{
+		m_irq_vector = 0xfd;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+	else if (param == 64)
+	{
+		// Pandora "sprite end dma" irq? TODO: timing is likely off
+		m_irq_vector = 0xff;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
 }
+
+IRQ_CALLBACK_MEMBER(hvyunit_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
+}
+
 
 /*************************************
  *
@@ -621,6 +643,7 @@ void hvyunit_state::hvyunit(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hvyunit_state::main_memory);
 	m_maincpu->set_addrmap(AS_IO, &hvyunit_state::main_io);
 	TIMER(config, "scantimer").configure_scanline(FUNC(hvyunit_state::scanline), "screen", 0, 1);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(hvyunit_state::cpu_acknowledge_irq));
 
 	Z80(config, m_subcpu, XTAL(12'000'000)/2); // 6MHz verified on PCB
 	m_subcpu->set_addrmap(AS_PROGRAM, &hvyunit_state::sub_memory);

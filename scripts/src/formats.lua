@@ -78,7 +78,6 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/d88_dsk.h",
 		MAME_DIR .. "src/lib/formats/dfi_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/dfi_dsk.h",
-		MAME_DIR .. "src/lib/formats/fdi_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/rpk.cpp",
 		MAME_DIR .. "src/lib/formats/rpk.h",
 		MAME_DIR .. "src/lib/formats/86f_dsk.cpp",
@@ -858,7 +857,7 @@ end
 --@src/lib/formats/dmk_dsk.h,FORMATS["DMK_DSK"] = true
 --------------------------------------------------
 
-if opt_tool(FORMATS, "DMK_DSK") then
+if opt_tool(FORMATS, "DMK_DSK") or opt_tool(FORMATS, "SDF_DSK") then
 	files {
 		MAME_DIR.. "src/lib/formats/dmk_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/dmk_dsk.h",

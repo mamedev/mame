@@ -31,6 +31,8 @@ public:
 		set_port_tags<First + 1>(std::forward<U>(other_tags)...);
 	}
 
+	void set_analog_bits(uint8_t bits) { m_analog_bits = bits; }
+
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	void jvs13551_coin_1_w(int state);
@@ -38,6 +40,8 @@ public:
 	void inc_coin(int coin);
 
 protected:
+	sega_837_13551_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+
 	template <uint8_t First> void set_port_tags() { }
 
 	// device-level overrides
@@ -62,8 +66,107 @@ protected:
 private:
 	optional_ioport_array<12> port;
 	uint16_t coin_counter[2];
+
+	uint8_t m_analog_bits;
 };
 
 DECLARE_DEVICE_TYPE(SEGA_837_13551, sega_837_13551_device)
+
+class sega_837_13844_device : public sega_837_13551_device
+{
+public:
+	template <typename T>
+	sega_837_13844_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&jvs_host_tag)
+		: sega_837_13844_device(mconfig, tag, owner)
+	{
+		host.set_tag(std::forward<T>(jvs_host_tag));
+	}
+
+	sega_837_13844_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	// TODO: actual ROM
+	static auto parent_rom_device_type() { return &SEGA_837_13551; }
+//  virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	void set_digital_bits(uint8_t bits) { m_digital_bits = bits; }
+	void set_encoder_bits(uint8_t bits) { m_encoder_bits = bits; }
+	void set_lightgun_count(uint8_t count) { m_lightgun_count = count; }
+
+	template <uint8_t Which, typename T>
+	void set_rotary_tag(T &&port_tag) { rotary_port[Which].set_tag(std::forward<T>(port_tag)); }
+	template <uint8_t First = 0U, typename T, typename... U>
+	void set_rotary_tags(T &&first_tag, U &&... other_tags)
+	{
+		set_rotary_tag<First>(std::forward<T>(first_tag));
+		set_rotary_tags<First + 1>(std::forward<U>(other_tags)...);
+	}
+
+	template <uint8_t Which, typename T>
+	void set_lightgun_tag(T &&port_tag) { lightgun_port[Which].set_tag(std::forward<T>(port_tag)); }
+	template <uint8_t First = 0U, typename T, typename... U>
+	void set_lightgun_tags(T &&first_tag, U &&... other_tags)
+	{
+		set_lightgun_tag<First>(std::forward<T>(first_tag));
+		set_lightgun_tags<First + 1>(std::forward<U>(other_tags)...);
+	}
+
+
+protected:
+	template <uint8_t First> void set_rotary_tags() { }
+	template <uint8_t First> void set_lightgun_tags() { }
+
+	virtual const char *device_id() override;
+	virtual void function_list(uint8_t *&buf) override;
+	virtual bool rotary(uint8_t *&buf, uint8_t count) override;
+	virtual bool lightgun(uint8_t *&buf, uint8_t count) override;
+
+private:
+	optional_ioport_array<4> rotary_port;
+	optional_ioport_array<3> lightgun_port;
+
+	uint8_t m_digital_bits;
+	uint8_t m_encoder_bits;
+	uint8_t m_lightgun_count;
+};
+
+class sega_837_13938_device : public sega_837_13551_device
+{
+public:
+	template <typename T>
+	sega_837_13938_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&jvs_host_tag)
+		: sega_837_13938_device(mconfig, tag, owner)
+	{
+		host.set_tag(std::forward<T>(jvs_host_tag));
+	}
+
+	sega_837_13938_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	// TODO: actual ROM
+	static auto parent_rom_device_type() { return &SEGA_837_13551; }
+//  virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	template <uint8_t Which, typename T>
+	void set_rotary_tag(T &&port_tag) { rotary_port[Which].set_tag(std::forward<T>(port_tag)); }
+	template <uint8_t First = 0U, typename T, typename... U>
+	void set_rotary_tags(T &&first_tag, U &&... other_tags)
+	{
+		set_rotary_tag<First>(std::forward<T>(first_tag));
+		set_rotary_tags<First + 1>(std::forward<U>(other_tags)...);
+	}
+
+protected:
+	template <uint8_t First> void set_rotary_tags() { }
+
+	virtual const char *device_id() override;
+	virtual void function_list(uint8_t *&buf) override;
+	virtual bool rotary(uint8_t *&buf, uint8_t count) override;
+
+private:
+	optional_ioport_array<4> rotary_port;
+};
+
+
+DECLARE_DEVICE_TYPE(SEGA_837_13844, sega_837_13844_device)
+DECLARE_DEVICE_TYPE(SEGA_837_13938, sega_837_13938_device)
 
 #endif // MAME_SEGA_JVS13551_H

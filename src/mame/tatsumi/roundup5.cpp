@@ -23,6 +23,7 @@
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/mb3773.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -37,6 +38,7 @@ public:
 	roundup5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tatsumi_state(mconfig, type, tag)
 		, m_subcpu(*this, "sub")
+		, m_watchdog(*this, "watchdog")
 		, m_vregs(*this, "vregs")
 		, m_bg_scrollx(*this, "bg_scrollx")
 		, m_bg_scrolly(*this, "bg_scrolly")
@@ -72,6 +74,7 @@ private:
 	void draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, const bitmap_ind8 &shadow, uint8_t type);
 
 	required_device<cpu_device> m_subcpu;
+	required_device<mb3773_device> m_watchdog;
 
 	required_shared_ptr<uint16_t> m_vregs;
 	required_shared_ptr<uint16_t> m_bg_scrollx;
@@ -270,9 +273,27 @@ pos is 11.5 fixed point
 			int bank = 0;
 			int64_t const pos1 = int64_t(x - start1) * step;
 			int64_t const pos2 = int64_t(x - start2) * step;
-			if (pos1 >= 0 && (pos1 >> 11) < 0x80)
+			bool const in1 = pos1 >= 0 && (pos1 >> 11) < 0x80;
+			bool const in2 = pos2 >= 0 && (pos2 >> 11) < 0x80;
+			if (in1 && in2)
+			{
+				// Where the sets overlap, as in a fork, the higher pen appears to win so that the asphalt
+				// of one set covers the kerb of the other and the two roads merge
+				int const col1 = linedata[pos1 >> 11] & 0xf;
+				int const col2 = linedata[(pos2 >> 11) + 0x200] & 0xf;
+				if (col2 > col1)
+				{
+					col = col2;
+					bank = 32;
+				}
+				else
+				{
+					col = col1;
+				}
+			}
+			else if (in1)
 				col = linedata[pos1 >> 11] & 0xf;
-			else if (pos2 >= 0 && (pos2 >> 11) < 0x80)
+			else if (in2)
 			{
 				col = linedata[(pos2 >> 11) + 0x200] & 0xf;
 				bank = 32;
@@ -424,7 +445,8 @@ void roundup5_state::roundup5_control_w(offs_t offset, uint16_t data, uint16_t m
 //  if (offset == 1 && (tatsumi_control_w & 0xfeff) != (last_bank & 0xfeff))
 //      logerror("%s:  Changed bank to %04x (%d)\n", m_maincpu->pc(), tatsumi_control_w,offset);
 
-//todo - watchdog
+	// The control word latch drives the MB3773 watchdog clock (EHCK); the program pulses it every frame
+	m_watchdog->write_line_ck(BIT(m_control_word, 8));
 
 	/* Bank:
 
@@ -558,7 +580,7 @@ static INPUT_PORTS_START( roundup5 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -661,6 +683,8 @@ void roundup5_state::roundup5(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
+	MB3773(config, m_watchdog); // resets the board when the program stops pulsing the clock
+
 	i8255_device &ppi(I8255(config, "ppi"));
 	ppi.in_pa_callback().set_ioport("IN0");
 	ppi.in_pb_callback().set_ioport("IN1");
@@ -739,4 +763,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAMEL(1989, roundup5,  0,        roundup5,  roundup5, roundup5_state, init_tatsumi,  ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_roundup5 )
+GAMEL(1989, roundup5,  0,        roundup5,  roundup5, roundup5_state, init_tatsumi,  ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", MACHINE_IMPERFECT_GRAPHICS, layout_roundup5 )

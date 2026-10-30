@@ -836,7 +836,7 @@ void nes_cart_slot_device::call_load_ines()
 		if ((header[11] & 0x0f) > 0)
 			vram_size = 0x80 << ((header[11] & 0x0f) - 1);
 		if ((header[11] & 0xf0) > 0)
-			vram_size |= 0x80 << (((header[11] & 0xf0) >> 4) - 1);
+			vram_size += 0x80 << (((header[11] & 0xf0) >> 4) - 1);
 		// header[11] & 0xf0 is the size of battery backed VRAM, found so far in Racermate II only and not supported yet
 	}
 	else

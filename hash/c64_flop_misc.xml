@@ -980,6 +980,18 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
+	<software name="prologic" supported="no">
+		<description>Prologic-DOS</description>
+		<year>1987</year>
+		<publisher>REX Data Technology</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="prologic.d64" size="174848" crc="488bc786" sha1="03e671e274e9de88b5c46a7514f980128a9efc2c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="scpuutil">
 		<description>CMD SuperCPU Utilities</description>
 		<year>1990</year>

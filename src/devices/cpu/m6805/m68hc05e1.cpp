@@ -54,6 +54,8 @@ void m68hc05ex_device::device_reset()
 	// all ports reset to input on startup
 	memset(m_ports, 0, sizeof(m_ports));
 	memset(m_ddrs, 0, sizeof(m_ddrs));
+
+	m_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 }
 
 device_memory_interface::space_config_vector m68hc05ex_device::memory_space_config() const
@@ -198,8 +200,6 @@ u8 m68hc05ex_device::onesec_r()
 
 void m68hc05ex_device::onesec_w(u8 data)
 {
-	m_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
-
 	if ((m_onesec & 0x40) && !(data & 0x40))
 	{
 		set_input_line(M68HC05EX_INT_CPI, CLEAR_LINE);

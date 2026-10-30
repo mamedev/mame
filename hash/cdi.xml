@@ -190,7 +190,6 @@ license:CC0-1.0
 	</software>
 
 	<software name="morlov">
-	<!-- Alt. Title: The Morlov Affair -->
 		<!--
 		Origin: TOSEC
 		<rom name="affaire Morlov, L' (1996)(Titus)(EU)(en-fr)[!][The Morlov Affair][CD-i-PC].iso" size="677827584" crc="725039f3" md5="cd0d2f791d6d11c37716043b619c4520"/>
@@ -199,6 +198,7 @@ license:CC0-1.0
 		<description>L'Affaire Morlov (Europe)[CD-i-PC]</description>
 		<year>1996</year>
 		<publisher>Titus</publisher>
+		<info name="alt_title" value="The Morlov Affair"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="affaire morlov, l' (1996)(titus)(eu)(en-fr)[the morlov affair][cd-i-pc]" sha1="ebd7586ff238e366f789f8b5e2e30e17b045b4b0"/>
@@ -292,7 +292,7 @@ license:CC0-1.0
 		<rom name="Asterix - Caesar's Challenge v3.9 (1995)(Pathe - Philips)(EU)[!].iso" size="436590000" crc="5ae23f16" md5="cd68855f3ad2cb2f5bf7304af25c152c"/>
 		<rom name="Asterix - Caesar's Challenge v3.9 (1995)(Pathe - Philips)(EU)[!].cue" size="153" crc="5643e0e9" md5="929bbe226d86782563f3d0d2655a208b"/>
 		-->
-		<description>Astérix - Caesar's Challenge v3.9 (Europe)</description>
+		<description>Astérix: Caesar's Challenge (Europe, v3.9)</description>
 		<year>1995</year>
 		<publisher>Pathe ~ Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -308,7 +308,7 @@ license:CC0-1.0
 		<rom name="Asterix - De Uitdaging Van Caesar v3.9 (1995)(Pathe - Philips)(NL)[!].iso" size="442587600" crc="b5cae9cf" md5="2478131823418e86e5c06e8a94da6ad4"/>
 		<rom name="Asterix - De Uitdaging Van Caesar v3.9 (1995)(Pathe - Philips)(NL)[!].cue" size="158" crc="fc401090" md5="6e485493504cdab1e9a3c22e318b4295"/>
 		-->
-		<description>Astérix - De Uitdaging Van Caesar v3.9 (Netherlands)</description>
+		<description>Astérix: De Uitdaging Van Caesar (Netherlands, v3.9)</description>
 		<year>1995</year>
 		<publisher>Pathe ~ Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -324,7 +324,7 @@ license:CC0-1.0
 		<rom name="Asterix - Die Grosse Reise v3.9 (1995)(Pathe - Philips)(DE)[!].iso" size="444528000" crc="2084ceb1" md5="358fb285070323b2b4882c04902acad0"/>
 		<rom name="Asterix - Die Grosse Reise v3.9 (1995)(Pathe - Philips)(DE)[!].cue" size="151" crc="d4c503dc" md5="205f69bc9e00472cef5c6cf4631ee16e"/>
 		-->
-		<description>Asterix - Die Grosse Reise v3.9 (Germany)</description>
+		<description>Asterix: Die Grosse Reise (Germany, v3.9)</description>
 		<year>1995</year>
 		<publisher>Pathe ~ Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -340,7 +340,7 @@ license:CC0-1.0
 		<rom name="Asterix - El desafio de Cesar v3.9 (1995)(Pathe - Philips)(ES)[!].iso" size="439412400" crc="f00e6ef0" md5="9360e2ffe626aa1501ef315ca653dbce"/>
 		<rom name="Asterix - El desafio de Cesar v3.9 (1995)(Pathe - Philips)(ES)[!].cue" size="154" crc="0ad57bb6" md5="cff3f62602d2612e8df842a290eb1f91"/>
 		-->
-		<description>Asterix - El Desafio de Cesar v3.9 (Spain)</description>
+		<description>Asterix: El Desafio de Cesar (Spain, v3.9)</description>
 		<year>1995</year>
 		<publisher>Pathe ~ Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -356,7 +356,7 @@ license:CC0-1.0
 		<rom name="Asterix - La sfida di Cesare v3.9 (1995)(Pathe - Philips)(IT).iso" size="443116800" crc="b2ed075c" md5="31662fd62e730955022032b5560d5965"/>
 		<rom name="Asterix - La sfida di Cesare v3.9 (1995)(Pathe - Philips)(IT).cue" size="150" crc="9bfee00f" md5="a1eab33350d8c69fc0d3751ea84ffb0a"/>
 		-->
-		<description>Astérix - La Sfida di Cesare v3.9 (Italy)</description>
+		<description>Astérix: La Sfida di Cesare (Italy, v3.9)</description>
 		<year>1995</year>
 		<publisher>Pathe ~ Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -372,7 +372,7 @@ license:CC0-1.0
 		<rom name="Asterix - Le defi de Cesar v3.9 (1995)(Pathe - Philips)(FR).iso" size="498506400" crc="09e983b3" md5="9e00df4811f65c84abd3e3e22cc360e9"/>
 		<rom name="Asterix - Le defi de Cesar v3.9 (1995)(Pathe - Philips)(FR).cue" size="148" crc="ff2449c7" md5="9fd796ec0f2156b27e57875854ee3067"/>
 		-->
-		<description>Astérix - Le Défi de César v3.9 (France)</description>
+		<description>Astérix: Le Défi de César (France, v3.9)</description>
 		<year>1995</year>
 		<publisher>Pathe ~ Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -388,7 +388,7 @@ license:CC0-1.0
 		<rom name="Atlantis - The Last Resort v1.11 (1996)(Philips)(EU)[DVC].iso" size="598172400" crc="afa266cc" md5="b54e17fa8d07ada25ba9dd0c9216113f"/>
 		<rom name="Atlantis - The Last Resort v1.11 (1996)(Philips)(EU)[DVC].cue" size="146" crc="8706a12a" md5="569b273e9bf98bbd6835801970a3a9d3"/>
 		-->
-		<description>Atlantis - The Last Resort v1.11 (Europe)</description>
+		<description>Atlantis: The Last Resort (Europe, v1.11)</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -453,7 +453,7 @@ license:CC0-1.0
 		<rom name="Brain Dead 13 v1.07 (1997)(Philips)(EU)[DVC].iso" size="728964768" crc="32748463" md5="b82bd1a979e2709a5d189ae5bfa204bb"/>
 		<rom name="Brain Dead 13 v1.07 (1997)(Philips)(EU)[DVC].cue" size="133" crc="e2f6fe96" md5="fa7e8e2609f3a93c4db3889cdbc9fb9a"/>
 		-->
-		<description>Brain Dead 13 v1.07 (Europe)</description>
+		<description>Brain Dead 13 (Europe, v1.07)</description>
 		<year>1997</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -666,7 +666,7 @@ license:CC0-1.0
 		<rom name="Chaos Control v1.15 (1995)(Philips)(EU)[!][DVC].iso" size="487040400" crc="e1b0c5c0" md5="ff6996caf6f7c93f6fad489f5abca411"/>
 		<rom name="Chaos Control v1.15 (1995)(Philips)(EU)[!][DVC].cue" size="136" crc="e51449a5" md5="d469d1292e434615a3d1905338007d1b"/>
 		-->
-		<description>Chaos Control v1.15 (Europe)</description>
+		<description>Chaos Control (Europe, v1.15)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -683,7 +683,7 @@ license:CC0-1.0
 		<rom name="Chaos Control v1.15 (1995)(Philips)(FR)[DVC].iso" size="487395552" crc="a2741721" md5="b4fe9c8fa914e9ad614ec63af96356d3"/>
 		<rom name="Chaos Control v1.15 (1995)(Philips)(FR)[DVC].cue" size="133" crc="abfeb0f0" md5="13928d8b61ff8ae758f32d925e4db0a2"/>
 		-->
-		<description>Chaos Control v1.15 (France)</description>
+		<description>Chaos Control (France, v1.15)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -700,7 +700,7 @@ license:CC0-1.0
 		<rom name="Chaos Control v1.15 (1995)(Philips)(DE)[!][DVC].iso" size="487393200" crc="98e92db4" md5="781ac8d6b9e3615aef9cef6bca6bda5b"/>
 		<rom name="Chaos Control v1.15 (1995)(Philips)(DE)[!][DVC].cue" size="136" crc="767c0ba6" md5="8f48330dac70ff350654220e0121dcf2"/>
 		-->
-		<description>Chaos Control v1.15 (Germany)</description>
+		<description>Chaos Control (Germany, v1.15)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -717,7 +717,7 @@ license:CC0-1.0
 		<rom name="Chaos Control v1.15 (1995)(Philips)(US)[DVC].iso" size="487393200" crc="a0595d1c" md5="5996ddf519de7c5d4d9b0bf06ab70d5e"/>
 		<rom name="Chaos Control v1.15 (1995)(Philips)(US)[DVC].cue" size="133" crc="6c9561ab" md5="32c1cb1f1b00c9ac7de26cc65061b58b"/>
 		-->
-		<description>Chaos Control v1.15 (USA)</description>
+		<description>Chaos Control (USA, v1.15)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -1026,7 +1026,7 @@ license:CC0-1.0
 		<rom name="Earth Command - The Future of Our World is in Your Hands v1.05 (1994)(Philips)(EU)[!].iso" size="751863840" crc="4f9539d0" md5="1dcc309d90ac90daa3a2ea27862e96f0"/>
 		<rom name="Earth Command - The Future of Our World is in Your Hands v1.05 (1994)(Philips)(EU)[!].cue" size="174" crc="9d5929b7" md5="8a7e8878c53e2429ea64e1a7e0e03311"/>
 		-->
-		<description>Earth Command - The Future of Our World is in Your Hands v1.05 (Europe)</description>
+		<description>Earth Command: The Future of Our World is in Your Hands (Europe, v1.05)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -1042,7 +1042,7 @@ license:CC0-1.0
 		<rom name="Earth Command - De toekomst van de wereld ligt in jouw handen v1.05 (1994)(Philips)(NL)[!].iso" size="766822560" crc="f8c86de7" md5="5c76c6fc3b85b3394c8a8fa8c0d36e74"/>
 		<rom name="Earth Command - De toekomst van de wereld ligt in jouw handen v1.05 (1994)(Philips)(NL)[!].cue" size="179" crc="ec6782a0" md5="50c99c6f62d3efba1ae3548ea816f7d6"/>
 		-->
-		<description>Earth Command - De Toekomst van de Wereld Ligt in Jouw Handen v1.05 (Netherlands)</description>
+		<description>Earth Command: De Toekomst van de Wereld Ligt in Jouw Handen (Netherlands, v1.05)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -1058,7 +1058,7 @@ license:CC0-1.0
 		<rom name="Earth Command - Die zukunft unserer welt liegt in ihrer hand v1.05 (1994)(Philips)(DE)[!].iso" size="754968480" crc="14805d05" md5="7affdc60d6356ff8e79a2c35b7ef1c39"/>
 		<rom name="Earth Command - Die zukunft unserer welt liegt in ihrer hand v1.05 (1994)(Philips)(DE)[!].cue" size="178" crc="3886de6e" md5="c5f85b0259c9639782cd4be3dd556e3f"/>
 		-->
-		<description>Earth Command - Die Zukunft Unserer welt Liegt in Ihrer Hand v1.05 (Germany)</description>
+		<description>Earth Command: Die Zukunft Unserer welt Liegt in Ihrer Hand (Germany, v1.05)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -1074,7 +1074,7 @@ license:CC0-1.0
 		<rom name="Earth Command - The Future of Our World is in Your Hands v1.05 (1994)(Philips)(US).iso" size="752216640" crc="3bccae1f" md5="2c481f0ffca3cbb2a9ea35acdcb9f749"/>
 		<rom name="Earth Command - The Future of Our World is in Your Hands v1.05 (1994)(Philips)(US).cue" size="171" crc="11130987" md5="2beb2215d042e092f058086b56862613"/>
 		-->
-		<description>Earth Command - The Future of Our World is in Your Hands v1.05 (USA)</description>
+		<description>Earth Command: The Future of Our World is in Your Hands (USA, v1.05)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -1090,7 +1090,8 @@ license:CC0-1.0
 		<rom name="Earth Command v1.05 (1994)(Philips)(FR).iso" size="754625088" crc="cc48b0f4" md5="088dea33c94c0b72c99deec85dfeefef"/>
 		<rom name="Earth Command v1.05 (1994)(Philips)(FR).cue" size="128" crc="978581b8" md5="7fa2a026bda675e34145a801e4dfe626"/>
 		-->
-		<description>Earth Command v1.05 (France)</description>
+		<!-- TODO: subtitle -->
+		<description>Earth Command (France, v1.05)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -1397,7 +1398,7 @@ license:CC0-1.0
 		<rom name="International Tennis Open v2.01 (1993)(Pathe - Philips)(ES)(en-es).iso" size="369381600" crc="f9719857" md5="7fc5240019e610a12dbd3f1d65e44b33"/>
 		<rom name="International Tennis Open v2.01 (1993)(Pathe - Philips)(ES)(en-es).cue" size="155" crc="d819858d" md5="f6dd037d330ced629a640aa49afb33d4"/>
 		-->
-		<description>International Tennis Open v2.01 (Spain)</description>
+		<description>International Tennis Open (Spain, v2.01)</description>
 		<year>1993</year>
 		<publisher>Pathe ~ Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -1413,7 +1414,7 @@ license:CC0-1.0
 		<rom name="International Tennis Open v3.01 (1993)(Pathe - Philips)(DE)(en-de)[!].iso" size="354034800" crc="506b751a" md5="bfaa49c875b845c9fb83cb28e4867bcf"/>
 		<rom name="International Tennis Open v3.01 (1993)(Pathe - Philips)(DE)(en-de)[!].cue" size="158" crc="b1f8c342" md5="e3a4d966e430b8102694aabcd873b815"/>
 		-->
-		<description>International Tennis Open v3.01 (Germany)</description>
+		<description>International Tennis Open (Germany, v3.01)</description>
 		<year>1993</year>
 		<publisher>Pathe ~ Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -1429,7 +1430,7 @@ license:CC0-1.0
 		<rom name="International Tennis Open v3.01 (1994)(Pathe - Philips)(DE)(en-de)[2 players].iso" size="361620000" crc="1252d3bf" md5="d6445067269524d58cf105733294ceac"/>
 		<rom name="International Tennis Open v3.01 (1994)(Pathe - Philips)(DE)(en-de)[2 players].cue" size="166" crc="4cf78f91" md5="aa0dfa77c893d85e95fe62f02e327393"/>
 		-->
-		<description>International Tennis Open v3.01 (Germany)[2 players]</description>
+		<description>International Tennis Open (Germany, v3.01, 2 players)</description>
 		<year>1994</year>
 		<publisher>Pathe ~ Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -1445,7 +1446,7 @@ license:CC0-1.0
 		<rom name="International Tennis Open v1.01 (1994)(Pathe - Philips)(IT)(en-it)[2 players].iso" size="347331600" crc="c2aaa0bd" md5="c34615d2168fdcc3047cdcff5782aa24"/>
 		<rom name="International Tennis Open v1.01 (1994)(Pathe - Philips)(IT)(en-it)[2 players].cue" size="166" crc="373239e5" md5="f4f36457cb15c43f7abaef7ce197e018"/>
 		-->
-		<description>International Tennis Open v1.01 (Italy)[2 players]</description>
+		<description>International Tennis Open (Italy, v1.01, 2 players)</description>
 		<year>1994</year>
 		<publisher>Pathe ~ Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -1461,7 +1462,7 @@ license:CC0-1.0
 		<rom name="International Tennis Open v3.03 (1994)(Pathe - Philips)(EU)(en-fr)[!][2 players].iso" size="375202800" crc="3a92072b" md5="b2af7886107582bc410fca16640820e2"/>
 		<rom name="International Tennis Open v3.03 (1994)(Pathe - Philips)(EU)(en-fr)[!][2 players].cue" size="169" crc="f3c91081" md5="2aa0c852635bde74c23f395fe9fb0e16"/>
 		-->
-		<description>International Tennis Open v3.03 (Europe)[2 players]</description>
+		<description>International Tennis Open (Europe, v3.03, 2 players)</description>
 		<year>1994</year>
 		<publisher>Pathe ~ Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -1477,7 +1478,7 @@ license:CC0-1.0
 		<rom name="International Tennis Open v3.03 (1994)(Philips)(US)(en-fr)[!][2 players].iso" size="375555600" crc="e4d7b648" md5="0fede7e0d126849305f00769f0e0611e"/>
 		<rom name="International Tennis Open v3.03 (1994)(Philips)(US)(en-fr)[!][2 players].cue" size="161" crc="7cd5fe58" md5="89a41a875cc784f0cf2e27fddab7be2f"/>
 		-->
-		<description>International Tennis Open v3.03 (USA)[2 players]</description>
+		<description>International Tennis Open (USA, v3.03, 2 players)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -1557,7 +1558,7 @@ license:CC0-1.0
 		<rom name="Kether v3.11 (1994)(Philips)(EU)(en-fr)[!].iso" size="383140800" crc="91b489ef" md5="703af6cf94291517f0142c67423e709d"/>
 		<rom name="Kether v3.11 (1994)(Philips)(EU)(en-fr)[!].cue" size="131" crc="5b880612" md5="9b2ed88fe396a81eecbf8c21448d1d50"/>
 		-->
-		<description>Kether v3.11 (Europe)</description>
+		<description>Kether (Europe, v3.11)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -1573,7 +1574,7 @@ license:CC0-1.0
 		<rom name="Kether v3.09 (1993)(Philips)(EU)(en-fr).iso" size="383140800" crc="71ea2cfd" md5="8c194c11187d4af8a1f93ca043b03569"/>
 		<rom name="Kether v3.09 (1993)(Philips)(EU)(en-fr).cue" size="128" crc="abd8d1f7" md5="187cd92e21589b09e7bb4b3bb6b940f7"/>
 		-->
-		<description>Kether v3.09 (Europe)</description>
+		<description>Kether (Europe, v3.09)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -1589,7 +1590,7 @@ license:CC0-1.0
 		<rom name="Kether v3.09 (1993)(Philips)(EU)(en-fr)[a].iso" size="383140800" crc="8898aa27" md5="1da7ade02f9e043b6ea342a19353b3e7"/>
 		<rom name="Kether v3.09 (1993)(Philips)(EU)(en-fr)[a].cue" size="131" crc="497ee0ce" md5="ec7fa47d4f1edbeb82f2dc40f3e5ef45"/>
 		-->
-		<description>Kether v3.09 (Europe, alt)</description>
+		<description>Kether (Europe, v3.09 alt)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -1605,7 +1606,7 @@ license:CC0-1.0
 		<rom name="Kether v3.12 (1994)(Philips)(NL)(en-nl).iso" size="390020400" crc="ff4616fb" md5="a85eebe8c2d5d942323c8ac03ca0b4cb"/>
 		<rom name="Kether v3.12 (1994)(Philips)(NL)(en-nl).cue" size="128" crc="5e60a729" md5="c2b000e6e34a94399de74f1d853a5bfb"/>
 		-->
-		<description>Kether v3.12 (Netherlands)</description>
+		<description>Kether (Netherlands, v3.12)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -1621,7 +1622,7 @@ license:CC0-1.0
 		<rom name="Kether v3.08 (1993)(Philips)(DE)(en-de).iso" size="388609200" crc="96296ef4" md5="efec1072e1a891083d0145837c14ca99"/>
 		<rom name="Kether v3.08 (1993)(Philips)(DE)(en-de).cue" size="128" crc="20d9e4b7" md5="4dd362f25173509f45efb6162a9e3701"/>
 		-->
-		<description>Kether v3.08 (Germany)</description>
+		<description>Kether (Germany, v3.08)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -1637,7 +1638,7 @@ license:CC0-1.0
 		<rom name="Kether v3.11 (1994)(Philips)(DE)(en-de)[!].iso" size="388609200" crc="3694d45f" md5="1840d0d1b49c7be020ed1574326915cf"/>
 		<rom name="Kether v3.11 (1994)(Philips)(DE)(en-de)[!].cue" size="131" crc="3e7d12e3" md5="de750ca42b18cf20d313b847db54ec47"/>
 		-->
-		<description>Kether v3.11 (Germany)</description>
+		<description>Kether (Germany, v3.11)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -1653,7 +1654,7 @@ license:CC0-1.0
 		<rom name="Kether v3.11 (1994)(Philips)(US)(en-fr).iso" size="383493600" crc="0902eae7" md5="139ffcced2b51d6e481348a79d3988af"/>
 		<rom name="Kether v3.11 (1994)(Philips)(US)(en-fr).cue" size="128" crc="f8623602" md5="0f0cfbfdd5aa2a1659660f938c902044"/>
 		-->
-		<description>Kether v3.11 (USA)</description>
+		<description>Kether (USA, v3.11)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -1802,7 +1803,7 @@ license:CC0-1.0
 		<rom name="Lingo v1.07 (1995)(Philips)(NL)[!].iso" size="142178400" crc="ebe953aa" md5="745e523cfac66c4a072e5ae67b7d15a7"/>
 		<rom name="Lingo v1.07 (1995)(Philips)(NL)[!].cue" size="123" crc="ba7e8f63" md5="7b06eee6a1ad004470dd1990955c3704"/>
 		-->
-		<description>Lingo v1.07 (Netherlands)</description>
+		<description>Lingo (Netherlands, v1.07)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -2120,7 +2121,7 @@ license:CC0-1.0
 		<rom name="Making the Grade v0.90 (1994)(Philips)(EU)[pre-release][DVC].iso" size="746701200" crc="9e05bb27" md5="f9fd6acc2dbf2cfbf1d7c39660a855f7"/>
 		<rom name="Making the Grade v0.90 (1994)(Philips)(EU)[pre-release][DVC].cue" size="149" crc="3854464d" md5="4593a9ebf00835c59c4b71b464c06aa0"/>
 		-->
-		<description>Making the Grade v0.90 (Europe, pre-release)</description>
+		<description>Making the Grade (Europe, v0.90 pre-release)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -2182,14 +2183,16 @@ license:CC0-1.0
 	</software>
 
 	<software name="mlabyrnt" supported="no">
+		<!-- TODO: what TOSEC smoke for crediting Pack-In-Video here? -->
+		<!-- https://www.theworldofcdi.com/cd-i_encyclopedia/master-labyrinth/ -->
 		<!--
 		Origin: TOSEC
 		<rom name="Master Labyrinth v1.06 (1995)(Pack-In-Video)(EU)[DVC].iso" size="686019600" crc="ac7a7b27" md5="7d331f64c9c0dfa70c1b32e0a24d4c8e"/>
 		<rom name="Master Labyrinth v1.06 (1995)(Pack-In-Video)(EU)[DVC].cue" size="142" crc="74737f6f" md5="8a89de65ceebe5fb12286c46ff138df0"/>
 		-->
-		<description>Master Labyrinth v1.06 (Europe)</description>
+		<description>Master Labyrinth (Europe, v1.06)</description>
 		<year>1995</year>
-		<publisher>Pack-In Video</publisher>
+		<publisher>Philips Interactive Media</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2204,7 +2207,7 @@ license:CC0-1.0
 		<rom name="Mega Maze v1.06 (1994)(Philips)(EU)[!].iso" size="89775840" crc="39661973" md5="4aee20d05830458603939660121e5835"/>
 		<rom name="Mega Maze v1.06 (1994)(Philips)(EU)[!].cue" size="127" crc="b796b39d" md5="9f84388c710935dd685173b63082f454"/>
 		-->
-		<description>Mega Maze v1.06 (Europe)</description>
+		<description>Mega Maze (Europe, v1.06)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -2220,7 +2223,7 @@ license:CC0-1.0
 		<rom name="Mega Maze v1.06 (1994)(Philips)(US).iso" size="90128640" crc="7e859367" md5="a737066da4b4afacb3f8e1630d97f5ff"/>
 		<rom name="Mega Maze v1.06 (1994)(Philips)(US).cue" size="124" crc="ba27089e" md5="8204c6eb3a11712ddbc3df7edcef5658"/>
 		-->
-		<description>Mega Maze v1.06 (USA)</description>
+		<description>Mega Maze (USA, v1.06)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -2236,7 +2239,7 @@ license:CC0-1.0
 		<rom name="Merlin's Apprentice v1.1 (1995)(Philips)(EU)[!].iso" size="309546720" crc="1faab5b3" md5="45444f2b7a2edc348691a5484b6fb1c2"/>
 		<rom name="Merlin's Apprentice v1.1 (1995)(Philips)(EU)[!].cue" size="136" crc="68cb6544" md5="b62e302e25cdf86566095684abcd5626"/>
 		-->
-		<description>Merlin's Apprentice v1.1 (Europe)</description>
+		<description>Merlin's Apprentice (Europe, v1.1)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -2252,7 +2255,7 @@ license:CC0-1.0
 		<rom name="Merlin's Apprentice v1.2 (1995)(Philips)(US).iso" size="309899520" crc="2aaf7924" md5="7b59e7addb5f1710d5d510561bc26406"/>
 		<rom name="Merlin's Apprentice v1.2 (1995)(Philips)(US).cue" size="133" crc="cb6f9cd3" md5="227301b2d30ffbc2bb04376b84e6697b"/>
 		-->
-		<description>Merlin's Apprentice v1.2 (USA)</description>
+		<description>Merlin's Apprentice (USA, v1.2)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -2694,7 +2697,7 @@ license:CC0-1.0
 		<rom name="Scotland Yard - Interactive v1.03 (1994)(Philips)(EU).iso" size="545781600" crc="1ee1a0aa" md5="738d7b3867e844baf51c679017fa5f50"/>
 		<rom name="Scotland Yard - Interactive v1.03 (1994)(Philips)(EU).cue" size="142" crc="57fb2ad8" md5="b25b49d2dee8f2d3e874569bbdabcc53"/>
 		-->
-		<description>Scotland Yard - Interactive v1.03 (Europe)</description>
+		<description>Scotland Yard: Interactive (Europe, v1.03)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -2710,7 +2713,7 @@ license:CC0-1.0
 		<rom name="Scotland Yard - Interactif v1.04 (1994)(Philips)(FR).iso" size="552308400" crc="c7fe1a0f" md5="fc390a08ae6440dbf6d659976427af31"/>
 		<rom name="Scotland Yard - Interactif v1.04 (1994)(Philips)(FR).cue" size="141" crc="cf03df57" md5="d974bb951295ad0c7802b1f57faab5f3"/>
 		-->
-		<description>Scotland Yard - Interactif v1.04 (France)</description>
+		<description>Scotland Yard: Interactif (France, v1.04)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -2726,7 +2729,7 @@ license:CC0-1.0
 		<rom name="Scotland Yard - Interactive v1.09 (1993)(Philips)(DE)[!].iso" size="607698000" crc="637fb9ac" md5="e0c5d4c573c8fe7aacfd534f9bd15665"/>
 		<rom name="Scotland Yard - Interactive v1.09 (1993)(Philips)(DE)[!].cue" size="145" crc="e0f14bb8" md5="acabb55d610aced9736459332453d73d"/>
 		-->
-		<description>Scotland Yard - Interactive v1.09 (Germany)</description>
+		<description>Scotland Yard: Interactive (Germany, v1.09)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -2742,7 +2745,7 @@ license:CC0-1.0
 		<rom name="Secret Mission v1.03 (1996)(Philips)(EU)[!].iso" size="636274800" crc="e3b34073" md5="d2a6052fbc21584979972e990e2286e0"/>
 		<rom name="Secret Mission v1.03 (1996)(Philips)(EU)[!].cue" size="132" crc="3bf76e26" md5="cf9a90fa7c46469bff55c4fb824c8749"/>
 		-->
-		<description>Secret Mission v1.03 (Europe)</description>
+		<description>Secret Mission (Europe, v1.03)</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -2758,7 +2761,7 @@ license:CC0-1.0
 		<rom name="Secret Mission v1.03 (1996)(Philips)(DE).iso" size="630630000" crc="7ab16741" md5="7d22f5cef76fdecdf086188b04c9f898"/>
 		<rom name="Secret Mission v1.03 (1996)(Philips)(DE).cue" size="129" crc="459e0a85" md5="d654d95b87e2b0812715d50931e325f7"/>
 		-->
-		<description>Secret Mission v1.03 (Germany)</description>
+		<description>Secret Mission (Germany, v1.03)</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -2774,7 +2777,7 @@ license:CC0-1.0
 		<rom name="Secret Mission v1.03 (1996)(Philips)(NL).iso" size="636274800" crc="459823cf" md5="d7e9006cbccd4250384a177d7b022716"/>
 		<rom name="Secret Mission v1.03 (1996)(Philips)(NL).cue" size="129" crc="cd542a44" md5="8cb7fd33797733ee40202b8e10f9a8ee"/>
 		-->
-		<description>Secret Mission v1.03 (Netherlands)</description>
+		<description>Secret Mission (Netherlands, v1.03)</description>
 		<year>1996</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -3204,7 +3207,7 @@ license:CC0-1.0
 		<rom name="Voetbal v1.04 (1994)(Philips)(NL)[DVC].iso" size="766458000" crc="e26ad47f" md5="f4cac8185326c248e510c3bd65496a55"/>
 		<rom name="Voetbal v1.04 (1994)(Philips)(NL)[DVC].cue" size="127" crc="65c7a8fb" md5="0efca0738e2ab63487ec23bb560701ef"/>
 		-->
-		<description>Voetbal v1.04 (Netherlands)</description>
+		<description>Voetbal (Netherlands, v1.04)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -3668,7 +3671,7 @@ license:CC0-1.0
 		<rom name="A Child is Born v1.0 (1993)(Philips)(EU).iso" size="615400800" crc="e0bc8efa" md5="cfa6536231f449241ff2987455f85b6a"/>
 		<rom name="A Child is Born v1.0 (1993)(Philips)(EU).cue" size="129" crc="f4123da4" md5="8ec9aaf8530efbd4503596e5459ca1a0"/>
 		-->
-		<description>A Child is Born v1.0 (Europe)</description>
+		<description>A Child is Born (Europe, v1.0)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -3684,7 +3687,7 @@ license:CC0-1.0
 		<rom name="A Child is Born v1.0 (1994)(Philips)(US).iso" size="615753600" crc="321b3d44" md5="86f59239e31de4091eac4afb6c181c83"/>
 		<rom name="A Child is Born v1.0 (1994)(Philips)(US).cue" size="129" crc="65c29211" md5="d140a192f61b1dddd352dc696af055d8"/>
 		-->
-		<description>A Child is Born v1.0 (USA)</description>
+		<description>A Child is Born (USA, v1.0)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -5984,30 +5987,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="flowers">
-		<!--
-		Origin: TOSEC
-		<rom name="Flowers of Robert Mapplethorpe, The (1992)(Philips)(US)(Track 1 of 2)[!][Photo CD].iso" size="511030800" crc="fbf3915f" md5="22ae24fd51d368f534b3963aed4a8350"/>
-		<rom name="Flowers of Robert Mapplethorpe, The (1992)(Philips)(US)(Track 2 of 2)[!][Photo CD].wav" size="218030444" crc="73b4776b" md5="ac291bb92f9033e9a90cb8572de02a6c"/>
-		<rom name="Flowers of Robert Mapplethorpe, The (1992)(Philips)(US)[!][Photo CD].cue" size="333" crc="5d4e0813" md5="7d75fbaa2960289a5f4a17e591db0b76"/>
-		-->
-		<description>The Flowers of Robert Mapplethorpe (USA)[Photo CD]</description>
-		<year>1992</year>
-		<publisher>Philips</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="flowers of robert mapplethorpe, the (1992)(philips)(us)[photo cd]" sha1="e66a82313a0894eff7d93803febb645c7fd67f07"/>
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="football" supported="no">
 		<!--
 		Origin: TOSEC
 		<rom name="Football - l'histoire, les regles, les vedettes, le jeu de penalties v1.04 (1994)(Philips)(FR)[!][DVC].iso" size="764517600" crc="1895810b" md5="98d026bb71ab819b96d20c50af14bac0"/>
 		<rom name="Football - l'histoire, les regles, les vedettes, le jeu de penalties v1.04 (1994)(Philips)(FR)[!][DVC].cue" size="191" crc="7d6b44cd" md5="b0980f1f51f71cdc28745ce867c85184"/>
 		-->
-		<description>Football - L'histoire, les regles, les vedettes, le jeu de penalties v1.04 (France)</description>
+		<description>Football: L'histoire, les regles, les vedettes, le jeu de penalties (France, v1.04)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -6138,7 +6124,7 @@ license:CC0-1.0
 		<rom name="Gnomes v2.10 (1995)(Philips)(US)[!].iso" size="733123104" crc="ecd412a2" md5="54c3bbf4fcf97cdba13b4951484f4489"/>
 		<rom name="Gnomes v2.10 (1995)(Philips)(US)[!].cue" size="124" crc="ac6d915c" md5="a8dfa6028c5498e4e9b5ce78322249a7"/>
 		-->
-		<description>Gnomes v2.10 (USA)</description>
+		<description>Gnomes (USA, v2.10)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -6722,23 +6708,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="howphoto">
-		<!--
-		Origin: TOSEC
-		<rom name="How to Photograph Nature (1993)(Philips)(US)(Track 1 of 2)[!][CD-i-Photo CD].iso" size="490392000" crc="e3c64107" md5="c9b23be5e796b517f29b77a358f7deaf"/>
-		<rom name="How to Photograph Nature (1993)(Philips)(US)(Track 2 of 2)[!][CD-i-Photo CD].wav" size="230202044" crc="c92dbd5b" md5="d816d1ef2c27d4f10be7e0ba7b8f274e"/>
-		<rom name="How to Photograph Nature (1993)(Philips)(US)[!][CD-i-Photo CD].cue" size="321" crc="7a10ddfa" md5="59c7d8e28bb242bf0c0c6a33491b03fc"/>
-		-->
-		<description>How to Photograph Nature (USA)[CD-i-Photo CD]</description>
-		<year>1993</year>
-		<publisher>Philips</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="how to photograph nature (1993)(philips)(us)[cd-i-photo cd]" sha1="5a0338596cec6feef16283ba7c3aa30066d48a77"/>
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="ikmiklet" supported="no">
 		<!--
 		Origin: TOSEC
@@ -6782,7 +6751,7 @@ license:CC0-1.0
 		<rom name="Interactive Math - Decimals v1.0 (1994)(Gulliver Ritchie Associates)(US)[DVC].iso" size="676498704" crc="6cbc3692" md5="fa424cc6500cafb222ab87ca47c7285e"/>
 		<rom name="Interactive Math - Decimals v1.0 (1994)(Gulliver Ritchie Associates)(US)[DVC].cue" size="166" crc="e742cc7d" md5="be0f4ef9b69ac964070d8aec12f72c91"/>
 		-->
-		<description>Interactive Math - Decimals v1.0 (USA)</description>
+		<description>Interactive Math: Decimals (USA, v1.0)</description>
 		<year>1994</year>
 		<publisher>Gulliver Ritchie Associates</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -6799,7 +6768,7 @@ license:CC0-1.0
 		<rom name="Interactive Math - Percentages v1.0 (1994)(Gulliver Ritchie Associates)(US).iso" size="665385504" crc="1801d8ae" md5="402192767b8f37d3ffb50fa5b59c6eb9"/>
 		<rom name="Interactive Math - Percentages v1.0 (1994)(Gulliver Ritchie Associates)(US).cue" size="164" crc="31bab77b" md5="524287a34ea12b6739c5f55243131ab0"/>
 		-->
-		<description>Interactive Math - Percentages v1.0 (USA)</description>
+		<description>Interactive Math: Percentages (USA, v1.0)</description>
 		<year>1994</year>
 		<publisher>Gulliver Ritchie Associates</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -6951,7 +6920,7 @@ license:CC0-1.0
 		<rom name="Joy of Sex, The v3.01 (1994)(Philips)(US)[DVC].iso" size="735411600" crc="e323ffb3" md5="ca7148ec8ed8d55b724e9e248afc81ea"/>
 		<rom name="Joy of Sex, The v3.01 (1994)(Philips)(US)[DVC].cue" size="135" crc="e9814a4d" md5="b65b45f80c2cc7a62ed2420d62bb6671"/>
 		-->
-		<description>The Joy of Sex v3.01 (USA)</description>
+		<description>The Joy of Sex (USA, v3.01)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -6968,7 +6937,7 @@ license:CC0-1.0
 		<rom name="Joy of Sex, The v3.03 (1993)(Philips)(EU)[!][DVC].iso" size="725886000" crc="fbcd7f45" md5="8e7ccf5080a4a46652c22594f05d009d"/>
 		<rom name="Joy of Sex, The v3.03 (1993)(Philips)(EU)[!][DVC].cue" size="138" crc="20b33050" md5="a169eee09d8c458b50e975ada2fcf909"/>
 		-->
-		<description>The Joy of Sex v3.03 (Europe)</description>
+		<description>The Joy of Sex (Europe, v3.03)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -7186,7 +7155,7 @@ license:CC0-1.0
 		<rom name="Kiss v1.07 (1994)(Philips)(EU).iso" size="760813200" crc="309e761e" md5="a45106a8afcfd375b567dc2e75bb04d3"/>
 		<rom name="Kiss v1.07 (1994)(Philips)(EU).cue" size="119" crc="cc0c51df" md5="9407afe4157081461ea9f22aac14bddc"/>
 		-->
-		<description>Kiss v1.07 (Europe)</description>
+		<description>Kiss (Europe, v1.07)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -8167,7 +8136,7 @@ license:CC0-1.0
 		<rom name="Ontdek het onbekende Nederland - Nederland-Waterland v1.0 (1995)(Philips)(NL)[!][DVC].iso" size="782326944" crc="4a462f44" md5="135cc121785c8dbfdfb5754cd499d397"/>
 		<rom name="Ontdek het onbekende Nederland - Nederland-Waterland v1.0 (1995)(Philips)(NL)[!][DVC].cue" size="174" crc="fecee438" md5="aa4f126db78efa41823fc209fa30c9ad"/>
 		-->
-		<description>Ontdek het onbekende Nederland - Nederland-Waterland v1.0 (Netherlands)</description>
+		<description>Ontdek het onbekende Nederland: Nederland-Waterland (Netherlands, v1.0)</description>
 		<year>1995</year>
 		<publisher>Philips</publisher>
 		<sharedfeat name="compatibility" value="DVC" />
@@ -8248,7 +8217,7 @@ license:CC0-1.0
 		<rom name="Paint School I v1.0 (1991)(Philips)(US).iso" size="179351760" crc="65e33f31" md5="225e3c02df5027b6c99c20415a8c3902"/>
 		<rom name="Paint School I v1.0 (1991)(Philips)(US).cue" size="128" crc="88852fd1" md5="af3e3a93f7b5f8df797d224181ba808f"/>
 		-->
-		<description>Paint School I v1.0 (USA)</description>
+		<description>Paint School I (USA, v1.0)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -8264,7 +8233,7 @@ license:CC0-1.0
 		<rom name="Paint School II v1.0 (1991)(Philips)(US).iso" size="162640800" crc="9540272e" md5="6f4d79bee313b6a3f8cb4bee0e549be2"/>
 		<rom name="Paint School II v1.0 (1991)(Philips)(US).cue" size="129" crc="43cef9a1" md5="3a2b293de38930a3596b239822064162"/>
 		-->
-		<description>Paint School II v1.0 (USA)</description>
+		<description>Paint School II (USA, v1.0)</description>
 		<year>1991</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -8403,38 +8372,6 @@ license:CC0-1.0
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="philips media medische encyclopedie (1996)(philips)(nl)[dvc]" sha1="015e23599f7c83dcec262d49f269cecca5657c17"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="photocddo" cloneof="photocdd">
-		<!--
-		Origin: TOSEC
-		<rom name="Photo CD Demo Disc v3.0 (1993)(Philips)(EU)[1993-03].iso" size="463108800" crc="58fce69a" md5="c5cb66dff16c1ec69bc118a394eab777"/>
-		<rom name="Photo CD Demo Disc v3.0 (1993)(Philips)(EU)[1993-03].cue" size="141" crc="5f1b92d2" md5="9f82863685d80426ce9e0eb37fe4d703"/>
-		-->
-		<description>Photo CD Demo Disc v3.0 (Europe)[1993-03]</description>
-		<year>1993</year>
-		<publisher>Philips</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="photo cd demo disc v3.0 (1993)(philips)(eu)[1993-03]" sha1="bd46faaebe1725eb345de81dd912187b74b4dea8"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="photocdd">
-		<!--
-		Origin: TOSEC
-		<rom name="Photo CD Demo Disc v3.2 (1995)(Philips)(EU)[1995-11].iso" size="297281040" crc="4090c3ad" md5="ee6557e858a6b789bb622c34e429c54e"/>
-		<rom name="Photo CD Demo Disc v3.2 (1995)(Philips)(EU)[1995-11].cue" size="141" crc="16767025" md5="e0be2e958b118049ec1d582e24f4332c"/>
-		-->
-		<description>Photo CD Demo Disc v3.2 (Europe)[1995-11]</description>
-		<year>1995</year>
-		<publisher>Philips</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="photo cd demo disc v3.2 (1995)(philips)(eu)[1995-11]" sha1="d32fb0741e06f247c6f2b7e49c66ea284a0d5caf"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9291,22 +9228,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="schonste">
-		<!--
-		Origin: TOSEC
-		<rom name="Schonsten Hotels der Welt, Die - von Burba Holiday (1992)(Philips)(DE)[!][Photo CD].iso" size="117835200" crc="be3eabc9" md5="e1bea9ed5369040db3e669409ce362da"/>
-		<rom name="Schonsten Hotels der Welt, Die - von Burba Holiday (1992)(Philips)(DE)[!][Photo CD].cue" size="172" crc="cbdde2d5" md5="e0029a07753cb512891111325f0c4536"/>
-		-->
-		<description>Die Schonsten Hotels der Welt - von Burba Holiday (Germany)[Photo CD]</description>
-		<year>1992</year>
-		<publisher>Philips</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="schonsten hotels der welt, die - von burba holiday (1992)(philips)(de)[photo cd]" sha1="f233fa4abf5b60a363f1e664a3f5688193e05a78"/>
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="tombaski" supported="no">
 		<!--
 		Origin: TOSEC
@@ -9382,7 +9303,7 @@ license:CC0-1.0
 		<rom name="Shipwreck v3.03 (1993)(Philips)(EU)[!].iso" size="717595200" crc="8d6f5672" md5="a88e948b71a5576566b594870ae2ef65"/>
 		<rom name="Shipwreck v3.03 (1993)(Philips)(EU)[!].cue" size="127" crc="ea2c73d0" md5="ce5486372c3bbf9bc3de784366b778d3"/>
 		-->
-		<description>Shipwreck v3.03 (Europe)</description>
+		<description>Shipwreck (Europe, v3.03)</description>
 		<year>1993</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -9446,7 +9367,7 @@ license:CC0-1.0
 		<rom name="Soundtrap v3.04 (1994)(Philips)(EU).iso" size="762930000" crc="714caf9e" md5="8df6ae12be8a6d3c41b13141b190ebf8"/>
 		<rom name="Soundtrap v3.04 (1994)(Philips)(EU).cue" size="124" crc="d45b1cdd" md5="5ef1f026f24ba1839fbcea8f0cc45273"/>
 		-->
-		<description>Soundtrap v3.04 (Europe)</description>
+		<description>Soundtrap (Europe, v3.04)</description>
 		<year>1994</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -9607,7 +9528,7 @@ license:CC0-1.0
 		<rom name="Story Machine - Magic Tales v1.0 (1992)(Philips)(US)[!].iso" size="203988960" crc="f89203d3" md5="b56b439a0ddb8c5e658d16e10f78b128"/>
 		<rom name="Story Machine - Magic Tales v1.0 (1992)(Philips)(US)[!].cue" size="144" crc="33dc34df" md5="f82cf4ded367fe0a9f6b59771eb1c8e1"/>
 		-->
-		<description>Story Machine - Magic Tales v1.0 (USA)</description>
+		<description>Story Machine: Magic Tales (USA, v1.0)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -9623,7 +9544,7 @@ license:CC0-1.0
 		<rom name="Story Machine - Marchenzauber v1.0 (1992)(Philips)(DE).iso" size="205576560" crc="c6e1a977" md5="dff453e2d4ab9fb246a2fb3ec4819d57"/>
 		<rom name="Story Machine - Marchenzauber v1.0 (1992)(Philips)(DE).cue" size="143" crc="7ce763c1" md5="2c25494b7d692c20eb922fb56468c4f3"/>
 		-->
-		<description>Story Machine - Marchenzauber v1.0 (Germany)</description>
+		<description>Story Machine: Marchenzauber (Germany, v1.0)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -9639,7 +9560,7 @@ license:CC0-1.0
 		<rom name="Story Machine - Star Dreams v1.0 (1992)(Philips)(US).iso" size="208363680" crc="c48c8a86" md5="2abd4a02e353377092cff478f27c68be"/>
 		<rom name="Story Machine - Star Dreams v1.0 (1992)(Philips)(US).cue" size="141" crc="3531179b" md5="ad16cea72ee6eb85067145bf70f55bd5"/>
 		-->
-		<description>Story Machine - Star Dreams v1.0 (USA)</description>
+		<description>Story Machine: Star Dreams (USA, v1.0)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -9655,7 +9576,7 @@ license:CC0-1.0
 		<rom name="Story Maschine - Galaxis v1.0 (1992)(Philips)(DE).iso" size="206105760" crc="9b64da9a" md5="c7f7bce5e9aa59907de2466e13b46b24"/>
 		<rom name="Story Maschine - Galaxis v1.0 (1992)(Philips)(DE).cue" size="138" crc="9269bb84" md5="f36be205134b32d47b9ec18af44932c8"/>
 		-->
-		<description>Story Maschine - Galaxis v1.0 (Germany)</description>
+		<description>Story Maschine: Galaxis (Germany, v1.0)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -10106,7 +10027,7 @@ license:CC0-1.0
 		<rom name="Tom le Maximagier v1.0 (1992)(Philips)(FR)(M3)[8120021 50262 231 03].iso" size="189277200" crc="aed2f62e" md5="298db6eb4b0c8d6fde9fdb254fee3e81"/>
 		<rom name="Tom le Maximagier v1.0 (1992)(Philips)(FR)(M3)[8120021 50262 231 03].cue" size="157" crc="44020e16" md5="6ec17ed93ee4d4e3897b7b5c652c7acd"/>
 		-->
-		<description>Tom le Maximagier v1.0 (France)</description>
+		<description>Tom le Maximagier (France, v1.0)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -10123,7 +10044,7 @@ license:CC0-1.0
 		<rom name="Tom le Maximagier v1.0 (1992)(Philips)(FR)(M3)[8120021V203 50262231 05].iso" size="189100800" crc="51eca1c0" md5="da9eda403461a719a642a660b41028c7"/>
 		<rom name="Tom le Maximagier v1.0 (1992)(Philips)(FR)(M3)[8120021V203 50262231 05].cue" size="160" crc="35d9008a" md5="652bf5460ae3fa75d5dced92e6286338"/>
 		-->
-		<description>Tom le Maximagier v1.0 (France, alt)</description>
+		<description>Tom le Maximagier (France, v1.0 alt)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -10374,7 +10295,7 @@ Other stuff in between
 		<rom name="Verhalen Toverdoos - Magische Vertellingen v1.0 (1992)(Philips)(NL).iso" size="205447200" crc="c9d0a42d" md5="e3d49bc822d366b0aea1b997c459a2d5"/>
 		<rom name="Verhalen Toverdoos - Magische Vertellingen v1.0 (1992)(Philips)(NL).cue" size="156" crc="fbcdc10b" md5="1316dcc06757ae8836a4ab2f41fdfb98"/>
 		-->
-		<description>Verhalen Toverdoos - Magische Vertellingen v1.0 (Netherlands)</description>
+		<description>Verhalen Toverdoos: Magische Vertellingen (Netherlands, v1.0)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -10390,7 +10311,7 @@ Other stuff in between
 		<rom name="Verhalen Toverdoos - Sterrendromen v1.0 (1992)(Philips)(NL)[!].iso" size="205964640" crc="323fb975" md5="3d0fb64d23be5896a8336216eb597b34"/>
 		<rom name="Verhalen Toverdoos - Sterrendromen v1.0 (1992)(Philips)(NL)[!].cue" size="151" crc="46ce5492" md5="64b122e5f4b8041d620a3cf2de5e7267"/>
 		-->
-		<description>Verhalen Toverdoos - Sterrendromen v1.0 (Netherlands)</description>
+		<description>Verhalen Toverdoos: Sterrendromen (Netherlands, v1.0)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
 		<part name="cdrom" interface="cdrom">
@@ -10719,9 +10640,10 @@ Other stuff in between
 		<rom name="You Can Do It All With Philips CD-i - A Title Sampler v1.0 (1992)(Philips)(EU)(M4)[Oct 1992].iso" size="466935504" crc="1834e1b8" md5="c5acfd99c9fad1df8779c76a7415e646"/>
 		<rom name="You Can Do It All With Philips CD-i - A Title Sampler v1.0 (1992)(Philips)(EU)(M4)[Oct 1992].cue" size="181" crc="7af8c19f" md5="38553950a371a58807cd998c8cb66fb2"/>
 		-->
-		<description>You Can Do It All With Philips CD-i - A Title Sampler v1.0 (Europe)[Oct 1992]</description>
+		<description>You Can Do It All With Philips CD-i: A Title Sampler (Europe, v1.0)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
+		<info name="release" value="199210xx"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="you can do it all with philips cd-i - a title sampler v1.0 (1992)(philips)(eu)(m4)[oct 1992]" sha1="6f6a655fe84b7574e7005155382b4e1b8c69939e"/>
@@ -11138,33 +11060,6 @@ Other stuff in between
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ulihamkke bulleoyo - jayeongwa hamkke (1993)(skc limited)(kr)" sha1="64e69cd4fc4c71d8cdddd65465da2646a3cb434a"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="pcd1904">
-		<!--
-		Origin: Foxhack
-		<rom name="PCD1904 (Track 1).bin" size="818496" crc="1d037f6d" md5="05dde46197ea63a14510717960e414fd" sha1="0a805e88a5f40e5fd6ba8a579cb6ca0cf379ed05" />
-		<rom name="PCD1904 (Track 2).bin" size="100018800" crc="24233b6d" md5="24444ff73512426f74e2fc0505bf0df6" sha1="34c8dd58666d502ede55d632e643bd121426a1a0" />
-		<rom name="PCD1904 (Track 3).bin" size="16581600" crc="b779625b" md5="fc057c2568599b68bd3a657e3688ef85" sha1="b3c4ad5df7568b0a891d192bc49f673e352fd243" />
-		<rom name="PCD1904 (Track 4).bin" size="4762800" crc="88c2e4e9" md5="cd6402f0b46c83996d24826a03186c3c" sha1="5690073a9162bf31123e07f6fdd8e1ddcc8077d4" />
-		<rom name="PCD1904 (Track 5).bin" size="132300000" crc="c4a7ee90" md5="3c4731edeffded203ab96c184edd84d1" sha1="723f14cad145fb8dc197d2066ae77fb09a775d93" />
-		<rom name="PCD1904 (Track 6).bin" size="38631600" crc="099b3382" md5="2bc8816b0d2194801e6a98e756067613" sha1="79712b1aa0a0b5b4901d3ed91cde25ac871b029d" />
-		<rom name="PCD1904 (Track 7).bin" size="26460000" crc="7b76c4b6" md5="4586c3b510abf2dee4ac532a2ad6bf86" sha1="3407398b97cae5d5af4121cd2759c85f1dcf4b49" />
-		<rom name="PCD1904 (Track 8).bin" size="26283600" crc="825108c2" md5="c118c88266b337ebbd5df15bca71a8a5" sha1="24d9e26729e780891a598657fabf11a41708f67a" />
-		<rom name="PCD1904 (Track 9).bin" size="41207040" crc="823fb562" md5="f2abea76d3e4d823c2356232ad60d39c" sha1="ce794bbf1b299107133cb8797342e44868d90b6c" />
-
-		Note: This is a Windows ISO9660-formatted CD that included Photo CD on CD-Interactive, Version 3.1 (April 14, 1993). This disc also works under Windows
-		3.1, and includes demo software for that platform.
-
-		-->
-		<description>The Photo CD Book Companion CD-ROM</description>
-		<year>1994</year>
-		<publisher>Abacus</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="pcd1904" sha1="19c7875a0329b2a75b3c0c05fa646536473e8c7d"/>
 			</diskarea>
 		</part>
 	</software>

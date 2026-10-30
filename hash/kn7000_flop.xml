@@ -23,7 +23,7 @@ original could supersede.
 		<publisher>Technics</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="idd7000.img" size="1474560" crc="9eb2cf06" sha1="d61b2b11dc2a933fd7b7b3de217486b493f95806"/>
+				<rom name="idd7000.img" size="1474560" crc="c25cc616" sha1="141a8cdc3a6789fd7db3a48dd141d703323b34b1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -34,7 +34,7 @@ original could supersede.
 		<publisher>Technics</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="custom1.img" size="1474560" crc="9e8c6445" sha1="8829b00e54a3bae1ecc5f00b93d2269b7aaa5674"/>
+				<rom name="custom1.img" size="1474560" crc="36238e3a" sha1="030f8d7acdbfcc35ffbd30c00abad46059f1e93e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -45,7 +45,7 @@ original could supersede.
 		<publisher>Technics</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="custom2.img" size="1474560" crc="be22aa34" sha1="1ddedb87970ab6ccec8cdd32b7ee68679c02fa0f"/>
+				<rom name="custom2.img" size="1474560" crc="508a15e3" sha1="65d1bae305d2bc10b981181d9f44091a3c80bf99"/>
 			</dataarea>
 		</part>
 	</software>
@@ -56,7 +56,7 @@ original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="organs.img" size="1474560" crc="6022fccb" sha1="844f5e6416342ea6a2da7a9e768778cfd78d1b4a"/>
+				<rom name="organs.img" size="1474560" crc="34e06c68" sha1="a1d9dea3cd1a723c921c6c55e6114d1b1563f431"/>
 			</dataarea>
 		</part>
 	</software>
@@ -67,7 +67,7 @@ original could supersede.
 		<publisher>Technics</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="scd7000.img" size="1474560" crc="3e588db0" sha1="c1bc222e4b481806df6b741b9ed725e87ce54166"/>
+				<rom name="scd7000.img" size="1474560" crc="13a03dd1" sha1="ae04748349bc8a8c728c285a714ec94477796c88"/>
 			</dataarea>
 		</part>
 	</software>
@@ -78,7 +78,7 @@ original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="ca7001.img" size="1474560" crc="4c45a857" sha1="26b358cc716486489f26c287403b15114647622e"/>
+				<rom name="ca7001.img" size="1474560" crc="c078a373" sha1="89ed606c4785ccfa09b78b525d7cb3cace0c54ee"/>
 			</dataarea>
 		</part>
 	</software>

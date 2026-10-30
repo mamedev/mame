@@ -222,6 +222,8 @@ protected:
 	uint16_t  m_vsync_on_pos;
 	uint16_t  m_vsync_off_pos;
 	bool    m_has_valid_parameters;
+	bool    m_display_off;         /* valid timing, but nothing displayed (R1 or R6 is 0) */
+	uint8_t m_display_off_columns; /* columns in the screen configuration kept while the display is off */
 	bool    m_display_disabled_msg_shown;
 
 	uint16_t   m_current_disp_addr;   /* the display address currently drawn (used only in mc6845_update) */

@@ -34325,7 +34325,7 @@ Alternate board (XL-1)
 
 	<software name="shangban">
 		<!-- single cartridge source: Yakushi~Kabuto -->
-		<description>Shanghai - Banri no Choujou (Japan, rev. A)</description>
+		<description>Shanghai: Banri no Choujou (Japan, rev. A)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SHVC-A4SJ-JPN" />
@@ -56701,7 +56701,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="shangbana" cloneof="shangban">
-		<description>Shanghai - Banri no Choujou (Japan)</description>
+		<description>Shanghai: Banri no Choujou (Japan)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SHVC-A4SJ-JPN" />

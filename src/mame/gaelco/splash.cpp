@@ -132,7 +132,13 @@ void splash_state::sound_bank_w(uint8_t data)
 void roldfrog_state::roldfrog_update_irq()
 {
 	const int irq = (m_sound_irq ? 0x08 : 0) | (m_vblank_irq ? 0x18 : 0);
-	m_audiocpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); // Z80
+	m_audiocpu_irq_vector = 0xc7 | irq;
+	m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE); // Z80
+}
+
+IRQ_CALLBACK_MEMBER(roldfrog_state::roldfrog_audiocpu_acknowledge_int)
+{
+	return m_audiocpu_irq_vector;
 }
 
 void roldfrog_state::roldfrog_vblank_ack_w(uint8_t data)
@@ -586,11 +592,13 @@ void roldfrog_state::machine_start()
 	save_item(NAME(m_ret));
 	save_item(NAME(m_vblank_irq));
 	save_item(NAME(m_sound_irq));
+	save_item(NAME(m_audiocpu_irq_vector));
 }
 
 void roldfrog_state::machine_reset()
 {
 	m_ret = 0x100;
+	m_audiocpu_irq_vector = 0xc7;
 }
 
 INTERRUPT_GEN_MEMBER(roldfrog_state::roldfrog_interrupt)
@@ -610,6 +618,7 @@ void roldfrog_state::roldfrog(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &roldfrog_state::roldfrog_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &roldfrog_state::roldfrog_sound_io_map);
 	m_audiocpu->set_vblank_int("screen", FUNC(roldfrog_state::roldfrog_interrupt));
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(roldfrog_state::roldfrog_audiocpu_acknowledge_int));
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<1>().set(FUNC(roldfrog_state::coin_lockout_w<0>));

@@ -128,6 +128,7 @@ void windermere_device::device_reset()
 	m_rtc = time(nullptr) - 946684800;
 	m_pwrsr = (1 << 7) | (1 << 12); // DCDET, PFFLG
 	m_pwrcnt = 0;
+	m_pumpcon = 0;
 	m_kscan = 0;
 	m_last_ssi_request = 0;
 	m_ssi_read_counter = 0;
@@ -164,7 +165,7 @@ void windermere_device::eint1_w(int state)
 
 void windermere_device::eint2_w(int state)
 {
-	// edge triggered, active low
+	// falling edge triggered
 	if (state)
 		m_pending_ints |= (1 << IRQ_EINT2);
 
@@ -178,6 +179,15 @@ void windermere_device::eint3_w(int state)
 		m_pending_ints |= (1 << IRQ_EINT3);
 	else
 		m_pending_ints &= ~(1 << IRQ_EINT3);
+
+	check_interrupts();
+}
+
+void windermere_device::medchg_w(int state)
+{
+	// rising edge triggered
+	if (state)
+		m_pending_ints |= (1 << IRQ_MCINT);
 
 	check_interrupts();
 }

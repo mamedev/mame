@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include <vector>
+
 void cbm_ieee488_devices(device_slot_interface &device);
 void hp_ieee488_devices(device_slot_interface &device);
 void remote488_devices(device_slot_interface &device);
@@ -60,19 +62,22 @@ public:
 
 	void add_device(ieee488_slot_device *slot, device_t *target);
 
+	// call before a CPU samples the bus; returns false after setting up a retry of the access
+	bool sample_ready(cpu_device &cpu);
+
 	// reads for both host and peripherals
-	uint8_t dio_r() { return get_data(); }
-	int eoi_r() { return get_signal(EOI); }
-	int dav_r() { return get_signal(DAV); }
-	int nrfd_r() { return get_signal(NRFD); }
-	int ndac_r() { return get_signal(NDAC); }
-	int ifc_r() { return get_signal(IFC); }
-	int srq_r() { return get_signal(SRQ); }
-	int atn_r() { return get_signal(ATN); }
-	int ren_r() { return get_signal(REN); }
+	uint8_t dio_r() { return read_signal(DIO); }
+	int eoi_r() { return read_signal(EOI); }
+	int dav_r() { return read_signal(DAV); }
+	int nrfd_r() { return read_signal(NRFD); }
+	int ndac_r() { return read_signal(NDAC); }
+	int ifc_r() { return read_signal(IFC); }
+	int srq_r() { return read_signal(SRQ); }
+	int atn_r() { return read_signal(ATN); }
+	int ren_r() { return read_signal(REN); }
 
 	// writes for host (driver_device)
-	void host_dio_w(uint8_t data) { set_data(this, data); }
+	void host_dio_w(uint8_t data) { set_signal(this, DIO, data); }
 	void host_eoi_w(int state) { set_signal(this, EOI, state); }
 	void host_dav_w(int state) { set_signal(this, DAV, state); }
 	void host_nrfd_w(int state) { set_signal(this, NRFD, state); }
@@ -83,7 +88,7 @@ public:
 	void host_ren_w(int state) { set_signal(this, REN, state); }
 
 	// writes for peripherals (device_t)
-	void dio_w(device_t *device, uint8_t data) { set_data(device, data); }
+	void dio_w(device_t *device, uint8_t data) { set_signal(device, DIO, data); }
 	void eoi_w(device_t *device, int state) { set_signal(device, EOI, state); }
 	void dav_w(device_t *device, int state) { set_signal(device, DAV, state); }
 	void nrfd_w(device_t *device, int state) { set_signal(device, NRFD, state); }
@@ -118,12 +123,29 @@ protected:
 		SRQ,
 		ATN,
 		REN,
+		DIO,
 		SIGNAL_COUNT
+	};
+
+	static constexpr unsigned EDGE_COUNT = 16;
+
+	struct source_lines
+	{
+		void reset();
+
+		attotime m_time[SIGNAL_COUNT][EDGE_COUNT];
+		u8 m_state[SIGNAL_COUNT][EDGE_COUNT];
+		u8 m_count[SIGNAL_COUNT];
+		u8 m_line[SIGNAL_COUNT];
+		device_execute_interface *m_exec;
+		s32 m_exec_index;
 	};
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_stop() override ATTR_COLD;
+	virtual void device_pre_save() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 	class daisy_entry
 	{
@@ -135,8 +157,7 @@ protected:
 		device_t *                  m_device;       // associated device
 		device_ieee488_interface *  m_interface;    // associated device's daisy interface
 
-		int m_line[SIGNAL_COUNT];
-		uint8_t m_dio;
+		source_lines m_lines;
 	};
 
 	simple_list<daisy_entry> m_device_list;
@@ -152,13 +173,16 @@ private:
 	devcb_write_line   m_write_ren;
 	devcb_write8       m_write_dio;
 
-	void set_signal(device_t *device, int signal, int state);
-	int get_signal(int signal);
-	void set_data(device_t *device, uint8_t data);
-	uint8_t get_data();
+	void set_signal(device_t *device, int signal, u8 state);
+	u8 read_signal(int signal);
+	u8 get_signal(int signal, const attotime &time, source_lines const *own = nullptr);
+	void update_lines(source_lines &lines, daisy_entry *entry);
+	void update_lines();
+	TIMER_CALLBACK_MEMBER(update_tick);
 
-	int m_line[SIGNAL_COUNT];
-	uint8_t m_dio;
+	source_lines m_lines;
+	emu_timer *m_update_timer;
+	std::vector<device_execute_interface *> m_execs;
 };
 
 

@@ -16,7 +16,7 @@
     - WD1016D-PL (MCS-51 MCU) or SAB 8051A-P
     - TC5565PL-15 (8k SRAM)
     - 12 MHz XTAL
-    - 4 Position Dipswitch (time, game handling and cycling/slot count)
+    - 4 Position DIP switch (time, game handling and cycling/slot count)
 
     Connector pinout:
 
@@ -90,23 +90,24 @@ public:
 		m_snes_rom(*this, "user3"),
 		m_slots(*this, "slot%u", 0U),
 		m_pad(*this, "P%u", 1U)
-		{ }
+	{ }
 
-	void base(machine_config &config);
-	void mk3snes(machine_config &config);
-	void snes4sl(machine_config &config);
-	void snes4sln(machine_config &config);
+	void mk3snes(machine_config &config) ATTR_COLD;
+	void snes4sl(machine_config &config) ATTR_COLD;
+	void snes4sln(machine_config &config) ATTR_COLD;
 
-	void init_fatfurspb();
+	void init_fatfurspb() ATTR_COLD;
 
-	template<int N> int snes_address_status_r();
-	template<int N> ioport_value mk3_controller_r();
-	template<int N> ioport_value switcher_controller_r();
+	template <int N> int snes_address_status_r();
+	template <int N> ioport_value mk3_controller_r();
+	template <int N> ioport_value switcher_controller_r();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
+
+	void base(machine_config &config) ATTR_COLD;
 
 	virtual void hblank_w(int state) override;
 
@@ -121,11 +122,12 @@ private:
 	void mcu_p3_w(uint8_t data);
 
 	void switch_game_select_w(uint8_t data);
-	void switch_sound_ctrl_w(uint8_t data);
+	void switch_overlay_color_mute_w(uint8_t data);
 
 	void mk3_controller_w(uint8_t data);
 	void mk3_controller_aux_w(uint8_t data);
 	void mk3_sound_ctrl_w(uint8_t data);
+	void mk3_overlay_color_w(uint8_t data);
 
 	void vram_address_high_w(uint8_t data);
 	void vram_address_low_w(uint8_t data);
@@ -135,9 +137,9 @@ private:
 	void rom_address_low_w(uint8_t data);
 	uint8_t rom_r();
 
-	template<int N> void install_watcher();
-	template<int N> uint8_t snes_bus_watch_ack_r();
-	template<int N> void snes_bus_watch_w(uint8_t data);
+	template <int N> void install_watcher();
+	template <int N> uint8_t snes_bus_watch_ack_r();
+	template <int N> void snes_bus_watch_w(uint8_t data);
 
 	uint32_t overlay_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -154,11 +156,13 @@ private:
 	uint8_t m_selected_slot = 0;
 
 	uint8_t m_p1 = 0xff;
+	uint8_t m_p3 = 0xff;
 	uint8_t m_mk3_controller = 0xff;
 	uint8_t m_mk3_controller_aux = 0xff;
 
 	bool m_overlay_start = false;
 	uint8_t m_overlay_y = 0;
+	rgb_t m_overlay_color = rgb_t::white();
 
 	memory_passthrough_handler m_snes_address_tap[4];
 	bool m_snes_address_tap_active[4]{};
@@ -200,6 +204,7 @@ void snesb51_state::mk3_io_map(address_map &map)
 	map(0x8e00, 0x8e00).w(FUNC(snesb51_state::vram_address_low_w));
 	map(0x9000, 0x9000).w(FUNC(snesb51_state::mk3_controller_w));
 	map(0xa000, 0xa000).w(FUNC(snesb51_state::vram_w));
+	map(0xb000, 0xb000).w(FUNC(snesb51_state::mk3_overlay_color_w));
 	map(0xc000, 0xc000).r(FUNC(snesb51_state::snes_bus_watch_ack_r<2>));
 	map(0xd000, 0xd000).r(FUNC(snesb51_state::snes_bus_watch_ack_r<3>));
 	map(0xd200, 0xd200).portr("DSW1");
@@ -224,7 +229,7 @@ void snesb51_state::switcher_io_map(address_map &map)
 	map(0xd000, 0xd000).w(FUNC(snesb51_state::rom_address_low_w));
 	map(0xd400, 0xd400).w(FUNC(snesb51_state::rom_address_high_w));
 	map(0xd800, 0xd800).r(FUNC(snesb51_state::rom_r));
-	map(0xb000, 0xb000).w(FUNC(snesb51_state::switch_sound_ctrl_w)); // only on the 1994 variants?
+	map(0xb000, 0xb000).w(FUNC(snesb51_state::switch_overlay_color_mute_w));
 	map(0xe000, 0xe000).w(FUNC(snesb51_state::snes_bus_watch_w<1>));
 }
 
@@ -240,33 +245,33 @@ static INPUT_PORTS_START( snesb51 )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Button B") PORT_PLAYER(1)
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 Button Y") PORT_PLAYER(1)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("%p Button B") PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("%p Button Y") PORT_PLAYER(1)
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Button A") PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Button X") PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("P1 Button L") PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Button R") PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("%p Button A") PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("%p Button X") PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("%p Button L") PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("%p Button R") PORT_PLAYER(1)
 	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2")
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Button B") PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P2 Button Y") PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("%p Button B") PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("%p Button Y") PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 Button A") PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P2 Button X") PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("P2 Button L") PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P2 Button R") PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("%p Button A") PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("%p Button X") PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("%p Button L") PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("%p Button R") PORT_PLAYER(2)
 	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("SERIAL1_DATA1")
@@ -306,23 +311,23 @@ static INPUT_PORTS_START( mk3snes )
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "DSW1:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "DSW1:2")
 	PORT_DIPNAME(0x1c, 0x0c, DEF_STR(Coin_A)) PORT_DIPLOCATION("DSW1:3,4,5")
-	PORT_DIPSETTING(0x00, DEF_STR(1C_10C))
-	PORT_DIPSETTING(0x04, DEF_STR(1C_5C))
-	PORT_DIPSETTING(0x08, DEF_STR(1C_2C))
-	PORT_DIPSETTING(0x0c, DEF_STR(1C_1C))
-	PORT_DIPSETTING(0x10, DEF_STR(2C_1C))
-	PORT_DIPSETTING(0x14, DEF_STR(5C_1C))
 	PORT_DIPSETTING(0x18, DEF_STR(10C_1C))
+	PORT_DIPSETTING(0x14, DEF_STR(5C_1C))
+	PORT_DIPSETTING(0x10, DEF_STR(2C_1C))
+	PORT_DIPSETTING(0x0c, DEF_STR(1C_1C))
 	PORT_DIPSETTING(0x1c, DEF_STR(1C_1C)) // duplicate
-	PORT_DIPNAME(0xe0, 0x60, DEF_STR(Coin_B)) PORT_DIPLOCATION("DSW1:6,7,8")
+	PORT_DIPSETTING(0x08, DEF_STR(1C_2C))
+	PORT_DIPSETTING(0x04, DEF_STR(1C_5C))
 	PORT_DIPSETTING(0x00, DEF_STR(1C_10C))
-	PORT_DIPSETTING(0x20, DEF_STR(1C_5C))
-	PORT_DIPSETTING(0x40, DEF_STR(1C_2C))
-	PORT_DIPSETTING(0x60, DEF_STR(1C_1C))
-	PORT_DIPSETTING(0x80, DEF_STR(2C_1C))
-	PORT_DIPSETTING(0xa0, DEF_STR(5C_1C))
+	PORT_DIPNAME(0xe0, 0x60, DEF_STR(Coin_B)) PORT_DIPLOCATION("DSW1:6,7,8")
 	PORT_DIPSETTING(0xc0, DEF_STR(10C_1C))
+	PORT_DIPSETTING(0xa0, DEF_STR(5C_1C))
+	PORT_DIPSETTING(0x80, DEF_STR(2C_1C))
+	PORT_DIPSETTING(0x60, DEF_STR(1C_1C))
 	PORT_DIPSETTING(0xe0, DEF_STR(1C_1C)) // duplicate
+	PORT_DIPSETTING(0x40, DEF_STR(1C_2C))
+	PORT_DIPSETTING(0x20, DEF_STR(1C_5C))
+	PORT_DIPSETTING(0x00, DEF_STR(1C_10C))
 
 	PORT_START("DSW2")
 	PORT_DIPNAME(0x01, 0x01, "Game Program") PORT_DIPLOCATION("DSW2:1")
@@ -343,8 +348,8 @@ static INPUT_PORTS_START( mk3snes )
 	PORT_DIPSETTING(0x60, "15 Minutes")
 	PORT_DIPSETTING(0x70, "17 Minutes")
 	PORT_DIPNAME(0x80, 0x80, "Time Limit Enable") PORT_DIPLOCATION("DSW2:8")
-	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPSETTING(0x80, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kinstsnes )
@@ -413,9 +418,22 @@ static INPUT_PORTS_START( snes4sl94 )
 	PORT_DIPSETTING(   0x01, "5 Minutes")
 INPUT_PORTS_END
 
+
 //**************************************************************************
 //  VIDEO EMULATION
 //**************************************************************************
+
+void snesb51_state::mk3_overlay_color_w(uint8_t data)
+{
+	// 765432--  overlay color, format rrbbgg
+	// ------10  unknown
+
+	const int r = BIT(data, 6, 2);
+	const int b = BIT(data, 4, 2);
+	const int g = BIT(data, 2, 2);
+
+	m_overlay_color = rgb_t(r * 0x55, g * 0x55, b * 0x55);
+}
 
 void snesb51_state::hblank_w(int state)
 {
@@ -424,21 +442,30 @@ void snesb51_state::hblank_w(int state)
 
 uint32_t snesb51_state::overlay_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+//	bitmap.fill(0, cliprect);
+
 	if (m_overlay_start)
 	{
 		m_overlay_y = (m_vram_address & 0xff) + 1;
 		m_overlay_start = false;
 	}
 
-	bitmap.fill(rgb_t::black(), cliprect);
-
-	if (!BIT(m_p1, 7))
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-		{
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-				bitmap.pix(y, x) = BIT(m_vram[((x >> 3) << 8) | m_overlay_y], 7 - (x & 7)) ? rgb_t::white() : rgb_t::black();
+		m_ppu->refresh_scanline(bitmap, y, y);
 
+		if (!BIT(m_p1, 7))
+		{
+			auto *const dst = &bitmap.pix(y);
+			for (int x = cliprect.left(); x <= cliprect.right(); x+= 2)
+			{
+				u8 dot = BIT(m_vram[((x >> 4) << 8) | m_overlay_y], ~(x >> 1) & 7);
+				if (dot)
+				{
+					dst[x + 0] = m_overlay_color;
+					dst[x + 1] = m_overlay_color;
+				}
+			}
 			m_overlay_y++;
 		}
 	}
@@ -462,10 +489,16 @@ void snesb51_state::mk3_sound_ctrl_w(uint8_t data)
 	m_speaker->set_input_gain(1, gain);
 }
 
-void snesb51_state::switch_sound_ctrl_w(uint8_t data)
+void snesb51_state::switch_overlay_color_mute_w(uint8_t data)
 {
-	// 7654321-  unknown
+	// 765432--  overlay color, format bbggrr
+	// ------1-  unknown
 	// -------0  audio mute (audio is unmuted after inserting a coin)
+
+	const int b = BIT(data, 6, 2);
+	const int g = BIT(data, 4, 2);
+	const int r = BIT(data, 2, 2);
+	m_overlay_color = rgb_t(r * 0x55, g * 0x55, b * 0x55);
 
 	const float gain = BIT(data, 0) ? 1.0f : 0.0f;
 	m_speaker->set_input_gain(0, gain);
@@ -477,7 +510,7 @@ void snesb51_state::switch_sound_ctrl_w(uint8_t data)
 //  MACHINE EMULATION
 //**************************************************************************
 
-template<int N>
+template <int N>
 ioport_value snesb51_state::mk3_controller_r()
 {
 	uint16_t data = 0;
@@ -516,7 +549,7 @@ void snesb51_state::mk3_controller_aux_w(uint8_t data)
 	m_mk3_controller_aux = data;
 }
 
-template<int N>
+template <int N>
 ioport_value snesb51_state::switcher_controller_r()
 {
 	uint16_t data = 0;
@@ -561,7 +594,12 @@ void snesb51_state::mcu_p3_w(uint8_t data)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
 
+	if (BIT(m_p3, 3) == 1 && BIT(data, 3) == 0)
+		m_ppu->reset();
+
 	m_mcu_speaker->level_w(data & 0x03);
+
+	m_p3 = data;
 }
 
 void snesb51_state::switch_game_select_w(uint8_t data)
@@ -593,7 +631,7 @@ void snesb51_state::switch_game_select_w(uint8_t data)
 void snesb51_state::vram_address_high_w(uint8_t data)
 {
 	data &= 0x1f;
-	m_vram_address = (data << 8) | (m_vram_address & 0x00ff);
+	m_vram_address = (uint16_t(data) << 8) | (m_vram_address & 0x00ff);
 }
 
 void snesb51_state::vram_address_low_w(uint8_t data)
@@ -613,7 +651,7 @@ void snesb51_state::rom_address_low_w(uint8_t data)
 
 void snesb51_state::rom_address_high_w(uint8_t data)
 {
-	m_rom_address = (data << 8) | (m_rom_address & 0x00ff);
+	m_rom_address = (uint16_t(data) << 8) | (m_rom_address & 0x00ff);
 }
 
 uint8_t snesb51_state::rom_r()
@@ -621,34 +659,32 @@ uint8_t snesb51_state::rom_r()
 	return m_snes_rom->base()[m_rom_address];
 }
 
-template<int N>
+template <int N>
 int snesb51_state::snes_address_status_r()
 {
 	return m_snes_address_status[N] ? 1 : 0;
 }
 
-template<int N>
+template <int N>
 void snesb51_state::install_watcher()
 {
 	m_snes_address_tap[N].remove();
-	m_snes_address_tap[N] = m_maincpu->space(AS_PROGRAM).install_read_tap
-	(
-		m_snes_address_offset_latch[N], m_snes_address_offset_latch[N],
-		util::string_format("snes_bus_watcher%d", N),
-		[this] (offs_t offset, uint8_t &, uint8_t)
-		{
-			if (machine().side_effects_disabled())
-				return;
+	m_snes_address_tap[N] = m_maincpu->space(AS_PROGRAM).install_read_tap(
+			m_snes_address_offset_latch[N], m_snes_address_offset_latch[N],
+			util::string_format("snes_bus_watcher%d", N),
+			[this] (offs_t offset, uint8_t &, uint8_t)
+			{
+				if (machine().side_effects_disabled())
+					return;
 
-			m_snes_address_status[N] = true;
-			m_snes_address_tap[N].remove();
-			m_snes_address_tap_active[N] = false;
-		},
-		&m_snes_address_tap[N]
-	);
+				m_snes_address_status[N] = true;
+				m_snes_address_tap[N].remove();
+				m_snes_address_tap_active[N] = false;
+			},
+			&m_snes_address_tap[N]);
 }
 
-template<int N>
+template <int N>
 uint8_t snesb51_state::snes_bus_watch_ack_r()
 {
 	if (machine().side_effects_disabled())
@@ -663,10 +699,10 @@ uint8_t snesb51_state::snes_bus_watch_ack_r()
 	return 0xff;
 }
 
-template<int N>
+template <int N>
 void snesb51_state::snes_bus_watch_w(uint8_t data)
 {
-	m_snes_address_offset[N] = (data << 16) | (m_snes_address_offset[N] >> 8);
+	m_snes_address_offset[N] = (uint32_t(data) << 16) | (m_snes_address_offset[N] >> 8);
 }
 
 void snesb51_state::machine_start()
@@ -681,10 +717,12 @@ void snesb51_state::machine_start()
 	save_item(NAME(m_rom_address));
 	save_item(NAME(m_selected_slot));
 	save_item(NAME(m_p1));
+	save_item(NAME(m_p3));
 	save_item(NAME(m_mk3_controller));
 	save_item(NAME(m_mk3_controller_aux));
 	save_item(NAME(m_overlay_start));
 	save_item(NAME(m_overlay_y));
+	save_item(NAME(m_overlay_color));
 	save_item(NAME(m_snes_address_tap_active));
 	save_item(NAME(m_snes_address_offset));
 	save_item(NAME(m_snes_address_offset_latch));
@@ -696,6 +734,7 @@ void snesb51_state::machine_reset()
 	snes_state::machine_reset();
 
 	m_p1 = 0xff;
+	m_p3 = 0xff;
 	m_mk3_controller = 0xff;
 	m_mk3_controller_aux = 0xff;
 
@@ -737,7 +776,7 @@ void snesb51_state::device_post_load()
 void snesb51_state::base(machine_config &config)
 {
 	// basic machine hardware
-	_5A22(config, m_maincpu, 3580000 * 6);
+	_5A22(config, m_maincpu, 3'580'000 * 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &snesb51_state::snes_map);
 
 	S_SMP(config, m_soundcpu, XTAL(24'576'000) / 12);
@@ -750,15 +789,10 @@ void snesb51_state::base(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen);
 	m_screen->set_raw(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC);
-	m_screen->set_video_attributes(VIDEO_VARIABLE_WIDTH);
-	m_screen->set_screen_update(FUNC(snes_state::screen_update));
+	// TODO: can't use VIDEO_VARIABLE_WIDTH with an overlay
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
+	m_screen->set_screen_update(FUNC(snesb51_state::overlay_update));
 	m_screen->screen_vblank().set_inputline(m_mcu, MCS51_INT0_LINE);
-
-	// temporary until the screen is actually overlayed
-	screen_device &overlay(SCREEN(config, "overlay"));
-	overlay.set_raw(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, 256, SNES_VTOTAL_NTSC, 0, 256);
-	overlay.set_video_attributes(VIDEO_UPDATE_SCANLINE);
-	overlay.set_screen_update(FUNC(snesb51_state::overlay_update));
 
 	SNES_PPU(config, m_ppu, MCLK_NTSC);
 	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); });

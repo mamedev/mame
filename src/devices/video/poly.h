@@ -37,9 +37,9 @@
 
 #pragma once
 
-#include <atomic>
 #include <climits>
 #include <limits>
+#include <mutex>
 
 
 #define KEEP_POLY_STATISTICS 0
@@ -335,11 +335,13 @@ private:
 
 	static constexpr int SCANLINES_PER_BUCKET = 32;
 	static constexpr int TOTAL_BUCKETS        = (512 / SCANLINES_PER_BUCKET);
+	// Bound unpublished work while starting substantial primitives promptly.
+	static constexpr u32 BATCH_UNITS          = 128;
+	static constexpr u32 BATCH_PIXELS         = 16384;
 
 	// primitive_info describes a single primitive
 	struct primitive_info
 	{
-		poly_manager *      m_owner;                // pointer back to the poly manager
 		ObjectType *        m_object;               // object data pointer
 		render_delegate     m_callback;             // callback to handle a scanline's worth of work
 	};
@@ -347,17 +349,23 @@ private:
 	// internal unit of work
 	struct work_unit
 	{
-		work_unit &operator=(work_unit const &rhs)
-		{
-			// this is just to satisfy the compiler; we don't actually copy
-			fatalerror("Attempt to copy work_unit");
-		}
-
-		std::atomic<uint32_t> count_next;             // number of scanlines and index of next item to process
+		int32_t               count;                  // number of scanlines
 		primitive_info *      primitive;              // pointer to primitive
 		int32_t               scanline;               // starting scanline
-		uint32_t              previtem;               // index of previous item in the same bucket
+		work_unit *           next;                   // next unit in the same bucket's list
 		extent_t              extent[SCANLINES_PER_BUCKET]; // array of scanline extents
+	};
+
+	struct work_bucket_t
+	{
+		// Only the submitting thread touches the unpublished list.
+		work_unit *pending_head = nullptr;
+		work_unit *pending_tail = nullptr;
+		// The mutex protects publication and the drain-to-idle handoff, never rendering.
+		std::mutex lock;
+		work_unit *ready_head = nullptr;
+		work_unit *ready_tail = nullptr;
+		bool active = false;
 	};
 
 	// internal array types
@@ -385,34 +393,67 @@ private:
 	{
 		// return and initialize the next one
 		primitive_info &primitive = m_primitive.next();
-		primitive.m_owner = this;
 		primitive.m_object = &m_object.last();
 		primitive.m_callback = callback;
 		return primitive;
 	}
 
-	// enqueue work items in contiguous chunks
-	void queue_items(u32 start)
+	// add new work units to their buckets' pending lists
+	void queue_items(u32 start, u32 pixels)
 	{
 		// do nothing if no queue; items will be processed on the next wait
 		if (m_queue == nullptr)
 			return;
 
-		// enqueue the items in contiguous chunks
-		while (start < m_unit.count())
+		// with no background threads, render immediately on this thread
+		if (!m_batched)
 		{
-			u32 chunk;
-			work_unit *base = m_unit.contiguous(start, m_unit.count() - start, chunk);
-			osd_work_item_queue_multiple(m_queue, work_item_callback, chunk, base, m_unit.itemsize(), WORK_ITEM_FLAG_AUTO_RELEASE);
-			start += chunk;
+			for ( ; start < m_unit.count(); start++)
+			{
+				render_unit(m_unit.byindex(start), 0);
+			}
+			return;
+		}
+
+		const u32 units = m_unit.count() - start;
+		if (!units)
+		{
+			return;
+		}
+		m_pending_units += units;
+		m_pending_pixels += pixels;
+		for (; start < m_unit.count(); ++start)
+		{
+			work_unit &unit = m_unit.byindex(start);
+			work_bucket_t &bucket = m_work_bucket[(u32(unit.scanline) / SCANLINES_PER_BUCKET) % TOTAL_BUCKETS];
+			unit.next = nullptr;
+			if (bucket.pending_tail)
+			{
+				bucket.pending_tail->next = &unit;
+			}
+			else
+			{
+				bucket.pending_head = &unit;
+			}
+			bucket.pending_tail = &unit;
+		}
+		if (m_pending_units >= BATCH_UNITS || m_pending_pixels >= BATCH_PIXELS)
+		{
+			flush_buckets(false);
 		}
 	}
 
-	static void *work_item_callback(void *param, int threadid);
+	static void *bucket_callback(void *param, int threadid);
+	static void render_unit(work_unit const &unit, int threadid);
+	static void render_units(work_unit *unit, int threadid);
+	void flush_buckets(bool waiting);
 	void presave() { wait("pre-save"); }
 
 	// queue management
 	osd_work_queue *m_queue;               // work queue
+	bool m_batched;                        // true if the queue has background threads
+	u32 m_pending_units;                   // units not yet handed to the queue
+	u64 m_pending_pixels;                  // pixels in those units
 
 	// arrays
 	primitive_array m_primitive;           // array of primitives
@@ -421,17 +462,13 @@ private:
 	std::vector<poly_array_base *> m_arrays; // list of arrays we are managing
 
 	// buckets
-	uint32_t m_unit_bucket[TOTAL_BUCKETS]; // buckets for tracking unit usage
+	work_bucket_t m_work_bucket[TOTAL_BUCKETS]; // per-bucket lists of work units
 
 	// statistics
 	uint32_t m_tiles;                       // number of tiles queued
 	uint32_t m_triangles;                   // number of triangles queued
 	uint32_t m_polygons;                    // number of polygons queued
 	uint64_t m_pixels;                      // number of pixels rendered
-#if KEEP_POLY_STATISTICS
-	uint32_t m_conflicts[WORK_MAX_THREADS] = { 0 }; // number of conflicts found, per thread
-	uint32_t m_resolved[WORK_MAX_THREADS] = { 0 };  // number of conflicts resolved, per thread
-#endif
 #if TRACK_POLY_WAITS
 	static std::string friendly_number(u64 number);
 	struct wait_tracker
@@ -471,19 +508,15 @@ private:
 
 template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
 poly_manager<BaseType, ObjectType, MaxParams, Flags>::poly_manager(running_machine &machine) :
-	m_queue(nullptr),
+	m_queue((Flags & POLY_FLAG_NO_WORK_QUEUE) ? nullptr : osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI | WORK_QUEUE_FLAG_HIGH_FREQ | WORK_QUEUE_FLAG_COARSE)),
+	m_batched(m_queue && osd_work_queue_thread_count(m_queue)),
+	m_pending_units(0),
+	m_pending_pixels(0),
 	m_tiles(0),
 	m_triangles(0),
 	m_polygons(0),
 	m_pixels(0)
 {
-	// create the work queue
-	if (!(Flags & POLY_FLAG_NO_WORK_QUEUE))
-		m_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI | WORK_QUEUE_FLAG_HIGH_FREQ);
-
-	// initialize the buckets to empty
-	std::fill_n(&m_unit_bucket[0], std::size(m_unit_bucket), 0xffffffff);
-
 	// register our arrays for reset
 	register_poly_array(m_primitive);
 	register_poly_array(m_object);
@@ -526,14 +559,6 @@ poly_manager<BaseType, ObjectType, MaxParams, Flags>::~poly_manager()
 {
 #if KEEP_POLY_STATISTICS
 {
-	// accumulate stats over the entire collection
-	int conflicts = 0, resolved = 0;
-	for (int i = 0; i < std::size(m_conflicts); i++)
-	{
-		conflicts += m_conflicts[i];
-		resolved += m_resolved[i];
-	}
-
 	// output global stats
 	osd_printf_info("Total triangles = %d\n", m_triangles);
 	osd_printf_info("Total polygons = %d\n", m_polygons);
@@ -542,7 +567,6 @@ poly_manager<BaseType, ObjectType, MaxParams, Flags>::~poly_manager()
 	else
 		osd_printf_info("Total pixels   = %d\n", uint32_t(m_pixels));
 
-	osd_printf_info("Conflicts:   %d resolved, %d total\n", resolved, conflicts);
 	osd_printf_info("Units:       %5d used, %5d allocated, %4d bytes each, %7d total\n", m_unit.max(), m_unit.allocated(), int(m_unit.itemsize()), int(m_unit.allocated() * m_unit.itemsize()));
 	osd_printf_info("Primitives:  %5d used, %5d allocated, %4d bytes each, %7d total\n", m_primitive.max(), m_primitive.allocated(), int(m_primitive.itemsize()), int(m_primitive.allocated() * m_primitive.itemsize()));
 	osd_printf_info("Object data: %5d used, %5d allocated, %4d bytes each, %7d total\n", m_object.max(), m_object.allocated(), int(m_object.itemsize()), int(m_object.allocated() * m_object.itemsize()));
@@ -587,64 +611,106 @@ poly_manager<BaseType, ObjectType, MaxParams, Flags>::~poly_manager()
 
 
 //-------------------------------------------------
-//  work_item_callback - process a work item
+//  batched work - publish and drain ordered buckets
 //-------------------------------------------------
 
 template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
-void *poly_manager<BaseType, ObjectType, MaxParams, Flags>::work_item_callback(void *param, int threadid)
+void poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_unit(work_unit const &unit, int threadid)
 {
-	while (1)
+	primitive_info const &primitive = *unit.primitive;
+	for (int line = 0; line < unit.count; ++line)
 	{
-		work_unit &unit = *(work_unit *)param;
-		primitive_info &primitive = *unit.primitive;
-		int count = unit.count_next & 0xff;
-		uint32_t orig_count_next;
+		primitive.m_callback(unit.scanline + line, unit.extent[line], *primitive.m_object, threadid);
+	}
+}
 
-		// if our previous item isn't done yet, enqueue this item to the end and proceed
-		if (unit.previtem != 0xffffffff)
+template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
+void poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_units(work_unit *unit, int threadid)
+{
+	for ( ; unit; unit = unit->next)
+	{
+		render_unit(*unit, threadid);
+	}
+}
+
+template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
+void *poly_manager<BaseType, ObjectType, MaxParams, Flags>::bucket_callback(void *param, int threadid)
+{
+	auto &bucket = *static_cast<work_bucket_t *>(param);
+	while (true)
+	{
+		work_unit *head;
 		{
-			work_unit &prevunit = primitive.m_owner->m_unit.byindex(unit.previtem);
-			if (prevunit.count_next != 0)
+			std::lock_guard<std::mutex> lock(bucket.lock);
+			head = bucket.ready_head;
+			bucket.ready_head = bucket.ready_tail = nullptr;
+			if (!head)
 			{
-				uint32_t unitnum = primitive.m_owner->m_unit.indexof(unit);
-				uint32_t new_count_next;
-
-				// attempt to atomically swap in this new value
-				do
-				{
-					orig_count_next = prevunit.count_next;
-					new_count_next = orig_count_next | (unitnum << 8);
-				} while (!prevunit.count_next.compare_exchange_weak(orig_count_next, new_count_next, std::memory_order_release, std::memory_order_relaxed));
-
-#if KEEP_POLY_STATISTICS
-				// track resolved conflicts
-				primitive.m_owner->m_conflicts[threadid]++;
-				if (orig_count_next != 0)
-					primitive.m_owner->m_resolved[threadid]++;
-#endif
-				// if we succeeded, skip out early so we can do other work
-				if (orig_count_next != 0)
-					break;
+				bucket.active = false;
+				// After relinquishing ownership, do not touch the bucket or its units.
+				return nullptr;
 			}
 		}
-
-		// iterate over extents
-		for (int curscan = 0; curscan < count; curscan++)
-			primitive.m_callback(unit.scanline + curscan, unit.extent[curscan], *primitive.m_object, threadid);
-
-		// set our count to 0 and re-fetch the original count value
-		do
-		{
-			orig_count_next = unit.count_next;
-		} while (!unit.count_next.compare_exchange_weak(orig_count_next, 0, std::memory_order_release, std::memory_order_relaxed));
-
-		// if we have no more work to do, do nothing
-		orig_count_next >>= 8;
-		if (orig_count_next == 0)
-			break;
-		param = &primitive.m_owner->m_unit.byindex(orig_count_next);
+		render_units(head, threadid);
 	}
-	return nullptr;
+}
+
+template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
+void poly_manager<BaseType, ObjectType, MaxParams, Flags>::flush_buckets(bool waiting)
+{
+	if (!m_pending_units)
+	{
+		return;
+	}
+
+	// A small final flush needs no workers if all previously published work is done.
+	const bool direct = waiting && !osd_work_queue_items(m_queue);
+	void *dispatch_buckets[TOTAL_BUCKETS];
+	int dispatch_count = 0;
+	for (work_bucket_t &bucket : m_work_bucket)
+	{
+		if (!bucket.pending_head)
+		{
+			continue;
+		}
+		work_unit *const head = bucket.pending_head;
+		work_unit *const tail = bucket.pending_tail;
+		bucket.pending_head = bucket.pending_tail = nullptr;
+		if (direct)
+		{
+			render_units(head, osd_work_queue_thread_count(m_queue));
+			continue;
+		}
+
+		bool dispatch = false;
+		{
+			std::lock_guard<std::mutex> lock(bucket.lock);
+			if (bucket.ready_tail)
+			{
+				bucket.ready_tail->next = head;
+			}
+			else
+			{
+				bucket.ready_head = head;
+			}
+			bucket.ready_tail = tail;
+			if (!bucket.active)
+			{
+				bucket.active = true;
+				dispatch = true;
+			}
+		}
+		if (dispatch)
+		{
+			dispatch_buckets[dispatch_count++] = &bucket;
+		}
+	}
+	if (dispatch_count)
+	{
+		osd_work_item_queue_list(m_queue, bucket_callback, dispatch_count, dispatch_buckets, WORK_ITEM_FLAG_AUTO_RELEASE);
+	}
+	m_pending_units = 0;
+	m_pending_pixels = 0;
 }
 
 
@@ -664,21 +730,26 @@ void poly_manager<BaseType, ObjectType, MaxParams, Flags>::wait(char const *debu
 	osd_ticks_t time = get_profile_ticks();
 #endif
 
-	// wait for all pending work items to complete
-	if (m_queue != nullptr)
-		osd_work_queue_wait(m_queue, osd_ticks_per_second() * 100);
+	// hand over the remaining units and wait for every callback to finish;
+	// the arrays must not be reset while any of them is still running
+	if (m_batched)
+	{
+		flush_buckets(true);
+		while (!osd_work_queue_wait(m_queue, osd_ticks_per_second() * 100)) { }
+	}
 
 	// if we don't have a queue, just run the whole list now
-	else
-		for (int unitnum = 0; unitnum < m_unit.count(); unitnum++)
-			work_item_callback(&m_unit.byindex(unitnum), 0);
+	else if (m_queue == nullptr)
+	{
+		for (u32 unitnum = 0; unitnum < m_unit.count(); unitnum++)
+		{
+			render_unit(m_unit.byindex(unitnum), 0);
+		}
+	}
 
 #if TRACK_POLY_WAITS
 	m_waitmap[debug_reason].update(items, get_profile_ticks() - time);
 #endif
-
-	// clear the buckets
-	std::fill_n(&m_unit_bucket[0], std::size(m_unit_bucket), 0xffffffff);
 
 	// reset all the poly arrays
 	for (auto array : m_arrays)
@@ -762,8 +833,6 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_tile(recta
 	int32_t scaninc = 1;
 	for (int32_t curscan = v1yclip; curscan < v2yclip; curscan += scaninc)
 	{
-		uint32_t bucketnum = (uint32_t(curscan) / SCANLINES_PER_BUCKET) % TOTAL_BUCKETS;
-		uint32_t unit_index = m_unit.count();
 		work_unit &unit = m_unit.next();
 
 		// determine how much to advance to hit the next bucket
@@ -771,13 +840,11 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_tile(recta
 
 		// fill in the work unit basics
 		unit.primitive = &primitive;
-		unit.count_next = std::min(v2yclip - curscan, scaninc);
+		unit.count = std::min(v2yclip - curscan, scaninc);
 		unit.scanline = curscan;
-		unit.previtem = m_unit_bucket[bucketnum];
-		m_unit_bucket[bucketnum] = unit_index;
 
 		// iterate over extents
-		for (int extnum = 0; extnum < unit.count_next; extnum++)
+		for (int extnum = 0; extnum < unit.count; extnum++)
 		{
 			// set the extent and update the total pixel count
 			extent_t &extent = unit.extent[extnum];
@@ -800,7 +867,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_tile(recta
 	}
 
 	// enqueue the work items
-	queue_items(startunit);
+	queue_items(startunit, pixels);
 
 	// return the total number of pixels in the triangle
 	m_tiles++;
@@ -903,8 +970,6 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle(c
 	int32_t scaninc = 1;
 	for (int32_t curscan = v1yclip; curscan < v3yclip; curscan += scaninc)
 	{
-		uint32_t bucketnum = (uint32_t(curscan) / SCANLINES_PER_BUCKET) % TOTAL_BUCKETS;
-		uint32_t unit_index = m_unit.count();
 		work_unit &unit = m_unit.next();
 
 		// determine how much to advance to hit the next bucket
@@ -912,13 +977,11 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle(c
 
 		// fill in the work unit basics
 		unit.primitive = &primitive;
-		unit.count_next = std::min(v3yclip - curscan, scaninc);
+		unit.count = std::min(v3yclip - curscan, scaninc);
 		unit.scanline = curscan;
-		unit.previtem = m_unit_bucket[bucketnum];
-		m_unit_bucket[bucketnum] = unit_index;
 
 		// iterate over extents
-		for (int extnum = 0; extnum < unit.count_next; extnum++)
+		for (int extnum = 0; extnum < unit.count; extnum++)
 		{
 			// compute the ending X based on which part of the triangle we're in
 			BaseType fully = BaseType(curscan + extnum) + BaseType(0.5);
@@ -963,7 +1026,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle(c
 	}
 
 	// enqueue the work items
-	queue_items(startunit);
+	queue_items(startunit, pixels);
 
 	// return the total number of pixels in the triangle
 	m_triangles++;
@@ -1035,8 +1098,6 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_extents(re
 	int32_t scaninc = 1;
 	for (int32_t curscan = v1yclip; curscan < v3yclip; curscan += scaninc)
 	{
-		uint32_t bucketnum = (uint32_t(curscan) / SCANLINES_PER_BUCKET) % TOTAL_BUCKETS;
-		uint32_t unit_index = m_unit.count();
 		work_unit &unit = m_unit.next();
 
 		// determine how much to advance to hit the next bucket
@@ -1044,13 +1105,11 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_extents(re
 
 		// fill in the work unit basics
 		unit.primitive = &primitive;
-		unit.count_next = std::min(v3yclip - curscan, scaninc);
+		unit.count = std::min(v3yclip - curscan, scaninc);
 		unit.scanline = curscan;
-		unit.previtem = m_unit_bucket[bucketnum];
-		m_unit_bucket[bucketnum] = unit_index;
 
 		// iterate over extents
-		for (int extnum = 0; extnum < unit.count_next; extnum++)
+		for (int extnum = 0; extnum < unit.count; extnum++)
 		{
 			extent_t const &srcextent = extents[(curscan + extnum) - startscanline];
 			int32_t istartx = srcextent.startx, istopx = srcextent.stopx;
@@ -1085,7 +1144,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_extents(re
 	}
 
 	// enqueue the work items
-	queue_items(startunit);
+	queue_items(startunit, pixels);
 
 	// return the total number of pixels in the object
 	m_triangles++;
@@ -1209,8 +1268,6 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(re
 	int32_t scaninc = 1;
 	for (int32_t curscan = minyclip; curscan < maxyclip; curscan += scaninc)
 	{
-		uint32_t bucketnum = (uint32_t(curscan) / SCANLINES_PER_BUCKET) % TOTAL_BUCKETS;
-		uint32_t unit_index = m_unit.count();
 		work_unit &unit = m_unit.next();
 
 		// determine how much to advance to hit the next bucket
@@ -1218,13 +1275,11 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(re
 
 		// fill in the work unit basics
 		unit.primitive = &primitive;
-		unit.count_next = std::min(maxyclip - curscan, scaninc);
+		unit.count = std::min(maxyclip - curscan, scaninc);
 		unit.scanline = curscan;
-		unit.previtem = m_unit_bucket[bucketnum];
-		m_unit_bucket[bucketnum] = unit_index;
 
 		// iterate over extents
-		for (int extnum = 0; extnum < unit.count_next; extnum++)
+		for (int extnum = 0; extnum < unit.count; extnum++)
 		{
 			// compute the ending X based on which part of the triangle we're in
 			BaseType fully = BaseType(curscan + extnum) + BaseType(0.5);
@@ -1282,7 +1337,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(re
 	}
 
 	// enqueue the work items
-	queue_items(startunit);
+	queue_items(startunit, pixels);
 
 	// return the total number of pixels in the polygon
 	m_polygons++;

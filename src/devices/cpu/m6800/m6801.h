@@ -177,6 +177,7 @@ protected:
 	static const op_func m6803_insn[256];
 	static const op_func hd63701_insn[256];
 
+	bool check_irq2_is3();
 	bool check_irq2_ici();
 	bool check_irq2_oci();
 	bool check_irq2_toi();

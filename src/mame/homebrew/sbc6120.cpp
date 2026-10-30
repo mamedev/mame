@@ -10,6 +10,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/pdp8/hd6120.h"
 #include "machine/ay31015.h"
@@ -38,8 +39,8 @@ public:
 	{
 	}
 
-	void sbc6120(machine_config &config);
-	void init_sbc6120();
+	void sbc6120(machine_config &config) ATTR_COLD;
+	void init_sbc6120() ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(baud_changed);
 
@@ -298,10 +299,10 @@ void sbc6120_state::devctl_map(address_map &map)
 static INPUT_PORTS_START(sbc6120)
 	PORT_START("JUMPERS")
 	PORT_CONFNAME(0x07ff, 0x0020, "Console Baud Rate") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sbc6120_state::baud_changed), 0)
-	PORT_CONFSETTING(0x0008, "38400 (J11)")
-	PORT_CONFSETTING(0x0020, "9600 (J12)")
-	PORT_CONFSETTING(0x0100, "1200 (J13)")
 	PORT_CONFSETTING(0x0400, "300 (J14)")
+	PORT_CONFSETTING(0x0100, "1200 (J13)")
+	PORT_CONFSETTING(0x0020, "9600 (J12)")
+	PORT_CONFSETTING(0x0008, "38400 (J11)")
 	PORT_CONFNAME(0x8000, 0x8000, "Console Break Requests Panel Mode (J10)")
 	PORT_CONFSETTING(0x0000, DEF_STR(No))
 	PORT_CONFSETTING(0x8000, DEF_STR(Yes))

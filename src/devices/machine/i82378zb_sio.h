@@ -9,7 +9,6 @@
 #include "pci.h"
 
 #include "bus/isa/isa.h"
-#include "cpu/i386/i386.h"
 #include "machine/am9517a.h"
 #include "machine/at_keybc.h"
 #include "machine/idectrl.h"
@@ -32,6 +31,9 @@ public:
 
 	template <typename T> void set_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
 
+	auto intr() { return m_write_intr.bind(); }
+	u8 acknowledge() { return m_pic[0]->acknowledge(); }
+
 	auto boot_state_hook() { return m_boot_state_hook.bind(); }
 	auto a20m() { return m_write_a20m.bind(); }
 	auto cpureset() { return m_write_cpureset.bind(); }
@@ -39,6 +41,8 @@ public:
 
 	// X-Bus integrations
 	void pc_irq1_w(int state);
+	void pc_irq8n_w(int state);
+	void pc_irq12m_w(int state);
 	void pc_irq14_w(int state);
 	void pc_irq15_w(int state);
 
@@ -53,7 +57,6 @@ protected:
 	i82378zb_sio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config & config) override;
-	virtual void device_config_complete() override;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -78,6 +81,7 @@ private:
 	optional_device<at_keyboard_controller_device> m_xbus_keybc;
 	optional_device_array<ide_controller_32_device, 2> m_xbus_ide;
 
+	devcb_write_line m_write_intr;
 	devcb_write8 m_boot_state_hook;
 	devcb_write_line m_write_a20m;
 	devcb_write_line m_write_cpureset;
@@ -137,6 +141,7 @@ private:
 	void keyboard_gatea20(int state);
 
 	// Southbridge common stuff
+	void pic_int_w(int state);
 	void at_pit8254_out0_changed(int state);
 	void at_pit8254_out1_changed(int state);
 	void at_pit8254_out2_changed(int state);
@@ -168,6 +173,8 @@ private:
 	void pc_dma_write_byte(offs_t offset, uint8_t data);
 	uint8_t pc_dma_read_word(offs_t offset);
 	void pc_dma_write_word(offs_t offset, uint8_t data);
+	u8 isa_port60_r();
+	void isa_port60_w(u8 data);
 	uint8_t at_portb_r();
 	void at_portb_w(uint8_t data);
 	void at_speaker_set_spkrdata(uint8_t data);
@@ -177,11 +184,9 @@ private:
 	void pc_irq5_w(int state);
 	void pc_irq6_w(int state);
 	void pc_irq7_w(int state);
-	void pc_irq8n_w(int state);
 	void pc_irq9_w(int state);
 	void pc_irq10_w(int state);
 	void pc_irq11_w(int state);
-	void pc_irq12m_w(int state);
 
 //  void pc_pirqa_w(int state);
 //  void pc_pirqb_w(int state);
@@ -195,6 +200,10 @@ private:
 	void pc_select_dma_channel(int channel, bool state);
 	uint8_t at_page8_r(offs_t offset);
 	void at_page8_w(offs_t offset, uint8_t data);
+	uint8_t dma_page_high_r(offs_t offset);
+	void dma_page_high_w(offs_t offset, uint8_t data);
+	void dma_write(u8 controller, offs_t offset, uint8_t data);
+	void at_dma8237_1_w(offs_t offset, uint8_t data);
 	uint8_t at_dma8237_2_r(offs_t offset);
 	void at_dma8237_2_w(offs_t offset, uint8_t data);
 
@@ -202,9 +211,9 @@ private:
 	uint8_t m_pit_out2 = 0;
 	uint8_t m_at_speaker = 0;
 	bool m_refresh = false;
-	int m_dma_channel = 0;
+	s32 m_dma_channel = -1;
 	bool m_cur_eop = false;
-	uint8_t m_dma_offset[2][4];
+	uint16_t m_dma_offset[2][4]{};
 	uint8_t m_at_pages[0x10]{};
 	uint16_t m_dma_high_byte = 0;
 	uint8_t m_channel_check = 0;

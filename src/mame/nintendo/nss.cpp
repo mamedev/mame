@@ -493,7 +493,7 @@ void nss_state::nss_prot_w(uint8_t data)
 	{
 		m_rp5h01->test_w(data & 0x10);     /* D4 */
 		m_rp5h01->clock_w(data & 0x08);    /* D3 */
-		m_rp5h01->cs_w(~data & 0x01);
+		m_rp5h01->reset_w(~data & 0x01);
 	}
 
 	m_eepromout->write(data, 0xff);

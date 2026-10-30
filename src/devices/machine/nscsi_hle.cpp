@@ -5,6 +5,9 @@
 
 #include "util/multibyte.h"
 
+#include <algorithm>
+#include <iterator>
+
 
 #define LOG_UNSUPPORTED (1U << 1)
 #define LOG_STATE       (1U << 2)
@@ -75,6 +78,13 @@ void nscsi_full_device::device_start()
 		save_item(NAME(m_buf_control[i].m_param1), i);
 		save_item(NAME(m_buf_control[i].m_param2), i);
 	}
+	save_item(NAME(m_resume_state));
+	save_item(NAME(m_resume_phase));
+	save_item(NAME(m_resume_buffer_id));
+	save_item(NAME(m_resume_buffer_pos));
+	save_item(NAME(m_resume_cmdsize));
+	save_item(NAME(m_resume_cmdbuf));
+	save_item(NAME(m_reset_unit_attention));
 }
 
 void nscsi_full_device::device_reset()
@@ -84,6 +94,8 @@ void nscsi_full_device::device_reset()
 	m_scsi_identify = 0;
 	m_data_buffer_size = 0;
 	m_data_buffer_pos = 0;
+	m_resume_state = IDLE;
+	m_reset_unit_attention = false;
 	m_scsi_bus->data_w(m_scsi_refid, 0);
 	m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ALL);
 	m_scsi_bus->ctrl_wait(m_scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
@@ -114,6 +126,7 @@ void nscsi_full_device::step(bool timeout)
 		m_scsi_identify = 0;
 		m_data_buffer_size = 0;
 		m_data_buffer_pos = 0;
+		m_resume_state = IDLE;
 		return;
 	}
 
@@ -160,6 +173,10 @@ void nscsi_full_device::step(bool timeout)
 		if(!(ctrl & S_ACK)) {
 			m_scsi_state &= STATE_MASK;
 			m_scsi_bus->ctrl_wait(m_scsi_refid, 0, S_ACK);
+			if((ctrl & S_ATN) && m_scsi_state != TARGET_WAIT_MSG_BYTE && m_scsi_state != TARGET_WAIT_CMD_BYTE) {
+				target_go_message_out();
+				break;
+			}
 			attotime delay = scsi_data_byte_period();
 			if (delay == attotime::zero) {
 				step(false);
@@ -181,6 +198,10 @@ void nscsi_full_device::step(bool timeout)
 		if(!(ctrl & S_ACK)) {
 			m_scsi_state &= STATE_MASK;
 			m_scsi_bus->ctrl_wait(m_scsi_refid, 0, S_ACK);
+			if((ctrl & S_ATN) && m_scsi_state != TARGET_WAIT_MSG_BYTE && m_scsi_state != TARGET_WAIT_CMD_BYTE) {
+				target_go_message_out();
+				break;
+			}
 			attotime delay = scsi_data_byte_period();
 			if (delay == attotime::zero) {
 				step(false);
@@ -277,6 +298,14 @@ void nscsi_full_device::step(bool timeout)
 			return;
 		if(!(ctrl & S_ATN)) {
 			m_scsi_cmdsize = m_data_buffer_pos;
+			if(m_scsi_cmdbuf[0] == SM_ABORT || m_scsi_cmdbuf[0] == SM_BUS_DEVICE_RESET) {
+				target_abort(m_scsi_cmdbuf[0] == SM_BUS_DEVICE_RESET);
+				break;
+			}
+			if(m_resume_state != IDLE) {
+				target_interrupt_message();
+				break;
+			}
 			scsi_message();
 			m_data_buffer_id = SBUF_MAIN;
 			m_data_buffer_pos = 0;
@@ -298,7 +327,19 @@ void nscsi_full_device::step(bool timeout)
 		if(scsi_command_done(m_scsi_cmdbuf[0], m_data_buffer_pos)) {
 			m_scsi_cmdsize = m_data_buffer_pos;
 			m_scsi_bus->ctrl_wait(m_scsi_refid, 0, S_ACK);
-			scsi_command();
+			if(m_reset_unit_attention && m_scsi_cmdbuf[0] != SC_INQUIRY) {
+				// SCSI-2 7.9: the unit attention fails the next command other
+				// than INQUIRY; REQUEST SENSE reports it, and either clears it
+				m_reset_unit_attention = false;
+				if(m_scsi_cmdbuf[0] == SC_REQUEST_SENSE) {
+					set_sense_data(SK_UNIT_ATTENTION, SKC_POWER_ON_RESET_OR_BUS_DEVICE_RESET_OCCURRED);
+					scsi_command();
+				} else {
+					report_condition(SK_UNIT_ATTENTION, SKC_POWER_ON_RESET_OR_BUS_DEVICE_RESET_OCCURRED);
+				}
+			} else {
+				scsi_command();
+			}
 			m_scsi_state = TARGET_NEXT_CONTROL;
 			attotime delay = scsi_data_command_delay();
 			if (delay == attotime::zero) {
@@ -308,6 +349,10 @@ void nscsi_full_device::step(bool timeout)
 			}
 		} else
 			target_recv_byte();
+		break;
+
+	case TARGET_MSG_REJECT_SENT:
+		target_resume_transfer();
 		break;
 
 	default:
@@ -680,6 +725,81 @@ void nscsi_full_device::scsi_message()
 	for(int i=0; i != m_scsi_cmdsize; i++)
 		txt += util::string_format(" %02x", m_scsi_cmdbuf[i]);
 	LOGMASKED(LOG_UNSUPPORTED, "%s\n", txt);
+}
+
+void nscsi_full_device::scsi_abort()
+{
+}
+
+// The initiator asserted ATN while a byte was in flight (SCSI-2 6.2.1):
+// remember where the transfer stands and go to MESSAGE OUT at the end of this
+// byte.  ATN during the MESSAGE REJECT answering an earlier message keeps the
+// transfer saved then.
+void nscsi_full_device::target_go_message_out()
+{
+	if(m_scsi_state != TARGET_MSG_REJECT_SENT) {
+		m_resume_state = m_scsi_state;
+		m_resume_phase = m_scsi_bus->ctrl_r() & S_PHASE_MASK;
+		m_resume_buffer_id = m_data_buffer_id;
+		m_resume_buffer_pos = m_data_buffer_pos;
+		m_resume_cmdsize = m_scsi_cmdsize;
+		std::copy(std::begin(m_scsi_cmdbuf), std::end(m_scsi_cmdbuf), std::begin(m_resume_cmdbuf));
+	}
+	m_data_buffer_id = SBUF_MAIN;
+	m_data_buffer_pos = 0;
+	m_scsi_state = TARGET_WAIT_MSG_BYTE;
+	m_scsi_bus->ctrl_w(m_scsi_refid, S_PHASE_MSG_OUT, S_PHASE_MASK);
+	target_recv_byte();
+}
+
+// ABORT or BUS DEVICE RESET (SCSI-2 6.6.1, 6.6.3): drop the command and free
+// the bus.  A bus device reset also leaves a unit attention condition.
+void nscsi_full_device::target_abort(bool bus_device_reset)
+{
+	if(bus_device_reset)
+		m_reset_unit_attention = true;
+	m_resume_state = IDLE;
+	scsi_abort();
+	m_buf_control_rpos = m_buf_control_wpos = 0;
+	m_data_buffer_id = SBUF_MAIN;
+	m_data_buffer_pos = 0;
+	buf_control_push()->m_action = BC_BUS_FREE;
+	m_scsi_state = TARGET_NEXT_CONTROL;
+	step(false);
+}
+
+// Any other message during a transfer.  NO OPERATION and the error reports
+// are accepted (MAME's bus has no parity errors to retry), the rest get
+// MESSAGE REJECT (SCSI-2 6.6.14), and the interrupted transfer carries on.
+void nscsi_full_device::target_interrupt_message()
+{
+	switch(m_scsi_cmdbuf[0]) {
+	case SM_INITIATOR_DETECTED_ERROR:
+	case SM_MESSAGE_REJECT:
+	case SM_NO_OPERATION:
+	case SM_MESSAGE_PARITY_ERROR:
+		target_resume_transfer();
+		break;
+
+	default:
+		LOGMASKED(LOG_UNSUPPORTED, "Rejected message %02x during a transfer\n", m_scsi_cmdbuf[0]);
+		m_scsi_state = TARGET_MSG_REJECT_SENT;
+		m_scsi_bus->ctrl_w(m_scsi_refid, S_PHASE_MSG_IN, S_PHASE_MASK);
+		target_send_byte(SM_MESSAGE_REJECT);
+		break;
+	}
+}
+
+void nscsi_full_device::target_resume_transfer()
+{
+	std::copy(std::begin(m_resume_cmdbuf), std::end(m_resume_cmdbuf), std::begin(m_scsi_cmdbuf));
+	m_scsi_cmdsize = m_resume_cmdsize;
+	m_data_buffer_id = m_resume_buffer_id;
+	m_data_buffer_pos = m_resume_buffer_pos;
+	m_scsi_state = m_resume_state;
+	m_resume_state = IDLE;
+	m_scsi_bus->ctrl_w(m_scsi_refid, m_resume_phase, S_PHASE_MASK);
+	step(false);
 }
 
 int nscsi_full_device::get_lun(int def)

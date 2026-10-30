@@ -660,7 +660,33 @@ mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_typ
 	set_palette(s_palette);
 }
 
+void mc6847_base_device::change_mode(uint8_t mode, int state)
+{
+	// sanity check, to ensure that we're not changing fixed modes
+	// i.e. client shouldn't use set_fixed_mode bits on live setups
+	assert((mode & m_fixed_mode_mask) == 0);
 
+	// calculate new mode
+	uint8_t new_mode;
+	if (state)
+		new_mode = m_mode | mode;
+	else
+		new_mode = m_mode & ~mode;
+
+	// has the mode changed?
+	if (new_mode != m_mode)
+	{
+		// it has!  check dirty flag
+		video_flush();
+		if (!m_dirty)
+		{
+			m_dirty = true;
+		}
+
+		// and set the new mode
+		m_mode = new_mode;
+	}
+}
 
 //-------------------------------------------------
 //  setup_fixed_mode - sets up fixed mode mask
@@ -996,6 +1022,7 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	/* if the video didn't change, indicate as much */
 	if (!m_artifacter.poll_config() && !has_video_changed())
 		return UPDATE_HAS_NOT_CHANGED;
+	const bool ntsc_artifacting = m_artifacter.get_ntsc_artifacting();
 
 	/* top border */
 	for (int y = min_y; y < base_y; y++)
@@ -1021,6 +1048,9 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 
 		/* body */
 		const int width = m_data[y].m_sample_count;
+		uint8_t artifact_modes[256];
+		if (ntsc_artifacting)
+			std::fill_n(artifact_modes, 256, 0);
 		pixel_t *RESTRICT pixels = bitmap_addr(bitmap, base_y + y, base_x);
 		for (int x = 0; x < width; )
 		{
@@ -1030,7 +1060,7 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 				;
 
 			/* emit the samples */
-			pixels += emit_samples(
+			const uint32_t pixel_count = emit_samples(
 					m_data[y].m_mode[x],
 					&m_data[y].m_data[x],
 					x2 - x,
@@ -1039,6 +1069,13 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 					m_charrom_cb,
 					x,
 					y);
+
+			if (ntsc_artifacting)
+			{
+				const unsigned pixel_offset = std::min<unsigned>(pixels - bitmap_addr(bitmap, base_y + y, base_x), 256);
+				std::fill_n(artifact_modes + pixel_offset, std::min<unsigned>(pixel_count, 256 - pixel_offset), m_data[y].m_mode[x]);
+			}
+			pixels += pixel_count;
 
 			/* update x */
 			x = x2;
@@ -1055,9 +1092,9 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 			if (y % 2)
 				m_artifacter.process_artifacts_pal<1>(bitmap, y - 1, base_x, base_y, m_data[y].m_mode[0], palette);
 		}
-		else
+		else if (ntsc_artifacting)
 		{
-			m_artifacter.process_artifacts<1>(bitmap_addr(bitmap, y + base_y, base_x), m_data[y].m_mode[0], palette);
+			m_artifacter.process_artifacts<1>(bitmap_addr(bitmap, y + base_y, base_x), m_data[y].m_mode[0], palette, artifact_modes);
 		}
 	}
 

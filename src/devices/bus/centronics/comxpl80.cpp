@@ -6,14 +6,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - CPU type?
-
-*/
-
 #include "emu.h"
 #include "comxpl80.h"
 
@@ -23,7 +15,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define CX005_TAG       "cx005"
+#define CX005_TAG "p16"
 
 
 
@@ -39,10 +31,11 @@ DEFINE_DEVICE_TYPE(COMX_PL80, comx_pl80_device, "comx_pl80", "COMX PL-80")
 //-------------------------------------------------
 
 ROM_START( comxpl80 )
-	ROM_REGION( 0x1000, CX005_TAG, 0 ) // TODO: what is this? (not 6805 code)
-	ROM_LOAD( "pl80.pt6",       0x0080, 0x0e00, CRC(ae059e5b) SHA1(f25812606b0082d32eb603d0a702a2187089d332) )
+	ROM_REGION( 0x1000, CX005_TAG, 0 )
+	ROM_LOAD( "mask.p16", 0x080, 0xf00, NO_DUMP )
 
 	ROM_REGION( 0x6000, "gfx1", ROMREGION_ERASEFF ) // Plotter fonts
+	ROM_LOAD( "pl80.pt6",       0x0080, 0x0e00, CRC(ae059e5b) SHA1(f25812606b0082d32eb603d0a702a2187089d332) )
 	ROM_LOAD( "it.em.ou.bin",   0x2000, 0x2000, CRC(1b4a3198) SHA1(138ff6666a31c2d18cd63e609dd94d9cd1529931) )
 	ROM_LOAD( "tiny.bin",       0x4000, 0x0400, CRC(940ec1ed) SHA1(ad83a3b57e2f0fbaa1e40644cd999b3f239635e8) )
 ROM_END
@@ -64,10 +57,12 @@ const tiny_rom_entry *comx_pl80_device::device_rom_region() const
 
 void comx_pl80_device::device_add_mconfig(machine_config &config)
 {
-#if 0
-	m6805_device &cx005(M6805(config, CX005_TAG, 4000000)); // CX005: some kind of MC6805/MC68HC05 clone
-	cx005.set_disable();
-#endif
+	m6805u3_device &maincpu(M6805U3(config, CX005_TAG, 4_MHz_XTAL));
+	maincpu.set_disable();
+	maincpu.porta_w().set(FUNC(comx_pl80_device::pa_w));
+	maincpu.portb_w().set(FUNC(comx_pl80_device::pb_w));
+	maincpu.portc_w().set(FUNC(comx_pl80_device::pc_w));
+	maincpu.portd_r().set(FUNC(comx_pl80_device::pd_r));
 }
 
 
@@ -113,12 +108,20 @@ ioport_constructor comx_pl80_device::device_input_ports() const
 //  comx_pl80_device - constructor
 //-------------------------------------------------
 
-comx_pl80_device::comx_pl80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, COMX_PL80, tag, owner, clock),
-		device_centronics_peripheral_interface(mconfig, *this),
-		m_plotter(*this, "gfx1"),
-		m_font(*this, "FONT"),
-		m_sw(*this, "SW"), m_font_addr(0), m_x_motor_phase(0), m_y_motor_phase(0), m_z_motor_phase(0), m_plotter_data(0), m_plotter_ack(0), m_plotter_online(0), m_data(0)
+comx_pl80_device::comx_pl80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, COMX_PL80, tag, owner, clock),
+	device_centronics_peripheral_interface(mconfig, *this),
+	m_plotter(*this, "gfx1"),
+	m_font(*this, "FONT"),
+	m_sw(*this, "SW"),
+	m_font_addr(0),
+	m_x_motor_phase(0),
+	m_y_motor_phase(0),
+	m_z_motor_phase(0),
+	m_plotter_data(0),
+	m_plotter_ack(0),
+	m_plotter_online(0),
+	m_data(0)
 {
 }
 

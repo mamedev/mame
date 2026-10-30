@@ -7,12 +7,20 @@
     FameG (福华先进微电子, Shanghai) FS8806 authentication and secure-counter chip
     Emulation by R. Belmont
 
-    I2C dongle (SPI mode not emulated).  Every message is one or more DES-ECB
+    I2C or SPI dongle.  Every message is one or more DES-ECB
     blocks under a shared 8-byte key, each block byte-reversed into and out of
     the cipher, followed by a 16-bit CRC.  The chip counts the data messages
     it accepts and the host periodically compares that count with its own.
 
     Message: [ command, sequence, ... ][ payload from byte 8 ][ crc-lo, crc-hi ]
+
+    In SPI mode a message is the bytes clocked in while chip select is low,
+    and a reply is clocked out in a separate selection.  The bit timing is
+    the one the FS8806 library of the tjf_vr0.cpp medal games is set up for: data
+    sampled on the rising edge of SCK, next bit presented after the falling
+    edge, MSB first.  Since SPI is full duplex, the 0xff bytes clocked in
+    while the host reads a reply also arrive as a message; they fail the CRC
+    check and are ignored.
 
     Commands, as used by the Happy Fish 302-in-1 Linux kernel:
 
@@ -162,7 +170,13 @@ fs8806_device::fs8806_device(const machine_config &mconfig, const char *tag, dev
 	m_tx_len(0),
 	m_challenge{},
 	m_verify{},
-	m_counter(0)
+	m_counter(0),
+	m_spi_cs(1),
+	m_spi_sck(1),
+	m_spi_mosi(1),
+	m_spi_bit(0),
+	m_spi_shift(0),
+	m_spi_offset(0)
 {
 }
 
@@ -179,6 +193,12 @@ void fs8806_device::device_start()
 	save_item(NAME(m_challenge));
 	save_item(NAME(m_verify));
 	save_item(NAME(m_counter));
+	save_item(NAME(m_spi_cs));
+	save_item(NAME(m_spi_sck));
+	save_item(NAME(m_spi_mosi));
+	save_item(NAME(m_spi_bit));
+	save_item(NAME(m_spi_shift));
+	save_item(NAME(m_spi_offset));
 }
 
 void fs8806_device::device_reset()
@@ -274,6 +294,60 @@ void fs8806_device::i2c_stop()
 		handle_packet();
 		m_rx_len = 0;
 	}
+}
+
+/***************************************************************************
+    SPI INTERFACE
+***************************************************************************/
+
+void fs8806_device::spi_cs_w(int state)
+{
+	if (state == m_spi_cs)
+		return;
+	m_spi_cs = state;
+
+	if (!state)
+	{
+		m_rx_len = 0;
+		m_spi_bit = 0;
+		m_spi_offset = 0;
+	}
+	else if (m_rx_len != 0)
+	{
+		// deselecting ends the message
+		handle_packet();
+		m_rx_len = 0;
+	}
+}
+
+void fs8806_device::spi_sck_w(int state)
+{
+	if (state == m_spi_sck)
+		return;
+	m_spi_sck = state;
+
+	if (!m_spi_cs && state)
+	{
+		m_spi_shift = (m_spi_shift << 1) | m_spi_mosi;
+		if (++m_spi_bit == 8)
+		{
+			write_data(m_spi_offset++, m_spi_shift);
+			m_spi_bit = 0;
+		}
+	}
+}
+
+void fs8806_device::spi_mosi_w(int state)
+{
+	m_spi_mosi = state ? 1 : 0;
+}
+
+int fs8806_device::spi_miso_r()
+{
+	if (m_spi_cs)
+		return 1;
+
+	return BIT(read_data(m_spi_offset), 7 - m_spi_bit);
 }
 
 /***************************************************************************

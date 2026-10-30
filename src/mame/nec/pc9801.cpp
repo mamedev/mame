@@ -35,19 +35,23 @@ TODO (pc9801rs):
 - Remove IDE hack to not make 512 to 256 sector byte translations
 \- probably need a working C-Bus IDE in place, or a SCSI option;
 
-TODO (pc9801us / pc9801fs):
+TODO (pc9801us):
 - "Invalid Command Byte 13" for bitmap upd7220 at POST (?)
 - RAM check detects more RAM than what's really installed (and saves previous detection in MEMSW);
-- pc9801fs: Crashes with Japanese error for "HDD failure" when mounted with IDE BIOS
-\- wants specifically (the internal) SCSI?
+
+TODO (pc9801fs, on top of pc9801us notes):
+- no way to get past "run-time error R6003" with format /h in msdos62
+\- attempts to read a "VOL1" string from an unformatted HDD ...
 
 TODO (pc9801bx2):
-- Accesses $8f0-$8f2 PMC area, shared with 98NOTE machines;
+- Accesses $8f0-$8f2 PMC area, shared with 98NOTE machines and pc9821as;
 - A non-fatal "MEMORY ERROR" is always thrown no matter the RAM size afterwards, missing
   stealth SRAM hookup.
   NOTE: stealth SRAM must be introduced between pc9821ce ~ pc9801bx2 (former doesn't have it)
 - unemulated conventional or EMS RAM bank, definitely should have one given the odd minimum RAM
   size;
+- keyboard never brings setup mode;
+- Runs at 38.x Hz by default;
 
 TODO (pc9801ux):
 - "I/O Error" on any 3.5" floppy, specific to this romset (i.e. those works on pc9821).
@@ -883,6 +887,35 @@ void pc9801us_state::pc9801us_io(address_map &map)
 //  map(0x8f1f, 0x8f1f).w(m_sdip, FUNC(pc98_sdip_device::bank_w));
 }
 
+void pc9801bx_state::itf_43d_bank_w(offs_t offset, uint8_t data)
+{
+	// assume overlay disabled on writes to $43d
+	m_bios_view.disable();
+	pc9801vm_state::itf_43d_bank_w(offset, data);
+}
+
+void pc9801bx_state::cbus_43f_bank_w(offs_t offset, uint8_t data)
+{
+	if ((data & 0xf8) == 0xe0)
+	{
+		logerror("C-Bus overlay set %02x\n", data);
+		m_bios_view.select(data & 0x7);
+		return;
+	}
+
+	// Exit setup mode disarms overlay with a 0xe8 write
+	// (or writes are >> 1 and undocumented mem is wrong?)
+	if ((data & 0xf8) == 0xe8)
+	{
+		logerror("C-Bus overlay disable (%02x)\n", data);
+		m_bios_view.disable();
+		return;
+	}
+
+	pc9801vm_state::cbus_43f_bank_w(offset, data);
+}
+
+
 void pc9801bx_state::pc9801bx2_map(address_map &map)
 {
 	pc9801vm_map(map);
@@ -898,6 +931,12 @@ void pc9801bx_state::pc9801bx2_map(address_map &map)
 //  map(0x000da000, 0x000dbfff).ram(); // ide ram (declared in RS)
 //  map(0x000e0000, 0x000e7fff).rw(FUNC(pc9821_state::pc9821_grcg_gvram0_r), FUNC(pc9821_state::pc9821_grcg_gvram0_w));
 	map(0x000e8000, 0x000fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+
+	map(0x000f8000, 0x000fffff).view(m_bios_view);
+	// TODO: remaining settings
+	m_bios_view[4](0x000f8000, 0x000fffff).rom().region("biosrom", 0x10000);
+	// setup mode
+	m_bios_view[6](0x000f8000, 0x000fffff).rom().region("biosrom", 0x18000);
 
 	map(0x00100000, 0x00efffff).rw("simm", FUNC(pc9801_61_simm_device::read_ext), FUNC(pc9801_61_simm_device::write_ext));
 	map(0x00f00000, 0x00ffffff).view(m_hole_15M_view);
@@ -2354,6 +2393,8 @@ void pc9801us_state::pc9801fs(machine_config &config)
 	config_floppy_525hd(config);
 
 	// optional SCSI HDD
+	PC98_CBUS_SLOT(config, "cbus:mb1", 0, "cbus", pc98_cbus_devices, "scsi1_pc98", true);
+	// TODO: SASI BIOS hookup
 
 	pit_clock_config(config, xtal / 4);
 
@@ -2382,6 +2423,9 @@ void pc9801bx_state::pc9801bx2(machine_config &config)
 	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST, /4 ~ /7
 
 	PC98_SDIP(config, "sdip");
+
+	PC98_119_KBD(config.replace(), m_keyb, 0);
+	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 
 	// RAM 1.8 MB (U2/M2) / 3.6 MB (U7) ~ 19.6 MB (from EMS?)
 	config.device_remove("simm");
@@ -2717,8 +2761,10 @@ ROM_START( pc9801fs )
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	// 0x0c000-0x0ffff sound ROM BIOS
 	// 0x10000-0x13fff ^ mirror
-	// 0x14000-0x16fff <unknown>
-	// 0x17000-0x17fff SCSI disk BIOS?
+	// 0x14000-0x14fff SCSI disk BIOS bank 0
+	// 0x15000-0x15fff <empty>
+	// 0x16000-0x16fff SCSI disk BIOS bank 1
+	// 0x17000-0x17fff SASI disk BIOS
 	// 0x18000-0x1ffff <empty>
 	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x08000 )  //ITF ROM
 	ROM_COPY( "biosrom", 0x28000, 0x18000, 0x08000 )  //BIOS ROM
@@ -2729,10 +2775,13 @@ ROM_START( pc9801fs )
 	ROM_LOAD( "font_ux.rom",     0x000000, 0x046800, BAD_DUMP CRC(19a76eeb) SHA1(96a006e8515157a624599c2b53a581ae0dd560fd) )
 
 	LOAD_KANJI_ROMS
+	// NOTE: Crashes with Japanese error for "HDD failure" when mounted with IDE BIOS
 //  LOAD_IDE_ROM
 
-//  ROM_REGION( 0x4000, "scsi", ROMREGION_ERASEVAL(0xcb) )
-//  ROM_COPY( "biosrom", 0x16000, 0x00000, 0x02000 )
+	// NOTE: SCSI BIOS is always selected as "external" (0xfd) in PkgId regardless of DSW2:6
+	ROM_REGION16_LE( 0x8000, "cbus:mb1:scsi1_pc98:bios", 0 )
+	ROM_COPY( "biosrom", 0x14000, 0x00000, 0x01000 )
+	ROM_COPY( "biosrom", 0x16000, 0x01000, 0x01000 )
 ROM_END
 
 /*
@@ -2808,17 +2857,22 @@ Floppy 5.25" x 2, otherwise same as U2
 
 ROM_START( pc9801bx2 )
 	ROM_REGION16_LE( 0x40000, "biosrom", ROMREGION_ERASEFF )
-	// baddump: getitf98 format
-	ROM_LOAD( "pc98bank0.bin",  0x00000, 0x08000, BAD_DUMP CRC(bfd100cc) SHA1(cf8e6a5679cca7761481abef0ba4b35ead39efdb) )
-	ROM_LOAD( "pc98bank1.bin",  0x08000, 0x08000, BAD_DUMP CRC(d0562af8) SHA1(2c4fd27eb598f4b8a00f3e86941ba27007d58e47) )
-	ROM_LOAD( "pc98bank2.bin",  0x10000, 0x08000, BAD_DUMP CRC(12818a14) SHA1(9c31e8ac85d78fa779d6bbc2095557065294ec09) )
-	ROM_LOAD( "pc98bank3.bin",  0x18000, 0x08000, BAD_DUMP CRC(d0bda44e) SHA1(c1022a3b2be4d2a1e43914df9e4605254e5f99d5) )
-	ROM_LOAD( "pc98bank4.bin",  0x20000, 0x08000, BAD_DUMP CRC(be8092f4) SHA1(12c8a166b8c6ebbef85568b67e1f098562883365) )
-	ROM_LOAD( "pc98bank5.bin",  0x28000, 0x08000, BAD_DUMP CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )
-	ROM_LOAD( "pc98bank6.bin",  0x30000, 0x08000, BAD_DUMP CRC(f878c160) SHA1(cad47f09075ffe4f7b51bb937c9f716c709d4596) )
-	ROM_LOAD( "pc98bank7.bin",  0x38000, 0x08000, BAD_DUMP CRC(1bd6537b) SHA1(ff9ee1c976a12b87851635ce8991ac4ad607675b) )
+//	ROM_LOAD( "pc98bank0.bin",  0x00000, 0x08000, BAD_DUMP CRC(bfd100cc) SHA1(cf8e6a5679cca7761481abef0ba4b35ead39efdb) )
+//	ROM_LOAD( "pc98bank1.bin",  0x08000, 0x08000, BAD_DUMP CRC(d0562af8) SHA1(2c4fd27eb598f4b8a00f3e86941ba27007d58e47) )
+//	ROM_LOAD( "pc98bank2.bin",  0x10000, 0x08000, BAD_DUMP CRC(12818a14) SHA1(9c31e8ac85d78fa779d6bbc2095557065294ec09) )
+//	ROM_LOAD( "pc98bank3.bin",  0x18000, 0x08000, BAD_DUMP CRC(d0bda44e) SHA1(c1022a3b2be4d2a1e43914df9e4605254e5f99d5) )
+//	ROM_LOAD( "pc98bank4.bin",  0x20000, 0x08000, BAD_DUMP CRC(be8092f4) SHA1(12c8a166b8c6ebbef85568b67e1f098562883365) )
+//	ROM_LOAD( "pc98bank5.bin",  0x28000, 0x08000, BAD_DUMP CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )
+//	ROM_LOAD( "pc98bank6.bin",  0x30000, 0x08000, BAD_DUMP CRC(f878c160) SHA1(cad47f09075ffe4f7b51bb937c9f716c709d4596) )
+//	ROM_LOAD( "pc98bank7.bin",  0x38000, 0x08000, BAD_DUMP CRC(1bd6537b) SHA1(ff9ee1c976a12b87851635ce8991ac4ad607675b) )
+	// TODO: ROM label, verify with actual chip level dump
+	ROM_LOAD( "getitf98_bx2.bin", 0x00000, 0x40000, CRC(e8832068) SHA1(f78958eeef283debb7eafb31b418cf8f1cbfe72e) )
 
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// 0x00000: KBCRT X47 891105
+	// 0x0c000: sound BIOS
+	// 0x17000: SCSI BIOS?
+	// 0x18000: IDE BIOS
 	// 0x1a000: setup mode
 	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x8000 ) // ITF ROM
 	ROM_COPY( "biosrom", 0x28000, 0x18000, 0x8000 ) // BIOS ROM

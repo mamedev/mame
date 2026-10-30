@@ -12,10 +12,11 @@
     Register 0 belongs to the board, not to the chip -- the WD1010's own
     register 0 is unused.
 
-    Transfers are programmed I/O: the Tandy MS-DOS 2.11 driver polls the
-    status register and moves 512 bytes a byte at a time, so INTRQ and
-    the board's DMA acknowledge window are not exercised by any known
-    software.
+    The WD1010 BDRQ output drives BUSDMARQ3*, so the host can move the
+    sector through register 0 with an 80186 DMA channel.  The board has
+    no BUSDMACK3* input; the main board's acknowledge decode at
+    0x0e0-0x0ff is unused.  The Tandy MS-DOS 2.11 driver polls the
+    status register and moves the sector with the CPU instead.
 
 *********************************************************************/
 
@@ -41,6 +42,7 @@ public:
 	tandy2k_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto intrq_wr_callback() { return m_write_intrq.bind(); }
+	auto bdrq_wr_callback() { return m_write_bdrq.bind(); }
 
 	// host interface: 0 = board sector buffer, 1-7 = WD1010 task file
 	uint8_t read(offs_t offset);
@@ -71,6 +73,7 @@ private:
 	required_device<harddisk_image_device> m_hdd;
 
 	devcb_write_line m_write_intrq;
+	devcb_write_line m_write_bdrq;
 
 	uint8_t m_buf[BUFFER_SIZE];     // u12 (WD1100-11) and its static RAM
 	uint16_t m_ptr;
