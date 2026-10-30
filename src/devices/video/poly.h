@@ -448,6 +448,7 @@ private:
 	static void render_units(work_unit *unit, int threadid);
 	void flush_buckets(bool waiting);
 	void presave() { wait("pre-save"); }
+	void preload() { wait("pre-load"); }
 
 	// queue management
 	osd_work_queue *m_queue;               // work queue
@@ -522,8 +523,9 @@ poly_manager<BaseType, ObjectType, MaxParams, Flags>::poly_manager(running_machi
 	register_poly_array(m_object);
 	register_poly_array(m_unit);
 
-	// request a pre-save callback for synchronization
+	// request pre-save and pre-load callbacks for synchronization
 	machine.save().register_presave(save_prepost_delegate(FUNC(poly_manager::presave), this));
+	machine.save().register_preload(save_prepost_delegate(FUNC(poly_manager::preload), this));
 }
 
 
