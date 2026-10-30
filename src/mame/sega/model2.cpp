@@ -183,6 +183,7 @@ void model2_state::machine_start()
 	save_item(NAME(m_geo_write_start_address));
 	save_item(NAME(m_geo_read_start_address));
 	save_item(NAME(m_geo_mesh));
+	save_item(NAME(m_geo_dual_matrix));
 
 	m_irq_delay_timer = timer_alloc(FUNC(model2_state::irq_mask_delayed_update), this);
 	m_irq_delay_timer->adjust(attotime::never);
@@ -3116,6 +3117,7 @@ void model2c_state::segawski(machine_config &config)
 void model2c_state::topskatr(machine_config &config)
 {
 	model2c(config);
+	m_geo_dual_matrix = true;
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
 	io.an_port_callback<0>().set_ioport("CURVING");
