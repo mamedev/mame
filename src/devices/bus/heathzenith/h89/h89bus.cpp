@@ -454,6 +454,23 @@ h89bus_device::~h89bus_device()
 
 void h89bus_device::device_start()
 {
+	m_gpp = 0;
+
+	save_item(NAME(m_gpp));
+}
+
+//-------------------------------------------------
+//  device_reset - the general purpose port is
+//  cleared on reset, every handler is called so
+//  devices can take their reset state from it
+//-------------------------------------------------
+
+void h89bus_device::device_reset()
+{
+	m_gpp = 0;
+
+	for (auto &[mask, handler] : m_gpp_handlers)
+		handler(0);
 }
 
 //-------------------------------------------------
@@ -500,8 +517,12 @@ h89bus::addr_ranges h89bus_device::get_address_ranges(u8 select_bits, bool p506_
 	return m_io_decoder_socket->get_address_ranges(select_bits, p506_signals);
 }
 
-void h89bus_device::gpp_w(u8 data, u8 changed)
+void h89bus_device::gpp_w(u8 data)
 {
+	u8 const changed = m_gpp ^ data;
+
+	m_gpp = data;
+
 	for (auto &[mask, handler] : m_gpp_handlers)
 		if (changed & mask)
 			handler(data);

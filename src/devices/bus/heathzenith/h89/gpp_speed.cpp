@@ -28,7 +28,6 @@ protected:
 	h89_gpp_speed_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 fast_multiplier);
 
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 	void gpp_w(u8 data);
 
@@ -46,11 +45,6 @@ h89_gpp_speed_device::h89_gpp_speed_device(const machine_config &mconfig, device
 void h89_gpp_speed_device::device_start()
 {
 	h89bus().add_gpp_handler(h89bus::GPP_MEM0, write8smo_delegate(*this, FUNC(h89_gpp_speed_device::gpp_w)));
-}
-
-void h89_gpp_speed_device::device_reset()
-{
-	set_cpu_clock(clock());
 }
 
 void h89_gpp_speed_device::gpp_w(u8 data)

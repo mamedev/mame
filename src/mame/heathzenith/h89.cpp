@@ -123,9 +123,6 @@ protected:
 	required_ioport                                      m_sw501;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 
-	// General Purpose Port (GPP)
-	u8   m_gpp;
-
 	bool m_rom_enabled;
 	bool m_timer_intr_enabled;
 	bool m_single_step_enabled;
@@ -142,16 +139,11 @@ protected:
 	static constexpr XTAL H89_CLOCK                      = XTAL(12'288'000) / 6;
 	static constexpr XTAL INS8250_CLOCK                  = XTAL(1'843'200);
 
-	static constexpr u8 GPP_SINGLE_STEP_BIT             = 0;
-	static constexpr u8 GPP_ENABLE_TIMER_INTERRUPT_BIT  = 1;
-	static constexpr u8 GPP_MEM0_BIT                    = 4;
-	static constexpr u8 GPP_MEM1_BIT                    = 5;
-	static constexpr u8 GPP_IO0_BIT                     = 6;
-	static constexpr u8 GPP_IO1_BIT                     = 7;
-
 	void update_mem_view();
 
-	void update_gpp(u8 gpp);
+	void gpp_single_step_w(u8 data);
+	void gpp_timer_intr_w(u8 data);
+	void gpp_mem1_w(u8 data);
 	void port_f2_w(u8 data);
 	u8 read_sw();
 
@@ -634,9 +626,13 @@ INPUT_PORTS_END
 
 void h89_base_state::machine_start()
 {
-	m_gpp = 0;
+	m_h89bus->add_gpp_handler(h89bus::GPP_SINGLE_STEP,
+		write8smo_delegate(*this, FUNC(h89_base_state::gpp_single_step_w)));
+	m_h89bus->add_gpp_handler(h89bus::GPP_TIMER_INTR,
+		write8smo_delegate(*this, FUNC(h89_base_state::gpp_timer_intr_w)));
+	m_h89bus->add_gpp_handler(h89bus::GPP_MEM1,
+		write8smo_delegate(*this, FUNC(h89_base_state::gpp_mem1_w)));
 
-	save_item(NAME(m_gpp));
 	save_item(NAME(m_rom_enabled));
 	save_item(NAME(m_timer_intr_enabled));
 	save_item(NAME(m_single_step_enabled));
@@ -742,13 +738,7 @@ void h89_base_state::machine_reset()
 		m_installed = true;
 	}
 
-	m_rom_enabled         = true;
-	m_timer_intr_enabled  = true;
-	m_single_step_enabled = false;
-	reset_single_step_state();
-
-	update_gpp(0);
-	update_mem_view();
+	// the general purpose port line state is set by the bus reset calling the gpp handlers
 }
 
 void h89_base_state::set_wait_state(int data)
@@ -825,52 +815,35 @@ void h89_base_state::reset_single_step_state()
 	m_intr_socket->set_irq_level(2, CLEAR_LINE);
 }
 
-// General Purpose Port
-//
-// Bit     OUTPUT
-// ---------------------
-//  0    Single-step enable
-//  1    2 mSec interrupt enable
-//  2    Not used (on original Heath CPU Board)
-//  3    Not used (on original Heath CPU Board)
-//  4    Latched bit MEM 0 H on memory expansion connector (Commonly used for Speed upgrades)
-//  5    Latched bit MEM 1 H on memory expansion connector - ORG-0 (CP/M map)
-//  6    Latched bit I/O 0 on I/O exp connector
-//  7    Latched bit I/O 1 on I/O exp connector
-//
-void h89_base_state::update_gpp(u8 gpp)
+// General Purpose Port lines used by the CPU board, see h89bus::gpp_lines
+void h89_base_state::gpp_single_step_w(u8 data)
 {
-	u8 changed_gpp = gpp ^ m_gpp;
+	m_single_step_enabled = bool(data & h89bus::GPP_SINGLE_STEP);
 
-	m_gpp = gpp;
+	LOGSS("single step enable: %d\n", m_single_step_enabled);
 
-	m_timer_intr_enabled = bool(BIT(m_gpp, GPP_ENABLE_TIMER_INTERRUPT_BIT));
-
-	m_h89bus->gpp_w(m_gpp, changed_gpp);
-
-	if (BIT(changed_gpp, GPP_SINGLE_STEP_BIT))
+	if (!m_single_step_enabled)
 	{
-		LOGSS("single step enable: %d\n", BIT(m_gpp, GPP_SINGLE_STEP_BIT));
-		m_single_step_enabled = bool(BIT(m_gpp, GPP_SINGLE_STEP_BIT));
-
-		if (!m_single_step_enabled)
-		{
-			reset_single_step_state();
-		}
-	}
-
-	if (BIT(changed_gpp, GPP_MEM1_BIT))
-	{
-		m_rom_enabled = BIT(m_gpp, GPP_MEM1_BIT) == 0;
-
-		update_mem_view();
+		reset_single_step_state();
 	}
 }
 
-// General Purpose Port
+void h89_base_state::gpp_timer_intr_w(u8 data)
+{
+	m_timer_intr_enabled = bool(data & h89bus::GPP_TIMER_INTR);
+}
+
+void h89_base_state::gpp_mem1_w(u8 data)
+{
+	m_rom_enabled = !(data & h89bus::GPP_MEM1);
+
+	update_mem_view();
+}
+
+// General Purpose Port, latched by the bus
 void h89_base_state::port_f2_w(u8 data)
 {
-	update_gpp(data);
+	m_h89bus->gpp_w(data);
 
 	m_intr_socket->set_irq_level(1, CLEAR_LINE);
 }

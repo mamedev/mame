@@ -130,15 +130,21 @@ namespace h89bus
 	// lines latched by the general purpose port (port 0xf2), as bit masks
 	enum gpp_lines : u8
 	{
-		// not on the bus connectors, reach a card only through a CPU board modification
-		GPP_RSVD0 = 0x04,
-		GPP_RSVD1 = 0x08,
-		// memory expansion connector (left slots)
-		GPP_MEM0  = 0x10,
-		GPP_MEM1  = 0x20,
-		// I/O expansion connector (right slots)
-		GPP_IO0   = 0x40,
-		GPP_IO1   = 0x80,
+		// single-step interrupt enable, used on the CPU board
+		GPP_SINGLE_STEP = 0x01,
+		// 2 mSec interrupt enable, used on the CPU board
+		GPP_TIMER_INTR  = 0x02,
+		// RSVD0/1: not used on the original Heath CPU board and not on the bus connectors, reach a
+		// card only through a CPU board modification
+		GPP_RSVD0       = 0x04,
+		GPP_RSVD1       = 0x08,
+		// MEM0/1: memory expansion connector (left slots)
+		GPP_MEM0        = 0x10,
+		// selects the ORG-0 (CP/M) memory map on the CPU board
+		GPP_MEM1        = 0x20,
+		// IO0/1: I/O expansion connector (right slots)
+		GPP_IO0         = 0x40,
+		GPP_IO1         = 0x80,
 	};
 }
 
@@ -486,12 +492,14 @@ public:
 	void install_io_device(offs_t start, offs_t end, read8smo_delegate rhandler, write8smo_delegate whandler) ATTR_COLD;
 	h89bus::addr_ranges get_address_ranges(u8 select_bits, bool p506_signals = false) ATTR_COLD;
 
-	// general purpose port lines (h89bus::gpp_lines), pushed only to the devices that add a handler for them
-	// - add handlers from device_start(); each call adds another handler
+	// general purpose port (port 0xf2) latch; its lines (h89bus::gpp_lines) are pushed only to
+	// the devices that add a handler for them
+	// - add handlers before the first reset; each call adds another handler
 	// - a handler is called once per port write in which any line in its mask changed, with
 	//   the whole port value, so lines that change together are seen together
-	// - the lines are 0 after reset
-	void gpp_w(u8 data, u8 changed);
+	// - the latch is cleared on reset and every handler is called with 0, so devices can take
+	//   their reset state for these lines from their handlers
+	void gpp_w(u8 data);
 	void add_gpp_handler(u8 mask, write8smo_delegate handler) ATTR_COLD { m_gpp_handlers.emplace_back(mask, std::move(handler)); }
 
 	// inline configuration
@@ -508,6 +516,7 @@ protected:
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	// bus-internal handlers
@@ -528,6 +537,7 @@ private:
 	devcb_write_line m_out_int3_cb, m_out_int4_cb, m_out_int5_cb;
 	devcb_write_line m_out_fmwe_cb, m_out_wait_cb;
 
+	u8 m_gpp;
 	std::vector<std::pair<u8, write8smo_delegate>> m_gpp_handlers;
 
 	std::vector<std::reference_wrapper<device_h89bus_left_card_interface>> m_left_device_list;
