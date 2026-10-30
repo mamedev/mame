@@ -1590,6 +1590,17 @@ void output_track_metadata(int mode, std::ostream &file, int tracknum, const cdr
 			util::stream_format(file, "    INDEX 01 %s\n", msf_string_from_frames(frameoffs));
 		}
 
+		// output additional indexes
+		const uint32_t index1offs = frameoffs + ((info.pregap > 0 && info.pgdatasize > 0) ? info.pregap : 0);
+
+		for (int index = 2; index <= cdrom_file::MAX_INDEX; index++)
+		{
+			if (info.idx[index] == -1)
+				continue;
+
+			file.printf("    INDEX %02d %s\n", index, msf_string_from_frames(index1offs + info.idx[index]));
+		}
+
 		// output POSTGAP
 		if (info.postgap > 0)
 			util::stream_format(file, "    POSTGAP %s\n", msf_string_from_frames(info.postgap));
