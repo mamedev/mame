@@ -4473,6 +4473,46 @@ ROM_START( gunfront )
 // Pals c71-16.28  c71-07.27
 ROM_END
 
+ROM_START( gunfrontup ) // all labels handwritten, where present
+	ROM_REGION( 0xc0000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ic9.bin",  0x00000, 0x20000, CRC(50e4c892) SHA1(4177c588b1654481183d511945546e99c5f69296) )
+	ROM_LOAD16_BYTE( "ic2.bin",  0x00001, 0x20000, CRC(9e9e35bd) SHA1(78d2519c2096bf89c932f4e9fd9f610407aab234) ) // ic2 フロンティア 10/16 6/22
+	ROM_LOAD16_BYTE( "ic10.bin", 0x40000, 0x20000, CRC(d7e2a3cf) SHA1(6b01233a82f39c53e3e828973dd9404e3527c229) )
+	ROM_LOAD16_BYTE( "ic3.bin",  0x40001, 0x20000, CRC(b9bf1d5b) SHA1(3ae5903b19e57ddba143018668076c9ef600e07f) )
+	ROM_LOAD16_BYTE( "ic11.bin", 0x80000, 0x20000, CRC(22d0a0f7) SHA1(e890caa028effd2eb416feda18b1aeec0f3c1535) )
+	ROM_LOAD16_BYTE( "ic4.bin",  0x80001, 0x20000, CRC(23cd728d) SHA1(98066a412bddd22fde20ed763ba406f224c1975f) )
+
+	ROM_REGION( 0x100000, "tc0100scn_1", 0 ) // SCR
+	ROM_LOAD16_BYTE( "8-scr_0_l.c8",   0x00001, 0x40000, CRC(5215eabd) SHA1(f3d521ab6e0e9f0e6d895681c11de076a1c529b9) )
+	ROM_LOAD16_BYTE( "16-scr_0_h.c16", 0x00000, 0x40000, CRC(c474f28d) SHA1(e20bba77d9d4f4ea9a4d4e6ca4ba67e6aa8052bd) )
+	ROM_LOAD16_BYTE( "7-scr_1_l.c7",   0x80001, 0x40000, CRC(6fc43078) SHA1(6fdfd2a567ff09ab3368da55bf805d5e62971587) )
+	ROM_LOAD16_BYTE( "15-scr_1_h.c15", 0x80000, 0x40000, CRC(52b59b9f) SHA1(615296e14cf48b0f4e911bfdf114ed44ee5fdaab) )
+
+	ROM_REGION( 0x100000, "sprites", 0 ) // OBJ
+	ROM_LOAD16_BYTE( "10-obj_0_l.c10", 0x00000, 0x40000, CRC(208f4426) SHA1(0648af975b8da55909bd521900ed05188d8c153d) )
+	ROM_LOAD16_BYTE( "12-obj_0_h.c12", 0x00001, 0x40000, CRC(65828db7) SHA1(7e5d0ac1ed051fcde03ec25dbeae080386cb863f) )
+	ROM_LOAD16_BYTE( "11-obj_1_l.c11", 0x80000, 0x40000, CRC(a67ebe22) SHA1(a4c40c5ee34904cfc117b75ab2450b56e0e8bc1e) )
+	ROM_LOAD16_BYTE( "13-obj_1_h.c13", 0x80001, 0x40000, CRC(13c31064) SHA1(a4d4d51e751f7600358229cb7b80430ec4719284) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "ic5.bin", 0x00000, 0x10000, CRC(22670cfc) SHA1(c791998eeaa7d8734d23261300d1586e36dac157) )
+
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
+	ROM_LOAD( "2-yaa_0.c2", 0x00000, 0x40000, CRC(52524ae9) SHA1(2e1687b00606c6d3e5cb9982c109dd5c33c1bd4e) )
+	ROM_LOAD( "3-yaa_1.c3", 0x40000, 0x40000, CRC(c7723b1c) SHA1(dc9ad1382402a12602332973fba5fb9c077b5d7d) )
+	ROM_LOAD( "4-yaa_2.c4", 0x80000, 0x40000, CRC(4d016414) SHA1(5f5d7132e2c54dd3e61cb3aa1c3300206f6a4188) )
+	ROM_LOAD( "5-yaa_3.c5", 0xc0000, 0x40000, CRC(e3e98dea) SHA1(c65a3bb6f19aa423432b4b0a99a785c4eb5561c5) )
+
+	// no Delta-T samples
+
+	ROM_REGION( 0xa00, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "pal16l8.ic12", 0x000, 0x104, CRC(a7e96f55) SHA1(8fca8abeb6adc295e57d92ad104b8115fde01f01) )
+	ROM_LOAD( "pal16l8.ic13", 0x200, 0x104, CRC(77631010) SHA1(e9b7a397d37e237f6578ff819171f4e3ff2acc78) )
+	ROM_LOAD( "pal16l8.ic40", 0x400, 0x104, CRC(6430b559) SHA1(e886d7ac44018cac8e788c822ddbb612c14390c9) )
+	ROM_LOAD( "pal16l8.ic44", 0x600, 0x104, CRC(634592e2) SHA1(8d9251958e7f9bdcf2e360b15dce3552a8da0c28) )
+	ROM_LOAD( "pal16l8.ic56", 0x800, 0x104, CRC(4095b97a) SHA1(ff63fe125e8e38c25cc7ef05c6cf8f7818fbdaa3) )
+ROM_END
+
 ROM_START( gunfrontj )
 	ROM_REGION( 0xc0000, "maincpu", 0 )     /* 768k for 68000 code */
 	ROM_LOAD16_BYTE( "c71-09.ic42",  0x00000, 0x20000, CRC(10a544a2) SHA1(3b46bbd494b432d36aed3fd4b429cef074050c1d) )
@@ -5606,8 +5646,9 @@ GAME( 1990, majest12ua, ssi,      ssi,       majest12u,  taitof2_state,  empty_i
 GAME( 1990, majest12ub, ssi,      ssi,       majest12u,  taitof2_state,  empty_init,    ROT270, "Taito America", "Majestic Twelve - The Space Invaders Part IV (US, earlier code base)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1990, majest12j,  ssi,      ssi,       majest12j,  taitof2_state,  empty_init,    ROT270, "Taito",         "Majestic Twelve - The Space Invaders Part IV (Japan)",                   MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, gunfront,   0,        gunfront,  gunfront,   taitof2_state,  empty_init,    ROT270, "Taito",         "Gun & Frontier (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, gunfrontj,  gunfront, gunfront,  gunfrontj,  taitof2_state,  empty_init,    ROT270, "Taito",         "Gun Frontier (Japan)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gunfront,   0,        gunfront,  gunfront,   taitof2_state,  empty_init,    ROT270, "Taito",         "Gun & Frontier (World)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gunfrontup, gunfront, gunfront,  gunfront,   taitof2_state,  empty_init,    ROT270, "Taito",         "Gun & Frontier (US, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gunfrontj,  gunfront, gunfront,  gunfrontj,  taitof2_state,  empty_init,    ROT270, "Taito",         "Gun Frontier (Japan)",           MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, growl,      0,        growl,     growl,      taitof2_state,  empty_init,    ROT0,   "Taito",         "Growl (World, Rev 1)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1990, growla,     growl,    growl,     growl,      taitof2_state,  empty_init,    ROT0,   "Taito",         "Growl (World)",            MACHINE_SUPPORTS_SAVE )
