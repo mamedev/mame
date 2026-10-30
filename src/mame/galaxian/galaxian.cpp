@@ -2875,6 +2875,26 @@ void guttangt_state::guttangts3_map(address_map &map)
 	map(0x8000, 0x87ff).rom().region("maincpu", 0x4000);
 }
 
+// like theend_map, but no watchdog, and gfxbank at 6000
+void staratk_state::staratk_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x4800, 0x4bff).mirror(0x0400).ram().w(FUNC(staratk_state::galaxian_videoram_w)).share("videoram");
+	map(0x5000, 0x50ff).mirror(0x0700).ram().w(FUNC(staratk_state::galaxian_objram_w)).share("spriteram");
+	map(0x6000, 0x6000).w(FUNC(staratk_state::galaxian_gfxbank_w));
+	map(0x6801, 0x6801).mirror(0x07f8).w(FUNC(staratk_state::irq_enable_w));
+	map(0x6802, 0x6802).mirror(0x07f8).w(FUNC(staratk_state::coin_count_0_w));
+	map(0x6803, 0x6803).mirror(0x07f8).w(FUNC(staratk_state::scramble_background_enable_w));
+	map(0x6804, 0x6804).mirror(0x07f8).w(FUNC(staratk_state::galaxian_stars_enable_w));
+	map(0x6805, 0x6805).mirror(0x07f8); //POUT2
+	map(0x6806, 0x6806).mirror(0x07f8).w(FUNC(staratk_state::galaxian_flip_screen_x_w));
+	map(0x6807, 0x6807).mirror(0x07f8).w(FUNC(staratk_state::galaxian_flip_screen_y_w));
+	//map(0x7000, 0x7000).mirror(0x07ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x8000, 0xffff).rw(FUNC(staratk_state::theend_ppi8255_r), FUNC(staratk_state::theend_ppi8255_w));
+}
+
 
 /*************************************
  *
@@ -8224,6 +8244,16 @@ void galaxian_state::ozon1(machine_config &config)
 }
 
 
+void staratk_state::staratk(machine_config &config)
+{
+	scramble(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &staratk_state::staratk_map);
+
+	// no watchdog?
+	config.device_remove("watchdog");
+}
+
 void namenayo_state::namenayo(machine_config &config)
 {
 	konami_base(config);
@@ -9486,6 +9516,14 @@ void galaxian_state::init_scramble()
 {
 	// video extensions
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, nullptr, nullptr);
+}
+
+void staratk_state::init_staratk()
+{
+	// video extensions
+	common_init(&staratk_state::scramble_draw_bullet, &staratk_state::scramble_draw_background, nullptr, nullptr);
+	m_extend_tile_info_ptr = extend_tile_info_delegate(&staratk_state::staratk_extend_tile_info, this);
+	m_extend_sprite_info_ptr = extend_sprite_info_delegate(&staratk_state::staratk_extend_sprite_info, this);
 }
 
 void galaxian_state::init_mandingaeg()
@@ -15609,6 +15647,32 @@ ROM_START( explorer )
 	ROM_LOAD( "c01s.6e",      0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
 
+ROM_START( staratk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sa1.2c",       0x0000, 0x1000, CRC(14c44344) SHA1(0fe3c15527cece456067b27bdf37f1f7e7db4626) )
+	ROM_LOAD( "sa2.2e",       0x1000, 0x1000, CRC(4ce8f186) SHA1(39bab0c274da8a19c58786759ba8602757a736bd) )
+	ROM_LOAD( "sa3.2f",       0x2000, 0x1000, CRC(bd956295) SHA1(8fadebab34b2e082ef7eb38afb9b8c5604016d9c) )
+	ROM_LOAD( "sa4.2h",       0x3000, 0x1000, CRC(d8f11ac1) SHA1(d403bb05b7f5b9f8dcc0d68279c4061e10503fba) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "sa_s1.5c",  0x0000, 0x0800, CRC(be037cf6) SHA1(f28e5ead496e70beaada24775aa58bd5d75f2d25) )
+	ROM_LOAD( "sa_s2.5d",  0x0800, 0x0800, CRC(40b994dd) SHA1(79336450f7b4337d7cdb9b97e5ca33e7697324e3) )
+	ROM_LOAD( "sa_s3.5e",  0x1000, 0x0800, CRC(0a5e2327) SHA1(ee244e001ada4060ab29b16c5982fed40e850ba9) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "sa5.5f", 0x0000, 0x1000, CRC(b690153b) SHA1(c2a383fc8a6ade7a113ca80c9587fd69160d1962) )
+	ROM_LOAD( "sa6.5g", 0x3000, 0x1000, BAD_DUMP CRC(b0a3a3e4) SHA1(aac35cdd9610eb0c3139094735b587b8c23880b0) ) // bad pixels in some tiles
+
+	// extra background, positioned away from 5f/5g
+	ROM_LOAD( "sa8.6f", 0x1000, 0x1000, CRC(563825bd) SHA1(ca4020dd0e4974df6f67d4ee070159641c977093) ) // plane 0
+	ROM_LOAD( "sa7.6d", 0x2000, 0x1000, CRC(3fb29add) SHA1(03906f2eb9e9c51f614fac1890d14227d889d93a) )
+	ROM_LOAD( "sa9.6g", 0x4000, 0x1000, CRC(fdef1479) SHA1(b204f2d1763f8e7fa037c58207fc2dc9a9450742) ) // plane 1
+	ROM_LOAD( "sa10.6j", 0x5000, 0x1000, NO_DUMP ) // rom read as blank, is meant to be half of 1 plane of the 3rd stage background
+	ROM_FILL(0x5000,0x1000,0x00) // wipe over with 0x00 as 0xff fill ends up hiding bullets
+
+	ROM_REGION( 0x0020, "proms", 0 ) // not dumped from this set, but colours match reference footage
+	ROM_LOAD( "prom", 0x0000, 0x0020, BAD_DUMP CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+ROM_END
 
 ROM_START( atlantis )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -17332,6 +17396,9 @@ GAME( 1981, kamikazesp,  scramble, scramble,   scramble,   galaxian_state, init_
 GAME( 198?, bomber,      scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (Alca)",                     "Bomber (bootleg of Scramble)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 198?, spcmission,  scramble, scramble,   scramble,   galaxian_state, init_scramble,   ROT90,  "bootleg (SegaSA / Sonic)",           "Space Mission (SegaSA / Sonic, Spanish bootleg of Scramble)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, astroamb,    scramble, astroamb,   astroamb,   galaxian_state, init_scramble,   ROT90,  "bootleg (U.C.E.)",                   "Astro Ambush (Scramble bootleg on Galaxian hardware)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // uses the same sound implementation as Galaxian, might differ
+
+// derived from scramble code, heavily modified
+GAME( 1981, staratk,     0,        staratk,    scramble,   staratk_state,  init_staratk,    ROT90,  "Hiraoka New York",                   "Star Attack",                                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, seainv,      scramble, astroamb,   astroamb,   galaxian_state, init_scramble,   ROT90,  "Hoei",                               "Sea Invasion",                                                MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // colors don't match reference pics 100%
 
