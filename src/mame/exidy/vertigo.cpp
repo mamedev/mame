@@ -142,11 +142,8 @@ void vertigo_state::vertigo(machine_config &config)
 
 	/* video hardware */
 	VECTOR(config, m_vector);
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
-	screen.set_refresh_hz(60);
-	screen.set_size(400, 300);
-	screen.set_visarea(0, 510, 0, 400);
-	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
+	m_vector->set_refresh_hz(60);
+	m_vector->set_visarea(0, 510, 0, 400);
 }
 
 

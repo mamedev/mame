@@ -208,12 +208,14 @@ upd765_family_device::upd765_family_device(const machine_config &mconfig, device
 	select_multiplexed(true),
 	ts_connected(true),
 	has_dor(true),
+	has_base_mode(false),
 	external_ready(false),
 	recalibrate_steps(77),
 	mode(mode_t::AT),
 	intrq_cb(*this),
 	drq_cb(*this),
 	hdl_cb(*this),
+	mtr0_cb(*this),
 	idx_cb(*this),
 	ts_cb(*this, ASSERT_LINE),
 	us_cb(*this)
@@ -249,6 +251,7 @@ void upd765_family_device::device_start()
 	save_item(STRUCT_MEMBER(flopi, pcn));
 	save_item(STRUCT_MEMBER(flopi, st0));
 	save_item(STRUCT_MEMBER(flopi, st0_filled));
+	save_item(STRUCT_MEMBER(flopi, st0_seek));
 	save_item(STRUCT_MEMBER(flopi, live));
 	save_item(STRUCT_MEMBER(flopi, index));
 	save_item(STRUCT_MEMBER(flopi, ready));
@@ -288,6 +291,7 @@ void upd765_family_device::device_start()
 	save_item(NAME(locked));
 	save_item(NAME(mfm));
 	save_item(NAME(scan_done));
+	save_item(NAME(base_mode_pending));
 	save_item(NAME(fifo_write));
 	save_item(NAME(fifo_pos));
 	save_item(NAME(fifo_expected));
@@ -334,6 +338,7 @@ void upd765_family_device::device_start()
 		flopi[i].pcn = 0;
 		flopi[i].st0 = 0;
 		flopi[i].st0_filled = false;
+		flopi[i].st0_seek = false;
 		flopi[i].live = false;
 		flopi[i].index = false;
 		flopi[i].ready = false;
@@ -360,6 +365,7 @@ void upd765_family_device::device_start()
 
 	cur_irq = false;
 	locked = false;
+	base_mode_pending = false;
 }
 
 void upd765_family_device::device_reset()
@@ -367,6 +373,7 @@ void upd765_family_device::device_reset()
 	if(has_dor)
 		dor = 0x00;
 	locked = false;
+	base_mode_pending = has_base_mode;
 	soft_reset();
 }
 
@@ -380,6 +387,7 @@ void upd765_family_device::soft_reset()
 		flopi[i].ready = !ready_polled;
 		flopi[i].st0 = i;
 		flopi[i].st0_filled = false;
+		flopi[i].st0_seek = false;
 	}
 	clr_drive_busy();
 	irq = false;
@@ -397,6 +405,7 @@ void upd765_family_device::soft_reset()
 	cur_live.fi = nullptr;
 	tc_done = false;
 	st1 = st2 = st3 = 0x00;
+	xfer_in_progress = false;
 
 	set_ds(select_multiplexed ? 0 : -1);
 
@@ -414,12 +423,23 @@ void upd765_family_device::end_reset()
 		poll_timer->adjust(attotime::from_usec(100), 0, attotime::from_usec(1024));
 }
 
+void upd765_family_device::base_mode_access()
+{
+	if(!base_mode_pending || machine().side_effects_disabled())
+		return;
+
+	base_mode_pending = false;
+	dor |= 0x04;
+	end_reset();
+}
+
 void upd765_family_device::tc_w(bool _tc)
 {
 	LOGTCIRQ("tc=%d\n", _tc);
 	if(tc != _tc && _tc) {
 		live_sync();
 		tc_done = true;
+		disable_transfer();
 		tc = _tc;
 		if(cur_live.fi)
 			general_continue(*cur_live.fi);
@@ -546,6 +566,7 @@ void upd765_family_device::dor_w(uint8_t data)
 {
 	assert(has_dor);
 	LOGREGS("dor = %02x\n", data);
+	base_mode_pending = false;
 	uint8_t diff = dor ^ data;
 	dor = data;
 	if(BIT(diff, 2)) {
@@ -561,6 +582,9 @@ void upd765_family_device::dor_w(uint8_t data)
 			fi.dev->mon_w(!(dor & (0x10 << i)));
 	}
 	check_irq();
+
+	if(BIT(diff, 4))
+		mtr0_cb(BIT(dor, 4));
 }
 
 uint8_t upd765_family_device::tdr_r()
@@ -574,6 +598,8 @@ void upd765_family_device::tdr_w(uint8_t data)
 
 uint8_t upd765_family_device::msr_r()
 {
+	base_mode_access();
+
 	uint8_t msr = 0;
 	switch(main_phase) {
 	case PHASE_CMD:
@@ -583,8 +609,11 @@ uint8_t upd765_family_device::msr_r()
 		break;
 	case PHASE_EXEC:
 		msr |= MSR_CB;
-		if(spec & SPEC_ND)
+		if((spec & SPEC_ND) && xfer_in_progress) {
 			msr |= MSR_EXM;
+			if(!fifo_write)
+				msr |= MSR_DIO;
+		}
 		if(internal_drq) {
 			msr |= MSR_RQM;
 			if(!fifo_write)
@@ -623,6 +652,8 @@ void upd765_family_device::set_rate(int rate)
 
 uint8_t upd765_family_device::fifo_r()
 {
+	base_mode_access();
+
 	uint8_t r = 0xff;
 	if(!machine().side_effects_disabled())
 	{
@@ -650,9 +681,13 @@ uint8_t upd765_family_device::fifo_r()
 		if(!machine().side_effects_disabled()) {
 			result_pos--;
 			memmove(result, result+1, result_pos);
-			if(!result_pos)
+			if(!result_pos) {
 				main_phase = PHASE_CMD;
-			else if(result_pos == 1) {
+				for(floppy_info &fi : flopi)
+					if(fi.st0_filled && fi.st0_seek)
+						irq = true;
+				check_irq();
+			} else if(result_pos == 1) {
 				// clear drive busy bit after the first sense interrupt status result byte is read
 				for(floppy_info &fi : flopi)
 					if((fi.main_state == RECALIBRATE || fi.main_state == SEEK) && fi.sub_state == IDLE && fi.st0_filled == false)
@@ -671,6 +706,8 @@ uint8_t upd765_family_device::fifo_r()
 
 void upd765_family_device::fifo_w(uint8_t data)
 {
+	base_mode_access();
+
 	if(!BIT(dor, 2))
 		LOGWARN("%s: fifo_w(%02x) in reset\n", machine().describe_context(), data);
 
@@ -710,8 +747,10 @@ void upd765_family_device::fifo_w(uint8_t data)
 
 uint8_t upd765_family_device::do_dir_r()
 {
-	floppy_info &fi = flopi[dor & 3];
-	if(fi.dev)
+	int const fid = dor & 3;
+	floppy_info &fi = flopi[fid];
+	// only report dskchg for a drive if the motor is enabled too
+	if(BIT(dor, 4 + fid) && fi.dev)
 		return fi.dev->dskchg_r() ? 0x00 : 0x80;
 	return 0x00;
 }
@@ -787,7 +826,6 @@ void upd765_family_device::fifo_push(uint8_t data, bool internal)
 		disable_transfer();
 }
 
-
 uint8_t upd765_family_device::fifo_pop(bool internal)
 {
 	if(!fifo_pos) {
@@ -813,7 +851,7 @@ void upd765_family_device::fifo_expect(int size, bool write)
 {
 	fifo_expected = size;
 	fifo_write = write;
-	if(fifo_write)
+	if(fifo_write && !tc_done)
 		enable_transfer();
 }
 
@@ -1197,6 +1235,7 @@ void upd765_family_device::live_run(attotime limit)
 			return;
 
 		case WRITE_SECTOR_DATA:
+			cur_live.pll.start_writing(cur_live.tm, cur_live.fi->dev);
 			if(mfm) {
 				if(cur_live.byte_counter < 12)
 					live_write_mfm(0x00);
@@ -1496,6 +1535,8 @@ int ps2_fdc_device::check_command()
 		return C_LOCK;
 
 	default:
+		if((command[0] & 0xbf) == 0x21)
+			return check_command_set_track();
 		return upd765_family_device::check_command();
 	}
 }
@@ -1506,6 +1547,11 @@ void upd765_family_device::start_command(int cmd)
 	result_pos = 0;
 	main_phase = PHASE_EXEC;
 	tc_done = false;
+	fifo_pos = 0;
+	if(internal_drq) {
+		internal_drq = false;
+		check_irq();
+	}
 
 	execute_command(cmd);
 }
@@ -1665,10 +1711,35 @@ void ps2_fdc_device::execute_command(int cmd)
 		main_phase = PHASE_CMD;
 		break;
 
+	case C_SET_TRACK:
+		execute_command_set_track();
+		break;
+
 	default:
 		upd765_family_device::execute_command(cmd);
 		break;
 	}
+}
+
+int upd765_family_device::check_command_set_track() const
+{
+	if((command[0] & 0xbf) != 0x21)
+		return C_INVALID;
+	if(command_pos < 3)
+		return C_INCOMPLETE;
+	return (command[1] & 0xf8) == 0x30 ? C_SET_TRACK : C_INVALID;
+}
+
+void upd765_family_device::execute_command_set_track()
+{
+	floppy_info &fi = flopi[command[1] & 3];
+	bool high = BIT(command[1], 2);
+	LOGCOMMAND("command set track %d %s%s\n", command[1] & 3, high ? "high" : "low", BIT(command[0], 6) ? " write" : "");
+	if(BIT(command[0], 6) && !high)
+		fi.pcn = command[2];
+	main_phase = PHASE_RESULT;
+	result[0] = high ? 0x00 : fi.pcn;
+	result_pos = 1;
 }
 
 void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
@@ -1678,6 +1749,7 @@ void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 	irq = true;
 	if(!data_completion) {
 		fi.st0_filled = true;
+		fi.st0_seek = true;
 		drive_busy |= (1 << fi.id);
 	}
 	check_irq();
@@ -1710,7 +1782,7 @@ void upd765_family_device::recalibrate_start(floppy_info &fi)
 	fi.dir = 1;
 	fi.counter = recalibrate_steps;
 	fi.ready = get_ready(command[1] & 3);
-	fi.st0 = command[1] & 7;
+	fi.st0 = command[1] & 3;
 	if(fi.ready) {
 		seek_continue(fi);
 	} else {
@@ -1726,7 +1798,7 @@ void upd765_family_device::seek_start(floppy_info &fi)
 	fi.sub_state = SEEK_WAIT_STEP_TIME_DONE;
 	fi.dir = fi.pcn > command[2] ? 1 : 0;
 	fi.ready = get_ready(command[1] & 3);
-	fi.st0 = command[1] & 7;
+	fi.st0 = command[1] & 3;
 	if(fi.ready) {
 		seek_continue(fi);
 	} else {
@@ -1842,7 +1914,7 @@ void upd765_family_device::read_data_start(floppy_info &fi)
 				cur_rate);
 
 	fi.st0 = command[1] & 7;
-	st1 = ST1_MA;
+	st1 = 0x00;
 	st2 = 0x00;
 	hdl_cb(1);
 	set_ds(command[1] & 3);
@@ -1859,6 +1931,7 @@ void upd765_family_device::read_data_start(floppy_info &fi)
 
 	if(fi.dev)
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
+	st1 = ST1_MA | ST1_ND;
 	read_data_continue(fi);
 }
 
@@ -1886,7 +1959,7 @@ void upd765_family_device::scan_start(floppy_info &fi)
 				cur_rate);
 
 	fi.st0 = command[1] & 7;
-	st1 = ST1_MA;
+	st1 = 0x00;
 	st2 = 0x00;
 	scan_done = false;
 	hdl_cb(1);
@@ -1904,6 +1977,7 @@ void upd765_family_device::scan_start(floppy_info &fi)
 
 	if(fi.dev)
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
+	st1 = ST1_MA | ST1_ND;
 	read_data_continue(fi);
 }
 
@@ -1997,6 +2071,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 			}
 			st1 &= ~ST1_ND;
 			st2 &= ~ST2_WC;
+			xfer_in_progress = true;
 			LOGRW("reading sector %02x %02x %02x %02x\n",
 						cur_live.idbuf[0],
 						cur_live.idbuf[1],
@@ -2020,6 +2095,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 
 		case SECTOR_READ: {
 			LOGSTATE("SECTOR_READ\n");
+			xfer_in_progress = false;
 			if(st2 & ST2_MD) {
 				fi.st0 |= ST0_FAIL;
 				fi.sub_state = COMMAND_DONE;
@@ -2116,7 +2192,7 @@ void upd765_family_device::write_data_start(floppy_info &fi)
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
 
 	fi.st0 = command[1] & 7;
-	st1 = ST1_MA;
+	st1 = 0x00;
 	st2 = 0x00;
 	hdl_cb(1);
 	set_ds(command[1] & 3);
@@ -2139,6 +2215,7 @@ void upd765_family_device::write_data_start(floppy_info &fi)
 		return;
 	}
 
+	st1 = ST1_MA | ST1_ND;
 	write_data_continue(fi);
 }
 
@@ -2161,6 +2238,8 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 
 		case SCAN_ID:
 			LOGSTATE("SCAN_ID\n");
+			st1 &= ~ST1_MA;
+			st1 |= ST1_ND;
 			if(!sector_matches()) {
 				LOGSTATE("SEARCH_ADDRESS_MARK_HEADER\n");
 				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
@@ -2172,7 +2251,8 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 				fi.sub_state = COMMAND_DONE;
 				break;
 			}
-			st1 &= ~ST1_MA;
+			st1 &= ~ST1_ND;
+			xfer_in_progress = true;
 			LOGRW("writing sector %02x %02x %02x %02x\n",
 						cur_live.idbuf[0],
 						cur_live.idbuf[1],
@@ -2195,6 +2275,7 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 		case SECTOR_WRITTEN: {
 			LOGSTATE("SECTOR_WRITTEN\n");
 			bool done = tc_done;
+			xfer_in_progress = false;
 			if(command[4] == command[6]) {
 				if(command[0] & 0x80) {
 					command[3] = command[3] ^ 1;
@@ -2265,7 +2346,7 @@ void upd765_family_device::read_track_start(floppy_info &fi)
 				command[8],
 				cur_rate);
 	fi.st0 = command[1] & 7;
-	st1 = ST1_MA;
+	st1 = 0x00;
 	st2 = 0x00;
 	hdl_cb(1);
 	set_ds(command[1] & 3);
@@ -2282,6 +2363,7 @@ void upd765_family_device::read_track_start(floppy_info &fi)
 
 	if(fi.dev)
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
+	st1 = ST1_MA | ST1_ND;
 	read_track_continue(fi);
 }
 
@@ -2368,6 +2450,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			else
 				st1 &= ~ST1_ND;
 
+			xfer_in_progress = true;
 			sector_size = calc_sector_size(command[5]);
 			fifo_expect(sector_size, false);
 			fi.sub_state = SECTOR_READ;
@@ -2384,6 +2467,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 
 		case SECTOR_READ: {
 			LOGSTATE("SECTOR_READ\n");
+			xfer_in_progress = false;
 			if(st2 & ST2_MD) {
 				fi.st0 |= ST0_FAIL;
 				fi.sub_state = COMMAND_DONE;
@@ -2495,9 +2579,9 @@ void upd765_family_device::format_track_continue(floppy_info &fi)
 		case WAIT_INDEX_DONE:
 			LOGSTATE("WAIT_INDEX_DONE\n");
 			fi.sub_state = TRACK_DONE;
-			cur_live.pll.start_writing(machine().time());
 			LOGSTATE("WRITE_TRACK_PRE_SECTORS\n");
 			live_start(fi, WRITE_TRACK_PRE_SECTORS);
+			cur_live.pll.start_writing(machine().time(), cur_live.fi->dev);
 			return;
 
 		case TRACK_DONE:
@@ -2679,6 +2763,7 @@ TIMER_CALLBACK_MEMBER(upd765_family_device::run_drive_ready_polling)
 			if(!flopi[fid].st0_filled) {
 				flopi[fid].st0 = ST0_ABRT | fid | (ready ? 0 : ST0_NR);
 				flopi[fid].st0_filled = true;
+				flopi[fid].st0_seek = false;
 				irq = true;
 			}
 		}
@@ -3261,6 +3346,21 @@ void dp8473_device::soft_reset()
 	irq = true;
 }
 
+int dp8473_device::check_command()
+{
+	if((command[0] & 0xbf) == 0x21)
+		return check_command_set_track();
+	return upd765_family_device::check_command();
+}
+
+void dp8473_device::execute_command(int cmd)
+{
+	if(cmd == C_SET_TRACK)
+		execute_command_set_track();
+	else
+		upd765_family_device::execute_command(cmd);
+}
+
 pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ps2_fdc_device(mconfig, PC8477A, tag, owner, clock)
 {
 	ready_polled = true;
@@ -3268,6 +3368,24 @@ pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, d
 	select_connected = true;
 	select_multiplexed = false;
 	recalibrate_steps = 85; // TODO: may also be programmed as 255, 3925 or 4095 by (unemulated) mode command
+}
+
+int pc8477a_device::check_command()
+{
+	if((command[0] & 0x1f) == 0x18)
+		return C_NSC;
+	return ps2_fdc_device::check_command();
+}
+
+void pc8477a_device::execute_command(int cmd)
+{
+	if(cmd == C_NSC) {
+		LOGCOMMAND("command nsc\n");
+		main_phase = PHASE_RESULT;
+		result[0] = 0x72;
+		result_pos = 1;
+	} else
+		ps2_fdc_device::execute_command(cmd);
 }
 
 pc8477b_device::pc8477b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ps2_fdc_device(mconfig, PC8477B, tag, owner, clock)
@@ -3279,10 +3397,29 @@ pc8477b_device::pc8477b_device(const machine_config &mconfig, const char *tag, d
 	recalibrate_steps = 85; // TODO: may also be programmed as 255, 3925 or 4095 by (unemulated) mode command
 }
 
+int pc8477b_device::check_command()
+{
+	if((command[0] & 0x1f) == 0x18)
+		return C_NSC;
+	return ps2_fdc_device::check_command();
+}
+
+void pc8477b_device::execute_command(int cmd)
+{
+	if(cmd == C_NSC) {
+		LOGCOMMAND("command nsc\n");
+		main_phase = PHASE_RESULT;
+		result[0] = 0x73;
+		result_pos = 1;
+	} else
+		ps2_fdc_device::execute_command(cmd);
+}
+
 wd37c65_device::wd37c65_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	upd765_family_device(mconfig, type, tag, owner, clock),
 	m_clock2(0)
 {
+	has_base_mode = true;
 	ready_polled = true;
 	ready_connected = false;
 	select_connected = true;
@@ -3594,8 +3731,11 @@ void hd63266f_device::start_command(int cmd)
 		break;
 	}
 
-	// execute the command immediately if there's no motor on delay
-	if(motor_on_counter == 0) {
+	// execute the command immediately if there's no motor on delay.  The delay is counted
+	// in index pulses, and a drive holding no disk never gives any, so a drive that reports
+	// itself not ready has to be let through to fail on its own.
+	if(motor_on_counter == 0 || !get_ready(command[1] & 3)) {
+		motor_on_counter = 0;
 		upd765_family_device::start_command(cmd);
 	} else
 		delayed_command = cmd;

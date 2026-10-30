@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles,m1macrophage
 #ifndef MAME_SOUND_CEM3394_H
 #define MAME_SOUND_CEM3394_H
 
@@ -13,23 +13,6 @@
 class cem3394_device : public device_t, public device_sound_interface
 {
 public:
-	// inputs
-	// Each of these CV inputs can either be specified with `set_voltage()`, or
-	// provided via a sound stream.
-	enum
-	{
-		AUDIO_INPUT = 0,  // not valid for set_voltage()
-		VCO_FREQUENCY,
-		MODULATION_AMOUNT,
-		WAVE_SELECT,
-		PULSE_WIDTH,
-		MIXER_BALANCE,
-		FILTER_RESONANCE,
-		FILTER_FREQUENCY,
-		FINAL_GAIN,
-		INPUT_COUNT
-	};
-
 	// external component values
 	struct components
 	{
@@ -44,10 +27,37 @@ public:
 		double c_ac = 4.7E-6;
 	};
 
-	using input_array = std::array<device_sound_interface *, INPUT_COUNT>;
+	// optional streaming inputs
+	struct stream_inputs
+	{
+		device_sound_interface *ext_input = nullptr;      // pin 9
+		device_sound_interface *filt_freq_cv = nullptr;   // pin 16
+		device_sound_interface *final_gain_cv = nullptr;  // pin 18
+	};
 
 	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0) ATTR_COLD;
-	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, const components &comps, const input_array& inputs) ATTR_COLD;
+	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, const components &comps, const stream_inputs &inputs) ATTR_COLD;
+
+	// control voltage setters
+	// Cannot not be called when the corresponding CV is configured as a
+	// streaming input (see stream_inputs).
+	void set_vco_freq_cv(double cv);       // pin 2
+	void set_mod_amount_cv(double cv);     // pin 5
+	void set_wave_select_cv(double cv);    // pin 6
+	void set_pulse_width_cv(double cv);    // pin 7
+	void set_mixer_balance_cv(double cv);  // pin 10
+	void set_filt_res_cv(double cv);       // pin 11
+	void set_filt_freq_cv(double cv);      // pin 16
+	void set_final_gain_cv(double cv);     // pin 18
+
+	// internal state accessors
+	// Note that these do not return the raw CVs. They return values derived
+	// from CVs. See per-function comments.
+	// Calling these might trigger a stream update.
+	double vco_freq();    // in Hz
+	double filt_res();    // feedback gain (0: no resonance, ~4: self-oscillation. Could be > 4)
+	double filt_freq();   // in Hz
+	double final_gain();  // linear (0: quiet, 1: no attenuation)
 
 protected:
 	// device-level overrides
@@ -58,42 +68,24 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream) override;
 
-public:
-	// Set the voltage going to a particular parameter
-	void set_voltage(int input, double voltage);
-
-	// Requesting a streaming voltage will force a stream update.
-	double get_voltage(int input);
-
-	// Get the translated parameter associated with the given input as follows:
-	//    VCO_FREQUENCY:      frequency in Hz
-	//    MODULATION_AMOUNT:  scale factor, 0.0 to 2.0
-	//    WAVE_SELECT:        voltage from this line
-	//    PULSE_WIDTH:        width fraction, from 0.0 to 1.0
-	//    MIXER_BALANCE:      balance, from -1.0 to 1.0
-	//    FILTER_RESONANCE:   resonance, from 0.0 to 1.0
-	//    FILTER_FREQUENCY:   frequency, in Hz
-	//    FINAL_GAIN:         gain, in dB
-	// Requesting a parameter associated with a streaming input will force a
-	// stream update.
-	double get_parameter(int input);
-
 private:
 	double compute_db(double voltage);
 	sound_stream::sample_t compute_db_volume(double voltage);
 
-	void set_voltage_internal(int input, double voltage);
-	void update_mix();
+	void set_filt_freq_cv_internal(double cv);
+	void set_final_gain_cv_internal(double cv);
+	void update_osc_mix();
 
 	float stream_op_filter_freq(float voltage);
 	float stream_op_amp_gain(float voltage);
 
 	// device configuration, not needed in save state
-	const input_array m_stream_inputs;// streaming inputs
-	const components m_components;    // external components
-	const double m_vco_zero_freq;     // frequency of VCO at 0.0V
-	const double m_filter_zero_freq;  // frequency of filter at 0.0V
-	sound_stream *m_stream;           // our stream
+	const stream_inputs m_stream_inputs;  // streaming inputs
+	const components m_components;        // external components
+	const double m_vco_zero_freq;         // frequency of VCO at 0.0V
+	const double m_filter_zero_freq;      // frequency of filter at 0.0V
+	bool m_initialized;                   // parameters initialized
+	sound_stream *m_stream;               // our stream
 
 	required_device<va_vco_device> m_vco;
 	optional_device<va_const_device> m_filt_freq;
@@ -103,16 +95,24 @@ private:
 
 	// device state
 
-	double m_values[INPUT_COUNT];     // raw values of registers
+	// raw control voltages for the chip's parameters
+	double m_vco_freq_cv;
+	double m_mod_amount_cv;
+	double m_wave_select_cv;
+	double m_pulse_width_cv;
+	double m_mixer_balance_cv;
+	double m_filt_res_cv;
+	double m_filt_freq_cv;
+	double m_final_gain_cv;
 
-	u8 m_wave_select;                 // flags which waveforms are enabled
+	// parameters derived from control voltages
+	bool m_tri;                       // triangle waveform enabled
+	bool m_saw;                       // sawtooth waveform enabled
 	double m_vco_frequency;           // current VCO frequency
 	double m_pulse_width;             // fractional pulse width
-
 	double m_volume;                  // linear overall volume (0-1)
 	double m_mixer_internal;          // linear internal volume (0-1)
 	double m_mixer_external;          // linear external volume (0-1)
-
 	double m_filter_frequency;        // baseline filter frequency
 	double m_filter_modulation;       // depth of modulation (up to 1.0)
 	double m_filter_resonance;        // depth of modulation (up to 1.0)

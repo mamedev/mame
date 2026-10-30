@@ -94,7 +94,7 @@ nscsi_sa1403d_device::nscsi_sa1403d_device(const machine_config &mconfig, device
 	m_cfg_type[0] = SA850;
 	m_cfg_type[1] = SA850;
 	m_cfg_type[2] = SA850;      // LUN 2 = CP/M drive D:; the connector defaults
-	                            // empty below (Xerox units shipped two floppies)
+								// empty below (Xerox units shipped two floppies)
 	m_cfg_type[3] = SA1004;
 }
 

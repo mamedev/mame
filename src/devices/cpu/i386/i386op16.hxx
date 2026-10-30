@@ -58,6 +58,7 @@ uint16_t i386_device::i386_shift_rotate16(uint8_t modrm, uint32_t value, uint8_t
 				break;
 		}
 	} else {
+		shift &= 31;
 		switch( (modrm >> 3) & 0x7 )
 		{
 			case 0:         /* ROL rm16, i8 */
@@ -114,21 +115,18 @@ uint16_t i386_device::i386_shift_rotate16(uint8_t modrm, uint32_t value, uint8_t
 				break;
 			case 4:         /* SHL/SAL rm16, i8 */
 			case 6:
-				shift &= 31;
 				dst = src << shift;
 				m_CF = (shift <= 16) && (src & (1 << (16-shift)));
 				SetSZPF16(dst);
 				CYCLES_RM(modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
 			case 5:         /* SHR rm16, i8 */
-				shift &= 31;
 				dst = src >> shift;
 				m_CF = (src & (1 << (shift-1))) ? 1 : 0;
 				SetSZPF16(dst);
 				CYCLES_RM(modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
 			case 7:         /* SAR rm16, i8 */
-				shift &= 31;
 				dst = (int16_t)src >> shift;
 				m_CF = (src & (1 << (shift-1))) ? 1 : 0;
 				SetSZPF16(dst);
@@ -1297,7 +1295,7 @@ void i386_device::i386_mov_rm16_r16()      // Opcode 0x89
 		STORE_RM16(modrm, src);
 		CYCLES(CYCLES_MOV_REG_REG);
 	} else {
-		uint32_t ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1,2);
 		src = LOAD_REG16(modrm);
 		WRITE16(ea, src);
 		CYCLES(CYCLES_MOV_REG_MEM);
@@ -1313,7 +1311,7 @@ void i386_device::i386_mov_r16_rm16()      // Opcode 0x8b
 		STORE_REG16(modrm, src);
 		CYCLES(CYCLES_MOV_REG_REG);
 	} else {
-		uint32_t ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0,2);
 		src = READ16(ea);
 		STORE_REG16(modrm, src);
 		CYCLES(CYCLES_MOV_MEM_REG);
@@ -1328,7 +1326,7 @@ void i386_device::i386_mov_rm16_i16()      // Opcode 0xc7
 		STORE_RM16(modrm, value);
 		CYCLES(CYCLES_MOV_IMM_REG);
 	} else {
-		uint32_t ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1,2);
 		uint16_t value = FETCH16();
 		WRITE16(ea, value);
 		CYCLES(CYCLES_MOV_IMM_MEM);
@@ -1345,9 +1343,9 @@ void i386_device::i386_mov_ax_m16()        // Opcode 0xa1
 	}
 	/* TODO: Not sure if this is correct... */
 	if( m_segment_prefix ) {
-		ea = i386_translate(m_segment_override, offset, 0 );
+		ea = i386_translate(m_segment_override, offset, 0, 2 );
 	} else {
-		ea = i386_translate(DS, offset, 0 );
+		ea = i386_translate(DS, offset, 0, 2 );
 	}
 	REG16(AX) = READ16(ea);
 	CYCLES(CYCLES_MOV_MEM_ACC);
@@ -1363,9 +1361,9 @@ void i386_device::i386_mov_m16_ax()        // Opcode 0xa3
 	}
 	/* TODO: Not sure if this is correct... */
 	if( m_segment_prefix ) {
-		ea = i386_translate(m_segment_override, offset, 1 );
+		ea = i386_translate(m_segment_override, offset, 1, 2 );
 	} else {
-		ea = i386_translate(DS, offset, 1 );
+		ea = i386_translate(DS, offset, 1, 2 );
 	}
 	WRITE16(ea, REG16(AX) );
 	CYCLES(CYCLES_MOV_ACC_MEM);

@@ -1161,35 +1161,77 @@ uint32_t gba_cons_state::gba_bios_r(offs_t offset, uint32_t mem_mask)
 			return 0;
 	}
 
-	if (m_maincpu->pc() >= 0x4000)
+	const uint32_t pc = m_maincpu->pc();
+	if (pc >= 0x4000)
 	{
-		//printf("GBA protection: blocking PC=%x\n", m_maincpu->pc());
-		return 0;
+		// The BIOS can only be read while executing from it; other reads return the most recently
+		// fetched BIOS opcode as per GBATEK.
+		return m_bios_prefetch;
 	}
 
-	return rom[offset & 0x3fff];
+	// The core prefetches 2 words ahead of the PC like the real pipeline, so PC+8
+	if (((offset << 2) == ((pc & ~3) + 8)) && !machine().side_effects_disabled())
+	{
+		m_bios_prefetch = rom[offset];
+	}
+
+	return rom[offset];
 }
 
-uint32_t gba_state::gba_10000000_r(offs_t offset, uint32_t mem_mask)
+// Reads from unused address space return the most recently prefetched opcode.
+// Justice League Chronicles and The Pinball of the Dead both do null pointer
+// reads and work by accident.
+uint32_t gba_state::gba_open_bus_r(offs_t offset, uint32_t mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
-	uint32_t data;
-	uint32_t pc = m_maincpu->state_int(arm7_cpu_device::ARM7_PC);
-	if (pc >= 0x10000000)
+	const uint32_t pc = m_maincpu->pc();
+
+	// don't recurse if we're somehow executing from unused space
+	if ((pc >= 0x10000000) || ((pc >= 0x4000) && (pc < 0x02000000)))
 	{
 		return 0;
 	}
-	uint32_t cpsr = m_maincpu->state_int(arm7_cpu_device::ARM7_CPSR);
-	if (T_IS_SET( cpsr))
+
+	uint32_t data;
+	if (T_IS_SET(m_maincpu->state_int(arm7_cpu_device::ARM7_CPSR)))
 	{
-		data = mspace.read_dword(pc + 8);
+		// Thumb: the two halves depend on where the code is and how it's aligned
+		switch (pc >> 24)
+		{
+			case 0x00: // BIOS
+			case 0x07: // OAM
+				if (pc & 2)
+				{
+					data = mspace.read_word(pc + 2) | (mspace.read_word(pc + 4) << 16);
+				}
+				else
+				{
+					data = mspace.read_word(pc + 4) | (mspace.read_word(pc + 6) << 16);
+				}
+				break;
+
+			case 0x03: // IWRAM: the other half is the previous prefetch, usually [$+2]
+				if (pc & 2)
+				{
+					data = mspace.read_word(pc + 2) | (mspace.read_word(pc + 4) << 16);
+				}
+				else
+				{
+					data = mspace.read_word(pc + 4) | (mspace.read_word(pc + 2) << 16);
+				}
+				break;
+
+			default: // EWRAM, palette, VRAM, cartridge ROM
+				data = mspace.read_word(pc + 4);
+				data |= data << 16;
+				break;
+		}
 	}
 	else
 	{
-		uint16_t insn = mspace.read_word(pc + 4);
-		data = (insn << 16) | (insn << 0);
+		data = mspace.read_dword(pc + 8);
 	}
-	logerror("%s: unmapped program memory read from %08X = %08X & %08X\n", machine().describe_context( ), 0x10000000 + (offset << 2), data, mem_mask);
+	logerror("%s: unmapped program memory read = %08X & %08X\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
 
@@ -1243,14 +1285,15 @@ void gba_state::gba_map(address_map &map)
 	map(0x06018000, 0x0601ffff).mirror(0x00fe0000).rw("lcd", FUNC(gba_lcd_device::gba_vram_r), FUNC(gba_lcd_device::gba_vram_w));  // VRAM
 	map(0x07000000, 0x070003ff).mirror(0x00fffc00).rw("lcd", FUNC(gba_lcd_device::gba_oam_r), FUNC(gba_lcd_device::gba_oam_w));    // OAM
 
-	map(0x10000000, 0xffffffff).r(FUNC(gba_state::gba_10000000_r)); // for "Justice League Chronicles" (game bug)
+	map(0x10000000, 0xffffffff).r(FUNC(gba_state::gba_open_bus_r));
 }
 
 void gba_cons_state::gba_cons_map(address_map &map)
 {
 	gba_map(map);
 
-	map(0x00000000, 0x00003fff).rom().mirror(0x01ffc000).r(FUNC(gba_cons_state::gba_bios_r));
+	map(0x00000000, 0x00003fff).rom().r(FUNC(gba_cons_state::gba_bios_r));
+	map(0x00004000, 0x01ffffff).r(FUNC(gba_cons_state::gba_open_bus_r));
 	//map(0x08000000, 0x0cffffff)  // cart ROM + mirrors, mapped here at machine_start if a cart is present
 }
 
@@ -1365,6 +1408,8 @@ void gba_state::machine_start()
 void gba_cons_state::machine_start()
 {
 	gba_state::machine_start();
+
+	save_item(NAME(m_bios_prefetch));
 
 	// install the cart ROM & SRAM into the address map, if present
 	if (m_cart->exists())

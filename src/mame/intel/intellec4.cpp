@@ -129,8 +129,8 @@ protected:
 	{
 	}
 
-	virtual void driver_start() override;
-	virtual void driver_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void intellec4_program_banks(address_map &map) ATTR_COLD;
 	void intellec4_rom_port_banks(address_map &map) ATTR_COLD;
@@ -637,7 +637,7 @@ INPUT_CHANGED_MEMBER(intellec4_state::sw_do_enable)
   driver_device implementation
 ----------------------------------*/
 
-void intellec4_state::driver_start()
+void intellec4_state::machine_start()
 {
 	m_reset_timer = timer_alloc(FUNC(intellec4_state::reset_expired), this);
 
@@ -678,7 +678,7 @@ void intellec4_state::driver_start()
 	m_ff_prg_mode[1] = m_ff_prg_mode[2] = false;
 };
 
-void intellec4_state::driver_reset()
+void intellec4_state::machine_reset()
 {
 	// set stuff according to initial state of front panel
 	ioport_value const sw_mode(m_sw_mode->read()), sw_control(m_sw_control->read());
@@ -1046,8 +1046,8 @@ public:
 	void mod4(machine_config &config);
 
 protected:
-	virtual void driver_start() override;
-	virtual void driver_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	enum
@@ -1163,9 +1163,9 @@ void mod4_state::mod4(machine_config &config)
   driver_device implementation
 ----------------------------------*/
 
-void mod4_state::driver_start()
+void mod4_state::machine_start()
 {
-	intellec4_state::driver_start();
+	intellec4_state::machine_start();
 
 	m_one_shot_timer = timer_alloc(FUNC(mod4_state::one_shot_expired), this);
 
@@ -1178,9 +1178,9 @@ void mod4_state::driver_start()
 	m_one_shot = false;
 }
 
-void mod4_state::driver_reset()
+void mod4_state::machine_reset()
 {
-	intellec4_state::driver_reset();
+	intellec4_state::machine_reset();
 
 	// set stuff according to initial state of front panel
 	m_sw_hold = BIT(~m_sw_mode->read(), BIT_SW_HOLD);
@@ -1240,8 +1240,8 @@ public:
 	void mod40(machine_config &config);
 
 protected:
-	virtual void driver_start() override;
-	virtual void driver_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	enum
@@ -1391,9 +1391,9 @@ void mod40_state::mod40(machine_config &config)
   driver_device implementation
 ----------------------------------*/
 
-void mod40_state::driver_start()
+void mod40_state::machine_start()
 {
-	intellec4_state::driver_start();
+	intellec4_state::machine_start();
 
 	m_single_step_timer = timer_alloc(FUNC(mod40_state::single_step_expired), this);
 
@@ -1407,9 +1407,9 @@ void mod40_state::driver_start()
 	m_stp_ack = m_single_step = false;
 }
 
-void mod40_state::driver_reset()
+void mod40_state::machine_reset()
 {
-	intellec4_state::driver_reset();
+	intellec4_state::machine_reset();
 
 	// set stuff according to initial state of front panel
 	m_sw_stop = BIT(~m_sw_mode->read(), BIT_SW_STOP);

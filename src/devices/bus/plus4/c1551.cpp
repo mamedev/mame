@@ -12,6 +12,8 @@
 #include "formats/d64_dsk.h"
 #include "formats/g64_dsk.h"
 
+#include <algorithm>
+
 
 
 //**************************************************************************
@@ -138,10 +140,10 @@ uint8_t c1551_device::tcbm_data_r()
 
 	*/
 
-	return m_tcbm_data;
+	return tcbm_r(TCBM_DATA0) & tcbm_r(TCBM_DATA1);
 }
 
-void c1551_device::tcbm_data_w(uint8_t data)
+template <int N> void c1551_device::tcbm_data_w(uint8_t data)
 {
 	/*
 
@@ -158,15 +160,21 @@ void c1551_device::tcbm_data_w(uint8_t data)
 
 	*/
 
-	m_tcbm_data = data;
+	tcbm_w(TCBM_DATA0 + N, data);
 }
 
 uint8_t c1551_device::tpi0_r(offs_t offset)
 {
+	if (((offset == 0) || (offset == 2)) && !tcbm_sample_ready())
+		return 0xff;
+
 	uint8_t data = m_tpi0->read(offset);
 
-	m_ga->ted_w(0);
-	m_ga->ted_w(1);
+	if (!machine().side_effects_disabled())
+	{
+		m_ga->ted_w(0);
+		m_ga->ted_w(1);
+	}
 
 	return data;
 }
@@ -185,8 +193,8 @@ uint8_t c1551_device::tpi0_pc_r()
 
 	    bit     description
 
-	    PC0
-	    PC1
+	    PC0     TCBM STATUS0
+	    PC1     TCBM STATUS1
 	    PC2
 	    PC3
 	    PC4
@@ -204,8 +212,11 @@ uint8_t c1551_device::tpi0_pc_r()
 	// SYNC detect line
 	data |= m_ga->sync_r() << 6;
 
+	// TCBM status
+	data |= tcbm_r(TCBM_STATUS) & tcbm_r(TCBM_HOST_STATUS);
+
 	// TCBM data valid
-	data |= m_dav << 7;
+	data |= tcbm_r(TCBM_DAV) << 7;
 
 	return data;
 }
@@ -228,13 +239,13 @@ void c1551_device::tpi0_pc_w(uint8_t data)
 	*/
 
 	// TCBM status
-	m_status = data & 0x03;
+	tcbm_w(TCBM_STATUS, data & 0x03);
 
 	// TCBM device number
 	m_dev = BIT(data, 2);
 
 	// TCBM acknowledge
-	m_ack = BIT(data, 3);
+	tcbm_w(TCBM_ACK, BIT(data, 3));
 
 	// read/write mode
 	m_ga->oe_w(BIT(data, 4));
@@ -261,7 +272,12 @@ uint8_t c1551_device::tpi1_pb_r()
 
 	*/
 
-	return m_status & 0x03;
+	return tcbm_r(TCBM_STATUS) & tcbm_r(TCBM_HOST_STATUS);
+}
+
+void c1551_device::tpi1_pb_w(uint8_t data)
+{
+	tcbm_w(TCBM_HOST_STATUS, data & 0x03);
 }
 
 uint8_t c1551_device::tpi1_pc_r()
@@ -284,7 +300,7 @@ uint8_t c1551_device::tpi1_pc_r()
 	uint8_t data = 0;
 
 	// TCBM acknowledge
-	data |= m_ack << 7;
+	data |= tcbm_r(TCBM_ACK) << 7;
 
 	return data;
 }
@@ -307,7 +323,116 @@ void c1551_device::tpi1_pc_w(uint8_t data)
 	*/
 
 	// TCBM data valid
-	m_dav = BIT(data, 6);
+	tcbm_w(TCBM_DAV, BIT(data, 6));
+}
+
+uint8_t c1551_device::tpi1_r(offs_t offset)
+{
+	if ((offset < 3) && !tcbm_sample_ready())
+		return 0xff;
+
+	return m_tpi1->read(offset);
+}
+
+
+//-------------------------------------------------
+//  tcbm_w - drive a TCBM line; port outputs
+//  change half a cycle after the write
+//-------------------------------------------------
+
+void c1551_device::tcbm_w(int line, uint8_t state)
+{
+	uint8_t &count = m_tcbm_count[line];
+	attotime *const times = m_tcbm_time[line];
+	uint8_t *const states = m_tcbm_state[line];
+	if (states[count - 1] == state)
+		return;
+
+	attotime time = machine().time();
+	device_execute_interface *const exec = machine().scheduler().currently_executing();
+	if (exec)
+	{
+		attotime const cycle = exec->cycles_to_attotime(1);
+		if (!cycle.is_never())
+			time += cycle / 2;
+	}
+	time = std::max(time, times[count - 1]);
+
+	if (times[count - 1] == time)
+	{
+		if ((count > 1) && (states[count - 2] == state))
+			count--;
+		else
+			states[count - 1] = state;
+	}
+	else
+	{
+		if (count == EDGE_COUNT)
+		{
+			std::copy(times + 1, times + count, times);
+			std::copy(states + 1, states + count, states);
+			count--;
+		}
+		times[count] = time;
+		states[count] = state;
+		count++;
+	}
+}
+
+
+//-------------------------------------------------
+//  tcbm_r - TCBM line state at the current time
+//-------------------------------------------------
+
+uint8_t c1551_device::tcbm_r(int line) const
+{
+	attotime const time = machine().time();
+	int i = m_tcbm_count[line] - 1;
+	while ((i > 0) && (m_tcbm_time[line][i] > time))
+		i--;
+
+	if ((i == 0) && (m_tcbm_time[line][0] > time) && !machine().side_effects_disabled())
+		logerror("TCBM line %d history overflow\n", line);
+
+	return m_tcbm_state[line][i];
+}
+
+
+//-------------------------------------------------
+//  tcbm_sample_ready - hold a CPU's TCBM port
+//  read until every other CPU has passed the
+//  point where its outputs could still change it
+//-------------------------------------------------
+
+bool c1551_device::tcbm_sample_ready()
+{
+	if (machine().side_effects_disabled())
+		return true;
+
+	cpu_device *const host = &m_slot->cpu();
+	cpu_device *const drive = m_maincpu;
+	device_execute_interface *const executing = machine().scheduler().currently_executing();
+	if ((executing != host) && (executing != drive))
+		return true;
+
+	cpu_device *const reader = (executing == host) ? host : drive;
+	cpu_device *const other = (executing == host) ? drive : host;
+	if (other->suspended(SUSPEND_ANY_REASON & ~SUSPEND_REASON_TIMESLICE))
+		return true;
+
+	attotime const cycle = other->cycles_to_attotime(1);
+	if ((other->local_time() + (cycle / 2)) <= reader->local_time())
+	{
+		if ((other->local_time() + cycle) > reader->local_time())
+		{
+			reader->yield();
+			machine().scheduler().perfect_quantum(cycle);
+		}
+		reader->retry_access();
+		return false;
+	}
+
+	return true;
 }
 
 //-------------------------------------------------
@@ -348,7 +473,7 @@ void c1551_device::device_add_mconfig(machine_config &config)
 
 	TPI6525(config, m_tpi0);
 	m_tpi0->in_pa_cb().set(FUNC(c1551_device::tcbm_data_r));
-	m_tpi0->out_pa_cb().set(FUNC(c1551_device::tcbm_data_w));
+	m_tpi0->out_pa_cb().set(FUNC(c1551_device::tcbm_data_w<0>));
 	m_tpi0->in_pb_cb().set(m_ga, FUNC(c64h156_device::yb_r));
 	m_tpi0->out_pb_cb().set(m_ga, FUNC(c64h156_device::yb_w));
 	m_tpi0->in_pc_cb().set(FUNC(c1551_device::tpi0_pc_r));
@@ -356,8 +481,9 @@ void c1551_device::device_add_mconfig(machine_config &config)
 
 	TPI6525(config, m_tpi1);
 	m_tpi1->in_pa_cb().set(FUNC(c1551_device::tcbm_data_r));
-	m_tpi1->out_pa_cb().set(FUNC(c1551_device::tcbm_data_w));
+	m_tpi1->out_pa_cb().set(FUNC(c1551_device::tcbm_data_w<1>));
 	m_tpi1->in_pb_cb().set(FUNC(c1551_device::tpi1_pb_r));
+	m_tpi1->out_pb_cb().set(FUNC(c1551_device::tpi1_pb_w));
 	m_tpi1->in_pc_cb().set(FUNC(c1551_device::tpi1_pc_r));
 	m_tpi1->out_pc_cb().set(FUNC(c1551_device::tpi1_pc_w));
 
@@ -369,13 +495,9 @@ void c1551_device::device_add_mconfig(machine_config &config)
 	connector.set_default_option("525ssqd");
 	connector.set_fixed(true);
 	connector.set_formats(c1551_device::floppy_formats);
+	connector.enable_sound(true);
 
-	PLUS4_EXPANSION_SLOT(config, m_exp, DERIVED_CLOCK(1, 1));
-	m_exp->irq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(plus4_expansion_slot_device::irq_w));
-	m_exp->cd_rd_callback().set(DEVICE_SELF_OWNER, FUNC(plus4_expansion_slot_device::dma_cd_r));
-	m_exp->cd_wr_callback().set(DEVICE_SELF_OWNER, FUNC(plus4_expansion_slot_device::dma_cd_w));
-	m_exp->aec_wr_callback().set(DEVICE_SELF_OWNER, FUNC(plus4_expansion_slot_device::aec_w));
-	plus4_expansion_cards(*m_exp);
+	plus4_expansion_slot_device::add_passthrough(config, "exp");
 }
 
 
@@ -419,13 +541,8 @@ c1551_device::c1551_device(const machine_config &mconfig, const char *tag, devic
 	, m_ga(*this, C64H156_TAG)
 	, m_pla(*this, PLA_TAG)
 	, m_floppy(*this, C64H156_TAG":0:525ssqd")
-	, m_exp(*this, "exp")
 	, m_jp1(*this, "JP1")
 	, m_leds(*this, "led%u", 0U)
-	, m_tcbm_data(0xff)
-	, m_status(1)
-	, m_dav(1)
-	, m_ack(1)
 	, m_dev(0)
 	, m_irq_timer(nullptr)
 {
@@ -445,11 +562,18 @@ void c1551_device::device_start()
 	// install image callbacks
 	m_ga->set_floppy(m_floppy);
 
+	static constexpr uint8_t TCBM_INIT[TCBM_COUNT] = { 0xff, 0xff, 1, 3, 1, 1 };
+	for (int line = 0; line < TCBM_COUNT; line++)
+	{
+		std::fill(std::begin(m_tcbm_time[line]), std::end(m_tcbm_time[line]), attotime::zero);
+		std::fill(std::begin(m_tcbm_state[line]), std::end(m_tcbm_state[line]), TCBM_INIT[line]);
+		m_tcbm_count[line] = 1;
+	}
+
 	// register for state saving
-	save_item(NAME(m_tcbm_data));
-	save_item(NAME(m_status));
-	save_item(NAME(m_dav));
-	save_item(NAME(m_ack));
+	save_item(NAME(m_tcbm_time));
+	save_item(NAME(m_tcbm_state));
+	save_item(NAME(m_tcbm_count));
 	save_item(NAME(m_dev));
 }
 
@@ -460,17 +584,14 @@ void c1551_device::device_start()
 
 void c1551_device::device_reset()
 {
-	m_maincpu->reset();
-
-	m_tpi0->reset();
-
-	m_exp->reset();
-
 	// initialize gate array
 	m_ga->test_w(1);
 	m_ga->soe_w(1);
 	m_ga->accl_w(1);
 	m_ga->atna_w(1);
+
+	offs_t const base = m_jp1->read() ? 0x1c0 : 0x1e0;
+	m_slot->io().install_readwrite_handler(base, base + 0x07, 0x18, emu::rw_delegate(*this, FUNC(c1551_device::tpi1_r)), emu::rw_delegate(*m_tpi1, FUNC(tpi6525_device::write)));
 }
 
 
@@ -492,60 +613,4 @@ TIMER_CALLBACK_MEMBER(c1551_device::irq_timer_tick)
 		// Tm = 0.7*(R1+R2)*C1 = 0.7*(120K+100R)*0.1uF = 0.008407s
 		m_irq_timer->adjust(attotime::from_usec(8407), ASSERT_LINE);
 	}
-}
-
-
-//-------------------------------------------------
-//  tpi1_selected -
-//-------------------------------------------------
-
-bool c1551_device::tpi1_selected(offs_t offset)
-{
-#ifdef PLA_DUMPED
-	int mux = 0, ras = 0, phi0 = 0, f7 = 0;
-	uint16_t input = A5 << 15 | A6 << 14 | A7 << 13 | A8 << 12 | A9 << 11 | mux << 10 | A10 << 9 | m_dev << 8 | ras << 7 | phi0 << 6 | A15 << 5 | A14 << 4 | A13 << 3 | A12 << 2 | A11 << 1 | f7;
-	uint8_t data = m_pla->read(input);
-	return BIT(data, 0) ? true : false;
-#endif
-
-	offs_t start_address = m_dev ? 0xfee0 : 0xfec0;
-
-	if (offset >= start_address && offset < (start_address + 0x20))
-	{
-		return true;
-	}
-
-	return false;
-}
-
-
-//-------------------------------------------------
-//  plus4_cd_r - cartridge data read
-//-------------------------------------------------
-
-uint8_t c1551_device::plus4_cd_r(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
-{
-	data = m_exp->cd_r(offset, data, ba, cs0, c1l, c2l, cs1, c1h, c2h);
-
-	if (tpi1_selected(offset))
-	{
-		data = m_tpi1->read(offset & 0x07);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  plus4_cd_w - cartridge data write
-//-------------------------------------------------
-
-void c1551_device::plus4_cd_w(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
-{
-	if (tpi1_selected(offset))
-	{
-		m_tpi1->write(offset & 0x07, data);
-	}
-
-	m_exp->cd_w(offset, data, ba, cs0, c1l, c2l, cs1, c1h, c2h);
 }

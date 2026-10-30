@@ -174,7 +174,7 @@ public:
 
 void a2bus_videx160_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, ULTRATERM_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, ULTRATERM_SCREEN_NAME));
 	screen.set_raw(CLOCK_LOW, 882, 0, 720, 370, 0, 350);
 	screen.set_screen_update(ULTRATERM_MC6845_NAME, FUNC(mc6845_device::screen_update));
 

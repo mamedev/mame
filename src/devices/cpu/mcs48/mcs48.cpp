@@ -72,6 +72,7 @@
     UPD7751 64   1k   27  (8048, speech synthesizer in internal ROM)
 
     8039   128    0   27  (external ROM)
+    MB8881 128    0   27  (8039 clone)
     8049   128   2k   27  (ROM)
     8749   128   2k   27  (EPROM)
     M58715 128   2k   27  (8049 clone)
@@ -201,6 +202,7 @@ DEFINE_DEVICE_TYPE(I8742AH, i8742ah_device, "i8742ah", "Intel 8742AH")
 
 DEFINE_DEVICE_TYPE(MB8884,  mb8884_device,  "mb8884",  "Fujitsu MB8884")
 DEFINE_DEVICE_TYPE(UPD7751, upd7751_device, "upd7751", "NEC uPD7751")
+DEFINE_DEVICE_TYPE(MB8881,  mb8881_device,  "mb8881",  "Fujitsu MB8881")
 DEFINE_DEVICE_TYPE(M58715,  m58715_device,  "m58715",  "Mitsubishi M58715")
 
 
@@ -304,6 +306,11 @@ mb8884_device::mb8884_device(const machine_config &mconfig, const char *tag, dev
 
 upd7751_device::upd7751_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: mcs48_cpu_device(mconfig, UPD7751, tag, owner, clock, 1024, 64, I8048_FEATURE, s_mcs48_opcodes)
+{
+}
+
+mb8881_device::mb8881_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: mcs48_cpu_device(mconfig, MB8881, tag, owner, clock, 0, 128, I8048_FEATURE, s_mcs48_opcodes)
 {
 }
 
@@ -587,8 +594,6 @@ u8 mcs48_cpu_device::p2_mask()
 	u8 result = 0xff;
 	if ((m_feature_mask & UPI41_FEATURE) == 0)
 		return result;
-	if (m_flags_enabled)
-		result &= ~(P2_OBF | P2_NIBF);
 	if (m_dma_enabled)
 		result &= ~(P2_DRQ | P2_NDACK);
 	return result;
@@ -767,8 +772,8 @@ OPHANDLER( in_a_dbb )
 	m_sts &= ~STS_IBF;
 
 	// if P2 flags are enabled, update the state of P2
-	if (m_flags_enabled && (m_p2 & P2_NIBF) == 0)
-		port_w(2, m_p2 |= P2_NIBF);
+	if (m_flags_enabled)
+		port_w(2, m_p2);
 	m_a = m_dbbi;
 }
 
@@ -907,8 +912,8 @@ OPHANDLER( out_dbb_a )
 	m_sts |= STS_OBF;
 
 	// if P2 flags are enabled, update the state of P2
-	if (m_flags_enabled && (m_p2 & P2_OBF) == 0)
-		port_w(2, m_p2 |= P2_OBF);
+	if (m_flags_enabled)
+		port_w(2, m_p2);
 }
 
 OPHANDLER( ret )            { burn_cycles(2); pull_pc(); }
@@ -1068,7 +1073,7 @@ const mcs48_cpu_device::mcs48_ophandler mcs48_cpu_device::s_i8021_opcodes[256] =
 	OP(anl_a_r0),   OP(anl_a_r1),   OP(anl_a_r2),  OP(anl_a_r3),  OP(anl_a_r4),  OP(anl_a_r5),   OP(anl_a_r6),  OP(anl_a_r7),
 	OP(add_a_xr0),  OP(add_a_xr1),  OP(mov_t_a),   OP(illegal),   OP(jmp_3),     OP(stop_tcnt),  OP(illegal),   OP(rrc_a),      // 60
 	OP(add_a_r0),   OP(add_a_r1),   OP(add_a_r2),  OP(add_a_r3),  OP(add_a_r4),  OP(add_a_r5),   OP(add_a_r6),  OP(add_a_r7),
-	OP(adc_a_xr0),  OP(adc_a_xr1),  OP(illegal),   OP(illegal),   OP(call_3),    OP(illegal),    OP(illegal),   OP(rr_a),       // 70
+	OP(adc_a_xr0),  OP(adc_a_xr1),  OP(illegal),   OP(illegal),   OP(call_3),    OP(illegal),    OP(jnc),       OP(rr_a),       // 70
 	OP(adc_a_r0),   OP(adc_a_r1),   OP(adc_a_r2),  OP(adc_a_r3),  OP(adc_a_r4),  OP(adc_a_r5),   OP(adc_a_r6),  OP(adc_a_r7),
 	OP(illegal),    OP(illegal),    OP(illegal),   OP(ret),       OP(jmp_4),     OP(illegal),    OP(illegal),   OP(illegal),    // 80
 	OP(illegal),    OP(illegal),    OP(illegal),   OP(illegal),   OP(orld_p4_a), OP(orld_p5_a),  OP(orld_p6_a), OP(orld_p7_a),
@@ -1104,7 +1109,7 @@ const mcs48_cpu_device::mcs48_ophandler mcs48_cpu_device::s_i8022_opcodes[256] =
 	OP(anl_a_r0),   OP(anl_a_r1),   OP(anl_a_r2),  OP(anl_a_r3),  OP(anl_a_r4),  OP(anl_a_r5),   OP(anl_a_r6),  OP(anl_a_r7),
 	OP(add_a_xr0),  OP(add_a_xr1),  OP(mov_t_a),   OP(illegal),   OP(jmp_3),     OP(stop_tcnt),  OP(illegal),   OP(rrc_a),      // 60
 	OP(add_a_r0),   OP(add_a_r1),   OP(add_a_r2),  OP(add_a_r3),  OP(add_a_r4),  OP(add_a_r5),   OP(add_a_r6),  OP(add_a_r7),
-	OP(adc_a_xr0),  OP(adc_a_xr1),  OP(illegal),   OP(illegal),   OP(call_3),    OP(illegal),    OP(illegal),   OP(rr_a),       // 70
+	OP(adc_a_xr0),  OP(adc_a_xr1),  OP(illegal),   OP(illegal),   OP(call_3),    OP(illegal),    OP(jnc),       OP(rr_a),       // 70
 	OP(adc_a_r0),   OP(adc_a_r1),   OP(adc_a_r2),  OP(adc_a_r3),  OP(adc_a_r4),  OP(adc_a_r5),   OP(adc_a_r6),  OP(adc_a_r7),
 	OP(illegal),    OP(illegal),    OP(illegal),   OP(ret),       OP(jmp_4),     OP(illegal),    OP(illegal),   OP(illegal),    // 80
 	OP(illegal),    OP(illegal),    OP(illegal),   OP(illegal),   OP(orld_p4_a), OP(orld_p5_a),  OP(orld_p6_a), OP(orld_p7_a),
@@ -1187,7 +1192,7 @@ void mcs48_cpu_device::device_start()
 	state_add(STATE_GENPC,     "GENPC",     m_pc).mask(0xfff).noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     m_prevpc).mask(0xfff).noshow();
 	state_add(MCS48_SP,        "SP",        m_psw).mask(0x7).noshow();
-	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_psw).noshow().formatstr("%11s");
+	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_psw).noshow().formatstr("%12s");
 	state_add(MCS48_A,         "A",         m_a);
 	state_add(MCS48_TC,        "TC",        m_timer);
 	state_add(MCS48_TPRE,      "TPRE",      m_prescaler).mask(0x1f);
@@ -1198,7 +1203,7 @@ void mcs48_cpu_device::device_start()
 	state_add(MCS48_P2,        "P2",        m_p2);
 
 	for (int regnum = 0; regnum < 8; regnum++)
-		state_add(MCS48_R0 + regnum, string_format("R%d", regnum).c_str(), m_rtemp).callimport().callexport();
+		state_add(MCS48_R0 + regnum, string_format("R%d", regnum), m_rtemp).callimport().callexport();
 
 	if (!(m_feature_mask & I802X_FEATURE))
 		state_add(MCS48_EA,    "EA",        m_ea).mask(0x1);
@@ -1416,6 +1421,36 @@ void mcs48_cpu_device::execute_run()
 *******************************************************************************/
 
 /*-------------------------------------------------
+    p2_output - apply UPI-41 buffer flags to the
+    port pins without changing the port latch
+-------------------------------------------------*/
+
+u8 upi41_cpu_device::p2_output(u8 data) const
+{
+	if (m_flags_enabled)
+	{
+		if (!(m_sts & STS_OBF))
+			data &= ~P2_OBF;
+		if (m_sts & STS_IBF)
+			data &= ~P2_NIBF;
+	}
+	return data;
+}
+
+
+u8 upi41_cpu_device::port_r(offs_t a)
+{
+	const u8 data = mcs48_cpu_device::port_r(a);
+	return (a == 2) ? p2_output(data) : data;
+}
+
+void upi41_cpu_device::port_w(offs_t a, u8 v)
+{
+	mcs48_cpu_device::port_w(a, (a == 2) ? p2_output(v) : v);
+}
+
+
+/*-------------------------------------------------
     upi41_master_r - master CPU data/status
     read
 -------------------------------------------------*/
@@ -1431,7 +1466,7 @@ u8 upi41_cpu_device::upi41_master_r(offs_t offset)
 	{
 		m_sts &= ~STS_OBF;
 		if (m_flags_enabled)
-			port_w(2, m_p2 &= ~P2_OBF);
+			port_w(2, m_p2);
 	}
 	return m_dbbo;
 }
@@ -1452,7 +1487,7 @@ TIMER_CALLBACK_MEMBER(upi41_cpu_device::master_callback)
 	{
 		m_sts |= STS_IBF;
 		if (m_flags_enabled)
-			port_w(2, m_p2 &= ~P2_NIBF);
+			port_w(2, m_p2);
 	}
 
 	// set F1 accordingly

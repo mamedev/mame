@@ -465,7 +465,7 @@ void mk98_state::mk98(machine_config &config)
 	serport0.ri_handler().set(uart0, FUNC(ins8250_device::ri_w));
 	serport0.cts_handler().set(uart0, FUNC(ins8250_device::cts_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD, rgb_t::white());
+	SCREEN(config, m_screen).set_lcd().set_color(rgb_t::white());
 	m_screen->set_screen_update(FUNC(mk98_state::screen_update));
 	m_screen->set_raw(XTAL(5'370'000) / 2, 300, 0, 240, 180, 0, 128);
 	m_screen->set_palette("palette");

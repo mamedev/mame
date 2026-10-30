@@ -117,7 +117,7 @@ void fontwriter_state::fontwriter(machine_config &config)
 
 	AT28C16(config, "at28c16");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_screen_update(FUNC(fontwriter_state::screen_update));
@@ -134,7 +134,7 @@ void fontwriter_state::fw600(machine_config &config)
 
 	AT28C16(config, "at28c16");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_screen_update(FUNC(fontwriter_state::screen_update));

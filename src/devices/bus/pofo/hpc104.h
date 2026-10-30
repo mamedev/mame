@@ -36,6 +36,7 @@ protected:
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -47,12 +48,14 @@ protected:
 	// device_portfolio_expansion_slot_interface implementation
 	virtual bool nmd1() override { return m_ccm->cdet_r(); }
 
-	virtual uint8_t nrdi_r(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
-	virtual void nwri_w(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
+	virtual void ncc1_w(int state) override;
 
 	virtual void iint_w(int state) override { m_exp->iint_w(state); }
+	virtual void nmio_w(int state) override { m_exp->nmio_w(state); }
 
 private:
+	void update_ccm_b_tap();
+
 	required_device<portfolio_memory_card_slot_device> m_ccm;
 	required_device<portfolio_expansion_slot_device> m_exp;
 	memory_share_creator<uint8_t> m_nvram;
@@ -60,6 +63,7 @@ private:
 
 	bool m_sw1;
 	bool m_ncc1_out;
+	bool m_upstream_ccm_b;
 };
 
 

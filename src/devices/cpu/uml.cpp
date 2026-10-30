@@ -474,9 +474,9 @@ public:
 				auto const rot = inst.param(2).immediate();
 
 				if (size == 4)
-					convert_to_mov_immediate(inst, rotr_32(inst.param(1).immediate(), rot) & field);
+					convert_to_mov_immediate(inst, std::rotr<u32>(inst.param(1).immediate(), rot) & field);
 				else
-					convert_to_mov_immediate(inst, rotr_64(inst.param(1).immediate(), rot) & field);
+					convert_to_mov_immediate(inst, std::rotr<u64>(inst.param(1).immediate(), rot) & field);
 			}
 			else if (inst.param(2).is_immediate_value(0))
 			{
@@ -520,9 +520,9 @@ public:
 				auto const shift = -s64(inst.param(3).immediate()) & (bits - 1);
 
 				if (size == 4)
-					convert_to_mov_immediate(inst, u32(s32(rotr_32(inst.param(1).immediate(), rot)) >> shift));
+					convert_to_mov_immediate(inst, u32(s32(std::rotr<u32>(inst.param(1).immediate(), rot)) >> shift));
 				else
-					convert_to_mov_immediate(inst, u64(s64(rotr_64(inst.param(1).immediate(), rot)) >> shift));
+					convert_to_mov_immediate(inst, u64(s64(std::rotr<u64>(inst.param(1).immediate(), rot)) >> shift));
 			}
 			else if (inst.param(2).is_immediate_value(0))
 			{
@@ -576,18 +576,18 @@ public:
 		{
 			// constant result, convert to MOV or a logic operation
 			if (size == 4)
-				convert_to_mov_immediate(inst, rotl_32(inst.param(1).immediate(), inst.param(2).immediate()) & inst.param(3).immediate());
+				convert_to_mov_immediate(inst, std::rotl<u32>(inst.param(1).immediate(), inst.param(2).immediate()) & inst.param(3).immediate());
 			else
-				convert_to_mov_immediate(inst, rotl_64(inst.param(1).immediate(), inst.param(2).immediate()) & inst.param(3).immediate());
+				convert_to_mov_immediate(inst, std::rotl<u64>(inst.param(1).immediate(), inst.param(2).immediate()) & inst.param(3).immediate());
 		}
 		else if (inst.param(1).is_immediate() && inst.param(2).is_immediate())
 		{
 			// only mask is variable, convert to AND
 			inst.m_opcode = OP_AND;
 			if (size == 4)
-				inst.m_param[1] = rotl_32(inst.param(1).immediate(), inst.param(2).immediate());
+				inst.m_param[1] = std::rotl<u32>(inst.param(1).immediate(), inst.param(2).immediate());
 			else
-				inst.m_param[1] = rotl_64(inst.param(1).immediate(), inst.param(2).immediate());
+				inst.m_param[1] = std::rotl<u64>(inst.param(1).immediate(), inst.param(2).immediate());
 			inst.m_param[2] = inst.param(3);
 			inst.m_numparams = 3;
 		}
@@ -1183,9 +1183,9 @@ public:
 		{
 			// constant result, convert to MOV or a logic operation
 			if (size == 4)
-				convert_to_mov_immediate(inst, rotl_32(inst.param(1).immediate(), inst.param(2).immediate()));
+				convert_to_mov_immediate(inst, std::rotl<u32>(inst.param(1).immediate(), inst.param(2).immediate()));
 			else
-				convert_to_mov_immediate(inst, rotl_64(inst.param(1).immediate(), inst.param(2).immediate()));
+				convert_to_mov_immediate(inst, std::rotl<u64>(inst.param(1).immediate(), inst.param(2).immediate()));
 		}
 		else if (inst.param(2).is_immediate_value(0))
 		{
@@ -1214,9 +1214,9 @@ public:
 		{
 			// constant result, convert to MOV or a logic operation
 			if (size == 4)
-				convert_to_mov_immediate(inst, rotr_32(inst.param(1).immediate(), inst.param(2).immediate()));
+				convert_to_mov_immediate(inst, std::rotr<u32>(inst.param(1).immediate(), inst.param(2).immediate()));
 			else
-				convert_to_mov_immediate(inst, rotr_64(inst.param(1).immediate(), inst.param(2).immediate()));
+				convert_to_mov_immediate(inst, std::rotr<u64>(inst.param(1).immediate(), inst.param(2).immediate()));
 		}
 		else if (inst.param(2).is_immediate_value(0))
 		{

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: Angelo Salese, David Haywood, Lysiwyg, Philip Bennett
+// copyright-holders: Angelo Salese, David Haywood, Philip Bennett
 /*
 
 Williams The Predators (prototype)
@@ -763,7 +763,7 @@ void predators_state::predators(machine_config &config)
 
 	for (auto &screen : m_screen)
 	{
-		SCREEN(config, screen, SCREEN_TYPE_RASTER);
+		SCREEN(config, screen);
 		screen->set_refresh_hz(60);
 		screen->set_size(512, 256);
 		screen->set_visarea(48, 436 - 1, 20, 252 - 1);

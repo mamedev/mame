@@ -34,7 +34,7 @@ namespace bus::amiga::zorro {
 void a2232_device::device_add_mconfig(machine_config &config)
 {
 	// main cpu
-	M65CE02(config, m_iocpu, 28.37516_MHz_XTAL / 8); // should run at Amiga clock 7M / 2
+	M65CE02(config, m_iocpu, DERIVED_CLOCK(1, 2));
 	m_iocpu->set_addrmap(AS_PROGRAM, &a2232_device::iocpu_map);
 
 	INPUT_MERGER_ANY_HIGH(config, m_ioirq);
@@ -42,7 +42,7 @@ void a2232_device::device_add_mconfig(machine_config &config)
 
 	// acia
 	for (auto &acia : m_acia)
-		MOS6551(config, acia, 28.37516_MHz_XTAL / 8).set_xtal(1.8432_MHz_XTAL);
+		MOS6551(config, acia, DERIVED_CLOCK(1, 2)).set_xtal(1.8432_MHz_XTAL);
 	m_acia[0]->txd_handler().set("rs232_1", FUNC(rs232_port_device::write_txd));
 	m_acia[0]->irq_handler().set(m_ioirq, FUNC(input_merger_device::in_w<0>));
 	m_acia[1]->txd_handler().set("rs232_2", FUNC(rs232_port_device::write_txd));
@@ -158,11 +158,11 @@ void a2232_device::device_reset_after_children()
 //  IMPLEMENTATION
 //**************************************************************************
 
-void a2232_device::int2_w(uint8_t data)
+void a2232_device::iocpu_int2_w(uint8_t data)
 {
 	LOG("%s: int2_w %04x\n", shortname(), data);
 
-	m_zorro->int2_w(1);
+	int2_w(1);
 }
 
 void a2232_device::irq_ack8_w(uint8_t data)
@@ -183,30 +183,30 @@ void a2232_device::autoconfig_base_address(offs_t address)
 	LOG("-> installing a2232\n");
 
 	// stop responding to default autoconfig
-	m_zorro->space().unmap_readwrite(0xe80000, 0xe8007f);
+	zorro_space().unmap_readwrite(0xe80000, 0xe8007f);
 
-	m_zorro->space().install_readwrite_handler(address, address + 0x3fff,
+	zorro_space().install_readwrite_handler(address, address + 0x3fff,
 		read16s_delegate(*this, FUNC(a2232_device::shared_ram_r)),
 		write16s_delegate(*this, FUNC(a2232_device::shared_ram_w)), 0xffff);
 
-	m_zorro->space().install_readwrite_handler(address + 0x4000, address + 0x4001,
+	zorro_space().install_readwrite_handler(address + 0x4000, address + 0x4001,
 		read16smo_delegate(*this, FUNC(a2232_device::irq_ack_r)),
 		write16smo_delegate(*this, FUNC(a2232_device::irq_ack_w)), 0xffff);
 
-	m_zorro->space().install_readwrite_handler(address + 0x8000, address + 0x8001,
+	zorro_space().install_readwrite_handler(address + 0x8000, address + 0x8001,
 		read16smo_delegate(*this, FUNC(a2232_device::reset_low_r)),
 		write16smo_delegate(*this, FUNC(a2232_device::reset_low_w)), 0xffff);
 
-	m_zorro->space().install_readwrite_handler(address + 0xa000, address + 0xa001,
+	zorro_space().install_readwrite_handler(address + 0xa000, address + 0xa001,
 		read16smo_delegate(*this, FUNC(a2232_device::irq_r)),
 		write16smo_delegate(*this, FUNC(a2232_device::irq_w)), 0xffff);
 
-	m_zorro->space().install_readwrite_handler(address + 0xc000, address + 0xc001,
+	zorro_space().install_readwrite_handler(address + 0xc000, address + 0xc001,
 		read16s_delegate(*this, FUNC(a2232_device::reset_high_r)),
 		write16s_delegate(*this, FUNC(a2232_device::reset_high_w)), 0xffff);
 
 	// we're done
-	m_zorro->cfgout_w(0);
+	cfgout_w(0);
 }
 
 void a2232_device::cfgin_w(int state)
@@ -230,7 +230,7 @@ void a2232_device::cfgin_w(int state)
 		autoconfig_can_shutup(true); // ?
 
 		// install autoconfig handler
-		m_zorro->space().install_readwrite_handler(0xe80000, 0xe8007f,
+		zorro_space().install_readwrite_handler(0xe80000, 0xe8007f,
 			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
 			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 	}
@@ -273,14 +273,14 @@ void a2232_device::shared_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t a2232_device::irq_ack_r()
 {
-	m_zorro->int2_w(0);
+	int2_w(0);
 
 	return 0xffff;
 }
 
 void a2232_device::irq_ack_w(uint16_t data)
 {
-	m_zorro->int2_w(0);
+	int2_w(0);
 }
 
 uint16_t a2232_device::reset_low_r()
@@ -482,7 +482,7 @@ void a2232_device::iocpu_map(address_map &map)
 	map(0x5800, 0x5fff).rw(FUNC(a2232_device::acia_r<3>), FUNC(a2232_device::acia_w<3>));
 	map(0x6000, 0x67ff).rw(FUNC(a2232_device::acia_r<4>), FUNC(a2232_device::acia_w<4>));
 	map(0x6800, 0x6fff).rw(FUNC(a2232_device::acia_r<5>), FUNC(a2232_device::acia_w<5>));
-	map(0x7000, 0x73ff).w(FUNC(a2232_device::int2_w));
+	map(0x7000, 0x73ff).w(FUNC(a2232_device::iocpu_int2_w));
 	map(0x7400, 0x77ff).rw(FUNC(a2232_device::acia_r<6>), FUNC(a2232_device::acia_w<6>));
 	map(0x7800, 0x7fff).rw(FUNC(a2232_device::cia_r), FUNC(a2232_device::cia_w));
 	map(0x8000, 0x8000).w(FUNC(a2232_device::irq_ack8_w));

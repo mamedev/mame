@@ -44,23 +44,17 @@ void cbm2_standard_cartridge_device::device_start()
 
 
 //-------------------------------------------------
-//  cbm2_bd_r - cartridge data read
+//  device_reset - device-specific reset
 //-------------------------------------------------
 
-uint8_t cbm2_standard_cartridge_device::cbm2_bd_r(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
+void cbm2_standard_cartridge_device::device_reset()
 {
-	if (!csbank1 && m_bank1)
-	{
-		data = m_bank1[offset];
-	}
-	else if (!csbank2 && m_bank2)
-	{
-		data = m_bank2[offset];
-	}
-	else if (!csbank3 && m_bank3)
-	{
-		data = m_bank3[offset];
-	}
+	if (memory_region *const bank1 = m_slot->memregion("bank1"))
+		m_slot->bank1().install_rom(0x0000, 0x1fff, bank1->base());
 
-	return data;
+	if (memory_region *const bank2 = m_slot->memregion("bank2"))
+		m_slot->bank2().install_rom(0x0000, 0x1fff, bank2->base());
+
+	if (memory_region *const bank3 = m_slot->memregion("bank3"))
+		m_slot->bank3().install_rom(0x0000, 0x1fff, bank3->base());
 }

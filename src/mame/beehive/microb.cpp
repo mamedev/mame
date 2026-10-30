@@ -314,7 +314,7 @@ void microb_state::microb(machine_config &config)
 	m_dmac->out_tc_cb().set_inputline(m_maincpu, I8085_RST75_LINE);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_raw(1'620'000 * 8, 800, 0, 640, 324, 0, 300);
 	//screen.set_raw(1'620'000 * 8, 800, 0, 640, 270, 0, 250);
 	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));

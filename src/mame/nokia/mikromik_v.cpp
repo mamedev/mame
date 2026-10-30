@@ -136,7 +136,7 @@ void mm1_state::mm1_palette(palette_device &palette) const
 
 void mm1_state::mm1_video(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_refresh_hz( 50 );
 	screen.set_screen_update(FUNC(mm1_state::screen_update));
 	screen.set_size( 800, 375 ); // (25 text rows * 15 vertical pixels / character)
@@ -149,7 +149,7 @@ void mm1_state::mm1_video(machine_config &config)
 	I8275(config, m_crtc, XTAL(18'720'000)/8);
 	m_crtc->set_character_width(HORIZONTAL_CHARACTER_PIXELS);
 	m_crtc->set_display_callback(FUNC(mm1_state::crtc_display_pixels));
-	m_crtc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq0_w));
+	m_crtc->drq_wr_callback().set(FUNC(mm1_state::crtc_drq_w));
 	m_crtc->set_screen("screen");
 }
 

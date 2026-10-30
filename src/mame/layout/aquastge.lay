@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+
+Aqua Stage layout
 -->
 <mamelayout version="2">
 
@@ -12,7 +14,6 @@ license:CC0-1.0
 		<screen index="1">
 			<bounds left="900" top="0" right="1800" bottom="450" />
 		</screen>
-
 	</view>
 
 </mamelayout>

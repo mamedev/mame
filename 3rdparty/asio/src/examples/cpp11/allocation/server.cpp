@@ -2,7 +2,7 @@
 // server.cpp
 // ~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,6 +10,7 @@
 
 #include <array>
 #include <cstdlib>
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <type_traits>
@@ -17,6 +18,114 @@
 #include "asio.hpp"
 
 using asio::ip::tcp;
+
+// Class to manage the memory to be used for allocating objects that are
+// associated with an execution context (such as services and internal state of
+// I/O objects). It contains a single block of memory from which objects are
+// monotonically allocated (similar to std::pmr::monotonic_resource). If no
+// more space is available it delegates allocation to the global heap.
+class context_memory
+{
+public:
+  explicit context_memory(std::size_t preallocated)
+    : preallocated_(preallocated),
+      next_allocation_(0),
+      storage_(new unsigned char[preallocated_])
+  {
+  }
+
+  ~context_memory()
+  {
+    delete[] storage_;
+  }
+
+  context_memory(const context_memory&) = delete;
+  context_memory& operator=(const context_memory&) = delete;
+
+  void* allocate(std::size_t size, std::size_t align)
+  {
+    // Since this program is single-threaded there is no need to perform any
+    // synchronisation when modifying next_allocation_. Use an atomic or other
+    // form of synchronisation when using an exeution context from multiple
+    // threads.
+    std::size_t space = size + align;
+    if (next_allocation_ + space < preallocated_)
+    {
+      void* ptr = storage_ + next_allocation_;
+      next_allocation_ += space;
+      return std::align(align, size, ptr, space);
+    }
+    else
+    {
+      return ::operator new(size);
+    }
+  }
+
+  void deallocate(void* ptr)
+  {
+    auto* ucptr = static_cast<unsigned char*>(ptr);
+    if (std::less_equal<unsigned char*>{}(storage_, ucptr)
+        && std::less<unsigned char*>{}(ucptr, storage_ + preallocated_))
+    {
+      // Nothing to do.
+    }
+    else
+    {
+      ::operator delete(ptr);
+    }
+  }
+
+private:
+  std::size_t preallocated_;
+  std::size_t next_allocation_;
+  unsigned char* storage_;
+};
+
+// The allocator to be associated with the execution context. This allocatoro
+// only needs to satisfy the C++11 minimal allocator requirements.
+template <typename T>
+class context_allocator
+{
+public:
+  using value_type = T;
+
+  explicit context_allocator(context_memory& mem)
+    : memory_(mem)
+  {
+  }
+
+  template <typename U>
+  context_allocator(const context_allocator<U>& other) noexcept
+    : memory_(other.memory_)
+  {
+  }
+
+  bool operator==(const context_allocator& other) const noexcept
+  {
+    return &memory_ == &other.memory_;
+  }
+
+  bool operator!=(const context_allocator& other) const noexcept
+  {
+    return &memory_ != &other.memory_;
+  }
+
+  T* allocate(std::size_t n) const
+  {
+    return static_cast<T*>(memory_.allocate(sizeof(T) * n, alignof(T)));
+  }
+
+  void deallocate(T* p, std::size_t /*n*/) const
+  {
+    return memory_.deallocate(p);
+  }
+
+private:
+  template <typename> friend class context_allocator;
+
+  // The underlying memory.
+  context_memory& memory_;
+};
 
 // Class to manage the memory to be used for handler-based custom allocation.
 // It contains a single block of memory which may be returned for allocation
@@ -204,7 +313,9 @@ int main(int argc, char* argv[])
       return 1;
     }
 
-    asio::io_context io_context;
+    context_memory memory(4096);
+    context_allocator<void> allocator(memory);
+    asio::io_context io_context(std::allocator_arg, allocator);
     server s(io_context, std::atoi(argv[1]));
     io_context.run();
   }

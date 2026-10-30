@@ -631,7 +631,7 @@ void mips_i2000_state::rs2030(machine_config &config)
 	u32 const pixclock = 108'189'000;
 
 	// timing from VESA 1280x1024 @ 60Hz
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(pixclock, 1688, 248, 1528, 1066, 38, 1062);
 	m_screen->set_screen_update(FUNC(mips_i2000_state::screen_update));
 	m_screen->screen_vblank().set_inputline(m_cpu, INPUT_LINE_IRQ5);

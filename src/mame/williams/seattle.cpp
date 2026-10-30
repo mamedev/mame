@@ -2031,7 +2031,7 @@ void seattle_state::seattle_common(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// screen
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// Screeen size and timing is re-calculated later in voodoo card
 	m_screen->set_refresh_hz(57);
 	m_screen->set_size(640, 480);

@@ -35,10 +35,10 @@ enum
 	MCR_REGISTER                = 27
 };
 
-#define X_CODE(val)      ((val & 0x7000) >> 12)
-#define E_BIT(val)       ((val & 0x8000) >> 15)
-#define S_BIT_CONST(val) ((val & 0x4000) >> 14)
-#define DD(val)          ((val & 0x3000) >> 12)
+constexpr uint16_t X_CODE(uint16_t val)      { return (val & 0x7000) >> 12; }
+constexpr uint16_t E_BIT(uint16_t val)       { return (val & 0x8000) >> 15; }
+constexpr uint16_t S_BIT_CONST(uint16_t val) { return (val & 0x4000) >> 14; }
+constexpr uint16_t DD(uint16_t val)          { return (val & 0x3000) >> 12; }
 
 #define S_BIT                   ((OP & 0x100) >> 8)
 #define D_BIT                   ((OP & 0x200) >> 9)
@@ -48,29 +48,29 @@ enum
 #define N_OP_MASK               (m_op & 0x10f)
 #define DRC_HI_N_VALUE          (0x10 | (op & 0x0f))
 #define DRC_LO_N_VALUE          (op & 0x0f)
-#define DRC_N_OP_MASK           (op & 0x10f)
 #define DST_CODE                ((OP & 0xf0) >> 4)
 #define SRC_CODE                (OP & 0x0f)
+
 #define SIGN_BIT(val)           ((val & 0x80000000) >> 31)
 #define SIGN_TO_N(val)          ((val & 0x80000000) >> 29)
 #define SIGN64_TO_N(val)        ((val & 0x8000000000000000ULL) >> 61)
 
 /* Extended DSP instructions */
-#define EHMAC           0x02a
-#define EHMACD          0x02e
-#define EHCMULD         0x046
-#define EHCMACD         0x04e
-#define EHCSUMD         0x086
-#define EHCFFTD         0x096
-#define EMUL_N          0x100
-#define EMUL            0x102
-#define EMULU           0x104
-#define EMULS           0x106
-#define EMAC            0x10a
-#define EMACD           0x10e
-#define EMSUB           0x11a
-#define EMSUBD          0x11e
-#define EHCFFTSD        0x296
+constexpr uint16_t EHMAC        = 0x02a;
+constexpr uint16_t EHMACD       = 0x02e;
+constexpr uint16_t EHCMULD      = 0x046;
+constexpr uint16_t EHCMACD      = 0x04e;
+constexpr uint16_t EHCSUMD      = 0x086;
+constexpr uint16_t EHCFFTD      = 0x096;
+constexpr uint16_t EMUL_N       = 0x100;
+constexpr uint16_t EMUL         = 0x102;
+constexpr uint16_t EMULU        = 0x104;
+constexpr uint16_t EMULS        = 0x106;
+constexpr uint16_t EMAC         = 0x10a;
+constexpr uint16_t EMACD        = 0x10e;
+constexpr uint16_t EMSUB        = 0x11a;
+constexpr uint16_t EMSUBD       = 0x11e;
+constexpr uint16_t EHCFFTSD     = 0x296;
 
 // IRQ numbers
 enum

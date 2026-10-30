@@ -922,7 +922,7 @@ void einstein_state::einstein(machine_config &config)
 	tms9129_device &vdp(TMS9129(config, "vdp", 10.738635_MHz_XTAL));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000); // 16k RAM, provided by IC i040 and i041
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -550,7 +550,7 @@ void pv1000_state::pv1000(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pv1000_state::pv1000_io);
 
 	/* D65010G031 - Video & sound chip */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(17897725/4, 288, 32, 32+224, 262, 0, 244);
 	// Pixel aspect is 48/35.
 	// Display aspect is MAME's 4:3 default.

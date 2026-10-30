@@ -270,7 +270,7 @@ void mcr_state::render_sprites_91399(screen_device &screen, bitmap_ind16 &bitmap
 
 		/* loop over lines in the sprite */
 		for (int y = 0; y < 32; y++, sy = (sy + 1) & 0x1ff)
-			if (sy >= cliprect.min_y && sy <= cliprect.max_y)
+			if (cliprect.containsy(sy))
 			{
 				uint8_t const *const src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
 				uint16_t *const dst = &bitmap.pix(sy);
@@ -337,7 +337,7 @@ void mcr_state::render_sprites_91464(screen_device &screen, bitmap_ind16 &bitmap
 
 		/* loop over lines in the sprite */
 		for (int y = 0; y < 32; y++, sy = (sy + 1) & 0x1ff)
-			if (sy >= 2 && sy >= cliprect.min_y && sy <= cliprect.max_y)
+			if (sy >= 2 && cliprect.containsy(sy))
 			{
 				uint8_t const *const src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
 				uint16_t *const dst = &bitmap.pix(sy);

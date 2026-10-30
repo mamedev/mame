@@ -295,7 +295,7 @@ void kron180_state::kron180(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &kron180_state::kron180_iomap);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(FUNC(kron180_state::screen_update));
 	screen.set_size(80 * 10, 24 * 10);

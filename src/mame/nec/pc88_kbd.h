@@ -61,8 +61,8 @@ public:
 	auto irq_cb() { return m_irq_cb.bind(); }
 	u8 read_direct(offs_t offset) { return m_key_rows[offset]->read() ^ 0xff; }
 
-	// TODO: interface not yet done
-	u8 read(offs_t offset) { if (offset) { return m_scan_code; } else { return 0; } }
+	u8 read_code(offs_t offset) { return m_scan_code; }
+	void write_command(offs_t offset, u8 data);
 
 protected:
 	virtual void device_start() override ATTR_COLD;

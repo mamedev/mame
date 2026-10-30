@@ -134,14 +134,14 @@ void lw700i_state::video_start()
 uint32_t lw700i_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	static const uint32_t palette[2] = { 0xffffff, 0 };
-	uint8_t const *const pVRAM = (uint8_t *)m_mainram.target() + 0x3e200;
+	auto const pVRAM = util::big_endian_cast<uint8_t const>(&m_mainram[0x3e200 >> 1]);
 
 	for (int y = 0; y < 128; y++)
 	{
 		uint32_t *scanline = &bitmap.pix(y);
 		for (int x = 0; x < 480/8; x++)
 		{
-			uint8_t const pixels = pVRAM[(y * (480/8)) + (BYTE_XOR_BE(x))];
+			uint8_t const pixels = pVRAM[(y * (480/8)) + x];
 
 			*scanline++ = palette[BIT(pixels, 7)];
 			*scanline++ = palette[BIT(pixels, 6)];
@@ -284,7 +284,7 @@ void lw700i_state::lw700i(machine_config &config)
 	m_maincpu->tend2().set(m_fdc, FUNC(hd63266f_device::tc_line_w));
 	TIMER(config, "scantimer").configure_scanline(FUNC(lw700i_state::vbl_interrupt), "screen", 0, 1);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_screen_update(FUNC(lw700i_state::screen_update));

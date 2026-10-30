@@ -136,6 +136,8 @@ Methods
 
 output:exists()
     Returns a Boolean indicating whether the output exists.
+output:name()
+    Returns the output’s name if it exists, or ``nil`` otherwise.
 output:get()
     Returns the current value of the output if it exists, or a value stored by
     the output proxy if the output does no exist.
@@ -297,6 +299,10 @@ machine.screens (read-only)
 machine.cassettes (read-only)
     A :ref:`device enumerator <luascript-ref-devenum>` that yields all
     :ref:`cassette image devices <luascript-ref-cassdev>` in the emulated
+    system.
+machine.cdplayers (read-only)
+    A :ref:`device enumerator <luascript-ref-devenum>` that yields all
+    :ref:`audio CD player devices <luascript-ref-cdplayerdev>` in the emulated
     system.
 machine.images (read-only)
     A :ref:`device enumerator <luascript-ref-devenum>` that yields all

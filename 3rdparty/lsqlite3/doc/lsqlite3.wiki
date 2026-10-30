@@ -140,7 +140,11 @@ You can get it from <a href="http://www.sqlite.org/">http://www.sqlite.org/</a>
 </p>
 <p>The module <code>lsqlite3complete</code> links SQLite3 statically.
 The SQLite3 amalgamation source code is included in 
-the LuaSQLite 3 distribution.</p>
+the LuaSQLite 3 distribution.  This can simplify deployment, but might
+result in more than one copy of the SQLite library if other parts
+of the code also include it.  See
+<a href="http://www.sqlite.org/howtocorrupt.html#multiple_copies_of_sqlite_linked_into_the_same_application">http://www.sqlite.org/howtocorrupt.html</a>
+for an explanation on why it would be a bad idea.</p>
 <p>Both modules support the creation and manipulation of 
 SQLite3 databases. After a <code>sqlite3 = require('lsqlite3')</code> 
 (or <code>sqlite3 = require('lsqlite3complete')</code>) the exported 
@@ -372,7 +376,7 @@ or <code>nil</code> the COMMIT is allowed to prodeed, otherwise the COMMIT is co
 </p>
 <h2><a name="db_create_aggregate">db:create_aggregate</a></h2>
 <pre>
-        db:create_aggregate(name,nargs,step,final)</pre>
+        db:create_aggregate(name,nargs,step,final[,userdata])</pre>
 <p>This function creates an aggregate callback function. Aggregates perform
 an operation over all rows in a query. <code>name</code> is a string with the name 
 of the aggregate function as given in an SQL statement; <code>nargs</code> is the 
@@ -381,7 +385,8 @@ function that gets called once for every row; it should accept a function
 context (see <a href="#methods_for_callback_contexts">Methods for callback contexts</a>) plus the same number of
 parameters as given in <code>nargs</code>. <code>final</code> is a function that is called 
 once after all rows have been processed; it receives one argument, the
-function context.</p>
+function context. If provided, <code>userdata</code> can be any Lua value and would be returned
+by the <code>context:user_data()</code> method.</p>
 <p>The function context can be used inside the two callback functions to
 communicate with SQLite3. Here is a simple example:</p>
 <pre>
@@ -438,14 +443,15 @@ is higher in the collation order than the second. A simple example:</p>
 </p>
 <h2><a name="db_create_function">db:create_function</a></h2>
 <pre>
-        db:create_function(name,nargs,func)</pre>
+        db:create_function(name,nargs,func[,userdata])</pre>
 <p>This function creates a callback function. Callback function are called
 by SQLite3 once for every row in a query. <code>name</code> is a string with the 
 name of the callback function as given in an SQL statement; <code>nargs</code> is 
 the number of arguments this call will provide. <code>func</code> is the actual Lua
 function that gets called once for every row; it should accept a
 function context (see <a href="#methods_for_callback_contexts">Methods for callback contexts</a>) plus the same
-number of parameters as given in nargs. Here is an example:</p>
+number of parameters as given in nargs. If provided, <code>userdata</code> can be any Lua value and would be returned
+by the <code>context:user_data()</code> method. Here is an example:</p>
 <pre>
         db:exec'CREATE TABLE test(col1,col2,col3)'
         db:exec'INSERT INTO test VALUES(1,2,4)'

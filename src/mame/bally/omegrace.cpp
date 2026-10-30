@@ -222,7 +222,7 @@
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "video/avgdvg.h"
-#include "video/vector.h"
+#include "vector.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -543,12 +543,9 @@ void omegrace_state::omegrace(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_hz(12_MHz_XTAL/16/256/256));
 
 	/* video hardware */
-	VECTOR(config, "vector");
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
-	screen.set_refresh_hz(40);
-	screen.set_size(400, 300);
-	screen.set_visarea(522, 1566, 522, 1566);
-	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
+	vector_device &vector(VECTOR(config, "vector"));
+	vector.set_refresh_hz(40);
+	vector.set_visarea(522, 1566, 522, 1566);
 
 	DVG(config, m_dvg);
 	m_dvg->set_vector("vector");

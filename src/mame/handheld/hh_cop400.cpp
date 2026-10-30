@@ -25,7 +25,7 @@ TODO:
 #include "sound/dac.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -540,10 +540,9 @@ void einvaderc_state::einvaderc(machine_config &config)
 	m_maincpu->write_l().set(FUNC(einvaderc_state::write_l));
 
 	// video hardware
-	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
+	screen_svg_device &mask(SCREEN_SVG(config, "mask"));
 	mask.set_refresh_hz(60);
 	mask.set_size(919, 1080);
-	mask.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(7, 0x7f);
@@ -1382,10 +1381,9 @@ void lafootb_state::lafootb(machine_config &config)
 	m_maincpu->write_sk().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	// video hardware
-	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
+	screen_svg_device &mask(SCREEN_SVG(config, "mask"));
 	mask.set_refresh_hz(60);
 	mask.set_size(1920, 864);
-	mask.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0x4, 0x7f);

@@ -54,7 +54,7 @@ INPUT_PORTS_END
 void c64dtv_state::c64dtv(machine_config &config)
 {
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(FUNC(c64dtv_state::screen_update));
 	screen.set_size(640,480);
 	screen.set_visarea_full();

@@ -691,7 +691,7 @@ void lethal_state::lethalen(machine_config &config)
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 24, 312, 262, 16, 240); // measured 59.638Hz
 	m_screen->set_screen_update(FUNC(lethal_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(lethal_state::vblank));

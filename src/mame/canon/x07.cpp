@@ -1687,7 +1687,7 @@ void x07_state::x07(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &x07_state::x07_io);
 
 	/* video hardware */
-	screen_device &lcd(SCREEN(config, "lcd", SCREEN_TYPE_LCD));
+	screen_device &lcd(SCREEN(config, "lcd").set_lcd());
 	lcd.set_refresh_hz(60);
 	lcd.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	lcd.set_screen_update(FUNC(x07_state::screen_update));

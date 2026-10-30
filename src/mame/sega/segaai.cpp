@@ -687,7 +687,7 @@ void segaai_state::segaai(machine_config &config)
 	m_v9938->set_vram_size(0x10000);
 	m_v9938->int_cb().set(FUNC(segaai_state::vdp_interrupt));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 
 	I8255(config, m_i8255);
 	m_i8255->in_pa_callback().set_ioport(m_port4);

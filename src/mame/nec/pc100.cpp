@@ -684,7 +684,7 @@ void pc100_state::pc100(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:3", pc100_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	/* TODO: Unknown Pixel Clock and CRTC is dynamic */
 	screen.set_raw(MASTER_CLOCK*4, 1024, 0, 768, 264*2, 0, 512);
 	screen.set_screen_update(FUNC(pc100_state::screen_update_pc100));

@@ -116,9 +116,10 @@
 #include "bus/generic/carts.h"
 #include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "imagedev/floppy.h"
 #include "imagedev/harddriv.h"
+#include "machine/74123.h"
 #include "machine/acorn_bmu.h"
 #include "machine/acorn_ioc.h"
 #include "machine/acorn_lc.h"
@@ -133,6 +134,7 @@
 #include "machine/pcf8573.h"
 #include "machine/pcf8583.h"
 #include "machine/ram.h"
+#include "machine/rescap.h"
 #include "machine/upc82c710.h"
 #include "machine/upc82c711.h"
 #include "machine/wd_fdc.h"
@@ -195,7 +197,7 @@ protected:
 
 	void post_debug(int post_state);
 
-	required_device<arm_cpu_device> m_maincpu;
+	required_device<arm2_cpu_device> m_maincpu;
 	required_device<acorn_ioc_device> m_ioc;
 	required_device<acorn_memc_device> m_memc;
 	required_device<acorn_vidc10_device> m_vidc;
@@ -342,6 +344,8 @@ public:
 	required_device<pcf8583_device> m_i2cmem;
 
 protected:
+	void aa3010_common(machine_config &config) ATTR_COLD;
+
 	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void memc_map(address_map &map) override ATTR_COLD;
@@ -946,7 +950,7 @@ void aabase_state::memc_map(address_map &map)
 	map(0x00000000, 0x01ffffff).rw(m_memc, FUNC(acorn_memc_device::logical_r), FUNC(acorn_memc_device::logical_w));
 	map(0x02000000, 0x02ffffff).noprw(); // physical ram installed in machine_start
 	map(0x03000000, 0x033fffff).m(m_ioc, FUNC(acorn_ioc_device::map));
-	map(0x03000000, 0x0300ffff).rw(m_exp, FUNC(archimedes_exp_device::ms_r), FUNC(archimedes_exp_device::ms_w)).umask32(0x0000ffff);
+	map(0x03000000, 0x0300ffff).rw(m_exp, FUNC(archimedes_exp_device::ms0_r), FUNC(archimedes_exp_device::ms0_w)).umask32(0x0000ffff);
 	map(0x03400000, 0x035fffff).nopr().w(m_vidc, FUNC(acorn_vidc10_device::write));
 	map(0x03600000, 0x037fffff).nopr().w(m_memc, FUNC(acorn_memc_device::registers_w));
 	map(0x03800000, 0x039fffff).mirror(0x600000).rom().region("maincpu", 0).w(m_memc, FUNC(acorn_memc_device::page_w));
@@ -1051,18 +1055,17 @@ static void aa310_floppies(device_slot_interface &device)
 
 void aabase_state::aabase(machine_config &config)
 {
-	ARM(config, m_maincpu, 24_MHz_XTAL / 3); // ARM2
+	ARM2(config, m_maincpu, 24_MHz_XTAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &aabase_state::arm_map);
-	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
 
 	ACORN_MEMC(config, m_memc, 24_MHz_XTAL / 3, m_vidc);
 	m_memc->set_addrmap(0, &aabase_state::memc_map);
 	m_memc->sirq_w().set(m_ioc, FUNC(acorn_ioc_device::il1_w));
-	//m_memc->abort_w().set_inputline(m_maincpu, ARM_ABORT_LINE);
+	//m_memc->abort_w().set_inputline(m_maincpu, arm7_cpu_device::ARM7_ABORT_EXCEPTION);
 
 	ACORN_IOC(config, m_ioc, 24_MHz_XTAL / 3);
-	m_ioc->fiq_w().set_inputline(m_maincpu, ARM_FIRQ_LINE);
-	m_ioc->irq_w().set_inputline(m_maincpu, ARM_IRQ_LINE);
+	m_ioc->fiq_w().set_inputline(m_maincpu, arm7_cpu_device::ARM7_FIRQ_LINE);
+	m_ioc->irq_w().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
 	m_ioc->kout_w().set("keyboard", FUNC(archimedes_keyboard_device::kin_w));
 	m_ioc->peripheral_r<4>().set(m_exp, FUNC(archimedes_exp_device::ps4_r));
 	m_ioc->peripheral_w<4>().set(m_exp, FUNC(archimedes_exp_device::ps4_w));
@@ -1071,13 +1074,17 @@ void aabase_state::aabase(machine_config &config)
 
 	ARCHIMEDES_KEYBOARD(config, "keyboard").kout().set(m_ioc, FUNC(acorn_ioc_device::kin_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
+
+	SPEAKER(config, "speaker", 2).front();
 
 	ACORN_VIDC1A(config, m_vidc, 24_MHz_XTAL);
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(m_memc, FUNC(acorn_memc_device::vidrq_w));
 	m_vidc->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
+	m_vidc->add_route(0, "speaker", 1.00, 0);
+	m_vidc->add_route(1, "speaker", 1.00, 1);
 
 	RAM(config, m_ram).set_default_size("1M");
 
@@ -1119,6 +1126,8 @@ void aa500_state::aa500(machine_config &config)
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(m_memc, FUNC(acorn_memc_device::vidrq_w));
 	m_vidc->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
+	m_vidc->add_route(0, "speaker", 1.00, 0);
+	m_vidc->add_route(1, "speaker", 1.00, 1);
 
 	// TODO: implement A500 keyboard, uses M6500/1 MCU
 
@@ -1141,15 +1150,31 @@ void aa500_state::aa500(machine_config &config)
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
 
+	ttl74123_device &txen(TTL74123(config, "txen", RES_K(220), CAP_U(47)));
+	txen.set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	txen.set_a_pin_value(0);
+	txen.set_b_pin_value(1);
+	txen.set_clear_pin_value(0);
+	txen.out_cb().set("network", FUNC(econet_device::host_rts_w));
+
 	MC6854(config, m_adlc);
 	m_adlc->out_txd_cb().set("network", FUNC(econet_device::host_data_w));
-	m_adlc->out_irq_cb().set(m_ioc, FUNC(acorn_ioc_device::fl_w));
-	//m_adlc->out_rts_cb().
+	m_adlc->out_irq_cb().set(m_ioc, FUNC(acorn_ioc_device::fl_w)).invert();
+	m_adlc->out_rts_cb().set(txen, FUNC(ttl74123_device::clear_w));
+	m_adlc->out_rts_cb().append(m_adlc, FUNC(mc6854_device::set_cts)).invert();
+
+	ttl74123_device &clkdet(TTL74123(config, "clkdet", RES_K(39), CAP_N(2.2)));
+	clkdet.set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	clkdet.set_b_pin_value(1);
+	clkdet.set_clear_pin_value(1);
+	clkdet.out_cb().set(m_adlc, FUNC(mc6854_device::set_dcd)).invert();
 
 	econet_device &econet(ECONET(config, "network"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
+	econet.clk_wr_callback().append(clkdet, FUNC(ttl74123_device::a_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
+	ECONET_SLOT(config, "econet", "network", econet_devices);
 
 	mos6551_device &acia(MOS6551(config, "acia"));
 	acia.set_xtal(1.8432_MHz_XTAL);
@@ -1442,8 +1467,8 @@ void aa310_state::aa540(machine_config &config)
 {
 	aa310(config);
 
-	m_maincpu->set_clock(52_MHz_XTAL / 2); // ARM3
-	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
+	ARM3(config.replace(), m_maincpu, 52_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &aa310_state::arm_map);
 
 	m_ram->set_default_size("16M").set_extra_options("8M,16M");
 
@@ -1502,18 +1527,16 @@ void aa310_state::av20dev(machine_config &config)
 	m_podule[3]->set_default_option(nullptr);
 }
 
-void aa4000_state::aa3010(machine_config &config)
+void aa4000_state::aa3010_common(machine_config &config)
 {
 	aabase(config);
 
-	m_maincpu->set_clock(72_MHz_XTAL / 6); // ARM250
-	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
+	ARM250(config.replace(), m_maincpu, 72_MHz_XTAL / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &aa4000_state::arm_map);
 
 	m_ioc->baud_w().set("upc:serial1", FUNC(ns16450_device::clock_w));
 	m_ioc->peripheral_r<1>().set([this] () { logerror("%s: IOC: Peripheral Select 1 R\n", machine().describe_context()); return 0; });
 	m_ioc->peripheral_w<1>().set([this] (int state) { logerror("%s: IOC: Peripheral Select 1 W %d\n", machine().describe_context(), state); });
-	m_ioc->peripheral_r<2>().set("econet", FUNC(archimedes_econet_slot_device::read));
-	m_ioc->peripheral_w<2>().set("econet", FUNC(archimedes_econet_slot_device::write));
 	m_ioc->peripheral_r<3>().set([this] () { logerror("%s: IOC: Peripheral Select 3 R\n", machine().describe_context()); return 0; });
 	m_ioc->peripheral_w<3>().set([this] (int state) { logerror("%s: IOC: Peripheral Select 3 W %d\n", machine().describe_context(), state); });
 	m_ioc->peripheral_r<5>().set(FUNC(aa4000_state::ioeb_r));
@@ -1555,6 +1578,14 @@ void aa4000_state::aa3010(machine_config &config)
 	rs232.dsr_handler().set("upc:serial1", FUNC(ns16450_device::dsr_w));
 	rs232.dcd_handler().set("upc:serial1", FUNC(ns16450_device::dcd_w));
 	rs232.ri_handler().set("upc:serial1", FUNC(ns16450_device::ri_w));
+}
+
+void aa4000_state::aa3010(machine_config &config)
+{
+	aa3010_common(config);
+
+	m_ioc->peripheral_r<2>().set("econet", FUNC(archimedes_econet_slot_device::read));
+	m_ioc->peripheral_w<2>().set("econet", FUNC(archimedes_econet_slot_device::write));
 
 	// expansion slots - mini
 	ARCHIMEDES_PODULE_SLOT(config, m_podule[1], m_exp, archimedes_mini_exp_devices, nullptr);
@@ -1589,8 +1620,8 @@ void aa5000_state::aa5000(machine_config &config)
 {
 	aabase(config);
 
-	m_maincpu->set_clock(50_MHz_XTAL / 2); // ARM3
-	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
+	ARM3(config.replace(), m_maincpu, 50_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &aa5000_state::arm_map);
 
 	m_ioc->baud_w().set("upc:serial", FUNC(ns16450_device::clock_w));
 	m_ioc->peripheral_r<1>().set([this] () { logerror("%s: IOC: Peripheral Select 1 R\n", machine().describe_context()); return 0; });
@@ -1659,22 +1690,22 @@ void aa5000_state::aa5000(machine_config &config)
 
 void aa4_state::aa4(machine_config &config)
 {
-	aa3010(config);
+	aa3010_common(config);
 
-	m_maincpu->set_clock(24_MHz_XTAL); // ARM3
-	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
+	ARM3(config.replace(), m_maincpu, 24_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &aa4_state::arm_map);
 
 	ACORN_BMU(config, m_bmu, 4.194304_MHz_XTAL);
 	//bmu.battlo_callback().set(m_ioc, FUNC(acorn_ioc_device::il7_w));
 
-	//m_ioc->peripheral_r<2>().set("lc", FUNC(lc_device::read));
-	//m_ioc->peripheral_w<2>().set("lc", FUNC(lc_device::write));
+	m_ioc->peripheral_r<2>().set_constant(0xff);
+	m_ioc->peripheral_w<2>().set_nop();
 	m_ioc->gpio_r<0>().set([this]() { return m_i2cmem->sda_r() & m_bmu->sda_r(); });
 	m_ioc->gpio_w<0>().append(m_bmu, FUNC(acorn_bmu_device::sda_w));
 	m_ioc->gpio_w<1>().append(m_bmu, FUNC(acorn_bmu_device::scl_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config.replace(), "screen").set_lcd());
 	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
 
 	ACORN_LC(config, m_lc, 24_MHz_XTAL);
@@ -1683,14 +1714,13 @@ void aa4_state::aa4(machine_config &config)
 	//m_vidc->set_screen("screen");
 	//m_vidc->vblank().set(m_memc, FUNC(acorn_memc_device::vidrq_w));
 	//m_vidc->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
+	//m_vidc->add_route(0, "speaker", 1.00, 0);
+	//m_vidc->add_route(1, "speaker", 1.00, 1);
 
 	m_ram->set_default_size("2M").set_extra_options("4M");
 
 	// ide 60MB HDD
 	subdevice<ata_interface_device>("upc:ide")->options(ata_devices, "hdd", nullptr, false);
-
-	// expansion slots - none
-	config.device_remove("podule1");
 
 	// extension rom
 	GENERIC_SOCKET(config, m_ext_rom, generic_linear_slot, "ext_rom", "bin,rom");

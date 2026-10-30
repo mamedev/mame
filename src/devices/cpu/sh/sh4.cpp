@@ -30,6 +30,7 @@
 #include "sh3comn.h"
 #include "sh4fe.h"
 #include "sh4comn.h"
+#include "sh4fpu.h"
 #include "sh4regs.h"
 #include "sh4tmu.h"
 #include "sh_dasm.h"
@@ -38,7 +39,60 @@
 
 #include "endianness.h"
 
-#include <numbers>
+#include <cfenv>
+
+#if defined(__clang_major__) && (__clang_major__ < 12)
+// can't guarantee floating point environment control works
+#else
+#pragma STDC FENV_ACCESS ON
+#endif
+
+// From FPSCR.RM: 00 = round to nearest, 01 = round to zero; 10/11 are reserved
+static const uint8_t fpmode_source[4] = { uml::ROUND_ROUND, uml::ROUND_TRUNC, uml::ROUND_ROUND, uml::ROUND_ROUND };
+static const int feround_source[4] = { FE_TONEAREST, FE_TOWARDZERO, FE_TONEAREST, FE_TONEAREST };
+
+namespace {
+
+// the FPSCR cause field, and what an exception sets in it and in the flag field (which has no FPU error bit)
+constexpr uint32_t FPSCR_CAUSE = 0x0003f000;
+
+constexpr uint32_t fpscr_exception_bits(uint32_t cause)
+{
+	return (cause << 12) | ((cause & 0x1f) << 2);
+}
+
+// For convenience, we run in the host's rounding mode most of the time and only switch during actual FPU ops.
+// That shields read/write handlers and the debugger hook from seeing unexpected rounding mode changes.
+class host_rounding_scope
+{
+public:
+	host_rounding_scope(uint32_t fpscr, int hostmode) :
+		m_hostmode(hostmode),
+		m_changed(feround_source[fpscr & 3] != hostmode)
+	{
+		if (m_changed)
+		{
+			std::fesetround(feround_source[fpscr & 3]);
+		}
+	}
+
+	~host_rounding_scope()
+	{
+		if (m_changed)
+		{
+			std::fesetround(m_hostmode);
+		}
+	}
+
+	host_rounding_scope(const host_rounding_scope &) = delete;
+	host_rounding_scope &operator=(const host_rounding_scope &) = delete;
+
+private:
+	const int   m_hostmode;
+	const bool  m_changed;
+};
+
+} // anonymous namespace
 
 
 DEFINE_DEVICE_TYPE(SH3, sh3_device,   "sh3", "Hitachi SH-3 (Unidentified)")
@@ -853,16 +907,9 @@ void sh3_base_device::irda_7709_map(address_map& map)
 	map(0x0400014e, 0x0400014f).rw(FUNC(sh3_base_device::scfdr1_r), FUNC(sh3_base_device::scfdr1_w));
 }
 
-void sh3_base_device::scif_7709_map(address_map& map)
+void sh7709_base_device::scif_7709_map(address_map& map)
 {
-	map(0x04000150, 0x04000150).rw(FUNC(sh3_base_device::scsmr2_r), FUNC(sh3_base_device::scsmr2_w));
-	map(0x04000152, 0x04000152).rw(FUNC(sh3_base_device::scbrr2_r), FUNC(sh3_base_device::scbrr2_w));
-	map(0x04000154, 0x04000154).rw(FUNC(sh3_base_device::scscr2_r), FUNC(sh3_base_device::scscr2_w));
-	map(0x04000156, 0x04000156).rw(FUNC(sh3_base_device::scftdr2_r), FUNC(sh3_base_device::scftdr2_w));
-	map(0x04000158, 0x04000159).rw(FUNC(sh3_base_device::scssr2_r), FUNC(sh3_base_device::scssr2_w));
-	map(0x0400015a, 0x0400015a).rw(FUNC(sh3_base_device::scfrdr2_r), FUNC(sh3_base_device::scfrdr2_w));
-	map(0x0400015c, 0x0400015c).rw(FUNC(sh3_base_device::scfcr2_r), FUNC(sh3_base_device::scfcr2_w));
-	map(0x0400015e, 0x0400015f).rw(FUNC(sh3_base_device::scfdr2_r), FUNC(sh3_base_device::scfdr2_w));
+	map(0x04000150, 0x0400015f).m(m_scif, FUNC(sh7709_scif_device::map));
 }
 
 void sh3_base_device::udi_7709s_map(address_map& map)
@@ -928,6 +975,22 @@ sh3_base_device::~sh3_base_device()
 }
 
 
+sh7709_base_device::sh7709_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
+	: sh3_base_device(mconfig, type, tag, owner, clock, endianness)
+	, m_scif(*this, "scif")
+{
+}
+
+void sh7709_base_device::device_add_mconfig(machine_config &config)
+{
+	sh3_base_device::device_add_mconfig(config);
+
+	// Clocked from the peripheral clock, which is CPU clock / 4 with the
+	// reset FRQCR setting.
+	SH7709_SCIF(config, m_scif, DERIVED_CLOCK(1, 4));
+}
+
+
 sh4_base_device::sh4_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
 	: sh34_base_device(mconfig, type, tag, owner, clock, endianness, address_map_constructor(FUNC(sh4_base_device::sh4_internal_map), this))
 {
@@ -941,7 +1004,7 @@ sh4_base_device::~sh4_base_device()
 
 
 sh3_device::sh3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
-	: sh3_base_device(mconfig, SH3, tag, owner, clock, endianness)
+	: sh7709_base_device(mconfig, SH3, tag, owner, clock, endianness)
 {
 }
 
@@ -951,7 +1014,7 @@ sh7708s_device::sh7708s_device(const machine_config& mconfig, const char* tag, d
 }
 
 sh7709_device::sh7709_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
-	: sh3_base_device(mconfig, SH7709, tag, owner, clock, endianness)
+	: sh7709_base_device(mconfig, SH7709, tag, owner, clock, endianness)
 {
 }
 
@@ -2076,18 +2139,53 @@ inline void sh34_base_device::FTRC(const uint16_t opcode)
 {
 	uint32_t n = REG_N;
 
+	// Out-of-range and infinite operands saturate, NaNs give the negative limit.
+	// A C cast is undefined for these and can differs between x64 and AArch64
 	if (m_sh2_state->m_fpu_pr) /* PR = 1 */
 	{
 		if (n & 1)
 			fatalerror("SH-4: FTRC opcode used with n %d", n);
 
 		n = n & 14;
-		*((int32_t *)&m_sh2_state->m_fpul) = (int32_t)FP_RFD(n);
+
+		const double val = FP_RFD(n);
+		if (std::isnan(val))
+		{
+			*((int32_t *)&m_sh2_state->m_fpul) = -0x80000000;
+		}
+		else if (val >= 2147483648.0)
+		{
+			*((int32_t *)&m_sh2_state->m_fpul) = 0x7fffffff;
+		}
+		else if (val <= -2147483649.0)
+		{
+			*((int32_t *)&m_sh2_state->m_fpul) = -0x80000000;
+		}
+		else
+		{
+			*((int32_t *)&m_sh2_state->m_fpul) = (int32_t)val;
+		}
 	}
 	else                /* PR = 0 */
 	{
-		/* read m_sh2_state->m_fr[n] as float -> truncate -> fpul(32) */
-		*((int32_t *)&m_sh2_state->m_fpul) = (int32_t)FP_RFS(n);
+		// read m_sh2_state->m_fr[n] as float -> truncate -> fpul(32)
+		const float val = FP_RFS(n);
+		if (std::isnan(val))
+		{
+			*((int32_t *)&m_sh2_state->m_fpul) = -0x80000000;
+		}
+		else if (val >= 2147483648.0f)
+		{
+			*((int32_t *)&m_sh2_state->m_fpul) = 0x7fffffff;
+		}
+		else if (val < -2147483648.0f)
+		{
+			*((int32_t *)&m_sh2_state->m_fpul) = -0x80000000;
+		}
+		else
+		{
+			*((int32_t *)&m_sh2_state->m_fpul) = (int32_t)val;
+		}
 	}
 }
 
@@ -2102,11 +2200,14 @@ inline void sh34_base_device::FLOAT(const uint16_t opcode)
 		if (n & 1)
 			fatalerror("SH-4: FLOAT opcode used with n %d", n);
 
+		// int32 -> double is an exact conversion so the rounding mode doesn't matter
 		n = n & 14;
 		FP_RFD(n) = (double)*((int32_t *)&m_sh2_state->m_fpul);
 	}
 	else                /* PR = 0 */
 	{
+		const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
+
 		FP_RFS(n) = (float)*((int32_t *)&m_sh2_state->m_fpul);
 	}
 }
@@ -2206,6 +2307,8 @@ inline void sh34_base_device::FCNVDS(const uint16_t opcode)
 
 	if (m_sh2_state->m_fpu_pr) /* PR = 1 */
 	{
+		const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
+
 		n = n & 14;
 		if (m_sh2_state->m_fpscr & RM)
 			m_sh2_state->m_fr[n | NATIVE_ENDIAN_VALUE_LE_BE(0, 1)] &= 0xe0000000; /* round toward zero*/
@@ -2232,6 +2335,8 @@ inline void sh34_base_device::FADD(const uint16_t opcode)
 	uint32_t m = REG_M;
 	uint32_t n = REG_N;
 
+	const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
+
 	if (m_sh2_state->m_fpu_pr) /* PR = 1 */
 	{
 		n = n & 14;
@@ -2250,6 +2355,8 @@ inline void sh34_base_device::FSUB(const uint16_t opcode)
 {
 	uint32_t m = REG_M;
 	uint32_t n = REG_N;
+
+	const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
 
 	if (m_sh2_state->m_fpu_pr) /* PR = 1 */
 	{
@@ -2271,6 +2378,8 @@ inline void sh34_base_device::FMUL(const uint16_t opcode)
 	uint32_t m = REG_M;
 	uint32_t n = REG_N;
 
+	const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
+
 	if (m_sh2_state->m_fpu_pr) /* PR = 1 */
 	{
 		n = n & 14;
@@ -2290,18 +2399,16 @@ inline void sh34_base_device::FDIV(const uint16_t opcode)
 	uint32_t m = REG_M;
 	uint32_t n = REG_N;
 
+	const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
+
 	if (m_sh2_state->m_fpu_pr) /* PR = 1 */
 	{
 		n = n & 14;
 		m = m & 14;
-		if (FP_RFD(m) == 0)
-			return;
 		FP_RFD(n) = FP_RFD(n) / FP_RFD(m);
 	}
 	else                /* PR = 0 */
 	{
-		if (FP_RFS(m) == 0)
-			return;
 		FP_RFS(n) = FP_RFS(n) / FP_RFS(m);
 	}
 }
@@ -2312,9 +2419,12 @@ inline void sh34_base_device::FMAC(const uint16_t opcode)
 	uint32_t m = REG_M;
 	uint32_t n = REG_N;
 
+	const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
+
 	if (m_sh2_state->m_fpu_pr == 0) /* PR = 0 */
 	{
-		FP_RFS(n) = (FP_RFS(0) * FP_RFS(m)) + FP_RFS(n);
+		const float p = FP_RFS(0) * FP_RFS(m);
+		FP_RFS(n) = p + FP_RFS(n);
 	}
 }
 
@@ -2324,69 +2434,82 @@ inline void sh34_base_device::FSQRT(const uint16_t opcode)
 {
 	uint32_t n = REG_N;
 
+	const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
+
 	if (m_sh2_state->m_fpu_pr) /* PR = 1 */
 	{
 		n = n & 14;
-		if (FP_RFD(n) < 0)
-			return;
-		FP_RFD(n) = sqrtf(FP_RFD(n));
+		FP_RFD(n) = sqrt(FP_RFD(n));
 	}
 	else                /* PR = 0 */
 	{
-		if (FP_RFS(n) < 0)
-			return;
 		FP_RFS(n) = sqrtf(FP_RFS(n));
 	}
+}
+
+// FSRRA, FSCA, FIPR and FTRV aren't IEEE-754 operations, so the host's floating point is no use for them.
+// They all replace the FPSCR cause field and add to the flag field, and do nothing at all while PR is set.
+// TODO: FPU exception traps, which the enables cause in ways the manual doesn't describe (see sh4fpu.cpp)
+inline void sh34_base_device::fpu_raise(uint32_t cause)
+{
+	m_sh2_state->m_fpscr = (m_sh2_state->m_fpscr & ~FPSCR_CAUSE) | fpscr_exception_bits(cause);
 }
 
 /* FSRRA FRn PR=0 1111nnnn01111101 */
 inline void sh34_base_device::FSRRA(const uint16_t opcode)
 {
-	uint32_t n = REG_N;
-
-	if (FP_RFS(n) < 0)
+	if (m_sh2_state->m_fpu_pr)
 		return;
-	FP_RFS(n) = 1.0f / sqrtf(FP_RFS(n));
+
+	const uint32_t n = REG_N;
+	const uint32_t fpscr = m_sh2_state->m_fpscr;
+
+	// an FPU error leaves the operand as it was
+	uint32_t cause;
+	m_sh2_state->m_fr[n] = sh4fpu::fsrra(m_sh2_state->m_fr[n], (fpscr & RM) == 1, (fpscr & DN) != 0, cause);
+	fpu_raise(cause);
 }
 
-/*  FSSCA FPUL,FRn PR=0 1111nnn011111101 */
+/*  FSCA FPUL,DRn PR=0 1111nnn011111101 */
 void sh34_base_device::FSSCA(const uint16_t opcode)
 {
-	uint32_t n = REG_N;
+	if (m_sh2_state->m_fpu_pr)
+		return;
 
-	float angle = (((float)(m_sh2_state->m_fpul & 0xFFFF)) / 65536.0f) * 2.0f * std::numbers::pi_v<float>;
-	FP_RFS(n) = sinf(angle);
-	FP_RFS(n + 1) = cosf(angle);
+	const uint32_t n = REG_N & 14;
+	const bool rz = (m_sh2_state->m_fpscr & RM) == 1;
+
+	// the cosine is the sine a quarter of a turn on
+	m_sh2_state->m_fr[n] = sh4fpu::fsca_round(sh4fpu::fsca(m_sh2_state->m_fpul), rz);
+	m_sh2_state->m_fr[n + 1] = sh4fpu::fsca_round(sh4fpu::fsca(m_sh2_state->m_fpul + 0x4000), rz);
+	fpu_raise(sh4fpu::CAUSE_I);
 }
 
 /* FIPR FVm,FVn PR=0 1111nnmm11101101 */
 inline void sh34_base_device::FIPR(const uint16_t opcode)
 {
-	uint32_t n = REG_N;
-	uint32_t m = (n & 3) << 2;
-	n = n & 12;
+	if (m_sh2_state->m_fpu_pr)
+		return;
 
-	float ml[4];
-	for (int a = 0; a < 4; a++)
-		ml[a] = FP_RFS(n + a) * FP_RFS(m + a);
-	FP_RFS(n + 3) = ml[0] + ml[1] + ml[2] + ml[3];
+	const uint32_t n = REG_N & 12;
+	const uint32_t m = (REG_N & 3) << 2;
+	const uint32_t fpscr = m_sh2_state->m_fpscr;
+
+	uint32_t cause;
+	m_sh2_state->m_fr[n + 3] = sh4fpu::fipr(&m_sh2_state->m_fr[m], &m_sh2_state->m_fr[n], (fpscr & RM) == 1, (fpscr & DN) != 0, cause);
+	fpu_raise(cause);
 }
 
 /* FTRV XMTRX,FVn PR=0 1111nn0111111101 */
 void sh34_base_device::FTRV(const uint16_t opcode)
 {
-	uint32_t n = REG_N;
-	n = n & 12;
+	if (m_sh2_state->m_fpu_pr)
+		return;
 
-	float sum[4];
-	for (int i = 0; i < 4; i++)
-	{
-		sum[i] = 0;
-		for (int j = 0; j < 4; j++)
-			sum[i] += FP_XFS((j << 2) + i)*FP_RFS(n + j);
-	}
-	for (int i = 0; i < 4; i++)
-		FP_RFS(n + i) = sum[i];
+	const uint32_t n = REG_N & 12;
+	const uint32_t fpscr = m_sh2_state->m_fpscr;
+
+	fpu_raise(sh4fpu::ftrv(m_sh2_state->m_xf, &m_sh2_state->m_fr[n], (fpscr & RM) == 1, (fpscr & DN) != 0));
 }
 
 inline void sh34_base_device::op1111_0xf13(const uint16_t opcode)
@@ -2674,16 +2797,6 @@ void sh3_base_device::device_reset()
 	m_scfrdr1 = 0;
 	m_scfcr1 = 0;
 	m_scfdr1 = 0;
-
-	// SCIF 7709
-	m_scsmr2 = 0;
-	m_scbrr2 = 0xff;
-	m_scscr2 = 0;
-	m_scftdr2 = 0;
-	m_scssr2 = 0x60;
-	m_scfrdr2 = 0;
-	m_scfcr2 = 0;
-	m_scfdr2 = 0;
 
 	// UDI 7709S
 	m_sdir = 0xffff;
@@ -2978,6 +3091,9 @@ void sh34_base_device::execute_run()
 		return;
 	}
 
+	// save the host's rounding mode so the RAII helper can restore it when necessary
+	m_host_round = std::fegetround();
+
 	do
 	{
 		m_sh2_state->m_ppc = m_sh2_state->pc;
@@ -3244,16 +3360,6 @@ void sh3_base_device::device_start()
 	save_item(NAME(m_scfrdr1));
 	save_item(NAME(m_scfcr1));
 	save_item(NAME(m_scfdr1));
-
-	// SCIF 7709
-	save_item(NAME(m_scsmr2));
-	save_item(NAME(m_scbrr2));
-	save_item(NAME(m_scscr2));
-	save_item(NAME(m_scftdr2));
-	save_item(NAME(m_scssr2));
-	save_item(NAME(m_scfrdr2));
-	save_item(NAME(m_scfcr2));
-	save_item(NAME(m_scfdr2));
 
 	// UDI 7709S
 	save_item(NAME(m_sdir));
@@ -3882,6 +3988,15 @@ void sh34_base_device::device_start()
 	//state_add(STATE_GENPCBASE, "CURPC", m_sh2_state->m_ppc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_sh2_state->pc).callimport().noshow();
 
+	memcpy(m_sh2_state->m_fpmode, fpmode_source, sizeof(fpmode_source));
+	m_host_round = FE_TONEAREST;
+
+	m_sh2_state->m_fsca_unit = 1.0f / float(1 << 26);
+	m_sh2_state->m_ftrc_smin = -2147483648.0f;
+	m_sh2_state->m_ftrc_smax = 2147483648.0f;
+	m_sh2_state->m_ftrc_dmin = -2147483648.0;
+	m_sh2_state->m_ftrc_dmax = 2147483648.0;
+
 	for (int regnum = 0; regnum < 16; regnum++)
 	{
 		m_fs_regmap[regnum] = uml::mem(((float *)(m_sh2_state->m_fr+(regnum))));
@@ -3893,6 +4008,15 @@ void sh34_base_device::device_start()
 	}
 
 	drc_start();
+
+	m_drcuml->symbol_add(&m_sh2_state->m_fpmode, sizeof(m_sh2_state->m_fpmode), "fpmode");
+
+	if (m_isdrc)
+	{
+		m_fsca_table = std::make_unique<int32_t []>(0x10000);
+		for (uint32_t angle = 0; angle < 0x10000; angle++)
+			m_fsca_table[angle] = sh4fpu::fsca(angle);
+	}
 }
 
 void sh34_base_device::state_import(const device_state_entry &entry)
@@ -4284,6 +4408,19 @@ void sh34_base_device::generate_update_cycles(drcuml_block &block, compiler_stat
 }
 
 /*-------------------------------------------------
+    generate_set_fmod - set the host FP rounding
+    mode from FPSCR.  Must be re-emitted after
+    anything that writes FPSCR.
+-------------------------------------------------*/
+
+void sh34_base_device::generate_set_fmod(drcuml_block &block)
+{
+	UML_AND(block, I0, mem(&m_sh2_state->m_fpscr), 3);                          // and     i0,fpscr,3
+	UML_LOAD(block, I0, &m_sh2_state->m_fpmode[0], I0, SIZE_BYTE, SCALE_x1);    // load    i0,fpmode,i0,byte
+	UML_SETFMOD(block, I0);                                                     // setfmod i0
+}
+
+/*-------------------------------------------------
     static_generate_entry_point - generate a
     static entry point
 -------------------------------------------------*/
@@ -4291,21 +4428,22 @@ void sh34_base_device::generate_update_cycles(drcuml_block &block, compiler_stat
 
 void sh34_base_device::static_generate_entry_point()
 {
-	//uml::code_label const skip = 1;
-
-	/* begin generating */
+	// begin generating
 	drcuml_block &block(m_drcuml->begin_block(200));
 
-	/* forward references */
+	// forward references
 	alloc_handle(m_nocode, "nocode");
 	alloc_handle(m_write32, "write32");     // necessary?
 	alloc_handle(m_entry, "entry");
 	UML_HANDLE(block, *m_entry);                         // handle  entry
 
+	// reset the FPU mode
+	generate_set_fmod(block);
+
 	UML_CALLC(block, cfunc_CHECKIRQ, this);
 	load_fast_iregs(block);
 
-	/* generate a hash jump via the current mode and PC */
+	// generate a hash jump via the current mode and PC
 	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode);     // hashjmp <mode>,<pc>,nocode
 
 	block.end();
@@ -4530,15 +4668,46 @@ bool sh34_base_device::generate_group_0(drcuml_block &block, compiler_state &com
 	return false;
 }
 
-void sh34_base_device::func_STCRBANK() { STCRBANK(m_sh2_state->arg0); }
-static void cfunc_STCRBANK(void *param) { ((sh34_base_device *)param)->func_STCRBANK(); };
+/*-------------------------------------------------
+    generate_push / generate_pop - the @-Rn and
+    @Rn+ forms shared by the SH-4 control and
+    system register transfers
+-------------------------------------------------*/
+
+void sh34_base_device::generate_push(drcuml_block &block, uint32_t reg, const uml::parameter &src)
+{
+	UML_MOV(block, I1, src);                            // mov I1, src
+	UML_SUB(block, R32(reg), R32(reg), 4);              // sub reg, reg, 4
+	UML_MOV(block, I0, R32(reg));                       // mov I0, reg
+	SETEA(0);                                           // setea I0
+	UML_CALLH(block, *m_write32);                       // callh m_write32
+}
+
+void sh34_base_device::generate_pop(drcuml_block &block, uint32_t reg, const uml::parameter &dst)
+{
+	UML_MOV(block, I0, R32(reg));                       // mov I0, reg
+	SETEA(0);                                           // setea I0
+	UML_CALLH(block, *m_read32);                        // callh m_read32
+	UML_MOV(block, dst, I0);                            // mov dst, I0
+	UML_ADD(block, R32(reg), R32(reg), 4);              // add reg, reg, 4
+}
 
 bool sh34_base_device::generate_group_0_STCRBANK(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_STCRBANK, this);
-	load_fast_iregs(block);
+	const uint32_t m = REG_M & 7;
+	const int bank1 = compiler.labelnum++;
+	const int done = compiler.labelnum++;
+
+	UML_TEST(block, uml::mem(&m_sh2_state->sr), sRB);                           // test sr, sRB
+	UML_JMPc(block, COND_Z, bank1);                                             // jmpc Z, bank1
+
+	UML_MOV(block, R32(REG_N), uml::mem(&m_sh2_state->m_rbnk[0][m]));           // mov reg_n, m_rbnk[0][m]
+	UML_JMP(block, done);                                                       // jmp done
+
+	UML_LABEL(block, bank1);                                                    // bank1:
+	UML_MOV(block, R32(REG_N), uml::mem(&m_sh2_state->m_rbnk[1][m]));           // mov reg_n, m_rbnk[1][m]
+
+	UML_LABEL(block, done);                                                     // done:
 	return true;
 }
 
@@ -4587,27 +4756,15 @@ bool sh34_base_device::generate_group_0_LDTLB(drcuml_block &block, compiler_stat
 	return true;
 }
 
-void sh34_base_device::func_CLRS() { CLRS(m_sh2_state->arg0); }
-static void cfunc_CLRS(void *param) { ((sh34_base_device *)param)->func_CLRS(); };
-
 bool sh34_base_device::generate_group_0_CLRS(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_CLRS, this);
-	load_fast_iregs(block);
+	UML_AND(block, uml::mem(&m_sh2_state->sr), uml::mem(&m_sh2_state->sr), ~SH_S);
 	return true;
 }
 
-void sh34_base_device::func_SETS() { SETS(m_sh2_state->arg0); }
-static void cfunc_SETS(void *param) { ((sh34_base_device *)param)->func_SETS(); };
-
 bool sh34_base_device::generate_group_0_SETS(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_SETS, this);
-	load_fast_iregs(block);
+	UML_OR(block, uml::mem(&m_sh2_state->sr), uml::mem(&m_sh2_state->sr), SH_S);
 	return true;
 }
 
@@ -4642,16 +4799,18 @@ static void cfunc_RTE(void *param) { ((sh34_base_device *)param)->func_RTE();  }
 
 bool sh34_base_device::generate_group_0_RTE(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	generate_delay_slot(block, compiler, desc, 0xffffffff);
+	// the delay slot instruction sees the SR value restored from SSR
 	save_fast_iregs(block);
 	UML_CALLC(block, cfunc_RTE, this);
 	load_fast_iregs(block);
+	UML_MOV(block, mem(&m_sh2_state->target), mem(&m_sh2_state->m_delay));
+
+	generate_delay_slot(block, compiler, desc, SH_OVRPC_DYNAMIC);
 
 	compiler.checkints = true;
 
-	UML_MOV(block, mem(&m_sh2_state->pc), mem(&m_sh2_state->m_delay));
-	generate_update_cycles(block, compiler, uml::mem(&m_sh2_state->ea), true);  // <subtract cycles>
-	UML_HASHJMP(block, 0, mem(&m_sh2_state->pc), *m_nocode); // and jump to the "resume PC"
+	generate_update_cycles(block, compiler, uml::mem(&m_sh2_state->target), true);  // <subtract cycles>
+	UML_HASHJMP(block, 0, mem(&m_sh2_state->target), *m_nocode); // and jump to the "resume PC"
 	return true;
 }
 
@@ -4701,27 +4860,63 @@ bool sh34_base_device::generate_group_4_LDCMSR(drcuml_block &block, compiler_sta
 	return true;
 }
 
-void sh34_base_device::func_SHAD() { SHAD(m_sh2_state->arg0); }
-static void cfunc_SHAD(void *param) { ((sh34_base_device *)param)->func_SHAD(); };
-
 bool sh34_base_device::generate_group_4_SHAD(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_SHAD, this);
-	load_fast_iregs(block);
+	const int right = compiler.labelnum++;
+	const int fill = compiler.labelnum++;
+	const int done = compiler.labelnum++;
+
+	UML_TEST(block, R32(REG_M), 0x80000000);                    // test reg_m, 0x80000000
+	UML_JMPc(block, COND_NZ, right);                            // jmpc NZ, right
+
+	UML_AND(block, I0, R32(REG_M), 0x1f);                       // and i0, reg_m, 0x1f
+	UML_SHL(block, R32(REG_N), R32(REG_N), I0);                 // shl reg_n, reg_n, i0
+	UML_JMP(block, done);                                       // jmp done
+
+	UML_LABEL(block, right);                                    // right:
+	UML_AND(block, I0, R32(REG_M), 0x1f);                       // and i0, reg_m, 0x1f
+	UML_TEST(block, I0, 0x1f);                                  // test i0, 0x1f
+	UML_JMPc(block, COND_Z, fill);                              // jmpc Z, fill
+
+	UML_XOR(block, I0, I0, 0x1f);                               // xor i0, i0, 0x1f
+	UML_ADD(block, I0, I0, 1);                                  // add i0, i0, 1
+	UML_SAR(block, R32(REG_N), R32(REG_N), I0);                 // sar reg_n, reg_n, i0
+	UML_JMP(block, done);                                       // jmp done
+
+	UML_LABEL(block, fill);                                     // fill:
+	UML_SAR(block, R32(REG_N), R32(REG_N), 31);                 // sar reg_n, reg_n, 31
+
+	UML_LABEL(block, done);                                     // done:
 	return true;
 }
 
-void sh34_base_device::func_SHLD() { SHLD(m_sh2_state->arg0); }
-static void cfunc_SHLD(void *param) { ((sh34_base_device *)param)->func_SHLD(); };
-
 bool sh34_base_device::generate_group_4_SHLD(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_SHLD, this);
-	load_fast_iregs(block);
+	const int right = compiler.labelnum++;
+	const int zero = compiler.labelnum++;
+	const int done = compiler.labelnum++;
+
+	UML_TEST(block, R32(REG_M), 0x80000000);                    // test reg_m, 0x80000000
+	UML_JMPc(block, COND_NZ, right);                            // jmpc NZ, right
+
+	UML_AND(block, I0, R32(REG_M), 0x1f);                       // and i0, reg_m, 0x1f
+	UML_SHL(block, R32(REG_N), R32(REG_N), I0);                 // shl reg_n, reg_n, i0
+	UML_JMP(block, done);                                       // jmp done
+
+	UML_LABEL(block, right);                                    // right:
+	UML_AND(block, I0, R32(REG_M), 0x1f);                       // and i0, reg_m, 0x1f
+	UML_TEST(block, I0, 0x1f);                                  // test i0, 0x1f
+	UML_JMPc(block, COND_Z, zero);                              // jmpc Z, zero
+
+	UML_XOR(block, I0, I0, 0x1f);                               // xor i0, i0, 0x1f
+	UML_ADD(block, I0, I0, 1);                                  // add i0, i0, 1
+	UML_SHR(block, R32(REG_N), R32(REG_N), I0);                 // shr reg_n, reg_n, i0
+	UML_JMP(block, done);                                       // jmp done
+
+	UML_LABEL(block, zero);                                     // zero:
+	UML_MOV(block, R32(REG_N), 0);                              // mov reg_n, #0
+
+	UML_LABEL(block, done);                                     // done:
 	return true;
 }
 
@@ -4849,75 +5044,88 @@ bool sh34_base_device::generate_group_4(drcuml_block &block, compiler_state &com
 }
 
 
-void sh34_base_device::func_LDCRBANK() { LDCRBANK(m_sh2_state->arg0); }
-static void cfunc_LDCRBANK(void *param) { ((sh34_base_device *)param)->func_LDCRBANK(); };
-
 bool sh34_base_device::generate_group_4_LDCRBANK(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_LDCRBANK, this);
-	load_fast_iregs(block);
+	const uint32_t m = REG_M & 7;
+	const int bank1 = compiler.labelnum++;
+	const int done = compiler.labelnum++;
+
+	UML_TEST(block, uml::mem(&m_sh2_state->sr), sRB);                       // test sr, sRB
+	UML_JMPc(block, COND_Z, bank1);                                         // jmpc Z, bank1
+
+	UML_MOV(block, uml::mem(&m_sh2_state->m_rbnk[0][m]), R32(REG_N));       // mov m_rbnk[0][m], reg_n
+	UML_JMP(block, done);                                                   // jmp done
+
+	UML_LABEL(block, bank1);                                                // bank1:
+	UML_MOV(block, uml::mem(&m_sh2_state->m_rbnk[1][m]), R32(REG_N));       // mov m_rbnk[1][m], reg_n
+
+	UML_LABEL(block, done);                                                 // done:
 	return true;
 }
-
-void sh34_base_device::func_STCMRBANK() { STCMRBANK(m_sh2_state->arg0); }
-static void cfunc_STCMRBANK(void *param) { ((sh34_base_device *)param)->func_STCMRBANK(); };
 
 bool sh34_base_device::generate_group_4_STCMRBANK(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_STCMRBANK, this);
-	load_fast_iregs(block);
+	const uint32_t m = REG_M & 7;
+	const int bank1 = compiler.labelnum++;
+	const int done = compiler.labelnum++;
+
+	UML_TEST(block, uml::mem(&m_sh2_state->sr), sRB);                   // test sr, sRB
+	UML_JMPc(block, COND_Z, bank1);                                     // jmpc Z, bank1
+
+	UML_MOV(block, I1, uml::mem(&m_sh2_state->m_rbnk[0][m]));           // mov i1, m_rbnk[0][m]
+	UML_JMP(block, done);                                               // jmp done
+
+	UML_LABEL(block, bank1);                                            // bank1:
+	UML_MOV(block, I1, uml::mem(&m_sh2_state->m_rbnk[1][m]));           // mov i1, m_rbnk[1][m]
+
+	UML_LABEL(block, done);                                             // done:
+	UML_SUB(block, R32(REG_N), R32(REG_N), 4);                          // sub reg_n, reg_n, 4
+	UML_MOV(block, I0, R32(REG_N));                                     // mov i0, reg_n
+	SETEA(0);                                                           // setea i0
+	UML_CALLH(block, *m_write32);                                       // callh m_write32
+	UML_SUB(block, uml::mem(&m_sh2_state->icount), uml::mem(&m_sh2_state->icount), 1);  // sub m_icount, m_icount, 1
 	return true;
 }
-
-void sh34_base_device::func_LDCMRBANK() { LDCMRBANK(m_sh2_state->arg0); }
-static void cfunc_LDCMRBANK(void *param) { ((sh34_base_device *)param)->func_LDCMRBANK(); };
 
 bool sh34_base_device::generate_group_4_LDCMRBANK(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_LDCMRBANK, this);
-	load_fast_iregs(block);
+	const uint32_t m = REG_M & 7;
+	const int bank1 = compiler.labelnum++;
+	const int done = compiler.labelnum++;
+
+	UML_MOV(block, I0, R32(REG_N));                                     // mov i0, reg_n
+	SETEA(0);                                                           // setea i0
+	UML_CALLH(block, *m_read32);                                        // callh m_read32
+	UML_ADD(block, R32(REG_N), R32(REG_N), 4);                          // add reg_n, reg_n, 4
+
+	UML_TEST(block, uml::mem(&m_sh2_state->sr), sRB);                   // test sr, sRB
+	UML_JMPc(block, COND_Z, bank1);                                     // jmpc Z, bank1
+
+	UML_MOV(block, uml::mem(&m_sh2_state->m_rbnk[0][m]), I0);           // mov m_rbnk[0][m], i0
+	UML_JMP(block, done);                                               // jmp done
+
+	UML_LABEL(block, bank1);                                            // bank1:
+	UML_MOV(block, uml::mem(&m_sh2_state->m_rbnk[1][m]), I0);           // mov m_rbnk[1][m], i0
+
+	UML_LABEL(block, done);                                             // done:
 	return true;
 }
-
-void sh34_base_device::func_STCMSGR() { STCMSGR(m_sh2_state->arg0); }
-static void cfunc_STCMSGR(void *param) { ((sh34_base_device *)param)->func_STCMSGR(); };
 
 bool sh34_base_device::generate_group_4_STCMSGR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_STCMSGR, this);
-	load_fast_iregs(block);
+	generate_push(block, REG_N, uml::mem(&m_sh2_state->m_sgr));
 	return true;
 }
-
-void sh34_base_device::func_STCMSSR() { STCMSSR(m_sh2_state->arg0); }
-static void cfunc_STCMSSR(void *param) { ((sh34_base_device *)param)->func_STCMSSR(); };
 
 bool sh34_base_device::generate_group_4_STCMSSR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_STCMSSR, this);
-	load_fast_iregs(block);
+	generate_push(block, REG_N, uml::mem(&m_sh2_state->m_ssr));
 	return true;
 }
 
-void sh34_base_device::func_LDCMSSR() { LDCMSSR(m_sh2_state->arg0); }
-static void cfunc_LDCMSSR(void *param) { ((sh34_base_device *)param)->func_LDCMSSR(); };
-
 bool sh34_base_device::generate_group_4_LDCMSSR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_LDCMSSR, this);
-	load_fast_iregs(block);
+	generate_pop(block, REG_N, uml::mem(&m_sh2_state->m_ssr));
 	return true;
 }
 
@@ -4927,27 +5135,15 @@ bool sh34_base_device::generate_group_4_LDCSSR(drcuml_block &block, compiler_sta
 	return true;
 }
 
-void sh34_base_device::func_STCMSPC() { STCMSPC(m_sh2_state->arg0); }
-static void cfunc_STCMSPC(void *param) { ((sh34_base_device *)param)->func_STCMSPC(); };
-
 bool sh34_base_device::generate_group_4_STCMSPC(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_STCMSPC, this);
-	load_fast_iregs(block);
+	generate_push(block, REG_N, uml::mem(&m_sh2_state->m_spc));
 	return true;
 }
 
-void sh34_base_device::func_LDCMSPC() { LDCMSPC(m_sh2_state->arg0); }
-static void cfunc_LDCMSPC(void *param) { ((sh34_base_device *)param)->func_LDCMSPC(); };
-
 bool sh34_base_device::generate_group_4_LDCMSPC(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_LDCMSPC, this);
-	load_fast_iregs(block);
+	generate_pop(block, REG_N, uml::mem(&m_sh2_state->m_spc));
 	return true;
 }
 
@@ -4957,27 +5153,15 @@ bool sh34_base_device::generate_group_4_LDCSPC(drcuml_block &block, compiler_sta
 	return true;
 }
 
-void sh34_base_device::func_STSMFPUL() { STSMFPUL(m_sh2_state->arg0); }
-static void cfunc_STSMFPUL(void *param) { ((sh34_base_device *)param)->func_STSMFPUL(); };
-
 bool sh34_base_device::generate_group_4_STSMFPUL(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_STSMFPUL, this);
-	load_fast_iregs(block);
+	generate_push(block, REG_N, uml::mem(&m_sh2_state->m_fpul));
 	return true;
 }
 
-void sh34_base_device::func_LDSMFPUL() { LDSMFPUL(m_sh2_state->arg0); }
-static void cfunc_LDSMFPUL(void *param) { ((sh34_base_device *)param)->func_LDSMFPUL(); };
-
 bool sh34_base_device::generate_group_4_LDSMFPUL(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_LDSMFPUL, this);
-	load_fast_iregs(block);
+	generate_pop(block, REG_N, uml::mem(&m_sh2_state->m_fpul));
 	return true;
 }
 
@@ -4987,77 +5171,114 @@ bool sh34_base_device::generate_group_4_LDSFPUL(drcuml_block &block, compiler_st
 	return true;
 }
 
-void sh34_base_device::func_STSMFPSCR() { STSMFPSCR(m_sh2_state->arg0); }
-static void cfunc_STSMFPSCR(void *param) { ((sh34_base_device *)param)->func_STSMFPSCR(); };
-
 bool sh34_base_device::generate_group_4_STSMFPSCR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_STSMFPSCR, this);
-	load_fast_iregs(block);
+	UML_AND(block, I1, uml::mem(&m_sh2_state->m_fpscr), 0x003fffff);        // and i1, m_fpscr, 0x003fffff
+	UML_SUB(block, R32(REG_N), R32(REG_N), 4);                              // sub reg_n, reg_n, 4
+	UML_MOV(block, I0, R32(REG_N));                                         // mov i0, reg_n
+	SETEA(0);                                                               // setea i0
+	UML_CALLH(block, *m_write32);                                           // callh m_write32
 	return true;
 }
 
-void sh34_base_device::func_LDSMFPSCR() { LDSMFPSCR(m_sh2_state->arg0); }
-static void cfunc_LDSMFPSCR(void *param) { ((sh34_base_device *)param)->func_LDSMFPSCR(); };
+/*-------------------------------------------------
+    generate_set_fpscr - install the new FPSCR
+    held in I0.  Toggling FR exchanges the two
+    register banks, and on a little-endian host
+    toggling PR re-orders every couple.
+-------------------------------------------------*/
 
+void sh34_base_device::generate_set_fpscr(drcuml_block &block, compiler_state &compiler)
+{
+	const int no_fr = compiler.labelnum++;
+	const int fr_loop = compiler.labelnum++;
+
+	UML_AND(block, I0, I0, 0x003fffff);                                     // and i0, i0, 0x003fffff
+	UML_XOR(block, I1, I0, uml::mem(&m_sh2_state->m_fpscr));                // xor i1, i0, m_fpscr
+	UML_MOV(block, uml::mem(&m_sh2_state->m_fpscr), I0);                    // mov m_fpscr, i0
+
+	UML_TEST(block, I1, FR);                                                // test i1, FR
+	UML_JMPc(block, COND_Z, no_fr);                                         // jmpc Z, no_fr
+
+	UML_MOV(block, I2, 0);                                                  // mov i2, #0
+	UML_LABEL(block, fr_loop);                                              // fr_loop:
+	UML_LOAD(block, I0, m_sh2_state->m_fr, I2, SIZE_DWORD, SCALE_x4);       // load i0, m_fr[i2]
+	UML_LOAD(block, I3, m_sh2_state->m_xf, I2, SIZE_DWORD, SCALE_x4);       // load i3, m_xf[i2]
+	UML_STORE(block, m_sh2_state->m_xf, I2, I0, SIZE_DWORD, SCALE_x4);      // store m_xf[i2], i0
+	UML_STORE(block, m_sh2_state->m_fr, I2, I3, SIZE_DWORD, SCALE_x4);      // store m_fr[i2], i3
+	UML_ADD(block, I2, I2, 1);                                              // add i2, i2, 1
+	UML_CMP(block, I2, 16);                                                 // cmp i2, #16
+	UML_JMPc(block, COND_NZ, fr_loop);                                      // jmpc NZ, fr_loop
+
+	UML_LABEL(block, no_fr);                                                // no_fr:
+
+#ifdef LSB_FIRST
+	const int no_pr = compiler.labelnum++;
+
+	UML_TEST(block, I1, PR);                                                // test i1, PR
+	UML_JMPc(block, COND_Z, no_pr);                                         // jmpc Z, no_pr
+
+	for (uint32_t *const bank : { m_sh2_state->m_fr, m_sh2_state->m_xf })
+	{
+		const int loop = compiler.labelnum++;
+
+		UML_MOV(block, I2, 0);                                              // mov i2, #0
+		UML_LABEL(block, loop);                                             // loop:
+		UML_LOAD(block, I0, bank, I2, SIZE_DWORD, SCALE_x4);                // load i0, bank[i2]
+		UML_ADD(block, I2, I2, 1);                                          // add i2, i2, 1
+		UML_LOAD(block, I3, bank, I2, SIZE_DWORD, SCALE_x4);                // load i3, bank[i2]
+		UML_STORE(block, bank, I2, I0, SIZE_DWORD, SCALE_x4);               // store bank[i2], i0
+		UML_SUB(block, I2, I2, 1);                                          // sub i2, i2, 1
+		UML_STORE(block, bank, I2, I3, SIZE_DWORD, SCALE_x4);               // store bank[i2], i3
+		UML_ADD(block, I2, I2, 2);                                          // add i2, i2, 2
+		UML_CMP(block, I2, 16);                                             // cmp i2, #16
+		UML_JMPc(block, COND_NZ, loop);                                     // jmpc NZ, loop
+	}
+
+	UML_LABEL(block, no_pr);                                                // no_pr:
+#endif
+
+	UML_TEST(block, uml::mem(&m_sh2_state->m_fpscr), SZ);                   // test m_fpscr, SZ
+	UML_SETc(block, COND_NZ, uml::mem(&m_sh2_state->m_fpu_sz));             // setc NZ, m_fpu_sz
+	UML_TEST(block, uml::mem(&m_sh2_state->m_fpscr), PR);                   // test m_fpscr, PR
+	UML_SETc(block, COND_NZ, uml::mem(&m_sh2_state->m_fpu_pr));             // setc NZ, m_fpu_pr
+
+	generate_set_fmod(block);
+}
 
 bool sh34_base_device::generate_group_4_LDSMFPSCR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_LDSMFPSCR, this);
-	load_fast_iregs(block);
+	UML_MOV(block, I0, R32(REG_N));                                         // mov i0, reg_n
+	SETEA(0);                                                               // setea i0
+	UML_CALLH(block, *m_read32);                                            // callh m_read32
+	UML_ADD(block, R32(REG_N), R32(REG_N), 4);                              // add reg_n, reg_n, 4
+	generate_set_fpscr(block, compiler);
 	return true;
 }
 
-
-void sh34_base_device::func_LDSFPSCR() { LDSFPSCR(m_sh2_state->arg0); }
-static void cfunc_LDSFPSCR(void *param) { ((sh34_base_device *)param)->func_LDSFPSCR(); };
 
 bool sh34_base_device::generate_group_4_LDSFPSCR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_LDSFPSCR, this);
-	load_fast_iregs(block);
+	UML_MOV(block, I0, R32(REG_N));                                         // mov i0, reg_n
+	generate_set_fpscr(block, compiler);
 	return true;
 }
-
-void sh34_base_device::func_STCMDBR() { STCMDBR(m_sh2_state->arg0); }
-static void cfunc_STCMDBR(void *param) { ((sh34_base_device *)param)->func_STCMDBR(); };
 
 bool sh34_base_device::generate_group_4_STCMDBR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_STCMDBR, this);
-	load_fast_iregs(block);
+	generate_push(block, REG_N, uml::mem(&m_sh2_state->m_dbr));             // push reg_n, m_dbr
 	return true;
 }
-
-void sh34_base_device::func_LDCMDBR() { LDCMDBR(m_sh2_state->arg0); }
-static void cfunc_LDCMDBR(void *param) { ((sh34_base_device *)param)->func_LDCMDBR(); };
 
 bool sh34_base_device::generate_group_4_LDCMDBR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_LDCMDBR, this);
-	load_fast_iregs(block);
+	generate_pop(block, REG_N, uml::mem(&m_sh2_state->m_dbr));              // pop reg_n, m_dbr
 	return true;
 }
 
-void sh34_base_device::func_LDCDBR() { LDCDBR(m_sh2_state->arg0); }
-static void cfunc_LDCDBR(void *param) { ((sh34_base_device *)param)->func_LDCDBR(); };
-
 bool sh34_base_device::generate_group_4_LDCDBR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_LDCDBR, this);
-	load_fast_iregs(block);
+	UML_MOV(block, uml::mem(&m_sh2_state->m_dbr), R32(REG_N));              // mov m_dbr, reg_n
 	return true;
 }
 
@@ -5089,23 +5310,23 @@ bool sh34_base_device::generate_group_15(drcuml_block &block, compiler_state &co
 }
 bool sh34_base_device::generate_group_15_FADD(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 0);
-	UML_JMPc(block, COND_Z, compiler.labelnum);
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 1);                        // test m_fpu_pr, 1
+	UML_JMPc(block, COND_Z, compiler.labelnum);                             // jmpc Z, labelnum
 
-	UML_FDADD(block, FPD32(REG_N), FPD32(REG_N), FPD32(REG_M));
-	UML_JMP(block, compiler.labelnum+1);
+	UML_FDADD(block, FPD32(REG_N), FPD32(REG_N), FPD32(REG_M));             // fdadd reg_n, reg_n, reg_m
+	UML_JMP(block, compiler.labelnum+1);                                    // jmp labelnum+1
 
-	UML_LABEL(block, compiler.labelnum++);  // labelnum:
-	UML_FSADD(block, FPS32(REG_N), FPS32(REG_N), FPS32(REG_M));
+	UML_LABEL(block, compiler.labelnum++);                                  // labelnum:
+	UML_FSADD(block, FPS32(REG_N), FPS32(REG_N), FPS32(REG_M));             // fsadd reg_n, reg_n, reg_m
 
-	UML_LABEL(block, compiler.labelnum++);  // labelnum+1:
+	UML_LABEL(block, compiler.labelnum++);                                  // labelnum+1:
 
 	return true;
 }
 
 bool sh34_base_device::generate_group_15_FSUB(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 0);
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 1);
 	UML_JMPc(block, COND_Z, compiler.labelnum);
 
 	UML_FDSUB(block, FPD32(REG_N), FPD32(REG_N), FPD32(REG_M));
@@ -5121,7 +5342,7 @@ bool sh34_base_device::generate_group_15_FSUB(drcuml_block &block, compiler_stat
 
 bool sh34_base_device::generate_group_15_FMUL(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 0);
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 1);
 	UML_JMPc(block, COND_Z, compiler.labelnum);
 
 	UML_FDMUL(block, FPD32(REG_N), FPD32(REG_N), FPD32(REG_M));
@@ -5137,7 +5358,7 @@ bool sh34_base_device::generate_group_15_FMUL(drcuml_block &block, compiler_stat
 
 bool sh34_base_device::generate_group_15_FDIV(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 0);
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 1);
 	UML_JMPc(block, COND_Z, compiler.labelnum);
 
 	UML_FDDIV(block, FPD32(REG_N), FPD32(REG_N), FPD32(REG_M));
@@ -5153,7 +5374,7 @@ bool sh34_base_device::generate_group_15_FDIV(drcuml_block &block, compiler_stat
 
 bool sh34_base_device::generate_group_15_FCMP_EQ(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 0);
+	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 1);
 	UML_JMPc(block, COND_Z, compiler.labelnum);
 
 	UML_FDCMP(block, FPD32(REG_M & 14), FPD32(REG_N & 14));
@@ -5174,7 +5395,7 @@ bool sh34_base_device::generate_group_15_FCMP_EQ(drcuml_block &block, compiler_s
 
 bool sh34_base_device::generate_group_15_FCMP_GT(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 0);
+	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 1);
 	UML_JMPc(block, COND_Z, compiler.labelnum);
 
 	UML_FDCMP(block, FPD32(REG_M & 14), FPD32(REG_N & 14));
@@ -5193,93 +5414,224 @@ bool sh34_base_device::generate_group_15_FCMP_GT(drcuml_block &block, compiler_s
 	return true;
 }
 
-void sh34_base_device::func_FMOVS0FR() { FMOVS0FR(m_sh2_state->arg0); }
-static void cfunc_FMOVS0FR(void *param) { ((sh34_base_device *)param)->func_FMOVS0FR(); };
-
 bool sh34_base_device::generate_group_15_FMOVS0FR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_FMOVS0FR, this);
-	load_fast_iregs(block);
+	UML_ADD(block, I2, R32(0), R32(REG_M));                                 // add i2, reg_0, reg_m
+	SETEA(2);                                                               // setea i2
+
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_sz), 1);                        // test m_fpu_sz, 1
+	UML_JMPc(block, COND_NZ, compiler.labelnum);                            // jmpc NZ, labelnum
+
+	generate_fmov_single(block, REG_N, true);                               // mov reg_n, [i2]
+	UML_JMP(block, compiler.labelnum + 1);                                  // jmp labelnum+1
+
+	UML_LABEL(block, compiler.labelnum++);                                  // labelnum:
+	generate_fmov_pair(block, REG_N, true);                                 // mov reg_n, [i2] and [i2+4]
+
+	UML_LABEL(block, compiler.labelnum++);                                  // labelnum+1:
 	return true;
 }
-
-void sh34_base_device::func_FMOVFRS0() { FMOVFRS0(m_sh2_state->arg0); }
-static void cfunc_FMOVFRS0(void *param) { ((sh34_base_device *)param)->func_FMOVFRS0(); };
 
 bool sh34_base_device::generate_group_15_FMOVFRS0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_FMOVFRS0, this);
-	load_fast_iregs(block);
+	UML_ADD(block, I2, R32(0), R32(REG_N));                                 // add i2, reg_0, reg_n
+	SETEA(2);                                                               // setea i2
+
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_sz), 1);                        // test m_fpu_sz, 1
+	UML_JMPc(block, COND_NZ, compiler.labelnum);                            // jmpc NZ, labelnum
+
+	generate_fmov_single(block, REG_M, false);                              // mov reg_m, [i2]
+	UML_JMP(block, compiler.labelnum + 1);                                  // jmp labelnum+1
+
+	UML_LABEL(block, compiler.labelnum++);                                  // labelnum:
+	generate_fmov_pair(block, REG_M, false);                                // mov reg_m, [i2] and [i2+4]
+
+	UML_LABEL(block, compiler.labelnum++);                                  // labelnum+1:
 	return true;
 }
 
-void sh34_base_device::func_FMOVMRFR() { FMOVMRFR(m_sh2_state->arg0); }
-static void cfunc_FMOVMRFR(void *param) { ((sh34_base_device *)param)->func_FMOVMRFR(); };
+/*-------------------------------------------------
+    generate_fmov_single / generate_fmov_pair -
+    move one floating-point register, or a register
+    couple, to or from the address held in I2.
+
+    NOTE: on a little-endian host the register file
+    holds pairs byte-swapped while PR = 1, so the
+    index has to be fixed up at run time.
+-------------------------------------------------*/
+
+void sh34_base_device::generate_fmov_single(drcuml_block &block, uint32_t reg, bool load)
+{
+	UML_MOV(block, I3, reg);                                                // mov i3, reg
+#ifdef LSB_FIRST
+	UML_XOR(block, I3, I3, mem(&m_sh2_state->m_fpu_pr));                    // xor i3, i3, m_fpu_pr
+#endif
+
+	if (load)
+	{
+		UML_MOV(block, I0, I2);                                             // mov i0, i2
+		UML_CALLH(block, *m_read32);                                        // callh m_read32
+		UML_STORE(block, m_sh2_state->m_fr, I3, I0, SIZE_DWORD, SCALE_x4);  // store m_fr[i3], i0
+	}
+	else
+	{
+		UML_LOAD(block, I1, m_sh2_state->m_fr, I3, SIZE_DWORD, SCALE_x4);   // load i1, m_fr[i3]
+		UML_MOV(block, I0, I2);                                             // mov i0, i2
+		UML_CALLH(block, *m_write32);                                       // callh m_write32
+	}
+}
+
+void sh34_base_device::generate_fmov_pair(drcuml_block &block, uint32_t reg, bool load)
+{
+	// the bank is fixed by the opcode; only the index moves with PR
+	uint32_t *const bank = (reg & 1) ? m_sh2_state->m_xf : m_sh2_state->m_fr;
+
+	UML_MOV(block, I3, reg & 14);                                           // mov i3, reg & 14
+#ifdef LSB_FIRST
+	UML_XOR(block, I3, I3, mem(&m_sh2_state->m_fpu_pr));                    // xor i3, i3, m_fpu_pr
+#endif
+
+	if (load)
+	{
+		UML_MOV(block, I0, I2);                                             // mov i0, i2
+		UML_CALLH(block, *m_read32);                                        // callh m_read32
+		UML_STORE(block, bank, I3, I0, SIZE_DWORD, SCALE_x4);               // store bank[i3], i0
+
+		UML_ADD(block, I0, I2, 4);                                          // add i0, i2, 4
+		UML_CALLH(block, *m_read32);                                        // callh m_read32
+		UML_XOR(block, I3, I3, 1);                                          // xor i3, i3, 1
+		UML_STORE(block, bank, I3, I0, SIZE_DWORD, SCALE_x4);               // store bank[i3], i0
+	}
+	else
+	{
+		UML_LOAD(block, I1, bank, I3, SIZE_DWORD, SCALE_x4);                // load i1, bank[i3]
+		UML_MOV(block, I0, I2);                                             // mov i0, i2
+		UML_CALLH(block, *m_write32);                                       // callh m_write32
+
+		UML_XOR(block, I3, I3, 1);                                          // xor i3, i3, 1
+		UML_LOAD(block, I1, bank, I3, SIZE_DWORD, SCALE_x4);                // load i1, bank[i3]
+		UML_ADD(block, I0, I2, 4);                                          // add i0, i2, 4
+		UML_CALLH(block, *m_write32);                                       // callh m_write32
+	}
+}
 
 bool sh34_base_device::generate_group_15_FMOVMRFR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_FMOVMRFR, this);
-	load_fast_iregs(block);
+	UML_MOV(block, I2, R32(REG_M));                                         // mov i2, reg_m
+	SETEA(2);                                                               // setea i2
+
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_sz), 1);                        // test m_fpu_sz, 1
+	UML_JMPc(block, COND_NZ, compiler.labelnum);                            // jmpc NZ, labelnum
+
+	generate_fmov_single(block, REG_N, true);                               // mov reg_n, [i2]
+	UML_JMP(block, compiler.labelnum + 1);                                  // jmp labelnum+1
+
+	UML_LABEL(block, compiler.labelnum++);                                  // labelnum:
+	generate_fmov_pair(block, REG_N, true);                                 // mov reg_n, [i2] and [i2+4]
+
+	UML_LABEL(block, compiler.labelnum++);                                  // labelnum+1:
 	return true;
 }
-
-void sh34_base_device::func_FMOVMRIFR() { FMOVMRIFR(m_sh2_state->arg0); }
-static void cfunc_FMOVMRIFR(void *param) { ((sh34_base_device *)param)->func_FMOVMRIFR(); };
 
 bool sh34_base_device::generate_group_15_FMOVMRIFR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_FMOVMRIFR, this);
-	load_fast_iregs(block);
+	UML_MOV(block, I2, R32(REG_M));                                         // mov i2, reg_m
+	SETEA(2);                                                               // setea i2
+
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_sz), 1);                        // test m_fpu_sz, 1
+	UML_JMPc(block, COND_NZ, compiler.labelnum);                            // jmpc NZ, labelnum
+
+	generate_fmov_single(block, REG_N, true);                               // mov reg_n, [i2]
+	UML_ADD(block, R32(REG_M), R32(REG_M), 4);                              // add reg_m, reg_m, 4
+	UML_JMP(block, compiler.labelnum + 1);                                  // jmp labelnum+1
+
+	UML_LABEL(block, compiler.labelnum++);                                  // labelnum:
+	generate_fmov_pair(block, REG_N, true);                                 // mov reg_n, [i2] and [i2+4]
+	UML_ADD(block, R32(REG_M), R32(REG_M), 8);                              // add reg_m, reg_m, 8
+
+	UML_LABEL(block, compiler.labelnum++);                                  // labelnum+1:
 	return true;
 }
-
-void sh34_base_device::func_FMOVFRMR() { FMOVFRMR(m_sh2_state->arg0); }
-static void cfunc_FMOVFRMR(void *param) { ((sh34_base_device *)param)->func_FMOVFRMR(); };
 
 bool sh34_base_device::generate_group_15_FMOVFRMR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_FMOVFRMR, this);
-	load_fast_iregs(block);
+	UML_MOV(block, I2, R32(REG_N));                                         // mov i2, reg_n
+	SETEA(2);                                                               // setea i2
+
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_sz), 1);                        // test m_fpu_sz, 1
+	UML_JMPc(block, COND_NZ, compiler.labelnum);                            // jmpc NZ, labelnum
+
+	generate_fmov_single(block, REG_M, false);                              // mov [i2], reg_m
+	UML_JMP(block, compiler.labelnum + 1);                                  // jmp labelnum+1
+
+	UML_LABEL(block, compiler.labelnum++);                                  // labelnum:
+	generate_fmov_pair(block, REG_M, false);                                // mov [i2] and [i2+4], reg_m
+
+	UML_LABEL(block, compiler.labelnum++);                                  // labelnum+1:
 	return true;
 }
-
-void sh34_base_device::func_FMOVFRMDR() { FMOVFRMDR(m_sh2_state->arg0); }
-static void cfunc_FMOVFRMDR(void *param) { ((sh34_base_device *)param)->func_FMOVFRMDR(); };
 
 bool sh34_base_device::generate_group_15_FMOVFRMDR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_FMOVFRMDR, this);
-	load_fast_iregs(block);
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_sz), 1);
+	UML_JMPc(block, COND_NZ, compiler.labelnum);
+
+	UML_SUB(block, R32(REG_N), R32(REG_N), 4);
+	UML_MOV(block, I2, R32(REG_N));
+	SETEA(2);
+	generate_fmov_single(block, REG_M, false);
+	UML_JMP(block, compiler.labelnum + 1);
+
+	UML_LABEL(block, compiler.labelnum++);
+	UML_SUB(block, R32(REG_N), R32(REG_N), 8);
+	UML_MOV(block, I2, R32(REG_N));
+	SETEA(2);
+	generate_fmov_pair(block, REG_M, false);
+
+	UML_LABEL(block, compiler.labelnum++);
 	return true;
 }
 
-void sh34_base_device::func_FMOVFR() { FMOVFR(m_sh2_state->arg0); }
-static void cfunc_FMOVFR(void *param) { ((sh34_base_device *)param)->func_FMOVFR(); };
-
 bool sh34_base_device::generate_group_15_FMOVFR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_FMOVFR, this);
-	load_fast_iregs(block);
+	const uint32_t m = REG_M;
+	const uint32_t n = REG_N;
+
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_sz), 1);
+	UML_JMPc(block, COND_NZ, compiler.labelnum);
+
+	// SZ = 0 (single)
+#ifdef LSB_FIRST
+	UML_MOV(block, I0, m);
+	UML_XOR(block, I0, I0, mem(&m_sh2_state->m_fpu_pr));
+	UML_LOAD(block, I1, m_sh2_state->m_fr, I0, SIZE_DWORD, SCALE_x4);
+	UML_MOV(block, I0, n);
+	UML_XOR(block, I0, I0, mem(&m_sh2_state->m_fpu_pr));
+	UML_STORE(block, m_sh2_state->m_fr, I0, I1, SIZE_DWORD, SCALE_x4);
+#else
+	UML_MOV(block, mem(&m_sh2_state->m_fr[n]), mem(&m_sh2_state->m_fr[m]));
+#endif
+	UML_JMP(block, compiler.labelnum + 1);
+
+	UML_LABEL(block, compiler.labelnum++);              // labelnum:
+
+	// SZ = 1: (pair) both banks and both indices are fixed by the opcode, and copying the whole
+	// couple means the PR fixup above is not needed here
+	{
+		uint32_t *const src = (m & 1) ? m_sh2_state->m_xf : m_sh2_state->m_fr;
+		uint32_t *const dst = (n & 1) ? m_sh2_state->m_xf : m_sh2_state->m_fr;
+
+		UML_MOV(block, mem(&dst[n & 14]), mem(&src[m & 14]));
+		UML_MOV(block, mem(&dst[n | 1]), mem(&src[m | 1]));
+	}
+
+	UML_LABEL(block, compiler.labelnum++);              // labelnum+1:
 	return true;
 }
 
 bool sh34_base_device::generate_group_15_FMAC(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 0);
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 1);
 	UML_JMPc(block, COND_NZ, compiler.labelnum);
 
 	UML_FSMUL(block, F0, FPS32(0), FPS32(REG_M));
@@ -5324,21 +5676,21 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FSTS(drcuml_block &block, c
 	return true;
 }
 
-void sh34_base_device::func_FLDS() { FLDS(m_sh2_state->arg0); }
-static void cfunc_FLDS(void *param) { ((sh34_base_device *)param)->func_FLDS(); };
-
 bool sh34_base_device::generate_group_15_op1111_0x13_FLDS(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_FLDS, this);
-	load_fast_iregs(block);
+#ifdef LSB_FIRST
+	UML_XOR(block, I0, REG_N, uml::mem(&m_sh2_state->m_fpu_pr));
+	UML_LOAD(block, I1, m_sh2_state->m_fr, I0, SIZE_DWORD, SCALE_x4);
+	UML_MOV(block, uml::mem(&m_sh2_state->m_fpul), I1);
+#else
+	UML_MOV(block, uml::mem(&m_sh2_state->m_fpul), uml::mem(&m_sh2_state->m_fr[REG_N]));
+#endif
 	return true;
 }
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FLOAT(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 0);
+	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 1);
 	UML_JMPc(block, COND_Z, compiler.labelnum);
 
 	UML_FDFRINT(block, FPD32(REG_N & 14), uml::mem(&m_sh2_state->m_fpul), SIZE_DWORD);
@@ -5353,38 +5705,63 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FLOAT(drcuml_block &block, 
 	return true;
 }
 
+// out-of-range and infinite operands saturate and NaNs give the negative limit, so the
+// range has to be checked before the host convert
 bool sh34_base_device::generate_group_15_op1111_0x13_FTRC(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 0);
-	UML_JMPc(block, COND_Z, compiler.labelnum);
+	const int single = compiler.labelnum++;
+	const int saturate = compiler.labelnum++;
+	const int convert = compiler.labelnum++;
+	const int done = compiler.labelnum++;
 
-	UML_FDTOINT(block, uml::mem(&m_sh2_state->m_fpul), FPD32(REG_N & 14), SIZE_DWORD, ROUND_TRUNC);
-	UML_JMP(block, compiler.labelnum+1);
+	UML_MOV(block, uml::mem(&m_sh2_state->m_fpul), 0x80000000);
 
-	UML_LABEL(block, compiler.labelnum++);  // labelnum:
+	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 1);
+	UML_JMPc(block, COND_Z, single);
 
+	UML_FDCMP(block, FPD32(REG_N), uml::mem(&m_sh2_state->m_ftrc_dmin));
+	UML_JMPc(block, COND_U, done);
+	UML_JMPc(block, COND_C, done);
+	UML_FDCMP(block, FPD32(REG_N), uml::mem(&m_sh2_state->m_ftrc_dmax));
+	UML_JMPc(block, COND_NC, saturate);
+	UML_FDTOINT(block, uml::mem(&m_sh2_state->m_fpul), FPD32(REG_N), SIZE_DWORD, ROUND_TRUNC);
+	UML_JMP(block, done);
+
+	UML_LABEL(block, single);
+	UML_FSCMP(block, FPS32(REG_N), uml::mem(&m_sh2_state->m_ftrc_smin));
+	UML_JMPc(block, COND_U, done);
+	UML_JMPc(block, COND_C, done);
+	UML_FSCMP(block, FPS32(REG_N), uml::mem(&m_sh2_state->m_ftrc_smax));
+	UML_JMPc(block, COND_C, convert);
+
+	UML_LABEL(block, saturate);
+	UML_MOV(block, uml::mem(&m_sh2_state->m_fpul), 0x7fffffff);
+	UML_JMP(block, done);
+
+	UML_LABEL(block, convert);
 	UML_FSTOINT(block, uml::mem(&m_sh2_state->m_fpul), FPS32(REG_N), SIZE_DWORD, ROUND_TRUNC);
 
-	UML_LABEL(block, compiler.labelnum++);  // labelnum+1:
+	UML_LABEL(block, done);
 	return true;
 }
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FNEG(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	UML_MOV(block, I0, 0);
-
-	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 0);
+	// FNEG inverts the sign bit; it is not an arithmetic subtraction from zero
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 1);
 	UML_JMPc(block, COND_Z, compiler.labelnum);
 
-	UML_FDFRINT(block, F1, I0, SIZE_DWORD);
-	UML_FDSUB(block, FPD32(REG_N), F1, FPD32(REG_N));
+#ifdef LSB_FIRST
+	UML_XOR(block, FPS32(((REG_N & 14) | 1)), FPS32(((REG_N & 14) | 1)), 0x80000000);
+#else
+	UML_XOR(block, FPS32(REG_N & 14), FPS32(REG_N & 14), 0x80000000);
+#endif
 
 	UML_JMP(block, compiler.labelnum+1);
 
 	UML_LABEL(block, compiler.labelnum++);  // labelnum:
 
-	UML_FSFRINT(block, F1, I0, SIZE_DWORD);
-	UML_FSSUB(block, FPS32(REG_N), F1, FPS32(REG_N));
+	UML_XOR(block, FPS32(REG_N), FPS32(REG_N), 0x80000000);
 
 	UML_LABEL(block, compiler.labelnum++);  // labelnum+1:
 	return true;
@@ -5392,7 +5769,7 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FNEG(drcuml_block &block, c
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FABS(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 0);
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 1);
 	UML_JMPc(block, COND_Z, compiler.labelnum);
 
 #ifdef LSB_FIRST
@@ -5411,27 +5788,33 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FABS(drcuml_block &block, c
 	return true;
 }
 
-void sh34_base_device::func_FSQRT() { FSQRT(m_sh2_state->arg0); }
-static void cfunc_FSQRT(void *param) { ((sh34_base_device *)param)->func_FSQRT(); };
-
 bool sh34_base_device::generate_group_15_op1111_0x13_FSQRT(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_FSQRT, this);
-	load_fast_iregs(block);
+	const int single = compiler.labelnum++;
+	const int done = compiler.labelnum++;
+
+	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 1);
+	UML_JMPc(block, COND_Z, single);
+
+	UML_FDSQRT(block, FPD32(REG_N), FPD32(REG_N));
+	UML_JMP(block, done);
+
+	UML_LABEL(block, single);
+	UML_FSSQRT(block, FPS32(REG_N), FPS32(REG_N));
+
+	UML_LABEL(block, done);
 	return true;
 }
 
+// FSRRA, FIPR and FTRV are between four and sixteen truncated multiplications each, all of it
+// integer work.  None of them touches an integer register, so there's nothing to save around the call.
 void sh34_base_device::func_FSRRA() { FSRRA(m_sh2_state->arg0); }
-static void cfunc_FSRRA(void *param) { ((sh34_base_device *)param)->func_FSRRA(); };
+static void cfunc_FSRRA(void *param) { static_cast<sh34_base_device *>(param)->func_FSRRA(); }
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FSRRA(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
 	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
 	UML_CALLC(block, cfunc_FSRRA, this);
-	load_fast_iregs(block);
 	return true;
 }
 
@@ -5459,39 +5842,46 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FLDI1(drcuml_block &block, 
 	return true;
 }
 
-void sh34_base_device::func_FCNVSD() { FCNVSD(m_sh2_state->arg0); }
-static void cfunc_FCNVSD(void *param) { ((sh34_base_device *)param)->func_FCNVSD(); };
-
 bool sh34_base_device::generate_group_15_op1111_0x13_FCNVSD(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_FCNVSD, this);
-	load_fast_iregs(block);
+	const int done = compiler.labelnum++;
+
+	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 1);
+	UML_JMPc(block, COND_Z, done);
+
+	UML_FDFRFLT(block, FPD32(REG_N), uml::mem((float *)&m_sh2_state->m_fpul), SIZE_DWORD);
+
+	UML_LABEL(block, done);
 	return true;
 }
 
-void sh34_base_device::func_FCNVDS() { FCNVDS(m_sh2_state->arg0); }
-static void cfunc_FCNVDS(void *param) { ((sh34_base_device *)param)->func_FCNVDS(); };
-
 bool sh34_base_device::generate_group_15_op1111_0x13_FCNVDS(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_FCNVDS, this);
-	load_fast_iregs(block);
+	const int convert = compiler.labelnum++;
+	const int done = compiler.labelnum++;
+
+	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 1);
+	UML_JMPc(block, COND_Z, done);
+
+	UML_TEST(block, uml::mem(&m_sh2_state->m_fpscr), RM);
+	UML_JMPc(block, COND_Z, convert);
+	UML_AND(block, uml::mem(&m_sh2_state->m_fr[(REG_N & 14) | NATIVE_ENDIAN_VALUE_LE_BE(0, 1)]),
+			uml::mem(&m_sh2_state->m_fr[(REG_N & 14) | NATIVE_ENDIAN_VALUE_LE_BE(0, 1)]), 0xe0000000);
+
+	UML_LABEL(block, convert);
+	UML_FSFRFLT(block, uml::mem((float *)&m_sh2_state->m_fpul), FPD32(REG_N), SIZE_QWORD);
+
+	UML_LABEL(block, done);
 	return true;
 }
 
 void sh34_base_device::func_FIPR() { FIPR(m_sh2_state->arg0); }
-static void cfunc_FIPR(void *param) { ((sh34_base_device *)param)->func_FIPR(); };
+static void cfunc_FIPR(void *param) { static_cast<sh34_base_device *>(param)->func_FIPR(); }
 
 bool sh34_base_device::generate_group_15_op1111_0x13_FIPR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
 	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
 	UML_CALLC(block, cfunc_FIPR, this);
-	load_fast_iregs(block);
 	return true;
 }
 
@@ -5555,26 +5945,39 @@ bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FRCHG(drcuml_b
 }
 
 void sh34_base_device::func_FTRV() { FTRV(m_sh2_state->arg0); }
-static void cfunc_FTRV(void *param) { ((sh34_base_device *)param)->func_FTRV(); };
+static void cfunc_FTRV(void *param) { static_cast<sh34_base_device *>(param)->func_FTRV(); }
 
 bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FTRV(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
 	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
 	UML_CALLC(block, cfunc_FTRV, this);
-	load_fast_iregs(block);
 	return true;
 }
 
-void sh34_base_device::func_FSSCA() { FSSCA(m_sh2_state->arg0); }
-static void cfunc_FSSCA(void *param) { ((sh34_base_device *)param)->func_FSSCA(); };
-
+// FSCA only has 65536 operands, so the multiplications are done ahead of time.  What is left of the
+// instruction is rounding a 27-bit integer in the current rounding mode, which the host can do.
 bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FSSCA(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_FSSCA, this);
-	load_fast_iregs(block);
+	const uint32_t n = REG_N & 14;
+	const uml::code_label done = compiler.labelnum++;
+
+	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 1);
+	UML_JMPc(block, COND_NZ, done);
+
+	UML_AND(block, I0, uml::mem(&m_sh2_state->m_fpscr), ~FPSCR_CAUSE);
+	UML_OR(block, uml::mem(&m_sh2_state->m_fpscr), I0, fpscr_exception_bits(sh4fpu::CAUSE_I));
+
+	UML_AND(block, I0, uml::mem(&m_sh2_state->m_fpul), 0xffff);
+	UML_LOAD(block, I1, m_fsca_table.get(), I0, SIZE_DWORD, SCALE_x4);
+	UML_FSFRINT(block, F0, I1, SIZE_DWORD);
+	UML_FSMUL(block, FPS32(n), F0, uml::mem(&m_sh2_state->m_fsca_unit));
+
+	UML_ADD(block, I0, I0, 0x4000);
+	UML_AND(block, I0, I0, 0xffff);
+	UML_LOAD(block, I1, m_fsca_table.get(), I0, SIZE_DWORD, SCALE_x4);
+	UML_FSFRINT(block, F0, I1, SIZE_DWORD);
+	UML_FSMUL(block, FPS32(n + 1), F0, uml::mem(&m_sh2_state->m_fsca_unit));
+
+	UML_LABEL(block, done);
 	return true;
 }
-

@@ -675,7 +675,7 @@ void z80_device::device_start()
 	save_item(NAME(m_tmp_irq_vector));
 	save_item(NAME(m_shared_data.w));
 	save_item(NAME(m_shared_data2.w));
-	save_item(NAME(m_rtemp));
+	save_item(NAME(m_irtmp.w));
 	save_item(NAME(m_ref));
 
 	// Reset registers to their initial values
@@ -710,7 +710,7 @@ void z80_device::device_start()
 	m_busack_state = 0;
 	m_ea = 0;
 	m_service_attention = 0;
-	m_rtemp = 0;
+	m_irtmp.w = 0;
 
 	space(AS_PROGRAM).cache(m_args);
 	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_opcodes);
@@ -744,8 +744,9 @@ void z80_device::device_start()
 	state_add(Z80_DE2,         "DE2",       m_de2.w);
 	state_add(Z80_HL2,         "HL2",       m_hl2.w);
 	state_add(Z80_WZ,          "WZ",        WZ);
-	state_add(Z80_R,           "R",         m_rtemp).callimport().callexport();
+	state_add(Z80_R,           "R",         m_irtmp.b.l).callimport().callexport();
 	state_add(Z80_I,           "I",         m_i);
+	state_add(Z80_IR,          "IR",        m_irtmp.w).noshow().callimport().callexport();
 	state_add(Z80_IM,          "IM",        m_im).mask(0x3);
 	state_add(Z80_IFF1,        "IFF1",      m_iff1).mask(0x1);
 	state_add(Z80_IFF2,        "IFF2",      m_iff2).mask(0x1);
@@ -844,9 +845,12 @@ void z80_device::state_import(const device_state_entry &entry)
 	case Z80_F: case Z80_AF:
 		set_f(F);
 		break;
+	case Z80_IR:
+		m_i = m_irtmp.b.h;
+		[[fallthrough]];
 	case Z80_R:
-		m_r = m_rtemp & 0x7f;
-		m_r2 = m_rtemp & 0x80;
+		m_r = m_irtmp.b.l & 0x7f;
+		m_r2 = m_irtmp.b.l & 0x80;
 		break;
 
 	default:
@@ -861,8 +865,8 @@ void z80_device::state_export(const device_state_entry &entry)
 	case Z80_F: case Z80_AF:
 		F = get_f();
 		break;
-	case Z80_R:
-		m_rtemp = (m_r & 0x7f) | (m_r2 & 0x80);
+	case Z80_IR: case Z80_R:
+		m_irtmp.w = (m_i << 8) | ((m_r & 0x7f) | (m_r2 & 0x80));
 		break;
 
 	default:

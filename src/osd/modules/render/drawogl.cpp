@@ -34,6 +34,7 @@ typedef uint64_t HashT;
 #elif defined(OSD_MAC)
 #define GL_SILENCE_DEPRECATION (1)
 #include "osdmac.h"
+#include "macglcontext.h"
 #else
 #include "osdsdl.h"
 #include "sdlglcontext.h"
@@ -69,9 +70,6 @@ typedef uint64_t HashT;
 
 #include <cstring>
 #include <cstdio>
-
-#include <sys/types.h>
-#include <sys/sysctl.h>
 
 #ifndef APIENTRY
 #define APIENTRY
@@ -755,8 +753,7 @@ int renderer_ogl::create()
 #if defined(OSD_WINDOWS)
 	m_gl_context.reset(new win_gl_context(dynamic_cast<win_window_info &>(window()).platform_window()));
 #elif defined(OSD_MAC)
-// TODO
-//  m_gl_context.reset(new mac_gl_context(dynamic_cast<mac_window_info &>(window()).platform_window()));
+	m_gl_context.reset(new mac_gl_context(dynamic_cast<mac_window_info &>(window()).platform_window()));
 #else
 	m_gl_context.reset(new sdl_gl_context(dynamic_cast<sdl_window_info &>(window()).platform_window()));
 #endif
@@ -1244,35 +1241,7 @@ int renderer_ogl::draw(const int update)
 		//   |_________|
 		// (0,h)     (w,h)
 
-		GLsizei iScale = 1;
-
-		/*
-		    Mac hack: macOS version 10.15 and later flipped from assuming you don't support Retina to
-		    assuming you do support Retina.
-		*/
-		#if !defined(SDLMAME_MACOSX) && defined(OSD_MAC)
-		{
-			// now get the Darwin kernel version
-			int dMaj, dMin, dPatch;
-			char versStr[64];
-			dMaj = dMin = dPatch = 0;
-			size_t size = sizeof(versStr);
-			int retVal = sysctlbyname("kern.osrelease", versStr, &size, NULL, 0);
-			if (retVal == 0)
-			{
-			  sscanf(versStr, "%d.%d.%d", &dMaj, &dMin, &dPatch);
-			  // 10.15 Catalina is Darwin version 19
-			  if (dMaj >= 19)
-			  {
-				  // do the workaround for Retina being forced on
-				  osd_printf_verbose("OpenGL: enabling Retina workaround\n");
-				  iScale = 2;
-			  }
-			}
-		}
-		#endif
-
-		glViewport(0.0, 0.0, (GLsizei) m_width * iScale, (GLsizei) m_height * iScale);
+		glViewport(0.0, 0.0, (GLsizei) m_width, (GLsizei) m_height);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		glOrtho(0.0, (GLdouble) m_width, (GLdouble) m_height, 0.0, 0.0, -1.0);

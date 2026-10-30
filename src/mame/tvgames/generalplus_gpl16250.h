@@ -7,7 +7,7 @@
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
-#include "machine/generalplus_gpl1625x_soc.h"
+#include "machine/generalplus_gpl162xx_b_soc.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -61,7 +61,7 @@ protected:
 
 	memory_access<32, 1, -1, ENDIANNESS_BIG>::specific m_memory;
 
-	required_device<sunplus_gcm394_base_device> m_maincpu;
+	required_device<generalplus_gpl162xx_base_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
 	required_ioport_array<3> m_io;

@@ -2,7 +2,7 @@
 // basic_waitable_timer.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -31,6 +31,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 
 #if !defined(ASIO_BASIC_WAITABLE_TIMER_FWD_DECL)
 #define ASIO_BASIC_WAITABLE_TIMER_FWD_DECL
@@ -75,7 +76,7 @@ class basic_waitable_timer;
  * timer.wait();
  * @endcode
  *
- * @par 
+ * @par
  * Performing an asynchronous wait (C++11):
  * @code
  * void handler(const asio::error_code& error)
@@ -134,6 +135,8 @@ class basic_waitable_timer;
  *
  * @li If a wait handler is cancelled, the asio::error_code passed to
  * it contains the value asio::error::operation_aborted.
+ *
+ * @sa @ref overview_timers "Timers"
  */
 template <typename Clock, typename WaitTraits, typename Executor>
 class basic_waitable_timer
@@ -411,36 +414,6 @@ public:
     return s;
   }
 
-#if !defined(ASIO_NO_DEPRECATED)
-  /// (Deprecated: Use non-error_code overload.) Cancel any asynchronous
-  /// operations that are waiting on the timer.
-  /**
-   * This function forces the completion of any pending asynchronous wait
-   * operations against the timer. The handler for each cancelled operation will
-   * be invoked with the asio::error::operation_aborted error code.
-   *
-   * Cancelling the timer does not change the expiry time.
-   *
-   * @param ec Set to indicate what error occurred, if any.
-   *
-   * @return The number of asynchronous operations that were cancelled.
-   *
-   * @note If the timer has already expired when cancel() is called, then the
-   * handlers for asynchronous wait operations will:
-   *
-   * @li have already been invoked; or
-   *
-   * @li have been queued for invocation in the near future.
-   *
-   * These handlers can no longer be cancelled, and therefore are passed an
-   * error code that indicates the successful completion of the wait operation.
-   */
-  std::size_t cancel(asio::error_code& ec)
-  {
-    return impl_.get_service().cancel(impl_.get_implementation(), ec);
-  }
-#endif // !defined(ASIO_NO_DEPRECATED)
-
   /// Cancels one asynchronous operation that is waiting on the timer.
   /**
    * This function forces the completion of one pending asynchronous wait
@@ -473,49 +446,6 @@ public:
     asio::detail::throw_error(ec, "cancel_one");
     return s;
   }
-
-#if !defined(ASIO_NO_DEPRECATED)
-  /// (Deprecated: Use non-error_code overload.) Cancels one asynchronous
-  /// operation that is waiting on the timer.
-  /**
-   * This function forces the completion of one pending asynchronous wait
-   * operation against the timer. Handlers are cancelled in FIFO order. The
-   * handler for the cancelled operation will be invoked with the
-   * asio::error::operation_aborted error code.
-   *
-   * Cancelling the timer does not change the expiry time.
-   *
-   * @param ec Set to indicate what error occurred, if any.
-   *
-   * @return The number of asynchronous operations that were cancelled. That is,
-   * either 0 or 1.
-   *
-   * @note If the timer has already expired when cancel_one() is called, then
-   * the handlers for asynchronous wait operations will:
-   *
-   * @li have already been invoked; or
-   *
-   * @li have been queued for invocation in the near future.
-   *
-   * These handlers can no longer be cancelled, and therefore are passed an
-   * error code that indicates the successful completion of the wait operation.
-   */
-  std::size_t cancel_one(asio::error_code& ec)
-  {
-    return impl_.get_service().cancel_one(impl_.get_implementation(), ec);
-  }
-
-  /// (Deprecated: Use expiry().) Get the timer's expiry time as an absolute
-  /// time.
-  /**
-   * This function may be used to obtain the timer's current expiry time.
-   * Whether the timer has expired or not does not affect this value.
-   */
-  time_point expires_at() const
-  {
-    return impl_.get_service().expires_at(impl_.get_implementation());
-  }
-#endif // !defined(ASIO_NO_DEPRECATED)
 
   /// Get the timer's expiry time as an absolute time.
   /**
@@ -558,38 +488,6 @@ public:
     return s;
   }
 
-#if !defined(ASIO_NO_DEPRECATED)
-  /// (Deprecated: Use non-error_code overload.) Set the timer's expiry time as
-  /// an absolute time.
-  /**
-   * This function sets the expiry time. Any pending asynchronous wait
-   * operations will be cancelled. The handler for each cancelled operation will
-   * be invoked with the asio::error::operation_aborted error code.
-   *
-   * @param expiry_time The expiry time to be used for the timer.
-   *
-   * @param ec Set to indicate what error occurred, if any.
-   *
-   * @return The number of asynchronous operations that were cancelled.
-   *
-   * @note If the timer has already expired when expires_at() is called, then
-   * the handlers for asynchronous wait operations will:
-   *
-   * @li have already been invoked; or
-   *
-   * @li have been queued for invocation in the near future.
-   *
-   * These handlers can no longer be cancelled, and therefore are passed an
-   * error code that indicates the successful completion of the wait operation.
-   */
-  std::size_t expires_at(const time_point& expiry_time,
-      asio::error_code& ec)
-  {
-    return impl_.get_service().expires_at(
-        impl_.get_implementation(), expiry_time, ec);
-  }
-#endif // !defined(ASIO_NO_DEPRECATED)
-
   /// Set the timer's expiry time relative to now.
   /**
    * This function sets the expiry time. Any pending asynchronous wait
@@ -620,80 +518,6 @@ public:
     asio::detail::throw_error(ec, "expires_after");
     return s;
   }
-
-#if !defined(ASIO_NO_DEPRECATED)
-  /// (Deprecated: Use expiry().) Get the timer's expiry time relative to now.
-  /**
-   * This function may be used to obtain the timer's current expiry time.
-   * Whether the timer has expired or not does not affect this value.
-   */
-  duration expires_from_now() const
-  {
-    return impl_.get_service().expires_from_now(impl_.get_implementation());
-  }
-
-  /// (Deprecated: Use expires_after().) Set the timer's expiry time relative
-  /// to now.
-  /**
-   * This function sets the expiry time. Any pending asynchronous wait
-   * operations will be cancelled. The handler for each cancelled operation will
-   * be invoked with the asio::error::operation_aborted error code.
-   *
-   * @param expiry_time The expiry time to be used for the timer.
-   *
-   * @return The number of asynchronous operations that were cancelled.
-   *
-   * @throws asio::system_error Thrown on failure.
-   *
-   * @note If the timer has already expired when expires_from_now() is called,
-   * then the handlers for asynchronous wait operations will:
-   *
-   * @li have already been invoked; or
-   *
-   * @li have been queued for invocation in the near future.
-   *
-   * These handlers can no longer be cancelled, and therefore are passed an
-   * error code that indicates the successful completion of the wait operation.
-   */
-  std::size_t expires_from_now(const duration& expiry_time)
-  {
-    asio::error_code ec;
-    std::size_t s = impl_.get_service().expires_from_now(
-        impl_.get_implementation(), expiry_time, ec);
-    asio::detail::throw_error(ec, "expires_from_now");
-    return s;
-  }
-
-  /// (Deprecated: Use expires_after().) Set the timer's expiry time relative
-  /// to now.
-  /**
-   * This function sets the expiry time. Any pending asynchronous wait
-   * operations will be cancelled. The handler for each cancelled operation will
-   * be invoked with the asio::error::operation_aborted error code.
-   *
-   * @param expiry_time The expiry time to be used for the timer.
-   *
-   * @param ec Set to indicate what error occurred, if any.
-   *
-   * @return The number of asynchronous operations that were cancelled.
-   *
-   * @note If the timer has already expired when expires_from_now() is called,
-   * then the handlers for asynchronous wait operations will:
-   *
-   * @li have already been invoked; or
-   *
-   * @li have been queued for invocation in the near future.
-   *
-   * These handlers can no longer be cancelled, and therefore are passed an
-   * error code that indicates the successful completion of the wait operation.
-   */
-  std::size_t expires_from_now(const duration& expiry_time,
-      asio::error_code& ec)
-  {
-    return impl_.get_service().expires_from_now(
-        impl_.get_implementation(), expiry_time, ec);
-  }
-#endif // !defined(ASIO_NO_DEPRECATED)
 
   /// Perform a blocking wait on the timer.
   /**
@@ -746,7 +570,7 @@ public:
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using asio::async_immediate().
    *
    * @par Completion Signature
    * @code void(asio::error_code) @endcode
@@ -817,6 +641,7 @@ private:
     executor_type > impl_;
 };
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

@@ -1,0 +1,5 @@
+@PACKAGE_INIT@
+include("${CMAKE_CURRENT_LIST_DIR}/utf8proc-targets.cmake")
+# `check_required_components` is used to ensure consumer did not erroneously request components.
+# No components are currently defined.
+check_required_components(utf8proc)

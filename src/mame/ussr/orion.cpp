@@ -115,7 +115,7 @@ void orion_state::orion128(machine_config &config)
 	m_ppi2->out_pc_callback().set(FUNC(orion_state::radio86_8255_portc_w2));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(384, 256);
@@ -185,7 +185,7 @@ void orion_z80_state::orionz80(machine_config &config)
 	m_ppi2->out_pc_callback().set(FUNC(orion_z80_state::radio86_8255_portc_w2));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(384, 256);
@@ -260,7 +260,7 @@ void orion_pro_state::orionpro(machine_config &config)
 	m_ppi2->out_pc_callback().set(FUNC(orion_pro_state::radio86_8255_portc_w2));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(384, 256);

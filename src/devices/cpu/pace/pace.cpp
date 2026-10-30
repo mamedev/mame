@@ -127,10 +127,10 @@ void pace_device::device_start()
 	state_add<u16>(PACE_FR, "FR", [this]() { return m_fr; }, [this](u16 data) { set_fr(data); });
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_fr).noshow().formatstr("%14s");
 	for (int i = 0; i < 4; i++)
-		state_add(PACE_AC0 + i, string_format("AC%d", i).c_str(), m_ac[i]);
+		state_add(PACE_AC0 + i, string_format("AC%d", i), m_ac[i]);
 	state_add<u8>(PACE_STKD, "STKD", [this]() { return m_stack_depth; }, [this](u8 data) { m_stack_depth = data >= 10 ? 10 : data; }).mask(0xf);
 	for (int i = 0; i < 10; i++)
-		state_add<u16>(PACE_STK0 + i, string_format("STK%d", i).c_str(),
+		state_add<u16>(PACE_STK0 + i, string_format("STK%d", i),
 			[this, i]() { return m_stack[m_stkp > i ? m_stkp - i - 1 : m_stkp + 9 - i]; },
 			[this, i](u16 data) { m_stack[m_stkp > i ? m_stkp - i - 1 : m_stkp + 9 - i] = data; }
 		);

@@ -136,6 +136,8 @@ public:
 	{
 	}
 
+	device_t& device() { return m_device; }
+
 	std::error_code start()
 	{
 		std::error_code err;
@@ -305,16 +307,6 @@ private:
 		bool m_full = false;
 		std::array<u8, 128> m_buf;
 	};
-
-	template <typename Format, typename... Params>
-	void logerror(Format &&fmt, Params &&... args) const
-	{
-		util::stream_format(
-				std::cerr,
-				"[%s] %s",
-				m_device.tag(),
-				util::string_format(std::forward<Format>(fmt), std::forward<Params>(args)...));
-	}
 
 	bool forwarding() const
 	{

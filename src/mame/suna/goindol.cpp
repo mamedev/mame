@@ -443,7 +443,7 @@ void goindol_state::goindol(machine_config &config)
 	audiocpu.set_periodic_int(FUNC(goindol_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
@@ -577,8 +577,7 @@ void goindol_state::init_goindol()
 	uint8_t *rom = memregion("maincpu")->base();
 
 
-	// I hope that's all patches to avoid protection
-
+	// HACK: skip protection checks
 	rom[0x18e9] = 0x18; // ROM 1 check
 	rom[0x1964] = 0x00; // ROM 9 error (MCU?)
 	rom[0x1965] = 0x00; //

@@ -1051,7 +1051,7 @@ void namcos86_state::hopmappy(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(49.152_MHz_XTAL/8, 384, 3+8*8, 3+44*8, 264, 2*8, 30*8);
 	screen.set_screen_update(FUNC(namcos86_state::screen_update));
 	screen.screen_vblank().set(FUNC(namcos86_state::screen_vblank));

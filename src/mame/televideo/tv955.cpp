@@ -157,7 +157,7 @@ void tv955_state::tv955(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // HM6116LP-4 + 3.2V battery
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_raw(19.3396_MHz_XTAL, 846, 0, 720, 381, 0, 364);
 	//screen.set_raw(31.684_MHz_XTAL, 1386, 0, 1188, 381, 0, 364);

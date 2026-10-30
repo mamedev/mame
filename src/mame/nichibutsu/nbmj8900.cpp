@@ -53,7 +53,7 @@ void nbmj8900_state::init_ohpaipee()
 #else
 	unsigned char *ROM = memregion("maincpu")->base();
 
-	// Protection ROM check skip
+	// HACK: Protection ROM check skip
 	ROM[0x00e4] = 0x00;
 	ROM[0x00e5] = 0x00;
 	ROM[0x00e6] = 0x00;
@@ -81,7 +81,7 @@ void nbmj8900_state::init_togenkyo()
 #else
 	unsigned char *ROM = memregion("maincpu")->base();
 
-	// Protection ROM check skip
+	// HACK: Protection ROM check skip
 	ROM[0x010b] = 0x00;
 	ROM[0x010c] = 0x00;
 	ROM[0x010d] = 0x00;
@@ -315,7 +315,7 @@ void nbmj8900_state::ohpaipee(machine_config &config)
 	m_nb1413m3->set_blitter_rom_tag("gfx");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);

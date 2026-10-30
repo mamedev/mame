@@ -7,38 +7,7 @@
 
 #include "gba_slot.h"
 #include "machine/intelfsh.h"
-
-// GBA RTC device
-
-class gba_s3511_device
-{
-public:
-	gba_s3511_device(running_machine &machine);
-	running_machine &machine() const { return m_machine; }
-
-	void update_time(int len);
-	uint8_t convert_to_bcd(int val);
-
-	int read_line();
-	void write(uint16_t data, int gpio_dirs);
-
-protected:
-	enum
-	{
-		S3511_RTC_IDLE = 0,
-		S3511_RTC_DATAOUT,
-		S3511_RTC_DATAIN,
-		S3511_RTC_COMMAND
-	};
-
-	int m_phase;
-	uint8_t m_last_val, m_bits, m_command;
-	int m_data_len;
-	uint8_t m_data[7];
-
-	running_machine& m_machine;
-};
-
+#include "machine/s35180.h"
 
 
 // GBA EEPROM device
@@ -78,8 +47,6 @@ protected:
 
 	running_machine& m_machine;
 };
-
-
 
 // ======================> gba_rom_device
 
@@ -210,10 +177,11 @@ public:
 	virtual void gpio_dev_write(uint16_t data, int gpio_dirs) override;
 
 protected:
-	virtual void device_start() override ATTR_COLD;
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	std::unique_ptr<gba_s3511_device> m_rtc;
+	required_device<s3511_device> m_rtc;
 };
 
 
@@ -255,10 +223,10 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	std::unique_ptr<gba_s3511_device> m_rtc;
+	required_device<s3511_device> m_rtc;
 };
 
 
@@ -351,8 +319,9 @@ public:
 private:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	std::unique_ptr<gba_s3511_device> m_rtc;
+	required_device<s3511_device> m_rtc;
 	required_ioport m_sensor;
 	uint8_t m_last_val;
 	int m_counter;

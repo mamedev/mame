@@ -20,6 +20,7 @@
 #include "divtlb.h"
 
 #include <algorithm>
+#include <unordered_map>
 
 
 /***************************************************************************
@@ -33,6 +34,7 @@
 
 // interrupt types
 #define PPC_IRQ                 0       /* external IRQ */
+#define PPC_SMI                 1       /* (603 family) system management interrupt */
 #define PPC_IRQ_LINE_0          0       /* (4XX) external IRQ0 */
 #define PPC_IRQ_LINE_1          1       /* (4XX) external IRQ1 */
 #define PPC_IRQ_LINE_2          2       /* (4XX) external IRQ2 */
@@ -168,6 +170,8 @@ enum
 #define PPCDRC_ACCURATE_SINGLES       0x0004        // do excessive rounding to make single-precision results "accurate"
 #define PPCDRC_FULL_CACHE_FLUSH       0x0008        // completely flush the DRC cache on ICBI.  Should never be necessary now.
 #define PPCDRC_STRICT_601_SELF_MODIFY 0x0010        // check for self-modifying code on 601 in the write handler (fairly large performance impact & does not work with RAM bypass)
+#define PPCDRC_MACOS_CACHE_HACK       0x0020        // HACK for Mac OS relying on data cache behavior; see ppccom_dcbz_check() for details
+#define PPCDRC_BUS_RETRY              0x0040        // honor cpu_device::retry_access() on aligned I/O instructions
 
 // common sets of options
 #define PPCDRC_COMPATIBLE_OPTIONS   (PPCDRC_STRICT_VERIFY | PPCDRC_FLUSH_PC | PPCDRC_ACCURATE_SINGLES)
@@ -230,6 +234,7 @@ public:
 
 	void set_serial_clock(uint32_t serial_clock) { c_serial_clock = serial_clock; }
 	void set_serial_clock(const XTAL &xtal) { set_serial_clock(xtal.value()); }
+	void set_tb_divisor(uint32_t divisor) { m_tb_divisor = divisor; }
 
 	void ppc_set_dcstore_callback(write32sm_delegate callback);
 
@@ -250,8 +255,10 @@ public:
 	void ppc_cfunc_unimplemented();
 	void ppc_cfunc_ppccom_mismatch();
 	void ppccom_tlb_fill();
+	int  ppccom_fetch_intention() const;
 	void ppccom_update_fprf();
 	void ppccom_dcstore_callback();
+	void ppccom_dcbz_check();
 	void ppccom_execute_tlbie();
 	void ppccom_execute_tlbia();
 	void ppccom_execute_tlbl();
@@ -322,6 +329,7 @@ protected:
 		EXCEPTION_ITLBMISS      = 16,       // PPCCAP_603_MMU
 		EXCEPTION_DTLBMISSL     = 17,       // PPCCAP_603_MMU
 		EXCEPTION_DTLBMISSS     = 18,       // PPCCAP_603_MMU
+		EXCEPTION_SMI           = 20,       // 603 family
 		EXCEPTION_COUNT
 	};
 
@@ -331,6 +339,7 @@ protected:
 	memory_access<32, 3, 0, ENDIANNESS_BIG>::cache m_cache64;
 	uint32_t c_bus_frequency;
 	uint32_t c_serial_clock;
+	uint32_t c_rtc_clock;
 
 	struct internal_ppc_state
 	{
@@ -354,6 +363,7 @@ protected:
 		// PowerPC 603-specific state
 		uint32_t mmu603_cmp;
 		uint32_t mmu603_hash[2];
+		uint32_t mmu603_key;                 // SRR1[KEY] for the pending TLB miss: SR[Ks] or SR[Kp]
 		uint32_t mmu603_r[4];
 
 		// parameters for subroutines
@@ -616,6 +626,28 @@ protected:
 	std::vector<uint8_t>  m_codepage_bits;              // 1 bit for each 4K page
 	uint32_t              m_codewrite_skip_page = ~uint32_t(0);   // 601 write-watch: page to leave unmarked for one recompile
 
+	// Code reuse cache.  The PCI PowerMac 68K DRC frequently regenerates the exact
+	// same code at the exact same address, so keep a cache of translations.  Entries
+	// record the physical address and a signature over every word of the sequence, and
+	// are dropped when the cache is flushed and the code goes away.  A stale match is
+	// harmless: the reused code still begins with its own translation check and
+	// checksum, so it degrades to an ordinary recompile rather than running stale.
+	//
+	// Reuse must leave the block's entry checks in the same state as a fresh compile,
+	// so the checks are recorded in m_entry_checks and re-verified before the code is handed back.
+	struct reuse_entry
+	{
+		drcuml_state::hash_codeptr code;
+		offs_t physpc;
+		uint32_t sig;
+		uint32_t checkfirst; // first of this block's entry checks in m_entry_checks
+		uint32_t checkcount; // number of entry checks the block was generated with
+	};
+	std::unordered_map<uint64_t, reuse_entry> m_reuse_cache; // key = (mode << 32) | pc
+	uint64_t m_last_reuse = ~uint64_t(0);                    // key handed back by the last compile, if it was a reuse
+
+	bool reuse_entry_checks(uint32_t first, uint32_t count);
+
 	// After a 601 self-modifying store, we clear the page's code bit and
 	// immediately recompile the store's own block.  We leave the bit clear for
 	// that whole recompile because a block can hold several sequences that would
@@ -638,6 +670,7 @@ protected:
 	uml::code_handle *   m_entry;                      // entry point
 	uml::code_handle *   m_nocode;                     // nocode exception handler
 	uml::code_handle *   m_out_of_cycles;              // out of cycles exception handler
+	uml::code_handle *   m_bus_retry;                  // unwind an I/O instruction the bus asked us to redo
 	uml::code_handle *   m_tlb_mismatch;               // tlb mismatch handler
 	uml::code_handle *   m_swap_tgpr;                  // swap TGPR handler
 	uml::code_handle *   m_lsw[8][32];                 // lsw entries
@@ -706,6 +739,7 @@ protected:
 	void set_xer(uint32_t value);
 	uint64_t get_timebase();
 	void set_timebase(uint64_t newtb);
+	uint64_t get_rtc();
 	virtual uint32_t get_decrementer();
 	virtual void set_decrementer(uint32_t newdec);
 	uint32_t ppccom_translate_address_internal(int intention, bool debug, offs_t &address);
@@ -732,6 +766,7 @@ protected:
 	void static_generate_entry_point();
 	void static_generate_nocode_handler();
 	void static_generate_out_of_cycles();
+	void static_generate_bus_retry();
 	void static_generate_tlb_mismatch();
 	void static_generate_code_write_reset();
 	void static_generate_exception(uint8_t exception, int recover, const char *name);
@@ -804,6 +839,9 @@ class ppc601_device : public ppc_device
 {
 public:
 	ppc601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void set_rtc_clock(uint32_t rtc_clock) { c_rtc_clock = rtc_clock; }
+	void set_rtc_clock(const XTAL &xtal) { set_rtc_clock(xtal.value()); }
 
 protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;

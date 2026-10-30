@@ -23,7 +23,7 @@ private:
 	u8 m_stack_ptr;
 
 	optional_shared_ptr<u16> m_sharedprotram;
-	required_memory_region m_rom;
+	required_region_ptr<u8> m_rom;
 
 	u32 read_reg(u16 offset);
 	void write_reg(u16 offset, u32 data);

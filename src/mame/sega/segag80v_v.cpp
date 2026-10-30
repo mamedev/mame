@@ -324,14 +324,15 @@ void segag80v_state::video_start()
 	if (!m_vectorram.bytes())
 		throw emu_fatalerror("segag80v_state::video_start: !vectorram.bytes()");
 
-	m_min_x = m_screen->visible_area().min_x;
-	m_min_y = m_screen->visible_area().min_y;
+	m_min_x = m_vector->visible_area().min_x;
+	m_min_y = m_vector->visible_area().min_y;
 }
 
 
-u32 segag80v_state::screen_update_segag80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void segag80v_state::vector_update_segag80v(vector_device &vector)
 {
+	m_edgint_ff_state = 1;
+	update_int();
+
 	sega_generate_vector_list();
-	m_vector->screen_update(screen, bitmap, cliprect);
-	return 0;
 }

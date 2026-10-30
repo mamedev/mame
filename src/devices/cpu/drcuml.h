@@ -144,6 +144,14 @@ private:
 class drcbe_interface
 {
 public:
+	struct hash_codeptr
+	{
+		drccodeptr ptr = nullptr;
+		uintptr_t aux = 0U;
+
+		explicit operator bool() const { return bool(ptr); }
+	};
+
 	// allow deleting through base pointer
 	virtual ~drcbe_interface();
 
@@ -155,6 +163,13 @@ public:
 	virtual void hash_invalidate_range(u32 pcstart, u32 pcend) noexcept = 0;
 	virtual void get_info(drcbe_info &info) const noexcept = 0;
 	virtual bool logging() const noexcept { return false; }
+
+	// Optional direct access to the hash table, allowing a front-end to point an entry
+	// back at code it generated earlier rather than regenerating identical code.
+	// Back-ends that don't implement these report "unsupported" and the front-end
+	// simply compiles as it normally would.
+	virtual hash_codeptr hash_get_codeptr(u32 mode, u32 pc) const noexcept;
+	virtual bool hash_set_codeptr(u32 mode, u32 pc, hash_codeptr code) noexcept;
 
 protected:
 	// base constructor
@@ -173,6 +188,8 @@ protected:
 class drcuml_state
 {
 public:
+	using hash_codeptr = drcbe_interface::hash_codeptr;
+
 	// construction/destruction
 	drcuml_state(device_t &device, drc_cache &cache, u32 flags, int modes, int addrbits, int ignorebits, u32 max_sequence_length);
 	~drcuml_state();
@@ -194,6 +211,8 @@ public:
 	void get_backend_info(drcbe_info &info) const { m_beintf->get_info(info); }
 	bool hash_exists(u32 mode, u32 pc) const { return m_beintf->hash_exists(mode, pc); }
 	void hash_invalidate_range(u32 pcstart, u32 pcend) { m_beintf->hash_invalidate_range(pcstart, pcend); }
+	hash_codeptr hash_get_codeptr(u32 mode, u32 pc) const { return m_beintf->hash_get_codeptr(mode, pc); }
+	bool hash_set_codeptr(u32 mode, u32 pc, hash_codeptr code) { return m_beintf->hash_set_codeptr(mode, pc, code); }
 	void generate(drcuml_block &block, uml::instruction *instructions, u32 count) { m_beintf->generate(block, instructions, count); }
 
 	// handle management

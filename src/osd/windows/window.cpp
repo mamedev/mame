@@ -17,12 +17,13 @@
 
 // MAME headers
 #include "emu.h"
+#include "video.h"
 #include "ui/uimain.h"
 
 // MAMEOS headers
 #include "winmain.h"
 #include "window.h"
-#include "video.h"
+#include "winvideo.h"
 #include "winutf8.h"
 
 #include "winutil.h"
@@ -108,8 +109,8 @@ static DWORD main_threadid;
 static int ui_temp_pause;
 static int ui_temp_was_paused;
 
-static HANDLE window_thread;
-static DWORD window_threadid;
+[[maybe_unused]] static HANDLE window_thread; // to be able to get it in a debugger when debugging COM issues
+[[maybe_unused]] static DWORD window_threadid; // debug builds only
 
 static DWORD last_update_time;
 

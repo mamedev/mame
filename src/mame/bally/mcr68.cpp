@@ -303,8 +303,7 @@ void mcr68_state::mcr68_update_sprites(screen_device &screen, bitmap_ind16 &bitm
 	rectangle sprite_clip = m_screen->visible_area();
 
 	/* adjust for clipping */
-	sprite_clip.min_x += m_sprite_clip;
-	sprite_clip.max_x -= m_sprite_clip;
+	sprite_clip.insetx(m_sprite_clip, m_sprite_clip);
 	sprite_clip &= cliprect;
 
 	screen.priority().fill(1, sprite_clip);
@@ -1228,7 +1227,7 @@ void mcr68_state::mcr68(machine_config &config)
 	m_ptm->irq_callback().set_inputline("maincpu", 2);
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(30);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */ );
 	m_screen->set_size(32*16, 30*16);

@@ -18,6 +18,8 @@ public:
 	{
 		LOWPASS1P = 0,
 		HIGHPASS1P,
+		LOWPASS1P1Z,
+		HIGHPASS1P1Z,
 		LOWPASS,
 		HIGHPASS,
 		BANDPASS,
@@ -25,8 +27,11 @@ public:
 		PEAK,
 		LOWSHELF,
 		HIGHSHELF,
-		RAWPARAMS,
-		HIGHPASS1P1Z
+		LOWSHELF1O,
+		HIGHSHELF1O,
+		ALLPASS,
+		ALLPASS1O,
+		RAWPARAMS
 	};
 
 	struct biquad_params
@@ -65,6 +70,11 @@ public:
 	void opamp_sk_highpass_modify(double r1, double r2, double r3, double r4, double c1, double c2);
 
 	// TODO when needed: Sallen-Key band-pass (there are several versions of this in the 1955 Sallen-Key paper)
+	/*filter_biquad_device& opamp_sk_bandpass_setup(double r1, double r2, double r3, double r4, double r5, double c1, double c2);
+	void opamp_sk_bandpass_modify(double r1, double r2, double r3, double r4, double r5, double c1, double c2);
+	biquad_params opamp_sk_bandpass_calc(double r1, double r2, double r3, double r4, double r5, double c1, double c2);*/
+
+	// TODO when needed: Sallen-Key band-reject ... does this even exist?
 
 	// Multiple-Feedback low-pass
 	filter_biquad_device &opamp_mfb_lowpass_setup(double r1, double r2, double r3, double c1, double c2);
@@ -76,6 +86,11 @@ public:
 
 	// Multiple-Feedback high-pass
 	filter_biquad_device &opamp_mfb_highpass_setup(double r1, double r2, double c1, double c2, double c3);
+
+	// Inverting first-order low-pass
+	/*filter_biquad_device& opamp_inv_lowpass_setup(double r1, double r2, double c1);
+	void opamp_inv_lowpass_modify(double r1, double r2, double c1);
+	biquad_params opamp_inv_lowpass_calc(double r1, double r2, double c1);*/
 
 	// Differentiator band-pass
 	filter_biquad_device &opamp_diff_bandpass_setup(double r1, double r2, double c1, double c2);

@@ -62,6 +62,9 @@ enum
 #define VFP_LORES           22
 #define HFP_LORES           16
 
+#define LINES_PER_FRAME     262
+#define CCLK_LORES          1824
+
 
 
 //**************************************************************************
@@ -77,7 +80,7 @@ DEFINE_DEVICE_TYPE(AMS40041, ams40041_device, "ams40041", "AMS40041 VDU")
 ams40041_device::ams40041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6845_device(mconfig, AMS40041, tag, owner, clock)
 	, m_char_rom(*this, DEVICE_SELF)
-	, m_lk(*this, "^LK") // hack
+	, m_lk_cb(*this, 0x60)
 {
 	m_clk_scale = 32;
 
@@ -252,12 +255,11 @@ uint8_t ams40041_device::vdu_r(offs_t offset)
 		// light pen switch
 		data |= 0x04;
 
-		// vertical sync
-		//data |= vsync_r();
+		int line = int((machine().time().as_ticks(clock()) / CCLK_LORES) % LINES_PER_FRAME);
 		int flyback = 0;
 
-		if (screen().vpos() < VFP_LORES - 16) flyback = 1;
-		if (screen().vpos() > VFP_LORES + 200) flyback = 1;
+		if (line < VFP_LORES - 16) flyback = 1;
+		if (line > VFP_LORES + 200) flyback = 1;
 
 		data |= flyback << 3;
 		break;
@@ -482,7 +484,7 @@ int ams40041_device::get_display_mode(uint8_t mode)
 
 offs_t ams40041_device::get_char_rom_offset()
 {
-	return ((m_lk->read() >> 5) & 0x03) << 11;
+	return ((m_lk_cb() >> 5) & 0x03) << 11;
 }
 
 MC6845_UPDATE_ROW( ams40041_device::draw_alpha )

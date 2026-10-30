@@ -87,7 +87,7 @@ void mrdo_state::protection_w(uint8_t data)
 
 uint8_t mrdo_state::protection_r()
 {
-	// HACK: workaround until accurate PAL emulation
+	// HACK: workaround until we have accurate PAL emulation
 	uint8_t *ROM = memregion("maincpu")->base();
 	return ROM[m_maincpu->state_int(Z80_HL)];
 }
@@ -226,7 +226,7 @@ void mrdo_state::mrdo(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(mrdo_state::irq0_line_hold));
 
 	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(19.6_MHz_XTAL/4, 312, 8, 248, 262, 32, 224);
 	screen.set_screen_update(FUNC(mrdo_state::screen_update_mrdo));
 	screen.set_palette(m_palette);

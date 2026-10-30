@@ -41,14 +41,6 @@ Notes:
 
 */
 
-/*
-
-    TODO:
-
-    - serial input is not working, fails systest1600 keyboard test
-
-*/
-
 #include "emu.h"
 #include "abc77.h"
 #include "speaker.h"
@@ -165,7 +157,7 @@ INPUT_CHANGED_MEMBER( abc77_device::keyboard_reset )
 {
 	if (oldval && !newval)
 	{
-		device_reset();
+		reset();
 	}
 }
 

@@ -2,7 +2,7 @@
 // basic_raw_socket.hpp
 // ~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -27,6 +27,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 
 #if !defined(ASIO_BASIC_RAW_SOCKET_FWD_DECL)
 #define ASIO_BASIC_RAW_SOCKET_FWD_DECL
@@ -339,7 +340,7 @@ public:
    * This function is used to send data on the raw socket. The function call
    * will block until the data has been sent successfully or an error occurs.
    *
-   * @param buffers One ore more data buffers to be sent on the socket.
+   * @param buffers One or more data buffers to be sent on the socket.
    *
    * @returns The number of bytes sent.
    *
@@ -370,7 +371,7 @@ public:
    * This function is used to send data on the raw socket. The function call
    * will block until the data has been sent successfully or an error occurs.
    *
-   * @param buffers One ore more data buffers to be sent on the socket.
+   * @param buffers One or more data buffers to be sent on the socket.
    *
    * @param flags Flags specifying how the send call is to be made.
    *
@@ -439,7 +440,7 @@ public:
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using asio::async_immediate().
    *
    * @par Completion Signature
    * @code void(asio::error_code, std::size_t) @endcode
@@ -509,7 +510,7 @@ public:
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using asio::async_immediate().
    *
    * @par Completion Signature
    * @code void(asio::error_code, std::size_t) @endcode
@@ -658,7 +659,7 @@ public:
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using asio::async_immediate().
    *
    * @par Completion Signature
    * @code void(asio::error_code, std::size_t) @endcode
@@ -731,7 +732,7 @@ public:
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using asio::async_immediate().
    *
    * @par Completion Signature
    * @code void(asio::error_code, std::size_t) @endcode
@@ -876,7 +877,7 @@ public:
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using asio::async_immediate().
    *
    * @par Completion Signature
    * @code void(asio::error_code, std::size_t) @endcode
@@ -947,7 +948,7 @@ public:
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using asio::async_immediate().
    *
    * @par Completion Signature
    * @code void(asio::error_code, std::size_t) @endcode
@@ -1019,7 +1020,7 @@ public:
     asio::detail::throw_error(ec, "receive_from");
     return s;
   }
-  
+
   /// Receive raw data with the endpoint of the sender.
   /**
    * This function is used to receive raw data. The function call will block
@@ -1046,7 +1047,7 @@ public:
     asio::detail::throw_error(ec, "receive_from");
     return s;
   }
-  
+
   /// Receive raw data with the endpoint of the sender.
   /**
    * This function is used to receive raw data. The function call will block
@@ -1100,7 +1101,7 @@ public:
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using asio::async_immediate().
    *
    * @par Completion Signature
    * @code void(asio::error_code, std::size_t) @endcode
@@ -1173,7 +1174,7 @@ public:
    * Regardless of whether the asynchronous operation completes immediately or
    * not, the completion handler will not be invoked from within this function.
    * On immediate completion, invocation of the handler will be performed in a
-   * manner equivalent to using asio::post().
+   * manner equivalent to using asio::async_immediate().
    *
    * @par Completion Signature
    * @code void(asio::error_code, std::size_t) @endcode
@@ -1349,6 +1350,7 @@ private:
   };
 };
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

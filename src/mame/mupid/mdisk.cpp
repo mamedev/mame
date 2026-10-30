@@ -60,6 +60,7 @@ private:
 	void fdc_side_w(uint8_t data);
 
 	void update_irq(uint8_t vector);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
 	required_device<z80_device> m_cpu;
 	required_device<ram_device> m_ram;
@@ -71,7 +72,10 @@ private:
 
 	emu_timer *m_rom_timer;
 
-	int m_uart1_rxrdy, m_uart1_txrdy, m_fdc_irq;
+	int m_uart1_rxrdy;
+	int m_uart1_txrdy;
+	int m_fdc_irq;
+	uint8_t m_irq_vector;
 };
 
 
@@ -138,6 +142,7 @@ void mdisk_state::machine_start()
 	save_item(NAME(m_uart1_rxrdy));
 	save_item(NAME(m_uart1_txrdy));
 	save_item(NAME(m_fdc_irq));
+	save_item(NAME(m_irq_vector));
 }
 
 void mdisk_state::machine_reset()
@@ -153,6 +158,7 @@ void mdisk_state::machine_reset()
 	m_uart1_rxrdy = 0;
 	m_uart1_txrdy = 0;
 	m_fdc_irq = 0;
+	m_irq_vector = 0;
 }
 
 TIMER_CALLBACK_MEMBER(mdisk_state::rom_timer_callback)
@@ -164,10 +170,13 @@ TIMER_CALLBACK_MEMBER(mdisk_state::rom_timer_callback)
 
 void mdisk_state::update_irq(uint8_t vector)
 {
-	if (m_uart1_rxrdy || m_uart1_txrdy || m_fdc_irq)
-		m_cpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, vector); // Z80
-	else
-		m_cpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	m_irq_vector = vector;
+	m_cpu->set_input_line(INPUT_LINE_IRQ0, (m_uart1_rxrdy || m_uart1_txrdy || m_fdc_irq) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(mdisk_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 void mdisk_state::fdc_irq_w(int state)
@@ -203,6 +212,7 @@ void mdisk_state::mdisk(machine_config &config)
 	Z80(config, m_cpu, 4_MHz_XTAL);
 	m_cpu->set_addrmap(AS_PROGRAM, &mdisk_state::mdisk_mem);
 	m_cpu->set_addrmap(AS_IO, &mdisk_state::mdisk_io);
+	m_cpu->set_irq_acknowledge_callback(FUNC(mdisk_state::cpu_acknowledge_irq));
 
 	// 64k internal ram
 	RAM(config, m_ram).set_default_size("64K");

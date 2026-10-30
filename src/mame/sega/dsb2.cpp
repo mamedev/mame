@@ -33,6 +33,7 @@ dsb2_device::dsb2_device(const machine_config &mconfig, const char *tag, device_
 	m_lp_end(0),
 	m_start(0),
 	m_end(0),
+	m_rom_bank(0),
 	m_mp_pos(0),
 	m_audio_pos(0),
 	m_audio_avail(0),
@@ -88,6 +89,7 @@ void dsb2_device::device_start()
 	save_item(NAME(m_lp_end));
 	save_item(NAME(m_start));
 	save_item(NAME(m_end));
+	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_mp_pos));
 	save_item(NAME(m_audio_pos));
 	save_item(NAME(m_audio_avail));
@@ -96,6 +98,7 @@ void dsb2_device::device_start()
 void dsb2_device::device_reset()
 {
 	m_start = m_end = 0;
+	m_rom_bank = 0;
 	m_audio_pos = m_audio_avail = 0;
 	std::fill(std::begin(m_audio_buf), std::end(m_audio_buf), 0);
 	m_mp_vol = 0x7f;
@@ -129,7 +132,15 @@ TIMER_CALLBACK_MEMBER(dsb2_device::timer_irq_cb)
 
 void dsb2_device::system_control_w(offs_t offset, u8 data)
 {
-	LOG("$d00001: write %02x\n", data);
+	// Bit 3 of this latch is the MPEG ROM bank select (A24, inverted): the 68k
+	// firmware sets bit 3 before playing a song from the lower 16MB of MPEG ROM
+	// and clears it for the upper 16MB (flsbeats epr-21612 routines $db8/$dc4,
+	// driven by bit 7 of the song-table flag byte at record offset 0; the
+	// START/END fifo commands only carry a 24-bit address). Only honored when
+	// more than 16MB of MPEG ROM is populated, so boards with <=16MB (model2/3
+	// DSB2 users) are unaffected.
+	m_rom_bank = BIT(~data, 3);
+	LOG("$d00001: write %02x (mpeg bank %d)\n", data, m_rom_bank);
 }
 
 void dsb2_device::fifo_w(offs_t offset, u8 data)
@@ -176,13 +187,54 @@ void dsb2_device::fifo_w(offs_t offset, u8 data)
 		default:
 		{
 			if ((data & 0xfe) == 0x14)
+			{
+				// The START opcode is 0x14 or 0x15; the low bit is the MPEG
+				// player/channel number (the 68k firmware ORs a per-player id byte,
+				// initialized to 4 and 5, with 0x10/0x20/0x70/0x80 to form each
+				// command). It is NOT part of the address: the upper-16MB bank
+				// select arrives separately via bit 3 of the $d00001 latch.
 				m_command = mpeg_command_t::START_ADDRESS_HI;
+			}
 			if ((data & 0xfe) == 0x24)
+			{
 				m_command = mpeg_command_t::END_ADDRESS_HI;
+			}
 			if ((data & 0xfe) == 0x74)
 			{
-				m_mp_pos = m_mp_start * 8;
-				m_player = mpeg_player_t::PLAYING;
+				const uint32_t rom_bytes = (uint32_t)m_mpeg_rom.length();
+
+				// Apply the ROM bank (A24) latched via system_control_w. Only 24
+				// address bits travel through the fifo; boards populated with more
+				// than 16MB of MPEG ROM select the upper half with the bank line.
+				// No song crosses the 16MB boundary (the flsbeats firmware song
+				// table tiles each half separately), so latching it at play time
+				// is equivalent to decoding it live.
+				uint32_t start = m_mp_start & 0xffffff;
+				uint32_t end = m_mp_end & 0xffffff;
+				if (rom_bytes > 0x1000000 && m_rom_bank)
+				{
+					start |= 0x1000000;
+					end |= 0x1000000;
+				}
+
+				// Guard: never start a play window that falls outside the mpeg ROM
+				// region or has end <= start. A bad/unmapped index would otherwise
+				// drive the decoder's unbounded bit-reader past the ROM buffer and
+				// crash MAME (host-side access violation) instead of failing safe.
+				if (start >= rom_bytes || end > rom_bytes || end <= start)
+				{
+					logerror("dsb2: refusing out-of-range play window start=%07x end=%07x (romsz=%07x)\n",
+						start, end, rom_bytes);
+					m_player = mpeg_player_t::NOT_PLAYING;
+					m_audio_pos = m_audio_avail = 0;
+				}
+				else
+				{
+					m_mp_start = start;
+					m_mp_end = end;
+					m_mp_pos = m_mp_start * 8;
+					m_player = mpeg_player_t::PLAYING;
+				}
 			}
 
 			if ((data & 0xfe) == 0x84)

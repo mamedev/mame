@@ -292,7 +292,7 @@ void cchance_state::cchance(machine_config &config)
 	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57.5);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(32*8, 32*8);
@@ -329,4 +329,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1987, cchance, 0, cchance, cchance, cchance_state, empty_init, ROT0, "Taito Corporation", "Cherry Chance", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // year/manufacturer confirmed from Taito old "Arcade Game History" page
+GAME( 1987, cchance, 0, cchance, cchance, cchance_state, empty_init, ROT0, "Taito", "Cherry Chance", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // year/manufacturer confirmed from Taito old "Arcade Game History" page

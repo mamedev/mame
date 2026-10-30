@@ -349,7 +349,7 @@ void jazz_state::jazz(machine_config &config)
 	m_kbdc->aux_data().set(aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
 	m_kbdc->aux_irq().set(m_mct_adr, FUNC(mct_adr_device::irq<7>));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(78643200, 1280, 0, 1280, 1024, 0, 1024);
 	m_screen->set_screen_update(m_cvc, FUNC(g364_device::screen_update));
 	m_screen->screen_vblank().set(m_mct_adr, FUNC(mct_adr_device::irq<3>)); // maybe?

@@ -19,20 +19,11 @@ void coco12_state::machine_start()
 {
 	coco_state::machine_start();
 	configure_sam();
-}
 
-
-
-//-------------------------------------------------
-//  coco12_state::configure_sam
-//-------------------------------------------------
-
-void coco12_state::configure_sam()
-{
-	offs_t ramsize = m_ram->size();
-	m_sam->space(0).install_ram(0, ramsize - 1, m_ram->pointer());
-	if (ramsize < 65536)
-		m_sam->space(0).nop_readwrite(ramsize, 0xffff);
+	// right joystick
+	m_joy_handlers[0] = std::make_unique<coco_joy_standard>(*this, 0, ioport(JOYSTICK_BUTTONS_TAG));
+	// left joystick
+	m_joy_handlers[1] = std::make_unique<coco_joy_standard>(*this, 2, ioport(JOYSTICK_BUTTONS_TAG));
 }
 
 
@@ -60,6 +51,20 @@ void coco12_state::field_sync(int state)
 
 
 //-------------------------------------------------
+//  coco12_state::configure_sam
+//-------------------------------------------------
+
+void coco12_state::configure_sam()
+{
+	offs_t ramsize = m_ram->size();
+	m_sam->space(0).install_ram(0, ramsize - 1, m_ram->pointer());
+	if (ramsize < 65536)
+		m_sam->space(0).nop_readwrite(ramsize, 0xffff);
+}
+
+
+
+//-------------------------------------------------
 //  sam_read
 //-------------------------------------------------
 
@@ -77,10 +82,10 @@ uint8_t coco12_state::sam_read(offs_t offset)
 //  pia1_pb_changed
 //-------------------------------------------------
 
-void coco12_state::pia1_pb_changed(uint8_t data)
+void coco12_state::pia1_pb_w(uint8_t data)
 {
 	/* call inherited function */
-	coco_state::pia1_pb_changed(data);
+	coco_state::pia1_pb_w(data);
 
 	m_vdg->css_w(data & 0x08);
 	m_vdg->intext_w(data & 0x10);
@@ -98,7 +103,7 @@ void coco12_state::pia1_pb_changed(uint8_t data)
 
 void deluxecoco_state::machine_start()
 {
-	coco12_state::device_start();
+	coco12_state::machine_start();
 	configure_sam();
 
 	m_ram_view.disable();

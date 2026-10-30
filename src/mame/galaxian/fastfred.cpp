@@ -11,14 +11,488 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "fastfred.h"
+#include "galaxold.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 
 #include "speaker.h"
+#include "tilemap.h"
+#include "video/resnet.h"
+
+
+namespace {
+
+class fastfred_state : public galaxold_state
+{
+public:
+	fastfred_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galaxold_state(mconfig, type, tag)
+		, m_outlatch(*this, "outlatch")
+		, m_videoram(*this, "videoram")
+		, m_spriteram(*this, "spriteram")
+		, m_attributesram(*this, "attributesram")
+		, m_background_color(*this, "bgcolor")
+	{ }
+
+	void jumpcoas(machine_config &config) ATTR_COLD;
+	void fastfred(machine_config &config) ATTR_COLD;
+
+	void init_fastfred() ATTR_COLD;
+	void init_flyboy() ATTR_COLD;
+	void init_flyboyb() ATTR_COLD;
+	void init_boggy84() ATTR_COLD;
+	void init_jumpcoas() ATTR_COLD;
+	void init_boggy84b() ATTR_COLD;
+
+protected:
+	required_device<ls259_device> m_outlatch;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_attributesram;
+	optional_shared_ptr<uint8_t> m_background_color;
+
+	int m_hardware_type = 0;
+	uint16_t m_charbank = 0U;
+	uint8_t m_colorbank = 0U;
+	uint8_t m_nmi_mask = 0U;
+	uint8_t m_sound_nmi_mask = 0U;
+
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	uint8_t fastfred_custom_io_r(offs_t offset);
+	uint8_t flyboy_custom1_io_r(offs_t offset);
+	uint8_t flyboy_custom2_io_r(offs_t offset);
+	uint8_t jumpcoas_custom_io_r(offs_t offset);
+	uint8_t boggy84_custom_io_r(offs_t offset);
+	void nmi_mask_w(int state);
+	void sound_nmi_mask_w(uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	void attributes_w(offs_t offset, uint8_t data);
+	void charbank1_w(int state);
+	void charbank2_w(int state);
+	void colorbank1_w(int state);
+	void colorbank2_w(int state);
+	void flip_screen_x_w(int state);
+	void flip_screen_y_w(int state);
+
+	TILE_GET_INFO_MEMBER(get_tile_info);
+
+	void vblank_irq(int state);
+	INTERRUPT_GEN_MEMBER(sound_timer_irq);
+
+	virtual void machine_start() override ATTR_COLD;
+	void fastfred_palette(palette_device &palette) const;
+	DECLARE_VIDEO_START(fastfred);
+
+	uint32_t screen_update_fastfred(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void fastfred_map(address_map &map) ATTR_COLD;
+	void jumpcoas_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+};
+
+class imago_state : public fastfred_state
+{
+public:
+	imago_state(const machine_config &mconfig, device_type type, const char *tag)
+		: fastfred_state(mconfig, type, tag)
+		, m_fg_videoram(*this, "imago_fg_vram")
+		, m_gfx2(*this, "gfx2")
+	{ }
+
+	void imago(machine_config &config) ATTR_COLD;
+
+	void init_imago() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	required_shared_ptr<uint8_t> m_fg_videoram;
+	required_region_ptr<uint8_t> m_gfx2;
+
+	uint8_t m_sprites[0x800*3]{};
+	uint16_t m_sprites_address = 0U;
+	uint8_t m_sprites_bank = 0U;
+
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_web_tilemap = nullptr;
+
+	void dma_irq_w(int state);
+	void sprites_bank_w(uint8_t data);
+	void sprites_dma_w(offs_t offset, uint8_t data);
+	uint8_t sprites_offset_r(address_space &space, offs_t offset);
+	void fg_videoram_w(offs_t offset, uint8_t data);
+	void imago_charbank_w(int state);
+
+	TILE_GET_INFO_MEMBER(get_tile_info_bg);
+	TILE_GET_INFO_MEMBER(get_tile_info_fg);
+	TILE_GET_INFO_MEMBER(get_tile_info_web);
+
+	DECLARE_VIDEO_START(imago);
+
+	uint32_t screen_update_imago(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void imago_map(address_map &map) ATTR_COLD;
+};
+
+
+/***************************************************************************
+
+  Convert the color PROMs into a more useable format.
+
+  bit 0 -- 1  kohm resistor  -- RED/GREEN/BLUE
+        -- 470 ohm resistor  -- RED/GREEN/BLUE
+        -- 220 ohm resistor  -- RED/GREEN/BLUE
+  bit 3 -- 100 ohm resistor  -- RED/GREEN/BLUE
+
+***************************************************************************/
+
+void fastfred_state::fastfred_palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+	static constexpr int resistances[4] = { 1000, 470, 220, 100 };
+
+	// compute the color output resistor weights
+	double rweights[4], gweights[4], bweights[4];
+	compute_resistor_weights(0, 255, -1.0,
+			4, resistances, rweights, 470, 0,
+			4, resistances, gweights, 470, 0,
+			4, resistances, bweights, 470, 0);
+
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x100; i++)
+	{
+		int bit0, bit1, bit2, bit3;
+
+		// red component
+		bit0 = BIT(color_prom[i | 0x000], 0);
+		bit1 = BIT(color_prom[i | 0x000], 1);
+		bit2 = BIT(color_prom[i | 0x000], 2);
+		bit3 = BIT(color_prom[i | 0x000], 3);
+		int const r = combine_weights(rweights, bit0, bit1, bit2, bit3);
+
+		// green component
+		bit0 = BIT(color_prom[i | 0x100], 0);
+		bit1 = BIT(color_prom[i | 0x100], 1);
+		bit2 = BIT(color_prom[i | 0x100], 2);
+		bit3 = BIT(color_prom[i | 0x100], 3);
+		int const g = combine_weights(gweights, bit0, bit1, bit2, bit3);
+
+		// blue component
+		bit0 = BIT(color_prom[i | 0x200], 0);
+		bit1 = BIT(color_prom[i | 0x200], 1);
+		bit2 = BIT(color_prom[i | 0x200], 2);
+		bit3 = BIT(color_prom[i | 0x200], 3);
+		int const b = combine_weights(bweights, bit0, bit1, bit2, bit3);
+
+		palette.set_indirect_color(i, rgb_t(r, g, b));
+	}
+
+	// characters and sprites use the same palette
+	for (int i = 0; i < 0x100; i++)
+		palette.set_pen_indirect(i, i);
+}
+
+/***************************************************************************
+
+  Callbacks for the TileMap code
+
+***************************************************************************/
+
+TILE_GET_INFO_MEMBER(fastfred_state::get_tile_info)
+{
+	uint8_t x = tile_index & 0x1f;
+
+	uint16_t code = m_charbank | m_videoram[tile_index];
+	uint8_t color = m_colorbank | (m_attributesram[2 * x + 1] & 0x07);
+
+	tileinfo.set(0, code, color, 0);
+}
+
+
+
+/*************************************
+ *
+ *  Video system start
+ *
+ *************************************/
+
+VIDEO_START_MEMBER(fastfred_state,fastfred)
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fastfred_state::get_tile_info)), TILEMAP_SCAN_ROWS,8,8,32,32);
+
+	m_bg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_scroll_cols(32);
+}
+
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
+
+void fastfred_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+
+void fastfred_state::attributes_w(offs_t offset, uint8_t data)
+{
+	if (m_attributesram[offset] != data)
+	{
+		if (offset & 0x01)
+		{
+			/* color change */
+			for (int i = offset / 2; i < 0x0400; i += 32)
+				m_bg_tilemap->mark_tile_dirty(i);
+		}
+		else
+		{
+			/* coloumn scroll */
+			m_bg_tilemap->set_scrolly(offset / 2, data);
+		}
+
+		m_attributesram[offset] = data;
+	}
+}
+
+
+void fastfred_state::charbank1_w(int state)
+{
+	uint16_t new_data = (m_charbank & 0x0200) | (state << 8);
+
+	if (new_data != m_charbank)
+	{
+		m_bg_tilemap->mark_all_dirty();
+
+		m_charbank = new_data;
+	}
+}
+
+void fastfred_state::charbank2_w(int state)
+{
+	uint16_t new_data = (m_charbank & 0x0100) | (state << 9);
+
+	if (new_data != m_charbank)
+	{
+		m_bg_tilemap->mark_all_dirty();
+
+		m_charbank = new_data;
+	}
+}
+
+
+void fastfred_state::colorbank1_w(int state)
+{
+	uint8_t new_data = (m_colorbank & 0x10) | (state << 3);
+
+	if (new_data != m_colorbank)
+	{
+		m_bg_tilemap->mark_all_dirty();
+
+		m_colorbank = new_data;
+	}
+}
+
+void fastfred_state::colorbank2_w(int state)
+{
+	uint8_t new_data = (m_colorbank & 0x08) | (state << 4);
+
+	if (new_data != m_colorbank)
+	{
+		m_bg_tilemap->mark_all_dirty();
+
+		m_colorbank = new_data;
+	}
+}
+
+
+
+void fastfred_state::flip_screen_x_w(int state)
+{
+	flip_screen_x_set(state);
+
+	m_bg_tilemap->set_flip((flip_screen_x() ? TILEMAP_FLIPX : 0) | (flip_screen_y() ? TILEMAP_FLIPY : 0));
+}
+
+void fastfred_state::flip_screen_y_w(int state)
+{
+	flip_screen_y_set(state);
+
+	m_bg_tilemap->set_flip((flip_screen_x() ? TILEMAP_FLIPX : 0) | (flip_screen_y() ? TILEMAP_FLIPY : 0));
+}
+
+
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
+
+void fastfred_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const rectangle spritevisiblearea(2*8, 32*8-1, 2*8, 30*8-1);
+	const rectangle spritevisibleareaflipx(0*8, 30*8-1, 2*8, 30*8-1);
+	int offs;
+
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	{
+		uint8_t code,sx,sy;
+		int flipx,flipy;
+
+		sx = m_spriteram[offs + 3];
+		sy = 240 - m_spriteram[offs];
+
+		if (m_hardware_type == 3)
+		{
+			// Imago
+			code  = (m_spriteram[offs + 1]) & 0x3f;
+			flipx = 0;
+			flipy = 0;
+		}
+		else if (m_hardware_type == 2)
+		{
+			// Boggy 84
+			code  =  m_spriteram[offs + 1] & 0x7f;
+			flipx =  0;
+			flipy =  m_spriteram[offs + 1] & 0x80;
+		}
+		else if (m_hardware_type == 1)
+		{
+			// Fly-Boy/Fast Freddie/Red Robin
+			code  =  m_spriteram[offs + 1] & 0x7f;
+			flipx =  0;
+			flipy = ~m_spriteram[offs + 1] & 0x80;
+		}
+		else
+		{
+			// Jump Coaster
+			code  = (m_spriteram[offs + 1] & 0x3f) | 0x40;
+			flipx = ~m_spriteram[offs + 1] & 0x40;
+			flipy =  m_spriteram[offs + 1] & 0x80;
+		}
+
+
+		if (flip_screen_x())
+		{
+			sx = 240 - sx;
+			flipx = !flipx;
+		}
+		if (flip_screen_y())
+		{
+			sy = 240 - sy;
+			flipy = !flipy;
+		}
+
+		m_gfxdecode->gfx(1)->transpen(bitmap,flip_screen_x() ? spritevisibleareaflipx : spritevisiblearea,
+				code,
+				m_colorbank | (m_spriteram[offs + 2] & 0x07),
+				flipx,flipy,
+				sx,sy,0);
+	}
+}
+
+
+uint32_t fastfred_state::screen_update_fastfred(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(*m_background_color, cliprect);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	draw_sprites(bitmap, cliprect);
+
+	return 0;
+}
+
+
+TILE_GET_INFO_MEMBER(imago_state::get_tile_info_bg)
+{
+	uint8_t x = tile_index & 0x1f;
+
+	uint16_t code = m_charbank * 0x100 + m_videoram[tile_index];
+	uint8_t color = m_colorbank | (m_attributesram[2 * x + 1] & 0x07);
+
+	tileinfo.set(0, code, color, 0);
+}
+
+TILE_GET_INFO_MEMBER(imago_state::get_tile_info_fg)
+{
+	int code = m_fg_videoram[tile_index];
+	tileinfo.set(2, code, 2, 0);
+}
+
+TILE_GET_INFO_MEMBER(imago_state::get_tile_info_web)
+{
+	tileinfo.set(3, tile_index & 0x1ff, 0, 0);
+}
+
+void imago_state::fg_videoram_w(offs_t offset, uint8_t data)
+{
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+void imago_state::imago_charbank_w(int state)
+{
+	if (m_charbank != state)
+	{
+		m_charbank = state;
+		m_bg_tilemap->mark_all_dirty();
+	}
+}
+
+VIDEO_START_MEMBER(imago_state,imago)
+{
+	m_web_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(imago_state::get_tile_info_web)),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(imago_state::get_tile_info_bg)), TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_fg_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(imago_state::get_tile_info_fg)), TILEMAP_SCAN_ROWS,8,8,32,32);
+
+	m_bg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
+
+	m_flipscreen_x = 0;
+	m_flipscreen_y = 0;
+
+	/* the game has a galaxian starfield */
+	galaxold_init_stars(256);
+	m_stars_on = 1;
+	m_stars_scrollpos = 0;
+
+	/* web colors */
+	m_palette->set_pen_color(256+64+0,rgb_t(0x50,0x00,0x00));
+	m_palette->set_pen_color(256+64+1,rgb_t(0x00,0x00,0x00));
+
+	save_item(NAME(m_sprites));
+	save_item(NAME(m_sprites_address));
+	save_item(NAME(m_sprites_bank));
+
+	// galaxold starfield related save states. Something's still missing here.
+	save_item(NAME(m_stars_on));
+	save_item(NAME(m_stars_blink_state));
+	save_item(NAME(m_timer_adjusted));
+	save_item(NAME(m_stars_scrollpos));
+	save_item(STRUCT_MEMBER(m_stars, x));
+	save_item(STRUCT_MEMBER(m_stars, y));
+	save_item(STRUCT_MEMBER(m_stars, color));
+}
+
+uint32_t imago_state::screen_update_imago(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_web_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	galaxold_draw_stars(bitmap, cliprect);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	draw_sprites(bitmap, cliprect);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
+
+	return 0;
+}
 
 
 void fastfred_state::machine_start()
@@ -137,43 +611,39 @@ uint8_t fastfred_state::boggy84_custom_io_r(offs_t offset)
     Imago sprites DMA
 */
 
-MACHINE_START_MEMBER(fastfred_state,imago)
+void imago_state::machine_start()
 {
-	machine_start();
-	m_gfxdecode->gfx(1)->set_source(m_imago_sprites);
+	fastfred_state::machine_start();
+
+	m_gfxdecode->gfx(1)->set_source(m_sprites);
 }
 
-void fastfred_state::imago_dma_irq_w(int state)
+void imago_state::dma_irq_w(int state)
 {
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void fastfred_state::imago_sprites_bank_w(uint8_t data)
+void imago_state::sprites_bank_w(uint8_t data)
 {
-	m_imago_sprites_bank = (data & 2) >> 1;
+	m_sprites_bank = BIT(data, 1);
 }
 
-void fastfred_state::imago_sprites_dma_w(offs_t offset, uint8_t data)
+void imago_state::sprites_dma_w(offs_t offset, uint8_t data)
 {
-	uint8_t *rom = (uint8_t *)memregion("gfx2")->base();
-	uint8_t sprites_data;
+	auto const base = m_sprites_address + (m_sprites_bank << 12);
 
-	sprites_data = rom[m_imago_sprites_address + 0x2000*0 + m_imago_sprites_bank * 0x1000];
-	m_imago_sprites[offset + 0x800*0] = sprites_data;
+	m_sprites[offset + 0x800*0] = m_gfx2[base + 0x2000*0];
+	m_sprites[offset + 0x800*1] = m_gfx2[base + 0x2000*1];
+	m_sprites[offset + 0x800*2] = m_gfx2[base + 0x2000*2];
 
-	sprites_data = rom[m_imago_sprites_address + 0x2000*1 + m_imago_sprites_bank * 0x1000];
-	m_imago_sprites[offset + 0x800*1] = sprites_data;
-
-	sprites_data = rom[m_imago_sprites_address + 0x2000*2 + m_imago_sprites_bank * 0x1000];
-	m_imago_sprites[offset + 0x800*2] = sprites_data;
-
-	m_gfxdecode->gfx(1)->mark_dirty(offset/32);
+	m_gfxdecode->gfx(1)->mark_dirty(offset / 32);
 }
 
-uint8_t fastfred_state::imago_sprites_offset_r(offs_t offset)
+uint8_t imago_state::sprites_offset_r(address_space &space, offs_t offset)
 {
-	m_imago_sprites_address = offset;
-	return 0xff; //not really used
+	if (!machine().side_effects_disabled())
+		m_sprites_address = offset;
+	return space.unmap(); //not really used
 }
 
 void fastfred_state::nmi_mask_w(int state)
@@ -192,11 +662,11 @@ void fastfred_state::fastfred_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xd000, 0xd3ff).mirror(0x400).ram().w(FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
-	map(0xd800, 0xd83f).ram().w(FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
-	map(0xd840, 0xd85f).ram().share("spriteram");
+	map(0xd000, 0xd3ff).mirror(0x400).ram().w(FUNC(fastfred_state::videoram_w)).share(m_videoram);
+	map(0xd800, 0xd83f).ram().w(FUNC(fastfred_state::attributes_w)).share(m_attributesram);
+	map(0xd840, 0xd85f).ram().share(m_spriteram);
 	map(0xd860, 0xdbff).ram(); // Unused, but initialized
-	map(0xe000, 0xe000).portr("BUTTONS").writeonly().share("bgcolor");
+	map(0xe000, 0xe000).portr("BUTTONS").writeonly().share(m_background_color);
 	map(0xe800, 0xe800).portr("JOYS");
 	map(0xf000, 0xf007).mirror(0x07f8).w(m_outlatch, FUNC(ls259_device::write_d0));
 	map(0xf000, 0xf000).portr("DSW").nopw();
@@ -208,11 +678,11 @@ void fastfred_state::jumpcoas_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xd000, 0xd03f).ram().w(FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
-	map(0xd040, 0xd05f).ram().share("spriteram");
+	map(0xd000, 0xd03f).ram().w(FUNC(fastfred_state::attributes_w)).share(m_attributesram);
+	map(0xd040, 0xd05f).ram().share(m_spriteram);
 	map(0xd060, 0xd3ff).ram();
-	map(0xd800, 0xdbff).mirror(0x400).ram().w(FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
-	map(0xe000, 0xe000).writeonly().share("bgcolor");
+	map(0xd800, 0xdbff).mirror(0x400).ram().w(FUNC(fastfred_state::videoram_w)).share(m_videoram);
+	map(0xe000, 0xe000).writeonly().share(m_background_color);
 	map(0xe800, 0xe800).portr("DSW1");
 	map(0xe801, 0xe801).portr("DSW2");
 	map(0xe802, 0xe802).portr("BUTTONS");
@@ -223,25 +693,25 @@ void fastfred_state::jumpcoas_map(address_map &map)
 }
 
 
-void fastfred_state::imago_map(address_map &map)
+void imago_state::imago_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-	map(0x1000, 0x1fff).r(FUNC(fastfred_state::imago_sprites_offset_r));
+	map(0x1000, 0x1fff).r(FUNC(imago_state::sprites_offset_r));
 	map(0x2000, 0x6fff).rom();
 	map(0xb000, 0xb3ff).ram(); // same fg videoram (which one of the 2 is really used?)
-	map(0xb800, 0xbfff).ram().w(FUNC(fastfred_state::imago_sprites_dma_w));
+	map(0xb800, 0xbfff).ram().w(FUNC(imago_state::sprites_dma_w));
 	map(0xc000, 0xc7ff).ram();
-	map(0xc800, 0xcbff).ram().w(FUNC(fastfred_state::imago_fg_videoram_w)).share("imago_fg_vram");
-	map(0xd000, 0xd3ff).ram().w(FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
-	map(0xd800, 0xd83f).ram().w(FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
-	map(0xd840, 0xd85f).ram().share("spriteram");
+	map(0xc800, 0xcbff).ram().w(FUNC(imago_state::fg_videoram_w)).share(m_fg_videoram);
+	map(0xd000, 0xd3ff).ram().w(FUNC(imago_state::videoram_w)).share(m_videoram);
+	map(0xd800, 0xd83f).ram().w(FUNC(imago_state::attributes_w)).share(m_attributesram);
+	map(0xd840, 0xd85f).ram().share(m_spriteram);
 	map(0xd860, 0xd8ff).ram(); // Unused, but initialized
 	map(0xe000, 0xe000).portr("BUTTONS");
 	map(0xe800, 0xe800).portr("JOYS");
 	map(0xf000, 0xf000).portr("DSW");
 	map(0xf000, 0xf007).mirror(0x03f8).w(m_outlatch, FUNC(ls259_device::write_d0));
 	map(0xf400, 0xf400).nopw(); // writes 0 or 2
-	map(0xf401, 0xf401).w(FUNC(fastfred_state::imago_sprites_bank_w));
+	map(0xf401, 0xf401).w(FUNC(imago_state::sprites_bank_w));
 	map(0xf800, 0xf800).nopr().w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
@@ -631,7 +1101,7 @@ void fastfred_state::fastfred(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); // CLOCK/16/60
 	m_screen->set_size(32*8, 32*8);
@@ -671,25 +1141,23 @@ void fastfred_state::jumpcoas(machine_config &config)
 	config.device_remove("ay8910.2");
 }
 
-void fastfred_state::imago(machine_config &config)
+void imago_state::imago(machine_config &config)
 {
 	fastfred(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &fastfred_state::imago_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &imago_state::imago_map);
 
 	m_outlatch->q_out_cb<0>().set_nop(); // writes 1 when level starts, 0 when game over
-	m_outlatch->q_out_cb<4>().set(FUNC(fastfred_state::imago_dma_irq_w));
-	m_outlatch->q_out_cb<5>().set(FUNC(fastfred_state::imago_charbank_w));
-
-	MCFG_MACHINE_START_OVERRIDE(fastfred_state,imago)
+	m_outlatch->q_out_cb<4>().set(FUNC(imago_state::dma_irq_w));
+	m_outlatch->q_out_cb<5>().set(FUNC(imago_state::imago_charbank_w));
 
 	/* video hardware */
 	m_palette->set_entries(256+64+2); // 256 for characters, 64 for the stars and 2 for the web
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_imago);
 
-	MCFG_VIDEO_START_OVERRIDE(fastfred_state,imago)
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(fastfred_state::screen_update_imago));
+	MCFG_VIDEO_START_OVERRIDE(imago_state,imago)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(imago_state::screen_update_imago));
 }
 
 #undef CLOCK
@@ -1065,10 +1533,13 @@ void fastfred_state::init_boggy84()
 }
 
 
-void fastfred_state::init_imago()
+void imago_state::init_imago()
 {
 	m_hardware_type = 3;
 }
+
+} // anonymous namespace
+
 
 GAME( 1982, flyboy,    0,        fastfred, flyboy,   fastfred_state, init_flyboy,   ROT90, "Kaneko", "Fly-Boy", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, flyboyb,   flyboy,   fastfred, flyboy,   fastfred_state, init_flyboyb,  ROT90, "bootleg", "Fly-Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
@@ -1080,5 +1551,5 @@ GAME( 1983, boggy84,   0,        jumpcoas, boggy84,  fastfred_state, init_boggy8
 GAME( 1983, boggy84b,  boggy84,  jumpcoas, boggy84,  fastfred_state, init_boggy84b, ROT90, "bootleg (Eddie's Games)", "Boggy '84 (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, boggy84b2, boggy84,  jumpcoas, boggy84,  fastfred_state, init_boggy84,  ROT90, "bootleg", "Boggy '84 (bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // one program ROM isn't dumped
 GAME( 1986, redrobin,  0,        fastfred, redrobin, fastfred_state, init_flyboyb,  ROT90, "Elettronolo", "Red Robin", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, imago,     0,        imago,    imago,    fastfred_state, init_imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )
-GAME( 1983, imagoa,    imago,    imago,    imagoa,   fastfred_state, init_imago,    ROT90, "Acom", "Imago (no cocktail set)", 0 )
+GAME( 1984, imago,     0,        imago,    imago,    imago_state,    init_imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )
+GAME( 1983, imagoa,    imago,    imago,    imagoa,   imago_state,    init_imago,    ROT90, "Acom", "Imago (no cocktail set)", 0 )

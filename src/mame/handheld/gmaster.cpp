@@ -118,9 +118,9 @@ SED1520_UPDATE_CB(gmaster_state::screen_update_cb)
 	// LCD #0: top half, LCD #1: bottom half
 	rectangle clip = m_screen->visible_area();
 	if (N == 1)
-		clip.min_y = 32;
+		clip.sety(32, clip.bottom());
 	else
-		clip.max_y = 32-1;
+		clip.sety(clip.top(), 32-1);
 	clip &= cliprect;
 
 	for (int c = 0; c < 320; c++)
@@ -229,7 +229,7 @@ void gmaster_state::gmaster(machine_config &config)
 	m_maincpu->pc_out_cb().set(FUNC(gmaster_state::portc_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(80, 64);
 	m_screen->set_visarea(0, 64-1-3, 0, 64-1);

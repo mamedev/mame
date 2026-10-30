@@ -152,7 +152,7 @@ uint32_t srmp5_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 {
 	const uint16_t *sprite_list = m_sprram.get();
 	const uint16_t *sprite_list_end = &m_sprram[0x4000]; //guess
-	const uint8_t *pixels = (uint8_t *)m_tileram.get();
+	auto const pixels = util::little_endian_cast<uint8_t const>(m_tileram.get());
 	const pen_t *const pens = m_palette->pens();
 
 //Table surface seems to be tiles, but display corrupts when switching the scene if always ON.
@@ -176,7 +176,7 @@ uint32_t srmp5_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				{
 					for (int x = 0; x < 16; x++)
 					{
-						uint8_t pen = pixels[BYTE_XOR_LE(address)];
+						uint8_t pen = pixels[address];
 						if (pen)
 						{
 							bitmap.pix(yw * 16 + y, xw * 16 + x) = pens[pen];
@@ -226,7 +226,7 @@ uint32_t srmp5_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 							const int ys2 = flipy ? ys : (sizey - ys);
 							for (int xs = 0; xs <= sizex; xs++)
 							{
-								const uint8_t pen = pixels[BYTE_XOR_LE(address & 0xfffff)];
+								const uint8_t pen = pixels[address & 0xfffff];
 								const int xs2 = flipx ? (sizex - xs) : xs;
 								if (pen)
 								{
@@ -568,7 +568,7 @@ void srmp5_state::srmp5(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(96*8, 64*8);
 	screen.set_visarea(0*8, 42*8-1, 2*8, 32*8-1);
@@ -617,4 +617,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1994, srmp5, 0, srmp5, srmp5, srmp5_state, empty_init, ROT0, "Seta", "Super Real Mahjong P5", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, srmp5, 0, srmp5, srmp5, srmp5_state, empty_init, ROT0, "Seta", "Super Real Mahjong P.V (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

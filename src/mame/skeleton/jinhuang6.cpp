@@ -113,7 +113,7 @@ void jinhuang6_state::jinhuang6(machine_config &config)
 
 	DS12885(config, "rtc", 32.768_kHz_XTAL); // should be DS12C887
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO
+	screen_device &screen(SCREEN(config, "screen")); // TODO
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);

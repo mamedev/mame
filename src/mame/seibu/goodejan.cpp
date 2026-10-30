@@ -545,7 +545,7 @@ void goodejan_state::goodejan(machine_config &config)
 	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// guess: assume ~59.61 Hz like toki, assume clock coming from the otherwise unused 12 MHz XTal
 	// (audio one don't give valid ranges for the provided HSync)
 	m_screen->set_raw(GOODEJAN_MHZ3/2, 390, 0, 256, 258, 16, 240);

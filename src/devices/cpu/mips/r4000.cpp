@@ -177,7 +177,7 @@ void r4000_base_device::device_start()
 #else
 	state_add(MIPS3_R0,        "R0",       m_r[0]).callimport().formatstr("%016X");
 	for (unsigned i = 1; i < 32; i++)
-		state_add(MIPS3_R0 + i, util::string_format("R%d", i).c_str(), m_r[i]);
+		state_add(MIPS3_R0 + i, util::string_format("R%d", i), m_r[i]);
 #endif
 
 	state_add(MIPS3_HI,        "HI",       m_hi).formatstr("%016X");
@@ -187,7 +187,7 @@ void r4000_base_device::device_start()
 	state_add(MIPS3_FCR30,     "FCR30",    m_fcr30).formatstr("%08X");
 	state_add(MIPS3_FCR31,     "FCR31",    m_fcr31).formatstr("%08X");
 	for (unsigned i = 0; i < 32; i++)
-		state_add(MIPS3_F0 + i, util::string_format("F%d", i).c_str(), m_f[i]);
+		state_add(MIPS3_F0 + i, util::string_format("F%d", i), m_f[i]);
 
 	set_icountptr(m_icount);
 
@@ -228,6 +228,7 @@ void r4000_base_device::device_reset()
 	m_cp0[CP0_Count] = 0;
 
 	m_cp0_timer_zero = total_cycles();
+	m_cp0_random_zero = total_cycles();
 
 	m_hard_reset = false;
 	m_ll_active = false;
@@ -493,7 +494,14 @@ void r4000_base_device::cpu_execute(u32 const op)
 			}
 			break;
 		case 0x1a: // DIV
-			if (m_r[RTREG])
+			// INT_MIN / -1 wraps on hardware but is undefined in C++
+			if (u32(m_r[RSREG]) == 0x8000'0000U && u32(m_r[RTREG]) == 0xffff'ffffU)
+			{
+				m_lo = s64(s32(0x8000'0000U));
+				m_hi = 0;
+				m_hilo_delay = m_hilo_cycles[2];
+			}
+			else if (m_r[RTREG])
 			{
 				m_lo = s64(s32(m_r[RSREG]) / s32(m_r[RTREG]));
 				m_hi = s64(s32(m_r[RSREG]) % s32(m_r[RTREG]));
@@ -517,7 +525,13 @@ void r4000_base_device::cpu_execute(u32 const op)
 			m_hilo_delay = m_hilo_cycles[1];
 			break;
 		case 0x1e: // DDIV
-			if (m_r[RTREG])
+			if (m_r[RSREG] == 0x8000'0000'0000'0000U && m_r[RTREG] == 0xffff'ffff'ffff'ffffU)
+			{
+				m_lo = 0x8000'0000'0000'0000U;
+				m_hi = 0;
+				m_hilo_delay = m_hilo_cycles[3];
+			}
+			else if (m_r[RTREG])
 			{
 				m_lo = s64(m_r[RSREG]) / s64(m_r[RTREG]);
 				m_hi = s64(m_r[RSREG]) % s64(m_r[RTREG]);
@@ -700,7 +714,7 @@ void r4000_base_device::cpu_execute(u32 const op)
 				cpu_exception(EXCEPTION_TR);
 			break;
 		case 0x0b: // TLTIU
-			if (m_r[RSREG] >= u64(s64(s16(op))))
+			if (m_r[RSREG] < u64(s64(s16(op))))
 				cpu_exception(EXCEPTION_TR);
 			break;
 		case 0x0c: // TEQI
@@ -1372,13 +1386,20 @@ void r4000_base_device::cp0_execute(u32 const op)
 		break;
 
 	case 0x08: // BC0
+		// the CP0 condition input is unconnected, so it always reads false
 		switch ((op >> 16) & 0x1f)
 		{
 			case 0x00: // BC0F
+				m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
+				break;
 			case 0x01: // BC0T
+				break;
 			case 0x02: // BC0FL
+				m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
+				break;
 			case 0x03: // BC0TL
-				// fall through
+				m_branch_state = NULLIFY;
+				break;
 
 			default:
 				// γ Operation codes marked with a gamma cause a reserved
@@ -1458,7 +1479,8 @@ u64 r4000_base_device::cp0_get(unsigned const reg)
 			u8 const wired = m_cp0[CP0_Wired] & 0x3f;
 
 			if (wired < std::size(m_tlb))
-				return ((total_cycles() - m_cp0_timer_zero) % (std::size(m_tlb) - wired) + wired) & 0x3f;
+				// counts down from the upper bound, restarted by reset and Wired writes
+				return ((std::size(m_tlb) - 1) - (total_cycles() - m_cp0_random_zero) % (std::size(m_tlb) - wired)) & 0x3f;
 			else
 				return std::size(m_tlb) - 1;
 		}
@@ -1490,6 +1512,8 @@ void r4000_base_device::cp0_set(unsigned const reg, u64 const data)
 		break;
 	case CP0_Wired:
 		m_cp0[CP0_Wired] = data & 0x3f;
+		// a Wired write restarts Random
+		m_cp0_random_zero = total_cycles();
 		break;
 	case CP0_Count:
 		m_cp0[CP0_Count] = u32(data);
@@ -1610,12 +1634,7 @@ void r4000_base_device::cp0_tlbwi(u8 const index)
 
 void r4000_base_device::cp0_tlbwr()
 {
-	u8 const wired = m_cp0[CP0_Wired] & 0x3f;
-	u8 const unwired = std::size(m_tlb) - wired;
-
-	u8 const index = (unwired > 0) ? ((total_cycles() - m_cp0_timer_zero) % unwired + wired) & 0x3f : (std::size(m_tlb) - 1);
-
-	cp0_tlbwi(index);
+	cp0_tlbwi(u8(cp0_get(CP0_Random)));
 }
 
 void r4000_base_device::cp0_tlbp()
@@ -3731,9 +3750,8 @@ void r4000_base_device::address_error(int intention, u64 const address)
 	{
 		logerror("address_error 0x%016x (%s)\n", address, machine().describe_context());
 
-		// TODO: check this
-		if (!(SR & SR_EXL))
-			m_cp0[CP0_BadVAddr] = address;
+		// BadVAddr is written regardless of EXL
+		m_cp0[CP0_BadVAddr] = address;
 
 		cpu_exception((intention == TR_WRITE) ? EXCEPTION_ADES : EXCEPTION_ADEL);
 

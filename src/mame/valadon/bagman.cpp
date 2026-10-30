@@ -487,7 +487,7 @@ void bagman_state::bagman_base(machine_config &config)
 	m_mainlatch->q_out_cb<4>().set_nop(); // ????
 
 	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	screen.set_screen_update(FUNC(bagman_state::screen_update));
 	screen.set_palette(m_palette);
@@ -569,7 +569,7 @@ void pickin_state::pickin(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	screen.set_screen_update(FUNC(pickin_state::screen_update));
 	screen.set_palette(m_palette);
@@ -631,7 +631,7 @@ void pickin_state::botanic(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	screen.set_screen_update(FUNC(pickin_state::screen_update));
 	screen.set_palette(m_palette);

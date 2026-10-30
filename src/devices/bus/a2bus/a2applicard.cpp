@@ -178,7 +178,8 @@ uint8_t a2bus_applicard_device::read_c0nx(uint8_t offset)
 	switch (offset & 0xf)
 	{
 		case 0:
-			m_6502stat = false;
+			if (!machine().side_effects_disabled())
+				m_6502stat = false;
 			return m_to6502;
 
 		case 1:
@@ -189,31 +190,37 @@ uint8_t a2bus_applicard_device::read_c0nx(uint8_t offset)
 			{
 				return 0x80;
 			}
-			return false;
+			return 0;
 
 		case 3:
 			if (m_6502stat)
 			{
 				return 0x80;
 			}
-			return false;
+			return 0;
 
 		case 5:
-			m_z80rom.select(0);
-			m_toz80 = false;
-			m_to6502 = false;
-			m_z80->reset();
+			if (!machine().side_effects_disabled())
+			{
+				m_z80rom.select(0);
+				m_toz80 = false;
+				m_to6502 = false;
+				m_z80->reset();
+			}
 			break;
 
 		case 6: // IRQ on Z80 via CTC channel 3 (CP/M doesn't use the CTC or IRQs)
-			fatalerror("Applicard: Z80 IRQ not supported yet\n");
+			if (!machine().side_effects_disabled())
+				fatalerror("Applicard: Z80 IRQ not supported yet\n");
+			break;
 
 		case 7: // NMI on Z80 (direct)
-			m_z80->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+			if (!machine().side_effects_disabled())
+				m_z80->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			break;
 
 	}
-	return 0xff;
+	return get_open_bus();
 }
 
 void a2bus_applicard_device::write_c0nx(uint8_t offset, uint8_t data)

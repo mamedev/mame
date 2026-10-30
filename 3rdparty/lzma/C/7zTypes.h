@@ -1,5 +1,5 @@
 /* 7zTypes.h -- Basic types
-2023-04-02 : Igor Pavlov : Public domain */
+: Igor Pavlov : Public domain */
 
 #ifndef ZIP7_7Z_TYPES_H
 #define ZIP7_7Z_TYPES_H
@@ -46,8 +46,9 @@ typedef int SRes;
 
 
 #ifdef _MSC_VER
+  #define MY_ALIGN_IN_STRUCT(n) __declspec(align(n))
   #if _MSC_VER > 1200
-    #define MY_ALIGN(n) __declspec(align(n))
+    #define MY_ALIGN(n) MY_ALIGN_IN_STRUCT(n)
   #else
     #define MY_ALIGN(n)
   #endif
@@ -58,6 +59,7 @@ typedef int SRes;
   #define MY_ALIGN(n) alignas(n)
   */
   #define MY_ALIGN(n) __attribute__ ((aligned(n)))
+  #define MY_ALIGN_IN_STRUCT(n) MY_ALIGN(n)
 #endif
 
 
@@ -530,20 +532,20 @@ struct ISzAlloc
 #define Z7_CONTAINER_FROM_VTBL_CLS(ptr, type, m) Z7_CONTAINER_FROM_VTBL(ptr, type, m)
 */
 #if defined (__clang__) || defined(__GNUC__)
-#define Z7_DIAGNOSCTIC_IGNORE_BEGIN_CAST_QUAL \
+#define Z7_DIAGNOSTIC_IGNORE_BEGIN_CAST_QUAL \
   _Pragma("GCC diagnostic push") \
   _Pragma("GCC diagnostic ignored \"-Wcast-qual\"")
-#define Z7_DIAGNOSCTIC_IGNORE_END_CAST_QUAL \
+#define Z7_DIAGNOSTIC_IGNORE_END_CAST_QUAL \
   _Pragma("GCC diagnostic pop")
 #else
-#define Z7_DIAGNOSCTIC_IGNORE_BEGIN_CAST_QUAL
-#define Z7_DIAGNOSCTIC_IGNORE_END_CAST_QUAL
+#define Z7_DIAGNOSTIC_IGNORE_BEGIN_CAST_QUAL
+#define Z7_DIAGNOSTIC_IGNORE_END_CAST_QUAL
 #endif
 
 #define Z7_CONTAINER_FROM_VTBL_TO_DECL_VAR(ptr, type, m, p) \
-  Z7_DIAGNOSCTIC_IGNORE_BEGIN_CAST_QUAL \
+  Z7_DIAGNOSTIC_IGNORE_BEGIN_CAST_QUAL \
   type *p = Z7_CONTAINER_FROM_VTBL(ptr, type, m); \
-  Z7_DIAGNOSCTIC_IGNORE_END_CAST_QUAL
+  Z7_DIAGNOSTIC_IGNORE_END_CAST_QUAL
 
 #define Z7_CONTAINER_FROM_VTBL_TO_DECL_VAR_pp_vt_p(type) \
   Z7_CONTAINER_FROM_VTBL_TO_DECL_VAR(pp, type, vt, p)

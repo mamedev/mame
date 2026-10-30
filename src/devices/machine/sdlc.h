@@ -35,8 +35,6 @@ protected:
 	bool is_frame_check_good() const { return 0x1d0fU == m_frame_check; }
 
 private:
-	template <typename... Params> void logerror(Params &&... args) { device().logerror(std::forward<Params>(args)...); }
-
 	virtual void frame_start() { }
 	virtual void frame_end() { }
 	virtual void frame_abort() { }

@@ -125,9 +125,9 @@ void _119_state::sprites_clip(screen_device &screen, rectangle &cliprect)
 {
 	rectangle clip = screen.visible_area();
 	if (m_flipscreen_x)
-		clip.min_x += (64 * m_x_scale);
+		clip.insetx(64 * m_x_scale, 0);
 	else
-		clip.max_x -= (64 * m_x_scale);
+		clip.insetx(0, 64 * m_x_scale);
 
 	cliprect &= clip;
 }
@@ -289,7 +289,7 @@ void _119_state::_119(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_119);
 	PALETTE(config, m_palette, FUNC(_119_state::galaxian_palette), 32);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART);
 	m_screen->set_screen_update(FUNC(_119_state::screen_update_galaxian));
 	m_screen->screen_vblank().set(FUNC(_119_state::vblank_interrupt_w));

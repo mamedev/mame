@@ -469,7 +469,7 @@ OSD := sdl
 else ifeq ($(TARGETOS),macosx)
 OSD := sdl3
 else ifeq ($(TARGETOS),asmjs)
-OSD := sdl
+OSD := sdl3
 endif # TARGETOS
 
 endif # OSD
@@ -1058,13 +1058,43 @@ else
 FULLTARGET := $(TARGET)$(SUBTARGET_FULL)
 endif
 PROJECTDIR := $(BUILDDIR)/projects/$(OSD)/$(FULLTARGET)
-PROJECTDIR_SDL := $(BUILDDIR)/projects/sdl/$(FULLTARGET)
+PROJECTDIR_SDL := $(BUILDDIR)/projects/sdl3/$(FULLTARGET)
 PROJECTDIR_WIN := $(BUILDDIR)/projects/windows/$(FULLTARGET)
 
 .PHONY: all clean regenie generate FORCE
 all: $(GENIE) $(TARGETOS)$(ARCHITECTURE)
 regenie:
 FORCE:
+
+#-------------------------------------------------
+# JSON compilation database (without compiling)
+#-------------------------------------------------
+
+JCDB_GCC := $(TARGETOS)
+ifeq ($(TARGETOS),linux)
+JCDB_GCC := linux-gcc
+else ifeq ($(TARGETOS),macosx)
+JCDB_GCC := osx
+else ifeq ($(TARGETOS),windows)
+JCDB_GCC := mingw$(if $(filter _x64%,$(ARCHITECTURE)),64,32)-gcc
+endif
+
+JCDB_VERSION := $(GCC_VERSION)
+ifneq ($(CLANG_VERSION),)
+JCDB_VERSION := $(CLANG_VERSION)
+ifneq ($(filter linux windows,$(TARGETOS)),)
+JCDB_GCC := $(if $(filter windows,$(TARGETOS)),mingw,linux)-clang
+else ifneq ($(TARGETOS),asmjs)
+JCDB_GCC := $(JCDB_GCC)-clang
+endif
+endif
+
+JCDB_CONFIG := $(CONFIG)$(if $(filter _x64% _arm64%,$(ARCHITECTURE)),64,$(if $(filter _x86%,$(ARCHITECTURE)),32))
+
+.PHONY: jcdb
+jcdb: $(GENIE)
+	-$(call MKDIR,$(GENDIR)/$(TARGET))
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=$(JCDB_GCC) --gcc_version=$(JCDB_VERSION) --jcdb-config=$(JCDB_CONFIG) jcdb
 
 #-------------------------------------------------
 # gmake-mingw64-gcc
@@ -1185,7 +1215,7 @@ endif
 #-------------------------------------------------
 
 $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=arm --NOASM=1 $(MAKETYPE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=$(CLANG_VERSION) --osd=sdl3 --targetos=android --PLATFORM=arm --NOASM=1 $(MAKETYPE)
 
 .PHONY: android-arm
 android-arm: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm/Makefile
@@ -1197,7 +1227,7 @@ android-arm: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm/Make
 #-------------------------------------------------
 
 $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm64 --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=arm64 --NOASM=1 $(MAKETYPE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm64 --gcc_version=$(CLANG_VERSION) --osd=sdl3 --targetos=android --PLATFORM=arm64 --NOASM=1 $(MAKETYPE)
 
 .PHONY: android-arm64
 android-arm64: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64/Makefile
@@ -1209,7 +1239,7 @@ android-arm64: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64/
 #-------------------------------------------------
 
 $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x86/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=x86 $(MAKETYPE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=$(CLANG_VERSION) --osd=sdl3 --targetos=android --PLATFORM=x86 $(MAKETYPE)
 
 .PHONY: android-x86
 android-x86: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x86/Makefile
@@ -1221,7 +1251,7 @@ android-x86: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x86/Make
 #-------------------------------------------------
 
 $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x64/Makefile: makefile $(SCRIPTS) $(GENIE)
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x64 --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=x64 $(MAKETYPE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x64 --gcc_version=$(CLANG_VERSION) --osd=sdl3 --targetos=android --PLATFORM=x64 $(MAKETYPE)
 
 .PHONY: android-x64
 android-x64: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x64/Makefile
@@ -1233,15 +1263,15 @@ android-x64: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x64/Make
 #-------------------------------------------------
 
 $(PROJECTDIR)/$(MAKETYPE)-asmjs/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef EMSCRIPTEN
-	$(error EMSCRIPTEN is not set)
+ifndef EMSDK
+	$(error EMSDK is not set)
 endif
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=asmjs --gcc_version=$(CLANG_VERSION) $(MAKETYPE)
 
 .PHONY: asmjs
 asmjs: generate $(PROJECTDIR)/$(MAKETYPE)-asmjs/Makefile
-ifndef EMSCRIPTEN
-	$(error EMSCRIPTEN is not set)
+ifndef EMSDK
+	$(error EMSDK is not set)
 endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-asmjs config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-asmjs config=$(CONFIG)
@@ -1510,7 +1540,7 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.288"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.289"' > $@
 	@echo '#define BARE_VCS_REVISION "$(NEW_GIT_VERSION)"' >> $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char bare_vcs_revision[];' >> $@
@@ -1520,7 +1550,7 @@ $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " (" BARE_VCS_REVISION ")";' >> $@
 else
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo #define BARE_BUILD_VERSION "0.288" > $@
+	@echo #define BARE_BUILD_VERSION "0.289" > $@
 	@echo #define BARE_VCS_REVISION "$(NEW_GIT_VERSION)" >> $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char bare_vcs_revision[]; >> $@
@@ -1571,16 +1601,19 @@ ifeq (posix,$(SHELLTYPE))
 		-name \*.lay -o \
 		-name \*.lst \
 		\) -print0 | xargs -0 -n 20 ./srcclean >&2
-	$(SILENT)- find hash    \( -name \*.hsi -o -name \*.xml  \) -print0 | xargs -0 -n 20 ./srcclean >&2
-	$(SILENT)- find bgfx    \( -name \*.json                 \) -print0 | xargs -0 -n 20 ./srcclean >&2
-	$(SILENT)- find plugins \( -name \*.lua -o -name \*.json \) -print0 | xargs -0 -n 20 ./srcclean >&2
-	$(SILENT)- find scripts \( -name \*.lua                  \) -print0 | xargs -0 -n 20 ./srcclean >&2
+	$(SILENT)- find hash                     \( -name \*.hsi -o -name \*.xml  \) -print0 | xargs -0 -n 20 ./srcclean >&2
+	$(SILENT)- find bgfx                     \( -name \*.json                 \) -print0 | xargs -0 -n 20 ./srcclean >&2
+	$(SILENT)- find plugins                  \( -name \*.lua -o -name \*.json \) -print0 | xargs -0 -n 20 ./srcclean >&2
+	$(SILENT)- find scripts                  \( -name \*.lua                  \) -print0 | xargs -0 -n 20 ./srcclean >&2
+	$(SILENT)- find ini/examples ini/presets \( -name \*.ini                  \) -print0 | xargs -0 -n 20 ./srcclean >&2
 else
-	$(shell for /r src     %%i in (*.c, *.cpp, *.h, *.hpp, *.hxx, *.ipp, *.mm, *.lay, *.lst) do srcclean %%i >&2 )
-	$(shell for /r hash    %%i in (*.hsi, *.xml)  do srcclean %%i >&2 )
-	$(shell for /r bgfx    %%i in (*.json)        do srcclean %%i >&2 )
-	$(shell for /r plugins %%i in (*.lua, *.json) do srcclean %%i >&2 )
-	$(shell for /r scripts %%i in (*.lua)         do srcclean %%i >&2 )
+	$(shell for /r src          %%i in (*.c, *.cpp, *.h, *.hpp, *.hxx, *.ipp, *.mm, *.lay, *.lst) do srcclean %%i >&2 )
+	$(shell for /r hash         %%i in (*.hsi, *.xml)  do srcclean %%i >&2 )
+	$(shell for /r bgfx         %%i in (*.json)        do srcclean %%i >&2 )
+	$(shell for /r plugins      %%i in (*.lua, *.json) do srcclean %%i >&2 )
+	$(shell for /r scripts      %%i in (*.lua)         do srcclean %%i >&2 )
+	$(shell for /r ini/examples %%i in (*.ini)         do srcclean %%i >&2 )
+	$(shell for /r ini/presets  %%i in (*.ini)         do srcclean %%i >&2 )
 endif
 
 #-------------------------------------------------

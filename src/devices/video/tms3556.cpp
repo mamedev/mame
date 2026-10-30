@@ -120,7 +120,7 @@ tms3556_device::tms3556_device(const machine_config &mconfig, const char *tag, d
 		m_vdp_acmpxy_mode(dma_write),
 		m_vdp_acmpxy(0),
 		m_vdp_acmp(0),
-		m_init_read(0),
+		m_init_read(false),
 		m_scanline(0),
 		m_blink(0),
 		m_blink_count(0),
@@ -151,6 +151,7 @@ void tms3556_device::device_start()
 	save_item(NAME(m_vdp_acmpxy_mode));
 	save_item(NAME(m_vdp_acmpxy));
 	save_item(NAME(m_vdp_acmp));
+	save_item(NAME(m_init_read));
 	save_item(NAME(m_scanline));
 	save_item(NAME(m_blink));
 	save_item(NAME(m_blink_count));
@@ -362,15 +363,22 @@ void tms3556_device::draw_line_text_common(uint16_t *ln)
 	int pattern_ix;
 	int alphanumeric_mode, dbl_w, dbl_h, dbl_w_phase = 0;
 
+	// The start of each row acts like a delimiter carrying the serial
+	// attributes held in CM4.  Every scanline of a row scans the same name
+	// table entries, so the serial attribute state restarts on each one.
+	const uint16_t margin_color = (VDP_CM4 >> 5) & 0x7;
+	uint16_t zone_bg = margin_color;
+	bool zone_masked = BIT(VDP_CM4, 3);
+
 	nametbl_base = m_address_regs[2];
 	for (i = 0; i < 4; i++)
 		patterntbl_base[i] = m_address_regs[i + 3];
 
 	for (xx = 0; xx < LEFT_BORDER; xx++)
 #if TMS3556_DOUBLE_WIDTH
-		*ln++ = m_bg_color;
+		*ln++ = margin_color;
 #endif
-		*ln++ = m_bg_color;
+		*ln++ = margin_color;
 
 	name_offset = m_name_offset;
 
@@ -378,45 +386,64 @@ void tms3556_device::draw_line_text_common(uint16_t *ln)
 	{
 		name_hi = readbyte(nametbl_base + name_offset);
 		name_lo = readbyte(nametbl_base + name_offset + 1);
-		pattern_ix = ((name_hi >> 2) & 2) | ((name_hi >> 4) & 1);
-		alphanumeric_mode = (pattern_ix < 2) || ((pattern_ix == 3) && !(m_control_regs[7] & 0x08));
-		fg = (name_hi >> 5) & 0x7;
-		if (alphanumeric_mode)
-		{
-			if (name_hi & 4)
-			{   /* inverted color */
-				bg = fg;
-				fg = m_bg_color;
-			}
-			else
-				bg = m_bg_color;
-			dbl_w = name_hi & 0x2;
-			dbl_h = name_hi & 0x1;
-		}
-		else
-		{
-			bg = name_hi & 0x7;
+		if ((name_lo & 0x7f) == 0x20)
+		{   /* delimiter: sets the background colour of the zone that follows */
+			fg = (name_hi >> 5) & 0x7;
+			if (zone_masked && BIT(VDP_CM2, 5))
+				fg = zone_bg;   /* a delimiter ending a masked zone takes that zone's background colour */
+			zone_bg = name_hi & 0x7;
+			zone_masked = BIT(name_hi, 3);
+			bg = zone_bg;
+			pattern = 0xff; /* the delimiter cell is shown in its foreground colour */
 			dbl_w = 0;
-			dbl_h = 0;
-		}
-		if ((name_lo & 0x80) && m_blink)
-			fg = bg;    /* blink off time */
-		if (! dbl_h)
-		{   /* single height */
-			pattern = readbyte(patterntbl_base[pattern_ix] + (name_lo & 0x7f) + 128 * m_char_line_counter);
 			if (m_char_line_counter == 0)
 				m_dbl_h_phase[x] = 0;
 		}
 		else
-		{   /* double height */
-			if (! m_dbl_h_phase[x])
-				/* first phase: pattern from upper half */
-				pattern = readbyte(patterntbl_base[pattern_ix] + (name_lo & 0x7f) + 128 * (5 + (m_char_line_counter >> 1)));
+		{
+			pattern_ix = ((name_hi >> 2) & 2) | ((name_hi >> 4) & 1);
+			alphanumeric_mode = (pattern_ix < 2) || ((pattern_ix == 3) && !(m_control_regs[5] & 0x08));
+			fg = (name_hi >> 5) & 0x7;
+			if (alphanumeric_mode)
+			{
+				if (name_hi & 4)
+				{   /* inverted color */
+					bg = fg;
+					fg = zone_bg;
+				}
+				else
+					bg = zone_bg;
+				dbl_w = name_hi & 0x2;
+				dbl_h = name_hi & 0x1;
+			}
 			else
-				/* second phase: pattern from lower half */
-				pattern = readbyte(patterntbl_base[pattern_ix] + (name_lo & 0x7f) + 128 * (m_char_line_counter >> 1));
-			if (m_char_line_counter == 0)
-				m_dbl_h_phase[x] = !m_dbl_h_phase[x];
+			{
+				bg = name_hi & 0x7;
+				zone_bg = bg;   /* mosaic background is a serial attribute */
+				dbl_w = 0;
+				dbl_h = 0;
+			}
+			if ((name_lo & 0x80) && m_blink)
+				fg = bg;    /* blink off time */
+			if (! dbl_h)
+			{   /* single height */
+				pattern = readbyte(patterntbl_base[pattern_ix] + (name_lo & 0x7f) + 128 * m_char_line_counter);
+				if (m_char_line_counter == 0)
+					m_dbl_h_phase[x] = 0;
+			}
+			else
+			{   /* double height */
+				if (! m_dbl_h_phase[x])
+					/* first phase: pattern from upper half */
+					pattern = readbyte(patterntbl_base[pattern_ix] + (name_lo & 0x7f) + 128 * (5 + (m_char_line_counter >> 1)));
+				else
+					/* second phase: pattern from lower half */
+					pattern = readbyte(patterntbl_base[pattern_ix] + (name_lo & 0x7f) + 128 * (m_char_line_counter >> 1));
+				if (m_char_line_counter == 0)
+					m_dbl_h_phase[x] = !m_dbl_h_phase[x];
+			}
+			if (zone_masked && BIT(VDP_CM2, 5))
+				pattern = 0;    /* characters in a masked zone are displayed as spaces */
 		}
 		if (!dbl_w)
 		{   /* single width */
@@ -452,9 +479,9 @@ void tms3556_device::draw_line_text_common(uint16_t *ln)
 
 	for (xx = 0; xx < RIGHT_BORDER; xx++)
 #if TMS3556_DOUBLE_WIDTH
-		*ln++ = m_bg_color;
+		*ln++ = margin_color;
 #endif
-		*ln++ = m_bg_color;
+		*ln++ = margin_color;
 
 	if (m_char_line_counter == 0)
 		m_name_offset = name_offset;
@@ -527,7 +554,9 @@ void tms3556_device::draw_line_text(uint16_t *ln)
 void tms3556_device::draw_line_bitmap(uint16_t *ln)
 {
 	draw_line_bitmap_common(ln);
-	m_bg_color = (readbyte(m_address_regs[2] + m_name_offset) >> 5) & 0x7;
+	// the trailing byte of each bitmap line is loaded into CM4
+	VDP_CM4 = readbyte(m_address_regs[2] + m_name_offset);
+	m_bg_color = (VDP_CM4 >> 5) & 0x7;
 	m_name_offset += 2;
 }
 
@@ -541,8 +570,10 @@ void tms3556_device::draw_line_mixed(uint16_t *ln)
 	if (m_cg_flag)
 	{   /* bitmap line */
 		draw_line_bitmap_common(ln);
-		m_bg_color = (readbyte(m_address_regs[2] + m_name_offset) >> 5) & 0x7;
-		m_cg_flag = (readbyte(m_address_regs[2] + m_name_offset) >> 4) & 0x1;
+		// the trailing byte of each bitmap line is loaded into CM4
+		VDP_CM4 = readbyte(m_address_regs[2] + m_name_offset);
+		m_bg_color = (VDP_CM4 >> 5) & 0x7;
+		m_cg_flag = (VDP_CM4 >> 4) & 0x1;
 		m_name_offset += 2;
 	}
 	else
@@ -553,8 +584,10 @@ void tms3556_device::draw_line_mixed(uint16_t *ln)
 		draw_line_text_common(ln);
 		if (m_char_line_counter == 0)
 		{
-			m_bg_color = (readbyte(m_address_regs[2] + m_name_offset) >> 5) & 0x7;
-			m_cg_flag = (readbyte(m_address_regs[2] + m_name_offset) >> 4) & 0x1;
+			// the trailing byte of each character row is loaded into CM4
+			VDP_CM4 = readbyte(m_address_regs[2] + m_name_offset);
+			m_bg_color = (VDP_CM4 >> 5) & 0x7;
+			m_cg_flag = (VDP_CM4 >> 4) & 0x1;
 			m_name_offset += 2;
 		}
 	}
@@ -568,21 +601,9 @@ void tms3556_device::draw_line_mixed(uint16_t *ln)
 
 void tms3556_device::draw_line(bitmap_ind16 &bmp, int line)
 {
-	int double_lines;
-	uint16_t *ln, *ln2;
+	uint16_t *ln = &bmp.pix(line);
 
-//  if (m_control_regs[4] & 0x??)
-//  {   // interlaced mode
-//      ln = &bmp->pix(line, m_field);
-//  }
-//  else
-	{   /* non-interlaced mode */
-		ln = &bmp.pix(line);
-		ln2 = &bmp.pix(line, 1);
-		double_lines = 1;
-	}
-
-	if ((line < TOP_BORDER) || (line >= (TOP_BORDER + 250)))
+	if ((line < TOP_BORDER) || (line >= (TOP_BORDER + active_height())))
 	{
 		/* draw top and bottom borders */
 		draw_line_empty(ln);
@@ -606,13 +627,6 @@ void tms3556_device::draw_line(bitmap_ind16 &bmp, int line)
 			draw_line_mixed(ln);
 			break;
 		}
-	}
-
-	if (double_lines)
-	{
-		// TODO: this overlaps in exeltel - use memmove for now
-		//memcpy(ln2, ln, TOTAL_WIDTH * (TMS3556_DOUBLE_WIDTH ? 2 : 1));
-		memmove(ln2, ln, TOTAL_WIDTH * (TMS3556_DOUBLE_WIDTH ? 2 : 1));
 	}
 }
 
@@ -654,7 +668,7 @@ void tms3556_device::interrupt_start_vblank(void)
 void tms3556_device::interrupt()
 {
 	/* check for start of vblank */
-	if (m_scanline == 310)  /*no idea what the real value is*/
+	if (m_scanline == (lines_per_frame() - 3))  /*no idea what the real value is*/
 		interrupt_start_vblank();
 
 	/* render the current line */
@@ -664,6 +678,6 @@ void tms3556_device::interrupt()
 			draw_line(m_bitmap, m_scanline);
 	}
 
-	if (++m_scanline == 313)
+	if (++m_scanline >= lines_per_frame())
 		m_scanline = 0;
 }

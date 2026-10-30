@@ -59,7 +59,7 @@ private:
 	static constexpr uint8_t CST_SHIFT = 0x02;
 	static constexpr uint8_t CST_LOCK  = 0x01;
 
-	static constexpr int MATRIX_ROWS = 8;
+	static constexpr int MATRIX_ROWS = 14;
 
 	TIMER_CALLBACK_MEMBER(scan_tick);
 

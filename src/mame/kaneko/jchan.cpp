@@ -598,7 +598,7 @@ void jchan_state::jchan(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(28.636363_MHz_XTAL / 4, 460, 0, 320, 261, 0, 240);
 	screen.set_screen_update(FUNC(jchan_state::screen_update));
 	screen.set_palette(m_palette);
@@ -760,6 +760,6 @@ void jchan_state::init_jchan()
 
 
 /* game drivers */
-GAME( 1995, jchan,      0, jchan, jchan,  jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master (rev 4?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, jchan,  0,     jchan, jchan,  jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master (rev 4?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, jchana, jchan, jchan, jchan,  jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master (rev 3?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, jchan2,     0, jchan, jchan2, jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan in Fists of Fire",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, jchan2, 0,     jchan, jchan2, jchan_state, init_jchan, ROT0, "Kaneko", "Jackie Chan in Fists of Fire",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

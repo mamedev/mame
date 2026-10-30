@@ -6,15 +6,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - write protect
-    - 75,format speed error,01,00,0
-
-*/
-
 #include "emu.h"
 #include "c8050fdc.h"
 
@@ -122,6 +113,62 @@ void c8050_fdc_device::device_start()
 	save_item(NAME(m_rw_sel));
 	save_item(NAME(m_odd_hd));
 	save_item(NAME(m_pi));
+
+	save_item(NAME(cur_live.tm));
+	save_item(NAME(cur_live.state));
+	save_item(NAME(cur_live.next_state));
+	save_item(NAME(cur_live.sync));
+	save_item(NAME(cur_live.ready));
+	save_item(NAME(cur_live.brdy));
+	save_item(NAME(cur_live.error));
+	save_item(NAME(cur_live.ds));
+	save_item(NAME(cur_live.drv_sel));
+	save_item(NAME(cur_live.mode_sel));
+	save_item(NAME(cur_live.rw_sel));
+	save_item(NAME(cur_live.odd_hd));
+	save_item(NAME(cur_live.edge));
+	save_item(NAME(cur_live.shift_reg));
+	save_item(NAME(cur_live.bit_counter));
+	save_item(NAME(cur_live.e));
+	save_item(NAME(cur_live.i));
+	save_item(NAME(cur_live.pi));
+	save_item(NAME(cur_live.shift_reg_write));
+
+	save_item(NAME(checkpoint_live.tm));
+	save_item(NAME(checkpoint_live.state));
+	save_item(NAME(checkpoint_live.next_state));
+	save_item(NAME(checkpoint_live.sync));
+	save_item(NAME(checkpoint_live.ready));
+	save_item(NAME(checkpoint_live.brdy));
+	save_item(NAME(checkpoint_live.error));
+	save_item(NAME(checkpoint_live.ds));
+	save_item(NAME(checkpoint_live.drv_sel));
+	save_item(NAME(checkpoint_live.mode_sel));
+	save_item(NAME(checkpoint_live.rw_sel));
+	save_item(NAME(checkpoint_live.odd_hd));
+	save_item(NAME(checkpoint_live.edge));
+	save_item(NAME(checkpoint_live.shift_reg));
+	save_item(NAME(checkpoint_live.bit_counter));
+	save_item(NAME(checkpoint_live.e));
+	save_item(NAME(checkpoint_live.i));
+	save_item(NAME(checkpoint_live.pi));
+	save_item(NAME(checkpoint_live.shift_reg_write));
+
+	save_item(NAME(cur_pll.ctime));
+	save_item(NAME(cur_pll.period));
+	save_item(NAME(cur_pll.min_period));
+	save_item(NAME(cur_pll.max_period));
+	save_item(NAME(cur_pll.period_adjust_base));
+	save_item(NAME(cur_pll.phase_adjust));
+	save_item(NAME(cur_pll.freq_hist));
+
+	save_item(NAME(checkpoint_pll.ctime));
+	save_item(NAME(checkpoint_pll.period));
+	save_item(NAME(checkpoint_pll.min_period));
+	save_item(NAME(checkpoint_pll.max_period));
+	save_item(NAME(checkpoint_pll.period_adjust_base));
+	save_item(NAME(checkpoint_pll.phase_adjust));
+	save_item(NAME(checkpoint_pll.freq_hist));
 }
 
 
@@ -252,9 +299,9 @@ void c8050_fdc_device::pll_reset(const attotime &when)
 	cur_pll.set_clock(attotime::from_hz(clock() / (16 - m_ds)));
 }
 
-void c8050_fdc_device::pll_start_writing(const attotime &tm)
+void c8050_fdc_device::pll_start_writing(const attotime &tm, floppy_image_device *floppy)
 {
-	cur_pll.start_writing(tm);
+	cur_pll.start_writing(tm, floppy);
 	pll_reset(cur_live.tm);
 }
 
@@ -376,7 +423,7 @@ void c8050_fdc_device::live_run(const attotime &limit)
 
 			// write bit
 			int write_bit = BIT(cur_live.shift_reg_write, 9);
-			if (!cur_live.rw_sel) { // TODO WPS
+			if (!cur_live.rw_sel && !get_floppy()->wpt_r()) {
 				/*
 				write precompensation
 
@@ -558,7 +605,7 @@ void c8050_fdc_device::rw_sel_w(int state)
 		if (m_rw_sel) {
 			pll_stop_writing(get_floppy(), cur_live.tm);
 		} else {
-			pll_start_writing(cur_live.tm);
+			pll_start_writing(cur_live.tm, get_floppy());
 		}
 		live_run();
 	}

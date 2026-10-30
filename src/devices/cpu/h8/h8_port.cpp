@@ -20,7 +20,7 @@ DEFINE_DEVICE_TYPE(H8_PORT, h8_port_device, "h8_digital_port", "H8 digital port"
 
 h8_port_device::h8_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, H8_PORT, tag, owner, clock),
-	m_cpu(*this, DEVICE_SELF_OWNER), m_address(0), m_default_ddr(0), m_ddr(0), m_pcr(0), m_odr(0), m_mask(0), m_dr(0), m_last_output(0)
+	m_cpu(*this, DEVICE_SELF_OWNER), m_address(0), m_default_ddr(0), m_ddr(0), m_pcr(0), m_odr(0), m_mask(0), m_forced_inputs(0), m_dr(0), m_last_output(0)
 {
 }
 
@@ -51,11 +51,12 @@ u8 h8_port_device::dr_r()
 
 u8 h8_port_device::port_r()
 {
-	u8 res = m_mask | (m_dr & m_ddr);
-	if((m_ddr & ~m_mask) != u8(~m_mask))
-		res |= m_cpu->do_read_port(m_address) & ~m_ddr;
+	u8 res = m_mask | (m_dr & ~m_forced_inputs & m_ddr);
 
-	//logerror("port_r %02x (%02x %02x)\n", res, ddr & ~mask, u8(~mask));
+	if(((m_ddr & ~m_mask) != u8(~m_mask)) || m_forced_inputs)
+		res |= m_cpu->do_read_port(m_address) & (m_forced_inputs | ~m_ddr);
+
+	//logerror("port_r %02x (%02x %02x)\n", res, m_ddr & ~m_mask, u8(~m_mask));
 	return res;
 }
 

@@ -63,7 +63,7 @@ u8 a2bus_noisemaker_device::read_c0nx(u8 offset)
 	if (BIT(offset, 0))
 		return m_psg->data_r();
 	else
-		return 0xff; // BDIR1 = BC1 = 0, so this should be open bus
+		return get_open_bus(); // BDIR1 = BC1 = 0, so this should be open bus
 }
 
 void a2bus_noisemaker_device::write_c0nx(u8 offset, u8 data)
@@ -78,7 +78,7 @@ void a2bus_noisemaker_device::reset_from_bus()
 
 void a2bus_noisemaker_device::device_add_mconfig(machine_config &config)
 {
-	AY8910(config, m_psg, 1021800); // CLK tied to ϕ1 signal from bus pin 38
+	AY8910(config, m_psg, A2BUS_1M_CLOCK); // CLK tied to ϕ1 signal from bus pin 38
 	m_psg->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	SPEAKER(config, "speaker").front_center();

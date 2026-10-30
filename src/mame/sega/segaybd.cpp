@@ -214,6 +214,7 @@ EPR-12028 - 27C256 EPROM
 #include "sound/ymopm.h"
 
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "pdrift.lh"
@@ -299,6 +300,7 @@ private:
 	// linked cabinet specific handlers
 	void mb8421_intl(int state);
 	void mb8421_intr(int state);
+	IRQ_CALLBACK_MEMBER(linkcpu_acknowledge_irq);
 	uint16_t link_r();
 	uint16_t link2_r();
 	void link2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -488,13 +490,13 @@ uint32_t segaybd_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			cliprect,
 			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
 			{
-				for (int y = rect.min_y; y <= rect.max_y; y++)
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
 					uint16_t *const dest = &bitmap.pix(y);
 					uint16_t const *const src = &sprites.pix(y);
 					uint8_t const *const pri = &screen.priority().pix(y);
 
-					for (int x = rect.min_x; x <= rect.max_x; x++)
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
 						// only process written pixels
 						uint16_t const pix = src[x];
@@ -1037,7 +1039,12 @@ void segaybd_state::mb8421_intl(int state)
 void segaybd_state::mb8421_intr(int state)
 {
 	// shared ram interrupt request from maincpu side
-	m_linkcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xef); // Z80 - RST $28
+	m_linkcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(segaybd_state::linkcpu_acknowledge_irq)
+{
+	return 0xef; // Z80 - RST $28
 }
 
 
@@ -1688,7 +1695,7 @@ void segaybd_state::yboard(machine_config &config)
 	SEGA_315_5249_DIVIDER(config, "divider_suby");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(342,262);   // to be verified
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
@@ -1731,6 +1738,7 @@ void segaybd_state::yboard_link(machine_config &config)
 	Z80(config, m_linkcpu, XTAL(16'000'000)/2); // 8 Mhz
 	m_linkcpu->set_addrmap(AS_PROGRAM, &segaybd_state::link_map);
 	m_linkcpu->set_addrmap(AS_IO, &segaybd_state::link_portmap);
+	m_linkcpu->set_irq_acknowledge_callback(FUNC(segaybd_state::linkcpu_acknowledge_irq));
 
 	mb8421_device &mb8421(MB8421(config, "mb8421"));
 	mb8421.intl_callback().set(FUNC(segaybd_state::mb8421_intl));

@@ -63,17 +63,22 @@ void dspp_device::code_map(address_map &map)
 // TODO: quickie and incomplete
 void dspp_device::data_clio_map(address_map &map)
 {
-	map(0x000, 0x06f).mirror(0x080).ram().share("eimem"); // EI (read only by DSPP)
-//  map(0x0d0, 0x0de) EIFIFO status words
-//  map(0x0e0, 0x0e3) EOFIFO status words
+	map(0x000, 0x06f).ram().share("eimem"); // EI (read only by DSPP)
+	// quick reads from FIFO head, without removing them from the queue (host clears them through EI writes)
+	map(0x070, 0x07e).rw(FUNC(dspp_device::fifo_peek_r), FUNC(dspp_device::fifo_head_w));
+	map(0x080, 0x0cf).ram(); // TODO: really a mirror of EI?
+	// EIFIFO status words
+	map(0x0d0, 0x0de).r(FUNC(dspp_device::fifo_status_r));
+	// EOFIFO status words
+	map(0x0e0, 0x0e3).r(FUNC(dspp_device::outfifo_status_r));
 	map(0x0ea, 0x0ea).r(FUNC(dspp_device::noise_r));
 //  map(0x0eb, 0x0eb) audio output status read
-//  map(0x0ec, 0x0ec) semaphore status read
-//  map(0x0ed, 0x0ed) semaphore data word
+	map(0x0ec, 0x0ec).r(FUNC(dspp_device::semaphore_status_r));
+	map(0x0ed, 0x0ed).r(FUNC(dspp_device::semaphore_data_r));
 	map(0x0ee, 0x0ee).rw(FUNC(dspp_device::pc_r), FUNC(dspp_device::pc_w));
 	map(0x0ef, 0x0ef).rw(FUNC(dspp_device::clock_r), FUNC(dspp_device::clock_w));
-//  map(0x0f0, 0x0fe) input FIFOs
-//  map(0x070, 0x07e) quick reads from FIFO, without removing them from the queue
+	// input FIFOs (reading pops a sample)
+	map(0x0f0, 0x0fe).r(FUNC(dspp_device::fifo_pop_r));
 	map(0x100, 0x1ff).ram().share("imem");
 	map(0x200, 0x2ff).ram().share("imem");
 	map(0x300, 0x3ea).ram().share("eomem"); // write only by DSPP
@@ -84,19 +89,15 @@ void dspp_device::data_clio_map(address_map &map)
 			m_core->m_flag_audlock = BIT(data, 15);
 		})
 	);
-//  map(0x3ec, 0x3ec) semaphore ACK
-//  map(0x3ed, 0x3ed) semaphore write
-	// host CPU irq
-	map(0x3ee, 0x3ee).lw16(NAME([this] (offs_t offset, u16 data) {
-		// TODO: reads word written at $3fb8 on host end
-		m_int_handler(1);
-	}));
-//  map(0x3ef, 0x3ef) clock reload
-	map(0x3ef, 0x3ef).lw16(NAME([] (offs_t offset, u16 data) {
-		// TODO: correct?
-		// output_control_w(1);
-	}));
-//  map(0x3f0, 0x3f3) output FIFO, for audio reverb or data streams
+	map(0x3ec, 0x3ec).w(FUNC(dspp_device::semaphore_ack_w));
+	map(0x3ed, 0x3ed).w(FUNC(dspp_device::semaphore_data_w));
+	// host CPU irq, the word is the audio folio tick counter (read back by the host at $3fb8)
+	map(0x3ee, 0x3ee).rw(FUNC(dspp_device::tick_r), FUNC(dspp_device::tick_w));
+	// clock reload: instruments write $4000 at the top of the frame and read back $0ef
+	// to meter how many cycles the frame took
+	map(0x3ef, 0x3ef).w(FUNC(dspp_device::clock_w));
+	// output FIFOs, for audio reverb or data streams
+	map(0x3f0, 0x3f3).w(FUNC(dspp_device::outfifo_w));
 //  map(0x3fd, 0x3fd) flush output FIFO
 	map(0x3fe, 0x3ff).w(FUNC(dspp_device::output_w));
 }
@@ -156,6 +157,11 @@ dspp_device::dspp_device(
 	m_int_handler(*this),
 	m_dma_read_handler(*this, 0),
 	m_dma_write_handler(*this),
+	m_dma_rollover_handler(*this),
+	m_frame_period(568),
+	m_frame_counter(568),
+	m_frame_sync(false),
+	m_tick(0),
 	m_code_config("code", ENDIANNESS_BIG, 16, 10, -1, code_map_ctor),
 	m_data_config("data", ENDIANNESS_BIG, 16, 10, -1, data_map_ctor),
 	m_output_fifo_start(0),
@@ -245,6 +251,8 @@ void dspp_device::device_start()
 	save_item(NAME(m_core->m_stack));
 	save_item(NAME(m_core->m_stack_ptr));
 	save_item(NAME(m_core->m_rbase));
+	save_item(NAME(m_core->m_rmap));
+	save_item(NAME(m_core->m_rbase_xor));
 	save_item(NAME(m_core->m_acc));
 	save_item(NAME(m_core->m_tclock));
 
@@ -255,6 +263,13 @@ void dspp_device::device_start()
 	save_item(NAME(m_core->m_flag_exact));
 	save_item(NAME(m_core->m_flag_audlock));
 	save_item(NAME(m_core->m_flag_sleep));
+	save_item(NAME(m_frame_period));
+	save_item(NAME(m_frame_counter));
+	save_item(NAME(m_frame_sync));
+	save_item(NAME(m_tick));
+
+	save_item(NAME(m_semaphore_data));
+	save_item(NAME(m_semaphore_status));
 
 	save_item(NAME(m_outputs));
 	save_item(NAME(m_output_fifo_start));
@@ -306,6 +321,7 @@ void dspp_device::device_start()
 	set_icountptr(m_core->m_icount);
 
 	m_cache_dirty = true;
+
 }
 
 
@@ -320,12 +336,16 @@ void dspp_device::device_reset()
 	m_core->m_stack_ptr = 0;
 	m_output_fifo_start = 0;
 	m_output_fifo_count = 0;
+	m_semaphore_status = 0;
+	m_semaphore_data = 0;
 
 	m_core->m_flag_audlock = 0;
 	m_core->m_flag_sleep = 0;
 	m_core->m_stack_ptr = 0;
 	m_core->m_writeback = ~1; // TODO
-	set_rbase(0, 0);
+	m_frame_counter = m_frame_period;
+	m_frame_sync = false;
+	set_rmap(0, 0);
 
 	// TODO: CLEAR DMA CHANNELS
 
@@ -334,6 +354,14 @@ void dspp_device::device_reset()
 	update_host_interrupt();
 
 	m_cache_dirty = true;
+}
+
+void dspp_bulldog_device::device_reset()
+{
+	dspp_device::device_reset();
+
+	// the register bases are plain addresses here
+	set_rbase(0, 0);
 }
 
 
@@ -687,6 +715,38 @@ inline void dspp_device::set_rbase(uint32_t base, uint32_t addr)
 
 
 //-------------------------------------------------
+//  set_rmap - Set register address map and base
+//-------------------------------------------------
+
+// Rather than Bulldog's four bases, this version builds a register address out of the register number:
+// bit 9 is register bit 3, bit 8 is picked from register bits 3 and 2 by RMAP, bits 2-0 are register
+// bits 2-0, and RBASE is XORed over bits 7-2.  RMAP 0, the only mode the audio folio uses, puts R0-R3
+// in EI memory, R4-R11 in I memory and R12-R15 in EO memory.
+void dspp_device::set_rmap(uint32_t rmap, uint32_t rbase)
+{
+	m_core->m_rmap = rmap;
+	m_core->m_rbase_xor = rbase;
+
+	for (uint32_t group = 0; group < 4; group++)
+	{
+		const bool x = BIT(group, 0);
+		const bool y = BIT(group, 1);
+		bool sel;
+
+		switch (rmap)
+		{
+			case 4:  sel = y; break;
+			case 5:  sel = !y; break;
+			case 6:  sel = x && y; break;
+			case 7:  sel = x || y; break;
+			default: sel = x; break;
+		}
+		m_core->m_rbase[group] = ((y << 9) | (sel << 8) | (x << 2)) ^ rbase;
+	}
+}
+
+
+//-------------------------------------------------
 //  translate_reg - Translate register address
 //-------------------------------------------------
 
@@ -728,6 +788,30 @@ uint32_t dspp_device::execute_max_cycles() const noexcept
 //  execute_run - core execution loop
 //-------------------------------------------------
 
+inline void dspp_device::execute_one(bool check_debugger)
+{
+	// Only run if enabled
+	if (m_core->m_dspx_control & DSPX_CONTROL_GWILLING)
+	{
+		if (check_debugger)
+			debugger_instruction_hook(m_core->m_pc);
+
+		m_core->m_op = read_op(m_core->m_pc);
+		//logerror("%04x: %04x\n", (uint16_t)m_core->m_pc, (uint16_t)m_core->m_op);
+		update_pc();
+
+		// Decode and execute
+		if (m_core->m_op & 0x8000)
+			exec_control();
+		else
+			exec_arithmetic();
+	}
+}
+
+// The complete program executes once per frame and then sleeps,
+// in typical audio DSP fashion.
+// If AUDLOCK is set the frame is restarted by the DAC clock,
+// otherwise the clock counter reload does it.
 void dspp_device::execute_run()
 {
 	if (m_isdrc)
@@ -752,26 +836,52 @@ void dspp_device::execute_run()
 
 	do
 	{
+		const int32_t start = m_core->m_icount;
 		update_ticks();
 		update_fifo_dma();
 
-		// Only run if enabled
-		if (m_core->m_dspx_control & DSPX_CONTROL_GWILLING)
+		if (!m_core->m_flag_sleep)
 		{
-			if (check_debugger)
-				debugger_instruction_hook(m_core->m_pc);
-
-			m_core->m_op = read_op(m_core->m_pc);
-			//logerror("%04x: %04x\n", (uint16_t)m_core->m_pc, (uint16_t)m_core->m_op);
-			update_pc();
-
-			// Decode and execute
-			if (m_core->m_op & 0x8000)
-				exec_control();
-			else
-				exec_arithmetic();
+			execute_one(check_debugger);
 		}
 
+		m_frame_counter -= start - m_core->m_icount;
+
+		if (m_frame_sync || (!m_core->m_flag_audlock && m_frame_counter <= 0))
+		{
+			new_frame();
+		}
+	} while (m_core->m_icount > 0);
+}
+
+// Bulldog follows a typical free-running CPU model vs. the original DSPP's
+// "complete program once per frame".
+void dspp_bulldog_device::execute_run()
+{
+	if (m_isdrc)
+	{
+		do
+		{
+			if (m_core->m_dspx_control & DSPX_CONTROL_GWILLING)
+			{
+				execute_run_drc();
+			}
+			else
+			{
+				update_ticks();
+				update_fifo_dma();
+			}
+		} while (m_core->m_icount > 0);
+		return;
+	}
+
+	const bool check_debugger = debugger_enabled();
+
+	do
+	{
+		update_ticks();
+		update_fifo_dma();
+		execute_one(check_debugger);
 	} while (m_core->m_icount > 0);
 }
 
@@ -797,6 +907,16 @@ inline void dspp_device::exec_super_special()
 			m_core->m_pc = m_core->m_acc >> 4;
 			break;
 		}
+		case 2: // RBASE (not on Bulldog, which has the special op instead)
+		{
+			set_rmap(m_core->m_rmap, (m_core->m_op & 0x3f) << 2);
+			break;
+		}
+		case 3: // RMAP (not on Bulldog)
+		{
+			set_rmap(m_core->m_op & 7, m_core->m_rbase_xor);
+			break;
+		}
 		case 4: // RTS
 		{
 			m_core->m_pc = pop_pc();
@@ -817,9 +937,7 @@ inline void dspp_device::exec_super_special()
 		}
 
 		case 0: // NOP
-		case 2: // Unused
-		case 3:
-		case 6:
+		case 6: // Unused
 			break;
 	}
 }
@@ -897,7 +1015,7 @@ inline void dspp_device::exec_special()
 //  exec_branch - Execute a branch control op
 //-------------------------------------------------
 
-void dspp_device::exec_branch()
+inline void dspp_device::exec_branch()
 {
 	uint32_t mode = (m_core->m_op >> 13) & 3;
 	uint32_t select = (m_core->m_op >> 12) & 1;
@@ -1479,6 +1597,7 @@ void dspp_device::process_next_dma(int32_t channel)
 			m_dspx_channel_complete &= ~chmask;
 			m_dspx_dmanext_int |= chmask;
 			update_host_interrupt();
+			m_dma_rollover_handler(channel, 1);
 		}
 		else
 		{
@@ -1961,7 +2080,49 @@ uint16_t dspp_device::noise_r()
 	return machine().rand();
 }
 
+//-------------------------------------------------
+//  semaphore section
+//-------------------------------------------------
 
+uint16_t dspp_device::semaphore_status_r()
+{
+	return m_semaphore_status;
+}
+
+uint16_t dspp_device::semaphore_data_r()
+{
+	return m_semaphore_data;
+}
+
+template <unsigned N> void dspp_device::semaphore_delayed_write(s32 param)
+{
+	m_semaphore_status = 1 << (3 - N);
+	m_semaphore_data = param & 0xffff;
+}
+
+void dspp_device::host_semaphore_w(uint32_t data)
+{
+	machine().scheduler().synchronize(
+		timer_expired_delegate(FUNC(dspp_device::semaphore_delayed_write<0>), this),
+			unsigned(data & 0xffff));
+}
+
+void dspp_device::host_semaphore_ack_w(uint16_t data)
+{
+	 m_semaphore_status |= 1 << 1;
+}
+
+void dspp_device::semaphore_data_w(uint16_t data)
+{
+	machine().scheduler().synchronize(
+		timer_expired_delegate(FUNC(dspp_device::semaphore_delayed_write<1>), this),
+			unsigned(data & 0xffff));
+}
+
+void dspp_device::semaphore_ack_w(uint16_t data)
+{
+	m_semaphore_status |= 1 << 0;
+}
 
 //**************************************************************************
 //  EXTERNAL INTERFACE AND CONTROL REGISTERS
@@ -1978,7 +2139,8 @@ void dspp_device::host_n_write(offs_t offset, u16 data)
 
 u16 dspp_device::host_eo_read(offs_t offset)
 {
-	return m_data.read_word(offset);
+	// EO memory sits at 0x300 in DSPP data space
+	return m_data.read_word(0x300 + offset);
 }
 
 void dspp_device::host_ei_write(offs_t offset, u16 data)
@@ -1989,13 +2151,161 @@ void dspp_device::host_ei_write(offs_t offset, u16 data)
 // TODO: remaining bits
 void dspp_device::host_gw_control_write(offs_t offset, u16 data)
 {
-	m_core->m_dspx_control = data;
-
-	if (BIT(data, 0))
+	// ---- x--- DSPPError, ---- -x-- DSPPReset, ---- --x- DSPPSleep, ---- ---x DSPPGW
+	if (BIT(data, 2))
 		device_reset();
-	if (data & ~1)
+	m_core->m_dspx_control = BIT(data, 0) ? DSPX_CONTROL_GWILLING : 0;
+	if (data & ~5)
 		logerror("host_gw_control_write: %02x\n", data);
 }
+
+//-------------------------------------------------
+// Audio frame model and host DMA interface
+//-------------------------------------------------
+
+void dspp_device::new_frame()
+{
+	// a DAC sync or a host restart starts a full count, the clock counter carries its overshoot into the next frame
+	m_frame_counter = (m_frame_sync || m_frame_counter > 0) ? m_frame_period : m_frame_counter + m_frame_period;
+	m_frame_sync = false;
+	m_core->m_pc = 0;
+	m_core->m_flag_sleep = 0;
+
+	if (m_output_fifo_count == OUTPUT_FIFO_DEPTH)
+		m_output_fifo_start = (m_output_fifo_start + 2) & OUTPUT_FIFO_MASK;
+	else
+		m_output_fifo_count += 2;
+	const uint32_t end = (m_output_fifo_start + m_output_fifo_count - 2) & OUTPUT_FIFO_MASK;
+	m_output_fifo[(end + 0) & OUTPUT_FIFO_MASK] = m_outputs[0];
+	m_output_fifo[(end + 1) & OUTPUT_FIFO_MASK] = m_outputs[1];
+}
+
+void dspp_device::frame_sync()
+{
+	if (m_core->m_flag_audlock)
+	{
+		m_frame_sync = true;
+	}
+}
+
+void dspp_device::host_tick_reset(bool default_period)
+{
+	if (default_period)
+		m_frame_period = 568;
+	new_frame();
+}
+
+uint16_t dspp_device::tick_r()
+{
+	return m_tick;
+}
+
+void dspp_device::tick_w(uint16_t data)
+{
+	m_tick = data;
+	m_int_handler(1);
+	m_int_handler(0);
+}
+
+uint16_t dspp_device::fifo_peek_r(offs_t offset)
+{
+	fifo_dma &dma = m_fifo_dma[offset];
+	if (dma.m_depth == 0)
+		return dma.m_prev_current;
+	return dma.m_fifo[dma.m_dspi_ptr];
+}
+
+void dspp_device::fifo_head_w(offs_t offset, uint16_t data)
+{
+	m_fifo_dma[offset].m_prev_current = data;
+}
+
+uint16_t dspp_device::fifo_status_r(offs_t offset)
+{
+	// TODO: flags in the upper bits
+	return m_fifo_dma[offset].m_depth;
+}
+
+uint16_t dspp_device::outfifo_status_r(offs_t offset)
+{
+	return m_fifo_dma[16 + offset].m_depth;
+}
+
+uint16_t dspp_device::fifo_pop_r(offs_t offset)
+{
+	if (machine().side_effects_disabled())
+		return fifo_peek_r(offset);
+	fifo_dma &dma = m_fifo_dma[offset];
+	const uint16_t data = read_fifo_to_dspp(offset);
+	dma.m_prev_current = data;
+	return data;
+}
+
+void dspp_device::outfifo_w(offs_t offset, uint16_t data)
+{
+	fifo_dma &dma = m_fifo_dma[16 + offset];
+	if (dma.m_depth < DMA_FIFO_DEPTH)
+		write_dspp_to_fifo(16 + offset, data);
+}
+
+uint16_t dspp_device::host_fifo_status_r(int channel)
+{
+	return m_fifo_dma[channel & 31].m_depth;
+}
+
+void dspp_device::host_fifo_init_w(uint32_t mask)
+{
+	for (int channel = 0; channel < NUM_DMA_CHANNELS; channel++)
+	{
+		if (BIT(mask, channel))
+		{
+			fifo_dma &dma = m_fifo_dma[channel];
+			dma.m_dma_ptr = 0;
+			dma.m_dspi_ptr = 0;
+			dma.m_depth = 0;
+			dma.m_prev_current = 0;
+		}
+	}
+}
+
+/*
+ * Madam DMA stack: address, length, next address, next length.
+ * Lengths are in bytes minus 4, the DSPP side counts 16-bit samples.
+ * Next stays valid once written (a silence buffer loops forever without host intervention).
+ */
+void dspp_device::host_dma_w(int channel, int reg, uint32_t data)
+{
+	fifo_dma &dma = m_fifo_dma[channel & 31];
+	switch (reg & 3)
+	{
+		case 0: dma.m_current_addr = data; break;
+		case 1: dma.m_current_count = (data + 4) >> 1; break;
+		case 2: dma.m_next_addr = data; dma.m_next_valid = 1; dma.m_go_forever = 1; break;
+		case 3: dma.m_next_count = (data + 4) >> 1; dma.m_next_valid = 1; dma.m_go_forever = 1; break;
+	}
+}
+
+uint32_t dspp_device::host_dma_r(int channel, int reg)
+{
+	fifo_dma &dma = m_fifo_dma[channel & 31];
+	switch (reg & 3)
+	{
+		case 0: return dma.m_current_addr;
+		case 1: return (dma.m_current_count << 1) - 4;
+		case 2: return dma.m_next_addr;
+		case 3: return (dma.m_next_count << 1) - 4;
+	}
+	return 0;
+}
+
+void dspp_device::host_channel_enable_w(uint32_t set_mask, uint32_t clr_mask)
+{
+	m_dspx_channel_enable = (m_dspx_channel_enable | set_mask) & ~clr_mask;
+	m_dspx_channel_complete &= ~set_mask;
+	// channels 16-19 are DSPP -> RAM
+	m_dspx_channel_direction = 0x000f0000;
+}
+
 
 //-------------------------------------------------
 //  read_ext_control -

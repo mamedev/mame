@@ -380,7 +380,7 @@ void pickytlk_base_state::pickytlk(machine_config &config)
 	m_maincpu->in0_cb().set(FUNC(pickytlk_base_state::in0_r));
 	m_maincpu->input_flag_cb().set(FUNC(pickytlk_base_state::input_flag_read));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(127, 64);
 	m_screen->set_visarea(0, 127 - 1, 0, 64 - 1);

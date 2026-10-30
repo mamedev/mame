@@ -1480,7 +1480,7 @@ void hyperstone_device::hyperstone_rol()
 
 	uint32_t val = m_core->local_regs[dst_code];
 
-	val = rotl_32(val, n);
+	val = std::rotl(val, n);
 
 	SR &= ~(V_MASK | Z_MASK | C_MASK | N_MASK);
 	if (!(val & 0x80000000) ? (val & mask) : ((val & mask) ^ mask))
@@ -2169,7 +2169,7 @@ void hyperstone_device::hyperstone_set()
 	{
 		if (n == 0)
 		{
-			(DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code] = (SP & 0xfffffe00) | (GET_FP << 2) | (((SP & 0x100) && (SIGN_BIT(SR) == 0)) ? 1 : 0);
+			(DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code] = ((SP & 0xfffffe00) | (GET_FP << 2)) + (((SP & 0x100) && (SIGN_BIT(SR) == 0)) ? 0x200 : 0);
 		}
 		else if (n >= 2)
 		{

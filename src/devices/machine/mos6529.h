@@ -58,6 +58,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	uint8_t m_input;
+	uint8_t m_output;
 
 	devcb_write_line::array<8> m_p_handler;
 };

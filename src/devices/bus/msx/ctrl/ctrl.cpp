@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "ctrl.h"
 
+#include "dual_joyport.h"
 #include "hypershot.h"
 #include "joystick.h"
 #include "libbler.h"
@@ -48,6 +49,7 @@ void msx_general_purpose_port_device::device_start()
 void msx_general_purpose_port_devices(device_slot_interface &device)
 {
 	device.option_add("hypershot", MSX_HYPERSHOT);
+	device.option_add("dual_joyport", MSX_DUAL_JOYPORT);
 	device.option_add("joystick", MSX_JOYSTICK);
 	device.option_add("libbler", MSX_LIBBLERPAD);
 	device.option_add("magickey", MSX_MAGICKEY);

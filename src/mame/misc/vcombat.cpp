@@ -87,8 +87,8 @@ TODO :  This is a partially working driver.  Most of the memory maps for
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
+#include "video/bt47x.h"
 #include "video/mc6845.h"
-#include "video/tlc34076.h"
 #include "layout/generic.h"
 #include "screen.h"
 #include "speaker.h"
@@ -104,7 +104,7 @@ class vcombat_state : public driver_device
 public:
 	vcombat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_tlc34076(*this, "tlc34076"),
+		m_ramdac(*this, "ramdac"),
 		m_framebuffer_ctrl(*this, "fb_control"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
@@ -129,7 +129,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<tlc34076_device> m_tlc34076;
+	required_device<bt476_device> m_ramdac;
 	required_shared_ptr<uint16_t> m_framebuffer_ctrl;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -196,7 +196,7 @@ private:
 uint32_t vcombat_state::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)
 {
 	int y;
-	const pen_t *const pens = m_tlc34076->pens();
+	const pen_t *const pens = m_ramdac->pens();
 
 	uint16_t *m68k_buf = m_m68k_framebuffer[(*m_framebuffer_ctrl & 0x20) ? 1 : 0].get();
 	uint16_t *i860_buf = m_i860_framebuffer[index][0].get();
@@ -514,7 +514,7 @@ void vcombat_state::single_i860_map(address_map &map)
 	//map(0x703000, 0x703001)      /* Headset rotation axis? */
 	//map(0x704000, 0x704001)      /* Headset rotation axis? */
 
-	map(0x706000, 0x70601f).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
+	map(0x706000, 0x70601f).w(m_ramdac, FUNC(bt476_device::write)).umask16(0x00ff);
 }
 
 
@@ -592,6 +592,7 @@ void vcombat_state::init_vcombat()
 	m_i860_framebuffer[1][0] = std::make_unique<uint16_t[]>(0x8000);
 	m_i860_framebuffer[1][1] = std::make_unique<uint16_t[]>(0x8000);
 
+	// HACK: get rid of this
 	/* pc==4016 : jump 4038 ... There's something strange about how it waits at 402e (interrupts all masked out)
 	   I think what is happening here is that M0 snags the first time
 	   it hits this point based on a counter test just above this
@@ -713,18 +714,18 @@ void vcombat_state::vcombat(machine_config &config)
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 #endif
 
-	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
+	BT476(config, m_ramdac); // ADV476KN50E
 
 	/* Disabled for now as it can't handle multiple screens */
 //  MC6845(config, m_crtc, 6000000 / 16);
 //  m_crtc->set_screen("screen");
 	config.set_default_layout(layout_dualhsxs);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(12'000'000) / 2, 400, 0, 256, 291, 0, 208);
 	screen.set_screen_update(FUNC(vcombat_state::screen_update_vcombat_main));
 
-	screen_device &aux(SCREEN(config, "aux", SCREEN_TYPE_RASTER));
+	screen_device &aux(SCREEN(config, "aux"));
 	aux.set_raw(XTAL(12'000'000) / 2, 400, 0, 256, 291, 0, 208);
 	aux.set_screen_update(FUNC(vcombat_state::screen_update_vcombat_aux));
 
@@ -749,7 +750,7 @@ void vcombat_state::shadfgtr(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
+	BT476(config, m_ramdac); // ADV476KN50E
 
 	MC6845(config, m_crtc, XTAL(20'000'000) / 4 / 16);
 	m_crtc->set_screen("screen");
@@ -757,7 +758,7 @@ void vcombat_state::shadfgtr(machine_config &config)
 	m_crtc->set_char_width(16);
 	m_crtc->out_hsync_callback().set(FUNC(vcombat_state::sound_update));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(20'000'000) / 4, 320, 0, 256, 277, 0, 224);
 	screen.set_screen_update(FUNC(vcombat_state::screen_update_vcombat_main));
 

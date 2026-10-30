@@ -156,8 +156,8 @@ Apparently two PCB revisions, one is red coated.
 
 **************************************************************************************************/
 
-
 #include "emu.h"
+
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 

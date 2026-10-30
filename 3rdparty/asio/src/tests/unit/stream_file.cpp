@@ -2,7 +2,7 @@
 // stream_file.cpp
 // ~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -85,7 +85,7 @@ void test()
     file1 = std::move(file2);
     file1 = std::move(file10);
 
-    // basic_io_object functions.
+    // I/O object functions.
 
     stream_file::executor_type ex = file1.get_executor();
     (void)ex;

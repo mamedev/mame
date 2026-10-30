@@ -411,7 +411,7 @@ void shettle_state::shettle(machine_config &config)
 	mainlatch.q_out_cb<4>().set(FUNC(shettle_state::flip_screen_set));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 288, 264, 0, 224); // unknown, single XTAL on PCB & 288x224 suggests 60.606060 Hz like Galaxian HW
 	screen.set_screen_update(FUNC(shettle_state::screen_update));
 	screen.set_palette(m_palette);

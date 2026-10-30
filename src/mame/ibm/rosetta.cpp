@@ -12,7 +12,7 @@
  *   - external device and multiple errors
  *   - ras diagnostic modes
  *   - advanced/enhanced variants
- *   - ram holes
+ *   - ram state save and holes
  */
 
 #include "emu.h"
@@ -171,15 +171,19 @@ static u8 const led_pattern[16] =
 	0x39, 0x5e, 0x79, 0x00,
 };
 
+// memory configuration register to ram size lookup table
+static constexpr unsigned ram_sizes[] = { 4096, 1024, 0, 0, 8192, 2048, 512, 0 };
+
 DEFINE_DEVICE_TYPE(ROSETTA, rosetta_device, "rosetta", "IBM Rosetta")
 
 ALLOW_SAVE_TYPE(rosetta_device::mear_state)
 
-rosetta_device::rosetta_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, ram_size ram)
+rosetta_device::rosetta_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, ROSETTA, tag, owner, clock)
 	, rsc_cpu_interface(mconfig, *this)
 	, m_mem_space(*this, finder_base::DUMMY_TAG, -1, 32)
 	, m_rom(*this, finder_base::DUMMY_TAG)
+	, m_mcr(*this, "MCR")
 	, m_leds(*this, "led%u", 0U)
 	, m_out_pchk(*this)
 	, m_out_mchk(*this)
@@ -191,14 +195,9 @@ rosetta_device::rosetta_device(machine_config const &mconfig, char const *tag, d
 	, m_pchk_state(false)
 	, m_tlb{ {}, {} }
 	, m_tlb_lru(0)
-	, m_ram_size(ram)
+	, m_ram(nullptr)
+	, m_ecc(nullptr)
 {
-}
-
-void rosetta_device::device_validity_check(validity_checker &valid) const
-{
-	if (!m_ram_size)
-		osd_printf_error("invalid ram size\n");
 }
 
 void rosetta_device::device_start()
@@ -215,21 +214,35 @@ void rosetta_device::device_start()
 	save_item(STRUCT_MEMBER(m_tlb, field2));
 	save_item(NAME(m_tlb_lru));
 
-	save_pointer(NAME(m_ram), m_ram_size);
-	save_pointer(NAME(m_ecc), m_ram_size);
-	save_pointer(NAME(m_rca), 2048);
-
 	config_tlb();
 
-	m_ram = std::make_unique<u32[]>(m_ram_size);
-	m_ecc = std::make_unique<u8[]>(m_ram_size);
 	m_rca = std::make_unique<u8[]>(2048);
 
-	m_mem_space->cache(m_mem);
+	//save_pointer(NAME(m_ram), m_ram_size);
+	//save_pointer(NAME(m_ecc), m_ram_size);
+	save_pointer(NAME(m_rca), 2048);
+
+	m_mem_space->specific(m_mem);
 }
 
 void rosetta_device::device_reset()
 {
+	if (m_ram == nullptr)
+	{
+		// RAM size is sum of amount installed in slot C and D in doublewords
+		// TODO: hole for 1M/4M memory boards
+		//   2/2 rams 4M
+		//   2/1 rams 4M
+		//   1/1 rams 4M hole 1M
+		//   4/0 rams 4M
+		//   4/4 rams 16M hole 4M
+		u8 const mcr = m_mcr->read();
+		m_ram_size = (ram_sizes[BIT(mcr, 0, 3)] + ram_sizes[BIT(mcr, 4, 3)]) << 8;
+
+		m_ram = std::make_unique<u32[]>(m_ram_size);
+		m_ecc = std::make_unique<u8[]>(m_ram_size);
+	}
+
 	m_mear_lock = UNLOCKED;
 	m_rmdr_lock = false;
 	m_led_lock = true;
@@ -243,7 +256,7 @@ void rosetta_device::device_post_load()
 	config_tlb();
 }
 
-bool rosetta_device::ior(u32 address, u32 &data)
+bool rosetta_device::ior(offs_t address, u32 &data)
 {
 	if ((address >> 16) == u8(m_control[IOBA]))
 	{
@@ -297,7 +310,7 @@ bool rosetta_device::ior(u32 address, u32 &data)
 	return false;
 }
 
-bool rosetta_device::iow(u32 address, u32 data)
+bool rosetta_device::iow(offs_t address, u32 data)
 {
 	if ((address >> 16) == u8(m_control[IOBA]))
 	{
@@ -358,8 +371,10 @@ bool rosetta_device::iow(u32 address, u32 data)
 }
 
 // translate logical to physical address ignoring protection and without side effects
-bool rosetta_device::translate(u32 &address) const
+bool rosetta_device::translate(int spacenum, offs_t &address, address_space *&target_space) const
 {
+	target_space = m_mem_space;
+
 	unsigned const segment = address >> 28;
 
 	// segment present
@@ -429,7 +444,7 @@ bool rosetta_device::translate(u32 &address) const
 	return true;
 }
 
-bool rosetta_device::translate(u32 &address, bool system_processor, bool store)
+bool rosetta_device::translate(offs_t &address, bool system_processor, bool store)
 {
 	unsigned const segment = address >> 28;
 
@@ -832,7 +847,8 @@ u32 rosetta_device::rca_r(offs_t offset)
 
 	if (!m_led_lock)
 	{
-		LOGMASKED(LOG_LED, "led 0x%02x (%s)\n", u8(offset), machine().describe_context());
+		if (u8(offset) != 0xff)
+			LOGMASKED(LOG_LED, "led 0x%02x (%s)\n", u8(offset), machine().describe_context());
 
 		m_leds[0] = led_pattern[(offset >> 0) & 15];
 		m_leds[1] = led_pattern[(offset >> 4) & 15];
@@ -1101,7 +1117,7 @@ void rosetta_device::compute_address(u32 data)
 			: ((t.field1 & TLB_RPN2K) << 8) | (data & 0x07ffU);
 }
 
-bool rosetta_device::fetch(u32 address, u16 &data, rsc_mode const mode)
+bool rosetta_device::fetch(offs_t address, u16 &data, rsc_mode const mode)
 {
 	if (mode & rsc_mode::RSC_T)
 	{
@@ -1141,7 +1157,7 @@ bool rosetta_device::fetch(u32 address, u16 &data, rsc_mode const mode)
 	return true;
 }
 
-template <typename T> bool rosetta_device::load(u32 address, T &data, rsc_mode const mode, bool sp)
+template <typename T> bool rosetta_device::load(offs_t address, T &data, T mask, rsc_mode const mode, bool sp)
 {
 	if (mode & rsc_mode::RSC_T)
 	{
@@ -1162,8 +1178,8 @@ template <typename T> bool rosetta_device::load(u32 address, T &data, rsc_mode c
 	switch (sizeof(T))
 	{
 	case 1: data = m_mem.read_byte(address); break;
-	case 2: data = m_mem.read_word(address); break;
-	case 4: data = m_mem.read_dword(address); break;
+	case 2: data = m_mem.read_word(address, mask); break;
+	case 4: data = m_mem.read_dword(address, mask); break;
 	}
 
 	switch ((mer ^ m_control[MER]) & (MER_B | MER_U | MER_C))
@@ -1191,7 +1207,7 @@ template <typename T> bool rosetta_device::load(u32 address, T &data, rsc_mode c
 	return true;
 }
 
-template <typename T> bool rosetta_device::store(u32 address, T data, rsc_mode const mode, bool sp)
+template <typename T> bool rosetta_device::store(offs_t address, T data, T mask, rsc_mode const mode, bool sp)
 {
 	if (mode & rsc_mode::RSC_T)
 	{
@@ -1212,8 +1228,8 @@ template <typename T> bool rosetta_device::store(u32 address, T data, rsc_mode c
 	switch (sizeof(T))
 	{
 	case 1: m_mem.write_byte(address, data); break;
-	case 2: m_mem.write_word(address, data); break;
-	case 4: m_mem.write_dword(address, data); break;
+	case 2: m_mem.write_word(address, data, mask); break;
+	case 4: m_mem.write_dword(address, data, mask); break;
 	}
 
 	switch ((mer ^ m_control[MER]) & (MER_B | MER_W))
@@ -1235,7 +1251,7 @@ template <typename T> bool rosetta_device::store(u32 address, T data, rsc_mode c
 	return true;
 }
 
-template <typename T> bool rosetta_device::modify(u32 address, std::function<T(T)> f, rsc_mode const mode)
+template <typename T> bool rosetta_device::modify(offs_t address, std::function<T(T)> f, T mask, rsc_mode const mode)
 {
 	if (mode & rsc_mode::RSC_T)
 	{
@@ -1256,8 +1272,8 @@ template <typename T> bool rosetta_device::modify(u32 address, std::function<T(T
 	switch (sizeof(T))
 	{
 	case 1: m_mem.write_byte(address, f(m_mem.read_byte(address))); break;
-	case 2: m_mem.write_word(address, f(m_mem.read_word(address))); break;
-	case 4: m_mem.write_dword(address, f(m_mem.read_dword(address))); break;
+	case 2: m_mem.write_word(address, f(m_mem.read_word(address, mask)), mask); break;
+	case 4: m_mem.write_dword(address, f(m_mem.read_dword(address, mask)), mask); break;
 	}
 
 	switch ((mer ^ m_control[MER]) & (MER_B | MER_W))
@@ -1277,4 +1293,32 @@ template <typename T> bool rosetta_device::modify(u32 address, std::function<T(T
 	}
 
 	return true;
+}
+
+INPUT_PORTS_START(rosetta)
+	PORT_START("MCR")
+	PORT_CONFNAME(0x07, 0x00, "Slot C")
+	PORT_CONFSETTING(0x00, "4MB")
+	PORT_CONFSETTING(0x01, "1MB")
+	PORT_CONFSETTING(0x04, "8MB")
+	PORT_CONFSETTING(0x05, "2MB")
+	PORT_CONFSETTING(0x06, "512KB")
+	PORT_CONFSETTING(0x07, "Empty")
+
+	PORT_CONFNAME(0x08, 0x00, "Refresh Rate")
+	PORT_CONFSETTING(0x08, u8"7.0µs")
+	PORT_CONFSETTING(0x00, u8"13.8µs")
+
+	PORT_CONFNAME(0xf0, 0xf0, "Slot D")
+	PORT_CONFSETTING(0x80, "4MB")
+	PORT_CONFSETTING(0x90, "1MB")
+	PORT_CONFSETTING(0xc0, "8MB")
+	PORT_CONFSETTING(0xd0, "2MB")
+	PORT_CONFSETTING(0xe0, "512KB")
+	PORT_CONFSETTING(0xf0, "Empty")
+INPUT_PORTS_END
+
+ioport_constructor rosetta_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(rosetta);
 }

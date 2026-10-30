@@ -783,7 +783,7 @@ void funkball_state::funkball(machine_config &config)
 	m_voodoo->set_screen("screen");
 	m_voodoo->set_cpu(m_maincpu);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// 494 263 (62 380 ~ 10 249)
 	// vestigial, updated by Voodoo core
 	m_screen->set_raw(XTAL(14'318'181) / 2, 494, 62, 381, 263, 10, 250);

@@ -113,7 +113,7 @@ void screen_ula_device::draw_ula(bitmap_rgb32 &bitmap, const rectangle &clip, bo
 		screen_location += 0x2000;
 
 	const u16 x2_min = ((clip.left() - m_offset_h) + (m_ula_scroll_x << 1) + m_ula_fine_scroll_x) % (SCREEN_AREA.width() << 1);
-	bool use_latch = x2_min & 0xf;
+	bool use_latch = (clip.left() != ((m_ula_clip_x1 << 1) + m_offset_h)) && (x2_min & 0xf);
 	for (u16 vpos = clip.top(); vpos <= clip.bottom(); vpos++)
 	{
 		u16 hpos = clip.left();

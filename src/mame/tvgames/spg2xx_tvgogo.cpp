@@ -267,4 +267,4 @@ ROM_END
 
 
 // Toyquest games
-CONS( 2005, tvgogo,  0,        0, tvgogo, tvgogo,   tvgogo_state, empty_init, "Toyquest", "GoGo TV Video Vision",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // or TV Go Go - the game addons call it the 'Video Vision console'
+CONS( 2005, tvgogo, 0, 0, tvgogo, tvgogo, tvgogo_state, empty_init, "Toyquest", "GoGo TV Video Vision", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // or TV Go Go - the game addons call it the 'Video Vision console'

@@ -196,7 +196,7 @@ void astrocde_home_state::astrocde(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(ASTROCADE_CLOCK, 455, 0, 352, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(astrocde_state::screen_update_astrocde));
 	m_screen->set_palette(m_palette);

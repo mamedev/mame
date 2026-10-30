@@ -88,7 +88,7 @@ void sigma21_state::sigma21(machine_config &config)
 
 	PIA6821(config, "pia");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(5600000, 360, 0, 256, 276, 0, 224); // copied from r2dtank; actual params are in badly dumped ROM
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

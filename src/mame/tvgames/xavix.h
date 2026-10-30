@@ -48,7 +48,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
-		m_sprite_xhigh_ignore_hack(true),
 		m_mainram(*this, "mainram"),
 		m_fragment_sprite(*this, "fragment_sprite"),
 		m_rom_dma_src(*this, "rom_dma_src"),
@@ -205,8 +204,6 @@ protected:
 	void xavix_lowbus_map(address_map &map) ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
-
 
 	virtual void video_start() override ATTR_COLD;
 
@@ -402,9 +399,9 @@ protected:
 	void palram_l_w(offs_t offset, uint8_t data);
 	void colmix_sh_w(offs_t offset, uint8_t data);
 	void colmix_l_w(offs_t offset, uint8_t data);
+	void spriteram_set_high_x(offs_t offset, uint8_t data);
 	void spriteram_w(offs_t offset, uint8_t data);
 	void mainram_w(offs_t offset, uint8_t data);
-	bool m_sprite_xhigh_ignore_hack;
 
 	void tmap1_regs_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	void tmap2_regs_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
@@ -1218,5 +1215,34 @@ protected:
 
 };
 
+
+class xavix_pl1000_state : public xavix_state
+{
+public:
+	xavix_pl1000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag)
+		, m_lightgun2(*this, "GUN2_%u", 0U)
+	{ }
+
+	void init_pl1000();
+	void xavix_pl1000(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+
+	virtual void write_io1(uint8_t data, uint8_t direction) override
+	{
+		m_io1_out = data;
+	}
+
+
+	virtual uint8_t lightgun_r(offs_t offset) override;
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
+	u8 m_io1_out;
+	required_ioport_array<2> m_lightgun2;
+};
 
 #endif // MAME_TVGAMES_XAVIX_H

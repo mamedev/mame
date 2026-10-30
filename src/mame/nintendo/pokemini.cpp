@@ -77,6 +77,7 @@ private:
 	PRC m_prc;
 	TIMERS m_timers;
 	bitmap_ind16 m_bitmap;
+	uint8_t m_irq_vector;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -96,6 +97,7 @@ private:
 	void pokemini_mem_map(address_map &map) ATTR_COLD;
 
 	void check_irqs();
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 	void update_sound();
 	TIMER_CALLBACK_MEMBER(seconds_timer_callback);
 	TIMER_CALLBACK_MEMBER(timer_256hz_callback);
@@ -286,16 +288,13 @@ void pokemini_state::check_irqs()
 	if ( irq_set[3] )
 		vector = irq_set[3];
 
-	if ( vector )
-	{
-		//logerror("Triggering IRQ with vector %02x\n", vector );
-		/* Trigger interrupt and set vector */
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector ); // MINX
-	}
-	else
-	{
-		m_maincpu->set_input_line(0, CLEAR_LINE );
-	}
+	m_irq_vector = vector;
+	m_maincpu->set_input_line(0, vector ? ASSERT_LINE : CLEAR_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(pokemini_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 
@@ -1696,13 +1695,14 @@ void pokemini_state::pokemini(machine_config &config)
 	/* basic machine hardware */
 	MINX(config, m_maincpu, 4000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pokemini_state::pokemini_mem_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(pokemini_state::cpu_acknowledge_irq));
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	I2C_24C64(config, m_i2cmem); // ?
 
 	/* This still needs to be improved to actually match the hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_screen_update(FUNC(pokemini_state::screen_update));
 	m_screen->set_size(96, 64);
 	m_screen->set_visarea(0, 95, 0, 63);

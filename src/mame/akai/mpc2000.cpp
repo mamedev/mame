@@ -653,7 +653,7 @@ void mpc2000_state::mpc2000(machine_config &config)
 	m_subcpu->an3_func().set(FUNC(mpc2000_state::an3_pads_r));
 	m_subcpu->an4_func().set(FUNC(mpc2000_state::an4_r));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(80);
 	m_screen->set_screen_update(FUNC(mpc2000_state::screen_update));
 	m_screen->set_size(248, 60);

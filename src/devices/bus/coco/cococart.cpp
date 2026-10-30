@@ -39,7 +39,6 @@
 
 #include "emu.h"
 #include "cococart.h"
-#include "formats/rpk.h"
 
 #include "coco_dcmodem.h"
 #include "coco_fdc.h"
@@ -68,6 +67,8 @@
 #include "dragon_msx2.h"
 #include "dragon_serial.h"
 #include "dragon_sprites.h"
+
+#include "formats/rpk.h"
 
 
 /***************************************************************************
@@ -141,7 +142,7 @@ cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const 
 
 void cococart_slot_device::device_start()
 {
-	for(int i=0; i < TIMER_POOL; i++ )
+	for (int i=0; i < TIMER_POOL; i++)
 	{
 		m_cart_line.timer[i]    = timer_alloc(FUNC(cococart_slot_device::cart_line_timer_tick), this);
 		m_nmi_line.timer[i]     = timer_alloc(FUNC(cococart_slot_device::nmi_line_timer_tick), this);
@@ -319,8 +320,6 @@ void cococart_slot_device::set_line(line ln, coco_cartridge_line &line, cococart
 		case line::HALT:
 			LOGHALT( "set_line: HALT, value: %s\n", line_value_string(value));
 			break;
-		case line::SOUND_ENABLE:
-			break;
 		}
 
 		// engage in a bit of gymnastics for this odious 'Q' value
@@ -410,11 +409,6 @@ void cococart_slot_device::set_line_value(cococart_slot_device::line which, coco
 
 	case cococart_slot_device::line::HALT:
 		set_line_timer(m_halt_line, value);
-		break;
-
-	case cococart_slot_device::line::SOUND_ENABLE:
-		if (m_cart)
-			m_cart->set_sound_enable(value != cococart_slot_device::line_value::CLEAR);
 		break;
 	}
 }
@@ -514,7 +508,7 @@ void cococart_slot_device::set_cart_base_update(cococart_base_update_delegate up
 //  read_coco_rpk
 //-------------------------------------------------
 
-static std::error_condition read_coco_rpk(std::unique_ptr<util::random_read> &&stream, rpk_file::ptr &result)
+static std::error_condition read_coco_rpk(util::random_read &stream, rpk_file::ptr &result)
 {
 	// sanity checks
 	static_assert(std::size(coco_rpk_pcbdefs) - 1 == std::size(coco_rpk_cardslottypes));
@@ -523,7 +517,7 @@ static std::error_condition read_coco_rpk(std::unique_ptr<util::random_read> &&s
 	rpk_reader reader(coco_rpk_pcbdefs, false);
 
 	// and read the RPK file
-	return reader.read(std::move(stream), result);
+	return reader.read(stream, result);
 }
 
 
@@ -531,13 +525,13 @@ static std::error_condition read_coco_rpk(std::unique_ptr<util::random_read> &&s
 //  read_coco_rpk
 //-------------------------------------------------
 
-static std::error_condition read_coco_rpk(std::unique_ptr<util::random_read> &&stream, u8 *mem, offs_t cart_length, offs_t &actual_length)
+static std::error_condition read_coco_rpk(util::random_read &stream, u8 *mem, offs_t cart_length, offs_t &actual_length)
 {
 	actual_length = 0;
 
 	// open the RPK
 	rpk_file::ptr file;
-	std::error_condition err = read_coco_rpk(std::move(stream), file);
+	std::error_condition err = read_coco_rpk(stream, file);
 	if (err)
 		return err;
 
@@ -589,10 +583,7 @@ std::pair<std::error_condition, std::string> cococart_slot_device::call_load()
 		else if (is_filetype("rpk"))
 		{
 			// RPK file
-			util::core_file::ptr proxy;
-			std::error_condition err = util::core_file::open_proxy(image_core_file(), proxy);
-			if (!err)
-				err = read_coco_rpk(std::move(proxy), base, cart_length, read_length);
+			std::error_condition const err = read_coco_rpk(image_core_file(), base, cart_length, read_length);
 			if (err)
 				return std::make_pair(err, std::string());
 		}
@@ -627,10 +618,7 @@ std::string cococart_slot_device::get_default_card_software(get_default_card_sof
 	{
 		// RPK file
 		rpk_file::ptr file;
-		util::core_file::ptr proxy;
-		std::error_condition err = util::core_file::open_proxy(*hook.image_file(), proxy);
-		if (!err)
-			err = read_coco_rpk(std::move(proxy), file);
+		std::error_condition const err = read_coco_rpk(*hook.image_file(), file);
 		if (!err)
 			pcb_type = file->pcb_type();
 	}
@@ -737,15 +725,6 @@ void device_cococart_interface::scs_write(offs_t offset, u8 data)
 
 
 //-------------------------------------------------
-//  set_sound_enable
-//-------------------------------------------------
-
-void device_cococart_interface::set_sound_enable(bool sound_enable)
-{
-}
-
-
-//-------------------------------------------------
 //  get_cart_base
 //-------------------------------------------------
 
@@ -811,6 +790,25 @@ address_space &device_cococart_interface::cartridge_space()
 
 
 //-------------------------------------------------
+//  add_sound_route
+//-------------------------------------------------
+
+void device_cococart_interface::add_sound_route(device_sound_interface &sound_device, int output_index, double gain)
+{
+	host().add_sound_route(sound_device, output_index, gain);
+}
+
+
+//-------------------------------------------------
+//  set_sound_gain
+//-------------------------------------------------
+
+void device_cococart_interface::set_sound_gain(device_sound_interface &sound_device, int output_index, double gain)
+{
+	host().set_sound_gain(sound_device, output_index, gain);
+}
+
+//-------------------------------------------------
 //  set_line_value
 //-------------------------------------------------
 
@@ -827,8 +825,7 @@ void device_cococart_interface::set_line_value(cococart_slot_device::line line, 
 void coco_cart_add_basic_devices(device_slot_interface &device)
 {
 	// basic devices, on both the main slot and the Multi-Pak interface
-	device.option_add_internal("banked_16k", COCO_PAK_BANKED);
-	device.option_add_internal("pak", COCO_PAK);
+	device.option_add("banked_16k", COCO_PAK_BANKED);
 	device.option_add("ccpsg", COCO_PSG);
 	device.option_add("dcmodem", COCO_DCMODEM);
 	device.option_add("gmc", COCO_PAK_GMC);
@@ -836,6 +833,7 @@ void coco_cart_add_basic_devices(device_slot_interface &device)
 	device.option_add("max", COCO_PAK_MAX);
 	device.option_add("midi", COCO_MIDI);
 	device.option_add("orch90", COCO_ORCH90);
+	device.option_add("pak", COCO_PAK);
 	device.option_add("ram", COCO_PAK_RAM);
 	device.option_add("rs232", COCO_RS232);
 	device.option_add("ssc", COCO_SSC);
@@ -844,8 +842,8 @@ void coco_cart_add_basic_devices(device_slot_interface &device)
 	device.option_add("sym12", COCO_SYM12);
 	device.option_add("wpk", COCO_WPK);
 	device.option_add("wpk2", COCO_WPK2);
-	device.option_add("wpkrs", COCO_WPKRS);
 	device.option_add("wpk2p", COCO_WPK2P);
+	device.option_add("wpkrs", COCO_WPKRS);
 	device.option_add("xsid", COCO_XSID);
 }
 

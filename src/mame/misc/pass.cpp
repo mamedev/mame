@@ -338,7 +338,7 @@ void pass_state::pass(machine_config &config)
 	audiocpu.set_periodic_int(FUNC(pass_state::irq0_line_hold), attotime::from_hz(60)); // probably not accurate, unknown timing and generation (ym2203 sound chip?).
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);

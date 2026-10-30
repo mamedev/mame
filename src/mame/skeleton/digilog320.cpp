@@ -367,7 +367,7 @@ void digilog320_state::digilog320(machine_config &config)
 	AM9519(config, m_uic);
 	m_uic->out_int_callback().set_inputline(m_subcpu, INPUT_LINE_IRQ0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(5.6592_MHz_XTAL, 320, 0, 256, 262, 0, 192);
 	screen.set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 

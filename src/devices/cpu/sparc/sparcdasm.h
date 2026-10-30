@@ -112,7 +112,7 @@ public:
 private:
 	struct branch_desc
 	{
-		int32_t           (*get_disp)(uint32_t op);
+		int32_t         (*get_disp)(uint32_t op);
 		const char *    (*get_comment)(const config *conf, bool use_cc, offs_t pc, uint32_t op);
 		int             disp_width;
 		bool            use_pred, use_cc;
@@ -219,10 +219,10 @@ private:
 	static const int_op_desc_map::value_type    SPARCLITE_INT_OP_DESC[];
 	static const int_op_desc_map::value_type    V9_INT_OP_DESC[];
 	static const state_reg_desc_map::value_type V9_STATE_REG_DESC[];
-	static const char * const                   MOVCC_CC_NAMES[8];
-	static const char * const                   MOVCC_COND_NAMES[32];
-	static const char * const                   MOVE_INT_COND_MNEMONICS[8];
-	static const char * const                   V9_PRIV_REG_NAMES[32];
+	static const char *const                    MOVCC_CC_NAMES[8];
+	static const char *const                    MOVCC_COND_NAMES[32];
+	static const char *const                    MOVE_INT_COND_MNEMONICS[8];
+	static const char *const                    V9_PRIV_REG_NAMES[32];
 	static const fpop1_desc_map::value_type     V7_FPOP1_DESC[];
 	static const fpop1_desc_map::value_type     V9_FPOP1_DESC[];
 	static const fpop2_desc_map::value_type     V7_FPOP2_DESC[];

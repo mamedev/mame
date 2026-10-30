@@ -65,20 +65,6 @@ void abc_keyboard_port_device::device_start()
 
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void abc_keyboard_port_device::device_reset()
-{
-	if (m_card)
-	{
-		m_card->reset_w(ASSERT_LINE);
-		m_card->reset_w(CLEAR_LINE);
-	}
-}
-
-
-//-------------------------------------------------
 //  write_rx -
 //-------------------------------------------------
 

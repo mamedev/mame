@@ -1,3 +1,4 @@
+#define GLM_ENABLE_EXPERIMENTAL
 #define GLM_FORCE_INLINE
 #include <glm/gtc/epsilon.hpp>
 #include <glm/gtc/integer.hpp>
@@ -15,7 +16,7 @@
 
 namespace log2_
 {
-	int test()
+	static int test()
 	{
 		int Error = 0;
 
@@ -52,9 +53,14 @@ namespace log2_
 		return Error;
 	}
 
-	int perf(std::size_t Count)
+	static int perf(std::size_t Count)
 	{
 		int Error = 0;
+
+#if GLM_COMPILER & GLM_COMPILER_CLANG
+#	pragma clang diagnostic push
+#	pragma clang diagnostic ignored "-Wsign-conversion"
+#endif
 
 		{
 			std::vector<int> Result;
@@ -67,7 +73,7 @@ namespace log2_
 
 			std::clock_t End = clock();
 
-			printf("glm::log2<int>: %ld clocks\n", End - Begin);
+			std::printf("glm::log2<int>: %d clocks\n", static_cast<int>(End - Begin));
 		}
 
 		{
@@ -81,8 +87,12 @@ namespace log2_
 
 			std::clock_t End = clock();
 
-			printf("glm::log2<ivec4>: %ld clocks\n", End - Begin);
+			std::printf("glm::log2<ivec4>: %d clocks\n", static_cast<int>(End - Begin));
 		}
+
+#if GLM_COMPILER & GLM_COMPILER_CLANG
+#	pragma clang diagnostic pop
+#endif
 
 #		if GLM_HAS_BITSCAN_WINDOWS
 		{
@@ -91,9 +101,14 @@ namespace log2_
 
 			std::clock_t Begin = clock();
 
+#if GLM_COMPILER& GLM_COMPILER_VC
+#	pragma warning(push)
+#	pragma warning(disable: 4267)
+#endif
+
 			for(std::size_t i = 0; i < Count; ++i)
 			{
-				glm::tvec4<unsigned long, glm::defaultp> Tmp(glm::uninitialize);
+				glm::vec<4, unsigned long, glm::defaultp> Tmp;
 				_BitScanReverse(&Tmp.x, i);
 				_BitScanReverse(&Tmp.y, i);
 				_BitScanReverse(&Tmp.z, i);
@@ -101,17 +116,26 @@ namespace log2_
 				Result[i] = glm::ivec4(Tmp);
 			}
 
+#if GLM_COMPILER & GLM_COMPILER_VC
+#	pragma warning(pop)
+#endif
+
 			std::clock_t End = clock();
 
-			printf("glm::log2<ivec4> inlined: %ld clocks\n", End - Begin);
+			std::printf("glm::log2<ivec4> inlined: %d clocks\n", static_cast<int>(End - Begin));
 		}
 
 
 		{
-			std::vector<glm::tvec4<unsigned long, glm::defaultp> > Result;
+			std::vector<glm::vec<4, unsigned long, glm::defaultp> > Result;
 			Result.resize(Count);
 
 			std::clock_t Begin = clock();
+
+#if GLM_COMPILER& GLM_COMPILER_VC
+#	pragma warning(push)
+#	pragma warning(disable: 4267)
+#endif
 
 			for(std::size_t i = 0; i < Count; ++i)
 			{
@@ -121,9 +145,13 @@ namespace log2_
 				_BitScanReverse(&Result[i].w, i);
 			}
 
+#if GLM_COMPILER & GLM_COMPILER_VC
+#	pragma warning(pop)
+#endif
+
 			std::clock_t End = clock();
 
-			printf("glm::log2<ivec4> inlined no cast: %ld clocks\n", End - Begin);
+			std::printf("glm::log2<ivec4> inlined no cast: %d clocks\n", static_cast<int>(End - Begin));
 		}
 
 
@@ -133,6 +161,11 @@ namespace log2_
 
 			std::clock_t Begin = clock();
 
+#if GLM_COMPILER& GLM_COMPILER_VC
+#	pragma warning(push)
+#	pragma warning(disable: 4267)
+#endif
+
 			for(std::size_t i = 0; i < Count; ++i)
 			{
 				_BitScanReverse(reinterpret_cast<unsigned long*>(&Result[i].x), i);
@@ -141,12 +174,20 @@ namespace log2_
 				_BitScanReverse(reinterpret_cast<unsigned long*>(&Result[i].w), i);
 			}
 
+#if GLM_COMPILER & GLM_COMPILER_VC
+#	pragma warning(pop)
+#endif
+
 			std::clock_t End = clock();
 
-			printf("glm::log2<ivec4> reinterpret: %ld clocks\n", End - Begin);
+			std::printf("glm::log2<ivec4> reinterpret: %d clocks\n", static_cast<int>(End - Begin));
 		}
 #		endif//GLM_HAS_BITSCAN_WINDOWS
 
+#if GLM_COMPILER & GLM_COMPILER_CLANG
+#	pragma clang diagnostic push
+#	pragma clang diagnostic ignored "-Wsign-conversion"
+#endif
 		{
 			std::vector<float> Result;
 			Result.resize(Count);
@@ -158,9 +199,16 @@ namespace log2_
 
 			std::clock_t End = clock();
 
-			printf("glm::log2<float>: %ld clocks\n", End - Begin);
+			std::printf("glm::log2<float>: %d clocks\n", static_cast<int>(End - Begin));
 		}
+#if GLM_COMPILER & GLM_COMPILER_CLANG
+#	pragma clang diagnostic pop
+#endif
 
+#if GLM_COMPILER & GLM_COMPILER_CLANG
+#	pragma clang diagnostic push
+#	pragma clang diagnostic ignored "-Wsign-conversion"
+#endif
 		{
 			std::vector<glm::vec4> Result;
 			Result.resize(Count);
@@ -168,12 +216,15 @@ namespace log2_
 			std::clock_t Begin = clock();
 
 			for(int i = 0; i < static_cast<int>(Count); ++i)
-				Result[i] = glm::log2(glm::vec4(i));
+				Result[i] = glm::log2(glm::vec4(static_cast<float>(i)));
 
 			std::clock_t End = clock();
 
-			printf("glm::log2<vec4>: %ld clocks\n", End - Begin);
+			std::printf("glm::log2<vec4>: %d clocks\n", static_cast<int>(End - Begin));
 		}
+#if GLM_COMPILER & GLM_COMPILER_CLANG
+#	pragma clang diagnostic pop
+#endif
 
 		return Error;
 	}
@@ -181,14 +232,14 @@ namespace log2_
 
 namespace iround
 {
-	int test()
+	static int test()
 	{
 		int Error = 0;
 
 		for(float f = 0.0f; f < 3.1f; f += 0.05f)
 		{
-			int RoundFast = glm::iround(f);
-			int RoundSTD = glm::round(f);
+			int RoundFast = static_cast<int>(glm::iround(f));
+			int RoundSTD = static_cast<int>(glm::round(f));
 			Error += RoundFast == RoundSTD ? 0 : 1;
 			assert(!Error);
 		}
@@ -199,14 +250,14 @@ namespace iround
 
 namespace uround
 {
-	int test()
+	static int test()
 	{
 		int Error = 0;
 
 		for(float f = 0.0f; f < 3.1f; f += 0.05f)
 		{
-			int RoundFast = glm::uround(f);
-			int RoundSTD = glm::round(f);
+			int RoundFast = static_cast<int>(glm::uround(f));
+			int RoundSTD = static_cast<int>(glm::round(f));
 			Error += RoundFast == RoundSTD ? 0 : 1;
 			assert(!Error);
 		}
@@ -223,10 +274,8 @@ int main()
 	Error += ::iround::test();
 	Error += ::uround::test();
 
-#	ifdef NDEBUG
-		std::size_t const Samples(1000);
-		Error += ::log2_::perf(Samples);
-#	endif//NDEBUG
+	std::size_t const Samples(1000);
+	Error += ::log2_::perf(Samples);
 
 	return Error;
 }

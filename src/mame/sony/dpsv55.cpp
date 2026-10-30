@@ -95,7 +95,7 @@ void dpsv55_state::dpsv55(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // CY62256LL-70SNC-T2 + 3V lithium battery + M62021FP-600C reset generator + M5239L voltage detector
 
 	// LCD unit (LC0801)
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));

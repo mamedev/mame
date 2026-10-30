@@ -259,15 +259,16 @@ bool nfd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		{
 			cur_sec_map = track * 26 + i;
 			sector_size = 128 << sec_sizes[cur_sec_map];
-			sects[i].track       = tracks[cur_sec_map];
-			sects[i].head        = heads[cur_sec_map];
-			sects[i].sector      = secs[cur_sec_map];
-			sects[i].size        = sec_sizes[cur_sec_map];
-			sects[i].actual_size = sector_size;
-			sects[i].deleted     = false;
+			sects[i].track        = tracks[cur_sec_map];
+			sects[i].head         = heads[cur_sec_map];
+			sects[i].sector       = secs[cur_sec_map];
+			sects[i].size         = sec_sizes[cur_sec_map];
+			sects[i].actual_size  = sector_size;
+			sects[i].deleted      = false;
 			sects[i].bad_data_crc = false;
 			sects[i].bad_addr_crc = false;
-			sects[i].data        = sect_data + i * sector_size;
+			sects[i].weak         = false;
+			sects[i].data         = sect_data + i * sector_size;
 		}
 		pos += track_sizes[track];
 

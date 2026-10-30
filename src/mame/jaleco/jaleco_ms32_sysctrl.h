@@ -42,6 +42,7 @@ public:
 	auto sound_ack_cb() { return m_sound_ack_cb.bind(); }
 	auto sound_reset_cb() { return m_sound_reset_cb.bind(); }
 	void set_invert_vblank_lines(bool enable) { m_invert_vblank_lines = enable; }
+	void set_field_irq_last_active_line(bool enable) { m_field_irq_last_active_line = enable; }
 //  template <typename T> void set_screen(T &&screen_tag) { m_screen.set_tag(std::forward<T>(screen_tag)); printf("xxx"); }
 
 protected:
@@ -99,6 +100,7 @@ private:
 	TIMER_CALLBACK_MEMBER(flush_scanline_timer);
 
 	bool m_invert_vblank_lines;
+	bool m_field_irq_last_active_line;
 };
 
 // device type definition

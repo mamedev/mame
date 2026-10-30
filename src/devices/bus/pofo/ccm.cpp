@@ -51,6 +51,7 @@ portfolio_memory_card_slot_device::portfolio_memory_card_slot_device(const machi
 	device_t(mconfig, PORTFOLIO_MEMORY_CARD_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_portfolio_memory_card_slot_interface>(mconfig, *this),
 	device_memcard_image_interface(mconfig, *this),
+	m_memspace(*this, finder_base::DUMMY_TAG, -1),
 	m_card(nullptr)
 {
 }

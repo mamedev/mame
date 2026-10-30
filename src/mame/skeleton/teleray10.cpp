@@ -118,7 +118,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(teleray10_state::timer_expired)
 	{
 		int height = BIT(m_swmisc->read(), 2) ? 310 : 372;
 		if (height != m_screen->height())
-			m_screen->configure(1000, height, m_screen->visible_area(), attotime::from_ticks(1000 * height, 18.6_MHz_XTAL).as_attoseconds());
+			m_screen->configure(1000, height, m_screen->visible_area(), attotime::from_ticks(1000 * height, 18.6_MHz_XTAL));
 	}
 
 	if (m_outreg->q7_r())
@@ -490,7 +490,7 @@ void teleray10_state::teleray10(machine_config &config)
 	m_outreg->q_out_cb<6>().set(FUNC(teleray10_state::bell_off_w));
 	m_outreg->q_out_cb<7>().set(FUNC(teleray10_state::reset_timer_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(18.6_MHz_XTAL, 1000, 0, 800, 310, 0, 288); // 372 total lines in 50 Hz mode
 	m_screen->set_screen_update(FUNC(teleray10_state::screen_update));
 

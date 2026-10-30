@@ -928,7 +928,7 @@ void sderby_state::sderby(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);
@@ -951,7 +951,7 @@ void sderby_state::sderbya(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);
@@ -974,7 +974,7 @@ void sderby_state::luckboom(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);
@@ -997,7 +997,7 @@ void sderby_state::spacewin(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);
@@ -1020,7 +1020,7 @@ void sderby_state::shinygld(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(57.47); // measured on PCB
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);
@@ -1043,7 +1043,7 @@ void sderby_state::pmroulet(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*8, 64*8);
@@ -1275,8 +1275,9 @@ ROM_START( croupier )
 	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x20000, CRC(e7941975) SHA1(ea32cd51b8d87205a1d6c6a83ebf8b50e03c55fc))
 	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x20000, CRC(29d06a38) SHA1(c6fdca1a31fad9abf854e521e593f3ec8018ae6d))
 
-	ROM_REGION( 0x4008, "pic16c74", 0 )
+	ROM_REGION16_LE( 0x4010, "pic16c74", ROMREGION_ERASEFF )
 	ROM_LOAD( "pic16c74.u39", 0x00000, 0x4008, CRC(9cb88e5b) SHA1(3c6b371efeda757f2bcab6c860e7585b628c210a))
+	// missing configuration word
 
 	ROM_REGION( 0x080000, "oki", 0 )
 	ROM_LOAD( "1.bin", 0x00000, 0x40000, CRC(6673de85) SHA1(df390cd6268efc0e743a9020f19bc0cbeb757cfa))
@@ -1294,8 +1295,9 @@ ROM_START( croupiera )
 	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x20000, CRC(1677a2de) SHA1(4dcbb3c1ce9b65e06ba7e0cffa00c0c8016538f5)) // sldh
 	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x20000, CRC(11acaac2) SHA1(19e7bbbf4356fc9a866f9f36d0568c42d6a36c07)) // sldh
 
-	ROM_REGION( 0x4008, "pic16c74", 0 )
+	ROM_REGION16_LE( 0x4010, "pic16c74", ROMREGION_ERASEFF )
 	ROM_LOAD( "pic16c74.u39", 0x00000, 0x4008, CRC(9cb88e5b) SHA1(3c6b371efeda757f2bcab6c860e7585b628c210a))
+	// missing configuration word
 
 	ROM_REGION( 0x080000, "oki", 0 )
 	ROM_LOAD( "1.bin", 0x00000, 0x40000, CRC(6673de85) SHA1(df390cd6268efc0e743a9020f19bc0cbeb757cfa))
@@ -1373,8 +1375,8 @@ ROM_START( magictch )
 	ROM_LOAD16_BYTE( "22.u43", 0x00000, 0x20000, CRC(7826e130) SHA1(f4928661fee1170c3df03be0842cab57c338a7c6) )
 	ROM_LOAD16_BYTE( "23.u42", 0x00001, 0x20000, CRC(8f74ec63) SHA1(b158851872dcc2af9c349926d26c36fd097fb418) )
 
-	ROM_REGION( 0x4008, "pic16c65", 0 )
-	ROM_LOAD( "pic16c65.u28", 0x0000, 0x4008, NO_DUMP )
+	ROM_REGION16_LE( 0x4010, "pic16c65", ROMREGION_ERASEFF )
+	ROM_LOAD( "pic16c65.u28", 0x0000, 0x4010, NO_DUMP )
 
 	ROM_REGION( 0x040000, "oki", 0 )
 	ROM_LOAD( "21.u16", 0x00000, 0x40000, CRC(e06a023f) SHA1(b4cd64f6c97e9c3e50a9658e171d748cb9f1c4ef) )
@@ -1395,8 +1397,8 @@ ROM_START( magictcha )
 	ROM_LOAD16_BYTE( "22.u43", 0x00000, 0x20000, CRC(47f047b1) SHA1(f47ab9734f6bb1dc50baf159bca144fa79eac1a5) ) // TMS27C010A, SLDH
 	ROM_LOAD16_BYTE( "23.u42", 0x00001, 0x20000, CRC(f63e31bf) SHA1(e96da519a8d6488d600e031ac48f5ce1a8a376f5) ) // TMS27C010A, SLDH
 
-	ROM_REGION( 0x4008, "pic16c65", 0 )
-	ROM_LOAD( "pic16c65.u28", 0x0000, 0x4008, NO_DUMP )
+	ROM_REGION16_LE( 0x4010, "pic16c65", ROMREGION_ERASEFF )
+	ROM_LOAD( "pic16c65.u28", 0x0000, 0x4010, NO_DUMP )
 
 	ROM_REGION( 0x040000, "oki", 0 )
 	ROM_LOAD( "21.u16", 0x00000, 0x40000, CRC(e06a023f) SHA1(b4cd64f6c97e9c3e50a9658e171d748cb9f1c4ef) ) // ST M27C2001, 1xxxxxxxxxxxxxxxxx = 0xFF
@@ -1417,8 +1419,8 @@ ROM_START( croupierb ) // identical PCB to magictch, but with 'ROULETTE' sticker
 	ROM_LOAD16_BYTE( "12.u43", 0x00000, 0x20000, CRC(fe6c95f6) SHA1(9a90e15753fab2304a05192202456a3ee7adbc38) ) // TMS27C010A
 	ROM_LOAD16_BYTE( "13.u42", 0x00001, 0x20000, CRC(9e76bd67) SHA1(19951f6a1201feecf8caa79bff6b46508db0f999) ) // TMS27C010A
 
-	ROM_REGION( 0x4008, "pic16c65", 0 )
-	ROM_LOAD( "pic16c65.u28", 0x0000, 0x4008, NO_DUMP )
+	ROM_REGION16_LE( 0x4010, "pic16c65", ROMREGION_ERASEFF )
+	ROM_LOAD( "pic16c65.u28", 0x0000, 0x4010, NO_DUMP )
 
 	ROM_REGION( 0x080000, "oki", 0 )
 	ROM_LOAD( "1.u16", 0x00000, 0x40000, CRC(6673de85) SHA1(df390cd6268efc0e743a9020f19bc0cbeb757cfa) ) // TMS27C020, same as other croupier sets
@@ -1439,8 +1441,8 @@ ROM_START( tropfrt ) // identical PCB to magictch, but with 'TROPICAL' sticker a
 	ROM_LOAD16_BYTE( "9.u43",  0x00000, 0x20000, CRC(25c675c7) SHA1(ba89fec39028d96c88a22bed71c82361d50eef12) ) // M27C1001
 	ROM_LOAD16_BYTE( "10.u42", 0x00001, 0x20000, CRC(cd1a533a) SHA1(c611cc26239309d8ea21724f20ed88e8cf076fc5) ) // M27C1001
 
-	ROM_REGION( 0x4008, "pic16c65", 0 )
-	ROM_LOAD( "pic16c65.u28", 0x0000, 0x4008, NO_DUMP )
+	ROM_REGION16_LE( 0x4010, "pic16c65", ROMREGION_ERASEFF )
+	ROM_LOAD( "pic16c65.u28", 0x0000, 0x4010, NO_DUMP )
 
 	ROM_REGION( 0x040000, "oki", 0 )
 	ROM_LOAD( "16.u16", 0x00000, 0x40000, CRC(85acb618) SHA1(b7f1cb288bf155cebd8aa47286d1147b538b27e6) ) // M27C2001, 1xxxxxxxxxxxxxxxxx = 0xFF
@@ -1466,15 +1468,15 @@ ROM_END
 *        Game Drivers         *
 ******************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT      CLASS         INIT        ROT   COMPANY     FULLNAME                                   FLAGS                                                LAYOUT
-GAMEL( 1996, sderby,    0,        sderby,   sderby,    sderby_state, empty_init, ROT0, "Playmark", "Super Derby (Playmark, v.07.03)",         0,                                                   layout_sderby   )
-GAMEL( 1996, sderbya,   sderby,   sderbya,  sderbya,   sderby_state, empty_init, ROT0, "Playmark", "Super Derby (Playmark, v.10.04)",         0,                                                   layout_sderby   )
-GAMEL( 1996, spacewin,  0,        spacewin, spacewin,  sderby_state, empty_init, ROT0, "Playmark", "Scacco Matto / Space Win",                0,                                                   layout_spacewin )
-GAME(  1996, shinygld,  0,        shinygld, shinygld,  sderby_state, empty_init, ROT0, "Playmark", "Shiny Golds",                             0                                                                    )
-GAMEL( 1997, croupier,  0,        pmroulet, pmroulet,  sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.20.05)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
-GAMEL( 1997, croupiera, croupier, pmroulet, pmroulet,  sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.09.04)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
-GAMEL( 1997, croupierb, croupier, zw3,      croupierb, zw3_state,    empty_init, ROT0, "Playmark", "Croupier II (Playmark Roulette v.03.09)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS, layout_pmroulet ) // title screen says Croupier 2 but every string in ROM says Croupier.
-GAME(  1996, luckboom,  0,        luckboom, luckboom,  sderby_state, empty_init, ROT0, "Playmark", "Lucky Boom",                              0                                                                    )
-GAME(  1998, magictch,  0,        zw3,      magictch,  zw3_state,    empty_init, ROT0, "Playmark", "Magic Touch (v. 28.05)",                  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // sprite offsets aren't 100% correct, no PIC16C65 emulation, needs proper layout
-GAME(  1998, magictcha, magictch, zw3,      magictch,  zw3_state,    empty_init, ROT0, "Playmark", "Magic Touch (v. 24.03)",                  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // sprite offsets aren't 100% correct, no PIC16C65 emulation, needs proper layout
-GAME(  1999, tropfrt,   0,        zw3,      tropfrt,   zw3_state,    empty_init, ROT0, "Playmark", "Tropical Fruits (V. 24-06.00 Rev. 4.0)",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // sprite offsets aren't 100% correct, no PIC16C74 emulation, needs proper layout
+//     YEAR  NAME       PARENT    MACHINE   INPUT      CLASS         INIT        ROT   COMPANY     FULLNAME                                             FLAGS                                                LAYOUT
+GAMEL( 1996, sderby,    0,        sderby,   sderby,    sderby_state, empty_init, ROT0, "Playmark", "Super Derby (Playmark, v.07.03)",                   0,                                                   layout_sderby   )
+GAMEL( 1996, sderbya,   sderby,   sderbya,  sderbya,   sderby_state, empty_init, ROT0, "Playmark", "Super Derby (Playmark, v.10.04)",                   0,                                                   layout_sderby   )
+GAMEL( 1996, spacewin,  0,        spacewin, spacewin,  sderby_state, empty_init, ROT0, "Playmark", "Scacco Matto / Space Win",                          0,                                                   layout_spacewin )
+GAME(  1996, shinygld,  0,        shinygld, shinygld,  sderby_state, empty_init, ROT0, "Playmark", "Shiny Golds",                                       0                                                                    )
+GAMEL( 1997, croupier,  0,        pmroulet, pmroulet,  sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.20.05)",              MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
+GAMEL( 1997, croupiera, croupier, pmroulet, pmroulet,  sderby_state, empty_init, ROT0, "Playmark", "Croupier (Playmark Roulette v.09.04)",              MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_pmroulet )
+GAMEL( 1997, croupierb, croupier, zw3,      croupierb, zw3_state,    empty_init, ROT0, "Playmark", "Croupier II (Playmark Roulette v.03.09)",           MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS, layout_pmroulet ) // title screen says Croupier 2 but every string in ROM says Croupier.
+GAME(  1996, luckboom,  0,        luckboom, luckboom,  sderby_state, empty_init, ROT0, "Playmark", "Lucky Boom",                                        0                                                                    )
+GAME(  1998, magictch,  0,        zw3,      magictch,  zw3_state,    empty_init, ROT0, "Playmark", "Magic Touch (v. 28.05)",                            MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // sprite offsets aren't 100% correct, no PIC16C65 emulation, needs proper layout
+GAME(  1998, magictcha, magictch, zw3,      magictch,  zw3_state,    empty_init, ROT0, "Playmark", "Magic Touch (v. 24.03)",                            MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // sprite offsets aren't 100% correct, no PIC16C65 emulation, needs proper layout
+GAME(  1999, tropfrt,   0,        zw3,      tropfrt,   zw3_state,    empty_init, ROT0, "Playmark", "Tropical Fruits (Playmark, V. 24-06.00 Rev. 4.0)",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // sprite offsets aren't 100% correct, no PIC16C74 emulation, needs proper layout

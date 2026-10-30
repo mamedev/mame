@@ -39,8 +39,7 @@ public:
 	{
 		CART,             // connects to PIA1 CB1
 		NMI,              // connects to NMI line on CPU
-		HALT,             // connects to HALT line on CPU
-		SOUND_ENABLE      // sound enable
+		HALT              // connects to HALT line on CPU
 	};
 
 	// since we have a special value "Q" - we have to use a special enum here
@@ -151,6 +150,8 @@ class device_cococart_host_interface
 {
 public:
 	virtual address_space &cartridge_space() = 0;
+	virtual void add_sound_route(device_sound_interface &sound_device, int output_index, double gain) = 0;
+	virtual void set_sound_gain(device_sound_interface &sound_device, int output_index, double gain) = 0;
 };
 
 
@@ -166,7 +167,6 @@ public:
 	virtual void cts_write(offs_t offset, u8 data);
 	virtual u8 scs_read(offs_t offset);
 	virtual void scs_write(offs_t offset, u8 data);
-	virtual void set_sound_enable(bool sound_enable);
 
 	virtual u8 *get_cart_base();
 	virtual u32 get_cart_size();
@@ -189,6 +189,8 @@ protected:
 	// cartridges (e.g. - Orch-90, Multi-Pak interface) for their control registers, independently
 	// of the SCS or CTS lines
 	address_space &cartridge_space();
+	virtual void add_sound_route(device_sound_interface &sound_device, int output_index, double gain);
+	virtual void set_sound_gain(device_sound_interface &sound_device, int output_index, double gain);
 	template <typename R>
 	void install_read_handler(u16 addrstart, u16 addrend, R &&rhandler)
 	{

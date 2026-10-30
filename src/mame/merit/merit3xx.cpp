@@ -1182,7 +1182,7 @@ void merit3xx_state::crt307(machine_config &config)
 	i8255_device &ppi1(I8255(config, "ppi1"));
 	ppi1.out_pa_callback().set(FUNC(merit3xx_state::crt307_rombank_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(10_MHz_XTAL, 616, 0, 512, 270, 0, 256);
 	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 

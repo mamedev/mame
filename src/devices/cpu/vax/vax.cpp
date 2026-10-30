@@ -67,7 +67,7 @@ void vax_cpu_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_gpr[15]).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_gpr[15]).noshow();
 	for (int i = 0; i < 12; i++)
-		state_add(VAX_R0 + i, util::string_format("R%d", i).c_str(), m_gpr[i]);
+		state_add(VAX_R0 + i, util::string_format("R%d", i), m_gpr[i]);
 	state_add(VAX_AP, "AP", m_gpr[12]);
 	state_add(VAX_FP, "FP", m_gpr[13]);
 	state_add(VAX_SP, "SP", m_gpr[14]);

@@ -14,10 +14,12 @@
 #include "cpu/tlcs900/tmp94c241.h"
 #include "imagedev/floppy.h"
 #include "machine/gen_latch.h"
+#include "machine/nvram.h"
 #include "machine/upd765.h"
 #include "video/pc_vga.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 
 #include "kn5000.lh"
 
@@ -91,6 +93,10 @@ uint16_t mn89304_vga_device::offset()
 
 namespace {
 
+// data wheel: detents per full turn, and the drag adjuster's 0..100 range plus one
+static constexpr int ENCODER_POSITIONS = 24;
+static constexpr int ENCODER_DRAG_POSITIONS = 101;
+
 class kn5000_state : public driver_device
 {
 public:
@@ -102,6 +108,7 @@ public:
 		, m_maincpu_latch(*this, "maincpu_latch")
 		, m_subcpu_latch(*this, "subcpu_latch")
 		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:1")
 		, m_com_select(*this, "COM_SELECT")
 		, m_extension(*this, "extension")
 		, m_CPL_SEG(*this, "CPL_SEG%u", 0U)
@@ -112,6 +119,8 @@ public:
 		, m_sstat(0)
 		, m_cpanel_inta(0)
 	{ }
+
+	DECLARE_INPUT_CHANGED_MEMBER(encoder_moved);
 
 	void kn5000(machine_config &config) ATTR_COLD;
 
@@ -126,6 +135,7 @@ private:
 	required_device<generic_latch_8_device> m_maincpu_latch;
 	required_device<generic_latch_8_device> m_subcpu_latch;
 	required_device<upd72067_device> m_fdc;
+	required_device<floppy_connector> m_floppy;
 	required_ioport m_com_select;
 	required_device<kn5000_extension_connector> m_extension;
 
@@ -145,13 +155,22 @@ void kn5000_state::maincpu_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).ram(); // 1Mbyte = 2 * 4Mbit DRAMs @ IC9, IC10 (CS3)
 	// Button states and LED control are handled via serial protocol to cpanel HLE device
-	//FIXME: map(0x110000, 0x11ffff).m(m_fdc, FUNC(upd765a_device::map)); // Floppy Controller @ IC208
-	//FIXME: map(0x120000, 0x12ffff).w(m_fdc, FUNC(upd765a_device::dack_w)); // Floppy DMA Acknowledge
+	// Floppy controller @ IC208: main status / auxiliary command and data registers
+	map(0x110008, 0x110008).r(m_fdc, FUNC(upd72067_device::msr_r));
+	map(0x110008, 0x110008).lw8(NAME([this] (u8 data) {
+		// The firmware selects the data rate with the "control internal mode" auxiliary
+		// command: 0x4b before trying a 1.44 MB disk, 0x0b before trying a 720 KB one.
+		if ((data & 0xbf) == 0x0b)
+			m_fdc->set_rate(BIT(data, 6) ? 500'000 : 250'000);
+		m_fdc->auxcmd_w(data);
+	}));
+	map(0x11000a, 0x11000a).rw(m_fdc, FUNC(upd72067_device::fifo_r), FUNC(upd72067_device::fifo_w));
+	map(0x120000, 0x12ffff).rw(m_fdc, FUNC(upd72067_device::dma_r), FUNC(upd72067_device::dma_w)); // Floppy DMA Acknowledge
 	map(0x140000, 0x14ffff).r(m_maincpu_latch, FUNC(generic_latch_8_device::read)); // @ IC23
 	map(0x140000, 0x14ffff).w(m_subcpu_latch, FUNC(generic_latch_8_device::write)); // @ IC22
 	map(0x1703b0, 0x1703df).m("vga", FUNC(mn89304_vga_device::io_map)); // LCD controller @ IC206
 	map(0x1a0000, 0x1dffff).rw("vga", FUNC(mn89304_vga_device::mem_linear_r), FUNC(mn89304_vga_device::mem_linear_w));
-	map(0x1e0000, 0x1fffff).ram(); // 1Mbit SRAM @ IC21 (CS0)  Note: I think this is the message "ERROR in back-up SRAM"
+	map(0x1e0000, 0x1fffff).ram().share("nvram"); // 1Mbit SRAM @ IC21 (CS0)
 	map(0x300000, 0x3fffff).rom().region("custom_data", 0); // 8MBit FLASH ROM @ IC19 (CS5)
 	map(0x400000, 0x7fffff).rom().region("rhythm_data", 0); // 32MBit ROM @ IC14 (A22=1 and CS5)
 	//map(0x800000, 0x82ffff).rom().region("subprogram", 0); // not sure yet in which chip this is stored, but I suspect it should be IC19
@@ -175,7 +194,7 @@ void kn5000_state::subcpu_mem(address_map &map)
 
 static void kn5000_floppies(device_slot_interface &device)
 {
-	device.option_add("35dd", FLOPPY_35_DD);
+	device.option_add("35hd", FLOPPY_35_HD);
 }
 
 static INPUT_PORTS_START(kn5000)
@@ -446,6 +465,20 @@ static INPUT_PORTS_START(kn5000)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("UP 1")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("DOWN 2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("UP 2")
+	// TEMPO/PROGRAM data wheel below the LCD: an endless rotary encoder, so a wrapping
+	// positional control.  Each step becomes one detent for the control panel device.
+	PORT_START("ENCODER")
+	PORT_BIT(0x1f, 0x00, IPT_POSITIONAL) PORT_NAME("Tempo / Program Data Wheel")
+		PORT_POSITIONS(ENCODER_POSITIONS) PORT_WRAPS PORT_SENSITIVITY(20) PORT_KEYDELTA(1)
+		PORT_CODE_DEC(KEYCODE_OPENBRACE) PORT_CODE_INC(KEYCODE_CLOSEBRACE)
+		PORT_FULL_TURN_COUNT(ENCODER_POSITIONS)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(kn5000_state::encoder_moved), ENCODER_POSITIONS)
+
+	// The same wheel, as an adjuster for the layout script to drag; detents from both are summed.
+	PORT_START("ENCODER_DRAG")
+	PORT_ADJUSTER(50, "Tempo / Program Data Wheel (mouse drag)")
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(kn5000_state::encoder_moved), ENCODER_DRAG_POSITIONS)
+
 INPUT_PORTS_END
 
 
@@ -463,6 +496,22 @@ void kn5000_state::machine_reset()
 {
 	m_checking_device_led_cn11 = 0;
 	m_checking_device_led_cn12 = 0;
+}
+
+// A step of the data wheel.  Both wheel controls arrive here; param is the control's full
+// turn, so that a wrap reads as one detent rather than a full-scale move backwards.
+INPUT_CHANGED_MEMBER(kn5000_state::encoder_moved)
+{
+	int const modulus = int(param);
+	int delta = int(newval) - int(oldval);
+	if (delta > modulus / 2)
+		delta -= modulus;
+	else if (delta < -modulus / 2)
+		delta += modulus;
+
+	// magnitude is kept, not reduced to a direction: the firmware uses it as an acceleration index
+	if (delta != 0)
+		m_cpanel->encoder_detent(delta);
 }
 
 void kn5000_state::kn5000(machine_config &config)
@@ -512,7 +561,12 @@ void kn5000_state::kn5000(machine_config &config)
 	//   bit 0 (output) = FDCRST
 	//   bit 6 (input) = FD.I/O
 	m_maincpu->portd_write().set(m_fdc, FUNC(upd72067_device::reset_w)).bit(0);
-	// TODO: bit 6!
+	// FD.I/O is low while a disk is in the drive. The firmware reads it as a level,
+	// not as a disk-change latch: it reports no disk on 1 without touching the drive.
+	m_maincpu->portd_read().set([this] () -> u8 {
+		floppy_image_device *const floppy = m_floppy->get_device();
+		return (floppy && floppy->exists()) ? 0x00 : 0x40;
+	});
 
 
 	// MAINCPU PORT E:
@@ -552,7 +606,11 @@ void kn5000_state::kn5000(machine_config &config)
 
 
 	// MAINCPU PORT H:
+	//   bit 0 (output) = FDCTC, the floppy controller's terminal count. The boot code
+	//                    leaves the pin's timer function off and the firmware pulses it
+	//                    by hand when the floppy's micro DMA channel (3) runs out.
 	m_maincpu->porth_read().set_ioport("AREA"); // checked at EF083E (v10 ROM)
+	m_maincpu->porth_write().set(m_fdc, FUNC(upd72067_device::tc_line_w)).bit(0);
 
 
 	// MAINCPU PORT Z:
@@ -637,10 +695,12 @@ void kn5000_state::kn5000(machine_config &config)
 	m_subcpu_latch->data_pending_callback().set_inputline(m_subcpu, TLCS900_INT0);
 
 	UPD72067(config, m_fdc, 32'000'000); // actual controller is UPD72068GF-3B9 at IC208
+	// RDY is taken to be tied active (the net is not traced): the firmware issues its
+	// first seek about 5 ms after motor on, and reads the drive's status as FD.I/O instead
+	m_fdc->set_ready_line_connected(false);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, TLCS900_INT4);
 	m_fdc->drq_wr_callback().set_inputline(m_maincpu, TLCS900_INT5);
 	m_fdc->hdl_wr_callback().set_inputline(m_maincpu, TLCS900_INT6);
-	// TODO: tc coming from maincpu TC0 signal
 	//m_fdc->??_wr_callback().set_inputline(m_maincpu, TLCS900_INT7);
 	//FIXME:
 	// Interrupt 4: FDCINT
@@ -648,7 +708,11 @@ void kn5000_state::kn5000(machine_config &config)
 	// Interrupt 6: FDC.H/D
 	// Interrupt 7: FDC.I/O
 
-	FLOPPY_CONNECTOR(config, "fdc:0", kn5000_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	// The firmware addresses unit 1 in every command. The software list holds raw sector
+	// images, which only the PC formats include.
+	FLOPPY_CONNECTOR(config, m_floppy, kn5000_floppies, "35hd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("kn5000_flop");
 
 	/* Extension port */
 	KN5000_EXTENSION(config, m_extension, kn5000_extension_intf, nullptr);
@@ -656,7 +720,7 @@ void kn5000_state::kn5000(machine_config &config)
 
 	/* video hardware */
 	// LCD Controller MN89304 @ IC206 24_MHz_XTAL
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_raw(XTAL(40'000'000)/6, 424, 0, 320, 262, 0, 240);
 	screen.set_screen_update("vga", FUNC(mn89304_vga_device::screen_update));
 
@@ -666,6 +730,8 @@ void kn5000_state::kn5000(machine_config &config)
 	vga.set_vram_size(0x80000);
 	// iochrdy tied to refresh pin and SA19, A21 and A20 to GND
 	// TODO: VGA.A18 signal, banking? From maincpu thru a T7W139F decoder
+
+	NVRAM(config, "nvram");
 
 	config.set_default_layout(layout_kn5000);
 }
@@ -727,7 +793,7 @@ ROM_START(kn5000)
 	ROMX_LOAD("kn5000_subprogram_v140_compressed.rom", 0x0e0000, 0x16bc4, CRC(5b182629) SHA1(13098dd150c5a6083a5d15a63d5d785802d8e8ae), ROM_BIOS(5)) // v5
 
 	ROM_REGION16_LE(0x400000, "rhythm_data", 0)
-	ROM_LOAD("kn5000_rhythm_data_rom.ic14", 0x000000, 0x400000, CRC(76d11a5e) SHA1(e4b572d318c9fe7ba00e5b44ea783e89da9c68bd))
+	ROM_LOAD("kn5000_rhythm_data_rom.ic14", 0x000000, 0x400000, CRC(aa4917ce) SHA1(fef7f1927935d8fdada2afbdbfac29aac56e1c3c))
 
 	ROM_REGION16_LE(0x1000000, "waveform", 0)
 	ROM_LOAD("kn5000_waveform_rom.ic304", 0x000000, 0x400000, NO_DUMP)

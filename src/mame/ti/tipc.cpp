@@ -552,7 +552,7 @@ void tipc_state::tipc(machine_config &config)
 
 	// CRT Controller board
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(18'000'000), 936, 0, 720, 320, 0, 300);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

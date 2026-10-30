@@ -2,7 +2,7 @@
 // impl/use_future.hpp
 // ~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -19,8 +19,9 @@
 #include <tuple>
 #include "asio/async_result.hpp"
 #include "asio/detail/memory.hpp"
+#include "asio/detail/type_traits.hpp"
 #include "asio/dispatch.hpp"
-#include "asio/error_code.hpp"
+#include "asio/disposition.hpp"
 #include "asio/execution.hpp"
 #include "asio/packaged_task.hpp"
 #include "asio/system_error.hpp"
@@ -29,6 +30,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 template <typename T, typename F, typename... Args>
@@ -101,7 +103,7 @@ private:
   decay_t<F> f_;
 };
 
-// An executor that adapts the system_executor to capture any exeption thrown
+// An executor that adapts the system_executor to capture any exception thrown
 // by a submitted function object and save it into a promise.
 template <typename T, typename Blocking = execution::blocking_t::possibly_t>
 class promise_executor
@@ -228,36 +230,18 @@ public:
   }
 };
 
-// For completion signature void(error_code).
-class promise_handler_ec_0
+// For completion signature void(disposition auto).
+template <typename Disposition>
+class promise_handler_d_0
   : public promise_creator<void>
 {
 public:
-  void operator()(const asio::error_code& ec)
+  void operator()(Disposition d)
   {
-    if (ec)
+    if (d != no_error)
     {
       this->p_->set_exception(
-          std::make_exception_ptr(
-            asio::system_error(ec)));
-    }
-    else
-    {
-      this->p_->set_value();
-    }
-  }
-};
-
-// For completion signature void(exception_ptr).
-class promise_handler_ex_0
-  : public promise_creator<void>
-{
-public:
-  void operator()(const std::exception_ptr& ex)
-  {
-    if (ex)
-    {
-      this->p_->set_exception(ex);
+          (to_exception_ptr)(static_cast<Disposition&&>(d)));
     }
     else
     {
@@ -279,39 +263,20 @@ public:
   }
 };
 
-// For completion signature void(error_code, T).
-template <typename T>
-class promise_handler_ec_1
+// For completion signature void(disposition auto, T).
+template <typename Disposition, typename T>
+class promise_handler_d_1
   : public promise_creator<T>
 {
 public:
   template <typename Arg>
-  void operator()(const asio::error_code& ec,
-      Arg&& arg)
+  void operator()(Disposition d, Arg&& arg)
   {
-    if (ec)
+    if (d != no_error)
     {
       this->p_->set_exception(
-          std::make_exception_ptr(
-            asio::system_error(ec)));
+          (to_exception_ptr)(static_cast<Disposition&&>(d)));
     }
-    else
-      this->p_->set_value(static_cast<Arg&&>(arg));
-  }
-};
-
-// For completion signature void(exception_ptr, T).
-template <typename T>
-class promise_handler_ex_1
-  : public promise_creator<T>
-{
-public:
-  template <typename Arg>
-  void operator()(const std::exception_ptr& ex,
-      Arg&& arg)
-  {
-    if (ex)
-      this->p_->set_exception(ex);
     else
       this->p_->set_value(static_cast<Arg&&>(arg));
   }
@@ -333,41 +298,19 @@ public:
 };
 
 // For completion signature void(error_code, T1, ..., Tn);
-template <typename T>
-class promise_handler_ec_n
+template <typename Disposition, typename T>
+class promise_handler_d_n
   : public promise_creator<T>
 {
 public:
   template <typename... Args>
-  void operator()(const asio::error_code& ec, Args&&... args)
+  void operator()(Disposition d, Args&&... args)
   {
-    if (ec)
+    if (d != no_error)
     {
       this->p_->set_exception(
-          std::make_exception_ptr(
-            asio::system_error(ec)));
+          (to_exception_ptr)(static_cast<Disposition&&>(d)));
     }
-    else
-    {
-      this->p_->set_value(
-          std::forward_as_tuple(
-            static_cast<Args&&>(args)...));
-    }
-  }
-};
-
-// For completion signature void(exception_ptr, T1, ..., Tn);
-template <typename T>
-class promise_handler_ex_n
-  : public promise_creator<T>
-{
-public:
-  template <typename... Args>
-  void operator()(const std::exception_ptr& ex,
-      Args&&... args)
-  {
-    if (ex)
-      this->p_->set_exception(ex);
     else
     {
       this->p_->set_value(
@@ -379,43 +322,36 @@ public:
 
 // Helper template to choose the appropriate concrete promise handler
 // implementation based on the supplied completion signature.
-template <typename> class promise_handler_selector;
+template <typename, typename = void> class promise_handler_selector;
 
 template <>
 class promise_handler_selector<void()>
   : public promise_handler_0 {};
 
-template <>
-class promise_handler_selector<void(asio::error_code)>
-  : public promise_handler_ec_0 {};
-
-template <>
-class promise_handler_selector<void(std::exception_ptr)>
-  : public promise_handler_ex_0 {};
+template <typename Arg>
+class promise_handler_selector<void(Arg),
+  enable_if_t<is_disposition<Arg>::value>>
+    : public promise_handler_d_0<Arg> {};
 
 template <typename Arg>
-class promise_handler_selector<void(Arg)>
-  : public promise_handler_1<Arg> {};
+class promise_handler_selector<void(Arg),
+  enable_if_t<!is_disposition<Arg>::value>>
+    : public promise_handler_1<Arg> {};
 
-template <typename Arg>
-class promise_handler_selector<void(asio::error_code, Arg)>
-  : public promise_handler_ec_1<Arg> {};
+template <typename Arg0, typename Arg1>
+class promise_handler_selector<void(Arg0, Arg1),
+  enable_if_t<is_disposition<Arg0>::value>>
+    : public promise_handler_d_1<Arg0, Arg1> {};
 
-template <typename Arg>
-class promise_handler_selector<void(std::exception_ptr, Arg)>
-  : public promise_handler_ex_1<Arg> {};
+template <typename Arg0, typename... ArgN>
+class promise_handler_selector<void(Arg0, ArgN...),
+  enable_if_t<!is_disposition<Arg0>::value>>
+    : public promise_handler_n<std::tuple<Arg0, ArgN...>> {};
 
-template <typename... Arg>
-class promise_handler_selector<void(Arg...)>
-  : public promise_handler_n<std::tuple<Arg...>> {};
-
-template <typename... Arg>
-class promise_handler_selector<void(asio::error_code, Arg...)>
-  : public promise_handler_ec_n<std::tuple<Arg...>> {};
-
-template <typename... Arg>
-class promise_handler_selector<void(std::exception_ptr, Arg...)>
-  : public promise_handler_ex_n<std::tuple<Arg...>> {};
+template <typename Arg0, typename... ArgN>
+class promise_handler_selector<void(Arg0, ArgN...),
+  enable_if_t<is_disposition<Arg0>::value>>
+    : public promise_handler_d_n<Arg0, std::tuple<ArgN...>> {};
 
 // Completion handlers produced from the use_future completion token, when not
 // using use_future::operator().
@@ -700,6 +636,7 @@ struct require_member<
 
 #endif // !defined(GENERATING_DOCUMENTATION)
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

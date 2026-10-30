@@ -1203,7 +1203,7 @@ void taito_f3_state::scanline_draw(bitmap_rgb32 &bitmap, const rectangle &clipre
 				});
 
 		// draw layers to framebuffer (currently top to bottom)
-		if (screen_y >= cliprect.min_y && screen_y <= cliprect.max_y) {
+		if (screen_y >= cliprect.top() && screen_y <= cliprect.bottom()) {
 			for (auto gfx : layers) {
 				std::visit(
 						[this, &line_data, &line_buf, &line_pri] (auto &&arg) {
@@ -1261,7 +1261,7 @@ inline void taito_f3_state::f3_drawgfx(const tempsprite &sprite, const rectangle
 	for (u8 y = 0; y < 16; y++) {
 		const int dy = dy8 >> 8;
 		dy8 += sprite.scale_y;
-		if (dy < cliprect.min_y || dy > cliprect.max_y)
+		if (dy < cliprect.top() || dy > cliprect.bottom())
 			continue;
 		u16 *dest = &dest_bmp.pix(dy);
 		auto &usage = m_sprite_pri_row_usage[dy];
@@ -1272,7 +1272,7 @@ inline void taito_f3_state::f3_drawgfx(const tempsprite &sprite, const rectangle
 			const int dx = dx8 >> 8;
 			dx8 += sprite.scale_x;
 			// is this necessary with the large margins outside visarea?
-			if (dx < cliprect.min_x || dx > cliprect.max_x)
+			if (dx < cliprect.left() || dx > cliprect.right())
 				continue;
 			if (dx == dx8 >> 8) // if the next pixel would be in the same column, skip this one
 				continue;
@@ -1407,7 +1407,7 @@ void taito_f3_state::get_sprite_info()
 		const fixed8 tx = m_flipscreen ? (512<<8) - x.block_scale*16 - x.pos : x.pos;
 		const fixed8 ty = m_flipscreen ? (256<<8) - y.block_scale*16 - y.pos : y.pos;
 
-		if (tx + x.block_scale*16 <= visarea.min_x<<8 || tx > visarea.max_x<<8 || ty + y.block_scale*16 <= visarea.min_y<<8 || ty > visarea.max_y<<8)
+		if (tx + x.block_scale*16 <= visarea.left()<<8 || tx > visarea.right()<<8 || ty + y.block_scale*16 <= visarea.top()<<8 || ty > visarea.bottom()<<8)
 			continue;
 
 		const bool flip_x = BIT(spritecont, 0);

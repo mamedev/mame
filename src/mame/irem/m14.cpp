@@ -154,23 +154,23 @@ void m14_state::video_start()
 void m14_state::draw_ball_and_paddle(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//const rgb_t white_pen =  rgb_t::white();
-	const u8 white_pen = 0x1f;
-	const int xoffs = -8; // matches left-right wall bounces
-	const int p_ybase = 184; // matches ball bounce to paddle
+	constexpr u8 white_pen = 0x1f;
+	constexpr int xoffs = -8; // matches left-right wall bounces
+	constexpr int p_ybase = 184; // matches ball bounce to paddle
 
 	rectangle ball_clip;
-	ball_clip.min_x = flip_screen() ? 32 * 8 - (m_ballx + xoffs) : m_ballx + xoffs;
-	ball_clip.max_x = ball_clip.min_x + 4;
-	ball_clip.min_y = flip_screen() ? 28 * 8 - (m_bally) : m_bally;
-	ball_clip.max_y = ball_clip.min_y + 4;
+	ball_clip.set_origin(
+			flip_screen() ? (32 * 8 - (m_ballx + xoffs)) : (m_ballx + xoffs),
+			flip_screen() ? (28 * 8 - m_bally) : m_bally);
+	ball_clip.set_size(5, 5);
 	ball_clip &= cliprect;
 	bitmap.fill(white_pen, ball_clip);
 
 	rectangle paddle_clip;
-	paddle_clip.min_x = flip_screen() ? 32 * 8 - (m_paddlex + xoffs) : m_paddlex + xoffs;
-	paddle_clip.max_x = paddle_clip.min_x + 12;
-	paddle_clip.min_y = flip_screen() ? 28 * 8 - (p_ybase) : p_ybase;
-	paddle_clip.max_y = paddle_clip.min_y + 4;
+	paddle_clip.set_origin(
+			flip_screen() ? (32 * 8 - (m_paddlex + xoffs)) : (m_paddlex + xoffs),
+			flip_screen() ? (28 * 8 - p_ybase) : p_ybase);
+	paddle_clip.set_size(13, 5);
 	paddle_clip &= cliprect;
 	bitmap.fill(white_pen, paddle_clip);
 }
@@ -414,7 +414,7 @@ void m14_state::m14(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &m14_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(m14_state::vblank_irq));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); //not accurate
 	m_screen->set_size(32*8, 32*8);

@@ -11,16 +11,20 @@ SMSC FDC37C665GT High Performance Multi-Mode Parallel Port Super I/O Floppy Disk
 #include "emu.h"
 #include "fdc37c665gt.h"
 
+//#include <iostream>
+
 #define LOG_CONFIG (1U << 1) // Show global configuration changes
+#define LOG_ACCESS (1U << 2) // Show read/write access (verbose)
 
 #define VERBOSE (LOG_GENERAL | LOG_CONFIG)
-// #define LOG_OUTPUT_STREAM std::cout
+//#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 
 #define LOGCONFIG(...) LOGMASKED(LOG_CONFIG, __VA_ARGS__)
+#define LOGACCESS(...) LOGMASKED(LOG_ACCESS, __VA_ARGS__)
 
-DEFINE_DEVICE_TYPE(FDC37C665GT, fdc37c665gt_device, "fdc37c665gt", "FDC37C665GT")
+DEFINE_DEVICE_TYPE(FDC37C665GT, fdc37c665gt_device, "fdc37c665gt", "SMSC FDC37C665GT Super I/O")
 
 fdc37c665gt_device::fdc37c665gt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, upd765_family_device::mode_t floppy_mode)
 	: device_t(mconfig, FDC37C665GT, tag, owner, clock)
@@ -42,6 +46,7 @@ fdc37c665gt_device::fdc37c665gt_device(const machine_config &mconfig, const char
 	, m_fdc(*this, "fdc")
 	, m_serial(*this, "uart%u", 1)
 	, m_lpt(*this, "lpt")
+	, m_ide(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -61,9 +66,8 @@ void fdc37c665gt_device::device_start()
 	device_addresses[LogicalDevice::Serial2] = 1; // COM port
 
 	const uint8_t configuration_registers_defaults[] = {
-		0x3b, 0x9f, 0xdc, 0x78, 0x00,
-		0x00, 0xff, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x66, 0x01, 0x00
+		0x3b, 0x9f, 0xdc, 0x78, 0x00, 0x00, 0xff, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x66, 0x01, 0x00
 	};
 
 	// Set the value first and then use write_configuration_register because some flags
@@ -79,6 +83,7 @@ void fdc37c665gt_device::device_add_mconfig(machine_config &config)
 	// floppy disc controller
 	N82077AA(config, m_fdc, 24_MHz_XTAL, m_floppy_mode);
 	m_fdc->intrq_wr_callback().set(FUNC(fdc37c665gt_device::irq_floppy_w));
+	m_fdc->drq_wr_callback().set(FUNC(fdc37c665gt_device::drq_floppy_w));
 
 	// parallel port
 	PC_LPT(config, m_lpt);
@@ -98,9 +103,33 @@ void fdc37c665gt_device::device_add_mconfig(machine_config &config)
 	m_serial[1]->out_rts_callback().set(FUNC(fdc37c665gt_device::rts_serial2_w));
 }
 
-uint8_t fdc37c665gt_device::read(offs_t offset)
+uint16_t fdc37c665gt_device::read16(offs_t offset)
 {
-	// TODO: IDE not implemented
+	LOGACCESS("[%04x]\n", offset);
+
+	if (offset == 0x3f1 && mode == OperatingMode::Configuration) {
+		u8 res = 0;
+		switch(config_index)
+		{
+			case 0x0d:
+				// read identifier (most if not all riscpc targets)
+				// '666GT reads 0x66 here
+				res = 0x65;
+				break;
+			case 0x0e:
+				// chip revision level
+				res = 0x02;
+				break;
+			default:
+				if (config_index & 0xf0)
+					LOG("Warning: read of register %02x with upper address bits set\n", config_index);
+				res = configuration_registers[config_index & 0xf];
+				break;
+		}
+		return res;
+	}
+
+	// TODO: a7000p access at $70~$73, does it belong here or it's an external (ISA) GPIO?
 
 	// Parallel port
 	if (offset >= device_addresses[LogicalDevice::Parallel] && offset <= device_addresses[LogicalDevice::Parallel] + 2) {
@@ -143,16 +172,30 @@ uint8_t fdc37c665gt_device::read(offs_t offset)
 			case 3: return m_fdc->tdr_r();
 			case 4: return m_fdc->msr_r();
 			case 5: return m_fdc->fifo_r();
-			case 7: return m_fdc->dir_r();
+			case 7: return m_fdc->dir_r() | (m_ide.found() ? (m_ide->cs1_r(7) & 0x7f) : 0);
 		}
+	}
+
+	// IDE
+	if ((offset & ~7) == device_addresses[LogicalDevice::IDE]) {
+		if (!enabled_logical[LogicalDevice::IDE] || !m_ide.found()) {
+			return 0;
+		}
+		return m_ide->cs0_r(offset & 7);
+	}
+	if ((device_addresses[LogicalDevice::IDE] == 0x1f0 && offset == 0x3f6) || (device_addresses[LogicalDevice::IDE] == 0x170 && offset == 0x376)) {
+		if (!enabled_logical[LogicalDevice::IDE] || !m_ide.found()) {
+			return 0;
+		}
+		return m_ide->cs1_r(offset & 7);
 	}
 
 	return 0;
 }
 
-void fdc37c665gt_device::write(offs_t offset, uint8_t data)
+void fdc37c665gt_device::write16(offs_t offset, uint16_t data)
 {
-	// TODO: IDE not implemented
+	LOGACCESS("[%04x] %04x\n", offset, data);
 
 	// Parallel port
 	if (offset >= device_addresses[LogicalDevice::Parallel] && offset <= device_addresses[LogicalDevice::Parallel] + 2) {
@@ -232,6 +275,20 @@ void fdc37c665gt_device::write(offs_t offset, uint8_t data)
 			case 7: m_fdc->ccr_w(data); return;
 		}
 	}
+
+	// IDE
+	if ((offset & ~7) == device_addresses[LogicalDevice::IDE]) {
+		if (!enabled_logical[LogicalDevice::IDE] || !m_ide.found()) {
+			return;
+		}
+		m_ide->cs0_w(offset & 7, data);
+	}
+	if ((device_addresses[LogicalDevice::IDE] == 0x1f0 && offset == 0x3f6) || (device_addresses[LogicalDevice::IDE] == 0x170 && offset == 0x376)) {
+		if (!enabled_logical[LogicalDevice::IDE] || !m_ide.found()) {
+			return;
+		}
+		m_ide->cs1_w(offset & 7, data);
+	}
 }
 
 void fdc37c665gt_device::write_configuration_register(int index, int data)
@@ -246,67 +303,79 @@ void fdc37c665gt_device::write_configuration_register(int index, int data)
 	configuration_registers[index] = data;
 	LOGCONFIG("Modified configuration register cr[%02x] = %02x\n", index, data);
 
-	if (index == 0) {
-		enabled_logical[LogicalDevice::IDE] = BIT(configuration_registers[index], 1);
-		enabled_logical[LogicalDevice::FDC] = BIT(configuration_registers[index], 3) && BIT(configuration_registers[index], 4);
-	} else if (index == 1) {
-		enabled_logical[LogicalDevice::Parallel] = BIT(configuration_registers[index], 2) && BIT(configuration_registers[index], 3);
+	switch (index) {
+		case 0:
+			enabled_logical[LogicalDevice::IDE] = BIT(configuration_registers[index], 0);
+			// TODO: bit 1 IDE AT/XT mode
+			enabled_logical[LogicalDevice::FDC] = BIT(configuration_registers[index], 3) && BIT(configuration_registers[index], 4);
+			break;
 
-		auto lpt_port = BIT(configuration_registers[index], 0, 2);
-		if (lpt_port == 0) {
-			enabled_logical[LogicalDevice::Parallel] = false; // Disabled
-		} else if (lpt_port == 1) {
-			device_addresses[LogicalDevice::Parallel] = 0x3bc;
-		} else if (lpt_port == 2) {
-			device_addresses[LogicalDevice::Parallel] = 0x378;
-		} else if (lpt_port == 3) {
-			device_addresses[LogicalDevice::Parallel] = 0x278; // Default
-		}
+		case 1:
+			enabled_logical[LogicalDevice::Parallel] = BIT(configuration_registers[index], 2) && BIT(configuration_registers[index], 3);
 
-		auto com34 = BIT(configuration_registers[index], 5, 2);
-		if (com34 == 0) {
-			com_addresses[2] = 0x338;
-			com_addresses[3] = 0x238;
-		} else if (com34 == 1) {
-			com_addresses[2] = 0x3e8;
-			com_addresses[3] = 0x2e8;
-		} else if (com34 == 2) {
-			com_addresses[2] = 0x2e8;
-			com_addresses[3] = 0x2e0;
-		} else if (com34 == 3) {
-			com_addresses[2] = 0x220;
-			com_addresses[3] = 0x228;
-		}
-	} else if (index == 2) {
-		enabled_logical[LogicalDevice::Serial1] = BIT(configuration_registers[index], 2) && BIT(configuration_registers[index], 3);
-		device_addresses[LogicalDevice::Serial1] = BIT(configuration_registers[index], 0, 2);
+			switch (BIT(configuration_registers[index], 0, 2)) { // Parallel port address
+				case 0:  enabled_logical[LogicalDevice::Parallel] = false; break; // Disabled
+				case 1: device_addresses[LogicalDevice::Parallel] = 0x3bc; break;
+				case 2: device_addresses[LogicalDevice::Parallel] = 0x378; break;
+				case 3: device_addresses[LogicalDevice::Parallel] = 0x278; break; // Default
+			}
 
-		enabled_logical[LogicalDevice::Serial2] = BIT(configuration_registers[index], 6) && BIT(configuration_registers[index], 7);
-		device_addresses[LogicalDevice::Serial2] = BIT(configuration_registers[index], 4, 2);
-	} else if (index == 3) {
-		auto floppy_mode = BIT(configuration_registers[index], 5, 2);
+			// TODO: bit 4 irq polarity
 
-		// 2 is reserved/unused
-		if (floppy_mode == 3) {
-			m_floppy_mode = upd765_family_device::mode_t::AT;
-		} else if (floppy_mode == 1) {
-			m_floppy_mode = upd765_family_device::mode_t::PS2;
-		} else if (floppy_mode == 0) {
-			m_floppy_mode = upd765_family_device::mode_t::M30;
-		}
+			switch (BIT(configuration_registers[index], 5, 2)) { // COM3,4
+				case 0: com_addresses[2] = 0x338; com_addresses[3] = 0x238; break;
+				case 1: com_addresses[2] = 0x3e8; com_addresses[3] = 0x2e8; break;
+				case 2: com_addresses[2] = 0x2e8; com_addresses[3] = 0x2e0; break;
+				case 3: com_addresses[2] = 0x220; com_addresses[3] = 0x228; break;
+			}
+			break;
 
-		m_fdc->set_mode(m_floppy_mode);
-	} else if (index == 4) {
-		// Set clock speeds for MIDI modes (clock divisor becomes 12 instead of 13)
-		m_serial[0]->set_unscaled_clock(clock() / (13 - BIT(configuration_registers[4], 4)));
-		m_serial[1]->set_unscaled_clock(clock() / (13 - BIT(configuration_registers[5], 5)));
-	} else if (index == 5) {
-		auto fdc_port = BIT(configuration_registers[index], 0);
-		if (fdc_port == 0) {
-			device_addresses[LogicalDevice::FDC] = 0x3f0;
-		} else if (fdc_port == 1) {
-			device_addresses[LogicalDevice::FDC] = 0x370;
-		}
+		case 2:
+			enabled_logical[LogicalDevice::Serial1] = BIT(configuration_registers[index], 2) && BIT(configuration_registers[index], 3);
+			device_addresses[LogicalDevice::Serial1] = BIT(configuration_registers[index], 0, 2);
+
+			enabled_logical[LogicalDevice::Serial2] = BIT(configuration_registers[index], 6) && BIT(configuration_registers[index], 7);
+			device_addresses[LogicalDevice::Serial2] = BIT(configuration_registers[index], 4, 2);
+			break;
+
+		case 3:
+			// TODO: enhanced floppy mode 2 (bit 1), Drive Options (bits 3~4), PINTR (bit 2), ADRx/DRV2 EN/PINTR (bit 7)
+			switch (BIT(configuration_registers[index], 5, 2)) {
+				case 0: m_floppy_mode = upd765_family_device::mode_t::M30; break;
+				case 1: m_floppy_mode = upd765_family_device::mode_t::PS2; break;
+				case 2: break;
+				case 3: m_floppy_mode = upd765_family_device::mode_t::AT;  break;
+			}
+			m_fdc->set_mode(m_floppy_mode);
+			break;
+
+		case 4:
+			// Set clock speeds for MIDI modes (clock divisor becomes 12 instead of 13)
+			m_serial[0]->set_unscaled_clock(clock() / (13 - BIT(configuration_registers[4], 4)));
+			m_serial[1]->set_unscaled_clock(clock() / (13 - BIT(configuration_registers[4], 5)));
+			// TODO: PP EXT modes (bits 1~0), EPP Type (bit 6), Parallel Port FDC (bits 3~2)
+			break;
+
+		case 5:
+			if (BIT(configuration_registers[index], 0))
+				device_addresses[LogicalDevice::FDC] = 0x370;
+			else
+				device_addresses[LogicalDevice::FDC] = 0x3f0;
+
+			if (BIT(configuration_registers[index], 1))
+				device_addresses[LogicalDevice::IDE] = 0x170;
+			else
+				device_addresses[LogicalDevice::IDE] = 0x1f0;
+			// TODO: FDC DMA Mode (bit 2), DenSel (bits 4~3), Swap drv 0,1 (bit 5), EXTx4 (bit 6), DS3 (bit 7)
+			break;
+
+		default:
+			// TODO: CR6 floppy disk type, reflected in FDC $3f3 bits 5~4
+			// TODO: CR7 Media ID Polarity (bits 3~2) and Floppy Boot Drive (bits 1~0)
+			// TODO: CR8~CR9 ADRx
+			// TODO: CRA ECP FIFO Threshold (bits 3~0)
+			// TODO: CRF Test Modes
+			break;
 	}
 }
 
@@ -317,6 +386,15 @@ void fdc37c665gt_device::irq_floppy_w(int state)
 	}
 
 	m_fintr_callback(state);
+}
+
+void fdc37c665gt_device::drq_floppy_w(int state)
+{
+	if (!enabled_logical[LogicalDevice::FDC]) {
+		return;
+	}
+
+	m_fdrq_callback(state);
 }
 
 void fdc37c665gt_device::irq_parallel_w(int state)

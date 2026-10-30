@@ -600,7 +600,7 @@ void schick_state::schick(machine_config &config) // all dividers unknown
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_schick);
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x8000); // unknown format, from missing PROMs?
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // to be verified
+	screen_device &screen(SCREEN(config, "screen")); // to be verified
 	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	screen.set_screen_update(FUNC(schick_state::screen_update_schick));
 	screen.set_palette(m_palette);

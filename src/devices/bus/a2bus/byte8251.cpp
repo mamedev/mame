@@ -137,7 +137,7 @@ ioport_constructor a2bus_byte8251_device::device_input_ports() const
 
 void a2bus_byte8251_device::device_add_mconfig(machine_config &config)
 {
-	I8251(config, m_usart, 1021800); // CLK tied to ϕ1 signal from bus pin 38
+	I8251(config, m_usart, A2BUS_1M_CLOCK); // CLK tied to ϕ1 signal from bus pin 38
 	m_usart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 
 	MM5307AA(config, m_brg, DERIVED_CLOCK(1, 8));

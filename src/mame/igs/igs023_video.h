@@ -10,13 +10,18 @@
 class igs023_video_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
+	// A nonzero clock enables timed sprite DMA; zero retains vblank copying.
 	igs023_video_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto read_spriteram_callback() { return m_readspriteram_cb.bind(); }
+	auto irq4_callback() { return m_irq4_cb.bind(); }
+	auto irq6_callback() { return m_irq6_cb.bind(); }
+	auto dma_callback() { return m_dma_cb.bind(); }
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void get_sprites();
+	void vblank(int state);
 
 	void videoram_map(address_map &map) ATTR_COLD;
 	void videoregs_map(address_map &map) ATTR_COLD;
@@ -48,6 +53,22 @@ private:
 	memory_share_creator<u16> m_zoomram;
 
 	devcb_read16 m_readspriteram_cb; // for reading spritelist from mainram
+	devcb_write_line m_irq4_cb;
+	devcb_write_line m_irq6_cb;
+	devcb_write_line m_dma_cb;
+	emu_timer *m_irq4_timer = nullptr;
+	bool m_irq4_pending = false;
+	bool m_irq6_pending = false;
+	void update_irqs();
+	TIMER_CALLBACK_MEMBER(irq4_tick);
+	emu_timer *m_dma_start_timer = nullptr;
+	emu_timer *m_dma_timer = nullptr;
+	u16 m_dma_words = 0;
+	bool m_dma_active = false;
+	bool m_dma_finishing = false;
+	void restore_dma();
+	TIMER_CALLBACK_MEMBER(dma_start);
+	TIMER_CALLBACK_MEMBER(dma_tick);
 
 	std::unique_ptr<sprite_t[]> m_spritelist;
 	sprite_t *m_sprite_ptr_pre;

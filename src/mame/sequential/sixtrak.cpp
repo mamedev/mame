@@ -93,64 +93,23 @@ For all other functionality, see the owner's manual.
 #include "sound/mixer.h"
 #include "sound/mm5837.h"
 #include "sound/va_eg.h"
+#include "sound/va_vco.h"
 #include "speaker.h"
 
 #include "sequential_sixtrak.lh"
 
-#define LOG_CV              (1U << 1)
-#define LOG_KEYS            (1U << 2)
-#define LOG_ADC_VALUE_KNOB  (1U << 3)
-#define LOG_ADC_PITCH_WHEEL (1U << 4)
-#define LOG_VOLUME          (1U << 5)
-#define LOG_AUTOTUNE        (1U << 6)
-#define LOG_CALIBRATION     (1U << 7)
-#define LOG_WHEEL_RC        (1U << 8)
+#define LOG_KEYS            (1U << 1)
+#define LOG_ADC_VALUE_KNOB  (1U << 2)
+#define LOG_ADC_PITCH_WHEEL (1U << 3)
+#define LOG_VOLUME          (1U << 4)
+#define LOG_AUTOTUNE        (1U << 5)
+#define LOG_CALIBRATION     (1U << 6)
+#define LOG_WHEEL_RC        (1U << 7)
 
 #define VERBOSE (LOG_CALIBRATION)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
-
-namespace {
-
-// TODO: Move somewhere in sound/device.
-class sixtrak_transistor_noise_device : public device_t, public device_sound_interface
-{
-public:
-	sixtrak_transistor_noise_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
-
-protected:
-	void sound_stream_update(sound_stream &stream) override;
-	void device_start() override ATTR_COLD;
-
-private:
-	sound_stream *m_stream = nullptr;
-};
-
-}  // anonymous namespace
-
-DEFINE_DEVICE_TYPE(SIXTRAK_TRANSISTOR_NOISE, sixtrak_transistor_noise_device, "sixtrak_transistor_noise", "Six-Trak PNP-based noise generator")
-
-sixtrak_transistor_noise_device::sixtrak_transistor_noise_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SIXTRAK_TRANSISTOR_NOISE, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
-{
-}
-
-void sixtrak_transistor_noise_device::sound_stream_update(sound_stream &stream)
-{
-	const int n = stream.samples();
-	for (int i = 0; i < n; ++i)
-	{
-		// Uniformly distributed random number between -1 and 1.
-		stream.put(0, i, 2 * (double(machine().rand()) / std::numeric_limits<u32>::max() - 0.5));
-	}
-}
-
-void sixtrak_transistor_noise_device::device_start()
-{
-	m_stream = stream_alloc(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
-}
 
 namespace {
 
@@ -179,7 +138,6 @@ protected:
 private:
 	double get_dac_v(bool inverted) const;
 	double get_voltage_mux_out() const;
-	static void update_sh_rc(bool sampling, double cv, va_rc_eg_device &rc);
 	void update_cvs();
 
 	void update_wheel_rc(int which);
@@ -209,8 +167,8 @@ private:
 	required_device<ttl7474_device> m_tuning_ff;  // U146A
 	required_device<output_latch_device> m_tune_control;  // U148 (CD40174)
 	required_device_array<cem3394_device, 6> m_voices;
-	required_device_array<va_rc_eg_device, 6> m_gain_rc;
-	required_device_array<va_rc_eg_device, 6> m_freq_rc;
+	required_device_array<va_smooth_sh_device, 6> m_gain_sh;
+	required_device_array<va_smooth_sh_device, 6> m_freq_sh;
 	required_device<filter_volume_device> m_mute;  // U147 (CD4049)
 	required_device<filter_volume_device> m_master_vol;  // R197
 	required_device_array<va_rc_eg_device, 2> m_wheel_rc;
@@ -233,8 +191,6 @@ private:
 	u8 m_sh_voices = 0x3f;
 	u8 m_sh_param = 0;
 	u8 m_voltage_mux_input = 0;
-	std::array<bool, 6> m_sampling_gain = { false, false, false, false, false, false };
-	std::array<bool, 6> m_sampling_freq = { false, false, false, false, false, false };
 
 	static inline constexpr double VPLUS = 5.0;
 	static inline constexpr double VMINUS = -6.5;
@@ -247,8 +203,8 @@ sixtrak_state::sixtrak_state(const machine_config &mconfig, device_type type, co
 	, m_tuning_ff(*this, "tuningff")
 	, m_tune_control(*this, "tune_control")
 	, m_voices(*this, "cem3394_%u", 1U)
-	, m_gain_rc(*this, "gain_rc_%u", 1U)
-	, m_freq_rc(*this, "freq_rc_%u", 1U)
+	, m_gain_sh(*this, "gain_sh_%u", 1U)
+	, m_freq_sh(*this, "freq_sh_%u", 1U)
 	, m_mute(*this, "mute")
 	, m_master_vol(*this, "master_volume")
 	, m_wheel_rc(*this, "wheel_rc_%u", 0U)
@@ -328,72 +284,9 @@ double sixtrak_state::get_voltage_mux_out() const
 	return 0;
 }
 
-// Will only be accurate if called when `sampling` is true, or when `sampling`
-// is transitioning to false. Should not be called multiple times in a row with
-// sampling == false.
-void sixtrak_state::update_sh_rc(bool sampling, double cv, va_rc_eg_device &rc)
-{
-	// The sample & hold circuits for the filter frequency and VCA gain CVs
-	// include an RC network. This smoothens the CV updates sent from the
-	// firmware.
-
-	// When the CV is being sampled, Cl (Clarge) reaches the target voltage
-	// immediately, while Cs (Csmall) (dis)charges towards the CV via R (1 MOhm).
-	// The CEM3394 senses the voltage at Cs.
-	//
-	// CV ---+--- R ---+--- CEM3394 CV input
-	//       |         |
-	//       Cl        Cs
-	//       |         |
-	//      GND       GND
-
-	// When the CV is not being sampled, Cs and Cl will (dis)charge towards the
-	// same target voltage. The (dis)charge rate will be that of an RC circuit
-	// where C is the series combination of Cs and Cl.
-	//
-	//       +--- R ---+--- CEM3394 CV input
-	//       |         |
-	//       Cl        Cs
-	//       |         |
-	//      GND       GND
-
-	constexpr double C_SMALL = CAP_U(0.001);
-	constexpr double C_LARGE = CAP_U(0.01);
-	constexpr double C_SERIES = (C_LARGE * C_SMALL) / (C_LARGE + C_SMALL);
-
-	if (sampling)
-	{
-		rc.set_target_v(cv);
-		rc.set_c(C_SMALL);
-	}
-	else
-	{
-		rc.set_target_v((C_LARGE * rc.get_target_v() + C_SMALL * rc.get_v()) / (C_LARGE + C_SMALL));
-		rc.set_c(C_SERIES);
-	}
-}
-
 void sixtrak_state::update_cvs()
 {
-	constexpr int PARAM2CVIN[8] =
-	{
-		cem3394_device::VCO_FREQUENCY,
-		cem3394_device::FINAL_GAIN,
-		cem3394_device::FILTER_RESONANCE,
-		cem3394_device::FILTER_FREQUENCY,
-		cem3394_device::MIXER_BALANCE,
-		cem3394_device::MODULATION_AMOUNT,
-		cem3394_device::PULSE_WIDTH,
-		cem3394_device::WAVE_SELECT,
-	};
-
-	constexpr const char *PARAMNAMES[8] =
-	{
-		"pitch", "gain", "resonance", "cutoff", "mixer", "mod", "PW", "waveform"
-	};
-
 	assert(m_sh_param < 8);
-	const int cv_input = PARAM2CVIN[m_sh_param];
 	const double cv = get_voltage_mux_out();
 
 	for (int voice = 0; voice < 6; ++voice)
@@ -401,31 +294,34 @@ void sixtrak_state::update_cvs()
 		const bool voice_active = !BIT(m_sh_voices, voice);
 
 		const bool sampling_gain = voice_active && (m_sh_param == 1);
-		if (sampling_gain || sampling_gain != m_sampling_gain[voice])
-		{
-			update_sh_rc(sampling_gain, cv, *m_gain_rc[voice]);
-		}
-		m_sampling_gain[voice] = sampling_gain;
+		if (sampling_gain)
+			m_gain_sh[voice]->sample(cv);
+		else
+			m_gain_sh[voice]->hold();
 
 		const bool sampling_freq = voice_active && (m_sh_param == 3);
-		if (sampling_freq || sampling_freq != m_sampling_freq[voice])
-		{
-			update_sh_rc(sampling_freq, cv, *m_freq_rc[voice]);
-		}
-		m_sampling_freq[voice] = sampling_freq;
+		if (sampling_freq)
+			m_freq_sh[voice]->sample(cv);
+		else
+			m_freq_sh[voice]->hold();
 
 		if (!voice_active || sampling_freq || sampling_gain)
 			continue;
 
 		cem3394_device *v = m_voices[voice];
-		if (v->get_voltage(cv_input) == cv)
-			continue;
-
-		v->set_voltage(cv_input, cv);
-		LOGMASKED(LOG_CV, "CV - voice: %u, param: %u (%s), cv: %f - %03x - %x\n",
-				  voice, m_sh_param, PARAMNAMES[m_sh_param], cv, m_dac_value, m_voltage_mux_input);
-		if (m_sh_param == 0)
-			LOGMASKED(LOG_CV, "Pitch %d: %f\n", voice, v->get_parameter(cem3394_device::VCO_FREQUENCY));
+		switch (m_sh_param)
+		{
+			// Parameters 1 (final gain) and 3 (filter frequency) are streaming
+			// inputs and are handled above.
+			case 0: v->set_vco_freq_cv(cv);      break;
+			case 2: v->set_filt_res_cv(cv);      break;
+			case 4: v->set_mixer_balance_cv(cv); break;
+			case 5: v->set_mod_amount_cv(cv);    break;
+			case 6: v->set_pulse_width_cv(cv);   break;
+			case 7: v->set_wave_select_cv(cv);   break;
+			default:
+				fatalerror("Invalid CEM3394 fixed CV address: %d\n", m_sh_param);
+		}
 	}
 }
 
@@ -456,10 +352,13 @@ void sixtrak_state::update_wheel_rc(int which)
 	constexpr const char *WHEEL_NAME[2] = {"Pitch", "Mod"};
 
 	// The real hardware does not use the full range of the wheel potentiometers.
-	// Using the full range results in erratic behavior. The exact range is not
-	// known, but the value used here results in reasonable pitch bend behavior
-	// (+/- ~3 semitones).
-	constexpr double WHEEL_RANGE = 0.25;
+	// Using the full range results in erratic behavior. According to the owner's
+	// manual, the pitch wheel can change the pitch "up or down by about a 3rd",
+	// or 4 semitones assuming a major 3rd. The value chosen here results in
+	// a pitch bend of +/- ~3.75 semitones (the range changes a bit depending on
+	// the base note), which is the closest we can get to +/- 4 while still
+	// having a nearly symmetric bend amount.
+	constexpr double WHEEL_RANGE = 0.3;
 
 	const s32 value = m_wheels[which]->read();
 	if (value <= 0)
@@ -546,15 +445,15 @@ void sixtrak_state::update_tuning_timer()
 
 	int active_voices = 0;
 	int loudest_voice = -1;
-	double max_gain_cv = -1;
+	double max_gain = -1;
 	for (int voice = 0; voice < m_voices.size(); ++voice)
 	{
-		const double gain_cv = m_voices[voice]->get_voltage(cem3394_device::FINAL_GAIN);
-		if (gain_cv > 0.1)
+		const double gain = m_voices[voice]->final_gain();
+		if (gain > 0.1)
 			++active_voices;
-		if (gain_cv > max_gain_cv)
+		if (gain > max_gain)
 		{
-			max_gain_cv = gain_cv;
+			max_gain = gain;
 			loudest_voice = voice;
 		}
 	}
@@ -573,14 +472,14 @@ void sixtrak_state::update_tuning_timer()
 	cem3394_device *voice = m_voices[loudest_voice];
 	double freq = 0;
 	bool tuning_filter = false;
-	if (voice->get_parameter(cem3394_device::FILTER_RESONANCE) > 0.9)
+	if (voice->filt_res() > 3)
 	{
-		freq = voice->get_parameter(cem3394_device::FILTER_FREQUENCY);
+		freq = voice->filt_freq();
 		tuning_filter = true;
 	}
 	else
 	{
-		freq = voice->get_parameter(cem3394_device::VCO_FREQUENCY);
+		freq = voice->vco_freq();
 		tuning_filter = false;
 	}
 
@@ -747,8 +646,6 @@ void sixtrak_state::machine_start()
 	save_item(NAME(m_sh_voices));
 	save_item(NAME(m_sh_param));
 	save_item(NAME(m_voltage_mux_input));
-	save_item(NAME(m_sampling_gain));
-	save_item(NAME(m_sampling_freq));
 
 	m_maincpu->space(AS_IO).install_readwrite_before_time(
 		0x00, 0xff, ws_time_delegate(*this, FUNC(sixtrak_state::iorq_wait_state)));
@@ -840,9 +737,11 @@ void sixtrak_state::sixtrak_common(machine_config &config, device_sound_interfac
 	// *** Audio configuration ***
 
 	// The audio pipeline operates on current and voltage magnitudes. This
-	// scaler converts the loudest voltage signal to an audio signal within the
-	// range [-1, 1].
-	constexpr double VOLTAGE_TO_AUDIO_SCALER = 0.7;
+	// scaler converts the final voltage to audio within the range [-1, 1]. The
+	// value is chosen such that the demo sequences do not clip at max volume,
+	// with headroom to spare. Also verified with a random selection of patches
+	// in unison mode.
+	constexpr double VOLTAGE_TO_AUDIO_SCALER = 1.4;
 
 	// The typical peak-to-peak current of the CE33394, when all waveforms are
 	// enabled, is 400 uA [-200, 200].
@@ -855,23 +754,32 @@ void sixtrak_state::sixtrak_common(machine_config &config, device_sound_interfac
 	constexpr double C_VCO_JITTER[6] = {-0.9781, 0.0426, 0.6231, -0.4256, 0.2138, -0.0607};
 	constexpr double C_VCO = CAP_U(0.002);
 
+	// ... and similarly for the VCF capacitors.
+	constexpr double C_VCF_JITTER[6] = {-0.3612, -0.8436, -0.2686, -0.1601, 0.7358, 0.7788};
+	constexpr double C_VCF = CAP_U(0.033);
+
+	// The sixtrak schematic does not include tolerance values. Using those from
+	// the parts list on the Sente voice board, which is based on the sixtrak.
+	constexpr double C_VCO_TOL = 0.05;  // 5%
+	constexpr double C_VCF_TOL = 0.10;  // 10%
+
 	for (int i = 0; i < 6; ++i)
 	{
-		VA_RC_EG(config, m_gain_rc[i]).set_r(RES_M(1));
-		VA_RC_EG(config, m_freq_rc[i]).set_r(RES_M(1));
+		VA_SMOOTH_SH(config, m_gain_sh[i], RES_M(1), CAP_U(0.01), CAP_U(0.001));
+		VA_SMOOTH_SH(config, m_freq_sh[i], RES_M(1), CAP_U(0.01), CAP_U(0.001));
 
-		cem3394_device::components comps =
+		const cem3394_device::components comps =
 		{
 			.r_vco = RES_K(301),
-			.c_vco = C_VCO + C_VCO * C_VCO_JITTER[i] * 0.025,  // +/- 2.5%.
-			.c_vcf = CAP_U(0.033),
+			.c_vco = C_VCO + C_VCO * C_VCO_JITTER[i] * C_VCO_TOL,
+			.c_vcf = C_VCF + C_VCF * C_VCF_JITTER[i] * C_VCF_TOL,
 			.c_ac = CAP_U(10),
 		};
 
-		cem3394_device::input_array voice_inputs{};
-		voice_inputs[cem3394_device::AUDIO_INPUT] = &noise;
-		voice_inputs[cem3394_device::FINAL_GAIN] = m_gain_rc[i].target();
-		voice_inputs[cem3394_device::FILTER_FREQUENCY] = m_freq_rc[i].target();
+		cem3394_device::stream_inputs voice_inputs;
+		voice_inputs.ext_input = &noise;
+		voice_inputs.final_gain_cv = m_gain_sh[i].target();
+		voice_inputs.filt_freq_cv = m_freq_sh[i].target();
 
 		CEM3394(config, m_voices[i], comps, voice_inputs);
 		m_voices[i]->add_route(0, "voicemixer", CEM3394_IOUT_MAX);
@@ -928,7 +836,7 @@ void sixtrak_state::sixtrak_rev_a(machine_config &config)
 
 void sixtrak_state::sixtrak_rev_b(machine_config &config)
 {
-	sixtrak_common(config, SIXTRAK_TRANSISTOR_NOISE(config, "noise"));
+	sixtrak_common(config, VA_NOISE(config, "noise"));
 
 	// On the Rev B and C, the D input of the tuning flip-flop is attached to
 	// its /Q output.
@@ -973,7 +881,7 @@ INPUT_PORTS_START(sixtrak)
 	PORT_START("key_row_1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("SEL 8") PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("SEL 9") PORT_CODE(KEYCODE_9_PAD)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PROGRAM") PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PROGRAM") PORT_CODE(KEYCODE_M)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PARAM") PORT_CODE(KEYCODE_P)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("VALUE") PORT_CODE(KEYCODE_V)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RECORD") PORT_CODE(KEYCODE_C)
@@ -1024,7 +932,7 @@ INPUT_PORTS_START(sixtrak)
 
 	PORT_START("key_row_9")  // G#0 - D#1
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_GS2
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A2
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A2 PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_AS2
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_B2
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_C3
@@ -1038,25 +946,25 @@ INPUT_PORTS_START(sixtrak)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_FS3
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_G3
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_GS3
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A3
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A3 PORT_CODE(KEYCODE_S)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_AS3
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_B3
 
 	PORT_START("key_row_11")  // C2 - G2
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_C4
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_C4 PORT_CODE(KEYCODE_D)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_CS4
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_D4
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_DS4
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_E4
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_E4 PORT_CODE(KEYCODE_F)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_F4
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_FS4
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_G4
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_G4 PORT_CODE(KEYCODE_G)
 
 	PORT_START("key_row_12")  // G#2 - D#3
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_GS4
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A4 PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A4
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_AS4
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_B4
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_B4 PORT_CODE(KEYCODE_H)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_C5
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_CS5
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_D5
@@ -1068,7 +976,7 @@ INPUT_PORTS_START(sixtrak)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_FS5
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_G5
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_GS5
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A5
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_A5 PORT_CODE(KEYCODE_J)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_AS5
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_B5
 
@@ -1126,8 +1034,8 @@ ROM_START(sixtrak)
 	ROMX_LOAD("trak-9.bin", 0x000000, 0x004000, CRC(d1e6261c) SHA1(bdad57290c24a9ce02c3a5161f8d12f8f96fc74a), ROM_BIOS(1))
 
 	ROM_REGION(0x1000, "nvram_a", ROMREGION_ERASE00)
-	ROMX_LOAD("nvram_a-11.bin", 0x000000, 0x001000, CRC(e36e5a14) SHA1(e31fc4fb23ddb34374c785233980023e01a4bffa), ROM_BIOS(0))
-	ROMX_LOAD("nvram_a-9.bin", 0x000000, 0x001000, CRC(4dac5eea) SHA1(7afd40b7a79ac0d9e8f081766391232354fb7028), ROM_BIOS(1))
+	ROMX_LOAD("nvram_a-11.bin", 0x000000, 0x001000, CRC(be700170) SHA1(fec7c376130acb0c73b69519c46c777b7ef002c9), ROM_BIOS(0))
+	ROMX_LOAD("nvram_a-9.bin", 0x000000, 0x001000, CRC(e5965e9d) SHA1(35adff747df1822d30db923793e69407cce1545c), ROM_BIOS(1))
 
 	ROM_REGION(0x800, "nvram_b", ROMREGION_ERASE00)
 	ROMX_LOAD("nvram_b-11.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(0))
@@ -1146,8 +1054,8 @@ ROM_START(sixtraka)
 	ROMX_LOAD("trak-9.bin", 0x000000, 0x004000, CRC(d1e6261c) SHA1(bdad57290c24a9ce02c3a5161f8d12f8f96fc74a), ROM_BIOS(1))
 
 	ROM_REGION(0x1000, "nvram_a", ROMREGION_ERASE00)
-	ROMX_LOAD("nvram_a-11.bin", 0x000000, 0x001000, CRC(e36e5a14) SHA1(e31fc4fb23ddb34374c785233980023e01a4bffa), ROM_BIOS(0))
-	ROMX_LOAD("nvram_a-9.bin", 0x000000, 0x001000, CRC(4dac5eea) SHA1(7afd40b7a79ac0d9e8f081766391232354fb7028), ROM_BIOS(1))
+	ROMX_LOAD("nvram_a-11.bin", 0x000000, 0x001000, CRC(be700170) SHA1(fec7c376130acb0c73b69519c46c777b7ef002c9), ROM_BIOS(0))
+	ROMX_LOAD("nvram_a-9.bin", 0x000000, 0x001000, CRC(e5965e9d) SHA1(35adff747df1822d30db923793e69407cce1545c), ROM_BIOS(1))
 
 	ROM_REGION(0x800, "nvram_b", ROMREGION_ERASE00)
 	ROMX_LOAD("nvram_b-11.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(0))

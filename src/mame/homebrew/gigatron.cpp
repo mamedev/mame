@@ -235,7 +235,7 @@ void gigatron_state::gigatron(machine_config &config)
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("32K");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(59.98);
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640-1, 0, 480-1);

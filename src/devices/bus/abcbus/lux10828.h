@@ -67,13 +67,15 @@ protected:
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(uint8_t data) override;
-	virtual uint8_t abcbus_inp() override;
-	virtual void abcbus_out(uint8_t data) override;
+	virtual uint8_t abcbus_inp(offs_t offset) override;
+	virtual void abcbus_out(offs_t offset, uint8_t data) override;
 	virtual uint8_t abcbus_stat() override;
 	virtual void abcbus_c1(uint8_t data) override;
 	virtual void abcbus_c3(uint8_t data) override;
 
 private:
+	static constexpr uint16_t ULA_SIGNATURE = 0xb6f7;
+
 	uint8_t pio_pa_r();
 	void pio_pa_w(uint8_t data);
 	uint8_t pio_pb_r();
@@ -84,6 +86,7 @@ private:
 
 	void ctrl_w(uint8_t data);
 	void status_w(uint8_t data);
+	bool fdc_wait();
 	uint8_t fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, uint8_t data);
 
@@ -98,6 +101,7 @@ private:
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_ioport m_sw1;
 	required_ioport m_s1;
+	required_ioport m_xtal;
 
 	bool m_cs;              // card selected
 	uint8_t m_status;       // ABC BUS status
@@ -106,6 +110,8 @@ private:
 	bool m_fdc_drq;         // floppy data request
 	int m_wait_enable;      // wait enable
 	uint8_t m_sel;          // drive select
+	bool m_dden;            // FDC _DDEN
+	uint8_t m_ula_bit;      // ULA signature bit
 };
 
 

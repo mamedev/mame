@@ -546,7 +546,7 @@ void ms0515_state::ms0515(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms0515_state::ms0515_mem);
 
 	/* video hardware -- 50 Hz refresh rate */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(15'000'000), 958, 0, 640, 313, 0, 200);
 	screen.set_screen_update(FUNC(ms0515_state::screen_update_ms0515));
 	screen.screen_vblank().set(FUNC(ms0515_state::screen_vblank));

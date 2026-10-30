@@ -50,11 +50,11 @@ public:
 		, m_ram(*this, RAM_TAG)
 	{ }
 
-	void ec1840(machine_config &config);
-	void ec1841(machine_config &config);
+	void ec1840(machine_config &config) ATTR_COLD;
+	void ec1841(machine_config &config) ATTR_COLD;
 
-	void init_ec1840();
-	void init_ec1841();
+	void init_ec1840() ATTR_COLD;
+	void init_ec1841() ATTR_COLD;
 
 private:
 	DECLARE_MACHINE_RESET(ec1841);

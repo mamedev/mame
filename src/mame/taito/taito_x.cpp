@@ -3,7 +3,6 @@
 // thanks-to:Richard Bush
 /***************************************************************************
 
-
 Taito X-system
 
 driver by Richard Bush, Howie Cohen and Yochizo
@@ -1038,7 +1037,7 @@ void taitox_cchip_state::superman(machine_config &config)
 	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(57.43);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(52*8, 32*8);
@@ -1081,7 +1080,7 @@ void taitox_state::daisenpu(machine_config &config)
 	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(52*8, 32*8);
@@ -1121,7 +1120,7 @@ void taitox_state::gigandes(machine_config &config)
 	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(52*8, 32*8);
@@ -1164,7 +1163,7 @@ void taitox_state::ballbros(machine_config &config)
 	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(52*8, 32*8);
@@ -1418,13 +1417,13 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1988, superman,  0,        superman, superman,  taitox_cchip_state, empty_init, ROT0,   "Taito Corporation",         "Superman (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, supermanu, superman, superman, supermanu, taitox_cchip_state, empty_init, ROT0,   "Taito Corporation",         "Superman (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, supermanj, superman, superman, supermanj, taitox_cchip_state, empty_init, ROT0,   "Taito Corporation",         "Superman (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, twinhawk,  0,        daisenpu, twinhawk,  taitox_state,       empty_init, ROT270, "Taito Corporation Japan",   "Twin Hawk (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, twinhawku, twinhawk, daisenpu, twinhawku, taitox_state,       empty_init, ROT270, "Taito America Corporation", "Twin Hawk (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, daisenpu,  twinhawk, daisenpu, daisenpu,  taitox_state,       empty_init, ROT270, "Taito Corporation",         "Daisenpu (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gigandes,  0,        gigandes, gigandes,  taitox_state,       empty_init, ROT0,   "East Technology",           "Gigandes", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gigandesa, gigandes, gigandes, gigandes,  taitox_state,       empty_init, ROT0,   "East Technology",           "Gigandes (earlier)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, kyustrkr,  0,        kyustrkr, kyustrkr,  taitox_state,       empty_init, ROT180, "East Technology",           "Last Striker / Kyuukyoku no Striker", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, ballbros,  0,        ballbros, ballbros,  taitox_state,       empty_init, ROT0,   "East Technology",           "Balloon Brothers", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, superman,  0,        superman, superman,  taitox_cchip_state, empty_init, ROT0,   "Taito",                   "Superman (World)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, supermanu, superman, superman, supermanu, taitox_cchip_state, empty_init, ROT0,   "Taito",                   "Superman (US)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, supermanj, superman, superman, supermanj, taitox_cchip_state, empty_init, ROT0,   "Taito",                   "Superman (Japan)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twinhawk,  0,        daisenpu, twinhawk,  taitox_state,       empty_init, ROT270, "Toaplan / Taito",         "Twin Hawk (World)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twinhawku, twinhawk, daisenpu, twinhawku, taitox_state,       empty_init, ROT270, "Toaplan / Taito America", "Twin Hawk (US)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1989, daisenpu,  twinhawk, daisenpu, daisenpu,  taitox_state,       empty_init, ROT270, "Toaplan / Taito",         "Daisenpu (Japan)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gigandes,  0,        gigandes, gigandes,  taitox_state,       empty_init, ROT0,   "East Technology",         "Gigandes",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gigandesa, gigandes, gigandes, gigandes,  taitox_state,       empty_init, ROT0,   "East Technology",         "Gigandes (earlier)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1989, kyustrkr,  0,        kyustrkr, kyustrkr,  taitox_state,       empty_init, ROT180, "East Technology",         "Last Striker / Kyuukyoku no Striker", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, ballbros,  0,        ballbros, ballbros,  taitox_state,       empty_init, ROT0,   "East Technology",         "Balloon Brothers",                    MACHINE_SUPPORTS_SAVE )

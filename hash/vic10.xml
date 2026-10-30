@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -112,13 +112,13 @@ license:CC0-1.0
 		<year>19??</year>
 		<publisher>Commodore</publisher>
 		<part name="cart" interface="vic10_cart">
+			<feature name="slot" value="basic" />
 			<dataarea name="lorom" size="0x2000">
 				<rom name="901230-01" size="0x2000" crc="489aab86" sha1="448e0403baed7fcdc3be6ce8497958beaf3b4566" offset="0x0000" />
 			</dataarea>
 			<dataarea name="uprom" size="0x2000">
 				<rom name="901231-01" size="0x2000" crc="caac20ff" sha1="f31ba36a5f8fca7722d4b482716166b578301ed4" offset="0x0000" />
 			</dataarea>
-			<dataarea name="exram" size="0x800" />
 		</part>
 	</software>
 

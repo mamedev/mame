@@ -831,7 +831,7 @@ void ddragon3_state::ddragon3(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ddragon3_state::sound_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(28_MHz_XTAL / 4, 448, 0, 320, 272, 8, 248); // HTOTAL and VTOTAL are guessed
 	m_screen->set_screen_update(FUNC(ddragon3_state::screen_update_ddragon3));
 	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
@@ -904,7 +904,7 @@ void wwfwfest_state::wwfwfest(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(28_MHz_XTAL / 4, 448, 0, 320, 272, 8, 248); // HTOTAL and VTOTAL are guessed
 	m_screen->set_screen_update(FUNC(wwfwfest_state::screen_update_wwfwfest));
 	m_screen->set_palette(m_palette);

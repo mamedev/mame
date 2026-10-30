@@ -34,7 +34,7 @@ anymore in original working order.
 #include "video/hlcd0538.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -378,10 +378,9 @@ void savant_state::savant(machine_config &config)
 	HLCD0538(config, m_lcd1).write_cols().set(FUNC(savant_state::lcd1_output_w));
 	HLCD0539(config, m_lcd2).write_cols().set(FUNC(savant_state::lcd2_output_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(958, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(8, 24+27);
 	config.set_default_layout(layout_novag_savant);

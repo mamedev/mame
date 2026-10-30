@@ -2371,7 +2371,7 @@ static INPUT_PORTS_START( marty )
 	PORT_BIT(0xffffffff,IP_ACTIVE_LOW,IPT_UNUSED)
 INPUT_PORTS_END
 
-void towns_state::driver_start()
+void towns_state::machine_start()
 {
 	m_towns_vram = std::make_unique<uint32_t[]>(0x20000);
 	m_towns_gfxvram = std::make_unique<uint8_t[]>(0x80000);
@@ -2507,17 +2507,7 @@ void towns_state::driver_start()
 
 	if (m_ram->size() > 0x100000)
 		m_maincpu->space(AS_PROGRAM).install_ram(0x100000,m_ram->size()-1,m_ram->pointer() + 0x100000);
-}
 
-void marty_state::driver_start()
-{
-	towns_state::driver_start();
-	if(m_towns_machine_id == 0x0101) // default if no serial ROM present
-		m_towns_machine_id = 0x034a;
-}
-
-void towns_state::machine_start()
-{
 	if (m_flop[0]->get_device())
 		m_flop[0]->get_device()->set_rpm(360);
 	if (m_flop[1]->get_device())
@@ -2533,6 +2523,14 @@ void towns_state::machine_start()
 	m_serial_irq_source = 0;
 	m_serial_irq_enable = 0;
 	m_serial_irq_state = 0;
+}
+
+void marty_state::machine_start()
+{
+	towns_state::machine_start();
+
+	if (m_towns_machine_id == 0x0101) // default if no serial ROM present
+		m_towns_machine_id = 0x034a;
 }
 
 void towns_state::machine_reset()
@@ -2560,7 +2558,7 @@ void towns_state::machine_reset()
 	m_rtc_busy = false;
 	m_vram_mask_addr = 0;
 	m_towns_pcm_channel_flag = 0;
-	m_towns_pcm_channel_mask = 0xff;
+	m_towns_pcm_channel_mask = 0;
 	m_towns_pcm_irq_flag = 0;
 	m_towns_fm_irq_flag = 0;
 	m_dma_msb[0] = m_dma_msb[1] = 0;
@@ -2626,7 +2624,7 @@ void towns_state::towns_base(machine_config &config)
 	MSX_GENERAL_PURPOSE_PORT(config, m_pad_ports[1], msx_general_purpose_port_devices, "mouse");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(768,512);

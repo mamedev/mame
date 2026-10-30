@@ -116,7 +116,7 @@ void syvg_state::syvg(machine_config &config)
 	Z80(config, m_maincpu, 21_MHz_XTAL / 4); // divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &syvg_state::program_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO
+	screen_device &screen(SCREEN(config, "screen")); // TODO
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);
@@ -149,11 +149,11 @@ ROM_END
 
 void syvg_state::init_luckyvl()
 {
+	// TODO: decrypt me
 	uint8_t *rom = memregion("maincpu")->base();
 
 	for (int i = 0; i < 0x20000; i++)
 	{
-		// TODO
 		rom[i] = rom[i];
 	}
 }

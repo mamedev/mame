@@ -1,6 +1,7 @@
 PROG = lzma.exe
 MY_CONSOLE = 1
 
+CFLAGS = $(CFLAGS) -DZ7_NO_LONG_PATH
 # CFLAGS = $(CFLAGS) -DZ7_ST
 
 

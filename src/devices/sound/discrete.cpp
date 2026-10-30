@@ -38,6 +38,8 @@
 #include "emu.h"
 #include "discrete.h"
 
+#include "sound.h"
+
 #include "wavwrite.h"
 
 #include <atomic>

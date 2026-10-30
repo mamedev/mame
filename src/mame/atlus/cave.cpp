@@ -124,29 +124,18 @@ NOTE: Easter egg in Fereron SOS / Dangun Feveron:
 ***************************************************************************/
 
 
-/* Update the IRQ state based on all possible causes */
-void cave_state::update_irq_state()
-{
-	if (m_vblank_irq || m_sound_irq || m_unknown_irq)
-		m_maincpu->set_input_line(m_irq_level, ASSERT_LINE);
-	else
-		m_maincpu->set_input_line(m_irq_level, CLEAR_LINE);
-}
-
 TIMER_CALLBACK_MEMBER(cave_state::vblank_end)
 {
 	if (m_kludge == 3) // mazinger metmqstr
 	{
-		m_unknown_irq = 1;
-		update_irq_state();
+		m_irqs->in_set<UNKNOWN_IRQ>();
 	}
 	m_agallet_vblank_irq = 0;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(cave_state::vblank_start)
 {
-	m_vblank_irq = 1;
-	update_irq_state();
+	m_irqs->in_set<VBLANK_IRQ>();
 	m_spritegen[0]->get_sprite_info(m_screen[0]->visible_area());
 	m_agallet_vblank_irq = 1;
 	m_vblank_end_timer->adjust(attotime::from_usec(2000)); // 2000us : vblank time
@@ -173,14 +162,6 @@ INTERRUPT_GEN_MEMBER(ppsatan_state::interrupt_ppsatan)
 	m_int_timer_right->adjust(attotime::from_usec(17376 - m_time_vblank_irq));
 }
 
-/* Called by the YMZ280B to set the IRQ state */
-void cave_state::sound_irq_gen(int state)
-{
-	m_sound_irq = (state != 0);
-	update_irq_state();
-}
-
-
 /*  Level 1 irq routines:
 
     Game        |first read | bit==0->routine + |
@@ -201,19 +182,17 @@ u16 cave_state::irq_cause_r(offs_t offset)
 {
 	u16 result = 0x0003;
 
-	if (m_vblank_irq)
+	if (m_irqs->in_r<VBLANK_IRQ>())
 		result ^= 0x01;
-	if (m_unknown_irq)
+	if (m_irqs->in_r<UNKNOWN_IRQ>())
 		result ^= 0x02;
 
 	if (!machine().side_effects_disabled())
 	{
 		if (offset == 4/2)
-			m_vblank_irq = 0;
+			m_irqs->in_clear<VBLANK_IRQ>();
 		if (offset == 6/2)
-			m_unknown_irq = 0;
-
-		update_irq_state();
+			m_irqs->in_clear<UNKNOWN_IRQ>();
 	}
 
 /*
@@ -2129,9 +2108,6 @@ void cave_state::machine_start()
 {
 	m_vblank_end_timer = timer_alloc(FUNC(cave_state::vblank_end), this);
 
-	save_item(NAME(m_vblank_irq));
-	save_item(NAME(m_sound_irq));
-	save_item(NAME(m_unknown_irq));
 	save_item(NAME(m_agallet_vblank_irq));
 }
 
@@ -2155,9 +2131,9 @@ void ppsatan_state::machine_start()
 
 void cave_state::machine_reset()
 {
-	m_vblank_irq = 0;
-	m_sound_irq = 0;
-	m_unknown_irq = 0;
+	m_irqs->in_clear<VBLANK_IRQ>();
+	m_irqs->in_clear<SOUND_IRQ>();
+	m_irqs->in_clear<UNKNOWN_IRQ>();
 	m_agallet_vblank_irq = 0;
 }
 
@@ -2176,9 +2152,11 @@ void cave_state::add_base_config(machine_config &config, int layer)
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_vblank_int("screen.0", FUNC(cave_state::interrupt));
 
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, 1);
+
 	TIMER(config, m_int_timer).configure_generic(FUNC(cave_state::vblank_start));
 
-	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[0]);
 	m_screen[0]->set_refresh_hz(15625/271.5);
 	m_screen[0]->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen[0]->set_size(320, 240);
@@ -2211,7 +2189,7 @@ void cave_state::add_ymz(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", 16.9344_MHz_XTAL));
-	ymz.irq_handler().set(FUNC(cave_state::sound_irq_gen));
+	ymz.irq_handler().set(m_irqs, FUNC(input_merger_any_high_device::in_w<SOUND_IRQ>));
 	ymz.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -2419,6 +2397,8 @@ void cave_state::korokoro(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::korokoro_map);
 
+	m_irqs->output_handler().set_inputline(m_maincpu, 2);
+
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
@@ -2569,7 +2549,7 @@ void ppsatan_state::ppsatan(machine_config &config)
 	m_screen[0]->set_screen_update(FUNC(ppsatan_state::screen_update_ppsatan_top));
 	subdevice<timer_device>("int_timer")->configure_generic(FUNC(ppsatan_state::vblank_start));
 
-	SCREEN(config, m_screen[1], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[1]);
 	m_screen[1]->set_refresh_hz(15625/271.5);
 	m_screen[1]->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen[1]->set_size(320, 240);
@@ -2577,7 +2557,7 @@ void ppsatan_state::ppsatan(machine_config &config)
 	m_screen[1]->set_screen_update(FUNC(ppsatan_state::screen_update_ppsatan_left));
 	TIMER(config, "int_timer_left").configure_generic(FUNC(ppsatan_state::vblank_start_left));
 
-	SCREEN(config, m_screen[2], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[2]);
 	m_screen[2]->set_refresh_hz(15625/271.5);
 	m_screen[2]->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen[2]->set_size(320, 240);
@@ -4367,10 +4347,10 @@ ROM_START( paccarn )
 	ROM_REGION( 0x40000, "oki2", ROMREGION_ERASE00 )
 	// empty ROM socket
 
-	ROM_REGION( 0x117 * 3, "plds", 0 ) // all protected
-	ROM_LOAD( "n44u1b.u1",   0x117*0, 0x117, NO_DUMP )
-	ROM_LOAD( "n44u3b.u3",   0x117*1, 0x117, NO_DUMP )
-	ROM_LOAD( "n44u51a.u51", 0x117*2, 0x117, NO_DUMP )
+	ROM_REGION( 0x117 * 3, "plds", 0 )
+	ROM_LOAD( "n44u1b.u1",   0x117*0, 0x117, CRC(5ceb0101) SHA1(ad5d221eb87c52ee558d60e5e44a9933c669dcf2) )
+	ROM_LOAD( "n44u3b.u3",   0x117*1, 0x117, CRC(4cd79750) SHA1(cfb3331cd8bb2eaaf5d2a80ae76a5a15ae92d379) )
+	ROM_LOAD( "n44u51a.u51", 0x117*2, 0x117, CRC(3c5e9bc5) SHA1(b4e04c4fa91ff33542b73971f67e71d13e24c5ec) )
 ROM_END
 
 /***************************************************************************
@@ -5415,8 +5395,6 @@ void cave_state::init_cave()
 {
 	m_kludge = 0;
 	m_time_vblank_irq = 100;
-
-	m_irq_level = 1;
 }
 
 void cave_z80_state::init_z80_bank()
@@ -5473,13 +5451,6 @@ void cave_state::init_esprade()
 	init_cave();
 
 	m_time_vblank_irq = 2000;
-
-#if 0       //ROM PATCH
-	{
-		u16 *rom = (u16 *)memregion("maincpu")->base();
-		rom[0x118A/2] = 0x4e71;         //palette fix   118A: 5548              SUBQ.W  #2,A0       --> NOP
-	}
-#endif
 }
 
 void cave_state::init_guwange()
@@ -5574,8 +5545,6 @@ void cave_state::init_uopoko()
 void cave_state::init_korokoro()
 {
 	init_guwange();
-
-	m_irq_level = 2;
 
 	m_leds[0] = 0;
 	m_leds[1] = 0;

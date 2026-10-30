@@ -378,7 +378,7 @@ class render_container
 
 public:
 	// construction/destruction
-	render_container(render_manager &manager, screen_device *screen = nullptr);
+	render_container(render_manager &manager, device_video_output_interface *screen = nullptr);
 	~render_container();
 
 	// user settings describes the collected user-controllable settings
@@ -399,7 +399,7 @@ public:
 	};
 
 	// getters
-	screen_device *screen() const { return m_screen; }
+	device_video_output_interface *screen() const { return m_screen; }
 	render_manager &manager() const { return m_manager; }
 	render_texture *overlay() const { return m_overlaytexture; }
 	int orientation() const { return m_user.m_orientation; }
@@ -475,7 +475,7 @@ private:
 	render_manager &        m_manager;              // reference back to the owning manager
 	simple_list<item>       m_itemlist;             // head of the item list
 	fixed_allocator<item>   m_item_allocator;       // free container items
-	screen_device *         m_screen;               // the screen device
+	device_video_output_interface *         m_screen;               // the screen device
 	user_settings           m_user;                 // user settings
 	bitmap_argb32 *         m_overlaybitmap;        // overlay bitmap
 	render_texture *        m_overlaytexture;       // overlay texture
@@ -675,7 +675,7 @@ public:
 	running_machine &machine() const { return m_machine; }
 
 	// global queries
-	bool is_live(screen_device &screen) const;
+	bool is_live(device_video_output_interface &screen) const;
 	float max_update_rate() const;
 
 	// targets

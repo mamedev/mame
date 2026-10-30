@@ -30,7 +30,7 @@ private:
 	required_shared_ptr<u16> m_fb;
 
 	void hd63484_map(address_map &map);
-	void acrtc_display(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data);
+	void acrtc_display(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data, int screen_n);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 

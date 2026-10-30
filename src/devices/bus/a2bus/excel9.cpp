@@ -52,7 +52,7 @@ ROM_END
 
 void a2bus_excel9_device::device_add_mconfig(machine_config &config)
 {
-	MC6809E(config, m_6809, 1021800);   // 6809E runs at ~1 MHz
+	MC6809E(config, m_6809, A2BUS_1M_CLOCK);   // 6809E runs at ~1 MHz
 	m_6809->set_addrmap(AS_PROGRAM, &a2bus_excel9_device::m6809_mem);
 }
 

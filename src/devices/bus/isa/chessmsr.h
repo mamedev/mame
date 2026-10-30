@@ -12,7 +12,7 @@
 #pragma once
 
 #include "isa.h"
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "machine/gen_latch.h"
 
 
@@ -34,7 +34,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
-	required_device<arm_cpu_device> m_maincpu;
+	required_device<arm2_cpu_device> m_maincpu;
 	required_device<generic_latch_8_device> m_mainlatch;
 	required_device<generic_latch_8_device> m_sublatch;
 	std::unique_ptr<u32[]> m_ram;

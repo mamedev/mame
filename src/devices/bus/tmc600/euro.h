@@ -84,9 +84,19 @@ public:
 
 	tmc600_eurobus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }
+
+	// card interface
+	auto const &memspace() { return m_memspace; }
+	auto const &iospace() { return m_iospace; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+
+	required_address_space m_memspace;
+	required_address_space m_iospace;
 
 	device_tmc600_eurobus_card_interface *m_card;
 };

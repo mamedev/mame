@@ -1273,7 +1273,7 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_target &target)
 	}
 	if (!found_pixel)
 		util::stream_format(title_buf,
-				((gfx.source_width() == gfx.width()) && (gfx.source_height() == gfx.height())) ? 
+				((gfx.source_width() == gfx.width()) && (gfx.source_height() == gfx.height())) ?
 				_("gfxview", u8" %1$d\u00d7%2$d color %7$X/%8$X") :
 				_("gfxview", u8" %1$d\u00d7%2$d (clip: %3$d:%4$d\u00d7%5$d:%6$d) color %7$X/%8$X"),
 				gfx.source_width(), gfx.source_height(),
@@ -1518,11 +1518,10 @@ void gfx_viewer::update_gfxset_bitmap(int xcells, int ycells, gfx_element &gfx)
 				for (int x = 0; x < xcells; x++, index++)
 				{
 					// update the bounds for this cell
-					cellbounds.min_x = x * cellxpix;
-					cellbounds.max_x = (x + 1) * cellxpix - 1;
+					cellbounds.setx(x * cellxpix, (x + 1) * cellxpix - 1);
 
 					if (index < gfx.elements()) // only render if there is data
-						gfxset_draw_item(gfx, index, cellbounds.min_x, cellbounds.min_y, set);
+						gfxset_draw_item(gfx, index, cellbounds.left(), cellbounds.top(), set);
 					else // otherwise, fill with transparency
 						m_bitmap.fill(0, cellbounds);
 				}

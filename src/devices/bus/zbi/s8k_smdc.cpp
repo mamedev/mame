@@ -2,7 +2,7 @@
 // copyright-holders:A. Lenard
 /**********************************************************************
 
-	Storage Module Device Controller
+    Storage Module Device Controller
 
 Based on prior work by Christian Corti
 
@@ -10,12 +10,25 @@ NOTE: The actual board uses an AM2910 MPC and 4x AM2901B bit-slice ALUs
 (+2 KB SRAM). However, the firmware ROMs (U131-U136) for these have not
 been dumped yet, so currently only high-level emulation is possible.
 
+NOTE: The disks are CHD images rather than a flux-level model of the
+medium, by choice.  A CHD holds the data of the active sectors only, so
+there is nowhere to keep the sector IDs, their ECC or the spare sector
+that WRITE FORMAT lays down.  READ FORMAT therefore returns IDs made up
+from the image geometry, not the ones that were written, and the little
+format state that is kept (one extra sector and its data) is per drive,
+not per track.  This only matters for low-level formatting; it is modelled
+far enough for the SADIE format diagnostics (SMDFMT, SMDMEDIA) to pass.
+Regular use only reads and writes sectors and is not affected.
+
 **********************************************************************/
 
 #include "emu.h"
 #include "s8k_smdc.h"
 
 #include "imagedev/harddriv.h"
+
+#include <algorithm>
+#include <iterator>
 
 //**************************************************************************
 //  DEBUGGING
@@ -48,128 +61,139 @@ been dumped yet, so currently only high-level emulation is possible.
 /* Command Register */
 enum : uint16_t
 {
-	SMD_CR_CMD_MASK	= 0x0007,
-	SMD_CR_WK		= 0x0008,	/* wakeup */
-	SMD_CR_EI		= 0x0010,	/* enable interrupts (reset by IUS) */
-	SMD_CR_DI		= 0x0020,	/* disable interrupts */
-	SMD_CR_RI		= 0x0040,	/* reset IP and IUS */
-	SMD_CR_INIT		= 0x0080,	/* initialze controller */
-	SMD_CR_DTA		= 0x0100,	/* dispatch table address or interrupt vector */
-	SMD_CR_DTA_MASK	= 0xff00
+	SMD_CR_CMD_MASK = 0x0007,
+	SMD_CR_WK       = 0x0008,   /* wakeup */
+	SMD_CR_EI       = 0x0010,   /* enable interrupts (reset by IUS) */
+	SMD_CR_DI       = 0x0020,   /* disable interrupts */
+	SMD_CR_RI       = 0x0040,   /* reset IP and IUS */
+	SMD_CR_INIT     = 0x0080,   /* initialze controller */
+	SMD_CR_DTA      = 0x0100,   /* dispatch table address or interrupt vector */
+	SMD_CR_DTA_MASK = 0xff00
 };
 
 /* Command Register Command */
 enum
 {
-	SMD_CR_CMD_NOP	= 0,
-	SMD_CR_CMD_RPA	= 1,	/* read packet address from DT */
-	SMD_CR_CMD_DTA0	= 4,	/* dispatch table address byte 0 (lsb) */
-	SMD_CR_CMD_DTA1	= 5,	/* dispatch table address byte 1 */
-	SMD_CR_CMD_DTA2	= 6,	/* dispatch table address byte 2 (msb)  */
-	SMD_CR_CMD_IV	= 7		/* interrupt vector */
+	SMD_CR_CMD_NOP  = 0,
+	SMD_CR_CMD_RPA  = 1,    /* read packet address from DT */
+	SMD_CR_CMD_DTA0 = 4,    /* dispatch table address byte 0 (lsb) */
+	SMD_CR_CMD_DTA1 = 5,    /* dispatch table address byte 1 */
+	SMD_CR_CMD_DTA2 = 6,    /* dispatch table address byte 2 (msb)  */
+	SMD_CR_CMD_IV   = 7     /* interrupt vector */
 };
 
 /* Status Register */
 enum : uint16_t
 {
-	SMD_SR_BZ		= 0x0001,	/* controller busy from CR_CMD */
-	SMD_SR_IUS		= 0x0002,	/* interrupt under service */
-	SMD_SR_IP		= 0x0004,	/* interrupt pending */
-	SMD_SR_NDT		= 0x0080,	/* no dispatch table/interrupt vector */
-	SMD_SR_ES		= 0x0100,	/* packet ST or selftest code */
-	SMD_SR_DRV		= 0x4000	/* drive number 0-3 */
+	SMD_SR_BZ       = 0x0001,   /* controller busy from CR_CMD */
+	SMD_SR_IUS      = 0x0002,   /* interrupt under service */
+	SMD_SR_IP       = 0x0004,   /* interrupt pending */
+	SMD_SR_NDT      = 0x0080,   /* no dispatch table/interrupt vector */
+	SMD_SR_ES       = 0x0100,   /* packet ST or selftest code */
+	SMD_SR_DRV      = 0x4000    /* drive number 0-3 */
 };
 
 /* Dipatch Table Packet Status */
 enum : uint16_t
 {
 	/* set by host */
-	SMD_DT_PS_IDLE	= 0,
-	SMD_DT_PS_GO	= 1,
+	SMD_DT_PS_IDLE  = 0,
+	SMD_DT_PS_GO    = 1,
 	/* set by SMDC */
-	SMD_DT_PS_BUSY	= 2,
-	SMD_DT_PS_DONE	= 4
+	SMD_DT_PS_BUSY  = 2,
+	SMD_DT_PS_DONE  = 4
 };
 
 /* Current Command */
 enum : uint16_t
 {
-	SMD_CM_CMD_MASK	= 0x00ff,
-	SMD_CM_NO		= 0x0100,	/* no offsets during retries */
-	SMD_CM_NE		= 0x0200,	/* no error correction */
-	SMD_CM_NR		= 0x0400	/* no retries, use pkt.OF */
+	SMD_CM_CMD_MASK = 0x00ff,
+	SMD_CM_NO       = 0x0100,   /* no offsets during retries */
+	SMD_CM_NE       = 0x0200,   /* no error correction */
+	SMD_CM_NR       = 0x0400    /* no retries, use pkt.OF */
 };
 
 /* Curent Command Code */
 enum
 {
-	SMD_CM_CMD_NOP	= 0,
-	SMD_CM_CMD_WRAM,		/* write RAM */
-	SMD_CM_CMD_RRAM,		/* read RAM */
-	SMD_CM_CMD_SELECT,		/* select drive */
-	SMD_CM_CMD_PRISEL,		/* priority select */
-	SMD_CM_CMD_RELEASE,		/* release */
-	SMD_CM_CMD_RESET,		/* reset fault */
-	SMD_CM_CMD_SEEK,		/* position (seek/rezero) */
-	SMD_CM_CMD_WFMT,		/* write format */
-	SMD_CM_CMD_WLONG,		/* write long */
-	SMD_CM_CMD_WRITE,		/* write */
+	SMD_CM_CMD_NOP  = 0,
+	SMD_CM_CMD_WRAM,        /* write RAM */
+	SMD_CM_CMD_RRAM,        /* read RAM */
+	SMD_CM_CMD_SELECT,      /* select drive */
+	SMD_CM_CMD_PRISEL,      /* priority select */
+	SMD_CM_CMD_RELEASE,     /* release */
+	SMD_CM_CMD_RESET,       /* reset fault */
+	SMD_CM_CMD_SEEK,        /* position (seek/rezero) */
+	SMD_CM_CMD_WFMT,        /* write format */
+	SMD_CM_CMD_WLONG,       /* write long */
+	SMD_CM_CMD_WRITE,       /* write */
 	/* 11 = reserved */
-	SMD_CM_CMD_RFMT	= 12,	/* read format */
-	SMD_CM_CMD_RLONG,		/* read long */
-	SMD_CM_CMD_READ,		/* read */
-	SMD_CM_CMD_SIZE			/* size disk */
+	SMD_CM_CMD_RFMT = 12,   /* read format */
+	SMD_CM_CMD_RLONG,       /* read long */
+	SMD_CM_CMD_READ,        /* read */
+	SMD_CM_CMD_SIZE         /* size disk */
 };
 
 /* Ending Status */
 enum : uint8_t
 {
-	SMD_ES_NOERR 	= 0,	/* no error */
-	SMD_ES_ERRINIT,			/* initialization error (no DT, IV or bad CR) */
-	SMD_ES_ERRSECTOR,		/* sector overrun error */
-	SMD_ES_ERRDMA,			/* DMA memory error returned in SR_ES */
-	SMD_ES_ERRSEL,			/* select error */
-	SMD_ES_BADCT,			/* CT invalid */
-	SMD_ES_BUSY,			/* SMD dual access busy */
-	SMD_ES_ERRSEEK,			/* multiple rezero error */
-	SMD_ES_ERRST,			/* SMD status error (see DS) */
-	SMD_ES_BADDMA,			/* odd DMA address */
-	SMD_ES_OVERFLOW,		/* pack overflow error */
-	SMD_ES_PWRFAIL,			/* power failure during read/write */
-	SMD_ES_BADCMD,			/* undefined CM_CMD */
-	SMD_ES_ERRDATA,			/* unrecovered data error */
-	SMD_ES_NOSECTOR,		/* sector not found */
-	SMD_ES_VIOL,			/* write protect violation */
+	SMD_ES_NOERR    = 0,    /* no error */
+	SMD_ES_ERRINIT,         /* initialization error (no DT, IV or bad CR) */
+	SMD_ES_ERRSECTOR,       /* sector overrun error */
+	SMD_ES_ERRDMA,          /* DMA memory error returned in SR_ES */
+	SMD_ES_ERRSEL,          /* select error */
+	SMD_ES_BADCT,           /* CT invalid */
+	SMD_ES_BUSY,            /* SMD dual access busy */
+	SMD_ES_ERRSEEK,         /* multiple rezero error */
+	SMD_ES_ERRST,           /* SMD status error (see DS) */
+	SMD_ES_BADDMA,          /* odd DMA address */
+	SMD_ES_OVERFLOW,        /* pack overflow error */
+	SMD_ES_PWRFAIL,         /* power failure during read/write */
+	SMD_ES_BADCMD,          /* undefined CM_CMD */
+	SMD_ES_ERRDATA,         /* unrecovered data error */
+	SMD_ES_NOSECTOR,        /* sector not found */
+	SMD_ES_VIOL,            /* write protect violation */
 	/* timeout errors */
-	SMD_ES_WAITIDLE = 32,	/* idle loop */
-	SMD_ES_WAITINT,			/* waiting for IP and IUS to clear */
-	SMD_ES_WAITDMA,			/* waiting for DMA to complete */
-	SMD_ES_WAITCYL,			/* waiting for SMD on-cylinder */
-	SMD_ES_WAITSRV,			/* waiting for SMD servo clock */
-	SMD_ES_WAITDCLK,		/* waiting for SMD data clock */
-	SMD_ES_WAITSECTOR,		/* waiting for sector/index mark */
-	SMD_ES_WAITID,			/* waiting for ID sync */
-	SMD_ES_WAITDATA			/* waiting for data sync */
+	SMD_ES_WAITIDLE = 32,   /* idle loop */
+	SMD_ES_WAITINT,         /* waiting for IP and IUS to clear */
+	SMD_ES_WAITDMA,         /* waiting for DMA to complete */
+	SMD_ES_WAITCYL,         /* waiting for SMD on-cylinder */
+	SMD_ES_WAITSRV,         /* waiting for SMD servo clock */
+	SMD_ES_WAITDCLK,        /* waiting for SMD data clock */
+	SMD_ES_WAITSECTOR,      /* waiting for sector/index mark */
+	SMD_ES_WAITID,          /* waiting for ID sync */
+	SMD_ES_WAITDATA         /* waiting for data sync */
 };
 
 /* Drive Select */
 enum : uint16_t
 {
-	SMD_DS_RY		= 0x0001,	/* selected drive ready */
-	SMD_DS_OC		= 0x0002,	/* selected drive on cylinder */
-	SMD_DS_SE		= 0x0004,	/* selected drive seek error */
-	SMD_DS_FT		= 0x0008,	/* selected drive fault */
-	SMD_DS_RO		= 0x0010,	/* selected drive read only */
-	SMD_DS_BZ		= 0x0020,	/* selected drive busy (dual access) */
-	SMD_DS_XM		= 0x0040,	/* index mark */
-	SMD_DS_SM		= 0x0080,	/* sector mark */
-	SMD_DS_SEL		= 0x0100,	/* ports 0-3 selected */
-	SMD_DS_SKE		= 0x1000	/* ports 0-3 seek end */
+	SMD_DS_RY       = 0x0001,   /* selected drive ready */
+	SMD_DS_OC       = 0x0002,   /* selected drive on cylinder */
+	SMD_DS_SE       = 0x0004,   /* selected drive seek error */
+	SMD_DS_FT       = 0x0008,   /* selected drive fault */
+	SMD_DS_RO       = 0x0010,   /* selected drive read only */
+	SMD_DS_BZ       = 0x0020,   /* selected drive busy (dual access) */
+	SMD_DS_XM       = 0x0040,   /* index mark */
+	SMD_DS_SM       = 0x0080,   /* sector mark */
+	SMD_DS_SEL      = 0x0100,   /* ports 0-3 selected */
+	SMD_DS_SKE      = 0x1000    /* ports 0-3 seek end */
 };
 
 constexpr uint16_t SMD_FW_VERSION = 0x1234;
 
 namespace {
+
+/* Format ID words */
+enum : uint16_t
+{
+	SMD_ID_ET          = 0x8000,   /* last sector on track */
+	SMD_ID_EC          = 0x4000,   /* last sector on cylinder */
+	SMD_ID_EP          = 0x2000,   /* last sector on pack */
+	SMD_ID_FL          = 0x8000,   /* bad sector */
+	SMD_ID_SP          = 0x4000,   /* spare sector */
+	SMD_ID_SECTOR_MASK = 0x3fff
+};
 
 class zbi_s8k_smdc_card_device : public device_t, public device_zbi_card_interface
 {
@@ -198,11 +222,11 @@ protected:
 private:
 	struct smd_dispatch_table
 	{
-		uint16_t PS[4];		/* packet status */
+		uint16_t PS[4];     /* packet status */
 		struct
 		{
-			uint16_t PH;	/* packet address msh */
-			uint16_t PL;	/* packet address lsh */
+			uint16_t PH;    /* packet address msh */
+			uint16_t PL;    /* packet address lsh */
 		} PA[4];
 	};
 
@@ -217,7 +241,6 @@ private:
 
 	void smd_init();
 	void smd_do_drive(int drv);
-	int get_lbasector();
 
 	optional_device_array<harddisk_image_device, 4> m_drives;
 	int m_cyl[4];
@@ -226,20 +249,23 @@ private:
 
 	/* data buffers */
 	uint8_t m_buffer[512];
-	uint16_t m_dt[12];	/* dispatch table */
-	uint16_t m_pkt[16];	/* packet */
+	uint16_t m_dt[12];  /* dispatch table */
+	uint16_t m_pkt[16]; /* packet */
 
 	/* dispatch table address */
-	uint16_t m_dta_seg;	/* address high word */
+	uint16_t m_dta_seg; /* address high word */
 	uint16_t m_dta_ofs; /* address low word */
 	offs_t m_dta_idx;
 
-	uint16_t m_status;	/* status register */
-	uint8_t m_drv;		/* drive number 0-3 */
-	uint8_t m_es;		/* packet command ending status */
-	uint8_t m_iv;		/* interrupt vector */
-	bool m_ie;			/* interrupt enable */
+	uint16_t m_status;  /* status register */
+	uint8_t m_drv;      /* drive number 0-3 */
+	uint8_t m_es;       /* packet command ending status */
+	uint8_t m_iv;       /* interrupt vector */
+	bool m_ie;          /* interrupt enable */
 	bool m_wakeup;
+	bool m_format_overflow[4]; /* unflagged IDs exceed active + spare capacity */
+	bool m_extra_sector[4];    /* physical sector after the CHD sectors is active */
+	uint8_t m_extra_data[4][512];
 
 	int m_init_left;
 	int m_busreq_state;
@@ -266,6 +292,9 @@ zbi_s8k_smdc_card_device::zbi_s8k_smdc_card_device(const machine_config &mconfig
 	, m_iv(0)
 	, m_ie(false)
 	, m_wakeup(false)
+	, m_format_overflow{ false, false, false, false }
+	, m_extra_sector{ false, false, false, false }
+	, m_extra_data{}
 	, m_init_left(5)
 	, m_busreq_state(0)
 {
@@ -277,11 +306,15 @@ zbi_s8k_smdc_card_device::zbi_s8k_smdc_card_device(const machine_config &mconfig
 
 void zbi_s8k_smdc_card_device::smd_init()
 {
-	memset(&m_buffer[0], 0, 512);
-	memset(&m_dt[0], 0, 24);
-	memset(&m_pkt[0], 0, 32);
+	std::fill(std::begin(m_buffer), std::end(m_buffer), 0);
+	std::fill(std::begin(m_dt), std::end(m_dt), 0);
+	std::fill(std::begin(m_pkt), std::end(m_pkt), 0);
 
 	m_cyl[0] = m_cyl[1] = m_cyl[2] = m_cyl[3] = 0;
+	m_format_overflow[0] = m_format_overflow[1] = m_format_overflow[2] = m_format_overflow[3] = false;
+	m_extra_sector[0] = m_extra_sector[1] = m_extra_sector[2] = m_extra_sector[3] = false;
+	for (auto &data : m_extra_data)
+		std::fill_n(data, sizeof(data), 0);
 
 	m_ie = false;
 	m_iv = 0;
@@ -333,15 +366,14 @@ void zbi_s8k_smdc_card_device::write(uint16_t data)
 
 	if (data & SMD_CR_RI)
 	{
+		// HRM 03-3237-04, p. 4-32: RI resets IP/IUS; DI separately disables interrupts.
 		m_status &= ~(SMD_SR_IP | SMD_SR_IUS);
-		m_ie = false;
 	}
 
 	if (data & SMD_CR_WK)
 	{
 		m_wakeup = true;
 		m_status |= SMD_SR_BZ;
-		m_update_timer->adjust(attotime::from_nsec(180));	/* bus frequency */
 	}
 
 	if (data & SMD_CR_EI)
@@ -379,6 +411,14 @@ void zbi_s8k_smdc_card_device::write(uint16_t data)
 	}
 
 	LOGCMD("%s SMDC command: %02x\n", machine().describe_context(), data & SMD_CR_CMD_MASK);
+
+	// A wakeup may be queued by the interrupt handler before it resets the
+	// previous completion.  Do not let that reset discard the next completion.
+	// HRM pp. 4-32, 4-38 describe the IP/IUS handshake and wait-for-clear state.
+	if (m_wakeup && !(m_status & (SMD_SR_IP | SMD_SR_IUS)) && !m_busreq_state)
+		m_update_timer->adjust(attotime::from_nsec(180));
+
+	m_bus->vi_w((z80daisy_irq_state() & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 //-------------------------------------------------
@@ -389,12 +429,15 @@ TIMER_CALLBACK_MEMBER(zbi_s8k_smdc_card_device::update_buffers)
 {
 	if (m_wakeup)
 	{
+		if (m_status & (SMD_SR_IP | SMD_SR_IUS))
+			return;
+
+		/* reset wakeup bit before requesting the bus */
+		m_wakeup = false;
+
 		/* tell the CPU to relinquish the bus */
 		m_busreq_state = ASSERT_LINE;
 		m_bus->busreq_w(m_busreq_state);
-
-		/* reset wakeup bit */
-		m_wakeup = false;
 	}
 	else
 	{
@@ -433,7 +476,6 @@ int zbi_s8k_smdc_card_device::z80daisy_irq_state()
 int zbi_s8k_smdc_card_device::z80daisy_irq_ack()
 {
 	m_status |= SMD_SR_IUS;
-	m_status &= ~SMD_SR_IP;
 	m_ie = false;
 
 	LOGINT("%s SMD interrupt: iv=%02x, es=%02x, drv=%d\n", machine().describe_context(), m_iv, m_es, m_drv);
@@ -452,6 +494,9 @@ void zbi_s8k_smdc_card_device::z80daisy_irq_reti()
 	{
 		/* clear the IEO state and update the IRQs */
 		m_status &= ~SMD_SR_IUS;
+
+		if (m_wakeup && !(m_status & SMD_SR_IP) && !m_busreq_state)
+			m_update_timer->adjust(attotime::from_nsec(180));
 
 		int state = (z80daisy_irq_state() & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE;
 		m_bus->vi_w(state);
@@ -527,48 +572,7 @@ void zbi_s8k_smdc_card_device::busdaisy_req_ack()
 	m_busreq_state = CLEAR_LINE;
 	m_bus->busreq_w(m_busreq_state);
 
-	m_update_timer->adjust(attotime::from_nsec(180));	/* bus frequency */
-}
-
-//-------------------------------------------------
-//  get_lbasector - translate to lba
-//-------------------------------------------------
-
-int zbi_s8k_smdc_card_device::get_lbasector()
-{
-	harddisk_image_device *file = m_drives[m_drv];
-	const hard_disk_file::info &info = file->get_info();
-	smd_packet *pkt = reinterpret_cast<smd_packet*>(m_pkt);
-	int lbasector;
-
-	if (pkt->CY > info.cylinders)
-	{
-		LOGDATA("%s: Unexpected cylinder %d for range 0 to %d\n", machine().describe_context(), pkt->CY, info.cylinders - 1);
-	}
-
-	if (pkt->HD >= info.heads)
-	{
-		LOGDATA("%s: Unexpected head %d for range 0 to %d\n", machine().describe_context(), pkt->HD, info.heads - 1);
-	}
-
-	if (pkt->SC >= info.sectors)
-	{
-		LOGDATA("%s: Unexpected sector number %d for range 0 to %d\n", machine().describe_context(), pkt->SC, info.sectors - 1);
-	}
-
-	if ((pkt->CT == 0) || (pkt->CT > info.sectorbytes))
-	{
-		LOGDATA("%s: Unexpected sector bytes %d for range 1 to %d\n", machine().describe_context(), pkt->CT, info.sectorbytes);
-		pkt->CT = 512;
-	}
-
-	lbasector = pkt->CY;
-	lbasector *= info.heads;
-	lbasector += pkt->HD;
-	lbasector *= info.sectors;
-	lbasector += pkt->SC;
-
-	return lbasector;
+	m_update_timer->adjust(attotime::from_nsec(180));   /* bus frequency */
 }
 
 //-------------------------------------------------
@@ -579,10 +583,12 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 {
 	offs_t dma_idx;
 	int unit, block;
+	unsigned active_sectors, cylinder, head, sector, sectors_per_track;
 	smd_dispatch_table *dt = reinterpret_cast<smd_dispatch_table*>(m_dt);
 	smd_packet *pkt = reinterpret_cast<smd_packet*>(m_pkt);
 	harddisk_image_device *file;
 	bool drv_good;
+	bool virtual_spare;
 
 	unit = pkt->UN & 3;
 
@@ -597,11 +603,11 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 
 	switch (pkt->CM & SMD_CM_CMD_MASK)
 	{
-	case SMD_CM_CMD_NOP:		/* NOP */
+	case SMD_CM_CMD_NOP:        /* NOP */
 		pkt->CT = SMD_FW_VERSION;
 		break;
 
-	case SMD_CM_CMD_SELECT:		/* select drive */
+	case SMD_CM_CMD_SELECT:     /* select drive */
 		LOGCMD("%s SMDC select unit %d\n", machine().describe_context(), unit);
 		if (!drv_good)
 		{
@@ -610,11 +616,11 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 		}
 		break;
 
-	case SMD_CM_CMD_RESET:		/* reset fault */
+	case SMD_CM_CMD_RESET:      /* reset fault */
 		pkt->DS &= ~SMD_DS_FT;
 		break;
 
-	case SMD_CM_CMD_SEEK:		/* seek */
+	case SMD_CM_CMD_SEEK:       /* seek */
 		if (pkt->CY == 0xffff)
 		{
 			/* rezero drive and reset fault */
@@ -631,11 +637,120 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 		}
 		break;
 
-	case SMD_CM_CMD_WRITE:		/* write */
+	case SMD_CM_CMD_WFMT:       /* write format */
+		if (!drv_good)
+		{
+			m_es = SMD_ES_NOSECTOR;
+			pkt->DS |= SMD_DS_FT;
+			break;
+		}
+		if (file->get_info().sectorbytes > sizeof(m_buffer))
+		{
+			m_es = SMD_ES_BADCT;
+			pkt->DS |= SMD_DS_FT;
+			break;
+		}
+
+		dma_idx = (pkt->AH << 16) | pkt->AL;
+		if (dma_idx & 1)
+		{
+			m_es = SMD_ES_BADDMA;
+			pkt->DS |= SMD_DS_FT;
+			break;
+		}
+
+		// A CHD has no representation for the physical sector IDs or their
+		// ECC.  Consume the supplied ID list and initialise the corresponding
+		// data sectors; bad and spare sectors have no LBA in the image.
+		std::fill_n(m_buffer, file->get_info().sectorbytes, 0);
+		m_format_overflow[unit] = false;
+		m_extra_sector[unit] = false;
+		active_sectors = 0;
+		for (unsigned n = 0; n < pkt->CT; n++, dma_idx += 8)
+		{
+			uint16_t const id_cylinder = m_bus->ram16_r(dma_idx + 2);
+			uint16_t const id_head = m_bus->ram16_r(dma_idx + 4);
+			uint16_t const id_sector = m_bus->ram16_r(dma_idx + 6);
+
+			if (id_sector & (SMD_ID_FL | SMD_ID_SP))
+				continue;
+
+			if ((id_cylinder >= file->get_info().cylinders) || (id_head >= file->get_info().heads))
+			{
+				m_es = SMD_ES_NOSECTOR;
+				pkt->DS |= SMD_DS_FT;
+				break;
+			}
+
+			m_format_overflow[unit] |= ++active_sectors > (file->get_info().sectors + 1);
+			m_extra_sector[unit] |= (id_sector & SMD_ID_SECTOR_MASK) == file->get_info().sectors;
+			// CHD geometry describes active sectors.  IDs beyond that capacity
+			// affect physical track layout but have no image LBA.
+			if ((id_sector & SMD_ID_SECTOR_MASK) >= file->get_info().sectors)
+			{
+				if ((id_sector & SMD_ID_SECTOR_MASK) == file->get_info().sectors)
+					std::fill_n(m_extra_data[unit], file->get_info().sectorbytes, 0);
+				continue;
+			}
+
+			block = ((id_cylinder * file->get_info().heads) + id_head) * file->get_info().sectors + (id_sector & SMD_ID_SECTOR_MASK);
+			if (!file->write(block, m_buffer))
+			{
+				m_es = SMD_ES_NOSECTOR;
+				pkt->DS |= SMD_DS_FT;
+				break;
+			}
+		}
+		break;
+
+	case SMD_CM_CMD_RFMT:       /* read format */
+		if (!drv_good)
+		{
+			m_es = SMD_ES_NOSECTOR;
+			pkt->DS |= SMD_DS_FT;
+			break;
+		}
+
+		dma_idx = (pkt->AH << 16) | pkt->AL;
+		if (dma_idx & 1)
+		{
+			m_es = SMD_ES_BADDMA;
+			pkt->DS |= SMD_DS_FT;
+			break;
+		}
+
+		// Model a normally formatted track with the CHD's active sectors and
+		// one physical spare.  READ FORMAT returns four ID words followed by
+		// two ID-ECC words for each sector (HRM 03-3237-04, pp. 4-34--4-35).
+		for (unsigned n = 0; n < pkt->CT; n++, dma_idx += 12)
+		{
+			unsigned const physical_sectors = file->get_info().sectors + 1;
+			unsigned const position = (pkt->SC + n) % physical_sectors;
+			unsigned const track = (pkt->SC + n) / physical_sectors;
+			unsigned const id_head = (pkt->HD + track) % file->get_info().heads;
+			unsigned const id_cylinder = pkt->CY + (pkt->HD + track) / file->get_info().heads;
+			uint16_t flags = (position == file->get_info().sectors) ? SMD_ID_ET : 0;
+
+			if ((position == file->get_info().sectors) && (id_head == file->get_info().heads - 1))
+				flags |= SMD_ID_EC;
+			if ((position == file->get_info().sectors) && (id_head == file->get_info().heads - 1) && (id_cylinder == file->get_info().cylinders - 1))
+				flags |= SMD_ID_EP;
+
+			m_bus->ram16_w(dma_idx + 0, flags);
+			m_bus->ram16_w(dma_idx + 2, id_cylinder);
+			m_bus->ram16_w(dma_idx + 4, id_head);
+			uint16_t const id_sector = (m_format_overflow[unit] && !position) ? 1 : position;
+			m_bus->ram16_w(dma_idx + 6, id_sector);
+			m_bus->ram16_w(dma_idx + 8, 0);
+			m_bus->ram16_w(dma_idx + 10, 0);
+		}
+		break;
+
+	case SMD_CM_CMD_WRITE:      /* write */
 		LOGWRITE("%s SMD write: unit=%d cyl=%d hd=%d sec=%d count=%d addr=%04x:%04x\n", machine().describe_context(),
 				 unit, pkt->CY, pkt->HD, pkt->SC, pkt->CT, pkt->AH, pkt->AL);
 
-		if (pkt->CT & 1)
+		if ((pkt->CT == 0) || (pkt->CT & 1))
 		{
 			m_es = SMD_ES_BADCT;
 			pkt->DS |= SMD_DS_FT;
@@ -649,6 +764,12 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 			pkt->DS |= SMD_DS_FT;
 			break;
 		}
+		if (file->get_info().sectorbytes > sizeof(m_buffer))
+		{
+			m_es = SMD_ES_BADCT;
+			pkt->DS |= SMD_DS_FT;
+			break;
+		}
 
 		dma_idx = (pkt->AH << 16) | pkt->AL;
 
@@ -659,28 +780,66 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 			break;
 		}
 
-		block = get_lbasector();
+		cylinder = pkt->CY;
+		head = pkt->HD;
+		sector = pkt->SC;
+		sectors_per_track = file->get_info().sectors + unsigned(m_extra_sector[unit]);
 
-		LOGSEEK(" --> seek to block $%d (offset %d)\n", block, block*512);
-
-		/* DMA from main memory */
-		for (unsigned int n = 0; n < pkt->CT; n++)
+		// CT is the total transfer size and may span sectors (swap I/O uses up to 0xfe00 bytes).
+		for (unsigned remaining = pkt->CT; remaining != 0; )
 		{
-			m_buffer[n] = m_bus->ram8_r(dma_idx++);
-		}
+			unsigned const count = std::min<unsigned>(remaining, file->get_info().sectorbytes);
+			if ((cylinder >= file->get_info().cylinders) || (head >= file->get_info().heads) || (sector >= sectors_per_track))
+			{
+				m_es = SMD_ES_NOSECTOR;
+				pkt->DS |= SMD_DS_FT;
+				break;
+			}
 
-		if (!file->write(block, m_buffer))
-		{
-			m_es = SMD_ES_NOSECTOR;
-			pkt->DS |= SMD_DS_FT;
+			virtual_spare = sector == file->get_info().sectors;
+			block = ((cylinder * file->get_info().heads) + head) * file->get_info().sectors + sector;
+			LOGSEEK(" --> seek to block $%d (offset %d)\n", block, block*512);
+
+			// Preserve the unused part of a sector for a short final transfer.
+			if (virtual_spare)
+				std::copy_n(m_extra_data[unit], file->get_info().sectorbytes, m_buffer);
+			else if ((count != file->get_info().sectorbytes) && !file->read(block, m_buffer))
+			{
+				m_es = SMD_ES_NOSECTOR;
+				pkt->DS |= SMD_DS_FT;
+				break;
+			}
+
+			for (unsigned n = 0; n < count; n++)
+				m_buffer[n] = m_bus->ram8_r(dma_idx++);
+
+			if (virtual_spare)
+				std::copy_n(m_buffer, file->get_info().sectorbytes, m_extra_data[unit]);
+			else if (!file->write(block, m_buffer))
+			{
+				m_es = SMD_ES_NOSECTOR;
+				pkt->DS |= SMD_DS_FT;
+				break;
+			}
+
+			remaining -= count;
+			if (++sector == sectors_per_track)
+			{
+				sector = 0;
+				if (++head == file->get_info().heads)
+				{
+					head = 0;
+					cylinder++;
+				}
+			}
 		}
 		break;
 
-	case SMD_CM_CMD_READ:		/* read */
+	case SMD_CM_CMD_READ:       /* read */
 		LOGREAD("%s SMD read: unit=%d cyl=%d hd=%d sec=%d count=%d addr=%04x:%04x\n", machine().describe_context(),
 				unit, pkt->CY, pkt->HD, pkt->SC, pkt->CT, pkt->AH, pkt->AL);
 
-		if (pkt->CT & 1)
+		if ((pkt->CT == 0) || (pkt->CT & 1))
 		{
 			m_es = SMD_ES_BADCT;
 			pkt->DS |= SMD_DS_FT;
@@ -694,6 +853,12 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 			pkt->DS |= SMD_DS_FT;
 			break;
 		}
+		if (file->get_info().sectorbytes > sizeof(m_buffer))
+		{
+			m_es = SMD_ES_BADCT;
+			pkt->DS |= SMD_DS_FT;
+			break;
+		}
 
 		dma_idx = (pkt->AH << 16) | pkt->AL;
 
@@ -704,26 +869,51 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 			break;
 		}
 
-		block = get_lbasector();
+		cylinder = pkt->CY;
+		head = pkt->HD;
+		sector = pkt->SC;
+		sectors_per_track = file->get_info().sectors + unsigned(m_extra_sector[unit]);
 
-		LOGSEEK(" --> seek to block $%d (offset %d)\n", block, block*512);
-
-		if (!file->read(block, m_buffer))
+		for (unsigned remaining = pkt->CT; remaining != 0; )
 		{
-			m_es = SMD_ES_NOSECTOR;
-			pkt->DS |= SMD_DS_FT;
-		}
-		else
-		{
-			/* DMA to main memory */
-			for (unsigned int n = 0; n < pkt->CT; n++)
+			unsigned const count = std::min<unsigned>(remaining, file->get_info().sectorbytes);
+			if ((cylinder >= file->get_info().cylinders) || (head >= file->get_info().heads) || (sector >= sectors_per_track))
 			{
+				m_es = SMD_ES_NOSECTOR;
+				pkt->DS |= SMD_DS_FT;
+				break;
+			}
+
+			virtual_spare = sector == file->get_info().sectors;
+			block = ((cylinder * file->get_info().heads) + head) * file->get_info().sectors + sector;
+			LOGSEEK(" --> seek to block $%d (offset %d)\n", block, block*512);
+
+			if (virtual_spare)
+				std::copy_n(m_extra_data[unit], file->get_info().sectorbytes, m_buffer);
+			else if (!file->read(block, m_buffer))
+			{
+				m_es = SMD_ES_NOSECTOR;
+				pkt->DS |= SMD_DS_FT;
+				break;
+			}
+
+			for (unsigned n = 0; n < count; n++)
 				m_bus->ram8_w(dma_idx++, m_buffer[n]);
+
+			remaining -= count;
+			if (++sector == sectors_per_track)
+			{
+				sector = 0;
+				if (++head == file->get_info().heads)
+				{
+					head = 0;
+					cylinder++;
+				}
 			}
 		}
 		break;
 
-	case SMD_CM_CMD_SIZE:	/* size disk */
+	case SMD_CM_CMD_SIZE:   /* size disk */
 		if (drv_good)
 		{
 			pkt->CY = file->get_info().cylinders;
@@ -742,11 +932,13 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 		pkt->DS = SMD_DS_FT;
 	}
 
-	if (drv_good)
-		pkt->DS |= SMD_DS_OC;
-
 	pkt->DS &= 0x003f;
-	pkt->DS |= SMD_DS_RY | ((1<<drv) << 8) | ((1<<drv) << 12);
+	pkt->DS |= ((1<<drv) << 8) | ((1<<drv) << 12);
+	// Only report the drive ready / on-cylinder when a disk is actually present.
+	// Reporting RY for an empty unit makes ZEUS's disk-config probe treat the 3
+	// unpopulated SMD units as real (size 0) drives and spin on them.
+	if (drv_good)
+		pkt->DS |= SMD_DS_RY | SMD_DS_OC;
 }
 
 //**************************************************************************
@@ -781,6 +973,9 @@ void zbi_s8k_smdc_card_device::device_start()
 	save_item(NAME(m_iv));
 	save_item(NAME(m_ie));
 	save_item(NAME(m_wakeup));
+	save_item(NAME(m_format_overflow));
+	save_item(NAME(m_extra_sector));
+	save_item(NAME(m_extra_data));
 	save_item(NAME(m_init_left));
 	save_item(NAME(m_dta_seg));
 	save_item(NAME(m_dta_ofs));

@@ -88,7 +88,7 @@ inline u32 jaguar_cpu_device::READLONG(offs_t a)
 	// - pdrive $580e
 	if (!DWORD_ALIGNED(a))
 	{
-		if (a == std::clamp(a, (u32)0xf00000, (u32)0xf00fff) || a == std::clamp(a, (u32)0xf10000, (u32)0xf10fff))
+		if (a == std::clamp<offs_t>(a, 0xf00000, 0xf00fff) || a == std::clamp<offs_t>(a, 0xf10000, 0xf10fff))
 		{
 			//printf("%d: %08x R\n", m_isdsp, a);
 			u32 res = m_program.read_word(a) << 0;
@@ -98,7 +98,7 @@ inline u32 jaguar_cpu_device::READLONG(offs_t a)
 			return res;
 		}
 
-		//if (a == std::clamp(a, (u32)0xf03000, (u32)0xf03fff) || a == std::clamp(a, (u32)0xf1b000, (u32)0xf1cfff))
+		//if (a == std::clamp<offs_t>(a, 0xf03000, 0xf03fff) || a == std::clamp<offs_t>(a, 0xf1b000, 0xf1cfff))
 		//  a &= ~3;
 	}
 
@@ -121,7 +121,7 @@ inline void jaguar_cpu_device::WRITELONG(offs_t a, u32 v)
 	// TODO: verify what happens on other accesses (just rolls over?)
 	if (!DWORD_ALIGNED(a))
 	{
-		if(a == std::clamp(a, (u32)0xf00000, (u32)0xf00fff) || a == std::clamp(a, (u32)0xf10000, (u32)0xf10fff))
+		if(a == std::clamp<offs_t>(a, 0xf00000, 0xf00fff) || a == std::clamp<offs_t>(a, 0xf10000, 0xf10fff))
 		{
 			//printf("%d: %08x %08x W\n", m_isdsp, a, v);
 			m_program.write_word(a, v & 0xffff);
@@ -129,7 +129,7 @@ inline void jaguar_cpu_device::WRITELONG(offs_t a, u32 v)
 			return;
 		}
 
-		//if (a == std::clamp(a, (u32)0xf03000, (u32)0xf03fff) || a == std::clamp(a, (u32)0xf1b000, (u32)0xf1cfff))
+		//if (a == std::clamp<offs_t>(a, 0xf03000, 0xf03fff) || a == std::clamp<offs_t>(a, 0xf1b000, 0xf1cfff))
 		//  a &= ~3;
 	}
 
@@ -990,8 +990,12 @@ void jaguar_cpu_device::moveta_rn_rn(u16 op)
 
 void jaguar_cpu_device::mtoi_rn_rn(u16 op)
 {
+	// Convert the IEEE sign and 24-bit significand to a two's complement integer
 	const u32 r1 = m_r[(op >> 5) & 31];
-	m_r[op & 31] = (((s32)r1 >> 8) & 0xff800000) | (r1 & 0x007fffff);
+	const s32 mant = (r1 & 0x007fffff) | 0x00800000;
+	const u32 res = BIT(r1, 31) ? u32(-mant) : u32(mant);
+	m_r[op & 31] = res;
+	CLR_ZN(); SET_ZN(res);
 }
 
 void jaguar_cpu_device::mult_rn_rn(u16 op)
@@ -1021,14 +1025,15 @@ void jaguar_cpu_device::normi_rn_rn(u16 op)
 {
 	u32 r1 = m_r[(op >> 5) & 31];
 	u32 res = 0;
+	// right shift count that lands the most significant set bit on bit 23, the IEEE implicit one
 	if (r1 != 0)
 	{
-		while ((r1 & 0xffc00000) == 0)
+		while ((r1 & 0xff800000) == 0)
 		{
 			r1 <<= 1;
 			res--;
 		}
-		while ((r1 & 0xff800000) != 0)
+		while ((r1 & 0xff000000) != 0)
 		{
 			r1 >>= 1;
 			res++;
@@ -1079,7 +1084,7 @@ void jaguar_cpu_device::ror_rn_rn(u16 op)
 	const u8 dreg = op & 31;
 	const u32 r1 = m_r[(op >> 5) & 31] & 31;
 	const u32 r2 = m_r[dreg];
-	const u32 res = rotr_32(r2, r1);
+	const u32 res = std::rotr(r2, r1);
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZN(res); m_flags |= (r2 >> 30) & 2;
 }
@@ -1089,7 +1094,7 @@ void jaguar_cpu_device::rorq_n_rn(u16 op)
 	const u8 dreg = op & 31;
 	const u32 r1 = convert_zero[(op >> 5) & 31];
 	const u32 r2 = m_r[dreg];
-	const u32 res = rotr_32(r2, r1);
+	const u32 res = std::rotr(r2, r1);
 	m_r[dreg] = res;
 	CLR_ZNC(); SET_ZN(res); m_flags |= (r2 >> 30) & 2;
 }
@@ -1448,6 +1453,7 @@ void jaguar_cpu_device::pc_w(offs_t offset, u32 data, u32 mem_mask)
 	m_pc = m_io_pc & 0xffffff;
 	// JTRM warns against changing PC while GPU/DSP is running
 	// - speedst2 does it anyway on DSP side
+	// - other stuff (cfr. hash file), verify them if not red herring
 	if (m_go == true)
 	{
 		logerror("%s: inflight PC write %08x\n", this->tag(), m_pc);
@@ -1469,7 +1475,8 @@ void jaguar_cpu_device::endian_w(offs_t offset, u32 data, u32 mem_mask)
 	if (ACCESSING_BITS_0_7)
 	{
 		// sburnout sets bit 1 == 0
-		if ((m_io_end & 0x7) != 0x7)
+		logerror("%s: endian setup %08x\n", this->tag(), m_io_end);
+		if ((m_io_end & 0x5) != 0x5)
 			throw emu_fatalerror("%s: fatal endian setup %08x", this->tag(), m_io_end);
 	}
 }
@@ -1480,7 +1487,7 @@ void jaguardsp_cpu_device::dsp_endian_w(offs_t offset, u32 data, u32 mem_mask)
 	if (ACCESSING_BITS_0_7)
 	{
 		// wolfn3d writes a '0' to bit 1 (which is a NOP for DSP)
-		// bretth sets 0x7e06 after dyna cam logo
+		// bretth sets 0x7e06 after dyna cam logo (fluke out of crashing?)
 		if ((m_io_end & 0x5) != 0x5)
 			throw emu_fatalerror("%s: fatal endian setup %08x", this->tag(), m_io_end);
 	}

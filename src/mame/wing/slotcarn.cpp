@@ -556,7 +556,7 @@ void slotcarn_state::slotcarn(machine_config &config)
 	ppi2.in_pb_callback().set_ioport("IN4");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256);   /* temporary, CRTC will configure screen */
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

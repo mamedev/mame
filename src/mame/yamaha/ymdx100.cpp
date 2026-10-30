@@ -606,7 +606,7 @@ void yamaha_dx100_state::dx100(machine_config &config)
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set([this](int state) { m_midi_in = state; });
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));

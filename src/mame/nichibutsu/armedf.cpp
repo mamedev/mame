@@ -1076,7 +1076,7 @@ void armedf_state::machine_reset()
 
 void armedf_state::video_config(machine_config &config, int hchar_start, int vstart, int vend)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// assume all games on this HW running at ~59.1358Hz (trusted for Big Fighter)
 	// TODO: recheck if visible area isn't just 320x240 for everything (overscan may be masked by the text layer).
 	// TODO: bootlegs may not run at this speed
@@ -1988,9 +1988,9 @@ void armedf_state::init_kozure()
 {
 	u16 *ROM = (u16 *)memregion("maincpu")->base();
 
-	/* patch "time over" bug, see notes on top. */
+	// HACK: patch "time over" bug, see notes on top.
 	ROM[0x1016c/2] = 0x4e71;
-	/* ROM check at POST. */
+	// ROM check at POST.
 	ROM[0x04fc6/2] = 0x4e71;
 	m_scroll_type = 0;
 }

@@ -4,10 +4,6 @@
 
     Psion Siena
 
-    TODO:
-    - Siena (US) should report USA instead of English, the locale switch is
-      unknown.
-
 ******************************************************************************/
 
 #include "emu.h"
@@ -42,7 +38,8 @@ public:
 		, m_honda(*this, "honda")
 	{ }
 
-	void siena(machine_config &config);
+	void siena(machine_config &config) ATTR_COLD;
+	void siena_us(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(wakeup);
 
@@ -51,6 +48,10 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	void palette_init(palette_device &palette);
+
+	uint16_t kbd_r();
+
 	required_device<psion_asic9_device> m_asic9;
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_nvram;
@@ -60,10 +61,6 @@ private:
 	required_device<psion_condor_device> m_condor;
 	required_device<psion_honda_slot_device> m_honda;
 
-	void palette_init(palette_device &palette);
-
-	uint16_t kbd_r();
-
 	uint8_t m_key_col = 0;
 };
 
@@ -71,6 +68,8 @@ private:
 void siena_state::machine_start()
 {
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
+
+	save_item(NAME(m_key_col));
 }
 
 void siena_state::machine_reset()
@@ -282,10 +281,11 @@ void siena_state::siena(machine_config &config)
 	m_asic9->set_screen("screen");
 	m_asic9->set_ram_rom("ram", "rom");
 	m_asic9->port_ab_r().set(FUNC(siena_state::kbd_r));
+	m_asic9->port_cd_r().set([]() { return 0x00; });
 	m_asic9->buz_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_asic9->col_cb().set([this](uint8_t data) { m_key_col = data; });
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_size(240, 160);
 	screen.set_visarea_full();
 	screen.set_refresh_hz(66);
@@ -319,23 +319,32 @@ void siena_state::siena(machine_config &config)
 	//SOFTWARE_LIST(config, "flop_list").set_original("psion_flop").set_filter("SIENA");
 }
 
+void siena_state::siena_us(machine_config &config)
+{
+	siena(config);
+	// locale on port C:
+	// 00 - English
+	// 01 - Swedish
+	// 02 - USA
+	// 03 - Spanish
+	m_asic9->port_cd_r().set_constant(0x02); // USA
+}
+
 
 ROM_START(siena)
 	ROM_REGION16_LE(0x100000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "420f", "V4.20F/ENG")
 	ROMX_LOAD("vine_v4.20f_eng.bin", 0x00000, 0x100000, CRC(641f8e7c) SHA1(fe0e46540e0aac5aabb2dd1b96689da41e8f55fb), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "408f", "V4.08F/ENG")
+	ROMX_LOAD("vine_v4.08f_eng.bin", 0x00000, 0x100000, CRC(222a7fd4) SHA1(250f43d327fbd5eea0b6ac4a7d7f514072b738f4), ROM_BIOS(1))
 ROM_END
+
+#define rom_siena_us rom_siena
 
 ROM_START(siena_fr)
 	ROM_REGION16_LE(0x100000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "421f", "V4.21F/FRN")
 	ROMX_LOAD("vine_v4.21f_frn.bin", 0x00000, 0x100000, CRC(104691d6) SHA1(d1e12b305cd2de7dbf6b1a342adb7bf196d7abcb), ROM_BIOS(0))
-ROM_END
-
-ROM_START(siena_us)
-	ROM_REGION16_LE(0x100000, "rom", 0)
-	ROM_SYSTEM_BIOS(0, "408f", "V4.08F/ENG")
-	ROMX_LOAD("vine_v4.08f_eng.bin", 0x00000, 0x100000, CRC(222a7fd4) SHA1(250f43d327fbd5eea0b6ac4a7d7f514072b738f4), ROM_BIOS(0))
 ROM_END
 
 } // anonymous namespace
@@ -344,4 +353,4 @@ ROM_END
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT      CLASS          INIT         COMPANY   FULLNAME           FLAGS
 COMP( 1996, siena,    0,      0,      siena,    siena,     siena_state,   empty_init,  "Psion",  "Siena",           MACHINE_SUPPORTS_SAVE )
 COMP( 1996, siena_fr, siena,  0,      siena,    siena_fr,  siena_state,   empty_init,  "Psion",  "Siena (French)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1996, siena_us, siena,  0,      siena,    siena,     siena_state,   empty_init,  "Psion",  "Siena (US)",      MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1996, siena_us, siena,  0,      siena_us, siena,     siena_state,   empty_init,  "Psion",  "Siena (US)",      MACHINE_SUPPORTS_SAVE )

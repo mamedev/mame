@@ -214,9 +214,6 @@ extFloat80_t extFloat80_2xm1(extFloat80_t a)
 //
 extFloat80_t extFloat80_etox(extFloat80_t a)
 {
-	uint64_t zSig0, zSig1, zSig2;
-	struct exp32_sig64 normExpSig;
-
 	// handle unsupported extended double-precision floating encodings
 	if (extF80_isUnsupported(a)) {
 		softfloat_exceptionFlags |= softfloat_flag_invalid;
@@ -236,22 +233,20 @@ extFloat80_t extFloat80_etox(extFloat80_t a)
 			return rv;
 		}
 
-		return (aSign) ? floatx80_negone : a;
+		// exp(-inf) is zero, exp(+inf) is +inf
+		if (aSign) {
+			extFloat80_t rv;
+			rv.signExp = 0;
+			rv.signif = 0;
+			return rv;
+		}
+		return a;
 	}
 
 	if (! aExp) {
-		if (! aSig) return a;
-		softfloat_exceptionFlags |= softfloat_flag_inexact; // denormal also
-		normExpSig = softfloat_normSubnormalExtF80Sig(aSig);
-		aExp = normExpSig.exp + 1;
-		aSig = normExpSig.sig;
-
-		mul128By64To192(0x1000000000000000, 0, aSig, &zSig0, &zSig1, &zSig2);
-		if (0 < (int64_t) zSig0) {
-			shortShift128Left(zSig0, zSig1, 1, &zSig0, &zSig1);
-			--aExp;
-		}
-		return softfloat_roundPackToExtF80(aSign, aExp, zSig0, zSig1, 80);
+		// exp(+/-0) is one, and a denormal argument rounds to one
+		if (aSig) softfloat_exceptionFlags |= softfloat_flag_inexact;
+		return floatx80_posone;
 	}
 
 	softfloat_exceptionFlags |= softfloat_flag_inexact;
@@ -312,9 +307,6 @@ ret:
 //
 extFloat80_t extFloat80_2tox(extFloat80_t a)
 {
-	uint64_t zSig0, zSig1, zSig2;
-	struct exp32_sig64 normExpSig;
-
 	// handle unsupported extended double-precision floating encodings
 	if (extF80_isUnsupported(a)) {
 		softfloat_exceptionFlags |= softfloat_flag_invalid;
@@ -334,22 +326,20 @@ extFloat80_t extFloat80_2tox(extFloat80_t a)
 			return rv;
 		}
 
-		return (aSign) ? floatx80_negone : a;  // -inf or +inf
+		// 2^(-inf) is zero, 2^(+inf) is +inf
+		if (aSign) {
+			extFloat80_t rv;
+			rv.signExp = 0;
+			rv.signif = 0;
+			return rv;
+		}
+		return a;
 	}
 
-	if (! aExp) {  // subnormal
-		if (! aSig) return a;
-		softfloat_exceptionFlags |= softfloat_flag_inexact; // denormal also
-		normExpSig = softfloat_normSubnormalExtF80Sig(aSig);
-		aExp = normExpSig.exp + 1;
-		aSig = normExpSig.sig;
-
-		mul128By64To192(LN2_SIG_HI, LN2_SIG_LO, aSig, &zSig0, &zSig1, &zSig2);
-		if (0 < (int64_t) zSig0) {
-			shortShift128Left(zSig0, zSig1, 1, &zSig0, &zSig1);
-			--aExp;
-		}
-		return softfloat_roundPackToExtF80(aSign, aExp, zSig0, zSig1, 80);
+	if (! aExp) {
+		// 2^(+/-0) is one, and a denormal argument rounds to one
+		if (aSig) softfloat_exceptionFlags |= softfloat_flag_inexact;
+		return floatx80_posone;
 	}
 
 	softfloat_exceptionFlags |= softfloat_flag_inexact;
@@ -411,9 +401,6 @@ ret:
 //
 extFloat80_t extFloat80_10tox(extFloat80_t a)
 {
-	uint64_t zSig0, zSig1, zSig2;
-	struct exp32_sig64 normExpSig;
-
 	// handle unsupported extended double-precision floating encodings
 	if (extF80_isUnsupported(a)) {
 		softfloat_exceptionFlags |= softfloat_flag_invalid;
@@ -433,22 +420,20 @@ extFloat80_t extFloat80_10tox(extFloat80_t a)
 			return rv;
 		}
 
-		return (aSign) ? floatx80_negone : a;
+		// 10^(-inf) is zero, 10^(+inf) is +inf
+		if (aSign) {
+			extFloat80_t rv;
+			rv.signExp = 0;
+			rv.signif = 0;
+			return rv;
+		}
+		return a;
 	}
 
 	if (! aExp) {
-		if (! aSig) return a;
-		softfloat_exceptionFlags |= softfloat_flag_inexact; // denormal also
-		normExpSig = softfloat_normSubnormalExtF80Sig(aSig);
-		aExp = normExpSig.exp + 1;
-		aSig = normExpSig.sig;
-
-		mul128By64To192(LN10_SIG_HI, LN10_SIG_LO, aSig, &zSig0, &zSig1, &zSig2);
-		if (0 < (int64_t) zSig0) {
-			shortShift128Left(zSig0, zSig1, 1, &zSig0, &zSig1);
-			--aExp;
-		}
-		return softfloat_roundPackToExtF80(aSign, aExp, zSig0, zSig1, 80);
+		// 10^(+/-0) is one, and a denormal argument rounds to one
+		if (aSig) softfloat_exceptionFlags |= softfloat_flag_inexact;
+		return floatx80_posone;
 	}
 
 	softfloat_exceptionFlags |= softfloat_flag_inexact;

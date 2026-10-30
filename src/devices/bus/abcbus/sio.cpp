@@ -41,6 +41,8 @@ Notes:
 
 #define Z80CTC_TAG  "z80ctc"
 #define Z80SIO_TAG  "z80sio"
+#define RS232A_TAG  "rs232a"
+#define RS232B_TAG  "rs232b"
 
 
 
@@ -73,13 +75,59 @@ const tiny_rom_entry *abc_sio_device::device_rom_region() const
 
 
 //-------------------------------------------------
+//  INPUT_PORTS( abc_sio )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( abc_sio )
+	PORT_START("SW1")
+	PORT_CONFNAME( 0xff, 0x0a, "Card Address" )
+	PORT_CONFSETTING(    0x0a, "10 (SI0/SI1)" )
+	PORT_CONFSETTING(    0x0b, "11 (SI2/SI3)" )
+	PORT_CONFSETTING(    0x0c, "12 (SI4/SI5)" )
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor abc_sio_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( abc_sio );
+}
+
+
+//-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 void abc_sio_device::device_add_mconfig(machine_config &config)
 {
 	Z80CTC(config, m_ctc, XTAL(4'915'200));
-	Z80DART(config, m_sio);
+	m_ctc->set_clk<0>(XTAL(4'915'200)/16);
+	m_ctc->set_clk<1>(XTAL(4'915'200)/16);
+	m_ctc->set_clk<2>(XTAL(4'915'200)/16);
+	m_ctc->zc_callback<0>().set(m_sio, FUNC(z80sio_device::txca_w));
+	m_ctc->zc_callback<1>().set(m_sio, FUNC(z80sio_device::rxca_w));
+	m_ctc->zc_callback<2>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
+
+	Z80SIO(config, m_sio, XTAL(4'915'200));
+	m_sio->out_txda_callback().set(m_rs232a, FUNC(rs232_port_device::write_txd));
+	m_sio->out_dtra_callback().set(m_rs232a, FUNC(rs232_port_device::write_dtr));
+	m_sio->out_rtsa_callback().set(m_rs232a, FUNC(rs232_port_device::write_rts));
+	m_sio->out_txdb_callback().set(m_rs232b, FUNC(rs232_port_device::write_txd));
+	m_sio->out_dtrb_callback().set(m_rs232b, FUNC(rs232_port_device::write_dtr));
+	m_sio->out_rtsb_callback().set(m_rs232b, FUNC(rs232_port_device::write_rts));
+
+	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
+	m_rs232a->rxd_handler().set(m_sio, FUNC(z80sio_device::rxa_w));
+	m_rs232a->cts_handler().set(m_sio, FUNC(z80sio_device::ctsa_w));
+	m_rs232a->dcd_handler().set(m_sio, FUNC(z80sio_device::dcda_w));
+
+	RS232_PORT(config, m_rs232b, default_rs232_devices, nullptr);
+	m_rs232b->rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
+	m_rs232b->cts_handler().set(m_sio, FUNC(z80sio_device::ctsb_w));
+	m_rs232b->dcd_handler().set(m_sio, FUNC(z80sio_device::dcdb_w));
 }
 
 
@@ -92,12 +140,16 @@ void abc_sio_device::device_add_mconfig(machine_config &config)
 //  abc_sio_device - constructor
 //-------------------------------------------------
 
-abc_sio_device::abc_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ABC_SIO, tag, owner, clock),
-		device_abcbus_card_interface(mconfig, *this),
-		m_ctc(*this, Z80CTC_TAG),
-		m_sio(*this, Z80SIO_TAG),
-		m_rom(*this, "abc80")
+abc_sio_device::abc_sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ABC_SIO, tag, owner, clock),
+	device_abcbus_card_interface(mconfig, *this),
+	m_ctc(*this, Z80CTC_TAG),
+	m_sio(*this, Z80SIO_TAG),
+	m_rs232a(*this, RS232A_TAG),
+	m_rs232b(*this, RS232B_TAG),
+	m_rom(*this, "abc80"),
+	m_sw1(*this, "SW1"),
+	m_cs(false)
 {
 }
 
@@ -108,15 +160,7 @@ abc_sio_device::abc_sio_device(const machine_config &mconfig, const char *tag, d
 
 void abc_sio_device::device_start()
 {
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void abc_sio_device::device_reset()
-{
+	save_item(NAME(m_cs));
 }
 
 
@@ -131,6 +175,51 @@ void abc_sio_device::device_reset()
 
 void abc_sio_device::abcbus_cs(uint8_t data)
 {
+	m_cs = (data == m_sw1->read());
+}
+
+
+//-------------------------------------------------
+//  abcbus_inp -
+//-------------------------------------------------
+
+uint8_t abc_sio_device::abcbus_inp(offs_t offset)
+{
+	uint8_t data = 0xff;
+
+	if (m_cs)
+	{
+		if (BIT(offset, 7))
+		{
+			data = m_sio->cd_ba_r(bitswap<2>(offset, 6, 5));
+		}
+		else
+		{
+			data = m_ctc->read(bitswap<2>(offset, 6, 5));
+		}
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  abcbus_out -
+//-------------------------------------------------
+
+void abc_sio_device::abcbus_out(offs_t offset, uint8_t data)
+{
+	if (m_cs)
+	{
+		if (BIT(offset, 7))
+		{
+			m_sio->cd_ba_w(bitswap<2>(offset, 6, 5), data);
+		}
+		else
+		{
+			m_ctc->write(bitswap<2>(offset, 6, 5), data);
+		}
+	}
 }
 
 
@@ -142,7 +231,7 @@ uint8_t abc_sio_device::abcbus_xmemfl(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	if (offset >= 0x4000 && offset < 0x5000) // TODO where is this mapped?
+	if (offset >= 0x4000 && offset < 0x5000)
 	{
 		data = m_rom->base()[offset & 0xfff];
 	}

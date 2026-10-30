@@ -473,12 +473,12 @@ u32 cmi_state::screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bitmap, 
 	u8 y_scroll = m_q219_pia->a_output();
 	u8 invert = BIT(~m_q219_pia->b_output(), 3);
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); ++y)
 	{
 		u8 *src = &m_video_ram[(512/8) * ((y + y_scroll) & 0xff)];
-		u32 *dest = &bitmap.pix(y, cliprect.min_x);
+		u32 *dest = &bitmap.pix(y, cliprect.left());
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
+		for (int x = cliprect.left(); x <= cliprect.right(); x += 8)
 		{
 			u8 data = *src++;
 
@@ -2017,7 +2017,7 @@ void cmi_state::cmi2x(machine_config &config)
 	m_cmi07cpu->set_addrmap(AS_PROGRAM, &cmi_state::cmi07cpu_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(config, m_screen).set_color(rgb_t::green());
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBLANK_END, HBLANK_START, VTOTAL, VBLANK_END, VBLANK_START);
 	m_screen->set_screen_update(FUNC(cmi_state::screen_update_cmi2x));
 	m_screen->screen_vblank().set(FUNC(cmi_state::cmi_iix_vblank));

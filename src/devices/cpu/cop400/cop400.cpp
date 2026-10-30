@@ -955,9 +955,8 @@ const cop400_cpu_device::cop400_opcode_func cop400_cpu_device::COP424C_OPCODE_MA
 
 inline bool cop400_cpu_device::is_control_transfer(uint8_t opcode)
 {
-	// JP, JSRP, JID or LQID
-	// (TODO: verify that LQID inhibits interrupts since it transfers control temporarily)
-	if ((opcode & 0x80) == 0x80)
+	// JP, JSRP or JID (LQID is a memory reference instruction)
+	if ((opcode & 0x80) == 0x80 && opcode != 0xbf)
 		return true;
 
 	// JMP or JSR

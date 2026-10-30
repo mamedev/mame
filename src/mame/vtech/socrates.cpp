@@ -926,7 +926,7 @@ void iqunlimz_state::video_regs_w(offs_t offset, uint8_t data)
 	{
 		rectangle visarea = m_screen->visible_area();
 		visarea.set(0, (data & 0x02 ? 496 : 256) - 1, 0, 224 - 1);
-		m_screen->configure(data & 0x02 ? 496 : 256 , 224, visarea, m_screen->frame_period().attoseconds());
+		m_screen->configure(data & 0x02 ? 496 : 256 , 224, visarea, m_screen->frame_period());
 	}
 
 	m_video_regs[offset] = data;
@@ -1462,7 +1462,7 @@ void socrates_state::socrates(machine_config &config)
 	ADDRESS_MAP_BANK(config, "rambank2").set_map(&socrates_state::socrates_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(264, 228); // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
@@ -1521,7 +1521,7 @@ void iqunlimz_state::iqunlimz(machine_config &config)
 	ADDRESS_MAP_BANK(config, "rambank2").set_map(&iqunlimz_state::iqunlimz_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_screen_update(FUNC(iqunlimz_state::screen_update));
@@ -1591,7 +1591,7 @@ ROM_START(socrates)
 	ROM_LOAD("speech_eng_vsm1.bin", 0x0000, 0x4000, CRC(888e3ddd) SHA1(33af6a21ba6d826071c9d48557b1c9012752570b)) // 16k in serial rom
 	ROM_LOAD("speech_eng_vsm2.bin", 0x4000, 0x4000, CRC(de4ac89d) SHA1(3dfa853b02df756a9b72def94a39310992ee11c7)) // 16k in serial rom
 	ROM_LOAD("speech_eng_vsm3.bin", 0x8000, 0x4000, CRC(972384aa) SHA1(ffcb1d633ca6bffc7f481ec505da447e5b847f16)) // 16k in serial rom
-	ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
+	ROM_FILL(0xc000, 0x4000, 0xff) // last vsm isn't present, FF fill
 ROM_END
 
 ROM_START(socratfc)
@@ -1603,13 +1603,11 @@ ROM_START(socratfc)
 	ROM_LOAD("tmp42c40p1844.u6", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
 	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
-	ROM_LOAD("speech_fra_internal.bin", 0x0000, 0x2000, NO_DUMP)
+	ROM_LOAD("speech_fra_internal.bin", 0x0000, 0x2000, CRC(d08310a3) SHA1(43a3ac3f8206a3bd11d9ac8bac1e93031f935523) )
 
 	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // speech serial modules outside of the speech chip but still on speech cart
-	ROM_LOAD("speech_fra_vsm1.bin", 0x0000, 0x4000, NO_DUMP) // 16k in serial rom
-	ROM_LOAD("speech_fra_vsm2.bin", 0x4000, 0x4000, NO_DUMP) // 16k in serial rom
-	ROM_LOAD("speech_fra_vsm3.bin", 0x8000, 0x4000, NO_DUMP) // 16k in serial rom
-	ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
+	ROM_LOAD("speech_fra_vsm1.bin", 0x0000, 0x4000, CRC(b1146420) SHA1(a2738a017b8257fe0f82731883e90d87a7232560) ) // 16k in serial rom
+	ROM_FILL(0x4000, 0xc000, 0xff) // last 3 vsms aren't present, FF fill
 ROM_END
 
 ROM_START(profweis)

@@ -101,6 +101,10 @@ static constexpr int M68K_CACR_CEI = 0x04; // Clear Entry in Instruction Cache
 static constexpr int M68K_CACR_FI  = 0x02; // Freeze Instruction Cache
 static constexpr int M68K_CACR_EI  = 0x01; // Enable Instruction Cache
 
+static constexpr u32 M68K_CACR_040_DE   = 0x80000000; // Enable Data Cache
+static constexpr u32 M68K_CACR_040_IE   = 0x00008000; // Enable Instruction Cache
+static constexpr u32 M68K_CACR_040_MASK = M68K_CACR_040_DE | M68K_CACR_040_IE;
+
 /* ======================================================================== */
 /* ================================ MACROS ================================ */
 /* ======================================================================== */
@@ -233,6 +237,36 @@ inline u32 CPU_TYPE_IS_010_LESS() const    { return ((m_cpu_type) & (CPU_TYPE_00
 inline u32 CPU_TYPE_IS_000() const         { return ((m_cpu_type) == CPU_TYPE_000 || (m_cpu_type) == CPU_TYPE_008); }
 
 inline u32 CPU_TYPE_IS_070() const         { return ((m_cpu_type) == CPU_TYPE_SCC070); }
+
+inline u32 m68ki_shift_cycles(u32 shift) const
+{
+	// this calculation is only for '030+
+	if (!CPU_TYPE_IS_030_PLUS())
+		return 0;
+
+	if (m_cpu_type & (CPU_TYPE_EC030 | CPU_TYPE_030))
+	{
+		if (!BIT_5(m_ir))
+			return 0;
+
+		const u32 operand_bits = 8U << ((m_ir >> 6) & 3);
+		if (shift > operand_bits)
+		{
+			switch ((m_ir >> 3) & 3)
+			{
+			case 0: // ASx
+				return BIT_8(m_ir) ? 0 : 4;
+
+			case 1: // LSx
+				return 2;
+			}
+		}
+
+		return 0;
+	}
+
+	return shift * m_cyc_shift;
+}
 
 
 /* Initiates trace checking before each instruction (t1) */
@@ -1071,6 +1105,8 @@ inline void m68ki_set_s_flag(u32 value)
 	REG_SP() = REG_SP_BASE()[m_s_flag | ((m_s_flag>>1) & m_m_flag)];
 	if ((old_s_flag ^ m_s_flag) & SFLAG_SET)
 	{
+	  // The prefetched word was fetched with the old mode's function code
+		m_pref_addr = ~0;
 		debugger_privilege_hook();
 	}
 }
@@ -1090,6 +1126,8 @@ inline void m68ki_set_sm_flag(u32 value)
 	REG_SP() = REG_SP_BASE()[m_s_flag | ((m_s_flag>>1) & m_m_flag)];
 	if ((old_s_flag ^ m_s_flag) & SFLAG_SET)
 	{
+		/* The prefetched word was fetched with the old mode's function code */
+		m_pref_addr = ~0;
 		debugger_privilege_hook();
 	}
 }
@@ -1103,6 +1141,8 @@ inline void m68ki_set_sm_flag_nosp(u32 value)
 	m_m_flag = value & MFLAG_SET;
 	if ((old_s_flag ^ m_s_flag) & SFLAG_SET)
 	{
+		/* The prefetched word was fetched with the old mode's function code */
+		m_pref_addr = ~0;
 		debugger_privilege_hook();
 	}
 }
@@ -1187,6 +1227,14 @@ inline void m68ki_stack_frame_3word(u32 pc, u32 sr)
  */
 inline void m68ki_stack_frame_0000(u32 pc, u32 sr, u32 vector)
 {
+	if (CPU_TYPE_IS_COLDFIRE())
+	{
+		u32 const format = 4 | (REG_A()[7] & 3);
+		REG_A()[7] &= ~3U;
+		m68ki_push_32(pc);
+		m68ki_push_32((format << 28) | (vector << 18) | sr);
+		return;
+	}
 	/* Stack a 3-word frame if we are 68000 */
 	if(CPU_TYPE_IS_000())
 	{
@@ -1512,7 +1560,7 @@ inline void m68ki_exception_trap(u32 vector)
 {
 	u32 sr = m68ki_init_exception(vector);
 
-	if(CPU_TYPE_IS_010_LESS())
+	if(CPU_TYPE_IS_010_LESS() || CPU_TYPE_IS_COLDFIRE())
 		m68ki_stack_frame_0000(m_pc, sr, vector);
 	else
 		m68ki_stack_frame_0010(sr, vector);
@@ -1596,6 +1644,24 @@ inline void m68ki_exception_1111()
 
 	/* Use up some clock cycles and undo the instruction's cycles */
 	m_icount -= m_cyc_exception[EXCEPTION_1111] - m_cyc_instruction[m_ir];
+}
+
+// Helper for unimplemented coprocessor instructions
+inline void m68ki_cp_unimplemented(const char *name)
+{
+	const int cpid = (m_ir >> 9) & 7;
+
+	if ((cpid == 0 && m_has_pmmu) || (cpid == 1 && m_has_fpu))
+	{
+		logerror("%s at %08x: called unimplemented instruction %04x (%s)\n",
+				tag(), m_ppc, m_ir, name);
+	}
+	else
+	{
+		logerror("%s at %08x: coprocessor %d not present (%s %04x)\n",
+				tag(), m_ppc, cpid, name, m_ir);
+		m68ki_exception_1111();
+	}
 }
 
 /* Exception for illegal instructions */

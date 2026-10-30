@@ -92,7 +92,7 @@ enum exception_type : unsigned
 class ns32000_abort : public std::exception { };
 class ns32000_delay : public std::exception { };
 
-static const u32 size_mask[] = { 0x0000'00ffU, 0x0000'ffffU, 0x0000'0000U, 0xffff'ffffU };
+static constexpr u32 size_mask[] = { 0x0000'00ffU, 0x0000'ffffU, 0x0000'0000U, 0xffff'ffffU };
 
 template <int HighBits, int Width>ns32000_device<HighBits, Width>::ns32000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool cg16)
 	: cpu_device(mconfig, type, tag, owner, clock)
@@ -205,7 +205,7 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::device_
 
 	// general registers
 	for (unsigned i = 0; i < 8; i++)
-		state_add(index++, util::string_format("R%d", i).c_str(), m_r[i]);
+		state_add(index++, util::string_format("R%d", i), m_r[i]);
 
 	// floating point registers
 	if (m_fpu)
@@ -813,22 +813,6 @@ template <int HighBits, int Width> bool ns32000_device<HighBits, Width>::conditi
 	return false;
 }
 
-template <int HighBits, int Width> void ns32000_device<HighBits, Width>::flags(u32 const src1, u32 const src2, u32 const dest, unsigned const size, bool const subtraction)
-{
-	unsigned const sign_bit = (size + 1) * 8 - 1;
-
-	bool const src1_s = BIT(src1, sign_bit);
-	bool const src2_s = subtraction ? !BIT(src2, sign_bit) : BIT(src2, sign_bit);
-	bool const dest_s = subtraction ? !BIT(dest, sign_bit) : BIT(dest, sign_bit);
-
-	m_psr &= ~(PSR_F | PSR_C);
-	if ((src2_s && src1_s) || (!dest_s && (src2_s || src1_s)))
-		m_psr |= PSR_C;
-
-	if ((src2_s == src1_s) && (dest_s != src2_s))
-		m_psr |= PSR_F;
-}
-
 template <int HighBits, int Width> void ns32000_device<HighBits, Width>::interrupt(unsigned const trap)
 {
 	if (machine().debug_enabled() && (trap > ABT))
@@ -1169,8 +1153,13 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 
 						if (!(m_cfg & CFG_DE))
 						{
-							m_mod = mem_read<u16>(ns32000::ST_ODT, SP() + 4);
-							tex = top(SIZE_D, SP()) + top(SIZE_W, SP()) * 2 + top(SIZE_D, m_mod) + 35;
+							u16 const mod = mem_read<u16>(ns32000::ST_ODT, SP() + 4);
+							u32 const sb = mem_read<u32>(ns32000::ST_ODT, mod);
+
+							m_mod = mod;
+							m_sb = sb;
+
+							tex = top(SIZE_D, SP()) + top(SIZE_W, SP()) * 2 + top(SIZE_D, mod) + 35;
 						}
 						else
 							tex = top(SIZE_D, SP()) + top(SIZE_W, SP()) + 35;
@@ -1179,13 +1168,6 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 
 						m_pc = pc;
 						m_psr = psr;
-
-						// the static base is fetched from the module table AFTER the PSR is
-						// restored: a return to user mode reads the USER address space's module
-						// table (dual-space translation), not the supervisor's
-						if (!(m_cfg & CFG_DE))
-							m_sb = mem_read<u32>(ns32000::ST_ODT, m_mod);
-
 						SP() += constant;
 
 						m_sequential = false;
@@ -1217,7 +1199,12 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 
 						if (!(m_cfg & CFG_DE))
 						{
-							m_mod = mem_read<u16>(ns32000::ST_ODT, SP() + 4);
+							u16 const mod = mem_read<u16>(ns32000::ST_ODT, SP() + 4);
+							u32 const sb = mem_read<u32>(ns32000::ST_ODT, mod);
+
+							m_mod = mod;
+							m_sb = sb;
+
 							tex = top(SIZE_B) + top(SIZE_W, SP()) * 3 + top(SIZE_D) * 3 + 39;
 						}
 						else
@@ -1227,12 +1214,6 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 
 						m_pc = pc;
 						m_psr = psr;
-
-						// as with RETT: the static base is fetched from the module table AFTER the
-						// PSR is restored, so a return to user mode reads the USER address space's
-						// module table under dual-space translation
-						if (!(m_cfg & CFG_DE))
-							m_sb = mem_read<u32>(ns32000::ST_ODT, m_mod);
 
 						m_sequential = false;
 					}
@@ -1380,11 +1361,23 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 						mode[0].rmw_i(size);
 						decode(mode, bytes);
 
-						u32 const src1 = util::sext(quick, 4);
+						u32 const src1 = util::sext(quick, 4) & size_mask[size];
 						u32 const src2 = gen_read(mode[0]);
 
-						u32 const dst = src1 + src2;
-						flags(src1, src2, dst, size, false);
+						u32 const dst = (src1 + src2) & size_mask[size];
+
+						// carry
+						if (dst < src1)
+							m_psr |= PSR_C;
+						else
+							m_psr &= ~PSR_C;
+
+						// overflow
+						unsigned const sign_bit = (size + 1) * 8 - 1;
+						if (BIT(~(src1 ^ src2) & (src1 ^ dst), sign_bit))
+							m_psr |= PSR_F;
+						else
+							m_psr &= ~PSR_F;
 
 						gen_write(mode[0], dst);
 
@@ -1668,8 +1661,20 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 						u32 const src1 = gen_read(mode[0]);
 						u32 const src2 = gen_read(mode[1]);
 
-						u32 const dst = src1 + src2;
-						flags(src1, src2, dst, size, false);
+						u32 const dst = (src1 + src2) & size_mask[size];
+
+						// carry
+						if (dst < src1)
+							m_psr |= PSR_C;
+						else
+							m_psr &= ~PSR_C;
+
+						// overflow
+						unsigned const sign_bit = (size + 1) * 8 - 1;
+						if (BIT(~(src1 ^ src2) & (src1 ^ dst), sign_bit))
+							m_psr |= PSR_F;
+						else
+							m_psr &= ~PSR_F;
 
 						gen_write(mode[1], dst);
 
@@ -1750,8 +1755,21 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 						u32 const src1 = gen_read(mode[0]);
 						u32 const src2 = gen_read(mode[1]);
 
-						u32 const dst = src1 + src2 + (m_psr & PSR_C);
-						flags(src1, src2, dst, size, false);
+						u32 const sum1 = (src1 + src2) & size_mask[size];
+						u32 const dst = (sum1 + (m_psr & PSR_C)) & size_mask[size];
+
+						// carry
+						if (sum1 < src1 || dst < sum1)
+							m_psr |= PSR_C;
+						else
+							m_psr &= ~PSR_C;
+
+						// overflow
+						unsigned const sign_bit = (size + 1) * 8 - 1;
+						if (BIT(~(src1 ^ src2) & (src1 ^ dst), sign_bit))
+							m_psr |= PSR_F;
+						else
+							m_psr &= ~PSR_F;
 
 						gen_write(mode[1], dst);
 
@@ -1821,7 +1839,19 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 						u32 const src2 = gen_read(mode[1]);
 
 						u32 const dst = src2 - src1;
-						flags(src1, src2, dst, size, true);
+
+						// borrow
+						if (src2 < src1)
+							m_psr |= PSR_C;
+						else
+							m_psr &= ~PSR_C;
+
+						// overflow
+						unsigned const sign_bit = (size + 1) * 8 - 1;
+						if (BIT((src1 ^ src2) & (src2 ^ dst), sign_bit))
+							m_psr |= PSR_F;
+						else
+							m_psr &= ~PSR_F;
 
 						gen_write(mode[1], dst);
 
@@ -1885,7 +1915,19 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::execute
 						u32 const src2 = gen_read(mode[1]);
 
 						u32 const dst = src2 - src1 - (m_psr & PSR_C);
-						flags(src1, src2, dst, size, true);
+
+						// borrow
+						if (src2 < src1 || (src2 == src1 && (m_psr & PSR_C)))
+							m_psr |= PSR_C;
+						else
+							m_psr &= ~PSR_C;
+
+						// overflow
+						unsigned const sign_bit = (size + 1) * 8 - 1;
+						if (BIT((src1 ^ src2) & (src2 ^ dst), sign_bit))
+							m_psr |= PSR_F;
+						else
+							m_psr &= ~PSR_F;
 
 						gen_write(mode[1], dst);
 

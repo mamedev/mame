@@ -33,84 +33,75 @@ using namespace NDir;
 extern
 HINSTANCE g_hInstance;
 HINSTANCE g_hInstance;
+extern
+bool g_DisableUserQuestions;
+bool g_DisableUserQuestions;
 
 static CFSTR const kTempDirPrefix = FTEXT("7zS");
 
 #define MY_SHELL_EXECUTE
 
-static bool ReadDataString(CFSTR fileName, LPCSTR startID,
-    LPCSTR endID, AString &stringResult)
+static const char kStartID[] = { ',','!','@','I','n','s','t','a','l','l','@','!','U','T','F','-','8','!' };
+static const char kEndID[]   = { ',','!','@','I','n','s','t','a','l','l','E','n','d','@','!' };
+
+static bool ReadDataString(CFSTR fileName, AString &stringResult)
 {
-  stringResult.Empty();
+  // stringResult.Empty(); // (stringResult) is empty already
   NIO::CInFile inFile;
   if (!inFile.Open(fileName))
     return false;
-  const size_t kBufferSize = (1 << 12);
+  const size_t kBufferSize = 1 << 12;
 
   Byte buffer[kBufferSize];
-  const unsigned signatureStartSize = MyStringLen(startID);
-  const unsigned signatureEndSize = MyStringLen(endID);
+  const size_t startSize1 = sizeof(kStartID) - 1;
+  const size_t endSize1 = sizeof(kEndID) - 1;
   
   size_t numBytesPrev = 0;
-  bool writeMode = false;
-  UInt64 posTotal = 0;
+  bool scanMode = true;
+  UInt32 posTotal = 0;
   for (;;)
   {
-    if (posTotal > (1 << 20))
-      return (stringResult.IsEmpty());
     const size_t numReadBytes = kBufferSize - numBytesPrev;
     size_t processedSize;
     if (!inFile.ReadFull(buffer + numBytesPrev, numReadBytes, processedSize))
       return false;
     if (processedSize == 0)
-      return true;
-    const size_t numBytesInBuffer = numBytesPrev + processedSize;
-    UInt32 pos = 0;
+      break;
+    numBytesPrev += processedSize;
+    size_t pos = 0;
     for (;;)
     {
-      if (writeMode)
+      if (!scanMode)
       {
-        if (pos + signatureEndSize > numBytesInBuffer)
+        if (pos + endSize1 >= numBytesPrev)
           break;
-        if (memcmp(buffer + pos, endID, signatureEndSize) == 0)
-          return true;
-        const Byte b = buffer[pos];
+        const Byte b = buffer[pos++];
         if (b == 0)
           return false;
+        if (b == ';' && memcmp(buffer + pos, kEndID + 1, endSize1) == 0)
+          return true;
         stringResult += (char)b;
-        pos++;
       }
       else
       {
-        if (pos + signatureStartSize > numBytesInBuffer)
+        if (pos + startSize1 >= numBytesPrev)
           break;
-        if (memcmp(buffer + pos, startID, signatureStartSize) == 0)
+        const Byte b = buffer[pos++];
+        if (b == ';' && memcmp(buffer + pos, kStartID + 1, startSize1) == 0)
         {
-          writeMode = true;
-          pos += signatureStartSize;
+          scanMode = false;
+          pos += startSize1;
         }
-        else
-          pos++;
       }
     }
-    numBytesPrev = numBytesInBuffer - pos;
-    posTotal += pos;
+    posTotal += (UInt32)pos;
+    if (posTotal > (1 << 21))
+      break;
+    numBytesPrev -= pos;
     memmove(buffer, buffer + pos, numBytesPrev);
   }
+  return scanMode;
 }
-
-static char kStartID[] = { ',','!','@','I','n','s','t','a','l','l','@','!','U','T','F','-','8','!', 0 };
-static char kEndID[]   = { ',','!','@','I','n','s','t','a','l','l','E','n','d','@','!', 0 };
-
-static struct CInstallIDInit
-{
-  CInstallIDInit()
-  {
-    kStartID[0] = ';';
-    kEndID[0] = ';';
-  }
-} g_CInstallIDInit;
-
 
 #if defined(_WIN32) && defined(_UNICODE) && !defined(_WIN64) && !defined(UNDER_CE)
 #define NT_CHECK_FAIL_ACTION ShowErrorMessage(L"Unsupported Windows version"); return 1;
@@ -165,7 +156,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
   }
 
   AString config;
-  if (!ReadDataString(fullPath, kStartID, kEndID, config))
+  if (!ReadDataString(fullPath, config))
   {
     if (!assumeYes)
       ShowErrorMessage(L"Can't load config info");
@@ -226,7 +217,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
   }
 
   const FString tempDirPath = tempDir.GetPath();
-  // tempDirPath = L"M:\\1\\"; // to test low disk space
+  // tempDirPath = "M:\\1\\"; // to test low disk space
   {
     bool isCorrupt = false;
     UString errorMessage;
@@ -305,7 +296,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
   {
     if (appLaunched.IsEmpty())
     {
-      appLaunched = L"setup.exe";
+      appLaunched = "setup.exe";
       if (!NFind::DoesFileExist_FollowLink(us2fs(appLaunched)))
       {
         if (!assumeYes)

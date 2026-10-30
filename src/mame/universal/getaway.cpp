@@ -385,7 +385,7 @@ void getaway_state::getaway(machine_config &config)
 	m_maincpu->intlevel_cb().set_constant(2);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(1*8, 32*8-1, 0*8, 30*8-1);

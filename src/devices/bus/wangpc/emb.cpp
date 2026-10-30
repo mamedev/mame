@@ -19,7 +19,7 @@
 
 #define OPTION_ID       0x3f
 
-#define RAM_SIZE        0x40000
+#define RAM_SIZE        0x80000
 
 #define A19_A18_A17     ((offset >> 16) & 0x07)
 #define BASE(bank)      ((m_option >> (bank * 4)) & 0x07)
@@ -108,7 +108,7 @@ void wangpc_emb_device::wangpcbus_amwc_w(offs_t offset, uint16_t mem_mask, uint1
 	{
 		if (ENABLE(bank) && (A19_A18_A17 == BASE(bank)))
 		{
-			RAM_BANK(bank) = data;
+			RAM_BANK(bank) = (RAM_BANK(bank) & ~mem_mask) | (data & mem_mask);
 		}
 	}
 }

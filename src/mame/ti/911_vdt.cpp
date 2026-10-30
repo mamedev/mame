@@ -238,7 +238,7 @@ void vdt911_device::device_reset()
 	// European models have 50 Hz
 	int lines = (m_model == model::US) || (m_model == model::Japanese) ? 262 : 314;
 	attotime refresh = attotime::from_hz(11.004_MHz_XTAL / 700 / lines);
-	m_screen->configure(700, lines, m_screen->visible_area(), refresh.as_attoseconds());
+	m_screen->configure(700, lines, m_screen->visible_area(), refresh);
 	m_line_timer->adjust(attotime::from_msec(0), 0, refresh);
 }
 
@@ -786,7 +786,7 @@ INPUT_PORTS_END
 
 void vdt911_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(11.004_MHz_XTAL, 700, 0, 560, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(vdt911_device::screen_update));
 	m_screen->set_palette("palette");

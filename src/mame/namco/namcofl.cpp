@@ -709,7 +709,7 @@ void namcofl_state::namcofl(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(48.384_MHz_XTAL / 8, 384, 0, 288, 264, 0, 224); // same as namconb1.cpp?
 	m_screen->set_screen_update(FUNC(namcofl_state::screen_update));
 	m_screen->screen_vblank().set(m_c355spr, FUNC(namco_c355spr_device::vblank));

@@ -2,7 +2,7 @@
 // experimental/channel.cpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,8 +21,8 @@
 #include "asio/bind_executor.hpp"
 #include "asio/bind_immediate_executor.hpp"
 #include "asio/error.hpp"
+#include "asio/inline_executor.hpp"
 #include "asio/io_context.hpp"
-#include "asio/system_executor.hpp"
 #include "../unit_test.hpp"
 
 using namespace asio;
@@ -305,7 +305,7 @@ void unbuffered_immediate_receive()
   asio::error_code ec2 = asio::error::would_block;
   std::string s2;
   ch1.async_receive(
-      bind_immediate_executor(system_executor(),
+      bind_immediate_executor(inline_executor(),
         [&](asio::error_code ec, std::string s)
         {
           ec2 = ec;
@@ -416,7 +416,7 @@ void unbuffered_immediate_send()
   asio::error_code ec2 = asio::error::would_block;
   std::string s2 = "0123456789";
   ch1.async_send(asio::error::eof, std::move(s2),
-      bind_immediate_executor(system_executor(),
+      bind_immediate_executor(inline_executor(),
         [&](asio::error_code ec)
         {
           ec2 = ec;
@@ -533,7 +533,7 @@ void buffered_immediate_receive()
   asio::error_code ec2 = asio::error::would_block;
   std::string s2;
   ch1.async_receive(
-      bind_immediate_executor(system_executor(),
+      bind_immediate_executor(inline_executor(),
         [&](asio::error_code ec, std::string s)
         {
           ec2 = ec;
@@ -621,7 +621,7 @@ void buffered_immediate_send()
   asio::error_code ec1 = asio::error::would_block;
   std::string s1 = "0123456789";
   ch1.async_send(asio::error::eof, std::move(s1),
-      bind_immediate_executor(system_executor(),
+      bind_immediate_executor(inline_executor(),
         [&](asio::error_code ec)
         {
           ec1 = ec;
@@ -668,7 +668,7 @@ void try_send_via_dispatch()
   asio::error_code ec1 = asio::error::would_block;
   std::string s1;
   ch1.async_receive(
-      bind_executor(asio::system_executor(),
+      bind_executor(asio::inline_executor(),
         [&](asio::error_code ec, std::string s)
         {
           ec1 = ec;
@@ -698,7 +698,7 @@ void try_send_n_via_dispatch()
   asio::error_code ec1 = asio::error::would_block;
   std::string s1;
   ch1.async_receive(
-      bind_executor(asio::system_executor(),
+      bind_executor(asio::inline_executor(),
         [&](asio::error_code ec, std::string s)
         {
           ec1 = ec;
@@ -710,7 +710,7 @@ void try_send_n_via_dispatch()
   asio::error_code ec2 = asio::error::would_block;
   std::string s2;
   ch1.async_receive(
-      bind_executor(asio::system_executor(),
+      bind_executor(asio::inline_executor(),
         [&](asio::error_code ec, std::string s)
         {
           ec2 = ec;
@@ -863,6 +863,19 @@ void channel_with_any_completion_handler_test()
   ASIO_CHECK(!ec2);
 }
 
+void channel_move_test()
+{
+  io_context ctx;
+
+  channel<void(asio::error_code)> ch1(ctx);
+  channel<void(asio::error_code)> ch2 = std::move(ch1);
+  (void)ch2;
+
+  channel<void(asio::error_code, std::string)> ch3(ctx);
+  channel<void(asio::error_code, std::string)> ch4 = std::move(ch3);
+  (void)ch4;
+}
+
 ASIO_TEST_SUITE
 (
   "experimental/channel",
@@ -885,4 +898,5 @@ ASIO_TEST_SUITE
   ASIO_TEST_CASE(try_send_n_via_dispatch)
   ASIO_TEST_CASE(implicit_error_signature_channel_test)
   ASIO_TEST_CASE(channel_with_any_completion_handler_test)
+  ASIO_COMPILE_TEST_CASE(channel_move_test)
 )

@@ -835,7 +835,7 @@ void positron_state::positron(machine_config &config)
 
 	RAM(config, m_ram).set_default_size("192K").set_extra_options("64K,128K,256K");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(17.73447_MHz_XTAL*2, 1135, 0, 960, 625, 0, 480); // clk doubled for interlace
 	screen.set_screen_update("saa5050", FUNC(saa5050_device::screen_update));
 

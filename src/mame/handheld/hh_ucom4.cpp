@@ -98,7 +98,7 @@ ROM source notes when dumped from another title, but confident it's the same:
 #include "video/hlcd0515.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -340,10 +340,9 @@ void ufombs_state::ufombs(machine_config &config)
 	m_maincpu->write_i().set(FUNC(ufombs_state::plate_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(243, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 11);
 	config.set_default_layout(layout_ufombs);
@@ -496,10 +495,9 @@ void ssfball_state::ssfball(machine_config &config)
 	m_maincpu->write_i().set(FUNC(ssfball_state::plate_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 482);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 19);
 
@@ -646,10 +644,9 @@ void bmsoccer_state::bmsoccer(machine_config &config)
 	m_maincpu->write_i().set(FUNC(bmsoccer_state::plate_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(271, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 19);
 
@@ -766,10 +763,9 @@ void bmsafari_state::bmsafari(machine_config &config)
 	m_maincpu->write_i().set(FUNC(bmsafari_state::plate_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(248, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 11);
 	config.set_default_layout(layout_bmsafari);
@@ -929,10 +925,9 @@ void splasfgt_state::splasfgt(machine_config &config)
 	m_maincpu->write_i().set(FUNC(splasfgt_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 476);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 17);
 	config.set_default_layout(layout_splasfgt);
@@ -1072,10 +1067,9 @@ void bgunf_state::bgunf(machine_config &config)
 	m_maincpu->write_i().set(FUNC(bgunf_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 528);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 
@@ -1191,10 +1185,9 @@ void bgalaxn_state::bgalaxn(machine_config &config)
 	m_maincpu->write_i().set(FUNC(bgalaxn_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(301, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 
@@ -1311,10 +1304,9 @@ void bcclimbr_state::bcclimbr(machine_config &config)
 	m_maincpu->write_i().set(FUNC(bcclimbr_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(310, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(6, 20);
 
@@ -1698,10 +1690,9 @@ void einspace_state::einspace(machine_config &config)
 	m_maincpu->write_i().set(FUNC(einspace_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(289, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(10, 16);
 
@@ -1934,10 +1925,9 @@ void galaxy2_state::galaxy2(machine_config &config)
 	m_maincpu->write_i().set(FUNC(galaxy2_state::plate_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(304, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(10, 15);
 
@@ -1952,9 +1942,8 @@ void galaxy2_state::galaxy2b(machine_config &config)
 	galaxy2(config);
 
 	// video hardware
-	screen_device *screen = subdevice<screen_device>("screen");
+	screen_svg_device *screen = subdevice<screen_svg_device>("screen");
 	screen->set_size(306, 1080);
-	screen->set_visarea_full();
 }
 
 // roms
@@ -2075,10 +2064,9 @@ void astrocmd_state::astrocmd(machine_config &config)
 	m_maincpu->write_i().set(FUNC(astrocmd_state::plate_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 525);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 19);
 
@@ -2191,10 +2179,9 @@ void edracula_state::edracula(machine_config &config)
 	m_maincpu->write_i().set(FUNC(edracula_state::plate_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 526);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(8, 18);
 
@@ -2287,10 +2274,9 @@ void mcompgin_state::mcompgin(machine_config &config)
 	m_maincpu->write_e().set(FUNC(mcompgin_state::lcd_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 743);
-	screen.set_visarea_full();
 
 	HLCD0530(config, m_lcd, 500); // C=0.01uF
 	m_lcd->write_cols().set(FUNC(mcompgin_state::lcd_output_w));
@@ -2642,10 +2628,9 @@ void tccombat_state::tccombat(machine_config &config)
 	m_maincpu->write_i().set(FUNC(tccombat_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(300, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 	config.set_default_layout(layout_tccombat);
@@ -2806,10 +2791,9 @@ void tmtennis_state::tmtennis(machine_config &config)
 	m_maincpu->write_i().set(FUNC(tmtennis_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 417);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(12, 12);
 	config.set_default_layout(layout_tmtennis);
@@ -2928,10 +2912,9 @@ void tmpacman_state::tmpacman(machine_config &config)
 	m_maincpu->write_i().set(FUNC(tmpacman_state::plate_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 508);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(8, 19);
 
@@ -3044,10 +3027,9 @@ void tmscramb_state::tmscramb(machine_config &config)
 	m_maincpu->write_i().set(FUNC(tmscramb_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 556);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(10, 16);
 
@@ -3155,10 +3137,9 @@ void tcaveman_state::tcaveman(machine_config &config)
 	m_maincpu->write_i().set(FUNC(tcaveman_state::plate_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 559);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(8, 19);
 
@@ -3303,10 +3284,9 @@ void alnchase_state::alnchase(machine_config &config)
 	m_maincpu->write_i().set(FUNC(alnchase_state::output_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(362, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 17);
 	config.set_default_layout(layout_alnchase);

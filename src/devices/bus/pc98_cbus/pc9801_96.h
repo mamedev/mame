@@ -15,8 +15,8 @@
 
 
 class pc9801_96_device : public device_t,
-                         public device_pc98_cbus_slot_interface,
-                         public device_memory_interface
+						 public device_pc98_cbus_slot_interface,
+						 public device_memory_interface
 {
 public:
 	pc9801_96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

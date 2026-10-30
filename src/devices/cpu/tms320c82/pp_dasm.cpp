@@ -722,7 +722,7 @@ offs_t tms320c82_pp_disassembler::disassemble(std::ostream &stream, offs_t pc, c
 							case 7:
 								a_text = util::string_format("%s", get_reg_name(s1reg, true));
 								//b_text = util::string_format("1\\\\0x%02X", src2imm);
-								b_text = util::string_format("0x%08X", rotl_32(1, src2imm));
+								b_text = util::string_format("0x%08X", u32(1) << src2imm);
 								c_text = util::string_format("0x%02X", src2imm);
 								break;
 						}
@@ -853,7 +853,7 @@ offs_t tms320c82_pp_disassembler::disassemble(std::ostream &stream, offs_t pc, c
 							case 7:
 								a_text = util::string_format("%s", get_reg_name(s1reg, true));
 								//b_text = util::string_format("1\\\\0x%08X", imm32);
-								b_text = util::string_format("%08X", rotl_32(1, imm32));
+								b_text = util::string_format("0x%08X", u32(1) << (imm32 & 0x1f));
 								c_text = util::string_format("0x%08X", imm32);
 								break;
 						}

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -249,13 +249,13 @@ VIDEO.BAT has various superimpose effects, requires dedicated board
 <!-- !Games -->
 
 	<software name="famista" supported="no">
-		<description>Family Stadium</description>
+		<description>Pro Yakyuu Family Stadium</description>
 		<!-- newspaper/stadium has ads for pc8801_flop:veigues -->
 		<year>1988?</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
 [SGP] playfield artifacts (press button 2 from pitcher side in 2p play)
-Lists dual port 1/2 as a unsupported [DE-9] input method, cursor abruptly cycles when 1 player or 2 players is selected
+Cursor abruptly cycles when 1 player or 2 players is selected (btanb, same as fmtowns:famist90)
 Win/Lose newspaper screen has [IDP] one frame of sprite lag
 [IDP] text draws below sprites (verify)
 How to exit from attract mode (2 innings?) once game enters it?
@@ -264,6 +264,8 @@ Throws an "OUT" shout when selecting 3rd option "new pennant race", bad dump?
 ]]></notes>
 		<info name="alt_title" value="ファミリースタジアム" />
 		<info name="usage" value="Menuing works with keyboard only until game prompts you to use a joystick"/>
+		<sharedfeat name="mouseport_default" value="dual_joyport"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1281968">
@@ -290,7 +292,7 @@ Throws an "OUT" shout when selecting 3rd option "new pennant race", bad dump?
 
 	<!-- Mislabeled disk -->
 	<software name="famist89" cloneof="famista" supported="no">
-		<description>Family Stadium (alt)</description>
+		<description>Pro Yakyuu Family Stadium (alt)</description>
 		<year>1988?</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
@@ -301,6 +303,7 @@ Untested user disk creation
 		<info name="usage" value="Menuing works with keyboard only until game prompts you to use a joystick"/>
 		<!--combined image-->
 		<!--rom name="family stadium pennant race ban (va).d88" size="2563936" crc="91d95d8e" sha1="3d31ab00a0be2f792d2bcb031afd065d138c747a"/-->
+		<sharedfeat name="mouseport_default" value="dual_joyport"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
@@ -318,15 +321,16 @@ Untested user disk creation
 	</software>
 
 	<software name="famist89a" supported="no">
-		<description>Family Stadium '89 - Pennant Race Hen</description>
+		<description>Pro Yakyuu Family Stadium - '89 Pennant Race-ban</description>
 		<!-- newspaper has ads for pc8801_flop:harakiri -->
-		<year>1989?</year>
+		<year>1989</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
 (same as famista, except it allows for a new season)
 Untested user disk creation
 ]]></notes>
 		<info name="alt_title" value="ファミリースタジアム'89ペナントレース編" />
+		<sharedfeat name="mouseport_default" value="dual_joyport"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
@@ -1343,6 +1347,9 @@ Crashes after stage 1 (fixed, cfr. usage)
 		<description>Pac-Man</description>
 		<year>2006?</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+[Clock HACK] Cannot be played, player dies when starting a life (regression)
+]]></notes>
 		<info name="developer" value="Shinra" />
 		<info name="usage" value="Boot a PC-Engine OS disk, then swap with this disk and type BASIC PACMAN.BAS to load" />
 		<part name="flop1" interface="floppy_5_25">
@@ -1357,6 +1364,9 @@ Crashes after stage 1 (fixed, cfr. usage)
 		<description>Pac-Man (auto-bootable)</description>
 		<year>2011?</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+(Same as pacman)
+]]></notes>
 		<info name="developer" value="Shinra" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">

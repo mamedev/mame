@@ -52,7 +52,15 @@ HRESULT SetLzma2Prop(PROPID propID, const PROPVARIANT &prop, CLzma2EncProps &lzm
     case NCoderPropID::kNumThreads:
       if (prop.vt != VT_UI4)
         return E_INVALIDARG;
-      lzma2Props.numTotalThreads = (int)(prop.ulVal);
+      lzma2Props.numTotalThreads = (int)prop.ulVal;
+      break;
+    case NCoderPropID::kNumThreadGroups:
+      if (prop.vt != VT_UI4)
+        return E_INVALIDARG;
+      // 16-bit value supported by Windows
+      if (prop.ulVal >= (1u << 16))
+        return E_INVALIDARG;
+      lzma2Props.numThreadGroups = (unsigned)prop.ulVal;
       break;
     default:
       RINOK(NLzma::SetLzmaProp(propID, prop, lzma2Props.lzmaProps))

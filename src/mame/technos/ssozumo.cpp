@@ -425,7 +425,7 @@ void ssozumo_state::ssozumo(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(ssozumo_state::scanline), "screen", 8, 16);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 8, 248); // DECO video CRTC, unverified
 	screen.set_screen_update(FUNC(ssozumo_state::screen_update));
 	screen.set_palette(m_palette);

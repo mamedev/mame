@@ -119,7 +119,7 @@ DEVICE_INPUT_DEFAULTS_END
 void cms_4080term_device::device_add_mconfig(machine_config &config)
 {
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12_MHz_XTAL, 768, 0, 492, 312, 0, 270);
 	screen.set_screen_update("ef9345", FUNC(ef9345_device::screen_update));
 

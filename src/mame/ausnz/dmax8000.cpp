@@ -59,6 +59,7 @@ private:
 	void port14_w(u8 data);
 	void port40_w(u8 data);
 	void fdc_drq_w(int state);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_int);
 
 	void io_map(address_map &map) ATTR_COLD;
 	void mem_map(address_map &map) ATTR_COLD;
@@ -71,6 +72,10 @@ private:
 	required_device<floppy_connector> m_floppy0;
 };
 
+IRQ_CALLBACK_MEMBER(dmax8000_state::cpu_acknowledge_int)
+{
+	return 0xee;
+}
 
 void dmax8000_state::fdc_drq_w(int state)
 {
@@ -137,7 +142,6 @@ INPUT_PORTS_END
 void dmax8000_state::machine_reset()
 {
 	m_bank1->set_entry(1);
-	m_maincpu->set_input_line_vector(0, 0xee); // Z80 - fdc vector
 }
 
 void dmax8000_state::machine_start()
@@ -158,6 +162,7 @@ void dmax8000_state::dmax8000(machine_config &config)
 	Z80(config, m_maincpu, 4'000'000); // no idea what crystal is used, but 4MHz clock is confirmed
 	m_maincpu->set_addrmap(AS_PROGRAM, &dmax8000_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &dmax8000_state::io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(dmax8000_state::cpu_acknowledge_int));
 
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 4_MHz_XTAL));
 	ctc.set_clk<0>(4_MHz_XTAL / 2); // 2MHz

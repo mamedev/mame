@@ -262,8 +262,8 @@ ROM_START( cgunman )
 	ROM_REGION( 0x20000, "dotcpu", 0 )
 	ROM_LOAD( "cgm1_dot0.bin", 0x00000, 0x20000, NO_DUMP ) // not 100% sure it exists
 
-	ROM_REGION( 0x400000, "oki", 0 )
-	ROM_LOAD( "cgm1_vo1.ic18", 0x000000, 0x400000, NO_DUMP ) // size not verified
+	ROM_REGION( 0x800000, "oki", 0 )
+	ROM_LOAD( "cgm1_vo1.ic18", 0x000000, 0x800000, CRC(7ccae65c) SHA1(240a6c527c919fb9cc60901c2ebc5f3aab0df8d5) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "93c46n.ic6", 0x00, 0x80, NO_DUMP )

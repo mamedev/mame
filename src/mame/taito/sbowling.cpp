@@ -69,6 +69,8 @@ public:
 	void sbowling(machine_config &config);
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -76,6 +78,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
+	uint8_t m_irq_vector = 0;
 	int m_bgmap = 0;
 	int m_system = 0;
 	tilemap_t *m_tilemap = nullptr;
@@ -94,6 +97,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
 	void sbowling_palette(palette_device &palette) const;
 
@@ -103,6 +107,16 @@ private:
 	void main_map(address_map &map) ATTR_COLD;
 	void port_map(address_map &map) ATTR_COLD;
 };
+
+void sbowling_state::machine_start()
+{
+	save_item(NAME(m_irq_vector));
+}
+
+void sbowling_state::machine_reset()
+{
+	m_irq_vector = 0;
+}
 
 TILE_GET_INFO_MEMBER(sbowling_state::get_tile_info)
 {
@@ -202,14 +216,21 @@ uint8_t sbowling_state::pix_data_r()
 
 TIMER_DEVICE_CALLBACK_MEMBER(sbowling_state::interrupt)
 {
-	int scanline = param;
+	if (param == 256)
+	{
+		m_irq_vector = 0xcf; // RST 08h
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+	else if (param == 128)
+	{
+		m_irq_vector = 0xd7; // RST 10h
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+}
 
-	if (scanline == 256)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* Z80 - RST 08h */
-
-	if (scanline == 128)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* Z80 - RST 10h */
-
+IRQ_CALLBACK_MEMBER(sbowling_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 void sbowling_state::system_w(offs_t offset, uint8_t data)
@@ -420,13 +441,14 @@ void sbowling_state::sbowling(machine_config &config)
 	I8080(config, m_maincpu, XTAL(19'968'000)/10);   /* ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &sbowling_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &sbowling_state::port_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(sbowling_state::cpu_acknowledge_irq));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(sbowling_state::interrupt), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(32*8, 262);     /* vert size taken from mw8080bw */
 	screen.set_visarea(1*8, 31*8-1, 4*8, 32*8-1);
@@ -465,4 +487,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1982, sbowling, 0, sbowling, sbowling, sbowling_state, empty_init, ROT90, "Taito Corporation", "Strike Bowling", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sbowling, 0, sbowling, sbowling, sbowling_state, empty_init, ROT90, "Taito", "Strike Bowling", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

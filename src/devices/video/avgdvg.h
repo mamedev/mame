@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "video/vector.h"
+#include "vector.h"
 
 
 class avgdvg_device_base : public device_t

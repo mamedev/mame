@@ -3714,13 +3714,13 @@ void dpb7000_state::dpb7000(machine_config &config)
 	m_brg->ft_handler().append(m_acia[2], FUNC(acia6850_device::write_txc));
 	m_brg->ft_handler().append(m_acia[2], FUNC(acia6850_device::write_rxc));
 
-	screen_device &combined_screen(SCREEN(config, "combined_screen", SCREEN_TYPE_RASTER));
+	screen_device &combined_screen(SCREEN(config, "combined_screen"));
 	combined_screen.set_refresh_hz(50);
 	combined_screen.set_size(800, 625);
 	combined_screen.set_visarea(0, 709, 0, 574);
 	combined_screen.set_screen_update(FUNC(dpb7000_state::combined_screen_update));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_size(696, 276);
 	screen.set_visarea(56, 695, 36, 275);
@@ -3728,25 +3728,25 @@ void dpb7000_state::dpb7000(machine_config &config)
 
 	if (0)
 	{
-		screen_device &store_screen1(SCREEN(config, "store_screen1", SCREEN_TYPE_RASTER));
+		screen_device &store_screen1(SCREEN(config, "store_screen1"));
 		store_screen1.set_refresh_hz(50);
 		store_screen1.set_size(800, 768);
 		store_screen1.set_visarea(0, 799, 0, 767);
 		store_screen1.set_screen_update(FUNC(dpb7000_state::store_debug_screen_update<0>));
 
-		screen_device &store_screen2(SCREEN(config, "store_screen2", SCREEN_TYPE_RASTER));
+		screen_device &store_screen2(SCREEN(config, "store_screen2"));
 		store_screen2.set_refresh_hz(50);
 		store_screen2.set_size(800, 768);
 		store_screen2.set_visarea(0, 799, 0, 767);
 		store_screen2.set_screen_update(FUNC(dpb7000_state::store_debug_screen_update<1>));
 
-		screen_device &ext_screen(SCREEN(config, "ext_screen", SCREEN_TYPE_RASTER));
+		screen_device &ext_screen(SCREEN(config, "ext_screen"));
 		ext_screen.set_refresh_hz(50);
 		ext_screen.set_size(800, 768);
 		ext_screen.set_visarea(0, 799, 0, 767);
 		ext_screen.set_screen_update(FUNC(dpb7000_state::stencil_debug_screen_update));
 
-		screen_device &brush_screen(SCREEN(config, "brush_screen", SCREEN_TYPE_RASTER));
+		screen_device &brush_screen(SCREEN(config, "brush_screen"));
 		brush_screen.set_refresh_hz(50);
 		brush_screen.set_size(512, 512);
 		brush_screen.set_visarea(0, 511, 0, 511);

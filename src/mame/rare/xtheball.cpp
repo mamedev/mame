@@ -327,7 +327,7 @@ void xtheball_state::xtheball(machine_config &config)
 	/* video hardware */
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(10000000, 640, 114, 626, 257, 24, 248);
 	screen.set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_rgb32));
 

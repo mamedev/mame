@@ -694,7 +694,7 @@ static INPUT_PORTS_START( nzerotea )
 	PORT_DIPSETTING(      0x3000, "2000000" )
 	PORT_DIPSETTING(      0x1000, "3000000" )
 	PORT_DIPSETTING(      0x0000, "No Extend" )
-	PORT_DIPNAME( 0x4000, 0x4000, "Demo Sound" ) PORT_DIPLOCATION("SW2:!7")
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:!7")  // "Demo Sound"
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW2:!8" )
@@ -785,7 +785,7 @@ void r2dx_v33_state::rdx_v33(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_refresh_hz(55.47);    /* verified on pcb */
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(500)); /* not accurate */
@@ -811,7 +811,7 @@ void nzeroteam_state::nzerotea(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(nzeroteam_state::irq0_line_hold));
 	m_maincpu->set_irq_acknowledge_callback(FUNC(nzeroteam_state::vector_r));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_refresh_hz(55.47);    /* verified on pcb */
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(500)); /* not accurate */

@@ -164,7 +164,7 @@ private:
 	floppy_image_device* get_floppy();
 	void live_start();
 	void pll_reset(const attotime &when);
-	void pll_start_writing(const attotime &tm);
+	void pll_start_writing(const attotime &tm, floppy_image_device *floppy);
 	void pll_commit(floppy_image_device *floppy, const attotime &tm);
 	void pll_stop_writing(floppy_image_device *floppy, const attotime &tm);
 	int pll_get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit);

@@ -2,7 +2,7 @@
 // bind_cancellation_slot.cpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,22 +22,10 @@
 #include "asio/steady_timer.hpp"
 #include "unit_test.hpp"
 
-#if defined(ASIO_HAS_BOOST_DATE_TIME)
-# include "asio/deadline_timer.hpp"
-#else // defined(ASIO_HAS_BOOST_DATE_TIME)
-# include "asio/steady_timer.hpp"
-#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
-
 using namespace asio;
 namespace bindns = std;
-
-#if defined(ASIO_HAS_BOOST_DATE_TIME)
-typedef deadline_timer timer;
-namespace chronons = boost::posix_time;
-#else // defined(ASIO_HAS_BOOST_DATE_TIME)
 typedef steady_timer timer;
 namespace chronons = asio::chrono;
-#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
 
 void increment_on_cancel(int* count, const asio::error_code& error)
 {
@@ -193,10 +181,49 @@ void bind_cancellation_slot_to_completion_token_v2_test()
   ASIO_CHECK(count == 1);
 }
 
+void partial_bind_cancellation_slot()
+{
+  io_context ioc;
+  cancellation_signal sig;
+
+  int count = 0;
+
+  timer t(ioc, chronons::seconds(5));
+  t.async_wait(bind_cancellation_slot(sig.slot()))(
+      bindns::bind(&increment_on_cancel,
+        &count, bindns::placeholders::_1));
+
+  ioc.poll();
+
+  ASIO_CHECK(count == 0);
+
+  sig.emit(asio::cancellation_type::all);
+
+  ioc.run();
+
+  ASIO_CHECK(count == 1);
+
+  t.async_wait()(
+      bind_cancellation_slot(sig.slot()))(
+        incrementer_token_v2(&count));
+
+  ioc.restart();
+  ioc.poll();
+
+  ASIO_CHECK(count == 1);
+
+  sig.emit(asio::cancellation_type::all);
+
+  ioc.run();
+
+  ASIO_CHECK(count == 2);
+}
+
 ASIO_TEST_SUITE
 (
   "bind_cancellation_slot",
   ASIO_TEST_CASE(bind_cancellation_slot_to_function_object_test)
   ASIO_TEST_CASE(bind_cancellation_slot_to_completion_token_v1_test)
   ASIO_TEST_CASE(bind_cancellation_slot_to_completion_token_v2_test)
+  ASIO_TEST_CASE(partial_bind_cancellation_slot)
 )

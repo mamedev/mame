@@ -22,6 +22,7 @@ public:
 	auto intrq_wr_callback() { return intrq_cb.bind(); }
 	auto drq_wr_callback() { return drq_cb.bind(); }
 	auto hdl_wr_callback() { return hdl_cb.bind(); }
+	auto mtr0_wr_callback() { return mtr0_cb.bind(); }
 	auto us_wr_callback() { return us_cb.bind(); }
 	auto idx_wr_callback() { return idx_cb.bind(); }
 	auto ts_rd_callback() { return ts_cb.bind(); }
@@ -209,7 +210,7 @@ protected:
 		int main_state, sub_state;
 		int dir, counter;
 		uint8_t pcn, st0;
-		bool st0_filled;
+		bool st0_filled, st0_seek;
 		bool live, index, ready;
 	};
 
@@ -230,7 +231,7 @@ protected:
 
 	static constexpr int rates[4] = { 500000, 300000, 250000, 1000000 };
 
-	bool ready_connected, ready_polled, select_connected, select_multiplexed, ts_connected, has_dor;
+	bool ready_connected, ready_polled, select_connected, select_multiplexed, ts_connected, has_dor, has_base_mode;
 
 	bool external_ready;
 
@@ -240,10 +241,10 @@ protected:
 	int main_phase;
 
 	live_info cur_live, checkpoint_live;
-	devcb_write_line intrq_cb, drq_cb, hdl_cb, idx_cb;
+	devcb_write_line intrq_cb, drq_cb, hdl_cb, mtr0_cb, idx_cb;
 	devcb_read_line ts_cb;
 	devcb_write8 us_cb;
-	bool cur_irq, irq, drq, internal_drq, tc, tc_done, locked, mfm, scan_done;
+	bool cur_irq, irq, drq, internal_drq, tc, tc_done, locked, mfm, scan_done, base_mode_pending;
 	floppy_info flopi[4];
 
 	int fifo_pos, fifo_expected, command_pos, result_pos, sectors_read;
@@ -257,6 +258,7 @@ protected:
 	int cur_rate;
 	int selected_drive;
 	u8 drive_busy;
+	bool xfer_in_progress;
 
 	emu_timer *poll_timer;
 
@@ -286,12 +288,15 @@ protected:
 		C_SLEEP,
 		C_ABORT,
 		C_SPECIFY2,
+		C_NSC,
+		C_SET_TRACK,
 
 		C_INVALID,
 		C_INCOMPLETE
 	};
 
 	void end_reset();
+	void base_mode_access();
 
 	void delay_cycles(floppy_info &fi, int cycles);
 	void check_irq();
@@ -313,6 +318,9 @@ protected:
 	virtual void execute_command(int cmd);
 	virtual void command_end(floppy_info &fi, bool data_completion);
 	virtual uint8_t get_st3(floppy_info &fi);
+
+	int check_command_set_track() const;
+	void execute_command_set_track();
 
 	void recalibrate_start(floppy_info &fi);
 	void seek_start(floppy_info &fi);
@@ -548,6 +556,8 @@ public:
 
 protected:
 	virtual void soft_reset() override;
+	virtual int check_command() override;
+	virtual void execute_command(int cmd) override;
 };
 
 class pc8477a_device : public ps2_fdc_device {
@@ -560,6 +570,10 @@ public:
 	pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override ATTR_COLD;
+
+protected:
+	virtual int check_command() override;
+	virtual void execute_command(int cmd) override;
 };
 
 class pc8477b_device : public ps2_fdc_device {
@@ -572,6 +586,10 @@ public:
 	pc8477b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override ATTR_COLD;
+
+protected:
+	virtual int check_command() override;
+	virtual void execute_command(int cmd) override;
 };
 
 class wd37c65_device : public upd765_family_device {

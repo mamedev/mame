@@ -27,7 +27,8 @@ amiga_cpuslot_device::amiga_cpuslot_device(const machine_config &mconfig, const 
 	m_ovr_cb(*this),
 	m_int2_cb(*this),
 	m_int6_cb(*this),
-	m_ipl7_cb(*this)
+	m_ipl7_cb(*this),
+	m_fc_cb(*this, 0)
 {
 }
 
@@ -44,6 +45,9 @@ void amiga_cpuslot_device::cfgin_w(int state)
 
 void amiga_cpuslot_device::rst_w(int state)
 {
+	m_int2_cb(0);
+	m_int6_cb(0);
+
 	if (m_card)
 		m_card->rst_w(state);
 }

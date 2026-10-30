@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="tiki100_hdd" description="TIKI-100 hard disks">
+
+	<software name="tiko401">
+		<description>TIKO v4.01 Winchester system (Norway)</description>
+		<year>198?</year>
+		<publisher>Tiki Data</publisher>
+
+		<part name="hdd" interface="tiki100_hdd">
+			<diskarea name="harddriv">
+				<disk name="tiko401" sha1="8e98634337f1a71259dbf80aac976e53eb91ec68" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

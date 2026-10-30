@@ -31,7 +31,7 @@
 #define LOGFIFO(...) LOGMASKED(LOG_FIFO, __VA_ARGS__)
 
 
-#define CLOCK_DIVIDER (7*6*8)
+#define CLOCK_DIVIDER (6*4*13)
 #define HIGH_QUALITY
 
 #define SCBUF_SIZE   (4096)             /* Must be power of 2               */

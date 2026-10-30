@@ -46,9 +46,11 @@ TODO:
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "video/v9938.h"
 #include "sound/ymopl.h"
+#include "video/v9938.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -82,9 +84,9 @@ class pzlestar_state : public sangho_state
 public:
 	using sangho_state::sangho_state;
 
-	void init_pzlestar();
+	void init_pzlestar() ATTR_COLD;
 
-	void pzlestar(machine_config &config);
+	void pzlestar(machine_config &config) ATTR_COLD;
 
 protected:
 	void pzlestar_bank_w(uint8_t data);
@@ -110,7 +112,7 @@ class sexyboom_state : public sangho_state
 public:
 	using sangho_state::sangho_state;
 
-	void sexyboom(machine_config &config);
+	void sexyboom(machine_config &config) ATTR_COLD;
 
 protected:
 	void sexyboom_bank_w(offs_t offset, uint8_t data);
@@ -489,7 +491,7 @@ void pzlestar_state::pzlestar(machine_config &config)
 	v9958.set_screen_ntsc("screen");
 	v9958.set_vram_size(0x20000);
 	v9958.int_cb().set_inputline("maincpu", 0);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	SPEAKER(config, "mono").front_center();
 	YM2413(config, "ymsnd", XTAL(21'477'272)/6).add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -506,7 +508,7 @@ void sexyboom_state::sexyboom(machine_config &config)
 	v9958.set_screen_ntsc("screen");
 	v9958.set_vram_size(0x20000);
 	v9958.int_cb().set_inputline("maincpu", 0);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	PALETTE(config, "palette").set_entries(19780);
 
@@ -575,7 +577,7 @@ void pzlestar_state::init_pzlestar()
 {
 	uint8_t *ROM = m_region_user1->base();
 
-	/* patch nasty looping check, related to sound? */
+	// HACK: patch nasty looping check, related to sound?
 	ROM[0x12ca7] = 0x00;
 	ROM[0x12ca8] = 0x00;
 }

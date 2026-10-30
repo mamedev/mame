@@ -546,7 +546,7 @@ void mg1_state::mg1(machine_config &config)
 
 	// black & white crt, 56Hz refresh, 46.877kHz line, line sync 1.066uS, frame sync 341.32uS
 	// crtc sees it as 16 col x 50 rows, with 64x16 character cells
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(60_MHz_XTAL, 20*64, 1*64, 17*64, 51*16 + 4, 0, 50*16);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 	m_screen->screen_vblank().set_inputline(m_iop, M6801_TIN_LINE);

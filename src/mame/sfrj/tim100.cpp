@@ -180,7 +180,7 @@ void tim100_state::tim100(machine_config &config)
 	m_maincpu->out_sod_func().set(FUNC(tim100_state::sod_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update("crtc", FUNC(i8276_device::screen_update));
 	screen.set_raw(9'600'000, 600, 0, 480, 320, 0, 272);
 

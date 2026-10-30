@@ -26,10 +26,10 @@ public:
 		m_io_config(*this, "CONFIG")
 	{ }
 
-	void alto2(machine_config &config);
+	void alto2(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void driver_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(handle_vblank);
 
@@ -278,7 +278,7 @@ void alto2_state::alto2(machine_config &config)
 	m_maincpu->set_diablo(1, DIABLO_HD_1);
 
 	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::white());
 	screen.set_physical_aspect(3, 4); // Portrait CRT
 	screen.set_raw(XTAL(20'160'000), A2_DISP_TOTAL_WIDTH, 0, A2_DISP_WIDTH, A2_DISP_TOTAL_HEIGHT, 0, A2_DISP_HEIGHT);
@@ -296,7 +296,7 @@ void alto2_state::alto2(machine_config &config)
 	DIABLO_HD(config, DIABLO_HD_1, 3333333);
 }
 
-void alto2_state::driver_start()
+void alto2_state::machine_start()
 {
 	// Create a timer which fires twice per frame, once for each field
 	m_vblank_timer = timer_alloc(FUNC(alto2_state::handle_vblank), this);

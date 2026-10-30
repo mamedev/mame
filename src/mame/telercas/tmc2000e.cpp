@@ -32,10 +32,80 @@
 */
 
 #include "emu.h"
-#include "tmc2000e.h"
+
+#include "cpu/cosmac/cosmac.h"
+#include "imagedev/cassette.h"
+#include "machine/ram.h"
+#include "machine/rescap.h"
+#include "sound/cdp1864.h"
 
 #include "screen.h"
 #include "speaker.h"
+
+#define SCREEN_TAG      "screen"
+#define CDP1802_TAG     "cdp1802"
+#define CDP1864_TAG     "cdp1864"
+
+#define TMC2000E_COLORRAM_SIZE 0x100 // ???
+
+namespace {
+
+
+class tmc2000e_state : public driver_device
+{
+public:
+	tmc2000e_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, CDP1802_TAG)
+		, m_cti(*this, CDP1864_TAG)
+		, m_cassette(*this, "cassette")
+		, m_colorram(*this, "colorram")
+		, m_key_row(*this, {"Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7"})
+		, m_run(*this, "RUN")
+		, m_led(*this, "led1")
+	{ }
+
+	void tmc2000e(machine_config &config);
+
+private:
+	uint8_t vismac_r();
+	void vismac_w(uint8_t data);
+	uint8_t floppy_r();
+	void floppy_w(uint8_t data);
+	uint8_t ascii_keyboard_r();
+	uint8_t io_r();
+	void io_w(uint8_t data);
+	void io_select_w(uint8_t data);
+	void keyboard_latch_w(uint8_t data);
+	int rdata_r();
+	int bdata_r();
+	int gdata_r();
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
+	void dma_w(offs_t offset, uint8_t data);
+
+	/* video state */
+	int m_cdp1864_efx = 0;      /* EFx */
+	uint8_t m_color = 0;
+
+	/* keyboard state */
+	int m_keylatch = 0;         /* key latch */
+	void tmc2000e_io_map(address_map &map) ATTR_COLD;
+	void tmc2000e_map(address_map &map) ATTR_COLD;
+
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	required_device<cosmac_device> m_maincpu;
+	required_device<cdp1864_device> m_cti;
+	required_device<cassette_image_device> m_cassette;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_ioport_array<8> m_key_row;
+	required_ioport m_run;
+	output_finder<> m_led;
+};
 
 
 /* Read/Write Handlers */
@@ -291,17 +361,19 @@ void tmc2000e_state::tmc2000e(machine_config &config)
 	m_maincpu->ef3_cb().set(FUNC(tmc2000e_state::ef3_r));
 	m_maincpu->q_cb().set(FUNC(tmc2000e_state::q_w));
 	m_maincpu->dma_wr_cb().set(FUNC(tmc2000e_state::dma_w));
+	m_maincpu->sc_cb().set(m_cti, FUNC(cdp1864_device::sc_w));
+	m_maincpu->tpa_cb().set(m_cti, FUNC(cdp1864_device::tpa_w));
+	m_maincpu->int_cb().set(m_cti, FUNC(cdp1864_device::int_r));
+	m_maincpu->dma_out_cb().set(m_cti, FUNC(cdp1864_device::dma_out_r));
+	m_maincpu->ef1_cb().set(m_cti, FUNC(cdp1864_device::efx_r));
 
 	// video hardware
-	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, SCREEN_TAG);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	CDP1864(config, m_cti, 1.75_MHz_XTAL).set_screen(SCREEN_TAG);
 	m_cti->inlace_cb().set_constant(0);
-	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
-	m_cti->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
-	m_cti->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
 	m_cti->rdata_cb().set(FUNC(tmc2000e_state::rdata_r));
 	m_cti->bdata_cb().set(FUNC(tmc2000e_state::bdata_r));
 	m_cti->gdata_cb().set(FUNC(tmc2000e_state::gdata_r));
@@ -325,6 +397,8 @@ ROM_START( tmc2000e )
 	ROM_LOAD( "3", 0xd000, 0x0800, NO_DUMP )
 	ROM_LOAD( "4", 0xd800, 0x0800, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY        FULLNAME        STATE
 COMP( 1980, tmc2000e, 0,      0,      tmc2000e, tmc2000e, tmc2000e_state, empty_init, "Telercas Oy", "Telmac 2000E", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

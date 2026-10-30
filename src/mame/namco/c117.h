@@ -6,8 +6,6 @@
 #pragma once
 
 
-#include "machine/watchdog.h"
-
 
 //***************************************************************************
 //  TYPE DEFINITIONS
@@ -28,14 +26,12 @@ public:
 		m_cpuexec[1].set_tag(std::forward<U>(subtag));
 	}
 	auto subres_cb() { return m_subres_cb.bind(); }
+	auto watchdog_cb() { return m_watchdog_cb.bind(); }
 
 	uint8_t main_r(offs_t offset);
 	uint8_t sub_r(offs_t offset);
 	void main_w(offs_t offset, uint8_t data);
 	void sub_w(offs_t offset, uint8_t data);
-
-	// FIXME: this doesn't belong here
-	void sound_watchdog_w(uint8_t data);
 
 	offs_t remap(int whichcpu, offs_t offset) { return m_offsets[whichcpu][offset>>13] | (offset & 0x1fff); }
 
@@ -43,7 +39,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -52,7 +47,6 @@ private:
 	// internal helpers
 	void register_w(int whichcpu, offs_t offset, uint8_t data);
 	void bankswitch(int whichcpu, int whichbank, int a0, uint8_t data);
-	void kick_watchdog(int whichcpu);
 
 	// internal state
 	uint32_t m_offsets[2][8];
@@ -60,6 +54,7 @@ private:
 
 	// callbacks
 	devcb_write_line           m_subres_cb;
+	devcb_write8               m_watchdog_cb;
 
 	// address space
 	const address_space_config m_program_config;
@@ -68,8 +63,6 @@ private:
 	// cpu interfaces
 	required_device<cpu_device> m_cpuexec[2];
 	memory_access<23, 0, 0, ENDIANNESS_BIG>::cache m_cpucache[2];
-
-	required_device<watchdog_timer_device> m_watchdog;
 };
 
 // device type definition

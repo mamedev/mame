@@ -633,7 +633,7 @@ void pc88va_state::io_map(address_map &map)
 //  map(0x0188, 0x018b) V50 ICU
 //  map(0x0190, 0x0191) System Port 5
 	map(0x0190, 0x0190).rw(FUNC(pc88va_state::sys_port5_r), FUNC(pc88va_state::sys_port5_w));
-//  map(0x0196, 0x0197) Keyboard sub CPU command port
+	map(0x0197, 0x0197).w("kbd", FUNC(pc88va_kbd_device::write_command));
 	map(0x0198, 0x0199).w("memsw", FUNC(pc88va_memsw_device::write_disable_w));
 	map(0x019a, 0x019b).w("memsw", FUNC(pc88va_memsw_device::write_enable_w));
 //  map(0x01a0, 0x01a7) V50 TCU
@@ -641,7 +641,7 @@ void pc88va_state::io_map(address_map &map)
 	map(0x01b0, 0x01b7).rw(FUNC(pc88va_state::fdc_r), FUNC(pc88va_state::fdc_w)).umask16(0x00ff); // FDC related (765)
 	map(0x01b8, 0x01bb).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
 //  map(0x01c0, 0x01c1) keyboard scan code, polled thru IRQ1 ...
-	map(0x01c0, 0x01c1).r("kbd", FUNC(pc88va_kbd_device::read));
+	map(0x01c1, 0x01c1).r("kbd", FUNC(pc88va_kbd_device::read_code));
 	map(0x01c6, 0x01c7).nopw(); // ???
 	map(0x01c8, 0x01cf).rw("d8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00); //i8255 3 (byte access)
 //  map(0x01d0, 0x01d1) Expansion RAM bank selection
@@ -1162,7 +1162,7 @@ void pc88va_state::pc88va_cbus(machine_config &config)
 	m_maincpu->out_iow_cb<0>().set([this] (u8 data) { m_cbus_root->dack_w(0, data); });
 
 	// should be 3 slots for each iteration here
-	// FIXME: set clock to SCKL1 clock frequency
+	// FIXME: set clock to SCLK1 clock frequency
 	PC98_CBUS_SLOT(config, "cbus:0", 0, "cbus", pc88va_cbus_devices, nullptr);
 	PC98_CBUS_SLOT(config, "cbus:1", 0, "cbus", pc88va_cbus_devices, nullptr);
 	PC98_CBUS_SLOT(config, "cbus:2", 0, "cbus", pc88va_cbus_devices, nullptr);
@@ -1200,7 +1200,7 @@ void pc88va_state::pc88va(machine_config &config)
 
 	// TODO: pc80s31k here
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(42'105'200) / 2, 848, 0, 640, 448, 0, 400);
 	m_screen->set_screen_update(FUNC(pc88va_state::screen_update));
 

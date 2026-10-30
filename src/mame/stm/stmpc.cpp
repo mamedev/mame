@@ -178,7 +178,7 @@ void stmpc_state::stmpc(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", chars);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_raw(16000000, 1344, 0, 1280, 113, 0, 104);
 	screen.set_screen_update(m_avdc, FUNC(scn2674_device::screen_update));
 

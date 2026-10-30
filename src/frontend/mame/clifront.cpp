@@ -31,6 +31,7 @@
 
 #include "chd.h"
 #include "corestr.h"
+#include "ioprocsstream.h"
 #include "path.h"
 #include "unzip.h"
 #include "xmlfile.h"
@@ -44,6 +45,9 @@
 #include <cctype>
 #include <cstdio>
 #include <iostream>
+#include <locale>
+#include <sstream>
+#include <utility>
 
 
 //**************************************************************************
@@ -1733,8 +1737,10 @@ void cli_frontend::execute_commands(std::string_view exename)
 	// showusage?
 	if (m_options.command() == CLICOMMAND_SHOWUSAGE)
 	{
-		osd_printf_info("Usage:  %s [machine] [media] [software] [options]",exename);
-		osd_printf_info("\n\nOptions:\n%s", m_options.output_help());
+		osd_printf_info("Usage:  %s [machine] [media] [software] [options]", exename);
+		std::ostringstream str;
+		m_options.output_help(str);
+		osd_printf_info("\n\nOptions:\n%s", std::move(str).str());
 		return;
 	}
 
@@ -1767,40 +1773,62 @@ void cli_frontend::execute_commands(std::string_view exename)
 	if (m_options.command() == CLICOMMAND_CREATECONFIG)
 	{
 		// attempt to open the output file and generate the updated (mame).ini
-		emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(std::string(emulator_info::get_configname()) + ".ini"))
-			throw emu_fatalerror("Unable to create file %s.ini\n",emulator_info::get_configname());
+		{
+			emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			if (file.open(std::string(emulator_info::get_configname()) + ".ini"))
+				throw emu_fatalerror("Unable to create file %s.ini\n",emulator_info::get_configname());
 
-		file.puts(m_options.output_ini());
+			util::owritestream str(file);
+			str.imbue(std::locale::classic());
+			m_options.output_ini(str);
+			str << std::flush;
+		}
 
 		// ui.ini
-		ui_options ui_opts;
-		emu_file file_ui(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file_ui.open("ui.ini"))
-			throw emu_fatalerror("Unable to create file ui.ini\n");
+		{
+			ui_options ui_opts;
+			emu_file file_ui(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			if (file_ui.open("ui.ini"))
+				throw emu_fatalerror("Unable to create file ui.ini\n");
 
-		file_ui.puts(ui_opts.output_ini());
+			util::owritestream str(file_ui);
+			str.imbue(std::locale::classic());
+			ui_opts.output_ini(str);
+			str << std::flush;
+		}
 
 		// plugin.ini
-		plugin_options plugin_opts;
-		path_iterator iter(m_options.plugins_path());
-		std::string pluginpath;
-		while (iter.next(pluginpath))
-			plugin_opts.scan_directory(pluginpath, true);
-
-		std::string plugins(plugin_opts.output_ini());
-
-		// only update the file when it found plugins
-		if (!plugins.empty())
 		{
-			emu_file file_plugin(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			if (file_plugin.open("plugin.ini"))
-				throw emu_fatalerror("Unable to create file plugin.ini\n");
+			plugin_options plugin_opts;
+			path_iterator iter(m_options.plugins_path());
+			std::string pluginpath;
+			while (iter.next(pluginpath))
+				plugin_opts.scan_directory(pluginpath, true);
 
-			file_plugin.puts(plugins);
+			std::string plugins;
+			{
+				std::ostringstream str;
+				str.imbue(std::locale::classic());
+				plugin_opts.output_ini(str);
+				plugins = std::move(str).str();
+			}
+
+			// only update the file when it found plugins
+			if (!plugins.empty())
+			{
+				emu_file file_plugin(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+				if (file_plugin.open("plugin.ini"))
+					throw emu_fatalerror("Unable to create file plugin.ini\n");
+
+				util::owritestream str(file_plugin);
+				str.imbue(std::locale::classic());
+				str << std::flush;
+			}
+			else
+			{
+				osd_printf_error("Skipped plugin.ini, could not find any plugins\n");
+			}
 		}
-		else
-			osd_printf_error("Skipped plugin.ini, could not find any plugins\n");
 
 		return;
 	}
@@ -1809,7 +1837,10 @@ void cli_frontend::execute_commands(std::string_view exename)
 	if (m_options.command() == CLICOMMAND_SHOWCONFIG)
 	{
 		// print the INI text
-		printf("%s\n", m_options.output_ini().c_str());
+		std::ostringstream str;
+		str.imbue(std::locale::classic());
+		m_options.output_ini(str);
+		std::cout << std::move(str).str() << '\n';
 		return;
 	}
 

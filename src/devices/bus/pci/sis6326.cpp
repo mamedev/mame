@@ -11,6 +11,8 @@ TODO:
 - Make AGP to install properly (bridge fault?);
 - 3d rendering;
 - MPEG acceleration for DVD;
+- Win2k driver for this is "SiS 5598/SiS 6326", which implies the integrated chipset uses this
+  exact variant;
 
 **************************************************************************************************/
 
@@ -67,7 +69,7 @@ const tiny_rom_entry *sis6326_pci_device::device_rom_region() const
 
 void sis6326_pci_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(sis6326_vga_device::screen_update));
 

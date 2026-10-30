@@ -76,9 +76,9 @@ public:
 		, m_bram(*this, "bram")
 		{ }
 
-	void tosh1000(machine_config &config);
+	void tosh1000(machine_config &config) ATTR_COLD;
 
-	void init_tosh1000();
+	void init_tosh1000() ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;

@@ -148,7 +148,6 @@ public:
 
 private:
 	static constexpr size_t nibbles_per_track = 0x1a00;
-	static constexpr size_t min_sync_bytes = 4;
 	static constexpr auto expected_size_35t = APPLE2_STD_TRACK_COUNT * nibbles_per_track;
 	static constexpr auto expected_size_40t = APPLE2_TRACK_COUNT * nibbles_per_track;
 

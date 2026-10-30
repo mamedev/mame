@@ -607,7 +607,7 @@ void acefruit_state::acefruit(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_acefruit);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(512, 256);
@@ -626,9 +626,10 @@ void acefruit_state::acefruit(machine_config &config)
 void acefruit_state::init_sidewndr()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	/* replace "ret nc" (0xd0) with "di" */
+
+	// HACK: replace "ret nc" (0xd0) with "di"
+	// this is either a bad dump or the cpu core should set the carry flag on reset
 	ROM[0] = 0xf3;
-	/* this is either a bad dump or the cpu core should set the carry flag on reset */
 }
 
 /***************************************************************************

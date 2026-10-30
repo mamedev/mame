@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <vector>
+#include <list>
 
 
 
@@ -31,22 +31,26 @@ public:
 
 	auto clk_wr_callback() { return m_write_clk.bind(); }
 	auto data_wr_callback() { return m_write_data.bind(); }
+	auto valid_wr_callback() { return m_write_valid.bind(); }
 
 	void add_device(device_econet_interface &target, int address);
 
 	// writes for host (driver_device)
 	void host_clk_w(int state);
 	void host_data_w(int state);
+	void host_rts_w(int state);
 
 	// writes for peripherals (device_t)
 	void clk_w(device_t *device, int state);
 	void data_w(device_t *device, int state);
+	void rts_w(device_t *device, int state);
 
 protected:
 	enum
 	{
 		CLK = 0,
 		DATA,
+		DRIVE,
 		SIGNAL_COUNT
 	};
 
@@ -58,7 +62,7 @@ protected:
 		device_t &device() { return *m_device; }
 		device_econet_interface &interface() { return *m_interface; }
 
-		int m_line[SIGNAL_COUNT];
+		uint8_t m_line[SIGNAL_COUNT];
 
 	private:
 		device_t *                  m_device;       // associated device
@@ -69,16 +73,19 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_stop() override ATTR_COLD;
 
-	std::vector<daisy_entry> m_device_list;
+	std::list<daisy_entry> m_device_list;
 
 private:
 	devcb_write_line   m_write_clk;
 	devcb_write_line   m_write_data;
+	devcb_write_line   m_write_valid;
 
 	void set_signal(device_t *device, int signal, int state);
-	int get_signal(int signal);
+	int get_clk();
+	int get_data();
+	int get_valid();
 
-	int m_line[SIGNAL_COUNT];
+	uint8_t m_line[SIGNAL_COUNT];
 };
 
 
@@ -121,6 +128,7 @@ class device_econet_interface : public device_interface
 public:
 	virtual void econet_clk(int state) = 0;
 	virtual void econet_data(int state) = 0;
+	virtual void econet_valid(int state);
 
 protected:
 	// construction/destruction

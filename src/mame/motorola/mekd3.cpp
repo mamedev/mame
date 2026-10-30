@@ -1016,7 +1016,7 @@ void mekd3_state::mekd3(machine_config &config)
 
 	// MEK68R2
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 
 	m_screen->set_refresh_hz(50);
 	m_screen->set_size(80 * 8 + 80 * 10, 20 * 12 + 100);

@@ -32,7 +32,7 @@
 #include "machine/adc0808.h"
 #include "machine/watchdog.h"
 #include "video/avgdvg.h"
-#include "video/vector.h"
+#include "vector.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -319,12 +319,9 @@ void starwars_state::starwars(machine_config &config)
 	outlatch.q_out_cb<7>().set(FUNC(starwars_state::recall_w)); // NVRAM array recall
 
 	/* video hardware */
-	VECTOR(config, "vector");
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
-	screen.set_refresh_hz(CLOCK_3KHZ / 12 / 6);
-	screen.set_size(400, 300);
-	screen.set_visarea(0, 250, 0, 280);
-	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
+	vector_device &vector(VECTOR(config, "vector"));
+	vector.set_refresh_hz(CLOCK_3KHZ / 12 / 6);
+	vector.set_visarea(0, 250, 0, 280);
 
 	avg_device &avg(AVG_STARWARS(config, "avg"));
 	avg.set_vector("vector");

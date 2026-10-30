@@ -77,7 +77,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	void gpspi_direct_internal_map(address_map &map) ATTR_COLD;
-	template<int Port> void add_port(address_map& map, u32 base) ATTR_COLD;
+	template<int Port> void add_port(address_map &map, u32 base) ATTR_COLD;
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

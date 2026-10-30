@@ -18,7 +18,7 @@
 
 #include "emu.h"
 
-// cpu cluster
+// CPU cluster
 #include "cpu/ns32000/ns32000.h"
 #include "machine/ns32081.h"
 #include "machine/ns32202.h"
@@ -33,6 +33,7 @@
 
 // busses and connectors
 #include "bus/rs232/rs232.h"
+#include "bus/nscsi/et532.h"
 #include "bus/nscsi/hd.h"
 #include "bus/nscsi/tape.h"
 
@@ -61,7 +62,7 @@ public:
 	{
 	}
 
-	void pc532(machine_config &config);
+	void pc532(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -209,37 +210,36 @@ u32 pc532_state::dma_r(offs_t offset, u32 mem_mask)
 {
 	u32 data = 0;
 
-	if (!machine().side_effects_disabled())
+	switch (m_state)
 	{
-		switch (m_state)
+	case IDLE:
+		if (!machine().side_effects_disabled() && m_drq && !m_irq)
 		{
-		case IDLE:
-			if (m_drq && !m_irq)
-			{
-				// buffer empty and SCSI ready to transfer; read SCSI data, enter the read state, and signal the CPU to wait
-				m_dma = m_dp8490->dma_r();
-				m_state = RD1;
+			// buffer empty and SCSI ready to transfer; read SCSI data, enter the read state, and signal the CPU to wait
+			m_dma = m_dp8490->dma_r();
+			m_state = RD1;
 
-				m_cpu->rdy_w(1);
-			}
-			break;
-
-		case RD1:
-		case RD2:
-		case RD3:
-			// buffer partly full; signal the CPU to wait
 			m_cpu->rdy_w(1);
-			break;
-
-		case RD4:
-			// buffer full; return the data to the CPU and enter idle state
-			data = m_dma;
-			m_state = IDLE;
-			break;
-
-		default:
-			break;
 		}
+		break;
+
+	case RD1:
+	case RD2:
+	case RD3:
+		// buffer partly full; signal the CPU to wait
+		if (!machine().side_effects_disabled())
+			m_cpu->rdy_w(1);
+		break;
+
+	case RD4:
+		// buffer full; return the data to the CPU and enter idle state
+		data = m_dma;
+		if (!machine().side_effects_disabled())
+			m_state = IDLE;
+		break;
+
+	default:
+		break;
 	}
 
 	return data;
@@ -295,35 +295,34 @@ u32 pc532_state::aic_dma_r(offs_t offset, u32 mem_mask)
 {
 	u32 data = 0;
 
-	if (!machine().side_effects_disabled())
+	switch (m_state)
 	{
-		switch (m_state)
+	case IDLE:
+		if (!machine().side_effects_disabled() && m_drq)
 		{
-		case IDLE:
-			if (m_drq)
-			{
-				m_dma = m_aic6250->dma_r();
-				m_state = RD1;
-				m_aic6250->back_w(1);
+			m_dma = m_aic6250->dma_r();
+			m_state = RD1;
+			m_aic6250->back_w(1);
 
-				m_cpu->rdy_w(1);
-			}
-			break;
-
-		case RD1:
-		case RD2:
-		case RD3:
 			m_cpu->rdy_w(1);
-			break;
-
-		case RD4:
-			data = m_dma;
-			m_state = IDLE;
-			break;
-
-		default:
-			break;
 		}
+		break;
+
+	case RD1:
+	case RD2:
+	case RD3:
+		if (!machine().side_effects_disabled())
+			m_cpu->rdy_w(1);
+		break;
+
+	case RD4:
+		data = m_dma;
+		if (!machine().side_effects_disabled())
+			m_state = IDLE;
+		break;
+
+	default:
+		break;
 	}
 
 	return data;
@@ -379,6 +378,7 @@ template <unsigned ST> void pc532_state::cpu_map(address_map &map)
 
 static void scsi_devices(device_slot_interface &device)
 {
+	device.option_add("et532", ET532_SCSI); // ET532 serial/ethernet coprocessor card (532SC)
 	device.option_add("harddisk", NSCSI_HARDDISK);
 	device.option_add("tape", NSCSI_TAPE);
 }

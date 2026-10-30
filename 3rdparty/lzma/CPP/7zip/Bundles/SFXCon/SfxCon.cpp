@@ -153,7 +153,7 @@ namespace NCommandType
   };
 }
 
-static const char *g_Commands = "txl";
+static const char * const g_Commands = "txl";
 
 struct CArchiveCommand
 {
@@ -422,7 +422,7 @@ int Main2(
     {
       CExtractCallbackConsole *ecs = new CExtractCallbackConsole;
       CMyComPtr<IFolderArchiveExtractCallback> extractCallback = ecs;
-      ecs->Init(g_StdStream, &g_StdErr, g_StdStream);
+      ecs->Init(g_StdStream, &g_StdErr, g_StdStream, false);
 
       #ifndef Z7_NO_CRYPTO
       ecs->PasswordIsDefined = passwordEnabled;

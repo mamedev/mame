@@ -68,9 +68,9 @@ public:
 		, m_kbdio(*this, "Y%u", 1)
 	{ }
 
-	void mc1502(machine_config &config);
+	void mc1502(machine_config &config) ATTR_COLD;
 
-	void init_mc1502();
+	void init_mc1502() ATTR_COLD;
 
 	void fdc_config(device_t *device);
 

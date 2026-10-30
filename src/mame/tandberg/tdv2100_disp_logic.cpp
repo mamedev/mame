@@ -520,11 +520,11 @@ uint32_t tandberg_tdv2100_disp_logic_device::screen_update(screen_device &screen
 	bool block_cursor = BIT(u61, 9);
 	bool full_inverse_video = !m_sw_invert_video->read();
 
-	int const char_min_col = cliprect.min_x/9;
-	int const char_min_row = cliprect.min_y/14;
+	int const char_min_col = cliprect.left()/9;
+	int const char_min_row = cliprect.top()/14;
 	update_attribute(char_min_row, char_min_col, m_char_max_row, m_char_max_col);
-	m_char_max_col = cliprect.max_x/9;
-	m_char_max_row = cliprect.max_y/14;
+	m_char_max_col = cliprect.right()/9;
+	m_char_max_row = cliprect.bottom()/14;
 	bool const blink_strobe = BIT(m_frame_counter, 3);
 	bool const cursor_blink_strobe = blink_strobe && !m_speed_check;
 
@@ -956,7 +956,7 @@ void tandberg_tdv2100_disp_logic_device::transk_w(int state)
 void tandberg_tdv2100_disp_logic_device::device_add_mconfig(machine_config &mconfig)
 {
 	/* Video hardware */
-	SCREEN(mconfig, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(mconfig, m_screen).set_color(rgb_t::green());
 	m_screen->set_raw(DOT_CLOCK, 999, 0, 783, 402, 0, 350);
 	m_screen->set_screen_update(FUNC(tandberg_tdv2100_disp_logic_device::screen_update));
 	m_screen->screen_vblank().set(FUNC(tandberg_tdv2100_disp_logic_device::vblank));

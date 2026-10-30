@@ -152,7 +152,7 @@ void mtx_sdxcpm_device::device_add_mconfig(machine_config &config)
 		FLOPPY_CONNECTOR(config, floppy, sdx_floppies, "525qd", mtx_sdx_device::floppy_formats).enable_sound(true);
 
 	/* 80 column video card - required to be installed in MTX internally */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(15_MHz_XTAL, 960, 0, 640, 313, 0, 240);
 	m_screen->set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 

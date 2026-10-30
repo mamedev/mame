@@ -2,7 +2,7 @@
 // time_t_timer.cpp
 // ~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -63,7 +63,7 @@ struct time_t_wait_traits
   }
 
   // Determine how long until the clock should be next polled to determine
-  // whether the absoluate time has been reached.
+  // whether the absolute time has been reached.
   static time_t_clock::duration to_wait_duration(
       const time_t_clock::time_point& t)
   {

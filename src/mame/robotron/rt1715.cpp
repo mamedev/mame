@@ -755,7 +755,7 @@ void rt1715_state::rt1715(machine_config &config)
 	keyboard.set_addrmap(AS_IO, &rt1715_state::k7658_io);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update("i8275", FUNC(i8275_device::screen_update));
 	m_screen->set_raw(13.824_MHz_XTAL, 864, 0, 640, 320, 0, 288);
 

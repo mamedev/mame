@@ -1414,7 +1414,7 @@ void jpmimpct_video_state::impact_video(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(30000));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(40000000/4, 156*4, 0, 100*4, 328, 0, 300);
 	screen.set_screen_update("dsp", FUNC(tms34010_device::tms340x0_rgb32));
 

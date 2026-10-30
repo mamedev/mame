@@ -13,6 +13,8 @@
 
 #include "pc9801.h"
 
+#include "machine/nvram.h"
+
 class pc9821_state : public pc9801bx_state
 {
 public:
@@ -91,7 +93,7 @@ class pc9821_mate_a_state : public pc9821_state
 public:
 	pc9821_mate_a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc9821_state(mconfig, type, tag)
-		, m_bios_view(*this, "bios_view")
+		, m_nvram(*this, "nvram")
 	{
 	}
 
@@ -106,20 +108,17 @@ protected:
 	virtual void itf_43d_bank_w(offs_t offset, uint8_t data) override;
 	virtual void cbus_43f_bank_w(offs_t offset, uint8_t data) override;
 
+	virtual uint8_t kanji_r(offs_t offset) override;
+	virtual void kanji_w(offs_t offset, uint8_t data) override;
+
 private:
 	DECLARE_MACHINE_START(pc9821ap2);
 	DECLARE_MACHINE_RESET(pc9821ap2);
 
-	// Starting from Af
-	memory_view m_bios_view;
+	required_device<nvram_device> m_nvram;
+	std::unique_ptr<uint8_t[]> m_nvram_ptr;
 
-	// Ap, As, Ae only
-	u8 ext_sdip_data_r(offs_t offset);
-	void ext_sdip_data_w(offs_t offset, u8 data);
-	void ext_sdip_address_w(offs_t offset, u8 data);
-	void ext_sdip_access_w(offs_t offset, u8 data);
-
-	uint8_t m_ext_sdip[0x100]{}, m_ext_sdip_addr = 0;
+	void sram_init();
 };
 
 // CanBe
@@ -129,7 +128,6 @@ class pc9821_canbe_state : public pc9821_state
 public:
 	pc9821_canbe_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc9821_state(mconfig, type, tag)
-		, m_bios_view(*this, "bios_view")
 	{
 	}
 
@@ -148,8 +146,6 @@ protected:
 	virtual void cbus_43f_bank_w(offs_t offset, uint8_t data) override;
 
 private:
-	memory_view m_bios_view;
-
 	DECLARE_MACHINE_START(pc9821_canbe);
 	DECLARE_MACHINE_RESET(pc9821_canbe);
 

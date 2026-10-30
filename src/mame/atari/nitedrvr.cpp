@@ -558,7 +558,7 @@ void nitedrvr_state::nitedrvr(machine_config &config)
 	TIMER(config, "crash_timer").configure_periodic(FUNC(nitedrvr_state::crash_toggle_callback), PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 240);
 	// PROM derives VRESET, VBLANK, VSYNC, IRQ from vertical scan count and last VBLANK
 	screen.set_screen_update(FUNC(nitedrvr_state::screen_update));

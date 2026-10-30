@@ -1018,7 +1018,7 @@ void smc777_state::smc777(machine_config &config)
 	m_ioctrl->q_out_cb<6>().set(FUNC(smc777_state::printer_strb_w));
 	m_ioctrl->q_out_cb<7>().set(FUNC(smc777_state::cas_out_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK / 2, 1024, 0, 640, 262, 0, 200);
 	m_screen->set_screen_update(FUNC(smc777_state::screen_update));
 	m_screen->set_palette(m_palette);

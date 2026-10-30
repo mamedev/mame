@@ -29,11 +29,12 @@ public:
 	{
 	}
 
-	void wy30p(machine_config &config);
+	void wy30p(machine_config &config) ATTR_COLD;
+
+	void init_wy30p() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void driver_start() override;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -125,7 +126,7 @@ void wy30p_state::wy30p(machine_config &config)
 
 	WYSE_KEYBOARD(config, m_keyboard, wy30_keyboards, "wy30");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(31.2795_MHz_XTAL * 2 / 3, 1050, 0, 800, 331, 0, 312); // divider and dimensions guessed
 	m_screen->set_screen_update(FUNC(wy30p_state::screen_update));
 	m_screen->screen_vblank().set_inputline("maincpu", MCS51_INT0_LINE);
@@ -146,7 +147,7 @@ ROM_START(wy30p)
 	ROM_LOAD("250971-02.u4", 0x0000, 0x4000, CRC(3666549c) SHA1(23c432da2083df4b355daf566dd6514d1f9a7690))
 ROM_END
 
-void wy30p_state::driver_start()
+void wy30p_state::init_wy30p()
 {
 	uint8_t *rom = memregion("program")->base();
 	for (offs_t base = 0x0000; base < 0x4000; base += 0x2000)
@@ -162,4 +163,4 @@ void wy30p_state::driver_start()
 } // anonymous namespace
 
 
-COMP(1992, wy30p, 0, 0, wy30p, wy30p, wy30p_state, empty_init, "Wyse Technology", "WY-30+ (v1.8)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1992, wy30p, 0, 0, wy30p, wy30p, wy30p_state, init_wy30p, "Wyse Technology", "WY-30+ (v1.8)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

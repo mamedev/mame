@@ -17,7 +17,13 @@ control registers:
      ------x- enable row/colscroll instead of normal scroll
      -----x-- if above is enabled: 0 = rowscroll, 1 = colscroll
 
-003: ----x--- selects sprite ram bank/offset (0 = 0x0, 1 = 0x100)
+003: ------xx tile ROM bank override
+     -----x-- sprite ROM bank override
+     ----x--- selects sprite RAM bank/offset (0 = 0x0, 1 = 0x100)
+     ---x---- tile color bank override?
+     --x----- ?
+     -x------ enable sprites?
+     x------- mask off screen left/right edge columns (8 pixels each)
 
 004: -------x nmi enable
      ------x- irq enable
@@ -25,6 +31,7 @@ control registers:
      ----x--- flip screen
 
 Above undocumented bits/regs = unknown
+Reg 3 bank override bits are weird, maybe bus conflicts.
 
 TODO:
 - Move sprites and tilemap emulation from drivers to this device.

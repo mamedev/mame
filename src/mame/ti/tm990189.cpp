@@ -843,7 +843,7 @@ void tm990189_v_state::tm990_189_v(machine_config &config)
 	m_tms9918->set_screen("screen");
 	m_tms9918->set_vram_size(0x4000);
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	config.set_default_layout(layout_tm990189v);
 }

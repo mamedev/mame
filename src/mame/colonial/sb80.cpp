@@ -259,7 +259,7 @@ void sb80_state::fdc_drq_w(int state)
 		// Rising edge.  Check whether we're inside the settle window.
 		attotime now = machine().time();
 		if (!m_drq_drop_time.is_zero()
-		    && (now - m_drq_drop_time) < attotime::from_usec(6))
+			&& (now - m_drq_drop_time) < attotime::from_usec(6))
 		{
 			m_nmi_assert_pending = true;
 			m_nmi_assert_timer->adjust(attotime::from_usec(6) - (now - m_drq_drop_time));

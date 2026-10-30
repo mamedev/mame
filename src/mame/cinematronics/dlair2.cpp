@@ -204,7 +204,7 @@ void dlair2_state::dlair2(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(dlair2_state::timer_irq), attotime::from_hz(60)); // timer irq, TODO: from vblank signal really?
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_screen_update(FUNC(dlair2_state::screen_update));

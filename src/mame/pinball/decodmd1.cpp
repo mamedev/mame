@@ -213,7 +213,7 @@ void decodmd_type1_device::device_add_mconfig(machine_config &config)
 
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(decodmd_type1_device::dmd_nmi), attotime::from_hz(2000));  // seems a lot
 
-	screen_device &dmd(SCREEN(config, "dmd", SCREEN_TYPE_LCD));
+	screen_device &dmd(SCREEN(config, "dmd").set_lcd());
 	dmd.set_size(128, 16);
 	dmd.set_visarea(0, 128-1, 0, 16-1);
 	dmd.set_screen_update(FUNC(decodmd_type1_device::screen_update));

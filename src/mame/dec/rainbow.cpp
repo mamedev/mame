@@ -338,10 +338,8 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 
 #include "machine/z80sio.h"
 #include "bus/rs232/rs232.h"
-#include "imagedev/bitbngr.h"
 #include "machine/com8116.h"
 #include "bus/rs232/hlemouse.h"
-#include "bus/rs232/terminal.h"
 
 #include "machine/i8251.h"
 #include "lk201.h"
@@ -352,7 +350,6 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 
 #include "machine/ds1215.h"
 #include "emupal.h"
-#include "softlist.h"
 #include "screen.h"
 
 #include "rainbow.lh" // BEZEL - LAYOUT with LEDs for diag 1-7, keyboard 8-11 and floppy 20-23
@@ -586,6 +583,7 @@ protected:
 
 	uint32_t screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(irq_callback);
+	IRQ_CALLBACK_MEMBER(z80_acknowledge_irq);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(hd_motor_tick);
 
@@ -712,7 +710,8 @@ protected:
 	int m_present_drive;
 	floppy_image_device *m_floppy;
 
-	int m_irq_high;
+	uint8_t m_irq_high;
+	uint8_t m_i8088_int_vector;
 	uint32_t m_irq_mask;
 
 	int m_bdl_irq;
@@ -917,6 +916,7 @@ void rainbow_base_state::machine_start()
 	save_item(NAME(m_kbd_rx_ready));
 	save_item(NAME(m_irq_high));
 	save_item(NAME(m_irq_mask));
+	save_item(NAME(m_i8088_int_vector));
 }
 
 
@@ -1239,6 +1239,7 @@ void rainbow_base_state::machine_reset()
 
 	m_intz80 = false;
 	m_int88 = false;
+	m_i8088_int_vector = 0;
 
 	// *********** SERIAL COMM. (7201)
 	m_mpsc->reset();
@@ -1346,7 +1347,8 @@ void rainbow_base_state::update_8088_irqs()
 		{
 			if (m_irq_mask & (1 << i))
 			{
-				m_i8088->set_input_line_and_vector(INPUT_LINE_INT0, ASSERT_LINE, vectors[i] | m_irq_high); // I8088
+				m_i8088_int_vector = vectors[i] | m_irq_high;
+				m_i8088->set_input_line(INPUT_LINE_INT0, ASSERT_LINE);
 				break;
 			}
 		}
@@ -1369,7 +1371,6 @@ void rainbow_base_state::lower_8088_irq(int ref)
 	m_irq_mask &= ~(1 << ref);
 	update_8088_irqs();
 }
-
 
 // IRQ service for 7201 (commm / printer)
 void rainbow_base_state::update_mpsc_irq()
@@ -1552,7 +1553,7 @@ uint8_t rainbow_modela_state::rtc_r(offs_t offset)
 		{
 			if (m_rtc->ceo_r())
 				return m_rtc->read();
-			 else
+			else
 				m_rtc->read();
 		}
 	}
@@ -2191,10 +2192,7 @@ void rainbow_base_state::i8088_latch_w(uint8_t data)
 {
 	// logerror("%02x to Z80 mailbox\n", data);
 
-	// The interrupt vector address(F7H) placed on the bus is hardwired into the Z80A interrupt vector encoder.
-	// The F7H interrupt vector address causes the Z80A processor to perform an RST 30 instruction in
-	// interrupt mode 0
-	m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf7); // Z80
+	m_z80->set_input_line(0, ASSERT_LINE);
 	m_z80_mailbox = data;
 
 	m_intz80 = true;
@@ -2471,19 +2469,25 @@ uint8_t rainbow_base_state::read_video_ram_r(offs_t offset)
 // CPU acknowledge of VBL IRQ resets counter
 IRQ_CALLBACK_MEMBER(rainbow_base_state::irq_callback)
 {
-	int intnum = -1;
 	for (int i = IRQ_8088_VBL; i >= 0; i--)
 	{
-			if (m_irq_mask & (1 << i))
-			{
-				if (i == IRQ_8088_VBL)  // If VBL IRQ acknowledged...
-					m_crtc->MHFU(MHFU_RESET); // ...reset counter (also: DC012_W)
+		if (m_irq_mask & (1 << i))
+		{
+			if (i == IRQ_8088_VBL)  // If VBL IRQ acknowledged...
+				m_crtc->MHFU(MHFU_RESET); // ...reset counter (also: DC012_W)
 
-				intnum = vectors[i] | m_irq_high;
-				break;
-			}
+			break;
+		}
 	}
-	return intnum;
+	return m_i8088_int_vector;
+}
+
+IRQ_CALLBACK_MEMBER(rainbow_base_state::z80_acknowledge_irq)
+{
+	// The interrupt vector address(F7H) placed on the bus is hardwired into the Z80A interrupt vector encoder.
+	// The F7H interrupt vector address causes the Z80A processor to perform an RST 30 instruction in
+	// interrupt mode 0
+	return 0xf7;
 }
 
 // NEC7220 Vsync IRQ ***************************************** GDC
@@ -3057,7 +3061,7 @@ void rainbow_base_state::GDC_EXTRA_REGISTER_w(offs_t offset, uint8_t data)
 				last_scroll_index = m_gdc_scroll_index;
 				if (data & GDC_MODE_READONLY_SCROLL_MAP) // 0x20
 				   logerror(" SCROLL MAP READ_ONLY. Index : %02x ", m_gdc_scroll_index);
-				 else
+				else
 				   logerror(" SCROLL MAP IS WRITABLE. Index : %02x ", m_gdc_scroll_index);
 			}
 
@@ -3160,9 +3164,10 @@ void rainbow_base_state::rainbow_base(machine_config &config)
 	Z80(config, m_z80, 24.0734_MHz_XTAL / 6);
 	m_z80->set_addrmap(AS_PROGRAM, &rainbow_base_state::rainbowz80_mem);
 	m_z80->set_addrmap(AS_IO, &rainbow_base_state::rainbowz80_io);
+	m_z80->set_irq_acknowledge_callback(FUNC(rainbow_base_state::z80_acknowledge_irq));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24.0734_MHz_XTAL / 6, 442, 0, 400, 264, 0, 240); // ~NTSC compatible video timing (?)
 	screen.set_screen_update(FUNC(rainbow_base_state::screen_update_rainbow));
 	screen.set_palette("vt100_video:palette");
@@ -3181,11 +3186,11 @@ void rainbow_base_state::rainbow_base(machine_config &config)
 
 	m_hgdc->set_addrmap(0, &rainbow_base_state::upd7220_map);
 	m_hgdc->set_display_pixels(FUNC(rainbow_base_state::hgdc_display_pixels));
-	m_hgdc->set_screen(m_screen2); // set_screen needs to be added after 7720 device in the machine config, not after the screen.
+	m_hgdc->set_screen(m_screen2); // set_screen needs to be added after 7220 device in the machine config, not after the screen.
 
 	PALETTE(config, m_palette2).set_entries(32);
 
-	SCREEN(config, m_screen2, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen2);
 	m_screen2->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE);
 
 	// VR241 color monitor is specified for 20 MHz bandwidth ( 60 Hz / 15.72 kHz horizontal rate )

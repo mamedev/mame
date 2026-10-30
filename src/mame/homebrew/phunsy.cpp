@@ -342,7 +342,7 @@ void phunsy_state::phunsy(machine_config &config)
 	m_maincpu->flag_handler().set(FUNC(phunsy_state::cass_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	/* Display (page 12 of pdf)
 	   - 8Mhz clock
 	   - 64 6 pixel characters on a line.

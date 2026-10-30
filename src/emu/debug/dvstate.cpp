@@ -317,12 +317,13 @@ void debug_view_state::view_update()
 //  state_item - constructor
 //-------------------------------------------------
 
-debug_view_state::state_item::state_item(int index, const char *name, u8 valuechars)
+template <typename T>
+debug_view_state::state_item::state_item(int index, T &&name, u8 valuechars)
 	: m_lastval(0)
 	, m_currval(0)
 	, m_index(index)
 	, m_vallen(valuechars)
-	, m_symbol(name)
+	, m_symbol(std::forward<T>(name))
 {
 }
 

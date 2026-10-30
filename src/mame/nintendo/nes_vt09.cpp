@@ -488,6 +488,16 @@ ROM_START( lxplasma )
 	ROM_LOAD( "ig810.u2", 0x00000, 0x800000, CRC(e2cf5fe7) SHA1(1f75c723b1ab456e322c81c1d3080b9dd1f80fec) )
 ROM_END
 
+ROM_START( gampow50 )
+    ROM_REGION( 0x400000, "mainrom", 0 )
+    ROM_LOAD( "mx29lv320bt.u2", 0x00000, 0x400000, CRC(65ede8ed) SHA1(a7dc43a6d47a3f486e5af24cdd730dcd479fa8bb) )
+ROM_END
+
+ROM_START( pckarc50 )
+    ROM_REGION( 0x400000, "mainrom", 0 )
+    ROM_LOAD( "mx29lv320bt.u1", 0x00000, 0x400000, CRC(a38f0c89) SHA1(28e8c428394e71bcd2b19d26e271df8eb2634b2a) )
+ROM_END
+
 ROM_START( vgtablet )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "vgtablet.bin", 0x00000, 0x400000, CRC(99ef3978) SHA1(0074445708d66a04ab02b4993069ce1ae0514c2f) )
@@ -588,7 +598,9 @@ CONS( 200?, vgpmini,   0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_ini
 // VG Pocket Max (VG-3000) (white case, 75 games) (does the game selection differ, or only the case?)
 CONS( 2006, vgtablet,  0, 0,  nes_vt09_4mb_rasterhack,  nes_vt09, nes_vt09_state, empty_init, "Performance Designed Products (licensed by Konami) / JungleTac", "VG Pocket Tablet (VG-4000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // raster timing for Frogger needs a hack
 // VG Pocket Caplet is SunPlus hardware instead, see spg2xx_lexibook.cpp
-CONS( 2005, lxplasma,  0,  0,  nes_vt09_8mb, nes_vt09, nes_vt09_state, empty_init, "Lexibook / JungleTac", "Plasma Console (IG810, 60-in-1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, lxplasma,  0,  0,  nes_vt09_8mb, nes_vt09, nes_vt09_state, empty_init, "Lexibook / JungleTac",  "Plasma Console (IG810, 60-in-1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, gampow50,  0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "Logic 3 / JungleTac",   "GamesPower 50 Games", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, pckarc50,  0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "<unknown> / JungleTac", "Pocket Arcade 50-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 200?, timetp25,   0,  0,  nes_vt09_cart, nes_vt09, nes_vt09_cart_state, empty_init, "Timetop", "Super Game 25-in-1 (GM-228)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 

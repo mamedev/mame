@@ -732,7 +732,7 @@ void pn8800fxb_state::pn8800fxb(machine_config &config)
 
 	TIMER(config, "1khz").configure_periodic(FUNC(pn8800fxb_state::int1_timer), attotime::from_hz(1000));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_size(640, 200);
 	screen.set_visarea_full();
 	screen.set_refresh_hz(70.23);

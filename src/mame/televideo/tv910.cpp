@@ -114,7 +114,7 @@ void tv910_state::tv910_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
-	map(0x4000, 0x47ff).ram().share("vram"); // VRAM
+	map(0x4000, 0x47ff).mirror(0x3800).ram().share("vram"); // VRAM
 	map(0x8010, 0x801f).r(FUNC(tv910_state::charset_r));
 	map(0x8020, 0x8020).rw(m_crtc, FUNC(r6545_1_device::status_r), FUNC(r6545_1_device::address_w));
 	map(0x8021, 0x8021).rw(m_crtc, FUNC(r6545_1_device::register_r), FUNC(r6545_1_device::register_w));
@@ -522,7 +522,7 @@ void tv910_state::tv910(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MASTER_CLOCK, 840, 0, 640, 270, 0, 240);
 	screen.set_screen_update(CRTC_TAG, FUNC(r6545_1_device::screen_update));
 

@@ -891,7 +891,7 @@ void twin16_state::twin16(machine_config &config)
 	m_video->virq_callback().set(FUNC(twin16_state::virq_callback));
 	m_video->set_sprite_callback(FUNC(twin16_state::sprite_callback));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(18'432'000)/3, 384, 0, 40*8, 264, 2*8, 30*8);
 	m_screen->set_screen_update(m_video, FUNC(konami_twin16_video_device::screen_update));
 	m_screen->screen_vblank().set(m_video, FUNC(konami_twin16_video_device::screen_vblank));
@@ -944,7 +944,7 @@ void fround_state::fround(machine_config &config)
 	m_video->set_sprite_callback(FUNC(fround_state::fround_sprite_callback));
 	m_video->set_tile_callback(FUNC(fround_state::tile_callback));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(18'432'000)/3, 384, 0, 40*8, 264, 2*8, 30*8);
 	m_screen->set_screen_update(m_video, FUNC(konami_twin16_video_device::screen_update));
 	m_screen->screen_vblank().set(m_video, FUNC(konami_twin16_video_device::screen_vblank));

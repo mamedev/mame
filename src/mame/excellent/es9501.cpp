@@ -466,7 +466,7 @@ void es9501_state::es9501(machine_config &config)
 	for (auto &bank : m_vram_bank)
 		ADDRESS_MAP_BANK(config, bank).set_map(&es9501_state::vram_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x1000);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_screen_update(FUNC(es9501_state::screen_update));

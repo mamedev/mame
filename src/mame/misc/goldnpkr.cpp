@@ -1103,6 +1103,7 @@
 #include "lespendu.lh"
 #include "pmpoker.lh"
 #include "upndown.lh"
+#include "smb_be4k.lh"
 
 
 namespace {
@@ -1159,6 +1160,7 @@ public:
 	void dynchance(machine_config &config) ATTR_COLD;
 	void lfhouse(machine_config &config) ATTR_COLD;
 	void unkdep(machine_config &config) ATTR_COLD;
+	void smb_be4k(machine_config &config) ATTR_COLD;
 
 	void init_vkdlswwh() ATTR_COLD;
 	void init_icp1db() ATTR_COLD;
@@ -1241,11 +1243,13 @@ private:
 	TILE_GET_INFO_MEMBER(super21p_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wing_w90_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(kmhpan_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(smb_be4k_get_bg_tile_info);
 	void goldnpkr_palette(palette_device &palette) const ATTR_COLD;
 	DECLARE_VIDEO_START(wcrdxtnd);
 	DECLARE_VIDEO_START(super21p);
 	DECLARE_VIDEO_START(wing_w90);
 	DECLARE_VIDEO_START(kmhpan);
+	DECLARE_VIDEO_START(smb_be4k);
 	void wcrdxtnd_palette(palette_device &palette) const ATTR_COLD;
 	DECLARE_MACHINE_START(mondial);
 	DECLARE_MACHINE_RESET(mondial);
@@ -1266,6 +1270,7 @@ private:
 	void super21p_map(address_map &map) ATTR_COLD;
 	void op5cards_map(address_map &map) ATTR_COLD;
 	void icp_ext_map(address_map &map) ATTR_COLD;
+	void smb_be4k_map(address_map &map) ATTR_COLD;
 	void glfever_map(address_map &map) ATTR_COLD;
 	void kmhpan_map(address_map &map) ATTR_COLD;
 	void unkicpf40_map(address_map &map) ATTR_COLD;
@@ -1476,6 +1481,27 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::kmhpan_get_bg_tile_info)
 	tileinfo.set(bank, code, color, 0);
 }
 
+TILE_GET_INFO_MEMBER(goldnpkr_state::smb_be4k_get_bg_tile_info)
+{
+/* 4 graphics banks system...
+
+    - bits -
+    7654 3210
+    --xx xx--   tiles color.
+    -x-- --x-   tiles bank.
+    x--- ---x   unused.
+*/
+	uint16_t const attr = m_colorram[tile_index];
+	uint16_t const code = ((attr & 0x01) << 8) | m_videoram[tile_index];
+	uint16_t const color = (attr & 0x3c) >> 2;
+
+	uint16_t const select0 = (attr & 0x02) >> 1;  // bit1 to bit0
+	uint16_t const select1 = (attr & 0x40) >> 5;  // bit6 to bit1
+	uint16_t const bank = select1 | select0;
+
+	tileinfo.set(bank, code, color, 0);
+}
+
 
 void goldnpkr_state::video_start()
 {
@@ -1500,6 +1526,11 @@ VIDEO_START_MEMBER(goldnpkr_state, wing_w90)
 VIDEO_START_MEMBER(goldnpkr_state, kmhpan)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldnpkr_state::kmhpan_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+}
+
+VIDEO_START_MEMBER(goldnpkr_state, smb_be4k)
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldnpkr_state::smb_be4k_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -2109,6 +2140,26 @@ void goldnpkr_state::icp_ext_map(address_map &map)
 	map(0x2000, 0x3fff).rom();
 	map(0x6000, 0x7fff).rom();
 }
+
+
+void goldnpkr_state::smb_be4k_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");         // battery backed RAM
+	map(0x0800, 0x0bff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
+	map(0x0c00, 0x0fff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
+
+	map(0x10b0, 0x10b0).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x10b1, 0x10b1).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+
+	map(0x10f4, 0x10f7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x10f8, 0x10fb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+
+	map(0x8000, 0xffff).rom();
+}
+
+
+
+
 
 void lespendu_state::lespendu_map(address_map &map)
 {
@@ -5127,6 +5178,69 @@ static INPUT_PORTS_START( icp_etg )  // ICP-1 w/daughterboard
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( smb_be4k )
+	// Multiplexed - 4x5bits
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("Play / Bet / Raise")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Books / Meters")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )    PORT_NAME("Double-Up / BJ Hit")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Deal / Draw")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Cancel / Game Select")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )          PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )    PORT_NAME("Take / BJ Stand")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )     PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Hold 1 / Coin1 Set / Turns Set")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Hold 2 / Note1 Set")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Hold 3 / Note2 Set")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Learn Mode (Coin-Notes-Turns set)") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("IN0-3-02")                          PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Note 1 In")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("Coin In")   PORT_IMPULSE(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Note 2 In")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SW1")
+	// only bits 4-7 are connected here and were routed to SW1 1-4
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x10, "Jacks or Better" )   PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x00, "Factory Set" )       PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )    // factory ON
+	PORT_DIPNAME( 0x40, 0x40, "Play Mode" )         PORT_DIPLOCATION("SW1:3")  // listed in the manual as "Play Mode"
+	PORT_DIPSETTING(    0x40, "Points" )                                       // normal game with coin-in. note1-in & note2-in
+	PORT_DIPSETTING(    0x00, "Turns" )                                        // 1-4 turns game with coin-in in thousands units
+	PORT_DIPNAME( 0x80, 0x00, "Top Hand" )          PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+INPUT_PORTS_END
+
+
 /*********************************************
 *              Graphics Layouts              *
 *********************************************/
@@ -5222,6 +5336,13 @@ static GFXDECODE_START( gfx_dep_9801 )
 	GFXDECODE_ENTRY( "gfx2", 0, fixedtilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, fixedtilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, fixedtilelayout, 0, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_smb_be4k )
+	GFXDECODE_ENTRY( "gfx1", 0, fixedtilelayout, 0, 16 )  // chars 
+	GFXDECODE_ENTRY( "gfx2", 0, fixedtilelayout, 0, 16 )  // cards
+	GFXDECODE_ENTRY( "gfx3", 0, fixedtilelayout, 0, 16 )  // empty
+	GFXDECODE_ENTRY( "gfx4", 0, fixedtilelayout, 0, 16 )  // fruits & backcards
 GFXDECODE_END
 
 
@@ -5413,7 +5534,7 @@ void goldnpkr_state::goldnpkr_base(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::mux_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, (39 + 1) * 8, 0, 32 * 8, ((31 + 1) * 8) + 4, 0, 29 * 8); // from MC6845 parameters
 	m_screen->set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
 
@@ -5716,6 +5837,24 @@ void goldnpkr_state::gldnirq0(machine_config &config)
 }
 
 
+void goldnpkr_state::smb_be4k(machine_config &config)
+{
+	goldnpkr(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::smb_be4k_map);
+
+	// basic machine hardware
+	mc6845_device &crtc(MC6845(config.replace(), "crtc", CPU_CLOCK));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, smb_be4k)
+	m_gfxdecode->set_info(gfx_smb_be4k);
+}
+
+
 void lespendu_state::lespendu(machine_config &config)
 {
 	goldnpkr(config);
@@ -5849,7 +5988,7 @@ void blitz_state::megadpkr(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(blitz_state::mux_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, (37 + 1) * 8, 0, 32 * 8, (38 + 1) * 8, 0, 32 * 8); // from MC6845 parameters
 	m_screen->set_screen_update(FUNC(blitz_state::screen_update_goldnpkr));
 
@@ -6195,7 +6334,7 @@ ROM_END
    Original hardware, with tearoom*sara text hack.
 
    You can play 1-50 credits.
-   So the hackers removed the "PLAY 1 TO 50" string to put "TEAROOM*SARA" instead.
+   So the hackers removed the "PLAY 1 TO 50" string to put "TEAROOM*SARA" instead.
 */
 ROM_START( goldnpkh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -6646,7 +6785,7 @@ ROM_END
 
 /*
   Golden/Potten's Poker
-  1986 0415 VER 7.0 1987 06-03 BY PED.
+  1986 0415 VER 7.0 1987 06-03 BY PED.
 
   ICP-1 hardware with modifications.
   The first set has bookkeeping with DSW test.
@@ -14509,6 +14648,92 @@ ROM_START( unkdep )
 ROM_END
 
 
+/*
+  Super Mini-Boy
+  Model: BE-4000/SMB
+  Bonanza Enterprises, Ltd.
+  1994
+
+  4-games multigame with two play modes (points & turns).
+  Poker, Hi-Lo, Black Jack & Golden Ftuits.
+  PCB original from Bonanza Enterprises, Ltd.
+
+  To see the game instructions / how to play, see above at Games Notes section.
+
+*/
+ROM_START( smb_be4k )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "smb1-32_2764.14a", 0x8000, 0x2000, CRC(c152a7b1) SHA1(3f99857b4f927237cb4b4406722eb704f9cfe364) )
+	ROM_LOAD( "smb2-32_2764.13a", 0xa000, 0x2000, CRC(e332b724) SHA1(0257f46f75598f7ec2fa9d9455929d9eb13d3bf1) )
+	ROM_LOAD( "smb3-32_2764.11a", 0xc000, 0x2000, CRC(5aa84150) SHA1(734e9f8a752acd730261fd030428dd53d19a37f9) )
+	ROM_LOAD( "smb4-32_2764.10a", 0xe000, 0x2000, CRC(0a1b644a) SHA1(d85d94567fe0e1e66c35ea0914c4a13f80e737a7) )
+
+	ROM_REGION( 0x4000, "gfxpool", 0 )  // all mixed
+	ROM_LOAD( "smba1_2764.4a", 0x0000, 0x2000, CRC(4de28faa) SHA1(bf0b7bd3d1549c3173d3b01fbdb1df707d00d364) )
+	ROM_LOAD( "smb2_2732.3a",  0x2000, 0x1000, CRC(881d28ec) SHA1(463c0ea17cd167402ed134a91ca0105d7a12d5f5) )
+	ROM_LOAD( "smb3_2732.1a",  0x3000, 0x1000, CRC(f64647a5) SHA1(052d876de4fb1f1a4c308fb8c407a939ce57012e) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
+	ROM_FILL(            0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
+	ROM_COPY( "gfxpool", 0x0000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
+	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (data), bitplane 1
+	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (data), bitplane 2
+	ROM_COPY( "gfxpool", 0x0800, 0x1000, 0x0800 ) // src-dest-size (data), bitplane 3
+
+	ROM_REGION( 0x1800, "gfx3", 0 )  // empty
+	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x1000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x1000, 0x1000, 0x0800 ) // src-dest-size (empty)
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // backcards & fruits
+	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data), bitplane 1
+	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data), bitplane 2
+	ROM_COPY( "gfxpool", 0x1800, 0x1000, 0x0800 ) // src-dest-size (data), bitplane 3
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "smb_82s129.5d", 0x0080, 0x0080, CRC(d45e50ff) SHA1(c9fa48525f042721cc5ccf030431aa1121b32f00) )
+	ROM_CONTINUE(              0x0000, 0x0080)    // switching halves.
+ROM_END
+
+
+/*
+  Falcon Potten's Poker game
+  with CPU brick.
+
+  PCB silkscreened "KPK" with Falcon sticker.
+
+  Chars ROM is broken or bad dumped,
+  so the first half with the char data
+  is missing.
+
+  In the CPU brick there is a second DSW bank, but seems
+  unimplemented. There are no extra reads to support it.
+
+  The game is writting to PIA0, CA2 line constantly
+  Maybe some watchdog unimplemented circuitry?
+
+*/
+  ROM_START( potnpkrq )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "7.16a", 0x2000, 0x1000, CRC(29c647e6) SHA1(1a1c672474c0d4d76728794f661a94925ab245a1) )
+	ROM_LOAD( "8.17a", 0x3000, 0x1000, CRC(3a6e8ca4) SHA1(047edcc344fe97e47d785920d1b499d92febf81f) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(          0x0000, 0x2000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "1.4a",  0x2000, 0x1000, BAD_DUMP CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )    // char ROM
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "2.6a",  0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "3.7a",  0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )    // cards deck gfx, bitplane2
+	ROM_LOAD( "4.8a",  0x2000, 0x1000, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    // cards deck gfx, bitplane3
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "prom.bin",  0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+
 /*********************************************
 *                Driver Init                 *
 *********************************************/
@@ -14554,176 +14779,177 @@ ROM_END
 
 void goldnpkr_state::init_vkdlsa()
 {
-	// $e097-e098, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e097-e098, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe097] = 0xea;
 	ROM[0xe098] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlsb()
 {
-	// $e87b-e87c, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e87b-e87c, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe87b] = 0xea;
 	ROM[0xe87c] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlsc()
 {
-	// $453a-453b, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $453a-453b, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0x453a] = 0xea;
 	ROM[0x453b] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlsww()
 {
-	// $f2c9-f2ca, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $f2c9-f2ca, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xf2c9] = 0xea;
 	ROM[0xf2ca] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwa()
 {
-	// $df80-df81, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $df80-df81, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xdf80] = 0xea;
 	ROM[0xdf81] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwc()
 {
-	// $e42f-e430, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e42f-e430, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe42f] = 0xea;
 	ROM[0xe430] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwd()
 {
-	// $e442-e443, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e442-e443, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe442] = 0xea;
 	ROM[0xe443] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwh()
 {
-	// $e4d5-e4d6, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e4d5-e4d6, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe4d5] = 0xea;
 	ROM[0xe4d6] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwl()
 {
-	// $e87c-e87d, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e87c-e87d, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe87c] = 0xea;
 	ROM[0xe87d] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwo()
 {
-	// $e7d5-e7d6, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e7d5-e7d6, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe7d5] = 0xea;
 	ROM[0xe7d6] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwp()
 {
-	// $e7d9-e7da, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e7d9-e7da, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe7d9] = 0xea;
 	ROM[0xe7da] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwr()
 {
-	// $e7f7-e7f8, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e7f7-e7f8, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe7f7] = 0xea;
 	ROM[0xe7f8] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswws()
 {
-	// $e8a5-e8a6, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e8a5-e8a6, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe8a5] = 0xea;
 	ROM[0xe8a6] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwt()
 {
-	// $e955-e956, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e955-e956, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe955] = 0xea;
 	ROM[0xe956] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwu()
 {
-	// $ee6b-ee6c, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $ee6b-ee6c, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xee6b] = 0xea;
 	ROM[0xee6c] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwv()
 {
-	// $f052-f053, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $f052-f053, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xf052] = 0xea;
 	ROM[0xf053] = 0xea;
 }
@@ -15264,8 +15490,9 @@ GAMEL( 198?, potnpkrk,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init
 GAMEL( 198?, potnpkrl,  pottnpkr, pottnpkr, potnpkra, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (set 13, ICP-1 PCB)",    0,                layout_goldnpkr )  // unencrypted IPC-1 PCB.
 GAMEL( 1988, potnpkrm,  pottnpkr, pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 14, ICP-1 PCB)",    0,                layout_goldnpkr )  // unencrypted IPC-1 PCB.
 GAME ( 198?, potnpkrn,  pottnpkr, glfever,  glfever,  goldnpkr_state, init_glfev,    ROT0,   "bootleg (PED)",            "Jack Potten's Poker (set 15, w/fever, ICP-1 PCB)", 0 )
-GAMEL( 1987, potnpkro,  pottnpkr, goldnpkr, potnpkro, goldnpkr_state, empty_init,    ROT0,   "bootleg (PED)",            "Jack Potten's Poker (set 16, ICP-1 PCB)",    0,                layout_goldnpkr ) // ICP-1 with mods, 1986 0415 VER 7.0 1987 06-03 BY PED. (wires hack)
-GAMEL( 1987, potnpkrp,  pottnpkr, goldnpkr, potnpkro, goldnpkr_state, empty_init,    ROT0,   "bootleg (PED)",            "Jack Potten's Poker (set 17, ICP-1 PCB)",    0,                layout_goldnpkr ) // ICP-1 with mods, 1986 0415 VER 7.0 1987 06-03 BY PED. (PROM mod)
+GAMEL( 1987, potnpkro,  pottnpkr, goldnpkr, potnpkro, goldnpkr_state, empty_init,    ROT0,   "bootleg (PED)",            "Jack Potten's Poker (set 16, ICP-1 PCB)",    0,                layout_goldnpkr ) // ICP-1 with mods, 1986 0415 VER 7.0 1987 06-03 BY PED. (wires hack)
+GAMEL( 1987, potnpkrp,  pottnpkr, goldnpkr, potnpkro, goldnpkr_state, empty_init,    ROT0,   "bootleg (PED)",            "Jack Potten's Poker (set 17, ICP-1 PCB)",    0,                layout_goldnpkr ) // ICP-1 with mods, 1986 0415 VER 7.0 1987 06-03 BY PED. (PROM mod)
+GAMEL( 198?, potnpkrq,  0,        pottnpkr, pottnpkr, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Jack Potten's Poker (set 18, Falcon CPU brick)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_goldnpkr )
 GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngoldb,    pottnpkr, pottnpkr, ngoldb,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",         0,                layout_goldnpkr )
@@ -15486,3 +15713,13 @@ GAME(  1990, maxidpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init
 
 GAME(  1989, olym65wc,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_olym65,   ROT0,   "Olympic Video Gaming PTY LTD", "Wild Card (Olympic Games, v2.0)",                              MACHINE_NOT_WORKING )
 GAME(  1989, olym65bj,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_olym65,   ROT0,   "Olympic Video Gaming PTY LTD", "Black Jack (Olympic Games, v5.04, upgrade kit for Wild Card)", MACHINE_NOT_WORKING )
+
+
+/*************************************** MULTIGAMES ***************************************/
+
+//     YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT         ROT      COMPANY                     FULLNAME                       FLAGS  LAYOUT  
+GAMEL( 1984, smb_be4k,  0,        smb_be4k,  smb_be4k, goldnpkr_state, empty_init,  ROT0,   "Bonanza Enterprises, Ltd", "Super Mini-Boy (BE-4000/SMB)", 0,     layout_smb_be4k )
+
+
+/*************************************** OTHER/UNCLASSIFIED ***************************************/
+

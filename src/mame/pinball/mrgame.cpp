@@ -701,7 +701,7 @@ void mrgame_state::mrgame(machine_config &config)
 	//watchdog.set_vblank_count("screen", 8);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 8, 248); // If you align with X on test screen some info is chopped off
 	screen.set_screen_update(FUNC(mrgame_state::screen_update_mrgame));
 	screen.set_palette(m_palette);

@@ -274,7 +274,7 @@ void apogee_state::apogee(machine_config &config)
 	i8275.drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 	screen.set_refresh_hz(50);
 	screen.set_size(78*6, 30*10);

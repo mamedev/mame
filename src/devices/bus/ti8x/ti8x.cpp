@@ -8,7 +8,6 @@
 #define LOG_BYTEPROTO   (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_BITPROTO | LOG_BYTEPROTO)
-#define LOG_OUTPUT_FUNC device().logerror
 #include "logmacro.h"
 
 #define LOGBITPROTO(...)    LOGMASKED(LOG_BITPROTO,  __VA_ARGS__)

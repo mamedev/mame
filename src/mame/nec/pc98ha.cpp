@@ -553,7 +553,7 @@ void pc98lt_state::lt_config(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, m_fdc_irqs).output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
 
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	// TODO: copied verbatim from base PC98, verify clock et al.
 	m_screen->set_raw(21.0526_MHz_XTAL, 848, 0, 640, 440, 0, 400);
 	m_screen->set_screen_update(FUNC(pc98lt_state::screen_update));

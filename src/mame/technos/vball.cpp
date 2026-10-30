@@ -630,7 +630,7 @@ void vball_state::vball(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &vball_state::sound_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 8, 248);   // based on ddragon driver
 	m_screen->set_screen_update(FUNC(vball_state::screen_update));

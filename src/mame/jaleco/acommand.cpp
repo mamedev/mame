@@ -499,7 +499,7 @@ void acommand_state::acommand(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &acommand_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(acommand_state::scanline_cb), "screen", 0, 1);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// assume same as armchmp2
 	screen.set_raw(XTAL(12'000'000)/2,396,0,256,256,16,240);
 	screen.set_screen_update(FUNC(acommand_state::screen_update));

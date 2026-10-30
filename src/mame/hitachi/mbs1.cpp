@@ -344,3 +344,4 @@ ROM_END
 
 
 COMP( 1984, mbs1,    0,     0,      mbs1,    mbs1,  mbs1_state,    empty_init, "Hitachi", "MB-S1", MACHINE_NOT_WORKING )
+// インターフィールドシステムズ	来夢来人, S1 compatible

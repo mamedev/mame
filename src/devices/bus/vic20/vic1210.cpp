@@ -42,36 +42,20 @@ vic1210_device::vic1210_device(const machine_config &mconfig, const char *tag, d
 
 void vic1210_device::device_start()
 {
+	m_slot->ram1().install_ram(0x000, 0x3ff, &m_ram[0x000]);
+	m_slot->ram2().install_ram(0x000, 0x3ff, &m_ram[0x400]);
+	m_slot->ram3().install_ram(0x000, 0x3ff, &m_ram[0x800]);
 }
 
 
 //-------------------------------------------------
-//  vic20_cd_r - cartridge data read
+//  device_reset - device-specific reset
 //-------------------------------------------------
 
-uint8_t vic1210_device::vic20_cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+void vic1210_device::device_reset()
 {
-	if (!ram1 || !ram2 || !ram3)
-	{
-		data = m_ram[offset & 0xbff];
-	}
-	else if (!blk5 && m_blk5)
-	{
-		data = m_blk5[offset & 0xfff];
-	}
+	memory_region *const blk5 = m_slot->memregion("blk5");
 
-	return data;
-}
-
-
-//-------------------------------------------------
-//  vic20_cd_w - cartridge data write
-//-------------------------------------------------
-
-void vic1210_device::vic20_cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
-{
-	if (!ram1 || !ram2 || !ram3)
-	{
-		m_ram[offset & 0xbff] = data;
-	}
+	if (blk5)
+		m_slot->blk5().install_rom(0x0000, 0x0fff, 0x1000, blk5->base());
 }

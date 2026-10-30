@@ -61,7 +61,7 @@ GFXDECODE_END
 void airraid_video_device::device_add_mconfig(machine_config &config)
 {
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);
@@ -174,11 +174,11 @@ void airraid_video_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &c
 
 void airraid_video_device::mix_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* clut, int base)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t *const dest = &bitmap.pix(y);
 		uint16_t const *const src = &m_temp_bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint8_t pix = src[x] & 0xff;
 			uint8_t real = clut[pix];

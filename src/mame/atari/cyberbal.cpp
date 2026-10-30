@@ -755,7 +755,7 @@ void cyberbal_state::cyberbal(machine_config &config)
 	m_mob2->set_config(cyberbal_state::s_mob_config);
 	m_mob2->set_gfxdecode("gfxdecode");
 
-	SCREEN(config, m_lscreen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_lscreen);
 	m_lscreen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived
 	// the board uses an SOS-2 chip to generate video signals
@@ -764,7 +764,7 @@ void cyberbal_state::cyberbal(machine_config &config)
 	m_lscreen->set_palette("lpalette");
 	m_lscreen->screen_vblank().set(FUNC(cyberbal_state::video_int_write_line)); // or is it "right?" har, har!
 
-	SCREEN(config, m_rscreen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_rscreen);
 	m_rscreen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived
 	// the board uses an SOS-2 chip to generate video signals
@@ -817,7 +817,7 @@ void cyberbal2p_state::cyberbal2p(machine_config &config)
 	m_mob->set_config(cyberbal2p_state::s_mob_config);
 	m_mob->set_gfxdecode("gfxdecode");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived
 	// the board uses an SOS-2 chip to generate video signals

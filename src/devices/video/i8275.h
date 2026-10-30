@@ -229,6 +229,7 @@ protected:
 	int m_dma_idx;
 	uint8_t m_dma_last_char;
 	int m_buffer_dma;
+	attotime m_drq_time;
 
 	int m_lpen;
 

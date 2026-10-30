@@ -508,7 +508,7 @@ void xain_state::xsleena(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 272, 8, 248);   // based on ddragon driver
 	m_screen->set_screen_update(FUNC(xain_state::screen_update));
 	m_screen->set_palette(m_palette);

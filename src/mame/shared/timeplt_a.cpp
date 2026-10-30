@@ -16,6 +16,7 @@
 #include "timeplt_a.h"
 
 #include "machine/gen_latch.h"
+#include "sound.h"
 #include "speaker.h"
 
 

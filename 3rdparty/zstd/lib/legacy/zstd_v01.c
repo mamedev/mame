@@ -14,6 +14,7 @@
 ******************************************/
 #include <stddef.h>    /* size_t, ptrdiff_t */
 #include "zstd_v01.h"
+#include "../common/compiler.h"
 #include "../common/error_private.h"
 
 
@@ -1382,7 +1383,7 @@ typedef struct {
     BYTE* matchLength;
     BYTE* dumpsStart;
     BYTE* dumps;
-} seqStore_t;
+} SeqStore_t;
 
 
 typedef struct ZSTD_Cctx_s
@@ -1390,7 +1391,7 @@ typedef struct ZSTD_Cctx_s
     const BYTE* base;
     U32 current;
     U32 nextUpdate;
-    seqStore_t seqStore;
+    SeqStore_t seqStore;
 #ifdef __AVX2__
     __m256i hashTable[HASH_TABLESIZE>>3];
 #else
@@ -2118,6 +2119,7 @@ size_t ZSTDv01_decompressContinue(ZSTDv01_Dctx* dctx, void* dst, size_t maxDstSi
         }
         ctx->phase = 1;
         ctx->expected = ZSTD_blockHeaderSize;
+        if (ZSTDv01_isError(rSize)) return rSize;
         ctx->previousDstEnd = (void*)( ((char*)dst) + rSize);
         return rSize;
     }

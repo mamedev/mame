@@ -230,7 +230,7 @@ void nss_tvinterface_device::device_add_mconfig(machine_config &config)
 	m_maincpu->out_p2_cb().set(FUNC(nss_tvinterface_device::p2_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(14.318181_MHz_XTAL/2, 472, 0, 320, 260, 0, 200);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 

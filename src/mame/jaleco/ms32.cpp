@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood,Paul Priest
+// copyright-holders:David Haywood,Paul Priest, Andrea Bogazzi
 /* Jaleco MegaSystem 32 (Preliminary Driver)
 
  - hardware tests are needed to establish how the mixing really works (and interrupt source etc.)
@@ -125,8 +125,7 @@ gratia: the 3d sky seems to be the only place needed the "wrap" parameter to dra
 gratia: at the beginning of the game, before the sky appears, the city background appears for
     an instant. Missing layer enable register?
 
-background color: pen 0 is correct for gametngk, but wrong for f1superb. Maybe it depends on the layer
-    priority order?
+background color: pen 0 is correct for gametngk. Maybe it depends on the layer priority order?
 
 roz layer wrapping: currently it's always ON, breaking places where it gets very small so it gets
     repeated on the screen (p47aces, kirarast, bbbxing, gametngk need it OFF).
@@ -136,13 +135,10 @@ there are sprite lag issues - sprites should be framebuffered
 
 missing clipping window effect in gametngk intro
 
-
-Not Working Games
------------------
-
-f1superb - the road is always rendered as straight.
-         - the game has a road layer and extra ROMs for it
-         - there is an unknown maths DSP for protection
+f1superb - network link not emulated (MCU on the F1-93159 I/O board is not dumped)
+         - steering shock and seat motor outputs not hooked up
+         - priority RAM output bits 1-0 ignored, "effect" outputs drawn at half brightness
+         - math coprocessor unidentified and clock unknown
 
 Jaleco Megasystem 32 Game List - thanks to Yasuhiro
 ---------------------------------------------------
@@ -687,41 +683,31 @@ void ms32_state::ms32_map(address_map &map)
 }
 
 
-/* F1 Super Battle has an extra linemap for the road, and am unknown maths chip (mcu?) handling perspective calculations for the road / corners etc. */
-/* it should use its own memory map */
+/* F1 Super Battle per-line road plane (F1-93158 board, gfx5 textures): tile row and colour per line at fdc00000,
+   line scroll/zoom at fde00000, control at fce00800 */
 
-void ms32_f1superbattle_state::road_vram_w16(offs_t offset, u16 data, u16 mem_mask)
+void f1superb_state::road_vram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_road_vram[offset]);
 	m_extra_tilemap->mark_tile_dirty(offset / 2);
 }
 
-u16 ms32_f1superbattle_state::road_vram_r16(offs_t offset)
+u16 f1superb_state::road_vram_r16(offs_t offset)
 {
 	return m_road_vram[offset];
 }
 
-void ms32_f1superbattle_state::ms32_irq2_guess_w(u32 data)
-{
-	irq_raise(2, true);
-}
-
-void ms32_f1superbattle_state::ms32_irq5_guess_w(u32 data)
-{
-	irq_raise(5, true);
-}
-
-u32 ms32_f1superbattle_state::analog_r()
+u32 f1superb_state::analog_r()
 {
 	int a,b,c,d;
 	a = m_io_analog[2]->read(); // unused?
 	b = m_io_analog[2]->read(); // unused?
 	c = m_io_analog[1]->read();
-	d = (m_io_analog[0]->read() - 0xb0) & 0xff;
+	d = m_io_analog[0]->read();
 	return a << 24 | b << 16 | c << 8 | d << 0;
 }
 
-void ms32_f1superbattle_state::f1superb_map(address_map &map)
+void f1superb_state::f1superb_map(address_map &map)
 {
 	ms32_map(map);
 
@@ -731,134 +717,74 @@ void ms32_f1superbattle_state::f1superb_map(address_map &map)
 	// irq 11 is cleared to port $1e (irq_ack_w) in sysctrl.
 	map(0xfd0c0000, 0xfd0c0fff).ram();
 	map(0xfd0d0000, 0xfd0d0003).portr("DSW2"); // MB-93159
-	map(0xfd0e0000, 0xfd0e0003).r(FUNC(ms32_f1superbattle_state::analog_r)).nopw(); // writes 7-led seg at very least
+	map(0xfd0e0000, 0xfd0e0003).r(FUNC(f1superb_state::analog_r)).nopw(); // writes 7-led seg at very least
 
-	map(0xfce00800, 0xfce0085f).ram(); // ROZ0 control register (mirrored from 0x400?)
+	map(0xfce00800, 0xfce0085f).ram().share(m_road_ctrl);
 
-	/* these two are almost certainly wrong, they just let you see what
-	   happens if you generate the FPU ints without breaking other games */
-//  map(0xfce00e00, 0xfce00e03).w(FUNC(ms32_f1superbattle_state::ms32_irq5_guess_w));
-	// bit 1: steering shock
-	// bit 0: seat motor
-//  map(0xfd0f0000, 0xfd0f0003).w(FUNC(ms32_f1superbattle_state::ms32_irq2_guess_w));
+	map(0xfd0f0000, 0xfd0f0003).nopw(); // bit 1: steering shock, bit 0: seat motor
 
-	// Note: it is unknown how COPRO irqs actually acks,
-	// most likely candidate is a 0x06 ping at both $fd1024c8 / $fd1424c8
-	// irq_2: 0xffe00878 (really unused)
-	// irq_5: 0xffe008ac
-	// irq_7: 0xffe008ea (basically identical to irq_5)
-	// COPRO 1
-	map(0xfd100000, 0xfd103fff).ram(); // used when you start enabling fpu ints
-	map(0xfd104000, 0xfd105fff).ram(); // uploads data here
-
-	// COPRO 2
-	map(0xfd140000, 0xfd143fff).ram(); // used when you start enabling fpu ints
-	map(0xfd144000, 0xfd145fff).ram(); // same data here
+	map(0xfd100000, 0xfd105fff).m(m_fpu[0], FUNC(jaleco_fpu_device::host_map));
+	map(0xfd140000, 0xfd145fff).m(m_fpu[1], FUNC(jaleco_fpu_device::host_map));
 //  map(0xfd440000, 0xfd47ffff).ram(); // color?
 
-	map(0xfdc00000, 0xfdc1ffff).rw(FUNC(ms32_f1superbattle_state::road_vram_r16), FUNC(ms32_f1superbattle_state::road_vram_w16)).umask32(0x0000ffff);
-	map(0xfde00000, 0xfde1ffff).ram(); // scroll info for lineram?
+	map(0xfdc00000, 0xfdc1ffff).rw(FUNC(f1superb_state::road_vram_r16), FUNC(f1superb_state::road_vram_w16)).umask32(0x0000ffff);
+	map(0xfde00000, 0xfde1ffff).lrw16(
+			NAME([this] (offs_t offset) { return m_road_lineram[offset]; }),
+			NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_road_lineram[offset]); })).umask32(0x0000ffff);
 //  map(0xfe202000, 0xfe2fffff).ram(); // vram?
 }
 
-/* F1 Super Battle speculation from nuapete
+void f1superb_state::f1superb_field_irq_w(int state)
+{
+	if (state && !std::equal(m_txram_latch.begin(), m_txram_latch.end(), &m_txram[0]))
+	{
+		std::copy_n(&m_txram[0], m_txram_latch.size(), m_txram_latch.begin());
+		tx_tilemap()->mark_all_dirty();
+	}
+	field_irq_w(state);
+}
 
-Hi David,
+void f1superb_state::fpu0_irq_w(int state)
+{
+	irq_raise(5, state);
+}
 
-I had a first look at f1superb, this is what I found so far.
+void f1superb_state::fpu1_irq_w(int state)
+{
+	irq_raise(2, state);
+}
 
-The sprite RAM is updated in a few places, but taking one of the
-sprite RAM updating routines at 0xFFE47B6F which is used to draw stuff
-that should move around, I see that the information is copied from
-buffers with these bases:
-FEE11000 = x position data
-FEE11100 = y position data
-FEE11200 = priority etc data
+/* F1 Super Battle hardware notes
 
-You already spotted that loop at FFE19D1C that fills the "y position"
-buffer from an array of static values. The buffers are refilled again
-by the routine at 0xFFE17581. You can see that the data is sourced
-from another buffer at 0xFD100000 (currently not mapped in the driver,
-but I mapped it in for testing...)
+Coprocessor instruction set, road display and priority RAM mixing reverse engineered by Andrea Bogazzi.
 
-If you backtrace that call, it comes from irq 5 and 7. (They have
-identical ISR code) so I tried adding in a trigger for irq 7. Now the
-values are populated, and stuff moves, but everything moves way too
-much, it's all over the place, eventually the car zooms off up into
-the sky. It gets clearer as you map less and less of the RAM at
-0xFD100000. With just 1K or so mapped, you can see the buildings in
-the background veer about in quite a promising manner. (The patch you
-put in loses effect with irq 5 or 7 hooked up, because they repopulate
-the Y coords too.)
+Extra boards on top of the MS32 motherboard and ROM cart:
+- F1-93158 (EB93007-20095): road plane graphics ROMs (MR93007-xx, gfx5), one custom QFP (marking unread)
+- F1-93159 (EB93007-20096): I/O and network board, DSW2, JALECO SS91022-06,
+  undumped 40-pin MCU "MO-93007 Ver1.0" with a 12 MHz crystal
 
-I took a closer look at the interrupts. Handily enough they left some
-strings in the ROM with names for each interrupt  :)  They aren't quite
-in the order of the interrupts, but I matched the unreferenced strings
-up to the valid interrupts as well as I could and then tried to
-confirm them by looking at the code. The ROM string is in quotes.
+Two identical math coprocessors (jalfpu) at fd100000 / fd140000. The V70 uploads the same
+program to both, loads track data into their RAM and runs routines in sequence:
+track point interpolation, rotation, perspective, then road raster (per-scanline x offset,
+texture row, zoom, crest segment). Results are copied to FEE11000 (x), FEE11100 (y),
+FEE11200 (sprite priority) and to the road planes.
 
-FFE00DE8  ; irq_0  probably "1msec interrupt"
-FFE00DF4  ; irq_1  "sound cpu interrupt"
-FFE00878  ; irq_2  probably "fpu 1-1 interrupt"
-FFE00884  ; irq_3  unused and labeled "fpu 0-1 interrupt"
-FFE00898  ; irq_4  unused and labeled "fpu 1-0 interrupt"
-FFE008AC  ; irq_5  probably "fpu 0-0 interrupt", x coords (and y) populated from here
-FFE008D0  ; irq_6  unused and labeled "option 2 interrupt"
-FFE008E4  ; irq_7  same as 5 - probably "option 1 interrupt"
-FFE01034  ; irq_9  VBL at 60Hz this would be "16msec interrupt"
-FFE01094  ; irq_10 loads of processing in the 0xfc000000 area : must be "32msec interrupt"
-FFE00E14  ; irq_11 "communication interrupt"
+Road display: each road scanline is written to both the standard ROZ layer (road surface,
+panoramas) and the road plane (ground, sky). Colour bits 6-4 of each line hold a depth
+(crest segment) that feeds the low bits of the priority RAM index.
 
-irq_0 is sort of confirmed by the "hayaosi2 needs at least 12 IRQ
-0..." comment. irq_1 I see is already known. irq_9 is known, irq_10 I
-tried halving the frequency it runs at, no effect. irq_11 can be
-pretty much confirmed as comms by the code there and the use of
-MOVT/MOVZ to i/o with 16 bit device based at FEE00000, so that leaves
-the ones that do the sprite info loading, this is where it starts to
-look less promising  :(
-
-Between irqs 2,3,4,5,7 the only unused strings in the ROM are the four "fpu
-* interrupt" and the "option 1".
-Irqs 2,5,7 all do "or.w    #6, FD1424C8[PC]" ,so they are all probably
-"fpu * interrupt".
-
-I'm thinking that the stuff is dumped in that RAM at 0xFD100000 that's
-not used by other games and then some FPU operation is carried out on it
-before it's grabbed by the sprite copy code. The "option" stuff, may be
-they tried a few different ways to work out the sprite coords? There's
-one more interesting string at 0xFFE481FC referenced from unused code
-at 0xFFE47FBC. It looks like debugging dump of sprite coordinate and
-angle information.
-
-I had a scout around for photos or anything of the PCB to see if there
-is some sort of DSP or FPU on it, but I can't find anything useful. I
-suspect it's not a generic MegaSystem 32 PCB, going by the extra
-stuff, and also the IRQ 5/7 breaks the other games. I see a vanilla
-one for sale, but I'd guess there's no point me picking it up for a
-closer look because it won't have whatever the extras are.
-
-I'll keep looking a bit more, but I think that 0xFD100000 buffer is
-processed by something external that triggers irq 5 or 7 when it's
-done. I might see something obvious by looking at the values in
-fact... I'd be interested to know what you think, or if there's any
-chance of finding out if there's stuff like dual port RAM or something
-that might qualify as a FPU?
-
-
-Hi David,
-
-On the f1superb stuff, I've traced the sprite elements right back to
-the arrays for each race track in ROM that they are sourced from. The
-only processing they get is in that "fpu" interrupt. I've figured out
-the structure of the "fpu" device, it uses two arrays of static info
-loaded from the ROM at boot, two identical sets of registers, and 4
-banks of volatile data read in every frame or so from the ROM race
-track arrays (although it looks like one was not used in the end).
-There's a sequence of four operations involving the "fpu" carried out
-to prepare the info which then gets copied back to RAM and then to
-sprite RAM. I'll capture the relevant info and see if I can figure out
-what the operations might be, my maths isn't up to much though...
-
+IRQ vectors and names matched to strings in the V70 ROM by nuapete:
+FFE00DE8  irq_0   probably "1msec interrupt"
+FFE00DF4  irq_1   "sound cpu interrupt"
+FFE00878  irq_2   probably "fpu 1-1 interrupt" (coprocessor 1)
+FFE00884  irq_3   unused, labeled "fpu 0-1 interrupt"
+FFE00898  irq_4   unused, labeled "fpu 1-0 interrupt"
+FFE008AC  irq_5   probably "fpu 0-0 interrupt" (coprocessor 0)
+FFE008D0  irq_6   unused, labeled "option 2 interrupt"
+FFE008E4  irq_7   same handler as irq_5, probably "option 1 interrupt"
+FFE01034  irq_9   30 Hz field, "32msec interrupt"
+FFE01094  irq_10  probably "16msec interrupt"
+FFE00E14  irq_11  "communication interrupt"
 */
 
 
@@ -1456,7 +1382,7 @@ static INPUT_PORTS_START( f1superb )
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Shift") PORT_TOGGLE
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Brake")
 	PORT_BIT( 0x0000fffc, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00c00000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x00000001, 0x00000001, "Credit Counter" ) PORT_DIPLOCATION("SW2:8")
@@ -1482,11 +1408,11 @@ static INPUT_PORTS_START( f1superb )
 	PORT_DIPSETTING(          0x0040, "Europe" )
 	PORT_DIPSETTING(          0x00c0, DEF_STR( Japan ) )
 	PORT_DIPUNUSED_DIPLOC( 0x00000100, 0x00000100, "SW1:8" )
-	PORT_DIPUNUSED_DIPLOC( 0x00000200, 0x00000200, "SW1:7" )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("AN0")   // Acceleration
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	// pot rests at 0x50 and decreases when pressed: the game stores the rest value at boot and computes throttle as rest - current (same scheme as f1gpstar in cischeat.cpp)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0,0x50) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_REVERSE
 
 	PORT_START("AN1")   // Steering
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
@@ -1545,10 +1471,10 @@ static GFXDECODE_START( gfx_ms32 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_f1superb )
-	GFXDECODE_ENTRY( "roztiles", 0, gfx_16x16x8_raw, 0x2000, 0x10 )
+	GFXDECODE_ENTRY( "roztiles", 0, f1layout,        0x2000, 0x10 )
 	GFXDECODE_ENTRY( "bgtiles",  0, gfx_16x16x8_raw, 0x1000, 0x10 )
 	GFXDECODE_ENTRY( "txtiles",  0, gfx_8x8x8_raw,   0x6000, 0x10 )
-	GFXDECODE_ENTRY( "gfx5",     0, f1layout,        0x0000, 0x80 ) // not tilemap data?
+	GFXDECODE_ENTRY( "gfx5",     0, f1layout,        0x0000, 0x80 )
 GFXDECODE_END
 
 
@@ -1720,7 +1646,7 @@ void ms32_state::ms32(machine_config &config)
 	m_sysctrl->sound_reset_cb().set(FUNC(ms32_state::sound_reset_line_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// dot clock is 48/8 MHz, settable with /6 thru system register [0]
 	m_screen->set_raw(XTAL(48'000'000) / 8, 384, 0, 320, 263, 0, 224); // default CRTC setup
 	m_screen->set_screen_update(FUNC(ms32_state::screen_update));
@@ -1754,10 +1680,19 @@ void ms32_state::ms32_invert_lines(machine_config &config)
 	m_sysctrl->set_invert_vblank_lines(true);
 }
 
-void ms32_f1superbattle_state::f1superb(machine_config &config)
+void f1superb_state::f1superb(machine_config &config)
 {
 	ms32(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_f1superbattle_state::f1superb_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &f1superb_state::f1superb_map);
+
+	m_sysctrl->set_field_irq_last_active_line(true);
+	m_sysctrl->field_cb().set(FUNC(f1superb_state::f1superb_field_irq_w));
+
+	JALECO_FPU(config, m_fpu[0], XTAL(48'000'000) / 8); // clock unknown, guessed
+	m_fpu[0]->irq_cb().set(FUNC(f1superb_state::fpu0_irq_w));
+
+	JALECO_FPU(config, m_fpu[1], XTAL(48'000'000) / 8);
+	m_fpu[1]->irq_cb().set(FUNC(f1superb_state::fpu1_irq_w));
 
 	m_gfxdecode->set_info(gfx_f1superb);
 }
@@ -2711,14 +2646,8 @@ void ms32_state::init_ss92048_01()
 	decrypt_ms32_bg(machine(), 0x20400,0xd4, "bgtiles");
 }
 
-void ms32_f1superbattle_state::init_f1superb()
+void f1superb_state::init_f1superb()
 {
-#if 0
-	// hack for ?, game needs FPUs emulated anyway, eventually remove me
-	u32 *pROM = (u32 *)memregion("maincpu")->base();
-	pROM[0x19d04/4]=0x167a021a; // bne->br  : sprite Y offset table is always copied to RAM
-	// the x offsets are never copied either ...
-#endif
 	init_ss92046_01();
 }
 
@@ -2727,26 +2656,25 @@ void ms32_f1superbattle_state::init_f1superb()
 
 
 // TODO: inputs in akiss, bnstars (former has no dip display in service mode)
-GAME( 1994, hayaosi2,  0,        ms32,              hayaosi2, ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Grand Champion Taikai", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, hayaosi3,  0,        ms32,              hayaosi3, ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.5)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, hayaosi3a, hayaosi3, ms32,              hayaosi3, ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.2)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, bbbxing,   0,        ms32,              bbbxing,  ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "Best Bout Boxing (ver 1.3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
-GAME( 1994, suchie2,   0,        ms32,              suchie2,  ms32_state,               init_ss92048_01, ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, suchie2o,  suchie2,  ms32,              suchie2,  ms32_state,               init_ss92048_01, ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, desertwr,  0,        ms32,              desertwr, ms32_state,               init_ss91022_10, ROT270, "Jaleco",        "Desert War / Wangan Sensou (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, gametngk,  0,        ms32,              gametngk, ms32_state,               init_ss91022_10, ROT270, "Jaleco",        "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, tetrisp,   0,        ms32,              tetrisp,  ms32_state,               init_ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, p47aces,   0,        ms32,              p47aces,  ms32_state,               init_ss92048_01, ROT0,   "Jaleco",        "P-47 Aces (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, p47acesa,  p47aces,  ms32,              p47aces,  ms32_state,               init_ss92048_01, ROT0,   "Jaleco",        "P-47 Aces (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, akiss,     0,        ms32,              suchie2,  ms32_state,               init_ss92047_01, ROT0,   "Jaleco",        "Mahjong Angel Kiss (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, akissa,    akiss,    ms32,              suchie2,  ms32_state,               init_ss92048_01, ROT0,   "Jaleco",        "Mahjong Angel Kiss (ver 1.0, 92048-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, gratia,    0,        ms32,              gratia,   ms32_state,               init_ss92047_01, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, gratiaa,   gratia,   ms32,              gratia,   ms32_state,               init_ss91022_10, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, kirarast,  0,        ms32,              kirarast, ms32_state,               init_ss92047_01, ROT0,   "Jaleco",        "Ryuusei Janshi Kirara Star (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, kirarasta, kirarast, ms32,              kirarast, ms32_state,               init_ss91022_10, ROT0,   "Jaleco",        "Ryuusei Janshi Kirara Star (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tp2m32,    tetrisp2, ms32_invert_lines, tp2m32,   ms32_state,               init_ss91022_10, ROT0,   "Jaleco",        "Tetris Plus 2 (ver 1.0, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, bnstars,   bnstars1, ms32,              suchie2,  ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "Vs. Janshi Brandnew Stars (Ver 1.1, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, wpksocv2,  0,        ms32_invert_lines, wpksocv2, ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, hayaosi2,  0,        ms32,              hayaosi2, ms32_state,     init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Grand Champion Taikai", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, hayaosi3,  0,        ms32,              hayaosi3, ms32_state,     init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.5)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, hayaosi3a, hayaosi3, ms32,              hayaosi3, ms32_state,     init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.2)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, bbbxing,   0,        ms32,              bbbxing,  ms32_state,     init_ss92046_01, ROT0,   "Jaleco",        "Best Bout Boxing (ver 1.3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1994, suchie2,   0,        ms32,              suchie2,  ms32_state,     init_ss92048_01, ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, suchie2o,  suchie2,  ms32,              suchie2,  ms32_state,     init_ss92048_01, ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, desertwr,  0,        ms32,              desertwr, ms32_state,     init_ss91022_10, ROT270, "Jaleco",        "Desert War / Wangan Sensou (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gametngk,  0,        ms32,              gametngk, ms32_state,     init_ss91022_10, ROT270, "Jaleco",        "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, tetrisp,   0,        ms32,              tetrisp,  ms32_state,     init_ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, p47aces,   0,        ms32,              p47aces,  ms32_state,     init_ss92048_01, ROT0,   "Jaleco",        "P-47 Aces (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, p47acesa,  p47aces,  ms32,              p47aces,  ms32_state,     init_ss92048_01, ROT0,   "Jaleco",        "P-47 Aces (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, akiss,     0,        ms32,              suchie2,  ms32_state,     init_ss92047_01, ROT0,   "Jaleco",        "Mahjong Angel Kiss (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, akissa,    akiss,    ms32,              suchie2,  ms32_state,     init_ss92048_01, ROT0,   "Jaleco",        "Mahjong Angel Kiss (ver 1.0, 92048-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, gratia,    0,        ms32,              gratia,   ms32_state,     init_ss92047_01, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, gratiaa,   gratia,   ms32,              gratia,   ms32_state,     init_ss91022_10, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kirarast,  0,        ms32,              kirarast, ms32_state,     init_ss92047_01, ROT0,   "Jaleco",        "Ryuusei Janshi Kirara Star (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kirarasta, kirarast, ms32,              kirarast, ms32_state,     init_ss91022_10, ROT0,   "Jaleco",        "Ryuusei Janshi Kirara Star (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tp2m32,    tetrisp2, ms32_invert_lines, tp2m32,   ms32_state,     init_ss91022_10, ROT0,   "Jaleco",        "Tetris Plus 2 (ver 1.0, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, bnstars,   bnstars1, ms32,              suchie2,  ms32_state,     init_ss92046_01, ROT0,   "Jaleco",        "Vs. Janshi Brandnew Stars (Ver 1.1, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, wpksocv2,  0,        ms32_invert_lines, wpksocv2, ms32_state,     init_ss92046_01, ROT0,   "Jaleco",        "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-/* these boot and show something */
-GAMEL(1994, f1superb,  0,        f1superb,          f1superb, ms32_f1superbattle_state, init_f1superb,   ROT0,   "Jaleco",        "F-1 Super Battle", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_f1superb )
+GAMEL(1994, f1superb,  0,        f1superb,          f1superb, f1superb_state, init_f1superb,   ROT0,   "Jaleco",        "F-1 Super Battle", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_f1superb )

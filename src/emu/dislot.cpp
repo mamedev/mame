@@ -162,9 +162,13 @@ get_default_card_software_hook::get_default_card_software_hook(std::string const
 	if (!path.empty())
 	{
 		std::string revised_path;
-		util::zippath_fopen(path, OPEN_FLAG_READ, m_image_file, revised_path);
-		if (m_image_file)
+		util::core_file::ptr f;
+		util::zippath_fopen(path, OPEN_FLAG_READ, f, revised_path);
+		if (f)
+		{
+			m_image_file = std::move(f);
 			m_file_type = core_filename_extract_extension(revised_path, true);
+		}
 	}
 }
 

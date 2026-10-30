@@ -754,7 +754,7 @@ void mtu130_state::mtu130(machine_config &config)
 	m_maincpu->set_address_width(18, true);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mtu130_state::map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// HSync is between 40 and 79, VSync between 256 and 259, boundaries included
 	m_screen->set_raw(10_MHz_XTAL, 620, 120, 600, 269, 0, 256);
 	m_screen->set_screen_update(FUNC(mtu130_state::screen_update));

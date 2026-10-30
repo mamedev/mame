@@ -65,22 +65,22 @@ public:
 	/* CPU status codes */
 	enum
 	{
-		ST_INTERNAL = 0,	/* internal operation */
-		ST_MEM_REFRESH,		/* memory refresh */
-		ST_REF_IO,			/* I/O reference */
-		ST_REF_SIO,			/* special I/O reference */
-		ST_SEGT_ACK,		/* segment trap acknowledge */
-		ST_NMI_ACK,			/* nonmaskable interrupt acknowledge */
-		ST_NVI_ACK,			/* nonvectored interrupt acknowledge */
-		ST_VI_ACK,			/* vectored interrupt acknowledge */
-		ST_REQ_DATA,		/* data memory request */
-		ST_REQ_STACK,		/* stack memory request */
-		ST_EREQ_DATA,		/* data memory request (EPU) */
-		ST_EREQ_STACK,		/* stack memory request (EPU) */
-		ST_IFETCH_N,		/* instruction fetch, nth word */
-		ST_IFETCH_1,		/* instruction fetch, first word */
-		ST_EPU_TRF,			/* extension processor transfer */
-		ST_BUS_LOCK			/* bus lock, data memory request (not used) */
+		ST_INTERNAL = 0,    /* internal operation */
+		ST_MEM_REFRESH,     /* memory refresh */
+		ST_REF_IO,          /* I/O reference */
+		ST_REF_SIO,         /* special I/O reference */
+		ST_SEGT_ACK,        /* segment trap acknowledge */
+		ST_NMI_ACK,         /* nonmaskable interrupt acknowledge */
+		ST_NVI_ACK,         /* nonvectored interrupt acknowledge */
+		ST_VI_ACK,          /* vectored interrupt acknowledge */
+		ST_REQ_DATA,        /* data memory request */
+		ST_REQ_STACK,       /* stack memory request */
+		ST_EREQ_DATA,       /* data memory request (EPU) */
+		ST_EREQ_STACK,      /* stack memory request (EPU) */
+		ST_IFETCH_N,        /* instruction fetch, nth word */
+		ST_IFETCH_1,        /* instruction fetch, first word */
+		ST_EPU_TRF,         /* extension processor transfer */
+		ST_BUS_LOCK         /* bus lock, data memory request (not used) */
 	};
 
 	enum
@@ -112,7 +112,6 @@ public:
 	auto ns() { return m_ns_out.bind(); }
 
 	bool is_ifetch1() const noexcept { return (m_op_valid == 0); }
-	void set_m20_hack(bool is_hack) { m_m20_hack = is_hack; }
 
 protected:
 	z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, int vecmult);
@@ -156,6 +155,8 @@ protected:
 	uint32_t  m_op[4];      /* opcodes/data of current instruction */
 	uint32_t  m_ppc;        /* previous program counter */
 	uint32_t  m_pc;         /* program counter */
+	uint8_t   m_pc_b15;     /* bit 15 of the segment word the PC was loaded from */
+	uint8_t   m_addr_b15;   /* bit 15 of the last address operand's segment word (per-instruction, not saved) */
 	uint16_t  m_psapseg;    /* program status pointer, segment (Z8001 only) */
 	uint16_t  m_psapoff;    /* program status pointer, offset */
 	uint16_t  m_fcw;        /* flags and control word */
@@ -187,7 +188,6 @@ protected:
 	memory_access<16, 1, 0, ENDIANNESS_BIG>::specific m_sio;
 	int m_icount;
 	const int m_vector_mult;
-	bool m_m20_hack;
 
 	void clear_internal_state();
 	void register_debug_state();
@@ -213,13 +213,16 @@ protected:
 	inline void cycles(int cycles);
 	virtual void PUSH_PC();
 	virtual void CHANGE_FCW(uint16_t fcw);
-	static inline uint32_t make_segmented_addr(uint32_t addr);
+	inline uint32_t make_segmented_pc(uint32_t addr);
 	static inline uint32_t segmented_addr(uint32_t addr);
 	inline uint32_t addr_from_reg(int regno);
 	inline void addr_to_reg(int regno, uint32_t addr);
 	inline void add_to_addr_reg(int regno, uint16_t addend);
 	inline void sub_from_addr_reg(int regno, uint16_t subtrahend);
 	inline void set_pc(uint32_t addr);
+	inline void set_pc_long(uint32_t segaddr);
+	inline void set_pc_reg(int regno);
+	inline void set_pc_addr(uint32_t addr);
 	inline uint8_t RDIR_B(uint8_t reg);
 	inline uint16_t RDIR_W(uint8_t reg);
 	inline uint32_t RDIR_L(uint8_t reg);
@@ -494,6 +497,7 @@ protected:
 	void Z4D_ddN0_0110_addr();
 	void Z4D_ddN0_1000_addr();
 	void Z4E_ddN0_ssN0_addr();
+	void Z4F_ext();
 	void Z50_0000_dddd_addr();
 	void Z50_ssN0_dddd_addr();
 	void Z51_ddN0_0000_addr();

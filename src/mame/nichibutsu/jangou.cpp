@@ -969,7 +969,7 @@ void cntrygrl_state::cntrygrl(machine_config &config)
 	JANGOU_BLITTER(config, "blitter", MASTER_CLOCK/4);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MASTER_CLOCK/4,320,0,256,264,16,240); // assume same as nightgal.cpp
 	screen.set_screen_update(FUNC(cntrygrl_state::screen_update));
 	screen.set_palette(m_palette);

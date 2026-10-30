@@ -451,7 +451,7 @@ void hp9845_base_state::machine_start()
 	m_t15->set_name("T15");
 	m_t14->set_name("T14");
 
-	// setup RAM dynamically for -ramsize
+	// setup RAM dynamically for -ram
 	// 0K..64K
 	setup_ram_block(0 , 0);
 	if (m_ram->size() >= 192 * 1024) {
@@ -949,11 +949,11 @@ void hp9845b_state::set_graphic_mode(bool graphic)
 		m_graphic_sel = graphic;
 		logerror("GS=%d\n" , graphic);
 		if (m_graphic_sel) {
-			m_screen->configure(GVIDEO_HTOTAL , GVIDEO_VTOTAL , rectangle(GVIDEO_HBEND , GVIDEO_HBSTART - 1 , GVIDEO_VBEND , GVIDEO_VBSTART - 1) , HZ_TO_ATTOSECONDS(VIDEO_PIXEL_CLOCK) * GVIDEO_HTOTAL * GVIDEO_VTOTAL);
+			m_screen->configure(GVIDEO_HTOTAL , GVIDEO_VTOTAL , rectangle(GVIDEO_HBEND , GVIDEO_HBSTART - 1 , GVIDEO_VBEND , GVIDEO_VBSTART - 1) , attotime::from_ticks(GVIDEO_HTOTAL * GVIDEO_VTOTAL, VIDEO_PIXEL_CLOCK));
 			// Set graphic mode view (1.23:1 aspect ratio)
 			machine().render().first_target()->set_view(1);
 		} else {
-			m_screen->configure(VIDEO_HTOTAL , VIDEO_VTOTAL , rectangle(0 , VIDEO_HBSTART - 1 , 0 , VIDEO_ACTIVE_SCANLINES - 1) , HZ_TO_ATTOSECONDS(VIDEO_PIXEL_CLOCK) * VIDEO_HTOTAL * VIDEO_VTOTAL);
+			m_screen->configure(VIDEO_HTOTAL , VIDEO_VTOTAL , rectangle(0 , VIDEO_HBSTART - 1 , 0 , VIDEO_ACTIVE_SCANLINES - 1) , attotime::from_ticks(VIDEO_HTOTAL * VIDEO_VTOTAL, VIDEO_PIXEL_CLOCK));
 			// Set alpha mode view (1.92:1 aspect ratio)
 			machine().render().first_target()->set_view(0);
 		}
@@ -3548,7 +3548,7 @@ void hp9845_state::hp9845a(machine_config &config)
 	//HP_5061_3011(config, m_ppu, XTAL(11'400'000));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(FUNC(hp9845_state::screen_update));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -3564,7 +3564,7 @@ void hp9845_state::hp9835a(machine_config &config)
 	//HP_5061_301(1config, m_ppu, XTAL(11'400'000));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(FUNC(hp9845_state::screen_update));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -3600,7 +3600,7 @@ void hp9845_state::hp9835a(machine_config &config)
     - block 45 is reserved for the Test ROM
     - memory addresses are continuous (for convenience, the mapping below uses block numbers as
       address part above 0xffff, so there are gaps between 0x8000 and 0xffff which are masked out).
-    - all LPU RAM is dynamically mapped at machine start according to -ramsize option
+    - all LPU RAM is dynamically mapped at machine start according to -ram option
 */
 
 void hp9845_base_state::global_mem_map(address_map &map)
@@ -3662,7 +3662,7 @@ void hp9845_base_state::hp9845_base(machine_config &config)
 	m_io_sys->dmar().set(m_ppu , FUNC(hp_5061_3001_cpu_device::dmar_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 
 	TIMER(config, m_gv_timer).configure_generic(FUNC(hp9845_base_state::gv_timer));
 

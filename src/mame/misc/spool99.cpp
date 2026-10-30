@@ -374,7 +374,7 @@ void spool99_state::spool99(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_spool99);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -479,6 +479,7 @@ ROM_END
 
 void spool99_state::init_spool99()
 {
+	// TODO: move vector init in machine_reset
 	uint8_t *ROM = memregion("maincpu")->base();
 //  vram = std::make_unique<uint8_t[]>(0x2000);
 	memcpy(m_main, ROM, 0x100);

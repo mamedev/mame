@@ -217,7 +217,7 @@ void emax_state::emax(machine_config &config)
 
 	ACIA6850(config, "acia"); // MC68A50P
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(m_lcdc, FUNC(hd44780_device::screen_update));
 	screen.set_size(16*6, 16);
@@ -257,7 +257,7 @@ void emax_state::emax2(machine_config &config)
 
 	scsihd(config);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(m_lcdc, FUNC(hd44780_device::screen_update));
 	screen.set_size(16*6, 16);

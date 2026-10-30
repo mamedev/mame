@@ -1150,11 +1150,11 @@ void deco_146_base_device::write_data(u16 address, u16 data, u16 mem_mask, u8 &c
 	address = bitswap<16>(address >> 1, 15,14,13,12,11,10, m_external_addrswap[9],m_external_addrswap[8] ,m_external_addrswap[7],m_external_addrswap[6],m_external_addrswap[5],m_external_addrswap[4],m_external_addrswap[3],m_external_addrswap[2],m_external_addrswap[1],m_external_addrswap[0]) << 1;
 
 	csflags = 0;
-	int upper_addr_bits = (address & 0x7800) >> 11;
+	int const upper_addr_bits = (address & 0x7800) >> 11;
 
 	if (upper_addr_bits == 0x8) // configuration registers are hardcoded to this area
 	{
-		int real_address = address & 0xf;
+		int const real_address = address & 0xf;
 		LOGPROT("%s: write to config regs %04x %04x %04x\n", machine().describe_context(), real_address, data, mem_mask);
 
 		if ((real_address >= 0x2) && (real_address <= 0x0c))
@@ -1172,11 +1172,11 @@ void deco_146_base_device::write_data(u16 address, u16 data, u16 mem_mask, u8 &c
 
 	for (int i = 0; i < 6; i++)
 	{
-		int cs = m_region_selects[i];
+		int const cs = m_region_selects[i];
 
 		if (cs == upper_addr_bits)
 		{
-			int real_address = address & 0x7ff;
+			int const real_address = address & 0x7ff;
 			csflags |= (1 << i);
 
 			if (i == 0) // the first cs is our internal protection area
@@ -1218,7 +1218,7 @@ u16 deco_146_base_device::read_protport(u16 address)
 		address ^= m_magic_read_address_xor;
 
 	int location = 0;
-	u16 realret = read_data_getloc(address, location);
+	u16 const realret = read_data_getloc(address, location);
 
 	if ((location == m_bankswitch_swap_read_address) && !machine().side_effects_disabled()) // this has a special meaning
 	{
@@ -1233,6 +1233,7 @@ u16 deco_146_base_device::read_protport(u16 address)
 TIMER_CALLBACK_MEMBER(deco_146_base_device::write_soundlatch)
 {
 	m_soundlatch = param;
+	m_soundlatch_pending = true;
 	m_soundlatch_irq_cb(ASSERT_LINE);
 }
 
@@ -1269,11 +1270,11 @@ u16 deco_146_base_device::read_data(u16 address, u8 &csflags)
 
 	u16 retdata = 0;
 	csflags = 0;
-	int upper_addr_bits = (address & 0x7800) >> 11;
+	int const upper_addr_bits = (address & 0x7800) >> 11;
 
 	if (upper_addr_bits == 0x8) // configuration registers are hardcoded to this area
 	{
-		int real_address = address & 0xf;
+		int const real_address = address & 0xf;
 		if (!machine().side_effects_disabled())
 			LOGUNK("%s: read config regs? %04x\n", machine().describe_context(), real_address);
 
@@ -1283,11 +1284,11 @@ u16 deco_146_base_device::read_data(u16 address, u8 &csflags)
 	// what gets priority?
 	for (int i = 0; i < 6; i++)
 	{
-		int cs = m_region_selects[i];
+		int const cs = m_region_selects[i];
 
 		if (cs == upper_addr_bits)
 		{
-			int real_address = address & 0x7ff;
+			int const real_address = address & 0x7ff;
 			csflags |= (1 << i);
 
 			if (i == 0) // the first cs is our internal protection area
@@ -1312,7 +1313,11 @@ u16 deco_146_base_device::read_data(u16 address, u8 &csflags)
 
 u8 deco_146_base_device::soundlatch_r()
 {
-	m_soundlatch_irq_cb(CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+	{
+		m_soundlatch_pending = false;
+		m_soundlatch_irq_cb(CLEAR_LINE);
+	}
 	return m_soundlatch;
 }
 
@@ -1345,6 +1350,7 @@ deco_146_base_device::deco_146_base_device(const machine_config &mconfig,
 	m_latchflag(0),
 	m_region_selects{0},
 	m_soundlatch(0),
+	m_soundlatch_pending(false),
 	m_soundlatch_irq_cb(*this),
 	m_port_a_r(*this, 0xffff),
 	m_port_b_r(*this, 0xffff),
@@ -1383,6 +1389,7 @@ void deco_146_base_device::device_start()
 	save_item(NAME(m_region_selects));
 
 	save_item(NAME(m_soundlatch));
+	save_item(NAME(m_soundlatch_pending));
 }
 
 void deco_146_base_device::device_reset()
@@ -1401,6 +1408,7 @@ void deco_146_base_device::device_reset()
 	m_latchflag = 0;
 
 	m_soundlatch = 0x00;
+	m_soundlatch_pending = false;
 	m_soundlatch_irq_cb(CLEAR_LINE);
 
 	m_xor = 0;

@@ -2,27 +2,27 @@
 // copyright-holders:Devin Acker
 
 /***************************************************************************
-	Akai S612, S700, X7000 samplers
+    Akai S612, S700, X7000 samplers
 
-	These early Akai samplers share a 6-voice sound hardware design based around
-	two 8253 (or 8254) timers each clocking an 8237 DMA controller into a 12-bit DAC.
-	Two more 8253s also clock a total of six MF6CN-50 lowpass filter ICs (one per voice).
-	The S700 and X7000 expand the sampling capacity via bank switching.
+    These early Akai samplers share a 6-voice sound hardware design based around
+    two 8253 (or 8254) timers each clocking an 8237 DMA controller into a 12-bit DAC.
+    Two more 8253s also clock a total of six MF6CN-50 lowpass filter ICs (one per voice).
+    The S700 and X7000 expand the sampling capacity via bank switching.
 
-	All three models support Quick Disk loading and saving.
-	The S612 uses a separate disk drive unit based around a Z80 SIO and discrete logic.
-	The S700 and X7000 instead have a built-in drive controlled by a 8251 and MB87013.
+    All three models support Quick Disk loading and saving.
+    The S612 uses a separate disk drive unit based around a Z80 SIO and discrete logic.
+    The S700 and X7000 instead have a built-in drive controlled by a 8251 and MB87013.
 
-	The S612 also supports Commodore Datasette tape units, but the physical connector was
-	removed early in production. The Aug. 1985 service bulletin cites "the unfavorable
-	popularity of Commodore type cassette data recorder" [sic].	Both firmware versions
-	support it if present, though.
+    The S612 also supports Commodore Datasette tape units, but the physical connector was
+    removed early in production. The Aug. 1985 service bulletin cites "the unfavorable
+    popularity of Commodore type cassette data recorder" [sic]. Both firmware versions
+    support it if present, though.
 
-	TODO:
-	- output & input filters
-	- layouts
-	- S612 analog dials/sliders
-	- disk support
+    TODO:
+    - output & input filters
+    - layouts
+    - S612 analog dials/sliders
+    - disk support
 
 ***************************************************************************/
 #include "emu.h"
@@ -53,12 +53,13 @@
 
 #include "emupal.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include <algorithm>
 
 namespace {
-	
+
 class s612_state : public driver_device
 {
 public:
@@ -81,8 +82,7 @@ public:
 		, m_led(*this, "led%u", 0U)
 	{}
 
-	void base_config(machine_config &config, bool use_8254 = true);
-	void s612(machine_config &config);
+	void s612(machine_config &config) ATTR_COLD;
 
 	ioport_value cass_sense_r() { return m_cass->sense_r(); }
 	ioport_value cass_data_r() { return m_cass->read(); }
@@ -96,6 +96,8 @@ protected:
 
 	virtual void machine_start() override ATTR_COLD;
 
+	void base_config(machine_config &config, bool use_8254 = true) ATTR_COLD;
+
 	virtual void common_map(address_map &map) ATTR_COLD;
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
@@ -103,29 +105,29 @@ protected:
 	TIMER_CALLBACK_MEMBER(refresh_timer);
 
 	void led_digit_w(u8 data) { m_led_digit = data; }
-	template<int Num> void led_w(int state) { m_led[Num] = state; }
+	template <int Num> void led_w(int state) { m_led[Num] = state; }
 
 	void dma_w(offs_t offset, u8 data);
 	u8 dma_r(offs_t offset);
 
-	template<int Voice> void voice_bank_sel_w(u8 data);
+	template <int Voice> void voice_bank_sel_w(u8 data);
 	void cpu_bank_sel_w(u8 data);
 	void cpu_bank_msb_w(offs_t offset, u8 data);
 	void cpu_bank_lsb_w(offs_t offset, u8 data);
 	u8 cpu_bank_msb_r(offs_t offset);
 	u8 cpu_bank_lsb_r(offs_t offset);
 
-	template<int Voice> void dreq_set_w(int state);
-	template<int Voice> void dreq_clear_w(int state);
-	template<int Num> void dma_eop_w(int state);
+	template <int Voice> void dreq_set_w(int state);
+	template <int Voice> void dreq_clear_w(int state);
+	template <int Num> void dma_eop_w(int state);
 
 	u8 dma_io_r(offs_t offset);
 	void dma_mem_w(offs_t offset, u8 data);
-	template<int Voice> void dma_io_w(offs_t offset, u8 data);
+	template <int Voice> void dma_io_w(offs_t offset, u8 data);
 
 	void mute_w(int state);
 	void overdub_w(int state);
-	template<int Voice> void envelope_w(u8 data);
+	template <int Voice> void envelope_w(u8 data);
 
 	required_device<z80_device> m_maincpu;
 	required_device<input_merger_any_high_device> m_irq;
@@ -167,7 +169,7 @@ public:
 		, m_sl(*this, "SL%u", 0)
 	{}
 
-	void s700(machine_config &config);
+	void s700(machine_config &config) ATTR_COLD;
 
 	ioport_value dial_r();
 
@@ -179,7 +181,7 @@ protected:
 
 	HD44780_PIXEL_UPDATE(lcd_update);
 
-	template<int Voice> void env_strobe_w(int state);
+	template <int Voice> void env_strobe_w(int state);
 	void env_latch_w(offs_t offset, u8 data);
 
 	void sl_w(u8 data) { m_sl_select = data; }
@@ -206,7 +208,7 @@ public:
 		, m_pitch(*this, "PITCH")
 	{}
 
-	void x7000(machine_config &config);
+	void x7000(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -578,7 +580,7 @@ void s700_state::s700(machine_config &config)
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(s700_state::lcd_update));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
@@ -629,7 +631,7 @@ u8 s612_state::dma_r(offs_t offset)
 }
 
 /**************************************************************************/
-template<int Voice>
+template <int Voice>
 void s612_state::voice_bank_sel_w(u8 data)
 {
 	m_voice_bank[Voice]->set_bank(data & 0x7);
@@ -670,14 +672,14 @@ u8 s612_state::cpu_bank_lsb_r(offs_t offset)
 }
 
 /**************************************************************************/
-template<int Voice>
+template <int Voice>
 void s612_state::dreq_set_w(int state)
 {
 	// DREQ is generated on both clock edges
 	m_dma[Voice / 4]->dreq_w<Voice % 4>(0);
 }
 /**************************************************************************/
-template<int Voice>
+template <int Voice>
 void s612_state::dreq_clear_w(int state)
 {
 	if (!state)
@@ -685,7 +687,7 @@ void s612_state::dreq_clear_w(int state)
 }
 
 /**************************************************************************/
-template<int Num>
+template <int Num>
 void s612_state::dma_eop_w(int state)
 {
 	m_dma_eop[Num] = state;
@@ -705,7 +707,7 @@ void s612_state::dma_mem_w(offs_t offset, u8 data)
 }
 
 /**************************************************************************/
-template<int Voice>
+template <int Voice>
 void s612_state::dma_io_w(offs_t offset, u8 data)
 {
 	const u16 sample = m_voice_bank[Voice]->read16(offset);
@@ -728,14 +730,14 @@ void s612_state::overdub_w(int state)
 }
 
 /**************************************************************************/
-template<int Voice>
+template <int Voice>
 void s612_state::envelope_w(u8 data)
 {
 	m_dac[Voice]->set_output_gain(0, data / 255.0);
 }
 
 /**************************************************************************/
-template<int Voice>
+template <int Voice>
 void s700_state::env_strobe_w(int state)
 {
 	if (state)
@@ -1025,7 +1027,7 @@ static INPUT_PORTS_START( x7000 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("B6")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("C7")
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
-		
+
 	PORT_START("PITCH")
 	PORT_BIT( 0x1ff, 0x100, IPT_PADDLE ) PORT_NAME("Pitch Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CODE_DEC(JOYCODE_Y_DOWN_SWITCH) PORT_CODE_INC(JOYCODE_Y_UP_SWITCH)
 

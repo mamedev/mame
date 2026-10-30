@@ -513,7 +513,7 @@ void pixter_multimedia_state::pixter_multimedia(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::IRGB_1555, 256);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_palette("palette");
 
 	m_screen->set_refresh_hz(60);

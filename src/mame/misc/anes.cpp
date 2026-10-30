@@ -769,7 +769,7 @@ void anes_state::anes(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // TODO: set_raw
+	SCREEN(config, m_screen); // TODO: set_raw
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
@@ -815,9 +815,8 @@ ROM_START( chardash )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD( "anes_c13.u10", 0x00000, 0x80000, CRC(9d23bded) SHA1(7ddf8947c8f8c4e974e0cdbfc7956dcc6ebbde5c) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x8080, "pic", 0 )
-	ROM_LOAD( "pic16f84_code.bin", 0x000, 0x800, NO_DUMP )
-	ROM_LOAD( "pic16f84_data.bin", 0x800, 0x080, NO_DUMP )
+	ROM_REGION16_LE( 0x4280, "pic", 0 )
+	ROM_LOAD( "pic16f84.bin", 0x0000, 0x4280, NO_DUMP )
 
 	ROM_REGION(0x200000, "blitter", 0)
 	ROM_LOAD( "anes_e21.u16", 0x000000, 0x100000, CRC(2db77530) SHA1(a1e7f1b4c34999342a75b459f63f790526da9ca0) )

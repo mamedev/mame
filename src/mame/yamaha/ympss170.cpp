@@ -24,7 +24,7 @@ public:
 	{
 	}
 
-	void pss170(machine_config &config);
+	void pss170(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -53,12 +53,12 @@ u8 yamaha_pss170_state::p4_r()
 
 	for(int i = 0; i < 8; i++)
 	{
-		if(!(m_p5 & (1 << i)))
+		if(!BIT(m_p5, i))
 			data &= m_keys[i]->read();
 	}
 	for(int i = 0; i < 6; i++)
 	{
-		if(!(m_p6 & (1 << i)))
+		if(!BIT(m_p6, i))
 			data &= m_keys[i + 8]->read();
 	}
 	return data;
@@ -201,12 +201,12 @@ void yamaha_pss170_state::pss170(machine_config &config)
 {
 	HD6301Y0(config, m_maincpu, 4_MHz_XTAL); // Yamaha XC194A0
 	m_maincpu->in_p4_cb().set(FUNC(yamaha_pss170_state::p4_r));
-	m_maincpu->out_p1_cb().set([this](u8 d){ m_display->write_my(d >> 6); });
-	m_maincpu->out_p2_cb().set([this](u8 d){ m_display->write_mx(d ^ 0x80); });
-	m_maincpu->out_p3_cb().set([this](u8 d){ m_p3 = d; });
-	m_maincpu->out_p5_cb().set([this](u8 d){ m_p5 = d; });
-	m_maincpu->out_p6_cb().set([this](u8 d){ m_p6 = d; });
-	m_maincpu->out_p7_cb().set([this](u8 d){ if(!(d & 2)) m_ym2413->write(d & 1, m_p3); if(!(d & 0x10)) m_ym2413->reset(); });
+	m_maincpu->out_p1_cb().set([this] (u8 d) { m_display->write_my(d >> 6); });
+	m_maincpu->out_p2_cb().set([this] (u8 d) { m_display->write_mx(d ^ 0x80); });
+	m_maincpu->out_p3_cb().set([this] (u8 d) { m_p3 = d; });
+	m_maincpu->out_p5_cb().set([this] (u8 d) { m_p5 = d; });
+	m_maincpu->out_p6_cb().set([this] (u8 d) { m_p6 = d; });
+	m_maincpu->out_p7_cb().set([this] (u8 d) { if(!(d & 2)) m_ym2413->write(d & 1, m_p3); if(!(d & 0x10)) m_ym2413->reset(); });
 
 	PWM_DISPLAY(config, m_display).set_size(2, 8);
 	m_display->set_segmask(0x03, 0xff);

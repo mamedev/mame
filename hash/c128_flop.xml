@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -119,6 +119,20 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="thaibxnga" cloneof="thaibxng">
+		<description>Thai Boxing (alt)</description>
+		<year>1986</year>
+		<publisher>Anco</publisher>
+		<sharedfeat name="iec8_default" value="c1541"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="295442">
+				<rom name="ThaiBoxing_s0.g64" size="295442" crc="bd26bb80" sha1="cc9c0d2da2986bfae78f34bad664a204ef4a4297"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Applications -->
 
 	<software name="10yrhvsc">
@@ -146,7 +160,22 @@ license:CC0-1.0
 	</software>
 
 	<software name="bbr128">
-		<description>Big Blue Reader 128</description>
+		<description>Big Blue Reader 128 v4.10</description>
+		<year>1993</year>
+		<publisher>SOGWAP</publisher>
+		<notes><![CDATA[
+Before loading FORMAT.128, disable automatic write verification with this command: OPEN9,9,15,"U0>V1":CLOSE9. Otherwise MS-DOS disk formatting fails.
+]]></notes>
+		<info name="protection" value="none" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="big.blue.reader.128.v4.10.d64" size="174848" crc="148f793e" sha1="169b91f8733cce68e3fc0e2e5739a303a5221a73"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbr128a" cloneof="bbr128">
+		<description>Big Blue Reader 128 v3.12</description>
 		<year>1991</year>
 		<publisher>SOGWAP</publisher>
 		<info name="protection" value="none" />
@@ -320,6 +349,37 @@ license:CC0-1.0
 			<feature name="part_id" value="GEOSpell"/>
 			<dataarea name="flop" size="333744">
 				<rom name="geos_128_2_0_s6_geospell[berkeley_1988].g64" size="333744" crc="7df9ec72" sha1="211828b78afdeab3246302951750062c256ca1b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geos20a" cloneof="geos20">
+		<description>GEOS 128 v2.0 (Click Here Software)</description>
+		<year>199?</year>
+		<publisher>Click Here Software</publisher>
+		<info name="protection" value="none" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System"/>
+			<dataarea name="flop" size="174848">
+				<rom name="geos128.d64" size="174848" crc="0ef8b5a7" sha1="a232c8d912c8cae5d9096120669c3782b451c408"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Applications"/>
+			<dataarea name="flop" size="174848">
+				<rom name="apps128.d64" size="174848" crc="0e77c5b6" sha1="72fda59f1a9258e6ee68da2ed1c4a3ccffc95792"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Write Utilities"/>
+			<dataarea name="flop" size="174848">
+				<rom name="wruti128.d64" size="174848" crc="5dbf92c8" sha1="30527b3ca256b92ee837945b1a4f730988da3a57"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="GEOSpell"/>
+			<dataarea name="flop" size="174848">
+				<rom name="spell128.d64" size="174848" crc="2f3be014" sha1="c9a7027f2f48126d85cc930f9cf28dd3b2ffa1c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -526,11 +586,12 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="1581demo" supported="no">
+	<software name="1581demo">
 		<description>Commodore 1581 3.5" Disk Drive Demo/Utilities</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="354011-07" />
+		<sharedfeat name="iec8_default" value="c1581"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -555,6 +616,7 @@ license:CC0-1.0
 		<description>Commodore 1700/1750 RAM Expansion Test/Demo Disk (v1.0)</description>
 		<year>1985</year>
 		<publisher>Commodore</publisher>
+		<sharedfeat name="exp_default" value="reu1750"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
@@ -710,11 +772,12 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cpm1581" supported="no">
+	<software name="cpm1581" cloneof="cpm">
 		<description>CP/M Version 3.0 (1581)</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="622-5002336" />
+		<sharedfeat name="iec8_default" value="c1581"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -776,11 +839,80 @@ license:CC0-1.0
 		<description>LUnix Next Generation (v0.21, REU)</description>
 		<year>2004</year>
 		<publisher>LNG-Project</publisher>
+		<sharedfeat name="exp_default" value="reu1750"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="lunix-c128-reu.d64" size="174848" crc="234af728" sha1="741127341c1bef3dbe5f137680f6df2547f5d02e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vdcmaniac">
+		<description>vdcmaniac (v1.0.2)</description>
+		<year>2026</year>
+		<publisher>xahmol</publisher>
+		<sharedfeat name="vdcram_default" value="64k"/>
+		<sharedfeat name="iec8_default" value="c1581"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="vdcmaniac.d81" size="819200" crc="da64c227" sha1="9f81e9a10274f514b74b54c980f532cc23862ad0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=b0rox-_jOis -->
+	<software name="vdcmm">
+		<description>VDC Mode Mania (v1.2)</description>
+		<year>2023</year>
+		<publisher>Akronyme Analogiker</publisher>
+		<sharedfeat name="vdcram_default" value="64k"/>
+		<sharedfeat name="iec8_default" value="c1581"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="819200">
+				<rom name="vmm 1.d81" size="819200" crc="86fc59d5" sha1="fd93254961f7634e3c9620315f0ded4e1622df3a" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="819200">
+				<rom name="vmm 2.d81" size="819200" crc="34af1304" sha1="68c2e5abcd33b972bee828bb0cfbabf8ded0049b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ipaint">
+		<description>I-Paint (v1.50H)</description>
+		<year>1993</year>
+		<publisher>Living Proof Software</publisher>
+		<sharedfeat name="vdcram_default" value="64k"/>
+		<sharedfeat name="iec8_default" value="c1581"/>
+		<sharedfeat name="joy1_default" value="c1351"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="i-paint v1.5h complete.d81" size="819200" crc="a0e67a96" sha1="0760c489e55f0b04d872b9f2d2370a64872cec95" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pocketw2">
+		<description>Pocket Writer 2</description>
+		<year>1986</year>
+		<publisher>Digital Solutions</publisher>
+		<sharedfeat name="compatibility" value="PAL,NTSC"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="287512">
+				<rom name="PocketWriter2_s1.g64" size="287512" crc="bbc03711" sha1="e84a52c7dc9af54beb64a568f9e33e6112edee97"/>
 			</dataarea>
 		</part>
 	</software>

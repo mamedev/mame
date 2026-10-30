@@ -151,7 +151,6 @@ REF. 970429
 #include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68020.h"
 
-#include "emupal.h"
 #include "speaker.h"
 
 #include "speedup.lh"
@@ -955,15 +954,12 @@ void gaelco3d_state::gaelco3d(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set_inputline(m_adsp, ADSP2115_IRQ2);
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // Not accurate
 	m_screen->set_size(576, 432);
 	m_screen->set_visarea(0, 575, 0, 431);
 	m_screen->set_screen_update(FUNC(gaelco3d_state::screen_update));
-	m_screen->set_palette("palette");
-
-	PALETTE(config, "palette", palette_device::RGB_555);
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1685,13 +1681,18 @@ ROM_START( footbpow ) // Version 4.6
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) )
 
-	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
-	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
-	       Oscillator =  High Speed
-	       Watchdog Timer = Enabled
-	       Power-Up Timer = Disabled
-	       Brown Out = Enabled */
-	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+	ROM_REGION16_LE( 0x4010, "io", 0 )
+	ROM_LOAD( "fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+	ROM_FILL( 0x4000, 0x01, 0xff )
+	ROM_FILL( 0x4001, 0x01, 0x3f ) // user_id0: 0x3fff
+	ROM_FILL( 0x4002, 0x01, 0xff )
+	ROM_FILL( 0x4003, 0x01, 0x3f ) // user_id1: 0x3fff
+	ROM_FILL( 0x4004, 0x01, 0xff )
+	ROM_FILL( 0x4005, 0x01, 0x3f ) // user_id2: 0x3fff
+	ROM_FILL( 0x4006, 0x01, 0xff )
+	ROM_FILL( 0x4007, 0x01, 0x3f ) // user_id3: 0x3fff
+	ROM_FILL( 0x400e, 0x01, 0xfe )
+	ROM_FILL( 0x400f, 0x01, 0x3f ) // configuration: 0x3ffe (HS oscillator, WDT enabled, PWRT disabled, BOR enabled)
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
@@ -1730,13 +1731,18 @@ ROM_START( footbpow14 ) // Version 1.4
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) )
 
-	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
-	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
-	       Oscillator =  High Speed
-	       Watchdog Timer = Enabled
-	       Power-Up Timer = Disabled
-	       Brown Out = Enabled */
-	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+	ROM_REGION16_LE( 0x4010, "io", 0 )
+	ROM_LOAD( "fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+	ROM_FILL( 0x4000, 0x01, 0xff )
+	ROM_FILL( 0x4001, 0x01, 0x3f ) // user_id0: 0x3fff
+	ROM_FILL( 0x4002, 0x01, 0xff )
+	ROM_FILL( 0x4003, 0x01, 0x3f ) // user_id1: 0x3fff
+	ROM_FILL( 0x4004, 0x01, 0xff )
+	ROM_FILL( 0x4005, 0x01, 0x3f ) // user_id2: 0x3fff
+	ROM_FILL( 0x4006, 0x01, 0xff )
+	ROM_FILL( 0x4007, 0x01, 0x3f ) // user_id3: 0x3fff
+	ROM_FILL( 0x400e, 0x01, 0xfe )
+	ROM_FILL( 0x400f, 0x01, 0x3f ) // configuration: 0x3ffe (HS oscillator, WDT enabled, PWRT disabled, BOR enabled)
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
@@ -1775,13 +1781,18 @@ ROM_START( footbpow12 ) // Version 1.2 - REF. 000208 ROM board
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) ) // labeled FOP 26 in IC36 on the PCB
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) ) // labeled FOP 27 in IC37 on the PCB
 
-	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
-	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
-	       Oscillator =  High Speed
-	       Watchdog Timer = Enabled
-	       Power-Up Timer = Disabled
-	       Brown Out = Enabled */
-	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+	ROM_REGION16_LE( 0x4010, "io", 0 )
+	ROM_LOAD( "fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+	ROM_FILL( 0x4000, 0x01, 0xff )
+	ROM_FILL( 0x4001, 0x01, 0x3f ) // user_id0: 0x3fff
+	ROM_FILL( 0x4002, 0x01, 0xff )
+	ROM_FILL( 0x4003, 0x01, 0x3f ) // user_id1: 0x3fff
+	ROM_FILL( 0x4004, 0x01, 0xff )
+	ROM_FILL( 0x4005, 0x01, 0x3f ) // user_id2: 0x3fff
+	ROM_FILL( 0x4006, 0x01, 0xff )
+	ROM_FILL( 0x4007, 0x01, 0x3f ) // user_id3: 0x3fff
+	ROM_FILL( 0x400e, 0x01, 0xfe )
+	ROM_FILL( 0x400f, 0x01, 0x3f ) // configuration: 0x3ffe (HS oscillator, WDT enabled, PWRT disabled, BOR enabled)
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
@@ -1820,13 +1831,18 @@ ROM_START( footbpow11 ) // Version 1.1 - REF. 000208 ROM board
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) ) // labeled FOP 26 in IC36 on the PCB
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) ) // labeled FOP 27 in IC37 on the PCB
 
-	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
-	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
-	       Oscillator =  High Speed
-	       Watchdog Timer = Enabled
-	       Power-Up Timer = Disabled
-	       Brown Out = Enabled */
-	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+	ROM_REGION16_LE( 0x4010, "io", 0 )
+	ROM_LOAD( "fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+	ROM_FILL( 0x4000, 0x01, 0xff )
+	ROM_FILL( 0x4001, 0x01, 0x3f ) // user_id0: 0x3fff
+	ROM_FILL( 0x4002, 0x01, 0xff )
+	ROM_FILL( 0x4003, 0x01, 0x3f ) // user_id1: 0x3fff
+	ROM_FILL( 0x4004, 0x01, 0xff )
+	ROM_FILL( 0x4005, 0x01, 0x3f ) // user_id2: 0x3fff
+	ROM_FILL( 0x4006, 0x01, 0xff )
+	ROM_FILL( 0x4007, 0x01, 0x3f ) // user_id3: 0x3fff
+	ROM_FILL( 0x400e, 0x01, 0xfe )
+	ROM_FILL( 0x400f, 0x01, 0x3f ) // configuration: 0x3ffe (HS oscillator, WDT enabled, PWRT disabled, BOR enabled)
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )

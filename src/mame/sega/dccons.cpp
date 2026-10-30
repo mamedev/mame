@@ -82,7 +82,8 @@ void dc_cons_state::init_dc()
 
 void dc_cons_state::init_tream()
 {
-	// Modchip connected to BIOS ROM chip changes 4 bytes (actually bits) as shown below, which allow to boot any region games.
+	// Modchip connected to BIOS ROM chip changes 4 bytes (actually bits) as shown below,
+	// which allow to boot any region games.
 	u8 *rom = (u8 *)memregion("maincpu")->base();
 	rom[0x503] |= 0x40;
 	rom[0x50f] |= 0x40;
@@ -407,7 +408,7 @@ void dc_cons_state::dc_base(machine_config &config)
 	m_maple->irq_callback().set(FUNC(dc_state::maple_irq));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// TODO: find exact pclk source
 	screen.set_raw(13458568*2, 857, 0, 640, 524, 0, 480);
 	screen.set_screen_update("powervr2", FUNC(powervr2_device::screen_update));

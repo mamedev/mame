@@ -386,6 +386,8 @@ public:
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, u32 numinst) override;
 	virtual bool hash_exists(u32 mode, u32 pc) const noexcept override;
 	virtual void hash_invalidate_range(u32 pcstart, u32 pcend) noexcept override;
+	virtual hash_codeptr hash_get_codeptr(u32 mode, u32 pc) const noexcept override;
+	virtual bool hash_set_codeptr(u32 mode, u32 pc, hash_codeptr code) noexcept override;
 	virtual void get_info(drcbe_info &info) const noexcept override;
 	virtual bool logging() const noexcept override { return bool(m_log); }
 
@@ -1185,6 +1187,7 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	a.cmp(eax, gpd(REG_PARAM3));
 	a.mov(gpd(REG_PARAM3), 0xff);
 	a.cmovne(gpd(REG_PARAM1), gpd(REG_PARAM3));
+	a.mov(MABS(&m_state.fmod), gpb_lo(REG_PARAM1));
 	a.mov(MABS(&m_near.nominalfmod), gpb_lo(REG_PARAM1));
 
 	a.call(gpq(REG_PARAM2));
@@ -1438,6 +1441,39 @@ bool drcbe_x64::hash_exists(u32 mode, u32 pc) const noexcept
 void drcbe_x64::hash_invalidate_range(u32 pcstart, u32 pcend) noexcept
 {
 	m_hash.invalidate_range(pcstart, pcend);
+}
+
+
+//-------------------------------------------------
+//  hash_get_codeptr/hash_set_codeptr - direct hash
+//  access, letting a front-end point an entry back
+//  at code it generated earlier
+//-------------------------------------------------
+
+drcbe_x64::hash_codeptr drcbe_x64::hash_get_codeptr(u32 mode, u32 pc) const noexcept
+{
+	if (m_hash.code_exists(mode, pc))
+		return hash_codeptr{ m_hash.get_codeptr(mode, pc), m_cache.flush_count() };
+	else
+		return hash_codeptr();
+}
+
+bool drcbe_x64::hash_set_codeptr(u32 mode, u32 pc, hash_codeptr code) noexcept
+{
+	if (UNEXPECTED((m_cache.flush_count() != code.aux) || !m_cache.contains_ephemeral_pointer(code.ptr)))
+	{
+		if (!code.ptr)
+			osd_printf_error("drcbe_x64(%s): Attempt to connect %u:%x to null code pointer.\n", m_device.tag(), mode, pc);
+		else if (m_cache.flush_count() != code.aux)
+			osd_printf_error("drcbe_x64(%s): Attempt to connect %u:%x to code pointer from previous generation.\n", m_device.tag(), mode, pc);
+		else
+			osd_printf_error("drcbe_x64(%s): Attempt to connect %u:%x to code pointer outside ephemeral cache.\n", m_device.tag(), mode, pc);
+		std::fflush(stdout);
+		std::fflush(stderr);
+		std::abort();
+	}
+
+	return m_hash.set_codeptr(mode, pc, code.ptr);
 }
 
 

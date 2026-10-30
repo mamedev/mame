@@ -531,7 +531,7 @@ void dbz_state::dbz(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &dbz_state::sound_io_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(55);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 40*8);
@@ -737,9 +737,9 @@ void dbz_state::init_dbz()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
-	// to avoid crash during loop at 0x00076e after D4 > 0x80 (reading tiles region out of bounds)
+	// HACK: avoid crash during loop at 0x00076e after D4 > 0x80 (reading tiles region out of bounds)
 	ROM[0x76c/2] = 0x007f;    /* 0x00ff */
-	// nop out dbz1's mask rom test
+	// HACK: nop out dbz1's mask ROM tests
 	// tile ROM test
 	ROM[0x7b0/2] = 0x4e71;    /* 0x0c43 - cmpi.w  #-$1e0d, D3 */
 	ROM[0x7b2/2] = 0x4e71;    /* 0xe1f3 */
@@ -768,7 +768,7 @@ void dbz_state::init_dbza()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
-	// nop out dbz1's mask rom test
+	// HACK: nop out dbz1's mask ROM tests
 	// tile ROM test
 	ROM[0x78c/2] = 0x4e71;    /* 0x0c43 - cmpi.w  #-$1236, D3 */
 	ROM[0x78e/2] = 0x4e71;    /* 0x0010 */
@@ -789,7 +789,7 @@ void dbz_state::init_dbz2()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
-	// to avoid crash during loop at 0x000a4a after D4 > 0x80 (reading tiles region out of bounds)
+	// HACK: avoid crash during loop at 0x000a4a after D4 > 0x80 (reading tiles region out of bounds)
 	ROM[0xa48/2] = 0x007f;    /* 0x00ff */
 	// nop out dbz1's mask rom test
 	// tile ROM test

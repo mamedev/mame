@@ -19,6 +19,7 @@
 #include "bgfx/texture.h"
 #include "bgfx/texturemanager.h"
 #include "bgfx/uniform.h"
+#include "bgfx/vectorrenderer.h"
 #include "bgfx/view.h"
 
 // render
@@ -64,6 +65,7 @@ extern void *GetOSWindow(void *wincontroller);
 #include "imgui/imgui.h"
 
 #include <algorithm>
+#include <limits>
 
 
 //============================================================
@@ -629,6 +631,9 @@ renderer_bgfx::renderer_bgfx(osd_window &window, parent_module &parent)
 	, m_texture_cache(nullptr)
 	, m_dimensions(0, 0)
 	, m_max_view(0)
+	, m_vector_present(false)
+	, m_vector_composited(false)
+	, m_vector_composite_pending(false)
 	, m_avi_view()
 	, m_avi_writer()
 	, m_avi_target(nullptr)
@@ -736,6 +741,9 @@ int renderer_bgfx::create()
 	m_screen_effect[1] = m_effects->get_or_load_effect(m_module().options(), "screen_blend");
 	m_screen_effect[2] = m_effects->get_or_load_effect(m_module().options(), "screen_multiply");
 	m_screen_effect[3] = m_effects->get_or_load_effect(m_module().options(), "screen_add");
+
+	if (m_module().options().bgfx_vectorcrt())
+		m_vector_renderer = std::make_unique<bgfx_vector_renderer>(*m_effects, m_module().options());
 
 	const uint32_t max_prescale_size = std::min(2u * std::max(wdim.width(), wdim.height()), m_module().max_texture_size());
 	m_chains = std::make_unique<chain_manager>(
@@ -1271,6 +1279,26 @@ int renderer_bgfx::draw(int update)
 		s_current_view += chain_view_count;
 	}
 
+	if (m_vector_renderer && m_vector_renderer->available())
+	{
+		window().m_primlist->acquire_lock();
+		m_vector_renderer->prepare(
+				s_current_view,
+				window().m_primlist->first(),
+				uint16_t(std::min<uint32_t>(m_dimensions.width(), std::numeric_limits<uint16_t>::max())),
+				uint16_t(std::min<uint32_t>(m_dimensions.height(), std::numeric_limits<uint16_t>::max())),
+				window().machine().time().as_double());
+		window().m_primlist->release_lock();
+
+		if (m_vector_present != m_vector_renderer->present())
+		{
+			m_vector_present = m_vector_renderer->present();
+			m_sliders_dirty = true;
+		}
+	}
+	m_vector_composited = false;
+	m_vector_composite_pending = false;
+
 	if (s_current_view > m_max_view)
 	{
 		m_max_view = s_current_view;
@@ -1312,7 +1340,7 @@ int renderer_bgfx::draw(int update)
 
 		buffer_status status = buffer_primitives(atlas_valid, &prim, &buffer, screen, window_index);
 
-		if (status != BUFFER_EMPTY && status != BUFFER_SCREEN)
+		if (status != BUFFER_EMPTY && status != BUFFER_SCREEN && status != BUFFER_DONE_EMPTY)
 		{
 			bgfx::setVertexBuffer(0, &buffer);
 			bgfx::setTexture(0, m_gui_effect[blend]->uniform("s_tex")->handle(), m_texture_cache->texture());
@@ -1328,7 +1356,14 @@ int renderer_bgfx::draw(int update)
 			m_gui_effect[blend]->submit(m_ortho_view->get_index());
 		}
 
-		if (status != BUFFER_DONE && status != BUFFER_PRE_FLUSH)
+		if (m_vector_composite_pending)
+		{
+			m_vector_renderer->composite(uint16_t(m_ortho_view->get_index()));
+			m_vector_composite_pending = false;
+			m_vector_composited = true;
+		}
+
+		if (status != BUFFER_DONE && status != BUFFER_DONE_EMPTY && status != BUFFER_PRE_FLUSH)
 		{
 			prim = prim->next();
 		}
@@ -1396,6 +1431,7 @@ bool renderer_bgfx::update_dimensions()
 		if (window().index() == 0)
 		{
 			bgfx::reset(m_dimensions.width(), m_dimensions.height(), video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE);
+			bgfx::setViewFrameBuffer(s_current_view, BGFX_INVALID_HANDLE);
 		}
 		else
 		{
@@ -1413,6 +1449,7 @@ bool renderer_bgfx::update_dimensions()
 			bgfx::setViewFrameBuffer(s_current_view, m_framebuffer->target());
 		}
 
+		bgfx::setViewRect(s_current_view, 0, 0, m_dimensions.width(), m_dimensions.height());
 		bgfx::setViewClear(s_current_view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
 		bgfx::setViewMode(s_current_view, bgfx::ViewMode::Sequential);
 		bgfx::touch(s_current_view);
@@ -1426,15 +1463,15 @@ void renderer_bgfx::setup_ortho_view()
 {
 	if (!m_ortho_view)
 	{
-		m_ortho_view = std::make_unique<bgfx_ortho_view>(this, 0, m_framebuffer, m_seen_views);
+		m_ortho_view = std::make_unique<bgfx_ortho_view>(this, UINT_MAX, m_framebuffer, m_seen_views);
 	}
+	m_ortho_view->update();
 	if (m_ortho_view->get_index() == UINT_MAX)
 	{
 		m_ortho_view->set_index(s_current_view);
 		m_ortho_view->setup();
 		s_current_view++;
 	}
-	m_ortho_view->update();
 }
 
 render_primitive_list *renderer_bgfx::get_primitives()
@@ -1466,10 +1503,22 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(bool atlas_valid, 
 	{
 		switch ((*prim)->type)
 		{
-			case render_primitive::LINE:
-				setup_ortho_view();
-				put_packed_line(*prim, (ScreenVertex*)buffer->data + vertices);
-				vertices += 30;
+		case render_primitive::LINE:
+				if (m_vector_renderer && m_vector_renderer->available() && m_vector_renderer->present() && PRIMFLAG_GET_VECTOR((*prim)->flags))
+				{
+					if (!m_vector_composited && !m_vector_composite_pending)
+					{
+						setup_ortho_view();
+						m_vector_renderer->composite(uint16_t(m_ortho_view->get_index()));
+						m_vector_composited = true;
+					}
+				}
+				else
+				{
+					setup_ortho_view();
+					put_packed_line(*prim, (ScreenVertex*)buffer->data + vertices);
+					vertices += 30;
+				}
 				break;
 
 			case render_primitive::QUAD:
@@ -1478,6 +1527,8 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(bool atlas_valid, 
 					setup_ortho_view();
 					put_packed_quad(*prim, WHITE_HASH, (ScreenVertex*)buffer->data + vertices);
 					vertices += 6;
+					if (m_vector_renderer && m_vector_renderer->available() && m_vector_renderer->present() && PRIMFLAG_GET_VECTORBUF((*prim)->flags))
+						m_vector_composite_pending = true;
 				}
 				else
 				{
@@ -1532,7 +1583,7 @@ renderer_bgfx::buffer_status renderer_bgfx::buffer_primitives(bool atlas_valid, 
 
 	if (*prim == nullptr)
 	{
-		return BUFFER_DONE;
+		return vertices ? BUFFER_DONE : BUFFER_DONE_EMPTY;
 	}
 	if (vertices == 0)
 	{
@@ -1665,8 +1716,9 @@ void renderer_bgfx::allocate_buffer(render_primitive *prim, uint32_t blend, bgfx
 	{
 		switch (prim->type)
 		{
-			case render_primitive::LINE:
-				vertices += 30;
+		case render_primitive::LINE:
+				if (!(m_vector_renderer && m_vector_renderer->available() && m_vector_renderer->present() && PRIMFLAG_GET_VECTOR(prim->flags)))
+					vertices += 30;
 				break;
 
 			case render_primitive::QUAD:
@@ -1712,7 +1764,10 @@ void renderer_bgfx::allocate_buffer(render_primitive *prim, uint32_t blend, bgfx
 std::vector<ui::menu_item> renderer_bgfx::get_slider_list()
 {
 	m_sliders_dirty = false;
-	return m_chains->get_slider_list();
+	std::vector<ui::menu_item> sliders = m_chains->get_slider_list();
+	if (m_vector_renderer)
+		m_vector_renderer->append_sliders(sliders);
+	return sliders;
 }
 
 void renderer_bgfx::set_sliders_dirty()

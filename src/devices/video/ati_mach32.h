@@ -223,6 +223,7 @@ public:
 	u32 framebuffer_be_r(offs_t offset, u32 mem_mask);
 	void framebuffer_be_w(offs_t offset, u32 data, u32 mem_mask);
 	u8 *get_framebuffer_addr() { return &vga.memory[0]; }
+	size_t get_framebuffer_size() const { return vga.svga_intf.vram_size; }
 
 protected:
 	mach64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

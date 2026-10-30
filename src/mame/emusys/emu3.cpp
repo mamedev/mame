@@ -250,7 +250,7 @@ void emu3_state::emu3(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(emu3_state::palette_init), 2);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60); // no idea
 	screen.set_screen_update(m_lcdc, FUNC(hd44780_device::screen_update));
 	screen.set_size(20 * 6, 4 * 9); // 20x4 columns/rows, 5x8 character cells

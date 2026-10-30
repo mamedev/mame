@@ -141,7 +141,7 @@ void mt420_state::mt420(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom").do_callback().set("duart", FUNC(scn2681_device::ip6_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(9.87768_MHz_XTAL * 2, 612 * 2, 0, 480 * 2, 269, 0, 250);
 	//screen.set_raw(15.30072_MHz_XTAL * 2, 948 * 2, 0, 792 * 2, 269, 0, 250);
 	screen.set_screen_update("avdc", FUNC(scn2674_device::screen_update));

@@ -225,4 +225,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 1996, vl70, 0, 0, vl70,  vl70, vl70_state, empty_init, "Yamaha", "VL70-m", MACHINE_NOT_WORKING )
+CONS( 1996, vl70, 0, 0, vl70,  vl70, vl70_state, empty_init, "Yamaha", "VL70-m Virtual Acoustic Tone Generator", MACHINE_NOT_WORKING )

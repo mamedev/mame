@@ -79,8 +79,8 @@ public:
 	{
 	}
 
-	void rastersp(machine_config &config);
-	void rs_config_base(machine_config &config);
+	void rastersp(machine_config &config) ATTR_COLD;
+	void rs_config_base(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -406,7 +406,7 @@ void rastersp_state::dpylist_w(uint32_t data)
 				uint32_t pixels = (word2 >> 16) & 0x1ff;
 
 				uint16_t* palptr = &m_paletteram[m_palette_number*256];
-				uint8_t* srcptr = reinterpret_cast<uint8_t*>(&m_dram[0]);
+				auto const srcptr = util::little_endian_cast<uint8_t const>(&m_dram[0]);
 
 				uint32_t acc = srcaddr << 8;
 
@@ -419,7 +419,7 @@ void rastersp_state::dpylist_w(uint32_t data)
 				{
 					while (x < 320 && pixels)
 					{
-						*bmpptr++ = palptr[srcptr[BYTE_XOR_LE(acc >> 8)]];
+						*bmpptr++ = palptr[srcptr[acc >> 8]];
 						acc = (acc + incr) & VIDEO_ADDR_MASK;
 
 						--pixels;
@@ -440,7 +440,7 @@ void rastersp_state::dpylist_w(uint32_t data)
 				uint32_t srcaddr = word1 >> 8;
 				uint32_t pixels = (word2 >> 16) & 0x1ff;
 
-				uint16_t* srcptr = reinterpret_cast<uint16_t*>(&m_dram[0]);
+				auto const srcptr = util::little_endian_cast<uint16_t const>(&m_dram[0]);
 
 				uint32_t acc = srcaddr << 8;
 
@@ -453,7 +453,7 @@ void rastersp_state::dpylist_w(uint32_t data)
 				{
 					while (x < 320 && pixels)
 					{
-						*bmpptr++ = srcptr[WORD_XOR_LE(acc >> 9)];
+						*bmpptr++ = srcptr[acc >> 9];
 						acc = (acc + incr) & VIDEO_ADDR_MASK;
 
 						--pixels;
@@ -1104,7 +1104,7 @@ void rastersp_state::cpu_map_base(address_map &map)
 {
 	map(0x02200000, 0x022fffff).rw(FUNC(rastersp_state::nvram_r), FUNC(rastersp_state::nvram_w)).umask32(0x000000ff);
 	map(0x02200800, 0x02200803).rw(FUNC(rastersp_state::interrupt_ctrl_r),FUNC(rastersp_state::interrupt_ctrl_w));
-	map(0x02208000, 0x02208fff).rw("ncr53c700", FUNC(ncr53c7xx_device::read), FUNC(ncr53c7xx_device::write));
+	map(0x02208000, 0x02208fff).rw("ncr53c700", FUNC(ncr53c700_device::read), FUNC(ncr53c700_device::write));
 	map(0x0220e000, 0x0220e003).w(FUNC(rastersp_state::dpylist_w));
 	map(0xfff00000, 0xffffffff).bankrw("bank1");//was 3
 }
@@ -1443,7 +1443,7 @@ void rastersp_state::rs_config_base(machine_config &config)
 
 	(NSCSI_BUS(config, m_scsibus));
 
-	auto &scsictrl(NCR53C7XX(config, "ncr53c700",66'000'000));
+	auto &scsictrl(NCR53C700(config, "ncr53c700",66'000'000));
 	m_scsibus->set_external_device(7, scsictrl);
 	scsictrl.irq_handler().set(DEVICE_SELF, FUNC(rastersp_state::scsi_irq));
 	scsictrl.host_read().set(DEVICE_SELF, FUNC(rastersp_state::ncr53c700_read));
@@ -1452,7 +1452,7 @@ void rastersp_state::rs_config_base(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(1));
 
 	/* Video */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_size(320, 240);
 	screen.set_visarea(0, 320-1, 0, 240-1);
 	screen.set_screen_update(FUNC(rastersp_state::screen_update));

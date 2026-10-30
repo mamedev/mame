@@ -10,6 +10,8 @@
     <EnumProperty Name="Linkage-pugixml" DisplayName="Linkage" Description="Which version of the runtime library to use for this library" Category="pugixml">
       <EnumValue Name="dynamic" DisplayName="Dynamic CRT (/MD, /MDd)" />
       <EnumValue Name="static" DisplayName="Static CRT (/MT, /MTd)" />
+      <EnumValue Name="source" DisplayName="Include pugixml.cpp" />
+      <EnumValue Name="header" DisplayName="Header Only" />
     </EnumProperty>
   </Rule>
 </ProjectSchemaDefinitions>

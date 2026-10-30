@@ -69,12 +69,11 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 	required_device<ram_device> m_ram;
 
 	uint32_t m_checksize;
-	std::unique_ptr<uint8_t[]> m_checkbits;	// 1 check bit per 8 data bits
+	std::unique_ptr<uint8_t[]> m_checkbits; // 1 check bit per 8 data bits
 
 private:
 	bool check_parity(offs_t offset, uint8_t data, bool write);

@@ -741,7 +741,7 @@ void m63_state::m63(machine_config &config)
 	m_soundcpu->set_periodic_int(FUNC(m63_state::snd_irq), attotime::from_hz(60));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
@@ -788,7 +788,7 @@ void m63_state::fghtbskt(machine_config &config)
 	m_soundcpu->set_periodic_int(FUNC(m63_state::snd_irq), attotime::from_hz(60/2));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

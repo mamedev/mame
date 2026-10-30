@@ -430,7 +430,7 @@ static INPUT_PORTS_START( kzaurus )
 	PORT_DIPNAME( 0x4000, 0x0000, "Backup Memory" )      PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x4000, "Keep" )
 	PORT_DIPSETTING(    0x0000, "Clear" )
-	PORT_DIPNAME( 0x8000, 0x0000, "Demo Sound" )         PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) )         PORT_DIPLOCATION("SW2:8")  // "Demo Sound"
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -645,7 +645,7 @@ void konmedal68k_state::kzaurus(machine_config &config)
 	HOPPER(config, "hopper", attotime::from_msec(100));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(59.62);  /* verified on pcb */
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
@@ -700,7 +700,7 @@ void konmedal68k_state::gs662(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_state::gs662_main);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config.replace(), "screen"));
 	screen.set_refresh_hz(59.62); /* verified on pcb */
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64 * 8, 32 * 8);

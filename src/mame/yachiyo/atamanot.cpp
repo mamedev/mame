@@ -460,7 +460,7 @@ void atamanot_state::atamanot(machine_config &config)
 	m_bank->set_options(ENDIANNESS_LITTLE, 8, 21, 0x2000);
 	m_bank->set_map(&atamanot_state::bank_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(14_MHz_XTAL / 2, 400, 0, 288, 293, 0, 192); // from CRTC
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

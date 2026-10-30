@@ -555,7 +555,7 @@ void hotchili_state::hotchili(machine_config &config)
 	RAM(config, m_ram).set_default_size("2K").set_default_value(0);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw( MAIN_CLOCK / 2, 260, 0, 256, 256, 16, 239);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_screen_update(FUNC(hotchili_state::screen_update));
@@ -609,11 +609,12 @@ void hotchili_state::init_hc()
 	uint8_t *ROM = memregion("maincpu")->base();
 	m_bank->configure_entries(0, 4, &ROM[0x8000], 0x2000);
 
+	// HACK: get rid of these
 	ROM[0x05bc] = 0x00;  // Avoids ram error flag setup
-	ROM[0x06c1] = 0x20;  // Skip Rom Error
-	ROM[0x06c4] = 0xc6;  // Skip Ram Error
-	ROM[0x06d1] = 0xd3;  // Skip Ram Error
-	ROM[0x06d2] = 0x06;  // Skip Ram Error
+	ROM[0x06c1] = 0x20;  // Skip ROM Error
+	ROM[0x06c4] = 0xc6;  // Skip RAM Error
+	ROM[0x06d1] = 0xd3;  // Skip RAM Error
+	ROM[0x06d2] = 0x06;  // Skip RAM Error
 	ROM[0x1c54] = 0x84;  // Avoids meter error
 	ROM[0x1c5b] = 0x84;  // Avoids meter error
 }

@@ -50,6 +50,35 @@ void st0016_device::device_start()
 	// allocate stream
 	m_stream = stream_alloc(0, 2, clock() / 128);
 
+	// Sample decode tables.  Linear: plain signed 8-bit.  Non-linear: two's complement code whose
+	// 7-bit magnitude is a 3-bit exponent / 4-bit mantissa float with hidden bit (exponent 0 =
+	// denormal), i.e. a mu-law-like expansion, selected by voice 7 reg $1f bit 1 (renju, srmp5,
+	// gostop, koikois, nratechu and dcrown set it; mayjinsn, mayjisn2, speglsht, macs and jclub2
+	// keep it clear).  Derived from PCB recordings of renju and mayjinsn/mayjisn2 - the exact
+	// curve is still an approximation.
+	for (int i = 0; i < 256; i++)
+	{
+		const s8 code = s8(i);
+		const int mag = std::min(std::abs(int(code)), 127);
+		const int e = mag >> 4, m = mag & 15;
+		const int v = (e == 0) ? (m << 1) : ((m | 16) << e);   // 0..3968
+		m_linear[i] = s16(code) << 8;
+		m_nonlinear[i] = s16((code < 0 ? -v : v) << 3);        // +-31744
+	}
+	select_table(false);
+
+	// Volume: 7-bit value with a roughly exponential law, ~6 dB per 8 steps (0 = mute), realised
+	// here as a 4-bit exponent / 3-bit mantissa float: gain = (8 | (v & 7)) << (v >> 3), full scale
+	// at 0x7f.  Fitted to PCB recordings of mayjisn2 and renju (frame-level spread vs.
+	// the recording is minimal between 6 and 8 steps per 6 dB; a linear law leaves ~3 dB spread).
+	for (int v = 0; v < 256; v++)
+	{
+		const int v7 = v & 0x7f;
+		m_voltab[v] = (v7 == 0) ? 0 : (((8 | (v7 & 7)) << (v7 >> 3)) * 256) / (15 << 15);
+	}
+	for (auto &vc : m_voice)
+		vc.m_voltab = m_voltab;
+
 	save_item(STRUCT_MEMBER(m_voice, m_regs));
 	save_item(STRUCT_MEMBER(m_voice, m_start));
 	save_item(STRUCT_MEMBER(m_voice, m_end));
@@ -66,6 +95,17 @@ void st0016_device::device_start()
 }
 
 
+void st0016_device::select_table(bool nonlinear)
+{
+	for (auto &v : m_voice)
+		v.m_table = nonlinear ? m_nonlinear : m_linear;
+}
+
+void st0016_device::device_post_load()
+{
+	select_table(BIT(m_voice[7].m_regs[0x1f], 1));
+}
+
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
@@ -79,8 +119,8 @@ void st0016_device::sound_stream_update(sound_stream &stream)
 			// check if voice is activated
 			if (m_voice[v].update())
 			{
-				stream.add_int(0, sampleind, (m_voice[v].m_out * m_voice[v].m_vol_l) >> 8, 32768 << 4);
-				stream.add_int(1, sampleind, (m_voice[v].m_out * m_voice[v].m_vol_r) >> 8, 32768 << 4);
+				stream.add_int(0, sampleind, (m_voice[v].m_out * m_voice[v].m_vol_l) >> 8, 32768); // full scale per voice: the exponential volume law keeps typical levels ~13 dB down
+				stream.add_int(1, sampleind, (m_voice[v].m_out * m_voice[v].m_vol_r) >> 8, 32768);
 			}
 		}
 	}
@@ -104,7 +144,11 @@ bool st0016_device::voice_t::update()
 {
 	if (m_flags & 0x06) // TODO: keyon flag?
 	{
-		m_out = s16(s8(m_host.read_byte(m_pos & 0x1fffff))) << 8;
+		// linear interpolation between the current and the next sample: real hardware
+		// shows none of the images a nearest-sample fetch produces (verified against
+		// PCB recordings of mayjinsn/mayjisn2, whose samples play at 5.6-16 kHz)
+		const s32 a = fetch(m_pos), b = fetch(next_pos(m_pos));
+		m_out = s16(a + (((b - a) * s32(m_frac & 0xffff)) >> 16));
 		m_frac += m_freq;
 		m_pos += (m_frac >> 16);
 		m_frac &= 0xffff;
@@ -144,6 +188,16 @@ bool st0016_device::voice_t::update()
 	}
 }
 
+u32 st0016_device::voice_t::next_pos(u32 pos) const
+{
+	const u32 next = pos + 1;
+	if (m_lponce)
+		return (next >= m_lpend) ? m_lpstart : next;
+	if (next >= m_end)
+		return BIT(m_flags, 0) ? m_lpstart : pos;
+	return next;
+}
+
 //-------------------------------------------------
 //  snd_r - read sound registers
 //-------------------------------------------------
@@ -169,6 +223,8 @@ void st0016_device::snd_w(offs_t offset, u8 data)
 	{
 		m_stream->update();
 		m_voice[offset >> 5].reg_w(offset & 0x1f, data, offset >> 5);
+		if (offset == 0xff) // global control (voice 7 reg $1f): bit 1 = non-linear sample format
+			select_table(BIT(data, 1));
 	}
 }
 
@@ -217,10 +273,10 @@ void st0016_device::voice_t::reg_w(offs_t offset, u8 data, int voice)
 		m_freq = (m_regs[0x11] << 8) | m_regs[0x10];
 		break;
 	case 0x14: // Left volume
-		m_vol_l = (char)data;
+		m_vol_l = m_voltab[data];
 		break;
 	case 0x15: // Right volume
-		m_vol_r = (char)data;
+		m_vol_r = m_voltab[data];
 		break;
 	case 0x16:
 		if (data != m_flags)

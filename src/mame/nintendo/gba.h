@@ -33,6 +33,8 @@ protected:
 
 	void gba_map(address_map &map) ATTR_COLD;
 
+	uint32_t gba_open_bus_r(offs_t offset, uint32_t mem_mask = ~0);
+
 private:
 	required_device_array<dac_8bit_r2r_twos_complement_device, 2> m_ldac;
 	required_device_array<dac_8bit_r2r_twos_complement_device, 2> m_rdac;
@@ -72,7 +74,6 @@ private:
 
 	uint32_t gba_io_r(offs_t offset, uint32_t mem_mask = ~0);
 	void gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t gba_10000000_r(offs_t offset, uint32_t mem_mask = ~0);
 	void int_hblank_callback(int state);
 	void int_vblank_callback(int state);
 	void int_vcount_callback(int state);
@@ -107,6 +108,8 @@ protected:
 	required_region_ptr<uint32_t> m_region_maincpu;
 	required_device<gba_cart_slot_device> m_cart;
 	required_ioport m_bios_hack;
+
+	uint32_t m_bios_prefetch = 0;
 };
 
 

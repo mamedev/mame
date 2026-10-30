@@ -10,6 +10,10 @@
 
 #import "appdelegate.h"
 
+// implemented in window.cpp
+extern "C" int MacRequestMachineExit();
+extern "C" void MacOrderWindowsFront();
+
 @interface MAMEAppDelegate ()
 @end
 
@@ -25,6 +29,7 @@
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification
 {
+	MacOrderWindowsFront();
 }
 
 - (void)applicationDidResignActive:(NSNotification *)notification
@@ -33,6 +38,11 @@
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSNotification *)notification
 {
+	if (MacRequestMachineExit())
+	{
+		return NSTerminateCancel;
+	}
+
 	return NSTerminateNow;
 }
 @end

@@ -605,7 +605,7 @@ void crshrace_state::crshrace(machine_config &config) // TODO: PCB sports 32 MHz
 	m_audiocpu->set_addrmap(AS_IO, &crshrace_state::sound_io_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);

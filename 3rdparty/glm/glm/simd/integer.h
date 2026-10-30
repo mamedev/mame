@@ -55,7 +55,7 @@ GLM_FUNC_QUALIFIER glm_uvec4 glm_i128_interleave(glm_uvec4 x)
 	Reg2 = _mm_slli_epi32(Reg1, 1);
 	Reg2 = _mm_srli_si128(Reg2, 8);
 	Reg1 = _mm_or_si128(Reg1, Reg2);
-	
+
 	return Reg1;
 }
 
@@ -108,7 +108,7 @@ GLM_FUNC_QUALIFIER glm_uvec4 glm_i128_interleave2(glm_uvec4 x, glm_uvec4 y)
 	Reg2 = _mm_slli_epi32(Reg1, 1);
 	Reg2 = _mm_srli_si128(Reg2, 8);
 	Reg1 = _mm_or_si128(Reg1, Reg2);
-	
+
 	return Reg1;
 }
 

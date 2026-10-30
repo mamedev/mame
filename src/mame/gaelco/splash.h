@@ -113,6 +113,7 @@ protected:
 private:
 	INTERRUPT_GEN_MEMBER(roldfrog_interrupt);
 	void roldfrog_update_irq();
+	IRQ_CALLBACK_MEMBER(roldfrog_audiocpu_acknowledge_int);
 
 	void roldfrog_map(address_map &map) ATTR_COLD;
 	void roldfrog_sound_io_map(address_map &map) ATTR_COLD;
@@ -124,6 +125,7 @@ private:
 	uint16_t m_ret = 0;
 	uint8_t m_vblank_irq = 0;
 	uint8_t m_sound_irq = 0;
+	uint8_t m_audiocpu_irq_vector = 0;
 
 	// roldfrog specific
 	uint16_t roldfrog_bombs_r();

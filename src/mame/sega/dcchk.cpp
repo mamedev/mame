@@ -283,7 +283,7 @@ void dcchk_state::dcchk(machine_config &config)
 	m_mdz80cpu->set_addrmap(AS_PROGRAM, &dcchk_state::md_z80_map);
 	m_mdz80cpu->set_addrmap(AS_IO, &dcchk_state::md_z80_io);
 
-	SCREEN(config, m_mdscreen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_mdscreen);
 	m_mdscreen->set_raw(md_master_xtal / 8, 427, 0, 320, 262, 0, 224);
 	m_mdscreen->set_screen_update(m_md_vdp, FUNC(ym7101_device::screen_update));
 
@@ -308,7 +308,8 @@ void dcchk_state::dcchk(machine_config &config)
 
 	SPEAKER(config, "md_speaker", 2).front();
 
-	YM2612(config, m_opn, md_master_xtal / 7);
+	// should be MD2 VA4 equivalent
+	YM3438(config, m_opn, md_master_xtal / 7);
 	m_opn->add_route(0, "md_speaker", 0.50, 0);
 	m_opn->add_route(1, "md_speaker", 0.50, 1);
 

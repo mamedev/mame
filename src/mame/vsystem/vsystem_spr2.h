@@ -32,6 +32,12 @@ public:
 		m_xoffs = xoffs;
 		m_yoffs = yoffs;
 	}
+	// mirror constants for flip_screen, from the game's raster geometry
+	void set_flip_offsets(int xoffs, int yoffs)
+	{
+		m_flip_xoffs = xoffs;
+		m_flip_yoffs = yoffs;
+	}
 
 	void draw_sprites(uint16_t const *spriteram3,  int spriteram3_bytes,  int spritepalettebank, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param, bool flip_screen = false);
 	void draw_sprites(uint16_t const *spriteram3,  int spriteram3_bytes,  int spritepalettebank, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_param, bool flip_screen = false);
@@ -68,6 +74,7 @@ private:
 	vsystem_tile2_indirection_delegate m_newtilecb;
 	int m_pritype;
 	int m_xoffs, m_yoffs;
+	int m_flip_xoffs, m_flip_yoffs;
 
 	sprite_attributes m_curr_sprite;
 };

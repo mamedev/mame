@@ -423,7 +423,7 @@ void advision_state::advision(machine_config &config)
 	m_soundcpu->write_d().set(FUNC(advision_state::sound_d_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(4 * 14); // see notes
 	m_screen->set_vblank_time(0);
 	m_screen->set_size(960, 40 * 4 + 4);

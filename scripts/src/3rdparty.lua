@@ -31,12 +31,12 @@ project "expat"
 		"PACKAGE=\"expat\"",
 		"PACKAGE_BUGREPORT=\"https://github.com/libexpat/libexpat/issues\"",
 		"PACKAGE_NAME=\"expat\"",
-		"PACKAGE_STRING=\"expat-2.7.1\"",
+		"PACKAGE_STRING=\"expat-2.8.3\"",
 		"PACKAGE_TARNAME=\"expat\"",
 		"PACKAGE_URL=\"\"",
-		"PACKAGE_VERSION=\"2.7.1\"",
+		"PACKAGE_VERSION=\"2.8.3\"",
 		"STDC_HEADERS",
-		"VERSION=\"2.7.1\"",
+		"VERSION=\"2.8.3\"",
 		"XML_CONTEXT_BYTES=1024",
 		"XML_DTD",
 		"XML_GE=1",
@@ -57,9 +57,15 @@ if _OPTIONS["targetos"]=="windows" then
 		"__USE_MINGW_ANSI_STDIO=0",
 	}
 end
-if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="freebsd" then
+if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
 	defines {
 		"HAVE_ARC4RANDOM",
+		"HAVE_ARC4RANDOM_BUF",
+	}
+end
+if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
+	defines {
+		"HAVE_GETENTROPY",
 	}
 end
 if BASE_TARGETOS=="unix" then
@@ -84,7 +90,7 @@ if _OPTIONS["vs"]==nil then
 		}
 end
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 if _OPTIONS["gcc"]~=nil then
 	if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
 
@@ -93,6 +99,11 @@ if _OPTIONS["gcc"]~=nil then
 			"-Wno-error=maybe-uninitialized", -- expat in GCC 11.1
 		}
 	end
+end
+if _OPTIONS["targetos"]=="asmjs" then
+		buildoptions_c {
+			"-Wno-error=format", -- expat ptrdiff_t format mismatch
+		}
 end
 if _OPTIONS["targetos"]=="windows" then
 		buildoptions_c {
@@ -108,6 +119,27 @@ end
 		MAME_DIR .. "3rdparty/expat/lib/xmlrole.c",
 		MAME_DIR .. "3rdparty/expat/lib/xmltok.c",
 	}
+if _OPTIONS["targetos"]=="windows" then
+	files {
+		MAME_DIR .. "3rdparty/expat/lib/random_rand_s.c",
+	}
+end
+if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
+	files {
+		MAME_DIR .. "3rdparty/expat/lib/random_arc4random.c",
+		MAME_DIR .. "3rdparty/expat/lib/random_arc4random_buf.c",
+	}
+end
+if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
+	files {
+		MAME_DIR .. "3rdparty/expat/lib/random_getentropy.c",
+	}
+end
+if BASE_TARGETOS=="unix" then
+	files {
+		MAME_DIR .. "3rdparty/expat/lib/random_dev_urandom.c",
+	}
+end
 else
 links {
 	ext_lib("expat"),
@@ -126,7 +158,7 @@ project "zlib"
 
 	local version = str_to_version(_OPTIONS["gcc_version"])
 	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android")) then
-		configuration { "gmake or ninja" }
+		configuration { "gmake or ninja or jcdb" }
 		if (version >= 30700) then
 			buildoptions {
 				"-Wno-shift-negative-value",
@@ -222,6 +254,7 @@ end
 		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_ldm.c",
 		MAME_DIR .. "3rdparty/zstd/lib/compress/zstdmt_compress.c",
 		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_opt.c",
+		MAME_DIR .. "3rdparty/zstd/lib/compress/zstd_preSplit.c",
 		--MAME_DIR .. "3rdparty/zstd/lib/decompress/huf_decompress_amd64.S", only supports GCC-like assemblers and SysV calling convention
 		MAME_DIR .. "3rdparty/zstd/lib/decompress/huf_decompress.c",
 		MAME_DIR .. "3rdparty/zstd/lib/decompress/zstd_ddict.c",
@@ -256,7 +289,7 @@ project "softfloat3"
 		MAME_DIR .. "3rdparty/softfloat3/bochs_ext"
 	}
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions_cpp {
 			"-x c++",
 		}
@@ -753,7 +786,7 @@ end
 		end
 
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions_c {
 			"-Wno-error=bad-function-cast",
 			"-Wno-error=unused-function",
@@ -825,10 +858,9 @@ project "7z"
 	uuid "ad573d62-e76a-4b11-ae34-5110a6789a42"
 	kind "StaticLib"
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions_c {
 			"-Wno-error=undef",
-			"-Wno-error=strict-prototypes",
 		}
 if _OPTIONS["gcc"]~=nil then
 	if string.find(_OPTIONS["gcc"], "clang") then
@@ -921,7 +953,7 @@ project "lua"
 		"ForceCPP",
 	}
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions_cpp {
 			"-x c++",
 		}
@@ -1002,10 +1034,7 @@ project "lualibs"
 		"ForceCPP",
 	}
 
-	configuration { "gmake or ninja" }
-		buildoptions {
-			"-Wno-error=unused-variable",
-		}
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions_cpp {
 			"-x c++",
 		}
@@ -1013,15 +1042,10 @@ project "lualibs"
 	configuration { "vs*" }
 if _OPTIONS["vs"]==nil then
 		buildoptions {
-			"/wd4101", -- warning C4101: 'identifier': unreferenced local variable
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 			"/wd4055", -- warning C4055: 'type cast': from data pointer 'void *' to function pointer 'xxx'
 			"/wd4152", -- warning C4152: nonstandard extension, function/data pointer conversion in expression
 			"/wd4130", -- warning C4130: '==': logical operation on address of string constant
-		}
-elseif _OPTIONS["vs"]=="clangcl" then
-		buildoptions {
-			"-Wno-error=unused-variable",
 		}
 end
 
@@ -1056,13 +1080,13 @@ project "sqlite3"
 	uuid "5cb3d495-57ed-461c-81e5-80dc0857517d"
 	kind "StaticLib"
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions_c {
-			"-Wno-bad-function-cast",
+			"-Wno-error=bad-function-cast",
 			"-Wno-discarded-qualifiers",
 			"-Wno-undef",
-			"-Wno-unused-but-set-variable",
-			"-Wno-unused-variable",
+			"-Wno-error=unused-but-set-variable",
+			"-Wno-error=unused-variable",
 		}
 if _OPTIONS["gcc"]~=nil then
 	if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
@@ -1071,16 +1095,16 @@ if _OPTIONS["gcc"]~=nil then
 		}
 	else
 		buildoptions_c {
-			"-Wno-return-local-addr", -- sqlite3.c in GCC 10
-			"-Wno-misleading-indentation",  -- sqlite3.c in GCC 11.1
+			"-Wno-error=return-local-addr", -- sqlite3.c in GCC 10
+			"-Wno-error=misleading-indentation",  -- sqlite3.c in GCC 11.1
 		}
 	end
 end
 	configuration { "vs*" }
 if _OPTIONS["vs"]=="clangcl" then
 		buildoptions {
-			"-Wno-unused-but-set-variable",
-			"-Wno-unused-variable",
+			"-Wno-error=unused-but-set-variable",
+			"-Wno-error=unused-variable",
 		}
 end
 
@@ -1136,7 +1160,7 @@ end
 		}
 	configuration { }
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions_c {
 			"-Wno-unknown-pragmas",
 			"-Wno-unused-but-set-variable",
@@ -1307,7 +1331,7 @@ project "bimg"
 			MAME_DIR .. "3rdparty/bx/include/compat/linux",
 		}
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions {
 			"-Wno-unused-but-set-variable",
 			"-Wno-undef",
@@ -1470,7 +1494,7 @@ end
 			MAME_DIR .. "3rdparty/bx/include/compat/linux",
 		}
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions {
 			"-Wno-uninitialized",
 			"-Wno-unused-but-set-variable",
@@ -1622,7 +1646,7 @@ elseif _OPTIONS["vs"]=="clangcl" then
 		}
 end
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions_c {
 			"-Wno-bad-function-cast",
 			"-Wno-missing-braces",
@@ -1825,7 +1849,7 @@ project "wdlfft"
 	uuid "74ca017e-fa0d-48b8-81d6-8081a37be14c"
 	kind "StaticLib"
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions_c {
 			"-Wno-strict-prototypes",
 		}
@@ -1845,6 +1869,13 @@ project "wdlfft"
 project "ymfm"
 	uuid "2403a536-cb0a-4b50-b41f-10c17917689b"
 	kind "StaticLib"
+
+	configuration { "gmake or ninja or jcdb" }
+		if _OPTIONS["targetos"]=="asmjs" then
+			buildoptions_cpp {
+				"-Wno-array-bounds", -- ymfm_fm.ipp accesses operator array index past 12 in template code clang can't fully analyse
+			}
+		end
 
 	configuration { }
 		defines {
@@ -1877,6 +1908,82 @@ project "ymfm"
 
 
 --------------------------------------------------
+-- reSIDfp library objects
+--------------------------------------------------
+
+project "residfp"
+	uuid "8a6f7e6c-56b9-4770-851f-2f8aa62cb3d8"
+	kind "StaticLib"
+
+	configuration { }
+
+	includedirs {
+		MAME_DIR .. "3rdparty/residfp",
+	}
+
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
+		configuration { "gmake or ninja or jcdb" }
+			buildoptions_cpp {
+				"-Wno-mismatched-tags",
+			}
+		configuration { }
+	end
+
+	files {
+		MAME_DIR .. "3rdparty/residfp/Dac.cpp",
+		MAME_DIR .. "3rdparty/residfp/Dac.h",
+		MAME_DIR .. "3rdparty/residfp/EnvelopeGenerator.cpp",
+		MAME_DIR .. "3rdparty/residfp/EnvelopeGenerator.h",
+		MAME_DIR .. "3rdparty/residfp/ExternalFilter.cpp",
+		MAME_DIR .. "3rdparty/residfp/ExternalFilter.h",
+		MAME_DIR .. "3rdparty/residfp/Filter.cpp",
+		MAME_DIR .. "3rdparty/residfp/Filter.h",
+		MAME_DIR .. "3rdparty/residfp/Filter6581.cpp",
+		MAME_DIR .. "3rdparty/residfp/Filter6581.h",
+		MAME_DIR .. "3rdparty/residfp/Filter8580.cpp",
+		MAME_DIR .. "3rdparty/residfp/Filter8580.h",
+		MAME_DIR .. "3rdparty/residfp/FilterModelConfig.cpp",
+		MAME_DIR .. "3rdparty/residfp/FilterModelConfig.h",
+		MAME_DIR .. "3rdparty/residfp/FilterModelConfig6581.cpp",
+		MAME_DIR .. "3rdparty/residfp/FilterModelConfig6581.h",
+		MAME_DIR .. "3rdparty/residfp/FilterModelConfig8580.cpp",
+		MAME_DIR .. "3rdparty/residfp/FilterModelConfig8580.h",
+		MAME_DIR .. "3rdparty/residfp/Integrator.h",
+		MAME_DIR .. "3rdparty/residfp/Integrator6581.cpp",
+		MAME_DIR .. "3rdparty/residfp/Integrator6581.h",
+		MAME_DIR .. "3rdparty/residfp/Integrator8580.cpp",
+		MAME_DIR .. "3rdparty/residfp/Integrator8580.h",
+		MAME_DIR .. "3rdparty/residfp/OpAmp.cpp",
+		MAME_DIR .. "3rdparty/residfp/OpAmp.h",
+		MAME_DIR .. "3rdparty/residfp/SID.cpp",
+		MAME_DIR .. "3rdparty/residfp/SID.h",
+		MAME_DIR .. "3rdparty/residfp/Spline.cpp",
+		MAME_DIR .. "3rdparty/residfp/Spline.h",
+		MAME_DIR .. "3rdparty/residfp/State.cpp",
+		MAME_DIR .. "3rdparty/residfp/State.h",
+		MAME_DIR .. "3rdparty/residfp/Voice.h",
+		MAME_DIR .. "3rdparty/residfp/WaveformCalculator.cpp",
+		MAME_DIR .. "3rdparty/residfp/WaveformCalculator.h",
+		MAME_DIR .. "3rdparty/residfp/WaveformGenerator.cpp",
+		MAME_DIR .. "3rdparty/residfp/WaveformGenerator.h",
+		MAME_DIR .. "3rdparty/residfp/array.h",
+		MAME_DIR .. "3rdparty/residfp/siddefs-fp.h",
+		MAME_DIR .. "3rdparty/residfp/version.cc",
+		MAME_DIR .. "3rdparty/residfp/resample/Limiter.h",
+		MAME_DIR .. "3rdparty/residfp/resample/PassThrough.h",
+		MAME_DIR .. "3rdparty/residfp/resample/Resampler.h",
+		MAME_DIR .. "3rdparty/residfp/resample/SincResampler.cpp",
+		MAME_DIR .. "3rdparty/residfp/resample/SincResampler.h",
+		MAME_DIR .. "3rdparty/residfp/resample/TwoPassSincResampler.h",
+		MAME_DIR .. "3rdparty/residfp/resample/ZeroOrderResampler.h",
+		MAME_DIR .. "3rdparty/residfp/residfp/residfp.cpp",
+		MAME_DIR .. "3rdparty/residfp/residfp/residfp.h",
+		MAME_DIR .. "3rdparty/residfp/residfp/residfp_defs.h",
+		MAME_DIR .. "3rdparty/residfp/residfp/sidversion.h",
+	}
+
+
+--------------------------------------------------
 -- asmjit library
 --------------------------------------------------
 
@@ -1885,7 +1992,7 @@ project "asmjit"
 	uuid "4539757c-6e99-4bae-b3d0-b342a7c49539"
 	kind "StaticLib"
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 	if (_OPTIONS["gcc"] ~= nil) and (not string.find(_OPTIONS["gcc"], "clang")) and (str_to_version(_OPTIONS["gcc_version"]) < 80000) then
 		buildoptions {
 			"-Wno-maybe-uninitialized",

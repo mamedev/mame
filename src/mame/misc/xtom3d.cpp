@@ -717,7 +717,7 @@ void xtom3d_state::xtom3d(machine_config &config)
 //  subdevice<generic_voodoo_device>(PCI_AGP_ID":voodoo")->vblank_callback().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq5_w));
 
 	// TODO: fix legacy raw setup here
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(57);
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640 - 1, 0, 480 - 1);

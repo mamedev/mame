@@ -18,6 +18,7 @@
 #include "main.h"
 #include "natkeyboard.h"
 #include "profiler.h"
+#include "video.h"
 
 #include "ui/uimain.h"
 
@@ -931,6 +932,7 @@ std::string ioport_field::key_name(int which) const
 	case UCHAR_SHIFT_1: return "Shift";
 	case UCHAR_SHIFT_2: return "Ctrl";
 	case UCHAR_MAMEKEY(ESC): return "Esc";
+	case UCHAR_MAMEKEY(TAB): return "Tab";
 	case UCHAR_MAMEKEY(INSERT): return "Insert";
 	case UCHAR_MAMEKEY(DEL): return "Delete";
 	case UCHAR_MAMEKEY(HOME): return "Home";
@@ -3997,22 +3999,20 @@ void analog_field::read(ioport_value &result)
 	if (!m_field.enabled())
 		return;
 
-	// if set programmatically, only use the override value
-	if (m_use_adjoverride)
+	s32 value;
+	if (!m_use_adjoverride)
 	{
-		result = m_adjoverride;
-		return;
+		// interpolate if appropriate and if time has passed since the last update
+		value = !m_interpolate ? m_accum : manager().frame_interpolate(m_previous, m_accum);
+
+		// apply standard analog settings
+		value = apply_settings(value);
 	}
-
-	// start with the raw value
-	s32 value = m_accum;
-
-	// interpolate if appropriate and if time has passed since the last update
-	if (m_interpolate)
-		value = manager().frame_interpolate(m_previous, m_accum);
-
-	// apply standard analog settings
-	value = apply_settings(value);
+	else
+	{
+		// if set programmatically, use the override value
+		value = m_adjoverride;
+	}
 
 	// remap the value if needed
 	if (m_field.remap_table() != nullptr)

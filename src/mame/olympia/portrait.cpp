@@ -384,8 +384,8 @@ uint32_t portrait_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	cliprect_scroll = cliprect_no_scroll = cliprect;
 
 	// TODO: make clipping areas more readable
-	cliprect_no_scroll.min_x = cliprect_no_scroll.max_x - 111;
-	cliprect_scroll.max_x = cliprect_scroll.min_x + 319;
+	cliprect_no_scroll.setx(cliprect_no_scroll.right() - 111, cliprect_no_scroll.right());
+	cliprect_scroll.setx(cliprect_scroll.left(), cliprect_scroll.left() + 319);
 
 	// status bar
 	m_background->set_scrolly(0, 0);
@@ -574,7 +574,7 @@ void portrait_state::portrait(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);

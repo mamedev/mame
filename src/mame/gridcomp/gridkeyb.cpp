@@ -2,174 +2,99 @@
 // copyright-holders:Vas Crabb, Sergey Svishchev
 /***************************************************************************
 
-    GRiD Compass keyboard HLE
-
-    Keycodes from "GRiD-OS Reference Appendix A - Key scan codes"
+    GRiD Compass keyboard
 
 ***************************************************************************/
 
 #include "emu.h"
 
 #include "gridkeyb.h"
-#include "machine/keyboard.ipp"
-
-
-
-namespace {
-// Regarding the document, the scan code for Escape when Code and Shift are pressed has been corrected.
-// All values in the table have been verified against the values from the keyboard firmware.
-u8 const TRANSLATION_TABLE[][4][16] = {
-	{   // Plain
-		{   '`',   '1',   '2',   '3',   '4',   '5',   '6',   '7',   '8',   '9',   '0',   '-',   '=', 0x08U, 0x7fU, 0x1bU },
-		{ 0x09U,   'q',   'w',   'e',   'r',   't',   'y',   'u',   'i',   'o',   'p',   '[',   ']',  '\\', 0xffU, 0xffU },
-		{ 0xffU,   'a',   's',   'd',   'f',   'g',   'h',   'j',   'k',   'l',   ';',  '\'', 0x0dU, 0xc5U, 0xc4U, 0xffU },
-		{ 0xffU,  '\\',   'z',   'x',   'c',   'v',   'b',   'n',   'm',   ',',   '.',   '/', 0xffU, 0xc6U, 0xc7U,   ' ' },
-	},
-	{   // SHIFT
-		{   '~',   '!',   '@',   '#',   '$',   '%',   '^',   '&',   '*',   '(',   ')',   '_',   '+', 0xc8U, 0x7fU, 0x1bU },
-		{ 0xc9U,   'Q',   'W',   'E',   'R',   'T',   'Y',   'U',   'I',   'O',   'P',   '{',   '}',   '|', 0xffU, 0xffU },
-		{ 0xffU,   'A',   'S',   'D',   'F',   'G',   'H',   'J',   'K',   'L',   ':',   '"', 0xcdU, 0xcfU, 0xceU, 0xffU },
-		{ 0xffU,   '|',   'Z',   'X',   'C',   'V',   'B',   'N',   'M',   '<',   '>',   '?', 0xffU, 0xd0U, 0xd1U,   ' ' },
-	},
-	{   // CODE
-		{   '`', 0xb1U, 0xb2U, 0xb3U, 0xb4U, 0xb5U, 0xb6U, 0xb7U, 0xb8U, 0xb9U, 0xb0U, 0xadU, 0xbdU, 0x88U, 0x7fU, 0x9bU },
-		{ 0x89U, 0xf1U, 0xf7U, 0xe5U, 0xf2U, 0xf4U, 0xf9U, 0xf5U, 0xe9U, 0xefU, 0xf0U,   '[',   ']',  '\\', 0xffU, 0xffU },
-		{ 0xffU, 0xe1U, 0xf3U, 0xe4U, 0xe6U, 0xe7U, 0xe8U, 0xeaU, 0xebU, 0xecU,   '~',   '`', 0x8dU, 0xd3U, 0xd2U, 0xffU },
-		{ 0xffU,  '\\', 0xfaU, 0xf8U, 0xe3U, 0xf6U, 0xe2U, 0xeeU, 0xedU,   '[',   ']', 0xbfU, 0xffU, 0xd4U, 0xd5U,   ' ' },
-	},
-	{   // CODE + SHIFT
-		{   '~', 0xa1U, 0xc0U, 0xa3U, 0xa4U, 0xa5U, 0xdeU, 0xa6U, 0xaaU, 0xa8U, 0xa9U, 0x7fU, 0xabU, 0x8aU, 0x7fU, 0xfeU },
-		{ 0x8bU, 0xf1U, 0xf7U, 0xe5U, 0xf2U, 0xf4U, 0xf9U, 0xf5U, 0xe9U, 0xefU, 0xf0U,   '{',   '}',   '|', 0xffU, 0xffU },
-		{ 0xffU, 0xe1U, 0xf3U, 0xe4U, 0xe6U, 0xe7U, 0xe8U, 0xeaU, 0xebU, 0xecU,   '|',  '\\', 0x8cU, 0xd7U, 0xd6U, 0xffU },
-		{ 0xffU,   '|', 0xfaU, 0xf8U, 0xe3U, 0xf6U, 0xe2U, 0xeeU, 0xedU,   '{',   '}', 0xbfU, 0xffU, 0xd8U, 0xd9U,   ' ' },
-	},
-};
-} // anonymous namespace
-
-
 
 /***************************************************************************
     REUSABLE I/O PORTS
 ***************************************************************************/
 
 INPUT_PORTS_START( grid_keyboard )
-	PORT_START("GRIDKBD_CFG")
-	PORT_CONFNAME( 0x0006U, 0x0004U, "Typematic Delay" )
-	PORT_CONFSETTING(       0x0000U, "0.25s" )
-	PORT_CONFSETTING(       0x0002U, "0.5s"  )
-	PORT_CONFSETTING(       0x0004U, "0.75s" )
-	PORT_CONFSETTING(       0x0006U, "1.0s"  )
-	PORT_CONFNAME( 0x00f8U, 0x0098U, "Typematic Rate" )
-	PORT_CONFSETTING(       0x0000U,  "2.0cps" )
-	PORT_CONFSETTING(       0x0008U,  "2.1cps" )
-	PORT_CONFSETTING(       0x0010U,  "2.5cps" )
-	PORT_CONFSETTING(       0x0018U,  "2.7cps" )
-	PORT_CONFSETTING(       0x0020U,  "2.0cps" )
-	PORT_CONFSETTING(       0x0028U,  "2.1cps" )
-	PORT_CONFSETTING(       0x0030U,  "2.5cps" )
-	PORT_CONFSETTING(       0x0038U,  "2.7cps" )
-	PORT_CONFSETTING(       0x0040U,  "3.3cps" )
-	PORT_CONFSETTING(       0x0048U,  "3.8cps" )
-	PORT_CONFSETTING(       0x0050U,  "4.0cps" )
-	PORT_CONFSETTING(       0x0058U,  "4.3cps" )
-	PORT_CONFSETTING(       0x0060U,  "4.6cps" )
-	PORT_CONFSETTING(       0x0068U,  "5.0cps" )
-	PORT_CONFSETTING(       0x0070U,  "5.5cps" )
-	PORT_CONFSETTING(       0x0078U,  "6.0cps" )
-	PORT_CONFSETTING(       0x0080U,  "8.0cps" )
-	PORT_CONFSETTING(       0x0088U,  "8.6cps" )
-	PORT_CONFSETTING(       0x0090U,  "9.2cps" )
-	PORT_CONFSETTING(       0x0098U, "10.0cps" )
-	PORT_CONFSETTING(       0x00a0U, "10.9cps" )
-	PORT_CONFSETTING(       0x00a8U, "12.0cps" )
-	PORT_CONFSETTING(       0x00b0U, "13.3cps" )
-	PORT_CONFSETTING(       0x00b8U, "15.0cps" )
-	PORT_CONFSETTING(       0x00c0U, "16.0cps" )
-	PORT_CONFSETTING(       0x00c8U, "17.1cps" )
-	PORT_CONFSETTING(       0x00d0U, "18.5cps" )
-	PORT_CONFSETTING(       0x00d8U, "20.0cps" )
-	PORT_CONFSETTING(       0x00e0U, "21.8cps" )
-	PORT_CONFSETTING(       0x00e8U, "24.0cps" )
-	PORT_CONFSETTING(       0x00f0U, "26.7cps" )
-	PORT_CONFSETTING(       0x00f8U, "30.0cps" )
-
 	PORT_START("GRIDKBD_MOD")
 	PORT_BIT( 0x01U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl")       PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)             PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0x02U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift")      PORT_CODE(KEYCODE_LSHIFT)   PORT_CODE(KEYCODE_RSHIFT)               PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x04U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Caps Lock")  PORT_CODE(KEYCODE_CAPSLOCK)                             PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+	PORT_BIT( 0x04U, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Code")       PORT_CODE(KEYCODE_LALT)     PORT_CODE(KEYCODE_RALT)                 PORT_CHAR(UCHAR_MAMEKEY(LALT))
 
-	PORT_START("GRIDKBD_ROW0")
-	PORT_BIT( 0x0001U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE)                              PORT_CHAR('`')   PORT_CHAR('~')
-	PORT_BIT( 0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1)                                  PORT_CHAR('1')   PORT_CHAR('!')
-	PORT_BIT( 0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2)                                  PORT_CHAR('2')   PORT_CHAR('@')
-	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3)                                  PORT_CHAR('3')   PORT_CHAR('#')
-	PORT_BIT( 0x0010U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4)                                  PORT_CHAR('4')   PORT_CHAR('$')
-	PORT_BIT( 0x0020U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5)                                  PORT_CHAR('5')   PORT_CHAR('%')
-	PORT_BIT( 0x0040U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6)                                  PORT_CHAR('6')   PORT_CHAR('^')
-	PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7)                                  PORT_CHAR('7')   PORT_CHAR('&')
-	PORT_BIT( 0x0100U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8)                                  PORT_CHAR('8')   PORT_CHAR('*')
-	PORT_BIT( 0x0200U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9)                                  PORT_CHAR('9')   PORT_CHAR('(')
-	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0)                                  PORT_CHAR('0')   PORT_CHAR(')')
-	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)                              PORT_CHAR('-')   PORT_CHAR('_')
-	PORT_BIT( 0x1000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)                             PORT_CHAR('=')   PORT_CHAR('+')
-	PORT_BIT( 0x2000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE)  PORT_NAME("Backspace")  PORT_CHAR(0x08U)
-	PORT_BIT( 0x4000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL)        PORT_NAME("Del")        PORT_CHAR(UCHAR_MAMEKEY(DEL))
-	PORT_BIT( 0x8000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC)        PORT_NAME("Escape")     PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_START("GRIDKBD_COL0")
+	PORT_BIT( 0x01U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB)       PORT_CHAR('\t')
+	PORT_BIT( 0x02U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC)       PORT_NAME("Escape") PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_BIT( 0xfCU, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("GRIDKBD_ROW1")
-	PORT_BIT( 0x0001U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB)                                PORT_CHAR('\t')
-	PORT_BIT( 0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)                                  PORT_CHAR('q')   PORT_CHAR('Q')
-	PORT_BIT( 0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)                                  PORT_CHAR('w')   PORT_CHAR('W')
-	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)                                  PORT_CHAR('e')   PORT_CHAR('E')
-	PORT_BIT( 0x0010U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)                                  PORT_CHAR('r')   PORT_CHAR('R')
-	PORT_BIT( 0x0020U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T)                                  PORT_CHAR('t')   PORT_CHAR('T')
-	PORT_BIT( 0x0040U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y)                                  PORT_CHAR('y')   PORT_CHAR('Y')
-	PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U)                                  PORT_CHAR('u')   PORT_CHAR('U')
-	PORT_BIT( 0x0100U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I)                                  PORT_CHAR('i')   PORT_CHAR('I')
-	PORT_BIT( 0x0200U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)                                  PORT_CHAR('o')   PORT_CHAR('O')
-	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P)                                  PORT_CHAR('p')   PORT_CHAR('P')
-	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)                          PORT_CHAR('[')   PORT_CHAR('{')
-	PORT_BIT( 0x1000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)                         PORT_CHAR(']')   PORT_CHAR('}')
-	PORT_BIT( 0x2000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)                          PORT_CHAR('\\')  PORT_CHAR('|')
-	PORT_BIT( 0x4000U, IP_ACTIVE_HIGH, IPT_UNUSED   )
-	PORT_BIT( 0x8000U, IP_ACTIVE_HIGH, IPT_UNUSED   )
+	PORT_START("GRIDKBD_COL1")
+	PORT_BIT( 0x01U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1)         PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT( 0x02U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH)     PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT( 0x04U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER)     PORT_NAME("Return") PORT_CHAR(0x0dU)
+	PORT_BIT( 0x08U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)     PORT_CHAR('\'') PORT_CHAR('"')
+	PORT_BIT( 0x10U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT)      PORT_NAME("LeftArrow")
+	PORT_BIT( 0x20U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)     PORT_CHAR('-') PORT_CHAR('_')
+	PORT_BIT( 0x40U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I)         PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT( 0x80U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9)         PORT_CHAR('9') PORT_CHAR('(')
 
-	PORT_START("GRIDKBD_ROW2")
-	PORT_BIT( 0x0001U, IP_ACTIVE_HIGH, IPT_UNUSED   )
-	PORT_BIT( 0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A)                                 PORT_CHAR('a')    PORT_CHAR('A')
-	PORT_BIT( 0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)                                 PORT_CHAR('s')    PORT_CHAR('S')
-	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D)                                 PORT_CHAR('d')    PORT_CHAR('D')
-	PORT_BIT( 0x0010U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F)                                 PORT_CHAR('f')    PORT_CHAR('F')
-	PORT_BIT( 0x0020U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G)                                 PORT_CHAR('g')    PORT_CHAR('G')
-	PORT_BIT( 0x0040U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H)                                 PORT_CHAR('h')    PORT_CHAR('H')
-	PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)                                 PORT_CHAR('j')    PORT_CHAR('J')
-	PORT_BIT( 0x0100U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)                                 PORT_CHAR('k')    PORT_CHAR('K')
-	PORT_BIT( 0x0200U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)                                 PORT_CHAR('l')    PORT_CHAR('L')
-	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)                             PORT_CHAR(';')    PORT_CHAR(':')
-	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)                             PORT_CHAR('\'')   PORT_CHAR('"')
-	PORT_BIT( 0x1000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER)      PORT_NAME("Return")    PORT_CHAR(0x0dU)
-	PORT_BIT( 0x2000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP)         PORT_NAME("UpArrow")
-	PORT_BIT( 0x4000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN)       PORT_NAME("DownArrow")
-	PORT_BIT( 0x8000U, IP_ACTIVE_HIGH, IPT_UNUSED   )
+	PORT_START("GRIDKBD_COL2")
+	PORT_BIT( 0x01U, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M)         PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT( 0x04U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP)      PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT( 0x08U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA)     PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT( 0x10U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)     PORT_CHAR(';') PORT_CHAR(':')
+	PORT_BIT( 0x20U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P)         PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT( 0x40U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U)         PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT( 0x80U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8)         PORT_CHAR('8') PORT_CHAR('*')
 
-	PORT_START("GRIDKBD_ROW3")
-	PORT_BIT( 0x0001U, IP_ACTIVE_HIGH, IPT_UNUSED   )
-	PORT_BIT( 0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2)                        PORT_CHAR('\\')  PORT_CHAR('_')
-	PORT_BIT( 0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)                                 PORT_CHAR('z')   PORT_CHAR('Z')
-	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X)                                 PORT_CHAR('x')   PORT_CHAR('X')
-	PORT_BIT( 0x0010U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C)                                 PORT_CHAR('c')   PORT_CHAR('C')
-	PORT_BIT( 0x0020U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V)                                 PORT_CHAR('v')   PORT_CHAR('V')
-	PORT_BIT( 0x0040U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B)                                 PORT_CHAR('b')   PORT_CHAR('B')
-	PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N)                                 PORT_CHAR('n')   PORT_CHAR('N')
-	PORT_BIT( 0x0100U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M)                                 PORT_CHAR('m')   PORT_CHAR('M')
-	PORT_BIT( 0x0200U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA)                             PORT_CHAR(',')   PORT_CHAR('<')
-	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP)                              PORT_CHAR('.')   PORT_CHAR('>')
-	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH)                             PORT_CHAR('/')   PORT_CHAR('?')
-	PORT_BIT( 0x1000U, IP_ACTIVE_HIGH, IPT_UNUSED   )
-	PORT_BIT( 0x2000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT)       PORT_NAME("LeftArrow")
-	PORT_BIT( 0x4000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT)      PORT_NAME("RightArrow")
-	PORT_BIT( 0x8000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE)                             PORT_CHAR(' ')
+	PORT_START("GRIDKBD_COL3")
+	PORT_BIT( 0x01U, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V)         PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT( 0x04U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N)         PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT( 0x08U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B)         PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT( 0x10U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)         PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT( 0x20U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)         PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT( 0x40U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y)         PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT( 0x80U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7)         PORT_CHAR('7') PORT_CHAR('&')
+
+	PORT_START("GRIDKBD_COL4")
+	PORT_BIT( 0x01U, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)         PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT( 0x04U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C)         PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT( 0x08U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X)         PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT( 0x10U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)         PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT( 0x20U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H)         PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT( 0x40U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T)         PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT( 0x80U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6)         PORT_CHAR('6') PORT_CHAR('^')
+
+	PORT_START("GRIDKBD_COL5")
+	PORT_BIT( 0x01U, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)         PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT( 0x04U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A)         PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT( 0x08U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)         PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT( 0x10U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G)         PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT( 0x20U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F)         PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT( 0x40U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)         PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT( 0x80U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5)         PORT_CHAR('5') PORT_CHAR('%')
+
+	PORT_START("GRIDKBD_COL6")
+	PORT_BIT( 0x01U, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02U, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2)         PORT_CHAR('2') PORT_CHAR('@')
+	PORT_BIT( 0x08U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)         PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT( 0x10U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D)         PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT( 0x20U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)         PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT( 0x40U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3)         PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT( 0x80U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4)         PORT_CHAR('4') PORT_CHAR('$')
+
+	PORT_START("GRIDKBD_COL7")
+	PORT_BIT( 0x01U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE)     PORT_CHAR(' ')
+	PORT_BIT( 0x02U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Backspace") PORT_CHAR(0x08U)
+	PORT_BIT( 0x04U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN)      PORT_NAME("DownArrow")
+	PORT_BIT( 0x08U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT)     PORT_NAME("RightArrow")
+	PORT_BIT( 0x10U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP)        PORT_NAME("UpArrow")
+	PORT_BIT( 0x20U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)    PORT_CHAR('=') PORT_CHAR('+')
+	PORT_BIT( 0x40U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)         PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT( 0x80U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0)         PORT_CHAR('0') PORT_CHAR(')')
 INPUT_PORTS_END
 
 
@@ -180,128 +105,89 @@ INPUT_PORTS_END
 
 DEFINE_DEVICE_TYPE(GRID_KEYBOARD, grid_keyboard_device, "grid_keyboard", "GRiD Compass Keyboard")
 
+ROM_START(grid_keyboard)
+	ROM_REGION(0x0400, "mcu", 0)
+	ROM_DEFAULT_BIOS("1101")
 
+	// The 1101 keyboard firmware is used by all Compass systems.
+	ROM_SYSTEM_BIOS(0, "1101", "GRiD 1101")
+	ROMX_LOAD("300067-01.bin", 0x0000, 0x0400, CRC(48cb0b57) SHA1(3163a4209093c4cd9498db5d89ac9bb7c2ca2a6c), ROM_BIOS(0))
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-
-grid_keyboard_device::grid_keyboard_device(
-		machine_config const &mconfig,
-		device_type type,
-		char const *tag,
-		device_t *owner,
-		u32 clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, device_matrix_keyboard_interface(mconfig, *this, "GRIDKBD_ROW0", "GRIDKBD_ROW1", "GRIDKBD_ROW2", "GRIDKBD_ROW3")
-	, m_config(*this, "GRIDKBD_CFG")
-	, m_modifiers(*this, "GRIDKBD_MOD")
-	, m_last_modifiers(0U)
-	, m_keyboard_cb(*this)
-{
-}
-
+	// The 1137 firmware slightly differs and appears to be a rebuild with a newer compiler.
+	ROM_SYSTEM_BIOS(1, "1137", "GRiD 1137")
+	ROMX_LOAD("300001-02.bin", 0x0000, 0x0400, CRC(cebbccdc) SHA1(67ff291457ae5c97d4c3e6b3b96aa8cb8378552c), ROM_BIOS(1))
+ROM_END
 
 grid_keyboard_device::grid_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: grid_keyboard_device(mconfig, GRID_KEYBOARD, tag, owner, clock)
+	: device_t(mconfig, GRID_KEYBOARD, tag, owner, clock)
+	, m_mcu(*this, "mcu")
+	, m_columns(*this, "GRIDKBD_COL%u", 0U)
+	, m_modifiers(*this, "GRIDKBD_MOD")
+	, m_irq_cb(*this)
+	, m_dma_cb(*this)
+	, m_nmi_cb(*this)
 {
 }
-
 
 ioport_constructor grid_keyboard_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(grid_keyboard);
 }
 
-
 void grid_keyboard_device::device_start()
 {
-	m_keyboard_cb.resolve();
-
-	save_item(NAME(m_last_modifiers));
 }
 
-
-void grid_keyboard_device::device_reset()
+void grid_keyboard_device::device_add_mconfig(machine_config &config)
 {
-	reset_key_state();
-	m_last_modifiers = 0;
-
-	start_processing(attotime::from_hz(2'400));
-	typematic_stop();
+	i8741a_device &mcu(I8741A(config, m_mcu, XTAL(5'000'000)));
+	mcu.p1_in_cb().set(FUNC(grid_keyboard_device::p1_r));
+	mcu.p2_in_cb().set_constant(0xff);
+	mcu.p2_out_cb().set(FUNC(grid_keyboard_device::p2_w));
+	mcu.t0_in_cb().set(FUNC(grid_keyboard_device::t0_r));
+	mcu.t1_in_cb().set(FUNC(grid_keyboard_device::t1_r));
 }
 
-
-void grid_keyboard_device::key_make(u8 row, u8 column)
+const tiny_rom_entry *grid_keyboard_device::device_rom_region() const
 {
-	send_translated((row << 4) | column);
-	typematic_start(row, column, typematic_delay(), typematic_period());
+	return ROM_NAME(grid_keyboard);
 }
 
-
-void grid_keyboard_device::key_repeat(u8 row, u8 column)
+u8 grid_keyboard_device::read(offs_t offset)
 {
-	send_translated((row << 4) | column);
+	return m_mcu->upi41_master_r(offset & 1);
 }
 
-
-void grid_keyboard_device::send_key(u16 code)
+void grid_keyboard_device::write(offs_t offset, u8 data)
 {
-	m_keyboard_cb(code);
+	m_mcu->upi41_master_w(offset & 1, data);
 }
 
-
-bool grid_keyboard_device::translate(u8 code, u16 &translated) const
+void grid_keyboard_device::p2_w(u8 data)
 {
-	unsigned const row((code >> 4) & 0x03U);
-	unsigned const col((code >> 0) & 0x0fU);
-
-	u16 const modifiers(m_modifiers->read());
-	bool const shift(bool(modifiers & 0x02) || bool(modifiers & 0x04));
-	bool const ctrl(modifiers & 0x01U);
-	bool const meta(modifiers & 0x08U);
-
-	int const map((int)meta << 1 | (int)shift);
-
-	u8 const result(TRANSLATION_TABLE[map][row][col]);
-	if (result == 0xff)
-		return false;
-
-	if (ctrl)
-		translated = result & 0x9f;
-	else
-		translated = result;
-
-	return true;
+	m_irq_cb(BIT(data, 3));
+	m_dma_cb(BIT(data, 4));
+	m_nmi_cb(BIT(data, 6));
 }
 
-
-void grid_keyboard_device::will_scan_row(u8 row)
+u8 grid_keyboard_device::p1_r()
 {
-	u16 const modifiers(m_modifiers->read());
-	if (modifiers != m_last_modifiers)
-		typematic_restart(typematic_delay(), typematic_period());
+	unsigned const column = m_mcu->p2_r() & 0x07;
+	u8 data = ~u8(m_columns[column]->read());
 
-	m_last_modifiers = modifiers;
+	// Ctrl is wired to P1.0 while the firmware selects decoder output 2.
+	if (column == 2 && BIT(m_modifiers->read(), 0))
+		data &= ~0x01;
+
+	return data;
 }
 
-
-void grid_keyboard_device::send_translated(u8 code)
+int grid_keyboard_device::t0_r()
 {
-	u16 translated;
-	if (translate(code, translated))
-		send_key(translated);
+	return !BIT(m_modifiers->read(), 1); // Shift, active low
 }
 
-
-attotime grid_keyboard_device::typematic_delay() const
+int grid_keyboard_device::t1_r()
 {
-	return attotime::from_msec(250 * (1 + ((m_config->read() >> 1) & 0x03U)));
-}
-
-
-attotime grid_keyboard_device::typematic_period() const
-{
-	unsigned const rate(~(m_config->read() >> 3) & 0x1fU);
-	return attotime::from_ticks((8U + (rate & 0x07U)) * (1 << ((rate >> 3) & 0x03)), 240U);
+	return !BIT(m_modifiers->read(), 3); // Code, active low
 }

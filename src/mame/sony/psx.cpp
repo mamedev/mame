@@ -39,10 +39,14 @@ namespace {
 class psx1_state : public driver_device
 {
 public:
-	psx1_state(const machine_config &mconfig, device_type type, const char *tag) :
+	psx1_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_ram(*this, "maincpu:ram"),
+		m_gpu(*this, "gpu"),
+		m_spu(*this, "spu"),
+		m_ram(*this, "ram"),
+		m_gpu_ram(*this, "gpu_ram"),
+		m_spu_ram(*this, "spu_ram"),
 		m_parallel(*this, "parallel"),
 		m_psxcd(*this, "psxcd"),
 		m_cd_softlist(*this, "cd_list")
@@ -67,7 +71,11 @@ private:
 	void cd_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	required_device<psxcpu_device> m_maincpu;
+	required_device<psxgpu_device> m_gpu;
+	required_device<spu_device> m_spu;
 	required_device<ram_device> m_ram;
+	required_device<ram_device> m_gpu_ram;
+	required_device<ram_device> m_spu_ram;
 
 	void psx_map(address_map &map) ATTR_COLD;
 	void subcpu_map(address_map &map) ATTR_COLD;
@@ -502,9 +510,11 @@ void psx1_state::subcpu_map(address_map &map)
 void psx1_state::psx_base(machine_config &config)
 {
 	m_maincpu->set_addrmap(AS_PROGRAM, &psx1_state::psx_map);
+	m_maincpu->set_ram(m_ram);
 	m_maincpu->cd_read().set(m_psxcd, FUNC(psxcd_device::read));
 	m_maincpu->cd_write().set(m_psxcd, FUNC(psxcd_device::write));
-	m_maincpu->subdevice<ram_device>("ram")->set_default_size("2M");
+
+	RAM(config, m_ram).set_bits(32).set_default_size("2M").set_extra_options("2M,4M,8M,16M").set_default_value(0);
 
 	psxcontrollerports_device &controllers(PSXCONTROLLERPORTS(config, "controllers"));
 	controllers.rxd().set("maincpu:sio0", FUNC(psxsio0_device::write_rxd));
@@ -517,13 +527,24 @@ void psx1_state::psx_base(machine_config &config)
 	sio0.sck_handler().set("controllers", FUNC(psxcontrollerports_device::write_sck));
 	sio0.txd_handler().set("controllers", FUNC(psxcontrollerports_device::write_txd));
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	m_gpu->set_cpu(m_maincpu);
+	m_gpu->set_ram(m_gpu_ram);
+	m_gpu->set_screen("screen");
+
+	RAM(config, m_gpu_ram).set_bits(16).set_default_size("1M").set_extra_options("1M,2M").set_default_value(0);
+
+	SCREEN(config, "screen");
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
-	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, m_maincpu.target()));
-	spu.add_route(0, "speaker", 1.00, 0);
-	spu.add_route(1, "speaker", 1.00, 1);
+
+	SPU(config, m_spu, 67.7376_MHz_XTAL / 2);
+	m_spu->set_cpu(m_maincpu);
+	m_spu->set_ram(m_spu_ram);
+	m_spu->add_route(0, "speaker", 1.00, 0);
+	m_spu->add_route(1, "speaker", 1.00, 1);
+
+	RAM(config, m_spu_ram).set_bits(16).set_default_size("512K").set_extra_options("512K,1M,2M,4M").set_default_value(0);
 
 	QUICKLOAD(config, "quickload", "cpe,exe,psf,psx").set_load_callback(FUNC(psx1_state::quickload_exe));
 
@@ -539,10 +560,12 @@ void psx1_state::psx_base(machine_config &config)
 
 void psx1_state::psj(machine_config &config)
 {
-	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
+	CXD8530CQ(config, m_maincpu, 67.7376_MHz_XTAL);
 
 	/* TODO: visible area and refresh rate */
-	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x100000, m_maincpu.target()).set_screen("screen");
+	CXD8561Q(config, m_gpu, 67.7376_MHz_XTAL / 2);
+	m_gpu->set_vclkn(53.693175_MHz_XTAL);
+	m_gpu->set_vclkp(53.693175_MHz_XTAL);
 
 	psx_base(config);
 
@@ -560,10 +583,12 @@ void psx1_state::psu(machine_config &config)
 
 void psx1_state::pse(machine_config &config)
 {
-	CXD8530AQ(config, m_maincpu, XTAL(67'737'600));
+	CXD8530AQ(config, m_maincpu, 67.7376_MHz_XTAL);
 
 	/* TODO: visible area and refresh rate */
-	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x100000, m_maincpu.target()).set_screen("screen");
+	CXD8561Q(config, m_gpu, 67.7376_MHz_XTAL / 2);
+	m_gpu->set_vclkn(53.203424_MHz_XTAL);
+	m_gpu->set_vclkp(53.203424_MHz_XTAL);
 
 	psx_base(config);
 

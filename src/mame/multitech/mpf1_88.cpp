@@ -326,7 +326,7 @@ void mpf1_88_state::mpf1_88(machine_config &config)
 
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(mpf1_88_state::key_nmi), attotime::from_msec(15));
 
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_LCD);
+	auto &screen = SCREEN(config, "screen").set_lcd();
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(132, 28);

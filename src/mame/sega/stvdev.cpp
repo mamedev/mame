@@ -8,7 +8,7 @@ Presumably for stvbios "hold F2 at boot -> System Configuration" cart dev mode.
 
 ALi/ACER FINALi 486 PCI motherboard
 M1489 A1 (northbridge) + M1487 B1 (southbridge)
-M5113 (super i/o, sorta compatible with FDC37C665 as per PSC-586VGA single board)
+M5113 (super I/O, sorta compatible with FDC37C665 as per PSC-586VGA single board)
 DP8432V-33
 CAK0003UA
 2x Altera EPM7032LC44-10 near northbridge
@@ -32,7 +32,7 @@ public:
 	{ }
 
 
-	void stvdev(machine_config &config);
+	void stvdev(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;

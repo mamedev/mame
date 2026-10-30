@@ -214,13 +214,14 @@ u32 blockout_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	copybitmap(bitmap, m_tmpbitmap, 0, 0, 0, 0, cliprect);
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		auto *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			const u16 d = m_frontvideoram[((y & 0xff) << 6) + ((x & 0x1ff) >> 3)];
-			if (d & (1 << (7 - (x & 7))))
-				bitmap.pix(y, x) = color;
+			if (BIT(d, ~x & 7))
+				dst[x] = color;
 		}
 	}
 
@@ -433,7 +434,7 @@ void blockout_state::blockout(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &blockout_state::audio_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// assume same as ddragon3 with adjusted visible display area
 	m_screen->set_raw(XTAL(28'000'000) / 4, 448, 0, 320, 272, 10, 250);
 	m_screen->set_screen_update(FUNC(blockout_state::screen_update));
@@ -564,6 +565,7 @@ ROM_END
 
 void blockout_state::init_agress()
 {
+	// HACK: understand why following is a thing
 	/*
 	 * agress checks at F3A that this is mirrored, blockout glitches if you mirror to it
 	 * But actually mirroring this VRAM makes display to be offset
