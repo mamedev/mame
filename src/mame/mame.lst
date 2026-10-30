@@ -33848,9 +33848,6 @@ policet2
 5acespkr
 vpoker
 
-@source:misc/vroulet.cpp
-vroulet
-
 @source:misc/whtm68k.cpp
 yizhix
 
@@ -47237,6 +47234,10 @@ pbaction3
 pbaction4
 pbactiont
 pbactiont2
+
+@source:tecmo/rusroul.cpp
+rusroul
+vroulet
 
 @source:tecmo/senjyo.cpp
 baluba
