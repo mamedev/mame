@@ -891,17 +891,17 @@ uint8_t ncr53c90_device::command_r()
 void ncr53c90_device::command_w(uint8_t data)
 {
 	LOG("command_w %02x command_pos %d (%s)\n", data, command_pos, machine().describe_context());
-	if(command_pos == 2) {
-		status |= S_GROSS_ERROR;
-		check_irq();
-		return;
-	}
 	/*
 	 * Note the RESET chip and RESET SCSI Bus commands execute as soon as they are loaded into
 	 * the top of the Command Register.
 	 */
 	if((data & 0x7f) == CM_RESET || (data & 0x7f) == CM_RESET_BUS)
 		command_pos = 0;
+	else if(command_pos == 2) {
+		status |= S_GROSS_ERROR;
+		check_irq();
+		return;
+	}
 
 	command[command_pos++] = data;
 	if(command_pos == 1)
