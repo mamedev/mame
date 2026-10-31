@@ -36929,6 +36929,12 @@ c1pmf
 sb2m600b
 uk101
 
+@source:pachinko/funky7.cpp
+pcfunky7
+
+@source:pachinko/rookiedelta.cpp
+pcrkdelta
+
 @source:pacific/mrflea.cpp
 mrflea
 
