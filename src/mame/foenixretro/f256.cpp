@@ -2355,4 +2355,4 @@ ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS           INIT        COMPANY              FULLNAME                               FLAGS
 COMP( 2024, f256k,   0,      0,      f256k,   f256k, f256k_state,    empty_init, "Stefany Allaire", "F256K 8-bit Retro System",           MACHINE_UNOFFICIAL )
-COMP( 2024, f256k2x, f256k,  0,      f256k2x, f256k, f256k2x_state,  empty_init, "Stefany Allaire", "F256K2 Core2X 16-bit Retro System",  MACHINE_UNOFFICIAL )
+COMP( 2026, f256k2x, f256k,  0,      f256k2x, f256k, f256k2x_state,  empty_init, "Stefany Allaire", "F256K2 Core2X 16-bit Retro System",  MACHINE_UNOFFICIAL )
