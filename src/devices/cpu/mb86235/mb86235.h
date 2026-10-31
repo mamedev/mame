@@ -231,12 +231,12 @@ private:
 	bool aluop_has_result(int aluop);
 	bool check_previous_op_stall();
 
-	static void clear_fifoin(void *param);
-	static void clear_fifoout(void *param);
-	static void read_fifoin(void *param);
-	static void write_fifoout(void *param);
-	static void empty_fifoin(void *param);
-	static void full_fifoout(void *param);
+	static void clear_fifoin(mb86235_device &cpu);
+	static void clear_fifoout(mb86235_device &cpu);
+	static void read_fifoin(mb86235_device &cpu);
+	static void write_fifoout(mb86235_device &cpu);
+	static void empty_fifoin(mb86235_device &cpu);
+	static void full_fifoout(mb86235_device &cpu);
 
 	// interpreter
 	void execute_op(uint64_t op);

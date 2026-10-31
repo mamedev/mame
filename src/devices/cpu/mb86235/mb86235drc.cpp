@@ -377,40 +377,34 @@ void mb86235_device::static_generate_out_of_cycles()
 	block.end();
 }
 
-void mb86235_device::clear_fifoin(void *param)
+void mb86235_device::clear_fifoin(mb86235_device &cpu)
 {
-	mb86235_device *cpu = (mb86235_device *)param;
-	cpu->m_fifoin->clear();
+	cpu.m_fifoin->clear();
 }
 
-void mb86235_device::clear_fifoout(void *param)
+void mb86235_device::clear_fifoout(mb86235_device &cpu)
 {
-	mb86235_device *cpu = (mb86235_device *)param;
-	cpu->m_fifoout->clear();
+	cpu.m_fifoout->clear();
 }
 
-void mb86235_device::read_fifoin(void *param)
+void mb86235_device::read_fifoin(mb86235_device &cpu)
 {
-	mb86235_device *cpu = (mb86235_device *)param;
-	cpu->m_core->cur_value = cpu->m_fifoin->pop();
+	cpu.m_core->cur_value = cpu.m_fifoin->pop();
 }
 
-void mb86235_device::write_fifoout(void *param)
+void mb86235_device::write_fifoout(mb86235_device &cpu)
 {
-	mb86235_device *cpu = (mb86235_device *)param;
-	cpu->m_fifoout->push(u32(cpu->m_core->cur_value));
+	cpu.m_fifoout->push(u32(cpu.m_core->cur_value));
 }
 
-void mb86235_device::empty_fifoin(void *param)
+void mb86235_device::empty_fifoin(mb86235_device &cpu)
 {
-	mb86235_device *cpu = (mb86235_device *)param;
-	cpu->m_core->cur_value = cpu->m_fifoin->is_empty();
+	cpu.m_core->cur_value = cpu.m_fifoin->is_empty();
 }
 
-void mb86235_device::full_fifoout(void *param)
+void mb86235_device::full_fifoout(mb86235_device &cpu)
 {
-	mb86235_device *cpu = (mb86235_device *)param;
-	cpu->m_core->cur_value = cpu->m_fifoout->is_full();
+	cpu.m_core->cur_value = cpu.m_fifoout->is_full();
 }
 
 void mb86235_device::static_generate_memory_accessors()
