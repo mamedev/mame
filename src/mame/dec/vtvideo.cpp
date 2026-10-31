@@ -466,38 +466,24 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 
 	uint8_t line = 0;
 	int bit = 0, j = 0;
-	int fg_intensity;
-	int back_intensity, back_default_intensity;
 
 	display_type = display_type & 3;
 
 	// * SCREEN ATTRIBUTES (see VT-180 manual 6-30) *
 	// 'reverse field' = reverse video over entire screen
 
-	// For reference: a complete truth table can be taken from TABLE 4-6-4 / VT100 technical manual.
-	// Following IF statements implement it in full. Code segments should not be shuffled.
+	// Truth table: TABLE 4-6-4 / VT100 technical manual.
 	invert = invert ^ m_reverse_field ^ m_basic_attribute;
 
-	fg_intensity = bold + 2;   // FOREGROUND (FG):  normal (2) or bright (3)
-
-	back_intensity = 0; // DO NOT SHUFFLE CODE AROUND !!
-	if ((blink != 0) && (m_blink_flip_flop != 0))
-		fg_intensity -= 1; // normal => dim    bright => normal (when bold)
-
-	// INVERSION: background gets foreground intensity (reduced by 1).
-	// _RELIES ON_ on_ previous evaluation of the BLINK signal (fg_intensity).
-	if (invert != 0)
-	{
-		back_intensity = fg_intensity - 1; // BG: normal => dim;  dim => OFF;   bright => normal
-
-		if (back_intensity != 0)           //  FG: avoid 'black on black'
-			fg_intensity = 0;
-		else
-			fg_intensity = fg_intensity + 1; // FG: dim => normal; normal => bright
-	}
-
-	// BG: DEFAULT for entire character (underline overrides this for 1 line) -
-	back_default_intensity = back_intensity;
+	// intensities: 0 off, 1 dim, 2 normal, 3 bright
+	// reverse: black character on dim (normal when bold) background
+	// otherwise: normal (bright when bold) on black
+	// blink lowers a non-reverse character one step, and shows a reverse one
+	// in its non-reverse form
+	bool const blink_on = blink && m_blink_flip_flop;
+	bool const reverse = invert && !blink_on;
+	int const fg_intensity = reverse ? 0 : (bold + 2 - ((blink_on && !invert) ? 1 : 0));
+	int const back_intensity = reverse ? (bold + 1) : 0;
 
 	bool double_width = (display_type != 3) ? true : false; // all except normal: double width
 	bool double_height = (display_type & 1) ? false : true;  // 0,2 = double height
@@ -554,21 +540,9 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 
 		line = m_char_rom[(code << 4) + j]; // code * 16
 
-		// UNDERLINED CHARACTERS (CASE 5 - different in 1 line):
-		back_intensity = back_default_intensity; // 0, 1, 2
-		if (underline != 0)
-		{
-			if (i == 8)
-			{
-				if (invert == 0)
-					line = 0xff; // CASE 5 A)
-				else
-				{
-					line = 0x00; // CASE 5 B)
-					back_intensity = 0; // OVERRIDE: BLACK BACKGROUND
-				}
-			}
-		}
+		// underline: the 9th scan takes the character intensity (black when reverse)
+		if (underline && (i == 8))
+			line = 0xff;
 
 		for (int b = 0; b < 8; b++) // 0..7
 		{
