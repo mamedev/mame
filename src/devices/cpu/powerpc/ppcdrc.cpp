@@ -1106,6 +1106,12 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
 			UML_LABEL(block, not_smi);
 		}
 
+		if (exception == EXCEPTION_MACHCHECK)
+		{
+			UML_AND(block, SPR32(SPROEA_SRR1), MSR32, 0x0000fffd);
+			UML_OR(block, SPR32(SPROEA_SRR1), SPR32(SPROEA_SRR1), 0x00040000);
+		}
+
 		// an ISI (reason flags) and a PROGRAM exception both carry their SRR1 status in the exception parameter
 		if (exception == EXCEPTION_ISI || exception == EXCEPTION_PROGRAM)
 		{
