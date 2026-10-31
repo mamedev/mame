@@ -63,6 +63,8 @@ public:
 	void roylcrdn(machine_config &config) ATTR_COLD;
 	void luckygrl(machine_config &config) ATTR_COLD;
 
+	void init_roylcrdnb() ATTR_COLD;
+
 protected:
 	required_device<cpu_device> m_cpu_0;
 	required_device<jangou_blitter_device> m_blitter;
@@ -1330,6 +1332,34 @@ ROM_START( roylcrdna )
 	ROM_LOAD( "mb7051.h3",  0x0000, 0x0020, CRC(cb6f1aec) SHA1(84136393f9cf8bd836123a31483e9a746ca00cdc) )
 ROM_END
 
+/*
+  Royal Card
+  Vers 1.02
+  alt set.
+  
+  ROM check failed at initial test ($1fb).
+  After patching to bypass it, the program
+  gets stuck in an infinite RAM check loop.
+
+  It needs futher investigation about if
+  it's a kind of protection or just a bad dump.
+
+*/
+ROM_START( roylcrdnb )
+	ROM_REGION( 0x10000, "cpu0", 0 )  // code has a lot of suspicious things
+	ROM_LOAD( "p1.bin",  0x0000, 0x1000, BAD_DUMP CRC(b977915c) SHA1(531255eb52b63a9a80e120fb39f624daafdb5790) )
+	ROM_LOAD( "p2.bin",  0x1000, 0x1000, BAD_DUMP CRC(38f53141) SHA1(6f4f08fadf621b0cc3336098683f7d8fed1dc5f7) )
+	ROM_LOAD( "p3.bin",  0x2000, 0x1000, BAD_DUMP CRC(d3659f2d) SHA1(8f513caf4425e771f314109ec910a8cff03d2083) )
+
+	ROM_REGION( 0x10000, "gfx", 0 )
+	ROM_LOAD( "k5.bin",  0x0000, 0x1000, CRC(935d0e1c) SHA1(0d5b067f6931585c8138b211cf73e5f585af8101) )  // same as parent
+	ROM_LOAD( "l5.bin",  0x1000, 0x1000, CRC(4429362e) SHA1(0bbb6dedf919e0453be2db6343827c5787d139f3) )  // same as parent
+	ROM_LOAD( "n5.bin",  0x2000, 0x1000, CRC(f1e6b7e0) SHA1(b7105031372ae7773d3b4a42ec87b9cca113e6ac) )  // only two bytes different
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mb7051.3h",  0x0000, 0x0020, BAD_DUMP CRC(cb6f1aec) SHA1(84136393f9cf8bd836123a31483e9a746ca00cdc) )  // not provided
+ROM_END
+
 
 ROM_START( luckygrl )
 	ROM_REGION( 0x10000, "cpu0", 0 )
@@ -1360,6 +1390,21 @@ void jngolady_state::init_jngolady()
 	m_nsc->space(AS_PROGRAM).install_read_handler(0x08, 0x08, read8smo_delegate(*this, NAME([this] () { return u8(machine().rand()); })));
 }
 
+void cntrygrl_state::init_roylcrdnb()
+{
+	uint8_t *rom = memregion("cpu0")->base();
+
+	// not passing the initial checksum test
+	// patching to bypass...
+	// but stay checking RAM in an infinite loop 
+	rom[0x0008] = 0x00;
+	rom[0x000a] = 0x30;
+	rom[0x000b] = 0x2d;
+	rom[0x000e] = 0x62;
+	rom[0x000f] = 0x2a;
+	rom[0x0012] = 0xa4;
+}
+
 } // anonymous namespace
 
 
@@ -1369,20 +1414,22 @@ void jngolady_state::init_jngolady()
  *
  *************************************/
 
-GAME( 1983,  jangou,    0,        jangou,   jangou,   jangou_state,   empty_init,    ROT0, "Nichibutsu",     "Jangou (Japan)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1983,  macha,     0,        jangou,   macha,    jangou_state,   empty_init,    ROT0, "Logitec",        "Monoshiri Quiz Oshaberi Macha (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  jngolady,  0,        jngolady, jngolady, jngolady_state, init_jngolady, ROT0, "Nichibutsu",     "Jangou Lady (Japan)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  cntrygrl,  0,        cntrygrl, cntrygrl, cntrygrl_state, empty_init,    ROT0, "Royal Denshi",   "Country Girl (Japan set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  cntrygrla, cntrygrl, cntrygrl, cntrygrl, cntrygrl_state, empty_init,    ROT0, "Nichibutsu",     "Country Girl (Japan set 2)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  fruitbun,  cntrygrl, cntrygrl, cntrygrl, cntrygrl_state, empty_init,    ROT0, "Nichibutsu",     "Fruits & Bunny (World?)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1985,  roylcrdn,  0,        roylcrdn, roylcrdn, cntrygrl_state, empty_init,    ROT0, "Amusement",      "Royal Card (Nichibutsu HW)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1982,  roylcrdna, roylcrdn, roylcrdn, roylcrdn, cntrygrl_state, empty_init,    ROT0, "Miki Corp.",     "Royal Card Part-Two (Nichibutsu HW, Ver. 1.02)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1985,  luckygrl,  0,        luckygrl, luckygrl, cntrygrl_state, empty_init,    ROT0, "Wing Co., Ltd.", "Lucky Girl (Wing)",                     MACHINE_SUPPORTS_SAVE )
+//    YEAR   NAME       PARENT    MACHINE   INPUT     STATE           INIT            ROT    COMPANY           FULLNAME                                FLAGS
+GAME( 1983,  jangou,    0,        jangou,   jangou,   jangou_state,   empty_init,     ROT0, "Nichibutsu",     "Jangou (Japan)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1983,  macha,     0,        jangou,   macha,    jangou_state,   empty_init,     ROT0, "Logitec",        "Monoshiri Quiz Oshaberi Macha (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  jngolady,  0,        jngolady, jngolady, jngolady_state, init_jngolady,  ROT0, "Nichibutsu",     "Jangou Lady (Japan)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  cntrygrl,  0,        cntrygrl, cntrygrl, cntrygrl_state, empty_init,     ROT0, "Royal Denshi",   "Country Girl (Japan set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  cntrygrla, cntrygrl, cntrygrl, cntrygrl, cntrygrl_state, empty_init,     ROT0, "Nichibutsu",     "Country Girl (Japan set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  fruitbun,  cntrygrl, cntrygrl, cntrygrl, cntrygrl_state, empty_init,     ROT0, "Nichibutsu",     "Fruits & Bunny (World?)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1985,  roylcrdn,  0,        roylcrdn, roylcrdn, cntrygrl_state, empty_init,     ROT0, "Amusement",      "Royal Card (Nichibutsu HW)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1982,  roylcrdna, roylcrdn, roylcrdn, roylcrdn, cntrygrl_state, empty_init,     ROT0, "Miki Corp.",     "Royal Card Part-Two (Nichibutsu HW, Ver. 1.02)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982,  roylcrdnb, roylcrdn, roylcrdn, roylcrdn, cntrygrl_state, init_roylcrdnb, ROT0, "Miki Corp.",     "Royal Card (Nichibutsu HW, Ver. 1.02, alt)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1985,  luckygrl,  0,        luckygrl, luckygrl, cntrygrl_state, empty_init,     ROT0, "Wing Co., Ltd.", "Lucky Girl (Wing)",                     MACHINE_SUPPORTS_SAVE )
 
 /*
 Some other games that might run on this HW:
     Jangou (non-BET version) (WR score listed on MyCom magazines)
-    Jangou Night (first "mature" mahjong ever made)
+    Jangou Night  (first "mature" mahjong ever made)
     Jangou Lady (BET version) (images on the flyer, it might not exists)
     Hana Royal
     Hana Puter

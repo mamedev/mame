@@ -686,18 +686,18 @@ void ms32_state::ms32_map(address_map &map)
 /* F1 Super Battle per-line road plane (F1-93158 board, gfx5 textures): tile row and colour per line at fdc00000,
    line scroll/zoom at fde00000, control at fce00800 */
 
-void ms32_f1superbattle_state::road_vram_w16(offs_t offset, u16 data, u16 mem_mask)
+void f1superb_state::road_vram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_road_vram[offset]);
 	m_extra_tilemap->mark_tile_dirty(offset / 2);
 }
 
-u16 ms32_f1superbattle_state::road_vram_r16(offs_t offset)
+u16 f1superb_state::road_vram_r16(offs_t offset)
 {
 	return m_road_vram[offset];
 }
 
-u32 ms32_f1superbattle_state::analog_r()
+u32 f1superb_state::analog_r()
 {
 	int a,b,c,d;
 	a = m_io_analog[2]->read(); // unused?
@@ -707,7 +707,7 @@ u32 ms32_f1superbattle_state::analog_r()
 	return a << 24 | b << 16 | c << 8 | d << 0;
 }
 
-void ms32_f1superbattle_state::f1superb_map(address_map &map)
+void f1superb_state::f1superb_map(address_map &map)
 {
 	ms32_map(map);
 
@@ -717,7 +717,7 @@ void ms32_f1superbattle_state::f1superb_map(address_map &map)
 	// irq 11 is cleared to port $1e (irq_ack_w) in sysctrl.
 	map(0xfd0c0000, 0xfd0c0fff).ram();
 	map(0xfd0d0000, 0xfd0d0003).portr("DSW2"); // MB-93159
-	map(0xfd0e0000, 0xfd0e0003).r(FUNC(ms32_f1superbattle_state::analog_r)).nopw(); // writes 7-led seg at very least
+	map(0xfd0e0000, 0xfd0e0003).r(FUNC(f1superb_state::analog_r)).nopw(); // writes 7-led seg at very least
 
 	map(0xfce00800, 0xfce0085f).ram().share(m_road_ctrl);
 
@@ -727,14 +727,14 @@ void ms32_f1superbattle_state::f1superb_map(address_map &map)
 	map(0xfd140000, 0xfd145fff).m(m_fpu[1], FUNC(jaleco_fpu_device::host_map));
 //  map(0xfd440000, 0xfd47ffff).ram(); // color?
 
-	map(0xfdc00000, 0xfdc1ffff).rw(FUNC(ms32_f1superbattle_state::road_vram_r16), FUNC(ms32_f1superbattle_state::road_vram_w16)).umask32(0x0000ffff);
+	map(0xfdc00000, 0xfdc1ffff).rw(FUNC(f1superb_state::road_vram_r16), FUNC(f1superb_state::road_vram_w16)).umask32(0x0000ffff);
 	map(0xfde00000, 0xfde1ffff).lrw16(
 			NAME([this] (offs_t offset) { return m_road_lineram[offset]; }),
 			NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_road_lineram[offset]); })).umask32(0x0000ffff);
 //  map(0xfe202000, 0xfe2fffff).ram(); // vram?
 }
 
-void ms32_f1superbattle_state::f1superb_field_irq_w(int state)
+void f1superb_state::f1superb_field_irq_w(int state)
 {
 	if (state && !std::equal(m_txram_latch.begin(), m_txram_latch.end(), &m_txram[0]))
 	{
@@ -744,12 +744,12 @@ void ms32_f1superbattle_state::f1superb_field_irq_w(int state)
 	field_irq_w(state);
 }
 
-void ms32_f1superbattle_state::fpu0_irq_w(int state)
+void f1superb_state::fpu0_irq_w(int state)
 {
 	irq_raise(5, state);
 }
 
-void ms32_f1superbattle_state::fpu1_irq_w(int state)
+void f1superb_state::fpu1_irq_w(int state)
 {
 	irq_raise(2, state);
 }
@@ -1680,19 +1680,19 @@ void ms32_state::ms32_invert_lines(machine_config &config)
 	m_sysctrl->set_invert_vblank_lines(true);
 }
 
-void ms32_f1superbattle_state::f1superb(machine_config &config)
+void f1superb_state::f1superb(machine_config &config)
 {
 	ms32(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_f1superbattle_state::f1superb_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &f1superb_state::f1superb_map);
 
 	m_sysctrl->set_field_irq_last_active_line(true);
-	m_sysctrl->field_cb().set(FUNC(ms32_f1superbattle_state::f1superb_field_irq_w));
+	m_sysctrl->field_cb().set(FUNC(f1superb_state::f1superb_field_irq_w));
 
 	JALECO_FPU(config, m_fpu[0], XTAL(48'000'000) / 8); // clock unknown, guessed
-	m_fpu[0]->irq_cb().set(FUNC(ms32_f1superbattle_state::fpu0_irq_w));
+	m_fpu[0]->irq_cb().set(FUNC(f1superb_state::fpu0_irq_w));
 
 	JALECO_FPU(config, m_fpu[1], XTAL(48'000'000) / 8);
-	m_fpu[1]->irq_cb().set(FUNC(ms32_f1superbattle_state::fpu1_irq_w));
+	m_fpu[1]->irq_cb().set(FUNC(f1superb_state::fpu1_irq_w));
 
 	m_gfxdecode->set_info(gfx_f1superb);
 }
@@ -2646,7 +2646,7 @@ void ms32_state::init_ss92048_01()
 	decrypt_ms32_bg(machine(), 0x20400,0xd4, "bgtiles");
 }
 
-void ms32_f1superbattle_state::init_f1superb()
+void f1superb_state::init_f1superb()
 {
 	init_ss92046_01();
 }
@@ -2656,25 +2656,25 @@ void ms32_f1superbattle_state::init_f1superb()
 
 
 // TODO: inputs in akiss, bnstars (former has no dip display in service mode)
-GAME( 1994, hayaosi2,  0,        ms32,              hayaosi2, ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Grand Champion Taikai", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, hayaosi3,  0,        ms32,              hayaosi3, ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.5)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, hayaosi3a, hayaosi3, ms32,              hayaosi3, ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.2)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, bbbxing,   0,        ms32,              bbbxing,  ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "Best Bout Boxing (ver 1.3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
-GAME( 1994, suchie2,   0,        ms32,              suchie2,  ms32_state,               init_ss92048_01, ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, suchie2o,  suchie2,  ms32,              suchie2,  ms32_state,               init_ss92048_01, ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, desertwr,  0,        ms32,              desertwr, ms32_state,               init_ss91022_10, ROT270, "Jaleco",        "Desert War / Wangan Sensou (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, gametngk,  0,        ms32,              gametngk, ms32_state,               init_ss91022_10, ROT270, "Jaleco",        "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, tetrisp,   0,        ms32,              tetrisp,  ms32_state,               init_ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, p47aces,   0,        ms32,              p47aces,  ms32_state,               init_ss92048_01, ROT0,   "Jaleco",        "P-47 Aces (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, p47acesa,  p47aces,  ms32,              p47aces,  ms32_state,               init_ss92048_01, ROT0,   "Jaleco",        "P-47 Aces (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, akiss,     0,        ms32,              suchie2,  ms32_state,               init_ss92047_01, ROT0,   "Jaleco",        "Mahjong Angel Kiss (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, akissa,    akiss,    ms32,              suchie2,  ms32_state,               init_ss92048_01, ROT0,   "Jaleco",        "Mahjong Angel Kiss (ver 1.0, 92048-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, gratia,    0,        ms32,              gratia,   ms32_state,               init_ss92047_01, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, gratiaa,   gratia,   ms32,              gratia,   ms32_state,               init_ss91022_10, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, kirarast,  0,        ms32,              kirarast, ms32_state,               init_ss92047_01, ROT0,   "Jaleco",        "Ryuusei Janshi Kirara Star (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, kirarasta, kirarast, ms32,              kirarast, ms32_state,               init_ss91022_10, ROT0,   "Jaleco",        "Ryuusei Janshi Kirara Star (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tp2m32,    tetrisp2, ms32_invert_lines, tp2m32,   ms32_state,               init_ss91022_10, ROT0,   "Jaleco",        "Tetris Plus 2 (ver 1.0, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, bnstars,   bnstars1, ms32,              suchie2,  ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "Vs. Janshi Brandnew Stars (Ver 1.1, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, wpksocv2,  0,        ms32_invert_lines, wpksocv2, ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, hayaosi2,  0,        ms32,              hayaosi2, ms32_state,     init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Grand Champion Taikai", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, hayaosi3,  0,        ms32,              hayaosi3, ms32_state,     init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.5)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, hayaosi3a, hayaosi3, ms32,              hayaosi3, ms32_state,     init_ss92046_01, ROT0,   "Jaleco",        "Hayaoshi Quiz Nettou Namahousou (ver 1.2)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, bbbxing,   0,        ms32,              bbbxing,  ms32_state,     init_ss92046_01, ROT0,   "Jaleco",        "Best Bout Boxing (ver 1.3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1994, suchie2,   0,        ms32,              suchie2,  ms32_state,     init_ss92048_01, ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, suchie2o,  suchie2,  ms32,              suchie2,  ms32_state,     init_ss92048_01, ROT0,   "Jaleco",        "Idol Janshi Suchie-Pai II (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, desertwr,  0,        ms32,              desertwr, ms32_state,     init_ss91022_10, ROT270, "Jaleco",        "Desert War / Wangan Sensou (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, gametngk,  0,        ms32,              gametngk, ms32_state,     init_ss91022_10, ROT270, "Jaleco",        "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, tetrisp,   0,        ms32,              tetrisp,  ms32_state,     init_ss92046_01, ROT0,   "Jaleco / BPS",  "Tetris Plus (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, p47aces,   0,        ms32,              p47aces,  ms32_state,     init_ss92048_01, ROT0,   "Jaleco",        "P-47 Aces (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, p47acesa,  p47aces,  ms32,              p47aces,  ms32_state,     init_ss92048_01, ROT0,   "Jaleco",        "P-47 Aces (ver 1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, akiss,     0,        ms32,              suchie2,  ms32_state,     init_ss92047_01, ROT0,   "Jaleco",        "Mahjong Angel Kiss (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, akissa,    akiss,    ms32,              suchie2,  ms32_state,     init_ss92048_01, ROT0,   "Jaleco",        "Mahjong Angel Kiss (ver 1.0, 92048-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, gratia,    0,        ms32,              gratia,   ms32_state,     init_ss92047_01, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, gratiaa,   gratia,   ms32,              gratia,   ms32_state,     init_ss91022_10, ROT0,   "Jaleco",        "Gratia - Second Earth (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kirarast,  0,        ms32,              kirarast, ms32_state,     init_ss92047_01, ROT0,   "Jaleco",        "Ryuusei Janshi Kirara Star (ver 1.0, 92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kirarasta, kirarast, ms32,              kirarast, ms32_state,     init_ss91022_10, ROT0,   "Jaleco",        "Ryuusei Janshi Kirara Star (ver 1.0, 91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tp2m32,    tetrisp2, ms32_invert_lines, tp2m32,   ms32_state,     init_ss91022_10, ROT0,   "Jaleco",        "Tetris Plus 2 (ver 1.0, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, bnstars,   bnstars1, ms32,              suchie2,  ms32_state,     init_ss92046_01, ROT0,   "Jaleco",        "Vs. Janshi Brandnew Stars (Ver 1.1, MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, wpksocv2,  0,        ms32_invert_lines, wpksocv2, ms32_state,     init_ss92046_01, ROT0,   "Jaleco",        "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1994, f1superb,  0,        f1superb,          f1superb, ms32_f1superbattle_state, init_f1superb,   ROT0,   "Jaleco",        "F-1 Super Battle", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_f1superb )
+GAMEL(1994, f1superb,  0,        f1superb,          f1superb, f1superb_state, init_f1superb,   ROT0,   "Jaleco",        "F-1 Super Battle", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_f1superb )

@@ -2045,6 +2045,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/jz4755.h,MACHINES["JZ4755"] = true
+---------------------------------------------------
+
+if MACHINES["JZ4755"] then
+	files {
+		MAME_DIR .. "src/devices/machine/jz4755.cpp",
+		MAME_DIR .. "src/devices/machine/jz4755.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/k033906.h,MACHINES["K033906"] = true
 ---------------------------------------------------
 

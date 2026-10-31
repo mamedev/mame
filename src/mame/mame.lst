@@ -31649,10 +31649,6 @@ magjoker
 @source:misc/galgame.cpp
 galgame
 
-@source:misc/gameace.cpp
-hotbody
-hotbody2
-
 @source:misc/gambl186.cpp
 gambl186
 gambl186a
@@ -31660,6 +31656,13 @@ gambl186b
 gambl186c
 gambl186d
 gambl186e
+
+@source:misc/gameace.cpp
+hotbody
+hotbody2
+
+@source:misc/gamebox.cpp
+gamebox
 
 @source:misc/gamemasters.cpp
 gmsshoot
@@ -33852,9 +33855,6 @@ policet2
 5acespkr
 vpoker
 
-@source:misc/vroulet.cpp
-vroulet
-
 @source:misc/whtm68k.cpp
 yizhix
 
@@ -35490,6 +35490,7 @@ luckygrl
 macha
 roylcrdn
 roylcrdna
+roylcrdnb
 
 @source:nichibutsu/magmax.cpp
 magmax
@@ -44172,9 +44173,6 @@ ft68m
 @source:skeleton/galpro.cpp
 galpro
 
-@source:skeleton/gamebox.cpp
-gamebox
-
 @source:skeleton/ganbaremo.cpp
 ganbaremo
 
@@ -46486,6 +46484,7 @@ growlp
 growlu
 gunfront
 gunfrontj
+gunfrontup
 htheroj
 htherou
 koshien
@@ -47240,6 +47239,10 @@ pbaction3
 pbaction4
 pbactiont
 pbactiont2
+
+@source:tecmo/rusroul.cpp
+rusroul
+vroulet
 
 @source:tecmo/senjyo.cpp
 baluba

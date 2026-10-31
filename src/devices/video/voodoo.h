@@ -214,6 +214,7 @@ public:
 
 	// configuration
 	void configure(u32 *base, u32 size);
+	void set_base(u32 *base) { m_base = base; }
 
 	// state saving
 	void register_save(save_proxy &save);
@@ -524,6 +525,11 @@ protected:
 	void prepare_for_read();
 	bool prepare_for_write();
 	void recompute_fbmem_fifo();
+
+	// the memory FIFO free count reads 0xffff when empty, whatever the FIFO's size,
+	// and the high water mark compares against it; Glide subtracts the unusable part itself
+	u32 memory_fifo_free() const { return std::max(0xffff - m_fbmem_fifo.items() / 2, 0); }
+
 	void add_to_fifo(u32 offset, u32 data, u32 mem_mask);
 	void flush_fifos(attotime current_time);
 	virtual u32 execute_fifos();

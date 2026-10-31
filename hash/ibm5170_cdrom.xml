@@ -8318,6 +8318,28 @@ Ends with “Workspace Manager Error” and cannot login.
 		</part>
 	</software>
 
+	<software name="theos50182" supported="no">
+		<description>THEOS Corona Operating System Release 6 PL 50182</description>
+		<year>2008</year>
+		<publisher>THEOS Software Corporation</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="corona50182" sha1="bcd996cae4dba7e9158277fe3f506612ba2b26cd" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="theos50209" supported="no">
+		<description>THEOS Corona Operating System PL 50209 (Beta)</description>
+		<year>2013</year>
+		<publisher>THEOS Software Corporation</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="corona50209" sha1="28aca5192d0ff37587a76c0f9b9ab5c44177a117" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="win95">
 		<description>Windows 95 (en 4.00.950)</description>
 		<year>1995</year>

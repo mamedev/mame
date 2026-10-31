@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    drcuml.c
+    drcuml.cpp
 
     Universal machine language for dynamic recompiling CPU cores.
 
@@ -139,6 +139,26 @@ drcbe_interface::drcbe_interface(drcuml_state &drcuml, drc_cache &cache, device_
 
 drcbe_interface::~drcbe_interface()
 {
+}
+
+
+//-------------------------------------------------
+//  hash_get_codeptr
+//-------------------------------------------------
+
+drcbe_interface::hash_codeptr drcbe_interface::hash_get_codeptr(u32 mode, u32 pc) const noexcept
+{
+	return hash_codeptr();
+}
+
+
+//-------------------------------------------------
+//  hash_set_codeptr
+//-------------------------------------------------
+
+bool drcbe_interface::hash_set_codeptr(u32 mode, u32 pc, hash_codeptr code) noexcept
+{
+	return false;
 }
 
 

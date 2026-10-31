@@ -20,6 +20,8 @@
 #include <bit>
 #include <cfenv>
 #include <cmath>
+#include <cstdio>
+#include <cstdlib>
 
 #if defined(__clang_major__) && (__clang_major__ < 12)
 // can't guarantee floating point environment control works
@@ -368,8 +370,8 @@ public:
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
 	virtual bool hash_exists(uint32_t mode, uint32_t pc) const noexcept override;
 	virtual void hash_invalidate_range(uint32_t pcstart, uint32_t pcend) noexcept override;
-	virtual drccodeptr hash_get_codeptr(uint32_t mode, uint32_t pc) const noexcept override;
-	virtual bool hash_set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code) noexcept override;
+	virtual hash_codeptr hash_get_codeptr(uint32_t mode, uint32_t pc) const noexcept override;
+	virtual bool hash_set_codeptr(uint32_t mode, uint32_t pc, hash_codeptr code) noexcept override;
 	virtual void get_info(drcbe_info &info) const noexcept override;
 
 private:
@@ -717,14 +719,30 @@ void drcbe_c::hash_invalidate_range(uint32_t pcstart, uint32_t pcend) noexcept
 //  at code it generated earlier
 //-------------------------------------------------
 
-drccodeptr drcbe_c::hash_get_codeptr(uint32_t mode, uint32_t pc) const noexcept
+drcbe_c::hash_codeptr drcbe_c::hash_get_codeptr(uint32_t mode, uint32_t pc) const noexcept
 {
-	return m_hash.code_exists(mode, pc) ? m_hash.get_codeptr(mode, pc) : nullptr;
+	if (m_hash.code_exists(mode, pc))
+		return hash_codeptr{ m_hash.get_codeptr(mode, pc), m_cache.flush_count() };
+	else
+		return hash_codeptr();
 }
 
-bool drcbe_c::hash_set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code) noexcept
+bool drcbe_c::hash_set_codeptr(uint32_t mode, uint32_t pc, hash_codeptr code) noexcept
 {
-	return m_hash.set_codeptr(mode, pc, code);
+	if (UNEXPECTED((m_cache.flush_count() != code.aux) || !m_cache.contains_ephemeral_pointer(code.ptr)))
+	{
+		if (!code.ptr)
+			osd_printf_error("drcbe_c(%s): Attempt to connect %u:%x to null code pointer.\n", m_device.tag(), mode, pc);
+		else if (m_cache.flush_count() != code.aux)
+			osd_printf_error("drcbe_c(%s): Attempt to connect %u:%x to code pointer from previous generation.\n", m_device.tag(), mode, pc);
+		else
+			osd_printf_error("drcbe_c(%s): Attempt to connect %u:%x to code pointer outside ephemeral cache.\n", m_device.tag(), mode, pc);
+		std::fflush(stdout);
+		std::fflush(stderr);
+		std::abort();
+	}
+
+	return m_hash.set_codeptr(mode, pc, code.ptr);
 }
 
 

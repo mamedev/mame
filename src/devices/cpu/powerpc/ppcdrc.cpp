@@ -548,8 +548,8 @@ void ppc_device::code_compile_block(uint8_t mode, offs_t pc)
 	// remember what was generated so an identical recompile can reuse it
 	if (desclist != nullptr)
 	{
-		drccodeptr const code = m_drcuml->hash_get_codeptr(mode, pc);
-		if (code != nullptr)
+		auto const code = m_drcuml->hash_get_codeptr(mode, pc);
+		if (code)
 		{
 			m_reuse_cache[reusekey] = reuse_entry{
 					code, desclist->physpc, seqsig,

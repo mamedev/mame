@@ -266,6 +266,7 @@ u8 mcs51_cpu_device::ie_r()
 void mcs51_cpu_device::ie_w(u8 data)
 {
 	m_ie = data;
+	m_irq_delayed = 0xff;
 }
 
 u8 mcs51_cpu_device::ip_r()
@@ -277,6 +278,7 @@ void mcs51_cpu_device::ip_w(u8 data)
 {
 	m_ip = data;
 	update_irq_prio();
+	m_irq_delayed = 0xff;
 }
 
 u8 mcs51_cpu_device::p0_r()
@@ -967,6 +969,7 @@ void mcs51_cpu_device::check_irqs()
 
 	// Flags are sampled in one machine cycle and polled in the next, so a flag
 	// set in the last cycle of an instruction is only seen after the next one.
+	// RETI and IE/IP writes inhibit every source for that polling cycle.
 	ints &= ~m_irq_delayed;
 	m_irq_delayed = 0;
 
