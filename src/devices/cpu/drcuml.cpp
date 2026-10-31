@@ -171,22 +171,15 @@ bool drcbe_interface::hash_set_codeptr(u32 mode, u32 pc, hash_codeptr code) noex
 //  drcuml_state - constructor
 //-------------------------------------------------
 
-drcuml_state::drcuml_state(device_t &device, drc_cache &cache, u32 flags, int modes, int addrbits, int ignorebits, u32 max_sequence_length)
+drcuml_state::drcuml_state(device_t &device, std::size_t cache_bytes)
 	: m_device(device)
-	, m_cache(cache)
-	, m_max_sequence_length(max_sequence_length)
-	, m_beintf(device.machine().options().drc_use_c()
-			? drc::make_drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits)
-			: drc::make_drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits))
-	, m_umllog(device.machine().options().drc_log_uml()
-			? new std::ofstream(uml_log_name(device))
-			: nullptr)
+	, m_cache(cache_bytes)
+	, m_beintf()
+	, m_umllog()
 	, m_blocklist()
 	, m_handlelist()
 	, m_symlist()
 {
-	if (m_umllog)
-		m_umllog->imbue(std::locale::classic());
 }
 
 
@@ -196,6 +189,31 @@ drcuml_state::drcuml_state(device_t &device, drc_cache &cache, u32 flags, int mo
 
 drcuml_state::~drcuml_state()
 {
+}
+
+
+//-------------------------------------------------
+//  initialize - allocate the cache and create the
+//  back-end
+//-------------------------------------------------
+
+void drcuml_state::initialize(u32 flags, int modes, int addrbits, int ignorebits, u32 max_sequence_length)
+{
+	assert(!m_beintf);
+	assert(!m_umllog);
+
+	m_cache.allocate_cache(device().machine().options().drc_rwx());
+
+	if (device().machine().options().drc_use_c())
+		m_beintf = drc::make_drcbe_c(*this, device(), m_cache, flags, modes, addrbits, ignorebits, max_sequence_length);
+	else
+		m_beintf = drc::make_drcbe_native(*this, device(), m_cache, flags, modes, addrbits, ignorebits, max_sequence_length);
+
+	if (device().machine().options().drc_log_uml())
+	{
+		m_umllog.reset(new std::ofstream(uml_log_name(device())));
+		m_umllog->imbue(std::locale::classic());
+	}
 }
 
 

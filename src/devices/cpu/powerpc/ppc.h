@@ -238,7 +238,7 @@ public:
 
 	void ppc_set_dcstore_callback(write32sm_delegate callback);
 
-	void set_drc_cache_size(size_t bytes) { m_cache.set_size(bytes); }
+	void set_drc_cache_size(size_t bytes) { m_drcuml.set_cache_size(bytes); }
 	void ppcdrc_set_options(uint32_t options);
 	void ppcdrc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
 	void ppcdrc_add_hotspot(offs_t pc, uint32_t opcode, uint32_t cycles);
@@ -604,9 +604,8 @@ protected:
 	void (*m_optable[64])(uint32_t);
 
 	// core state
-	drc_cache           m_cache;                        // pointer to the DRC code cache
-	std::unique_ptr<drcuml_state>      m_drcuml;        // DRC UML generator state
-	std::unique_ptr<frontend>          m_drcfe;         // pointer to the DRC front-end state
+	drcuml_state          m_drcuml;                     // DRC code generator state
+	std::unique_ptr<frontend> m_drcfe;                  // pointer to the DRC front-end
 	uint32_t              m_drcoptions;                 // configurable DRC options
 
 	// parameters for subroutines
@@ -753,7 +752,7 @@ protected:
 	void ppc4xx_spu_update_irq_states();
 	void ppc4xx_spu_rx_data(uint8_t data);
 	void ppc4xx_spu_timer_reset();
-	void alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name);
+	void alloc_handle(uml::code_handle **handleptr, const char *name);
 	void load_fast_iregs(drcuml_block &block);
 	void save_fast_iregs(drcuml_block &block);
 	void load_fast_fregs(drcuml_block &block);

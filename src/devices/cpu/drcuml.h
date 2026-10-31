@@ -191,13 +191,25 @@ public:
 	using hash_codeptr = drcbe_interface::hash_codeptr;
 
 	// construction/destruction
-	drcuml_state(device_t &device, drc_cache &cache, u32 flags, int modes, int addrbits, int ignorebits, u32 max_sequence_length);
+	drcuml_state(device_t &device, std::size_t cache_bytes);
 	~drcuml_state();
 
 	// getters
 	device_t &device() const { return m_device; }
-	drc_cache &cache() const { return m_cache; }
-	u32 max_sequence_length() const { return m_max_sequence_length; }
+
+	// setup
+	void set_cache_size(std::size_t bytes) { m_cache.set_size(bytes); }
+	void initialize(u32 flags, int modes, int addrbits, int ignorebits, u32 max_sequence_length);
+
+	// allocating memory from the cache
+	template <typename T, typename... Params> auto cache_alloc(Params &&... args) { return m_cache.alloc<T>(std::forward<Params>(args)...); }
+	template <typename T, typename... Params> auto cache_alloc_near(Params &&... args) { return m_cache.alloc_near<T>(std::forward<Params>(args)...); }
+	template <typename T, typename... Params> auto cache_alloc_invariant(Params &&... args) { return m_cache.alloc_invariant<T>(std::forward<Params>(args)...); }
+	template <typename T, typename... Params> auto cache_alloc_transient(Params &&... args) { return m_cache.alloc_transient<T>(std::forward<Params>(args)...); }
+	void cache_dealloc(void *memory, std::size_t bytes) noexcept { m_cache.dealloc(memory, bytes); }
+	bool cache_contains_pointer(void const *ptr) const noexcept { return m_cache.contains_pointer(ptr); }
+	std::ptrdiff_t cache_pointer_offset(void const *ptr) const noexcept { return m_cache.pointer_offset(ptr); }
+
 
 	// reset the state
 	void reset();
@@ -269,14 +281,13 @@ private:
 	drcuml_block &begin_block(u32 maxinst, bool invariant);
 
 	// internal state
-	device_t &                              m_device;           // CPU device we are associated with
-	drc_cache &                             m_cache;            // pointer to the codegen cache
-	u32 const                               m_max_sequence_length; // maximum length in bytes of a generated sequence
-	std::unique_ptr<drcbe_interface> const  m_beintf;           // backend interface pointer
-	std::unique_ptr<std::ostream> const     m_umllog;           // handle to the UML logfile
-	std::list<block_impl>                   m_blocklist;        // list of active blocks
-	std::list<uml::code_handle>             m_handlelist;       // list of active handles
-	std::list<symbol>                       m_symlist;          // list of symbols
+	device_t &                          m_device;           // CPU device we are associated with
+	drc_cache                           m_cache;            // code generation cache
+	std::unique_ptr<drcbe_interface>    m_beintf;           // backend interface pointer
+	std::unique_ptr<std::ostream>       m_umllog;           // handle to the UML logfile
+	std::list<block_impl>               m_blocklist;        // list of active blocks
+	std::list<uml::code_handle>         m_handlelist;       // list of active handles
+	std::list<symbol>                   m_symlist;          // list of symbols
 };
 
 
@@ -297,9 +308,9 @@ inline void drcuml_block::append_comment(Format &&fmt, Params &&... args)
 	std::string const temp(util::string_format(std::forward<Format>(fmt), std::forward<Params>(args)...));
 
 	// allocate space in the cache to hold the comment
-	char *const comment = reinterpret_cast<char *>(invariant()
-			? m_drcuml.cache().alloc_invariant(temp.length() + 1, std::align_val_t(alignof(char)))
-			: m_drcuml.cache().alloc_transient(temp.length() + 1, std::align_val_t(alignof(char))));
+	char *const comment = invariant()
+			? m_drcuml.cache_alloc_invariant<char []>(temp.length() + 1)
+			: m_drcuml.cache_alloc_transient<char []>(temp.length() + 1);
 	if (comment)
 	{
 		strcpy(comment, temp.c_str());
