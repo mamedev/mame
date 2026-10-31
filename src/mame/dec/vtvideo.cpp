@@ -466,8 +466,6 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 
 	uint8_t line = 0;
 	int bit = 0, j = 0;
-	int fg_intensity;
-	int back_intensity;
 
 	display_type = display_type & 3;
 
@@ -477,22 +475,15 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 	// Truth table: TABLE 4-6-4 / VT100 technical manual.
 	invert = invert ^ m_reverse_field ^ m_basic_attribute;
 
+	// intensities: 0 off, 1 dim, 2 normal, 3 bright
+	// reverse: black character on dim (normal when bold) background
+	// otherwise: normal (bright when bold) on black
+	// blink lowers a non-reverse character one step, and shows a reverse one
+	// in its non-reverse form
 	bool const blink_on = blink && m_blink_flip_flop;
-	if (invert && !blink_on)
-	{
-		// reverse: black character on dim (normal when bold) background
-		fg_intensity = 0;
-		back_intensity = bold + 1;
-	}
-	else
-	{
-		// normal (2) or bright (3) on black; blink lowers a non-reverse character
-		// one step, and shows a reverse one in its non-reverse form
-		fg_intensity = bold + 2;
-		if (blink_on && !invert)
-			fg_intensity -= 1;
-		back_intensity = 0;
-	}
+	bool const reverse = invert && !blink_on;
+	int const fg_intensity = reverse ? 0 : (bold + 2 - ((blink_on && !invert) ? 1 : 0));
+	int const back_intensity = reverse ? (bold + 1) : 0;
 
 	bool double_width = (display_type != 3) ? true : false; // all except normal: double width
 	bool double_height = (display_type & 1) ? false : true;  // 0,2 = double height
