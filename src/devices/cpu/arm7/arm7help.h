@@ -4,7 +4,7 @@
 
 /* Macros that need to be defined according to the cpu implementation specific need */
 #define ARM7REG(reg)        m_r[reg]
-#define ARM7_ICOUNT         m_icount
+#define ARM7_ICOUNT         m_core->icount
 
 
 /***************
@@ -36,24 +36,6 @@
 				| HandleALUNZFlags(rd)));                                                           \
 	R15 += 2;
 
-#define DRCHandleThumbALUAddFlags(rd, rn, op2)                                                  \
-	UML_AND(block, DRC_CPSR, DRC_CPSR, ~(N_MASK | Z_MASK | V_MASK | C_MASK));                   \
-	DRCHandleALUNZFlags(rd);                                                                    \
-	UML_XOR(block, uml::I1, rn, ~0);                                                            \
-	UML_CMP(block, uml::I1, op2);                                                               \
-	UML_MOVc(block, uml::COND_B, uml::I1, C_BIT);                                               \
-	UML_MOVc(block, uml::COND_AE, uml::I1, 0);                                                  \
-	UML_OR(block, uml::I0, uml::I0, uml::I1);                                                   \
-	UML_XOR(block, uml::I1, rn, op2);                                                           \
-	UML_XOR(block, uml::I2, rn, rd);                                                            \
-	UML_AND(block, uml::I1, uml::I1, uml::I2);                                                  \
-	UML_TEST(block, uml::I1, 1 << 31);                                                          \
-	UML_MOVc(block, uml::COND_NZ, uml::I1, V_BIT);                                              \
-	UML_MOVc(block, uml::COND_Z, uml::I1, 0);                                                   \
-	UML_OR(block, uml::I0, uml::I0, uml::I1);                                                   \
-	UML_OR(block, DRC_CPSR, DRC_CPSR, uml::I0);                                                  \
-	UML_ADD(block, DRC_PC, DRC_PC, 2);
-
 #define HandleALUSubFlags(rd, rn, op2)                                                                         \
 	if (insn & INSN_S)                                                                                           \
 	set_cpsr(((GET_CPSR & ~(N_MASK | Z_MASK | V_MASK | C_MASK))                                                \
@@ -69,46 +51,12 @@
 				| HandleALUNZFlags(rd)));                                                                        \
 	R15 += 2;
 
-#define DRCHandleThumbALUSubFlags(rd, rn, op2)                                                  \
-	UML_AND(block, DRC_CPSR, DRC_CPSR, ~(N_MASK | Z_MASK | V_MASK | C_MASK));                   \
-	DRCHandleALUNZFlags(rd);                                                                    \
-	UML_XOR(block, uml::I1, rn, op2);                                                           \
-	UML_XOR(block, uml::I2, rn, rd);                                                            \
-	UML_AND(block, uml::I1, uml::I1, uml::I2);                                                  \
-	UML_TEST(block, uml::I1, 1 << 31);                                                          \
-	UML_MOVc(block, uml::COND_NZ, uml::I1, V_BIT);                                              \
-	UML_MOVc(block, uml::COND_Z, uml::I1, 0);                                                   \
-	UML_OR(block, uml::I0, uml::I0, uml::I1);                                                   \
-	UML_OR(block, DRC_CPSR, DRC_CPSR, uml::I0);                                                 \
-	UML_AND(block, uml::I0, rd, 1 << 31);                                                       \
-	UML_AND(block, uml::I1, op2, 1 << 31);                                                      \
-	UML_AND(block, uml::I2, rn, 1 << 31);                                                       \
-	UML_XOR(block, uml::I2, uml::I2, ~0);                                                       \
-	UML_AND(block, uml::I1, uml::I1, uml::I2);                                                  \
-	UML_AND(block, uml::I2, uml::I2, uml::I0);                                                  \
-	UML_OR(block, uml::I1, uml::I1, uml::I2);                                                   \
-	UML_AND(block, uml::I2, op2, 1 << 31);                                                      \
-	UML_AND(block, uml::I2, uml::I2, uml::I0);                                                  \
-	UML_OR(block, uml::I1, uml::I1, uml::I2);                                                   \
-	UML_TEST(block, uml::I1, 1 << 31);                                                          \
-	UML_MOVc(block, uml::COND_NZ, uml::I0, C_MASK);                                             \
-	UML_MOVc(block, uml::COND_Z, uml::I0, 0);                                                   \
-	UML_OR(block, DRC_CPSR, DRC_CPSR, uml::I0);                                                 \
-	UML_ADD(block, DRC_PC, DRC_PC, 2);
-
 /* Set NZC flags for logical operations. */
 
 // This macro (which I didn't write) - doesn't make it obvious that the SIGN BIT = 31, just as the N Bit does,
 // therefore, N is set by default
 #define HandleALUNZFlags(rd)               \
 	(((rd) & SIGN_BIT) | ((!(rd)) << Z_BIT))
-
-#define DRCHandleALUNZFlags(rd)                            \
-	UML_AND(block, uml::I0, rd, SIGN_BIT);                 \
-	UML_CMP(block, rd, 0);                                 \
-	UML_MOVc(block, uml::COND_E, uml::I1, 1);              \
-	UML_MOVc(block, uml::COND_NE, uml::I1, 0);             \
-	UML_ROLINS(block, uml::I0, uml::I1, Z_BIT, 1 << Z_BIT);
 
 // Long ALU Functions use bit 63
 #define HandleLongALUNZFlags(rd)                            \
@@ -120,26 +68,6 @@
 				| HandleALUNZFlags(rd)                   \
 				| (((sc) != 0) << C_BIT)));              \
 	R15 += 4;
-
-#define DRC_RD      uml::mem(&GetRegister(rd))
-#define DRC_RS      uml::mem(&GetRegister(rs))
-#define DRC_CPSR    uml::mem(&GET_CPSR)
-#define DRC_PC      uml::mem(&R15)
-#define DRC_REG(i)  uml::mem(&m_r[(i)])
-
-#define DRCHandleALULogicalFlags(rd, sc)                                \
-	if (insn & INSN_S)                                                  \
-	{                                                                   \
-		UML_AND(block, DRC_CPSR, DRC_CPSR, ~(N_MASK | Z_MASK | C_MASK); \
-		DRCHandleALUNZFlags(rd);                                        \
-		UML_TEST(block, sc, ~0);                                        \
-		UML_MOVc(block, uml::COND_Z, uml::I1, C_BIT);                   \
-		UML_MOVc(block, uml::COND_NZ, uml::I1, 0);                      \
-		UML_OR(block, uml::I0, uml::I0, uml::I1);                       \
-		UML_OR(block, DRC_CPSR, DRC_CPSR, uml::I0);                     \
-	}                                                                   \
-	UML_ADD(block, DRC_PC, DRC_PC, 4);
-
 
 // used to be functions, but no longer a need, so we'll use define for better speed.
 #define GetRegister(rIndex)        m_r[m_reg_group[rIndex]]
