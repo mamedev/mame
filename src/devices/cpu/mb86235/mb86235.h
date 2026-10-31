@@ -147,6 +147,7 @@ private:
 		uint32_t alutemp;
 		uint32_t multemp;
 		uint32_t condtemp;
+		uint32_t cur_value; // FIFO word or status exchanged with the C callbacks
 
 		uint32_t pdr;
 		uint32_t ddr;
@@ -229,9 +230,6 @@ private:
 	bool has_register_clash(const opcode_desc *desc, int outreg);
 	bool aluop_has_result(int aluop);
 	bool check_previous_op_stall();
-
-	// UML is sad...
-	u32 m_cur_value;
 
 	static void clear_fifoin(void *param);
 	static void clear_fifoout(void *param);
