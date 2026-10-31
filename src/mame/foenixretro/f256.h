@@ -51,8 +51,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 protected:
     required_device<cpu_device> m_maincpu;
@@ -225,8 +225,8 @@ public:
 	void f256k2x(machine_config &config);
 
 protected:
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
+	virtual void machine_start() override; // ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void core2x_map(address_map &map);

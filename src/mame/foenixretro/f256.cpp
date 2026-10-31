@@ -66,7 +66,7 @@ void f256k_state::f256k(machine_config &config)
 
     SST_39VF040(config, m_flash);
 
-    SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+    SCREEN(config, m_screen); // , SCREEN_TYPE_RASTER);
     m_screen->set_refresh_hz(60); // Refresh rate (e.g., 60Hz)
     m_screen->set_size(800,525);
     //m_screen->set_visarea(160, 799, 45, 524);  // this is how it should reall work, but the screen ends up offset
@@ -1013,7 +1013,7 @@ void f256k_state::mem_w(offs_t offset, u8 data)
                                         logerror("SOFTWARE RESET triggered\n");
                                         m_reset_unlock = false;
                                         m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-                                        device_reset();
+                                        machine_reset();
                                     }
                                     break;
                                 case 0xd6a2:
@@ -1716,11 +1716,10 @@ void f256k_state::performLinearDMA()
 
 
 //-------------------------------------------------
-//  device_start
+//  machine_start
 //-------------------------------------------------
-void f256k_state::device_start()
+void f256k_state::machine_start()
 {
-	driver_device::device_start();
     reset_mmu();
     save_item(NAME(m_mmu_reg));
     save_item(NAME(m_ioreg));
@@ -1826,11 +1825,10 @@ void f256k_state::device_start()
 }
 
 //-------------------------------------------------
-//  device_reset
+//  machine_reset
 //-------------------------------------------------
-void f256k_state::device_reset()
+void f256k_state::machine_reset()
 {
-	driver_device::device_reset();
     reset_mmu();
     m_via6522[0]->reset();
     m_via6522[1]->reset();
@@ -1857,15 +1855,15 @@ void f256k_state::device_reset()
     m_timer1_val = 0;
 }
 
-void f256k2x_state::device_start()
+void f256k2x_state::machine_start()
 {
-    f256k_state::device_start();
+    f256k_state::machine_start();
     save_item(NAME(m_mmu_ext));
 }
 
-void f256k2x_state::device_reset()
+void f256k2x_state::machine_reset()
 {
-    f256k_state::device_reset();
+    f256k_state::machine_reset();
     std::fill(std::begin(m_mmu_ext), std::end(m_mmu_ext), 0);
 }
 
@@ -2357,4 +2355,4 @@ ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS           INIT        COMPANY              FULLNAME                               FLAGS
 COMP( 2024, f256k,   0,      0,      f256k,   f256k, f256k_state,    empty_init, "Stefany Allaire", "F256K 8-bit Retro System",           MACHINE_UNOFFICIAL )
-COMP( 2024, f256k2x, f256k,  0,      f256k2x, f256k, f256k2x_state, empty_init, "Stefany Allaire", "F256K2 Core2X 16-bit Retro System", MACHINE_UNOFFICIAL )
+COMP( 2024, f256k2x, f256k,  0,      f256k2x, f256k, f256k2x_state,  empty_init, "Stefany Allaire", "F256K2 Core2X 16-bit Retro System",  MACHINE_UNOFFICIAL )
