@@ -492,11 +492,25 @@ void tms320c3x_device::negf(tmsreg &dst, tmsreg &src)
 	}
 	else
 	{
-		dst.set_mantissa(man ^ 0x80000000);
-		if (man == 0)
-			dst.set_exponent(src.exponent() - 1);
+		// 1.0 x 2^e negates to -2.0 x 2^(e-1), and -2.0 x 2^e to 1.0 x 2^(e+1)
+		int const exp = src.exponent() + ((man == 0) ? -1 : 1);
+		if (exp < -127)
+		{
+			dst.set_mantissa(0);
+			dst.set_exponent(-128);
+			IREG(TMR_ST) |= UFFLAG | LUFFLAG;
+		}
+		else if (exp > 127)
+		{
+			dst.set_mantissa(0x7fffffff);
+			dst.set_exponent(127);
+			IREG(TMR_ST) |= VFLAG | LVFLAG;
+		}
 		else
-			dst.set_exponent(src.exponent() + 1);
+		{
+			dst.set_mantissa(man ^ 0x80000000);
+			dst.set_exponent(exp);
+		}
 	}
 	OR_NZF(dst);
 }
