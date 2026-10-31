@@ -228,11 +228,9 @@ void tms320c82_pp_disassembler::parallel_transfer(uint64_t op)
 
 				m_alu_condition = make_condition(cond, ncvz);
 
-				m_src1bank = (op >> 6) & 0xf;
-				m_dstbank = (op >> 18) & 0xf;
-
-				int dst = ((op >> 3) & 7) | (m_dstbank << 3);
-				int src = ((op >> 10) & 7) | (m_src1bank << 3);
+				// The bank fields select the move registers; the ALU uses D registers.
+				int dst = ((op >> 3) & 7) | (((op >> 18) & 0xf) << 3);
+				int src = ((op >> 10) & 7) | (((op >> 6) & 0xf) << 3);
 
 				bool r = (op & (1 << 29)) ? true : false;
 
@@ -248,13 +246,11 @@ void tms320c82_pp_disassembler::parallel_transfer(uint64_t op)
 				// 8. Conditional DU||Conditional Field Move
 				m_parallel_transfer = util::string_format("cond du||cond field move");
 
-				m_dstbank = (op >> 18) & 0xf;
-
 				int itm = (op >> 22) & 3;
 				bool e = (op & (1 << 9)) ? true : false;
 				bool d = (op & (1 << 6)) ? true : false;
 				int size = (op >> 7) & 3;
-				int dst = ((op >> 3) & 7) | (m_dstbank << 3);
+				int dst = ((op >> 3) & 7) | (((op >> 18) & 0xf) << 3);
 				int src = ((op >> 10) & 7) | (4 << 3);
 
 				int cond = (op >> 32) & 0xf;
@@ -306,6 +302,10 @@ void tms320c82_pp_disassembler::parallel_transfer(uint64_t op)
 			int global_a = ((op >> 3) & 7) | 8;     // global a-registers: a8-a12
 			int cond = (op >> 32) & 0xf;
 			int ncvz = (op >> 25) & 0xf;
+
+			// s-bit is MSB for immediate value when transfer size is 8 bits
+			if (global_size == 0)
+				global_im |= global_s ? 0x8 : 0;
 
 			m_alu_condition = make_condition(cond, ncvz);
 
@@ -385,8 +385,12 @@ void tms320c82_pp_disassembler::parallel_transfer(uint64_t op)
 				int size = (op >> 29) & 3;
 				bool s = (op & (1 << 28)) ? true : false;
 				int a = (op >> 25) & 7;
-				int im = (op >> 22) & 7;
-				int x = ((op >> 22) & 7);
+				int im = op & 7;
+				int x = op & 7;
+
+				// s-bit is MSB for immediate value when transfer size is 8 bits
+				if (size == 0)
+					im |= s ? 0x8 : 0;
 
 				m_dstbank = (op >> 18) & 0xf;
 				m_src1bank = (op >> 6) & 0xf;
@@ -443,7 +447,7 @@ void tms320c82_pp_disassembler::parallel_transfer(uint64_t op)
 
 		// s-bit is MSB for immediate value when transfer size is 8 bits
 		if (global_size == 0)
-			global_im |= local_s ? 0x8 : 0;
+			global_im |= global_s ? 0x8 : 0;
 		if (local_size == 0)
 			local_im |= local_s ? 0x8 : 0;
 
@@ -579,14 +583,15 @@ offs_t tms320c82_pp_disassembler::disassemble(std::ostream &stream, offs_t pc, c
 		{
 			int sixop = (op >> 57) & 0xf;
 
+			// parallel transfer formats 6 and 10 select the src1 and dst1 banks
+			parallel_transfer(op);
+
 			int src3 = ((op >> 54) & 7) | (4 << 3);
 			int dst2 = ((op >> 51) & 7) | (4 << 3);
 			int dst1 = ((op >> 48) & 7) | (m_dstbank << 3);
 			int src1 = ((op >> 45) & 7) | (m_src1bank << 3);
 			int src4 = ((op >> 42) & 7) | (4 << 3);
 			int src2 = ((op >> 39) & 7) | (4 << 3);
-
-			parallel_transfer(op);
 
 			switch (sixop)
 			{
