@@ -7,15 +7,27 @@ Russian Roulette (c) 1988 Tecmo
 original misc/vroulet.cpp by Curt Coder & Tomasz Slanina
 
 TODO:
-- what's the use of the 0 bitplane in GFX;
 - verify ball priority vs. tilemap (needs real HW ref);
-- payout, winning hangs in rusroul (sits checking bit 5 of $6001, may require NMI?);
-- remaining outputs;
+- payout is enough to avoid hanging in rusroul but it's definitely not giving back the correct
+  number of tokens in bookkeeping. Also why it routes to in-game coin counter anyway, is it just
+  internal and game is supposed to be for amusement only?
+- remaining outputs ($c000 range, PPIs);
+- find a manual or probe pinout, has several connectors on board
+\- CN1 (non-JAMMA connector? keyed with 6-21 format);
+\- CN2 (12-pin);
+\- CN3 (4-pin);
+\- CN4 (5-pin, keyed);
+\- CN5 (3-pin, keyed);
+- Confirm use of the 0 bitplane in GFX;
+- Has a MN50005XTA just like gaiden.cpp and tecmo.cpp (CMOS gate array), assume not present on
+  bootleg. Understand role and routing;
+- Throws a CRAM ERR on soft resets particularly when coin count is 0, investigate;
+- Why with default NVRAM game starts with 1 coin in, is it expected?
 
 ===================================================================================================
 
     Vegas Roulette
-    World Games 1989
+    World Game 1989
 
     LE1000
 
@@ -39,6 +51,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 
@@ -47,7 +60,7 @@ TODO:
 #include "speaker.h"
 #include "tilemap.h"
 
-#include "input.h"
+#include "rusroul.lh"
 
 namespace {
 
@@ -58,7 +71,9 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_ppi(*this, "ppi_%u", 0)
+		, m_hopper(*this, "hopper")
 		, m_nvram(*this, "nvram")
+		, m_lamps(*this, "lamp%u", 1U)
 		, m_vram(*this, "vram")
 		, m_cram(*this, "cram")
 		, m_gfxdecode(*this, "gfxdecode")
@@ -78,7 +93,9 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<i8255_device, 2> m_ppi;
+	required_device<hopper_device> m_hopper;
 	required_device<nvram_device> m_nvram;
+	output_finder<8> m_lamps;
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_cram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -110,8 +127,9 @@ TILE_GET_INFO_MEMBER(rusroul_state::get_tile_info)
 	int const color = attr & 0x0f;
 	// vroulet: right arrow in "Last 20th DATA" screen
 	int const flags = BIT(attr, 5) ? TILE_FLIPY : 0;
+	int const region = BIT(attr, 4);
 
-	tileinfo.set(0, code, color, flags);
+	tileinfo.set(region, code, color, flags);
 }
 
 uint32_t rusroul_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -180,10 +198,17 @@ void rusroul_state::main_map(address_map &map)
 			logerror("$b100 non-zero write %02x\n", data);
 	}));
 
-	// writes: priority mixing or lamps
-	// - always 0x0f in rusroul
-	// - 0 in vroulet when idle and non-zero when spinning
-	map(0xc000, 0xc000).portr("SYSTEM");
+	// TODO: other bits
+	// - always 0x0f in rusroul, bit 4 directly routes to PPI[1] port A bit 4 (payout sense?)
+	// - 0 in vroulet when idle, 0x30 with coin in at "Last 20th Data", 0x70 when ball is spinning (sprite layer enable?)
+	map(0xc000, 0xc000).lrw8(
+		NAME([this] () {
+			return m_hopper->line_r() << 7;
+		}),
+		NAME([this] (offs_t offset, uint8_t data) {
+			m_hopper->motor_w(BIT(data, 7));
+		})
+	);
 }
 
 void rusroul_state::main_io(address_map &map)
@@ -202,8 +227,60 @@ void rusroul_state::vroulet_map(address_map &map)
 }
 
 static INPUT_PORTS_START( rusroul )
-	PORT_START("SYSTEM")
-	PORT_DIPNAME( 0x01, 0x00, "SYSTEM" )
+	// TODO: diplocations (requires manual or real HW checks), confirm routing
+	// Currently following in-game instructions but it's more likely that SSG controls DSW2 and
+	// DSW3 instead out of being nearby on PCB.
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x00, "1 Coin/11 Credits" )
+	PORT_DIPNAME( 0x70, 0x70, "Winning Percentage" )
+	PORT_DIPSETTING(    0x60, "50%" )
+	PORT_DIPSETTING(    0x50, "60%" )
+	PORT_DIPSETTING(    0x40, "65%" )
+	PORT_DIPSETTING(    0x30, "70%" )
+	PORT_DIPSETTING(    0x70, "75%" )
+	PORT_DIPSETTING(    0x20, "80%" )
+	PORT_DIPSETTING(    0x10, "90%" )
+	PORT_DIPSETTING(    0x00, "100%" )
+	PORT_DIPNAME( 0x80, 0x80, "Extra Payout Control" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, "Revolutions" )
+	PORT_DIPSETTING(    0x02, "1" )
+	PORT_DIPSETTING(    0x03, "2")
+	PORT_DIPSETTING(    0x01, "3")
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Max Payout Adjust" )
+	PORT_DIPSETTING(    0x08, "36" )
+	PORT_DIPSETTING(    0x0c, "60" )
+	PORT_DIPSETTING(    0x04, "90" )
+	PORT_DIPSETTING(    0x00, "240" )
+	PORT_DIPNAME( 0x10, 0x10, "Ball Speed" )
+	PORT_DIPSETTING(    0x10, "Normal" )
+	PORT_DIPSETTING(    0x00, "Fast" )
+	PORT_DIPNAME( 0x20, 0x20, "Credit In" )
+	PORT_DIPSETTING(    0x20, "Coin Out" )
+	PORT_DIPSETTING(    0x00, "Credit Out" ) // this skips hopper output entirely
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	// busy out? Gets stuck in rusroul if '0'
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
@@ -221,7 +298,6 @@ static INPUT_PORTS_START( rusroul )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	// Following two looks related to payout
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
@@ -229,34 +305,9 @@ static INPUT_PORTS_START( rusroul )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
+	// TODO: "Demo Sounds" and nothing else?
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, "DSW3" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -290,9 +341,8 @@ static INPUT_PORTS_START( rusroul )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	// NOTE: no push button on PCB, may really be IPT_GAMBLE_KEYIN and IPT_COIN3 respectively instead.
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Token")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -321,17 +371,14 @@ static INPUT_PORTS_START( vroulet )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("Payout")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Red")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Blue")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("2")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("6")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("10")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("20")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Bet Red")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Bet Blue")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Bet 2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Bet 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Bet 6")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Bet 10")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Bet 20")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("SYSTEM")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
@@ -371,6 +418,7 @@ static INPUT_PORTS_START( vroulet )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	// doesn't really do anything?
 	PORT_DIPNAME( 0x10, 0x10, "Red & Blue Select" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -383,9 +431,12 @@ static INPUT_PORTS_START( vroulet )
 	PORT_DIPSETTING(    0x40, "80%" )
 	PORT_DIPSETTING(    0x20, "90%" )
 	PORT_DIPSETTING(    0x00, "100%" )
+
+	PORT_START("IN2")
+
+	PORT_START("DSW3")
 INPUT_PORTS_END
 
-// bitplane 0 looks left-over, contains "some" GFX which looks meaningless ...
 static gfx_layout const layout_8x8_3bpp =
 {
 	8, 8,
@@ -397,12 +448,14 @@ static gfx_layout const layout_8x8_3bpp =
 	8 * 8 * 4
 };
 
+// TODO: bitplane 0 looks barely used, hookup is guessed
+// there are two dots near 2x bottom-left "red 2", which this effectively blanks them out
 static gfx_layout const layout_8x8_1bpp =
 {
 	8, 8,
 	RGN_FRAC(1, 1),
-	1,
-	{ 0 },
+	3,
+	{ 0, 0, 0 },
 	{ STEP8(0, 4) },
 	{ STEP8(0, 8 * 4) },
 	8 * 8 * 4
@@ -410,7 +463,7 @@ static gfx_layout const layout_8x8_1bpp =
 
 static GFXDECODE_START( gfx_rusroul )
 	GFXDECODE_ENTRY( "gfx",  0x0000, layout_8x8_3bpp,   0, 16 )
-	GFXDECODE_ENTRY( "gfx",  0x0000, layout_8x8_1bpp,   0x76, 1 )
+	GFXDECODE_ENTRY( "gfx",  0x0000, layout_8x8_1bpp,   0, 16 )
 //	GFXDECODE_ENTRY( "prom", 0x0000, layout_8x8_sprite, 0, 16 )
 GFXDECODE_END
 
@@ -429,8 +482,24 @@ void rusroul_state::rusroul(machine_config &config)
 	I8255(config, m_ppi[0]);
 	m_ppi[0]->in_pa_callback().set_ioport("IN0");
 	m_ppi[0]->in_pb_callback().set_ioport("IN1");
+	m_ppi[0]->in_pc_callback().set_ioport("IN2");
 
 	I8255(config, m_ppi[1]);
+//	m_ppi[1]->in_pc_callback().set_ioport("DSW3");
+	m_ppi[1]->out_pa_callback().set([this] (uint8_t data) {
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 6));
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 7));
+		// Token In
+		machine().bookkeeping().coin_counter_w(2, BIT(data, 5));
+	});
+	m_ppi[1]->out_pb_callback().set([this] (uint8_t data) {
+		// x--- ---- start lamp
+		// -xxx xxxx bet lamps
+		for (int i = 0; i < 8; i++)
+			m_lamps[i] = BIT(data, i);
+	});
+
+	HOPPER(config, m_hopper, attotime::from_msec(600));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rusroul);
 	PALETTE(config, m_palette).set_entries(128);
@@ -498,5 +567,7 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1988, rusroul, 0,       rusroul, rusroul, rusroul_state, empty_init,   ROT90, "Tecmo",                "Russian Roulette", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1989, vroulet, rusroul, vroulet, vroulet, rusroul_state, empty_init,   ROT90, "bootleg (World Game)", "Vegas Roulette (bootleg)", MACHINE_IMPERFECT_GRAPHICS )
+// vroulet looks based off a later revision, that has Red & Blue selector and Last 20th Data.
+// Matches Russian Roulette flyer description and game screenshot, must be undumped.
+GAMEL( 1988, rusroul, 0,       rusroul, rusroul, rusroul_state, empty_init,   ROT90, "Tecmo",                "Russian Roulette (old revision)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS, layout_rusroul )
+GAMEL( 1989, vroulet, rusroul, vroulet, vroulet, rusroul_state, empty_init,   ROT90, "bootleg (World Game)", "Vegas Roulette (bootleg, new revision)", MACHINE_IMPERFECT_GRAPHICS, layout_rusroul )
