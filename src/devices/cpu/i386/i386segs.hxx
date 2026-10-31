@@ -1981,9 +1981,9 @@ void i386_device::i386_protected_mode_retf(uint8_t count, uint8_t operand32)
 		desc.selector = newSS;
 		i386_load_protected_mode_segment(&desc,nullptr);
 		DPL = (desc.flags >> 5) & 0x03;  // descriptor privilege level
-		if((newSS & ~0x07) == 0)
+		if((newSS & ~0x03) == 0)
 		{
-			LOGMASKED(LOG_PM_FAULT_GP, "RETF: SS segment is null.\n");
+			LOGMASKED(LOG_PM_FAULT_GP, "RETF: GDT SS segment is null.\n");
 			FAULT(FAULT_GP,0)
 		}
 		if(newSS & 0x04)
@@ -2572,4 +2572,3 @@ inline void i386_device::dr7_changed(uint32_t old_val, uint32_t new_val)
 	int new_breakpoint_info = new_val >> 16;
 	if(old_breakpoint_info != new_breakpoint_info) dri_changed();
 }
-
