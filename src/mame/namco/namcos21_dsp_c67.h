@@ -21,6 +21,7 @@ public:
 		NAMCOS21_STARBLADE,
 		NAMCOS21_CYBERSLED,
 		NAMCOS21_SOLVALOU,
+		NAMCOS21_GALAXIAN3
 	};
 
 	namcos21_dsp_c67_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
