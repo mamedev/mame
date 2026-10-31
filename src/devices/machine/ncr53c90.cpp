@@ -1199,7 +1199,7 @@ uint8_t ncr53c90_device::dma_r()
 
 	uint8_t r = fifo_pop();
 
-	if ((sync_offset != 0) || ((m_scsi_bus->ctrl_r() & S_PHASE_MASK) != S_PHASE_DATA_IN))
+	if ((sync_offset != 0) || (xfr_phase != S_PHASE_DATA_IN))
 	{
 		decrement_tcounter();
 	}
@@ -1341,7 +1341,7 @@ u16 ncr53c94_device::dma16_r()
 		memmove(fifo, fifo + 2, fifo_pos);
 
 		// update drq
-		if ((sync_offset != 0) || ((m_scsi_bus->ctrl_r() & S_PHASE_MASK) != S_PHASE_DATA_IN))
+		if ((sync_offset != 0) || (xfr_phase != S_PHASE_DATA_IN))
 		{
 			decrement_tcounter(2);
 		}
