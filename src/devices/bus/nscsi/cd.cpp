@@ -1264,7 +1264,10 @@ void nscsi_cdrom_apple_device::scsi_command()
 				std::fill_n(m_scsi_cmdbuf, size, 0);
 
 				// data taken from the ROM of an AppleCD 150
-				m_scsi_cmdbuf[0] = 0x05;   // device is present, device is CD/DVD (MMC-3)
+				if (lun != 0)
+					m_scsi_cmdbuf[0] = 0x7f;
+				else
+					m_scsi_cmdbuf[0] = 0x05;   // device is present, device is CD/DVD (MMC-3)
 				m_scsi_cmdbuf[1] = 0x80;       // media is removable
 				m_scsi_cmdbuf[2] = 0x01;
 				m_scsi_cmdbuf[3] = 0x01;
