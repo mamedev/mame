@@ -2677,6 +2677,10 @@ if BUSES["HEATHZENITH_H89"] then
 	files {
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/cdr_fdc_880h.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/cdr_fdc_880h.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/dsm240.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/dsm240.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/gpp_speed.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/gpp_speed.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h89bus.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h89bus.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h17_fdc.cpp",
