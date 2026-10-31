@@ -80,8 +80,8 @@ protected:
 
 	void illegal_1();
 	void illegal_2();
-	template <u8 Bit, bool State> void set_service_attention() { static_assert(Bit < 8, "out of range bit index"); if (State) m_service_attention |= (1 << Bit); else m_service_attention &= ~(1 << Bit); };
-	template <u8 Bit> bool get_service_attention() { static_assert(Bit < 8, "out of range bit index"); return m_service_attention & (1 << Bit); };
+	template <u8 Bit, bool State> void set_service_attention() { static_assert(Bit < 16, "out of range bit index"); if (State) m_service_attention |= (u16(1) << Bit); else m_service_attention &= ~(u16(1) << Bit); };
+	template <u8 Bit> bool get_service_attention() { static_assert(Bit < 16, "out of range bit index"); return (m_service_attention & (u16(1) << Bit)) != 0; };
 
 	void halt();
 	void leave_halt();
@@ -140,14 +140,16 @@ protected:
 	devcb_write_line m_halt_cb;
 	devcb_write_line m_busack_cb;
 
-	static constexpr u8 SA_BUSREQ        = 0;
-	static constexpr u8 SA_NMI_PENDING   = 1;
-	static constexpr u8 SA_IRQ_ON        = 2;
-	static constexpr u8 SA_HALT          = 3;
-	static constexpr u8 SA_AFTER_EI      = 4;
-	static constexpr u8 SA_AFTER_LDAIR   = 5;
-	static constexpr u8 SA_NSC800_IRQ_ON = 6;
-	u8 m_service_attention; // bitmap for required handling in service step
+	static constexpr u8 SA_BUSREQ         = 0;
+	static constexpr u8 SA_NMI_PENDING    = 1;
+	static constexpr u8 SA_IRQ_ON         = 2;
+	static constexpr u8 SA_HALT           = 3;
+	static constexpr u8 SA_AFTER_EI       = 4;
+	static constexpr u8 SA_AFTER_LDAIR    = 5;
+	static constexpr u8 SA_NSC800_IRQ_ON  = 6;
+	static constexpr u8 SA_PFI_PENDING    = 7;
+	static constexpr u8 SA_LE1080A_IRQ_ON = 8;
+	u16 m_service_attention; // bitmap for required handling in service step
 
 	PAIR16 m_prvpc;
 	PAIR16 m_pc;

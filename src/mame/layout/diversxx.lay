@@ -1,0 +1,1087 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Chiaki Tachibana
+************************************************************
+	Divers XX  (C) 1994 Yamasa
+************************************************************
+-->
+<mamelayout version="2">
+
+<!-- Define elements -->
+
+	<element name="screen_background_color">
+		<rect>
+			<color red="0.00" green="0.00" blue="0.00"/>
+		</rect>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.2" blue="0.2"/>
+		</led7seg>
+	</element>
+
+<!-- Frame LEDs -->
+
+	<element name="LFRAME0" defstate="0">
+		<rect state="0">
+			<color red="0.1" green="0.1" blue="0.2"/>
+		</rect>
+		<rect state="1">
+			<color red="0.1" green="0.1" blue="1.0"/>
+		</rect>
+	</element>
+	<element name="LFRAME1" defstate="0">
+		<rect state="0">
+			<color red="0.2" green="0.2" blue="0.1"/>
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="0.7" blue="0.1"/>
+		</rect>
+	</element>
+	<element name="LFRAME2" defstate="0">
+		<rect state="0">
+			<color red="0.2" green="0.1" blue="0.1"/>
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="0.1" blue="0.1"/>
+		</rect>
+	</element>
+	<element name="LFRAME3" defstate="0">
+		<rect state="0">
+			<color red="0.2" green="0.2" blue="0.1"/>
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="0.7" blue="0.1"/>
+		</rect>
+	</element>
+	<element name="LFRAME4" defstate="0">
+		<rect state="0">
+			<color red="0.1" green="0.1" blue="0.2"/>
+		</rect>
+		<rect state="1">
+			<color red="0.1" green="0.1" blue="1.0"/>
+		</rect>
+	</element>
+
+<!-- Top panel LED -->
+
+	<element name="LTOPPALEL" defstate="0">
+		<rect state="0">
+			<color red="0.2" green="0.2" blue="0.1"/>
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="0.1"/>
+		</rect>
+	</element>
+
+<!-- Betline LED -->
+
+	<element name="LBETLINE3" defstate="0">
+		<rect>
+			<color red="0.6" green="0.1" blue="0.1"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</rect>
+		<text string="3">
+			<color red="1.0" green="1.0" blue="1.0"/>
+			<bounds x="0" y="0.23" width="1" height="0.5"/>
+		</text>
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0.70" y="0.4" width="0.2" height="0.2"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="0.74" y="0.44" width="0.12" height="0.12"/>
+		</disk>
+		<disk state="1">
+			<color red="0.8" green="0.1" blue="0.1"/>
+			<bounds x="0.74" y="0.44" width="0.12" height="0.12"/>
+		</disk>
+	</element>
+	<element name="LBETLINE1" defstate="0">
+		<rect>
+			<color red="0.7" green="0.4" blue="0.1"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</rect>
+		<text string="2">
+			<color red="1.0" green="1.0" blue="1.0"/>
+			<bounds x="0" y="0.23" width="1" height="0.5"/>
+		</text>
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0.70" y="0.4" width="0.2" height="0.2"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="0.74" y="0.44" width="0.12" height="0.12"/>
+		</disk>
+		<disk state="1">
+			<color red="0.8" green="0.4" blue="0.1"/>
+			<bounds x="0.74" y="0.44" width="0.12" height="0.12"/>
+		</disk>
+	</element>
+	<element name="LBETLINE0" defstate="0">
+		<rect>
+			<color red="0.1" green="0.7" blue="0.1"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</rect>
+		<text string="1">
+			<color red="1.0" green="1.0" blue="1.0"/>
+			<bounds x="0" y="0.23" width="1" height="0.5"/>
+		</text>
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0.70" y="0.4" width="0.2" height="0.2"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="0.74" y="0.44" width="0.12" height="0.12"/>
+		</disk>
+		<disk state="1">
+			<color red="0.1" green="0.8" blue="0.1"/>
+			<bounds x="0.74" y="0.44" width="0.12" height="0.12"/>
+		</disk>
+	</element>
+	<element name="LBETLINE2" defstate="0">
+		<rect>
+			<color red="0.7" green="0.4" blue="0.1"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</rect>
+		<text string="2">
+			<color red="1.0" green="1.0" blue="1.0"/>
+			<bounds x="0" y="0.23" width="1" height="0.5"/>
+		</text>
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0.70" y="0.4" width="0.2" height="0.2"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="0.74" y="0.44" width="0.12" height="0.12"/>
+		</disk>
+		<disk state="1">
+			<color red="0.8" green="0.4" blue="0.1"/>
+			<bounds x="0.74" y="0.44" width="0.12" height="0.12"/>
+		</disk>
+	</element>
+	<element name="LBETLINE4" defstate="0">
+		<rect>
+			<color red="0.6" green="0.1" blue="0.1"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</rect>
+		<text string="3">
+			<color red="1.0" green="1.0" blue="1.0"/>
+			<bounds x="0" y="0.23" width="1" height="0.5"/>
+		</text>
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0.70" y="0.4" width="0.2" height="0.2"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="0.74" y="0.44" width="0.12" height="0.12"/>
+		</disk>
+		<disk state="1">
+			<color red="0.7" green="0.1" blue="0.1"/>
+			<bounds x="0.74" y="0.44" width="0.12" height="0.12"/>
+		</disk>
+	</element>
+
+<!-- Stop button LED -->
+
+	<element name="LSTOP0" defstate="0">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0" y="0" width="7.0" height="7.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+	</element>
+	<element name="LSTOP1" defstate="0">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0" y="0" width="7.0" height="7.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+	</element>
+	<element name="LSTOP2" defstate="0">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0" y="0" width="7.0" height="7.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+	</element>
+
+<!-- Payout, Medal in, Start LED -->
+
+	<element name="LPAYOUT" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.3"/>
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.2" blue="0.2"/>
+		</rect>
+		<text state="0" string=" PAYOUT / CREDIT ">
+			<color red="0.65" green="0.65" blue="0.65"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+		<text state="1" string=" PAYOUT / CREDIT ">
+			<color red="1.00" green="1.00" blue="1.00"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+
+	<element name="LINSERT" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.3"/>
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.2" blue="0.2"/>
+		</rect>
+		<text state="0" string=" MEDAL IN ">
+			<color red="0.65" green="0.65" blue="0.65"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+		<text state="1" string=" MEDAL IN ">
+			<color red="1.00" green="1.00" blue="1.00"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+
+	<element name="LMAXBET" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.3"/>
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.2" blue="0.2"/>
+		</rect>
+		<text state="0" string=" MAXBET ">
+			<color red="0.65" green="0.65" blue="0.65"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+		<text state="1" string=" MAXBET ">
+			<color red="1.00" green="1.00" blue="1.00"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+
+	<element name="LSTART" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.3"/>
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.2" blue="0.2"/>
+		</rect>
+		<text state="0" string=" START ">
+			<color red="0.65" green="0.65" blue="0.65"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+		<text state="1" string=" START ">
+			<color red="1.00" green="1.00" blue="1.00"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+
+<!-- Machine status LED -->
+
+	<element name="LED_STATUS0" defstate="0">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0" y="0" width="7.0" height="7.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+	</element>
+	<element name="LED_STATUS1" defstate="0">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0" y="0" width="7.0" height="7.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+	</element>
+
+<!-- Bonus counter LED -->
+
+	<element name="LED_COUNTER00" defstate="0">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0" y="0" width="7.0" height="7.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+	</element>
+	<element name="LED_COUNTER01" defstate="0">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0" y="0" width="7.0" height="7.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+	</element>
+	<element name="LED_COUNTER02" defstate="0">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0" y="0" width="7.0" height="7.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+	</element>
+	<element name="LED_COUNTER03" defstate="0">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0" y="0" width="7.0" height="7.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+	</element>
+	<element name="LED_COUNTER04" defstate="0">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0" y="0" width="7.0" height="7.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+	</element>
+	<element name="LED_COUNTER05" defstate="0">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0" y="0" width="7.0" height="7.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+	</element>
+	<element name="LED_COUNTER06" defstate="0">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0" y="0" width="7.0" height="7.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+	</element>
+	<element name="LED_COUNTER07" defstate="0">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0" y="0" width="7.0" height="7.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+	</element>
+	<element name="LED_COUNTER08" defstate="0">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0" y="0" width="7.0" height="7.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+	</element>
+	<element name="LED_COUNTER09" defstate="0">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0" y="0" width="7.0" height="7.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+	</element>
+	<element name="LED_COUNTER10" defstate="0">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0" y="0" width="7.0" height="7.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+	</element>
+	<element name="LED_COUNTER11" defstate="0">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0" y="0" width="7.0" height="7.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+	</element>
+
+<!-- JAC game LED -->
+
+	<element name="LED_JAC0" defstate="0">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0" y="0" width="7.0" height="7.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+	</element>
+	<element name="LED_JAC1" defstate="0">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0" y="0" width="7.0" height="7.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+	</element>
+	<element name="LED_JAC2" defstate="0">
+		<disk>
+			<color red="0.3" green="0.3" blue="0.3"/>
+			<bounds x="0" y="0" width="7.0" height="7.0"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0"/>
+			<bounds x="1.4" y="1.4" width="4.0" height="4.0"/>
+		</disk>
+	</element>
+
+<!-- Machine status text -->
+
+	<element name="TEXT_MACHINESTATUS0">
+		<text string=" TROUBLE ">
+			<color red="0.7" green="0.7" blue="0.7"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</text>
+	</element>
+	<element name="TEXT_MACHINESTATUS1">
+		<text string=" GAME OVER ">
+			<color red="0.7" green="0.7" blue="0.7"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</text>
+	</element>
+
+<!-- Bonus counter text -->
+
+	<element name="TEXT_BONUSCOUNT0">
+		<text string=" 1 ">
+			<color red="0.7" green="0.7" blue="0.7"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</text>
+	</element>
+	<element name="TEXT_BONUSCOUNT1">
+		<text string=" 2 ">
+			<color red="0.7" green="0.7" blue="0.7"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</text>
+	</element>
+	<element name="TEXT_BONUSCOUNT2">
+		<text string=" 3 ">
+			<color red="0.7" green="0.7" blue="0.7"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</text>
+	</element>
+	<element name="TEXT_BONUSCOUNT3">
+		<text string=" 4 ">
+			<color red="0.7" green="0.7" blue="0.7"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</text>
+	</element>
+	<element name="TEXT_BONUSCOUNT4">
+		<text string=" 5 ">
+			<color red="0.7" green="0.7" blue="0.7"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</text>
+	</element>
+	<element name="TEXT_BONUSCOUNT5">
+		<text string=" 6 ">
+			<color red="0.7" green="0.7" blue="0.7"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</text>
+	</element>
+	<element name="TEXT_BONUSCOUNT6">
+		<text string=" 7 ">
+			<color red="0.7" green="0.7" blue="0.7"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</text>
+	</element>
+	<element name="TEXT_BONUSCOUNT7">
+		<text string=" 8 ">
+			<color red="0.7" green="0.7" blue="0.7"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</text>
+	</element>
+	<element name="TEXT_BONUSCOUNT8">
+		<text string=" 9 ">
+			<color red="0.7" green="0.7" blue="0.7"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</text>
+	</element>
+	<element name="TEXT_BONUSCOUNT9">
+		<text string=" 10 ">
+			<color red="0.7" green="0.7" blue="0.7"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</text>
+	</element>
+	<element name="TEXT_BONUSCOUNT10">
+		<text string=" +10 ">
+			<color red="0.7" green="0.7" blue="0.7"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</text>
+	</element>
+	<element name="TEXT_BONUSCOUNT11">
+		<text string=" +20 ">
+			<color red="0.7" green="0.7" blue="0.7"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</text>
+	</element>
+
+<!-- JAC game text -->
+
+	<element name="TEXT_JACGAME0">
+		<text string=" 1 ">
+			<color red="0.7" green="0.7" blue="0.7"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</text>
+	</element>
+	<element name="TEXT_JACGAME1">
+		<text string=" 2 ">
+			<color red="0.7" green="0.7" blue="0.7"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</text>
+	</element>
+	<element name="TEXT_JACGAME2">
+		<text string=" 3 ">
+			<color red="0.7" green="0.7" blue="0.7"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</text>
+	</element>
+
+<!-- Reel backlight -->
+
+	<element name="LREEL">
+		<rect>
+			<color red="1.0" green="1.0" blue="1.0"/>
+		</rect>
+	</element>
+
+<!-- Hopper & Solenoid -->
+
+	<element name="SIGNALHOPPER" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.3"/>
+		</rect>
+		<rect state="1">
+			<color red="0.3" green="1.0" blue="1.0"/>
+		</rect>
+		<rect state="2">
+			<color red="1.0" green="0.6" blue="0.3"/>
+		</rect>
+		<text string=" Hopper ">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+	<element name="SIGNALSOLENOID" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.3"/>
+		</rect>
+		<rect state="1">
+			<color red="0.3" green="1.0" blue="1.0"/>
+		</rect>
+		<text string=" Medal Lock ">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+
+<!-- Knocker solenoid -->
+
+	<element name="SIGNALKNOCKER" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.3"/>
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="0.3"/>
+		</rect>
+		<text string=" KNOCKER ">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+
+<!-- Bonus signal -->
+
+	<element name="SIGNALBIG" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.3"/>
+		</rect>
+		<rect state="1">
+			<color red="0.3" green="1.0" blue="1.0"/>
+		</rect>
+		<text string=" Signal BIG ">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+	<element name="SIGNALJAC" defstate="0">
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="0.3"/>
+		</rect>
+		<rect state="1">
+			<color red="0.3" green="1.0" blue="1.0"/>
+		</rect>
+		<text string=" Signal JAC ">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+
+<!-- Game reels -->
+
+	<element name="SREEL0">
+		<rect> <bounds x="0" y="0" width="100" height="400"/> <color alpha="0.0"/> </rect>
+		<text string=" replay ">   <bounds x="0" y="0"      width="100" height="19.04"/> <color red="0.0" green="0.7" blue="0.7"/> </text>
+		<text string=" bell ">     <bounds x="0" y="19.04"  width="100" height="19.04"/> <color red="0.8" green="0.8" blue="0.0"/> </text>
+		<text string=" TURTLE ">   <bounds x="0" y="38.09"  width="100" height="19.04"/> <color red="0.0" green="0.0" blue="1.0"/> </text>
+		<text string=" cherry ">   <bounds x="0" y="57.14"  width="100" height="19.04"/> <color red="0.5" green="0.2" blue="0.3"/> </text>
+		<text string=" SEVEN ">    <bounds x="0" y="76.19"  width="100" height="19.04"/> <color red="1.0" green="0.0" blue="0.0"/> </text>
+		<text string=" starfish "> <bounds x="0" y="95.23"  width="100" height="19.04"/> <color red="1.0" green="0.6" blue="0.0"/> </text>
+		<text string=" replay ">   <bounds x="0" y="114.28" width="100" height="19.04"/> <color red="0.0" green="0.7" blue="0.7"/> </text>
+		<text string=" bell ">     <bounds x="0" y="133.33" width="100" height="19.04"/> <color red="0.8" green="0.8" blue="0.0"/> </text>
+		<text string=" starfish "> <bounds x="0" y="152.38" width="100" height="19.04"/> <color red="1.0" green="0.6" blue="0.0"/> </text>
+		<text string=" replay ">   <bounds x="0" y="171.42" width="100" height="19.04"/> <color red="0.0" green="0.7" blue="0.7"/> </text>
+		<text string=" bell ">     <bounds x="0" y="190.47" width="100" height="19.04"/> <color red="0.8" green="0.8" blue="0.0"/> </text>
+		<text string=" SEVEN ">    <bounds x="0" y="209.52" width="100" height="19.04"/> <color red="1.0" green="0.0" blue="0.0"/> </text>
+		<text string=" cherry ">   <bounds x="0" y="228.57" width="100" height="19.04"/> <color red="0.5" green="0.2" blue="0.3"/> </text>
+		<text string=" TURTLE ">   <bounds x="0" y="247.61" width="100" height="19.04"/> <color red="0.0" green="0.0" blue="1.0"/> </text>
+		<text string=" starfish "> <bounds x="0" y="266.66" width="100" height="19.04"/> <color red="1.0" green="0.6" blue="0.0"/> </text>
+		<text string=" replay ">   <bounds x="0" y="285.71" width="100" height="19.04"/> <color red="0.0" green="0.7" blue="0.7"/> </text>
+		<text string=" bell ">     <bounds x="0" y="304.76" width="100" height="19.04"/> <color red="0.8" green="0.8" blue="0.0"/> </text>
+		<text string=" starfish "> <bounds x="0" y="323.80" width="100" height="19.04"/> <color red="1.0" green="0.6" blue="0.0"/> </text>
+		<text string=" DIVERS ">   <bounds x="0" y="342.85" width="100" height="19.04"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string=" bell ">     <bounds x="0" y="361.90" width="100" height="19.04"/> <color red="0.8" green="0.8" blue="0.0"/> </text>
+		<text string=" starfish "> <bounds x="0" y="380.95" width="100" height="19.04"/> <color red="1.0" green="0.6" blue="0.0"/> </text>
+	</element>
+
+	<element name="SREEL1">
+		<rect> <bounds x="0" y="0" width="100" height="400"/><color alpha="0.0"/> </rect>
+		<text string=" replay ">   <bounds x="0" y="0"      width="100" height="19.04"/> <color red="0.0" green="0.7" blue="0.7"/> </text>
+		<text string=" cherry ">   <bounds x="0" y="19.04"  width="100" height="19.04"/> <color red="0.5" green="0.2" blue="0.3"/> </text>
+		<text string=" bell ">     <bounds x="0" y="38.09"  width="100" height="19.04"/> <color red="0.8" green="0.8" blue="0.0"/> </text>
+		<text string=" cherry ">   <bounds x="0" y="57.14"  width="100" height="19.04"/> <color red="0.5" green="0.2" blue="0.3"/> </text>
+		<text string=" SEVEN ">    <bounds x="0" y="76.19"  width="100" height="19.04"/> <color red="1.0" green="0.0" blue="0.0"/> </text>
+		<text string=" replay ">   <bounds x="0" y="95.23"  width="100" height="19.04"/> <color red="0.0" green="0.7" blue="0.7"/> </text>
+		<text string=" cherry ">   <bounds x="0" y="114.28" width="100" height="19.04"/> <color red="0.5" green="0.2" blue="0.3"/> </text>
+		<text string=" bell ">     <bounds x="0" y="133.33" width="100" height="19.04"/> <color red="0.8" green="0.8" blue="0.0"/> </text>
+		<text string=" DIVERS ">   <bounds x="0" y="152.38" width="100" height="19.04"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string=" cherry ">   <bounds x="0" y="171.42" width="100" height="19.04"/> <color red="0.5" green="0.2" blue="0.3"/> </text>
+		<text string=" replay ">   <bounds x="0" y="190.47" width="100" height="19.04"/> <color red="0.0" green="0.7" blue="0.7"/> </text>
+		<text string=" starfish "> <bounds x="0" y="209.52" width="100" height="19.04"/> <color red="1.0" green="0.6" blue="0.0"/> </text>
+		<text string=" cherry ">   <bounds x="0" y="228.57" width="100" height="19.04"/> <color red="0.5" green="0.2" blue="0.3"/> </text>
+		<text string=" replay ">   <bounds x="0" y="247.61" width="100" height="19.04"/> <color red="0.0" green="0.7" blue="0.7"/> </text>
+		<text string=" TURTLE ">   <bounds x="0" y="266.66" width="100" height="19.04"/> <color red="0.0" green="0.0" blue="1.0"/> </text>
+		<text string=" cherry ">   <bounds x="0" y="285.71" width="100" height="19.04"/> <color red="0.5" green="0.2" blue="0.3"/> </text>
+		<text string=" starfish "> <bounds x="0" y="304.76" width="100" height="19.04"/> <color red="1.0" green="0.6" blue="0.0"/> </text>
+		<text string=" DIVERS ">   <bounds x="0" y="323.80" width="100" height="19.04"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string=" replay ">   <bounds x="0" y="342.85" width="100" height="19.04"/> <color red="0.0" green="0.7" blue="0.7"/> </text>
+		<text string=" starfish "> <bounds x="0" y="361.90" width="100" height="19.04"/> <color red="1.0" green="0.6" blue="0.0"/> </text>
+		<text string=" cherry ">   <bounds x="0" y="380.95" width="100" height="19.04"/> <color red="0.5" green="0.2" blue="0.3"/> </text>
+	</element>
+
+	<element name="SREEL2">
+		<rect> <bounds x="0" y="0" width="100" height="400"/><color alpha="0.0"/> </rect>
+		<text string=" cherry ">   <bounds x="0" y="0"      width="100" height="19.04"/> <color red="0.5" green="0.2" blue="0.3"/> </text>
+		<text string=" starfish "> <bounds x="0" y="19.04"  width="100" height="19.04"/> <color red="1.0" green="0.6" blue="0.0"/> </text>
+		<text string=" bell ">     <bounds x="0" y="38.09"  width="100" height="19.04"/> <color red="0.8" green="0.8" blue="0.0"/> </text>
+		<text string=" replay ">   <bounds x="0" y="57.14"  width="100" height="19.04"/> <color red="0.0" green="0.7" blue="0.7"/> </text>
+		<text string=" SEVEN ">    <bounds x="0" y="76.19"  width="100" height="19.04"/> <color red="1.0" green="0.0" blue="0.0"/> </text>
+		<text string=" starfish "> <bounds x="0" y="95.23"  width="100" height="19.04"/> <color red="1.0" green="0.6" blue="0.0"/> </text>
+		<text string=" bell ">     <bounds x="0" y="114.28" width="100" height="19.04"/> <color red="0.8" green="0.8" blue="0.0"/> </text>
+		<text string=" replay ">   <bounds x="0" y="133.33" width="100" height="19.04"/> <color red="0.0" green="0.7" blue="0.7"/> </text>
+		<text string=" DIVERS ">   <bounds x="0" y="152.38" width="100" height="19.04"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string=" starfish "> <bounds x="0" y="171.42" width="100" height="19.04"/> <color red="1.0" green="0.6" blue="0.0"/> </text>
+		<text string=" bell ">     <bounds x="0" y="190.47" width="100" height="19.04"/> <color red="0.8" green="0.8" blue="0.0"/> </text>
+		<text string=" replay ">   <bounds x="0" y="209.52" width="100" height="19.04"/> <color red="0.0" green="0.7" blue="0.7"/> </text>
+		<text string=" SEVEN ">    <bounds x="0" y="228.57" width="100" height="19.04"/> <color red="1.0" green="0.0" blue="0.0"/> </text>
+		<text string=" starfish "> <bounds x="0" y="247.61" width="100" height="19.04"/> <color red="1.0" green="0.6" blue="0.0"/> </text>
+		<text string=" bell ">     <bounds x="0" y="266.66" width="100" height="19.04"/> <color red="0.8" green="0.8" blue="0.0"/> </text>
+		<text string=" replay ">   <bounds x="0" y="285.71" width="100" height="19.04"/> <color red="0.0" green="0.7" blue="0.7"/> </text>
+		<text string=" DIVERS ">   <bounds x="0" y="304.76" width="100" height="19.04"/> <color red="0.0" green="0.0" blue="0.0"/> </text>
+		<text string=" starfish "> <bounds x="0" y="323.80" width="100" height="19.04"/> <color red="1.0" green="0.6" blue="0.0"/> </text>
+		<text string=" bell ">     <bounds x="0" y="342.85" width="100" height="19.04"/> <color red="0.8" green="0.8" blue="0.0"/> </text>
+		<text string=" TURTLE ">   <bounds x="0" y="361.90" width="100" height="19.04"/> <color red="0.0" green="0.0" blue="1.0"/> </text>
+		<text string=" replay ">   <bounds x="0" y="380.95" width="100" height="19.04"/> <color red="0.0" green="0.7" blue="0.7"/> </text>
+	</element>
+
+<!-- View field -->
+
+	<view name="AWP Simulated Video" showpointers="no">
+
+	<!-- Screen size -->
+
+		<element ref="screen_background_color">
+			<bounds x="0" y="0" width="640" height="480"/>
+		</element>
+
+	<!-- Frame LEDs -->
+
+		<element name="led_frame0" ref="LFRAME0">
+			<bounds x="70" y="0" width="75" height="25"/>
+		</element>
+
+		<element name="led_frame1" ref="LFRAME1">
+			<bounds x="150" y="0" width="75" height="25"/>
+		</element>
+
+		<element name="led_frame2" ref="LFRAME2">
+			<bounds x="230" y="0" width="180" height="25"/>
+		</element>
+
+		<element name="led_frame3" ref="LFRAME3">
+			<bounds x="415" y="0" width="75" height="25"/>
+		</element>
+
+		<element name="led_frame4" ref="LFRAME4">
+			<bounds x="495" y="0" width="75" height="25"/>
+		</element>
+
+	<!-- Top panel LED -->
+
+		<element name="led_toppanel" ref="LTOPPALEL">
+			<bounds x="245" y="30" width="150" height="20"/>
+		</element>
+
+	<!-- Betline LED -->
+
+		<element name="led_betline3" ref="LBETLINE3">
+			<bounds x="20" y="110" width="80" height="40"/>
+		</element>
+		<element name="led_betline1" ref="LBETLINE1">
+			<bounds x="20" y="160" width="80" height="40"/>
+		</element>
+		<element name="led_betline0" ref="LBETLINE0">
+			<bounds x="20" y="210" width="80" height="40"/>
+		</element>
+		<element name="led_betline2" ref="LBETLINE2">
+			<bounds x="20" y="260" width="80" height="40"/>
+		</element>
+		<element name="led_betline4" ref="LBETLINE4">
+			<bounds x="20" y="310" width="80" height="40"/>
+		</element>
+
+	<!-- Stop button LED -->
+
+		<element name="led_stop0" ref="LSTOP0">
+			<bounds x="171" y="345" width="16" height="16"/>
+		</element>
+		<element name="led_stop1" ref="LSTOP1">
+			<bounds x="312" y="345" width="16" height="16"/>
+		</element>
+		<element name="led_stop2" ref="LSTOP2">
+			<bounds x="451" y="345" width="16" height="16"/>
+		</element>
+
+	<!-- Payout, Medal in, Start LED -->
+
+		<element name="led_payout" ref="LPAYOUT">
+			<bounds x="550" y="290" width="60" height="15"/>
+		</element>
+		<element name="led_insert" ref="LINSERT">
+			<bounds x="550" y="310" width="60" height="15"/>
+		</element>
+		<element name="led_start" ref="LSTART">
+			<bounds x="550" y="330" width="60" height="15"/>
+		</element>
+
+	<!-- Credit SEG -->
+
+		<element name="seg_credit0" ref="digit">
+			<bounds x="560" y="370" width="20" height="35"/>
+		</element>
+		<element name="seg_credit1" ref="digit">
+			<bounds x="580" y="370" width="20" height="35"/>
+		</element>
+
+	<!-- Payout meter SEG -->
+
+		<element name="seg_payout0" ref="digit">
+			<bounds x="40" y="370" width="20" height="35"/>
+		</element>
+		<element name="seg_payout1" ref="digit">
+			<bounds x="60" y="370" width="20" height="35"/>
+		</element>
+
+	<!-- Machine status LED -->
+
+		<element name="led_status0" ref="LED_STATUS0">
+			<bounds x="36" y="79" width="16" height="16"/>
+		</element>
+		<element name="led_status1" ref="LED_STATUS1">
+			<bounds x="66" y="79" width="16" height="16"/>
+		</element>
+
+	<!-- Bonus counter LED -->
+
+		<element name="led_counter0" ref="LED_COUNTER00">
+			<bounds x="146" y="79" width="16" height="16"/>
+		</element>
+		<element name="led_counter1" ref="LED_COUNTER01">
+			<bounds x="176" y="79" width="16" height="16"/>
+		</element>
+		<element name="led_counter2" ref="LED_COUNTER02">
+			<bounds x="206" y="79" width="16" height="16"/>
+		</element>
+		<element name="led_counter3" ref="LED_COUNTER03">
+			<bounds x="236" y="79" width="16" height="16"/>
+		</element>
+		<element name="led_counter4" ref="LED_COUNTER04">
+			<bounds x="266" y="79" width="16" height="16"/>
+		</element>
+		<element name="led_counter5" ref="LED_COUNTER05">
+			<bounds x="296" y="79" width="16" height="16"/>
+		</element>
+		<element name="led_counter6" ref="LED_COUNTER06">
+			<bounds x="326" y="79" width="16" height="16"/>
+		</element>
+		<element name="led_counter7" ref="LED_COUNTER07">
+			<bounds x="356" y="79" width="16" height="16"/>
+		</element>
+		<element name="led_counter8" ref="LED_COUNTER08">
+			<bounds x="386" y="79" width="16" height="16"/>
+		</element>
+		<element name="led_counter9" ref="LED_COUNTER09">
+			<bounds x="416" y="79" width="16" height="16"/>
+		</element>
+		<element name="led_counter10" ref="LED_COUNTER10">
+			<bounds x="446" y="79" width="16" height="16"/>
+		</element>
+		<element name="led_counter11" ref="LED_COUNTER11">
+			<bounds x="476" y="79" width="16" height="16"/>
+		</element>
+
+	<!-- JAC game LED -->
+
+		<element name="led_jac0" ref="LED_JAC0">
+			<bounds x="531" y="79" width="16" height="16"/>
+		</element>
+		<element name="led_jac1" ref="LED_JAC1">
+			<bounds x="561" y="79" width="16" height="16"/>
+		</element>
+		<element name="led_jac2" ref="LED_JAC2">
+			<bounds x="591" y="79" width="16" height="16"/>
+		</element>
+
+	<!-- Machine status text -->
+
+		<element ref="TEXT_MACHINESTATUS0">
+			<bounds x="32" y="66" width="24" height="10"/>
+		</element>
+		<element ref="TEXT_MACHINESTATUS1">
+			<bounds x="62" y="66" width="24" height="10"/>
+		</element>
+
+	<!-- Bonus counter text -->
+
+		<element ref="TEXT_BONUSCOUNT0">
+			<bounds x="142" y="66" width="24" height="10"/>
+		</element>
+		<element ref="TEXT_BONUSCOUNT1">
+			<bounds x="172" y="66" width="24" height="10"/>
+		</element>
+		<element ref="TEXT_BONUSCOUNT2">
+			<bounds x="202" y="66" width="24" height="10"/>
+		</element>
+		<element ref="TEXT_BONUSCOUNT3">
+			<bounds x="232" y="66" width="24" height="10"/>
+		</element>
+		<element ref="TEXT_BONUSCOUNT4">
+			<bounds x="262" y="66" width="24" height="10"/>
+		</element>
+		<element ref="TEXT_BONUSCOUNT5">
+			<bounds x="292" y="66" width="24" height="10"/>
+		</element>
+		<element ref="TEXT_BONUSCOUNT6">
+			<bounds x="322" y="66" width="24" height="10"/>
+		</element>
+		<element ref="TEXT_BONUSCOUNT7">
+			<bounds x="352" y="66" width="24" height="10"/>
+		</element>
+		<element ref="TEXT_BONUSCOUNT8">
+			<bounds x="382" y="66" width="24" height="10"/>
+		</element>
+		<element ref="TEXT_BONUSCOUNT9">
+			<bounds x="411" y="66" width="24" height="10"/>
+		</element>
+		<element ref="TEXT_BONUSCOUNT10">
+			<bounds x="441" y="66" width="24" height="10"/>
+		</element>
+		<element ref="TEXT_BONUSCOUNT11">
+			<bounds x="471" y="66" width="24" height="10"/>
+		</element>
+
+	<!-- JAC game text -->
+
+		<element ref="TEXT_JACGAME0">
+			<bounds x="527" y="66" width="24" height="10"/>
+		</element>
+		<element ref="TEXT_JACGAME1">
+			<bounds x="557" y="66" width="24" height="10"/>
+		</element>
+		<element ref="TEXT_JACGAME2">
+			<bounds x="587" y="66" width="24" height="10"/>
+		</element>
+
+	<!-- Reel -->
+
+		<repeat count="3">
+
+			<param name="i" start="0" increment="1"/>
+			<param name="x" start="120" increment="140"/>
+
+		<!-- Reel backlight -->
+
+			<element ref="LREEL">
+				<bounds x="~x~" y="140" width="120" height="180"/>
+			</element>
+
+		<!-- Reel pattern -->
+
+			<element ref="SREEL~i~">
+				<bounds x="~x~" y="140" width="120" height="180"/>
+				<yscroll name="reel~i~:scroll" size="0.15" wrap="yes" min="65536" max="0"/>
+			</element>
+
+		</repeat>
+
+	<!-- Knocker solenoid -->
+
+		<element name="signal_knocker" ref="SIGNALKNOCKER">
+			<bounds x="550" y="270" width="60" height="15"/>
+		</element>
+
+	<!-- Big bonus & Regular bonus signal -->
+
+		<element name="signal_big" ref="SIGNALBIG">
+			<bounds x="550" y="120" width="60" height="25"/>
+		</element>
+		<element name="signal_jac" ref="SIGNALJAC">
+			<bounds x="550" y="155" width="60" height="25"/>
+		</element>
+
+	<!-- Hopper & Coin solenoid -->
+
+		<element name="signal_hopper" ref="SIGNALHOPPER">
+			<bounds x="550" y="190" width="60" height="25"/>
+		</element>
+		<element name="signal_solenoid" ref="SIGNALSOLENOID">
+			<bounds x="550" y="225" width="60" height="25"/>
+		</element>
+
+	</view>
+</mamelayout>
