@@ -772,6 +772,7 @@ protected:
 	void static_generate_exception(uint8_t exception, int recover, const char *name);
 	void static_generate_memory_accessor(int mode, int size, bool iswrite, bool ismasked, bool isreserve, const char *name, uml::code_handle *&handleptr, uml::code_handle *masked);
 	void static_generate_swap_tgpr();
+	void static_generate_memory_handlers();
 	void static_generate_lsw_entries(int mode);
 	void static_generate_stsw_entries(int mode);
 	void static_generate_fpscr_finish();
