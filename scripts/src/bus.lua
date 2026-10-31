@@ -2625,8 +2625,26 @@ end
 
 if BUSES["HEATHZENITH_H19"] then
 	files {
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/cards.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/cards.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/gp19.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/gp19.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/igc.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/igc.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/imaginator.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/imaginator.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/super19.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/super19.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/superset.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/superset.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h19/tlb.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h19/tlb.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/tlbbase.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/tlbbase.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/ultra.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/ultra.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/watz.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/watz.h",
 	}
 end
 

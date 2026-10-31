@@ -1,0 +1,767 @@
+// license:BSD-3-Clause
+// copyright-holders:Mark Garlanger
+/***************************************************************************
+
+  Heathkit Terminal Logic Board (TLB)
+
+    Standard Heath TLB, and the base class for the other variants.
+
+****************************************************************************/
+/***************************************************************************
+
+  Memory Layout
+
+    The U435 three-to-eight line decoder uses A14 and A15 to generate
+    three memory address spaces:
+
+    Address             Description
+    ----------------------------------------------------
+      0x0000            Program ROM
+      0x4000            Scratchpad RAM
+      0xF800 (0xC000)   Display Memory
+
+
+  Port Layout
+
+    Only address lines A5, A6, A7 are used by the U442 three-to-eight
+    line decoder
+
+    Address   Description
+    ----------------------------------------------------
+      0x00    Power-up configuration (primary - SW401)
+      0x20    Power-up configuration (secondary - SW402)
+      0x40    INS8250 ACE (communications)
+      0x60    MC6845 CRT controller
+      0x80    MM5740 Keyboard encoder
+      0xA0    Keyboard status
+      0xC0    Trigger key click
+      0xE0    Trigger bell
+
+****************************************************************************/
+
+#include "emu.h"
+#include "tlbbase.h"
+
+#include "cpu/z80/z80.h"
+
+#include "speaker.h"
+
+#include <algorithm>
+
+
+namespace bus::heathzenith::h19 {
+
+// DOT clocks
+static constexpr XTAL BASE_DOT_CLOCK = MASTER_CLOCK;
+
+static constexpr XTAL INS8250_CLOCK  = MASTER_CLOCK / 4;
+
+// Beep Frequency is 1 KHz
+static constexpr XTAL H19_BEEP_FRQ   = (H19_CLOCK / 2048);
+
+// Capacitor value in pF
+static constexpr u32 H19_KEY_DEBOUNCE_CAPACITOR = 5000;
+static const     u32 MM5740_CLOCK               = mm5740_device::calc_effective_clock_key_debounce(H19_KEY_DEBOUNCE_CAPACITOR);
+
+// Keyboard flag masks
+static constexpr u8 KB_STATUS_SHIFT_KEYS_MASK      = 0x01;
+static constexpr u8 KB_STATUS_CONTROL_KEY_MASK     = 0x10;
+static constexpr u8 KB_STATUS_KEYBOARD_STROBE_MASK = 0x80;
+
+
+/**
+ * Original Heath H19 functionality
+ */
+heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: heath_tlb_device(mconfig, HEATH_TLB, tag, owner, clock)
+{
+}
+
+heath_tlb_device::heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_heath_tlb_card_interface(mconfig, *this)
+	, m_maincpu(*this, "maincpu")
+	, m_screen(*this, "screen")
+	, m_palette(*this, "palette")
+	, m_crtc(*this, "crtc")
+	, m_p_videoram(*this, "videoram")
+	, m_p_chargen(*this, "chargen")
+	, m_config(*this, "CONFIG")
+	, m_ace(*this, "ins8250")
+	, m_beep(*this, "beeper")
+	, m_mm5740(*this, "mm5740")
+	, m_kbdrom(*this, "keyboard")
+	, m_kbspecial(*this, "MODIFIERS")
+	, m_repeat_clock(*this, "repeatclock")
+{
+}
+
+void heath_tlb_device::check_beep_state()
+{
+	if (!m_key_click_active && !m_bell_active)
+	{
+		m_beep->set_state(0);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(heath_tlb_device::key_click_off)
+{
+	m_key_click_active = false;
+
+	check_beep_state();
+}
+
+TIMER_CALLBACK_MEMBER(heath_tlb_device::bell_off)
+{
+	m_bell_active = false;
+
+	check_beep_state();
+}
+
+void heath_tlb_device::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+
+	// H19 ROM
+	map(0x0000, 0x0fff).mirror(0x3000).rom();
+
+	// Scratchpad memory
+	map(0x4000, 0x40ff).mirror(0x3f00).ram();
+
+	// Video Memory
+	map(0xc000, 0xc7ff).mirror(0x3800).ram().share(m_p_videoram);
+}
+
+void heath_tlb_device::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).mirror(0x1f).portr("SW401");
+	map(0x20, 0x20).mirror(0x1f).portr("SW402");
+	map(0x40, 0x47).mirror(0x18).rw(m_ace, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
+	map(0x60, 0x60).mirror(0x1a).select(0x04).w(FUNC(heath_tlb_device::crtc_addr_w));
+	map(0x61, 0x61).mirror(0x1a).select(0x04).rw(FUNC(heath_tlb_device::crtc_reg_r), FUNC(heath_tlb_device::crtc_reg_w));
+	map(0x80, 0x80).mirror(0x1f).r(FUNC(heath_tlb_device::kbd_key_r));
+	map(0xa0, 0xa0).mirror(0x1f).r(FUNC(heath_tlb_device::kbd_flags_r));
+	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(heath_tlb_device::key_click_w));
+	map(0xe0, 0xe0).mirror(0x1f).w(FUNC(heath_tlb_device::bell_w));
+}
+
+void heath_tlb_device::device_start()
+{
+	save_item(NAME(m_transchar));
+	save_item(NAME(m_strobe));
+	save_item(NAME(m_key_click_active));
+	save_item(NAME(m_bell_active));
+	save_item(NAME(m_reset_pending));
+	save_item(NAME(m_right_shift));
+	save_item(NAME(m_reset_key));
+	save_item(NAME(m_keyboard_irq_raised));
+	save_item(NAME(m_serial_irq_raised));
+	save_item(NAME(m_break_key_irq_raised));
+	save_item(NAME(m_allow_vsync_nmi));
+
+	m_transchar            = 0;
+	m_strobe               = false;
+	m_key_click_active     = false;
+	m_bell_active          = false;
+	m_reset_pending        = false;
+	m_right_shift          = false;
+	m_reset_key            = false;
+	m_keyboard_irq_raised  = false;
+	m_serial_irq_raised    = false;
+	m_break_key_irq_raised = false;
+	m_allow_vsync_nmi      = false;
+
+	m_key_click_timer      = timer_alloc(FUNC(heath_tlb_device::key_click_off), this);
+	m_bell_timer           = timer_alloc(FUNC(heath_tlb_device::bell_off), this);
+
+	// Flip bits in font ROM to avoid having to flip them during scan out since some
+	// boards with graphics has the pixel graphic reversed from the font layout. Doing
+	// it for all devices for consistency.
+	for (size_t i = 0; i < m_p_chargen.length(); i++)
+	{
+		m_p_chargen[i] = bitswap<8>(m_p_chargen[i], 0, 1, 2, 3, 4, 5, 6, 7);
+	}
+}
+
+void heath_tlb_device::device_reset()
+{
+	m_strobe              = false;
+	m_keyboard_irq_raised = false;
+	m_key_click_active    = false;
+	m_bell_active         = false;
+	m_allow_vsync_nmi     = false;
+
+	// clearing the keyboard strobe also clears its interrupt
+	set_irq_line();
+
+	ioport_value const cfg(m_config->read());
+
+	// CPU clock speed
+	switch (BIT(cfg, 0, 2))
+	{
+	case 0x01:
+		m_maincpu->set_clock(H19_3MHZ);
+		break;
+	case 0x02:
+		m_maincpu->set_clock(H19_4MHZ);
+		break;
+	case 0x03:
+		m_maincpu->set_clock(H19_6MHZ);
+		break;
+	case 0x00:
+	default:
+		// Standard Clock
+		m_maincpu->set_clock(H19_CLOCK);
+		break;
+	}
+
+	// Set screen color
+	switch (BIT(cfg, 2, 2))
+	{
+	case 0x01:
+		m_screen->set_color(rgb_t::white());
+		break;
+	case 0x02:
+		m_screen->set_color(rgb_t::amber());
+		break;
+	case 0x00:
+	default:
+		m_screen->set_color(rgb_t::green());
+		break;
+	}
+}
+
+void heath_tlb_device::key_click_w(u8 data)
+{
+	// Keyclick - 6 mSec
+	m_beep->set_state(1);
+	m_key_click_active = true;
+	m_key_click_timer->adjust(attotime::from_msec(6));
+}
+
+void heath_tlb_device::bell_w(u8 data)
+{
+	// Bell (^G) - 200 mSec
+	m_beep->set_state(1);
+	m_bell_active = true;
+	m_bell_timer->adjust(attotime::from_msec(200));
+}
+
+/**
+ * MM5740 B Mapping to the ROM address
+ */
+u16 heath_tlb_device::translate_mm5740_b(u16 b)
+{
+	return bitswap<9>(b, 7, 6, 8, 5, 4, 3, 2, 1, 0);
+}
+
+u8 heath_tlb_device::kbd_key_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_strobe              = false;
+		m_keyboard_irq_raised = false;
+
+		set_irq_line();
+	}
+
+	// high bit is for control key pressed, this is handled in the ROM,
+	// no processing needed.
+	return m_transchar;
+}
+
+u8 heath_tlb_device::kbd_flags_r()
+{
+	u16 modifiers = m_kbspecial->read();
+	u8 rv         = modifiers & 0x7e;
+
+	// check both shifts
+	if ((modifiers & 0x120) != 0x120)
+	{
+		rv |= KB_STATUS_SHIFT_KEYS_MASK;
+	}
+
+	if (!m_strobe)
+	{
+		rv |= KB_STATUS_KEYBOARD_STROBE_MASK;
+	}
+
+	return rv;
+}
+
+int heath_tlb_device::mm5740_shift_r()
+{
+	return ((m_kbspecial->read() & 0x120) != 0x120) ? 1 : 0;
+}
+
+int heath_tlb_device::mm5740_control_r()
+{
+	return (m_kbspecial->read() & KB_STATUS_CONTROL_KEY_MASK) ? 0 : 1;
+}
+
+void heath_tlb_device::mm5740_data_ready_w(int state)
+{
+	if (state)
+	{
+		u8 *decode            = m_kbdrom->base();
+
+		m_transchar           = decode[translate_mm5740_b(m_mm5740->b_r())];
+		m_strobe              = true;
+		m_keyboard_irq_raised = true;
+
+		set_irq_line();
+	}
+}
+
+void heath_tlb_device::crtc_addr_w(offs_t reg, u8 val)
+{
+	m_allow_vsync_nmi = bool(BIT(reg, 2));
+
+	m_crtc->address_w(val);
+}
+
+u8 heath_tlb_device::crtc_reg_r(offs_t reg)
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_allow_vsync_nmi = bool(BIT(reg, 2));
+	}
+
+	return m_crtc->register_r();
+}
+
+void heath_tlb_device::crtc_reg_w(offs_t reg, u8 val)
+{
+	m_allow_vsync_nmi = bool(BIT(reg, 2));
+
+	m_crtc->register_w(val);
+}
+
+void heath_tlb_device::crtc_vsync_w(int val)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, m_allow_vsync_nmi ? val : CLEAR_LINE);
+}
+
+void heath_tlb_device::serial_irq_w(int state)
+{
+	m_serial_irq_raised = bool(state);
+
+	set_irq_line();
+}
+
+void heath_tlb_device::set_irq_line()
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0,
+		(m_keyboard_irq_raised || m_serial_irq_raised || m_break_key_irq_raised) ?
+		 ASSERT_LINE : CLEAR_LINE);
+}
+
+void heath_tlb_device::check_for_reset()
+{
+	if (m_reset_key && m_right_shift)
+	{
+		m_reset_pending = true;
+		m_slot->reset_out(1);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	}
+	else if (m_reset_pending)
+	{
+		m_reset_pending = false;
+		reset();
+		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_slot->reset_out(0);
+	}
+}
+
+void heath_tlb_device::reset_key_w(int state)
+{
+	m_reset_key = (state == 0);
+
+	check_for_reset();
+}
+
+void heath_tlb_device::right_shift_w(int state)
+{
+	m_right_shift = (state == 0);
+
+	check_for_reset();
+}
+
+void heath_tlb_device::repeat_key_w(int state)
+{
+	// when repeat key pressed, set duty cycle to 50%, else 0%.
+	m_repeat_clock->set_duty_cycle(state == 0 ? 0.5 : 0);
+}
+
+void heath_tlb_device::break_key_w(int state)
+{
+	m_break_key_irq_raised = (state == 0);
+
+	set_irq_line();
+}
+
+MC6845_UPDATE_ROW(heath_tlb_device::crtc_update_row)
+{
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u32               *p       = &bitmap.pix(y);
+
+	if (de)
+	{
+		for (int x = 0; x < x_count; x++)
+		{
+			u8 inv = (x == cursor_x) ? 0xff : 0;
+			u8 chr = m_p_videoram[(ma + x) & 0x7ff];
+
+			if (chr & 0x80)
+			{
+				inv ^= 0xff;
+				chr &= 0x7f;
+			}
+
+			// get pattern of pixels for that character scanline
+			u8 const gfx = m_p_chargen[(chr << 4) | ra] ^ inv;
+
+			// Display a scanline of a character (8 pixels)
+			for (int b = 0; 8 > b; ++b)
+			{
+				*p++ = palette[BIT(gfx, b)];
+			}
+		}
+	}
+	else
+	{
+		std::fill_n(p, x_count * 8, palette[0]);
+	}
+}
+
+
+// F4 Character Displayer
+static const gfx_layout h19_charlayout =
+{
+	8, 10,                  // 8 x 10 characters
+	128,                    // 128 characters
+	1,                      // 1 bits per pixel
+	{ 0 },                  // no bitplanes
+	// x offsets
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	// y offsets
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
+	8*16                    // every char takes 16 bytes
+};
+
+static GFXDECODE_START( gfx_h19 )
+	GFXDECODE_ENTRY("chargen", 0x0000, h19_charlayout, 0, 1)
+GFXDECODE_END
+
+
+// Input ports
+INPUT_PORTS_START( tlb )
+
+	PORT_START("MODIFIERS")
+	// bit 0 - 0x001 connects to B8 of MM5740 - low if either shift key is
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CapsLock")   PORT_CODE(KEYCODE_CAPSLOCK)   PORT_TOGGLE
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break")      PORT_CODE(KEYCODE_PAUSE)      PORT_WRITE_LINE_MEMBER(FUNC(heath_tlb_device::break_key_w))
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("OffLine")    PORT_CODE(KEYCODE_F12)        PORT_TOGGLE
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL")       PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LeftShift")  PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Repeat")     PORT_CODE(KEYCODE_RALT)       PORT_WRITE_LINE_MEMBER(FUNC(heath_tlb_device::repeat_key_w))
+	// bit 7 - 0x080 is low if any key is pressed
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RightShift") PORT_CODE(KEYCODE_RSHIFT)     PORT_WRITE_LINE_MEMBER(FUNC(heath_tlb_device::right_shift_w))
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset")      PORT_CODE(KEYCODE_F10)        PORT_WRITE_LINE_MEMBER(FUNC(heath_tlb_device::reset_key_w))
+
+	PORT_START("X1")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/")          PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("k_X2")
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-0")       PORT_CODE(KEYCODE_0_PAD)      PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-.")       PORT_CODE(KEYCODE_DEL_PAD)    PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-Enter")   PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("X2")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("; :")        PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';')  PORT_CHAR(':')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("' \"")       PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR('\'') PORT_CHAR('"')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("{ }")        PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('{')  PORT_CHAR('}')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return")     PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-1 IL")    PORT_CODE(KEYCODE_1_PAD)      PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-2 Down")  PORT_CODE(KEYCODE_2_PAD)      PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-3 DL")    PORT_CODE(KEYCODE_3_PAD)      PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("X3")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P")          PORT_CODE(KEYCODE_P)          PORT_CHAR('p')  PORT_CHAR('P')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[ ]")        PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[')  PORT_CHAR(']')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\ |")       PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line Feed")  PORT_CODE(KEYCODE_RWIN)       PORT_CHAR(10)
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL")        PORT_CODE(KEYCODE_DEL)        PORT_CHAR(127)
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-4 LEFT")  PORT_CODE(KEYCODE_4_PAD)      PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-5 HOME")  PORT_CODE(KEYCODE_5_PAD)      PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-6 RIGHT") PORT_CODE(KEYCODE_6_PAD)      PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("X4")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 )")        PORT_CODE(KEYCODE_0)          PORT_CHAR('0')  PORT_CHAR(')')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- _")        PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-')  PORT_CHAR('_')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("= +")        PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=')  PORT_CHAR('+')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("` ~")        PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('`')  PORT_CHAR('~')
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Back Space") PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(8)
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("k_X1")
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-7 IC")    PORT_CODE(KEYCODE_7_PAD)      PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-8 UP")    PORT_CODE(KEYCODE_8_PAD)      PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KP-9 DC")    PORT_CODE(KEYCODE_9_PAD)      PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("X5")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1")         PORT_CODE(KEYCODE_F1)         PORT_CHAR(UCHAR_MAMEKEY(F1))
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2")         PORT_CODE(KEYCODE_F2)         PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3")         PORT_CODE(KEYCODE_F3)         PORT_CHAR(UCHAR_MAMEKEY(F3))
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4")         PORT_CODE(KEYCODE_F4)         PORT_CHAR(UCHAR_MAMEKEY(F4))
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5")         PORT_CODE(KEYCODE_F5)         PORT_CHAR(UCHAR_MAMEKEY(F5))
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Erase")      PORT_CODE(KEYCODE_F6)         PORT_CHAR(UCHAR_MAMEKEY(F6))
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Blue")       PORT_CODE(KEYCODE_F7)         PORT_CHAR(UCHAR_MAMEKEY(F7))
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Red")        PORT_CODE(KEYCODE_F8)         PORT_CHAR(UCHAR_MAMEKEY(F8))
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Gray")       PORT_CODE(KEYCODE_F9)         PORT_CHAR(UCHAR_MAMEKEY(F9))
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("X6")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z")          PORT_CODE(KEYCODE_Z)          PORT_CHAR('z')  PORT_CHAR('Z')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X")          PORT_CODE(KEYCODE_X)          PORT_CHAR('x')  PORT_CHAR('X')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C")          PORT_CODE(KEYCODE_C)          PORT_CHAR('c')  PORT_CHAR('C')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V")          PORT_CODE(KEYCODE_V)          PORT_CHAR('v')  PORT_CHAR('V')
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B")          PORT_CODE(KEYCODE_B)          PORT_CHAR('b')  PORT_CHAR('B')
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N")          PORT_CODE(KEYCODE_N)          PORT_CHAR('n')  PORT_CHAR('N')
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M")          PORT_CODE(KEYCODE_M)          PORT_CHAR('m')  PORT_CHAR('M')
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(", <")        PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',')  PORT_CHAR('<')
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(". >")        PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.')  PORT_CHAR('>')
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space")      PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ')
+
+	PORT_START("X7")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A")          PORT_CODE(KEYCODE_A)          PORT_CHAR('a')  PORT_CHAR('A')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S")          PORT_CODE(KEYCODE_S)          PORT_CHAR('s')  PORT_CHAR('S')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D")          PORT_CODE(KEYCODE_D)          PORT_CHAR('d')  PORT_CHAR('D')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F")          PORT_CODE(KEYCODE_F)          PORT_CHAR('f')  PORT_CHAR('F')
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G")          PORT_CODE(KEYCODE_G)          PORT_CHAR('g')  PORT_CHAR('G')
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H")          PORT_CODE(KEYCODE_H)          PORT_CHAR('h')  PORT_CHAR('H')
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J")          PORT_CODE(KEYCODE_J)          PORT_CHAR('j')  PORT_CHAR('J')
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K")          PORT_CODE(KEYCODE_K)          PORT_CHAR('k')  PORT_CHAR('K')
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L")          PORT_CODE(KEYCODE_L)          PORT_CHAR('l')  PORT_CHAR('L')
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Scroll")     PORT_CODE(KEYCODE_F11)
+
+	PORT_START("X8")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q")          PORT_CODE(KEYCODE_Q)          PORT_CHAR('q')  PORT_CHAR('Q')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W")          PORT_CODE(KEYCODE_W)          PORT_CHAR('w')  PORT_CHAR('W')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E")          PORT_CODE(KEYCODE_E)          PORT_CHAR('e')  PORT_CHAR('E')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R")          PORT_CODE(KEYCODE_R)          PORT_CHAR('r')  PORT_CHAR('R')
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T")          PORT_CODE(KEYCODE_T)          PORT_CHAR('t')  PORT_CHAR('T')
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y")          PORT_CODE(KEYCODE_Y)          PORT_CHAR('y')  PORT_CHAR('Y')
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U")          PORT_CODE(KEYCODE_U)          PORT_CHAR('u')  PORT_CHAR('U')
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I")          PORT_CODE(KEYCODE_I)          PORT_CHAR('i')  PORT_CHAR('I')
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O")          PORT_CODE(KEYCODE_O)          PORT_CHAR('o')  PORT_CHAR('O')
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab")        PORT_CODE(KEYCODE_TAB)        PORT_CHAR(9)
+
+	PORT_START("X9")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 !")        PORT_CODE(KEYCODE_1)          PORT_CHAR('1')  PORT_CHAR('!')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 @")        PORT_CODE(KEYCODE_2)          PORT_CHAR('2')  PORT_CHAR('@')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 #")        PORT_CODE(KEYCODE_3)          PORT_CHAR('3')  PORT_CHAR('#')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 $")        PORT_CODE(KEYCODE_4)          PORT_CHAR('4')  PORT_CHAR('$')
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 %")        PORT_CODE(KEYCODE_5)          PORT_CHAR('5')  PORT_CHAR('%')
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 ^")        PORT_CODE(KEYCODE_6)          PORT_CHAR('6')  PORT_CHAR('^')
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 &")        PORT_CODE(KEYCODE_7)          PORT_CHAR('7')  PORT_CHAR('&')
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 *")        PORT_CODE(KEYCODE_8)          PORT_CHAR('8')  PORT_CHAR('*')
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 (")        PORT_CODE(KEYCODE_9)          PORT_CHAR('9')  PORT_CHAR('(')
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc")        PORT_CODE(KEYCODE_ESC)        PORT_CHAR(27)
+
+	PORT_START("SW401")
+	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")        PORT_DIPLOCATION("SW401:1,2,3,4")
+	PORT_DIPSETTING(    0x01, "110")
+	PORT_DIPSETTING(    0x02, "150")
+	PORT_DIPSETTING(    0x03, "300")
+	PORT_DIPSETTING(    0x04, "600")
+	PORT_DIPSETTING(    0x05, "1200")
+	PORT_DIPSETTING(    0x06, "1800")
+	PORT_DIPSETTING(    0x07, "2000")
+	PORT_DIPSETTING(    0x08, "2400")
+	PORT_DIPSETTING(    0x09, "3600")
+	PORT_DIPSETTING(    0x0a, "4800")
+	PORT_DIPSETTING(    0x0b, "7200")
+	PORT_DIPSETTING(    0x0c, "9600")
+	PORT_DIPSETTING(    0x0d, "19200")
+	PORT_DIPNAME( 0x30, 0x00, "Parity")           PORT_DIPLOCATION("SW401:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x10, "Odd")
+	PORT_DIPSETTING(    0x20, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x30, "Even")
+	PORT_DIPNAME( 0x40, 0x00, "Parity Type")      PORT_DIPLOCATION("SW401:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, "Stick")
+	PORT_DIPNAME( 0x80, 0x80, "Duplex")           PORT_DIPLOCATION("SW401:8")
+	PORT_DIPSETTING(    0x00, "Half")
+	PORT_DIPSETTING(    0x80, "Full")
+
+	PORT_START("SW402")
+	PORT_DIPNAME( 0x01, 0x00, "Cursor")           PORT_DIPLOCATION("SW402:1")
+	PORT_DIPSETTING(    0x00, "Underline")
+	PORT_DIPSETTING(    0x01, "Block")
+	PORT_DIPNAME( 0x02, 0x00, "Keyclick")         PORT_DIPLOCATION("SW402:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x04, 0x00, "Wrap at EOL")      PORT_DIPLOCATION("SW402:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x08, 0x00, "Auto LF on CR")    PORT_DIPLOCATION("SW402:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x10, 0x00, "Auto CR on LF")    PORT_DIPLOCATION("SW402:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x00, "Mode")             PORT_DIPLOCATION("SW402:6")
+	PORT_DIPSETTING(    0x00, "Heath/VT52")
+	PORT_DIPSETTING(    0x20, "ANSI")
+	PORT_DIPNAME( 0x40, 0x00, "Keypad Shifted")   PORT_DIPLOCATION("SW402:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x00, "Refresh")          PORT_DIPLOCATION("SW402:8")
+	PORT_DIPSETTING(    0x00, "60Hz")
+	PORT_DIPSETTING(    0x80, "50Hz")
+
+	PORT_START("CONFIG")
+	PORT_CONFNAME(0x03, 0x00, "CPU Clock")
+	PORT_CONFSETTING(   0x00, "2 MHz")
+	PORT_CONFSETTING(   0x01, "3 MHz")
+	PORT_CONFSETTING(   0x02, "4 MHz")
+	PORT_CONFSETTING(   0x03, "6 MHz")
+	PORT_CONFNAME(0x0C, 0x00, "CRT Color")
+	PORT_CONFSETTING(   0x00, "Green")
+	PORT_CONFSETTING(   0x04, "White")
+	PORT_CONFSETTING(   0x08, "Amber")
+INPUT_PORTS_END
+
+
+ROM_START( h19 )
+	// Original terminal code
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "2732_444-46_h19code.u437",         0x0000, 0x1000, CRC(f4447da0) SHA1(fb4093d5b763be21a9580a0defebed664b1f7a7b))
+
+	// Original font
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD( "2716_444-29_h19font.u420",         0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
+
+	// Original keyboard
+	ROM_REGION( 0x0800, "keyboard", 0 )
+	ROM_LOAD( "2716_444-37_h19keyb.u445",         0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
+ROM_END
+
+
+ioport_constructor heath_tlb_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(tlb);
+}
+
+const tiny_rom_entry *heath_tlb_device::device_rom_region() const
+{
+	return ROM_NAME(h19);
+}
+
+void heath_tlb_device::serial_out_b(int data)
+{
+	m_slot->serial_out_b(data);
+}
+
+void heath_tlb_device::dtr_out(int data)
+{
+	m_slot->dtr_out(data);
+}
+
+void heath_tlb_device::rts_out(int data)
+{
+	m_slot->rts_out(data);
+}
+
+void heath_tlb_device::serial_in_w(int state)
+{
+	m_ace->rx_w(state);
+}
+
+void heath_tlb_device::rlsd_in_w(int state)
+{
+	m_ace->dcd_w(state);
+}
+
+void heath_tlb_device::dsr_in_w(int state)
+{
+	m_ace->dsr_w(state);
+}
+
+void heath_tlb_device::cts_in_w(int state)
+{
+	m_ace->cts_w(state);
+}
+
+void heath_tlb_device::device_add_mconfig(machine_config &config)
+{
+	// basic machine hardware
+	Z80(config, m_maincpu, H19_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &heath_tlb_device::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &heath_tlb_device::io_map);
+
+	// video hardware
+	SCREEN(config, m_screen).set_color(rgb_t::green());
+	// based on the H19 ROM code for 60 Hz
+	m_screen->set_raw(BASE_DOT_CLOCK, 768, 32, 672, 270, 0, 250);
+	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_h19);
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+
+	// MC 6845 uses a character clock, divide the DOT clock by 8.
+	MC6845(config, m_crtc, BASE_DOT_CLOCK / 8);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(heath_tlb_device::crtc_update_row));
+	// frame pulse
+	m_crtc->out_vsync_callback().set(FUNC(heath_tlb_device::crtc_vsync_w));
+
+	// serial port
+	INS8250(config, m_ace, INS8250_CLOCK);
+	m_ace->out_int_callback().set(FUNC(heath_tlb_device::serial_irq_w));
+	m_ace->out_tx_callback().set(FUNC(heath_tlb_device::serial_out_b));
+	m_ace->out_dtr_callback().set(FUNC(heath_tlb_device::dtr_out));
+	m_ace->out_rts_callback().set(FUNC(heath_tlb_device::rts_out));
+
+	// keyboard
+	MM5740(config, m_mm5740, MM5740_CLOCK);
+	m_mm5740->x_cb<1>().set_ioport("X1");
+	m_mm5740->x_cb<2>().set_ioport("X2");
+	m_mm5740->x_cb<3>().set_ioport("X3");
+	m_mm5740->x_cb<4>().set_ioport("X4");
+	m_mm5740->x_cb<5>().set_ioport("X5");
+	m_mm5740->x_cb<6>().set_ioport("X6");
+	m_mm5740->x_cb<7>().set_ioport("X7");
+	m_mm5740->x_cb<8>().set_ioport("X8");
+	m_mm5740->x_cb<9>().set_ioport("X9");
+	m_mm5740->shift_cb().set(FUNC(heath_tlb_device::mm5740_shift_r));
+	m_mm5740->control_cb().set(FUNC(heath_tlb_device::mm5740_control_r));
+	m_mm5740->data_ready_cb().set(FUNC(heath_tlb_device::mm5740_data_ready_w));
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beep, H19_BEEP_FRQ).add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	// clock for repeat key
+	CLOCK(config, m_repeat_clock, 40);
+	m_repeat_clock->set_duty_cycle(0);
+	m_repeat_clock->signal_handler().set(m_mm5740, FUNC(mm5740_device::repeat_line_w));
+}
+
+} // namespace bus::heathzenith::h19
+
+DEFINE_DEVICE_TYPE_PRIVATE(HEATH_TLB, device_heath_tlb_card_interface, bus::heathzenith::h19::heath_tlb_device, "heath_tlb", "Heath Terminal Logic Board")
