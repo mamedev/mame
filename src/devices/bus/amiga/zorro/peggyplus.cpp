@@ -22,7 +22,8 @@
       7.16 (10.11.95) on the installation disk
 
     TODO:
-    - CL450 and L64111 devices
+    - CL450 device
+    - L64111 INTR and FIFO flags in the board status register
     - Board control register (interrupt enables, FIFO status, A/V switching)
     - Video timing and synchronization to the Amiga (needs video slot support)
     - Optional RAM expansion
@@ -33,14 +34,15 @@
 #include "peggyplus.h"
 
 #include "machine/autoconfig.h"
+#include "sound/l64111.h"
+
 #include "screen.h"
 #include "speaker.h"
 
 #define LOG_VIDEO (1U << 1)
-#define LOG_AUDIO (1U << 2)
 #define LOG_REG   (1U << 3)
 
-#define VERBOSE (LOG_GENERAL | LOG_VIDEO | LOG_AUDIO | LOG_REG)
+#define VERBOSE (LOG_GENERAL | LOG_VIDEO | LOG_REG)
 #include "logmacro.h"
 
 
@@ -81,16 +83,13 @@ private:
 	void video_data_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t video_status_r();
 
-	void audio_data_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	uint8_t l64111_r(offs_t offset);
-	void l64111_w(offs_t offset, uint8_t data);
-
 	uint16_t status_r();
 	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<screen_device> m_screen;
+	required_device<l64111_device> m_l64111;
 	std::unique_ptr<uint16_t[]> m_ram;
 	offs_t m_base_address = 0;
 	uint16_t m_ram_bank = 0;
@@ -100,7 +99,8 @@ private:
 peggyplus_device::peggyplus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, AMIGA_PEGGYPLUS, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
-	m_screen(*this, "screen")
+	m_screen(*this, "screen"),
+	m_l64111(*this, "l64111")
 {
 }
 
@@ -114,8 +114,8 @@ void peggyplus_device::mmio_map(address_map &map)
 	map(0x0000, 0x1fff).rw(FUNC(peggyplus_device::ram_r), FUNC(peggyplus_device::ram_w));
 	map(0x4000, 0x40ff).rw(FUNC(peggyplus_device::cl450_r), FUNC(peggyplus_device::cl450_w));
 	map(0x6000, 0x6001).w(FUNC(peggyplus_device::video_data_w));
-	map(0x8000, 0x8001).w(FUNC(peggyplus_device::audio_data_w));
-	map(0x8002, 0x803f).rw(FUNC(peggyplus_device::l64111_r), FUNC(peggyplus_device::l64111_w)).umask16(0x00ff);
+	map(0x8000, 0x803f).m(m_l64111, FUNC(l64111_device::map)).umask16(0x00ff);
+	map(0x8000, 0x8001).w(m_l64111, FUNC(l64111_device::data_w)); // MPEG data, 8 or 16 bits
 	map(0x8040, 0x8041).rw(FUNC(peggyplus_device::status_r), FUNC(peggyplus_device::control_w));
 	map(0x8044, 0x8045).w(FUNC(peggyplus_device::ram_bank_w));
 	map(0xc040, 0xc041).r(FUNC(peggyplus_device::video_status_r)); // might be a mirror of 0x8040
@@ -137,6 +137,10 @@ void peggyplus_device::device_add_mconfig(machine_config &config)
 	m_screen->set_screen_update(FUNC(peggyplus_device::screen_update));
 
 	SPEAKER(config, "speaker", 2).front();
+
+	L64111(config, m_l64111, 30_MHz_XTAL); // which crystal drives SYSCLK is unverified
+	m_l64111->add_route(0, "speaker", 1.0, 0);
+	m_l64111->add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -255,24 +259,6 @@ uint16_t peggyplus_device::video_status_r()
 {
 	// bit 12: ready for video data
 	return 0x1000;
-}
-
-void peggyplus_device::audio_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	LOGMASKED(LOG_AUDIO, "MPEG audio data: %04x & %04x\n", data, mem_mask);
-}
-
-uint8_t peggyplus_device::l64111_r(offs_t offset)
-{
-	if (!machine().side_effects_disabled())
-		LOGMASKED(LOG_AUDIO, "L64111 read: %02x\n", (offset + 1) << 1);
-
-	return 0;
-}
-
-void peggyplus_device::l64111_w(offs_t offset, uint8_t data)
-{
-	LOGMASKED(LOG_AUDIO, "L64111 write: %02x = %02x\n", (offset + 1) << 1, data);
 }
 
 uint16_t peggyplus_device::status_r()
