@@ -568,10 +568,8 @@ void macrossp_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, c
 		int ymin = 0;
 		int ymax = high + 1;
 		int yinc = 1;
-		int yoffst = 0;
 		if (flipy)
 		{
-			yoffst = (high * yzoom * 16);
 			ymin = high;
 			ymax = -1;
 			yinc = -1;
@@ -580,39 +578,29 @@ void macrossp_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, c
 		int xmin = 0;
 		int xmax = wide + 1;
 		int xinc = 1;
-		int xoffst = 0;
 		if (flipx)
 		{
-			xoffst = (wide * xzoom * 16);
 			xmin = wide;
 			xmax = -1;
 			xinc = -1;
 		}
 
-		int yoffset = yoffst;
+		u32 const xstep = gfx_element::subpixel_zoom_step(xzoom << 8);
+		u32 const ystep = gfx_element::subpixel_zoom_step(yzoom << 8);
+
 		for (int ycnt = ymin; ycnt != ymax; ycnt += yinc)
 		{
-			int xoffset = xoffst;
 			for (int xcnt = xmin; xcnt != xmax; xcnt += xinc)
 			{
-				int fudged_xzoom = xzoom << 8;
-				int fudged_yzoom = yzoom << 8;
-
-				// cover seams as don't know exactly how many pixels on target will cover, and can't specify fractional offsets to start
-				if (xzoom < 0x100) fudged_xzoom += 0x600;
-				if (yzoom < 0x100) fudged_yzoom += 0x600;
-
-				gfx->prio_zoom_alpha(bitmap, cliprect,
+				gfx->prio_zoom_subpixel_alpha(bitmap, cliprect,
 					tileno + loopno, col,
 					flipx, flipy,
-					xpos + (xoffset >> 8), ypos + (yoffset >> 8),
-					fudged_xzoom, fudged_yzoom,
+					xpos << 16, ypos << 16, xcnt, ycnt,
+					xstep, ystep,
 					screen.priority(), primask, 0, alpha);
 
-				xoffset += ((xzoom * 16) * xinc);
 				loopno++;
 			}
-			yoffset += ((yzoom * 16) * yinc);
 		}
 		source -= 3;
 	}

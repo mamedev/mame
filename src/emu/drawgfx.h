@@ -233,21 +233,48 @@ public:
 
 	// ----- zoomed graphics drawing -----
 
-	// core zoom implementation
-	template <typename BitmapType, typename FunctionClass> void drawgfxzoom_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, FunctionClass pixel_op);
-
 	// specific zoom implementations for each transparency type
-	void zoom_opaque(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley);
-	void zoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley);
-	void zoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 transpen);
-	void zoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 transpen);
-	void zoom_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 transpen);
-	void zoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 transpen);
-	void zoom_transmask(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 transmask);
-	void zoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 transmask);
-	void zoom_transtable(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, const u8 *pentable);
-	void zoom_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, const u8 *pentable);
-	void zoom_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 transpen, u8 alpha);
+	void zoom_opaque(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley) { zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley); }
+	void zoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley) { zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley); }
+	void zoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 transpen) { zoom_transpen_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, transpen); }
+	void zoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 transpen) { zoom_transpen_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, transpen); }
+	void zoom_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 transpen) { zoom_transpen_raw_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, transpen); }
+	void zoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 transpen) { zoom_transpen_raw_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, transpen); }
+	void zoom_transmask(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 transmask) { zoom_transmask_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, transmask); }
+	void zoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 transmask) { zoom_transmask_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, transmask); }
+	void zoom_transtable(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, const u8 *pentable) { zoom_transtable_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, pentable); }
+	void zoom_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, const u8 *pentable) { zoom_transtable_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, pentable); }
+	void zoom_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 transpen, u8 alpha) { zoom_alpha_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, transpen, alpha); }
+
+	// ----- sub-pixel zoomed graphics drawing -----
+
+	// Draw one element of a sprite made of several elements. destx/desty are
+	// the 16.16 position of the sprite's top-left corner, tilex/tiley are the
+	// column/row of this element within the sprite as it appears on screen,
+	// and stepx/stepy are the 16.16 source step per destination pixel
+	// (0x10000 is 1:1; subpixel_zoom_step() converts a scale). All elements
+	// of the sprite share one source accumulator, so they join without gaps
+	// or overlap. See drawgfxt.ipp for details.
+	void zoom_subpixel_opaque(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy) { zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy); }
+	void zoom_subpixel_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy) { zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy); }
+	void zoom_subpixel_transpen(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, u32 transpen) { zoom_transpen_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, transpen); }
+	void zoom_subpixel_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, u32 transpen) { zoom_transpen_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, transpen); }
+	void zoom_subpixel_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, u32 transpen) { zoom_transpen_raw_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, transpen); }
+	void zoom_subpixel_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, u32 transpen) { zoom_transpen_raw_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, transpen); }
+	void zoom_subpixel_transmask(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, u32 transmask) { zoom_transmask_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, transmask); }
+	void zoom_subpixel_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, u32 transmask) { zoom_transmask_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, transmask); }
+	void zoom_subpixel_transtable(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, const u8 *pentable) { zoom_transtable_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, pentable); }
+	void zoom_subpixel_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, const u8 *pentable) { zoom_transtable_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, pentable); }
+	void zoom_subpixel_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, u32 transpen, u8 alpha) { zoom_alpha_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, transpen, alpha); }
+
+	// subpixel_zoom_step: the 16.16 source step for a 16.16 scale, rounded up
+	// so a sprite never gains a pixel. subpixel_zoom_span: the same placement
+	// for drivers with their own pixel loops; along one axis, the visible
+	// destination span [deststart, destend] and starting 16.16 source
+	// position/step of the element at column/row 'tile' of a sprite whose
+	// 16.16 origin is 'pos'. Returns false if nothing is visible.
+	static u32 subpixel_zoom_step(u32 scale);
+	static bool subpixel_zoom_span(s32 pos, s32 tile, u32 size, u32 step, int flip, s32 clipmin, s32 clipmax, s32 &deststart, s32 &destend, s32 &src, s32 &srcstep);
 
 	// ----- priority masked graphics drawing -----
 
@@ -269,29 +296,88 @@ public:
 
 	// ----- priority masked zoomed graphics drawing -----
 
-	// core prio_zoom implementation
-	template <typename BitmapType, typename PriorityType, typename FunctionClass> void drawgfxzoom_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, PriorityType &priority, FunctionClass pixel_op);
-
 	// specific prio_zoom implementations for each transparency type
-	void prio_zoom_opaque(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask);
-	void prio_zoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask);
-	void prio_zoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, u32 transpen);
-	void prio_zoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, u32 transpen);
-	void prio_zoom_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, u32 transpen);
-	void prio_zoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, u32 transpen);
-	void prio_zoom_transmask(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, u32 transmask);
-	void prio_zoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, u32 transmask);
-	void prio_zoom_transtable(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, const u8 *pentable);
-	void prio_zoom_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, const u8 *pentable);
-	void prio_zoom_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, u32 transpen, u8 alpha);
+	void prio_zoom_opaque(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask) { prio_zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, priority, pmask); }
+	void prio_zoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask) { prio_zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, priority, pmask); }
+	void prio_zoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, u32 transpen) { prio_zoom_transpen_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, priority, pmask, transpen); }
+	void prio_zoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, u32 transpen) { prio_zoom_transpen_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, priority, pmask, transpen); }
+	void prio_zoom_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, u32 transpen) { prio_zoom_transpen_raw_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, priority, pmask, transpen); }
+	void prio_zoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, u32 transpen) { prio_zoom_transpen_raw_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, priority, pmask, transpen); }
+	void prio_zoom_transmask(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, u32 transmask) { prio_zoom_transmask_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, priority, pmask, transmask); }
+	void prio_zoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, u32 transmask) { prio_zoom_transmask_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, priority, pmask, transmask); }
+	void prio_zoom_transtable(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, const u8 *pentable) { prio_zoom_transtable_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, priority, pmask, pentable); }
+	void prio_zoom_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, const u8 *pentable) { prio_zoom_transtable_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, priority, pmask, pentable); }
+	void prio_zoom_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, u32 transpen, u8 alpha) { prio_zoom_alpha_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, priority, pmask, transpen, alpha); }
+
+	// ----- priority masked sub-pixel zoomed graphics drawing -----
+
+	// specific prio_zoom_subpixel implementations for each transparency type
+	void prio_zoom_subpixel_opaque(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, bitmap_ind8 &priority, u32 pmask) { prio_zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, priority, pmask); }
+	void prio_zoom_subpixel_opaque(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, bitmap_ind8 &priority, u32 pmask) { prio_zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, priority, pmask); }
+	void prio_zoom_subpixel_transpen(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, bitmap_ind8 &priority, u32 pmask, u32 transpen) { prio_zoom_transpen_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, priority, pmask, transpen); }
+	void prio_zoom_subpixel_transpen(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, bitmap_ind8 &priority, u32 pmask, u32 transpen) { prio_zoom_transpen_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, priority, pmask, transpen); }
+	void prio_zoom_subpixel_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, bitmap_ind8 &priority, u32 pmask, u32 transpen) { prio_zoom_transpen_raw_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, priority, pmask, transpen); }
+	void prio_zoom_subpixel_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, bitmap_ind8 &priority, u32 pmask, u32 transpen) { prio_zoom_transpen_raw_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, priority, pmask, transpen); }
+	void prio_zoom_subpixel_transmask(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, bitmap_ind8 &priority, u32 pmask, u32 transmask) { prio_zoom_transmask_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, priority, pmask, transmask); }
+	void prio_zoom_subpixel_transmask(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, bitmap_ind8 &priority, u32 pmask, u32 transmask) { prio_zoom_transmask_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, priority, pmask, transmask); }
+	void prio_zoom_subpixel_transtable(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, bitmap_ind8 &priority, u32 pmask, const u8 *pentable) { prio_zoom_transtable_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, priority, pmask, pentable); }
+	void prio_zoom_subpixel_transtable(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, bitmap_ind8 &priority, u32 pmask, const u8 *pentable) { prio_zoom_transtable_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, priority, pmask, pentable); }
+	void prio_zoom_subpixel_alpha(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, bitmap_ind8 &priority, u32 pmask, u32 transpen, u8 alpha) { prio_zoom_alpha_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, priority, pmask, transpen, alpha); }
 
 	// implementations moved here from specific drivers
 	void prio_transpen_additive(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, bitmap_ind8 &priority, u32 pmask, u32 trans_pen);
-	void prio_zoom_transpen_additive(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, u32 trans_pen);
+	void prio_zoom_transpen_additive(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask, u32 trans_pen) { prio_zoom_transpen_additive_common(dest, cliprect, code, color, flipx, flipy, pixel_pos(destx, desty), scalex, scaley, priority, pmask, trans_pen); }
+	void prio_zoom_subpixel_transpen_additive(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, s32 tilex, s32 tiley, u32 stepx, u32 stepy, bitmap_ind8 &priority, u32 pmask, u32 trans_pen) { prio_zoom_transpen_additive_common(dest, cliprect, code, color, flipx, flipy, subpixel_pos(destx, desty, tilex, tiley), stepx, stepy, priority, pmask, trans_pen); }
 	void alphastore(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, int fixedalpha, u8 *alphatable);
 	void alphatable(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, int fixedalpha, u8 *alphatable);
 
 private:
+	// destination of a zoomed draw: a pixel position, or the 16.16 origin of a
+	// multi-element sprite plus the column/row of the element within it
+	struct zoom_pos
+	{
+		s32 x, y;
+		s32 tilex, tiley;
+		bool subpixel;
+	};
+
+	static zoom_pos pixel_pos(s32 x, s32 y) { return zoom_pos{ x, y, 0, 0, false }; }
+	static zoom_pos subpixel_pos(s32 x, s32 y, s32 tilex, s32 tiley) { return zoom_pos{ x, y, tilex, tiley, true }; }
+
+	// top-left pixel when drawn unzoomed
+	s32 unzoomed_x(const zoom_pos &pos) const { return pos.subpixel ? s32((s64(pos.x) + 0xffff) >> 16) + pos.tilex * width() : pos.x; }
+	s32 unzoomed_y(const zoom_pos &pos) const { return pos.subpixel ? s32((s64(pos.y) + 0xffff) >> 16) + pos.tiley * height() : pos.y; }
+
+	// core zoom implementations
+	static bool zoom_axis(s32 pos, s32 tile, bool subpixel, u32 zoom, u32 size, int flip, s32 clipmin, s32 clipmax, s32 &deststart, s32 &destend, s32 &src, s32 &step);
+	template <typename BitmapType, typename FunctionClass> void drawgfxzoom_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, FunctionClass pixel_op);
+	template <typename BitmapType, typename PriorityType, typename FunctionClass> void drawgfxzoom_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, PriorityType &priority, FunctionClass pixel_op);
+
+	// zoom implementations shared by the pixel and sub-pixel variants
+	void zoom_opaque_common(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy);
+	void zoom_opaque_common(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy);
+	void zoom_transpen_common(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, u32 transpen);
+	void zoom_transpen_common(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, u32 transpen);
+	void zoom_transpen_raw_common(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, u32 transpen);
+	void zoom_transpen_raw_common(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, u32 transpen);
+	void zoom_transmask_common(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, u32 transmask);
+	void zoom_transmask_common(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, u32 transmask);
+	void zoom_transtable_common(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, const u8 *pentable);
+	void zoom_transtable_common(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, const u8 *pentable);
+	void zoom_alpha_common(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, u32 transpen, u8 alpha);
+	void prio_zoom_opaque_common(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask);
+	void prio_zoom_opaque_common(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask);
+	void prio_zoom_transpen_common(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask, u32 transpen);
+	void prio_zoom_transpen_common(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask, u32 transpen);
+	void prio_zoom_transpen_raw_common(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask, u32 transpen);
+	void prio_zoom_transpen_raw_common(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask, u32 transpen);
+	void prio_zoom_transmask_common(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask, u32 transmask);
+	void prio_zoom_transmask_common(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask, u32 transmask);
+	void prio_zoom_transtable_common(bitmap_ind16 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask, const u8 *pentable);
+	void prio_zoom_transtable_common(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask, const u8 *pentable);
+	void prio_zoom_alpha_common(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask, u32 transpen, u8 alpha);
+	void prio_zoom_transpen_additive_common(bitmap_rgb32 &dest, const rectangle &cliprect, u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask, u32 trans_pen);
+
 	// internal helpers
 	void decode(u32 code);
 
