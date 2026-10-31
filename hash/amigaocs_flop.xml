@@ -3184,7 +3184,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="armagman" supported="no">
+	<software name="armagman">
 		<!-- SPS (CAPS) release 629 -->
 		<description>The Armageddon Man (Europe)</description>
 		<!-- retail, standalone -->
@@ -7422,7 +7422,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="bombjack" supported="no">
+	<software name="bombjack">
 		<!-- SPS (CAPS) release 2797 -->
 		<description>Bomb Jack (Europe)</description>
 		<!-- retail, standalone -->
@@ -13928,7 +13928,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="demolitn" supported="no">
+	<software name="demolitn">
 		<!-- SPS (CAPS) release 2712 -->
 		<description>Demolition (Europe)</description>
 		<!-- retail, standalone -->
@@ -13936,7 +13936,6 @@ ATK test: failed
 		<year>1987</year>
 		<publisher>Anco</publisher>
 		<notes><![CDATA[
-Black screen after title screen, [FDC] dsksync (fixed)
 ATK test: OK
 ]]></notes>
 		<info name="usage" value="Insert ABUSS when prompted for secret code"/>
@@ -16523,7 +16522,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="eco" supported="no">
+	<software name="eco">
 		<!-- SPS (CAPS) release 1139 -->
 		<description>ECO (Europe)</description>
 		<!-- budget, standalone -->
@@ -16531,7 +16530,6 @@ ATK test: OK
 		<year>1988</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-Guru Meditation during initial boot, [FDC] with adkcon=$1100
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -19975,7 +19973,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="fbmang2" supported="no">
+	<software name="fbmang2">
 		<!-- SPS (CAPS) release 246 -->
 		<description>Football Manager 2 (Europe)</description>
 		<!-- retail, standalone -->
@@ -19984,7 +19982,6 @@ ATK test: OK
 		<!-- Publisher: Prism Leisure -->
 		<publisher>Addictive</publisher>
 		<notes><![CDATA[
-Guru Meditation during Workbench load after pressing left mouse button on Hot Shot advertisement
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -19994,7 +19991,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="fbmang2ek" cloneof="fbmang2" supported="no">
+	<software name="fbmang2ek" cloneof="fbmang2">
 		<!-- SPS (CAPS) release 793 -->
 		<description>Football Manager 2 Expansion Kit (Europe, FM2 &amp; FM2 Expansion Kit)</description>
 		<!-- retail, standalone -->
@@ -20011,7 +20008,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="fbmang2eka" cloneof="fbmang2" supported="no">
+	<software name="fbmang2eka" cloneof="fbmang2">
 		<!-- SPS (CAPS) release 2226 -->
 		<description>Football Manager 2 Expansion Kit (Europe, Amiga Sports Pack)</description>
 		<!-- retail, standalone -->
@@ -24975,7 +24972,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="ikplus" supported="no">
+	<software name="ikplus">
 		<!-- SPS (CAPS) release 339 -->
 		<description>IK+ (Europe)</description>
 		<!-- retail, standalone -->
@@ -24993,7 +24990,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="ikplusa" cloneof="ikplus" supported="no">
+	<software name="ikplusa" cloneof="ikplus">
 		<!-- SPS (CAPS) release 2063 -->
 		<description>IK+ (Europe, Budget)</description>
 		<!-- budget, standalone -->
@@ -39198,7 +39195,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="prison" supported="no">
+	<software name="prison">
 		<!-- SPS (CAPS) release 416 -->
 		<description>Prison (Europe)</description>
 		<!-- retail, standalone -->
@@ -52581,7 +52578,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="dizzy2" supported="no">
+	<software name="dizzy2">
 		<!-- SPS (CAPS) release 594 -->
 		<description>Treasure Island Dizzy (Europe)</description>
 		<!-- retail, standalone -->
@@ -55955,7 +55952,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="wizball" supported="no">
+	<software name="wizball">
 		<!-- SPS (CAPS) release 176 -->
 		<description>Wizball (Europe)</description>
 		<!-- retail, standalone -->
@@ -55972,7 +55969,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="wizballa" cloneof="wizball" supported="no">
+	<software name="wizballa" cloneof="wizball">
 		<!-- SPS (CAPS) release 1380 -->
 		<description>Wizball (Europe, Tenstar Pack)</description>
 		<!-- retail, standalone -->
@@ -55989,7 +55986,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="wizballb" cloneof="wizball" supported="no">
+	<software name="wizballb" cloneof="wizball">
 		<!-- SPS (CAPS) release 1544 -->
 		<description>Wizball (Europe, Budget)</description>
 		<!-- budget, standalone -->
