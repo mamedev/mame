@@ -818,6 +818,12 @@ void mips3_device::static_generate_exception(drcuml_block &block, int &label, ui
 	UML_LABEL(block, next);                                                     // <next>:
 	UML_MOV(block, CPR032(COP0_EPC), I0);                                       // mov     [EPC],i0
 	UML_MOV(block, I3, offset);                                                 // mov     i3,offset
+	if (exception == EXCEPTION_INTERRUPT && m_flavor == MIPS3_TYPE_XBURST)
+	{
+		/* MIPS32 takes interrupts through the 0x200 vector when Cause.IV is set */
+		UML_TEST(block, CPR032(COP0_Cause), 0x00800000);                        // test    [Cause],IV
+		UML_MOVc(block, COND_NZ, I3, 0x200);                                    // mov     i3,0x200,nz
+	}
 	UML_JMP(block, causeok);                                                    // jmp     <causeok>
 	UML_LABEL(block, nested);                                                   // <nested>:
 	UML_AND(block, I0, CPR032(COP0_Cause), 0x80000000);                         // and     i0,[Cause],0x80000000
@@ -894,6 +900,9 @@ void mips3_device::static_generate_memory_mode_checks(drcuml_block &block, uml::
 
 void mips3_device::static_generate_fastram_accessor(drcuml_block &block, int &label, int size, bool iswrite, bool ismasked)
 {
+	// fast RAM is laid out like the program space; a 32-bit bus has a doubleword's halves in two words
+	const int qword_rotate = (m_data_bits == 64) ? 0 : (32 * (m_bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0)));
+
 	if (!debugger_enabled())
 	{
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
@@ -916,25 +925,25 @@ void mips3_device::static_generate_fastram_accessor(drcuml_block &block, int &la
 				{
 					if (size == 1)
 					{
-						UML_XOR(block, I0, I0, m_bigendian ? BYTE4_XOR_BE(0) : BYTE4_XOR_LE(0));
-																					// xor     i0,i0,bytexor
+						UML_XOR(block, I0, I0, m_byte_xor);                         // xor     i0,i0,bytexor
 						UML_LOAD(block, I0, fastbase, I0, SIZE_BYTE, SCALE_x1);     // load    i0,fastbase,i0,byte
 					}
 					else if (size == 2)
 					{
-						UML_XOR(block, I0, I0, m_bigendian ? WORD_XOR_BE(0) : WORD_XOR_LE(0));
-																					// xor     i0,i0,wordxor
+						UML_XOR(block, I0, I0, m_word_xor);                         // xor     i0,i0,wordxor
 						UML_LOAD(block, I0, fastbase, I0, SIZE_WORD, SCALE_x1);     // load    i0,fastbase,i0,word_x1
 					}
 					else if (size == 4)
 					{
+						if (m_dword_xor)
+							UML_XOR(block, I0, I0, m_dword_xor);                    // xor     i0,i0,dwordxor
 						UML_LOAD(block, I0, fastbase, I0, SIZE_DWORD, SCALE_x1);    // load    i0,fastbase,i0,dword_x1
 					}
 					else if (size == 8)
 					{
 						UML_DLOAD(block, I0, fastbase, I0, SIZE_QWORD, SCALE_x1);   // dload   i0,fastbase,i0,qword_x1
-						UML_DROR(block, I0, I0, 32 * (m_bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0)));
-																					// dror    i0,i0,32*bytexor
+						if (qword_rotate)
+							UML_DROR(block, I0, I0, qword_rotate);                  // dror    i0,i0,32*bytexor
 					}
 					UML_RET(block);                                                 // ret
 				}
@@ -942,18 +951,18 @@ void mips3_device::static_generate_fastram_accessor(drcuml_block &block, int &la
 				{
 					if (size == 1)
 					{
-						UML_XOR(block, I0, I0, m_bigendian ? BYTE4_XOR_BE(0) : BYTE4_XOR_LE(0));
-																					// xor     i0,i0,bytexor
+						UML_XOR(block, I0, I0, m_byte_xor);                         // xor     i0,i0,bytexor
 						UML_STORE(block, fastbase, I0, I1, SIZE_BYTE, SCALE_x1);    // store   fastbase,i0,i1,byte
 					}
 					else if (size == 2)
 					{
-						UML_XOR(block, I0, I0, m_bigendian ? WORD_XOR_BE(0) : WORD_XOR_LE(0));
-																					// xor     i0,i0,wordxor
+						UML_XOR(block, I0, I0, m_word_xor);                         // xor     i0,i0,wordxor
 						UML_STORE(block, fastbase, I0, I1, SIZE_WORD, SCALE_x1);    // store   fastbase,i0,i1,word_x1
 					}
 					else if (size == 4)
 					{
+						if (m_dword_xor)
+							UML_XOR(block, I0, I0, m_dword_xor);                        // xor     i0,i0,dwordxor
 						if (ismasked)
 						{
 							UML_LOAD(block, I3, fastbase, I0, SIZE_DWORD, SCALE_x1);    // load    i3,fastbase,i0,dword_x1
@@ -965,12 +974,12 @@ void mips3_device::static_generate_fastram_accessor(drcuml_block &block, int &la
 					}
 					else if (size == 8)
 					{
-						UML_DROR(block, I1, I1, 32 * (m_bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0)));
-																						// dror    i1,i1,32*bytexor
+						if (qword_rotate)
+							UML_DROR(block, I1, I1, qword_rotate);                      // dror    i1,i1,32*bytexor
 						if (ismasked)
 						{
-							UML_DROR(block, I2, I2, 32 * (m_bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0)));
-																						// dror    i2,i2,32*bytexor
+							if (qword_rotate)
+								UML_DROR(block, I2, I2, qword_rotate);                  // dror    i2,i2,32*bytexor
 							UML_DLOAD(block, I3, fastbase, I0, SIZE_QWORD, SCALE_x1);   // dload   i3,fastbase,i0,qword_x1
 							UML_DROLINS(block, I3, I1, 0, I2);                          // drolins i3,i1,0,i2
 							UML_DSTORE(block, fastbase, I0, I3, SIZE_QWORD, SCALE_x1);  // dstore  fastbase,i0,i3,qword_x1
@@ -2792,8 +2801,9 @@ bool mips3_device::generate_idt(drcuml_block &block, compiler_state &compiler, c
 {
 	const uint32_t op = desc->opptr;
 	const uint8_t opswitch = op & 0x1f;
+	const int in_delay_slot = desc->in_delay_slot();
 
-	if (m_flavor == MIPS3_TYPE_VR5500)
+	if (m_flavor == MIPS3_TYPE_VR5500 || m_flavor == MIPS3_TYPE_XBURST)
 	{
 		switch (op & 0x3f)
 		{
@@ -2822,6 +2832,41 @@ bool mips3_device::generate_idt(drcuml_block &block, compiler_state &compiler, c
 					UML_MULS(block, I0, I0, R32(RSREG), R32(RTREG));            // muls    i0,i0,<rsreg>,<rtreg>
 					UML_DSEXT(block, R64(RDREG), I0, SIZE_DWORD);               // dsext   <rdreg>,i0,dword
 				}
+				return true;
+
+			case 0x10:  /* S32LDD xra,rb,s12 (XBurst MXU) */
+				if (m_flavor != MIPS3_TYPE_XBURST)
+					return false;
+				UML_ADD(block, I0, R32(RSREG), (int32_t(op << 12) >> 22) << 2);     // add     i0,<rsreg>,s12
+				UML_CALLH(block, *m_read32[m_core->mode >> 1]);                     // callh   read32
+				if ((op >> 6) & 0xf)
+					UML_MOV(block, mem(&m_mxu[(op >> 6) & 0xf]), I0);               // mov     [mxu],i0
+				if (!in_delay_slot)
+					generate_update_cycles(block, compiler, desc->pc + 4, true);
+				return true;
+
+			case 0x11:  /* S32STD xra,rb,s12 (XBurst MXU) */
+				if (m_flavor != MIPS3_TYPE_XBURST)
+					return false;
+				UML_ADD(block, I0, R32(RSREG), (int32_t(op << 12) >> 22) << 2);     // add     i0,<rsreg>,s12
+				UML_MOV(block, I1, mem(&m_mxu[(op >> 6) & 0xf]));                   // mov     i1,[mxu]
+				UML_CALLH(block, *m_write32[m_core->mode >> 1]);                    // callh   write32
+				if (!in_delay_slot)
+					generate_update_cycles(block, compiler, desc->pc + 4, true);
+				return true;
+
+			case 0x2e:  /* S32M2I xra,rb (XBurst MXU) */
+				if (m_flavor != MIPS3_TYPE_XBURST)
+					return false;
+				if (RTREG != 0)
+					UML_DSEXT(block, R64(RTREG), mem(&m_mxu[(op >> 6) & 0x1f]), SIZE_DWORD); // dsext   <rtreg>,[mxu],dword
+				return true;
+
+			case 0x2f:  /* S32I2M xra,rb (XBurst MXU) */
+				if (m_flavor != MIPS3_TYPE_XBURST)
+					return false;
+				if ((op >> 6) & 0x1f)
+					UML_MOV(block, mem(&m_mxu[(op >> 6) & 0x1f]), R32(RTREG));      // mov     [mxu],<rtreg>
 				return true;
 
 			case 0x20:  /* CLZ */
@@ -2909,8 +2954,8 @@ bool mips3_device::generate_set_cop0_reg(drcuml_block &block, compiler_state &co
 	switch (reg)
 	{
 		case COP0_Cause:
-			/* only IP(1:0) is writable */
-			UML_ROLINS(block, CPR032(COP0_Cause), I0, 0, 0x300);                // rolins  [Cause],i0,0,0x300
+			/* only IP(1:0) is writable, plus IV (the interrupt vector select) on MIPS32 */
+			UML_ROLINS(block, CPR032(COP0_Cause), I0, 0, (m_flavor == MIPS3_TYPE_XBURST) ? 0x00800300 : 0x300); // rolins  [Cause],i0,0,0x300
 			compiler.checksoftints = true;
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, true);
@@ -3105,6 +3150,22 @@ bool mips3_device::generate_cop0(drcuml_block &block, compiler_state &compiler, 
 	{
 		UML_TEST(block, CPR032(COP0_Status), SR_COP0);                          // test    [Status],SR_COP0
 		UML_EXHc(block, COND_Z, *m_exception[EXCEPTION_BADCOP], 0);             // exh     cop,0,Z
+	}
+
+	/* MIPS32 selects between several registers with one number; the R4000 family has no select field */
+	const int sel = (m_flavor == MIPS3_TYPE_XBURST) ? (op & 7) : 0;
+	if (sel != 0 && opswitch == 0x00)
+	{
+		if (RTREG != 0)
+			UML_DSEXT(block, R64(RTREG), mem(&m_cp0_sel[RDREG][sel]), SIZE_DWORD); // dsext   <rtreg>,[cp0_sel],dword
+		return true;
+	}
+	if (sel != 0 && opswitch == 0x04)
+	{
+		/* Config1 is read-only */
+		if (RDREG != COP0_Config || sel != 1)
+			UML_MOV(block, mem(&m_cp0_sel[RDREG][sel]), R32(RTREG));            // mov     [cp0_sel],<rtreg>
+		return true;
 	}
 
 	switch (opswitch)

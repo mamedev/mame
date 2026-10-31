@@ -51,6 +51,7 @@ DECLARE_DEVICE_TYPE(RM7000BE, rm7000be_device)
 DECLARE_DEVICE_TYPE(RM7000LE, rm7000le_device)
 DECLARE_DEVICE_TYPE(R5900LE, r5900le_device)
 DECLARE_DEVICE_TYPE(R5900BE, r5900be_device)
+DECLARE_DEVICE_TYPE(XBURST, xburst_device)
 
 
 /***************************************************************************
@@ -281,7 +282,10 @@ protected:
 		MIPS3_TYPE_VR5500,
 		MIPS3_TYPE_QED5271,
 		MIPS3_TYPE_R5900,
-		MIPS3_TYPE_RM7000
+		MIPS3_TYPE_RM7000,
+
+		/* MIPS32 variants */
+		MIPS3_TYPE_XBURST
 	};
 
 	static inline constexpr unsigned MIPS3_MAX_FASTRAM      = 3;
@@ -446,6 +450,12 @@ protected:
 	uint64_t        m_entrylo_wmask;
 	uint64_t        m_entryhi_wmask;
 	uint8_t         m_tlbentries;
+
+	/* MIPS32 CP0 registers with a non-zero select field, indexed [register][select]; select 0 lives in cpr[0] */
+	uint32_t        m_cp0_sel[32][8];
+
+	/* XBurst MXU SIMD registers xr0-xr15 (xr0 reads as zero) and the control register xr16; only the moves and loads/stores are implemented */
+	uint32_t        m_mxu[32];
 
 	/* primary data cache geometry, for the parts that model one */
 	struct dcache_geometry
@@ -1049,6 +1059,16 @@ public:
 	// construction/destruction
 	rm7000le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: mips3_device(mconfig, RM7000LE, tag, owner, clock, MIPS3_TYPE_RM7000, ENDIANNESS_LITTLE, 32) // Should be 64 bits
+	{
+	}
+};
+
+// Ingenic XBurst: the MIPS32 release 1 core of the JZ47xx SoCs (JZ4740/JZ4750/JZ4755), no FPU, little-endian
+class xburst_device : public mips3_device {
+public:
+	// construction/destruction
+	xburst_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: mips3_device(mconfig, XBURST, tag, owner, clock, MIPS3_TYPE_XBURST, ENDIANNESS_LITTLE, 32)
 	{
 	}
 };
