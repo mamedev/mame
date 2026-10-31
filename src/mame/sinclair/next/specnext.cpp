@@ -4250,8 +4250,10 @@ void specnext_state::tbblue(machine_config &config)
 	m_uart[0]->out_txd_callback().append(FUNC(specnext_state::txd_w<0>));
 	m_uart[0]->out_rx_full_near_callback().set(m_im2_uart0_rx, FUNC(specnext_im2_device::irq_w));
 	m_uart[0]->out_tx_empty_callback().set(m_im2_uart0_tx, FUNC(specnext_im2_device::irq_w));
+	m_uart[0]->out_rts_callback().set("rs232_esp", FUNC(rs232_port_device::write_rts));
 	rs232_port_device &rs232_esp(RS232_PORT(config, "rs232_esp", rs232_devices, nullptr));
 	rs232_esp.rxd_handler().set(m_uart[0], FUNC(specnext_uart_device::rx_w));
+	rs232_esp.cts_handler().set(m_uart[0], FUNC(specnext_uart_device::cts_w));
 	rs232_esp.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(rs232_baud));
 	rs232_esp.set_option_device_input_defaults("pty", DEVICE_INPUT_DEFAULTS_NAME(rs232_baud));
 
@@ -4266,8 +4268,10 @@ void specnext_state::tbblue(machine_config &config)
 	m_uart[1]->out_txd_callback().append(FUNC(specnext_state::txd_w<1>));
 	m_uart[1]->out_rx_full_near_callback().set(m_im2_uart1_rx, FUNC(specnext_im2_device::irq_w));
 	m_uart[1]->out_tx_empty_callback().set(m_im2_uart1_tx, FUNC(specnext_im2_device::irq_w));
+	m_uart[1]->out_rts_callback().set("rs232_rpi", FUNC(rs232_port_device::write_rts));
 	rs232_port_device &rs232_rpi(RS232_PORT(config, "rs232_rpi", rs232_devices, nullptr));
 	rs232_rpi.rxd_handler().set(m_uart[1], FUNC(specnext_uart_device::rx_w));
+	rs232_rpi.cts_handler().set(m_uart[1], FUNC(specnext_uart_device::cts_w));
 	rs232_rpi.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(rs232_baud));
 	rs232_rpi.set_option_device_input_defaults("pty", DEVICE_INPUT_DEFAULTS_NAME(rs232_baud));
 

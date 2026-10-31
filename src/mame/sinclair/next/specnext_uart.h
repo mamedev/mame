@@ -17,14 +17,19 @@ public:
 	auto out_txd_callback() { return m_out_txd_cb.bind(); }
 	auto out_rx_full_near_callback() { return m_out_rx_full_near_cb.bind(); }
 	auto out_tx_empty_callback() { return m_out_tx_empty_cb.bind(); }
+	auto out_rts_callback() { return m_out_rts_cb.bind(); }
 
 	u8 reg_r(offs_t reg);
 	void reg_w(offs_t reg, u8 data);
+	void cts_w(int state);
+
 
 protected:
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void tra_callback() override;
+	virtual void tra_complete() override;
 	virtual void received_byte(u8 byte) override;
 
 private:
@@ -33,21 +38,30 @@ private:
 	devcb_write_line    m_out_txd_cb;
 	devcb_write_line    m_out_rx_full_near_cb;
 	devcb_write_line    m_out_tx_empty_cb;
-
+	devcb_write_line    m_out_rts_cb;
 	u8 m_framing;
 	u8 m_prescalar_msb; // u3
 	u16 m_prescalar_lsb; // u14
-	u8 m_rx_fifo[RX_FIFO_SIZE];
+	u16 m_rx_fifo[RX_FIFO_SIZE]; // bit 8: error flag
 	u16 m_rx_head, m_rx_tail;
 	bool m_rx_empty;
 	bool m_rx_full_near; // 3/4+
+	u16 m_rx_hold;
+	bool m_rx_hold_valid;
+	bool m_rx_overflow;
+	bool m_cts_n;      // 0 = clear to send
+	bool m_tx_bit_sent;
 
 	u8 dat_r();
 	u8 status_reg_r();
 	void clear_rx_fifo();
+	void rx_fifo_push();
 	void update_serial();
+	bool tx_blocked() const;
+	void tx_resume();
+	void txd_idle_w();
+	void update_rts();
 };
-
 
 DECLARE_DEVICE_TYPE(SPECNEXT_UART, specnext_uart_device)
 
