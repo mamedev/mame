@@ -568,13 +568,16 @@ void tms320c3x_device::addf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	// add
 	man = m1 + m2;
 
-	if (man == 0 || exp == -128)
+	// an exact zero result is not an underflow
+	if (man == 0)
 	{
-		// if the mantissa is zero, set the exponent appropriately
-		exp = -128;
-		man = 0x80000000;
+		dst.set_mantissa(0);
+		dst.set_exponent(-128);
+		IREG(TMR_ST) |= ZFLAG;
+		return;
 	}
-	else if (man >= int64_t(0x100000000U) || man < int64_t(0xffffffff00000000U))
+
+	if (man >= int64_t(0x100000000U) || man < int64_t(0xffffffff00000000U))
 	{
 		// if the mantissa is >= 2.0 or < -2.0, normalize
 		man >>= 1;
@@ -646,6 +649,11 @@ void tms320c3x_device::subf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 		OR_NZF(dst);
 		return;
 	}
+	if (src1.exponent() == -128)
+	{
+		negf(dst, src2);
+		return;
+	}
 
 	// extract mantissas from 1.0.31 values to 1.1.31 values
 	m1 = (int64_t)src1.mantissa() ^ 0x80000000;
@@ -679,15 +687,17 @@ void tms320c3x_device::subf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	// subtract
 	man = m1 - m2;
 
-	// if the mantissa is zero, set the exponent appropriately
-	if (man == 0 || exp == -128)
+	// an exact zero result is not an underflow
+	if (man == 0)
 	{
-		exp = -128;
-		man = 0x80000000;
+		dst.set_mantissa(0);
+		dst.set_exponent(-128);
+		IREG(TMR_ST) |= ZFLAG;
+		return;
 	}
 
 	// if the mantissa is >= 2.0 or < -2.0, normalize
-	else if (man >= int64_t(0x100000000U) || man < int64_t(0xffffffff00000000U))
+	if (man >= int64_t(0x100000000U) || man < int64_t(0xffffffff00000000U))
 	{
 		man >>= 1;
 		exp++;
@@ -713,11 +723,9 @@ void tms320c3x_device::subf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	// check for underflow
 	if (exp <= -128)
 	{
-		// make sure a 0 result doesn't set underflow
-		if (man != 0 || exp < -128)
-			IREG(TMR_ST) |= UFFLAG | LUFFLAG;
 		man = 0x80000000;
 		exp = -128;
+		IREG(TMR_ST) |= UFFLAG | LUFFLAG;
 	}
 
 	// check for overflow
@@ -839,32 +847,26 @@ void tms320c3x_device::norm(tmsreg &dst, tmsreg &src)
 	{
 		dst.set_mantissa(0);
 		dst.set_exponent(-128);
+
+		// a nonzero mantissa with exponent -128 underflows and leaves Z clear
 		if (man != 0)
 			IREG(TMR_ST) |= UFFLAG | LUFFLAG;
-	}
-	else
-	{
-		int cnt;
-		if (man > 0)
-		{
-			cnt = std::countl_zero(uint32_t(man));
-			man <<= cnt;
-			exp -= cnt;
-		}
 		else
-		{
-			cnt = std::countl_one(uint32_t(man));
-			man <<= cnt;
-			exp -= cnt;
-		}
+			IREG(TMR_ST) |= ZFLAG;
+		return;
+	}
 
-		// check for underflow
-		if (exp <= -128)
-		{
-			man = 0x00000000;
-			exp = -128;
-			IREG(TMR_ST) |= UFFLAG | LUFFLAG;
-		}
+	// shift the most significant nonsign bit into bit 31, then replace it with the sign
+	int const cnt = (man > 0) ? std::countl_zero(uint32_t(man)) : std::countl_one(uint32_t(man));
+	man = ((cnt < 32) ? (uint32_t(man) << cnt) : 0) ^ 0x80000000;
+	exp -= cnt;
+
+	// check for underflow
+	if (exp <= -128)
+	{
+		man = 0x00000000;
+		exp = -128;
+		IREG(TMR_ST) |= UFFLAG | LUFFLAG;
 	}
 
 	dst.set_mantissa(man);
@@ -2286,7 +2288,7 @@ void tms320c3x_device::mpyi_imm(uint32_t op)
 	if (!OVM() || !OVERFLOW_SUB(0,src,_res))                        \
 		IREG(dreg) = _res;                                          \
 	else                                                            \
-		IREG(dreg) = ((int32_t)src < 0) ? 0x80000000 : 0x7fffffff;    \
+		IREG(dreg) = ((int32_t)src < 0) ? 0x7fffffff : 0x80000000;    \
 	if (dreg < 8)                                                   \
 	{                                                               \
 		uint32_t tempc = IREG(TMR_ST) & CFLAG;                        \
@@ -2366,7 +2368,7 @@ void tms320c3x_device::negf_imm(uint32_t op)
 	if (!OVM() || !OVERFLOW_SUB(0,src,_res))                        \
 		IREG(dreg) = _res;                                          \
 	else                                                            \
-		IREG(dreg) = ((int32_t)src < 0) ? 0x80000000 : 0x7fffffff;    \
+		IREG(dreg) = ((int32_t)src < 0) ? 0x7fffffff : 0x80000000;    \
 	if (dreg < 8)                                                   \
 	{                                                               \
 		CLR_NZCVUF();                                               \
@@ -5715,6 +5717,8 @@ void tms320c3x_device::retsc_reg(uint32_t op)
 
 /*-----------------------------------------------------*/
 
+// MPYF3 || ADDF3 and MPYF3 || SUBF3 clear N and Z; V and UF report either operation
+
 void tms320c3x_device::mpyaddf_0(uint32_t op)
 {
 	// src3 * src4, src1 + src2
@@ -5724,7 +5728,9 @@ void tms320c3x_device::mpyaddf_0(uint32_t op)
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[TMR_TEMP1], m_r[TMR_TEMP2]);
+	uint32_t const mflags = IREG(TMR_ST) & (VFLAG | UFFLAG);
 	addf(m_r[((op >> 22) & 1) | 2], m_r[(op >> 19) & 7], m_r[(op >> 16) & 7]);
+	IREG(TMR_ST) = (IREG(TMR_ST) & ~(NFLAG | ZFLAG)) | mflags;
 	m_r[(op >> 23) & 1] = m_r[TMR_TEMP3];
 	UPDATE_DEF();
 }
@@ -5738,7 +5744,9 @@ void tms320c3x_device::mpyaddf_1(uint32_t op)
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[TMR_TEMP1], m_r[(op >> 19) & 7]);
+	uint32_t const mflags = IREG(TMR_ST) & (VFLAG | UFFLAG);
 	addf(m_r[((op >> 22) & 1) | 2], m_r[TMR_TEMP2], m_r[(op >> 16) & 7]);
+	IREG(TMR_ST) = (IREG(TMR_ST) & ~(NFLAG | ZFLAG)) | mflags;
 	m_r[(op >> 23) & 1] = m_r[TMR_TEMP3];
 	UPDATE_DEF();
 }
@@ -5752,7 +5760,9 @@ void tms320c3x_device::mpyaddf_2(uint32_t op)
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[(op >> 19) & 7], m_r[(op >> 16) & 7]);
+	uint32_t const mflags = IREG(TMR_ST) & (VFLAG | UFFLAG);
 	addf(m_r[((op >> 22) & 1) | 2], m_r[TMR_TEMP1], m_r[TMR_TEMP2]);
+	IREG(TMR_ST) = (IREG(TMR_ST) & ~(NFLAG | ZFLAG)) | mflags;
 	m_r[(op >> 23) & 1] = m_r[TMR_TEMP3];
 	UPDATE_DEF();
 }
@@ -5766,7 +5776,9 @@ void tms320c3x_device::mpyaddf_3(uint32_t op)
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[TMR_TEMP1], m_r[(op >> 19) & 7]);
+	uint32_t const mflags = IREG(TMR_ST) & (VFLAG | UFFLAG);
 	addf(m_r[((op >> 22) & 1) | 2], m_r[(op >> 16) & 7], m_r[TMR_TEMP2]);
+	IREG(TMR_ST) = (IREG(TMR_ST) & ~(NFLAG | ZFLAG)) | mflags;
 	m_r[(op >> 23) & 1] = m_r[TMR_TEMP3];
 	UPDATE_DEF();
 }
@@ -5782,7 +5794,9 @@ void tms320c3x_device::mpysubf_0(uint32_t op)
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[TMR_TEMP1], m_r[TMR_TEMP2]);
+	uint32_t const mflags = IREG(TMR_ST) & (VFLAG | UFFLAG);
 	subf(m_r[((op >> 22) & 1) | 2], m_r[(op >> 19) & 7], m_r[(op >> 16) & 7]);
+	IREG(TMR_ST) = (IREG(TMR_ST) & ~(NFLAG | ZFLAG)) | mflags;
 	m_r[(op >> 23) & 1] = m_r[TMR_TEMP3];
 	UPDATE_DEF();
 }
@@ -5796,7 +5810,9 @@ void tms320c3x_device::mpysubf_1(uint32_t op)
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[TMR_TEMP1], m_r[(op >> 19) & 7]);
+	uint32_t const mflags = IREG(TMR_ST) & (VFLAG | UFFLAG);
 	subf(m_r[((op >> 22) & 1) | 2], m_r[TMR_TEMP2], m_r[(op >> 16) & 7]);
+	IREG(TMR_ST) = (IREG(TMR_ST) & ~(NFLAG | ZFLAG)) | mflags;
 	m_r[(op >> 23) & 1] = m_r[TMR_TEMP3];
 	UPDATE_DEF();
 }
@@ -5810,7 +5826,9 @@ void tms320c3x_device::mpysubf_2(uint32_t op)
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[(op >> 19) & 7], m_r[(op >> 16) & 7]);
+	uint32_t const mflags = IREG(TMR_ST) & (VFLAG | UFFLAG);
 	subf(m_r[((op >> 22) & 1) | 2], m_r[TMR_TEMP1], m_r[TMR_TEMP2]);
+	IREG(TMR_ST) = (IREG(TMR_ST) & ~(NFLAG | ZFLAG)) | mflags;
 	m_r[(op >> 23) & 1] = m_r[TMR_TEMP3];
 	UPDATE_DEF();
 }
@@ -5824,7 +5842,9 @@ void tms320c3x_device::mpysubf_3(uint32_t op)
 	LONG2FP(TMR_TEMP1, src3);
 	LONG2FP(TMR_TEMP2, src4);
 	mpyf(m_r[TMR_TEMP3], m_r[TMR_TEMP1], m_r[(op >> 19) & 7]);
+	uint32_t const mflags = IREG(TMR_ST) & (VFLAG | UFFLAG);
 	subf(m_r[((op >> 22) & 1) | 2], m_r[(op >> 16) & 7], m_r[TMR_TEMP2]);
+	IREG(TMR_ST) = (IREG(TMR_ST) & ~(NFLAG | ZFLAG)) | mflags;
 	m_r[(op >> 23) & 1] = m_r[TMR_TEMP3];
 	UPDATE_DEF();
 }
