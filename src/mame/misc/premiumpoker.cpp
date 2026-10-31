@@ -8,12 +8,14 @@ Five card draw poker with holds, a BIG/SMALL double up and a coin hopper.
 Program ROMs are labelled P221 and the title string reads "Version 2.21";
 the graphics ROMs are labelled V211.
 
+ROMs dumped by Hammy.
+
 PCB parts (from photos):
 - Sharp LH0080E Z80E-CPU, 8.000 MHz crystal beside it
 - 2x Fujitsu MB89363B (each one is a pair of 8255-type PPIs)
 - 64-pin custom DIP "SPECIAL VI JAPAN & US" (video), 2148-type RAMs
-- Small square QFP with a green program label: unidentified, probably the
-  tone generator and/or the security/accounting device
+- Square footprint with a green label: no chip fitted. The tone generator
+  and the security/accounting device are probably inside the custom.
 - 24.000 MHz oscillator (use unknown, probably video)
 - AMI 18CV8 PAL, 3 banks of 8 DIP switches, UDN2803A driver, battery
 - 8 KB battery backed SRAM
