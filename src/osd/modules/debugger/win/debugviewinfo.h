@@ -11,6 +11,7 @@
 #pragma once
 
 #include "debugwin.h"
+#include "uimetrics.h"
 
 #include "debugbaseinfo.h"
 
@@ -55,6 +56,10 @@ public:
 	HWND create_source_combobox(HWND parent, LONG_PTR userdata);
 	void recompute_source_combobox(HWND wnd);
 
+	void show() const { smart_show_window(m_wnd, true); }
+	void hide() const { smart_show_window(m_wnd, false); }
+	bool is_visible() const { return IsWindowVisible(m_wnd); }
+
 	virtual void restore_configuration_from_node(util::xml::data_node const &node);
 	virtual void save_configuration_to_node(util::xml::data_node &node);
 
@@ -66,14 +71,15 @@ protected:
 	};
 
 	template <typename T> T *view() const { return downcast<T *>(m_view); }
+	ui_metrics const &metrics() const;
 
 	virtual void add_items_to_context_menu(HMENU menu);
 	virtual void update_context_menu(HMENU menu);
 	virtual void handle_context_menu(unsigned command);
+	virtual void update();
 
 private:
 	void draw_contents(HDC windc);
-	void update();
 	uint32_t process_scroll(WORD type, HWND wnd);
 	bool process_context_menu(int x, int y);
 	LRESULT view_proc(UINT message, WPARAM wparam, LPARAM lparam);
