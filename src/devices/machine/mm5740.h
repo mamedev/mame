@@ -94,6 +94,9 @@ public:
 	static u32 calc_effective_clock_key_debounce(u32 capacitance);
 
 protected:
+	// for devices with a different internal ROM
+	mm5740_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 
