@@ -143,6 +143,25 @@ REF. 970429
 10 * CY7C199 =   10 * 32k x 8
 
 
+Development PCB -- Radikal Bikers
+----------
+
+3D-3G-AER/2, with a DIP-64 socket for the 68000 (U34), on a REF. 960520 bottom board whose
+68000 footprint is unpopulated. 68000 areas decoded by the PAL at U21, in addition to those
+of the production boards:
+  000000-0FFFFF  flash (U22/U30), or RAM when the swap bit is set
+  100000-1FFFFF  RAM, or flash when the swap bit is set
+  200000-3FFFFF  flash when the swap bit is set
+  800000-BFFFFF  texture flash (not emulated)
+  C00000-CFFFFF  texture mask RAM, low byte of each word
+  D00000-DFFFFF  unknown, the program fills it with $ffff
+  E00000-EFFFFF  unknown
+The RAM is two KM684002 (512K x 8).
+Not decoded by U21:
+  500004-500005  parallel link to the development host (not emulated)
+  500070         D0 = swap bit, cleared on reset (perhaps half of the 74LS74 at U46)
+
+
 **************************************************************************/
 
 #include "emu.h"
@@ -842,6 +861,43 @@ static INPUT_PORTS_START( radikalb )
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(25)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( radikalbp )
+	PORT_START("IN0")
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 )      // view
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )      // brake
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0e00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(gaelco3d_state::analog_bit_r<0>))
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(gaelco3d_state::analog_bit_r<1>))
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(gaelco3d_state::analog_bit_r<2>))
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(gaelco3d_state::analog_bit_r<3>))
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x0200, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x0800, 0x0800, "Boot mode" )
+	PORT_DIPSETTING(      0x0000, "Development host" )
+	PORT_DIPSETTING(      0x0800, "Flash program" )
+	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("ANALOG0")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(25)
+
+	PORT_START("ANALOG1")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( footbpow )
 	PORT_START("IN0")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1006,6 +1062,86 @@ void gaelco3d_state::footbpow(machine_config &config)
 	gaelco3d2(config);
 	m_outlatch->q_out_cb<5>().set(FUNC(gaelco3d_state::fp_analog_clock_w));
 }
+
+
+
+/*************************************
+ *
+ *  Development PCB
+ *
+ *************************************/
+
+namespace {
+
+class radikalbp_state : public gaelco3d_state
+{
+public:
+	radikalbp_state(const machine_config &mconfig, device_type type, const char *tag)
+		: gaelco3d_state(mconfig, type, tag)
+		, m_boot_view(*this, "boot_view")
+		, m_texmask_ram(*this, "texmask_ram", TEXMASK_RAM_SIZE, ENDIANNESS_BIG)
+	{ }
+
+	void radikalbp(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
+
+private:
+	memory_view m_boot_view;
+	memory_share_creator<uint8_t> m_texmask_ram;
+
+	void texmask_ram_w(offs_t offset, uint8_t data);
+
+	void radikalbp_map(address_map &map) ATTR_COLD;
+};
+
+
+void radikalbp_state::machine_reset()
+{
+	gaelco3d_state::machine_reset();
+
+	m_boot_view.select(0);
+}
+
+
+void radikalbp_state::device_post_load()
+{
+	gaelco3d_state::device_post_load();
+
+	for (offs_t i = 0; i < TEXMASK_RAM_SIZE; i++)
+		texmask_w(i, m_texmask_ram[i]);
+}
+
+
+void radikalbp_state::texmask_ram_w(offs_t offset, uint8_t data)
+{
+	m_texmask_ram[offset] = data;
+	texmask_w(offset, data);
+}
+
+
+void radikalbp_state::radikalbp_map(address_map &map)
+{
+	main_map(map);
+	map(0x000000, 0x3fffff).view(m_boot_view);
+	m_boot_view[0](0x000000, 0x0fffff).rom().region("maincpu", 0);
+	m_boot_view[0](0x100000, 0x1fffff).ram().share("prgram");
+	m_boot_view[1](0x000000, 0x0fffff).ram().share("prgram");
+	m_boot_view[1](0x100000, 0x3fffff).rom().region("maincpu", 0x100000);
+	map(0x500070, 0x500071).lw16(NAME([this] (u16 data) { m_boot_view.select(BIT(data, 0)); }));
+	map(0xc00000, 0xcfffff).umask16(0x00ff).w(FUNC(radikalbp_state::texmask_ram_w));
+}
+
+
+void radikalbp_state::radikalbp(machine_config &config)
+{
+	gaelco3d(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &radikalbp_state::radikalbp_map);
+}
+
+} // anonymous namespace
 
 
 /*************************************
@@ -1592,9 +1728,19 @@ ROM_END
 
 /* All ROMs but the two program ROMs were on custom DIP42 PCBs with solderded flash chips:
    - FLA32X8 dip modules are equivalent to 27c322 eproms but in “8 bit mode” (such EPROM doesnt exist), the module has A0 in place of D15. These modules use two 29F016 flash chips.
-   - FLASH32M/1 dip modules are equivalent to 27c322 (full 16 bit output), pin 11 chip enable is active HIGH (instead of active LOW). These modules use two 29F016 flash chips. */
+   - FLASH32M/1 dip modules are equivalent to 27c322 (full 16 bit output), pin 11 chip enable is active HIGH (instead of active LOW). These modules use two 29F016 flash chips.
+
+   Program flash contents:
+   000000  monitor: in "Development host" boot mode it waits for commands on the parallel link,
+           otherwise it copies the program image to RAM and starts it
+   100000  512KB RAM image with an early build of the game (Spanish texts)
+   200000  circuit data, identical to 100000-1e29ff of the final program but for one byte
+   380000  texture mask, which the program copies to the mask RAM (215 bits differ from the final mask ROMs)
+   The program expects circuit data at 30000 and a palette at 20000 in RAM, and a sine table at 200000,
+   none of which are in the flash. It takes an address error while loading the first circuit, and its
+   built-in copy of the monitor then waits for the development host. */
 ROM_START( radikalbp ) // Development PCB, silkscreened "3D-3G-AER/2"
-	ROM_REGION( 0x400000, "maincpu", 0 )    // 68020 code
+	ROM_REGION( 0x400000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "29f016.u22", 0x000000, 0x200000, CRC(534ce101) SHA1(4763ecd7e075b69b0742912050633b5d87b26413) )
 	ROM_LOAD16_BYTE( "29f016.u30", 0x000001, 0x200000, CRC(48b26455) SHA1(743d7f32642891d608e345021cabbdf3dd025870) )
 
@@ -1609,18 +1755,13 @@ ROM_START( radikalbp ) // Development PCB, silkscreened "3D-3G-AER/2"
 	ROM_LOAD( "b_fla32x8_8_bit.u18", 0x0000000, 0x400000, CRC(4fbd4737) SHA1(594438d3edbe00682290986cc631615d7bef67f3) )
 	ROM_LOAD( "d_fla32x8_8_bit.u28", 0x0800000, 0x400000, CRC(2eaa42e7) SHA1(0fd6bf9a464392a201fe55327a86573ee7e82890) )
 	ROM_LOAD( "a_fla32x8_8_bit.u41", 0x1000000, 0x400000, CRC(edb9d409) SHA1(1f8df507e990eee197f2779b45bd8f143d1bd439) )
-	ROM_LOAD( "c_fla32x8_8_bit.u43", 0x1800000, 0x400000, CRC(72fe2ad9) SHA1(b65b099eb245f75dde9758690ada3acf35cce8f1) )
+	ROM_LOAD( "c_fla32x8_8_bit.u43", 0x1800000, 0x400000, BAD_DUMP CRC(72fe2ad9) SHA1(b65b099eb245f75dde9758690ada3acf35cce8f1) ) // first 2MB (one 29F016) all 0xff, rab_ic17.ic17 has textures there
 	ROM_LOAD( "f_fla32x8_8_bit.u27", 0x0400000, 0x400000, CRC(5b88077f) SHA1(d38db0df40f078273c6ac6d001a6c83460915beb) )
 	ROM_LOAD( "h_fla32x8_8_bit.u29", 0x0c00000, 0x400000, CRC(4fbbd8df) SHA1(08f9b43dd4de967a26434c7295ea3b21dfea0405) )
 	ROM_LOAD( "e_fla32x8_8_bit.u42", 0x1400000, 0x400000, CRC(dd16837e) SHA1(7d37b5a571895a4ae39e2bbb804acae645de68c1) )
 	ROM_LOAD( "g_fla32x8_8_bit.u44", 0x1c00000, 0x400000, CRC(7d868c37) SHA1(fdc7e836208f904a53417d61daf765bc9804dfea) )
 
-	// There were neither texmask ROMs on this PCB nor sockets for them
-	ROM_REGION( 0x0080000, "texmask", 0 )
-	ROM_LOAD( "rab_24.ic24", 0x0000000, 0x020000, BAD_DUMP CRC(2984bc1d) SHA1(1f62bdaa86feeff96640e325f8241b9c5f383a44) ) // Not present on the development PCB ??
-	ROM_LOAD( "rab_25.ic25", 0x0020000, 0x020000, BAD_DUMP CRC(777758e3) SHA1(bd334b1ba46189ac8509eee3a4ab295c121400fd) ) // Not present on the development PCB ??
-	ROM_LOAD( "rab_26.ic26", 0x0040000, 0x020000, BAD_DUMP CRC(bd9c1b54) SHA1(c9ef679cf7eca9ed315ea62a7ada452bc85f7a6a) ) // Not present on the development PCB ??
-	ROM_LOAD( "rab_27.ic27", 0x0060000, 0x020000, BAD_DUMP CRC(bbcf6977) SHA1(0282c8ba79c35ed1240711d5812bfb590d151738) ) // Not present on the development PCB ??
+	// There were neither texmask ROMs on this PCB nor sockets for them, the mask is in the program flash
 
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "deco-i_pal16l8.ic21", 0x000, 0x117, BAD_DUMP CRC(81484e3b) SHA1(c63f35dba20c7fd7226e03cf18d2860740b0dd0c) ) // Bruteforced
@@ -1857,26 +1998,26 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1996, speedup,    0,        speedup,   speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.20, checksum 2037)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 11/Mar
-GAMEL( 1996, speedup21,  speedup,  speedup,   speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.10, checksum 9536)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 05/Mar
-GAMEL( 1996, speedup20,  speedup,  speedup,   speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.00, checksum E145)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 18/Feb
-GAMEL( 1996, speedup20a, speedup,  speedup,   speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.00, checksum 491B)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 17/Feb
-GAMEL( 1996, speedup12,  speedup,  speedup,   speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.20, checksum 6851)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 10/Oct
-GAMEL( 1996, speedup10,  speedup,  speedup,   speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.00, checksum 31A9)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
+GAMEL( 1996, speedup,    0,        speedup,   speedup,   gaelco3d_state,  empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.20, checksum 2037)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 11/Mar
+GAMEL( 1996, speedup21,  speedup,  speedup,   speedup,   gaelco3d_state,  empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.10, checksum 9536)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 05/Mar
+GAMEL( 1996, speedup20,  speedup,  speedup,   speedup,   gaelco3d_state,  empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.00, checksum E145)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 18/Feb
+GAMEL( 1996, speedup20a, speedup,  speedup,   speedup,   gaelco3d_state,  empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.00, checksum 491B)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 17/Feb
+GAMEL( 1996, speedup12,  speedup,  speedup,   speedup,   gaelco3d_state,  empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.20, checksum 6851)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 10/Oct
+GAMEL( 1996, speedup10,  speedup,  speedup,   speedup,   gaelco3d_state,  empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.00, checksum 31A9)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
 
-GAME( 1997, surfplnt,    0,        gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (version 4.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1997, surfplnt40,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (version 4.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1997, surfplnt31,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Surf Planet (version 3.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1997, surfplnt30,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Surf Planet (version 3.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE) // 12/Nov
-GAME( 1997, surfplnt20,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Surf Planet (version 2.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE) // 12/Sep
-GAME( 1997, surfplnt12,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Surf Planet (version 1.2)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE) // 25/Jun. Older than 1.0??
-GAME( 1997, surfplnt10,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Surf Planet (version 1.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE) // 10/Sep
+GAME( 1997, surfplnt,    0,        gaelco3d,  surfplnt,  gaelco3d_state,  empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (version 4.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1997, surfplnt40,  surfplnt, gaelco3d,  surfplnt,  gaelco3d_state,  empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (version 4.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1997, surfplnt31,  surfplnt, gaelco3d,  surfplnt,  gaelco3d_state,  empty_init, ROT0, "Gaelco",                 "Surf Planet (version 3.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1997, surfplnt30,  surfplnt, gaelco3d,  surfplnt,  gaelco3d_state,  empty_init, ROT0, "Gaelco",                 "Surf Planet (version 3.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE) // 12/Nov
+GAME( 1997, surfplnt20,  surfplnt, gaelco3d,  surfplnt,  gaelco3d_state,  empty_init, ROT0, "Gaelco",                 "Surf Planet (version 2.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE) // 12/Sep
+GAME( 1997, surfplnt12,  surfplnt, gaelco3d,  surfplnt,  gaelco3d_state,  empty_init, ROT0, "Gaelco",                 "Surf Planet (version 1.2)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE) // 25/Jun. Older than 1.0??
+GAME( 1997, surfplnt10,  surfplnt, gaelco3d,  surfplnt,  gaelco3d_state,  empty_init, ROT0, "Gaelco",                 "Surf Planet (version 1.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE) // 10/Sep
 
-GAME( 1998, radikalb,    0,        gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Radikal Bikers (version 2.02)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1998, radikalba,   radikalb, gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Radikal Bikers (version 2.02, Atari license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1998, radikalbp,   radikalb, gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Radikal Bikers (prototype)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+GAME( 1998, radikalb,    0,        gaelco3d2, radikalb,  gaelco3d_state,  empty_init, ROT0, "Gaelco",                 "Radikal Bikers (version 2.02)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1998, radikalba,   radikalb, gaelco3d2, radikalb,  gaelco3d_state,  empty_init, ROT0, "Gaelco (Atari license)", "Radikal Bikers (version 2.02, Atari license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1998, radikalbp,   radikalb, radikalbp, radikalbp, radikalbp_state, empty_init, ROT0, "Gaelco",                 "Radikal Bikers (prototype)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
 
-GAME( 1999, footbpow,    0,        footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 4.6)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
-GAME( 1999, footbpow14,  footbpow, footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 1.4)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
-GAME( 1999, footbpow12,  footbpow, footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 1.2)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
-GAME( 1999, footbpow11,  footbpow, footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 1.1)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1999, footbpow,    0,        footbpow,  footbpow,  gaelco3d_state,  empty_init, ROT0, "Gaelco",                 "Football Power (version 4.6)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1999, footbpow14,  footbpow, footbpow,  footbpow,  gaelco3d_state,  empty_init, ROT0, "Gaelco",                 "Football Power (version 1.4)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1999, footbpow12,  footbpow, footbpow,  footbpow,  gaelco3d_state,  empty_init, ROT0, "Gaelco",                 "Football Power (version 1.2)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1999, footbpow11,  footbpow, footbpow,  footbpow,  gaelco3d_state,  empty_init, ROT0, "Gaelco",                 "Football Power (version 1.1)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
