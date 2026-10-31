@@ -2840,7 +2840,7 @@ bool mips3_device::generate_idt(drcuml_block &block, compiler_state &compiler, c
 				UML_ADD(block, I0, R32(RSREG), (int32_t(op << 12) >> 22) << 2);     // add     i0,<rsreg>,s12
 				UML_CALLH(block, *m_read32[m_core->mode >> 1]);                     // callh   read32
 				if ((op >> 6) & 0xf)
-					UML_MOV(block, mem(&m_mxu[(op >> 6) & 0xf]), I0);               // mov     [mxu],i0
+					UML_MOV(block, mem(&m_core->mxu[(op >> 6) & 0xf]), I0);         // mov     [mxu],i0
 				if (!in_delay_slot)
 					generate_update_cycles(block, compiler, desc->pc + 4, true);
 				return true;
@@ -2849,7 +2849,7 @@ bool mips3_device::generate_idt(drcuml_block &block, compiler_state &compiler, c
 				if (m_flavor != MIPS3_TYPE_XBURST)
 					return false;
 				UML_ADD(block, I0, R32(RSREG), (int32_t(op << 12) >> 22) << 2);     // add     i0,<rsreg>,s12
-				UML_MOV(block, I1, mem(&m_mxu[(op >> 6) & 0xf]));                   // mov     i1,[mxu]
+				UML_MOV(block, I1, mem(&m_core->mxu[(op >> 6) & 0xf]));             // mov     i1,[mxu]
 				UML_CALLH(block, *m_write32[m_core->mode >> 1]);                    // callh   write32
 				if (!in_delay_slot)
 					generate_update_cycles(block, compiler, desc->pc + 4, true);
@@ -2859,14 +2859,14 @@ bool mips3_device::generate_idt(drcuml_block &block, compiler_state &compiler, c
 				if (m_flavor != MIPS3_TYPE_XBURST)
 					return false;
 				if (RTREG != 0)
-					UML_DSEXT(block, R64(RTREG), mem(&m_mxu[(op >> 6) & 0x1f]), SIZE_DWORD); // dsext   <rtreg>,[mxu],dword
+					UML_DSEXT(block, R64(RTREG), mem(&m_core->mxu[(op >> 6) & 0x1f]), SIZE_DWORD); // dsext   <rtreg>,[mxu],dword
 				return true;
 
 			case 0x2f:  /* S32I2M xra,rb (XBurst MXU) */
 				if (m_flavor != MIPS3_TYPE_XBURST)
 					return false;
 				if ((op >> 6) & 0x1f)
-					UML_MOV(block, mem(&m_mxu[(op >> 6) & 0x1f]), R32(RTREG));      // mov     [mxu],<rtreg>
+					UML_MOV(block, mem(&m_core->mxu[(op >> 6) & 0x1f]), R32(RTREG)); // mov     [mxu],<rtreg>
 				return true;
 
 			case 0x20:  /* CLZ */
@@ -3157,14 +3157,14 @@ bool mips3_device::generate_cop0(drcuml_block &block, compiler_state &compiler, 
 	if (sel != 0 && opswitch == 0x00)
 	{
 		if (RTREG != 0)
-			UML_DSEXT(block, R64(RTREG), mem(&m_cp0_sel[RDREG][sel]), SIZE_DWORD); // dsext   <rtreg>,[cp0_sel],dword
+			UML_DSEXT(block, R64(RTREG), mem(&m_core->cp0_sel[RDREG][sel]), SIZE_DWORD); // dsext   <rtreg>,[cp0_sel],dword
 		return true;
 	}
 	if (sel != 0 && opswitch == 0x04)
 	{
 		/* Config1 is read-only */
 		if (RDREG != COP0_Config || sel != 1)
-			UML_MOV(block, mem(&m_cp0_sel[RDREG][sel]), R32(RTREG));            // mov     [cp0_sel],<rtreg>
+			UML_MOV(block, mem(&m_core->cp0_sel[RDREG][sel]), R32(RTREG));      // mov     [cp0_sel],<rtreg>
 		return true;
 	}
 

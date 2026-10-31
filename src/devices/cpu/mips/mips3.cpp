@@ -613,8 +613,8 @@ void mips3_device::device_start()
 	save_item(NAME(m_core->pc));
 	save_item(NAME(m_core->r));
 	save_item(NAME(m_core->cpr));
-	save_item(NAME(m_cp0_sel));
-	save_item(NAME(m_mxu));
+	save_item(NAME(m_core->cp0_sel));
+	save_item(NAME(m_core->mxu));
 	save_item(NAME(m_core->ccr));
 	save_item(NAME(m_core->llbit));
 	save_item(NAME(m_core->count_zero_time));
@@ -1226,10 +1226,10 @@ void mips3_device::device_reset()
 	m_core->count_zero_time = total_cycles();
 
 	/* MIPS32 select registers; the XBurst reports 32 TLB entries and 16 KB 4-way I and D caches with 32-byte lines */
-	memset(m_cp0_sel, 0, sizeof(m_cp0_sel));
-	memset(m_mxu, 0, sizeof(m_mxu));
+	memset(m_core->cp0_sel, 0, sizeof(m_core->cp0_sel));
+	memset(m_core->mxu, 0, sizeof(m_core->mxu));
 	if (m_flavor == MIPS3_TYPE_XBURST)
-		m_cp0_sel[COP0_Config][1] = 0x3e63318a;
+		m_core->cp0_sel[COP0_Config][1] = 0x3e63318a;
 
 	/* initialize the FPU state */
 	m_core->ccr[1][0] = compute_fpu_prid_register();
@@ -2709,14 +2709,14 @@ void mips3_device::handle_cop0(uint32_t op)
 	const int sel = (m_flavor == MIPS3_TYPE_XBURST) ? (op & 7) : 0;
 	if (sel != 0 && RSREG == 0x00)
 	{
-		if (RTREG) RTVAL64 = (int32_t)m_cp0_sel[RDREG][sel];
+		if (RTREG) RTVAL64 = (int32_t)m_core->cp0_sel[RDREG][sel];
 		return;
 	}
 	if (sel != 0 && RSREG == 0x04)
 	{
 		/* Config1 is read-only */
 		if (RDREG != COP0_Config || sel != 1)
-			m_cp0_sel[RDREG][sel] = RTVAL32;
+			m_core->cp0_sel[RDREG][sel] = RTVAL32;
 		return;
 	}
 
@@ -4227,26 +4227,26 @@ void mips3_device::handle_idt(uint32_t op)
 				}
 				uint32_t temp;
 				if (RWORD(RSVAL32 + ((int32_t(op << 12) >> 22) << 2), &temp) && ((op >> 6) & 0xf))
-					m_mxu[(op >> 6) & 0xf] = temp;
+					m_core->mxu[(op >> 6) & 0xf] = temp;
 				break;
 			}
 			case 0x11: // S32STD xra, rb, s12 (XBurst MXU): store a SIMD register
 				if (m_flavor != MIPS3_TYPE_XBURST)
 					invalid_instruction(op);
 				else
-					WWORD(RSVAL32 + ((int32_t(op << 12) >> 22) << 2), m_mxu[(op >> 6) & 0xf]);
+					WWORD(RSVAL32 + ((int32_t(op << 12) >> 22) << 2), m_core->mxu[(op >> 6) & 0xf]);
 				break;
 			case 0x2e: // S32M2I xra, rb (XBurst MXU): SIMD register to GPR
 				if (m_flavor != MIPS3_TYPE_XBURST)
 					invalid_instruction(op);
 				else if (RTREG)
-					RTVAL64 = s32(m_mxu[(op >> 6) & 0x1f]);
+					RTVAL64 = s32(m_core->mxu[(op >> 6) & 0x1f]);
 				break;
 			case 0x2f: // S32I2M xra, rb (XBurst MXU): GPR to SIMD register; xr16 is the control register
 				if (m_flavor != MIPS3_TYPE_XBURST)
 					invalid_instruction(op);
 				else if ((op >> 6) & 0x1f)
-					m_mxu[(op >> 6) & 0x1f] = RTVAL32;
+					m_core->mxu[(op >> 6) & 0x1f] = RTVAL32;
 				break;
 			case 0x20: // CLZ
 				if (RDREG) RDVAL64 = std::countl_zero(RSVAL32);

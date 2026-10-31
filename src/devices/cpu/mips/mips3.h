@@ -397,6 +397,12 @@ protected:
 		uint64_t        random_zero_time;           /* Random counter origin; reset by a Wired write */
 		uint32_t        compare_armed;
 		uint32_t        jmpdest;                    /* destination jump target */
+
+		/* MIPS32 CP0 registers with a non-zero select field, indexed [register][select]; select 0 lives in cpr[0] */
+		uint32_t        cp0_sel[32][8];
+
+		/* XBurst MXU SIMD registers xr0-xr15 (xr0 reads as zero) and the control register xr16; only the moves and loads/stores are implemented */
+		uint32_t        mxu[32];
 	};
 
 	/* core state */
@@ -450,12 +456,6 @@ protected:
 	uint64_t        m_entrylo_wmask;
 	uint64_t        m_entryhi_wmask;
 	uint8_t         m_tlbentries;
-
-	/* MIPS32 CP0 registers with a non-zero select field, indexed [register][select]; select 0 lives in cpr[0] */
-	uint32_t        m_cp0_sel[32][8];
-
-	/* XBurst MXU SIMD registers xr0-xr15 (xr0 reads as zero) and the control register xr16; only the moves and loads/stores are implemented */
-	uint32_t        m_mxu[32];
 
 	/* primary data cache geometry, for the parts that model one */
 	struct dcache_geometry

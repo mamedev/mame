@@ -31645,10 +31645,6 @@ magjoker
 @source:misc/galgame.cpp
 galgame
 
-@source:misc/gameace.cpp
-hotbody
-hotbody2
-
 @source:misc/gambl186.cpp
 gambl186
 gambl186a
@@ -31656,6 +31652,13 @@ gambl186b
 gambl186c
 gambl186d
 gambl186e
+
+@source:misc/gameace.cpp
+hotbody
+hotbody2
+
+@source:misc/gamebox.cpp
+gamebox
 
 @source:misc/gamemasters.cpp
 gmsshoot
@@ -44164,9 +44167,6 @@ ft68m
 
 @source:skeleton/galpro.cpp
 galpro
-
-@source:skeleton/gamebox.cpp
-gamebox
 
 @source:skeleton/ganbaremo.cpp
 ganbaremo
