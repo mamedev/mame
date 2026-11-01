@@ -326,9 +326,8 @@ void ppstation_state::draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect
           0 = 16x16, 1 = 32x32, 2 = 64x64, 3 = 128x128 pixels
       +3  draw order, lower values are in front
       +4  Y centre, +6 X centre
-      +8  X zoom, +a Y zoom: 0x40 is 1:1, smaller values enlarge (the
-          program scales the pieces' X offsets with the value it stores at
-          +8 and their Y offsets with the one at +a; as in konami/djmain.cpp)
+      +8  X zoom, +a Y zoom (as in konami/djmain.cpp): 0x40 is 1:1,
+          smaller values enlarge
       +c  colour (palette in the low 6 bits)
 
     Larger sprites use the usual Konami interleaved cell order. The list is
@@ -373,8 +372,8 @@ void ppstation_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 		bool const flipy = BIT(flags, 3);
 
 		// zoom values are 6.? fixed point steps: 0x40 is 1:1
-		u32 const scalex = zoomx ? (0x40 << 16) / zoomx : 0x10000;
-		u32 const scaley = zoomy ? (0x40 << 16) / zoomy : 0x10000;
+		u32 const scalex = zoomx ? ((0x40 << 16) / zoomx) : 0x10000;
+		u32 const scaley = zoomy ? ((0x40 << 16) / zoomy) : 0x10000;
 		int const width = (cells * 16 * scalex) >> 16;
 		int const height = (cells * 16 * scaley) >> 16;
 		int const left = xpos - width / 2;
@@ -574,7 +573,7 @@ void ppstation_state::main_map(address_map &map)
 	map(0x3c0000, 0x3c000f).umask32(0xff00'0000).rw(FUNC(ppstation_state::printer_r), FUNC(ppstation_state::printer_w));
 	map(0x3e0000, 0x3e0003).umask32(0xffff'0000).w(m_soundlatch, FUNC(generic_latch_16_device::write)); // command word to the sound CPU, polled by its main loop
 	map(0x400000, 0x7fffff).rom().region("data", 0); // b03 on D31-16, b04 on D15-0
-	map(0xa00000, 0xafffff).umask32(0xffff'0000).ram(); // "PRINT RAM", the self test covers bytes 0 and 1 of each long word
+	map(0xa00000, 0xafffff).umask32(0xffff'0000).ram(); // "PRINT RAM"
 	map(0xc00000, 0xcfffff).umask32(0xffff'0000).ram(); // "CCD RAM 1"
 	map(0xd00000, 0xdfffff).umask32(0xffff'0000).ram(); // "CCD RAM 2"
 
@@ -599,7 +598,7 @@ void ppstation_state::main_map(address_map &map)
 
 
 /***************************************************************************
-    Sound CPU (guesswork: only the ROM and RAM ranges are confirmed)
+    Sound CPU
 ***************************************************************************/
 
 void ppstation_state::sound_map(address_map &map)
@@ -614,7 +613,7 @@ void ppstation_state::sound_map(address_map &map)
 }
 
 
-static INPUT_PORTS_START( ppstation )
+INPUT_PORTS_START( ppstation )
 	PORT_START("IN0") // read at 340008
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN1 ) // counted on release, held for 5 seconds -> coin selector error
@@ -677,7 +676,7 @@ static INPUT_PORTS_START( ppstation )
 INPUT_PORTS_END
 
 
-static GFXDECODE_START( gfx_ppstation )
+GFXDECODE_START( gfx_ppstation )
 	GFXDECODE_ENTRY( "gfx_a", 0, gfx_8x8x4_packed_lsb, 0,    64 )
 	GFXDECODE_ENTRY( "gfx_b", 0, gfx_8x8x4_packed_lsb, 1024, 64 )
 GFXDECODE_END
@@ -734,7 +733,7 @@ ROM_START( ppstation )
 	ROM_REGION( 0x200000, "gfx_b", 0 ) // sprites for video chip B, mask ROM on the video board
 	ROM_LOAD( "657a07.4n", 0x000000, 0x200000, CRC(62aa2a05) SHA1(88b5ba5c6c43d6f84fb52496b7b14b6d72ef4c87) )
 
-	ROM_REGION32_BE( 0x400000, "data", 0 ) // tilemap data (card designs, text): b03 on the upper word, b04 on the lower word (the self test checksums confirm the lanes)
+	ROM_REGION32_BE( 0x400000, "data", 0 ) // tilemap data (card designs, text): b03 on the upper word, b04 on the lower word
 	ROM_LOAD32_WORD_SWAP( "657b03.18g", 0x000000, 0x200000, CRC(83647332) SHA1(c0202b63bf384b60d4536ae38093b483482ab4cd) )
 	ROM_LOAD32_WORD_SWAP( "657b04.18h", 0x000002, 0x200000, CRC(c67a3d3f) SHA1(30a4d121c76d3531b5ed7babf3cfe833f5b9b2db) )
 
