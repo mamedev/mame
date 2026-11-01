@@ -40,8 +40,8 @@ class mcd212_ext_video_source
 public:
 	virtual ~mcd212_ext_video_source() = default;
 
-	// returns true and fills argb when the source drives this pixel
-	virtual bool ext_video_pixel(int x, int y, uint32_t &argb) const = 0;
+	// fills line y with the source's pixels, transparent where it shows nothing
+	virtual void ext_video_line(int y, uint32_t *line, int count) const = 0;
 };
 
 
@@ -224,6 +224,7 @@ protected:
 	int m_display_line = 0;
 	uint32_t m_mosaic_hold[2]{};
 	uint8_t m_weight_factor[2][768]{};
+	uint32_t m_ext_video_line[768]{};
 
 	// DYUV color limit arrays.
 	uint32_t m_dyuv_limit_lut[0x300];
@@ -268,10 +269,9 @@ protected:
 	uint32_t dyuv_to_rgb(uint8_t y, uint8_t u, uint8_t v) const;
 	int get_screen_width();
 	int get_border_width();
+	int get_border_height();
 	bool ica_enabled(int channel) const { return BIT(m_dcr[0], DCR_DE_BIT) && BIT(m_dcr[channel], DCR_ICA_BIT); }
 	bool dca_enabled(int channel) const { return ica_enabled(channel) && BIT(m_dcr[channel], DCR_DCA_BIT); }
-	uint32_t get_backdrop_plane(int x, int y);
-
 	template <int Path> void set_vsr(uint32_t value);
 	template <int Path> uint32_t get_vsr();
 
