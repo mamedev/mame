@@ -726,16 +726,82 @@ inline void gfx_element::drawgfx_core(BitmapType &dest, const rectangle &cliprec
         u32 code - index of the entry within gfx_element
         int flipx - non-zero means render right-to-left instead of left-to-right
         int flipy - non-zero means render bottom-to-top instead of top-to-bottom
-        s32 destx - the top-left X coordinate to render to
-        s32 desty - the top-left Y coordinate to render to
-        u32 scalex - the 16.16 scale factor in the X dimension
-        u32 scaley - the 16.16 scale factor in the Y dimension
+        zoom_pos &pos - where to render:
+            pixel mode: the top-left X/Y coordinate to render to
+            subpixel mode: the 16.16 X/Y origin of a sprite made of several
+                elements, plus the column/row of this element within it
+        u32 zoomx - X zoom: pixel mode, the 16.16 scale factor;
+            subpixel mode, the 16.16 source step per destination pixel
+        u32 zoomy - Y zoom, as zoomx
         bitmap_t &priority - the priority bitmap (if and only if priority is to be applied)
+
+    In pixel mode each element is scaled and positioned on its own, so
+    adjacent elements of a larger sprite can leave gaps or overlap.
+
+    In subpixel mode all elements of a sprite share one 16.16 source
+    accumulator: at destination pixel p its value is (p - x) * step, where
+    x is the 16.16 origin. Each element draws the destination pixels whose
+    accumulator falls inside it, so the elements tile without gaps or
+    overlap and match a single element of the combined size. A sprite N
+    elements wide covers destination pixels [ceil(x), ceil(x + N * width
+    / step)). Flipping reverses the source within each element; the caller
+    still picks the element for each column/row. Tile indices may be
+    negative.
 */
 
 
+//-------------------------------------------------
+//  zoom_axis - compute the visible destination
+//  span and the starting 16.16 source position
+//  and step along one axis; returns false if
+//  nothing is visible
+//-------------------------------------------------
+
+inline bool gfx_element::zoom_axis(s32 pos, s32 tile, bool subpixel, u32 zoom, u32 size, int flip, s32 clipmin, s32 clipmax, s32 &deststart, s32 &destend, s32 &src, s32 &step)
+{
+	if (!subpixel)
+	{
+		// compute scaled size
+		u32 const dstsize = (zoom * size + 0x8000) >> 16;
+		if (dstsize < 1)
+			return false;
+
+		// compute 16.16 source step
+		step = (size << 16) / dstsize;
+
+		// compute final pixel and exit if we are entirely clipped
+		deststart = pos;
+		destend = pos + dstsize - 1;
+		if (deststart > clipmax || destend < clipmin)
+			return false;
+
+		// apply low clip
+		src = 0;
+		if (deststart < clipmin)
+		{
+			src = (clipmin - deststart) * step;
+			deststart = clipmin;
+		}
+
+		// apply high clip
+		if (destend > clipmax)
+			destend = clipmax;
+
+		// apply flipping
+		if (flip)
+		{
+			src = (dstsize - 1) * step - src;
+			step = -step;
+		}
+		return true;
+	}
+
+	return subpixel_zoom_span(pos, tile, size, zoom, flip, clipmin, clipmax, deststart, destend, src, step);
+}
+
+
 template <typename BitmapType, typename FunctionClass>
-inline void gfx_element::drawgfxzoom_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, FunctionClass pixel_op)
+inline void gfx_element::drawgfxzoom_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, FunctionClass pixel_op)
 {
 	auto profile = g_profiler.start(PROFILER_DRAWGFX);
 	do {
@@ -746,63 +812,13 @@ inline void gfx_element::drawgfxzoom_core(BitmapType &dest, const rectangle &cli
 		if (cliprect.empty())
 			break;
 
-		// compute scaled size
-		u32 dstwidth = (scalex * width() + 0x8000) >> 16;
-		u32 dstheight = (scaley * height() + 0x8000) >> 16;
-		if (dstwidth < 1 || dstheight < 1)
+		// compute the visible span and source start in X and Y; exit if nothing is visible
+		s32 destx, destendx, srcx, dx;
+		if (!zoom_axis(pos.x, pos.tilex, pos.subpixel, zoomx, width(), flipx, cliprect.left(), cliprect.right(), destx, destendx, srcx, dx))
 			break;
-
-		// compute 16.16 source steps in dx and dy
-		s32 dx = (width() << 16) / dstwidth;
-		s32 dy = (height() << 16) / dstheight;
-
-		// compute final pixel in X and exit if we are entirely clipped
-		s32 destendx = destx + dstwidth - 1;
-		if (destx > cliprect.right() || destendx < cliprect.left())
+		s32 desty, destendy, srcy, dy;
+		if (!zoom_axis(pos.y, pos.tiley, pos.subpixel, zoomy, height(), flipy, cliprect.top(), cliprect.bottom(), desty, destendy, srcy, dy))
 			break;
-
-		// apply left clip
-		s32 srcx = 0;
-		if (destx < cliprect.left())
-		{
-			srcx = (cliprect.left() - destx) * dx;
-			destx = cliprect.left();
-		}
-
-		// apply right clip
-		if (destendx > cliprect.right())
-			destendx = cliprect.right();
-
-		// compute final pixel in Y and exit if we are entirely clipped
-		s32 destendy = desty + dstheight - 1;
-		if (desty > cliprect.bottom() || destendy < cliprect.top())
-			break;
-
-		// apply top clip
-		s32 srcy = 0;
-		if (desty < cliprect.top())
-		{
-			srcy = (cliprect.top() - desty) * dy;
-			desty = cliprect.top();
-		}
-
-		// apply bottom clip
-		if (destendy > cliprect.bottom())
-			destendy = cliprect.bottom();
-
-		// apply X flipping
-		if (flipx)
-		{
-			srcx = (dstwidth - 1) * dx - srcx;
-			dx = -dx;
-		}
-
-		// apply Y flipping
-		if (flipy)
-		{
-			srcy = (dstheight - 1) * dy - srcy;
-			dy = -dy;
-		}
 
 		// fetch the source data
 		const u8 *srcdata = get_data(code);
@@ -847,7 +863,7 @@ inline void gfx_element::drawgfxzoom_core(BitmapType &dest, const rectangle &cli
 
 
 template <typename BitmapType, typename PriorityType, typename FunctionClass>
-inline void gfx_element::drawgfxzoom_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, PriorityType &priority, FunctionClass pixel_op)
+inline void gfx_element::drawgfxzoom_core(BitmapType &dest, const rectangle &cliprect, u32 code, int flipx, int flipy, const zoom_pos &pos, u32 zoomx, u32 zoomy, PriorityType &priority, FunctionClass pixel_op)
 {
 	auto profile = g_profiler.start(PROFILER_DRAWGFX);
 	do {
@@ -859,63 +875,13 @@ inline void gfx_element::drawgfxzoom_core(BitmapType &dest, const rectangle &cli
 		if (cliprect.empty())
 			break;
 
-		// compute scaled size
-		u32 dstwidth = (scalex * width() + 0x8000) >> 16;
-		u32 dstheight = (scaley * height() + 0x8000) >> 16;
-		if (dstwidth < 1 || dstheight < 1)
+		// compute the visible span and source start in X and Y; exit if nothing is visible
+		s32 destx, destendx, srcx, dx;
+		if (!zoom_axis(pos.x, pos.tilex, pos.subpixel, zoomx, width(), flipx, cliprect.left(), cliprect.right(), destx, destendx, srcx, dx))
 			break;
-
-		// compute 16.16 source steps in dx and dy
-		s32 dx = (width() << 16) / dstwidth;
-		s32 dy = (height() << 16) / dstheight;
-
-		// compute final pixel in X and exit if we are entirely clipped
-		s32 destendx = destx + dstwidth - 1;
-		if (destx > cliprect.right() || destendx < cliprect.left())
+		s32 desty, destendy, srcy, dy;
+		if (!zoom_axis(pos.y, pos.tiley, pos.subpixel, zoomy, height(), flipy, cliprect.top(), cliprect.bottom(), desty, destendy, srcy, dy))
 			break;
-
-		// apply left clip
-		s32 srcx = 0;
-		if (destx < cliprect.left())
-		{
-			srcx = (cliprect.left() - destx) * dx;
-			destx = cliprect.left();
-		}
-
-		// apply right clip
-		if (destendx > cliprect.right())
-			destendx = cliprect.right();
-
-		// compute final pixel in Y and exit if we are entirely clipped
-		s32 destendy = desty + dstheight - 1;
-		if (desty > cliprect.bottom() || destendy < cliprect.top())
-			return;
-
-		// apply top clip
-		s32 srcy = 0;
-		if (desty < cliprect.top())
-		{
-			srcy = (cliprect.top() - desty) * dy;
-			desty = cliprect.top();
-		}
-
-		// apply bottom clip
-		if (destendy > cliprect.bottom())
-			destendy = cliprect.bottom();
-
-		// apply X flipping
-		if (flipx)
-		{
-			srcx = (dstwidth - 1) * dx - srcx;
-			dx = -dx;
-		}
-
-		// apply Y flipping
-		if (flipy)
-		{
-			srcy = (dstheight - 1) * dy - srcy;
-			dy = -dy;
-		}
 
 		// fetch the source data
 		const u8 *srcdata = get_data(code);
