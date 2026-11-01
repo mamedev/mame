@@ -24,6 +24,9 @@ ToDo:
 #include "emu.h"
 #include "aim65.h"
 
+#include "bus/kim1/cards.h"
+#include "bus/kim1/kim1bus.h"
+
 #include "softlist_dev.h"
 #include "speaker.h"
 
@@ -291,6 +294,10 @@ void aim65_state::aim65(machine_config &config)
 	GENERIC_SOCKET(config, "z13", generic_plain_slot, "rm65_z13_cart", "z13").set_device_load(FUNC(aim65_state::z13_load));
 	GENERIC_SOCKET(config, "z14", generic_plain_slot, "rm65_z14_cart", "z14").set_device_load(FUNC(aim65_state::z14_load));
 	GENERIC_SOCKET(config, "z15", generic_plain_slot, "rm65_z15_cart", "z15").set_device_load(FUNC(aim65_state::z15_load));
+
+	// expansion connector
+	KIM1BUS(config, "expbus", AIM65_CLOCK).set_space(m_maincpu, AS_PROGRAM);
+	KIM1BUS_SLOT(config, "exp", AIM65_CLOCK, "expbus", aim65_cards, nullptr);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("1K,2K,3K");
