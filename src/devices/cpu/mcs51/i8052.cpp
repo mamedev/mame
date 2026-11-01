@@ -32,52 +32,28 @@ i8752_device::i8752_device(const machine_config &mconfig, const char *tag, devic
 
 void i8052_device::update_timer_t2(int cycles)
 {
-	// Update Timer 2
-	if (BIT(m_t2con, T2CON_TR2))
+	if (!BIT(m_t2con, T2CON_TR2) || BIT(m_t2con, T2CON_CT2))
+		return;
+
+	bool const baud = BIT(m_t2con, T2CON_TCLK) || BIT(m_t2con, T2CON_RCLK);
+	increment_timer_t2(cycles * (baud ? 6 : 1));
+}
+
+void i8052_device::increment_timer_t2(u32 delta)
+{
+	bool const baud = BIT(m_t2con, T2CON_TCLK) || BIT(m_t2con, T2CON_RCLK);
+	u32 count = m_t2 + delta;
+	while (count > 0xffff)
 	{
-		int mode = ((BIT(m_t2con, T2CON_TCLK) | BIT(m_t2con, T2CON_RCLK)) << 1) | BIT(m_t2con, T2CON_CP);
-		int delta = BIT(m_t2con, T2CON_CT2) ? m_t2_cnt : (mode & 2) ? cycles * (12/2) : cycles;
-
-		u32 count = m_t2 + delta;
-		m_t2_cnt = 0;
-
-		switch (mode)
-		{
-			case 0: // 16 Bit Auto Reload
-				if (count & 0xffff0000)
-				{
-					set_tf2(1);
-					count += m_rcap2;
-				}
-				else if (BIT(m_t2con, T2CON_EXEN2) && m_t2ex_cnt > 0)
-				{
-					count += m_rcap2;
-					m_t2ex_cnt = 0;
-				}
-				m_t2 = count;
-				break;
-			case 1: // 16 Bit Capture
-				if (count & 0xffff0000)
-					set_tf2(1);
-				m_t2 = count;
-
-				if (BIT(m_t2con, T2CON_EXEN2) && m_t2ex_cnt > 0)
-				{
-					m_rcap2 = m_t2;
-					m_t2ex_cnt = 0;
-				}
-				break;
-			case 2:
-			case 3: // Baud rate
-				if (count & 0xffff0000)
-				{
-					count += m_rcap2;
-					transmit_receive(2);
-				}
-				m_t2 = count;
-				break;
-		}
+		count -= 0x10000;
+		if (baud)
+			transmit_receive(2);
+		else
+			set_tf2(1);
+		if (baud || !BIT(m_t2con, T2CON_CP))
+			count += m_rcap2;
 	}
+	m_t2 = count;
 }
 
 void i8052_device::handle_8bit_uart_clock(int source)
@@ -105,15 +81,21 @@ void i8052_device::handle_irq(int irqline, int state, u32 new_state, u32 tr_stat
 	switch (irqline)
 	{
 		case MCS51_T2_LINE:
-			if (BIT(tr_state, MCS51_T2_LINE) && BIT(m_tcon, TCON_TR1))
-				m_t2_cnt++;
+			if (BIT(tr_state, MCS51_T2_LINE) && BIT(m_t2con, T2CON_TR2) && BIT(m_t2con, T2CON_CT2))
+				increment_timer_t2(1);
 			break;
 
 		case MCS51_T2EX_LINE:
-			if (BIT(tr_state, MCS51_T2EX_LINE))
+			if (BIT(tr_state, MCS51_T2EX_LINE) && BIT(m_t2con, T2CON_EXEN2))
 			{
 				set_exf2(1);
-				m_t2ex_cnt++;
+				if (!BIT(m_t2con, T2CON_TCLK) && !BIT(m_t2con, T2CON_RCLK))
+				{
+					if (BIT(m_t2con, T2CON_CP))
+						m_rcap2 = m_t2;
+					else
+						m_t2 = m_rcap2;
+				}
 			}
 			break;
 		default:

@@ -28,6 +28,7 @@
 
 #define PPU_DRAW_BG       0
 #define PPU_DRAW_OAM      1
+#define PPU_DRAW_NONE     2   // not rendering (for CPU accesses through $2007)
 
 /* constant definitions */
 #define VISIBLE_SCREEN_WIDTH         (32*8) /* Visible screen width */

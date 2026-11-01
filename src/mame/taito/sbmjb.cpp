@@ -70,18 +70,34 @@ public:
 	void sbmjb(machine_config &config);
 
 private:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0091lvc_device> m_vdpcpu;
 	required_device<taitoio_opto_device> m_opto;
 
+	uint8_t m_vdp_irq_vector = 0;
+
 	void screen_vblank(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
+	IRQ_CALLBACK_MEMBER(vdpcpu_acknowledge_irq);
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 	void tc0091lvc_map(address_map &map) ATTR_COLD;
 };
 
+
+void sbmjb_state::machine_start()
+{
+	save_item(NAME(m_vdp_irq_vector));
+}
+
+void sbmjb_state::machine_reset()
+{
+	m_vdp_irq_vector = 0;
+}
 
 void sbmjb_state::screen_vblank(int state) // TODO: copy-pasted from other drivers using same chip, to be verified
 {
@@ -296,17 +312,22 @@ INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(sbmjb_state::scanline_callback) // TODO: copy-pasted from other drivers using same chip, to be verified
 {
-	int const scanline = param;
-
-	if (scanline == 240 && (m_vdpcpu->irq_enable() & 4))
+	if (param == 240 && (m_vdpcpu->irq_enable() & 4))
 	{
-		m_vdpcpu->set_input_line_and_vector(0, HOLD_LINE, m_vdpcpu->irq_vector(2));
+		m_vdp_irq_vector = m_vdpcpu->irq_vector(2);
+		m_vdpcpu->set_input_line(0, HOLD_LINE);
 	}
 
-	if (scanline == 0 && (m_vdpcpu->irq_enable() & 2))
+	if (param == 0 && (m_vdpcpu->irq_enable() & 2))
 	{
-		m_vdpcpu->set_input_line_and_vector(0, HOLD_LINE, m_vdpcpu->irq_vector(1));
+		m_vdp_irq_vector = m_vdpcpu->irq_vector(1);
+		m_vdpcpu->set_input_line(0, HOLD_LINE);
 	}
+}
+
+IRQ_CALLBACK_MEMBER(sbmjb_state::vdpcpu_acknowledge_irq)
+{
+	return m_vdp_irq_vector;
 }
 
 void sbmjb_state::sbmjb(machine_config &config)
@@ -321,6 +342,7 @@ void sbmjb_state::sbmjb(machine_config &config)
 
 	TC0091LVC(config, m_vdpcpu, 13.33056_MHz_XTAL / 2); // TC0091LVC, divider not verified
 	m_vdpcpu->set_addrmap(AS_PROGRAM, &sbmjb_state::tc0091lvc_map);
+	m_vdpcpu->set_irq_acknowledge_callback(FUNC(sbmjb_state::vdpcpu_acknowledge_irq));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(sbmjb_state::scanline_callback), "screen", 0, 1);
 

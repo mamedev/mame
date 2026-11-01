@@ -49,6 +49,7 @@ public:
 	// configuration helpers
 	void set_vtlb_dynamic_entries(int entries) { m_dynamic = entries; }
 	void set_vtlb_fixed_entries(int entries) { m_fixed = entries; }
+	void set_vtlb_saved(bool saved) { m_saved = saved; }    // false: the table only caches translations the core can redo; flushed after a load
 
 	// filling
 	bool vtlb_fill(offs_t address, offs_t taddress, int intention);
@@ -69,12 +70,14 @@ protected:
 	virtual void interface_pre_start() override;
 	virtual void interface_post_start() override;
 	virtual void interface_pre_reset() override;
+	virtual void interface_post_load() override;
 
 private:
 	// private state
 	int    m_space;            // address space
 	int                 m_dynamic;          // number of dynamic entries
 	int                 m_fixed;            // number of fixed entries
+	bool                m_saved;            // the table goes in save states
 	int                 m_dynindex;         // index of next dynamic entry
 	int                 m_pageshift;        // bits to shift to get page index
 	int                 m_addrwidth;        // logical address bus width

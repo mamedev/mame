@@ -354,7 +354,7 @@ ROM_END
 ROM_START( qhzb ) // PCB-0701-01-IU
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "qhzb_igs036", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "qhzb_igs036.bin", 0x00000, 0x4000, CRC(b294079b) SHA1(5f1e63e302497fd8c9144fbc5c128cac215b28ec) ) // same of slqzsp, but both were dumped from the correct game
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v100cn_u18.u18", 0x000000, 0x200000, CRC(8c2733b7) SHA1(226768eead8d7754b2468384e5e691812d0ac96d) )
@@ -708,7 +708,7 @@ ROM_END
 ROM_START( xydn )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "igs036", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "igs036", 0x00000, 0x4000, CRC(c91f51aa) SHA1(1dd6004fab553e867a53f9f8a4fef484ffb2a8a7) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "s-110cn.u18",  0x000000, 0x200000, CRC(3212dbf0) SHA1(3fac70ca9bb537f29a36e2453f90ac4d3abbb392) )
@@ -781,7 +781,7 @@ ROM_END
 ROM_START( hyleyuan )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "igs036", 0x0000, 0x4000, NO_DUMP )
+	ROM_LOAD( "hyleyuan_igs036.bin", 0x0000, 0x4000, CRC(ea7cd4da) SHA1(cec3c04be1fdc15a7e11ca86bb98f73cbb8e6ebd) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "s_103cn.u24", 0x000000, 0x200000, CRC(248aa7e3) SHA1(d24ef32021dc03d9ae875f53767d742c91dd7d78) )
@@ -813,6 +813,47 @@ ROM_START( xcjnh )
 	ROM_LOAD( "xcjnh_s100cn_cg.u2", 0x2000000, 0x2000000, CRC(094ba5e1) SHA1(f71b0f8f6ffe90bc7a0773636cc5812245eb33a5) )
 	ROM_LOAD( "xcjnh_s100cn_cg.u3", 0x4000000, 0x2000000, CRC(f479a413) SHA1(ca7436ea4ba39f1fe27cc246ebebda3c818ed368) )
 	ROM_LOAD( "xcjnh_s100cn_cg.u4", 0x6000000, 0x2000000, CRC(b94e2565) SHA1(24168183c84012c3ef12e82ae076ee8ca2e4d4e6) )
+ROM_END
+
+// 欢乐敲敲敲 (Huānlè Qiāo Qiāo Qiāo)
+// KO-0999-02
+ROM_START( hlqqq )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "igs036", 0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "hlqqq_v100cn.u26", 0x000000, 0x200000, CRC(39fb6a4c) SHA1(fc391b74910c26c6b46c218dc387ca539fc4949f) )
+
+	ROM_REGION( 0x1000000, "oki", 0 ) // samples
+	ROM_LOAD( "hlqqq_sp.u17", 0x000000, 0x800000, CRC(55d24d28) SHA1(b467fcc485e6748300a59928f6689439952b70b4) )
+	ROM_LOAD( "hlqqq_sp.u18", 0x000000, 0x800000, CRC(69addcf2) SHA1(216e8a14dae32a8cd8547215132b183dc0d12fe1) )
+
+	ROM_REGION( 0x8000000, "gfx", 0 )
+	ROM_LOAD( "hlqqq_cg_v100cn.u1", 0x0000000, 0x2000000, NO_DUMP )
+	ROM_LOAD( "hlqqq_cg_v100cn.u2", 0x2000000, 0x2000000, NO_DUMP )
+	ROM_LOAD( "hlqqq_cg_v100cn.u3", 0x4000000, 0x2000000, NO_DUMP )
+	ROM_LOAD( "hlqqq_cg_v100cn.u4", 0x6000000, 0x2000000, NO_DUMP )
+ROM_END
+
+// 敲击大冒险 (Qiāojī Dà Màoxiǎn)
+// PCB-0670-02-IE
+ROM_START( qiaojidm )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "igs036", 0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "qiaojidm_v100cn.u33", 0x000000, 0x200000, CRC(7eb744cd) SHA1(25976322f84001c56e053cf7d925b8a01184b50a) )
+
+	ROM_REGION( 0x800000, "oki", 0 ) // samples
+	ROM_LOAD( "qiaojidm_sp.u31", 0x000000, 0x800000, CRC(b4f76f8f) SHA1(4cd0a94cb09ae4d040091637bdf97a2ed2e94c3d) )
+
+	ROM_REGION( 0x8000000, "gfx", 0 )
+	ROM_LOAD( "qiaojidm_v-100cn.u1", 0x0000000, 0x2000000, NO_DUMP )
+	ROM_LOAD( "qiaojidm_v-100cn.u2", 0x2000000, 0x2000000, NO_DUMP )
+	ROM_LOAD( "qiaojidm_v-100cn.u3", 0x4000000, 0x2000000, NO_DUMP )
+	ROM_LOAD( "qiaojidm_v-100cn.u4", 0x6000000, 0x2000000, NO_DUMP )
 ROM_END
 
 
@@ -936,5 +977,9 @@ GAME( 2010, lhzbgqb,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<lhz
 GAME( 201?, hyleyuan, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<hyleyuan_key>, ROT0, "IGS",           "Hou Ye Leyuan (S103CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 201?, xcjnh,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<xcjnh_key>,    ROT0, "IGS",           "Xiaochou Jianianhua (S100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+GAME( 201?, hlqqq,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<hlqqq_key>,    ROT0, "IGS",           "Huanle Qiao Qiao Qiao (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+GAME( 201?, qiaojidm, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036,          ROT0, "IGS",           "Qiaoji Da Maoxian (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 2015, mghammer, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_mghammer,          ROT0, "IGS / Enheart", "Medal Get Hammer (V100JP)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // but has S033CN strings?

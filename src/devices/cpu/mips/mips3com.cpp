@@ -191,6 +191,10 @@ uint32_t mips3_device::compute_config_register()
 	/* set the cache line size to 32 bytes */
 	uint32_t configreg = 0x00026030;
 
+	// MIPS32 Config: M (Config1 present), MT = 1 (standard TLB), K0 = 3 (cacheable)
+	if (m_flavor == MIPS3_TYPE_XBURST)
+		return 0x80000083;
+
 	// NEC VR series does not use a 100% compatible COP0/TLB implementation
 	if (m_flavor == MIPS3_TYPE_VR4300)
 	{
@@ -328,6 +332,10 @@ uint32_t mips3_device::compute_prid_register()
 
 		case MIPS3_TYPE_R5900:
 			return 0x2e14;
+
+		case MIPS3_TYPE_XBURST:
+			// JZ4755 programming manual, section 2: Ingenic company ID 0xd0, JZRISC core
+			return 0x1ed0024f;
 
 		default:
 			fatalerror("Unknown MIPS flavor specified\n");

@@ -34,6 +34,7 @@
 
 // interrupt types
 #define PPC_IRQ                 0       /* external IRQ */
+#define PPC_SMI                 1       /* (603 family) system management interrupt */
 #define PPC_IRQ_LINE_0          0       /* (4XX) external IRQ0 */
 #define PPC_IRQ_LINE_1          1       /* (4XX) external IRQ1 */
 #define PPC_IRQ_LINE_2          2       /* (4XX) external IRQ2 */
@@ -237,7 +238,7 @@ public:
 
 	void ppc_set_dcstore_callback(write32sm_delegate callback);
 
-	void set_drc_cache_size(size_t bytes) { m_cache.set_size(bytes); }
+	void set_drc_cache_size(size_t bytes) { m_drcuml.set_cache_size(bytes); }
 	void ppcdrc_set_options(uint32_t options);
 	void ppcdrc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
 	void ppcdrc_add_hotspot(offs_t pc, uint32_t opcode, uint32_t cycles);
@@ -328,6 +329,7 @@ protected:
 		EXCEPTION_ITLBMISS      = 16,       // PPCCAP_603_MMU
 		EXCEPTION_DTLBMISSL     = 17,       // PPCCAP_603_MMU
 		EXCEPTION_DTLBMISSS     = 18,       // PPCCAP_603_MMU
+		EXCEPTION_SMI           = 20,       // 603 family
 		EXCEPTION_COUNT
 	};
 
@@ -602,9 +604,8 @@ protected:
 	void (*m_optable[64])(uint32_t);
 
 	// core state
-	drc_cache           m_cache;                        // pointer to the DRC code cache
-	std::unique_ptr<drcuml_state>      m_drcuml;        // DRC UML generator state
-	std::unique_ptr<frontend>          m_drcfe;         // pointer to the DRC front-end state
+	drcuml_state          m_drcuml;                     // DRC code generator state
+	std::unique_ptr<frontend> m_drcfe;                  // pointer to the DRC front-end
 	uint32_t              m_drcoptions;                 // configurable DRC options
 
 	// parameters for subroutines
@@ -635,7 +636,7 @@ protected:
 	// so the checks are recorded in m_entry_checks and re-verified before the code is handed back.
 	struct reuse_entry
 	{
-		drccodeptr code;
+		drcuml_state::hash_codeptr code;
 		offs_t physpc;
 		uint32_t sig;
 		uint32_t checkfirst; // first of this block's entry checks in m_entry_checks
@@ -751,7 +752,7 @@ protected:
 	void ppc4xx_spu_update_irq_states();
 	void ppc4xx_spu_rx_data(uint8_t data);
 	void ppc4xx_spu_timer_reset();
-	void alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name);
+	void alloc_handle(uml::code_handle **handleptr, const char *name);
 	void load_fast_iregs(drcuml_block &block);
 	void save_fast_iregs(drcuml_block &block);
 	void load_fast_fregs(drcuml_block &block);
@@ -770,6 +771,7 @@ protected:
 	void static_generate_exception(uint8_t exception, int recover, const char *name);
 	void static_generate_memory_accessor(int mode, int size, bool iswrite, bool ismasked, bool isreserve, const char *name, uml::code_handle *&handleptr, uml::code_handle *masked);
 	void static_generate_swap_tgpr();
+	void static_generate_memory_handlers();
 	void static_generate_lsw_entries(int mode);
 	void static_generate_stsw_entries(int mode);
 	void static_generate_fpscr_finish();

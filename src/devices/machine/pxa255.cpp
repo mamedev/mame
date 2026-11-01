@@ -15,6 +15,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
+
 #define LOG_UNKNOWN     (1U << 1)
 #define LOG_I2S         (1U << 2)
 #define LOG_DMA         (1U << 3)
@@ -30,6 +32,13 @@
 
 #define VERBOSE         (LOG_GPIO)
 #include "logmacro.h"
+
+namespace {
+
+// the I2S SYSCLK is this PLL divided by SADIV; one stereo frame takes 256 SYSCLK cycles
+constexpr u32 I2S_PLL_CLOCK = 147'456'000;
+
+} // anonymous namespace
 
 DEFINE_DEVICE_TYPE(PXA255_PERIPHERALS, pxa255_periphs_device, "pxa255_periphs", "Intel XScale PXA255 Peripherals")
 
@@ -250,6 +259,9 @@ void pxa255_periphs_device::device_reset()
 	memset(&m_gpio_regs, 0, sizeof(m_gpio_regs));
 	memset(&m_power_regs, 0, sizeof(m_power_regs));
 	memset(&m_clk_regs, 0, sizeof(m_clk_regs));
+
+	m_i2s_regs = i2s_regs();
+	m_i2s_regs.sadiv = 0x1a;
 }
 
 void pxa255_periphs_device::device_add_mconfig(machine_config &config)
@@ -364,7 +376,7 @@ void pxa255_periphs_device::i2s_sadiv_w(offs_t offset, u32 data, u32 mem_mask)
 	m_i2s_regs.sadiv = data & 0x0000007f;
 	for (int i = 0; i < 2; i++)
 	{
-		m_dmadac[i]->set_frequency(((double)147600000 / (double)m_i2s_regs.sadiv) / 256.0);
+		m_dmadac[i]->set_frequency(double(I2S_PLL_CLOCK) / (double(std::max<u32>(1, m_i2s_regs.sadiv)) * 256.0));
 		m_dmadac[i]->enable(1);
 	}
 }
@@ -430,7 +442,8 @@ void pxa255_periphs_device::dma_load_descriptor_and_start(int channel)
 	switch (channel)
 	{
 		case 3:
-			m_dma_regs.timer[channel]->adjust(attotime::from_hz((147600000 / m_i2s_regs.sadiv) / (4 * 64)) * std::max<u32>(1, m_dma_regs.dcmd[channel] & 0x00001fff), channel);
+			// I2S transmit: each word is one 16-bit stereo frame
+			m_dma_regs.timer[channel]->adjust(attotime::from_ticks(256 * std::max<u32>(1, m_i2s_regs.sadiv), I2S_PLL_CLOCK) * std::max<u32>(1, (m_dma_regs.dcmd[channel] & 0x00001fff) / 4), channel);
 			break;
 		default:
 			// a zero-length descriptor still costs a fetch, otherwise a chain of them would stall the scheduler
@@ -456,15 +469,16 @@ TIMER_CALLBACK_MEMBER(pxa255_periphs_device::audio_dma_end_tick)
 	s16 *out_samples = &m_samples[0];
 	for (u32 index = 0; index < count; index += 4, sadr += 4)
 	{
+		// left sample in the low halfword, right in the high
 		const u32 word = space.read_dword(sadr);
-		*out_samples++ = (s16)(word >> 16);
-		*out_samples++ = (s16)(word & 0xffff);
+		*out_samples++ = s16(word & 0xffff);
+		*out_samples++ = s16(word >> 16);
 	}
 
 	for (int index = 0; index < 2; index++)
 	{
 		m_dmadac[index]->flush();
-		m_dmadac[index]->transfer(index, 2, 2, count/4, m_samples.get());
+		m_dmadac[index]->transfer(index, 1, 2, count / 4, m_samples.get());
 	}
 
 	dma_finish(param);
@@ -1467,8 +1481,9 @@ void pxa255_periphs_device::lcd_dma_kickoff(int channel)
 
 		if (m_lcd_regs.dma[channel].ldcmd & LDCMD_PAL)
 		{
+			// the palette RAM holds 256 entries; a longer descriptor's excess is ignored
 			address_space &space = m_maincpu->space(AS_PROGRAM);
-			int length = m_lcd_regs.dma[channel].ldcmd & 0x000fffff;
+			int length = std::min<int>(m_lcd_regs.dma[channel].ldcmd & 0x000fffff, 0x200);
 			int index = 0;
 			for(index = 0; index < length; index += 2)
 			{

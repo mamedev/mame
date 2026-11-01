@@ -10,6 +10,8 @@
 #include "emu.h"
 #include "ieee488.h"
 
+#include <algorithm>
+
 #define VERBOSE 0
 #include "logmacro.h"
 
@@ -124,8 +126,6 @@ ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, d
 	m_update_timer(nullptr)
 {
 	m_lines.reset();
-	std::fill(std::begin(m_line), std::end(m_line), 1);
-	m_line[DIO] = 0xff;
 }
 
 
@@ -144,7 +144,8 @@ void ieee488_device::device_start()
 	save_item(NAME(m_lines.m_time));
 	save_item(NAME(m_lines.m_state));
 	save_item(NAME(m_lines.m_count));
-	save_item(NAME(m_line));
+	save_item(NAME(m_lines.m_line));
+	save_item(NAME(m_lines.m_exec_index));
 }
 
 
@@ -155,6 +156,41 @@ void ieee488_device::device_start()
 void ieee488_device::device_stop()
 {
 	m_device_list.reset();
+}
+
+
+//-------------------------------------------------
+//  device_pre_save -
+//-------------------------------------------------
+
+void ieee488_device::device_pre_save()
+{
+	auto const save_exec = [this] (source_lines &lines)
+	{
+		auto const it = std::find(m_execs.begin(), m_execs.end(), lines.m_exec);
+		lines.m_exec_index = (it != m_execs.end()) ? (it - m_execs.begin()) : -1;
+	};
+
+	save_exec(m_lines);
+	for (daisy_entry *entry = m_device_list.first(); entry; entry = entry->next())
+		save_exec(entry->m_lines);
+}
+
+
+//-------------------------------------------------
+//  device_post_load -
+//-------------------------------------------------
+
+void ieee488_device::device_post_load()
+{
+	auto const load_exec = [this] (source_lines &lines)
+	{
+		lines.m_exec = (lines.m_exec_index >= 0) ? m_execs[lines.m_exec_index] : nullptr;
+	};
+
+	load_exec(m_lines);
+	for (daisy_entry *entry = m_device_list.first(); entry; entry = entry->next())
+		load_exec(entry->m_lines);
 }
 
 
@@ -173,6 +209,8 @@ void ieee488_device::add_device(ieee488_slot_device *slot, device_t *target)
 	save_item(NAME(entry->m_lines.m_time), m_device_list.count());
 	save_item(NAME(entry->m_lines.m_state), m_device_list.count());
 	save_item(NAME(entry->m_lines.m_count), m_device_list.count());
+	save_item(NAME(entry->m_lines.m_line), m_device_list.count());
+	save_item(NAME(entry->m_lines.m_exec_index), m_device_list.count());
 }
 
 
@@ -202,7 +240,10 @@ void ieee488_device::source_lines::reset()
 		std::fill(std::begin(m_time[signal]), std::end(m_time[signal]), attotime::zero);
 		std::fill(std::begin(m_state[signal]), std::end(m_state[signal]), (signal == DIO) ? 0xff : 1);
 		m_count[signal] = 1;
+		m_line[signal] = (signal == DIO) ? 0xff : 1;
 	}
+	m_exec = nullptr;
+	m_exec_index = -1;
 }
 
 
@@ -213,10 +254,11 @@ void ieee488_device::source_lines::reset()
 void ieee488_device::set_signal(device_t *device, int signal, u8 state)
 {
 	source_lines *lines = &m_lines;
+	daisy_entry *entry = nullptr;
 
 	if (device != this)
 	{
-		daisy_entry *entry = m_device_list.first();
+		entry = m_device_list.first();
 		while (entry && entry->m_device != device)
 			entry = entry->next();
 		if (!entry)
@@ -267,43 +309,58 @@ void ieee488_device::set_signal(device_t *device, int signal, u8 state)
 	}
 
 	if (time <= now)
+	{
 		update_lines();
-	else if (!m_update_timer->enabled() || m_update_timer->expire() > time)
-		m_update_timer->adjust(time - now);
+	}
+	else
+	{
+		// a source's own receivers see its outputs without the write delay
+		lines->m_exec = exec;
+		update_lines(*lines, entry);
+
+		if (!m_update_timer->enabled() || m_update_timer->expire() > time)
+			m_update_timer->adjust(time - now);
+	}
 }
 
 
 //-------------------------------------------------
-//  update_lines - notify devices of resolved
+//  update_lines - notify one source of resolved
 //  line changes up to the current time
 //-------------------------------------------------
 
-void ieee488_device::update_lines()
+void ieee488_device::update_lines(source_lines &lines, daisy_entry *entry)
 {
 	attotime const now = machine().time();
 
 	for (int signal = 0; signal < SIGNAL_COUNT; signal++)
 	{
-		u8 const state = get_signal(signal, now);
-		if (m_line[signal] == state)
+		u8 const state = get_signal(signal, now, &lines);
+		if (lines.m_line[signal] == state)
 			continue;
 
-		m_line[signal] = state;
+		lines.m_line[signal] = state;
 
-		switch (signal)
+		if (!entry)
 		{
-		case EOI:   m_write_eoi(state);  break;
-		case DAV:   m_write_dav(state);  break;
-		case NRFD:  m_write_nrfd(state); break;
-		case NDAC:  m_write_ndac(state); break;
-		case IFC:   m_write_ifc(state);  break;
-		case SRQ:   m_write_srq(state);  break;
-		case ATN:   m_write_atn(state);  break;
-		case REN:   m_write_ren(state);  break;
-		case DIO:   m_write_dio(state);  break;
-		}
+			switch (signal)
+			{
+			case EOI:   m_write_eoi(state);  break;
+			case DAV:   m_write_dav(state);  break;
+			case NRFD:  m_write_nrfd(state); break;
+			case NDAC:  m_write_ndac(state); break;
+			case IFC:   m_write_ifc(state);  break;
+			case SRQ:   m_write_srq(state);  break;
+			case ATN:   m_write_atn(state);  break;
+			case REN:   m_write_ren(state);  break;
+			case DIO:   m_write_dio(state);  break;
+			}
 
-		for (daisy_entry *entry = m_device_list.first(); (signal != DIO) && entry; entry = entry->next())
+			LOG("EOI %u DAV %u NRFD %u NDAC %u IFC %u SRQ %u ATN %u REN %u DIO %02x\n",
+				lines.m_line[EOI], lines.m_line[DAV], lines.m_line[NRFD], lines.m_line[NDAC],
+				lines.m_line[IFC], lines.m_line[SRQ], lines.m_line[ATN], lines.m_line[REN], lines.m_line[DIO]);
+		}
+		else
 		{
 			switch (signal)
 			{
@@ -317,11 +374,20 @@ void ieee488_device::update_lines()
 			case REN:   entry->m_interface->ieee488_ren(state);  break;
 			}
 		}
-
-		LOG("EOI %u DAV %u NRFD %u NDAC %u IFC %u SRQ %u ATN %u REN %u DIO %02x\n",
-			m_line[EOI], m_line[DAV], m_line[NRFD], m_line[NDAC],
-			m_line[IFC], m_line[SRQ], m_line[ATN], m_line[REN], m_line[DIO]);
 	}
+}
+
+
+//-------------------------------------------------
+//  update_lines - notify every source
+//-------------------------------------------------
+
+void ieee488_device::update_lines()
+{
+	update_lines(m_lines, nullptr);
+
+	for (daisy_entry *entry = m_device_list.first(); entry; entry = entry->next())
+		update_lines(entry->m_lines, entry);
 }
 
 
@@ -401,15 +467,38 @@ bool ieee488_device::sample_ready(cpu_device &cpu)
 
 
 //-------------------------------------------------
+//  read_signal - sample the bus, seeing the
+//  pending outputs of the executing device
+//-------------------------------------------------
+
+u8 ieee488_device::read_signal(int signal)
+{
+	source_lines const *own = nullptr;
+	device_execute_interface *const exec = machine().scheduler().currently_executing();
+
+	if (exec)
+	{
+		if (m_lines.m_exec == exec)
+			own = &m_lines;
+		for (daisy_entry *entry = m_device_list.first(); !own && entry; entry = entry->next())
+			if (entry->m_lines.m_exec == exec)
+				own = &entry->m_lines;
+	}
+
+	return get_signal(signal, machine().time(), own);
+}
+
+
+//-------------------------------------------------
 //  get_signal -
 //-------------------------------------------------
 
-u8 ieee488_device::get_signal(int signal, const attotime &time)
+u8 ieee488_device::get_signal(int signal, const attotime &time, source_lines const *own)
 {
-	auto const source_state = [signal, &time] (source_lines const &lines)
+	auto const source_state = [signal, &time, own] (source_lines const &lines)
 	{
 		int i = lines.m_count[signal] - 1;
-		while ((i > 0) && (lines.m_time[signal][i] > time))
+		while ((&lines != own) && (i > 0) && (lines.m_time[signal][i] > time))
 			i--;
 		return lines.m_state[signal][i];
 	};

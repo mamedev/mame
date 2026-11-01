@@ -168,12 +168,10 @@ protected:
 	u32 m_last_line_state; // last state of input lines line
 	int m_t0_cnt;          // number of 0->1 transitions on T0 line
 	int m_t1_cnt;          // number of 0->1 transitions on T1 line
-	int m_t2_cnt;          // number of 0->1 transitions on T2 line
-	int m_t2ex_cnt;        // number of 0->1 transitions on T2EX line
 	int m_cur_irq_prio;    // Holds value of the current IRQ Priority Level; -1 if no irq
 	u8 m_irq_active;       // mask which irq levels are serviced
 	u8 m_irq_prio[8];      // interrupt priority
-	u8 m_irq_delayed;      // flags set in an instruction's last cycle, polled after the next one
+	u8 m_irq_delayed;      // interrupt sources excluded from the next poll
 
 	u8 m_forced_inputs[4]; // allow read even if configured as output
 

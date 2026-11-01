@@ -165,6 +165,12 @@ public:
 	hynix_hy27uf084g2m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class hynix_h27uag8t2a_device : public nand_device
+{
+public:
+	hynix_h27uag8t2a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 
 class toshiba_tc58v64bft_device : public nand_device
 {
@@ -208,6 +214,7 @@ DECLARE_DEVICE_TYPE(SAMSUNG_K9F1G08U0M, samsung_k9f1g08u0m_device)
 DECLARE_DEVICE_TYPE(SAMSUNG_K9LAG08U0M, samsung_k9lag08u0m_device)
 DECLARE_DEVICE_TYPE(SAMSUNG_K9F2G08U0M, samsung_k9f2g08u0m_device)
 DECLARE_DEVICE_TYPE(HYNIX_HY27UF084G2M, hynix_hy27uf084g2m_device)
+DECLARE_DEVICE_TYPE(HYNIX_H27UAG8T2A, hynix_h27uag8t2a_device)
 DECLARE_DEVICE_TYPE(TOSHIBA_TC58V64BFT, toshiba_tc58v64bft_device)
 DECLARE_DEVICE_TYPE(TOSHIBA_TC58256AFT, toshiba_tc58256aft_device)
 DECLARE_DEVICE_TYPE(GENERALPLUS_GPR27P512A, generalplus_gpr27p512a)

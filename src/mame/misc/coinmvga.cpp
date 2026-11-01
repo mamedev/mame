@@ -225,9 +225,8 @@
 #include "sound/ymz280b.h"
 #include "machine/i2cmem.h"
 #include "machine/msm6242.h"
-#include "video/ramdac.h"
+#include "video/bt47x.h"
 
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -248,8 +247,8 @@ public:
 		, m_vram(*this, "vram")
 		, m_maincpu(*this, "maincpu")
 		, m_eeprom(*this, "eeprom")
-		, m_gfxdecode(*this, "gfxdecode%u", 0U)
-		, m_palette(*this, "palette%u", 0U)
+		, m_ramdac(*this, "ramdac")
+		, m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	void coinmvga(machine_config &config);
@@ -266,12 +265,10 @@ private:
 	required_shared_ptr<uint16_t> m_vram;
 	required_device<cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_eeprom;
-	required_device_array<gfxdecode_device, 2> m_gfxdecode;
-	required_device_array<palette_device, 2> m_palette;
+	required_device<bt471_device> m_ramdac;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	void coinmvga_map(address_map &map) ATTR_COLD;
-	void ramdac2_map(address_map &map) ATTR_COLD;
-	void ramdac_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -294,13 +291,14 @@ void coinmvga_state::i2c_w(uint8_t data)
 
 void coinmvga_state::video_start()
 {
+	m_gfxdecode->gfx(1)->set_colorbase(0x100); // foreground uses the overlay colors
 }
 
 
 uint32_t coinmvga_state::screen_update_coinmvga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx_8bpp = m_gfxdecode[0]->gfx(0);
-	gfx_element *gfx_4bpp = m_gfxdecode[1]->gfx(0);
+	gfx_element *gfx_8bpp = m_gfxdecode->gfx(0);
+	gfx_element *gfx_4bpp = m_gfxdecode->gfx(1);
 
 	for (int y = 0; y < 64; y++)
 	{
@@ -357,12 +355,7 @@ void coinmvga_state::coinmvga_map(address_map &map)
 //  map(0x403afa, 0x403afb).r(FUNC(coinmvga_state::test_r)).nopw(); //touch screen related, cmrltv75
 	map(0x400000, 0x40ffff).ram();
 
-	map(0x600000, 0x600000).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x600001, 0x600001).w("ramdac", FUNC(ramdac_device::pal_w));
-	map(0x600002, 0x600002).w("ramdac", FUNC(ramdac_device::mask_w));
-	map(0x600004, 0x600004).w("ramdac2", FUNC(ramdac_device::index_w));
-	map(0x600005, 0x600005).w("ramdac2", FUNC(ramdac_device::pal_w));
-	map(0x600006, 0x600006).w("ramdac2", FUNC(ramdac_device::mask_w));
+	map(0x600000, 0x600007).w(m_ramdac, FUNC(bt471_device::write));
 	map(0x600008, 0x600009).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
 	map(0x610000, 0x61000f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 
@@ -628,29 +621,15 @@ static const gfx_layout tiles8x8x8bpp_layout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( gfx_coinmvga_4bpp )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x4bpp_layout, 0x000, 1 )  // Foreground GFX
-GFXDECODE_END
-
-static GFXDECODE_START( gfx_coinmvga_8bpp )
+static GFXDECODE_START( gfx_coinmvga )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8x8bpp_layout, 0x000, 1 )  // Background GFX
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x4bpp_layout, 0x000, 1 )  // Foreground GFX
 GFXDECODE_END
 
 
 /*************************
 *    Machine Drivers     *
 *************************/
-
-void coinmvga_state::ramdac_map(address_map &map)
-{
-	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
-}
-
-void coinmvga_state::ramdac2_map(address_map &map)
-{
-	map(0x000, 0x3ff).rw("ramdac2", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
-}
-
 
 void coinmvga_state::coinmvga(machine_config &config)
 {
@@ -672,18 +651,10 @@ void coinmvga_state::coinmvga(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MACH_CLOCK / 2, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(FUNC(coinmvga_state::screen_update_coinmvga));
-	//screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_coinmvga_8bpp);
-	GFXDECODE(config, m_gfxdecode[1], m_palette[1], gfx_coinmvga_4bpp);
+	BT471(config, m_ramdac); // ADV471
 
-	PALETTE(config, m_palette[0]).set_entries(256);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette[0]));
-	ramdac.set_addrmap(0, &coinmvga_state::ramdac_map);
-
-	PALETTE(config, m_palette[1]).set_entries(16);
-	ramdac_device &ramdac2(RAMDAC(config, "ramdac2", m_palette[1]));
-	ramdac2.set_addrmap(0, &coinmvga_state::ramdac2_map);
+	GFXDECODE(config, m_gfxdecode, m_ramdac, gfx_coinmvga);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

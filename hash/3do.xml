@@ -719,7 +719,7 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- TODO: Shanghai Banri no Choujou (Japan version) released by Electronic Arts Victor -->
+	<!-- TODO: shangban: Shanghai: Banri no Choujou (Japan version) released by Electronic Arts Victor -->
 
 	<!-- https://redump.info/disc/59953 -->
 	<software name="cpubach" supported="no">
@@ -802,7 +802,7 @@ Pause menu has ACW/ACCW bug with the background rotating ball, verify PIXC blend
 		</part>
 	</software>
 
-	<!-- TODO: ssf2t published by Panasonic overseas, convert below as cloneof -->
+	<!-- TODO: ssf2t: published by Panasonic overseas, convert below as cloneof -->
 
 	<!-- https://redump.info/disc/16131 -->
 	<software name="ssf2xj" supported="partial">

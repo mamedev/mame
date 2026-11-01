@@ -23,6 +23,12 @@ public:
 	// the 8-byte DES key is unique to each customer's chips
 	fs8806_device &set_key(u64 key) { m_key = key; return *this; }
 
+	// SPI mode
+	void spi_cs_w(int state);
+	void spi_sck_w(int state);
+	void spi_mosi_w(int state);
+	int spi_miso_r();
+
 protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -54,6 +60,13 @@ private:
 	u8 m_challenge[8];  // last block presented by command 0xb1
 	u8 m_verify[8];     // last block presented by command 0xb3
 	u16 m_counter;      // packets accepted since the last reset
+
+	u8 m_spi_cs;
+	u8 m_spi_sck;
+	u8 m_spi_mosi;
+	u8 m_spi_bit;       // bits shifted in the current byte
+	u8 m_spi_shift;
+	u8 m_spi_offset;    // bytes transferred since chip select
 };
 
 DECLARE_DEVICE_TYPE(FS8806, fs8806_device)

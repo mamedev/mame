@@ -445,6 +445,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "cdc1700",         be, -1, []() -> util::disasm_interface * { return new cdc1700_disassembler; } },
 	{ "cdp1801",         le,  0, []() -> util::disasm_interface * { return new cosmac_disassembler(cosmac_disassembler::TYPE_1801); } },
 	{ "cdp1802",         le,  0, []() -> util::disasm_interface * { return new cosmac_disassembler(cosmac_disassembler::TYPE_1802); } },
+	{ "cdp1804",         le,  0, []() -> util::disasm_interface * { return new cosmac_disassembler(cosmac_disassembler::TYPE_1804); } },
 	{ "cdp1805",         le,  0, []() -> util::disasm_interface * { return new cosmac_disassembler(cosmac_disassembler::TYPE_1805); } },
 	{ "clipper",         le,  0, []() -> util::disasm_interface * { return new clipper_disassembler; } },
 	{ "coldfire",        be,  0, []() -> util::disasm_interface * { return new m68k_disassembler(m68k_disassembler::TYPE_COLDFIRE); } },

@@ -432,7 +432,7 @@ inline void get_carry(a64::Assembler &a, const a64::Gp &reg, bool inverted = fal
 class drcbe_arm64 : public drcbe_interface
 {
 public:
-	drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits);
+	drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits, uint32_t max_sequence_length);
 	virtual ~drcbe_arm64();
 
 	virtual void reset() override;
@@ -440,8 +440,8 @@ public:
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
 	virtual bool hash_exists(uint32_t mode, uint32_t pc) const noexcept override;
 	virtual void hash_invalidate_range(uint32_t pcstart, uint32_t pcend) noexcept override;
-	virtual drccodeptr hash_get_codeptr(uint32_t mode, uint32_t pc) const noexcept override;
-	virtual bool hash_set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code) noexcept override;
+	virtual hash_codeptr hash_get_codeptr(uint32_t mode, uint32_t pc) const noexcept override;
+	virtual bool hash_set_codeptr(uint32_t mode, uint32_t pc, hash_codeptr code) noexcept override;
 	virtual void get_info(drcbe_info &info) const noexcept override;
 	virtual bool logging() const noexcept override { return false; }
 
@@ -1558,9 +1558,17 @@ inline void drcbe_arm64::calculate_carry_shift_right_imm(a64::Assembler &a, cons
 		store_carry_reg(a, reg, shift - 1);
 }
 
-drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)
+drcbe_arm64::drcbe_arm64(
+		drcuml_state &drcuml,
+		device_t &device,
+		drc_cache &cache,
+		uint32_t flags,
+		int modes,
+		int addrbits,
+		int ignorebits,
+		uint32_t max_sequence_length)
 	: drcbe_interface(drcuml, cache, device)
-	, m_hash(cache, modes, addrbits, ignorebits, drcuml.max_sequence_length(), std::align_val_t(1 << 12), std::align_val_t(1 << 12))
+	, m_hash(cache, modes, addrbits, ignorebits, max_sequence_length, std::align_val_t(1 << 12), std::align_val_t(1 << 12))
 	, m_map(cache, 0xaaaaaaaa5555)
 	, m_log_asmjit(nullptr)
 	, m_carry_state(carry_state::POISON)
@@ -1834,14 +1842,30 @@ void drcbe_arm64::hash_invalidate_range(uint32_t pcstart, uint32_t pcend) noexce
 	m_hash.invalidate_range(pcstart, pcend);
 }
 
-drccodeptr drcbe_arm64::hash_get_codeptr(uint32_t mode, uint32_t pc) const noexcept
+drcbe_arm64::hash_codeptr drcbe_arm64::hash_get_codeptr(uint32_t mode, uint32_t pc) const noexcept
 {
-	return m_hash.code_exists(mode, pc) ? m_hash.get_codeptr(mode, pc) : nullptr;
+	if (m_hash.code_exists(mode, pc))
+		return hash_codeptr{ m_hash.get_codeptr(mode, pc), m_cache.flush_count() };
+	else
+		return hash_codeptr();
 }
 
-bool drcbe_arm64::hash_set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code) noexcept
+bool drcbe_arm64::hash_set_codeptr(uint32_t mode, uint32_t pc, hash_codeptr code) noexcept
 {
-	return m_hash.set_codeptr(mode, pc, code);
+	if (UNEXPECTED((m_cache.flush_count() != code.aux) || !m_cache.contains_transient_pointer(code.ptr)))
+	{
+		if (!code.ptr)
+			osd_printf_error("drcbe_arm64(%s): Attempt to connect %u:%x to null code pointer.\n", m_device.tag(), mode, pc);
+		else if (m_cache.flush_count() != code.aux)
+			osd_printf_error("drcbe_arm64(%s): Attempt to connect %u:%x to code pointer from previous generation.\n", m_device.tag(), mode, pc);
+		else
+			osd_printf_error("drcbe_arm64(%s): Attempt to connect %u:%x to code pointer outside transient cache.\n", m_device.tag(), mode, pc);
+		std::fflush(stdout);
+		std::fflush(stderr);
+		std::abort();
+	}
+
+	return m_hash.set_codeptr(mode, pc, code.ptr);
 }
 
 void drcbe_arm64::get_info(drcbe_info &info) const noexcept
@@ -5769,9 +5793,10 @@ std::unique_ptr<drcbe_interface> make_drcbe_arm64(
 		uint32_t flags,
 		int modes,
 		int addrbits,
-		int ignorebits)
+		int ignorebits,
+		uint32_t max_sequence_length)
 {
-	return std::unique_ptr<drcbe_interface>(new drcbe_arm64(drcuml, device, cache, flags, modes, addrbits, ignorebits));
+	return std::unique_ptr<drcbe_interface>(new drcbe_arm64(drcuml, device, cache, flags, modes, addrbits, ignorebits, max_sequence_length));
 }
 
 } // namespace drc

@@ -4,6 +4,8 @@
 #include "cgc7900.h"
 #include "screen.h"
 
+#include <algorithm>
+
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
@@ -20,10 +22,6 @@
 #define OVERLAY_FG                  BIT(cell, 9)    /* turns on Green in foreground if SET */
 #define OVERLAY_FB                  BIT(cell, 8)    /* turns on Blue in background if SET */
 #define OVERLAY_DATA                (cell & 0xff)   /* ASCII or Plot Dot character */
-
-#define IMAGE_SELECT                BIT(m_roll_overlay[0], 13)
-#define OVERLAY_CURSOR_BLINK        BIT(m_roll_overlay[0], 14)
-#define OVERLAY_CHARACTER_BLINK     BIT(m_roll_overlay[0], 15)
 
 void cgc7900_state::cgc7900_palette(palette_device &palette) const
 {
@@ -42,28 +40,123 @@ void cgc7900_state::cgc7900_palette(palette_device &palette) const
 ***************************************************************************/
 
 /*-------------------------------------------------
-    cgc7900_z_mode_r - Z mode read
+    z_mode_r - Z mode read
 -------------------------------------------------*/
 
-u16 cgc7900_state::z_mode_r()
+u16 cgc7900_state::z_mode_r(offs_t offset)
 {
-	return 0;
+	offs_t const pixel = (offset + (bitmap_roll() << 10)) & 0xfffff;
+	offs_t const word = pixel >> 4;
+	int const bit = 15 - (pixel & 0x0f);
+	u16 const select = m_latch[LATCH_PLANE_SELECT];
+	u16 data = 0;
+
+	for (int plane = 0; plane < 16; plane++)
+		if (BIT(select, plane) && BIT(m_plane_ram[(plane << 16) | word], bit))
+			data |= 1 << plane;
+
+	return data;
 }
 
 /*-------------------------------------------------
-    cgc7900_z_mode_w - Z mode write
+    z_mode_w - Z mode write
 -------------------------------------------------*/
 
-void cgc7900_state::z_mode_w(u16 data)
+void cgc7900_state::z_mode_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	offs_t const pixel = (offset + (bitmap_roll() << 10)) & 0xfffff;
+	offs_t const word = pixel >> 4;
+	u16 const bit = 1 << (15 - (pixel & 0x0f));
+	u16 const select = m_latch[LATCH_PLANE_SELECT] & mem_mask;
+
+	for (int plane = 0; plane < 16; plane++)
+	{
+		if (!BIT(select, plane))
+			continue;
+
+		u16 &ram = m_plane_ram[(plane << 16) | word];
+
+		if (BIT(data, plane))
+			ram |= bit;
+		else
+			ram &= ~bit;
+	}
 }
 
 /*-------------------------------------------------
-    cgc7900_color_status_w - color status write
+    color_status_w - color status write
 -------------------------------------------------*/
 
-void cgc7900_state::color_status_w(u16 data)
+void cgc7900_state::color_status_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	u16 const fg = m_latch[LATCH_COLOR_STATUS_FG];
+	u16 const bg = m_latch[LATCH_COLOR_STATUS_BG];
+
+	for (int plane = 0; plane < 16; plane++)
+	{
+		u16 const color = (BIT(fg, plane) ? data : 0) | (BIT(bg, plane) ? ~data : 0);
+		u16 &ram = m_plane_ram[(plane << 16) | offset];
+
+		ram = (ram & ~mem_mask) | (color & mem_mask);
+	}
+}
+
+/*-------------------------------------------------
+    clut_r - color lookup table read
+-------------------------------------------------*/
+
+u16 cgc7900_state::clut_r(offs_t offset)
+{
+	return BIT(offset, 0) ? m_clut_ram[offset] : (0xff00 | m_clut_ram[offset]);
+}
+
+/*-------------------------------------------------
+    clut_w - color lookup table write
+-------------------------------------------------*/
+
+void cgc7900_state::clut_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_clut_ram[offset]);
+
+	if (!BIT(offset, 0))
+		m_clut_ram[offset] &= 0x00ff;
+}
+
+/*-------------------------------------------------
+    overlay_r - overlay memory read
+-------------------------------------------------*/
+
+u16 cgc7900_state::overlay_r(offs_t offset)
+{
+	return m_overlay_ram[((((offset >> 1) + overlay_roll()) & 0xfff) << 1) | (offset & 1)];
+}
+
+/*-------------------------------------------------
+    overlay_w - overlay memory write
+-------------------------------------------------*/
+
+void cgc7900_state::overlay_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_overlay_ram[((((offset >> 1) + overlay_roll()) & 0xfff) << 1) | (offset & 1)]);
+}
+
+/*-------------------------------------------------
+    latch_r - hardware latch read
+-------------------------------------------------*/
+
+u16 cgc7900_state::latch_r(offs_t offset)
+{
+	return m_cmos_ram[offset];
+}
+
+/*-------------------------------------------------
+    latch_w - hardware latch write
+-------------------------------------------------*/
+
+void cgc7900_state::latch_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_cmos_ram[offset]);
+	COMBINE_DATA(&m_latch[offset]);
 }
 
 /*-------------------------------------------------
@@ -97,8 +190,9 @@ u16 cgc7900_state::sync_r()
 
 	*/
 
-	if (m_screen->vblank()) data &= 1;
-	if (m_screen->hblank()) data &= 4;
+	if (m_screen->vblank()) data &= ~1;
+	if (BIT(m_screen->frame_number(), 0)) data &= ~2;
+	if (m_screen->hblank()) data &= ~4;
 
 	return data;
 }
@@ -114,64 +208,133 @@ u16 cgc7900_state::sync_r()
 void cgc7900_state::update_clut()
 {
 	for (int i = 0; i < 256; i++)
-	{
-		u16 addr = i * 2;
-		u32 data = (m_clut_ram[addr + 1] << 16) | m_clut_ram[addr];
-		u8 b = data & 0xff;
-		u8 g = (data >> 8) & 0xff;
-		u8 r = (data >> 16) & 0xff;
+		m_clut[i] = rgb_t(m_clut_ram[i << 1] & 0xff, m_clut_ram[(i << 1) | 1] >> 8, m_clut_ram[(i << 1) | 1] & 0xff);
+}
 
-		m_clut[i] = rgb_t(r, g, b);
+void cgc7900_state::device_post_load()
+{
+	update_clut();
+}
+
+/*-------------------------------------------------
+    vblank_w - vertical retrace
+-------------------------------------------------*/
+
+void cgc7900_state::vblank_w(int state)
+{
+	if (state)
+	{
+		update_clut();
+
+		bool off_center = false;
+
+		for (auto &axis : m_joystick)
+			if ((axis->read() & 0x3ff) != 0x200)
+				off_center = true;
+
+		irq_encoder(11, off_center ? ASSERT_LINE : CLEAR_LINE);
 	}
+
+	irq_encoder(12, state);
 }
 
 /*-------------------------------------------------
     draw_bitmap - draw bitmap image
 -------------------------------------------------*/
 
-void cgc7900_state::draw_bitmap(screen_device *screen, bitmap_rgb32 &bitmap)
+void cgc7900_state::draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	int const base = image_select() ? 8 : 0;
+	u16 mask = m_latch[LATCH_PLANE_SWITCH];
+
+	int const zoom_h = zoom_x() + 1;
+	int const zoom_v = zoom_y() + 1;
+
+	if (m_blink)
+		mask &= ~m_latch[LATCH_BLINK_SELECT];
+
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		offs_t const row = ((pan_y() + y / zoom_v + bitmap_roll()) & 0x3ff) << 6;
+		u32 *const dest = &bitmap.pix(y);
+		offs_t cached = ~offs_t(0);
+		u16 data[8] = { };
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			offs_t const column = (pan_x() + x / zoom_h) & 0x3ff;
+			offs_t const word = row | (column >> 4);
+			int const bit = 15 - (column & 0x0f);
+
+			if (word != cached)
+			{
+				for (int plane = 0; plane < 8; plane++)
+					data[plane] = BIT(mask, base + plane) ? m_plane_ram[((base + plane) << 16) | word] : 0;
+
+				cached = word;
+			}
+
+			u8 index = 0;
+
+			for (int plane = 0; plane < 8; plane++)
+				index |= BIT(data[plane], bit) << plane;
+
+			dest[x] = m_clut[index];
+		}
+	}
 }
 
 /*-------------------------------------------------
     draw_overlay - draw text overlay
 -------------------------------------------------*/
 
-void cgc7900_state::draw_overlay(screen_device *screen, bitmap_rgb32 &bitmap)
+void cgc7900_state::draw_overlay(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();
-	for (int y = 0; y < 48 * 8; y++)
+	u8 const *const char_rom = m_char_rom->base();
+
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		int sy = y / 8;
-		int line = y % 8;
+		int const sy = y / 16;
+		int const line = (y % 16) / 2;
+		u32 *const dest = &bitmap.pix(y);
 
-		for (int sx = 0; sx < 85; sx++)
+		for (int sx = cliprect.min_x / 12; (sx < 85) && (sx * 12 <= cliprect.max_x); sx++)
 		{
-			u16 addr = (sy * 170) + (sx * 2);
-			u32 cell = (m_overlay_ram[addr] << 16) | m_overlay_ram[addr + 1];
-			u8 data = m_char_rom->base()[(OVERLAY_DATA << 3) | line];
-			int fg = (cell >> 8) & 0x07;
-			int bg = (cell >> 16) & 0x07;
+			offs_t const addr = (((sy * 85) + sx + overlay_roll()) & 0xfff) << 1;
+			u32 const cell = (m_overlay_ram[addr] << 16) | m_overlay_ram[addr + 1];
+			int const x0 = std::max(sx * 12, cliprect.min_x);
+			int const x1 = std::min(sx * 12 + 11, cliprect.max_x);
 
-			for (int x = 0; x < 8; x++)
+			if (OVERLAY_CUR && (!overlay_cursor_blink() || m_blink) && ((line == 0) || (line == 7)))
 			{
-				if (OVERLAY_CUR)
+				for (int x = x0; x <= x1; x++)
+					dest[x] = pen[7];
+
+				continue;
+			}
+
+			u8 pattern;
+
+			if (OVERLAY_PL)
+				pattern = BIT(OVERLAY_DATA, (y % 16) / 4) | (BIT(OVERLAY_DATA, 4 + (y % 16) / 4) << 1);
+			else
+				pattern = char_rom[(OVERLAY_DATA << 3) | line];
+
+			if (OVERLAY_BLK && overlay_character_blink() && !m_blink)
+				pattern = 0;
+
+			for (int x = x0; x <= x1; x++)
+			{
+				bool const dot = OVERLAY_PL ? BIT(pattern, (x - sx * 12) / 6) : BIT(pattern, (x - sx * 12) / 2);
+
+				if (dot)
 				{
-					if (!OVERLAY_CURSOR_BLINK || m_blink)
-					{
-						bitmap.pix(y, (sx * 8) + x) = pen[7];
-					}
+					if (OVERLAY_VF) dest[x] = pen[(cell >> 8) & 0x07];
 				}
 				else
 				{
-					if (!BIT(data, x) || (OVERLAY_BLK && OVERLAY_CHARACTER_BLINK && !m_blink))
-					{
-						if (OVERLAY_VB) bitmap.pix(y, (sx * 8) + x) = pen[bg];
-					}
-					else
-					{
-						if (OVERLAY_VF) bitmap.pix(y, (sx * 8) + x) = pen[fg];
-					}
+					if (OVERLAY_VB) dest[x] = pen[(cell >> 16) & 0x07];
 				}
 			}
 		}
@@ -189,9 +352,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(cgc7900_state::blink_tick)
 
 u32 cgc7900_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	update_clut();
-	draw_bitmap(&screen, bitmap);
-	draw_overlay(&screen, bitmap);
+	draw_bitmap(bitmap, cliprect);
+	draw_overlay(bitmap, cliprect);
 
 	return 0;
 }
@@ -230,12 +392,10 @@ GFXDECODE_END
 void cgc7900_state::cgc7900_video(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, SCREEN_TAG));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	// interlaced fields of 395.5 lines are modeled as 791 half-lines at twice the pixel clock
+	screen.set_raw(XTAL(28'480'000) * 2, 1200, 0, 1024, 791, 0, 768);
 	screen.set_screen_update(FUNC(cgc7900_state::screen_update));
-	screen.set_size(1024, 768);
-	screen.set_visarea(0, 1024-1, 0, 768-1);
-	screen.screen_vblank().set(FUNC(cgc7900_state::irq<0xc>));
+	screen.screen_vblank().set(FUNC(cgc7900_state::vblank_w));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_cgc7900);
 	PALETTE(config, m_palette, FUNC(cgc7900_state::cgc7900_palette), 8);

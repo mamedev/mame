@@ -34,17 +34,12 @@ protected:
 	virtual void interrupt_taken() override;
 	virtual bool timer1_split_uses_input() const override { return true; }
 	virtual void update_timer_t2(int cycles) override;
-	virtual void handle_irq(int irqline, int state, u32 new_state, u32 tr_state) override;
-
-	u8 m_irq_delay;
 
 private:
 	static const u8 INSTRUCTION_CYCLES[256];
 	u8 pointer_r(offs_t offset);
 	void pointer_w(offs_t offset, u8 data);
 	void pointer_select_w(u8 data);
-	void interrupt_enable_w(u8 data);
-	void interrupt_priority_w(u8 data);
 
 	u16 m_other_dptr;
 	u8 m_dps;

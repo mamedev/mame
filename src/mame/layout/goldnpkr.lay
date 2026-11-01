@@ -1,170 +1,170 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+copyright-holders: Roberto Fresca
+
+**********************************************
+
+  Golden Poker Double-Up
+  High-Realism Internal Layout
+
+  3D Plastic Buttons with Layered Bevels
+
+**********************************************
 -->
 <mamelayout version="2">
-	<element name="BET" defstate="0">
-		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
-		<rect state="0"><color red="0.3" green="0.0" blue="0.0" /></rect>
-		<text string="BET">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
-		</text>
+
+	<!-- ELEMENTS -->
+
+	<!-- Red Button -->
+	<element name="red_btn" defstate="0">
+		<rect state="0"><color red="0.18" green="0.02" blue="0.02" /><bounds x="0.0" y="0.0" width="1.0" height="1.0" /></rect>
+		<rect state="1"><color red="0.48" green="0.04" blue="0.04" /><bounds x="0.0" y="0.0" width="1.0" height="1.0" /></rect>
+		
+		<rect><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.04" y="0.04" width="0.92" height="0.92" /></rect>
+		
+		<!-- button face -->
+		<rect state="0"><color red="0.38" green="0.02" blue="0.02" /><bounds x="0.08" y="0.08" width="0.84" height="0.84" /></rect>
+		<rect state="1"><color red="0.85" green="0.0" blue="0.0" /><bounds x="0.08" y="0.08" width="0.84" height="0.84" /></rect> 
+		
+		<!-- button face reflection -->
+		<rect state="0"><color red="0.44" green="0.08" blue="0.08" /><bounds x="0.12" y="0.12" width="0.76" height="0.25" /></rect> 
+		<rect state="1"><color red="1.0" green="0.3" blue="0.3" /><bounds x="0.12" y="0.12" width="0.76" height="0.25" /></rect> 
 	</element>
 
-	<element name="DEAL" defstate="0">
-		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
-		<rect state="0"><color red="0.3" green="0.0" blue="0.0" /></rect>
-		<text string="DEAL">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
-		</text>
+	<!-- Orange button -->
+	<element name="orange_btn" defstate="0">
+		<rect state="0"><color red="0.18" green="0.08" blue="0.02" /><bounds x="0.0" y="0.0" width="1.0" height="1.0" /></rect>
+		<rect state="1"><color red="0.48" green="0.22" blue="0.04" /><bounds x="0.0" y="0.0" width="1.0" height="1.0" /></rect>
+
+		<rect><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.04" y="0.04" width="0.92" height="0.92" /></rect>
+
+		<!-- button face -->
+		<rect state="0"><color red="0.38" green="0.15" blue="0.02" /><bounds x="0.08" y="0.08" width="0.84" height="0.84" /></rect>
+		<rect state="1"><color red="0.85" green="0.4" blue="0.0" /><bounds x="0.08" y="0.08" width="0.84" height="0.84" /></rect>
+
+		<!-- button face reflection -->
+		<rect state="0"><color red="0.46" green="0.20" blue="0.06" /><bounds x="0.12" y="0.12" width="0.76" height="0.25" /></rect>
+		<rect state="1"><color red="1.0" green="0.65" blue="0.3" /><bounds x="0.12" y="0.12" width="0.76" height="0.25" /></rect>
 	</element>
 
-	<element name="HOLD" defstate="0">
-		<rect state="1"><color red="1.0" green="0.5" blue="0.0" /></rect>
-		<rect state="0"><color red="0.3" green="0.1" blue="0.0" /></rect>
-		<text string="HOLD">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
-		</text>
+	<!-- White button -->
+	<element name="white_btn" defstate="0">
+		<rect state="0"><color red="0.07" green="0.07" blue="0.07" /><bounds x="0.0" y="0.0" width="1.0" height="1.0" /></rect>
+		<rect state="1"><color red="0.35" green="0.35" blue="0.35" /><bounds x="0.0" y="0.0" width="1.0" height="1.0" /></rect>
+
+		<rect><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.04" y="0.04" width="0.92" height="0.92" /></rect>
+		
+		<!-- button face -->
+		<rect state="0"><color red="0.12" green="0.12" blue="0.12" /><bounds x="0.08" y="0.08" width="0.84" height="0.84" /></rect>
+		<rect state="1"><color red="0.75" green="0.75" blue="0.75" /><bounds x="0.08" y="0.08" width="0.84" height="0.84" /></rect>
+		
+		<!-- button face reflection -->
+		<rect state="0"><color red="0.16" green="0.16" blue="0.16" /><bounds x="0.12" y="0.12" width="0.76" height="0.25" /></rect>
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0.12" y="0.12" width="0.76" height="0.25" /></rect>
 	</element>
 
-	<element name="D-UP" defstate="0">
-		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><color red="0.2" green="0.2" blue="0.2" /></rect>
-		<text string="D-UP">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
-		</text>
+
+	<!-- Secondary indicator lamps -->
+	<element name="green_ind" defstate="0">
+		<rect><color red="0.0" green="0.05" blue="0.0" /><bounds x="0.0" y="0.0" width="1.0" height="1.0" /></rect>
+		<rect><color red="0.0" green="0.25" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></rect>
+		<rect state="1"><color red="0.0" green="0.85" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></rect>
 	</element>
 
-	<element name="TAKE" defstate="0">
-		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><color red="0.2" green="0.2" blue="0.2" /></rect>
-		<text string="TAKE">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
-		</text>
+
+	<!-- Button text labels -->
+
+	<!-- Single line -->
+	<element name="txt_bet">
+		<text string="BET"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.18" y="0.28" width="0.64" height="0.45" /></text>
+	</element>
+	<element name="txt_big">
+		<text string="BIG"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.18" y="0.28" width="0.64" height="0.45" /></text>
+	</element>
+	<element name="txt_small">
+		<text string="SMALL"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.18" y="0.28" width="0.64" height="0.45" /></text>
+	</element>
+	<element name="txt_hold">
+		<text string="HOLD"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.18" y="0.28" width="0.64" height="0.45" /></text>
+	</element>
+	<element name="txt_deal">
+		<text string="DEAL"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.18" y="0.28" width="0.64" height="0.45" /></text>
+	</element>
+	<element name="txt_cancel">
+		<text string="CANCEL"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.18" y="0.28" width="0.64" height="0.45" /></text>
+	</element>
+	<element name="txt_dup">
+		<text string="D-UP"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.18" y="0.28" width="0.64" height="0.45" /></text>
+	</element>
+	<element name="txt_take">
+		<text string="TAKE"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.18" y="0.28" width="0.64" height="0.45" /></text>
 	</element>
 
-	<element name="BIG" defstate="0">
-		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><color red="0.2" green="0.2" blue="0.2" /></rect>
-		<text string="BIG">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
-		</text>
-	</element>
+	<!-- Bottom indicators -->
+	<element name="txt_he1"><text string="Hopper Ena.1"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="txt_he2"><text string="Hopper Ena.2"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="txt_div"><text string="Diverter"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="txt_col"><text string="Coin Lock"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 
-	<element name="SMALL" defstate="0">
-		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
-		<rect state="0"><color red="0.2" green="0.2" blue="0.2" /></rect>
-		<text string="SMALL">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
-		</text>
-	</element>
 
-	<element name="CANCEL" defstate="0">
-		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
-		<rect state="0"><color red="0.3" green="0.0" blue="0.0" /></rect>
-		<text string="CANCEL">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
-		</text>
-	</element>
-
-	<element name="HE1" defstate="0">
-		<rect state="1"><color red="0.0" green="0.5" blue="0.0" /></rect>
-		<rect state="0"><color red="0.5" green="0.0" blue="0.0" /></rect>
-		<text string="Hopper Ena.1">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
-		</text>
-	</element>
-
-	<element name="HE2" defstate="0">
-		<rect state="1"><color red="0.0" green="0.5" blue="0.0" /></rect>
-		<rect state="0"><color red="0.5" green="0.0" blue="0.0" /></rect>
-		<text string="Hopper Ena.2">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
-		</text>
-	</element>
-
-	<element name="DIV" defstate="0">
-		<rect state="1"><color red="0.0" green="0.5" blue="0.0" /></rect>
-		<rect state="0"><color red="0.5" green="0.0" blue="0.0" /></rect>
-		<text string="Diverter">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
-		</text>
-	</element>
-
-	<element name="COL" defstate="0">
-		<rect state="1"><color red="0.0" green="0.5" blue="0.0" /></rect>
-		<rect state="0"><color red="0.5" green="0.0" blue="0.0" /></rect>
-		<text string="Coin Lock">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
-		</text>
-	</element>
+	<!--=============== Screen view ===============-->
 
 	<view name="Button Lamps">
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<element name="lamp2" ref="HOLD" inputtag="IN0-2" inputmask="0x01">
-			<bounds x="0.25" y="3.13" width="0.50" height="0.24" />
-		</element>
-		<element name="lamp2" ref="HOLD" inputtag="IN0-2" inputmask="0x02">
-			<bounds x="0.85" y="3.13" width="0.50" height="0.24" />
-		</element>
-		<element name="lamp2" ref="HOLD" inputtag="IN0-2" inputmask="0x04">
-			<bounds x="1.45" y="3.13" width="0.50" height="0.24" />
-		</element>
-		<element name="lamp2" ref="HOLD" inputtag="IN0-2" inputmask="0x08">
-			<bounds x="2.05" y="3.13" width="0.50" height="0.24" />
-		</element>
-		<element name="lamp2" ref="HOLD" inputtag="IN0-2" inputmask="0x10">
-			<bounds x="2.65" y="3.13" width="0.50" height="0.24" />
-		</element>
-		<element name="lamp2" ref="CANCEL" inputtag="IN0-0" inputmask="0x10">
-			<bounds x="3.25" y="3.13" width="0.50" height="0.24" />
-		</element>
+		<!-- Top row -->
+		<element name="lamp2" ref="orange_btn" inputtag="IN0-2" inputmask="0x01"><bounds x="0.25" y="3.13" width="0.50" height="0.24" /></element>
+		<element ref="txt_hold"><bounds x="0.30" y="3.17" width="0.40" height="0.16" /></element>
+		
+		<element name="lamp2" ref="orange_btn" inputtag="IN0-2" inputmask="0x02"><bounds x="0.85" y="3.13" width="0.50" height="0.24" /></element>
+		<element ref="txt_hold"><bounds x="0.90" y="3.17" width="0.40" height="0.16" /></element>
+		
+		<element name="lamp2" ref="orange_btn" inputtag="IN0-2" inputmask="0x04"><bounds x="1.45" y="3.13" width="0.50" height="0.24" /></element>
+		<element ref="txt_hold"><bounds x="1.50" y="3.17" width="0.40" height="0.16" /></element>
+		
+		<element name="lamp2" ref="orange_btn" inputtag="IN0-2" inputmask="0x08"><bounds x="2.05" y="3.13" width="0.50" height="0.24" /></element>
+		<element ref="txt_hold"><bounds x="2.10" y="3.17" width="0.40" height="0.16" /></element>
+		
+		<element name="lamp2" ref="orange_btn" inputtag="IN0-2" inputmask="0x10"><bounds x="2.65" y="3.13" width="0.50" height="0.24" /></element>
+		<element ref="txt_hold"><bounds x="2.70" y="3.17" width="0.40" height="0.16" /></element>
+		
+		<element name="lamp2" ref="red_btn" inputtag="IN0-0" inputmask="0x10"><bounds x="3.25" y="3.13" width="0.50" height="0.24" /></element>
+		<element ref="txt_cancel"><bounds x="3.30" y="3.17" width="0.40" height="0.16" /></element>
 
-		<element name="lamp3" ref="TAKE" inputtag="IN0-1" inputmask="0x04">
-			<bounds x="0.25" y="3.45" width="0.50" height="0.24" />
-		</element>
-		<element name="lamp4" ref="SMALL" inputtag="IN0-1" inputmask="0x10">
-			<bounds x="0.85" y="3.45" width="0.50" height="0.24" />
-		</element>
-		<element name="lamp0" ref="BET" inputtag="IN0-0" inputmask="0x01">
-			<bounds x="1.45" y="3.45" width="0.50" height="0.24" />
-		</element>
-		<element name="lamp4" ref="BIG" inputtag="IN0-1" inputmask="0x08">
-			<bounds x="2.05" y="3.45" width="0.50" height="0.24" />
-		</element>
-		<element name="lamp3" ref="D-UP" inputtag="IN0-0" inputmask="0x04">
-			<bounds x="2.65" y="3.45" width="0.50" height="0.24" />
-		</element>
-		<element name="lamp1" ref="DEAL" inputtag="IN0-0" inputmask="0x08">
-			<bounds x="3.25" y="3.45" width="0.50" height="0.24" />
-		</element>
+		<!-- Middle row -->
+		<element name="lamp3" ref="white_btn" inputtag="IN0-1" inputmask="0x04"><bounds x="0.25" y="3.45" width="0.50" height="0.24" /></element>
+		<element ref="txt_take"><bounds x="0.30" y="3.49" width="0.40" height="0.16" /></element>
+		
+		<element name="lamp4" ref="white_btn" inputtag="IN0-1" inputmask="0x10"><bounds x="0.85" y="3.45" width="0.50" height="0.24" /></element>
+		<element ref="txt_small"><bounds x="0.90" y="3.49" width="0.40" height="0.16" /></element>
+		
+		<element name="lamp0" ref="red_btn" inputtag="IN0-0" inputmask="0x01"><bounds x="1.45" y="3.45" width="0.50" height="0.24" /></element>
+		<element ref="txt_bet"><bounds x="1.50" y="3.49" width="0.40" height="0.16" /></element>
+		
+		<element name="lamp4" ref="white_btn" inputtag="IN0-1" inputmask="0x08"><bounds x="2.05" y="3.45" width="0.50" height="0.24" /></element>
+		<element ref="txt_big"><bounds x="2.10" y="3.49" width="0.40" height="0.16" /></element>
+		
+		<element name="lamp3" ref="white_btn" inputtag="IN0-0" inputmask="0x04"><bounds x="2.65" y="3.45" width="0.50" height="0.24" /></element>
+		<element ref="txt_dup"><bounds x="2.70" y="3.49" width="0.40" height="0.16" /></element>
+		
+		<element name="lamp1" ref="red_btn" inputtag="IN0-0" inputmask="0x08"><bounds x="3.25" y="3.45" width="0.50" height="0.24" /></element>
+		<element ref="txt_deal"><bounds x="3.30" y="3.49" width="0.40" height="0.16" /></element>
 
-		<element name="lamp5" ref="HE1">
-			<bounds x="0.25" y="3.77" width="0.5" height="0.12" />
-		</element>
-		<element name="lamp6" ref="HE2">
-			<bounds x="0.85" y="3.77" width="0.5" height="0.12" />
-		</element>
-		<element name="lamp7" ref="DIV">
-			<bounds x="2.05" y="3.77" width="0.5" height="0.12" />
-		</element>
-		<element name="lamp8" ref="COL">
-			<bounds x="3.25" y="3.77" width="0.5" height="0.12" />
-		</element>
+		<!-- Bottom row: mech indicators -->
+		<element name="lamp5" ref="green_ind"><bounds x="0.25" y="3.77" width="0.5" height="0.12" /></element>
+		<element ref="txt_he1"><bounds x="0.27" y="3.79" width="0.46" height="0.08" /></element>
+
+		<element name="lamp6" ref="green_ind"><bounds x="0.85" y="3.77" width="0.5" height="0.12" /></element>
+		<element ref="txt_he2"><bounds x="0.87" y="3.79" width="0.46" height="0.08" /></element>
+
+		<element name="lamp7" ref="green_ind"><bounds x="2.05" y="3.77" width="0.5" height="0.12" /></element>
+		<element ref="txt_div"><bounds x="2.07" y="3.79" width="0.46" height="0.08" /></element>
+
+		<element name="lamp8" ref="green_ind"><bounds x="3.25" y="3.77" width="0.5" height="0.12" /></element>
+		<element ref="txt_col"><bounds x="3.27" y="3.79" width="0.46" height="0.08" /></element>
+
 	</view>
 </mamelayout>

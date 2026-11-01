@@ -466,7 +466,7 @@ void atomrr_state::extram_w(offs_t offset, uint8_t data)
 uint8_t atomrr_state::extram1_r(offs_t offset)
 {
 	if (BIT(m_switch_latch, 0))
-		return m_ram [offset | 0x6000];
+		return m_ram[offset | 0x6000];
 	else
 		return m_flash[offset | (m_rom_latch << 12)];
 }

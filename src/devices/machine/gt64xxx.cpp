@@ -356,14 +356,15 @@ void gt64xxx_device::map_cpu_space()
 	// RAS[0:3]
 	for (int ramIndex = 0; ramIndex < 4; ++ramIndex)
 	{
-		winStart = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex/2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
-		winEnd = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
+		winStart = sub_window_start(GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2), GREG_RAS0_LO + 0x8 / 4 * ramIndex);
+		winEnd = sub_window_end(GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2), GREG_RAS0_LO + 0x8 / 4 * ramIndex);
+		const bool winValid = winEnd >= winStart;
 		// Cap window end at physical memory bounds
 		uint32_t winSize = winEnd - winStart + 1;
 		if (winSize > m_ram[ramIndex].size() * 4)
 			winEnd = winStart + m_ram[ramIndex].size() * 4 - 1;
 		//m_ram[ramIndex].resize((winEnd + 1 - winStart) / 4);
-		if (m_ram[ramIndex].size()>0)
+		if (winValid && m_ram[ramIndex].size()>0)
 			m_cpu_space->install_ram(winStart, winEnd, m_ram[ramIndex].data());
 		//m_cpu->add_fastram(winStart, m_ram[ramIndex].size() * sizeof(m_ram[ramIndex][0]), false, &m_ram[ramIndex][0]);
 		//m_cpu->add_fastram(winStart, m_ram[ramIndex].size() * sizeof(uint32_t), false, m_ram[ramIndex].data());
@@ -374,31 +375,42 @@ void gt64xxx_device::map_cpu_space()
 	// CS[0:3]
 	for (int csIndex = 0; csIndex < 4; ++csIndex)
 	{
-		winStart = (m_reg[GREG_CS_2_0_LO + 0x10 / 4 * (csIndex / 3)] << 21) | (m_reg[GREG_CS0_LO + 0x8 / 4 * csIndex] << 20);
-		winEnd = (m_reg[GREG_CS_2_0_LO + 0x10 / 4 * (csIndex / 3)] << 21) | (m_reg[GREG_CS0_HI + 0x8 / 4 * csIndex] << 20) | 0xfffff;
-		m_cpu_space->install_device_delegate(winStart, winEnd, *m_cs_devices[csIndex], m_cs_maps[csIndex]);
+		winStart = sub_window_start(GREG_CS_2_0_LO + 0x10 / 4 * (csIndex / 3), GREG_CS0_LO + 0x8 / 4 * csIndex);
+		winEnd = sub_window_end(GREG_CS_2_0_LO + 0x10 / 4 * (csIndex / 3), GREG_CS0_LO + 0x8 / 4 * csIndex);
+		// a window is empty while software has written its low register but not its high
+		if (winEnd >= winStart)
+			m_cpu_space->install_device_delegate(winStart, winEnd, *m_cs_devices[csIndex], m_cs_maps[csIndex]);
 		logerror("map_cpu_space cs[%i] start: %08X end: %08X\n", csIndex, winStart, winEnd);
 	}
 
 	// PCI IO Window
-	winStart = m_reg[GREG_PCI_IO_LO]<<21;
-	winEnd =   (m_reg[GREG_PCI_IO_LO]<<21) | (m_reg[GREG_PCI_IO_HI]<<21) | 0x1fffff;
-	m_cpu_space->install_read_handler(winStart, winEnd, read32s_delegate(*this, FUNC(gt64xxx_device::master_io_r)));
-	m_cpu_space->install_write_handler(winStart, winEnd, write32s_delegate(*this, FUNC(gt64xxx_device::master_io_w)));
+	winStart = proc_window_start(GREG_PCI_IO_LO);
+	winEnd = proc_window_end(GREG_PCI_IO_LO);
+	if (winEnd >= winStart)
+	{
+		m_cpu_space->install_read_handler(winStart, winEnd, read32s_delegate(*this, FUNC(gt64xxx_device::master_io_r)));
+		m_cpu_space->install_write_handler(winStart, winEnd, write32s_delegate(*this, FUNC(gt64xxx_device::master_io_w)));
+	}
 	logerror("map_cpu_space pci_io start: %08X end: %08X\n", winStart, winEnd);
 
 	// PCI MEM0 Window
-	winStart = m_reg[GREG_PCI_MEM0_LO]<<21;
-	winEnd =   (m_reg[GREG_PCI_MEM0_LO]<<21) | (m_reg[GREG_PCI_MEM0_HI]<<21) | 0x1fffff;
-	m_cpu_space->install_read_handler(winStart, winEnd, read32s_delegate(*this, FUNC(gt64xxx_device::master_mem0_r)));
-	m_cpu_space->install_write_handler(winStart, winEnd, write32s_delegate(*this, FUNC(gt64xxx_device::master_mem0_w)));
+	winStart = proc_window_start(GREG_PCI_MEM0_LO);
+	winEnd = proc_window_end(GREG_PCI_MEM0_LO);
+	if (winEnd >= winStart)
+	{
+		m_cpu_space->install_read_handler(winStart, winEnd, read32s_delegate(*this, FUNC(gt64xxx_device::master_mem0_r)));
+		m_cpu_space->install_write_handler(winStart, winEnd, write32s_delegate(*this, FUNC(gt64xxx_device::master_mem0_w)));
+	}
 	logerror("map_cpu_space pci_mem0 start: %08X end: %08X\n", winStart, winEnd);
 
 	// PCI MEM1 Window
-	winStart = m_reg[GREG_PCI_MEM1_LO]<<21;
-	winEnd =   (m_reg[GREG_PCI_MEM1_LO]<<21) | (m_reg[GREG_PCI_MEM1_HI]<<21) | 0x1fffff;
-	m_cpu_space->install_read_handler(winStart, winEnd, read32s_delegate(*this, FUNC(gt64xxx_device::master_mem1_r)));
-	m_cpu_space->install_write_handler(winStart, winEnd, write32s_delegate(*this, FUNC(gt64xxx_device::master_mem1_w)));
+	winStart = proc_window_start(GREG_PCI_MEM1_LO);
+	winEnd = proc_window_end(GREG_PCI_MEM1_LO);
+	if (winEnd >= winStart)
+	{
+		m_cpu_space->install_read_handler(winStart, winEnd, read32s_delegate(*this, FUNC(gt64xxx_device::master_mem1_r)));
+		m_cpu_space->install_write_handler(winStart, winEnd, write32s_delegate(*this, FUNC(gt64xxx_device::master_mem1_w)));
+	}
 	logerror("map_cpu_space pci_mem1 start: %08X end: %08X\n", winStart, winEnd);
 
 	// Setup the address mapping table for DMA lookups
@@ -431,45 +443,46 @@ void gt64xxx_device::map_cpu_space()
 void gt64xxx_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-	int ramIndex;
-	uint32_t winStart, winEnd, winSize;
+	using ras_read = uint32_t (gt64xxx_device::*)(offs_t, uint32_t);
+	using ras_write = void (gt64xxx_device::*)(offs_t, uint32_t, uint32_t);
+	static constexpr ras_read RAS_R[4] = {
+			&gt64xxx_device::ras_0_r, &gt64xxx_device::ras_1_r, &gt64xxx_device::ras_2_r, &gt64xxx_device::ras_3_r };
+	static constexpr ras_write RAS_W[4] = {
+			&gt64xxx_device::ras_0_w, &gt64xxx_device::ras_1_w, &gt64xxx_device::ras_2_w, &gt64xxx_device::ras_3_w };
 
 	// Not sure if GREG_R1_0_LO should be added on PCI address map side.
-	// RAS0
-	ramIndex = 0;
-	winStart = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
-	winEnd = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
-	winSize = winEnd - winStart + 1;
-	memory_space->install_read_handler(winStart, winEnd, read32s_delegate(*this, FUNC(gt64xxx_device::ras_0_r)));
-	memory_space->install_write_handler(winStart, winEnd, write32s_delegate(*this, FUNC(gt64xxx_device::ras_0_w)));
-	LOGGALILEO("map_extra RAS0 start=%08X end=%08X size=%08X\n", winStart, winEnd, winSize);
+	for (int ramIndex = 0; ramIndex < 4; ramIndex++)
+	{
+		const uint32_t winStart = sub_window_start(GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2), GREG_RAS0_LO + 0x8 / 4 * ramIndex);
+		uint32_t winEnd = sub_window_end(GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2), GREG_RAS0_LO + 0x8 / 4 * ramIndex);
+		if ((winEnd < winStart) || m_ram[ramIndex].empty())
+			continue;
+		if ((winEnd - winStart + 1) > m_ram[ramIndex].size() * 4)
+			winEnd = winStart + m_ram[ramIndex].size() * 4 - 1;
 
-	// RAS1
-	ramIndex = 1;
-	winStart = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
-	winEnd = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
-	winSize = winEnd - winStart + 1;
-	memory_space->install_read_handler(winStart, winEnd, read32s_delegate(*this, FUNC(gt64xxx_device::ras_1_r)));
-	memory_space->install_write_handler(winStart, winEnd, write32s_delegate(*this, FUNC(gt64xxx_device::ras_1_w)));
-	LOGGALILEO("map_extra RAS1 start=%08X end=%08X size=%08X\n", winStart, winEnd, winSize);
-
-	// RAS2
-	ramIndex = 2;
-	winStart = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
-	winEnd = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
-	winSize = winEnd - winStart + 1;
-	memory_space->install_read_handler(winStart, winEnd, read32s_delegate(*this, FUNC(gt64xxx_device::ras_2_r)));
-	memory_space->install_write_handler(winStart, winEnd, write32s_delegate(*this, FUNC(gt64xxx_device::ras_2_w)));
-	LOGGALILEO("map_extra RAS2 start=%08X end=%08X size=%08X\n", winStart, winEnd, winSize);
-
-	// RAS3
-	ramIndex = 3;
-	winStart = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_LO + 0x8 / 4 * ramIndex] << 20);
-	winEnd = (m_reg[GREG_R1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
-	winSize = winEnd - winStart + 1;
-	memory_space->install_read_handler(winStart, winEnd, read32s_delegate(*this, FUNC(gt64xxx_device::ras_3_r)));
-	memory_space->install_write_handler(winStart, winEnd, write32s_delegate(*this, FUNC(gt64xxx_device::ras_3_w)));
-	LOGGALILEO("map_extra RAS3 start=%08X end=%08X size=%08X\n", winStart, winEnd, winSize);
+		if (m_be)
+		{
+			// PCI masters see a big-endian CPU's memory byte for byte
+			auto const ras_be_r =
+					[this, winStart] (offs_t offset, uint32_t mem_mask) -> uint32_t
+					{
+						return swapendian_int32(m_cpu_space->read_dword(winStart + offset * 4, swapendian_int32(mem_mask)));
+					};
+			auto const ras_be_w =
+					[this, winStart] (offs_t offset, uint32_t data, uint32_t mem_mask)
+					{
+						m_cpu_space->write_dword(winStart + offset * 4, swapendian_int32(data), swapendian_int32(mem_mask));
+					};
+			memory_space->install_read_handler(winStart, winEnd, read32s_delegate(*this, NAME(ras_be_r)));
+			memory_space->install_write_handler(winStart, winEnd, write32s_delegate(*this, NAME(ras_be_w)));
+		}
+		else
+		{
+			memory_space->install_read_handler(winStart, winEnd, read32s_delegate(*this, RAS_R[ramIndex], "gt64xxx_device::ras_r"));
+			memory_space->install_write_handler(winStart, winEnd, write32s_delegate(*this, RAS_W[ramIndex], "gt64xxx_device::ras_w"));
+		}
+		LOGGALILEO("map_extra RAS%d start=%08X end=%08X size=%08X\n", ramIndex, winStart, winEnd, winEnd - winStart + 1);
+	}
 }
 
 void gt64xxx_device::reset_all_mappings()
@@ -490,7 +503,7 @@ void gt64xxx_device::pci_stall(int state)
 			// Should actually check for a stall after each write...
 			while (m_stall_windex > 0) {
 				// master_mem0_w -- Should actually be checking for master_mem1_w as well
-				this->space(AS_PCI_MEM).write_dword((m_reg[GREG_PCI_MEM0_LO] << 21) | (m_cpu_stalled_offset[index] * 4),
+				this->space(AS_PCI_MEM).write_dword(proc_window_start(GREG_PCI_MEM0_LO) + (m_cpu_stalled_offset[index] * 4),
 					m_cpu_stalled_data[index], m_cpu_stalled_mem_mask[index]);
 				LOGGALILEO("pci_stall: Writing index: %d offset: %08x data: %08x mask: %08x\n",
 					index, m_cpu_stalled_offset[index] * 4, m_cpu_stalled_data[index], m_cpu_stalled_mem_mask[index]);
@@ -521,8 +534,8 @@ void gt64xxx_device::pci_config_w(offs_t offset, uint32_t data, uint32_t mem_mas
 // PCI Master Window 0
 uint32_t gt64xxx_device::master_mem0_r(offs_t offset, uint32_t mem_mask)
 {
-	uint32_t result = this->space(AS_PCI_MEM).read_dword((m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), mem_mask);
-	LOGPCI("%s galileo pci mem0 read from offset %08X = %08X & %08X\n", machine().describe_context(), (m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), result, mem_mask);
+	uint32_t result = this->space(AS_PCI_MEM).read_dword(proc_window_start(GREG_PCI_MEM0_LO) + (offset*4), mem_mask);
+	LOGPCI("%s galileo pci mem0 read from offset %08X = %08X & %08X\n", machine().describe_context(), proc_window_start(GREG_PCI_MEM0_LO) + (offset*4), result, mem_mask);
 	return result;
 }
 void gt64xxx_device::master_mem0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -545,39 +558,39 @@ void gt64xxx_device::master_mem0_w(offs_t offset, uint32_t data, uint32_t mem_ma
 		}
 		return;
 	}
-	this->space(AS_PCI_MEM).write_dword((m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), data, mem_mask);
-	LOGPCI("%s galileo pci mem0 write to offset %08X = %08X & %08X\n", machine().describe_context(), (m_reg[GREG_PCI_MEM0_LO]<<21) | (offset*4), data, mem_mask);
+	this->space(AS_PCI_MEM).write_dword(proc_window_start(GREG_PCI_MEM0_LO) + (offset*4), data, mem_mask);
+	LOGPCI("%s galileo pci mem0 write to offset %08X = %08X & %08X\n", machine().describe_context(), proc_window_start(GREG_PCI_MEM0_LO) + (offset*4), data, mem_mask);
 }
 
 // PCI Master Window 1
 uint32_t gt64xxx_device::master_mem1_r(offs_t offset, uint32_t mem_mask)
 {
-	uint32_t result = this->space(AS_PCI_MEM).read_dword((m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), mem_mask);
-	LOGPCI("%s galileo pci mem1 read from offset %08X = %08X & %08X\n", machine().describe_context(), (m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), result, mem_mask);
+	uint32_t result = this->space(AS_PCI_MEM).read_dword(proc_window_start(GREG_PCI_MEM1_LO) + (offset*4), mem_mask);
+	LOGPCI("%s galileo pci mem1 read from offset %08X = %08X & %08X\n", machine().describe_context(), proc_window_start(GREG_PCI_MEM1_LO) + (offset*4), result, mem_mask);
 	return result;
 }
 void gt64xxx_device::master_mem1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	this->space(AS_PCI_MEM).write_dword((m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), data, mem_mask);
-	LOGPCI("%s galileo pci mem1 write to offset %08X = %08X & %08X\n", machine().describe_context(), (m_reg[GREG_PCI_MEM1_LO]<<21) | (offset*4), data, mem_mask);
+	this->space(AS_PCI_MEM).write_dword(proc_window_start(GREG_PCI_MEM1_LO) + (offset*4), data, mem_mask);
+	LOGPCI("%s galileo pci mem1 write to offset %08X = %08X & %08X\n", machine().describe_context(), proc_window_start(GREG_PCI_MEM1_LO) + (offset*4), data, mem_mask);
 }
 
 // PCI Master IO
 uint32_t gt64xxx_device::master_io_r(offs_t offset, uint32_t mem_mask)
 {
-	uint32_t result = this->space(AS_PCI_IO).read_dword((m_reg[GREG_PCI_IO_LO] << 21) | (offset * 4), mem_mask);
+	uint32_t result = this->space(AS_PCI_IO).read_dword(proc_window_start(GREG_PCI_IO_LO) + (offset * 4), mem_mask);
 	if (m_prev_addr != offset) {
 		m_prev_addr = offset;
-		LOGPCI("%s galileo pci io read from offset %08X = %08X & %08X\n", machine().describe_context(), (m_reg[GREG_PCI_IO_LO] << 21) | (offset * 4), result, mem_mask);
+		LOGPCI("%s galileo pci io read from offset %08X = %08X & %08X\n", machine().describe_context(), proc_window_start(GREG_PCI_IO_LO) + (offset * 4), result, mem_mask);
 	}
 	return result;
 }
 void gt64xxx_device::master_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	this->space(AS_PCI_IO).write_dword((m_reg[GREG_PCI_IO_LO] << 21) | (offset * 4), data, mem_mask);
+	this->space(AS_PCI_IO).write_dword(proc_window_start(GREG_PCI_IO_LO) + (offset * 4), data, mem_mask);
 	if (m_prev_addr != offset) {
 		m_prev_addr = offset;
-		LOGPCI("%s galileo pci io write to offset %08X = %08X & %08X\n", machine().describe_context(), (m_reg[GREG_PCI_IO_LO] << 21) | (offset * 4), data, mem_mask);
+		LOGPCI("%s galileo pci io write to offset %08X = %08X & %08X\n", machine().describe_context(), proc_window_start(GREG_PCI_IO_LO) + (offset * 4), data, mem_mask);
 	}
 }
 
@@ -757,14 +770,18 @@ void gt64xxx_device::cpu_if_w(address_space &space, offs_t offset, uint32_t data
 				if (m_dma_active==0)
 					m_dma_timer->adjust(DMA_TIMER_PERIOD, 0, DMA_TIMER_PERIOD);
 				m_dma_active |= (1<< which);
+
+				// the channel is active from now on, not only once its first burst goes out
+				m_reg[offset] |= 0x4000;
 				//perform_dma(space, which);
 				LOGDMA("%s Galileo starting DMA Chan %i\n", machine().describe_context(), which);
 			}
 			if ((oldata & 0x1000) && !(data & 0x1000) && (m_dma_active & (1 << which)))
 			{
 				m_dma_active &= ~(1 << which);
-				// Turn off the timer
-				m_dma_timer->adjust(attotime::never);
+				// Turn off the timer once no channel is left
+				if (!m_dma_active)
+					m_dma_timer->adjust(attotime::never);
 				LOGDMA("%s Galileo stopping DMA Chan %i\n", machine().describe_context(), which);
 			}
 
@@ -1009,13 +1026,16 @@ TIMER_CALLBACK_MEMBER (gt64xxx_device::perform_dma)
 	int which = -1;
 	for (int i = 1; i <= 4; i++)
 	{
-		which = (m_last_dma + i) % 4;
-		if ((m_dma_active & (1 << which)) && (m_reg[GREG_DMA0_CONTROL + which] & 0x1000))
+		const int channel = (m_last_dma + i) % 4;
+		if ((m_dma_active & (1 << channel)) && (m_reg[GREG_DMA0_CONTROL + channel] & 0x1000))
+		{
+			which = channel;
 			break;
-
+		}
 	}
 	// Save which dma is processed for arbitration next time
-	m_last_dma = which;
+	if (which != -1)
+		m_last_dma = which;
 
 	if (which==-1)
 	{
@@ -1068,8 +1088,9 @@ TIMER_CALLBACK_MEMBER (gt64xxx_device::perform_dma)
 				// Signal error and abort DMA
 				m_dma_active &= ~(1 << which);
 				m_retry_count = 0;
-				// Turn off the timer
-				m_dma_timer->adjust(attotime::never);
+				// Turn off the timer once no channel is left
+				if (!m_dma_active)
+					m_dma_timer->adjust(attotime::never);
 				// Set the RetryCtr interrupt
 				m_irq_pending |= 1 << (GINT_DMA0COMP_SHIFT + which);
 				update_irqs();
@@ -1091,7 +1112,10 @@ TIMER_CALLBACK_MEMBER (gt64xxx_device::perform_dma)
 			}
 			else
 			{
-				dstSpace->write_dword(dstaddr, srcSpace->read_dword(srcaddr));
+				uint32_t data = srcSpace->read_dword(srcaddr);
+				if (srcSpace->endianness() != dstSpace->endianness())
+					data = swapendian_int32(data);
+				dstSpace->write_dword(dstaddr, data);
 				srcaddr += srcinc * 4;
 				dstaddr += dstinc * 4;
 				bytesleft -= 4;
@@ -1119,8 +1143,12 @@ TIMER_CALLBACK_MEMBER (gt64xxx_device::perform_dma)
 				LOGDMA("gt64xxx_device: Done DMA descriptors time: %s\n", machine().time().as_string());
 				m_dma_active &= ~(1 << which);
 
-				// Turn off the timer
-				m_dma_timer->adjust(attotime::never);
+				// the channel disables itself and goes idle, chained or not
+				m_reg[GREG_DMA0_CONTROL + which] &= ~0x5000;
+
+				// Turn off the timer once no channel is left
+				if (!m_dma_active)
+					m_dma_timer->adjust(attotime::never);
 
 				// no more descriptors interrupt (bit 10) in chained mode (not bit 9)
 				if ((m_reg[GREG_DMA0_CONTROL + which] & (1 << 10)) && !(m_reg[GREG_DMA0_CONTROL + which] & (1 << 9)))

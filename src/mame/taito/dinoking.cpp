@@ -205,8 +205,8 @@ void hkuranai_printer_device::send(u8 data)
     for a read and whose high nibble is the first register; the address
     auto-increments.  Registers 0-6 are the BCD time (seconds, minutes,
     hours (24h), weekday, day, month, year), 7-15 are alarm / control
-    registers which the game only ever clears.  The exact chip has not
-    been identified.
+    registers which the game only ever clears.  The exact chip has been
+    verified as a Epson RTC-4574SA.
 */
 class hkuranai_rtc_device : public device_t, public device_rtc_interface
 {

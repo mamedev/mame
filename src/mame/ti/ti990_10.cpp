@@ -88,9 +88,10 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_terminal(*this, "vdt911")
 		, m_intlines(0)
-		, m_ckon_state(0) { }
+		, m_ckon_state(0)
+	{ }
 
-	void ti990_10(machine_config &config);
+	void ti990_10(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -112,6 +113,7 @@ private:
 
 	void hold_load();
 	void set_int_line(int line, int state);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<vdt911_device> m_terminal;
@@ -127,22 +129,20 @@ private:
 
 void ti990_10_state::set_int_line(int line, int state)
 {
-	int level;
-
-
 	if (state)
 		m_intlines |= (1 << line);
 	else
 		m_intlines &= ~ (1 << line);
 
 	if (m_intlines)
-	{
-		for (level = 0; ! (m_intlines & (1 << level)); level++)
-			;
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, level);  /* TI990_10 - interrupt it, baby */
-	}
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	else
 		m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(ti990_10_state::cpu_acknowledge_irq)
+{
+	return std::countr_zero(m_intlines);
 }
 
 
@@ -338,6 +338,7 @@ void ti990_10_state::ti990_10(machine_config &config)
 	TI990_10(config, m_maincpu, 4000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti990_10_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &ti990_10_state::io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(ti990_10_state::cpu_acknowledge_irq));
 
 	// VDT 911 terminal
 	VDT911(config, m_terminal);

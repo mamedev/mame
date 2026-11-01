@@ -14,7 +14,6 @@
 #include "gba.h"
 
 #include "bus/gba/rom.h"
-#include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/gb.h"
 
@@ -1161,18 +1160,11 @@ uint32_t gba_cons_state::gba_bios_r(offs_t offset, uint32_t mem_mask)
 			return 0;
 	}
 
-	const uint32_t pc = m_maincpu->pc();
-	if (pc >= 0x4000)
+	if (m_maincpu->pc() >= 0x4000)
 	{
 		// The BIOS can only be read while executing from it; other reads return the most recently
 		// fetched BIOS opcode as per GBATEK.
-		return m_bios_prefetch;
-	}
-
-	// The core prefetches 2 words ahead of the PC like the real pipeline, so PC+8
-	if (((offset << 2) == ((pc & ~3) + 8)) && !machine().side_effects_disabled())
-	{
-		m_bios_prefetch = rom[offset];
+		return m_maincpu->fetch_shadow();
 	}
 
 	return rom[offset];
@@ -1275,8 +1267,8 @@ void gba_state::dma_vblank_callback(int state)
 void gba_state::gba_map(address_map &map)
 {
 	map.unmap_value_high(); // for "Fruit Mura no Doubutsu Tachi" and "Classic NES Series"
-	map(0x02000000, 0x0203ffff).ram().mirror(0xfc0000); // External RAM (16 bit)
-	map(0x03000000, 0x03007fff).ram().mirror(0xff8000); // Internal RAM (32 bit)
+	map(0x02000000, 0x0203ffff).ram().mirror(0xfc0000).share("ewram"); // External RAM (16 bit)
+	map(0x03000000, 0x03007fff).ram().mirror(0xff8000).share("iwram"); // Internal RAM (32 bit)
 	map(0x04000000, 0x0400005f).rw("lcd", FUNC(gba_lcd_device::video_r), FUNC(gba_lcd_device::video_w));
 	map(0x04000060, 0x040003ff).rw(FUNC(gba_state::gba_io_r), FUNC(gba_state::gba_io_w));
 	map(0x04000400, 0x04ffffff).noprw();                                         // Not used
@@ -1365,6 +1357,10 @@ void gba_state::machine_reset()
 
 void gba_state::machine_start()
 {
+	// the recompiler accesses the work RAM in place
+	m_maincpu->arm7drc_add_fastram(0x02000000, 0x0203ffff, false, memshare("ewram")->ptr());
+	m_maincpu->arm7drc_add_fastram(0x03000000, 0x03007fff, false, memshare("iwram")->ptr());
+
 	/* and one for each DMA channel */
 	m_dma_timer[0] = timer_alloc(FUNC(gba_state::dma_complete), this);
 	m_dma_timer[1] = timer_alloc(FUNC(gba_state::dma_complete), this);
@@ -1408,8 +1404,6 @@ void gba_state::machine_start()
 void gba_cons_state::machine_start()
 {
 	gba_state::machine_start();
-
-	save_item(NAME(m_bios_prefetch));
 
 	// install the cart ROM & SRAM into the address map, if present
 	if (m_cart->exists())
@@ -1522,6 +1516,7 @@ void gba_cons_state::gbadv_cons(machine_config &config)
 	gbadv(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &gba_cons_state::gba_cons_map);
+	m_maincpu->set_fetch_shadow(0x00000000, 0x00003fff);     // the BIOS protection returns the last opcode fetched there
 
 	GBA_CART_SLOT(config, m_cart, gba_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("gba");

@@ -20,6 +20,8 @@
 #include <bit>
 #include <cfenv>
 #include <cmath>
+#include <cstdio>
+#include <cstdlib>
 
 #if defined(__clang_major__) && (__clang_major__ < 12)
 // can't guarantee floating point environment control works
@@ -359,7 +361,7 @@ class drcbe_c : public drcbe_interface
 {
 public:
 	// construction/destruction
-	drcbe_c(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits);
+	drcbe_c(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits, uint32_t max_sequence_length);
 	virtual ~drcbe_c();
 
 	// required overrides
@@ -368,8 +370,8 @@ public:
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
 	virtual bool hash_exists(uint32_t mode, uint32_t pc) const noexcept override;
 	virtual void hash_invalidate_range(uint32_t pcstart, uint32_t pcend) noexcept override;
-	virtual drccodeptr hash_get_codeptr(uint32_t mode, uint32_t pc) const noexcept override;
-	virtual bool hash_set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code) noexcept override;
+	virtual hash_codeptr hash_get_codeptr(uint32_t mode, uint32_t pc) const noexcept override;
+	virtual bool hash_set_codeptr(uint32_t mode, uint32_t pc, hash_codeptr code) noexcept override;
 	virtual void get_info(drcbe_info &info) const noexcept override;
 
 private:
@@ -441,9 +443,17 @@ const uint32_t drcbe_c::s_condition_map[] =
 //  drcbe_c - constructor
 //-------------------------------------------------
 
-drcbe_c::drcbe_c(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits) :
+drcbe_c::drcbe_c(
+		drcuml_state &drcuml,
+		device_t &device,
+		drc_cache &cache,
+		uint32_t flags,
+		int modes,
+		int addrbits,
+		int ignorebits,
+		uint32_t max_sequence_length) :
 	drcbe_interface(drcuml, cache, device),
-	m_hash(cache, modes, addrbits, ignorebits, drcuml.max_sequence_length()),
+	m_hash(cache, modes, addrbits, ignorebits, max_sequence_length),
 	m_map(cache, 0xaaaaaaaa55555555),
 	m_fixup_delegate(&drcbe_c::fixup_label, this)
 {
@@ -717,14 +727,30 @@ void drcbe_c::hash_invalidate_range(uint32_t pcstart, uint32_t pcend) noexcept
 //  at code it generated earlier
 //-------------------------------------------------
 
-drccodeptr drcbe_c::hash_get_codeptr(uint32_t mode, uint32_t pc) const noexcept
+drcbe_c::hash_codeptr drcbe_c::hash_get_codeptr(uint32_t mode, uint32_t pc) const noexcept
 {
-	return m_hash.code_exists(mode, pc) ? m_hash.get_codeptr(mode, pc) : nullptr;
+	if (m_hash.code_exists(mode, pc))
+		return hash_codeptr{ m_hash.get_codeptr(mode, pc), m_cache.flush_count() };
+	else
+		return hash_codeptr();
 }
 
-bool drcbe_c::hash_set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code) noexcept
+bool drcbe_c::hash_set_codeptr(uint32_t mode, uint32_t pc, hash_codeptr code) noexcept
 {
-	return m_hash.set_codeptr(mode, pc, code);
+	if (UNEXPECTED((m_cache.flush_count() != code.aux) || !m_cache.contains_transient_pointer(code.ptr)))
+	{
+		if (!code.ptr)
+			osd_printf_error("drcbe_c(%s): Attempt to connect %u:%x to null code pointer.\n", m_device.tag(), mode, pc);
+		else if (m_cache.flush_count() != code.aux)
+			osd_printf_error("drcbe_c(%s): Attempt to connect %u:%x to code pointer from previous generation.\n", m_device.tag(), mode, pc);
+		else
+			osd_printf_error("drcbe_c(%s): Attempt to connect %u:%x to code pointer outside transient cache.\n", m_device.tag(), mode, pc);
+		std::fflush(stdout);
+		std::fflush(stderr);
+		std::abort();
+	}
+
+	return m_hash.set_codeptr(mode, pc, code.ptr);
 }
 
 
@@ -2618,9 +2644,10 @@ std::unique_ptr<drcbe_interface> make_drcbe_c(
 		uint32_t flags,
 		int modes,
 		int addrbits,
-		int ignorebits)
+		int ignorebits,
+		uint32_t max_sequence_length)
 {
-	return std::unique_ptr<drcbe_interface>(new drcbe_c(drcuml, device, cache, flags, modes, addrbits, ignorebits));
+	return std::unique_ptr<drcbe_interface>(new drcbe_c(drcuml, device, cache, flags, modes, addrbits, ignorebits, max_sequence_length));
 }
 
 } // namespace drc

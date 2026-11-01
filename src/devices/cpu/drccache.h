@@ -54,11 +54,15 @@ public:
 	// getters
 	drccodeptr near() const { return m_near; }
 	drccodeptr top() const { return m_top; }
+	uint32_t flush_count() const { return m_flush_count; }
 
 	// pointer checking
-	bool contains_pointer(const void *ptr) const { return ((drccodeptr)ptr >= m_near && (drccodeptr)ptr < m_near + m_size); }
-	bool contains_near_pointer(const void *ptr) const { return ((drccodeptr)ptr >= m_near && (drccodeptr)ptr < m_neartop); }
-	bool generating_code() const { return (m_codegen != nullptr); }
+	bool contains_pointer(void const *ptr) const noexcept { return ((drccodeptr)ptr >= m_near) && ((drccodeptr)ptr < m_near + m_size); }
+	bool contains_near_pointer(void const *ptr) const noexcept { return ((drccodeptr)ptr >= m_near && (drccodeptr)ptr < m_neartop); }
+	bool contains_invariant_pointer(void const *ptr) const noexcept { return ((drccodeptr)ptr >= m_neartop) && ((drccodeptr)ptr < m_invartop); }
+	bool contains_transient_pointer(void const *ptr) const noexcept { return ((drccodeptr)ptr >= m_invartop) && ((drccodeptr)ptr < m_top); }
+	std::ptrdiff_t pointer_offset(void const *ptr) const noexcept { return (drccodeptr)ptr - m_near; }
+	bool generating_code() const noexcept { return (m_codegen != nullptr); }
 
 	// cache memory allocation
 	void flush() noexcept;
@@ -68,7 +72,7 @@ public:
 	void *alloc_transient(std::size_t bytes, std::align_val_t align) noexcept;
 	void dealloc(void *memory, std::size_t bytes) noexcept;
 
-	template <typename T, typename... Params>
+	template <typename T, typename... Params> requires (!std::is_array_v<T>)
 	T *alloc(Params &&... args)
 	{
 		auto const result = reinterpret_cast<T *>(alloc(sizeof(T), std::align_val_t(alignof(T))));
@@ -87,7 +91,16 @@ public:
 		return result;
 	}
 
-	template <typename T, typename... Params>
+	template <typename T> requires (std::is_unbounded_array_v<T>)
+	std::remove_extent_t<T> *alloc(std::size_t count)
+	{
+		using Elem = std::remove_extent_t<T>;
+		static_assert(std::is_trivially_constructible_v<Elem>);
+		static_assert(std::is_trivially_destructible_v<Elem>);
+		return reinterpret_cast<Elem *>(alloc(sizeof(Elem) * count, std::align_val_t(alignof(Elem))));
+	}
+
+	template <typename T, typename... Params> requires (!std::is_array_v<T>)
 	T *alloc_near(Params &&... args)
 	{
 		auto const result = reinterpret_cast<T *>(alloc_near(sizeof(T), std::align_val_t(alignof(T))));
@@ -104,6 +117,75 @@ public:
 			}
 		}
 		return result;
+	}
+
+	template <typename T> requires (std::is_unbounded_array_v<T>)
+	std::remove_extent_t<T> *alloc_near(std::size_t count)
+	{
+		using Elem = std::remove_extent_t<T>;
+		static_assert(std::is_trivially_constructible_v<Elem>);
+		static_assert(std::is_trivially_destructible_v<Elem>);
+		return reinterpret_cast<Elem *>(alloc_near(sizeof(Elem) * count, std::align_val_t(alignof(Elem))));
+	}
+
+	template <typename T, typename... Params> requires (!std::is_array_v<T>)
+	T *alloc_invariant(Params &&... args)
+	{
+		static_assert(std::is_trivially_destructible_v<T>);
+		auto const old_top = m_top;
+		auto const result = reinterpret_cast<T *>(alloc_invariant(sizeof(T), std::align_val_t(alignof(T))));
+		if (result)
+		{
+			try
+			{
+				new (result) T(std::forward<Params>(args)...);
+			}
+			catch (...)
+			{
+				m_top = old_top;
+				throw;
+			}
+		}
+		return result;
+	}
+
+	template <typename T> requires (std::is_unbounded_array_v<T>)
+	std::remove_extent_t<T> *alloc_invariant(std::size_t count)
+	{
+		using Elem = std::remove_extent_t<T>;
+		static_assert(std::is_trivially_constructible_v<Elem>);
+		static_assert(std::is_trivially_destructible_v<Elem>);
+		return reinterpret_cast<Elem *>(alloc_invariant(sizeof(Elem) * count, std::align_val_t(alignof(Elem))));
+	}
+
+	template <typename T, typename... Params> requires (!std::is_array_v<T>)
+	T *alloc_transient(Params &&... args)
+	{
+		static_assert(std::is_trivially_destructible_v<T>);
+		auto const old_top = m_top;
+		auto const result = reinterpret_cast<T *>(alloc_transient(sizeof(T), std::align_val_t(alignof(T))));
+		if (result)
+		{
+			try
+			{
+				new (result) T(std::forward<Params>(args)...);
+			}
+			catch (...)
+			{
+				m_invartop = m_top = old_top;
+				throw;
+			}
+		}
+		return result;
+	}
+
+	template <typename T> requires (std::is_unbounded_array_v<T>)
+	std::remove_extent_t<T> *alloc_transient(std::size_t count)
+	{
+		using Elem = std::remove_extent_t<T>;
+		static_assert(std::is_trivially_constructible_v<Elem>);
+		static_assert(std::is_trivially_destructible_v<Elem>);
+		return reinterpret_cast<Elem *>(alloc_transient(sizeof(Elem) * count, std::align_val_t(alignof(Elem))));
 	}
 
 	// codegen helpers

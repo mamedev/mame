@@ -28,7 +28,6 @@
 
 TODO:
 - Cleanups
-- Write a DRC
 
 *****************************************************************************/
 
@@ -36,11 +35,14 @@ TODO:
 #include "arm7.h"
 
 #include "arm7core.h"   //include arm7 core
+#include "arm7fe.h"
 #include "arm7help.h"
 
 #include "debug/debugcon.h"
 #include "debugger.h"
+#include "emuopts.h"
 
+#include <algorithm>
 #include <cassert>
 
 #define LOG_MMU             (1U << 1)
@@ -60,13 +62,12 @@ TODO:
 #define PRINT_HAPYFSH2      (0)
 #define PRINT_CE_KERNEL     (0)
 
-/* prototypes of coprocessor functions */
-void arm7_dt_r_callback(arm_state *arm, uint32_t insn, uint32_t *prn, uint32_t (*read32)(arm_state *arm, uint32_t addr));
-void arm7_dt_w_callback(arm_state *arm, uint32_t insn, uint32_t *prn, void (*write32)(arm_state *arm, uint32_t addr, uint32_t data));
+namespace {
 
-// holder for the co processor Data Transfer Read & Write Callback funcs
-void (*arm7_coproc_dt_r_callback)(arm_state *arm, uint32_t insn, uint32_t *prn, uint32_t (*read32)(arm_state *arm, uint32_t addr));
-void (*arm7_coproc_dt_w_callback)(arm_state *arm, uint32_t insn, uint32_t *prn, void (*write32)(arm_state *arm, uint32_t addr, uint32_t data));
+// the recompiler's code cache: the code of a large OS with its hash tables; only what is touched is resident
+constexpr size_t DRC_CACHE_SIZE = 128 * 1024 * 1024;
+
+} // anonymous namespace
 
 
 DEFINE_DEVICE_TYPE(ARM1,         arm1_cpu_device,         "arm1",         "ARM1")
@@ -74,6 +75,7 @@ DEFINE_DEVICE_TYPE(ARM2,         arm2_cpu_device,         "arm2",         "ARM2"
 DEFINE_DEVICE_TYPE(ARM250,       arm250_cpu_device,       "arm250",       "ARM250")
 DEFINE_DEVICE_TYPE(ARM3,         arm3_cpu_device,         "arm3",         "ARM3")
 DEFINE_DEVICE_TYPE(ARM60,        arm60_cpu_device,        "arm60",        "ARM60")
+DEFINE_DEVICE_TYPE(ARM60_BE,     arm60_be_cpu_device,     "arm60_be",     "ARM60 (big)")
 DEFINE_DEVICE_TYPE(ARM610,       arm610_cpu_device,       "arm610",       "ARM610")
 DEFINE_DEVICE_TYPE(ARM610_BE,    arm610_be_cpu_device,    "arm610_be",    "ARM610 (big)")
 DEFINE_DEVICE_TYPE(ARM7,         arm7_cpu_device,         "arm7_le",      "ARM7 (little)")
@@ -100,7 +102,7 @@ DEFINE_DEVICE_TYPE(DE101,        de101_cpu_device,        "de101",        "Data 
 DEFINE_DEVICE_TYPE(IGS036,       igs036_cpu_device,       "igs036",       "IGS036")
 
 arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, ARM7, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_LITTLE)
+	: arm7_cpu_device(mconfig, ARM7, tag, owner, clock, 4, ARCHFLAG_T | ARCHFLAG_NOCOPRO, ENDIANNESS_LITTLE)
 {
 }
 
@@ -114,7 +116,10 @@ arm7_cpu_device::arm7_cpu_device(
 		endianness_t endianness,
 		address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", endianness, 32, (archFlags & ARCHFLAG_ONLY26) ? 26 : 32, 0, internal_map)
+	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
+	, m_program_config("program", endianness, 32, (archFlags & ARCHFLAG_ONLY26) ? 26 : 32, 0, (archFlags & ARCHFLAG_ONLY26) ? 26 : 32, 12, internal_map)
+	, m_core(nullptr)
+	, m_r(nullptr)
 	, m_insn_prefetch_depth(3)
 	, m_insn_prefetch_count(0)
 	, m_insn_prefetch_index(0)
@@ -141,22 +146,49 @@ arm7_cpu_device::arm7_cpu_device(
 	, m_archRev(archRev)
 	, m_archFlags(archFlags)
 	, m_vectorbase(0)
+	, m_fetch_shadow_start(1)
+	, m_fetch_shadow_end(0)
 	, m_pc(0)
+	, m_isdrc(false)
+	, m_drcuml(*this, DRC_CACHE_SIZE)
+	, m_drcoptions(DRC_COMPATIBLE_OPTIONS)
+	, m_drc_generate(0)
+	, m_drc_opt(0)
+	, m_drc_tlb(nullptr)
+	, m_drc_tlb_size(DRC_TLB_SIZE)
+	, m_drc_tlb_base(nullptr)
+	, m_drc_prefetched(false)
+	, m_drc_cache_dirty(true)
+	, m_drc_fastram_stale(true)
+	, m_fastram_select(0)
+	, m_drc_hotspot_select(0)
+	, m_entry(nullptr)
+	, m_entry_exact(nullptr)
+	, m_nocode(nullptr)
+	, m_nocode_verify(nullptr)
+	, m_nocode_miss(nullptr)
+	, m_nocode_exact(nullptr)
+	, m_nocode_literal(nullptr)
+	, m_out_of_cycles(nullptr)
+	, m_resync(nullptr)
+	, m_resync_next(nullptr)
+	, m_slice_exact(nullptr)
+	, m_shift_reg{ }
+	, m_read8{ }
+	, m_read16{ }
+	, m_read32{ }
+	, m_write8{ }
+	, m_write16{ }
+	, m_write32{ }
+	, m_access_miss{ }
 {
-	std::fill(std::begin(m_r), std::end(m_r), 0);
 	m_faultStatus[0] = 0;
 	m_faultStatus[1] = 0;
 	std::fill_n(&m_decoded_access_control[0], 16, 0);
-	for (auto &entry : m_dtlb_entries)
-	{
-		entry = tlb_entry();
-	}
-	for (auto &entry : m_itlb_entries)
-	{
-		entry = tlb_entry();
-	}
-	std::fill(std::begin(m_dtlb_entry_index), std::end(m_dtlb_entry_index), 0);
-	std::fill(std::begin(m_itlb_entry_index), std::end(m_itlb_entry_index), 0);
+
+	// pages the MMU walk has translated, with the permissions of both privilege levels; replaced round-robin
+	set_vtlb_dynamic_entries(1024);
+	set_vtlb_saved(false);     // a cache of the page table walks
 
 	uint32_t arch = ARM9_COPRO_ID_ARCH_V4;
 	if (m_archFlags & ARCHFLAG_T)
@@ -177,7 +209,7 @@ arm7_cpu_device::~arm7_cpu_device()
 
 
 arm7_be_cpu_device::arm7_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, ARM7_BE, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_BIG)
+	: arm7_cpu_device(mconfig, ARM7_BE, tag, owner, clock, 4, ARCHFLAG_T | ARCHFLAG_NOCOPRO, ENDIANNESS_BIG)
 {
 }
 
@@ -304,6 +336,10 @@ arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, device_t
 	cp15_dtcm_size = 0;
 	cp15_dtcm_end = 0;
 	cp15_itcm_reg = cp15_dtcm_reg = 0;
+
+	// the recompiler accesses the TCMs in place
+	m_drc_tcm[0] = { &cp15_itcm_base, &cp15_itcm_end, ITCM, 0x7fff };
+	m_drc_tcm[1] = { &cp15_dtcm_base, &cp15_dtcm_end, DTCM, 0x3fff };
 }
 
 arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -517,9 +553,19 @@ void arm3_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 }
 
 arm60_cpu_device::arm60_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm7_cpu_device(mconfig, ARM60, tag, owner, clock, 3, ARCHFLAG_MODE26, ENDIANNESS_LITTLE)
+	: arm60_cpu_device(mconfig, ARM60, tag, owner, clock, ENDIANNESS_LITTLE)
+{
+}
+
+arm60_cpu_device::arm60_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
+	: arm7_cpu_device(mconfig, type, tag, owner, clock, 3, ARCHFLAG_MODE26, endianness)
 {
 	m_copro_id = 0x41560600;   // ARM / VLSI / ARM6
+}
+
+arm60_be_cpu_device::arm60_be_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm60_cpu_device(mconfig, ARM60_BE, tag, owner, clock, ENDIANNESS_BIG)
+{
 }
 
 void arm60_cpu_device::set_config_pins(bool prog32, bool data32)
@@ -576,7 +622,11 @@ device_memory_interface::space_config_vector arm7_cpu_device::memory_space_confi
 
 void arm7_cpu_device::update_reg_ptr()
 {
+	// register bank index for the recompiler: USR 0, FIQ 1, IRQ 2, SVC 3, ABT 4, UND 5, SYS 6
+	static constexpr uint8_t BANK[16] = { 0, 1, 2, 3, 0, 0, 0, 4, 0, 0, 0, 5, 0, 0, 0, 6 };
+
 	m_reg_group = sRegisterTable[GET_MODE];
+	m_core->mode = (BANK[GET_MODE] << 2) | (T_IS_SET(GET_CPSR) ? 2 : 0) | (MODE32 ? 0 : 1);
 }
 
 uint32_t arm7_cpu_device::vector_base() const
@@ -584,9 +634,17 @@ uint32_t arm7_cpu_device::vector_base() const
 	return m_vectorbase | ((COPRO_CTRL & COPRO_CTRL_INTVEC_ADJUST) ? 0xffff0000 : 0);
 }
 
+void arm7_cpu_device::set_fetch_shadow(offs_t start, offs_t end)
+{
+	m_fetch_shadow_start = start;
+	m_fetch_shadow_end = end;
+	m_drc_cache_dirty = true;       // the recompiler compiles the words in
+}
+
 void arm7_cpu_device::set_cpsr(uint32_t val)
 {
-	uint8_t old_mode = GET_CPSR & MODE_FLAG;
+	uint32_t const old_cpsr = GET_CPSR;
+	uint8_t old_mode = old_cpsr & MODE_FLAG;
 	bool call_hook = false;
 
 	if (m_archFlags & ARCHFLAG_ONLY26)
@@ -623,8 +681,8 @@ void arm7_cpu_device::set_cpsr(uint32_t val)
 		{
 			if (!(val & 0x10))
 			{
-				// mirror bits in pc
-				m_r[eR15] = (m_r[eR15] & 0x03FFFFFF) | (val & 0xF0000000) /* N Z C V */ | ((val & 0x000000C0) << (26 - 6)) /* I F */;
+				// mirror bits in pc, the mode bits too
+				m_r[eR15] = (m_r[eR15] & 0x03FFFFFC) | (val & 0xF0000000) /* N Z C V */ | ((val & 0x000000C0) << (26 - 6)) /* I F */ | (val & 0x00000003) /* M1 M0 */;
 			}
 		}
 	}
@@ -639,8 +697,9 @@ void arm7_cpu_device::set_cpsr(uint32_t val)
 	{
 		if ((GET_CPSR & MODE_FLAG) == eARM7_MODE_USER || old_mode == eARM7_MODE_USER)
 			call_hook = true;
-		update_reg_ptr();
 	}
+	if ((val ^ old_cpsr) & (MODE_FLAG | T_MASK | SR_MODE32))
+		update_reg_ptr();
 	if (call_hook)
 		debugger_privilege_hook();
 }
@@ -766,84 +825,7 @@ int arm7_cpu_device::detect_fault(int desc_lvl1, int ap, int flags)
 	return FAULT_NONE;
 }
 
-arm7_cpu_device::tlb_entry *arm7_cpu_device::tlb_map_entry(const offs_t vaddr, const int flags)
-{
-	const uint32_t section = (vaddr >> (COPRO_TLB_VADDR_FLTI_MASK_SHIFT + 2)) & 0xFFF;
-	tlb_entry *entries = (flags & ARM7_TLB_ABORT_D) ? m_dtlb_entries : m_itlb_entries;
-	const uint32_t start = section << 1;
-	uint32_t index = (flags & ARM7_TLB_ABORT_D) ? m_dtlb_entry_index[section] : m_itlb_entry_index[section];
-
-	bool entry_found = false;
-
-	for (uint32_t i = 0; i < 2; i++)
-	{
-		index = (index + 1) & 1;
-		if (!entries[start + index].valid)
-		{
-			entry_found = true;
-			break;
-		}
-	}
-
-	if (!entry_found)
-	{
-		index = (index + 1) & 1;
-	}
-
-	if (flags & ARM7_TLB_ABORT_D)
-		m_dtlb_entry_index[section] = index;
-	else
-		m_itlb_entry_index[section] = index;
-
-	return &entries[start + index];
-}
-
-arm7_cpu_device::tlb_entry *arm7_cpu_device::tlb_probe(const offs_t vaddr, const int flags)
-{
-	const uint32_t section = (vaddr >> (COPRO_TLB_VADDR_FLTI_MASK_SHIFT + 2)) & 0xFFF;
-	tlb_entry *entries = (flags & ARM7_TLB_ABORT_D) ? m_dtlb_entries : m_itlb_entries;
-	const uint32_t start = section << 1;
-	uint32_t index = (flags & ARM7_TLB_ABORT_D) ? m_dtlb_entry_index[section] : m_itlb_entry_index[section];
-
-	if (m_tlb_log)
-		LOGMASKED(LOG_TLB, "%s: tlb_probe: vaddr %08x, section %02x, start %02x, index %d\n", machine().describe_context(), vaddr, section, start, index);
-
-	for (uint32_t i = 0; i < 2; i++)
-	{
-		uint32_t position = start + index;
-		if (entries[position].valid)
-		{
-			switch (entries[position].type)
-			{
-			case COPRO_TLB_TYPE_SECTION:
-				if (entries[position].table_bits == (vaddr & COPRO_TLB_STABLE_MASK))
-					return &entries[position];
-				break;
-			case COPRO_TLB_TYPE_LARGE:
-			case COPRO_TLB_TYPE_SMALL:
-				if (entries[position].table_bits == (vaddr & COPRO_TLB_LSTABLE_MASK))
-					return &entries[position];
-				break;
-			case COPRO_TLB_TYPE_TINY:
-				if (entries[position].table_bits == (vaddr & COPRO_TLB_TTABLE_MASK))
-					return &entries[position];
-				break;
-			}
-		}
-		if (m_tlb_log)
-		{
-			LOGMASKED(LOG_TLB, "%s: tlb_probe: skipped due to mismatch (valid %d, domain %02x, access %d, table_bits %08x, base_addr %08x, type %d\n",
-				machine().describe_context(), entries[position].valid ? 1 : 0, entries[position].domain, entries[position].access,
-				entries[position].table_bits, entries[position].base_addr, entries[position].type);
-		}
-
-		index = (index - 1) & 1;
-	}
-
-	return nullptr;
-}
-
-uint32_t arm7_cpu_device::get_fault_from_permissions(const uint8_t access, const uint8_t domain, const uint8_t type, int flags)
+uint32_t arm7_cpu_device::get_fault_from_permissions(const uint8_t access, const uint8_t domain, const uint8_t type, int flags, bool user)
 {
 	const uint8_t domain_bits = m_decoded_access_control[domain];
 	switch (domain_bits)
@@ -854,7 +836,6 @@ uint32_t arm7_cpu_device::get_fault_from_permissions(const uint8_t access, const
 			return (domain << 4) | COPRO_FAULT_DOMAIN_PAGE;
 		case COPRO_DOMAIN_CLIENT:
 		{
-			const uint32_t mode = GET_CPSR & 0xF;
 			switch (access)
 			{
 				case 0: // Check System/ROM bit
@@ -867,7 +848,7 @@ uint32_t arm7_cpu_device::get_fault_from_permissions(const uint8_t access, const
 								return (domain << 4) | COPRO_FAULT_PERM_SECTION;
 							return (domain << 4) | COPRO_FAULT_PERM_PAGE;
 						case 1: // No User Access, Read-Only System Access
-							if (mode == 0 || (flags & ARM7_TLB_WRITE))
+							if (user || (flags & ARM7_TLB_WRITE))
 							{
 								if (type == COPRO_TLB_TYPE_SECTION)
 									return (domain << 4) | COPRO_FAULT_PERM_SECTION;
@@ -889,13 +870,13 @@ uint32_t arm7_cpu_device::get_fault_from_permissions(const uint8_t access, const
 					return COPRO_FAULT_NONE;
 				}
 				case 1: // No User Access
-					if (mode != 0)
+					if (!user)
 						return COPRO_FAULT_NONE;
 					if (type == COPRO_TLB_TYPE_SECTION)
 						return (domain << 4) | COPRO_FAULT_PERM_SECTION;
 					return (domain << 4) | COPRO_FAULT_PERM_PAGE;
 				case 2: // Read-Only User Access
-					if (mode != 0 || (flags & ARM7_TLB_READ))
+					if (!user || (flags & ARM7_TLB_READ))
 						return COPRO_FAULT_NONE;
 					if (type == COPRO_TLB_TYPE_SECTION)
 						return (domain << 4) | COPRO_FAULT_PERM_SECTION;
@@ -913,59 +894,22 @@ uint32_t arm7_cpu_device::get_fault_from_permissions(const uint8_t access, const
 	}
 }
 
-uint32_t arm7_cpu_device::tlb_check_permissions(tlb_entry *entry, const offs_t vaddr, const int flags)
-{
-	uint8_t access = entry->access;
-	switch (entry->type)
-	{
-		case COPRO_TLB_TYPE_LARGE:
-			access >>= (vaddr >> 13) & 6;
-			break;
-		case COPRO_TLB_TYPE_SMALL:
-			access >>= (vaddr >> 9) & 6;
-			break;
-		default:
-			break;
-	}
-	return get_fault_from_permissions(access & 3, entry->domain, entry->type, flags);
-}
-
-offs_t arm7_cpu_device::tlb_translate(tlb_entry *entry, const offs_t vaddr)
-{
-	switch (entry->type)
-	{
-		case COPRO_TLB_TYPE_SECTION:
-			return entry->base_addr | (vaddr & ~COPRO_TLB_SECTION_PAGE_MASK);
-		case COPRO_TLB_TYPE_LARGE:
-			return entry->base_addr | (vaddr & ~COPRO_TLB_LARGE_PAGE_MASK);
-		case COPRO_TLB_TYPE_SMALL:
-			return entry->base_addr | (vaddr & ~COPRO_TLB_SMALL_PAGE_MASK);
-		case COPRO_TLB_TYPE_TINY:
-			return entry->base_addr | (vaddr & ~COPRO_TLB_TINY_PAGE_MASK);
-		default:
-			return 0;
-	}
-}
-
 bool arm7_cpu_device::page_table_finish_translation(offs_t &vaddr, const uint8_t type, const uint32_t lvl1, const uint32_t lvl2, const int flags, const uint32_t lvl1a, const uint32_t lvl2a)
 {
 	const uint8_t domain = (uint8_t)(lvl1 >> 5) & 0xF;
 	uint8_t access = 0;         // AP bits for the subpage being accessed
-	uint8_t access_all = 0;     // every AP field in the descriptor, cached in the TLB entry
-	uint32_t table_bits = 0;
+	uint8_t access_all = 0;     // every AP field in the descriptor
 	switch (type)
 	{
 		case COPRO_TLB_TYPE_SECTION:
 			access = (uint8_t)((lvl2 >> 10) & 3);
 			access_all = access;
-			table_bits = vaddr & COPRO_TLB_STABLE_MASK;
 			break;
 		case COPRO_TLB_TYPE_LARGE:
 		{
 			const uint8_t subpage_shift = 4 + (uint8_t)((vaddr >> 13) & 6);
 			access = (uint8_t)((lvl2 >> subpage_shift) & 3);
 			access_all = (uint8_t)((lvl2 >> 4) & 0xff);
-			table_bits = vaddr & COPRO_TLB_LSTABLE_MASK;
 			break;
 		}
 
@@ -974,18 +918,16 @@ bool arm7_cpu_device::page_table_finish_translation(offs_t &vaddr, const uint8_t
 			const uint8_t subpage_shift = 4 + (uint8_t)((vaddr >> 9) & 6);
 			access = (uint8_t)((lvl2 >> subpage_shift) & 3);
 			access_all = (uint8_t)((lvl2 >> 4) & 0xff);
-			table_bits = vaddr & COPRO_TLB_LSTABLE_MASK;
 			break;
 		}
 
 		case COPRO_TLB_TYPE_TINY:
 			access = (uint8_t)((lvl2 >> 4) & 3);
 			access_all = access;
-			table_bits = vaddr & COPRO_TLB_TTABLE_MASK;
 			break;
 	}
 
-	const uint32_t access_result = get_fault_from_permissions(access, domain, type, flags);
+	const uint32_t access_result = get_fault_from_permissions(access, domain, type, flags, GET_MODE == eARM7_MODE_USER);
 	if (access_result != 0)
 	{
 		if (flags & ARM7_TLB_ABORT_P)
@@ -1008,20 +950,74 @@ bool arm7_cpu_device::page_table_finish_translation(offs_t &vaddr, const uint8_t
 	const uint32_t base_addr = lvl2 & s_page_masks[type];
 	const uint32_t paddr = base_addr | (vaddr & ~s_page_masks[type]);
 
-	if (flags)
+	// Cache the page in the translation table when its permissions hold for the whole 4 KB: sections, and large or
+	// small pages whose four subpage AP fields agree.  Tiny pages and pages with differing subpages are walked
+	// on every access.
+	if (flags && ((type == COPRO_TLB_TYPE_SECTION) || ((type != COPRO_TLB_TYPE_TINY) && (access_all == (access_all & 3) * 0x55))))
 	{
-		tlb_entry *entry = tlb_map_entry(vaddr, flags);
-
-		entry->valid = true;
-		entry->domain = domain;
-		entry->access = access_all;
-		entry->table_bits = table_bits;
-		entry->base_addr = base_addr;
-		entry->type = type;
+		// an entry that maps the page elsewhere is replaced: the data TLB may hold it too
+		const vtlb_entry old = vtlb_table()[vaddr >> 12];
+		if ((old & FLAG_VALID) && ((old ^ paddr) & ~offs_t(0xfff)))
+		{
+			drc_tlb_flush_mva(vaddr);
+		}
+		vtlb_dynload(vaddr >> 12, paddr, page_permissions(access, domain, type));
 	}
 
 	vaddr = paddr;
 	return true;
+}
+
+// the translation table bits an access needs at the current privilege level; a fetch needs the read bit too, which
+// the walk's entries carry and the recompiler's fetch-only entries (func_fetch_refill()) don't
+device_vtlb_interface::vtlb_entry arm7_cpu_device::vtlb_permission(int flags) const
+{
+	const vtlb_entry bits = (flags & ARM7_TLB_WRITE) ? WRITE_ALLOWED : ((flags & ARM7_TLB_ABORT_P) ? (FETCH_ALLOWED | READ_ALLOWED) : READ_ALLOWED);
+	return (GET_MODE == eARM7_MODE_USER) ? (bits << TR_USER) : bits;
+}
+
+// the permission bits of a page for both privilege levels, from its AP field, its domain and the S and R bits;
+// the table is flushed when the domain access control or the S and R bits change
+device_vtlb_interface::vtlb_entry arm7_cpu_device::page_permissions(uint8_t access, uint8_t domain, uint8_t type)
+{
+	vtlb_entry result = 0;
+	if (get_fault_from_permissions(access, domain, type, ARM7_TLB_ABORT_D | ARM7_TLB_READ, false) == COPRO_FAULT_NONE)
+	{
+		result |= READ_ALLOWED | FETCH_ALLOWED;
+	}
+	if (get_fault_from_permissions(access, domain, type, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE, false) == COPRO_FAULT_NONE)
+	{
+		result |= WRITE_ALLOWED;
+	}
+	if (get_fault_from_permissions(access, domain, type, ARM7_TLB_ABORT_D | ARM7_TLB_READ, true) == COPRO_FAULT_NONE)
+	{
+		result |= USER_READ_ALLOWED | USER_FETCH_ALLOWED;
+	}
+	if (get_fault_from_permissions(access, domain, type, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE, true) == COPRO_FAULT_NONE)
+	{
+		result |= USER_WRITE_ALLOWED;
+	}
+	return result;
+}
+
+// a single-entry TLB invalidate drops the whole mapping the address belongs to; the table does not record whether
+// that was a 4 KB page, a 64 KB page or a 1 MB section, so the entire section around the address goes
+void arm7_cpu_device::vtlb_flush_mva(offs_t mva)
+{
+	offs_t const section = mva & 0xfff00000;
+	for (uint32_t index = 0; index < 0x100; index++)
+	{
+		offs_t const page = section | (index << 12);
+		vtlb_flush_address(page);
+		drc_tlb_flush_mva(page);
+	}
+}
+
+// the translation table, and the recompiler's data TLB that caches it
+void arm7_cpu_device::flush_translations()
+{
+	vtlb_flush_dynamic();
+	drc_tlb_flush();
 }
 
 bool arm7_cpu_device::page_table_translate(offs_t &vaddr, const int flags)
@@ -1142,42 +1138,18 @@ bool arm7_cpu_device::translate_vaddr_to_paddr(offs_t &vaddr, const int flags)
 			LOGMASKED(LOG_TLB, "%s: translate_vaddr_to_paddr: vaddr < 32M, adding PID (%08x) = %08x\n", machine().describe_context(), m_pid_offset, vaddr);
 	}
 
-	tlb_entry *entry = tlb_probe(vaddr, flags);
-
-	if (entry)
+	// the translation table holds the pages the walk has seen, with both privilege levels' permissions
+	const vtlb_entry entry = vtlb_table()[vaddr >> 12];
+	const vtlb_entry needed = vtlb_permission(flags);
+	if ((entry & needed) == needed)
 	{
-		if (m_tlb_log)
-		{
-			LOGMASKED(LOG_TLB, "%s: translate_vaddr_to_paddr: found entry (domain %02x, access %d, table_bits %08x, base_addr %08x, type %d\n",
-				machine().describe_context(), entry->domain, entry->access, entry->table_bits, entry->base_addr, entry->type);
-		}
+		vaddr = (entry & ~offs_t(0xfff)) | (vaddr & 0xfff);
+		return true;
+	}
 
-		const uint32_t access_result = tlb_check_permissions(entry, vaddr, flags);
-		if (access_result == 0)
-		{
-			vaddr = tlb_translate(entry, vaddr);
-			return true;
-		}
-		else if (flags & ARM7_TLB_ABORT_P)
-		{
-			LOGMASKED(LOG_MMU, "ARM7: TLB, Potential prefetch abort, vaddr = %08x\n", vaddr);
-		}
-		else if (flags & ARM7_TLB_ABORT_D)
-		{
-			LOGMASKED(LOG_MMU, "ARM7: TLB, Data abort, vaddr = %08x\n", vaddr);
-			m_faultStatus[0] = access_result;
-			m_faultAddress = vaddr;
-			m_pendingAbtD = true;
-			update_irq_state();
-		}
-		return false;
-	}
-	else
-	{
-		if (m_tlb_log)
-			LOGMASKED(LOG_MMU, "No TLB entry for %08x yet, running page_table_translate\n", vaddr);
-		return page_table_translate(vaddr, flags);
-	}
+	if (m_tlb_log)
+		LOGMASKED(LOG_MMU, "No TLB entry for %08x yet, running page_table_translate\n", vaddr);
+	return page_table_translate(vaddr, flags);
 }
 
 void arm7_cpu_device::translate_insn_command(const std::vector<std::string_view> &params)
@@ -1213,26 +1185,20 @@ bool arm7_cpu_device::memory_translate(int spacenum, int intention, offs_t &addr
 	/* only applies to the program address space and only does something if the MMU's enabled */
 	if (spacenum == AS_PROGRAM && (m_control & COPRO_CTRL_MMU_EN))
 	{
-		const int flags = intention == TR_FETCH ? ARM7_TLB_ABORT_P : ARM7_TLB_ABORT_D;
+		const int flags = (intention == TR_FETCH) ? (ARM7_TLB_ABORT_P | ARM7_TLB_READ) : (intention == TR_WRITE) ? (ARM7_TLB_ABORT_D | ARM7_TLB_WRITE) : (ARM7_TLB_ABORT_D | ARM7_TLB_READ);
 		if (address < 0x2000000)
 			address += m_pid_offset;
 
-		tlb_entry *entry = tlb_probe(address, flags);
+		const vtlb_entry entry = vtlb_table()[address >> 12];
+		const vtlb_entry needed = vtlb_permission(flags);
+		if ((entry & needed) == needed)
+		{
+			address = (entry & ~offs_t(0xfff)) | (address & 0xfff);
+			return true;
+		}
 
-		if (entry)
-		{
-			const uint32_t access_result = tlb_check_permissions(entry, address, flags);
-			if (access_result == 0)
-			{
-				address = tlb_translate(entry, address);
-				return true;
-			}
-			return false;
-		}
-		else
-		{
-			return page_table_translate(address, 0);
-		}
+		// the walk without the abort bits has no side effects (but may fill the translation table)
+		return page_table_translate(address, flags & (ARM7_TLB_READ | ARM7_TLB_WRITE));
 	}
 	return true;
 }
@@ -1248,10 +1214,16 @@ bool arm7_cpu_device::memory_translate(int spacenum, int intention, offs_t &addr
 void arm7_cpu_device::postload()
 {
 	update_reg_ptr();
+	m_drc_cache_dirty = true;   // compiled code holds the TCM bounds and the memory layout it was compiled against
 }
 
 void arm7_cpu_device::device_start()
 {
+	// the register file and the recompiler's variables live in the recompiler cache's near area
+	drc_initialize();
+	m_core = m_drcuml.cache_alloc_near<core_state>();
+	m_r = m_core->r;
+
 	init_ce_kernel_addrs();
 
 	m_program = &space(AS_PROGRAM);
@@ -1274,7 +1246,11 @@ void arm7_cpu_device::device_start()
 	save_item(NAME(m_insn_prefetch_valid));
 	save_item(NAME(m_tlb_log));
 	save_item(NAME(m_actual_log));
-	save_item(NAME(m_r));
+	save_item(NAME(m_core->r));
+	save_item(NAME(m_drc_prefetched));
+	save_item(NAME(m_core->fetch_shadow));
+	save_item(NAME(m_fetch_shadow_start));
+	save_item(NAME(m_fetch_shadow_end));
 	save_item(NAME(m_pendingIrq));
 	save_item(NAME(m_pendingFiq));
 	save_item(NAME(m_pendingAbtD));
@@ -1302,23 +1278,15 @@ void arm7_cpu_device::device_start()
 	save_item(NAME(m_pid_offset));
 	save_item(NAME(m_domainAccessControl));
 	save_item(NAME(m_decoded_access_control));
-	save_item(STRUCT_MEMBER(m_dtlb_entries, valid));
-	save_item(STRUCT_MEMBER(m_dtlb_entries, domain));
-	save_item(STRUCT_MEMBER(m_dtlb_entries, access));
-	save_item(STRUCT_MEMBER(m_dtlb_entries, table_bits));
-	save_item(STRUCT_MEMBER(m_dtlb_entries, base_addr));
-	save_item(STRUCT_MEMBER(m_dtlb_entries, type));
-	save_item(STRUCT_MEMBER(m_itlb_entries, valid));
-	save_item(STRUCT_MEMBER(m_itlb_entries, domain));
-	save_item(STRUCT_MEMBER(m_itlb_entries, access));
-	save_item(STRUCT_MEMBER(m_itlb_entries, table_bits));
-	save_item(STRUCT_MEMBER(m_itlb_entries, base_addr));
-	save_item(STRUCT_MEMBER(m_itlb_entries, type));
-	save_item(NAME(m_dtlb_entry_index));
-	save_item(NAME(m_itlb_entry_index));
 	machine().save().register_postload(save_prepost_delegate(FUNC(arm7_cpu_device::postload), this));
 
-	set_icountptr(m_icount);
+	set_icountptr(m_core->icount);
+
+	m_isdrc = allow_drc();
+	if (m_isdrc)
+	{
+		drc_start();
+	}
 
 	state_add( ARM7_PC,    "PC", m_pc).callexport().formatstr("%08X");
 	state_add(STATE_GENPC, "GENPC", m_pc).callexport().noshow();
@@ -1341,7 +1309,7 @@ void arm7_cpu_device::device_start()
 	state_add( ARM7_R14,   "R14",  m_r[14]).formatstr("%08X");
 	state_add( ARM7_R15,   "R15",  m_r[15]).formatstr("%08X");
 	/* Current Status Program Register */
-	state_add( ARM7_CPSR,  "CPSR", m_r[eCPSR]).formatstr("%08X");
+	state_add( ARM7_CPSR,  "CPSR", m_r[eCPSR]).callimport().formatstr("%08X");
 	/* FIRQ Mode Shadowed Registers */
 	state_add( ARM7_FR8,   "FR8",  m_r[eR8_FIQ]  ).formatstr("%08X");
 	state_add( ARM7_FR9,   "FR9",  m_r[eR9_FIQ]  ).formatstr("%08X");
@@ -1395,6 +1363,16 @@ void arm946es_cpu_device::device_start()
 	save_item(NAME(cp15_dtcm_reg));
 	save_item(NAME(ITCM));
 	save_item(NAME(DTCM));
+}
+
+void arm7_cpu_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case ARM7_CPSR:
+			update_reg_ptr();       // the bank pointer and the recompiler mode follow a CPSR written from outside
+			break;
+	}
 }
 
 void arm7_cpu_device::state_export(const device_state_entry &entry)
@@ -1472,26 +1450,8 @@ void arm7_cpu_device::device_reset()
 	m_r[eR14_SVC] = old_pc;
 	m_r[eSPSR_SVC] = old_cpsr;
 
-	for (auto &entry : m_dtlb_entries)
-	{
-		entry.valid = false;
-		entry.domain = 0;
-		entry.access = 0;
-		entry.table_bits = 0;
-		entry.base_addr = 0;
-		entry.type = 0;
-	}
-	for (auto &entry : m_itlb_entries)
-	{
-		entry.valid = false;
-		entry.domain = 0;
-		entry.access = 0;
-		entry.table_bits = 0;
-		entry.base_addr = 0;
-		entry.type = 0;
-	}
-	std::fill(std::begin(m_dtlb_entry_index), std::end(m_dtlb_entry_index), 0);
-	std::fill(std::begin(m_itlb_entry_index), std::end(m_itlb_entry_index), 0);
+	m_drc_cache_dirty = true;
+	m_drc_prefetched = false;
 }
 
 
@@ -1572,10 +1532,107 @@ void arm7_cpu_device::add_ce_kernel_addr(offs_t addr, std::string value)
 
 #include "cecalls.hxx"
 
+// one ARM instruction: the condition check, then the handler; the handler advances R15 and adjusts m_core->icount
+// relative to the 3 cycles the caller charges (the recompiler's fallback path runs instructions through here too)
+void arm7_cpu_device::execute_arm_insn(uint32_t insn)
+{
+	auto const UNEXECUTED = [this] { m_r[eR15] += 4; m_core->icount += 2; }; // Any unexecuted instruction only takes 1 cycle (page 193)
+
+	int op_offset = 0;
+	/* process condition codes for this instruction */
+	if ((insn >> INSN_COND_SHIFT) != COND_AL)
+	{
+		switch (insn >> INSN_COND_SHIFT)
+		{
+			case COND_EQ:
+				if (Z_IS_CLEAR(m_r[eCPSR]))
+					{ UNEXECUTED(); return; }
+				break;
+			case COND_NE:
+				if (Z_IS_SET(m_r[eCPSR]))
+					{ UNEXECUTED(); return; }
+				break;
+			case COND_CS:
+				if (C_IS_CLEAR(m_r[eCPSR]))
+					{ UNEXECUTED(); return; }
+				break;
+			case COND_CC:
+				if (C_IS_SET(m_r[eCPSR]))
+					{ UNEXECUTED(); return; }
+				break;
+			case COND_MI:
+				if (N_IS_CLEAR(m_r[eCPSR]))
+					{ UNEXECUTED(); return; }
+				break;
+			case COND_PL:
+				if (N_IS_SET(m_r[eCPSR]))
+					{ UNEXECUTED(); return; }
+				break;
+			case COND_VS:
+				if (V_IS_CLEAR(m_r[eCPSR]))
+					{ UNEXECUTED(); return; }
+				break;
+			case COND_VC:
+				if (V_IS_SET(m_r[eCPSR]))
+					{ UNEXECUTED(); return; }
+				break;
+			case COND_HI:
+				if (C_IS_CLEAR(m_r[eCPSR]) || Z_IS_SET(m_r[eCPSR]))
+					{ UNEXECUTED(); return; }
+				break;
+			case COND_LS:
+				if (C_IS_SET(m_r[eCPSR]) && Z_IS_CLEAR(m_r[eCPSR]))
+					{ UNEXECUTED(); return; }
+				break;
+			case COND_GE:
+				if (!(m_r[eCPSR] & N_MASK) != !(m_r[eCPSR] & V_MASK)) /* Use x ^ (x >> ...) method */
+					{ UNEXECUTED(); return; }
+				break;
+			case COND_LT:
+				if (!(m_r[eCPSR] & N_MASK) == !(m_r[eCPSR] & V_MASK))
+					{ UNEXECUTED(); return; }
+				break;
+			case COND_GT:
+				if (Z_IS_SET(m_r[eCPSR]) || (!(m_r[eCPSR] & N_MASK) != !(m_r[eCPSR] & V_MASK)))
+					{ UNEXECUTED(); return; }
+				break;
+			case COND_LE:
+				if (Z_IS_CLEAR(m_r[eCPSR]) && (!(m_r[eCPSR] & N_MASK) == !(m_r[eCPSR] & V_MASK)))
+					{ UNEXECUTED(); return; }
+				break;
+			case COND_NV:
+				if (m_archRev < 5)
+				  { UNEXECUTED(); return; }
+				else
+					op_offset = 0x10;
+				break;
+		}
+	}
+	/*******************************************************************/
+	/* If we got here - condition satisfied, so decode the instruction */
+	/*******************************************************************/
+	(this->*ops_handler[((insn & 0xF000000) >> 24) + op_offset])(insn);
+}
+
+void arm7_cpu_device::execute_thumb_insn(uint32_t pc, uint32_t insn)
+{
+	(this->*thumb_handler[(insn & 0xffc0) >> 6])(pc, insn);
+}
+
 void arm7_cpu_device::execute_run()
 {
-	auto const UNEXECUTED = [this] { m_r[eR15] += 4; m_icount += 2; }; // Any unexecuted instruction only takes 1 cycle (page 193)
+	if (m_isdrc)
+	{
+		execute_run_drc();
+	}
+	else
+	{
+		execute_run_interpreter();
+	}
+}
 
+void arm7_cpu_device::execute_run_interpreter()
+{
 	m_tlb_log = m_actual_log;
 
 	uint32_t insn;
@@ -1776,7 +1833,22 @@ void arm7_cpu_device::execute_run()
 			printf("\n");
 		}
 #endif
+		// the 26-bit modes: R15's PSR bits are a view of the CPSR, whatever a handler last wrote there (MUL, SWP, a
+		// byte or halfword load with R15 as the destination write the whole register)
+		if (!MODE32)
+		{
+			m_r[eR15] = (m_r[eR15] & 0x03FFFFFC) | (GET_CPSR & 0xF0000003) | ((GET_CPSR & (I_MASK | F_MASK)) << 20);
+		}
+
 		update_insn_prefetch(pc);
+		if (pc >= m_fetch_shadow_start && pc <= m_fetch_shadow_end && m_insn_prefetch_count == m_insn_prefetch_depth)
+		{
+			const uint32_t ahead = (m_insn_prefetch_index + 2) % m_insn_prefetch_depth;
+			if (m_insn_prefetch_valid[ahead])
+			{
+				m_core->fetch_shadow = m_insn_prefetch_buffer[ahead];
+			}
+		}
 
 		m_tlb_log = 0;
 		debugger_instruction_hook(pc);
@@ -1795,9 +1867,11 @@ void arm7_cpu_device::execute_run()
 				prefetch_abort(raddr);
 				m_pendingAbtP = true;
 				update_irq_state();
-				goto skip_exec;
 			}
-			(this->*thumb_handler[(insn & 0xffc0) >> 6])(pc, insn);
+			else
+			{
+				execute_thumb_insn(pc, insn);
+			}
 		}
 		else
 		{
@@ -1817,92 +1891,18 @@ void arm7_cpu_device::execute_run()
 				prefetch_abort(raddr);
 				m_pendingAbtP = true;
 				update_irq_state();
-				goto skip_exec;
 			}
-
-			int op_offset = 0;
-			/* process condition codes for this instruction */
-			if ((insn >> INSN_COND_SHIFT) != COND_AL)
+			else
 			{
-				switch (insn >> INSN_COND_SHIFT)
-				{
-					case COND_EQ:
-						if (Z_IS_CLEAR(m_r[eCPSR]))
-							{ UNEXECUTED();  goto skip_exec; }
-						break;
-					case COND_NE:
-						if (Z_IS_SET(m_r[eCPSR]))
-							{ UNEXECUTED();  goto skip_exec; }
-						break;
-					case COND_CS:
-						if (C_IS_CLEAR(m_r[eCPSR]))
-							{ UNEXECUTED();  goto skip_exec; }
-						break;
-					case COND_CC:
-						if (C_IS_SET(m_r[eCPSR]))
-							{ UNEXECUTED();  goto skip_exec; }
-						break;
-					case COND_MI:
-						if (N_IS_CLEAR(m_r[eCPSR]))
-							{ UNEXECUTED();  goto skip_exec; }
-						break;
-					case COND_PL:
-						if (N_IS_SET(m_r[eCPSR]))
-							{ UNEXECUTED();  goto skip_exec; }
-						break;
-					case COND_VS:
-						if (V_IS_CLEAR(m_r[eCPSR]))
-							{ UNEXECUTED();  goto skip_exec; }
-						break;
-					case COND_VC:
-						if (V_IS_SET(m_r[eCPSR]))
-							{ UNEXECUTED();  goto skip_exec; }
-						break;
-					case COND_HI:
-						if (C_IS_CLEAR(m_r[eCPSR]) || Z_IS_SET(m_r[eCPSR]))
-							{ UNEXECUTED();  goto skip_exec; }
-						break;
-					case COND_LS:
-						if (C_IS_SET(m_r[eCPSR]) && Z_IS_CLEAR(m_r[eCPSR]))
-							{ UNEXECUTED();  goto skip_exec; }
-						break;
-					case COND_GE:
-						if (!(m_r[eCPSR] & N_MASK) != !(m_r[eCPSR] & V_MASK)) /* Use x ^ (x >> ...) method */
-							{ UNEXECUTED();  goto skip_exec; }
-						break;
-					case COND_LT:
-						if (!(m_r[eCPSR] & N_MASK) == !(m_r[eCPSR] & V_MASK))
-							{ UNEXECUTED();  goto skip_exec; }
-						break;
-					case COND_GT:
-						if (Z_IS_SET(m_r[eCPSR]) || (!(m_r[eCPSR] & N_MASK) != !(m_r[eCPSR] & V_MASK)))
-							{ UNEXECUTED();  goto skip_exec; }
-						break;
-					case COND_LE:
-						if (Z_IS_CLEAR(m_r[eCPSR]) && (!(m_r[eCPSR] & N_MASK) == !(m_r[eCPSR] & V_MASK)))
-							{ UNEXECUTED();  goto skip_exec; }
-						break;
-					case COND_NV:
-						if (m_archRev < 5)
-						  { UNEXECUTED();  goto skip_exec; }
-						else
-							op_offset = 0x10;
-						break;
-				}
+				execute_arm_insn(insn);
 			}
-			/*******************************************************************/
-			/* If we got here - condition satisfied, so decode the instruction */
-			/*******************************************************************/
-			(this->*ops_handler[((insn & 0xF000000) >> 24) + op_offset])(insn);
 		}
-
-skip_exec:
 
 		arm7_check_irq_state();
 
 		/* All instructions remove 3 cycles.. Others taking less / more will have adjusted this # prior to here */
-		m_icount -= 3;
-	} while (m_icount > 0);
+		m_core->icount -= 3;
+	} while (m_core->icount > 0);
 
 	m_tlb_log = 0;
 }
@@ -2109,6 +2109,14 @@ uint32_t arm7_cpu_device::arm7_rt_r_callback(offs_t offset)
 	uint8_t cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
 	uint32_t data = 0;
 
+	if (m_archFlags & ARCHFLAG_NOCOPRO)
+	{
+		LOGMASKED(LOG_COPRO_UNKNOWN, "%08x: MRC p%d on a part without coprocessors\n", R15, cpnum);
+		m_pendingUnd = true;
+		update_irq_state();
+		return 0;
+	}
+
 	// we only handle system copro here
 	if (cpnum != 15)
 	{
@@ -2146,7 +2154,6 @@ uint32_t arm7_cpu_device::arm7_rt_r_callback(offs_t offset)
 	switch( cReg )
 	{
 		case 4:
-		case 7:
 		case 8:
 		case 9:
 		case 10:
@@ -2154,6 +2161,18 @@ uint32_t arm7_cpu_device::arm7_rt_r_callback(offs_t offset)
 		case 12:
 			// RESERVED
 			LOGMASKED(LOG_COPRO_RESERVED, "arm7_rt_r_callback CR%d, RESERVED\n", cReg);
+			break;
+		case 7:             // Cache Operations
+			// ARM926 test and clean (c7, c10, 3) and test, clean and invalidate (c7, c14, 3)
+			// set Z when no dirty lines remain; there is no cache model so that is always
+			if (op2 == 3 && ((opcode & 0xf) == 10 || (opcode & 0xf) == 14))
+			{
+				data = Z_MASK;
+			}
+			else
+			{
+				LOGMASKED(LOG_COPRO_RESERVED, "arm7_rt_r_callback CR%d, RESERVED\n", cReg);
+			}
 			break;
 		case 0:             // ID
 			switch(op2)
@@ -2229,6 +2248,14 @@ void arm7_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 	uint8_t op3 =    opcode & INSN_COPRO_OP3;
 	uint8_t cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
 
+	if (m_archFlags & ARCHFLAG_NOCOPRO)
+	{
+		LOGMASKED(LOG_COPRO_UNKNOWN, "%08x: MCR p%d on a part without coprocessors\n", R15, cpnum);
+		m_pendingUnd = true;
+		update_irq_state();
+		return;
+	}
+
 	// handle XScale specific CP14 - just eat writes for now
 	if (cpnum != 15)
 	{
@@ -2281,6 +2308,11 @@ void arm7_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 				}
 			}
 #endif
+			if ((data ^ COPRO_CTRL) & (COPRO_CTRL_SYSTEM | COPRO_CTRL_ROM))
+			{
+				flush_translations();   // the cached page permissions depend on the S and R bits
+			}
+			drc_control_written(data & COPRO_CTRL_MASK);   // generated code has some of the bits compiled in
 			COPRO_CTRL = data & COPRO_CTRL_MASK;
 			break;
 		case 2:             // Translation Table Base
@@ -2295,15 +2327,13 @@ void arm7_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 			{
 				m_decoded_access_control[i >> 1] = (COPRO_DOMAIN_ACCESS_CONTROL >> i) & 3;
 			}
+			flush_translations();   // the cached page permissions depend on the domain types
 			break;
 		case 5:             // Fault Status (ARMv4 and later), TLB flush (ARMv3)
 			if (m_archRev < 4)
 			{
 				LOGMASKED(LOG_COPRO_WRITES, "%s: arm7_rt_w_callback ARMv3 TLB Flush, PC = %08x\n", machine().describe_context(), m_r[eR15]);
-				for (auto &entry : m_dtlb_entries)
-					entry.valid = false;
-				for (auto &entry : m_itlb_entries)
-					entry.valid = false;
+				flush_translations();
 				break;
 			}
 			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Fault Status = %08x (%d) (%d), PC = %08x\n", data, op2, op3, m_r[eR15]);
@@ -2320,12 +2350,7 @@ void arm7_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 			if (m_archRev < 4)
 			{
 				LOGMASKED(LOG_COPRO_WRITES, "%s: arm7_rt_w_callback ARMv3 TLB Purge %08x, PC = %08x\n", machine().describe_context(), data, m_r[eR15]);
-				tlb_entry *entry = tlb_probe(data, ARM7_TLB_ABORT_D);
-				if (entry)
-					entry->valid = false;
-				entry = tlb_probe(data, ARM7_TLB_ABORT_P);
-				if (entry)
-					entry->valid = false;
+				vtlb_flush_mva(data);
 				break;
 			}
 			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Fault Address = %08x (%d) (%d), PC = %08x\n", data, op2, op3, m_r[eR15]);
@@ -2336,32 +2361,16 @@ void arm7_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 			break;
 		case 8:             // TLB Operations
 			LOGMASKED(LOG_COPRO_WRITES, "%s: arm7_rt_w_callback TLB Ops = %08x (%d) (%d), PC = %08x\n", machine().describe_context(), data, op2, op3, m_r[eR15]);
+			// the translation table is unified, so the I, D and I+D forms are the same operation
 			switch (op2)
 			{
 				case 0:
 					switch (op3)
 					{
-						case 5:
-							// Flush I
-							for (uint32_t i = 0; i < std::size(m_itlb_entries); i++)
-							{
-								m_itlb_entries[i].valid = false;
-							}
-							break;
-						case 6:
-							// Flush D
-							for (uint32_t i = 0; i < std::size(m_dtlb_entries); i++)
-							{
-								m_dtlb_entries[i].valid = false;
-							}
-							break;
-						case 7:
-							// Flush I+D
-							for (uint32_t i = 0; i < std::size(m_dtlb_entries); i++)
-							{
-								m_dtlb_entries[i].valid = false;
-								m_itlb_entries[i].valid = false;
-							}
+						case 5:     // Flush I
+						case 6:     // Flush D
+						case 7:     // Flush I+D
+							flush_translations();
 							break;
 						default:
 							LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Unsupported TLB Op\n");
@@ -2371,46 +2380,11 @@ void arm7_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 				case 1:
 					switch (op3)
 					{
-						case 5:
-						{
-							// Flush I single entry
-							tlb_entry *entry = tlb_probe(data, ARM7_TLB_ABORT_P);
-							if (entry)
-							{
-								LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback TLB Ops: Successfully flushed I entry for %08x\n", data);
-								entry->valid = false;
-							}
+						case 5:     // Flush I single entry
+						case 6:     // Flush D single entry
+						case 7:     // Flush unified single entry
+							vtlb_flush_mva(data);
 							break;
-						}
-
-						case 6:
-						{
-							// Flush D single entry
-							tlb_entry *entry = tlb_probe(data, ARM7_TLB_ABORT_D);
-							if (entry)
-							{
-								LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback TLB Ops: Successfully flushed D entry for %08x\n", data);
-								entry->valid = false;
-							}
-							break;
-						}
-						case 7:
-						{
-							// Flush unified single entry
-							tlb_entry *entry = tlb_probe(data, ARM7_TLB_ABORT_D);
-							if (entry)
-							{
-								LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback TLB Ops: Successfully flushed D entry for %08x\n", data);
-								entry->valid = false;
-							}
-							entry = tlb_probe(data, ARM7_TLB_ABORT_P);
-							if (entry)
-							{
-								LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback TLB Ops: Successfully flushed I entry for %08x\n", data);
-								entry->valid = false;
-							}
-							break;
-						}
 						default:
 							LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Unsupported TLB Op\n");
 							break;
@@ -2425,6 +2399,7 @@ void arm7_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Write PID = %08x (%d) (%d), PC = %08x\n", data, op2, op3, m_r[eR15]);
 			COPRO_FCSE_PID = data;
 			m_pid_offset = (((COPRO_FCSE_PID >> 25) & 0x7F)) * 0x2000000;
+			drc_tlb_flush();    // the data TLB is keyed by the address before the relocation
 			break;
 		case 14:            // Write Breakpoint
 			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Write Breakpoint = %08x (%d) (%d)\n", data, op2, op3);
@@ -2522,6 +2497,11 @@ void arm946es_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 				break;
 
 			case 7: // cache commands
+				// c7,c0,4 and c7,c8,2 wait for an interrupt, unless IRQ or FIQ is already asserted
+				if (((op3 == 0 && op2 == 4) || (op3 == 8 && op2 == 2)) && !m_pendingIrq && !m_pendingFiq)
+				{
+					spin_until_interrupt();
+				}
 				break;
 
 			case 9: // cache lockdown & TCM controls
@@ -2557,6 +2537,7 @@ void arm946es_cpu_device::RefreshDTCM()
 		cp15_dtcm_base = 0xffffffff;
 		cp15_dtcm_size = cp15_dtcm_end = 0;
 	}
+	drc_remapped();
 }
 
 void arm946es_cpu_device::RefreshITCM()
@@ -2573,6 +2554,7 @@ void arm946es_cpu_device::RefreshITCM()
 		cp15_itcm_base = 0xffffffff;
 		cp15_itcm_size = cp15_itcm_end = 0;
 	}
+	drc_remapped();
 }
 
 void arm946es_cpu_device::arm7_cpu_write32(offs_t addr, uint32_t data)
@@ -2640,6 +2622,16 @@ uint32_t arm946es_cpu_device::insn_fetch_word(offs_t addr)
 	}
 
 	return m_pr32(addr);
+}
+
+const void *arm946es_cpu_device::insn_fetch_ptr(offs_t addr)
+{
+	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
+	{
+		return &ITCM[addr & 0x7ffc];
+	}
+
+	return m_prptr(addr);
 }
 
 uint32_t arm946es_cpu_device::arm7_cpu_read32(offs_t addr)

@@ -319,6 +319,7 @@ protected:
 	// device-level overrides
 	virtual void device_reset() override ATTR_COLD;
 
+	virtual void execute_set_input(int inputnum, int state) override;
 	virtual void interrupt_vector() override;
 
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override;

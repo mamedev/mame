@@ -6823,11 +6823,13 @@ Black screen after loading of a new game, requires raster effect support in [VDP
 		</part>
 	</software>
 
-	<!-- Identifying Shanghai - Banri no Choujou (Japan) (1M)... -->
 	<software name="shangban" cloneof="shanghtt" supported="no">
-		<description>Shanghai - Banri no Choujou (Japan, 1M)</description>
+		<description>Shanghai: Banri no Choujou (Japan, 1M)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
+		<notes><![CDATA[
+[CD-Block] Black screen, regressed around 0.289 ~ 0.290
+]]></notes>
 		<info name="serial" value="T-1505G"/>
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="上海 万里の長城"/>
@@ -6839,11 +6841,13 @@ Black screen after loading of a new game, requires raster effect support in [VDP
 		</part>
 	</software>
 
-	<!-- Identifying Shanghai - Banri no Choujou (Japan) (Rev A)... -->
 	<software name="shangbana" cloneof="shanghtt" supported="no">
-		<description>Shanghai - Banri no Choujou (Japan, rev A)</description>
+		<description>Shanghai: Banri no Choujou (Japan, rev A)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
+		<notes><![CDATA[
+(as shangban)
+]]></notes>
 		<info name="serial" value="T-1505G"/>
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="上海 万里の長城"/>
@@ -14839,7 +14843,7 @@ Not extensively tested
 	<software name="bptennisj" cloneof="bptennis" supported="no">
 		<description>Break Point (Japan)</description>
 		<year>1997</year>
-		<publisher>Pack-In Video</publisher>
+		<publisher>Pack-in-Video</publisher>
 		<notes><![CDATA[
 Not extensively tested
 ]]></notes>
@@ -17503,7 +17507,7 @@ Allegedly should enable [VDP2] RGB1 with RGB0 disabled
 	<software name="hyprsecs" supported="no">
 		<description>Hyper Securities S (Japan)</description>
 		<year>1997</year>
-		<publisher>Pack-In Video</publisher>
+		<publisher>Pack-in-Video</publisher>
 		<info name="serial" value="T-9105G"/>
 		<info name="release" value="19970207"/>
 		<info name="alt_title" value="はいぱあセキュリティーズS"/>
@@ -18655,7 +18659,7 @@ Known to use [SCUDSP]
 	<software name="pinbgrafj" cloneof="pinbgraf" supported="no">
 		<description>Pinball Graffiti (Japan)</description>
 		<year>1996</year>
-		<publisher>Pack-In Video</publisher>
+		<publisher>Pack-in-Video</publisher>
 		<info name="serial" value="T-9101G"/>
 		<info name="release" value="19960712"/>
 		<info name="alt_title" value="ピンボールグラフィティ"/>
@@ -19491,11 +19495,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Shanghai - Haonri no Choujou (T-1505G)... -->
 	<software name="shangbanb" cloneof="shanghtt" supported="no">
-		<description>Shanghai - Banri no Choujou (Japan, alt)</description>
+		<description>Shanghai: Banri no Choujou (Japan, alt)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
+		<notes><![CDATA[
+(as shangban)
+]]></notes>
 		<info name="serial" value="T-1505G"/>
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="上海 万里の長城"/>
@@ -21355,7 +21361,7 @@ Eventually crashes with a divide by zero, [VDP1] timings?
 	<software name="wangan" cloneof="highway2" supported="no">
 		<description>Wangan Dead Heat (Japan)</description>
 		<year>1995</year>
-		<publisher>Pack-In Video</publisher>
+		<publisher>Pack-in-Video</publisher>
 		<info name="serial" value="T-9102G"/>
 		<info name="release" value="19951215"/>
 		<info name="alt_title" value="湾岸デッドヒート"/>
@@ -36731,8 +36737,7 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying dw-sat-0815-Shanghai_TripleThreat-usa... -->
-	<software name="shanghtt" supported="no">
+	<software name="shanghtt" supported="yes">
 		<description>Shanghai: Triple Threat (USA)</description>
 		<year>1995</year>
 		<publisher>Activision</publisher>
