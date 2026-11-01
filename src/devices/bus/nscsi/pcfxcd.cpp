@@ -31,7 +31,7 @@
 #define LOG_CMD            (1U << 1)
 #define LOG_CDDA           (1U << 2)
 
-#define VERBOSE (0)
+#define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
@@ -338,17 +338,59 @@ void nscsi_cdrom_pcfx_device::scsi_command()
 			break;
 
 		case 0x0d:  // NEC: no operation
-		case 0xdb:  // NEC: set stop time
+			LOGCMD("0x0d NEC No Operation\n");
 			scsi_status_complete(SS_GOOD);
 			break;
 
 		case 0xd8: nec_set_audio_start_position(); break;
 		case 0xd9: nec_set_audio_end_position(); break;
 		case 0xda: nec_pause(); break;
+		case 0xdb:
+			// TODO: stub
+			LOGCMD("0xdb NEC Set Stop Time\n");
+			scsi_status_complete(SS_GOOD);
+			break;
 		case 0xdd: nec_read_subq(); break;
 		case 0xde: nec_get_dir_info(); break;
 
+		// 9.2.17
+		// a.k.a. eject disc (testable by pressing button I on ⏏️ icon on main menu)
+		// TODO: this depends on mechanical tray timing
+		case SC_START_STOP_UNIT:
+		{
+			// const u8 lun = m_scsi_cmdbuf[1] >> 5;
+
+			// 1 = return status immediately
+			// 0 = return status after operation is complete
+			const u8 immed = BIT(m_scsi_cmdbuf[1], 0);
+
+			// LoEj 1 & start 0 = unload disc
+			// LoEj 0 & start 1 = load disc (should be N/A for this)
+			const u8 LoEj = BIT(m_scsi_cmdbuf[4], 1);
+			const u8 start = BIT(m_scsi_cmdbuf[4], 0);
+
+			LOGCMD("0x1b Start/Stop Unit Immed=%d LoEj=%d start=%d\n", immed, LoEj, start);
+
+			if (LoEj && !start)
+			{
+				cdda->stop_audio();
+				set_cdda_status(CDDA_STOPPED);
+				image->unload();
+				sense(false, SK_NOT_READY, SK_ASC_MEDIUM_NOT_PRESENT);
+				scsi_status_complete(SS_GOOD);
+			}
+			else
+			{
+				// TODO: no idea what error code this should return
+				LOG("Start/Stop Unit unsupported combination (%d %d)!\n", LoEj, start);
+				scsi_status_complete(SS_CHECK_CONDITION);
+				sense(false, SK_ILLEGAL_REQUEST);
+			}
+			break;
+		}
+
 		default:
+			// TODO: this should log potentially unhandled commands by the parent
 			nscsi_cdrom_device::scsi_command();
 			break;
 	}
@@ -448,7 +490,7 @@ void nscsi_cdrom_pcfx_device::scsi_play_audio(u32 start, u32 end)
 			return;
 		}
 
-		LOGCMD("SCSI audio play %d-%d\n", start, end);
+		LOGCDDA("SCSI audio play %d-%d\n", start, end);
 		m_cdda_loop = false;
 		cdda->set_output_gain(ALL_OUTPUTS, 1.0);
 		cdda->pause_audio(0);
