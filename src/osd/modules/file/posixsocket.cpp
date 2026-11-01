@@ -43,59 +43,76 @@ public:
 	posix_osd_socket& operator=(posix_osd_socket &&) = delete;
 
 	posix_osd_socket(int sock, bool listening) noexcept
-		: m_sock(sock)
-		, m_listening(listening)
+		: m_listener(listening ? sock : -1)
+		, m_sock(listening ? -1 : sock)
+		, m_eof(false)
 	{
-		assert(m_sock >= 0);
+		assert(sock >= 0);
 	}
 
 	virtual ~posix_osd_socket()
 	{
-		::close(m_sock);
+		if (m_sock >= 0)
+			::close(m_sock);
+		if (m_listener >= 0)
+			::close(m_listener);
 	}
 
 	virtual std::error_condition read(void *buffer, std::uint64_t offset, std::uint32_t count, std::uint32_t &actual) noexcept override
 	{
+		// once the client has finished sending, watch for the next one instead
+		int const fd = ((m_sock < 0) || m_eof) ? m_listener : m_sock;
+		assert(fd >= 0);
+
 		fd_set readfds;
 		FD_ZERO(&readfds);
-		FD_SET(m_sock, &readfds);
+		FD_SET(fd, &readfds);
 
 		struct timeval timeout;
 		timeout.tv_sec = timeout.tv_usec = 0;
 
-		if (::select(m_sock + 1, &readfds, nullptr, nullptr, &timeout) < 0)
+		if (::select(fd + 1, &readfds, nullptr, nullptr, &timeout) < 0)
 		{
 			return std::error_condition(errno, std::generic_category());
 		}
-		else if (FD_ISSET(m_sock, &readfds))
+		else if (FD_ISSET(fd, &readfds))
 		{
-			if (!m_listening)
+			if (fd == m_sock)
 			{
 				// connected socket
 				ssize_t const result = ::read(m_sock, buffer, count);
 				if (result < 0)
 				{
-					return std::error_condition(errno, std::generic_category());
+					std::error_condition const err(errno, std::generic_category());
+					if ((m_listener < 0) || !connection_lost(err))
+						return err;
+
+					// report a lost connection as end of file, as for one the peer closed
+					disconnect();
+					actual = 0;
+					return std::error_condition();
 				}
 				else
 				{
+					// end of file: the peer has finished sending, but may still be reading
+					if (!result && count && (m_listener >= 0))
+						m_eof = true;
 					actual = std::uint32_t(size_t(result));
 					return std::error_condition();
 				}
 			}
 			else
 			{
-				// listening socket
-				int const accepted = ::accept(m_sock, nullptr, nullptr);
+				// listening socket - accept the next connection, replacing a client that has finished sending
+				int const accepted = ::accept(m_listener, nullptr, nullptr);
 				if (accepted < 0)
 				{
 					return std::error_condition(errno, std::generic_category());
 				}
 				else
 				{
-					::close(m_sock);
+					disconnect();
 					m_sock = accepted;
-					m_listening = false;
 					actual = 0;
 
 					return std::error_condition();
@@ -112,19 +129,25 @@ public:
 
 	virtual std::error_condition write(void const *buffer, std::uint64_t offset, std::uint32_t count, std::uint32_t &actual) noexcept override
 	{
-		if (!m_listening)
+		if (m_sock >= 0)
 		{
 			// connected socket
 			ssize_t const result = ::write(m_sock, buffer, count);
 			if (result < 0)
-				return std::error_condition(errno, std::generic_category());
+			{
+				// once the peer has finished sending, a failed write ends the connection
+				std::error_condition const err(errno, std::generic_category());
+				if (m_eof && connection_lost(err))
+					disconnect();
+				return err;
+			}
 
 			actual = std::uint32_t(size_t(result));
 			return std::error_condition();
 		}
 		else
 		{
-			// listening socket - writing may raise SIGPIPE
+			// not connected
 			actual = 0;
 			return std::errc::not_connected;
 		}
@@ -143,8 +166,30 @@ public:
 	}
 
 private:
-	int     m_sock;
-	bool    m_listening;
+	static bool connection_lost(std::error_condition const &err) noexcept
+	{
+		return
+				(std::errc::interrupted != err) &&
+				(std::errc::operation_would_block != err) &&
+				(std::errc::resource_unavailable_try_again != err) &&
+				(std::errc::no_buffer_space != err) &&
+				(std::errc::not_enough_memory != err);
+	}
+
+	void disconnect() noexcept
+	{
+		// a listening socket goes back to accepting; an outgoing connection stays as it is
+		if ((m_listener >= 0) && (m_sock >= 0))
+		{
+			::close(m_sock);
+			m_sock = -1;
+			m_eof = false;
+		}
+	}
+
+	int     m_listener; // -1 for an outgoing connection
+	int     m_sock;     // -1 while waiting for a connection
+	bool    m_eof;      // client has finished sending
 };
 
 
