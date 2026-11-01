@@ -239,6 +239,7 @@ protected:
 	attotime m_amplifier_freakout_time;
 	int m_cache_index;
 	u32 m_cache_entry;
+	u32 m_cache_weak_id;
 	bool m_cache_weak;
 
 	bool m_image_dirty, m_track_dirty;
