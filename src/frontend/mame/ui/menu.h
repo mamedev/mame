@@ -41,8 +41,14 @@
 
 struct ui_event;
 
-
 namespace ui {
+
+// context in which a menu presents its items, used for resolving item colors
+enum class menu_color_context : uint8_t
+{
+	CONFIGURATION,
+	SELECTION
+};
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -75,11 +81,11 @@ public:
 	}
 
 	// append a new item to the end of the menu
-	int item_append(const std::string &text, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN) { return item_append(std::string(text), std::string(), flags, ref, type); }
-	int item_append(const std::string &text, const std::string &subtext, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN) { return item_append(std::string(text), std::string(subtext), flags, ref, type); }
-	int item_append(std::string &&text, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN) { return item_append(text, std::string(), flags, ref, type); }
-	int item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
-	int item_append(menu_item item) { return item_append(item.text(), item.subtext(), item.flags(), item.ref(), item.type()); }
+	int item_append(const std::string &text, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN, menu_item_color_state color_state = menu_item_color_state::NORMAL) { return item_append(std::string(text), std::string(), flags, ref, type, color_state); }
+	int item_append(const std::string &text, const std::string &subtext, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN, menu_item_color_state color_state = menu_item_color_state::NORMAL) { return item_append(std::string(text), std::string(subtext), flags, ref, type, color_state); }
+	int item_append(std::string &&text, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN, menu_item_color_state color_state = menu_item_color_state::NORMAL) { return item_append(text, std::string(), flags, ref, type, color_state); }
+	int item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN, menu_item_color_state color_state = menu_item_color_state::NORMAL);
+	int item_append(menu_item item) { return item_append(item.text(), item.subtext(), item.flags(), item.ref(), item.type(), item.color_state()); }
 	int item_append(menu_item_type type, uint32_t flags = 0);
 	int item_append_on_off(const std::string &text, bool state, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
 
@@ -344,6 +350,9 @@ protected:
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect);
 	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2);
 
+	// context for resolving item colors (selection menus vs. configuration menus)
+	virtual menu_color_context color_context() const noexcept { return menu_color_context::CONFIGURATION; }
+
 	// access to pointer state
 	bool have_pointer() const noexcept { return m_global_state.have_pointer(); }
 	bool pointer_idle() const noexcept { return (track_pointer::IDLE == m_pointer_state) && have_pointer(); }
@@ -508,6 +517,9 @@ private:
 	// drawing the menu
 	void do_draw_menu();
 	virtual void draw(uint32_t flags);
+
+	// resolve the color for deemphasized item text in the current color context
+	rgb_t deemphasis_color(uint32_t flags) const;
 
 	// request the specific handling of the game selection main menu
 	void set_special_main_menu(bool disable);

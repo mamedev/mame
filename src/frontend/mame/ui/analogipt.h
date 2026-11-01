@@ -88,6 +88,7 @@ private:
 	bool update_scroll_drag(ui_event const &uievt);
 
 	static std::string item_text(int type, int value);
+	static menu_item_color_state item_color_state(int type, int value);
 
 	item_data_vector m_item_data;
 	field_data_vector m_field_data;

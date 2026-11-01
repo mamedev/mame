@@ -252,7 +252,7 @@ void menu_dats_view::custom_render(uint32_t flags, void *selectedref, float top,
 	float y2 = y1 + (2.0F * tb_border()) + line_height();
 
 	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().accent_color());
 
 	draw_text_normal(
 			driver,
@@ -292,12 +292,12 @@ void menu_dats_view::custom_render(uint32_t flags, void *selectedref, float top,
 		rgb_t bgcolor;
 		if (i == m_current_tab)
 		{
-			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
-			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
+			fgcolor = ui().colors().focus_color();
+			bgcolor = ui().colors().focus_bg_color();
 			ui().draw_textured_box(
 					container(),
 					elem.bounds.first, m_tab_line.first, elem.bounds.second, m_tab_line.second,
-					bgcolor, rgb_t(255, 43, 43, 43),
+					bgcolor, ui().colors().focus_outline_color(),
 					hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 		}
 		else
@@ -349,7 +349,7 @@ void menu_dats_view::custom_render(uint32_t flags, void *selectedref, float top,
 		y2 = origy2 + bottom;
 
 		// draw a box
-		ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
+		ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().accent_color());
 
 		// draw the text within it
 		draw_text_normal(
