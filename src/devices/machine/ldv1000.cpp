@@ -56,6 +56,7 @@
 
 // devices
 DEFINE_DEVICE_TYPE(PIONEER_LDV1000, pioneer_ldv1000_device, "ldv1000", "Pioneer LD-V1000")
+DEFINE_DEVICE_TYPE(FUNAI_LDV1000, funai_ldv1000_device, "funai_ldv1000", "Funai Modified LD-V1000")
 
 
 
@@ -646,4 +647,63 @@ void pioneer_ldv1000_device::ppi1_portc_w(uint8_t data)
 
 	// audio squelch is controlled by bits 0-2
 	set_audio_squelch(!(data & 0x04) || !(data & 0x01), !(data & 0x04) || !(data & 0x02));
+}
+
+
+
+//**************************************************************************
+//  FUNAI MODIFIED LD-V1000 IMPLEMENTATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  funai_ldv1000_device - constructor
+//-------------------------------------------------
+
+funai_ldv1000_device::funai_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pioneer_ldv1000_device(mconfig, FUNAI_LDV1000, tag, owner, clock)
+	, m_hold_command(false)
+{
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void funai_ldv1000_device::device_reset()
+{
+	pioneer_ldv1000_device::device_reset();
+
+	// a game reset doesn't power-cycle the player on real hardware, so don't let stale servo state survive it
+	address_space &space = m_z80_cpu->space(AS_PROGRAM);
+	for (offs_t offs = 0x8000; offs < 0x8800; offs++)
+		space.write_byte(offs, 0);
+	m_multitimer->adjust(attotime::never);
+	set_slider_speed(0);
+}
+
+
+//-------------------------------------------------
+//  data_w - handle a parallel data write to the
+//  player
+//-------------------------------------------------
+
+void funai_ldv1000_device::data_w(uint8_t data)
+{
+	// keep a pending command until the player has read it, rather than letting idle bytes overwrite it
+	if (!m_hold_command || data != 0xff)
+		pioneer_ldv1000_device::data_w(data);
+}
+
+
+//-------------------------------------------------
+//  player_update - the disc must only advance
+//  while the spindle is turning, otherwise the
+//  player's startup check fails after a soft reset
+//-------------------------------------------------
+
+int32_t funai_ldv1000_device::player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
+{
+	int32_t const result = pioneer_ldv1000_device::player_update(vbi, fieldnum, curtime);
+	return (focus_on() && spdl_on() && laser_on()) ? result : 0;
 }

@@ -46,40 +46,6 @@ Todo:
 
 namespace {
 
-// A game reset doesn't power-cycle the player on real hardware, so the disc must only advance
-// while the spindle is turning, otherwise the player's startup check fails after a soft reset.
-class istellar_ldv1000_device : public pioneer_ldv1000_device
-{
-public:
-	istellar_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-
-protected:
-	virtual void device_reset() override
-	{
-		pioneer_ldv1000_device::device_reset();
-
-		// don't let stale servo state survive a game reset
-		address_space &space = m_z80_cpu->space(AS_PROGRAM);
-		for (offs_t offs = 0x8000; offs < 0x8800; offs++)
-			space.write_byte(offs, 0);
-		m_multitimer->adjust(attotime::never);
-		set_slider_speed(0);
-	}
-
-	virtual int32_t player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override
-	{
-		int32_t const result = pioneer_ldv1000_device::player_update(vbi, fieldnum, curtime);
-		return (focus_on() && spdl_on() && laser_on()) ? result : 0;
-	}
-};
-
-DEFINE_DEVICE_TYPE_PRIVATE(ISTELLAR_LDV1000, pioneer_ldv1000_device, istellar_ldv1000_device, "istellar_ldv1000", "Pioneer LDV-1000 (Inter Stellar)")
-
-istellar_ldv1000_device::istellar_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pioneer_ldv1000_device(mconfig, ISTELLAR_LDV1000, tag, owner, clock)
-{
-}
-
 class istellar_state : public driver_device
 {
 public:
@@ -120,6 +86,8 @@ private:
 	required_shared_ptr<uint8_t> m_tile_ram;
 	required_shared_ptr<uint8_t> m_tile_control_ram;
 	required_shared_ptr<uint8_t> m_sprite_ram;
+
+	bool m_irq_pulse = false;
 
 	tilemap_t *m_fg_tilemap = nullptr;
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -473,7 +441,8 @@ void istellar_state::vblank_irq(int state)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 
 		// Interrupt presumably comes from the LDP's status strobe
-		m_subcpu->set_input_line(0, ASSERT_LINE);
+		// Laser Fantasy's comm CPU IRQ handler never writes port 2 to release the line
+		m_subcpu->set_input_line(0, m_irq_pulse ? HOLD_LINE : ASSERT_LINE);
 	}
 }
 
@@ -507,7 +476,12 @@ void istellar_state::istellar(machine_config &config)
 	latch2.data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
 	latch2.set_separate_acknowledge(true);
 
-	pioneer_ldv1000_device &laserdisc(downcast<pioneer_ldv1000_device &>(*config.device_add(m_laserdisc.finder_tag(), ISTELLAR_LDV1000, 0U)));
+	// Laser Fantasy's comm CPU never clears its IRQ, loses commands to the player, and needs a faster player servo timer
+	m_irq_pulse = true;
+
+	funai_ldv1000_device &laserdisc(downcast<funai_ldv1000_device &>(*config.device_add(m_laserdisc.finder_tag(), FUNAI_LDV1000, 0U)));
+	laserdisc.set_hold_command(true);
+	subdevice<z80ctc_device>("laserdisc:ldvctc")->set_clock(XTAL(5'000'000));
 	laserdisc.set_overlay(256, 256, FUNC(istellar_state::screen_update));
 	laserdisc.add_route(0, "speaker", 1.0, 0);
 	laserdisc.add_route(1, "speaker", 1.0, 1);
@@ -532,6 +506,11 @@ void istellar_state::istellar(machine_config &config)
 void istellar_state::istellar2(machine_config &config)
 {
 	istellar(config);
+
+	// Zangus keeps the stock player and IRQ behaviour
+	m_irq_pulse = false;
+	downcast<funai_ldv1000_device &>(*subdevice("laserdisc")).set_hold_command(false);
+	subdevice<z80ctc_device>("laserdisc:ldvctc")->set_clock(XTAL(5'000'000) / 2);
 	m_subcpu->set_addrmap(AS_PROGRAM, &istellar_state::z80_2_mem_roms);
 }
 
@@ -646,5 +625,5 @@ void istellar_state::init_istellar()
 
 
 //    YEAR  NAME       PARENT   MACHINE    INPUT     STATE            INIT           MONITOR  COMPANY          FULLNAME                                       FLAGS)
-GAME( 1983, istellar,  0,       istellar,  istellar, istellar_state,  init_istellar, ROT0,    "Funai/Gakken",  "Inter Stellar (Laser Fantasy)", MACHINE_NOT_WORKING)
+GAME( 1983, istellar,  0,       istellar,  istellar, istellar_state,  init_istellar, ROT0,    "Funai/Gakken",  "Inter Stellar (Laser Fantasy)", 0)
 GAME( 1984, istellar2, 0,       istellar2, istellar2, istellar_state,  init_istellar, ROT0,    "Funai/Gakken",  "Inter Stellar Zangus (Laser Fantasy vol. 2)", 0)

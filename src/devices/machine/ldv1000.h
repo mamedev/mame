@@ -25,6 +25,7 @@
 
 // device type definition
 DECLARE_DEVICE_TYPE(PIONEER_LDV1000, pioneer_ldv1000_device)
+DECLARE_DEVICE_TYPE(FUNAI_LDV1000, funai_ldv1000_device)
 
 
 
@@ -122,6 +123,31 @@ protected:
 	bool                  m_vbiready;                 /* VBI ready flag */
 	uint8_t               m_vbiindex;                 /* index within the VBI data */
 
+};
+
+
+// ======================> funai_ldv1000_device
+
+// Funai-modified LD-V1000, as used by Inter Stellar
+class funai_ldv1000_device : public pioneer_ldv1000_device
+{
+public:
+	funai_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	// Laser Fantasy's comm CPU sends idle (0xff) bytes faster than the player polls
+	void set_hold_command(bool hold) { m_hold_command = hold; }
+
+	virtual void data_w(uint8_t data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_reset() override ATTR_COLD;
+
+	// subclass overrides
+	virtual int32_t player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
+
+private:
+	bool m_hold_command;
 };
 
 #endif // MAME_MACHINE_LDV1000_H
