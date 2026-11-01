@@ -115,10 +115,10 @@ protected:
 	virtual void io_w(offs_t offset, u16 data, u16 mem_mask);
 
 	required_ioport_array<5> m_strobein;
-	u16 m_output_latch = 0;
+	u16 m_output_latch;
 
 private:
-	static constexpr unsigned NVRAM_BYTES = 16 * 1024;
+	static constexpr unsigned int NVRAM_BYTES = 16 * 1024;
 
 	void update_lamps();
 	void lamp_port_a_w(u8 data);
@@ -165,10 +165,10 @@ private:
 	output_finder<24> m_lamps;
 	output_finder<5> m_coin_lockouts;
 
-	u8 m_active_strobe = 0;
-	u8 m_volume = 0;
-	u16 m_lamp_latch = 0;
-	u8 m_lamp_port_a = 0;
+	u8 m_active_strobe;
+	u8 m_volume;
+	u16 m_lamp_latch;
+	u8 m_lamp_port_a;
 };
 
 class c3_payslide_state : public bfm_cobra3_state
@@ -237,6 +237,7 @@ private:
 bfm_cobra3_state::bfm_cobra3_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag)
 	, m_strobein(*this, "STROBE%u", 0)
+	, m_output_latch(0)
 	, m_maincpu(*this, "maincpu")
 	, m_cpuregion(*this, "maincpu")
 	, m_mainram(*this, "nvram", NVRAM_BYTES, ENDIANNESS_BIG)
@@ -255,6 +256,10 @@ bfm_cobra3_state::bfm_cobra3_state(const machine_config &mconfig, device_type ty
 	, m_meters(*this, "meters")
 	, m_lamps(*this, "lamp%u", 0U)
 	, m_coin_lockouts(*this, "coin_lockout%u", 0U)
+	, m_active_strobe(0)
+	, m_volume(0)
+	, m_lamp_latch(0)
+	, m_lamp_port_a(0)
 {
 }
 
@@ -280,10 +285,10 @@ c3_hopper_state::c3_hopper_state(const machine_config &mconfig, device_type type
 
 void bfm_cobra3_state::update_lamps()
 {
-	for (unsigned i = 0; i < 16; i++)
+	for (unsigned int i = 0; i < 16; i++)
 		m_lamps[i] = BIT(m_lamp_latch, i);
 
-	for (unsigned i = 0; i < 8; i++)
+	for (unsigned int i = 0; i < 8; i++)
 		m_lamps[16 + i] = BIT(m_lamp_port_a, i);
 }
 
@@ -299,7 +304,7 @@ void bfm_cobra3_state::output_latch_w(u16 data, u16 mem_mask)
 	u16 const previous = m_output_latch;
 	COMBINE_DATA(&m_output_latch);
 
-	for (unsigned i = 0; i < 4; i++)
+	for (unsigned int i = 0; i < 4; i++)
 		m_meters->update(i, BIT(m_output_latch, i));
 
 	if (BIT(previous, 15) && !BIT(m_output_latch, 15))
@@ -307,7 +312,7 @@ void bfm_cobra3_state::output_latch_w(u16 data, u16 mem_mask)
 
 	m_watchdog->reset_line_w(BIT(m_output_latch, 8));
 
-	for (unsigned i = 0; i < 5; i++)
+	for (unsigned int i = 0; i < 5; i++)
 	{
 		if (BIT(m_output_latch, i + 10))
 			m_active_strobe = i;
@@ -316,7 +321,7 @@ void bfm_cobra3_state::output_latch_w(u16 data, u16 mem_mask)
 
 int bfm_cobra3_state::meter_sense_r()
 {
-	for (unsigned i = 0; i < 4; i++)
+	for (unsigned int i = 0; i < 4; i++)
 	{
 		if (m_meters->get_activity(i))
 			return 1;
@@ -336,13 +341,13 @@ void bfm_cobra3_state::coin_lockouts_w(u8 enables)
 		!BIT(enables, 4)  // fifth validator channel
 	};
 
-	for (unsigned channel = 0; channel < std::size(lockouts); channel++)
+	for (unsigned int channel = 0; channel < std::size(lockouts); channel++)
 		m_coin_lockouts[channel] = lockouts[channel];
 
 	// Follow the encoded-coin ROM tables: 5p/10p/50p use bit 2, and £1/£2 use bit 3.
 	// TODO: Verify £2 inhibit wiring; the standard BCO profile has separate £1/£2 inhibit inputs.
-	unsigned const mapped_channels = m_coin_inputs.found() ? 3 : std::size(lockouts);
-	for (unsigned channel = 0; channel < mapped_channels; channel++)
+	unsigned int const mapped_channels = m_coin_inputs.found() ? 3 : std::size(lockouts);
+	for (unsigned int channel = 0; channel < mapped_channels; channel++)
 		machine().bookkeeping().coin_lockout_w(channel, lockouts[channel]);
 	if (m_coin_inputs.found())
 	{
@@ -406,7 +411,7 @@ INPUT_CHANGED_MEMBER(c3_payslide_state::coin_inserted)
 
 void c3_hopper_state::update_diverters()
 {
-	for (unsigned i = 0; i < 4; i++)
+	for (unsigned int i = 0; i < 4; i++)
 		m_diverters[i] = BIT(m_diverter_latch, i);
 }
 
