@@ -29,12 +29,12 @@ class gaelco3d_state : public driver_device
 public:
 	gaelco3d_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 		, m_adsp_ram_base(*this, "adsp_ram_base")
 		, m_m68k_ram_base16(*this, "m68k_ram_base16")
 		, m_m68k_ram_base32(*this, "m68k_ram_base32")
 		, m_adsp_control_regs(*this, "adsp_regs")
 		, m_adsp_fastram_base(*this, "adsp_fastram")
-		, m_maincpu(*this, "maincpu")
 		, m_adsp(*this, "adsp")
 		, m_eeprom(*this, "eeprom")
 		, m_tms(*this, "tms")
@@ -49,6 +49,7 @@ public:
 		, m_paletteram32(*this, "paletteram32")
 		, m_analog(*this, "ANALOG%u", 0U)
 		, m_adsp_bank(*this, "adspbank")
+		, m_texmask_rom(*this, "texmask")
 	{ }
 
 	void footbpow(machine_config &config);
@@ -60,9 +61,18 @@ public:
 	template <int N> int fp_analog_bit_r();
 
 protected:
+	// texture mask RAM, on boards without mask ROMs
+	static constexpr offs_t TEXMASK_RAM_SIZE = 0x80000;
+
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
+
+	void texmask_w(offs_t offset, uint8_t data);
+
+	void main_map(address_map &map) ATTR_COLD;
+
+	required_device<cpu_device> m_maincpu;
 
 private:
 	static constexpr unsigned SOUND_CHANNELS = 4;
@@ -86,6 +96,7 @@ private:
 		uint32_t polygons() { uint32_t result = m_polygons; m_polygons = 0; return result; }
 
 		void render_poly(screen_device &screen, uint32_t *polydata);
+		void texmask_w(offs_t offset, uint8_t data);
 
 	protected:
 		gaelco3d_state &m_state;
@@ -111,7 +122,6 @@ private:
 	optional_shared_ptr<uint32_t> m_m68k_ram_base32;
 	required_shared_ptr<uint16_t> m_adsp_control_regs;
 	required_shared_ptr<uint16_t> m_adsp_fastram_base;
-	required_device<cpu_device> m_maincpu;
 	required_device<adsp21xx_device> m_adsp;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<tms320c31_device> m_tms;
@@ -127,6 +137,7 @@ private:
 	optional_shared_ptr<uint32_t> m_paletteram32;
 	optional_ioport_array<4> m_analog;
 	required_memory_bank m_adsp_bank;
+	optional_region_ptr<uint8_t> m_texmask_rom;
 
 	uint8_t m_sound_status = 0;
 	uint8_t m_analog_ports[4]{};
@@ -178,7 +189,6 @@ private:
 	void adsp_data_map(address_map &map) ATTR_COLD;
 	void adsp_program_map(address_map &map) ATTR_COLD;
 	void main020_map(address_map &map) ATTR_COLD;
-	void main_map(address_map &map) ATTR_COLD;
 	void tms_map(address_map &map) ATTR_COLD;
 };
 
