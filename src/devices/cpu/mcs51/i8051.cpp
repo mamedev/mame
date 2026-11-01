@@ -252,9 +252,9 @@ u8 mcs51_cpu_device::sbuf_r()
 
 void mcs51_cpu_device::sbuf_w(u8 data)
 {
-	m_sbuf = data;
-	LOGMASKED(LOG_TX, "tx byte 0x%02x\n", m_sbuf);
-	m_uart.data_out = m_sbuf;
+	// SBUF is two registers: writes load the transmitter, reads (sbuf_r) the receive buffer
+	LOGMASKED(LOG_TX, "tx byte 0x%02x\n", data);
+	m_uart.data_out = data;
 	m_uart.txbit = SIO_START;
 }
 
