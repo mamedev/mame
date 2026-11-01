@@ -117,7 +117,10 @@ public:
 	struct
 	{
 		uint8_t current_value = 0;
+		uint8_t last_value = 0;
+		int8_t delta = 0;
 		bool reverse = false;
+		uint8_t port_value = 0;
 	} m_dial_status[2];
 
 	struct
@@ -491,7 +494,10 @@ void cyclemb_state::cyclemb_dial_reset()
 	for (int i = 0; i < 2; i++)
 	{
 		m_dial_status[i].current_value = 0;
+		m_dial_status[i].last_value = 0;
+		m_dial_status[i].delta = 0;
 		m_dial_status[i].reverse = false;
+		m_dial_status[i].port_value = 0;
 	}
 }
 
@@ -675,7 +681,6 @@ void cyclemb_state::cyclemb_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x6000, 0x63ff).ram();
-
 }
 
 uint8_t cyclemb_state::skydest_i8741_1_r(offs_t offset)
@@ -728,13 +733,15 @@ void cyclemb_state::machine_start()
 	for (int i = 0; i < 2; i++)
 	{
 		save_item(NAME(m_dial_status[i].current_value), i);
+		save_item(NAME(m_dial_status[i].last_value), i);
+		save_item(NAME(m_dial_status[i].delta), i);
 		save_item(NAME(m_dial_status[i].reverse), i);
+		save_item(NAME(m_dial_status[i].port_value), i);
 	}
 
 	save_item(NAME(m_screen_display));
 	save_item(NAME(m_sprite_page));
 
-	cyclemb_dial_reset();
 	m_screen_display = true;
 	m_sprite_page = 0;
 }
@@ -752,20 +759,19 @@ void cyclemb_state::update_dial(int P)
 		return;
 	}
 
-	int8_t input_value = m_dial[P]->read();
-	int delta = std::clamp((int)input_value, -0x1f, 0x1f);
-
-	if (delta != 0)
-	{
-		m_dial_status[P].reverse = (delta < 0);
-		m_dial_status[P].current_value = (m_dial_status[P].current_value + (uint8_t)abs(delta)) & 0x1f;
-	}
+	uint8_t const curr = m_dial[P]->read();
+	m_dial_status[P].last_value = m_dial_status[P].current_value;
+	m_dial_status[P].current_value = curr;
+	m_dial_status[P].delta = (int8_t)((int)m_dial_status[P].current_value - (int)m_dial_status[P].last_value);
+	m_dial_status[P].reverse = m_dial_status[P].delta < 0;
+	m_dial_status[P].port_value = (((m_dial_status[P].port_value & 0x7f) + std::abs(m_dial_status[P].delta)) & 0x1f) |
+		(m_dial_status[P].reverse ? 0x80 : 0x00);
 }
 
 template <int P>
 ioport_value cyclemb_state::dial_r()
 {
-	return m_dial_status[P].current_value | (m_dial_status[P].reverse ? 0x80 : 0x00);
+	return m_dial_status[P].port_value;
 }
 
 
@@ -785,7 +791,7 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(cyclemb_state::dial_r<0>))
 
 	PORT_START("DIAL_P1")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(16) PORT_PLAYER(1) PORT_RESET PORT_REVERSE
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(8) PORT_PLAYER(1) PORT_REVERSE
 
 	PORT_START("P2_0")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -797,7 +803,7 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DIAL_P2")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(16) PORT_PLAYER(2) PORT_RESET PORT_REVERSE PORT_COCKTAIL
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(8) PORT_PLAYER(2) PORT_REVERSE PORT_COCKTAIL
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x02, "Difficulty (Stage 1-3)" )
