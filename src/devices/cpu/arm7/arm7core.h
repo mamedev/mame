@@ -95,9 +95,6 @@ enum
 #define COPRO_TLB_LARGE_PAGE_MASK           0xffff0000
 #define COPRO_TLB_SMALL_PAGE_MASK           0xfffff000
 #define COPRO_TLB_TINY_PAGE_MASK            0xfffffc00
-#define COPRO_TLB_STABLE_MASK               0xfff00000
-#define COPRO_TLB_LSTABLE_MASK              0xfffff000
-#define COPRO_TLB_TTABLE_MASK               0xfffffc00
 #define COPRO_TLB_UNMAPPED                  0
 #define COPRO_TLB_LARGE_PAGE                1
 #define COPRO_TLB_SMALL_PAGE                2
@@ -146,50 +143,6 @@ enum
 
 #define COPRO_FCSE_PID                      m_fcsePID
 
-//#define ARM7_USE_DRC
-
-/* forward declaration of implementation-specific state */
-#ifndef ARM7_USE_DRC
-struct arm7imp_state {};
-#else
-struct arm7imp_state;
-#endif
-
-/* CPU state struct */
-struct arm_state
-{
-	uint32_t m_r[NUM_REGS];
-	bool m_pendingIrq;
-	bool m_pendingFiq;
-	bool m_pendingAbtD;
-	bool m_pendingAbtP;
-	bool m_pendingUnd;
-	bool m_pendingSwi;
-	bool m_pending_interrupt;
-	int m_icount;
-	endianness_t m_endian;
-	address_space *m_program;
-	std::function<u32 (offs_t)> m_pr32;
-
-	/* Coprocessor Registers */
-	uint32_t m_control;
-	uint32_t m_tlbBase;
-	uint32_t m_tlb_base_mask;
-	uint32_t m_faultStatus[2];
-	uint32_t m_faultAddress;
-	uint32_t m_fcsePID;
-	uint32_t m_domainAccessControl;
-	uint32_t m_decoded_access_control[16];
-
-	uint8_t m_archRev;          // ARM architecture revision (3, 4, and 5 are valid)
-	uint8_t m_archFlags;        // architecture flags
-
-#if ARM7_MMU_ENABLE_HACK
-	uint32_t mmu_enable_addr; // workaround for "MMU is enabled when PA != VA" problem
-#endif
-	arm7imp_state m_impstate;
-};
-
 /****************************************************************************************************
  *  VARIOUS INTERNAL STRUCS/DEFINES/ETC..
  ***************************************************************************************************/
@@ -207,27 +160,6 @@ enum
 };
 
 #define ARM7_NUM_MODES 0x10
-
-static const int thumbCycles[256] =
-{
-//  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  // 0
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  // 1
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  // 2
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  // 3
-	1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3, 3, 3,  // 4
-	2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,  // 5
-	2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3,  // 6
-	2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3,  // 7
-	2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3,  // 8
-	2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3,  // 9
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,  // a
-	1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 2, 4, 1, 1,  // b
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,  // c
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3,  // d
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,  // e
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2   // f
-};
 
 /* 17 processor registers are visible at any given time,
  * banked depending on processor mode.
@@ -516,6 +448,7 @@ enum arm7_cpu_device::arm_arch_flag : uint32_t
 	ARCHFLAG_T2       = 1U << 8,    // Thumb-2 present
 	ARCHFLAG_ONLY26   = 1U << 9,    // only the 26-bit modes exist (ARM1/ARM2/ARM3): 26-bit program space, no PROG32/DATA32
 	ARCHFLAG_V2A      = 1U << 10,   // ARMv2a: SWP present (ARM250, ARM3)
+	ARCHFLAG_NOCOPRO  = 1U << 11,   // no coprocessors at all (ARM7TDMI): MRC/MCR take the undefined instruction trap
 };
 
 enum arm7_cpu_device::arm_copro_id : uint32_t

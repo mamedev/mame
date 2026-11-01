@@ -5,6 +5,8 @@
 #include "arm7core.h"
 #include "arm7help.h"
 
+#include <bit>
+
 #define LOG_OPS     (1U << 1)
 
 #define VERBOSE     (0)
@@ -955,10 +957,7 @@ void arm7_cpu_device::tg04_01_30(uint32_t pc, uint32_t op)
 	else
 	{
 		set_cpsr(GET_CPSR & ~T_MASK);
-		if (addr & 2)
-		{
-			addr += 2;
-		}
+		addr &= ~3;     // the PC has no bits 1:0
 	}
 	R15 = addr;
 }
@@ -969,7 +968,7 @@ void arm7_cpu_device::tg04_01_31(uint32_t pc, uint32_t op)
 	uint32_t addr = GetRegister(rs+8);
 	if (rs == 7)
 	{
-		addr += 2;
+		addr += 4;     // PC reads as the instruction address + 4
 	}
 	if (addr & 1)
 	{
@@ -978,10 +977,7 @@ void arm7_cpu_device::tg04_01_31(uint32_t pc, uint32_t op)
 	else
 	{
 		set_cpsr(GET_CPSR & ~T_MASK);
-		if (addr & 2)
-		{
-			addr += 2;
-		}
+		addr &= ~3;     // the PC has no bits 1:0
 	}
 	R15 = addr;
 }
@@ -1001,10 +997,7 @@ void arm7_cpu_device::tg04_01_32(uint32_t pc, uint32_t op)
 	if (!(addr & 1))
 	{
 		set_cpsr(GET_CPSR & ~T_MASK);
-		if (addr & 2)
-		{
-			addr += 2;
-		}
+		addr &= ~3;     // the PC has no bits 1:0
 	}
 	else
 	{
@@ -1026,7 +1019,7 @@ void arm7_cpu_device::tg04_01_33(uint32_t pc, uint32_t op)
 	uint32_t addr = GetRegister(rs+8);
 	if (rs == 7)
 	{
-		addr += 2;      // R15 reads as the instruction address + 4
+		addr += 4;      // R15 reads as the instruction address + 4
 	}
 	SetRegister(14, (R15 + 2) | 1);
 
@@ -1034,10 +1027,7 @@ void arm7_cpu_device::tg04_01_33(uint32_t pc, uint32_t op)
 	if (!(addr & 1))
 	{
 		set_cpsr(GET_CPSR & ~T_MASK);
-		if (addr & 2)
-		{
-			addr += 2;
-		}
+		addr &= ~3;     // the PC has no bits 1:0
 	}
 	else
 	{
@@ -1229,7 +1219,7 @@ void arm7_cpu_device::tg09_1(uint32_t pc, uint32_t op) /* Load */
 {
 	uint32_t rd = (op & THUMB_STACKOP_RD) >> THUMB_STACKOP_RD_SHIFT;
 	int32_t offs = (uint8_t)(op & THUMB_INSN_IMM);
-	uint32_t readword = READ32((GetRegister(13) + ((uint32_t)offs << 2)) & ~3);
+	uint32_t readword = READ32(GetRegister(13) + (uint32_t(offs) << 2));
 	if (!m_pendingAbtD)
 		SetRegister(rd, readword);
 	R15 += 2;
@@ -1296,29 +1286,42 @@ void arm7_cpu_device::tg0b_4(uint32_t pc, uint32_t op) /* PUSH {Rlist} */
 		thumb_empty_rlist(13, false, false);
 		return;
 	}
-	for (int32_t offs = 7; offs >= 0; offs--)
+	// stored from the lowest address up, like STMDB
+	uint32_t const sp = GetRegister(13) - (std::popcount(op & 0xffu) << 2);
+	uint32_t addr = sp;
+	for (int32_t offs = 0; offs < 8; offs++)
 	{
 		if (op & (1 << offs))
 		{
-			SetRegister(13, GetRegister(13) - 4);
-			WRITE32(GetRegister(13), GetRegister(offs));
+			WRITE32(addr, GetRegister(offs));
+			if (m_pendingAbtD)
+				break;      // no base writeback
+			addr += 4;
 		}
 	}
+	if (!m_pendingAbtD)
+		SetRegister(13, sp);
 	R15 += 2;
 }
 
 void arm7_cpu_device::tg0b_5(uint32_t pc, uint32_t op) /* PUSH {Rlist}{LR} */
 {
-	SetRegister(13, GetRegister(13) - 4);
-	WRITE32(GetRegister(13), GetRegister(14));
-	for (int32_t offs = 7; offs >= 0; offs--)
+	uint32_t const sp = GetRegister(13) - ((std::popcount(op & 0xffu) + 1) << 2);
+	uint32_t addr = sp;
+	for (int32_t offs = 0; offs < 8; offs++)
 	{
 		if (op & (1 << offs))
 		{
-			SetRegister(13, GetRegister(13) - 4);
-			WRITE32(GetRegister(13), GetRegister(offs));
+			WRITE32(addr, GetRegister(offs));
+			if (m_pendingAbtD)
+				break;
+			addr += 4;
 		}
 	}
+	if (!m_pendingAbtD)
+		WRITE32(addr, GetRegister(14));
+	if (!m_pendingAbtD)
+		SetRegister(13, sp);
 	R15 += 2;
 }
 
@@ -1422,10 +1425,7 @@ void arm7_cpu_device::tg0b_d(uint32_t pc, uint32_t op) /* POP {Rlist}{PC} */
 		else
 		{
 			set_cpsr(GET_CPSR & ~T_MASK);
-			if (addr & 2)
-			{
-				addr += 2;
-			}
+			addr &= ~3;     // the PC has no bits 1:0
 		}
 
 		R15 = addr;
@@ -1467,6 +1467,9 @@ void arm7_cpu_device::tg0c_0(uint32_t pc, uint32_t op) /* Store */
 	}
 	uint32_t rd = (op & THUMB_MULTLS_BASE) >> THUMB_MULTLS_BASE_SHIFT;
 	uint32_t ld_st_address = GetRegister(rd);
+	// the base is stored written back unless it is the first register in the list (ARM7TDMI 4.11.6); ARMv5 stores the old value
+	if ((m_archRev < 5) && (op & (1 << rd)) && (op & util::make_bitmask<uint32_t>(rd)))
+		SetRegister(rd, ld_st_address + (std::popcount(op & 0xffu) << 2));
 	for (int32_t offs = 0; offs < 8; offs++)
 	{
 		if (op & (1 << offs))

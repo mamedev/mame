@@ -95,6 +95,7 @@ protected:
 	u8 m_fetch_rle_count = 0;
 	u8 m_fetch_rle_value = 0;
 	u8 m_fetch_rle_literal = 0;
+	u8 m_analog_last[4];
 	emu_timer *m_irq_off_timer = nullptr;
 	emu_timer *m_blitter_done_timer = nullptr;
 	int m_bankxor = 0;
