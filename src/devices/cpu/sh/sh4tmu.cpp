@@ -63,27 +63,32 @@ void sh34_base_device::sh4_timer_recompute(int which)
 TIMER_CALLBACK_MEMBER( sh34_base_device::sh4_timer_callback )
 {
 	int which = param;
+	uint32_t tcor = 0;
+	uint32_t tcr = 0;
 
 	switch (which)
 	{
 		case 0:
-			m_tcnt0 = m_tcor0;
+			tcor = m_tcor0;
+			tcr = m_tcr0;
+			m_tcnt0 = tcor;
 			break;
 
 		case 1:
-			m_tcnt1 = m_tcor1;
+			tcor = m_tcor1;
+			tcr = m_tcr1;
+			m_tcnt1 = tcor;
 			break;
 
 		case 2:
-			m_tcnt2 = m_tcor2;
+			tcor = m_tcor2;
+			tcr = m_tcr2;
+			m_tcnt2 = tcor;
 			break;
 
 	}
 
-	// a reload of 0 underflows on every tick: with the interrupt off nothing can see it, so stop until the
-	// registers are next written
-	const uint32_t tcor = (which == 0) ? m_tcor0 : (which == 1) ? m_tcor1 : m_tcor2;
-	const uint32_t tcr = (which == 0) ? m_tcr0 : (which == 1) ? m_tcr1 : m_tcr2;
+	// TCOR = 0 underflows on every tick; with UNIE clear only UNF shows it, and it stays set, so stop until TCOR, TCNT, TCR or TSTR is written
 	if (tcor != 0 || (tcr & 0x20))
 		sh4_timer_recompute(which);
 
