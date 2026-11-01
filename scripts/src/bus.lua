@@ -1781,6 +1781,7 @@ end
 ---------------------------------------------------
 --
 --@src/devices/bus/centronics/ctronics.h,BUSES["CENTRONICS"] = true
+--@src/devices/bus/centronics/hardlock.h,BUSES["CENTRONICS"] = true
 ---------------------------------------------------
 
 if BUSES["CENTRONICS"] then
@@ -1811,6 +1812,8 @@ if BUSES["CENTRONICS"] then
 		MAME_DIR .. "src/devices/bus/centronics/epson_lx810l.h",
 		MAME_DIR .. "src/devices/bus/centronics/epson_rx80.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/epson_rx80.h",
+		MAME_DIR .. "src/devices/bus/centronics/hardlock.cpp",
+		MAME_DIR .. "src/devices/bus/centronics/hardlock.h",
 		MAME_DIR .. "src/devices/bus/centronics/hasp_savquest.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/hasp_savquest.h",
 		MAME_DIR .. "src/devices/bus/centronics/neomania_adapter.cpp",
