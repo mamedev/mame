@@ -723,7 +723,12 @@ void mcs51_cpu_device::transmit_receive(int source)
 }
 
 
-bool mcs51_cpu_device::timer_running(unsigned timer) const
+bool mcs51_cpu_device::timer1_split_uses_input() const
+{
+	return false;
+}
+
+bool mcs51_cpu_device::timer_running(u32 timer) const
 {
 	bool const running = BIT(m_tcon, timer ? TCON_TR1 : TCON_TR0)
 		|| (timer && (m_tmod & 3) == 3 && timer1_split_uses_input());

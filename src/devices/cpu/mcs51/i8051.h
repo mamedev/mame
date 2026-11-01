@@ -335,8 +335,8 @@ protected:
 	virtual bool instruction_enabled() const;
 	virtual void prepare_instruction(u8 op);
 	virtual void update_peripherals();
-	virtual bool timer1_split_uses_input() const { return false; }
-	bool timer_running(unsigned timer) const;
+	virtual bool timer1_split_uses_input() const;
+	bool timer_running(u32 timer) const;
 	void acall(u8 r);
 	void set_reg(u8 r, u8 v);
 	u8 r_reg(u8 r);
