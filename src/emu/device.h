@@ -736,6 +736,14 @@ public:
 	bool started() const { return m_started; }
 	void reset();
 
+	/// \brief Opt the device out of machine reset
+	///
+	/// If set, the device and all of its child devices receive only their
+	/// initial power-on reset; they are not affected by subsequent machine
+	/// resets.  Use this for devices that are not connected to the system
+	/// reset signal in real hardware.
+	void set_ignore_reset(bool ignore_reset = true) { m_ignore_reset = ignore_reset; }
+
 	// clock/timing accessors
 	u32 clock() const { return m_clock; }
 	u32 unscaled_clock() const { return m_unscaled_clock; }
@@ -1055,6 +1063,8 @@ private:
 	std::string             m_basetag;              // base part of the tag
 	bool                    m_config_complete;      // have we completed our configuration?
 	bool                    m_started;              // true if the start function has succeeded
+	bool                    m_ignore_reset;         // device is not reset with the machine
+	bool                    m_reset_done;           // device has received its power-on reset
 	device_resolver_base *  m_auto_finder_list;     // list of objects to auto-find
 	mutable std::vector<rom_entry>  m_rom_entries;
 	std::vector<memory_view *> m_viewlist;          // list of views

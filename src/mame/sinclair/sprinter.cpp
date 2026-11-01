@@ -1985,6 +1985,7 @@ void sprinter_state::sprinter(machine_config &config)
 	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
 
 	PC_KBDC(config, m_kbd, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
+	m_kbd->set_ignore_reset();
 	m_kbd->out_data_cb().set(m_maincpu, FUNC(z84c015_device::rxa_w)); // KBD_DATR
 	m_kbd->out_clock_cb().set(m_maincpu, FUNC(z84c015_device::rxca_w)); // KBD_CLKR
 	m_kbd->out_clock_cb().append(m_maincpu, FUNC(z84c015_device::txca_w));
