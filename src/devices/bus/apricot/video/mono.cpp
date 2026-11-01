@@ -204,8 +204,7 @@ void apricot_mono_display_device::portb_w(uint8_t data)
 
 	m_portb = data;
 
-	if (BIT(m_portb, 0) == 0)
-		m_crtc->reset();
+	m_crtc->reset_w(BIT(m_portb, 0));
 }
 
 void apricot_mono_display_device::portx_w(uint8_t data)
