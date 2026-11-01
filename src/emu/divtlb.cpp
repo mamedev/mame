@@ -143,7 +143,7 @@ void device_vtlb_interface::interface_pre_reset()
 
 //-------------------------------------------------
 //  interface_post_load - work to be done after
-	loading a saved state
+//  loading a saved state
 //-------------------------------------------------
 
 void device_vtlb_interface::interface_post_load()
