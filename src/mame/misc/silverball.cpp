@@ -4,8 +4,11 @@
 
 TAB Austria "Silverball" PC-based touch games
 
+The Hardlock ASIC keys were recovered from the protected software. No dongle was dumped, so
+the EEPROM contents are reconstructed; original serial numbers and options are unknown.
+
 TODO:
-- Existing dumps all punts at dongle checks, requiring an emulation of the parallel port device.
+- Silverball I/O controller and sound card.
 - i440zx BIOSes crashes when writing Flash ROM sequences at PC=61C51 onward (by saving in CMOS).
 - slvrball806: crashes in vmm32.vxd loading, doesn't check the dongle, -chs mismatch with the
   comment. Commented out for now;
@@ -34,6 +37,7 @@ SiS 5600/SiS 5595 is a Slot 1 Pentium II MB, the earlier version of what is in s
 **************************************************************************************************/
 
 #include "emu.h"
+#include "bus/centronics/hardlock.h"
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/pci-smbus.h"
@@ -47,9 +51,62 @@ SiS 5600/SiS 5595 is a Slot 1 Pentium II MB, the earlier version of what is in s
 #include "bus/pci/virge_pci.h"
 #include "machine/w83977tf.h"
 
+#include <array>
+
 namespace {
 
 #define PCI_IDE_ID "pci:07.1"
+
+// These are reconstructed dongle EEPROM contents, not actual data.
+constexpr std::array<u16, 64> SLVRBALL720_EEPROM =
+{
+	0xb406, 0xc71b, 0x9100, 0x8ad8, 0x940e, 0x4038, 0x09a8, 0x200f,
+	0x967c, 0x3dd4, 0x342f, 0x16fe, 0x967c, 0x3dd4, 0x342f, 0x16fe,
+	0x967c, 0x3dd4, 0x342f, 0x16fe, 0x967c, 0x3dd4, 0x342f, 0x16fe,
+	0x967c, 0x3dd4, 0x342f, 0x16fe, 0x967c, 0x3dd4, 0x342f, 0x16fe,
+	0x967c, 0x3dd4, 0x342f, 0x16fe, 0x967c, 0x3dd4, 0x342f, 0x16fe,
+	0x967c, 0x3dd4, 0x342f, 0x16fe, 0x967c, 0x3dd4, 0x342f, 0x16fe,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+};
+
+constexpr std::array<u16, 64> SLVRBALL632_EEPROM =
+{
+	0x33b5, 0x69f9, 0xa9f8, 0x1965, 0x31fe, 0x7360, 0x6f2b, 0xd1c5,
+	0xbd63, 0x26c3, 0xfe4f, 0xd2dd, 0x31fe, 0x7360, 0x6f2b, 0xd1c5,
+	0xc7c8, 0x9643, 0x679f, 0x1120, 0x31fe, 0x7360, 0x6f2b, 0xd1c5,
+	0x970c, 0xfdee, 0x07c6, 0xb831, 0xd303, 0x1212, 0xde35, 0x01ef,
+	0xf652, 0xa4dc, 0xdaa1, 0xdbb7, 0x31fe, 0x7360, 0x6f2b, 0xd1c5,
+	0x31fe, 0x7360, 0x6f2b, 0xd1c5, 0x4f63, 0xe591, 0xf611, 0x8858,
+	0x31fe, 0x7360, 0x6f2b, 0xd1c5, 0x31fe, 0x7360, 0x6f2b, 0xd1c5,
+	0x31fe, 0x7360, 0x6f2b, 0xd1c5, 0x31fe, 0x7360, 0x6f2b, 0xd1c5,
+};
+
+constexpr std::array<u16, 64> SLVRBALLBU409_EEPROM =
+{
+	0x33b5, 0x69f9, 0xa9f8, 0x1965, 0x31fe, 0x7360, 0x6f2b, 0xd1c5,
+	0xbd63, 0x26c3, 0xfe4f, 0xd2dd, 0x31fe, 0x7360, 0x6f2b, 0xd1c5,
+	0xe05b, 0x5886, 0x9419, 0x9f99, 0x31fe, 0x7360, 0x6f2b, 0xd1c5,
+	0x970c, 0xfdee, 0x07c6, 0xb831, 0x89ea, 0x7ee7, 0xd9e0, 0x43b9,
+	0xb35f, 0xcccf, 0x620d, 0xb3ed, 0x31fe, 0x7360, 0x6f2b, 0xd1c5,
+	0x31fe, 0x7360, 0x6f2b, 0xd1c5, 0x9dc4, 0xd8a0, 0xaf2b, 0x6c22,
+	0x31fe, 0x7360, 0x6f2b, 0xd1c5, 0x31fe, 0x7360, 0x6f2b, 0xd1c5,
+	0x31fe, 0x7360, 0x6f2b, 0xd1c5, 0x31fe, 0x7360, 0x6f2b, 0xd1c5,
+};
+
+struct dongle_data
+{
+	u16 module;
+	u16 seed1;
+	u16 seed2;
+	u16 seed3;
+	const std::array<u16, 64> &eeprom;
+};
+
+// Recovered ASIC keys: module address, then seeds 1-3.
+constexpr dongle_data SLVRBALL720_DONGLE = { 0x6391, 0xdc31, 0x0cd7, 0x8325, SLVRBALL720_EEPROM };
+constexpr dongle_data SLVRBALL632_DONGLE = { 0x6fd6, 0x1db8, 0x9b26, 0x0614, SLVRBALL632_EEPROM };
+constexpr dongle_data SLVRBALLBU409_DONGLE = { 0x6fd6, 0x1db8, 0x9b26, 0x0614, SLVRBALLBU409_EEPROM };
 
 class silverball_state : public driver_device
 {
@@ -61,14 +118,18 @@ public:
 	}
 
 	void silverball_i440zx(machine_config &config);
+	void silverball632_i440zx(machine_config &config) ATTR_COLD;
+	void silverball720_i440zx(machine_config &config) ATTR_COLD;
+	void silverballbu_i440zx(machine_config &config) ATTR_COLD;
 
 private:
 	void silverball_map(address_map &map) ATTR_COLD;
 	void silverball_io(address_map &map) ATTR_COLD;
 
-	required_device<pentium_device> m_maincpu;
+	static void i440zx_superio_config(device_t *device) ATTR_COLD;
+	static void hardlock_superio_config(device_t *device, const dongle_data &dongle) ATTR_COLD;
 
-	static void i440zx_superio_config(device_t *device);
+	required_device<pentium_device> m_maincpu;
 };
 
 void silverball_state::silverball_map(address_map &map)
@@ -103,6 +164,21 @@ void silverball_state::i440zx_superio_config(device_t *device)
 //  fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
 //  fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
 //  fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+}
+
+void silverball_state::hardlock_superio_config(device_t *device, const dongle_data &dongle)
+{
+	i440zx_superio_config(device);
+
+	auto &port = *device->subdevice<centronics_device>("lpt:centronics");
+	port.set_default_option("hardlock");
+	port.set_fixed(true);
+	port.set_option_machine_config("hardlock", [&dongle] (device_t *device)
+	{
+		auto &hardlock = *downcast<hardlock_device *>(device);
+		hardlock.set_keys(dongle.module, dongle.seed1, dongle.seed2, dongle.seed3);
+		hardlock.set_eeprom_data(dongle.eeprom);
+	});
 }
 
 // SY-7IZB+
@@ -146,6 +222,27 @@ void silverball_state::silverball_i440zx(machine_config &config)
 	ISA16_SLOT(config, "isa2",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	PCI_SLOT(config, "pci:1", pci_cards, 14, 0, 1, 2, 3, "trio64dx");
+}
+
+void silverball_state::silverball632_i440zx(machine_config &config)
+{
+	silverball_i440zx(config);
+	subdevice<isa16_slot_device>("board4")->set_option_machine_config("w83977tf",
+			[] (device_t *device) { hardlock_superio_config(device, SLVRBALL632_DONGLE); });
+}
+
+void silverball_state::silverball720_i440zx(machine_config &config)
+{
+	silverball_i440zx(config);
+	subdevice<isa16_slot_device>("board4")->set_option_machine_config("w83977tf",
+			[] (device_t *device) { hardlock_superio_config(device, SLVRBALL720_DONGLE); });
+}
+
+void silverball_state::silverballbu_i440zx(machine_config &config)
+{
+	silverball_i440zx(config);
+	subdevice<isa16_slot_device>("board4")->set_option_machine_config("w83977tf",
+			[] (device_t *device) { hardlock_superio_config(device, SLVRBALLBU409_DONGLE); });
 }
 
 
@@ -259,8 +356,8 @@ ROM_END
 GAME(199?, slvrball, 0, silverball_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball BIOS", MACHINE_NOT_WORKING | MACHINE_IS_BIOS_ROOT )
 
 //GAME(1997?, slvrball806,    slvrball, silverball_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (8.01)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)
-GAME(1997?, slvrball720,    slvrball, silverball_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (7.20)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)
-GAME(1997?, slvrball632,    slvrball, silverball_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (6.32)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)
+GAME(1997?, slvrball720,    slvrball, silverball720_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (7.20)",               MACHINE_NOT_WORKING)
+GAME(1997?, slvrball632,    slvrball, silverball632_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (6.32)",               MACHINE_NOT_WORKING)
 
-GAME(199?,  slvrballbu409,  slvrball,      silverball_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)
-GAME(199?,  slvrballbu409b, slvrballbu409, silverball_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING) // Probably the same as set 1
+GAME(199?,  slvrballbu409,  slvrball,      silverballbu_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 1)", MACHINE_NOT_WORKING)
+GAME(199?,  slvrballbu409b, slvrballbu409, silverballbu_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 2)", MACHINE_NOT_WORKING) // Probably the same as set 1

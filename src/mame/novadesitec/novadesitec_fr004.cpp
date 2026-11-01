@@ -110,7 +110,7 @@ void novadesitec_fr004_state::fr004(machine_config &config)
 }
 
 
-ROM_START( unkfr004 )
+ROM_START( hallow2nd )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "hd64f2318te25.u38", 0x00000, 0x40000, NO_DUMP ) // internal ROM
 
@@ -121,7 +121,7 @@ ROM_START( unkfr004 )
 	ROM_LOAD( "hii 5.u5",  0x00000, 0x80000, CRC(676c6767) SHA1(682cc45b9ffae55136a262082a550cfa61ab3352) )
 ROM_END
 
-ROM_START( unkfr004a ) // same flash but different Oki ROM
+ROM_START( hallow2nda ) // same flash as hallow2nd, but different Oki ROM
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "hd64f2318te25.u38", 0x00000, 0x40000, NO_DUMP ) // internal ROM
 
@@ -132,7 +132,7 @@ ROM_START( unkfr004a ) // same flash but different Oki ROM
 	ROM_LOAD( "u5",  0x00000, 0x80000, CRC(0704e5ef) SHA1(d759f5b79d4f661cf008d4b6955fddb4774a598f) )
 ROM_END
 
-ROM_START( unkfr004b ) // same flash but different Oki ROM
+ROM_START( photosafa )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "hd64f2318te25.u38", 0x00000, 0x40000, NO_DUMP ) // internal ROM
 
@@ -140,10 +140,10 @@ ROM_START( unkfr004b ) // same flash but different Oki ROM
 	ROM_LOAD( "te28f128.u2",  0x0000000, 0x1000012, CRC(127abb20) SHA1(fb38e90fc694cec38383ba0cc373e800e7bed2f5) ) // labeled ND0507-1.1X.21.00.PT.BR.BR L.NS.C20-2.24.04 (X is unreadable)
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "u5",  0x00000, 0x80000, CRC(0704e5ef) SHA1(d759f5b79d4f661cf008d4b6955fddb4774a598f) ) // same as unkfr004a
+	ROM_LOAD( "u5",  0x00000, 0x80000, CRC(0704e5ef) SHA1(d759f5b79d4f661cf008d4b6955fddb4774a598f) ) // same as hallow2nda
 ROM_END
 
-ROM_START( unkfr004c ) // same flash but different Oki ROM
+ROM_START( photosafaa )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "hd64f2318te25.u38", 0x00000, 0x40000, NO_DUMP ) // internal ROM
 
@@ -151,13 +151,13 @@ ROM_START( unkfr004c ) // same flash but different Oki ROM
 	ROM_LOAD( "js28f128.u2",  0x0000000, 0x1000012, CRC(d2583982) SHA1(76c1da870a6940396ddb89aeae2687588c7e2ba2) ) // labeled ND0516-1.06.01.00.PT.WO.GEN.SE.B20 DN-2.25.04
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "hii 5.u5",  0x00000, 0x80000, CRC(676c6767) SHA1(682cc45b9ffae55136a262082a550cfa61ab3352) ) // same as unkfr004
+	ROM_LOAD( "hii 5.u5",  0x00000, 0x80000, CRC(676c6767) SHA1(682cc45b9ffae55136a262082a550cfa61ab3352) ) // same as hallow2nd
 ROM_END
 
 } // anonymous namespace
 
 
-GAME( 200?, unkfr004,  0,        fr004, fr004, novadesitec_fr004_state, empty_init, ROT0, "Nova Desitec", "unknown game on FR004 hardware (set 1)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // possibly Halloween II (wild guesswork due to HII label on Oki ROM)
-GAME( 200?, unkfr004a, unkfr004, fr004, fr004, novadesitec_fr004_state, empty_init, ROT0, "Nova Desitec", "unknown game on FR004 hardware (set 2)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, unkfr004b, unkfr004, fr004, fr004, novadesitec_fr004_state, empty_init, ROT0, "Nova Desitec", "unknown game on FR004 hardware (set 3)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, unkfr004c, unkfr004, fr004, fr004, novadesitec_fr004_state, empty_init, ROT0, "Nova Desitec", "unknown game on FR004 hardware (set 4)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // possibly Halloween II (wild guesswork due to HII label on Oki ROM)
+GAME( 200?, hallow2nd,  0,         fr004, fr004, novadesitec_fr004_state, empty_init, ROT0, "Nova Desitec", "Halloween 2 (Nova Desitec, set 1, Portuguese)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, hallow2nda, hallow2nd, fr004, fr004, novadesitec_fr004_state, empty_init, ROT0, "Nova Desitec", "Halloween 2 (Nova Desitec, set 2, Portuguese)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, photosafa,  0,         fr004, fr004, novadesitec_fr004_state, empty_init, ROT0, "Nova Desitec", "Photo Safari in Australia (set 1, Brazilian Portuguese)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, photosafaa, photosafa, fr004, fr004, novadesitec_fr004_state, empty_init, ROT0, "Nova Desitec", "Photo Safari in Australia (set 2, Portuguese)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

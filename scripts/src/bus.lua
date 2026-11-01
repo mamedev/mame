@@ -1520,6 +1520,8 @@ if BUSES["C64"] then
 		MAME_DIR .. "src/devices/bus/c64/pagefox.h",
 		MAME_DIR .. "src/devices/bus/c64/partner.cpp",
 		MAME_DIR .. "src/devices/bus/c64/partner.h",
+		MAME_DIR .. "src/devices/bus/c64/prologicdos.cpp",
+		MAME_DIR .. "src/devices/bus/c64/prologicdos.h",
 		MAME_DIR .. "src/devices/bus/c64/prophet64.cpp",
 		MAME_DIR .. "src/devices/bus/c64/prophet64.h",
 		MAME_DIR .. "src/devices/bus/c64/ps64.cpp",
@@ -1781,6 +1783,7 @@ end
 ---------------------------------------------------
 --
 --@src/devices/bus/centronics/ctronics.h,BUSES["CENTRONICS"] = true
+--@src/devices/bus/centronics/hardlock.h,BUSES["CENTRONICS"] = true
 ---------------------------------------------------
 
 if BUSES["CENTRONICS"] then
@@ -1799,6 +1802,8 @@ if BUSES["CENTRONICS"] then
 		MAME_DIR .. "src/devices/bus/centronics/digiblst.h",
 		MAME_DIR .. "src/devices/bus/centronics/dsjoy.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/dsjoy.h",
+		MAME_DIR .. "src/devices/bus/centronics/eeprom_dongle.cpp",
+		MAME_DIR .. "src/devices/bus/centronics/eeprom_dongle.h",
 		MAME_DIR .. "src/devices/bus/centronics/epson_ex800.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/epson_ex800.h",
 		MAME_DIR .. "src/devices/bus/centronics/epson_fx80.cpp",
@@ -1809,6 +1814,8 @@ if BUSES["CENTRONICS"] then
 		MAME_DIR .. "src/devices/bus/centronics/epson_lx810l.h",
 		MAME_DIR .. "src/devices/bus/centronics/epson_rx80.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/epson_rx80.h",
+		MAME_DIR .. "src/devices/bus/centronics/hardlock.cpp",
+		MAME_DIR .. "src/devices/bus/centronics/hardlock.h",
 		MAME_DIR .. "src/devices/bus/centronics/hasp_savquest.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/hasp_savquest.h",
 		MAME_DIR .. "src/devices/bus/centronics/neomania_adapter.cpp",

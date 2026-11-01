@@ -31,6 +31,7 @@ public:
 
 	virtual void parallel_data_w(uint8_t data) = 0;
 	virtual void parallel_strobe_w(int state) = 0;
+	virtual void parallel_select_w(int state);
 
 	device_c64_floppy_parallel_interface *m_other;
 

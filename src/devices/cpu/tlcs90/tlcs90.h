@@ -32,6 +32,7 @@ public:
 	// configuration
 	template <size_t Port> auto port_read() { return m_port_read_cb[Port].bind(); }
 	template <size_t Port> auto port_write() { return m_port_write_cb[Port].bind(); }
+	template <size_t Bit> auto an_read() { return m_an_read[Bit].bind(); }
 
 protected:
 	// construction/destruction
@@ -65,6 +66,7 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(t90_timer_callback);
 	TIMER_CALLBACK_MEMBER(t90_timer4_callback);
+	TIMER_CALLBACK_MEMBER(adc_callback);
 
 	// internal registers
 	uint8_t p1_r();
@@ -110,6 +112,9 @@ protected:
 	void bx_w(uint8_t data);
 	uint8_t by_r();
 	void by_w(uint8_t data);
+	uint8_t adreg_r();
+	uint8_t admod_r();
+	void admod_w(uint8_t data);
 	uint8_t reserved_r(offs_t offset);
 	void reserved_w(offs_t offset, uint8_t data);
 
@@ -137,12 +142,13 @@ private:
 	};
 
 	static constexpr int MAX_PORTS = 9;
-	//static constexpr int MAX_ANALOG_INPUTS = 16;
+	static constexpr int MAX_ANALOG_INPUTS = 6;
 
 	address_space_config m_program_config;
 
 	devcb_read8::array<MAX_PORTS> m_port_read_cb;
 	devcb_write8::array<MAX_PORTS> m_port_write_cb;
+	devcb_read8::array<MAX_ANALOG_INPUTS> m_an_read;
 
 	PAIR m_prvpc, m_pc, m_sp, m_af, m_bc, m_de, m_hl, m_ix, m_iy;
 	PAIR m_af2, m_bc2, m_de2, m_hl2;
@@ -174,6 +180,12 @@ private:
 	uint8_t m_treg_8bit[4];
 	uint8_t m_t4mod;
 	uint16_t m_treg_16bit[2];
+
+	// A/D converter
+	emu_timer *m_adc_timer;
+	uint8_t m_admod;
+	uint8_t m_adreg;
+	bool m_adis;
 
 	// Work registers
 	uint8_t m_op;

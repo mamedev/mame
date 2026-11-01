@@ -52,6 +52,15 @@ device_c64_floppy_parallel_interface::~device_c64_floppy_parallel_interface()
 }
 
 
+//-------------------------------------------------
+//  parallel_select_w -
+//-------------------------------------------------
+
+void device_c64_floppy_parallel_interface::parallel_select_w(int state)
+{
+}
+
+
 
 //**************************************************************************
 //  LIVE DEVICE

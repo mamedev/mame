@@ -8333,6 +8333,7 @@ Ends with “Workspace Manager Error” and cannot login.
 		<description>THEOS Corona Operating System PL 50209 (Beta)</description>
 		<year>2013</year>
 		<publisher>THEOS Software Corporation</publisher>
+		<info name="usage" value="Attach eeprom_dongle to the LPT port and use BCPP-M962-PPH2-MMMM-VSMM-MM as code" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="corona50209" sha1="28aca5192d0ff37587a76c0f9b9ab5c44177a117" />

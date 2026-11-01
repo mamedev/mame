@@ -122,11 +122,13 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 #include "comxpl80.h"
 #include "covox.h"
 #include "digiblst.h"
+#include "eeprom_dongle.h"
 #include "epson_ex800.h"
 #include "epson_fx80.h"
 #include "epson_lx800.h"
 #include "epson_lx810l.h"
 #include "epson_rx80.h"
+#include "hardlock.h"
 #include "hasp_savquest.h"
 #include "neomania_adapter.h"
 #include "mz1p16.h"
@@ -142,6 +144,7 @@ void centronics_devices(device_slot_interface &device)
 {
 	device.option_add("adaptator", ADAPTATOR_MULTITAP);
 	device.option_add("pl80", COMX_PL80);
+	device.option_add("eeprom_dongle", EEPROM_DONGLE);
 	device.option_add("ex800", EPSON_EX800);
 	device.option_add("fx80", EPSON_FX80);
 	device.option_add("jx80", EPSON_JX80);
@@ -162,6 +165,7 @@ void centronics_devices(device_slot_interface &device)
 	device.option_add("pc6022", PC6022);
 	device.option_add("mps1250", MPS1250);
 
+	device.option_add_internal("hardlock", HARDLOCK);
 	device.option_add_internal("hasp_savquest", HASP_SAVQUEST);
 	// TODO: will become option_add_internal when misc/neomania.cpp will have a working chipset
 	device.option_add("neomania", NEOMANIA_ADAPTER);
