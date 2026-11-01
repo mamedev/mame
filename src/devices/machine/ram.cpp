@@ -11,9 +11,12 @@ Provides a configurable amount of RAM to drivers
 #include "emu.h"
 #include "ram.h"
 
+#include "emuopts.h"
+
 #include "corestr.h"
 
 #include <cstdio>
+#include <cstdlib>
 #include <cctype>
 
 #include <algorithm>
@@ -110,15 +113,32 @@ ram_device::ram_device(const machine_config &mconfig, const char *tag, device_t 
 	, device_single_card_slot_interface<device_ram_interface>(mconfig, *this)
 	, m_size(0)
 	, m_bits(8)
-	, m_default_value(0xff)
+	, m_default_fill{ 0xff, 0xff, 1, false }
 	, m_extra_options_string(nullptr)
 {
+}
+
+ram_device &ram_device::set_default_fill(fill_pattern pattern, u32 run)
+{
+	switch (pattern)
+	{
+	case fill_pattern::ZERO:        m_default_fill = fill_spec{ 0x00, 0x00, run, false }; break;
+	case fill_pattern::ONES:        m_default_fill = fill_spec{ 0xff, 0xff, run, false }; break;
+	case fill_pattern::ALT_00FF:    m_default_fill = fill_spec{ 0x00, 0xff, run, false }; break;
+	case fill_pattern::ALT_FF00:    m_default_fill = fill_spec{ 0xff, 0x00, run, false }; break;
+	case fill_pattern::ALT_55AA:    m_default_fill = fill_spec{ 0x55, 0xaa, run, false }; break;
+	case fill_pattern::ALT_AA55:    m_default_fill = fill_spec{ 0xaa, 0x55, run, false }; break;
+	case fill_pattern::RANDOM:      m_default_fill = fill_spec{ 0x00, 0x00, run, true }; break;
+	}
+	return *this;
 }
 
 void ram_device::device_validity_check(validity_checker& valid) const
 {
 	if (m_bits != 8 && m_bits != 16 && m_bits != 32 && m_bits != 64)
 		osd_printf_error("Invalid RAM bits: %u\n", m_bits);
+	if (!m_default_fill.run)
+		osd_printf_error("Invalid RAM fill run length: %u\n", m_default_fill.run);
 }
 
 void ram_device::device_config_complete()
@@ -194,8 +214,86 @@ void ram_device::allocate_ram()
 		m_pointer.reset(std::malloc(m_size));
 		if (!m_pointer)
 			throw emu_fatalerror("%s: error allocating memory", tag());
-		std::fill_n(reinterpret_cast<u8*>(m_pointer.get()), m_size, m_default_value);
+
+		// the command line takes priority over the driver's choice
+		fill_spec fill(m_default_fill);
+		emu_options const &options(mconfig().options());
+		if (options.has_slot_option(slot_name()))
+		{
+			std::string const &option(options.slot_option(slot_name()).argument());
+			if (!option.empty() && !parse_fill_option(option, fill))
+				throw emu_fatalerror("Invalid fill for RAM slot %s: %s (expected zero, ones, random, a hex byte such as 55, or two hex bytes with optional run length such as 00ff:64)\n", slot_name(), option);
+		}
+
+		fill_ram(fill, reinterpret_cast<u8 *>(m_pointer.get()));
 	}
+}
+
+void ram_device::fill_ram(fill_spec const &fill, u8 *base)
+{
+	if (fill.random)
+	{
+		for (u32 i = 0; i < m_size; i++)
+			base[i] = u8(machine().rand());
+	}
+	else if (fill.first == fill.second)
+	{
+		std::fill_n(base, m_size, fill.first);
+	}
+	else
+	{
+		bool use_second(false);
+		for (u64 offset = 0; offset < m_size; offset += fill.run, use_second = !use_second)
+			std::fill_n(base + offset, std::min<u64>(fill.run, m_size - offset), use_second ? fill.second : fill.first);
+	}
+}
+
+bool ram_device::parse_fill_option(std::string_view option, fill_spec &fill)
+{
+	if (!core_stricmp(option, "zero"))
+	{
+		fill = fill_spec{ 0x00, 0x00, 1, false };
+		return true;
+	}
+	if (!core_stricmp(option, "ones"))
+	{
+		fill = fill_spec{ 0xff, 0xff, 1, false };
+		return true;
+	}
+	if (!core_stricmp(option, "random"))
+	{
+		fill = fill_spec{ 0x00, 0x00, 1, true };
+		return true;
+	}
+
+	// otherwise it must be XX, XXYY or XXYY:run
+	auto const colon(option.find(':'));
+	std::string_view const bytes(option.substr(0, colon));
+	if ((bytes.length() != 2) && (bytes.length() != 4))
+		return false;
+	if (!std::all_of(bytes.begin(), bytes.end(), [] (char c) { return std::isxdigit(u8(c)); }))
+		return false;
+	unsigned long const value(std::strtoul(std::string(bytes).c_str(), nullptr, 16));
+
+	unsigned long run(1);
+	if (colon != std::string_view::npos)
+	{
+		// limiting the digits keeps the value within range of a u32
+		std::string_view const digits(option.substr(colon + 1));
+		if ((bytes.length() != 4) || digits.empty() || (digits.length() > 9))
+			return false;
+		if (!std::all_of(digits.begin(), digits.end(), [] (char c) { return std::isdigit(u8(c)); }))
+			return false;
+		run = std::strtoul(std::string(digits).c_str(), nullptr, 10);
+		if (!run)
+			return false;
+	}
+
+	if (bytes.length() == 2)
+		fill = fill_spec{ u8(value), u8(value), 1, false };
+	else
+		fill = fill_spec{ u8(value >> 8), u8(value), u32(run), false };
+	return true;
 }
 
 DEFINE_DEVICE_TYPE(RAM, ram_device, "ram_slot", "RAM Slot")

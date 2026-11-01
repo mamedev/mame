@@ -45,6 +45,18 @@ protected:
 class ram_device : public device_t, public device_single_card_slot_interface<device_ram_interface>
 {
 public:
+	// patterns for initialising RAM contents; two-byte patterns alternate every "run" bytes
+	enum class fill_pattern
+	{
+		ZERO,       // all bytes 0x00
+		ONES,       // all bytes 0xff
+		ALT_00FF,   // 0x00, 0xff
+		ALT_FF00,   // 0xff, 0x00
+		ALT_55AA,   // 0x55, 0xaa
+		ALT_AA55,   // 0xaa, 0x55
+		RANDOM      // pseudo-random bytes
+	};
+
 	// construction/destruction
 	ram_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
@@ -67,9 +79,21 @@ public:
 		update_options();
 		return *this;
 	}
-	ram_device &set_default_value(u8 default_value) { m_default_value = default_value; return *this; }
+	ram_device &set_default_value(u8 default_value) { m_default_fill = fill_spec{ default_value, default_value, 1, false }; return *this; }
+	ram_device &set_default_fill(fill_pattern pattern, u32 run = 1);
+
+	// device_slot_interface implementation
+	virtual bool accepts_argument() const override { return true; }
 
 protected:
+	struct fill_spec
+	{
+		u8 first;
+		u8 second;
+		u32 run;
+		bool random;
+	};
+
 	virtual void device_validity_check(validity_checker& valid) const override ATTR_COLD;
 	virtual void device_config_complete() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
@@ -77,6 +101,8 @@ protected:
 	std::string sanitise_option(std::string_view option);
 	void update_options();
 	void allocate_ram();
+	void fill_ram(fill_spec const &fill, u8 *base);
+	static bool parse_fill_option(std::string_view option, fill_spec &fill);
 
 	struct stdlib_deleter { void operator()(void *p) const { std::free(p); } };
 
@@ -87,7 +113,7 @@ protected:
 	// device config
 	u8                                      m_bits;
 	std::string                             m_default_size;
-	u8                                      m_default_value;
+	fill_spec                               m_default_fill;
 	char const *                            m_extra_options_string;
 };
 
