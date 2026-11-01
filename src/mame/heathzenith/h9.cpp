@@ -7,7 +7,7 @@
     A 1977 kit terminal built entirely from TTL logic - there is no
     microprocessor. 12 lines of 80 upper-case characters (or four columns
     of 12 lines of 20 in "short form") from a 1K x 8 static RAM, a 2513
-    character generator, an MM5740 keyboard encoder and an AY-3-1015 UART.
+    character generator, an MM5740AAE keyboard encoder and an AY-3-1015 UART.
 
     All housekeeping is done by the Timing and Processing Unit (TPU), a
     state machine built from three 32x8 PROMs (444-10, 444-11, 444-12),
@@ -30,8 +30,8 @@
     TODO:
       - parallel input/output port and handshakes
       - reader start/stop (20 mA current loop) control
-      - the TPU PROMs, PLA and the 443-767 MM5740 mask ROM have not been
-        dumped; the images were reconstructed from the manuals
+      - the PLA has not been dumped; the image was reconstructed from the
+        Operation manual
 
 ****************************************************************************/
 
@@ -51,10 +51,8 @@
 
 namespace {
 
-// 12.395 MHz master clock and 8 dots per character. The horizontal counter
-// (IC220, IC215) counts 100 character times per scan line: 80 visible and
-// 20 for horizontal retrace, giving 15,494 Hz. A frame is 256 scan lines,
-// 192 visible and 64 for vertical retrace, giving 60.5 Hz.
+// 100 character times per line (80 visible), 15,494 Hz.
+// 256 lines per frame (192 visible), 60.5 Hz.
 static constexpr XTAL MASTER_CLOCK          = XTAL(12'395'000);
 static constexpr int  DOTS_PER_CHAR         = 8;
 static constexpr int  CHARS_PER_SCAN_TOTAL  = 100;
@@ -67,11 +65,8 @@ static constexpr int  ROW_CHARS             = BLOCKS * BLOCK_CHARS;
 static constexpr int  VISIBLE_LINES         = ROWS * SCAN_LINES;
 static constexpr int  TPU_CYCLE_LINES       = 8;    // one complete TPU cycle
 
-// The 100 character line is counted by two decade counters. The "9600 baud"
-// clock (16x) is the QD output of the units counter (IC220, character clock
-// divided by 10) and the "4800 baud" clock is the QA output of the tens
-// counter (IC215, divided by 20). The I/O board divides 4800 down to 300,
-// and 1200 by 11 for 110.
+// 4800 baud (16x) clock is the character clock / 20 (IC215 QA).
+// The I/O board divides it down to 300, and 110 (1200 / 11).
 static constexpr u32 BAUD_4800_DIVISOR = DOTS_PER_CHAR * 20;
 
 static constexpr u8 CHAR_BEL = 0x07;
@@ -80,38 +75,6 @@ static constexpr u8 CHAR_LF  = 0x0a;
 static constexpr u8 CHAR_CR  = 0x0d;
 static constexpr u8 CHAR_SP  = 0x20;
 static constexpr u8 CHAR_DEL = 0x7f;
-
-// MM5740 keyboard encoder with the Heath 443-767 mask. The keyboard uses a
-// Teletype-style bit-paired layout and letters are always upper case.
-class h9_kbd_encoder_device : public mm5740_device
-{
-public:
-	h9_kbd_encoder_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
-};
-
-DEFINE_DEVICE_TYPE_PRIVATE(H9_KBD_ENCODER, mm5740_device, h9_kbd_encoder_device, "h9_kbd_encoder", "Heath 443-767 MM5740 Keyboard Encoder")
-
-h9_kbd_encoder_device::h9_kbd_encoder_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: mm5740_device(mconfig, H9_KBD_ENCODER, tag, owner, clock)
-{
-}
-
-// The 443-767 mask ROM has not been dumped. This image was reconstructed from
-// the key codes in Pictorial 4-6 of the Illustration Booklet and the key
-// matrix on the schematic, in the internal ROM layout used by mm5740_device.
-// CTRL is assumed to only affect the codes 0x40-0x5f that the table lists.
-ROM_START( h9_kbd_encoder )
-	ROM_REGION( 0x1c2, "internal", 0 )
-	ROM_LOAD( "443-767.ic402", 0x000, 0x1c2, BAD_DUMP CRC(f80add72) SHA1(ed50d32dfafd57ade43d36dbd81d608d45e2f802) )
-ROM_END
-
-const tiny_rom_entry *h9_kbd_encoder_device::device_rom_region() const
-{
-	return ROM_NAME( h9_kbd_encoder );
-}
 
 class h9_state : public driver_device
 {
@@ -757,9 +720,9 @@ void h9_state::tpu_cycle_0()
 
 	if (!(out & PLA_OB2_XP_LOAD_N))
 	{
-		// the character has been sent; the CR and EOL flip-flops are
-		// clocked, and in half duplex a "fake" DAV counts the cursor up.
-		// The CR flip-flop stays set until the line feed is counted at 1C,
+		// character sent; the CR and EOL flip-flops are clocked, and
+		// in half duplex a "fake" DAV counts the cursor up. The CR
+		// flip-flop stays set until the line feed is counted at 1C,
 		// which in full duplex is when its echo comes back.
 		m_xp_sent  = true;
 		m_eolff    = BIT(ic730_r(), 4) && !cr;
@@ -1192,13 +1155,13 @@ static INPUT_PORTS_START( h9 )
 	// push-on/push-off keys, a set bit means the key is pushed in. The keys
 	// that default to pushed in are active low.
 	PORT_START("MODE")
-	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_CODE(KEYCODE_F5)         PORT_TOGGLE                      PORT_NAME("AUTO CARRY")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6)         PORT_TOGGLE                      PORT_NAME("SHORT FORM")
-	PORT_BIT(0x04, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_CODE(KEYCODE_F7)         PORT_TOGGLE                      PORT_NAME("SCROLL")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8)         PORT_TOGGLE                      PORT_NAME("PLOT")
-	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_CODE(KEYCODE_F9)         PORT_TOGGLE                      PORT_NAME("BAUD RATE")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F10)        PORT_TOGGLE                      PORT_NAME("OFF LINE")
-	PORT_BIT(0x40, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_CODE(KEYCODE_F11)        PORT_TOGGLE                      PORT_NAME("FULL DUPLEX")
+	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_KEYBOARD)  PORT_CODE(KEYCODE_F5)        PORT_TOGGLE                      PORT_NAME("AUTO CARRY")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_CODE(KEYCODE_F6)        PORT_TOGGLE                      PORT_NAME("SHORT FORM")
+	PORT_BIT(0x04, IP_ACTIVE_LOW,  IPT_KEYBOARD)  PORT_CODE(KEYCODE_F7)        PORT_TOGGLE                      PORT_NAME("SCROLL")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_CODE(KEYCODE_F8)        PORT_TOGGLE                      PORT_NAME("PLOT")
+	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_KEYBOARD)  PORT_CODE(KEYCODE_F9)        PORT_TOGGLE                      PORT_NAME("BAUD RATE")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)  PORT_CODE(KEYCODE_F10)       PORT_TOGGLE                      PORT_NAME("OFF LINE")
+	PORT_BIT(0x40, IP_ACTIVE_LOW,  IPT_KEYBOARD)  PORT_CODE(KEYCODE_F11)       PORT_TOGGLE                      PORT_NAME("FULL DUPLEX")
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME(0x03, 0x00, "Repeat rate")
@@ -1257,9 +1220,9 @@ void h9_state::h9(machine_config &config)
 	// 14 input, 8 output, 96 term mask PLA
 	PLA(config, m_pla, 14, 8, 96);
 
-	// the encoder is clocked by the 4800 baud clock; the scan rate used here
-	// comes from the debounce capacitor C405 (0.001 uF)
-	H9_KBD_ENCODER(config, m_kbdenc, mm5740_device::calc_effective_clock_key_debounce(1000));
+	// Heath 443-767 at IC402. Clocked by the 4800 baud clock.
+	// Scan rate based on debounce capacitor C405 (0.001 uF)
+	MM5740AAE(config, m_kbdenc, mm5740_device::calc_effective_clock_key_debounce(1000));
 	m_kbdenc->x_cb<1>().set(FUNC(h9_state::kbd_x_r<1>));
 	m_kbdenc->x_cb<2>().set(FUNC(h9_state::kbd_x_r<2>));
 	m_kbdenc->x_cb<3>().set(FUNC(h9_state::kbd_x_r<3>));
@@ -1283,25 +1246,23 @@ void h9_state::h9(machine_config &config)
 // ROM definition
 ROM_START( h9 )
 	ROM_REGION( 0x0200, "chargen", 0 )
-	ROM_LOAD( "443-812.ic205", 0x0000, 0x0200,        CRC(a7e567fc) SHA1(b18aae0a2d4f92f5a7e22640719bbc4652f3f4ee) ) // RO-3-2513
+	ROM_LOAD( "443-812.ic205", 0x0000, 0x0200,          CRC(a7e567fc) SHA1(b18aae0a2d4f92f5a7e22640719bbc4652f3f4ee) ) // RO-3-2513
 
-	// The TPU PROMs and PLA have not been dumped. These images were typed in
-	// from the "ROM and PLA Programs" truth tables in the Operation manual
-	// (595-2017-03, pages 85-88). Outputs 6-8 of 444-12 are marked "don't
-	// care" and are set to 0. The PLA is a 14 input, 8 output, 96 term mask
-	// PLA; its 16 programmed terms are stored as a JEDEC binary fuse map with
-	// the unused terms left unprogrammed.
 	ROM_REGION( 0x20, "ic724", 0 )
-	ROM_LOAD( "444-12.ic724", 0x00, 0x20, BAD_DUMP    CRC(7b926bea) SHA1(2abc1212b8c04f538c835b26e996f1efed53335e) )
+	ROM_LOAD( "444-12.ic724",    0x00,   0x20,          CRC(966204b4) SHA1(1d68987809dfa8047f288d8a95ddc1590d4f519b) )
 
 	ROM_REGION( 0x20, "ic728", 0 )
-	ROM_LOAD( "444-10.ic728", 0x00, 0x20, BAD_DUMP    CRC(a6df938a) SHA1(74db64591eabf64e50883fbdd9a5395730bd2c59) )
+	ROM_LOAD( "444-10.ic728",    0x00,   0x20,          CRC(ec1d81db) SHA1(d694ba9ffc7f3218e95b254aa37ea2996464520c) )
 
 	ROM_REGION( 0x20, "ic730", 0 )
-	ROM_LOAD( "444-11.ic730", 0x00, 0x20, BAD_DUMP    CRC(e0aed960) SHA1(3a1506a4a8a59e2c42579299dc9ff74443525acb) )
+	ROM_LOAD( "444-11.ic730",    0x00,   0x20,          CRC(e0aed960) SHA1(3a1506a4a8a59e2c42579299dc9ff74443525acb) )
 
+	// PLA not dumped, typed from the "ROM and PLA Programs" table in
+	// Operation manual (595-2017-03, page 88). Has 14 input, 8 output,
+	// 96 term mask PLA; its 16 programmed terms are stored as a JEDEC
+	// binary fuse map with the unused terms left unprogrammed.
 	ROM_REGION( 0x1b5, "ic702", 0 )
-	ROM_LOAD( "443-787.ic702", 0x000, 0x1b5, BAD_DUMP CRC(7fa9b871) SHA1(1efe606e041b1091964da56f20319133f1aef2b3) )
+	ROM_LOAD( "443-787.ic702",  0x000,  0x1b5, BAD_DUMP CRC(7fa9b871) SHA1(1efe606e041b1091964da56f20319133f1aef2b3) )
 ROM_END
 
 } // anonymous namespace

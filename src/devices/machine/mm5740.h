@@ -123,8 +123,18 @@ private:
 	emu_timer *m_scan_timer;      // keyboard scan timer
 };
 
+class mm5740aae_device : public mm5740_device
+{
+public:
+	mm5740aae_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+};
+
 
 // device type definition
-DECLARE_DEVICE_TYPE(MM5740, mm5740_device)
+DECLARE_DEVICE_TYPE(MM5740,    mm5740_device)
+DECLARE_DEVICE_TYPE(MM5740AAE, mm5740aae_device)
 
 #endif // MAME_MACHINE_MM5740_H
