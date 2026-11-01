@@ -33,6 +33,22 @@ namespace {
 char const *const posixfile_socket_identifier  = "socket.";
 char const *const posixfile_domain_identifier  = "domain.";
 
+// a write to a connection the peer has closed must fail with EPIPE rather than raise SIGPIPE
+// (hosts with neither MSG_NOSIGNAL nor SO_NOSIGPIPE get no protection)
+#if defined(MSG_NOSIGNAL)
+constexpr int SEND_FLAGS = MSG_NOSIGNAL;
+#else
+constexpr int SEND_FLAGS = 0;
+#endif
+
+void suppress_sigpipe([[maybe_unused]] int sock) noexcept
+{
+#if !defined(MSG_NOSIGNAL) && defined(SO_NOSIGPIPE)
+	int const flag = 1;
+	::setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, &flag, sizeof(flag));
+#endif
+}
+
 
 class posix_osd_socket : public osd_file
 {
@@ -112,6 +128,7 @@ public:
 				else
 				{
 					disconnect();
+					suppress_sigpipe(accepted);
 					m_sock = accepted;
 					actual = 0;
 
@@ -132,7 +149,7 @@ public:
 		if (m_sock >= 0)
 		{
 			// connected socket
-			ssize_t const result = ::write(m_sock, buffer, count);
+			ssize_t const result = ::send(m_sock, buffer, count, SEND_FLAGS);
 			if (result < 0)
 			{
 				// once the peer has finished sending, a failed write ends the connection
@@ -227,6 +244,7 @@ std::error_condition create_socket(T const &sa, int sock, std::uint32_t openflag
 			::close(sock);
 			return connerr;
 		}
+		suppress_sigpipe(sock);
 		result.reset(new (std::nothrow) posix_osd_socket(sock, false));
 	}
 
