@@ -110,6 +110,8 @@ protected:
 		ID_SHOW_RAW,
 		ID_SHOW_ENCRYPTED,
 		ID_SHOW_COMMENTS,
+		ID_SHOW_SOURCE,
+		ID_SHOW_DISASM,
 
 		ID_SHOW_BREAKPOINTS,
 		ID_SHOW_WATCHPOINTS,
@@ -142,6 +144,7 @@ protected:
 	virtual void update_menu() { }
 	virtual bool handle_command(WPARAM wparam, LPARAM lparam);
 	virtual void draw_contents(HDC dc);
+	virtual bool source_stepping_active() { return false; }
 	void draw_border(HDC dc, RECT &bounds);
 	void draw_border(HDC dc, HWND child);
 
