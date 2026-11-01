@@ -628,32 +628,46 @@ void qx10_state::qx10_io(address_map &map)
 }*/
 
 static INPUT_PORTS_START( qx10 )
-	/* TODO: All of those have unknown meaning */
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x00, "DSW" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+/*
+	SW1 when ON, Zapple uses MC146818 NVRAM byte 0x20 as a CP/M IOBYTE to
+	select the console device. When OFF, bits 0-1 are forced to 01
+	(keyboard in, CRT out).
+*/
+	PORT_DIPNAME( 0x01, 0x00, "Zapple Console" )           PORT_DIPLOCATION("SW:1")
+	PORT_DIPSETTING(    0x00, "Normal" )
+	PORT_DIPSETTING(    0x01, "Reset IOBYTE" )
+/*
+	SW2 under TPM-II/III decides if the OS or the Zapple monitor is launched.
+*/
+	PORT_DIPNAME( 0x02, 0x00, "TPM Boot Mode" )            PORT_DIPLOCATION("SW:2")
+	PORT_DIPSETTING(    0x00, "Normal" )
+	PORT_DIPSETTING(    0x02, "Zapple" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )         PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )         PORT_DIPLOCATION("SW:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) //CMOS related
+/*
+	SW5 is used for testing the CMOS Battery with the diagnostic disk.
+*/
+	PORT_DIPNAME( 0x10, 0x00, "CMOS Battery Backup Test" ) PORT_DIPLOCATION("SW:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+/*
+	SW6 + SW7 + SW8 below are informational only, read by the QX-10
+	diagnostic disk to know what to test. They do not control how much
+	RAM or Video RAM is actually installed.
+*/
+	PORT_DIPNAME( 0x20, 0x20, "Video RAM" )                PORT_DIPLOCATION("SW:6")
+	PORT_DIPSETTING(    0x00, "32K" )
+	PORT_DIPSETTING(    0x20, "128K" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Main Memory" )              PORT_DIPLOCATION("SW:7,8")
+	PORT_DIPSETTING(    0x00, "64K" )
+	PORT_DIPSETTING(    0x80, "128K" )
+	PORT_DIPSETTING(    0x40, "192K" )
+	PORT_DIPSETTING(    0xc0, "256K" )
 INPUT_PORTS_END
 
 
