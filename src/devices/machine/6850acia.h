@@ -122,6 +122,7 @@ private:
 	int m_rxc;
 	int m_rxd;
 	int m_rx_state;
+	bool m_rx_wait_mark;   // after a stop bit sampled low, wait for the line to go high
 	int m_rx_bits;
 	int m_rx_shift;
 	int m_rx_parity;
