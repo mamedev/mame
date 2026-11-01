@@ -1,0 +1,517 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Chiaki Tachibana
+************************************************************
+	Rookie Delta MH  (C) 1991 Nishijin / Sophia
+************************************************************
+-->
+<mamelayout version="2">
+
+<!-- Define elements -->
+
+	<element name="screen_background_color">
+		<rect>
+			<color red="0.0" green="0.22" blue="0.22"/>
+		</rect>
+	</element>
+
+	<element name="static_bgcolor"><rect><color red="0.00" green="0.22" blue="0.22"/> </rect> </element>
+	<element name="digit_red"><led7seg><color red="1.00" green="0.10" blue="0.15"/> </led7seg> </element>
+	<element name="digit_green"><led7seg><color red="0.10" green="1.00" blue="0.15"/> </led7seg> </element>
+	<element name="digit_yellow"><led7seg><color red="1.00" green="1.00" blue="0.15"/> </led7seg> </element>
+
+<!-- Define SEG background -->
+
+	<element name="segbgcolor" defstate="0">
+		<disk>
+			<color red="0.80" green="0.30" blue="0.00"/>
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
+		</disk>
+		<disk state="0">
+			<color red="0.15" green="0.15" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+		<disk state="1">
+			<color red="1.00" green="0.00" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+		<disk state="2">
+			<color red="0.00" green="1.00" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+		<disk state="3">
+			<color red="1.00" green="1.00" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+	</element>
+
+<!-- Define reserve ball LEDs -->
+
+	<element name="def_leds1_0" defstate="0">
+		<rect>
+			<color red="0" green="0" blue="0"/>
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.02" blue="0.03"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="0.1" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</rect>
+		<text string=" LED1 ">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+	<element name="def_leds1_1" defstate="0">
+		<rect>
+			<color red="0" green="0" blue="0"/>
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.02" blue="0.03"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="0.1" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</rect>
+		<text string=" LED2 ">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+	<element name="def_leds1_2" defstate="0">
+		<rect>
+			<color red="0" green="0" blue="0"/>
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.02" blue="0.03"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="0.1" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</rect>
+		<text string=" LED3 ">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+	<element name="def_leds1_3" defstate="0">
+		<rect>
+			<color red="0" green="0" blue="0"/>
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.02" blue="0.03"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="0.1" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</rect>
+		<text string=" LED4 ">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+
+<!-- Define lamps -->
+
+	<element name="def_lamps0" defstate="0">
+		<rect>
+			<color red="0" green="0" blue="0"/>
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.02" blue="0.03"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="0.1" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</rect>
+		<text string=" LAMP1 ">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+	<element name="def_lamps1" defstate="0">
+		<rect>
+			<color red="0" green="0" blue="0"/>
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.02" blue="0.03"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="0.1" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</rect>
+		<text string=" LAMP2 ">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+	<element name="def_lamps2" defstate="0">
+		<rect>
+			<color red="0" green="0" blue="0"/>
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.02" blue="0.03"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="0.1" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</rect>
+		<text string=" LAMP3 ">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+	<element name="def_lamps3" defstate="0">
+		<rect>
+			<color red="0" green="0" blue="0"/>
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.02" blue="0.03"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="0.1" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</rect>
+		<text string=" LAMP4 ">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+	<element name="def_lamps4" defstate="0">
+		<rect>
+			<color red="0" green="0" blue="0"/>
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.02" blue="0.03"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="0.1" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</rect>
+		<text string=" LAMP5 ">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+	<element name="def_lamps5" defstate="0">
+		<rect>
+			<color red="0" green="0" blue="0"/>
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.02" blue="0.03"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="0.1" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</rect>
+		<text string=" LAMP6 ">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+	<element name="def_lamps6" defstate="0">
+		<disk>
+			<color red="0" green="0" blue="0"/>
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.02" blue="0.03"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.5" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+		<text string=" ATTACKER ">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+	<element name="def_lamps7" defstate="0">
+		<disk>
+			<color red="0" green="0" blue="0"/>
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.02" blue="0.03"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.5" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+		<text string=" V-ZONE ">
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0" y="0.25" width="1" height="0.5"/>
+		</text>
+	</element>
+
+<!-- Define LEDs -->
+
+	<element name="def_leds2_0" defstate="0">
+		<disk>
+			<color red="0" green="0" blue="0"/>
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.02" blue="0.03"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.1" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+	</element>
+	<element name="def_leds2_1" defstate="0">
+		<disk>
+			<color red="0" green="0" blue="0"/>
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.02" blue="0.03"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.1" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+	</element>
+	<element name="def_leds2_2" defstate="0">
+		<disk>
+			<color red="0" green="0" blue="0"/>
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.02" blue="0.03"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.1" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+	</element>
+	<element name="def_leds2_3" defstate="0">
+		<disk>
+			<color red="0" green="0" blue="0"/>
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.02" blue="0.03"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.5" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+	</element>
+	<element name="def_leds2_4" defstate="0">
+		<disk>
+			<color red="0" green="0" blue="0"/>
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.02" blue="0.03"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.5" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+	</element>
+	<element name="def_leds2_5" defstate="0">
+		<disk>
+			<color red="0" green="0" blue="0"/>
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.02" blue="0.03"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+		<disk state="1">
+			<color red="0.0" green="0.8" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+	</element>
+	<element name="def_leds2_6" defstate="0">
+		<disk>
+			<color red="0" green="0" blue="0"/>
+			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.02" blue="0.03"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+		<disk state="1">
+			<color red="0.0" green="0.8" blue="0.15"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+	</element>
+
+<!-- View field -->
+
+	<view name="AWP Simulated Video" showpointers="no">
+
+	<!-- Screen size -->
+
+		<bounds left="0" right="147" top="0" bottom="100"/>
+
+		<element ref="static_bgcolor">
+			<bounds left="0" right="147" top="0" bottom="100"/>
+		</element>
+
+	<!-- Digital back color (upper, left, right) -->
+
+		<element name="digit0_back" ref="segbgcolor">
+			<bounds x="58" y="6" width="30" height="30"/>
+		</element>
+		<element name="digit1_back" ref="segbgcolor">
+			<bounds x="40" y="36" width="30" height="30"/>
+		</element>
+		<element name="digit2_back" ref="segbgcolor">
+			<bounds x="76" y="36" width="30" height="30"/>
+		</element>
+
+	<!-- Digital (upper, left, right) -->
+
+		<element name="digit0_red" ref="digit_red">
+			<bounds x="65" y="11.5" width="16" height="18.5"/>
+		</element>
+		<element name="digit1_red" ref="digit_red">
+			<bounds x="47" y="41.5" width="16" height="18.5"/>
+		</element>
+		<element name="digit2_red" ref="digit_red">
+			<bounds x="83" y="41.5" width="16" height="18.5"/>
+		</element>
+
+		<element name="digit0_green" ref="digit_green">
+			<bounds x="65" y="11.5" width="16" height="18.5"/>
+		</element>
+		<element name="digit1_green" ref="digit_green">
+			<bounds x="47" y="41.5" width="16" height="18.5"/>
+		</element>
+		<element name="digit2_green" ref="digit_green">
+			<bounds x="83" y="41.5" width="16" height="18.5"/>
+		</element>
+
+		<element name="digit0_yellow" ref="digit_yellow">
+			<bounds x="65" y="11.5" width="16" height="18.5"/>
+		</element>
+		<element name="digit1_yellow" ref="digit_yellow">
+			<bounds x="47" y="41.5" width="16" height="18.5"/>
+		</element>
+		<element name="digit2_yellow" ref="digit_yellow">
+			<bounds x="83" y="41.5" width="16" height="18.5"/>
+		</element>
+
+	<!-- Reserveball LED -->
+
+		<element name="leds1_0" ref="def_leds1_0">
+			<bounds x="47.5" y="71" width="10" height="10"/>
+		</element>
+		<element name="leds1_1" ref="def_leds1_1">
+			<bounds x="61.5" y="71" width="10" height="10"/>
+		</element>
+		<element name="leds1_2" ref="def_leds1_2">
+			<bounds x="75.5" y="71" width="10" height="10"/>
+		</element>
+		<element name="leds1_3" ref="def_leds1_3">
+			<bounds x="89.5" y="71" width="10" height="10"/>
+		</element>
+
+	<!-- LED -->
+
+		<element name="leds2_0" ref="def_leds2_0">
+			<bounds x="32" y="35" width="4" height="4"/>
+		</element>
+		<element name="leds2_1" ref="def_leds2_1">
+			<bounds x="32" y="40" width="4" height="4"/>
+		</element>
+		<element name="leds2_2" ref="def_leds2_2">
+			<bounds x="32" y="45" width="4" height="4"/>
+		</element>
+		<element name="leds2_3" ref="def_leds2_3">
+			<bounds x="32" y="50" width="4" height="4"/>
+		</element>
+		<element name="leds2_4" ref="def_leds2_4">
+			<bounds x="32" y="55" width="4" height="4"/>
+		</element>
+		<element name="leds2_5" ref="def_leds2_5">
+			<bounds x="32" y="60" width="4" height="4"/>
+		</element>
+		<element name="leds2_6" ref="def_leds2_6">
+			<bounds x="32" y="65" width="4" height="4"/>
+		</element>
+
+		<element name="leds3_0" ref="def_leds2_0">
+			<bounds x="111" y="35" width="4" height="4"/>
+		</element>
+		<element name="leds3_1" ref="def_leds2_1">
+			<bounds x="111" y="40" width="4" height="4"/>
+		</element>
+		<element name="leds3_2" ref="def_leds2_2">
+			<bounds x="111" y="45" width="4" height="4"/>
+		</element>
+		<element name="leds3_3" ref="def_leds2_3">
+			<bounds x="111" y="50" width="4" height="4"/>
+		</element>
+		<element name="leds3_4" ref="def_leds2_4">
+			<bounds x="111" y="55" width="4" height="4"/>
+		</element>
+		<element name="leds3_5" ref="def_leds2_5">
+			<bounds x="111" y="60" width="4" height="4"/>
+		</element>
+		<element name="leds3_6" ref="def_leds2_6">
+			<bounds x="111" y="65" width="4" height="4"/>
+		</element>
+
+	<!-- Lamps -->
+
+		<element name="lamps0" ref="def_lamps0">
+			<bounds x="7.25" y="86" width="10" height="10"/>
+		</element>
+		<element name="lamps1" ref="def_lamps1">
+			<bounds x="24.75" y="86" width="10" height="10"/>
+		</element>
+		<element name="lamps2" ref="def_lamps2">
+			<bounds x="42.25" y="86" width="10" height="10"/>
+		</element>
+		<element name="lamps3" ref="def_lamps3">
+			<bounds x="59.75" y="86" width="10" height="10"/>
+		</element>
+		<element name="lamps4" ref="def_lamps4">
+			<bounds x="77.25" y="86" width="10" height="10"/>
+		</element>
+		<element name="lamps5" ref="def_lamps5">
+			<bounds x="94.75" y="86" width="10" height="10"/>
+		</element>
+		<element name="lamps6" ref="def_lamps6">
+			<bounds x="112.25" y="86" width="10" height="10"/>
+		</element>
+		<element name="lamps7" ref="def_lamps7">
+			<bounds x="129.75" y="86" width="10" height="10"/>
+		</element>
+
+	</view>
+</mamelayout>
