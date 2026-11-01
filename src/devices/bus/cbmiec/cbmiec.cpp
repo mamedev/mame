@@ -546,7 +546,7 @@ bool cbm_iec_device::sample_ready(cpu_device &cpu)
 		attotime const cycle = exec->cycles_to_attotime(1);
 		if (!cycle.is_never())
 		{
-			ready = (exec->local_time() + (cycle / 2)) > time;
+			ready = (exec->local_time() + (cycle / 2)) >= time;
 			if (!ready && ((exec->local_time() + cycle) > time))
 				stalled = cycle;
 		}
