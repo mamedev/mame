@@ -63,9 +63,10 @@
                     read the captured frame back. Mocked here
       3e0000        command word to the sound CPU
       400000-7fffff DATA ROMs, b03 on D31-16 and b04 on D15-0
-      a00000-bfffff "PRINT RAM" (8-bit, tested on byte lane 0x00ff0000)
-      c00000-cfffff "CCD RAM 1" (8-bit)
-      d00000-dfffff "CCD RAM 2" (8-bit)
+      a00000-afffff "PRINT RAM" (16-bit on D31-16; the print code reads
+                    RGB555 pixels from a19000 in rows of 0x800 bytes)
+      c00000-cfffff "CCD RAM 1" (16-bit on D31-16)
+      d00000-dfffff "CCD RAM 2" (16-bit on D31-16)
       e00000-e3ffff video chip A
       e40000-e7ffff video chip B
       e80000        video mixer / camera control (level 6 handler state machine):
@@ -325,7 +326,9 @@ void ppstation_state::draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect
           0 = 16x16, 1 = 32x32, 2 = 64x64, 3 = 128x128 pixels
       +3  draw order, lower values are in front
       +4  Y centre, +6 X centre
-      +8  Y zoom, +a X zoom: 0x40 is 1:1, smaller values enlarge
+      +8  X zoom, +a Y zoom: 0x40 is 1:1, smaller values enlarge (the
+          program scales the pieces' X offsets with the value it stores at
+          +8 and their Y offsets with the one at +a; as in konami/djmain.cpp)
       +c  colour (palette in the low 6 bits)
 
     Larger sprites use the usual Konami interleaved cell order. The list is
@@ -362,8 +365,8 @@ void ppstation_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 		u8 const flags = (e[0] >> 8) & 0xff;
 		s16 const ypos = e[1] >> 16;
 		s16 const xpos = e[1] & 0xffff;
-		u16 const zoomy = (e[2] >> 16) & 0xffff;
-		u16 const zoomx = e[2] & 0xffff;
+		u16 const zoomx = e[2] >> 16;
+		u16 const zoomy = e[2] & 0xffff;
 		u32 const color = (e[3] >> 16) & 0x3f;
 		int const cells = 1 << (flags & 3);
 		bool const flipx = BIT(flags, 2);
@@ -571,9 +574,9 @@ void ppstation_state::main_map(address_map &map)
 	map(0x3c0000, 0x3c000f).umask32(0xff00'0000).rw(FUNC(ppstation_state::printer_r), FUNC(ppstation_state::printer_w));
 	map(0x3e0000, 0x3e0003).umask32(0xffff'0000).w(m_soundlatch, FUNC(generic_latch_16_device::write)); // command word to the sound CPU, polled by its main loop
 	map(0x400000, 0x7fffff).rom().region("data", 0); // b03 on D31-16, b04 on D15-0
-	map(0xa00000, 0xbfffff).ram(); // "PRINT RAM" (tested on byte lane 0x00ff0000 only)
-	map(0xc00000, 0xcfffff).ram(); // "CCD RAM 1"
-	map(0xd00000, 0xdfffff).ram(); // "CCD RAM 2"
+	map(0xa00000, 0xafffff).umask32(0xffff'0000).ram(); // "PRINT RAM", the self test covers bytes 0 and 1 of each long word
+	map(0xc00000, 0xcfffff).umask32(0xffff'0000).ram(); // "CCD RAM 1"
+	map(0xd00000, 0xdfffff).umask32(0xffff'0000).ram(); // "CCD RAM 2"
 
 	// video chip A
 	map(0xe00000, 0xe3ffff).ram().share(m_vidram[0]);
