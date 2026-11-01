@@ -79,10 +79,15 @@
       180000        interrupt enable / acknowledge latch (level 6 is the
                     command interrupt; the handler only acknowledges it, the
                     main loop polls the command word)
+      200000        ? (write only): 0x490f at reset, 0x4d3f once initialised,
+                    then 0x4d00 | low byte of each command taken
       400000-400003 YMZ280B
       500000        command word from the main CPU
 
-    Level 4 interrupt is the frame interrupt.
+    The sound program also has level 3 and 4 handlers (level 4 checks the
+    command word too); their sources are unknown and not hooked up.
+
+    The main CPU's level 4 interrupt is the frame interrupt.
 
     The printer interface at 3c0000 carries both directions of image data:
     the captured camera frame is read back from it 8KB at a time (main loop
@@ -94,12 +99,6 @@
     The camera video itself is mixed in behind the graphics by the register
     at e80000 while bit 28 is set (the photo screen and the attract demo of
     it); the driver shows a test pattern there.
-
-    What works: the power-on self test passes completely (RAM, both video
-    chips, tile ROM read-back, DATA ROM checksums, sound CPU handshake), the
-    attract mode runs, coins are accepted and the whole game flow (genre and
-    design selection, photo, name/address/phone entry, printing) can be
-    walked through with the joystick and the OK/Cancel buttons. Sound works.
 
     The operator menu is on the Test button.
 
@@ -135,6 +134,8 @@ namespace {
 class ppstation_state : public driver_device
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::CAMERA | feature::PRINTER; }
+
 	ppstation_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -172,7 +173,10 @@ private:
 
 	void irqctrl_w(offs_t offset, u16 data, u16 mem_mask);
 	void outputs_w(u8 data);
+	u32 mixer_r();
+	void mixer_w(offs_t offset, u32 data, u32 mem_mask);
 	template <int Chip> void colorram_w(offs_t offset, u32 data, u32 mem_mask);
+	u16 vidreg(offs_t address) const { return m_vidregs[BIT(address, 18)][(address & 0xfe) >> 1]; } // by CPU address, either chip
 	template <int Chip> u16 vidregs_r(offs_t offset);
 	template <int Chip> void vidregs_w(offs_t offset, u16 data, u16 mem_mask);
 	template <int Chip> u32 gfxrom_window_r(offs_t offset);
@@ -233,6 +237,9 @@ void ppstation_state::machine_start()
 void ppstation_state::machine_reset()
 {
 	m_irqctrl = 0;
+	m_maincpu->set_input_line(4, CLEAR_LINE);
+	m_maincpu->set_input_line(5, CLEAR_LINE);
+	m_maincpu->set_input_line(6, CLEAR_LINE);
 	m_printer_busy = false;
 	m_capture_count = 0;
 	m_mixer = 0;
@@ -263,12 +270,12 @@ void ppstation_state::vidregs_w(offs_t offset, u16 data, u16 mem_mask)
 	COMBINE_DATA(&m_vidregs[Chip][offset & 0x7f]);
 }
 
-// the self test selects one of 1024 2KB banks with register 0x14 and reads the tile ROM back here
+// the self test selects one of 1024 2KB banks with e03028 / e43028 and reads the tile ROM back here
 template <int Chip>
 u32 ppstation_state::gfxrom_window_r(offs_t offset)
 {
 	u8 const *const rom = m_gfxrom[Chip]->base();
-	u32 const base = (((m_vidregs[Chip][0x14] & 0x3ff) * 0x800) + (offset * 4)) & (m_gfxrom[Chip]->bytes() - 1);
+	u32 const base = (((vidreg(0xe03028 + (Chip * 0x40000)) & 0x3ff) * 0x800) + (offset * 4)) & (m_gfxrom[Chip]->bytes() - 1);
 	return get_u32be(&rom[base]);
 }
 
@@ -429,10 +436,10 @@ u32 ppstation_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		bitmap.fill(m_palette->black_pen(), cliprect);
 	}
 	// On the card screens the program loads a second set of 32 palettes into colour RAM
-	// entries 512-1023 and sets register 0x50 bit 1: the text layer then takes its colours
+	// entries 512-1023 and sets bit 1 of e03050: the text layer then takes its colours
 	// from that set (the customer's name is white in the first set, black in the second).
 	draw_layer(bitmap, cliprect, 0, 0x08000, 48, 0);
-	draw_layer(bitmap, cliprect, 0, 0x10000, 48, BIT(m_vidregs[0][0x50 / 2], 1) ? 32 : 0);
+	draw_layer(bitmap, cliprect, 0, 0x10000, 48, BIT(vidreg(0xe03050), 1) ? 32 : 0);
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }
@@ -481,6 +488,17 @@ void ppstation_state::outputs_w(u8 data)
 	machine().bookkeeping().coin_lockout_w(0, !BIT(data, 4)); // coin blocker: the game keeps it set while it accepts coins
 	m_error_lamp = BIT(data, 5);
 	m_side_light = BIT(data, 6);
+}
+
+// video mixer / camera control at e80000, see screen_update
+u32 ppstation_state::mixer_r()
+{
+	return m_mixer;
+}
+
+void ppstation_state::mixer_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_mixer);
 }
 
 /*
@@ -547,11 +565,11 @@ void ppstation_state::main_map(address_map &map)
 	map(0x340000, 0x340001).w(FUNC(ppstation_state::irqctrl_w));
 	map(0x340004, 0x340007).lr32(NAME([this] () -> u32 { return u32(m_inputs[1]->read()) << 16; })); // DIP switches
 	map(0x340008, 0x34000b).lr32(NAME([this] () -> u32 { return u32(m_inputs[0]->read()) << 16; }));
-	map(0x360000, 0x360003).r(m_soundstatus, FUNC(generic_latch_8_device::read)).umask32(0xff000000); // status byte from the sound CPU
-	map(0x380000, 0x380003).w(FUNC(ppstation_state::outputs_w)).umask32(0xff000000); // lamps and counters
+	map(0x360000, 0x360003).umask32(0xff00'0000).r(m_soundstatus, FUNC(generic_latch_8_device::read)); // status byte from the sound CPU
+	map(0x380000, 0x380003).umask32(0xff00'0000).w(FUNC(ppstation_state::outputs_w)); // lamps and counters
 	map(0x3a0000, 0x3a0003).nopw(); // self test stage / error code on the low byte, bits 8-10 set by the video code
-	map(0x3c0000, 0x3c000f).rw(FUNC(ppstation_state::printer_r), FUNC(ppstation_state::printer_w)).umask32(0xff000000);
-	map(0x3e0000, 0x3e0003).w(m_soundlatch, FUNC(generic_latch_16_device::write)).umask32(0xffff0000); // command word to the sound CPU, picked up in its level 6 interrupt handler
+	map(0x3c0000, 0x3c000f).umask32(0xff00'0000).rw(FUNC(ppstation_state::printer_r), FUNC(ppstation_state::printer_w));
+	map(0x3e0000, 0x3e0003).umask32(0xffff'0000).w(m_soundlatch, FUNC(generic_latch_16_device::write)); // command word to the sound CPU, polled by its main loop
 	map(0x400000, 0x7fffff).rom().region("data", 0); // b03 on D31-16, b04 on D15-0
 	map(0xa00000, 0xbfffff).ram(); // "PRINT RAM" (tested on byte lane 0x00ff0000 only)
 	map(0xc00000, 0xcfffff).ram(); // "CCD RAM 1"
@@ -569,7 +587,7 @@ void ppstation_state::main_map(address_map &map)
 	map(0xe43000, 0xe430ff).rw(FUNC(ppstation_state::vidregs_r<1>), FUNC(ppstation_state::vidregs_w<1>));
 	map(0xe43800, 0xe43fff).r(FUNC(ppstation_state::gfxrom_window_r<1>));
 
-	map(0xe80000, 0xe80003).lrw32(NAME([this] () -> u32 { return m_mixer; }), NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_mixer); })); // video mixer / camera control
+	map(0xe80000, 0xe80003).rw(FUNC(ppstation_state::mixer_r), FUNC(ppstation_state::mixer_w)); // video mixer / camera control
 	map(0xe80004, 0xe8001f).noprw();
 	map(0xf00000, 0xf0001f).nopw(); // camera interfaces? 16-bit registers, written at reset and once per frame
 	map(0xf40000, 0xf4001f).nopw();
@@ -585,11 +603,10 @@ void ppstation_state::sound_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().region("soundcpu", 0);
 	map(0x080000, 0x083fff).ram();
-	map(0x100000, 0x100001).w(m_soundstatus, FUNC(generic_latch_8_device::write)).umask16(0xff00); // status byte to the main CPU
-	map(0x100010, 0x100011).r(m_soundlatch, FUNC(generic_latch_16_device::read));
-	map(0x180000, 0x180001).w(m_soundlatch, FUNC(generic_latch_16_device::acknowledge_w)).umask16(0xff00); // interrupt enable / acknowledge latch: the level 6 handler writes 0x4c4c then 0x6c6c
-	map(0x200000, 0x200001).nopw(); // 0x490f written at reset, then updated with the current command byte
-	map(0x400000, 0x400003).rw(m_ymz, FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff);
+	map(0x100000, 0x100001).umask16(0xff00).w(m_soundstatus, FUNC(generic_latch_8_device::write)); // status byte to the main CPU
+	map(0x180000, 0x180001).umask16(0xff00).w(m_soundlatch, FUNC(generic_latch_16_device::acknowledge_w)); // interrupt enable / acknowledge latch: the level 6 handler writes 0x4c4c then 0x6c6c
+	map(0x200000, 0x200001).nopw(); // ? 0x490f at reset, 0x4d3f once initialised, then 0x4d00 | low byte of each command
+	map(0x400000, 0x400003).umask16(0x00ff).rw(m_ymz, FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
 	map(0x500000, 0x500001).r(m_soundlatch, FUNC(generic_latch_16_device::read)); // command word from the main CPU, polled by the main loop
 }
 
@@ -702,24 +719,24 @@ void ppstation_state::ppstation(machine_config &config)
 
 ROM_START( ppstation )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // HN27C4096 EPROMs on the CPU board
-	ROM_LOAD32_WORD_SWAP( "a01.12c", 0x000000, 0x080000, CRC(eb42a415) SHA1(3f03868a0d152c20705b94ea1143499f4f8646f7) )
-	ROM_LOAD32_WORD_SWAP( "a02.14c", 0x000002, 0x080000, CRC(5cafe0a7) SHA1(cdc22cec9b760257623347cba4cbf3e9036415a7) )
+	ROM_LOAD32_WORD_SWAP( "657a01.12c", 0x000000, 0x080000, CRC(eb42a415) SHA1(3f03868a0d152c20705b94ea1143499f4f8646f7) )
+	ROM_LOAD32_WORD_SWAP( "657a02.14c", 0x000002, 0x080000, CRC(5cafe0a7) SHA1(cdc22cec9b760257623347cba4cbf3e9036415a7) )
 
 	ROM_REGION( 0x80000, "soundcpu", 0 ) // 27C240
-	ROM_LOAD16_WORD_SWAP( "a06.23n", 0x000000, 0x080000, CRC(b970de57) SHA1(4c6b761ea518a6d9b8d32689ecbdd445101f1d15) )
+	ROM_LOAD16_WORD_SWAP( "657a06.23n", 0x000000, 0x080000, CRC(b970de57) SHA1(4c6b761ea518a6d9b8d32689ecbdd445101f1d15) )
 
 	ROM_REGION( 0x200000, "gfx_a", 0 ) // tiles for video chip A (monitor), mask ROM on the video board
-	ROM_LOAD( "a08.6n", 0x000000, 0x200000, CRC(38497880) SHA1(6ba0e4a0e57c529f655e9fc9fcf5c390323baa86) )
+	ROM_LOAD( "657a08.6n", 0x000000, 0x200000, CRC(38497880) SHA1(6ba0e4a0e57c529f655e9fc9fcf5c390323baa86) )
 
 	ROM_REGION( 0x200000, "gfx_b", 0 ) // sprites for video chip B, mask ROM on the video board
-	ROM_LOAD( "a07.4n", 0x000000, 0x200000, CRC(62aa2a05) SHA1(88b5ba5c6c43d6f84fb52496b7b14b6d72ef4c87) )
+	ROM_LOAD( "657a07.4n", 0x000000, 0x200000, CRC(62aa2a05) SHA1(88b5ba5c6c43d6f84fb52496b7b14b6d72ef4c87) )
 
 	ROM_REGION32_BE( 0x400000, "data", 0 ) // tilemap data (card designs, text): b03 on the upper word, b04 on the lower word (the self test checksums confirm the lanes)
-	ROM_LOAD32_WORD_SWAP( "b03.18g", 0x000000, 0x200000, CRC(83647332) SHA1(c0202b63bf384b60d4536ae38093b483482ab4cd) )
-	ROM_LOAD32_WORD_SWAP( "b04.18h", 0x000002, 0x200000, CRC(c67a3d3f) SHA1(30a4d121c76d3531b5ed7babf3cfe833f5b9b2db) )
+	ROM_LOAD32_WORD_SWAP( "657b03.18g", 0x000000, 0x200000, CRC(83647332) SHA1(c0202b63bf384b60d4536ae38093b483482ab4cd) )
+	ROM_LOAD32_WORD_SWAP( "657b04.18h", 0x000002, 0x200000, CRC(c67a3d3f) SHA1(30a4d121c76d3531b5ed7babf3cfe833f5b9b2db) )
 
 	ROM_REGION( 0x200000, "ymz", 0 )
-	ROM_LOAD( "a05.9n", 0x000000, 0x200000, CRC(d603e144) SHA1(8d1775bf1d167ec91e962f23b80d17fd4a610f7f) )
+	ROM_LOAD( "657a05.9n", 0x000000, 0x200000, CRC(d603e144) SHA1(8d1775bf1d167ec91e962f23b80d17fd4a610f7f) )
 
 	ROM_REGION( 0xa00, "plds", 0 )
 	ROM_LOAD( "002799.19k", 0x000, 0x400, NO_DUMP ) // MACH111, CPU board
@@ -731,4 +748,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1996, ppstation, 0, ppstation, ppstation, ppstation_state, empty_init, ROT0, "Konami", "Puri Puri Station", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER ) // requires camera and printer emulation
+GAME( 1996, ppstation, 0, ppstation, ppstation, ppstation_state, empty_init, ROT0, "Konami", "Puri Puri Station", MACHINE_NOT_WORKING ) // requires camera and printer emulation
