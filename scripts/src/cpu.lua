@@ -3213,6 +3213,7 @@ end
 --@src/devices/cpu/z80/kl5c80a16.h,CPUS["KC80"] = true
 --@src/devices/cpu/z80/ky80.h,CPUS["KC80"] = true
 --@src/devices/cpu/z80/t6a84.h,CPUS["T6A84"] = true
+--@src/devices/cpu/z80/le1080a.h,CPUS["LE1080A"] = true
 --------------------------------------------------
 
 if CPUS["Z80"] or CPUS["KC80"] or CPUS["Z80N"] or CPUS["T6A84"] then
@@ -3288,10 +3289,11 @@ if CPUS["KC80"] then
 	}
 end
 
-local want_disasm_z80  = opt_tool(CPUS, "Z80")
-local want_disasm_kc80 = opt_tool(CPUS, "KC80")
+local want_disasm_z80     = opt_tool(CPUS, "Z80")
+local want_disasm_kc80    = opt_tool(CPUS, "KC80")
+local want_disasm_le1080a = opt_tool(CPUS, "LE1080A")
 
-if want_disasm_z80 or want_disasm_kc80 then
+if want_disasm_z80 or want_disasm_kc80 or want_disasm_le1080a then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/r800dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/r800dasm.h")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm.cpp")
@@ -3302,6 +3304,21 @@ if opt_tool(CPUS, "Z80N") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80ndasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/z80/z80ndasm.h")
+end
+
+if CPUS["LE1080A"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/z80/le1080a.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/le1080a.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/cpu/z80/le1080a.cpp", GEN_DIR .. "emu/cpu/z80/le1080a.hxx" },
+	}
+
+	custombuildtask {
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/le1080a.hxx", { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating LE1080A source file...",   PYTHON .. "  $(1) le1080a $(<) $(@)" } },
+	}
 end
 
 --------------------------------------------------
