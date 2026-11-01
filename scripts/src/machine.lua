@@ -1478,6 +1478,7 @@ end
 --
 --@src/devices/machine/eeprom.h,MACHINES["EEPROMDEV"] = true
 --@src/devices/machine/eepromser.h,MACHINES["EEPROMDEV"] = true
+--@src/devices/machine/eepromspi.h,MACHINES["EEPROMDEV"] = true
 --@src/devices/machine/eeprompar.h,MACHINES["EEPROMDEV"] = true
 ---------------------------------------------------
 
@@ -1487,6 +1488,8 @@ if MACHINES["EEPROMDEV"] then
 		MAME_DIR .. "src/devices/machine/eeprom.h",
 		MAME_DIR .. "src/devices/machine/eepromser.cpp",
 		MAME_DIR .. "src/devices/machine/eepromser.h",
+		MAME_DIR .. "src/devices/machine/eepromspi.cpp",
+		MAME_DIR .. "src/devices/machine/eepromspi.h",
 		MAME_DIR .. "src/devices/machine/eeprompar.cpp",
 		MAME_DIR .. "src/devices/machine/eeprompar.h",
 	}
@@ -2965,6 +2968,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/nrf2401.h,MACHINES["NRF2401"] = true
+---------------------------------------------------
+
+if MACHINES["NRF2401"] then
+	files {
+		MAME_DIR .. "src/devices/machine/nrf2401.cpp",
+		MAME_DIR .. "src/devices/machine/nrf2401.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/nscsi_bus.h,MACHINES["NSCSI"] = true
 --@src/devices/machine/nscsi_cb.h,MACHINES["NSCSI"] = true
 --@src/devices/machine/nscsi_hle.h,MACHINES["NSCSI"] = true
@@ -3544,6 +3559,18 @@ if MACHINES["S3520CF"] then
 	files {
 		MAME_DIR .. "src/devices/machine/s3520cf.cpp",
 		MAME_DIR .. "src/devices/machine/s3520cf.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/s35390a.h,MACHINES["S35390A"] = true
+---------------------------------------------------
+
+if MACHINES["S35390A"] then
+	files {
+		MAME_DIR .. "src/devices/machine/s35390a.cpp",
+		MAME_DIR .. "src/devices/machine/s35390a.h",
 	}
 end
 
@@ -4460,6 +4487,42 @@ if MACHINES["X76F100"] then
 	files {
 		MAME_DIR .. "src/devices/machine/x76f100.cpp",
 		MAME_DIR .. "src/devices/machine/x76f100.h",
+	}
+end
+
+---------------------------------------------------
+-- XaviX System-on-Chip Family
+--@src/devices/machine/xavix_soc.h,MACHINES["XAVIX_SOC"] = true
+---------------------------------------------------
+
+if MACHINES["XAVIX_SOC"] then
+	files {
+		MAME_DIR .. "src/devices/machine/xavix_soc.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_soc.h",
+		MAME_DIR .. "src/devices/machine/xavix_intc.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_intc.h",
+		MAME_DIR .. "src/devices/machine/xavix_video.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_video_render.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_video_timing.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_video.h",
+		MAME_DIR .. "src/devices/machine/xavix_plotter.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_plotter.h",
+		MAME_DIR .. "src/devices/machine/xavix_timer.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_timer.h",
+		MAME_DIR .. "src/devices/machine/xavix_dma.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_dma.h",
+		MAME_DIR .. "src/devices/machine/xavix_sound.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_sound.h",
+		MAME_DIR .. "src/devices/machine/xavix_adc.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_adc.h",
+		MAME_DIR .. "src/devices/machine/xavix_anport.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_anport.h",
+		MAME_DIR .. "src/devices/machine/xavix_math.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_math.h",
+		MAME_DIR .. "src/devices/machine/xavix_io.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_io.h",
+		MAME_DIR .. "src/devices/machine/xavix_pio.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_pio.h",
 	}
 end
 

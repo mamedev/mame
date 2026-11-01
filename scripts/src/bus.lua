@@ -2248,20 +2248,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/ekara/slot.h,BUSES["EKARA"] = true
----------------------------------------------------
-
-if BUSES["EKARA"] then
-	files {
-		MAME_DIR .. "src/devices/bus/ekara/slot.cpp",
-		MAME_DIR .. "src/devices/bus/ekara/slot.h",
-		MAME_DIR .. "src/devices/bus/ekara/rom.cpp",
-		MAME_DIR .. "src/devices/bus/ekara/rom.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/bus/electron/exp.h,BUSES["ELECTRON"] = true
 ---------------------------------------------------
 
@@ -6792,6 +6778,43 @@ if BUSES["X68K"] then
 		MAME_DIR .. "src/devices/bus/x68k/x68k_scsiext.h",
 		MAME_DIR .. "src/devices/bus/x68k/x68k_midi.cpp",
 		MAME_DIR .. "src/devices/bus/x68k/x68k_midi.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/xavix/cart.h,BUSES["XAVIX"] = true
+--@src/devices/bus/xavix/beyblade_link.h,BUSES["XAVIX"] = true
+--@src/devices/bus/xavix/mailcot_mascot.h,BUSES["XAVIX"] = true
+--@src/devices/bus/xavix/domyos_step.h,BUSES["XAVIX"] = true
+--@src/devices/bus/xavix/tvpc_mouse.h,BUSES["XAVIX"] = true
+--@src/devices/bus/xavix/suprtvpc_cart.h,BUSES["XAVIX"] = true
+--@src/devices/bus/xavix/suprtvpc_exp.h,BUSES["XAVIX"] = true
+---------------------------------------------------
+
+if BUSES["XAVIX"] then
+	files {
+		MAME_DIR .. "src/devices/bus/xavix/beyblade_link.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/beyblade_link.h",
+		MAME_DIR .. "src/devices/bus/xavix/cart.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/cart.h",
+		MAME_DIR .. "src/devices/bus/xavix/cart_rom.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/cart_rom.h",
+		MAME_DIR .. "src/devices/bus/xavix/domyos_step.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/domyos_step.h",
+		MAME_DIR .. "src/devices/bus/xavix/mailcot_mascot.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/mailcot_mascot.h",
+		MAME_DIR .. "src/devices/bus/xavix/tvpc_mouse.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/tvpc_mouse.h",
+		MAME_DIR .. "src/devices/bus/xavix/suprtvpc_cart.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/suprtvpc_cart.h",
+		MAME_DIR .. "src/devices/bus/xavix/suprtvpc_cart_ir.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/suprtvpc_cart_ir.h",
+		MAME_DIR .. "src/devices/bus/xavix/suprtvpc_exp.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/suprtvpc_exp.h",
+		MAME_DIR .. "src/devices/bus/xavix/suprtvpc_printer.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/suprtvpc_printer.h",
 	}
 end
 

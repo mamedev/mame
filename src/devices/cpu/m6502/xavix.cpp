@@ -1,29 +1,25 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, MagikalUnicorn
 /***************************************************************************
 
-    xavix.cpp
+    Original XaviX 6502-derived CPU core, with custom opcodes for far calls
+    and interrupts and independent code/data bank latches. Graphics and
+    sound are integrated into the SoC but modelled outside this CPU device.
 
-    The dies for these are marked
+    Banks 0x00-0x7f use low bus below 0x8000 and external bus above it. Bank
+    bit 7 selects external bus throughout the 64 KiB window and is removed
+    from the 23-bit address. Zero-page instructions, pointer cycles and stack
+    cycles always use low bus; addresses 0xfe and 0xff expose the code and
+    data bank latches.
 
+    Known Die Markings:
     SSD 97 PA7270-107 (only seen on Ping Pong)
     SSD 98 PA7351-107
     SSD 98 PL7351-181
 
-    6502 with custom opcodes
-    integrated gfx / sound
-
-    special notes
-
-    0x0000-0x7fff seems to be a 'low bus' area, it is always the same regardless
-                  of banking
-    0x8000-0xffff is a banked area with individual code and data banks
-
-    Zero Page notes:
-
-    0x00ff contains the DATA bank, set manually in code
-    0x00fe appears to be the current CODE bank, set with either the
-            custom opcodes, or manually (if running from lowbus only?)
+    TODO:
+    - Confirm the physical bank-stack arrangement used by far calls and
+      interrupts.
 
 ***************************************************************************/
 
@@ -31,19 +27,23 @@
 #include "xavix.h"
 #include "xavixd.h"
 
+#include <algorithm>
+
 DEFINE_DEVICE_TYPE(XAVIX, xavix_device, "xavix", "XaviX (SSD 97 / SSD 98)")
 
 xavix_device::xavix_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	xavix_device(mconfig, XAVIX, tag, owner, clock)
+	xavix_device(mconfig, XAVIX, tag, owner, clock, false, true)
 {
 }
 
-xavix_device::xavix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+xavix_device::xavix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool full_bank_register_decode, bool use_separate_codebank_stack) :
 	m6502_device(mconfig, type, tag, owner, clock),
-	m_XPC(0),
+	m_data_address_mask(0x7fffff),
+	m_full_bank_register_decode(full_bank_register_decode),
 	m_lowbus_config("lowbus", ENDIANNESS_LITTLE, 8, 15),
 	m_extbus_config("extbus", ENDIANNESS_LITTLE, 8, 24),
-	m_vector_callback(*this)
+	m_interrupt_vector_callback(*this),
+	m_use_separate_codebank_stack(use_separate_codebank_stack)
 {
 	m_program_config.m_addr_width = 24;
 	m_program_config.m_logaddr_width = 24;
@@ -58,41 +58,54 @@ xavix_device::xavix_device(const machine_config &mconfig, device_type type, cons
 
 
 
-std::unique_ptr<util::disasm_interface> xavix_device::create_disassembler()
+xavix_device::mi_xavix::mi_xavix(xavix_device *_base)
 {
-	return std::make_unique<xavix_disassembler>();
+	m_base = _base;
 }
 
-
-offs_t xavix_device::pc_to_external(u16 pc)
+device_memory_interface::space_config_vector xavix_device::memory_space_config() const
 {
-	return adr_with_codebank(pc);
+	if(has_configured_map(AS_OPCODES))
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_OPCODES, &m_sprogram_config),
+			std::make_pair(AS_LOW_BUS, &m_lowbus_config),
+			std::make_pair(AS_EXTERNAL_BUS, &m_extbus_config)
+		};
+	else
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_LOW_BUS, &m_lowbus_config),
+			std::make_pair(AS_EXTERNAL_BUS, &m_extbus_config)
+		};
 }
 
 void xavix_device::device_start()
 {
-	m_mintf = std::make_unique<mi_xavix>(this);
+	if (!m_mintf)
+		m_mintf = std::make_unique<mi_xavix>(this);
 
 	// bind delegates
-	m_vector_callback.resolve();
+	m_interrupt_vector_callback.resolve();
 
 	init();
 
-	space(5).specific(m_lowbus);
-	space(6).specific(m_extbus);
+	space(AS_LOW_BUS).specific(m_lowbus);
+	space(AS_EXTERNAL_BUS).specific(m_extbus);
 
-	state_add(XAVIX_DATABANK, "DATBNK", m_databank).callimport().formatstr("%2s");
-	state_add(XAVIX_CODEBANK, "CODBNK", m_codebank).callimport().formatstr("%2s");
+	state_add(XAVIX_DATABANK, "DATBNK", m_databank).formatstr("%2s");
+	state_add(XAVIX_CODEBANK, "CODBNK", m_codebank).formatstr("%2s");
 
-	save_item(NAME(m_special_stack));
-	save_item(NAME(m_special_stackpos));
+	save_item(NAME(m_databank));
+	save_item(NAME(m_codebank));
+	save_item(NAME(m_codebank_stack));
+	save_item(NAME(m_codebank_stack_pointer));
 }
 
 void xavix_device::device_reset()
 {
-	m_special_stackpos = 0xff;
-	for (int i = 0; i < 0x100; i++)
-		m_special_stack[i] = 0x00;
+	m_codebank_stack_pointer = 0xff;
+	std::ranges::fill(m_codebank_stack, 0x00);
 
 	set_codebank(0);
 	set_databank(0);
@@ -101,16 +114,22 @@ void xavix_device::device_reset()
 
 
 
-xavix_device::mi_xavix::mi_xavix(xavix_device *_base)
+std::unique_ptr<util::disasm_interface> xavix_device::create_disassembler()
 {
-	m_base = _base;
+	return std::make_unique<xavix_disassembler>();
 }
 
-void xavix_device::write_special_stack(uint32_t addr, uint8_t data)
+
+offs_t xavix_device::pc_to_external(u16 pc)
 {
-	if (m_use_private_stack_for_extra_callf_byte)
+	return code_address(pc);
+}
+
+void xavix_device::write_codebank_stack(uint32_t addr, uint8_t data)
+{
+	if (m_use_separate_codebank_stack)
 	{
-		m_special_stack[m_special_stackpos & 0xff] = data;
+		m_codebank_stack[m_codebank_stack_pointer & 0xff] = data;
 	}
 	else
 	{
@@ -118,11 +137,11 @@ void xavix_device::write_special_stack(uint32_t addr, uint8_t data)
 	}
 }
 
-void xavix_device::dec_special_stack()
+void xavix_device::dec_codebank_stack_pointer()
 {
-	if (m_use_private_stack_for_extra_callf_byte)
+	if (m_use_separate_codebank_stack)
 	{
-		m_special_stackpos--;
+		m_codebank_stack_pointer--;
 	}
 	else
 	{
@@ -130,11 +149,11 @@ void xavix_device::dec_special_stack()
 	}
 }
 
-void xavix_device::inc_special_stack()
+void xavix_device::inc_codebank_stack_pointer()
 {
-	if (m_use_private_stack_for_extra_callf_byte)
+	if (m_use_separate_codebank_stack)
 	{
-		m_special_stackpos++;
+		m_codebank_stack_pointer++;
 	}
 	else
 	{
@@ -142,11 +161,11 @@ void xavix_device::inc_special_stack()
 	}
 }
 
-uint8_t xavix_device::read_special_stack(uint32_t addr)
+uint8_t xavix_device::read_codebank_stack(uint32_t addr)
 {
-	if (m_use_private_stack_for_extra_callf_byte)
+	if (m_use_separate_codebank_stack)
 	{
-		return m_special_stack[m_special_stackpos & 0xff];
+		return m_codebank_stack[m_codebank_stack_pointer & 0xff];
 	}
 	else
 	{
@@ -156,22 +175,32 @@ uint8_t xavix_device::read_special_stack(uint32_t addr)
 
 
 
-uint8_t xavix_device::read_full_data(uint32_t addr)
+uint8_t xavix_device::read_banked_data(uint32_t addr)
 {
-	return read_full_data((addr & 0xff0000)>>16, addr & 0xffff);
+	return downcast<mi_xavix &>(*m_mintf).read_banked(addr);
 }
 
-inline uint8_t xavix_device::read_full_data(uint8_t databank, uint16_t adr)
+uint8_t xavix_device::read_banked_data(uint8_t databank, uint16_t adr)
+{
+	return read_banked_data((uint32_t(databank) << 16) | adr);
+}
+
+uint8_t xavix_device::read_banked_data_raw(uint32_t addr)
+{
+	return read_banked_data_raw(BIT(addr, 16, 8), addr & 0xffff);
+}
+
+inline uint8_t xavix_device::read_banked_data_raw(uint8_t databank, uint16_t adr)
 {
 	if (databank < 0x80)
 	{
 		if (adr < 0x8000)
 		{
-			if (adr == 0xfe)
+			if (adr == 0xfe && (!m_full_bank_register_decode || databank == 0))
 			{
 				return m_codebank;
 			}
-			else if (adr == 0xff)
+			else if (adr == 0xff && (!m_full_bank_register_decode || databank == 0))
 			{
 				return m_databank;
 			}
@@ -180,102 +209,99 @@ inline uint8_t xavix_device::read_full_data(uint8_t databank, uint16_t adr)
 		}
 		else
 		{
-			return m_extbus.read_interruptible(((databank << 16) | adr) & 0x7fffff);
+			return m_extbus.read_interruptible(((databank << 16) | adr) & m_data_address_mask);
 		}
 	}
 	else
 	{
-		return m_extbus.read_interruptible(((databank << 16) | adr) & 0x7fffff);
+		return m_extbus.read_interruptible(((databank << 16) | adr) & m_data_address_mask);
 	}
 }
 
 // data reads
 inline uint8_t xavix_device::mi_xavix::read(uint16_t adr)
 {
-	uint8_t databank = m_base->get_databank();
-	return m_base->read_full_data(databank, adr);
+	uint8_t databank = m_base->databank();
+	return read_banked((uint32_t(databank) << 16) | adr);
+}
+
+uint8_t xavix_device::mi_xavix::read_banked(uint32_t adr)
+{
+	return m_base->read_banked_data_raw(adr);
 }
 
 // opcode reads
 uint8_t xavix_device::mi_xavix::read_sync(uint16_t adr)
 {
-	return m_csprogram.read_interruptible(m_base->adr_with_codebank(adr));
+	if (m_base->m_full_bank_register_decode && m_base->codebank() == 0 && (adr == 0xfe || adr == 0xff))
+		return m_base->read_zeropage(adr);
+
+	return m_csprogram.read_interruptible(m_base->code_address(adr));
 }
 
 // oprand reads
 uint8_t xavix_device::mi_xavix::read_arg(uint16_t adr)
 {
-	return m_cprogram.read_interruptible(m_base->adr_with_codebank(adr));
+	if (m_base->m_full_bank_register_decode && m_base->codebank() == 0 && (adr == 0xfe || adr == 0xff))
+		return m_base->read_zeropage(adr);
+
+	return m_cprogram.read_interruptible(m_base->code_address(adr));
 }
 
 // data writes
-void xavix_device::write_full_data(uint32_t addr, uint8_t val)
+void xavix_device::write_banked_data(uint32_t addr, uint8_t val)
 {
-	write_full_data((addr & 0xff0000)>>16, addr & 0xffff, val);
+	downcast<mi_xavix &>(*m_mintf).write_banked(addr, val);
+}
+
+void xavix_device::write_banked_data(uint8_t databank, uint16_t adr, uint8_t val)
+{
+	write_banked_data((uint32_t(databank) << 16) | adr, val);
+}
+
+void xavix_device::write_banked_data_raw(uint32_t addr, uint8_t val)
+{
+	write_banked_data_raw(BIT(addr, 16, 8), addr & 0xffff, val);
 }
 
 uint8_t xavix_device::read_stack(uint32_t addr)
 {
 	// address is always 0x100-0x1ff
-	return m_lowbus.read_interruptible((addr & 0xff) + 0x100);
+	return read_banked_data((addr & 0xff) + 0x100);
 }
 
 void xavix_device::write_stack(uint32_t addr, uint8_t val)
 {
 	// address is always 0x100-0x1ff
-	m_lowbus.write_interruptible((addr & 0xff) + 0x100, val);
+	write_banked_data((addr & 0xff) + 0x100, val);
 }
 
 uint8_t xavix_device::read_zeropage(uint32_t addr)
 {
 	// address is always 0x00-0xff
-	addr &= 0xff;
-
-	if (addr == 0xfe)
-	{
-		return m_codebank;
-	}
-	else if (addr == 0xff)
-	{
-		return m_databank;
-	}
-
-	return m_lowbus.read_interruptible(addr);
+	return read_banked_data(addr & 0xff);
 }
 
 void xavix_device::write_zeropage(uint32_t addr, uint8_t val)
 {
 	// address is always 0x00-0xff
-	addr &= 0xff;
-
-	if (addr == 0xfe)
-	{
-		m_codebank = val;
-		return;
-	}
-	else if (addr == 0xff)
-	{
-		m_databank = val;
-		return;
-	}
-
-	m_lowbus.write_interruptible(addr, val);
+	write_banked_data(addr & 0xff, val);
 }
 
 
 // data writes
-inline void xavix_device::write_full_data(uint8_t databank, uint16_t adr, uint8_t val)
+inline void xavix_device::write_banked_data_raw(uint8_t databank, uint16_t adr, uint8_t val)
 {
 	if (databank < 0x80)
 	{
 		if (adr < 0x8000)
 		{
-			if (adr == 0xfe)
+			if (adr == 0xfe && (!m_full_bank_register_decode || databank == 0))
 			{
 				m_codebank = val;
 				return;
 			}
-			else if (adr == 0xff)
+			else if (adr == 0xff && (!m_full_bank_register_decode || databank == 0))
 			{
 				m_databank = val;
 				return;
@@ -285,76 +311,47 @@ inline void xavix_device::write_full_data(uint8_t databank, uint16_t adr, uint8_
 		}
 		else
 		{
-			m_extbus.write_interruptible(((databank << 16) | adr) & 0x7fffff, val);
+			m_extbus.write_interruptible(((databank << 16) | adr) & m_data_address_mask, val);
 		}
 	}
 	else
 	{
-		m_extbus.write_interruptible(((databank << 16) | adr) & 0x7fffff, val);
+		m_extbus.write_interruptible(((databank << 16) | adr) & m_data_address_mask, val);
 	}
 }
 
 void xavix_device::mi_xavix::write(uint16_t adr, uint8_t val)
 {
-	uint8_t databank = m_base->get_databank();
-	m_base->write_full_data(databank, adr, val);
+	uint8_t databank = m_base->databank();
+	write_banked((uint32_t(databank) << 16) | adr, val);
+}
+
+void xavix_device::mi_xavix::write_banked(uint32_t adr, uint8_t val)
+{
+	m_base->write_banked_data_raw(adr, val);
 }
 
 void xavix_device::set_codebank(uint8_t bank)
 {
-//  space().write_byte(0xfe, bank);
 	m_codebank = bank;
 }
 
-inline uint8_t xavix_device::get_codebank()
+inline uint8_t xavix_device::codebank()
 {
-//  return space().read_byte(0xfe);
 	return m_codebank;
 }
 
 inline void xavix_device::set_databank(uint8_t bank)
 {
-//  space().write_byte(0xff, bank);
 	m_databank = bank;
 }
 
-inline uint8_t xavix_device::get_databank()
+inline uint8_t xavix_device::databank()
 {
-//  return space().read_byte(0xff);
 	return m_databank;
 }
 
-device_memory_interface::space_config_vector xavix_device::memory_space_config() const
-{
-	if(has_configured_map(AS_OPCODES))
-		return space_config_vector {
-			std::make_pair(AS_PROGRAM, &m_program_config),
-			std::make_pair(AS_OPCODES, &m_sprogram_config),
-			std::make_pair(5, &m_lowbus_config),
-			std::make_pair(6, &m_extbus_config)
-		};
-	else
-		return space_config_vector {
-			std::make_pair(AS_PROGRAM, &m_program_config),
-			std::make_pair(5, &m_lowbus_config),
-			std::make_pair(6, &m_extbus_config)
-		};
-}
 
-
-
-void xavix_device::state_import(const device_state_entry &entry)
-{
-	m6502_device::state_import(entry);
-
-	switch(entry.index())
-	{
-	case XAVIX_DATABANK:
-		break;
-	case XAVIX_CODEBANK:
-		break;
-	}
-}
 
 void xavix_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
