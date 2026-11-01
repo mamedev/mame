@@ -149,7 +149,7 @@ bool hardlock_device::select_module(u8 data)
 	if (m_address_count == m_address.size())
 	{
 		const u16 module = BIT(m_address[0], 1, 5) | (BIT(m_address[2], 1, 5) << 5) | (BIT(m_address[5], 1, 5) << 10);
-		m_selected = module == (m_module && m_address[7] == 0xc1) && (m_address[8] == 0x41);
+		m_selected = (module == m_module) && (m_address[7] == 0xc1) && (m_address[8] == 0x41);
 		m_sync_clocks = -1;
 		m_address_count = 0;
 		reset_cipher();
