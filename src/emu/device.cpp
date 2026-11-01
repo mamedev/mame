@@ -104,6 +104,8 @@ device_t::device_t(const machine_config &mconfig, device_type type, std::string_
 	, m_basetag(tag)
 	, m_config_complete(false)
 	, m_started(false)
+	, m_ignore_reset(false)
+	, m_reset_done(false)
 	, m_auto_finder_list(nullptr)
 {
 	if (owner)
@@ -345,6 +347,11 @@ void device_t::validity_check(validity_checker &valid) const
 
 void device_t::reset()
 {
+	// a device that has opted out of reset only takes its initial power-on reset
+	if (m_ignore_reset && m_reset_done)
+		return;
+	m_reset_done = true;
+
 	// let the interfaces do their pre-work
 	for (device_interface &intf : interfaces())
 		intf.interface_pre_reset();
