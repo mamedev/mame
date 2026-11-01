@@ -236,6 +236,9 @@ void invasnab_state::machine_start()
 
 void midzeus_state::machine_reset()
 {
+	m_zeus_light_valid = false;
+	m_zeus_unkbase = 0;
+
 	memcpy(m_ram_base, memregion("maindata")->base(), 0x40000*4);
 	*m_ram_base <<= 1;
 	m_maincpu->reset();
