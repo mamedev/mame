@@ -1464,13 +1464,71 @@ void pxa255_periphs_device::lcd_irq_check()
 	}
 }
 
+u32 pxa255_periphs_device::lcd_clock() const
+{
+	// LCLK is the memory clock, the crystal times CCCR's L multiplier (27 out of reset)
+	switch (m_clk_regs.cccr & 0x1f)
+	{
+		case 3:  return INTERNAL_OSC * 36;
+		case 5:  return INTERNAL_OSC * 45;
+		default: return INTERNAL_OSC * 27;
+	}
+}
+
+u64 pxa255_periphs_device::lcd_frame_ticks() const
+{
+	// one frame in LCLK cycles; each field is programmed minus one, except EFW and BFW,
+	// which only apply in active (TFT) mode
+	const u32 lccr1 = m_lcd_regs.lccr[1];
+	const u32 lccr2 = m_lcd_regs.lccr[2];
+	const u32 line = (lccr1 & LCCR1_PPL) + ((lccr1 & LCCR1_HSW) >> 10) + ((lccr1 & LCCR1_ELW) >> 16) + ((lccr1 & LCCR1_BLW) >> 24) + 4;
+	u32 lines = (lccr2 & LCCR2_LPP) + ((lccr2 & LCCR2_VSW) >> 10) + 2;
+	if (m_lcd_regs.lccr[0] & LCCR0_PAS)
+	{
+		lines += ((lccr2 & LCCR2_EFW) >> 16) + ((lccr2 & LCCR2_BFW) >> 24);
+	}
+
+	// TODO: passive panels shift several pixels per pixel clock
+	return u64(line) * lines * 2 * ((m_lcd_regs.lccr[3] & LCCR3_PCD) + 1);
+}
+
+attotime pxa255_periphs_device::lcd_dma_period(int channel) const
+{
+	const u32 length = m_lcd_regs.dma[channel].ldcmd & 0x000fffff;
+	const u32 bpp = 1 << std::min<u32>((m_lcd_regs.lccr[3] & LCCR3_BPP) >> 24, 4);
+	const u64 frame_bytes = u64((m_lcd_regs.lccr[1] & LCCR1_PPL) + 1) * ((m_lcd_regs.lccr[2] & LCCR2_LPP) + 1) * bpp / 8;
+
+	// pixel data drains at the panel's refresh rate, so a whole frame's worth takes one frame period;
+	// a palette load bursts in during blanking
+	if (!(m_lcd_regs.dma[channel].ldcmd & LDCMD_PAL) && frame_bytes)
+	{
+		return attotime::from_ticks(lcd_frame_ticks() * length / frame_bytes, lcd_clock());
+	}
+	return attotime::from_hz(20000000) * length;
+}
+
+void pxa255_periphs_device::lcd_configure_screen()
+{
+	const u16 lpp = (m_lcd_regs.lccr[2] & LCCR2_LPP);
+	const u16 ppl = (m_lcd_regs.lccr[1] & LCCR1_PPL);
+
+	// the timing registers must all be programmed before the controller is enabled
+	if ((m_lcd_regs.lccr[0] & LCCR0_ENB) && lpp && ppl)
+	{
+		const rectangle rect(0, ppl, 0, lpp);
+		const attotime period = attotime::from_ticks(lcd_frame_ticks(), lcd_clock());
+		if (rect != m_screen->visible_area() || period != m_screen->frame_period())
+		{
+			m_screen->configure(1024, 1024, rect, period);
+		}
+	}
+}
+
 void pxa255_periphs_device::lcd_dma_kickoff(int channel)
 {
 	if (m_lcd_regs.dma[channel].fdadr != 0)
 	{
-		attotime period = attotime::from_hz(20000000) * (m_lcd_regs.dma[channel].ldcmd & 0x000fffff);
-
-		m_lcd_regs.dma[channel].eof->adjust(period, channel);
+		m_lcd_regs.dma[channel].eof->adjust(lcd_dma_period(channel), channel);
 
 		if (m_lcd_regs.dma[channel].ldcmd & LDCMD_SOFINT)
 		{
@@ -1564,21 +1622,13 @@ void pxa255_periphs_device::lcd_lccr_w(offs_t offset, u32 data, u32 mem_mask)
 					lcd_dma_kickoff(channel);
 			}
 		}
+
+		lcd_configure_screen();
 	}
 	else
 	{
 		m_lcd_regs.lccr[Which] = data;
-		if (Which == 1 || Which == 2)
-		{
-			const u16 lpp = (m_lcd_regs.lccr[2] & LCCR2_LPP);
-			const u16 ppl = (m_lcd_regs.lccr[1] & LCCR1_PPL);
-
-			if (lpp && ppl)
-			{
-				rectangle rect(0, ppl, 0, lpp);
-				m_screen->configure(1024, 1024, rect, attotime::from_hz(60));
-			}
-		}
+		lcd_configure_screen();
 	}
 }
 
@@ -1904,7 +1954,7 @@ void pxa255_periphs_device::clk_cken_w(offs_t offset, u32 data, u32 mem_mask)
 
 u32 pxa255_periphs_device::clk_oscc_r(offs_t offset, u32 mem_mask)
 {
-	const u32 data = m_clk_regs.cccr;
+	const u32 data = m_clk_regs.oscc;
 	LOGMASKED(LOG_CLOCKS, "%s: clk_oscc_r: Oscillator Configuration Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
