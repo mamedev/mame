@@ -124,6 +124,7 @@ private:
 	uint32_t m_PRCB;
 	uint32_t m_PC;
 	uint32_t m_AC;
+	uint32_t m_TC;  // trace controls: kept for modtc, nothing traces
 	uint32_t m_IP;
 	uint32_t m_PIP;
 	uint32_t m_ICR;
