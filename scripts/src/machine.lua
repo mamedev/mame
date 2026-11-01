@@ -909,6 +909,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ansi_disk.h,MACHINES["ANSI_DISK"] = true
+---------------------------------------------------
+
+if MACHINES["ANSI_DISK"] then
+	files {
+		MAME_DIR .. "src/devices/machine/ansi_disk.cpp",
+		MAME_DIR .. "src/devices/machine/ansi_disk.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/applepic.h,MACHINES["APPLEPIC"] = true
 ---------------------------------------------------
 

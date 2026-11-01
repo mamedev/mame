@@ -299,7 +299,13 @@ void hd63450_device::dma_transfer_start(int channel)
 
 	// Burst transfers will halt the CPU until the transfer is complete
 	// max rate transfer hold the bus
-	if (((m_reg[channel].dcr & 0xc0) == 0x00))  // Burst transfer
+	if (((m_reg[channel].dcr & 0xc0) == 0x00) && ((m_reg[channel].ocr & 3) == 2) && !m_drq_state[channel])  // Burst transfer, external request, DRQ idle
+	{
+		// the rising edge of DRQ starts the transfer (drq_w); polling at the
+		// burst clock until then would only find DRQ low
+		m_timer[channel]->adjust(attotime::never, channel, attotime::never);
+	}
+	else if (((m_reg[channel].dcr & 0xc0) == 0x00))  // Burst transfer
 	{
 		if((m_reg[channel].ocr & 3) == 1 && m_cpu) // TODO: proper cycle stealing
 			m_cpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -404,7 +410,7 @@ void hd63450_device::single_transfer(int x)
 				data = m_dma32_read[x](m_reg[x].mar);
 			else
 				data = m_dma_space->read_dword(m_reg[x].dar);  // read from device address
-			m_dma_space->write_word(m_reg[x].mar,data);
+			m_dma_space->write_dword(m_reg[x].mar,data);
 			datasize = 4;
 			break;
 		}
@@ -496,6 +502,7 @@ void hd63450_device::single_transfer(int x)
 			m_reg[x].mar = m_reg[x].bar;
 			m_reg[x].mtc = m_reg[x].btc;
 			m_reg[x].csr |= 0x40;
+			m_reg[x].ccr &= ~0x40;  // the continued block is now running: CNT clears
 			set_irq(x);
 			return;
 		}
