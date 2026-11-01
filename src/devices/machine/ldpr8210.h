@@ -22,8 +22,9 @@
 //**************************************************************************
 
 // device type definition
-DECLARE_DEVICE_TYPE(PIONEER_PR8210,   pioneer_pr8210_device)
-DECLARE_DEVICE_TYPE(SIMUTREK_SPECIAL, simutrek_special_device)
+DECLARE_DEVICE_TYPE(PIONEER_PR8210,    pioneer_pr8210_device)
+DECLARE_DEVICE_TYPE(SIMUTREK_SPECIAL,  simutrek_special_device)
+DECLARE_DEVICE_TYPE(WILLIAMS_PR8210,   williams_pr8210_device)
 
 
 
@@ -130,6 +131,34 @@ protected:
 
 private:
 	void pr8210_portmap(address_map &map) ATTR_COLD;
+};
+
+
+// ======================> williams_pr8210_device
+
+// Williams' modified player exposes additional signals to the PIF board.
+class williams_pr8210_device : public pioneer_pr8210_device
+{
+public:
+	// construction/destruction
+	williams_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	// ROM sharing
+	static auto parent_rom_device_type() { return &PIONEER_PR8210; }
+
+	// input and output
+	uint8_t pif_status_r() const;
+	void jump_trigger(bool forward);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override ATTR_COLD;
+
+	// subclass overrides
+	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
+
+private:
+	bool m_field;
 };
 
 

@@ -1,11 +1,15 @@
 // license:BSD-3-Clause
-// copyright-holders:Vas Crabb
+// copyright-holders:Vas Crabb, OM3GAZX, Aaron Giles
 /*
  Williams Star Rider
 
  One of the more sophisticated LaserDisc games.  The "video expander"
  allows part of the LaserDisc backdrop to be enlarged and panned
  horizontally.  Overlay graphics are also supported.
+
+ Based on code from the FreeBASIC Star Rider Emulator, by Joseba and SynaMax.
+ Sound implementation based on Luis Quinto's webJS port of Star Rider Emulator.
+ FIXME: Establish compatible licensing and provenance for these contributions.
 
  Major components:
  -----------------
@@ -241,12 +245,10 @@
  but it isn't populated.
 
 
- TODO:
- * Everything
- * Map the banked CPU ROM
- * Video DMA etc.
- * Need a dump of the clock state machine PROM at VGG U114 (82S123 32*8)
- * Need dumps of colour mapping PROMs at VGG U10 and U11 (82S137 1204*4)
+ FIXME: Emulate the video expander at circuit level.
+ FIXME: Diagnose intermittent PIF stalls and disc faults, including after reset.
+ FIXME: Resolve attract-mode video and overlay timing.
+ FIXME: Replace the reconstructed LaserDisc capture with a verified capture.
 
  */
 
@@ -258,9 +260,13 @@
 #include "machine/6840ptm.h"
 #include "machine/bankdev.h"
 #include "machine/input_merger.h"
+#include "machine/ldpr8210.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
+#include "sound/dac.h"
 
 #include "emupal.h"
+#include "speaker.h"
 
 #include <algorithm>
 #include <iterator>
@@ -275,22 +281,34 @@ public:
 	sr_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
 		, m_main_cpu(*this, "cpu.u46")
+		, m_screen(*this, "screen")
 		, m_main_pia1(*this, "cpu.u10")
 		, m_main_pia2(*this, "cpu.u20")
 		, m_main_banks(*this, "cpu.page")
 		, m_main_nvram(*this, "cpu.u9")
 		, m_main_mem_prot(*this, "MEMPROT")
+		, m_controls(*this, "IN%u", 0U)
+		, m_steer(*this, "STEER")
+		, m_accel(*this, "ACCEL")
+		, m_brake(*this, "BRAKE")
 		, m_main_led(*this, "cpu.u3")
 		, m_vgg_pia(*this, "vgg.u7")
 		, m_vgg_palette(*this, "vgg.color")
 		, m_vgg_horz(*this, "horz")
+		, m_vgg_gfx(*this, "gfx")
+		, m_vgg_text(*this, "text")
+		, m_vgg_color_prom(*this, "color")
 		, m_pif_cpu(*this, "pif.u4")
 		, m_pif_pia(*this, "pif.u1")
+		, m_main_irq(*this, "main.irq")
+		, m_pif_irq(*this, "pif.irq")
+		, m_laserdisc(*this, "ld_pr8210a")
 		, m_sound_cpu(*this, "sound.u5")
 		, m_sound_ptm(*this, "sound.u14")
 		, m_sound_pia1(*this, "sound.u34")
 		, m_sound_pia2(*this, "sound.u15")
 		, m_sound_fifos(*this, { "sound.u23", "sound.u22" })
+		, m_sound_dacs(*this, "sound.dac%u", 0U)
 	{
 	}
 
@@ -299,15 +317,26 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(sound_sw1_changed);
 
 protected:
+	void device_post_load() override;
+
 	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
+	static constexpr u32 VGG_DRAM_SIZE = 16'384 * 4 / 8 * 6;
+
 	u8 cpu_page_r(address_space &space);
 	void cpu_page_w(u8 data);
 	u8 cpu_led_r(address_space &space);
 	void cpu_led_w(u8 data);
 	u8 cpu_wd_r(address_space &space);
 	void cpu_wd_w(u8 data);
+	u8 video_counter_r();
+	u8 field_r();
+	void vgg_vblank(int state);
+	TIMER_DEVICE_CALLBACK_MEMBER(vgg_scanline);
+	u8 control1_r();
+	u8 control2_r();
 	u8 cpu_nvram_r(address_space &space, offs_t offset);
 	void cpu_nvram_w(offs_t offset, u8 data);
 	void cpu_pia2_ca2_w(int state);
@@ -315,16 +344,33 @@ private:
 	static constexpr u16 vgg_drams_map(u16 v, u16 h, u16 p);
 	u16 vgg_drams_map(u16 a) const;
 
+	u8 vgg_drams_r(offs_t offset);
+	u8 vgg_image_r(offs_t offset);
 	void vgg_drams_w(offs_t offset, u8 data);
 	void vgg_impg_w(u8 data);
 	void vgg_xlate_w(u8 data);
+	void vgg_blitter_w(offs_t offset, u8 data);
+	void vgg_blit();
+	TIMER_CALLBACK_MEMBER(vgg_blit_done);
+	void vgg_blit_pixel(u16 destination, u8 source, u8 control, u8 mask, u8 solid);
+	u32 vgg_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vgg_disable_w(u8 data);
 	void vgg_color_palet_w(u8 data);
 
 	u8 pif_irq_enable_r(address_space &space);
 	void pif_irq_enable_w(u8 data);
-	u8 pif_irq_ack_r(address_space &space) { m_pif_cpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); return space.unmap(); }
-	void pif_irq_ack_w(u8 data) { m_pif_cpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
+	u8 pif_irq_ack_r(address_space &space);
+	void pif_irq_ack_w(u8 data);
+	void pif_irq_update();
+	void vgg_portb_w(offs_t offset, u8 data, u8 ddr);
+	void pif_porta_w(u8 data);
+	void vgg_cb2_w(int state);
+	void pif_ca2_w(int state);
+	TIMER_CALLBACK_MEMBER(pif_data_sync);
+	TIMER_CALLBACK_MEMBER(vgg_data_sync);
+	TIMER_CALLBACK_MEMBER(pif_ca1_sync);
+	TIMER_CALLBACK_MEMBER(vgg_cb1_sync);
+	void pif_portb_w(offs_t offset, u8 data, u8 ddr);
 
 	template <unsigned N> u8 sound_fifo_pl_r(address_space &space);
 	template <unsigned N> void sound_fifo_pl_w(u8 data);
@@ -338,8 +384,10 @@ private:
 	void sound_ef2_w(u8 data);
 	u8 sound_er2_r(address_space &space);
 	void sound_er2_w(u8 data);
+	void sound_attenuator_w(unsigned index, u8 data);
 
 	void sound_pia2_pa(u8 data);
+	template <unsigned N> void sound_fifo_q(u8 data);
 	void sound_fifo0_ir(int state);
 	void sound_fifo1_ir(int state);
 	template <unsigned N> void sound_fifo_or(int state);
@@ -351,38 +399,59 @@ private:
 	void sound_memory(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_main_cpu;
+	required_device<screen_device> m_screen;
 	required_device<pia6821_device> m_main_pia1;
 	required_device<pia6821_device> m_main_pia2;
 	required_device<address_map_bank_device> m_main_banks;
 	required_shared_ptr<u8> m_main_nvram;
 	required_ioport m_main_mem_prot;
+	required_ioport_array<2> m_controls;
+	required_ioport m_steer;
+	required_ioport m_accel;
+	required_ioport m_brake;
 	output_finder<> m_main_led;
 
 	required_device<pia6821_device> m_vgg_pia;
 	required_device<palette_device> m_vgg_palette;
 	required_region_ptr<u8> m_vgg_horz;
+	required_memory_region m_vgg_gfx;
+	required_memory_region m_vgg_text;
+	required_memory_region m_vgg_color_prom;
 
 	required_device<cpu_device> m_pif_cpu;
 	required_device<pia6821_device> m_pif_pia;
+	required_device<input_merger_device> m_main_irq;
+	required_device<input_merger_device> m_pif_irq;
+	required_device<williams_pr8210_device> m_laserdisc;
 
 	required_device<cpu_device> m_sound_cpu;
 	required_device<ptm6840_device> m_sound_ptm;
 	required_device<pia6821_device> m_sound_pia1;
 	required_device<pia6821_device> m_sound_pia2;
 	required_device_array<fifo2812_device, 2> m_sound_fifos;
+	required_device_array<dac_8bit_r2r_device, 4> m_sound_dacs;
 
 	u8 m_main_page = 0U;
 
 	std::unique_ptr<u8 []> m_vgg_drams;
 	u8 m_vgg_image_page = 0U;
 	u8 m_vgg_xlate = 0U;
+	u8 m_vgg_blitter_regs[16] = {};
 	u8 m_vgg_expand_disable = 0U;
 	u8 m_vgg_background_disable = 0U;
 	u8 m_vgg_color_palet = 0U;
+	u16 m_vgg_pan = 0x1ffU;
+	bool m_vgg_4ms = false;
+
+	u16 m_vgg_vblank_count = 0U;
 
 	u8 m_pif_irq_enable = 0U;
+	bool m_pif_timer_irq = false; // pending IRQ latched from the VGG 4MS signal
+	u8 m_pif_portb = 0xffU;
+	emu_timer *m_vgg_blit_timer = nullptr;
 
 	u8 m_sound_ptm_o[2] = { 0U, 0U };
+	u8 m_sound_attenuation[4] = {};
 	u8 m_sound_pia2_pa_out = 0xffU;
 	u8 m_sound_pia2_pb_in = 0xffU;
 };
@@ -398,16 +467,16 @@ void sr_state::starrider(machine_config &config)
 	m_main_pia1->readpa_handler().set_ioport("IN2");
 	// CA1 is the /END SCREEN signal
 	// CA2 is the 4MS signal
-	m_main_pia1->writepb_handler().set(m_sound_pia1, FUNC(pia6821_device::portb_w));
+	m_main_pia1->writepb_handler().set(m_sound_pia1, FUNC(pia6821_device::porta_w)); // sound command latch
 	m_main_pia1->cb2_handler().set(m_sound_pia1, FUNC(pia6821_device::ca1_w));
-	m_main_pia1->irqa_handler().set("main.irq", FUNC(input_merger_device::in_w<0>));
-	m_main_pia1->irqb_handler().set("main.irq", FUNC(input_merger_device::in_w<1>));
+	m_main_pia1->irqa_handler().set(m_main_irq, FUNC(input_merger_device::in_w<0>));
+	m_main_pia1->irqb_handler().set(m_main_irq, FUNC(input_merger_device::in_w<1>));
 
 	PIA6821(config, m_main_pia2, 24_MHz_XTAL / 2 / 12); // 6820/21
-	m_main_pia2->readpa_handler().set_ioport("IN0");
+	m_main_pia2->readpa_handler().set(FUNC(sr_state::control1_r));
 	m_main_pia2->ca1_w(0); // grounded
 	m_main_pia2->ca2_handler().set(FUNC(sr_state::cpu_pia2_ca2_w));
-	m_main_pia2->readpb_handler().set_ioport("IN1");
+	m_main_pia2->readpb_handler().set(FUNC(sr_state::control2_r));
 	m_main_pia2->cb1_w(0); // grounded
 	// CB2 is unused
 	// IRQA and IRQB are unused
@@ -420,15 +489,20 @@ void sr_state::starrider(machine_config &config)
 	m_main_banks->set_addr_width(20);
 	m_main_banks->set_stride(0x1'0000);
 
-	INPUT_MERGER_ANY_HIGH(config, "main.irq").output_handler().set_inputline(m_main_cpu, M6809_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, m_main_irq).output_handler().set_inputline(m_main_cpu, M6809_IRQ_LINE);
 
 	// VGG
 	PIA6821(config, m_vgg_pia, 24_MHz_XTAL / 2 / 12); // 6821
-	// PA0-8 and CA2 are outputs to the expander board
+	// PA0-7 and CA2 provide the nine expander preset bits
 	// CA1 is the /HALT signal
-	// PB0-7 and CB1-2 are the interface to the PIF board (bidirectional)
+	// PB0-7 and CB1-2 are the bidirectional interface to the PIF board
+	m_vgg_pia->writepa_handler().set([this] (u8 data) { m_vgg_pan = (m_vgg_pan & 0x100) | data; });
+	m_vgg_pia->ca2_handler().set([this] (int state) { m_vgg_pan = (m_vgg_pan & 0xff) | (state ? 0x100 : 0); });
+	m_vgg_pia->writepb_handler().set(FUNC(sr_state::vgg_portb_w));
+	m_vgg_pia->tspb_handler().set_constant(0xff);
+	m_vgg_pia->cb2_handler().set(FUNC(sr_state::vgg_cb2_w));
 	m_vgg_pia->irqa_handler().set_inputline(m_main_cpu, M6809_FIRQ_LINE);
-	m_vgg_pia->irqb_handler().set("main.irq", FUNC(input_merger_device::in_w<2>));
+	m_vgg_pia->irqb_handler().set(m_main_irq, FUNC(input_merger_device::in_w<2>));
 
 	PALETTE(config, m_vgg_palette).set_format(palette_device::IBGR_4444, 1024).set_endianness(ENDIANNESS_LITTLE);
 
@@ -437,8 +511,18 @@ void sr_state::starrider(machine_config &config)
 	m_pif_cpu->set_addrmap(AS_PROGRAM, &sr_state::pif_memory);
 
 	PIA6821(config, m_pif_pia, 4_MHz_XTAL / 4); // 6821
+	m_pif_pia->writepa_handler().set(FUNC(sr_state::pif_porta_w));
+	m_pif_pia->readpb_handler().set(m_laserdisc, FUNC(williams_pr8210_device::pif_status_r));
+	m_pif_pia->writepb_handler().set(FUNC(sr_state::pif_portb_w));
+	m_pif_pia->ca2_handler().set(FUNC(sr_state::pif_ca2_w));
 	m_pif_pia->irqa_handler().set_inputline(m_pif_cpu, M6809_FIRQ_LINE);
 	m_pif_pia->irqb_handler().set_inputline(m_pif_cpu, INPUT_LINE_NMI);
+
+	WILLIAMS_PR8210(config, m_laserdisc);
+	m_laserdisc->add_ntsc_screen(config, "screen");
+	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(sr_state::vgg_vblank));
+	m_laserdisc->set_overlay(640, 512, FUNC(sr_state::vgg_screen_update));
+	TIMER(config, "vgg.scanline").configure_scanline(FUNC(sr_state::vgg_scanline), "screen", 0, 1);
 
 	// Sound
 	MC6809E(config, m_sound_cpu, 8_MHz_XTAL / 4); // 68B09E
@@ -464,22 +548,35 @@ void sr_state::starrider(machine_config &config)
 	// PA3 is the IR output from the unpopulated third FIFO (active low)
 	// PA7 is the RDY output from the unpopulated 5220 (active low)
 	// CB1-2 are unused
-	m_sound_pia1->irqb_handler().set("sound.irq", FUNC(input_merger_device::in_w<2>));
-	m_sound_pia1->irqb_handler().set("sound.irq", FUNC(input_merger_device::in_w<3>));
+	m_sound_pia2->irqa_handler().set("sound.irq", FUNC(input_merger_device::in_w<2>));
+	m_sound_pia2->irqb_handler().set("sound.irq", FUNC(input_merger_device::in_w<3>));
+
+	SPEAKER(config, "speaker", 4).corners();
+	DAC_8BIT_R2R(config, m_sound_dacs[0]).add_route(ALL_OUTPUTS, "speaker", 1.0, 0); // EF1: front left
+	DAC_8BIT_R2R(config, m_sound_dacs[1]).add_route(ALL_OUTPUTS, "speaker", 1.0, 2); // ER1: rear left
+	DAC_8BIT_R2R(config, m_sound_dacs[2]).add_route(ALL_OUTPUTS, "speaker", 1.0, 1); // EF2: front right
+	DAC_8BIT_R2R(config, m_sound_dacs[3]).add_route(ALL_OUTPUTS, "speaker", 1.0, 3); // ER2: rear right
+
+	// FIXME: Verify the LaserDisc audio routing through the cabinet mixer.
+	m_laserdisc->add_route(0, "speaker", 1.0, 0);
+	m_laserdisc->add_route(1, "speaker", 1.0, 1);
 
 	FIFO2812(config, m_sound_fifos[0]);
+	m_sound_fifos[0]->q_cb().set(FUNC(sr_state::sound_fifo_q<0>));
 	m_sound_fifos[0]->ir_cb().set(FUNC(sr_state::sound_fifo0_ir));
-	//m_sound_fifos[0]->ir_cb().append(...) IR is input to a clock-stretching circuit
+	// FIXME: Connect IR to the sound CPU clock-stretching circuit.
 	m_sound_fifos[0]->or_cb().set(FUNC(sr_state::sound_fifo_or<0>));
 	m_sound_fifos[0]->flag_cb().set(FUNC(sr_state::sound_fifo_flag<0>));
 
 	FIFO2812(config, m_sound_fifos[1]);
+	m_sound_fifos[1]->q_cb().set(FUNC(sr_state::sound_fifo_q<1>));
 	m_sound_fifos[1]->ir_cb().set(FUNC(sr_state::sound_fifo1_ir));
-	//m_sound_fifos[1]->ir_cb().append(...) IR is input to a clock-stretching circuit
+	// FIXME: Connect IR to the sound CPU clock-stretching circuit.
 	m_sound_fifos[1]->or_cb().set(FUNC(sr_state::sound_fifo_or<1>));
 	m_sound_fifos[1]->flag_cb().set(FUNC(sr_state::sound_fifo_flag<1>));
 
 	INPUT_MERGER_ANY_HIGH(config, "sound.irq").output_handler().set_inputline(m_sound_cpu, M6809_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, m_pif_irq).output_handler().set_inputline(m_pif_cpu, M6809_IRQ_LINE);
 }
 
 
@@ -489,40 +586,87 @@ INPUT_CHANGED_MEMBER(sr_state::sound_sw1_changed)
 	m_sound_cpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
 void sr_state::machine_start()
 {
-	m_vgg_drams = std::make_unique<u8 []>(16'384 * 4 / 8 * 6);
+	m_laserdisc->video_enable(false); // the expander composites video into the overlay
+	m_vgg_drams = std::make_unique<u8 []>(VGG_DRAM_SIZE);
 
 	save_item(NAME(m_main_page));
-	save_pointer(NAME(m_vgg_drams), 16'384 * 4 / 8 * 6);
+	save_pointer(NAME(m_vgg_drams), VGG_DRAM_SIZE);
 	save_item(NAME(m_vgg_image_page));
 	save_item(NAME(m_vgg_xlate));
+	save_item(NAME(m_vgg_blitter_regs));
 	save_item(NAME(m_vgg_expand_disable));
 	save_item(NAME(m_vgg_background_disable));
 	save_item(NAME(m_vgg_color_palet));
+	save_item(NAME(m_vgg_pan));
+	save_item(NAME(m_vgg_4ms));
 	save_item(NAME(m_pif_irq_enable));
+	save_item(NAME(m_vgg_vblank_count));
+	save_item(NAME(m_pif_timer_irq));
+	save_item(NAME(m_pif_portb));
 	save_item(NAME(m_sound_ptm_o));
+	save_item(NAME(m_sound_attenuation));
 	save_item(NAME(m_sound_pia2_pa_out));
 	save_item(NAME(m_sound_pia2_pb_in));
 
 	m_main_page = 0U;
-	std::fill_n(m_vgg_drams.get(), 16'384 * 4 / 8 * 6, 0U);
+	std::fill_n(m_vgg_drams.get(), VGG_DRAM_SIZE, 0U);
 	m_vgg_image_page = 0U;
 	m_vgg_xlate = 0U;
 	m_vgg_expand_disable = 0U;
 	m_vgg_background_disable = 0U;
 	m_vgg_color_palet = 0U;
+	m_vgg_pan = 0x1ffU;
+	m_vgg_4ms = false;
 	m_pif_irq_enable = 0U;
+	m_pif_timer_irq = false;
+	m_vgg_vblank_count = 0U;
+	m_pif_portb = 0xffU;
+	m_pif_irq->in_w<1>(0);
+	m_vgg_blit_timer = timer_alloc(FUNC(sr_state::vgg_blit_done), this);
 	std::fill(std::begin(m_sound_ptm_o), std::end(m_sound_ptm_o), 0U);
+	std::fill(std::begin(m_sound_attenuation), std::end(m_sound_attenuation), 0U);
 	m_sound_pia2_pa_out = 0xffU;
-	m_sound_pia2_pb_in = 0xffU;
+	m_sound_pia2_pb_in = 0x44U; // empty FIFOs: half-full and output-ready low, third FIFO's flag pulled up
+	for (auto &dac : m_sound_dacs)
+		dac->set_output_gain(ALL_OUTPUTS, 0.0F);
+	sound_fifo_q<0>(0x80U);
+	sound_fifo_q<1>(0x80U);
 
 	for (unsigned i = 0U; 3U > i; ++i)
 	{
 		m_sound_ptm->set_gate(i, 0);
 		m_sound_ptm->set_clock(i, 0);
 	}
+}
+
+void sr_state::machine_reset()
+{
+	// present the empty-FIFO state to the sound PIA; the FIFOs only report changes
+	m_sound_pia2_pa_out = 0xffU;
+	m_sound_pia2_pb_in = 0x44U;
+	m_sound_pia2->portb_w(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
+	m_sound_pia2->ca1_w(1);
+	m_sound_pia2->ca2_w(1);
+
+	m_vgg_blit_timer->adjust(attotime::never);
+	m_main_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	m_vgg_pia->ca1_w(1);
+
+	// PIF reset
+	m_pif_portb = 0xffU;
+	m_pif_irq->in_w<1>(0);
+	m_vgg_pan = 0x1ffU;
+	m_vgg_4ms = false;
+	m_pif_irq_enable = 0U;
+	m_pif_timer_irq = false;
+}
+
+void sr_state::device_post_load()
+{
+	for (unsigned i = 0; i < std::size(m_sound_attenuation); ++i)
+		m_sound_dacs[i]->set_output_gain(ALL_OUTPUTS, 0.5F * m_sound_attenuation[i] / 63.0F);
 }
 
 
@@ -572,6 +716,55 @@ void sr_state::cpu_wd_w(u8 data)
 	}
 }
 
+u8 sr_state::video_counter_r()
+{
+	// The VGG counts one line for every two NTSC scanlines.
+	return (m_screen->vpos() >> 1) & 0xff;
+}
+
+u8 sr_state::field_r()
+{
+	// FIXME: Derive FIELD from the VGG sync circuit rather than vblank parity.
+	return BIT(m_vgg_vblank_count, 0) ? 0x00 : 0x80;
+}
+
+void sr_state::vgg_vblank(int state)
+{
+	if (state)
+		m_vgg_vblank_count++;
+	// /END SCREEN is active low; the PIA owns interrupt latching/acknowledgment.
+	m_main_pia1->ca1_w(!state);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(sr_state::vgg_scanline)
+{
+	// VGG VA11 supplies 4MS to CPU U10 CA2 and PIF J2 pin 13/U6.
+	// FIXME: Model sync-clear and half-line phase in the VGG counter chain.
+	bool const signal = BIT(param >> 1, 5);
+	m_main_pia1->ca2_w(signal);
+	if (signal && !m_vgg_4ms)
+	{
+		m_pif_timer_irq = true;
+		pif_irq_update();
+	}
+	m_vgg_4ms = signal;
+}
+
+u8 sr_state::control1_r()
+{
+	u8 const steering = m_steer->read() & 0x3f;
+	u8 const gray = steering ^ (steering >> 1);
+	return gray | (m_controls[0]->read() & 0xc0);
+}
+
+u8 sr_state::control2_r()
+{
+	u8 const accelerator = m_accel->read() & 0x0f;
+	u8 const gray = accelerator ^ (accelerator >> 1);
+	u8 const brake = m_brake->read() & 0x03;
+	return gray | ((brake ^ (brake >> 1)) << 4) | (m_controls[1]->read() & 0xc0);
+}
+
 u8 sr_state::cpu_nvram_r(address_space &space, offs_t offset)
 {
 	// U9 (5514) is 4 bits wide
@@ -618,26 +811,256 @@ u16 sr_state::vgg_drams_map(u16 a) const
 	return vgg_drams_map(a & 0x00ff, pa & 0x003f, (pa >> 6) & 0x0003);
 }
 
+u8 sr_state::vgg_drams_r(offs_t offset)
+{
+	u16 const address(vgg_drams_map(offset));
+	return (address < VGG_DRAM_SIZE) ? m_vgg_drams[address] : 0xff;
+}
+
+
+u8 sr_state::vgg_image_r(offs_t offset)
+{
+	// Page 1 reads the image ROM selected by the image page latch (used by the ROM test).
+	if ((m_vgg_image_page & 0x1f) == 0x1e)
+		return m_vgg_text->base()[offset & 0x3fff];
+
+	u32 const bank = (u32(m_vgg_image_page & 0x0f) * 2) + BIT(offset, 14);
+	return m_vgg_gfx->base()[(bank * 0x4000) + (offset & 0x3fff)];
+}
+
 
 void sr_state::vgg_drams_w(offs_t offset, u8 data)
 {
 	if (((m_main_page & 0x03) == 0x03) || (((m_main_page & 0x03) == 0x01) && ((m_vgg_image_page & 0x1f) == 0x1e)))
 		offset ^= 0x8000;
 	u16 const addr(vgg_drams_map(offset));
-	if ((offset & 0xc000) != 0xc000)
+	if (((offset & 0xc000) != 0xc000) && (addr < VGG_DRAM_SIZE))
 		m_vgg_drams[addr] = data;
 }
 
 void sr_state::vgg_impg_w(u8 data)
 {
-	// 6 bits latched by U13 (74LS173) but only 5 bits used
-	m_vgg_image_page = data & 0x3f;
+	// U13 latches six bits, but only PP0-4 are connected to the image-page decode.
+	m_vgg_image_page = data & 0x1f;
 }
 
 void sr_state::vgg_xlate_w(u8 data)
 {
 	// 6 bits latched by U12 (74LS173)
 	m_vgg_xlate = data & 0x3f;
+}
+
+void sr_state::vgg_blitter_w(offs_t offset, u8 data)
+{
+	m_vgg_blitter_regs[offset] = data;
+
+	// Writing the control register in the second register bank starts DMA.
+	if (offset == 8)
+	{
+		m_vgg_pia->ca1_w(0);
+		m_main_cpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		vgg_blit();
+
+		// FIXME: Sequence DMA bus accesses against the VGG clocks.
+		// Estimate the transfer time using the Williams special-chip fast/slow rates.
+		u32 const accesses = 2 * std::max(1U, unsigned(m_vgg_blitter_regs[14])) * std::max(1U, unsigned(m_vgg_blitter_regs[15]));
+		u32 const clocks = 4 + (BIT(data, 2) ? 4 * (accesses + 2) : 2 * (accesses + 3));
+		m_vgg_blit_timer->adjust(attotime::from_ticks(clocks, 4_MHz_XTAL));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(sr_state::vgg_blit_done)
+{
+	m_main_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	m_vgg_pia->ca1_w(1);
+}
+
+void sr_state::vgg_blit_pixel(u16 destination, u8 source, u8 control, u8 mask, u8 solid)
+{
+	// Williams special-chip nibble inhibition (see williamsblitter.cpp).
+	// Foreground-only zero pixels invert, rather than simply set, inhibition.
+	if (BIT(control, 3))
+	{
+		if (!(source & 0xf0))
+			mask ^= 0xf0;
+		if (!(source & 0x0f))
+			mask ^= 0x0f;
+	}
+
+	u16 const address = vgg_drams_map(destination);
+	if (address >= VGG_DRAM_SIZE)
+		return;
+
+	u8 &target = m_vgg_drams[address];
+	target = (target & mask) | ((BIT(control, 4) ? solid : source) & ~mask);
+}
+
+void sr_state::vgg_blit()
+{
+	u8 const control = m_vgg_blitter_regs[8];
+	u8 const mask_value = m_vgg_blitter_regs[9];
+	u16 const source_start = (u16(m_vgg_blitter_regs[10]) << 8) | m_vgg_blitter_regs[11];
+	u16 const destination_start = (u16(m_vgg_blitter_regs[12]) << 8) | m_vgg_blitter_regs[13];
+	unsigned const width = std::max(1U, unsigned(m_vgg_blitter_regs[14]));
+	unsigned const height = std::max(1U, unsigned(m_vgg_blitter_regs[15]));
+
+	// FIXME: Resolve text placement through the VGG address and DMA circuitry.
+	u16 const row_source_step = BIT(control, 0) ? 1 : width;
+	u16 const row_destination_step = BIT(control, 1) ? 1 : width;
+	u16 const source_pixel_step = BIT(control, 0) ? 0x100 : 1;
+	u16 const destination_pixel_step = BIT(control, 1) ? 0x100 : 1;
+	u8 const mask = (BIT(control, 7) ? 0xf0 : 0) | (BIT(control, 6) ? 0x0f : 0);
+	u16 source_row = source_start;
+	u16 destination_row = destination_start;
+	auto const source_read = [this] (u16 address)
+	{
+		// The /1F image-page decode selects DRAM for DMA source reads.
+		if (m_vgg_image_page == 0x1f)
+		{
+			u16 const mapped = vgg_drams_map(address);
+			return (mapped < VGG_DRAM_SIZE) ? m_vgg_drams[mapped] : u8(0);
+		}
+
+		if (address >= 0xc000)
+			return m_vgg_text->base()[address & 0x3fff];
+
+		if (address >= 0x8000)
+			return u8(0);
+
+		// Image pages are wired as even/odd ROM pairs in the graphics region.
+		u32 const bank = (u32(m_vgg_image_page & 0x0f) * 2) + BIT(address, 14);
+		u32 const offset = (bank * 0x4000) + (address & 0x3fff);
+		return m_vgg_gfx->base()[offset];
+	};
+
+	// Traversal, PROM-before-shift ordering and shift-register carry follow
+	// the Williams special-chip implementation in williamsblitter.cpp.
+	u16 pixels = 0;
+	for (unsigned y = 0; y < height; ++y)
+	{
+		u16 source = source_row;
+		u16 destination = destination_row;
+		for (unsigned x = 0; x < width; ++x)
+		{
+			u8 const raw = source_read(source);
+			u16 const color_bank = (m_vgg_xlate & 0x3f) << 4;
+			u8 const mapped = ((m_vgg_color_prom->base()[color_bank | (raw >> 4)] & 0x0f) << 4)
+					| (m_vgg_color_prom->base()[color_bank | (raw & 0x0f)] & 0x0f);
+			u8 pixel = mapped;
+			if (BIT(control, 5))
+			{
+				pixels = (pixels << 8) | mapped;
+				pixel = (pixels >> 4) & 0xff;
+			}
+			vgg_blit_pixel(destination, pixel, control, mask, mask_value);
+			source += source_pixel_step;
+			destination += destination_pixel_step;
+		}
+
+		if (BIT(control, 0))
+			source_row = (source_row & 0xff00) | ((source_row + row_source_step) & 0xff);
+		else
+			source_row += row_source_step;
+		if (BIT(control, 1))
+			destination_row = (destination_row & 0xff00) | ((destination_row + row_destination_step) & 0xff);
+		else
+			destination_row += row_destination_step;
+	}
+}
+
+u32 sr_state::vgg_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	// the raw laserdisc picture must never show through (it carries the Manchester code)
+	bitmap.fill(rgb_t(255, 0, 0, 0), cliprect);
+
+	// FIXME: Replace this approximate resampling with the expander counter/RAM circuit.
+	bitmap_yuy16 const &video = m_laserdisc->get_raw_video();
+	bool const have_video = !m_vgg_background_disable && m_laserdisc->video_active();
+	bool const expand = !m_vgg_expand_disable;
+	int const expanded_offset = -1'052 + m_vgg_pan * 2;
+
+	rgb_t video_line[640];
+
+	for (int y = std::max(cliprect.top(), 0); y <= std::min(cliprect.bottom(), 511); ++y)
+	{
+		int video_row = -1;
+		if (have_video)
+		{
+			// the lower 152 lines of the picture (rear view) are never expanded
+			int const row = y - 25;
+			bool const rear = row >= 337;
+			// FIXME: Verify the rear-view boundary against expander timing.
+			video_row = (row == 336) ? -1 : (rear ? (row - 1) : row);
+			// The Manchester code occupies the last 32 lines of the picture (from line 456).
+			if (video_row >= 0 && video_row < 456 && video_row < int(video.height()))
+			{
+				u16 const *const src = &video.pix(video_row, 0);
+				for (int x = 0; x < 640; ++x)
+				{
+					int sx;
+					if (!expand)
+						sx = x + (rear ? 50 + 5 : 50) + 14;
+					else if (rear)
+						sx = x + 45 + 5 + 14; // FIXME: Verify the rear-view horizontal offset.
+					else if (x >= expanded_offset)
+						sx = ((x - expanded_offset) >> 1) + 14;
+					else
+						sx = -1;
+
+					if (sx < 0 || sx >= int(video.width()))
+					{
+						video_line[x] = rgb_t(255, 0, 0, 0);
+						continue;
+					}
+					int const base = sx & ~1;
+					int const luma = 298 * ((src[sx] >> 8) - 16) + 128;
+					int const cb = (src[base] & 0xff) - 128;
+					int const cr = (src[base + 1] & 0xff) - 128;
+					video_line[x] = rgb_t(
+							255,
+							std::clamp((luma + 409 * cr) >> 8, 0, 255),
+							std::clamp((luma - 100 * cb - 208 * cr) >> 8, 0, 255),
+							std::clamp((luma + 516 * cb) >> 8, 0, 255));
+				}
+			}
+			else
+			{
+				video_row = -1;
+			}
+		}
+
+		u32 *const dest = &bitmap.pix(y);
+		for (int x = std::max(cliprect.left(), 0); x <= std::min(cliprect.right(), 639); ++x)
+		{
+			// FIXME: Verify overlay blanking and monitor framing; these crop limits are approximate.
+			if ((y >= 480) || (x >= 630))
+			{
+				if (video_row >= 0)
+					dest[x] = video_line[x];
+				continue;
+			}
+
+			u32 const pixel_x = x / 2;
+			u32 const byte_address = (pixel_x / 2) * 256 + (y / 2);
+			u16 const address = vgg_drams_map(byte_address);
+			if (address >= VGG_DRAM_SIZE)
+			{
+				if (video_row >= 0)
+					dest[x] = video_line[x];
+				continue;
+			}
+
+			u8 const packed = m_vgg_drams[address];
+			u8 const pixel = (pixel_x & 1) ? (packed & 0x0f) : (packed >> 4);
+			rgb_t const color = m_vgg_palette->pen_color(((m_vgg_color_palet & 0x3f) << 4) | pixel);
+			if (!pixel && !m_vgg_background_disable)
+				dest[x] = (video_row >= 0) ? video_line[x] : rgb_t(255, 0, 0, 0);
+			else
+				dest[x] = color;
+		}
+	}
+
+	return 0;
 }
 
 void sr_state::vgg_disable_w(u8 data)
@@ -665,6 +1088,78 @@ u8 sr_state::pif_irq_enable_r(address_space &space)
 void sr_state::pif_irq_enable_w(u8 data)
 {
 	m_pif_irq_enable = BIT(data, 0);
+	pif_irq_update();
+}
+
+u8 sr_state::pif_irq_ack_r(address_space &space)
+{
+	u8 const data(space.unmap());
+	if (!machine().side_effects_disabled())
+		pif_irq_ack_w(data);
+	return data;
+}
+
+void sr_state::pif_irq_ack_w(u8)
+{
+	m_pif_timer_irq = false;
+	pif_irq_update();
+}
+
+void sr_state::pif_irq_update()
+{
+	m_pif_irq->in_w<1>(m_pif_irq_enable && m_pif_timer_irq);
+}
+
+// Synchronize data and handshake edges in the same scheduler queue so neither
+// CPU observes the other CPU's PIA output before reaching the write time.
+void sr_state::vgg_portb_w(offs_t, u8 data, u8 ddr)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(sr_state::pif_data_sync), this), data | u8(~ddr));
+}
+
+void sr_state::pif_porta_w(u8 data)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(sr_state::vgg_data_sync), this), data);
+}
+
+void sr_state::vgg_cb2_w(int state)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(sr_state::pif_ca1_sync), this), state);
+}
+
+void sr_state::pif_ca2_w(int state)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(sr_state::vgg_cb1_sync), this), state);
+}
+
+TIMER_CALLBACK_MEMBER(sr_state::pif_data_sync)
+{
+	m_pif_pia->porta_w(param);
+}
+
+TIMER_CALLBACK_MEMBER(sr_state::vgg_data_sync)
+{
+	m_vgg_pia->portb_w(param);
+}
+
+TIMER_CALLBACK_MEMBER(sr_state::pif_ca1_sync)
+{
+	m_pif_pia->ca1_w(param);
+}
+
+TIMER_CALLBACK_MEMBER(sr_state::vgg_cb1_sync)
+{
+	m_vgg_pia->cb1_w(param);
+}
+
+void sr_state::pif_portb_w(offs_t, u8 data, u8 ddr)
+{
+	u8 const pins = data | ~ddr;
+	if ((m_pif_portb & 0x01) && !(pins & 0x01) && !(pins & 0x04))
+		m_laserdisc->jump_trigger(BIT(pins, 1));
+
+	m_pif_portb = pins;
+	m_laserdisc->control_w((!(pins & 0x08) && (pins & 0x10)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -706,7 +1201,7 @@ u8 sr_state::sound_ef1_r(address_space &space)
 
 void sr_state::sound_ef1_w(u8 data)
 {
-	data &= 0x3f; // DAC 1 -> front mix level (6 bits latched by U19)
+	sound_attenuator_w(0, data); // DAC 1 -> front left speaker
 }
 
 u8 sr_state::sound_er1_r(address_space &space)
@@ -719,7 +1214,7 @@ u8 sr_state::sound_er1_r(address_space &space)
 
 void sr_state::sound_er1_w(u8 data)
 {
-	data &= 0x3f; // DAC 1 -> rear mix level (6 bits latched by U2)
+	sound_attenuator_w(1, data); // DAC 1 -> rear left speaker
 }
 
 u8 sr_state::sound_ef2_r(address_space &space)
@@ -732,7 +1227,7 @@ u8 sr_state::sound_ef2_r(address_space &space)
 
 void sr_state::sound_ef2_w(u8 data)
 {
-	data &= 0x3f; // DAC 2 -> front mix level (6 bits latched by U17)
+	sound_attenuator_w(2, data); // DAC 2 -> front right speaker
 }
 
 u8 sr_state::sound_er2_r(address_space &space)
@@ -745,9 +1240,20 @@ u8 sr_state::sound_er2_r(address_space &space)
 
 void sr_state::sound_er2_w(u8 data)
 {
-	data &= 0x3f; // DAC 2 -> rear mix level (6 bits latched by U36)
+	sound_attenuator_w(3, data); // DAC 2 -> rear right speaker
 }
 
+void sr_state::sound_attenuator_w(unsigned index, u8 data)
+{
+	m_sound_attenuation[index] = data & 0x3f;
+	m_sound_dacs[index]->set_output_gain(ALL_OUTPUTS, 0.5F * m_sound_attenuation[index] / 63.0F);
+}
+
+template <unsigned N> void sr_state::sound_fifo_q(u8 data)
+{
+	m_sound_dacs[2 * N]->write(data);
+	m_sound_dacs[2 * N + 1]->write(data);
+}
 
 void sr_state::sound_pia2_pa(u8 data)
 {
@@ -819,9 +1325,9 @@ void sr_state::main_memory(address_map &map)
 	map(0xc984, 0xc987).mirror(0x0070).rw(m_main_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 
 	map(0xcb80, 0xcb83).mirror(0x000c).rw(m_vgg_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	//map(0xcb90, 0xcb90).mirror(0x000f).r(FUNC(sr_state::...)); inverted FIELD signal on D7
-	//map(0xcba0, 0xcba0).mirror(0x000f).r(FUNC(sr_state::...)); vertical counters (video address A13..A6)
-	//map(0xcbb0, 0xcbbf) DMA
+	map(0xcb90, 0xcb90).mirror(0x000f).r(FUNC(sr_state::field_r));
+	map(0xcba0, 0xcba0).mirror(0x000f).r(FUNC(sr_state::video_counter_r));
+	map(0xcbb0, 0xcbbf).w(FUNC(sr_state::vgg_blitter_w));
 	map(0xcbc0, 0xcbc0).mirror(0x000e).w(FUNC(sr_state::vgg_impg_w));
 	map(0xcbc1, 0xcbc1).mirror(0x000e).w(FUNC(sr_state::vgg_xlate_w));
 	map(0xcbd0, 0xcbd0).mirror(0x000f).w(FUNC(sr_state::vgg_disable_w));
@@ -840,10 +1346,16 @@ void sr_state::main_banks(address_map &map)
 	map(0x0'4000, 0x0'7fff).mirror(0x8'0000).rom().region("banked", 0x0'8000); // /R3 -> U26
 	map(0x0'8000, 0x0'9fff).mirror(0x8'0000).rom().region("banked", 0x1'0000); // /R5 -> U45
 
+	// page 0x1/0x9 read
+	map(0x1'0000, 0x1'7fff).mirror(0x8'0000).r(FUNC(sr_state::vgg_image_r));
+
 	// page 0x4/0xc read
 	map(0x4'0000, 0x4'3fff).mirror(0x8'0000).rom().region("banked", 0x0'4000); // /R2 -> U15
 	map(0x4'4000, 0x4'7fff).mirror(0x8'0000).rom().region("banked", 0x0'c000); // /R4 -> U37
 	// nothing in 0x4'8000-0x4'9fff
+
+	// Page 2 selects VGG DRAM for CPU readback during the video RAM test.
+	map(0x2'0000, 0x2'9fff).r(FUNC(sr_state::vgg_drams_r));
 
 	// page 0x0-0x7 write
 	map(0x0'0000, 0x0'9fff).mirror(0x7'0000).w(FUNC(sr_state::vgg_drams_w));
@@ -888,15 +1400,21 @@ void sr_state::sound_memory(address_map &map)
 
 INPUT_PORTS_START(starrider)
 	PORT_START("IN0")
-	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN) // TODO: steering Gray code
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_START2)
 
 	PORT_START("IN1")
-	PORT_BIT(0x0f, IP_ACTIVE_LOW,  IPT_UNKNOWN) // TODO: accelerator
-	PORT_BIT(0x30, IP_ACTIVE_LOW,  IPT_UNKNOWN) // TODO: brake
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON1)                  PORT_NAME("Turbo")
-	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_BUTTON2)      PORT_TOGGLE PORT_NAME("Hi/Lo")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON1)                   PORT_NAME("Turbo")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON2)      PORT_TOGGLE PORT_NAME("Hi/Lo")
+
+	PORT_START("STEER")
+	PORT_BIT(0x3f, 0x20, IPT_AD_STICK_X) PORT_MINMAX(0, 63) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_CENTERDELTA(0) PORT_NAME("Steering")
+
+	PORT_START("ACCEL")
+	PORT_BIT(0x0f, 0x00, IPT_PEDAL) PORT_MINMAX(0, 15) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_NAME("Accelerator")
+
+	PORT_START("BRAKE")
+	PORT_BIT(0x03, 0x00, IPT_PEDAL2) PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_NAME("Brake")
 
 	PORT_START("IN2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE1)     PORT_TOGGLE PORT_NAME("Auto Up / Manual Down")
@@ -1008,7 +1526,7 @@ ROM_START(starridr)
 	ROM_LOAD("u74.6349", 0x000, 0x200, CRC(362ec0f9) SHA1(0304a36d038436e9f5e817dfc2c40b6421953cad))
 
 	DISK_REGION( "ld_pr8210a" )
-	DISK_IMAGE_READONLY( "starrider", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "starrider", 0, BAD_DUMP SHA1(b9441a585161f2d867ec44d21d65c7f458d7c61c))
 ROM_END
 
 ROM_START(starridrp3)
@@ -1100,7 +1618,7 @@ ROM_START(starridrp3)
 	ROM_LOAD("u74.6349", 0x000, 0x200, CRC(362ec0f9) SHA1(0304a36d038436e9f5e817dfc2c40b6421953cad))
 
 	DISK_REGION( "ld_pr8210a" )
-	DISK_IMAGE_READONLY( "starrider", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "starrider", 0, BAD_DUMP SHA1(b9441a585161f2d867ec44d21d65c7f458d7c61c))
 ROM_END
 
 } // anonymous namespace
@@ -1109,5 +1627,5 @@ ROM_END
 /***********************************************************************
     Machine definitions
 ***********************************************************************/
-GAME( 1984, starridr,   0,        starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (REV 1)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1984, starridrp3, starridr, starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (PROTO 3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1984, starridr,   0,        starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (REV 1)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )
+GAME( 1984, starridrp3, starridr, starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (PROTO 3)", MACHINE_NOT_WORKING )
