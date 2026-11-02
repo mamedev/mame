@@ -14715,7 +14715,7 @@ ROM_END
   Maybe some watchdog unimplemented circuitry?
 
 */
-  ROM_START( potnpkrq )
+ROM_START( potnpkrq )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "7.16a", 0x2000, 0x1000, CRC(29c647e6) SHA1(1a1c672474c0d4d76728794f661a94925ab245a1) )
 	ROM_LOAD( "8.17a", 0x3000, 0x1000, CRC(3a6e8ca4) SHA1(047edcc344fe97e47d785920d1b499d92febf81f) )
@@ -15461,6 +15461,8 @@ void goldnpkr_state::init_unkdep()
 *                Game Drivers                *
 *********************************************/
 
+/***************************** GOLDEN POKER TYPE *****************************/
+
 //     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT      COMPANY                     FULLNAME                                     FLAGS             LAYOUT
 GAMEL( 1981, goldnpkr,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Big Boy)",           0,                layout_goldnpkr )
 GAMEL( 1981, goldnpkb,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Mini Boy)",          0,                layout_goldnpkr )
@@ -15492,7 +15494,7 @@ GAMEL( 1988, potnpkrm,  pottnpkr, pottnpkr, goldnpkr, goldnpkr_state, empty_init
 GAME ( 198?, potnpkrn,  pottnpkr, glfever,  glfever,  goldnpkr_state, init_glfev,    ROT0,   "bootleg (PED)",            "Jack Potten's Poker (set 15, w/fever, ICP-1 PCB)", 0 )
 GAMEL( 1987, potnpkro,  pottnpkr, goldnpkr, potnpkro, goldnpkr_state, empty_init,    ROT0,   "bootleg (PED)",            "Jack Potten's Poker (set 16, ICP-1 PCB)",    0,                layout_goldnpkr ) // ICP-1 with mods, 1986 0415 VER 7.0 1987 06-03 BY PED. (wires hack)
 GAMEL( 1987, potnpkrp,  pottnpkr, goldnpkr, potnpkro, goldnpkr_state, empty_init,    ROT0,   "bootleg (PED)",            "Jack Potten's Poker (set 17, ICP-1 PCB)",    0,                layout_goldnpkr ) // ICP-1 with mods, 1986 0415 VER 7.0 1987 06-03 BY PED. (PROM mod)
-GAMEL( 198?, potnpkrq,  0,        pottnpkr, pottnpkr, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Jack Potten's Poker (set 18, Falcon CPU brick)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_goldnpkr )
+GAMEL( 198?, potnpkrq,  pottnpkr, pottnpkr, pottnpkr, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Jack Potten's Poker (set 18, Falcon CPU brick)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_goldnpkr )
 GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngoldb,    pottnpkr, pottnpkr, ngoldb,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",         0,                layout_goldnpkr )
@@ -15523,11 +15525,54 @@ GAMEL( 1991, bsuerteu,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init
 GAMEL( 1991, bsuertev,  bsuerte,  witchcrd, bsuertev, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish/Portuguese, set 23)",  0,                layout_goldnpkr )
 GAMEL( 1991, goodluck,  bsuerte,  witchcrd, goodluck, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Good Luck",                                  0,                layout_goldnpkr )
 
-GAMEL( 1991, falcnwld,  0,        wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "TVG",                      "Falcons Wild - Wild Card 1991 (TVG)",        0,                layout_goldnpkr )
-GAMEL( 1990, falcnwlda, falcnwld, wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 1)", 0,      layout_goldnpkr )
-GAMEL( 1990, falcnwldb, falcnwld, wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 2)", 0,      layout_goldnpkr )
-GAME(  1983, falcnwldc, falcnwld, wildcrde, wildcard, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original, protected)", MACHINE_NOT_WORKING ) // MCU hook up incomplete, currently game runs only after a soft reset. Then you can coin up but bet doesn't work
-GAMEL( 1983, falcnwldd, falcnwld, wildcrdb, wildcard, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original)", 0,         layout_goldnpkr )
+
+/**************************** ICP-1 HARDWARE TYPE ****************************/
+
+GAME(  198?, unkicpf40, 0,        unkicpf40, unkicpf40, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "ICP F40 poker (137 Fever, 10 bet)",       0 )
+GAME(  198?, unkicpf80, 0,        unkicpf40, unkicpf40, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "ICP F80 poker (137 Fever, 50 bet)",       0 )
+
+GAME(  198?, icpf40_01, unkicpf40, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F40 poker (137fv_10yen_f40)",         0 )
+GAME(  198?, icpf40_02, unkicpf40, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F40 poker (jap_9a)",                  0 )
+GAME(  198?, icpf40_03, unkicpf40, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F40 poker (100yen)",                  0 )
+GAME(  198?, icpf80_01, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_50_100)",              0 )
+GAME(  198?, icpf80_02, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9.bin)",               0 )
+GAME(  198?, icpf80_03, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9_0jap)",              0 )
+GAME(  198?, icpf80_04, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9_10bet)",             0 )
+GAME(  198?, icpf80_05, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9_50)",                0 )
+GAME(  198?, icpf80_06, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9_60)",                0 )
+GAME(  198?, icpf80_07, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9_70)",                0 )
+GAME(  198?, icpf80_08, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9_90)",                0 )
+GAME(  198?, icpf80_09, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9_jap)",               0 )
+GAME(  198?, icpf80_10, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9_redsquare)",         0 )
+GAME(  198?, icpf80_11, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_number7)",             0 )
+GAME(  198?, icpf80_12, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (9_jap)",                   0 )
+GAME(  198?, icpf80_13, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (9_reddot)",                0 )
+GAME(  198?, icpf80_14, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (abg)",                     0 )
+GAME(  198?, icpf80_15, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (af_80_newer)",             0 )
+GAME(  198?, icpf80_16, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (af_80_older)",             0 )
+GAME(  198?, icpf80_17, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (jap_9)",                   0 )
+GAME(  198?, icpf80_18, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (jap_9_jap)",               0 )
+GAME(  198?, icpf80_19, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (redx_9_40_45_50_60)",      0 )
+GAME(  198?, icpf80_20, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (redx_9_7)",                0 )
+GAME(  198?, icpf80_21, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (blue-green-red dots)",     0 )
+
+GAMEL( 198?, icp_etg,   0,         unkicpf40, icp_etg,   goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP EX-Turbo-GT poker",                   0,                layout_goldnpkr )
+GAMEL( 198?, techtrna,  unkicpf80, unkicpf40, icp_etg,   goldnpkr_state, empty_init, ROT0,   "Techtron Japan",           "Techtron EX-Turbo-GT poker (set 1)",      0,                layout_goldnpkr )
+GAMEL( 198?, techtrnb,  unkicpf80, unkicpf40, icp_etg,   goldnpkr_state, empty_init, ROT0,   "Techtron Japan",           "Techtron EX-Turbo-GT poker (set 2)",      0,                layout_goldnpkr )
+
+GAME(  198?, gp_turbo,  0,         pottnpkr,  pottnpkr,  goldnpkr_state, empty_init, ROT0,   "<unknown>",                "Unknown Turbo Poker (set 1)",             0 )  // no lamps
+GAME(  198?, gp_turboa, gp_turbo,  pottnpkr,  pottnpkr,  goldnpkr_state, empty_init, ROT0,   "<unknown>",                "Unknown Turbo Poker (set 2)",             0 )  // no lamps
+GAME(  198?, gp_turbob, gp_turbo,  pottnpkr,  pottnpkr,  goldnpkr_state, empty_init, ROT0,   "<unknown>",                "Unknown Turbo Poker (set 3)",             0 )  // no lamps
+GAME(  198?, gp_jpn22,  goldnpkr,  goldnpkr,  goldnpkr,  goldnpkr_state, empty_init, ROT0,   "<unknown>",                "Unknown Golden Poker (Japan Ver. 2.2)",   0 )  // no lamps
+GAME(  1987, gp_ped42_95,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 95%, set 1)",   0 )  // no lamps
+GAME(  1987, gp_ped42_95a, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 95%, set 2)",   0 )  // no lamps
+GAME(  1987, gp_ped42_90, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 90%)",          0 )  // no lamps
+GAME(  1987, gp_ped42_85, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 85%)",          0 )  // no lamps
+GAME(  1987, gp_ped42_80, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 80%)",          0 )  // no lamps
+GAME(  1987, gp_ped42_70, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 70%)",          0 )  // no lamps
+
+
+/*********************** WITCH CARD / VIDEO KLEIN TYPE ***********************/
 
 GAMEL( 1991, witchcrd,  0,        witchcrd, witchcrd, goldnpkr_state, init_vkdlsc,   ROT0,   "Video Klein?",             "Witch Card (Video Klein CPU box, set 1)",    0,                   layout_goldnpkr )
 GAME(  1991, witchcrda, witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 1)",    0 )
@@ -15593,8 +15638,55 @@ GAMEL( 1995, wtchjackh, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init
 GAMEL( 1995, wtchjacki, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.40)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    // Ver 0.40 / 1995-02-27
 GAMEL( 1994, wtchjackj, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jackpot (Export, 6T/12T ver 0.25)", MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    // Ver 0.25 / 1994-11-24
 
+// hybrids in similar hardware with improvements
+GAMEL( 1991, falcnwld,  0,        wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "TVG",                      "Falcons Wild - Wild Card 1991 (TVG)",        0,                layout_goldnpkr )
+GAMEL( 1990, falcnwlda, falcnwld, wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 1)", 0,      layout_goldnpkr )
+GAMEL( 1990, falcnwldb, falcnwld, wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 2)", 0,      layout_goldnpkr )
+GAME(  1983, falcnwldc, falcnwld, wildcrde, wildcard, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original, protected)", MACHINE_NOT_WORKING ) // MCU hook up incomplete, currently game runs only after a soft reset. Then you can coin up but bet doesn't work
+GAMEL( 1983, falcnwldd, falcnwld, wildcrdb, wildcard, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original)", 0,         layout_goldnpkr )
 
-/*************************************** OTHER SETS ***************************************/
+
+/************************ DEP 9801 ENCRYPTED PLATFORM ************************/
+
+GAME(  1998, dash_a37,  0,         dash_a37,  goldnpkr, goldnpkr_state, init_dash,   ROT0,   "<unknown>",                "Dash! (A37, ver 1998/10/22)",                MACHINE_NOT_WORKING )
+GAME(  1996, dash_a37b, dash_a37,  dash_a37,  goldnpkr, goldnpkr_state, init_dash,   ROT0,   "<unknown>",                "Dash! (A37, ver 1996/11/18)",                MACHINE_NOT_WORKING )
+GAME(  1996, lfhouse,   0,         lfhouse,   goldnpkr, goldnpkr_state, init_lfhouse,ROT0,   "<unknown>",                "Lucky Full House (ver 1.16, data ver 1.05)", MACHINE_NOT_WORKING )
+GAME(  1994, lfhouseb,  lfhouse,   lfhouse,   goldnpkr, goldnpkr_state, init_lfhouseb,ROT0,  "<unknown>",                "Lucky Full House (ver 1.15, data ver 1.04)", MACHINE_NOT_WORKING )
+GAME(  1992, dynchance, 0,         dynchance, goldnpkr, goldnpkr_state, init_dynchance,ROT0, "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2)",         MACHINE_NOT_WORKING )
+GAME(  1992, dynchancf, dynchance, dynchance, goldnpkr, goldnpkr_state, init_dynchance,ROT0, "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2, alt)",    MACHINE_NOT_WORKING )
+GAME(  1997, dynplus,   dynchance, dynplus,   goldnpkr, goldnpkr_state, init_dynplus,ROT0,   "<unknown>",                "Dynamic Plus One (SP Type ver 1.10)",        MACHINE_NOT_WORKING )
+GAME(  1998, unkdep,    lfhouse,         unkdep,    goldnpkr, goldnpkr_state, init_unkdep, ROT0,   "<unknown>",                "unknown DEP 9801 poker game",                MACHINE_NOT_WORKING )
+
+
+/******************************** SETS W/IRQ0 *********************************/
+
+//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT      COMPANY          FULLNAME                                             FLAGS      LAYOUT
+GAMEL( 198?, bchancep,  0,        gldnirq0, goldnpkr, goldnpkr_state, init_bchancep, ROT0,   "<unknown>",     "Bonne Chance! (Golden Poker prequel HW, set 1)",     0,         layout_goldnpkr )
+GAMEL( 198?, bchanceq,  0,        gldnirq0, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",     "Bonne Chance! (Golden Poker prequel HW, set 2)",     0,         layout_goldnpkr )
+GAMEL( 198?, boasorte,  bchanceq, gldnirq0, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",     "Boa Sorte! (Golden Poker prequel HW)",               0,         layout_goldnpkr )
+
+
+/********************************* SETS W/MCU *********************************/
+
+//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT      COMPANY          FULLNAME                                             FLAGS
+GAME(  1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Mega Double Poker (conversion kit, version 2.3 MD)", MACHINE_NOT_WORKING )
+GAME(  1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Mega Double Poker (conversion kit, version 2.1 MD)", MACHINE_NOT_WORKING )
+GAME(  1990, maxidpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Maxi Double Poker (version 1.8)",                    MACHINE_NOT_WORKING )
+
+
+/******************************** SETS W/R6511 ********************************/
+
+GAME(  1989, olym65wc,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_olym65,   ROT0,   "Olympic Video Gaming PTY LTD", "Wild Card (Olympic Games, v2.0)",                              MACHINE_NOT_WORKING )
+GAME(  1989, olym65bj,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_olym65,   ROT0,   "Olympic Video Gaming PTY LTD", "Black Jack (Olympic Games, v5.04, upgrade kit for Wild Card)", MACHINE_NOT_WORKING )
+
+
+/********************************* MULTIGAMES *********************************/
+
+//     YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT         ROT      COMPANY                     FULLNAME                       FLAGS  LAYOUT  
+GAMEL( 1984, smb_be4k,  0,        smb_be4k,  smb_be4k, goldnpkr_state, empty_init,  ROT0,   "Bonanza Enterprises, Ltd", "Super Mini-Boy (BE-4000/SMB)", 0,     layout_smb_be4k )
+
+
+/********************************* OTHER SETS *********************************/
 
 //     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT      COMPANY                     FULLNAME                                  FLAGS                LAYOUT
 GAMEL( 1981, pmpoker,   0,        goldnpkr, pmpoker,  goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "PlayMan Poker (German)",                  0,                   layout_pmpoker  )
@@ -15638,88 +15730,3 @@ GAME(  198?, icproul,   0,        icproul,  icproul,  goldnpkr_state, empty_init
 GAME(  199?, kmhpan,    0,        kmhpan,   kmhpan,   goldnpkr_state, empty_init,    ROT0,   "PAN Electronics",          "Kaimen Hu (PAN Electronics)",             MACHINE_IMPERFECT_COLORS )  // needs proper palette decoding
 
 GAME(  198?, wing90pkr, goldnpkr, wing_w90, wing_w90, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Wing W90 poker (Wing 8510-A W90-3 PCB)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )  // bad gfx dump
-
-GAME(  198?, unkicpf40, 0,        unkicpf40, unkicpf40, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "ICP F40 poker (137 Fever, 10 bet)",       0 )
-GAME(  198?, unkicpf80, 0,        unkicpf40, unkicpf40, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "ICP F80 poker (137 Fever, 50 bet)",       0 )
-
-GAME(  198?, icpf40_01, unkicpf40, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F40 poker (137fv_10yen_f40)",         0 )
-GAME(  198?, icpf40_02, unkicpf40, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F40 poker (jap_9a)",                  0 )
-GAME(  198?, icpf40_03, unkicpf40, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F40 poker (100yen)",                  0 )
-GAME(  198?, icpf80_01, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_50_100)",              0 )
-GAME(  198?, icpf80_02, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9.bin)",               0 )
-GAME(  198?, icpf80_03, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9_0jap)",              0 )
-GAME(  198?, icpf80_04, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9_10bet)",             0 )
-GAME(  198?, icpf80_05, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9_50)",                0 )
-GAME(  198?, icpf80_06, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9_60)",                0 )
-GAME(  198?, icpf80_07, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9_70)",                0 )
-GAME(  198?, icpf80_08, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9_90)",                0 )
-GAME(  198?, icpf80_09, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9_jap)",               0 )
-GAME(  198?, icpf80_10, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_9_redsquare)",         0 )
-GAME(  198?, icpf80_11, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (137_number7)",             0 )
-GAME(  198?, icpf80_12, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (9_jap)",                   0 )
-GAME(  198?, icpf80_13, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (9_reddot)",                0 )
-GAME(  198?, icpf80_14, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (abg)",                     0 )
-GAME(  198?, icpf80_15, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (af_80_newer)",             0 )
-GAME(  198?, icpf80_16, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (af_80_older)",             0 )
-GAME(  198?, icpf80_17, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (jap_9)",                   0 )
-GAME(  198?, icpf80_18, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (jap_9_jap)",               0 )
-GAME(  198?, icpf80_19, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (redx_9_40_45_50_60)",      0 )
-GAME(  198?, icpf80_20, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (redx_9_7)",                0 )
-GAME(  198?, icpf80_21, unkicpf80, unkicpf40, unkicpf40, goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP F80 poker (blue-green-red dots)",     0 )
-
-GAMEL( 198?, icp_etg,   0,         unkicpf40, icp_etg,   goldnpkr_state, empty_init, ROT0,   "<unknown>",                "ICP EX-Turbo-GT poker",                   0,                layout_goldnpkr )
-GAMEL( 198?, techtrna,  unkicpf80, unkicpf40, icp_etg,   goldnpkr_state, empty_init, ROT0,   "Techtron Japan",           "Techtron EX-Turbo-GT poker (set 1)",      0,                layout_goldnpkr )
-GAMEL( 198?, techtrnb,  unkicpf80, unkicpf40, icp_etg,   goldnpkr_state, empty_init, ROT0,   "Techtron Japan",           "Techtron EX-Turbo-GT poker (set 2)",      0,                layout_goldnpkr )
-
-GAME(  198?, gp_turbo,  0,         pottnpkr,  pottnpkr,  goldnpkr_state, empty_init, ROT0,   "<unknown>",                "Unknown Turbo Poker (set 1)",             0 )  // no lamps
-GAME(  198?, gp_turboa, gp_turbo,  pottnpkr,  pottnpkr,  goldnpkr_state, empty_init, ROT0,   "<unknown>",                "Unknown Turbo Poker (set 2)",             0 )  // no lamps
-GAME(  198?, gp_turbob, gp_turbo,  pottnpkr,  pottnpkr,  goldnpkr_state, empty_init, ROT0,   "<unknown>",                "Unknown Turbo Poker (set 3)",             0 )  // no lamps
-GAME(  198?, gp_jpn22,  goldnpkr,  goldnpkr,  goldnpkr,  goldnpkr_state, empty_init, ROT0,   "<unknown>",                "Unknown Golden Poker (Japan Ver. 2.2)",   0 )  // no lamps
-GAME(  1987, gp_ped42_95,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 95%, set 1)",   0 )  // no lamps
-GAME(  1987, gp_ped42_95a, goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 95%, set 2)",   0 )  // no lamps
-GAME(  1987, gp_ped42_90, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 90%)",          0 )  // no lamps
-GAME(  1987, gp_ped42_85, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 85%)",          0 )  // no lamps
-GAME(  1987, gp_ped42_80, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 80%)",          0 )  // no lamps
-GAME(  1987, gp_ped42_70, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 70%)",          0 )  // no lamps
-
-// DEP 9801 encrypted platform...
-GAME(  1998, dash_a37,  0,         dash_a37,  goldnpkr, goldnpkr_state, init_dash,   ROT0,   "<unknown>",                "Dash! (A37, ver 1998/10/22)",                MACHINE_NOT_WORKING )
-GAME(  1996, dash_a37b, dash_a37,  dash_a37,  goldnpkr, goldnpkr_state, init_dash,   ROT0,   "<unknown>",                "Dash! (A37, ver 1996/11/18)",                MACHINE_NOT_WORKING )
-GAME(  1996, lfhouse,   0,         lfhouse,   goldnpkr, goldnpkr_state, init_lfhouse,ROT0,   "<unknown>",                "Lucky Full House (ver 1.16, data ver 1.05)", MACHINE_NOT_WORKING )
-GAME(  1994, lfhouseb,  lfhouse,   lfhouse,   goldnpkr, goldnpkr_state, init_lfhouseb,ROT0,  "<unknown>",                "Lucky Full House (ver 1.15, data ver 1.04)", MACHINE_NOT_WORKING )
-GAME(  1992, dynchance, 0,         dynchance, goldnpkr, goldnpkr_state, init_dynchance,ROT0, "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2)",         MACHINE_NOT_WORKING )
-GAME(  1992, dynchancf, dynchance, dynchance, goldnpkr, goldnpkr_state, init_dynchance,ROT0, "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2, alt)",    MACHINE_NOT_WORKING )
-GAME(  1997, dynplus,   dynchance, dynplus,   goldnpkr, goldnpkr_state, init_dynplus,ROT0,   "<unknown>",                "Dynamic Plus One (SP Type ver 1.10)",        MACHINE_NOT_WORKING )
-GAME(  1998, unkdep,    lfhouse,         unkdep,    goldnpkr, goldnpkr_state, init_unkdep, ROT0,   "<unknown>",                "unknown DEP 9801 poker game",                MACHINE_NOT_WORKING )
-
-
-/*************************************** SETS W/IRQ0 ***************************************/
-
-//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT      COMPANY          FULLNAME                                             FLAGS      LAYOUT
-GAMEL( 198?, bchancep,  0,        gldnirq0, goldnpkr, goldnpkr_state, init_bchancep, ROT0,   "<unknown>",     "Bonne Chance! (Golden Poker prequel HW, set 1)",     0,         layout_goldnpkr )
-GAMEL( 198?, bchanceq,  0,        gldnirq0, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",     "Bonne Chance! (Golden Poker prequel HW, set 2)",     0,         layout_goldnpkr )
-GAMEL( 198?, boasorte,  bchanceq, gldnirq0, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",     "Boa Sorte! (Golden Poker prequel HW)",               0,         layout_goldnpkr )
-
-
-/*************************************** SETS W/MCU ***************************************/
-
-//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT      COMPANY          FULLNAME                                             FLAGS
-GAME(  1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Mega Double Poker (conversion kit, version 2.3 MD)", MACHINE_NOT_WORKING )
-GAME(  1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Mega Double Poker (conversion kit, version 2.1 MD)", MACHINE_NOT_WORKING )
-GAME(  1990, maxidpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Maxi Double Poker (version 1.8)",                    MACHINE_NOT_WORKING )
-
-
-/*************************************** SETS W/R6511 ***************************************/
-
-GAME(  1989, olym65wc,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_olym65,   ROT0,   "Olympic Video Gaming PTY LTD", "Wild Card (Olympic Games, v2.0)",                              MACHINE_NOT_WORKING )
-GAME(  1989, olym65bj,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_olym65,   ROT0,   "Olympic Video Gaming PTY LTD", "Black Jack (Olympic Games, v5.04, upgrade kit for Wild Card)", MACHINE_NOT_WORKING )
-
-
-/*************************************** MULTIGAMES ***************************************/
-
-//     YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT         ROT      COMPANY                     FULLNAME                       FLAGS  LAYOUT  
-GAMEL( 1984, smb_be4k,  0,        smb_be4k,  smb_be4k, goldnpkr_state, empty_init,  ROT0,   "Bonanza Enterprises, Ltd", "Super Mini-Boy (BE-4000/SMB)", 0,     layout_smb_be4k )
-
-
-/*************************************** OTHER/UNCLASSIFIED ***************************************/
-

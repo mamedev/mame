@@ -104,7 +104,7 @@
 #define LOG_BLITTER   (1U << 1)
 #define LOG_VIDEO     (1U << 2)
 
-#define VERBOSE (LOG_GENERAL | LOG_BLITTER)
+//#define VERBOSE (LOG_GENERAL | LOG_BLITTER | LOG_VIDEO)
 
 #include "logmacro.h"
 

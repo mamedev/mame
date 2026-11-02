@@ -27,7 +27,6 @@
 #include "machine/w83787f.h"
 #include "video/voodoo_pci.h"
 
-#include "softlist.h"
 #include "softlist_dev.h"
 
 namespace {

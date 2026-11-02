@@ -5523,9 +5523,10 @@ ROM_START( rchase2 ) /* Rail Chase 2 Revision A, Model 2B. Sega game ID# 833-118
 
 	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
 	// 16Mbit ROMs in 32Mbit sockets: A21 is not decoded, so each ROM is mirrored
-	ROM_LOAD16_WORD_SWAP("mpr-18029.32", 0x0000000, 0x200000, CRC(f6804150) SHA1(ef40c11008c75d04159772ad30f02cdb8c5464f3) )
+	// baddump: clearly both half size, cfr. sound test (F_xx Flint M_xx Mary)
+	ROM_LOAD16_WORD_SWAP("mpr-18029.32", 0x0000000, 0x200000, BAD_DUMP CRC(f6804150) SHA1(ef40c11008c75d04159772ad30f02cdb8c5464f3) )
 	ROM_RELOAD(                          0x0200000, 0x200000 )
-	ROM_LOAD16_WORD_SWAP("mpr-18030.34", 0x0400000, 0x200000, CRC(1167615d) SHA1(bae0060aec3c15f08342f11df665c05c5703523d) )
+	ROM_LOAD16_WORD_SWAP("mpr-18030.34", 0x0400000, 0x200000, BAD_DUMP CRC(1167615d) SHA1(bae0060aec3c15f08342f11df665c05c5703523d) )
 	ROM_RELOAD(                          0x0600000, 0x200000 )
 
 	/* Z80 code located on the I/O board type 837-11694. Z80 @ 4Mhz with 8-way DSW & SONY CXD1095Q QFP64 chip */
@@ -5568,9 +5569,9 @@ ROM_START( rchase2a ) /* Rail Chase 2, Model 2B */
 
 	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
 	// 16Mbit ROMs in 32Mbit sockets: A21 is not decoded, so each ROM is mirrored
-	ROM_LOAD16_WORD_SWAP("mpr-18029.32", 0x0000000, 0x200000, CRC(f6804150) SHA1(ef40c11008c75d04159772ad30f02cdb8c5464f3) )
+	ROM_LOAD16_WORD_SWAP("mpr-18029.32", 0x0000000, 0x200000, BAD_DUMP CRC(f6804150) SHA1(ef40c11008c75d04159772ad30f02cdb8c5464f3) )
 	ROM_RELOAD(                          0x0200000, 0x200000 )
-	ROM_LOAD16_WORD_SWAP("mpr-18030.34", 0x0400000, 0x200000, CRC(1167615d) SHA1(bae0060aec3c15f08342f11df665c05c5703523d) )
+	ROM_LOAD16_WORD_SWAP("mpr-18030.34", 0x0400000, 0x200000, BAD_DUMP CRC(1167615d) SHA1(bae0060aec3c15f08342f11df665c05c5703523d) )
 	ROM_RELOAD(                          0x0600000, 0x200000 )
 
 	/* Z80 code located on the I/O board type 837-11694. Z80 @ 4Mhz with 8-way DSW & SONY CXD1095Q QFP64 chip */

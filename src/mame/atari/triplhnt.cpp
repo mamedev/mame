@@ -51,7 +51,7 @@ public:
 		m_stick(*this, "STICK%c", 'X')
 	{ }
 
-	void triplhnt(machine_config &config);
+	void triplhnt(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -95,7 +95,7 @@ private:
 	uint8_t da_latch_r(offs_t offset);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	void palette(palette_device &palette) const;
+	void palette(palette_device &palette) const ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -239,7 +239,7 @@ uint8_t triplhnt_state::cmos_r(offs_t offset)
 	if (!machine().side_effects_disabled())
 		m_cmos_latch = offset;
 
-	return m_cmos[m_cmos_latch] ^ 15;
+	return m_cmos[offset] ^ 15;
 }
 
 

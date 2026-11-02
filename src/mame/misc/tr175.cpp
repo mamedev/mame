@@ -67,7 +67,7 @@ public:
 		m_nvram(*this, "nvram", 0x80, ENDIANNESS_BIG)
 	{ }
 
-	void tr175(machine_config &config);
+	void tr175(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -125,19 +125,19 @@ void tr175_state::mem_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom().region("maincpu", 0);
 	map(0xfe8000, 0xfebfff).ram().w(FUNC(tr175_state::charram_w)).share(m_chargen);
-	map(0xfefe00, 0xfefeff).lrw8(
+	map(0xfefe00, 0xfefeff).umask16(0x00ff).lrw8(
 		[this](offs_t offset) { return m_nvram[offset]; }, "nvram_r",
-		[this](offs_t offset, uint8_t data) { m_nvram[offset] = data; }, "nvram_w").umask16(0x00ff);
+		[this](offs_t offset, uint8_t data) { m_nvram[offset] = data; }, "nvram_w");
 	map(0xff0000, 0xffbfff).ram().share(m_vram);
-	map(0xffe000, 0xffe01f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0xff00);
-	map(0xffe400, 0xffe40f).rw("avdc", FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0xff00);
-	map(0xffe800, 0xffe805).unmaprw(); //.rw("pai", FUNC(um82c11_device::read), FUNC(um82c11_device::write)).umask16(0xff00);
+	map(0xffe000, 0xffe01f).umask16(0xff00).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+	map(0xffe400, 0xffe40f).umask16(0xff00).rw("avdc", FUNC(scn2674_device::read), FUNC(scn2674_device::write));
+	map(0xffe800, 0xffe805).unmaprw(); //.umask16(0xff00).rw("pai", FUNC(um82c11_device::read), FUNC(um82c11_device::write));
 	map(0xffec00, 0xffec00).w(FUNC(tr175_state::volume_w));
 	map(0xffec01, 0xffec01).w(FUNC(tr175_state::video_control_w));
 	map(0xfff000, 0xfff000).w(FUNC(tr175_state::keyboard_w));
 	map(0xfff400, 0xfff400).r(FUNC(tr175_state::keyboard_r));
-	map(0xfff800, 0xfff807).r(m_ramdac, FUNC(bt476_device::read)).umask16(0x00ff);
-	map(0xfffc00, 0xfffc07).w(m_ramdac, FUNC(bt476_device::write)).umask16(0x00ff);
+	map(0xfff800, 0xfff807).umask16(0x00ff).r(m_ramdac, FUNC(bt476_device::read));
+	map(0xfffc00, 0xfffc07).umask16(0x00ff).w(m_ramdac, FUNC(bt476_device::write));
 }
 
 
