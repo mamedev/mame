@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail, Angelo Salese
+// copyright-holders:Bryan McPhail, Angelo Salese, Andrea Bogazzi
 /***************************************************************************
 
     Apache 3                                            ATF-011
@@ -24,6 +24,7 @@
 #include "speaker.h"
 
 #include <algorithm>
+#include <iterator>
 
 namespace {
 
@@ -62,6 +63,7 @@ private:
 	void apache3_road_z_w(uint16_t data);
 	void apache3_road_x_w(offs_t offset, uint8_t data);
 
+	void screen_vblank(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void apache3_68000_reset(int state);
 
@@ -85,6 +87,9 @@ private:
 	int m_apache3_rot_idx;
 	int16_t m_apache3_road_x_ram[256]{};
 	uint8_t m_apache3_road_z = 0;
+	uint16_t m_sprite_buffer[0x2000]{};
+	uint16_t m_sprite_bank = 0;
+	bool m_sprite_buffer_valid = false;
 };
 
 
@@ -108,17 +113,17 @@ void apache3_state::apache3_road_x_w(offs_t offset, uint8_t data)
     (rN is the Nth word written):
 
       horizontal  start r0:r4 (low byte of r0 = bits 16-23, r4 = bits 0-15), +r2 per pixel, +r6 per line
-      sky         start r1:r5 (r1 = bits 8-23, low byte of r5 = bits 0-7),   +r3 per pixel, +r7 per line
+      depth       start r1:r5 (r1 = bits 8-23, low byte of r5 = bits 0-7),   +r3 per pixel, +r7 per line
       ground      start r9:r10 (r9 = bits 8-23, low byte of r10 = bits 0-7), +r8 per pixel, +r11 per line
 
-    The per-pixel and per-line steps appear to be the cos and sin of the bank angle (scaled 1.0 for
-    the ground, by a game-set sky scale for the sky, and with an extra shear term for the horizontal
-    accumulator). The ground accumulator is the distance below the horizon, which picks a row of
-    the ground pattern RAM (512 pixels x 256 rows, 2 bits per pixel, pre-scaled for perspective and
-    mirrored about the centre). Above the horizon the same accumulator goes negative and its low 7
-    bits appear to address the sky gradient (palette entries 0x100-0x17f): one entry per line, the
-    lightest at the horizon. The gradient keeps the same height whatever the pitch, while the words
-    the game writes for the sky accumulator follow it, so they do not appear to select the gradient.
+    The unscaled ground accumulator selects the horizontal road offset and the sky/ground
+    boundary. Above the horizon it selects the sky gradient (palette entries 0x100-0x17f),
+    one entry per line with the lightest at the horizon.
+
+    The depth accumulator is scaled by the camera-height table in the game's code. It selects
+    the ground pattern RAM row and the road stripe PROM entry. The pattern is 512 pixels x
+    256 rows, 2 bits per pixel, pre-scaled for perspective and mirrored about the centre.
+    The horizontal accumulator includes an additional camera shear term.
 */
 void apache3_state::draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect)
 {
@@ -126,8 +131,10 @@ void apache3_state::draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect)
 	auto const acc24 = [] (uint16_t hi, uint16_t lo) { return util::sext((uint32_t(hi) << 8) | (lo & 0xff), 24); };
 	int32_t const h0 = util::sext((uint32_t(m_apache3_rotate_ctrl[0] & 0xff) << 16) | m_apache3_rotate_ctrl[4], 24);
 	int32_t const g0 = acc24(m_apache3_rotate_ctrl[9], m_apache3_rotate_ctrl[10]);
+	int32_t const depth0 = acc24(m_apache3_rotate_ctrl[1], m_apache3_rotate_ctrl[5]);
 	int32_t const h_dx = int16_t(m_apache3_rotate_ctrl[2]), h_dy = int16_t(m_apache3_rotate_ctrl[6]);
 	int32_t const g_dx = int16_t(m_apache3_rotate_ctrl[8]), g_dy = int16_t(m_apache3_rotate_ctrl[11]);
+	int32_t const depth_dx = int16_t(m_apache3_rotate_ctrl[3]), depth_dy = int16_t(m_apache3_rotate_ctrl[7]);
 
 	pen_t const *const pens = m_palette->pens();
 
@@ -136,6 +143,7 @@ void apache3_state::draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect)
 		uint32_t *const dest = &dst.pix(y);
 		int32_t h = h0 + y * h_dy + cliprect.left() * h_dx;
 		int32_t g = g0 + y * g_dy + cliprect.left() * g_dx;
+		int32_t depth = depth0 + y * depth_dy + cliprect.left() * depth_dx;
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int const row = g >> 8;
@@ -146,8 +154,8 @@ void apache3_state::draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect)
 			}
 			else
 			{
-				int const r = std::min(row, 0xff);
-				int hval = util::sext((h >> 8) + m_apache3_road_x_ram[r], 12);
+				int const r = std::clamp(depth >> 8, 0, 0xff);
+				int hval = util::sext((h >> 8) + m_apache3_road_x_ram[std::min(row, 0xff)], 12);
 				bool const side = (hval < 0);
 				if (side)
 					hval = ~hval;
@@ -162,6 +170,7 @@ void apache3_state::draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect)
 			}
 			h += h_dx;
 			g += g_dx;
+			depth += depth_dx;
 		}
 	}
 }
@@ -171,20 +180,37 @@ void apache3_state::video_start()
 	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(apache3_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
 
 	m_tx_layer->set_transparent_pen(0);
+
+	save_item(NAME(m_sprite_buffer));
+	save_item(NAME(m_sprite_bank));
+	save_item(NAME(m_sprite_buffer_valid));
+}
+
+void apache3_state::screen_vblank(int state)
+{
+	if (state)
+	{
+		std::copy_n(&m_spriteram[0], std::size(m_sprite_buffer), m_sprite_buffer);
+		m_sprite_bank = m_sprite_control_ram[0x20] & 0x1000;
+		m_sprite_buffer_valid = true;
+	}
 }
 
 uint32_t apache3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	uint16_t const *const sprite_ram = m_sprite_buffer_valid ? m_sprite_buffer : &m_spriteram[0];
+	int const sprite_bank = m_sprite_buffer_valid ? m_sprite_bank : (m_sprite_control_ram[0x20] & 0x1000);
+
 	m_sprites->update_cluts();
 
 	m_tx_layer->set_scrollx(0,24);
 
 	bitmap.fill(m_palette->pen(0), cliprect);
 	screen.priority().fill(0, cliprect);
-	m_sprites->draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
+	m_sprites->draw_sprites(screen.priority(), cliprect, 1, sprite_bank, sprite_ram); // Alpha pass only
 	draw_ground(bitmap, cliprect);
 	apply_shadow_bitmap(bitmap,cliprect,screen.priority(), 0);
-	m_sprites->draw_sprites(bitmap,cliprect,0, (m_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
+	m_sprites->draw_sprites(bitmap, cliprect, 0, sprite_bank, sprite_ram);
 	m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
@@ -420,6 +446,8 @@ void apache3_state::apache3_68000_reset(int state)
 void apache3_state::machine_reset()
 {
 	m_subcpu2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // TODO
+	m_sprite_bank = 0;
+	m_sprite_buffer_valid = false;
 }
 
 
@@ -462,6 +490,7 @@ void apache3_state::apache3(machine_config &config)
 	screen.set_raw(apache3_state::CLOCK_2 / 8, 400, 0, 320, 280, 0, 240); // TODO: Hook up CRTC
 	screen.set_screen_update(FUNC(apache3_state::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, 0);
+	screen.screen_vblank().append(FUNC(apache3_state::screen_vblank));
 
 	TZB215_SPRITES(config, m_sprites, 0, 0x800);
 	m_sprites->set_sprite_palette_base(0);

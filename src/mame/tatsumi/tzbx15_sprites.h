@@ -15,8 +15,8 @@ public:
 	template <typename T> void set_basepalette(T &&tag) { m_palette_base.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_spriteram(T &&tag) { m_spriteram.set_tag(std::forward<T>(tag)); }
 
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int write_priority_only, int rambank);
-	void draw_sprites(bitmap_ind8 &bitmap, const rectangle &cliprect, int write_priority_only, int rambank);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int write_priority_only, int rambank, const uint16_t *ram = nullptr);
+	void draw_sprites(bitmap_ind8 &bitmap, const rectangle &cliprect, int write_priority_only, int rambank, const uint16_t *ram = nullptr);
 
 	void update_cluts();
 
@@ -31,7 +31,7 @@ private:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	template<class BitmapClass> void draw_sprites_main(BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank);
+	template<class BitmapClass> void draw_sprites_main(BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank, const uint16_t *ram);
 	template<class BitmapClass> void draw_sprite(BitmapClass &bitmap, const rectangle &cliprect,
 			int index, int color, int x, int y, int scale, int rotate, bool flip_x, bool flip_y,
 			int write_priority_only);
