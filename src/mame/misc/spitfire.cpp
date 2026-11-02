@@ -70,13 +70,13 @@ private:
 	required_ioport_array<2> m_inputs;
 	required_ioport m_duration;
 
-	u8 m_y_ram[0x100]{};
-	u8 m_x_ram[0x200]{};
-	u8 m_sprite[2]{};
-	u8 m_port1 = 0;
-	bool m_game_on = false;
-	emu_timer *m_game_timer = nullptr;
-	emu_timer *m_sound_pulse_timer[2]{};
+	u8 m_y_ram[0x100];
+	u8 m_x_ram[0x200];
+	u8 m_sprite[2];
+	u8 m_port1;
+	bool m_game_on;
+	emu_timer *m_game_timer;
+	emu_timer *m_sound_pulse_timer[2];
 
 	u8 input0_r();
 	u8 input1_r();
