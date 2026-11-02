@@ -13,7 +13,7 @@
   MC74HCT273A output latch driving an ULN2803A
   SN74LS365AN buffer for the DIP switches
   2x TLP504A optocouplers
-  1 bank of 6 dips
+  1 bank of 6 DIP switches
 
   Gaelco FUTBOL-3 PCB
   _____________________________________________________
@@ -138,28 +138,28 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void common(machine_config &config) ATTR_COLD;
-
 	// hooks for the different boards
 	virtual void update_outputs() = 0;
 	virtual void display_shift(int bit) { }     // Q1 falling edge (rising at the connector)
 	virtual void display_strobe() { }           // Q2 rising edge
 	virtual u8 bus_inputs_r();                  // bus value when nothing else drives it
 
+	u8 m_latch = 0x00;
+
+private:
 	required_device<pic16c5x_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_ioport m_inputs;
 	required_ioport m_dsw;
 
-	u8 m_latch = 0x00;
-
-private:
 	u8 const m_oki_cs;      // port A bit driving the M6295 /CS
 	u8 const m_latch_clk;   // port A bit clocking the 74HCT273
 
 	u8 m_porta = 0x0f;
 	u8 m_portb = 0xff;
 	u8 m_portb_driven = 0x00;
+
+	void common(machine_config &config) ATTR_COLD;
 
 	void porta_w(offs_t offset, u8 data, u8 mem_mask);
 	u8 portb_r();
@@ -219,8 +219,8 @@ void gaelcof3_state::porta_w(offs_t offset, u8 data, u8 mem_mask)
 	m_porta = data;
 
 	// what the M6295 and the 74HCT273 see: the bits the PIC drives, the 74LS365 or the pull-ups for the rest.
-	// the programs raise /WR once at power on with port B still an input, so the M6295 takes 0xc0 | dips as the
-	// first byte of a command and plays phrase 64-127, which is empty in all the ROMs
+	// the programs raise /WR once at power on with port B still an input, so the M6295 takes 0xc0 | DIP switches
+	// as the first byte of a command and plays phrase 64-127, which is empty in all the ROMs
 	u8 const bus = (m_portb & m_portb_driven) | (bus_r(old) & ~m_portb_driven);
 
 	// the M6295 latches a command on the /WR rising edge, with /CS asserted
@@ -420,7 +420,7 @@ void futbol_state::display_strobe()
 	// three bytes: display select and indicators, then the segments of the units and the tens digit.
 	// the board keeps the last 24 bits, the program also clocks it while reading the inputs
 	// the bits are captured before the ULN2803A inverters, so the frame comes out complemented
-	auto const frame = ~m_display_shift;
+	u32 const frame = ~m_display_shift;
 	u8 const select = BIT(frame, 16, 8);
 	u8 const units = BIT(frame, 8, 8);    // sent first
 	u8 const tens = BIT(frame, 0, 8);
@@ -583,7 +583,7 @@ static INPUT_PORTS_START( gruacarr )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Button 2 (Q1 while held)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Grab")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Sensor D4 (waited for with Q7 on)")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Return Home")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Return Home")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1") // order not verified, read only at power on
