@@ -538,21 +538,11 @@ void pgm2_state::pgm2_map(address_map &map)
 	map(0x40000000, 0x40000003).r("ymz774", FUNC(ymz774_device::read)).w("ymz774", FUNC(ymz774_device::write));
 
 	// internal IGS036 - most of them is standard ATMEL peripherals followed by custom bits
-	// map(0xfffa0000, 0xfffa00ff) TC (Timer Counter) not used, mentioned in disabled / unused code
-	// map(0xffffec00, 0xffffec7f) SMC (Static Memory Controller)
-	// map(0xffffee00, 0xffffee57) MATRIX (Bus Matrix)
-
-	// map(0xfffff200, 0xfffff247) DBGU (Debug Unit)
-	// map(0xfffff400, 0xfffff4af) PIO (Parallel Input Output Controller)
 	map(0xfffff430, 0xfffff437).nopw(); // often
-	// map(0xfffffd00, 0xfffffd0b) RSTC (Reset Controller)
-	// map(0xfffffd20, 0xfffffd2f) RTTC (Real Time Timer)
 
-	// map(0xfffffd40, 0xfffffd4b) WDTC (Watch Dog Timer)
 	// custom IGS036 stuff starts here
 	map(0xfffffa08, 0xfffffa0b).w(FUNC(pgm2_state::encryption_do_w)); // after uploading encryption? table might actually send it or enable external ROM? when read bits0-1 called FUSE 0 and 1, must be 0
-
-	map(0xfffffc00, 0xfffffcff).rw(FUNC(pgm2_state::encryption_r), FUNC(pgm2_state::encryption_w));
+map(0xfffffc00, 0xfffffcff).rw(FUNC(pgm2_state::encryption_r), FUNC(pgm2_state::encryption_w));
 }
 
 

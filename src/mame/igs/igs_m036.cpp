@@ -762,12 +762,6 @@ void m036_base_state::m036_boot_map(address_map &map)
 	map(0x3000'0008, 0x3000'000f).r(FUNC(m036_base_state::dips_r));
 
 	// IGS036 system peripherals, also used by PGM2.
-
-	map(0xffff'ec00, 0xffff'ec7f).nopw(); // TODO: static memory controller
-	map(0xffff'ee00, 0xffff'ee57).nopw(); // TODO: bus matrix
-
-	map(0xffff'f200, 0xffff'f247).nopw(); // TODO: debug UART
-	map(0xffff'f400, 0xffff'f4af).nopw(); // TODO: remaining parallel I/O registers
 	map(0xffff'f430, 0xffff'f437).w(FUNC(m036_base_state::gpio_outputs_w));
 	map(0xffff'f438, 0xffff'f43b).lr32(NAME([this] () -> u32 { return m_pio_out; }));
 	map(0xffff'f43c, 0xffff'f43f).portr(m_service);
@@ -776,10 +770,6 @@ void m036_base_state::m036_boot_map(address_map &map)
 	map(0xffff'fa08, 0xffff'fa0b).lr32(NAME([this] () -> u32 { return m_has_decrypted ? 4U : 0U; })).w(FUNC(m036_base_state::encryption_control_w));
 
 	map(0xffff'fc00, 0xffff'fcff).rw(FUNC(m036_base_state::encryption_r), FUNC(m036_base_state::encryption_w));
-	map(0xffff'fd00, 0xffff'fd0b).nopw(); // TODO: reset controller
-	map(0xffff'fd20, 0xffff'fd27).nopw(); // TODO: real-time timer control
-
-	map(0xffff'fd40, 0xffff'fd4b).nopw(); // TODO: watchdog
 }
 
 
