@@ -188,8 +188,8 @@ void mvp3_state::mvp3(machine_config &config)
 	PCI_SLOT(config, "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, nullptr);
 
 	// 8~11 is trusted, otherwise BIOS won't map intr_line(s) properly
-	PCI_SLOT(config, "pci:1", pci_cards, 8,  0, 1, 2, 3, "sis6326_pci");
-	PCI_SLOT(config, "pci:2", pci_cards, 9,  1, 2, 3, 0, "4dwavedx");
+	PCI_SLOT(config, "pci:1", pci_cards,  8, 0, 1, 2, 3, "sis6326_pci");
+	PCI_SLOT(config, "pci:2", pci_cards,  9, 1, 2, 3, 0, "4dwavedx");
 	PCI_SLOT(config, "pci:3", pci_cards, 10, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci:4", pci_cards, 11, 3, 0, 1, 2, nullptr);
 
@@ -256,8 +256,8 @@ void mvp3_state::apollopro(machine_config &config)
 	PCI_SLOT(config, "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, nullptr);
 
 	// 8~11 is trusted, otherwise BIOS won't map intr_line(s) properly
-	PCI_SLOT(config, "pci:1", pci_cards, 8,  0, 1, 2, 3, "sis6326_pci");
-	PCI_SLOT(config, "pci:2", pci_cards, 9,  1, 2, 3, 0, "4dwavedx");
+	PCI_SLOT(config, "pci:1", pci_cards,  8, 0, 1, 2, 3, "sis6326_pci");
+	PCI_SLOT(config, "pci:2", pci_cards,  9, 1, 2, 3, 0, "4dwavedx");
 	PCI_SLOT(config, "pci:3", pci_cards, 10, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci:4", pci_cards, 11, 3, 0, 1, 2, nullptr);
 
@@ -325,8 +325,8 @@ void mvp3_state::ga6vx(machine_config &config)
 
 	// 8~11 is trusted, otherwise BIOS won't map intr_line(s) properly
 	// TODO: pin mapper
-	PCI_SLOT(config, "pci:1", pci_cards, 8,  0, 1, 2, 3, "sis6326_pci");
-	PCI_SLOT(config, "pci:2", pci_cards, 9,  1, 2, 3, 0, "4dwavedx");
+	PCI_SLOT(config, "pci:1", pci_cards,  8, 0, 1, 2, 3, "sis6326_pci");
+	PCI_SLOT(config, "pci:2", pci_cards,  9, 1, 2, 3, 0, "4dwavedx");
 	PCI_SLOT(config, "pci:3", pci_cards, 10, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci:4", pci_cards, 11, 3, 0, 1, 2, nullptr);
 	PCI_SLOT(config, "pci:5", pci_cards, 12, 0, 1, 2, 3, nullptr);
@@ -396,8 +396,8 @@ void mvp3_state::ct6vta2(machine_config &config)
 
 	// TODO: add on-board Yamaha YMF740C DS-1L
 	// 8~11 is trusted, otherwise BIOS won't map intr_line(s) properly
-	PCI_SLOT(config, "pci:1", pci_cards, 8,  0, 1, 2, 3, "sis6326_pci");
-	PCI_SLOT(config, "pci:2", pci_cards, 9,  1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:1", pci_cards,  8, 0, 1, 2, 3, "sis6326_pci");
+	PCI_SLOT(config, "pci:2", pci_cards,  9, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci:3", pci_cards, 10, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci:4", pci_cards, 11, 3, 0, 1, 2, nullptr);
 

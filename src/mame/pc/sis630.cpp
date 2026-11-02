@@ -309,7 +309,7 @@ void sis630_state::sis630(machine_config &config)
 
 	// 3 expansion PCI slots (PC104+)
 	// "pci:09.x" to "pci:12.x"?
-	PCI_SLOT(config, "pci:1", pci_cards, 9,  0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:1", pci_cards,  9, 0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards, 10, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci:3", pci_cards, 11, 2, 3, 0, 1, nullptr);
 
