@@ -687,6 +687,8 @@ void applix_state::applix(machine_config &config)
 	TIMER(config, "applix_c").configure_periodic(FUNC(applix_state::cass_timer), attotime::from_hz(100000));
 
 	scc8530_device &scc(SCC8530(config, "scc", 30_MHz_XTAL / 8));
+	// the timing PAL's 3.75 MHz output reaches /RTxC through the serial jumpers, as the baud rate generator reference
+	scc.configure_channels((30_MHz_XTAL / 8).value(), 0, (30_MHz_XTAL / 8).value(), 0);
 	scc.out_txda_callback().set("serial_a", FUNC(rs232_port_device::write_txd));
 	scc.out_rtsa_callback().set("serial_a", FUNC(rs232_port_device::write_rts));
 	scc.out_dtra_callback().set("serial_a", FUNC(rs232_port_device::write_dtr));
@@ -696,14 +698,14 @@ void applix_state::applix(machine_config &config)
 	scc.out_int_callback().set_inputline("maincpu", M68K_IRQ_3);
 
 	rs232_port_device &serial_a(RS232_PORT(config, "serial_a", default_rs232_devices, nullptr));
-	serial_a.rxd_handler().set("scc", FUNC(scc8530_device::rxa_w));
-	serial_a.cts_handler().set("scc", FUNC(scc8530_device::ctsa_w));
-	serial_a.cts_handler().set("scc", FUNC(scc8530_device::dcda_w));
+	serial_a.rxd_handler().set(scc, FUNC(scc8530_device::rxa_w));
+	serial_a.cts_handler().set(scc, FUNC(scc8530_device::ctsa_w));
+	serial_a.dcd_handler().set(scc, FUNC(scc8530_device::dcda_w));
 
 	rs232_port_device &serial_b(RS232_PORT(config, "serial_b", default_rs232_devices, nullptr));
-	serial_b.rxd_handler().set("scc", FUNC(scc8530_device::rxb_w));
-	serial_b.cts_handler().set("scc", FUNC(scc8530_device::ctsb_w));
-	serial_b.cts_handler().set("scc", FUNC(scc8530_device::dcdb_w));
+	serial_b.rxd_handler().set(scc, FUNC(scc8530_device::rxb_w));
+	serial_b.cts_handler().set(scc, FUNC(scc8530_device::ctsb_w));
+	serial_b.dcd_handler().set(scc, FUNC(scc8530_device::dcdb_w));
 
 	SOFTWARE_LIST(config, "flop_list").set_original("applix_flop");
 }

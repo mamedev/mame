@@ -432,33 +432,33 @@ void sprite013_device::draw_single_sprite_nozoom(
 	}
 	int srcx_base = srcx_start;
 	int srcy = srcy_start;
-	if (drawx_start < cliprect.min_x)
+	if (drawx_start < cliprect.left())
 	{
-		const int diff = cliprect.min_x - drawx_start;
+		const int diff = cliprect.left() - drawx_start;
 		srcx_base += srcx_inc * diff;
 		if ((flipx && srcx_base < 0) || ((!flipx) && srcx_base >= width))
 			return;
 
 		drawx_start += diff;
 	}
-	if (drawy_start < cliprect.min_y)
+	if (drawy_start < cliprect.top())
 	{
-		const int diff = cliprect.min_y - drawy_start;
+		const int diff = cliprect.top() - drawy_start;
 		srcy += srcy_inc * diff;
 		if ((flipy && srcy < 0) || ((!flipy) && srcy >= height))
 			return;
 
 		drawy_start += diff;
 	}
-	if (drawx_start > cliprect.max_x || drawy_start > cliprect.max_y)
+	if (drawx_start > cliprect.right() || drawy_start > cliprect.bottom())
 		return;
 
 	code <<= 8;
-	for (int drawy = drawy_start; (srcy != srcy_end) && (drawy <= cliprect.max_y); drawy++, srcy += srcy_inc)
+	for (int drawy = drawy_start; (srcy != srcy_end) && (drawy <= cliprect.bottom()); drawy++, srcy += srcy_inc)
 	{
 		u16 *const dstbitmap = &m_sprite_bitmap.pix(drawy);
 		const u32 srcoffs = code + (srcy * width);
-		for (int drawx = drawx_start, srcx = srcx_base; (srcx != srcx_end) && (drawx <= cliprect.max_x); drawx++, srcx += srcx_inc)
+		for (int drawx = drawx_start, srcx = srcx_base; (srcx != srcx_end) && (drawx <= cliprect.right()); drawx++, srcx += srcx_inc)
 		{
 			const u8 pix = m_sprite_gfx[(srcoffs + srcx) & m_sprite_gfx_mask];
 			if (pix != m_transpen)
@@ -475,7 +475,7 @@ void sprite013_device::draw_single_sprite_zoom(
 		int width, int height,
 		int zoomx, int zoomy)
 {
-	const rectangle clip_scaled(cliprect.min_x << 8, (cliprect.max_x + 1) << 8, cliprect.min_y << 8, (cliprect.max_y + 1) << 8);
+	const rectangle clip_scaled(cliprect.left() << 8, (cliprect.right() + 1) << 8, cliprect.top() << 8, (cliprect.bottom() + 1) << 8);
 	int drawx_start = x << 8;
 	int drawy_start = y << 8;
 	int srcx_start, srcx_end, srcx_inc;
@@ -506,7 +506,7 @@ void sprite013_device::draw_single_sprite_zoom(
 	}
 	int srcx_base = srcx_start;
 	int srcy = srcy_start;
-	while (drawx_start < clip_scaled.min_x)
+	while (drawx_start < clip_scaled.left())
 	{
 		srcx_base += srcx_inc;
 		if (srcx_base == srcx_end)
@@ -514,7 +514,7 @@ void sprite013_device::draw_single_sprite_zoom(
 
 		drawx_start += zoomx;
 	}
-	while (drawy_start < clip_scaled.min_y)
+	while (drawy_start < clip_scaled.top())
 	{
 		srcy += srcy_inc;
 		if (srcy == srcy_end)
@@ -522,15 +522,15 @@ void sprite013_device::draw_single_sprite_zoom(
 
 		drawy_start += zoomy;
 	}
-	if (drawx_start >= clip_scaled.max_x || drawy_start >= clip_scaled.max_y)
+	if (drawx_start >= clip_scaled.right() || drawy_start >= clip_scaled.bottom())
 		return;
 
 	code <<= 8;
-	for (int drawy = drawy_start; (srcy != srcy_end) && (drawy < clip_scaled.max_y); drawy += zoomy, srcy += srcy_inc)
+	for (int drawy = drawy_start; (srcy != srcy_end) && (drawy < clip_scaled.bottom()); drawy += zoomy, srcy += srcy_inc)
 	{
 		u16 *const dstbitmap = &m_sprite_bitmap.pix(drawy >> 8);
 		const u32 srcoffs = code + (srcy * width);
-		for (int drawx = drawx_start, srcx = srcx_base; (srcx != srcx_end) && (drawx < clip_scaled.max_x); drawx += zoomx, srcx += srcx_inc)
+		for (int drawx = drawx_start, srcx = srcx_base; (srcx != srcx_end) && (drawx < clip_scaled.right()); drawx += zoomx, srcx += srcx_inc)
 		{
 			const u8 pix = m_sprite_gfx[(srcoffs + srcx) & m_sprite_gfx_mask];
 			if (pix != m_transpen)
@@ -544,12 +544,12 @@ void sprite013_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const r
 	rectangle clip(cliprect);
 	clip &= m_sprite_bitmap.cliprect();
 
-	for (int y = clip.min_y; y <= clip.max_y; y++)
+	for (int y = clip.top(); y <= clip.bottom(); y++)
 	{
 		u16 const *const srcbitmap = &m_sprite_bitmap.pix(y);
 		u16 *const dstbitmap = &bitmap.pix(y);
 		u8 *const dstprimap = &screen.priority().pix(y);
-		for (int x = clip.min_x; x <= clip.max_x; x++)
+		for (int x = clip.left(); x <= clip.right(); x++)
 		{
 			const u16 pixel = srcbitmap[x];
 			if (pixel != 0)
@@ -569,12 +569,12 @@ void sprite013_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const r
 	rectangle clip(cliprect);
 	clip &= m_sprite_bitmap.cliprect();
 
-	for (int y = clip.min_y; y <= clip.max_y; y++)
+	for (int y = clip.top(); y <= clip.bottom(); y++)
 	{
 		u16 const *const srcbitmap = &m_sprite_bitmap.pix(y);
 		u32 *const dstbitmap = &bitmap.pix(y);
 		u8 *const dstprimap = &screen.priority().pix(y);
-		for (int x = clip.min_x; x <= clip.max_x; x++)
+		for (int x = clip.left(); x <= clip.right(); x++)
 		{
 			const u16 pixel = srcbitmap[x];
 			if (pixel != 0)

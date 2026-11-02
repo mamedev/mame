@@ -78,6 +78,7 @@ protected:
 	uint8_t OP2, OP3, OPI;
 	uint32_t TMP;
 	bool irq_requested;
+	bool m_long_index;
 
 	virtual void do_exec_full() = 0;
 	virtual void do_exec_partial() = 0;
@@ -117,6 +118,8 @@ protected:
 
 	void set_nz8(uint8_t v);
 	void set_nz16(uint16_t v);
+	enum class shift_type { LOGICAL_RIGHT, LEFT, ARITHMETIC_RIGHT };
+	u32 shift(u32 value, unsigned width, unsigned count, shift_type kind);
 
 #define O(o) void o ## _full(); void o ## _partial()
 

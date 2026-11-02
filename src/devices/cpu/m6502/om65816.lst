@@ -6,8 +6,8 @@
 # datasheet.  Cycle counts are from Table 5-4.
 
 reset
-	read_pc();
-	read_pc();
+	read_sync(m_PC);
+	read_pc_idle();
 	read(m_SP);
 	dec_SP();
 	read(m_SP);
@@ -23,42 +23,42 @@ reset
 #   flags and mode control
 
 clc_imp
-	read_pc();
+	read_pc_idle();
 	m_P &= ~F_C;
 	prefetch();
 
 sec_imp
-	read_pc();
+	read_pc_idle();
 	m_P |= F_C;
 	prefetch();
 
 cld_imp
-	read_pc();
+	read_pc_idle();
 	m_P &= ~F_D;
 	prefetch();
 
 sed_imp
-	read_pc();
+	read_pc_idle();
 	m_P |= F_D;
 	prefetch();
 
 clv_imp
-	read_pc();
+	read_pc_idle();
 	m_P &= ~F_V;
 	prefetch();
 
 cli_imp
-	read_pc();
+	read_pc_idle();
 	prefetch();
 	m_P &= ~F_I; // Do *not* move it before the prefetch
 
 sei_imp
-	read_pc();
+	read_pc_idle();
 	prefetch();
 	m_P |= F_I; // Do *not* move it before the prefetch
 
 nop_imp
-	read_pc();
+	read_pc_idle();
 	prefetch();
 
 wdm_imm
@@ -68,7 +68,7 @@ wdm_imm
 	prefetch();
 
 xce_imp
-	read_pc();
+	read_pc_idle();
 	m_TMP2 = m_P & F_C;
 	if(m_E)
 		m_P |= F_C;
@@ -87,7 +87,7 @@ xce_imp
 rep_imm
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_P &= ~m_TMP2;
 	update_state_base();
 	prefetch();
@@ -95,7 +95,7 @@ rep_imm
 sep_imm
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_P |= m_TMP2;
 	update_state_base();
 	if(m_P & F_X) {
@@ -105,14 +105,14 @@ sep_imm
 	prefetch();
 
 php_imp
-	read_pc();
+	read_pc_idle();
 	write(m_SP, m_P);
 	dec_SP();
 	prefetch();
 
 plp_imp
-	read_pc();
-	read(m_SP);
+	read_pc_idle();
+	read_idle(m_SP);
 	inc_SP();
 	m_TMP2 = read(m_SP);
 	prefetch();
@@ -147,13 +147,13 @@ jmp_abl
 #   stack
 
 pha_imp
-	read_pc();
+	read_pc_idle();
 	write(m_SP, m_A);
 	dec_SP();
 	prefetch();
 
 pha_w_imp
-	read_pc();
+	read_pc_idle();
 	write(m_SP, m_A >> 8);
 	dec_SP();
 	write(m_SP, m_A);
@@ -161,16 +161,16 @@ pha_w_imp
 	prefetch();
 
 pla_imp
-	read_pc();
-	read(m_SP);
+	read_pc_idle();
+	read_idle(m_SP);
 	inc_SP();
 	m_A = set_l(m_A, read(m_SP));
 	set_nz(m_A);
 	prefetch();
 
 pla_w_imp
-	read_pc();
-	read(m_SP);
+	read_pc_idle();
+	read_idle(m_SP);
 	inc_SP();
 	m_A = read(m_SP);
 	inc_SP();
@@ -179,19 +179,19 @@ pla_w_imp
 	prefetch();
 
 tsx_imp
-	read_pc();
+	read_pc_idle();
 	m_X = set_l(m_X, m_SP);
 	set_nz(m_X);
 	prefetch();
 
 tsx_w_imp
-	read_pc();
+	read_pc_idle();
 	m_X = m_SP;
 	set_nz16(m_X);
 	prefetch();
 
 txs_imp
-	read_pc();
+	read_pc_idle();
 	if(m_E)
 		m_SP = 0x0100 | (m_X & 0xff);
 	else
@@ -207,9 +207,9 @@ bcc_rel
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(!(m_P & F_C)) {
-		read_pc();
+		read_pc_idle();
 		if(m_E && page_changing(m_PC, int8_t(m_TMP2))) {
-			read_arg(set_l(m_PC, m_PC + int8_t(m_TMP2)));
+			read_arg_idle(set_l(m_PC, m_PC + int8_t(m_TMP2)));
 		}
 		m_PC += int8_t(m_TMP2);
 	}
@@ -219,9 +219,9 @@ bcs_rel
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_P & F_C) {
-		read_pc();
+		read_pc_idle();
 		if(m_E && page_changing(m_PC, int8_t(m_TMP2))) {
-			read_arg(set_l(m_PC, m_PC + int8_t(m_TMP2)));
+			read_arg_idle(set_l(m_PC, m_PC + int8_t(m_TMP2)));
 		}
 		m_PC += int8_t(m_TMP2);
 	}
@@ -231,9 +231,9 @@ beq_rel
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_P & F_Z) {
-		read_pc();
+		read_pc_idle();
 		if(m_E && page_changing(m_PC, int8_t(m_TMP2))) {
-			read_arg(set_l(m_PC, m_PC + int8_t(m_TMP2)));
+			read_arg_idle(set_l(m_PC, m_PC + int8_t(m_TMP2)));
 		}
 		m_PC += int8_t(m_TMP2);
 	}
@@ -243,9 +243,9 @@ bne_rel
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(!(m_P & F_Z)) {
-		read_pc();
+		read_pc_idle();
 		if(m_E && page_changing(m_PC, int8_t(m_TMP2))) {
-			read_arg(set_l(m_PC, m_PC + int8_t(m_TMP2)));
+			read_arg_idle(set_l(m_PC, m_PC + int8_t(m_TMP2)));
 		}
 		m_PC += int8_t(m_TMP2);
 	}
@@ -255,9 +255,9 @@ bmi_rel
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_P & F_N) {
-		read_pc();
+		read_pc_idle();
 		if(m_E && page_changing(m_PC, int8_t(m_TMP2))) {
-			read_arg(set_l(m_PC, m_PC + int8_t(m_TMP2)));
+			read_arg_idle(set_l(m_PC, m_PC + int8_t(m_TMP2)));
 		}
 		m_PC += int8_t(m_TMP2);
 	}
@@ -267,9 +267,9 @@ bpl_rel
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(!(m_P & F_N)) {
-		read_pc();
+		read_pc_idle();
 		if(m_E && page_changing(m_PC, int8_t(m_TMP2))) {
-			read_arg(set_l(m_PC, m_PC + int8_t(m_TMP2)));
+			read_arg_idle(set_l(m_PC, m_PC + int8_t(m_TMP2)));
 		}
 		m_PC += int8_t(m_TMP2);
 	}
@@ -279,9 +279,9 @@ bvc_rel
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(!(m_P & F_V)) {
-		read_pc();
+		read_pc_idle();
 		if(m_E && page_changing(m_PC, int8_t(m_TMP2))) {
-			read_arg(set_l(m_PC, m_PC + int8_t(m_TMP2)));
+			read_arg_idle(set_l(m_PC, m_PC + int8_t(m_TMP2)));
 		}
 		m_PC += int8_t(m_TMP2);
 	}
@@ -291,9 +291,9 @@ bvs_rel
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_P & F_V) {
-		read_pc();
+		read_pc_idle();
 		if(m_E && page_changing(m_PC, int8_t(m_TMP2))) {
-			read_arg(set_l(m_PC, m_PC + int8_t(m_TMP2)));
+			read_arg_idle(set_l(m_PC, m_PC + int8_t(m_TMP2)));
 		}
 		m_PC += int8_t(m_TMP2);
 	}
@@ -302,9 +302,9 @@ bvs_rel
 bra_rel
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	if(m_E && page_changing(m_PC, int8_t(m_TMP2))) {
-		read_arg(set_l(m_PC, m_PC + int8_t(m_TMP2)));
+		read_arg_idle(set_l(m_PC, m_PC + int8_t(m_TMP2)));
 	}
 	m_PC += int8_t(m_TMP2);
 	prefetch();
@@ -314,7 +314,7 @@ brl_rell
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_PC += m_TMP;
 	prefetch();
 
@@ -347,7 +347,7 @@ jmp_iax
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_TMP3 = m_TMP + m_X;
 	m_PC = read_arg(m_TMP3);
 	m_PC = set_h(m_PC, read_arg(uint16_t(m_TMP3 + 1)));
@@ -359,7 +359,7 @@ jsr_adr
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_TMP3 = m_PC - 1;
 	write(m_SP, m_TMP3 >> 8);
 	dec_SP();
@@ -377,7 +377,7 @@ jsr_iax
 	dec_SP();
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_TMP3 = m_TMP + m_X;
 	m_PC = read_arg(m_TMP3);
 	m_PC = set_h(m_PC, read_arg(uint16_t(m_TMP3 + 1)));
@@ -390,7 +390,7 @@ jsl_abl
 	m_PC++;
 	write(m_SP, m_PB);
 	dec_SP_nw();
-	read(m_SP);
+	read_idle(m_SP);
 	m_TMP2 = read_pc();
 	m_PC++;
 	m_TMP3 = m_PC - 1;
@@ -403,19 +403,19 @@ jsl_abl
 	prefetch();
 
 rts_imp
-	read_pc();
-	read(m_SP);
+	read_pc_idle();
+	read_idle(m_SP);
 	inc_SP();
 	m_PC = read(m_SP);
 	inc_SP();
 	m_PC = set_h(m_PC, read(m_SP));
-	read_pc();
+	read_pc_idle();
 	m_PC++;
 	prefetch();
 
 rtl_imp
-	read_pc();
-	read_pc();
+	read_pc_idle();
+	read_pc_idle();
 	inc_SP_nw();
 	m_TMP = read(m_SP);
 	inc_SP_nw();
@@ -429,7 +429,7 @@ rtl_imp
 
 brk_imm
 	if(m_irq_taken || m_nmi_pending) {
-		read_pc();
+		read_pc_idle();
 	} else {
 		read_pc();
 		m_PC++;
@@ -461,7 +461,7 @@ brk_imm
 
 brk_e_imm
 	if(m_irq_taken || m_nmi_pending) {
-		read_pc();
+		read_pc_idle();
 	} else {
 		read_pc();
 		m_PC++;
@@ -524,8 +524,8 @@ cop_e_imm
 	m_inst_state = -1;
 
 rti_imp
-	read_pc();
-	read_pc();
+	read_pc_idle();
+	read_pc_idle();
 	inc_SP();
 	m_TMP2 = read(m_SP);
 	inc_SP();
@@ -543,8 +543,8 @@ rti_imp
 	prefetch();
 
 rti_e_imp
-	read_pc();
-	read_pc();
+	read_pc_idle();
+	read_pc_idle();
 	inc_SP();
 	m_TMP2 = read(m_SP);
 	inc_SP();
@@ -558,55 +558,55 @@ rti_e_imp
 #   index register increment and decrement
 
 inx_imp
-	read_pc();
+	read_pc_idle();
 	m_X = set_l(m_X, do_inc(m_X));
 	prefetch();
 
 inx_w_imp
-	read_pc();
+	read_pc_idle();
 	m_X = do_inc16(m_X);
 	prefetch();
 
 iny_imp
-	read_pc();
+	read_pc_idle();
 	m_Y = set_l(m_Y, do_inc(m_Y));
 	prefetch();
 
 iny_w_imp
-	read_pc();
+	read_pc_idle();
 	m_Y = do_inc16(m_Y);
 	prefetch();
 
 dex_imp
-	read_pc();
+	read_pc_idle();
 	m_X = set_l(m_X, do_dec(m_X));
 	prefetch();
 
 dex_w_imp
-	read_pc();
+	read_pc_idle();
 	m_X = do_dec16(m_X);
 	prefetch();
 
 dey_imp
-	read_pc();
+	read_pc_idle();
 	m_Y = set_l(m_Y, do_dec(m_Y));
 	prefetch();
 
 dey_w_imp
-	read_pc();
+	read_pc_idle();
 	m_Y = do_dec16(m_Y);
 	prefetch();
 
 #   stack
 
 phx_imp
-	read_pc();
+	read_pc_idle();
 	write(m_SP, m_X);
 	dec_SP();
 	prefetch();
 
 phx_w_imp
-	read_pc();
+	read_pc_idle();
 	write(m_SP, m_X >> 8);
 	dec_SP();
 	write(m_SP, m_X);
@@ -614,13 +614,13 @@ phx_w_imp
 	prefetch();
 
 phy_imp
-	read_pc();
+	read_pc_idle();
 	write(m_SP, m_Y);
 	dec_SP();
 	prefetch();
 
 phy_w_imp
-	read_pc();
+	read_pc_idle();
 	write(m_SP, m_Y >> 8);
 	dec_SP();
 	write(m_SP, m_Y);
@@ -628,16 +628,16 @@ phy_w_imp
 	prefetch();
 
 plx_imp
-	read_pc();
-	read(m_SP);
+	read_pc_idle();
+	read_idle(m_SP);
 	inc_SP();
 	m_X = set_l(m_X, read(m_SP));
 	set_nz(m_X);
 	prefetch();
 
 plx_w_imp
-	read_pc();
-	read(m_SP);
+	read_pc_idle();
+	read_idle(m_SP);
 	inc_SP();
 	m_X = read(m_SP);
 	inc_SP();
@@ -646,16 +646,16 @@ plx_w_imp
 	prefetch();
 
 ply_imp
-	read_pc();
-	read(m_SP);
+	read_pc_idle();
+	read_idle(m_SP);
 	inc_SP();
 	m_Y = set_l(m_Y, read(m_SP));
 	set_nz(m_Y);
 	prefetch();
 
 ply_w_imp
-	read_pc();
-	read(m_SP);
+	read_pc_idle();
+	read_idle(m_SP);
 	inc_SP();
 	m_Y = read(m_SP);
 	inc_SP();
@@ -664,27 +664,27 @@ ply_w_imp
 	prefetch();
 
 phb_imp
-	read_pc();
+	read_pc_idle();
 	write(m_SP, m_DB);
 	dec_SP();
 	prefetch();
 
 phk_imp
-	read_pc();
+	read_pc_idle();
 	write(m_SP, m_PB);
 	dec_SP();
 	prefetch();
 
 plb_imp
-	read_pc();
-	read(m_SP);
+	read_pc_idle();
+	read_idle(m_SP);
 	inc_SP_nw();
 	m_DB = read(m_SP);
 	set_nz(m_DB);
 	prefetch();
 
 phd_imp
-	read_pc();
+	read_pc_idle();
 	write(m_SP, m_D >> 8);
 	dec_SP_nw();
 	write(m_SP, m_D);
@@ -692,8 +692,8 @@ phd_imp
 	prefetch();
 
 pld_imp
-	read_pc();
-	read(m_SP);
+	read_pc_idle();
+	read_idle(m_SP);
 	inc_SP_nw();
 	m_D = read(m_SP);
 	inc_SP_nw();
@@ -718,7 +718,7 @@ pei_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -734,7 +734,7 @@ per_rell
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_TMP3 = m_PC + m_TMP;
 	write(m_SP, m_TMP3 >> 8);
 	dec_SP_nw();
@@ -747,73 +747,73 @@ per_rell
 #   TCS, TSC, TCD and TDC always move all 16 bits regardless of M
 
 tax_imp
-	read_pc();
+	read_pc_idle();
 	m_X = set_l(m_X, m_A);
 	set_nz(m_X);
 	prefetch();
 
 tax_w_imp
-	read_pc();
+	read_pc_idle();
 	m_X = m_A;
 	set_nz16(m_X);
 	prefetch();
 
 tay_imp
-	read_pc();
+	read_pc_idle();
 	m_Y = set_l(m_Y, m_A);
 	set_nz(m_Y);
 	prefetch();
 
 tay_w_imp
-	read_pc();
+	read_pc_idle();
 	m_Y = m_A;
 	set_nz16(m_Y);
 	prefetch();
 
 txa_imp
-	read_pc();
+	read_pc_idle();
 	m_A = set_l(m_A, m_X);
 	set_nz(m_A);
 	prefetch();
 
 txa_w_imp
-	read_pc();
+	read_pc_idle();
 	m_A = m_X;
 	set_nz16(m_A);
 	prefetch();
 
 tya_imp
-	read_pc();
+	read_pc_idle();
 	m_A = set_l(m_A, m_Y);
 	set_nz(m_A);
 	prefetch();
 
 tya_w_imp
-	read_pc();
+	read_pc_idle();
 	m_A = m_Y;
 	set_nz16(m_A);
 	prefetch();
 
 txy_imp
-	read_pc();
+	read_pc_idle();
 	m_Y = set_l(m_Y, m_X);
 	set_nz(m_Y);
 	prefetch();
 
 txy_w_imp
-	read_pc();
+	read_pc_idle();
 	m_Y = m_X;
 	set_nz16(m_Y);
 	prefetch();
 
 tyx_imp
-	read_pc();
+	read_pc_idle();
 	m_X = set_l(m_X, m_Y);
 	set_nz(m_X);
 	prefetch();
 
 tyx_w_imp
-	read_pc();
+	read_pc_idle();
 	m_X = m_Y;
 	set_nz16(m_X);
 	prefetch();
@@ -821,7 +821,7 @@ tyx_w_imp
 # "When in the Emulation mode, a 01 is forced into SH.  In this case, the B
 # Accumulator will not be loaded into SH." (§7.14)
 tcs_imp
-	read_pc();
+	read_pc_idle();
 	if(m_E)
 		m_SP = 0x0100 | (m_A & 0xff);
 	else
@@ -829,19 +829,19 @@ tcs_imp
 	prefetch();
 
 tsc_imp
-	read_pc();
+	read_pc_idle();
 	m_A = m_SP;
 	set_nz16(m_A);
 	prefetch();
 
 tcd_imp
-	read_pc();
+	read_pc_idle();
 	m_D = m_A;
 	set_nz16(m_D);
 	prefetch();
 
 tdc_imp
-	read_pc();
+	read_pc_idle();
 	m_A = m_D;
 	set_nz16(m_A);
 	prefetch();
@@ -856,8 +856,8 @@ mvn_dbf
 	m_DB = m_DST;
 	m_TMP2 = read((m_SRC << 16) | (m_X & 0xff));
 	write((m_DST << 16) | (m_Y & 0xff), m_TMP2);
-	read_pc();
-	read_pc();
+	read_pc_idle();
+	read_pc_idle();
 	m_X = set_l(m_X, m_X + 1);
 	m_Y = set_l(m_Y, m_Y + 1);
 	m_A--;
@@ -873,8 +873,8 @@ mvn_w_dbf
 	m_DB = m_DST;
 	m_TMP2 = read((m_SRC << 16) | m_X);
 	write((m_DST << 16) | m_Y, m_TMP2);
-	read_pc();
-	read_pc();
+	read_pc_idle();
+	read_pc_idle();
 	m_X++;
 	m_Y++;
 	m_A--;
@@ -890,8 +890,8 @@ mvp_dbf
 	m_DB = m_DST;
 	m_TMP2 = read((m_SRC << 16) | (m_X & 0xff));
 	write((m_DST << 16) | (m_Y & 0xff), m_TMP2);
-	read_pc();
-	read_pc();
+	read_pc_idle();
+	read_pc_idle();
 	m_X = set_l(m_X, m_X - 1);
 	m_Y = set_l(m_Y, m_Y - 1);
 	m_A--;
@@ -907,8 +907,8 @@ mvp_w_dbf
 	m_DB = m_DST;
 	m_TMP2 = read((m_SRC << 16) | m_X);
 	write((m_DST << 16) | m_Y, m_TMP2);
-	read_pc();
-	read_pc();
+	read_pc_idle();
+	read_pc_idle();
 	m_X--;
 	m_Y--;
 	m_A--;
@@ -919,36 +919,40 @@ mvp_w_dbf
 #   miscellaneous
 
 xba_imp
-	read_pc();
-	read_pc();
+	read_pc_idle();
+	read_pc_idle();
 	m_A = (m_A >> 8) | (m_A << 8);
 	set_nz(m_A);
 	prefetch();
 
 # STP stops the clock; only RESB restarts it (§7.15)
 stp_imp
-	read_pc();
-	read_pc();
+	read_pc_idle();
+	read_pc_idle();
 	for(;;) {
 		eat-all-cycles;
 	}
 
 # WAI pulls RDY low until an interrupt arrives (§7.13)
 wai_imp
-	read_pc();
-	read_pc();
+	read_pc_idle();
+	read_pc_idle();
+	m_wai = true;
+	m_rdy_w(CLEAR_LINE);
 	while(!m_nmi_pending && !m_irq_state && !m_abort_state) {
 		eat-all-cycles;
 	}
+	m_wai = false;
+	m_rdy_w(ASSERT_LINE);
 	prefetch();
 
 ora_idx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_TMP3 = dp_idx(m_TMP2, m_X);
 	m_TMP = read(m_TMP3);
 	m_TMP = set_h(m_TMP, read(dp_lng(m_TMP3, 1)));
@@ -961,9 +965,9 @@ ora_w_idx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_TMP3 = dp_idx(m_TMP2, m_X);
 	m_TMP = read(m_TMP3);
 	m_TMP = set_h(m_TMP, read(dp_lng(m_TMP3, 1)));
@@ -976,7 +980,7 @@ ora_w_idx
 ora_ds
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(sr(m_TMP2));
 	m_A = set_l(m_A, m_A | m_VAL);
 	set_nz(m_A);
@@ -985,7 +989,7 @@ ora_ds
 ora_w_ds
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(sr(m_TMP2));
 	m_VAL = set_h(m_VAL, read(sr(m_TMP2 + 1)));
 	m_A |= m_VAL;
@@ -996,7 +1000,7 @@ ora_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_A = set_l(m_A, m_A | m_VAL);
@@ -1007,7 +1011,7 @@ ora_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_VAL = set_h(m_VAL, read(dp(m_TMP2 + 1)));
@@ -1019,7 +1023,7 @@ ora_zil
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -1034,7 +1038,7 @@ ora_w_zil
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -1112,12 +1116,12 @@ ora_idy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_A = set_l(m_A, m_A | m_VAL);
@@ -1128,12 +1132,12 @@ ora_w_idy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
@@ -1145,7 +1149,7 @@ ora_zpi
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
@@ -1158,7 +1162,7 @@ ora_w_zpi
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
@@ -1171,10 +1175,10 @@ ora_w_zpi
 ora_dsy
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_TMP = read(sr(m_TMP2));
 	m_TMP = set_h(m_TMP, read(sr(m_TMP2 + 1)));
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_A = set_l(m_A, m_A | m_VAL);
 	set_nz(m_A);
@@ -1183,10 +1187,10 @@ ora_dsy
 ora_w_dsy
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_TMP = read(sr(m_TMP2));
 	m_TMP = set_h(m_TMP, read(sr(m_TMP2 + 1)));
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
 	m_A |= m_VAL;
@@ -1197,9 +1201,9 @@ ora_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	m_A = set_l(m_A, m_A | m_VAL);
 	set_nz(m_A);
@@ -1209,9 +1213,9 @@ ora_w_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	m_VAL = set_h(m_VAL, read(dp_idx(m_TMP2 + 1, m_X)));
 	m_A |= m_VAL;
@@ -1222,7 +1226,7 @@ ora_ziy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -1237,7 +1241,7 @@ ora_w_ziy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -1255,7 +1259,7 @@ ora_aby
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_A = set_l(m_A, m_A | m_VAL);
@@ -1268,7 +1272,7 @@ ora_w_aby
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
@@ -1282,7 +1286,7 @@ ora_abx
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_X)) {
-		read(ab_idx_phantom(m_TMP, m_X));
+		read_idle(ab_idx_phantom(m_TMP, m_X));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	m_A = set_l(m_A, m_A | m_VAL);
@@ -1295,7 +1299,7 @@ ora_w_abx
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_X)) {
-		read(ab_idx_phantom(m_TMP, m_X));
+		read_idle(ab_idx_phantom(m_TMP, m_X));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_X + 1)));
@@ -1332,9 +1336,9 @@ and_idx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_TMP3 = dp_idx(m_TMP2, m_X);
 	m_TMP = read(m_TMP3);
 	m_TMP = set_h(m_TMP, read(dp_lng(m_TMP3, 1)));
@@ -1347,9 +1351,9 @@ and_w_idx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_TMP3 = dp_idx(m_TMP2, m_X);
 	m_TMP = read(m_TMP3);
 	m_TMP = set_h(m_TMP, read(dp_lng(m_TMP3, 1)));
@@ -1362,7 +1366,7 @@ and_w_idx
 and_ds
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(sr(m_TMP2));
 	m_A = set_l(m_A, m_A & m_VAL);
 	set_nz(m_A);
@@ -1371,7 +1375,7 @@ and_ds
 and_w_ds
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(sr(m_TMP2));
 	m_VAL = set_h(m_VAL, read(sr(m_TMP2 + 1)));
 	m_A &= m_VAL;
@@ -1382,7 +1386,7 @@ and_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_A = set_l(m_A, m_A & m_VAL);
@@ -1393,7 +1397,7 @@ and_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_VAL = set_h(m_VAL, read(dp(m_TMP2 + 1)));
@@ -1405,7 +1409,7 @@ and_zil
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -1420,7 +1424,7 @@ and_w_zil
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -1498,12 +1502,12 @@ and_idy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_A = set_l(m_A, m_A & m_VAL);
@@ -1514,12 +1518,12 @@ and_w_idy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
@@ -1531,7 +1535,7 @@ and_zpi
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
@@ -1544,7 +1548,7 @@ and_w_zpi
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
@@ -1557,10 +1561,10 @@ and_w_zpi
 and_dsy
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_TMP = read(sr(m_TMP2));
 	m_TMP = set_h(m_TMP, read(sr(m_TMP2 + 1)));
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_A = set_l(m_A, m_A & m_VAL);
 	set_nz(m_A);
@@ -1569,10 +1573,10 @@ and_dsy
 and_w_dsy
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_TMP = read(sr(m_TMP2));
 	m_TMP = set_h(m_TMP, read(sr(m_TMP2 + 1)));
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
 	m_A &= m_VAL;
@@ -1583,9 +1587,9 @@ and_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	m_A = set_l(m_A, m_A & m_VAL);
 	set_nz(m_A);
@@ -1595,9 +1599,9 @@ and_w_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	m_VAL = set_h(m_VAL, read(dp_idx(m_TMP2 + 1, m_X)));
 	m_A &= m_VAL;
@@ -1608,7 +1612,7 @@ and_ziy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -1623,7 +1627,7 @@ and_w_ziy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -1641,7 +1645,7 @@ and_aby
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_A = set_l(m_A, m_A & m_VAL);
@@ -1654,7 +1658,7 @@ and_w_aby
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
@@ -1668,7 +1672,7 @@ and_abx
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_X)) {
-		read(ab_idx_phantom(m_TMP, m_X));
+		read_idle(ab_idx_phantom(m_TMP, m_X));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	m_A = set_l(m_A, m_A & m_VAL);
@@ -1681,7 +1685,7 @@ and_w_abx
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_X)) {
-		read(ab_idx_phantom(m_TMP, m_X));
+		read_idle(ab_idx_phantom(m_TMP, m_X));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_X + 1)));
@@ -1718,9 +1722,9 @@ eor_idx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_TMP3 = dp_idx(m_TMP2, m_X);
 	m_TMP = read(m_TMP3);
 	m_TMP = set_h(m_TMP, read(dp_lng(m_TMP3, 1)));
@@ -1733,9 +1737,9 @@ eor_w_idx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_TMP3 = dp_idx(m_TMP2, m_X);
 	m_TMP = read(m_TMP3);
 	m_TMP = set_h(m_TMP, read(dp_lng(m_TMP3, 1)));
@@ -1748,7 +1752,7 @@ eor_w_idx
 eor_ds
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(sr(m_TMP2));
 	m_A = set_l(m_A, m_A ^ m_VAL);
 	set_nz(m_A);
@@ -1757,7 +1761,7 @@ eor_ds
 eor_w_ds
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(sr(m_TMP2));
 	m_VAL = set_h(m_VAL, read(sr(m_TMP2 + 1)));
 	m_A ^= m_VAL;
@@ -1768,7 +1772,7 @@ eor_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_A = set_l(m_A, m_A ^ m_VAL);
@@ -1779,7 +1783,7 @@ eor_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_VAL = set_h(m_VAL, read(dp(m_TMP2 + 1)));
@@ -1791,7 +1795,7 @@ eor_zil
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -1806,7 +1810,7 @@ eor_w_zil
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -1884,12 +1888,12 @@ eor_idy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_A = set_l(m_A, m_A ^ m_VAL);
@@ -1900,12 +1904,12 @@ eor_w_idy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
@@ -1917,7 +1921,7 @@ eor_zpi
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
@@ -1930,7 +1934,7 @@ eor_w_zpi
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
@@ -1943,10 +1947,10 @@ eor_w_zpi
 eor_dsy
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_TMP = read(sr(m_TMP2));
 	m_TMP = set_h(m_TMP, read(sr(m_TMP2 + 1)));
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_A = set_l(m_A, m_A ^ m_VAL);
 	set_nz(m_A);
@@ -1955,10 +1959,10 @@ eor_dsy
 eor_w_dsy
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_TMP = read(sr(m_TMP2));
 	m_TMP = set_h(m_TMP, read(sr(m_TMP2 + 1)));
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
 	m_A ^= m_VAL;
@@ -1969,9 +1973,9 @@ eor_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	m_A = set_l(m_A, m_A ^ m_VAL);
 	set_nz(m_A);
@@ -1981,9 +1985,9 @@ eor_w_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	m_VAL = set_h(m_VAL, read(dp_idx(m_TMP2 + 1, m_X)));
 	m_A ^= m_VAL;
@@ -1994,7 +1998,7 @@ eor_ziy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -2009,7 +2013,7 @@ eor_w_ziy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -2027,7 +2031,7 @@ eor_aby
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_A = set_l(m_A, m_A ^ m_VAL);
@@ -2040,7 +2044,7 @@ eor_w_aby
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
@@ -2054,7 +2058,7 @@ eor_abx
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_X)) {
-		read(ab_idx_phantom(m_TMP, m_X));
+		read_idle(ab_idx_phantom(m_TMP, m_X));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	m_A = set_l(m_A, m_A ^ m_VAL);
@@ -2067,7 +2071,7 @@ eor_w_abx
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_X)) {
-		read(ab_idx_phantom(m_TMP, m_X));
+		read_idle(ab_idx_phantom(m_TMP, m_X));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_X + 1)));
@@ -2104,9 +2108,9 @@ adc_idx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_TMP3 = dp_idx(m_TMP2, m_X);
 	m_TMP = read(m_TMP3);
 	m_TMP = set_h(m_TMP, read(dp_lng(m_TMP3, 1)));
@@ -2118,9 +2122,9 @@ adc_w_idx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_TMP3 = dp_idx(m_TMP2, m_X);
 	m_TMP = read(m_TMP3);
 	m_TMP = set_h(m_TMP, read(dp_lng(m_TMP3, 1)));
@@ -2132,7 +2136,7 @@ adc_w_idx
 adc_ds
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(sr(m_TMP2));
 	do_adc(m_VAL);
 	prefetch();
@@ -2140,7 +2144,7 @@ adc_ds
 adc_w_ds
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(sr(m_TMP2));
 	m_VAL = set_h(m_VAL, read(sr(m_TMP2 + 1)));
 	do_adc16(m_VAL);
@@ -2150,7 +2154,7 @@ adc_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	do_adc(m_VAL);
@@ -2160,7 +2164,7 @@ adc_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_VAL = set_h(m_VAL, read(dp(m_TMP2 + 1)));
@@ -2171,7 +2175,7 @@ adc_zil
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -2185,7 +2189,7 @@ adc_w_zil
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -2256,12 +2260,12 @@ adc_idy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	do_adc(m_VAL);
@@ -2271,12 +2275,12 @@ adc_w_idy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
@@ -2287,7 +2291,7 @@ adc_zpi
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
@@ -2299,7 +2303,7 @@ adc_w_zpi
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
@@ -2311,10 +2315,10 @@ adc_w_zpi
 adc_dsy
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_TMP = read(sr(m_TMP2));
 	m_TMP = set_h(m_TMP, read(sr(m_TMP2 + 1)));
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	do_adc(m_VAL);
 	prefetch();
@@ -2322,10 +2326,10 @@ adc_dsy
 adc_w_dsy
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_TMP = read(sr(m_TMP2));
 	m_TMP = set_h(m_TMP, read(sr(m_TMP2 + 1)));
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
 	do_adc16(m_VAL);
@@ -2335,9 +2339,9 @@ adc_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	do_adc(m_VAL);
 	prefetch();
@@ -2346,9 +2350,9 @@ adc_w_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	m_VAL = set_h(m_VAL, read(dp_idx(m_TMP2 + 1, m_X)));
 	do_adc16(m_VAL);
@@ -2358,7 +2362,7 @@ adc_ziy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -2372,7 +2376,7 @@ adc_w_ziy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -2389,7 +2393,7 @@ adc_aby
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	do_adc(m_VAL);
@@ -2401,7 +2405,7 @@ adc_w_aby
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
@@ -2414,7 +2418,7 @@ adc_abx
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_X)) {
-		read(ab_idx_phantom(m_TMP, m_X));
+		read_idle(ab_idx_phantom(m_TMP, m_X));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	do_adc(m_VAL);
@@ -2426,7 +2430,7 @@ adc_w_abx
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_X)) {
-		read(ab_idx_phantom(m_TMP, m_X));
+		read_idle(ab_idx_phantom(m_TMP, m_X));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_X + 1)));
@@ -2460,9 +2464,9 @@ sbc_idx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_TMP3 = dp_idx(m_TMP2, m_X);
 	m_TMP = read(m_TMP3);
 	m_TMP = set_h(m_TMP, read(dp_lng(m_TMP3, 1)));
@@ -2474,9 +2478,9 @@ sbc_w_idx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_TMP3 = dp_idx(m_TMP2, m_X);
 	m_TMP = read(m_TMP3);
 	m_TMP = set_h(m_TMP, read(dp_lng(m_TMP3, 1)));
@@ -2488,7 +2492,7 @@ sbc_w_idx
 sbc_ds
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(sr(m_TMP2));
 	do_sbc(m_VAL);
 	prefetch();
@@ -2496,7 +2500,7 @@ sbc_ds
 sbc_w_ds
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(sr(m_TMP2));
 	m_VAL = set_h(m_VAL, read(sr(m_TMP2 + 1)));
 	do_sbc16(m_VAL);
@@ -2506,7 +2510,7 @@ sbc_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	do_sbc(m_VAL);
@@ -2516,7 +2520,7 @@ sbc_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_VAL = set_h(m_VAL, read(dp(m_TMP2 + 1)));
@@ -2527,7 +2531,7 @@ sbc_zil
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -2541,7 +2545,7 @@ sbc_w_zil
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -2612,12 +2616,12 @@ sbc_idy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	do_sbc(m_VAL);
@@ -2627,12 +2631,12 @@ sbc_w_idy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
@@ -2643,7 +2647,7 @@ sbc_zpi
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
@@ -2655,7 +2659,7 @@ sbc_w_zpi
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
@@ -2667,10 +2671,10 @@ sbc_w_zpi
 sbc_dsy
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_TMP = read(sr(m_TMP2));
 	m_TMP = set_h(m_TMP, read(sr(m_TMP2 + 1)));
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	do_sbc(m_VAL);
 	prefetch();
@@ -2678,10 +2682,10 @@ sbc_dsy
 sbc_w_dsy
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_TMP = read(sr(m_TMP2));
 	m_TMP = set_h(m_TMP, read(sr(m_TMP2 + 1)));
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
 	do_sbc16(m_VAL);
@@ -2691,9 +2695,9 @@ sbc_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	do_sbc(m_VAL);
 	prefetch();
@@ -2702,9 +2706,9 @@ sbc_w_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	m_VAL = set_h(m_VAL, read(dp_idx(m_TMP2 + 1, m_X)));
 	do_sbc16(m_VAL);
@@ -2714,7 +2718,7 @@ sbc_ziy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -2728,7 +2732,7 @@ sbc_w_ziy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -2745,7 +2749,7 @@ sbc_aby
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	do_sbc(m_VAL);
@@ -2757,7 +2761,7 @@ sbc_w_aby
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
@@ -2770,7 +2774,7 @@ sbc_abx
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_X)) {
-		read(ab_idx_phantom(m_TMP, m_X));
+		read_idle(ab_idx_phantom(m_TMP, m_X));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	do_sbc(m_VAL);
@@ -2782,7 +2786,7 @@ sbc_w_abx
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_X)) {
-		read(ab_idx_phantom(m_TMP, m_X));
+		read_idle(ab_idx_phantom(m_TMP, m_X));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_X + 1)));
@@ -2816,9 +2820,9 @@ cmp_idx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_TMP3 = dp_idx(m_TMP2, m_X);
 	m_TMP = read(m_TMP3);
 	m_TMP = set_h(m_TMP, read(dp_lng(m_TMP3, 1)));
@@ -2830,9 +2834,9 @@ cmp_w_idx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_TMP3 = dp_idx(m_TMP2, m_X);
 	m_TMP = read(m_TMP3);
 	m_TMP = set_h(m_TMP, read(dp_lng(m_TMP3, 1)));
@@ -2844,7 +2848,7 @@ cmp_w_idx
 cmp_ds
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(sr(m_TMP2));
 	do_cmp(m_A, m_VAL);
 	prefetch();
@@ -2852,7 +2856,7 @@ cmp_ds
 cmp_w_ds
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(sr(m_TMP2));
 	m_VAL = set_h(m_VAL, read(sr(m_TMP2 + 1)));
 	do_cmp16(m_A, m_VAL);
@@ -2862,7 +2866,7 @@ cmp_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	do_cmp(m_A, m_VAL);
@@ -2872,7 +2876,7 @@ cmp_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_VAL = set_h(m_VAL, read(dp(m_TMP2 + 1)));
@@ -2883,7 +2887,7 @@ cmp_zil
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -2897,7 +2901,7 @@ cmp_w_zil
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -2968,12 +2972,12 @@ cmp_idy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	do_cmp(m_A, m_VAL);
@@ -2983,12 +2987,12 @@ cmp_w_idy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
@@ -2999,7 +3003,7 @@ cmp_zpi
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
@@ -3011,7 +3015,7 @@ cmp_w_zpi
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
@@ -3023,10 +3027,10 @@ cmp_w_zpi
 cmp_dsy
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_TMP = read(sr(m_TMP2));
 	m_TMP = set_h(m_TMP, read(sr(m_TMP2 + 1)));
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	do_cmp(m_A, m_VAL);
 	prefetch();
@@ -3034,10 +3038,10 @@ cmp_dsy
 cmp_w_dsy
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_TMP = read(sr(m_TMP2));
 	m_TMP = set_h(m_TMP, read(sr(m_TMP2 + 1)));
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
 	do_cmp16(m_A, m_VAL);
@@ -3047,9 +3051,9 @@ cmp_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	do_cmp(m_A, m_VAL);
 	prefetch();
@@ -3058,9 +3062,9 @@ cmp_w_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	m_VAL = set_h(m_VAL, read(dp_idx(m_TMP2 + 1, m_X)));
 	do_cmp16(m_A, m_VAL);
@@ -3070,7 +3074,7 @@ cmp_ziy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -3084,7 +3088,7 @@ cmp_w_ziy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -3101,7 +3105,7 @@ cmp_aby
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	do_cmp(m_A, m_VAL);
@@ -3113,7 +3117,7 @@ cmp_w_aby
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
@@ -3126,7 +3130,7 @@ cmp_abx
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_X)) {
-		read(ab_idx_phantom(m_TMP, m_X));
+		read_idle(ab_idx_phantom(m_TMP, m_X));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	do_cmp(m_A, m_VAL);
@@ -3138,7 +3142,7 @@ cmp_w_abx
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_X)) {
-		read(ab_idx_phantom(m_TMP, m_X));
+		read_idle(ab_idx_phantom(m_TMP, m_X));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_X + 1)));
@@ -3172,9 +3176,9 @@ lda_idx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_TMP3 = dp_idx(m_TMP2, m_X);
 	m_TMP = read(m_TMP3);
 	m_TMP = set_h(m_TMP, read(dp_lng(m_TMP3, 1)));
@@ -3187,9 +3191,9 @@ lda_w_idx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_TMP3 = dp_idx(m_TMP2, m_X);
 	m_TMP = read(m_TMP3);
 	m_TMP = set_h(m_TMP, read(dp_lng(m_TMP3, 1)));
@@ -3202,7 +3206,7 @@ lda_w_idx
 lda_ds
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(sr(m_TMP2));
 	m_A = set_l(m_A, m_VAL);
 	set_nz(m_A);
@@ -3211,7 +3215,7 @@ lda_ds
 lda_w_ds
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(sr(m_TMP2));
 	m_VAL = set_h(m_VAL, read(sr(m_TMP2 + 1)));
 	m_A = m_VAL;
@@ -3222,7 +3226,7 @@ lda_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_A = set_l(m_A, m_VAL);
@@ -3233,7 +3237,7 @@ lda_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_VAL = set_h(m_VAL, read(dp(m_TMP2 + 1)));
@@ -3245,7 +3249,7 @@ lda_zil
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -3260,7 +3264,7 @@ lda_w_zil
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -3338,12 +3342,12 @@ lda_idy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_A = set_l(m_A, m_VAL);
@@ -3354,12 +3358,12 @@ lda_w_idy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
@@ -3371,7 +3375,7 @@ lda_zpi
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
@@ -3384,7 +3388,7 @@ lda_w_zpi
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
@@ -3397,10 +3401,10 @@ lda_w_zpi
 lda_dsy
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_TMP = read(sr(m_TMP2));
 	m_TMP = set_h(m_TMP, read(sr(m_TMP2 + 1)));
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_A = set_l(m_A, m_VAL);
 	set_nz(m_A);
@@ -3409,10 +3413,10 @@ lda_dsy
 lda_w_dsy
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_TMP = read(sr(m_TMP2));
 	m_TMP = set_h(m_TMP, read(sr(m_TMP2 + 1)));
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
 	m_A = m_VAL;
@@ -3423,9 +3427,9 @@ lda_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	m_A = set_l(m_A, m_VAL);
 	set_nz(m_A);
@@ -3435,9 +3439,9 @@ lda_w_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	m_VAL = set_h(m_VAL, read(dp_idx(m_TMP2 + 1, m_X)));
 	m_A = m_VAL;
@@ -3448,7 +3452,7 @@ lda_ziy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -3463,7 +3467,7 @@ lda_w_ziy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -3481,7 +3485,7 @@ lda_aby
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_A = set_l(m_A, m_VAL);
@@ -3494,7 +3498,7 @@ lda_w_aby
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
@@ -3508,7 +3512,7 @@ lda_abx
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_X)) {
-		read(ab_idx_phantom(m_TMP, m_X));
+		read_idle(ab_idx_phantom(m_TMP, m_X));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	m_A = set_l(m_A, m_VAL);
@@ -3521,7 +3525,7 @@ lda_w_abx
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_X)) {
-		read(ab_idx_phantom(m_TMP, m_X));
+		read_idle(ab_idx_phantom(m_TMP, m_X));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_X + 1)));
@@ -3558,9 +3562,9 @@ sta_idx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_TMP3 = dp_idx(m_TMP2, m_X);
 	m_TMP = read(m_TMP3);
 	m_TMP = set_h(m_TMP, read(dp_lng(m_TMP3, 1)));
@@ -3571,9 +3575,9 @@ sta_w_idx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_TMP3 = dp_idx(m_TMP2, m_X);
 	m_TMP = read(m_TMP3);
 	m_TMP = set_h(m_TMP, read(dp_lng(m_TMP3, 1)));
@@ -3584,14 +3588,14 @@ sta_w_idx
 sta_ds
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	write(sr(m_TMP2), m_A);
 	prefetch();
 
 sta_w_ds
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	write(sr(m_TMP2), m_A);
 	write(sr(m_TMP2 + 1), m_A >> 8);
 	prefetch();
@@ -3600,7 +3604,7 @@ sta_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	write(dp(m_TMP2), m_A);
 	prefetch();
@@ -3609,7 +3613,7 @@ sta_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	write(dp(m_TMP2), m_A);
 	write(dp(m_TMP2 + 1), m_A >> 8);
@@ -3619,7 +3623,7 @@ sta_zil
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -3632,7 +3636,7 @@ sta_w_zil
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -3684,11 +3688,11 @@ sta_idy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
-	read(ab_idx_phantom(m_TMP, m_Y));
+	read_idle(ab_idx_phantom(m_TMP, m_Y));
 	write(ab_idx(m_TMP, m_Y), m_A);
 	prefetch();
 
@@ -3696,11 +3700,11 @@ sta_w_idy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
-	read(ab_idx_phantom(m_TMP, m_Y));
+	read_idle(ab_idx_phantom(m_TMP, m_Y));
 	write(ab_idx(m_TMP, m_Y), m_A);
 	write(ab_idx(m_TMP, m_Y + 1), m_A >> 8);
 	prefetch();
@@ -3709,7 +3713,7 @@ sta_zpi
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
@@ -3720,7 +3724,7 @@ sta_w_zpi
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP = read(dp_ptr(m_TMP2, 0));
 	m_TMP = set_h(m_TMP, read(dp_ptr(m_TMP2, 1)));
@@ -3731,20 +3735,20 @@ sta_w_zpi
 sta_dsy
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_TMP = read(sr(m_TMP2));
 	m_TMP = set_h(m_TMP, read(sr(m_TMP2 + 1)));
-	read_pc();
+	read_pc_idle();
 	write(ab_idx(m_TMP, m_Y), m_A);
 	prefetch();
 
 sta_w_dsy
 	m_TMP2 = read_pc();
 	m_PC++;
-	read_pc();
+	read_pc_idle();
 	m_TMP = read(sr(m_TMP2));
 	m_TMP = set_h(m_TMP, read(sr(m_TMP2 + 1)));
-	read_pc();
+	read_pc_idle();
 	write(ab_idx(m_TMP, m_Y), m_A);
 	write(ab_idx(m_TMP, m_Y + 1), m_A >> 8);
 	prefetch();
@@ -3753,9 +3757,9 @@ sta_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	write(dp_idx(m_TMP2, m_X), m_A);
 	prefetch();
 
@@ -3763,9 +3767,9 @@ sta_w_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	write(dp_idx(m_TMP2, m_X), m_A);
 	write(dp_idx(m_TMP2 + 1, m_X), m_A >> 8);
 	prefetch();
@@ -3774,7 +3778,7 @@ sta_ziy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -3787,7 +3791,7 @@ sta_w_ziy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_TMP3 = dp(m_TMP2);
 	m_TMP = read(m_TMP3);
@@ -3802,7 +3806,7 @@ sta_aby
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read(ab_idx_phantom(m_TMP, m_Y));
+	read_idle(ab_idx_phantom(m_TMP, m_Y));
 	write(ab_idx(m_TMP, m_Y), m_A);
 	prefetch();
 
@@ -3811,7 +3815,7 @@ sta_w_aby
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read(ab_idx_phantom(m_TMP, m_Y));
+	read_idle(ab_idx_phantom(m_TMP, m_Y));
 	write(ab_idx(m_TMP, m_Y), m_A);
 	write(ab_idx(m_TMP, m_Y + 1), m_A >> 8);
 	prefetch();
@@ -3821,7 +3825,7 @@ sta_abx
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read(ab_idx_phantom(m_TMP, m_X));
+	read_idle(ab_idx_phantom(m_TMP, m_X));
 	write(ab_idx(m_TMP, m_X), m_A);
 	prefetch();
 
@@ -3830,7 +3834,7 @@ sta_w_abx
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read(ab_idx_phantom(m_TMP, m_X));
+	read_idle(ab_idx_phantom(m_TMP, m_X));
 	write(ab_idx(m_TMP, m_X), m_A);
 	write(ab_idx(m_TMP, m_X + 1), m_A >> 8);
 	prefetch();
@@ -3860,7 +3864,7 @@ bit_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	do_bit(m_VAL);
@@ -3870,7 +3874,7 @@ bit_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_VAL = set_h(m_VAL, read(dp(m_TMP2 + 1)));
@@ -3881,9 +3885,9 @@ bit_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	do_bit(m_VAL);
 	prefetch();
@@ -3892,9 +3896,9 @@ bit_w_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	m_VAL = set_h(m_VAL, read(dp_idx(m_TMP2 + 1, m_X)));
 	do_bit16(m_VAL);
@@ -3925,7 +3929,7 @@ bit_abx
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_X)) {
-		read(ab_idx_phantom(m_TMP, m_X));
+		read_idle(ab_idx_phantom(m_TMP, m_X));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	do_bit(m_VAL);
@@ -3937,7 +3941,7 @@ bit_w_abx
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_X)) {
-		read(ab_idx_phantom(m_TMP, m_X));
+		read_idle(ab_idx_phantom(m_TMP, m_X));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_X + 1)));
@@ -3978,7 +3982,7 @@ ldx_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_X = set_l(m_X, m_VAL);
@@ -3989,7 +3993,7 @@ ldx_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_VAL = set_h(m_VAL, read(dp(m_TMP2 + 1)));
@@ -4001,9 +4005,9 @@ ldx_zpy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_Y));
 	m_X = set_l(m_X, m_VAL);
 	set_nz(m_X);
@@ -4013,9 +4017,9 @@ ldx_w_zpy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_Y));
 	m_VAL = set_h(m_VAL, read(dp_idx(m_TMP2 + 1, m_Y)));
 	m_X = m_VAL;
@@ -4049,7 +4053,7 @@ ldx_aby
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_X = set_l(m_X, m_VAL);
@@ -4062,7 +4066,7 @@ ldx_w_aby
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_Y)) {
-		read(ab_idx_phantom(m_TMP, m_Y));
+		read_idle(ab_idx_phantom(m_TMP, m_Y));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_Y));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_Y + 1)));
@@ -4090,7 +4094,7 @@ ldy_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_Y = set_l(m_Y, m_VAL);
@@ -4101,7 +4105,7 @@ ldy_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_VAL = set_h(m_VAL, read(dp(m_TMP2 + 1)));
@@ -4113,9 +4117,9 @@ ldy_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	m_Y = set_l(m_Y, m_VAL);
 	set_nz(m_Y);
@@ -4125,9 +4129,9 @@ ldy_w_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	m_VAL = set_h(m_VAL, read(dp_idx(m_TMP2 + 1, m_X)));
 	m_Y = m_VAL;
@@ -4161,7 +4165,7 @@ ldy_abx
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_X)) {
-		read(ab_idx_phantom(m_TMP, m_X));
+		read_idle(ab_idx_phantom(m_TMP, m_X));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	m_Y = set_l(m_Y, m_VAL);
@@ -4174,7 +4178,7 @@ ldy_w_abx
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
 	if(idx_extra_cycle(m_TMP, m_X)) {
-		read(ab_idx_phantom(m_TMP, m_X));
+		read_idle(ab_idx_phantom(m_TMP, m_X));
 	}
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_X + 1)));
@@ -4186,7 +4190,7 @@ stx_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	write(dp(m_TMP2), m_X);
 	prefetch();
@@ -4195,7 +4199,7 @@ stx_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	write(dp(m_TMP2), m_X);
 	write(dp(m_TMP2 + 1), m_X >> 8);
@@ -4205,9 +4209,9 @@ stx_zpy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	write(dp_idx(m_TMP2, m_Y), m_X);
 	prefetch();
 
@@ -4215,9 +4219,9 @@ stx_w_zpy
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	write(dp_idx(m_TMP2, m_Y), m_X);
 	write(dp_idx(m_TMP2 + 1, m_Y), m_X >> 8);
 	prefetch();
@@ -4243,7 +4247,7 @@ sty_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	write(dp(m_TMP2), m_Y);
 	prefetch();
@@ -4252,7 +4256,7 @@ sty_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	write(dp(m_TMP2), m_Y);
 	write(dp(m_TMP2 + 1), m_Y >> 8);
@@ -4262,9 +4266,9 @@ sty_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	write(dp_idx(m_TMP2, m_X), m_Y);
 	prefetch();
 
@@ -4272,9 +4276,9 @@ sty_w_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	write(dp_idx(m_TMP2, m_X), m_Y);
 	write(dp_idx(m_TMP2 + 1, m_X), m_Y >> 8);
 	prefetch();
@@ -4300,7 +4304,7 @@ stz_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	write(dp(m_TMP2), 0x00);
 	prefetch();
@@ -4309,7 +4313,7 @@ stz_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	write(dp(m_TMP2), 0x00);
 	write(dp(m_TMP2 + 1), 0x00);
@@ -4319,9 +4323,9 @@ stz_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	write(dp_idx(m_TMP2, m_X), 0x00);
 	prefetch();
 
@@ -4329,9 +4333,9 @@ stz_w_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	write(dp_idx(m_TMP2, m_X), 0x00);
 	write(dp_idx(m_TMP2 + 1, m_X), 0x00);
 	prefetch();
@@ -4358,7 +4362,7 @@ stz_abx
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read(ab_idx_phantom(m_TMP, m_X));
+	read_idle(ab_idx_phantom(m_TMP, m_X));
 	write(ab_idx(m_TMP, m_X), 0x00);
 	prefetch();
 
@@ -4367,7 +4371,7 @@ stz_w_abx
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read(ab_idx_phantom(m_TMP, m_X));
+	read_idle(ab_idx_phantom(m_TMP, m_X));
 	write(ab_idx(m_TMP, m_X), 0x00);
 	write(ab_idx(m_TMP, m_X + 1), 0x00);
 	prefetch();
@@ -4390,7 +4394,7 @@ cpx_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	do_cmp(m_X, m_VAL);
@@ -4400,7 +4404,7 @@ cpx_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_VAL = set_h(m_VAL, read(dp(m_TMP2 + 1)));
@@ -4444,7 +4448,7 @@ cpy_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	do_cmp(m_Y, m_VAL);
@@ -4454,7 +4458,7 @@ cpy_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_VAL = set_h(m_VAL, read(dp(m_TMP2 + 1)));
@@ -4481,12 +4485,12 @@ cpy_w_aba
 	prefetch();
 
 asl_acc
-	read_pc();
+	read_pc_idle();
 	m_A = set_l(m_A, do_asl(m_A));
 	prefetch();
 
 asl_w_acc
-	read_pc();
+	read_pc_idle();
 	m_A = do_asl16(m_A);
 	prefetch();
 
@@ -4494,7 +4498,7 @@ asl_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	write_modify_cycle(dp(m_TMP2), m_VAL);
@@ -4506,7 +4510,7 @@ asl_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_VAL = set_h(m_VAL, read(dp(m_TMP2 + 1)));
@@ -4520,9 +4524,9 @@ asl_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	write_modify_cycle(dp_idx(m_TMP2, m_X), m_VAL);
 	m_VAL = do_asl(m_VAL);
@@ -4533,9 +4537,9 @@ asl_w_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	m_VAL = set_h(m_VAL, read(dp_idx(m_TMP2 + 1, m_X)));
 	write_modify_cycle(dp_idx(m_TMP2 + 1, m_X), m_VAL >> 8);
@@ -4573,7 +4577,7 @@ asl_abx
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read(ab_idx_phantom(m_TMP, m_X));
+	read_idle(ab_idx_phantom(m_TMP, m_X));
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	write_modify_cycle(ab_idx(m_TMP, m_X), m_VAL);
 	m_VAL = do_asl(m_VAL);
@@ -4585,7 +4589,7 @@ asl_w_abx
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read(ab_idx_phantom(m_TMP, m_X));
+	read_idle(ab_idx_phantom(m_TMP, m_X));
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_X + 1)));
 	write_modify_cycle(ab_idx(m_TMP, m_X + 1), m_VAL >> 8);
@@ -4595,12 +4599,12 @@ asl_w_abx
 	prefetch();
 
 lsr_acc
-	read_pc();
+	read_pc_idle();
 	m_A = set_l(m_A, do_lsr(m_A));
 	prefetch();
 
 lsr_w_acc
-	read_pc();
+	read_pc_idle();
 	m_A = do_lsr16(m_A);
 	prefetch();
 
@@ -4608,7 +4612,7 @@ lsr_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	write_modify_cycle(dp(m_TMP2), m_VAL);
@@ -4620,7 +4624,7 @@ lsr_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_VAL = set_h(m_VAL, read(dp(m_TMP2 + 1)));
@@ -4634,9 +4638,9 @@ lsr_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	write_modify_cycle(dp_idx(m_TMP2, m_X), m_VAL);
 	m_VAL = do_lsr(m_VAL);
@@ -4647,9 +4651,9 @@ lsr_w_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	m_VAL = set_h(m_VAL, read(dp_idx(m_TMP2 + 1, m_X)));
 	write_modify_cycle(dp_idx(m_TMP2 + 1, m_X), m_VAL >> 8);
@@ -4687,7 +4691,7 @@ lsr_abx
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read(ab_idx_phantom(m_TMP, m_X));
+	read_idle(ab_idx_phantom(m_TMP, m_X));
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	write_modify_cycle(ab_idx(m_TMP, m_X), m_VAL);
 	m_VAL = do_lsr(m_VAL);
@@ -4699,7 +4703,7 @@ lsr_w_abx
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read(ab_idx_phantom(m_TMP, m_X));
+	read_idle(ab_idx_phantom(m_TMP, m_X));
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_X + 1)));
 	write_modify_cycle(ab_idx(m_TMP, m_X + 1), m_VAL >> 8);
@@ -4709,12 +4713,12 @@ lsr_w_abx
 	prefetch();
 
 rol_acc
-	read_pc();
+	read_pc_idle();
 	m_A = set_l(m_A, do_rol(m_A));
 	prefetch();
 
 rol_w_acc
-	read_pc();
+	read_pc_idle();
 	m_A = do_rol16(m_A);
 	prefetch();
 
@@ -4722,7 +4726,7 @@ rol_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	write_modify_cycle(dp(m_TMP2), m_VAL);
@@ -4734,7 +4738,7 @@ rol_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_VAL = set_h(m_VAL, read(dp(m_TMP2 + 1)));
@@ -4748,9 +4752,9 @@ rol_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	write_modify_cycle(dp_idx(m_TMP2, m_X), m_VAL);
 	m_VAL = do_rol(m_VAL);
@@ -4761,9 +4765,9 @@ rol_w_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	m_VAL = set_h(m_VAL, read(dp_idx(m_TMP2 + 1, m_X)));
 	write_modify_cycle(dp_idx(m_TMP2 + 1, m_X), m_VAL >> 8);
@@ -4801,7 +4805,7 @@ rol_abx
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read(ab_idx_phantom(m_TMP, m_X));
+	read_idle(ab_idx_phantom(m_TMP, m_X));
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	write_modify_cycle(ab_idx(m_TMP, m_X), m_VAL);
 	m_VAL = do_rol(m_VAL);
@@ -4813,7 +4817,7 @@ rol_w_abx
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read(ab_idx_phantom(m_TMP, m_X));
+	read_idle(ab_idx_phantom(m_TMP, m_X));
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_X + 1)));
 	write_modify_cycle(ab_idx(m_TMP, m_X + 1), m_VAL >> 8);
@@ -4823,12 +4827,12 @@ rol_w_abx
 	prefetch();
 
 ror_acc
-	read_pc();
+	read_pc_idle();
 	m_A = set_l(m_A, do_ror(m_A));
 	prefetch();
 
 ror_w_acc
-	read_pc();
+	read_pc_idle();
 	m_A = do_ror16(m_A);
 	prefetch();
 
@@ -4836,7 +4840,7 @@ ror_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	write_modify_cycle(dp(m_TMP2), m_VAL);
@@ -4848,7 +4852,7 @@ ror_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_VAL = set_h(m_VAL, read(dp(m_TMP2 + 1)));
@@ -4862,9 +4866,9 @@ ror_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	write_modify_cycle(dp_idx(m_TMP2, m_X), m_VAL);
 	m_VAL = do_ror(m_VAL);
@@ -4875,9 +4879,9 @@ ror_w_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	m_VAL = set_h(m_VAL, read(dp_idx(m_TMP2 + 1, m_X)));
 	write_modify_cycle(dp_idx(m_TMP2 + 1, m_X), m_VAL >> 8);
@@ -4915,7 +4919,7 @@ ror_abx
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read(ab_idx_phantom(m_TMP, m_X));
+	read_idle(ab_idx_phantom(m_TMP, m_X));
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	write_modify_cycle(ab_idx(m_TMP, m_X), m_VAL);
 	m_VAL = do_ror(m_VAL);
@@ -4927,7 +4931,7 @@ ror_w_abx
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read(ab_idx_phantom(m_TMP, m_X));
+	read_idle(ab_idx_phantom(m_TMP, m_X));
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_X + 1)));
 	write_modify_cycle(ab_idx(m_TMP, m_X + 1), m_VAL >> 8);
@@ -4937,12 +4941,12 @@ ror_w_abx
 	prefetch();
 
 inc_acc
-	read_pc();
+	read_pc_idle();
 	m_A = set_l(m_A, do_inc(m_A));
 	prefetch();
 
 inc_w_acc
-	read_pc();
+	read_pc_idle();
 	m_A = do_inc16(m_A);
 	prefetch();
 
@@ -4950,7 +4954,7 @@ inc_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	write_modify_cycle(dp(m_TMP2), m_VAL);
@@ -4962,7 +4966,7 @@ inc_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_VAL = set_h(m_VAL, read(dp(m_TMP2 + 1)));
@@ -4976,9 +4980,9 @@ inc_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	write_modify_cycle(dp_idx(m_TMP2, m_X), m_VAL);
 	m_VAL = do_inc(m_VAL);
@@ -4989,9 +4993,9 @@ inc_w_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	m_VAL = set_h(m_VAL, read(dp_idx(m_TMP2 + 1, m_X)));
 	write_modify_cycle(dp_idx(m_TMP2 + 1, m_X), m_VAL >> 8);
@@ -5029,7 +5033,7 @@ inc_abx
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read(ab_idx_phantom(m_TMP, m_X));
+	read_idle(ab_idx_phantom(m_TMP, m_X));
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	write_modify_cycle(ab_idx(m_TMP, m_X), m_VAL);
 	m_VAL = do_inc(m_VAL);
@@ -5041,7 +5045,7 @@ inc_w_abx
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read(ab_idx_phantom(m_TMP, m_X));
+	read_idle(ab_idx_phantom(m_TMP, m_X));
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_X + 1)));
 	write_modify_cycle(ab_idx(m_TMP, m_X + 1), m_VAL >> 8);
@@ -5051,12 +5055,12 @@ inc_w_abx
 	prefetch();
 
 dec_acc
-	read_pc();
+	read_pc_idle();
 	m_A = set_l(m_A, do_dec(m_A));
 	prefetch();
 
 dec_w_acc
-	read_pc();
+	read_pc_idle();
 	m_A = do_dec16(m_A);
 	prefetch();
 
@@ -5064,7 +5068,7 @@ dec_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	write_modify_cycle(dp(m_TMP2), m_VAL);
@@ -5076,7 +5080,7 @@ dec_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_VAL = set_h(m_VAL, read(dp(m_TMP2 + 1)));
@@ -5090,9 +5094,9 @@ dec_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	write_modify_cycle(dp_idx(m_TMP2, m_X), m_VAL);
 	m_VAL = do_dec(m_VAL);
@@ -5103,9 +5107,9 @@ dec_w_zpx
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
-	read_pc();
+	read_pc_idle();
 	m_VAL = read(dp_idx(m_TMP2, m_X));
 	m_VAL = set_h(m_VAL, read(dp_idx(m_TMP2 + 1, m_X)));
 	write_modify_cycle(dp_idx(m_TMP2 + 1, m_X), m_VAL >> 8);
@@ -5143,7 +5147,7 @@ dec_abx
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read(ab_idx_phantom(m_TMP, m_X));
+	read_idle(ab_idx_phantom(m_TMP, m_X));
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	write_modify_cycle(ab_idx(m_TMP, m_X), m_VAL);
 	m_VAL = do_dec(m_VAL);
@@ -5155,7 +5159,7 @@ dec_w_abx
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
-	read(ab_idx_phantom(m_TMP, m_X));
+	read_idle(ab_idx_phantom(m_TMP, m_X));
 	m_VAL = read(ab_idx(m_TMP, m_X));
 	m_VAL = set_h(m_VAL, read(ab_idx(m_TMP, m_X + 1)));
 	write_modify_cycle(ab_idx(m_TMP, m_X + 1), m_VAL >> 8);
@@ -5168,7 +5172,7 @@ tsb_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	write_modify_cycle(dp(m_TMP2), m_VAL);
@@ -5180,7 +5184,7 @@ tsb_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_VAL = set_h(m_VAL, read(dp(m_TMP2 + 1)));
@@ -5218,7 +5222,7 @@ trb_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	write_modify_cycle(dp(m_TMP2), m_VAL);
@@ -5230,7 +5234,7 @@ trb_w_zpg
 	m_TMP2 = read_pc();
 	m_PC++;
 	if(m_D & 0xff) {
-		read_pc();
+		read_pc_idle();
 	}
 	m_VAL = read(dp(m_TMP2));
 	m_VAL = set_h(m_VAL, read(dp(m_TMP2 + 1)));

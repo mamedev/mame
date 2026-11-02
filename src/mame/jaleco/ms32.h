@@ -182,10 +182,10 @@ private:
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority);
 };
 
-class ms32_f1superbattle_state : public ms32_state
+class f1superb_state : public ms32_state
 {
 public:
-	ms32_f1superbattle_state(const machine_config &mconfig, device_type type, const char *tag) :
+	f1superb_state(const machine_config &mconfig, device_type type, const char *tag) :
 		ms32_state(mconfig, type, tag)
 		, m_road_vram(*this, "road_vram", 0x10000, ENDIANNESS_LITTLE)
 		, m_io_analog(*this, "AN%u", 0U)

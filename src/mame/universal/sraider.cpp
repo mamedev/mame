@@ -255,15 +255,9 @@ u32 sraider_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	// draw the stars
 	rectangle stars_clip = cliprect;
 	if (flip_screen())
-	{
-		stars_clip.min_x = 0x27;
-		stars_clip.max_x = 0xff;
-	}
+		stars_clip.setx(0x27, 0xff);
 	else
-	{
-		stars_clip.min_x = 0x00;
-		stars_clip.max_x = 0xd8;
-	}
+		stars_clip.setx(0x00, 0xd8);
 	stars_clip &= cliprect;
 	m_stars->draw(bitmap, stars_clip);
 
@@ -274,17 +268,16 @@ u32 sraider_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 			m_grid_color & 0x10 ? 0xff : 0));
 	m_grid_tilemap->draw(screen, bitmap, cliprect, 0, flip_screen());
 
+	const int height = cliprect.height();
 	for (unsigned i = 0; i < 0x100; i++)
 	{
 		if (m_grid_data[i] != 0)
 		{
 			u8 x = i;
-			int height = cliprect.max_y - cliprect.min_y + 1;
-
 			if (flip_screen())
 				x = ~x;
 
-			bitmap.plot_box(x, cliprect.min_y, 1, height, 0x81);
+			bitmap.plot_box(x, cliprect.top(), 1, height, 0x81);
 		}
 	}
 

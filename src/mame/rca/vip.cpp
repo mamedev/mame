@@ -260,22 +260,6 @@ enum
 //**************************************************************************
 
 //-------------------------------------------------
-//  update_interrupts -
-//-------------------------------------------------
-
-void vip_state::update_interrupts()
-{
-	int irq = m_vdc_int || m_exp_int;
-	int dma_in = m_exp_dma_in;
-	int dma_out = m_vdc_dma_out || m_exp_dma_out;
-
-	m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, irq);
-	m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAIN, dma_in);
-	m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAOUT, dma_out);
-}
-
-
-//-------------------------------------------------
 //  read -
 //-------------------------------------------------
 
@@ -473,9 +457,19 @@ int vip_state::clear_r()
 	return BIT(m_run->read(), 0);
 }
 
+int vip_state::int_r()
+{
+	return m_vdc->int_r() || m_exp_int;
+}
+
+int vip_state::dma_out_r()
+{
+	return m_vdc->dma_out_r() || m_exp_dma_out;
+}
+
 int vip_state::ef1_r()
 {
-	return m_vdc_ef1 || m_exp->ef1_r();
+	return m_vdc->efx_r() || m_exp->ef1_r();
 }
 
 int vip_state::ef2_r()
@@ -510,29 +504,6 @@ void vip_state::q_w(int state)
 	m_exp->q_w(state);
 }
 
-
-//-------------------------------------------------
-//  CDP1861_INTERFACE( vdc_intf )
-//-------------------------------------------------
-
-void vip_state::vdc_int_w(int state)
-{
-	m_vdc_int = state;
-
-	update_interrupts();
-}
-
-void vip_state::vdc_dma_out_w(int state)
-{
-	m_vdc_dma_out = state;
-
-	update_interrupts();
-}
-
-void vip_state::vdc_ef1_w(int state)
-{
-	m_vdc_ef1 = state;
-}
 
 uint32_t vip_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -582,22 +553,18 @@ void vip_state::byteio_inst_w(int state)
 void vip_state::exp_int_w(int state)
 {
 	m_exp_int = state;
-
-	update_interrupts();
 }
 
 void vip_state::exp_dma_out_w(int state)
 {
 	m_exp_dma_out = state;
-
-	update_interrupts();
 }
 
 void vip_state::exp_dma_in_w(int state)
 {
 	m_exp_dma_in = state;
 
-	update_interrupts();
+	m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAIN, state);
 }
 
 
@@ -628,9 +595,6 @@ void vip_state::machine_start()
 
 	// state saving
 	save_item(NAME(m_8000));
-	save_item(NAME(m_vdc_int));
-	save_item(NAME(m_vdc_dma_out));
-	save_item(NAME(m_vdc_ef1));
 	save_item(NAME(m_exp_int));
 	save_item(NAME(m_exp_dma_out));
 	save_item(NAME(m_exp_dma_in));
@@ -721,6 +685,8 @@ void vip_state::vip(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &vip_state::vip_io);
 	m_maincpu->wait_cb().set_constant(1);
 	m_maincpu->clear_cb().set(FUNC(vip_state::clear_r));
+	m_maincpu->int_cb().set(FUNC(vip_state::int_r));
+	m_maincpu->dma_out_cb().set(FUNC(vip_state::dma_out_r));
 	m_maincpu->ef1_cb().set(FUNC(vip_state::ef1_r));
 	m_maincpu->ef2_cb().set(FUNC(vip_state::ef2_r));
 	m_maincpu->ef3_cb().set(FUNC(vip_state::ef3_r));
@@ -729,14 +695,13 @@ void vip_state::vip(machine_config &config)
 	m_maincpu->dma_rd_cb().set(m_exp, FUNC(vip_expansion_slot_device::dma_r));
 	m_maincpu->dma_wr_cb().set(m_vdc, FUNC(cdp1861_device::dma_w));
 	m_maincpu->dma_wr_cb().append(m_exp, FUNC(vip_expansion_slot_device::dma_w));
-	m_maincpu->sc_cb().set(m_exp, FUNC(vip_expansion_slot_device::sc_w));
+	m_maincpu->sc_cb().set(m_vdc, FUNC(cdp1861_device::sc_w));
+	m_maincpu->sc_cb().append(m_exp, FUNC(vip_expansion_slot_device::sc_w));
+	m_maincpu->tpa_cb().set(m_vdc, FUNC(cdp1861_device::tpa_w));
 	m_maincpu->tpb_cb().set(m_exp, FUNC(vip_expansion_slot_device::tpb_w));
 
 	// video hardware
 	CDP1861(config, m_vdc, 3.52128_MHz_XTAL / 2).set_screen(SCREEN_TAG);
-	m_vdc->int_cb().set(FUNC(vip_state::vdc_int_w));
-	m_vdc->dma_out_cb().set(FUNC(vip_state::vdc_dma_out_w));
-	m_vdc->efx_cb().set(FUNC(vip_state::vdc_ef1_w));
 
 	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_screen_update(FUNC(vip_state::screen_update));

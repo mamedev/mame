@@ -231,7 +231,7 @@ static void draw_wireframe_line(bitmap_rgb32 &bitmap, const rectangle &clip, int
 	const double lx1 = x1, ly1 = y1;
 	const double cdx = double(x2) - lx1, cdy = double(y2) - ly1;
 	const double p[4] = { -cdx, cdx, -cdy, cdy };
-	const double q[4] = { lx1 - clip.min_x, clip.max_x - lx1, ly1 - clip.min_y, clip.max_y - ly1 };
+	const double q[4] = { lx1 - clip.left(), clip.right() - lx1, ly1 - clip.top(), clip.bottom() - ly1 };
 	double t0 = 0.0, t1 = 1.0;
 	for (int i = 0; i < 4; i++)
 	{
@@ -577,10 +577,10 @@ void model1_state::draw_quads(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int save_x2 = view->x2;
 	int save_y1 = view->y1;
 	int save_y2 = view->y2;
-	view->x1 = std::max(view->x1, cliprect.min_x);
-	view->x2 = std::min(view->x2, cliprect.max_x);
-	view->y1 = std::max(view->y1, cliprect.min_y);
-	view->y2 = std::min(view->y2, cliprect.max_y);
+	view->x1 = std::max(view->x1, cliprect.left());
+	view->x2 = std::min(view->x2, cliprect.right());
+	view->y1 = std::max(view->y1, cliprect.top());
+	view->y2 = std::min(view->y2, cliprect.bottom());
 
 	for (int i = 0; i < count; i++)
 	{
@@ -1757,10 +1757,10 @@ void model1_state::video_start()
 void model1_state::build_overlay_mask(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	constexpr int feature_level = 8; // anything darker counts as HUD background
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint32_t const *const src = &bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint32_t argb = src[x];
 			int r = (argb >> 16) & 0xff, g = (argb >> 8) & 0xff, b = argb & 0xff;
@@ -1775,10 +1775,10 @@ void model1_state::build_overlay_mask(bitmap_rgb32 &bitmap, const rectangle &cli
 // remain where the HUD pixel was transparent / near-black.
 void model1_state::apply_overlay_stencil(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint32_t *const dst = &bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int i = y * m_overlay_stride + x;
 			if (m_overlay_block[i])

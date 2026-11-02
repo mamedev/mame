@@ -185,7 +185,7 @@ void sspeedr_state::track_ice_w(uint8_t data)
 
 void sspeedr_state::draw_track(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+	for (int x = cliprect.left(); x <= cliprect.right(); x++)
 	{
 		unsigned counter_x = x + m_track_horz + 0x50;
 
@@ -212,10 +212,10 @@ void sspeedr_state::draw_track(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			counter_x -= 0x1c8;
 		}
 
-		int y = cliprect.min_y;
+		int y = cliprect.top();
 
 		// upper landscape
-		for (; y < m_track_vert[0] && y <= cliprect.max_y; y++)
+		for ( ; y < m_track_vert[0] && y <= cliprect.bottom(); y++)
 		{
 			unsigned const counter_y = y - m_track_vert[0];
 
@@ -235,13 +235,13 @@ void sspeedr_state::draw_track(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		}
 
 		// street
-		for (; y < 128 + m_track_vert[1] && y <= cliprect.max_y; y++)
+		for ( ; y < 128 + m_track_vert[1] && y <= cliprect.bottom(); y++)
 		{
 			bitmap.pix(y, x) = flag ? 15 : 0;
 		}
 
 		// lower landscape
-		for (; y <= cliprect.max_y; y++)
+		for ( ; y <= cliprect.bottom(); y++)
 		{
 			unsigned const counter_y = y - m_track_vert[1];
 

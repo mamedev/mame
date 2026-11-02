@@ -116,12 +116,12 @@ def save_opcodes(f, device, opcodes):
                 emit(f, "\tif(m_icount <= 0) {")
                 emit(f, "\t\tif(access_to_be_redone()) {")
                 emit(f, "\t\t\tm_icount++;")
-                emit(f, "\t\t\tm_inst_substate = %d;" % substate)
-                emit(f, "\t\t} else")
                 emit(f, "\t\t\tm_inst_substate = %d;" % (substate+1))
+                emit(f, "\t\t} else")
+                emit(f, "\t\t\tm_inst_substate = %d;" % (substate+2))
                 emit(f, "\t\treturn;")
                 emit(f, "\t}")
-                substate += 2
+                substate += 3
             else:
                 emit(f, ins)
         emit(f, "}")
@@ -154,19 +154,21 @@ def save_opcodes(f, device, opcodes):
                     emit(f, "\t}")
                 if interrupt_sampled and samples_interrupt(ins, single_cycle):
                     emit(f, "\tsample_interrupt();")
+                emit(f, "\t[[fallthrough]];")
+                emit(f, "case %d:" % (substate+1))
                 emit(f, ins)
                 emit(f, "\tm_icount--;")
                 emit(f, "\tif(m_icount <= 0) {")
                 emit(f, "\t\tif(access_to_be_redone()) {")
                 emit(f, "\t\t\tm_icount++;")
-                emit(f, "\t\t\tm_inst_substate = %d;" % substate)
-                emit(f, "\t\t} else")
                 emit(f, "\t\t\tm_inst_substate = %d;" % (substate+1))
+                emit(f, "\t\t} else")
+                emit(f, "\t\t\tm_inst_substate = %d;" % (substate+2))
                 emit(f, "\t\treturn;")
                 emit(f, "\t}")
                 emit(f, "\t[[fallthrough]];")
-                emit(f, "case %d:;" % (substate+1))
-                substate += 2
+                emit(f, "case %d:;" % (substate+2))
+                substate += 3
             else:
                 emit(f, ins)
         emit(f, "\tbreak;")

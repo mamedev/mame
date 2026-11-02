@@ -313,6 +313,7 @@ public:
 	void mandingarf(machine_config &config) ATTR_COLD;
 	void mandinka(machine_config &config) ATTR_COLD;
 	void thepitm(machine_config &config) ATTR_COLD;
+	void amidarc(machine_config &config) ATTR_COLD;
 	void kong(machine_config &config) ATTR_COLD;
 	void bongo(machine_config &config) ATTR_COLD;
 	void bongog(machine_config &config) ATTR_COLD;
@@ -338,6 +339,7 @@ protected:
 	void set_x_scale(uint8_t scale) { m_x_scale = scale; }
 	void set_h0_start(uint8_t start) { m_h0_start = start; }
 
+	void amidarc_map(address_map &map) ATTR_COLD;
 	void amigo2_map(address_map &map) ATTR_COLD;
 	void anteaterg_map(address_map &map) ATTR_COLD;
 	void anteatergg_map(address_map &map) ATTR_COLD;

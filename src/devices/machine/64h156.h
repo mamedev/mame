@@ -124,6 +124,7 @@ private:
 		int state = 0, next_state = 0;
 		int sync = 0;
 		int byte = 0;
+		int byte_in = 0;
 		int ds = 0;
 		int oe = 0;
 		int soe = 0;

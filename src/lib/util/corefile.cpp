@@ -10,14 +10,11 @@
 
 #include "corefile.h"
 
-#include "coretmpl.h"
 #include "osdcore.h"
 #include "unicode.h"
-#include "vecstream.h"
 
 #include <cassert>
 #include <cstring>
-#include <iterator>
 #include <limits>
 
 

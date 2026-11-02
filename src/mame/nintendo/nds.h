@@ -98,6 +98,7 @@ private:
 	template <int Cpu> void keyinput_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	template <int Cpu> uint32_t ipcsync_r(offs_t offset, uint32_t mem_mask = ~0);
 	template <int Cpu> void ipcsync_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template <int Cpu> TIMER_CALLBACK_MEMBER(ipcsync_sync);
 	uint16_t auxspi_cnt_r(offs_t offset, uint16_t mem_mask = ~0);
 	void auxspi_cnt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t auxspi_data_r();
@@ -243,8 +244,10 @@ private:
 	uint8_t m_ipcfifo_head[2], m_ipcfifo_count[2];
 	template <int Cpu> uint32_t ipcfifo_recv();
 	template <int Cpu> void ipcfifo_send(uint32_t data);
+	template <int Cpu> TIMER_CALLBACK_MEMBER(ipcfifo_send_sync);
 	template <int Cpu> uint16_t ipcfifo_cnt_r();
 	template <int Cpu> void ipcfifo_cnt_w(uint16_t data);
+	template <int Cpu> TIMER_CALLBACK_MEMBER(ipcfifo_cnt_sync);
 
 	// SPI bus
 	uint16_t m_spi_cnt;
@@ -288,7 +291,6 @@ private:
 	int m_visible_lines;
 	uint32_t m_gba_soundregs[0x50/4];
 	uint16_t m_gba_waitcnt;
-	uint32_t m_gba_bios_prefetch;
 
 	// GBA mode DirectSound: two FIFOs fed by DMA, drained to the DACs on timer overflow
 	struct gba_fifo_t

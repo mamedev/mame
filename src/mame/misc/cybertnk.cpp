@@ -317,11 +317,10 @@ void cybertnk_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 {
 	const pen_t *paldata = m_palette->pens();
 
-	int miny = cliprect.min_y;
-	int maxy = cliprect.max_y;
-	int minx = cliprect.min_x;
-	int maxx = cliprect.max_x;
-	uint16_t* dest;
+	int miny = cliprect.top();
+	int maxy = cliprect.bottom();
+	int minx = cliprect.left();
+	int maxx = cliprect.right();
 
 	/*
 
@@ -380,7 +379,7 @@ void cybertnk_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 			if ((yy>=miny) && (yy<=maxy))
 			{
-				dest = &bitmap.pix(yy, 0);
+				uint16_t *dest = &bitmap.pix(yy, 0);
 
 				int start,end,inc;
 

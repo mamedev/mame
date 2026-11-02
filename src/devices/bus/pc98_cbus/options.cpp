@@ -87,6 +87,9 @@ void pc98_cbus_devices(device_slot_interface &device)
 	// internal sound options
 	device.option_add_internal("sound_pc9821ce",  SOUND_PC9821CE);
 	device.option_add_internal("sound_pc9821cx3", SOUND_PC9821CX3);
+
+	// internal SCSI options
+	device.option_add_internal("scsi1_pc98", SCSI1_PC98);
 }
 
 void pc98_cbus_ram_devices(device_slot_interface &device)

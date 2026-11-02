@@ -225,15 +225,17 @@ void abc80_state::draw_character(bitmap_rgb32 &bitmap, int y, int sx, bool dv, u
 	}
 
 	// shift out pixels
+	if (!blank)
+		data = 0;
+	else if (cursor & m_blink)
+		data = ~data;
+
+	pen_t const *const pens = m_palette->pens();
+	u32 *const dest = &bitmap.pix(y, sx * 6);
+
 	for (int bit = 0; bit < 6; bit++)
 	{
-		bool color = BIT(data, 7);
-		int x = (sx * 6) + bit;
-
-		color ^= (cursor & m_blink);
-		color &= blank;
-
-		bitmap.pix(y, x) = m_palette->pen(color);
+		dest[bit] = pens[BIT(data, 7)];
 
 		data <<= 1;
 	}

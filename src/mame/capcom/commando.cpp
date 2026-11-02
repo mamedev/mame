@@ -224,6 +224,9 @@ private:
 	uint8_t m_scroll_x[2]{};
 	uint8_t m_scroll_y[2]{};
 
+	// interrupt-related
+	uint8_t m_irq_vector = 0xff;
+
 	template <uint8_t Which> void videoram_w(offs_t offset, uint8_t data);
 	template <uint8_t Which> void colorram_w(offs_t offset, uint8_t data);
 	void scrollx_w(offs_t offset, uint8_t data);
@@ -233,6 +236,8 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	IRQ_CALLBACK_MEMBER(maincpu_acknowledge_irq);
+	IRQ_CALLBACK_MEMBER(audiocpu_acknowledge_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map) ATTR_COLD;
@@ -525,11 +530,26 @@ TIMER_DEVICE_CALLBACK_MEMBER(commando_state::scanline)
 	// RST 08h at scanline 109 (unused)
 	// RST 10h at scanline 240 (vblank)
 	if (irq & 8)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc7 | (irq << 3 & 0x18));
+	{
+		m_irq_vector = 0xc7 | (irq << 3 & 0x18);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
 
 	// 4 audio interrupts per frame
 	if (irq & 4)
-		m_audiocpu->set_input_line(0, HOLD_LINE);
+		m_audiocpu->set_input_line(0, ASSERT_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(commando_state::maincpu_acknowledge_irq)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+	return m_irq_vector;
+}
+
+IRQ_CALLBACK_MEMBER(commando_state::audiocpu_acknowledge_irq)
+{
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
+	return 0xff;
 }
 
 // Machine Driver
@@ -538,6 +558,7 @@ void commando_state::machine_start()
 {
 	save_item(NAME(m_scroll_x));
 	save_item(NAME(m_scroll_y));
+	save_item(NAME(m_irq_vector));
 }
 
 void commando_state::machine_reset()
@@ -561,9 +582,11 @@ void commando_state::commando(machine_config &config)
 	Z80(config, m_maincpu, PHI_MAIN); // 3 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &commando_state::main_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &commando_state::decrypted_opcodes_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(commando_state::maincpu_acknowledge_irq));
 
 	Z80(config, m_audiocpu, PHI_B); // 3 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &commando_state::sound_map);
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(commando_state::audiocpu_acknowledge_irq));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(commando_state::scanline), "screen", 0, 1);
 

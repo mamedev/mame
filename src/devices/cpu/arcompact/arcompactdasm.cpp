@@ -1964,29 +1964,29 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 					case 0x0c:
 					{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// Unknown Extension Op
+// Dual 16-bit DSP multiply/accumulate instruction
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 						// Leapster BIOS uses this in loop at 400384a0
-						size = handle04_helper_dasm(stream, pc, op, opcodes, "UNKNOWN 0x05-0x0c op", 0,0);
+						size = handle04_helper_dasm(stream, pc, op, opcodes, "MULDW", 0,0);
 						break;
 					}
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// Unknown Extension Op
+// Dual 16-bit DSP multiply/accumulate instruction
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 					case 0x10:
 					{
 						// Leapster BIOS uses this in loop at 400384a0
-						size = handle04_helper_dasm(stream, pc, op, opcodes, "UNKNOWN 0x05-0x10 op", 0,0);
+						size = handle04_helper_dasm(stream, pc, op, opcodes, "MACDW", 0,0);
 						break;
 					}
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// Unknown Extension Op
+// Dual 16-bit DSP multiply/accumulate instruction
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 					case 0x14:
 					{
 						// Leapster BIOS uses this in loop at 400384a0
-						size = handle04_helper_dasm(stream, pc, op, opcodes, "UNKNOWN 0x05-0x14 op", 0,0);
+						size = handle04_helper_dasm(stream, pc, op, opcodes, "MSUBDW", 0,0);
 						break;
 					}
 					case 0x28:

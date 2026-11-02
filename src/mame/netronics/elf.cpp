@@ -211,14 +211,16 @@ void elf2_state::elf2(machine_config &config)
 	m_maincpu->dma_rd_cb().set(FUNC(elf2_state::data_r));
 	m_maincpu->dma_wr_cb().set(m_vdc, FUNC(cdp1861_device::dma_w));
 	m_maincpu->sc_cb().set(FUNC(elf2_state::sc_w));
+	m_maincpu->sc_cb().append(m_vdc, FUNC(cdp1861_device::sc_w));
+	m_maincpu->tpa_cb().set(m_vdc, FUNC(cdp1861_device::tpa_w));
+	m_maincpu->int_cb().set(m_vdc, FUNC(cdp1861_device::int_r));
+	m_maincpu->dma_out_cb().set(m_vdc, FUNC(cdp1861_device::dma_out_r));
+	m_maincpu->ef1_cb().set(m_vdc, FUNC(cdp1861_device::efx_r));
 
 	/* video hardware */
 	config.set_default_layout(layout_elf2);
 
 	CDP1861(config, m_vdc, XTAL(3'579'545)/2).set_screen(SCREEN_TAG);
-	m_vdc->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
-	m_vdc->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
-	m_vdc->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
 	SCREEN(config, SCREEN_TAG);
 
 	/* devices */

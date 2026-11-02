@@ -146,7 +146,7 @@ void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 
 	const uint8_t *const source = flipy ? addr + (7 - line) * gfxelement->rowbytes() : addr + line * gfxelement->rowbytes();
 
-	if (realline >= cliprect.min_y && realline <= cliprect.max_y)
+	if (cliprect.containsy(realline))
 	{
 		struct drawmodes
 		{
@@ -181,7 +181,7 @@ void ssv_state::drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 		{
 			const uint8_t pen = (source[column] & gfxbppmask) >> gfxshift;
 
-			if (pen && sx >= cliprect.min_x && sx <= cliprect.max_x)
+			if (pen && cliprect.containsx(sx))
 			{
 				if (shadow)
 					dest[sx] = ((dest[sx] & m_shadow_pen_mask) | (pen << m_shadow_pen_shift)) & 0x7fff;
@@ -651,23 +651,19 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 	in_sy = (in_sy & 0x1ff) - (in_sy & 0x200);
 
 	// Set up a clipping region for the tilemap slice ..
-	rectangle outclip;
-	outclip.set(0, 0x20/*width in tiles*/ * 0x10, in_sy, in_sy + 0x8/*height in tiles, always 64 pixels*/ * 0x8);
+	rectangle outclip(
+			0, 0x20/*width in tiles*/ * 0x10,
+			in_sy, in_sy + 0x8/*height in tiles, always 64 pixels*/ * 0x8);
 
 	// .. and clip it against the visible screen
-
-	if (outclip.min_x > cliprect.max_x)    return;
-	if (outclip.min_y > cliprect.max_y)    return;
-
-	if (outclip.max_x < cliprect.min_x)    return;
-	if (outclip.max_y < cliprect.min_y)    return;
-
 	outclip &= cliprect;
+	if (outclip.empty())
+		return;
 
-	for (int line = outclip.min_y; line <= outclip.max_y; line++)
+	rectangle clip = outclip;
+	for (int line = outclip.top(); line <= outclip.bottom(); line++)
 	{
-		rectangle clip;
-		clip.set(outclip.min_x, outclip.max_x, line, line);
+		clip.sety(line, line);
 
 		// Get the scroll data
 		int tilemap_scrollx = m_scroll[scrollreg * 4 + 0];    // x scroll
@@ -705,7 +701,7 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 		// Draw the rows
 		const int sx1 = 0 - (tilemap_scrollx & 0xf);
 		int x = tilemap_scrollx;
-		for (int sx = sx1; sx <= clip.max_x; sx += 0x10)
+		for (int sx = sx1; sx <= clip.right(); sx += 0x10)
 		{
 			int code, attr;
 			bool flipx, flipy;
@@ -720,7 +716,7 @@ void ssv_state::draw_row_64pixhigh(bitmap_ind16 &bitmap, const rectangle &clipre
 
 void ssv_state::draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int nr)
 {
-	for (int sy = 0; sy <= m_screen->visible_area().max_y; sy += 0x40)
+	for (int sy = 0; sy <= m_screen->visible_area().bottom(); sy += 0x40)
 		draw_row_64pixhigh(bitmap, cliprect, sy, nr);
 }
 
@@ -945,8 +941,6 @@ void ssv_state::enable_video(bool enable)
 
 uint32_t ssv_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	rectangle clip;
-
 	// Shadow
 	if (m_scroll[0x76/2] & 0x0080)
 	{
@@ -964,12 +958,13 @@ uint32_t ssv_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	bitmap.fill(0, cliprect);
 
 	// used by twineag2 and ultrax
-	clip.min_x = (cliprect.max_x / 2 + m_scroll[0x62/2]) * 2 - m_scroll[0x64/2] * 2 + 2;
-	clip.max_x = (cliprect.max_x / 2 + m_scroll[0x62/2]) * 2 - m_scroll[0x62/2] * 2 + 1;
-	clip.min_y = (cliprect.max_y     + m_scroll[0x6a/2])     - m_scroll[0x6c/2]     + 1;
-	clip.max_y = (cliprect.max_y     + m_scroll[0x6a/2])     - m_scroll[0x6a/2]        ;
+	rectangle clip(
+			(cliprect.right() / 2 + m_scroll[0x62/2]) * 2 - m_scroll[0x64/2] * 2 + 2,
+			(cliprect.right() / 2 + m_scroll[0x62/2]) * 2 - m_scroll[0x62/2] * 2 + 1,
+			(cliprect.bottom()    + m_scroll[0x6a/2])     - m_scroll[0x6c/2]     + 1,
+			(cliprect.bottom()    + m_scroll[0x6a/2])     - m_scroll[0x6a/2]        );
 
-//  printf("%04x %04x %04x %04x\n",clip.min_x, clip.max_x, clip.min_y, clip.max_y);
+	//printf("%04x %04x %04x %04x\n", clip.left(), clip.right(), clip.top(), clip.bottom());
 
 	clip &= cliprect;
 

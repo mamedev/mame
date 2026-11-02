@@ -1097,14 +1097,15 @@ u32 mb86292_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, r
 		return 0;
 	}
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		const u32 fb_addr = (m_fb.base + y * (m_fb.xres << 1));
+		auto *const dst = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			u16 pixel = vram_read_word(fb_addr + (x << 1));
-			bitmap.pix(y, x) = pal555(pixel, 10, 5, 0);
+			dst[x] = pal555(pixel, 10, 5, 0);
 		}
 	}
 

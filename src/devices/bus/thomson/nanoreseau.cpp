@@ -8,6 +8,8 @@
 #include "emu.h"
 #include "nanoreseau.h"
 
+#include "machine/clock.h"
+
 DEFINE_DEVICE_TYPE(NANORESEAU_TO, nanoreseau_to_device, "nanoreseau_to", "Nanoreseau controller (TO rom)")
 DEFINE_DEVICE_TYPE(NANORESEAU_MO, nanoreseau_mo_device, "nanoreseau_mo", "Nanoreseau controller (MO rom)")
 
@@ -104,6 +106,10 @@ void nanoreseau_device::device_add_mconfig(machine_config &config)
 {
 	MC6854(config, m_mc6854);
 	m_mc6854->set_out_frame_callback(FUNC(nanoreseau_device::got_frame));
+
+	clock_device &netclk(CLOCK(config, "netclk", 500'000));
+	netclk.signal_handler().set(m_mc6854, FUNC(mc6854_device::txc_w));
+	netclk.signal_handler().append(m_mc6854, FUNC(mc6854_device::rxc_w));
 }
 
 void nanoreseau_device::device_start()

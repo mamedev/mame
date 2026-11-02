@@ -210,37 +210,36 @@ u32 pc532_state::dma_r(offs_t offset, u32 mem_mask)
 {
 	u32 data = 0;
 
-	if (!machine().side_effects_disabled())
+	switch (m_state)
 	{
-		switch (m_state)
+	case IDLE:
+		if (!machine().side_effects_disabled() && m_drq && !m_irq)
 		{
-		case IDLE:
-			if (m_drq && !m_irq)
-			{
-				// buffer empty and SCSI ready to transfer; read SCSI data, enter the read state, and signal the CPU to wait
-				m_dma = m_dp8490->dma_r();
-				m_state = RD1;
+			// buffer empty and SCSI ready to transfer; read SCSI data, enter the read state, and signal the CPU to wait
+			m_dma = m_dp8490->dma_r();
+			m_state = RD1;
 
-				m_cpu->rdy_w(1);
-			}
-			break;
-
-		case RD1:
-		case RD2:
-		case RD3:
-			// buffer partly full; signal the CPU to wait
 			m_cpu->rdy_w(1);
-			break;
-
-		case RD4:
-			// buffer full; return the data to the CPU and enter idle state
-			data = m_dma;
-			m_state = IDLE;
-			break;
-
-		default:
-			break;
 		}
+		break;
+
+	case RD1:
+	case RD2:
+	case RD3:
+		// buffer partly full; signal the CPU to wait
+		if (!machine().side_effects_disabled())
+			m_cpu->rdy_w(1);
+		break;
+
+	case RD4:
+		// buffer full; return the data to the CPU and enter idle state
+		data = m_dma;
+		if (!machine().side_effects_disabled())
+			m_state = IDLE;
+		break;
+
+	default:
+		break;
 	}
 
 	return data;
@@ -296,35 +295,34 @@ u32 pc532_state::aic_dma_r(offs_t offset, u32 mem_mask)
 {
 	u32 data = 0;
 
-	if (!machine().side_effects_disabled())
+	switch (m_state)
 	{
-		switch (m_state)
+	case IDLE:
+		if (!machine().side_effects_disabled() && m_drq)
 		{
-		case IDLE:
-			if (m_drq)
-			{
-				m_dma = m_aic6250->dma_r();
-				m_state = RD1;
-				m_aic6250->back_w(1);
+			m_dma = m_aic6250->dma_r();
+			m_state = RD1;
+			m_aic6250->back_w(1);
 
-				m_cpu->rdy_w(1);
-			}
-			break;
-
-		case RD1:
-		case RD2:
-		case RD3:
 			m_cpu->rdy_w(1);
-			break;
-
-		case RD4:
-			data = m_dma;
-			m_state = IDLE;
-			break;
-
-		default:
-			break;
 		}
+		break;
+
+	case RD1:
+	case RD2:
+	case RD3:
+		if (!machine().side_effects_disabled())
+			m_cpu->rdy_w(1);
+		break;
+
+	case RD4:
+		data = m_dma;
+		if (!machine().side_effects_disabled())
+			m_state = IDLE;
+		break;
+
+	default:
+		break;
 	}
 
 	return data;

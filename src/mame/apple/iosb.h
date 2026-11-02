@@ -184,8 +184,10 @@ protected:
 
 private:
 	u16 ata_regs_r(offs_t offset);
+	void ata_regs_w(offs_t offset, u16 data, u16 mem_mask);
 
 	s32 m_ata_irq;
+	u8 m_ata_irq_enables;
 	u16 m_primetimeii_regs[0x20];
 };
 

@@ -558,12 +558,12 @@ void acorn_vidc10_device::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, 
 	const u16 xchar_size = 1 << (3 - bpp);
 	const u8 pen_byte_sizes[4] = { 1, 2, 4, 1 };
 	const u16 pen_byte_size = pen_byte_sizes[bpp];
-	const int raster_ystart = std::max(0, cliprect.min_y-ystart);
+	const int raster_ystart = std::max(0, cliprect.top() - ystart);
 	const int line_size = m_crtc_interlace + 1;
 
 	xsize >>= 3 - bpp;
 
-	//printf("%d %d %d %d\n",ystart, ysize, cliprect.min_y, cliprect.max_y);
+	//printf("%d %d %d %d\n",ystart, ysize, cliprect.top(), cliprect.bottom());
 
 	for (int srcy = raster_ystart; srcy < ysize; srcy++)
 	{

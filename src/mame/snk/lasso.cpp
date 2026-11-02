@@ -344,19 +344,20 @@ void lasso_state::draw_lasso(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		if (flip_screen_y())
 			y = ~y;
 
-		if ((y < cliprect.min_y) || (y > cliprect.max_y))
+		if (!cliprect.containsy(y))
 			continue;
 
 		uint8_t x = (offs & 0x1f) << 3;
 		uint8_t data = m_bitmap_ram[offs];
+		auto *const dst = &bitmap.pix(y);
 
 		if (flip_screen_x())
 			x = ~x;
 
 		for (int bit = 0; bit < 8; bit++)
 		{
-			if ((data & 0x80) && (x >= cliprect.min_x) && (x <= cliprect.max_x))
-				bitmap.pix(y, x) = 0x3f;
+			if ((data & 0x80) && cliprect.containsx(x))
+				dst[x] = 0x3f;
 
 			if (flip_screen_x())
 				x--;

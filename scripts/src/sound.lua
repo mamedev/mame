@@ -260,6 +260,18 @@ if SOUNDS["CEM3360"] then
 end
 
 ---------------------------------------------------
+-- CEM 3372 uP-controllable signal processor chip
+--@src/devices/sound/cem3372.h,SOUNDS["CEM3372"] = true
+---------------------------------------------------
+
+if SOUNDS["CEM3372"] then
+	files {
+		MAME_DIR .. "src/devices/sound/cem3372.cpp",
+		MAME_DIR .. "src/devices/sound/cem3372.h",
+	}
+end
+
+---------------------------------------------------
 -- CEM 3394 analog synthesizer chip
 --@src/devices/sound/cem3394.h,SOUNDS["CEM3394"] = true
 ---------------------------------------------------
@@ -670,6 +682,32 @@ if SOUNDS["MB87077"] then
 end
 
 
+---------------------------------------------------
+-- Fujitsu MB87126 reverb DSP
+--@src/devices/sound/mb87126.h,SOUNDS["MB87126"] = true
+---------------------------------------------------
+
+if SOUNDS["MB87126"] then
+	files {
+		MAME_DIR .. "src/devices/sound/mb87126.cpp",
+		MAME_DIR .. "src/devices/sound/mb87126.h",
+	}
+end
+
+
+
+---------------------------------------------------
+-- Fujitsu MB654119 chorus gate array
+--@src/devices/sound/mb654119.h,SOUNDS["MB654119"] = true
+---------------------------------------------------
+
+if SOUNDS["MB654119"] then
+	files {
+		MAME_DIR .. "src/devices/sound/mb654119.cpp",
+		MAME_DIR .. "src/devices/sound/mb654119.h",
+	}
+end
+
 
 ---------------------------------------------------
 -- Micronas DAC 3550A Stereo Audio DAC
@@ -832,6 +870,19 @@ if SOUNDS["IMAADPCM"] then
 	}
 end
 
+
+
+---------------------------------------------------
+-- Novatek NT3570F sound generator
+--@src/devices/sound/nt3570.h,SOUNDS["NT3570"] = true
+---------------------------------------------------
+
+if SOUNDS["NT3570"] then
+	files {
+		MAME_DIR .. "src/devices/sound/nt3570.cpp",
+		MAME_DIR .. "src/devices/sound/nt3570.h",
+	}
+end
 
 
 ---------------------------------------------------
@@ -1600,6 +1651,18 @@ if SOUNDS["AD1848"] then
 end
 
 ---------------------------------------------------
+-- AD1859
+--@src/devices/sound/ad1859.h,SOUNDS["AD1859"] = true
+---------------------------------------------------
+
+if SOUNDS["AD1859"] then
+	files {
+		MAME_DIR .. "src/devices/sound/ad1859.cpp",
+		MAME_DIR .. "src/devices/sound/ad1859.h",
+	}
+end
+
+---------------------------------------------------
 -- GB_SOUND
 --@src/devices/sound/gb.h,SOUNDS["GB_SOUND"] = true
 ---------------------------------------------------
@@ -1847,6 +1910,19 @@ if SOUNDS["ROLANDLP"] then
 	files {
 		MAME_DIR .. "src/devices/sound/roland_lp.cpp",
 		MAME_DIR .. "src/devices/sound/roland_lp.h",
+	}
+end
+
+---------------------------------------------------
+-- Roland RPP-324 RDAC phrase player
+--@src/devices/sound/roland_rpp324.h,SOUNDS["ROLANDRPP324"] = true
+---------------------------------------------------
+
+if SOUNDS["ROLANDRPP324"] then
+	files {
+		MAME_DIR .. "src/devices/sound/roland_rpp324.cpp",
+		MAME_DIR .. "src/devices/sound/roland_rpp324.h",
+		MAME_DIR .. "src/devices/sound/roland_rpp324_codec.h",
 	}
 end
 

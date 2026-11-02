@@ -507,13 +507,30 @@ inline void hd63484_device::dequeue_r(uint8_t *data)
 	}
 }
 
+int hd63484_device::get_ppmc()
+{
+	int gai = (m_omr >> 4) & 0x07;
+	int acm = (m_omr & 0x08) ? 2 : 1;
+	int ppw = 16 / get_bpp();
+
+	switch (gai)
+	{
+		case 0: case 1: case 2: case 3: // address incremented by 1, 2, 4 or 8 words
+			return (ppw << gai) / acm;
+		case 7:                         // address incremented by 1 every two display cycles
+			return std::max(ppw / 2 / acm, 1);
+		default:                        // 4-6: address not incremented
+			return ppw / acm;
+	}
+}
+
 //-------------------------------------------------
 //  recompute_parameters -
 //-------------------------------------------------
 
 inline void hd63484_device::recompute_parameters()
 {
-	if(!m_auto_configure_screen || m_hdw < 3 || m_hc == 0 || m_vc == 0) //bail out if screen params aren't valid
+	if (!m_auto_configure_screen)
 		return;
 
 	if (LOG)
@@ -523,22 +540,41 @@ inline void hd63484_device::recompute_parameters()
 		logerror("SP0 %d SP1 %d SP2 %d\n",m_sp[0],m_sp[1],m_sp[2]);
 	}
 
-	int gai = (m_omr>>4) & 0x07;
-	if (gai > 3)    logerror("unsupported GAI=%d\n", gai);
-	int acm = (m_omr & 0x08) ? 2 : 1;
-	int ppw = 16 / get_bpp();
-	int ppmc = ppw * (1 << gai) / acm;  // TODO: GAI > 3
-	int vbstart = m_vds + m_sp[1];
+	int ppmc = get_ppmc();
+	int htotal = m_hc * ppmc;
 	int hbend = (m_hsw + m_hds + m_external_skew) * ppmc;
+	int hbstart = hbend + m_hdw * ppmc;
+	int vbstart = m_vds + m_sp[1];
 	if (BIT(m_dcr, 13)) vbstart += m_sp[0];
 	if (BIT(m_dcr, 11)) vbstart += m_sp[2];
 
+	// bail out if screen params aren't valid
+	if (m_hc == 0 || m_vc == 0 || hbstart > htotal || vbstart <= m_vds)
+		return;
+
 	rectangle visarea = screen().visible_area();
-	visarea.set(hbend, hbend + (m_hdw * ppmc) - 1, m_vds, vbstart - 1);
-	attotime frame_period = screen().frame_period(); // TODO: use clock() to calculate the frame_period
-	screen().configure(m_hc * ppmc, m_vc, visarea, frame_period);
+	visarea.set(hbend, hbstart - 1, m_vds, vbstart - 1);
+	attotime frame_period = screen().frame_period();
+	if (clock() != 0)
+	{
+		// a memory cycle is two 2CLK periods in all access modes
+		attotime const line = clocks_to_attotime(2 * m_hc);
+		switch (m_omr & 0x03)
+		{
+			case 2: // interlace sync: dummy raster adds half a line per field
+				frame_period = line * m_vc + line / 2;
+				break;
+			case 3: // interlace sync & video: VC counts both fields
+				frame_period = line * m_vc / 2;
+				break;
+			default: // non-interlace
+				frame_period = line * m_vc;
+				break;
+		}
+	}         
+	screen().configure(htotal, m_vc, visarea, frame_period);
 	if (LOG)
-		logerror("ACRTC: full %dx%d vis (%d, %d)-(%d, %d)\n", m_hc * ppmc, m_vc, visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+		logerror("ACRTC: full %dx%d vis (%d, %d)-(%d, %d)\n", htotal, m_vc, visarea.left(), visarea.top(), visarea.right(), visarea.bottom());
 }
 
 
@@ -548,46 +584,32 @@ inline void hd63484_device::recompute_parameters()
 
 int hd63484_device::translate_command(uint16_t data)
 {
-	/* annoying switch-case sequence, but it's the only way to get invalid commands ... */
-	switch (data)
-	{
-		case HD63484_COMMAND_ORG:    return COMMAND_ORG;
-		case HD63484_COMMAND_DRD:    return COMMAND_DRD;
-		case HD63484_COMMAND_DWT:    return COMMAND_DWT;
-		case HD63484_COMMAND_RD:     return COMMAND_RD;
-		case HD63484_COMMAND_WT:     return COMMAND_WT;
-		case HD63484_COMMAND_CLR:    return COMMAND_CLR;
-		case HD63484_COMMAND_AMOVE:  return COMMAND_AMOVE;
-		case HD63484_COMMAND_RMOVE:  return COMMAND_RMOVE;
-	}
-
-	switch(data & ~0x3)
-	{
-		case HD63484_COMMAND_DMOD:   return COMMAND_DMOD;
-		case HD63484_COMMAND_MOD:    return COMMAND_MOD;
-		case HD63484_COMMAND_SCLR:   return COMMAND_SCLR;
-	}
-
-	switch(data & ~0xf)
-	{
-		case HD63484_COMMAND_WPTN:   return COMMAND_WPTN;
-		case HD63484_COMMAND_RPTN:   return COMMAND_RPTN;
-	}
-
-	switch(data & ~0x1f)
-	{
-		case HD63484_COMMAND_WPR:    return COMMAND_WPR;
-		case HD63484_COMMAND_RPR:    return COMMAND_RPR;
-	}
-
-	switch(data & ~0x0f03)
+	switch (data & 0xf000) // using top 4 bits for decoding
 	{
 		case HD63484_COMMAND_CPY:    return COMMAND_CPY;
 		case HD63484_COMMAND_SCPY:   return COMMAND_SCPY;
+		case HD63484_COMMAND_PTN:    return COMMAND_PTN;
+		case HD63484_COMMAND_AGCPY:  return COMMAND_AGCPY;
+		case HD63484_COMMAND_RGCPY:  return COMMAND_RGCPY;
 	}
 
-	switch(data & ~0x00ff)
+	switch (data & 0xfc00) // using top 6 bits for decoding
 	{
+		case HD63484_COMMAND_ORG:    return COMMAND_ORG;
+		case HD63484_COMMAND_WPR:    return COMMAND_WPR;
+		case HD63484_COMMAND_RPR:    return COMMAND_RPR;
+		case HD63484_COMMAND_WPTN:   return COMMAND_WPTN;
+		case HD63484_COMMAND_RPTN:   return COMMAND_RPTN;
+		case HD63484_COMMAND_DRD:    return COMMAND_DRD;
+		case HD63484_COMMAND_DWT:    return COMMAND_DWT;
+		case HD63484_COMMAND_DMOD:   return COMMAND_DMOD;
+		case HD63484_COMMAND_RD:     return COMMAND_RD;
+		case HD63484_COMMAND_WT:     return COMMAND_WT;
+		case HD63484_COMMAND_MOD:    return COMMAND_MOD;
+		case HD63484_COMMAND_CLR:    return COMMAND_CLR;
+		case HD63484_COMMAND_SCLR:   return COMMAND_SCLR;
+		case HD63484_COMMAND_AMOVE:  return COMMAND_AMOVE;
+		case HD63484_COMMAND_RMOVE:  return COMMAND_RMOVE;
 		case HD63484_COMMAND_ALINE:  return COMMAND_ALINE;
 		case HD63484_COMMAND_RLINE:  return COMMAND_RLINE;
 		case HD63484_COMMAND_ARCT:   return COMMAND_ARCT;
@@ -596,27 +618,16 @@ int hd63484_device::translate_command(uint16_t data)
 		case HD63484_COMMAND_RPLL:   return COMMAND_RPLL;
 		case HD63484_COMMAND_APLG:   return COMMAND_APLG;
 		case HD63484_COMMAND_RPLG:   return COMMAND_RPLG;
-		case HD63484_COMMAND_AFRCT:  return COMMAND_AFRCT;
-		case HD63484_COMMAND_RFRCT:  return COMMAND_RFRCT;
-		case HD63484_COMMAND_DOT:    return COMMAND_DOT;
-	}
-
-	switch(data & ~0x01ff)
-	{
 		case HD63484_COMMAND_CRCL:   return COMMAND_CRCL;
 		case HD63484_COMMAND_ELPS:   return COMMAND_ELPS;
 		case HD63484_COMMAND_AARC:   return COMMAND_AARC;
 		case HD63484_COMMAND_RARC:   return COMMAND_RARC;
 		case HD63484_COMMAND_AEARC:  return COMMAND_AEARC;
 		case HD63484_COMMAND_REARC:  return COMMAND_REARC;
+		case HD63484_COMMAND_AFRCT:  return COMMAND_AFRCT;
+		case HD63484_COMMAND_RFRCT:  return COMMAND_RFRCT;
 		case HD63484_COMMAND_PAINT:  return COMMAND_PAINT;
-	}
-
-	switch(data & ~0x0fff)
-	{
-		case HD63484_COMMAND_PTN:    return COMMAND_PTN;
-		case HD63484_COMMAND_AGCPY:  return COMMAND_AGCPY;
-		case HD63484_COMMAND_RGCPY:  return COMMAND_RGCPY;
+		case HD63484_COMMAND_DOT:    return COMMAND_DOT;
 	}
 
 	return COMMAND_INVALID;
@@ -1035,6 +1046,54 @@ void hd63484_device::command_clr_exec()
 
 	m_rwp[m_rwp_dn] -= (ay + d1_inc) * m_mwr[m_rwp_dn];
 	m_rwp[m_rwp_dn] &= 0xfffff;
+}
+
+bool hd63484_device::command_dma_write_exec(uint16_t data, bool modify)
+{
+	int16_t const ax = (int16_t)m_pr[0];
+	int16_t const ay = (int16_t)m_pr[1];
+	int const d0_inc = (ax < 0) ? -1 : 1;
+	int const d1_inc = (ay < 0) ? -1 : 1;
+	uint32_t const offset = (m_rwp[m_rwp_dn] - m_dma_d1 * m_mwr[m_rwp_dn] + m_dma_d0) & 0xfffff;
+
+	if (modify)
+	{
+		uint16_t const fb = readword(offset);
+		switch (m_cr & 0x03)
+		{
+			case 0: // replace
+				data = (fb & ~m_mask) | (data & m_mask);
+				break;
+			case 1: // OR
+				data = (fb & ~m_mask) | ((fb | data) & m_mask);
+				break;
+			case 2: // AND
+				data = (fb & ~m_mask) | ((fb & data) & m_mask);
+				break;
+			case 3: // XOR
+				data = (fb & ~m_mask) | ((fb ^ data) & m_mask);
+				break;
+		}
+	}
+
+	writeword(offset, data);
+
+	if (m_dma_d0 != ax)
+	{
+		m_dma_d0 += d0_inc;
+		return false;
+	}
+
+	m_dma_d0 = 0;
+	if (m_dma_d1 != ay)
+	{
+		m_dma_d1 += d1_inc;
+		return false;
+	}
+
+	m_rwp[m_rwp_dn] -= (ay + d1_inc) * m_mwr[m_rwp_dn];
+	m_rwp[m_rwp_dn] &= 0xfffff;
+	return true;
 }
 
 void hd63484_device::command_cpy_exec()
@@ -1515,18 +1574,30 @@ void hd63484_device::process_fifo()
 		case COMMAND_DWT:
 			if (m_param_ptr == 2)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': DWT %d, %d\n", tag(), m_pr[0], m_pr[1]);
-				command_end_seq();
-				fatalerror("HD63484 COMMAND_DWT!\n");
+				if (CMD_LOG)    logerror("HD63484 '%s': DWT %d, %d\n", tag(), (int16_t)m_pr[0], (int16_t)m_pr[1]);
+				m_dma_d0 = m_dma_d1 = 0;
+			}
+			else if (m_param_ptr == 3)
+			{
+				// data words follow the parameters, written by CPU
+				m_param_ptr = 2;
+				if (command_dma_write_exec(m_pr[2], false))
+					command_end_seq();
 			}
 			break;
 
 		case COMMAND_DMOD:
 			if (m_param_ptr == 2)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': DMOD (%d) %d, %d\n", tag(), m_cr & 0x03, m_pr[0], m_pr[1]);
-				command_end_seq();
-				fatalerror("HD63484 COMMAND_DMOD!\n");
+				if (CMD_LOG)    logerror("HD63484 '%s': DMOD (%d) %d, %d\n", tag(), m_cr & 0x03, (int16_t)m_pr[0], (int16_t)m_pr[1]);
+				m_dma_d0 = m_dma_d1 = 0;
+			}
+			else if (m_param_ptr == 3)
+			{
+				// as DWT, each data word is combined with the frame buffer under MASK
+				m_param_ptr = 2;
+				if (command_dma_write_exec(m_pr[2], true))
+					command_end_seq();
 			}
 			break;
 
@@ -2050,6 +2121,7 @@ void hd63484_device::device_reset()
 	m_mask = -1;
 	m_cpx = m_cpy = 0;
 	m_dn = 0;
+	m_dma_d0 = m_dma_d1 = 0;
 
 	memset(m_vreg, 0, sizeof(m_vreg));
 	memset(m_fifo, 0, sizeof(m_fifo));
@@ -2075,8 +2147,7 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 	uint32_t base_offs = m_sar[layer_n] + (y - vs) * m_mwr[layer_n] + m_external_skew;
 	uint32_t wind_offs = m_sar[3] + (y - m_vws) * m_mwr[3] + m_external_skew;
 	int step = (m_omr & 0x08) ? 2 : 1;
-	int gai = (m_omr>>4) & 0x07;
-	int ppmc = ppw * (1 << gai) / step;  // TODO: GAI > 3
+	int ppmc = get_ppmc();
 	int ws = m_hsw + m_hws + m_external_skew;
 
 	if (m_omr & 0x08)
@@ -2094,7 +2165,7 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 			wind_offs++;
 	}
 
-	for(int x=cliprect.min_x; x<=cliprect.max_x; x+=ppw)
+	for(int x=cliprect.left(); x<=cliprect.right(); x+=ppw)
 	{
 		uint16_t data = 0;
 		int screen_n = layer_n;
@@ -2129,18 +2200,18 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 
 uint32_t hd63484_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int l0 = cliprect.min_y + (BIT(m_dcr, 13) ? m_sp[0] : 0);
+	int l0 = cliprect.top() + (BIT(m_dcr, 13) ? m_sp[0] : 0);
 	int l1 = l0 + m_sp[1];
 	int l2 = l1 + (BIT(m_dcr, 11) ? m_sp[2] : 0);
 
 	if(m_omr & 0x4000)
 	{
-		for(int y=cliprect.min_y; y<=cliprect.max_y; y++)
+		for(int y=cliprect.top(); y<=cliprect.bottom(); y++)
 		{
 			bool ins_window = BIT(m_dcr, 9) && y >= m_vws && y < m_vws+m_vww;
 
-			if (BIT(m_dcr, 13) && y >= cliprect.min_y && y < l0)
-				draw_graphics_line(bitmap, cliprect, cliprect.min_y, y, 0, BIT(m_dcr, 12), ins_window);
+			if (BIT(m_dcr, 13) && y >= cliprect.top() && y < l0)
+				draw_graphics_line(bitmap, cliprect, cliprect.top(), y, 0, BIT(m_dcr, 12), ins_window);
 			else if (y >= l0 && y < l1)
 				draw_graphics_line(bitmap, cliprect, l0, y, 1, BIT(m_dcr, 14), ins_window);
 			else if (BIT(m_dcr, 11) && y >= l1 && y < l2)
@@ -2163,6 +2234,8 @@ void hd63484_device::register_save_state()
 	save_item(NAME(m_pr));
 	save_item(NAME(m_param_ptr));
 	save_item(NAME(m_rwp));
+	save_item(NAME(m_dma_d0));
+	save_item(NAME(m_dma_d1));
 	save_item(NAME(m_rwp_dn));
 	save_item(NAME(m_org_dpa));
 	save_item(NAME(m_org_dn));

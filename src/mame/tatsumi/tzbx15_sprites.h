@@ -31,19 +31,9 @@ private:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	void mycopyrozbitmap_core(bitmap_ind8 &bitmap, const bitmap_rgb32 &srcbitmap,
-			int dstx, int dsty, int srcwidth, int srcheight, int incxx, int incxy, int incyx, int incyy,
-			const rectangle &clip, int transparent_color);
-	void mycopyrozbitmap_core(bitmap_rgb32 &bitmap, const bitmap_rgb32 &srcbitmap,
-			int dstx, int dsty, int srcwidth, int srcheight, int incxx, int incxy, int incyx, int incyy,
-			const rectangle &clip, int transparent_color);
-
 	template<class BitmapClass> void draw_sprites_main(BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank);
-	template<class BitmapClass> void roundupt_drawgfxzoomrotate(
-			BitmapClass &dest_bmp, const rectangle &clip,
-			gfx_element *gfx, uint32_t code, uint32_t color,
-			int flipx, int flipy, uint32_t ssx, uint32_t ssy,
-			int scalex, int scaley, int rotate,
+	template<class BitmapClass> void draw_sprite(BitmapClass &bitmap, const rectangle &cliprect,
+			int index, int color, int x, int y, int scale, int rotate, bool flip_x, bool flip_y,
 			int write_priority_only);
 
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
@@ -55,7 +45,6 @@ private:
 	required_region_ptr<uint8_t> m_sprites_h_rom;
 
 	std::unique_ptr<uint8_t[]> m_shadow_pen_array;
-	bitmap_rgb32 m_temp_bitmap;
 
 	// config
 	int m_rom_clut_size;

@@ -12,22 +12,9 @@
 
     TODO:
 
-    . does not boot
-    . interrupts
-    . vsync interrupt
-    . map ROM to 000000-000007 at boot
-    - NVRAM (= battery backed SRAM) at 0xE40xxx
     - floppy
-    - bitmap display
-    - Z mode read/write
-    - color status write
-    - bitmap roll
-    - overlay roll
-    . keyboard
-    - joystick
     - light pen
-    - memory parity
-    - sync
+    - raster processor (needs rp0a/rp1a/rp2a PROM dumps)
     - disk DMA
     - PIO DMA
     - serial port controller
@@ -54,6 +41,8 @@
 #include "emu.h"
 #include "cgc7900.h"
 #include "speaker.h"
+
+#include <algorithm>
 
 #define VERBOSE 1
 #include "logmacro.h"
@@ -303,6 +292,73 @@ void cgc7900_state::update_interrupts()
 }
 
 /*-------------------------------------------------
+    joystick_r - joystick A/D read
+-------------------------------------------------*/
+
+template <int Axis>
+u16 cgc7900_state::joystick_r()
+{
+	/*
+
+	    bit     description
+
+	     0      A/D data bit 0
+	     1      A/D data bit 1
+	     2      A/D data bit 2
+	     3      A/D data bit 3
+	     4      A/D data bit 4
+	     5      A/D data bit 5
+	     6      A/D data bit 6
+	     7      A/D data bit 7
+	     8      A/D data bit 8
+	     9      A/D data bit 9
+	    10      conversion in progress
+	    11
+	    12
+	    13
+	    14
+	    15
+
+	*/
+
+	bool const busy = m_adc_timer->enabled();
+
+	if (!busy && !machine().side_effects_disabled())
+	{
+		m_adc_axis = Axis;
+		m_adc_timer->adjust(attotime::from_usec(25));
+	}
+
+	return m_adc_data | (busy ? 0x400 : 0);
+}
+
+TIMER_CALLBACK_MEMBER(cgc7900_state::adc_done)
+{
+	m_adc_data = m_joystick[m_adc_axis]->read() & 0x3ff;
+}
+
+/*-------------------------------------------------
+    parity_r - buffer memory parity check
+-------------------------------------------------*/
+
+u16 cgc7900_state::parity_r()
+{
+	return m_parity_error ? 0xfffe : 0xffff;
+}
+
+/*-------------------------------------------------
+    parity_w - buffer memory parity set/reset
+-------------------------------------------------*/
+
+void cgc7900_state::parity_w(u16 data)
+{
+	m_parity_error = BIT(data, 0);
+
+	if (m_parity_error)
+		m_maincpu->trigger_bus_error();
+}
+
+/*-------------------------------------------------
     disk_data_r - disk data read
 -------------------------------------------------*/
 
@@ -375,23 +431,12 @@ void cgc7900_state::cgc7900_mem(address_map &map)
 	map(0x810000, 0x9fffff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 	map(0xa00000, 0xbfffff).rw(FUNC(cgc7900_state::z_mode_r), FUNC(cgc7900_state::z_mode_w));
 	map(0xc00000, 0xdfffff).ram().share("plane_ram");
-	map(0xe00000, 0xe1ffff).w(FUNC(cgc7900_state::color_status_w));
+	map(0xe00000, 0xe1ffff).nopr().w(FUNC(cgc7900_state::color_status_w));
 //  map(0xe20000, 0xe23fff) Raster Processor
-	map(0xe30000, 0xe303ff).ram().share("clut_ram");
-	map(0xe38000, 0xe3bfff).ram().share("overlay_ram");
-	map(0xe40000, 0xe40001).ram().share("roll_bitmap");
-	map(0xe40002, 0xe40003).ram().share("pan_x");
-	map(0xe40004, 0xe40005).ram().share("pan_y");
-	map(0xe40006, 0xe40007).ram().share("zoom");
-	map(0xe40008, 0xe40009).ram();
-	map(0xe4000a, 0xe4000f).ram(); // Raster Processor
-	map(0xe40010, 0xe40011).ram().share("blink_select");
-	map(0xe40012, 0xe40013).ram().share("plane_select");
-	map(0xe40014, 0xe40015).ram().share("plane_switch");
-	map(0xe40016, 0xe40017).ram().share("color_status_fg");
-	map(0xe40018, 0xe40019).ram().share("color_status_bg");
-	map(0xe4001a, 0xe4001b).ram().share("roll_overlay");
-	map(0xe4001c, 0xe40fff).ram();
+	map(0xe30000, 0xe303ff).rw(FUNC(cgc7900_state::clut_r), FUNC(cgc7900_state::clut_w));
+	map(0xe38000, 0xe3bfff).rw(FUNC(cgc7900_state::overlay_r), FUNC(cgc7900_state::overlay_w));
+	map(0xe40000, 0xe40fff).ram().share("nvram");
+	map(0xe40000, 0xe4001f).rw(FUNC(cgc7900_state::latch_r), FUNC(cgc7900_state::latch_w));
 //  map(0xefc440, 0xefc441) HVG Load X
 //  map(0xefc442, 0xefc443) HVG Load Y
 //  map(0xefc444, 0xefc445) HVG Load dX
@@ -401,9 +446,9 @@ void cgc7900_state::cgc7900_mem(address_map &map)
 	map(0xff8000, 0xff8003).rw(m_i8251_0, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xff8040, 0xff8043).rw(m_i8251_1, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xff8080, 0xff8081).rw(FUNC(cgc7900_state::keyboard_r), FUNC(cgc7900_state::keyboard_w));
-//  map(0xff80c6, 0xff80c7) Joystick X axis
-//  map(0xff80ca, 0xff80cb) Joystick Y axis
-//  map(0xff80cc, 0xff80cd) Joystick Z axis
+	map(0xff80c6, 0xff80c7).r(FUNC(cgc7900_state::joystick_r<0>));
+	map(0xff80ca, 0xff80cb).r(FUNC(cgc7900_state::joystick_r<1>));
+	map(0xff80cc, 0xff80cd).r(FUNC(cgc7900_state::joystick_r<2>));
 	map(0xff8100, 0xff8101).rw(FUNC(cgc7900_state::disk_data_r), FUNC(cgc7900_state::disk_data_w));
 	map(0xff8120, 0xff8121).rw(FUNC(cgc7900_state::disk_status_r), FUNC(cgc7900_state::disk_command_w));
 	map(0xff8140, 0xff8141).portr("BEZEL");
@@ -413,8 +458,8 @@ void cgc7900_state::cgc7900_mem(address_map &map)
 //  map(0xff8240, 0xff8241) Light Pen enable
 //  map(0xff8242, 0xff8243) Light Pen X value
 //  map(0xff8244, 0xff8245) Light Pen Y value
-//  map(0xff8246, 0xff8247) Buffer memory parity check
-//  map(0xff8248, 0xff8249) Buffer memory parity set/reset
+	map(0xff8246, 0xff8247).r(FUNC(cgc7900_state::parity_r));
+	map(0xff8248, 0xff8249).w(FUNC(cgc7900_state::parity_w));
 	map(0xff824a, 0xff824b).r(FUNC(cgc7900_state::sync_r));
 	map(0xff83c0, 0xff83c0).w(AY8910_TAG, FUNC(ay8910_device::address_w));
 	map(0xff83c2, 0xff83c2).r(AY8910_TAG, FUNC(ay8910_device::data_r));
@@ -480,10 +525,26 @@ INPUT_PORTS_END
 
 void cgc7900_state::machine_start()
 {
+	m_adc_timer = timer_alloc(FUNC(cgc7900_state::adc_done), this);
+
+	std::fill(std::begin(m_latch), std::end(m_latch), 0);
+	std::fill(std::begin(m_overlay_ram), std::end(m_overlay_ram), 0);
+	std::fill(std::begin(m_clut_ram), std::end(m_clut_ram), 0);
+	update_clut();
+
 	/* register for state saving */
-	save_pointer(NAME(m_overlay_ram.target()), 0x4000);
+	save_item(NAME(m_latch));
+	save_item(NAME(m_overlay_ram));
+	save_item(NAME(m_clut_ram));
+	save_item(NAME(m_blink));
 	save_item(NAME(m_int_mask));
 	save_item(NAME(m_int_active));
+	save_item(NAME(m_adc_data));
+	save_item(NAME(m_adc_axis));
+	save_item(NAME(m_parity_error));
+	save_item(NAME(kbd_mods));
+	save_item(NAME(kbd_data));
+	save_item(NAME(kbd_ready));
 }
 
 void cgc7900_state::machine_reset()
@@ -501,6 +562,8 @@ void cgc7900_state::machine_reset()
 	m_int_active = 0;
 
 	update_interrupts();
+
+	m_parity_error = false;
 }
 
 /***************************************************************************
@@ -534,6 +597,8 @@ void cgc7900_state::cgc7900(machine_config &config)
 	AY8910(config, AY8910_TAG, XTAL(28'480'000)/16).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(cgc7900_state::kbd_put));
 

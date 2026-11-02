@@ -118,6 +118,8 @@ upd3301_device::upd3301_device(const machine_config &mconfig, const char *tag, d
 	, m_display_cb(*this)
 	, m_attr_fetch_cb(*this)
 	, m_width(0)
+	, m_hrtc(0)
+	, m_vrtc(0)
 	, m_status(0)
 	, m_param_count(0)
 	, m_data_fifo_pos(0)
@@ -207,8 +209,6 @@ void upd3301_device::device_reset()
 	m_reverse_display = false;
 	if (!m_write_rvv.isunset())
 		m_write_rvv(m_reverse_display);
-
-	recompute_parameters();
 }
 
 
@@ -832,7 +832,7 @@ void upd3301_device::recompute_parameters()
 	visarea.set(0, (m_h * m_width) - 1, 0, (m_l * m_r) - 1);
 
 	LOGCRTC("Screen: %u x %u @ %f Hz\n", horiz_pix_total, vert_pix_total, refresh.as_hz());
-	LOGCRTC("Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+	LOGCRTC("Visible Area: (%u, %u) - (%u, %u)\n", visarea.left(), visarea.top(), visarea.right(), visarea.bottom());
 
 	screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 

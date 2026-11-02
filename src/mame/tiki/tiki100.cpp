@@ -495,11 +495,11 @@ uint32_t tiki100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	for (int vaddr = cliprect.min_y; vaddr <= cliprect.max_y; vaddr++)
+	for (int vaddr = cliprect.top(); vaddr <= cliprect.bottom(); vaddr++)
 	{
 		// This is at the start of a line
-		int haddr = (cliprect.min_x>>4);
-		int const haddr_end = (cliprect.max_x>>4);
+		int haddr = cliprect.left() >> 4;
+		int const haddr_end = cliprect.right() >> 4;
 		for (; haddr <= haddr_end; haddr++)
 		{
 			// This is at the start of a 16-dot cluster. Changes in m_scroll and m_video_ram come into effect here.

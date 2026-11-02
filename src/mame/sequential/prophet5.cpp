@@ -830,7 +830,7 @@ void prophet5_voice_device::device_add_mconfig(machine_config &config)
 	const double cp_f = jittered(CAP_P(150), m_jitter[4], 5);  // C4151 (5%, poly)
 	CEM3320_LPF4(config, m_vcf, cp_f)  // U469
 		.configure_resonance(RES_K(200), RES_K(51), RES_K(3), VCF_OUT_GAIN)  // R4414, R4416, R4415
-		.add_route(0, "vcf_dcblock", 1.0);
+		.add_route(cem3320_lpf4_device::OUTPUT_LPF4, "vcf_dcblock", 1.0);
 	FILTER_RC(config, "vcf_dcblock")
 		.set_rc(filter_rc_device::HIGHPASS, RES_K(68), 0, 0, CAP_U(2.2))  // R4460, C4164 (tantalum, 20%)
 		.add_route(0, m_vca, VCF_OUT_GAIN);

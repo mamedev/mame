@@ -13,6 +13,8 @@
 
 #include "ctrl.h"
 
+#include "machine/quadmouse.h"
+
 
 
 //**************************************************************************
@@ -32,11 +34,12 @@ public:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	ioport_value keypad_r();
-	DECLARE_INPUT_CHANGED_MEMBER( slider_w );
 
 protected:
 	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_vcs_control_port_interface overrides
 	virtual uint8_t joy_r() override;
@@ -45,6 +48,12 @@ private:
 	required_ioport m_io_common0;
 	required_ioport m_io_common1;
 	required_ioport m_io_keypad;
+	required_device<quadencoder_device> m_encoder;
+
+	uint8_t m_mn;
+	uint8_t m_pl;
+
+	void mn_w(int state);
 };
 
 

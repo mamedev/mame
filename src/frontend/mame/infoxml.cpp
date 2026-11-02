@@ -1339,11 +1339,11 @@ void output_display(std::ostream &out, device_t &device, machine_flags::type con
 
 				util::stream_format(out, " pixclock=\"%d\"", pixclock);
 				util::stream_format(out, " htotal=\"%d\"", output_as_screen->width());
-				util::stream_format(out, " hbend=\"%d\"", output_as_screen->visible_area().min_x);
-				util::stream_format(out, " hbstart=\"%d\"", output_as_screen->visible_area().max_x+1);
+				util::stream_format(out, " hbend=\"%d\"", output_as_screen->visible_area().left());
+				util::stream_format(out, " hbstart=\"%d\"", output_as_screen->visible_area().right()+1);
 				util::stream_format(out, " vtotal=\"%d\"", output_as_screen->height());
-				util::stream_format(out, " vbend=\"%d\"", output_as_screen->visible_area().min_y);
-				util::stream_format(out, " vbstart=\"%d\"", output_as_screen->visible_area().max_y+1);
+				util::stream_format(out, " vbend=\"%d\"", output_as_screen->visible_area().top());
+				util::stream_format(out, " vbstart=\"%d\"", output_as_screen->visible_area().bottom()+1);
 			}
 			out << " />\n";
 		}

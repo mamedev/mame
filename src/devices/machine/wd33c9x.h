@@ -104,7 +104,6 @@ private:
 	bool m_drq_state;
 
 	void delay(uint32_t cycles);
-	void delay_cycles(uint32_t cycles);
 	emu_timer *m_timer;
 
 	bool set_command_length(const uint8_t cc);

@@ -113,12 +113,13 @@ void miconkit_state::machine_start()
 
 u32 miconkit_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		auto *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int pixel = BIT(m_vram[(y << 4 & 0xfe0) | (x >> 3 & 0x1f)], x & 7);
-			bitmap.pix(y, x) = pixel ? rgb_t::white() : rgb_t::black();
+			dst[x] = pixel ? rgb_t::white() : rgb_t::black();
 		}
 	}
 

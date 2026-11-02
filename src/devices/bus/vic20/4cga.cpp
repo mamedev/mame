@@ -77,6 +77,8 @@ void c64_4cga_device::device_start()
 {
 	// state saving
 	save_item(NAME(m_port));
+	save_item(NAME(m_joy3));
+	save_item(NAME(m_joy4));
 }
 
 //-------------------------------------------------

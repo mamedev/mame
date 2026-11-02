@@ -39,6 +39,7 @@
 #include "emu.h"
 #include "meb_intrf.h"
 
+#include "meb_3n1.h"
 #include "meb_rtime.h"
 
 //**************************************************************************
@@ -183,5 +184,6 @@ void device_distomeb_interface::set_cart_value(int value)
 void disto_meb_add_basic_devices(device_slot_interface &device)
 {
 	// basic devices
+	device.option_add("3n1", DISTOMEB_3N1);
 	device.option_add("rtime", DISTOMEB_RTIME);
 }

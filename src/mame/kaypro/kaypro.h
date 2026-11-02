@@ -16,7 +16,6 @@
 #include "machine/mm58167.h"
 #include "machine/wd_fdc.h"
 #include "machine/wd1010.h"
-#include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -37,7 +36,6 @@ public:
 		, m_bankr(*this, "bankr")
 		, m_bankw(*this, "bankw")
 		, m_bank3(*this, "bank3")
-		, m_floppy_timer(*this, "floppy_timer")
 		, m_leds(*this, "led%c", unsigned('A'))
 	{ }
 
@@ -51,7 +49,8 @@ protected:
 	void kaypro_map(address_map &map) ATTR_COLD;
 
 	void write_centronics_busy(int state);
-	TIMER_DEVICE_CALLBACK_MEMBER(floppy_timer);
+	void cpu_halt_w(int state);
+	void update_nmi();
 	void fdc_intrq_w(int state);
 	void fdc_drq_w(int state);
 	static void floppy_formats(format_registration &fr);
@@ -64,7 +63,7 @@ protected:
 	std::unique_ptr<u8[]> m_vram; // video ram
 	std::unique_ptr<u8[]> m_dummy;  // black hole for write to rom
 	int m_centronics_busy = 0;
-	bool m_is_motor_off = false;
+	bool m_cpu_halted = false;
 	u8 m_fdc_rq = 0U;
 	u8 m_system_port = 0U;
 	floppy_image_device *m_floppy = nullptr;
@@ -81,7 +80,6 @@ protected:
 	required_memory_bank m_bankr;
 	required_memory_bank m_bankw;
 	required_memory_bank m_bank3;
-	required_device<timer_device> m_floppy_timer;
 	output_finder<2> m_leds;
 };
 

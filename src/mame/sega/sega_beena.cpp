@@ -192,14 +192,14 @@ protected:
 	static inline constexpr uint32_t ROM_MASK_BASE = 0x80000000;
 	static inline constexpr uint32_t ROM_FLASH_BASE = 0xa0000000;
 
-	void sega_9h0_0008(machine_config &config);
+	void sega_9h0_0008(machine_config &config) ATTR_COLD;
 
 	virtual void device_post_load() override;
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-	virtual void install_game_rom();
+	virtual void install_game_rom() ATTR_COLD;
 	virtual void update_sensors(offs_t offset);
 
 	void beena_arm7_map(address_map &map) ATTR_COLD;
@@ -1434,16 +1434,10 @@ void sega_9h0_0008_state::draw_layer_scanlines(
 					// Redo the x-axis visible area adjustment
 					dst_x -= 10 * tile_factor;
 
-					if (dst_x * m_scale < cliprect.min_x
-						|| dst_x * m_scale > cliprect.max_x
-						|| dst_y * m_scale < cliprect.min_y
-						|| dst_y * m_scale > cliprect.max_y) {
+					if (!cliprect.contains(dst_x * m_scale, dst_y * m_scale)) {
 						continue; // Skip beyond screen size
 					}
-					if (src_x < m_cache_layer.cliprect().min_x
-						|| src_x > m_cache_layer.cliprect().max_x
-						|| src_y < m_cache_layer.cliprect().min_y
-						|| src_y > m_cache_layer.cliprect().max_y) {
+					if (!m_cache_layer.cliprect().contains(src_x, src_y)) {
 						continue; // Skip beyond cache size
 					}
 
@@ -1490,8 +1484,8 @@ void sega_9h0_0008_state::draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cli
 			if (color == 0
 					|| y >= bitmap_clip_h * m_scale
 					|| x >= bitmap_clip_w * m_scale
-					|| y + bitmap_scroll_y * m_scale > cliprect.max_y
-					|| x + bitmap_scroll_x * m_scale > cliprect.max_x) {
+					|| y + bitmap_scroll_y * m_scale > cliprect.bottom()
+					|| x + bitmap_scroll_x * m_scale > cliprect.right()) {
 				continue;
 			}
 
@@ -1659,8 +1653,8 @@ void sega_9h0_0008_state::screen_blend(bitmap_rgb32 &bitmap, const rectangle &cl
 	uint8_t blend_b = alpha_b_step < 0x20 ? 0xff : 0;
 	uint32_t blend_rgb = blend_b | (blend_g << 8) | (blend_r << 16);
 
-	for (size_t y = cliprect.min_y; y <= cliprect.max_y; y++) {
-		for (size_t x = cliprect.min_x; x <= cliprect.max_x; x++) {
+	for (size_t y = cliprect.top(); y <= cliprect.bottom(); y++) {
+		for (size_t x = cliprect.left(); x <= cliprect.right(); x++) {
 			uint32_t *dst = &bitmap.pix(y, x);
 			*dst = alpha_blend_rgb_levels(blend_rgb, *dst, alpha_b, alpha_r, alpha_g);
 		}
@@ -1787,7 +1781,7 @@ public:
 		, m_io_pen_y(*this, "PENY")
 	{ }
 
-	void sega_beena(machine_config &config);
+	void sega_beena(machine_config &config) ATTR_COLD;
 
 	virtual float pen_y_mapper(float linear_value);
 
@@ -1795,7 +1789,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	virtual void install_game_rom() override;
+	virtual void install_game_rom() override ATTR_COLD;
 	virtual uint32_t io_expansion_r() override;
 	virtual void update_crosshair(screen_device &screen) override;
 	virtual void update_sensors(offs_t offset) override;
@@ -2035,12 +2029,12 @@ public:
 		, m_io_buttons(*this, "BUTTONS")
 	{ }
 
-	void tvochken(machine_config &config);
+	void tvochken(machine_config &config) ATTR_COLD;
 
 	virtual uint32_t io_expansion_r() override;
 
 private:
-	virtual void install_game_rom() override;
+	virtual void install_game_rom() override ATTR_COLD;
 
 	required_device<sega_9h0_0008_card_device> m_card;
 	required_ioport m_io_buttons;
@@ -2103,12 +2097,12 @@ public:
 		, m_io_buttons(*this, "BUTTONS")
 	{ }
 
-	void carbeena(machine_config &config);
+	void carbeena(machine_config &config) ATTR_COLD;
 
 	virtual uint32_t io_expansion_r() override;
 
 private:
-	virtual void install_game_rom() override;
+	virtual void install_game_rom() override ATTR_COLD;
 
 	required_ioport m_io_buttons;
 };

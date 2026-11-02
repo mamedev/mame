@@ -2416,6 +2416,26 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_tr
 }
 
 
+bool floppy_image_format_t::find_gcr5_data_block(const uint32_t *hblk, uint32_t hblk_count, const uint32_t *dblk, uint32_t dblk_count, uint32_t index, uint32_t track_size, uint32_t &pos)
+{
+	uint32_t const next = (index + 1 < hblk_count) ? hblk[index + 1] : (hblk[0] + track_size);
+	uint32_t const *const data = std::upper_bound(dblk, dblk + dblk_count, hblk[index]);
+
+	uint32_t start;
+	if(data != dblk + dblk_count)
+		start = *data;
+	else if(dblk_count)
+		start = dblk[0] + track_size;
+	else
+		return false;
+
+	if(start >= next)
+		return false;
+
+	pos = start % track_size;
+	return true;
+}
+
 std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bitstream_gcr5(const std::vector<bool> &bitstream, int head, int tracks)
 {
 	std::vector<std::vector<uint8_t>> sectors;
@@ -2475,7 +2495,8 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bi
 			continue;
 		}
 
-		pos = dblk[i];
+		if(!find_gcr5_data_block(hblk, hblk_count, dblk, dblk_count, i, bitstream.size(), pos))
+			continue;
 		block_id = sbyte_gcr5_r(bitstream, pos);
 
 		if (track > tracks) track -= tracks;
@@ -2550,7 +2571,8 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bi
 		[[maybe_unused]] uint8_t track = sbyte_gcr5_r(bitstream, pos);
 		uint8_t sector = sbyte_gcr5_r(bitstream, pos);
 
-		pos = dblk[i];
+		if(!find_gcr5_data_block(hblk, hblk_count, dblk, dblk_count, i, bitstream.size(), pos))
+			continue;
 		block_id = sbyte_gcr5_r(bitstream, pos);
 
 		if(sectors.size() <= sector)

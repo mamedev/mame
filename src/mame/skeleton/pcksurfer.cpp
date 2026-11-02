@@ -69,7 +69,7 @@ INPUT_PORTS_END
 void pcksurfer_state::pcksurfer(machine_config &config)
 {
 	// Basic machine hardware
-	ARM7(config, m_maincpu, 76'205'000); // Sharp LH79524-NOF (BGA-208)
+	ARM720T(config, m_maincpu, 76'205'000); // Sharp LH79524-NOF (BGA-208)
 }
 
 // ROM definitions

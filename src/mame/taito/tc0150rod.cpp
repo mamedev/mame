@@ -233,10 +233,10 @@ void tc0150rod_device::draw( bitmap_ind16 &bitmap, const rectangle &cliprect, in
 	int left_edge, right_edge, begin, end, right_over, left_over;
 	int line_needs_drawing, draw_top_road_line, background_only;
 
-	int min_x = cliprect.min_x;
-	int max_x = cliprect.max_x;
-	int min_y = cliprect.min_y;
-	int max_y = cliprect.max_y;
+	int min_x = cliprect.left();
+	int max_x = cliprect.right();
+	int min_y = cliprect.top();
+	int max_y = cliprect.bottom();
 	int screen_width = max_x - min_x + 1;
 
 	int y = min_y;

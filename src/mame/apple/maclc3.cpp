@@ -122,11 +122,8 @@ private:
 		m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
 	}
 
-	void cuda_reset_w(int state)
-	{
-		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
-		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
-	}
+	void cuda_reset_w(int state);
+	void cuda_power_w(int state);
 };
 
 void macvail_state::machine_start()
@@ -139,6 +136,20 @@ void macvail_state::machine_reset()
 	if (m_config)
 	{
 		m_maincpu->set_fpu_enable(BIT(m_config->read(), 0));
+	}
+}
+
+void macvail_state::cuda_reset_w(int state)
+{
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
+}
+
+void macvail_state::cuda_power_w(int state)
+{
+	if (state)
+	{
+		machine().schedule_exit();
 	}
 }
 
@@ -382,6 +393,7 @@ void macvail_state::maclc520(machine_config &config)
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->set_default_bios_tag("341s0060");
 	m_cuda->reset_callback().set(FUNC(macvail_state::cuda_reset_w));
+	m_cuda->poweroff_callback().set(FUNC(macvail_state::cuda_power_w));
 	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_cuda->via_clock_callback().set(m_sonora, FUNC(sonora_device::cb1_w));
 	m_cuda->via_data_callback().set(m_sonora, FUNC(sonora_device::cb2_w));

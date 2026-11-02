@@ -13,11 +13,15 @@
 
 #include "scsihd.h"
 
+#include "bus/nscsi/s1410.h"
+
 class s1410_device : public scsihd_device
 {
 public:
 	// construction/destruction
 	s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static auto parent_rom_device_type() { return &NSCSI_S1410; }
 
 protected:
 	// optional information overrides

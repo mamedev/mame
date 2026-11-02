@@ -99,7 +99,13 @@ public:
 	void step_bgcolor_w(uint8_t data);
 	void tone_latch_w(uint8_t data);
 
+	int int_r() { return m_int; }
+	int dma_out_r() { return m_dmaout; }
+	int efx_r() { return m_efx; }
+
 	void dma_w(uint8_t data);
+	void tpa_w(int state);
+	void sc_w(uint8_t data);
 
 	void con_w(int state);
 	void aoe_w(int state);
@@ -116,12 +122,15 @@ protected:
 	// internal callbacks
 	virtual void sound_stream_update(sound_stream &stream) override;
 
-	TIMER_CALLBACK_MEMBER(int_tick);
-	TIMER_CALLBACK_MEMBER(efx_tick);
-	TIMER_CALLBACK_MEMBER(dma_tick);
-
 private:
+	static constexpr unsigned CYCLES_PER_LINE   = 14;
+	static constexpr unsigned CYCLE_DMA_START   = 2;
+	static constexpr unsigned CYCLE_DMA_END     = 10;
+
 	void initialize_palette();
+	void set_int(int state);
+	void set_dma_out(int state);
+	void set_efx(int state);
 
 	static constexpr int bckgnd[4] = { 2, 0, 4, 1 };
 
@@ -146,6 +155,8 @@ private:
 	rgb_t m_palette[16];
 	int m_disp;                     // display on
 	int m_dmaout;                   // DMA request active
+	int m_int;
+	int m_efx;
 	int m_bgcolor;                  // background color
 	bool m_con;                     // color on
 
@@ -155,10 +166,12 @@ private:
 	sound_stream::sample_t m_signal; // current signal
 	int m_incr;                     // initial wave state
 
-	// timers
-	emu_timer *m_int_timer;
-	emu_timer *m_efx_timer;
-	emu_timer *m_dma_timer;
+	int m_tpa;
+	uint8_t m_sc;
+	uint16_t m_line;
+	uint8_t m_cycle;
+	uint16_t m_next_line;
+	uint8_t m_next_cycle;
 };
 
 

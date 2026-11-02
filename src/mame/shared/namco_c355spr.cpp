@@ -147,30 +147,30 @@ void namco_c355spr_device::zdrawgfxzoom(
 			y_index = 0;
 		}
 
-		if (hpos < clip.min_x)
+		if (hpos < clip.left())
 		{
 			// clip left
-			int pixels = clip.min_x - hpos;
+			int pixels = clip.left() - hpos;
 			hpos += pixels;
 			x_index_base += pixels * dx;
 		}
-		if (vpos < clip.min_y)
+		if (vpos < clip.top())
 		{
 			// clip top
-			int pixels = clip.min_y - vpos;
+			int pixels = clip.top() - vpos;
 			vpos += pixels;
 			y_index += pixels * dy;
 		}
-		if (ex > clip.max_x + 1)
+		if (ex > clip.right() + 1)
 		{
 			// clip right
-			int pixels = ex - clip.max_x - 1;
+			int pixels = ex - clip.right() - 1;
 			ex -= pixels;
 		}
-		if (ey > clip.max_y + 1)
+		if (ey > clip.bottom() + 1)
 		{
 			// clip bottom
-			int pixels = ey - clip.max_y - 1;
+			int pixels = ey - clip.bottom() - 1;
 			ey -= pixels;
 		}
 
@@ -209,12 +209,12 @@ bool namco_c355spr_device::default_mix(u16 &dest, u8 &destpri, u16 colbase, u16 
 
 void namco_c355spr_device::copybitmap(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, int pri)
 {
-	for (int y = clip.min_y; y <= clip.max_y; y++)
+	for (int y = clip.top(); y <= clip.bottom(); y++)
 	{
 		u16 *const src = &m_renderbitmap.pix(y);
 		u16 *const dest = &dest_bmp.pix(y);
 		u8 *const destpri = &screen.priority().pix(y);
-		for (int x = clip.min_x; x <= clip.max_x; x++)
+		for (int x = clip.left(); x <= clip.right(); x++)
 		{
 			if (src[x] != 0xffff)
 			{
@@ -230,13 +230,13 @@ void namco_c355spr_device::copybitmap(screen_device &screen, bitmap_rgb32 &dest_
 {
 	device_palette_interface &palette = gfx(0)->palette();
 	const pen_t *pal = palette.pens();
-	for (int y = clip.min_y; y <= clip.max_y; y++)
+	for (int y = clip.top(); y <= clip.bottom(); y++)
 	{
 		u16 *const src = &m_renderbitmap.pix(y);
 		u16 *const srcrender = &m_screenbitmap.pix(y);
 		u32 *const dest = &dest_bmp.pix(y);
 		u8 *const destpri = &screen.priority().pix(y);
-		for (int x = clip.min_x; x <= clip.max_x; x++)
+		for (int x = clip.left(); x <= clip.right(); x++)
 		{
 			if (src[x] != 0xffff)
 			{

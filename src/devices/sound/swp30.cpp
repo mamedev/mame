@@ -448,7 +448,7 @@ void swp30_device::streaming_block::read_16(memory_access<25, 2, -2, ENDIANNESS_
 		// 32103210 32103210 32103210
 		// bbbbaaaa ddddcccc ........
 		u32 l0 = wave.read_dword(adr);
-		u32 l1 = wave.read_dword(adr);
+		u32 l1 = wave.read_dword(adr+1);
 		val0 = l0;
 		val1 = l0 >> 16;
 		val2 = l1;
@@ -751,7 +751,11 @@ std::pair<s16, bool> swp30_device::streaming_block::step(memory_access<25, 2, -2
 				if(m_pos_dec >= 0x8000)
 					m_pos ++;
 				m_pos_dec &= 0x7fff;
-				m_dpcm_pos = 3;
+				// The loop end is followed by a copy of the first three deltas,
+				// so decoding carries on from where it had got to.  Restarting
+				// at 3 drops a delta whenever the position crossed the loop
+				// point by two samples.
+				m_dpcm_pos -= m_loop_size;
 			} else {
 				m_done = true;
 				m_last = result;
@@ -1730,8 +1734,7 @@ swp30_device::swp30_device(const machine_config &mconfig, const char *tag, devic
 	  m_program_config("meg_program", ENDIANNESS_LITTLE, 64, 9, -3, address_map_constructor(FUNC(swp30_device::meg_prg_map), this)),
 	  m_wave_config("wave", ENDIANNESS_LITTLE, 32, 25, -2),
 	  m_reverb_config("reverb_ram", ENDIANNESS_LITTLE, 16, 18, -1, address_map_constructor(FUNC(swp30_device::meg_reverb_map), this)),
-	  m_sintab(*this, "sintab"),
-	  m_drccache(32*1024*1024 + sizeof(meg_state))
+	  m_sintab(*this, "sintab")
 {
 }
 
@@ -1744,8 +1747,9 @@ void swp30_device::device_start()
 	m_wave->cache(m_wave_cache);
 	m_reverb->cache(m_reverb_cache);
 
-	m_drccache.allocate_cache(mconfig().options().drc_rwx());
-	m_meg = m_drccache.alloc_near<meg_state>();
+	m_drcuml = std::make_unique<drcuml_state>(*this, 32*1024*1024 + sizeof(meg_state));
+	m_drcuml->initialize(0, 1, 9, 0, 0);
+	m_meg = m_drcuml->cache_alloc_near<meg_state>();
 	m_meg->m_swp = this;
 	m_meg->reset();
 
@@ -1759,7 +1763,6 @@ void swp30_device::device_start()
 
 	// SWP30 compiles the entire MEG program as one block, so the max sequence length is
 	// passed as 0 bytes.  In the unlikely event that changes, this should be updated.
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_drccache, 0, 1, 9, 0, 0);
 	m_drcuml->symbol_add(&m_meg->m_pc,          sizeof(m_meg->m_pc),          "pc");
 	m_drcuml->symbol_add(&m_meg->m_icount,      sizeof(m_meg->m_icount),      "icount");
 	m_drcuml->symbol_add(&m_meg->m_program,     sizeof(m_meg->m_program),     "program");
@@ -2762,7 +2765,9 @@ s32 swp30_device::mixer_att(s32 sample, s32 att)
 {
 	if(att >= 0xff)
 		return 0;
-	return (sample - ((sample * (att & 0xf)) >> 4)) >> (att >> 4);
+	// The low nibble is in 1/32 steps: 0x0f reaches 17/32, just short of
+	// the next octave (0x10 = 1/2).
+	return (sample - ((sample * (att & 0xf)) >> 5)) >> (att >> 4);
 }
 
 void swp30_device::mixer_step(const std::array<s32, 0x40> &samples_per_chan)
@@ -3799,7 +3804,12 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 	}
 
 	if(BIT(opcode, 0x3d)) {
-		UML_DSAR(block, I0, mem(&m_p), 15);
+		// m_p / 32768, truncated towards zero
+		UML_DMOV(block, I0, mem(&m_p));
+		UML_DSAR(block, I1, I0, 63);
+		UML_DAND(block, I1, I1, 0x7fff);
+		UML_DADD(block, I0, I0, I1);
+		UML_DSAR(block, I0, I0, 15);
 		UML_MOV(block, mem(&m_memw_value[index2]), I0);
 	}
 
@@ -4003,7 +4013,10 @@ void swp30_device::meg_state::step()
 
 	if(BIT(opcode, 0x3d)) {
 		m_memw_active[m_delay_2] = true;
-		m_memw_value[m_delay_2] = m_p >> 15;
+		// Truncated towards zero, like pack24.  Rounding down keeps
+		// negative values from ever decaying to zero in a feedback loop,
+		// and a reverb goes on ringing after its input has stopped.
+		m_memw_value[m_delay_2] = m_p / 32768;
 	} else
 		m_memw_active[m_delay_2] = false;
 

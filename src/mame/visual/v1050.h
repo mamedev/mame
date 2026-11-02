@@ -149,6 +149,8 @@ private:
 	void pic_int_w(int state);
 	void disp_ppi_pc_w(uint8_t data);
 	void m6502_ppi_pc_w(uint8_t data);
+	TIMER_CALLBACK_MEMBER(disp_ppi_pc_sync);
+	TIMER_CALLBACK_MEMBER(m6502_ppi_pc_sync);
 	uint8_t misc_ppi_pc_r();
 	IRQ_CALLBACK_MEMBER(v1050_int_ack);
 
@@ -214,7 +216,7 @@ private:
 	// serial state
 	int m_rxrdy = 0;                // receiver ready
 	int m_txrdy = 0;                // transmitter ready
-	int m_baud_sel = 0;             // baud select
+	int m_baud_sel = -1;            // baud select
 
 	// memory state
 	uint8_t m_bank = 0;               // bank register

@@ -880,6 +880,7 @@ void sega8_cart_slot_device::internal_header_logging(const uint8_t *ROM, uint32_
 #include "rom.h"
 #include "ccatch.h"
 #include "mgear.h"
+#include "sf7000.h"
 
 void sg1000_cart(device_slot_interface &device)
 {
@@ -894,6 +895,12 @@ void sg1000_cart(device_slot_interface &device)
 	device.option_add_internal("cardcatcher",  SEGA8_ROM_CARDCATCH);
 	device.option_add_internal("multicart",  SEGA8_ROM_MULTICART);
 	device.option_add_internal("megacart",  SEGA8_ROM_MEGACART);
+}
+
+void sc3000_cart(device_slot_interface &device)
+{
+	sg1000_cart(device);
+	device.option_add("sf7000",  SEGA8_SF7000);
 }
 
 void sg1000mk3_cart(device_slot_interface &device)

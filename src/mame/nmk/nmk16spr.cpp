@@ -112,19 +112,19 @@ void nmk_16bit_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &
 		// restrict to cliprect
 		if (m_flip_screen)
 		{
-			if (sx < cliprect.min_x - 0xf) sx += xpos_max;
-			if (sx > cliprect.max_x)
+			if (sx < cliprect.left() - 0xf) sx += xpos_max;
+			if (sx > cliprect.right())
 			{
-				const int pixels = (sx - cliprect.max_x) / 16;
+				const int pixels = (sx - cliprect.right()) / 16;
 				code += pixels;
 				sx += pixels * xinc;
 				xx_base -= pixels;
 			}
 
-			if (sy < cliprect.min_y - 0xf) sy += ypos_max;
-			if (sy > cliprect.max_y)
+			if (sy < cliprect.top() - 0xf) sy += ypos_max;
+			if (sy > cliprect.bottom())
 			{
-				const int pixels = (sy - cliprect.max_y) / 16;
+				const int pixels = (sy - cliprect.bottom()) / 16;
 				code += pixels * (w + 1);
 				sy += pixels * yinc;
 				yy -= pixels;
@@ -132,19 +132,19 @@ void nmk_16bit_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &
 		}
 		else
 		{
-			if (sx > cliprect.max_x) sx -= xpos_max;
-			if (sx < cliprect.min_x - 0xf)
+			if (sx > cliprect.right()) sx -= xpos_max;
+			if (sx < cliprect.left() - 0xf)
 			{
-				const int pixels = ((cliprect.min_x - 0xf) - sx) / 16;
+				const int pixels = ((cliprect.left() - 0xf) - sx) / 16;
 				code += pixels;
 				sx += pixels * xinc;
 				xx_base -= pixels;
 			}
 
-			if (sy > cliprect.max_y) sy -= ypos_max;
-			if (sy < cliprect.min_y - 0xf)
+			if (sy > cliprect.bottom()) sy -= ypos_max;
+			if (sy < cliprect.top() - 0xf)
 			{
-				const int pixels = ((cliprect.min_y - 0xf) - sy) / 16;
+				const int pixels = ((cliprect.top() - 0xf) - sy) / 16;
 				code += pixels * (w + 1);
 				sy += pixels * yinc;
 				yy -= pixels;
@@ -159,10 +159,10 @@ void nmk_16bit_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &
 			// wraparound Y
 			if (yinc > 0)
 			{
-				if (sy > cliprect.max_y) sy -= ypos_max;
-				if (sy < cliprect.min_y - 0xf)
+				if (sy > cliprect.bottom()) sy -= ypos_max;
+				if (sy < cliprect.top() - 0xf)
 				{
-					const int pixels = ((cliprect.min_y - 0xf) - sy) / 16;
+					const int pixels = ((cliprect.top() - 0xf) - sy) / 16;
 					code += pixels * (w + 1);
 					sy += pixels * yinc;
 					yy -= pixels;
@@ -170,10 +170,10 @@ void nmk_16bit_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &
 			}
 			else if (yinc < 0)
 			{
-				if (sy < cliprect.min_y - 0xf) sy += ypos_max;
-				if (sy > cliprect.max_y)
+				if (sy < cliprect.top() - 0xf) sy += ypos_max;
+				if (sy > cliprect.bottom())
 				{
-					const int pixels = (sy - cliprect.max_y) / 16;
+					const int pixels = (sy - cliprect.bottom()) / 16;
 					code += pixels * (w + 1);
 					sy += pixels * yinc;
 					yy -= pixels;
@@ -190,10 +190,10 @@ void nmk_16bit_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &
 				// wraparound X
 				if (xinc > 0)
 				{
-					if (x > cliprect.max_x) x -= xpos_max;
-					if (x < cliprect.min_x - 0xf)
+					if (x > cliprect.right()) x -= xpos_max;
+					if (x < cliprect.left() - 0xf)
 					{
-						const int pixels = ((cliprect.min_x - 0xf) - x) / 16;
+						const int pixels = ((cliprect.left() - 0xf) - x) / 16;
 						codecol += pixels;
 						x += pixels * xinc;
 						xx -= pixels;
@@ -201,10 +201,10 @@ void nmk_16bit_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &
 				}
 				else if (xinc < 0)
 				{
-					if (x < cliprect.min_x - 0xf) x += xpos_max;
-					if (x > cliprect.max_x)
+					if (x < cliprect.left() - 0xf) x += xpos_max;
+					if (x > cliprect.right())
 					{
-						const int pixels = (x - cliprect.max_x) / 16;
+						const int pixels = (x - cliprect.right()) / 16;
 						codecol += pixels;
 						x += pixels * xinc;
 						xx -= pixels;

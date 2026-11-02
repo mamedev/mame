@@ -45,7 +45,7 @@ cdp1852_device::cdp1852_device(const machine_config &mconfig, const char *tag, d
 	m_write_sr(*this),
 	m_read_data(*this, 0),
 	m_write_data(*this),
-	m_new_data(false), m_data(0),
+	m_mode(false), m_new_data(false), m_data(0),
 	m_clock_active(true), m_sr(false), m_next_sr(false),
 	m_update_do_timer(nullptr),
 	m_update_sr_timer(nullptr)
@@ -59,6 +59,8 @@ cdp1852_device::cdp1852_device(const machine_config &mconfig, const char *tag, d
 
 void cdp1852_device::device_start()
 {
+	m_mode = m_read_mode();
+
 	// allocate timers
 	m_update_do_timer = timer_alloc(FUNC(cdp1852_device::update_do), this);
 	m_update_sr_timer = timer_alloc(FUNC(cdp1852_device::update_sr), this);
@@ -81,19 +83,15 @@ void cdp1852_device::device_reset()
 	// reset data register
 	m_data = 0;
 
-	if (!m_read_mode())
-	{
-		// reset service request flip-flop
-		set_sr_line(true);
-	}
-	else
+	if (m_mode)
 	{
 		// output data
 		m_write_data((offs_t)0, m_data);
-
-		// reset service request flip-flop
-		set_sr_line(false);
 	}
+
+	// reset service request flip-flop
+	m_sr = !m_mode;
+	m_update_sr_timer->adjust(attotime::zero);
 }
 
 
@@ -108,31 +106,39 @@ void cdp1852_device::clock_w(int state)
 
 	m_clock_active = bool(state);
 
-	if (!state)
-	{
-		if (!m_read_mode())
-		{
-			// input data into register
-			m_data = m_read_data(0);
+	if (!state && (!m_mode || m_new_data || (m_sr != m_next_sr)))
+		clock_falling();
+}
 
-			// signal processor
-			set_sr_line(false);
+
+//-------------------------------------------------
+//  clock_falling - clock falling edge
+//-------------------------------------------------
+
+void cdp1852_device::clock_falling()
+{
+	if (!m_mode)
+	{
+		// input data into register
+		m_data = m_read_data(0);
+
+		// signal processor
+		set_sr_line(false);
+	}
+	else
+	{
+		if (m_new_data)
+		{
+			m_new_data = false;
+
+			// signal peripheral device
+			set_sr_line(true);
+
+			m_next_sr = false;
 		}
 		else
 		{
-			if (m_new_data)
-			{
-				m_new_data = false;
-
-				// signal peripheral device
-				set_sr_line(true);
-
-				m_next_sr = false;
-			}
-			else
-			{
-				set_sr_line(m_next_sr);
-			}
+			set_sr_line(m_next_sr);
 		}
 	}
 }
@@ -159,7 +165,7 @@ void cdp1852_device::set_sr_line(bool state)
 
 TIMER_CALLBACK_MEMBER(cdp1852_device::update_do)
 {
-	if (!m_read_mode())
+	if (!m_mode)
 	{
 		// input data into register
 		m_data = param;
@@ -190,7 +196,7 @@ TIMER_CALLBACK_MEMBER(cdp1852_device::update_sr)
 
 uint8_t cdp1852_device::read()
 {
-	if (!m_read_mode() && m_clock_active)
+	if (!m_mode && m_clock_active)
 	{
 		// input data into register
 		m_data = m_read_data(0);
@@ -208,7 +214,7 @@ uint8_t cdp1852_device::read()
 
 void cdp1852_device::write(uint8_t data)
 {
-	if (m_read_mode() && m_clock_active)
+	if (m_mode && m_clock_active)
 	{
 		// output data
 		m_update_do_timer->adjust(attotime::zero, data);
@@ -225,7 +231,7 @@ void cdp1852_device::write(uint8_t data)
 
 void cdp1852_device::write_strobe(uint8_t data)
 {
-	if (!m_read_mode())
+	if (!m_mode)
 	{
 		// output data
 		m_update_do_timer->adjust(attotime::zero, data);

@@ -33,7 +33,6 @@
 
     - Kaypro 2x, 4a: floppy not working "No operating system present on this disk"
     - Kaypro 10: Boots from floppy, but needs hard drive added.
-    - "Univeral"-ROM 81-478A: Boots, but fails with CP/M "BDOS Error on A:", was working until MAME v0190
     - fix Kayplus 84 ROM screen corruption
     - Kaypro iip88, 484p88: works as a normal Kaypro 4, extra hardware not done
     - Kaypro Robie: has twin 2.6MB 5.25 floppy drives which we don't support, no software available
@@ -314,14 +313,13 @@ void kayproii_state::kayproii(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &kayproii_state::kaypro_map);
 	m_maincpu->set_addrmap(AS_IO, &kayproii_state::kayproii_io);
 	m_maincpu->set_daisy_config(kayproii_daisy_chain);
+	m_maincpu->halt_cb().set(FUNC(kayproii_state::cpu_halt_w));
 
 	/* video hardware */
 	SCREEN(config, m_screen).set_color(rgb_t::green());
 	m_screen->set_raw(13.9776_MHz_XTAL, 128 * 7, 0, 80 * 7, 260, 0, 240);
 	m_screen->set_screen_update(FUNC(kayproii_state::screen_update_kayproii));
 	m_screen->set_palette(m_palette);
-
-	TIMER(config, m_floppy_timer).configure_generic(FUNC(kayproii_state::floppy_timer));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_kayproii);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
@@ -403,13 +401,12 @@ void kaypro84_state::kaypro484(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &kaypro84_state::kaypro_map);
 	m_maincpu->set_addrmap(AS_IO, &kaypro84_state::kaypro484_io);
 	m_maincpu->set_daisy_config(kaypro484_daisy_chain);
+	m_maincpu->halt_cb().set(FUNC(kaypro84_state::cpu_halt_w));
 
 	/* video hardware */
 	SCREEN(config, m_screen);
 	m_screen->set_raw(18_MHz_XTAL, 856, 0, 640, 426, 0, 400);
 	m_screen->set_screen_update(FUNC(kaypro84_state::screen_update_kaypro484));
-
-	TIMER(config, m_floppy_timer).configure_generic(FUNC(kaypro84_state::floppy_timer));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_kaypro484);
 	PALETTE(config, m_palette, FUNC(kaypro84_state::kaypro_palette), 3);

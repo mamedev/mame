@@ -221,12 +221,12 @@ uint32_t mermaid_state::screen_update_mermaid(screen_device &screen, bitmap_ind1
 		constexpr int split_y = 64;
 		constexpr rectangle rr(0, 32*8-1, 0, 32*8-1);
 		m_bg_tilemap->draw(screen, m_helper_mask, rr, 0, 0);
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			int sy = y >= split_y ? 32*8 - 2 - (y - split_y) : 32*8 - split_y + y;
-			const u16 *s = &m_helper_mask.pix(sy, cliprect.min_x);
-			u16 *p = &bitmap.pix(y, cliprect.min_x);
-			memcpy(p, s, 2*(cliprect.max_x - cliprect.min_x + 1));
+			const u16 *s = &m_helper_mask.pix(sy, cliprect.left());
+			u16 *p = &bitmap.pix(y, cliprect.left());
+			memcpy(p, s, 2 * cliprect.width());
 		}
 
 
@@ -235,25 +235,25 @@ uint32_t mermaid_state::screen_update_mermaid(screen_device &screen, bitmap_ind1
 	}
 	else if (m_bg_mask)
 	{
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			u16 *p = &bitmap.pix(y, cliprect.min_x);
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-				*p++ = x < 26*8 ? 0x42 : 0x40;
+			u16 *p = &bitmap.pix(y, cliprect.left());
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
+				*p++ = (x < 26*8) ? 0x42 : 0x40;
 		}
 		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 		draw_sprites(bitmap, cliprect);
 
 		m_bg_tilemap->draw(screen, m_helper_mask, cliprect, 0, 0);
-		int max_x = cliprect.max_x;
+		int max_x = cliprect.right();
 		if (max_x >= 26*8)
 			max_x = 26*8-1;
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			const u16 *s = &m_helper_mask.pix(y, cliprect.min_x);
-			u16 *p = &bitmap.pix(y, cliprect.min_x);
+			const u16 *s = &m_helper_mask.pix(y, cliprect.left());
+			u16 *p = &bitmap.pix(y, cliprect.left());
 			bool on = false;
-			for (int x = cliprect.min_x; x <= max_x; x++)
+			for (int x = cliprect.left(); x <= max_x; x++)
 			{
 				if (*s++ & 1)
 					on = !on;

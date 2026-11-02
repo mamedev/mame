@@ -246,13 +246,13 @@ uint8_t kc85_state::uart_status_r()
 	    2       FE          framing error
 	    3       PE          parity error
 	    4       TBRE        transmit buffer register empty
-	    5       RP
+	    5       RP          modem connector pin 8 (pulled up)
 	    6       +5V
 	    7       _LPS        low power sensor
 
 	*/
 
-	uint8_t data = 0x40;
+	uint8_t data = 0x60;
 
 	// carrier detect
 	data |= m_rs232->dcd_r();
@@ -268,9 +268,6 @@ uint8_t kc85_state::uart_status_r()
 
 	// transmit buffer register empty
 	data |= m_uart->tbre_r() << 4;
-
-	// rp TODO
-	data |= 0x20;
 
 	// low power sensor
 	data |= BIT(m_battery->read(), 0) << 7;
@@ -289,13 +286,13 @@ uint8_t pc8201_state::uart_status_r()
 	    2       FE          framing error
 	    3       PE          parity error
 	    4       TBRE        transmit buffer register empty
-	    5       RP
-	    6       +5V
+	    5                   not connected
+	    6                   not connected
 	    7       _LPS        low power signal
 
 	*/
 
-	uint8_t data = 0x40;
+	uint8_t data = 0x60;
 
 	// data carrier detect / ring detect
 	data |= m_rs232->dcd_r();
@@ -311,9 +308,6 @@ uint8_t pc8201_state::uart_status_r()
 
 	// transmit buffer register empty
 	data |= m_uart->tbre_r() << 4;
-
-	// rp TODO
-	data |= 0x20;
 
 	// low power sensor
 	data |= BIT(m_battery->read(), 0) << 7;
