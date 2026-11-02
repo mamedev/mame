@@ -12,6 +12,11 @@ TODO:
 - i440zx BIOSes crashes when writing Flash ROM sequences at PC=61C51 onward (by saving in CMOS).
 - slvrball806: crashes in vmm32.vxd loading, doesn't check the dongle, -chs mismatch with the
   comment. Commented out for now;
+- has the usual trio64 bugs once it actually enters in Windows;
+- slvrball720: will throw a Windows crash in German around Update 2, dump may be bad;
+- slvrball632: throws "No Silverball soundcard", does PnP talk at $77a, afterwards will try to
+  ping dongle at LPT3 ($3bc-$3bf) failing in the process;
+- slvrballbu409: "No sound card found", does a different kind of PnP check than above;
 
 ===================================================================================================
 
@@ -21,7 +26,7 @@ Motherboard: Soyo 5EAS / Soyo SY-7IZB+ / Acorp 694XT-694XT1 / others
 Intel Pentium-S CPU 133 MHz (A80502133)
 
 MicroTouch (external)
-ESS AudioDrive ES1869FC ISA sound card
+ESS AudioDrive ES1869FC ISA sound card (PnP compliant)
 S3 Trio64V2/DX PCI VGA (86C775, 512KB RAM)
 I/O Controller Silverball 3 (ISA card, Actel A40MX04-F PL84, DB50 external connector)
 
@@ -52,6 +57,66 @@ SiS 5600/SiS 5595 is a Slot 1 Pentium II MB, the earlier version of what is in s
 #include "machine/w83977tf.h"
 
 #include <array>
+
+/*
+ * ISA8 I/O Controller Silverball 3
+ *
+ * Actmel A40MX04-F on a single DB50 connector, what's on the other end needs figuring out ...
+ *
+ */
+
+class isa8_ioc_silverball : public device_t, public device_isa8_card_interface
+{
+public:
+	// construction/destruction
+	isa8_ioc_silverball(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	void remap(int space_id, offs_t start, offs_t end) override;
+private:
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+};
+
+DEFINE_DEVICE_TYPE(ISA8_IOC_SILVERBALL, isa8_ioc_silverball, "isa8_ioc_silverball", "ISA16 Silverball I/O Controller")
+
+isa8_ioc_silverball::isa8_ioc_silverball(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ISA8_IOC_SILVERBALL, tag, owner, clock)
+	, device_isa8_card_interface(mconfig, *this)
+{
+}
+
+void isa8_ioc_silverball::device_start()
+{
+	set_isa_device();
+}
+
+void isa8_ioc_silverball::device_reset()
+{
+}
+
+void isa8_ioc_silverball::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x0300, 0x0307, read8sm_delegate(*this, FUNC(isa8_ioc_silverball::read)), write8sm_delegate(*this, FUNC(isa8_ioc_silverball::write)));
+	}
+}
+
+// TODO: enough to make it pass the initial check and nothing else
+u8 isa8_ioc_silverball::read(offs_t offset)
+{
+	logerror("I/O Controller R %02x\n", offset + 0x300);
+	return 0;
+}
+
+void isa8_ioc_silverball::write(offs_t offset, u8 data)
+{
+	logerror("I/O Controller W %02x %02x\n", offset + 0x300, data);
+}
 
 namespace {
 
@@ -147,6 +212,7 @@ static void isa_internal_devices(device_slot_interface &device)
 {
 	// TODO: additional Winbond W83782M for HW monitoring
 	device.option_add("w83977tf", W83977TF);
+	device.option_add("ioc", ISA8_IOC_SILVERBALL);
 }
 
 void silverball_state::i440zx_superio_config(device_t *device)
@@ -218,7 +284,7 @@ void silverball_state::silverball_i440zx(machine_config &config)
 
 	// FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", i440zx_superio_config);
-	ISA16_SLOT(config, "isa1",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa1",   0, "pci:07.0:isabus", isa_internal_devices, "ioc", true);
 	ISA16_SLOT(config, "isa2",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	PCI_SLOT(config, "pci:1", pci_cards, 14, 0, 1, 2, 3, "trio64dx");
