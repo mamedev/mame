@@ -363,8 +363,4 @@ All views retain the same 4:3 raster; no gameplay coordinates are altered.
 		<element ref="tower"><bounds x="472" y="488" width="96" height="232" /></element>
 	</view>
 
-	<view name="Screen Only">
-		<screen index="0"><bounds x="0" y="0" width="1000" height="750" /></screen>
-	</view>
-
 </mamelayout>
