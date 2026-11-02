@@ -770,7 +770,7 @@ ROM_END
 // Based on the song "El auto feo", composed by Enrique Fischer 'Pipo Pescador'.
 ROM_START( autopapa )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD( "m.irn_pic16c56.u3", 0x0000, 0x1fff, CRC(a2c24ec3) SHA1(e87520c6de714b1638c9b156411522e0209fb06e) )
+	ROM_LOAD( "m.irn_pic16c56.u3", 0x0000, 0x2000, CRC(9c17c8ed) SHA1(2c45053565eca5741e33236520187656bebe1a17) ) // decapped, config word bits 3-11 were missing: added as not code protected
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "autopapa.u1", 0x00000, 0x40000, CRC(a3e5607e) SHA1(24a9c79edec7b2f7f64b622240f2ad8f3ffa29ca) ) // NEC D27C2001D
@@ -779,7 +779,7 @@ ROM_END
 // Based on the song "Hola Don Pepito", composed by Ramón del Rivero.
 ROM_START( donpepito )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD( "m.irn_pic16c56.u3", 0x0000, 0x1fff, CRC(a2c24ec3) SHA1(e87520c6de714b1638c9b156411522e0209fb06e) )
+	ROM_LOAD( "m.irn_pic16c56.u3", 0x0000, 0x2000, CRC(9c17c8ed) SHA1(2c45053565eca5741e33236520187656bebe1a17) ) // decapped, config word bits 3-11 were missing: added as not code protected
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "don_pepito.u1", 0x00000, 0x40000, CRC(574fcd14) SHA1(a23f1eb6d2cef5aa07df3a553fe1d33803648f43) )
@@ -788,7 +788,7 @@ ROM_END
 // Based on the Spanish cover version of the song "I Like To Move It" by Reel 2 Real, named "Te Gusta el Mueve Mueve".
 ROM_START( mueve )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD( "m.irn_pic16c56.u3", 0x0000, 0x1fff, CRC(a2c24ec3) SHA1(e87520c6de714b1638c9b156411522e0209fb06e) )
+	ROM_LOAD( "m.irn_pic16c56.u3", 0x0000, 0x2000, CRC(9c17c8ed) SHA1(2c45053565eca5741e33236520187656bebe1a17) ) // decapped, config word bits 3-11 were missing: added as not code protected
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "mueve_reclam_ea76_pic_irn_27c020.u1", 0x00000, 0x40000, CRC(f3cc6936) SHA1(35334aeb85f3524f2afdf20f49005d7573ec5494) )
@@ -797,7 +797,7 @@ ROM_END
 // Based on the song by the Beatles.
 ROM_START( obladi )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD( "m.irn_pic16c56.u3", 0x0000, 0x1fff, CRC(a2c24ec3) SHA1(e87520c6de714b1638c9b156411522e0209fb06e) )
+	ROM_LOAD( "m.irn_pic16c56.u3", 0x0000, 0x2000, CRC(9c17c8ed) SHA1(2c45053565eca5741e33236520187656bebe1a17) ) // decapped, config word bits 3-11 were missing: added as not code protected
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "obladi_reclam_5a5c_pic_irn_27c020.u1", 0x00000, 0x40000, CRC(a156f749) SHA1(f2bcbe5857e8ea6d96c2abe3051a5d02308dc963) )
@@ -806,7 +806,7 @@ ROM_END
 // Based on the song composed by Rafael Pérez Botija.
 ROM_START( susanita )
 	ROM_REGION( 0x2000, "maincpu", 0 )
-	ROM_LOAD( "m.irn_pic16c56.u3", 0x0000, 0x1fff, CRC(a2c24ec3) SHA1(e87520c6de714b1638c9b156411522e0209fb06e) )
+	ROM_LOAD( "m.irn_pic16c56.u3", 0x0000, 0x2000, CRC(9c17c8ed) SHA1(2c45053565eca5741e33236520187656bebe1a17) ) // decapped, config word bits 3-11 were missing: added as not code protected
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "susanita.u1", 0x00000, 0x40000, CRC(766868cb) SHA1(eb42dc46b865bc448052d9d67c840e51c49ce49a) ) // Am27C020
