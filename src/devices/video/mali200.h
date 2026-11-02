@@ -136,13 +136,13 @@ private:
 	// Small front caches avoid hashing the same shader/descriptor for every
 	// fragment. The maps still own entries for the whole job; rehashing does
 	// not invalidate references, and collisions only replace these pointers.
-	std::array<pp_instruction *, 64> m_pp_instruction_cache{};
-	std::array<pp_texture_state *, 64> m_pp_texture_cache{};
+	std::array<pp_instruction *, 64> m_pp_instruction_cache;
+	std::array<pp_texture_state *, 64> m_pp_texture_cache;
 	// CPU execution cannot interleave with a synchronous rendering callback.
 	// Cache its page walks, invalidating if GPU writes touch a walked table.
-	bool m_dma_cache_active = false;
-	std::array<u32, 1024> m_dma_page_tags{}, m_dma_page_entries{};
-	std::array<u8, 1024> m_dma_page_access{};
+	bool m_dma_cache_active;
+	std::array<u32, 1024> m_dma_page_tags, m_dma_page_entries;
+	std::array<u8, 1024> m_dma_page_access;
 	std::unordered_set<u32> m_dma_table_pages;
 };
 
