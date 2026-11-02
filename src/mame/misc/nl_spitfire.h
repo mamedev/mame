@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:David Haywood
+// license:CC0-1.0
+// copyright-holders:Peter Wilhelmsen
 #ifndef MAME_MISC_NL_SPITFIRE_H
 #define MAME_MISC_NL_SPITFIRE_H
 
