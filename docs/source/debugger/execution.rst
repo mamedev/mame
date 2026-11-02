@@ -14,6 +14,9 @@ Execution Debugger Commands
 :ref:`debugger-command-out`
     single step until the current subroutine/exception handler returns
     (Shift-F11)
+:ref:`debugger-command-outs`
+    single step until the current subroutine/exception handler returns
+    to a source line (Shift-F11)
 :ref:`debugger-command-go`
     resume execution (F5)
 :ref:`debugger-command-gbt`
@@ -88,13 +91,6 @@ If neither the called function nor any of its callees have source associated
 with them, ``steps`` will continue execution until the call is complete, and
 the first instruction with source associated with it is encountered.
 
-If the current line returns from a recursive function, ``steps`` will stop
-at the same line, but in the prior call frame.  It will appear as if
-no stepping occurred, but the stack register will indicate a return
-has occurred.  Note that this logic can be fooled when stepping into a function
-without associated source, which makes further calls without proper
-matching returns (using direct manipulation of the stack pointer instead).
-
 
 
 Examples:
@@ -142,7 +138,7 @@ Back to :ref:`debugger-execution-list`
 overs
 -----
 
-**overs**
+**o[ver]s**
 
 When :ref:`source-level debugging <srcdbg>` is enabled, this steps forward
 over one *source* line on the currently executing CPU.  When the original
@@ -203,6 +199,11 @@ source-level information exist between the current instruction and the
 most recent calling instruction *with* source-level information, ``outs``
 will skip over those "non source-level information" layers until it lands on
 calling code with source-level information.
+
+If the current line returns from a recursive function, ``outs`` will stop
+at the same line, but in the prior call frame.  It will appear as if
+no stepping occurred, but the stack register will indicate a return
+has occurred.
 
 Examples:
 

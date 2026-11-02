@@ -601,6 +601,7 @@ Enables the :ref:`source-level debugging information file <srcdbg_mdi>`
 with the specified index.
 This is intended for use during :ref:`MMU-aware debugging <srcdbg_mmuaware>`
 of an application that bank-switches its code in and out of the logical address space.
+Note that this command has no effect on any breakpoints or watchpoints currently set.
 
 Example:
 
@@ -618,6 +619,7 @@ Disables the specified :ref:`source-level debugging information file <srcdbg_mdi
 with the specified index.
 This is intended for use during :ref:`MMU-aware debugging <srcdbg_mmuaware>`
 of an application that bank-switches its code in and out of the logical address space.
+Note that this command has no effect on any breakpoints or watchpoints currently set.
 
 Example:
 

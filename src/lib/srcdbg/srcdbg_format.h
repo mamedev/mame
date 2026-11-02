@@ -51,6 +51,7 @@
     - A symbol name may appear in multiple entries of local_fixed_symbol_values[] and
         local_relative_symbol_values[], but not with intersecting scope address ranges.
     - There is no compiler padding in these structures
+    - All integers use little-endian encoding.  Shorts are 16-bits and ints are 32-bits.
 */
 
 
