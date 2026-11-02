@@ -33,37 +33,37 @@ Notes:
 Hardware configuration:
 
 P5TX-LA Motherboard:
--CPU: Intel SL27J Pentium MMX @ 200 MHz
--Onboard sound: Crystal CS4237B ISA Audio
--Onboard VGA: ATI Rage II 3D Graph (removed from motherboard)
+- CPU: Intel SL27J Pentium MMX @ 200 MHz
+- Onboard sound: Crystal CS4237B ISA Audio
+- Onboard VGA: ATI Rage II 3D Graph (removed from motherboard)
 
 Chipsets (430TX PCIset):
--82439TX Northbridge
--82371AB PIIX4 PCI-ISA Southbridge
+- 82439TX Northbridge
+- 82371AB PIIX4 PCI-ISA Southbridge
 
 Taito W Main Board:
--AMD M4-128N/64 CPLD stamped 'E58-01'
--AMD MACH231 CPLD stamped 'E58-02'
--AMD MACH211 CPLD stamped 'E58-03'
--Panasonic MN1020019 (MN10200 based) Sound CPU
--Zoom ZFX-2 DSP (TMS57002 DSP)
--Zoom ZSG-2 Sound PCM chip
--Taito TC0510NIO I/O chip
--1x RAM NEC 42S4260
--1x RAM GM71C4400
--12x RAM Alliance AS4C256K16E0-35 (256k x 16)
--Mitsubishi M66220 256 x 8-bit CMOS memory
--Fujitsu MB87078 6-bit, 4-channel Electronic Volume Controller
--Atmel 93C66 EEPROM (4kb probably for high scores, test mode settings etc)
--ICS5342-3 GENDAC 16-Bit Integrated Clock-LUT-DAC
--3DFX 500-0003-03 F805281.1 FBI
--3DFX 500-0004-02 F804701.1 TMU
--Rom: E58-04 (bootscreen)
--XTALs 50MHz (near 3DFX) and 14.31818MHz (near RAMDAC)
+- AMD M4-128N/64 CPLD stamped 'E58-01'
+- AMD MACH231 CPLD stamped 'E58-02'
+- AMD MACH211 CPLD stamped 'E58-03'
+- Panasonic MN1020019 (MN10200 based) Sound CPU
+- Zoom ZFX-2 DSP (TMS57002 DSP)
+- Zoom ZSG-2 Sound PCM chip
+- Taito TC0510NIO I/O chip
+- 1x RAM NEC 42S4260
+- 1x RAM GM71C4400
+- 12x RAM Alliance AS4C256K16E0-35 (256k x 16)
+- Mitsubishi M66220 256 x 8-bit CMOS memory
+- Fujitsu MB87078 6-bit, 4-channel Electronic Volume Controller
+- Atmel 93C66 EEPROM (4kb probably for high scores, test mode settings etc)
+- ICS5342-3 GENDAC 16-Bit Integrated Clock-LUT-DAC
+- 3DFX 500-0003-03 F805281.1 FBI
+- 3DFX 500-0004-02 F804701.1 TMU
+- ROM: E58-04 (bootscreen)
+- XTALs 50MHz (near 3DFX) and 14.31818MHz (near RAMDAC)
 
 Taito W Rom Board:
--AMD M4-128N/64 CPLD stamped 'E58-05'
--Program, Sound roms
+- AMD M4-128N/64 CPLD stamped 'E58-05'
+- Program, Sound roms
 
 */
 

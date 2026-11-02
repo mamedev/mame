@@ -43,6 +43,8 @@ protected:
 	virtual unsigned color_bits() const { return m_color_bits; }
 
 private:
+	void update_pen(unsigned index);
+
 	// device state
 	u8 m_address;
 	u8 m_address_rgb;

@@ -1298,7 +1298,7 @@ Black screen, self modifies code in the 0x100-0x14f range
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 
-			<dataarea name="roml" size="0xa0000">
+			<dataarea name="roml" size="0x100000">
 				<rom name="rom-menu.bin" size="0xa0000" crc="a3842c0d" sha1="a147584a959034c8a5679e72c183c82f7e876fd6" />
 			</dataarea>
 		</part>

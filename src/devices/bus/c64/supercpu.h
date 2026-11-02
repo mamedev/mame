@@ -114,6 +114,19 @@ private:
 	bool m_2mhz;
 	bool m_native_c128_mode;
 	uint8_t m_mmu[11];
+	memory_region m_decode[256][17];
+	int32_t m_read_base[256][17];
+	bool m_write_fast[256][17];
+	uint16_t m_mirror_range[256];
+	bool m_has_exp_card;
+	attotime m_period;
+	attotime m_half_cycle;
+	attoseconds_t m_phase_quot;
+	attoseconds_t m_phase_rem;
+	uint64_t m_time_base;
+	uint32_t m_time_seconds;
+	uint32_t m_cpu_clock;
+	attoseconds_t m_cpu_period;
 	uint8_t m_p0h_latch;
 	uint8_t m_p1h_latch;
 
@@ -128,8 +141,9 @@ private:
 	// m_clk/m_accu locate the next access in host-cycle/20 MHz phase units.
 	// m_dirty requests CPU catch-up; bus synchronization also waits for PHI2.
 	// A deferred access keeps m_in_access and m_step so retries cannot repeat
-	// waits or start the write buffer twice. Only end_access sets m_inc_pending,
-	// which charges the completed 65816 cycle on the next begin_access.
+	// waits or start the write buffer twice. end_access and the turbo SRAM fast
+	// paths in cpu_r/cpu_w set m_inc_pending, which charges the completed 65816
+	// cycle on the next access.
 	// Each timing path names its own stages, beginning at ACCESS_START.
 	bool m_fast;
 	uint64_t m_clk;
@@ -176,7 +190,10 @@ private:
 
 	// C64 memory mapping
 	uint8_t config(offs_t offset);
-	memory_region decode(offs_t offset, uint8_t cfg);
+	uint8_t exp_config(offs_t offset);
+	static memory_region decode_region(offs_t offset, uint8_t cfg) ATTR_COLD;
+	static unsigned decode_index(offs_t offset) { return ((offset & 0xfc00) == 0xd800) ? 16 : BIT(offset, 12, 4); }
+	memory_region decode(offs_t offset, uint8_t cfg) const { return m_decode[cfg][decode_index(offset)]; }
 	void pport_w(uint8_t data) { m_pport = data & 7; }
 	unsigned mirror_mode() const;
 	bool mirrored(offs_t offset);
@@ -197,6 +214,7 @@ private:
 	void hardware_w(offs_t offset, uint8_t data);
 
 	// bus timing
+	attotime host_time(uint64_t clk);
 	attotime clk_time(uint64_t clk, uint32_t accu);
 	void maincpu_inc();
 	void advance_phase(uint32_t delta, bool wrap_at_boundary = false);

@@ -108,11 +108,8 @@ private:
 	u16 read_sense();
 	void write_sense(u16 data);
 
-	void cuda_reset_w(int state)
-	{
-		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
-		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
-	}
+	void cuda_reset_w(int state);
+	void cuda_power_w(int state);
 
 	void slot_irq_handler(int line, int state);
 };
@@ -193,6 +190,20 @@ void gazelle_state::write_sense(u16 data)
 	m_sense = data;
 }
 
+void gazelle_state::cuda_reset_w(int state)
+{
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
+}
+
+void gazelle_state::cuda_power_w(int state)
+{
+	if (state)
+	{
+		machine().schedule_exit();
+	}
+}
+
 void gazelle_state::slot_irq_handler(int line, int state)
 {
 }
@@ -236,7 +247,7 @@ INPUT_PORTS_END
 void gazelle_state::gazelle(machine_config &config)
 {
 	PPC603E(config, m_maincpu, 225'000'000);
-	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS | PPCDRC_MACOS_CACHE_HACK);
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS | PPCDRC_MACOS_CACHE_HACK | PPCDRC_BUS_RETRY);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gazelle_state::pmac6500_map);
 	m_maincpu->set_bus_frequency(MAIN_BUS_FREQUENCY);
 	m_maincpu->set_tb_divisor(4);
@@ -256,6 +267,7 @@ void gazelle_state::gazelle(machine_config &config)
 
 	OHARE(config, m_ohare);
 	m_ohare->set_maincpu_tag("maincpu");
+	m_ohare->set_via_retry(true); // keep Cuda's shift clock edges in order with OF's VIA accesses
 	m_ohare->irq_callback().set_inputline(m_maincpu, PPC_IRQ);
 
 	m_ohare->ata(0).slot(0).set_default_option("hdd");
@@ -300,6 +312,7 @@ void gazelle_state::gazelle(machine_config &config)
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->set_default_bios_tag("341s0060");
 	m_cuda->reset_callback().set(FUNC(gazelle_state::cuda_reset_w));
+	m_cuda->poweroff_callback().set(FUNC(gazelle_state::cuda_power_w));
 	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_cuda->via_clock_callback().set(m_ohare, FUNC(ohare_device::cb1_w));
 	m_cuda->via_data_callback().set(m_ohare, FUNC(ohare_device::cb2_w));

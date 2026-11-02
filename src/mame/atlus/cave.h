@@ -69,6 +69,7 @@ public:
 	void esprade(machine_config &config) ATTR_COLD;
 	void gaia(machine_config &config) ATTR_COLD;
 	void guwange(machine_config &config) ATTR_COLD;
+	void hotdogstbl(machine_config &config) ATTR_COLD;
 	void jumbogod(machine_config &config) ATTR_COLD;
 	void korokoro(machine_config &config) ATTR_COLD;
 	void paccarn(machine_config &config) ATTR_COLD;
@@ -168,6 +169,7 @@ protected:
 	void esprade_map(address_map &map) ATTR_COLD;
 	void gaia_map(address_map &map) ATTR_COLD;
 	void guwange_map(address_map &map) ATTR_COLD;
+	void hotdogstbl_map(address_map &map) ATTR_COLD;
 	void jumbogod_map(address_map &map) ATTR_COLD;
 	void korokoro_map(address_map &map) ATTR_COLD;
 	void paccarn_map(address_map &map) ATTR_COLD;

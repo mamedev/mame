@@ -37,7 +37,7 @@ TODO:
 - how does sound banking work? when the IRQ callbacks happen for each IRQ level? currently no way
   to access this because it's a daisy chain setup with the CTC?
 - even if I hack that the title screen speech doesn't work properly - is there a timing register like Little Robin?
-- Verify when m_ppi_to_pic_command is set and cleared. It's currently guessed but seems to work fine this way.
+- Verify PIC PB0 - needs a hardware trace where it's connected to
 - The PIC startup delay is patched in all sets, otherwise the PIC isn't ready yet when the 68000 reads the
   DIP switches (only once, at boot). The PIC probably holds the 68000 in reset during that delay (port B
   bits 6 and 7 are pulled low for its duration, which is also what the watchdog does).
@@ -184,32 +184,21 @@ public:
 	megaphx_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_mainram(*this, "mainram"),
-		m_bootrom(*this, "boot"),
 		m_indervid(*this, "inder_vid"),
 		m_indersb(*this, "inder_sb"),
 		m_ppi(*this, "ppi8255_0"),
 		m_dsw_shifter(*this, "ttl166_%u", 1U),
-		m_start(*this, "START")
+		m_start(*this, "START"),
+		m_boot_view(*this, "boot_view")
 	{ }
 
 	void megaphx(machine_config &config) ATTR_COLD;
-	void hamboy(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint16_t> m_mainram;
-	required_region_ptr<uint16_t> m_bootrom;
-	required_device<inder_vid_device> m_indervid;
-	required_device<inder_sb_device> m_indersb;
-	required_device<i8255_device> m_ppi;
-	required_device_array<ttl166_device, 2> m_dsw_shifter;
-	required_ioport m_start;
-
 	uint8_t pic_porta_r();
 	void pic_porta_w(uint8_t data);
 	uint8_t pic_portb_r();
@@ -220,25 +209,26 @@ private:
 
 	void megaphx_68k_map(address_map &map) ATTR_COLD;
 
-	void install_bootrom(bool enable);
-	TIMER_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
+	required_device<cpu_device> m_maincpu;
+	required_device<inder_vid_device> m_indervid;
+	required_device<inder_sb_device> m_indersb;
+	required_device<i8255_device> m_ppi;
+	required_device_array<ttl166_device, 2> m_dsw_shifter;
+	required_ioport m_start;
 
-	emu_timer *m_disable_bootrom = nullptr;
+	memory_view m_boot_view;
+	memory_passthrough_handler m_boot_tap;
 
-	int m_dsw_data = 0;
-	int m_ppi_to_pic_command = 0;
-	int m_ppi_to_pic_clock = 0;
-	int m_ppi_to_pic_data = 0;
-	int m_pic_to_ppi_clock = 0;
-	int m_pic_to_ppi_data = 0;
+	bool m_dsw_data = false;
+	bool m_ppi_to_pic_clock = false;
+	bool m_ppi_to_pic_data = false;
+	bool m_pic_to_ppi_clock = false;
+	bool m_pic_to_ppi_data = false;
 };
 
 void megaphx_state::machine_start()
 {
-	m_disable_bootrom = timer_alloc(FUNC(megaphx_state::disable_bootrom), this);
-
 	save_item(NAME(m_dsw_data));
-	save_item(NAME(m_ppi_to_pic_command));
 	save_item(NAME(m_ppi_to_pic_clock));
 	save_item(NAME(m_ppi_to_pic_data));
 	save_item(NAME(m_pic_to_ppi_clock));
@@ -247,27 +237,16 @@ void megaphx_state::machine_start()
 
 void megaphx_state::machine_reset()
 {
-	install_bootrom(true);
-	m_disable_bootrom->adjust(m_maincpu->cycles_to_attotime(50));
+	// hold in reset at start. the PIC will start us
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
-
-void megaphx_state::install_bootrom(bool enable)
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	program.unmap_readwrite(0, std::max(m_bootrom.bytes(), m_mainram.bytes()) - 1);
-
-	// bootrom bankswitch
-	if (enable)
-		program.install_rom(0, m_bootrom.bytes() - 1, m_bootrom);
-	else
-		program.install_ram(0, m_mainram.bytes() - 1, m_mainram);
-}
-
 
 
 void megaphx_state::megaphx_68k_map(address_map &map)
 {
-	map(0x000000, 0x00ffff).ram().share(m_mainram);
+	map(0x000000, 0x00ffff).ram();
+	map(0x000000, 0x03ffff).view(m_boot_view);
+	m_boot_view[0](0x000000, 0x03ffff).rom().region("boot", 0);
 	map(0x040000, 0x040007).rw("inder_vid:tms", FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 	map(0x050000, 0x050001).w(m_indersb, FUNC(inder_sb_device::megaphx_0x050000_w));
 	map(0x050002, 0x050003).r(m_indersb, FUNC(inder_sb_device::megaphx_0x050002_r));
@@ -275,7 +254,6 @@ void megaphx_state::megaphx_68k_map(address_map &map)
 	map(0x800000, 0x8fffff).rom().region("data", 0x00000);
 	map(0xfc0000, 0xffffff).rom().region("boot", 0x00000);
 }
-
 
 
 static INPUT_PORTS_START( megaphx )
@@ -455,7 +433,6 @@ static INPUT_PORTS_START( yoyospel )
 INPUT_PORTS_END
 
 
-
 // PIC port a
 //
 // 3---  r   serial clock
@@ -466,9 +443,6 @@ INPUT_PORTS_END
 uint8_t megaphx_state::pic_porta_r()
 {
 	uint8_t data = 0;
-
-	// clear when the PIC starts reading the command
-	m_ppi_to_pic_command = 0;
 
 	data |= m_ppi_to_pic_data << 0;
 	data |= m_ppi_to_pic_clock << 3;
@@ -484,20 +458,20 @@ void megaphx_state::pic_porta_w(uint8_t data)
 
 // PIC port b
 //
-// 7-------   w  not used
-// -6------   w  watchdog (not enabled by megaphx)
+// 7-------   w  watchdog / cpu reset
+// -6------   w  watchdog / cpu reset
 // --5-----  r   start2
 // ---4----  r   start1
 // ----3---   w  DIP switch clock
 // -----2--   w  DIP switch shift/load
 // ------1-  r   DIP switch data
-// -------0  r   PPI to PIC command incoming
+// -------0  r   active low input, causes a cpu reset when set
 
 uint8_t megaphx_state::pic_portb_r()
 {
 	uint8_t data = 0;
 
-	data |= m_ppi_to_pic_command << 0;
+	data |= 1 << 0;
 	data |= m_dsw_data << 1;
 	data |= m_start->read() << 4 & 0x30;
 
@@ -510,18 +484,45 @@ void megaphx_state::pic_portb_w(uint8_t data)
 	m_dsw_shifter[1]->shift_load_w(BIT(data, 2));
 	m_dsw_shifter[0]->clock_w(BIT(data, 3));
 	m_dsw_shifter[1]->clock_w(BIT(data, 3));
+
+	// bit 6 and 7 are the CPU reset handling (always changed at the same time)
+	if (!BIT(data, 6))
+	{
+		// switch in boot vector rom
+		m_boot_view.select(0);
+
+		// install a read tap that disables the boot vector ROM once we execute from 0x800000
+		// on the real system this is likely handled by the PALs and SN74HC393N counter
+		m_boot_tap.remove();
+		m_boot_tap = m_maincpu->space(AS_PROGRAM).install_read_tap
+		(
+			0x800000, 0x8fffff, "boot",
+			[this](offs_t offset, uint16_t &data, uint16_t mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					m_boot_view.disable();
+					m_boot_tap.remove();
+				}
+			},
+			&m_boot_tap
+		);
+	}
+
+	// might also reset other stuff
+	m_maincpu->set_input_line(INPUT_LINE_RESET, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 // ppi port c
 //
 // 7-------   w  PPI to PIC clock
 // -6------   w  PPI to PIC data
-// --5-----   w  unknown
-// ---4----   w  PPI to PIC command
+// --5-----   w  not used
+// ---4----   w  pulsed high for every command sent to the PIC
 // ----3---  r   PIC to PPI clock
-// -----2--  r   unknown
+// -----2--  r   not used
 // ------1-  r   PIC to PPI data
-// -------0  r   unknown
+// -------0  r   not used
 
 uint8_t megaphx_state::ppi_portc_r()
 {
@@ -535,14 +536,9 @@ uint8_t megaphx_state::ppi_portc_r()
 
 void megaphx_state::ppi_portc_w(uint8_t data)
 {
-	// only set, don't clear here. otherwise the PIC has no chance to pick it up
-	if (BIT(data, 4))
-		m_ppi_to_pic_command = BIT(data, 4);
-
 	m_ppi_to_pic_data = BIT(data, 6);
 	m_ppi_to_pic_clock = BIT(data, 7);
 }
-
 
 
 void megaphx_state::megaphx(machine_config &config)
@@ -578,13 +574,6 @@ void megaphx_state::megaphx(machine_config &config)
 	INDER_AUDIO(config, "inder_sb");
 }
 
-void megaphx_state::hamboy(machine_config &config)
-{
-	megaphx(config);
-
-	m_indervid->set_bpp(4);
-}
-
 
 ROM_START( afterwar )
 	ROM_REGION16_BE( 0x40000, "boot", 0 )
@@ -607,7 +596,6 @@ ROM_START( afterwar )
 
 	ROM_REGION( 0x400, "pic", 0 )
 	ROM_LOAD( "pic16c54.bin", 0x000, 0x400, CRC(89e74d49) SHA1(29b5a37000ddc59242c95cc4973371ba18233076) )
-	ROM_FILL(0x2c, 1, 0x01) // patch timer length or it's too slow (PIC issue?), otherwise the DIP switches are always read as 0
 
 	ROM_REGION( 0x300, "pals", 0 )
 	ROM_LOAD( "b3_palce20v8h.bin",   0x000, 0x157, NO_DUMP )
@@ -621,6 +609,7 @@ ROM_START( afterwar )
 	ROM_LOAD( "s32_palce16v8h.bin",  0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "s33_palce16v8h.bin",  0x000, 0x117, NO_DUMP )
 ROM_END
+
 
 ROM_START( megaphx )
 	ROM_REGION16_BE( 0x40000, "boot", 0 ) // the majority of the data in these does not get used?! (only the vector table) is it just garbage??
@@ -644,7 +633,6 @@ ROM_START( megaphx )
 
 	ROM_REGION( 0x100000, "pic", 0 )
 	ROM_LOAD( "pic16c54-xt.bin", 0x000000, 0x430,  CRC(21f396fb) SHA1(c8badb9b3681e684bced0ced1de4c3a15641de8b) )
-	ROM_FILL(0x2c, 1, 0x01) // patch timer length or it's too slow (PIC issue?)
 
 	ROM_REGION( 0x1000, "pals", 0 ) // protected
 	ROM_LOAD( "p31_u31_palce16v8h-25.jed", 0x000, 0xbd4, BAD_DUMP CRC(05ef04b7) SHA1(330dd81a832b6675fb0473868c26fe9bec2da854) )
@@ -676,7 +664,6 @@ ROM_START( hamboy )
 
 	ROM_REGION( 0x100000, "pic", 0 )
 	ROM_LOAD( "pic16c54-xt.bin", 0x000000, 0x430, CRC(21f396fb) SHA1(c8badb9b3681e684bced0ced1de4c3a15641de8b) )
-	ROM_FILL(0x2c, 1, 0x01) // patch timer length or it's too slow (PIC issue?)
 ROM_END
 
 
@@ -704,7 +691,6 @@ ROM_START( yoyospel )
 
 	ROM_REGION( 0x100000, "pic", 0 )
 	ROM_LOAD( "pic16c54-xt.bin", 0x000000, 0x430,  CRC(21f396fb) SHA1(c8badb9b3681e684bced0ced1de4c3a15641de8b) ) // Unprotected, verified to be the same as "Mega Phoenix"
-	ROM_FILL(0x2c, 1, 0x01) // patch timer length or it's too slow (PIC issue?)
 
 	ROM_REGION( 0x200, "pals", 0 ) // protected
 	// On main PCB
@@ -724,9 +710,9 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1991, afterwar, 0, hamboy,  afterwar, megaphx_state, empty_init, ROT0, "Dinamic / Inder", "After the War", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, afterwar, 0, megaphx, afterwar, megaphx_state, empty_init, ROT0, "Dinamic / Inder", "After the War", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, megaphx,  0, megaphx, megaphx,  megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Mega Phoenix",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hamboy,   0, hamboy,  hamboy,   megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Hammer Boy",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hamboy,   0, megaphx, hamboy,   megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Hammer Boy",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // This game would later become Little Robin, although this early version has significant design differences. The game has no music, verified to be the same as the real hardware.
 GAME( 1992, yoyospel, littlerb, megaphx, yoyospel, megaphx_state, empty_init, ROT0, "Inder", "YoYo Spell (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -18,7 +18,8 @@
 
 DEFINE_DEVICE_TYPE(NDS_SOUND, nds_sound_device, "nds_sound", "Nintendo DS sound")
 
-namespace {
+namespace
+{
 
 // IMA-ADPCM magic numbers
 const int16_t s_ima_step[89] =
@@ -44,6 +45,8 @@ nds_sound_device::nds_sound_device(const machine_config &mconfig, const char *ta
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_space(nullptr)
+	, m_regs{}
+	, m_chan{}
 {
 }
 
@@ -67,6 +70,7 @@ void nds_sound_device::device_start()
 	save_item(STRUCT_MEMBER(m_chan, frac));
 	save_item(STRUCT_MEMBER(m_chan, step));
 	save_item(STRUCT_MEMBER(m_chan, sample));
+	save_item(STRUCT_MEMBER(m_chan, startup_delay));
 	save_item(STRUCT_MEMBER(m_chan, adpcm_val));
 	save_item(STRUCT_MEMBER(m_chan, adpcm_index));
 	save_item(STRUCT_MEMBER(m_chan, adpcm_loop_val));
@@ -94,7 +98,7 @@ uint32_t nds_sound_device::chan_freq(int ch) const
 	return (33513982 / 2) / period;
 }
 
-void nds_sound_device::key_on(int ch)
+void nds_sound_device::update_controls(int ch)
 {
 	channel_t &c = m_chan[ch];
 	const uint32_t cnt = m_regs[ch * 4];
@@ -105,6 +109,19 @@ void nds_sound_device::key_on(int ch)
 	c.hold = BIT(cnt, 15);
 	c.pan = (cnt >> 16) & 0x7f;
 	c.duty = (cnt >> 24) & 7;
+
+	if (!c.active && !c.hold)
+	{
+		c.sample = 0;
+	}
+}
+
+void nds_sound_device::key_on(int ch)
+{
+	channel_t &c = m_chan[ch];
+	const uint32_t cnt = m_regs[ch * 4];
+
+	update_controls(ch);
 	c.repeat = (cnt >> 27) & 3;
 	c.format = (cnt >> 29) & 3;
 
@@ -116,9 +133,10 @@ void nds_sound_device::key_on(int ch)
 
 	c.frac = 0;
 	c.step = uint32_t((uint64_t(chan_freq(ch)) << 16) / OUTPUT_RATE);
+	c.startup_delay = 0;
 	c.adpcm_loop_saved = false;
 
-	// load the first sample and leave addr pointing at the second
+	// PCM preloads its first sample; ADPCM only initializes the decoder.
 	c.addr = c.sad;
 	switch (c.format)
 	{
@@ -138,7 +156,12 @@ void nds_sound_device::key_on(int ch)
 			c.adpcm_val = int16_t(header & 0xffff);
 			c.adpcm_index = std::clamp<int32_t>((header >> 16) & 0x7f, 0, 88);
 			c.adpcm_low_nibble = true;
-			c.sample = c.adpcm_val;
+			if (!c.hold)
+			{
+				c.sample = 0;
+			}
+			// Three startup periods plus eight periods for the header.
+			c.startup_delay = 11;
 			c.addr += 4;
 			break;
 		}
@@ -155,6 +178,17 @@ void nds_sound_device::key_on(int ch)
 
 void nds_sound_device::advance_sample(channel_t &c, int ch)
 {
+	if (c.startup_delay != 0)
+	{
+		// A held sample survives only the first startup period.
+		c.sample = 0;
+		c.startup_delay--;
+		if (c.startup_delay != 0)
+		{
+			return;
+		}
+	}
+
 	if (c.format == FORMAT_PSG)
 	{
 		if (ch >= 14)
@@ -272,14 +306,22 @@ void nds_sound_device::advance_sample(channel_t &c, int ch)
 			break;
 		}
 	}
+
+	// Busy clears when the last sample begins; its output lasts one more period.
+	if ((c.repeat != 1) && (c.addr >= (c.sad + c.length)))
+	{
+		m_regs[ch * 4] &= ~0x80000000;
+	}
 }
 
 void nds_sound_device::mute_all()
 {
 	m_stream->update();
-	for (auto &c : m_chan)
+	for (int ch = 0; ch < NUM_CHANNELS; ch++)
 	{
-		c.active = false;
+		m_chan[ch].active = false;
+		m_chan[ch].sample = 0;
+		m_regs[ch * 4] &= ~0x80000000;
 	}
 }
 
@@ -288,6 +330,10 @@ uint32_t nds_sound_device::read(offs_t offset, uint32_t mem_mask)
 	if (offset >= std::size(m_regs))
 	{
 		return 0;
+	}
+	if (!machine().side_effects_disabled())
+	{
+		m_stream->update();
 	}
 	return m_regs[offset];
 }
@@ -310,14 +356,23 @@ void nds_sound_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 		{
 			key_on(ch);
 		}
-		else if (!BIT(m_regs[offset], 31))
+		else
 		{
-			m_chan[ch].active = false;
+			if (BIT(mem_mask, 31) && !BIT(m_regs[offset], 31))
+			{
+				m_chan[ch].active = false;
+			}
+			update_controls(ch);
 		}
 		return;
 	}
 
 	COMBINE_DATA(&m_regs[offset]);
+	if ((offset < (NUM_CHANNELS * 4)) && ((offset & 3) == 2) && ACCESSING_BITS_0_15)
+	{
+		const int ch = offset / 4;
+		m_chan[ch].step = uint32_t((uint64_t(chan_freq(ch)) << 16) / OUTPUT_RATE);
+	}
 }
 
 void nds_sound_device::sound_stream_update(sound_stream &stream)
@@ -335,7 +390,7 @@ void nds_sound_device::sound_stream_update(sound_stream &stream)
 			for (int ch = 0; ch < NUM_CHANNELS; ch++)
 			{
 				channel_t &c = m_chan[ch];
-				if (!c.active)
+				if (!c.active && !c.hold)
 				{
 					continue;
 				}
@@ -345,11 +400,14 @@ void nds_sound_device::sound_stream_update(sound_stream &stream)
 				left += (v * (128 - c.pan)) >> 7;
 				right += (v * c.pan) >> 7;
 
-				c.frac += c.step;
-				for (int guard = 0; (c.frac >= 0x10000) && (guard < 64); guard++)
+				if (c.active)
 				{
-					c.frac -= 0x10000;
-					advance_sample(c, ch);
+					c.frac += c.step;
+					for (int guard = 0; c.active && (c.frac >= 0x10000) && (guard < 64); guard++)
+					{
+						c.frac -= 0x10000;
+						advance_sample(c, ch);
+					}
 				}
 			}
 

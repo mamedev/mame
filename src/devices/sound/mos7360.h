@@ -118,6 +118,7 @@ private:
 	void fetch_idle();
 	uint8_t reg_r(offs_t offset);
 	void render(int load, bool force_blank);
+	template <uint8_t Mode> void render_active(uint32_t *dest, int load);
 
 	void soundport_w(int offset, int data);
 	void update_sound_outputs();

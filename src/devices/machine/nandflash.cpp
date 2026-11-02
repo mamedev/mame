@@ -34,6 +34,7 @@ DEFINE_DEVICE_TYPE(GENERALPLUS_GPR27P512A,  generalplus_gpr27p512a,  "generalplu
 DEFINE_DEVICE_TYPE(SANDISK_NAND_128MB_512_DEVICE,  sandisk_nand_128mb_512_device,  "sandisk_nand_128mb_512",  "Sandisk 128Mbyte NAND (512+16 block size)") // found on JAKKS Pacific units, part number was erased
 DEFINE_DEVICE_TYPE(SANDISK_NAND_256MB_512_DEVICE,  sandisk_nand_256mb_512_device,  "sandisk_nand_256mb_512",  "Sandisk 256Mbyte NAND (512+16 block size)") // found on JAKKS Pacific units, part number was erased
 DEFINE_DEVICE_TYPE(HYNIX_HY27UF084G2M,  hynix_hy27uf084g2m_device,  "hynix_hy27uf084g2m",  "Hynix HY27UF084G2M")
+DEFINE_DEVICE_TYPE(HYNIX_H27UAG8T2A,    hynix_h27uag8t2a_device,    "hynix_h27uag8t2a",    "Hynix H27UAG8T2A")
 
 
 nand_device::nand_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -210,6 +211,25 @@ hynix_hy27uf084g2m_device::hynix_hy27uf084g2m_device(const machine_config &mconf
 	m_col_address_cycles = 2;
 	m_row_address_cycles = 3;
 	m_sequential_row_read = 1; // uncertain
+}
+
+hynix_h27uag8t2a_device::hynix_h27uag8t2a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nand_device(mconfig, HYNIX_H27UAG8T2A, tag, owner, clock)
+{
+	// 16 Gbit MLC, 4096 + 218 byte pages; dumps carry 448 spare bytes per page, the extra bytes read as 0xff
+	m_id_len = 5;
+	m_id[0] = 0xad;
+	m_id[1] = 0xd5;
+	m_id[2] = 0x94;
+	m_id[3] = 0x25;
+	m_id[4] = 0x44;
+	m_page_data_size = 4096;
+	m_page_total_size = 4096 + 448;
+	m_log2_pages_per_block = compute_log2(128);
+	m_num_pages = 128 * 4096;
+	m_col_address_cycles = 2;
+	m_row_address_cycles = 3;
+	m_sequential_row_read = 0;
 }
 
 toshiba_tc58v64bft_device::toshiba_tc58v64bft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

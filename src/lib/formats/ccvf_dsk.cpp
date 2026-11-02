@@ -12,8 +12,11 @@
 
 #include "coretmpl.h" // BIT
 #include "ioprocs.h"
+#include "strformat.h"
 
+#include <algorithm>
 #include <cstring>
+#include <sstream>
 
 
 ccvf_format::ccvf_format()
@@ -105,7 +108,7 @@ bool ccvf_format::load(util::random_read &io, uint32_t form_factor, const std::v
 		return false;
 
 	std::string ccvf = std::string((const char *)&img[0], size);
-	std::vector<uint8_t> bytes(78720);
+	std::vector<uint8_t> bytes(TRACK_BYTES * f.track_count);
 
 	int start = 0, end = 0;
 	std::string line;
@@ -114,10 +117,10 @@ bool ccvf_format::load(util::random_read &io, uint32_t form_factor, const std::v
 
 	do {
 		end = ccvf.find_first_of(10, start);
-		line.assign(ccvf.substr(start, end));
-		if (line.find("Compucolor Virtual Floppy Disk Image") != std::string::npos && line.find("Label") != std::string::npos && line.find("Track") != std::string::npos) {
+		line.assign(ccvf.substr(start, end - start));
+		if (line.length() >= 64 && !line.starts_with("Compucolor Virtual Floppy Disk Image") && !line.starts_with("Label") && !line.starts_with("Track")) {
 			for (int byte = 0; byte < 32; byte++) {
-				if (byteoffs==78720) break;
+				if (byteoffs == bytes.size()) break;
 				hex[0]=line[byte * 2];
 				hex[1]=line[(byte * 2) + 1];
 				bytes[byteoffs++] = strtol(hex, nullptr, 16);
@@ -126,25 +129,14 @@ bool ccvf_format::load(util::random_read &io, uint32_t form_factor, const std::v
 		start = end + 1;
 	} while (start > 0 && end != -1);
 
-	uint64_t pos = 0;
-	int total_size = 200000000/f.cell_size;
-
-	for(int track=0; track < f.track_count; track++) {
+	for (int track = 0; track < f.track_count; track++) {
+		const uint8_t *levels = &bytes[track * TRACK_BYTES];
 		std::vector<uint32_t> buffer;
-		int offset = 0;
 
-		for (int i=0; i<1920 && pos<size; i++, pos++) {
-			for (int bit=0; bit<8; bit++) {
-				bit_w(buffer, util::BIT(bytes[pos], bit), f.cell_size);
-			}
-		}
-
-		if (offset < total_size) {
-			// pad the remainder of the track with sync
-			int count = total_size-buffer.size();
-			for (int i=0; i<count;i++) {
-				bit_w(buffer, (track > 0) ? 1 : 0, f.cell_size);
-			}
+		for (int cell = 0; cell < TRACK_CELLS; cell++) {
+			int const prev = (cell + TRACK_CELLS - 1) % TRACK_CELLS;
+			bool const transition = util::BIT(levels[cell >> 3], cell & 7) != util::BIT(levels[prev >> 3], prev & 7);
+			bit_w(buffer, transition, f.cell_size);
 		}
 
 		generate_track_from_levels(track, 0, buffer, 0, image);
@@ -153,6 +145,66 @@ bool ccvf_format::load(util::random_read &io, uint32_t form_factor, const std::v
 	image.set_variant(f.variant);
 
 	return true;
+}
+
+bool ccvf_format::supports_save() const noexcept
+{
+	return true;
+}
+
+bool ccvf_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
+{
+	const format &f = formats[0];
+
+	std::ostringstream ccvf;
+	ccvf << "Compucolor Virtual Floppy Disk Image\r\n";
+
+	for (int track = 0; track < f.track_count; track++) {
+		std::vector<bool> transitions(TRACK_CELLS, false);
+
+		for (uint32_t entry : image.get_buffer(track, 0)) {
+			if ((entry & floppy_image::MG_MASK) == floppy_image::MG_F) {
+				uint64_t const cell = uint64_t(entry & floppy_image::TIME_MASK) * TRACK_CELLS / 200'000'000;
+				transitions[cell % TRACK_CELLS].flip();
+			}
+		}
+
+		uint8_t bytes[TRACK_BYTES] = {};
+
+		// flux reversals carry no polarity, so recover it the way the drive's read latch does: a run
+		// longer than any space in an 8N1 frame is the idle mark
+		if (std::find(transitions.begin(), transitions.end(), true) != transitions.end()) {
+			bool level = true;
+			int run = IDLE_CELLS;
+
+			for (int i = 0; i < TRACK_CELLS * 2; i++) {
+				int const cell = i % TRACK_CELLS;
+
+				if (transitions[cell]) {
+					level = !level;
+					run = 0;
+				} else if (++run >= IDLE_CELLS) {
+					level = true;
+				}
+
+				if (level && i >= TRACK_CELLS)
+					bytes[cell >> 3] |= 1 << (cell & 7);
+			}
+		}
+
+		util::stream_format(ccvf, "Track %d\r\n", track);
+
+		for (int i = 0; i < TRACK_BYTES; i++) {
+			util::stream_format(ccvf, "%02X", bytes[i]);
+
+			if ((i & 31) == 31)
+				ccvf << "\r\n";
+		}
+	}
+
+	std::string const text = std::move(ccvf).str();
+	auto const [err, actual] = write_at(io, 0, text.data(), text.length());
+	return !err && (actual == text.length());
 }
 
 const ccvf_format FLOPPY_CCVF_FORMAT;

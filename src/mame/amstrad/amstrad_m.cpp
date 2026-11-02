@@ -1410,15 +1410,6 @@ void amstrad_state::amstrad_plus_asic_6000_w(offs_t offset, uint8_t data)
 		}
 		if(offset == 0x0805)  // Interrupt vector register (for IM 2, used by Pang)
 		{
-			// high 5 bits go to interrupt vector
-			int vector;
-
-			if ( m_asic.enabled )
-			{
-				vector = (data & 0xf8) + (m_plus_irq_cause);
-				m_maincpu->set_input_line_vector(0, vector); // Z80
-				logerror("ASIC: IM 2 vector write %02x, data = &%02x\n",vector,data);
-			}
 			m_asic.dma_clear = data & 0x01;
 		}
 		// DMA channels
@@ -2783,7 +2774,7 @@ IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 			m_amx_mouse_data |= (m_io_kbrow[9].read_safe(0) & 0x80);  // DEL key
 		}
 	}
-	return 0xFF;
+	return 0xff;
 }
 
 
@@ -2934,10 +2925,6 @@ void amstrad_state::amstrad_common_init()
 	enumerate_roms();
 
 	m_maincpu->reset();
-	if ( m_system_type == SYSTEM_CPC || m_system_type == SYSTEM_ALESTE )
-		m_maincpu->set_input_line_vector(0, 0xff); // Z80
-	else
-		m_maincpu->set_input_line_vector(0, 0x00); // Z80
 	m_maincpu->z80_set_iorq_cycles(5);
 }
 

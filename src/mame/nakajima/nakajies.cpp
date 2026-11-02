@@ -306,6 +306,7 @@ protected:
 
 	void set_irq(u8 data);
 	void nakajies_update_irqs();
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 	u8 sys_stat_r();
 	u8 keyboard_r();
 	void keyboard_row_reset(u8 data);
@@ -359,6 +360,7 @@ protected:
 	emu_timer *m_f9_timer = nullptr;
 	u8 m_irq_enabled = 0;
 	u8 m_irq_active = 0;
+	u8 m_irq_vector = 0;
 	u8 m_lcd_memory_start = 0;
 	u8 m_keyboard_row = 0;
 	u8 m_keyboard_row_reset = 0xff;
@@ -738,14 +740,13 @@ void nakajies_state::nakajies_update_irqs()
 		vector -= 1;
 	}
 
-	if (vector >= 0xf8)
-	{
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector); // V20
-	}
-	else
-	{
-		m_maincpu->set_input_line(0, CLEAR_LINE);
-	}
+	m_irq_vector = vector;
+	m_maincpu->set_input_line(0, vector >= 0xf8 ? ASSERT_LINE : CLEAR_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(nakajies_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 
@@ -1165,6 +1166,7 @@ void nakajies_state::machine_start()
 
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_irq_active));
+	save_item(NAME(m_irq_vector));
 	save_item(NAME(m_lcd_memory_start));
 	save_item(NAME(m_lcd_on));
 	save_item(NAME(m_keyboard_row));
@@ -1187,6 +1189,7 @@ void nakajies_state::machine_reset()
 {
 	m_irq_enabled = m_ram_base[0x6d4f];
 	m_irq_active = 0;
+	m_irq_vector = 0;
 	m_lcd_memory_start = 0;
 	m_lcd_on = true;
 	m_keyboard_row_reset = BIT(m_irq_enabled, 3) ? 0xfe : 0xff;
@@ -1322,6 +1325,7 @@ void nakajies_state::drwrt100(machine_config &config)
 	V20(config, m_maincpu, X301 / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nakajies_state::nakajies_map);
 	m_maincpu->set_addrmap(AS_IO, &nakajies_state::nakajies_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(nakajies_state::cpu_acknowledge_irq));
 
 	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(50);  // Wild guess

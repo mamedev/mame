@@ -66,6 +66,7 @@ DEFINE_DEVICE_TYPE(FLOPPY_35_ED,   floppy_35_ed,   "floppy_35_ed",   "3.5\" exte
 DEFINE_DEVICE_TYPE(FLOPPY_525_SSSD_35T, floppy_525_sssd_35t, "floppy_525_sssd_35t", "5.25\" single-sided single density 35-track floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_525_SD_35T,   floppy_525_sd_35t,   "floppy_525_sd_35t",   "5.25\" double-sided single density 35-track floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_525_VTECH,    floppy_525_vtech,    "floppy_525_vtech",    "5.25\" single-sided single density VTECH floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_525_COMPUCOLOR, floppy_525_compucolor, "floppy_525_compucolor", "5.25\" single-sided single density Compucolor floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_525_SSSD,     floppy_525_sssd,     "floppy_525_sssd",     "5.25\" single-sided single density floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_525_SD,       floppy_525_sd,       "floppy_525_sd",       "5.25\" single density floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_525_SSDD,     floppy_525_ssdd,     "floppy_525_ssdd",     "5.25\" single-sided double density floppy drive")
@@ -297,7 +298,6 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 	m_cyl(0),
 	m_subcyl(0),
 	m_amplifier_freakout_time(attotime::from_usec(16)),
-	m_glitch_threshold(attotime::zero),
 	m_image_dirty(false),
 	m_track_dirty(false),
 	m_writing(false),
@@ -609,6 +609,8 @@ void floppy_image_device::device_start()
 	save_item(NAME(m_cache_index));
 	save_item(NAME(m_cache_entry));
 	save_item(NAME(m_cache_weak));
+	save_item(NAME(m_cache_weak_start));
+	save_item(NAME(m_cache_weak_id));
 	save_item(NAME(m_image_dirty));
 	save_item(NAME(m_ready_counter));
 	save_item(NAME(m_phases));
@@ -1137,18 +1139,45 @@ attotime floppy_image_device::position_to_time(const attotime &base, int positio
 	return base + attotime::from_double(position/m_angular_speed);
 }
 
+namespace {
+
+bool is_neutral(u32 entry)
+{
+	u32 const type = entry & floppy_image::MG_MASK;
+	return type == floppy_image::MG_N || type == floppy_image::MG_D;
+}
+
+constexpr s64 WEAK_SLOT_NS = 60000;
+constexpr u32 WEAK_SPREAD_NS = 50000;
+
+} // anonymous namespace
+
 void floppy_image_device::cache_fill_index(const std::vector<uint32_t> &buf, int &index, attotime &base)
 {
-	int cells = buf.size();
+	int const cells = buf.size();
 
 	m_cache_index = index;
 	m_cache_start_time = position_to_time(base, buf[index] & floppy_image::TIME_MASK);
 	m_cache_entry = buf[m_cache_index];
 
-	index ++;
-	if(index >= cells) {
-		index = 0;
-		base += m_rev_time;
+	bool const neutral = is_neutral(m_cache_entry);
+	int span = 0;
+	do {
+		index ++;
+		span ++;
+		if(index >= cells) {
+			index = 0;
+			base += m_rev_time;
+		}
+	} while(neutral && span < cells && is_neutral(buf[index]));
+
+	if(neutral && span >= cells) {
+		// Nothing but neutral surface, there is no zone boundary at all
+		m_cache_index = 0;
+		m_cache_entry = floppy_image::MG_N;
+		m_cache_start_time = attotime::zero;
+		m_cache_end_time = attotime::never;
+		return;
 	}
 
 	m_cache_end_time = position_to_time(base, buf[index] & floppy_image::TIME_MASK);
@@ -1159,8 +1188,10 @@ void floppy_image_device::cache_clear()
 	m_cache_start_time = m_cache_end_time = m_cache_weak_start = attotime::zero;
 	m_cache_index = 0;
 	m_cache_entry = 0;
+	m_cache_weak_id = 0;
 	m_cache_weak = false;
 }
+
 void floppy_image_device::cache_fill(const attotime &when)
 {
 	if(m_writing)
@@ -1172,7 +1203,7 @@ void floppy_image_device::cache_fill(const attotime &when)
 		m_cache_end_time = attotime::never;
 		m_cache_index = 0;
 		m_cache_entry = (cells == 1) ? buf[0] : floppy_image::MG_N;
-		cache_weakness_setup(buf, attotime::zero);
+		cache_weakness_setup();
 		return;
 	}
 
@@ -1191,47 +1222,34 @@ void floppy_image_device::cache_fill(const attotime &when)
 		index = int(it - buf.begin()) - 1;
 	}
 
+	// If in the middle of a neutral run, go back to its first entry
+	if(is_neutral(buf[index])) {
+		for(uint32_t step = 1; step < cells && is_neutral(buf[index ? index - 1 : cells - 1]); step++) {
+			if(index) {
+				index--;
+			} else {
+				index = cells - 1;
+				base -= m_rev_time;
+			}
+		}
+	}
+
 	for(;;) {
 		cache_fill_index(buf, index, base);
 		if(m_cache_end_time > when) {
-			// base now belongs to the entry after the current one;
-			// cache_fill_index wrapped it if index reached zero
-			attotime const base_cur = index ? base : base - m_rev_time;
-			cache_weakness_setup(buf, base_cur);
+			cache_weakness_setup();
 			break;
 		}
 	}
 }
 
-void floppy_image_device::cache_weakness_setup(const std::vector<uint32_t> &buf, attotime base)
+void floppy_image_device::cache_weakness_setup()
 {
-	auto const weak_kind = [] (u32 e) {
-		u32 const t = e & floppy_image::MG_MASK;
-		return t == floppy_image::MG_N || t == floppy_image::MG_D;
-	};
+	m_cache_weak_id = m_cache_entry & floppy_image::TIME_MASK;
 
-	if(weak_kind(m_cache_entry)) {
-		// Anchor the noise on the start of the weak run, not on the
-		// entry the cache sits on, so a zone serves the same stream
-		// however the decoder chopped it up
+	if(is_neutral(m_cache_entry)) {
 		m_cache_weak = true;
-		if(buf.size() <= 1) {
-			// Whole track unformatted
-			m_cache_weak_start = m_cache_start_time;
-			return;
-		}
-		int s = m_cache_index;
-		int c = 0;
-		while(c < 1024 && s > 0 && weak_kind(buf[s-1])) {
-			s--;
-			c++;
-		}
-		if(c == 1024 || (s == 0 && weak_kind(buf[buf.size()-1]))) {
-			// Run start not reachable: no anchor, no blip
-			m_cache_weak_start = attotime::never;
-			return;
-		}
-		m_cache_weak_start = position_to_time(base, buf[s] & floppy_image::TIME_MASK);
+		m_cache_weak_start = m_cache_start_time;
 		return;
 	}
 
@@ -1240,7 +1258,6 @@ void floppy_image_device::cache_weakness_setup(const std::vector<uint32_t> &buf,
 		m_cache_weak_start = attotime::never;
 		return;
 	}
-	// The comparator reference needs time to decay before it follows the noise
 	m_cache_weak_start = m_cache_start_time + attotime::from_usec(16);
 }
 
@@ -1249,35 +1266,23 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	if(!m_image || m_mon || m_media_changing)
 		return attotime::never;
 
-	attotime from = from_when;
-	for(;;) {
-		if(from < m_cache_start_time || m_cache_start_time.is_zero() || (!m_cache_end_time.is_never() && from >= m_cache_end_time))
-			cache_fill(from);
+	if(from_when < m_cache_start_time || (!m_cache_end_time.is_never() && from_when >= m_cache_end_time))
+		cache_fill(from_when);
 
-		if(m_cache_weak) {
-			// Weak surface: noise at an unknown rate.  One hash-drawn
-			// blip per zone per revolution, silence for the rest -
-			// entries are skipped like the bounce filter skips ring,
-			// so no entry boundaries leak out as flux.
-			if(m_cache_weak_start.is_never())
-				return attotime::never;
-			attotime const blip = m_cache_weak_start
-				+ attotime::from_nsec(hash32(hash32(m_revolution_count) ^ 0x4242
-						^ u32(m_cache_weak_start.as_ticks(7000000))) % 50000);
-			if(blip > from && blip < m_cache_end_time)
-				return blip;
-			if(m_cache_end_time.is_never())
-				return attotime::never;
-			from = m_cache_end_time;
-			continue;
-		}
-		// A change too close after the previous one is read-chain ring,
-		// not signal - drop it
-		if(!m_cache_end_time.is_never() && m_cache_end_time - m_cache_start_time < m_glitch_threshold) {
-			from = m_cache_end_time;
-			continue;
-		}
+	if(!m_cache_weak)
 		return m_cache_end_time;
+
+	u32 const key = hash32(hash32(m_revolution_count ^ 0x4242) + m_cache_weak_id);
+	u64 slot = from_when > m_cache_weak_start
+		? (from_when - m_cache_weak_start).as_ticks(1000000) / (WEAK_SLOT_NS / 1000)
+		: 0;
+	for(;; slot++) {
+		u32 const h = hash32(key + u32(slot) * 0x9e3779b9U);
+		attotime const trigger = m_cache_weak_start + attotime::from_nsec(s64(slot) * WEAK_SLOT_NS + h % WEAK_SPREAD_NS);
+		if(trigger >= m_cache_end_time)
+			return m_cache_end_time;
+		if(trigger > from_when)
+			return trigger;
 	}
 }
 
@@ -1724,9 +1729,8 @@ void floppy_35_dd::setup_characteristics()
 	m_tracks = 84;
 	m_sides = 2;
 	set_rpm(300);
-	// Changes closer than ~2.1us are read-chain ring; legal DD flux never comes closer than 4us
-	m_glitch_threshold = attotime::from_nsec(2100);
 
+	add_variant(floppy_image::SSSD);
 	add_variant(floppy_image::SSDD);
 	add_variant(floppy_image::DSDD);
 }
@@ -1851,6 +1855,30 @@ void floppy_525_vtech::setup_characteristics()
 	m_tracks = 40;
 	m_sides = 1;
 	set_rpm(85);
+
+	add_variant(floppy_image::SSSD);
+}
+
+//-------------------------------------------------
+//  5.25" single-sided single density, Compucolor edition
+//-------------------------------------------------
+
+floppy_525_compucolor::floppy_525_compucolor(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_525_COMPUCOLOR, tag, owner, clock)
+{
+	m_amplifier_freakout_time = attotime::never;
+}
+
+floppy_525_compucolor::~floppy_525_compucolor()
+{
+}
+
+void floppy_525_compucolor::setup_characteristics()
+{
+	m_form_factor = floppy_image::FF_525;
+	m_tracks = 42;
+	m_sides = 1;
+	set_rpm(300);
 
 	add_variant(floppy_image::SSSD);
 }

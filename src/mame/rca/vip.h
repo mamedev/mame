@@ -39,9 +39,6 @@ public:
 		, m_keypad(*this, "KEYPAD")
 		, m_io_beeper(*this, "BEEPER")
 		, m_8000(1)
-		, m_vdc_int(CLEAR_LINE)
-		, m_vdc_dma_out(CLEAR_LINE)
-		, m_vdc_ef1(CLEAR_LINE)
 		, m_exp_int(CLEAR_LINE)
 		, m_exp_dma_out(CLEAR_LINE)
 		, m_exp_dma_in(CLEAR_LINE)
@@ -62,23 +59,19 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void update_interrupts();
-
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, uint8_t data);
 
 	int clear_r();
+	int int_r();
+	int dma_out_r();
 	int ef1_r();
 	int ef2_r();
 	int ef3_r();
 	int ef4_r();
 	void q_w(int state);
-
-	void vdc_int_w(int state);
-	void vdc_dma_out_w(int state);
-	void vdc_ef1_w(int state);
 
 	void byteio_inst_w(int state);
 
@@ -112,9 +105,6 @@ private:
 	int m_8000;
 
 	// interrupt state
-	int m_vdc_int;
-	int m_vdc_dma_out;
-	int m_vdc_ef1;
 	int m_exp_int;
 	int m_exp_dma_out;
 	int m_exp_dma_in;

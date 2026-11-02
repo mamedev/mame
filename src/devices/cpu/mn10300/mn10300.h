@@ -36,7 +36,7 @@ public:
 
 	// The on-chip DMA controller's channel 0 is driven by an external request
 	// (the floppy controller's DRQ); when its byte count runs out the channel
-	// pulses terminal count back to the requesting device.
+	// pulses terminal count and raises its end-of-transfer interrupt.
 	auto dma_tc_cb() { return m_dma_tc_cb.bind(); }
 	void dma_req_w(int state);
 
@@ -81,6 +81,7 @@ private:
 	static constexpr unsigned NUM_INTC_GROUPS = 0x20;
 	static constexpr int SIO0_GROUP = 0x10;   // RX; TX is the next group, then channel 1
 	static constexpr int TM4_GROUP = 0x06;    // TM5 is the next group
+	static constexpr int DMA0_GROUP = 0x0f;   // DMA channel 0 end of transfer
 	static constexpr int IRQ0_GROUP = 0x17;
 	static constexpr unsigned TM_PRESCALE = 8;
 

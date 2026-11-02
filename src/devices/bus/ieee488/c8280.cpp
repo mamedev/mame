@@ -173,6 +173,9 @@ void c8280_device::c8280_fdc_mem(address_map &map)
 
 uint8_t c8280_device::dio_r()
 {
+	if (!m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
 	/*
 
 	    bit     description
@@ -218,6 +221,9 @@ void c8280_device::dio_w(uint8_t data)
 
 uint8_t c8280_device::riot1_pa_r()
 {
+	if (!m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
 	/*
 
 	    bit     description
@@ -284,6 +290,9 @@ void c8280_device::riot1_pa_w(uint8_t data)
 
 uint8_t c8280_device::riot1_pb_r()
 {
+	if (!m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
 	/*
 
 	    bit     description
@@ -493,7 +502,7 @@ void c8280_device::device_reset()
 	m_riot1->reset();
 	m_fdc->reset();
 
-	m_riot1->pa_bit_w<7>(1);
+	m_riot1->pa_bit_w<7>(0);
 
 	m_fk5 = 0;
 	m_selected_floppy = nullptr;
@@ -510,7 +519,7 @@ void c8280_device::ieee488_atn(int state)
 {
 	update_ieee_signals();
 
-	m_riot1->pa_bit_w<7>(state);
+	m_riot1->pa_bit_w<7>(!state);
 }
 
 

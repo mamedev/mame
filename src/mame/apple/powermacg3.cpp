@@ -67,11 +67,8 @@ private:
 	u16 read_sense();
 	void write_sense(u16 data);
 
-	void cuda_reset_w(int state)
-	{
-		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
-		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
-	}
+	void cuda_reset_w(int state);
+	void cuda_power_w(int state);
 
 	void irq_w(int state)
 	{
@@ -189,6 +186,20 @@ void pwrmacg3_state::write_sense(u16 data)
 	m_sense = data;
 }
 
+void pwrmacg3_state::cuda_reset_w(int state)
+{
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
+}
+
+void pwrmacg3_state::cuda_power_w(int state)
+{
+	if (state)
+	{
+		machine().schedule_exit();
+	}
+}
+
 void pwrmacg3_state::pwrmacg3(machine_config &config)
 {
 	PPC750(config, m_maincpu, 233'000'000);
@@ -218,6 +229,7 @@ void pwrmacg3_state::pwrmacg3(machine_config &config)
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->set_default_bios_tag("341s0060");
 	m_cuda->reset_callback().set(FUNC(pwrmacg3_state::cuda_reset_w));
+	m_cuda->poweroff_callback().set(FUNC(pwrmacg3_state::cuda_power_w));
 	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_cuda->via_clock_callback().set(heathrow, FUNC(heathrow_device::cb1_w));
 	m_cuda->via_data_callback().set(heathrow, FUNC(heathrow_device::cb2_w));

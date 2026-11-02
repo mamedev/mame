@@ -66,10 +66,12 @@ void isbx_slot_device::device_start()
 
 // slot devices
 #include "compis_fdc.h"
+#include "compis_hdc.h"
 #include "isbc_218a.h"
 
 void isbx_cards(device_slot_interface &device)
 {
 	device.option_add("fdc", COMPIS_FDC);
 	device.option_add("fdc_218a", ISBC_218A);
+	device.option_add("hdc", COMPIS_HDC);
 }

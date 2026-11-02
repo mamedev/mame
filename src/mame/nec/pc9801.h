@@ -520,9 +520,9 @@ protected:
 	DECLARE_MACHINE_START(pc9801us);
 
 
-	// SDIP, PC9801DA onward
+	// SDIP, PC9801DA onward, except for Ap, As, Ae
 protected:
-	required_device<pc98_sdip_device> m_sdip;
+	optional_device<pc98_sdip_device> m_sdip;
 };
 
 /**********************************************************
@@ -537,6 +537,7 @@ public:
 	pc9801bx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc9801us_state(mconfig, type, tag)
 		, m_hole_15M_view(*this, "hole_15M_view")
+		, m_bios_view(*this, "bios_view")
 	{
 	}
 
@@ -554,7 +555,12 @@ protected:
 
 	u8 m_hole_15m;
 
+	virtual void itf_43d_bank_w(offs_t offset, uint8_t data) override;
+	virtual void cbus_43f_bank_w(offs_t offset, uint8_t data) override;
+
 	memory_view m_hole_15M_view;
+	// Bx2 at least, then PC-9821Af onward
+	memory_view m_bios_view;
 private:
 	u8 i486_cpu_mode_r(offs_t offset);
 	u8 gdc_31kHz_r(offs_t offset);

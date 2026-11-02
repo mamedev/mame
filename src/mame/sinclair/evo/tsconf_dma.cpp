@@ -162,13 +162,14 @@ TIMER_CALLBACK_MEMBER(tsconfdma_device::dma_clock)
 		const u32 m_m1 = m_asz ? 0x3ffe00 : 0x3fff00;
 		const u32 m_m2 = m_asz ? 0x0001ff : 0x0000ff;
 		const u16 m_align = m_asz ? 512 : 256;
-		m_tx_s_addr = m_align_s ? ((m_tx_s_addr & m_m1) | ((m_tx_s_addr + 2) & m_m2)) : ((m_tx_s_addr + 2) & 0x3fffff);
+		if (m_task != FILL_MEM)
+			m_tx_s_addr = m_align_s ? ((m_tx_s_addr & m_m1) | ((m_tx_s_addr + 2) & m_m2)) : ((m_tx_s_addr + 2) & 0x3fffff);
 		m_tx_d_addr = m_align_d ? ((m_tx_d_addr & m_m1) | ((m_tx_d_addr + 2) & m_m2)) : ((m_tx_d_addr + 2) & 0x3fffff);
 
 		++m_tx_block;
 		if (m_tx_block > m_block_len)
 		{
-			m_address_s = m_align_s ? (m_address_s + m_align) : m_tx_s_addr;
+			m_address_s = (m_task == FILL_MEM) ? m_address_s : (m_align_s ? (m_address_s + m_align) : m_tx_s_addr);
 			m_address_d = m_align_d ? (m_address_d + m_align) : m_tx_d_addr;
 
 			m_tx_block = 0;

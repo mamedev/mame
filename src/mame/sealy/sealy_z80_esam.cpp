@@ -124,7 +124,8 @@ uint64_t des_encrypt(uint64_t block, uint64_t key)
 sealy_z80_esam_device::sealy_z80_esam_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SEALY_Z80_ESAM, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
-	m_default_image(*this, DEVICE_SELF)
+	m_default_image(*this, DEVICE_SELF),
+	m_file_id(0x001d)
 {
 }
 
@@ -133,6 +134,11 @@ void sealy_z80_esam_device::device_start()
 	m_tx_start.fill(0);
 	m_tx_byte.fill(0);
 	m_rx.fill(0);
+
+	reset_session();
+	m_clock = false;
+	m_reset = false;
+	m_line = true;
 
 	save_item(NAME(m_system));
 	save_item(NAME(m_file));
@@ -432,7 +438,7 @@ void sealy_z80_esam_device::command(uint64_t t)
 			status(t, 0x67);
 		else
 		{
-			m_selected = has(OBJ_DATA_FILE) && m_rx[5] == 0x00 && m_rx[6] == 0x1d;
+			m_selected = has(OBJ_DATA_FILE) && get_u16be(&m_rx[5]) == m_file_id;
 			status(t, m_selected ? 0x90 : 0x6a, m_selected ? 0x00 : 0x82);
 		}
 	}
@@ -443,7 +449,7 @@ void sealy_z80_esam_device::command(uint64_t t)
 			status(t, 0x69, 0x86);
 		else if (p1p2 + length > FILE_SIZE)
 			status(t, 0x6b);
-		else if (!m_authenticated || !m_verified)
+		else if ((has(OBJ_DES_KEY) && !m_authenticated) || !m_verified)
 			status(t, 0x69, 0x82);
 		else if (ins == 0xb0)
 		{

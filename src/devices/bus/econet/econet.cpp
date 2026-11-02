@@ -18,7 +18,7 @@
 #define LOG 0
 
 
-static const char *const SIGNAL_NAME[] = { "CLK", "DATA" };
+static const char *const SIGNAL_NAME[] = { "CLK", "DATA", "DRIVE" };
 
 
 
@@ -41,6 +41,11 @@ DEFINE_DEVICE_TYPE(ECONET_SLOT, econet_slot_device, "econet_slot", "Econet stati
 
 device_econet_interface::device_econet_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "econet"), m_econet(nullptr), m_address(0)
+{
+}
+
+
+void device_econet_interface::econet_valid(int state)
 {
 }
 
@@ -86,7 +91,9 @@ void econet_slot_device::device_start()
 
 inline void econet_device::set_signal(device_t *device, int signal, int state)
 {
-	bool changed = false;
+	int const old_clk = get_clk();
+	int const old_data = get_data();
+	int const old_valid = get_valid();
 
 	if (device == this)
 	{
@@ -94,7 +101,6 @@ inline void econet_device::set_signal(device_t *device, int signal, int state)
 		{
 			if (LOG) logerror("Econet: '%s' %s %u\n", tag(), SIGNAL_NAME[signal], state);
 			m_line[signal] = state;
-			changed = true;
 		}
 	}
 	else
@@ -107,60 +113,97 @@ inline void econet_device::set_signal(device_t *device, int signal, int state)
 				{
 					if (LOG) logerror("Econet: '%s' %s %u\n", device->tag(), SIGNAL_NAME[signal], state);
 					entry.m_line[signal] = state;
-					changed = true;
 				}
 			}
 		}
 	}
 
-	if (changed)
+	int const clk = get_clk();
+	if (clk != old_clk)
 	{
-		switch (signal)
-		{
-		case CLK:   m_write_clk(state);  break;
-		case DATA:  m_write_data(state); break;
-		}
-
+		m_write_clk(clk);
 		for (auto &entry : m_device_list)
-		{
-			switch (signal)
-			{
-			case CLK:
-				entry.interface().econet_clk(state);
-				break;
-
-			case DATA:
-				entry.interface().econet_data(state);
-				break;
-			}
-		}
-
-		if (LOG) logerror("Econet: CLK %u DATA %u\n", get_signal(CLK), get_signal(DATA));
+			entry.interface().econet_clk(clk);
 	}
+
+	int const data = get_data();
+	if (data != old_data)
+	{
+		m_write_data(data);
+		for (auto &entry : m_device_list)
+			entry.interface().econet_data(data);
+	}
+
+	int const valid = get_valid();
+	if (valid != old_valid)
+	{
+		m_write_valid(valid);
+		for (auto &entry : m_device_list)
+			entry.interface().econet_valid(valid);
+	}
+
+	if (LOG) logerror("Econet: CLK %u DATA %u VALID %u\n", clk, data, valid);
 }
 
 
 //-------------------------------------------------
-//  get_signal -
+//  get_clk - wired-AND of the clock line
 //-------------------------------------------------
 
-inline int econet_device::get_signal(int signal)
+inline int econet_device::get_clk()
 {
-	int state = m_line[signal];
+	int state = m_line[CLK];
 
-	if (state)
+	for (auto &entry : m_device_list)
+		state &= entry.m_line[CLK];
+
+	return state;
+}
+
+
+//-------------------------------------------------
+//  get_data - the terminators pull undriven data
+//  lines to 1
+//-------------------------------------------------
+
+inline int econet_device::get_data()
+{
+	int state = m_line[DRIVE] ? m_line[DATA] : 1;
+
+	for (auto &entry : m_device_list)
+		if (entry.m_line[DRIVE])
+			state &= entry.m_line[DATA];
+
+	return state;
+}
+
+
+//-------------------------------------------------
+//  get_valid - data lines are driven without a
+//  collision
+//-------------------------------------------------
+
+inline int econet_device::get_valid()
+{
+	int drivers = 0;
+	int ones = 0;
+
+	if (m_line[DRIVE])
 	{
-		for (auto &entry : m_device_list)
+		drivers++;
+		ones += m_line[DATA];
+	}
+
+	for (auto &entry : m_device_list)
+	{
+		if (entry.m_line[DRIVE])
 		{
-			if (!entry.m_line[signal])
-			{
-				state = 0;
-				break;
-			}
+			drivers++;
+			ones += entry.m_line[DATA];
 		}
 	}
 
-	return state;
+	return drivers && ((ones == 0) || (ones == drivers));
 }
 
 
@@ -176,7 +219,8 @@ inline int econet_device::get_signal(int signal)
 econet_device::econet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ECONET, tag, owner, clock),
 	m_write_clk(*this),
-	m_write_data(*this)
+	m_write_data(*this),
+	m_write_valid(*this)
 {
 	for (auto & elem : m_line)
 	{
@@ -191,6 +235,7 @@ econet_device::econet_device(const machine_config &mconfig, const char *tag, dev
 
 void econet_device::device_start()
 {
+	save_item(NAME(m_line));
 }
 
 
@@ -213,7 +258,8 @@ void econet_device::add_device(device_econet_interface &target, int address)
 	target.m_econet = this;
 	target.m_address = address;
 
-	m_device_list.emplace_back(target);
+	daisy_entry &entry = m_device_list.emplace_back(target);
+	save_item(NAME(entry.m_line), address);
 }
 
 
@@ -251,6 +297,16 @@ void econet_device::host_data_w(int state)
 
 
 //-------------------------------------------------
+//  host_rts_w - data line driver enable
+//-------------------------------------------------
+
+void econet_device::host_rts_w(int state)
+{
+	set_signal(this, DRIVE, state);
+}
+
+
+//-------------------------------------------------
 //  clk_w -
 //-------------------------------------------------
 
@@ -267,6 +323,16 @@ void econet_device::clk_w(device_t *device, int state)
 void econet_device::data_w(device_t *device, int state)
 {
 	set_signal(device, DATA, state);
+}
+
+
+//-------------------------------------------------
+//  rts_w - data line driver enable
+//-------------------------------------------------
+
+void econet_device::rts_w(device_t *device, int state)
+{
+	set_signal(device, DRIVE, state);
 }
 
 

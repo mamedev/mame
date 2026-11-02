@@ -3949,6 +3949,19 @@ Black screen after [tape] loading
 		</part>
 	</software>
 
+	<!-- origin: Ultimate Tape Archive V3.0 id=6435 -->
+	<software name="emlynhis">
+		<description>Emlyn Hughes International Soccer</description>
+		<year>1988</year>
+		<publisher>Audiogenic Software</publisher>
+    
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="638446">
+				<rom name="Emlyn_Hughes_International_Soccer.tap" size="638446" crc="d23d10c5" sha1="daf1972bf0a41a1c43721c013c12ba5fbf946379" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="enduro">
 		<description>Enduro Racer</description>
 		<year>1989</year>

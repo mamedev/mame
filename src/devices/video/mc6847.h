@@ -176,6 +176,7 @@ protected:
 		bool poll_config();
 		void set_pal_artifacting(bool palartifacting) { m_palartifacting = palartifacting; }
 		bool get_pal_artifacting() { return m_palartifacting; }
+		bool get_ntsc_artifacting() const { return m_artifacting != 0 && !m_palartifacting; }
 		void create_color_blend_table(const pixel_t *palette);
 
 		// artifacting application
@@ -207,27 +208,38 @@ protected:
 		}
 
 		template<int xscale>
-		ATTR_FORCE_INLINE void process_artifacts(pixel_t *pixels, uint8_t mode, const pixel_t *palette)
+		ATTR_FORCE_INLINE void process_artifacts(pixel_t *pixels, uint8_t mode, const pixel_t *palette, const uint8_t *pixel_modes = nullptr)
 		{
-			if (((mode & (MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0)) == (MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0))
+			if ((pixel_modes || ((mode & (MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0)) == (MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0)))
 				&& (m_artifacting != 0))
 			{
-				// identify the new colors and update
-				pixel_t c0 = palette[(mode & MODE_CSS) ? 10 : 8];
-				pixel_t c1 = palette[(mode & MODE_CSS) ? 11 : 9];
-				update_colors(c0, c1);
+				// Recover each sample using its own CSS state, including across mode boundaries.
+				const auto is_set = [=](int x)
+				{
+					const uint8_t sample_mode = (pixel_modes && x >= 0 && x < 256) ? pixel_modes[x] : mode;
+					return pixels[x * xscale] == palette[(sample_mode & MODE_CSS) ? 11 : 9];
+				};
 
 				// generate the new line
 				pixel_t new_line[256];
 				int x, i;
 				for (x = 0; x < 256; x += 2)
 				{
-					uint8_t val = ((pixels[(x - 2) * xscale] == c1) ? 0x20 : 0x00)
-							| ((pixels[(x - 1) * xscale] == c1) ? 0x10 : 0x00)
-							| ((pixels[(x + 0) * xscale] == c1) ? 0x08 : 0x00)
-							| ((pixels[(x + 1) * xscale] == c1) ? 0x04 : 0x00)
-							| ((pixels[(x + 2) * xscale] == c1) ? 0x02 : 0x00)
-							| ((pixels[(x + 3) * xscale] == c1) ? 0x01 : 0x00);
+					const uint8_t pixel_mode = pixel_modes ? pixel_modes[x] : mode;
+					if ((pixel_mode & (MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0)) != (MODE_AG|MODE_GM2|MODE_GM1|MODE_GM0))
+					{
+						new_line[x + 0] = pixels[(x + 0) * xscale];
+						new_line[x + 1] = pixels[(x + 1) * xscale];
+						continue;
+					}
+
+					update_colors(palette[(pixel_mode & MODE_CSS) ? 10 : 8], palette[(pixel_mode & MODE_CSS) ? 11 : 9]);
+					uint8_t val = (is_set(x - 2) ? 0x20 : 0x00)
+							| (is_set(x - 1) ? 0x10 : 0x00)
+							| (is_set(x + 0) ? 0x08 : 0x00)
+							| (is_set(x + 1) ? 0x04 : 0x00)
+							| (is_set(x + 2) ? 0x02 : 0x00)
+							| (is_set(x + 3) ? 0x01 : 0x00);
 
 					new_line[x + 0] = m_expanded_colors[val * 2 + 0];
 					new_line[x + 1] = m_expanded_colors[val * 2 + 1];
@@ -489,7 +501,7 @@ class mc6847_base_device : public mc6847_friend_device
 public:
 	auto input_callback() { return m_input_cb.bind(); }
 
-	void set_get_fixed_mode(uint8_t mode) { m_fixed_mode = mode; }
+	void set_fixed_mode(uint8_t mode) { m_fixed_mode = mode; }
 	void set_black_and_white(bool bw) { m_black_and_white = bw; }
 
 	/* updates the screen -- this will call begin_update(),
@@ -569,32 +581,7 @@ private:
 	bool m_dirty;
 	video_scanline m_data[192];
 
-	void change_mode(uint8_t mode, int state)
-	{
-		// sanity check, to ensure that we're not changing fixed modes
-		assert((mode & m_fixed_mode_mask) == 0);
-
-		// calculate new mode
-		uint8_t new_mode;
-		if (state)
-			new_mode = m_mode | mode;
-		else
-			new_mode = m_mode & ~mode;
-
-		// has the mode changed?
-		if (new_mode != m_mode)
-		{
-			// it has!  check dirty flag
-			video_flush();
-			if (!m_dirty)
-			{
-				m_dirty = true;
-			}
-
-			// and set the new mode
-			m_mode = new_mode;
-		}
-	}
+	void change_mode(uint8_t mode, int state);
 
 	// setup functions
 	void setup_fixed_mode();

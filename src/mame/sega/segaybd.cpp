@@ -300,6 +300,7 @@ private:
 	// linked cabinet specific handlers
 	void mb8421_intl(int state);
 	void mb8421_intr(int state);
+	IRQ_CALLBACK_MEMBER(linkcpu_acknowledge_irq);
 	uint16_t link_r();
 	uint16_t link2_r();
 	void link2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -1038,7 +1039,12 @@ void segaybd_state::mb8421_intl(int state)
 void segaybd_state::mb8421_intr(int state)
 {
 	// shared ram interrupt request from maincpu side
-	m_linkcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xef); // Z80 - RST $28
+	m_linkcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(segaybd_state::linkcpu_acknowledge_irq)
+{
+	return 0xef; // Z80 - RST $28
 }
 
 
@@ -1732,6 +1738,7 @@ void segaybd_state::yboard_link(machine_config &config)
 	Z80(config, m_linkcpu, XTAL(16'000'000)/2); // 8 Mhz
 	m_linkcpu->set_addrmap(AS_PROGRAM, &segaybd_state::link_map);
 	m_linkcpu->set_addrmap(AS_IO, &segaybd_state::link_portmap);
+	m_linkcpu->set_irq_acknowledge_callback(FUNC(segaybd_state::linkcpu_acknowledge_irq));
 
 	mb8421_device &mb8421(MB8421(config, "mb8421"));
 	mb8421.intl_callback().set(FUNC(segaybd_state::mb8421_intl));

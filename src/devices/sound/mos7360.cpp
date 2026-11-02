@@ -1420,13 +1420,53 @@ void mos7360_device::render(int load, bool force_blank)
 	uint8_t const mode = m_render_mode & (MODE_MCM | MODE_BMM | MODE_ECM);
 	bool const active = !blank && m_display_active && (mode < 0x05);
 
+	if (!active)
+	{
+		if (blank || m_display_active)
+		{
+			std::fill_n(dest, 4, m_palette[0]);
+		}
+		else
+		{
+			dest[0] = m_palette[m_color_latch[4] & 0x7f];
+			std::fill_n(dest + 1, 3, m_palette[m_reg[0x19] & 0x7f]);
+		}
+
+		for (int p = 0; p < 4; p++)
+		{
+			if (p == load)
+				m_shift = m_current;
+
+			bool const multicolor = (m_mode & MODE_MCM) && !(((m_mode & (MODE_MCM | MODE_BMM)) == MODE_MCM) && !(m_shift.attr & 0x08));
+			if (!multicolor)
+				m_shift.bitmap <<= 1;
+			else if ((p - load) & 1)
+				m_shift.bitmap <<= 2;
+		}
+		return;
+	}
+
+	switch (mode)
+	{
+	case 0x00: render_active<0x00>(dest, load); break;
+	case MODE_MCM: render_active<MODE_MCM>(dest, load); break;
+	case MODE_BMM: render_active<MODE_BMM>(dest, load); break;
+	case MODE_MCM | MODE_BMM: render_active<MODE_MCM | MODE_BMM>(dest, load); break;
+	default: render_active<MODE_ECM>(dest, load); break;
+	}
+}
+
+
+template <uint8_t Mode>
+void mos7360_device::render_active(uint32_t *dest, int load)
+{
 	for (int p = 0; p < 4; p++)
 	{
 		if (p == load)
 		{
 			m_shift = m_current;
 
-			if (active && (mode == 0x00) && (m_shift.attr & 0x80))
+			if ((Mode == 0x00) && (m_shift.attr & 0x80))
 				m_shift.bitmap &= BIT(m_shift.flags, 7) ? 0xff : m_flash;
 		}
 
@@ -1434,65 +1474,53 @@ void mos7360_device::render(int load, bool force_blank)
 		uint8_t const c = m_shift.ch;
 		uint8_t const b = m_shift.bitmap;
 		uint8_t color = 0;
-		bool multicolor;
+		bool const multicolor = (Mode == (MODE_MCM | MODE_BMM)) || ((Mode == MODE_MCM) && (a & 0x08));
 
-		if (active)
+		switch (Mode)
 		{
-			multicolor = (mode == (MODE_MCM | MODE_BMM)) || ((mode == MODE_MCM) && (a & 0x08));
-
-			switch (mode)
-			{
-			case 0x00:
-			{
-				int bit = BIT(b, 7);
-				if (BIT(c, 7) && BIT(m_shift.flags, 3))
-					bit ^= 1;
-				if (BIT(m_shift.flags, 7))
-					bit ^= BIT(m_flash, 7);
-				color = bit ? a : (p ? m_reg[0x15] : m_color_latch[0]);
-				break;
-			}
-
-			case MODE_MCM:
-				if (multicolor)
-				{
-					int const pair = b >> 6;
-					color = (pair == 3) ? (a & 0x77) : (p ? m_reg[0x15 + pair] : m_color_latch[pair]);
-				}
-				else
-				{
-					color = BIT(b, 7) ? a : (p ? m_reg[0x15] : m_color_latch[0]);
-				}
-				break;
-
-			case MODE_BMM:
-				color = BIT(b, 7) ? (((a & 0x07) << 4) | (c >> 4)) : ((a & 0x70) | (c & 0x0f));
-				break;
-
-			case MODE_MCM | MODE_BMM:
-				switch (b >> 6)
-				{
-				case 0: color = p ? m_reg[0x15] : m_color_latch[0]; break;
-				case 1: color = ((a & 0x07) << 4) | (c >> 4); break;
-				case 2: color = (a & 0x70) | (c & 0x0f); break;
-				default: color = p ? m_reg[0x16] : m_color_latch[1]; break;
-				}
-				break;
-
-			default:
-			{
-				int const bg = c >> 6;
-				color = BIT(b, 7) ? a : (p ? m_reg[0x15 + bg] : m_color_latch[bg]);
-				break;
-			}
-			}
+		case 0x00:
+		{
+			int bit = BIT(b, 7);
+			if (BIT(c, 7) && BIT(m_shift.flags, 3))
+				bit ^= 1;
+			if (BIT(m_shift.flags, 7))
+				bit ^= BIT(m_flash, 7);
+			color = bit ? a : (p ? m_reg[0x15] : m_color_latch[0]);
+			break;
 		}
-		else
-		{
-			multicolor = (m_mode & MODE_MCM) && !(((m_mode & (MODE_MCM | MODE_BMM)) == MODE_MCM) && !(a & 0x08));
 
-			if (!blank && !m_display_active)
-				color = p ? m_reg[0x19] : m_color_latch[4];
+		case MODE_MCM:
+			if (multicolor)
+			{
+				int const pair = b >> 6;
+				color = (pair == 3) ? (a & 0x77) : (p ? m_reg[0x15 + pair] : m_color_latch[pair]);
+			}
+			else
+			{
+				color = BIT(b, 7) ? a : (p ? m_reg[0x15] : m_color_latch[0]);
+			}
+			break;
+
+		case MODE_BMM:
+			color = BIT(b, 7) ? (((a & 0x07) << 4) | (c >> 4)) : ((a & 0x70) | (c & 0x0f));
+			break;
+
+		case MODE_MCM | MODE_BMM:
+			switch (b >> 6)
+			{
+			case 0: color = p ? m_reg[0x15] : m_color_latch[0]; break;
+			case 1: color = ((a & 0x07) << 4) | (c >> 4); break;
+			case 2: color = (a & 0x70) | (c & 0x0f); break;
+			default: color = p ? m_reg[0x16] : m_color_latch[1]; break;
+			}
+			break;
+
+		default:
+		{
+			int const bg = c >> 6;
+			color = BIT(b, 7) ? a : (p ? m_reg[0x15 + bg] : m_color_latch[bg]);
+			break;
+		}
 		}
 
 		dest[p] = m_palette[color & 0x7f];

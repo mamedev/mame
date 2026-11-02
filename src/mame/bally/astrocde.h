@@ -71,6 +71,8 @@ public:
 	std::unique_ptr<uint8_t[]> m_sparklestar{};
 	uint8_t m_interrupt_enabl = 0U;
 	uint8_t m_interrupt_vector = 0U;
+	uint8_t m_interrupt_feedback = 0U;
+	bool m_interrupt_clear_on_ack = false;
 	uint8_t m_interrupt_scanline = 0xff;
 	uint8_t m_vertical_feedback = 0U;
 	uint8_t m_horizontal_feedback = 0U;
@@ -146,6 +148,7 @@ public:
 	inline int mame_vpos_to_astrocade_vpos(int scanline);
 	void init_savestate();
 	void astrocade_trigger_lightpen(uint8_t vfeedback, uint8_t hfeedback);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 	inline void increment_source(uint8_t curwidth, uint8_t *u13ff);
 	inline void increment_dest(uint8_t curwidth);
 	void execute_blit();

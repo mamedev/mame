@@ -1065,8 +1065,12 @@ void scsp_device::w16(u32 addr, u16 val)
 			*((u16 *) (m_DSP.COEF + (addr - 0x700) / 2)) = val;
 		else if (addr < 0x7c0)
 			*((u16 *) (m_DSP.MADRS + (addr - 0x780) / 2)) = val;
-		else if (addr < 0x800) // MADRS is mirrored twice
-			*((u16 *) (m_DSP.MADRS + (addr - 0x7c0) / 2)) = val;
+		else if (addr < 0x800)
+		{
+			// 0x7c0-0x7ff does not mirror MADRS: doa clears this range
+			// right after loading MADRS, which left every DSP memory
+			// access at offset 0 and drove its output to a DC level
+		}
 		else if (addr < 0xC00)
 		{
 			*((uint16_t *) (m_DSP.MPRO + (addr - 0x800) / 2)) = val;

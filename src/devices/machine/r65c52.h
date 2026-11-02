@@ -205,6 +205,8 @@ private:
 	u8 m_isr[2];
 
 	u8 m_irq[2];
+	bool m_irq_latch[2];
+	u8 m_irq_sources[2];
 
 	bool m_overrun[2];
 	bool m_parity_err[2];

@@ -35,13 +35,13 @@
 
     TODO:
 
-    - booting system2 with disk in drive b: fails
     - uhrg graphics are drawn wrong (upd7220 bugs?)
     - compis2
         - color graphics
         - 8087
         - programmable keyboard
-    - hard disk
+    - SASI hard disk (units 4-5)
+    - QIC-02 streamer tape
 
 */
 
@@ -815,18 +815,19 @@ void compis_state::compis(machine_config &config)
 
 	COMPIS_GRAPHICS_SLOT(config, m_graphics, 15.36_MHz_XTAL/2, compis_graphics_cards, "hrg");
 
-	// FIXME: set clock to MCLK frequency
 	ISBX_SLOT(config, m_isbx0, 0, isbx_cards, "fdc");
 	m_isbx0->mintr0().set(m_osp, FUNC(i80130_device::ir1_w));
 	m_isbx0->mintr1().set(m_osp, FUNC(i80130_device::ir0_w));
 	m_isbx0->mdrqt().set(m_maincpu, FUNC(i80186_cpu_device::drq0_w));
+	
 	ISBX_SLOT(config, m_isbx1, 0, isbx_cards, nullptr);
 	m_isbx1->mintr0().set(m_osp, FUNC(i80130_device::ir6_w));
 	m_isbx1->mintr1().set(m_osp, FUNC(i80130_device::ir5_w));
 	m_isbx1->mdrqt().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
 
 	// software lists
-	SOFTWARE_LIST(config, "flop_list").set_original("compis");
+	SOFTWARE_LIST(config, "flop_list").set_original("compis_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("compis_hdd");
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("128K").set_extra_options("256K");

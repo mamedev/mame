@@ -3,9 +3,10 @@
 /*
     Secure module (ESAM) on Sealy Z80 boards, high-level emulation
 
-    Used by Sealy lucky168, wired to the lines the other Sealy Z80 boards use for
-    their 93C46.  The chip is an eight-pin DIP marked "Watchdata e2829 0F10"
-    (read from a PCB photo); it is undumped and no datasheet has been found.
+    Used by Sealy lucky168 and ddz1, wired to the lines the other Sealy Z80
+    boards use for their 93C46, and by clonekng on lines of its own.  On
+    lucky168 the chip is an eight-pin DIP marked "Watchdata e2829 0F10" (read
+    from a PCB photo); it is undumped and no datasheet has been found.
 
     Deduced from the host code, not confirmed on documentation: the host speaks
     ISO 7816 T=0 and, next to the standard GET CHALLENGE, EXTERNAL
@@ -18,8 +19,9 @@
 
     Only what the host uses is implemented: one DES external authentication
     key, one 8-byte PIN and the single binary file.  Access conditions are not
-    modelled beyond requiring both authentication and PIN for file access, the
-    ATR is minimal (3B 00) and GET RESPONSE has nothing to return.
+    modelled beyond requiring the PIN, and authentication when a key is present,
+    for file access; the ATR is minimal (3B 00) and GET RESPONSE has nothing to
+    return.  clonekng selects its file as 004D and never authenticates.
 
     The bit period is 748 ticks of the device clock, i.e. the period of the
     host's bit-banging loop when the device is clocked like the 6 MHz Z80.  The
@@ -46,6 +48,9 @@ class sealy_z80_esam_device : public device_t, public device_nvram_interface
 {
 public:
 	sealy_z80_esam_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// ID of the transparent EF, 001D unless changed
+	void set_file_id(uint16_t id) { m_file_id = id; }
 
 	void clk_w(int state); // clock enable
 	void rst_w(int state); // reset, active low
@@ -77,6 +82,7 @@ private:
 	};
 
 	optional_memory_region m_default_image;
+	uint16_t m_file_id;
 
 	// persistent contents
 	std::array<uint8_t, SYSTEM_SIZE> m_system;

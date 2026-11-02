@@ -1,144 +1,201 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+copyright-holders: Roberto Fresca
+
+************************************************
+
+  Lucky Roulette Plus layout.
+
+  37-LED European Roulette artwork with
+  accurate number mapping, inverted LED matrix
+
+  Vertical design (4:3).
+
+************************************************
 -->
 <mamelayout version="2">
 
+	<!-- Background 4:3, 1600x1200 -->
+	<element name="bg_adjust">
+		<rect>
+			<bounds x="0" y="0" width="1600" height="1200" />
+			<color red="0.0" green="0.1" blue="0.0" />
+		</rect>
+	</element>
+
+	<!-- Static element simulating the physical roulette wheel -->
+	<element name="roulette">
+		<!-- 1. External plate -->
+		<disk>
+			<bounds x="0" y="0" width="100" height="100" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</disk>
+		<!-- 2. Intermediate ring where the LEDs and numbers are placed -->
+		<disk>
+			<bounds x="6" y="6" width="88" height="88" />
+			<color red="0.05" green="0.05" blue="0.05" />
+		</disk>
+		<!-- 3. Center plate -->
+		<disk>
+			<bounds x="17" y="17" width="66" height="66" />
+			<color red="0.10" green="0.10" blue="0.10" />
+		</disk>
+		<!-- 4. Center cone element -->
+		<disk>
+			<bounds x="36" y="36" width="28" height="28" />
+			<color red="0.20" green="0.20" blue="0.20" />
+		</disk>
+		<!-- 5. Turret spindle -->
+		<disk>
+			<bounds x="44" y="44" width="12" height="12" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</disk>
+		<!-- 6. Roulette turret (horizontal piece) -->
+		<rect>
+			<bounds x="30" y="48" width="40" height="4" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<!-- 7. Roulette turret (verticalal piece) -->
+		<rect>
+			<bounds x="48" y="30" width="4" height="40" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<!-- BALL elements definitions -->
 	<element name="BALL0">
-		<disk state = "0">
-			<color red="0.0" green="0.3" blue="0" />
-		</disk>
-		<disk state = "1">
-			<color red="0" green="1" blue="0" />
-		</disk>
+		<disk state="0"><color red="0.0" green="0.3" blue="0" /></disk>
+		<disk state="1"><color red="0" green="1" blue="0" /></disk>
 	</element>
 
 	<element name="BALL">
-		<disk state = "0">
-			<color red="0.3" green="0" blue="0" />
-		</disk>
-		<disk state = "1">
-			<color red="1" green="0" blue="0" />
-		</disk>
+		<disk state="0"><color red="0.3" green="0" blue="0" /></disk>
+		<disk state="1"><color red="1" green="0" blue="0" /></disk>
 	</element>
 
+	<!-- Roulette numbers definition -->
+	<element name="n0"><text string="0"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n1"><text string="1"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n2"><text string="2"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n3"><text string="3"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n4"><text string="4"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n5"><text string="5"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n6"><text string="6"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n7"><text string="7"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n8"><text string="8"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n9"><text string="9"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n10"><text string="10"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n11"><text string="11"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n12"><text string="12"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n13"><text string="13"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n14"><text string="14"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n15"><text string="15"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n16"><text string="16"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n17"><text string="17"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n18"><text string="18"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n19"><text string="19"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n20"><text string="20"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n21"><text string="21"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n22"><text string="22"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n23"><text string="23"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n24"><text string="24"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n25"><text string="25"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n26"><text string="26"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n27"><text string="27"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n28"><text string="28"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n29"><text string="29"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n30"><text string="30"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n31"><text string="31"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n32"><text string="32"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n33"><text string="33"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n34"><text string="34"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n35"><text string="35"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+	<element name="n36"><text string="36"><color red="0.5" green="0.5" blue="0.5"/></text></element>
+
 	<view name="Lamps">
+		<element ref="bg_adjust"><bounds x="0" y="0" width="1600" height="1200" /></element>
+		<screen index="0"><bounds left="28" top="32" right="880" bottom="1168" /></screen>
 
-		<screen index="0">
-			<bounds left="100" top="96" right="832" bottom="1072" />
-		</screen>
+		<!-- Roulette structure -->
+		<element ref="roulette"><bounds x="1000.25" y="159.25" width="479.55" height="479.55" /></element>
 
-		<element name="lamp134" ref="BALL0">
-			<bounds x="1321.5755279531" y="319.178830824334" width="16" height="16" />
-		</element>
-		<element name="lamp135" ref="BALL">
-			<bounds x="1332.56513467655" y="335.702636395822" width="16" height="16" />
-		</element>
-		<element name="lamp8" ref="BALL">
-			<bounds x="1340.60412921523" y="353.84601461785" width="16" height="16" />
-		</element>
-		<element name="lamp9" ref="BALL">
-			<bounds x="1345.46124433281" y="373.087013532536" width="16" height="16" />
-		</element>
-		<element name="lamp10" ref="BALL">
-			<bounds x="1346.9967496707" y="392.872104633103" width="16" height="16" />
-		</element>
-		<element name="lamp11" ref="BALL">
-			<bounds x="1345.16647153601" y="412.632106871213" width="16" height="16" />
-		</element>
-		<element name="lamp12" ref="BALL">
-			<bounds x="1340.0230636983" y="431.798560959421" width="16" height="16" />
-		</element>
-		<element name="lamp13" ref="BALL">
-			<bounds x="1331.71449263647" y="449.820082909883" width="16" height="16" />
-		</element>
-		<element name="lamp14" ref="BALL">
-			<bounds x="1320.4797808126" y="466.178226347788" width="16" height="16" />
-		</element>
-		<element name="lamp16" ref="BALL">
-			<bounds x="1306.64213043088" y="480.402397269624" width="16" height="16" />
-		</element>
-		<element name="lamp17" ref="BALL">
-			<bounds x="1290.59962549863" y="492.083392175853" width="16" height="16" />
-		</element>
-		<element name="lamp18" ref="BALL">
-			<bounds x="1272.81377967425" y="500.885170110556" width="16" height="16" />
-		</element>
-		<element name="lamp19" ref="BALL">
-			<bounds x="1253.7962593595" y="506.554519947908" width="16" height="16" />
-		</element>
-		<element name="lamp20" ref="BALL">
-			<bounds x="1234.09416398871" y="508.928344815248" width="16" height="16" />
-		</element>
-		<element name="lamp21" ref="BALL">
-			<bounds x="1214.27428697419" y="507.938354093155" width="16" height="16" />
-		</element>
-		<element name="lamp22" ref="BALL">
-			<bounds x="1194.90681009169" y="503.613028012232" width="16" height="16" />
-		</element>
-		<element name="lamp32" ref="BALL">
-			<bounds x="1176.54890038884" y="496.076798328726" width="16" height="16" />
-		</element>
-		<element name="lamp33" ref="BALL">
-			<bounds x="1159.72868150364" y="485.546468649452" width="16" height="16" />
-		</element>
-		<element name="lamp34" ref="BALL">
-			<bounds x="1144.93004050891" y="472.32497738676" width="16" height="16" />
-		</element>
-		<element name="lamp35" ref="BALL">
-			<bounds x="1132.57870736225" y="456.792682771969" width="16" height="16" />
-		</element>
-		<element name="lamp36" ref="BALL">
-			<bounds x="1123.03000743027" y="439.396420641569" width="16" height="16" />
-		</element>
-		<element name="lamp37" ref="BALL">
-			<bounds x="1116.55863942476" y="420.636649783757" width="16" height="16" />
-		</element>
-		<element name="lamp38" ref="BALL">
-			<bounds x="1113.35077282082" y="401.053054650283" width="16" height="16" />
-		</element>
-		<element name="lamp64" ref="BALL">
-			<bounds x="1113.49869210012" y="381.209019617376" width="16" height="16" />
-		</element>
-		<element name="lamp65" ref="BALL">
-			<bounds x="1116.99814189431" y="361.675421442988" width="16" height="16" />
-		</element>
-		<element name="lamp66" ref="BALL">
-			<bounds x="1123.74844940422" y="343.014206181865" width="16" height="16" />
-		</element>
-		<element name="lamp67" ref="BALL">
-			<bounds x="1133.55542057307" y="325.762223020679" width="16" height="16" />
-		</element>
-		<element name="lamp68" ref="BALL">
-			<bounds x="1146.13692669582" y="310.415780104371" width="16" height="16" />
-		</element>
-		<element name="lamp69" ref="BALL">
-			<bounds x="1161.13102074843" y="297.416366654444" width="16" height="16" />
-		</element>
-		<element name="lamp70" ref="BALL">
-			<bounds x="1178.10634994466" y="287.137952127882" width="16" height="16" />
-		</element>
-		<element name="lamp71" ref="BALL">
-			<bounds x="1196.57456497046" y="279.876227796751" width="16" height="16" />
-		</element>
-		<element name="lamp128" ref="BALL">
-			<bounds x="1216.00436890452" y="275.840100248669" width="16" height="16" />
-		</element>
-		<element name="lamp129" ref="BALL">
-			<bounds x="1235.83680166342" y="275.145681524636" width="16" height="16" />
-		</element>
-		<element name="lamp130" ref="BALL">
-			<bounds x="1255.5013202655" y="277.812948787016" width="16" height="16" />
-		</element>
-		<element name="lamp131" ref="BALL">
-			<bounds x="1274.43221231367" y="283.765169612954" width="16" height="16" />
-		</element>
-		<element name="lamp132" ref="BALL">
-			<bounds x="1292.08487051111" y="292.831109446467" width="16" height="16" />
-		</element>
-		<element name="lamp133" ref="BALL">
-			<bounds x="1307.95146002158" y="304.749957704861" width="16" height="16" />
-		</element>
+		<!-- Roulette numbers ring -->
+		<element ref="n0"><bounds x="1366.86" y="279.26" width="24" height="24" /></element>
+		<element ref="n32"><bounds x="1383.35" y="304.05" width="24" height="24" /></element>
+		<element ref="n15"><bounds x="1395.41" y="331.27" width="24" height="24" /></element>
+		<element ref="n19"><bounds x="1402.69" y="360.13" width="24" height="24" /></element>
+		<element ref="n4"><bounds x="1404.99" y="389.81" width="24" height="24" /></element>
+		<element ref="n21"><bounds x="1402.25" y="419.45" width="24" height="24" /></element>
+		<element ref="n2"><bounds x="1394.53" y="448.20" width="24" height="24" /></element>
+		<element ref="n25"><bounds x="1382.07" y="475.23" width="24" height="24" /></element>
+		<element ref="n17"><bounds x="1365.22" y="499.77" width="24" height="24" /></element>
+		<element ref="n34"><bounds x="1344.46" y="521.10" width="24" height="24" /></element>
+		<element ref="n6"><bounds x="1320.40" y="538.62" width="24" height="24" /></element>
+		<element ref="n27"><bounds x="1293.72" y="551.83" width="24" height="24" /></element>
+		<element ref="n13"><bounds x="1265.19" y="560.33" width="24" height="24" /></element>
+		<element ref="n36"><bounds x="1235.64" y="563.89" width="24" height="24" /></element>
+		<element ref="n11"><bounds x="1205.91" y="562.41" width="24" height="24" /></element>
+		<element ref="n30"><bounds x="1176.86" y="555.92" width="24" height="24" /></element>
+		<element ref="n8"><bounds x="1149.32" y="544.61" width="24" height="24" /></element>
+		<element ref="n23"><bounds x="1124.09" y="528.82" width="24" height="24" /></element>
+		<element ref="n10"><bounds x="1101.89" y="508.99" width="24" height="24" /></element>
+		<element ref="n5"><bounds x="1083.37" y="485.69" width="24" height="24" /></element>
+		<element ref="n24"><bounds x="1069.05" y="459.59" width="24" height="24" /></element>
+		<element ref="n16"><bounds x="1059.34" y="431.45" width="24" height="24" /></element>
+		<element ref="n33"><bounds x="1054.53" y="402.08" width="24" height="24" /></element>
+		<element ref="n1"><bounds x="1054.75" y="372.31" width="24" height="24" /></element>
+		<element ref="n20"><bounds x="1060.00" y="343.01" width="24" height="24" /></element>
+		<element ref="n14"><bounds x="1070.12" y="315.02" width="24" height="24" /></element>
+		<element ref="n31"><bounds x="1084.83" y="289.14" width="24" height="24" /></element>
+		<element ref="n9"><bounds x="1103.71" y="266.12" width="24" height="24" /></element>
+		<element ref="n22"><bounds x="1126.20" y="246.62" width="24" height="24" /></element>
+		<element ref="n18"><bounds x="1151.66" y="231.21" width="24" height="24" /></element>
+		<element ref="n29"><bounds x="1179.36" y="220.31" width="24" height="24" /></element>
+		<element ref="n7"><bounds x="1208.51" y="214.26" width="24" height="24" /></element>
+		<element ref="n28"><bounds x="1238.26" y="213.22" width="24" height="24" /></element>
+		<element ref="n12"><bounds x="1267.75" y="217.22" width="24" height="24" /></element>
+		<element ref="n35"><bounds x="1296.15" y="226.15" width="24" height="24" /></element>
+		<element ref="n3"><bounds x="1322.63" y="239.75" width="24" height="24" /></element>
+		<element ref="n26"><bounds x="1346.43" y="257.62" width="24" height="24" /></element>
 
+		<!-- LEDs ring (inverted matrix) -->
+		<element name="lamp134" ref="BALL0"><bounds x="1385.89" y="262.88" width="24" height="24" /></element> <!-- 0 -->
+		<element name="lamp133" ref="BALL"><bounds x="1404.85" y="291.38" width="24" height="24" /></element> <!-- 32 -->
+		<element name="lamp132" ref="BALL"><bounds x="1418.72" y="322.64" width="24" height="24" /></element> <!-- 15 -->
+		<element name="lamp131" ref="BALL"><bounds x="1427.09" y="355.83" width="24" height="24" /></element> <!-- 19 -->
+		<element name="lamp130" ref="BALL"><bounds x="1429.74" y="389.96" width="24" height="24" /></element> <!-- 4 -->
+		<element name="lamp129" ref="BALL"><bounds x="1426.59" y="424.04" width="24" height="24" /></element> <!-- 21 -->
+		<element name="lamp128" ref="BALL"><bounds x="1417.71" y="457.11" width="24" height="24" /></element> <!-- 2 -->
+		<element name="lamp71" ref="BALL"><bounds x="1403.38" y="488.20" width="24" height="24" /></element> <!-- 25 -->
+		<element name="lamp70" ref="BALL"><bounds x="1384.00" y="516.42" width="24" height="24" /></element> <!-- 17 -->
+		<element name="lamp69" ref="BALL"><bounds x="1360.13" y="540.95" width="24" height="24" /></element> <!-- 34 -->
+		<element name="lamp68" ref="BALL"><bounds x="1332.46" y="561.10" width="24" height="24" /></element> <!-- 6 -->
+		<element name="lamp67" ref="BALL"><bounds x="1301.78" y="576.28" width="24" height="24" /></element> <!-- 27 -->
+		<element name="lamp66" ref="BALL"><bounds x="1268.97" y="586.06" width="24" height="24" /></element> <!-- 13 -->
+		<element name="lamp65" ref="BALL"><bounds x="1234.99" y="590.15" width="24" height="24" /></element> <!-- 36 -->
+		<element name="lamp64" ref="BALL"><bounds x="1200.80" y="588.45" width="24" height="24" /></element> <!-- 11 -->
+		<element name="lamp38" ref="BALL"><bounds x="1167.39" y="580.99" width="24" height="24" /></element> <!-- 30 -->
+		<element name="lamp37" ref="BALL"><bounds x="1135.72" y="568.00" width="24" height="24" /></element> <!-- 8 -->
+		<element name="lamp36" ref="BALL"><bounds x="1106.71" y="549.83" width="24" height="24" /></element> <!-- 23 -->
+		<element name="lamp35" ref="BALL"><bounds x="1081.18" y="527.02" width="24" height="24" /></element> <!-- 10 -->
+		<element name="lamp34" ref="BALL"><bounds x="1059.87" y="500.22" width="24" height="24" /></element> <!-- 5 -->
+		<element name="lamp33" ref="BALL"><bounds x="1043.40" y="470.21" width="24" height="24" /></element> <!-- 24 -->
+		<element name="lamp32" ref="BALL"><bounds x="1032.24" y="437.85" width="24" height="24" /></element> <!-- 16 -->
+		<element name="lamp22" ref="BALL"><bounds x="1026.71" y="404.07" width="24" height="24" /></element> <!-- 33 -->
+		<element name="lamp21" ref="BALL"><bounds x="1026.96" y="369.84" width="24" height="24" /></element> <!-- 1 -->
+		<element name="lamp20" ref="BALL"><bounds x="1033.00" y="336.15" width="24" height="24" /></element> <!-- 20 -->
+		<element name="lamp19" ref="BALL"><bounds x="1044.64" y="303.96" width="24" height="24" /></element> <!-- 14 -->
+		<element name="lamp18" ref="BALL"><bounds x="1061.56" y="274.19" width="24" height="24" /></element> <!-- 31 -->
+		<element name="lamp17" ref="BALL"><bounds x="1083.26" y="247.72" width="24" height="24" /></element> <!-- 9 -->
+		<element name="lamp16" ref="BALL"><bounds x="1109.12" y="225.29" width="24" height="24" /></element> <!-- 22 -->
+		<element name="lamp14" ref="BALL"><bounds x="1138.41" y="207.57" width="24" height="24" /></element> <!-- 18 -->
+		<element name="lamp13" ref="BALL"><bounds x="1170.27" y="195.03" width="24" height="24" /></element> <!-- 29 -->
+		<element name="lamp12" ref="BALL"><bounds x="1203.78" y="188.08" width="24" height="24" /></element> <!-- 7 -->
+		<element name="lamp11" ref="BALL"><bounds x="1238.00" y="186.88" width="24" height="24" /></element> <!-- 28 -->
+		<element name="lamp10" ref="BALL"><bounds x="1271.91" y="191.48" width="24" height="24" /></element> <!-- 12 -->
+		<element name="lamp9" ref="BALL"><bounds x="1304.57" y="201.75" width="24" height="24" /></element> <!-- 35 -->
+		<element name="lamp8" ref="BALL"><bounds x="1335.02" y="217.36" width="24" height="24" /></element> <!-- 3 -->
+		<element name="lamp135" ref="BALL"><bounds x="1362.39" y="237.91" width="24" height="24" /></element> <!-- 26 -->
 	</view>
 </mamelayout>

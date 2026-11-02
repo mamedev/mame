@@ -249,7 +249,7 @@ void mcd251_device::dram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 void mcd251_device::write_data(uint8_t data)
 {
 	const bool was_body = m_demux.packet_body;
-	m_demux.byte(data, m_fmv_stream);
+	m_demux.byte(data, 0xe0 | m_fmv_stream);
 
 	if (was_body)
 	{
@@ -261,7 +261,6 @@ void mcd251_device::write_data(uint8_t data)
 		if (m_video_startcode_shift == 0x00000100)
 		{
 			m_pictures_in_input_fifo++;
-			m_sequence_ended = false;
 			m_dts_fifo.push_back(m_next_picture_dts);
 			m_next_picture_dts = 0;
 		}
@@ -449,7 +448,6 @@ void mcd251_device::video_picture_decoded()
 void mcd251_device::video_sequence_end()
 {
 	release_held_reference();
-	m_sequence_ended = true;
 	m_fmv_isr |= FMV_IRQ_ESI;
 	LOGMASKED(LOG_VIDEO, "FMV sequence end\n");
 	update_intreq();
@@ -530,7 +528,7 @@ void mcd251_device::clear_video_fifo()
 	m_dts_fifo.clear();
 	m_next_picture_dts = 0;
 	m_pictures_in_input_fifo = 0;
-	m_sequence_ended = false;
+	m_display_starved = false;
 	m_latch_until_vsync = false;
 	m_latch_until_vblank = false;
 	m_single_step_latch = false;
@@ -612,15 +610,9 @@ TIMER_CALLBACK_MEMBER(mcd251_device::frame_period_tick)
 		if (!synchronous || desync > -30)
 			m_desync_satisfied = true;
 
-		// When the demuxer's SCR has run far ahead of the timestamp we are
-		// about to display there is no point correcting the frame period, so
-		// the correction is dropped.
 		const bool valid_dts = m_dts_fifo.front() != 0;
-		const bool way_out = valid_dts
-				&& mpeg_timestamp_diff(m_demux.scr, m_dts_fifo.front()) > 15000;
-
 		m_display_dts_desync =
-				(m_syscr_written && synchronous && valid_dts && !way_out) ? desync : 0;
+				(m_syscr_written && synchronous && valid_dts) ? desync : 0;
 
 		// Correct the frame period rather than skipping a picture: the queue
 		// empties faster than the disc fills it, and the NDAT that follows
@@ -683,19 +675,16 @@ void mcd251_device::vblank_w(int state)
 
 			if (!m_picture_fifo.empty())
 			{
-				// Underflow is reported as the last picture is taken with
-				// nothing behind it, counting the pictures whose start code
-				// has arrived but which the decoder has not handed back.  The
-				// end of a sequence is not an underflow.
-				if (m_fmv_playback_active && m_picture_fifo.size() == 1
-						&& m_pictures_in_input_fifo == 0 && !m_sequence_ended)
-				{
-					m_fmv_isr |= FMV_IRQ_NDAT;
-					LOGMASKED(LOG_VIDEO, "FMV underflow\n");
-				}
-
+				m_display_starved = false;
 				latch_display_frame();
 				m_latch_until_vblank = true;
+			}
+			else if (m_fmv_playback_active && m_pictures_in_input_fifo == 0 && !m_display_starved)
+			{
+				// underflow: a picture is due and the decoder has none
+				m_display_starved = true;
+				m_fmv_isr |= FMV_IRQ_NDAT;
+				LOGMASKED(LOG_VIDEO, "FMV underflow\n");
 			}
 		}
 

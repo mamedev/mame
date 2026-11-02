@@ -648,7 +648,7 @@ void tc0100scn_base_device::tilemap_draw_fg( screen_device &screen, bitmap_ind16
 	// Row offsets are 'screen space' 0-255 regardless of Y scroll
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		src_x = (m_fgscrollx - m_fgscroll_ram[(y + scrolly_delta) & 0x1ff] + scrollx_delta + cliprect.right()) & width_mask;
+		src_x = (m_fgscrollx - m_fgscroll_ram[(y + scrolly_delta) & 0x1ff] + scrollx_delta + cliprect.left()) & width_mask;
 		if (m_ctrl[0x7] & 1) // Flipscreen
 			src_x = (256 - 64 - src_x) & width_mask;
 

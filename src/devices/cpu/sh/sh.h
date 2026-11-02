@@ -142,8 +142,7 @@ public:
 		double  m_ftrc_dmax;
 		float   m_ftrc_smin;         // FTRC single-precision range check
 		float   m_ftrc_smax;
-		float   m_fzero;             // FTRV accumulator initialiser
-		float   m_fone;              // FSRRA reciprocal numerator
+		float   m_fsca_unit;         // what one unit of the FSCA table is worth
 		uint8_t m_fpmode[4];         // FPSCR.RM -> UML rounding mode
 
 		int     m_frt_input;
@@ -368,8 +367,6 @@ protected:
 	virtual void TRAPA(uint32_t i) = 0;
 	virtual void ILLEGAL() = 0;
 
-	drc_cache           m_cache;                  /* pointer to the DRC code cache */
-
 public:
 	/* fast RAM */
 	uint32_t              m_fastram_select;
@@ -385,8 +382,6 @@ public:
 	uint32_t m_pcflushes[16];           // pcflush entries
 
 	virtual void init_drc_frontend() = 0;
-
-	void drc_start();
 
 	void sh2drc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
 
@@ -487,6 +482,9 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
+
+private:
+	void drc_start();
 };
 
 #endif // MAME_CPU_SH_SH_H

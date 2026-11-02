@@ -619,14 +619,28 @@ void v1050_state::pic_int_w(int state)
 
 void v1050_state::disp_ppi_pc_w(uint8_t data)
 {
-	m_ppi_6502->pc2_w(BIT(data, 6));
-	m_ppi_6502->pc4_w(BIT(data, 7));
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(v1050_state::disp_ppi_pc_sync), this), data);
+}
+
+TIMER_CALLBACK_MEMBER(v1050_state::disp_ppi_pc_sync)
+{
+	machine().scheduler().perfect_quantum(attotime::from_usec(50));
+
+	m_ppi_6502->pc2_w(BIT(param, 6));
+	m_ppi_6502->pc4_w(BIT(param, 7));
 }
 
 void v1050_state::m6502_ppi_pc_w(uint8_t data)
 {
-	m_ppi_disp->pc2_w(BIT(data, 7));
-	m_ppi_disp->pc4_w(BIT(data, 6));
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(v1050_state::m6502_ppi_pc_sync), this), data);
+}
+
+TIMER_CALLBACK_MEMBER(v1050_state::m6502_ppi_pc_sync)
+{
+	machine().scheduler().perfect_quantum(attotime::from_usec(50));
+
+	m_ppi_disp->pc2_w(BIT(param, 7));
+	m_ppi_disp->pc4_w(BIT(param, 6));
 }
 
 // Miscellanous 8255A Interface
@@ -997,7 +1011,6 @@ void v1050_state::v1050(machine_config &config)
 
 	M6502(config, m_subcpu, 15.36_MHz_XTAL/16);
 	m_subcpu->set_addrmap(AS_PROGRAM, &v1050_state::v1050_crt_mem);
-	config.set_perfect_quantum(m_subcpu);
 
 	// keyboard HACK
 	TIMER(config, "keyboard").configure_periodic(FUNC(v1050_state::v1050_keyboard_tick), attotime::from_hz(60));
@@ -1117,4 +1130,4 @@ ROM_END
 // System Drivers
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                  FULLNAME       FLAGS
-COMP( 1983, v1050, 0,      0,      v1050,   v1050, v1050_state, empty_init, "Visual Technology Inc", "Visual 1050", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1983, v1050, 0,      0,      v1050,   v1050, v1050_state, empty_init, "Visual Technology Inc", "Visual 1050", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

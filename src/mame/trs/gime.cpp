@@ -2101,6 +2101,18 @@ inline gime_device::pixel_t gime_device::palette_resolver::lookup(uint8_t color)
 
 
 //-------------------------------------------------
+//  searchpath - shared GIME ROM search path
+//-------------------------------------------------
+
+std::vector<std::string> gime_device::searchpath() const
+{
+	auto result = device_t::searchpath();
+	result.emplace(result.begin(), "gime");
+	return result;
+}
+
+
+//-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 

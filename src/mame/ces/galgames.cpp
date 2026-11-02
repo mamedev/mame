@@ -50,10 +50,10 @@ Notes:
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
+#include "video/bt48x.h"
 #include "video/cesblit.h"
 
 #include "dirom.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -740,7 +740,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
+		m_ramdac(*this, "ramdac"),
 		m_blitter(*this, "blitter"),
 		m_oki(*this, "oki"),
 		m_slot(*this, "slot"),
@@ -752,29 +752,19 @@ public:
 	void galgame2(machine_config &config) ATTR_COLD;
 	void galgame3(machine_config &config) ATTR_COLD;
 
-protected:
-	virtual void video_start() override ATTR_COLD;
-
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	required_device<bt481_device> m_ramdac;
 	required_device<cesblit_device> m_blitter;
 	required_device<okim6295_device> m_oki;
 	required_device<galgames_slot_device> m_slot;
 	required_shared_ptr<u8> m_okiram;
 
-	u8 m_palette_offset = 0;
-	u8 m_palette_index = 0;
-	u8 m_palette_data[3]{};
-
 	void blitter_irq_callback(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void palette_offset_w(u8 data);
-	void palette_data_w(u8 data);
 
 	u8 okiram_r(offs_t offset);
 	void okiram_w(offs_t offset, u8 data);
@@ -801,35 +791,8 @@ void galgames_state::blitter_irq_callback(int state)
 
 u32 galgames_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(m_ramdac->black_pen(), cliprect);
 	return m_blitter->screen_update(screen, bitmap, cliprect);
-}
-
-// BT481A Palette RAMDAC
-
-void galgames_state::palette_offset_w(u8 data)
-{
-	m_palette_offset = data & 0xff;
-	m_palette_index = 0;
-}
-
-void galgames_state::palette_data_w(u8 data)
-{
-	m_palette_data[m_palette_index] = data & 0xff;
-	if (++m_palette_index == 3)
-	{
-		for (int palette_base = 0; palette_base < 0x1000; palette_base += 0x100)
-			m_palette->set_pen_color(m_palette_offset + palette_base, rgb_t(m_palette_data[0], m_palette_data[1], m_palette_data[2]));
-		m_palette_index = 0;
-		m_palette_offset++;
-	}
-}
-
-void galgames_state::video_start()
-{
-	save_item(NAME(m_palette_offset));
-	save_item(NAME(m_palette_index));
-	save_item(NAME(m_palette_data));
 }
 
 /***************************************************************************
@@ -896,8 +859,7 @@ void galgames_state::galgames_map(address_map &map)
 	map(0xa00001, 0xa00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xb00000, 0xb7ffff).rw(FUNC(galgames_state::okiram_r), FUNC(galgames_state::okiram_w)).umask16(0x00ff); // (only low bytes tested) 4x N341024SJ-15
 
-	map(0xc00001, 0xc00001).w(FUNC(galgames_state::palette_offset_w));
-	map(0xc00003, 0xc00003).w(FUNC(galgames_state::palette_data_w));
+	map(0xc00000, 0xc0000f).m(m_ramdac, FUNC(bt481_device::map)).umask16(0x00ff);
 
 	map(0xd00000, 0xd00001).portr("TRACKBALL_1_X");
 	map(0xd00000, 0xd00001).nopw();  // bit 0: FPGA programming serial in (lsb first)
@@ -1018,14 +980,15 @@ void galgames_state::galgames_base(machine_config &config)
 	m_screen->set_size(400, 256);
 	m_screen->set_visarea(0, 400-1, 0, 256-1);
 	m_screen->set_screen_update(FUNC(galgames_state::screen_update));
-	m_screen->set_palette(m_palette);
+	m_screen->set_palette(m_ramdac);
 
 	CESBLIT(config, m_blitter, XTAL(24'000'000), m_screen);
 	m_blitter->set_addrmap(AS_PROGRAM, &galgames_state::blitter_map);
 	m_blitter->set_compute_addr(galgames_compute_addr);
 	m_blitter->irq_callback().set(FUNC(galgames_state::blitter_irq_callback));
+	m_blitter->set_extended_palette(false);
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x1000); // only 0x100 used
+	BT481(config, m_ramdac);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

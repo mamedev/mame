@@ -874,7 +874,7 @@ void plus4_state::plus4(machine_config &config)
 	PLS100(config, PLA_TAG);
 
 	PET_USER_PORT(config, m_user, plus4_user_port_cards, nullptr);
-	m_user->p4_handler().set(m_spi_user, FUNC(mos6529_device::write_p2)); // cassette sense
+	m_user->p4_handler().set(m_spi_user, FUNC(mos6529_device::write_p2));
 	m_user->p5_handler().set(m_spi_user, FUNC(mos6529_device::write_p3));
 	m_user->p6_handler().set(m_spi_user, FUNC(mos6529_device::write_p4));
 	m_user->p7_handler().set(m_spi_user, FUNC(mos6529_device::write_p5));
@@ -882,10 +882,10 @@ void plus4_state::plus4(machine_config &config)
 	m_user->pb_handler().set(m_spi_user, FUNC(mos6529_device::write_p0));
 	m_user->pc_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
 	m_user->pf_handler().set(m_spi_user, FUNC(mos6529_device::write_p7));
-	m_user->ph_handler().set(m_acia, FUNC(mos6551_device::write_dcd)).invert(); // TODO: add missing pull up before inverter
+	m_user->ph_handler().set(m_acia, FUNC(mos6551_device::write_dcd)).invert();
 	m_user->pj_handler().set(m_spi_user, FUNC(mos6529_device::write_p6));
 	m_user->pk_handler().set(m_spi_user, FUNC(mos6529_device::write_p1));
-	m_user->pl_handler().set(m_acia, FUNC(mos6551_device::write_dsr)).invert(); // TODO: add missing pull up before inverter
+	m_user->pl_handler().set(m_acia, FUNC(mos6551_device::write_dsr)).invert();
 
 	MOS6551(config, m_acia);
 	m_acia->set_xtal(1.8432_MHz_XTAL);

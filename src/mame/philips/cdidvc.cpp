@@ -124,6 +124,11 @@ void cdi_dvc_vmpeg_device::device_reset()
 	m_slot->intreq_w(0);
 }
 
+void cdi_dvc_vmpeg_device::device_post_load()
+{
+	m_slot->intreq_w(m_intreq_state ? 1 : 0);
+}
+
 //**************************************************************************
 //  TRANSFERS
 //**************************************************************************

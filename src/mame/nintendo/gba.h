@@ -4,6 +4,7 @@
 #ifndef MAME_NINTENDO_GBA_H
 #define MAME_NINTENDO_GBA_H
 
+#include "cpu/arm7/arm7.h"
 #include "sound/gb.h"
 #include "machine/intelfsh.h"
 #include "bus/gba/gba_slot.h"
@@ -29,7 +30,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<arm7_cpu_device> m_maincpu;
 
 	void gba_map(address_map &map) ATTR_COLD;
 
@@ -108,8 +109,6 @@ protected:
 	required_region_ptr<uint32_t> m_region_maincpu;
 	required_device<gba_cart_slot_device> m_cart;
 	required_ioport m_bios_hack;
-
-	uint32_t m_bios_prefetch = 0;
 };
 
 

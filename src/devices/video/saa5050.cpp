@@ -228,6 +228,12 @@ saa5057_device::saa5057_device(const machine_config &mconfig, const char *tag, d
 
 void saa5050_device::device_start()
 {
+	m_rounded_rom = std::make_unique<uint16_t []>(128 * 20);
+
+	for (int data = 0; data < 128; data++)
+		for (int ra = 0; ra < 20; ra++)
+			m_rounded_rom[(data * 20) + ra] = character_rounding(get_rom_data(data, ra), get_rom_data(data, ra + ((ra & 1) ? 1 : -1)));
+
 	// register for state saving
 	save_item(NAME(m_code));
 	save_item(NAME(m_held_char));
@@ -491,7 +497,7 @@ void saa5050_device::get_character_data(uint8_t data)
 		data = 0x20;
 
 	if (m_curr_chartype == ALPHANUMERIC || !BIT(data,5))
-		m_char_data = character_rounding(get_rom_data(data, ra), get_rom_data(data, ra + ((ra & 1) ? 1 : -1)));
+		m_char_data = m_rounded_rom[(data * 20) + ra];
 	else
 		m_char_data = get_gfx_data(data, ra, (m_curr_chartype == SEPARATED));
 }
@@ -647,21 +653,27 @@ uint32_t saa5050_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 			f1_w(1);
 			f1_w(0);
 
-			for (int bit = 0; bit < 12; bit++)
+			int const invert = BIT(code, 7) ? 0x07 : 0;
+			rgb_t const fg = rgb_t(pal1bit(m_prev_col ^ invert), pal1bit((m_prev_col ^ invert) >> 1), pal1bit((m_prev_col ^ invert) >> 2));
+			rgb_t const bg = rgb_t(pal1bit(m_bg ^ invert), pal1bit((m_bg ^ invert) >> 1), pal1bit((m_bg ^ invert) >> 2));
+			uint32_t *const dest = &bitmap.pix(y, x);
+			uint16_t const char_data = m_char_data;
+			int bit = m_bit;
+			bool on = false;
+
+			for (int px = 0; px < 12; px++)
 			{
-				tr6_w(1);
-				tr6_w(0);
+				on = BIT(char_data, bit);
+				dest[px] = on ? fg : bg;
 
-				int color = get_rgb();
-
-				if (BIT(code, 7)) color ^= 0x07;
-
-				int r = BIT(color, 0) * 0xff;
-				int g = BIT(color, 1) * 0xff;
-				int b = BIT(color, 2) * 0xff;
-
-				bitmap.pix(y, x++) = rgb_t(r, g, b);
+				bit--;
+				if (bit < 0) bit = 11;
 			}
+
+			m_bit = bit;
+			m_color = on ? m_prev_col : m_bg;
+
+			x += 12;
 		}
 	}
 

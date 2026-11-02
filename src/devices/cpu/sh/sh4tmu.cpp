@@ -24,6 +24,9 @@ static uint32_t compute_ticks_timer(emu_timer *timer, int hertz, int divisor)
 {
 	double ret;
 
+	if (timer->remaining() == attotime::never)
+		return 0;
+
 	ret=((timer->remaining().as_double() * (double)hertz) / (double)divisor) - 1;
 	return (uint32_t)ret;
 }
@@ -60,24 +63,34 @@ void sh34_base_device::sh4_timer_recompute(int which)
 TIMER_CALLBACK_MEMBER( sh34_base_device::sh4_timer_callback )
 {
 	int which = param;
+	uint32_t tcor = 0;
+	uint32_t tcr = 0;
 
 	switch (which)
 	{
 		case 0:
-			m_tcnt0 = m_tcor0;
+			tcor = m_tcor0;
+			tcr = m_tcr0;
+			m_tcnt0 = tcor;
 			break;
 
 		case 1:
-			m_tcnt1 = m_tcor1;
+			tcor = m_tcor1;
+			tcr = m_tcr1;
+			m_tcnt1 = tcor;
 			break;
 
 		case 2:
-			m_tcnt2 = m_tcor2;
+			tcor = m_tcor2;
+			tcr = m_tcr2;
+			m_tcnt2 = tcor;
 			break;
 
 	}
 
-	sh4_timer_recompute(which);
+	// TCOR = 0 underflows on every tick; with UNIE clear only UNF shows it, and it stays set, so stop until TCOR, TCNT, TCR or TSTR is written
+	if (tcor != 0 || (tcr & 0x20))
+		sh4_timer_recompute(which);
 
 	switch (which)
 	{
@@ -187,6 +200,8 @@ uint32_t sh34_base_device::tcor0_r(offs_t offset, uint32_t mem_mask)
 void sh34_base_device::tcor0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tcor0);
+	if ((m_tstr & 1) && m_timer[0]->remaining() == attotime::never)
+		sh4_timer_recompute(0);
 }
 
 uint32_t sh34_base_device::tcnt0_r(offs_t offset, uint32_t mem_mask)
@@ -230,6 +245,8 @@ uint32_t sh34_base_device::tcor1_r(offs_t offset, uint32_t mem_mask)
 void sh34_base_device::tcor1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tcor1);
+	if ((m_tstr & 2) && m_timer[1]->remaining() == attotime::never)
+		sh4_timer_recompute(1);
 }
 
 uint32_t sh34_base_device::tcnt1_r(offs_t offset, uint32_t mem_mask)
@@ -273,6 +290,8 @@ uint32_t sh34_base_device::tcor2_r(offs_t offset, uint32_t mem_mask)
 void sh34_base_device::tcor2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tcor2);
+	if ((m_tstr & 4) && m_timer[2]->remaining() == attotime::never)
+		sh4_timer_recompute(2);
 }
 
 uint32_t sh34_base_device::tcnt2_r(offs_t offset, uint32_t mem_mask)

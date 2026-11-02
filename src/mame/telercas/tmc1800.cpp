@@ -159,7 +159,6 @@ Demo tape contents:
 
     TODO:
 
-    - tape input/output
     - tmc2000: add missing keys
     - tmc2000: TOOL-2000 rom banking
     - nano: correct time constant for EF4 RC circuit
@@ -231,6 +230,7 @@ public:
 	tmc1800_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tmc1800_base_state(mconfig, type, tag)
 		, m_vdc(*this, CDP1861_TAG)
+		, m_key_row(*this, {"Y0", "Y1"})
 	{ }
 
 	void keylatch_w(uint8_t data);
@@ -250,6 +250,8 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cdp1861_device> m_vdc;
+	required_ioport_array<2> m_key_row;
+
 	/* keyboard state */
 	int m_keylatch = 0;
 };
@@ -259,6 +261,7 @@ class osc1000b_state : public tmc1800_base_state
 public:
 	osc1000b_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tmc1800_base_state(mconfig, type, tag)
+		, m_key_row(*this, {"Y0", "Y1"})
 	{ }
 
 
@@ -277,6 +280,8 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	required_ioport_array<2> m_key_row;
 
 	/* keyboard state */
 	int m_keylatch = 0;
@@ -406,12 +411,12 @@ uint32_t osc1000b_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 void tmc1800_state::keylatch_w(uint8_t data)
 {
-	m_keylatch = data;
+	m_keylatch = data & 0x0f;
 }
 
 void osc1000b_state::keylatch_w(uint8_t data)
 {
-	m_keylatch = data;
+	m_keylatch = data & 0x0f;
 }
 
 void tmc2000_state::keylatch_w(uint8_t data)
@@ -537,7 +542,6 @@ void tmc1800_state::dispoff_w(uint8_t data)
 
 void tmc1800_state::tmc1800_map(address_map &map)
 {
-	map(0x0000, 0x07ff).mirror(0x7800).ram();
 	map(0x8000, 0x81ff).mirror(0x7e00).rom().region(CDP1802_TAG, 0);
 }
 
@@ -551,7 +555,6 @@ void tmc1800_state::tmc1800_io_map(address_map &map)
 
 void osc1000b_state::osc1000b_map(address_map &map)
 {
-	map(0x0000, 0x07ff).mirror(0x7800).ram();
 	map(0x8000, 0x81ff).mirror(0x7e00).rom().region(CDP1802_TAG, 0);
 }
 
@@ -780,7 +783,9 @@ int tmc1800_state::ef2_r()
 
 int tmc1800_state::ef3_r()
 {
-	return CLEAR_LINE; // TODO
+	uint8_t data = ~m_key_row[m_keylatch / 8]->read();
+
+	return BIT(data, m_keylatch % 8);
 }
 
 void tmc1800_state::q_w(int state)
@@ -802,7 +807,9 @@ int osc1000b_state::ef2_r()
 
 int osc1000b_state::ef3_r()
 {
-	return CLEAR_LINE; // TODO
+	uint8_t data = ~m_key_row[m_keylatch / 8]->read();
+
+	return BIT(data, m_keylatch % 8);
 }
 
 void osc1000b_state::q_w(int state)
@@ -892,6 +899,8 @@ void nano_state::q_w(int state)
 
 void tmc1800_state::machine_start()
 {
+	m_maincpu->space(AS_PROGRAM).install_ram(0x0000, m_ram->mask(), 0x7fff & ~m_ram->mask(), m_ram->pointer());
+
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 }
@@ -910,6 +919,8 @@ void tmc1800_state::machine_reset()
 
 void osc1000b_state::machine_start()
 {
+	m_maincpu->space(AS_PROGRAM).install_ram(0x0000, m_ram->mask(), 0x7fff & ~m_ram->mask(), m_ram->pointer());
+
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 }
@@ -981,13 +992,12 @@ QUICKLOAD_LOAD_MEMBER(tmc1800_base_state::quickload_cb)
 {
 	int const size = image.length();
 
-	if (size > m_ram->size()) // FIXME: comparing size to RAM size, but loading to ROM - seems incorrect
+	if (size > m_ram->size())
 	{
 		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 	}
 
-	uint8_t *const ptr = m_rom->base();
-	image.fread(ptr, size);
+	image.fread(m_ram->pointer(), size);
 
 	return std::make_pair(std::error_condition(), std::string());
 }
@@ -1004,12 +1014,14 @@ void tmc1800_state::tmc1800(machine_config &config)
 	m_maincpu->ef3_cb().set(FUNC(tmc1800_state::ef3_r));
 	m_maincpu->q_cb().set(FUNC(tmc1800_state::q_w));
 	m_maincpu->dma_wr_cb().set(m_vdc, FUNC(cdp1861_device::dma_w));
+	m_maincpu->sc_cb().set(m_vdc, FUNC(cdp1861_device::sc_w));
+	m_maincpu->tpa_cb().set(m_vdc, FUNC(cdp1861_device::tpa_w));
+	m_maincpu->int_cb().set(m_vdc, FUNC(cdp1861_device::int_r));
+	m_maincpu->dma_out_cb().set(m_vdc, FUNC(cdp1861_device::dma_out_r));
+	m_maincpu->ef1_cb().set(m_vdc, FUNC(cdp1861_device::efx_r));
 
 	// video hardware
 	CDP1861(config, m_vdc, XTAL(1'750'000)).set_screen(SCREEN_TAG);
-	m_vdc->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
-	m_vdc->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
-	m_vdc->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
 	SCREEN(config, SCREEN_TAG);
 
 	// sound hardware
@@ -1077,15 +1089,17 @@ void tmc2000_state::tmc2000(machine_config &config)
 	m_maincpu->ef3_cb().set(FUNC(tmc2000_state::ef3_r));
 	m_maincpu->q_cb().set(FUNC(tmc2000_state::q_w));
 	m_maincpu->dma_wr_cb().set(FUNC(tmc2000_state::dma_w));
+	m_maincpu->sc_cb().set(m_cti, FUNC(cdp1864_device::sc_w));
+	m_maincpu->tpa_cb().set(m_cti, FUNC(cdp1864_device::tpa_w));
+	m_maincpu->int_cb().set(m_cti, FUNC(cdp1864_device::int_r));
+	m_maincpu->dma_out_cb().set(m_cti, FUNC(cdp1864_device::dma_out_r));
+	m_maincpu->ef1_cb().set(m_cti, FUNC(cdp1864_device::efx_r));
 
 	// video hardware
 	SCREEN(config, SCREEN_TAG);
 	SPEAKER(config, "mono").front_center();
 	CDP1864(config, m_cti, XTAL(1'750'000)).set_screen(SCREEN_TAG);
 	m_cti->inlace_cb().set_constant(0);
-	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
-	m_cti->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
-	m_cti->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
 	m_cti->rdata_cb().set(FUNC(tmc2000_state::rdata_r));
 	m_cti->bdata_cb().set(FUNC(tmc2000_state::bdata_r));
 	m_cti->gdata_cb().set(FUNC(tmc2000_state::gdata_r));
@@ -1114,15 +1128,17 @@ void nano_state::nano(machine_config &config)
 	m_maincpu->ef3_cb().set(FUNC(nano_state::ef3_r));
 	m_maincpu->q_cb().set(FUNC(nano_state::q_w));
 	m_maincpu->dma_wr_cb().set(m_cti, FUNC(cdp1864_device::dma_w));
+	m_maincpu->sc_cb().set(m_cti, FUNC(cdp1864_device::sc_w));
+	m_maincpu->tpa_cb().set(m_cti, FUNC(cdp1864_device::tpa_w));
+	m_maincpu->int_cb().set(m_cti, FUNC(cdp1864_device::int_r));
+	m_maincpu->dma_out_cb().set(m_cti, FUNC(cdp1864_device::dma_out_r));
+	m_maincpu->ef1_cb().set(m_cti, FUNC(cdp1864_device::efx_r));
 
 	// video hardware
 	SCREEN(config, SCREEN_TAG);
 	SPEAKER(config, "mono").front_center();
 	CDP1864(config, m_cti, XTAL(1'750'000)).set_screen(SCREEN_TAG);
 	m_cti->inlace_cb().set_constant(0);
-	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
-	m_cti->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
-	m_cti->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
 	m_cti->rdata_cb().set_constant(1);
 	m_cti->bdata_cb().set_constant(1);
 	m_cti->gdata_cb().set_constant(1);

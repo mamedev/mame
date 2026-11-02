@@ -115,6 +115,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/axell_ag1.h,VIDEOS["AXELL_AG1"] = true
+--------------------------------------------------
+
+if VIDEOS["AXELL_AG1"] then
+	files {
+		MAME_DIR .. "src/devices/video/axell_ag1.cpp",
+		MAME_DIR .. "src/devices/video/axell_ag1.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/bt431.h,VIDEOS["BT431"] = true
 --------------------------------------------------
 
@@ -1969,6 +1981,18 @@ if VIDEOS["ZEUS2"] then
 	files {
 		MAME_DIR .. "src/devices/video/zeus2.cpp",
 		MAME_DIR .. "src/devices/video/zeus2.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/zr36050.h,VIDEOS["ZR36050"] = true
+--------------------------------------------------
+
+if VIDEOS["ZR36050"] then
+	files {
+		MAME_DIR .. "src/devices/video/zr36050.cpp",
+		MAME_DIR .. "src/devices/video/zr36050.h",
 	}
 end
 
