@@ -936,6 +936,7 @@ void mcs51_cpu_device::reti(u8 r)
 {
 	pop_pc();
 	clear_current_irq();
+	m_irq_delayed = 0xff;
 }
 
 //RL A                                      /* 1: 0010 0011 */

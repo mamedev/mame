@@ -32,6 +32,7 @@ public:
 	virtual void nt_w(offs_t offset, uint8_t data) override;
 
 	virtual void hblank_irq(int scanline, bool vblank, bool blanked) override;
+	virtual void scanline_irq(int scanline, bool vblank, bool blanked) override;
 	virtual void pcb_reset() override;
 
 protected:

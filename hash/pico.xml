@@ -793,11 +793,12 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 	</software>
 
 	<software name="cuteyhon">
-		<description>Cutey Honey (Japan)</description>
+		<!-- a.k.a. Cutey Honey Flash / フラッシュ -->
+		<description>Cutey Honey F (Japan)</description>
 		<year>1997</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="T-133230"/>
-		<info name="alt_title" value="キューティーハニー"/>
+		<info name="alt_title" value="キューティーハニーF"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6882A" />
 			<feature name="ic1" value="MPR-19960-S" />

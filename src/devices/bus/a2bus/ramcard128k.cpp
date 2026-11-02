@@ -32,7 +32,7 @@ DEFINE_DEVICE_TYPE(A2BUS_RAMCARD128K, a2bus_ssramcard_device, "ssram128", "Satur
 
 a2bus_ssramcard_device::a2bus_ssramcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock), device_a2bus_card_interface(mconfig, *this),
-	m_inh_state(0), m_last_offset(0), m_dxxx_bank(0), m_main_bank(0)
+	m_inh_state(0), m_dxxx_bank(0), m_main_bank(0)
 {
 }
 
@@ -53,7 +53,6 @@ void a2bus_ssramcard_device::device_start()
 	save_item(NAME(m_ram));
 	save_item(NAME(m_dxxx_bank));
 	save_item(NAME(m_main_bank));
-	save_item(NAME(m_last_offset));
 }
 
 void a2bus_ssramcard_device::device_reset()
@@ -66,25 +65,12 @@ void a2bus_ssramcard_device::reset_from_bus()
 	m_inh_state = INH_NONE;
 	m_dxxx_bank = 0;
 	m_main_bank = 0;
-	m_last_offset = -1;
 	recalc_slot_inh();
 }
 
 void a2bus_ssramcard_device::do_io(int offset)
 {
 	int old_inh_state = m_inh_state;
-
-	switch (offset)
-	{
-		case 0x1: case 0x3: case 0x9: case 0xb:
-			if (offset != m_last_offset)
-			{
-				m_last_offset = offset;
-				return;
-			}
-			break;
-	}
-	m_last_offset = offset;
 
 	if (offset & 4)
 	{

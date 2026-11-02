@@ -109,13 +109,18 @@ protected:
 
 	virtual uint8_t read_data(u16 adr) override;
 	virtual void write_data(u16 adr, u8 val) override;
+	virtual void prefetch_end() override;
 
 private:
+	void request_interrupt(int reg, u8 mask);
+	void update_interrupt_lines(int reg, u8 old_effective, u8 new_effective);
 	u8 interrupt_control_r(offs_t offset);
 	void interrupt_control_w(offs_t offset, u8 data);
 
 	template <int N> u8 port_r(offs_t offset);
 	template <int N> void port_w(offs_t offset, u8 data);
+	template <int N> void port_update();
+	u8 phase_output(int which) const;
 	u8 p4_r();
 	u8 p0_function_r();
 	void p0_function_w(u8 data);
@@ -144,6 +149,7 @@ private:
 	u8 timer_r(offs_t offset);
 	void timer_w(offs_t offset, u8 data);
 	void step_motor(int which);
+	void clock_motor(int which);
 	template <int N> TIMER_CALLBACK_MEMBER(timer_interrupt);
 	u8 step_counter_r(offs_t offset);
 	void step_counter_w(offs_t offset, u8 data);
@@ -187,6 +193,7 @@ private:
 	u8 m_timer_reload[3];
 	u8 m_step_counter[2];
 	u8 m_phase_counter;
+	u8 m_p2_output;
 	u8 m_smcon[2];
 	u16 m_tx_count;
 	u16 m_tx_reload;
@@ -198,6 +205,7 @@ private:
 	bool m_int_state[2];
 	bool m_cntr_state;
 	u8 m_interrupt_control[3];
+	u8 m_ic_pending[3];
 };
 
 DECLARE_DEVICE_TYPE(M50734, m50734_device)

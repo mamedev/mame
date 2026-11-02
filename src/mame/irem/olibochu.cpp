@@ -140,6 +140,7 @@ private:
 	u16 m_sound_command = 0U;
 	u8 m_sample_latch = 0U;
 	u16 m_sample_address = 0U;
+	u8 m_irq_vector = 0U;
 
 	// video-related
 	void videoram_w(offs_t offset, u8 data);
@@ -150,6 +151,7 @@ private:
 	void adjust_palette();
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, rectangle const &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, rectangle const &cliprect);
 
 	// sound-related
@@ -169,11 +171,13 @@ void olibochu_state::machine_start()
 	save_item(NAME(m_sound_command));
 	save_item(NAME(m_sample_latch));
 	save_item(NAME(m_sample_address));
+	save_item(NAME(m_irq_vector));
 }
 
 void olibochu_state::machine_reset()
 {
 	m_sound_command = 0;
+	m_irq_vector = 0;
 	adjust_palette();
 }
 
@@ -325,15 +329,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(olibochu_state::scanline)
 
 	if (scanline == 248) // VBLANK
 	{
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, HOLD_LINE, 0xd7); // Z80 - RST 10h
+		m_irq_vector = 0xd7; // RST 10h
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 		m_audiocpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 	}
 
 	if (scanline == 128) // periodic
 	{
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, HOLD_LINE, 0xcf); // Z80 - RST 08h
+		m_irq_vector = 0xcf; // RST 08h
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 		m_audiocpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 	}
+}
+
+IRQ_CALLBACK_MEMBER(olibochu_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 
@@ -571,6 +582,7 @@ void olibochu_state::olibochu(machine_config &config)
 
 	Z80(config, m_maincpu, MASTER_CLOCK / 3 / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &olibochu_state::main_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(olibochu_state::cpu_acknowledge_irq));
 
 	Z80(config, m_audiocpu, MASTER_CLOCK / 3 / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &olibochu_state::sound_map);

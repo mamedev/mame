@@ -54,8 +54,14 @@ public:
 	void heromem(machine_config &config);
 
 private:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 	required_device<tc0091lvc_device> m_tc0091lvc_l;
 	required_device<tc0091lvc_device> m_tc0091lvc_r;
+
+	uint8_t m_irq_vector_l = 0;
+	uint8_t m_irq_vector_r = 0;
 
 	void maincpu_prg_map(address_map &map) ATTR_COLD;
 	void audiocpu_l_prg_map(address_map &map) ATTR_COLD;
@@ -67,9 +73,23 @@ private:
 	void screen_vblank_r(int state) { if (state) { m_tc0091lvc_l->screen_eof(); } }
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_scanline_l);
+	IRQ_CALLBACK_MEMBER(tc0091lvc_l_acknowledge_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_scanline_r);
+	IRQ_CALLBACK_MEMBER(tc0091lvc_r_acknowledge_irq);
 };
 
+
+void heromem_state::machine_start()
+{
+	save_item(NAME(m_irq_vector_l));
+	save_item(NAME(m_irq_vector_r));
+}
+
+void heromem_state::machine_reset()
+{
+	m_irq_vector_l = 0;
+	m_irq_vector_r = 0;
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(heromem_state::irq_scanline_l)
 {
@@ -77,13 +97,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(heromem_state::irq_scanline_l)
 
 	if (scanline == 240 && (m_tc0091lvc_l->irq_enable() & 4))
 	{
-		m_tc0091lvc_l->set_input_line_and_vector(0, HOLD_LINE, m_tc0091lvc_l->irq_vector(2));
+		m_irq_vector_l = m_tc0091lvc_l->irq_vector(2);
+		m_tc0091lvc_l->set_input_line(0, HOLD_LINE);
 	}
 
 	if (scanline == 0 && (m_tc0091lvc_l->irq_enable() & 2))
 	{
-		m_tc0091lvc_l->set_input_line_and_vector(0, HOLD_LINE, m_tc0091lvc_l->irq_vector(1));
+		m_irq_vector_l = m_tc0091lvc_l->irq_vector(1);
+		m_tc0091lvc_l->set_input_line(0, HOLD_LINE);
 	}
+}
+
+IRQ_CALLBACK_MEMBER(heromem_state::tc0091lvc_l_acknowledge_irq)
+{
+	return m_irq_vector_l;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(heromem_state::irq_scanline_r)
@@ -92,15 +119,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(heromem_state::irq_scanline_r)
 
 	if (scanline == 240 && (m_tc0091lvc_r->irq_enable() & 4))
 	{
-		m_tc0091lvc_r->set_input_line_and_vector(0, HOLD_LINE, m_tc0091lvc_r->irq_vector(2));
+		m_irq_vector_r = m_tc0091lvc_r->irq_vector(2);
+		m_tc0091lvc_r->set_input_line(0, HOLD_LINE);
 	}
 
 	if (scanline == 0 && (m_tc0091lvc_r->irq_enable() & 2))
 	{
-		m_tc0091lvc_r->set_input_line_and_vector(0, HOLD_LINE, m_tc0091lvc_r->irq_vector(1));
+		m_irq_vector_r = m_tc0091lvc_r->irq_vector(1);
+		m_tc0091lvc_r->set_input_line(0, HOLD_LINE);
 	}
 }
 
+IRQ_CALLBACK_MEMBER(heromem_state::tc0091lvc_r_acknowledge_irq)
+{
+	return m_irq_vector_r;
+}
 
 void heromem_state::maincpu_prg_map(address_map &map)
 {
@@ -251,9 +284,11 @@ void heromem_state::heromem(machine_config &config)
 
 	tc0091lvc_device &vdp_l(TC0091LVC(config, m_tc0091lvc_l, 16000000 / 4));
 	vdp_l.set_addrmap(AS_PROGRAM, &heromem_state::tc0091lvc_l_prg_map);
+	vdp_l.set_irq_acknowledge_callback(FUNC(heromem_state::tc0091lvc_l_acknowledge_irq));
 
 	tc0091lvc_device &vdp_r(TC0091LVC(config, m_tc0091lvc_r, 16000000 / 4));
 	vdp_r.set_addrmap(AS_PROGRAM, &heromem_state::tc0091lvc_r_prg_map);
+	vdp_r.set_irq_acknowledge_callback(FUNC(heromem_state::tc0091lvc_r_acknowledge_irq));
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

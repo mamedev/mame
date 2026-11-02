@@ -41,9 +41,10 @@ ioport_value coleco_super_action_controller_device::keypad_r()
 	return data;
 }
 
-INPUT_CHANGED_MEMBER( coleco_super_action_controller_device::slider_w )
+void coleco_super_action_controller_device::mn_w(int state)
 {
-	// TODO
+	m_mn = state;
+	m_port->irq_w(state);
 }
 
 static INPUT_PORTS_START( coleco_super_action_controller )
@@ -79,8 +80,20 @@ static INPUT_PORTS_START( coleco_super_action_controller )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON4 )
 
 	PORT_START("SLIDER")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_REVERSE PORT_RESET PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(coleco_super_action_controller_device::slider_w), 0)
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_REVERSE PORT_CHANGED_MEMBER("encoder", FUNC(quadencoder_device::changed), 0)
 INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void coleco_super_action_controller_device::device_add_mconfig(machine_config &config)
+{
+	QUADENCODER(config, m_encoder);
+	m_encoder->write_mn().set(FUNC(coleco_super_action_controller_device::mn_w));
+	m_encoder->write_pl().set([this] (int state) { m_pl = state; });
+}
 
 
 //-------------------------------------------------
@@ -107,7 +120,10 @@ coleco_super_action_controller_device::coleco_super_action_controller_device(con
 	device_colecovision_control_port_interface(mconfig, *this),
 	m_io_common0(*this, "COMMON0"),
 	m_io_common1(*this, "COMMON1"),
-	m_io_keypad(*this, "KEYPAD")
+	m_io_keypad(*this, "KEYPAD"),
+	m_encoder(*this, "encoder"),
+	m_mn(0),
+	m_pl(0)
 {
 }
 
@@ -121,6 +137,22 @@ void coleco_super_action_controller_device::device_start()
 	// state saving
 	save_item(NAME(m_common0));
 	save_item(NAME(m_common1));
+	save_item(NAME(m_mn));
+	save_item(NAME(m_pl));
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void coleco_super_action_controller_device::device_reset()
+{
+	if (m_mn)
+		m_port->irq_w(0);
+
+	m_mn = 0;
+	m_pl = 0;
 }
 
 
@@ -134,6 +166,9 @@ uint8_t coleco_super_action_controller_device::joy_r()
 
 	if (!m_common0) data &= m_io_common0->read();
 	if (!m_common1) data &= m_io_common1->read();
+
+	if (m_mn) data &= ~0x10;
+	if (m_pl) data &= ~0x20;
 
 	return data;
 }

@@ -16,8 +16,9 @@
       models are known, more detailed documentation is not easy to find.
     * Few internal special function registers have been emulated, again
       owing to lack of documentation. The MN1880023 and MN18801A
-      peripherals are emulated only as far as CR-504 and PSR-500 firmware
-      uses them, and their register assignments are inferred from it.
+      peripherals are emulated only as far as CR-504, Drum Station and
+      PSR-500 firmware uses them, and their register assignments are
+      inferred from it.
     * Instruction timings are based mostly on those documented for the
       MN1870, which lacks a number of MN1880 instructions and differs in
       some other important ways. Many have been guessed at.
@@ -2579,10 +2580,13 @@ mn1880023_device::mn1880023_device(const machine_config &mconfig, const char *ta
 	, m_ad_in_cb(*this, 0)
 	, m_sio_in_cb(*this, 0xff)
 	, m_sio_out_cb(*this)
+	, m_uart_txd_cb(*this)
 	, m_pwm_out_cb(*this)
 	, m_timer0(nullptr)
 	, m_timer3(nullptr)
 	, m_sio_timer{nullptr, nullptr}
+	, m_uart_tx_timer(nullptr)
+	, m_uart_rx_timer(nullptr)
 	, m_adc_timer(nullptr)
 	, m_pwm_timer(nullptr)
 	, m_port_input_mask{}
@@ -2592,6 +2596,12 @@ mn1880023_device::mn1880023_device(const machine_config &mconfig, const char *ta
 	, m_timer4_prescale(0)
 	, m_timer2_capture_input(false)
 	, m_timer4_count_input(false)
+	, m_uart_tx_data(0)
+	, m_uart_rx_data(0)
+	, m_uart_tx_bits(0)
+	, m_uart_rx_bits(0)
+	, m_uart_rxd(true)
+	, m_uart_txd(true)
 {
 }
 
@@ -2600,6 +2610,7 @@ void mn1880023_device::internal_map(address_map &map)
 	map(0x0000, 0x005f).rw(FUNC(mn1880023_device::reg_r), FUNC(mn1880023_device::reg_w));
 	map(0x0000, 0x0009).rw(FUNC(mn1880023_device::port_r), FUNC(mn1880023_device::port_w));
 	map(0x0014, 0x0014).w(FUNC(mn1880023_device::irq_flags_w));
+	map(0x0019, 0x0019).w(FUNC(mn1880023_device::sio0_control_w));
 	map(0x001a, 0x001a).w(FUNC(mn1880023_device::sio0_data_w));
 	map(0x001e, 0x001e).w(FUNC(mn1880023_device::adc_control_w));
 	map(0x0020, 0x0021).rw(FUNC(mn1880023_device::timer0_r), FUNC(mn1880023_device::timer0_w));
@@ -2607,6 +2618,7 @@ void mn1880023_device::internal_map(address_map &map)
 	map(0x0026, 0x0027).w(FUNC(mn1880023_device::timer3_w));
 	map(0x0031, 0x0031).w(FUNC(mn1880023_device::timer_run_w));
 	map(0x0033, 0x0033).w(FUNC(mn1880023_device::timer_control_w));
+	map(0x0035, 0x0035).w(FUNC(mn1880023_device::timer3_control_w));
 	map(0x003a, 0x003a).w(FUNC(mn1880023_device::sio1_data_w));
 	map(0x004e, 0x004f).r(FUNC(mn1880023_device::timer4_r));
 	map(0x0050, 0x0051).w(FUNC(mn1880023_device::pwm_reload_w));
@@ -2623,6 +2635,8 @@ void mn1880023_device::device_start()
 	m_timer3 = timer_alloc(FUNC(mn1880023_device::timer3_tick), this);
 	m_sio_timer[0] = timer_alloc(FUNC(mn1880023_device::sio0_tick), this);
 	m_sio_timer[1] = timer_alloc(FUNC(mn1880023_device::sio1_tick), this);
+	m_uart_tx_timer = timer_alloc(FUNC(mn1880023_device::uart_tx_tick), this);
+	m_uart_rx_timer = timer_alloc(FUNC(mn1880023_device::uart_rx_tick), this);
 	m_adc_timer = timer_alloc(FUNC(mn1880023_device::adc_tick), this);
 	m_pwm_timer = timer_alloc(FUNC(mn1880023_device::pwm_tick), this);
 
@@ -2632,18 +2646,32 @@ void mn1880023_device::device_start()
 	save_item(NAME(m_timer4_prescale));
 	save_item(NAME(m_timer2_capture_input));
 	save_item(NAME(m_timer4_count_input));
+	save_item(NAME(m_uart_tx_data));
+	save_item(NAME(m_uart_rx_data));
+	save_item(NAME(m_uart_tx_bits));
+	save_item(NAME(m_uart_rx_bits));
+	save_item(NAME(m_uart_rxd));
+	save_item(NAME(m_uart_txd));
 }
 
 void mn1880023_device::device_reset()
 {
 	mn1880_device::device_reset();
 
-	// port pin levels at reset are unknown, so no outputs are driven here
+	// GPIO pin levels at reset are unknown, so no GPIO outputs are driven here
 	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 	m_timer0->adjust(attotime::never);
 	m_timer3->adjust(attotime::never);
 	m_sio_timer[0]->adjust(attotime::never);
 	m_sio_timer[1]->adjust(attotime::never);
+	m_uart_tx_timer->adjust(attotime::never);
+	m_uart_rx_timer->adjust(attotime::never);
+	m_uart_tx_data = 0;
+	m_uart_rx_data = 0;
+	m_uart_tx_bits = 0;
+	m_uart_rx_bits = 0;
+	m_uart_txd = true; // TXD idles high
+	m_uart_txd_cb(1);
 	m_adc_timer->adjust(attotime::never);
 	m_pwm_timer->adjust(attotime::never);
 	m_timer2_start = machine().time();
@@ -2683,9 +2711,38 @@ void mn1880023_device::irq_flags_w(u8 data)
 	clear_interrupt_requests((~data & 0x15) << 4);
 }
 
+void mn1880023_device::sio0_control_w(u8 data)
+{
+	if (m_regs[0x19] != data)
+	{
+		m_sio_timer[0]->adjust(attotime::never);
+		m_uart_tx_timer->adjust(attotime::never);
+		m_uart_rx_timer->adjust(attotime::never);
+		m_uart_tx_bits = 0;
+		m_uart_rx_bits = 0;
+		m_regs[0x18] &= ~0x88;
+		clear_interrupt_requests(1U << IRQ_UART_RX);
+		uart_txd(1);
+	}
+	m_regs[0x19] = data;
+}
+
 void mn1880023_device::sio0_data_w(u8 data)
 {
 	m_regs[0x1a] = data;
+	if (uart_enabled())
+	{
+		// no transmit FIFO is known
+		if (!m_uart_tx_bits)
+		{
+			m_uart_tx_data = data;
+			m_uart_tx_bits = 1;
+			m_regs[0x18] |= 0x08;
+			uart_txd(0);
+			m_uart_tx_timer->adjust(uart_bit_period());
+		}
+		return;
+	}
 	m_regs[0x18] |= 0x80;
 	m_regs[0x14] &= ~0x20;
 	m_sio_timer[0]->adjust(clocks_to_attotime(64));
@@ -2701,6 +2758,82 @@ TIMER_CALLBACK_MEMBER(mn1880023_device::sio0_tick)
 		m_sio_out_cb[0](m_regs[0x1a]);
 	else if (m_regs[0x19] == 0xaf)
 		m_regs[0x1b] = m_sio_in_cb[0]();
+}
+
+attotime mn1880023_device::uart_bit_period() const
+{
+	// TODO: only 8N1 at oscillator/256 (control 62) is known
+	return clocks_to_attotime(256);
+}
+
+TIMER_CALLBACK_MEMBER(mn1880023_device::uart_tx_tick)
+{
+	if (m_uart_tx_bits <= 8)
+	{
+		uart_txd(BIT(m_uart_tx_data, 0));
+		m_uart_tx_data >>= 1;
+	}
+	else if (m_uart_tx_bits == 9)
+	{
+		uart_txd(1); // stop bit
+	}
+	else
+	{
+		m_uart_tx_bits = 0;
+		m_regs[0x18] &= ~0x08;
+		return;
+	}
+	++m_uart_tx_bits;
+	m_uart_tx_timer->adjust(uart_bit_period());
+}
+
+void mn1880023_device::uart_rxd_w(int state)
+{
+	if (m_uart_rxd && !state && !m_uart_rx_bits && uart_enabled())
+	{
+		m_uart_rx_bits = 1;
+		m_uart_rx_data = 0;
+		m_uart_rx_timer->adjust(uart_bit_period() / 2);
+	}
+	m_uart_rxd = bool(state);
+}
+
+TIMER_CALLBACK_MEMBER(mn1880023_device::uart_rx_tick)
+{
+	if (m_uart_rx_bits == 1)
+	{
+		if (m_uart_rxd) // reject a start pulse shorter than half a bit
+		{
+			m_uart_rx_bits = 0;
+			return;
+		}
+	}
+	else if (m_uart_rx_bits <= 9)
+	{
+		m_uart_rx_data |= u8(m_uart_rxd) << (m_uart_rx_bits - 2);
+	}
+	else
+	{
+		// status bits are unknown, so framing errors and breaks are dropped
+		if (m_uart_rxd)
+		{
+			m_regs[0x1b] = m_uart_rx_data;
+			request_interrupt(IRQ_UART_RX);
+		}
+		m_uart_rx_bits = 0;
+		return;
+	}
+	++m_uart_rx_bits;
+	m_uart_rx_timer->adjust(uart_bit_period());
+}
+
+void mn1880023_device::uart_txd(int state)
+{
+	if (m_uart_txd != bool(state))
+	{
+		m_uart_txd = bool(state);
+		m_uart_txd_cb(state);
+	}
 }
 
 void mn1880023_device::sio1_data_w(u8 data)
@@ -2720,13 +2853,15 @@ TIMER_CALLBACK_MEMBER(mn1880023_device::sio1_tick)
 void mn1880023_device::adc_control_w(u8 data)
 {
 	m_regs[0x1e] = data;
-	if (BIT(data, 3))
+	// CR-504 starts with bit 3, Drum Station with bit 5
+	if (BIT(data, 3) || BIT(data, 5))
 		m_adc_timer->adjust(clocks_to_attotime(64));
 }
 
 TIMER_CALLBACK_MEMBER(mn1880023_device::adc_tick)
 {
 	m_regs[0x1c] = m_ad_in_cb[m_regs[0x1d] & 7]();
+	m_regs[0x14] |= 0x40;
 	m_regs[0x37] |= 0x08;
 }
 
@@ -2800,9 +2935,12 @@ void mn1880023_device::timer3_w(offs_t offset, u8 data)
 
 void mn1880023_device::update_timer3()
 {
-	// TODO: only the first overflow of a programmed delay is emulated
 	if (BIT(m_regs[0x31], 7))
-		m_timer3->adjust(clocks_to_attotime(16 * (0x10000 - get_u16le(&m_regs[0x26]))));
+	{
+		// 0x35 bit 4 is periodic (inferred); other modes stop after one overflow
+		const attotime period = clocks_to_attotime(16 * (0x10000 - get_u16le(&m_regs[0x26])));
+		m_timer3->adjust(period, 0, BIT(m_regs[0x35], 4) ? period : attotime::never);
+	}
 	else
 		m_timer3->adjust(attotime::never);
 }
@@ -2811,7 +2949,8 @@ TIMER_CALLBACK_MEMBER(mn1880023_device::timer3_tick)
 {
 	m_regs[0x14] |= 0x04;
 	m_regs[0x37] |= 0x02;
-	if (BIT(m_regs[0x36], 1))
+	// periodic mode also requests the interrupt (inferred from Drum Station)
+	if (BIT(m_regs[0x35], 4) || BIT(m_regs[0x36], 1))
 		request_interrupt(IRQ_TIMER3);
 }
 
@@ -2838,6 +2977,14 @@ void mn1880023_device::timer_control_w(u8 data)
 		m_timer4_count = get_u16le(&m_regs[0x4c]);
 		m_timer4_prescale = 0;
 	}
+}
+
+void mn1880023_device::timer3_control_w(u8 data)
+{
+	const u8 changed = m_regs[0x35] ^ data;
+	m_regs[0x35] = data;
+	if (BIT(changed, 4))
+		update_timer3();
 }
 
 u8 mn1880023_device::timer4_r(offs_t offset)

@@ -28,6 +28,8 @@ class cococart_slot_device;
 class gime_device : public mc6847_friend_device, public sam6883_friend_device_interface
 {
 public:
+	virtual std::vector<std::string> searchpath() const override;
+
 	auto irq_wr_callback() { return m_write_irq.bind(); }
 	auto firq_wr_callback() { return m_write_firq.bind(); }
 	auto floating_bus_rd_callback() { return m_read_floating_bus.bind(); }

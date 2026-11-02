@@ -13,7 +13,7 @@
 -- Dynamic recompiler objects
 --------------------------------------------------
 
-DRC_CPUS = { "ADSP21062", "DSP16", "DSPP", "E1", "MB86235", "MIPS3", "POWERPC", "SH", "SWP30", "UNSP" }
+DRC_CPUS = { "ADSP21062", "ARM7", "DSP16", "DSPP", "E1", "MB86235", "MIPS3", "POWERPC", "SH", "SWP30", "UNSP" }
 CPU_INCLUDE_DRC = false
 for i, v in ipairs(DRC_CPUS) do
 	if (CPUS[v]~=null) then
@@ -182,9 +182,11 @@ if CPUS["ARM7"] then
 		MAME_DIR .. "src/devices/cpu/arm7/upd800468.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7core.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7core.hxx",
-		MAME_DIR .. "src/devices/cpu/arm7/arm7drc.hxx",
+		MAME_DIR .. "src/devices/cpu/arm7/arm7drc.cpp",
+		MAME_DIR .. "src/devices/cpu/arm7/arm7drcops.cpp",
+		MAME_DIR .. "src/devices/cpu/arm7/arm7fe.cpp",
+		MAME_DIR .. "src/devices/cpu/arm7/arm7fe.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7help.h",
-		MAME_DIR .. "src/devices/cpu/arm7/arm7tdrc.hxx",
 		MAME_DIR .. "src/devices/cpu/arm7/cecalls.hxx",
 		MAME_DIR .. "src/devices/cpu/arm7/arm1176.hxx",
 		MAME_DIR .. "src/devices/cpu/arm7/arm1176vfp.hxx",
@@ -2858,15 +2860,15 @@ end
 --------------------------------------------------
 
 if CPUS["T6M53"] then
-    files {
-        MAME_DIR .. "src/devices/cpu/t6m53/t6m53.cpp",
-        MAME_DIR .. "src/devices/cpu/t6m53/t6m53.h",
-    }
+	files {
+		MAME_DIR .. "src/devices/cpu/t6m53/t6m53.cpp",
+		MAME_DIR .. "src/devices/cpu/t6m53/t6m53.h",
+	}
 end
 
 if opt_tool(CPUS, "T6M53") then
-    table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/t6m53/t6m53_dasm.cpp")
-    table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/t6m53/t6m53_dasm.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/t6m53/t6m53_dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/t6m53/t6m53_dasm.h")
 end
 
 --------------------------------------------------

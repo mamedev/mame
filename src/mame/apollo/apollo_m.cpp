@@ -495,6 +495,7 @@ uint8_t apollo_state::pc_dma8237_0_dack_r() { return m_isa->dack_r(0); }
 uint8_t apollo_state::pc_dma8237_1_dack_r() { return m_isa->dack_r(1); }
 uint8_t apollo_state::pc_dma8237_2_dack_r() { return m_isa->dack_r(2); }
 uint8_t apollo_state::pc_dma8237_3_dack_r() { return m_isa->dack_r(3); }
+// TODO: test me, may not work right for DMA16 (requiring high byte being fed from ad-hoc port)
 uint8_t apollo_state::pc_dma8237_5_dack_r() { return m_isa->dack_r(5); }
 uint8_t apollo_state::pc_dma8237_6_dack_r() { return m_isa->dack_r(6); }
 uint8_t apollo_state::pc_dma8237_7_dack_r() { return m_isa->dack_r(7); }
@@ -503,6 +504,7 @@ void apollo_state::pc_dma8237_0_dack_w(uint8_t data){ m_isa->dack_w(0, data); }
 void apollo_state::pc_dma8237_1_dack_w(uint8_t data){ m_isa->dack_w(1, data); }
 void apollo_state::pc_dma8237_2_dack_w(uint8_t data){ m_isa->dack_w(2, data); }
 void apollo_state::pc_dma8237_3_dack_w(uint8_t data){ m_isa->dack_w(3, data); }
+// TODO: as above
 void apollo_state::pc_dma8237_5_dack_w(uint8_t data){ m_isa->dack_w(5, data); }
 void apollo_state::pc_dma8237_6_dack_w(uint8_t data){ m_isa->dack_w(6, data); }
 void apollo_state::pc_dma8237_7_dack_w(uint8_t data){ m_isa->dack_w(7, data); }

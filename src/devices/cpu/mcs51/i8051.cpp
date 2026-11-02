@@ -266,6 +266,7 @@ u8 mcs51_cpu_device::ie_r()
 void mcs51_cpu_device::ie_w(u8 data)
 {
 	m_ie = data;
+	m_irq_delayed = 0xff;
 }
 
 u8 mcs51_cpu_device::ip_r()
@@ -277,6 +278,7 @@ void mcs51_cpu_device::ip_w(u8 data)
 {
 	m_ip = data;
 	update_irq_prio();
+	m_irq_delayed = 0xff;
 }
 
 u8 mcs51_cpu_device::p0_r()
@@ -734,10 +736,8 @@ void mcs51_cpu_device::update_timer_t0(int cycles)
 		// taken, reset
 		m_t0_cnt = 0;
 
-		/* TODO: Not sure about IE0. The manual specifies INT0=high,
-		 * which in turn means CLEAR_LINE.
-		 * IE0 may be edge triggered depending on IT0 */
-		if (BIT(m_tmod, TMOD_GATE0) && !BIT(m_tcon, TCON_IE0))
+		// INT0 is active low; GATE uses its pin level, independently of IE0.
+		if (BIT(m_tmod, TMOD_GATE0) && BIT(m_last_line_state, MCS51_INT0_LINE))
 			delta = 0;
 
 		switch (mode)
@@ -828,10 +828,8 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 			// taken, reset
 			m_t1_cnt = 0;
 
-			/* TODO: Not sure about IE0. The manual specifies INT0=high,
-			 * which in turn means CLEAR_LINE. Change to access last_state?
-			 * IE0 may be edge triggered depending on IT0 */
-			if (BIT(m_tmod, TMOD_GATE1) && !BIT(m_tcon, TCON_IE1))
+			// INT1 is active low; GATE uses its pin level, independently of IE1.
+			if (BIT(m_tmod, TMOD_GATE1) && BIT(m_last_line_state, MCS51_INT1_LINE))
 				delta = 0;
 
 			switch (mode)
@@ -971,6 +969,7 @@ void mcs51_cpu_device::check_irqs()
 
 	// Flags are sampled in one machine cycle and polled in the next, so a flag
 	// set in the last cycle of an instruction is only seen after the next one.
+	// RETI and IE/IP writes inhibit every source for that polling cycle.
 	ints &= ~m_irq_delayed;
 	m_irq_delayed = 0;
 
@@ -1139,12 +1138,14 @@ void mcs51_cpu_device::handle_irq(int irqline, int state, u32 new_state, u32 tr_
 			break;
 
 		case MCS51_T0_LINE:
-			if (BIT(tr_state, MCS51_T0_LINE) && BIT(m_tcon, TCON_TR0))
+			if (BIT(tr_state, MCS51_T0_LINE) && BIT(m_tcon, TCON_TR0)
+				&& (!BIT(m_tmod, TMOD_GATE0) || !BIT(m_last_line_state, MCS51_INT0_LINE)))
 				m_t0_cnt++;
 			break;
 
 		case MCS51_T1_LINE:
-			if (BIT(tr_state, MCS51_T1_LINE) && BIT(m_tcon, TCON_TR1))
+			if (BIT(tr_state, MCS51_T1_LINE) && BIT(m_tcon, TCON_TR1)
+				&& (!BIT(m_tmod, TMOD_GATE1) || !BIT(m_last_line_state, MCS51_INT1_LINE)))
 				m_t1_cnt++;
 			break;
 	}
@@ -1233,8 +1234,6 @@ void mcs51_cpu_device::device_start()
 	save_item(NAME(m_last_line_state));
 	save_item(NAME(m_t0_cnt));
 	save_item(NAME(m_t1_cnt));
-	save_item(NAME(m_t2_cnt));
-	save_item(NAME(m_t2ex_cnt));
 	save_item(NAME(m_cur_irq_prio));
 	save_item(NAME(m_irq_active));
 	save_item(NAME(m_irq_prio));
@@ -1336,8 +1335,6 @@ void mcs51_cpu_device::device_reset()
 	m_last_line_state = 0;
 	m_t0_cnt = 0;
 	m_t1_cnt = 0;
-	m_t2_cnt = 0;
-	m_t2ex_cnt = 0;
 
 	// Flag as NO IRQ in Progress
 	m_irq_active = 0;

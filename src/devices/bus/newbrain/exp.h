@@ -66,6 +66,7 @@ public:
 
 	auto int_callback() { return m_write_int.bind(); }
 	auto m1_wait_callback() { return m_write_m1_wait.bind(); }
+	auto busrq_callback() { return m_write_busrq.bind(); }
 	auto host_mreq_r_callback() { return m_read_host.bind(); }
 	auto host_mreq_w_callback() { return m_write_host.bind(); }
 	auto host_main_r_callback() { return m_read_main.bind(); }
@@ -81,10 +82,12 @@ public:
 	void iorq_w(offs_t offset, uint8_t data, bool &prtov);
 	uint8_t page_r(int page, offs_t offset, uint8_t data);
 	void page_w(int page, offs_t offset, uint8_t data);
+	void busak_w(int state);
 
 	// card interface
 	void int_w(int state) { m_write_int(state); }
 	void m1_wait_w(int state) { m_write_m1_wait(state); }
+	void busrq_w(int state) { m_write_busrq(state); }
 	uint8_t host_mreq_r(offs_t offset) { return m_read_host(offset); }
 	void host_mreq_w(offs_t offset, uint8_t data) { m_write_host(offset, data); }
 	uint8_t host_main_r(offs_t offset) { return m_read_main(offset); }
@@ -101,6 +104,7 @@ protected:
 
 	devcb_write_line m_write_int;
 	devcb_write_line m_write_m1_wait;
+	devcb_write_line m_write_busrq;
 	devcb_read8 m_read_host;
 	devcb_write8 m_write_host;
 	devcb_read8 m_read_main;
@@ -127,6 +131,9 @@ public:
 	// paged memory access from the expansion interface module
 	virtual uint8_t page_r(int page, offs_t offset, uint8_t data) { return data; }
 	virtual void page_w(int page, offs_t offset, uint8_t data) { }
+
+	// bus acknowledge from the computer
+	virtual void busak_w(int state) { }
 
 protected:
 	// construction/destruction

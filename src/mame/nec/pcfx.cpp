@@ -40,6 +40,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_huc6261(*this, "huc6261")
+		, m_huc6270(*this, "huc6270_%c", 'a')
 		, m_intc(*this, "intc")
 		, m_pads(*this, "P%u", 1U)
 	{ }
@@ -57,10 +58,10 @@ private:
 
 	template <int Pad> u16 pad_r(offs_t offset);
 	template <int Pad> void pad_w(offs_t offset, u16 data);
-	[[maybe_unused]] u8 extio_r(offs_t offset);
-	[[maybe_unused]] void extio_w(offs_t offset, u8 data);
 
 	template <int Pad> TIMER_CALLBACK_MEMBER(pad_func);
+	void pad_irq_update();
+	u8 ar_hold(int chip) { const u8 ar = m_huc6270[chip]->get_ar(0); return (ar == 0x13) ? 0x03 : ar; }
 
 	u16 timer_control_r();
 	void timer_control_w(u16 data);
@@ -69,6 +70,28 @@ private:
 	u16 timer_counter_r();
 	TIMER_CALLBACK_MEMBER(timer_expired);
 	u32 timer_effective_period() const { return (m_timer_period ? m_timer_period : 0x10000) * 15; }
+
+	// the 16-bit video chips have their A1 on CPU A2, so a word access reaches the same register twice, low half first
+	// TODO: byte accesses are undefined (HuC6261 manual 2.1.1) and are passed on as halfword accesses
+	template <typename Read>
+	static u32 read_halves(u32 mem_mask, Read &&read)
+	{
+		u32 data = 0;
+		if (ACCESSING_BITS_0_15)
+			data |= read();
+		if (ACCESSING_BITS_16_31)
+			data |= u32(read()) << 16;
+		return data;
+	}
+
+	template <typename Write>
+	static void write_halves(u32 data, u32 mem_mask, Write &&write)
+	{
+		if (ACCESSING_BITS_0_15)
+			write(u16(data));
+		if (ACCESSING_BITS_16_31)
+			write(u16(data >> 16));
+	}
 
 	void pcfx_io(address_map &map) ATTR_COLD;
 	void pcfx_mem(address_map &map) ATTR_COLD;
@@ -85,33 +108,22 @@ private:
 
 	u16 m_timer_control = 0;
 	u16 m_timer_period = 0;
+	u16 m_timer_counter = 0;
 	emu_timer *m_timer = nullptr;
 
 	u8 m_bram_control = 0;
 	std::unique_ptr<u8[]> m_nvram_ptr;
 
 	u32 m_dram_page = 0;
+	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_io;
 
 	required_device<v810_device> m_maincpu;
 	required_device<huc6261_device> m_huc6261;
+	required_device_array<huc6270_device, 2> m_huc6270;
 	required_device<pcfx_intc_device> m_intc;
 	required_ioport_array<2> m_pads;
 };
 
-
-u8 pcfx_state::extio_r(offs_t offset)
-{
-	address_space &io_space = m_maincpu->space(AS_IO);
-
-	return io_space.read_byte(offset);
-}
-
-void pcfx_state::extio_w(offs_t offset, u8 data)
-{
-	address_space &io_space = m_maincpu->space(AS_IO);
-
-	io_space.write_byte(offset, data);
-}
 
 template <int Pad>
 u16 pcfx_state::pad_r(offs_t offset)
@@ -122,10 +134,12 @@ u16 pcfx_state::pad_r(offs_t offset)
 	{
 		// status
 		/*
-		---- x---
-		---- ---x incoming data state (0=available)
+		---- x--- END transfer finished
+		---- -x-- IOS input
+		---- --x- MOD multi-tap clear
+		---- ---x TRG transfer in progress
 		*/
-		res = m_pad.status[Pad];
+		res = m_pad.status[Pad] | m_pad.ctrl[Pad];
 		//logerror("%s: STATUS %d\n", machine().describe_context(), Pad);
 	}
 	else
@@ -138,7 +152,7 @@ u16 pcfx_state::pad_r(offs_t offset)
 			if (!machine().side_effects_disabled())
 			{
 				m_pad.status[Pad] &= ~8; // clear latch on LSB read according to docs
-				m_intc->irq_w<11>(CLEAR_LINE);
+				pad_irq_update();
 			}
 		}
 	}
@@ -152,7 +166,13 @@ TIMER_CALLBACK_MEMBER(pcfx_state::pad_func)
 	m_pad.latch[Pad] = m_pads[Pad]->read();
 	m_pad.status[Pad] |= 8;
 	m_pad.ctrl[Pad] &= ~1; // ack TX line
-	m_intc->irq_w<11>(ASSERT_LINE);
+	pad_irq_update();
+}
+
+// both ports share one interrupt, raised while either has END set
+void pcfx_state::pad_irq_update()
+{
+	m_intc->irq_w<11>(BIT(m_pad.status[0] | m_pad.status[1], 3));
 }
 
 template <int Pad>
@@ -166,7 +186,11 @@ void pcfx_state::pad_w(offs_t offset, u16 data)
 		---- --x- enable multi-tap
 		---- ---x enable send (0->1 transition)
 		*/
-		if ((data & 1) && !(m_pad.ctrl[Pad] & 1))
+		// only writable while TRG and END are both 0
+		if (BIT(m_pad.ctrl[Pad], 0) || BIT(m_pad.status[Pad], 3))
+			return;
+
+		if (data & 1)
 		{
 			m_pad_timers[Pad]->adjust(attotime::from_usec(100)); // TODO: time
 		}
@@ -197,14 +221,19 @@ u16 pcfx_state::timer_control_r()
 	return m_timer_control;
 }
 
+// TIREQ is set by every borrow; the interrupt is output while TIREQ, TCE and TIEN are all set
 void pcfx_state::timer_control_w(u16 data)
 {
 	if (!BIT(m_timer_control, 1) && BIT(data, 1))
 		m_timer->adjust(m_maincpu->clocks_to_attotime(timer_effective_period()));
-	else if (!BIT(data, 1))
+	else if (BIT(m_timer_control, 1) && !BIT(data, 1))
+	{
+		// a stopped counter keeps its value
+		m_timer_counter = timer_counter_r();
 		m_timer->adjust(attotime::never);
+	}
 	m_timer_control = data & 7;
-	m_intc->irq_w<9>(BIT(m_timer_control, 2));
+	m_intc->irq_w<9>((m_timer_control & 7) == 7);
 }
 
 u16 pcfx_state::timer_period_r()
@@ -220,7 +249,7 @@ void pcfx_state::timer_period_w(u16 data)
 u16 pcfx_state::timer_counter_r()
 {
 	if (!BIT(m_timer_control, 1))
-		return 0;
+		return m_timer_counter;
 	const u64 clocks = m_maincpu->attotime_to_clocks(m_timer->remaining());
 	return (clocks + 14) / 15;
 }
@@ -228,22 +257,31 @@ u16 pcfx_state::timer_counter_r()
 TIMER_CALLBACK_MEMBER(pcfx_state::timer_expired)
 {
 	m_timer->adjust(m_maincpu->clocks_to_attotime(timer_effective_period()));
-	if (BIT(m_timer_control, 0))
-	{
-		m_timer_control |= 4;
-		m_intc->irq_w<9>(ASSERT_LINE);
-	}
+	m_timer_control |= 4;
+	m_intc->irq_w<9>((m_timer_control & 7) == 7);
 }
 
 void pcfx_state::pcfx_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x001fffff).ram();   /* RAM */
-//  map(0x80000000, 0x80ffffff).rw(FUNC(pcfx_state::extio_r), FUNC(pcfx_state::extio_w));    /* EXTIO */
+	// memory image of the I/O space
+	map(0x80000000, 0x807fffff).lrw32(
+		NAME([this] (offs_t offset, u32 mem_mask) -> u32 { return m_io.read_dword(offset << 2, mem_mask); }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { m_io.write_dword(offset << 2, data, mem_mask); }));
 //  map(0x80700000, 0x807fffff).rom().region("scsi_rom", 0); // EXTIO ROM area
-	// internal backup control
+	// data ports of the HuC6261, HuC6270 #0, HuC6270 #1 and HuC6272 for bit-string instructions, read at Axxxxxxx and written at Bxxxxxxx
+	map(0xa0000000, 0xafffffff).lr32(
+		NAME([this] (offs_t offset, u32 mem_mask) -> u32 { return m_io.read_dword(0x304 + ((offset >> 24) & 3) * 0x100, mem_mask); }));
+	map(0xb0000000, 0xbfffffff).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { m_io.write_dword(0x304 + ((offset >> 24) & 3) * 0x100, data, mem_mask); }));
+	map(0xa0000000, 0xafffffff).nopw();
+	map(0xb0000000, 0xbfffffff).lr32(NAME([] () -> u32 { return 0; }));
+	// internal backup RAM, read and written only while enabled in C80h bit 0
 	map(0xe0000000, 0xe7ffffff).lrw8(
-		NAME([this] (offs_t offset) {
+		NAME([this] (offs_t offset) -> u8 {
+			if (!BIT(m_bram_control, 0))
+				return 0xff;
 			return m_nvram_ptr[offset & 0x7fff];
 		}),
 		NAME([this] (offs_t offset, u8 data) {
@@ -264,12 +302,19 @@ void pcfx_state::pcfx_io(address_map &map)
 	map(0x00000080, 0x000000ff).rw(FUNC(pcfx_state::pad_r<1>), FUNC(pcfx_state::pad_w<1>)); /* PAD */
 	map(0x00000100, 0x000001ff).w("huc6230", FUNC(huc6230_device::write)).umask32(0x00ff00ff);   /* HuC6230 */
 	map(0x00000200, 0x000002ff).m("huc6271", FUNC(huc6271_device::amap));   /* HuC6271 */
-	map(0x00000300, 0x000003ff).rw(m_huc6261, FUNC(huc6261_device::read), FUNC(huc6261_device::write)).umask32(0x0000ffff);  /* HuC6261 */
-	map(0x00000400, 0x000004ff).rw("huc6270_a", FUNC(huc6270_device::read16), FUNC(huc6270_device::write16)).umask32(0x0000ffff); /* HuC6270-A */
-	map(0x00000500, 0x000005ff).rw("huc6270_b", FUNC(huc6270_device::read16), FUNC(huc6270_device::write16)).umask32(0x0000ffff); /* HuC6270-B */
+	map(0x00000300, 0x000003ff).lrw32(
+		NAME([this] (offs_t offset, u32 mem_mask) -> u32 { return read_halves(mem_mask, [this, offset] { return m_huc6261->read(offset); }); }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { write_halves(data, mem_mask, [this, offset] (u16 d) { m_huc6261->write(offset, d); }); }));
+	map(0x00000400, 0x000004ff).lrw32(
+		NAME([this] (offs_t offset, u32 mem_mask) -> u32 { return read_halves(mem_mask, [this, offset] { return m_huc6270[0]->read16(offset); }); }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { write_halves(data, mem_mask, [this, offset] (u16 d) { m_huc6270[0]->write16(offset, d); }); }));
+	map(0x00000500, 0x000005ff).lrw32(
+		NAME([this] (offs_t offset, u32 mem_mask) -> u32 { return read_halves(mem_mask, [this, offset] { return m_huc6270[1]->read16(offset); }); }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { write_halves(data, mem_mask, [this, offset] (u16 d) { m_huc6270[1]->write16(offset, d); }); }));
 	map(0x00000600, 0x00000607).mirror(0xf8).m("huc6272", FUNC(huc6272_device::amap)); // King
-	map(0x00000c00, 0x00000c00).r("huc6270_a", FUNC(huc6270_device::get_ar));
-	map(0x00000c40, 0x00000c40).r("huc6270_b", FUNC(huc6270_device::get_ar));
+	// HuC6270 address hold registers: the last AR value written, with DVSSR ($13) reading as $03
+	map(0x00000c00, 0x00000c00).lr8(NAME([this] () -> u8 { return ar_hold(0); }));
+	map(0x00000c40, 0x00000c40).lr8(NAME([this] () -> u8 { return ar_hold(1); }));
 	map(0x00000c80, 0x00000c80).lrw8(
 		NAME([this] (offs_t offset) { return m_bram_control; }),
 		NAME([this] (offs_t offset, u8 data) {
@@ -319,32 +364,39 @@ INPUT_PORTS_END
 
 void pcfx_state::machine_start()
 {
-	for (int i = 0; i < 2; i++)
-	{
-		m_pad.ctrl[i] = 0;
-		m_pad.status[i] = 0;
-		m_pad.latch[i] = 0;
-	};
-
 	m_pad_timers[0] = timer_alloc(FUNC(pcfx_state::pad_func<0>), this);
 	m_pad_timers[1] = timer_alloc(FUNC(pcfx_state::pad_func<1>), this);
 	m_timer = timer_alloc(FUNC(pcfx_state::timer_expired), this);
+	m_maincpu->space(AS_IO).specific(m_io);
 
 	m_nvram_ptr = make_unique_clear<u8[]>(0x8000);
 	subdevice<nvram_device>("nvram")->set_base(&m_nvram_ptr[0], 0x8000);
 
 	save_pointer(NAME(m_nvram_ptr), 0x8000);
+	save_item(NAME(m_pad.ctrl));
+	save_item(NAME(m_pad.status));
+	save_item(NAME(m_pad.latch));
 	save_item(NAME(m_bram_control));
 	save_item(NAME(m_dram_page));
 	save_item(NAME(m_timer_control));
 	save_item(NAME(m_timer_period));
+	save_item(NAME(m_timer_counter));
 }
 
 void pcfx_state::machine_reset()
 {
+	for (int i = 0; i < 2; i++)
+	{
+		m_pad.ctrl[i] = 6;
+		m_pad.status[i] = 0;
+		m_pad.latch[i] = 0;
+		m_pad_timers[i]->adjust(attotime::never);
+	}
+	pad_irq_update();
 	m_bram_control = 0;
 	m_timer_control = 0;
-	m_timer_period = 0;
+	m_timer_period = 0xffff;
+	m_timer_counter = 0xffff;
 	m_timer->adjust(attotime::never);
 	m_intc->irq_w<9>(CLEAR_LINE);
 }
@@ -367,10 +419,10 @@ void pcfx_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 	std::copy(std::begin(FAT), std::end(FAT), &bram[0x80]);
 }
 
-// bus wait states: the DRAM charges 3 cycles when an access (opcode
-// fetches included) leaves the 2 KB page of the previous one, the BIOS ROM 2 cycles a
-// halfword, the video and sound chips 4 cycles a read and 2 a write; everything but
-// the DRAM is on a 16-bit bus, so a 32-bit access takes two bus cycles
+// bus wait states: the DRAM adds 3 when an access (opcode fetches included) leaves
+// the 2 KB page of the previous one, the BIOS ROM 2 a halfword, the video and sound
+// chips 4 a read and 2 a write, and writes to the gate array's own I/O registers 4;
+// everything but the DRAM is on a 16-bit bus, so a 32-bit access takes two bus cycles
 int pcfx_state::bus_wait(offs_t address, int access, int size)
 {
 	const bool io = access == v810_device::BUS_IO_READ || access == v810_device::BUS_IO_WRITE;
@@ -388,7 +440,11 @@ int pcfx_state::bus_wait(offs_t address, int access, int size)
 	if (io || (address >= 0x80000000 && address < 0x80800000))
 	{
 		const offs_t port = address & 0x7fffff;
-		wait = (port >= 0x100 && port < 0x700) ? (write ? 2 : 4) : 0;
+		// writes to the chips go through a one-entry write buffer, other I/O writes take 4 wait states
+		if (port >= 0x100 && port < 0x700)
+			wait = write ? 2 : 4;
+		else
+			wait = write ? 4 : 0;
 	}
 	else if (address >= 0xf0000000)
 		wait = write ? 0 : 2;
@@ -424,19 +480,19 @@ void pcfx_state::pcfx(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(m_huc6261, FUNC(huc6261_device::screen_update));
-	screen.set_raw(XTAL(21'477'272), huc6261_device::WPF, 64, 64 + 1024 + 64, huc6261_device::LPF, 18, 18 + 242);
+	screen.set_raw(XTAL(21'477'272) * 2, huc6261_device::WPF, 64, 64 + 1024 + 64, huc6261_device::SCREEN_LPF, 18 * 2, (18 + 242) * 2);
 
-	huc6270_device &huc6270_a(HUC6270(config, "huc6270_a", XTAL(21'477'272)));
-	huc6270_a.set_vram_size(0x20000);
-	huc6270_a.irq().set(m_intc, FUNC(pcfx_intc_device::irq_w<12>));
+	HUC6270(config, m_huc6270[0], XTAL(21'477'272));
+	m_huc6270[0]->set_vram_size(0x20000);
+	m_huc6270[0]->irq().set(m_intc, FUNC(pcfx_intc_device::irq_w<12>));
 
-	huc6270_device &huc6270_b(HUC6270(config, "huc6270_b", XTAL(21'477'272)));
-	huc6270_b.set_vram_size(0x20000);
-	huc6270_b.irq().set(m_intc, FUNC(pcfx_intc_device::irq_w<14>));
+	HUC6270(config, m_huc6270[1], XTAL(21'477'272));
+	m_huc6270[1]->set_vram_size(0x20000);
+	m_huc6270[1]->irq().set(m_intc, FUNC(pcfx_intc_device::irq_w<14>));
 
 	HUC6261(config, m_huc6261, XTAL(21'477'272));
-	m_huc6261->set_vdc1_tag("huc6270_a");
-	m_huc6261->set_vdc2_tag("huc6270_b");
+	m_huc6261->set_vdc1_tag(m_huc6270[0]);
+	m_huc6261->set_vdc2_tag(m_huc6270[1]);
 	m_huc6261->set_king_tag("huc6272");
 
 	huc6272_device &huc6272(HUC6272(config, "huc6272", XTAL(21'477'272)));
@@ -494,5 +550,5 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME                  FLAGS
-CONS( 1994, pcfx,   0,      0,      pcfx,    pcfx,  pcfx_state, empty_init, "NEC",   "PC-FX",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 199?, pcfxga, pcfx,   0,      pcfx,    pcfx,  pcfx_state, empty_init, "NEC",   "PC-FX/GA (PC ISA Card)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 1994, pcfx,   0,      0,      pcfx,    pcfx,  pcfx_state, empty_init, "NEC / Hudson Soft",   "PC-FX",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 199?, pcfxga, pcfx,   0,      pcfx,    pcfx,  pcfx_state, empty_init, "NEC / Hudson Soft",   "PC-FX/GA (PC ISA Card)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

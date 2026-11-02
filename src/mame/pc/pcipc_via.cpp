@@ -51,7 +51,6 @@
 #include "machine/vt82c598mvp.h"
 #include "machine/w83877tf.h"
 
-#include "softlist.h"
 #include "softlist_dev.h"
 
 namespace {

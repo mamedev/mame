@@ -185,7 +185,6 @@ dspp_device::dspp_device(
 	m_dspx_underover_enable(0),
 	m_dspx_audio_time(0),
 	m_dspx_audio_duration(0),
-	m_cache(CACHE_SIZE),
 	m_drcuml(nullptr),
 	m_drcfe(nullptr),
 	m_drcoptions(0)
@@ -214,11 +213,11 @@ void dspp_device::device_start()
 
 	if (m_isdrc)
 	{
-		m_cache.allocate_cache(mconfig().options().drc_rwx());
-		m_core = m_cache.alloc_near<dspp_internal_state>();
-
 		uint32_t flags = 0;
-		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 1, 16, 0, COMPILE_FORWARDS_BYTES);
+		m_drcuml = std::make_unique<drcuml_state>(*this, CACHE_SIZE);
+		m_drcuml->initialize(flags, 1, 16, 0, COMPILE_FORWARDS_BYTES);
+
+		m_core = m_drcuml->cache_alloc_near<dspp_internal_state>();
 
 		m_drcfe = std::make_unique<frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 	}

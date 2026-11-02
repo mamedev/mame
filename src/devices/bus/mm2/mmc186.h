@@ -13,8 +13,6 @@
 
 #include "exp.h"
 #include "bus/nscsi/devices.h"
-#include "bus/scsi/s1410.h"
-#include "bus/scsi/scsihd.h"
 #include "imagedev/floppy.h"
 #include "machine/74259.h"
 #include "machine/am9517a.h"

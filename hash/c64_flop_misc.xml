@@ -980,7 +980,7 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
-	<software name="prologic" supported="no">
+	<software name="prologic">
 		<description>Prologic-DOS</description>
 		<year>1987</year>
 		<publisher>REX Data Technology</publisher>

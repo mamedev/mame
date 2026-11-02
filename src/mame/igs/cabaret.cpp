@@ -13,9 +13,8 @@ TODO:
 - Keyboard is mapped through test mode, but some bits are unknown, and hopper
   is not emulated
 - Map LEDs and coin counters
-- Remove patches after finding why there are so many pitfalls.  Maybe the
-  game expects to read inputs via an external device and expects certain
-  timings
+- Protection is emulated from the game code only (see prot_r), verify it
+  on real hardware and check whether kungfua and double8l use the same one
 - Trojan out internal ROMs for kungfua and double8l
 - kungfua and double8l have 5 banks of 8 DIP switches (sheets available for
   double8l)
@@ -56,13 +55,14 @@ public:
 		, m_led(*this, "led6")
 	{ }
 
-	void cabaret(machine_config &config);
+	void cabaret(machine_config &config) ATTR_COLD;
 
-	void init_cabaret();
-	void init_double8l();
-	void init_kungfua();
+	void init_cabaret() ATTR_COLD;
+	void init_double8l() ATTR_COLD;
+	void init_kungfua() ATTR_COLD;
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
@@ -83,7 +83,9 @@ private:
 
 	uint8_t m_nmi_enable = 0;
 	uint8_t m_out[3]{};
+	uint8_t m_prot_counter = 0;
 
+	uint8_t prot_r(offs_t offset);
 	void bg_scroll_w(offs_t offset, uint8_t data);
 	void bg_tile_w(offs_t offset, uint8_t data);
 	void fg_tile_w(offs_t offset, uint8_t data);
@@ -213,9 +215,34 @@ void cabaret_state::ppi2_c_w(uint8_t data)
 
 
 
+/*
+  Protection (cabaret): reads in 0x5100-0x51ff and 0xcf00-0xcfff don't hit the ROM.
+  The ROM there only contains filler (an uncalled function at 0x5100 and the strings
+  it references at 0xcf00). Model derived from the game code, not verified on the PCB:
+  - read with A2 = 0: 4-bit counter, incremented if A1 == counter bit 1, decremented otherwise
+  - read with A2 = 1: bit 0 = !(counter bit 3 & counter bit 1); the other bits are not checked
+*/
+uint8_t cabaret_state::prot_r(offs_t offset)
+{
+	if (offset & 0x04)
+		return 0xfe | ((BIT(m_prot_counter, 3) & BIT(m_prot_counter, 1)) ^ 1);
+
+	if (!machine().side_effects_disabled())
+	{
+		if (BIT(offset, 1) == BIT(m_prot_counter, 1))
+			m_prot_counter = (m_prot_counter + 1) & 0x0f;
+		else
+			m_prot_counter = (m_prot_counter - 1) & 0x0f;
+	}
+
+	return 0xff; // value ignored by the game
+}
+
 void cabaret_state::program_map(address_map &map)
 {
 	map(0x00000, 0x0efff).rom();
+	map(0x05100, 0x051ff).r(FUNC(cabaret_state::prot_r));
+	map(0x0cf00, 0x0cfff).r(FUNC(cabaret_state::prot_r));
 	map(0x0f000, 0x0ffff).ram();
 }
 
@@ -302,9 +329,9 @@ static INPUT_PORTS_START( cabaret )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1   )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1   )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2   )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN   )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Down")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -370,9 +397,15 @@ GFXDECODE_END
                                 Machine Drivers
 ***************************************************************************/
 
+void cabaret_state::machine_start()
+{
+	save_item(NAME(m_prot_counter));
+}
+
 void cabaret_state::machine_reset()
 {
 	m_nmi_enable =   0;
+	m_prot_counter = 0; // the boot check at 0x0efd assumes the counter starts at 0
 }
 
 INTERRUPT_GEN_MEMBER(cabaret_state::interrupt_cb)
@@ -432,17 +465,6 @@ void cabaret_state::init_cabaret()
 	{
 		if ((i & 0x2206) == 0x2002) rom[i] ^= 0x01;
 	}
-
-	// Patch pitfalls
-	rom[0x1012] =
-	rom[0x1013] = 0;
-	rom[0x13b8] = 0x18;
-	rom[0x53a6] = 0x18;
-	rom[0x73c6] = 0x18;
-	rom[0xc46a] = 0x18;
-	rom[0xc583] = 0x18;
-	rom[0xc5fa] = 0x18;
-	rom[0xc6c4] = 0x18;
 }
 
 void cabaret_state::init_double8l()

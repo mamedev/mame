@@ -30,9 +30,6 @@
     Press DELETE to abort boot, then press H to list all the commands.
 
     TODO:
-    - fix interrupt flakiness depending on how system is started
-        - "interrupt circuit error. chip u208"
-        - screen scrolling not working
     - implement S-100 bus features;
         - Move floppy controller to a card
     - complete floppy controller implementation

@@ -26,7 +26,8 @@ std::unique_ptr<drcbe_interface> make_drcbe_x64(
 		uint32_t flags,
 		int modes,
 		int addrbits,
-		int ignorebits);
+		int ignorebits,
+		uint32_t max_sequence_length);
 
 } // namespace drc
 

@@ -312,7 +312,14 @@ bool d64_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 bool d64_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
 {
-	const format &f = formats[0];
+	int type = 0;
+	for(int i=1; formats[i].sector_count; i++)
+		for(int track=formats[type].track_count; track < formats[i].track_count; track++)
+			for(int head=0; head < formats[i].head_count; head++)
+				if(image.track_is_formatted(this->get_physical_track(formats[i], head, track), head))
+					type = i;
+
+	const format &f = formats[type];
 
 	for(int head=0; head < f.head_count; head++) {
 		for(int track=0; track < f.track_count; track++) {

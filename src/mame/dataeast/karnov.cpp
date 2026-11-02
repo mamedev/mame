@@ -900,7 +900,7 @@ ROM_START( karnov5e ) // DE-0248-3 main board, DE-259-0 sub/rom board
 	ROM_LOAD( "dn05-5.f3", 0x8000, 0x8000, CRC(fa1a31a8) SHA1(5007a625be03c546d2a78444d72c28761b10cdb0) )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) // i8751 MCU - byte 0x129:6B --> 6C to return expected World / Euro value - need to decap & dump real MCU!!!
-	ROM_LOAD( "dn-5e.k14", 0x0000, 0x1000, BAD_DUMP CRC(d2b12afe) SHA1(66bfce9430c1d72a953d22aed711e6b429c7b9db) ) // 5E is handwritten.  -  hand-crafted from the US version
+	ROM_LOAD( "dn-5e.k14", 0x0000, 0x1000, CRC(d2b12afe) SHA1(66bfce9430c1d72a953d22aed711e6b429c7b9db) ) // 5E is handwritten. Dump confirmed from decap
 
 	ROM_REGION( 0x08000, "char", 0 )
 	ROM_LOAD( "dn00-.c5", 0x00000, 0x08000, CRC(0ed77c6d) SHA1(4ec86ac56c01c158a580dc13dea3e5cbdf90d0e9) )

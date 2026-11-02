@@ -66,8 +66,8 @@ void tlcs90_device::tmp90840_regs(address_map &map)
 	//map(0xffeb, 0xffeb).rw(FUNC(tlcs90_device::scbuf_r), FUNC(tlcs90_device::scbuf_w));
 	map(0xffec, 0xffec).rw(FUNC(tlcs90_device::bx_r), FUNC(tlcs90_device::bx_w));
 	map(0xffed, 0xffed).rw(FUNC(tlcs90_device::by_r), FUNC(tlcs90_device::by_w));
-	//map(0xffee, 0xffee).r(FUNC(tlcs90_device::adreg_r));
-	//map(0xffef, 0xffef).rw(FUNC(tlcs90_device::admod_r), FUNC(tlcs90_device::admod_w));
+	map(0xffee, 0xffee).r(FUNC(tlcs90_device::adreg_r));
+	map(0xffef, 0xffef).rw(FUNC(tlcs90_device::admod_r), FUNC(tlcs90_device::admod_w));
 }
 
 void tlcs90_device::tmp90840_mem(address_map &map)
@@ -158,6 +158,7 @@ tlcs90_device::tlcs90_device(const machine_config &mconfig, device_type type, co
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, program_map)
 	, m_port_read_cb(*this, 0xff)
 	, m_port_write_cb(*this)
+	, m_an_read(*this, 0)
 {
 }
 
@@ -2110,6 +2111,10 @@ void tlcs90_device::device_reset()
 	m_t4mod = 0;
 	std::fill(std::begin(m_treg_8bit), std::end(m_treg_8bit), 0);
 	std::fill(std::begin(m_treg_16bit), std::end(m_treg_16bit), 0);
+
+	m_adc_timer->adjust(attotime::never);
+	m_admod = 0;
+	m_adis = false;
 }
 
 
@@ -2723,6 +2728,8 @@ void tlcs90_device::inteh_w(uint8_t data)
 	m_irq_mask  |=  ((data & 0x04) ? (1 << INT0 ) : 0) |
 						((data & 0x02) ? (1 << INTT0) : 0) |
 						((data & 0x01) ? (1 << INTT1) : 0) ;
+
+	m_adis = util::BIT(data, 3);
 }
 
 void tlcs90_device::irf_clear_w(uint8_t data)
@@ -2749,6 +2756,43 @@ uint8_t tlcs90_device::by_r()
 void tlcs90_device::by_w(uint8_t data)
 {
 	m_iybase = (data & 0xf) << 16;
+}
+
+uint8_t tlcs90_device::adreg_r()
+{
+	if (!machine().side_effects_disabled())
+		m_admod &= ~0x40;
+
+	return m_adreg;
+}
+
+uint8_t tlcs90_device::admod_r()
+{
+	return m_admod;
+}
+
+void tlcs90_device::admod_w(uint8_t data)
+{
+	// EOCF and ADBF are read-only, ADS always reads as 0
+	m_admod = (m_admod & 0x60) | (data & 0x17);
+
+	if (util::BIT(data, 3))
+	{
+		// 95 or 190 states, 1 state = 2/fc
+		m_admod = (m_admod & ~0x40) | 0x20;
+		m_adc_timer->adjust(attotime::from_ticks(util::BIT(m_admod, 4) ? 380 : 190, clock()));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(tlcs90_device::adc_callback)
+{
+	unsigned const channel = m_admod & 0x07;
+	m_adreg = (channel < MAX_ANALOG_INPUTS) ? m_an_read[channel]() : 0;
+	m_admod = (m_admod & ~0x20) | 0x40;
+
+	// INTAD shares the INTT2 request and vector
+	if (m_adis)
+		raise_irq(INTT2);
 }
 
 uint8_t tlcs90_device::reserved_r(offs_t offset)
@@ -2897,7 +2941,8 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
 	}
 	// regular handling
 	m_timer_value[i] = 0;
-	raise_irq(INTT0 + i);
+	if (i != 2 || !m_adis)
+		raise_irq(INTT0 + i);
 	}
 }
 
@@ -2972,6 +3017,10 @@ void tlcs90_device::device_start()
 	save_item(NAME(m_t4mod));
 	save_item(NAME(m_treg_16bit));
 
+	save_item(NAME(m_admod));
+	save_item(NAME(m_adreg));
+	save_item(NAME(m_adis));
+
 	// Work registers
 	save_item(NAME(m_op));
 	save_item(NAME(m_mode1));
@@ -3017,6 +3066,8 @@ void tlcs90_device::device_start()
 	m_ixbase = m_iybase = 0;
 	m_timer_value[0] = m_timer_value[1] = m_timer_value[2] = m_timer_value[3] = 0;
 	m_timer4_value = 0;
+	m_admod = m_adreg = 0;
+	m_adis = false;
 	m_op = 0;
 	m_mode1 = e_mode::NONE;
 	m_r1 = m_r1b = 0;
@@ -3035,6 +3086,7 @@ void tlcs90_device::device_start()
 		m_timer[i] = timer_alloc(FUNC(tlcs90_device::t90_timer_callback), this);
 
 	m_timer[4] = timer_alloc(FUNC(tlcs90_device::t90_timer4_callback), this);
+	m_adc_timer = timer_alloc(FUNC(tlcs90_device::adc_callback), this);
 
 	state_add( T90_PC, "PC", m_pc.w.l).formatstr("%04X");
 	state_add( T90_SP, "SP", m_sp.w.l).formatstr("%04X");
