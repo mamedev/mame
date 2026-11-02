@@ -1,7 +1,88 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
+// copyright-holders:Olivier Galibert, Curt Coder
+/*
+
+Xebec S1410
+
+The Z80 firmware is not executed; the controller is emulated at the SASI command level.
+
+PCB Layout
+----------
+
+ASSY 104527 REV E04 SN 127623
+
+|-------------------------------------------|
+|                                           |
+|CN1                                        |
+|                                           |
+|                                           |
+|CN2                                        |
+|                   XEBEC2               CN5|
+|   PROM                        2114        |
+|CN3                XEBEC1      2114        |
+|                                           |
+|CN4                Z80         ROM         |
+|   20MHz                             16MHz |
+|-------------------------------------------|
+
+Notes:
+    Relevant IC's shown.
+
+    Z80     - Zilog Z8400APS Z80A CPU
+    ROM     - 2732 pinout ROM "XEBEC 104521G 2155008 M460949"
+    PROM    - National Semiconductor DM74S288N "103911" 32x8 TTL PROM
+    2114    - National Semiconductor NMC2148HN-3 1Kx4 RAM
+    XEBEC1  - Xebec 3198-0009
+    XEBEC2  - Xebec 3198-0045 "T20"
+    CN1     - 4-pin Molex, drive power
+    CN2     - 34-pin PCB edge, ST-506 drive 0/1 control
+    CN3     - 2x10 PCB header, ST-506 drive 0 data
+    CN4     - 2x10 PCB header, ST-506 drive 1 data
+    CN5     - 2x25 PCB header, SASI host interface
+
+
+ASSY 104766 REV C02 SN 231985P
+
+|-------------------------------------------|
+|                                           |
+| CN1                           SY2158      |
+|                               CN7     CN6 |
+|                               ROM         |
+| CN2                                       |
+|           XEBEC1          Z80             |
+|                                       CN5 |
+| CN3       XEBEC2   20MHz      XEBEC3      |
+|                                           |
+| CN4       XEBEC4              XEBEC5      |
+|                                           |
+|-------------------------------------------|
+
+Notes:
+    Relevant IC's shown.
+
+    Z80     - Zilog Z8400APS Z80A CPU
+    ROM     - 2732 pinout ROM "104788D"
+    SY2158  - Synertek SY2158A-3 1Kx8 RAM
+    XEBEC1  - Xebec 3198-0046N8445
+    XEBEC2  - Xebec 3198-0009
+    XEBEC3  - Xebec 3198-0057
+    XEBEC4  - Xebec 3198-0058
+    XEBEC5  - Xebec 3198-0056
+    CN1     - 4-pin Molex, drive power
+    CN2     - 34-pin PCB edge, ST-506 drive 0/1 control
+    CN3     - 2x10 PCB header, ST-506 drive 0 data
+    CN4     - 2x10 PCB header, ST-506 drive 1 data
+    CN5     - 2x25 PCB header, SASI host interface
+    CN6     - 2x8 PCB header
+    CN7     - 2x10 PCB header (test only)
+
+*/
+
+
 #include "emu.h"
 #include "bus/nscsi/s1410.h"
+
+#include "cpu/z80/z80.h"
 
 #include "multibyte.h"
 
@@ -12,11 +93,64 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(NSCSI_S1410, nscsi_s1410_device, "scsi_s1410", "Xebec S1410 5.25 Inch Winchester Disk Controller")
+DEFINE_DEVICE_TYPE(NSCSI_S1410, nscsi_s1410_device, "s1410", "Xebec S1410 5.25 Inch Winchester Disk Controller")
+
+ROM_START( s1410 )
+	ROM_REGION( 0x1000, "z80", 0 )
+	ROM_DEFAULT_BIOS("104521g")
+	ROM_SYSTEM_BIOS( 0, "104521f", "104521F" )
+	ROMX_LOAD( "104521f", 0x0000, 0x1000, CRC(305b8e76) SHA1(9efaa53ae86bc111bd263ad433e083f78a000cab), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "104521g", "104521G" )
+	ROMX_LOAD( "104521g", 0x0000, 0x1000, CRC(24385115) SHA1(c389f6108cd5ed798a090acacce940ee43d77042), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "104788d", "104788D (BASF 6188)" )
+	ROMX_LOAD( "104788d", 0x0000, 0x1000, CRC(2e385e2d) SHA1(7e2c349b2b6e95f2134f82cffc38d86b8a68390d), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "104788e", "104788E (Seagate ST-251)" )
+	ROMX_LOAD( "104788e", 0x0000, 0x1000, CRC(40a7195d) SHA1(bf68e99dad182bfcbb5d488aeb440cba572a6ef8), ROM_BIOS(3) )
+
+	ROM_REGION( 0x20, "103911", 0 )
+	ROM_LOAD( "103911", 0x00, 0x20, NO_DUMP ) // DM74S288N
+ROM_END
 
 nscsi_s1410_device::nscsi_s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	nscsi_harddisk_device(mconfig, NSCSI_S1410, tag, owner, clock)
 {
+}
+
+const tiny_rom_entry *nscsi_s1410_device::device_rom_region() const
+{
+	return ROM_NAME( s1410 );
+}
+
+void nscsi_s1410_device::z80_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region("z80", 0);
+	map(0x1000, 0x13ff).ram();
+}
+
+void nscsi_s1410_device::z80_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x66, 0x66).nopw();
+	map(0x67, 0x67).nopw();
+	map(0x68, 0x68).nopr();
+	map(0x69, 0x69).nopw();
+	map(0x6a, 0x6a).nopw();
+	map(0x6b, 0x6b).nopw();
+	map(0x6c, 0x6c).nopw();
+	map(0xa0, 0xa0).noprw();
+	map(0xc1, 0xc1).nopw();
+	map(0xc2, 0xc2).nopw();
+	map(0xc3, 0xc3).nopw();
+}
+
+void nscsi_s1410_device::device_add_mconfig(machine_config &config)
+{
+	nscsi_harddisk_device::device_add_mconfig(config);
+
+	z80_device &z80(Z80(config, "z80", 16_MHz_XTAL / 4));
+	z80.set_addrmap(AS_PROGRAM, &nscsi_s1410_device::z80_mem);
+	z80.set_addrmap(AS_IO, &nscsi_s1410_device::z80_io);
+	z80.set_disable();
 }
 
 void nscsi_s1410_device::device_reset()

@@ -102,7 +102,7 @@ Notes:
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(S1410, s1410_device, "s1410", "Xebec S1410")
+DEFINE_DEVICE_TYPE(S1410, s1410_device, "s1410_legacy", "Xebec S1410")
 
 //-------------------------------------------------
 //  ROM( s1410 )

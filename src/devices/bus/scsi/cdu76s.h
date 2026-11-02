@@ -14,12 +14,15 @@
 #pragma once
 
 #include "scsicd.h"
+#include "bus/nscsi/cdu76s.h"
 #include "machine/t10mmc.h"
 
 class sony_cdu76s_device : public scsicd_device
 {
 public:
 	sony_cdu76s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static auto parent_rom_device_type() { return &NSCSI_CDU76S; }
 
 	virtual void ExecCommand() override;
 	virtual void ReadData( uint8_t *data, int dataLength ) override;
