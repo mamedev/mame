@@ -955,7 +955,7 @@ void m036_hyleyuan_state::hyleyuan_map(address_map &map)
 	// Without sensor pulses the game stops the motor after five seconds and
 	// displays the ticket-dispenser fault with the unpaid count.
 	map(0x6000'0000, 0x6000'0003).umask32(0x0000'00ff).lw8(NAME([this] (u8 data) { m_ticket->motor_w(BIT(data, 1)); }));
-	map(0xffff'f43c, 0xffff'f43f).r(FUNC(m036_hd_base_state::scan_inputs_r<4>));
+	map(0xffff'f43c, 0xffff'f43f).r(FUNC(m036_hyleyuan_state::scan_inputs_r<4>));
 }
 
 void m036_mj_state::mjzhizun_map(address_map &map)
@@ -1431,7 +1431,7 @@ void m036_hd_base_state::hd_config(machine_config &config)
 	m_maincpu->set_clock(100'000'000); // provisional PLL clock, as in PGM2
 	m_screen->set_size(800, 600);
 	m_screen->set_visarea(0, 799, 0, 599);
-	m_screen->set_screen_update(FUNC(m036_base_state::screen_update<true>));
+	m_screen->set_screen_update(FUNC(m036_hd_base_state::screen_update<true>));
 	TT5665(config, m_tt5665, 4.952_MHz_XTAL, tt5665_device::ss_state::SS_HIGH, 0);
 	m_tt5665->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
