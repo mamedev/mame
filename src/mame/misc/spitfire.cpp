@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Peter Wilhelmsen
+// copyright-holders:David Haywood
 /*
  * Spitfire (Wizard Kings / Innovative Coin Corporation, 1976)
  *
@@ -12,17 +12,20 @@
  * are selected by C000/D000; the other two channels are bullets.
  *
  * The tower is physical screen-overlay artwork, not generated video. Its
- * collision tests are in the program ROM. The internal layout supplies a
- * simplified tower based on photographs, not the complete original overlay.
+ * collision tests are in the program ROM. The internal layout redraws the
+ * physical overlay from photographs, including the sky and airfield scenery.
+ * Colours, optical blending and registration are approximate.
  *
  * TODO: verify oscillator, raster timing and display offsets against the PCB.
- * Trace the discrete sound circuit and analog game timer. Refine artwork
- * alignment and reproduce the full physical overlay.
+ * Trace the discrete sound circuit and analog game timer. Verify artwork
+ * registration and optical properties against physical measurements.
  */
 
 #include "emu.h"
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
+#include "machine/netlist.h"
+#include "nl_spitfire.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -31,176 +34,6 @@
 
 namespace {
 
-// Functional approximation, NOT a reconstruction of the PCB sound circuit.
-// The photographs show a probable 4006, a 9602 and a 7475 near the MC1358.
-// This suggests noise, timed pulses and analogue shaping, but the connections,
-// feedback taps, clock, RC values and even the exact effect timbres are unknown.
-// All synthesis frequencies, gains and time constants below are provisional.
-//
-// ROM-observed controls (both program revisions):
-//   5000/6000 = 01: shot created by the corresponding player
-//   5xxx/6xxx = 02, then repeated 22: aircraft falling after damage
-//   5xxx/6xxx = 08: impact/destruction helper (can be called more than once)
-//   5000 = 00/04: normal loop; 04 if EITHER aircraft's speed counter is 4
-//
-// Model both address banks as writes to shared mono hardware. Trigger shot and
-// impact envelopes on writes, not separate per-player latch edges: player 2
-// fires repeatedly with no intervening clear in the 6xxx bank. Keep D1 as a
-// level so the rapid 22 writes do not repeatedly restart the falling effect.
-// D5 and the exact address/enable decoding remain unresolved. No separate
-// sound is invented for D5, and no CPU-internal gameplay state is consulted.
-class spitfire_sound_device : public device_t, public device_sound_interface
-{
-public:
-	spitfire_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
-
-	void control_w(u8 data);
-	void enable_w(int state);
-
-protected:
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-	virtual void sound_stream_update(sound_stream &stream) override;
-
-private:
-	static constexpr unsigned SAMPLE_RATE = 48'000;
-	sound_stream* m_stream;
-	u8 m_control;
-	bool m_enabled;
-	u32 m_noise;
-	u8 m_noise_count;
-	float m_noise_low;
-	float m_noise_high;
-	float m_engine_phase;
-	float m_engine_filter;
-	float m_engine_level;
-	float m_fall_sweep;
-	float m_fall_filter;
-	float m_fall_level;
-	float m_shot;
-	float m_impact;
-	float m_output_dc;
-};
-
-DEFINE_DEVICE_TYPE_PRIVATE(SPITFIRE_SOUND, spitfire_sound_device, spitfire_sound_device, "spitfire_sound", "Spitfire sound (approximation)")
-
-spitfire_sound_device::spitfire_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, SPITFIRE_SOUND, tag, owner, clock),
-	device_sound_interface(mconfig, *this)
-{
-}
-
-void spitfire_sound_device::device_start()
-{
-	m_stream = stream_alloc(0, 1, SAMPLE_RATE);
-	save_item(NAME(m_control));
-	save_item(NAME(m_enabled));
-	save_item(NAME(m_noise));
-	save_item(NAME(m_noise_count));
-	save_item(NAME(m_noise_low));
-	save_item(NAME(m_noise_high));
-	save_item(NAME(m_engine_phase));
-	save_item(NAME(m_engine_filter));
-	save_item(NAME(m_engine_level));
-	save_item(NAME(m_fall_sweep));
-	save_item(NAME(m_fall_filter));
-	save_item(NAME(m_fall_level));
-	save_item(NAME(m_shot));
-	save_item(NAME(m_impact));
-	save_item(NAME(m_output_dc));
-}
-
-void spitfire_sound_device::device_reset()
-{
-	m_stream->update();
-	m_control = 0;
-	m_enabled = false;
-	m_noise = 1;
-	m_noise_count = 0;
-	m_noise_low = m_noise_high = 0.0f;
-	m_engine_phase = m_engine_filter = m_engine_level = 0.0f;
-	m_fall_sweep = m_fall_filter = m_fall_level = 0.0f;
-	m_shot = m_impact = m_output_dc = 0.0f;
-}
-
-void spitfire_sound_device::control_w(u8 data)
-{
-	m_stream->update();
-	if (m_enabled)
-	{
-		if (BIT(data, 0))
-			m_shot = 1.0f;
-		if (BIT(data, 3))
-			m_impact = 1.0f;
-		if (BIT(data, 1) && !BIT(m_control, 1))
-			m_fall_sweep = 0.0f;
-	}
-	m_control = data;
-}
-
-void spitfire_sound_device::enable_w(int state)
-{
-	m_stream->update();
-	m_enabled = bool(state);
-	// A separate game-active gate is assumed: the ROM can leave 04 latched
-	// when time expires. Clear pending effects across round boundaries.
-	m_control = 0;
-	m_shot = m_impact = 0.0f;
-}
-
-void spitfire_sound_device::sound_stream_update(sound_stream &stream)
-{
-	// Selected substitute values, not measured component values:
-	// 12 kHz noise clock; 80 Hz engine flutter; shot/impact decay 25/160 ms.
-	// Filters are first-order approximations, with 5/10 ms control smoothing
-	// and a 20 Hz output DC blocker. A falling aircraft darkens the noise
-	// over 300 ms; repeated 22 writes maintain, rather than restart, this.
-	const float shot_decay = std::exp(-1.0f / (0.025f * SAMPLE_RATE));
-	const float impact_decay = std::exp(-1.0f / (0.160f * SAMPLE_RATE));
-	const float engine_target = m_enabled && BIT(m_control, 2) ? 1.0f : 0.0f;
-	const float fall_target = m_enabled && BIT(m_control, 1) ? 1.0f : 0.0f;
-	for (int i = 0; i < stream.samples(); i++)
-	{
-		if (++m_noise_count == 4)
-		{
-			m_noise_count = 0;
-			// Maximal 17-bit sequence chosen as a deterministic noise source.
-			// This does NOT establish the actual 4006 feedback configuration.
-			m_noise = (m_noise >> 1) | ((BIT(m_noise, 0) ^ BIT(m_noise, 3)) << 16);
-		}
-		const float noise = BIT(m_noise, 0) ? 1.0f : -1.0f;
-		m_noise_low += 0.0755f * (noise - m_noise_low); // approximately 600 Hz
-		m_noise_high += 0.4076f * (noise - m_noise_high); // approximately 4 kHz
-
-		m_engine_phase += 80.0f / SAMPLE_RATE;
-		if (m_engine_phase >= 1.0f)
-			m_engine_phase -= 1.0f;
-		const float engine = noise * (m_engine_phase < 0.25f ? 1.0f : 0.25f);
-		m_engine_filter += 0.0448f * (engine - m_engine_filter); // 350 Hz
-		m_engine_level += (engine_target - m_engine_level) / (0.005f * SAMPLE_RATE);
-
-		if (fall_target)
-			m_fall_sweep = std::min(1.0f, m_fall_sweep + 1.0f / (0.300f * SAMPLE_RATE));
-		m_fall_filter += (0.21f - 0.16f * m_fall_sweep) * (noise - m_fall_filter);
-		m_fall_level += (fall_target - m_fall_level) / (0.010f * SAMPLE_RATE);
-
-		const float mix = 0.24f * m_engine_filter * m_engine_level
-				+ 0.26f * m_fall_filter * m_fall_level
-				+ 0.32f * (m_noise_high - m_noise_low) * m_shot
-				+ 0.42f * m_noise_low * m_impact;
-		m_output_dc += 0.002615f * (mix - m_output_dc);
-		stream.put(0, i, mix - m_output_dc);
-		m_shot *= shot_decay;
-		m_impact *= impact_decay;
-		// Avoid denormals and leave the idle output exactly silent after tails.
-		if (m_shot < 1.0e-7f) m_shot = 0.0f;
-		if (m_impact < 1.0e-7f) m_impact = 0.0f;
-		if (!engine_target && m_engine_level < 1.0e-7f) m_engine_level = 0.0f;
-		if (!fall_target && m_fall_level < 1.0e-7f) m_fall_level = 0.0f;
-		if (std::abs(m_output_dc) < 1.0e-12f) m_output_dc = 0.0f;
-	}
-}
-
 class spitfire_state : public driver_device
 {
 public:
@@ -208,7 +41,10 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_smi(*this, "smi"),
-		m_sound(*this, "soundboard"),
+		m_sound_trigger(*this, "soundboard:trigger%u", 0),
+		m_sound_engine(*this, "soundboard:engine"),
+		m_sound_fall(*this, "soundboard:fall"),
+		m_sound_enable(*this, "soundboard:enable"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_inputs(*this, "IN%u", 0),
@@ -225,18 +61,22 @@ protected:
 private:
 	required_device<f8_cpu_device> m_maincpu;
 	required_device<f3853_device> m_smi;
-	required_device<spitfire_sound_device> m_sound;
+	required_device_array<netlist_mame_logic_input_device, 2> m_sound_trigger;
+	required_device<netlist_mame_logic_input_device> m_sound_engine;
+	required_device<netlist_mame_logic_input_device> m_sound_fall;
+	required_device<netlist_mame_logic_input_device> m_sound_enable;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_ioport_array<2> m_inputs;
 	required_ioport m_duration;
 
-	u8 m_y_ram[0x100];
-	u8 m_x_ram[0x200];
-	u8 m_sprite[2];
-	u8 m_port1;
-	bool m_game_on;
-	emu_timer *m_game_timer;
+	u8 m_y_ram[0x100]{};
+	u8 m_x_ram[0x200]{};
+	u8 m_sprite[2]{};
+	u8 m_port1 = 0;
+	bool m_game_on = false;
+	emu_timer *m_game_timer = nullptr;
+	emu_timer *m_sound_pulse_timer[2]{};
 
 	u8 input0_r();
 	u8 input1_r();
@@ -247,6 +87,9 @@ private:
 	template <unsigned N> void sprite_w(u8 data);
 	void game_off_w(u8 data);
 	void game_on_w(u8 data);
+	void sound_w(u8 data);
+	void sound_enable_w(int state);
+	TIMER_CALLBACK_MEMBER(sound_pulse_off);
 	TIMER_CALLBACK_MEMBER(game_over);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void prg_map(address_map &map) ATTR_COLD;
@@ -301,14 +144,14 @@ template <unsigned N> void spitfire_state::sprite_w(u8 data)
 void spitfire_state::game_off_w(u8 data)
 {
 	m_game_on = false;
-	m_sound->enable_w(0);
+	sound_enable_w(0);
 	m_game_timer->adjust(attotime::never);
 }
 
 void spitfire_state::game_on_w(u8 data)
 {
 	m_game_on = true;
-	m_sound->enable_w(1);
+	sound_enable_w(1);
 	// The PCB has an analog duration adjustment, not a DIP switch.
 	m_game_timer->adjust(attotime::from_seconds(m_duration->read()));
 }
@@ -316,7 +159,50 @@ void spitfire_state::game_on_w(u8 data)
 TIMER_CALLBACK_MEMBER(spitfire_state::game_over)
 {
 	m_game_on = false;
-	m_sound->enable_w(0);
+	sound_enable_w(0);
+}
+
+// Both ROM revisions write shared mono controls in the 5xxx/6xxx banks:
+// D0 = shot, D1 = falling aircraft, D2 = either player at full throttle,
+// D3 = impact. Repeated 22 writes hold the falling effect; D5 is unresolved.
+// Address decoding and the separate game-active gate are still provisional.
+void spitfire_state::sound_w(u8 data)
+{
+	m_sound_engine->write_line(m_game_on && BIT(data, 2));
+	m_sound_fall->write_line(m_game_on && BIT(data, 1));
+	if (m_game_on)
+	{
+		for (unsigned i = 0; i < 2; ++i)
+		{
+			if (BIT(data, i ? 3 : 0))
+			{
+				// A short charge pulse for EVERY write, not a data-bit edge.
+				// P2 can fire again without an intervening zero in bank 6.
+				// 100 us is selected for this substitute circuit, not measured.
+				m_sound_trigger[i]->write_line(1);
+				m_sound_pulse_timer[i]->adjust(attotime::from_usec(100), i);
+			}
+		}
+	}
+}
+
+TIMER_CALLBACK_MEMBER(spitfire_state::sound_pulse_off)
+{
+	m_sound_trigger[param]->write_line(0);
+}
+
+void spitfire_state::sound_enable_w(int state)
+{
+	// The ROM may leave 04 latched on expiry. Clear pending effects across
+	// round boundaries and let the netlist discharge its transient envelopes.
+	m_sound_enable->write_line(state);
+	m_sound_engine->write_line(0);
+	m_sound_fall->write_line(0);
+	for (unsigned i = 0; i < 2; ++i)
+	{
+		m_sound_trigger[i]->write_line(0);
+		m_sound_pulse_timer[i]->adjust(attotime::never);
+	}
 }
 
 uint32_t spitfire_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -351,7 +237,7 @@ uint32_t spitfire_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 void spitfire_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x07ff).rom();
-	map(0x5000, 0x6fff).w(m_sound, FUNC(spitfire_sound_device::control_w));
+	map(0x5000, 0x6fff).w(FUNC(spitfire_state::sound_w));
 	map(0x7000, 0x70ff).mirror(0x0f00).w(FUNC(spitfire_state::y_w));
 	map(0x8000, 0x81ff).mirror(0x0e00).w(FUNC(spitfire_state::x_w));
 	map(0x9000, 0x91ff).mirror(0x0e00).w(FUNC(spitfire_state::clear_w));
@@ -411,6 +297,8 @@ GFXDECODE_END
 void spitfire_state::machine_start()
 {
 	m_game_timer = timer_alloc(FUNC(spitfire_state::game_over), this);
+	for (auto &timer : m_sound_pulse_timer)
+		timer = timer_alloc(FUNC(spitfire_state::sound_pulse_off), this);
 	save_item(NAME(m_y_ram));
 	save_item(NAME(m_x_ram));
 	save_item(NAME(m_sprite));
@@ -426,6 +314,7 @@ void spitfire_state::machine_reset()
 	m_port1 = 0;
 	m_game_on = false;
 	m_game_timer->adjust(attotime::never);
+	sound_enable_w(0);
 }
 
 void spitfire_state::spitfire(machine_config &config)
@@ -449,7 +338,15 @@ void spitfire_state::spitfire(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_spitfire);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 	SPEAKER(config, "mono").front_center();
-	SPITFIRE_SOUND(config, m_sound).add_route(ALL_OUTPUTS, "mono", 1.0);
+	NETLIST_SOUND(config, "soundboard", 48000)
+		.set_source(NETLIST_NAME(spitfire))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+	NETLIST_LOGIC_INPUT(config, m_sound_trigger[0], "SHOT.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_sound_trigger[1], "IMPACT.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_sound_engine, "ENGINE.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_sound_fall, "FALL.IN", 0);
+	NETLIST_LOGIC_INPUT(config, m_sound_enable, "ENABLE.IN", 0);
+	NETLIST_STREAM_OUTPUT(config, "soundboard:output", 0, "OUTPUT").set_mult_offset(1.0, 0.0);
 }
 
 ROM_START( spitfire )

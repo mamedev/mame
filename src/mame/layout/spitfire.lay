@@ -1,52 +1,370 @@
 <?xml version="1.0"?>
 <!--
-license:CC0-1.0
+Spitfire physical overlay: vector redraw from nine supplied photographs.
+Whole-face reference: 683797901-2bd818c5-2893-49d1-addb-4cd510e2565e.jpg;
+detail references: 683797908, 683797918 and 683797946 (same overlay).
 
-Simple tower artwork based on photographs of the original physical overlay.
-This omits the surrounding landscape and is not an exact artwork restoration.
-Placement approximates raw screen X=288..335, Y=192..255; collision bounds
-come from the program, not this layout. The screen retains its 4:3 aspect.
+The five cloud contours are traced; scenery and tower details are redrawn.
+Flat colours omit illumination, age damage and print halftoning. Photos are
+oblique and contain no active raster or scale: registration and optical
+blending remain approximate. This is not an exact restoration or a scan.
+
+Tower centre is near raw X=312. Its roof spans approximately X=292..332,
+Y=184, with feet near Y=252. These keep the photographic proportions while
+placing the cabin across the ROM's broad collision region (plane origins
+X=280..327/Y>=181; bullet positions X=291..338/Y>=197). The printed outline
+is not a collision mask. The driver and ROM determine all hits.
+
+Backdrop plus additive monochrome video is a readability approximation;
+transmission/reflectance of the original sheet and CRT brightness are unknown.
+All views retain the same 4:3 raster; no gameplay coordinates are altered.
 -->
 <mamelayout version="2">
 
-	<element name="tower">
+	<element name="airfield">
 		<image>
-			<bounds x="0" y="0" width="48" height="64" />
 			<data><![CDATA[
-				<svg xmlns="http://www.w3.org/2000/svg" width="48" height="64" viewBox="0 0 48 64">
-					<!-- Supports and three bays of crossed braces. -->
-					<g fill="none" stroke="#aebfb0" stroke-width="1.6">
-						<path d="M11 21 L7 63 M37 21 L41 63 M10 35 H38 M9 49 H39 M7 63 H41" />
-						<path d="M11 21 L38 35 M37 21 L10 35 M10 35 L39 49 M38 35 L9 49 M9 49 L41 63 M39 49 L7 63" />
-					</g>
-					<!-- Glazed cabin, sign panel and projecting platform. -->
-					<path d="M3 4 H45 L42 13 H6 Z" fill="#5d9fae" stroke="#c2cec3" stroke-width="1" />
-					<path d="M13 4 L15 13 M24 4 V13 M35 4 L33 13" fill="none" stroke="#344d51" stroke-width="0.8" />
-					<rect x="6" y="13" width="36" height="6" fill="#b8c8b9" />
-					<path d="M2 20 H46 M2 3 H46" fill="none" stroke="#c2cec3" stroke-width="1.5" />
-					<path d="M24 0 V3 M22 1 H26" fill="none" stroke="#aebfb0" stroke-width="0.5" />
+				<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="750" viewBox="0 0 1000 750">
+				<!-- Flat print colours; camera lighting, stains and scratches are omitted. -->
+				<rect width="1000" height="750" fill="#169db4"/>
+				<g fill="#cedbd5">
+				<path d="M392.75,43.06 Q393.87,41.49 397.98,41.88 Q402.09,42.28 406.20,44.62 Q410.31,46.97 411.81,46.97 Q413.30,46.97 413.68,45.80 Q414.05,44.62 416.67,43.45 Q419.28,42.28 426.38,42.28 Q433.48,42.28 435.72,43.45 Q437.97,44.62 438.71,46.19 Q439.46,47.76 439.09,50.10 Q438.71,52.45 437.59,52.45 Q436.47,52.45 435.35,54.02 Q434.23,55.58 432.74,55.58 Q431.24,55.58 429.37,57.15 Q427.50,58.72 432.74,59.89 Q437.97,61.06 442.08,64.20 Q446.19,67.33 446.94,70.46 Q447.68,73.59 446.19,75.94 Q444.69,78.29 443.57,78.68 Q442.45,79.07 442.45,80.25 Q442.45,81.42 444.32,82.20 Q446.19,82.99 446.19,85.33 Q446.19,87.68 448.43,88.47 Q450.67,89.25 452.17,91.99 Q453.66,94.73 451.79,97.47 Q449.93,100.21 447.31,101.38 Q444.69,102.56 441.33,103.34 Q437.97,104.12 430.87,104.12 Q423.77,104.12 421.52,102.95 Q419.28,101.77 419.28,98.25 Q419.28,94.73 413.68,93.95 Q408.07,93.16 407.70,95.12 Q407.32,97.08 404.33,99.03 Q401.35,100.99 398.73,101.38 Q396.11,101.77 394.62,102.95 Q393.12,104.12 387.14,104.51 Q381.17,104.91 377.43,104.91 Q373.69,104.91 371.45,108.43 Q369.21,111.95 359.87,115.08 Q350.52,118.22 341.55,119.00 Q332.59,119.78 331.84,119.00 Q331.09,118.22 326.98,117.82 Q322.87,117.43 320.63,115.87 Q318.39,114.30 318.39,110.39 Q318.39,106.47 320.25,104.91 Q322.12,103.34 323.99,102.95 Q325.86,102.56 326.61,101.38 Q327.35,100.21 330.72,99.82 Q334.08,99.43 334.45,97.08 Q334.83,94.73 336.32,93.95 Q337.82,93.16 334.45,91.21 Q331.09,89.25 331.46,87.29 Q331.84,85.33 330.34,85.33 Q328.85,85.33 327.35,83.77 Q325.86,82.20 325.11,78.68 Q324.36,75.16 325.49,73.59 Q326.61,72.03 329.97,70.46 Q333.33,68.89 334.83,67.33 Q336.32,65.76 346.79,63.80 Q357.25,61.85 358.00,59.89 Q358.74,57.93 360.61,57.54 Q362.48,57.15 362.11,54.02 Q361.73,50.89 364.35,48.93 Q366.97,46.97 371.08,45.80 Q375.19,44.62 383.41,44.62 Q391.63,44.62 392.75,43.06 Z"/>
+				<path d="M271.67,209.81 Q280.27,206.68 287.37,207.46 Q294.47,208.25 298.58,210.20 Q302.69,212.16 304.19,214.12 Q305.68,216.08 312.41,214.51 Q319.13,212.94 324.36,212.94 Q329.60,212.94 334.45,214.90 Q339.31,216.86 341.55,218.82 Q343.80,220.77 343.80,223.51 Q343.80,226.25 342.30,227.04 Q340.81,227.82 342.30,231.34 Q343.80,234.86 343.42,241.13 Q343.05,247.39 341.93,248.17 Q340.81,248.96 339.31,252.87 Q337.82,256.78 335.20,258.74 Q332.59,260.70 324.36,264.61 Q316.14,268.53 311.29,268.92 Q306.43,269.31 305.68,271.66 Q304.93,274.01 303.44,275.97 Q301.94,277.92 301.20,277.92 Q300.45,277.92 300.45,278.71 Q300.45,279.49 297.83,280.27 Q295.22,281.05 294.47,282.23 Q293.72,283.40 286.25,285.36 Q278.77,287.32 276.91,290.84 Q275.04,294.36 267.19,297.10 Q259.34,299.84 252.62,299.84 Q245.89,299.84 239.91,297.89 Q233.93,295.93 233.93,295.15 Q233.93,294.36 232.44,294.36 Q230.94,294.36 228.70,292.41 Q226.46,290.45 226.08,287.32 Q225.71,284.19 227.20,282.62 Q228.70,281.05 229.07,279.49 Q229.45,277.92 224.96,278.31 Q220.48,278.71 217.49,277.53 Q214.50,276.36 211.88,274.01 Q209.27,271.66 208.89,267.75 Q208.52,263.83 205.16,263.44 Q201.79,263.05 201.05,262.27 Q200.30,261.48 198.80,258.35 Q197.31,255.22 198.06,249.35 Q198.80,243.48 202.91,239.56 Q207.03,235.65 213.75,233.69 Q220.48,231.73 222.72,232.12 Q224.96,232.52 226.83,234.08 Q228.70,235.65 228.70,236.82 Q228.70,238.00 227.20,239.56 Q225.71,241.13 230.94,241.52 Q236.17,241.91 237.67,243.48 Q239.16,245.04 240.66,245.43 Q242.15,245.82 242.53,243.48 Q242.90,241.13 244.02,239.56 Q245.14,238.00 250.00,235.65 Q254.86,233.30 254.48,230.56 Q254.11,227.82 255.61,225.08 Q257.10,222.34 258.59,221.95 Q260.09,221.56 260.46,218.82 Q260.84,216.08 261.96,214.51 Q263.08,212.94 271.67,209.81 Z"/>
+				<path d="M753.36,181.24 Q757.85,179.28 763.83,180.06 Q769.81,180.85 770.93,182.02 Q772.05,183.19 774.29,183.59 Q776.53,183.98 777.28,185.15 Q778.03,186.33 780.27,186.72 Q782.51,187.11 784.01,188.28 Q785.50,189.46 786.62,189.46 Q787.74,189.46 788.86,188.28 Q789.99,187.11 792.97,187.89 Q795.96,188.67 797.46,189.46 Q798.95,190.24 798.95,191.02 Q798.95,191.81 801.57,192.20 Q804.19,192.59 806.80,195.72 Q809.42,198.85 814.28,198.85 Q819.13,198.85 819.13,195.72 Q819.13,192.59 821.38,189.46 Q823.62,186.33 825.11,185.93 Q826.61,185.54 830.34,187.89 Q834.08,190.24 835.95,192.98 Q837.82,195.72 840.81,194.94 Q843.80,194.15 847.16,194.55 Q850.52,194.94 855.38,197.68 Q860.24,200.42 861.73,203.55 Q863.23,206.68 863.23,208.64 Q863.23,210.59 862.11,210.20 Q860.99,209.81 860.61,211.38 Q860.24,212.94 858.74,213.34 Q857.25,213.73 858.00,218.82 Q858.74,223.90 857.62,225.08 Q856.50,226.25 855.38,226.25 Q854.26,226.25 854.63,227.43 Q855.01,228.60 850.15,229.78 Q845.29,230.95 839.69,230.95 Q834.08,230.95 828.48,228.60 Q822.87,226.25 821.75,226.25 Q820.63,226.25 819.13,227.82 Q817.64,229.38 810.16,229.38 Q802.69,229.38 798.58,228.60 Q794.47,227.82 795.59,231.34 Q796.71,234.86 804.19,236.82 Q811.66,238.78 813.53,241.91 Q815.40,245.04 815.02,246.22 Q814.65,247.39 817.64,249.74 Q820.63,252.09 821.75,252.09 Q822.87,252.09 822.87,253.26 Q822.87,254.44 825.11,256.00 Q827.35,257.57 826.98,258.35 Q826.61,259.13 827.73,260.31 Q828.85,261.48 828.10,263.44 Q827.35,265.40 825.49,266.96 Q823.62,268.53 824.74,269.70 Q825.86,270.88 826.23,273.23 Q826.61,275.57 825.11,277.53 Q823.62,279.49 821.75,279.49 Q819.88,279.49 819.88,280.27 Q819.88,281.05 816.89,281.84 Q813.90,282.62 810.16,282.62 Q806.43,282.62 801.57,281.45 Q796.71,280.27 796.71,279.49 Q796.71,278.71 793.35,277.14 Q789.99,275.57 788.49,273.23 Q787.00,270.88 778.40,271.27 Q769.81,271.66 763.83,270.09 Q757.85,268.53 757.10,267.35 Q756.35,266.18 754.86,266.18 Q753.36,266.18 751.49,264.61 Q749.63,263.05 748.88,263.44 Q748.13,263.83 747.01,261.87 Q745.89,259.92 744.77,259.92 Q743.65,259.92 742.53,258.35 Q741.41,256.78 741.03,251.30 Q740.66,245.82 738.79,244.65 Q736.92,243.48 735.80,241.52 Q734.68,239.56 735.05,238.39 Q735.43,237.21 735.05,236.43 Q734.68,235.65 733.93,236.04 Q733.18,236.43 733.18,235.65 Q733.18,234.86 733.93,234.86 Q734.68,234.86 734.30,233.69 Q733.93,232.52 735.80,230.17 Q737.67,227.82 742.90,227.04 Q748.13,226.25 748.13,225.47 Q748.13,224.69 747.38,224.69 Q746.64,224.69 745.89,221.56 Q745.14,218.42 739.16,216.86 Q733.18,215.29 731.32,213.73 Q729.45,212.16 727.58,209.42 Q725.71,206.68 725.71,203.94 Q725.71,201.20 726.46,199.24 Q727.20,197.29 728.70,197.29 Q730.19,197.29 730.19,196.50 Q730.19,195.72 731.69,194.94 Q733.18,194.15 740.28,194.94 Q747.38,195.72 748.13,194.55 Q748.88,193.37 748.88,188.28 Q748.88,183.19 753.36,181.24 Z"/>
+				<path d="M592.68,321.76 Q594.17,320.98 599.40,321.37 Q604.63,321.76 608.00,322.94 Q611.36,324.11 612.48,326.07 Q613.60,328.03 613.98,331.16 Q614.35,334.29 610.61,337.81 Q606.88,341.34 603.89,342.51 Q600.90,343.68 600.52,344.47 Q600.15,345.25 594.54,346.42 Q588.94,347.60 588.94,348.38 Q588.94,349.16 591.18,350.73 Q593.42,352.30 593.80,355.04 Q594.17,357.78 593.05,360.91 Q591.93,364.04 589.31,365.61 Q586.70,367.17 586.70,367.95 Q586.70,368.74 576.98,373.04 Q567.26,377.35 560.91,378.13 Q554.56,378.91 553.44,379.70 Q552.32,380.48 551.57,383.22 Q550.82,385.96 547.83,387.92 Q544.84,389.87 540.73,391.05 Q536.62,392.22 527.28,391.83 Q517.94,391.44 513.08,389.87 Q508.22,388.31 507.10,386.35 Q505.98,384.39 505.23,382.44 Q504.48,380.48 499.25,379.70 Q494.02,378.91 489.91,375.78 Q485.80,372.65 485.05,371.48 Q484.30,370.30 484.30,364.04 Q484.30,357.78 487.29,353.08 Q490.28,348.38 498.51,344.86 Q506.73,341.34 508.97,338.20 Q511.21,335.07 513.08,334.68 Q514.95,334.29 516.44,330.38 Q517.94,326.46 519.43,326.46 Q520.93,326.46 521.67,325.29 Q522.42,324.11 527.28,323.33 Q532.14,322.55 537.37,322.55 Q542.60,322.55 545.22,323.33 Q547.83,324.11 549.33,325.68 Q550.82,327.24 553.06,325.29 Q555.31,323.33 562.03,323.33 Q568.76,323.33 571.38,324.11 Q573.99,324.90 573.99,325.68 Q573.99,326.46 575.49,326.46 Q576.98,326.46 579.97,328.81 Q582.96,331.16 584.45,329.20 Q585.95,327.24 587.82,326.85 Q589.69,326.46 590.43,324.50 Q591.18,322.55 592.68,321.76 Z"/>
+				<path d="M311.29,393.79 Q311.66,393.01 316.14,393.01 Q320.63,393.01 322.12,394.18 Q323.62,395.35 325.11,395.35 Q326.61,395.35 328.48,400.05 Q330.34,404.75 332.21,404.36 Q334.08,403.97 335.95,405.14 Q337.82,406.32 339.31,406.32 Q340.81,406.32 343.05,408.66 Q345.29,411.01 346.04,413.75 Q346.79,416.49 347.53,416.88 Q348.28,417.28 348.28,420.80 Q348.28,424.32 346.79,425.89 Q345.29,427.45 344.92,429.02 Q344.54,430.58 343.80,430.58 Q343.05,430.58 341.55,432.54 Q340.06,434.50 335.95,436.06 Q331.84,437.63 335.20,440.76 Q338.57,443.89 338.57,446.24 Q338.57,448.59 335.58,452.51 Q332.59,456.42 331.46,456.42 Q330.34,456.42 330.34,457.20 Q330.34,457.99 329.22,458.38 Q328.10,458.77 326.23,458.77 Q324.36,458.77 322.87,462.29 Q321.38,465.81 316.14,467.77 Q310.91,469.73 305.68,469.73 Q300.45,469.73 296.71,468.16 Q292.97,466.60 292.60,464.25 Q292.23,461.90 293.35,461.12 Q294.47,460.33 294.47,457.20 Q294.47,454.07 297.09,451.72 Q299.70,449.37 299.33,448.59 Q298.95,447.81 296.34,447.81 Q293.72,447.81 290.73,446.63 Q287.74,445.46 285.87,448.59 Q284.01,451.72 280.27,451.72 Q276.53,451.72 271.30,450.16 Q266.07,448.59 263.08,446.24 Q260.09,443.89 258.97,441.54 Q257.85,439.20 258.22,434.89 Q258.59,430.58 260.84,428.63 Q263.08,426.67 263.08,425.89 Q263.08,425.10 265.70,424.32 Q268.31,423.54 268.31,422.76 Q268.31,421.97 270.93,421.58 Q273.54,421.19 272.05,417.28 Q270.55,413.36 271.30,411.40 Q272.05,409.45 274.29,407.10 Q276.53,404.75 278.77,404.36 Q281.02,403.97 281.76,402.79 Q282.51,401.62 288.49,400.84 Q294.47,400.05 295.59,399.27 Q296.71,398.49 297.09,396.92 Q297.46,395.35 304.19,394.96 Q310.91,394.57 311.29,393.79 Z"/>
+				</g>
+				<!-- Distant mountains and snowcaps, traced from the whole-face photograph. -->
+				<path fill="#365669" d="M0 612 L15 610 35 632 62 620 75 610 97 635 122 651 147 638 173 660 201 636 229 645 259 610 281 632 309 650 351 635 385 649 422 632 445 624 470 642 500 623 532 611 560 600 589 624 620 609 650 592 670 607 705 620 735 642 770 622 800 604 835 588 856 574 880 590 898 583 915 591 943 586 954 600 975 588 1000 574 V718 H0 Z"/>
+				<g fill="#94bdc0">
+				 <path d="M0 612 L15 610 35 632 22 625 17 617 15 625 9 617 Z"/>
+				 <path d="M55 624 L75 610 97 635 81 625 77 618 74 625 70 619 67 632 64 627 62 632 Z"/>
+				 <path d="M237 632 L259 610 281 632 266 624 263 617 260 627 256 619 252 640 248 637 251 627 245 630 Z"/>
+				 <path d="M623 608 L650 592 670 607 657 602 650 597 646 604 640 600 632 607 Z"/>
+				 <path d="M826 593 L856 574 880 590 869 589 859 582 858 590 851 582 847 591 841 582 838 597 832 593 Z"/>
+				 <path d="M935 590 L943 586 951 596 944 592 941 600 939 605 939 594 Z"/>
+				</g>
+				<!-- Low green ridge and yellow-green airfield. -->
+				<path fill="#359b73" d="M0 641 C19 641 39 666 61 664 S91 649 115 666 167 682 193 670 225 674 250 680 284 668 307 658 338 657 362 663 393 671 418 658 444 660 470 663 501 655 527 646 558 633 585 637 619 656 648 651 679 644 711 655 748 661 773 648 815 626 846 633 878 645 908 637 941 628 967 638 988 627 1000 628 V735 H0 Z"/>
+				<path fill="#c5c78c" d="M0 653 C23 659 37 687 57 684 S98 656 125 675 169 666 193 684 232 696 261 686 294 669 321 670 360 658 393 659 423 670 448 671 474 659 493 667 518 670 544 656 569 646 592 654 614 668 642 662 664 653 692 662 718 672 744 679 773 670 812 650 840 659 875 647 902 639 926 641 947 648 975 651 L1000 638 V750 H0 Z"/>
+				<path d="M0 0 C-8 -1 -9 -8 -5 -12 -10 -17 -5 -23 1 -23 -1 -30 8 -34 12 -29 15 -36 22 -32 23 -26 32 -29 36 -21 30 -16 39 -11 32 -3 25 -2 22 6 15 7 11 3 4 7 -1 4 0 0 Z" transform="translate(157 703) scale(0.85)" fill="#86b276"/>
+				<path d="M0 0 C-8 -1 -9 -8 -5 -12 -10 -17 -5 -23 1 -23 -1 -30 8 -34 12 -29 15 -36 22 -32 23 -26 32 -29 36 -21 30 -16 39 -11 32 -3 25 -2 22 6 15 7 11 3 4 7 -1 4 0 0 Z" transform="translate(452 706) scale(0.95)" fill="#86b276"/>
+				<path d="M0 0 C-8 -1 -9 -8 -5 -12 -10 -17 -5 -23 1 -23 -1 -30 8 -34 12 -29 15 -36 22 -32 23 -26 32 -29 36 -21 30 -16 39 -11 32 -3 25 -2 22 6 15 7 11 3 4 7 -1 4 0 0 Z" transform="translate(484 711) scale(0.45)" fill="#86b276"/>
+				<path d="M0 0 C-8 -1 -9 -8 -5 -12 -10 -17 -5 -23 1 -23 -1 -30 8 -34 12 -29 15 -36 22 -32 23 -26 32 -29 36 -21 30 -16 39 -11 32 -3 25 -2 22 6 15 7 11 3 4 7 -1 4 0 0 Z" transform="translate(614 704) scale(1.05)" fill="#86b276"/>
+				<path d="M0 0 C-8 -1 -9 -8 -5 -12 -10 -17 -5 -23 1 -23 -1 -30 8 -34 12 -29 15 -36 22 -32 23 -26 32 -29 36 -21 30 -16 39 -11 32 -3 25 -2 22 6 15 7 11 3 4 7 -1 4 0 0 Z" transform="translate(743 703) scale(0.7)" fill="#86b276"/>
+				<path d="M0 0 C-8 -1 -9 -8 -5 -12 -10 -17 -5 -23 1 -23 -1 -30 8 -34 12 -29 15 -36 22 -32 23 -26 32 -29 36 -21 30 -16 39 -11 32 -3 25 -2 22 6 15 7 11 3 4 7 -1 4 0 0 Z" transform="translate(919 704) scale(0.9)" fill="#86b276"/>
+				<!-- Runway/foreground strip. Its print stipple is simplified as fine hatching. -->
+				<path d="M0 721 C180 724 330 720 500 720 S820 719 1000 717 V750 H0 Z" fill="#aaa58c"/>
+				<path d="M0 732 C260 735 460 731 660 731 S890 727 1000 729" stroke="#d4ccb0" stroke-width="2.5" fill="none"/>
+				<path d="M0 721 C180 724 330 720 500 720 S820 719 1000 717" stroke="#4f6252" stroke-width="1.1" fill="none"/>
+				<path d="M0 744 l5 6 M2 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M8 744 l5 6 M10 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M16 744 l5 6 M18 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M24 744 l5 6 M26 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M32 744 l5 6 M34 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M40 744 l5 6 M42 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M48 744 l5 6 M50 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M56 744 l5 6 M58 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M64 744 l5 6 M66 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M72 744 l5 6 M74 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M80 744 l5 6 M82 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M88 744 l5 6 M90 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M96 744 l5 6 M98 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M104 744 l5 6 M106 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M112 744 l5 6 M114 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M120 744 l5 6 M122 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M128 744 l5 6 M130 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M136 744 l5 6 M138 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M144 744 l5 6 M146 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M152 744 l5 6 M154 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M160 744 l5 6 M162 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M168 744 l5 6 M170 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M176 744 l5 6 M178 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M184 744 l5 6 M186 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M192 744 l5 6 M194 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M200 744 l5 6 M202 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M208 744 l5 6 M210 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M216 744 l5 6 M218 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M224 744 l5 6 M226 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M232 744 l5 6 M234 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M240 744 l5 6 M242 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M248 744 l5 6 M250 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M256 744 l5 6 M258 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M264 744 l5 6 M266 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M272 744 l5 6 M274 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M280 744 l5 6 M282 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M288 744 l5 6 M290 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M296 744 l5 6 M298 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M304 744 l5 6 M306 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M312 744 l5 6 M314 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M320 744 l5 6 M322 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M328 744 l5 6 M330 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M336 744 l5 6 M338 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M344 744 l5 6 M346 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M352 744 l5 6 M354 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M360 744 l5 6 M362 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M368 744 l5 6 M370 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M376 744 l5 6 M378 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M384 744 l5 6 M386 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M392 744 l5 6 M394 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M400 744 l5 6 M402 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M408 744 l5 6 M410 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M416 744 l5 6 M418 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M424 744 l5 6 M426 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M432 744 l5 6 M434 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M440 744 l5 6 M442 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M448 744 l5 6 M450 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M456 744 l5 6 M458 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M464 744 l5 6 M466 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M472 744 l5 6 M474 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M480 744 l5 6 M482 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M488 744 l5 6 M490 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M496 744 l5 6 M498 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M504 744 l5 6 M506 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M512 744 l5 6 M514 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M520 744 l5 6 M522 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M528 744 l5 6 M530 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M536 744 l5 6 M538 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M544 744 l5 6 M546 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M552 744 l5 6 M554 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M560 744 l5 6 M562 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M568 744 l5 6 M570 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M576 744 l5 6 M578 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M584 744 l5 6 M586 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M592 744 l5 6 M594 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M600 744 l5 6 M602 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M608 744 l5 6 M610 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M616 744 l5 6 M618 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M624 744 l5 6 M626 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M632 744 l5 6 M634 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M640 744 l5 6 M642 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M648 744 l5 6 M650 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M656 744 l5 6 M658 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M664 744 l5 6 M666 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M672 744 l5 6 M674 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M680 744 l5 6 M682 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M688 744 l5 6 M690 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M696 744 l5 6 M698 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M704 744 l5 6 M706 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M712 744 l5 6 M714 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M720 744 l5 6 M722 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M728 744 l5 6 M730 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M736 744 l5 6 M738 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M744 744 l5 6 M746 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M752 744 l5 6 M754 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M760 744 l5 6 M762 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M768 744 l5 6 M770 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M776 744 l5 6 M778 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M784 744 l5 6 M786 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M792 744 l5 6 M794 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M800 744 l5 6 M802 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M808 744 l5 6 M810 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M816 744 l5 6 M818 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M824 744 l5 6 M826 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M832 744 l5 6 M834 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M840 744 l5 6 M842 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M848 744 l5 6 M850 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M856 744 l5 6 M858 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M864 744 l5 6 M866 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M872 744 l5 6 M874 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M880 744 l5 6 M882 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M888 744 l5 6 M890 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M896 744 l5 6 M898 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M904 744 l5 6 M906 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M912 744 l5 6 M914 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M920 744 l5 6 M922 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M928 744 l5 6 M930 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M936 744 l5 6 M938 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M944 744 l5 6 M946 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M952 744 l5 6 M954 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M960 744 l5 6 M962 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M968 744 l5 6 M970 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M976 744 l5 6 M978 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M984 744 l5 6 M986 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<path d="M992 744 l5 6 M994 723 l3 5" stroke="#6c7160" stroke-width=".65" opacity=".45"/>
+				<!-- Front-facing parked aircraft at the far left. -->
+				<g transform="translate(57 719)" stroke="#344b46" stroke-width=".65" fill="#b1b991" stroke-linejoin="round">
+				 <path d="M-30 -3 L-7 -4 -3 -7 -1 -15 1 -15 3 -7 7 -4 29 -3 29 -1 5 -1 4 3 -4 3 -5 -1 -30 -1 Z"/>
+				 <ellipse cx="0" cy="-3" rx="3.4" ry="5"/><path d="M-1 -12 L5 -19 M-1 -12 L-5 -16 M0 -8 V5" fill="none"/>
+				 <path d="M-6 0 L-8 6 M6 0 L8 6" fill="none"/><circle cx="-8" cy="6" r="1.7" fill="#344b46"/><circle cx="8" cy="6" r="1.7" fill="#344b46"/>
+				</g>
+				<!-- Curved hangar, vents and windsock. -->
+				<g transform="translate(91 720)" stroke="#46534a" stroke-width=".7" fill="#c3c4a6" stroke-linejoin="round">
+				 <path d="M0 0 C1 -18 9 -30 26 -31 H39 C57 -29 66 -15 68 0 Z"/>
+				 <path d="M0 0 C1 -18 9 -30 26 -31 C43 -29 51 -15 52 0 M3 0 C4 -15 11 -27 26 -28 C40 -25 48 -13 49 0" fill="none"/>
+				 <path d="M14 -2 V-19 H25 V-2 Z M30 -12 V-20 H41 V-12 Z" fill="#d5d1b2"/>
+				 <path d="M16 -3 V-17 H23 V-3 M32 -14 V-18 H39 V-14" fill="none"/>
+				 <circle cx="21" cy="-8" r=".65" fill="#46534a"/>
+				 <path d="M53 -16 l4 -2 2 6 -4 1 Z M59 -12 l4 -2 2 6 -4 1 Z" fill="#49554c"/>
+				 <path d="M29 -31 V-46" fill="none"/><path d="M29 -46 Q34 -50 39 -46 L50 -42 39 -43 Q33 -42 29 -44 Z" fill="#a5bc9c"/>
+				</g>
+				<!-- Radio hut just to the right of the tower. -->
+				<g transform="translate(578 719)" stroke="#344d4a" stroke-width=".7" stroke-linejoin="round">
+				 <path d="M0 -28 L10 -35 48 -35 57 -26 53 -24 V0 H4 V-26 Z" fill="#a8b39d"/>
+				 <path d="M0 -28 L10 -35 48 -35 57 -26 H12 Z" fill="#8fa79a"/>
+				 <path d="M10 -35 L12 -26 V0 M4 -26 H53" fill="none"/>
+				 <path d="M34 -35 V-68 M26 -35 L34 -54 43 -35 M34 -54 H48 M34 -50 H48 M34 -46 H48 M43 -57 V-43" fill="none"/>
+				 <path d="M5 -25 V-1 M8 -25 V-1 M12 -22 H53 M12 -17 H53 M12 -12 H53 M12 -7 H53 M12 -2 H53 M15 -34 L21 -27 M21 -34 L27 -27 M28 -34 L34 -27 M35 -34 L41 -27 M42 -34 L48 -27" fill="none" stroke-width=".45"/>
+				 <path d="M17 -22 H35 V-11 H17 Z M40 -22 H49 V-1 H40 Z" fill="#b9c2a6"/>
+				 <path d="M19 -20 H33 V-13 H19 Z" fill="#6bb0b9"/>
+				 <path d="M26 -20 V-13 M19 -17 H33 M42 -20 H47 V-13 H42 Z" fill="none"/>
+				 <circle cx="47" cy="-8" r=".5" fill="#344d4a"/>
+				 <path d="M-2 -25 Q-15 -27 -23 -35 M-3 -29 Q-16 -30 -23 -39" fill="none" stroke-width=".45"/>
+				 <path d="M13 0 C9 -1 11 -5 14 -4 12 -9 17 -10 19 -6 23 -7 26 -3 22 -1 L22 1 Z" fill="#83ae73"/>
+				</g>
+				<!-- Side-on parked Spitfire with roundel, canopy and landing gear. -->
+				<g transform="translate(669 718)" stroke="#314845" stroke-width=".8" stroke-linejoin="round">
+				 <path d="M0 -10 Q8 -14 17 -9 L30 -6 33 -11 40 -11 47 -7 60 -6 64 -14 69 -13 72 -5 73 -2 68 4 28 5 14 3 5 -1 Z" fill="#bcc1a0"/>
+				 <path d="M4 -1 L22 -4 35 1 64 1 71 -3 68 4 28 5 14 3 Z" fill="#344c48"/>
+				 <path d="M33 -10 L34 -6 46 -6 40 -10 Z" fill="#a8c5c0"/>
+				 <path d="M39 -10 V-6 M64 -14 L67 -5 72 -5 M27 -3 L15 4 43 4 49 1 Z" fill="none"/>
+				 <circle cx="51" cy="-2" r="3.8" fill="#344c48"/><circle cx="51" cy="-2" r="2.5" fill="#c4c8ac"/><circle cx="51" cy="-2" r="1.2" fill="#344c48"/>
+				 <path d="M9 -10 l2 3 3 0 -1 -2 M15 -9 l2 3 3 0 -1 -2 M2 -14 L-1 0 M24 4 l-1 3 M64 4 l1 3" fill="none"/>
+				 <ellipse cx="23" cy="8" rx="3" ry="2.2" fill="#314845"/><ellipse cx="65" cy="8" rx="2" ry="1.5" fill="#314845"/>
+				</g>
+				<path d="M86 720 l-1 -4 2 2 1 -5 1 7 3 -3 -1 3" fill="none" stroke="#456b4b" stroke-width=".65"/>
+				<path d="M93 720 l-1 -4 2 2 1 -5 1 7 3 -3 -1 3" fill="none" stroke="#456b4b" stroke-width=".65"/>
+				<path d="M164 720 l-1 -4 2 2 1 -5 1 7 3 -3 -1 3" fill="none" stroke="#456b4b" stroke-width=".65"/>
+				<path d="M169 720 l-1 -4 2 2 1 -5 1 7 3 -3 -1 3" fill="none" stroke="#456b4b" stroke-width=".65"/>
+				<path d="M471 720 l-1 -4 2 2 1 -5 1 7 3 -3 -1 3" fill="none" stroke="#456b4b" stroke-width=".65"/>
+				<path d="M475 720 l-1 -4 2 2 1 -5 1 7 3 -3 -1 3" fill="none" stroke="#456b4b" stroke-width=".65"/>
+				<path d="M479 720 l-1 -4 2 2 1 -5 1 7 3 -3 -1 3" fill="none" stroke="#456b4b" stroke-width=".65"/>
+				<path d="M491 720 l-1 -4 2 2 1 -5 1 7 3 -3 -1 3" fill="none" stroke="#456b4b" stroke-width=".65"/>
+				<path d="M548 720 l-1 -4 2 2 1 -5 1 7 3 -3 -1 3" fill="none" stroke="#456b4b" stroke-width=".65"/>
+				<path d="M551 720 l-1 -4 2 2 1 -5 1 7 3 -3 -1 3" fill="none" stroke="#456b4b" stroke-width=".65"/>
+				<path d="M555 720 l-1 -4 2 2 1 -5 1 7 3 -3 -1 3" fill="none" stroke="#456b4b" stroke-width=".65"/>
+				<path d="M561 720 l-1 -4 2 2 1 -5 1 7 3 -3 -1 3" fill="none" stroke="#456b4b" stroke-width=".65"/>
+				<path d="M567 720 l-1 -4 2 2 1 -5 1 7 3 -3 -1 3" fill="none" stroke="#456b4b" stroke-width=".65"/>
+				<path d="M575 720 l-1 -4 2 2 1 -5 1 7 3 -3 -1 3" fill="none" stroke="#456b4b" stroke-width=".65"/>
+				<path d="M641 720 l-1 -4 2 2 1 -5 1 7 3 -3 -1 3" fill="none" stroke="#456b4b" stroke-width=".65"/>
+				<path d="M648 720 l-1 -4 2 2 1 -5 1 7 3 -3 -1 3" fill="none" stroke="#456b4b" stroke-width=".65"/>
+				<path d="M652 720 l-1 -4 2 2 1 -5 1 7 3 -3 -1 3" fill="none" stroke="#456b4b" stroke-width=".65"/>
+				<path d="M744 720 l-1 -4 2 2 1 -5 1 7 3 -3 -1 3" fill="none" stroke="#456b4b" stroke-width=".65"/>
 				</svg>
 			]]></data>
 		</image>
-		<text string="I.C.C.">
-			<bounds x="9" y="13.3" width="30" height="5.4" />
-			<color red="0.08" green="0.14" blue="0.15" />
-		</text>
 	</element>
 
+	<element name="tower">
+		<image>
+			<data><![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="120" height="290" viewBox="0 0 120 290">
+				<!-- Roof instruments, glazing and the original slab-I / rounded-C lettering. -->
+				<g stroke="#294852" stroke-width=".65" fill="none">
+				 <path d="M46 30 V5 M62 30 V0 M58 5 H67 M58 9 H67 M16 30 L19 22 16 18 M19 22 L24 19 M19 22 L25 27"/>
+				 <ellipse cx="15" cy="17" rx="1.6" ry=".7" transform="rotate(35 15 17)"/><ellipse cx="25" cy="18" rx="1.6" ry=".7" transform="rotate(-40 25 18)"/><ellipse cx="26" cy="28" rx="1.6" ry=".7"/>
+				 <path d="M92 30 L88 19 Q96 16 102 26 Z M89 19 L101 26 M91 29 L98 21 M97 27 L100 31"/>
+				</g>
+				<path d="M1 30 H119 L109 68 H11 Z" fill="#244550"/>
+				<path d="M5 34 H115 L107 66 H13 Z" fill="#69afba" stroke="#a2c8c2" stroke-width=".9"/>
+				<path d="M7 57 L39 35 H54 L24 65 H15 Z M42 66 L78 35 H94 L65 61 63 66 Z M88 60 L110 35 H115 L107 66 H88 Z" fill="#9ec6c6"/>
+				<path d="M20 34 L24 66 M40 34 L42 66 M60 34 V66 M80 34 L78 66 M100 34 L96 66" fill="none" stroke="#244550" stroke-width=".65"/>
+				<path d="M0 29 H120 V33 H0 Z M10 68 H110 V98 H10 Z" fill="#a1c3bd" stroke="#294852" stroke-width=".8"/>
+				<g fill="#24424d">
+				 <path d="M18 73 H32 V78 H28 V91 H32 V96 H18 V91 H22 V78 H18 Z"/>
+				 <circle cx="38" cy="92" r="3.6"/>
+				 <path d="M65 75 V81 C61 77 55 77 52 81 C49 85 51 91 56 91 C60 92 62 90 65 89 V95 C58 98 51 96 48 92 C43 86 46 77 52 74 C56 72 61 72 65 75 Z"/>
+				 <circle cx="71" cy="92" r="3.6"/>
+				 <path d="M98 75 V81 C94 77 88 77 85 81 C82 85 84 91 89 91 C93 92 95 90 98 89 V95 C91 98 84 96 81 92 C76 86 79 77 85 74 C89 72 94 72 98 75 Z"/>
+				 <circle cx="104" cy="92" r="3.6"/>
+				</g>
+				<!-- Projecting walkway and its thin railings. -->
+				<path d="M0 99 H120 V112 H0 Z" fill="#8ab7b8" stroke="#284650" stroke-width="1"/>
+				<path d="M0 113 H120 L110 142 H10 Z" fill="#233f4b"/>
+				<g stroke="#24434c" stroke-width=".8">
+				<path d="M3 100 V111"/>
+				<path d="M8 100 V111"/>
+				<path d="M13 100 V111"/>
+				<path d="M18 100 V111"/>
+				<path d="M23 100 V111"/>
+				<path d="M28 100 V111"/>
+				<path d="M33 100 V111"/>
+				<path d="M38 100 V111"/>
+				<path d="M43 100 V111"/>
+				<path d="M48 100 V111"/>
+				<path d="M53 100 V111"/>
+				<path d="M58 100 V111"/>
+				<path d="M63 100 V111"/>
+				<path d="M68 100 V111"/>
+				<path d="M73 100 V111"/>
+				<path d="M78 100 V111"/>
+				<path d="M83 100 V111"/>
+				<path d="M88 100 V111"/>
+				<path d="M93 100 V111"/>
+				<path d="M98 100 V111"/>
+				<path d="M103 100 V111"/>
+				<path d="M108 100 V111"/>
+				<path d="M113 100 V111"/>
+				<path d="M118 100 V111"/>
+				</g><path d="M0 98 H120 M0 112 H120" stroke="#c0d0c2" stroke-width="1.5" fill="none"/>
+				<!-- Four X-braced bays and an inverted-V bottom bay; darker rear members. -->
+				<path d="M18.00 133 L102.00 154 M102.00 133 L18.00 154" fill="none" stroke="#24414a" stroke-width="7"/>
+				<path d="M18.00 132 L102.00 153 M102.00 132 L18.00 153" fill="none" stroke="#a9c2b7" stroke-width="4.2"/>
+				<path d="M17.32 160 L102.67 184 M102.67 160 L17.32 184" fill="none" stroke="#24414a" stroke-width="7"/>
+				<path d="M17.32 159 L102.67 183 M102.67 159 L17.32 183" fill="none" stroke="#a9c2b7" stroke-width="4.2"/>
+				<path d="M16.57 190 L103.42 214 M103.42 190 L16.57 214" fill="none" stroke="#24414a" stroke-width="7"/>
+				<path d="M16.57 189 L103.42 213 M103.42 189 L16.57 213" fill="none" stroke="#a9c2b7" stroke-width="4.2"/>
+				<path d="M15.82 220 L104.17 244 M104.17 220 L15.82 244" fill="none" stroke="#24414a" stroke-width="7"/>
+				<path d="M15.82 219 L104.17 243 M104.17 219 L15.82 243" fill="none" stroke="#a9c2b7" stroke-width="4.2"/>
+				<path d="M15 156 H106" stroke="#29474c" stroke-width="7"/><path d="M15 155 H106" stroke="#b1c7b8" stroke-width="5"/>
+				<path d="M15 186 H106" stroke="#29474c" stroke-width="7"/><path d="M15 185 H106" stroke="#b1c7b8" stroke-width="5"/>
+				<path d="M15 216 H106" stroke="#29474c" stroke-width="7"/><path d="M15 215 H106" stroke="#b1c7b8" stroke-width="5"/>
+				<path d="M15 246 H106" stroke="#29474c" stroke-width="7"/><path d="M15 245 H106" stroke="#b1c7b8" stroke-width="5"/>
+				<path d="M14 287 L61 250 108 287" fill="none" stroke="#29454b" stroke-width="8"/>
+				<path d="M14 286 L61 249 108 286" fill="none" stroke="#b7c8b6" stroke-width="4"/>
+				<path d="M17 128 H22 L16 290 H10 Z M99 128 H104 L111 290 H105 Z" fill="#b9caba" stroke="#29464a" stroke-width="1"/>
+				<path d="M18 128 L12 289 M101 128 L108 289" stroke="#688a84" stroke-width=".65" fill="none"/>
+				<!-- Ladder in front of the left-hand bracing. -->
+				<path d="M30 114 H43 V290 H30 Z" fill="#29434a"/>
+				<path d="M30 114 V290 M43 114 V290" stroke="#c1d0be" stroke-width="1.5" fill="none"/>
+				<path d="M31 119 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 125 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 131 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 137 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 143 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 149 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 155 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 161 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 167 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 173 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 179 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 185 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 191 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 197 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 203 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 209 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 215 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 221 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 227 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 233 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 239 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 245 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 251 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 257 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 263 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 269 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 275 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 281 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M31 287 H42" stroke="#b5c9b7" stroke-width="1.5"/>
+				<path d="M27 114 H46" stroke="#b5c9b7" stroke-width="2"/>
+				</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<view name="Full Overlay">
+		<element ref="airfield"><bounds x="0" y="0" width="1000" height="750" /></element>
+		<element ref="tower"><bounds x="472" y="488" width="96" height="232" /></element>
+		<screen index="0" blend="add"><bounds x="0" y="0" width="1000" height="750" /></screen>
+	</view>
+
 	<view name="Tower Overlay">
-		<screen index="0">
-			<bounds x="0" y="0" width="4" height="3" />
-		</screen>
-		<element ref="tower" blend="alpha">
-			<bounds x="1.846154" y="2.146341" width="0.461538" height="0.780488" />
-		</element>
+		<screen index="0"><bounds x="0" y="0" width="1000" height="750" /></screen>
+		<element ref="tower"><bounds x="472" y="488" width="96" height="232" /></element>
 	</view>
 
 	<view name="Screen Only">
-		<screen index="0">
-			<bounds x="0" y="0" width="4" height="3" />
-		</screen>
+		<screen index="0"><bounds x="0" y="0" width="1000" height="750" /></screen>
 	</view>
 
 </mamelayout>
