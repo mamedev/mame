@@ -51,7 +51,7 @@ public:
 		m_duration(*this, "DURATION")
 	{ }
 
-	void spitfire(machine_config &config);
+	void spitfire(machine_config &config) ATTR_COLD;
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed);
 
 protected:
