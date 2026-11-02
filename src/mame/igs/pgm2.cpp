@@ -95,20 +95,6 @@
 #include "pgm2.h"
 
 
-// checked on startup, or doesn't boot
-u32 pgm2_state::unk_startup_r()
-{
-	logerror("%s: unk_startup_r\n", machine().describe_context().c_str());
-	return 0x00000180;
-}
-
-u32 pgm2_state::rtc_r()
-{
-	// write to FFFFFD20 if bit 18 set (0x40000) probably reset this RTC timer
-	// TODO: somehow hook here current time/date, which is a bit complicated because value is relative, later to it added "base time" stored in SRAM
-	return machine().time().seconds();
-}
-
 u8 pgm2_state::encryption_r(offs_t offset)
 {
 	return m_encryption_table[offset];
@@ -510,8 +496,6 @@ u32 pgm2_state::pio_pdsr_r()
 
 void pgm2_state::pgm2_map(address_map &map)
 {
-	map(0x00000000, 0x00003fff).rom(); //.region("mainrom", 0x00000); // internal ROM
-
 	map(0x02000000, 0x0200ffff).ram().share("sram"); // 'battery RAM' (in CPU?)
 
 	map(0x03600000, 0x036bffff).rw(FUNC(pgm2_state::mcu_r), FUNC(pgm2_state::mcu_w));
@@ -563,11 +547,11 @@ void pgm2_state::pgm2_map(address_map &map)
 	map(0xfffff430, 0xfffff437).nopw(); // often
 	// map(0xfffffd00, 0xfffffd0b) RSTC (Reset Controller)
 	// map(0xfffffd20, 0xfffffd2f) RTTC (Real Time Timer)
-	map(0xfffffd28, 0xfffffd2b).r(FUNC(pgm2_state::rtc_r));
+
 	// map(0xfffffd40, 0xfffffd4b) WDTC (Watch Dog Timer)
 	// custom IGS036 stuff starts here
 	map(0xfffffa08, 0xfffffa0b).w(FUNC(pgm2_state::encryption_do_w)); // after uploading encryption? table might actually send it or enable external ROM? when read bits0-1 called FUSE 0 and 1, must be 0
-	map(0xfffffa0c, 0xfffffa0f).r(FUNC(pgm2_state::unk_startup_r)); // written 0, then 0x1c, then expected to return (result&0x180)==0x180, then written 0x7c
+
 	map(0xfffffc00, 0xfffffcff).rw(FUNC(pgm2_state::encryption_r), FUNC(pgm2_state::encryption_w));
 }
 

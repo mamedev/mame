@@ -8,7 +8,7 @@
 #include "igs036crypt.h"
 #include "pgm2_memcard.h"
 
-#include "cpu/arm7/arm7.h"
+#include "igs036.h"
 #include "machine/atmel_arm_aic.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
@@ -85,8 +85,6 @@ private:
 		u16 data_xor;
 	};
 
-	u32 unk_startup_r();
-	u32 rtc_r();
 	u32 mcu_r(offs_t offset);
 	void fg_videoram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void bg_videoram_w(offs_t offset, u32 data, u32 mem_mask = ~0);

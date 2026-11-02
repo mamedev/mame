@@ -142,10 +142,10 @@ check more info and photo from cjdh2.zip!!!
 
 #include "emu.h"
 
+#include "igs036.h"
 #include "igs036crypt.h"
 #include "igsmahjong.h"
 
-#include "cpu/arm7/arm7.h"
 #include "machine/atmel_arm_aic.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
@@ -839,9 +839,7 @@ void m036_base_state::screen_vblank(int state)
 
 void m036_state::m036_map(address_map &map)
 {
-	map(0x00000000, 0x00003fff).rom(); // Internal ROM
 	map(0x08000000, 0x081fffff).rom().region("user1", 0); // not 100% sure it maps here.
-
 }
 
 
@@ -849,7 +847,6 @@ void m036_base_state::m036_boot_map(address_map &map)
 {
 	// Boot map verified with the 17 dumped internal ROMs. Sets whose internal
 	// ROM is still undumped retain the original skeleton map and static keys.
-	map(0x0000'0000, 0x0000'3fff).rom();
 	map(0x0200'0000, 0x0200'ffff).ram().share("nvram");
 	map(0x1000'0000, 0x101f'ffff).rom().region("user1", 0);
 	// External SRAM also holds settings, credits and bookkeeping. The startup
@@ -888,11 +885,11 @@ void m036_base_state::m036_boot_map(address_map &map)
 	// Several internal ROMs verify that bit 2 reads back set after enabling
 	// decryption, and stop before the checksum if it is clear.
 	map(0xffff'fa08, 0xffff'fa0b).lr32(NAME([this] () -> u32 { return m_has_decrypted ? 4U : 0U; })).w(FUNC(m036_base_state::encryption_control_w));
-	map(0xffff'fa0c, 0xffff'fa0f).lr32(NAME([] () -> u32 { return 0x180; })).nopw(); // startup ready, as in pgm2.cpp
+
 	map(0xffff'fc00, 0xffff'fcff).rw(FUNC(m036_base_state::encryption_r), FUNC(m036_base_state::encryption_w));
 	map(0xffff'fd00, 0xffff'fd0b).nopw(); // TODO: reset controller
 	map(0xffff'fd20, 0xffff'fd27).nopw(); // TODO: real-time timer control
-	map(0xffff'fd28, 0xffff'fd2b).lr32(NAME([this] () -> u32 { return machine().time().seconds(); }));
+
 	map(0xffff'fd40, 0xffff'fd4b).nopw(); // TODO: watchdog
 }
 
