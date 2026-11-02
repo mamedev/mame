@@ -298,6 +298,8 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 	m_cyl(0),
 	m_subcyl(0),
 	m_amplifier_freakout_time(attotime::from_usec(16)),
+	m_weak_noise_period(8000),
+	m_weak_noise_spread(4000),
 	m_image_dirty(false),
 	m_track_dirty(false),
 	m_writing(false),
@@ -611,6 +613,7 @@ void floppy_image_device::device_start()
 	save_item(NAME(m_cache_weak));
 	save_item(NAME(m_cache_weak_start));
 	save_item(NAME(m_cache_weak_id));
+	save_item(NAME(m_cache_revolution));
 	save_item(NAME(m_image_dirty));
 	save_item(NAME(m_ready_counter));
 	save_item(NAME(m_phases));
@@ -1050,6 +1053,16 @@ void floppy_image_device::stp_w(int state)
 	}
 }
 
+void floppy_image_device::ss_w(int state)
+{
+	m_actual_ss = state;
+	if(m_sides > 1 && m_ss != state) {
+		m_ss = state;
+		// The cached zone belongs to the other side
+		cache_clear();
+	}
+}
+
 void floppy_image_device::seek_phase_w(int _phases)
 {
 	m_phases = _phases;
@@ -1147,8 +1160,28 @@ bool is_neutral(u32 entry)
 	return type == floppy_image::MG_N || type == floppy_image::MG_D;
 }
 
-constexpr s64 WEAK_SLOT_NS = 60000;
-constexpr u32 WEAK_SPREAD_NS = 50000;
+constexpr u32 TRACK_UNITS = 200000000;
+
+// A MG_E entry that ends one position before the next MG_N/MG_D entry
+// only separates two touching neutral zones, e.g. (MG_N, 0), (MG_E, 9),
+// (MG_D, 10), (MG_E, 19) is one run.  It is also the way (MG_N, 0),
+// (MG_E, 199,999,999) spells an all-neutral track.
+bool is_run_member(const std::vector<uint32_t> &buf, size_t index)
+{
+	if(is_neutral(buf[index]))
+		return true;
+	if((buf[index] & floppy_image::MG_MASK) != floppy_image::MG_E)
+		return false;
+
+	size_t const cells = buf.size();
+	uint32_t const next = buf[(index + 1 < cells) ? (index + 1) : 0];
+	if(!is_neutral(next) || !is_neutral(buf[index ? (index - 1) : (cells - 1)]))
+		return false;
+
+	uint32_t const end = buf[index] & floppy_image::TIME_MASK;
+	uint32_t const start = next & floppy_image::TIME_MASK;
+	return ((start + TRACK_UNITS - end) % TRACK_UNITS) == 1;
+}
 
 } // anonymous namespace
 
@@ -1159,6 +1192,9 @@ void floppy_image_device::cache_fill_index(const std::vector<uint32_t> &buf, int
 	m_cache_index = index;
 	m_cache_start_time = position_to_time(base, buf[index] & floppy_image::TIME_MASK);
 	m_cache_entry = buf[m_cache_index];
+	// base is the start of the revolution the zone begins in, which is
+	// not necessarily the current one for a read across the index
+	m_cache_revolution = m_revolution_count + int(std::lround((base - m_revolution_start_time).as_double() / m_rev_time.as_double()));
 
 	bool const neutral = is_neutral(m_cache_entry);
 	int span = 0;
@@ -1169,7 +1205,7 @@ void floppy_image_device::cache_fill_index(const std::vector<uint32_t> &buf, int
 			index = 0;
 			base += m_rev_time;
 		}
-	} while(neutral && span < cells && is_neutral(buf[index]));
+	} while(neutral && span < cells && is_run_member(buf, index));
 
 	if(neutral && span >= cells) {
 		// Nothing but neutral surface, there is no zone boundary at all
@@ -1177,6 +1213,7 @@ void floppy_image_device::cache_fill_index(const std::vector<uint32_t> &buf, int
 		m_cache_entry = floppy_image::MG_N;
 		m_cache_start_time = attotime::zero;
 		m_cache_end_time = attotime::never;
+		m_cache_revolution = m_revolution_count;
 		return;
 	}
 
@@ -1189,6 +1226,7 @@ void floppy_image_device::cache_clear()
 	m_cache_index = 0;
 	m_cache_entry = 0;
 	m_cache_weak_id = 0;
+	m_cache_revolution = 0;
 	m_cache_weak = false;
 }
 
@@ -1202,6 +1240,7 @@ void floppy_image_device::cache_fill(const attotime &when)
 		m_cache_start_time = attotime::zero;
 		m_cache_end_time = attotime::never;
 		m_cache_index = 0;
+		m_cache_revolution = m_revolution_count;
 		m_cache_entry = (cells == 1) ? buf[0] : floppy_image::MG_N;
 		cache_weakness_setup();
 		return;
@@ -1223,8 +1262,8 @@ void floppy_image_device::cache_fill(const attotime &when)
 	}
 
 	// If in the middle of a neutral run, go back to its first entry
-	if(is_neutral(buf[index])) {
-		for(uint32_t step = 1; step < cells && is_neutral(buf[index ? index - 1 : cells - 1]); step++) {
+	if(is_run_member(buf, index)) {
+		for(uint32_t step = 1; step < cells && is_run_member(buf, index ? (index - 1) : (cells - 1)); step++) {
 			if(index) {
 				index--;
 			} else {
@@ -1272,13 +1311,13 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	if(!m_cache_weak)
 		return m_cache_end_time;
 
-	u32 const key = hash32(hash32(m_revolution_count ^ 0x4242) + m_cache_weak_id);
-	u64 slot = from_when > m_cache_weak_start
-		? (from_when - m_cache_weak_start).as_ticks(1000000) / (WEAK_SLOT_NS / 1000)
+	u32 const key = hash32(hash32(m_cache_revolution ^ 0x4242) + m_cache_weak_id);
+	u64 slot = (from_when > m_cache_weak_start)
+		? (from_when - m_cache_weak_start).as_ticks(1000000000) / m_weak_noise_period
 		: 0;
 	for(;; slot++) {
 		u32 const h = hash32(key + u32(slot) * 0x9e3779b9U);
-		attotime const trigger = m_cache_weak_start + attotime::from_nsec(s64(slot) * WEAK_SLOT_NS + h % WEAK_SPREAD_NS);
+		attotime const trigger = m_cache_weak_start + attotime::from_nsec(s64(slot) * m_weak_noise_period + h % m_weak_noise_spread);
 		if(trigger >= m_cache_end_time)
 			return m_cache_end_time;
 		if(trigger > from_when)
@@ -1424,7 +1463,7 @@ void floppy_image_device::wspan_remove_damaged(std::vector<wspan> &wspans, const
 	for(size_t pos = 0; pos != track.size(); pos++)
 		if((track[pos] & floppy_image::MG_MASK) == floppy_image::MG_D) {
 			int start = track[pos] & floppy_image::TIME_MASK;
-			int end = track[pos+1] & floppy_image::TIME_MASK;
+			int end = (pos + 1 < track.size()) ? (track[pos+1] & floppy_image::TIME_MASK) : (TRACK_UNITS - 1);
 			int ne = wspans.size();
 			for(int i=0; i != ne; i++) {
 				// D range outside of span range
@@ -1733,6 +1772,11 @@ void floppy_35_dd::setup_characteristics()
 	add_variant(floppy_image::SSSD);
 	add_variant(floppy_image::SSDD);
 	add_variant(floppy_image::DSDD);
+
+	// The real noise rate is unknown.  Sparse noise is what the Amiga
+	// weak-bit protections have been tested with.
+	m_weak_noise_period = 60000;
+	m_weak_noise_spread = 50000;
 }
 
 //-------------------------------------------------

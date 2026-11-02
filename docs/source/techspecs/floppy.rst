@@ -446,10 +446,10 @@ The read/write interface is designed to work asynchronously, e.g. somewhat indep
 
   A zone where the surface gives no flux for a long time reads back as random pulses, see section 2.2.  Two kinds of zone are weak:
 
-  - a run of MG_N and MG_D entries.  Adjacent MG_N/MG_D entries are one zone to the read head, however the image format cut them up, and the run may cross the index position.  A track made only of such entries is one zone without end.
+  - a run of MG_N and MG_D entries.  Adjacent MG_N/MG_D entries are one zone to the read head, however the image format cut them up, and the run may cross the index position.  A MG_E entry placed one position before the next MG_N/MG_D entry, e.g. (MG_N, 0), (MG_E, 9), (MG_D, 10), only separates touching zones and does not break the run.  A track made only of such entries is one zone without end.
   - the gap between two flux changes when it lasts at least as long as the amplifier freakout time of the drive (16 µs by default, 64 µs for the VTech 5.25" drive, never for the Compucolor 5.25" drive).
 
-  Noise starts at the start of a MG_N/MG_D run, and 16 µs after the preceding flux change in a gap.  It is one pulse per 60 µs slot, at a pseudo-random offset in the first 50 µs of the slot.  The offsets are a hash of the revolution number, the image position of the zone start and the slot number, so they do not depend on when the zone is read or how the cache was filled.  Reading the same revolution again gives the same pulses, the next revolution gives different ones.  The real flux change that ends a gap, and the end of a MG_N/MG_D run, are always delivered after the noise.
+  Noise starts at the start of a MG_N/MG_D run, and 16 µs after the preceding flux change in a gap.  It is one pulse per slot, at a pseudo-random offset in the first part of the slot.  The real rate is unknown, so slot and offset range are a property of the drive: 8 µs and 4 µs by default, 60 µs and 50 µs for the 3.5" double density drive.  The offsets are a hash of the number of the revolution the zone starts in, the image position of the zone start and the slot number, so they do not depend on when the zone is read or how the cache was filled.  Reading the same revolution again gives the same pulses, the next revolution gives different ones.  The real flux change that ends a gap, and the end of a MG_N/MG_D run, are always delivered after the noise.
 
   The drive-side filtering of too-close pulses described in section 2.2 is not emulated.
 

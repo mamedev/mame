@@ -139,7 +139,7 @@ public:
 	virtual void seek_phase_w(int phases);
 	void stp_w(int state);
 	void dir_w(int state) { m_dir = state; }
-	void ss_w(int state) { m_actual_ss = state; if (m_sides > 1) m_ss = state; }
+	void ss_w(int state);
 	void inuse_w(int state) { }
 	void dskchg_w(int state) { if (m_dskchg_writable) m_dskchg = state; }
 	void ds_w(int state) { m_ds = state; check_led(); }
@@ -237,9 +237,11 @@ protected:
 	/* Current floppy zone cache */
 	attotime m_cache_start_time, m_cache_end_time, m_cache_weak_start;
 	attotime m_amplifier_freakout_time;
+	u32 m_weak_noise_period, m_weak_noise_spread; // ns
 	int m_cache_index;
 	u32 m_cache_entry;
 	u32 m_cache_weak_id;
+	u32 m_cache_revolution;
 	bool m_cache_weak;
 
 	bool m_image_dirty, m_track_dirty;
