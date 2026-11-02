@@ -114,21 +114,21 @@ private:
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_dma_access;
 	devcb_read8 m_dma_page_permissions;
 	devcb_write_line m_pp_irq, m_gp_irq, m_mmu_irq;
-	emu_timer *m_pp_timer = nullptr, *m_gp_timer = nullptr;
-	u32 m_pp[0x1100 / 4]{};
-	u32 m_gp[0x100 / 4]{};
-	u32 m_mmu[9]{};
-	u32 m_gp_heap[2]{};
-	u32 m_gp_started = 0;
-	u32 m_pp_jobs = 0, m_gp_jobs = 0;
-	u32 m_vs_config[0x50]{};
-	u32 m_vs_shader[512 * 4]{};
-	u32 m_vs_uniform[304 * 4]{};
-	u32 m_plb_config[16]{}, m_plb_bins[1024][2]{};
-	u32 m_plb_array = 0, m_plb_stride = 0, m_plb_state = 0, m_plb_vertex = 0;
-	u32 m_plb_scissor[2]{};
-	bool m_plb_scissor_set = false;
-	u64 m_plb_append_done = 0;
+	emu_timer *m_pp_timer, *m_gp_timer;
+	u32 m_pp[0x1100 / 4];
+	u32 m_gp[0x100 / 4];
+	u32 m_mmu[9];
+	u32 m_gp_heap[2];
+	u32 m_gp_started;
+	u32 m_pp_jobs, m_gp_jobs;
+	u32 m_vs_config[0x50];
+	u32 m_vs_shader[512 * 4];
+	u32 m_vs_uniform[304 * 4];
+	u32 m_plb_config[16], m_plb_bins[1024][2];
+	u32 m_plb_array, m_plb_stride, m_plb_state, m_plb_vertex;
+	u32 m_plb_scissor[2];
+	bool m_plb_scissor_set;
+	u64 m_plb_append_done;
 	// Host-side decode caches live only during one synchronous PP callback.
 	// They are rebuilt for each job and therefore are not save-state data.
 	std::unordered_map<u32, pp_instruction> m_pp_instructions;

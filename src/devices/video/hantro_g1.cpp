@@ -19,6 +19,7 @@ hantro_g1_device::hantro_g1_device(machine_config const &mconfig, char const *ta
 		: device_t(mconfig, HANTRO_G1, tag, owner, clock)
 		, m_dma(*this, finder_base::DUMMY_TAG, -1)
 		, m_irq(*this)
+		, m_decoder(nullptr)
 {
 }
 

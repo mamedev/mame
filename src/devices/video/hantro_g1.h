@@ -34,11 +34,14 @@ private:
 	required_address_space m_dma;
 	devcb_write_line m_irq;
 	emu_timer *m_decode_timer = nullptr, *m_pp_timer = nullptr;
-	u32 m_regs[256]{};
+	u32 m_regs[256];
 	// Replay data will reconstruct the host H.264 reference pictures on load.
 	std::unique_ptr<u8[]> m_history;
-	u32 m_history_size = 0, m_history_units = 0, m_jobs = 0;
-	ISVCDecoder *m_decoder = nullptr;
+	u32 m_history_size;
+	u32 m_history_units;
+	u32 m_jobs;
+	ISVCDecoder *m_decoder;
 };
 DECLARE_DEVICE_TYPE(HANTRO_G1, hantro_g1_device)
+
 #endif
