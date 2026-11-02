@@ -18,31 +18,6 @@ files {
 }
 
 --------------------------------------------------
---@src/devices/video/mali200.h,VIDEOS["MALI200"] = true
---@src/devices/video/hantro_g1.h,VIDEOS["HANTRO_G1"] = true
-
-if VIDEOS["HANTRO_G1"] then
-	files {
-		MAME_DIR .. "src/devices/video/hantro_g1.cpp",
-		MAME_DIR .. "src/devices/video/hantro_g1.h",
-		MAME_DIR .. "src/devices/video/hantro_g1_h264.h",
-	}
-end
---------------------------------------------------
-
-if VIDEOS["MALI200"] then
-	files {
-		MAME_DIR .. "src/devices/video/mali200.cpp",
-		MAME_DIR .. "src/devices/video/mali200_gp.hxx",
-		MAME_DIR .. "src/devices/video/mali200_plb.hxx",
-		MAME_DIR .. "src/devices/video/mali200_pp.hxx",
-		MAME_DIR .. "src/devices/video/mali200_texture.hxx",
-		MAME_DIR .. "src/devices/video/mali200_render.hxx",
-		MAME_DIR .. "src/devices/video/mali200.h",
-	}
-end
-
---------------------------------------------------
 --
 --@src/devices/video/315_5124.h,VIDEOS["SEGA315_5124"] = true
 --------------------------------------------------
@@ -512,6 +487,19 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/hantro_g1.h,VIDEOS["HANTRO_G1"] = true
+--------------------------------------------------
+
+if VIDEOS["HANTRO_G1"] then
+	files {
+		MAME_DIR .. "src/devices/video/hantro_g1.cpp",
+		MAME_DIR .. "src/devices/video/hantro_g1.h",
+		MAME_DIR .. "src/devices/video/hantro_g1_h264.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/hd44102.h,VIDEOS["HD44102"] = true
 --------------------------------------------------
 
@@ -903,6 +891,23 @@ if VIDEOS["M50458"] then
 	files {
 		MAME_DIR .. "src/devices/video/m50458.cpp",
 		MAME_DIR .. "src/devices/video/m50458.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/mali200.h,VIDEOS["MALI200"] = true
+--------------------------------------------------
+
+if VIDEOS["MALI200"] then
+	files {
+		MAME_DIR .. "src/devices/video/mali200.cpp",
+		MAME_DIR .. "src/devices/video/mali200_gp.hxx",
+		MAME_DIR .. "src/devices/video/mali200_plb.hxx",
+		MAME_DIR .. "src/devices/video/mali200_pp.hxx",
+		MAME_DIR .. "src/devices/video/mali200_texture.hxx",
+		MAME_DIR .. "src/devices/video/mali200_render.hxx",
+		MAME_DIR .. "src/devices/video/mali200.h",
 	}
 end
 
