@@ -567,7 +567,7 @@ u32 prempokr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, r
 	pen_t const *const pens = m_palette->pens();
 	bool const flip = flip_screen();
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u32 *const dest = &bitmap.pix(y);
 		int const sy = (flip ? (255 - y) : y) & 0xff;
@@ -575,14 +575,14 @@ u32 prempokr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, r
 
 		if (plane == 3)
 		{
-			std::fill(&dest[cliprect.min_x], &dest[cliprect.max_x + 1], rgb_t::black());
+			std::fill(&dest[cliprect.left()], &dest[cliprect.right() + 1], rgb_t::black());
 			continue;
 		}
 
 		u8 const *const planeram = &m_cardram[plane * 0x800];
 		u8 const *const scroll = &m_scrollram[plane * 0x20];
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int const sx = (flip ? (511 - x) : x) & 0x1ff;
 			int const py = (sy + scroll[sx >> 4]) & 0xff;
@@ -721,53 +721,54 @@ void prempokr_state::main_map(address_map &map)
   Input ports
 
   The matrix rows are 24 bits each: bits 0-7 read at be00, 8-15 at be01,
-  16-23 at be02. Names are the game's own, from its input test page.
+  16-23 at be02. Where MAME's default name doesn't fit, the name is the
+  game's own, from its input test page.
 *******************************************************************************/
 
 static INPUT_PORTS_START( prempokr )
 	PORT_START("ROW1")
-	PORT_BIT( 0x000200, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Key In")
-	PORT_BIT( 0x001000, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Coin A")
-	PORT_BIT( 0x008000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test")
-	PORT_BIT( 0x020000, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_NAME("Memory Clear")
+	PORT_BIT( 0x000200, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x001000, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x008000, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x020000, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 	PORT_BIT( 0xfd6dff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW2")
 	PORT_BIT( 0x000001, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
-	PORT_BIT( 0x000004, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Take Score")
-	PORT_BIT( 0x000008, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Out")
+	PORT_BIT( 0x000004, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x000008, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x000020, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
 	PORT_BIT( 0xffffd2, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW3")
-	PORT_BIT( 0x000040, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
-	PORT_BIT( 0x000002, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
-	PORT_BIT( 0x000010, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3")
-	PORT_BIT( 0x000080, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4")
-	PORT_BIT( 0x000100, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5")
+	PORT_BIT( 0x000040, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x000002, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x000010, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x000080, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x000100, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 	PORT_BIT( 0xfffe2d, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("ROW4")
-	PORT_BIT( 0x000200, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Double Up")
+	PORT_BIT( 0x000200, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x000800, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
-	PORT_BIT( 0x002000, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel")
-	PORT_BIT( 0x004000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Books")
+	PORT_BIT( 0x002000, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x004000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x010000, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet / Raise")
 	PORT_BIT( 0xfe95ff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DIRECT")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service In")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Empty") PORT_TOGGLE PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Motor On") PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin B")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Payout")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 
 	// switch n is bit 8-n, ON reads 0; the factory setting is all OFF
 	PORT_START("SW1")
-	PORT_DIPNAME( 0xe0, 0xe0, "Main Game %" ) PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME( 0xe0, 0xe0, "Main Game Payout Rate" ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, "72%" )
 	PORT_DIPSETTING(    0x80, "74%" )
 	PORT_DIPSETTING(    0x40, "76%" )
@@ -818,16 +819,17 @@ static INPUT_PORTS_START( prempokr )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_20C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_25C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_50C ) )
-	PORT_DIPNAME( 0x01, 0x01, "Screen Flip-Flop" ) PORT_DIPLOCATION("SW2:8")
+	// "SCREEN FLIP-FLOP" in test mode; the game only copies it to be61 bit 2
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SW3")
 	PORT_DIPNAME( 0xc0, 0xc0, "Credit Limit" ) PORT_DIPLOCATION("SW3:1,2")
-	PORT_DIPSETTING(    0xc0, "20000" )
-	PORT_DIPSETTING(    0x40, "30000" )
-	PORT_DIPSETTING(    0x80, "50000" )
-	PORT_DIPSETTING(    0x00, "No Limit" )
+	PORT_DIPSETTING(    0xc0, "20,000" )
+	PORT_DIPSETTING(    0x40, "30,000" )
+	PORT_DIPSETTING(    0x80, "50,000" )
+	PORT_DIPSETTING(    0x00, "Unlimited" )
 	PORT_DIPNAME( 0x20, 0x20, "At Credit Limit" ) PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x20, "Game Stops on Maximum Limit" )
 	PORT_DIPSETTING(    0x00, "Count Above Limit for Last Game Won" )
@@ -842,7 +844,7 @@ static INPUT_PORTS_START( prempokr )
 	PORT_DIPNAME( 0x02, 0x02, "Coin A Mode" ) PORT_DIPLOCATION("SW3:7")
 	PORT_DIPSETTING(    0x02, "Credit Mode" )
 	PORT_DIPSETTING(    0x00, "Bet Mode" )
-	PORT_DIPNAME( 0x01, 0x01, "Message" ) PORT_DIPLOCATION("SW3:8")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Language ) ) PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Japanese ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 INPUT_PORTS_END
