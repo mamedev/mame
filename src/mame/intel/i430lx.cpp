@@ -49,7 +49,6 @@ TODO:
 #include "machine/pci.h"
 #include "sound/spkrdev.h"
 
-#include "softlist.h"
 #include "softlist_dev.h"
 
 namespace {
