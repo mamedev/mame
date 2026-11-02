@@ -9,7 +9,6 @@
 #include "pgm2_memcard.h"
 
 #include "igs036.h"
-#include "machine/atmel_arm_aic.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/ymz770.h"
@@ -39,7 +38,6 @@ public:
 		m_vidmode(*this, "vidmode"),
 		m_gfxdecode2(*this, "gfxdecode2"),
 		m_gfxdecode3(*this, "gfxdecode3"),
-		m_arm_aic(*this, "arm_aic"),
 		m_sprites_mask(*this, "sprites_mask"),
 		m_sprites_colour(*this, "sprites_colour"),
 		m_sp_palette(*this, "sp_palette"),
@@ -121,7 +119,6 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
-	void irq(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_interrupt);
 
@@ -170,7 +167,7 @@ private:
 	u8 module_send_buf[9]{};
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<igs036_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<u32> m_lineram;
 	required_shared_ptr<u32> m_sp_zoom;
@@ -184,7 +181,6 @@ private:
 	required_shared_ptr<u32> m_vidmode;
 	required_device<gfxdecode_device> m_gfxdecode2;
 	required_device<gfxdecode_device> m_gfxdecode3;
-	required_device<arm_aic_device> m_arm_aic;
 	required_region_ptr<u8> m_sprites_mask;
 	required_region_ptr<u8> m_sprites_colour;
 	required_device<palette_device> m_sp_palette;

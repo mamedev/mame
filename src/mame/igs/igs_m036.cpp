@@ -146,7 +146,6 @@ check more info and photo from cjdh2.zip!!!
 #include "igs036crypt.h"
 #include "igsmahjong.h"
 
-#include "machine/atmel_arm_aic.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
@@ -184,7 +183,7 @@ public:
 private:
 	uint32_t screen_update_m036(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<igs036_cpu_device> m_maincpu;
 
 	void pgm_create_dummy_internal_arm_region() ATTR_COLD;
 
@@ -199,8 +198,7 @@ public:
 	void init_jxry() ATTR_COLD;
 
 protected:
-	required_device<arm7_cpu_device> m_maincpu;
-	required_device<arm_aic_device> m_arm_aic;
+	required_device<igs036_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_region_ptr<u32> m_internal_rom;
 	required_memory_region m_external_rom;
@@ -218,7 +216,6 @@ protected:
 	m036_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_arm_aic(*this, "arm_aic"),
 		m_screen(*this, "screen"),
 		m_internal_rom(*this, "maincpu"),
 		m_external_rom(*this, "user1"),
@@ -252,20 +249,13 @@ private:
 	u8 m_encryption_table[0x100];
 	u8 m_active_key[0x100];
 	bool m_has_decrypted;
-	emu_timer *m_tc_timer[3];
-	u32 m_tc_regs[3][16];
-	bool m_tc_enabled[3];
 
 	void install_idle_speedup() ATTR_COLD;
 	void restore_external_rom();
 	u8 encryption_r(offs_t offset) { return m_encryption_table[offset]; }
 	void encryption_w(offs_t offset, u8 data) { m_encryption_table[offset] = data; }
 	void encryption_control_w(offs_t offset, u32 data, u32 mem_mask = ~0U);
-	u32 timer_r(offs_t offset);
-	void timer_w(offs_t offset, u32 data, u32 mem_mask = ~0U);
-	void timer_schedule(u32 channel);
-	u32 timer_clock(u32 channel) const;
-	TIMER_CALLBACK_MEMBER(timer_expired);
+
 	void screen_vblank(int state);
 };
 
@@ -527,10 +517,6 @@ void m036_base_state::machine_start()
 	save_item(NAME(m_has_decrypted));
 	save_item(NAME(m_key_select));
 	save_item(NAME(m_pio_out));
-	save_item(NAME(m_tc_regs));
-	save_item(NAME(m_tc_enabled));
-	for (u32 i = 0; i < std::size(m_tc_timer); ++i)
-		m_tc_timer[i] = timer_alloc(FUNC(m036_base_state::timer_expired), this);
 
 	m_encrypted_copy = std::make_unique<u8 []>(m_external_rom->bytes());
 	std::copy_n(m_external_rom->base(), m_external_rom->bytes(), m_encrypted_copy.get());
@@ -545,12 +531,7 @@ void m036_base_state::machine_reset()
 	m_has_decrypted = false;
 	m_key_select = 0xffff;
 	m_pio_out = 0;
-	for (u32 i = 0; i < 3; ++i)
-	{
-		std::fill(std::begin(m_tc_regs[i]), std::end(m_tc_regs[i]), 0);
-		m_tc_enabled[i] = false;
-		m_tc_timer[i]->adjust(attotime::never);
-	}
+
 	restore_external_rom();
 }
 
@@ -734,106 +715,14 @@ void m036_hyleyuan_state::machine_reset()
 }
 
 
-u32 m036_base_state::timer_clock(u32 channel) const
-{
-	// Keep the peripheral time base separate from the provisional CPU PLL.
-	// Scaling it with the HD core clock accelerates input scanning/debounce
-	// and breaks normal coin/button operation in Hou Ye Leyuan.
-	static constexpr u32 DIVISORS[4] = { 2, 8, 32, 128 };
-	u32 const clock = m_tc_regs[channel][1] & 7;
-	return clock < 4 ? (20_MHz_XTAL).value() / DIVISORS[clock] : clock == 4 ? 32'768 : 0;
-}
-
-
-void m036_base_state::timer_schedule(u32 channel)
-{
-	u32 const clock = timer_clock(channel);
-	if (m_tc_enabled[channel] && clock)
-		m_tc_timer[channel]->adjust(attotime::from_ticks(m_tc_regs[channel][7] ? m_tc_regs[channel][7] : 0x1'0000, clock), channel);
-	else
-		m_tc_timer[channel]->adjust(attotime::never);
-}
-
-
-TIMER_CALLBACK_MEMBER(m036_base_state::timer_expired)
-{
-	u32 const channel = param;
-	m_tc_regs[channel][8] |= 0x10; // CPCS
-	if (m_tc_regs[channel][11] & 0x10)
-		m_arm_aic->set_irq(6 + channel, ASSERT_LINE);
-	timer_schedule(channel);
-}
-
-
-u32 m036_base_state::timer_r(offs_t offset)
-{
-	u32 const channel = offset / 16;
-	u32 const reg = offset % 16;
-	if (channel >= 3)
-		return 0;
-	if (reg == 4) // CV
-		return m_tc_enabled[channel] ? m_tc_timer[channel]->elapsed().as_ticks(timer_clock(channel)) & 0xffff : 0;
-	if (reg == 8) // SR, interrupt flags cleared on read
-	{
-		u32 const result = m_tc_regs[channel][8] | (m_tc_enabled[channel] ? 0x1'0000 : 0);
-		if (!machine().side_effects_disabled())
-		{
-			m_tc_regs[channel][8] = 0;
-			m_arm_aic->set_irq(6 + channel, CLEAR_LINE);
-		}
-		return result;
-	}
-	return m_tc_regs[channel][reg];
-}
-
-
-void m036_base_state::timer_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	u32 const channel = offset / 16;
-	u32 const reg = offset % 16;
-	if (channel >= 3)
-	{
-		if (offset == 0x30 && BIT(data & mem_mask, 0))
-		{
-			for (u32 i = 0; i < 3; ++i)
-				timer_schedule(i);
-		}
-		return;
-	}
-	data &= mem_mask;
-	switch (reg)
-	{
-	case 0: // CCR
-		if (BIT(data, 0))
-			m_tc_enabled[channel] = true;
-		if (BIT(data, 1))
-			m_tc_enabled[channel] = false;
-		timer_schedule(channel);
-		break;
-	case 9: // IER
-		m_tc_regs[channel][11] |= data;
-		m_arm_aic->set_irq(6 + channel, (m_tc_regs[channel][8] & m_tc_regs[channel][11] & 0x10) ? ASSERT_LINE : CLEAR_LINE);
-		break;
-	case 10: // IDR
-		m_tc_regs[channel][11] &= ~data;
-		m_arm_aic->set_irq(6 + channel, (m_tc_regs[channel][8] & m_tc_regs[channel][11] & 0x10) ? ASSERT_LINE : CLEAR_LINE);
-		break;
-	case 4: case 8: case 11: // read-only
-		break;
-	default:
-		COMBINE_DATA(&m_tc_regs[channel][reg]);
-		if (reg == 1 || reg == 7)
-			timer_schedule(channel);
-		break;
-	}
-}
-
 
 void m036_base_state::screen_vblank(int state)
 {
 	// The internal ROM acknowledges this latched source through the AIC.
 	if (state)
-		m_arm_aic->set_irq(2, ASSERT_LINE);
+	{
+		m_maincpu->set_aic_irq(2, ASSERT_LINE);
+	}
 }
 
 
@@ -873,10 +762,10 @@ void m036_base_state::m036_boot_map(address_map &map)
 	map(0x3000'0008, 0x3000'000f).r(FUNC(m036_base_state::dips_r));
 
 	// IGS036 system peripherals, also used by PGM2.
-	map(0xfffa'0000, 0xfffa'00c7).rw(FUNC(m036_base_state::timer_r), FUNC(m036_base_state::timer_w));
+
 	map(0xffff'ec00, 0xffff'ec7f).nopw(); // TODO: static memory controller
 	map(0xffff'ee00, 0xffff'ee57).nopw(); // TODO: bus matrix
-	map(0xffff'f000, 0xffff'f14b).m(m_arm_aic, FUNC(arm_aic_device::regs_map));
+
 	map(0xffff'f200, 0xffff'f247).nopw(); // TODO: debug UART
 	map(0xffff'f400, 0xffff'f4af).nopw(); // TODO: remaining parallel I/O registers
 	map(0xffff'f430, 0xffff'f437).w(FUNC(m036_base_state::gpio_outputs_w));
@@ -1345,7 +1234,6 @@ void m036_base_state::base_config(machine_config &config)
 {
 	IGS036(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m036_base_state::m036_boot_map);
-	ARM_AIC(config, m_arm_aic).irq_callback().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
 
 	SCREEN(config, m_screen);
 	// FIXME: pixel clock and blanking intervals are not known.

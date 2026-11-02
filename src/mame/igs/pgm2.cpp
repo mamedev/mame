@@ -172,7 +172,7 @@ void pgm2_state::shareram_w(offs_t offset, u8 data)
 
 TIMER_DEVICE_CALLBACK_MEMBER(pgm2_state::mcu_interrupt)
 {
-	m_arm_aic->set_irq(3, ASSERT_LINE);
+	m_maincpu->set_aic_irq(3, ASSERT_LINE);
 }
 
 // "MPU" MCU HLE starts here
@@ -334,13 +334,13 @@ void pgm2_state::mcu_w(offs_t offset, u32 data, u32 mem_mask)
 	if (reg == 5 && m_mcu_regs[5]) // ack to mcu (written at the end of irq handler routine)
 	{
 		mcu_command(false);
-		m_arm_aic->set_irq(3, CLEAR_LINE);
+		m_maincpu->set_aic_irq(3, CLEAR_LINE);
 	}
 }
 
 void pgm2_state::vbl_ack_w(u16 data)
 {
-	m_arm_aic->set_irq(12, CLEAR_LINE);
+	m_maincpu->set_aic_irq(12, CLEAR_LINE);
 }
 
 void pgm2_state::unk30120014_w(offs_t offset, u16 data)
@@ -541,7 +541,7 @@ void pgm2_state::pgm2_map(address_map &map)
 	// map(0xfffa0000, 0xfffa00ff) TC (Timer Counter) not used, mentioned in disabled / unused code
 	// map(0xffffec00, 0xffffec7f) SMC (Static Memory Controller)
 	// map(0xffffee00, 0xffffee57) MATRIX (Bus Matrix)
-	map(0xfffff000, 0xfffff14b).m(m_arm_aic, FUNC(arm_aic_device::regs_map));
+
 	// map(0xfffff200, 0xfffff247) DBGU (Debug Unit)
 	// map(0xfffff400, 0xfffff4af) PIO (Parallel Input Output Controller)
 	map(0xfffff430, 0xfffff437).nopw(); // often
@@ -665,12 +665,6 @@ static INPUT_PORTS_START( pgm2 )
 INPUT_PORTS_END
 
 
-void pgm2_state::irq(int state)
-{
-//  logerror("irq\n");
-	if (state == ASSERT_LINE) m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
-	else m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
-}
 
 void pgm2_state::machine_start()
 {
@@ -740,8 +734,6 @@ void pgm2_state::pgm2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm2_state::pgm2_rom_map);
 
 	TIMER(config, m_mcu_timer).configure_generic(FUNC(pgm2_state::mcu_interrupt));
-
-	ARM_AIC(config, m_arm_aic).irq_callback().set(FUNC(pgm2_state::irq));
 
 	// video hardware
 	SCREEN(config, m_screen);

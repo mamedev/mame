@@ -6,6 +6,7 @@
 #pragma once
 
 #include "cpu/arm7/arm7.h"
+#include "machine/atmel_arm_aic.h"
 
 class igs036_cpu_device : public arm946es_cpu_device
 {
@@ -13,8 +14,27 @@ public:
 	// construction/destruction
 	igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void set_aic_irq(int level, int state) { m_arm_aic->set_irq(level, state); }
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
 private:
 	void onboard_peripherals(address_map &map) ATTR_COLD;
+
+	emu_timer *m_tc_timer[3];
+	u32 m_tc_regs[3][16];
+	bool m_tc_enabled[3];
+
+	u32 timer_r(offs_t offset);
+	void timer_w(offs_t offset, u32 data, u32 mem_mask = ~0U);
+	void timer_schedule(u32 channel);
+	u32 timer_clock(u32 channel) const;
+	TIMER_CALLBACK_MEMBER(timer_expired);
+	void irq(int state);
+	required_device<arm_aic_device> m_arm_aic;
 };
 
 DECLARE_DEVICE_TYPE(IGS036,       igs036_cpu_device)
