@@ -14715,7 +14715,7 @@ ROM_END
   Maybe some watchdog unimplemented circuitry?
 
 */
-  ROM_START( potnpkrq )
+ROM_START( potnpkrq )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "7.16a", 0x2000, 0x1000, CRC(29c647e6) SHA1(1a1c672474c0d4d76728794f661a94925ab245a1) )
 	ROM_LOAD( "8.17a", 0x3000, 0x1000, CRC(3a6e8ca4) SHA1(047edcc344fe97e47d785920d1b499d92febf81f) )
