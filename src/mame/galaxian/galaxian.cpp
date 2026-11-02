@@ -15661,14 +15661,13 @@ ROM_START( staratk )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "sa5.5f", 0x0000, 0x1000, CRC(b690153b) SHA1(c2a383fc8a6ade7a113ca80c9587fd69160d1962) )
-	ROM_LOAD( "sa6.5g", 0x3000, 0x1000, BAD_DUMP CRC(b0a3a3e4) SHA1(aac35cdd9610eb0c3139094735b587b8c23880b0) ) // bad pixels in some tiles
+	ROM_LOAD( "sa6.5g", 0x3000, 0x1000, CRC(4ea68501) SHA1(e3697cce227df6ba82d9437bcd73c4679784ade5) )
 
 	// extra background, positioned away from 5f/5g
 	ROM_LOAD( "sa8.6f", 0x1000, 0x1000, CRC(563825bd) SHA1(ca4020dd0e4974df6f67d4ee070159641c977093) ) // plane 0
 	ROM_LOAD( "sa7.6d", 0x2000, 0x1000, CRC(3fb29add) SHA1(03906f2eb9e9c51f614fac1890d14227d889d93a) )
 	ROM_LOAD( "sa9.6g", 0x4000, 0x1000, CRC(fdef1479) SHA1(b204f2d1763f8e7fa037c58207fc2dc9a9450742) ) // plane 1
-	ROM_LOAD( "sa10.6j", 0x5000, 0x1000, NO_DUMP ) // rom read as blank, is meant to be half of 1 plane of the 3rd stage background
-	ROM_FILL(0x5000,0x1000,0x00) // wipe over with 0x00 as 0xff fill ends up hiding bullets
+	ROM_LOAD( "sa10.6j", 0x5000, 0x1000, BAD_DUMP CRC(efcc97d4) SHA1(e3173a7695cd3714cb7404fbae27f521ab09d160) ) // ROM was bad, this is hand-fixed, hence BAD_DUMP
 
 	ROM_REGION( 0x0020, "proms", 0 ) // not dumped from this set, but colours match reference footage
 	ROM_LOAD( "prom", 0x0000, 0x0020, BAD_DUMP CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
