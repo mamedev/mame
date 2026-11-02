@@ -17480,10 +17480,6 @@ clcd
 @source:commodore/kim1.cpp
 kim1
 
-@source:commodore/mps1230.cpp
-mps1000
-mps1230
-
 @source:commodore/pet.cpp
 cbm3008
 cbm3016

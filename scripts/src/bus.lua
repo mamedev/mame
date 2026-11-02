@@ -1720,6 +1720,8 @@ if BUSES["CBMIEC"] then
 		MAME_DIR .. "src/devices/bus/cbmiec/mps1200.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/mps1224.cpp",
 		MAME_DIR .. "src/devices/bus/cbmiec/mps1224.h",
+		MAME_DIR .. "src/devices/bus/cbmiec/mps1230.cpp",
+		MAME_DIR .. "src/devices/bus/cbmiec/mps1230.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/mps1270a.cpp",
 		MAME_DIR .. "src/devices/bus/cbmiec/mps1270a.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/prodos.cpp",
