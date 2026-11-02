@@ -1070,7 +1070,6 @@
   - Final cleanup.
 
   - dep 9801 sets:
-    - correct GFX banking
     - 2 more banks of switches
     - lfhouse inputs
 
@@ -6015,6 +6014,7 @@ void goldnpkr_state::dash_a37(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &goldnpkr_state::dep_9801_opcodes_map);
 
 	// video hardware
+	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, smb_be4k)
 	m_gfxdecode->set_info(gfx_dep_9801);
 
 	// sound hardware
@@ -14352,13 +14352,20 @@ ROM_END
 
   Sets:
 
-  dash_a37    DASH! A37             1998/10/22   VER OCT 22, 98
-  dash_a37b   DASH! A37             1996/11/18,  AVANTY  50 BET SPECIAL
-  lfhouse     Lucky Full House      1996/02/01 ver 1.16, DATA ver 1.05
-  lfhouseb    Lucky Full House      1994/08/26 ver 1.15, DATA ver 1.04
+  dash_a37    DASH! A.3.7           1998/10/22   VER OCT 22, 98
+  dash_a37b   DASH! A.3.7           1996/11/18,  AVANTY  50 BET SPECIAL
   dynchance   Dynamic Chance        type-3.0 1992/08/29  PART 1-2
   dynchancf   Dynamic Chance(alt)   type-3.0 1992/08/29  PART 1-2  (only 4 bytes of difference)
-  dynplus     Dynamic Plus One      1997/01/13, SP TYPE Ver 1.10
+
+  dynplus     Dynamic Plus One      1997/01/13, SP TYPE Ver 1.00
+  lfhouse     Lucky Full House      1996/02/01 ver 1.16, DATA ver 1.05
+  lfhouseb    Lucky Full House      1994/08/26 ver 1.15, DATA ver 1.04
+
+  issues....
+
+  dynplus, lfhouse and lfhouseb have wrong GFX ROMs.
+  They don't match the program so there are severe GFX fails. 
+  Will mark these as bad dumps.
 
 */
 ROM_START( dash_a37 )
@@ -14435,74 +14442,6 @@ ROM_START( dash_a37b )
 	ROM_LOAD( "nvram", 0x0000, 0x0800, CRC(9c895c1d) SHA1(323a18bc671d64b408d6861e0a248f42abc2eae9) )
 ROM_END
 
-ROM_START( lfhouse )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lf2_i220.5e", 0x8000, 0x8000, CRC(ff975444) SHA1(c13042b6a90a08304e4fcb7c683926b28f14a771) )
-
-	ROM_REGION( 0x8000, "gfxpool", 0 )
-	ROM_LOAD( "1.5l", 0x0000, 0x4000, CRC(a501edc4) SHA1(95fc04c16cde89636023639db236fba261ccd21b) )
-	ROM_IGNORE(               0x4000 )
-	ROM_LOAD( "2.5n", 0x4000, 0x4000, CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
-	ROM_IGNORE(               0x4000 )
-
-	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
-	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (empty)
-	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (empty)
-	ROM_COPY( "gfxpool", 0x5000, 0x1000, 0x0800 ) // src-dest-size (data)
-
-	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
-	ROM_COPY( "gfxpool", 0x1800, 0x0000, 0x0800 ) // src-dest-size (data)
-	ROM_COPY( "gfxpool", 0x0800, 0x0800, 0x0800 ) // src-dest-size (data)
-	ROM_COPY( "gfxpool", 0x5800, 0x1000, 0x0800 ) // src-dest-size (data)
-
-	ROM_REGION( 0x1800, "gfx3", 0 )  // extra 1
-	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (empty)
-	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (empty)
-	ROM_COPY( "gfxpool", 0x7000, 0x1000, 0x0800 ) // src-dest-size (data)
-
-	ROM_REGION( 0x1800, "gfx4", 0 )  // extra 2
-	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data)
-	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
-	ROM_COPY( "gfxpool", 0x7800, 0x1000, 0x0800 ) // src-dest-size (data)
-
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "27s13.2m", 0x0000, 0x0200, CRC(b5c007e4) SHA1(d66f68ad9e637c5720e71151c360d2053090b7b8) )
-ROM_END
-
-ROM_START( lfhouseb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lfh_115.5e", 0x8000, 0x8000, CRC(4c877f57) SHA1(160e2c0f5c08be05dd56787f01a5a9f8813796b1) )
-
-	ROM_REGION( 0x8000, "gfxpool", 0 )
-	ROM_LOAD( "1.5l", 0x0000, 0x4000, CRC(a501edc4) SHA1(95fc04c16cde89636023639db236fba261ccd21b) )
-	ROM_IGNORE(               0x4000 )
-	ROM_LOAD( "2.5n", 0x4000, 0x4000, CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
-	ROM_IGNORE(               0x4000 )
-
-	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
-	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (empty)
-	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (empty)
-	ROM_COPY( "gfxpool", 0x5000, 0x1000, 0x0800 ) // src-dest-size (data)
-
-	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
-	ROM_COPY( "gfxpool", 0x1800, 0x0000, 0x0800 ) // src-dest-size (data)
-	ROM_COPY( "gfxpool", 0x0800, 0x0800, 0x0800 ) // src-dest-size (data)
-	ROM_COPY( "gfxpool", 0x5800, 0x1000, 0x0800 ) // src-dest-size (data)
-
-	ROM_REGION( 0x1800, "gfx3", 0 )  // extra 1
-	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (empty)
-	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (empty)
-	ROM_COPY( "gfxpool", 0x7000, 0x1000, 0x0800 ) // src-dest-size (data)
-
-	ROM_REGION( 0x1800, "gfx4", 0 )  // extra 2
-	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data)
-	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
-	ROM_COPY( "gfxpool", 0x7800, 0x1000, 0x0800 ) // src-dest-size (data)
-
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "27s13.2m", 0x0000, 0x0200, CRC(b5c007e4) SHA1(d66f68ad9e637c5720e71151c360d2053090b7b8) )
-ROM_END
-
 ROM_START( dynchance )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dc1.5e", 0x8000, 0x8000, CRC(24912d1a) SHA1(7b956487b76564adb30475360ae6c27f7a4e0c9c) )
@@ -14571,14 +14510,17 @@ ROM_START( dynchancf )
 	ROM_LOAD( "7116.2m", 0x0000, 0x0200, CRC(d85503d9) SHA1(a80dc287c05c286837938071afe35b0a6a11765f) )
 ROM_END
 
+
 ROM_START( dynplus )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dc1.i227.bin", 0x8000, 0x8000, CRC(75b97ef9) SHA1(3a92695b8db680f0e49e3b1d6fcba1d6e1400c6b) )
 
-	ROM_REGION( 0x8000, "gfxpool", 0 )
-	ROM_LOAD( "mk2.5l", 0x0000, 0x4000, CRC(ac69168b) SHA1(cc425aea0bc7ac5337bb79c8a63176621c8606f5) )
+    // dynchance GFX set. doesn't match title and WIN graphics.
+	// need the real missing GFX ROMs
+	ROM_REGION( 0x8000, "gfxpool", 0 ) 
+	ROM_LOAD( "mk2.5l", 0x0000, 0x4000, BAD_DUMP CRC(ac69168b) SHA1(cc425aea0bc7ac5337bb79c8a63176621c8606f5) )
 	ROM_IGNORE(                 0x4000 )
-	ROM_LOAD( "mk3.5n", 0x4000, 0x4000, CRC(3f6c00cb) SHA1(fd45a515a068bf6e2dfa95d411029da0f2eb512c) )
+	ROM_LOAD( "mk3.5n", 0x4000, 0x4000, BAD_DUMP CRC(3f6c00cb) SHA1(fd45a515a068bf6e2dfa95d411029da0f2eb512c) )
 	ROM_IGNORE(                 0x4000 )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
@@ -14606,6 +14548,88 @@ ROM_START( dynplus )
 
 	ROM_REGION( 0x0800, "nvram", 0 )
 	ROM_LOAD( "nvram", 0x0000, 0x0800, CRC(5bdc6ce4) SHA1(5c47047128e8cd17da7e31cd175ae35498a868d0) )
+ROM_END
+
+ROM_START( lfhouse )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lf2_i220.5e", 0x8000, 0x8000, CRC(ff975444) SHA1(c13042b6a90a08304e4fcb7c683926b28f14a771) )
+
+    // wrong GFX set. doesn't match title and maybe other graphics.
+	// need the real missing GFX ROMs
+	ROM_REGION( 0x8000, "gfxpool", 0 )
+	ROM_LOAD( "1.5l", 0x0000, 0x4000, BAD_DUMP CRC(a501edc4) SHA1(95fc04c16cde89636023639db236fba261ccd21b) )
+	ROM_IGNORE(               0x4000 )
+	ROM_LOAD( "2.5n", 0x4000, 0x4000, BAD_DUMP CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
+	ROM_IGNORE(               0x4000 )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
+	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x5000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
+	ROM_COPY( "gfxpool", 0x1800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x5800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx3", 0 )  // extra 1
+	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x7000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // extra 2
+	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x7800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+    // scrambled addressing
+	ROM_REGION( 0x0200, "proms", 0 )
+//	ROM_LOAD( "27s13.2m", 0x0000, 0x0200, CRC(b5c007e4) SHA1(d66f68ad9e637c5720e71151c360d2053090b7b8) )
+	ROM_LOAD( "27s13.2m", 0x0100, 0x0080, CRC(b5c007e4) SHA1(d66f68ad9e637c5720e71151c360d2053090b7b8) )
+	ROM_CONTINUE(         0x0080, 0x0080)    // arrange quarters.
+	ROM_CONTINUE(         0x0180, 0x0080)    // arrange quarters.
+	ROM_CONTINUE(         0x0000, 0x0080)    // arrange quarters.
+ROM_END
+
+ROM_START( lfhouseb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lfh_115.5e", 0x8000, 0x8000, CRC(4c877f57) SHA1(160e2c0f5c08be05dd56787f01a5a9f8813796b1) )
+
+    // wrong GFX set. doesn't match title and maybe other graphics.
+	// need the real missing GFX ROMs
+	ROM_REGION( 0x8000, "gfxpool", 0 )
+	ROM_LOAD( "1.5l", 0x0000, 0x4000, BAD_DUMP CRC(a501edc4) SHA1(95fc04c16cde89636023639db236fba261ccd21b) )
+	ROM_IGNORE(               0x4000 )
+	ROM_LOAD( "2.5n", 0x4000, 0x4000, BAD_DUMP CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
+	ROM_IGNORE(               0x4000 )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
+	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x5000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
+	ROM_COPY( "gfxpool", 0x1800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x5800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx3", 0 )  // extra 1
+	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x7000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // extra 2
+	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x7800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+    // scrambled addressing
+	ROM_REGION( 0x0200, "proms", 0 )
+//	ROM_LOAD( "27s13.2m", 0x0000, 0x0200, CRC(b5c007e4) SHA1(d66f68ad9e637c5720e71151c360d2053090b7b8) )
+	ROM_LOAD( "27s13.2m", 0x0100, 0x0080, CRC(b5c007e4) SHA1(d66f68ad9e637c5720e71151c360d2053090b7b8) )
+	ROM_CONTINUE(         0x0080, 0x0080)    // arrange quarters.
+	ROM_CONTINUE(         0x0180, 0x0080)    // arrange quarters.
+	ROM_CONTINUE(         0x0000, 0x0080)    // arrange quarters.
 ROM_END
 
 // this program ROM was fitted on a Boram PCB (see misc/boramz80.cpp), probably due to an error while reassembling it
@@ -15648,14 +15672,14 @@ GAMEL( 1983, falcnwldd, falcnwld, wildcrdb, wildcard, goldnpkr_state, empty_init
 
 /************************ DEP 9801 ENCRYPTED PLATFORM ************************/
 
-GAME(  1998, dash_a37,  0,         dash_a37,  goldnpkr, goldnpkr_state, init_dash,   ROT0,   "<unknown>",                "Dash! (A37, ver 1998/10/22)",                MACHINE_NOT_WORKING )
-GAME(  1996, dash_a37b, dash_a37,  dash_a37,  goldnpkr, goldnpkr_state, init_dash,   ROT0,   "<unknown>",                "Dash! (A37, ver 1996/11/18)",                MACHINE_NOT_WORKING )
-GAME(  1996, lfhouse,   0,         lfhouse,   goldnpkr, goldnpkr_state, init_lfhouse,ROT0,   "<unknown>",                "Lucky Full House (ver 1.16, data ver 1.05)", MACHINE_NOT_WORKING )
-GAME(  1994, lfhouseb,  lfhouse,   lfhouse,   goldnpkr, goldnpkr_state, init_lfhouseb,ROT0,  "<unknown>",                "Lucky Full House (ver 1.15, data ver 1.04)", MACHINE_NOT_WORKING )
+GAME(  1998, dash_a37,  0,         dash_a37,  goldnpkr, goldnpkr_state, init_dash,   ROT0,   "<unknown>",                "Dash! A.3.7 (ver 1998/10/22)",               MACHINE_NOT_WORKING )
+GAME(  1996, dash_a37b, dash_a37,  dash_a37,  goldnpkr, goldnpkr_state, init_dash,   ROT0,   "<unknown>",                "Dash! A.3.7 (ver 1996/11/18)",               MACHINE_NOT_WORKING )
 GAME(  1992, dynchance, 0,         dynchance, goldnpkr, goldnpkr_state, init_dynchance,ROT0, "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2)",         MACHINE_NOT_WORKING )
 GAME(  1992, dynchancf, dynchance, dynchance, goldnpkr, goldnpkr_state, init_dynchance,ROT0, "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2, alt)",    MACHINE_NOT_WORKING )
 GAME(  1997, dynplus,   dynchance, dynplus,   goldnpkr, goldnpkr_state, init_dynplus,ROT0,   "<unknown>",                "Dynamic Plus One (SP Type ver 1.10)",        MACHINE_NOT_WORKING )
-GAME(  1998, unkdep,    lfhouse,         unkdep,    goldnpkr, goldnpkr_state, init_unkdep, ROT0,   "<unknown>",                "unknown DEP 9801 poker game",                MACHINE_NOT_WORKING )
+GAME(  1996, lfhouse,   0,         lfhouse,   goldnpkr, goldnpkr_state, init_lfhouse,ROT0,   "<unknown>",                "Lucky Full House (ver 1.16, data ver 1.05)", MACHINE_NOT_WORKING )
+GAME(  1994, lfhouseb,  lfhouse,   lfhouse,   goldnpkr, goldnpkr_state, init_lfhouseb,ROT0,  "<unknown>",                "Lucky Full House (ver 1.15, data ver 1.04)", MACHINE_NOT_WORKING )
+GAME(  1998, unkdep,    lfhouse,   unkdep,    goldnpkr, goldnpkr_state, init_unkdep, ROT0,   "<unknown>",                "unknown DEP 9801 poker game",                MACHINE_NOT_WORKING )
 
 
 /******************************** SETS W/IRQ0 *********************************/
