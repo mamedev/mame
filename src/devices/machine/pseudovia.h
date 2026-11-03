@@ -106,7 +106,11 @@ public:
 	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
+	virtual void device_start() override;
 	virtual void pseudovia_recalc_irqs() override;
+
+private:
+	u8 m_orb, m_ddrb, m_ddra, m_acr, m_pcr;
 };
 
 // device type definition
