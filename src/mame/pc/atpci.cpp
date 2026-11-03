@@ -259,6 +259,7 @@ void at586_state::at586x3(machine_config &config)
 	pentium_device &maincpu(PENTIUM(config, m_maincpu, 60000000));
 	maincpu.set_addrmap(AS_IO, &at586_state::at586_io);
 	maincpu.set_irq_acknowledge_callback("pci:01.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+	maincpu.smiact().set("pci:00.0", FUNC(i82439tx_host_device::smi_act_w));
 
 	PCI_ROOT(config, "pci");
 	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M,128M,256M");
@@ -298,6 +299,7 @@ void at586_state::at586m55(machine_config &config)
 	pentium_device &pentium(PENTIUM(config, m_maincpu, 60000000));
 	pentium.set_addrmap(AS_IO, &at586_state::at586_io);
 	pentium.set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+	pentium.smiact().set("pci:00.0", FUNC(i82439tx_host_device::smi_act_w));
 
 	PCI_ROOT(config, "pci");
 	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M,128M,256M");

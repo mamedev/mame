@@ -30,6 +30,7 @@ i82439tx_host_device::i82439tx_host_device(const machine_config &mconfig, const 
 	, cpu(*this, finder_base::DUMMY_TAG)
 	, m_ram_dev(*this, finder_base::DUMMY_TAG)
 	, m_ram(nullptr)
+	, smiact_n(true)
 {
 }
 
@@ -85,6 +86,7 @@ void i82439tx_host_device::device_reset()
 	errcmd = 0x00;
 	errsts = 0x00;
 	errsyn = 0x00;
+	smiact_n = true;
 }
 
 void i82439tx_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -97,8 +99,16 @@ void i82439tx_host_device::map_extra(uint64_t memory_window_start, uint64_t memo
 	else
 		memory_space->install_ram      (0x00000000, 0x0009ffff, &m_ram[0x00000000/4]);
 
-	if(smram & 0x40)
-		memory_space->install_ram      (0x000a0000, 0x000bffff, &m_ram[0x000a0000/4]);
+	// assume that map_extra of the northbridge is called after the video card has mapped its memory here
+	// FIXME: D_CLS and D_LCK not emulated
+	if (smram & 0x08)
+	{
+		if (smiact_n == 0)
+			memory_space->install_ram(0x000a0000, 0x000bffff, &m_ram[0x000a0000 / 4]);
+		else
+			if (smram & 0x40)
+				memory_space->install_ram(0x000a0000, 0x000bffff, &m_ram[0x000a0000 / 4]);
+	}
 
 	if(pam[1] & 0x01)
 		memory_space->install_rom      (0x000c0000, 0x000c3fff, &m_ram[0x000c0000/4]);
@@ -303,4 +313,15 @@ void i82439tx_host_device::errsts_w(uint8_t data)
 uint8_t i82439tx_host_device::errsyn_r()
 {
 	return errsyn;
+}
+
+void i82439tx_host_device::smi_act_w(int state)
+{
+	// state is 0 when smm is not active
+	// but smiact_n reflects the state of the SMIACT# pin
+	if (state == 0)
+		smiact_n = 1;
+	else
+		smiact_n = 0;
+	remap_cb();
 }

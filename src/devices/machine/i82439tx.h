@@ -27,6 +27,8 @@ public:
 	// take size and memory from a RAM device instead of set_ram_size
 	template <typename T> void set_ram_tag(T &&tag) { m_ram_dev.set_tag(std::forward<T>(tag)); }
 
+	void smi_act_w(int state);
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -48,6 +50,7 @@ private:
 	uint8_t pcon, cc, dramec, dramc, dramt;
 	uint8_t pam[7], drb[8];
 	uint8_t drt, drat, smram, errcmd, errsts, errsyn;
+	bool smiact_n;
 
 	uint8_t pcon_r();
 	void pcon_w(uint8_t data);
