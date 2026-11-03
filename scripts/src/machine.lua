@@ -25,8 +25,6 @@ files {
 	MAME_DIR .. "src/devices/machine/nvram.h",
 	MAME_DIR .. "src/devices/machine/ram.cpp",
 	MAME_DIR .. "src/devices/machine/ram.h",
-	MAME_DIR .. "src/devices/machine/legscsi.cpp",
-	MAME_DIR .. "src/devices/machine/legscsi.h",
 	MAME_DIR .. "src/devices/machine/sdlc.cpp",
 	MAME_DIR .. "src/devices/machine/sdlc.h",
 	MAME_DIR .. "src/devices/machine/terminal.cpp",
@@ -3857,7 +3855,7 @@ end
 --
 ---------------------------------------------------
 
-if BUSES["ATA"] or BUSES["SCSI"] then
+if BUSES["ATA"] then
 	MACHINES["T10"] = true
 end
 
@@ -3865,8 +3863,6 @@ if MACHINES["T10"] then
 	files {
 		MAME_DIR .. "src/devices/machine/t10mmc.cpp",
 		MAME_DIR .. "src/devices/machine/t10mmc.h",
-		MAME_DIR .. "src/devices/machine/t10sbc.cpp",
-		MAME_DIR .. "src/devices/machine/t10sbc.h",
 		MAME_DIR .. "src/devices/machine/t10spc.cpp",
 		MAME_DIR .. "src/devices/machine/t10spc.h",
 	}
