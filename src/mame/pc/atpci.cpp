@@ -35,6 +35,7 @@ public:
 
 	auto irq1() { return m_irq1_cb.bind(); }
 	auto irq8() { return m_irq8_cb.bind(); }
+	auto gate_a20() { return m_gate_a20_cb.bind(); }
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -48,6 +49,7 @@ private:
 	required_device<ds12885_device> m_rtc;
 	devcb_write_line m_irq1_cb;
 	devcb_write_line m_irq8_cb;
+	devcb_write_line m_gate_a20_cb;
 
 	void kbc_map(address_map &map) ATTR_COLD;
 	void rtc_map(address_map &map) ATTR_COLD;
@@ -65,6 +67,7 @@ at586_kbc_device::at586_kbc_device(const machine_config &mconfig, const char *ta
 	, m_rtc(*this, "rtc")
 	, m_irq1_cb(*this)
 	, m_irq8_cb(*this)
+	, m_gate_a20_cb(*this)
 {
 }
 
@@ -72,7 +75,7 @@ void at586_kbc_device::device_add_mconfig(machine_config &config)
 {
 	AT_KEYBOARD_CONTROLLER(config, m_keybc, XTAL(12'000'000));
 	m_keybc->hot_res().set_inputline(":maincpu", INPUT_LINE_RESET);
-	m_keybc->gate_a20().set_inputline(":maincpu", INPUT_LINE_A20);
+	m_keybc->gate_a20().set([this] (int state) { m_gate_a20_cb(state); });
 	m_keybc->kbd_irq().set([this] (int state) { m_irq1_cb(state); });
 	m_keybc->kbd_clk().set(m_pc_kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_keybc->kbd_data().set(m_pc_kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
@@ -191,7 +194,7 @@ void at586_state::at_softlists(machine_config &config)
 // tags of the PIIX4 functions, by PCI device number
 struct at586_piix4_tags
 {
-	const char *isa, *ide, *usb, *acpi, *acpi_pm, *smbus, *isabus, *pic_master, *kbc_irq1, *kbc_irq8;
+	const char *isa, *ide, *usb, *acpi, *acpi_pm, *smbus, *isabus, *pic_master, *isa_abs, *kbc_irq8;
 };
 
 constexpr at586_piix4_tags piix4_dev01 = {
@@ -232,7 +235,8 @@ void at586_state::at586_piix4(machine_config &config, const at586_piix4_tags &ta
 	ISA16_SLOT(config, "board4", 0, tags.isabus, pc_isa_onboard, "kbc", true).set_option_machine_config("kbc", [&tags] (device_t *device)
 	{
 		at586_kbc_device &kbc = downcast<at586_kbc_device &>(*device);
-		kbc.irq1().set(tags.kbc_irq1, FUNC(i82371eb_isa_device::pc_irq1_w));
+		kbc.irq1().set(tags.isa_abs, FUNC(i82371eb_isa_device::pc_irq1_w));
+		kbc.gate_a20().set(tags.isa_abs, FUNC(i82371eb_isa_device::a20gate_w));
 		kbc.irq8().set(tags.kbc_irq8, FUNC(pic8259_device::ir0_w));
 	});
 
