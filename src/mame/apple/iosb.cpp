@@ -26,6 +26,8 @@
 #include "emu.h"
 #include "iosb.h"
 
+#include "cpu/powerpc/ppc.h"
+
 #include "formats/ap_dsk35.h"
 
 #define LOG_TURBOSCSI   (1U << 1)
@@ -154,7 +156,8 @@ iosb_base::iosb_base(const machine_config &mconfig, device_type type, const char
 	m_scsi_dma_read_cycles(3),
 	m_scsi_dma_write_cycles(3),
 	m_scsi_dma_result(0),
-	m_scsi_second_half(false)
+	m_scsi_second_half(false),
+	m_scsi_stalled(false)
 {
 	std::fill(std::begin(m_iosb_regs), std::end(m_iosb_regs), 0);
 }
@@ -216,6 +219,8 @@ void iosb_base::device_start()
 	save_item(NAME(m_hdsel));
 	save_item(NAME(m_nubus_irqs));
 	save_item(NAME(m_iosb_regs));
+	save_item(NAME(m_scsi_stall_start));
+	save_item(NAME(m_scsi_stalled));
 }
 
 //-------------------------------------------------
@@ -228,6 +233,7 @@ void iosb_base::device_reset()
 	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
 
 	m_nubus_irqs = 0xff;
+	m_scsi_stalled = false;
 }
 
 TIMER_CALLBACK_MEMBER(iosb_base::mac_6015_tick)
@@ -546,11 +552,11 @@ u32 iosb_base::turboscsi_dma_r(offs_t offset, u32 mem_mask)
 	if (!m_drq)
 	{
 		// The real DAFB simply holds off /DTACK here, we simulate that
-		// by rewinding and repeating the instruction until DRQ is asserted.
-		RESTART_INSTRUCTION(m_maincpu);
-		m_maincpu->spin_until_time(attotime::from_usec(50));
+		// by rewinding and repeating the instruction until DRQ is asserted or, on the PowerPC, the access times out.
+		turboscsi_stall();
 		return 0xffff;
 	}
+	m_scsi_stalled = false;
 
 	LOGMASKED(LOG_TURBOSCSI, "dma_r mask %08x (%s)\n", mem_mask, machine().describe_context());
 
@@ -565,11 +571,11 @@ u32 iosb_base::turboscsi_dma_r(offs_t offset, u32 mem_mask)
 		if (!m_drq)
 		{
 			// The real DAFB simply holds off /DTACK here, we simulate that
-			// by rewinding and repeating the instruction until DRQ is asserted.
-			RESTART_INSTRUCTION(m_maincpu);
-			m_maincpu->spin_until_time(attotime::from_usec(50));
+			// by rewinding and repeating the instruction until DRQ is asserted or, on the PowerPC, the access times out.
+			turboscsi_stall();
 			return 0xffff;
 		}
+		m_scsi_stalled = false;
 
 		m_scsi_second_half = false;
 		m_scsi_dma_result |= m_ncr->dma16_swap_r();
@@ -625,6 +631,37 @@ void iosb_base::turboscsi_dma_w(offs_t offset, u32 data, u32 mem_mask)
 	{
 		fatalerror("IOSB: turboscsi_dma_w unhandled mask %08x\n", mem_mask);
 	}
+}
+
+void iosb_base::turboscsi_stall()
+{
+	auto *const ppc = dynamic_cast<ppc_device *>(&*m_maincpu);
+	if (!ppc)
+	{
+		RESTART_INSTRUCTION(m_maincpu);
+		m_maincpu->spin_until_time(attotime::from_usec(50));
+		return;
+	}
+
+	const attotime timeout = attotime::from_usec(40);
+
+	if (!m_scsi_stalled)
+	{
+		m_scsi_stalled = true;
+		m_scsi_stall_start = machine().time();
+	}
+
+	const attotime stalled = machine().time() - m_scsi_stall_start;
+	if (stalled >= timeout)
+	{
+		m_scsi_stalled = false;
+		m_scsi_second_half = false;
+		ppc->bus_error();
+		return;
+	}
+
+	ppc->retry_access();
+	ppc->spin_until_time(std::min(attotime::from_usec(50), timeout - stalled));
 }
 
 void iosb_base::scsi_drq_w(int state)
