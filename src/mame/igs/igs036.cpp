@@ -30,7 +30,7 @@ void igs036_cpu_device::onboard_peripherals(address_map &map)
 	// decryption, and stop before the checksum if it is clear.
 	//map(0xffff'fa08, 0xffff'fa0b).lr32(NAME([this] () -> u32 { return m_has_decrypted ? 4U : 0U; })).w(FUNC(m036_base_state::encryption_control_w));
 	map(0xffff'fa0c, 0xffff'fa0f).lr32(NAME([] () -> u32 { return 0x180; })).nopw(); // startup ready, as in pgm2.cpp
-	//map(0xffff'fc00, 0xffff'fcff).rw(FUNC(m036_base_state::encryption_r), FUNC(m036_base_state::encryption_w));
+	map(0xffff'fc00, 0xffff'fcff).rw(FUNC(igs036_cpu_device::encryption_r), FUNC(igs036_cpu_device::encryption_w));
 	map(0xffff'fd00, 0xffff'fd0b).nopw(); // TODO: reset controller
 	map(0xffff'fd20, 0xffff'fd27).nopw(); // TODO: real-time timer control
 	map(0xffff'fd28, 0xffff'fd2b).lr32(NAME([this] () -> u32 { return machine().time().seconds(); }));
@@ -50,6 +50,17 @@ void igs036_cpu_device::device_add_mconfig(machine_config &config)
 
 	ARM_AIC(config, m_arm_aic).irq_callback().set(FUNC(igs036_cpu_device::irq));
 }
+
+u8 igs036_cpu_device::encryption_r(offs_t offset)
+{
+	return m_encryption_table[offset];
+}
+
+void igs036_cpu_device::encryption_w(offs_t offset, u8 data)
+{
+	m_encryption_table[offset] = data;
+}
+
 
 u32 igs036_cpu_device::timer_clock(u32 channel) const
 {
@@ -149,6 +160,7 @@ void igs036_cpu_device::device_start()
 {
 	arm946es_cpu_device::device_start();
 
+	save_item(NAME(m_encryption_table));
 	save_item(NAME(m_tc_regs));
 	save_item(NAME(m_tc_enabled));
 	for (u32 i = 0; i < std::size(m_tc_timer); ++i)
@@ -158,6 +170,8 @@ void igs036_cpu_device::device_start()
 void igs036_cpu_device::device_reset()
 {
 	arm946es_cpu_device::device_reset();
+
+	std::fill(std::begin(m_encryption_table), std::end(m_encryption_table), 0);
 
 	for (u32 i = 0; i < 3; ++i)
 	{

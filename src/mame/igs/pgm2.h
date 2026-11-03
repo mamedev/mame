@@ -109,8 +109,6 @@ private:
 	u32 ddpdojt_speedup2_r();
 	u32 kov3_speedup_r();
 
-	u8 encryption_r(offs_t offset);
-	void encryption_w(offs_t offset, u8 data);
 	void encryption_do_w(u32 data);
 	void sprite_encryption_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
@@ -139,7 +137,6 @@ private:
 	void copy_sprites_from_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, u16 pri);
 
 	void common_encryption_init();
-	u8 m_encryption_table[0x100]{};
 	bool m_has_decrypted = false;    // so we only do it once.
 	bool m_has_decrypted_kov3_module = false;
 	u32 m_spritekey = 0;

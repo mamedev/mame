@@ -246,14 +246,11 @@ protected:
 private:
 	std::unique_ptr<u8 []> m_encrypted_copy;
 	memory_passthrough_handler m_idle_tap;
-	u8 m_encryption_table[0x100];
 	u8 m_active_key[0x100];
 	bool m_has_decrypted;
 
 	void install_idle_speedup() ATTR_COLD;
 	void restore_external_rom();
-	u8 encryption_r(offs_t offset) { return m_encryption_table[offset]; }
-	void encryption_w(offs_t offset, u8 data) { m_encryption_table[offset] = data; }
 	void encryption_control_w(offs_t offset, u32 data, u32 mem_mask = ~0U);
 
 	void screen_vblank(int state);
@@ -512,7 +509,6 @@ u32 m036_base_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 void m036_base_state::machine_start()
 {
-	save_item(NAME(m_encryption_table));
 	save_item(NAME(m_active_key));
 	save_item(NAME(m_has_decrypted));
 	save_item(NAME(m_key_select));
@@ -526,7 +522,6 @@ void m036_base_state::machine_start()
 
 void m036_base_state::machine_reset()
 {
-	std::fill(std::begin(m_encryption_table), std::end(m_encryption_table), 0);
 	std::fill(std::begin(m_active_key), std::end(m_active_key), 0);
 	m_has_decrypted = false;
 	m_key_select = 0xffff;
@@ -564,7 +559,11 @@ void m036_base_state::encryption_control_w(offs_t offset, u32 data, u32 mem_mask
 
 	m_has_decrypted = BIT(data, 2);
 	if (m_has_decrypted)
-		std::copy(std::begin(m_encryption_table), std::end(m_encryption_table), std::begin(m_active_key));
+	{
+		u8* key = m_maincpu->get_encryption_table();
+		for (int i = 0; i < 0x100; i++)
+			m_active_key[i] = key[i];
+	}
 	restore_external_rom();
 }
 
@@ -768,8 +767,6 @@ void m036_base_state::m036_boot_map(address_map &map)
 	// Several internal ROMs verify that bit 2 reads back set after enabling
 	// decryption, and stop before the checksum if it is clear.
 	map(0xffff'fa08, 0xffff'fa0b).lr32(NAME([this] () -> u32 { return m_has_decrypted ? 4U : 0U; })).w(FUNC(m036_base_state::encryption_control_w));
-
-	map(0xffff'fc00, 0xffff'fcff).rw(FUNC(m036_base_state::encryption_r), FUNC(m036_base_state::encryption_w));
 }
 
 

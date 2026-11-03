@@ -16,6 +16,8 @@ public:
 
 	void set_aic_irq(int level, int state) { m_arm_aic->set_irq(level, state); }
 
+	u8* get_encryption_table() { return m_encryption_table; }
+
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override;
@@ -27,6 +29,10 @@ private:
 	emu_timer *m_tc_timer[3];
 	u32 m_tc_regs[3][16];
 	bool m_tc_enabled[3];
+	u8 m_encryption_table[0x100];
+
+	u8 encryption_r(offs_t offset);
+	void encryption_w(offs_t offset, u8 data);
 
 	u32 timer_r(offs_t offset);
 	void timer_w(offs_t offset, u32 data, u32 mem_mask = ~0U);

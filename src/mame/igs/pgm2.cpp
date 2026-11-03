@@ -95,16 +95,6 @@
 #include "pgm2.h"
 
 
-u8 pgm2_state::encryption_r(offs_t offset)
-{
-	return m_encryption_table[offset];
-}
-
-void pgm2_state::encryption_w(offs_t offset, u8 data)
-{
-	m_encryption_table[offset] = data;
-}
-
 void pgm2_state::sprite_encryption_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_spritekey);
@@ -126,7 +116,7 @@ void pgm2_state::device_post_load()
 
 	if (m_has_decrypted)
 	{
-		igs036_decryptor decrypter(m_encryption_table);
+		igs036_decryptor decrypter(m_maincpu->get_encryption_table());
 
 		if (m_romboard_ram)
 		{
@@ -141,7 +131,7 @@ void pgm2_state::device_post_load()
 
 void pgm2_state::encryption_do_w(u32 data)
 {
-	igs036_decryptor decrypter(m_encryption_table);
+	igs036_decryptor decrypter(m_maincpu->get_encryption_table());
 	if (m_romboard_ram)
 	{
 		decrypter.decrypter_rom((u16*)&m_romboard_ram[0], m_romboard_ram.bytes(), 0);
@@ -542,7 +532,6 @@ void pgm2_state::pgm2_map(address_map &map)
 
 	// custom IGS036 stuff starts here
 	map(0xfffffa08, 0xfffffa0b).w(FUNC(pgm2_state::encryption_do_w)); // after uploading encryption? table might actually send it or enable external ROM? when read bits0-1 called FUSE 0 and 1, must be 0
-map(0xfffffc00, 0xfffffcff).rw(FUNC(pgm2_state::encryption_r), FUNC(pgm2_state::encryption_w));
 }
 
 
@@ -658,7 +647,6 @@ INPUT_PORTS_END
 
 void pgm2_state::machine_start()
 {
-	save_item(NAME(m_encryption_table));
 	save_item(NAME(m_has_decrypted));
 	save_item(NAME(m_has_decrypted_kov3_module));
 	save_item(NAME(m_spritekey));
