@@ -227,7 +227,6 @@ static const md_slot slot_list[] =
 
 	{ SEGA_EEPROM, "rom_eeprom" },
 	{ NBA_JAM, "rom_nbajam" },
-	{ NBA_JAM_ALT, "rom_nbajam_alt" },
 	{ NBA_JAM_TE, "rom_nbajamte" },
 	{ NFL_QB_96, "rom_nflqb96" },
 	{ C_SLAM, "rom_cslam" },
@@ -661,9 +660,6 @@ void base_md_cart_slot_device::setup_nvram()
 			m_cart->m_nvram_end = m_cart->m_nvram_start + 0xfffff;
 			m_cart->nvram_alloc(0x8000/2); // 32K mirrored
 			m_cart->m_nvram_active = 1;
-			break;
-		case NBA_JAM_ALT:
-			m_cart->nvram_alloc(0x100);
 			break;
 	}
 }

@@ -73,6 +73,20 @@ void megadrive_eeprom_nbajam_device::device_add_mconfig(machine_config &config)
 	I2C_24C02(config, m_i2cmem);
 }
 
+void megadrive_eeprom_nbajam_device::cart_map(address_map &map)
+{
+	map(0x00'0000, m_rom_mask).mirror(m_rom_mirror).bankr(m_rom);
+	map(0x20'0001, 0x20'0001).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_i2cmem->read_sda();
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_i2cmem->write_scl(BIT(data, 0));
+			m_i2cmem->write_sda(BIT(data, 0));
+		})
+	);
+}
+
 /*
  * nbajamte NBA Jam TE (MD and 32x versions)
  * nflqb    NFL Quarterback Club
