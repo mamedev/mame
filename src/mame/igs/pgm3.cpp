@@ -1185,7 +1185,7 @@ void pgm3_state::pgm3(machine_config &config)
 	m_sdhc[1]->irq_callback().set(m_vic[1], FUNC(vic_pl192_device::irq_w<3>));
 	m_sdhc[2]->irq_callback().set(m_vic[1], FUNC(vic_pl192_device::irq_w<4>));
 
-	MALI200(config, m_mali, 200000000);
+	MALI200(config, m_mali, 200'000'000);
 	m_mali->set_dma_space(m_maincpu, AS_PROGRAM);
 	// All physical access boundaries and remap views are 4 KiB aligned.
 	m_mali->dma_page_permissions_callback().set(FUNC(pgm3_state::spacc_dma_permissions));
@@ -1193,7 +1193,7 @@ void pgm3_state::pgm3(machine_config &config)
 	m_mali->gp_irq_callback().set(m_vic[1], FUNC(vic_pl192_device::irq_w<9>));
 	m_mali->pp_irq_callback().set(m_vic[1], FUNC(vic_pl192_device::irq_w<10>));
 
-	HANTRO_G1(config, m_hantro, 200000000); // functional timing; clock unverified
+	HANTRO_G1(config, m_hantro, 200'000'000); // functional timing; clock unverified
 	m_hantro->set_dma_space(m_maincpu, AS_PROGRAM);
 	m_hantro->irq_callback().set(m_vic[0], FUNC(vic_pl192_device::irq_w<26>));
 

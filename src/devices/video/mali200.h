@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <array>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -13,13 +14,15 @@
 class mali200_device : public device_t
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
 	mali200_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	template <typename T> void set_dma_space(T &&tag, int space) { m_dma.set_tag(std::forward<T>(tag), space); }
 
-	// Physical bus access for an entire aligned 4 KiB page: bit 0 read,
-	// bit 1 write. The integration must keep it stable within a synchronous
-	// GPU callback; the CPU cannot change mappings during that callback.
+	// Optional host bus permissions for an aligned 4 KiB page: bit 0 read,
+	// bit 1 write, default both. Use only for physical bus restrictions;
+	// GPU MMU permissions are checked separately. Stable for each GPU job.
 	auto dma_page_permissions_callback() { return m_dma_page_permissions.bind(); }
 	auto pp_irq_callback() { return m_pp_irq.bind(); }
 	auto gp_irq_callback() { return m_gp_irq.bind(); }
@@ -28,8 +31,9 @@ public:
 	void map(address_map &map) ATTR_COLD;
 
 protected:
-	void device_start() override ATTR_COLD;
-	void device_reset() override ATTR_COLD;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	struct pp_fragment
@@ -37,7 +41,7 @@ private:
 		// Only configured components are interpolated. Shader fetches return
 		// zero for the others without clearing all 64 entries for every pixel.
 		float varying[64], coordinate[4]{}, color[4]{};
-		unsigned varying_count = 0;
+		u32 varying_count = 0;
 		float depth = 0;
 		bool front = true, discard = false;
 	};
@@ -49,17 +53,17 @@ private:
 		u32 upper[12]{};
 		float constant[2][4]{};
 		u32 control = 0;
-		unsigned count = 0, fields = 0;
+		u32 count = 0, fields = 0;
 		bool texture_copy = false;
-		unsigned texture_sampler = 0, texture_varying = 0, texture_components = 0, texture_destination = 0;
+		u32 texture_sampler = 0, texture_varying = 0, texture_components = 0, texture_destination = 0;
 	};
 
 	struct pp_texture_state
 	{
 		u32 address = 0;
 		u32 base[11]{};
-		unsigned format = 0, layout = 0, max_level = 0, width = 0, height = 0;
-		unsigned size = 0, stride = 0, wrap_s = 0, wrap_t = 0, range = 0;
+		u32 format = 0, layout = 0, max_level = 0, width = 0, height = 0;
+		u32 size = 0, stride = 0, wrap_s = 0, wrap_t = 0, range = 0;
 		bool compressed = false, explicit_stride = false, unnormalized = false;
 		bool reverse = false, swap_rb = false, nearest_min = false, nearest_mag = false;
 		float border[4]{};
@@ -67,7 +71,7 @@ private:
 
 	struct pp_tile
 	{
-		unsigned x = 0, y = 0;
+		u32 x = 0, y = 0;
 		u32 scissor[4] = { 0, 32767, 0, 32767 };
 		float color[256][4]{}, depth[256]{};
 		u8 stencil[256]{};
@@ -88,33 +92,31 @@ private:
 	void begin_dma_cache();
 	void pp_command(u32 command);
 	void gp_command(u32 command);
-	bool translate(u32 address, bool write, u32 &physical, unsigned bus);
-	bool read_word(u32 address, u32 &data, unsigned bus);
-	bool write_word(u32 address, u32 data, unsigned bus);
-	bool read_bytes(u32 address, unsigned size, u32 &data, unsigned bus);
-	bool write_bytes(u32 address, unsigned size, u32 data, unsigned bus);
+	bool translate(u32 address, bool write, u32 &physical, u32 bus);
+	bool read_word(u32 address, u32 &data, u32 bus);
+	bool write_word(u32 address, u32 data, u32 bus);
+	bool read_bytes(u32 address, u32 size, u32 &data, u32 bus);
+	bool write_bytes(u32 address, u32 size, u32 data, u32 bus);
 	bool vs_commands();
 	bool plb_commands();
 	bool vs_vertex(u32 vertex);
-	bool vs_input(unsigned stream, u32 vertex, float *value);
-	bool vs_output(unsigned stream, u32 vertex, float const *value);
+	bool vs_input(u32 stream, u32 vertex, float *value);
+	bool vs_output(u32 stream, u32 vertex, float const *value);
 
 	bool pp_shader(u32 const *state, pp_fragment &fragment, bool &constant);
-	bool pp_texture(u32 const *state, unsigned sampler, float const *coordinate, float lod, float *color);
+	bool pp_texture(u32 const *state, u32 sampler, float const *coordinate, float lod, float *color);
 	bool pp_render();
 	bool pp_writeback(pp_tile const &tile);
 	bool pp_primitive(pp_tile &tile, u32 state_address, u32 vertex_address, u32 const *indices, bool rectangle);
-	void trace_list(char const *name, u32 start, u32 end, unsigned bus);
 	TIMER_CALLBACK_MEMBER(pp_run);
 	TIMER_CALLBACK_MEMBER(gp_run);
 
 	required_address_space m_dma;
-	// Framework address-handler cache: mappings, taps and device accesses
-	// retain their normal semantics; this does not cache the memory data.
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_dma_access;
 	devcb_read8 m_dma_page_permissions;
 	devcb_write_line m_pp_irq, m_gp_irq, m_mmu_irq;
 	emu_timer *m_pp_timer, *m_gp_timer;
+	bool m_pp_irq_state, m_gp_irq_state, m_mmu_irq_state;
 	u32 m_pp[0x1100 / 4];
 	u32 m_gp[0x100 / 4];
 	u32 m_mmu[9];
@@ -129,17 +131,12 @@ private:
 	u32 m_plb_scissor[2];
 	bool m_plb_scissor_set;
 	u64 m_plb_append_done;
-	// Host-side decode caches live only during one synchronous PP callback.
-	// They are rebuilt for each job and therefore are not save-state data.
+	// Decode and page-walk caches are rebuilt for each synchronous GPU job.
 	std::unordered_map<u32, pp_instruction> m_pp_instructions;
 	std::unordered_map<u32, pp_texture_state> m_pp_textures;
-	// Small front caches avoid hashing the same shader/descriptor for every
-	// fragment. The maps still own entries for the whole job; rehashing does
-	// not invalidate references, and collisions only replace these pointers.
 	std::array<pp_instruction *, 64> m_pp_instruction_cache;
 	std::array<pp_texture_state *, 64> m_pp_texture_cache;
-	// CPU execution cannot interleave with a synchronous rendering callback.
-	// Cache its page walks, invalidating if GPU writes touch a walked table.
+	// GPU writes to a walked page table invalidate the translation cache.
 	bool m_dma_cache_active;
 	std::array<u32, 1024> m_dma_page_tags, m_dma_page_entries;
 	std::array<u8, 1024> m_dma_page_access;

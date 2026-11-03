@@ -5,10 +5,10 @@
 
 namespace
 {
-unsigned mali_uorder(unsigned x, unsigned y, unsigned bits)
+u32 mali_uorder(u32 x, u32 y, u32 bits)
 {
-	unsigned offset = 0;
-	for (unsigned bit = 0; bit < bits; ++bit)
+	u32 offset = 0;
+	for (u32 bit = 0; bit < bits; ++bit)
 	{
 		offset |= ((x ^ y) & (1U << bit)) << bit;
 		offset |= (y & (1U << bit)) << (bit + 1);
@@ -16,20 +16,20 @@ unsigned mali_uorder(unsigned x, unsigned y, unsigned bits)
 	return offset;
 }
 
-void mali_etc1(u32 low_address, u32 high_address, unsigned x, unsigned y, float *color)
+void mali_etc1(u32 low_address, u32 high_address, u32 x, u32 y, float *color)
 {
 	// ETC1 blocks are eight bytes in big-endian bit order, independently of
 	// the CPU/GPU bus byte order.  Khronos OES_compressed_ETC1_RGB8_texture.
 	u32 const header = swapendian_int32(low_address);
 	u32 const indices = swapendian_int32(high_address);
-	unsigned const subblock = BIT(header, 0) ? (y >> 1) : (x >> 1);
-	unsigned const table = (header >> (subblock ? 2 : 5)) & 7;
-	unsigned const bit = x * 4 + y;
+	u32 const subblock = BIT(header, 0) ? (y >> 1) : (x >> 1);
+	u32 const table = (header >> (subblock ? 2 : 5)) & 7;
+	u32 const bit = x * 4 + y;
 	static constexpr int MODIFIERS[8][2] = { { 2, 8 }, { 5, 17 }, { 9, 29 }, { 13, 42 }, { 18, 60 }, { 24, 80 }, { 33, 106 }, { 47, 183 } };
 	int const modifier = MODIFIERS[table][BIT(indices, bit)] * (BIT(indices, bit + 16) ? -1 : 1);
-	for (unsigned c = 0; c < 3; ++c)
+	for (u32 c = 0; c < 3; ++c)
 	{
-		unsigned const shift = 24 - c * 8;
+		u32 const shift = 24 - c * 8;
 		int base;
 		if (BIT(header, 1))
 		{
@@ -48,7 +48,7 @@ void mali_etc1(u32 low_address, u32 high_address, unsigned x, unsigned y, float 
 }
 }
 
-bool mali200_device::pp_texture(u32 const *state, unsigned sampler, float const *coordinate, float lod, float *color)
+bool mali200_device::pp_texture(u32 const *state, u32 sampler, float const *coordinate, float lod, float *color)
 {
 	if (sampler >= 16)
 		return false;
@@ -68,10 +68,10 @@ bool mali200_device::pp_texture(u32 const *state, unsigned sampler, float const 
 		u32 descriptor_address, descriptor[16];
 		if (!read_word(pointer_address, descriptor_address, 3))
 			return false;
-		for (unsigned i = 0; i < 16; ++i)
+		for (u32 i = 0; i < 16; ++i)
 			if (!read_word((descriptor_address & ~63U) + i * 4, descriptor[i], 3))
 				return false;
-		auto f = [&](unsigned start, unsigned width)
+		auto const f = [&descriptor] (u32 start, u32 width)
 		{
 			return mali_field(descriptor, start, width);
 		};
@@ -80,9 +80,9 @@ bool mali200_device::pp_texture(u32 const *state, unsigned sampler, float const 
 		texture.max_level = std::min(10U, f(52, 8) / 16);
 		texture.width = f(86, 13);
 		texture.height = f(99, 13);
-		for (unsigned level = 0; level < 11; ++level)
+		for (u32 level = 0; level < 11; ++level)
 			texture.base[level] = f(222 + level * 26, 26) << 6;
-		unsigned const format = texture.format;
+		u32 const format = texture.format;
 		texture.compressed = format == 0x20;
 		texture.size = texture.compressed ? 8
 				: format >= 0x09 && format <= 0x0b ? 1
@@ -101,20 +101,20 @@ bool mali200_device::pp_texture(u32 const *state, unsigned sampler, float const 
 		texture.range = f(8, 2);
 		texture.nearest_min = f(75, 1);
 		texture.nearest_mag = f(76, 1);
-		for (unsigned c = 0; c < 4; ++c)
+		for (u32 c = 0; c < 4; ++c)
 			texture.border[c] = f(125 + 16 * c, 16) / 65535.0f;
 	}
-	unsigned const format = texture.format, layout = texture.layout;
-	unsigned const level = std::clamp(int(std::floor(lod + 0.5f)), 0, int(texture.max_level));
-	unsigned const width = std::max(1U, texture.width >> level), height = std::max(1U, texture.height >> level);
+	u32 const format = texture.format, layout = texture.layout;
+	u32 const level = mali_to_integer(std::floor(lod + 0.5f), 0, texture.max_level);
+	u32 const width = std::max(1U, texture.width >> level), height = std::max(1U, texture.height >> level);
 	if (width > 4096 || height > 4096)
 		return false;
 	u32 const base = texture.base[level];
 	bool const compressed = texture.compressed;
-	unsigned const size = texture.size;
+	u32 const size = texture.size;
 	// The implicit linear pitch is the packed texel row. Bus beat alignment
 	// does not add padding between rows; padded surfaces specify a stride.
-	unsigned const stride = texture.explicit_stride ? texture.stride : (compressed ? (width + 3) / 4 : width) * size;
+	u32 const stride = texture.explicit_stride ? texture.stride : (compressed ? (width + 3) / 4 : width) * size;
 	float u = coordinate[0], v = coordinate[1];
 	if (!std::isfinite(u) || !std::isfinite(v))
 	{
@@ -126,14 +126,13 @@ bool mali200_device::pp_texture(u32 const *state, unsigned sampler, float const 
 		u *= width;
 		v *= height;
 	}
-	u = std::clamp(u, -1073741824.0f, 1073741824.0f);
-	v = std::clamp(v, -1073741824.0f, 1073741824.0f);
-	auto wrap = [](int position, unsigned size, unsigned mode, bool &border) -> unsigned
+	u = std::clamp(u, -1'073'741'824.0f, 1'073'741'824.0f);
+	v = std::clamp(v, -1'073'741'824.0f, 1'073'741'824.0f);
+	auto const wrap = [] (int position, u32 size, u32 mode, bool &border) -> u32
 	{
-		// Every supported wrap mode leaves an in-range coordinate unchanged.
-		// Most samples take this path, avoiding repeat/mirror divisions.
-		if (unsigned(position) < size)
-			return unsigned(position);
+		// In-range coordinates are unchanged by all supported wrap modes.
+		if (u32(position) < size)
+			return u32(position);
 		if (mode == 4)
 		{
 			int const period = int(size) * 2;
@@ -151,13 +150,13 @@ bool mali200_device::pp_texture(u32 const *state, unsigned sampler, float const 
 			border = true;
 		return std::clamp(position, 0, int(size) - 1);
 	};
-	auto texel = [&](int sx, int sy, float *result) -> bool
+	auto const texel = [this, &wrap, width, height, &texture, layout, base, compressed, stride, size, format] (int sx, int sy, float *result) -> bool
 	{
 		bool border = false;
-		unsigned const x = wrap(sx, width, texture.wrap_s, border), y = wrap(sy, height, texture.wrap_t, border);
+		u32 const x = wrap(sx, width, texture.wrap_s, border), y = wrap(sy, height, texture.wrap_t, border);
 		if (border)
 		{
-			for (unsigned c = 0; c < 4; ++c)
+			for (u32 c = 0; c < 4; ++c)
 				result[c] = texture.border[c];
 			return true;
 		}
@@ -167,7 +166,7 @@ bool mali200_device::pp_texture(u32 const *state, unsigned sampler, float const 
 		else if (layout == 3)
 		{
 			// A 16x16 tile contains sixteen 4x4 ETC1 blocks, in U order.
-			unsigned const index = compressed ? mali_uorder((x >> 2) & 3, (y >> 2) & 3, 2) : mali_uorder(x & 15, y & 15, 4);
+			u32 const index = compressed ? mali_uorder((x >> 2) & 3, (y >> 2) & 3, 2) : mali_uorder(x & 15, y & 15, 4);
 			address = base + (((y >> 4) * ((width + 15) >> 4) + (x >> 4)) * (compressed ? 16 : 256) + index) * size;
 		}
 		else
@@ -226,7 +225,7 @@ bool mali200_device::pp_texture(u32 const *state, unsigned sampler, float const 
 		case 0x15:
 		case 0x16:
 		case 0x17:
-			for (unsigned c = 0; c < (format == 0x16 ? 4U : 3U); ++c)
+			for (u32 c = 0; c < (format == 0x16 ? 4U : 3U); ++c)
 				result[c] = ((data >> (8 * c)) & 255) / 255.0f;
 			break;
 		case 0x20:
@@ -254,7 +253,7 @@ bool mali200_device::pp_texture(u32 const *state, unsigned sampler, float const 
 				result[3] = mali_half(upper >> 16);
 			break;
 		case 0x2c:
-			result[0] = result[1] = result[2] = (data >> 8) / 16777215.0f;
+			result[0] = result[1] = result[2] = (data >> 8) / 16'777'215.0f;
 			break;
 		default:
 			logerror("unsupported Mali texel format %02x\n", format);
@@ -265,7 +264,7 @@ bool mali200_device::pp_texture(u32 const *state, unsigned sampler, float const 
 		if (texture.swap_rb)
 			std::swap(result[0], result[2]);
 		if (texture.range == 3)
-			for (unsigned c = 0; c < 4; ++c)
+			for (u32 c = 0; c < 4; ++c)
 				result[c] = 1 - result[c];
 		else if (texture.range != 0)
 		{
@@ -276,15 +275,15 @@ bool mali200_device::pp_texture(u32 const *state, unsigned sampler, float const 
 	};
 	bool const nearest = lod > 0 ? texture.nearest_min : texture.nearest_mag;
 	if (nearest)
-		return texel(int(std::floor(u)), int(std::floor(v)), color);
+		return texel(mali_to_integer(std::floor(u)), mali_to_integer(std::floor(v)), color);
 	float const x = u - 0.5f, y = v - 0.5f;
-	int const ix = std::floor(x), iy = std::floor(y);
+	int const ix = mali_to_integer(std::floor(x)), iy = mali_to_integer(std::floor(y));
 	float const fx = x - ix, fy = y - iy;
 	float samples[4][4];
 	if (!texel(ix, iy, samples[0]) || !texel(ix + 1, iy, samples[1]) || !texel(ix, iy + 1, samples[2]) ||
 			!texel(ix + 1, iy + 1, samples[3]))
 		return false;
-	for (unsigned c = 0; c < 4; ++c)
+	for (u32 c = 0; c < 4; ++c)
 		color[c] = (samples[0][c] * (1 - fx) + samples[1][c] * fx) * (1 - fy) + (samples[2][c] * (1 - fx) + samples[3][c] * fx) * fy;
 	return true;
 }
