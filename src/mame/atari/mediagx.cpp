@@ -70,7 +70,7 @@
 #include "pcshare.h"
 
 #include "cpu/i386/i386.h"
-#include "machine/lpci.h"
+#include "machine/cx5510.h"
 #include "machine/pc_lpt.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
@@ -149,23 +149,6 @@ private:
 	void mediagx_map(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
 
-	uint32_t cx5510_pci_r(int function, int reg, uint32_t mem_mask)
-	{
-		//osd_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
-		switch (reg)
-		{
-			case 0:     return 0x00001078;
-		}
-
-		return m_cx5510_regs[reg/4];
-	}
-
-	void cx5510_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
-	{
-		//osd_printf_debug("CX5510: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
-		COMBINE_DATA(&m_cx5510_regs[reg/4]);
-	}
-
 	required_device<ide_controller_32_device> m_ide;
 	required_device<ramdac_device> m_ramdac;
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
@@ -200,8 +183,6 @@ private:
 	//int m_control_num = 0;
 	//int m_control_num2 = 0;
 	//int m_control_read = 0;
-
-	uint32_t m_cx5510_regs[256/4]{};
 
 	std::unique_ptr<int16_t[]> m_dacl;
 	std::unique_ptr<int16_t[]> m_dacr;
@@ -768,7 +749,6 @@ void mediagx_state::mediagx_io(address_map &map)
 	map(0x03bc, 0x03bf).rw(m_lpt0, FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write)).umask16(0x00ff);
 	map(0x03f0, 0x03f7).rw(m_ide, FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 	map(0x0400, 0x04ff).rw(FUNC(mediagx_state::ad1847_r), FUNC(mediagx_state::ad1847_w));
-	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 }
 
 /*****************************************************************************/
@@ -890,8 +870,8 @@ void mediagx_state::mediagx(machine_config &config)
 
 	pcat_common(config);
 
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device(18, FUNC(mediagx_state::cx5510_pci_r), FUNC(mediagx_state::cx5510_pci_w));
+	PCI_ROOT(config, "pci");
+	CX5510(config, "pci:12.0", m_maincpu);
 
 	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set(m_pic8259_2, FUNC(pic8259_device::ir6_w));
