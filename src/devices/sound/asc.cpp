@@ -75,7 +75,7 @@
     - EASC doesn't implement the channel volumes yet because Mac OS doesn't use them
     - PrimeTime III records silence from DFAC2's output loopback sources
     - PrimeTime III IRQ acknowledgement during simultaneous playback/recording is untested on hardware
-    - PrimeTime III byte accesses to the 16-bit window and negative-sample volume distortion haven't been investigated
+    - PrimeTime III byte reads of the 16-bit window and negative-sample volume distortion haven't been investigated
     - Recording on the other variants hasn't been investigated
 
 ***************************************************************************/
@@ -1408,7 +1408,7 @@ void asc_primetime3_device::device_start()
 	m_sample_rate = clock() / 2048;
 	asc_base_device::device_start();
 
-	save_item(NAME(m_fifo16));
+	save_item(NAME(m_fifo8));
 	save_item(NAME(m_rdptr16));
 	save_item(NAME(m_wrptr16));
 	save_item(NAME(m_full));
@@ -1422,7 +1422,7 @@ void asc_primetime3_device::device_reset()
 {
 	asc_base_device::device_reset();
 
-	for (auto &fifo : m_fifo16)
+	for (auto &fifo : m_fifo8)
 		std::fill(std::begin(fifo), std::end(fifo), 0);
 	reset_fifos();
 	m_regs[R_FIFOA_IRQCTRL] = m_regs[R_FIFOB_IRQCTRL] = 1;
@@ -1449,19 +1449,25 @@ u16 asc_primetime3_device::fifo_cap(int f) const
 	return m_full[f] ? FIFO_BYTES : ((m_wrptr16[f] - m_rdptr16[f]) & FIFO_PTR_MASK);
 }
 
-void asc_primetime3_device::push_sample(int f, s16 sample)
+void asc_primetime3_device::push_byte(int f, u8 data)
 {
 	if (!m_full[f])
 	{
-		m_fifo16[f][(m_wrptr16[f] >> 1) & (FIFO_SAMPLES - 1)] = sample;
-		m_wrptr16[f] = (m_wrptr16[f] + 2) & FIFO_PTR_MASK;
+		m_fifo8[f][m_wrptr16[f]] = data;
+		m_wrptr16[f] = (m_wrptr16[f] + 1) & FIFO_PTR_MASK;
 		m_full[f] = (m_wrptr16[f] == m_rdptr16[f]);
 	}
 }
 
+void asc_primetime3_device::push_sample(int f, s16 sample)
+{
+	push_byte(f, u16(sample) >> 8);
+	push_byte(f, u8(sample));
+}
+
 s16 asc_primetime3_device::pop_sample(int f)
 {
-	const s16 sample = m_fifo16[f][(m_rdptr16[f] >> 1) & (FIFO_SAMPLES - 1)];
+	const s16 sample = s16((m_fifo8[f][m_rdptr16[f]] << 8) | m_fifo8[f][(m_rdptr16[f] + 1) & FIFO_PTR_MASK]);
 	m_rdptr16[f] = (m_rdptr16[f] + 2) & FIFO_PTR_MASK;
 	m_full[f] = false;
 	return sample;
@@ -1484,15 +1490,17 @@ void asc_primetime3_device::update_status16()
 		}
 	}
 
-	if (fifo_cap(FIFO_B) <= FIFO_HALF_BYTES)
+	if ((fifo_cap(FIFO_A) <= FIFO_HALF_BYTES) && (fifo_cap(FIFO_B) <= FIFO_HALF_BYTES))
 	{
 		st |= STAT_HALF_FULL_B;
 	}
 
-	if ((fifo_cap(FIFO_B) == 0) || m_full[FIFO_B])
+	if (((fifo_cap(FIFO_A) == 0) || m_full[FIFO_A]) && ((fifo_cap(FIFO_B) == 0) || m_full[FIFO_B]))
 	{
 		st |= STAT_EMPTY_OR_FULL_B;
 	}
+
+	m_irq_pending &= st;
 
 	if ((st & STAT_HALF_FULL_B) && !(m_laststat & STAT_HALF_FULL_B) && !(m_regs[R_FIFOB_IRQCTRL] & 1))
 	{
@@ -1515,8 +1523,9 @@ void asc_primetime3_device::update_fifo_timer()
 	u32 samples = FIFO_SAMPLES;
 	if (recording() && !(m_regs[R_FIFOA_IRQCTRL] & 1) && !(m_irq_pending & STAT_HALF_FULL_A) && (fifo_cap(FIFO_REC) < FIFO_HALF_BYTES))
 		samples = (FIFO_HALF_BYTES - fifo_cap(FIFO_REC) + 1) / 2;
-	if (m_regs[R_MODE] && !(m_regs[R_FIFOB_IRQCTRL] & 1) && !(m_irq_pending & STAT_HALF_FULL_B) && (fifo_cap(FIFO_B) > FIFO_HALF_BYTES))
-		samples = std::min<u32>(samples, (fifo_cap(FIFO_B) - FIFO_HALF_BYTES + 1) / 2);
+	const u16 playback = std::max(fifo_cap(FIFO_A), fifo_cap(FIFO_B));
+	if (m_regs[R_MODE] && !(m_regs[R_FIFOB_IRQCTRL] & 1) && !(m_irq_pending & STAT_HALF_FULL_B) && (playback > FIFO_HALF_BYTES))
+		samples = std::min<u32>(samples, (playback - FIFO_HALF_BYTES + 1) / 2);
 
 	m_timer->adjust((samples == FIFO_SAMPLES) ? attotime::never :
 		m_stream->sample_to_time(m_stream->end_index() + samples - 1) - machine().time());
@@ -1531,7 +1540,19 @@ u16 asc_primetime3_device::read16(offs_t offset)
 		return pop_record();
 	}
 
-	return u16(m_fifo16[ch][(m_rdptr16[ch] >> 1) & (FIFO_SAMPLES - 1)]);
+	return (m_fifo8[ch][m_rdptr16[ch]] << 8) | m_fifo8[ch][(m_rdptr16[ch] + 1) & FIFO_PTR_MASK];
+}
+
+int asc_primetime3_device::pointer_fifo(offs_t offset) const
+{
+	return (offset >= 0xf2a) ? FIFO_A : BIT(offset, 5) ? FIFO_B : FIFO_REC;
+}
+
+u16 &asc_primetime3_device::pointer(offs_t offset)
+{
+	const int f = pointer_fifo(offset);
+	const bool read = BIT((f == FIFO_A) ? (offset - 0xf2a) : offset, 1);
+	return read ? m_rdptr16[f] : m_wrptr16[f];
 }
 
 u16 asc_primetime3_device::pop_record()
@@ -1539,7 +1560,7 @@ u16 asc_primetime3_device::pop_record()
 	if (!machine().side_effects_disabled())
 	{
 		m_stream->update();
-		if (fifo_cap(FIFO_REC))
+		if (fifo_cap(FIFO_REC) >= 2)
 		{
 			m_rec_last = u16(pop_sample(FIFO_REC));
 			update_status16();
@@ -1552,7 +1573,10 @@ u16 asc_primetime3_device::pop_record()
 void asc_primetime3_device::write16(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_stream->update();
-	push_sample(BIT(offset, 10), s16(data & mem_mask));
+	if (ACCESSING_BITS_8_15)
+		push_byte(BIT(offset, 10), data >> 8);
+	if (ACCESSING_BITS_0_7)
+		push_byte(BIT(offset, 10), u8(data));
 	update_status16();
 }
 
@@ -1569,7 +1593,7 @@ void asc_primetime3_device::sound_stream_update(sound_stream &stream)
 			push_sample(FIFO_REC, s16(u16(std::clamp(int(in * 32768.0), -32768, 32767)) ^ 0x8000));
 		}
 
-		const bool have_left = fifo_cap(FIFO_A) != 0;
+		const bool have_left = fifo_cap(FIFO_A) >= 2;
 		if (m_regs[R_MODE] != 0)
 		{
 			if (have_left)
@@ -1577,7 +1601,7 @@ void asc_primetime3_device::sound_stream_update(sound_stream &stream)
 				m_last_left = pop_sample(FIFO_A);
 			}
 
-			if (fifo_cap(FIFO_B))
+			if (fifo_cap(FIFO_B) >= 2)
 			{
 				m_last_right = pop_sample(FIFO_B);
 			}
@@ -1613,12 +1637,7 @@ u8 asc_primetime3_device::read(offs_t offset)
 	{
 		case R_FIFOSTAT:
 			if (!machine().side_effects_disabled())
-			{
 				m_stream->update();
-				m_irq_pending &= m_regs[R_FIFOSTAT];
-				set_irq_line(m_irq_pending ? ASSERT_LINE : CLEAR_LINE);
-				update_fifo_timer();
-			}
 			return m_regs[R_FIFOSTAT];
 
 		case R_FIFOA_IRQCTRL:
@@ -1637,16 +1656,20 @@ u8 asc_primetime3_device::read(offs_t offset)
 		case R_WRPTRB_L:
 		case R_RDPTRB_H:
 		case R_RDPTRB_L:
+		case R_WRPTRPLAYA_H:
+		case R_WRPTRPLAYA_L:
+		case R_RDPTRPLAYA_H:
+		case R_RDPTRPLAYA_L:
 		{
 			if (!machine().side_effects_disabled())
 				m_stream->update();
-			const int f = BIT(offset, 5) ? FIFO_B : FIFO_REC;
-			const u16 ptr = BIT(offset, 1) ? m_rdptr16[f] : m_wrptr16[f];
+			const u16 ptr = pointer(offset);
 			return BIT(offset, 0) ? u8(ptr) : u8(ptr >> 8);
 		}
 
 		case 0xf0f - 0x800:
-			return m_regs[0xf0f - 0x800] & 0x0f;
+		case 0xf2f - 0x800:
+			return m_regs[offset - 0x800] & 0x0f;
 
 		case R_CLOCK:
 		case R_FIFOMODE:
@@ -1734,15 +1757,18 @@ void asc_primetime3_device::write(offs_t offset, u8 data)
 		case R_WRPTRB_L:
 		case R_RDPTRB_H:
 		case R_RDPTRB_L:
+		case R_WRPTRPLAYA_H:
+		case R_WRPTRPLAYA_L:
+		case R_RDPTRPLAYA_H:
+		case R_RDPTRPLAYA_L:
 		{
 			m_stream->update();
-			const int f = BIT(offset, 5) ? FIFO_B : FIFO_REC;
-			u16 &ptr = BIT(offset, 1) ? m_rdptr16[f] : m_wrptr16[f];
+			u16 &ptr = pointer(offset);
 			if (BIT(offset, 0))
 				ptr = (ptr & 0x700) | data;
 			else
 				ptr = (ptr & 0x0ff) | ((data & 7) << 8);
-			m_full[f] = false;
+			m_full[pointer_fifo(offset)] = false;
 			update_status16();
 			return;
 		}

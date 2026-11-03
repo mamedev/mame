@@ -248,20 +248,27 @@ private:
 	enum
 	{
 		R_COUNTA = 0xf0e - 0x800,
-		R_COUNTB = 0xf2e - 0x800
+		R_COUNTB = 0xf2e - 0x800,
+		R_WRPTRPLAYA_H = 0xf2a - 0x800,
+		R_WRPTRPLAYA_L,
+		R_RDPTRPLAYA_H,
+		R_RDPTRPLAYA_L
 	};
 
 	void reset_fifos();
 	u16 fifo_cap(int f) const;
+	void push_byte(int f, u8 data);
 	void push_sample(int f, s16 sample);
 	s16 pop_sample(int f);
 	void update_status16();
 	void update_fifo_timer();
 	u8 counter_value() const;
 	u16 pop_record();
+	int pointer_fifo(offs_t offset) const;
+	u16 &pointer(offs_t offset);
 	bool recording() const { return BIT(m_regs[R_PLAYRECA], 0); }
 
-	s16 m_fifo16[3][FIFO_SAMPLES]{};
+	u8 m_fifo8[3][FIFO_BYTES]{};
 	u16 m_rdptr16[3]{}, m_wrptr16[3]{};
 	bool m_full[3]{};
 	u8 m_laststat = 0;
