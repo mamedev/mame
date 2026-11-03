@@ -7,19 +7,19 @@
 
 namespace
 {
-float mali_modifier(float value, unsigned modifier)
+float mali_modifier(float value, u32 modifier)
 {
 	if (modifier & 1)
 		value = std::fabs(value);
 	return (modifier & 2) ? -value : value;
 }
 
-float mali_outmod(float value, unsigned modifier)
+float mali_outmod(float value, u32 modifier)
 {
 	switch (modifier)
 	{
 	case 1:
-		return std::clamp(value, 0.0f, 1.0f);
+		return mali_clamp(value);
 	case 2:
 		return std::max(0.0f, value);
 	case 3:
@@ -29,7 +29,7 @@ float mali_outmod(float value, unsigned modifier)
 	}
 }
 
-bool mali_alu(bool multiply, unsigned op, float a, float b, float &value)
+bool mali_alu(bool multiply, u32 op, float a, float b, float &value)
 {
 	if (multiply)
 	{
@@ -130,7 +130,7 @@ bool mali200_device::pp_shader(u32 const *state, pp_fragment &fragment, bool &co
 	float registers[16][4], temporary[1024];
 	bool registers_initialized = false;
 	bool temporary_initialized = false;
-	auto initialize_temporary = [&]
+	auto const initialize_temporary = [&temporary, &temporary_initialized]
 	{
 		if (!temporary_initialized)
 		{
@@ -139,8 +139,8 @@ bool mali200_device::pp_shader(u32 const *state, pp_fragment &fragment, bool &co
 		}
 	};
 	u32 address = state[9] & ~31U;
-	static constexpr unsigned FIELD_SIZE[12] = { 34, 62, 41, 43, 30, 44, 31, 30, 41, 73, 64, 64 };
-	for (unsigned instructions = 0; instructions < 4096; ++instructions)
+	static constexpr u32 FIELD_SIZE[12] = { 34, 62, 41, 43, 30, 44, 31, 30, 41, 73, 64, 64 };
+	for (u32 instructions = 0; instructions < 4096; ++instructions)
 	{
 		pp_instruction *&cached = m_pp_instruction_cache[(address >> 2) & 63];
 		bool inserted = false;
@@ -165,15 +165,15 @@ bool mali200_device::pp_shader(u32 const *state, pp_fragment &fragment, bool &co
 				logerror("invalid PP shader length at %08x\n", address);
 				return false;
 			}
-			for (unsigned i = 1; i < instruction.count; ++i)
+			for (u32 i = 1; i < instruction.count; ++i)
 				if (!read_word(address + i * 4, words[i], 1))
 					return false;
-			unsigned next = 32;
-			for (unsigned field = 0; field < 12; ++field)
+			u32 next = 32;
+			for (u32 field = 0; field < 12; ++field)
 			{
 				if (!BIT(instruction.fields, field))
 					continue;
-				unsigned const size = FIELD_SIZE[field];
+				u32 const size = FIELD_SIZE[field];
 				if (next + size > instruction.count * 32)
 				{
 					logerror("truncated PP shader at %08x\n", address);
@@ -186,15 +186,11 @@ bool mali200_device::pp_shader(u32 const *state, pp_fragment &fragment, bool &co
 					instruction.upper[field] = mali_field(words, next + 64, size - 64);
 				next += size;
 			}
-			// Constants belong to the decoded instruction, so their exact
-			// half-to-float conversion need only happen once for this job.
-			for (unsigned n = 0; n < 2; ++n)
+			for (u32 n = 0; n < 2; ++n)
 				if (BIT(instruction.fields, 10 + n))
-					for (unsigned c = 0; c < 4; ++c)
+					for (u32 c = 0; c < 4; ++c)
 						instruction.constant[n][c] = mali_half(instruction.field[10 + n] >> (c * 16));
-			// A single fetch followed by an unmodified texture-to-color MOV
-			// needs no register-file interpreter. Keep sampling in pp_texture
-			// so formats, addressing, filtering and memory faults are shared.
+			// Single texture fetch followed by an unmodified color MOV.
 			if (BIT(instruction.control, 5) && (instruction.fields == 0x23 || instruction.fields == 0x0b))
 			{
 				u64 const varying = instruction.field[0], texture = instruction.field[1];
@@ -202,14 +198,14 @@ bool mali200_device::pp_shader(u32 const *state, pp_fragment &fragment, bool &co
 				instruction.texture_copy = (varying & 15) == 0 && ((varying >> 24) & 15) == 15 &&
 						!(texture & ((1U << 18) | (31U << 24) | (1U << 29))) && (move & 0x3fff) == (14 | (0xe4 << 4)) &&
 						((move >> 32) & 15) == 15 && ((move >> 36) & 3) == 0 && ((move >> 38) & 31) == 31 && !BIT(move, 43);
-				unsigned const alignment = (varying >> 5) & 3;
+				u32 const alignment = (varying >> 5) & 3;
 				instruction.texture_components = alignment == 3 ? 4 : alignment + 1;
 				instruction.texture_varying = ((varying >> 18) & 63) * instruction.texture_components;
 				instruction.texture_sampler = (texture >> 30) & 0xfff;
 				instruction.texture_destination = (move >> 28) & 15;
 			}
 		}
-		unsigned const count = instruction.count, fields = instruction.fields;
+		u32 const count = instruction.count, fields = instruction.fields;
 		// Only immediate constants and arithmetic can be reused for another
 		// fragment. Exclude varying/texture/uniform fetches, framebuffer or
 		// temporary access, and all control flow (including discard).
@@ -217,7 +213,7 @@ bool mali200_device::pp_shader(u32 const *state, pp_fragment &fragment, bool &co
 		if (!instructions && instruction.texture_copy && !BIT(state[3], 11) && ((state[8] >> 16) & 15) == instruction.texture_destination)
 		{
 			float coordinate[4]{};
-			for (unsigned c = 0; c < instruction.texture_components; ++c)
+			for (u32 c = 0; c < instruction.texture_components; ++c)
 				if (instruction.texture_varying + c < fragment.varying_count)
 					coordinate[c] = fragment.varying[instruction.texture_varying + c];
 			return pp_texture(state, instruction.texture_sampler, coordinate, 0, fragment.color);
@@ -228,46 +224,46 @@ bool mali200_device::pp_shader(u32 const *state, pp_fragment &fragment, bool &co
 				std::fill(std::begin(reg), std::end(reg), 0);
 			registers_initialized = true;
 		}
-		auto f = [&](unsigned field, unsigned start, unsigned size) -> u32
+		auto const f = [&instruction] (u32 field, u32 start, u32 size) -> u32
 		{
 			u64 value = instruction.field[field] >> start;
 			if (start + size > 64)
 				value |= u64(instruction.upper[field]) << (64 - start);
-			return u32(value) & (size == 32 ? ~0U : (1U << size) - 1);
+			return u32(value) & util::make_bitmask<u32>(size);
 		};
-		auto scalar = [&](unsigned reg)
+		auto const scalar = [&registers] (u32 reg)
 		{
 			return registers[(reg >> 2) & 15][reg & 3];
 		};
-		for (unsigned constant = 0; constant < 2; ++constant)
-			if (BIT(fields, 10 + constant))
-				std::copy(std::begin(instruction.constant[constant]), std::end(instruction.constant[constant]), registers[12 + constant]);
+		for (u32 slot = 0; slot < 2; ++slot)
+			if (BIT(fields, 10 + slot))
+				std::copy(std::begin(instruction.constant[slot]), std::end(instruction.constant[slot]), registers[12 + slot]);
 		float coordinate[4]{};
 		if (BIT(fields, 0))
 		{
-			unsigned const source = f(0, 0, 4), dest = f(0, 24, 4), mask = f(0, 28, 4);
+			u32 const source = f(0, 0, 4), dest = f(0, 24, 4), mask = f(0, 28, 4);
 			if ((source & 12) == 0 || source == 8)
 			{
-				unsigned const alignment = f(0, 5, 2), stride = alignment == 3 ? 4 : alignment + 1;
-				int index = f(0, 18, 6);
-				unsigned const offset_reg = (f(0, 10, 4) << 2) | f(0, 16, 2);
+				u32 const alignment = f(0, 5, 2), stride = alignment == 3 ? 4 : alignment + 1;
+				s64 index = f(0, 18, 6);
+				u32 const offset_reg = (f(0, 10, 4) << 2) | f(0, 16, 2);
 				if (offset_reg != 63)
-					index += int(scalar(offset_reg));
+					index += mali_to_integer(scalar(offset_reg));
 				index *= stride;
-				for (unsigned c = 0; c < stride; ++c)
-					if (index + int(c) >= 0 && index + c < fragment.varying_count)
+				for (u32 c = 0; c < stride; ++c)
+					if (index + c >= 0 && index + c < fragment.varying_count)
 						coordinate[c] = fragment.varying[index + c];
 			}
 			else if ((source & 12) == 4 || source == 9 || source == 10)
 			{
-				unsigned const reg = f(0, 10, 4), swizzle = f(0, 16, 8);
-				for (unsigned c = 0; c < 4; ++c)
+				u32 const reg = f(0, 10, 4), swizzle = f(0, 16, 8);
+				for (u32 c = 0; c < 4; ++c)
 					coordinate[c] = mali_modifier(registers[reg][(swizzle >> (2 * c)) & 3], f(0, 15, 1) | (f(0, 14, 1) << 1));
 				if (source == 10)
 				{
 					float const length =
 							std::sqrt(coordinate[0] * coordinate[0] + coordinate[1] * coordinate[1] + coordinate[2] * coordinate[2]);
-					for (unsigned c = 0; c < 3; ++c)
+					for (u32 c = 0; c < 3; ++c)
 						coordinate[c] /= length;
 				}
 			}
@@ -283,19 +279,21 @@ bool mali200_device::pp_shader(u32 const *state, pp_fragment &fragment, bool &co
 			if (source < 8 && (source & 3) >= 2)
 			{
 				float const divisor = coordinate[source & 3];
-				for (unsigned c = 0; c < 4; ++c)
+				for (u32 c = 0; c < 4; ++c)
 					coordinate[c] /= divisor;
 			}
 			if (dest != 15)
-				for (unsigned c = 0; c < 4; ++c)
+				for (u32 c = 0; c < 4; ++c)
 					if (BIT(mask, c))
 						registers[dest][c] = coordinate[c];
 		}
 		if (BIT(fields, 1))
 		{
-			unsigned sampler = f(1, 30, 12);
+			s64 sampler = f(1, 30, 12);
 			if (f(1, 29, 1))
-				sampler += int(scalar(f(1, 6, 6)));
+				sampler += mali_to_integer(scalar(f(1, 6, 6)));
+			if (sampler < 0 || sampler >= 16)
+				return false;
 			float const lod = f(1, 18, 1) ? scalar(f(1, 0, 6)) : 0;
 			if (f(1, 24, 5) != 0)
 			{
@@ -307,29 +305,29 @@ bool mali200_device::pp_shader(u32 const *state, pp_fragment &fragment, bool &co
 		}
 		if (BIT(fields, 2))
 		{
-			unsigned const alignment = f(2, 10, 2), components = 1U << std::min(alignment, 2U);
-			int index = s16(f(2, 25, 16));
+			u32 const alignment = f(2, 10, 2), components = 1U << std::min(alignment, 2U);
+			s64 index = s16(f(2, 25, 16));
 			if (f(2, 24, 1))
-				index += int(scalar(f(2, 18, 6)));
+				index += mali_to_integer(scalar(f(2, 18, 6)));
 			index *= components;
 			if (f(2, 0, 2) == 3)
 			{
 				initialize_temporary();
-				for (unsigned c = 0; c < components; ++c)
+				for (u32 c = 0; c < components; ++c)
 				{
-					if (index + int(c) < 0 || index + c >= std::size(temporary))
+					if (index + c < 0 || index + c >= s64(std::size(temporary)))
 						return false;
 					registers[15][c] = temporary[index + c];
 				}
 			}
 			else
 			{
-				if (index < 0)
+				if (index < 0 || index + components > 0x1'0000'0000LL)
 					return false;
-				for (unsigned c = 0; c < components; ++c)
+				for (u32 c = 0; c < components; ++c)
 				{
 					u32 base, half;
-					unsigned const scalar_index = index + c;
+					u32 const scalar_index = index + c;
 					if (!read_word((state[11] & ~15U) + (scalar_index / 128) * 4, base, 2))
 						return false;
 					if (!read_bytes((base & ~3U) + (scalar_index % 128) * 2, 2, half, 2))
@@ -339,22 +337,22 @@ bool mali200_device::pp_shader(u32 const *state, pp_fragment &fragment, bool &co
 			}
 		}
 		float vector_product[4]{}, scalar_product = 0;
-		for (unsigned stage = 0; stage < 2; ++stage)
+		for (u32 stage = 0; stage < 2; ++stage)
 		{
-			unsigned const vec = 3 + stage * 2, scl = vec + 1;
+			u32 const vec = 3 + stage * 2, scl = vec + 1;
 			float vector_value[4]{}, scalar_value = 0;
 			if (BIT(fields, vec))
 			{
 				float a[4], b[4];
-				for (unsigned c = 0; c < 4; ++c)
+				for (u32 c = 0; c < 4; ++c)
 				{
 					a[c] = (stage && f(vec, 43, 1)) ? vector_product[(f(vec, 4, 8) >> (2 * c)) & 3]
 							: registers[f(vec, 0, 4)][(f(vec, 4, 8) >> (2 * c)) & 3];
 					a[c] = mali_modifier(a[c], f(vec, 12, 2));
 					b[c] = mali_modifier(registers[f(vec, 14, 4)][(f(vec, 18, 8) >> (2 * c)) & 3], f(vec, 26, 2));
 				}
-				unsigned const op = f(vec, 38, 5);
-				for (unsigned c = 0; c < 4; ++c)
+				u32 const op = f(vec, 38, 5);
+				for (u32 c = 0; c < 4; ++c)
 				{
 					if (stage && (op == 16 || op == 17))
 						vector_value[c] = a[0] + a[1] + a[2] + (op == 17 ? a[3] : 0);
@@ -373,7 +371,7 @@ bool mali200_device::pp_shader(u32 const *state, pp_fragment &fragment, bool &co
 				float a = (stage && f(scl, 30, 1)) ? scalar_product : scalar(f(scl, 0, 6));
 				a = mali_modifier(a, f(scl, 6, 2));
 				float const b = mali_modifier(scalar(f(scl, 8, 6)), f(scl, 14, 2));
-				unsigned const op = f(scl, 25, 5);
+				u32 const op = f(scl, 25, 5);
 				if (stage && op == 23)
 					scalar_value = scalar_product != 0 ? a : b;
 				else if (!mali_alu(!stage, op, a, b, scalar_value))
@@ -385,7 +383,7 @@ bool mali200_device::pp_shader(u32 const *state, pp_fragment &fragment, bool &co
 			}
 			// The vector and scalar units read the same incoming register bank.
 			if (BIT(fields, vec))
-				for (unsigned c = 0; c < 4; ++c)
+				for (u32 c = 0; c < 4; ++c)
 					if (BIT(f(vec, 32, 4), c))
 						registers[f(vec, 28, 4)][c] = vector_value[c];
 			if (BIT(fields, scl) && f(scl, 22, 1))
@@ -398,14 +396,14 @@ bool mali200_device::pp_shader(u32 const *state, pp_fragment &fragment, bool &co
 		}
 		if (BIT(fields, 7))
 		{
-			unsigned const mode = f(7, 0, 2);
+			u32 const mode = f(7, 0, 2);
 			float a = mali_modifier(scalar(f(7, 16, 6)), f(7, 14, 2));
 			if (mode == 3)
 			{
 				float result[4];
-				for (unsigned c = 0; c < 4; ++c)
+				for (u32 c = 0; c < 4; ++c)
 					result[c] = a * registers[f(7, 10, 4)][(f(7, 2, 8) >> (c * 2)) & 3];
-				for (unsigned c = 0; c < 4; ++c)
+				for (u32 c = 0; c < 4; ++c)
 					if (BIT(f(7, 22, 4), c))
 						registers[f(7, 26, 4)][c] = result[c];
 			}
@@ -442,7 +440,7 @@ bool mali200_device::pp_shader(u32 const *state, pp_fragment &fragment, bool &co
 					logerror("unsupported PP combine op %u\n", f(7, 2, 4));
 					return false;
 				}
-				unsigned const dest = f(7, 24, 6);
+				u32 const dest = f(7, 24, 6);
 				registers[dest / 4][dest % 4] = mali_outmod(value, f(7, 22, 2));
 			}
 			else
@@ -455,7 +453,7 @@ bool mali200_device::pp_shader(u32 const *state, pp_fragment &fragment, bool &co
 		{
 			if (f(8, 2, 2) == 3)
 			{
-				unsigned const dest = f(8, 6, 4);
+				u32 const dest = f(8, 6, 4);
 				if (f(8, 0, 1))
 					std::copy(std::begin(fragment.color), std::end(fragment.color), registers[dest]);
 				else
@@ -463,17 +461,17 @@ bool mali200_device::pp_shader(u32 const *state, pp_fragment &fragment, bool &co
 			}
 			else
 			{
-				unsigned const count = 1U << std::min(2U, f(8, 10, 2)), reg = f(8, 4, 6);
-				int index = s16(f(8, 25, 16));
+				u32 const components = 1U << std::min(2U, f(8, 10, 2)), reg = f(8, 4, 6);
+				s64 index = s16(f(8, 25, 16));
 				if (f(8, 24, 1))
-					index += int(scalar(f(8, 18, 6)));
-				index *= count;
+					index += mali_to_integer(scalar(f(8, 18, 6)));
+				index *= components;
 				initialize_temporary();
-				for (unsigned c = 0; c < count; ++c)
+				for (u32 c = 0; c < components; ++c)
 				{
-					if (index + int(c) < 0 || index + c >= std::size(temporary))
+					if (index + c < 0 || index + c >= s64(std::size(temporary)))
 						return false;
-					temporary[index + c] = scalar((reg & ~(count - 1)) + c);
+					temporary[index + c] = scalar((reg & ~(components - 1)) + c);
 				}
 			}
 		}
@@ -486,16 +484,16 @@ bool mali200_device::pp_shader(u32 const *state, pp_fragment &fragment, bool &co
 				return true;
 			}
 			float const a = scalar(f(9, 10, 6)), b = scalar(f(9, 4, 6));
-			unsigned const condition = f(9, 16, 3);
+			u32 const condition = f(9, 16, 3);
 			if ((BIT(condition, 0) && a > b) || (BIT(condition, 1) && a == b) || (BIT(condition, 2) && a < b))
 			{
-				s32 const relative = s32(f(9, 41, 27) << 5) >> 5;
+				s32 const relative = util::sext(f(9, 41, 27), 27);
 				next_address = address + relative * 4;
 			}
 		}
 		if (BIT(instruction.control, 5))
 		{
-			unsigned const color_register = (state[8] >> 16) & 15;
+			u32 const color_register = (state[8] >> 16) & 15;
 			std::copy(std::begin(registers[color_register]), std::end(registers[color_register]), fragment.color);
 			if (BIT(state[3], 11))
 				fragment.depth = scalar((state[3] >> 6) & 15);

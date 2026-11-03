@@ -7,7 +7,7 @@
 
 namespace
 {
-bool mali_compare(unsigned function, float a, float b)
+bool mali_compare(u32 function, float a, float b)
 {
 	switch (function & 7)
 	{
@@ -30,10 +30,10 @@ bool mali_compare(unsigned function, float a, float b)
 	}
 }
 
-float mali_blend_factor(unsigned function, unsigned component, float const *src, float const *dst, float const *constant)
+float mali_blend_factor(u32 function, u32 component, float const *src, float const *dst, float const *constant)
 {
 	float factor;
-	unsigned const c = BIT(function, 4) ? 3 : component;
+	u32 const c = BIT(function, 4) ? 3 : component;
 	switch (function & 7)
 	{
 	case 0:
@@ -58,7 +58,7 @@ float mali_blend_factor(unsigned function, unsigned component, float const *src,
 	return BIT(function, 3) ? 1 - factor : factor;
 }
 
-float mali_blend(unsigned function, float src, float dst, float destination)
+float mali_blend(u32 function, float src, float dst, float destination)
 {
 	switch (function)
 	{
@@ -79,7 +79,7 @@ float mali_blend(unsigned function, float src, float dst, float destination)
 	}
 }
 
-u8 mali_stencil(unsigned operation, u8 value, u8 reference)
+u8 mali_stencil(u32 operation, u8 value, u8 reference)
 {
 	switch (operation & 7)
 	{
@@ -102,7 +102,7 @@ u8 mali_stencil(unsigned operation, u8 value, u8 reference)
 	}
 }
 
-u8 mali_logic(unsigned operation, u8 src, u8 dst)
+u8 mali_logic(u32 operation, u8 src, u8 dst)
 {
 	// Each operation is the four-bit truth table indexed by (src, dst).
 	return (BIT(operation, 0) ? u8(~src & ~dst) : 0) | (BIT(operation, 1) ? u8(~src & dst) : 0) | (BIT(operation, 2) ? u8(src & ~dst) : 0) |
@@ -112,22 +112,22 @@ u8 mali_logic(unsigned operation, u8 src, u8 dst)
 
 bool mali200_device::pp_writeback(pp_tile const &tile)
 {
-	for (unsigned unit = 0; unit < 3; ++unit)
+	for (u32 unit = 0; unit < 3; ++unit)
 	{
 		u32 const *wb = &m_pp[(0x100 + unit * 0x100) / 4];
 		if (!(wb[0] & 3))
 			continue;
-		unsigned const format = wb[2] & 15, flags = wb[6] & 63;
+		u32 const format = wb[2] & 15, flags = wb[6] & 63;
 		if (wb[3] || wb[7])
 		{
 			logerror("unsupported PP writeback supersampling/MRT\n");
 			return false;
 		}
-		unsigned const size = format == 4 || format == 13 ? 1 : format == 3 || format == 8 || format == 15 ? 4 : format == 6 ? 8 : 2;
-		for (unsigned y = 0; y < 16; ++y)
-			for (unsigned x = 0; x < 16; ++x)
+		u32 const size = format == 4 || format == 13 ? 1 : format == 3 || format == 8 || format == 15 ? 4 : format == 6 ? 8 : 2;
+		for (u32 y = 0; y < 16; ++y)
+			for (u32 x = 0; x < 16; ++x)
 			{
-				unsigned const pixel = y * 16 + x, px = tile.x * 16 + x, py = tile.y * 16 + y;
+				u32 const pixel = y * 16 + x, px = tile.x * 16 + x, py = tile.y * 16 + y;
 				if (BIT(flags, 0) && !tile.dirty[pixel])
 					continue;
 				if (BIT(flags, 1) && (px < ((m_pp[10] >> 16) & 15) || px > (m_pp[10] & 0x3fff) || py >= (m_pp[11] & 0x3fff)))
@@ -145,8 +145,8 @@ bool mali200_device::pp_writeback(pp_tile const &tile)
 				}
 				if (BIT(flags, 2))
 					std::swap(rgba[0], rgba[2]);
-				unsigned r = std::clamp(int(rgba[0] * 255 + 0.5f), 0, 255), g = std::clamp(int(rgba[1] * 255 + 0.5f), 0, 255);
-				unsigned b = std::clamp(int(rgba[2] * 255 + 0.5f), 0, 255), a = std::clamp(int(rgba[3] * 255 + 0.5f), 0, 255);
+				u32 r = mali_to_integer(rgba[0] * 255 + 0.5f, 0, 255), g = mali_to_integer(rgba[1] * 255 + 0.5f, 0, 255);
+				u32 b = mali_to_integer(rgba[2] * 255 + 0.5f, 0, 255), a = mali_to_integer(rgba[3] * 255 + 0.5f, 0, 255);
 				u64 value;
 				switch (format)
 				{
@@ -183,10 +183,10 @@ bool mali200_device::pp_writeback(pp_tile const &tile)
 					value = tile.stencil[pixel];
 					break;
 				case 14:
-					value = std::clamp(int(tile.depth[pixel] * 65535 + 0.5f), 0, 65535);
+					value = mali_to_integer(tile.depth[pixel] * 65535 + 0.5f, 0, 65535);
 					break;
 				case 15:
-					value = (u32(tile.stencil[pixel]) << 24) | std::clamp(int(tile.depth[pixel] * 16777215 + 0.5f), 0, 16777215);
+					value = (u32(tile.stencil[pixel]) << 24) | u32(mali_to_integer(tile.depth[pixel] * 16'777'215 + 0.5f, 0, 16'777'215));
 					break;
 				default:
 					logerror("unsupported PP writeback format %u\n", format);
@@ -222,11 +222,11 @@ bool mali200_device::pp_writeback(pp_tile const &tile)
 				if (BIT(flags, 5))
 				{
 					u64 reversed = 0;
-					for (unsigned i = 0; i < size; ++i)
+					for (u32 i = 0; i < size; ++i)
 						reversed |= ((value >> (i * 8)) & 255) << ((size - i - 1) * 8);
 					value = reversed;
 				}
-				for (unsigned i = 0; i < size; i += 4)
+				for (u32 i = 0; i < size; i += 4)
 					if (!write_bytes(address + i, std::min(4U, size - i), value >> (i * 8), 4))
 						return false;
 			}
@@ -238,20 +238,20 @@ bool mali200_device::pp_primitive(pp_tile &tile, u32 state_address, u32 vertex_a
 {
 	u32 state[16];
 	float vertex[3][4], varying[3][64];
-	for (unsigned i = 0; i < 16; ++i)
+	for (u32 i = 0; i < 16; ++i)
 		if (!read_word(state_address + i * 4, state[i], 0))
 			return false;
-	for (unsigned v = 0; v < 3; ++v)
-		for (unsigned c = 0; c < 4; ++c)
+	for (u32 v = 0; v < 3; ++v)
+		for (u32 c = 0; c < 4; ++c)
 		{
 			u32 word;
 			if (!read_word(vertex_address + indices[v] * 16 + c * 4, word, 0))
 				return false;
-			vertex[v][c] = mali_float(word);
+			vertex[v][c] = u2f(word);
 			if (!std::isfinite(vertex[v][c]))
 				return true;
 		}
-	auto edge = [](float const *a, float const *b, float x, float y)
+	auto const edge = [] (float const *a, float const *b, float x, float y)
 	{
 		// Evaluate the determinant before rounding back to the interpolation
 		// precision. Float cancellation can make a shared edge zero in one
@@ -267,24 +267,24 @@ bool mali200_device::pp_primitive(pp_tile &tile, u32 state_address, u32 vertex_a
 	float const xmax = std::max({ vertex[0][0], vertex[1][0], vertex[2][0] });
 	float const ymin = std::min({ vertex[0][1], vertex[1][1], vertex[2][1] });
 	float const ymax = std::max({ vertex[0][1], vertex[1][1], vertex[2][1] });
-	unsigned const stride = (state[13] & 31) * 8;
-	unsigned varying_components = 0;
-	for (unsigned v = 0; v < 3 && stride; ++v)
+	u32 const stride = (state[13] & 31) * 8;
+	u32 varying_components = 0;
+	for (u32 v = 0; v < 3 && stride; ++v)
 	{
-		unsigned offset = 0, scalar = 0;
-		for (unsigned slot = 0; slot < 12 && offset < stride; ++slot)
+		u32 offset = 0, scalar = 0;
+		for (u32 slot = 0; slot < 12 && offset < stride; ++slot)
 		{
-			unsigned const type = slot < 10 ? (state[10] >> (slot * 3)) & 7
+			u32 const type = slot < 10 ? (state[10] >> (slot * 3)) & 7
 					: slot == 10 ? ((state[10] >> 30) | ((state[15] & 1) << 2))
 					: ((state[15] >> 1) & 7);
-			unsigned const components = type == 1 || type == 3 || type == 4 || type == 5 ? 2 : 4;
-			unsigned const size = type < 2 ? 4 : type < 6 ? 2 : 1;
-			for (unsigned c = 0; c < components; ++c)
+			u32 const components = type == 1 || type == 3 || type == 4 || type == 5 ? 2 : 4;
+			u32 const size = type < 2 ? 4 : type < 6 ? 2 : 1;
+			for (u32 c = 0; c < components; ++c)
 			{
 				u32 value;
 				if (!read_bytes((state[15] & ~15U) + indices[v] * stride + offset + c * size, size, value, 2))
 					return false;
-				varying[v][scalar + c] = type < 2 ? mali_float(value)
+				varying[v][scalar + c] = type < 2 ? u2f(value)
 						: type < 4 ? mali_half(value)
 						: type == 4 ? std::max(-1.0f, s16(value) / 32767.0f)
 						: type == 5 ? value / 65535.0f
@@ -295,16 +295,12 @@ bool mali200_device::pp_primitive(pp_tile &tile, u32 state_address, u32 vertex_a
 		}
 		varying_components = scalar;
 	}
-	// Intersect the primitive's sample bounds and scissor with this tile.
-	// Compare the same sample coordinates as the coverage test, avoiding
-	// float-to-integer rounding at subpixel edges or extreme vertex values.
-	// Keep vertex/varying reads above this rejection so DMA faults retain
-	// their normal behavior even for a primitive outside the tile.
-	unsigned x_first = 16, x_last = 0, y_first = 16, y_last = 0;
+	// Intersect the sample bounds and scissor with this tile.
+	u32 x_first = 16, x_last = 0, y_first = 16, y_last = 0;
 	float const sample_x = s16(m_pp[0x40 / 4]) * 0.5f;
-	for (unsigned i = 0; i < 16; ++i)
+	for (u32 i = 0; i < 16; ++i)
 	{
-		unsigned const px = tile.x * 16 + i, py = tile.y * 16 + i;
+		u32 const px = tile.x * 16 + i, py = tile.y * 16 + i;
 		float const sx = px + sample_x, sy = py + 0.5f;
 		if (px >= tile.scissor[0] && px <= tile.scissor[1] && sx >= xmin && sx < xmax)
 		{
@@ -327,20 +323,20 @@ bool mali200_device::pp_primitive(pp_tile &tile, u32 state_address, u32 vertex_a
 	u32 const stencil = state[front ? 5 : 6];
 	u8 const stencil_reference = stencil >> 16, stencil_mask = stencil >> 24;
 	u8 const stencil_write_mask = state[7] >> (front ? 0 : 8);
-	unsigned const alpha_function = state[8] & 7, depth_function = (state[3] >> 1) & 7;
+	u32 const alpha_function = state[8] & 7, depth_function = (state[3] >> 1) & 7;
 	float const alpha_reference = ((state[7] >> 16) & 255) / 255.0f;
-	unsigned const color_mask = state[2] >> 28;
-	unsigned const source_factor[2] = { (state[2] >> 6) & 31, (state[2] >> 16) & 15 };
-	unsigned const destination_factor[2] = { (state[2] >> 11) & 31, (state[2] >> 20) & 15 };
-	unsigned const blend_operation[2] = { state[2] & 7, (state[2] >> 3) & 7 };
+	u32 const color_mask = state[2] >> 28;
+	u32 const source_factor[2] = { (state[2] >> 6) & 31, (state[2] >> 16) & 15 };
+	u32 const destination_factor[2] = { (state[2] >> 11) & 31, (state[2] >> 20) & 15 };
+	u32 const blend_operation[2] = { state[2] & 7, (state[2] >> 3) & 7 };
 	float const blend_constant[4] = { float(state[1] & 255) / 255, float((state[0] >> 16) & 255) / 255, float(state[0] & 255) / 255,
 		float((state[1] >> 16) & 255) / 255 };
 	// Alpha factors, ZERO/ONE and alpha-saturate are identical for R/G/B.
 	// Color-dependent factors still evaluate each component independently.
 	bool const shared_source = BIT(source_factor[0], 4) || (source_factor[0] & 7) >= 3;
 	bool const shared_destination = BIT(destination_factor[0], 4) || (destination_factor[0] & 7) >= 3;
-	for (unsigned y = y_first; y < y_last; ++y)
-		for (unsigned x = x_first; x < x_last; ++x)
+	for (u32 y = y_first; y < y_last; ++y)
+		for (u32 x = x_first; x < x_last; ++x)
 		{
 			float const sx = tile.x * 16 + x + sample_x;
 			float const sy = tile.y * 16 + y + 0.5f;
@@ -350,7 +346,7 @@ bool mali200_device::pp_primitive(pp_tile &tile, u32 state_address, u32 vertex_a
 			// including the half outside the input triangle. This is also used
 			// for the driver's 1x1 PP readback jobs, not just full-screen clears.
 			bool inside = true;
-			for (unsigned i = 0; i < 3 && !rectangle; ++i)
+			for (u32 i = 0; i < 3 && !rectangle; ++i)
 			{
 				float const *a = vertex[(i + 1) % 3], *b = vertex[(i + 2) % 3];
 				float const dx = b[0] - a[0], dy = b[1] - a[1];
@@ -361,7 +357,7 @@ bool mali200_device::pp_primitive(pp_tile &tile, u32 state_address, u32 vertex_a
 			if (!inside)
 				continue;
 			float const weight[3] = { e[0] / area, e[1] / area, e[2] / area };
-			unsigned const pixel = y * 16 + x;
+			u32 const pixel = y * 16 + x;
 			pp_fragment fragment;
 			fragment.varying_count = varying_components;
 			fragment.front = front;
@@ -372,10 +368,8 @@ bool mali200_device::pp_primitive(pp_tile &tile, u32 state_address, u32 vertex_a
 			fragment.coordinate[2] = fragment.depth;
 			fragment.coordinate[3] = inverse_w;
 			std::copy(std::begin(tile.color[pixel]), std::end(tile.color[pixel]), fragment.color);
-			// Shader fetches return zero for unconfigured varying slots.
-			// A textured rectangle commonly supplies just two scalars, so avoid
-			// perspective interpolation of the remaining unused slots per pixel.
-			for (unsigned c = 0; c < varying_components; ++c)
+			// Interpolate only the configured varying components.
+			for (u32 c = 0; c < varying_components; ++c)
 				fragment.varying[c] = inverse_w
 						? (weight[0] * varying[0][c] * vertex[0][3] + weight[1] * varying[1][c] * vertex[1][3] +
 								weight[2] * varying[2][c] * vertex[2][3]) / inverse_w
@@ -401,12 +395,12 @@ bool mali200_device::pp_primitive(pp_tile &tile, u32 state_address, u32 vertex_a
 			// alpha greater than one to make every nonzero index opaque.
 			if (normalized)
 				for (float &component : fragment.color)
-					component = std::clamp(component, 0.0f, 1.0f);
+					component = mali_clamp(component);
 			if (fragment.discard || !mali_compare(alpha_function, fragment.color[3], alpha_reference))
 				continue;
 			bool const stencil_pass = mali_compare(stencil & 7, stencil_reference & stencil_mask, tile.stencil[pixel] & stencil_mask);
 			bool const depth_pass = mali_compare(depth_function, fragment.depth, tile.depth[pixel]);
-			unsigned const stencil_operation = (stencil >> (!stencil_pass ? 3 : !depth_pass ? 6 : 9)) & 7;
+			u32 const stencil_operation = (stencil >> (!stencil_pass ? 3 : !depth_pass ? 6 : 9)) & 7;
 			u8 const old_stencil = tile.stencil[pixel];
 			tile.stencil[pixel] = (tile.stencil[pixel] & ~stencil_write_mask) |
 					(mali_stencil(stencil_operation, tile.stencil[pixel], stencil_reference) & stencil_write_mask);
@@ -423,14 +417,14 @@ bool mali200_device::pp_primitive(pp_tile &tile, u32 state_address, u32 vertex_a
 					? mali_blend_factor(destination_factor[0], 0, fragment.color, tile.color[pixel], blend_constant)
 					: 0;
 			float result[4];
-			for (unsigned c = 0; c < 4; ++c)
+			for (u32 c = 0; c < 4; ++c)
 			{
-				unsigned const src = source_factor[c == 3], dst = destination_factor[c == 3];
-				unsigned const operation = blend_operation[c == 3];
+				u32 const src = source_factor[c == 3], dst = destination_factor[c == 3];
+				u32 const operation = blend_operation[c == 3];
 				if (operation == 3)
 				{
-					u8 const s = std::clamp(fragment.color[c], 0.0f, 1.0f) * 255 + 0.5f;
-					u8 const d = std::clamp(tile.color[pixel][c], 0.0f, 1.0f) * 255 + 0.5f;
+					u8 const s = mali_to_integer(fragment.color[c] * 255 + 0.5f, 0, 255);
+					u8 const d = mali_to_integer(tile.color[pixel][c] * 255 + 0.5f, 0, 255);
 					result[c] = mali_logic(src & 15, s, d) / 255.0f;
 				}
 				else
@@ -443,9 +437,9 @@ bool mali200_device::pp_primitive(pp_tile &tile, u32 state_address, u32 vertex_a
 					result[c] = mali_blend(operation, fragment.color[c] * sf, tile.color[pixel][c] * df, tile.color[pixel][c]);
 				}
 			}
-			for (unsigned c = 0; c < 4; ++c)
+			for (u32 c = 0; c < 4; ++c)
 				if (BIT(color_mask, c))
-					tile.color[pixel][c] = normalized ? std::clamp(result[c], 0.0f, 1.0f) : result[c];
+					tile.color[pixel][c] = normalized ? mali_clamp(result[c]) : result[c];
 			tile.dirty[pixel] = true;
 		}
 	return true;
@@ -460,14 +454,14 @@ bool mali200_device::pp_render()
 	// This is a host-side guard against malformed cyclic lists, not a
 	// hardware job limit. A 1280x720 scene can legitimately revisit hundreds
 	// of render-state packets for each of its 3,600 tiles (over 1M packets).
-	for (unsigned commands = 0; commands < 16U * 1048576; ++commands)
+	for (u32 commands = 0; commands < 16U * 1'048'576; ++commands)
 	{
 		u32 lo, hi;
 		if (!read_word(address, lo, 0) || !read_word(address + 4, hi, 0))
 			return false;
 		m_pp[0x1004 / 4] = address;
 		if (m_pp_jobs <= 3 && commands < 64)
-			LOGMASKED(LOG_LISTS, "PP command %08x: %08x %08x\n", address, lo, hi);
+			LOGLISTS("PP command %08x: %08x %08x\n", address, lo, hi);
 		address += 8;
 		if ((hi & 0xfc000000) == 0xb8000000)
 		{
@@ -476,12 +470,12 @@ bool mali200_device::pp_render()
 			tile.x = hi & 255;
 			tile.y = (hi >> 8) & 255;
 			have_tile = true;
-			for (unsigned pixel = 0; pixel < 256; ++pixel)
+			for (u32 pixel = 0; pixel < 256; ++pixel)
 			{
-				for (unsigned c = 0; c < 4; ++c)
+				for (u32 c = 0; c < 4; ++c)
 					tile.color[pixel][c] =
 							BIT(m_pp[3], 0) ? mali_half(m_pp[6 + c / 2] >> ((c % 2) * 16)) : ((m_pp[6] >> (c * 8)) & 255) / 255.0f;
-				tile.depth[pixel] = (m_pp[4] & 0xffffff) / 16777215.0f;
+				tile.depth[pixel] = (m_pp[4] & 0xffffff) / 16'777'215.0f;
 				tile.stencil[pixel] = m_pp[5];
 				tile.dirty[pixel] = false;
 			}

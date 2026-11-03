@@ -494,7 +494,6 @@ if VIDEOS["HANTRO_G1"] then
 	files {
 		MAME_DIR .. "src/devices/video/hantro_g1.cpp",
 		MAME_DIR .. "src/devices/video/hantro_g1.h",
-		MAME_DIR .. "src/devices/video/hantro_g1_h264.h",
 	}
 end
 

@@ -8,15 +8,22 @@
 #include "emu.h"
 #include "mali200.h"
 
+#include "corefloat.h"
+
+#include <algorithm>
 #include <cmath>
-#include <cstring>
 #include <numbers>
+#include <vector>
 
 #define LOG_REGS (1U << 1)
 #define LOG_JOBS (1U << 2)
 #define LOG_LISTS (1U << 3)
 #define VERBOSE (0)
 #include "logmacro.h"
+
+#define LOGREGS(...) LOGMASKED(LOG_REGS, __VA_ARGS__)
+#define LOGJOBS(...) LOGMASKED(LOG_JOBS, __VA_ARGS__)
+#define LOGLISTS(...) LOGMASKED(LOG_LISTS, __VA_ARGS__)
 
 #include "mali200_gp.hxx"
 #include "mali200_plb.hxx"
@@ -27,12 +34,12 @@
 DEFINE_DEVICE_TYPE(MALI200, mali200_device, "mali200", "ARM Mali-200 / MaliGP2")
 
 mali200_device::mali200_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-		: device_t(mconfig, MALI200, tag, owner, clock)
-		, m_dma(*this, finder_base::DUMMY_TAG, -1)
-		, m_dma_page_permissions(*this, 0)
-		, m_pp_irq(*this)
-		, m_gp_irq(*this)
-		, m_mmu_irq(*this)
+	: device_t(mconfig, MALI200, tag, owner, clock)
+	, m_dma(*this, finder_base::DUMMY_TAG, -1)
+	, m_dma_page_permissions(*this, 3)
+	, m_pp_irq(*this)
+	, m_gp_irq(*this)
+	, m_mmu_irq(*this)
 {
 }
 
@@ -46,11 +53,19 @@ void mali200_device::map(address_map &map)
 void mali200_device::device_start()
 {
 	m_dma->cache(m_dma_access);
+	m_dma_cache_active = false;
+	m_pp_irq_state = m_gp_irq_state = m_mmu_irq_state = false;
+	m_pp_irq(0);
+	m_gp_irq(0);
+	m_mmu_irq(0);
 	m_pp_timer = timer_alloc(FUNC(mali200_device::pp_run), this);
 	m_gp_timer = timer_alloc(FUNC(mali200_device::gp_run), this);
 	save_item(NAME(m_pp));
 	save_item(NAME(m_gp));
 	save_item(NAME(m_mmu));
+	save_item(NAME(m_pp_irq_state));
+	save_item(NAME(m_gp_irq_state));
+	save_item(NAME(m_mmu_irq_state));
 	save_item(NAME(m_gp_heap));
 	save_item(NAME(m_gp_started));
 	save_item(NAME(m_pp_jobs));
@@ -67,7 +82,6 @@ void mali200_device::device_start()
 	save_item(NAME(m_plb_scissor));
 	save_item(NAME(m_plb_scissor_set));
 	save_item(NAME(m_plb_append_done));
-	machine().save().register_postload(save_prepost_delegate(FUNC(mali200_device::update_irqs), this));
 }
 
 void mali200_device::device_reset()
@@ -89,7 +103,7 @@ void mali200_device::reset_pp()
 	// IGS38's r3p0 userspace library checks for the Mali-200 r0p5 core.
 	m_pp[0x1000 / 4] = 0xc8070005;
 	m_pp[0x1028 / 4] = 0x1ff;
-	m_pp[0x1064 / 4] = 1000000;
+	m_pp[0x1064 / 4] = 1'000'000;
 }
 
 void mali200_device::reset_gp()
@@ -98,13 +112,13 @@ void mali200_device::reset_gp()
 	std::fill(std::begin(m_gp), std::end(m_gp), 0);
 	m_gp[0x38 / 4] = 0xffffff00;
 	m_gp[0x6c / 4] = 0x0a070100;
-	m_gp[0xa4 / 4] = 1000000;
+	m_gp[0xa4 / 4] = 1'000'000;
 	m_gp_started = m_gp_heap[0] = m_gp_heap[1] = 0;
 	reset_plb();
 	std::fill(std::begin(m_vs_config), std::end(m_vs_config), 0);
 	std::fill(std::begin(m_vs_shader), std::end(m_vs_shader), 0);
 	std::fill(std::begin(m_vs_uniform), std::end(m_vs_uniform), 0);
-	for (unsigned i = 0; i < 32; ++i)
+	for (u32 i = 0; i < 32; ++i)
 		m_vs_config[i * 2 + 1] = 63;
 	m_vs_config[0x42] = 0x0f000000;
 }
@@ -117,9 +131,24 @@ void mali200_device::reset_mmu()
 
 void mali200_device::update_irqs()
 {
-	m_pp_irq(bool(m_pp[0x1020 / 4] & m_pp[0x1028 / 4]));
-	m_gp_irq(bool(m_gp[0x24 / 4] & m_gp[0x2c / 4]));
-	m_mmu_irq(bool(m_mmu[5] & m_mmu[7]));
+	bool const pp = bool(m_pp[0x1020 / 4] & m_pp[0x1028 / 4]);
+	bool const gp = bool(m_gp[0x24 / 4] & m_gp[0x2c / 4]);
+	bool const mmu = bool(m_mmu[5] & m_mmu[7]);
+	if (pp != m_pp_irq_state)
+	{
+		m_pp_irq_state = pp;
+		m_pp_irq(pp);
+	}
+	if (gp != m_gp_irq_state)
+	{
+		m_gp_irq_state = gp;
+		m_gp_irq(gp);
+	}
+	if (mmu != m_mmu_irq_state)
+	{
+		m_mmu_irq_state = mmu;
+		m_mmu_irq(mmu);
+	}
 }
 
 u32 mali200_device::pp_r(offs_t offset)
@@ -134,8 +163,8 @@ u32 mali200_device::pp_r(offs_t offset)
 void mali200_device::pp_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	u32 const written = data & mem_mask;
-	unsigned const reg = offset * 4;
-	LOGMASKED(LOG_REGS, "PP write %04x=%08x mask=%08x\n", reg, data, mem_mask);
+	u32 const reg = offset * 4;
+	LOGREGS("%s: PP write %04x=%08x mask=%08x\n", machine().describe_context(), reg, data, mem_mask);
 	switch (reg)
 	{
 	case 0x100c:
@@ -200,7 +229,7 @@ void mali200_device::pp_command(u32 command)
 		++m_pp_jobs;
 		m_pp[0x1008 / 4] |= 1;
 		m_pp[0x1004 / 4] = m_pp[0];
-		LOGMASKED(LOG_JOBS, "PP job %u list=%08x rsw=%08x vertex=%08x dte=%08x\n", m_pp_jobs, m_pp[0], m_pp[1], m_pp[2], m_mmu[0]);
+		LOGJOBS("PP job %u list=%08x rsw=%08x vertex=%08x dte=%08x\n", m_pp_jobs, m_pp[0], m_pp[1], m_pp[2], m_mmu[0]);
 		m_pp_timer->adjust(attotime::from_usec(10));
 	}
 }
@@ -217,8 +246,8 @@ u32 mali200_device::gp_r(offs_t offset)
 void mali200_device::gp_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	u32 const written = data & mem_mask;
-	unsigned const reg = offset * 4;
-	LOGMASKED(LOG_REGS, "GP write %04x=%08x mask=%08x\n", reg, data, mem_mask);
+	u32 const reg = offset * 4;
+	LOGREGS("%s: GP write %04x=%08x mask=%08x\n", machine().describe_context(), reg, data, mem_mask);
 	switch (reg)
 	{
 	case 0x20:
@@ -270,7 +299,7 @@ void mali200_device::gp_command(u32 command)
 		{
 			m_gp[0x68 / 4] &= ~0x20U;
 			m_gp_timer->adjust(attotime::from_usec(10));
-			LOGMASKED(LOG_JOBS, "PLB resume at %08x with heap %08x..%08x\n", m_gp[0x84 / 4], m_gp[4], m_gp[5]);
+			LOGJOBS("PLB resume at %08x with heap %08x..%08x\n", m_gp[0x84 / 4], m_gp[4], m_gp[5]);
 		}
 	}
 	if (command & 0x40)
@@ -288,7 +317,7 @@ void mali200_device::gp_command(u32 command)
 		m_gp[0x84 / 4] = m_gp[2];
 		if (command & 2)
 			reset_plb();
-		LOGMASKED(LOG_JOBS, "GP job %u units=%x vs=%08x..%08x plb=%08x..%08x heap=%08x..%08x dte=%08x\n", m_gp_jobs, m_gp_started, m_gp[0],
+		LOGJOBS("GP job %u units=%x vs=%08x..%08x plb=%08x..%08x heap=%08x..%08x dte=%08x\n", m_gp_jobs, m_gp_started, m_gp[0],
 				m_gp[1], m_gp[2], m_gp[3], m_gp[4], m_gp[5], m_mmu[0]);
 		m_gp_timer->adjust(attotime::from_usec(10));
 	}
@@ -302,7 +331,7 @@ u32 mali200_device::mmu_r(offs_t offset)
 void mali200_device::mmu_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	u32 const written = data & mem_mask;
-	LOGMASKED(LOG_REGS, "MMU write %04x=%08x mask=%08x\n", offset * 4, data, mem_mask);
+	LOGREGS("%s: MMU write %04x=%08x mask=%08x\n", machine().describe_context(), offset * 4, data, mem_mask);
 	switch (offset)
 	{
 	case 0:
@@ -359,14 +388,14 @@ void mali200_device::begin_dma_cache()
 	m_dma_cache_active = true;
 }
 
-bool mali200_device::translate(u32 address, bool write, u32 &physical, unsigned bus)
+bool mali200_device::translate(u32 address, bool write, u32 &physical, u32 bus)
 {
 	if (m_mmu[1] & 6)
 		return false;
 	physical = address;
 	if (m_mmu[1] & 1)
 	{
-		unsigned const slot = (address >> 12) & (m_dma_page_tags.size() - 1);
+		u32 const slot = (address >> 12) & (m_dma_page_tags.size() - 1);
 		if (m_dma_cache_active && m_dma_page_tags[slot] == (address >> 12) && (m_dma_page_entries[slot] & (write ? 4 : 2)))
 		{
 			physical = (m_dma_page_entries[slot] & ~4095U) | (address & 4095);
@@ -422,7 +451,7 @@ bool mali200_device::translate(u32 address, bool write, u32 &physical, unsigned 
 	return bool(m_dma_page_permissions(physical & ~4095U) & (write ? 2 : 1));
 }
 
-bool mali200_device::read_word(u32 address, u32 &data, unsigned bus)
+bool mali200_device::read_word(u32 address, u32 &data, u32 bus)
 {
 	u32 physical;
 	if ((address & 3) || !translate(address, false, physical, bus))
@@ -431,24 +460,13 @@ bool mali200_device::read_word(u32 address, u32 &data, unsigned bus)
 	return true;
 }
 
-bool mali200_device::write_word(u32 address, u32 data, unsigned bus)
+bool mali200_device::write_word(u32 address, u32 data, u32 bus)
 {
 	u32 physical;
 	if ((address & 3) || !translate(address, true, physical, bus))
 		return false;
 	m_dma_access.write_dword(physical, data);
 	return true;
-}
-
-void mali200_device::trace_list(char const *name, u32 start, u32 end, unsigned bus)
-{
-	for (u64 pos = start; pos < end && pos < u64(start) + 512; pos += 8)
-	{
-		u32 lo, hi;
-		if (!read_word(pos, lo, bus) || !read_word(pos + 4, hi, bus))
-			break;
-		logerror("%s %08x: %08x %08x\n", name, u32(pos), lo, hi);
-	}
 }
 
 TIMER_CALLBACK_MEMBER(mali200_device::pp_run)
@@ -475,10 +493,6 @@ TIMER_CALLBACK_MEMBER(mali200_device::pp_run)
 TIMER_CALLBACK_MEMBER(mali200_device::gp_run)
 {
 	begin_dma_cache();
-	if ((VERBOSE & LOG_LISTS) && (m_gp_started & 1))
-		trace_list("VS list", m_gp[0], m_gp[1], 5);
-	if ((VERBOSE & LOG_LISTS) && (m_gp_started & 2))
-		trace_list("PLB list", m_gp[2], m_gp[3], 7);
 	bool const vertex_done = !(m_gp_started & 1) || vs_commands();
 	if (vertex_done && (m_gp_started & 1))
 	{

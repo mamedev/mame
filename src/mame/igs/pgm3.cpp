@@ -180,10 +180,10 @@ void pgm3_state::pgm3(machine_config &config)
 	screen.screen_vblank().set(FUNC(pgm3_state::screen_vblank_pgm3));
 	screen.set_palette("palette");
 
-	MALI200(config, m_mali, 200000000);
+	MALI200(config, m_mali, 200'000'000);
 	m_mali->set_dma_space(m_maincpu, AS_PROGRAM);
 
-	HANTRO_G1(config, m_hantro, 200000000); // functional timing; clock unverified
+	HANTRO_G1(config, m_hantro, 200'000'000); // functional timing; clock unverified
 	m_hantro->set_dma_space(m_maincpu, AS_PROGRAM);
 
 	PALETTE(config, "palette").set_entries(0x1000);
