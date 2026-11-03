@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "i82439tx.h"
 
+#include <algorithm>
+
 DEFINE_DEVICE_TYPE(I82439TX, i82439tx_host_device, "i82439tx", "Intel 82439TX northbridge")
 
 void i82439tx_host_device::config_map(address_map &map)
@@ -26,6 +28,9 @@ void i82439tx_host_device::config_map(address_map &map)
 i82439tx_host_device::i82439tx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, I82439TX, tag, owner, clock)
 	, cpu(*this, finder_base::DUMMY_TAG)
+	, m_ram_dev(*this, finder_base::DUMMY_TAG)
+	, m_ram(nullptr)
+	, smiact_n(true)
 {
 }
 
@@ -47,7 +52,16 @@ void i82439tx_host_device::device_start()
 	io_offset       = 0;
 	status = 0x0010;
 
-	ram.resize(ram_size/4);
+	if (m_ram_dev)
+	{
+		ram_size = m_ram_dev->size();
+		m_ram = reinterpret_cast<uint32_t *>(m_ram_dev->pointer());
+	}
+	else
+	{
+		ram.resize(ram_size/4);
+		m_ram = ram.data();
+	}
 }
 
 void i82439tx_host_device::reset_all_mappings()
@@ -72,6 +86,7 @@ void i82439tx_host_device::device_reset()
 	errcmd = 0x00;
 	errsts = 0x00;
 	errsyn = 0x00;
+	smiact_n = true;
 }
 
 void i82439tx_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -80,71 +95,83 @@ void i82439tx_host_device::map_extra(uint64_t memory_window_start, uint64_t memo
 	io_space->install_device(0, 0xffff, *static_cast<pci_host_device *>(this), &pci_host_device::io_configuration_access_map);
 
 	if((dramc & 0xc0) == 0x40)
-		memory_space->install_ram      (0x00000000, 0x0007ffff, &ram[0x00000000/4]);
+		memory_space->install_ram      (0x00000000, 0x0007ffff, &m_ram[0x00000000/4]);
 	else
-		memory_space->install_ram      (0x00000000, 0x0009ffff, &ram[0x00000000/4]);
+		memory_space->install_ram      (0x00000000, 0x0009ffff, &m_ram[0x00000000/4]);
 
-	if(smram & 0x40)
-		memory_space->install_ram      (0x000a0000, 0x000bffff, &ram[0x000a0000/4]);
+	// assume that map_extra of the northbridge is called after the video card has mapped its memory here
+	// FIXME: D_CLS and D_LCK not emulated
+	if (smram & 0x08)
+	{
+		if (smiact_n == 0)
+			memory_space->install_ram(0x000a0000, 0x000bffff, &m_ram[0x000a0000 / 4]);
+		else
+			if (smram & 0x40)
+				memory_space->install_ram(0x000a0000, 0x000bffff, &m_ram[0x000a0000 / 4]);
+	}
 
 	if(pam[1] & 0x01)
-		memory_space->install_rom      (0x000c0000, 0x000c3fff, &ram[0x000c0000/4]);
+		memory_space->install_rom      (0x000c0000, 0x000c3fff, &m_ram[0x000c0000/4]);
 	if(pam[1] & 0x02)
-		memory_space->install_writeonly(0x000c0000, 0x000c3fff, &ram[0x000c0000/4]);
+		memory_space->install_writeonly(0x000c0000, 0x000c3fff, &m_ram[0x000c0000/4]);
 	if(pam[1] & 0x10)
-		memory_space->install_rom      (0x000c4000, 0x000c7fff, &ram[0x000c4000/4]);
+		memory_space->install_rom      (0x000c4000, 0x000c7fff, &m_ram[0x000c4000/4]);
 	if(pam[1] & 0x20)
-		memory_space->install_writeonly(0x000c4000, 0x000c7fff, &ram[0x000c4000/4]);
+		memory_space->install_writeonly(0x000c4000, 0x000c7fff, &m_ram[0x000c4000/4]);
 	if(pam[2] & 0x01)
-		memory_space->install_rom      (0x000c8000, 0x000cbfff, &ram[0x000c8000/4]);
+		memory_space->install_rom      (0x000c8000, 0x000cbfff, &m_ram[0x000c8000/4]);
 	if(pam[2] & 0x02)
-		memory_space->install_writeonly(0x000c8000, 0x000cbfff, &ram[0x000c8000/4]);
+		memory_space->install_writeonly(0x000c8000, 0x000cbfff, &m_ram[0x000c8000/4]);
 	if(pam[2] & 0x10)
-		memory_space->install_rom      (0x000cc000, 0x000cffff, &ram[0x000cc000/4]);
+		memory_space->install_rom      (0x000cc000, 0x000cffff, &m_ram[0x000cc000/4]);
 	if(pam[2] & 0x20)
-		memory_space->install_writeonly(0x000cc000, 0x000cffff, &ram[0x000cc000/4]);
+		memory_space->install_writeonly(0x000cc000, 0x000cffff, &m_ram[0x000cc000/4]);
 	if(pam[3] & 0x01)
-		memory_space->install_rom      (0x000d0000, 0x000d3fff, &ram[0x000d0000/4]);
+		memory_space->install_rom      (0x000d0000, 0x000d3fff, &m_ram[0x000d0000/4]);
 	if(pam[3] & 0x02)
-		memory_space->install_writeonly(0x000d0000, 0x000d3fff, &ram[0x000d0000/4]);
+		memory_space->install_writeonly(0x000d0000, 0x000d3fff, &m_ram[0x000d0000/4]);
 	if(pam[3] & 0x10)
-		memory_space->install_rom      (0x000d4000, 0x000d7fff, &ram[0x000d4000/4]);
+		memory_space->install_rom      (0x000d4000, 0x000d7fff, &m_ram[0x000d4000/4]);
 	if(pam[3] & 0x20)
-		memory_space->install_writeonly(0x000d4000, 0x000d7fff, &ram[0x000d4000/4]);
+		memory_space->install_writeonly(0x000d4000, 0x000d7fff, &m_ram[0x000d4000/4]);
 	if(pam[4] & 0x01)
-		memory_space->install_rom      (0x000d8000, 0x000dbfff, &ram[0x000d8000/4]);
+		memory_space->install_rom      (0x000d8000, 0x000dbfff, &m_ram[0x000d8000/4]);
 	if(pam[4] & 0x02)
-		memory_space->install_writeonly(0x000d8000, 0x000dbfff, &ram[0x000d8000/4]);
+		memory_space->install_writeonly(0x000d8000, 0x000dbfff, &m_ram[0x000d8000/4]);
 	if(pam[4] & 0x10)
-		memory_space->install_rom      (0x000dc000, 0x000dffff, &ram[0x000dc000/4]);
+		memory_space->install_rom      (0x000dc000, 0x000dffff, &m_ram[0x000dc000/4]);
 	if(pam[4] & 0x20)
-		memory_space->install_writeonly(0x000dc000, 0x000dffff, &ram[0x000dc000/4]);
+		memory_space->install_writeonly(0x000dc000, 0x000dffff, &m_ram[0x000dc000/4]);
 	if(pam[5] & 0x01)
-		memory_space->install_rom      (0x000e0000, 0x000e3fff, &ram[0x000e0000/4]);
+		memory_space->install_rom      (0x000e0000, 0x000e3fff, &m_ram[0x000e0000/4]);
 	if(pam[5] & 0x02)
-		memory_space->install_writeonly(0x000e0000, 0x000e3fff, &ram[0x000e0000/4]);
+		memory_space->install_writeonly(0x000e0000, 0x000e3fff, &m_ram[0x000e0000/4]);
 	if(pam[5] & 0x10)
-		memory_space->install_rom      (0x000e4000, 0x000e7fff, &ram[0x000e4000/4]);
+		memory_space->install_rom      (0x000e4000, 0x000e7fff, &m_ram[0x000e4000/4]);
 	if(pam[5] & 0x20)
-		memory_space->install_writeonly(0x000e4000, 0x000e7fff, &ram[0x000e4000/4]);
+		memory_space->install_writeonly(0x000e4000, 0x000e7fff, &m_ram[0x000e4000/4]);
 	if(pam[6] & 0x01)
-		memory_space->install_rom      (0x000e8000, 0x000ebfff, &ram[0x000e8000/4]);
+		memory_space->install_rom      (0x000e8000, 0x000ebfff, &m_ram[0x000e8000/4]);
 	if(pam[6] & 0x02)
-		memory_space->install_writeonly(0x000e8000, 0x000ebfff, &ram[0x000e8000/4]);
+		memory_space->install_writeonly(0x000e8000, 0x000ebfff, &m_ram[0x000e8000/4]);
 	if(pam[6] & 0x10)
-		memory_space->install_rom      (0x000ec000, 0x000effff, &ram[0x000ec000/4]);
+		memory_space->install_rom      (0x000ec000, 0x000effff, &m_ram[0x000ec000/4]);
 	if(pam[6] & 0x20)
-		memory_space->install_writeonly(0x000ec000, 0x000effff, &ram[0x000ec000/4]);
+		memory_space->install_writeonly(0x000ec000, 0x000effff, &m_ram[0x000ec000/4]);
 	if(pam[0] & 0x10)
-		memory_space->install_rom      (0x000f0000, 0x000fffff, &ram[0x000f0000/4]);
+		memory_space->install_rom      (0x000f0000, 0x000fffff, &m_ram[0x000f0000/4]);
 	if(pam[0] & 0x20)
-		memory_space->install_writeonly(0x000f0000, 0x000fffff, &ram[0x000f0000/4]);
+		memory_space->install_writeonly(0x000f0000, 0x000fffff, &m_ram[0x000f0000/4]);
 
-	memory_space->install_ram          (0x00100000, 0x00efffff, &ram[0x00100000/4]);
-	if((dramc & 0xc0) != 0x80)
-		memory_space->install_ram      (0x00f00000, 0x00ffffff, &ram[0x00f00000/4]);
+	// extended memory, only as far as there is RAM
+	const offs_t ram_top = ram_size;
+	if(ram_top > 0x00100000)
+		memory_space->install_ram      (0x00100000, std::min<offs_t>(ram_top, 0x00f00000) - 1, &m_ram[0x00100000/4]);
+	if(ram_top > 0x00f00000 && (dramc & 0xc0) != 0x80)
+		memory_space->install_ram      (0x00f00000, std::min<offs_t>(ram_top, 0x01000000) - 1, &m_ram[0x00f00000/4]);
 
-	memory_space->install_ram          (0x01000000, ram_size-1, &ram[0x01000000/4]);
+	if(ram_top > 0x01000000)
+		memory_space->install_ram      (0x01000000, ram_top - 1, &m_ram[0x01000000/4]);
 }
 
 
@@ -286,4 +313,15 @@ void i82439tx_host_device::errsts_w(uint8_t data)
 uint8_t i82439tx_host_device::errsyn_r()
 {
 	return errsyn;
+}
+
+void i82439tx_host_device::smi_act_w(int state)
+{
+	// state is 0 when smm is not active
+	// but smiact_n reflects the state of the SMIACT# pin
+	if (state == 0)
+		smiact_n = 1;
+	else
+		smiact_n = 0;
+	remap_cb();
 }

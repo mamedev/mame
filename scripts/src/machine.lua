@@ -3054,18 +3054,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/lpci.h,MACHINES["LPCI"] = true
----------------------------------------------------
-
-if MACHINES["LPCI"] then
-	files {
-		MAME_DIR .. "src/devices/machine/lpci.cpp",
-		MAME_DIR .. "src/devices/machine/lpci.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/pci.h,MACHINES["PCI"] = true
 ---------------------------------------------------
 
@@ -4901,6 +4889,30 @@ if MACHINES["VT82C496"] then
 	files {
 		MAME_DIR .. "src/devices/machine/vt82c496.cpp",
 		MAME_DIR .. "src/devices/machine/vt82c496.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/cx5510.h,MACHINES["CX5510"] = true
+---------------------------------------------------
+
+if MACHINES["CX5510"] then
+	files {
+		MAME_DIR .. "src/devices/machine/cx5510.cpp",
+		MAME_DIR .. "src/devices/machine/cx5510.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/vt82c505.h,MACHINES["VT82C505"] = true
+---------------------------------------------------
+
+if MACHINES["VT82C505"] then
+	files {
+		MAME_DIR .. "src/devices/machine/vt82c505.cpp",
+		MAME_DIR .. "src/devices/machine/vt82c505.h",
 	}
 end
 

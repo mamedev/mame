@@ -8,6 +8,7 @@
 #pragma once
 
 #include "pci.h"
+#include "ram.h"
 
 class i82439tx_host_device : public pci_host_device {
 public:
@@ -23,6 +24,10 @@ public:
 
 	template <typename T> void set_cpu_tag(T &&tag) { cpu.set_tag(std::forward<T>(tag)); }
 	void set_ram_size(int ram_size);
+	// take size and memory from a RAM device instead of set_ram_size
+	template <typename T> void set_ram_tag(T &&tag) { m_ram_dev.set_tag(std::forward<T>(tag)); }
+
+	void smi_act_w(int state);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -38,11 +43,14 @@ protected:
 private:
 	int ram_size;
 	required_device<device_memory_interface> cpu;
+	optional_device<ram_device> m_ram_dev;
 	std::vector<uint32_t> ram;
+	uint32_t *m_ram;
 
 	uint8_t pcon, cc, dramec, dramc, dramt;
 	uint8_t pam[7], drb[8];
 	uint8_t drt, drat, smram, errcmd, errsts, errsyn;
+	bool smiact_n;
 
 	uint8_t pcon_r();
 	void pcon_w(uint8_t data);
