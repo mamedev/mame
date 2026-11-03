@@ -14363,9 +14363,12 @@ ROM_END
 
   issues....
 
-  dynplus, lfhouse and lfhouseb have wrong GFX ROMs.
-  They don't match the program so there are severe GFX fails. 
+  dynplus has wrong GFX ROMs.
+  they don't match the program so there are severe GFX fails. 
   Will mark these as bad dumps.
+
+  lfhouse and lfhouseb have missing graphics bitplanes.
+  Graphics ROMs need to be redumped.
 
 */
 ROM_START( dash_a37 )
@@ -14556,31 +14559,37 @@ ROM_START( lfhouse )
 
     // wrong GFX set. doesn't match title and maybe other graphics.
 	// need the real missing GFX ROMs
-	ROM_REGION( 0x8000, "gfxpool", 0 )
-	ROM_LOAD( "1.5l", 0x0000, 0x4000, BAD_DUMP CRC(a501edc4) SHA1(95fc04c16cde89636023639db236fba261ccd21b) )
-	ROM_IGNORE(               0x4000 )
-	ROM_LOAD( "2.5n", 0x4000, 0x4000, BAD_DUMP CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
-	ROM_IGNORE(               0x4000 )
+	ROM_REGION( 0x10000, "gfxpool", 0 )
+	ROM_LOAD( "1.5l", 0x0000, 0x8000, BAD_DUMP CRC(a501edc4) SHA1(95fc04c16cde89636023639db236fba261ccd21b) )
+	ROM_LOAD( "2.5n", 0x8000, 0x8000, BAD_DUMP CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
 
-	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
+//  d000 --> lucky animation
+//  f000 --> title
+
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars (could have 2 missing bitplanes)
 	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (empty)
 	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (empty)
-	ROM_COPY( "gfxpool", 0x5000, 0x1000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x9000, 0x1000, 0x0800 ) // src-dest-size (data)
 
 	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
 	ROM_COPY( "gfxpool", 0x1800, 0x0000, 0x0800 ) // src-dest-size (data)
 	ROM_COPY( "gfxpool", 0x0800, 0x0800, 0x0800 ) // src-dest-size (data)
-	ROM_COPY( "gfxpool", 0x5800, 0x1000, 0x0800 ) // src-dest-size (data)
-
+	ROM_COPY( "gfxpool", 0x9800, 0x1000, 0x0800 ) // src-dest-size (data)
+/*
 	ROM_REGION( 0x1800, "gfx3", 0 )  // extra 1
 	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (empty)
 	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (empty)
 	ROM_COPY( "gfxpool", 0x7000, 0x1000, 0x0800 ) // src-dest-size (data)
+*/
+	ROM_REGION( 0x1800, "gfx3", 0 )  // extra 1: title (needs the 2 missing bitplanes)
+	ROM_COPY( "gfxpool", 0xf000, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0xf000, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0xf000, 0x1000, 0x0800 ) // src-dest-size (data)
 
 	ROM_REGION( 0x1800, "gfx4", 0 )  // extra 2
 	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data)
 	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
-	ROM_COPY( "gfxpool", 0x7800, 0x1000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0xb800, 0x1000, 0x0800 ) // src-dest-size (data)
 
     // scrambled addressing
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -15677,8 +15686,8 @@ GAME(  1996, dash_a37b, dash_a37,  dash_a37,  goldnpkr, goldnpkr_state, init_das
 GAME(  1992, dynchance, 0,         dynchance, goldnpkr, goldnpkr_state, init_dynchance,ROT0, "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2)",         MACHINE_NOT_WORKING )
 GAME(  1992, dynchancf, dynchance, dynchance, goldnpkr, goldnpkr_state, init_dynchance,ROT0, "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2, alt)",    MACHINE_NOT_WORKING )
 GAME(  1997, dynplus,   dynchance, dynplus,   goldnpkr, goldnpkr_state, init_dynplus,ROT0,   "<unknown>",                "Dynamic Plus One (SP Type ver 1.10)",        MACHINE_NOT_WORKING )
-GAME(  1996, lfhouse,   0,         lfhouse,   goldnpkr, goldnpkr_state, init_lfhouse,ROT0,   "<unknown>",                "Lucky Full House (ver 1.16, data ver 1.05)", MACHINE_NOT_WORKING )
-GAME(  1994, lfhouseb,  lfhouse,   lfhouse,   goldnpkr, goldnpkr_state, init_lfhouseb,ROT0,  "<unknown>",                "Lucky Full House (ver 1.15, data ver 1.04)", MACHINE_NOT_WORKING )
+GAME(  1996, lfhouse,   0,         lfhouse,   goldnpkr, goldnpkr_state, init_lfhouse,ROT0,   "R and E",                  "Lucky Full House (ver 1.16, data ver 1.05)", MACHINE_NOT_WORKING )
+GAME(  1994, lfhouseb,  lfhouse,   lfhouse,   goldnpkr, goldnpkr_state, init_lfhouseb,ROT0,  "R and E",                  "Lucky Full House (ver 1.15, data ver 1.04)", MACHINE_NOT_WORKING )
 GAME(  1998, unkdep,    lfhouse,   unkdep,    goldnpkr, goldnpkr_state, init_unkdep, ROT0,   "<unknown>",                "unknown DEP 9801 poker game",                MACHINE_NOT_WORKING )
 
 
