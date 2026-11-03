@@ -1213,7 +1213,7 @@ void floppy_image_device::cache_fill_index(const std::vector<uint32_t> &buf, int
 		m_cache_entry = floppy_image::MG_N;
 		m_cache_start_time = attotime::zero;
 		m_cache_end_time = attotime::never;
-		m_cache_revolution = m_revolution_count;
+		m_cache_revolution = 0; // no zone start to anchor the noise to, it depends on the time only
 		return;
 	}
 
@@ -1240,7 +1240,7 @@ void floppy_image_device::cache_fill(const attotime &when)
 		m_cache_start_time = attotime::zero;
 		m_cache_end_time = attotime::never;
 		m_cache_index = 0;
-		m_cache_revolution = m_revolution_count;
+		m_cache_revolution = 0;
 		m_cache_entry = (cells == 1) ? buf[0] : floppy_image::MG_N;
 		cache_weakness_setup();
 		return;
