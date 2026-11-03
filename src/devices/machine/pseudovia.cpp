@@ -742,7 +742,7 @@ uint8_t quadra_pseudovia_device::read(offs_t offset)
 		break;
 
 	case 14: // IER
-		data = m_pseudovia_regs[0x13];
+		data = m_pseudovia_regs[0x13] | 0x80;
 		break;
 
 	default:
