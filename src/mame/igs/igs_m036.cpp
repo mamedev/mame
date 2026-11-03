@@ -16,12 +16,14 @@
    display control, verify CPU/peripheral clocks, complete timer modes, serial
    links, real-time timer, lamps/counters and remaining DIP settings. Mechanical
    payout timing is provisional; alternate control modes still need checking.
+
    The 20 MHz oscillator is documented on several boards; the CPU's internal
    PLL/multiplier has not been established. PGM2's 100 MHz is also marked unknown.
    HD boards provisionally use 100 MHz: their ROMs select 0x1b rather than 0x18
    at 0xfffffa0c, and 20 MHz leaves Hou Ye Leyuan's sprite rebuild unfinished
    on alternate frames. The register's PLL/divider fields still need decoding.
-   Internal ROM dumps and the huoqilin program ROM redump: little0, Peter Wilhelmsen.
+
+   Is the video hardware here part of IGS036 that goes unused by PGM2?
 
    Operator password recovery
    --------------------------
@@ -242,6 +244,7 @@ protected:
 	u32 dips_packed_r();
 	void key_select_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
 	void gpio_outputs_w(offs_t offset, u32 data, u32 mem_mask = ~0U);
+	u32 base_gpio_r(offs_t offset, u32 mem_mask = ~0U);
 
 private:
 	std::unique_ptr<u8 []> m_encrypted_copy;
@@ -352,6 +355,7 @@ protected:
 		m_scan(*this, "SCAN%u", 0U) { }
 
 	void hd_config(machine_config &config) ATTR_COLD;
+	u32 hyleyuan_gpio_r(offs_t offset, u32 mem_mask);
 	template <u32 Rows> u32 scan_inputs_r();
 };
 
@@ -374,6 +378,7 @@ private:
 	u16 m_secondary_select;
 
 	void hd_map(address_map &map) ATTR_COLD;
+	u32 hd_gpio_r(offs_t offset, u32 mem_mask = ~0U);
 	u32 gpio_inputs_r();
 	void outputs_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
 };
@@ -729,15 +734,42 @@ void m036_state::m036_map(address_map &map)
 }
 
 
+
+u32 m036_base_state::base_gpio_r(offs_t offset, u32 mem_mask)
+{
+	switch (offset)
+	{
+	case 0: return m_pio_out;
+	case 1: return m_service->read();
+	}
+
+	return 0x00000000;
+}
+
+u32 m036_hd_state::hd_gpio_r(offs_t offset, u32 mem_mask)
+{
+	switch (offset)
+	{
+	case 0: return m_pio_out;
+	case 1: return gpio_inputs_r();
+	}
+
+	return 0x00000000;
+}
+
+u32 m036_hd_base_state::hyleyuan_gpio_r(offs_t offset, u32 mem_mask)
+{
+	switch (offset)
+	{
+	case 0: return m_pio_out;
+	case 1: return scan_inputs_r<4>();
+	}
+
+	return 0x00000000;
+}
+
 void m036_base_state::m036_boot_map(address_map &map)
 {
-	// Boot map verified with the 17 dumped internal ROMs. Sets whose internal
-	// ROM is still undumped retain the original skeleton map and static keys.
-	map(0x0200'0000, 0x0200'ffff).ram().share("nvram");
-	map(0x1000'0000, 0x101f'ffff).rom().region("user1", 0);
-	// External SRAM also holds settings, credits and bookkeeping. The startup
-	// code reinitializes its working areas but preserves valid accounting data.
-	map(0x2000'0000, 0x2001'ffff).ram().share("mainram"); // stacks at the top
 
 	// Video RAM ranges cleared by the internal ROM. Only basic sprites are drawn.
 	// Unlike PGM2, this board uses 0x03xxxxxx, not 0x30xxxxxx, for video/I/O.
@@ -752,16 +784,22 @@ void m036_base_state::m036_boot_map(address_map &map)
 	map(0x0352'0000, 0x0352'0003).lr32(NAME([] () -> u32 { return 1; })); // TODO: video ready/busy timing
 	map(0x0354'0000, 0x0354'0003).nopw();
 	map(0x0356'0000, 0x0356'0003).nopw();
-	map(0x5000'0004, 0x5000'0007).nopw(); // overridden for sydh's output at byte address 0x50000006
+
+	map(0x1000'0000, 0x101f'ffff).rom().region("user1", 0);
+	// External SRAM also holds settings, credits and bookkeeping. The startup
+	// code reinitializes its working areas but preserves valid accounting data.
+	map(0x2000'0000, 0x2001'ffff).ram().share("mainram"); // stacks at the top
 
 	map(0x3000'0000, 0x3000'0003).umask32(0xffff'0000).w(FUNC(m036_base_state::key_select_w));
 	map(0x3000'0004, 0x3000'0007).lr32(NAME([] () -> u32 { return 0xffff'ffff; }));
 	map(0x3000'0008, 0x3000'000f).r(FUNC(m036_base_state::dips_r));
 
+	map(0x5000'0004, 0x5000'0007).nopw(); // overridden for sydh's output at byte address 0x50000006
+
 	// IGS036 system peripherals, also used by PGM2.
-	map(0xffff'f430, 0xffff'f437).w(FUNC(m036_base_state::gpio_outputs_w));
-	map(0xffff'f438, 0xffff'f43b).lr32(NAME([this] () -> u32 { return m_pio_out; }));
-	map(0xffff'f43c, 0xffff'f43f).portr(m_service);
+	//map(0xffff'f430, 0xffff'f437).w(FUNC(m036_base_state::gpio_outputs_w));
+	//map(0xffff'f438, 0xffff'f43b).lr32(NAME([this] () -> u32 { return m_pio_out; }));
+	//map(0xffff'f43c, 0xffff'f43f).portr(m_service);
 	// Several internal ROMs verify that bit 2 reads back set after enabling
 	// decryption, and stop before the checksum if it is clear.
 	map(0xffff'fa08, 0xffff'fa0b).lr32(NAME([this] () -> u32 { return m_has_decrypted ? 4U : 0U; })).w(FUNC(m036_base_state::encryption_control_w));
@@ -771,7 +809,6 @@ void m036_base_state::m036_boot_map(address_map &map)
 void m036_tt_state::m036_tt_boot_map(address_map &map)
 {
 	m036_boot_map(map);
-	map(0xffff'f430, 0xffff'f437).w(FUNC(m036_tt_state::gpio_hopper_w));
 	map(0x4000'0000, 0x4000'0003).umask32(0x0000'00ff).rw(m_tt5665, FUNC(tt5665_device::csl_r), FUNC(tt5665_device::csl_w));
 	map(0x5000'0000, 0x5000'0003).umask32(0x0000'00ff).rw(m_tt5665, FUNC(tt5665_device::csr_r), FUNC(tt5665_device::csr_w));
 }
@@ -780,7 +817,6 @@ void m036_tt_state::m036_tt_boot_map(address_map &map)
 void m036_oki_state::m036_oki_boot_map(address_map &map)
 {
 	m036_boot_map(map);
-	map(0xffff'f430, 0xffff'f437).w(FUNC(m036_oki_state::gpio_hopper_w));
 	map(0x4000'0000, 0x4000'0003).umask32(0x0000'00ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x3000'0000, 0x3000'0003).umask32(0x0000'00ff).w(FUNC(m036_oki_state::oki_banks_w));
 	// Later OKI boards move the two DIP banks here.
@@ -805,13 +841,14 @@ void m036_tt_state::sydh_map(address_map &map)
 void m036_hd_state::hd_map(address_map &map)
 {
 	m036_boot_map(map);
+	map(0x0340'0000, 0x0340'0003).r(FUNC(m036_hd_state::dips_packed_r));
+
 	map(0x4000'0000, 0x4000'0003).umask32(0x0000'00ff).rw(m_tt5665, FUNC(tt5665_device::csl_r), FUNC(tt5665_device::csl_w));
 	map(0x4020'0000, 0x4020'0003).umask32(0x0000'00ff).rw(m_tt5665, FUNC(tt5665_device::csr_r), FUNC(tt5665_device::csr_w));
-	map(0x0340'0000, 0x0340'0003).r(FUNC(m036_hd_state::dips_packed_r));
+
 	map(0x5000'0000, 0x5000'0007).r(FUNC(m036_hd_state::dips_r));
 	map(0x5000'0000, 0x5000'0003).umask32(0x0000'ffff).w(FUNC(m036_hd_state::outputs_w));
 	map(0x5020'0000, 0x5020'0003).umask32(0x0000'ffff).w(FUNC(m036_hd_state::key_select_w));
-	map(0xffff'f43c, 0xffff'f43f).r(FUNC(m036_hd_state::gpio_inputs_r));
 }
 
 
@@ -826,21 +863,25 @@ void m036_hyleyuan_state::hyleyuan_map(address_map &map)
 	// Without sensor pulses the game stops the motor after five seconds and
 	// displays the ticket-dispenser fault with the unpaid count.
 	map(0x6000'0000, 0x6000'0003).umask32(0x0000'00ff).lw8(NAME([this] (u8 data) { m_ticket->motor_w(BIT(data, 1)); }));
-	map(0xffff'f43c, 0xffff'f43f).r(FUNC(m036_hyleyuan_state::scan_inputs_r<4>));
 }
 
 void m036_mj_state::mjzhizun_map(address_map &map)
 {
 	m036_boot_map(map);
-	map(0x3000'0000, 0x3000'0003).portr(m_service);
-	map(0x3000'0000, 0x3000'0003).umask32(0x0000'ffff).w(FUNC(m036_mj_state::outputs_w));
+
 	map(0x0340'0000, 0x0340'0003).lr32(NAME([this] () -> u32 {
 		return (dips_packed_r() & 0x00ff'ffff) | (u32(m_direct->read() & keys_r(m_key_select)) << 24);
 	}));
-	map(0x5000'0000, 0x5000'0003).nopw(); // TODO: sound sample banking?
+
+	map(0x3000'0000, 0x3000'0003).portr(m_service);
+
+	map(0x3000'0000, 0x3000'0003).umask32(0x0000'ffff).w(FUNC(m036_mj_state::outputs_w));
 	map(0x3001'0000, 0x3001'0003).lr32(NAME([] () -> u32 { return 0xffff'ffff; })).nopw();
+
 	map(0x4000'0000, 0x4000'0003).umask32(0x0000'00ff).rw(m_tt5665, FUNC(tt5665_device::csl_r), FUNC(tt5665_device::csl_w));
 	map(0x4001'0000, 0x4001'0003).umask32(0x0000'00ff).rw(m_tt5665, FUNC(tt5665_device::csr_r), FUNC(tt5665_device::csr_w));
+
+	map(0x5000'0000, 0x5000'0003).nopw(); // TODO: sound sample banking?
 }
 
 
@@ -1219,6 +1260,8 @@ void m036_base_state::base_config(machine_config &config)
 {
 	IGS036(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m036_base_state::m036_boot_map);
+	m_maincpu->set_gpio_r().set(FUNC(m036_base_state::base_gpio_r));
+	m_maincpu->set_gpio_w().set(FUNC(m036_base_state::gpio_outputs_w));
 
 	SCREEN(config, m_screen);
 	// FIXME: pixel clock and blanking intervals are not known.
@@ -1229,7 +1272,6 @@ void m036_base_state::base_config(machine_config &config)
 	m_screen->set_screen_update(FUNC(m036_base_state::screen_update<false>));
 	m_screen->screen_vblank().set(FUNC(m036_base_state::screen_vblank));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "mainram", nvram_device::DEFAULT_ALL_0);
 	SPEAKER(config, "speaker").front_center();
 }
@@ -1244,6 +1286,7 @@ void m036_oki_state::m036_boot(machine_config &config)
 {
 	hopper_config(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m036_oki_state::m036_oki_boot_map);
+	m_maincpu->set_gpio_w().set(FUNC(m036_oki_state::gpio_hopper_w));
 	OKIM6295(config, m_oki, 1'000'000, okim6295_device::PIN7_LOW); // clock and pin 7 not verified
 	m_oki->set_addrmap(0, &m036_oki_state::oki_rom_map);
 	m_oki->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -1267,12 +1310,14 @@ void m036_tt_state::m036_tt_boot(machine_config &config)
 {
 	tt_config(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m036_tt_state::m036_tt_boot_map);
+	m_maincpu->set_gpio_w().set(FUNC(m036_tt_state::gpio_hopper_w));
 }
 
 void m036_tt_state::m036_sydh(machine_config &config)
 {
 	tt_config(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m036_tt_state::sydh_map);
+	m_maincpu->set_gpio_w().set(FUNC(m036_tt_state::gpio_hopper_w));
 }
 
 void m036_tt_state::m036_sram(machine_config &config)
@@ -1310,6 +1355,8 @@ void m036_hd_state::m036_hd(machine_config &config)
 {
 	hd_config(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m036_hd_state::hd_map);
+	m_maincpu->set_gpio_r().set(FUNC(m036_hd_state::hd_gpio_r));
+
 	HOPPER(config, m_hopper, attotime::from_msec(100)); // mechanical period is provisional
 }
 
@@ -1317,6 +1364,8 @@ void m036_hyleyuan_state::m036_hyleyuan(machine_config &config)
 {
 	hd_config(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m036_hyleyuan_state::hyleyuan_map);
+	m_maincpu->set_gpio_r().set(FUNC(m036_hyleyuan_state::hyleyuan_gpio_r));
+
 	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100)); // mechanical period is provisional
 }
 

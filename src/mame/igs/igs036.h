@@ -7,6 +7,7 @@
 
 #include "cpu/arm7/arm7.h"
 #include "machine/atmel_arm_aic.h"
+#include "machine/nvram.h"
 
 class igs036_cpu_device : public arm946es_cpu_device
 {
@@ -17,6 +18,9 @@ public:
 	void set_aic_irq(int level, int state) { m_arm_aic->set_irq(level, state); }
 
 	u8* get_encryption_table() { return m_encryption_table; }
+
+	auto set_gpio_r() { return m_read_gpio.bind(); }
+	auto set_gpio_w() { return m_write_gpio.bind(); }
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -31,8 +35,13 @@ private:
 	bool m_tc_enabled[3];
 	u8 m_encryption_table[0x100];
 
+	devcb_read32 m_read_gpio;
+	devcb_write32 m_write_gpio;
+
 	u8 encryption_r(offs_t offset);
 	void encryption_w(offs_t offset, u8 data);
+	u32 gpio_r(offs_t offset, u32 mem_mask = ~0U);
+	void gpio_w(offs_t offset, u32 data, u32 mem_mask = ~0U);
 
 	u32 timer_r(offs_t offset);
 	void timer_w(offs_t offset, u32 data, u32 mem_mask = ~0U);

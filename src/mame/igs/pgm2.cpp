@@ -486,8 +486,6 @@ u32 pgm2_state::pio_pdsr_r()
 
 void pgm2_state::pgm2_map(address_map &map)
 {
-	map(0x02000000, 0x0200ffff).ram().share("sram"); // 'battery RAM' (in CPU?)
-
 	map(0x03600000, 0x036bffff).rw(FUNC(pgm2_state::mcu_r), FUNC(pgm2_state::mcu_w));
 
 	map(0x03900000, 0x03900003).portr("INPUTS0");
@@ -527,9 +525,6 @@ void pgm2_state::pgm2_map(address_map &map)
 
 	map(0x40000000, 0x40000003).r("ymz774", FUNC(ymz774_device::read)).w("ymz774", FUNC(ymz774_device::write));
 
-	// internal IGS036 - most of them is standard ATMEL peripherals followed by custom bits
-	map(0xfffff430, 0xfffff437).nopw(); // often
-
 	// custom IGS036 stuff starts here
 	map(0xfffffa08, 0xfffffa0b).w(FUNC(pgm2_state::encryption_do_w)); // after uploading encryption? table might actually send it or enable external ROM? when read bits0-1 called FUSE 0 and 1, must be 0
 }
@@ -548,14 +543,31 @@ void pgm2_state::pgm2_ram_rom_map(address_map &map)
 	map(0x10200000, 0x103fffff).rom().region("mainrom", 0); // external ROM
 }
 
+void pgm2_state::kov3_gpio_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	switch (offset)
+	{
+	case 0: pio_sodr_w(offset, data, mem_mask); break;
+	case 1: pio_codr_w(offset, data, mem_mask); break;
+	}
+}
+
+u32 pgm2_state::kov3_gpio_r(offs_t offset, u32 mem_mask)
+{
+	switch (offset)
+	{
+	case 0: return 0xffffffff;
+	case 1: return pio_pdsr_r();
+	}
+
+	return 0x00000000;
+}
+
 void pgm2_state::pgm2_module_rom_map(address_map &map)
 {
 	pgm2_rom_map(map);
 	map(0x10000000, 0x107fffff).w(FUNC(pgm2_state::module_rom_w));
 	map(0x10000000, 0x1000000f).r(FUNC(pgm2_state::module_rom_r));
-	map(0xfffff430, 0xfffff433).w(FUNC(pgm2_state::pio_sodr_w));
-	map(0xfffff434, 0xfffff437).w(FUNC(pgm2_state::pio_codr_w));
-	map(0xfffff43c, 0xfffff43f).r(FUNC(pgm2_state::pio_pdsr_r));
 }
 
 static INPUT_PORTS_START( pgm2 )
@@ -729,8 +741,6 @@ void pgm2_state::pgm2(machine_config &config)
 	PALETTE(config, m_tx_palette).set_format(palette_device::xRGB_888, 0x800 / 4); // text
 	PALETTE(config, m_bg_palette).set_format(palette_device::xRGB_888, 0x2000 / 4); // bg
 
-	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
-
 	SPEAKER(config, "speaker", 2).front();
 
 	ymz774_device &ymz774(YMZ774(config, "ymz774", 22.5792_MHz_XTAL));
@@ -755,6 +765,9 @@ void pgm2_state::pgm2_hires(machine_config &config)
 {
 	pgm2(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm2_state::pgm2_module_rom_map);
+	m_maincpu->set_gpio_r().set(FUNC(pgm2_state::kov3_gpio_r));
+	m_maincpu->set_gpio_w().set(FUNC(pgm2_state::kov3_gpio_w));
+
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
 }
 
@@ -789,7 +802,7 @@ void pgm2_state::pgm2_ramrom(machine_config &config)
 	ROM_REGION( 0x1000000, "ymz774", ROMREGION_ERASEFF ) /* ymz774 */ \
 	ROM_LOAD16_WORD_SWAP( "ig-a_sp.u2",  0x00000000, 0x1000000, CRC(8250688c) SHA1(d2488477afc528aeee96826065deba2bce4f0a7d) ) \
 	\
-	ROM_REGION( 0x10000, "sram", 0 ) \
+	ROM_REGION( 0x10000, "maincpu:sram", 0 ) \
 	ROM_LOAD( "xyj2_nvram",            0x00000000, 0x10000, CRC(ccccc71c) SHA1(585b5ccbf89dd28d8532da785d7c8af12f31c6d6) )
 
 /*
@@ -911,7 +924,7 @@ ROM_END
 	ROM_REGION( 0x2000000, "ymz774", ROMREGION_ERASEFF ) /* ymz774 */ \
 	ROM_LOAD16_WORD_SWAP( "ig-a3_sp.u37",            0x00000000, 0x2000000, CRC(45cdf422) SHA1(8005d284bcee73cff37a147fcd1c3e9f039a7203) ) \
 	\
-	ROM_REGION(0x10000, "sram", 0) \
+	ROM_REGION(0x10000, "maincpu:sram", 0) \
 	ROM_LOAD("gsyx_nvram", 0x00000000, 0x10000, CRC(22400c16) SHA1(f775a16299c30f2ce23d683161b910e06eff37c1) )
 
 #define KOV2NL_PROGRAM_302(prefix, extension) \
@@ -1013,7 +1026,7 @@ ROM_END
 	ROM_REGION( 0x1000000, "ymz774", ROMREGION_ERASEFF ) /* ymz774 */ \
 	ROM_LOAD16_WORD_SWAP( "ddpdoj_wave0.u12",        0x00000000, 0x1000000, CRC(2b71a324) SHA1(f69076cc561f40ca564d804bc7bd455066f8d77c) ) \
 	\
-	ROM_REGION( 0x10000, "sram", 0 ) \
+	ROM_REGION( 0x10000, "maincpu:sram", 0 ) \
 	ROM_LOAD( "ddpdojt_sram",            0x00000000, 0x10000, CRC(af99e304) SHA1(e44fed22b902431298748eca84533f8685926afd) )
 
 ROM_START( ddpdojt )
@@ -1054,7 +1067,7 @@ ROM_END
 	ROM_REGION( 0x4000000, "ymz774", ROMREGION_ERASEFF ) /* ymz774 */ \
 	ROM_LOAD16_WORD_SWAP( "kov3_wave0.u13",              0x00000000, 0x4000000, CRC(aa639152) SHA1(2314c6bd05524525a31a2a4668a36a938b924ba4) ) \
 	\
-	ROM_REGION( 0x10000, "sram", 0 ) \
+	ROM_REGION( 0x10000, "maincpu:sram", 0 ) \
 	ROM_LOAD( "kov3_sram",            0x00000000, 0x10000, CRC(d9608102) SHA1(dec5631642393f4ec76912c81fd60249bb45aa13) )
 
 #define KOV3_INTERNAL_CHINA \
@@ -1133,7 +1146,7 @@ all others:         SPANSION S99-50070
 	ROM_LOAD16_WORD_SWAP( "ig-d3_wave0.u12",        0x00000000, 0x4000000, CRC(edf2332d) SHA1(7e01c7e03e515814d7de117c265c3668d32842fa) ) \
 	ROM_LOAD16_WORD_SWAP( "ig-d3_wave1.u11",        0x04000000, 0x4000000, CRC(62321b20) SHA1(a388c8a2489430fbe92fb26b3ef81c66ce97f318) ) \
 	\
-	ROM_REGION( 0x10000, "sram", 0 ) \
+	ROM_REGION( 0x10000, "maincpu:sram", 0 ) \
 	ROM_LOAD( "kof98umh_sram",            0x00000000, 0x10000, CRC(60460ed9) SHA1(55cd8de37cee04ff7ad940fb52f8fb8db042c26e) )
 
 
@@ -1172,7 +1185,7 @@ ROM_START( bubucar )
 	ROM_REGION( 0x1000000, "ymz774", ROMREGION_ERASEFF ) // YMZ774
 	ROM_LOAD16_WORD_SWAP( "jg_wave.u18",          0x0000000, 0x1000000, CRC(8ba99c0c) SHA1(5a7cccfae47eee5c9ea4c172f5126d514156f771) ) // K8Q2815UQB
 
-	ROM_REGION( 0x10000, "sram", 0 )
+	ROM_REGION( 0x10000, "maincpu:sram", 0 )
 	ROM_LOAD( "bubucar_en_sram",                  0x0000000, 0x0010000, NO_DUMP )
 
 	ROM_REGION( 0x603, "cpld", 0 )

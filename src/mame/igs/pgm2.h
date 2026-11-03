@@ -97,6 +97,8 @@ private:
 	int module_data_r();
 	void module_data_w(int state);
 	void module_clk_w(int state);
+	void kov3_gpio_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 kov3_gpio_r(offs_t offset, u32 mem_mask);
 
 	void encryption_do_w(u32 data);
 	void sprite_encryption_w(offs_t offset, u32 data, u32 mem_mask = ~0);

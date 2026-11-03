@@ -1,6 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+/*
+	TODO:
+	- add support for missing peripherals (not needed at the moment)
+	- move igs036crypt handling into here (currently tricky due to ddpdojt using RAM not ROM)
+	- figure out if the igs_m036.cpp video emulation is an IGS036 feature that PGM2 ignores
+	  (and if so, move handling into here too)
+*/
+
 #include "emu.h"
 #include "igs036.h"
 
@@ -9,13 +17,28 @@
 // unknown configuration, but uses MPU not MMU, so closer to ARM946ES
 igs036_cpu_device::igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm946es_cpu_device(mconfig, IGS036, tag, owner, clock, address_map_constructor(FUNC(igs036_cpu_device::onboard_peripherals), this))
+	, m_read_gpio(*this, 0)
+	, m_write_gpio(*this)
 	, m_arm_aic(*this, "arm_aic")
 {
+}
+
+u32 igs036_cpu_device::gpio_r(offs_t offset, u32 mem_mask)
+{
+	return m_read_gpio(offset, mem_mask);
+}
+
+void igs036_cpu_device::gpio_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	m_write_gpio(offset, data, mem_mask);
 }
 
 void igs036_cpu_device::onboard_peripherals(address_map &map)
 {
 	map(0x0000'0000, 0x0000'3fff).rom().region(DEVICE_SELF, 0);
+
+	// this NVRAM range appears to be internal to the CPU
+	map(0x0200'0000, 0x0200'ffff).ram().share("sram");
 
 	// IGS036 system peripherals, also used by PGM2.
 	map(0xfffa'0000, 0xfffa'00c7).rw(FUNC(igs036_cpu_device::timer_r), FUNC(igs036_cpu_device::timer_w));
@@ -23,9 +46,8 @@ void igs036_cpu_device::onboard_peripherals(address_map &map)
 	map(0xffff'ee00, 0xffff'ee57).nopw(); // TODO: bus matrix
 	map(0xffff'f000, 0xffff'f14b).m(m_arm_aic, FUNC(arm_aic_device::regs_map));
 	map(0xffff'f200, 0xffff'f247).nopw(); // TODO: debug UART
-	//map(0xffff'f430, 0xffff'f437).w(FUNC(m036_base_state::gpio_outputs_w));
-	//map(0xffff'f438, 0xffff'f43b).lr32(NAME([this] () -> u32 { return m_pio_out; }));
-	//map(0xffff'f43c, 0xffff'f43f).portr(m_service);
+	map(0xffff'f430, 0xffff'f437).w(FUNC(igs036_cpu_device::gpio_w));
+	map(0xffff'f438, 0xffff'f43f).r(FUNC(igs036_cpu_device::gpio_r));
 	// Several internal ROMs verify that bit 2 reads back set after enabling
 	// decryption, and stop before the checksum if it is clear.
 	//map(0xffff'fa08, 0xffff'fa0b).lr32(NAME([this] () -> u32 { return m_has_decrypted ? 4U : 0U; })).w(FUNC(m036_base_state::encryption_control_w));
@@ -49,6 +71,7 @@ void igs036_cpu_device::device_add_mconfig(machine_config &config)
 	arm946es_cpu_device::device_add_mconfig(config);
 
 	ARM_AIC(config, m_arm_aic).irq_callback().set(FUNC(igs036_cpu_device::irq));
+	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 }
 
 u8 igs036_cpu_device::encryption_r(offs_t offset)
