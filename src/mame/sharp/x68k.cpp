@@ -1179,7 +1179,7 @@ void x68k_state::x68000(machine_config &config)
 	m_crtc->gvram_read_cb().set(FUNC(x68k_state::gvram_read));
 	m_crtc->gvram_write_cb().set(FUNC(x68k_state::gvram_write));
 
-	X68KHDC(config, "x68k_hdc");
+	X68KHDC(config, "x68k_hdc").drq_callback().set(m_hd63450, FUNC(hd63450_device::drq1_w));
 }
 
 static void scsi_devices(device_slot_interface &device)
