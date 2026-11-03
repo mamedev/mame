@@ -2261,6 +2261,8 @@ void goldnpkr_state::dynchance_map(address_map &map)
 	map(0x3801, 0x3801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x3844, 0x3847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x3848, 0x384b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x4000, 0x4000).portr("SW2");
+	map(0x4001, 0x4001).portr("SW3");
 	map(0x6000, 0x63ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
 	map(0x6800, 0x6bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
 	map(0x8000, 0xffff).rom();
@@ -5268,6 +5270,81 @@ static INPUT_PORTS_START( dash_a37 )
 	PORT_DIPSETTING(    0x80, "+10%" )
 	PORT_DIPSETTING(    0x20, "+20%" )
 	PORT_DIPSETTING(    0x00, "+30%" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( dynchance )
+	PORT_INCLUDE( goldnpkr )
+
+	PORT_MODIFY("SW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2") // $4000
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW3") // $4001
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -14448,8 +14525,8 @@ ROM_END
 
   dash_a37    DASH! A.3.7           1998/10/22   VER OCT 22, 98
   dash_a37b   DASH! A.3.7           1996/11/18,  AVANTY  50 BET SPECIAL
-  dynchance   Dynamic Chance        type-3.0 1992/08/29  PART 1-2
-  dynchancf   Dynamic Chance(alt)   type-3.0 1992/08/29  PART 1-2  (only 4 bytes of difference)
+  dynchance   Dynamic Chance        type-3.0 1992/08/29  PART 1-2  (Final Type3 DEP ver 1.1)
+  dynchancf   Dynamic Chance(alt)   type-3.0 1992/08/29  PART 1-2  (Final Type3 DEP ver 1.1) (only 4 bytes of difference)
 
   dynplus     Dynamic Plus One      1997/01/13, SP TYPE Ver 1.00
   lfhouse     Lucky Full House      1996/02/01 ver 1.16, DATA ver 1.05
@@ -15773,14 +15850,14 @@ GAMEL( 1983, falcnwldd, falcnwld, wildcrdb, wildcard, goldnpkr_state, empty_init
 
 /************************ DEP 9801 ENCRYPTED PLATFORM ************************/
 
-GAME(  1998, dash_a37,  0,         dash_a37,  dash_a37, goldnpkr_state, init_dash,      ROT0, "<unknown>",               "Dash! A.3.7 (ver 1998/10/22)",               0 )
-GAME(  1996, dash_a37b, dash_a37,  dash_a37,  dash_a37, goldnpkr_state, init_dash,      ROT0, "<unknown>",               "Dash! A.3.7 (ver 1996/11/18)",               0 )
-GAME(  1992, dynchance, 0,         dynchance, goldnpkr, goldnpkr_state, init_dynchance, ROT0, "<unknown>",               "Dynamic Chance (Type-3.0 Part 1-2)",         MACHINE_NOT_WORKING )
-GAME(  1992, dynchancf, dynchance, dynchance, goldnpkr, goldnpkr_state, init_dynchance, ROT0, "<unknown>",               "Dynamic Chance (Type-3.0 Part 1-2, alt)",    MACHINE_NOT_WORKING )
-GAME(  1997, dynplus,   dynchance, dynplus,   goldnpkr, goldnpkr_state, init_dynplus,   ROT0, "<unknown>",               "Dynamic Plus One (SP Type ver 1.10)",        MACHINE_NOT_WORKING )
-GAME(  1996, lfhouse,   0,         lfhouse,   goldnpkr, goldnpkr_state, init_lfhouse,   ROT0, "R and E",                 "Lucky Full House (ver 1.16, data ver 1.05)", MACHINE_NOT_WORKING )
-GAME(  1994, lfhouseb,  lfhouse,   lfhouse,   goldnpkr, goldnpkr_state, init_lfhouseb,  ROT0, "R and E",                 "Lucky Full House (ver 1.15, data ver 1.04)", MACHINE_NOT_WORKING )
-GAME(  1998, unkdep,    lfhouse,   unkdep,    goldnpkr, goldnpkr_state, init_unkdep,    ROT0, "<unknown>",               "unknown DEP 9801 poker game",                MACHINE_NOT_WORKING )
+GAME(  1998, dash_a37,  0,         dash_a37,  dash_a37,  goldnpkr_state, init_dash,      ROT0, "<unknown>",              "Dash! A.3.7 (ver 1998/10/22)",               0 )
+GAME(  1996, dash_a37b, dash_a37,  dash_a37,  dash_a37,  goldnpkr_state, init_dash,      ROT0, "<unknown>",              "Dash! A.3.7 (ver 1996/11/18)",               0 )
+GAME(  1992, dynchance, 0,         dynchance, dynchance, goldnpkr_state, init_dynchance, ROT0, "<unknown>",              "Dynamic Chance (Final Type3 DEP ver 1.1)",      0 )
+GAME(  1992, dynchancf, dynchance, dynchance, dynchance, goldnpkr_state, init_dynchance, ROT0, "<unknown>",              "Dynamic Chance (Final Type3 DEP ver 1.1, alt)", 0 )
+GAME(  1997, dynplus,   dynchance, dynplus,   goldnpkr,  goldnpkr_state, init_dynplus,   ROT0, "<unknown>",              "Dynamic Plus One (SP Type ver 1.10)",        MACHINE_NOT_WORKING )
+GAME(  1996, lfhouse,   0,         lfhouse,   goldnpkr,  goldnpkr_state, init_lfhouse,   ROT0, "R and E",                "Lucky Full House (ver 1.16, data ver 1.05)", MACHINE_NOT_WORKING )
+GAME(  1994, lfhouseb,  lfhouse,   lfhouse,   goldnpkr,  goldnpkr_state, init_lfhouseb,  ROT0, "R and E",                "Lucky Full House (ver 1.15, data ver 1.04)", MACHINE_NOT_WORKING )
+GAME(  1998, unkdep,    lfhouse,   unkdep,    goldnpkr,  goldnpkr_state, init_unkdep,    ROT0, "<unknown>",              "unknown DEP 9801 poker game",                MACHINE_NOT_WORKING )
 
 
 /******************************** SETS W/IRQ0 *********************************/
