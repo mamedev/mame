@@ -496,6 +496,7 @@ void calchase_host_device::config_map(address_map &map)
 	// plain register file, the header is not decoded either
 	map(0x00, 0x03).lr32(NAME([this] () { return (main_id >> 16) | (main_id << 16); }));
 	map(0x04, 0xff).rw(FUNC(calchase_host_device::config_r), FUNC(calchase_host_device::config_w));
+	map(0x08, 0x0b).lr32(NAME([this] () { return (pclass << 8) | revision; }));
 }
 
 uint8_t calchase_host_device::config_r(offs_t offset)
@@ -532,7 +533,7 @@ DEFINE_DEVICE_TYPE(CALCHASE_SOUTH, calchase_south_device, "calchase_south", "VIA
 calchase_south_device::calchase_south_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, CALCHASE_SOUTH, tag, owner, clock)
 {
-	set_ids(0x11063040, 0x00, 0x060100, 0x00000000);
+	set_ids(0x11060586, 0x41, 0x060100, 0x00000000);
 }
 
 void calchase_south_device::device_start()
@@ -550,6 +551,7 @@ void calchase_south_device::config_map(address_map &map)
 	map(0x04, 0xff).lrw8(
 			NAME([this] (offs_t offset) { return m_config_reg[0x04 + offset]; }),
 			NAME([this] (offs_t offset, uint8_t data) { m_config_reg[0x04 + offset] = data; }));
+	map(0x08, 0x0b).lr32(NAME([this] () { return (pclass << 8) | revision; }));
 }
 
 
