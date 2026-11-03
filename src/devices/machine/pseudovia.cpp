@@ -691,6 +691,8 @@ void pb030_pseudovia_device::write(offs_t offset, uint8_t data)
 // Most VIA-like pseudo-VIA found in PowerBook 140/160/170/180
 quadra_pseudovia_device::quadra_pseudovia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pseudovia_device(mconfig, APPLE_QUADRA_PSEUDOVIA, tag, owner, clock),
+	m_scsi_irq(0),
+	m_slot_irq(0),
 	m_orb(0), m_ddrb(0), m_ddra(0), m_acr(0), m_pcr(0)
 {
 }
@@ -699,11 +701,37 @@ void quadra_pseudovia_device::device_start()
 {
 	pseudovia_device::device_start();
 
+	save_item(NAME(m_scsi_irq));
+	save_item(NAME(m_slot_irq));
 	save_item(NAME(m_orb));
 	save_item(NAME(m_ddrb));
 	save_item(NAME(m_ddra));
 	save_item(NAME(m_acr));
 	save_item(NAME(m_pcr));
+}
+
+void quadra_pseudovia_device::scsi_irq_w(int state)
+{
+	const int irq = (state == ASSERT_LINE) ? 1 : 0;
+
+	if (irq && !m_scsi_irq)
+	{
+		m_pseudovia_regs[3] |= 0x08;
+		pseudovia_recalc_irqs();
+	}
+	m_scsi_irq = irq;
+}
+
+void quadra_pseudovia_device::slot_irq_w(int state)
+{
+	const int irq = (state == CLEAR_LINE) ? 1 : 0;
+
+	if (irq && !m_slot_irq)
+	{
+		m_pseudovia_regs[3] |= 0x02;
+		pseudovia_recalc_irqs();
+	}
+	m_slot_irq = irq;
 }
 
 uint8_t quadra_pseudovia_device::read(offs_t offset)
