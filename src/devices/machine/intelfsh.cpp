@@ -262,7 +262,7 @@ amd_29f800t_device::amd_29f800t_device(const machine_config &mconfig, const char
 	: intelfsh8_device(mconfig, AMD_29F800T, tag, owner, clock, 0x100000, MFG_AMD, 0xda) { m_top_boot_sector = true; m_has_reset_pin = true; }
 
 amd_29f800b_16bit_device::amd_29f800b_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, AMD_29F800B_16BIT, tag, owner, clock, 0x100000, MFG_AMD, 0x2258) { m_top_boot_sector = false; m_has_reset_pin = true; }
+	: intelfsh16_device(mconfig, AMD_29F800B_16BIT, tag, owner, clock, 0x100000, MFG_AMD, 0x2258) { m_bot_boot_sector = true; m_has_reset_pin = true; }
 
 amd_29lv160dt_device::amd_29lv160dt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, AMD_29LV160DT, tag, owner, clock, 0x200000, MFG_AMD, 0xc4) { m_has_reset_pin = true; }
@@ -1010,7 +1010,7 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 					m_timer->adjust( attotime::from_msec( 500 ) );
 				}
 			}
-			else if(m_bot_boot_sector && address < (64*1024))
+			else if(m_bot_boot_sector && base < (64*1024))
 			{
 				if (m_maker_id == MFG_ST)
 				{
@@ -1018,13 +1018,13 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 					m_erase_sector = address & ((m_bits == 16) ? ~0xfff : ~0x1fff);
 					m_timer->adjust(attotime::from_msec(250));
 				}
-				else if (address < (16*1024))
+				else if (base < (16*1024))
 				{
 					memset(&m_data[base & ~0x3fff], 0xff, 16 * 1024);
 					m_erase_sector = address & ((m_bits == 16) ? ~0x1fff : ~0x3fff);
 					m_timer->adjust( attotime::from_msec( 500 ) );
 				}
-				else if (address < (32*1024))
+				else if (base < (32*1024))
 				{
 					memset(&m_data[base & ~0x1fff], 0xff, 8 * 1024);
 					m_erase_sector = address & ((m_bits == 16) ? ~0xfff : ~0x1fff);
