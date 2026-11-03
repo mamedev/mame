@@ -13,6 +13,8 @@
 #include "emu.h"
 #include "vt82c505.h"
 
+#include <algorithm>
+
 
 DEFINE_DEVICE_TYPE(VT82C505, vt82c505_device, "vt82c505", "VIA VT82C505 PCI bridge")
 

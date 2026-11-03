@@ -25,6 +25,8 @@
 #include "softlist_dev.h"
 
 
+namespace {
+
 // on-board 8042 keyboard controller and RTC of the generic PIIX4 board
 class at586_kbc_device : public device_t, public device_isa16_card_interface
 {
@@ -51,7 +53,9 @@ private:
 	void rtc_map(address_map &map) ATTR_COLD;
 };
 
-DEFINE_DEVICE_TYPE(AT586_KBC, at586_kbc_device, "at586_kbc", "PC/AT 586 on-board keyboard controller and RTC")
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(AT586_KBC, at586_kbc_device, at586_kbc_device, "at586_kbc", "PC/AT 586 on-board keyboard controller and RTC")
 
 at586_kbc_device::at586_kbc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AT586_KBC, tag, owner, clock)
@@ -104,8 +108,8 @@ void at586_kbc_device::kbc_map(address_map &map)
 
 void at586_kbc_device::rtc_map(address_map &map)
 {
-	map(0x00, 0x0f).w(m_rtc, FUNC(ds12885_device::address_w)).umask32(0x00ff00ff);
-	map(0x00, 0x0f).rw(m_rtc, FUNC(ds12885_device::data_r), FUNC(ds12885_device::data_w)).umask32(0xff00ff00);
+	map(0x00, 0x0f).umask32(0x00ff00ff).w(m_rtc, FUNC(ds12885_device::address_w));
+	map(0x00, 0x0f).umask32(0xff00ff00).rw(m_rtc, FUNC(ds12885_device::data_r), FUNC(ds12885_device::data_w));
 }
 
 
@@ -190,11 +194,11 @@ struct at586_piix4_tags
 	const char *isa, *ide, *usb, *acpi, *acpi_pm, *smbus, *isabus, *pic_master, *kbc_irq1, *kbc_irq8;
 };
 
-static const at586_piix4_tags piix4_dev01 = {
+constexpr at586_piix4_tags piix4_dev01 = {
 	"pci:01.0", "pci:01.1", "pci:01.2", "pci:01.3", "pci:01.3:acpi", "pci:01.3:smbus",
 	"pci:01.0:isabus", "pci:01.0:pic8259_master", ":pci:01.0", ":pci:01.0:pic8259_slave" };
 
-static const at586_piix4_tags piix4_dev07 = {
+constexpr at586_piix4_tags piix4_dev07 = {
 	"pci:07.0", "pci:07.1", "pci:07.2", "pci:07.3", "pci:07.3:acpi", "pci:07.3:smbus",
 	"pci:07.0:isabus", "pci:07.0:pic8259_master", ":pci:07.0", ":pci:07.0:pic8259_slave" };
 

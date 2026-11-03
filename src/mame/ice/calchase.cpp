@@ -405,6 +405,8 @@ ioport_constructor isa16_calchase_jamma_if::device_input_ports() const
 	return INPUT_PORTS_NAME(calchase_jamma);
 }
 
+namespace {
+
 // VIA VT82C585VPX north bridge (Apollo VP), config space only
 class calchase_host_device : public pci_host_device
 {
@@ -428,7 +430,7 @@ protected:
 
 	virtual void device_start() override ATTR_COLD;
 
-	virtual space_config_vector memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
 
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
@@ -445,7 +447,9 @@ private:
 	void config_w(offs_t offset, uint8_t data);
 };
 
-DEFINE_DEVICE_TYPE(CALCHASE_HOST, calchase_host_device, "calchase_host", "VIA VT82C585VPX north bridge (California Chase)")
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(CALCHASE_HOST, calchase_host_device, calchase_host_device, "calchase_host", "VIA VT82C585VPX north bridge (California Chase)")
 
 calchase_host_device::calchase_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, CALCHASE_HOST, tag, owner, clock)
@@ -494,9 +498,9 @@ void calchase_host_device::device_start()
 void calchase_host_device::config_map(address_map &map)
 {
 	// plain register file, the header is not decoded either
-	map(0x00, 0x03).lr32(NAME([this] () { return (main_id >> 16) | (main_id << 16); }));
+	map(0x00, 0x03).lr32(NAME([this] () -> uint32_t { return (main_id >> 16) | (main_id << 16); }));
 	map(0x04, 0xff).rw(FUNC(calchase_host_device::config_r), FUNC(calchase_host_device::config_w));
-	map(0x08, 0x0b).lr32(NAME([this] () { return (pclass << 8) | revision; }));
+	map(0x08, 0x0b).lr32(NAME([this] () -> uint32_t { return (pclass << 8) | revision; }));
 }
 
 uint8_t calchase_host_device::config_r(offs_t offset)
@@ -513,6 +517,8 @@ void calchase_host_device::config_w(offs_t offset, uint8_t data)
 }
 
 
+namespace {
+
 // VIA VT82C586B south bridge (Apollo VP), config space only
 class calchase_south_device : public pci_device
 {
@@ -528,7 +534,9 @@ private:
 	uint8_t m_config_reg[256];
 };
 
-DEFINE_DEVICE_TYPE(CALCHASE_SOUTH, calchase_south_device, "calchase_south", "VIA VT82C586B south bridge (California Chase)")
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(CALCHASE_SOUTH, calchase_south_device, calchase_south_device, "calchase_south", "VIA VT82C586B south bridge (California Chase)")
 
 calchase_south_device::calchase_south_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, CALCHASE_SOUTH, tag, owner, clock)
@@ -547,11 +555,11 @@ void calchase_south_device::device_start()
 void calchase_south_device::config_map(address_map &map)
 {
 	// plain register file, the header is not decoded either
-	map(0x00, 0x03).lr32(NAME([this] () { return (main_id >> 16) | (main_id << 16); }));
+	map(0x00, 0x03).lr32(NAME([this] () -> uint32_t { return (main_id >> 16) | (main_id << 16); }));
 	map(0x04, 0xff).lrw8(
-			NAME([this] (offs_t offset) { return m_config_reg[0x04 + offset]; }),
+			NAME([this] (offs_t offset) -> uint8_t { return m_config_reg[0x04 + offset]; }),
 			NAME([this] (offs_t offset, uint8_t data) { m_config_reg[0x04 + offset] = data; }));
-	map(0x08, 0x0b).lr32(NAME([this] () { return (pclass << 8) | revision; }));
+	map(0x08, 0x0b).lr32(NAME([this] () -> uint32_t { return (pclass << 8) | revision; }));
 }
 
 

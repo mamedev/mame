@@ -102,6 +102,8 @@ Notes:
 #include "speaker.h"
 
 
+namespace {
+
 // 3dfx Voodoo Graphics config space, the framebuffer is mapped by the driver
 class funkball_voodoo_pci_device : public pci_device
 {
@@ -123,7 +125,9 @@ private:
 	uint32_t m_init_enable;
 };
 
-DEFINE_DEVICE_TYPE(FUNKBALL_VOODOO_PCI, funkball_voodoo_pci_device, "funkball_voodoo_pci", "3dfx Voodoo Graphics PCI config (Funky Ball)")
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(FUNKBALL_VOODOO_PCI, funkball_voodoo_pci_device, funkball_voodoo_pci_device, "funkball_voodoo_pci", "3dfx Voodoo Graphics PCI config (Funky Ball)")
 
 funkball_voodoo_pci_device::funkball_voodoo_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, FUNKBALL_VOODOO_PCI, tag, owner, clock)
@@ -154,10 +158,10 @@ void funkball_voodoo_pci_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
 	map(0x10, 0x13).lrw32(
-			NAME([this] () { return m_base_addr; }),
+			NAME([this] () -> uint32_t { return m_base_addr; }),
 			NAME([this] (uint32_t data) { m_base_addr = (data == 0xffffffff) ? 0xff000000 : data; }));
 	map(0x40, 0x43).lrw32(
-			NAME([this] () { return m_init_enable; }),
+			NAME([this] () -> uint32_t { return m_init_enable; }),
 			NAME([this] (uint32_t data) { m_init_enable = data; m_init_enable_cb(data); }));
 }
 

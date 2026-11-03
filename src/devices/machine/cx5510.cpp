@@ -14,6 +14,8 @@
 #include "emu.h"
 #include "cx5510.h"
 
+#include <algorithm>
+
 
 DEFINE_DEVICE_TYPE(CX5510, cx5510_device, "cx5510", "Cyrix Cx5510")
 
@@ -56,8 +58,8 @@ void cx5510_device::device_start()
 void cx5510_device::config_map(address_map &map)
 {
 	// plain register file, the header is not decoded either
-	map(0x00, 0x03).lr32(NAME([this] () { return (main_id >> 16) | (main_id << 16); }));
+	map(0x00, 0x03).lr32(NAME([this] () -> uint32_t { return (main_id >> 16) | (main_id << 16); }));
 	map(0x04, 0xff).lrw32(
-			NAME([this] (offs_t offset) { return m_regs[1 + offset]; }),
+			NAME([this] (offs_t offset) -> uint32_t { return m_regs[1 + offset]; }),
 			NAME([this] (offs_t offset, uint32_t data, uint32_t mem_mask) { COMBINE_DATA(&m_regs[1 + offset]); }));
 }

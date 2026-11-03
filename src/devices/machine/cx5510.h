@@ -38,7 +38,7 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 
-	virtual space_config_vector memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
 
 	virtual void config_map(address_map &map) override ATTR_COLD;
 

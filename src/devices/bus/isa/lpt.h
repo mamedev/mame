@@ -45,7 +45,7 @@ private:
 
 	// internal state
 	bool m_is_primary;
-	bool m_reset_done = false;
+	bool m_reset_done;
 };
 
 // device type definition

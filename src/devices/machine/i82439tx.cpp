@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "i82439tx.h"
 
+#include <algorithm>
+
 DEFINE_DEVICE_TYPE(I82439TX, i82439tx_host_device, "i82439tx", "Intel 82439TX northbridge")
 
 void i82439tx_host_device::config_map(address_map &map)
