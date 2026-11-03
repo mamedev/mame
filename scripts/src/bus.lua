@@ -3448,8 +3448,6 @@ if BUSES["LPCI"] then
 		MAME_DIR .. "src/devices/bus/lpci/northbridge.h",
 		MAME_DIR .. "src/devices/bus/lpci/southbridge.cpp",
 		MAME_DIR .. "src/devices/bus/lpci/southbridge.h",
-		MAME_DIR .. "src/devices/bus/lpci/vt82c505.cpp",
-		MAME_DIR .. "src/devices/bus/lpci/vt82c505.h",
 	}
 end
 

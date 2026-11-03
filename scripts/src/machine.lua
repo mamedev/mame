@@ -4906,6 +4906,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/vt82c505.h,MACHINES["VT82C505"] = true
+---------------------------------------------------
+
+if MACHINES["VT82C505"] then
+	files {
+		MAME_DIR .. "src/devices/machine/vt82c505.cpp",
+		MAME_DIR .. "src/devices/machine/vt82c505.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/fdc37c93x.h,MACHINES["FDC37C93X"] = true
 ---------------------------------------------------
 
