@@ -17,6 +17,7 @@
     Outputs are:
     - an analog monoural internal speaker
     - a stereo line level output
+    - a mono recording signal to the sound chip
 
 ***************************************************************************/
 
@@ -53,7 +54,8 @@ dfac2_device::dfac2_device(const machine_config &mconfig, const char *tag, devic
 	device_mixer_interface(mconfig, *this),
 	i2c_hle_interface(mconfig, *this, 0x6f),
 	m_dac(*this, "dac_%u", 0),
-	m_filter(*this, "filter3_%u", 0)
+	m_filter(*this, "filter3_%u", 0),
+	m_rec(*this, "rec_%u", 0)
 {
 }
 
@@ -73,6 +75,9 @@ void dfac2_device::device_add_mconfig(machine_config &config)
 		FILTER_BIQUAD(config, m_filter[ch]).setup(filter_biquad_device::biquad_type::LOWPASS, 6869.7, 4.5450, 1.0)
 			.add_route(0, *this, 1.0, ch);
 	}
+
+	for (unsigned i = 0; i < 4; i++)
+		FILTER_VOLUME(config, m_rec[i]);
 }
 
 void dfac2_device::device_start()
@@ -116,21 +121,27 @@ void dfac2_device::update_controls()
 		m_filter[ch]->set_output_gain(0, filter ? 1.0 : 0.0);
 		set_output_gain(ch, (ch ? mute_r : mute_l) ? 0.0 : 1.0);
 	}
+
+	const u8 source = m_regs[0x0e] & 7;
+	const double rec_gain = 0.5 * std::pow(10.0, (1.5 * (m_regs[0x08] & 0x1f) - 8.0) / 20.0);
+	for (unsigned i = 0; i < 4; i++)
+		m_rec[i]->set_gain((source == ((i < 2) ? 4 : 3)) ? rec_gain : 0.0);
 }
 
 /*
     Reverse-engineering DFAC2 is a work in progress.
 
     Known registers. The odd ones below 0x0c and any above 0x10 aren't present. The input
-    side is programmed per input source by the Mac ROM's 68k sound layer, and none of it is
-    emulated, since there is no input.
+    side is programmed per input source by the Mac ROM's 68k sound layer, and only the
+    source select and 0x08 are emulated.
     0x00    - 6 writable bits, never written by the ROM or Mac OS
     0x02    - bit 7 AGC, set by the ROM when the ASC's $806 is writable; bits 4-0 a
               per-source setting, 0x16
     0x04    - per-source setting, 0x1a
     0x06    - per-source setting, 0x16; the ROM writes 0x02 on this chip family
     0x08    - second input gain stage: the ROM writes the 0x0a step plus a per-source offset
-              here, and the same value to ASC $802
+              here, and the same value to ASC $802. 1.5dB per step, -8dB at 0, mixed to mono,
+              measured through the output loopback on a Performa 6200CD
     0x0a    - input gain, 0-31, for Sound Input Manager siInputGain 0.5-1.5; 0x10 for the
               internal mic and 0x17 for an external one on the Color Classic
     0x0c    - bits 2-0 output attenuator, 3dB per step, 0 = mute, 7 = full
@@ -140,7 +151,7 @@ void dfac2_device::update_controls()
               attenuates both sides by 6dB; bits 6/7 mute left/right
     0x0e    - bits 2-0 input source: 7 = none, the idle default; 3 = the sound input jack,
               with mic or line gain; 4 = the CD-ROM drive; 2 = the video input module; 5/6 =
-              the left/right output. Bit 7 mutes both sides
+              the left/right output, not emulated. Bit 7 mutes both sides
     0x0f    - bit 7 switches in the 7kHz output filter; the other bits are input settings
     0x10    - read only: bit 5 = something plugged into sound out, bit 7 = sound in
 */
@@ -160,6 +171,6 @@ void dfac2_device::write_data(u16 offset, u8 data)
 	LOG("DFAC2: write %02x to %04x (%s)\n", data, offset, machine().describe_context());
 
 	m_regs[offset] = (m_regs[offset] & ~WRITE_MASK[offset]) | (data & WRITE_MASK[offset]);
-	if ((offset >= 0x0c) && (offset <= 0x0f))
+	if ((offset == 0x08) || ((offset >= 0x0c) && (offset <= 0x0f)))
 		update_controls();
 }

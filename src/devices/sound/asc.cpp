@@ -73,7 +73,7 @@
       but still needs to be understood for a complete ASCTester "pass".
     - The IOSB variant has some surprising differences that aren't yet understood, including 16-bit wide FIFO ports
     - EASC doesn't implement the channel volumes yet because Mac OS doesn't use them
-    - PrimeTime III records silence: the analog inputs, CD input and output loopback are not emulated
+    - PrimeTime III records silence from DFAC2's output loopback sources
     - PrimeTime III IRQ acknowledgement during simultaneous playback/recording is untested on hardware
     - PrimeTime III byte accesses to the 16-bit window and negative-sample volume distortion haven't been investigated
     - Recording on the other variants hasn't been investigated
@@ -128,7 +128,7 @@ asc_base_device::asc_base_device(const machine_config &mconfig, device_type type
 void asc_base_device::device_start()
 {
 	// create the stream
-	m_stream = stream_alloc(0, 2, m_sample_rate);
+	m_stream = stream_alloc(get_sound_requested_inputs(), 2, m_sample_rate);
 
 	memset(m_regs, 0, sizeof(m_regs));
 
@@ -1565,7 +1565,8 @@ void asc_primetime3_device::sound_stream_update(sound_stream &stream)
 	{
 		if (recording())
 		{
-			push_sample(FIFO_REC, s16(0x8000));
+			const double in = stream.input_count() ? stream.get(0, i) : 0.0;
+			push_sample(FIFO_REC, s16(u16(std::clamp(int(in * 32768.0), -32768, 32767)) ^ 0x8000));
 		}
 
 		const bool have_left = fifo_cap(FIFO_A) != 0;

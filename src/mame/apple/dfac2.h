@@ -15,6 +15,7 @@ public:
 	dfac2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	required_device<filter_volume_device> const &dac(unsigned channel) const { return m_dac[channel]; }
+	required_device<filter_volume_device> const &rec(unsigned input) const { return m_rec[input]; }
 
 protected:
 	// device_r overrides
@@ -33,6 +34,7 @@ private:
 
 	required_device_array<filter_volume_device, 2> m_dac;
 	required_device_array<filter_biquad_device, 2> m_filter;
+	required_device_array<filter_volume_device, 4> m_rec;
 	u8 m_regs[0x11]{};
 };
 

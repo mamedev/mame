@@ -61,6 +61,7 @@
 #include "sound/flt_rc.h"
 
 #include "softlist_dev.h"
+#include "speaker.h"
 
 #include <numbers>
 
@@ -210,6 +211,8 @@ void pmac6200_state::pmac6200(machine_config &config)
 		{
 			device->subdevice<cdda_device>("cdda")->add_route(0, "^^^dfac2", 1.0, 0);
 			device->subdevice<cdda_device>("cdda")->add_route(1, "^^^dfac2", 1.0, 1);
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^^dfac2:rec_0", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^^dfac2:rec_1", 1.0);
 		});
 	NSCSI_CONNECTOR(config, "f108:scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "f108:scsi:5", mac_scsi_devices, nullptr);
@@ -261,6 +264,9 @@ void pmac6200_state::pmac6200(machine_config &config)
 	asc.reset_routes();
 	asc.add_route(0, m_dfac2->dac(0), 1.0);
 	asc.add_route(1, m_dfac2->dac(1), 1.0);
+	MICROPHONE(config, "sound_in", 2).front().add_route(0, m_dfac2->rec(2), 1.0).add_route(1, m_dfac2->rec(3), 1.0);
+	for (int i = 0; i < 4; i++)
+		m_dfac2->rec(i).lookup()->add_route(0, asc, 1.0);
 	// The board's reconstruction low-pass is modeled as two RC stages, with corners fitted to the line output of a Performa 6200CD
 	static const char *const LPF_TAGS[2][2] = { { "lpf1_l", "lpf_l" }, { "lpf1_r", "lpf_r" } };
 	for (int ch = 0; ch < 2; ch++)
