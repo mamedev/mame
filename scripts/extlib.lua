@@ -3,23 +3,24 @@
 
 local extlibs = {
 --
---      3rdparty       system        3rdparty
---      lib name:      lib name,     include dir
+--      3rdparty        system        3rdparty
+--      lib name:       lib name,     include dir
 --
-	asio       = { "asio",      "3rdparty/asio/include" },
-	expat      = { "expat",     "3rdparty/expat/lib" },
-	zlib       = { "z",         "3rdparty/zlib" },
-	zstd       = { "zstd",      "3rdparty/zstd/lib" },
-	jpeg       = { "jpeg",      "3rdparty/libjpeg" },
-	flac       = { "FLAC",      "3rdparty/flac/include" },
-	sqlite3    = { "sqlite3",   "3rdparty/sqlite3" },
-	portmidi   = { "portmidi",  "3rdparty/portmidi/pm_common" },
-	portaudio  = { "portaudio", "3rdparty/portaudio/include" },
-	lua        = { "lua",       "3rdparty/lua/src" },
-	utf8proc   = { "utf8proc",  "3rdparty/utf8proc" },
-	glm        = { "glm",       "3rdparty/glm" },
-	rapidjson  = { "rapidjson", "3rdparty/rapidjson/include" },
-	pugixml    = { "pugixml",   "3rdparty/pugixml/src" },
+	asio        = { "asio",      "3rdparty/asio/include" },
+	expat       = { "expat",     "3rdparty/expat/lib" },
+	zlib        = { "z",         "3rdparty/zlib" },
+	zstd        = { "zstd",      "3rdparty/zstd/lib" },
+	jpeg        = { "jpeg",      "3rdparty/libjpeg" },
+	flac        = { "FLAC",      "3rdparty/flac/include" },
+	sqlite3     = { "sqlite3",   "3rdparty/sqlite3" },
+	portmidi    = { "portmidi",  "3rdparty/portmidi/pm_common" },
+	portaudio   = { "portaudio", "3rdparty/portaudio/include" },
+	lua         = { "lua",       "3rdparty/lua/src" },
+	utf8proc    = { "utf8proc",  "3rdparty/utf8proc" },
+	glm         = { "glm",       "3rdparty/glm" },
+	rapidjson   = { "rapidjson", "3rdparty/rapidjson/include" },
+	pugixml     = { "pugixml",   "3rdparty/pugixml/src" },
+	openh264dec = { "openh264",  "3rdparty/openh264/codec/api"},
 }
 
 -- system lib options
@@ -91,6 +92,11 @@ newoption {
 newoption {
 	trigger = "with-system-pugixml",
 	description = "Use system pugixml library",
+}
+
+newoption {
+	trigger = "with-system-openh264dec",
+	description = "Use system openh264 libary",
 }
 
 -- build helpers
