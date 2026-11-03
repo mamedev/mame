@@ -572,7 +572,17 @@ void wd1010_device::cmd_read_sector()
 
 	LOGDATA("--> Transferring sector to buffer (lba = %08x)\n", get_lbasector(m_sector_number));
 
-	file->read(get_lbasector(m_sector_number), buffer);
+	if (!file->read(get_lbasector(m_sector_number), buffer))
+	{
+		LOG("--> Read failed, aborting\n");
+
+		m_out_bcs_cb(0);
+
+		// a sector the image lacks (or cannot read) is not found (data sheet: READ SECTOR flowchart)
+		set_error(ERR_ID);
+		end_command();
+		return;
+	}
 
 	for (int i = 0; i < 512; i++)
 		m_out_data_cb(buffer[i]);
