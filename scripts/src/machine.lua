@@ -3054,18 +3054,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/lpci.h,MACHINES["LPCI"] = true
----------------------------------------------------
-
-if MACHINES["LPCI"] then
-	files {
-		MAME_DIR .. "src/devices/machine/lpci.cpp",
-		MAME_DIR .. "src/devices/machine/lpci.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/pci.h,MACHINES["PCI"] = true
 ---------------------------------------------------
 
