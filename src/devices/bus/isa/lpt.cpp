@@ -45,6 +45,14 @@ void isa8_lpt_device::device_start()
 void isa8_lpt_device::device_reset()
 {
 	m_is_primary = (ioport("DSW")->read() & 1) ? false : true;
+	m_reset_done = true;
+	remap(AS_IO, 0, 0xffff);
+}
+
+void isa8_lpt_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id != AS_IO || !m_reset_done)
+		return;
 	pc_lpt_device &lpt(*subdevice<pc_lpt_device>("lpt"));
 	if (m_is_primary)
 		m_isa->install_device(0x0378, 0x037b, read8sm_delegate(lpt, FUNC(pc_lpt_device::read)), write8sm_delegate(lpt, FUNC(pc_lpt_device::write)));
