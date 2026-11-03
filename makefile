@@ -534,6 +534,10 @@ ifdef USE_SYSTEM_LIB_PUGIXML
 PARAMS += --with-system-pugixml='$(USE_SYSTEM_LIB_PUGIXML)'
 endif
 
+ifdef USE_SYSTEM_LIB_OPENH264
+PARAMS += --with-system-openh264='$(USE_SYSTEM_LIB_OPENH264)'
+endif
+
 ifdef TOOLCHAIN
 PARAMS += --TOOLCHAIN='$(TOOLCHAIN)'
 endif
