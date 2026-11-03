@@ -19,6 +19,7 @@ igs036_cpu_device::igs036_cpu_device(const machine_config &mconfig, const char *
 	: arm946es_cpu_device(mconfig, IGS036, tag, owner, clock, address_map_constructor(FUNC(igs036_cpu_device::onboard_peripherals), this))
 	, m_read_gpio(*this, 0)
 	, m_write_gpio(*this)
+	, m_write_encryption_control(*this)
 	, m_arm_aic(*this, "arm_aic")
 {
 }
@@ -31,6 +32,16 @@ u32 igs036_cpu_device::gpio_r(offs_t offset, u32 mem_mask)
 void igs036_cpu_device::gpio_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_write_gpio(offset, data, mem_mask);
+}
+
+u32 igs036_cpu_device::encryption_control_r(offs_t offset, u32 mem_mask)
+{
+	return m_has_decrypted ? 4U : 0U;
+}
+
+void igs036_cpu_device::encryption_control_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	m_write_encryption_control(offset, data, mem_mask);
 }
 
 void igs036_cpu_device::onboard_peripherals(address_map &map)
@@ -50,7 +61,7 @@ void igs036_cpu_device::onboard_peripherals(address_map &map)
 	map(0xffff'f438, 0xffff'f43f).r(FUNC(igs036_cpu_device::gpio_r));
 	// Several internal ROMs verify that bit 2 reads back set after enabling
 	// decryption, and stop before the checksum if it is clear.
-	//map(0xffff'fa08, 0xffff'fa0b).lr32(NAME([this] () -> u32 { return m_has_decrypted ? 4U : 0U; })).w(FUNC(m036_base_state::encryption_control_w));
+	map(0xffff'fa08, 0xffff'fa0b).rw(FUNC(igs036_cpu_device::encryption_control_r), FUNC(igs036_cpu_device::encryption_control_w));
 	map(0xffff'fa0c, 0xffff'fa0f).lr32(NAME([] () -> u32 { return 0x180; })).nopw(); // startup ready, as in pgm2.cpp
 	map(0xffff'fc00, 0xffff'fcff).rw(FUNC(igs036_cpu_device::encryption_r), FUNC(igs036_cpu_device::encryption_w));
 	map(0xffff'fd00, 0xffff'fd0b).nopw(); // TODO: reset controller
@@ -183,6 +194,7 @@ void igs036_cpu_device::device_start()
 {
 	arm946es_cpu_device::device_start();
 
+	save_item(NAME(m_has_decrypted));
 	save_item(NAME(m_encryption_table));
 	save_item(NAME(m_tc_regs));
 	save_item(NAME(m_tc_enabled));
@@ -195,6 +207,8 @@ void igs036_cpu_device::device_reset()
 	arm946es_cpu_device::device_reset();
 
 	std::fill(std::begin(m_encryption_table), std::end(m_encryption_table), 0);
+
+	m_has_decrypted = false;
 
 	for (u32 i = 0; i < 3; ++i)
 	{

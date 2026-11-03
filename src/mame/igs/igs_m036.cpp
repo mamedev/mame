@@ -250,7 +250,6 @@ private:
 	std::unique_ptr<u8 []> m_encrypted_copy;
 	memory_passthrough_handler m_idle_tap;
 	u8 m_active_key[0x100];
-	bool m_has_decrypted;
 
 	void restore_external_rom();
 	void encryption_control_w(offs_t offset, u32 data, u32 mem_mask = ~0U);
@@ -514,7 +513,6 @@ u32 m036_base_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 void m036_base_state::machine_start()
 {
 	save_item(NAME(m_active_key));
-	save_item(NAME(m_has_decrypted));
 	save_item(NAME(m_key_select));
 	save_item(NAME(m_pio_out));
 
@@ -526,7 +524,6 @@ void m036_base_state::machine_start()
 void m036_base_state::machine_reset()
 {
 	std::fill(std::begin(m_active_key), std::end(m_active_key), 0);
-	m_has_decrypted = false;
 	m_key_select = 0xffff;
 	m_pio_out = 0;
 
@@ -544,7 +541,7 @@ void m036_base_state::device_post_load()
 void m036_base_state::restore_external_rom()
 {
 	std::copy_n(m_encrypted_copy.get(), m_external_rom->bytes(), m_external_rom->base());
-	if (m_has_decrypted)
+	if (m_maincpu->get_has_decrypted())
 	{
 		igs036_decryptor decrypter(m_active_key);
 		auto const rom = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(m_external_rom->base()));
@@ -560,8 +557,8 @@ void m036_base_state::encryption_control_w(offs_t offset, u32 data, u32 mem_mask
 	if (!BIT(mem_mask, 2))
 		return;
 
-	m_has_decrypted = BIT(data, 2);
-	if (m_has_decrypted)
+	m_maincpu->set_has_decrypted(BIT(data, 2));
+	if (m_maincpu->get_has_decrypted())
 	{
 		u8* key = m_maincpu->get_encryption_table();
 		for (int i = 0; i < 0x100; i++)
@@ -795,14 +792,6 @@ void m036_base_state::m036_boot_map(address_map &map)
 	map(0x3000'0008, 0x3000'000f).r(FUNC(m036_base_state::dips_r));
 
 	map(0x5000'0004, 0x5000'0007).nopw(); // overridden for sydh's output at byte address 0x50000006
-
-	// IGS036 system peripherals, also used by PGM2.
-	//map(0xffff'f430, 0xffff'f437).w(FUNC(m036_base_state::gpio_outputs_w));
-	//map(0xffff'f438, 0xffff'f43b).lr32(NAME([this] () -> u32 { return m_pio_out; }));
-	//map(0xffff'f43c, 0xffff'f43f).portr(m_service);
-	// Several internal ROMs verify that bit 2 reads back set after enabling
-	// decryption, and stop before the checksum if it is clear.
-	map(0xffff'fa08, 0xffff'fa0b).lr32(NAME([this] () -> u32 { return m_has_decrypted ? 4U : 0U; })).w(FUNC(m036_base_state::encryption_control_w));
 }
 
 
@@ -1262,6 +1251,7 @@ void m036_base_state::base_config(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &m036_base_state::m036_boot_map);
 	m_maincpu->set_gpio_r().set(FUNC(m036_base_state::base_gpio_r));
 	m_maincpu->set_gpio_w().set(FUNC(m036_base_state::gpio_outputs_w));
+	m_maincpu->set_encryption_control_w().set(FUNC(m036_base_state::encryption_control_w));
 
 	SCREEN(config, m_screen);
 	// FIXME: pixel clock and blanking intervals are not known.
@@ -2175,7 +2165,7 @@ GAME( 2010, hlddz,    0,     m036_hd,       ddz_hd,   m036_hd_state,       empty
 
 GAME( 2010, zjddz,    0,     m036_hd,       ddz_hd,   m036_hd_state,       empty_init,      ROT0, "IGS",           "Zhongji Dou Dizhu (V204CN)", MACHINE_NOT_WORKING )
 
-GAME( 201?, hyleyuan, 0,     m036_hyleyuan, hyleyuan, m036_hyleyuan_state, empty_init,      ROT90, "IGS",           "Hou Ye Leyuan (S103CN)", MACHINE_NOT_WORKING )
+GAME( 2009, hyleyuan, 0,     m036_hyleyuan, hyleyuan, m036_hyleyuan_state, empty_init,      ROT90, "IGS",           "Hou Ye Leyuan (S103CN)", MACHINE_NOT_WORKING )
 
 
 // sets with no IGS036 ROM dump

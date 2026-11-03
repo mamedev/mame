@@ -21,6 +21,10 @@ public:
 
 	auto set_gpio_r() { return m_read_gpio.bind(); }
 	auto set_gpio_w() { return m_write_gpio.bind(); }
+	auto set_encryption_control_w() { return m_write_encryption_control.bind(); }
+
+	void set_has_decrypted(bool has_decrypted) { m_has_decrypted = has_decrypted; }
+	bool get_has_decrypted() { return m_has_decrypted; }
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -34,10 +38,14 @@ private:
 	u32 m_tc_regs[3][16];
 	bool m_tc_enabled[3];
 	u8 m_encryption_table[0x100];
+	bool m_has_decrypted = false;
 
 	devcb_read32 m_read_gpio;
 	devcb_write32 m_write_gpio;
+	devcb_write32 m_write_encryption_control;
 
+	u32 encryption_control_r(offs_t offset, u32 mem_mask);
+	void encryption_control_w(offs_t offset, u32 data, u32 mem_mask);
 	u8 encryption_r(offs_t offset);
 	void encryption_w(offs_t offset, u8 data);
 	u32 gpio_r(offs_t offset, u32 mem_mask = ~0U);

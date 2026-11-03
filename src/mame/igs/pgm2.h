@@ -127,7 +127,6 @@ private:
 	void draw_sprites(const rectangle &cliprect);
 	void copy_sprites_from_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, u16 pri);
 
-	bool m_has_decrypted = false;    // so we only do it once.
 	bool m_has_decrypted_kov3_module = false;
 	u32 m_spritekey = 0;
 	u32 m_realspritekey = 0;

@@ -114,7 +114,7 @@ void pgm2_state::device_post_load()
 		decrypt_kov3_module(module_key->addr_xor, module_key->data_xor);
 	}
 
-	if (m_has_decrypted)
+	if (m_maincpu->get_has_decrypted())
 	{
 		igs036_decryptor decrypter(m_maincpu->get_encryption_table());
 
@@ -141,7 +141,8 @@ void pgm2_state::encryption_do_w(u32 data)
 	{
 		decrypter.decrypter_rom((u16*)m_mainrom->base(), m_mainrom->bytes(), 0);
 	}
-	m_has_decrypted = true;
+
+	m_maincpu->set_has_decrypted(true);
 }
 
 
@@ -524,9 +525,6 @@ void pgm2_state::pgm2_map(address_map &map)
 	// there are other 0x301200xx regs
 
 	map(0x40000000, 0x40000003).r("ymz774", FUNC(ymz774_device::read)).w("ymz774", FUNC(ymz774_device::write));
-
-	// custom IGS036 stuff starts here
-	map(0xfffffa08, 0xfffffa0b).w(FUNC(pgm2_state::encryption_do_w)); // after uploading encryption? table might actually send it or enable external ROM? when read bits0-1 called FUSE 0 and 1, must be 0
 }
 
 
@@ -659,7 +657,6 @@ INPUT_PORTS_END
 
 void pgm2_state::machine_start()
 {
-	save_item(NAME(m_has_decrypted));
 	save_item(NAME(m_has_decrypted_kov3_module));
 	save_item(NAME(m_spritekey));
 	save_item(NAME(m_realspritekey));
@@ -689,7 +686,6 @@ void pgm2_state::machine_reset()
 	// as the decryption is dynamic controlled by the program, restore the encrypted copy
 	memcpy(m_mainrom->base(), &m_encrypted_copy[0], m_mainrom->bytes());
 
-	m_has_decrypted = false;
 	m_has_decrypted_kov3_module = false;
 
 	m_pio_out_data = 0;
@@ -722,6 +718,7 @@ void pgm2_state::pgm2(machine_config &config)
 	// basic machine hardware
 	IGS036(config, m_maincpu, 100000000); // Unknown clock / divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm2_state::pgm2_rom_map);
+	m_maincpu->set_encryption_control_w().set(FUNC(pgm2_state::encryption_do_w));
 
 	TIMER(config, m_mcu_timer).configure_generic(FUNC(pgm2_state::mcu_interrupt));
 
@@ -1272,8 +1269,6 @@ void pgm2_state::common_init()
 
 	src = (u16 *)memregion("sprites_colour")->base();
 	sprite_colour_decode(src, memregion("sprites_colour")->bytes());
-
-	m_has_decrypted = false;
 }
 
 // currently we don't know how to derive address/data xor values from real keys, so we need both
