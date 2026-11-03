@@ -3482,8 +3482,12 @@ end
 
 if BUSES["MACCOMM"] then
 	files {
+		MAME_DIR .. "src/devices/bus/maccomm/cards.cpp",
+		MAME_DIR .. "src/devices/bus/maccomm/cards.h",
 		MAME_DIR .. "src/devices/bus/maccomm/maccomm.cpp",
 		MAME_DIR .. "src/devices/bus/maccomm/maccomm.h",
+		MAME_DIR .. "src/devices/bus/maccomm/sonicsmc.cpp",
+		MAME_DIR .. "src/devices/bus/maccomm/sonicsmc.h",
 	}
 end
 
