@@ -249,7 +249,6 @@ private:
 	u8 m_active_key[0x100];
 	bool m_has_decrypted;
 
-	void install_idle_speedup() ATTR_COLD;
 	void restore_external_rom();
 	void encryption_control_w(offs_t offset, u32 data, u32 mem_mask = ~0U);
 
@@ -516,7 +515,6 @@ void m036_base_state::machine_start()
 
 	m_encrypted_copy = std::make_unique<u8 []>(m_external_rom->bytes());
 	std::copy_n(m_external_rom->base(), m_external_rom->bytes(), m_encrypted_copy.get());
-	install_idle_speedup();
 }
 
 
@@ -2078,44 +2076,6 @@ void m036_base_state::init_jxry()
 	for (u32 i = 0; i < m_gfx.bytes(); ++i)
 		m_gfx[i] = original[(i & ~0x7ffU) | bitswap<11>(i, 7, 8, 6, 10, 9, 5, 4, 3, 2, 1, 0)];
 }
-
-
-void m036_base_state::install_idle_speedup()
-{
-	// These internal ROMs share a wait routine that polls software flags cleared
-	// by the interrupt handlers. As in pgm2.cpp, suspend only the polling CPU;
-	// timers, video and interrupt handling continue normally. Match the complete
-	// routine and its caller so unrelated reads of the flags are unaffected.
-	for (u32 offset = 0; offset + 60 <= m_internal_rom.bytes(); offset += 4)
-	{
-		auto const word = [this, offset] (u32 n) { return m_internal_rom[offset / 4 + n]; };
-		if (word(0) != 0xe1a0'1000 || (word(1) & 0xffff'f000) != 0xe59f'0000
-				|| word(2) != 0xe790'0101 || word(3) != 0xe12f'ff1e
-				|| word(4) != 0xe52d'e004 || word(5) != 0xe1a0'2000 || word(6) != 0xe3a0'0001
-				|| (word(7) & 0xffff'f000) != 0xe59f'1000 || word(8) != 0xe781'0102
-				|| word(9) != 0xe1a0'0000 || word(10) != 0xe1a0'0002 || word(11) != 0xebff'fff3
-				|| word(12) != 0xe350'0000 || word(13) != 0x1aff'fffb || word(14) != 0xe49d'f004)
-			continue;
-		u32 const literal = offset + 12 + (word(1) & 0xfff);
-		u32 const caller_literal = offset + 36 + (word(7) & 0xfff);
-		if (literal + 4 > m_internal_rom.bytes() || caller_literal != literal)
-			continue;
-		u32 const flags = m_internal_rom[literal / 4];
-		if (flags < 0x0200'0000 || flags > 0x0201'0000 - 14 * 4 || (flags & 3))
-			continue;
-		m_idle_tap = m_maincpu->space(AS_PROGRAM).install_read_tap(flags, flags + 14 * 4 - 1, "internal_wait",
-			[this, offset] (offs_t address, u32 &data, u32 mem_mask)
-			{
-				if (!machine().side_effects_disabled() && data == 1 && mem_mask == ~0U
-						&& m_maincpu->pc() == offset + 8
-						&& m_maincpu->state_int(arm7_cpu_device::ARM7_SR14) == offset + 48
-						&& (m_maincpu->state_int(arm7_cpu_device::ARM7_CPSR) & 0xbf) == 0x13)
-					m_maincpu->spin_until_interrupt();
-			});
-		break;
-	}
-}
-
 
 } // anonymous namespace
 

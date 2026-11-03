@@ -1244,123 +1244,8 @@ static void sprite_colour_decode(u16* rom, int len)
 	}
 }
 
-u32 pgm2_state::orleg2_speedup_r()
-{
-	u32 const pc = m_maincpu->pc();
-	if ((pc == 0x1002faec) || (pc == 0x1002f9b8))
-	{
-		if ((m_mainram[0x20114 / 4] == 0x00) && (m_mainram[0x20118 / 4] == 0x00))
-			m_maincpu->spin_until_interrupt();
-	}
-	/*else
-	{
-	    logerror("pc is %08x\n", pc);
-	}*/
-
-	return m_mainram[0x20114 / 4];
-}
-
-u32 pgm2_state::kov2nl_speedup_r()
-{
-	u32 const pc = m_maincpu->pc();
-
-	if ((pc == 0x10053a94) || (pc == 0x1005332c) || (pc == 0x1005327c))
-	{
-		if ((m_mainram[0x20470 / 4] == 0x00) && (m_mainram[0x20474 / 4] == 0x00))
-			m_maincpu->spin_until_interrupt();
-	}
-	/*
-	else
-	{
-	    logerror("pc is %08x\n", pc);
-	}
-	*/
-
-	return m_mainram[0x20470 / 4];
-}
-
-u32 pgm2_state::kof98umh_speedup_r()
-{
-	u32 const pc = m_maincpu->pc();
-
-	if (pc == 0x100028f6)
-	{
-		if ((m_mainram[0x00060 / 4] == 0x00) && (m_mainram[0x00064 / 4] == 0x00))
-			m_maincpu->spin_until_interrupt();
-	}
-	/*
-	else
-	{
-	    logerror("pc is %08x\n", pc);
-	}
-	*/
-
-	return m_mainram[0x00060 / 4];
-}
-
-u32 pgm2_state::kov3_speedup_r()
-{
-	u32 const pc = m_maincpu->pc();
-
-	if ((pc == 0x1000729a) || (pc == 0x1000729e))
-	{
-		if ((m_mainram[0x000b4 / 4] == 0x00) && (m_mainram[0x000b8 / 4] == 0x00))
-			m_maincpu->spin_until_interrupt();
-	}
-	/*
-	else
-	{
-	    logerror("pc is %08x\n", pc);
-	}
-	*/
-
-	return m_mainram[0x000b4 / 4];
-}
-
-
-
-
-u32 pgm2_state::ddpdojt_speedup_r()
-{
-	u32 const pc = m_maincpu->pc();
-
-	if (pc == 0x10001a7e)
-	{
-		if ((m_mainram[0x00060 / 4] == 0x00) && (m_mainram[0x00064 / 4] == 0x00))
-			m_maincpu->spin_until_interrupt();
-	}
-	/*
-	else
-	{
-	    logerror("pc is %08x\n", pc);
-	}
-	*/
-
-	return m_mainram[0x00060 / 4];
-}
-
-u32 pgm2_state::ddpdojt_speedup2_r()
-{
-	u32 const pc = m_maincpu->pc();
-
-	if (pc == 0x1008fefe || pc == 0x1008fbe8)
-	{
-		if ((m_mainram[0x21e04 / 4] & 0x00ff0000) != 0) // not sure if this endian safe ?
-			m_maincpu->spin_until_interrupt();
-	}
-	/*
-	else
-	{
-	    logerror("pc is %08x\n", pc);
-	}
-	*/
-
-	return m_mainram[0x21e04 / 4];
-}
-
-
 // for games with the internal ROMs fully dumped that provide the sprite key and program rom key at runtime
-void pgm2_state::common_encryption_init()
+void pgm2_state::common_init()
 {
 	// store off a copy of the encrypted rom so we can restore it later when needed
 	m_encrypted_copy.resize(m_mainrom->bytes());
@@ -1378,32 +1263,7 @@ void pgm2_state::common_encryption_init()
 	m_has_decrypted = false;
 }
 
-void pgm2_state::init_orleg2()
-{
-	common_encryption_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32smo_delegate(*this, FUNC(pgm2_state::orleg2_speedup_r)));
-}
-
-void pgm2_state::init_kov2nl()
-{
-	common_encryption_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020470, 0x20020473, read32smo_delegate(*this, FUNC(pgm2_state::kov2nl_speedup_r)));
-}
-
-void pgm2_state::init_ddpdojt()
-{
-	common_encryption_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32smo_delegate(*this, FUNC(pgm2_state::ddpdojt_speedup_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20021e04, 0x20021e07, read32smo_delegate(*this, FUNC(pgm2_state::ddpdojt_speedup2_r)));
-}
-
 // currently we don't know how to derive address/data xor values from real keys, so we need both
-
-void pgm2_state::init_kov3()
-{
-	common_encryption_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000b4, 0x200000b7, read32smo_delegate(*this, FUNC(pgm2_state::kov3_speedup_r)));
-}
 
 void pgm2_state::decrypt_kov3_module(u32 addrxor, u16 dataxor)
 {
@@ -1427,7 +1287,7 @@ void pgm2_state::init_kov3_104()
 			{ 0xeb,0x7d,0x8d,0x90,0x2c,0xf4,0x09,0x82 },
 			0x18ec71, 0xb89d }; // fake zero-key
 	module_key = &kov3_104_key;
-	init_kov3();
+	common_init();
 }
 
 void pgm2_state::init_kov3_102()
@@ -1437,7 +1297,7 @@ void pgm2_state::init_kov3_102()
 			{ 0x09,0xbd,0xf1,0x31,0xe6,0xf0,0x65,0x2b },
 			0x021d37, 0x81d0 };
 	module_key = &kov3_102_key;
-	init_kov3();
+	common_init();
 }
 
 void pgm2_state::init_kov3_101()
@@ -1447,7 +1307,7 @@ void pgm2_state::init_kov3_101()
 			{ 0xf2,0xb2,0xf0,0x89,0x37,0xf2,0xc7,0x0b },
 			0, 0xffff }; // real xor values is unknown
 	module_key = &kov3_101_key;
-	init_kov3();
+	common_init();
 }
 
 void pgm2_state::init_kov3_100()
@@ -1457,23 +1317,8 @@ void pgm2_state::init_kov3_100()
 			{ 0x96,0xf0,0x91,0xe1,0xb3,0xf1,0xef,0x90 },
 			0x3e8aa8, 0xc530 }; // fake zero-key
 	module_key = &kov3_100_key;
-	init_kov3();
+	common_init();
 }
-
-void pgm2_state::init_kof98umh()
-{
-	common_encryption_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32smo_delegate(*this, FUNC(pgm2_state::kof98umh_speedup_r)));
-}
-
-void pgm2_state::init_bubucar()
-{
-	common_encryption_init();
-	// m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32smo_delegate(*this, FUNC(pgm2_state::bubucar_speedup_r))); TODO: once this is fully dumped and decrypted
-}
-
-
-
 
 
 // PGM2
@@ -1484,33 +1329,33 @@ void pgm2_state::init_bubucar()
 // Oriental Legend 2 - should be a V102 and V100 too
 //西游释厄传2/Xīyóu shì è zhuàn 2 (China; Simplified Chinese)
 //西遊釋厄傳2/Saiyū Shakuyakuden 2 (Japan; Traditional Chinese - Taiwan(undumped) too?)
-GAME( 2007, orleg2,       0,      pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS", "Oriental Legend 2 (V104, Oversea)", MACHINE_SUPPORTS_SAVE ) // Overseas sets of OL2 do not use the card reader
-GAME( 2007, orleg2_103,   orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS", "Oriental Legend 2 (V103, Oversea)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_101,   orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS", "Oriental Legend 2 (V101, Oversea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2,       0,      pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS", "Oriental Legend 2 (V104, Oversea)", MACHINE_SUPPORTS_SAVE ) // Overseas sets of OL2 do not use the card reader
+GAME( 2007, orleg2_103,   orleg2, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS", "Oriental Legend 2 (V103, Oversea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_101,   orleg2, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS", "Oriental Legend 2 (V101, Oversea)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2007, orleg2_104cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Zhuan 2 (V104, China)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_103cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Zhuan 2 (V103, China)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_101cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Zhuan 2 (V101, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_104cn, orleg2, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Zhuan 2 (V104, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_103cn, orleg2, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Zhuan 2 (V103, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_101cn, orleg2, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Zhuan 2 (V101, China)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2007, orleg2_104jp, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V104, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_103jp, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V103, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_101jp, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V101, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_104jp, orleg2, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V104, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_103jp, orleg2, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V103, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_101jp, orleg2, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V101, Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Knights of Valour 2 New Legend
 //三國戰紀2橫掃千軍 New Legend/Sānguó Zhàn Jì 2 Héngsǎo Qiān Jūn  New Legend (Oversea; Mixed Traditional and Simplified Chinese)
 //三國戰紀2盖世英雄/Sānguó Zhàn Jì 2 Gàishì Yīngxióng (China; Mixed Traditional and Simplified Chinese)
 //三國戰紀2乱世英雄/Sangoku-Senki 2 Ranse Eiyū (Japan; Mixed Traditional and Simplified Chinese - Undumped)
-GAME( 2008, kov2nl,       0,      pgm2,        pgm2, pgm2_state, init_kov2nl,   ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Hengsao Qian Jun (V302, Oversea)", MACHINE_SUPPORTS_SAVE )
-GAME( 2008, kov2nl_301,   kov2nl, pgm2,        pgm2, pgm2_state, init_kov2nl,   ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Hengsao Qian Jun (V301, Oversea)", MACHINE_SUPPORTS_SAVE )
-GAME( 2008, kov2nl_300,   kov2nl, pgm2,        pgm2, pgm2_state, init_kov2nl,   ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Hengsao Qian Jun (V300, Oversea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl,       0,      pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Hengsao Qian Jun (V302, Oversea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_301,   kov2nl, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Hengsao Qian Jun (V301, Oversea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_300,   kov2nl, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Hengsao Qian Jun (V300, Oversea)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2008, kov2nl_302cn, kov2nl, pgm2,        pgm2, pgm2_state, init_kov2nl,   ROT0, "IGS (Huatong license)", "Sanguo Zhan Ji 2 Gaishi Yingxiong (V302, China)", MACHINE_SUPPORTS_SAVE )
-GAME( 2008, kov2nl_301cn, kov2nl, pgm2,        pgm2, pgm2_state, init_kov2nl,   ROT0, "IGS (Huatong license)", "Sanguo Zhan Ji 2 Gaishi Yingxiong (V301, China)", MACHINE_SUPPORTS_SAVE )
-GAME( 2008, kov2nl_300cn, kov2nl, pgm2,        pgm2, pgm2_state, init_kov2nl,   ROT0, "IGS (Huatong license)", "Sanguo Zhan Ji 2 Gaishi Yingxiong (V300, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_302cn, kov2nl, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS (Huatong license)", "Sanguo Zhan Ji 2 Gaishi Yingxiong (V302, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_301cn, kov2nl, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS (Huatong license)", "Sanguo Zhan Ji 2 Gaishi Yingxiong (V301, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_300cn, kov2nl, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS (Huatong license)", "Sanguo Zhan Ji 2 Gaishi Yingxiong (V300, China)", MACHINE_SUPPORTS_SAVE )
 
 
 // Dodonpachi Daioujou Tamashii - should be a V200 too
-GAME( 2010, ddpdojt,      0,      pgm2_ramrom, pgm2, pgm2_state, init_ddpdojt,  ROT270, "IGS / Cave (Tong Li Animation license)", "DoDonPachi Dai-Ou-Jou Tamashii (V201, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2010, ddpdojt,      0,      pgm2_ramrom, pgm2, pgm2_state, common_init,  ROT270, "IGS / Cave (Tong Li Animation license)", "DoDonPachi Dai-Ou-Jou Tamashii (V201, China)", MACHINE_SUPPORTS_SAVE )
 
 // Knights of Valour 3 - should be a V103 and V101 too
 //三国战纪3/Sānguó zhàn jì 3 (Simplified Chinese)
@@ -1520,9 +1365,9 @@ GAME( 2011, kov3_101,     kov3,   pgm2_hires,  pgm2, pgm2_state, init_kov3_101, 
 GAME( 2011, kov3_100,     kov3,   pgm2_hires,  pgm2, pgm2_state, init_kov3_100, ROT0, "IGS (Huatong license)", "Knights of Valour 3 / Sanguo Zhan Ji 3 (V100, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
 
 // King of Fighters '98: Ultimate Match Hero
-GAME( 2009, kof98umh,     0,      pgm2_lores,  pgm2, pgm2_state, init_kof98umh, ROT0, "IGS / SNK Playmore / New Channel", "The King of Fighters '98: Ultimate Match HERO (China, V100, 09-08-23)", MACHINE_SUPPORTS_SAVE )
+GAME( 2009, kof98umh,     0,      pgm2_lores,  pgm2, pgm2_state, common_init, ROT0, "IGS / SNK Playmore / New Channel", "The King of Fighters '98: Ultimate Match HERO (China, V100, 09-08-23)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2009, bubucar,      0,      pgm2,        pgm2, pgm2_state, init_bubucar,  ROT0, "IGS", "Bu Bu Car (English)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2009, bubucar,      0,      pgm2,        pgm2, pgm2_state, common_init,  ROT0, "IGS", "Bu Bu Car (English)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // ジグソーワールドアリーナ/Jigsaw World Arena
 

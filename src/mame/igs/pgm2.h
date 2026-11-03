@@ -48,16 +48,12 @@ public:
 		m_mainrom(*this, "mainrom")
 	{ }
 
-	void init_kov2nl() ATTR_COLD;
-	void init_orleg2() ATTR_COLD;
-	void init_ddpdojt() ATTR_COLD;
-	void init_kov3() ATTR_COLD;
 	void init_kov3_104() ATTR_COLD;
 	void init_kov3_102() ATTR_COLD;
 	void init_kov3_101() ATTR_COLD;
 	void init_kov3_100() ATTR_COLD;
-	void init_kof98umh() ATTR_COLD;
-	void init_bubucar() ATTR_COLD;
+
+	void common_init();
 
 	void pgm2_ramrom(machine_config &config) ATTR_COLD;
 	void pgm2_lores(machine_config &config) ATTR_COLD;
@@ -102,13 +98,6 @@ private:
 	void module_data_w(int state);
 	void module_clk_w(int state);
 
-	u32 orleg2_speedup_r();
-	u32 kov2nl_speedup_r();
-	u32 kof98umh_speedup_r();
-	u32 ddpdojt_speedup_r();
-	u32 ddpdojt_speedup2_r();
-	u32 kov3_speedup_r();
-
 	void encryption_do_w(u32 data);
 	void sprite_encryption_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
@@ -136,7 +125,6 @@ private:
 	void draw_sprites(const rectangle &cliprect);
 	void copy_sprites_from_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, u16 pri);
 
-	void common_encryption_init();
 	bool m_has_decrypted = false;    // so we only do it once.
 	bool m_has_decrypted_kov3_module = false;
 	u32 m_spritekey = 0;
