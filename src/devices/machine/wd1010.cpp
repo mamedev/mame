@@ -247,6 +247,7 @@ void wd1010_device::start_command()
 	// now busy and command in progress, clear error
 	m_status |= STATUS_BSY;
 	m_status |= STATUS_CIP;
+	m_status &= ~STATUS_WF;
 	set_error(0);
 
 	switch (m_command >> 4)
@@ -453,6 +454,7 @@ void wd1010_device::write(offs_t offset, uint8_t data)
 			// selected drive not ready
 			LOG("--> Drive not ready, aborting\n");
 
+			m_status &= ~STATUS_WF;
 			set_error(ERR_AC);
 			end_command();
 		}
@@ -670,7 +672,19 @@ void wd1010_device::cmd_write_sector()
 	for (int i = 0; i < 512; i++)
 		buffer[i] = m_in_data_cb();
 
-	file->write(get_lbasector(m_sector_number), buffer);
+	if (!file->write(get_lbasector(m_sector_number), buffer))
+	{
+		LOG("--> Write failed, aborting\n");
+
+		m_out_bcs_cb(0);
+		m_out_wg_cb(0);
+
+		// a write fault latches WF and aborts the command (data sheet: status register, WRITE SECTOR flowchart)
+		m_status |= STATUS_WF;
+		set_error(ERR_AC);
+		end_command();
+		return;
+	}
 
 	// save last read head and sector number
 	m_drives[drive()].head = head();
