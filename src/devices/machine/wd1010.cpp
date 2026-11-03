@@ -322,6 +322,11 @@ void wd1010_device::drdy_w(int state)
 
 void wd1010_device::brdy_w(int state)
 {
+	// a full buffer ends the data request of a write, even during the seek
+	if (state && !m_brdy && (m_status & STATUS_CIP) &&
+			((m_command >> 4) == CMD_WRITE_SECTOR || (m_command >> 4) == CMD_WRITE_FORMAT))
+		set_bdrq(0);
+
 	m_brdy = state;
 }
 
@@ -456,6 +461,11 @@ void wd1010_device::write(offs_t offset, uint8_t data)
 			m_command = data;
 
 			start_command();
+
+			// BDRQ comes before the implied seek: a WD1010AL-00 passes the HP 9133XV self test, which polls
+			// DRQ right after the command; the FORMAT flowchart has it there too, the WRITE SECTOR one after the seek
+			if ((m_command >> 4) == CMD_WRITE_SECTOR || (m_command >> 4) == CMD_WRITE_FORMAT)
+				set_bdrq(1);
 
 			// all other command imply a seek
 			if ((m_command >> 4) != CMD_SCAN_ID)
@@ -600,11 +610,10 @@ void wd1010_device::cmd_read_sector()
 
 void wd1010_device::cmd_write_sector()
 {
-	set_bdrq(1);
-
 	// wait if the buffer isn't ready
 	if (m_brdy == 0)
 	{
+		set_bdrq(1);
 		m_write_timer->adjust(attotime::from_usec(35));
 		return;
 	}
