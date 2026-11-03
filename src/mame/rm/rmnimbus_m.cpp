@@ -46,10 +46,10 @@ to create a blank hard disk which can then be formatted with the RM tools.
 The important thing when doing this is to make sure that if using the Native
 SCSI tools, that the disk has the  same number of blocks as specified above,
 even if you have to use unusual geometry to do so !
-Currently, only the ST225N and ST125N can be formatted as the other native
-drives and Xebec board expect the WRITE BUFFER (0x3B) and READ BUFFER (0x3C)
-with mode 0 commands to be implemented and the Adaptec board uses unknown
-command 0xE4.
+HDFORM formats the ST125N, but the RO652-20 fails its buffer test, which
+needs WRITE BUFFER (0x3B) and READ BUFFER (0x3C).  WINFORM and ADAPT format
+their drives.  BIOS v1.25a only initialises a Xebec at boot, so a native SCSI
+or Adaptec boot drive needs BIOS v1.32 or later.
 
 
 for example:
@@ -420,7 +420,7 @@ void rmnimbus_state::sio_interrupt(int state)
 void rmnimbus_state::fdc_reset()
 {
 	m_nimbus_drives.reg400=0;
-	m_scsi_ctrl_out->write(0);
+	hdc_ctrl_w(0);
 }
 
 void rmnimbus_state::nimbus_fdc_intrq_w(int state)
@@ -488,11 +488,11 @@ uint8_t rmnimbus_state::scsi_r(offs_t offset)
 	switch(offset*2)
 	{
 		case 0x00 :
-			result |= m_scsi_req << 7;
-			result |= m_scsi_cd << 6;
-			result |= m_scsi_io << 5;
-			result |= m_scsi_bsy << 4;
-			result |= m_scsi_msg << 3;
+			result |= m_scsi->req_r() << 7;
+			result |= m_scsi->cd_r() << 6;
+			result |= m_scsi->io_r() << 5;
+			result |= m_scsi->bsy_r() << 4;
+			result |= (!m_scsi->msg_r()) << 3;
 			if(floppy)
 			{
 				result |= FDC_MOTOR() << 2;
@@ -501,8 +501,9 @@ uint8_t rmnimbus_state::scsi_r(offs_t offset)
 			}
 			break;
 		case 0x08 :
-			result = m_scsi_data_in->read();
-			hdc_post_rw();
+			result = m_scsi->read();
+			if (!machine().side_effects_disabled())
+				hdc_post_rw();
 			break;
 		default:
 			break;
@@ -565,21 +566,31 @@ void rmnimbus_state::scsi_w(offs_t offset, uint8_t data)
 	switch(offset*2)
 	{
 		case 0x00 :
-			m_scsi_ctrl_out->write(data);
+			hdc_ctrl_w(data);
 			break;
 
 		case 0x08 :
-			m_scsi_data_out->write(data);
+			m_scsi->write(data);
 			hdc_post_rw();
 			break;
+	}
+}
+
+void rmnimbus_state::hdc_ctrl_w(uint8_t data)
+{
+	m_scsi->rst_w(BIT(data, 0));
+	m_scsi->sel_w(BIT(data, 1));
+
+	if (BIT(data, 2) != m_scsi_iena)
+	{
+		m_scsi_iena = BIT(data, 2);
+		check_scsi_irq();
 	}
 }
 
 void rmnimbus_state::hdc_reset()
 {
 	m_scsi_iena = 0;
-	m_scsi_msg = 0;
-	m_scsi_bsy = 0;
 	m_scsi_io = 0;
 	m_scsi_cd = 0;
 	m_scsi_req = 0;
@@ -593,17 +604,14 @@ void rmnimbus_state::hdc_reset()
     The inputs on the RM schematic are fed through inverters, but because of the above
     we don't need to invert them, unless the schematic uses the signal directly
     For consistency we will invert msg before latching.
+
+    nscsi_callback_device reports every line on every bus change, so the handlers
+    below only act when their own line changes.
 */
 
 void rmnimbus_state::check_scsi_irq()
 {
 	nimbus_fdc_intrq_w(m_scsi_io && m_scsi_cd && m_scsi_req && m_scsi_iena);
-}
-
-void rmnimbus_state::write_scsi_iena(int state)
-{
-	m_scsi_iena = state;
-	check_scsi_irq();
 }
 
 // This emulates the 74LS74 latched version of req
@@ -622,11 +630,12 @@ void rmnimbus_state::set_scsi_drqlat(bool   clock, bool clear)
 
 void rmnimbus_state::hdc_post_rw()
 {
-	if(m_scsi_req)
-		m_scsibus->write_ack(1);
-
 	// IC17A, IC17B, latched req cleared by SCSI data read or write, or C/D= command
+	// Cleared before ACK: the target can drop REQ while ACK is being raised
 	set_scsi_drqlat(false, true);
+
+	if(m_scsi_req)
+		m_scsi->ack_w(1);
 }
 
 void rmnimbus_state::hdc_drq(bool state)
@@ -634,13 +643,11 @@ void rmnimbus_state::hdc_drq(bool state)
 	m_maincpu->drq1_w(HDC_DRQ_ENABLED() && !m_scsi_cd && state);
 }
 
-void rmnimbus_state::write_scsi_bsy(int state)
-{
-	m_scsi_bsy = state;
-}
-
 void rmnimbus_state::write_scsi_cd(int state)
 {
+	if (state == m_scsi_cd)
+		return;
+
 	m_scsi_cd = state;
 
 	// IC17A, IC17B, latched req cleared by SCSI data read or write, or C/D= command
@@ -651,22 +658,23 @@ void rmnimbus_state::write_scsi_cd(int state)
 
 void rmnimbus_state::write_scsi_io(int state)
 {
+	if (state == m_scsi_io)
+		return;
+
 	m_scsi_io = state;
 
 	if (m_scsi_io)
 	{
-		m_scsi_data_out->write(0);
+		m_scsi->write(0);
 	}
 	check_scsi_irq();
 }
 
-void rmnimbus_state::write_scsi_msg(int state)
-{
-	m_scsi_msg = !state;
-}
-
 void rmnimbus_state::write_scsi_req(int state)
 {
+	if (state == m_scsi_req)
+		return;
+
 	// Detect rising edge on req, IC11b, clock
 	int rising = ((m_scsi_req == 0) && (state == 1));
 
@@ -677,7 +685,7 @@ void rmnimbus_state::write_scsi_req(int state)
 	set_scsi_drqlat(rising, m_scsi_cd);
 
 	if (!m_scsi_reqlat)
-		m_scsibus->write_ack(0);
+		m_scsi->ack_w(0);
 
 	check_scsi_irq();
 }

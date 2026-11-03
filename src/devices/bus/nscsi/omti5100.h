@@ -28,6 +28,7 @@ private:
 	{
 		SC_CHECK_TRACK_FORMAT     = 0x05,
 		SC_FORMAT_TRACK           = 0x06,
+		SC_ASSIGN_ALTERNATE_TRACK = 0x0e,
 		SC_ASSIGN_DISK_PARAMETERS = 0xc2,
 		SC_READ_DATA_BUFFER       = 0xec
 	};
@@ -44,7 +45,8 @@ private:
 	{
 		BUF_DISK   = 2,
 		BUF_PARAM  = 3,
-		BUF_BUFFER = 4
+		BUF_BUFFER = 4,
+		BUF_ALT    = 5
 	};
 
 	bool lun_ready(int lun) const;

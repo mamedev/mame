@@ -25,7 +25,7 @@ public:
 	//         s->set_seek_timing(3000, 85000, 205000, 3600, 1);
 
 protected:
-	// SCSI status returns
+	// error codes, returned in sense byte 0
 	enum {
 		SS_GOOD                 = 0x00,
 		SS_NO_INDEX             = 0x01,
@@ -96,6 +96,9 @@ protected:
 	uint8_t params[8];
 
 private:
+	bool drive_ready() const;
+	void scsi_error(uint8_t code);
+
 	void z80_mem(address_map &map) ATTR_COLD;
 	void z80_io(address_map &map) ATTR_COLD;
 };

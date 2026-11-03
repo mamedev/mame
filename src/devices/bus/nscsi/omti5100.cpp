@@ -214,6 +214,12 @@ void nscsi_omti5100_device::scsi_command()
 			break;
 		}
 
+		case SC_ASSIGN_ALTERNATE_TRACK:
+			// the image has no bad tracks to redirect, so the alternate track address is only read
+			scsi_data_out(BUF_ALT, 4);
+			scsi_status_complete(SS_GOOD);
+			break;
+
 		case SC_ASSIGN_DISK_PARAMETERS:
 			scsi_data_out(BUF_PARAM, sizeof(m_param));
 			scsi_status_complete(SS_GOOD);
@@ -283,6 +289,9 @@ void nscsi_omti5100_device::scsi_put_data(int id, int pos, uint8_t data)
 			}
 			break;
 		}
+
+		case BUF_ALT:
+			break;
 
 		case BUF_PARAM:
 			m_param[pos] = data;

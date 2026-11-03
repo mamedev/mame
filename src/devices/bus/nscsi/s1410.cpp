@@ -155,7 +155,10 @@ void nscsi_s1410_device::device_add_mconfig(machine_config &config)
 
 void nscsi_s1410_device::device_reset()
 {
+	// the controller answers selection even without a drive image
+	const int scsi_id = m_scsi_id;
 	nscsi_harddisk_device::device_reset();
+	m_scsi_id = scsi_id;
 
 	// initialize drive characteristics
 	params[0] = 0;
@@ -185,9 +188,23 @@ bool nscsi_s1410_device::scsi_command_done(uint8_t command, uint8_t length)
 	return true;
 }
 
+bool nscsi_s1410_device::drive_ready() const
+{
+	// only drive 0 is attached, and only when it has an image
+	return !(m_scsi_cmdbuf[1] >> 5) && image->exists();
+}
+
+void nscsi_s1410_device::scsi_error(uint8_t code)
+{
+	// the status byte only flags the error, REQUEST SENSE returns the code
+	m_scsi_sense_buffer[0] = code;
+	scsi_status_complete(SS_CHECK_CONDITION);
+}
+
 void nscsi_s1410_device::scsi_command()
 {
-	memset(m_scsi_sense_buffer, 0, sizeof(m_scsi_sense_buffer));
+	if (m_scsi_cmdbuf[0] != SC_REQUEST_SENSE)
+		memset(m_scsi_sense_buffer, 0, sizeof(m_scsi_sense_buffer));
 
 	switch(m_scsi_cmdbuf[0]) {
 	case SC_TEST_UNIT_READY:
@@ -195,24 +212,24 @@ void nscsi_s1410_device::scsi_command()
 	case SC_REASSIGN_BLOCKS:
 	case SC_READ:
 	case SC_WRITE:
-		if (m_scsi_cmdbuf[1] >> 5) {
-			scsi_status_complete(SS_NOT_READY);
-			m_scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
+		if (!drive_ready()) {
+			scsi_error(SK_DRIVE_NOT_READY);
 		} else {
 			nscsi_harddisk_device::scsi_command();
 		}
 		break;
 
 	case SC_SEEK:
-		{
+		if (!drive_ready()) {
+			scsi_error(SK_DRIVE_NOT_READY);
+		} else {
 			const auto &info = image->get_info();
 			int max_lba = (info.cylinders * info.heads * info.sectors) - 1;
 			lba = get_u24be(&m_scsi_cmdbuf[1]) & 0x1fffff;
 			if (lba <= max_lba) {
 				scsi_status_complete(SS_GOOD);
 			} else {
-				scsi_status_complete(SS_SEEK_ERROR);
-				m_scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
+				scsi_error(SK_DRIVE_NOT_READY);
 			}
 		}
 		break;
@@ -224,7 +241,9 @@ void nscsi_s1410_device::scsi_command()
 
 	case SC_FORMAT_UNIT:
 		LOG("command FORMAT UNIT\n");
-		{
+		if (!drive_ready()) {
+			scsi_error(SK_DRIVE_NOT_READY);
+		} else {
 			const auto &info = image->get_info();
 			auto block = std::make_unique<uint8_t[]>(info.sectorbytes);
 			memset(&block[0], 0x6c, info.sectorbytes);
@@ -232,14 +251,13 @@ void nscsi_s1410_device::scsi_command()
 			for(; lba < (info.cylinders * info.heads * info.sectors); lba++) {
 				image->write(lba, block.get());
 			}
+			scsi_status_complete(SS_GOOD);
 		}
-		scsi_status_complete(SS_GOOD);
 		break;
 
 	case SC_FORMAT_TRACK: {
-		if (m_scsi_cmdbuf[1] >> 5) {
-			scsi_status_complete(SS_NOT_READY);
-			m_scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
+		if (!drive_ready()) {
+			scsi_error(SK_DRIVE_NOT_READY);
 			return;
 		}
 
@@ -252,8 +270,7 @@ void nscsi_s1410_device::scsi_command()
 
 		if(!image->write(lba, &block[0])) {
 			logerror("%s: HD WRITE ERROR !\n", tag());
-			scsi_status_complete(SS_FORMAT_ERROR);
-			m_scsi_sense_buffer[0] = SK_FORMAT_ERROR;
+			scsi_error(SK_FORMAT_ERROR);
 		} else {
 			scsi_status_complete(SS_GOOD);
 		}
@@ -261,9 +278,8 @@ void nscsi_s1410_device::scsi_command()
 		break;
 
 	case SC_FORMAT_ALT_TRACK:
-		if (m_scsi_cmdbuf[1] >> 5) {
-			scsi_status_complete(SS_NOT_READY);
-			m_scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
+		if (!drive_ready()) {
+			scsi_error(SK_DRIVE_NOT_READY);
 			return;
 		}
 
@@ -287,9 +303,8 @@ void nscsi_s1410_device::scsi_command()
 		break;
 
 	case SC_CHECK_TRACK_FORMAT:
-		if (m_scsi_cmdbuf[1] >> 5) {
-			scsi_status_complete(SS_NOT_READY);
-			m_scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
+		if (!drive_ready()) {
+			scsi_error(SK_DRIVE_NOT_READY);
 			return;
 		}
 		scsi_status_complete(SS_GOOD);

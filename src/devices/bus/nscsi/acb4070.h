@@ -16,6 +16,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	virtual void scsi_command() override;
+	virtual bool scsi_command_done(uint8_t command, uint8_t length) override;
 	virtual uint8_t scsi_get_data(int id, int pos) override;
 	virtual void scsi_put_data(int id, int pos, uint8_t data) override;
 
@@ -23,17 +24,27 @@ private:
 	enum : uint8_t
 	{
 		SC_WRITE_DATA_BUFFER = 0x13,
-		SC_READ_DATA_BUFFER  = 0x14
+		SC_READ_DATA_BUFFER  = 0x14,
+		SC_RAM_DIAGNOSTIC    = 0xe0,
+		SC_CONTROLLER_DIAG   = 0xe4
 	};
 
 	enum : int
 	{
 		BUF_DATA = 3,
-		BUF_MODE = 4
+		BUF_MODE = 4,
+		BUF_DIAG = 5,
+		BUF_SEARCH = 6,
+		BUF_DEFECT = 7
 	};
+
+	void format_unit();
 
 	uint8_t m_buffer[0x400];
 	uint8_t m_mode[24];
+	uint8_t m_search[20];  // SEARCH DATA parameter header, as ADAPT.EXE sends it
+	uint8_t m_defect_header[4];
+	uint8_t m_format_fill;
 };
 
 DECLARE_DEVICE_TYPE(NSCSI_ACB4070, nscsi_acb4070_device)

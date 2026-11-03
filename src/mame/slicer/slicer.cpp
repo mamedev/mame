@@ -8,12 +8,14 @@
 #include "emu.h"
 
 #include "bus/isa/isa.h"
+#include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
-#include "bus/scsi/scsi.h"
 #include "cpu/i86/i186.h"
 #include "imagedev/floppy.h"
 #include "machine/74259.h"
 #include "machine/mc68681.h"
+#include "machine/nscsi_bus.h"
+#include "machine/nscsi_cb.h"
 #include "machine/wd_fdc.h"
 
 
@@ -26,7 +28,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_fdc(*this, "fdc"),
 		m_floppies(*this, "fdc:%u", 0U),
-		m_sasi(*this, "sasi")
+		m_sasi(*this, "sasi:7:scsicb")
 	{
 	}
 
@@ -34,6 +36,7 @@ public:
 
 private:
 	void sio_out_w(uint8_t data);
+	uint8_t sasi_ctrl_r();
 	void drive_size_w(int state);
 	template <unsigned Drive> void drive_sel_w(int state);
 
@@ -42,7 +45,7 @@ private:
 
 	required_device<fd1797_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppies;
-	required_device<scsi_port_device> m_sasi;
+	required_device<nscsi_callback_device> m_sasi;
 };
 
 void slicer_state::sio_out_w(uint8_t data)
@@ -54,6 +57,19 @@ void slicer_state::sio_out_w(uint8_t data)
 		if (floppy->get_device())
 			floppy->get_device()->mon_w(state);
 	}
+}
+
+uint8_t slicer_state::sasi_ctrl_r()
+{
+	uint8_t data = 0;
+
+	data |= m_sasi->bsy_r() << 3;
+	data |= m_sasi->msg_r() << 4;
+	data |= m_sasi->cd_r() << 5;
+	data |= m_sasi->req_r() << 6;
+	data |= m_sasi->io_r() << 7;
+
+	return data;
 }
 
 template <unsigned Drive>
@@ -83,10 +99,10 @@ void slicer_state::slicer_io(address_map &map)
 	map(0x0080, 0x00ff).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff); //PCS1
 	map(0x0100, 0x010f).mirror(0x0070).w("drivelatch", FUNC(ls259_device::write_d0)).umask16(0x00ff); //PCS2
 	// TODO: 0x180 sets ack
-	map(0x0180, 0x0180).r("sasi_data_in", FUNC(input_buffer_device::read)).w("sasi_data_out", FUNC(output_latch_device::write)).umask16(0x00ff); //PCS3
-	map(0x0181, 0x0181).r("sasi_ctrl_in", FUNC(input_buffer_device::read));
-	map(0x0184, 0x0184).r("sasi_data_in", FUNC(input_buffer_device::read)).w("sasi_data_out", FUNC(output_latch_device::write)).umask16(0x00ff);
-	map(0x0185, 0x0185).r("sasi_ctrl_in", FUNC(input_buffer_device::read));
+	map(0x0180, 0x0180).rw(m_sasi, FUNC(nscsi_callback_device::read), FUNC(nscsi_callback_device::write)).umask16(0x00ff); //PCS3
+	map(0x0181, 0x0181).r(FUNC(slicer_state::sasi_ctrl_r));
+	map(0x0184, 0x0184).rw(m_sasi, FUNC(nscsi_callback_device::read), FUNC(nscsi_callback_device::write)).umask16(0x00ff);
+	map(0x0185, 0x0185).r(FUNC(slicer_state::sasi_ctrl_r));
 }
 
 static void slicer_floppies(device_slot_interface &device)
@@ -121,8 +137,8 @@ void slicer_state::slicer(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppies[3], slicer_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	ls259_device &drivelatch(LS259(config, "drivelatch")); // U29
-	drivelatch.q_out_cb<0>().set(m_sasi, FUNC(scsi_port_device::write_sel));
-	drivelatch.q_out_cb<1>().set(m_sasi, FUNC(scsi_port_device::write_rst));
+	drivelatch.q_out_cb<0>().set(m_sasi, FUNC(nscsi_callback_device::sel_w));
+	drivelatch.q_out_cb<1>().set(m_sasi, FUNC(nscsi_callback_device::rst_w));
 	drivelatch.q_out_cb<2>().set(FUNC(slicer_state::drive_sel_w<3>));
 	drivelatch.q_out_cb<3>().set(FUNC(slicer_state::drive_sel_w<2>));
 	drivelatch.q_out_cb<4>().set(FUNC(slicer_state::drive_sel_w<1>));
@@ -130,18 +146,16 @@ void slicer_state::slicer(machine_config &config)
 	drivelatch.q_out_cb<6>().set(FUNC(slicer_state::drive_size_w));
 	drivelatch.q_out_cb<7>().set(m_fdc, FUNC(fd1797_device::dden_w));
 
-	SCSI_PORT(config, m_sasi);
-	m_sasi->set_data_input_buffer("sasi_data_in");
-	m_sasi->bsy_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit3));
-	m_sasi->msg_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit4));
-	m_sasi->cd_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit5));
-	m_sasi->req_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit6));
-	m_sasi->io_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit7));
-
-	output_latch_device &sasi_data_out(OUTPUT_LATCH(config, "sasi_data_out"));
-	m_sasi->set_output_latch(sasi_data_out);
-	INPUT_BUFFER(config, "sasi_data_in");
-	INPUT_BUFFER(config, "sasi_ctrl_in");
+	NSCSI_BUS(config, "sasi");
+	NSCSI_CONNECTOR(config, "sasi:0", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "sasi:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "sasi:2", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "sasi:3", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "sasi:4", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "sasi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "sasi:6", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "sasi:7", default_scsi_devices, "scsicb", true)
+		.option_add_internal("scsicb", NSCSI_CB);
 }
 
 ROM_START( slicer )
