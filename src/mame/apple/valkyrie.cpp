@@ -283,7 +283,7 @@ u8 valkyrie_device::regs_r(offs_t offset)
 			return m_mode;
 
 		case VALKYRIEREG_CONFIG: // config
-			return m_config;
+			return (m_config & 0x7f) | ((m_screen->hblank() || m_screen->vblank()) ? 0x80 : 0);
 
 		case VALKYRIEREG_VBLANK:
 			return m_screen->vblank();
