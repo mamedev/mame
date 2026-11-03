@@ -2236,6 +2236,9 @@ void goldnpkr_state::dash_a37_map(address_map &map)
 	map(0x0c01, 0x0c01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
 	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
+	map(0x4000, 0x4000).portr("SW2");
+	map(0x4001, 0x4001).portr("SW3");
+	map(0x4007, 0x4007).portr("SW4");
 	map(0x8000, 0xffff).rom();
 }
 
@@ -5174,6 +5177,97 @@ static INPUT_PORTS_START( icp_etg )  // ICP-1 w/daughterboard
 	PORT_DIPNAME( 0x80, 0x80, "Royal Flush Value" ) PORT_DIPLOCATION("SWB:8")
 	PORT_DIPSETTING(    0x80, "500" )
 	PORT_DIPSETTING(    0x00, "1000" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( dash_a37 )
+	PORT_INCLUDE( goldnpkr )
+
+	PORT_MODIFY("SW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x10, "Odds" )              PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, "40/100" )
+	PORT_DIPSETTING(    0x10, "60/150" )
+	PORT_DIPNAME( 0x20, 0x20, "Out Speed" )         PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( High ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Low ) )
+	PORT_DIPNAME( 0x40, 0x40, "Card" )              PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, "Close" )
+	PORT_DIPSETTING(    0x00, "Open" )
+	PORT_DIPNAME( 0x80, 0x00, "Extra Settings" )    PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+
+	PORT_START("SW2") // $4000
+	PORT_DIPNAME( 0x03, 0x03, "ROY Limit" )         PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x03, "4" )
+	PORT_DIPNAME( 0x0c, 0x0c, "STF Limit" )         PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x0c, "4" )
+	PORT_DIPNAME( 0x30, 0x30, "4CD Limit" )         PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x20, "3" )
+	PORT_DIPSETTING(    0x30, "4" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Medium" )            PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(    0x00, "-5%" )
+	PORT_DIPSETTING(    0x40, "-10%" )
+	PORT_DIPSETTING(    0x80, "-15%" )
+	PORT_DIPSETTING(    0xc0, "-20%" )
+
+	PORT_START("SW3") // $4001
+	PORT_DIPNAME( 0x03, 0x03, "WUP Level" )         PORT_DIPLOCATION("SW3:1,2")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x03, "4" )
+	PORT_DIPNAME( 0x0c, 0x0c, "GRN Level" )         PORT_DIPLOCATION("SW3:3,4")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x0c, "4" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW3:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_100C ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Note/Coupon" )       PORT_DIPLOCATION("SW3:7,8")
+	PORT_DIPSETTING(    0x00, "10/5" )
+	PORT_DIPSETTING(    0x40, "20/10" )
+	PORT_DIPSETTING(    0x80, "50/25" )
+	PORT_DIPSETTING(    0xc0, "100/50" )
+
+	PORT_START("SW4") // $4007
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW4:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "NG Level" )          PORT_DIPLOCATION("SW4:3,4")
+	PORT_DIPSETTING(    0x0c, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW4:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW4:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xa0, 0xa0, "4 Card Continue" )   PORT_DIPLOCATION("SW4:6,8")
+	PORT_DIPSETTING(    0xa0, "+5%" )
+	PORT_DIPSETTING(    0x80, "+10%" )
+	PORT_DIPSETTING(    0x20, "+20%" )
+	PORT_DIPSETTING(    0x00, "+30%" )
 INPUT_PORTS_END
 
 
@@ -15679,14 +15773,14 @@ GAMEL( 1983, falcnwldd, falcnwld, wildcrdb, wildcard, goldnpkr_state, empty_init
 
 /************************ DEP 9801 ENCRYPTED PLATFORM ************************/
 
-GAME(  1998, dash_a37,  0,         dash_a37,  goldnpkr, goldnpkr_state, init_dash,   ROT0,   "<unknown>",                "Dash! A.3.7 (ver 1998/10/22)",               MACHINE_NOT_WORKING )
-GAME(  1996, dash_a37b, dash_a37,  dash_a37,  goldnpkr, goldnpkr_state, init_dash,   ROT0,   "<unknown>",                "Dash! A.3.7 (ver 1996/11/18)",               MACHINE_NOT_WORKING )
-GAME(  1992, dynchance, 0,         dynchance, goldnpkr, goldnpkr_state, init_dynchance,ROT0, "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2)",         MACHINE_NOT_WORKING )
-GAME(  1992, dynchancf, dynchance, dynchance, goldnpkr, goldnpkr_state, init_dynchance,ROT0, "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2, alt)",    MACHINE_NOT_WORKING )
-GAME(  1997, dynplus,   dynchance, dynplus,   goldnpkr, goldnpkr_state, init_dynplus,ROT0,   "<unknown>",                "Dynamic Plus One (SP Type ver 1.10)",        MACHINE_NOT_WORKING )
-GAME(  1996, lfhouse,   0,         lfhouse,   goldnpkr, goldnpkr_state, init_lfhouse,ROT0,   "R and E",                  "Lucky Full House (ver 1.16, data ver 1.05)", MACHINE_NOT_WORKING )
-GAME(  1994, lfhouseb,  lfhouse,   lfhouse,   goldnpkr, goldnpkr_state, init_lfhouseb,ROT0,  "R and E",                  "Lucky Full House (ver 1.15, data ver 1.04)", MACHINE_NOT_WORKING )
-GAME(  1998, unkdep,    lfhouse,   unkdep,    goldnpkr, goldnpkr_state, init_unkdep, ROT0,   "<unknown>",                "unknown DEP 9801 poker game",                MACHINE_NOT_WORKING )
+GAME(  1998, dash_a37,  0,         dash_a37,  dash_a37, goldnpkr_state, init_dash,      ROT0, "<unknown>",               "Dash! A.3.7 (ver 1998/10/22)",               0 )
+GAME(  1996, dash_a37b, dash_a37,  dash_a37,  dash_a37, goldnpkr_state, init_dash,      ROT0, "<unknown>",               "Dash! A.3.7 (ver 1996/11/18)",               0 )
+GAME(  1992, dynchance, 0,         dynchance, goldnpkr, goldnpkr_state, init_dynchance, ROT0, "<unknown>",               "Dynamic Chance (Type-3.0 Part 1-2)",         MACHINE_NOT_WORKING )
+GAME(  1992, dynchancf, dynchance, dynchance, goldnpkr, goldnpkr_state, init_dynchance, ROT0, "<unknown>",               "Dynamic Chance (Type-3.0 Part 1-2, alt)",    MACHINE_NOT_WORKING )
+GAME(  1997, dynplus,   dynchance, dynplus,   goldnpkr, goldnpkr_state, init_dynplus,   ROT0, "<unknown>",               "Dynamic Plus One (SP Type ver 1.10)",        MACHINE_NOT_WORKING )
+GAME(  1996, lfhouse,   0,         lfhouse,   goldnpkr, goldnpkr_state, init_lfhouse,   ROT0, "R and E",                 "Lucky Full House (ver 1.16, data ver 1.05)", MACHINE_NOT_WORKING )
+GAME(  1994, lfhouseb,  lfhouse,   lfhouse,   goldnpkr, goldnpkr_state, init_lfhouseb,  ROT0, "R and E",                 "Lucky Full House (ver 1.15, data ver 1.04)", MACHINE_NOT_WORKING )
+GAME(  1998, unkdep,    lfhouse,   unkdep,    goldnpkr, goldnpkr_state, init_unkdep,    ROT0, "<unknown>",               "unknown DEP 9801 poker game",                MACHINE_NOT_WORKING )
 
 
 /******************************** SETS W/IRQ0 *********************************/
