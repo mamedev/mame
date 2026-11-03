@@ -118,6 +118,7 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 
 
 #include "adaptator.h"
+#include "cgp220.h"
 #include "chessmec.h"
 #include "comxpl80.h"
 #include "covox.h"
@@ -143,6 +144,7 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 void centronics_devices(device_slot_interface &device)
 {
 	device.option_add("adaptator", ADAPTATOR_MULTITAP);
+	device.option_add("cgp220", CENTRONICS_CGP220);
 	device.option_add("pl80", COMX_PL80);
 	device.option_add("eeprom_dongle", EEPROM_DONGLE);
 	device.option_add("ex800", EPSON_EX800);

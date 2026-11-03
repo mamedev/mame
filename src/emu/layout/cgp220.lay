@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:tim lindner
+Radio Shack Color Graphics Printer CGP-220
+-->
+<mamelayout version="2">
+
+	<element name="panel"><rect><color red="0.82" green="0.80" blue="0.74" /></rect></element>
+
+	<element name="power_led" defstate="1">
+		<disk state="0"><color red="0.15" green="0.05" blue="0.05" /></disk>
+		<disk state="1"><color red="1.0" green="0.15" blue="0.1" /></disk>
+	</element>
+	<element name="green_led" defstate="0">
+		<disk state="0"><color red="0.05" green="0.18" blue="0.05" /></disk>
+		<disk state="1"><color red="0.15" green="1.0" blue="0.15" /></disk>
+	</element>
+	<element name="red_led" defstate="0">
+		<disk state="0"><color red="0.18" green="0.05" blue="0.05" /></disk>
+		<disk state="1"><color red="1.0" green="0.15" blue="0.1" /></disk>
+	</element>
+
+	<element name="label_power"><text string="POWER"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="label_ready"><text string="READY"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="label_alert"><text string="ALERT"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+
+	<element name="btn_online">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.25" green="0.25" blue="0.25" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.55" green="0.55" blue="0.55" /></rect>
+		<text string="ON LINE"><bounds x="0.05" y="0.3" width="0.9" height="0.4" /><color red="0.95" green="0.95" blue="0.95" /></text>
+	</element>
+	<element name="btn_feed">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.25" green="0.25" blue="0.25" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.55" green="0.55" blue="0.55" /></rect>
+		<text string="FEED"><bounds x="0.05" y="0.3" width="0.9" height="0.4" /><color red="0.95" green="0.95" blue="0.95" /></text>
+	</element>
+	<element name="btn_reset">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.25" green="0.25" blue="0.25" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.55" green="0.55" blue="0.55" /></rect>
+		<text string="RESET"><bounds x="0.05" y="0.3" width="0.9" height="0.4" /><color red="0.95" green="0.95" blue="0.95" /></text>
+	</element>
+	<element name="btn_pump">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.25" green="0.25" blue="0.25" /></rect>
+		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.55" green="0.55" blue="0.55" /></rect>
+		<text string="PUMP"><bounds x="0.05" y="0.3" width="0.9" height="0.4" /><color red="0.95" green="0.95" blue="0.95" /></text>
+	</element>
+
+	<!-- host's main screen above the printer, skipped by MAME if the host has no :screen -->
+	<view name="Computer and Printer">
+		<screen tag=":screen"><bounds x="571" y="0" width="1000" height="750" /></screen>
+
+		<screen tag="bitmap:screen"><bounds x="0" y="770" width="2142" height="384" /></screen>
+
+		<element ref="panel"><bounds x="0" y="1154" width="2142" height="160" /></element>
+
+		<element ref="power_led"><bounds x="120" y="1190" width="36" height="36" /></element>
+		<element ref="label_power"><bounds x="78" y="1236" width="120" height="36" /></element>
+		<element name="cgp220_ready_led" ref="green_led"><bounds x="300" y="1190" width="36" height="36" /></element>
+		<element ref="label_ready"><bounds x="258" y="1236" width="120" height="36" /></element>
+		<element name="cgp220_alert_led" ref="red_led"><bounds x="480" y="1190" width="36" height="36" /></element>
+		<element ref="label_alert"><bounds x="438" y="1236" width="120" height="36" /></element>
+
+		<element ref="btn_online" inputtag="BUTTONS" inputmask="0x20"><bounds x="1260" y="1184" width="180" height="100" /></element>
+		<element ref="btn_feed" inputtag="BUTTONS" inputmask="0x10"><bounds x="1470" y="1184" width="180" height="100" /></element>
+		<element ref="btn_reset" inputtag="BUTTONS" inputmask="0x40"><bounds x="1680" y="1184" width="180" height="100" /></element>
+		<element ref="btn_pump" inputtag="SWITCHES" inputmask="0x40"><bounds x="1890" y="1184" width="180" height="100" /></element>
+	</view>
+
+	<view name="Paper and Control Panel">
+		<screen tag="bitmap:screen"><bounds x="0" y="0" width="2142" height="384" /></screen>
+
+		<element ref="panel"><bounds x="0" y="384" width="2142" height="160" /></element>
+
+		<element ref="power_led"><bounds x="120" y="420" width="36" height="36" /></element>
+		<element ref="label_power"><bounds x="78" y="466" width="120" height="36" /></element>
+		<element name="cgp220_ready_led" ref="green_led"><bounds x="300" y="420" width="36" height="36" /></element>
+		<element ref="label_ready"><bounds x="258" y="466" width="120" height="36" /></element>
+		<element name="cgp220_alert_led" ref="red_led"><bounds x="480" y="420" width="36" height="36" /></element>
+		<element ref="label_alert"><bounds x="438" y="466" width="120" height="36" /></element>
+
+		<element ref="btn_online" inputtag="BUTTONS" inputmask="0x20"><bounds x="1260" y="414" width="180" height="100" /></element>
+		<element ref="btn_feed" inputtag="BUTTONS" inputmask="0x10"><bounds x="1470" y="414" width="180" height="100" /></element>
+		<element ref="btn_reset" inputtag="BUTTONS" inputmask="0x40"><bounds x="1680" y="414" width="180" height="100" /></element>
+		<element ref="btn_pump" inputtag="SWITCHES" inputmask="0x40"><bounds x="1890" y="414" width="180" height="100" /></element>
+	</view>
+
+	<view name="Paper">
+		<screen tag="bitmap:screen"><bounds x="0" y="0" width="2142" height="384" /></screen>
+	</view>
+
+</mamelayout>
