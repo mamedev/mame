@@ -618,10 +618,10 @@ void arm7_cpu_device::generate_abort_check(drcuml_block &block, const opcode_des
 
 
 // leaves once the instruction completes if an access ended the slice or changed the address map
-void arm7_cpu_device::generate_memory_end(drcuml_block &block, const opcode_desc *desc)
+void arm7_cpu_device::generate_memory_end(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	// the next two words as compiled are the interpreter's prefetch if the map changes (drc_prefetch_after_remap())
-	uml::code_handle *resync = m_resync;
+	bool next_words = false;
 	const opcode_desc *const next = desc->next();
 	if (desc->length == 4 && next && next->pc == desc->pc + 4 && next->length == 4)
 	{
@@ -630,14 +630,18 @@ void arm7_cpu_device::generate_memory_end(drcuml_block &block, const opcode_desc
 		if (second && second->pc == desc->pc + 8)
 		{
 			m_drc_prefetch[desc->pc + 4] = std::make_pair(next->opword, second->opword);
-			resync = m_resync_next;
+			next_words = true;
 		}
 		else if (next->is_unconditional_branch())
 		{
 			m_drc_prefetch[desc->pc + 4] = std::make_pair(next->opword, uint32_t(0));
-			resync = m_resync_next;
+			next_words = true;
 		}
 	}
+
+	// and the slice's end runs the words fetched before a store wrote, as compiled (drc_prefetch_after_store())
+	const bool window = drc_note_window(compiler, desc->pc + desc->length);
+	uml::code_handle *const resync = next_words ? (window ? m_resync_next_window : m_resync_next) : (window ? m_resync_window : m_resync);
 
 	// icount:stop as one 64-bit word, minus 1, has a bit above 30 iff icount <= 0 or stop != 0 (icount > INT_MIN)
 	static_assert(offsetof(core_state, stop) == offsetof(core_state, icount) + 4);
@@ -1275,7 +1279,7 @@ bool arm7_cpu_device::generate_mem_single(drcuml_block &block, compiler_state &c
 		UML_MOV(block, drc_reg(rd), uml::I0);                                       // mov     rd,i0
 	}
 
-	generate_memory_end(block, desc);
+	generate_memory_end(block, compiler, desc);
 	generate_condition_end(block, compiler, skip, desc->cycles);
 	return true;
 }
@@ -1396,7 +1400,7 @@ bool arm7_cpu_device::generate_mem_half(drcuml_block &block, compiler_state &com
 		UML_MOV(block, drc_reg(rn), uml::I4);                                       // mov     rn,i4
 	}
 
-	generate_memory_end(block, desc);
+	generate_memory_end(block, compiler, desc);
 	generate_condition_end(block, compiler, skip, desc->cycles);
 	return true;
 }
@@ -1585,7 +1589,7 @@ bool arm7_cpu_device::generate_mem_block(drcuml_block &block, compiler_state &co
 		return true;
 	}
 
-	generate_memory_end(block, desc);
+	generate_memory_end(block, compiler, desc);
 	generate_condition_end(block, compiler, skip, desc->cycles);
 	return true;
 }
@@ -1833,7 +1837,7 @@ void arm7_cpu_device::generate_thumb_access(drcuml_block &block, compiler_state 
 	{
 		UML_MOV(block, drc_reg(rd), uml::I0);                                       // mov     rd,i0
 	}
-	generate_memory_end(block, desc);
+	generate_memory_end(block, compiler, desc);
 }
 
 
@@ -2221,7 +2225,7 @@ bool arm7_cpu_device::generate_thumb(drcuml_block &block, compiler_state &compil
 							UML_LABEL(block, fast_done);                            // done:
 						}
 						UML_SUB(block, sp, sp, count << 2);                         // sub     sp,sp,count*4
-						generate_memory_end(block, desc);
+						generate_memory_end(block, compiler, desc);
 					}
 					return true;
 
@@ -2309,7 +2313,7 @@ bool arm7_cpu_device::generate_thumb(drcuml_block &block, compiler_state &compil
 							generate_branch_end(block, compiler, desc, uml::code_label(0), 0);
 							return true;
 						}
-						generate_memory_end(block, desc);
+						generate_memory_end(block, compiler, desc);
 					}
 					return true;
 			}
@@ -2405,7 +2409,7 @@ bool arm7_cpu_device::generate_thumb(drcuml_block &block, compiler_state &compil
 					UML_MOV(block, drc_reg(rb), uml::I4);                           // mov     rb,i4
 					generate_abort_check(block, desc);
 				}
-				generate_memory_end(block, desc);
+				generate_memory_end(block, compiler, desc);
 			}
 			return true;
 
