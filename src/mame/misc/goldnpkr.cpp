@@ -14368,7 +14368,7 @@ ROM_END
   Will mark these as bad dumps.
 
   lfhouse and lfhouseb have missing graphics bitplanes.
-  Graphics ROMs need to be redumped.
+  Graphics ROM 1.5l need to be redumped.
 
 */
 ROM_START( dash_a37 )
@@ -14557,11 +14557,10 @@ ROM_START( lfhouse )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lf2_i220.5e", 0x8000, 0x8000, CRC(ff975444) SHA1(c13042b6a90a08304e4fcb7c683926b28f14a771) )
 
-    // wrong GFX set. doesn't match title and maybe other graphics.
-	// need the real missing GFX ROMs
+	// GFX ROMs need to be redumped
 	ROM_REGION( 0x10000, "gfxpool", 0 )
 	ROM_LOAD( "1.5l", 0x0000, 0x8000, BAD_DUMP CRC(a501edc4) SHA1(95fc04c16cde89636023639db236fba261ccd21b) )
-	ROM_LOAD( "2.5n", 0x8000, 0x8000, BAD_DUMP CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
+	ROM_LOAD( "2.5n", 0x8000, 0x8000, CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
 
 //  d000 --> lucky animation
 //  f000 --> title
@@ -14604,12 +14603,11 @@ ROM_START( lfhouseb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lfh_115.5e", 0x8000, 0x8000, CRC(4c877f57) SHA1(160e2c0f5c08be05dd56787f01a5a9f8813796b1) )
 
-    // wrong GFX set. doesn't match title and maybe other graphics.
-	// need the real missing GFX ROMs
+	// GFX ROMs need to be redumped
 	ROM_REGION( 0x8000, "gfxpool", 0 )
 	ROM_LOAD( "1.5l", 0x0000, 0x4000, BAD_DUMP CRC(a501edc4) SHA1(95fc04c16cde89636023639db236fba261ccd21b) )
 	ROM_IGNORE(               0x4000 )
-	ROM_LOAD( "2.5n", 0x4000, 0x4000, BAD_DUMP CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
+	ROM_LOAD( "2.5n", 0x4000, 0x4000, CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
 	ROM_IGNORE(               0x4000 )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
