@@ -365,7 +365,7 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 						break;
 					case 0xf0: // Request SLAVE Revision
 						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: Request SLAVE Revision (0xf0)\n", offset);
-						prepare_readback(attotime::from_hz(10000), 2, 2, 0xf0, 0x32, 0x31, 0, 0xf0);
+						prepare_readback(attotime::from_hz(10000), 2, 3, 0xf0, 0x20, 0x20, 0, 0xf0);
 						m_in_index = 0;
 						break;
 					case 0xf3: // Request Pointer Type
