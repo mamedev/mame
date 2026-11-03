@@ -100,7 +100,7 @@ private:
 	void kov3_gpio_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 kov3_gpio_r(offs_t offset, u32 mem_mask);
 
-	void encryption_do_w(u32 data);
+	void decrypt(int state);
 	void sprite_encryption_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

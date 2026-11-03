@@ -19,7 +19,7 @@ igs036_cpu_device::igs036_cpu_device(const machine_config &mconfig, const char *
 	: arm946es_cpu_device(mconfig, IGS036, tag, owner, clock, address_map_constructor(FUNC(igs036_cpu_device::onboard_peripherals), this))
 	, m_read_gpio(*this, 0)
 	, m_write_gpio(*this)
-	, m_write_encryption_control(*this)
+	, m_do_decrypt(*this)
 	, m_arm_aic(*this, "arm_aic")
 {
 }
@@ -41,7 +41,15 @@ u32 igs036_cpu_device::encryption_control_r(offs_t offset, u32 mem_mask)
 
 void igs036_cpu_device::encryption_control_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_write_encryption_control(offset, data, mem_mask);
+	// The internal ROM uploads 256 key bytes, then writes 4 here before reading
+	// the external program. Other control bits and key changes while enabled are unknown.
+	if (!BIT(mem_mask, 2))
+		return;
+
+	m_has_decrypted = (BIT(data, 2));
+
+	if (m_has_decrypted)
+		m_do_decrypt(offset, data, mem_mask);
 }
 
 void igs036_cpu_device::onboard_peripherals(address_map &map)
@@ -70,18 +78,11 @@ void igs036_cpu_device::onboard_peripherals(address_map &map)
 	map(0xffff'fd40, 0xffff'fd4b).nopw(); // TODO: watchdog
 }
 
-void igs036_cpu_device::irq(int state)
-{
-	if (state == ASSERT_LINE) set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
-	else set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
-}
-
-
 void igs036_cpu_device::device_add_mconfig(machine_config &config)
 {
 	arm946es_cpu_device::device_add_mconfig(config);
 
-	ARM_AIC(config, m_arm_aic).irq_callback().set(FUNC(igs036_cpu_device::irq));
+	ARM_AIC(config, m_arm_aic).irq_callback().set_inputline(DEVICE_SELF, ARM7_IRQ_LINE);
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 }
 
@@ -111,7 +112,7 @@ void igs036_cpu_device::timer_schedule(u32 channel)
 {
 	u32 const clock = timer_clock(channel);
 	if (m_tc_enabled[channel] && clock)
-		m_tc_timer[channel]->adjust(attotime::from_ticks(m_tc_regs[channel][7] ? m_tc_regs[channel][7] : 0x1'0000, clock), channel);
+		m_tc_timer[channel]->adjust(attotime::from_ticks(m_tc_regs[channel][7] ? m_tc_regs[channel][7] : 0x10'000, clock), channel);
 	else
 		m_tc_timer[channel]->adjust(attotime::never);
 }

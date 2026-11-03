@@ -129,7 +129,7 @@ void pgm2_state::device_post_load()
 	}
 }
 
-void pgm2_state::encryption_do_w(u32 data)
+void pgm2_state::decrypt(int state)
 {
 	igs036_decryptor decrypter(m_maincpu->get_encryption_table());
 	if (m_romboard_ram)
@@ -141,8 +141,6 @@ void pgm2_state::encryption_do_w(u32 data)
 	{
 		decrypter.decrypter_rom((u16*)m_mainrom->base(), m_mainrom->bytes(), 0);
 	}
-
-	m_maincpu->set_has_decrypted(true);
 }
 
 
@@ -718,7 +716,7 @@ void pgm2_state::pgm2(machine_config &config)
 	// basic machine hardware
 	IGS036(config, m_maincpu, 100000000); // Unknown clock / divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm2_state::pgm2_rom_map);
-	m_maincpu->set_encryption_control_w().set(FUNC(pgm2_state::encryption_do_w));
+	m_maincpu->set_do_decrypt().set(FUNC(pgm2_state::decrypt));
 
 	TIMER(config, m_mcu_timer).configure_generic(FUNC(pgm2_state::mcu_interrupt));
 

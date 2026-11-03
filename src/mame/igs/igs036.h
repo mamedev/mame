@@ -21,9 +21,8 @@ public:
 
 	auto set_gpio_r() { return m_read_gpio.bind(); }
 	auto set_gpio_w() { return m_write_gpio.bind(); }
-	auto set_encryption_control_w() { return m_write_encryption_control.bind(); }
+	auto set_do_decrypt() { return m_do_decrypt.bind(); }
 
-	void set_has_decrypted(bool has_decrypted) { m_has_decrypted = has_decrypted; }
 	bool get_has_decrypted() { return m_has_decrypted; }
 
 protected:
@@ -33,16 +32,6 @@ protected:
 
 private:
 	void onboard_peripherals(address_map &map) ATTR_COLD;
-
-	emu_timer *m_tc_timer[3];
-	u32 m_tc_regs[3][16];
-	bool m_tc_enabled[3];
-	u8 m_encryption_table[0x100];
-	bool m_has_decrypted = false;
-
-	devcb_read32 m_read_gpio;
-	devcb_write32 m_write_gpio;
-	devcb_write32 m_write_encryption_control;
 
 	u32 encryption_control_r(offs_t offset, u32 mem_mask);
 	void encryption_control_w(offs_t offset, u32 data, u32 mem_mask);
@@ -56,7 +45,17 @@ private:
 	void timer_schedule(u32 channel);
 	u32 timer_clock(u32 channel) const;
 	TIMER_CALLBACK_MEMBER(timer_expired);
-	void irq(int state);
+
+	emu_timer *m_tc_timer[3];
+	u32 m_tc_regs[3][16];
+	bool m_tc_enabled[3];
+	u8 m_encryption_table[0x100];
+	bool m_has_decrypted = false;
+
+	devcb_read32 m_read_gpio;
+	devcb_write32 m_write_gpio;
+	devcb_write_line m_do_decrypt;
+
 	required_device<arm_aic_device> m_arm_aic;
 };
 

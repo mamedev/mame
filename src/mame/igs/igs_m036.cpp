@@ -252,7 +252,7 @@ private:
 	u8 m_active_key[0x100];
 
 	void restore_external_rom();
-	void encryption_control_w(offs_t offset, u32 data, u32 mem_mask = ~0U);
+	void decrypt(int state);
 
 	void screen_vblank(int state);
 };
@@ -550,20 +550,12 @@ void m036_base_state::restore_external_rom()
 	}
 }
 
-void m036_base_state::encryption_control_w(offs_t offset, u32 data, u32 mem_mask)
+void m036_base_state::decrypt(int state)
 {
-	// The internal ROM uploads 256 key bytes, then writes 4 here before reading
-	// the external program. Other control bits and key changes while enabled are unknown.
-	if (!BIT(mem_mask, 2))
-		return;
+	u8* key = m_maincpu->get_encryption_table();
+	for (int i = 0; i < 0x100; i++)
+		m_active_key[i] = key[i];
 
-	m_maincpu->set_has_decrypted(BIT(data, 2));
-	if (m_maincpu->get_has_decrypted())
-	{
-		u8* key = m_maincpu->get_encryption_table();
-		for (int i = 0; i < 0x100; i++)
-			m_active_key[i] = key[i];
-	}
 	restore_external_rom();
 }
 
@@ -1251,7 +1243,7 @@ void m036_base_state::base_config(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &m036_base_state::m036_boot_map);
 	m_maincpu->set_gpio_r().set(FUNC(m036_base_state::base_gpio_r));
 	m_maincpu->set_gpio_w().set(FUNC(m036_base_state::gpio_outputs_w));
-	m_maincpu->set_encryption_control_w().set(FUNC(m036_base_state::encryption_control_w));
+	m_maincpu->set_do_decrypt().set(FUNC(m036_base_state::decrypt));
 
 	SCREEN(config, m_screen);
 	// FIXME: pixel clock and blanking intervals are not known.
