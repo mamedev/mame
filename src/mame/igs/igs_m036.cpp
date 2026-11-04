@@ -200,21 +200,6 @@ public:
 	void init_jxry() ATTR_COLD;
 
 protected:
-	required_device<igs036_cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	required_region_ptr<u32> m_internal_rom;
-	required_memory_region m_external_rom;
-	required_region_ptr<u8> m_gfx;
-	required_shared_ptr<u32> m_spriteram;
-	required_shared_ptr<u32> m_paletteram;
-	required_ioport m_service;
-	required_ioport m_direct;
-	required_ioport_array<5> m_keys;
-	required_ioport_array<3> m_dsw;
-
-	u32 m_pio_out;
-	u16 m_key_select;
-
 	m036_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -229,13 +214,13 @@ protected:
 		m_keys(*this, "KEY%u", 0U),
 		m_dsw(*this, "DSW%u", 1U) { }
 
-	void base_config(machine_config &config) ATTR_COLD;
-	void m036_boot_map(address_map &map) ATTR_COLD;
-
 	// driver_device implementation
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;
+
+	void base_config(machine_config &config) ATTR_COLD;
+	void m036_boot_map(address_map &map) ATTR_COLD;
 
 	template <bool Wide> u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	u16 keys_r(u16 select);
@@ -243,12 +228,26 @@ protected:
 	u8 dips_r(offs_t offset);
 	u32 dips_packed_r();
 	void key_select_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
-	void gpio_outputs_w(offs_t offset, u32 data, u32 mem_mask = ~0U);
-	u32 base_gpio_r(offs_t offset, u32 mem_mask = ~0U);
+	void gpio_outputs_w(u32 data);
+	u32 base_gpio_r();
+
+	u32 m_pio_out;
+	u16 m_key_select;
+
+	required_device<igs036_cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_region_ptr<u32> m_internal_rom;
+	required_memory_region m_external_rom;
+	required_region_ptr<u8> m_gfx;
+	required_shared_ptr<u32> m_spriteram;
+	required_shared_ptr<u32> m_paletteram;
+	required_ioport m_service;
+	required_ioport m_direct;
+	required_ioport_array<5> m_keys;
+	required_ioport_array<3> m_dsw;
 
 private:
 	std::unique_ptr<u8 []> m_encrypted_copy;
-	memory_passthrough_handler m_idle_tap;
 	u8 m_active_key[0x100];
 
 	void restore_external_rom();
@@ -271,7 +270,7 @@ protected:
 
 	void hopper_config(machine_config &config) ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	void gpio_hopper_w(offs_t offset, u32 data, u32 mem_mask = ~0U);
+	void gpio_hopper_w(u32 data);
 };
 
 class m036_oki_state : public hopper_state
@@ -566,10 +565,10 @@ void hopper_state::machine_reset()
 	m_hopper->motor_w(0);
 }
 
-void hopper_state::gpio_hopper_w(offs_t offset, u32 data, u32 mem_mask)
+void hopper_state::gpio_hopper_w(u32 data)
 {
-	gpio_outputs_w(offset, data, mem_mask);
-	m_hopper->motor_w(!BIT(m_pio_out, 2));
+	gpio_outputs_w(data);
+	m_hopper->motor_w(!BIT(data, 2));
 }
 
 void m036_oki_state::machine_start()
@@ -631,12 +630,9 @@ void m036_base_state::key_select_w(offs_t offset, u16 data, u16 mem_mask)
 	COMBINE_DATA(&m_key_select);
 }
 
-void m036_base_state::gpio_outputs_w(offs_t offset, u32 data, u32 mem_mask)
+void m036_base_state::gpio_outputs_w(u32 data)
 {
-	if (offset == 0)
-		m_pio_out |= data & mem_mask;
-	else
-		m_pio_out &= ~(data & mem_mask);
+	m_pio_out = data;
 }
 
 template <u32 Rows>
@@ -724,37 +720,19 @@ void m036_state::m036_map(address_map &map)
 
 
 
-u32 m036_base_state::base_gpio_r(offs_t offset, u32 mem_mask)
+u32 m036_base_state::base_gpio_r()
 {
-	switch (offset)
-	{
-	case 0: return m_pio_out;
-	case 1: return m_service->read();
-	}
-
-	return 0x00000000;
+	 return m_service->read();
 }
 
 u32 m036_hd_state::hd_gpio_r(offs_t offset, u32 mem_mask)
 {
-	switch (offset)
-	{
-	case 0: return m_pio_out;
-	case 1: return gpio_inputs_r();
-	}
-
-	return 0x00000000;
+	return gpio_inputs_r();
 }
 
 u32 m036_hd_base_state::hyleyuan_gpio_r(offs_t offset, u32 mem_mask)
 {
-	switch (offset)
-	{
-	case 0: return m_pio_out;
-	case 1: return scan_inputs_r<4>();
-	}
-
-	return 0x00000000;
+	return scan_inputs_r<4>();
 }
 
 void m036_base_state::m036_boot_map(address_map &map)

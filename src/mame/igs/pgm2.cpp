@@ -466,19 +466,13 @@ void pgm2_state::module_rom_w(offs_t offset, u16 data)
 }
 
 // very primitive Atmel ARM PIO simulation, should be improved and devicified
-void pgm2_state::pio_sodr_w(offs_t offset, u32 data, u32 mem_mask)
+void pgm2_state::module_ctrl_w(u32 data)
 {
-	m_pio_out_data |= data & mem_mask;
-	module_data_w((m_pio_out_data & 0x100) ? ASSERT_LINE : CLEAR_LINE);
-	module_clk_w((m_pio_out_data & 0x200) ? ASSERT_LINE : CLEAR_LINE);
+	module_data_w((data & 0x100) ? ASSERT_LINE : CLEAR_LINE);
+	module_clk_w((data & 0x200) ? ASSERT_LINE : CLEAR_LINE);
 }
-void pgm2_state::pio_codr_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	m_pio_out_data &= ~(data & mem_mask);
-	module_data_w((m_pio_out_data & 0x100) ? ASSERT_LINE : CLEAR_LINE);
-	module_clk_w((m_pio_out_data & 0x200) ? ASSERT_LINE : CLEAR_LINE);
-}
-u32 pgm2_state::pio_pdsr_r()
+
+u32 pgm2_state::module_ctrl_r()
 {
 	return (module_data_r() == ASSERT_LINE ? 1 : 0) << 8; // fpga data read and status (bit 7, must be 0)
 }
@@ -537,26 +531,6 @@ void pgm2_state::pgm2_ram_rom_map(address_map &map)
 	pgm2_map(map);
 	map(0x10000000, 0x101fffff).ram().share("romboard_ram"); // we should also probably decrypt writes once the encryption is enabled, but the game never writes with it turned on anyway
 	map(0x10200000, 0x103fffff).rom().region("mainrom", 0); // external ROM
-}
-
-void pgm2_state::kov3_gpio_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	switch (offset)
-	{
-	case 0: pio_sodr_w(offset, data, mem_mask); break;
-	case 1: pio_codr_w(offset, data, mem_mask); break;
-	}
-}
-
-u32 pgm2_state::kov3_gpio_r(offs_t offset, u32 mem_mask)
-{
-	switch (offset)
-	{
-	case 0: return 0xffffffff;
-	case 1: return pio_pdsr_r();
-	}
-
-	return 0x00000000;
 }
 
 void pgm2_state::pgm2_module_rom_map(address_map &map)
@@ -760,8 +734,8 @@ void pgm2_state::pgm2_hires(machine_config &config)
 {
 	pgm2(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm2_state::pgm2_module_rom_map);
-	m_maincpu->set_gpio_r().set(FUNC(pgm2_state::kov3_gpio_r));
-	m_maincpu->set_gpio_w().set(FUNC(pgm2_state::kov3_gpio_w));
+	m_maincpu->set_gpio_r().set(FUNC(pgm2_state::module_ctrl_r));
+	m_maincpu->set_gpio_w().set(FUNC(pgm2_state::module_ctrl_w));
 
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
 }

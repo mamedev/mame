@@ -24,14 +24,28 @@ igs036_cpu_device::igs036_cpu_device(const machine_config &mconfig, const char *
 {
 }
 
-u32 igs036_cpu_device::gpio_r(offs_t offset, u32 mem_mask)
+u32 igs036_cpu_device::gpio_out_r()
 {
-	return m_read_gpio(offset, mem_mask);
+	return m_pio_out_data;
+}
+
+u32 igs036_cpu_device::gpio_r()
+{
+	return m_read_gpio();
 }
 
 void igs036_cpu_device::gpio_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_write_gpio(offset, data, mem_mask);
+	if (offset == 0)
+	{
+		m_pio_out_data |= data & mem_mask;
+	}
+	else
+	{
+		m_pio_out_data &= ~(data & mem_mask);
+	}
+
+	m_write_gpio(m_pio_out_data);
 }
 
 u32 igs036_cpu_device::encryption_control_r(offs_t offset, u32 mem_mask)
@@ -66,6 +80,7 @@ void igs036_cpu_device::onboard_peripherals(address_map &map)
 	map(0xffff'f000, 0xffff'f14b).m(m_arm_aic, FUNC(arm_aic_device::regs_map));
 	map(0xffff'f200, 0xffff'f247).nopw(); // TODO: debug UART
 	map(0xffff'f430, 0xffff'f437).w(FUNC(igs036_cpu_device::gpio_w));
+	map(0xffff'f430, 0xffff'f437).r(FUNC(igs036_cpu_device::gpio_out_r));
 	map(0xffff'f438, 0xffff'f43f).r(FUNC(igs036_cpu_device::gpio_r));
 	// Several internal ROMs verify that bit 2 reads back set after enabling
 	// decryption, and stop before the checksum if it is clear.
@@ -199,6 +214,8 @@ void igs036_cpu_device::device_start()
 	save_item(NAME(m_encryption_table));
 	save_item(NAME(m_tc_regs));
 	save_item(NAME(m_tc_enabled));
+	save_item(NAME(m_pio_out_data));
+
 	for (u32 i = 0; i < std::size(m_tc_timer); ++i)
 		m_tc_timer[i] = timer_alloc(FUNC(igs036_cpu_device::timer_expired), this);
 }
@@ -210,6 +227,7 @@ void igs036_cpu_device::device_reset()
 	std::fill(std::begin(m_encryption_table), std::end(m_encryption_table), 0);
 
 	m_has_decrypted = false;
+	m_pio_out_data = 0;
 
 	for (u32 i = 0; i < 3; ++i)
 	{

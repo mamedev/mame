@@ -89,9 +89,8 @@ private:
 	void vbl_ack_w(u16 data);
 	void unk30120014_w(offs_t offset, u16 data);
 
-	void pio_sodr_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void pio_codr_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	u32 pio_pdsr_r();
+	void module_ctrl_w(u32 data);
+	u32 module_ctrl_r();
 	void module_rom_w(offs_t offset, u16 data);
 	u16 module_rom_r(offs_t offset);
 	int module_data_r();

@@ -37,8 +37,9 @@ private:
 	void encryption_control_w(offs_t offset, u32 data, u32 mem_mask);
 	u8 encryption_r(offs_t offset);
 	void encryption_w(offs_t offset, u8 data);
-	u32 gpio_r(offs_t offset, u32 mem_mask = ~0U);
+	u32 gpio_r();
 	void gpio_w(offs_t offset, u32 data, u32 mem_mask = ~0U);
+	u32 gpio_out_r();
 
 	u32 timer_r(offs_t offset);
 	void timer_w(offs_t offset, u32 data, u32 mem_mask = ~0U);
@@ -51,6 +52,7 @@ private:
 	bool m_tc_enabled[3];
 	u8 m_encryption_table[0x100];
 	bool m_has_decrypted = false;
+	u32 m_pio_out_data;
 
 	devcb_read32 m_read_gpio;
 	devcb_write32 m_write_gpio;
