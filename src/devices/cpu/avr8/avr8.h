@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "avr8timers_classic.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -492,6 +493,12 @@ protected:
 		INTIDX_TOV5,
 	//---------------------------------
 
+		// new guys free of the old legacy crap
+		INTIDX_OCF1C,
+		INTIDX_OCF3C,
+		INTIDX_OCF4C,
+		INTIDX_OCF5C,
+
 		INTIDX_COUNT
 	};
 
@@ -706,6 +713,7 @@ protected:
 	{
 		uint8_t  m_intidx; 	     // one of the INTIDX_x universal interrupt mappings
 		uint8_t  m_intvector;    // interrupt vector number
+		uint8_t  m_intondev;     // interrupt is handled by a device (m_intreg, m_intmask, m_regindex, m_regmask all ignored)
 		uint8_t  m_intreg;       // register containing interrupt enable flag
 		uint8_t  m_intmask;      // bitmask for the interrupt enable flag itself
 		uint8_t  m_regindex;     // event indication register containing event flag e.g., TOV0
@@ -772,7 +780,7 @@ protected:
 	uint8_t m_lock_bits;
 
 	// CPU registers
-	required_shared_ptr<uint8_t> m_r;
+	std::unique_ptr<uint8_t []> m_r; // no longer shared because it's getting broken up
 	uint32_t m_pc;
 
 	// internal CPU state
@@ -785,6 +793,7 @@ protected:
 
 	// Interrupt handling tables
 	uint8_t m_int_statuses[INTIDX_COUNT];   // persistent, must be savestate-able
+	devcb_write_line::array<INTIDX_COUNT> m_int_ack_cbs; // rebuilt at device_start
 	std::unique_ptr<interrupt_condition[]> m_int_conditions_table; // rebuilt at device_start
 
 	// Interrupt handling size for the AVR8s is usually 2; some devices will only use 1
@@ -803,7 +812,26 @@ protected:
 	inline bool interrupt_condition_entry_is_terminator(interrupt_condition condition);
 	void populate_interrupt_condition_table();
 	void update_interrupt(uint8_t intidx);
+
+	// temporary; for registers in m_r that are not yet brought out to devices,
+	// or don't have dedicated _r() functions
+	template <int Reg> uint8_t reg_r() { return m_r[Reg]; }
+	template <int Reg> void reg_w(uint8_t data) { m_r[Reg] = data; }
+
+	// also temporary.
+	// m_r needs to be allocated 0x100 bytes exactly.
+	// not doing this corrupts the heap and causes weird crashes.
+	// so give the CPU a 32-byte window with the common registers
+	uint8_t regs_r(offs_t offset) { return m_r[offset]; }
+	void regs_w(offs_t offset, uint8_t data) { m_r[offset] = data; }
+
+
+	void set_interrupt_line(uint8_t intidx, uint8_t state);
 	
+	// for callback installation in devices; they can't call set_interrupt_line directly
+	template <uint8_t IntIdx>
+	void int_line_w(uint8_t state);
+
 	/**
 	 * Set interrupt flag for the given intidx. If the interrupt is also enabled,
 	 * set it to fire.
@@ -934,7 +962,9 @@ protected:
 
 // ======================> avr8_device
 
-template <int NumTimers>
+/**
+ * TODO: rename this class to something like avr8_classic_base_device
+ */
 class avr8_device : public avr8_base_device
 {
 public:
@@ -982,6 +1012,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual void execute_run() override;
@@ -990,6 +1021,9 @@ protected:
 	void base_internal_map(address_map &map) ATTR_COLD;
 
 	// Miscellaneous registers
+
+	// TODO: which regs are common on the classic AVR8s?
+	// ones that are megaAVR-specific need to be moved out
 	void wdtcsr_w(uint8_t data);
 	void clkpr_w(uint8_t data);
 	void prr0_w(uint8_t data);
@@ -1038,6 +1072,12 @@ protected:
 	// diffs a freshly-sampled port level against the last-known one, raising PCINT/INT0/INT1 as needed
 	template <int Port> void latch_pin_change(uint8_t state);
 
+	template <int Port, int Bit>
+	void toggle_gpio_bit(uint8_t _); // value written doesn't matter
+
+	template <int Port, int Bit>
+	void set_gpio_bit(uint8_t data);
+	
 	// ADC
 	uint8_t adcl_r();
 	void adcl_w(uint8_t data);
@@ -1058,7 +1098,7 @@ protected:
 	bool m_adc_first;
 	bool m_adc_hold;
 
-	// SPI
+	// SPI (only on megaAVRs, the tinyAVRs don't have it)
 	void spsr_w(uint8_t data);
 	void spcr_w(uint8_t data);
 	void spdr_w(uint8_t data);
@@ -1080,217 +1120,44 @@ protected:
 	uint8_t m_spi_rx_shift;
 
 	// timers
+	optional_device_array<avr8_base_timer_device, 6> m_timers; // optional, because some timers will almost certainly not be present
+	required_device<avr8_10bit_prescaler_device> m_syncprescale;
+	optional_device<avr8_fakertc_async_controller_device> m_asyncunit;
+};
+
+// ======================> megaavr_classic_base_device
+
+/**
+ * This is the common foundation for the classic megaAVRs,
+ * except for the ATMega8/16/32 series, which use different data address maps
+ * and registers closer to the classic tinyAVRs.
+ */
+class megaavr_classic_base_device : public avr8_device
+{
+
+protected:
+	megaavr_classic_base_device(const machine_config &mconfig,
+								const char *tag,
+								device_t *owner,
+								uint32_t clock,
+								const device_type type,
+								uint32_t address_mask,
+								address_map_constructor internal_map);
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	// GTCCR on most of the classic megaAVRs is pretty much the same
 	void gtccr_w(uint8_t data);
+	uint8_t gtccr_r();
 
-	template <int Timer> void update_timer_clock_source(uint8_t selection, const uint8_t old_clock_select);
-	void update_timer_waveform_gen_mode(uint8_t timer, uint8_t mode);
+	void megaavr_classic_base_internal_map(address_map &map);
 
-	int32_t m_timer_top[6];
-	uint16_t m_timer_prescale[6];
-	uint16_t m_timer_prescale_count[6];
-
-	// timer 0
-	void tccr0a_w(uint8_t data);
-	void tccr0b_w(uint8_t data);
-	void ocr0a_w(uint8_t data);
-	void ocr0b_w(uint8_t data);
-	void tifr0_w(uint8_t data);
-	void timsk0_w(uint8_t data);
-
-	void timer0_tick_norm();
-	void timer0_tick_pwm_pc();
-	void timer0_tick_ctc_norm();
-	void timer0_tick_ctc_toggle();
-	void timer0_tick_ctc_clear();
-	void timer0_tick_ctc_set();
-	void timer0_tick_fast_pwm();
-	void timer0_tick_pwm_pc_cmp();
-	void timer0_tick_fast_pwm_cmp();
-	void timer0_tick_default();
-
-	void update_ocr0(uint8_t newval, uint8_t reg);
-	void timer0_force_output_compare(int reg);
-
-	timer_func m_timer0_ticks[8*4];
-	timer_func m_timer0_tick;
-
-	// timer 1
-	enum wgm1_mode_t
-	{
-		WGM1_NORMAL = 0,
-		WGM1_PWM_8_PC,
-		WGM1_PWM_9_PC,
-		WGM1_PWM_10_PC,
-		WGM1_CTC_OCR,
-		WGM1_FAST_PWM_8,
-		WGM1_FAST_PWM_9,
-		WGM1_FAST_PWM_10,
-		WGM1_PWM_PFC_ICR,
-		WGM1_PWM_PFC_OCR,
-		WGM1_PWM_PC_ICR,
-		WGM1_PWM_PC_OCR,
-		WGM1_CTC_ICR,
-		WGM1_RESERVED,
-		WGM1_FAST_PWM_ICR,
-		WGM1_FAST_PWM_OCR
-	};
-
-	enum ocr_mode_t
-	{
-		OCR_NORM = 0,
-		OCR_TOGGLE,
-		OCR_CLEAR,
-		OCR_SET
-	};
-
-	void tccr1a_w(uint8_t data);
-	void tccr1b_w(uint8_t data);
-	void tccr1c_w(uint8_t data);
-	//void tcnt1l_w(uint8_t data);
-	//void tcnt1h_w(uint8_t data);
-	void icr1l_w(uint8_t data);
-	void icr1h_w(uint8_t data);
-	void ocr1al_w(uint8_t data);
-	void ocr1ah_w(uint8_t data);
-	void ocr1bl_w(uint8_t data);
-	void ocr1bh_w(uint8_t data);
-	void ocr1cl_w(uint8_t data);
-	void ocr1ch_w(uint8_t data);
-	void tifr1_w(uint8_t data);
-	void timsk1_w(uint8_t data);
-
-	template <int TimerMode, int ChannelModeA, int ChannelModeB> void timer1_tick();
-	void timer1_tick_normal() { timer1_tick<WGM1_NORMAL, OCR_NORM, OCR_NORM>(); };
-	void timer1_tick_pwm8_pc() { timer1_tick<WGM1_PWM_8_PC, OCR_NORM, OCR_NORM>(); };
-	void timer1_tick_pwm9_pc() { timer1_tick<WGM1_PWM_9_PC, OCR_NORM, OCR_NORM>(); };
-	void timer1_tick_pwm10_pc() { timer1_tick<WGM1_PWM_10_PC, OCR_NORM, OCR_NORM>(); };
-	void timer1_tick_ctc_ocr_norm_norm() { timer1_tick<WGM1_CTC_OCR, OCR_NORM, OCR_NORM>(); };
-	void timer1_tick_ctc_ocr_norm_toggle() { timer1_tick<WGM1_CTC_OCR, OCR_NORM, OCR_TOGGLE>(); };
-	void timer1_tick_ctc_ocr_norm_clear() { timer1_tick<WGM1_CTC_OCR, OCR_NORM, OCR_CLEAR>(); };
-	void timer1_tick_ctc_ocr_norm_set() { timer1_tick<WGM1_CTC_OCR, OCR_NORM, OCR_SET>(); };
-	void timer1_tick_ctc_ocr_toggle_norm() { timer1_tick<WGM1_CTC_OCR, OCR_TOGGLE, OCR_NORM>(); };
-	void timer1_tick_ctc_ocr_toggle_toggle() { timer1_tick<WGM1_CTC_OCR, OCR_TOGGLE, OCR_TOGGLE>(); };
-	void timer1_tick_ctc_ocr_toggle_clear() { timer1_tick<WGM1_CTC_OCR, OCR_TOGGLE, OCR_CLEAR>(); };
-	void timer1_tick_ctc_ocr_toggle_set() { timer1_tick<WGM1_CTC_OCR, OCR_TOGGLE, OCR_SET>(); };
-	void timer1_tick_ctc_ocr_clear_norm() { timer1_tick<WGM1_CTC_OCR, OCR_CLEAR, OCR_NORM>(); };
-	void timer1_tick_ctc_ocr_clear_toggle() { timer1_tick<WGM1_CTC_OCR, OCR_CLEAR, OCR_TOGGLE>(); };
-	void timer1_tick_ctc_ocr_clear_clear() { timer1_tick<WGM1_CTC_OCR, OCR_CLEAR, OCR_CLEAR>(); };
-	void timer1_tick_ctc_ocr_clear_set() { timer1_tick<WGM1_CTC_OCR, OCR_CLEAR, OCR_SET>(); };
-	void timer1_tick_ctc_ocr_set_norm() { timer1_tick<WGM1_CTC_OCR, OCR_SET, OCR_NORM>(); };
-	void timer1_tick_ctc_ocr_set_toggle() { timer1_tick<WGM1_CTC_OCR, OCR_SET, OCR_TOGGLE>(); };
-	void timer1_tick_ctc_ocr_set_clear() { timer1_tick<WGM1_CTC_OCR, OCR_SET, OCR_CLEAR>(); };
-	void timer1_tick_ctc_ocr_set_set() { timer1_tick<WGM1_CTC_OCR, OCR_SET, OCR_SET>(); };
-	void timer1_tick_fast_pwm8() { timer1_tick<WGM1_FAST_PWM_8, OCR_NORM, OCR_NORM>(); };
-	void timer1_tick_fast_pwm9() { timer1_tick<WGM1_FAST_PWM_9, OCR_NORM, OCR_NORM>(); };
-	void timer1_tick_fast_pwm10() { timer1_tick<WGM1_FAST_PWM_10, OCR_NORM, OCR_NORM>(); };
-	void timer1_tick_pwm_pfc_icr() { timer1_tick<WGM1_PWM_PFC_ICR, OCR_NORM, OCR_NORM>(); };
-	void timer1_tick_pwm_pfc_ocr() { timer1_tick<WGM1_PWM_PFC_OCR, OCR_NORM, OCR_NORM>(); };
-	void timer1_tick_pwm_pc_icr() { timer1_tick<WGM1_PWM_PC_ICR, OCR_NORM, OCR_NORM>(); };
-	void timer1_tick_pwm_pc_ocr() { timer1_tick<WGM1_PWM_PC_OCR, OCR_NORM, OCR_NORM>(); };
-	void timer1_tick_ctc_icr() { timer1_tick<WGM1_CTC_ICR, OCR_NORM, OCR_NORM>(); };
-	void timer1_tick_resv() { timer1_tick<WGM1_RESERVED, OCR_NORM, OCR_NORM>(); };
-	void timer1_tick_fast_pwm_icr_norm_norm() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_NORM, OCR_NORM>(); };
-	void timer1_tick_fast_pwm_icr_norm_toggle() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_NORM, OCR_TOGGLE>(); };
-	void timer1_tick_fast_pwm_icr_norm_clear() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_NORM, OCR_CLEAR>(); };
-	void timer1_tick_fast_pwm_icr_norm_set() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_NORM, OCR_SET>(); };
-	void timer1_tick_fast_pwm_icr_toggle_norm() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_TOGGLE, OCR_NORM>(); };
-	void timer1_tick_fast_pwm_icr_toggle_toggle() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_TOGGLE, OCR_TOGGLE>(); };
-	void timer1_tick_fast_pwm_icr_toggle_clear() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_TOGGLE, OCR_CLEAR>(); };
-	void timer1_tick_fast_pwm_icr_toggle_set() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_TOGGLE, OCR_SET>(); };
-	void timer1_tick_fast_pwm_icr_clear_norm() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_CLEAR, OCR_NORM>(); };
-	void timer1_tick_fast_pwm_icr_clear_toggle() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_CLEAR, OCR_TOGGLE>(); };
-	void timer1_tick_fast_pwm_icr_clear_clear() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_CLEAR, OCR_CLEAR>(); };
-	void timer1_tick_fast_pwm_icr_clear_set() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_CLEAR, OCR_SET>(); };
-	void timer1_tick_fast_pwm_icr_set_norm() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_SET, OCR_NORM>(); };
-	void timer1_tick_fast_pwm_icr_set_toggle() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_SET, OCR_TOGGLE>(); };
-	void timer1_tick_fast_pwm_icr_set_clear() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_SET, OCR_CLEAR>(); };
-	void timer1_tick_fast_pwm_icr_set_set() { timer1_tick<WGM1_FAST_PWM_ICR, OCR_SET, OCR_SET>(); };
-	void timer1_tick_fast_pwm_ocr_norm_norm() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_NORM, OCR_NORM>(); };
-	void timer1_tick_fast_pwm_ocr_norm_toggle() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_NORM, OCR_TOGGLE>(); };
-	void timer1_tick_fast_pwm_ocr_norm_clear() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_NORM, OCR_CLEAR>(); };
-	void timer1_tick_fast_pwm_ocr_norm_set() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_NORM, OCR_SET>(); };
-	void timer1_tick_fast_pwm_ocr_toggle_norm() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_TOGGLE, OCR_NORM>(); };
-	void timer1_tick_fast_pwm_ocr_toggle_toggle() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_TOGGLE, OCR_TOGGLE>(); };
-	void timer1_tick_fast_pwm_ocr_toggle_clear() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_TOGGLE, OCR_CLEAR>(); };
-	void timer1_tick_fast_pwm_ocr_toggle_set() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_TOGGLE, OCR_SET>(); };
-	void timer1_tick_fast_pwm_ocr_clear_norm() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_CLEAR, OCR_NORM>(); };
-	void timer1_tick_fast_pwm_ocr_clear_toggle() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_CLEAR, OCR_TOGGLE>(); };
-	void timer1_tick_fast_pwm_ocr_clear_clear() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_CLEAR, OCR_CLEAR>(); };
-	void timer1_tick_fast_pwm_ocr_clear_set() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_CLEAR, OCR_SET>(); };
-	void timer1_tick_fast_pwm_ocr_set_norm() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_SET, OCR_NORM>(); };
-	void timer1_tick_fast_pwm_ocr_set_toggle() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_SET, OCR_TOGGLE>(); };
-	void timer1_tick_fast_pwm_ocr_set_clear() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_SET, OCR_CLEAR>(); };
-	void timer1_tick_fast_pwm_ocr_set_set() { timer1_tick<WGM1_FAST_PWM_OCR, OCR_SET, OCR_SET>(); };
-	void update_timer1_input_noise_canceler();
-	void update_timer1_input_edge_select();
-	void update_ocr1(uint16_t newval, uint8_t reg);
-
-	timer_func m_timer1_ticks[16*16];
-	timer_func m_timer1_tick;
-	uint16_t m_ocr1[3];
-
-	// timer 2
-	void tccr2a_w(uint8_t data);
-	void tccr2b_w(uint8_t data);
-	void tcnt2_w(uint8_t data);
-	void ocr2a_w(uint8_t data);
-	void ocr2b_w(uint8_t data);
-	void tifr2_w(uint8_t data);
-	void timsk2_w(uint8_t data);
-
-	void timer2_tick_default();
-	void timer2_tick_norm();
-	void timer2_tick_fast_pwm();
-	void timer2_tick_fast_pwm_cmp();
-	void update_ocr2(uint8_t newval, uint8_t reg);
-	void timer2_force_output_compare(int reg);
-
-	timer_func m_timer2_ticks[8];
-	timer_func m_timer2_tick;
-	bool m_ocr2_not_reached_yet;
-
-	// timer 3
-	void tccr3a_w(uint8_t data);
-	void tccr3b_w(uint8_t data);
-	void tccr3c_w(uint8_t data);
-	//void tcnt3l_w(uint8_t data);
-	//void tcnt3h_w(uint8_t data);
-	void icr3l_w(uint8_t data);
-	void icr3h_w(uint8_t data);
-	void ocr3al_w(uint8_t data);
-	void ocr3ah_w(uint8_t data);
-	void ocr3bl_w(uint8_t data);
-	void ocr3bh_w(uint8_t data);
-	void ocr3cl_w(uint8_t data);
-	void ocr3ch_w(uint8_t data);
-	void timsk3_w(uint8_t data);
-
-	void timer3_tick();
-
-	// timer 4
-	void tccr4a_w(uint8_t data);
-	void tccr4b_w(uint8_t data);
-	void tccr4c_w(uint8_t data);
-	void tcnt4l_w(uint8_t data);
-	void tcnt4h_w(uint8_t data);
-	void icr4l_w(uint8_t data);
-	void icr4h_w(uint8_t data);
-	void ocr4al_w(uint8_t data);
-	void ocr4ah_w(uint8_t data);
-	void ocr4bl_w(uint8_t data);
-	void ocr4bh_w(uint8_t data);
-	void ocr4cl_w(uint8_t data);
-	void ocr4ch_w(uint8_t data);
-	void timsk4_w(uint8_t data);
-
-	void timer4_tick();
-
-	// timer 5
-	void tccr5a_w(uint8_t data);
-	void tccr5b_w(uint8_t data);
-	void timsk5_w(uint8_t data);
-
-	void timer5_tick();
+	// GTCCR flags, MUST BE SAVESTATE-ABLE
+	bool m_tsm;
+	bool m_psrasy;
+	bool m_psrsync;
 };
 
 // device type definition
@@ -1303,9 +1170,35 @@ DECLARE_DEVICE_TYPE(ATMEGA1284, atmega1284_device)
 DECLARE_DEVICE_TYPE(ATMEGA1280, atmega1280_device)
 DECLARE_DEVICE_TYPE(ATMEGA2560, atmega2560_device)
 
+
+///////////////////////////////////////////////////////////////
+// Classic ATMegax8 series devices
+///////////////////////////////////////////////////////////////
+
+class atmegax8_base_device : public megaavr_classic_base_device
+{
+protected:
+	// construction/destruction
+	atmegax8_base_device(const machine_config &mconfig,
+						 const char *tag,
+						 device_t *owner,
+						 uint32_t clock,
+						 const device_type type,
+						 uint32_t address_mask,
+						 address_map_constructor internal_map);
+
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	
+	void atmegax8_base_internal_map(address_map &map);
+
+};
+
 // ======================> atmega88_device
 
-class atmega88_device : public avr8_device<3>
+class atmega88_device : public atmegax8_base_device
 {
 public:
 	// construction/destruction
@@ -1313,13 +1206,15 @@ public:
 	void atmega88_internal_map(address_map &map) ATTR_COLD;
 
 protected:
+	// TODO: pcint_group unification in atmegax8_base_device
 	virtual bool pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const override;
+
 	virtual uint8_t vector_size_in_words() const override { return 1; }
 };
 
 // ======================> atmega168_device
 
-class atmega168_device : public avr8_device<3>
+class atmega168_device : public atmegax8_base_device
 {
 public:
 	// construction/destruction
@@ -1328,12 +1223,13 @@ public:
 	void atmega168_internal_map(address_map &map) ATTR_COLD;
 
 protected:
+	// TODO: pcint_group unification in atmegax8_base_device
 	virtual bool pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const override;
 };
 
 // ======================> atmega328_device
 
-class atmega328_device : public avr8_device<3>
+class atmega328_device : public atmegax8_base_device
 {
 public:
 	// construction/destruction
@@ -1342,13 +1238,38 @@ public:
 	void atmega328_internal_map(address_map &map) ATTR_COLD;
 
 protected:
+	// TODO: pcint_group unification in atmegax8_base_device
 	virtual bool pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const override;
+
 	virtual uint8_t eearh_mask() const override { return 0x03; } // 1024-byte EEPROM
 };
 
-// ======================> atmega32u4_device
 
-class atmega32u4_device : public avr8_device<4>
+///////////////////////////////////////////////////////////////
+// Classic ATMegaxU4 series devices
+///////////////////////////////////////////////////////////////
+
+class atmegaxu4_base_device : public megaavr_classic_base_device
+{
+protected:
+	// construction/destruction
+	atmegaxu4_base_device(const machine_config &mconfig,
+						  const char *tag,
+						  device_t *owner,
+						  uint32_t clock,
+						  const device_type type,
+						  uint32_t address_mask,
+						  address_map_constructor internal_map);
+
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void atmegaxu4_base_internal_map(address_map &map) ATTR_COLD;
+};
+
+class atmega32u4_device : public atmegaxu4_base_device
 {
 public:
 	// construction/destruction
@@ -1368,9 +1289,34 @@ protected:
 	virtual uint8_t eearh_mask() const override { return 0x03; } // 1024-byte EEPROM
 };
 
+
+///////////////////////////////////////////////////////////////
+// Classic ATMegax4 series devices
+///////////////////////////////////////////////////////////////
+
+class atmegax4_base_device : public megaavr_classic_base_device
+{
+protected:
+	// construction/destruction
+	atmegax4_base_device(const machine_config &mconfig,
+						  const char *tag,
+						  device_t *owner,
+						  uint32_t clock,
+						  const device_type type,
+						  uint32_t address_mask,
+						  address_map_constructor internal_map);
+
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void atmegax4_base_internal_map(address_map &map) ATTR_COLD;
+};
+
 // ======================> atmega644_device
 
-class atmega644_device : public avr8_device<3>
+class atmega644_device : public atmegax4_base_device
 {
 public:
 	// construction/destruction
@@ -1392,7 +1338,7 @@ protected:
 
 // ======================> atmega1284_device
 
-class atmega1284_device : public avr8_device<3>
+class atmega1284_device : public atmegax4_base_device
 {
 public:
 	// construction/destruction
@@ -1412,9 +1358,36 @@ protected:
 	virtual uint8_t eearh_mask() const override { return 0x0f; } // 4096-byte EEPROM
 };
 
+
+///////////////////////////////////////////////////////////////
+// Classic ATMegax0 series devices
+// Not to be confused with the modern megaAVR 0-series
+///////////////////////////////////////////////////////////////
+
+class atmegax0_base_device : public megaavr_classic_base_device
+{
+protected:
+	// construction/destruction
+	atmegax0_base_device(const machine_config &mconfig,
+						  const char *tag,
+						  device_t *owner,
+						  uint32_t clock,
+						  const device_type type,
+						  uint32_t address_mask,
+						  address_map_constructor internal_map);
+
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void atmegax0_base_internal_map(address_map &map) ATTR_COLD;
+};
+
+
 // ======================> atmega1280_device
 
-class atmega1280_device : public avr8_device<6>
+class atmega1280_device : public atmegax0_base_device
 {
 public:
 	// construction/destruction
@@ -1435,7 +1408,7 @@ protected:
 
 // ======================> atmega2560_device
 
-class atmega2560_device : public avr8_device<6>
+class atmega2560_device : public atmegax0_base_device
 {
 public:
 	// construction/destruction
@@ -1500,5 +1473,7 @@ enum : uint8_t
 	AVR8_SPH,
 	AVR8_SPL
 };
+
+
 
 #endif /* MAME_CPU_AVR8_AVR8_H */
