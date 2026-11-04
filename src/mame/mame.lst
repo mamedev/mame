@@ -15930,6 +15930,7 @@ apexc
 
 @source:bordun/att.cpp
 lianhp2
+lianhp2a
 lianhp3
 
 @source:bordun/skylncr.cpp
@@ -40847,6 +40848,7 @@ sandaha
 
 @source:sealy/sealy_z80.cpp
 bbddz
+bbddza
 ddz1
 ddz2
 ddz2a
