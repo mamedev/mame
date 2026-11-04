@@ -1804,6 +1804,16 @@ ROM_START( m10 )
 	ROM_LOAD( "m10rom.m12", 0x0000, 0x8000, CRC(f0e8447a) SHA1(d58867276213116a79f7074109b7d7ce02e8a3af) )
 ROM_END
 
+ROM_START( m10us )
+	ROM_REGION( 0x8000, I8085_TAG, 0 )
+	ROM_LOAD( "m10na.m12", 0x0000, 0x8000, CRC(80d1c1b7) SHA1(7177baacff5a3192fb15ae10838e1b87a90115a8) )
+ROM_END
+
+ROM_START( modell100 )
+	ROM_REGION( 0x8000, I8085_TAG, 0 )
+	ROM_LOAD( "modell100.m12", 0x0000, 0x8000, CRC(028ac87d) SHA1(5d6330c933d72ab1f969faba03bf2aaa7dd0d485) )
+ROM_END
+
 ROM_START( tandy102 )
 	ROM_REGION( 0x8000, I8085_TAG, 0 )
 	ROM_LOAD( "m102rom.m12", 0x0000, 0x8000, CRC(08e9f89c) SHA1(b6ede7735a361c80419f4c9c0e36e7d480c36d11) )
@@ -1823,14 +1833,15 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS           INIT        COMPANY              FULLNAME */
-COMP( 1983, kc85,     0,       0,      kc85,     kc85,    kc85_state,     empty_init, "Kyosei",            "Kyotronic 85 (Japan)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, m10,      kc85,    0,      kc85,     olivm10, kc85_state,     empty_init, "Olivetti",          "M-10",                 MACHINE_SUPPORTS_SAVE )
-//COMP( 1983, m10m,     kc85,    0,      kc85,     olivm10, kc85_state,     empty_init, "Olivetti",          "M-10 Modem (US)",      MACHINE_SUPPORTS_SAVE )
-COMP( 1983, trsm100,  0,       0,      trsm100,  kc85,    trsm100_state,  empty_init, "Tandy Radio Shack", "TRS-80 Model 100",     MACHINE_SUPPORTS_SAVE )
-COMP( 1986, tandy102, trsm100, 0,      tandy102, kc85,    trsm100_state,  empty_init, "Tandy Radio Shack", "Tandy 102 (US)",       MACHINE_SUPPORTS_SAVE )
-COMP( 1986, tandy102uk, trsm100, 0,    tandy102, kc85,    trsm100_state,  empty_init, "Tandy Radio Shack", "Tandy 102 (UK)",       MACHINE_SUPPORTS_SAVE )
-COMP( 1983, pc8201,   0,       0,      pc8201,   pc8201,  pc8201_state,   empty_init, "NEC",               "PC-8201 (Japan)",      MACHINE_SUPPORTS_SAVE )
-COMP( 1983, pc8201a,  pc8201,  0,      pc8201,   pc8201a, pc8201_state,   empty_init, "NEC",               "PC-8201A",             MACHINE_SUPPORTS_SAVE )
-COMP( 1987, npc8300,  pc8201,  0,      pc8300,   pc8201a, pc8201_state,   empty_init, "NEC",               "PC-8300",              MACHINE_SUPPORTS_SAVE )
-COMP( 1984, tandy200, 0,       0,      tandy200, tandy200, tandy200_state, empty_init, "Tandy Radio Shack", "Tandy 200",           MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY              FULLNAME */
+COMP( 1983, kc85,     0,       0,      kc85,     kc85,     kc85_state,     empty_init, "Kyosei",            "Kyotronic 85 (Japan)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, m10,      kc85,    0,      kc85,     olivm10,  kc85_state,     empty_init, "Olivetti",          "M-10 (Europe)",        MACHINE_SUPPORTS_SAVE )
+COMP( 1983, m10us,    kc85,    0,      kc85,     olivm10,  kc85_state,     empty_init, "Olivetti",          "M-10 (US)",            MACHINE_SUPPORTS_SAVE )
+COMP( 1983, trsm100,  0,       0,      trsm100,  kc85,     trsm100_state,  empty_init, "Tandy Radio Shack", "TRS-80 Model 100",     MACHINE_SUPPORTS_SAVE )
+COMP( 198?, modell100, trsm100, 0,     trsm100,  kc85,     trsm100_state,  empty_init, "Televerket",        "Modell 100 (Norway)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1986, tandy102, trsm100, 0,      tandy102, kc85,     trsm100_state,  empty_init, "Tandy Radio Shack", "Tandy 102 (US)",       MACHINE_SUPPORTS_SAVE )
+COMP( 1986, tandy102uk, trsm100, 0,    tandy102, kc85,     trsm100_state,  empty_init, "Tandy Radio Shack", "Tandy 102 (UK)",       MACHINE_SUPPORTS_SAVE )
+COMP( 1983, pc8201,   0,       0,      pc8201,   pc8201,   pc8201_state,   empty_init, "NEC",               "PC-8201 (Japan)",      MACHINE_SUPPORTS_SAVE )
+COMP( 1983, pc8201a,  pc8201,  0,      pc8201,   pc8201a,  pc8201_state,   empty_init, "NEC",               "PC-8201A",             MACHINE_SUPPORTS_SAVE )
+COMP( 1987, npc8300,  pc8201,  0,      pc8300,   pc8201a,  pc8201_state,   empty_init, "NEC",               "PC-8300",              MACHINE_SUPPORTS_SAVE )
+COMP( 1984, tandy200, 0,       0,      tandy200, tandy200, tandy200_state, empty_init, "Tandy Radio Shack", "Tandy 200",            MACHINE_SUPPORTS_SAVE )
