@@ -26,7 +26,6 @@
     0x1800 - 0x1fff | SAA 5050 video RAM
 
   TODO:
-  - implement sprite-playfield collisions;
   - sprite-playfield colors are dubious at best;
   - Tiles may be flipped for playfield in final stage;
   - Ranking table doesn't sort properly when player gets a better score than
@@ -84,6 +83,10 @@
 
 #include <algorithm>
 
+#define LOG_COLL (1U << 1)   // sprite<->playfield collision decision trace (see screen_vblank)
+#define VERBOSE (0)
+#include "logmacro.h"
+
 namespace {
 
 class malzak_state : public driver_device
@@ -121,6 +124,7 @@ private:
 
 	void palette_init(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_vblank(int state);
 	virtual void video_start() override ATTR_COLD;
 
 	void malzak2_map(address_map &map) ATTR_COLD;
@@ -146,7 +150,7 @@ private:
 	int m_playfield_code[256]{};
 	int m_scrollx = 0;
 	int m_scrolly = 0;
-	int m_collision_counter = 0;
+	u8  m_collision = 0;
 	u8  m_playfield_bank = 0;
 };
 
@@ -260,6 +264,146 @@ uint32_t malzak_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	return 0;
 }
 
+void malzak_state::screen_vblank(int state)
+{
+	// Reconstruct the sprite<->playfield collision once per emulated frame, on the rising edge
+	// of VBLANK.  This is machine logic (it drives the collision register the CPU reads), so it
+	// runs in emulation time rather than in screen_update(): computing it in the view would make
+	// it depend on frameskip/host drawing and break -record/-playback.  The S2636 sprite<->sprite
+	// collision is likewise refreshed here (m_s2636[n]->update()), so the screen no longer needs
+	// the VIDEO_ALWAYS_UPDATE attribute.
+	if (!state)
+		return;
+
+	const rectangle &va = m_screen->visible_area();
+	m_playfield_tilemap->draw(*m_screen, m_playfield_bitmap, va, 0, 0);
+	bitmap_ind16 const &s2636_0_bitmap = m_s2636[0]->update(va);
+	bitmap_ind16 const &s2636_1_bitmap = m_s2636[1]->update(va);
+	address_space &prog = m_maincpu->space(AS_PROGRAM);
+
+	// Sprite <-> playfield collision.  The single collision register is a shared POSITION latch
+	// (board glue, not an S2636 feature); the game classifies each hit itself.  0x0A50 looks up the
+	// per-column terrain table [0x1060 + col] and, for a structure column whose surface row equals
+	// the reported row (gates 1/2), consumes the structure (writes 0x18), applies its effect at
+	// 0x08A0 (fuel depot: [0x10D1] += 0x20; buildings: bonus), spawns the explosion entry and then
+	// FALLS THROUGH (0x0AC5) to 0x412F, which transforms the reported (row,col) by the ship scroll
+	// and matches it against each sprite -- missile/enemies/bomb while their timers are armed, and
+	// the ship always (0x41EC -> crash 0x2400).  So a ship touching a depot destroys it, banks its
+	// fuel and dies in the same frame (Scramble semantics); there is no safe "skim refuel".
+	//
+	// The classifier is TIME-GATED: each non-ship object carries a countdown timer in RAM (missile
+	// 0x10C3, enemies 0x10C4/0x10BF, bomb 0x10BE) that is armed to 0x0A when the object is activated
+	// and decremented every frame (routine ~0x20B2); 0x412F tests an object's position only while its
+	// timer is non-zero, i.e. for ~10 frames.  The SHIP has no timer -- its check (0x41EC) is always
+	// live, which is why it is the gate a mis-reported object falls onto.  (This is also why the game
+	// lets a shot pass through distant terrain: the missile's window has closed.)
+	//
+	// We report the CONTACT PIXEL (the first drawn object pixel that overlaps a playfield pixel):
+	// its cell is the structure's surface row when something lands on a structure (so gates 1/2
+	// register the hit), and it lies inside the object's footprint, so 0x412F reliably identifies
+	// the colliding object.  Ship first, then the forward missile, then the bomb.  The danger with
+	// the shared latch is the ship crash gate at 0x41EC: it has NO arming flag and a ~26px tolerance,
+	// so any reported non-ship object whose transformed position lands near the ship kills the player
+	// (a shot or a bomb hitting ground right next to a low ship).  For those we run `would_crash_ship`
+	// (the game's own 0x412F transform tested against the ship gate) and suppress the report; the
+	// object is simply reported a frame or two later, once the scroll has carried it clear.
+	{
+		u8 const scrolly = prog.read_byte(0x1022);
+		// True where a drawn pixel of an object coincides with a playfield pixel.  In the S2636
+		// bitmap (same coordinate space as m_playfield_bitmap) object i is drawn at top-left
+		// (py = VC + m_y_offset, px = (HC + m_x_offset) * m_divider); malzak sets m_y_offset = 0,
+		// m_x_offset = -16, m_divider = 1, so top-left = (yreg, xreg - 16), footprint
+		// (8 << scale) x (10 << scale).  We scan that footprint only, so pixels from other objects
+		// are out of range and cannot false-trigger this object's collision.
+		// On a hit, report the bitmap coords of the contact pixel (out_px/out_py) so the caller can
+		// encode the cell of the actual contact point.
+		auto overlaps = [this](bitmap_ind16 const &spr, s2636_device &dev, int obj, u8 xreg, u8 yreg, int &out_px, int &out_py) -> bool
+		{
+			if (yreg >= 0xf0)                      // parked / inactive object (y == 0xf8)
+				return false;
+			int const scale = (dev.read_data(0xc0) >> (2 * obj)) & 0x03;   // REG_OBJ_SIZE
+			int const w = 8 << scale, h = 10 << scale;
+			int const by = yreg;                   // sprite top bitmap row (VC + m_y_offset, both 0-based)
+			int const bx = int(xreg) - 16;         // sprite left bitmap column (HC + m_x_offset, divider 1)
+			for (int dy = 0; dy < h; dy++)
+				for (int dx = 0; dx < w; dx++)
+				{
+					int const py = by + dy, px = bx + dx;
+					// A drawn, visible sprite pixel (bit 0x08 set, colour != 0) coinciding with a
+					// non-black playfield pixel is a real contact.  malzak's S2636 pixels do not
+					// carry the object-tag bits, so match on the drawn+colour flags within the
+					// object's own footprint rather than a tag.
+					if (py >= 0 && px >= 0 && py < m_playfield_bitmap.height() && px < m_playfield_bitmap.width()
+						&& S2636_IS_PIXEL_DRAWN(spr.pix(py, px)) && S2636_PIXEL_COLOR(spr.pix(py, px)) != 0
+						&& m_playfield_bitmap.pix(py, px) != rgb_t::black())
+					{
+						out_px = px; out_py = py;
+						return true;
+					}
+				}
+			return false;
+		};
+		// Encode a contact position into the shared latch value: the 16x16 cell containing the point
+		// in the game's scroll-adjusted frame.  The column formula matches the game's [0x1060] slot
+		// mapping; the row formula puts a tile-aligned structure's top edge in its own surface row,
+		// which is what the game's height gate (0x0A6A) tests against.
+		auto encode = [this, scrolly](u8 x, u8 y) -> u8
+		{
+			u8 const col = ((x + m_scrollx + 0x1f) >> 4) & 0x0f;
+			u8 const row = ((y + scrolly) >> 4) & 0x0f;
+			return (row << 4) | col;
+		};
+		u8 const ship_x = m_s2636[0]->read_data(0x0a), ship_y = m_s2636[0]->read_data(0x0c);
+		u8 const bomb_x = m_s2636[0]->read_data(0x4a), bomb_y = m_s2636[0]->read_data(0x4c);
+		u8 const miss_x = m_s2636[1]->read_data(0x0a), miss_y = m_s2636[1]->read_data(0x0c);
+		// Predict whether a plain-terrain report of a non-ship object at (mx,my) would land on the
+		// *ship* crash gate (0x41EC -> 0x2400), which has no arming flag.  We apply the game's own
+		// 0x412F transform to the value we would report and test the ship's tolerance window; if it
+		// hits, reporting that object would kill the player on their own shot/bomb, so we suppress.
+		// The latch we set is read one frame later, after the scroll ([0x1021]/[0x1022]) has advanced
+		// a pixel or two, so we widen the ship window by DRIFT on each side to cover that lag -- else
+		// a bomb sitting exactly at the tolerance boundary tips onto the crash gate next frame (a rare
+		// "phantom death" seen via -playback).
+		constexpr int DRIFT = 4;   // px of scroll advance between our compute and the game's read
+		auto would_crash_ship = [this, &prog, scrolly, ship_x, ship_y](u8 mx, u8 my) -> bool
+		{
+			u8 const col = ((mx + m_scrollx + 0x1f) >> 4) & 0x0f;
+			u8 const row = ((my + scrolly) >> 4) & 0x0f;      // must match encode()
+			u8 const X = u8((col << 4) - prog.read_byte(0x1021) - 0x12);
+			u8 const Y = u8((row << 4) - prog.read_byte(0x1022) - 0x0c);
+			return u8(ship_x - X) >= u8(0xe6 - DRIFT) && u8(ship_y - Y) <= u8(0x1a + DRIFT);
+		};
+		// The reported position is the contact pixel of each object (xreg - 16 undoes the S2636 draw
+		// offset, so px + 16 is back in register space).  px/py are set by overlaps() on a hit and
+		// read immediately, before the next overlaps() call overwrites them.
+		int px = 0, py = 0;
+		bool const ship_hit = overlaps(s2636_0_bitmap, *m_s2636[0], 0, ship_x, ship_y, px, py);
+		u8 const ship_ex = u8(px + 16), ship_ey = u8(py);
+		bool const miss_hit = overlaps(s2636_1_bitmap, *m_s2636[1], 0, miss_x, miss_y, px, py);
+		u8 const miss_ex = u8(px + 16), miss_ey = u8(py);
+		bool const bomb_hit = overlaps(s2636_0_bitmap, *m_s2636[0], 3, bomb_x, bomb_y, px, py);
+		u8 const bomb_ex = u8(px + 16), bomb_ey = u8(py);
+
+		if (ship_hit)
+			m_collision = encode(ship_ex, ship_ey);   // ship -> crash (the game destroys a structure it hits)
+		else if (miss_hit && !would_crash_ship(miss_ex, miss_ey))
+			m_collision = encode(miss_ex, miss_ey);   // missile -> target, never the ship
+		else if (bomb_hit && !would_crash_ship(bomb_ex, bomb_ey))
+			m_collision = encode(bomb_ex, bomb_ey);   // bomb -> structure / ground, never the ship
+		else
+			m_collision = 0;
+
+		// Per-frame decision trace (VERBOSE LOG_COLL): raw and reported coords, guards, verdict.
+		if (ship_hit || miss_hit || bomb_hit)
+			LOGMASKED(LOG_COLL, "COL scx=%02x scy=%02x | ship %d %02x/%02x->%02x/%02x | miss %d %02x/%02x->%02x/%02x wcs=%d | bomb %d %02x/%02x->%02x/%02x wcs=%d | -> %02x\n",
+				u8(m_scrollx), scrolly,
+				ship_hit, ship_x, ship_y, ship_ex, ship_ey,
+				miss_hit, miss_x, miss_y, miss_ex, miss_ey, miss_hit ? would_crash_ship(miss_ex, miss_ey) : 0,
+				bomb_hit, bomb_x, bomb_y, bomb_ex, bomb_ey, bomb_hit ? would_crash_ship(bomb_ex, bomb_ey) : 0,
+				m_collision);
+	}
+}
+
 /*
  * System
  */
@@ -358,20 +502,9 @@ void malzak_state::port40_w(uint8_t data)
 
 uint8_t malzak_state::collision_r()
 {
-	// s2636 (0 only?) <-> tilemap collision detection
-	// yyyy ---- y collision
-	// 0100 -> upper tilemap border (pixel 160)
-	// 1101 -> lower (pixel 448)
-	// pix / 32 = suggested value+1
-	// ---- xxxx x collision
-	// TODO: verify scroll offsets
-
-	// High 4 bits seem to refer to the row affected.
-	if(++m_collision_counter > 15)
-		m_collision_counter = 0;
-
-	//  logerror("I/O port 0x00 read\n");
-	return 0xd0 + m_collision_counter;
+	// ship <-> playfield collision, latched once per frame at VBLANK (see screen_vblank()).
+	// yyyy xxxx = (row << 4) | col; 0 = no collision.
+	return m_collision;
 }
 
 void malzak_state::malzak_io_map(address_map &map)
@@ -461,7 +594,7 @@ void malzak_state::machine_start()
 	save_item(NAME(m_playfield_code));
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
-	save_item(NAME(m_collision_counter));
+	save_item(NAME(m_collision));
 }
 
 void malzak_state::machine_reset()
@@ -480,10 +613,10 @@ void malzak_state::malzak(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen);
-	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	// TODO: handtuned, unverified
 	m_screen->set_raw(6'000'000 * 4, 768, 0, 80 * 6, 312 * 2, 0, 240 * 2);
 	m_screen->set_screen_update(FUNC(malzak_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(malzak_state::screen_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_malzak);
 	PALETTE(config, m_palette, FUNC(malzak_state::palette_init), 128);
@@ -589,5 +722,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 19??, malzak,  0,      malzak,  malzak,  malzak_state, empty_init, ROT0, "Kitronix", "Malzak",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 19??, malzak2, malzak, malzak2, malzak2, malzak_state, empty_init, ROT0, "Kitronix", "Malzak II", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, malzak,  0,      malzak,  malzak,  malzak_state, empty_init, ROT0, "Kitronix", "Malzak",    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, malzak2, malzak, malzak2, malzak2, malzak_state, empty_init, ROT0, "Kitronix", "Malzak II", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
