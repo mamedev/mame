@@ -22,7 +22,8 @@
     0x1400 - 0x14ff | S2636 #1 video
     0x1500 - 0x15ff | S2636 #2 video
     0x1600 - 0x16ff | Playfield gfx
-    0x1700 - 0x17ff | Work RAM - contains hiscore table, coin count
+    0x1700 - 0x17ff | Work RAM - hi-score table (0x1700), coin meter (0x1780),
+                    |            config byte (0x17fd); battery NVRAM on Malzak II
     0x1800 - 0x1fff | SAA 5050 video RAM
 
   TODO:
@@ -39,6 +40,29 @@
   - Test mode in Malzak II should be enabled by setting a POT to position
   '4' and pressing button 1 three times.  Then the POT is set to position
   '1' to go back to the game.
+
+  POT / service switch and the Malzak I/II version select (decoded):
+  - The cabinet's only configuration input is the POT, a 4-position rotary
+    switch read through S2636 #1 port A at 0x14cc.  The boot dispatcher at
+    0x00a8 maps its positions to:
+      1  Normal play
+      2  Clear the high-score table (zeroes 0x1700-0x175a)
+      3  Coin / bookkeeping audit (shows the 8-digit BCD coin meter at
+         0x1780, incremented once per coin at 0x0705; reset with start+coin)
+      4  Settings / test menu (writes the NVRAM config byte 0x17fd)
+  - The POT=4 menu toggles three bits of battery NVRAM 0x17fd with button 1:
+      0x01  "Initials shoot"   (high-score entry style)
+      0x02  "Malzak version"   one / two
+      0x04  "Continue option"  on / off
+  - "Malzak version two" (0x17fd & 0x02) is what makes the sequel play like
+    the sequel: it gates the per-frame 0x2800 routine and, via port 0x40 bit
+    6, banks in the version-II screen data (second half of "user2").  With
+    the bit clear the malzak2 board plays like the original.  Version-II
+    extras behind this gate include the HUD edge arrows, a right-edge scroll
+    "turbo" (per-frame scroll step 0x1023 is loaded from 0x10cf, which
+    becomes 2 at the right edge), and a 0x0f "guided-target" scoring
+    structure spawned on a survival milestone.  malzak (v1) has none of this
+    code and does not read the POT at all.
 
   Guru Notes:
   This board looks like an early proto, it's hand etched, with
@@ -558,12 +582,12 @@ static INPUT_PORTS_START( malzak2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    )
 
-	PORT_START("POT")       /* Fake DIP switch to handle the POT switch */
+	PORT_START("POT")       /* Fake DIP switch to handle the POT service switch */
 	PORT_DIPNAME( 0x03, 0x00, "POT switch position" )
 	PORT_DIPSETTING( 0x00, "1" )  // Normal play
-	PORT_DIPSETTING( 0x01, "2" )
-	PORT_DIPSETTING( 0x02, "3" )
-	PORT_DIPSETTING( 0x03, "4" )  // Change settings
+	PORT_DIPSETTING( 0x01, "2" )  // Clear high-score table
+	PORT_DIPSETTING( 0x02, "3" )  // Coin / bookkeeping audit
+	PORT_DIPSETTING( 0x03, "4" )  // Settings / test menu
 
 INPUT_PORTS_END
 
