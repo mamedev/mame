@@ -1809,13 +1809,16 @@ ROM_START( tandy102 )
 	ROM_LOAD( "m102rom.m12", 0x0000, 0x8000, CRC(08e9f89c) SHA1(b6ede7735a361c80419f4c9c0e36e7d480c36d11) )
 ROM_END
 
+ROM_START( tandy102uk )
+	ROM_REGION( 0x8000, I8085_TAG, 0 )
+	ROM_LOAD( "m102uk.m12", 0x0000, 0x8000, CRC(20a6dd54) SHA1(cd7ec33e9a3b7ca1b41780c94bab2b334d116176) )
+ROM_END
+
 ROM_START( tandy200 )
 	ROM_REGION( 0x18000, I8085_TAG, 0 )
-	ROM_LOAD( "rom 1-1.m15", 0x00000, 0x8000, NO_DUMP )
-	ROM_LOAD( "rom 1-2.m13", 0x08000, 0x2000, NO_DUMP )
-	ROM_LOAD( "rom 2.m14",   0x10000, 0x8000, NO_DUMP )
-	ROM_LOAD( "t200rom.bin", 0x0000, 0xa000, BAD_DUMP CRC(e3358b38) SHA1(35d4e6a5fb8fc584419f57ec12b423f6021c0991) ) /* Y2K hacked */
-	ROM_CONTINUE(           0x10000, 0x8000 )
+	ROM_LOAD( "rom 1-1.m15", 0x00000, 0x8000, CRC(d0c56acf) SHA1(c644fabed28e659156527cd8acf45835dbb0cb5e) )
+	ROM_LOAD( "rom 1-2.m13", 0x08000, 0x2000, CRC(03a320c2) SHA1(f02a99c57c7bcd75cc31701059d4cc65298f2a7a) )
+	ROM_LOAD( "rom 2.m14",   0x10000, 0x8000, CRC(0a0da302) SHA1(865ce196ff72d6a1677eaa6ef6e6c815d9726f4d) )
 ROM_END
 
 /* System Drivers */
@@ -1825,8 +1828,9 @@ COMP( 1983, kc85,     0,       0,      kc85,     kc85,    kc85_state,     empty_
 COMP( 1983, m10,      kc85,    0,      kc85,     olivm10, kc85_state,     empty_init, "Olivetti",          "M-10",                 MACHINE_SUPPORTS_SAVE )
 //COMP( 1983, m10m,     kc85,    0,      kc85,     olivm10, kc85_state,     empty_init, "Olivetti",          "M-10 Modem (US)",      MACHINE_SUPPORTS_SAVE )
 COMP( 1983, trsm100,  0,       0,      trsm100,  kc85,    trsm100_state,  empty_init, "Tandy Radio Shack", "TRS-80 Model 100",     MACHINE_SUPPORTS_SAVE )
-COMP( 1986, tandy102, trsm100, 0,      tandy102, kc85,    trsm100_state,  empty_init, "Tandy Radio Shack", "Tandy 102",            MACHINE_SUPPORTS_SAVE )
+COMP( 1986, tandy102, trsm100, 0,      tandy102, kc85,    trsm100_state,  empty_init, "Tandy Radio Shack", "Tandy 102 (US)",       MACHINE_SUPPORTS_SAVE )
+COMP( 1986, tandy102uk, trsm100, 0,    tandy102, kc85,    trsm100_state,  empty_init, "Tandy Radio Shack", "Tandy 102 (UK)",       MACHINE_SUPPORTS_SAVE )
 COMP( 1983, pc8201,   0,       0,      pc8201,   pc8201,  pc8201_state,   empty_init, "NEC",               "PC-8201 (Japan)",      MACHINE_SUPPORTS_SAVE )
 COMP( 1983, pc8201a,  pc8201,  0,      pc8201,   pc8201a, pc8201_state,   empty_init, "NEC",               "PC-8201A",             MACHINE_SUPPORTS_SAVE )
 COMP( 1987, npc8300,  pc8201,  0,      pc8300,   pc8201a, pc8201_state,   empty_init, "NEC",               "PC-8300",              MACHINE_SUPPORTS_SAVE )
-COMP( 1984, tandy200, 0,       0,      tandy200, tandy200, tandy200_state, empty_init, "Tandy Radio Shack", "Tandy 200",            MACHINE_SUPPORTS_SAVE )
+COMP( 1984, tandy200, 0,       0,      tandy200, tandy200, tandy200_state, empty_init, "Tandy Radio Shack", "Tandy 200",           MACHINE_SUPPORTS_SAVE )
