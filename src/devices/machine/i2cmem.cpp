@@ -318,11 +318,9 @@ void i2cmem_device::write_e2(int state)
 }
 
 
-// Discard an incomplete transaction when a removable device loses power.
+// Discard an incomplete transaction without changing the input line levels.
 void i2cmem_device::reset_bus()
 {
-	m_scl = 0;
-	m_sdaw = 1;
 	m_sdar = 1;
 	m_state = STATE_IDLE;
 	m_bits = 0;
