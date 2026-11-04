@@ -47,9 +47,9 @@ public:
 		m_mainbank(*this, "mainbank")
 	{ }
 
-	void metlfrzr(machine_config &config);
+	void metlfrzr(machine_config &config) ATTR_COLD;
 
-	void init_metlfrzr();
+	void init_metlfrzr() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -63,6 +63,7 @@ private:
 	uint32_t screen_update_metlfrzr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void output_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 	void metlfrzr_map(address_map &map) ATTR_COLD;
 
@@ -78,6 +79,7 @@ private:
 
 	uint8_t m_fg_tilebank = 0;
 	bool m_rowscroll_enable = false;
+	uint8_t m_irq_vector = 0;
 };
 
 
@@ -325,11 +327,13 @@ INPUT_PORTS_END
 void metlfrzr_state::machine_start()
 {
 	m_mainbank->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
+	save_item(NAME(m_irq_vector));
 }
 
 void metlfrzr_state::machine_reset()
 {
 	m_mainbank->set_entry(0);
+	m_irq_vector = 0;
 }
 
 
@@ -365,14 +369,21 @@ GFXDECODE_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(metlfrzr_state::scanline)
 {
-	int scanline = param;
+	if (param == 240) // vblank-out irq
+	{
+		m_irq_vector = 0xd7; // RST 10h
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+	else if (param == 0) // vblank-in irq (TODO: check this irq)
+	{
+		m_irq_vector = 0xcf; // RST 08h
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+}
 
-	if (scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80 - RST 10h
-
-	// TODO: check this irq.
-	if (scanline == 0) // vblank-in irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 08h
+IRQ_CALLBACK_MEMBER(metlfrzr_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 void metlfrzr_state::metlfrzr(machine_config &config)
@@ -382,6 +393,7 @@ void metlfrzr_state::metlfrzr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &metlfrzr_state::metlfrzr_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &metlfrzr_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(metlfrzr_state::scanline), "screen", 0, 1);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(metlfrzr_state::cpu_acknowledge_irq));
 
 	t5182_device &t5182(T5182(config, "t5182", XTAL(14'318'181)/4));
 	t5182.ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));

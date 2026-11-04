@@ -266,6 +266,7 @@ u8 mcs51_cpu_device::ie_r()
 void mcs51_cpu_device::ie_w(u8 data)
 {
 	m_ie = data;
+	m_irq_delayed = 0xffff;
 }
 
 u8 mcs51_cpu_device::ip_r()
@@ -277,6 +278,7 @@ void mcs51_cpu_device::ip_w(u8 data)
 {
 	m_ip = data;
 	update_irq_prio();
+	m_irq_delayed = 0xffff;
 }
 
 u8 mcs51_cpu_device::p0_r()
@@ -721,14 +723,17 @@ void mcs51_cpu_device::transmit_receive(int source)
 }
 
 
-bool mcs51_cpu_device::timer_running(unsigned timer) const
+bool mcs51_cpu_device::timer1_split_uses_input() const
 {
-	bool const split = timer && ((m_tmod & 3) == 3);
-	bool const running = split || BIT(m_tcon, timer ? TCON_TR1 : TCON_TR0);
-	bool const gated = !split || timer1_split_uses_input();
-	return running && (!timer || (m_tmod & 0x30) != 0x30)
-		&& (!gated || !BIT(m_tmod, timer ? TMOD_GATE1 : TMOD_GATE0)
-			|| !BIT(m_last_line_state, timer ? MCS51_INT1_LINE : MCS51_INT0_LINE));
+	return false;
+}
+
+bool mcs51_cpu_device::timer_running(u32 timer) const
+{
+	bool const running = BIT(m_tcon, timer ? TCON_TR1 : TCON_TR0)
+		|| (timer && (m_tmod & 3) == 3 && timer1_split_uses_input());
+	return running && (!BIT(m_tmod, timer ? TMOD_GATE1 : TMOD_GATE0)
+		|| !BIT(m_last_line_state, timer ? MCS51_INT1_LINE : MCS51_INT0_LINE));
 }
 
 void mcs51_cpu_device::update_timer_t0(int cycles)
@@ -971,6 +976,16 @@ u16 mcs51_cpu_device::interrupt_mask()
 	return BIT(m_ie, IE_A) ? m_ie : 0;
 }
 
+u8 mcs51_cpu_device::interrupt_vector(u32 source) const
+{
+	return (source << 3) | 3;
+}
+
+u32 mcs51_cpu_device::interrupt_priority(u32 source) const
+{
+	return m_irq_prio[source];
+}
+
 void mcs51_cpu_device::interrupt_taken()
 {
 	m_inst_cycles += 2;
@@ -986,6 +1001,7 @@ void mcs51_cpu_device::check_irqs()
 
 	// Flags are sampled in one machine cycle and polled in the next, so a flag
 	// set in the last cycle of an instruction is only seen after the next one.
+	// RETI and IE/IP writes inhibit every source for that polling cycle.
 	ints &= ~m_irq_delayed;
 	m_irq_delayed = 0;
 
@@ -1190,14 +1206,19 @@ void mcs51_cpu_device::handle_ta_window()
 {
 }
 
+bool mcs51_cpu_device::execute_ready()
+{
+	return true;
+}
+
 bool mcs51_cpu_device::instruction_enabled() const
 {
 	return !(m_has_pd && BIT(m_pcon, PCON_IDL) && !BIT(m_pcon, PCON_PD));
 }
 
-unsigned mcs51_cpu_device::instruction_cycles(u8 op)
+void mcs51_cpu_device::prepare_instruction(u8 op)
 {
-	return mcs51_cycles[op];
+	m_inst_cycles += mcs51_cycles[op];
 }
 
 // Execute cycles
@@ -1209,7 +1230,7 @@ void mcs51_cpu_device::execute_run()
 		{
 			debugger_wait_hook();
 			m_icount = 0;
-			return;
+			break;
 		}
 		// check interrupts
 		check_irqs();
@@ -1229,7 +1250,7 @@ void mcs51_cpu_device::execute_run()
 			debugger_instruction_hook(m_pc);
 			u8 op = m_program.read_byte(m_pc++);
 
-			m_inst_cycles += instruction_cycles(op);
+			prepare_instruction(op);
 			execute_op(op);
 		}
 		else
@@ -1264,8 +1285,6 @@ void mcs51_cpu_device::device_start()
 	save_item(NAME(m_last_line_state));
 	save_item(NAME(m_t0_cnt));
 	save_item(NAME(m_t1_cnt));
-	save_item(NAME(m_t2_cnt));
-	save_item(NAME(m_t2ex_cnt));
 	save_item(NAME(m_cur_irq_prio));
 	save_item(NAME(m_irq_active));
 	save_item(NAME(m_irq_prio));
@@ -1367,8 +1386,6 @@ void mcs51_cpu_device::device_reset()
 	m_last_line_state = 0;
 	m_t0_cnt = 0;
 	m_t1_cnt = 0;
-	m_t2_cnt = 0;
-	m_t2ex_cnt = 0;
 
 	// Flag as NO IRQ in Progress
 	m_irq_active = 0;

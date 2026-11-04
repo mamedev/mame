@@ -66,15 +66,15 @@ public:
 	bool sample_ready(cpu_device &cpu);
 
 	// reads for both host and peripherals
-	uint8_t dio_r() { return get_signal(DIO, machine().time()); }
-	int eoi_r() { return get_signal(EOI, machine().time()); }
-	int dav_r() { return get_signal(DAV, machine().time()); }
-	int nrfd_r() { return get_signal(NRFD, machine().time()); }
-	int ndac_r() { return get_signal(NDAC, machine().time()); }
-	int ifc_r() { return get_signal(IFC, machine().time()); }
-	int srq_r() { return get_signal(SRQ, machine().time()); }
-	int atn_r() { return get_signal(ATN, machine().time()); }
-	int ren_r() { return get_signal(REN, machine().time()); }
+	uint8_t dio_r() { return read_signal(DIO); }
+	int eoi_r() { return read_signal(EOI); }
+	int dav_r() { return read_signal(DAV); }
+	int nrfd_r() { return read_signal(NRFD); }
+	int ndac_r() { return read_signal(NDAC); }
+	int ifc_r() { return read_signal(IFC); }
+	int srq_r() { return read_signal(SRQ); }
+	int atn_r() { return read_signal(ATN); }
+	int ren_r() { return read_signal(REN); }
 
 	// writes for host (driver_device)
 	void host_dio_w(uint8_t data) { set_signal(this, DIO, data); }
@@ -136,11 +136,16 @@ protected:
 		attotime m_time[SIGNAL_COUNT][EDGE_COUNT];
 		u8 m_state[SIGNAL_COUNT][EDGE_COUNT];
 		u8 m_count[SIGNAL_COUNT];
+		u8 m_line[SIGNAL_COUNT];
+		device_execute_interface *m_exec;
+		s32 m_exec_index;
 	};
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_stop() override ATTR_COLD;
+	virtual void device_pre_save() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 	class daisy_entry
 	{
@@ -169,12 +174,13 @@ private:
 	devcb_write8       m_write_dio;
 
 	void set_signal(device_t *device, int signal, u8 state);
-	u8 get_signal(int signal, const attotime &time);
+	u8 read_signal(int signal);
+	u8 get_signal(int signal, const attotime &time, source_lines const *own = nullptr);
+	void update_lines(source_lines &lines, daisy_entry *entry);
 	void update_lines();
 	TIMER_CALLBACK_MEMBER(update_tick);
 
 	source_lines m_lines;
-	u8 m_line[SIGNAL_COUNT];
 	emu_timer *m_update_timer;
 	std::vector<device_execute_interface *> m_execs;
 };

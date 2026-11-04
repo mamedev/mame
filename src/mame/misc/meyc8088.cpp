@@ -81,6 +81,7 @@ private:
 	void meyc8088_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(heartbeat_callback);
 	void meyc8088_map(address_map &map) ATTR_COLD;
 };
@@ -174,7 +175,13 @@ void meyc8088_state::screen_vblank(int state)
 {
 	// LC255(200ns pulse) rising edge asserts INTR at start and end of vblank
 	// INTA wired back to INTR to clear it, vector is hardwired to $20
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x20); // I8088
+	m_maincpu->set_input_line(0, ASSERT_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(meyc8088_state::cpu_acknowledge_irq)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+	return 0x20;
 }
 
 
@@ -368,6 +375,7 @@ void meyc8088_state::meyc8088(machine_config &config)
 	/* basic machine hardware */
 	I8088(config, m_maincpu, (XTAL(15'000'000) / 3) * 0.95); // NOTE: underclocked to prevent errors on diagnostics, MAME i8088 cycle timing is probably inaccurate
 	m_maincpu->set_addrmap(AS_PROGRAM, &meyc8088_state::meyc8088_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(meyc8088_state::cpu_acknowledge_irq));
 
 	i8155_device &i8155_1(I8155(config, "i8155_1", XTAL(15'000'000) / (3*1)));
 	// all ports set to input

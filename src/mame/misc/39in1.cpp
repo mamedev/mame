@@ -136,7 +136,7 @@ private:
 	u8 m_prot2_resp;
 	u8 m_prot2_op[3];
 
-	required_device<cpu_device> m_maincpu;
+	required_device<pxa255_cpu_device> m_maincpu;
 	required_device<pxa255_periphs_device> m_pxa_periphs;
 	required_device<eeprom_serial_93c66_16bit_device> m_eeprom;
 	required_shared_ptr<u32> m_ram;
@@ -163,6 +163,9 @@ private:
 
 void _39in1_state::machine_start()
 {
+	// the recompiler accesses RAM in place, unless a tap covers it (init_rodent())
+	m_maincpu->arm7drc_add_fastram(0xa0000000, 0xa0000000 + m_ram.bytes() - 1, false, &m_ram[0]);
+
 	save_item(NAME(m_prot_state));
 	save_item(NAME(m_prot_mode));
 	save_item(NAME(m_prot_count));

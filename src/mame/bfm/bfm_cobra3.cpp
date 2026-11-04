@@ -979,15 +979,84 @@ ROM_START( c3_rtime )
 	ROM_LOAD16_BYTE( "95400009.bin", 0x00001, 0x080000, CRC(a5e0a5ca) SHA1(e7063ddfb436152f15267fde2aa7695c8a262191) )
 	ROM_LOAD16_BYTE( "95400010.bin", 0x00000, 0x080000, CRC(03fd5f72) SHA1(379cfc4ef5087f24989bc1f2246b6056e33fd472) )
 
-	ROM_REGION( 0x100000, "altrevs", 0 )
+	ROM_REGION( 0x1000000, "ymz280b", 0 )
+	ROM_LOAD( "95004056.bin", 0x000000, 0x080000, CRC(24e8f9fb) SHA1(0d484a8f368b0f2140f148a1dc84db85a100af38) )
+	ROM_LOAD( "95004057.bin", 0x080000, 0x080000, CRC(f73c92d6) SHA1(08c7db2baccb703f99efb81f618719a7789ca564) )
+
+	ROM_REGION16_BE( 0x4000, "nvram", 0 )
+	ROM_LOAD( "c3_rtime.nv", 0x0000, 0x4000, CRC(ac8f938c) SHA1(305c76851fa9e936b3c54a8ba215643cf90660ea) )
+
+	DISK_REGION("cdrom")
+	DISK_IMAGE_READONLY( "95100302", 0, SHA1(20accfe236a0c85108cd2a205399ed8959f1a638) )
+ROM_END
+
+ROM_START( c3_rtimea )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "95400063.lhs", 0x00001, 0x080000, CRC(eecb5f3b) SHA1(a1c6ad61a65c5361c38aaae2a064983a978c45ea) )
 	ROM_LOAD16_BYTE( "95400064.rhs", 0x00000, 0x080000, CRC(251689f5) SHA1(4589a409c6b0f2869f99a08df8d76223e54d5b3c) )
+
+	ROM_REGION( 0x1000000, "ymz280b", 0 )
+	ROM_LOAD( "95004056.bin", 0x000000, 0x080000, CRC(24e8f9fb) SHA1(0d484a8f368b0f2140f148a1dc84db85a100af38) )
+	ROM_LOAD( "95004057.bin", 0x080000, 0x080000, CRC(f73c92d6) SHA1(08c7db2baccb703f99efb81f618719a7789ca564) )
+
+	ROM_REGION16_BE( 0x4000, "nvram", 0 )
+	ROM_LOAD( "c3_rtime.nv", 0x0000, 0x4000, CRC(ac8f938c) SHA1(305c76851fa9e936b3c54a8ba215643cf90660ea) )
+
+	DISK_REGION("cdrom")
+	DISK_IMAGE_READONLY( "95100302", 0, SHA1(20accfe236a0c85108cd2a205399ed8959f1a638) )
+ROM_END
+
+ROM_START( c3_rtimeb )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "95401063.lhs", 0x00001, 0x080000, CRC(ea98c159) SHA1(6f665d80b71af57b31194fdc981707822e62053e) )
 	ROM_LOAD16_BYTE( "95401064.rhs", 0x00000, 0x080000, CRC(bc125897) SHA1(a83fdb54349d3ea5d183754bf4b9fee1f0b73be3) )
+
+	ROM_REGION( 0x1000000, "ymz280b", 0 )
+	ROM_LOAD( "95004056.bin", 0x000000, 0x080000, CRC(24e8f9fb) SHA1(0d484a8f368b0f2140f148a1dc84db85a100af38) )
+	ROM_LOAD( "95004057.bin", 0x080000, 0x080000, CRC(f73c92d6) SHA1(08c7db2baccb703f99efb81f618719a7789ca564) )
+
+	ROM_REGION16_BE( 0x4000, "nvram", 0 )
+	ROM_LOAD( "c3_rtime.nv", 0x0000, 0x4000, CRC(ac8f938c) SHA1(305c76851fa9e936b3c54a8ba215643cf90660ea) )
+
+	DISK_REGION("cdrom")
+	DISK_IMAGE_READONLY( "95100302", 0, SHA1(20accfe236a0c85108cd2a205399ed8959f1a638) )
+ROM_END
+
+ROM_START( c3_rtimed )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "radtimes.lhs", 0x00001, 0x080000, CRC(c6574297) SHA1(bd9744c4b08f9ae35fe1523ebcd68c52a36a32e0) )
 	ROM_LOAD16_BYTE( "radtimes.rhs", 0x00000, 0x080000, CRC(ed2c24f0) SHA1(5f06b2de7e2b2dccee7763ea0938849d67256ff2) )
-	ROM_LOAD16_BYTE( "rt017.lhs", 0x00001, 0x080000, CRC(d2272c39) SHA1(f583fe39c153dca2e86e875ca39056a8756e0d2c) )
-	ROM_LOAD16_BYTE( "rt018.rhs", 0x00000, 0x080000, CRC(52999d03) SHA1(21d1e9034a26f6f73109e9e83272dcff104993e5) )
+
+	ROM_REGION( 0x1000000, "ymz280b", 0 )
+	ROM_LOAD( "95004056.bin", 0x000000, 0x080000, CRC(24e8f9fb) SHA1(0d484a8f368b0f2140f148a1dc84db85a100af38) )
+	ROM_LOAD( "95004057.bin", 0x080000, 0x080000, CRC(f73c92d6) SHA1(08c7db2baccb703f99efb81f618719a7789ca564) )
+
+	ROM_REGION16_BE( 0x4000, "nvram", 0 )
+	ROM_LOAD( "c3_rtime.nv", 0x0000, 0x4000, CRC(ac8f938c) SHA1(305c76851fa9e936b3c54a8ba215643cf90660ea) )
+
+	DISK_REGION("cdrom")
+	DISK_IMAGE_READONLY( "95100302", 0, SHA1(20accfe236a0c85108cd2a205399ed8959f1a638) )
+ROM_END
+
+ROM_START( c3_rtimee )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	// gives SUMCHECK ERROR, presumably one (or both) of these is bad
+	ROM_LOAD16_BYTE( "rt017.lhs", 0x00001, 0x080000, BAD_DUMP CRC(d2272c39) SHA1(f583fe39c153dca2e86e875ca39056a8756e0d2c) )
+	ROM_LOAD16_BYTE( "rt018.rhs", 0x00000, 0x080000, BAD_DUMP CRC(52999d03) SHA1(21d1e9034a26f6f73109e9e83272dcff104993e5) )
+
+	ROM_REGION( 0x1000000, "ymz280b", 0 )
+	ROM_LOAD( "95004056.bin", 0x000000, 0x080000, CRC(24e8f9fb) SHA1(0d484a8f368b0f2140f148a1dc84db85a100af38) )
+	ROM_LOAD( "95004057.bin", 0x080000, 0x080000, CRC(f73c92d6) SHA1(08c7db2baccb703f99efb81f618719a7789ca564) )
+
+	ROM_REGION16_BE( 0x4000, "nvram", 0 )
+	ROM_LOAD( "c3_rtime.nv", 0x0000, 0x4000, CRC(ac8f938c) SHA1(305c76851fa9e936b3c54a8ba215643cf90660ea) )
+
+	DISK_REGION("cdrom")
+	DISK_IMAGE_READONLY( "95100302", 0, SHA1(20accfe236a0c85108cd2a205399ed8959f1a638) )
+ROM_END
+
+ROM_START( c3_rtimec )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rtimesp1", 0x00001, 0x080000, CRC(f856d377) SHA1(a9fac7e2188bbd087f70c1c00cbf790bc52d573b) )
 	ROM_LOAD16_BYTE( "rtimesp2", 0x00000, 0x080000, CRC(130d0864) SHA1(034d6c4fdec3acd4329d16315aeac43b1f1a5e91) )
 
@@ -1007,15 +1076,51 @@ ROM_START( c3_telly )
 	ROM_LOAD16_BYTE( "95400021.p1",  0x00001, 0x080000, CRC(5c969746) SHA1(7458c613d7a3e7cf6a21e55f74dcdc052404f29c) )
 	ROM_LOAD16_BYTE( "95400022.p2",  0x00000, 0x080000, CRC(fa1fdb7b) SHA1(eff87c197a62dba49d95810e8669026db2edb187) )
 
-	ROM_REGION( 0x100000, "altrevs", 0 )
+	ROM_REGION( 0x1000000, "ymz280b", ROMREGION_ERASE00 )
+	ROM_LOAD( "telsndl", 0x0000, 0x080000, CRC(74996fbd) SHA1(90e46130dccf47be1fcfaf549e548cdd4883e59d) )
+
+	ROM_REGION16_BE( 0x4000, "nvram", 0 )
+	ROM_LOAD( "c3_telly.nv", 0x0000, 0x4000, CRC(5bc2b815) SHA1(c298c9c8df1b13ea702803cd7bae57ce28009e6d) )
+
+	DISK_REGION("cdrom")
+	DISK_IMAGE_READONLY( "95100300", 0, SHA1(98905cbff24c576c58210d1d003f710fa7064762) )
+ROM_END
+
+ROM_START( c3_tellya )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "95401021.p1",  0x00001, 0x080000, CRC(24a334d3) SHA1(672f16cbd2ddf627213de71024b6fbaa28f526a5) )
 	ROM_LOAD16_BYTE( "95401022.p2",  0x00000, 0x080000, CRC(90af3767) SHA1(e529ad7eef5e6d2a6951d46e77aaad2087890445) )
-	ROM_LOAD16_BYTE( "tadd13lh",     0x00001, 0x080000, CRC(2d6ed08c) SHA1(efa39b9ff5605c2e29971fb5e874c9a0c178b1f0) )
-	ROM_LOAD16_BYTE( "tadd14rh",     0x00000, 0x080000, CRC(26dd6ed6) SHA1(553f29017494b6f7ecc98940d527f498316ea55e) )
+
+	ROM_REGION( 0x1000000, "ymz280b", ROMREGION_ERASE00 )
+	ROM_LOAD( "telsndl", 0x0000, 0x080000, CRC(74996fbd) SHA1(90e46130dccf47be1fcfaf549e548cdd4883e59d) )
+
+	ROM_REGION16_BE( 0x4000, "nvram", 0 )
+	ROM_LOAD( "c3_telly.nv", 0x0000, 0x4000, CRC(5bc2b815) SHA1(c298c9c8df1b13ea702803cd7bae57ce28009e6d) )
+
+	DISK_REGION("cdrom")
+	DISK_IMAGE_READONLY( "95100300", 0, SHA1(98905cbff24c576c58210d1d003f710fa7064762) )
+ROM_END
+
+ROM_START( c3_tellyb )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "telad.tl",     0x00001, 0x080000, CRC(e6906027) SHA1(20ca64417ea3795dc26adfea717cb3d724019c34) )
 	ROM_LOAD16_BYTE( "telad.tr",     0x00000, 0x080000, CRC(38dbee05) SHA1(ee33cdaa7f817beb49a3cff49a5493a50d8d4504) )
-	ROM_LOAD16_BYTE( "tasndl",       0x00001, 0x080000, CRC(3f0b9d2b) SHA1(6db3451c26a3e673204c316403e0bb7127191a1f) )
-	ROM_LOAD16_BYTE( "tasndr",       0x00000, 0x080000, CRC(2dd9ebcf) SHA1(4d118d37e18266f82fb2acb37f5fd106e0f25a1f) )
+
+	ROM_REGION( 0x1000000, "ymz280b", ROMREGION_ERASE00 )
+	ROM_LOAD( "telsndl", 0x0000, 0x080000, CRC(74996fbd) SHA1(90e46130dccf47be1fcfaf549e548cdd4883e59d) )
+
+	ROM_REGION16_BE( 0x4000, "nvram", 0 )
+	ROM_LOAD( "c3_telly.nv", 0x0000, 0x4000, CRC(5bc2b815) SHA1(c298c9c8df1b13ea702803cd7bae57ce28009e6d) )
+
+	DISK_REGION("cdrom")
+	DISK_IMAGE_READONLY( "95100300", 0, SHA1(98905cbff24c576c58210d1d003f710fa7064762) )
+ROM_END
+
+ROM_START( c3_tellyc )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	// gives SUMCHECK ERROR, presumably one (or both) of these is bad
+	ROM_LOAD16_BYTE( "tadd13lh",     0x00001, 0x080000, BAD_DUMP CRC(2d6ed08c) SHA1(efa39b9ff5605c2e29971fb5e874c9a0c178b1f0) )
+	ROM_LOAD16_BYTE( "tadd14rh",     0x00000, 0x080000, BAD_DUMP CRC(26dd6ed6) SHA1(553f29017494b6f7ecc98940d527f498316ea55e) )
 
 	ROM_REGION( 0x1000000, "ymz280b", ROMREGION_ERASE00 )
 	ROM_LOAD( "telsndl", 0x0000, 0x080000, CRC(74996fbd) SHA1(90e46130dccf47be1fcfaf549e548cdd4883e59d) )
@@ -1033,9 +1138,35 @@ ROM_START( c3_tellyns )
 	ROM_LOAD16_BYTE( "95400023.lhs", 0x00001, 0x080000, CRC(b79279b8) SHA1(010edf0c299b0b01ab43f52dce540ff0847fb4c5) )
 	ROM_LOAD16_BYTE( "95400024.rhs", 0x00000, 0x080000, CRC(835d25fd) SHA1(6d780332f6016d6e1404922e0ac439a499211be3) )
 
-	ROM_REGION( 0x100000, "altrevs", 0 )
+	ROM_REGION( 0x1000000, "ymz280b", ROMREGION_ERASE00 )
+	ROM_LOAD( "telsndl", 0x0000, 0x080000, CRC(74996fbd) SHA1(90e46130dccf47be1fcfaf549e548cdd4883e59d) )
+
+	ROM_REGION16_BE( 0x4000, "nvram", 0 )
+	ROM_LOAD( "c3_tellyns.nv", 0x0000, 0x4000, CRC(96abd9a8) SHA1(6708c113d423809b2e5f6e94331c50605fd90b13) )
+
+	DISK_REGION("cdrom")
+	DISK_IMAGE_READONLY( "95100301", 0, SHA1(dbce040a6fb7916a240d24e2207cf6e1b3f572e7) )
+ROM_END
+
+ROM_START( c3_tellynsa )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "95401023.lhs", 0x00001, 0x080000, CRC(85b95b56) SHA1(106e617fc92f95a6b3769db1fd4e5ab47c752c08) )
 	ROM_LOAD16_BYTE( "95401024.rhs", 0x00000, 0x080000, CRC(835d25fd) SHA1(6d780332f6016d6e1404922e0ac439a499211be3) )
+
+	ROM_REGION( 0x1000000, "ymz280b", ROMREGION_ERASE00 )
+	ROM_LOAD( "telsndl", 0x0000, 0x080000, CRC(74996fbd) SHA1(90e46130dccf47be1fcfaf549e548cdd4883e59d) )
+
+	ROM_REGION16_BE( 0x4000, "nvram", 0 )
+	ROM_LOAD( "c3_tellyns.nv", 0x0000, 0x4000, CRC(96abd9a8) SHA1(6708c113d423809b2e5f6e94331c50605fd90b13) )
+
+	DISK_REGION("cdrom")
+	DISK_IMAGE_READONLY( "95100301", 0, SHA1(dbce040a6fb7916a240d24e2207cf6e1b3f572e7) )
+ROM_END
+
+ROM_START( c3_tellynsb )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "tasndl",       0x00001, 0x080000, CRC(3f0b9d2b) SHA1(6db3451c26a3e673204c316403e0bb7127191a1f) )
+	ROM_LOAD16_BYTE( "tasndr",       0x00000, 0x080000, CRC(2dd9ebcf) SHA1(4d118d37e18266f82fb2acb37f5fd106e0f25a1f) )
 
 	ROM_REGION( 0x1000000, "ymz280b", ROMREGION_ERASE00 )
 	ROM_LOAD( "telsndl", 0x0000, 0x080000, CRC(74996fbd) SHA1(90e46130dccf47be1fcfaf549e548cdd4883e59d) )
@@ -1052,7 +1183,19 @@ ROM_START( c3_totp )
 	ROM_LOAD16_BYTE( "95400101.lo", 0x00001, 0x080000, CRC(c95164c7) SHA1(7b2fada6a3208666219a53cba08f7acad015763d) )
 	ROM_LOAD16_BYTE( "95400102.hi", 0x00000, 0x080000, CRC(5ebba159) SHA1(34bcf48140261cd87d81a32581e965d722f42f71) )
 
-	ROM_REGION( 0x100000, "altrevs", 0 )
+	ROM_REGION( 0x1000000, "ymz280b", ROMREGION_ERASE00 )
+	ROM_LOAD( "totpsnd.lhs", 0x000000, 0x080000, CRC(56a73136) SHA1(10656ede18de9432a8a728cc59d000b5b1bf0150) )
+	ROM_LOAD( "totpsnd.rhs", 0x080000, 0x080000, CRC(28d156ab) SHA1(ebf5c4e008015b9b56b3aa5228c05b8e298daa80) )
+
+	ROM_REGION16_BE( 0x4000, "nvram", 0 )
+	ROM_LOAD( "c3_totp.nv", 0x0000, 0x4000, CRC(9fc151d8) SHA1(f089841fabc72f1170a04b379ae39bfecfb13396) )
+
+	DISK_REGION("cdrom")
+	DISK_IMAGE_READONLY( "95100307", 0, SHA1(27ad1565f9a153fe71b72d9c597a6e3c3f13ded0) )
+ROM_END
+
+ROM_START( c3_totpa )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "95401101.lo", 0x00001, 0x080000, CRC(97d2d90a) SHA1(d4a2afd3cc551986e76f107beb66e8c660a6ee1d) )
 	ROM_LOAD16_BYTE( "95401102.hi", 0x00000, 0x080000, CRC(3599427f) SHA1(16d915553b2b490a047888c64ebcf952714b3168) )
 
@@ -1084,8 +1227,23 @@ ROM_END
 
 } // anonymous namespace
 
-GAMEL( 1995, c3_telly,  0, c3_telly, c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (Bellfruit) (Cobra 3)", MACHINE_SUPPORTS_SAVE, layout_c3_telly )
-GAMEL( 1995, c3_tellyns, 0, c3_telly, c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (New Series) (Bellfruit) (Cobra 3)", MACHINE_SUPPORTS_SAVE, layout_c3_telly )
-GAMEL( 1996, c3_rtime,  0, bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Bellfruit) (Cobra 3)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
-GAMEL( 1997, c3_totp,   0, bfm_cobra3, c3_totp,  bfm_cobra3_state, empty_init, ROT0, "BFM", "Top of the Pops (Bellfruit) (Cobra 3?)", MACHINE_SUPPORTS_SAVE, layout_c3_totp )
-GAMEL( 1998, c3_ppays,  0, c3_ppays, c3_ppays, bfm_cobra3_state, empty_init, ROT0, "BFM", "The Phrase That Pays (Bellfruit) (Cobra 3?)", MACHINE_SUPPORTS_SAVE, layout_c3_ppays )
+GAMEL(1995, c3_telly,    0,          c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (Game Number 95400021)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
+GAMEL(1995, c3_tellya,   c3_telly,   c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (Game Number 95401021)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
+GAMEL(1995, c3_tellyb,   c3_telly,   c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (Game Number 95400005)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_c3_telly) // fails to boot
+GAMEL(1995, c3_tellyc,   c3_telly,   c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (Game Number 95400013)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_c3_telly) // checksum error
+
+GAMEL(1995, c3_tellyns,  0,          c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts - The New Series (Game Number 95400023)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
+GAMEL(1995, c3_tellynsa, c3_tellyns, c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts - The New Series (Game Number 95401023)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
+GAMEL(1995, c3_tellynsb, c3_tellyns, c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts - The New Series (Game Number 95400007)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
+
+GAMEL(1996, c3_rtime,    0,          bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95400009)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
+GAMEL(1996, c3_rtimea,   c3_rtime,   bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95400063)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
+GAMEL(1996, c3_rtimeb,   c3_rtime,   bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95401063)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
+GAMEL(1996, c3_rtimec,   c3_rtime,   bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95400047)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
+GAMEL(1996, c3_rtimed,   c3_rtime,   bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "bootleg", "Radio Times (Game Number radtimes, bootleg)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime ) // hack/bootleg?
+GAMEL(1996, c3_rtimee,   c3_rtime,   bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95400017)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_c3_rtime ) // checksum error
+
+GAMEL(1997, c3_totp,     0,          bfm_cobra3, c3_totp,  bfm_cobra3_state, empty_init, ROT0, "BFM", "Top of the Pops (Game Number 95400101)", MACHINE_SUPPORTS_SAVE, layout_c3_totp )
+GAMEL(1997, c3_totpa,    c3_totp,    bfm_cobra3, c3_totp,  bfm_cobra3_state, empty_init, ROT0, "BFM", "Top of the Pops (Game Number 95401101)", MACHINE_SUPPORTS_SAVE, layout_c3_totp )
+
+GAMEL(1998, c3_ppays,    0,          c3_ppays,   c3_ppays, bfm_cobra3_state, empty_init, ROT0, "BFM", "The Phrase That Pays (Game Number 95400687)", MACHINE_SUPPORTS_SAVE, layout_c3_ppays )

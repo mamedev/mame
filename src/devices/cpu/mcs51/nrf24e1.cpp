@@ -58,9 +58,9 @@ void nrf24e1_device::sfr_map(address_map &map)
 	map(0x80, 0x80).lrw8(NAME([this] () -> u8 { return gpio_r(0); }), NAME([this] (u8 data) { gpio_w(0, data); }));
 	map(0x90, 0x90).lrw8(NAME([this] () -> u8 { return gpio_r(1); }), NAME([this] (u8 data) { gpio_w(1, data); }));
 	map(0xa0, 0xa0).rw(FUNC(nrf24e1_device::radio_r), FUNC(nrf24e1_device::radio_w));
-	map(0xa8, 0xa8).lrw8(NAME([this] () -> u8 { return m_ie & 0xbf; }), NAME([this] (u8 data) { ie_w(data & 0xbf); m_irq_delay = 1; }));
+	map(0xa8, 0xa8).lrw8(NAME([this] () -> u8 { return m_ie & 0xbf; }), NAME([this] (u8 data) { ie_w(data & 0xbf); }));
 	map(0xb0, 0xb0).unmaprw();
-	map(0xb8, 0xb8).lrw8(NAME([this] () -> u8 { return m_ip; }), NAME([this] (u8 data) { ip_w((data & 0x3f) | 0x80); m_irq_delay = 1; }));
+	map(0xb8, 0xb8).lrw8(NAME([this] () -> u8 { return m_ip; }), NAME([this] (u8 data) { ip_w((data & 0x3f) | 0x80); }));
 }
 
 void nrf24e1_device::device_add_mconfig(machine_config &config)
@@ -223,7 +223,12 @@ u16 nrf24e1_device::pending_irq_flags(u16 int_mask)
 	return dw8051_device::pending_irq_flags(int_mask) | (pending & int_mask);
 }
 
-unsigned nrf24e1_device::interrupt_priority(unsigned source) const
+u8 nrf24e1_device::interrupt_vector(u32 source) const
+{
+	return source < 6 ? dw8051_device::interrupt_vector(source) : (source - 6) * 8 + 0x43;
+}
+
+u32 nrf24e1_device::interrupt_priority(u32 source) const
 {
 	return source < 6 ? dw8051_device::interrupt_priority(source) : BIT(m_extra[SFR_EIP], source - 6);
 }
@@ -250,7 +255,7 @@ void nrf24e1_device::sample_gpio()
 	if (BIT(m_extra[SFR_P0_ALT], 6) && BIT(falling0, 6) && BIT(m_tmod, TMOD_CT1) && timer_running(1))
 		++m_t1_cnt;
 	if (BIT(m_extra[SFR_P1_ALT], 0) && BIT(falling1, 0) && BIT(m_t2con, T2CON_CT2) && BIT(m_t2con, T2CON_TR2))
-		++m_t2_cnt;
+		increment_timer_t2(1);
 }
 
 u8 nrf24e1_device::extra_r(offs_t offset)
@@ -269,7 +274,7 @@ void nrf24e1_device::extra_w(offs_t offset, u8 data)
 	case SFR_REGX_CTRL: regx_start(data); return;
 	case SFR_CK_CTRL: clock_control_w(data); return;
 	case SFR_EICON: data = (data & 8) | 0x40; break;
-	case SFR_EIE: case SFR_EIP: data |= 0xe0; m_irq_delay = 1; break;
+	case SFR_EIE: case SFR_EIP: data |= 0xe0; m_irq_delayed = 0xffff; break;
 	}
 	m_extra[offset] = data;
 	if (offset >= SFR_P0_DIR && offset <= SFR_P1_ALT)

@@ -218,21 +218,23 @@ The floppy disk contents are represented by the class floppy_image.  It contains
 
 The media type is divided in two parts.  The first half indicates the physical form factor, i.e. all medias with that form factor can be physically inserted in a reader that handles it.  The second half indicates the variants which are usually detectable by the reader, such as density and number of sides.
 
-Track data consists of a series of 32-bits lsb-first values representing magnetic cells.  Bits 0-27 indicate the absolute position of the start of the cell (not the size), and bits 28-31 the type.  Type can be:
+Track data consists of a series of 32-bits lsb-first values representing magnetic events.  Bits 0-27 indicate the absolute position of the event, and bits 28-31 the type.  Type can be:
 
-- 0, MG_A -> Magnetic orientation A
+- 0, MG_F -> Flux orientation change
 
-- 1, MG_B -> Magnetic orientation B
+- 1, MG_N -> Start of a non-magnetized zone (neutral)
 
-- 2, MG_N -> Non-magnetized zone (neutral)
+- 2, MG_D -> Start of a damaged zone, reads as neutral but cannot be changed by writing
 
-- 3, MG_D -> Damaged zone, reads as neutral but cannot be changed by writing
+- 3, MG_E -> End of one of the previous zones, *inclusive*
 
 The position is in angular units of 1/200,000,000th of a turn.  It corresponds to one nanosecond when the drive rotates at 300 rpm.
 
-The last cell implicit end position is of course 200,000,000.
+The last event implicitly extends up to the end position 200,000,000.
 
-Unformatted tracks are encoded as zero-size.
+A MG_N or MG_D zone must not wrap at the 200,000,000 position, it has to be split in two: the first finishing at 199,999,999, the second starting at 0.
+
+Unformatted tracks are encoded as zero-size, which is strictly equivalent to (MG_N, 0), (MG_E, 199,999,999).
 
 The "track splice" information indicates where to start writing if you try to rewrite a physical disk with the data.  Some preservation formats encode that information, it is guessed for others.  The write track function of fdcs should set it.  The representation is the angular position relative to the index.
 
@@ -251,17 +253,23 @@ We need to be able to convert on-disk formats of the floppy data to and from the
 
 - **supports_save()** returns true is converting to that external format is supported
 
-- **identify(file, form factor)** gives a 0-100 score for the file to be of that format:
+- **identify(file, form factor, variants)** returns a bitwise OR of FIFID_* flags, compared numerically afterwards:
 
-  - **0** = not that format
+  - **0** = not that format, e.g. the signature is wrong
 
-  - **100** = certainly that format
+  - **FIFID_SIGN** = the file signature matches
 
-  - **50** = format identified from file size only
+  - **FIFID_SIZE** = the file size matches what is expected
 
-- **load(file, form factor, floppy_image)** loads an image and converts it into the internal representation
+  - **FIFID_STRUCT** = internal structure of the file has been verified
 
-- **save(file, floppy_image)** (if implemented) converts from the internal representation and saves an image
+  - **FIFID_HINT** = favour this format when everything else is equal
+
+  - **FIFID_EXT** = the extension matches, set by the caller and not by identify
+
+- **load(file, form factor, variants, floppy_image)** loads an image and converts it into the internal representation
+
+- **save(file, variants, floppy_image)** (if implemented) converts from the internal representation and saves an image
 
 All of these methods are supposed to be stateless.
 
@@ -352,7 +360,7 @@ A number of methods are provided to simplify writing the converter classes.
 3.3. Floppy drive
 ~~~~~~~~~~~~~~~~~
 
-  The class floppy_image_interface simulates the floppy drive.  That includes a number of control signals, reading, and writing.  Control signal changes must be synchronized, e.g. fired off a timer to ensure the current time is the same for all devices.
+  The class floppy_image_device simulates the floppy drive.  That includes a number of control signals, reading, and writing.  Control signal changes must be synchronized, e.g. fired off a timer to ensure the current time is the same for all devices.
 
 3.3.1. Control signals
 ''''''''''''''''''''''
@@ -432,6 +440,18 @@ The read/write interface is designed to work asynchronously, e.g. somewhat indep
 **set_write_splice(when)**
 
   Sets the track write-splice position to the angular position corresponding to *when*.
+
+3.3.3. Weak zones
+'''''''''''''''''
+
+  A zone where the surface gives no flux for a long time reads back as random pulses, see section 2.2.  Two kinds of zone are weak:
+
+  - a run of MG_N and MG_D entries.  Adjacent MG_N/MG_D entries are one zone to the read head, however the image format cut them up, and the run may cross the index position.  A track made only of such entries is one zone without end.
+  - the gap between two flux changes when it lasts at least as long as the amplifier freakout time of the drive (16 µs by default, 64 µs for the VTech 5.25" drive, never for the Compucolor 5.25" drive).
+
+  Noise starts at the start of a MG_N/MG_D run, and 16 µs after the preceding flux change in a gap.  It is one pulse per 60 µs slot, at a pseudo-random offset in the first 50 µs of the slot.  The offsets are a hash of the revolution number, the image position of the zone start and the slot number, so they do not depend on when the zone is read or how the cache was filled.  Reading the same revolution again gives the same pulses, the next revolution gives different ones.  The real flux change that ends a gap, and the end of a MG_N/MG_D run, are always delivered after the noise.
+
+  The drive-side filtering of too-close pulses described in section 2.2 is not emulated.
 
 
 .. [1] Cylinder is a hard-drive term somewhat improperly used for floppies.  It comes from the fact that hard-drives are similar to floppies but include a series of stacked disks with a read/write head on each.  The heads are physically linked and all point to the same circle on every disk at a given time, making the accessed area look like a cylinder.  Hence the name.

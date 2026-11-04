@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Patrick Mackinlay
+// copyright-holders:Patrick Mackinlay,Brice Onken
 
 #ifndef MAME_SONY_NEWS_HID_H
 #define MAME_SONY_NEWS_HID_H
@@ -7,6 +7,7 @@
 #pragma once
 
 #include "machine/keyboard.h"
+#include "diserial.h"
 
 class news_hid_hle_device
 	: public device_t
@@ -68,6 +69,67 @@ private:
 	u8 m_mouse_b;
 };
 
+class news_hid_serial_keyboard_device
+	: public device_t
+	, public device_buffered_serial_interface<16U>
+	, protected device_matrix_keyboard_interface<8U>
+{
+public:
+	news_hid_serial_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+
+	auto txd_handler() { return m_write_txd.bind(); }
+	void rxd_w(int state) { rx_w(state); }
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	virtual void key_make(u8 row, u8 column) override;
+	virtual void key_break(u8 row, u8 column) override;
+	virtual void tra_callback() override { m_write_txd(transmit_register_get_data_bit()); }
+
+private:
+	virtual void received_byte(u8 byte) override;
+	void push_key(u8 code);
+
+	devcb_write_line m_write_txd;
+};
+
+class news_hid_serial_mouse_device
+	: public device_t
+	, public device_buffered_serial_interface<8>
+{
+public:
+	news_hid_serial_mouse_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	auto txd_handler() { return m_write_txd.bind(); }
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+
+private:
+	virtual void received_byte(u8 byte) override;
+	void update_input();
+
+	devcb_write_line m_write_txd;
+
+	required_ioport m_mouse_x_axis;
+	required_ioport m_mouse_y_axis;
+	required_ioport m_mouse_buttons;
+
+	s16 m_mouse_x;
+	s16 m_mouse_y;
+	u8 m_mouse_b;
+};
+
 DECLARE_DEVICE_TYPE(NEWS_HID_HLE, news_hid_hle_device)
+DECLARE_DEVICE_TYPE(NEWS_HID_SERIAL_KEYBOARD, news_hid_serial_keyboard_device)
+DECLARE_DEVICE_TYPE(NEWS_HID_SERIAL_MOUSE, news_hid_serial_mouse_device)
 
 #endif // MAME_SONY_NEWS_HID_H

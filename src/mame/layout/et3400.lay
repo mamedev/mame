@@ -207,15 +207,6 @@ license:CC0-1.0
 		<element ref="btn_rst" inputtag="RESET" inputmask="0x01"><bounds x="1.775" y="5.375" width="1.0" height="1.0" /></element>
 	</group>
 
-	<view name="LED Displays and Terminal">
-		<collection name="Keypad">
-			<element ref="beige"><bounds x="320" y="0" width="172" height="372" /></element>
-			<group ref="keypad"><bounds x="336" y="16" width="140" height="260" /></group>
-		</collection>
-		<screen index="0"><bounds x="0" y="132" width="320" height="240" /></screen>
-		<group ref="displays"><bounds x="0" y="0" width="320" height="132" /></group>
-	</view>
-
 	<view name="LED Displays">
 		<collection name="Keypad">
 			<element ref="beige"><bounds x="0" y="0" width="320" height="424" /></element>

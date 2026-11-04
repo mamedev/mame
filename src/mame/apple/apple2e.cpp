@@ -1530,7 +1530,7 @@ void apple2e_state::accel_reset()
 	{
 		m_accel_unlocked = false;
 		m_accel_stage = 0;
-		m_accel_slotspk = 0xE4; // slots 7, 6, 5, 2 slow
+		m_accel_slotspk = 0xe4; // slots 7, 6, 5, 2 slow
 		m_accel_gameio = 0x40;  // paddle delay on
 		m_accel_disable_delay = false;
 
@@ -2884,7 +2884,7 @@ u8 apple2e_state::c080_r(offs_t offset)
 {
 	int slot;
 
-	offset &= 0x7F;
+	offset &= 0x7f;
 	slot = offset / 0x10;
 
 	if (slot == 0)
@@ -2922,7 +2922,7 @@ void apple2e_state::c080_w(offs_t offset, u8 data)
 {
 	int slot;
 
-	offset &= 0x7F;
+	offset &= 0x7f;
 	slot = offset / 0x10;
 
 	if (slot == 0)

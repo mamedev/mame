@@ -7,7 +7,7 @@
 **************************************************************************/
 #include "cpu/tms34010/tms34010.h"
 #include "sound/okim6295.h"
-#include "video/tlc34076.h"
+#include "video/bt47x.h"
 
 class artmagic_state : public driver_device
 {
@@ -17,7 +17,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_oki(*this, "oki")
 		, m_tms(*this, "tms")
-		, m_tlc34076(*this, "tlc34076")
+		, m_ramdac(*this, "ramdac")
 		, m_control(*this, "control")
 		, m_vram(*this, "vram%u", 0U)
 		, m_blitter_base(*this, "gfx")
@@ -47,7 +47,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<tms34010_device> m_tms;
-	required_device<tlc34076_device> m_tlc34076;
+	required_device<bt476_device> m_ramdac;
 
 	required_shared_ptr<uint16_t> m_control;
 	required_shared_ptr_array<uint16_t, 2> m_vram;

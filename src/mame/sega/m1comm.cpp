@@ -107,6 +107,7 @@ void m1comm_device::device_add_mconfig(machine_config &config)
 	Z80(config, m_cpu, 8000000); // 32 MHz / 4
 	m_cpu->set_memory_map(&m1comm_device::m1comm_mem);
 	m_cpu->set_io_map(&m1comm_device::m1comm_io);
+	m_cpu->set_irq_acknowledge_callback(FUNC(m1comm_device::cpu_acknowledge_irq));
 
 	AM9517A(config, m_dma, 8000000); // 32 MHz / 4
 	m_dma->out_hreq_callback().set(FUNC(m1comm_device::dma_hreq_w));
@@ -171,6 +172,12 @@ m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, dev
 
 void m1comm_device::device_start()
 {
+	save_pointer(NAME(m_shared), 0x1000);
+	save_item(NAME(m_syn));
+	save_item(NAME(m_zfg));
+	save_item(NAME(m_cn));
+	save_item(NAME(m_fg));
+	save_item(NAME(m_irq_vector));
 }
 
 //-------------------------------------------------
@@ -183,6 +190,7 @@ void m1comm_device::device_reset()
 	m_zfg = 0;
 	m_cn = 0;
 	m_fg = 0;
+	m_irq_vector = 0;
 }
 
 void m1comm_device::device_reset_after_children()
@@ -210,7 +218,8 @@ void m1comm_device::dma_mem_w(offs_t offset, uint8_t data)
 
 void m1comm_device::dlc_int7_w(int state)
 {
-	m_cpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff); // Z80
+	m_irq_vector = 0xff;
+	m_cpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 uint8_t m1comm_device::syn_r()
@@ -303,11 +312,17 @@ void m1comm_device::check_vint_irq()
 #ifndef M1COMM_SIMULATION
 	if (m_syn & 0x02)
 	{
-		m_cpu->set_input_line_and_vector(0, HOLD_LINE, 0xef); // Z80
+		m_irq_vector = 0xef;
+		m_cpu->set_input_line(0, HOLD_LINE);
 	}
 #else
 	comm_tick();
 #endif
+}
+
+IRQ_CALLBACK_MEMBER(m1comm_device::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 #ifdef M1COMM_SIMULATION

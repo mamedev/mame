@@ -609,6 +609,8 @@ void floppy_image_device::device_start()
 	save_item(NAME(m_cache_index));
 	save_item(NAME(m_cache_entry));
 	save_item(NAME(m_cache_weak));
+	save_item(NAME(m_cache_weak_start));
+	save_item(NAME(m_cache_weak_id));
 	save_item(NAME(m_image_dirty));
 	save_item(NAME(m_ready_counter));
 	save_item(NAME(m_phases));
@@ -1137,18 +1139,45 @@ attotime floppy_image_device::position_to_time(const attotime &base, int positio
 	return base + attotime::from_double(position/m_angular_speed);
 }
 
+namespace {
+
+bool is_neutral(u32 entry)
+{
+	u32 const type = entry & floppy_image::MG_MASK;
+	return type == floppy_image::MG_N || type == floppy_image::MG_D;
+}
+
+constexpr s64 WEAK_SLOT_NS = 60000;
+constexpr u32 WEAK_SPREAD_NS = 50000;
+
+} // anonymous namespace
+
 void floppy_image_device::cache_fill_index(const std::vector<uint32_t> &buf, int &index, attotime &base)
 {
-	int cells = buf.size();
+	int const cells = buf.size();
 
 	m_cache_index = index;
 	m_cache_start_time = position_to_time(base, buf[index] & floppy_image::TIME_MASK);
 	m_cache_entry = buf[m_cache_index];
 
-	index ++;
-	if(index >= cells) {
-		index = 0;
-		base += m_rev_time;
+	bool const neutral = is_neutral(m_cache_entry);
+	int span = 0;
+	do {
+		index ++;
+		span ++;
+		if(index >= cells) {
+			index = 0;
+			base += m_rev_time;
+		}
+	} while(neutral && span < cells && is_neutral(buf[index]));
+
+	if(neutral && span >= cells) {
+		// Nothing but neutral surface, there is no zone boundary at all
+		m_cache_index = 0;
+		m_cache_entry = floppy_image::MG_N;
+		m_cache_start_time = attotime::zero;
+		m_cache_end_time = attotime::never;
+		return;
 	}
 
 	m_cache_end_time = position_to_time(base, buf[index] & floppy_image::TIME_MASK);
@@ -1159,6 +1188,7 @@ void floppy_image_device::cache_clear()
 	m_cache_start_time = m_cache_end_time = m_cache_weak_start = attotime::zero;
 	m_cache_index = 0;
 	m_cache_entry = 0;
+	m_cache_weak_id = 0;
 	m_cache_weak = false;
 }
 
@@ -1192,6 +1222,18 @@ void floppy_image_device::cache_fill(const attotime &when)
 		index = int(it - buf.begin()) - 1;
 	}
 
+	// If in the middle of a neutral run, go back to its first entry
+	if(is_neutral(buf[index])) {
+		for(uint32_t step = 1; step < cells && is_neutral(buf[index ? index - 1 : cells - 1]); step++) {
+			if(index) {
+				index--;
+			} else {
+				index = cells - 1;
+				base -= m_rev_time;
+			}
+		}
+	}
+
 	for(;;) {
 		cache_fill_index(buf, index, base);
 		if(m_cache_end_time > when) {
@@ -1203,8 +1245,9 @@ void floppy_image_device::cache_fill(const attotime &when)
 
 void floppy_image_device::cache_weakness_setup()
 {
-	u32 type = m_cache_entry & floppy_image::MG_MASK;
-	if(type == floppy_image::MG_N || type == floppy_image::MG_D) {
+	m_cache_weak_id = m_cache_entry & floppy_image::TIME_MASK;
+
+	if(is_neutral(m_cache_entry)) {
 		m_cache_weak = true;
 		m_cache_weak_start = m_cache_start_time;
 		return;
@@ -1223,25 +1266,23 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	if(!m_image || m_mon || m_media_changing)
 		return attotime::never;
 
-	if(from_when < m_cache_start_time || m_cache_start_time.is_zero() || (!m_cache_end_time.is_never() && from_when >= m_cache_end_time))
+	if(from_when < m_cache_start_time || (!m_cache_end_time.is_never() && from_when >= m_cache_end_time))
 		cache_fill(from_when);
 
 	if(!m_cache_weak)
 		return m_cache_end_time;
 
-	// Put a flux transition in the middle of a 4us interval with a 50% probability
-	uint64_t interval_index = (from_when < m_cache_weak_start) ? 0 : (from_when - m_cache_weak_start).as_ticks(250000);
-	attotime weak_time = m_cache_weak_start + attotime::from_ticks(interval_index*2+1, 500000);
-	for(;;) {
-		if(weak_time >= m_cache_end_time)
+	u32 const key = hash32(hash32(m_revolution_count ^ 0x4242) + m_cache_weak_id);
+	u64 slot = from_when > m_cache_weak_start
+		? (from_when - m_cache_weak_start).as_ticks(1000000) / (WEAK_SLOT_NS / 1000)
+		: 0;
+	for(;; slot++) {
+		u32 const h = hash32(key + u32(slot) * 0x9e3779b9U);
+		attotime const trigger = m_cache_weak_start + attotime::from_nsec(s64(slot) * WEAK_SLOT_NS + h % WEAK_SPREAD_NS);
+		if(trigger >= m_cache_end_time)
 			return m_cache_end_time;
-		if(weak_time > from_when) {
-			u32 test = hash32(hash32(hash32(hash32(m_revolution_count) ^ 0x4242) + m_cache_index) + interval_index);
-			if(test & 1)
-				return weak_time;
-		}
-		weak_time += attotime::from_usec(4);
-		interval_index ++;
+		if(trigger > from_when)
+			return trigger;
 	}
 }
 

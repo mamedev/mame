@@ -48,6 +48,7 @@ bgfx_chain::bgfx_chain(
 	, m_current_time(0)
 	, m_screen_index(screen_index)
 	, m_has_converter(false)
+	, m_has_adjuster(false)
 {
 	for (bgfx_target* target : m_target_list)
 	{

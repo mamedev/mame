@@ -320,7 +320,7 @@ void pc88va_kbd_device::device_reset()
 uint8_t pc88va_kbd_device::translate(uint8_t row, uint8_t column)
 {
 	// this table produces same-ish scancodes as the one in pc98_kbd
-	// TODO: some stuff currently unmapped
+	// TODO: some stuff currently unmapped, implement key modifiers
 	const u8 keytable[0x80] = {
 //      [0],   [1],   [2],   [3],   [4],   [5],   [6],   [7]
 		0x4e,  0x4a,  0x4b,  0x4c,  0x46,  0x47,  0x48,  0x42,
@@ -335,7 +335,7 @@ uint8_t pc88va_kbd_device::translate(uint8_t row, uint8_t column)
 //      X,     Y,     Z,     [,     ¥,     ],     ^,     -
 		0x2a,  0x15,  0x29,  0x1b,  0xff,  0x28,  0x0c,  0x0b,
 //      0,     1,     2,     3,     4,     5,     6,     7
-		0x00,  0x01,  0x02,  0x03,  0x04,  0x05,  0x06,  0x07,
+		0x0a,  0x01,  0x02,  0x03,  0x04,  0x05,  0x06,  0x07,
 //      8,     9,     ：,     ；,     ，,     ．,    /,     ＿
 		0x08,  0x09,  0x27,  0x26,  0x30,  0x31,  0x32,  0x33,
 //      HOME,                INS,

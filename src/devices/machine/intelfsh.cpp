@@ -135,6 +135,7 @@ DEFINE_DEVICE_TYPE(SST_39VF020,              sst_39vf020_device,              "s
 DEFINE_DEVICE_TYPE(SST_49LF020,              sst_49lf020_device,              "sst_49lf020",              "SST 49LF020 Flash")
 
 DEFINE_DEVICE_TYPE(SHARP_LH28F400,           sharp_lh28f400_device,           "sharp_lh28f400",           "Sharp LH28F400 Flash")
+DEFINE_DEVICE_TYPE(SHARP_LH28F800SG,         sharp_lh28f800sg_device,         "sharp_lh28f800sg",         "Sharp LH28F800SG Flash")
 DEFINE_DEVICE_TYPE(INTEL_E28F008SA,          intel_e28f008sa_device,          "intel_e28f008sa",          "Intel E28F008SA Flash")
 DEFINE_DEVICE_TYPE(INTEL_TE28F160,           intel_te28f160_device,           "intel_te28f160",           "Intel TE28F160 Flash")
 DEFINE_DEVICE_TYPE(SHARP_LH28F160S3,         sharp_lh28f160s3_device,         "sharp_lh28f160s3",         "Sharp LH28F160S3 Flash")
@@ -266,7 +267,7 @@ amd_29f800t_device::amd_29f800t_device(const machine_config &mconfig, const char
 	: intelfsh8_device(mconfig, AMD_29F800T, tag, owner, clock, 0x100000, MFG_AMD, 0xda) { m_top_boot_sector = true; m_has_reset_pin = true; }
 
 amd_29f800b_16bit_device::amd_29f800b_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, AMD_29F800B_16BIT, tag, owner, clock, 0x100000, MFG_AMD, 0x2258) { m_top_boot_sector = false; m_has_reset_pin = true; }
+	: intelfsh16_device(mconfig, AMD_29F800B_16BIT, tag, owner, clock, 0x100000, MFG_AMD, 0x2258) { m_bot_boot_sector = true; m_has_reset_pin = true; }
 
 amd_29lv160dt_device::amd_29lv160dt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, AMD_29LV160DT, tag, owner, clock, 0x200000, MFG_AMD, 0xc4) { m_has_reset_pin = true; }
@@ -330,6 +331,10 @@ sst_49lf020_device::sst_49lf020_device(const machine_config &mconfig, const char
 
 sharp_lh28f400_device::sharp_lh28f400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh16_device(mconfig, SHARP_LH28F400, tag, owner, clock, 0x80000, MFG_SHARP, 0xed) { m_has_reset_pin = true; }
+
+// 16 symmetrical 64KB blocks
+sharp_lh28f800sg_device::sharp_lh28f800sg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh16_device(mconfig, SHARP_LH28F800SG, tag, owner, clock, 0x100000, MFG_SHARP, 0x50) { }
 
 intel_te28f160_device::intel_te28f160_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh16_device(mconfig, INTEL_TE28F160, tag, owner, clock, 0x200000, MFG_SHARP, 0xd0) { m_has_reset_pin = true; }

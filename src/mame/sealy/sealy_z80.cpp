@@ -618,6 +618,24 @@ ROM_START( bbddz )
 	ROM_LOAD( "93c46", 0x00, 0x80, BAD_DUMP CRC(6ca3a909) SHA1(2f55f4040bcab30387d7cc7fecbdcf4d5762a3ed) ) // default with standard control panel
 ROM_END
 
+// only program ROM differs
+ROM_START( bbddza )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "rom3.u11", 0x00000, 0x20000, CRC(f26f88f2) SHA1(49d4a880739704a3a4296b5ca14f0fcb49d6f059) )
+
+	ROM_REGION16_LE( 0x200000, "bgtiles", 0 )
+	ROM_LOAD( "rom2.u18", 0x000000, 0x200000, CRC(1ee033bb) SHA1(14ab0702e17add44dfc82ce21dd5a37c05a1b2a2) )
+
+	ROM_REGION16_LE( 0x200000, "fgtiles", 0 )
+	ROM_LOAD( "rom1.u21", 0x000000, 0x200000, CRC(937e9e76) SHA1(95907ddadc2bf260d88a391ab1f61e8931ec7cc3) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "rom4.u13", 0x00000, 0x80000, CRC(249b1a34) SHA1(94af1a9c64fb7d06a7510d527c176b2fa6845885) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46", 0x00, 0x80, BAD_DUMP CRC(6ca3a909) SHA1(2f55f4040bcab30387d7cc7fecbdcf4d5762a3ed) ) // default with standard control panel
+ROM_END
+
 // 斗地主 (Dòu Dìzhǔ). All labels prepend 斗地主 to what's below
 ROM_START( ddz1 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -1112,7 +1130,8 @@ void sealy_z80_eeprom_state::init_wakenz80()
 } // anonymous namespace
 
 
-GAME( 2005, bbddz,    0,     sealy,    djddz,    sealy_z80_eeprom_state,   init_bbddz,    ROT0, "Sealy", "Bai Bian Dou Dizhu",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2005, bbddz,    0,     sealy,    djddz,    sealy_z80_eeprom_state,   init_bbddz,    ROT0, "Sealy", "Bai Bian Dou Dizhu (set 1)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2005, bbddza,   bbddz, sealy,    djddz,    sealy_z80_eeprom_state,   init_bbddz,    ROT0, "Sealy", "Bai Bian Dou Dizhu (set 2)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2002, ddz1,     0,     ddz1,     ddz1,     sealy_z80_esam_state,     init_ddz1,     ROT0, "Sealy", "Dou Dizhu (Sealy)",                        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2003, ddz2,     0,     sealy,    djddz,    sealy_z80_eeprom_state,   init_ddz2,     ROT0, "Sealy", "Dou Dizhu II (set 1)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2003, ddz2a,    ddz2,  sealy,    djddz,    sealy_z80_eeprom_state,   init_ddz2,     ROT0, "Sealy", "Dou Dizhu II (set 2)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

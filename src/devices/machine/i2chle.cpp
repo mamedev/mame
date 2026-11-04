@@ -246,7 +246,7 @@ void i2c_hle_interface::scl_write(int state)
 					if (m_scl)
 					{
 						// did the master ACK or NACK?
-						if (m_sda)
+						if (m_sda && master_nack_stops())
 						{
 							LOGMASKED(LOG_DATAOUT, "%s: master NACK\n", get_tag());
 							m_state = STATE_IDLE;

@@ -548,7 +548,10 @@ void lk201_device::device_reset()
 	m_count->adjust(attotime::from_hz(1200), 0, attotime::from_hz(1200));
 	memset(m_timer.regs, 0, sizeof(m_timer.regs));
 
+	sci_ctl2 = 0;
 	sci_status = (SCSR_TC | SCSR_TDRE);
+	sci_tdr = 0;
+	sci_tdr_full = false;
 
 	spi_status = 0;
 	spi_data = 0;
@@ -564,14 +567,21 @@ void lk201_device::device_reset()
 	m_led_compose = 0; // led9
 	m_led_lock = 0;    // led10
 	m_led_hold = 0;    // led11
+
+	update_interrupts();
+	update_timer_interrupt();
 }
 
 TIMER_CALLBACK_MEMBER(lk201_device::timer_irq)
 {
 	m_timer.tsr |= TSR_OCFL;
+	update_timer_interrupt();
+}
 
-	if ((m_timer.tcr & TCR_OCIE) && (m_timer.tsr & TSR_OCFL))
-		m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ASSERT_LINE);
+void lk201_device::update_timer_interrupt()
+{
+	// the output compare interrupt is requested while OCFL is set and enabled
+	m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ((m_timer.tcr & TCR_OCIE) && (m_timer.tsr & TSR_OCFL)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(lk201_device::beeper_off)
@@ -593,7 +603,18 @@ void lk201_device::rcv_complete()
 
 void lk201_device::tra_complete()
 {
-	sci_status |= (SCSR_TC | SCSR_TDRE);
+	// a byte waiting in the transmit data register follows at once; transmit
+	// complete only when there is none
+	if (sci_tdr_full)
+	{
+		sci_tdr_full = false;
+		transmit_register_setup(sci_tdr);
+		sci_status |= SCSR_TDRE;
+	}
+	else
+	{
+		sci_status |= (SCSR_TC | SCSR_TDRE);
+	}
 	update_interrupts();
 }
 
@@ -634,7 +655,7 @@ uint8_t lk201_device::timer_r(offs_t offset)
 	if(m_timer.tsr)
 	{
 		m_timer.tsr = 0;
-		m_maincpu->set_input_line(M68HC05EG_INT_TIMER, CLEAR_LINE);
+		update_timer_interrupt();
 	}
 	return ret;
 }
@@ -648,6 +669,9 @@ void lk201_device::timer_w(offs_t offset, uint8_t data)
 
 	switch (offset)
 	{
+	case 0: // TCR: OCIE enables or withdraws a pending request
+		update_timer_interrupt();
+		break;
 	case 4: // OCRH
 		save_tsr = m_timer.tsr; //  prevent crashes in between OCRH / OCRL loads
 		m_timer.tsr &= (255-TSR_OCFL); // OCFL flag tested for zero in TIMER routine
@@ -815,7 +839,6 @@ uint8_t lk201_device::sci_r(offs_t offset)
 		case SCI_SCDR:  // Data
 			incoming = get_received_char();
 			sci_status &= ~SCSR_RDRF;
-			m_maincpu->set_input_line(M68HC05EG_INT_CPI, 0);
 			update_interrupts();
 			break;
 	}
@@ -845,9 +868,22 @@ void lk201_device::sci_w(offs_t offset, uint8_t data)
 
 		case SCI_SCDR:  // Data
 //          printf("LK201: sending %02x\n", data);
-			transmit_register_setup(data);
-			sci_status &= ~(SCSR_TC | SCSR_TDRE);
-			m_maincpu->set_input_line(M68HC05EG_INT_CPI, 0);
+			// the transmit data register is double buffered: it moves to the shift
+			// register when that is idle, emptying again, or waits for the byte
+			// being sent (a write while it is still full replaces it); TDRE is set
+			// at once here, where the chip sets it as the byte moves (not modelled)
+			sci_status &= ~SCSR_TC;
+			if (is_transmit_register_empty())
+			{
+				transmit_register_setup(data);
+				sci_status |= SCSR_TDRE;
+			}
+			else
+			{
+				sci_tdr = data;
+				sci_tdr_full = true;
+				sci_status &= ~SCSR_TDRE;
+			}
 			update_interrupts();
 			break;
 	}

@@ -82,8 +82,7 @@ public:
 		, m_led(*this, "led%u", 0U)
 	{}
 
-	void base_config(machine_config &config, bool use_8254 = true);
-	void s612(machine_config &config);
+	void s612(machine_config &config) ATTR_COLD;
 
 	ioport_value cass_sense_r() { return m_cass->sense_r(); }
 	ioport_value cass_data_r() { return m_cass->read(); }
@@ -97,6 +96,8 @@ protected:
 
 	virtual void machine_start() override ATTR_COLD;
 
+	void base_config(machine_config &config, bool use_8254 = true) ATTR_COLD;
+
 	virtual void common_map(address_map &map) ATTR_COLD;
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
@@ -104,29 +105,29 @@ protected:
 	TIMER_CALLBACK_MEMBER(refresh_timer);
 
 	void led_digit_w(u8 data) { m_led_digit = data; }
-	template<int Num> void led_w(int state) { m_led[Num] = state; }
+	template <int Num> void led_w(int state) { m_led[Num] = state; }
 
 	void dma_w(offs_t offset, u8 data);
 	u8 dma_r(offs_t offset);
 
-	template<int Voice> void voice_bank_sel_w(u8 data);
+	template <int Voice> void voice_bank_sel_w(u8 data);
 	void cpu_bank_sel_w(u8 data);
 	void cpu_bank_msb_w(offs_t offset, u8 data);
 	void cpu_bank_lsb_w(offs_t offset, u8 data);
 	u8 cpu_bank_msb_r(offs_t offset);
 	u8 cpu_bank_lsb_r(offs_t offset);
 
-	template<int Voice> void dreq_set_w(int state);
-	template<int Voice> void dreq_clear_w(int state);
-	template<int Num> void dma_eop_w(int state);
+	template <int Voice> void dreq_set_w(int state);
+	template <int Voice> void dreq_clear_w(int state);
+	template <int Num> void dma_eop_w(int state);
 
 	u8 dma_io_r(offs_t offset);
 	void dma_mem_w(offs_t offset, u8 data);
-	template<int Voice> void dma_io_w(offs_t offset, u8 data);
+	template <int Voice> void dma_io_w(offs_t offset, u8 data);
 
 	void mute_w(int state);
 	void overdub_w(int state);
-	template<int Voice> void envelope_w(u8 data);
+	template <int Voice> void envelope_w(u8 data);
 
 	required_device<z80_device> m_maincpu;
 	required_device<input_merger_any_high_device> m_irq;
@@ -168,7 +169,7 @@ public:
 		, m_sl(*this, "SL%u", 0)
 	{}
 
-	void s700(machine_config &config);
+	void s700(machine_config &config) ATTR_COLD;
 
 	ioport_value dial_r();
 
@@ -180,7 +181,7 @@ protected:
 
 	HD44780_PIXEL_UPDATE(lcd_update);
 
-	template<int Voice> void env_strobe_w(int state);
+	template <int Voice> void env_strobe_w(int state);
 	void env_latch_w(offs_t offset, u8 data);
 
 	void sl_w(u8 data) { m_sl_select = data; }
@@ -207,7 +208,7 @@ public:
 		, m_pitch(*this, "PITCH")
 	{}
 
-	void x7000(machine_config &config);
+	void x7000(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -630,7 +631,7 @@ u8 s612_state::dma_r(offs_t offset)
 }
 
 /**************************************************************************/
-template<int Voice>
+template <int Voice>
 void s612_state::voice_bank_sel_w(u8 data)
 {
 	m_voice_bank[Voice]->set_bank(data & 0x7);
@@ -671,14 +672,14 @@ u8 s612_state::cpu_bank_lsb_r(offs_t offset)
 }
 
 /**************************************************************************/
-template<int Voice>
+template <int Voice>
 void s612_state::dreq_set_w(int state)
 {
 	// DREQ is generated on both clock edges
 	m_dma[Voice / 4]->dreq_w<Voice % 4>(0);
 }
 /**************************************************************************/
-template<int Voice>
+template <int Voice>
 void s612_state::dreq_clear_w(int state)
 {
 	if (!state)
@@ -686,7 +687,7 @@ void s612_state::dreq_clear_w(int state)
 }
 
 /**************************************************************************/
-template<int Num>
+template <int Num>
 void s612_state::dma_eop_w(int state)
 {
 	m_dma_eop[Num] = state;
@@ -706,7 +707,7 @@ void s612_state::dma_mem_w(offs_t offset, u8 data)
 }
 
 /**************************************************************************/
-template<int Voice>
+template <int Voice>
 void s612_state::dma_io_w(offs_t offset, u8 data)
 {
 	const u16 sample = m_voice_bank[Voice]->read16(offset);
@@ -729,14 +730,14 @@ void s612_state::overdub_w(int state)
 }
 
 /**************************************************************************/
-template<int Voice>
+template <int Voice>
 void s612_state::envelope_w(u8 data)
 {
 	m_dac[Voice]->set_output_gain(0, data / 255.0);
 }
 
 /**************************************************************************/
-template<int Voice>
+template <int Voice>
 void s700_state::env_strobe_w(int state)
 {
 	if (state)

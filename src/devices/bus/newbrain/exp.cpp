@@ -49,6 +49,7 @@ newbrain_expansion_slot_device::newbrain_expansion_slot_device(const machine_con
 	m_card(nullptr),
 	m_write_int(*this),
 	m_write_m1_wait(*this),
+	m_write_busrq(*this),
 	m_read_host(*this, 0xff),
 	m_write_host(*this),
 	m_read_main(*this, 0xff),
@@ -162,6 +163,19 @@ void newbrain_expansion_slot_device::page_w(int page, offs_t offset, uint8_t dat
 	if (m_card != nullptr)
 	{
 		m_card->page_w(page, offset, data);
+	}
+}
+
+
+//-------------------------------------------------
+//  busak_w - bus acknowledge
+//-------------------------------------------------
+
+void newbrain_expansion_slot_device::busak_w(int state)
+{
+	if (m_card != nullptr)
+	{
+		m_card->busak_w(state);
 	}
 }
 

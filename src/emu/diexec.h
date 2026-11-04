@@ -161,8 +161,6 @@ public:
 
 	// input and interrupt management
 	void set_input_line(int linenum, int state) { assert(device().started()); m_input[linenum].set_state_synced(state); }
-	[[deprecated("set_input_line_and_vector is deprecated; use set_irq_acknowledge_callback instead")]]
-	void set_input_line_and_vector(int linenum, int state, int vector) { assert(device().started()); m_input[linenum].set_state_synced(state, vector); }
 	int input_line_state(int linenum) const { assert(device().started()); return m_input[linenum].m_curstate; }
 	void pulse_input_line(int irqline, const attotime &duration);
 
@@ -247,23 +245,18 @@ private:
 	// internal information about the state of inputs
 	class device_input
 	{
-		static constexpr int USE_STORED_VECTOR = 0xff000000;
-
 	public:
 		device_input();
 
 		void start(device_execute_interface &execute, int linenum);
 		void reset();
 
-		void set_state_synced(int state, int vector = USE_STORED_VECTOR);
-		void set_vector(int vector) { m_stored_vector = vector; }
+		void set_state_synced(int state);
 		int default_irq_callback();
 
 		device_execute_interface *m_execute;// pointer to the execute interface
 		int             m_linenum;          // which input line we are
 
-		s32             m_stored_vector;    // most recently written vector
-		s32             m_curvector;        // most recently processed vector
 		u8              m_curstate;         // most recently processed state
 		s32             m_queue[32];        // queue of pending events
 		int             m_qindex;           // index within the queue

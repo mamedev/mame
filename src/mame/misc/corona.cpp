@@ -341,7 +341,7 @@
 
 #include "re800.lh"
 #include "luckyrlt.lh"
-#include "rula.lh"
+#include "rula_v.lh"
 
 
 namespace {
@@ -926,11 +926,11 @@ void corona_state::re800_sound_cpu_io_map(address_map &map)
 }
 
 
-/* Lucky Roulette
+/* Lucky Roulette Plus
 
   Blitter: F0-F4
   Status:  F5
-  Ball:    F9
+  Ball:    F9   (inverted LED-matrix)
 
   F8       R-   DIP switches?
   FA       R-   DIP switches?
@@ -2267,4 +2267,4 @@ GAMEL( 1991, luckyrlta, luckyrlt, luckyrlta, luckyrlt, corona_state, empty_init,
 
 // Miky SRL games
 GAME(  1989, monte,     0,        monte,     monte,    corona_state, init_monte, ROT0,   "Miky SRL",                 "Monte (4-players Spanish cards game. Prototype, encrypted)", 0 )
-GAMEL( 1991, rula,      0,        rula,      rula,     corona_state, init_monte, ROT90,  "Miky SRL",                 "Rula (6-players roulette, encrypted)",            0,                        layout_rula )
+GAMEL( 1991, rula,      0,        rula,      rula,     corona_state, init_monte, ROT90,  "Miky SRL",                 "Rula (6-players roulette, encrypted)",            0,                        layout_rula_v )

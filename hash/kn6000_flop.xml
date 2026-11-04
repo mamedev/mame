@@ -21,7 +21,7 @@ files, which a dump of an original could supersede.
 		<publisher>Technics</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="idd6000.img" size="1474560" crc="22d5ad15" sha1="23806eda1e642da3d763f1702ea5eaa7ca0e54d7"/>
+				<rom name="idd6000.img" size="1474560" crc="bd8a2e77" sha1="b4a3c41e01efd01572e3ab0417fddfac3fba2bbe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32,7 +32,7 @@ files, which a dump of an original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="ca6000p.img" size="1474560" crc="ddd68b2f" sha1="d66efc55ceb08b72992d4fd61a7bf382549f2da3"/>
+				<rom name="ca6000p.img" size="1474560" crc="edaf5d60" sha1="89cf8fb24b3b3c538425e8b8bdab9f64a2811d3f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -43,7 +43,7 @@ files, which a dump of an original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="ca6000s.img" size="1474560" crc="c9e1c0c2" sha1="aec302f5989ae543257f1e6604dd107cc8196b0a"/>
+				<rom name="ca6000s.img" size="1474560" crc="cb1ca666" sha1="146edb7eb77c9d8ec088d0e32253f870b2dbd540"/>
 			</dataarea>
 		</part>
 	</software>
@@ -54,7 +54,7 @@ files, which a dump of an original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="ca6001.img" size="1474560" crc="4ca31a64" sha1="a3f7950ee59897e76e3f7dfe7a10ab43730c84c8"/>
+				<rom name="ca6001.img" size="1474560" crc="56ea2caa" sha1="981dd997ac8221759209c7e81544e5f32bd60a48"/>
 			</dataarea>
 		</part>
 	</software>
@@ -65,7 +65,7 @@ files, which a dump of an original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="ca6002.img" size="1474560" crc="1a1b7c92" sha1="d0c2ffbd608d388ce2334dd646ed54632de0e35b"/>
+				<rom name="ca6002.img" size="1474560" crc="b725b696" sha1="23b1da8fc7d959b811af4d2240aa77845df181b9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -76,7 +76,7 @@ files, which a dump of an original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="ca6003.img" size="1474560" crc="9cadb418" sha1="ea0d73f259e9d0791aa7eea92e90ef238ea6e866"/>
+				<rom name="ca6003.img" size="1474560" crc="0a5d06ad" sha1="6893eb0878f5dcbee936cde9103f161aec01c9bf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -87,7 +87,7 @@ files, which a dump of an original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="ca6004.img" size="1474560" crc="2efe8cf6" sha1="76673a18b457e65b3deafe13d214b1713b39d5ff"/>
+				<rom name="ca6004.img" size="1474560" crc="58f9aefe" sha1="43597244357a399972cd831609d96a32fffe071d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -98,7 +98,7 @@ files, which a dump of an original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="ca6005.img" size="1474560" crc="f3137b2e" sha1="d98161d888224c25181092858d48a6178a8fd949"/>
+				<rom name="ca6005.img" size="1474560" crc="c47e8ab5" sha1="def3e86e7effc7ae15e03280941714d365205c0f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -109,7 +109,7 @@ files, which a dump of an original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="ca6006.img" size="1474560" crc="d49efc3e" sha1="ba3cc02c2b76f0e8778520f79400020f31645cbd"/>
+				<rom name="ca6006.img" size="1474560" crc="0cb81991" sha1="9067d8b91255f9a565b3c6ead9ec133eec2d177f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -120,7 +120,7 @@ files, which a dump of an original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="ca6007.img" size="1474560" crc="6c0b496d" sha1="482c8d74242fc87a6b1535fdd2a06b04f45f3f35"/>
+				<rom name="ca6007.img" size="1474560" crc="4336c345" sha1="378b4afeb229197afb043f8aa7aaad72db52cb99"/>
 			</dataarea>
 		</part>
 	</software>
@@ -131,7 +131,7 @@ files, which a dump of an original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="ca6008.img" size="1474560" crc="4eea8f0d" sha1="fb80b983730d482aca0afb2bf0eefb308eed2575"/>
+				<rom name="ca6008.img" size="1474560" crc="656030d5" sha1="d0b52e1d4955087ef6b29f6b87877d41cb79da0c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -142,7 +142,7 @@ files, which a dump of an original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="ca6009.img" size="1474560" crc="8ae8f027" sha1="565d7df603426a2ad4be06ee8ccbd485f366bbea"/>
+				<rom name="ca6009.img" size="1474560" crc="e4848e3e" sha1="0980bce341e64839f8f4b19651a2029e229fd54b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -153,7 +153,7 @@ files, which a dump of an original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="ca6010.img" size="1474560" crc="a5c5a188" sha1="7aba3f273703d850388d3547670c5fbbc9a859ae"/>
+				<rom name="ca6010.img" size="1474560" crc="ad6a6653" sha1="d2a893801de5846b18d45d6f650ec260d38b92d0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -164,7 +164,7 @@ files, which a dump of an original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="ca6dim.img" size="1474560" crc="58d73084" sha1="97a423fe7a94571fda1e2fb11ad5b0383d335e1f"/>
+				<rom name="ca6dim.img" size="1474560" crc="fbff02b9" sha1="7baaf71e4a70c602ed993a9516291690f885051a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -175,7 +175,7 @@ files, which a dump of an original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="ca6fp01.img" size="1474560" crc="0e907c5d" sha1="2a3c3b2fce2b407c14904a667d878428f7650ffb"/>
+				<rom name="ca6fp01.img" size="1474560" crc="dd412653" sha1="e5f4f3d28ab9cb70621fc17f609f8f707bfeed03"/>
 			</dataarea>
 		</part>
 	</software>
@@ -186,7 +186,7 @@ files, which a dump of an original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="ca6fp02.img" size="1474560" crc="866d83f5" sha1="4a6c1646497e7981e9851588764d3931197f5ef7"/>
+				<rom name="ca6fp02.img" size="1474560" crc="4e4e0f2f" sha1="4326b58202ac4c15b2e113183ec7ea9a2ad4b9ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -197,7 +197,7 @@ files, which a dump of an original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="ca6fp03.img" size="1474560" crc="8aae025a" sha1="07311645aab25a59c8b8874926dc3a622f8a7034"/>
+				<rom name="ca6fp03.img" size="1474560" crc="4e576d82" sha1="7332bfde10fa1c682c4bdb7387e1b5cb01251402"/>
 			</dataarea>
 		</part>
 	</software>
@@ -208,7 +208,7 @@ files, which a dump of an original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="ca6fp04.img" size="1474560" crc="67cc60d5" sha1="a478843deaa025dbdb60f5076d17dcd7443860d0"/>
+				<rom name="ca6fp04.img" size="1474560" crc="973c92d3" sha1="971cfee255fda6869e6a91ad40e9214d98c436a8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -219,7 +219,7 @@ files, which a dump of an original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="ca6tm01.img" size="1474560" crc="b9584878" sha1="cd94bf3ac5c9ca94858716a18d6da3c304b50d19"/>
+				<rom name="ca6tm01.img" size="1474560" crc="1bd931ee" sha1="49f83a36387d1136300dfba3d2410ea140a46c59"/>
 			</dataarea>
 		</part>
 	</software>
@@ -230,7 +230,7 @@ files, which a dump of an original could supersede.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="ca6tm02.img" size="1474560" crc="54b176d3" sha1="011598e7c5e911b885c6aa041276729f934ad788"/>
+				<rom name="ca6tm02.img" size="1474560" crc="8400de72" sha1="d819cdd2f77197f4b4417a4e72356697200c94fb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -241,7 +241,7 @@ files, which a dump of an original could supersede.
 		<publisher>Technics</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="scd6000.img" size="1474560" crc="75abe8e1" sha1="7662dc611ac1305ef33904fc9c428d3aa425c74d"/>
+				<rom name="scd6000.img" size="1474560" crc="a424daba" sha1="c2c284e38b59bcbc3ac6d6aead515881bbc1d12e"/>
 			</dataarea>
 		</part>
 	</software>

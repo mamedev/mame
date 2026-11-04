@@ -857,7 +857,7 @@ end
 --@src/lib/formats/dmk_dsk.h,FORMATS["DMK_DSK"] = true
 --------------------------------------------------
 
-if opt_tool(FORMATS, "DMK_DSK") then
+if opt_tool(FORMATS, "DMK_DSK") or opt_tool(FORMATS, "SDF_DSK") then
 	files {
 		MAME_DIR.. "src/lib/formats/dmk_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/dmk_dsk.h",

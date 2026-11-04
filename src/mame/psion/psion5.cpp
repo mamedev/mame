@@ -5,10 +5,8 @@
     Psion Series 5 (EPOC R3)
 
     TODO:
-    - fix CODEC audio playback/record causes reboot
     - UART support
     - Compact Flash (Etna)
-    - Bezel artwork
 
 ****************************************************************************/
 
@@ -28,6 +26,8 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "psion5.lh"
 
 
 namespace {
@@ -75,6 +75,8 @@ private:
 	void portb_w(uint8_t data);
 	void portd_w(uint8_t data);
 	uint16_t adc_r(offs_t offset);
+	uint8_t etna_porta_r();
+	void etna_porta_w(uint8_t data);
 	void update_amp();
 
 	required_device<arm710a_cpu_device> m_maincpu;
@@ -102,27 +104,19 @@ private:
 
 void psion5_state::init_s5()
 {
-	uint8_t *eeprom = memregion("eeprom")->base();
-
-	// defaults expected by the touchscreen code
-	eeprom[0x0a] = 20;
-	eeprom[0x0b] = 20;
-	eeprom[0x0c] = 20;
-	eeprom[0x0d] = 30;
+	uint16_t *eeprom = &memregion("eeprom")->as_u16();
 
 	// machine unique ID
-	eeprom[0x1b] = 0xde;
-	eeprom[0x1a] = 0xad;
-	eeprom[0x19] = 0xbe;
-	eeprom[0x18] = 0xef;
+	eeprom[0x0c] = 0xbeef;
+	eeprom[0x0d] = 0xdead;
 
 	// calculate the checksum
 	uint8_t chksum = 0;
-	for (int i = 1; i < 0x20; i++)
-		chksum ^= eeprom[i];
+	for (int i = 0; i < 0x0f; i++)
+		chksum ^= (eeprom[i] & 0xff) ^ (eeprom[i] >> 8);
 
 	// EPOC is expecting 0x42
-	eeprom[0x00] = chksum ^ 0x42;
+	eeprom[0x0f] = (chksum ^ 0x42) << 8;
 }
 
 
@@ -199,10 +193,10 @@ uint16_t psion5_state::adc_r(offs_t offset)
 		data = 0;
 		break;
 	case 0xc1: // Digitiser X
-		data = 4079 - (uint16_t)(m_touchx->read() * 5.7);
+		data = m_touchx->read() ^ 0xfff;
 		break;
 	case 0x81: // Digitiser Y
-		data = 3834 - (uint16_t)(m_touchy->read() * 13.225);
+		data = m_touchy->read() ^ 0xfff;
 		break;
 	case 0x91: // Main battery
 		data = 3000;
@@ -213,9 +207,30 @@ uint16_t psion5_state::adc_r(offs_t offset)
 	case 0xa1: // Reference
 		data = 1000;
 		break;
+	case 0xe1: // PCCARD Vcc
+		data = 1320;
+		break;
 	}
 
 	return data;
+}
+
+
+uint8_t psion5_state::etna_porta_r()
+{
+	uint8_t data = 0x00;
+
+	data |= m_eeprom->do_read() << 3;
+
+	return data;
+}
+
+void psion5_state::etna_porta_w(uint8_t data)
+{
+	m_volume = data & 3;
+	update_amp();
+
+	m_eeprom->di_write(BIT(data, 2));
 }
 
 
@@ -236,6 +251,7 @@ void psion5_state::s5_map(address_map &map)
 	map(0x00000000, 0x003fffff).mirror(0x0fc00000).rom().region("maincpu", 0);
 	map(0x10000000, 0x103fffff).mirror(0x0fc00000).rom().region("maincpu", 0x400000);
 	map(0x20000000, 0x20000fff).rw(m_etna, FUNC(etna_device::regs_r), FUNC(etna_device::regs_w));
+	//map(0x40000000, 0x4fffffff).m(m_etna, FUNC(etna_device::pccard_map<0>));
 	map(0x80000000, 0x80001fff).rw(m_soc, FUNC(clps7110_device::periphs_r), FUNC(clps7110_device::periphs_w));
 }
 
@@ -259,10 +275,10 @@ INPUT_CHANGED_MEMBER(psion5_state::touch_down)
 
 INPUT_PORTS_START( psion5 )
 	PORT_START("TOUCHX")
-	PORT_BIT(0x3ff, 362, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0,694) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
+	PORT_BIT(0xfff, 0x800, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(100,3990) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
 
 	PORT_START("TOUCHY")
-	PORT_BIT(0x1ff, 125, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0,279) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
+	PORT_BIT(0xfff, 0x800, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(250,3770) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
 
 	PORT_START("TOUCH")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Touch") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psion5_state::touch_down), 0)
@@ -375,14 +391,18 @@ void psion5_state::psion5(machine_config &config)
 	m_soc->lcd_dma_cb().set(m_ram, FUNC(ram_device::read));
 	m_soc->porta_r().set(FUNC(psion5_state::keyboard_r));
 	m_soc->portb_w().set(FUNC(psion5_state::portb_w));
+	//m_soc->portc_w().set(FUNC(psion5_state::backlight_w)).bit(4);
+	//m_soc->portd_r().set_constant(0x80); // CF fail (active low)
 	m_soc->portd_w().set(FUNC(psion5_state::portd_w));
 	m_soc->pcm_in().set(m_codec, FUNC(psion_codec_device::pcm_out));
 	m_soc->pcm_out().set(m_codec, FUNC(psion_codec_device::pcm_in));
 	m_soc->buz_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_soc->col_cb().set([this](uint8_t data) { m_kbd_scan = data; });
 	m_soc->adc_r().set(FUNC(psion5_state::adc_r));
-	m_soc->set_screen_origin(55, 0);
+	m_soc->set_screen_origin(45, 5);
 	m_soc->set_screen("screen");
+
+	config.set_default_layout(layout_psion5);
 
 	ADC12138(config, "adc");
 
@@ -390,15 +410,15 @@ void psion5_state::psion5(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	ETNA(config, m_etna);
-	m_etna->porta_r().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read)).lshift(3);
-	m_etna->porta_w().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::di_write)).bit(2);
+	m_etna->porta_r().set(FUNC(psion5_state::etna_porta_r));
+	m_etna->porta_w().set(FUNC(psion5_state::etna_porta_w));
 
-	PCCARD_SLOT(config, m_pccard, pcmcia_devices, "cf").set_fixed(true);
-	//m_pccard->cd1().set(m_etna, FUNC(etna_device::write_pc1_cd1));
-	//m_pccard->cd2().set(m_etna, FUNC(etna_device::write_pc1_cd2));
-	//m_pccard->bvd1().set(m_etna, FUNC(etna_device::write_pc1_bvd1));
-	//m_pccard->bvd2().set(m_etna, FUNC(etna_device::write_pc1_bvd2));
-	//m_pccard->wp().set(m_etna, FUNC(etna_device::write_pc1_wp));
+	PCCARD_SLOT(config, m_pccard, pcmcia_devices, "cf");
+	//m_pccard->cd1().set(m_etna, FUNC(etna_device::write_pcm_cd1<0>));
+	//m_pccard->cd2().set(m_etna, FUNC(etna_device::write_pcm_cd2<0>));
+	//m_pccard->bvd1().set(m_etna, FUNC(etna_device::write_pcm_bvd1<0>));
+	//m_pccard->bvd2().set(m_etna, FUNC(etna_device::write_pcm_bvd2<0>));
+	//m_pccard->wp().set(m_etna, FUNC(etna_device::write_pcm_wp<0>));
 
 	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(58);

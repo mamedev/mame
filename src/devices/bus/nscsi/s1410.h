@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
+// copyright-holders:Olivier Galibert, Curt Coder
 #ifndef MAME_BUS_NSCSI_S1410_H
 #define MAME_BUS_NSCSI_S1410_H
 
@@ -25,7 +25,7 @@ public:
 	//         s->set_seek_timing(3000, 85000, 205000, 3600, 1);
 
 protected:
-	// SCSI status returns
+	// error codes, returned in sense byte 0
 	enum {
 		SS_GOOD                 = 0x00,
 		SS_NO_INDEX             = 0x01,
@@ -82,6 +82,8 @@ protected:
 		SK_FORMAT_ERROR         = 0x1a
 	};
 
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 	virtual bool scsi_command_done(uint8_t command, uint8_t length) override;
@@ -92,6 +94,13 @@ protected:
 	virtual attotime scsi_data_command_delay() override;
 
 	uint8_t params[8];
+
+private:
+	bool drive_ready() const;
+	void scsi_error(uint8_t code);
+
+	void z80_mem(address_map &map) ATTR_COLD;
+	void z80_io(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(NSCSI_S1410, nscsi_s1410_device)

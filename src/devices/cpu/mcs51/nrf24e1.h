@@ -34,7 +34,8 @@ protected:
 	virtual bool execute_ready() override;
 	virtual u16 interrupt_mask() override;
 	virtual u16 pending_irq_flags(u16 int_mask) override;
-	virtual unsigned interrupt_priority(unsigned source) const override;
+	virtual u8 interrupt_vector(u32 source) const override;
+	virtual u32 interrupt_priority(u32 source) const override;
 	virtual offs_t external_ram_iaddr(offs_t offset, offs_t mem_mask) override;
 
 private:

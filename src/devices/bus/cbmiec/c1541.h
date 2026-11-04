@@ -48,6 +48,7 @@ protected:
 	required_device<m6502_device> m_maincpu;
 	required_device<floppy_image_device> m_floppy;
 	required_device<via6522_device> m_via0;
+	required_device<via6522_device> m_via1;
 
 	void wpt_callback(floppy_image_device *floppy, int state);
 
@@ -71,7 +72,6 @@ private:
 
 	static void floppy_formats(format_registration &fr);
 
-	required_device<via6522_device> m_via1;
 	required_device<c64h156_device> m_ga;
 	required_ioport m_address;
 	output_finder<2> m_leds;
