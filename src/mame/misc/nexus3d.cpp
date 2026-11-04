@@ -278,10 +278,10 @@ struct nexus3d_poly_data
 class nexus3d_renderer : public poly_manager<float, nexus3d_poly_data, 7>
 {
 public:
-	nexus3d_renderer(running_machine &machine, address_space &space, uint32_t *ram, uint32_t *regs,
+	nexus3d_renderer(running_machine &machine, address_space &space, uint32_t *mainram, uint32_t *texram, uint32_t *regs,
 		float (*working)[4], float (*output)[3][4], uint16_t (*palette)[256])
 		: poly_manager<float, nexus3d_poly_data, 7>(machine),
-		m_space(space), m_ram(ram), m_regs(regs), m_working(working), m_output(output), m_palette(palette)
+		m_space(space), m_mainram(mainram), m_texram(texram), m_regs(regs), m_working(working), m_output(output), m_palette(palette)
 	{ }
 
 	void execute(uint32_t control);
@@ -290,6 +290,7 @@ public:
 private:
 	static uint32_t tiled_address(uint32_t segment, uint32_t x, uint32_t y, bool texture);
 	static uint32_t target_address(uint32_t info, uint32_t x, uint32_t y);
+	uint32_t *memory_pointer(uint32_t address) const;
 	uint16_t read_pixel(uint32_t address) const;
 	void write_pixel(uint32_t address, uint16_t color);
 	void fill_scanline(int32_t y, extent_t const &extent, nexus3d_poly_data const &data, int threadid);
@@ -303,7 +304,8 @@ private:
 	float reg_float(int address) const { return std::bit_cast<float>(m_regs[address / 4]); }
 
 	address_space &m_space;
-	uint32_t *const m_ram;
+	uint32_t *const m_mainram;
+	uint32_t *const m_texram;
 	uint32_t *const m_regs;
 	float (*const m_working)[4];
 	float (*const m_output)[3][4];
@@ -312,7 +314,7 @@ private:
 
 uint32_t nexus3d_renderer::tiled_address(uint32_t segment, uint32_t x, uint32_t y, bool texture)
 {
-	uint32_t address = (segment & 0x3f) << 21;
+	uint32_t address = (segment & 0x7ff) << 21;
 	address |= ((y & 0x3e0) << 11) | ((x & 0x7c0) << 5);
 	if (texture)
 		address |= ((y & 0x1e) << 6) | ((x & 0x3c) << 1) | ((y & 1) << 2) | (x & 3);
@@ -327,18 +329,34 @@ uint32_t nexus3d_renderer::target_address(uint32_t info, uint32_t x, uint32_t y)
 	x *= 2;
 	x = (x & 0x1ff) | (BIT(info, ((x >> 9) & 3) * 2, 2) << 9);
 	y = (y & 0xff) | (BIT(info, 8 + ((y >> 8) & 3) * 2, 2) << 8);
-	return tiled_address(BIT(info, 16, 6), x, y, false);
+	return tiled_address(BIT(info, 16, 11), x, y, false);
+}
+
+uint32_t *nexus3d_renderer::memory_pointer(uint32_t address) const
+{
+	// Sub-segments retain the CPU memory-bank bits: 038 is in main SDRAM,
+	// while 338 is in texture SDRAM. Rasterizer workers use the shared RAM directly.
+	switch (address & 0xf8000000)
+	{
+	case 0x00000000: return &m_mainram[address / 4];
+	case 0x60000000: return &m_texram[(address - 0x60000000) / 4];
+	default: return nullptr;
+	}
 }
 
 uint16_t nexus3d_renderer::read_pixel(uint32_t address) const
 {
-	return m_ram[address >> 2] >> ((address & 2) * 8);
+	uint32_t const *const word = memory_pointer(address);
+	return word ? (*word >> ((address & 2) * 8)) : 0xffff;
 }
 
 void nexus3d_renderer::write_pixel(uint32_t address, uint16_t color)
 {
-	uint32_t const shift = (address & 2) * 8;
-	m_ram[address >> 2] = (m_ram[address >> 2] & ~(0xffffU << shift)) | (uint32_t(color) << shift);
+	if (uint32_t *const word = memory_pointer(address))
+	{
+		uint32_t const shift = (address & 2) * 8;
+		*word = (*word & ~(0xffffU << shift)) | (uint32_t(color) << shift);
+	}
 }
 
 uint16_t nexus3d_renderer::display_pixel(int x, int y) const
@@ -381,13 +399,13 @@ void nexus3d_renderer::fill_scanline(int32_t y, extent_t const &extent, nexus3d_
 {
 	uint32_t const info = m_regs[0xa0 / 4];
 	for (int x = extent.startx; x < extent.stopx; x++)
-		write_pixel(tiled_address(BIT(info, 16, 6), x * 2, y, false), uint16_t(info));
+		write_pixel(tiled_address(BIT(info, 16, 11), x * 2, y, false), uint16_t(info));
 }
 
 void nexus3d_renderer::load_palette()
 {
 	uint32_t const info = m_regs[0x48 / 4];
-	uint32_t const segment = m_regs[0x38 / 4] & 0x3f;
+	uint32_t const segment = m_regs[0x38 / 4] & 0x7ff;
 	uint32_t const x = (BIT(info, 25) << 10) | ((info & 0xff) << 2);
 	uint32_t const y = (BIT(info, 26) << 9) | (BIT(info, 8, 8) << 1);
 	int const count = BIT(info, 17) ? 256 : 16;
@@ -408,7 +426,7 @@ uint16_t nexus3d_renderer::texture_pixel(int u, int v) const
 	v = BIT(info, 1) ? std::clamp(v, 0, int(vmask)) : (v & vmask);
 	uint32_t const xbase = (BIT(info, 25) << 10) | ((size & 0xff) << 2);
 	uint32_t const ybase = (BIT(info, 26) << 9) | (BIT(size, 8, 8) << 1);
-	uint32_t const segment = m_regs[0x38 / 4] & 0x3f;
+	uint32_t const segment = m_regs[0x38 / 4] & 0x7ff;
 	uint32_t address;
 	if (indexed)
 	{
@@ -422,7 +440,7 @@ uint16_t nexus3d_renderer::texture_pixel(int u, int v) const
 		address = tiled_address(segment, xbase + ((u * 2) >> shift), ybase + v, true);
 	if (format >= 2)
 		return read_pixel(address);
-	uint8_t const packed = m_ram[address >> 2] >> ((address & 3) * 8);
+	uint8_t const packed = read_pixel(address) >> ((address & 1) * 8);
 	uint8_t const index = format ? packed : ((packed >> ((u & 1) ? 0 : 4)) & 15);
 	return m_palette[0][index + (format ? 0 : BIT(info, 21, 4) * 16)];
 }
@@ -612,7 +630,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
-		m_fbram(*this, "fbram"),
 		m_texram(*this, "texram"),
 		m_nand(*this, "nand"),
 		m_eeprom(*this, "eeprom"),
@@ -633,7 +650,6 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_mainram;
-	required_shared_ptr<uint32_t> m_fbram;
 	required_shared_ptr<uint32_t> m_texram;
 	required_device<samsung_k9f2g08u0m_device> m_nand;
 	required_device<i2cmem_device> m_eeprom;
@@ -769,7 +785,7 @@ uint8_t nexus3d_state::music_port3_r()
 
 void nexus3d_state::video_start()
 {
-	m_renderer = std::make_unique<nexus3d_renderer>(machine(), m_maincpu->space(AS_PROGRAM), m_texram.target(),
+	m_renderer = std::make_unique<nexus3d_renderer>(machine(), m_maincpu->space(AS_PROGRAM), m_mainram.target(), m_texram.target(),
 		m_graphics_regs, m_gte_working, m_gte_output, m_texture_palette);
 	save_item(NAME(m_graphics_regs));
 	save_item(NAME(m_gte_working));
@@ -793,7 +809,7 @@ uint32_t nexus3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			uint32_t const address = base + y * pitch + x * 2;
 			if (BIT(m_mlc_regs[0], 0) && address >= 0x02000000 && address < 0x02400000)
 			{
-				uint16_t const foreground = m_fbram[(address - 0x02000000) / 4] >> ((address & 2) * 8);
+				uint16_t const foreground = m_mainram[address / 4] >> ((address & 2) * 8);
 				if (!BIT(key, 16) || foreground != uint16_t(key))
 					color = foreground;
 			}
@@ -1202,10 +1218,7 @@ void nexus3d_state::update_display_interrupt()
 
 void nexus3d_state::nexus3d_map(address_map &map)
 {
-	map(0x00000000, 0x01ffffff).ram().share("mainram");
-	map(0x02000000, 0x023fffff).ram().share("fbram"); // boundary tbd, also 8bpp texture RAM storage at around $020axxxx onward
-
-	map(0x02400000, 0x07ffffff).ram();
+	map(0x00000000, 0x07ffffff).ram().share("mainram");
 
 	map(0x60000000, 0x67ffffff).ram().share("texram");
 
