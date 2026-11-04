@@ -7,8 +7,8 @@
 
 #include "cpu/z80/z80.h"
 #include "bus/centronics/ctronics.h"
-#include "bus/scsi/scsi.h"
 #include "imagedev/floppy.h"
+#include "machine/nscsi_cb.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
@@ -126,10 +126,7 @@ class bulletf_state : public bullet_state
 public:
 	bulletf_state(const machine_config &mconfig, device_type type, const char *tag) :
 		bullet_state(mconfig, type, tag),
-		m_scsibus(*this, SCSIBUS_TAG),
-		m_scsi_data_in(*this, "scsi_data_in"),
-		m_scsi_data_out(*this, "scsi_data_out"),
-		m_scsi_ctrl_in(*this, "scsi_ctrl_in")
+		m_scsi(*this, SCSIBUS_TAG ":7:scsicb")
 	{
 	}
 
@@ -147,6 +144,7 @@ private:
 
 	uint8_t dma_mreq_r(offs_t offset);
 	void dma_mreq_w(offs_t offset, uint8_t data);
+	uint8_t pio_pa_r();
 	void pio_pa_w(uint8_t data);
 	void cstrb_w(int state);
 	void req_w(int state);
@@ -159,10 +157,7 @@ protected:
 
 	void update_dma_rdy();
 
-	required_device<scsi_port_device> m_scsibus;
-	required_device<input_buffer_device> m_scsi_data_in;
-	required_device<output_latch_device> m_scsi_data_out;
-	required_device<input_buffer_device> m_scsi_ctrl_in;
+	required_device<nscsi_callback_device> m_scsi;
 
 	int m_rome = 0;
 	uint8_t m_xdma0 = 0U;

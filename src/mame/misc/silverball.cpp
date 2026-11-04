@@ -7,16 +7,26 @@ TAB Austria "Silverball" PC-based touch games
 The Hardlock ASIC keys were recovered from the protected software. No dongle was dumped, so
 the EEPROM contents are reconstructed; original serial numbers and options are unknown.
 
+Windows (95?) setup first checks I/O Controller from UPDATE1.EXE (a DOS program), then boots Windows
+and loads UPDATE2.EXE (where it checks PnP from sound card and dongle functionality from LPT3).
+
+For Bulova sets, Windows is 3.1 (so you need to mash CTRL+C at autoexec.bat time for probing the
+dumps)
+
 TODO:
 - Silverball I/O controller and sound card.
 - i440zx BIOSes crashes when writing Flash ROM sequences at PC=61C51 onward (by saving in CMOS).
 - slvrball806: crashes in vmm32.vxd loading, doesn't check the dongle, -chs mismatch with the
   comment. Commented out for now;
 - has the usual trio64 bugs once it actually enters in Windows;
-- slvrball720: will throw a Windows crash in German around Update 2, dump may be bad;
+- slvrball720: will throw a Windows crash in German around update2.exe, has extra .DLLs failures
+  in Safe Mode, dump is bad (requires manually repairing them thru a Recovery disk);
 - slvrball632: throws "No Silverball soundcard", does PnP talk at $77a, afterwards will try to
   ping dongle at LPT3 ($3bc-$3bf) failing in the process;
-- slvrballbu409: "No sound card found", does a different kind of PnP check than above;
+- slvrballbu409: "No sound card found", does a different kind of PnP check than above, has
+  Chips & Technologies VGA driver loaded in Win 3.1;
+- slvrballbu409b: "TAB Blaster / No sound card found", uses $73xx'xxxx for some kind of data
+  (graphics or work RAM?);
 
 ===================================================================================================
 
@@ -29,6 +39,9 @@ MicroTouch (external)
 ESS AudioDrive ES1869FC ISA sound card (PnP compliant)
 S3 Trio64V2/DX PCI VGA (86C775, 512KB RAM)
 I/O Controller Silverball 3 (ISA card, Actel A40MX04-F PL84, DB50 external connector)
+RTL8139D PCI card (seen on 8.xx configs)
+TODO: the VIA mobo has 1 ISA slot only
+Does it expect a PCI based sound card rather than the AudioDrive?
 
 HDD Samsung Maxtor G1021U2 or other IDE HDD with similar capacity.
 
@@ -258,7 +271,7 @@ void silverball_state::silverball_i440zx(machine_config &config)
 
 	PCI_ROOT(config, "pci");
 	// i440ZX (BX equivalent)
-	// TODO: unknown RAM size
+	// TODO: unknown RAM size, PCI config space is unverified
 	I82443BX_HOST(config, "pci:00.0", "maincpu", 32*1024*1024);
 	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
 	//I82443BX_AGP   (config, "pci:01.0:00.0");
@@ -287,7 +300,9 @@ void silverball_state::silverball_i440zx(machine_config &config)
 	ISA16_SLOT(config, "isa1",   0, "pci:07.0:isabus", isa_internal_devices, "ioc", true);
 	ISA16_SLOT(config, "isa2",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
-	PCI_SLOT(config, "pci:1", pci_cards, 14, 0, 1, 2, 3, "trio64dx");
+	PCI_SLOT(config, "pci:1", pci_cards,  9, 0, 1, 2, 3, "trio64dx");
+	PCI_SLOT(config, "pci:2", pci_cards, 10, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:3", pci_cards, 11, 2, 3, 0, 1, nullptr);
 }
 
 void silverball_state::silverball632_i440zx(machine_config &config)
@@ -383,7 +398,8 @@ ROM_START(slvrball720)
 	ROM_DEFAULT_BIOS("bios33")
 
 	DISK_REGION( PCI_IDE_ID":ide1:0:hdd" )
-	DISK_IMAGE("silverball_7.20", 0, BAD_DUMP SHA1(008d0146b579793f9ba2aa2e43ffa7ec1401f752)) // May contain operator data
+	// baddump: May contain operator data, check header notes
+	DISK_IMAGE("silverball_7.20", 0, BAD_DUMP SHA1(008d0146b579793f9ba2aa2e43ffa7ec1401f752))
 ROM_END
 
 ROM_START(slvrball632)
@@ -421,9 +437,10 @@ ROM_END
 
 GAME(199?, slvrball, 0, silverball_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball BIOS", MACHINE_NOT_WORKING | MACHINE_IS_BIOS_ROOT )
 
-//GAME(1997?, slvrball806,    slvrball, silverball_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (8.01)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)
-GAME(1997?, slvrball720,    slvrball, silverball720_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (7.20)",               MACHINE_NOT_WORKING)
-GAME(1997?, slvrball632,    slvrball, silverball632_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (6.32)",               MACHINE_NOT_WORKING)
+// years from "VERSION" in HDD root filestamp
+//GAME(200?, slvrball806,    slvrball, silverball_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (8.01)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)
+GAME(2002, slvrball720,    slvrball, silverball720_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (7.20)",               MACHINE_NOT_WORKING)
+GAME(2001, slvrball632,    slvrball, silverball632_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (6.32)",               MACHINE_NOT_WORKING)
 
-GAME(199?,  slvrballbu409,  slvrball,      silverballbu_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 1)", MACHINE_NOT_WORKING)
-GAME(199?,  slvrballbu409b, slvrballbu409, silverballbu_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 2)", MACHINE_NOT_WORKING) // Probably the same as set 1
+GAME(1999,  slvrballbu409,  slvrball,      silverballbu_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 1)", MACHINE_NOT_WORKING)
+GAME(1999,  slvrballbu409b, slvrballbu409, silverballbu_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 2)", MACHINE_NOT_WORKING) // Windows 3.1 loaded with different HW drivers

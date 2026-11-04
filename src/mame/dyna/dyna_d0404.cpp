@@ -18,6 +18,7 @@ The main components are:
 2x LH28F800SGE-L70 or equivalent flash ROMs
 2x GAL16V8D
 Oki M62X42B RTC
+2x 74HC374 + RA7 resistor network (12-bit R-2R DAC?)
 
 The program flash also holds data written by the BIOS: a 64KB block with the key checked
 by the BIOS (see below) at +0x00/+0x04 and the operator settings from +0x20. It's at
@@ -45,8 +46,9 @@ Notes (all deduced from the code, no documentation available):
 - RLE stream (16-bit words): 0nnnnnnnnnnn = n+1 literal words follow (4 pixels each,
   leftmost pixel in the high nibble); 1ccccnnnnnnnnnnn = n+1 words filled with pen ~cccc.
 - sound is software mixed 8-bit PCM (samples in the program ROM), output at every PIT
-  channel 2 IRQ (~11 kHz if the PIT is clocked at 24 MHz) to a 12-bit DAC through the ports
-  at 0xffff1c00/0xffff1c04.
+  channel 2 IRQ to a 12-bit DAC through the ports at 0xffff1c00/0xffff1c04. With the PIT
+  clocked at 24 MHz this gives ~11025 Hz, which matches a recording of a real Super El
+  Dorado (at 12 MHz, ~5512 Hz, the sounds are an octave too low).
 - the BIOS refuses to start the game (silent loop at 0x2320) unless a key stored in the
   battery backed RAM at 0x240010/0x240014 (kept in triplicate, like the rest of the backup
   data) matches a value derived from the program header at 0xc0034/0xc0038. If the backup
@@ -62,7 +64,6 @@ TODO:
 - blitter word 3 low 16 bits (always 0xffff in the static tables)
 - display control register bits other than bit 1 (page select)
 - outputs / hopper
-- verify sound sample rate (depends on the PIT channel 2 input clock)
 - UARTs, PIT input clocks, PIT channels 0 and 1, IRQs 7 and 9
 - correct video timings
 */
@@ -492,15 +493,15 @@ void dyna_d0404_state::dyna_d0404(machine_config &config)
 
 	MSM6242(config, "rtc", 32.768_kHz_XTAL);
 
-	// inside the SoC, the input clocks are unknown: channel 2 is programmed with 2177 for the PCM IRQ, so
-	// 24 MHz gives ~11025 Hz, but the clock could as well be divided (12 MHz would give ~5512 Hz).
+	// inside the SoC, the input clocks are unknown: channel 2 is programmed with 2177 for the PCM IRQ, and
+	// 24 MHz (~11025 Hz) matches a real board recording within a few percent, 12 MHz would be an octave too low.
 	// Channel 0 is never programmed, channel 1 is only set up once at boot (mode 4) and otherwise used as a
 	// timeout by the serial / printer IRQ handlers, and the counters are never read back, so they are left
 	// unclocked: clocking channel 1 at 24 MHz made emulation about four times slower
 	pit8254_device &pit(PIT8254(config, "pit"));
 	pit.set_clk<0>(0); // unused
 	pit.set_clk<1>(0); // only used by the serial / printer code, output not hooked up
-	pit.set_clk<2>(24_MHz_XTAL); // TODO: verify clock
+	pit.set_clk<2>(24_MHz_XTAL); // TODO: exact clock, matches a real board recording within a few percent
 	pit.out_handler<2>().set([this] (int state) { set_irq(8, state); });
 
 	screen_device &screen(SCREEN(config, "screen"));
@@ -514,7 +515,7 @@ void dyna_d0404_state::dyna_d0404(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::GGGGGRRRRRBBBBBx, 0x800).set_init(FUNC(dyna_d0404_state::palette_init));
 
 	SPEAKER(config, "mono").front_center();
-	DAC_12BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.5); // TODO: actual DAC type unknown
+	DAC_12BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.5); // probably the RA7 resistor network driven by the two 74HC374 latches
 }
 
 void dyna_d0404_state::dyna_d0404_a29800(machine_config &config)

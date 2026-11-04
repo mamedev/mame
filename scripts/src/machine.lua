@@ -25,8 +25,6 @@ files {
 	MAME_DIR .. "src/devices/machine/nvram.h",
 	MAME_DIR .. "src/devices/machine/ram.cpp",
 	MAME_DIR .. "src/devices/machine/ram.h",
-	MAME_DIR .. "src/devices/machine/legscsi.cpp",
-	MAME_DIR .. "src/devices/machine/legscsi.h",
 	MAME_DIR .. "src/devices/machine/sdlc.cpp",
 	MAME_DIR .. "src/devices/machine/sdlc.h",
 	MAME_DIR .. "src/devices/machine/terminal.cpp",
@@ -3056,18 +3054,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/lpci.h,MACHINES["LPCI"] = true
----------------------------------------------------
-
-if MACHINES["LPCI"] then
-	files {
-		MAME_DIR .. "src/devices/machine/lpci.cpp",
-		MAME_DIR .. "src/devices/machine/lpci.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/pci.h,MACHINES["PCI"] = true
 ---------------------------------------------------
 
@@ -3857,7 +3843,7 @@ end
 --
 ---------------------------------------------------
 
-if BUSES["ATA"] or BUSES["SCSI"] then
+if BUSES["ATA"] then
 	MACHINES["T10"] = true
 end
 
@@ -3865,8 +3851,6 @@ if MACHINES["T10"] then
 	files {
 		MAME_DIR .. "src/devices/machine/t10mmc.cpp",
 		MAME_DIR .. "src/devices/machine/t10mmc.h",
-		MAME_DIR .. "src/devices/machine/t10sbc.cpp",
-		MAME_DIR .. "src/devices/machine/t10sbc.h",
 		MAME_DIR .. "src/devices/machine/t10spc.cpp",
 		MAME_DIR .. "src/devices/machine/t10spc.h",
 	}
@@ -4905,6 +4889,30 @@ if MACHINES["VT82C496"] then
 	files {
 		MAME_DIR .. "src/devices/machine/vt82c496.cpp",
 		MAME_DIR .. "src/devices/machine/vt82c496.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/cx5510.h,MACHINES["CX5510"] = true
+---------------------------------------------------
+
+if MACHINES["CX5510"] then
+	files {
+		MAME_DIR .. "src/devices/machine/cx5510.cpp",
+		MAME_DIR .. "src/devices/machine/cx5510.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/vt82c505.h,MACHINES["VT82C505"] = true
+---------------------------------------------------
+
+if MACHINES["VT82C505"] then
+	files {
+		MAME_DIR .. "src/devices/machine/vt82c505.cpp",
+		MAME_DIR .. "src/devices/machine/vt82c505.h",
 	}
 end
 

@@ -132,7 +132,7 @@ Grull Osgo - Improvements
 #include "bus/isa/isa.h"
 #include "bus/isa/svga_trident.h"
 #include "cpu/i386/i386.h"
-#include "machine/lpci.h"
+#include "machine/pci.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 #include "machine/ds128x.h"
@@ -407,6 +407,164 @@ ioport_constructor isa16_calchase_jamma_if::device_input_ports() const
 
 namespace {
 
+// VIA VT82C585VPX north bridge (Apollo VP), config space only
+class calchase_host_device : public pci_host_device
+{
+public:
+	template <typename T>
+	calchase_host_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: calchase_host_device(mconfig, tag, owner)
+	{
+		m_host_cpu.set_tag(std::forward<T>(cpu_tag));
+	}
+	calchase_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	auto pam_cb() { return m_pam_cb.bind(); }
+
+protected:
+	enum
+	{
+		AS_PCI_MEM = 1,
+		AS_PCI_IO = 2
+	};
+
+	virtual void device_start() override ATTR_COLD;
+
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
+
+	virtual void config_map(address_map &map) override ATTR_COLD;
+
+private:
+	required_device<cpu_device> m_host_cpu;
+	devcb_write8 m_pam_cb;
+
+	address_space_config m_pci_mem_config;
+	address_space_config m_pci_io_config;
+
+	uint8_t m_config_reg[256];
+
+	uint8_t config_r(offs_t offset);
+	void config_w(offs_t offset, uint8_t data);
+};
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(CALCHASE_HOST, calchase_host_device, calchase_host_device, "calchase_host", "VIA VT82C585VPX north bridge (California Chase)")
+
+calchase_host_device::calchase_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_host_device(mconfig, CALCHASE_HOST, tag, owner, clock)
+	, m_host_cpu(*this, finder_base::DUMMY_TAG)
+	, m_pam_cb(*this)
+	, m_pci_mem_config("pci_mem", ENDIANNESS_LITTLE, 32, 32)
+	, m_pci_io_config("pci_io", ENDIANNESS_LITTLE, 32, 16)
+{
+	set_ids_host(0x11060585, 0x00, 0x00000000);
+}
+
+device_memory_interface::space_config_vector calchase_host_device::memory_space_config() const
+{
+	auto r = pci_bridge_device::memory_space_config();
+	r.emplace_back(std::make_pair(AS_PCI_MEM, &m_pci_mem_config));
+	r.emplace_back(std::make_pair(AS_PCI_IO, &m_pci_io_config));
+	return r;
+}
+
+void calchase_host_device::device_start()
+{
+	pci_host_device::device_start();
+
+	// no PCI devices behind the bridge, keep the PCI side off the CPU spaces
+	set_spaces(&space(AS_PCI_MEM), &space(AS_PCI_IO));
+	memory_window_start = 0;
+	memory_window_end   = 0xffffffff;
+	memory_offset       = 0;
+	io_window_start = 0;
+	io_window_end   = 0xffff;
+	io_offset       = 0;
+
+	m_host_cpu->space(AS_IO).install_device(0, 0xffff, *static_cast<pci_host_device *>(this), &pci_host_device::io_configuration_access_map);
+
+	std::fill(std::begin(m_config_reg), std::end(m_config_reg), 0);
+	m_config_reg[0x60] = 0x02;
+	m_config_reg[0x61] = 0x02;
+	m_config_reg[0x62] = 0x02;
+	m_config_reg[0x63] = 0x02;
+	m_config_reg[0x64] = 0x02;
+	m_config_reg[0x65] = 0x02;
+
+	save_item(NAME(m_config_reg));
+}
+
+void calchase_host_device::config_map(address_map &map)
+{
+	// plain register file, the header is not decoded either
+	map(0x00, 0x03).lr32(NAME([this] () -> uint32_t { return (main_id >> 16) | (main_id << 16); }));
+	map(0x04, 0xff).rw(FUNC(calchase_host_device::config_r), FUNC(calchase_host_device::config_w));
+	map(0x08, 0x0b).lr32(NAME([this] () -> uint32_t { return (pclass << 8) | revision; }));
+}
+
+uint8_t calchase_host_device::config_r(offs_t offset)
+{
+	return m_config_reg[0x04 + offset];
+}
+
+void calchase_host_device::config_w(offs_t offset, uint8_t data)
+{
+	const offs_t reg = 0x04 + offset;
+	m_config_reg[reg] = data;
+	if (reg == 0x63)
+		m_pam_cb(0, data);
+}
+
+
+namespace {
+
+// VIA VT82C586B south bridge (Apollo VP), config space only
+class calchase_south_device : public pci_device
+{
+public:
+	calchase_south_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+
+	virtual void config_map(address_map &map) override ATTR_COLD;
+
+private:
+	uint8_t m_config_reg[256];
+};
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(CALCHASE_SOUTH, calchase_south_device, calchase_south_device, "calchase_south", "VIA VT82C586B south bridge (California Chase)")
+
+calchase_south_device::calchase_south_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, CALCHASE_SOUTH, tag, owner, clock)
+{
+	set_ids(0x11060586, 0x41, 0x060100, 0x00000000);
+}
+
+void calchase_south_device::device_start()
+{
+	pci_device::device_start();
+
+	std::fill(std::begin(m_config_reg), std::end(m_config_reg), 0);
+	save_item(NAME(m_config_reg));
+}
+
+void calchase_south_device::config_map(address_map &map)
+{
+	// plain register file, the header is not decoded either
+	map(0x00, 0x03).lr32(NAME([this] () -> uint32_t { return (main_id >> 16) | (main_id << 16); }));
+	map(0x04, 0xff).lrw8(
+			NAME([this] (offs_t offset) -> uint8_t { return m_config_reg[0x04 + offset]; }),
+			NAME([this] (offs_t offset, uint8_t data) { m_config_reg[0x04 + offset] = data; }));
+	map(0x08, 0x0b).lr32(NAME([this] () -> uint32_t { return (pclass << 8) | revision; }));
+}
+
+
+namespace {
+
 class calchase_state : public pcat_base_state
 {
 public:
@@ -427,40 +585,18 @@ protected:
 private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext_ram;
-	uint8_t m_mtxc_config_reg[256]{};
-	uint8_t m_piix4_config_reg[4][256]{};
+	uint8_t m_pam = 0x02;
 
 	void bios_ext_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	void intel82439tx_init();
+	void pam_w(uint8_t data);
 	void calchase_io(address_map &map) ATTR_COLD;
 	void calchase_map(address_map &map) ATTR_COLD;
-
-	uint8_t mtxc_config_r(int function, int reg);
-	void mtxc_config_w(int function, int reg, uint8_t data);
-	uint32_t intel82439tx_pci_r(int function, int reg, uint32_t mem_mask);
-	void intel82439tx_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
-	uint8_t piix4_config_r(int function, int reg);
-	void piix4_config_w(int function, int reg, uint8_t data);
-	uint32_t intel82371ab_pci_r(int function, int reg, uint32_t mem_mask);
-	void intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 };
 
-// Intel 82439TX System Controller (MTXC)
-// TODO: change with a VIA82C585VPX (North Bridge - APOLLO Chipset)
-
-uint8_t calchase_state::mtxc_config_r(int function, int reg)
+void calchase_state::pam_w(uint8_t data)
 {
-//  osd_printf_debug("MTXC: read %d, %02X\n", function, reg);
-
-	return m_mtxc_config_reg[reg];
-}
-
-void calchase_state::mtxc_config_w(int function, int reg, uint8_t data)
-{
-//  osd_printf_debug("%s:MTXC: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
-
 	/*
 	memory banking with North Bridge:
 	0x63 (PAM)  xx-- ---- BIOS extension 0xe0000 - 0xeffff
@@ -471,141 +607,21 @@ void calchase_state::mtxc_config_w(int function, int reg, uint8_t data)
 	10 -> 1 = Write Enable, 0 = Read Enable
 	*/
 
-	if (reg == 0x63)
-	{
-		if (data & 0x20)        // enable RAM access to region 0xf0000 - 0xfffff
-			membank("bios_bank")->set_base(m_bios_ram.get());
-		else                    // disable RAM access (reads go to BIOS ROM)
-			membank("bios_bank")->set_base(memregion("bios")->base() + 0x10000);
-		if (data & 0x80)        // enable RAM access to region 0xe0000 - 0xeffff
-			membank("bios_ext")->set_base(m_bios_ext_ram.get());
-		else
-			membank("bios_ext")->set_base(memregion("bios")->base() + 0);
-	}
+	if (data & 0x20)        // enable RAM access to region 0xf0000 - 0xfffff
+		membank("bios_bank")->set_base(m_bios_ram.get());
+	else                    // disable RAM access (reads go to BIOS ROM)
+		membank("bios_bank")->set_base(memregion("bios")->base() + 0x10000);
+	if (data & 0x80)        // enable RAM access to region 0xe0000 - 0xeffff
+		membank("bios_ext")->set_base(m_bios_ext_ram.get());
+	else
+		membank("bios_ext")->set_base(memregion("bios")->base() + 0);
 
-	m_mtxc_config_reg[reg] = data;
-}
-
-void calchase_state::intel82439tx_init()
-{
-	m_mtxc_config_reg[0x60] = 0x02;
-	m_mtxc_config_reg[0x61] = 0x02;
-	m_mtxc_config_reg[0x62] = 0x02;
-	m_mtxc_config_reg[0x63] = 0x02;
-	m_mtxc_config_reg[0x64] = 0x02;
-	m_mtxc_config_reg[0x65] = 0x02;
-}
-
-uint32_t calchase_state::intel82439tx_pci_r(int function, int reg, uint32_t mem_mask)
-{
-	uint32_t r = 0;
-
-	if(reg == 0)
-		return 0x05851106; // VT82C585VPX, VIA
-
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= mtxc_config_r(function, reg + 3) << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= mtxc_config_r(function, reg + 2) << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= mtxc_config_r(function, reg + 1) << 8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= mtxc_config_r(function, reg + 0) << 0;
-	}
-	return r;
-}
-
-void calchase_state::intel82439tx_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		mtxc_config_w(function, reg + 3, (data >> 24) & 0xff);
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		mtxc_config_w(function, reg + 2, (data >> 16) & 0xff);
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		mtxc_config_w(function, reg + 1, (data >> 8) & 0xff);
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		mtxc_config_w(function, reg + 0, (data >> 0) & 0xff);
-	}
-}
-
-// Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
-//TODO: change with VIA82C586B (South Bridge - APOLLO Chipset)
-
-uint8_t calchase_state::piix4_config_r(int function, int reg)
-{
-//  osd_printf_debug("PIIX4: read %d, %02X\n", function, reg);
-	return m_piix4_config_reg[function][reg];
-}
-
-void calchase_state::piix4_config_w(int function, int reg, uint8_t data)
-{
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
-	m_piix4_config_reg[function][reg] = data;
-}
-
-uint32_t calchase_state::intel82371ab_pci_r(int function, int reg, uint32_t mem_mask)
-{
-	uint32_t r = 0;
-
-	if(reg == 0)
-		return 0x30401106; // VT82C586B, VIA
-
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= piix4_config_r(function, reg + 3) << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= piix4_config_r(function, reg + 2) << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= piix4_config_r(function, reg + 1) << 8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= piix4_config_r(function, reg + 0) << 0;
-	}
-	return r;
-}
-
-void calchase_state::intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		piix4_config_w(function, reg + 3, (data >> 24) & 0xff);
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		piix4_config_w(function, reg + 2, (data >> 16) & 0xff);
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		piix4_config_w(function, reg + 1, (data >> 8) & 0xff);
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		piix4_config_w(function, reg + 0, (data >> 0) & 0xff);
-	}
+	m_pam = data;
 }
 
 void calchase_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if (m_mtxc_config_reg[0x63] & 0x10)       // write to RAM if this region is write-enabled
+	if (m_pam & 0x10)       // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_ram.get() + offset);
 	}
@@ -613,7 +629,7 @@ void calchase_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 void calchase_state::bios_ext_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if (m_mtxc_config_reg[0x63] & 0x40)       // write to RAM if this region is write-enabled
+	if (m_pam & 0x40)       // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_ext_ram.get() + offset);
 	}
@@ -642,7 +658,6 @@ void calchase_state::calchase_io(address_map &map)
 	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 //  map(0x03f8, 0x03ff).noprw(); // To debug Serial Port COM1:
 //  map(0x0a78, 0x0a7b).nopw();//.w(FUNC(calchase_state::pnp_data_w));
-	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 //  map(0x43c4, 0x43cb).rw("vga", FUNC(trident_vga_device::port_43c6_r), FUNC(trident_vga_device::port_43c6_w));  // Trident Memory and Video Clock register
 //  map(0x83c4, 0x83cb).rw("vga", FUNC(trident_vga_device::port_83c6_r), FUNC(trident_vga_device::port_83c6_w));  // Trident LUTDAC
 }
@@ -653,8 +668,7 @@ void calchase_state::machine_start()
 	m_bios_ram = std::make_unique<uint32_t[]>(0x10000/4);
 	m_bios_ext_ram = std::make_unique<uint32_t[]>(0x10000/4);
 
-	for (int i = 0; i < 4; i++)
-		std::fill(std::begin(m_piix4_config_reg[i]), std::end(m_piix4_config_reg[i]), 0);
+	save_item(NAME(m_pam));
 }
 
 void calchase_state::machine_reset()
@@ -682,9 +696,9 @@ void calchase_state::calchase(machine_config &config)
 	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device(0, FUNC(calchase_state::intel82439tx_pci_r), FUNC(calchase_state::intel82439tx_pci_w));
-	pcibus.set_device(7, FUNC(calchase_state::intel82371ab_pci_r), FUNC(calchase_state::intel82371ab_pci_w));
+	PCI_ROOT(config, "pci");
+	CALCHASE_HOST(config, "pci:00.0", m_maincpu).pam_cb().set(FUNC(calchase_state::pam_w));
+	CALCHASE_SOUTH(config, "pci:07.0");
 
 	// FIXME: determine ISA bus clock
 	isa16_device &isa(ISA16(config, "isa"));
@@ -712,9 +726,9 @@ void calchase_state::hostinv(machine_config &config)
 	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "cdrom", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device(0, FUNC(calchase_state::intel82439tx_pci_r), FUNC(calchase_state::intel82439tx_pci_w));
-	pcibus.set_device(7, FUNC(calchase_state::intel82371ab_pci_r), FUNC(calchase_state::intel82371ab_pci_w));
+	PCI_ROOT(config, "pci");
+	CALCHASE_HOST(config, "pci:00.0", m_maincpu).pam_cb().set(FUNC(calchase_state::pam_w));
+	CALCHASE_SOUTH(config, "pci:07.0");
 
 	// TODO: determine isa bus clock
 	isa16_device &isa(ISA16(config, "isa"));
@@ -728,15 +742,11 @@ void calchase_state::hostinv(machine_config &config)
 void calchase_state::init_calchase()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x20000/4);
-
-	intel82439tx_init();
 }
 
 void calchase_state::init_hostinv()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x20000/4);
-
-	intel82439tx_init();
 }
 
 ROM_START( calchase )

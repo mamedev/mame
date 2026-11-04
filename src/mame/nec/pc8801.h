@@ -126,7 +126,7 @@ private:
 	uint8_t m_extram_bank = 0;
 	uint32_t m_extram_size = 0;
 
-	struct { uint8_t r = 0, g = 0, b = 0; } m_palram[8];
+	struct { uint8_t r = 0, g = 0, b = 0; } m_palram[10];
 	enum {
 		BGPAL_PEN = 8,
 		BORDER_PEN = 9

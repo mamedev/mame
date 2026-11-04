@@ -525,7 +525,6 @@ public:
 	void init_schery97a() ATTR_COLD;
 	void init_skill98() ATTR_COLD;
 	void init_super7() ATTR_COLD;
-	void init_tcl() ATTR_COLD;
 	void init_tonypok() ATTR_COLD;
 	void init_reelmag() ATTR_COLD;
 	void init_rm7b() ATTR_COLD;
@@ -537,6 +536,8 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 	DECLARE_MACHINE_START(cm99);
+
+	void cm_map(address_map &map) ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_cherrym_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_jkrmast_bg_tile_info);
@@ -576,7 +577,6 @@ private:
 	void chryangl_decrypted_opcodes_map(address_map &map) ATTR_COLD;
 	void chyangb_portmap(address_map &map) ATTR_COLD;
 	void clb_map(address_map &map) ATTR_COLD;
-	void cm_map(address_map &map) ATTR_COLD;
 	void cm_portmap(address_map &map) ATTR_COLD;
 	void cm99_map(address_map &map) ATTR_COLD;
 	void cmast91_portmap(address_map &map) ATTR_COLD;
@@ -982,6 +982,45 @@ private:
 	uint8_t m_prot_index = 0;
 };
 
+class tcl_state : public cmaster_state
+{
+public:
+	tcl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		cmaster_state(mconfig, type, tag),
+		m_rom_bank(*this, "rom_bank"),
+		m_opcodes_bank(*this, "opcodes_bank")
+	{ }
+
+	void tcl(machine_config &config) ATTR_COLD;
+
+	void init_tcl() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	required_memory_bank m_rom_bank;
+	required_memory_bank m_opcodes_bank;
+
+	memory_passthrough_handler m_opcode_tap;
+	memory_passthrough_handler m_operand_tap;
+
+	std::unique_ptr<uint8_t []> m_decrypted_ops; // 0x0000-0x7fff normal bank, 0x8000-0xffff protection bank
+
+	uint8_t m_prefix = 0;
+	uint8_t m_prot_cmd = 0;
+	uint8_t m_jump_cmd = 0;
+	uint16_t m_jump_addr = 0;
+	uint16_t m_redirect_target = 0;
+
+	void tcl_map(address_map &map) ATTR_COLD;
+	void tcl_opcodes_map(address_map &map) ATTR_COLD;
+
+	void prot_opcode_tap(offs_t offset, uint8_t data);
+	void prot_operand_tap(offs_t offset, uint8_t &data);
+};
+
 
 void wingco_state::machine_start()
 {
@@ -1017,6 +1056,46 @@ void cd3poker_state::machine_start()
 	cmaster_state::machine_start();
 
 	save_item(NAME(m_prot_index));
+}
+
+void tcl_state::machine_start()
+{
+	cmaster_state::machine_start();
+
+	uint8_t *const rom = memregion("maincpu")->base();
+	m_rom_bank->configure_entry(0, &rom[0x10000]);
+	m_rom_bank->configure_entry(1, &rom[0x00000]);
+	m_opcodes_bank->configure_entries(0, 2, &m_decrypted_ops[0], 0x8000);
+
+	m_opcode_tap = m_maincpu->space(AS_OPCODES).install_read_tap(
+			0x0000, 0x7fff,
+			"prot_opcode_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask) { prot_opcode_tap(offset, data); });
+	m_operand_tap = m_maincpu->space(AS_PROGRAM).install_read_tap(
+			0x0000, 0x7fff,
+			"prot_operand_r",
+			[this] (offs_t offset, u8 &data, u8 mem_mask) { prot_operand_tap(offset, data); });
+
+	save_item(NAME(m_prefix));
+	save_item(NAME(m_prot_cmd));
+	save_item(NAME(m_jump_cmd));
+	save_item(NAME(m_jump_addr));
+	save_item(NAME(m_redirect_target));
+}
+
+void tcl_state::machine_reset()
+{
+	cmaster_state::machine_reset();
+
+	// the protection bank holds a self-check that leaves through ED EE + JP 0000
+	m_rom_bank->set_entry(1);
+	m_opcodes_bank->set_entry(1);
+
+	m_prefix = 0;
+	m_prot_cmd = 0;
+	m_jump_cmd = 0;
+	m_jump_addr = 0;
+	m_redirect_target = 0;
 }
 
 MACHINE_START_MEMBER(cmaster_state, cm99)
@@ -3253,6 +3332,93 @@ uint8_t cd3poker_state::armaly_prot_r()
 		return index == 0x0f ? 0xa5 : 0x5a;
 }
 
+/*
+  Qi Wang Zhengba protection (Lattice pLSI 1016 and PALs on the CPU board).
+
+  0x0000-0x7fff comes from one of two ROM banks, 0x8000-0xcfff always from ROM 0x08000.
+  The banks are switched by watching the opcode fetches for the undocumented ED EC,
+  ED EE and ED EF opcodes (NOPs for the Z80). The switch takes effect at the destination
+  of the following JP nn:
+  - ED EC: go to the protection bank (ROM 0x00000-0x07fff)
+  - ED EE: go back to the normal bank (ROM 0x10000-0x17fff)
+  - ED EF: in the normal bank, the following JP 0000 / 0038 / 0066 goes elsewhere.
+    The real destinations come from the PLSI and are unknown. The ones below are taken
+    from the IRQ handler of an older unprotected revision, still in the unused ROM areas.
+*/
+void tcl_state::prot_opcode_tap(offs_t offset, uint8_t data)
+{
+	if (machine().side_effects_disabled())
+		return;
+
+	if (m_prefix == 0xed)
+	{
+		m_prefix = 0;
+		if ((data == 0xec) || (data == 0xee) || (data == 0xef))
+			m_prot_cmd = data;
+	}
+	else if (m_prefix)
+	{
+		m_prefix = 0; // opcode after a CB, DD or FD prefix
+	}
+	else if ((data == 0xcb) || (data == 0xdd) || (data == 0xed) || (data == 0xfd))
+	{
+		m_prefix = data;
+	}
+	else if (m_prot_cmd && (data == 0xc3))
+	{
+		m_jump_cmd = m_prot_cmd;
+		m_jump_addr = offset + 1;
+		m_prot_cmd = 0;
+
+		if ((m_jump_cmd == 0xef) && !m_rom_bank->entry())
+		{
+			uint8_t const *const rom = reinterpret_cast<uint8_t const *>(m_rom_bank->base());
+			uint16_t const dest = rom[(offset + 1) & 0x7fff] | (rom[(offset + 2) & 0x7fff] << 8);
+			switch (dest)
+			{
+				case 0x0000: m_redirect_target = 0x017c; break;
+				case 0x0038: m_redirect_target = 0x016f; break;
+				case 0x0066: m_redirect_target = 0x03a7; break;
+				default:
+					logerror("%04x: unknown ED EF jump to %04x\n", offset, dest);
+					m_redirect_target = dest;
+					break;
+			}
+		}
+	}
+}
+
+void tcl_state::prot_operand_tap(offs_t offset, uint8_t &data)
+{
+	if (!m_jump_addr || machine().side_effects_disabled())
+		return;
+
+	bool const redirect = (m_jump_cmd == 0xef) && !m_rom_bank->entry();
+
+	if (offset == m_jump_addr)
+	{
+		if (redirect)
+			data = m_redirect_target & 0xff;
+	}
+	else if (offset == (m_jump_addr + 1U))
+	{
+		if (redirect)
+		{
+			data = m_redirect_target >> 8;
+		}
+		else if (m_jump_cmd != 0xef)
+		{
+			// both operands come from the old bank, the destination from the new one
+			int const bank = (m_jump_cmd == 0xec) ? 1 : 0;
+			m_rom_bank->set_entry(bank);
+			m_opcodes_bank->set_entry(bank);
+		}
+
+		m_jump_addr = 0;
+		m_jump_cmd = 0;
+	}
+}
+
 void unkch_state::bonch_0x10_w(uint8_t data)  // prot. system
 {
 //  popmessage("bonch_0x10_w %02x", data);
@@ -5204,6 +5370,18 @@ void cd3poker_state::cd3poker_map(address_map &map)
 	map(0xfa80, 0xfbff).ram();
 	map(0xfc00, 0xfc7f).ram().share(m_reel_scroll[2]);
 	map(0xfc80, 0xffff).ram();
+}
+
+void tcl_state::tcl_map(address_map &map)
+{
+	cm_map(map);
+
+	map(0x0000, 0x7fff).bankr(m_rom_bank);
+}
+
+void tcl_state::tcl_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr(m_opcodes_bank);
 }
 
 
@@ -16117,6 +16295,14 @@ void cd3poker_state::cd3poker(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cd3poker_state::cd3poker_map);
 
 	NVRAM(config.replace(), "nvram", nvram_device::DEFAULT_ALL_0);
+}
+
+void tcl_state::tcl(machine_config &config)
+{
+	cm(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &tcl_state::tcl_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &tcl_state::tcl_opcodes_map);
 }
 
 void cmaster_state::cmast91(machine_config &config)
@@ -28565,7 +28751,7 @@ ROM_START( wcherry )
 ROM_END
 
 /*
-  Taiwan Chess Legend
+  棋王爭霸 (Qí Wáng Zhēngbà)
   Uniwang, 1995
 
   Preliminary driver by Tomasz Slanina
@@ -28605,13 +28791,13 @@ ROM_END
 */
 
 ROM_START( tcl )
-	ROM_REGION( 0x10000*2, "maincpu", 0 )
+	ROM_REGION( 0x10000*2, "maincpu", 0 )  // 0x00000 protection bank, 0x08000 upper area, 0x10000 program, 0x18000 unused
 	ROM_LOAD( "tcl.16f",   0x00000, 0x20000, CRC(8e694a58) SHA1(7a3c20a7c740065b71fe66ec581edce0dd32f145) )
 
 	ROM_REGION( 0x8000*3, "gfx1", 0 )
-	ROM_LOAD( "tcl.1e",   0x00000, 0x8000, CRC(37edf9b8) SHA1(9225728116d6edfe8476e565a12e1f1e59766d26) )
+	ROM_LOAD( "tcl.4e",   0x00000, 0x8000, CRC(f880101c) SHA1(8417410a7dcb304a88e98f9199f44a4df1ee3fb7) )
 	ROM_LOAD( "tcl.3e",   0x08000, 0x8000, CRC(396298cf) SHA1(0ee306179a9d3dd84f7e5799527e6825d2979ddb) )
-	ROM_LOAD( "tcl.4e",   0x10000, 0x8000, CRC(f880101c) SHA1(8417410a7dcb304a88e98f9199f44a4df1ee3fb7) )
+	ROM_LOAD( "tcl.1e",   0x10000, 0x8000, CRC(37edf9b8) SHA1(9225728116d6edfe8476e565a12e1f1e59766d26) )
 
 	ROM_REGION( 0x2000*4, "gfx2", 0 ) // ???
 	ROM_LOAD( "tcl.3f",   0x0000, 0x2000, CRC(c290c1eb) SHA1(00eb5ff46affe01f240081211b7f9a40e9f76bd8) )
@@ -28621,10 +28807,12 @@ ROM_START( tcl )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )  // (girl bitmaps, not present)
 
-	ROM_REGION( 0x100*3, "proms", 0 )
-	ROM_LOAD( "tcl_pr1.15c",   0x000, 0x100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
-	ROM_LOAD( "tcl_pr2.16c",   0x100, 0x100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
-	ROM_LOAD( "tcl_pr3.9e",    0x200, 0x100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+	ROM_REGION( 0x200, "proms", 0 )  // same PROMs as cmaster (82s129.u84 / 82s129.u79)
+	ROM_LOAD( "tcl_pr2.16c",   0x000, 0x100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "tcl_pr1.15c",   0x100, 0x100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "tcl_pr3.9e",    0x000, 0x100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
 /****************************** Stealth Sets ******************************/
@@ -33687,48 +33875,50 @@ void wingco_state::init_fl7_3121()
 	m_palette->update();
 }
 
-void cmaster_state::init_tcl()
+void tcl_state::init_tcl()
 {
-	// only the first part is decrypted (and verified)
+	uint8_t *const rom = memregion("maincpu")->base();
 
-	uint8_t *dest = memregion("maincpu")->base();
-	int len = memregion("maincpu")->bytes();
-	std::vector<uint8_t> src(len);
+	m_decrypted_ops = std::make_unique<uint8_t []>(0x10000);
 
-	int idx=0;
-	memcpy(&src[0], dest, len);
-
-	auto const rol =
-		[] (int src, int n)
-		{
-			return bitswap<8>(src,(7+8-n)&7,(6+8-n)&7,(5+8-n)&7,(4+8-n)&7,(3+8-n)&7,(2+8-n)&7,(1+8-n)&7,(0+8-n)&7);
-		};
-
-	auto const writedest =
-		[dest, &idx] (int n)
-		{
-			dest[idx]=n;
-			dest[idx+0x10000]=n^0xff;
-			idx++;
-		};
-
-	for (int i = 0; i < 64*1024; i += 4)
+	// normal bank (0x0000-0x7fff): ROM 0x10000-0x17fff
+	for (int i = 0; i < 0x8000; i++)
 	{
-		if (i & 0x8000)
+		uint8_t x = rom[0x10000 | i];
+
+		switch (i & 3)
 		{
-			writedest(rol(src[idx]^0x44,4)); // abcdefgh -> aFghaBcd
-			writedest(rol(src[idx]^0x44,7)); // abcdefgh -> haBcdeFg
-			writedest(rol(src[idx]^0x44,2)); // abcdefgh -> cdeFghaB
-			writedest((src[idx]^0x44)^0xf0); // abcdefgh -> AbCEeFgh
+			case 0: x = bitswap<8>(x,        3, 2, 5, 0, 7, 6, 1, 4); break;
+			case 1: x = bitswap<8>(x,        0, 7, 6, 1, 4, 3, 2, 5); break;
+			case 2: x = bitswap<8>(x,        1, 4, 3, 2, 5, 0, 7, 6); break;
+			case 3: x = bitswap<8>(x ^ 0xd2, 7, 6, 1, 4, 3, 2, 5, 0); break;
 		}
-		else
-		{
-			writedest(rol(src[idx]^0x11,4)); // abcdefgh -> efgHabcD
-			writedest(rol(src[idx]^0x11,7)); // abcdefgh -> HabcDefg
-			writedest(rol(src[idx]^0x11,2)); // abcdefgh -> cDefgHab
-			writedest((src[idx]^0x11)^0xf0); // abcdefgh -> ABCdefgH
-		}
+
+		rom[0x10000 | i] = x;
+		m_decrypted_ops[i] = x ^ 0xff;
 	}
+
+	// protection bank (0x0000-0x7fff): ROM 0x00000-0x07fff
+	// upper area (0x8000-0xcfff): ROM 0x08000-0x0cfff
+	for (int i = 0; i < 0x10000; i++)
+	{
+		uint8_t const key = (i & 0x8000) ? 0x44 : 0x11;
+		uint8_t x = rom[i];
+
+		switch (i & 3)
+		{
+			case 0: x = bitswap<8>(x ^ key, 3, 2, 1, 0, 7, 6, 5, 4); break;
+			case 1: x = bitswap<8>(x ^ key, 0, 7, 6, 5, 4, 3, 2, 1); break;
+			case 2: x = bitswap<8>(x ^ key, 5, 4, 3, 2, 1, 0, 7, 6); break;
+			case 3: x = x ^ key ^ 0xf0; break;
+		}
+
+		rom[i] = x;
+		if (!(i & 0x8000))
+			m_decrypted_ops[0x8000 | i] = x ^ 0xff;
+	}
+
+	// ROM 0x18000-0x1ffff is unused
 }
 
 void cmaster_state::init_super7()
@@ -34270,7 +34460,7 @@ GAME(  1999, top7,       0,        cm,       cmast99,  cmaster_state,  empty_ini
 GAME(  1999, top7a,      top7,     cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "bootleg (UTech)",   "Top-7 (V8.8, set 2)",                         MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
 GAME(  1996, war3cb,     0,        cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "S.B.E.",            "War III Cherry Best",                         MACHINE_NOT_WORKING )   // different portmap?
 
-GAME(  1995, tcl,        0,        cm,       cmaster,  cmaster_state,  init_tcl,       ROT0, "Uniwang",           "Taiwan Chess Legend",                         MACHINE_NOT_WORKING )   // incomplete decryption
+GAME(  1995, tcl,        0,        tcl,      cmaster,  tcl_state,      init_tcl,       ROT0, "Uniwang",           "Qi Wang Zhengba",                             MACHINE_NOT_WORKING )   // protection partially reconstructed
 
 // --- Wing W-4 hardware ---
 GAMEL( 1989, lucky8,     0,        lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",       "New Lucky 8 Lines (set 1, W-4)",                           0,                      layout_lucky8 )    // 2 control sets...
