@@ -25,11 +25,11 @@ public:
 	pgm2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_mainrom(*this, "mainrom"),
 		m_screen(*this, "screen"),
 		m_lineram(*this, "lineram"),
 		m_sp_zoom(*this, "sp_zoom"),
 		m_mainram(*this, "mainram"),
-		m_romboard_ram(*this, "romboard_ram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_sp_videoram(*this, "sp_videoram"),
@@ -44,24 +44,15 @@ public:
 		m_bg_palette(*this, "bg_palette"),
 		m_tx_palette(*this, "tx_palette"),
 		m_mcu_timer(*this, "mcu_timer"),
-		m_memcard(*this, "memcard_p%u", 1U),
-		m_mainrom(*this, "mainrom")
+		m_memcard(*this, "memcard_p%u", 1U)
 	{ }
-
-	void init_kov3_104() ATTR_COLD;
-	void init_kov3_102() ATTR_COLD;
-	void init_kov3_101() ATTR_COLD;
-	void init_kov3_100() ATTR_COLD;
 
 	void common_init() ATTR_COLD;
 
-	void pgm2_ramrom(machine_config &config) ATTR_COLD;
 	void pgm2_lores(machine_config &config) ATTR_COLD;
 	void pgm2(machine_config &config) ATTR_COLD;
-	void pgm2_hires(machine_config &config) ATTR_COLD;
+
 	void pgm2_map(address_map &map) ATTR_COLD;
-	void pgm2_module_rom_map(address_map &map) ATTR_COLD;
-	void pgm2_ram_rom_map(address_map &map) ATTR_COLD;
 	void pgm2_rom_map(address_map &map) ATTR_COLD;
 
 protected:
@@ -70,15 +61,15 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;
 
-private:
-	struct kov3_module_key
-	{
-		u8 key[8];
-		u8 sum[8];
-		u32 addr_xor; // 22bit
-		u16 data_xor;
-	};
+	void restore_decrypted_rom(offs_t romoffset);
 
+	std::vector<u8> m_encrypted_copy;
+
+	required_device<igs036_cpu_device> m_maincpu;
+	required_memory_region m_mainrom;
+	required_device<screen_device> m_screen;
+
+private:
 	u32 mcu_r(offs_t offset);
 	void fg_videoram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void bg_videoram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -89,14 +80,7 @@ private:
 	void vbl_ack_w(u16 data);
 	void unk30120014_w(offs_t offset, u16 data);
 
-	void module_ctrl_w(u32 data);
-	u32 module_ctrl_r();
-	void module_rom_w(offs_t offset, u16 data);
-	u16 module_rom_r(offs_t offset);
-	int module_data_r();
-	void module_data_w(int state);
-	void module_clk_w(int state);
-
+	virtual void restore_decrypted_state();
 	void decrypt(int state);
 	void sprite_encryption_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
@@ -107,8 +91,6 @@ private:
 	void screen_vblank(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_interrupt);
-
-	void decrypt_kov3_module(u32 addrxor, u16 dataxor);
 
 	tilemap_t    *m_fg_tilemap = nullptr;
 	tilemap_t    *m_bg_tilemap = nullptr;
@@ -124,7 +106,6 @@ private:
 	void draw_sprites(const rectangle &cliprect);
 	void copy_sprites_from_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, u16 pri);
 
-	bool m_has_decrypted_kov3_module = false;
 	u32 m_spritekey = 0;
 	u32 m_realspritekey = 0;
 	bool m_sprite_predecrypted = false;
@@ -137,25 +118,12 @@ private:
 	u8 m_mcu_last_cmd = 0;
 	void mcu_command(bool is_command);
 
-	std::vector<u8> m_encrypted_copy;
-
 	u32 m_pio_out_data = 0;
-	const kov3_module_key *module_key = nullptr;
-	bool module_sum_read = false;
-	u32 module_in_latch = 0;
-	u32 module_out_latch = 0;
-	int module_prev_state = 0;
-	int module_clk_cnt = 0;
-	u8 module_rcv_buf[10]{};
-	u8 module_send_buf[9]{};
 
 	// devices
-	required_device<igs036_cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
 	required_shared_ptr<u32> m_lineram;
 	required_shared_ptr<u32> m_sp_zoom;
 	required_shared_ptr<u32> m_mainram;
-	optional_shared_ptr<u32> m_romboard_ram;
 	required_shared_ptr<u32> m_fg_videoram;
 	required_shared_ptr<u32> m_bg_videoram;
 	required_shared_ptr<u32> m_sp_videoram;
@@ -172,8 +140,81 @@ private:
 	required_device<timer_device> m_mcu_timer;
 
 	optional_device_array<pgm2_memcard_device, 4> m_memcard;
+};
 
-	required_memory_region m_mainrom;
+class kov3_state : public pgm2_state
+{
+public:
+	kov3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pgm2_state(mconfig, type, tag)
+	{ }
+
+	void init_kov3_104() ATTR_COLD;
+	void init_kov3_102() ATTR_COLD;
+	void init_kov3_101() ATTR_COLD;
+	void init_kov3_100() ATTR_COLD;
+
+	void pgm2_hires(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	struct kov3_module_key
+	{
+		u8 key[8];
+		u8 sum[8];
+		u32 addr_xor; // 22bit
+		u16 data_xor;
+	};
+
+	void module_ctrl_w(u32 data);
+	u32 module_ctrl_r();
+	void module_rom_w(offs_t offset, u16 data);
+	u16 module_rom_r(offs_t offset);
+	int module_data_r();
+	void module_data_w(int state);
+	void module_clk_w(int state);
+	void decrypt_kov3_module(u32 addrxor, u16 dataxor);
+	void pgm2_module_rom_map(address_map &map) ATTR_COLD;
+	virtual void restore_decrypted_state() override;
+
+	bool m_has_decrypted_kov3_module = false;
+	const kov3_module_key *module_key = nullptr;
+	bool module_sum_read = false;
+	u32 module_in_latch = 0;
+	u32 module_out_latch = 0;
+	int module_prev_state = 0;
+	int module_clk_cnt = 0;
+	u8 module_rcv_buf[10]{};
+	u8 module_send_buf[9]{};
+};
+
+class ddpdojt_state : public pgm2_state
+{
+public:
+	ddpdojt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pgm2_state(mconfig, type, tag),
+		m_romboard_ram(*this, "romboard_ram")
+	{ }
+
+	void init_ddpdojt() ATTR_COLD;
+
+	void pgm2_ramrom(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	virtual void restore_decrypted_state() override;
+
+	void pgm2_ram_rom_map(address_map &map) ATTR_COLD;
+	void romboard_ram_w(offs_t offset, u32 data, u32 mem_mask);
+
+	std::vector<u32> m_encrypted_ram_copy;
+
+	required_shared_ptr<u32> m_romboard_ram;
 };
 
 #endif // MAME_IGS_PGM2_H

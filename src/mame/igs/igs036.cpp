@@ -57,13 +57,8 @@ void igs036_cpu_device::encryption_control_w(offs_t offset, u32 data, u32 mem_ma
 {
 	// The internal ROM uploads 256 key bytes, then writes 4 here before reading
 	// the external program. Other control bits and key changes while enabled are unknown.
-	if (!BIT(mem_mask, 2))
-		return;
-
 	m_has_decrypted = (BIT(data, 2));
-
-	if (m_has_decrypted)
-		m_do_decrypt(offset, data, mem_mask);
+	m_do_decrypt(m_has_decrypted);
 }
 
 void igs036_cpu_device::onboard_peripherals(address_map &map)
