@@ -133,12 +133,12 @@ void kov3_state::restore_decrypted_state()
 void ddpdojt_state::restore_decrypted_state()
 {
 	memcpy(m_mainrom->base(), &m_encrypted_copy[0], m_mainrom->bytes());
-	memcpy(&m_romboard_ram[0], &m_encrypted_ram_copy[0],  m_romboard_ram.bytes());
+	memcpy(&m_decrypted_ram_copy[0], &m_romboard_ram[0], m_romboard_ram.bytes());
 
 	if (m_maincpu->get_has_decrypted())
 	{
 		igs036_decryptor decrypter(m_maincpu->get_encryption_table());
-		decrypter.decrypter_rom((u16*)&m_romboard_ram[0], m_romboard_ram.bytes(), 0);
+		decrypter.decrypter_rom((u16*)&m_decrypted_ram_copy[0], m_romboard_ram.bytes(), 0);
 	}
 
 	restore_decrypted_rom(m_romboard_ram.bytes());
@@ -538,16 +538,26 @@ void pgm2_state::pgm2_rom_map(address_map &map)
 	map(0x10000000, 0x10ffffff).rom().region("mainrom", 0); // external ROM
 }
 
+u32 ddpdojt_state::romboard_ram_r(offs_t offset, u32 mem_mask)
+{
+	return m_decrypted_ram_copy[offset];
+}
+
 void ddpdojt_state::romboard_ram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_romboard_ram[offset]);
-	m_encrypted_ram_copy[offset] = m_romboard_ram[offset];
+
+	// store a copy in the decrypted buffer too
+	// TODO: if encryption is enabled when this is written we should decrypt it
+	//       but in practice that never happens, it's a one-off copy then enable
+	//       decrypt on startup
+	m_decrypted_ram_copy[offset] = m_romboard_ram[offset];
 }
 
 void ddpdojt_state::pgm2_ram_rom_map(address_map &map)
 {
 	pgm2_map(map);
-	map(0x10000000, 0x101fffff).ram().w(FUNC(ddpdojt_state::romboard_ram_w)).share("romboard_ram"); // we should also probably decrypt writes once the encryption is enabled, but the game never writes with it turned on anyway
+	map(0x10000000, 0x101fffff).ram().rw(FUNC(ddpdojt_state::romboard_ram_r), FUNC(ddpdojt_state::romboard_ram_w)).share("romboard_ram"); // we should also probably decrypt writes once the encryption is enabled, but the game never writes with it turned on anyway
 	map(0x10200000, 0x103fffff).rom().region("mainrom", 0); // external ROM
 }
 
@@ -643,6 +653,19 @@ static INPUT_PORTS_START( pgm2 )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+void pgm2_state::machine_start()
+{
+	save_item(NAME(m_spritekey));
+	save_item(NAME(m_realspritekey));
+	save_item(NAME(m_mcu_regs));
+	save_item(NAME(m_mcu_result0));
+	save_item(NAME(m_mcu_result1));
+	save_item(NAME(m_mcu_last_cmd));
+	save_item(NAME(m_shareram));
+	save_item(NAME(m_share_bank));
+	save_item(NAME(m_pio_out_data));
+}
+
 void kov3_state::machine_start()
 {
 	pgm2_state::machine_start();
@@ -656,37 +679,6 @@ void kov3_state::machine_start()
 	save_item(NAME(module_send_buf));
 }
 
-void ddpdojt_state::machine_start()
-{
-	pgm2_state::machine_start();
-	save_item(NAME(m_encrypted_ram_copy));
-}
-
-void pgm2_state::machine_start()
-{
-	save_item(NAME(m_spritekey));
-	save_item(NAME(m_realspritekey));
-	save_item(NAME(m_mcu_regs));
-	save_item(NAME(m_mcu_result0));
-	save_item(NAME(m_mcu_result1));
-	save_item(NAME(m_mcu_last_cmd));
-	save_item(NAME(m_shareram));
-	save_item(NAME(m_share_bank));
-	save_item(NAME(m_pio_out_data));
-
-
-}
-
-void kov3_state::machine_reset()
-{
-	m_has_decrypted_kov3_module = false;
-	module_prev_state = 0;
-	module_sum_read = false;
-	module_clk_cnt = 151; // this needed because of "false" clock pulse happen during gpio init
-	pgm2_state::machine_reset();
-
-}
-
 void pgm2_state::machine_reset()
 {
 	m_spritekey = 0;
@@ -698,6 +690,26 @@ void pgm2_state::machine_reset()
 	memcpy(m_mainrom->base(), &m_encrypted_copy[0], m_mainrom->bytes());
 
 	m_pio_out_data = 0;
+}
+
+void ddpdojt_state::machine_reset()
+{
+	pgm2_state::machine_reset();
+	m_decrypted_ram_copy.resize(m_romboard_ram.bytes() / 4);
+	std::fill(std::begin(m_decrypted_ram_copy), std::end(m_decrypted_ram_copy), 0);
+}
+
+void kov3_state::machine_reset()
+{
+	m_has_decrypted_kov3_module = false;
+	module_prev_state = 0;
+	module_sum_read = false;
+	module_clk_cnt = 151; // this needed because of "false" clock pulse happen during gpio init
+	module_in_latch = 0;
+	module_out_latch = 0;
+	std::fill(std::begin(module_rcv_buf), std::end(module_rcv_buf), 0);
+	std::fill(std::begin(module_send_buf), std::end(module_send_buf), 0);	
+	pgm2_state::machine_reset();
 }
 
 static const gfx_layout tiles32x32x8_layout =
@@ -1336,9 +1348,6 @@ void kov3_state::init_kov3_100()
 
 void ddpdojt_state::init_ddpdojt()
 {
-	m_encrypted_ram_copy.resize(0x200000/4);
-	std::fill(std::begin(m_encrypted_ram_copy), std::end(m_encrypted_ram_copy), 0);
-
 	common_init();
 }
 

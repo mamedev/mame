@@ -156,11 +156,10 @@ public:
 
 	void pgm2_hires(machine_config &config) ATTR_COLD;
 
-protected:
+private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-private:
 	struct kov3_module_key
 	{
 		u8 key[8];
@@ -180,15 +179,15 @@ private:
 	void pgm2_module_rom_map(address_map &map) ATTR_COLD;
 	virtual void restore_decrypted_state() override;
 
-	bool m_has_decrypted_kov3_module = false;
-	const kov3_module_key *module_key = nullptr;
-	bool module_sum_read = false;
+	bool m_has_decrypted_kov3_module;
+	const kov3_module_key *module_key;
+	bool module_sum_read;
 	u32 module_in_latch = 0;
 	u32 module_out_latch = 0;
-	int module_prev_state = 0;
-	int module_clk_cnt = 0;
-	u8 module_rcv_buf[10]{};
-	u8 module_send_buf[9]{};
+	int module_prev_state;
+	int module_clk_cnt;
+	u8 module_rcv_buf[10];
+	u8 module_send_buf[9];
 };
 
 class ddpdojt_state : public pgm2_state
@@ -203,16 +202,16 @@ public:
 
 	void pgm2_ramrom(machine_config &config) ATTR_COLD;
 
-protected:
-	virtual void machine_start() override ATTR_COLD;
-
 private:
+	virtual void machine_reset() override ATTR_COLD;
+
 	virtual void restore_decrypted_state() override;
 
 	void pgm2_ram_rom_map(address_map &map) ATTR_COLD;
+	u32 romboard_ram_r(offs_t offset, u32 mem_mask);
 	void romboard_ram_w(offs_t offset, u32 data, u32 mem_mask);
 
-	std::vector<u32> m_encrypted_ram_copy;
+	std::vector<u32> m_decrypted_ram_copy; // rebuilt when loading save state, doesn't need to be saved
 
 	required_shared_ptr<u32> m_romboard_ram;
 };
