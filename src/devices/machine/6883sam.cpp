@@ -17,7 +17,7 @@
         27  Set     M0  Memory Size
         26  Clear   M0  Memory Size
         25  Set     R1  MPU Rate            00: Slow    10: Fast
-        24  Clear   R1  MPU Rate            01: Dual    11: Fast
+        24  Clear   R1  MPU Rate            01: A.D.    11: Fast
         23  Set     R0  MPU Rate
         22  Clear   R0  MPU Rate
         21  Set     P1  Page #1             0: Low      1: High
@@ -44,7 +44,8 @@
          0  Clear   V0  VDG Mode
 
     All parts of the SAM are fully emulated except R1/R0 (the changes in the
-    MPU rate are approximated) and M1/M0
+    MPU rate are approximated; the loss of VDG and refresh cycles in fast
+    mode is not emulated) and M1/M0
 
 ***************************************************************************/
 
@@ -157,6 +158,8 @@ void sam6883_device::device_start()
 	save_item(NAME(m_counter_ydiv));
 	save_item(NAME(m_counter_bit4_input));
 	save_item(NAME(m_counter_bit5_input));
+	save_item(NAME(m_ad_base));
+	save_item(NAME(m_ad_slow_end));
 }
 
 
@@ -166,6 +169,8 @@ void sam6883_device::device_start()
 
 uint8_t sam6883_device::read(offs_t offset)
 {
+	address_dependent_rate(offset);
+
 	bool mode_64k = (m_sam_state & SAM_STATE_M1) == SAM_STATE_M1;
 	if (offset < (mode_64k && (m_sam_state & SAM_STATE_TY) ? 0xff00 : 0x8000))
 	{
@@ -203,6 +208,8 @@ uint8_t sam6883_device::read(offs_t offset)
 
 void sam6883_device::write(offs_t offset, uint8_t data)
 {
+	address_dependent_rate(offset);
+
 	bool mode_64k = (m_sam_state & SAM_STATE_M1) == SAM_STATE_M1;
 	if (offset < 0x8000)
 	{
@@ -349,20 +356,56 @@ void sam6883_friend_device_interface::update_cpu_clock()
 	//      $FFD6   (clear) R0
 	//
 	// R1:R0 formed the following states:
-	//      00  - slow          0.89 MHz
-	//      01  - dual speed    ???
-	//      1x  - fast          1.78 MHz
+	//      00  - slow          0.89 MHz (crystal / 16)
+	//      01  - address dependent
+	//      1x  - fast          1.78 MHz (crystal / 8)
 	//
-	// R1 controlled whether the video addressing was speeded up and R0
-	// did the same for the CPU.  On pre-CoCo 3 machines, setting R1 caused
-	// the screen to display garbage because the M6847 could not display
-	// fast enough.
+	// In address dependent mode, $0000-$7FFF and $FF00-$FF1F are accessed
+	// at the slow rate and all other addresses at the fast rate.  The CPU
+	// is clocked at the fast rate and the MC6883 stretches slow accesses
+	// (see sam6883_device::address_dependent_cycle).
 	//
-	// TODO:  Make the overclock more accurate.  In dual speed, ROM was a fast
-	// access but RAM was not.  I don't know how to simulate this.
+	// Fast mode steals the time normally used for VDG and refresh access.
+	// On pre-CoCo 3 machines, setting R1 caused the screen to display
+	// garbage because the M6847 is not given access to RAM.
 
 	int speed = (m_sam_state & (SAM_STATE_R1|SAM_STATE_R0)) / SAM_STATE_R0;
 	m_cpu->owner()->set_unscaled_clock(device().clock() / (m_divider * (speed ? 2 : 4)));
+}
+
+
+
+//-------------------------------------------------
+//  address_dependent_cycle - time one MPU bus
+//  cycle in address dependent rate mode
+//-------------------------------------------------
+
+// The CPU is clocked at the fast rate (8 oscillator periods per cycle), and
+// the MPU calls here once per bus cycle, dead cycles included, after the
+// cycle has been counted.  Measured on a CoCo 1 (MC6883) and a CoCo 2B
+// (SN74LS785):
+//  - a slow access starts on a slow cycle boundary (16 oscillator periods)
+//  - the cycle following a slow access also lasts a full slow period
+
+void sam6883_device::address_dependent_cycle(bool slow)
+{
+	uint64_t start = m_cpu->total_cycles() - 1;
+	int extra = 0;
+
+	if (slow)
+	{
+		if ((start - m_ad_base) & 1)
+			extra++;
+		extra++;
+		m_ad_slow_end = start + extra + 1;
+	}
+	else if (start == m_ad_slow_end)
+	{
+		extra++;
+	}
+
+	if (extra)
+		m_cpu->adjust_icount(-extra);
 }
 
 
@@ -390,7 +433,13 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 	if (xorval & (SAM_STATE_TY|SAM_STATE_M1|SAM_STATE_M0|SAM_STATE_P1))
 		update_memory();
 	if (xorval & (SAM_STATE_R1|SAM_STATE_R0))
+	{
 		update_cpu_clock();
+
+		// this write ends on a slow cycle boundary
+		m_ad_base = m_cpu->total_cycles();
+		m_ad_slow_end = ~uint64_t(0);
+	}
 
 	if (xorval & (SAM_STATE_F6|SAM_STATE_F5|SAM_STATE_F4|SAM_STATE_F3|SAM_STATE_F2|SAM_STATE_F1|SAM_STATE_F0))
 	{
