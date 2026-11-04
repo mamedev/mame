@@ -229,7 +229,6 @@ protected:
 	u32 dips_packed_r();
 	void key_select_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
 	void gpio_outputs_w(u32 data);
-	u32 base_gpio_r();
 
 	u32 m_pio_out;
 	u16 m_key_select;
@@ -353,7 +352,6 @@ protected:
 		m_scan(*this, "SCAN%u", 0U) { }
 
 	void hd_config(machine_config &config) ATTR_COLD;
-	u32 hyleyuan_gpio_r(offs_t offset, u32 mem_mask);
 	template <u32 Rows> u32 scan_inputs_r();
 };
 
@@ -376,7 +374,6 @@ private:
 	u16 m_secondary_select;
 
 	void hd_map(address_map &map) ATTR_COLD;
-	u32 hd_gpio_r(offs_t offset, u32 mem_mask = ~0U);
 	u32 gpio_inputs_r();
 	void outputs_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
 };
@@ -716,23 +713,6 @@ void m036_base_state::screen_vblank(int state)
 void m036_state::m036_map(address_map &map)
 {
 	map(0x08000000, 0x081fffff).rom().region("user1", 0); // not 100% sure it maps here.
-}
-
-
-
-u32 m036_base_state::base_gpio_r()
-{
-	 return m_service->read();
-}
-
-u32 m036_hd_state::hd_gpio_r(offs_t offset, u32 mem_mask)
-{
-	return gpio_inputs_r();
-}
-
-u32 m036_hd_base_state::hyleyuan_gpio_r(offs_t offset, u32 mem_mask)
-{
-	return scan_inputs_r<4>();
 }
 
 void m036_base_state::m036_boot_map(address_map &map)
@@ -1219,7 +1199,7 @@ void m036_base_state::base_config(machine_config &config)
 {
 	IGS036(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m036_base_state::m036_boot_map);
-	m_maincpu->set_gpio_r().set(FUNC(m036_base_state::base_gpio_r));
+	m_maincpu->set_gpio_r().set_ioport("SERVICE");
 	m_maincpu->set_gpio_w().set(FUNC(m036_base_state::gpio_outputs_w));
 	m_maincpu->set_do_decrypt().set(FUNC(m036_base_state::decrypt));
 
@@ -1315,7 +1295,7 @@ void m036_hd_state::m036_hd(machine_config &config)
 {
 	hd_config(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m036_hd_state::hd_map);
-	m_maincpu->set_gpio_r().set(FUNC(m036_hd_state::hd_gpio_r));
+	m_maincpu->set_gpio_r().set(FUNC(m036_hd_state::gpio_inputs_r));
 
 	HOPPER(config, m_hopper, attotime::from_msec(100)); // mechanical period is provisional
 }
@@ -1324,7 +1304,7 @@ void m036_hyleyuan_state::m036_hyleyuan(machine_config &config)
 {
 	hd_config(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m036_hyleyuan_state::hyleyuan_map);
-	m_maincpu->set_gpio_r().set(FUNC(m036_hyleyuan_state::hyleyuan_gpio_r));
+	m_maincpu->set_gpio_r().set(FUNC(m036_hyleyuan_state::scan_inputs_r<4>));
 
 	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100)); // mechanical period is provisional
 }

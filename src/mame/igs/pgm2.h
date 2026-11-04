@@ -53,7 +53,7 @@ public:
 	void init_kov3_101() ATTR_COLD;
 	void init_kov3_100() ATTR_COLD;
 
-	void common_init();
+	void common_init() ATTR_COLD;
 
 	void pgm2_ramrom(machine_config &config) ATTR_COLD;
 	void pgm2_lores(machine_config &config) ATTR_COLD;
@@ -96,8 +96,6 @@ private:
 	int module_data_r();
 	void module_data_w(int state);
 	void module_clk_w(int state);
-	void kov3_gpio_w(offs_t offset, u32 data, u32 mem_mask);
-	u32 kov3_gpio_r(offs_t offset, u32 mem_mask);
 
 	void decrypt(int state);
 	void sprite_encryption_w(offs_t offset, u32 data, u32 mem_mask = ~0);

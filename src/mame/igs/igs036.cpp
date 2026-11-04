@@ -2,11 +2,11 @@
 // copyright-holders:David Haywood
 
 /*
-	TODO:
-	- add support for missing peripherals (not needed at the moment)
-	- move igs036crypt handling into here (currently tricky due to ddpdojt using RAM not ROM)
-	- figure out if the igs_m036.cpp video emulation is an IGS036 feature that PGM2 ignores
-	  (and if so, move handling into here too)
+    TODO:
+    - add support for missing peripherals (not needed at the moment)
+    - move igs036crypt handling into here (currently tricky due to ddpdojt using RAM not ROM)
+    - figure out if the igs_m036.cpp video emulation is an IGS036 feature that PGM2 ignores
+      (and if so, move handling into here too)
 */
 
 #include "emu.h"
@@ -48,7 +48,7 @@ void igs036_cpu_device::gpio_w(offs_t offset, u32 data, u32 mem_mask)
 	m_write_gpio(m_pio_out_data);
 }
 
-u32 igs036_cpu_device::encryption_control_r(offs_t offset, u32 mem_mask)
+u32 igs036_cpu_device::encryption_control_r()
 {
 	return m_has_decrypted ? 4U : 0U;
 }

@@ -27,13 +27,13 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void onboard_peripherals(address_map &map) ATTR_COLD;
 
-	u32 encryption_control_r(offs_t offset, u32 mem_mask);
+	u32 encryption_control_r();
 	void encryption_control_w(offs_t offset, u32 data, u32 mem_mask);
 	u8 encryption_r(offs_t offset);
 	void encryption_w(offs_t offset, u8 data);
@@ -51,7 +51,7 @@ private:
 	u32 m_tc_regs[3][16];
 	bool m_tc_enabled[3];
 	u8 m_encryption_table[0x100];
-	bool m_has_decrypted = false;
+	bool m_has_decrypted;
 	u32 m_pio_out_data;
 
 	devcb_read32 m_read_gpio;
@@ -63,4 +63,4 @@ private:
 
 DECLARE_DEVICE_TYPE(IGS036,       igs036_cpu_device)
 
-#endif // MAME_IGS_IGS027A_H
+#endif // MAME_IGS_IGS036_H
