@@ -143,14 +143,14 @@ void vt82c598mvp_host_device::config_map(address_map &map)
 		NAME([this] () { return m_noncache_control; }),
 		NAME([this] (offs_t offset, u8 data) {
 			m_noncache_control = data & 0xf5;
-			LOG("52h: Non-Cacheable Control 2 %02x\n", data);
+			LOG("52h: Non-Cacheable Control %02x\n", data);
 		})
 	);
 	map(0x53, 0x53).lrw8(
 		NAME([this] () { return m_system_perf_control; }),
 		NAME([this] (offs_t offset, u8 data) {
 			m_system_perf_control = data & 0xf0;
-			LOG("53h: System Performance Control 2 %02x\n", data);
+			LOG("53h: System Performance Control %02x\n", data);
 		})
 	);
 	map(0x54, 0x57).lrw16(
