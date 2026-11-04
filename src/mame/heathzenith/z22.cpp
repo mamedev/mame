@@ -39,11 +39,13 @@
     Setup is entered by holding CTRL and pressing SET-UP twice. The setup
     screen accepts control keys: ^D/^E comm diagnostics, ^K and ^Y
     keyboard tests, ^L and ^P comm tests, ^S display test, ^V character
-    set, RETURN memory test.
+    set, RETURN memory test. Typing "(OPT)" there opens the options
+    screen. A line feed on the bottom line only scrolls with AUTO ROLL
+    set, which is off in the firmware's defaults.
 
     TODO:
     - keyboard: the ROM isn't dumped, so it's emulated at a high level
-      with a partly guessed key layout (see bus/heathzenith/z22/kbd.cpp)
+      with a partly guessed key layout (see z22_kbd.cpp)
     - status bit 6 and control bit 1
     - whether bits 2 and 3 really select inverse and half intensity, and
       which setup option chooses them (NORMAL / 2LEV / INVERSE)
@@ -51,7 +53,8 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "bus/heathzenith/z22/kbd.h"
+
+#include "z22_kbd.h"
 
 #include "bus/rs232/rs232.h"
 #include "cpu/m6502/m6502.h"
@@ -81,7 +84,6 @@ public:
 		, m_beep(*this, "beep")
 		, m_dispram(*this, "dispram")
 		, m_fontram(*this, "fontram")
-		, m_control(0)
 		, m_eeprom_clk(false)
 		, m_kbd_data(true)
 		, m_comm_cts(true)
@@ -90,9 +92,7 @@ public:
 	{
 	}
 
-	void z22(machine_config &config);
-
-	void init_z22() ATTR_COLD;
+	void z22(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -102,28 +102,28 @@ private:
 	MC6845_UPDATE_ROW(update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(update_cb);
 
-	u8   irq_ack_r();
-	u8   status_r();
+	u8 irq_ack_r();
+	u8 status_r();
 	void control_w(u8 data);
 
 	void eeprom_clock_w(int state);
-	void kbd_data_w(int state)      { m_kbd_data = state; }
+	void kbd_data_w(int state) { m_kbd_data = state; }
 	void comm_cts_w(int state);
-	void comm_dcd_w(int state)      { m_comm_dcd = state; }
-	void printer_busy_w(int state)  { m_printer_busy = state; }
+	void comm_dcd_w(int state) { m_comm_dcd = state; }
+	void printer_busy_w(int state) { m_printer_busy = state; }
 
 	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<r6545_1_device> m_crtc;
-	optional_device_array<i8251_device, 2> m_uart;
+	required_device_array<i8251_device, 2> m_uart;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<z22_keyboard_device> m_keyboard;
 	required_device<beep_device> m_beep;
 	required_shared_ptr<u8> m_dispram;
 	required_shared_ptr<u8> m_fontram;
 
-	u8   m_control;
+	u8 m_control;
 	bool m_eeprom_clk;
 	bool m_kbd_data;
 	bool m_comm_cts;
@@ -151,12 +151,12 @@ MC6845_UPDATE_ROW(z22_state::update_row)
 {
 	u32 *pix = &bitmap.pix(y);
 
-	for (unsigned x = 0; x < x_count; x++)
+	for (int x = 0; x < x_count; x++)
 	{
-		u8  cdata = m_dispram[(ma + x) & 0x7ff];
-		u16 dots  = m_fontram[(cdata & 0x7f) << 4 | ra] << 1;
+		u8 cdata = m_dispram[(ma + x) & 0x7ff];
+		u16 dots = m_fontram[(cdata & 0x7f) << 4 | ra] << 1;
 
-		// the firmware draws its own cursor in display RAM
+		// the firmware disables this cursor (R10 = 20h) and draws its own in display RAM
 		if (x == cursor_x)
 			dots = ~dots;
 
@@ -252,26 +252,24 @@ INPUT_PORTS_END
 
 void z22_state::z22(machine_config &config)
 {
-	constexpr XTAL CPU_CLOCK = 16.5888_MHz_XTAL / 9;
-
-	M6512(config, m_maincpu, CPU_CLOCK); // R6512AP
+	M6512(config, m_maincpu, 16.5888_MHz_XTAL / 9); // R6512AP
 	m_maincpu->set_addrmap(AS_PROGRAM, &z22_state::mem_map);
 
-	I8251(config, m_uart[0], CPU_CLOCK); // NEC D8251AC (U33) + Intel P8251A (U35)
+	I8251(config, m_uart[0], 16.5888_MHz_XTAL / 9); // NEC D8251AC (U33) + Intel P8251A (U35)
 	m_uart[0]->rxrdy_handler().set_inputline(m_maincpu, m6512_device::NMI_LINE);
 	m_uart[0]->txd_handler().set("comm", FUNC(rs232_port_device::write_txd));
 	m_uart[0]->dtr_handler().set("comm", FUNC(rs232_port_device::write_dtr));
 	m_uart[0]->rts_handler().set("comm", FUNC(rs232_port_device::write_rts));
 
-	I8251(config, m_uart[1], CPU_CLOCK);
+	I8251(config, m_uart[1], 16.5888_MHz_XTAL / 9);
 	m_uart[1]->txd_handler().set("printer", FUNC(rs232_port_device::write_txd));
 
 	EEPROM_93C06_16BIT(config, m_eeprom); // NMC9306 (U27)
 
 	pit8254_device &pit(PIT8254(config, "pit")); // Intel P8254
-	pit.set_clk<0>(CPU_CLOCK);
-	pit.set_clk<1>(CPU_CLOCK);
-	pit.set_clk<2>(CPU_CLOCK);
+	pit.set_clk<0>(16.5888_MHz_XTAL / 9);
+	pit.set_clk<1>(16.5888_MHz_XTAL / 9);
+	pit.set_clk<2>(16.5888_MHz_XTAL / 9);
 	pit.out_handler<0>().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::clk_write)); // weird synchronous clocking
 	pit.out_handler<0>().append(FUNC(z22_state::eeprom_clock_w));
 	pit.out_handler<1>().set(m_uart[0], FUNC(i8251_device::write_rxc));
@@ -286,7 +284,7 @@ void z22_state::z22(machine_config &config)
 	screen.set_raw(16.5888_MHz_XTAL, 873, 0, 720, 317, 0, 300);
 	screen.set_screen_update(m_crtc, FUNC(r6545_1_device::screen_update));
 
-	R6545_1(config, m_crtc, CPU_CLOCK); // R6545-1AP
+	R6545_1(config, m_crtc, 16.5888_MHz_XTAL / 9); // R6545-1AP
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(9);
@@ -315,37 +313,9 @@ ROM_START(z22)
 	ROM_REGION(0x4000, "program", 0)
 	ROM_LOAD("u39.bin", 0x0000, 0x2000, CRC(2f62c1f8) SHA1(448581d987fee6b4303e481e78f46d3255baccbb)) // D2764A-3
 	ROM_LOAD("u38.bin", 0x2000, 0x2000, CRC(f0bfe9b5) SHA1(8807841b28549d0ddf30275fc6035a66093f8768)) // D2764A-3
-
-	ROM_REGION16_LE(0x20, "eeprom", ROMREGION_ERASEFF) // default setup, filled in by init_z22
 ROM_END
-
-/**
- * Default setup for the NMC9306 EEPROM
- *
- * Words 1-4 hold the setup bytes the firmware keeps at 44h-4Ah (word 1
- * low byte = 44h, word 2 = 46h:45h, and so on). Word 0 is a checksum: the
- * two's complement of the sum of the bytes in words 1-15. With a blank
- * EEPROM the firmware stores its built-in defaults; these are the same,
- * except that AUTO ROLL (48h bit 0) is on, so a line feed on the bottom
- * line scrolls the screen.
- */
-void z22_state::init_z22()
-{
-	static constexpr u8 SETUP[7] = { 0xaa, 0x50, 0x54, 0x4c, 0x5d, 0x4a, 0x55 }; // 44h-4Ah
-
-	u16 *const eeprom = &memregion("eeprom")->as_u16();
-	eeprom[1] = SETUP[0];
-	eeprom[2] = (SETUP[2] << 8) | SETUP[1];
-	eeprom[3] = (SETUP[4] << 8) | SETUP[3];
-	eeprom[4] = (SETUP[6] << 8) | SETUP[5];
-
-	u16 sum = 0;
-	for (int i = 1; i < 16; i++)
-		sum += (eeprom[i] >> 8) + (eeprom[i] & 0xff);
-	eeprom[0] = -sum;
-}
 
 } // anonymous namespace
 
 
-SYST(1984, z22, 0, 0, z22, z22, z22_state, init_z22, "Zenith Data Systems", "Z-22 Terminal", 0)
+SYST(1984, z22, 0, 0, z22, z22, z22_state, empty_init, "Zenith Data Systems", "Z-22 Terminal", MACHINE_IMPERFECT_SOUND)

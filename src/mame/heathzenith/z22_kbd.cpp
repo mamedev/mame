@@ -50,7 +50,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "kbd.h"
+#include "z22_kbd.h"
 
 #include "machine/keyboard.ipp"
 
@@ -139,11 +139,6 @@ z22_keyboard_device::z22_keyboard_device(const machine_config &mconfig, const ch
 	, device_buffered_serial_interface(mconfig, *this)
 	, device_matrix_keyboard_interface(mconfig, *this, "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6")
 	, m_txd_cb(*this)
-	, m_shift_left(false)
-	, m_shift_right(false)
-	, m_ctrl(false)
-	, m_caps(false)
-	, m_command(false)
 {
 }
 
@@ -237,9 +232,9 @@ static INPUT_PORTS_START(z22_keyboard)
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)   PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK)   PORT_NAME("Caps Lock")
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F12)        PORT_NAME("Set Up")
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT)       PORT_NAME("Line Feed")
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT)       PORT_NAME("Line Feed") PORT_CHAR(10)
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME)       PORT_NAME("Home  Clear") PORT_CHAR(UCHAR_MAMEKEY(HOME))
 	PORT_BIT(0xf800, IP_ACTIVE_HIGH, IPT_UNUSED)
 
@@ -271,7 +266,6 @@ void z22_keyboard_device::device_start()
 {
 	save_item(NAME(m_shift_left));
 	save_item(NAME(m_shift_right));
-	save_item(NAME(m_ctrl));
 	save_item(NAME(m_caps));
 	save_item(NAME(m_command));
 }
@@ -289,7 +283,6 @@ void z22_keyboard_device::device_reset()
 
 	m_shift_left = false;
 	m_shift_right = false;
-	m_ctrl = false;
 	m_caps = false;
 	m_command = false;
 
@@ -344,7 +337,6 @@ void z22_keyboard_device::key_make(u8 row, u8 column)
 	switch (code)
 	{
 	case KEY_CTRL:
-		m_ctrl = true;
 		transmit_byte((m_shift_left || m_shift_right) ? 0xe5 : 0xc5);
 		return;
 	case KEY_LSHIFT:
@@ -358,8 +350,8 @@ void z22_keyboard_device::key_make(u8 row, u8 column)
 		return;
 	}
 
-	// ')' sends 00h, so only the unshifted code can mark an empty position
-	if ((code == KEY_NONE) && (KEY_CODES[row][column][1] == KEY_NONE))
+	// ')' sends 00h, so only the unshifted code marks an empty position
+	if (code == KEY_NONE)
 		return;
 
 	LOGKEY("make %u,%u -> %02x\n", row, column, key_code(row, column));
@@ -383,7 +375,6 @@ void z22_keyboard_device::key_break(u8 row, u8 column)
 		switch (code)
 		{
 		case KEY_CTRL:
-			m_ctrl = false;
 			transmit_byte(0xd5);
 			break;
 		case KEY_LSHIFT:
