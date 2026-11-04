@@ -6534,6 +6534,8 @@ if BUSES["VIP"] then
 		MAME_DIR .. "src/devices/bus/vip/vp590.h",
 		MAME_DIR .. "src/devices/bus/vip/vp595.cpp",
 		MAME_DIR .. "src/devices/bus/vip/vp595.h",
+	    MAME_DIR .. "src/devices/bus/vip/vp601.cpp",
+    	MAME_DIR .. "src/devices/bus/vip/vp601.h",
 		MAME_DIR .. "src/devices/bus/vip/vp700.cpp",
 		MAME_DIR .. "src/devices/bus/vip/vp700.h",
 	}
