@@ -548,10 +548,17 @@ void ddpdojt_state::romboard_ram_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_romboard_ram[offset]);
 
 	// store a copy in the decrypted buffer too
-	// TODO: if encryption is enabled when this is written we should decrypt it
-	//       but in practice that never happens, it's a one-off copy then enable
-	//       decrypt on startup
-	m_decrypted_ram_copy[offset] = m_romboard_ram[offset];
+	if (m_maincpu->get_has_decrypted())
+	{
+		// TODO: if encryption is enabled when this is written we should decrypt it
+		//       but in practice that never happens, it's a one-off copy then enable
+		//       decrypt on startup
+		logerror("%s: write to RAM with decryption enabled %04x %04x (%04x)\n", machine().describe_context(), offset, data, mem_mask);
+	}
+	else
+	{
+		m_decrypted_ram_copy[offset] = m_romboard_ram[offset];
+	}
 }
 
 void ddpdojt_state::pgm2_ram_rom_map(address_map &map)
