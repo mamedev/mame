@@ -5,8 +5,7 @@
 
     Sega 837-7753 drive board for the Rad Mobile deluxe moving cabinet.
 
-    The board banks the cabinet with a DC motor, reading the bank position and the motor
-    shaft through two incremental encoders.
+    The board banks the cabinet with a DC motor.
 
     Hardware:
      - NEC D70008AC-8 (Z80) and 8 MHz oscillator.
@@ -39,10 +38,9 @@
       0f     r   PPI 0 port B
 
     Timer 1 makes the motor PWM: counter 0 sets a 15.625 kHz period and presumably triggers
-    counter 1, whose count sets the duty cycle. From the way the program uses it, 50% duty
-    gives no torque (locked anti-phase drive). Counter 2 is set up the same way for a second channel
-    that the program never uses. Timer 1 isn't clocked here, as emulating the PWM edges
-    slows the whole system down several times; the drive comes from the counter 1 count.
+    counter 1, whose count sets the duty cycle, 50% being no torque. Counter 2 is set up the
+    same way for a second channel the program never uses. Timer 1 isn't clocked, as emulating
+    the PWM edges slows the whole system down several times.
 
     TODO:
     - Timer 0 counters 1 and 2 ("safety clocks") feed logic that isn't emulated.
@@ -69,7 +67,7 @@ constexpr double MOTOR_MAX_SPEED = 94000.0; // motor encoder counts per second a
 constexpr double MOTOR_TIME_CONSTANT = 0.1; // seconds
 constexpr double GEAR_RATIO = 40.0; // motor encoder counts per bank encoder count
 constexpr s32 BANK_LIMIT = 400; // limit switches, in bank encoder counts from the center
-constexpr s32 BANK_STOP = 440; // mechanical end stops
+constexpr s32 BANK_STOP = 440;
 constexpr s32 BANK_CENTER = 16; // half width of the center sensor vane
 
 } // anonymous namespace
@@ -110,11 +108,6 @@ void radmdlxmc_device::device_start()
 	save_item(NAME(m_motor_pos));
 }
 
-
-/*******************************************************************************************
-    Host interface
-*******************************************************************************************/
-
 u8 radmdlxmc_device::data_r()
 {
 	// the board only drives the data lines during a read strobe
@@ -142,11 +135,6 @@ void radmdlxmc_device::strobe_w(int state)
 	m_host_strobe = state;
 }
 
-
-/*******************************************************************************************
-    Board I/O
-*******************************************************************************************/
-
 IRQ_CALLBACK_MEMBER(radmdlxmc_device::irq_ack)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
@@ -161,7 +149,7 @@ void radmdlxmc_device::timer_irq_w(int state)
 
 u8 radmdlxmc_device::switches_r()
 {
-	// d0: right limit, d1: left limit, d2: center, d4: low on over-current, d5: low on over-temperature
+	// d4: low on over-current, d5: low on over-temperature
 	s32 const pos = bank_position();
 	u8 data = 0xf8;
 	if (pos >= BANK_LIMIT)
@@ -176,7 +164,7 @@ u8 radmdlxmc_device::switches_r()
 
 void radmdlxmc_device::drive_enable_w(u8 data)
 {
-	// d0: set when driving left, d1: set when driving right, both clear to stop the motor; d4-d6 always set
+	// d0: driving left, d1: driving right, both clear to stop the motor; d4-d6 always set
 	m_drive_enable = data;
 }
 
@@ -184,20 +172,14 @@ void radmdlxmc_device::pit1_w(offs_t offset, u8 data)
 {
 	m_pit1->write(offset, data);
 
-	// counter 1 is loaded LSB only, its output pulse ends the PWM high time N + 1 clocks into the 256-clock period
+	// counter 1 ends the PWM high time N + 1 clocks into the 256-clock period
 	if (offset == 1)
 		m_pwm_duty = data;
 }
 
-
-/*******************************************************************************************
-    Cabinet mechanics
-*******************************************************************************************/
-
 TIMER_CALLBACK_MEMBER(radmdlxmc_device::motion_tick)
 {
-	// More than 50% duty drives left, less drives right. PA0/PA1 follow the sign of the servo
-	// output; either is taken to enable the motor, as the vibration added on top needs both ways.
+	// more than 50% duty drives left; either PA0/PA1 enables both ways, as the vibration needs it
 	double const drive = (m_drive_enable & 0x03) ? ((127.0 - m_pwm_duty) / 128.0) : 0.0;
 
 	m_motor_speed += (drive * MOTOR_MAX_SPEED - m_motor_speed) / (MOTOR_TIME_CONSTANT * MOTION_RATE);
@@ -236,11 +218,6 @@ ioport_value radmdlxmc_device::motor_encoder_r()
 	return s32(std::floor(m_motor_pos)) & 0xfff;
 }
 
-
-/*******************************************************************************************
-    Machine configuration
-*******************************************************************************************/
-
 void radmdlxmc_device::program_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -256,37 +233,32 @@ void radmdlxmc_device::program_map(address_map &map)
 
 void radmdlxmc_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_maincpu, 8_MHz_XTAL); // NEC D70008AC-8
+	Z80(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &radmdlxmc_device::program_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(radmdlxmc_device::irq_ack));
 
 	// PC3 toggles on every interrupt, probably the MB3773 watchdog clock
-	i8255_device &ppi0(I8255(config, "ppi0")); // NEC D71055GB
+	i8255_device &ppi0(I8255(config, "ppi0"));
 	ppi0.out_pa_callback().set(FUNC(radmdlxmc_device::drive_enable_w));
 	ppi0.in_pb_callback().set(FUNC(radmdlxmc_device::switches_r));
 	ppi0.in_pc_callback().set_ioport("DSW");
 
-	i8255_device &ppi1(I8255(config, "ppi1")); // NEC D71055GB
+	i8255_device &ppi1(I8255(config, "ppi1"));
 	ppi1.out_pa_callback().set([this] (u8 data) { m_lamps_cb(data); });
 	ppi1.in_pb_callback().set_ioport("SENSORS");
 
-	pit8254_device &pit0(PIT8254(config, "pit0")); // NEC D71054GB
+	pit8254_device &pit0(PIT8254(config, "pit0"));
 	pit0.set_clk<0>(8_MHz_XTAL / 2);
 	pit0.set_clk<1>(8_MHz_XTAL / 1024); // SFTYCLK jumper set to 8K
 	pit0.set_clk<2>(8_MHz_XTAL / 1024);
 	pit0.out_handler<0>().set(FUNC(radmdlxmc_device::timer_irq_w));
 
-	PIT8254(config, m_pit1); // NEC D71054GB, its 4 MHz clock is left unconnected (see above)
+	PIT8254(config, m_pit1);
 
-	UPD4701A(config, m_upd4701); // NEC D4701AC
+	UPD4701A(config, m_upd4701);
 	m_upd4701->set_portx_tag("BANK");
 	m_upd4701->set_porty_tag("MOTOR");
 }
-
-
-/*******************************************************************************************
-    Inputs
-*******************************************************************************************/
 
 static INPUT_PORTS_START(radmdlxmc)
 	PORT_START("DSW")
@@ -307,7 +279,7 @@ static INPUT_PORTS_START(radmdlxmc)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Sensor C (Base Right Rear)")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Sensor D (Base Left)")
 	PORT_BIT(0x70, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN) // when low the board moves the cabinet at random, ignoring the host
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN) // low: random motion, host ignored
 
 	PORT_START("BANK")
 	PORT_BIT(0xfff, 0x000, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(radmdlxmc_device::bank_encoder_r))
@@ -320,11 +292,6 @@ ioport_constructor radmdlxmc_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(radmdlxmc);
 }
-
-
-/*******************************************************************************************
-    ROM definition
-*******************************************************************************************/
 
 ROM_START(radmdlxmc)
 	ROM_REGION(0x8000, "maincpu", 0)

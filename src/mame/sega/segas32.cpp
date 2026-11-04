@@ -1996,7 +1996,6 @@ static INPUT_PORTS_START( radm )
 	PORT_START("mainpcb:ANALOG3")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	// must match the Cabinet type game setting
 	PORT_START("CABINET")
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
@@ -2882,7 +2881,6 @@ void segas32_new_state::sega_multi32_6p(machine_config &config)
 	SEGA_MULTI32_6PLAYER_DEVICE(config, "mainpcb");
 }
 
-// the deluxe cabinet wires I/O chip ports C, D and G to the drive board, which also drives the lamps
 void segas32_radm_state::sega_system32_radm(machine_config &config)
 {
 	sega_system32_analog(config);
