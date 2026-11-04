@@ -14,7 +14,7 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(VT82C598MVP_HOST, vt82c598mvp_host_device, "vt82c598mvp_host", "Via VT82C598MVP \"Apollo MVP3\" Host")
+DEFINE_DEVICE_TYPE(VT82C598MVP_HOST, vt82c598mvp_host_device, "vt82c598mvp_host", "VIA VT82C598MVP \"Apollo MVP3\" Host")
 
 vt82c598mvp_host_device::vt82c598mvp_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, type, tag, owner, clock)

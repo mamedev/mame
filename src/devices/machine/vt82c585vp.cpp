@@ -13,7 +13,7 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(VT82C585VP_HOST, vt82c585vp_host_device, "vt82c598mvp_host", "Via VT82C585VP \"Apollo VP\" Host")
+DEFINE_DEVICE_TYPE(VT82C585VP_HOST, vt82c585vp_host_device, "vt82c585vp_host", "VIA VT82C585VP \"Apollo VP\" Host")
 
 vt82c585vp_host_device::vt82c585vp_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, type, tag, owner, clock)
@@ -338,18 +338,13 @@ void vt82c585vp_host_device::map_extra(
 	else
 		memory_space->install_ram      (0x00000000, 0x0009ffff, &m_ram[0x00000000/4]);
 
-	const u8 smi_mapping = m_shadow_ram_control[2] & 3;
+	// TODO: different than MVP3 (hot579 and ice/calchase.cpp cares)
+	//const u8 smi_mapping = m_shadow_ram_control[2] & 3;
 
-	// 00 SMI DRAM disabled (default)
-	// 01 SMI DRAM always mapped (overlays VGA)
-	// 10 <reserved>
-	// 11 SMI DRAM on SMM
-	// HACK: function is for '691, that actually uses code/data separation for SMI DRAM
-	// (never setup shadow RAM control[2] bits 0-1)
-	if ((smi_mapping == smi_bank() && m_smiact == 0) || smi_mapping == 1)
-	{
-		memory_space->install_ram      (0x000a0000, 0x000bffff, &m_ram[0x000a0000/4]);
-	}
+	//if ((smi_mapping == smi_bank() && m_smiact == 0) || smi_mapping == 1)
+	//{
+	//	memory_space->install_ram      (0x000a0000, 0x000bffff, &m_ram[0x000a0000/4]);
+	//}
 
 	// upper memory hole settings
 	memory_space->install_ram          (0x00100000, 0x00dfffff, &m_ram[0x00100000/4]);

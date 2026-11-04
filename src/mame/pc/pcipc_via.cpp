@@ -30,9 +30,8 @@
  * TODO (ct6vta2)
  * - Currently maps a keyboard from southbridge and from Super I/O, clashing each other;
  *
- * TODO (hot579)
- * - Goes off the rails with shadow RAM, screen keeps being blanked regardless of ISA or PCI card
- *   used;
+ * TODO (hot579/pcm573)
+ * - Requires proper SMI handling from northbridge;
  *
  */
 

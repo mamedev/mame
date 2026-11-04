@@ -21,7 +21,7 @@ VT82C586B PCIC ISA section
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(VT82C586B_ISA, vt82c586b_isa_device, "vt82c586b_isa", "VT82C586B \"PIPC\" PCI-to-ISA bridge")
+DEFINE_DEVICE_TYPE(VT82C586B_ISA, vt82c586b_isa_device, "vt82c586b_isa", "VIA VT82C586B \"PIPC\" PCI-to-ISA bridge")
 
 vt82c586b_isa_device::vt82c586b_isa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, type, tag, owner, clock)
