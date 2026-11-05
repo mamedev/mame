@@ -389,10 +389,10 @@ void neoprint_state::audio_io_map(address_map &map)
 //  map(0x00, 0x00).mirror(0xff00).rw(FUNC(neoprint_state::audio_command_r), FUNC(neoprint_state::audio_cpu_clear_nmi_w)); // may not and NMI clear
 	map(0x00, 0x00).mirror(0xff00).r(FUNC(neoprint_state::audio_command_r)).nopw();
 	map(0x04, 0x07).mirror(0xff00).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
-//  map(0x08, 0x08).mirror(0xff00); /* write - NMI enable / acknowledge? (the data written doesn't matter) */
+//  map(0x08, 0x08).mirror(0xff00); // write - NMI enable / acknowledge? (the data written doesn't matter)
 	map(0x08, 0x0b).select(0xff00).r(m_neo_zmc, FUNC(neo_zmc_device::bank_r));
 	map(0x0c, 0x0c).mirror(0xff00).w(FUNC(neoprint_state::audio_result_w));
-//  map(0x18, 0x18).mirror(0xff00); /* write - NMI disable? (the data written doesn't matter) */
+//  map(0x18, 0x18).mirror(0xff00); // write - NMI disable? (the data written doesn't matter)
 }
 
 static INPUT_PORTS_START( neoprint )
