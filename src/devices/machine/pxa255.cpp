@@ -236,6 +236,87 @@ void pxa255_periphs_device::device_start()
 	m_samples = make_unique_clear<s16[]>(0x1000);
 
 	m_rtc_regs.timer = timer_alloc(FUNC(pxa255_periphs_device::rtc_tick), this);
+
+	save_item(NAME(m_dma_regs.dcsr));
+	save_item(NAME(m_dma_regs.dint));
+	save_item(NAME(m_dma_regs.drcmr));
+	save_item(NAME(m_dma_regs.ddadr));
+	save_item(NAME(m_dma_regs.dsadr));
+	save_item(NAME(m_dma_regs.dtadr));
+	save_item(NAME(m_dma_regs.dcmd));
+
+	save_item(NAME(m_rtc_regs.rcnr));
+	save_item(NAME(m_rtc_regs.rtar));
+	save_item(NAME(m_rtc_regs.rtsr));
+	save_item(NAME(m_rtc_regs.rttr));
+
+	save_item(NAME(m_i2s_regs.sacr0));
+	save_item(NAME(m_i2s_regs.sacr1));
+	save_item(NAME(m_i2s_regs.sasr0));
+	save_item(NAME(m_i2s_regs.saimr));
+	save_item(NAME(m_i2s_regs.saicr));
+	save_item(NAME(m_i2s_regs.sadiv));
+	save_item(NAME(m_i2s_regs.sadr));
+
+	save_item(NAME(m_ostimer_regs.osmr));
+	save_item(NAME(m_ostimer_regs.oscr));
+	save_item(NAME(m_ostimer_regs.ossr));
+	save_item(NAME(m_ostimer_regs.ower));
+	save_item(NAME(m_ostimer_regs.oier));
+	save_item(NAME(m_ostimer_regs.last_count_sync));
+
+	save_item(NAME(m_intc_regs.icip));
+	save_item(NAME(m_intc_regs.icmr));
+	save_item(NAME(m_intc_regs.iclr));
+	save_item(NAME(m_intc_regs.icfp));
+	save_item(NAME(m_intc_regs.icpr));
+	save_item(NAME(m_intc_regs.iccr));
+
+	save_item(NAME(m_gpio_regs.gpdr));
+	save_item(NAME(m_gpio_regs.gpsr));
+	save_item(NAME(m_gpio_regs.gpcr));
+	save_item(NAME(m_gpio_regs.grer));
+	save_item(NAME(m_gpio_regs.gfer));
+	save_item(NAME(m_gpio_regs.gedr));
+	save_item(NAME(m_gpio_regs.gafrl));
+	save_item(NAME(m_gpio_regs.gafru));
+	save_item(NAME(m_gpio_regs.out_data));
+	save_item(NAME(m_gpio_regs.in_data));
+
+	save_item(NAME(m_lcd_regs.lccr));
+	save_item(NAME(m_lcd_regs.fbr));
+	save_item(NAME(m_lcd_regs.lcsr));
+	save_item(NAME(m_lcd_regs.liidr));
+	save_item(NAME(m_lcd_regs.trgbr));
+	save_item(NAME(m_lcd_regs.tcr));
+	save_item(NAME(m_lcd_regs.dma[0].fdadr));
+	save_item(NAME(m_lcd_regs.dma[0].fsadr));
+	save_item(NAME(m_lcd_regs.dma[0].fidr));
+	save_item(NAME(m_lcd_regs.dma[0].ldcmd));
+	save_item(NAME(m_lcd_regs.dma[1].fdadr));
+	save_item(NAME(m_lcd_regs.dma[1].fsadr));
+	save_item(NAME(m_lcd_regs.dma[1].fidr));
+	save_item(NAME(m_lcd_regs.dma[1].ldcmd));
+
+	save_item(NAME(m_power_regs.pmcr));
+	save_item(NAME(m_power_regs.pssr));
+	save_item(NAME(m_power_regs.pspr));
+	save_item(NAME(m_power_regs.pwer));
+	save_item(NAME(m_power_regs.prer));
+	save_item(NAME(m_power_regs.pfer));
+	save_item(NAME(m_power_regs.pedr));
+	save_item(NAME(m_power_regs.pcfr));
+	save_item(NAME(m_power_regs.pgsr));
+	save_item(NAME(m_power_regs.rcsr));
+	save_item(NAME(m_power_regs.pmfw));
+
+	save_item(NAME(m_clk_regs.cccr));
+	save_item(NAME(m_clk_regs.cken));
+	save_item(NAME(m_clk_regs.oscc));
+
+	save_pointer(NAME(m_lcd_palette), 0x100);
+	save_pointer(NAME(m_lcd_framebuffer), 0x100000);
+	save_pointer(NAME(m_samples), 0x1000);
 }
 
 void pxa255_periphs_device::device_reset()
@@ -244,6 +325,12 @@ void pxa255_periphs_device::device_reset()
 	{
 		m_dma_regs.dcsr[index] = 0x00000008;
 	}
+	m_dma_regs.dint = 0x00000000;
+	memset(m_dma_regs.drcmr, 0, sizeof(m_dma_regs.drcmr));
+	memset(m_dma_regs.ddadr, 0, sizeof(m_dma_regs.ddadr)); // Uninitialized, per manual
+	memset(m_dma_regs.dsadr, 0, sizeof(m_dma_regs.dsadr)); // Uninitialized, per manual
+	memset(m_dma_regs.dtadr, 0, sizeof(m_dma_regs.dtadr)); // Uninitialized, per manual
+	memset(m_dma_regs.dsadr, 0, sizeof(m_dma_regs.dsadr));
 
 	m_rtc_regs.rcnr = 0x00000000;
 	m_rtc_regs.rtar = 0x00000000;
@@ -251,17 +338,51 @@ void pxa255_periphs_device::device_reset()
 	m_rtc_regs.rttr = 0x00007fff;
 	m_rtc_regs.timer->adjust(attotime::from_hz(1));
 
-	memset(&m_intc_regs, 0, sizeof(m_intc_regs));
+	m_i2s_regs.sacr0 = 0x00007700;
+	m_i2s_regs.sacr1 = 0x00000000;
+	m_i2s_regs.sasr0 = 0x00000001;
+	m_i2s_regs.saimr = 0x00000000;
+	m_i2s_regs.saicr = 0x00000000; // Write-only register
+	m_i2s_regs.sadiv = 0x0000001a;
+	m_i2s_regs.sadr = 0x00000000;
 
+	memset(m_ostimer_regs.osmr, 0, sizeof(m_ostimer_regs.osmr));
+	m_ostimer_regs.oscr = 0x00000000;
+	m_ostimer_regs.ossr = 0x00000000;
+	m_ostimer_regs.ower = 0x00000000;
+	m_ostimer_regs.oier = 0x00000000;
+	m_ostimer_regs.last_count_sync = attotime::zero;
+
+	memset(&m_intc_regs, 0, sizeof(m_intc_regs));
+	memset(&m_gpio_regs, 0, sizeof(m_gpio_regs));
+
+	memset(m_lcd_regs.lccr, 0, sizeof(m_lcd_regs.lccr));
+	m_lcd_regs.dma[0].fdadr = 0x00000000; // Unknown initialization value, per manual
+	m_lcd_regs.dma[0].fsadr = 0x00000000; // Unknown initialization value, per manual
+	m_lcd_regs.dma[0].fidr = 0x00000000; // Unknown initialization value, per manual
+	m_lcd_regs.dma[0].ldcmd = 0x00000000; // Unknown initialization value, per manual
+	m_lcd_regs.dma[1].fdadr = 0x00000000; // Unknown initialization value, per manual
+	m_lcd_regs.dma[1].fsadr = 0x00000000; // Unknown initialization value, per manual
+	m_lcd_regs.dma[1].fidr = 0x00000000; // Unknown initialization value, per manual
+	m_lcd_regs.dma[1].ldcmd = 0x00000000; // Unknown initialization value, per manual
+	m_lcd_regs.fbr[0] = 0x00000000;
+	m_lcd_regs.fbr[1] = 0x00000000;
+	m_lcd_regs.lcsr = 0x00000000;
+	m_lcd_regs.liidr = 0x00000000; // Unknown initialization value, per manual
 	m_lcd_regs.trgbr = 0x00aa5500;
 	m_lcd_regs.tcr = 0x0000754f;
 
-	memset(&m_gpio_regs, 0, sizeof(m_gpio_regs));
 	memset(&m_power_regs, 0, sizeof(m_power_regs));
-	memset(&m_clk_regs, 0, sizeof(m_clk_regs));
+	m_power_regs.pssr = 0x00000020;
+	m_power_regs.pwer = 0x00000003;
+	m_power_regs.prer = 0x00000003;
+	m_power_regs.pfer = 0x00000003;
+	m_power_regs.rcsr = 0x00000001;
 
-	m_i2s_regs = i2s_regs();
-	m_i2s_regs.sadiv = 0x1a;
+	memset(&m_clk_regs, 0, sizeof(m_clk_regs));
+	m_clk_regs.cccr = 0x00000121;
+	m_clk_regs.cken = 0x00017def;
+	m_clk_regs.oscc = 0x00000000;
 }
 
 void pxa255_periphs_device::device_add_mconfig(machine_config &config)
