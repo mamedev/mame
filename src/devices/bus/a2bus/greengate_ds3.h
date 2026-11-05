@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:Robyn Powell
 /*********************************************************************
 
     greengate_ds3.h

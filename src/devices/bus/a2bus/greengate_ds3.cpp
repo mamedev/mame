@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:Robyn Powell
 /*********************************************************************
 
     greengate_ds3.cpp
@@ -8,7 +8,8 @@
 
     Four voice 8-bit sample playback from Apple II main memory, plus
     an 8-bit ADC for recording and a 64 key diode matrix keyboard.
-    Hardware reverse engineered by Tube Time ("Goodgreat DS3").
+    Hardware reverse engineered by Tube Time ("Goodgreat DS3"):
+    https://github.com/schlae/goodgreat-ds3
 
     The card has no ROM. Everything is decoded from /IOSEL, so the
     software expects it in slot 5:
@@ -77,6 +78,7 @@ protected:
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_cnxx(uint8_t offset) override;
 	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
+	virtual void reset_from_bus() override;
 
 private:
 	template <unsigned N> void stc_out_w(int state);
@@ -123,6 +125,13 @@ INPUT_PORTS_START( ds3 )
 	DS3_GROUP(7)
 	DS3_GROUP(8)
 INPUT_PORTS_END
+
+void a2bus_ds3_device::reset_from_bus()
+{
+	// /RES from the slot goes to the 6844 and the 6522
+	m_dmac->reset();
+	m_via->reset();
+}
 
 ioport_constructor a2bus_ds3_device::device_input_ports() const
 {
