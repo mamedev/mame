@@ -204,7 +204,8 @@ MB81G163222-80 - Fujitsu MB81G163222-80 256k x 32-bit x 2 banks Synchronous Grap
                 and gives error RTC BAD meaning the RTC is not compatible with the version or the dongle is required.
                 See DS2430 below for more info.
        28-WAY - Edge connector used for connecting special controls such as guns etc.
-       DIP(4) - 4-position DIP switch. Switch 1 skips the CF check for a faster boot-up. The others appear unused?
+       DIP(4) - 4-position DIP switch. Switch 1 skips the CF check for a faster boot-up. What the others do depends on
+                the game, see the input ports.
 
 [DS2430] Has 256 bits x8 EEPROM (32 bytes), 64 bits x8 (8 bytes)
     one-time programmable application register and unique factory-lasered and tested 64-bit
@@ -2067,6 +2068,10 @@ INPUT_PORTS_START( thrild2 )
 	PORT_DIPSETTING( 0x08, DEF_STR( On ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW:3" ) // Never read by Thrill Drive 2 (checked in ver EBB, JAA and AAA)
+	// Selects one of two Voodoo3 CRTC/PLL setups, both 512x384 (same in GTI Club 2)
+	PORT_DIPNAME( 0x01, 0x01, "Video Timing" ) PORT_DIPLOCATION("SW:4")
+	PORT_DIPSETTING( 0x01, "32.0 MHz, 24.85 kHz / 58.06 Hz" )
+	PORT_DIPSETTING( 0x00, "33.0 MHz, 24.43 kHz / 57.62 Hz" )
 
 	PORT_MODIFY("IN3")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Shift Down")
@@ -2089,7 +2094,7 @@ INPUT_PORTS_START( gticlub2 )
 	PORT_INCLUDE( thrild2 )
 
 	PORT_MODIFY("IN2")
-	PORT_DIPNAME( 0x02, 0x02, "DIP3" ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPNAME( 0x02, 0x02, "Game Mode Lock Bypass" ) PORT_DIPLOCATION("SW:3") // Skips the "GAME MODE LOCKED! PLEASE SET THE PASSWORD" check
 	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
@@ -2113,7 +2118,7 @@ INPUT_PORTS_START( gticlub2ea )
 	PORT_INCLUDE( gticlub2 )
 
 	PORT_MODIFY("IN2")
-	PORT_DIPNAME( 0x02, 0x00, "DIP3" ) PORT_DIPLOCATION("SW:3") // This needs to be on or it asks for a password, parent doesn't care
+	PORT_DIPNAME( 0x02, 0x00, "Game Mode Lock Bypass" ) PORT_DIPLOCATION("SW:3") // This needs to be on or it asks for a password; the parent reads it too, but its lock does not trigger
 	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 INPUT_PORTS_END
