@@ -64,7 +64,6 @@ void pentium_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 		// Time Stamp Counter
 	case 0x10:
 		m_tsc = data;
-		m_tsc_rem = 0;
 		popmessage("WRMSR: Writing to TSC");
 		valid_msr = true;
 		break;
@@ -138,7 +137,6 @@ void pentium_pro_device::opcode_wrmsr(uint64_t data, bool &valid_msr)
 		// Time Stamp Counter
 	case 0x10:
 		m_tsc = data;
-		m_tsc_rem = 0;
 		popmessage("WRMSR: Writing to TSC");
 		valid_msr = true;
 		break;

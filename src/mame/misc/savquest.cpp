@@ -497,8 +497,8 @@ void savquest_state::winbond_superio_config(device_t *device)
 void savquest_state::savquest(machine_config &config)
 {
 	pentium2_device &maincpu(PENTIUM2(config, "maincpu", 66'000'000)); // actually Pentium II @ 450 MHz
-	// Execution is underclocked; count timestamps at an assumed nominal 450 MHz (board clock unverified)
-	maincpu.set_tsc_cycle_ratio(75, 11);
+	// TODO: restore nominal 450 MHz timestamps when the ratio API is available (board clock unverified)
+//  maincpu.set_tsc_cycle_ratio(75, 11);
 	maincpu.set_addrmap(AS_PROGRAM, &savquest_state::savquest_map);
 	maincpu.set_addrmap(AS_IO, &savquest_state::savquest_io);
 	maincpu.set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
