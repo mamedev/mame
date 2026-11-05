@@ -46,7 +46,7 @@ HDD Samsung SV0322A or other IDE HDD with similar capacity (e.g. Seagate ST32122
 #include "bus/rs232/sun_kbd.h"
 #include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
-#include "machine/fdc37c665ir.h"
+#include "machine/fdc37c669.h"
 #include "machine/pci.h"
 #include "machine/vt82c586b_acpi.h"
 #include "machine/vt82c586b_ide.h"
@@ -100,13 +100,12 @@ static void isa_com(device_slot_interface &device)
 
 static void isa_internal_devices(device_slot_interface &device)
 {
-	device.option_add_internal("superio", FDC37C665IR);
+	device.option_add_internal("superio", FDC37C669);
 }
 
 void startouch_state::superio_config(device_t *device)
 {
-	// TODO: upgrade to FDC37C669
-	fdc37c665ir_device &fdc = *downcast<fdc37c665ir_device *>(device);
+	fdc37c669_device &fdc = *downcast<fdc37c669_device *>(device);
 	fdc.fintr().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq6_w));
 	fdc.pintr1().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq7_w));
 	fdc.irq3().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq3_w));
@@ -170,18 +169,18 @@ void startouch_state::europl01(machine_config &config)
 	ISA16_SLOT(config, "isa3",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
-	serport0.rxd_handler().set("board4:superio", FUNC(fdc37c665ir_device::rxd1_w));
-	serport0.dcd_handler().set("board4:superio", FUNC(fdc37c665ir_device::ndcd1_w));
-	serport0.dsr_handler().set("board4:superio", FUNC(fdc37c665ir_device::ndsr1_w));
-	serport0.ri_handler().set("board4:superio", FUNC(fdc37c665ir_device::nri1_w));
-	serport0.cts_handler().set("board4:superio", FUNC(fdc37c665ir_device::ncts1_w));
+	serport0.rxd_handler().set("board4:superio", FUNC(fdc37c669_device::rxd1_w));
+	serport0.dcd_handler().set("board4:superio", FUNC(fdc37c669_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:superio", FUNC(fdc37c669_device::ndsr1_w));
+	serport0.ri_handler().set("board4:superio", FUNC(fdc37c669_device::nri1_w));
+	serport0.cts_handler().set("board4:superio", FUNC(fdc37c669_device::ncts1_w));
 
 	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
-	serport1.rxd_handler().set("board4:superio", FUNC(fdc37c665ir_device::rxd2_w));
-	serport1.dcd_handler().set("board4:superio", FUNC(fdc37c665ir_device::ndcd2_w));
-	serport1.dsr_handler().set("board4:superio", FUNC(fdc37c665ir_device::ndsr2_w));
-	serport1.ri_handler().set("board4:superio", FUNC(fdc37c665ir_device::nri2_w));
-	serport1.cts_handler().set("board4:superio", FUNC(fdc37c665ir_device::ncts2_w));
+	serport1.rxd_handler().set("board4:superio", FUNC(fdc37c669_device::rxd2_w));
+	serport1.dcd_handler().set("board4:superio", FUNC(fdc37c669_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:superio", FUNC(fdc37c669_device::ndsr2_w));
+	serport1.ri_handler().set("board4:superio", FUNC(fdc37c669_device::nri2_w));
+	serport1.cts_handler().set("board4:superio", FUNC(fdc37c669_device::ncts2_w));
 }
 
 ROM_START(europl01)

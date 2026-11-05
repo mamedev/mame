@@ -2161,7 +2161,6 @@ ROM_START( bakuhato )
 	ROM_LOAD( "19.7j", 0x1e0000, 0x20000, CRC(2b14cd5e) SHA1(4457a2fb9767eb4217b72b18dcc336f13766656d) )
 ROM_END
 
-
 ROM_START( av2mj1bb )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.bin",      0x00000, 0x10000, CRC(df0f03fb) SHA1(e6c2d6905b507611782bbd29f4d5fcd378a0a993) )
