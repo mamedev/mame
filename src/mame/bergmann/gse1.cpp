@@ -6,10 +6,38 @@ Tech used by Bergmann Automaten GmbH from 1983-1994
 In later manuals they are called GSE1.3 or GSE1.4
 GSE stands for Gerätesteuereinheit (device control unit)
 
+_________________________________
+|                               |
+|       74C373     74   TA1 TA2 |
+|-      74C373     LS           |
+|J      74C373  74 123          |
+|1              LS              |
+|3              132        4MHz |
+|-                   47      74 |
+|S         CTC1      02   -  04 |
+|E                       BAT 74 |
+|R         PIO1           +  LS |
+|-                           74 |
+|J    45   CTC2         4093    |
+|1    03                4069    |
+|5     P    RAM1        74H032  |
+|-     I    CPU1       74HC138  |
+|J     O               74LS155  |
+|1     2                        |
+|6         EPROM1               |
+|-                              |
+|J                      L7805   |
+|1  8251A  EPROM2               |
+|7                              |
+|-------------------------------|
+
+TA1 Reset
+TA2 NMI (unpopulated)
 CPU Z0840004PSC
 RAM MB8416-20L
 PIO 2x Z0842004PSC
 CTC 2x Z0843004PSC
+SERIAL 8251A + HD-4702 (unpopulated)
 
 TODO:
 Coin sequencing (string and security sensors)
