@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Scott Stone
+// copyright-holders:Peter Wilhelmsen, R.Belmont
 /************************************************************************
 
     NEXUS 3D Version 1.0 Board from Interpark
@@ -1644,6 +1644,6 @@ void nexus3d_state::init_nexus3d()
 
 } // anonymous namespace
 
-
-GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d_state, init_nexus3d, ROT0, "Examu", "Arcana Heart",      MACHINE_NOT_WORKING )
-GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d_state, init_nexus3d, ROT0, "Examu", "Arcana Heart Full", MACHINE_NOT_WORKING ) // has a "for use in Japan" texture uploaded at startup right after framebuffer space
+// Examu isn't credited ingame
+GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d_state, init_nexus3d, ROT0, "Examu / Atrativa Japan / Yuki Enterprise", "Arcana Heart (Japan)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d_state, init_nexus3d, ROT0, "Examu / Atrativa Japan",                   "Arcana Heart Full (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
