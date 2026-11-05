@@ -157,6 +157,8 @@ arm7_cpu_device::arm7_cpu_device(
 	, m_drc_tlb(nullptr)
 	, m_drc_tlb_size(DRC_TLB_SIZE)
 	, m_drc_tlb_base(nullptr)
+	, m_drc_control_next(~offs_t(0))
+	, m_drc_control_words{ 0, 0 }
 	, m_drc_prefetched(false)
 	, m_drc_cache_dirty(true)
 	, m_drc_fastram_stale(true)

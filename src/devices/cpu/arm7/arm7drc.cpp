@@ -274,33 +274,62 @@ bool arm7_cpu_device::drc_prefetch_after_remap()
 {
 	const bool next = m_core->resync_next != 0;
 	m_core->resync_next = 0;
-	if (!next || m_insn_prefetch_depth != 3)
-	{
-		return false;
-	}
-	const auto found = m_drc_prefetch.find(m_r[eR15]);
-	if (found == m_drc_prefetch.end())
-	{
-		return false;
-	}
-	const uint32_t words[2] = { found->second.first, found->second.second };
 
-	// a word behind a handler isn't read (the read could have side effects) and counts as different
-	const auto same = [this] (offs_t address, uint32_t word)
+	// after the MCR that changed the control register, the words drc_control_written() kept (the interpreter
+	// fell through to them); after an ARM memory instruction, its next two words as compiled
+	const bool control = m_drc_control_next == m_r[eR15];
+	m_drc_control_next = ~offs_t(0);
+	if (m_insn_prefetch_depth != 3)
 	{
-		offs_t physical = address;
-		if ((m_control & COPRO_CTRL_MMU_EN) && !translate_vaddr_to_paddr(physical, 0))
+		return false;
+	}
+	uint32_t words[2];
+	if (control)
+	{
+		words[0] = m_drc_control_words[0];
+		words[1] = m_drc_control_words[1];
+	}
+	else
+	{
+		const auto found = next ? m_drc_prefetch.find(m_r[eR15]) : m_drc_prefetch.end();
+		if (found == m_drc_prefetch.end())
 		{
 			return false;
 		}
-		const void *const host = insn_fetch_ptr(physical);
-		return host && *reinterpret_cast<const uint32_t *>(host) == word;
+		words[0] = found->second.first;
+		words[1] = found->second.second;
+	}
+
+	// a word that doesn't translate or is behind a handler counts as different
+	const auto same = [this] (offs_t address, uint32_t word)
+	{
+		uint32_t now;
+		return drc_host_word(address, now) && (now == word);
 	};
 	if (same(m_r[eR15], words[0]) && same(m_r[eR15] + 4, words[1]))
 	{
 		return false;
 	}
 	drc_prefetch_fill(m_r[eR15], words, 2);
+	return true;
+}
+
+
+// the word at address through the translation now; false when it doesn't translate or is behind a handler (the read
+// could have side effects)
+bool arm7_cpu_device::drc_host_word(offs_t address, uint32_t &word)
+{
+	offs_t physical = address;
+	if ((m_control & COPRO_CTRL_MMU_EN) && !translate_vaddr_to_paddr(physical, 0))
+	{
+		return false;
+	}
+	const void *const host = insn_fetch_ptr(physical);
+	if (!host)
+	{
+		return false;
+	}
+	word = *reinterpret_cast<const uint32_t *>(host);
 	return true;
 }
 
@@ -647,11 +676,19 @@ void arm7_cpu_device::drc_tlb_flush_mva(offs_t mva)
 }
 
 
-// the MMU, DATA32 and late-abort bits are compiled in, so a change to them flushes the cache
+// the MMU, DATA32 and late-abort bits are compiled in, so a change to them flushes the cache; the two words after the
+// MCR were prefetched through the old translation and run next if they differ (drc_prefetch_after_remap()): the
+// word after the MCR that enables the MMU is fetched flat (the Psion Series 7 boot ROM jumps to its virtual address there)
 void arm7_cpu_device::drc_control_written(uint32_t data)
 {
 	if (((data ^ m_control) & (COPRO_CTRL_MMU_EN | COPRO_CTRL_DATA32 | COPRO_CTRL_LATE_ABORT)) != 0)
 	{
+		// R15 is the MCR's address until the handler returns; m_control is still the old value
+		const offs_t next = (GET_PC & ~offs_t(3)) + 4;
+		if (m_isdrc && drc_host_word(next, m_drc_control_words[0]) && drc_host_word(next + 4, m_drc_control_words[1]))
+		{
+			m_drc_control_next = next;
+		}
 		drc_remapped();
 	}
 }
@@ -950,6 +987,7 @@ void arm7_cpu_device::code_flush_cache()
 	m_drcuml.reset();
 	m_drc_prefetch.clear();
 	m_drc_window.clear();
+	m_drc_control_next = ~offs_t(0);   // an interpreted slice made the control write and ran the words itself
 	m_drc_verify_misses.clear();
 	drc_check_fastram();
 	drc_tlb_choose_base();
