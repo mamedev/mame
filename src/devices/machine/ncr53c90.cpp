@@ -537,7 +537,7 @@ void ncr53c90_device::step(bool timeout)
 
 	case DISC_SEL_ATN_SEND_BYTE:
 		if(c == CD_SELECT_ATN_STOP) {
-			seq = 2;
+			seq = 1;
 			function_bus_complete();
 		} else {
 			state = DISC_SEL_WAIT_REQ;
