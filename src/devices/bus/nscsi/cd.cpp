@@ -656,13 +656,14 @@ void nscsi_cdrom_device::scsi_command()
 		break;
 	}
 
-	case SC_READ_DISC_INFORMATION:
+	case SC_READ_DISC_INFORMATION: {
 		LOG("command READ DISC INFORMATION\n");
 		if(!image->exists()) {
 			return_no_cd();
 			break;
 		}
 
+		const u16 alloc_length = get_u16be(&m_scsi_cmdbuf[7]);
 		std::fill_n(m_scsi_cmdbuf, 34, 0);
 		m_scsi_cmdbuf[1] = 32;
 		m_scsi_cmdbuf[2] = 2; // disc is complete
@@ -686,9 +687,10 @@ void nscsi_cdrom_device::scsi_command()
 			put_u32be(&m_scsi_cmdbuf[20], tstart);
 		}
 
-		scsi_data_in(0, 34);
+		scsi_data_in(0, std::min<u16>(alloc_length, 34));
 		scsi_status_complete(SS_GOOD);
 		break;
+	}
 
 	case SC_PREVENT_ALLOW_MEDIUM_REMOVAL:
 		// TODO: support eject prevention
@@ -1264,7 +1266,10 @@ void nscsi_cdrom_apple_device::scsi_command()
 				std::fill_n(m_scsi_cmdbuf, size, 0);
 
 				// data taken from the ROM of an AppleCD 150
-				m_scsi_cmdbuf[0] = 0x05;   // device is present, device is CD/DVD (MMC-3)
+				if (lun != 0)
+					m_scsi_cmdbuf[0] = 0x7f;
+				else
+					m_scsi_cmdbuf[0] = 0x05;   // device is present, device is CD/DVD (MMC-3)
 				m_scsi_cmdbuf[1] = 0x80;       // media is removable
 				m_scsi_cmdbuf[2] = 0x01;
 				m_scsi_cmdbuf[3] = 0x01;
