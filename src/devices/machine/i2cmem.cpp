@@ -45,7 +45,7 @@ constexpr int DEVSEL_ADDRESS(0xfe);
 #define LOG_READLINE  (1U << 2)
 #define LOG_WRITELINE (1U << 3)
 
-#define VERBOSE       (LOG_READLINE | LOG_WRITELINE | LOG_STATE)
+#define VERBOSE       (0)
 #include "logmacro.h"
 
 //**************************************************************************
