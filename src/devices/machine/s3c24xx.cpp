@@ -8,6 +8,8 @@
 #include "coreutil.h"
 #include "screen.h"
 
+#include <algorithm>
+#include <cmath>
 #include <cstdio>
 #include <cstring>
 
@@ -133,12 +135,43 @@ void s3c24xx_device::device_start()
 	m_rtc_timer_update = timer_alloc(FUNC(s3c24xx_device::rtc_timer_update_exp), this);
 	m_wdt_timer = timer_alloc(FUNC(s3c24xx_device::wdt_timer_exp), this);
 
+	for (auto &timer : m_uart_tx_timer)
+		timer = timer_alloc(FUNC(s3c24xx_device::uart_tx_complete), this);
+
+	save_item(NAME(m_uart_ulcon));
+	save_item(NAME(m_uart_ucon));
+	save_item(NAME(m_uart_ufcon));
+	save_item(NAME(m_uart_umcon));
+	save_item(NAME(m_uart_utrstat));
+	save_item(NAME(m_uart_uerstat));
+	save_item(NAME(m_uart_ufstat));
+	save_item(NAME(m_uart_umstat));
+	save_item(NAME(m_uart_utxh));
+	save_item(NAME(m_uart_urxh));
+	save_item(NAME(m_uart_ubrdiv));
+	save_item(NAME(m_uart_tx_fifo));
+	save_item(NAME(m_uart_tx_head));
+	save_item(NAME(m_uart_tx_count));
+	save_item(NAME(m_uart_tx_shift));
+	save_item(NAME(m_uart_tx_busy));
+	save_item(NAME(m_uart_tx_irq));
+	save_item(NAME(m_iis_iiscon));
+	save_item(NAME(m_iis_iismod));
+	save_item(NAME(m_iis_iispsr));
+	save_item(NAME(m_iis_iisfcon));
+	save_item(NAME(m_iis_tx_fifo));
+	save_item(NAME(m_iis_fifo_head));
+	save_item(NAME(m_iis_fifo_count));
+	save_item(NAME(m_iis_channel));
+
 	video_start();
 }
 
 void s3c2410_device::device_start()
 {
 	s3c24xx_device::device_start();
+	m_gpio_extint_lines = 0;
+	save_item(NAME(m_gpio_extint_lines));
 
 	int om0 = m_om0_r_cb();
 	int om1 = m_om1_r_cb();
@@ -229,7 +262,7 @@ void s3c24xx_device::device_reset()
 	gpio_reset();
 	memcon_reset();
 	clkpow_reset();
-	//usbhost_reset();
+	usbhost_reset();
 	usb_device_reset();
 	adc_reset();
 	spi_reset();
@@ -246,11 +279,11 @@ void s3c2410_device::device_reset()
 {
 	s3c24xx_device::device_reset();
 	LOG("s3c2410_device::device_reset\n");
+	std::fill(std::begin(m_dma_disrcc), std::end(m_dma_disrcc), 0);
+	std::fill(std::begin(m_dma_didstc), std::end(m_dma_didstc), 0);
 	sdi_reset();
 	nand_reset();
 	nand_auto_boot();
-	m_irq_subsrcpnd = 0;
-	m_irq_intsubmsk = 0;
 }
 
 void s3c2440_device::device_reset()
@@ -1836,6 +1869,11 @@ TIMER_CALLBACK_MEMBER(s3c24xx_device::lcd_timer_exp)
 
 void s3c24xx_device::video_start()
 {
+	std::fill(std::begin(m_lcdpal_data), std::end(m_lcdpal_data), 0);
+	std::fill(std::begin(m_lcd_dithpat), std::end(m_lcd_dithpat), 0);
+	save_item(NAME(m_lcdpal_data));
+	save_item(NAME(m_lcd_dithpat));
+
 	m_lcd_bitmap[0] = std::make_unique<bitmap_rgb32>(m_screen->width(), m_screen->height());
 	m_lcd_bitmap[1] = std::make_unique<bitmap_rgb32>(m_screen->width(), m_screen->height());
 
@@ -2522,8 +2560,7 @@ void s3c24xx_device::clkpow_mpllcon_w(offs_t offset, u32 data, u32 mem_mask)
 	LOGMASKED(LOG_CLKPOW, "%s:                    HCLK: %9.1fHz\n", machine().describe_context(), get_hclk().as_hz());
 	LOGMASKED(LOG_CLKPOW, "%s:                    PCLK: %9.1fHz\n", machine().describe_context(), get_pclk().as_hz());
 	m_cpu->set_unscaled_clock((u32)get_fclk().as_hz() * CLOCK_MULTIPLIER);
-	if (BIT(m_iis_iiscon, 0))
-		iis_start();
+	iis_recalc();
 }
 
 u32 s3c24xx_device::clkpow_upllcon_r(offs_t offset, u32 mem_mask)
@@ -2551,7 +2588,8 @@ void s3c24xx_device::clkpow_clkcon_w(offs_t offset, u32 data, u32 mem_mask)
 	const u32 old = m_clkpow_clkcon;
 	COMBINE_DATA(&m_clkpow_clkcon);
 	LOGMASKED(LOG_CLKPOW, "%s: clock/power write: CLKCON = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-	if (BIT(data, 2) && !BIT(old, 2))
+	// An interrupt may arrive between the CPU's last check and entering idle.
+	if (BIT(m_clkpow_clkcon, 2) && !BIT(old, 2) && (m_irq_line == CLEAR_LINE) && (m_fiq_line == CLEAR_LINE))
 		m_cpu->suspend(SUSPEND_REASON_HALT, 1);
 }
 
@@ -2567,6 +2605,7 @@ void s3c24xx_device::clkpow_clkslow_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_clkpow_clkslow);
 	LOGMASKED(LOG_CLKPOW, "%s: clock/power write: CLKSLOW = %08x & %08x - fclk %d hclk %d pclk %d\n", machine().describe_context(), data, mem_mask, (int)get_fclk().as_hz(), (int)get_hclk().as_hz(), (int)get_pclk().as_hz());
 	m_cpu->set_unscaled_clock((u32)get_fclk().as_hz() * CLOCK_MULTIPLIER);
+	iis_recalc();
 }
 
 u32 s3c24xx_device::clkpow_clkdivn_r(offs_t offset, u32 mem_mask)
@@ -2585,6 +2624,7 @@ void s3c24xx_device::clkpow_clkdivn_w(offs_t offset, u32 data, u32 mem_mask)
 	LOGMASKED(LOG_CLKPOW, "%s:                    FCLK: %9.1fHz\n", machine().describe_context(), get_fclk().as_hz());
 	LOGMASKED(LOG_CLKPOW, "%s:                    HCLK: %9.1fHz\n", machine().describe_context(), get_hclk().as_hz());
 	LOGMASKED(LOG_CLKPOW, "%s:                    PCLK: %9.1fHz\n", machine().describe_context(), get_pclk().as_hz());
+	iis_recalc();
 }
 
 void s3c2440_device::clkpow_clkdivn_w(offs_t offset, u32 data, u32 mem_mask)
@@ -2607,6 +2647,7 @@ void s3c2440_device::clkpow_clkdivn_w(offs_t offset, u32 data, u32 mem_mask)
 		break;
 	}
 	LOGMASKED(LOG_CLKPOW, "%s:                    PDIVN: %s\n", machine().describe_context(), BIT(data, 0) ? "PCLK = HCLK/2" : "PCLK = HCLK");
+	iis_recalc();
 }
 
 u32 s3c2440_device::clkpow_camdivn_r(offs_t offset, u32 mem_mask)
@@ -2620,6 +2661,7 @@ void s3c2440_device::clkpow_camdivn_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_clkpow_camdivn);
 	LOGMASKED(LOG_CLKPOW, "%s: clock/power write: CAMDIVN = %08x & %08x - fclk %d hclk %d pclk %d\n", machine().describe_context(), data, mem_mask, (int)get_fclk().as_hz(), (int)get_hclk().as_hz(), (int)get_pclk().as_hz());
+	iis_recalc();
 }
 
 /* Interrupt Controller */
@@ -2639,12 +2681,14 @@ void s3c24xx_device::irq_reset()
 void s3c2410_device::irq_reset()
 {
 	s3c24xx_device::irq_reset();
+	m_irq_subsrcpnd = 0;
 	m_irq_intsubmsk = 0x07ff;
 }
 
 void s3c2440_device::irq_reset()
 {
 	s3c24xx_device::irq_reset();
+	m_irq_subsrcpnd = 0;
 	m_irq_intsubmsk = 0xffff;
 }
 
@@ -2918,20 +2962,25 @@ u32 s3c2440_device::get_int_type_for_subint(u32 subint) const
 	return SUBINT_TO_INT_TYPE[subint];
 }
 
+void s3c2410_device::check_pending_irq()
+{
+	// Each UART has three sub-interrupts sharing one level-sensitive parent.
+	const u32 pending = m_irq_subsrcpnd & ~m_irq_intsubmsk;
+	for (u32 bit = 0; bit < 15; bit++)
+	{
+		if (BIT(pending, bit))
+		{
+			const u32 type = get_int_type_for_subint(bit);
+			if (type != ~0U)
+				m_irq_srcpnd |= 1U << get_irq_bit_for_int_type(type);
+		}
+	}
+	s3c24xx_device::check_pending_irq();
+}
+
 void s3c2410_device::check_pending_subirq()
 {
-	u32 temp = m_irq_subsrcpnd & ~m_irq_intsubmsk;
-	if (temp != 0)
-	{
-		u32 subint_type = 0;
-		while ((temp & 1) == 0)
-		{
-			subint_type++;
-			temp >>= 1;
-		}
-		const int int_type = get_int_type_for_subint(subint_type);
-		request_irq(int_type);
-	}
+	check_pending_irq();
 }
 
 void s3c2410_device::request_subirq(u32 int_type)
@@ -3050,7 +3099,6 @@ void s3c24xx_device::irq_srcpnd_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	//const u32 old = m_irq_srcpnd;
 	m_irq_srcpnd &= ~(data & mem_mask); // clear only the bit positions of SRCPND corresponding to those set to one in the data
-	m_irq_intoffset = 0; // "This bit can be cleared automatically by clearing SRCPND and INTPND."
 	//LOGMASKED(LOG_IRQ_REGS, "%s: irq write: SRCPND = %08x & %08x (old %08x)\n", machine().describe_context(), data, mem_mask, old);
 	check_pending_irq();
 }
@@ -3106,7 +3154,8 @@ void s3c24xx_device::irq_intpnd_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	//const u32 old = m_irq_intpnd;
 	m_irq_intpnd &= ~(data & mem_mask); // clear only the bit positions of INTPND corresponding to those set to one in the data
-	m_irq_intoffset = 0; // "This bit can be cleared automatically by clearing SRCPND and INTPND."
+	if (!m_irq_intpnd)
+		m_irq_intoffset = 0;
 	//LOGMASKED(LOG_IRQ_REGS, "%s: irq write: INTPND = %08x & %08x (old %08x)\n", machine().describe_context(), data, mem_mask, old);
 	check_pending_irq();
 }
@@ -3135,6 +3184,8 @@ void s3c2410_device::irq_subsrcpnd_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_IRQ_REGS, "%s: irq write: SUBSRCPND = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	m_irq_subsrcpnd &= ~(data & mem_mask); // clear only the bit positions of SRCPND corresponding to those set to one in the data
+	for (int which = 0; which < 3; which++)
+		uart_update_tx_irq(which);
 	check_pending_subirq();
 }
 
@@ -3699,7 +3750,7 @@ void s3c24xx_device::dma_request_pwm()
 template <int Which>
 void s3c24xx_device::dma_start()
 {
-	u32 swhwsel = BIT(m_dma_dcon[Which], 23);
+	const u32 swhwsel = BIT(m_dma_dcon[Which], 23);
 
 	if (VERBOSE & LOG_DMA)
 	{
@@ -3720,23 +3771,15 @@ void s3c24xx_device::dma_start()
 	}
 
 	dma_reload<Which>();
-	if (swhwsel == 0)
-		dma_trigger<Which>();
 }
 
 template <int Which>
 void s3c24xx_device::dma_stop()
 {
 	LOGMASKED(LOG_DMA, "DMA %d stop\n", Which);
-}
-
-template <int Which>
-void s3c24xx_device::dma_recalc()
-{
-	if (BIT(m_dma_dmasktrig[Which], 1))
-		dma_start<Which>();
-	else
-		dma_stop<Which>();
+	// Transfers are atomic here, so STOP takes effect immediately.
+	m_dma_dmasktrig[Which] &= ~2U;
+	m_dma_dstat[Which] = CLR_BITS(m_dma_dstat[Which], 19, 0);
 }
 
 TIMER_CALLBACK_MEMBER(s3c24xx_device::dma_timer_exp)
@@ -3853,8 +3896,20 @@ void s3c24xx_device::dma_dmasktrig_w(offs_t offset, u32 data, u32 mem_mask)
 	const u32 old = m_dma_dmasktrig[Which];
 	COMBINE_DATA(&m_dma_dmasktrig[Which]);
 	LOGMASKED(LOG_DMA_REGS, "%s: dma %d write: DMASKTRIG = %08x & %08x\n", machine().describe_context(), Which, data, mem_mask);
-	if (BIT(data ^ old, 1))
-		dma_recalc<Which>();
+	if (BIT(m_dma_dmasktrig[Which], 2))
+	{
+		dma_stop<Which>();
+	}
+	else if (BIT(m_dma_dmasktrig[Which], 1))
+	{
+		if (!BIT(old, 1))
+			dma_start<Which>();
+		if (BIT(m_dma_dmasktrig[Which], 0) && !BIT(m_dma_dcon[Which], 23))
+		{
+			m_dma_dmasktrig[Which] &= ~1U;
+			dma_trigger<Which>();
+		}
+	}
 }
 
 template <int Which>
@@ -3923,18 +3978,22 @@ void s3c2400_device::gpio_reset()
 void s3c2410_device::gpio_reset()
 {
 	s3c24xx_device::gpio_reset();
+	m_gpio_dclkcon = 0;
+	std::fill(std::begin(m_gpio_gstatus), std::end(m_gpio_gstatus), 0);
 	m_gpio_gpacon = 0x007fffff;
 	m_gpio_gpgup = 0xf800;
 	m_gpio_misccr = 0x00010330;
 	m_gpio_eintmask = 0x00fffff0;
 	m_gpio_gstatus[1] = 0x32410000;
 	m_gpio_gstatus[2] = 1 << 0; // Boot is caused by power on reset
-	m_gpio_extint_lines = 0;
+	m_gpio_extint_lines = (m_port_r_cb(GPIO_PORT_F) & 0xff) | ((m_port_r_cb(GPIO_PORT_G) & 0xffff) << 8);
+	m_gpio_eintpend = 0;
+	std::fill(std::begin(m_gpio_eintflt), std::end(m_gpio_eintflt), 0);
 }
 
 void s3c2440_device::gpio_reset()
 {
-	s3c24xx_device::gpio_reset();
+	s3c2410_device::gpio_reset();
 	m_gpio_gpacon = 0x00ffffff;
 	m_gpio_gpgup = 0xfc00;
 	m_gpio_mslcon = 0;
@@ -4404,7 +4463,8 @@ void s3c2410_device::gpio_eintpend_w(offs_t offset, u32 data, u32 mem_mask)
 
 u32 s3c2410_device::gpio_gstatus0_r(offs_t offset, u32 mem_mask)
 {
-	const u32 data = m_gpio_gstatus[0] | 0xd; // nWAIT, NCON, R, nBATT_FLT
+	// nWAIT and nBATT_FLT are inactive; NCON and RnB reflect their input pins.
+	const u32 data = 0x09 | (m_ncon_r_cb() ? 0x04 : 0) | (BIT(m_nand_nfstat, 0) ? 0x02 : 0);
 	LOGMASKED(LOG_GPIO, "%s: GPIO read: GSTATUS0: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
@@ -4945,6 +5005,16 @@ void s3c24xx_device::uart_reset()
 	std::fill(std::begin(m_uart_urxh), std::end(m_uart_urxh), 0);
 	std::fill(std::begin(m_uart_ubrdiv), std::end(m_uart_ubrdiv), 0);
 	std::fill(std::begin(m_uart_utrstat), std::end(m_uart_utrstat), 6);
+	for (int which = 0; which < 3; which++)
+	{
+		std::fill(std::begin(m_uart_tx_fifo[which]), std::end(m_uart_tx_fifo[which]), 0);
+		m_uart_tx_head[which] = 0;
+		m_uart_tx_count[which] = 0;
+		m_uart_tx_shift[which] = 0;
+		m_uart_tx_busy[which] = false;
+		m_uart_tx_irq[which] = false;
+		m_uart_tx_timer[which]->adjust(attotime::never);
+	}
 }
 
 template <int Which>
@@ -4974,6 +5044,8 @@ template <int Which>
 void s3c24xx_device::uart_ucon_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_uart_ucon[Which]);
+	uart_tx_start(Which);
+	uart_update_tx_irq(Which);
 	LOGMASKED(LOG_UART, "%s: UART %d write: UCON = %08x & %08x\n", machine().describe_context(), Which, data, mem_mask);
 }
 
@@ -4989,6 +5061,12 @@ template <int Which>
 void s3c24xx_device::uart_ufcon_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_uart_ufcon[Which]);
+	if (BIT(m_uart_ufcon[Which], 2))
+	{
+		m_uart_tx_head[Which] = 0;
+		m_uart_tx_count[Which] = 0;
+	}
+	uart_update_tx_irq(Which);
 	m_uart_ufcon[Which] &= ~((1 << 2) | (1 << 1)); // bits 1 and 2 are auto-cleared after resetting FIFO
 	LOGMASKED(LOG_UART, "%s: UART %d write: UFCON = %08x & %08x\n", machine().describe_context(), Which, data, mem_mask);
 }
@@ -5011,7 +5089,9 @@ void s3c24xx_device::uart_umcon_w(offs_t offset, u32 data, u32 mem_mask)
 template <int Which>
 u32 s3c24xx_device::uart_utrstat_r(offs_t offset, u32 mem_mask)
 {
-	const u32 data = (m_uart_utrstat[Which] & ~0x00000006) | 0x00000004 | 0x00000002; // [bit 2] Transmitter empty / [bit 1] Transmit buffer empty
+	u32 data = m_uart_utrstat[Which] & ~6U;
+	if (!m_uart_tx_count[Which])
+		data |= m_uart_tx_busy[Which] ? 2 : 6;
 	LOGMASKED(LOG_UART, "%s: UART %d read: UTRSTAT: %08x & %08x\n", machine().describe_context(), Which, data, mem_mask);
 	return data;
 }
@@ -5041,7 +5121,10 @@ void s3c24xx_device::uart_uerstat_w(offs_t offset, u32 data, u32 mem_mask)
 template <int Which>
 u32 s3c24xx_device::uart_ufstat_r(offs_t offset, u32 mem_mask)
 {
-	const u32 data = m_uart_ufstat[Which];
+	const u32 count = m_uart_tx_count[Which];
+	const u32 depth = uart_fifo_depth();
+	const u32 tx = (count == depth) ? ((depth == 64) ? 0x4000 : 0x0200) : (count << ((depth == 64) ? 8 : 4));
+	const u32 data = (m_uart_ufstat[Which] & ((depth == 64) ? ~0x7f00U : ~0x02f0U)) | tx;
 	LOGMASKED(LOG_UART, "%s: UART %d read: UFSTAT: %08x & %08x\n", machine().describe_context(), Which, data, mem_mask);
 	return data;
 }
@@ -5081,6 +5164,17 @@ void s3c24xx_device::uart_utxh_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_uart_utxh[Which]);
 	const u8 txdata = m_uart_utxh[Which] & 0xff;
+	if ((mem_mask & 0xff) && BIT(m_uart_ucon[Which], 2, 2))
+	{
+		const u32 capacity = BIT(m_uart_ufcon[Which], 0) ? uart_fifo_depth() : 1;
+		if (m_uart_tx_count[Which] < capacity)
+		{
+			m_uart_tx_fifo[Which][(m_uart_tx_head[Which] + m_uart_tx_count[Which]) & 63] = txdata;
+			m_uart_tx_count[Which]++;
+			uart_update_tx_irq(Which);
+			uart_tx_start(Which);
+		}
+	}
 #ifdef UART_PRINTF
 	if (txdata == 0x0d)
 		printf("\n");
@@ -5095,7 +5189,8 @@ u32 s3c24xx_device::uart_urxh_r(offs_t offset, u32 mem_mask)
 {
 	const u32 data = m_uart_urxh[Which];
 	const u8 rxdata = data & 0xff;
-	m_uart_utrstat[Which] &= ~1; // [bit 0] Receive buffer data ready
+	if (!machine().side_effects_disabled())
+		m_uart_utrstat[Which] &= ~1; // [bit 0] Receive buffer data ready
 	LOGMASKED(LOG_UART, "%s: UART %d read: URXH: %08x (%c) & %08x\n", machine().describe_context(), Which, data, ((rxdata >= 0x20 && rxdata < 0x7f) ? (char)rxdata : ' '), mem_mask);
 	return data;
 }
@@ -5120,6 +5215,70 @@ void s3c24xx_device::uart_ubrdiv_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_uart_ubrdiv[Which]);
 	LOGMASKED(LOG_UART, "%s: UART %d write: UBRDIV = %08x & %08x\n", machine().describe_context(), Which, data, mem_mask);
+}
+
+u32 s3c24xx_device::uart_fifo_depth() const
+{
+	return 16;
+}
+
+u32 s3c2440_device::uart_fifo_depth() const
+{
+	return 64;
+}
+
+void s3c24xx_device::uart_update_tx_irq(int which)
+{
+	const u32 trigger = BIT(m_uart_ufcon[which], 0) ? BIT(m_uart_ufcon[which], 6, 2) * (uart_fifo_depth() / 4) : 0;
+	const bool state = (BIT(m_uart_ucon[which], 2, 2) == 1) && (m_uart_tx_count[which] <= trigger);
+	const bool old = m_uart_tx_irq[which];
+	m_uart_tx_irq[which] = state;
+	if (state && (!old || BIT(m_uart_ucon[which], 9)))
+		uart_request_tx_irq(which);
+}
+
+void s3c24xx_device::uart_tx_start(int which)
+{
+	if (m_uart_tx_busy[which] || !m_uart_tx_count[which] || !BIT(m_uart_ucon[which], 2, 2))
+		return;
+
+	m_uart_tx_shift[which] = m_uart_tx_fifo[which][m_uart_tx_head[which]];
+	m_uart_tx_head[which] = (m_uart_tx_head[which] + 1) & 63;
+	m_uart_tx_count[which]--;
+	m_uart_tx_busy[which] = true;
+	const u32 bits = 1 + 5 + BIT(m_uart_ulcon[which], 0, 2) + BIT(m_uart_ulcon[which], 5) + 1 + BIT(m_uart_ulcon[which], 2);
+	// TODO: external UART clock selection and automatic flow control.
+	m_uart_tx_timer[which]->adjust(get_pclk() * (16 * (BIT(m_uart_ubrdiv[which], 0, 16) + 1) * bits), which);
+	uart_update_tx_irq(which);
+}
+
+TIMER_CALLBACK_MEMBER(s3c24xx_device::uart_tx_complete)
+{
+	m_uart_tx_busy[param] = false;
+	if (BIT(m_uart_ucon[param], 5))
+	{
+		switch (param)
+		{
+		case 0: uart_fifo_w<0>(m_uart_tx_shift[param]); break;
+		case 1: uart_fifo_w<1>(m_uart_tx_shift[param]); break;
+		case 2: uart_fifo_w<2>(m_uart_tx_shift[param]); break;
+		}
+	}
+	uart_tx_start(param);
+	uart_update_tx_irq(param);
+}
+
+void s3c24xx_device::uart_request_tx_irq(int which)
+{
+	static constexpr u32 INT_BITS[2] = { INT_UTXD0, INT_UTXD1 };
+	if (which < 2)
+		request_irq(INT_BITS[which]);
+}
+
+void s3c2410_device::uart_request_tx_irq(int which)
+{
+	static constexpr u32 INT_BITS[3] = { SUBINT_TXD0, SUBINT_TXD1, SUBINT_TXD2 };
+	request_subirq(INT_BITS[which]);
 }
 
 void s3c24xx_device::uart_request_irq(int which)
@@ -5190,10 +5349,25 @@ void s3c2400_device::usb_device_reset()
 void s3c2410_device::usb_device_reset()
 {
 	s3c24xx_device::usb_device_reset();
+	m_usbdev_ep_int = 0;
+	m_usbdev_usb_int = 0;
 	m_usbdev_ep_int_en = 0xff;
 	m_usbdev_usb_int_en = 0x04;
+	m_usbdev_frame_num1 = 0;
+	m_usbdev_frame_num2 = 0;
+	m_usbdev_index = 0;
 	m_usbdev_maxp = 0x01;
 	m_usbdev_in_csr2 = 0x20;
+	m_usbdev_out_csr1 = 0;
+	m_usbdev_out_csr2 = 0;
+	m_usbdev_out_fifo_cnt1 = 0;
+	m_usbdev_out_fifo_cnt2 = 0;
+	std::fill(std::begin(m_usbdev_ep_dma_con), std::end(m_usbdev_ep_dma_con), 0);
+	std::fill(std::begin(m_usbdev_ep_dma_unit), std::end(m_usbdev_ep_dma_unit), 0);
+	std::fill(std::begin(m_usbdev_ep_dma_fifo), std::end(m_usbdev_ep_dma_fifo), 0);
+	std::fill(std::begin(m_usbdev_ep_dma_ttc_l), std::end(m_usbdev_ep_dma_ttc_l), 0);
+	std::fill(std::begin(m_usbdev_ep_dma_ttc_m), std::end(m_usbdev_ep_dma_ttc_m), 0);
+	std::fill(std::begin(m_usbdev_ep_dma_ttc_h), std::end(m_usbdev_ep_dma_ttc_h), 0);
 }
 
 u32 s3c24xx_device::usbdev_func_addr_r(offs_t offset, u32 mem_mask)
@@ -5742,14 +5916,10 @@ void s3c2410_device::wdt_reset()
 
 u16 s3c24xx_device::wdt_calc_current_count()
 {
-	const double timeleft = m_wdt_timer->remaining().as_double();
-	LOG("timeleft %f freq %f cnt %d\n", timeleft, m_wdt_freq, m_wdt_cnt);
-	const double x1 = 1 / (m_wdt_freq / m_wdt_cnt);
-	const double x2 = x1 / timeleft;
-	printf("x1 %f\n", x1);
-	const u32 res = m_wdt_cnt / x2;
-	printf("cnt %d\n", res);
-	return res;
+	if (!m_wdt_timer->enabled() || (m_wdt_freq <= 0))
+		return m_wdt_wtcnt;
+
+	return std::min<u32>(0xffff, u32(std::ceil(m_wdt_timer->remaining().as_double() * m_wdt_cnt / m_wdt_freq)));
 }
 
 void s3c24xx_device::wdt_start()
@@ -5956,10 +6126,10 @@ void s3c24xx_device::iic_start()
 	int mode_selection = BIT(m_iic_iicstat, 6, 2);
 	switch (mode_selection)
 	{
-		case 2: i2c_send_byte(m_iic_iicds | 0x01); break;
-		case 3: i2c_send_byte(m_iic_iicds & ~0x01); break;
+		case 2: m_iic_iicstat = (m_iic_iicstat & ~1U) | i2c_send_byte(m_iic_iicds | 0x01); break;
+		case 3: m_iic_iicstat = (m_iic_iicstat & ~1U) | i2c_send_byte(m_iic_iicds & ~0x01); break;
 	}
-	m_iic_timer->adjust(attotime::from_usec(1));
+	m_iic_timer->adjust(get_pclk() * (9 * (BIT(m_iic_iiccon, 6) ? 512 : 16) * (BIT(m_iic_iiccon, 0, 4) + 1)));
 }
 
 void s3c24xx_device::iic_stop()
@@ -5976,9 +6146,9 @@ void s3c24xx_device::iic_resume()
 	switch (mode_selection)
 	{
 		case 2: m_iic_iicds = i2c_receive_byte(BIT(m_iic_iiccon, 7)); break;
-		case 3: i2c_send_byte(m_iic_iicds & 0xff); break;
+		case 3: m_iic_iicstat = (m_iic_iicstat & ~1U) | i2c_send_byte(m_iic_iicds & 0xff); break;
 	}
-	m_iic_timer->adjust(attotime::from_usec(1));
+	m_iic_timer->adjust(get_pclk() * (9 * (BIT(m_iic_iiccon, 6) ? 512 : 16) * (BIT(m_iic_iiccon, 0, 4) + 1)));
 }
 
 TIMER_CALLBACK_MEMBER(s3c24xx_device::iic_timer_exp)
@@ -6021,13 +6191,14 @@ void s3c24xx_device::iic_iiccon_w(offs_t offset, u32 data, u32 mem_mask)
 
 u32 s3c24xx_device::iic_iicstat_r(offs_t offset, u32 mem_mask)
 {
-	const u32 data = m_iic_iicstat & ~0x0000000f;
+	const u32 data = m_iic_iicstat;
 	//LOGMASKED(LOG_I2C, "%s: i2c read: IICSTAT: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
 
 void s3c24xx_device::iic_iicstat_w(offs_t offset, u32 data, u32 mem_mask)
 {
+	mem_mask &= 0xf0;
 	COMBINE_DATA(&m_iic_iicstat);
 	//LOGMASKED(LOG_I2C, "%s: i2c write: IICSTAT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	m_iic_count = 0;
@@ -6087,6 +6258,16 @@ void s3c2440_device::iic_iiclc_w(offs_t offset, u32 data, u32 mem_mask)
 
 /* IIS */
 
+u32 s3c24xx_device::iis_fifo_count_bits() const
+{
+	return 4;
+}
+
+u32 s3c2410_device::iis_fifo_count_bits() const
+{
+	return 6;
+}
+
 void s3c24xx_device::iis_reset()
 {
 	m_iis_iiscon = 0x0100;
@@ -6096,13 +6277,15 @@ void s3c24xx_device::iis_reset()
 	m_iis_iisfifo = 0;
 	m_iis_timer->adjust(attotime::never);
 	memset(m_iis_tx_fifo, 0, sizeof(m_iis_tx_fifo));
-	m_iis_fifo_index = 0;
+	m_iis_fifo_head = 0;
+	m_iis_fifo_count = 0;
+	m_iis_channel = 1;
 }
 
 void s3c24xx_device::iis_start()
 {
 	LOGMASKED(LOG_I2S, "IIS start\n");
-	static const u32 CODECLK_TABLE[2] = { 256, 384 };
+	static constexpr u32 CODECLK_TABLE[2] = { 256, 384 };
 
 	const int prescaler_enable = BIT(m_iis_iiscon, 1);
 	const int prescaler_control_a = (m_iis_iispsr >> 5) & 0x1f;
@@ -6110,10 +6293,11 @@ void s3c24xx_device::iis_start()
 	const int codeclk = BIT(m_iis_iismod, 2);
 
 	const attotime pclk = get_pclk();
-	attotime period = (pclk * (prescaler_control_a + 1) * CODECLK_TABLE[codeclk]) / 2;
+	const attotime period = pclk * (prescaler_enable ? (prescaler_control_a + 1) : 1) * CODECLK_TABLE[codeclk];
 
-	LOGMASKED(LOG_I2S, "IIS - pclk is %dHz, psc_enable is %d, psc_a is %d, psc_b is %d, codeclk is %d, sample freq is %fHz\n", (u32)pclk.as_hz(), prescaler_enable, prescaler_control_a, prescaler_control_b, CODECLK_TABLE[codeclk], (u32)period.as_hz());
-	m_iis_timer->adjust(period, 0, period);
+	LOGMASKED(LOG_I2S, "IIS - pclk is %dHz, psc_enable is %d, psc_a is %d, psc_b is %d, codeclk is %d, sample freq is %fHz\n", (u32)pclk.as_hz(), prescaler_enable, prescaler_control_a, prescaler_control_b, CODECLK_TABLE[codeclk], period.as_hz());
+	// One timer tick shifts one channel; the DAC clock is the stereo frame rate.
+	m_iis_timer->adjust(period / 2, 0, period / 2);
 	m_iis_clockchange_w_cb((u32)period.as_hz());
 }
 
@@ -6125,7 +6309,8 @@ void s3c24xx_device::iis_stop()
 
 void s3c24xx_device::iis_recalc()
 {
-	if (BIT(m_iis_iiscon, 0))
+	// TODO: external clock input in slave mode and receive transfers.
+	if (BIT(m_iis_iiscon, 0) && !BIT(m_iis_iismod, 8) && BIT(m_iis_iismod, 7) && !BIT(m_iis_iiscon, 3))
 		iis_start();
 	else
 		iis_stop();
@@ -6133,13 +6318,28 @@ void s3c24xx_device::iis_recalc()
 
 TIMER_CALLBACK_MEMBER(s3c24xx_device::iis_timer_exp)
 {
-	//LOGMASKED(LOG_I2S, "IIS timer callback\n");
-	dma_request_iis();
+	const u32 count_bits = iis_fifo_count_bits();
+	const u32 depth = 1U << (count_bits - 1);
+	const bool fifo_enabled = BIT(m_iis_iisfcon, 2 * count_bits + 1);
+	if (fifo_enabled && BIT(m_iis_iiscon, 5) && BIT(m_iis_iisfcon, 2 * count_bits + 3) && (m_iis_fifo_count < depth))
+		dma_request_iis();
+
+	m_iis_channel ^= 1;
+	u16 data = 0;
+	if (fifo_enabled && m_iis_fifo_count)
+	{
+		data = m_iis_tx_fifo[m_iis_fifo_head];
+		m_iis_fifo_head = (m_iis_fifo_head + 1) & 31;
+		m_iis_fifo_count--;
+	}
+	if (!BIT(m_iis_iismod, 3))
+		data <<= 8;
+	m_iis_data_w_cb(m_iis_channel, data, 0xffff);
 }
 
 u32 s3c24xx_device::iis_iiscon_r(offs_t offset, u32 mem_mask)
 {
-	const u32 data = m_iis_iiscon;
+	const u32 data = (m_iis_iiscon & 0x3f) | (m_iis_channel << 8) | (m_iis_fifo_count ? 0x80 : 0) | 0x40;
 	LOGMASKED(LOG_I2S, "%s: i2s read: IISCON: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
@@ -6147,6 +6347,7 @@ u32 s3c24xx_device::iis_iiscon_r(offs_t offset, u32 mem_mask)
 void s3c24xx_device::iis_iiscon_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	const u32 old = m_iis_iiscon;
+	mem_mask &= 0x3f;
 	COMBINE_DATA(&m_iis_iiscon);
 	LOGMASKED(LOG_I2S, "%s: i2s write: IISCON = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	LOGMASKED(LOG_I2S, "%s:            IIS Interface: %s\n", machine().describe_context(), BIT(data, 0) ? "Enabled" : "Disabled");
@@ -6155,7 +6356,7 @@ void s3c24xx_device::iis_iiscon_w(offs_t offset, u32 data, u32 mem_mask)
 	LOGMASKED(LOG_I2S, "%s:            Tx Idle: %s\n", machine().describe_context(), BIT(data, 3) ? "Idle" : "Active");
 	LOGMASKED(LOG_I2S, "%s:            Rx DREQ: %s\n", machine().describe_context(), BIT(data, 4) ? "Enabled" : "Disabled");
 	LOGMASKED(LOG_I2S, "%s:            Tx DREQ: %s\n", machine().describe_context(), BIT(data, 5) ? "Enabled" : "Disabled");
-	if (BIT(data ^ old, 0))
+	if ((m_iis_iiscon ^ old) & 0x0b)
 		iis_recalc();
 }
 
@@ -6179,6 +6380,7 @@ void s3c24xx_device::iis_iismod_w(offs_t offset, u32 data, u32 mem_mask)
 	LOGMASKED(LOG_I2S, "%s:            Receive: %s\n", machine().describe_context(), BIT(data, 6) ? "Yes" : "No");
 	LOGMASKED(LOG_I2S, "%s:            Transmit: %s\n", machine().describe_context(), BIT(data, 7) ? "Yes" : "No");
 	LOGMASKED(LOG_I2S, "%s:            Output/Input: %s\n", machine().describe_context(), BIT(data, 8) ? "Input" : "Output");
+	iis_recalc();
 }
 
 u32 s3c24xx_device::iis_iispsr_r(offs_t offset, u32 mem_mask)
@@ -6194,21 +6396,27 @@ void s3c24xx_device::iis_iispsr_w(offs_t offset, u32 data, u32 mem_mask)
 	LOGMASKED(LOG_I2S, "%s: i2s write: IISPSR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	LOGMASKED(LOG_I2S, "%s:            Prescaler A: %d\n", machine().describe_context(), ((data >> 5) & 0x1f) + 1);
 	LOGMASKED(LOG_I2S, "%s:            Prescaler B: %d\n", machine().describe_context(), (data & 0x1f) + 1);
-	if (BIT(m_iis_iiscon, 0))
-		iis_start();
+	iis_recalc();
 }
 
 u32 s3c24xx_device::iis_iisfcon_r(offs_t offset, u32 mem_mask)
 {
-	const u32 data = m_iis_iisfcon;
+	const u32 data = m_iis_iisfcon | (m_iis_fifo_count << iis_fifo_count_bits());
 	LOGMASKED(LOG_I2S, "%s: i2s read: IISFCON: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
 
 void s3c24xx_device::iis_iisfcon_w(offs_t offset, u32 data, u32 mem_mask)
 {
+	const u32 count_bits = iis_fifo_count_bits();
+	mem_mask &= 0xfU << (2 * count_bits);
 	COMBINE_DATA(&m_iis_iisfcon);
 	LOGMASKED(LOG_I2S, "%s: i2s write: IISFCON = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	if (!BIT(m_iis_iisfcon, 2 * count_bits + 1))
+	{
+		m_iis_fifo_head = 0;
+		m_iis_fifo_count = 0;
+	}
 }
 
 u32 s3c24xx_device::iis_iisfifo_r(offs_t offset, u32 mem_mask)
@@ -6222,20 +6430,18 @@ void s3c24xx_device::iis_iisfifo_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	//LOGMASKED(LOG_I2S, "%s: i2s write: IISFIFO = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	if (ACCESSING_BITS_0_15)
-	{
-		m_iis_tx_fifo[m_iis_fifo_index++] = BIT(data, 0, 16);
-	}
+		iis_fifo_push(BIT(data, 0, 16));
 	if (ACCESSING_BITS_16_31)
-	{
-		m_iis_tx_fifo[m_iis_fifo_index++] = BIT(data, 16, 16);
-	}
+		iis_fifo_push(BIT(data, 16, 16));
+}
 
-	// TODO: Not accurate, should be driven off DREQ or similar
-	if (m_iis_fifo_index == 2)
+void s3c24xx_device::iis_fifo_push(u16 data)
+{
+	const u32 count_bits = iis_fifo_count_bits();
+	if (BIT(m_iis_iisfcon, 2 * count_bits + 1) && (m_iis_fifo_count < (1U << (count_bits - 1))))
 	{
-		m_iis_data_w_cb(0, (u16)m_iis_tx_fifo[0], 0xffff);
-		m_iis_data_w_cb(1, (u16)m_iis_tx_fifo[1], 0xffff);
-		m_iis_fifo_index = 0;
+		m_iis_tx_fifo[(m_iis_fifo_head + m_iis_fifo_count) & 31] = data;
+		m_iis_fifo_count++;
 	}
 }
 
@@ -7365,9 +7571,12 @@ u8 s3c2410_device::nand_data_r()
 {
 	const bool update_ecc = m_nand_update_ecc_r_cb();
 	const u8 data = m_nand_data_r_cb(0, 0xff);
-	LOGMASKED(LOG_FLASH, "%s: NAND read data %02X [%04X]\n", machine().describe_context(), data, m_nand_data_count++);
-	if (update_ecc)
-		nand_update_ecc(data);
+	if (!machine().side_effects_disabled())
+	{
+		LOGMASKED(LOG_FLASH, "%s: NAND read data %02X [%04X]\n", machine().describe_context(), data, m_nand_data_count++);
+		if (update_ecc)
+			nand_update_ecc(data);
+	}
 	return data;
 }
 

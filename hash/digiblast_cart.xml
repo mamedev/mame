@@ -5,7 +5,9 @@ license:CC0-1.0
 -->
 
 <!--
-    These dumps seem to have blank ECC data, it might need to be reconstructed as done in eolith/ghosteo.cpp
+    Cartridge NAND types are provisional: capacities match the dumps, and the Toshiba
+    IDs are accepted by the boot firmware. PCB chip markings need verification.
+    Some dumps have blank spare areas; others contain spare data of unknown format.
 
     The following are known to exist but not dumped
 
@@ -38,6 +40,7 @@ license:CC0-1.0
 		<year>2005</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_64m" />
 			<dataarea name="rom" size="0x4200000">
 				<rom name="sonic x 1 [v] (it es).bin" size="0x4200000" crc="c24cb643" sha1="62d73be42aa4e104ec980a467bae01b233194579" />
 			</dataarea>
@@ -49,6 +52,7 @@ license:CC0-1.0
 		<year>2005</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_64m" />
 			<dataarea name="rom" size="0x4200000">
 				<rom name="sonic x 1 (ita esp).bin" size="0x4200000" crc="63c9ccc0" sha1="762a7b488a3c8b8ee37eaabf85245bfc3e71bbc3" />
 			</dataarea>
@@ -60,6 +64,7 @@ license:CC0-1.0
 		<year>2005</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_64m" />
 			<dataarea name="rom" size="0x4200000">
 				<rom name="sponge bob square pants 1 (ita spa).bin" size="0x4200000" crc="56deccb3" sha1="251967cdc72cf06bb92957ecc3ad8a3b1573c91e" />
 			</dataarea>
@@ -71,6 +76,7 @@ license:CC0-1.0
 		<year>2005</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_64m" />
 			<dataarea name="rom" size="0x4200000">
 				<rom name="totally spies 1 [v] (nl en fr tr).bin" size="0x4200000" crc="93e46afb" sha1="0495f2b468cbd9cfd2ef74a306a639c4fc9d3c57" />
 			</dataarea>
@@ -82,6 +88,7 @@ license:CC0-1.0
 		<year>2005</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_64m" />
 			<dataarea name="rom" size="0x4200000">
 				<rom name="totally spies 1 (ita).bin" size="0x4200000" crc="2f88baaf" sha1="5cda9f4844cd708e577426285a0d7f0024e83168" />
 			</dataarea>
@@ -93,6 +100,7 @@ license:CC0-1.0
 		<year>2005</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_64m" />
 			<dataarea name="rom" size="0x4200000">
 				<rom name="yu-gi-oh (ita esp).bin" size="0x4200000" crc="2494e958" sha1="76594cebc642c61afa84d20370b40d18e9aabc80" />
 			</dataarea>
@@ -104,6 +112,7 @@ license:CC0-1.0
 		<year>2005</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_32m" />
 			<dataarea name="rom" size="0x2100000">
 				<rom name="winx club + 5 atari games [v g] (it es).bin" size="0x2100000" crc="6b5ca82e" sha1="e934ace84ba44defb4e4c0967236ad8803837409" />
 			</dataarea>
@@ -115,6 +124,7 @@ license:CC0-1.0
 		<year>2005</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_64m" />
 			<dataarea name="rom" size="0x4200000">
 				<rom name="winx club + 5 atari games (ita esp).bin" size="0x4200000" crc="09897866" sha1="df1b42368ae776d9028a27796874d5830bfd38c2" />
 			</dataarea>
@@ -126,8 +136,10 @@ license:CC0-1.0
 		<year>2005</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_32m" />
 			<dataarea name="rom" size="0x2100000">
-				<rom name="winx club + 5 atari games [v g] (nl fr de tr).bin" size="0x2100000" crc="eb1d8fda" sha1="f192ffe38eadcc8e3b9b59db76379806e400892f" />
+				<!-- SquashFS data for the launcher fails decompression independently of emulation. -->
+				<rom name="winx club + 5 atari games [v g] (nl fr de tr).bin" size="0x2100000" status="baddump" crc="eb1d8fda" sha1="f192ffe38eadcc8e3b9b59db76379806e400892f" />
 			</dataarea>
 		</part>
 	</software>
@@ -137,6 +149,7 @@ license:CC0-1.0
 		<year>2005</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_64m" />
 			<dataarea name="rom" size="0x4200000">
 				<rom name="winx club 1 (ita esp).bin" size="0x4200000" crc="a870766e" sha1="ade470b1e574761bf35254064b2437dccf1a3c2c" />
 			</dataarea>
@@ -148,6 +161,7 @@ license:CC0-1.0
 		<year>200?</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_16m" />
 			<dataarea name="rom" size="0x1080000">
 				<rom name="crazy jack [g] (en).bin" size="0x1080000" crc="9bce041a" sha1="221d68d590bf8b716a69e330da83e9fab2b48c04" />
 			</dataarea>
@@ -159,6 +173,7 @@ license:CC0-1.0
 		<year>200?</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_64m" />
 			<dataarea name="rom" size="0x4200000">
 				<rom name="cuccioli cerca amici [g] (it).bin" size="0x4200000" crc="40a18574" sha1="7d5d2201a0f93b083ea32e116da8d2fe530f36f5" />
 			</dataarea>
@@ -170,6 +185,7 @@ license:CC0-1.0
 		<year>200?</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_16m" />
 			<dataarea name="rom" size="0x1080000">
 				<rom name="digiquad [g] (en).bin" size="0x1080000" crc="c57e4b7c" sha1="17aff879b64ebba5574a787cb78b763b04d7efea" />
 			</dataarea>
@@ -181,6 +197,7 @@ license:CC0-1.0
 		<year>200?</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_32m" />
 			<dataarea name="rom" size="0x2100000">
 				<rom name="gormiti 2 episodi [v] (it).bin" size="0x2100000" crc="b0b98ad1" sha1="78cdd5a11af87a762ef689ede4afe1f1852f124b" />
 			</dataarea>
@@ -192,6 +209,7 @@ license:CC0-1.0
 		<year>200?</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_32m" />
 			<dataarea name="rom" size="0x2100000">
 				<rom name="gormiti lotta oscura [g] (it).bin" size="0x2100000" crc="d11135f5" sha1="9538995c2fd9344be1e3b64c754488fac7ad3985" />
 			</dataarea>
@@ -203,6 +221,7 @@ license:CC0-1.0
 		<year>200?</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_16m" />
 			<dataarea name="rom" size="0x1080000">
 				<rom name="gormiti masters of the gorm island [g] (it).bin" size="0x1080000" crc="f890f74c" sha1="26431663f87e3549eab3c36e5d89ef0dbbadd489" />
 			</dataarea>
@@ -214,6 +233,7 @@ license:CC0-1.0
 		<year>200?</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_16m" />
 			<dataarea name="rom" size="0x1080000">
 				<rom name="pitfall the lost expedition [g] (en).bin" size="0x1080000" crc="d1d6118f" sha1="8f7027041c5a02ac8128a4fa2cb3a5dc6e45c357" />
 			</dataarea>
@@ -225,6 +245,7 @@ license:CC0-1.0
 		<year>200?</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_16m" />
 			<dataarea name="rom" size="0x1080000">
 				<rom name="rayman 3 [g] (m10).bin" size="0x1080000" crc="e3e1953e" sha1="015df5c3b9c7a6f1be4d58bedb49b6d0f5674bf9" />
 			</dataarea>
@@ -236,6 +257,7 @@ license:CC0-1.0
 		<year>200?</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_16m" />
 			<dataarea name="rom" size="0x1080000">
 				<rom name="spider-man mysterios menace [g] (en).bin" size="0x1080000" crc="142577ee" sha1="ddf13723b44ab1cdbb80d73a8b55601a98f7e1b6" />
 			</dataarea>
@@ -247,6 +269,7 @@ license:CC0-1.0
 		<year>200?</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_32m" />
 			<dataarea name="rom" size="0x2100000">
 				<rom name="sponge bob 5 atari games [v g] (it es).bin" size="0x2100000" crc="69ab74c0" sha1="f454bc13b5b2cde1dcee1cc6a5861ee0e9bc032c" />
 			</dataarea>
@@ -258,6 +281,7 @@ license:CC0-1.0
 		<year>200?</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_16m" />
 			<dataarea name="rom" size="0x1080000">
 				<rom name="superstar chefs [g] (en).bin" size="0x1080000" crc="93209877" sha1="026494753c9c35feee362342ff96bd4f05f241b1" />
 			</dataarea>
@@ -269,6 +293,7 @@ license:CC0-1.0
 		<year>200?</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
+			<feature name="slot" value="nand_16m" />
 			<dataarea name="rom" size="0x1080000">
 				<rom name="wade hixtons counter punch [g] (en).bin" size="0x1080000" crc="eba2a2c3" sha1="10e52e59d0be41db6f1e9ba4d895237569890c22" />
 			</dataarea>

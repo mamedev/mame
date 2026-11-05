@@ -24,6 +24,8 @@
 class s3c24xx_device : public device_t
 {
 public:
+	static constexpr flags_type emulation_flags() { return flags::SAVE_UNSUPPORTED; }
+
 	// configuration
 	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
@@ -191,7 +193,7 @@ protected:
 	};
 
 	virtual void irq_reset();
-	void check_pending_irq();
+	virtual void check_pending_irq();
 	virtual u32 get_irq_bit_for_int_type(u32 int_type) const = 0;
 	void request_irq(u32 int_type);
 	u32 irq_srcpnd_r(offs_t offset, u32 mem_mask = ~0);
@@ -221,7 +223,6 @@ protected:
 	void dma_request_pwm();
 	template <int Which> void dma_start();
 	template <int Which> void dma_stop();
-	template <int Which> void dma_recalc();
 	TIMER_CALLBACK_MEMBER(dma_timer_exp);
 	template <int Which> u32 dma_disrc_r(offs_t offset, u32 mem_mask = ~0);
 	template <int Which> void dma_disrc_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -362,6 +363,11 @@ protected:
 
 	void uart_reset();
 	virtual void uart_request_irq(int which);
+	virtual void uart_request_tx_irq(int which);
+	virtual u32 uart_fifo_depth() const;
+	void uart_update_tx_irq(int which);
+	void uart_tx_start(int which);
+	TIMER_CALLBACK_MEMBER(uart_tx_complete);
 	template <int Which> u32 uart_ulcon_r(offs_t offset, u32 mem_mask = ~0);
 	template <int Which> void uart_ulcon_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	template <int Which> u32 uart_ucon_r(offs_t offset, u32 mem_mask = ~0);
@@ -504,6 +510,8 @@ protected:
 	void iis_start();
 	void iis_stop();
 	void iis_recalc();
+	virtual u32 iis_fifo_count_bits() const;
+	void iis_fifo_push(u16 data);
 	TIMER_CALLBACK_MEMBER(iis_timer_exp);
 	u32 iis_iiscon_r(offs_t offset, u32 mem_mask = ~0);
 	void iis_iiscon_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -751,6 +759,13 @@ protected:
 	u32 m_uart_utxh[3];
 	u32 m_uart_urxh[3];
 	u32 m_uart_ubrdiv[3];
+	u8 m_uart_tx_fifo[3][64];
+	u8 m_uart_tx_head[3];
+	u8 m_uart_tx_count[3];
+	u8 m_uart_tx_shift[3];
+	bool m_uart_tx_busy[3];
+	bool m_uart_tx_irq[3];
+	emu_timer *m_uart_tx_timer[3];
 
 	u32 m_pwm_tcfg0;
 	u32 m_pwm_tcfg1;
@@ -811,8 +826,10 @@ protected:
 	u32 m_iis_iisfcon;
 	u32 m_iis_iisfifo;
 	emu_timer *m_iis_timer;
-	u16 m_iis_tx_fifo[16/2];
-	int m_iis_fifo_index;
+	u16 m_iis_tx_fifo[32];
+	u8 m_iis_fifo_head;
+	u8 m_iis_fifo_count;
+	u8 m_iis_channel;
 
 	u32 m_gpio_gpacon;
 	u32 m_gpio_gpbcon;
@@ -989,6 +1006,7 @@ protected:
 	void irq_intsubmsk_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	virtual u32 dma_dcon_get_tsz(const u32 value) override;
+	virtual u32 iis_fifo_count_bits() const override;
 	virtual u32 dma_dcon_get_hwsrcsel(const u32 value) override;
 	virtual u32 dma_dcon_get_servmode(const u32 value) override;
 	virtual u32 dma_dcon_get_int(const u32 value) override;
@@ -1039,6 +1057,8 @@ protected:
 	virtual void nand_auto_boot();
 
 	virtual void uart_request_irq(int which) override;
+	virtual void uart_request_tx_irq(int which) override;
+	virtual void check_pending_irq() override;
 
 	virtual void usb_device_reset() override;
 	u32 usbdev_ep_int_r(offs_t offset, u32 mem_mask = ~0);
@@ -1247,6 +1267,8 @@ public:
 	virtual void frnb_w(int state) override;
 
 protected:
+	virtual u32 uart_fifo_depth() const override;
+
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

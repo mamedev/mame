@@ -1,0 +1,92 @@
+// license:BSD-3-Clause
+// copyright-holders:
+
+// The boot firmware accepts Toshiba 0x73/0x75/0x76 devices.  These configurations
+// match the dump capacities; the parts fitted to the cartridges need verification.
+
+#include "emu.h"
+#include "nand.h"
+
+DEFINE_DEVICE_TYPE(DIGIBLAST_NAND_16M, digiblast_nand_16m_device, "digiblast_nand_16m", "digiBLAST 16 MiB NAND Cartridge")
+DEFINE_DEVICE_TYPE(DIGIBLAST_NAND_32M, digiblast_nand_32m_device, "digiblast_nand_32m", "digiBLAST 32 MiB NAND Cartridge")
+DEFINE_DEVICE_TYPE(DIGIBLAST_NAND_64M, digiblast_nand_64m_device, "digiblast_nand_64m", "digiBLAST 64 MiB NAND Cartridge")
+
+digiblast_nand_device::digiblast_nand_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_digiblast_cart_interface(mconfig, *this)
+	, m_nand(*this, "nand")
+	, m_slot(*this, DEVICE_SELF_OWNER)
+{
+}
+
+void digiblast_nand_device::device_start()
+{
+}
+
+void digiblast_nand_device::configure_nand()
+{
+	m_nand->rnb_wr_callback().set(m_slot, FUNC(digiblast_cart_slot_device::ready_w));
+}
+
+digiblast_nand_16m_device::digiblast_nand_16m_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: digiblast_nand_device(mconfig, DIGIBLAST_NAND_16M, tag, owner, clock)
+{
+}
+
+void digiblast_nand_16m_device::device_add_mconfig(machine_config &config)
+{
+	TOSHIBA_TC58128FT(config, m_nand);
+	configure_nand();
+}
+
+digiblast_nand_32m_device::digiblast_nand_32m_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: digiblast_nand_device(mconfig, DIGIBLAST_NAND_32M, tag, owner, clock)
+{
+}
+
+void digiblast_nand_32m_device::device_add_mconfig(machine_config &config)
+{
+	TOSHIBA_TC58256FT(config, m_nand);
+	configure_nand();
+}
+
+digiblast_nand_64m_device::digiblast_nand_64m_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: digiblast_nand_device(mconfig, DIGIBLAST_NAND_64M, tag, owner, clock)
+{
+}
+
+void digiblast_nand_64m_device::device_add_mconfig(machine_config &config)
+{
+	TOSHIBA_TC58512FT(config, m_nand);
+	configure_nand();
+}
+
+u8 digiblast_nand_device::data_r()
+{
+	return m_nand->data_r();
+}
+
+void digiblast_nand_device::data_w(u8 data)
+{
+	m_nand->data_w(data);
+}
+
+void digiblast_nand_device::command_w(u8 data)
+{
+	m_nand->command_w(data);
+}
+
+void digiblast_nand_device::address_w(u8 data)
+{
+	m_nand->address_w(data);
+}
+
+u32 digiblast_nand_device::rom_size() const
+{
+	return m_nand->nand_size();
+}
+
+void digiblast_nand_device::set_rom(const u8 *data, u32 size)
+{
+	m_nand->set_rom(data, size);
+}
