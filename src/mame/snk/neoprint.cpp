@@ -6,9 +6,6 @@
 
     preliminary driver by David Haywood & Angelo Salese
 
-    npcartv1 bp 1260 pc += 2
-    98best44 bp 1312 pc += 2
-
     TODO:
     - implement remaining video features;
     - sound interface, needs full Neo-Geo conversion;
@@ -63,17 +60,6 @@ public:
 	void neoprint(machine_config &config) ATTR_COLD;
 	void nprsp(machine_config &config) ATTR_COLD;
 
-	void init_98best44() ATTR_COLD;
-	void init_npmillen() ATTR_COLD;
-	void init_npcartv1() ATTR_COLD;
-	void init_npotogib() ATTR_COLD;
-	void init_nprsp() ATTR_COLD;
-	void init_npscv1() ATTR_COLD;
-	void init_npskv() ATTR_COLD;
-	void init_npsprgv4() ATTR_COLD;
-	void init_npspscv() ATTR_COLD;
-	void init_unkneo() ATTR_COLD;
-
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
@@ -82,6 +68,8 @@ private:
 	uint8_t calendar_r();
 	void calendar_w(uint8_t data);
 	uint8_t unk_r();
+	uint8_t mech_status_r();
+	void mech_command_w(uint8_t data);
 	uint8_t audio_result_r();
 	void audio_cpu_clear_nmi_w(uint8_t data);
 	void audio_command_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
@@ -118,6 +106,7 @@ private:
 
 	uint8_t m_audio_result = 0;
 	uint8_t m_bank_val = 0;
+	uint8_t m_mech_pos = 0;
 };
 
 
@@ -206,15 +195,38 @@ void neoprint_state::calendar_w(uint8_t data)
 uint8_t neoprint_state::unk_r()
 {
 	/* ---x ---- tested in irq routine, odd/even field number? */
-	/* ---- xx-- one of these two must be high */
-	/* ---- --xx checked right before entering into attract mode, presumably printer/camera related */
+	/* ---- xxxx printer/camera mechanism status, see mech_status_r */
 
 	const uint8_t vblank = (m_screen->frame_number() & 0x1) ? 0x10 : 0x00;
 
 	//if (m_maincpu->pc() != 0x1504 && m_maincpu->pc() != 0x5f86 && m_maincpu->pc() != 0x5f90)
 	//  printf("%08x\n",m_maincpu->pc());
 
-	return vblank | 4 | 3;
+	return vblank | mech_status_r();
+}
+
+/*
+    Printer/camera mechanism, behaviour deduced from the program code only:
+    ---- xx-- position sensor of a mechanism with three stops (0 = between stops)
+    ---- --xx active low busy/acknowledge lines, always idle here
+
+    Command 0x12 moves the mechanism to the previous stop (3 -> 2 -> 1 -> 3), the
+    nprsp boot code checks this sequence. Other commands need a busy/acknowledge
+    handshake that isn't emulated.
+    The code always writes the command to both 0x0a and 0x0c in the I/O area, only
+    the one that is also read back as status is mapped.
+*/
+uint8_t neoprint_state::mech_status_r()
+{
+	static constexpr uint8_t POS_ID[3] = { 0x0c, 0x04, 0x08 }; // stops 1, 2, 3
+
+	return POS_ID[m_mech_pos] | 0x03;
+}
+
+void neoprint_state::mech_command_w(uint8_t data)
+{
+	if (data == 0x12)
+		m_mech_pos = (m_mech_pos + 2) % 3;
 }
 
 uint8_t neoprint_state::audio_result_r()
@@ -281,7 +293,7 @@ void neoprint_state::neoprint_map(address_map &map)
 	map(0x600004, 0x600005).portr("SYSTEM").nopw();
 	map(0x600006, 0x600007).portr("IN").nopw();
 	map(0x600008, 0x600009).portr("DSW1");
-	map(0x60000a, 0x60000a).r(FUNC(neoprint_state::unk_r));
+	map(0x60000a, 0x60000a).rw(FUNC(neoprint_state::unk_r), FUNC(neoprint_state::mech_command_w));
 	map(0x60000c, 0x60000d).portr("DSW2");
 	map(0x60000e, 0x60000f).nopw();
 
@@ -339,8 +351,8 @@ void neoprint_state::nprsp_map(address_map &map)
 	map(0x200006, 0x200007).portr("IN").nopw();
 	map(0x200008, 0x200009).portr("DSW1");
 	map(0x200008, 0x200008).w(FUNC(neoprint_state::nprsp_bank_w));
-	map(0x20000a, 0x20000a).r(FUNC(neoprint_state::unk_r));
-	map(0x20000c, 0x20000d).portr("DSW2");
+	map(0x20000a, 0x20000b).portr("DSW2");
+	map(0x20000c, 0x20000c).rw(FUNC(neoprint_state::mech_status_r), FUNC(neoprint_state::mech_command_w));
 	map(0x20000e, 0x20000f).nopw();
 
 	map(0x240000, 0x24001b).ram().share(m_vregs);
@@ -499,6 +511,8 @@ void neoprint_state::machine_start()
 	m_upd4990a->c0_w(1);
 	m_upd4990a->c1_w(1);
 	m_upd4990a->c2_w(1);
+
+	save_item(NAME(m_mech_pos));
 }
 
 void neoprint_state::neoprint(machine_config &config)
@@ -915,117 +929,25 @@ ROM_START( npeurver2 ) // NP 1.30 19970430 string
 	// c5-c8 not populated
 ROM_END
 
-// FIXME: get rid of these patches
-// probably something to do with irq3 and camera / printer devices
-void neoprint_state::init_npcartv1()
-{
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
-
-	ROM[0x1260/2] = 0x4e71;
-
-	ROM[0x43c8/2] = 0x4e71; //ROM checksum
-}
-
-
-void neoprint_state::init_98best44()
-{
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
-
-	ROM[0x1312/2] = 0x4e71;
-}
-
-void neoprint_state::init_npmillen()
-{
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
-
-	ROM[0x1312/2] = 0x4e71;
-
-	ROM[0x42a8/2] = 0x4e71; //ROM checksum
-}
-
-void neoprint_state::init_npsprgv4()
-{
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
-
-	ROM[0x12e8/2] = 0x4e71;
-
-	ROM[0x3ba0/2] = 0x4e71; //ROM checksum
-}
-
-void neoprint_state::init_npskv()
-{
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
-
-	ROM[0x130a/2] = 0x4e71;
-
-	ROM[0x3bf4/2] = 0x4e71; //ROM checksum
-}
-
-void neoprint_state::init_nprsp()
-{
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
-
-	ROM[0x13a4/2] = 0x4e71;
-	ROM[0x13bc/2] = 0x4e71;
-	ROM[0x140c/2] = 0x4e71;
-
-	ROM[0x4832/2] = 0x4e71; //ROM checksum
-	ROM[0x4834/2] = 0x4e71;
-}
-
-void neoprint_state::init_npspscv()
-{
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
-
-	ROM[0x13a4/2] = 0x4e71;
-	ROM[0x13bc/2] = 0x4e71;
-	ROM[0x13f0/2] = 0x4e71;
-
-	ROM[0x44b0/2] = 0x4e71; //ROM checksum
-	ROM[0x44b2/2] = 0x4e71;
-}
-
-void neoprint_state::init_unkneo()
-{
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
-	ROM[0x12c2/2] = 0x4e71;
-}
-
-void neoprint_state::init_npscv1()
-{
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
-	ROM[0x1242/2] = 0x4e71;
-
-	ROM[0x4390/2] = 0x4e71; //ROM checksum
-}
-
-void neoprint_state::init_npotogib()
-{
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
-	ROM[0x1312/2] = 0x4e71;
-
-	ROM[0x3f4e/2] = 0x4e71; //ROM checksum
-}
-
 } // anonymous namespace
 
 
-GAME( 1996, neoprint,    0,        neoprint,    neoprint, neoprint_state, init_unkneo,   ROT0, "SNK", "Neo Print (Japan) (T2d)",                                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1996, npcartv1,    0,        neoprint,    neoprint, neoprint_state, init_npcartv1, ROT0, "SNK", "Neo Print V1 (World) (E1a)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1996, npscv1,      0,        neoprint,    neoprint, neoprint_state, init_npscv1,   ROT0, "SNK", "Neo Print - Senyou Cassette Ver. 1 (Japan)",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, neoprint,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print (Japan) (T2d)",                                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, npcartv1,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print V1 (World) (E1a)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, npscv1,      0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Senyou Cassette Ver. 1 (Japan)",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1996, npcramen,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Chicken Ramen (Japan)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, npsprgv4,    0,        neoprint,    neoprint, neoprint_state, init_npsprgv4, ROT0, "SNK", "Neo Print - Spring Ver. 4 (Japan) (T4f 1.00)",                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, npskv,       0,        neoprint,    neoprint, neoprint_state, init_npskv,    ROT0, "SNK", "Neo Print - Suizokukan Version (Japan) (T4i 2.00)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, npotogib,    0,        neoprint,    neoprint, neoprint_state, init_npotogib, ROT0, "SNK", "Neo Print - Otogibanashi (Japan) (T4i 3.00)",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, nppopeye,    0,        neoprint,    neoprint, neoprint_state, init_98best44, ROT0, "SNK", "Neo Print - Popeye (Japan) (T4i 3.04)",                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, npeurver,    0,        neoprint,    neoprint, neoprint_state, init_npskv,    ROT0, "SNK", "Neo Print - European Version (World) (T4i 2.00)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1996, npeurver2,   0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - European Version II (World) (T4i 3.07)",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, npusagif,    0,        neoprint,    neoprint, neoprint_state, init_98best44, ROT0, "SNK", "Neo Print - Usagi Frame (Japan) (T4i 3.07)",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1998, 98best44,    0,        neoprint,    neoprint, neoprint_state, init_98best44, ROT0, "SNK", "Neo Print - '98 NeoPri Best 44 (Japan) (T4i 3.07)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1998, npsprg98,    0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Spring '98 (T4i 3.07)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1999, npmillen,    0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Millennium Multi Shot Edition (World) (T4i 3.07)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1999, npfpit,      0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Fuyu Pri Iitoko-dori (Japan) (T4i 3.07)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1999, npft,        0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Fairy Tales (World) (T4i 3.07)",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1996, nprsp,       0,        nprsp,       neoprint, neoprint_state, init_nprsp,    ROT0, "SNK", "NeopriSP Retro Collection (Japan)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1996, npssr2,      0,        nprsp,       neoprint, neoprint_state, init_nprsp,    ROT0, "SNK", "Neo Print Special: Sekai Ryokou 2 (Japan)",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, npspscv,     0,        nprsp,       neoprint, neoprint_state, init_npspscv,  ROT0, "SNK", "Neo Print SP! Super Collection Version (Japan)",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, npsprgv4,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Spring Ver. 4 (Japan) (T4f 1.00)",                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, npskv,       0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Suizokukan Version (Japan) (T4i 2.00)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, npotogib,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Otogibanashi (Japan) (T4i 3.00)",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, nppopeye,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Popeye (Japan) (T4i 3.04)",                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, npeurver,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - European Version (World) (T4i 2.00)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, npeurver2,   0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - European Version II (World) (T4i 3.07)",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, npusagif,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Usagi Frame (Japan) (T4i 3.07)",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1998, 98best44,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - '98 NeoPri Best 44 (Japan) (T4i 3.07)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1998, npsprg98,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Spring '98 (T4i 3.07)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1999, npmillen,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Millennium Multi Shot Edition (World) (T4i 3.07)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1999, npfpit,      0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Fuyu Pri Iitoko-dori (Japan) (T4i 3.07)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1999, npft,        0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Fairy Tales (World) (T4i 3.07)",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, nprsp,       0,        nprsp,       neoprint, neoprint_state, empty_init,    ROT0, "SNK", "NeopriSP Retro Collection (Japan)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, npssr2,      0,        nprsp,       neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print Special: Sekai Ryokou 2 (Japan)",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, npspscv,     0,        nprsp,       neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print SP! Super Collection Version (Japan)",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
