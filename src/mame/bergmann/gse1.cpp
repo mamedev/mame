@@ -501,26 +501,26 @@ void gse1_state::gse1(machine_config &config)
 
 ROM_START( corsar )
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD( "crown_corsar_a.bin", 0x0000, 0x2000, CRC(cf907cab) SHA1(66e22b8e1f8e3645dd4b5f1504517b7e734b20f2) )
-	ROM_LOAD( "crown_corsar_b.bin", 0x2000, 0x2000, CRC(c1a69ccd) SHA1(97561620110ed991dcd2b17fbd0de5d0bbc282fe) )
+	ROM_LOAD( "crown_corsar.a", 0x0000, 0x2000, CRC(cf907cab) SHA1(66e22b8e1f8e3645dd4b5f1504517b7e734b20f2) )
+	ROM_LOAD( "crown_corsar.b", 0x2000, 0x2000, CRC(c1a69ccd) SHA1(97561620110ed991dcd2b17fbd0de5d0bbc282fe) )
 ROM_END
 
 ROM_START( croyal1 )
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD( "crown_royal_no1_a.bin", 0x0000, 0x2000, CRC(eccf354f) SHA1(de023a3403a82314609acac10072a3bef00b4969) )
-	ROM_LOAD( "crown_royal_no1_b.bin", 0x2000, 0x1000, CRC(c703a9cd) SHA1(015dd4c2454ff865bb9a88f63d7ad4d785ba5495) )
+	ROM_LOAD( "crown_royal_no1.a", 0x0000, 0x2000, CRC(eccf354f) SHA1(de023a3403a82314609acac10072a3bef00b4969) )
+	ROM_LOAD( "crown_royal_no1.b", 0x2000, 0x1000, CRC(c703a9cd) SHA1(015dd4c2454ff865bb9a88f63d7ad4d785ba5495) )
 ROM_END
 
 ROM_START( cwinner )
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD( "winner_a.bin", 0x0000, 0x2000, CRC(1fa5ef3a) SHA1(4c645b60dba740cfb5da55a9c096ef0669573af3) )
-	ROM_LOAD( "winner_b.bin", 0x2000, 0x2000, CRC(0cb99872) SHA1(18e4085b9c407ec7e656a9a733eae39ff00403e8) )
+	ROM_LOAD( "winner.a", 0x0000, 0x2000, CRC(1fa5ef3a) SHA1(4c645b60dba740cfb5da55a9c096ef0669573af3) )
+	ROM_LOAD( "winner.b", 0x2000, 0x2000, CRC(0cb99872) SHA1(18e4085b9c407ec7e656a9a733eae39ff00403e8) )
 ROM_END
 
 ROM_START( jubilees )
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD( "jubilee_super_a.bin", 0x0000, 0x2000, CRC(32b8ad57) SHA1(8b95f23b5cb22261f7db62e3879b475722cfe0f2) )
-	ROM_LOAD( "jubilee_super_b.bin", 0x2000, 0x1000, CRC(60b7a6d3) SHA1(a98375c970176927ad4f0ca6b62b1a22cc07df69) )
+	ROM_LOAD( "jubilee_super.a", 0x0000, 0x2000, CRC(32b8ad57) SHA1(8b95f23b5cb22261f7db62e3879b475722cfe0f2) )
+	ROM_LOAD( "jubilee_super.b", 0x2000, 0x1000, CRC(60b7a6d3) SHA1(a98375c970176927ad4f0ca6b62b1a22cc07df69) )
 ROM_END
 
 } // anonymous namespace
