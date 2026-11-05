@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "ds2717.h"
+
 #include "bus/pmd85/gpio.h"
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
@@ -39,6 +41,7 @@ public:
 		, m_ppi2(*this, "ppi2")
 		, m_ppi3(*this, "ppi3")
 		, m_gpio(*this, "gpio0")
+		, m_ds2717(*this, "ds2717")
 		, m_bank(*this, "bank%d", 0U)
 		, m_io_dsw0(*this, "DSW0")
 		, m_palette(*this, "palette")
@@ -53,6 +56,7 @@ public:
 	void pmd852a(machine_config &config);
 	void alfa(machine_config &config);
 	void c2717(machine_config &config);
+	void c2717ds(machine_config &config) ATTR_COLD;
 	void c2717pmd(machine_config &config) ATTR_COLD;
 	void c2717sd(machine_config &config) ATTR_COLD;
 	void mato(machine_config &config);
@@ -158,6 +162,7 @@ private:
 	optional_device<i8255_device> m_ppi2;
 	optional_device<i8255_device> m_ppi3;
 	optional_device<pmd85_gpio_slot_device> m_gpio;
+	optional_device<ds2717_device> m_ds2717;
 	optional_memory_bank_array<17> m_bank;
 	optional_ioport m_io_dsw0;
 	required_device<palette_device> m_palette;

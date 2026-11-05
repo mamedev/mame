@@ -514,6 +514,10 @@ uint8_t pmd85_state::io_r(offs_t offset)
 		return 0xff;
 	}
 
+	// the DS 2717 takes C8-CF, over the ROM module 8255 mirror
+	if (m_ds2717 && ((offset & 0xf8) == 0xc8))
+		return m_ds2717->read(offset & 0x07);
+
 	switch (offset & 0x0c)
 	{
 		case 0x04:  /* Motherboard */
@@ -567,6 +571,12 @@ void pmd85_state::io_w(offs_t offset, uint8_t data)
 	{
 		m_startup_mem_map = 0;
 		(this->*update_memory)();
+	}
+
+	if (m_ds2717 && ((offset & 0xf8) == 0xc8))
+	{
+		m_ds2717->write(offset & 0x07, data);
+		return;
 	}
 
 	switch (offset & 0x0c)

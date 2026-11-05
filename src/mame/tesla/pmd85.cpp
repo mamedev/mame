@@ -31,14 +31,14 @@ Notes on emulation status and to do list:
 3.  External interfaces connectors (K2-K5).
 4.  C2717PMD: no disc made for its PMD 32 driver is known.  Discs in the 8" layout
     (boot records signed "C2717 ") load CP/M from the PMD 32, but their BIOS
-    drives the DS 2717 board.
+    drives the DS 2717 board (c2717ds).
 5.  Verify PMD-85.2A, PMD-85.3, Didaktik Alfa and Mato monitor roms.
 6.  Verify all Basic roms.
 7.  8251 in Didaktik Alfa.
 8.  Colors (if any). Seems most versions supported 4 colours via RGB connector. But, the TV modulator only carried the G line.
     The video signals are developed in a forest of gates which may take a while to work out.
 9.  PMD-85, Didaktik Alfa 2 and Didaktik Beta (ROMs and documentation needed).
-10. Consul 2717 DS 2717 internal 8" floppy controller and classroom network.
+10. Consul 2717 classroom network.
 11. "Duch & Pampuch" Mato game displays scores with incorrect characters.
 12. PMD 32 on the PMD-85.2 and PMD-85.2A (needs the booter ROM module).
 
@@ -225,6 +225,9 @@ Some software items will crash MAME, for example "bdash".
 
 Disks
 -----
+- c2717ds : the DS 2717 8" disk controller is fitted (-flop1, -flop2).  At power-on
+  the monitor boots the disc in drive A; Stop leaves the wait for a disc.
+
 The I/O board's GPIO/0 connector (slot gpio0) takes the PMD 32 floppy unit
 (pmd32) or the PMD 32-SD (pmd32sd).
 - pmd853 : the PMD 32 is fitted; at power-on the monitor boots the disk in its
@@ -849,6 +852,16 @@ void pmd85_state::c2717(machine_config &config)
 	m_screen->set_screen_update(FUNC(pmd85_state::c2717_screen_update));
 }
 
+void pmd85_state::c2717ds(machine_config &config)
+{
+	c2717(config);
+
+	DS2717(config, m_ds2717, 18.432_MHz_XTAL / 9);
+	m_ds2717->int_cb().set_inputline(m_maincpu, I8085_INTR_LINE);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("c2717_flop");
+}
+
 void pmd85_state::c2717pmd(machine_config &config)
 {
 	c2717(config);
@@ -933,6 +946,11 @@ ROM_START(c2717)
 	ROM_LOAD("c2717.rom", 0x0000, 0x4000, CRC(da1703b1) SHA1(9fb93e6cae8b551064c7175bf3b4e3113429ce73))
 ROM_END
 
+ROM_START(c2717ds)
+	ROM_REGION(0x4000,"maincpu",0)
+	ROM_LOAD("c2717.rom", 0x0000, 0x4000, CRC(da1703b1) SHA1(9fb93e6cae8b551064c7175bf3b4e3113429ce73))
+ROM_END
+
 ROM_START(c2717pmd)
 	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD( "c2717-pmd32.rom", 0x00000, 0x4000, CRC(cbdd323c) SHA1(ee9fea11be8bd4f945c583b0ae5684269906d0ce))
@@ -954,5 +972,6 @@ COMP( 1988, pmd853,   pmd851, 0,      pmd853,   pmd85, pmd85_state, init_pmd853,
 COMP( 1986, alfa,     pmd851, 0,      alfa,     alfa,  pmd85_state, init_alfa,    "Didaktik Skalica",         "Didaktik Alfa",                MACHINE_SUPPORTS_SAVE )
 COMP( 1985, mato,     pmd851, 0,      mato,     mato,  pmd85_state, init_mato,    "Statny",                   "Mato",                         MACHINE_SUPPORTS_SAVE )
 COMP( 1989, c2717,    pmd851, 0,      c2717,    pmd85, pmd85_state, init_c2717,   "Zbrojovka Brno",           "Consul 2717",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1989, c2717ds,  pmd851, 0,      c2717ds,  pmd85, pmd85_state, init_c2717,   "Zbrojovka Brno",           "Consul 2717 (with DS 2717)",   MACHINE_SUPPORTS_SAVE )
 COMP( 1989, c2717pmd, pmd851, 0,      c2717pmd, pmd85, pmd85_state, init_c2717,   "Zbrojovka Brno",           "Consul 2717 (with PMD 32)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 2012, c2717sd,  pmd851, 0,      c2717sd,  pmd85, pmd85_state, init_c2717,   "Zbrojovka Brno / RM-TEAM", "Consul 2717 (with PMD 32-SD)", MACHINE_SUPPORTS_SAVE )
