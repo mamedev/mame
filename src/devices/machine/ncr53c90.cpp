@@ -969,6 +969,7 @@ void ncr53c90_device::start_command()
 	case CM_RESET_BUS:
 		LOGMASKED(LOG_COMMAND, "Reset SCSI bus\n");
 		state = BUSRESET_WAIT_INT;
+		mode = MODE_D;
 		m_scsi_bus->ctrl_w(m_scsi_refid, S_RST, S_RST);
 		delay(130);
 		break;
