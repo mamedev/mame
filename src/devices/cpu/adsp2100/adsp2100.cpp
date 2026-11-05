@@ -2097,8 +2097,8 @@ void adsp2181_device::control_w(offs_t offset, uint16_t data)
 
 		case SPORT0_AUTOBUF:
 		case SPORT1_AUTOBUF:
-			if (data & 3)
-				logerror("%s: SPORT%d autobuffering is not emulated\n", machine().describe_context(), (offset == SPORT1_AUTOBUF) ? 1 : 0);
+			if (data & 1)
+				logerror("%s: SPORT%d receive autobuffering is not emulated\n", machine().describe_context(), (offset == SPORT1_AUTOBUF) ? 1 : 0);
 			break;
 
 		case SPORT0_CONTROL:
@@ -2300,12 +2300,29 @@ void adsp2181_device::sport_start(int port)
 	m_sport_timer[port]->adjust(cycles_to_attotime(interrupt_bits * divider), port | 2);
 }
 
+bool adsp2181_device::sport_autobuffer_tx(int port)
+{
+	// the next word comes from the circular buffer; the interrupt only comes when it wraps
+	const uint16_t control = m_control[port ? SPORT1_AUTOBUF : SPORT0_AUTOBUF];
+	const uint32_t ireg = BIT(control, 9, 3);
+	const uint32_t mreg = (ireg & 4) | BIT(control, 7, 2);
+	const uint32_t address = m_i[ireg];
+
+	m_sport_tx[port] = data_read(address);
+	m_sport_tx_full[port] = true;
+	modify_address(ireg, mreg);
+
+	const uint32_t unwrapped = (address + m_m[mreg]) & 0x3fff;
+	return m_l[ireg] && (m_i[ireg] != unwrapped);
+}
+
 TIMER_CALLBACK_MEMBER(adsp2181_device::sport_tick)
 {
 	const int port = param & 1;
 	if (BIT(param, 1))
 	{
-		m_irq_latch[port ? ADSP2181_SPORT1_TX : ADSP2181_SPORT0_TX] = 1;
+		if (!BIT(m_control[port ? SPORT1_AUTOBUF : SPORT0_AUTOBUF], 1) || sport_autobuffer_tx(port))
+			m_irq_latch[port ? ADSP2181_SPORT1_TX : ADSP2181_SPORT0_TX] = 1;
 		m_sport_timer[port]->adjust(cycles_to_attotime(m_sport_tail[port]), port);
 		return;
 	}

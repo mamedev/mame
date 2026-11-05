@@ -152,7 +152,6 @@ adsp21062_device::adsp21062_device(
 	, m_program_config("program", ENDIANNESS_LITTLE, 64, 24, -3, internal_pgm)
 	, m_data_config("data", ENDIANNESS_LITTLE, 32, 32, -2, internal_data)
 	, m_boot_mode(BOOT_MODE_HOST)
-	, m_cache(CACHE_SIZE + sizeof(sharc_internal_state))
 	, m_entry(nullptr)
 	, m_nocode(nullptr)
 	, m_out_of_cycles(nullptr)
@@ -580,13 +579,13 @@ void adsp21062_device::device_start()
 	}
 	else
 	{
-		m_cache.allocate_cache(mconfig().options().drc_rwx());
-		m_core = m_cache.alloc_near<sharc_internal_state>();
-		memset(m_core, 0, sizeof(sharc_internal_state));
-
 		// init UML generator
 		uint32_t umlflags = 0;
-		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 1, 24, 0, COMPILE_FORWARDS_BYTES);
+		m_drcuml = std::make_unique<drcuml_state>(*this, CACHE_SIZE + sizeof(sharc_internal_state));
+		m_drcuml->initialize(umlflags, 1, 24, 0, COMPILE_FORWARDS_BYTES);
+
+		m_core = m_drcuml->cache_alloc_near<sharc_internal_state>();
+		memset(m_core, 0, sizeof(sharc_internal_state));
 
 		// add UML symbols
 		m_drcuml->symbol_add(&m_core->pc, sizeof(m_core->pc), "pc");

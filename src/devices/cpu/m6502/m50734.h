@@ -109,8 +109,11 @@ protected:
 
 	virtual uint8_t read_data(u16 adr) override;
 	virtual void write_data(u16 adr, u8 val) override;
+	virtual void prefetch_end() override;
 
 private:
+	void request_interrupt(int reg, u8 mask);
+	void update_interrupt_lines(int reg, u8 old_effective, u8 new_effective);
 	u8 interrupt_control_r(offs_t offset);
 	void interrupt_control_w(offs_t offset, u8 data);
 
@@ -202,6 +205,7 @@ private:
 	bool m_int_state[2];
 	bool m_cntr_state;
 	u8 m_interrupt_control[3];
+	u8 m_ic_pending[3];
 };
 
 DECLARE_DEVICE_TYPE(M50734, m50734_device)

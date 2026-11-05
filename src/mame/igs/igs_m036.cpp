@@ -708,7 +708,7 @@ ROM_END
 ROM_START( xydn )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "igs036", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "igs036", 0x00000, 0x4000, CRC(c91f51aa) SHA1(1dd6004fab553e867a53f9f8a4fef484ffb2a8a7) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "s-110cn.u18",  0x000000, 0x200000, CRC(3212dbf0) SHA1(3fac70ca9bb537f29a36e2453f90ac4d3abbb392) )

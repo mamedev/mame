@@ -546,7 +546,7 @@ bool cbm_iec_device::sample_ready(cpu_device &cpu)
 		attotime const cycle = exec->cycles_to_attotime(1);
 		if (!cycle.is_never())
 		{
-			ready = (exec->local_time() + (cycle / 2)) > time;
+			ready = (exec->local_time() + (cycle / 2)) >= time;
 			if (!ready && ((exec->local_time() + cycle) > time))
 				stalled = cycle;
 		}
@@ -616,6 +616,7 @@ int cbm_iec_device::get_signal(int signal, const attotime &time)
 #include "mps1000.h"
 #include "mps1200.h"
 #include "mps1224.h"
+#include "mps1230.h"
 #include "mps1270a.h"
 #include "mps2020.h"
 #include "mps801.h"
@@ -681,6 +682,7 @@ void cbm_iec_printer_devices(device_slot_interface &device)
 	device.option_add("mps1000", MPS1000);
 	device.option_add("mps1200", MPS1200);
 	device.option_add("mps1224", MPS1224);
+	device.option_add("mps1230", MPS1230);
 	device.option_add("mps1250", MPS1250);
 	device.option_add("mps1270a", MPS1270A);
 	device.option_add("mps2020", MPS2020);

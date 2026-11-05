@@ -16,7 +16,7 @@ SFF8038i v1.0 compliant
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(VT82C586B_IDE, vt82c586b_ide_device, "vt82c586b_ide", "VT82C586B \"PIPC\" IDE")
+DEFINE_DEVICE_TYPE(VT82C586B_IDE, vt82c586b_ide_device, "vt82c586b_ide", "VIA VT82C586B \"PIPC\" IDE")
 
 vt82c586b_ide_device::vt82c586b_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, VT82C586B_IDE, tag, owner, clock)

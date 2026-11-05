@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Barry Rodewald
+// copyright-holders:Barry Rodewald, R. Belmont
 /*
  *
  *  Implementation of Fujitsu FMR-50, FMR-60 and FM-Towns SCSI hardware
@@ -23,418 +23,254 @@
          bit 2 = SEL
          bit 1 = DMAE
          bit 0 = RST
+ 0xc34 = Word transfer support (read, Towns II)
+
+ Accessing the data register acknowledges a pending REQ.  INT is set by
+ each REQ outside the data phases and cleared by a data register access;
+ IMSK set enables the interrupt.  The data phases use DMA while DMAE is set.
 */
 #include "emu.h"
 #include "fm_scsi.h"
-#include "debugger.h"
 
-// SCSI input lines (from target)
-#define FMSCSI_LINE_REQ   0x80
-#define FMSCSI_LINE_IO    0x40
-#define FMSCSI_LINE_MSG   0x20
-#define FMSCSI_LINE_CD    0x10
-#define FMSCSI_LINE_BSY   0x08
-#define FMSCSI_LINE_EX    0x04
-#define FMSCSI_LINE_INT   0x02
-#define FMSCSI_LINE_PERR  0x01
+#define LOG_CONTROL (1U << 1)
 
-// SCSI output lines (to target)
-#define FMSCSI_LINE_WEN   0x80
-#define FMSCSI_LINE_IMSK  0x40
-#define FMSCSI_LINE_RMSK  0x20
-#define FMSCSI_LINE_ATN   0x10
-#define FMSCSI_LINE_WRD   0x08
-#define FMSCSI_LINE_SEL   0x04
-#define FMSCSI_LINE_DMAE  0x02
-#define FMSCSI_LINE_RST   0x01
+//#define VERBOSE (LOG_GENERAL | LOG_CONTROL)
+#include "logmacro.h"
 
-/*
- *  Device config
- */
+namespace {
+
+enum : uint8_t
+{
+	STAT_PERR = 0x01,
+	STAT_INT  = 0x02,
+	STAT_BSY  = 0x08,
+	STAT_CD   = 0x10,
+	STAT_MSG  = 0x20,
+	STAT_IO   = 0x40,
+	STAT_REQ  = 0x80
+};
+
+enum : uint8_t
+{
+	CTRL_RST  = 0x01,
+	CTRL_DMAE = 0x02,
+	CTRL_SEL  = 0x04,
+	CTRL_ATN  = 0x10,
+	CTRL_IMSK = 0x40,
+	CTRL_WEN  = 0x80
+};
+
+} // anonymous namespace
 
 DEFINE_DEVICE_TYPE(FMSCSI, fmscsi_device, "fmscsi", "FM-SCSI")
 
-/*
- * Device
- */
-
-fmscsi_device::fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: legacy_scsi_host_adapter(mconfig, FMSCSI, tag, owner, clock),
+fmscsi_device::fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, FMSCSI, tag, owner, clock),
+	nscsi_device_interface(mconfig, *this),
 	m_irq_handler(*this),
-	m_drq_handler(*this)
+	m_drq_handler(*this),
+	m_data(0),
+	m_control(0),
+	m_ctrl(0),
+	m_ack(false),
+	m_int(false),
+	m_irq(false),
+	m_drq(false)
 {
 }
 
 void fmscsi_device::device_start()
 {
-	save_item(NAME(m_command));
-	save_item(NAME(m_command_index));
-	save_item(NAME(m_result_length));
-	save_item(NAME(m_result_index));
-	save_item(NAME(m_input_lines));
-	save_item(NAME(m_output_lines));
 	save_item(NAME(m_data));
-	save_item(NAME(m_last_id));
-	save_item(NAME(m_phase));
-	save_item(NAME(m_target));
-	save_item(NAME(m_buffer));
-
-	// allocate read timer
-	m_transfer_timer = timer_alloc(FUNC(fmscsi_device::update_transfer), this);
-	m_phase_timer = timer_alloc(FUNC(fmscsi_device::set_phase), this);
+	save_item(NAME(m_control));
+	save_item(NAME(m_ctrl));
+	save_item(NAME(m_ack));
+	save_item(NAME(m_int));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_drq));
 }
 
 void fmscsi_device::device_reset()
 {
-	m_input_lines = 0;
-	m_output_lines = 0;
 	m_data = 0;
-	m_command_index = 0;
-	m_last_id = 0;
-	m_target = 0;
-	m_result_length = 0;
-	m_result_index = 0;
-	stop_transfer();
-	set_input_line(FMSCSI_LINE_INT,0);
-	m_irq_handler(0);
+	m_control = 0;
+	m_ack = false;
+	m_int = false;
 
-	m_phase = SCSI_PHASE_BUS_FREE;
+	m_scsi_bus->data_w(m_scsi_refid, 0);
+	m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ALL);
+	m_scsi_bus->ctrl_wait(m_scsi_refid, S_ALL, S_ALL);
+	m_ctrl = m_scsi_bus->ctrl_r();
+
+	m_irq = false;
+	m_irq_handler(CLEAR_LINE);
+	m_drq = false;
+	m_drq_handler(CLEAR_LINE);
 }
 
-// get the length of a SCSI command based on it's command byte type
-int fmscsi_device::get_scsi_cmd_len(uint8_t cbyte)
+void fmscsi_device::scsi_ctrl_changed()
 {
-	int group;
+	// targets can change the bus again from inside our own line changes, so
+	// everything after those reads m_ctrl rather than a local copy
+	const uint32_t ctrl = m_scsi_bus->ctrl_r();
+	const uint32_t changed = ctrl ^ m_ctrl;
+	m_ctrl = ctrl;
 
-	group = (cbyte>>5) & 7;
-
-	if (group == 0) return 6;
-	if (group == 1 || group == 2) return 10;
-	if (group == 5) return 12;
-
-	fatalerror("fmscsi: Unknown SCSI command group %d\n", group);
-
-	// never executed
-	//return 6;
-}
-
-TIMER_CALLBACK_MEMBER(fmscsi_device::update_transfer)
-{
-	set_input_line(FMSCSI_LINE_REQ,1);
-	//logerror("FMSCSI: timer triggered: %i/%i\n",m_result_index,m_result_length);
-	if(m_output_lines & FMSCSI_LINE_DMAE)
+	if (changed & S_INP)
 	{
-		m_drq_handler(1);
+		update_data();
 	}
-}
 
-void fmscsi_device::stop_transfer()
-{
-	m_transfer_timer->adjust(attotime::never);  // stop timer
-	m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_STATUS);
-	if(m_output_lines & FMSCSI_LINE_DMAE)
+	if (changed & S_REQ)
 	{
-		m_drq_handler(0);
-	}
-	logerror("FMSCSI: Stopping transfer : (%i/%i)\n",m_result_index,m_result_length);
-}
-
-uint8_t fmscsi_device::fmscsi_data_r(void)
-{
-	// read from data bus
-	// ACK is automatic on accessing the data bus, so REQ will go low.
-	set_input_line(FMSCSI_LINE_REQ,0);
-
-	if(m_phase == SCSI_PHASE_DATAIN)
-	{
-		m_data = m_buffer[m_result_index % 512];
-		//logerror("FMSCSI: DATAIN phase read data %02x\n",m_data);
-		m_result_index++;
-		if(m_result_index % 512 == 0)
-			read_data(m_buffer,512);  // read next sector
-
-		if(m_result_index >= m_result_length)
+		if (ctrl & S_REQ)
 		{
-			// end of data transfer
-			stop_transfer();
+			if (ctrl & (S_CTL | S_MSG))
+			{
+				set_int(true);
+			}
 		}
-		return m_data;
+		else if (m_ack)
+		{
+			ack_w(false);
+		}
 	}
 
-	if(m_phase == SCSI_PHASE_MESSAGE_IN)
-	{
-		m_data = 0;  // command complete message
-		m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_BUS_FREE);
-		m_command_index = 0;
-		return m_data;
-	}
-
-	if(m_phase == SCSI_PHASE_STATUS)
-	{
-		m_data = get_status();
-		// no command complete message?
-		m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_MESSAGE_IN);
-		m_command_index = 0;
-		//set_input_line(FMSCSI_LINE_REQ,1);  // raise REQ yet again
-		return m_data;
-	}
-
-	return m_data;
+	update_drq();
 }
 
-void fmscsi_device::fmscsi_data_w(uint8_t data)
+uint8_t fmscsi_device::data_r()
 {
-	int phase;
+	const uint8_t data = m_scsi_bus->data_r();
 
-	// write to data bus
+	if (!machine().side_effects_disabled())
+	{
+		set_int(false);
+		if (((m_ctrl & (S_REQ | S_INP)) == (S_REQ | S_INP)) && !m_ack)
+		{
+			ack_w(true);
+		}
+	}
+
+	return data;
+}
+
+void fmscsi_device::data_w(uint8_t data)
+{
 	m_data = data;
-	//logerror("FMSCSI: data write %02x\n",data);
+	update_data();
 
-	// ACK is automatic on accessing the data bus, so REQ will go low.
-	set_input_line(FMSCSI_LINE_REQ,0);
-
-	if(m_phase == SCSI_PHASE_BUS_FREE)
+	set_int(false);
+	if (((m_ctrl & (S_REQ | S_INP)) == S_REQ) && !m_ack)
 	{
-		// select target
-		switch(data & 0x7f)
-		{
-		case 0x01: m_target = 0; break;
-		case 0x02: m_target = 1; break;
-		case 0x04: m_target = 2; break;
-		case 0x08: m_target = 3; break;
-		case 0x10: m_target = 4; break;
-		}
-	}
-	if(m_phase == SCSI_PHASE_DATAOUT)
-	{
-		m_buffer[m_result_index % 512] = m_data;
-		m_result_index++;
-		if(m_result_index % 512 == 0)
-			write_data(m_buffer,512);  // write buffer to disc
-		if(m_result_index >= m_result_length)
-		{
-			// end of data transfer
-			m_transfer_timer->adjust(attotime::never);  // stop timer
-			m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_STATUS);
-			if(m_output_lines & FMSCSI_LINE_DMAE)
-			{
-				m_drq_handler(0);
-			}
-			logerror("FMSCSI: Stopping transfer : (%i/%i)\n",m_result_index,m_result_length);
-		}
-	}
-	if(m_phase == SCSI_PHASE_COMMAND)
-	{
-		m_command[m_command_index] = data;
-		logerror("FMSCSI: writing command byte %02x [%i]\n",data,m_command_index);
-		m_command_index++;
-		if(m_command_index >= get_scsi_cmd_len(m_command[0]))
-		{
-			// command complete
-			send_command(m_command,m_command_index);
-			m_result_length = get_length();
-			phase = legacy_scsi_host_adapter::get_phase();
-			m_phase_timer->adjust(attotime::from_usec(800),phase);
-
-			logerror("FMSCSI: Command %02x sent, result length = %i\n",m_command[0],m_result_length);
-		}
-		else
-		{
-			m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_COMMAND);
-		}
-	}
-	if(m_phase == SCSI_PHASE_MESSAGE_OUT)
-	{
-		m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_STATUS);
+		ack_w(true);
 	}
 }
 
-TIMER_CALLBACK_MEMBER(fmscsi_device::set_phase)
+uint8_t fmscsi_device::status_r()
 {
-	m_phase = param;
-	logerror("FMSCSI: phase set to %i\n",m_phase);
-	// set input lines accordingly
-	switch(param)
+	const uint32_t ctrl = m_scsi_bus->ctrl_r();
+
+	return ((ctrl & S_REQ) ? STAT_REQ : 0) |
+		((ctrl & S_INP) ? STAT_IO : 0) |
+		((ctrl & S_MSG) ? STAT_MSG : 0) |
+		((ctrl & S_CTL) ? STAT_CD : 0) |
+		((ctrl & S_BSY) ? STAT_BSY : 0) |
+		(m_int ? STAT_INT : 0);
+}
+
+void fmscsi_device::control_w(uint8_t data)
+{
+	LOGMASKED(LOG_CONTROL, "control %02x\n", data);
+
+	m_control = data;
+	if (data & CTRL_RST)
 	{
-	case SCSI_PHASE_BUS_FREE:
-		set_input_line(FMSCSI_LINE_BSY,0);
-		set_input_line(FMSCSI_LINE_CD,0);
-		set_input_line(FMSCSI_LINE_MSG,0);
-		set_input_line(FMSCSI_LINE_IO,0);
-		//set_input_line(FMSCSI_LINE_REQ,0);
-		break;
-	case SCSI_PHASE_COMMAND:
-		set_input_line(FMSCSI_LINE_BSY,1);
-		set_input_line(FMSCSI_LINE_CD,1);
-		set_input_line(FMSCSI_LINE_MSG,0);
-		set_input_line(FMSCSI_LINE_IO,0);
-		set_input_line(FMSCSI_LINE_REQ,1);
-		break;
-	case SCSI_PHASE_STATUS:
-		set_input_line(FMSCSI_LINE_CD,1);
-		set_input_line(FMSCSI_LINE_MSG,0);
-		set_input_line(FMSCSI_LINE_IO,1);
-		set_input_line(FMSCSI_LINE_REQ,1);
-		break;
-	case SCSI_PHASE_DATAIN:
-		set_input_line(FMSCSI_LINE_CD,0);
-		set_input_line(FMSCSI_LINE_MSG,0);
-		set_input_line(FMSCSI_LINE_IO,1);
-		set_input_line(FMSCSI_LINE_REQ,1);
-		// start transfer timer
-		m_transfer_timer->adjust(attotime::zero,0,attotime::from_hz(3000000));  // arbitrary value for now
-		read_data(m_buffer,512);
-		m_result_index = 0;
-		logerror("FMSCSI: Starting transfer in (%i)\n",m_result_length);
-		break;
-	case SCSI_PHASE_DATAOUT:
-		set_input_line(FMSCSI_LINE_CD,0);
-		set_input_line(FMSCSI_LINE_MSG,0);
-		set_input_line(FMSCSI_LINE_IO,0);
-		set_input_line(FMSCSI_LINE_REQ,1);
-		// start transfer timer
-		m_transfer_timer->adjust(attotime::zero,0,attotime::from_hz(3000000));  // arbitrary value for now
-		m_result_index = 0;
-		logerror("FMSCSI: Starting transfer out (%i)\n",m_result_length);
-		break;
-	case SCSI_PHASE_MESSAGE_IN:
-		set_input_line(FMSCSI_LINE_CD,1);
-		set_input_line(FMSCSI_LINE_MSG,1);
-		set_input_line(FMSCSI_LINE_IO,1);
-		set_input_line(FMSCSI_LINE_REQ,1);
-		break;
-	case SCSI_PHASE_MESSAGE_OUT:
-		set_input_line(FMSCSI_LINE_CD,1);
-		set_input_line(FMSCSI_LINE_MSG,1);
-		set_input_line(FMSCSI_LINE_IO,0);
-		set_input_line(FMSCSI_LINE_REQ,1);
-		break;
+		m_ack = false;
+		m_int = false;
+	}
+
+	const uint32_t lines = ((data & CTRL_RST) ? S_RST : 0) |
+		((data & CTRL_SEL) ? S_SEL : 0) |
+		((data & CTRL_ATN) ? S_ATN : 0) |
+		(m_ack ? S_ACK : 0);
+	m_scsi_bus->ctrl_w(m_scsi_refid, lines, S_RST | S_SEL | S_ATN | S_ACK);
+
+	update_irq();
+	update_drq();
+}
+
+void fmscsi_device::ack_w(bool state)
+{
+	// drop DRQ first: the target can raise REQ for the next byte inside the ACK
+	m_ack = state;
+	update_drq();
+	m_scsi_bus->ctrl_w(m_scsi_refid, state ? S_ACK : 0, S_ACK);
+}
+
+void fmscsi_device::set_int(bool state)
+{
+	m_int = state;
+	update_irq();
+}
+
+void fmscsi_device::update_data()
+{
+	// the data drivers are off while the target drives I/O
+	m_scsi_bus->data_w(m_scsi_refid, (m_ctrl & S_INP) ? 0 : m_data);
+}
+
+void fmscsi_device::update_irq()
+{
+	const bool irq = m_int && (m_control & CTRL_IMSK);
+	if (irq != m_irq)
+	{
+		m_irq = irq;
+		m_irq_handler(irq ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
-int fmscsi_device::get_phase(void)
+void fmscsi_device::update_drq()
 {
-	return m_phase;
-}
-
-void fmscsi_device::set_input_line(uint8_t line, uint8_t state)
-{
-	if(line == FMSCSI_LINE_REQ)
+	const bool drq = (m_control & CTRL_DMAE) && (m_ctrl & S_REQ) && !(m_ctrl & (S_CTL | S_MSG)) && !m_ack;
+	if (drq != m_drq)
 	{
-		if(state != 0 && !(m_input_lines & FMSCSI_LINE_REQ))  // low to high
-		{
-			if(m_output_lines & FMSCSI_LINE_IMSK && m_phase != SCSI_PHASE_DATAIN && m_phase != SCSI_PHASE_DATAOUT)
-			{
-				set_input_line(FMSCSI_LINE_INT,1);
-				m_irq_handler(1);
-				logerror("FMSCSI: IRQ high\n");
-			}
-		}
-		if(state == 0 && (m_input_lines & FMSCSI_LINE_REQ))  // high to low
-		{
-			if(m_output_lines & FMSCSI_LINE_IMSK && m_phase != SCSI_PHASE_DATAIN && m_phase != SCSI_PHASE_DATAOUT)
-			{
-				set_input_line(FMSCSI_LINE_INT,0);
-				m_irq_handler(0);
-				logerror("FMSCSI: IRQ low\n");
-			}
-		}
+		m_drq = drq;
+		m_drq_handler(drq ? ASSERT_LINE : CLEAR_LINE);
 	}
-	if(state != 0)
-		m_input_lines |= line;
-	else
-		m_input_lines &= ~line;
-//  logerror("FMSCSI: input line %02x set to %i\n",line,state);
 }
 
-uint8_t fmscsi_device::get_input_line(uint8_t line)
+uint8_t fmscsi_device::read(offs_t offset)
 {
-	return m_input_lines & line;
-}
-
-void fmscsi_device::set_output_line(uint8_t line, uint8_t state)
-{
-	if(line == FMSCSI_LINE_RST && state != 0)
-	{
-		device_reset();
-		logerror("FMSCSI: reset\n");
-	}
-
-	if(line == FMSCSI_LINE_SEL)
-	{
-		if(state != 0 && !(m_output_lines & FMSCSI_LINE_SEL)) // low to high transition
-		{
-			if (select(m_target))
-			{
-				m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_COMMAND);
-				m_data = 0x08;
-			}
-		}
-	}
-
-	if(line == FMSCSI_LINE_ATN)
-	{
-		if(state != 0)
-			m_phase_timer->adjust(attotime::from_usec(800),SCSI_PHASE_MESSAGE_OUT);
-	}
-
-	if(state != 0)
-		m_output_lines |= line;
-	else
-		m_output_lines &= ~line;
-//  logerror("FMSCSI: output line %02x set to %i\n",line,state);
-}
-
-uint8_t fmscsi_device::get_output_line(uint8_t line)
-{
-	return m_output_lines & line;
-}
-
-uint8_t fmscsi_device::fmscsi_status_r(void)
-{
-	// status inputs
-	return m_input_lines;
-}
-
-void fmscsi_device::fmscsi_control_w(uint8_t data)
-{
-	// control outputs
-	set_output_line(FMSCSI_LINE_RST,data & FMSCSI_LINE_RST);
-	set_output_line(FMSCSI_LINE_DMAE,data & FMSCSI_LINE_DMAE);
-	set_output_line(FMSCSI_LINE_IMSK,data & FMSCSI_LINE_IMSK);
-	set_output_line(FMSCSI_LINE_ATN,data & FMSCSI_LINE_ATN);
-	set_output_line(FMSCSI_LINE_WEN,data & FMSCSI_LINE_WEN);
-	set_output_line(FMSCSI_LINE_SEL,data & FMSCSI_LINE_SEL);
-	logerror("FMSCSI: control write %02x\n",data);
-}
-
-uint8_t fmscsi_device::fmscsi_r(offs_t offset)
-{
-	switch(offset & 0x03)
+	switch (offset & 0x03)
 	{
 	case 0x00:
-		return fmscsi_data_r();
+		return data_r();
 	case 0x01:
-		return fmscsi_status_r();
+		return status_r();
 	case 0x02:
 		return 0x80;  // Linux uses this port to detect the ability to do word transfers.  We'll tell it that it doesn't for now.
 	default:
-		logerror("FMSCSI: Unknown read at offset %i\n",offset);
+		if (!machine().side_effects_disabled())
+		{
+			LOG("unknown read at offset %d\n", offset);
+		}
+		return 0;
 	}
-	return 0;
 }
 
-void fmscsi_device::fmscsi_w(offs_t offset, uint8_t data)
+void fmscsi_device::write(offs_t offset, uint8_t data)
 {
-	switch(offset & 0x03)
+	switch (offset & 0x03)
 	{
 	case 0x00:
-		fmscsi_data_w(data);
+		data_w(data);
 		break;
 	case 0x01:
-		fmscsi_control_w(data);
+		control_w(data);
 		break;
 	default:
-		logerror("FMSCSI: Unknown write 0x%02x at offset %i\n",data,offset);
+		LOG("unknown write %02x at offset %d\n", data, offset);
+		break;
 	}
 }

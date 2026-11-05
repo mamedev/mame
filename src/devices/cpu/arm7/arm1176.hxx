@@ -208,7 +208,9 @@ void arm1176jzf_s_cpu_device::arm7_rt_w_callback(offs_t insn, uint32_t data)
 		case 1:
 			if (op2 == 0)
 			{
+				drc_control_written(data);
 				m_control = data;
+				vtlb_flush_dynamic();
 				return;
 			}
 			if (op2 == 1)
@@ -226,16 +228,19 @@ void arm1176jzf_s_cpu_device::arm7_rt_w_callback(offs_t insn, uint32_t data)
 			if (op2 == 0)
 			{
 				m_tlbBase = data & 0xffffff9b;
+				vtlb_flush_dynamic();
 				return;
 			}
 			if (op2 == 1)
 			{
 				m_ttbr1 = data & 0xffffc01b;
+				vtlb_flush_dynamic();
 				return;
 			}
 			if (op2 == 2)
 			{
 				m_ttbcr = data & 0x37;
+				vtlb_flush_dynamic();
 				return;
 			}
 			break;
@@ -245,6 +250,7 @@ void arm1176jzf_s_cpu_device::arm7_rt_w_callback(offs_t insn, uint32_t data)
 				m_domainAccessControl = data;
 				for (unsigned i = 0; i < 16; i++)
 					m_decoded_access_control[i] = (data >> (2 * i)) & 3;
+				vtlb_flush_dynamic();
 				return;
 			}
 			break;
@@ -278,11 +284,13 @@ void arm1176jzf_s_cpu_device::arm7_rt_w_callback(offs_t insn, uint32_t data)
 			if (op2 == 0)
 			{
 				m_fcsePID = m_pid_offset = data & 0xfe000000;
+				vtlb_flush_dynamic();
 				return;
 			}
 			if (op2 == 1)
 			{
 				m_context_id = data;
+				vtlb_flush_dynamic();
 				return;
 			}
 			if (op2 >= 2 && op2 <= 4)
@@ -325,9 +333,12 @@ void arm1176jzf_s_cpu_device::arm7_rt_w_callback(offs_t insn, uint32_t data)
 				(crm == 10 && (op2 == 4 || op2 == 5)))
 			return;
 	}
-	// Translation is uncached, so all documented TLB invalidations are complete.
+	// Translation is uncached; the recompiler's fetch validation caches the pages it compiled from.
 	if (crn == 8 && (crm == 5 || crm == 6 || crm == 7) && op2 <= 3)
+	{
+		vtlb_flush_dynamic();
 		return;
+	}
 	undefined_coprocessor();
 }
 

@@ -8063,7 +8063,7 @@ license:CC0-1.0
 		<info name="serial" value="AVE-DB"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nina006" />
-			<feature name="pcb" value="AVE-NINA-06" /> <!-- also found with AVE-MB-91 pcb -->
+			<feature name="pcb" value="AVE-NINA-06 / AVE-MB-91" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="65536">
 				<rom name="decc-pgm" size="65536" crc="8b781d39" sha1="b1e4b67b0a8b61fda6cbe142e53e90e6a4bcbf80" offset="00000" />
@@ -24476,6 +24476,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		<year>1989</year>
 		<publisher>Color Dreams</publisher>
 		<info name="serial" value="CDR-MR-81008"/>
+		<info name="developer" value="Joy Van" />
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="discrete_74x377" />
 			<feature name="pcb" value="COLORDREAMS-74*377" />
@@ -41442,7 +41443,7 @@ This mod inserts recreations of the music tracks and sound effects into the prot
 	</software>
 
 	<software name="ultraclb">
-		<description>Ultraman Club - Kaijuu Dai Kessen!! (Japan)</description>
+		<description>Ultraman Club - Kaijuu Daikessen!! (Japan)</description>
 		<year>1992</year>
 		<publisher>Angel</publisher>
 		<info name="serial" value="ANG-UA"/>
@@ -41768,8 +41769,8 @@ This mod inserts recreations of the music tracks and sound effects into the prot
 		<publisher>American Video Entertainment</publisher>
 		<info name="serial" value="AVE-VB"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cnrom" />
-			<feature name="pcb" value="NES-CNROM" /> <!-- This should be AVE-MB-91 -->
+			<feature name="slot" value="nina006" />
+			<feature name="pcb" value="AVE-MB-91" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="2388-pgm" size="32768" crc="552f1143" sha1="f16caf18b4c888cb4d1e495ac5481417f95466e6" offset="00000" />
@@ -54116,6 +54117,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="TC-008"/>
+		<info name="developer" value="Joy Van" />
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nina006" />
 			<feature name="pcb" value="UNL-SA-016-1M" />
@@ -54168,20 +54170,19 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 	<software name="mjtrapz">
 		<description>Mahjong Trap - Si Cuan Ma Que - Zhi Fu Pian (Taiwan)</description>
-		<!-- Shisen Mahjong - Seifuku Hen (Sachen) in GoodNES, check title -->
 		<year>1990</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="TC-010?"/>
-		<info name="alt_title" value="四川麻將 制服篇"/>
+		<info name="alt_title" value="四川麻將 制服篇 ~ Shisen Mahjong - Seifuku Hen (on Hacker cart for Japan?)"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sa0037" />
-			<feature name="pcb" value="UNL-SA-0037" />
+			<feature name="slot" value="cnrom" />
+			<feature name="pcb" value="UNL-3019" /> <!-- verified by ototo, PCB marked as SA-004 as well -->
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="65536">
-				<rom name="mahjong trap - si cuan ma que - zhi fu pian (asia) (unl).chr" size="65536" crc="a40a7eb2" sha1="8c4fdf2856ac24fb2f12bda29d69f728d02bce72" offset="00000" status="baddump" />
+				<rom name="mahjong trap - si cuan ma que - zhi fu pian (asia) (unl).chr" size="65536" crc="a40a7eb2" sha1="8c4fdf2856ac24fb2f12bda29d69f728d02bce72" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="mahjong trap - si cuan ma que - zhi fu pian (asia) (unl).prg" size="32768" crc="ee58af8a" sha1="a9c6581ce2a59fb5409f2723567c5010714d069f" offset="00000" status="baddump" />
+				<rom name="mahjong trap - si cuan ma que - zhi fu pian (asia) (unl).prg" size="32768" crc="ee58af8a" sha1="a9c6581ce2a59fb5409f2723567c5010714d069f" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -55069,16 +55070,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- These have wrong CHR order, probably. Bad dump or different board? I have to investigate.... -->
-	<software name="mnq1" cloneof="mnq" supported="no">
+	<software name="mnq1" cloneof="mnq">
 		<description>Mei Nu Quan (Taiwan, alt)</description>
 		<year>1990</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-006"/>
 		<info name="alt_title" value="Honey Peach"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="s74x374" />
-			<feature name="pcb" value="UNL-SACHEN-74LS374N" />
+			<feature name="slot" value="s74x374a" />
+			<feature name="pcb" value="UNL-SACHEN-74LS374N-A" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="131072">
 				<rom name="honey peach - mei nu quan (1990)(sachen)(tw)[p][a][sa-006].chr" size="131072" crc="413c60f7" sha1="c37e6930c3758a0fe65c5ecc8fbd96dbb0170e7e" offset="00000" status="baddump" />
@@ -55089,15 +55089,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="mnq2" cloneof="mnq" supported="no">
+	<software name="mnq2" cloneof="mnq">
 		<description>Mei Nu Quan (Taiwan, alt 2)</description>
 		<year>1990</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="SA-006"/>
 		<info name="alt_title" value="Honey Peach"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="s74x374" />
-			<feature name="pcb" value="UNL-SACHEN-74LS374N" />
+			<feature name="slot" value="s74x374a" />
+			<feature name="pcb" value="UNL-SACHEN-74LS374N-A" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="131072">
 				<rom name="honey peach - mei nu quan (1990)(sachen)(tw)[p][sa-006].chr" size="131072" crc="c71bd744" sha1="184609f1d5dd7944e1675bbaacb72b8db3dd8ba6" offset="00000" status="baddump" />
@@ -55116,7 +55116,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="Honey Peach"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="s74x374a" />
-			<feature name="pcb" value="UNL-SACHEN-74LS374N-A" /> <!-- is this correct? -->
+			<feature name="pcb" value="UNL-SACHEN-74LS374N-A" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="131072">
 				<rom name="honey_peach.chr" size="131072" crc="8c125ea5" sha1="6b145bc221fca5c911e372b401c6579e45606daa" offset="00000" status="baddump" />
@@ -61108,15 +61108,16 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>19??</year>
 		<publisher>Hacker International</publisher>
 		<info name="serial" value="HKI-04"/>
+		<info name="alt_title" value="風間ジュンと浅間夕子のAVドラゴン麻雀 ~ Kazama Jun to Asama Yuuko no AV Dragon Mahjong (on cart label)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nina006" />
-			<feature name="pcb" value="AVE-NINA-03" />
+			<feature name="pcb" value="UNL-3015" /> <!-- verified by ototo -->
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="65536">
-				<rom name="av dragon mahjang (japan) (unl).chr" size="65536" crc="a203df20" sha1="2a24122bfb37b9a62771e740c911a5cbb349178e" offset="00000" status="baddump" />
+				<rom name="av dragon mahjang (japan) (unl).chr" size="65536" crc="a203df20" sha1="2a24122bfb37b9a62771e740c911a5cbb349178e" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="65536">
-				<rom name="av dragon mahjang (japan) (unl).prg" size="65536" crc="b566f5c6" sha1="c4c94d1b572fbcd138a47788836e0712553f3800" offset="00000" status="baddump" />
+				<rom name="av dragon mahjang (japan) (unl).prg" size="65536" crc="b566f5c6" sha1="c4c94d1b572fbcd138a47788836e0712553f3800" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -61124,20 +61125,19 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 <!-- nointro -->
 	<software name="avhanacl">
 		<description>AV Hanafuda Club (Japan)</description>
-		<!-- TOSEC title Hayama Reiko, Katsuragi Mayako no AV Hanafuda Club - Honkakuha Koikoi Bakappana Hen check -->
 		<year>1991</year>
 		<publisher>Hacker International</publisher>
 		<info name="serial" value="HKI-05"/>
-		<info name="alt_title" value="AV花名札倶楽部"/>
+		<info name="alt_title" value="葉山レイコ、桂木麻也子のAV花名札倶楽部 ~ Hayama Reiko, Katsuragi Mayako no AV Hanafuda Club (on cart label)"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sa0037" />
-			<feature name="pcb" value="UNL-SA-0037" />
+			<feature name="slot" value="cnrom" />
+			<feature name="pcb" value="UNL-2209" /> <!-- verified by ototo -->
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="65536">
-				<rom name="av hanafuda club (japan) (unl).chr" size="65536" crc="54ab3688" sha1="ed11e82020eaedab2ff3af560bf008ede2179d42" offset="00000" status="baddump" />
+				<rom name="av hanafuda club (japan) (unl).chr" size="65536" crc="54ab3688" sha1="ed11e82020eaedab2ff3af560bf008ede2179d42" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="av hanafuda club (japan) (unl).prg" size="32768" crc="1d080886" sha1="98983c8e2e511a43c9b76801f3b788238a9fca20" offset="00000" status="baddump" />
+				<rom name="av hanafuda club (japan) (unl).prg" size="32768" crc="1d080886" sha1="98983c8e2e511a43c9b76801f3b788238a9fca20" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -61145,13 +61145,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 <!-- one of the following should have nudity, the other one should not... which one has it? -->
 <!-- nointro & cah4e3 -->
 	<software name="avmjclubj" cloneof="avmjclub">
-		<description>AV Mahjong Club (Japan)</description>
-		<!-- GoodNES title (and cah4e3's site): Av Strip Mahjong; TOSEC: Kudou Hitomi, Konno Mami no AV Mahjong Daitokai (1991)(Hacker International)(As)[P][!][English Cart] check -->
+		<description>AV Mahjong Club (Japan, Rev. A)</description>
 		<year>19??</year>
 		<publisher>Hacker International</publisher>
+		<info name="alt_title" value="工藤ひとみと紺野麻美のAV麻雀倶楽部 大都会 ~ Kudou Hitomi to Konno Mami no AV Mahjong Daitokai (on cart label)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="gxrom" />
-			<feature name="pcb" value="BANDAI-GNROM" />
+			<feature name="pcb" value="UNL-2209-A" /> <!-- base rev. board verified by ototo -->
+			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="65536">
 				<rom name="av mahjong club (japan) (unl).chr" size="65536" crc="26e0a1bc" sha1="41f2477ac5f8e1bd9df71be7becb7a5d4e7edc71" offset="00000" status="baddump" />
 			</dataarea>
@@ -61164,12 +61165,11 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 <!-- nointro -->
 	<software name="avmjclub">
 		<description>AV Mahjong Club (Asia)</description>
-		<!-- TOSEC title: Kudou Hitomi, Konno Mami no AV Mahjong Daitokai check -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="gxrom" />
-			<feature name="pcb" value="BANDAI-GNROM" />
+			<feature name="pcb" value="UNL-2209-A" /> <!-- Hacker Int. board verified by ototo -->
 			<dataarea name="chr" size="32768">
 				<rom name="av mahjong club (asia) (unl).chr" size="32768" crc="1f24603e" sha1="8001a375a10732aee8b6bff3fa89c44dffbc2333" offset="00000" status="baddump" />
 			</dataarea>
@@ -61181,21 +61181,20 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- nointro -->
 	<software name="avpachi">
-		<description>AV Pachi Slot (Japan)</description>
-		<!-- TOSEC title: Ozawa Nami, Yamashita Mai, Takizawa Miho no AV Pachi Slot - Big Chance check -->
+		<description>AV Pachi Slot - Big Chance (Japan)</description>
 		<year>1991</year>
 		<publisher>Hacker International</publisher>
 		<info name="serial" value="HKI-06"/>
-		<info name="alt_title" value="AVパチスロ"/>
+		<info name="alt_title" value="小沢奈美、山下麻衣、滝沢美穂の AVパチスロ Big Chance ~ Ozawa Nami, Yamashita Mai, Takizawa Miho no AV Pachi Slot - Big Chance (on cart label)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
-			<feature name="pcb" value="NES-CNROM" />
+			<feature name="pcb" value="UNL-2209" /> <!-- verified by ototo -->
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="65536">
-				<rom name="av pachi slot (japan) (unl).chr" size="65536" crc="49d19577" sha1="f272c9df9bd784d5df3629706f80c679036cbf05" offset="00000" status="baddump" />
+				<rom name="av pachi slot (japan) (unl).chr" size="65536" crc="49d19577" sha1="f272c9df9bd784d5df3629706f80c679036cbf05" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="av pachi slot (japan) (unl).prg" size="32768" crc="d1551b10" sha1="165f5423dee5c8ac81282ccaee82ada309f128c0" offset="00000" status="baddump" />
+				<rom name="av pachi slot (japan) (unl).prg" size="32768" crc="d1551b10" sha1="165f5423dee5c8ac81282ccaee82ada309f128c0" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -61227,14 +61226,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>19??</year>
 		<publisher>Hacker International</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sa0037" />
-			<feature name="pcb" value="UNL-SA-0037" />
+			<feature name="slot" value="cnrom" />
+			<feature name="pcb" value="UNL-2209" /> <!-- verified by ototo -->
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="65536">
-				<rom name="av soccer (japan) (unl).chr" size="65536" crc="44b5ea8b" sha1="6ab0e33a9f9bc5de72ed6c89bd7deb169ab0e0b4" offset="00000" status="baddump" />
+				<rom name="av soccer (japan) (unl).chr" size="65536" crc="44b5ea8b" sha1="6ab0e33a9f9bc5de72ed6c89bd7deb169ab0e0b4" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="av soccer (japan) (unl).prg" size="32768" crc="c7ae4de8" sha1="db709becf4c74da229dc50f69e87fa84f631a795" offset="00000" status="baddump" />
+				<rom name="av soccer (japan) (unl).prg" size="32768" crc="c7ae4de8" sha1="db709becf4c74da229dc50f69e87fa84f631a795" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -61248,7 +61247,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="AVスーパーリアルパチンコ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="gxrom" />
-			<feature name="pcb" value="2209-A" />
+			<feature name="pcb" value="UNL-2209-A" /> <!-- verified by ototo -->
 			<dataarea name="chr" size="65536">
 				<rom name="0.chr" size="65536" crc="be68914b" sha1="c77697cfc97464cec7517f72d0824aba2e1e43e7" offset="00000" />
 			</dataarea>
@@ -61266,8 +61265,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="HKI-09"/>
 		<info name="alt_title" value="花札遊侠伝 流れ花お竜"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sa0037" />
-			<feature name="pcb" value="UNL-SA-0037" />
+			<feature name="slot" value="cnrom" />
+			<feature name="pcb" value="UNL-2209" /> <!-- verified by ototo -->
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="65536">
 				<rom name="hanafuda yuukyou den - nagarebana oryuu (japan) (unl).chr" size="65536" crc="989f52f5" sha1="444265fdf725d1237aa4e45c5513f338f09556db" offset="00000" />
@@ -61287,13 +61286,13 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="アイドル四川麻雀"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
-			<feature name="pcb" value="NES-CNROM" />
+			<feature name="pcb" value="UNL-2208" /> <!-- verified by ototo -->
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="65536">
-				<rom name="idol shisen mahjong (japan) (unl).chr" size="65536" crc="d92b1549" sha1="1335bbaf8fdce3d0552f5ed30c40d3eb34cf3a35" offset="00000" status="baddump" />
+				<rom name="idol shisen mahjong (japan) (unl).chr" size="65536" crc="d92b1549" sha1="1335bbaf8fdce3d0552f5ed30c40d3eb34cf3a35" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="idol shisen mahjong (japan) (unl).prg" size="32768" crc="ecf31426" sha1="c816d8f7af78fa65558d342a0bd90e031d7d6f49" offset="00000" status="baddump" />
+				<rom name="idol shisen mahjong (japan) (unl).prg" size="32768" crc="ecf31426" sha1="c816d8f7af78fa65558d342a0bd90e031d7d6f49" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -61381,16 +61380,16 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>1991</year>
 		<publisher>Hacker International</publisher>
 		<info name="serial" value="HKI-10"/>
-		<info name="alt_title" value="麻雀サミット"/>
+		<info name="alt_title" value="麻雀サミット 歌舞伎町篇 ~ Mahjong Summit - Kabukichou-hen (on cart label)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nina006" />
-			<feature name="pcb" value="UNL-SA-016-1M" />
+			<feature name="pcb" value="UNL-SA-016-1M" /> <!-- verified by ototo, also found on UNL-3015 -->
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="65536">
-				<rom name="mahjan samit kabukicho hen (asia) (unl).chr" size="65536" crc="8af01754" sha1="43f60ec2d665d539e2f1bfed5c74a9228f86b3fc" offset="00000" status="baddump" />
+				<rom name="mahjan samit kabukicho hen (asia) (unl).chr" size="65536" crc="8af01754" sha1="43f60ec2d665d539e2f1bfed5c74a9228f86b3fc" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="65536">
-				<rom name="mahjan samit kabukicho hen (asia) (unl).prg" size="65536" crc="5232e0fd" sha1="7ebc6786326c1c9987efef5fbd6b375dc8904210" offset="00000" status="baddump" />
+				<rom name="mahjan samit kabukicho hen (asia) (unl).prg" size="65536" crc="5232e0fd" sha1="7ebc6786326c1c9987efef5fbd6b375dc8904210" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -61415,39 +61414,39 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 <!-- nointro -->
 	<software name="mjcompan">
 		<description>Mahjong Companion (Japan, Hacker)</description>
-		<!-- TOSEC title Mahjong Companion - Roppongi Hen check -->
 		<year>1990</year>
 		<publisher>Hacker International</publisher>
 		<info name="serial" value="HKI-02"/>
-		<info name="alt_title" value="麻雀コンパニオン 六本木編"/>
+		<info name="alt_title" value="麻雀コンパニオン 六本木編 ~ Mahjong Companion - Roppongi Hen (on cart label)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nina006" />
-			<feature name="pcb" value="AVE-NINA-06" />
+			<feature name="pcb" value="UNL-SA-016-1M" /> <!-- verified by ototo -->
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="65536">
-				<rom name="mahjang companion (asia) (hacker) (unl).chr" size="65536" crc="745b9cf9" sha1="89f8e4f5117ab34af3d9e4dbecd85aed99c4fbfd" offset="00000" status="baddump" />
+				<rom name="mahjang companion (asia) (hacker) (unl).chr" size="65536" crc="745b9cf9" sha1="89f8e4f5117ab34af3d9e4dbecd85aed99c4fbfd" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="65536">
-				<rom name="mahjang companion (asia) (hacker) (unl).prg" size="65536" crc="4538856f" sha1="d9149219f6b8121641d9fad4a11f0e054b5ed2f5" offset="00000" status="baddump" />
+				<rom name="mahjang companion (asia) (hacker) (unl).prg" size="65536" crc="4538856f" sha1="d9149219f6b8121641d9fad4a11f0e054b5ed2f5" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
 
 <!-- nointro -->
 	<software name="metalfgt1" cloneof="metalfgt">
-		<description>Metal Fighter μ (Japan, Hacker)</description>
-		<!-- HES pirate according to TOSEC, by Joy Van according GoodNES, check -->
+		<description>Metal Fighter μ (Japan, Kinema / Hacker)</description>
 		<year>19??</year>
-		<publisher>Hacker International</publisher>
+		<publisher>Kinema Music ~ Hacker International</publisher>
+		<info name="alt_title" value="メタルファイターμ" />
+		<info name="developer" value="Joy Van" />
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nina006" />
-			<feature name="pcb" value="AVE-NINA-06" />
+			<feature name="pcb" value="UNL-TC-04" /> <!-- verified by ototo -->
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="32768">
-				<rom name="metal fighter (asia) (hacker) (unl).chr" size="32768" crc="fe69de4b" sha1="11bcf115fa146923a87763f8f5f224a8ddb027ce" offset="00000" status="baddump" />
+				<rom name="metal fighter (asia) (hacker) (unl).chr" size="32768" crc="fe69de4b" sha1="11bcf115fa146923a87763f8f5f224a8ddb027ce" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="metal fighter (asia) (hacker) (unl).prg" size="32768" crc="7b29979f" sha1="eaa991b7d38f2493ae5f8cf52564b732bedf2a6e" offset="00000" status="baddump" />
+				<rom name="metal fighter (asia) (hacker) (unl).prg" size="32768" crc="7b29979f" sha1="eaa991b7d38f2493ae5f8cf52564b732bedf2a6e" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -61456,15 +61455,16 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<description>Miss Peach World 1 - Super L.A. Cop (Japan)</description>
 		<year>1991</year>
 		<publisher>Hacker International</publisher>
+		<info name="alt_title" value="ミスピーチワールド"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="discrete_74x377" />
-			<feature name="pcb" value="COLORDREAMS-74*377" />
+			<feature name="pcb" value="UNL-2209-B" /> <!-- verified by ototo -->
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="65536">
-				<rom name="miss peach world.prg" size="65536" crc="ea7af97e" sha1="2e68d334193d70f92619b656785f749eae82382a" status="baddump" />
+				<rom name="miss peach world.prg" size="65536" crc="ea7af97e" sha1="2e68d334193d70f92619b656785f749eae82382a" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="65536">
-				<rom name="miss peach world.chr" size="65536" crc="a9d5bea7" sha1="2241cf3ea84889d50009928e66ead5f15bff2cca" status="baddump" />
+				<rom name="miss peach world.chr" size="65536" crc="a9d5bea7" sha1="2241cf3ea84889d50009928e66ead5f15bff2cca" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -61475,16 +61475,16 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<description>Papillon (Asia)</description>
 		<year>19??</year>
 		<publisher>Hacker International</publisher>
-		<info name="alt_title" value="Papillon Gals (on the cart label)"/>
+		<info name="alt_title" value="パピヨンギャルズ ~ Papillon Gals (on the cart label)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nina006" />
-			<feature name="pcb" value="AVE-NINA-06" />
+			<feature name="pcb" value="UNL-3015" /> <!-- verified by ototo -->
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="65536">
-				<rom name="papillon (asia) (unl).chr" size="65536" crc="48a4a69b" sha1="c960931b6bcff36ff5dbbb79e98e5bd3ac812869" offset="00000" status="baddump" />
+				<rom name="papillon (asia) (unl).chr" size="65536" crc="48a4a69b" sha1="c960931b6bcff36ff5dbbb79e98e5bd3ac812869" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="papillon (asia) (unl).prg" size="32768" crc="d7df9b60" sha1="c52828b3159306a6e1d91678c7fe1b8cdfb422cb" offset="00000" status="baddump" />
+				<rom name="papillon (asia) (unl).prg" size="32768" crc="d7df9b60" sha1="c52828b3159306a6e1d91678c7fe1b8cdfb422cb" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -61550,40 +61550,39 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	<!-- same as the Sachen game, but with nudity -->
 	<software name="pyramidj" cloneof="pyramid">
 		<description>Pyramid (Japan, Hacker)</description>
-		<!-- Sexy Pyramid - Cleopatra Kiki Ippatsu (1990)(Hacker Interantional) in TOSEC, check -->
 		<year>1990</year>
 		<publisher>Hacker International</publisher>
 		<info name="serial" value="HKI-03"/>
-		<info name="alt_title" value="ピラミッド クレオパトラ危機一髪"/>
+		<info name="alt_title" value="ピラミッド クレオパトラ危機一髪 ~ Pyramid Cleaopatra Kiki Ippatsu (on cart label), セクシーピラミッド ~ Sexy Pyramid (on box)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
-			<feature name="pcb" value="NES-CNROM" />
+			<feature name="pcb" value="UNL-3019" /> <!-- verified by ototo, PCB marked as SA-004 as well -->
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="65536">
-				<rom name="pyramid (japan) (hacker inc.) (unl).chr" size="65536" crc="dbb5a214" sha1="01fbc81b5bf1244809384ddaa2e18c7a41e6ab02" offset="00000" status="baddump" />
+				<rom name="pyramid (japan) (hacker inc.) (unl).chr" size="65536" crc="dbb5a214" sha1="01fbc81b5bf1244809384ddaa2e18c7a41e6ab02" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="pyramid (japan) (hacker inc.) (unl).prg" size="32768" crc="1b47609d" sha1="c0eb8f9dca8815833f33808d1562d803c64b4927" offset="00000" status="baddump" />
+				<rom name="pyramid (japan) (hacker inc.) (unl).prg" size="32768" crc="1b47609d" sha1="c0eb8f9dca8815833f33808d1562d803c64b4927" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
 
-<!-- This has a fixed graphics ROM by using Magic Bubble CHR chunks? -->
+<!-- "Fixed" in filenames of the original dump is probably related to fixing CHR bank order based on Magic Bubble CHR. Dump verified by Ototo -->
 	<software name="soapanic">
-		<description>Soap Panic (Japan, fixed CHR?)</description>
+		<description>Soap Panic (Japan)</description>
 		<year>1991</year>
 		<publisher>Hacker International</publisher>
 		<info name="serial" value="HKI-11"/>
 		<info name="alt_title" value="ソープパニック"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sa0037" />
-			<feature name="pcb" value="UNL-SA-0037" />
+			<feature name="slot" value="cnrom" />
+			<feature name="pcb" value="UNL-2209" /> <!-- verified by ototo -->
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="65536">
-				<rom name="soap panic (hacker) [f1].chr" size="65536" crc="61dcc562" sha1="956f94577309ffaeab30b43cbf159f0f755dabe9" offset="00000" status="baddump" />
+				<rom name="soap panic (hacker) [f1].chr" size="65536" crc="61dcc562" sha1="956f94577309ffaeab30b43cbf159f0f755dabe9" offset="00000" />
 			</dataarea>
 			<dataarea name="prg" size="32768">
-				<rom name="soap panic (hacker) [f1].prg" size="32768" crc="52c78553" sha1="82700b29a6dd650ae1f835b93fb220fe81bf56be" offset="00000" status="baddump" />
+				<rom name="soap panic (hacker) [f1].prg" size="32768" crc="52c78553" sha1="82700b29a6dd650ae1f835b93fb220fe81bf56be" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -66724,8 +66723,8 @@ We don't include these hacks because they were not burned into real carts nor so
 		<year>1991</year>
 		<publisher>American Video Entertainment</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cnrom" />
-			<feature name="pcb" value="NES-CNROM" /> <!-- This should be AVE-MB-91 -->
+			<feature name="slot" value="nina006" />
+			<feature name="pcb" value="AVE-MB-91" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="venice beach volleyball (proto).prg" size="32768" crc="6f37e993" sha1="cb939fa2aa0cdad4e711bad4528cff091cc1d30e" offset="00000" status="baddump" />
@@ -66817,6 +66816,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Metal Fighter"/>
+		<info name="developer" value="Joy Van" />
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="tcu02" />
 			<feature name="pcb" value="UNL-SA-002" />
@@ -66834,6 +66834,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Metal Fighter"/>
+		<info name="developer" value="Joy Van" />
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
