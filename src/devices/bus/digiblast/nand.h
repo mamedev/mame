@@ -7,6 +7,7 @@
 
 #include "slot.h"
 
+#include "machine/i2cmem.h"
 #include "machine/nandflash.h"
 
 class digiblast_nand_device : public device_t, public device_digiblast_cart_interface
@@ -16,6 +17,9 @@ public:
 	virtual void data_w(u8 data) override;
 	virtual void command_w(u8 data) override;
 	virtual void address_w(u8 data) override;
+	virtual int i2c_sda_r() override;
+	virtual void i2c_sda_w(int state) override;
+	virtual void i2c_scl_w(int state) override;
 	virtual u32 rom_size() const override;
 	virtual void set_rom(const u8 *data, u32 size) override;
 
@@ -24,11 +28,13 @@ protected:
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
-	void configure_nand() ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	void configure_cart(machine_config &config) ATTR_COLD;
 
 	required_device<nand_device> m_nand;
 
 private:
+	required_device<i2cmem_device> m_i2cmem;
 	required_device<digiblast_cart_slot_device> m_slot;
 };
 

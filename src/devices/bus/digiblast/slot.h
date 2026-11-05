@@ -16,6 +16,9 @@ public:
 	virtual void data_w(u8 data) = 0;
 	virtual void command_w(u8 data) = 0;
 	virtual void address_w(u8 data) = 0;
+	virtual int i2c_sda_r() = 0;
+	virtual void i2c_sda_w(int state) = 0;
+	virtual void i2c_scl_w(int state) = 0;
 	virtual u32 rom_size() const = 0;
 	virtual void set_rom(const u8 *data, u32 size) = 0;
 
@@ -44,6 +47,9 @@ public:
 	void data_w(u8 data);
 	void command_w(u8 data);
 	void address_w(u8 data);
+	int i2c_sda_r();
+	void i2c_sda_w(int state);
+	void i2c_scl_w(int state);
 
 	// device_image_interface implementation
 	virtual std::pair<std::error_condition, std::string> call_load() override;

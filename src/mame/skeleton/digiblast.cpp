@@ -15,7 +15,6 @@
 
 #include "bus/digiblast/slot.h"
 #include "cpu/arm7/arm7.h"
-#include "machine/i2cmem.h"
 #include "machine/s3c24xx.h"
 #include "sound/cs43l43.h"
 
@@ -39,7 +38,6 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_s3c2410(*this, "s3c2410"),
-		m_i2cmem(*this, "i2cmem"),
 		m_i2sdac(*this, "i2sdac"),
 		m_cart(*this, "cartslot"),
 		m_buttons(*this, "GPIO%c", 'F'),
@@ -67,7 +65,6 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<s3c2410_device> m_s3c2410;
-	required_device<i2cmem_device> m_i2cmem;
 	required_device<cs43l43_device> m_i2sdac;
 
 	required_device<digiblast_cart_slot_device> m_cart;
@@ -130,7 +127,7 @@ uint32_t digiblast_state::adc_data_r(offs_t offset)
 void digiblast_state::i2c_scl_w(int state)
 {
 	LOGMASKED(LOG_I2C, "%s: i2c_scl_w: %d\n", machine().describe_context(), state);
-	m_i2cmem->write_scl(state);
+	m_cart->i2c_scl_w(state);
 	m_i2sdac->scl_write(state);
 }
 
@@ -141,7 +138,7 @@ void digiblast_state::i2c_sda_cb(int state)
 
 int digiblast_state::i2c_sda_r()
 {
-	const bool nvram_state = m_i2cmem->read_sda();
+	const bool nvram_state = m_cart->i2c_sda_r();
 	const bool state = nvram_state && m_dac_sda;
 	LOGMASKED(LOG_I2C, "%s: i2c_sda_r: %d\n", machine().describe_context(), state);
 	return state;
@@ -150,7 +147,7 @@ int digiblast_state::i2c_sda_r()
 void digiblast_state::i2c_sda_w(int state)
 {
 	LOGMASKED(LOG_I2C, "%s: i2c_sda_w: %d\n", machine().describe_context(), state);
-	m_i2cmem->write_sda(state);
+	m_cart->i2c_sda_w(state);
 	m_i2sdac->sda_write(state);
 }
 
@@ -223,12 +220,6 @@ void digiblast_state::digiblast(machine_config &config)
 	m_s3c2410->nand_update_ecc_r_callback().set_constant(1);
 	m_s3c2410->nand_data_r_callback().set(m_cart, FUNC(digiblast_cart_slot_device::data_r));
 	m_s3c2410->nand_data_w_callback().set(m_cart, FUNC(digiblast_cart_slot_device::data_w));
-
-	I2C_24C16(config, m_i2cmem, 0);
-	m_i2cmem->set_address(0xa0);
-	m_i2cmem->set_e0(0);
-	m_i2cmem->set_e1(0);
-	m_i2cmem->set_e2(0);
 
 	DIGIBLAST_CART_SLOT(config, m_cart, digiblast_cart);
 	m_cart->set_must_be_loaded(true);

@@ -119,3 +119,20 @@ void digiblast_cart_slot_device::address_w(u8 data)
 	if (m_cart)
 		m_cart->address_w(data);
 }
+
+int digiblast_cart_slot_device::i2c_sda_r()
+{
+	return m_cart ? m_cart->i2c_sda_r() : 1;
+}
+
+void digiblast_cart_slot_device::i2c_sda_w(int state)
+{
+	if (m_cart)
+		m_cart->i2c_sda_w(state);
+}
+
+void digiblast_cart_slot_device::i2c_scl_w(int state)
+{
+	if (m_cart)
+		m_cart->i2c_scl_w(state);
+}

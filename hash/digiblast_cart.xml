@@ -8,6 +8,8 @@ license:CC0-1.0
     Cartridge NAND types are provisional: capacities match the dumps, and the Toshiba
     IDs are accepted by the boot firmware. PCB chip markings need verification.
     Some dumps have blank spare areas; others contain spare data of unknown format.
+    Photographed cartridges have 24C08 EEPROMs. All current slot configurations use
+    24C08; EEPROM types on the remaining PCBs and factory contents need verification.
 
     The following are known to exist but not dumped
 
