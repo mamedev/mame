@@ -6,8 +6,6 @@
  MegaDrive / Genesis Cart + STM95 EEPROM device
 
 
- TO DO: split STM95 to a separate device...
-
 ***************************************************************************/
 
 
@@ -15,169 +13,14 @@
 #include "stm95.h"
 
 
-stm95_eeprom_device::stm95_eeprom_device(running_machine &machine, uint8_t *eeprom) :
-	stm_state(IDLE),
-	stream_pos(0),
-	m_machine(machine)
-{
-	eeprom_data = eeprom;
-	m_machine.save().save_item(latch, "STM95/latch");
-	m_machine.save().save_item(reset_line, "STM95/reset_line");
-	m_machine.save().save_item(sck_line, "STM95/sck_line");
-	m_machine.save().save_item(WEL, "STM95/WEL");
-	m_machine.save().save_item(stream_pos, "STM95/stream_pos");
-	m_machine.save().save_item(stream_data, "STM95/stream_data");
-	m_machine.save().save_item(eeprom_addr, "STM95/eeprom_addr");
-}
-
-void stm95_eeprom_device::set_cs_line(int state)
-{
-	reset_line = state;
-	if (reset_line != CLEAR_LINE)
-	{
-		stream_pos = 0;
-		stm_state = IDLE;
-	}
-}
-
-void stm95_eeprom_device::set_si_line(int state)
-{
-	latch = state;
-}
-
-int stm95_eeprom_device::get_so_line(void)
-{
-	if (stm_state == READING || stm_state == CMD_RDSR)
-		return (stream_data >> 8) & 1;
-	else
-		return 0;
-}
-
-void stm95_eeprom_device::set_sck_line(int state)
-{
-	if (reset_line == CLEAR_LINE)
-	{
-		if (state == ASSERT_LINE && sck_line == CLEAR_LINE)
-		{
-			switch (stm_state)
-			{
-				case IDLE:
-					stream_data = (stream_data << 1) | (latch ? 1 : 0);
-					stream_pos++;
-					if (stream_pos == 8)
-					{
-						stream_pos = 0;
-						//printf("STM95 EEPROM: got cmd %02X\n", stream_data&0xff);
-						switch(stream_data & 0xff)
-						{
-							case 0x01:  // write status register
-								if (WEL != 0)
-									stm_state = CMD_WRSR;
-								WEL = 0;
-								break;
-							case 0x02:  // write
-								if (WEL != 0)
-									stm_state = CMD_WRITE;
-								stream_data = 0;
-								WEL = 0;
-								break;
-							case 0x03:  // read
-								stm_state = M95320_CMD_READ;
-								stream_data = 0;
-								break;
-							case 0x04:  // write disable
-								WEL = 0;
-								break;
-							case 0x05:  // read status register
-								stm_state = CMD_RDSR;
-								stream_data = WEL<<1;
-								break;
-							case 0x06:  // write enable
-								WEL = 1;
-								break;
-							default:
-								machine().logerror("STM95 EEPROM: unknown cmd %02X\n", stream_data&0xff);
-						}
-					}
-					break;
-				case CMD_WRSR:
-					stream_pos++;       // just skip, don't care block protection
-					if (stream_pos == 8)
-					{
-						stm_state = IDLE;
-						stream_pos = 0;
-					}
-					break;
-				case CMD_RDSR:
-					stream_data = stream_data<<1;
-					stream_pos++;
-					if (stream_pos == 8)
-					{
-						stm_state = IDLE;
-						stream_pos = 0;
-					}
-					break;
-				case M95320_CMD_READ:
-					stream_data = (stream_data << 1) | (latch ? 1 : 0);
-					stream_pos++;
-					if (stream_pos == 16)
-					{
-						eeprom_addr = stream_data & (M95320_SIZE - 1);
-						stream_data = eeprom_data[eeprom_addr];
-						stm_state = READING;
-						stream_pos = 0;
-					}
-					break;
-				case READING:
-					stream_data = stream_data<<1;
-					stream_pos++;
-					if (stream_pos == 8)
-					{
-						if (++eeprom_addr == M95320_SIZE)
-							eeprom_addr = 0;
-						stream_data |= eeprom_data[eeprom_addr];
-						stream_pos = 0;
-					}
-					break;
-				case CMD_WRITE:
-					stream_data = (stream_data << 1) | (latch ? 1 : 0);
-					stream_pos++;
-					if (stream_pos == 16)
-					{
-						eeprom_addr = stream_data & (M95320_SIZE - 1);
-						stm_state = WRITING;
-						stream_pos = 0;
-					}
-					break;
-				case WRITING:
-					stream_data = (stream_data << 1) | (latch ? 1 : 0);
-					stream_pos++;
-					if (stream_pos == 8)
-					{
-						eeprom_data[eeprom_addr] = stream_data;
-						if (++eeprom_addr == M95320_SIZE)
-							eeprom_addr = 0;
-						stream_pos = 0;
-					}
-					break;
-			}
-		}
-	}
-	sck_line = state;
-}
-
-
-
-//-------------------------------------------------
-//  md_rom_device - constructor
-//-------------------------------------------------
-
 DEFINE_DEVICE_TYPE(MD_EEPROM_STM95, md_eeprom_stm95_device, "md_eeprom_stm95", "MD Cart + EEPROM STM95")
 
 
 md_eeprom_stm95_device::md_eeprom_stm95_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_md_cart_interface(mconfig, *this)
+	, m_stm95(*this, "eeprom")
+	, m_legacy_nvram(*this, "eeprom")
 	, m_rdcnt(0)
 {
 }
@@ -188,11 +31,28 @@ md_eeprom_stm95_device::md_eeprom_stm95_device(const machine_config &mconfig, co
 }
 
 
+ROM_START( md_eeprom_stm95 )
+	ROM_REGION(0x1000, "eeprom", ROMREGION_ERASEFF)
+ROM_END
+
+const tiny_rom_entry *md_eeprom_stm95_device::device_rom_region() const
+{
+	return ROM_NAME(md_eeprom_stm95);
+}
+
+void md_eeprom_stm95_device::device_add_mconfig(machine_config &config)
+{
+	EEPROM_M95320(config, m_stm95);
+}
+
+void md_eeprom_stm95_device::load_nvram(device_image_interface &image)
+{
+	// Import the old battery file as defaults; existing device NVRAM takes precedence.
+	image.battery_load(m_legacy_nvram->base(), m_legacy_nvram->bytes(), 0xff);
+}
+
 void md_eeprom_stm95_device::device_start()
 {
-	nvram_alloc(stm95_eeprom_device::M95320_SIZE);
-	m_stm95 = std::make_unique<stm95_eeprom_device>(machine(), (uint8_t*)get_nvram_base());
-
 	save_item(NAME(m_rdcnt));
 	save_item(NAME(m_bank));
 }
@@ -240,7 +100,7 @@ uint16_t md_eeprom_stm95_device::read_a13(offs_t offset)
 {
 	if (offset == 0x0a/2)
 	{
-		return m_stm95->get_so_line() & 1;
+		return m_stm95->so_r() & 1;
 	}
 	return 0xffff;
 }
@@ -257,9 +117,9 @@ void md_eeprom_stm95_device::write_a13(offs_t offset, uint16_t data)
 	}
 	else if (offset < 0x0a/2)
 	{
-		m_stm95->set_si_line(BIT(data, 0));
-		m_stm95->set_sck_line(BIT(data, 1));
-		m_stm95->set_halt_line(BIT(data, 2));
-		m_stm95->set_cs_line(BIT(data, 3));
+		m_stm95->si_w(BIT(data, 0));
+		m_stm95->sck_w(BIT(data, 1));
+		m_stm95->hold_w(BIT(data, 2));
+		m_stm95->cs_w(BIT(data, 3));
 	}
 }
