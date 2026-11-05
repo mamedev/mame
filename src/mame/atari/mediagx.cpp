@@ -69,6 +69,7 @@
 #include "emu.h"
 #include "pcshare.h"
 
+#include "bus/centronics/atari_jammit.h"
 #include "cpu/i386/i386.h"
 #include "machine/cx5510.h"
 #include "machine/pc_lpt.h"
@@ -102,8 +103,6 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_lpt0(*this, "lpt0"),
-		m_system(*this, "SYSTEM"),
-		m_starts(*this, "STARTS"),
 		m_guns(*this, "GUN%u", 0U),
 		m_jammit_outputs(*this, "jammit_out%u", 0U),
 		m_triggers(*this, "TRIGGERS")
@@ -130,8 +129,8 @@ private:
 	void memory_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t biu_ctrl_r(offs_t offset);
 	void biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t parallel_port_r(offs_t offset, uint32_t mem_mask = ~0);
-	void parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t jammit_gun_r(offs_t player);
+	void jammit_output_w(uint16_t data);
 	uint32_t ad1847_r(offs_t offset);
 	void ad1847_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	[[maybe_unused]] void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -167,20 +166,9 @@ private:
 	required_device<pc_lpt_device> m_lpt0;
 	uint8_t m_pal[768];
 
-	required_ioport m_system;
-	required_ioport m_starts;
 	required_ioport_array<4> m_guns;
 	output_finder<14> m_jammit_outputs;
-	uint16_t m_jammit_output_latch = 0;
 	required_ioport m_triggers;
-
-	uint8_t jammit_input_r();
-	void latch_guns();
-	void update_jammit_outputs();
-	uint16_t m_jammit_lfsr = 0;
-	uint16_t m_jammit_previous = 0;
-	uint16_t m_gun_latch[4]{};
-	uint8_t m_gun_flags = 0;
 
 	uint32_t m_disp_ctrl_reg[256/4]{};
 	int m_frame_width = 0;
@@ -193,15 +181,6 @@ private:
 
 	uint8_t m_mediagx_config_reg_sel = 0;
 	uint8_t m_mediagx_config_regs[256]{};
-
-	//uint8_t m_controls_data = 0;
-	uint8_t m_parallel_pointer = 0;
-	uint8_t m_parallel_latched = 0;
-	uint32_t m_parport = 0;
-	//int m_control_num = 0;
-	//int m_control_num2 = 0;
-	//int m_control_read = 0;
-
 
 	uint8_t m_ad1847_regs[16]{};
 	uint32_t m_audio_fifo_count = 0;
@@ -560,115 +539,33 @@ void mediagx_state::io20_w(offs_t offset, uint8_t data)
 	}
 }
 
-// JAMMIT returns a serial stream of nibbles on the parallel status lines.
-// Output commands also clock the input stream.  The previous LFSR state is
-// mixed into each reply; 0x10 seeds the shifter and 0x18 restarts the packet.
-void mediagx_state::latch_guns()
+void mediagx_state::jammit_output_w(uint16_t data)
+{
+	// Keep the existing cabinet output names at the machine root.
+	for (unsigned bit = 0; bit < 14; ++bit)
+		m_jammit_outputs[bit] = BIT(data, bit);
+}
+
+// Convert host aim to the existing JAMMIT beam-counter units.  The peripheral
+// samples both players once at the beginning of each input packet.
+uint32_t mediagx_state::jammit_gun_r(offs_t player)
 {
 	const uint8_t triggers = m_triggers->read();
-	m_gun_flags = (triggers & 3) | ((triggers >> 4) & 3);
 	const unsigned htotal = ((m_disp_ctrl_reg[DC_H_TIMING_1] >> 16) & 0x7ff) + 8;
 	// Horizontal gun counter is referenced to the leading edge of HSYNC.
 	const unsigned hsyncstart = (m_disp_ctrl_reg[DC_H_TIMING_3] & 0x7ff) + 8;
 	const unsigned backporch = htotal > hsyncstart ? htotal - hsyncstart : 0;
 	const unsigned pixel_double = BIT(m_disp_ctrl_reg[DC_TIMING_CFG], 15) ? 2 : 1;
 	const double counts_per_line = m_screen->scan_period().as_double() * 14'318'180;
-
-	for (unsigned player = 0; player < 2; ++player)
-	{
-		const unsigned x = m_guns[player * 2]->read();
-		const unsigned y = m_guns[player * 2 + 1]->read();
-		const bool offscreen = BIT(triggers, player + 4) || x == 0 || x == 255 || y == 0 || y == 255;
-		if (offscreen)
-			m_gun_flags |= 0x10 << player;
-		const unsigned xpos = x * std::max(m_frame_width - 1, 0) / 255;
-		const unsigned ypos = y * std::max(m_frame_height - 1, 0) / 255;
-		m_gun_latch[player * 2] = ~ypos & 0x0fff;
-		m_gun_latch[player * 2 + 1] = std::min<unsigned>(1023, (backporch + xpos * pixel_double) * counts_per_line / htotal);
-	}
-}
-
-uint8_t mediagx_state::jammit_input_r()
-{
-	const unsigned pos = m_parallel_pointer;
-	if (pos == 0)
-		latch_guns();
-	if (pos >= 1 && pos <= 3)
-		return (m_system->read() >> ((pos - 1) * 4)) & 15;
-	if (pos == 4)
-		return m_starts->read() & 15;
-	if (pos == 13)
-		return 5; // packet synchronisation signature
-	if (pos == 14 || pos == 15)
-		return (m_gun_flags >> ((pos - 14) * 4)) & 15;
-	if (pos >= 16 && pos < 28)
-		return (m_gun_latch[(pos - 16) / 3] >> (((pos - 16) % 3) * 4)) & 15;
-	return 0; // unconnected player switch lines / padding
-}
-
-uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
-{
-	uint32_t r = 0;
-	if (ACCESSING_BITS_8_15)
-		r |= ((~m_parallel_latched & 8) << 12) | ((m_parallel_latched & 7) << 11);
-	if (ACCESSING_BITS_16_23)
-		r |= m_parport & 0xff0000;
-	return r;
-}
-
-void mediagx_state::update_jammit_outputs()
-{
-	for (unsigned bit = 0; bit < 14; ++bit)
-		m_jammit_outputs[bit] = BIT(m_jammit_output_latch, bit);
-}
-
-void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	COMBINE_DATA(&m_parport);
-	if (!ACCESSING_BITS_0_7)
-		return;
-
-	const uint8_t command = data;
-	// Four command groups latch the outgoing data independently of the input
-	// shifter. Publish raw command latch levels; physical functions/polarities
-	// are not yet established. The guest inverts its low eight output bits.
-	unsigned shift = 0;
-	uint16_t mask = 0;
-	switch (command & 0xf0)
-	{
-	case 0x30: shift = 0; mask = 0x000f; break;
-	case 0x20: shift = 4; mask = 0x00f0; break;
-	case 0x40: shift = 8; mask = 0x0f00; break;
-	case 0x50: shift = 12; mask = 0x3000; break;
-	}
-	if (mask)
-	{
-		const uint16_t next = (m_jammit_output_latch & ~mask) | ((command << shift) & mask);
-		if (next != m_jammit_output_latch)
-		{
-			m_jammit_output_latch = next;
-			update_jammit_outputs();
-		}
-	}
-	m_parallel_latched = jammit_input_r() ^ (m_jammit_previous & 15);
-	m_jammit_previous = m_jammit_lfsr;
-	if (command <= 0x10)
-	{
-		if (command == 0x10)
-			m_jammit_lfsr = 0xffff;
-		else
-			m_jammit_lfsr |= 1 << command;
-	}
-	else
-	{
-		const bool feedback = BIT(m_jammit_lfsr, 13) != BIT(m_jammit_lfsr, 14);
-		m_jammit_lfsr = (m_jammit_lfsr << 1) | feedback;
-	}
-
-	if ((command & 0xfc) == 0x18)
-		m_parallel_pointer = command & 3;
-	else if (m_parallel_pointer < 28)
-		++m_parallel_pointer;
+	const unsigned x = m_guns[player * 2]->read();
+	const unsigned y = m_guns[player * 2 + 1]->read();
+	const bool offscreen = BIT(triggers, player + 4) || x == 0 || x == 255 || y == 0 || y == 255;
+	const unsigned xpos = x * std::max(m_frame_width - 1, 0) / 255;
+	const unsigned ypos = y * std::max(m_frame_height - 1, 0) / 255;
+	const unsigned vertical = ~ypos & 0x0fff;
+	const unsigned horizontal = std::min<unsigned>(1023, (backporch + xpos * pixel_double) * counts_per_line / htotal);
+	return vertical | (horizontal << 12) | (BIT(triggers, player) << 24)
+		| (BIT(triggers, player + 4) << 24) | (unsigned(offscreen) << 25);
 }
 
 /* Analog Devices AD1847 Stereo DAC */
@@ -792,7 +689,7 @@ void mediagx_state::mediagx_io(address_map &map)
 	map(0x0022, 0x0023).rw(FUNC(mediagx_state::io20_r), FUNC(mediagx_state::io20_w));
 	map(0x00e8, 0x00eb).noprw();     // I/O delay port
 	map(0x01f0, 0x01f7).rw(m_ide, FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
-	map(0x0378, 0x037b).rw(FUNC(mediagx_state::parallel_port_r), FUNC(mediagx_state::parallel_port_w));
+	map(0x0378, 0x037b).m("jammit_lpt", FUNC(pc_lpt_device::isa_map));
 	map(0x03bc, 0x03bf).rw(m_lpt0, FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write)).umask16(0x00ff);
 	map(0x03f0, 0x03f7).rw(m_ide, FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 	map(0x0400, 0x04ff).rw(FUNC(mediagx_state::ad1847_r), FUNC(mediagx_state::ad1847_w));
@@ -861,20 +758,11 @@ INPUT_PORTS_END
 
 void mediagx_state::machine_start()
 {
-	save_item(NAME(m_jammit_output_latch));
-	machine().save().register_postload(save_prepost_delegate(FUNC(mediagx_state::update_jammit_outputs), this));
 #if SPEEDUP_HACKS
 	m_video_poll_timer = timer_alloc(FUNC(mediagx_state::video_poll_end), this);
 	save_item(NAME(m_video_poll_pc));
 	save_item(NAME(m_video_poll_vna));
 #endif
-	save_item(NAME(m_parallel_pointer));
-	save_item(NAME(m_parallel_latched));
-	save_item(NAME(m_parport));
-	save_item(NAME(m_jammit_lfsr));
-	save_item(NAME(m_jammit_previous));
-	save_item(NAME(m_gun_latch));
-	save_item(NAME(m_gun_flags));
 	save_item(NAME(m_audio_fifo_count));
 	save_item(NAME(m_audio_fifo_sample_tick));
 	save_item(NAME(m_ad1847_sample_rate));
@@ -882,20 +770,11 @@ void mediagx_state::machine_start()
 
 void mediagx_state::machine_reset()
 {
-	m_jammit_output_latch = 0;
-	update_jammit_outputs();
 #if SPEEDUP_HACKS
 	m_video_poll_pc = 0;
 	m_video_poll_vna = 0;
 	m_video_poll_timer->adjust(attotime::never);
 #endif
-	m_parallel_pointer = 0;
-	m_parallel_latched = 0;
-	m_parport = 0;
-	m_jammit_lfsr = 0;
-	m_jammit_previous = 0;
-	std::fill(std::begin(m_gun_latch), std::end(m_gun_latch), 0);
-	m_gun_flags = 0;
 	// HACK: pretend shadow RAM doesn't exist in a x86 BIOS ...
 	uint8_t *rom = memregion("bios")->base();
 	memcpy(m_bios_ram, rom, 0x40000);
@@ -925,6 +804,21 @@ void mediagx_state::mediagx(machine_config &config)
 	// TODO: checked at POST, wants a debug device?
 	PC_LPT(config, m_lpt0);
 //  m_lpt0->irq_handler().set("mb:pic8259", FUNC(pic8259_device::ir7_w));
+
+	// External Atari JAMMIT board on the mainboard's DB25 parallel connector.
+	pc_lpt_device &jammit_lpt(PC_LPT(config, "jammit_lpt"));
+	centronics_device &centronics(*jammit_lpt.subdevice<centronics_device>("centronics"));
+	centronics.option_add_internal("atari_jammit", ATARI_JAMMIT);
+	centronics.set_default_option("atari_jammit");
+	centronics.set_fixed(true);
+	centronics.set_option_machine_config("atari_jammit", [this] (device_t *device)
+	{
+		auto &jammit = downcast<atari_jammit_device &>(*device);
+		jammit.system_callback().set_ioport(":SYSTEM");
+		jammit.starts_callback().set_ioport(":STARTS");
+		jammit.gun_callback().set(*this, FUNC(mediagx_state::jammit_gun_r));
+		jammit.output_callback().set(*this, FUNC(mediagx_state::jammit_output_w));
+	});
 
 	// Cabinet PS/2 connectors are unused. Keep the 8042, but do not attach
 	// a PC keyboard: its input ports put MAME in full keyboard mode and
@@ -963,7 +857,6 @@ void mediagx_state::mediagx(machine_config &config)
 void mediagx_state::init_mediagx()
 {
 	m_frame_width = m_frame_height = 1;
-	m_parallel_pointer = 0;
 	std::fill(std::begin(m_disp_ctrl_reg), std::end(m_disp_ctrl_reg), 0);
 	std::fill(std::begin(m_biu_ctrl_reg), std::end(m_biu_ctrl_reg), 0);
 	std::fill(std::begin(m_speedup_hits), std::end(m_speedup_hits), 0);
