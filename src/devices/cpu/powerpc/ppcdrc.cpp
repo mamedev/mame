@@ -4607,21 +4607,6 @@ bool ppc_device::generate_instruction_3b(drcuml_block &block, compiler_state *co
 			generate_fp_flags(block, desc);
 			return true;
 
-		case 0x16:  // FSQRTSx
-			if (m_flavor == PPC_MODEL_601)                                              // 601 has no fsqrts
-			{
-				return false;
-			}
-			if (!(m_drcoptions & PPCDRC_ACCURATE_SINGLES))
-			{
-				return generate_instruction_3f(block, compiler, desc);
-			}
-			generate_fp_invalid_sqrt(block, F64(G_RB(op)), false);
-			UML_FDSQRT(block, F0, F64(G_RB(op)));                                       // fdsqrt  f0,rb
-			UML_FDRNDS(block, F64(G_RD(op)), F0);                                       // fdrnds  rd,f0
-			generate_fp_flags(block, desc);
-			return true;
-
 		case 0x18:  // FRESx
 			if (m_flavor == PPC_MODEL_601)                                          // 601 has no fres
 			{
@@ -4717,16 +4702,6 @@ bool ppc_device::generate_instruction_3f(drcuml_block &block, compiler_state *co
 			case 0x12:  // FDIVx
 				generate_fp_invalid_div(block, F64(G_RA(op)), F64(G_RB(op)));
 				UML_FDDIV(block, F64(G_RD(op)), F64(G_RA(op)), F64(G_RB(op)));              // fddiv   rd,ra,rb
-				generate_fp_flags(block, desc);
-				return true;
-
-			case 0x16:  // FSQRTx
-				if (m_flavor == PPC_MODEL_601)                                          // 601 has no fsqrt
-				{
-					return false;
-				}
-				generate_fp_invalid_sqrt(block, F64(G_RB(op)), false);
-				UML_FDSQRT(block, F64(G_RD(op)), F64(G_RB(op)));                            // fdsqrt  rd,rb
 				generate_fp_flags(block, desc);
 				return true;
 
