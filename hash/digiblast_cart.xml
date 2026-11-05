@@ -237,7 +237,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sbsp1">
-		<description>Sponge Bob Square Pants 1 (Italy / Spain)</description>
+		<description>Sponge Bob Square Pants 1 (Italian / Spanish)</description>
 		<year>2005</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">

@@ -200,10 +200,10 @@ void digiblast_state::digiblast(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &digiblast_state::main_map);
 
 	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(455, 262);
-	screen.set_visarea(0, 320-1, 0, 256-1);
+	screen.set_visarea(0, 240-1, 0, 160-1);
 	screen.set_screen_update(m_s3c2410, FUNC(s3c2410_device::screen_update));
 
 	PALETTE(config, "palette").set_entries(256);
