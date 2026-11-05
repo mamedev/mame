@@ -78,7 +78,9 @@ std::string digiblast_cart_slot_device::get_default_card_software(get_default_ca
 void digiblast_cart(device_slot_interface &device)
 {
 	device.option_add_internal("nand_16m", DIGIBLAST_NAND_16M);
+	device.option_add_internal("nand_16m_r", DIGIBLAST_NAND_16M_R);
 	device.option_add_internal("nand_32m", DIGIBLAST_NAND_32M);
+	device.option_add_internal("nand_32m_r", DIGIBLAST_NAND_32M_R);
 	device.option_add_internal("nand_64m", DIGIBLAST_NAND_64M);
 	device.option_add_internal("nand_64m_r", DIGIBLAST_NAND_64M_R);
 }

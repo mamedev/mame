@@ -9,14 +9,16 @@
 #include "nand.h"
 
 DEFINE_DEVICE_TYPE(DIGIBLAST_NAND_16M,   digiblast_nand_16m_device,   "digiblast_nand_16m",   "digiBLAST 16 MiB NAND Cartridge")
+DEFINE_DEVICE_TYPE(DIGIBLAST_NAND_16M_R, digiblast_nand_16m_r_device, "digiblast_nand_16m_r", "digiBLAST 16 MiB NAND Cartridge (random SEEPROM default)")
 DEFINE_DEVICE_TYPE(DIGIBLAST_NAND_32M,   digiblast_nand_32m_device,   "digiblast_nand_32m",   "digiBLAST 32 MiB NAND Cartridge")
+DEFINE_DEVICE_TYPE(DIGIBLAST_NAND_32M_R, digiblast_nand_32m_r_device, "digiblast_nand_32m_r", "digiBLAST 32 MiB NAND Cartridge (random SEEPROM default)")
 DEFINE_DEVICE_TYPE(DIGIBLAST_NAND_64M,   digiblast_nand_64m_device,   "digiblast_nand_64m",   "digiBLAST 64 MiB NAND Cartridge")
 DEFINE_DEVICE_TYPE(DIGIBLAST_NAND_64M_R, digiblast_nand_64m_r_device, "digiblast_nand_64m_r", "digiBLAST 64 MiB NAND Cartridge (random SEEPROM default)")
 
 // The Atari classics require a 0x00 fill to avoid corrupt high score tables.
-// but cuccioli requires a random fill to properly initialize (so we use DIGIBLAST_NAND_64M_R to do that)
+// but cuccioli, gormitil and wadehix require a random fill to properly initialize (so we use DIGIBLAST_NAND_xxM_R to do that)
+
 ROM_START(digiblast_cart)
-	// Factory contents are undumped.
 	ROM_REGION(0x400, "i2cmem", ROMREGION_ERASE00)
 ROM_END
 
@@ -31,6 +33,14 @@ digiblast_nand_device::digiblast_nand_device(const machine_config &mconfig, devi
 
 void digiblast_nand_device::device_start()
 {
+}
+
+void digiblast_nand_device::randomize_default_i2cmem()
+{
+	digiblast_nand_device::device_start();
+	u8* i2c_default = memregion("i2cmem")->base();
+	for (int i = 0; i < memregion("i2cmem")->bytes(); i++)
+		i2c_default[i] = machine().rand();
 }
 
 const tiny_rom_entry *digiblast_nand_device::device_rom_region() const
@@ -49,7 +59,12 @@ void digiblast_nand_device::configure_cart(machine_config &config)
 }
 
 digiblast_nand_16m_device::digiblast_nand_16m_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: digiblast_nand_device(mconfig, DIGIBLAST_NAND_16M, tag, owner, clock)
+	: digiblast_nand_16m_device(mconfig, DIGIBLAST_NAND_16M, tag, owner, clock)
+{
+}
+
+digiblast_nand_16m_device::digiblast_nand_16m_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: digiblast_nand_device(mconfig, type, tag, owner, clock)
 {
 }
 
@@ -59,8 +74,24 @@ void digiblast_nand_16m_device::device_add_mconfig(machine_config &config)
 	configure_cart(config);
 }
 
+digiblast_nand_16m_r_device::digiblast_nand_16m_r_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: digiblast_nand_16m_device(mconfig, DIGIBLAST_NAND_16M_R, tag, owner, clock)
+{
+}
+
+void digiblast_nand_16m_r_device::device_start()
+{
+	randomize_default_i2cmem();
+}
+
+
 digiblast_nand_32m_device::digiblast_nand_32m_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: digiblast_nand_device(mconfig, DIGIBLAST_NAND_32M, tag, owner, clock)
+	: digiblast_nand_32m_device(mconfig, DIGIBLAST_NAND_32M, tag, owner, clock)
+{
+}
+
+digiblast_nand_32m_device::digiblast_nand_32m_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: digiblast_nand_device(mconfig, type, tag, owner, clock)
 {
 }
 
@@ -69,6 +100,17 @@ void digiblast_nand_32m_device::device_add_mconfig(machine_config &config)
 	TOSHIBA_TC58256FT(config, m_nand);
 	configure_cart(config);
 }
+
+digiblast_nand_32m_r_device::digiblast_nand_32m_r_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: digiblast_nand_32m_device(mconfig, DIGIBLAST_NAND_32M_R, tag, owner, clock)
+{
+}
+
+void digiblast_nand_32m_r_device::device_start()
+{
+	randomize_default_i2cmem();
+}
+
 
 digiblast_nand_64m_device::digiblast_nand_64m_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: digiblast_nand_64m_device(mconfig, DIGIBLAST_NAND_64M, tag, owner, clock)
@@ -93,10 +135,7 @@ digiblast_nand_64m_r_device::digiblast_nand_64m_r_device(const machine_config &m
 
 void digiblast_nand_64m_r_device::device_start()
 {
-	digiblast_nand_device::device_start();
-	u8* i2c_default = memregion("i2cmem")->base();
-	for (int i = 0; i < memregion("i2cmem")->bytes(); i++)
-		i2c_default[i] = machine().rand();
+	randomize_default_i2cmem();
 }
 
 u8 digiblast_nand_device::data_r()
