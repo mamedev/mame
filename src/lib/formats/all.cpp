@@ -254,6 +254,10 @@
 #include "ds9_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_DS2717_DSK
+#include "ds2717_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_SDF_DSK
 #include "sdf_dsk.h"
 #endif
@@ -1547,6 +1551,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #ifdef HAS_FORMATS_PMD32_DSK
 	en.add(FLOPPY_PMD32_FORMAT); // pmd32_dsk.h
 	en.add(FLOPPY_PMD32_C2717_FORMAT); // pmd32_dsk.h
+#endif
+#ifdef HAS_FORMATS_DS2717_DSK
+	en.add(FLOPPY_DS2717_FORMAT); // ds2717_dsk.h
 #endif
 
 	en.category("Microkey");
