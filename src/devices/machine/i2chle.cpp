@@ -51,6 +51,11 @@ i2c_hle_interface::~i2c_hle_interface()
 {
 }
 
+bool i2c_hle_interface::reset_pointer_on_stop() const
+{
+	return true;
+}
+
 void i2c_hle_interface::interface_post_start()
 {
 	m_latch = m_bit = 0;
@@ -85,7 +90,8 @@ void i2c_hle_interface::sda_write(int state)
 				m_state = STATE_IDLE;
 				m_last_address = 0;
 				m_just_acked = false;
-				m_data_offset = 0;
+				if (reset_pointer_on_stop())
+					m_data_offset = 0;
 				i2c_stop();
 			}
 			else
