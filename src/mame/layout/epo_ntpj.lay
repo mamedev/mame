@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:MagikalUnicorn
+-->
+<mamelayout version="2">
+	<element name="panel">
+		<rect><color red="1.0" green="0.8" blue="0.85" /></rect>
+	</element>
+	<element name="keybed">
+		<rect><color red="0.15" green="0.15" blue="0.15" /></rect>
+	</element>
+	<element name="whitekey" defstate="0">
+		<rect state="0"><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><color red="0.7" green="0.7" blue="0.7" /></rect>
+	</element>
+	<element name="blackkey" defstate="0">
+		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="0.1" y="0" width="0.8" height="0.97" /><color red="0.15" green="0.15" blue="0.15" /></rect>
+		<rect state="1"><bounds x="0.1" y="0" width="0.8" height="0.97" /><color red="0.4" green="0.4" blue="0.4" /></rect>
+	</element>
+	<element name="guide" defstate="0">
+		<rect state="0"><color alpha="0.0" /></rect>
+		<rect state="1"><color alpha="0.55" /></rect>
+	</element>
+
+	<view name="Screen and Piano">
+		<bounds x="0" y="0" width="1440" height="1420" />
+		<screen index="0"><bounds x="20" y="0" width="1400" height="1050" /></screen>
+		<element ref="panel"><bounds x="0" y="1070" width="1440" height="350" /></element>
+		<element ref="keybed"><bounds x="20" y="1100" width="1400" height="300" /></element>
+
+		<!-- White keys, F3 through E5. -->
+		<element id="key_f3" ref="whitekey" inputtag="PIANO2" inputmask="0x80"><bounds x="21" y="1100" width="98" height="300" /></element>
+		<element id="key_g3" ref="whitekey" inputtag="PIANO2" inputmask="0x40"><bounds x="121" y="1100" width="98" height="300" /></element>
+		<element id="key_a3" ref="whitekey" inputtag="PIANO2" inputmask="0x20"><bounds x="221" y="1100" width="98" height="300" /></element>
+		<element id="key_b3" ref="whitekey" inputtag="PIANO2" inputmask="0x10"><bounds x="321" y="1100" width="98" height="300" /></element>
+		<element id="key_c4" ref="whitekey" inputtag="PIANO0" inputmask="0x01"><bounds x="421" y="1100" width="98" height="300" /></element>
+		<element id="key_d4" ref="whitekey" inputtag="PIANO0" inputmask="0x02"><bounds x="521" y="1100" width="98" height="300" /></element>
+		<element id="key_e4" ref="whitekey" inputtag="PIANO0" inputmask="0x10"><bounds x="621" y="1100" width="98" height="300" /></element>
+		<element id="key_f4" ref="whitekey" inputtag="PIANO0" inputmask="0x08"><bounds x="721" y="1100" width="98" height="300" /></element>
+		<element id="key_g4" ref="whitekey" inputtag="PIANO0" inputmask="0x04"><bounds x="821" y="1100" width="98" height="300" /></element>
+		<element id="key_a4" ref="whitekey" inputtag="PIANO1" inputmask="0x80"><bounds x="921" y="1100" width="98" height="300" /></element>
+		<element id="key_b4" ref="whitekey" inputtag="PIANO2" inputmask="0x01"><bounds x="1021" y="1100" width="98" height="300" /></element>
+		<element id="key_c5" ref="whitekey" inputtag="PIANO2" inputmask="0x08"><bounds x="1121" y="1100" width="98" height="300" /></element>
+		<element id="key_d5" ref="whitekey" inputtag="PIANO2" inputmask="0x04"><bounds x="1221" y="1100" width="98" height="300" /></element>
+		<element id="key_e5" ref="whitekey" inputtag="PIANO2" inputmask="0x02"><bounds x="1321" y="1100" width="98" height="300" /></element>
+
+		<!-- The guide lights illuminate the white keys independently of their contacts. -->
+		<repeat count="14">
+			<param name="key" start="0" increment="1" />
+			<param name="x" start="21" increment="100" />
+			<element id="guide~key~" name="piano_key_light~key~" ref="guide" clickthrough="yes">
+				<bounds x="~x~" y="1100" width="98" height="300" />
+				<color red="1.0" green="0.25" blue="0.4" />
+			</element>
+		</repeat>
+
+		<!-- Draw black keys last so they receive clicks in the overlapping area. -->
+		<element id="key_fs3" ref="blackkey" inputtag="PIANO1" inputmask="0x01"><bounds x="90" y="1100" width="60" height="190" /></element>
+		<element id="key_gs3" ref="blackkey" inputtag="PIANO0" inputmask="0x80"><bounds x="190" y="1100" width="60" height="190" /></element>
+		<element id="key_as3" ref="blackkey" inputtag="PIANO1" inputmask="0x02"><bounds x="290" y="1100" width="60" height="190" /></element>
+		<element id="key_cs4" ref="blackkey" inputtag="PIANO0" inputmask="0x20"><bounds x="490" y="1100" width="60" height="190" /></element>
+		<element id="key_ds4" ref="blackkey" inputtag="PIANO0" inputmask="0x40"><bounds x="590" y="1100" width="60" height="190" /></element>
+		<element id="key_fs4" ref="blackkey" inputtag="PIANO1" inputmask="0x40"><bounds x="790" y="1100" width="60" height="190" /></element>
+		<element id="key_gs4" ref="blackkey" inputtag="PIANO1" inputmask="0x10"><bounds x="890" y="1100" width="60" height="190" /></element>
+		<element id="key_as4" ref="blackkey" inputtag="PIANO1" inputmask="0x20"><bounds x="990" y="1100" width="60" height="190" /></element>
+		<element id="key_cs5" ref="blackkey" inputtag="PIANO1" inputmask="0x04"><bounds x="1190" y="1100" width="60" height="190" /></element>
+		<element id="key_ds5" ref="blackkey" inputtag="PIANO1" inputmask="0x08"><bounds x="1290" y="1100" width="60" height="190" /></element>
+	</view>
+</mamelayout>

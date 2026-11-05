@@ -35,7 +35,7 @@ protected:
 	virtual bool instruction_enabled() const override;
 	virtual void prepare_instruction(u8 op) override;
 	virtual void update_peripherals() override;
-	virtual u8 interrupt_mask() override;
+	virtual u16 interrupt_mask() override;
 	virtual bool manage_idle_on_interrupt(u8 ints) override;
 	virtual void interrupt_taken() override;
 	virtual bool timer1_split_uses_input() const override;

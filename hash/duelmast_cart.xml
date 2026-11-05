@@ -12,12 +12,14 @@ license:CC0-1.0
 
 	<!-- only the single known cart exists for this system -->
 
-	<software name="ver1" supported="no">
+	<!-- Native duel/result/restart checks pass; a player victory remains unverified. -->
+	<software name="ver1" supported="partial">
 		<description>Duel Masters: Duel Station Senyō Cartridge Ver.1</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="デュエルマスターズ　デュエルステーション専用カートリッジ　Ver.1" />
-		<part name="cart" interface="ekara_cart">
+		<info name="usage" value="Boot with the scanner picture empty, then use File Manager to load a tightly cropped, upright image of a complete card front." />
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x800000">
 				<rom name="duelmasters_cart_ver1.u1" offset="0x000000" size="0x400000" crc="7ba0d51f" sha1="6227866c732ff0b5c9f5026ebabdf220a6c53cc1"/>
 				<rom name="duelmasters_cart_ver1.u3" offset="0x400000" size="0x400000" crc="1881fc17" sha1="daf201efac1073e790d94438dc49ac5b65df8d67"/>

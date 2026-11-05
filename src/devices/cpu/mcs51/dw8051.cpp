@@ -127,7 +127,7 @@ void dw8051_device::prepare_instruction(u8 op)
 	m_inst_cycles += cycles;
 }
 
-u8 dw8051_device::interrupt_mask()
+u16 dw8051_device::interrupt_mask()
 {
 	return BIT(m_pcon, PCON_PD) ? 0 : i8052_device::interrupt_mask();
 }

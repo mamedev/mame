@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="evio_cart" description="Tomy evio Media cartridges">
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
+
+	***********************************************************************************
+
+	evio Media cart listing
+
+	* = dumped
+	                                        Cartridge Colour
+
+	*eM1    - evio Selection 01               (translucent red)
+	*eM2    - evio Selection 02               (translucent red)
+	*eM3    - Anime Mix 1                     (yellow)
+	*eM4    - I Love Classic 1                (brown)
+	*eM5    - Healing Air 1                   (translucent green)
+	*eM6    - Drama Mix 1                     (blue)
+	*eM7    - Pure Kiss 1                     (pink)
+	*eM8    - Hard Soul 1                     (black)
+	*eM9    - evio Selection 03               (translucent red)
+	*eM10   - Anime Special: Pocket Monsters  (yellow)
+	*eM11   - Anime Mix 2                     (yellow)
+	*eM12   - I Love Classic 2                (brown)
+	*eM13   - Concerto Selection              (dark blue)
+	*eM14   - Disney Special 1                (light blue)
+	*eM15   - evio Selection 04               (translucent red)
+	*eM16   - Chisako Takashima Selection     (cream/gold)
+	*eM17   - Minna no evio                   (orange)
+	*eM18   - Evio Challenge!                 (red/pink)
+
+
+
+	Cartridge Pinout
+
+	A01|NC
+	A02|GND
+	A03|GND
+	A04|A16
+	A05|A17
+	A06|A18
+	A07|A19
+	A08|A20
+	A09|A21
+	A10|A22
+	A11|A23
+	A12|GND
+	A13|TO A18
+	A14|/CE
+	A15|NC (SEEPROM 6)
+	A16|NC (SEEPROM 5)
+	A17|NC
+	A18|TO A13 (internal ROM /CE)
+	A19|/OE
+	A20|NC (/WE)
+	A21|VCC (/RP)
+	A22|D00
+	A23|D01
+	A24|D02
+	A25|D03
+	A26|VCC
+	B01|NC
+	B02|VCC
+	B03|VCC
+	B04|A15
+	B05|A14
+	B06|A13
+	B07|A12
+	B08|A11
+	B09|A10
+	B10|A09
+	B11|A08
+	B12|A07
+	B13|A06
+	B14|A05
+	B15|A04
+	B16|A03
+	B17|A02
+	B18|A01
+	B19|A00
+	B20|VCC
+	B21|GND
+	B22|D07
+	B23|D06
+	B24|D05
+	B25|D04
+	B26|GND
+
+	-->
+
+	<!-- Songs:
+	    No.  Title
+	     1.  大きな古時計
+	     2.  COLORS
+	     3.  G線上のアリア
+	     4.  いつも何度でも
+	     5.  ミニハムずの結婚ソング
+	     6.  エレクトリカルパレード
+	     7.  もらい泣き
+	     8.  夜空ノムコウ
+	     9.  フラワー
+	    10.  バイオリン協奏曲
+	-->
+	<software name="em1" supported="no">
+		<description>evio Selection 01</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="エヴィオセレクション01"/>
+		<info name="serial" value="eM1"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em01.bin" size="0x080000" crc="01cfd6aa" sha1="e91f947bc7601af08d7e7395b7d14f7c32a22c51"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title
+	     1.  世界に1つだけの花
+	     2.  AS FOR ONE DAY
+	     3.  Voyage
+	     4.  君をのせて
+	     5.  It's a small world
+	     6.  ドナドナ
+	     7.  アイネクライネナハトムジーク
+	     8.  カノン
+	     9.  涙そうそう
+	    10.  地上の星
+	-->
+	<software name="em2" supported="no">
+		<description>evio Selection 02</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="エヴィオセレクション02"/>
+		<info name="serial" value="eM2"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em02.bin" size="0x080000" crc="f4c25b10" sha1="97627f6753bf21f30ec497656dbae3eaf4ca8386"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title
+	     1.  GRIP!
+	     2.  風のららら
+	     3.  true blue
+	     4.  風になる
+	     5.  やさしさに包まれたなら
+	     6.  ハッピーラッキー〜お願いミルモ〜
+	     7.  プリティ・ケーキ・マジック
+	     8.  迷Q!?-迷宮-MAKE★YOU-
+	     9.  ナージャ!
+	    10.  ムーンライト伝説
+	-->
+	<software name="em3" supported="no">
+		<description>Anime Mix 1</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="アニメミックス1"/>
+		<info name="serial" value="eM3"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em03.bin" size="0x080000" crc="2aa0107f" sha1="1f2302b0121819b8ea02409e23a7c21402e2632e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title
+	     1.  エリーゼのために
+	     2.  田園　第1楽章
+	     3.  白鳥の湖
+	     4.  ツィゴイネルワイゼン
+	     5.  天国と地獄
+	     6.  ボレロ
+	     7.  熊蜂の飛行
+	     8.  わが祖国よりモルダウ
+	     9.  主よ人の望みの喜びよ
+	    10.  ハンガリー舞曲第5番ト短調
+	-->
+	<software name="em4" supported="no">
+		<description>I Love Classic 1</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="アイラブクラッシク1"/>
+		<info name="serial" value="eM4"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em04.bin" size="0x080000" crc="22ad3e5b" sha1="e25269b1957e10cff6bb7590b912db9e62864c2d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title
+	     1.  energy flow
+	     2.  愛のうた
+	     3.  月のしずく
+	     4.  ワダツミの木
+	     5.  アヴェ・マリア
+	     6.  WILL
+	     7.  SAY YES
+	     8.  Best Friend
+	     9.  愛のあいさつ
+	    10.  情熱大陸
+	-->
+	<software name="em5" supported="no">
+		<description>Healing Air 1</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ヒーリングエアー1"/>
+		<info name="serial" value="eM5"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em05.bin" size="0x080000" crc="7ac2d917" sha1="9ff3da60c5333a5d97791dfcdf8ffc20244fc553"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title
+	     1.  踊る大捜査線のテーマ
+	     2.  古畑任三郎のテーマ
+	     3.  Ride on time
+	     4.  ラブストーリーは突然に
+	     5.  Everything
+	     6.  空と君のあいだに
+	     7.  孤独なカウボーイ
+	     8.  殺しのテーマ
+	     9.  琉球ムーン
+	    10.  遥かなる大地より
+	-->
+	<software name="em6" supported="no">
+		<description>Drama Mix 1</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ドラマミックス1"/>
+		<info name="serial" value="eM6"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em06.bin" size="0x080000" crc="7f67ff20" sha1="e94685b112c03615d6b27c21460a69c2b69c3419"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title
+	     1.  亜麻色の髪の乙女
+	     2.  fragile
+	     3.  SEASONS
+	     4.  Don't wanna cry
+	     5.  花火
+	     6.  I'm proud
+	     7.  未来予想図Ⅱ
+	     8.  PRIDE
+	     9.  M
+	    10.  LOVE2000
+	-->
+	<software name="em7" supported="no">
+		<description>Pure Kiss 1</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ピュアキッス1"/>
+		<info name="serial" value="eM7"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em07.bin" size="0x080000" crc="b507b926" sha1="af2872b738e57a42e22904c3f6df15b2bf5ead87"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title
+	     1.  熱き鼓動の果て
+	     2.  口唇
+	     3.  HEAVEN'S DRIVE
+	     4.  バンビーナ
+	     5.  歌舞伎町の女王
+	     6.  奇跡の地球
+	     7.  ROSIER
+	     8.  MARIONETTE
+	     9.  夢見る少女じゃいられない
+	    10.  ENDLESS RAIN
+	-->
+	<software name="em8" supported="no">
+		<description>Hard Soul 1</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ハードソウル1"/>
+		<info name="serial" value="eM8"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em08.bin" size="0x080000" crc="f41469c0" sha1="381e43b2a2fd716f3d91d47c7e899f02b2f52b91"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title
+	     1.  Do it! Now
+	     2.  ここにいるぜぇ!
+	     3.  WISH
+	     4.  恋愛レボリューション21
+	     5.  恋のダンスサイト
+	     6.  ちょこっとLOVE
+	     7.  ミニモニ。数え歌〜お風呂ば〜じょん〜
+	     8.  ね〜え?
+	     9.  ブギートレイン03
+	    10.  SHALL WE LOVE?
+	-->
+	<software name="em9" supported="no">
+		<description>evio Selection 03</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="エヴィオセレクション03"/>
+		<info name="serial" value="eM9"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em09.bin" size="0x080000" crc="17818b14" sha1="84058d60567972a336b36d8c406b1649956c8a2a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title
+	     1.  アドバンス・アドベンチャー
+	     2.  そこに空があるから
+	     3.  Ready Go!
+	     4.  ポケッターリ モンスターリ
+	     5.  OK!
+	     6.  ライバル!
+	     7.  かぞえてポケモンマスター
+	     8.  ニャースのパーティ
+	     9.  アドバンス・アドベンチャー（オーケストラアレンジ）
+	    10.  戦い
+	-->
+	<software name="em10" supported="no">
+		<description>Anime Special: Pocket Monsters</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="アニメスペシャル ポケットモンスター"/>
+		<info name="serial" value="eM10"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em10.bin" size="0x080000" crc="573d49ef" sha1="e2d528a2aa149d8ccbadf0c75ed5f75ca0e6bf9b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title
+	     1.  ヒカリヘ
+	     2.  LONG WAY
+	     3.  CHANGE THE WORLD
+	     4.  「名探偵コナン」メインテーマ
+	     5.  風の谷のナウシカ
+	     6.  カサブタ
+	     7.  ルージュの伝言
+	     8.  Believe
+	     9.  BOY'S HEART
+	    10.  おどるポンポコリン
+	-->
+	<software name="em11" supported="no">
+		<description>Anime Mix 2</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="アニメミックス2"/>
+		<info name="serial" value="eM11"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em11.bin" size="0x080000" crc="230f8f33" sha1="5bfbf8f5955de1908c24f42fba3d90f197a6d35f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title
+	     1.  運命
+	     2.  美しき青きドナウ
+	     3.  ワルキューレの騎行
+	     4.  クラリネットポルカ
+	     5.  展覧会の絵
+	     6.  ラデツキー行進曲
+	     7.  新世界より
+	     8.  威風堂々
+	     9.  交響曲第六番「悲愴」
+	    10.  トルコ行進曲
+	-->
+	<software name="em12" supported="no">
+		<description>I Love Classic 2</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="アイラブクラッシク2"/>
+		<info name="serial" value="eM12"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em12.bin" size="0x080000" crc="b8e2f986" sha1="62a341fd775a27317f6bf1630d55c15db262ab60"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title
+	     1.  世界に一つだけの花
+	     2.  LET IT BE
+	     3.  カルメン
+	     4.  ミッキーマウスマーチ
+	     5.  MY HEART WILL GO ON
+	     6.  アメイジンググレイス
+	     7.  アマリリス
+	     8.  メヌエット
+	     9.  ゆめいっぱい
+	    10.  組曲「惑星」より「木星」
+	-->
+	<software name="em13" supported="no">
+		<description>Concerto Selection</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="コンチェルトセレクション"/>
+		<info name="serial" value="eM13"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="em13.bin" size="0x080000" crc="f27756d5" sha1="90461bc44974d6a2b57ff3fa7ab3434acb6f0eef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title
+	     1.  サークル・オブ・ライフ
+	     2.  ユール・ビー・イン・マイ・ハート
+	     3.  ホール・ニュー・ワールド
+	     4.  アンダー・ザ・シー
+	     5.  ビューティー・アンド・ザ・ビースト
+	     6.  ハワイアン・ローラーコースター・ライド
+	     7.  ディス・イズ・ハロウィーン
+	     8.  魔法使いの弟子
+	     9.  星に願いを
+	    10.  ゴー・ザ・ディスタンス
+	-->
+	<software name="em14" supported="no">
+		<description>Disney Special 1</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="ディズニースペシャル1"/>
+		<info name="serial" value="eM14"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="em14.bin" size="0x100000" crc="7202b6c0" sha1="db92a462345b983c64f36bce07a700c1083a1359"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title
+	     1.  きよしこの夜
+	     2.  シャボン玉
+	     3.  さくら（独唱）
+	     4.  DEPARTURES
+	     5.  ふるさと
+	     6.  らいおんハート
+	     7.  クリスマス・イブ
+	     8.  WHITE LOVE
+	     9.  異邦人
+	    10.  交響曲第九番
+	-->
+	<software name="em15" supported="no">
+		<description>evio Selection 04</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="エヴィオセレクション04"/>
+		<info name="serial" value="eM15"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em15.bin" size="0x080000" crc="d3a12cc2" sha1="29fff4c9c6aedd156c9c9b3f3773c05916c6d5d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title
+	     1.  G線上のアリア
+	     2.  ルパン三世
+	     3.  太陽がいっぱい
+	     4.  オリビアを聴きながら
+	     5.  風のとおり道
+	     6.  春のスケッチ
+	     7.  タイスの瞑想曲
+	     8.  ブエノスアイレスの冬
+	     9.  君をのせて
+	    10.  ヴァイオリンチェロメドレー
+	-->
+	<software name="em16" supported="no">
+		<description>Chisako Takashima Selection</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="高嶋ちさ子セレクション"/>
+		<info name="serial" value="eM16"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em16.bin" size="0x080000" crc="39c86418" sha1="8442cb3923e1f09b369ece58ca52bbb2f0a7ab19"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title
+	     1.  ゆうき100%
+	     2.  だんご3きょうだい
+	     3.  WAになっておどろう
+	     4.  ハム太郎とっとこうた
+	     5.  ブンブンブン
+	     6.  おにのパンツ
+	     7.  おさかなてんごく
+	     8.  ドラえもんのうた
+	     9.  ひょっこりひょうたんじま
+	    10.  おおきなふるどけい
+	-->
+	<software name="em17" supported="no">
+		<description>Minna no evio</description>
+		<year>2003</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="みんなのエヴィオ"/>
+		<info name="serial" value="eM17"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em17.bin" size="0x080000" crc="5e41cde0" sha1="bee48cf8f41f715c5ba762c243cbfdd8bafeb3b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- eM18 uses a 24LC08 EEPROM. -->
+	<!-- Songs:
+	    No.  Title
+	     1.  アンパンマンのマーチ
+	     2.  おしえて
+	     3.  となりのトトロ
+	     4.  いとしのエリー
+	     5.  LOVEマシーン
+	     6.  いい日旅立ち
+	     7.  Yeah!めっちゃホリディ
+	     8.  ユーモレスク
+	     9.  アイーダより凱旋行進曲
+	    10.  ウィリアム・テル序曲
+	-->
+	<software name="em18" supported="no">
+		<description>evio Challenge!</description>
+		<year>2004</year>
+		<publisher>Tomy</publisher>
+		<info name="alt_title" value="エヴィオチャレンジ!"/>
+		<info name="serial" value="eM18"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c08_direct"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="evio_em18.bin" size="0x100000" crc="725a5720" sha1="062316f860cb6ca3c29d9c1e63ea4973b1eebcd8"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

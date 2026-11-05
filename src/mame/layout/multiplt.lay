@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:MagikalUnicorn
+-->
+<mamelayout version="2">
+
+	<element name="red_lamp" defstate="0">
+		<disk state="0"><color red="0.22" green="0.01" blue="0.01" /></disk>
+		<disk state="1"><color red="1.00" green="0.08" blue="0.03" /></disk>
+	</element>
+
+	<element name="yellow_lamp" defstate="0">
+		<disk state="0"><color red="0.22" green="0.14" blue="0.00" /></disk>
+		<disk state="1"><color red="1.00" green="0.75" blue="0.03" /></disk>
+	</element>
+
+	<element name="green_lamp" defstate="0">
+		<disk state="0"><color red="0.00" green="0.16" blue="0.03" /></disk>
+		<disk state="1"><color red="0.05" green="1.00" blue="0.12" /></disk>
+	</element>
+
+	<view name="Illuminated Buttons">
+		<bounds x="0" y="0" width="4" height="3.6" />
+
+		<screen index="0">
+			<bounds x="0" y="0" width="4" height="3" />
+		</screen>
+
+		<element name="lamp0" ref="red_lamp" inputtag="CONTROLS" inputmask="0x04">
+			<bounds x="1.23" y="3.08" width="0.34" height="0.34" />
+		</element>
+		<element name="lamp1" ref="yellow_lamp" inputtag="CONTROLS" inputmask="0x08">
+			<bounds x="1.83" y="3.16" width="0.34" height="0.34" />
+		</element>
+		<element name="lamp2" ref="green_lamp" inputtag="CONTROLS" inputmask="0x20">
+			<bounds x="2.43" y="3.08" width="0.34" height="0.34" />
+		</element>
+	</view>
+
+</mamelayout>

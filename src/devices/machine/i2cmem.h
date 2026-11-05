@@ -47,6 +47,7 @@ public:
 	void write_scl(int state);
 	void write_wc(int state);
 	int read_sda();
+	void reset_bus();
 
 protected:
 	// construction/destruction

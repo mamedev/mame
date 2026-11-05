@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="hikara_cart" description="Takara Tomy Hi-kara cartridges">
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
+
+	***********************************************************************************
+
+	cartridge pinout
+
+	01 | NC                         27 | GND
+	02 | connects to 13             28 | NC
+	03 | A15                        29 | NC
+	04 | A14                        30 | NC
+	05 | A13                        31 | NC
+	06 | A12                        32 | VCC
+	07 | A11                        33 | D07
+	08 | A10                        34 | D06
+	09 | A09                        35 | D05
+	10 | A08                        36 | D04
+	11 | A07                        37 | D03
+	12 | A06                        38 | D02
+	13 | connects to 02             39 | D01
+	14 | CE                         40 | D00
+	15 | A05                        41 | GND
+	16 | A04                        42 | WE
+	17 | A03                        43 | OE
+	18 | A02                        44 | VCC
+	19 | A01                        45 | NC
+	20 | A00                        46 | A22
+	21 | VCC                        47 | A21
+	22 | NC                         48 | A20
+	23 | NC                         49 | A19
+	24 | NC                         50 | A18
+	25 | NC                         51 | A17
+	26 | GND                        52 | A16
+
+	-->
+
+	<!-- User cartridges are advertised as 'prepaid' and come in 5,10, or 20 song capacity for the user to download songs to.
+	     The service is no longer available.
+	-->
+
+	<!--
+	        * = dumped
+
+	        * Best Hit Collection Volume 1: J-Pop 1         BH0801001   Light Blue
+	        * Best Hit Collection Volume 2: J-Pop 2         BH0801002   Bright Pink
+	        * Best Hit Collection Volume 3: J-Pop 3         BH0801003   Grey
+	        * Best Hit Collection Volume 4: Anime Song 1    BH0802001   Deep Pink
+	        * Best Hit Collection Volume 5: Anime Song 2    BH0802002   Yellow
+	        * Best Hit Collection Volume 6: Kid's Songs 1   BH0803001   Green
+	        * Best Hit Collection Volume 7 (no subtitle)    BH0904001   Blue
+	        * Best Hit Collection Volume 8 (no subtitle)    BH0904002   Orange
+
+	        * Pocket Monsters Special                       -none-      Yellow
+	        * Ciao Special                                  CC0907001   Translucent Pink - came with the 2009/06 issue of the Ciao (ちゃお) manga
+	        * PIZZA-LA                                      PZ0909001   Translucent Pink
+
+	        4 User Cartridge (5 Capacity)                   n/a         Translucent Grey/White
+	        2 User Cartridge (10 Capacity)                  n/a         Translucent Pink
+	        3 User Cartridge (20 Capacity)                  n/a         Translucent Blue
+	-->
+
+	<!-- Songs:
+	    No.  Title               Artist    Title (Latin)  Artist (Latin)
+	     1.  キューティーハニー  倖田來未  Cutie Honey    Kōda Kumi
+	     2.  KissHug             aiko      KissHug        aiko
+	     3.  さくらんぼ          大塚愛    Sakuranbo      Ōtsuka Ai
+	     4.  Dream Fighter       Perfume   Dream Fighter  Perfume
+	     5.  ポリリズム          Perfume   Polyrhythm     Perfume
+	-->
+	<software name="user5" supported="no">
+		<description>Hi-kara 5-song capacity user cartridge (used, with 5 songs, set 1) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="A29L800ATV.u1" size="0x100000" crc="679f92e9" sha1="9af880f7f09c0e616d0f0b3cd499ab42de3ab210"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title                         Artist                Title (Latin)              Artist (Latin)
+	     1.  崖の上のポニョ                藤岡藤巻と大橋のぞみ  Gake no Ue no Ponyo        Fujioka Fujimaki & Ōhashi Nozomi
+	     2.  タンタンターン!               MilkyWay              Tan Tan Tān!               MilkyWay
+	     3.  ハートのエースが出てこない    キャンディーズ        Heart no Ace ga Detekonai  Candies
+	     4.  プリキュア5、スマイル go go!  工藤真由              PreCure 5, Smile Go Go!    Kudō Mari
+	-->
+	<software name="user5a" cloneof="user5" supported="no">
+		<description>Hi-kara 5-song capacity user cartridge (used, with 4 songs, set 1) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="usercart_4songs.bin" size="0x100000" crc="e0c3d088" sha1="d2063a65e0e9526ac0f9907fcf82d1f55bd488ed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title               Artist                Title (Latin)        Artist (Latin)
+	     1.  崖の上のポニョ      藤岡藤巻と大橋のぞみ  Gake no Ue no Ponyo  Fujioka Fujimaki & Ōhashi Nozomi
+	     2.  キセキ              GReeeeN               Kiseki               GReeeeN
+	     3.  タッチ              岩崎良美              TOUCH                Iwasaki Yoshimi
+	     4.  キューティーハニー  倖田來未              Cutie Honey          Kōda Kumi
+	-->
+	<software name="user5b" cloneof="user5" supported="no">
+		<description>Hi-kara 5-song capacity user cartridge (used, with 4 songs, set 2) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="usercart_5_2.u1" size="0x100000" crc="800aaba1" sha1="bc1bf147ae83d9c601a053d856a6d7f9d7402ff0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title             Artist   Title (Latin)     Artist (Latin)
+	     1.  刹那              GReeeeN  Setsuna           GReeeeN
+	     2.  ヤッターマンの歌  ET-KING  Yatterman no Uta  ET-KING
+	-->
+	<software name="user5c" cloneof="user5" supported="no">
+		<description>Hi-kara 5-song capacity user cartridge (used, with 2 songs) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="usercart_5_1.u1" size="0x100000" crc="a2761c33" sha1="957b95983037bedb42759502e0111fd9008cb26f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs (existing metadata; ROM menu not verified):
+	    No.  Title               Artist  Title (Latin)                 Artist (Latin)
+	     1.  言葉より大切なもの  嵐      Kotoba Yori Taisetsu na Mono  ARASHI
+	     2.  時代（ジダイ）      嵐      Jidai                         ARASHI
+	     3.  PIKA☆☆NCHI DOUBLE   嵐      PIKA☆☆NCHI DOUBLE             ARASHI
+	     4.  Believe             嵐      Believe                       ARASHI
+	     5.  Love so sweet       嵐      Love so sweet                 ARASHI
+	-->
+	<software name="user5d" supported="no">
+		<description>Hi-kara 5-song capacity user cartridge (used, with 5 songs, set 2) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="usercart_5_3.bin" size="0x100000" crc="c4d75e61" sha1="225d5be516ca54393ad5ce7e46b6a445d51d0c35"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<!-- Songs:
+	    No.  Title               Artist              Title (Latin)        Artist (Latin)
+	     1.  雫                  スキマスイッチ      Shizuku              Sukima Switch
+	     2.  鐘を鳴らして        BONNIE PINK         Kane o Narashite     BONNIE PINK
+	     3.  ホウキ雲            RYTHEM              Houkigumo            RYTHEM
+	     4.  さくらびと          SunSet Swish        Sakurabito           SunSet Swish
+	     5.  again               YUI                 again                YUI
+	     6.  カルマ              BUMP OF CHICKEN     Karma                BUMP OF CHICKEN
+	     7.  創聖のアクエリオン  AKINO               Genesis of AQUARION  AKINO
+	     8.  レイン              シド                Rain                 SID
+	     9.  きっと伝えて        松たか子            Kitto Tsutaete       Matsu Takako
+	    10.  メリッサ            ポルノグラフィティ  Melissa              Porno Graffitti
+	-->
+	<software name="user10" supported="no">
+		<description>Hi-kara 10-song capacity user cartridge (used, with 10 songs, set 1) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="cartdump_pink.u1" size="0x200000" crc="235c1c52" sha1="8ce599227e2824d7ca98e3d0f9bb163c09d8fa58"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title                       Artist                       Title (Latin)                 Artist (Latin)
+	     1.  陽は、また昇る              アラジン                     Hi wa, Mata Noboru            Aladdin
+	     2.  ポリリズム                  Perfume                      Polyrhythm                    Perfume
+	     3.  世界がひとつになるまで      Ya-Ya-yah                    Sekai ga Hitotsu ni Naromade  Ya-Ya-yah
+	     4.  亜麻色の髪の乙女            島谷ひとみ                   Amairo no Kami no Otome       Shimatani Hitomi
+	     5.  サボテンの花                チューリップ                 Saboten no Hana               TULIP
+	     6.  涙そうそう                  夏川りみ                     Nada Sōsō                     Natsukawa Rimi
+	     7.  侍戦隊シンケンジャー        サイキックラバー(Project.R)  Samurai Sentai Shinkenger     PSYCHIC LOVER (Project.R)
+	     8.  Journey through the Decade  Gackt                        Journey through the Decade    Gackt
+	     9.  PEACH                       大塚愛                       PEACH                         Ōtsuka Ai
+	    10.  一秒ごとに Love for you     倉木麻衣                     Ichibyō-goto ni Love for you  Kuraki Mai
+	-->
+	<software name="user10a" cloneof="user10" supported="no">
+		<description>Hi-kara 10-song capacity user cartridge (used, with 10 songs, set 2) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="usercart_10.u1" size="0x200000" crc="51e64d8e" sha1="90e5592446101807f47772b0868ce3de5d78b9f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title                                 Artist      Title (Latin)                                 Artist (Latin)
+	     1.  君をのせて                            井上あずみ  Kimi o Nosete                                 Inoue Azumi
+	     2.  陽は、また昇る                        アラジン    Hi wa, Mata Noboru                            aladdin
+	     3.  タッチ                                岩崎良美    TOUCH                                         Iwasaki Yoshimi
+	     4.  ハッピー♥ラッキー～お願いミルモ～     Kaede-chan  Happy♥Lucky (Onegai Mirumo)                   Kaede-chan
+	     5.  こころのたまご                        Buono!      Kokoro no Tamago                              Buono!
+	     6.  遥か                                  GReeeeN     Haruka                                        GReeeeN
+	     7.  Love yourself ～君が嫌いな君が好き～  KAT-TUN     Love yourself (Kimi ga Kiraina Kimi ga Suki)  KAT-TUN
+	     8.  Butterfly                             木村カエラ  Butterfly                                     Kimura Kaela
+	     9.  さくらんぼ                            大塚愛      Sakuranbo                                     Ōtsuka Ai
+	-->
+	<software name="user10b" cloneof="user10" supported="no">
+		<description>Hi-kara 10-song capacity user cartridge (used, with 9 songs) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="usercart10.bin" size="0x200000" crc="48bac1fc" sha1="87c26fe1ada9940bf2712ae86dffa207dbeb2123"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="user20" supported="no">
+		<description>Hi-kara 20-song capacity user cartridge (blank) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="hikara_usercart20.u1" size="0x200000" crc="70147ead" sha1="d7274312700cf90e54135695d10b6a5108a980ab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title                   Artist              Title (Latin)              Artist (Latin)
+	     1.  一番綺麗な私を          中島美嘉            Ichiban Kireina Watashi o  Nakajima Mika
+	     2.  わかれうた              中島みゆき          Wakareuta                  Nakajima Miyuki
+	     3.  地上の星                中島みゆき          Chijō no Hoshi             Nakajima Miyuki
+	     4.  ロビンソン              スピッツ            Robinson                   Spitz
+	     5.  蕾                      コブクロ            Tsubomi                    KOBUKURO
+	     6.  粉雪                    レミオロメン        Konayuki                   Remioromen
+	     7.  木枯しに抱かれて        小泉今日子          Kogarashi ni Dakarete      Koizumi Kyōko
+	     8.  あなたに会えてよかった  小泉今日子          Anata ni Aeteyokatta       Koizumi Kyōko
+	     9.  能動的三分間            東京事変            Nōdōteki Sanpunkan         Tōkyō Jihen
+	    10.  ワンルーム・ディスコ    Perfume             One Room Disco             Perfume
+	    11.  VOICE                   Perfume             VOICE                      Perfume
+	    12.  時をかける少女          原田知世            Toki o Kakeru Shōjo        Harada Tomiyo
+	    13.  アポロ                  ポルノグラフィティ  Apollo                     Porno Graffitti
+	    14.  冬がはじまるよ          槇原敬之            Fuyu ga Hajimaru yo        Makihara Noriyuki
+	    15.  遠く遠く                槇原敬之            Tōku Tōku                  Makihara Noriyuki
+	    16.  もう一度キスしたかった  B'z                 Mō Ichidō Kiss Shitakatta  B'z
+	    17.  LOVE PHANTOM            B'z                 LOVE PHANTOM               B'z
+	    18.  天体観測                BUMP OF CHICKEN     Tentai Kansoku             BUMP OF CHICKEN
+	    19.  情熱の薔薇              THE BLUE HEARTS     Jōnetsu no Bara            THE BLUE HEARTS
+	    20.  ありがとう              いきものがかり      Arigatō                    Ikimonogakari
+	-->
+	<software name="user20a" cloneof="user20" supported="no">
+		<description>Hi-kara 20-song capacity user cartridge (used, with 20 songs, set 1) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="cartdump_blue.u1" size="0x200000" crc="4912b515" sha1="0b004821b07b82eb05c3ce7b0c89e55b35dff20b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title                               Artist                  Title (Latin)                            Artist (Latin)
+	     1.  もうすぐクリスマス                  里田まい with 合田兄妹  Mōsugu Christmas                         Satoda Mai with Gōda Kyōdai
+	     2.  ブルーバード                        いきものがかり          Blue Bird                                Ikimonogakari
+	     3.  さくらんぼ                          大塚愛                  Sakuranbo                                Ōtsuka Ai
+	     4.  千の風になって                      秋川雅史                Sen no Kaze ni Natte                     Akikawa Masafumi
+	     5.  想い出がいっぱい                    H2O                     Amaide ga Ippai                          H2O
+	     6.  残酷な天使のテーゼ                  高橋洋子                Sankoku na Tenshi no Thesis              Takahashi Yōko
+	     7.  青春おでん                          twe'lv                  Seishun Oden                             twe'lv
+	     8.  テルーの唄                          手嶌葵                  Therru no Uta                            Teshima Aoi
+	     9.  ゲゲゲの鬼太郎                      泉谷しげる              Gegege no Kitarō                         Izumiya Shigeru
+	    10.  気まぐれロマンティック              いきものがかり          Kimagure Romantic                        Ikimonogakari
+	    11.  世界に一つだけの花                  SMAP                    Sekai ni Hitotsu Dake no Hana            SMAP
+	    12.  地上の星                            中島みゆき              Chijō no Hoshi                           Nakajima Miyuki
+	    13.  碧いうさぎ                          酒井法子                Aoi Usagi                                Sakai Noriko
+	    14.  未来へ                              Kiroro                  Mirai e                                  Kiroro
+	    15.  弱虫サンタ                          羞恥心                  Yowamushi Santa                          Shūchishin
+	    16.  泣かないで                          羞恥心                  Nakanaide                                Shūchishin
+	    17.  羞恥心                              羞恥心                  Shūchishin                               Shūchishin
+	    18.  炎神戦隊ゴーオンジャー              高橋秀幸(Project.R)     ENGINE SENTAI GO-ONGER                   Takahashi Hideyuki
+	    19.  いつも何度でも                      木村弓                  Itsumo Nandodemo                         Kimura Yumi
+	    20.  ニホンノミカタ-ネバダカラキマシタ-  矢島美容室              Nihon no Mikata -Nevada kara Kimashita-  Yajima Biyōshitsu
+	-->
+	<software name="user20b" cloneof="user20" supported="no">
+		<description>Hi-kara 20-song capacity user cartridge (used, with 20 songs, set 2) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="usercart_20.u1" size="0x200000" crc="e047d928" sha1="a75ca2035d74bf4292562576872389e012ceb1ad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title              Artist                     Title (Latin)      Artist (Latin)
+	     1.  Ultra Music Power  Hey! Say! JUMP             Ultra Music Power  Hey! Say! JUMP
+	     2.  Dreams come true   Hey! Say! JUMP             Dreams come true   Hey! Say! JUMP
+	     3.  CHE.R.RY           YUI                        CHE.R.RY           YUI
+	     4.  PEACH              大塚愛                     PEACH              Ōtsuka Ai
+	     5.  三日月             絢香                       Mikazuki           Ayaka
+	     6.  Hi-Five            Superfly                   Hi-Five            Superfly
+	     7.  love the world     Perfume                    love the world     Perfume
+	     8.  銀河鉄道999        EXILE feat.VERBAL (m-flo)  Ginga Tetsudō 999  EXILE feat.VERBAL (m-flo)
+	     9.  虹                 Aqua Timez                 Niji               Aqua Timez
+	    10.  泣かないで         羞恥心                     Nakanaide          Shūchishin
+	-->
+	<software name="bh1jpop1" supported="no">
+		<description>Best Hit Collection Volume 1: J-Pop 1 (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.1 J-POP①"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0801001.u1" size="0x200000" crc="298dff43" sha1="c644a00154d129808261688482943b93440c33dc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title                            Artist          Title (Latin)                    Artist (Latin)
+	     1.  weeeek                           NEWS            weeeek                           NEWS
+	     2.  SUMMER TIME                      NEWS            SUMMER TIME                      NEWS
+	     3.  DON'T U EVER STOP                KAT-TUN         DON'T U EVER STOP                KAT-TUN
+	     4.  SUMMER SONG                      YUI             SUMMER SONG                      YUI
+	     5.  おかえり                         絢香            Okaeri                           Ayaka
+	     6.  帰りたくなったよ                 いきものがかり  Kaeritaku Natta yo               Ikimonogakari
+	     7.  愛のうた                         倖田來未        Ai no Uta                        Kōda Kumi
+	     8.  Flavor Of Life -Ballad Version-  宇多田ヒカル    Flavor Of Life -Ballad Version-  Utada Hikaru
+	     9.  愛唄                             GReeeeN         Aiuta                            GReeeeN
+	    10.  羞恥心                           羞恥心          Shūchishin                       Shūchishin
+	-->
+	<software name="bh2jpop2" supported="no">
+		<description>Best Hit Collection Volume 2: J-Pop 2 (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.2 J-POP②"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0801002.u1" size="0x200000" crc="ef4c68f3" sha1="ea9d62d6ba98f3c067f39b6d2e9d8b03d441b315"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title               Artist                  Title (Latin)     Artist (Latin)
+	     1.  Love so sweet       嵐                      Love so sweet     ARASHI
+	     2.  One Love            嵐                      One Love          ARASHI
+	     3.  Your Seed           Hey! Say! JUMP          Your Seed         Hey! Say! JUMP
+	     4.  KissHug             aiko                    KissHug           aiko
+	     5.  Prisoner Of Love    宇多田ヒカル            Prisoner Of Love  Utada Hikaru
+	     6.  ポリリズム          Perfume                 Polyrhythm        Perfume
+	     7.  ロケットスニーカー  大塚愛                  Rocket Sneaker    Ōtsuka Ai
+	     8.  Laugh away          YUI                     Laugh away        YUI
+	     9.  キセキ              GReeeeN                 Kiseki            GReeeeN
+	    10.  そばにいるね        青山テルマ feat.SoulJa  Soba ni Iru ne    Aoyama Thelma feat.SoulJa
+	-->
+	<software name="bh3jpop3" supported="no">
+		<description>Best Hit Collection Volume 3: J-Pop 3 (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.3 J-POP③"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0801003.u1" size="0x200000" crc="66fbff9d" sha1="02cc6f288a56ec4d598b6d51d920985caa8a7458"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title            Artist                                        Title (Latin)     Artist (Latin)
+	     1.  アナタボシ       Milky Way                                     Anataboshi        Milky Way
+	     2.  チャンス！       月島きらり starring 久住小春(モーニング娘。)  Chance!           Tsukishima Kirari starring Kusumi Koharu (Morning Musume)
+	     3.  ハッピー☆彡      月島きらり starring 久住小春(モーニング娘。)  Happy             Tsukishima Kirari starring Kusumi Koharu (Morning Musume)
+	     4.  はなをぷーん     きら☆ぴか                                     Hana o Pūn        Kira☆Pika
+	     5.  バラライカ       月島きらり starring 久住小春(モーニング娘。)  Balalaika         Tsukishima Kirari starring Kusumi Koharu (Morning Musume)
+	     6.  恋☆カナ          月島きらり starring 久住小春(モーニング娘。)  Koi☆Kana          Tsukishima Kirari starring Kusumi Koharu (Morning Musume)
+	     7.  サンサンGOGO     Milky Way                                     Sansan GOGO       Milky Way
+	     8.  Kiss!Kiss!Kiss!  Buono!                                        Kiss!Kiss!Kiss!   Buono!
+	     9.  みんなだいすき   Buono!                                        Minna Daisuki     Buono!
+	    10.  こころのたまご   Buono!                                        Kokoro no Tamago  Buono!
+	-->
+	<software name="bh4anim1" supported="no">
+		<description>Best Hit Collection Volume 4: Anime Song 1</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.4 アニメソング①"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0802001.u1" size="0x200000" crc="1294fbcc" sha1="aa68b6aeb497837f8fed595a3537f49a2a17dd11"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title                Artist           Title (Latin)               Artist (Latin)
+	     1.  O2(オー・ツー)       ORANGE RANGE     O2 (Ō Tsū)                  ORANGE RANGE
+	     2.  resonance            T.M.Revolution   resonance                   T.M.Revolution
+	     3.  DAYBREAK'S BELL      L'Arc～en～Ciel  DAYBREAK'S BELL             L'Arc～en～Ciel
+	     4.  88                   LM.C             88                          LM.C
+	     5.  DIVE TO WORLD        CHERRYBLOSSOM    DIVE TO WORLD               CHERRYBLOSSOM
+	     6.  七転八起☆至上主義！  KOTOKO           Shichitenhakki☆Shijōshugi!  KOTOKO
+	     7.  Rolling star         YUI              Rolling star                YUI
+	     8.  かさなる影           Hearts Grow      Kasanaru Kage               Hearts Grow
+	     9.  ブルーバード         いきものがかり   Blue Bird                   Ikimonogakari
+	    10.  グロリアス マインド  ZARD             Glorious Mind               ZARD
+	-->
+	<software name="bh5anim2" supported="no">
+		<description>Best Hit Collection Volume 5: Anime Song 2</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.5 アニメソング②"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0802002.u1" size="0x200000" crc="d367d127" sha1="9bbe04ca274caf9b70f542e317ea71028a4886ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title                                  Artist  Title (Latin)                     Artist (Latin)
+	     1.  おしりかじり虫                                 Oshirikajiri Mushi
+	     2.  おさかな天国                                   O-Sakana no Tengoku
+	     3.  アンパンマンのマーチ                           Anpanman no March
+	     4.  勇気りんりん                                   Yūkirinrin
+	     5.  さんぽ                                         Sanpo
+	     6.  となりのトトロ                                 Tonari no Totoro
+	     7.  にんげんっていいな                             Ningentte Īna
+	     8.  ハグしちゃお                                   Hug-shichao
+	     9.  夢をかなえてドラえもん                         Yume o Kanaete Doraemon
+	    10.  プリキュア5、フル・スロットル GO GO！          Purikyua 5, Full Throttle GO GO!
+	-->
+	<software name="bh6kids1" supported="no">
+		<description>Best Hit Collection Volume 6: Kids' Song 1</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.6 キッズソング①"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0803001.u1" size="0x200000" crc="2921a2ba" sha1="0708d985784669c4289636a87876163285f8cb97"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title                   Artist                Title (Latin)           Artist (Latin)
+	     1.  崖の上のポニョ          藤岡藤巻と大橋のぞみ  Gake no Ue no Ponyo     Fujioka Fujimaki & Ōhashi Nozomi
+	     2.  CHE.R.RY                YUI                   CHE.R.RY                YUI
+	     3.  I'll be                 YUI                   I'll be                 YUI
+	     4.  ブルーバード            いきものがかり        Blue Bird               Ikimonogakari
+	     5.  気まぐれロマンティック  いきものがかり        Kimagure Romantic       Ikimonogakari
+	     6.  さくらんぼ              大塚愛                Sakuranbo               Ōtsuka Ai
+	     7.  赤い糸                  新垣結衣              Akai Ito                Aragaki Yui
+	     8.  真夜中のシャドーボーイ  Hey! Say! JUMP        Mayonaka no Shadow Boy  Hey! Say! JUMP
+	     9.  陽は、また昇る          アラジン              Hi wa, Mata Noboru      Aladdin
+	    10.  羞恥心                  羞恥心                Shūchishin              Shūchishin
+	-->
+	<software name="bh7" supported="no">
+		<description>Best Hit Collection Volume 7</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.7"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0904001.u1" size="0x200000" crc="20d58743" sha1="25e348663d2d41bb96267c4430d2eb858bbb79c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title                     Artist            Title (Latin)                   Artist (Latin)
+	     1.  Beautiful days            嵐                Beautiful days                  ARASHI
+	     2.  truth                     嵐                truth                           ARASHI
+	     3.  One Love                  嵐                One Love                        ARASHI
+	     4.  Dream Fighter             Perfume           Dream Fighter                   Perfume
+	     5.  Lovers Again              EXILE             Lovers Again                    EXILE
+	     6.  手紙 ～拝啓 十五の君へ～  アンジェラ・アキ  Tegami -Haikei Jūgo no Kimi e-  Angela Aki
+	     7.  何度も                    青山テルマ        Nando mo                        Aoyama Thelma
+	     8.  weeeek                    NEWS              weeeek                          NEWS
+	     9.  愛唄                      GReeeeN           Aiuta                           GReeeeN
+	    10.  キセキ                    GReeeeN           Kiseki                          GReeeeN
+	-->
+	<software name="bh8" supported="no">
+		<description>Best Hit Collection Volume 8</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ベストヒットコレクション vol.8"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="bh0904002.u1" size="0x200000" crc="fd24eefa" sha1="015ce9845dd2fb36a04e2c1cdb50d2fc9d4e14c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title                         Artist                               Title (Latin)                      Artist (Latin)
+	     1.  ハイタッチ！                  サトシ(松本梨香)&ヒカリ(豊口めぐみ)  High Touch!                        Satoshi (Matsumoto Rika) & Hikari (Toyoguchi Megumi)
+	     2.  あしたはきっと                歌奈子                               Ashita wa Kitto                    Kanako
+	     3.  Together                      あきよしふみえ                       Together                           Akiyoshi Fumie
+	     4.  君のそばで～ヒカリのテーマ～  グリン                               Kimi no Soba de -Hikari no Theme-  Grin
+	     5.  風のメッセージ                水橋舞                               Kaze no Message                    Mizuhashi Mai
+	     6.  めざせポケモンマスター        松本梨香                             Mezase Pokémon Master              Matsumoto Rika
+	-->
+	<software name="pokemon" supported="no">
+		<description>Utatte Asonde! Best Hit Pokémon</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="うたってあそんで！ベストヒットポケモン"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="r-08b0541.u1" size="0x200000" crc="8b6a6d4b" sha1="5f264bff2deedbd61d844c4f8ba4421ac598636c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Songs:
+	    No.  Title                   Artist                                        Title (Latin)           Artist (Latin)
+	     1.  さくらんぼ              大塚愛                                        Sakuranbo               Ōtsuka Ai
+	     2.  崖の上のポニョ          藤岡藤巻と大橋のぞみ                          Gake no Ue no Ponyo     Fujioka Fujimaki & Ōhashi Nozomi
+	     3.  虹                      Aqua Timez                                    Niji                    Aqua Timez
+	     4.  キセキ                  GReeeeN                                       Kiseki                  GReeeeN
+	     5.  ブルーバード            いきものがかり                                Blue Bird               Ikimonogakari
+	     6.  真夜中のシャドーボーイ  Hey! Say! JUMP                                Mayonaka no Shadow Boy  Hey! Say! JUMP
+	     7.  はぴ☆はぴ サンデー！    月島きらり starring 久住小春(モーニング娘。)  Hapi☆Hapi Sunday!       Tsukishima Kirari starring Kusumi Koharu (Morning Musume)
+	     8.  ひまわり                遊助                                          Himawari                Yūsuke
+	     9.  めちゃモテ I LOVE YOU   MM学園合唱部                                  Mecha Mote I LOVE YOU   MM Gakuen Gasshōbu
+	    10.  明日の記憶              嵐                                            Ashita no Kioku         ARASHI
+	-->
+	<software name="ciao" supported="no">
+		<description>Ciao Best Hit Cartridge</description>
+		<year>2009</year>
+		<publisher>Takara Tomy</publisher>
+		<info name="alt_title" value="ちゃお ベストヒットカートリッジ"/>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="cc0907001.u1" size="0x200000" crc="45f6b2a3" sha1="b3b1b3f269b128a2b09aa932f77d53da53f6130f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- the presentation on this is almost the same as a 10 song user cartridge, but it's a standalone, non-reprogrammable release -->
+	<!-- 2009 date is from cart label, shows 2008 when running -->
+	<!-- Songs:
+	    No.  Title                         Artist                     Title (Latin)                  Artist (Latin)
+	     1.  キセキ                        GReeeeN                    Kiseki                         GReeeeN
+	     2.  さくらんぼ                    大塚愛                     Sakuranbo                      Ōtsuka Ai
+	     3.  Let's!フレッシュプリキュア！  茂家瑞季                   Let's! Furesshu Purikyua!      Moie Mizuki
+	     4.  崖の上のポニョ                藤岡藤巻と大橋のぞみ       Gake no Ue no Ponyo            Fujioka Fujimaki & Ōhashi Nozomi
+	     5.  夢をかなえてドラえもん        mao,ドラっ子隊,水田わさび  Yume o Kanaete Doraemon        mao, Dorakko-tai, Mizuta Wasabi
+	     6.  となりのトトロ                井上あずみ                 Tonari no Totoro               Inoue Azumi
+	     7.  ぼくはくま                    宇多田ヒカル               Boku wa Kuma                   Utada Hikaru
+	     8.  遥か                          GReeeeN                    Haruka                         GReeeeN
+	     9.  Everything                    嵐                         Everything                     ARASHI
+	    10.  世界に一つだけの花            SMAP                       Sekai ni Hitotsu Dake no Hana  SMAP
+	-->
+	<software name="pizzala" supported="no">
+		<description>Hi-kara PIZZA-LA</description>
+		<year>2009</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="xavix_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="pz0909001.u1" size="0x200000" crc="1c759eaf" sha1="bcab1f0b16c2866501c9cdeea9df7b9878bbda2a"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
