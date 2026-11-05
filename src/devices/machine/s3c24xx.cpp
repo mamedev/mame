@@ -1406,7 +1406,7 @@ void s3c24xx_device::lcd_dma_init()
 	lcd_dma_reload();
 	m_lcd_bswp = BIT(m_lcd_lcdcon5, 1);
 	m_lcd_hwswp = BIT(m_lcd_lcdcon5, 0);
-	m_lcd_tpal = m_lcd_tpal;
+	m_lcd_tpal = 0;
 	//LOGMASKED(LOG_LCD_DMA, "LCD - bppmode %d hwswp %d bswp %d\n", m_lcd_bppmode, m_lcd_hwswp, m_lcd_bswp);
 	m_lcd_dma_data = 0;
 	m_lcd_dma_bits = 0;
