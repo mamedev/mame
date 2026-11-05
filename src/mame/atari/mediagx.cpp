@@ -105,7 +105,8 @@ public:
 		m_lpt0(*this, "lpt0"),
 		m_guns(*this, "GUN%u", 0U),
 		m_jammit_outputs(*this, "jammit_out%u", 0U),
-		m_triggers(*this, "TRIGGERS")
+		m_triggers(*this, "TRIGGERS"),
+		m_render_options(*this, "RENDER_OPTIONS")
 	{ }
 
 	void init_a51site4();
@@ -136,6 +137,7 @@ private:
 	[[maybe_unused]] void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t io20_r(offs_t offset);
 	void io20_w(offs_t offset, uint8_t data);
+	void invalidate_render_cache();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	template <offs_t N> uint32_t speedup_r(address_space &space) { return generic_speedup(space, N); }
 	void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y);
@@ -169,6 +171,10 @@ private:
 	required_ioport_array<4> m_guns;
 	output_finder<14> m_jammit_outputs;
 	required_ioport m_triggers;
+	required_ioport m_render_options;
+	bitmap_rgb32 m_last_normal_frame;
+	bool m_last_normal_frame_valid = false;
+	uint32_t m_last_normal_pitch = 0;
 
 	uint32_t m_disp_ctrl_reg[256/4]{};
 	int m_frame_width = 0;
@@ -242,8 +248,16 @@ static const rgb_t cga_palette[16] =
 	rgb_t( 0xff, 0x55, 0x55 ), rgb_t( 0xff, 0x55, 0xff ), rgb_t( 0xff, 0xff, 0x55 ), rgb_t( 0xff, 0xff, 0xff ),
 };
 
+void mediagx_state::invalidate_render_cache()
+{
+	m_last_normal_frame_valid = false;
+	m_last_normal_pitch = 0;
+}
+
 void mediagx_state::video_start()
 {
+	m_screen->register_screen_bitmap(m_last_normal_frame);
+	machine().save().register_postload(save_prepost_delegate(FUNC(mediagx_state::invalidate_render_cache), this));
 	int i;
 	for (i=0; i < 16; i++)
 	{
@@ -387,6 +401,18 @@ void mediagx_state::draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 uint32_t mediagx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const uint32_t pitch = (m_disp_ctrl_reg[DC_LINE_DELTA] & 0x3ff) * 4;
+	const uint32_t start = m_disp_ctrl_reg[DC_FB_ST_OFFSET];
+	const bool gun_flash = !(m_disp_ctrl_reg[DC_OUTPUT_CFG] & 1) && !pitch &&
+		m_last_normal_frame_valid && m_last_normal_pitch &&
+		start == 2 * m_frame_height * m_last_normal_pitch &&
+		start < m_vram.bytes() && m_vram[start / 4] == 0xffffffff;
+	if (BIT(m_render_options->read(), 0) && gun_flash)
+	{
+		copybitmap(bitmap, m_last_normal_frame, 0, 0, 0, 0, cliprect);
+		return 0;
+	}
+
 	bitmap.fill(0, cliprect);
 
 	draw_framebuffer( bitmap, cliprect);
@@ -394,6 +420,12 @@ uint32_t mediagx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	if (m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)   // don't show MDA text screen on 16-bit mode. this is basically a hack
 	{
 		draw_cga(bitmap, cliprect);
+	}
+	if (pitch && !(m_disp_ctrl_reg[DC_OUTPUT_CFG] & 1))
+	{
+		copybitmap(m_last_normal_frame, bitmap, 0, 0, 0, 0, cliprect);
+		m_last_normal_pitch = pitch;
+		m_last_normal_frame_valid = true;
 	}
 	return 0;
 }
@@ -754,6 +786,10 @@ static INPUT_PORTS_START(mediagx)
 	PORT_BIT(0xff, 0x80, IPT_LIGHTGUN_X) PORT_MINMAX(0, 255) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_PLAYER(2)
 	PORT_START("GUN3")
 	PORT_BIT(0xff, 0x80, IPT_LIGHTGUN_Y) PORT_MINMAX(0, 255) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_PLAYER(2)
+	PORT_START("RENDER_OPTIONS")
+	PORT_CONFNAME(0x01, 0x01, "Gun Flash (presentation only)")
+	PORT_CONFSETTING(0x00, "Original")
+	PORT_CONFSETTING(0x01, "Hidden (LCD lightguns)")
 INPUT_PORTS_END
 
 void mediagx_state::machine_start()
@@ -770,6 +806,7 @@ void mediagx_state::machine_start()
 
 void mediagx_state::machine_reset()
 {
+	invalidate_render_cache();
 #if SPEEDUP_HACKS
 	m_video_poll_pc = 0;
 	m_video_poll_vna = 0;
@@ -997,3 +1034,4 @@ ROM_END
 
 GAME( 1998, a51site4, 0       , mediagx, mediagx, mediagx_state, init_a51site4,  ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.01, September 7, 1998)", MACHINE_NOT_WORKING )
 GAME( 1998, a51site4a,a51site4, mediagx, mediagx, mediagx_state, init_a51site4,  ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.0, September 11, 1998)", MACHINE_NOT_WORKING )
+
