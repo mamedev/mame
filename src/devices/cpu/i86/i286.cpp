@@ -845,11 +845,11 @@ void i80286_cpu_device::code_descriptor(uint16_t selector, uint16_t offset, int 
 							PUSH(read_word(oldstk+(i*2)));
 					}
 					else
-						check_permission(SS, m_regs.w[SP]-4, 4, I8086_READ);
+						check_permission(SS, uint16_t(m_regs.w[SP]-4), 4, I8086_READ);
 
 					SET_ACC(gatedesc);
 					write_word(addr+4, gatedesc[2]);
-					m_sregs[CS]=IDXTBL(gatesel) | DPL(r);
+					m_sregs[CS]=IDXTBL(gatesel) | DPL(CONF(r) ? m_sregs[CS] : r);
 					m_limit[CS]=LIMIT(gatedesc);
 					m_base[CS]=BASE(gatedesc);
 					m_rights[CS]=RIGHTS(gatedesc);
@@ -984,7 +984,7 @@ void i80286_cpu_device::interrupt_descriptor(int number, int hwint, int error)
 				PUSH(oldsp);
 			}
 			else
-				check_permission(SS, m_regs.w[SP] - ((error != -1) ? 8 : 6), (error != -1) ? 8 : 6, I8086_READ);
+				check_permission(SS, uint16_t(m_regs.w[SP] - ((error != -1) ? 8 : 6)), (error != -1) ? 8 : 6, I8086_READ);
 
 			SET_ACC(gatedesc);
 			write_word(addr + 4, gatedesc[2]);
@@ -993,7 +993,7 @@ void i80286_cpu_device::interrupt_descriptor(int number, int hwint, int error)
 			PUSH(m_ip);
 			if((hwint == 1) && (error != -1))
 				PUSH(error);
-			m_sregs[CS] = IDXTBL(gatesel) | DPL(r);
+			m_sregs[CS] = IDXTBL(gatesel) | DPL(CONF(r) ? m_sregs[CS] : r);
 			m_limit[CS] = LIMIT(gatedesc);
 			m_base[CS] = BASE(gatedesc);
 			m_rights[CS] = RIGHTS(gatedesc);
@@ -1398,7 +1398,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 
 				case 0x60: // i_pusha
 				{
-					check_permission(SS, m_regs.w[SP]-16, 16, I8086_WRITE);
+					check_permission(SS, uint16_t(m_regs.w[SP]-16), 16, I8086_WRITE);
 					uint32_t tmp = m_regs.w[SP];
 					PUSH(m_regs.w[AX]);
 					PUSH(m_regs.w[CX]);
@@ -1671,23 +1671,23 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 					uint32_t level;
 
 					nb |= fetch() << 8;
-					level = fetch();
+					level = fetch() % 32;
 					CLK(!level ? ENTER0 : (level == 1) ? ENTER1 : ENTER_BASE);
 					if(level > 1)
 						m_icount -= level * m_timing[ENTER_COUNT];
 					PUSH(m_regs.w[BP]);
-					m_regs.w[BP] = m_regs.w[SP];
-					m_regs.w[SP] -= nb;
+					uint16_t fp = m_regs.w[SP];
 					for (int i=1; i<level; i++)
 					{
-						PUSH( GetMemW(SS,m_regs.w[BP] - i*2) );
+						m_regs.w[BP] -= 2;
+						PUSH(GetMemW(SS,m_regs.w[BP]));
 					}
 					if (level)
-					{
-						PUSH(m_regs.w[BP]);
-					}
+						PUSH(fp);
+					m_regs.w[BP] = fp;
+					m_regs.w[SP] -= nb;
+					break;
 				}
-				break;
 
 				case 0xc9: // i_leave
 					m_regs.w[SP] = m_regs.w[BP];
