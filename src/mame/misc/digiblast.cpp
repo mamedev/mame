@@ -9,6 +9,12 @@
 
     TODO: verify cartridge part numbers and spare-area dumps, EEPROM wiring,
     battery sensing, TV encoder, USB accessories and LCD timing.
+
+	The LCD gets configured at ~150Hz in LCD mode for the games, but we seem
+	to be matching documentation, is it correct?  Some games run smoother and
+	are still rate limited, others such as gormitim seem too fast.  We default
+	to TV mode.
+
 */
 
 #include "emu.h"
@@ -102,7 +108,7 @@ static INPUT_PORTS_START( digiblast )
 	PORT_BIT(0xc0fe, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("DISPLAY")
-	PORT_CONFNAME(0x0100, 0x0100, "Display Connection")
+	PORT_CONFNAME(0x0100, 0x0000, "Display Connection")
 	PORT_CONFSETTING(0x0100, "LCD")
 	PORT_CONFSETTING(0x0000, "TV")
 INPUT_PORTS_END
@@ -242,4 +248,4 @@ ROM_END
 
 } // Anonymous namespace
 
-CONS( 2005, digiblst,  0, 0, digiblast,  digiblast,  digiblast_state, empty_init, "Nikko Entertainment B.V. / Grey Innovation", "digiBLAST", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 2005, digiblst,  0, 0, digiblast,  digiblast,  digiblast_state, empty_init, "Nikko Entertainment B.V. / Grey Innovation", "digiBLAST", MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )
