@@ -69,6 +69,7 @@ public:
 	gse1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_nvram(*this, "nvram")
 		, m_pio1(*this, "pio1")
 		, m_pio2(*this, "pio2")
 		, m_ctc1(*this, "ctc1")
@@ -92,6 +93,7 @@ protected:
 
 private:
 	required_device<z80_device> m_maincpu;
+	required_device<nvram_device> m_nvram;
 
 	required_device<z80pio_device> m_pio1;
 	required_device<z80pio_device> m_pio2;
@@ -460,6 +462,8 @@ void gse1_state::gse1(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gse1_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &gse1_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
+
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
 	Z80PIO(config, m_pio1, 4_MHz_XTAL/2);
 	m_pio1->in_pa_callback().set( FUNC(gse1_state::pio1_pa_r));
