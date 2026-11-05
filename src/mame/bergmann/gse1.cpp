@@ -297,7 +297,7 @@ void gse1_state::pio1_pb_w(uint8_t data)
 	// Steckerleiste 15
 	m_pio1_pb = data;
 	//coins out
-	machine().bookkeeping().coin_counter_w(3,BIT(m_pio1_pb,0)); // PB0 0.10DM 
+	machine().bookkeeping().coin_counter_w(3,BIT(m_pio1_pb,0)); // PB0 0.10DM
 	machine().bookkeeping().coin_counter_w(2,BIT(m_pio1_pb,1)); // PB1 1DM
 	machine().bookkeeping().coin_counter_w(1,BIT(m_pio1_pb,2)); // PB2 2DM
 	machine().bookkeeping().coin_counter_w(0,BIT(m_pio1_pb,3)); // PB3 5DM
@@ -380,27 +380,27 @@ static INPUT_PORTS_START( gse1 )
 	PORT_START("RETURN")
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x20, 0x20, "Level switch 2DM" ) // Pegelschalter 2,-
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x40, 0x40, "Level switch 5DM" ) // Pegelschalter 5,-
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Return")
 
 	PORT_START("COIN")
 	PORT_DIPNAME( 0x01, 0x01, "Level switch 10Pf" ) // Pegelschalter -,10
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x02, 0x02, "Level switch 1DM" ) // Pegelschalter 1,-
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	// TODO: These next 2 light barriers are triggered by the coin.
 	PORT_DIPNAME( 0x04, 0x04, "String light barrier" ) // Fadenfalle-Lichtschranke
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x08, 0x08, "Safety light barrier" ) // Sicherheits-Lichtschranke
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) // 5DM
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) // 2DM
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 ) // 1DM
