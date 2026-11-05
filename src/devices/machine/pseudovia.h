@@ -31,9 +31,9 @@ public:
 	void vbl_irq_w(int state);
 	void scc_irq_w(int state);
 	virtual void asc_irq_w(int state);
-	void scsi_irq_w(int state);
+	virtual void scsi_irq_w(int state);
 	void scsi_drq_w(int state);
-	void slot_irq_w(int state);
+	virtual void slot_irq_w(int state);
 
 protected:
 	pseudovia_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -105,8 +105,18 @@ public:
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
 
+	using pseudovia_device::slot_irq_w;
+	virtual void scsi_irq_w(int state) override;
+	virtual void slot_irq_w(int state) override;
+
 protected:
+	virtual void device_start() override;
 	virtual void pseudovia_recalc_irqs() override;
+
+private:
+	int m_scsi_irq;
+	int m_slot_irq;
+	u8 m_orb, m_ddrb, m_ddra, m_acr, m_pcr;
 };
 
 // device type definition
