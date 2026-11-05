@@ -380,7 +380,7 @@ void nscsi_cdrom_pcfx_device::scsi_command()
 			scsi_status_complete(SS_GOOD);
 			break;
 		case 0xdc:  // NEC: eject
-			LOGCMD("0xdc NEC Eject\n");
+			LOGCMD("0xdc NEC Eject Immed=%d\n", BIT(m_scsi_cmdbuf[1], 0));
 			report_condition(SK_ILLEGAL_REQUEST, NEC_SKC_TOP_LOADING);
 			break;
 		case 0xdd: nec_read_subq(); break;
@@ -392,7 +392,7 @@ void nscsi_cdrom_pcfx_device::scsi_command()
 		{
 			const bool loej = BIT(m_scsi_cmdbuf[4], 1);
 			const bool start = BIT(m_scsi_cmdbuf[4], 0);
-			LOGCMD("0x1b Start/Stop Unit LoEj=%d Start=%d\n", loej, start);
+			LOGCMD("0x1b Start/Stop Unit Immed=%d LoEj=%d Start=%d\n", BIT(m_scsi_cmdbuf[1], 0), loej, start);
 
 			if (loej)
 			{

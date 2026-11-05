@@ -433,8 +433,9 @@ void nscsi_cdrom_device::scsi_command()
 		break;
 
 	case SC_START_STOP_UNIT:
-		LOG("command %s UNIT%s\n", (m_scsi_cmdbuf[4] & 0x1) ? "START" : "STOP",
-			(m_scsi_cmdbuf[4] & 0x2) ? (m_scsi_cmdbuf[4] & 0x1) ? " (LOAD)" : " (EJECT)" : "");
+		// TODO: only reports good status, the motor state and LoEj (load/eject) aren't emulated; a drive
+		// that handles them overrides this
+		LOG("command START STOP UNIT Immed=%d LoEj=%d Start=%d\n", BIT(m_scsi_cmdbuf[1], 0), BIT(m_scsi_cmdbuf[4], 1), BIT(m_scsi_cmdbuf[4], 0));
 		scsi_status_complete(SS_GOOD);
 		break;
 
