@@ -175,7 +175,7 @@ license:CC0-1.0
 		<year>200?</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
-			<feature name="slot" value="nand_64m" />
+			<feature name="slot" value="nand_64m_r" />
 			<dataarea name="rom" size="0x4200000">
 				<rom name="cuccioli cerca amici [g] (it).bin" size="0x4200000" crc="40a18574" sha1="7d5d2201a0f93b083ea32e116da8d2fe530f36f5" />
 			</dataarea>

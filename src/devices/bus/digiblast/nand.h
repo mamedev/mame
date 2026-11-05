@@ -64,12 +64,25 @@ public:
 	digiblast_nand_64m_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
+	digiblast_nand_64m_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
-DECLARE_DEVICE_TYPE(DIGIBLAST_NAND_16M, digiblast_nand_16m_device)
-DECLARE_DEVICE_TYPE(DIGIBLAST_NAND_32M, digiblast_nand_32m_device)
-DECLARE_DEVICE_TYPE(DIGIBLAST_NAND_64M, digiblast_nand_64m_device)
+class digiblast_nand_64m_r_device : public digiblast_nand_64m_device
+{
+public:
+	digiblast_nand_64m_r_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+};
+
+DECLARE_DEVICE_TYPE(DIGIBLAST_NAND_16M,   digiblast_nand_16m_device)
+DECLARE_DEVICE_TYPE(DIGIBLAST_NAND_32M,   digiblast_nand_32m_device)
+DECLARE_DEVICE_TYPE(DIGIBLAST_NAND_64M,   digiblast_nand_64m_device)
+DECLARE_DEVICE_TYPE(DIGIBLAST_NAND_64M_R, digiblast_nand_64m_r_device)
 
 #endif // MAME_BUS_DIGIBLAST_NAND_H
