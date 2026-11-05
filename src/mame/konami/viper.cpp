@@ -2066,6 +2066,7 @@ INPUT_PORTS_START( thrild2 )
 	PORT_DIPNAME( 0x08, 0x00, "Memory Card Check On Boot" ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING( 0x08, DEF_STR( On ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW:3" ) // Never read by Thrill Drive 2 (checked in ver EBB, JAA and AAA)
 
 	PORT_MODIFY("IN3")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Shift Down")
@@ -2087,12 +2088,25 @@ INPUT_PORTS_END
 INPUT_PORTS_START( gticlub2 )
 	PORT_INCLUDE( thrild2 )
 
+	PORT_MODIFY("IN2")
+	PORT_DIPNAME( 0x02, 0x02, "DIP3" ) PORT_DIPLOCATION("SW:3")
+	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+
 	// K-Type steering wheel
 	PORT_MODIFY("AN0")
 	PORT_BIT( 0x1ff, 0x000, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x101,0x0ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
 
 	PORT_MODIFY("AN3")
 	PORT_BIT( 0x1ff, 0x000, IPT_PEDAL3 ) PORT_NAME("Handbrake Lever") PORT_MINMAX(0x101,0x0ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_REVERSE
+INPUT_PORTS_END
+
+// Thrill Drive 2 versions with the GTI Club 2 controls (K-type steering wheel and handbrake)
+INPUT_PORTS_START( thrild2j )
+	PORT_INCLUDE( gticlub2 )
+
+	PORT_MODIFY("IN2")
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW:3" )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( gticlub2ea )
@@ -3317,8 +3331,8 @@ GAME(2001, sscopexu,  sscopex,   viper,     sscopex,    viper_subscreen_state, i
 GAME(2001, sogeki,    sscopex,   viper,     sogeki,     viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Sogeki (ver JRB 1.01)", MACHINE_NOT_WORKING)
 GAME(2002, sscopefh,  kviper,    viper,     sscopefh,   viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter (ver EAA)", MACHINE_NOT_WORKING) // UK only?
 GAME(2001, thrild2,   kviper,    viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EBB)", MACHINE_NOT_WORKING)
-GAME(2001, thrild2j,  thrild2,   viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver JAA)", MACHINE_NOT_WORKING)
-GAME(2001, thrild2a,  thrild2,   viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA)", MACHINE_NOT_WORKING)
+GAME(2001, thrild2j,  thrild2,   viper,     thrild2j,   viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver JAA)", MACHINE_NOT_WORKING)
+GAME(2001, thrild2a,  thrild2,   viper,     thrild2j,   viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA)", MACHINE_NOT_WORKING)
 GAME(2001, thrild2c,  thrild2,   viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EAA)", MACHINE_NOT_WORKING)
 GAME(2002, tsurugi,   kviper,    viper,     tsurugi,    viper_state, init_vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB)", MACHINE_NOT_WORKING)
 GAME(2002, tsurugij,  tsurugi,   viper,     tsurugi,    viper_state, init_vipercf,  ROT0,  "Konami", "Tsurugi (ver JAC)", MACHINE_NOT_WORKING)
