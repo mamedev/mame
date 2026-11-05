@@ -3631,6 +3631,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/sab3019.h,MACHINES["SAB3019"] = true
+---------------------------------------------------
+
+if MACHINES["SAB3019"] then
+	files {
+		MAME_DIR .. "src/devices/machine/sab3019.cpp",
+		MAME_DIR .. "src/devices/machine/sab3019.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/sc16is741.h,MACHINES["SC16IS741"] = true
 ---------------------------------------------------
 if MACHINES["SC16IS741"] then
