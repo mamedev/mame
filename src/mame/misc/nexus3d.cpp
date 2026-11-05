@@ -271,8 +271,21 @@ TIMER_CALLBACK_MEMBER(nexus3d_key_device::reply_ready)
 
 // VR3511F has the older GRP3D command set, also used by MES_GRP3D02.
 // In particular, its texture and primitive registers differ from POLLUX.
+
+// Register state latched when work is queued, so the CPU can program the
+// next command while the rasterizer threads are still drawing.
 struct nexus3d_poly_data
 {
+	uint32_t state;         // 0x28
+	uint32_t blend;         // 0x30
+	uint32_t segment;       // 0x38
+	uint32_t key;           // 0x40
+	uint32_t texinfo;       // 0x50
+	uint32_t texsize;       // 0x54
+	uint32_t texblend;      // 0x60
+	uint32_t fill;          // 0xa0
+	uint32_t target;        // 0xb0
+	uint16_t palette[256];
 };
 
 class nexus3d_renderer : public poly_manager<float, nexus3d_poly_data, 7>
@@ -281,15 +294,25 @@ public:
 	nexus3d_renderer(running_machine &machine, address_space &space, uint32_t *mainram, uint32_t *texram, uint32_t *regs,
 		float (*working)[4], float (*output)[3][4], uint16_t (*palette)[256])
 		: poly_manager<float, nexus3d_poly_data, 7>(machine),
-		m_space(space), m_mainram(mainram), m_texram(texram), m_regs(regs), m_working(working), m_output(output), m_palette(palette)
+		m_space(space), m_mainram(mainram), m_texram(texram), m_regs(regs), m_working(working), m_output(output), m_palette(palette),
+		m_texture_used{}, m_pending(false), m_unprotected(false)
 	{ }
 
 	void execute(uint32_t control);
 	uint16_t display_pixel(int x, int y) const;
 
+	// Queued work reads only the texture blocks it has marked and writes only
+	// render targets at 0x07000000-0x07ffffff (anything else is finished
+	// before execute() returns), so only CPU accesses to those have to wait.
+	static constexpr offs_t TARGET_START = 0x07000000, TARGET_END = 0x07ffffff;
+	void sync();
+	bool pending() const { return m_pending; }
+	bool texture_used(offs_t address) const { return m_pending && BIT(m_texture_used[(address & 0x7ffffff) >> 17], (address >> 11) & 63); }
+
 private:
 	static uint32_t tiled_address(uint32_t segment, uint32_t x, uint32_t y, bool texture);
 	static uint32_t target_address(uint32_t info, uint32_t x, uint32_t y);
+	static bool in_target_window(uint32_t segment) { return (segment & 0x7f8) == (TARGET_START >> 21); }
 	uint32_t *memory_pointer(uint32_t address) const;
 	uint16_t read_pixel(uint32_t address) const;
 	void write_pixel(uint32_t address, uint16_t color);
@@ -297,10 +320,12 @@ private:
 	void draw_scanline(int32_t y, extent_t const &extent, nexus3d_poly_data const &data, int threadid);
 	void fill_memory();
 	void load_palette();
+	void latch_draw();
+	void mark_texture(uint32_t segment, uint32_t x0, uint32_t x1, uint32_t y0, uint32_t y1);
 	void draw_primitives();
 	void run_gte(int vertex, bool render);
 	void draw_triangle();
-	uint16_t texture_pixel(int u, int v) const;
+	uint16_t texture_pixel(nexus3d_poly_data const &data, int u, int v) const;
 	float reg_float(int address) const { return std::bit_cast<float>(m_regs[address / 4]); }
 
 	address_space &m_space;
@@ -310,6 +335,9 @@ private:
 	float (*const m_working)[4];
 	float (*const m_output)[3][4];
 	uint16_t (*const m_palette)[256];
+	uint64_t m_texture_used[0x8000000 >> 17]; // one bit per 2 KiB block (64 bytes by 32 lines)
+	bool m_pending;
+	bool m_unprotected;
 };
 
 uint32_t nexus3d_renderer::tiled_address(uint32_t segment, uint32_t x, uint32_t y, bool texture)
@@ -370,9 +398,9 @@ void nexus3d_renderer::execute(uint32_t control)
 		return;
 	switch (control & 3)
 	{
-	case 0: draw_primitives(); break;
-	case 1: run_gte(BIT(control, 6, 2) % 3, true); break;
-	case 2: draw_triangle(); break;
+	case 0: latch_draw(); draw_primitives(); break;
+	case 1: latch_draw(); run_gte(BIT(control, 6, 2) % 3, true); break;
+	case 2: latch_draw(); draw_triangle(); break;
 	case 3:
 		switch (BIT(control, 3, 2))
 		{
@@ -382,8 +410,79 @@ void nexus3d_renderer::execute(uint32_t control)
 		}
 		break;
 	}
-	// CPU accesses and subsequent commands must see completed memory writes.
+	// Work the CPU-side checks can't see has to finish now.
+	if (m_unprotected)
+		sync();
+}
+
+void nexus3d_renderer::sync()
+{
 	wait();
+	if (m_pending)
+	{
+		std::fill(std::begin(m_texture_used), std::end(m_texture_used), 0);
+		m_pending = m_unprotected = false;
+	}
+}
+
+void nexus3d_renderer::latch_draw()
+{
+	nexus3d_poly_data &data = object_data().next();
+	data.state = m_regs[0x28 / 4];
+	data.blend = m_regs[0x30 / 4];
+	data.segment = m_regs[0x38 / 4];
+	data.key = m_regs[0x40 / 4];
+	data.texinfo = m_regs[0x50 / 4];
+	data.texsize = m_regs[0x54 / 4];
+	data.texblend = m_regs[0x60 / 4];
+	data.target = m_regs[0xb0 / 4];
+	m_pending = true;
+	if (!in_target_window(BIT(data.target, 16, 11)))
+		m_unprotected = true;
+	if (!BIT(data.state, 1))
+		return;
+
+	// Mark the texture memory texture_pixel() can read.
+	uint32_t const info = data.texinfo, size = data.texsize;
+	uint32_t const format = BIT(info, 19, 2);
+	uint32_t const shift = (format < 2) ? 2 - format : 0;
+	bool const indexed = BIT(info, 16);
+	uint32_t const umask = ((BIT(size, 16, 8) + 1) << (indexed ? 4 : (shift + 1))) - 1;
+	uint32_t const vmask = ((BIT(size, 24, 8) + 1) << (indexed ? 4 : 1)) - 1;
+	uint32_t const xbase = (BIT(info, 25) << 10) | ((size & 0xff) << 2);
+	uint32_t const ybase = (BIT(info, 26) << 9) | (BIT(size, 8, 8) << 1);
+	uint32_t const segment = data.segment & 0x7ff;
+	if (format < 2)
+		std::copy(std::begin(m_palette[0]), std::end(m_palette[0]), std::begin(data.palette));
+	if ((segment & 0x7c0) != 0x300)
+		m_unprotected = true;
+	else if (indexed)
+	{
+		// The tile map, then tiles anywhere on its page.
+		mark_texture(segment, xbase, xbase + (umask >> 3) * 2 + 1, ybase, ybase + (vmask >> 3));
+		mark_texture(segment, BIT(info, 25) << 10, (BIT(info, 25) << 10) | 0x3ff, BIT(info, 26) << 9, (BIT(info, 26) << 9) | 0x1ff);
+	}
+	else
+		mark_texture(segment, xbase, xbase + ((umask * 2) >> shift) + 1, ybase, ybase + vmask);
+}
+
+void nexus3d_renderer::mark_texture(uint32_t segment, uint32_t x0, uint32_t x1, uint32_t y0, uint32_t y1)
+{
+	// Coordinates past the sub-segment wrap; just cover all of it.
+	if (x1 > 0x7ff || y1 > 0x3ff)
+	{
+		x0 = y0 = 0;
+		x1 = 0x7ff;
+		y1 = 0x3ff;
+	}
+	for (uint32_t y = y0 & ~0x1f; y <= y1; y += 0x20)
+	{
+		for (uint32_t x = x0 & ~0x3f; x <= x1; x += 0x40)
+		{
+			uint32_t const block = (tiled_address(segment, x, y, true) & 0x7ffffff) >> 11;
+			m_texture_used[block >> 6] |= uint64_t(1) << (block & 63);
+		}
+	}
 }
 
 void nexus3d_renderer::fill_memory()
@@ -391,13 +490,17 @@ void nexus3d_renderer::fill_memory()
 	uint32_t const start = m_regs[0xa4 / 4], end = m_regs[0xa8 / 4];
 	vertex_t const v0(float(start & 0x3ff), float(BIT(start, 16, 10)));
 	vertex_t const v1(float((end & 0x3ff) + 1), float(BIT(end, 16, 10) + 1));
-	object_data().next();
+	nexus3d_poly_data &data = object_data().next();
+	data.fill = m_regs[0xa0 / 4];
+	m_pending = true;
+	if (!in_target_window(BIT(data.fill, 16, 11)))
+		m_unprotected = true;
 	render_tile<0>(rectangle(0, 1023, 0, 1023), render_delegate(&nexus3d_renderer::fill_scanline, this), v0, v1);
 }
 
 void nexus3d_renderer::fill_scanline(int32_t y, extent_t const &extent, nexus3d_poly_data const &data, int threadid)
 {
-	uint32_t const info = m_regs[0xa0 / 4];
+	uint32_t const info = data.fill;
 	for (int x = extent.startx; x < extent.stopx; x++)
 		write_pixel(tiled_address(BIT(info, 16, 11), x * 2, y, false), uint16_t(info));
 }
@@ -414,9 +517,9 @@ void nexus3d_renderer::load_palette()
 		m_palette[BIT(info, 16)][first + i] = read_pixel(tiled_address(segment, x + (i & 7) * 2, y + (i >> 3), true));
 }
 
-uint16_t nexus3d_renderer::texture_pixel(int u, int v) const
+uint16_t nexus3d_renderer::texture_pixel(nexus3d_poly_data const &data, int u, int v) const
 {
-	uint32_t const info = m_regs[0x50 / 4], size = m_regs[0x54 / 4];
+	uint32_t const info = data.texinfo, size = data.texsize;
 	uint32_t const format = BIT(info, 19, 2);
 	uint32_t const shift = (format < 2) ? 2 - format : 0;
 	bool const indexed = BIT(info, 16);
@@ -426,7 +529,7 @@ uint16_t nexus3d_renderer::texture_pixel(int u, int v) const
 	v = BIT(info, 1) ? std::clamp(v, 0, int(vmask)) : (v & vmask);
 	uint32_t const xbase = (BIT(info, 25) << 10) | ((size & 0xff) << 2);
 	uint32_t const ybase = (BIT(info, 26) << 9) | (BIT(size, 8, 8) << 1);
-	uint32_t const segment = m_regs[0x38 / 4] & 0x7ff;
+	uint32_t const segment = data.segment & 0x7ff;
 	uint32_t address;
 	if (indexed)
 	{
@@ -442,7 +545,7 @@ uint16_t nexus3d_renderer::texture_pixel(int u, int v) const
 		return read_pixel(address);
 	uint8_t const packed = read_pixel(address) >> ((address & 1) * 8);
 	uint8_t const index = format ? packed : ((packed >> ((u & 1) ? 0 : 4)) & 15);
-	return m_palette[0][index + (format ? 0 : BIT(info, 21, 4) * 16)];
+	return data.palette[index + (format ? 0 : BIT(info, 21, 4) * 16)];
 }
 
 void nexus3d_renderer::run_gte(int vertex, bool render)
@@ -563,13 +666,13 @@ void nexus3d_renderer::draw_triangle()
 	}
 	uint32_t const start = m_regs[0xb4 / 4], end = m_regs[0xb8 / 4];
 	rectangle const clip(start & 0x3ff, end & 0x3ff, BIT(start, 16, 10), BIT(end, 16, 10));
-	object_data().next();
+	// Uses the state latch_draw() queued for this command.
 	render_triangle<7>(clip, render_delegate(&nexus3d_renderer::draw_scanline, this), vertices[0], vertices[1], vertices[2]);
 }
 
 void nexus3d_renderer::draw_scanline(int32_t y, extent_t const &extent, nexus3d_poly_data const &data, int threadid)
 {
-	uint32_t const state = m_regs[0x28 / 4];
+	uint32_t const state = data.state;
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		float p[7];
@@ -582,11 +685,11 @@ void nexus3d_renderer::draw_scanline(int32_t y, extent_t const &extent, nexus3d_
 		{
 			if (!std::isfinite(p[4]) || !std::isfinite(p[5]) || std::abs(p[4]) > 65535 || std::abs(p[5]) > 65535)
 				continue;
-			uint16_t const texel = texture_pixel(int(std::floor(p[4])), int(std::floor(p[5])));
-			if (BIT(state, 3) && texel == uint16_t(m_regs[0x40 / 4]))
+			uint16_t const texel = texture_pixel(data, int(std::floor(p[4])), int(std::floor(p[5])));
+			if (BIT(state, 3) && texel == uint16_t(data.key))
 				continue;
 			int const texture[4] = { 255, pal5bit(texel >> 11), pal6bit(texel >> 5), pal5bit(texel) };
-			uint32_t const blend = m_regs[0x60 / 4];
+			uint32_t const blend = data.texblend;
 			for (int c = 0; c < 4; c++)
 			{
 				int const a = BIT(blend, 4, 2) == 1 ? color[c] : texture[c];
@@ -600,12 +703,12 @@ void nexus3d_renderer::draw_scanline(int32_t y, extent_t const &extent, nexus3d_
 				}
 			}
 		}
-		uint32_t const address = target_address(m_regs[0xb0 / 4], x, y);
+		uint32_t const address = target_address(data.target, x, y);
 		if (BIT(state, 7))
 		{
 			uint16_t const pixel = read_pixel(address);
 			int const dest[4] = { 255, pal5bit(pixel >> 11), pal6bit(pixel >> 5), pal5bit(pixel) };
-			uint32_t const blend = m_regs[0x30 / 4];
+			uint32_t const blend = data.blend;
 			for (int c = 1; c < 4; c++)
 			{
 				auto factor = [&] (uint32_t function)
@@ -690,6 +793,8 @@ private:
 	uint32_t graphics_r(offs_t offset);
 	void graphics_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	std::unique_ptr<nexus3d_renderer> m_renderer;
+	memory_passthrough_handler m_texram_tap;
+	memory_passthrough_handler m_target_tap;
 	uint32_t m_graphics_regs[0x800 / 4] = {};
 	float m_gte_working[16][4] = {};
 	float m_gte_output[3][3][4] = {};
@@ -792,11 +897,40 @@ void nexus3d_state::video_start()
 	save_item(NAME(m_gte_output));
 	save_item(NAME(m_texture_palette));
 	save_item(NAME(m_mlc_regs));
+
+	// CPU writes to texture memory that queued work reads, and CPU accesses
+	// to render targets, wait for the rasterizer. A read tap runs after the
+	// read, so it reads the word again once rendering has finished.
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	m_texram_tap = space.install_write_tap(
+			0x60000000, 0x67ffffff, "texram_w",
+			[this] (offs_t offset, uint32_t &data, uint32_t mem_mask)
+			{
+				if (m_renderer->texture_used(offset))
+					m_renderer->sync();
+			},
+			&m_texram_tap);
+	m_target_tap = space.install_readwrite_tap(
+			nexus3d_renderer::TARGET_START, nexus3d_renderer::TARGET_END, "target",
+			[this] (offs_t offset, uint32_t &data, uint32_t mem_mask)
+			{
+				if (m_renderer->pending())
+				{
+					m_renderer->sync();
+					data = m_mainram[(offset & 0x07ffffff) / 4];
+				}
+			},
+			[this] (offs_t offset, uint32_t &data, uint32_t mem_mask)
+			{
+				if (m_renderer->pending())
+					m_renderer->sync();
+			},
+			&m_target_tap);
 }
 
 uint32_t nexus3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_renderer->wait();
+	m_renderer->sync();
 	uint32_t const base = m_mlc_regs[0x24 / 4];
 	uint32_t const pitch = m_mlc_regs[0x28 / 4];
 	uint32_t const key = m_mlc_regs[0x50 / 4];
@@ -822,7 +956,7 @@ uint32_t nexus3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 uint32_t nexus3d_state::vrender3d_status_r()
 {
-	// Commands currently complete synchronously. Low 16 bits count fetched vertices.
+	// Rendering isn't timed, so the engine always reports idle. Low 16 bits count fetched vertices.
 	return 0x00bf0000 | m_graphics_regs[0x14 / 4];
 }
 
@@ -1348,7 +1482,7 @@ void nexus3d_state::machine_start()
 
 void nexus3d_state::machine_reset()
 {
-	m_renderer->wait();
+	m_renderer->sync();
 	std::fill(std::begin(m_graphics_regs), std::end(m_graphics_regs), 0);
 	std::fill(std::begin(m_mlc_regs), std::end(m_mlc_regs), 0);
 	for (auto &vector : m_gte_working)
@@ -1392,6 +1526,8 @@ void nexus3d_state::screen_vblank(int state)
 	{
 		m_display_regs[0x46 / 2] |= 2;
 		update_display_interrupt();
+		// Bound the queue when screen updates are skipped.
+		m_renderer->sync();
 	}
 }
 
