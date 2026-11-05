@@ -565,7 +565,7 @@ uint32_t mediagx_state::jammit_gun_r(offs_t player)
 	const unsigned vertical = ~ypos & 0x0fff;
 	const unsigned horizontal = std::min<unsigned>(1023, (backporch + xpos * pixel_double) * counts_per_line / htotal);
 	return vertical | (horizontal << 12) | (BIT(triggers, player) << 24)
-		| (BIT(triggers, player + 4) << 24) | (unsigned(offscreen) << 25);
+		| (unsigned(offscreen) << 25);
 }
 
 /* Analog Devices AD1847 Stereo DAC */
