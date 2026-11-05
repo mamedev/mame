@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef DEVICES_SOUND_CS43L43_H
-#define DEVICES_SOUND_CS43L43_H
+#ifndef MAME_SOUND_CS43L43_H
+#define MAME_SOUND_CS43L43_H
 
 #pragma once
 
@@ -64,4 +64,4 @@ private:
 
 DECLARE_DEVICE_TYPE(CS43L43, cs43l43_device)
 
-#endif // DEVICES_SOUND_CS43L43_H
+#endif // MAME_SOUND_CS43L43_H
