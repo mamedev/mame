@@ -22,7 +22,7 @@
 
 #define LOG_DATAOUT (1U << 1)
 
-#define VERBOSE ( LOG_GENERAL )
+#define VERBOSE (0)
 
 #define LOG_OUTPUT_FUNC device().logerror
 
