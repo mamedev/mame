@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Tim Schuerewegen, Ryan Holtz
+// copyright-holders:Tim Schuerewegen, Ryan Holtz, Peter Wilhelmsen
 #include "emu.h"
 #include "s3c24xx.h"
 #include "cpu/arm7/arm7.h"
@@ -103,7 +103,7 @@ s3c2400_device::s3c2400_device(const machine_config &mconfig, const char *tag, d
 }
 
 s3c2410_device::s3c2410_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: s3c2400_device(mconfig, type, tag, owner, clock)
+	: s3c24xx_device(mconfig, type, tag, owner, clock)
 	, m_nand_command_w_cb(*this)
 	, m_nand_address_w_cb(*this)
 	, m_nand_data_r_cb(*this, 0)
@@ -138,6 +138,90 @@ void s3c24xx_device::device_start()
 	for (auto &timer : m_uart_tx_timer)
 		timer = timer_alloc(FUNC(s3c24xx_device::uart_tx_complete), this);
 
+	save_item(NAME(m_memcon_bwscon));
+	save_item(NAME(m_memcon_bankcon));
+	save_item(NAME(m_memcon_refresh));
+	save_item(NAME(m_memcon_banksize));
+	save_item(NAME(m_memcon_mrsrb6));
+	save_item(NAME(m_memcon_mrsrb7));
+
+	save_item(NAME(m_usbhost_rev));
+	save_item(NAME(m_usbhost_ctrl));
+	save_item(NAME(m_usbhost_common_stat));
+	save_item(NAME(m_usbhost_int_stat));
+	save_item(NAME(m_usbhost_int_en));
+	save_item(NAME(m_usbhost_int_dis));
+	save_item(NAME(m_usbhost_hcca));
+	save_item(NAME(m_usbhost_period_curr));
+	save_item(NAME(m_usbhost_ctrl_head));
+	save_item(NAME(m_usbhost_ctrl_curr));
+	save_item(NAME(m_usbhost_bulk_head));
+	save_item(NAME(m_usbhost_bulk_curr));
+	save_item(NAME(m_usbhost_done_head));
+	save_item(NAME(m_usbhost_rm_interval));
+	save_item(NAME(m_usbhost_fm_remaining));
+	save_item(NAME(m_usbhost_fm_number));
+	save_item(NAME(m_usbhost_periodic_start));
+	save_item(NAME(m_usbhost_ls_thresh));
+	save_item(NAME(m_usbhost_rh_desc));
+	save_item(NAME(m_usbhost_rh_status));
+	save_item(NAME(m_usbhost_rh_port_status));
+
+	save_item(NAME(m_irq_srcpnd));
+	save_item(NAME(m_irq_intmod));
+	save_item(NAME(m_irq_intmsk));
+	save_item(NAME(m_irq_priority));
+	save_item(NAME(m_irq_intpnd));
+	save_item(NAME(m_irq_intoffset));
+	save_item(NAME(m_irq_line));
+	save_item(NAME(m_fiq_line));
+
+	save_item(NAME(m_dma_disrc));
+	save_item(NAME(m_dma_didst));
+	save_item(NAME(m_dma_dcon));
+	save_item(NAME(m_dma_dstat));
+	save_item(NAME(m_dma_dcsrc));
+	save_item(NAME(m_dma_dcdst));
+	save_item(NAME(m_dma_dmasktrig));
+
+	save_item(NAME(m_clkpow_locktime));
+	save_item(NAME(m_clkpow_mpllcon));
+	save_item(NAME(m_clkpow_upllcon));
+	save_item(NAME(m_clkpow_clkcon));
+	save_item(NAME(m_clkpow_clkslow));
+	save_item(NAME(m_clkpow_clkdivn));
+
+	save_item(NAME(m_lcd_lcdcon1));
+	save_item(NAME(m_lcd_lcdcon2));
+	save_item(NAME(m_lcd_lcdcon3));
+	save_item(NAME(m_lcd_lcdcon4));
+	save_item(NAME(m_lcd_lcdcon5));
+	save_item(NAME(m_lcd_lcdsaddr1));
+	save_item(NAME(m_lcd_lcdsaddr2));
+	save_item(NAME(m_lcd_lcdsaddr3));
+	save_item(NAME(m_lcd_redlut));
+	save_item(NAME(m_lcd_greenlut));
+	save_item(NAME(m_lcd_bluelut));
+	save_item(NAME(m_lcd_dithmode));
+	save_item(NAME(m_lcd_tpal));
+	save_item(NAME(m_lcd_vramaddr_cur));
+	save_item(NAME(m_lcd_vramaddr_max));
+	save_item(NAME(m_lcd_offsize));
+	save_item(NAME(m_lcd_pagewidth_cur));
+	save_item(NAME(m_lcd_pagewidth_max));
+	save_item(NAME(m_lcd_bppmode));
+	save_item(NAME(m_lcd_bswp));
+	save_item(NAME(m_lcd_hwswp));
+	save_item(NAME(m_lcd_vpos));
+	save_item(NAME(m_lcd_hpos));
+	save_item(NAME(m_lcd_framerate));
+	save_item(NAME(m_lcd_hpos_min));
+	save_item(NAME(m_lcd_hpos_max));
+	save_item(NAME(m_lcd_vpos_min));
+	save_item(NAME(m_lcd_vpos_max));
+	save_item(NAME(m_lcd_dma_data));
+	save_item(NAME(m_lcd_dma_bits));
+
 	save_item(NAME(m_uart_ulcon));
 	save_item(NAME(m_uart_ucon));
 	save_item(NAME(m_uart_ufcon));
@@ -155,6 +239,57 @@ void s3c24xx_device::device_start()
 	save_item(NAME(m_uart_tx_shift));
 	save_item(NAME(m_uart_tx_busy));
 	save_item(NAME(m_uart_tx_irq));
+
+	save_item(NAME(m_pwm_tcfg0));
+	save_item(NAME(m_pwm_tcfg1));
+	save_item(NAME(m_pwm_tcon));
+	save_item(NAME(m_pwm_tcntb0));
+	save_item(NAME(m_pwm_tcmpb0));
+	save_item(NAME(m_pwm_tcnto0));
+	save_item(NAME(m_pwm_tcntb1));
+	save_item(NAME(m_pwm_tcmpb1));
+	save_item(NAME(m_pwm_tcnto1));
+	save_item(NAME(m_pwm_tcntb2));
+	save_item(NAME(m_pwm_tcmpb2));
+	save_item(NAME(m_pwm_tcnto2));
+	save_item(NAME(m_pwm_tcntb3));
+	save_item(NAME(m_pwm_tcmpb3));
+	save_item(NAME(m_pwm_tcnto3));
+	save_item(NAME(m_pwm_tcntb4));
+	save_item(NAME(m_pwm_tcnto4));
+	save_item(NAME(m_pwm_cnt));
+	save_item(NAME(m_pwm_cmp));
+	save_item(NAME(m_pwm_freq));
+
+	save_item(NAME(m_usbdev_func_addr));
+	save_item(NAME(m_usbdev_pwr));
+	save_item(NAME(m_usbdev_int));
+	save_item(NAME(m_usbdev_int_mask));
+	save_item(NAME(m_usbdev_frame_num));
+	save_item(NAME(m_usbdev_resume_con));
+	save_item(NAME(m_usbdev_ep_csr));
+	save_item(NAME(m_usbdev_ep_maxp));
+	save_item(NAME(m_usbdev_ep_out_cnt));
+	save_item(NAME(m_usbdev_ep_fifo));
+	save_item(NAME(m_usbdev_dma_con));
+	save_item(NAME(m_usbdev_dma_unit));
+	save_item(NAME(m_usbdev_dma_fifo));
+	save_item(NAME(m_usbdev_dma_tx));
+	save_item(NAME(m_usbdev_test_mode));
+	save_item(NAME(m_usbdev_in_con));
+
+	save_item(NAME(m_wdt_wtcon));
+	save_item(NAME(m_wdt_wtdat));
+	save_item(NAME(m_wdt_wtcnt));
+	save_item(NAME(m_wdt_freq));
+	save_item(NAME(m_wdt_cnt));
+
+	save_item(NAME(m_iic_iiccon));
+	save_item(NAME(m_iic_iicstat));
+	save_item(NAME(m_iic_iicadd));
+	save_item(NAME(m_iic_iicds));
+	save_item(NAME(m_iic_count));
+
 	save_item(NAME(m_iis_iiscon));
 	save_item(NAME(m_iis_iismod));
 	save_item(NAME(m_iis_iispsr));
@@ -164,18 +299,154 @@ void s3c24xx_device::device_start()
 	save_item(NAME(m_iis_fifo_count));
 	save_item(NAME(m_iis_channel));
 
+	save_item(NAME(m_gpio_gpacon));
+	save_item(NAME(m_gpio_gpbcon));
+	save_item(NAME(m_gpio_gpbup));
+	save_item(NAME(m_gpio_gpccon));
+	save_item(NAME(m_gpio_gpcup));
+	save_item(NAME(m_gpio_gpdcon));
+	save_item(NAME(m_gpio_gpdup));
+	save_item(NAME(m_gpio_gpecon));
+	save_item(NAME(m_gpio_gpeup));
+	save_item(NAME(m_gpio_gpfcon));
+	save_item(NAME(m_gpio_gpfup));
+	save_item(NAME(m_gpio_gpgcon));
+	save_item(NAME(m_gpio_gpgup));
+	save_item(NAME(m_gpio_gphcon));
+	save_item(NAME(m_gpio_gphup));
+	save_item(NAME(m_gpio_misccr));
+	save_item(NAME(m_gpio_opencr));
+	save_item(NAME(m_gpio_extint));
+
+	save_item(NAME(m_rtc_rtccon));
+	save_item(NAME(m_rtc_ticnt));
+	save_item(NAME(m_rtc_rtcalm));
+	save_item(NAME(m_rtc_almsec));
+	save_item(NAME(m_rtc_almmin));
+	save_item(NAME(m_rtc_almhour));
+	save_item(NAME(m_rtc_almday));
+	save_item(NAME(m_rtc_almmon));
+	save_item(NAME(m_rtc_almyear));
+	save_item(NAME(m_rtc_rtcrst));
+	save_item(NAME(m_rtc_bcdsec));
+	save_item(NAME(m_rtc_bcdmin));
+	save_item(NAME(m_rtc_bcdhour));
+	save_item(NAME(m_rtc_bcddate));
+	save_item(NAME(m_rtc_bcdday));
+	save_item(NAME(m_rtc_bcdmon));
+	save_item(NAME(m_rtc_bcdyear));
+
+	save_item(NAME(m_adc_adccon));
+
+	save_item(NAME(m_spi_spcon));
+	save_item(NAME(m_spi_spsta));
+	save_item(NAME(m_spi_sppin));
+	save_item(NAME(m_spi_sppre));
+	save_item(NAME(m_spi_sptdat));
+	save_item(NAME(m_spi_sprdat));
+
 	video_start();
+}
+
+void s3c2400_device::device_start()
+{
+	s3c24xx_device::device_start();
+
+	save_item(NAME(m_mmc_mmcon));
+	save_item(NAME(m_mmc_mmcrr));
+	save_item(NAME(m_mmc_mmfcon));
+	save_item(NAME(m_mmc_mmsta));
+	save_item(NAME(m_mmc_mmfsta));
+	save_item(NAME(m_mmc_mmpre));
+	save_item(NAME(m_mmc_mmlen));
+	save_item(NAME(m_mmc_mmcr7));
+	save_item(NAME(m_mmc_mmrsp));
+	save_item(NAME(m_mmc_mmcmd));
+	save_item(NAME(m_mmc_mmcr16));
+	save_item(NAME(m_mmc_mmdat));
 }
 
 void s3c2410_device::device_start()
 {
 	s3c24xx_device::device_start();
 	m_gpio_extint_lines = 0;
+	std::fill(std::begin(m_adc_adcdat), std::end(m_adc_adcdat), 0);
+	std::fill(std::begin(m_steppingstone), std::end(m_steppingstone), 0);
+
+	save_item(NAME(m_irq_subsrcpnd));
+	save_item(NAME(m_irq_intsubmsk));
+
+	save_item(NAME(m_dma_disrcc));
+	save_item(NAME(m_dma_didstc));
+
+	save_item(NAME(m_lcd_lpcsel));
+	save_item(NAME(m_lcd_lcdintpnd));
+	save_item(NAME(m_lcd_lcdsrcpnd));
+	save_item(NAME(m_lcd_lcdintmsk));
+
+	save_item(NAME(m_nand_nfconf));
+	save_item(NAME(m_nand_nfcmd));
+	save_item(NAME(m_nand_nfaddr));
+	save_item(NAME(m_nand_nfstat));
+	save_item(NAME(m_nand_nfecc));
+	save_item(NAME(m_nand_mecc));
+	save_item(NAME(m_nand_ecc_pos));
+	save_item(NAME(m_nand_data_count));
+
+	save_item(NAME(m_gpio_dclkcon));
+	save_item(NAME(m_gpio_eintflt));
+	save_item(NAME(m_gpio_eintmask));
+	save_item(NAME(m_gpio_eintpend));
+	save_item(NAME(m_gpio_gstatus));
 	save_item(NAME(m_gpio_extint_lines));
 
-	int om0 = m_om0_r_cb();
-	int om1 = m_om1_r_cb();
-	logerror("s3c2410_device::device_start: OM01 %d,%d\n", om0, om1);
+	save_item(NAME(m_steppingstone));
+
+	save_item(NAME(m_usbdev_ep_int));
+	save_item(NAME(m_usbdev_usb_int));
+	save_item(NAME(m_usbdev_ep_int_en));
+	save_item(NAME(m_usbdev_usb_int_en));
+	save_item(NAME(m_usbdev_frame_num1));
+	save_item(NAME(m_usbdev_frame_num2));
+	save_item(NAME(m_usbdev_index));
+	save_item(NAME(m_usbdev_in_csr2));
+	save_item(NAME(m_usbdev_maxp));
+	save_item(NAME(m_usbdev_out_csr1));
+	save_item(NAME(m_usbdev_out_csr2));
+	save_item(NAME(m_usbdev_out_fifo_cnt1));
+	save_item(NAME(m_usbdev_out_fifo_cnt2));
+	save_item(NAME(m_usbdev_ep_dma_con));
+	save_item(NAME(m_usbdev_ep_dma_unit));
+	save_item(NAME(m_usbdev_ep_dma_fifo));
+	save_item(NAME(m_usbdev_ep_dma_ttc_l));
+	save_item(NAME(m_usbdev_ep_dma_ttc_m));
+	save_item(NAME(m_usbdev_ep_dma_ttc_h));
+
+	save_item(NAME(m_adc_adctsc));
+	save_item(NAME(m_adc_adcdly));
+	save_item(NAME(m_adc_adcdat));
+
+	save_item(NAME(m_sdi_con));
+	save_item(NAME(m_sdi_pre));
+	save_item(NAME(m_sdi_cmdarg));
+	save_item(NAME(m_sdi_cmdcon));
+	save_item(NAME(m_sdi_cmdsta));
+	save_item(NAME(m_sdi_rsp0));
+	save_item(NAME(m_sdi_rsp1));
+	save_item(NAME(m_sdi_rsp2));
+	save_item(NAME(m_sdi_rsp3));
+	save_item(NAME(m_sdi_dtimer));
+	save_item(NAME(m_sdi_bsize));
+	save_item(NAME(m_sdi_datcon));
+	save_item(NAME(m_sdi_adidatcnt));
+	save_item(NAME(m_sdi_adidatsta));
+	save_item(NAME(m_sdi_fsta));
+	save_item(NAME(m_sdi_intmsk));
+	save_item(NAME(m_sdi_dat));
+
+	const int om0 = m_om0_r_cb();
+	const int om1 = m_om1_r_cb();
+	LOGMASKED(LOG_RESET, "OM01 %d,%d\n", om0, om1);
 	if (om0 == 0 && om1 == 0)
 	{
 		address_space &space = m_cpu->space(AS_PROGRAM);
@@ -187,55 +458,83 @@ void s3c2410_device::device_start()
 void s3c2440_device::device_start()
 {
 	s3c2410_device::device_start();
-
-	LOG("s3c2440_device::device_start\n");
 	m_adc_adcupdn = 0;
 
-	m_cam_srcfmt = 0;
-	m_cam_wdofst = 0;
-	m_cam_gctrl = 0;
-	m_cam_coysa1 = 0;
-	m_cam_coysa2 = 0;
-	m_cam_coysa3 = 0;
-	m_cam_coysa4 = 0;
-	m_cam_cocbsa1 = 0;
-	m_cam_cocbsa2 = 0;
-	m_cam_cocbsa3 = 0;
-	m_cam_cocbsa4 = 0;
-	m_cam_cocrsa1 = 0;
-	m_cam_cocrsa2 = 0;
-	m_cam_cocrsa3 = 0;
-	m_cam_cocrsa4 = 0;
-	m_cam_cotrgfmt = 0;
-	m_cam_coctrl = 0;
-	m_cam_coscpreratio = 0;
-	m_cam_coscpredst = 0;
-	m_cam_coscctrl = 0;
-	m_cam_cotarea = 0;
-	m_cam_costatus = 0;
-	m_cam_prclrsa1 = 0;
-	m_cam_prclrsa2 = 0;
-	m_cam_prclrsa3 = 0;
-	m_cam_prclrsa4 = 0;
-	m_cam_prtrgfmt = 0;
-	m_cam_prctrl = 0;
-	m_cam_prscpreratio = 0;
-	m_cam_prscpredst = 0;
-	m_cam_prscctrl = 0;
-	m_cam_prtarea = 0;
-	m_cam_prstatus = 0;
-	m_cam_imgcpt = 0;
+	save_item(NAME(m_gpio_mslcon));
+	save_item(NAME(m_gpio_gpjcon));
+	save_item(NAME(m_gpio_gpjup));
 
-	m_ac97_glbctrl = 0;
-	m_ac97_glbstat = 0;
-	m_ac97_codec_cmd = 0;
-	m_ac97_codec_stat = 0;
-	m_ac97_pcmaddr = 0;
-	m_ac97_micaddr = 0;
-	m_ac97_pcmdata = 0;
-	m_ac97_micdata = 0;
+	save_item(NAME(m_lcd_tconsel));
 
-	m_clkpow_camdivn = 0;
+	save_item(NAME(m_adc_adcupdn));
+
+	save_item(NAME(m_iic_iiclc));
+
+	save_item(NAME(m_nand_nfcont));
+	save_item(NAME(m_nand_nfmeccd));
+	save_item(NAME(m_nand_nfseccd));
+	save_item(NAME(m_nand_nfestat));
+	save_item(NAME(m_nand_nfmecc));
+	save_item(NAME(m_nand_nfsecc));
+	save_item(NAME(m_nand_nfsblk));
+	save_item(NAME(m_nand_nfeblk));
+	save_item(NAME(m_nand_secc));
+
+	save_item(NAME(m_cam_srcfmt));
+	save_item(NAME(m_cam_wdofst));
+	save_item(NAME(m_cam_gctrl));
+	save_item(NAME(m_cam_coysa1));
+	save_item(NAME(m_cam_coysa2));
+	save_item(NAME(m_cam_coysa3));
+	save_item(NAME(m_cam_coysa4));
+	save_item(NAME(m_cam_cocbsa1));
+	save_item(NAME(m_cam_cocbsa2));
+	save_item(NAME(m_cam_cocbsa3));
+	save_item(NAME(m_cam_cocbsa4));
+	save_item(NAME(m_cam_cocrsa1));
+	save_item(NAME(m_cam_cocrsa2));
+	save_item(NAME(m_cam_cocrsa3));
+	save_item(NAME(m_cam_cocrsa4));
+	save_item(NAME(m_cam_cotrgfmt));
+	save_item(NAME(m_cam_coctrl));
+	save_item(NAME(m_cam_coscpreratio));
+	save_item(NAME(m_cam_coscpredst));
+	save_item(NAME(m_cam_coscctrl));
+	save_item(NAME(m_cam_cotarea));
+	save_item(NAME(m_cam_costatus));
+	save_item(NAME(m_cam_prclrsa1));
+	save_item(NAME(m_cam_prclrsa2));
+	save_item(NAME(m_cam_prclrsa3));
+	save_item(NAME(m_cam_prclrsa4));
+	save_item(NAME(m_cam_prtrgfmt));
+	save_item(NAME(m_cam_prctrl));
+	save_item(NAME(m_cam_prscpreratio));
+	save_item(NAME(m_cam_prscpredst));
+	save_item(NAME(m_cam_prscctrl));
+	save_item(NAME(m_cam_prtarea));
+	save_item(NAME(m_cam_prstatus));
+	save_item(NAME(m_cam_imgcpt));
+
+	save_item(NAME(m_ac97_glbctrl));
+	save_item(NAME(m_ac97_glbstat));
+	save_item(NAME(m_ac97_codec_cmd));
+	save_item(NAME(m_ac97_codec_stat));
+	save_item(NAME(m_ac97_pcmaddr));
+	save_item(NAME(m_ac97_micaddr));
+	save_item(NAME(m_ac97_pcmdata));
+	save_item(NAME(m_ac97_micdata));
+
+	save_item(NAME(m_clkpow_camdivn));
+}
+
+void s3c24xx_device::device_post_load()
+{
+	// Scanout and LCD persistence are regenerated by the restored LCD timer.
+	for (auto &bitmap : m_lcd_bitmap)
+	{
+		bitmap.resize(m_screen->width(), m_screen->height());
+		bitmap.fill(0);
+	}
 }
 
 void s3c24xx_device::device_reset()
@@ -1316,7 +1615,7 @@ void s3c2410_device::lcd_reset()
 
 void s3c2440_device::lcd_reset()
 {
-	s3c24xx_device::lcd_reset();
+	s3c2410_device::lcd_reset();
 	m_lcd_tconsel = 0x0f84;
 	m_lcd_lcdintmsk = 3;
 }
@@ -1549,11 +1848,10 @@ u32 s3c24xx_device::lcd_dma_read_bits(int count)
 
 void s3c24xx_device::lcd_render_tpal()
 {
-	bitmap_rgb32 &bitmap = *m_lcd_bitmap[0];
 	const u32 color = lcd_get_color_tpal();
 	for (int y = m_lcd_vpos_min; y <= m_lcd_vpos_max; y++)
 	{
-		u32 *scanline = &bitmap.pix(y, m_lcd_hpos_min);
+		u32 *scanline = &m_lcd_bitmap[0].pix(y, m_lcd_hpos_min);
 		for (int x = m_lcd_hpos_min; x <= m_lcd_hpos_max; x++)
 		{
 			*scanline++ = color;
@@ -1563,8 +1861,7 @@ void s3c24xx_device::lcd_render_tpal()
 
 void s3c24xx_device::lcd_render_stn_01()
 {
-	bitmap_rgb32 &bitmap = *m_lcd_bitmap[0];
-	u32 *scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+	u32 *scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 	for (int i = 0; i < 4; i++)
 	{
 		u32 data = lcd_dma_read();
@@ -1586,7 +1883,7 @@ void s3c24xx_device::lcd_render_stn_01()
 				m_lcd_vpos++;
 				if (m_lcd_vpos > m_lcd_vpos_max) m_lcd_vpos = m_lcd_vpos_min;
 				m_lcd_hpos = m_lcd_hpos_min;
-				scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+				scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 			}
 		}
 	}
@@ -1594,8 +1891,7 @@ void s3c24xx_device::lcd_render_stn_01()
 
 void s3c24xx_device::lcd_render_stn_02()
 {
-	bitmap_rgb32 &bitmap = *m_lcd_bitmap[0];
-	u32 *scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+	u32 *scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 	for (int i = 0; i < 4; i++)
 	{
 		u32 data = lcd_dma_read();
@@ -1610,7 +1906,7 @@ void s3c24xx_device::lcd_render_stn_02()
 				if (m_lcd_vpos > m_lcd_vpos_max)
 					m_lcd_vpos = m_lcd_vpos_min;
 				m_lcd_hpos = m_lcd_hpos_min;
-				scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+				scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 			}
 		}
 	}
@@ -1618,8 +1914,7 @@ void s3c24xx_device::lcd_render_stn_02()
 
 void s3c24xx_device::lcd_render_stn_04()
 {
-	bitmap_rgb32 &bitmap = *m_lcd_bitmap[0];
-	u32 *scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+	u32 *scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 	for (int i = 0; i < 4; i++)
 	{
 		u32 data = lcd_dma_read();
@@ -1634,7 +1929,7 @@ void s3c24xx_device::lcd_render_stn_04()
 				if (m_lcd_vpos > m_lcd_vpos_max)
 					m_lcd_vpos = m_lcd_vpos_min;
 				m_lcd_hpos = m_lcd_hpos_min;
-				scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+				scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 			}
 		}
 	}
@@ -1642,8 +1937,7 @@ void s3c24xx_device::lcd_render_stn_04()
 
 void s3c24xx_device::lcd_render_stn_08()
 {
-	bitmap_rgb32 &bitmap = *m_lcd_bitmap[0];
-	u32 *scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+	u32 *scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 	for (int i = 0; i < 4; i++)
 	{
 		u32 data = lcd_dma_read();
@@ -1658,7 +1952,7 @@ void s3c24xx_device::lcd_render_stn_08()
 				if (m_lcd_vpos > m_lcd_vpos_max)
 					m_lcd_vpos = m_lcd_vpos_min;
 				m_lcd_hpos = m_lcd_hpos_min;
-				scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+				scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 			}
 		}
 	}
@@ -1666,8 +1960,7 @@ void s3c24xx_device::lcd_render_stn_08()
 
 void s3c24xx_device::lcd_render_stn_12_p()
 {
-	bitmap_rgb32 &bitmap = *m_lcd_bitmap[0];
-	u32 *scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+	u32 *scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 	for (int i = 0; i < 16; i++)
 	{
 		*scanline++ = lcd_get_color_stn_12(lcd_dma_read_bits(12));
@@ -1678,15 +1971,14 @@ void s3c24xx_device::lcd_render_stn_12_p()
 			if (m_lcd_vpos > m_lcd_vpos_max)
 				m_lcd_vpos = m_lcd_vpos_min;
 			m_lcd_hpos = m_lcd_hpos_min;
-			scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+			scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 		}
 	}
 }
 
 void s3c24xx_device::lcd_render_stn_12_u() // not tested
 {
-	bitmap_rgb32 &bitmap = *m_lcd_bitmap[0];
-	u32 *scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+	u32 *scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 	for (int i = 0; i < 4; i++)
 	{
 		u32 data = lcd_dma_read();
@@ -1700,7 +1992,7 @@ void s3c24xx_device::lcd_render_stn_12_u() // not tested
 				m_lcd_vpos++;
 				if (m_lcd_vpos > m_lcd_vpos_max) m_lcd_vpos = m_lcd_vpos_min;
 				m_lcd_hpos = m_lcd_hpos_min;
-				scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+				scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 			}
 		}
 	}
@@ -1708,8 +2000,7 @@ void s3c24xx_device::lcd_render_stn_12_u() // not tested
 
 void s3c24xx_device::lcd_render_tft_01()
 {
-	bitmap_rgb32 &bitmap = *m_lcd_bitmap[0];
-	u32 *scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+	u32 *scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 	for (int i = 0; i < 4; i++)
 	{
 		u32 data = lcd_dma_read();
@@ -1724,7 +2015,7 @@ void s3c24xx_device::lcd_render_tft_01()
 				if (m_lcd_vpos > m_lcd_vpos_max)
 					m_lcd_vpos = m_lcd_vpos_min;
 				m_lcd_hpos = m_lcd_hpos_min;
-				scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+				scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 			}
 		}
 	}
@@ -1732,8 +2023,7 @@ void s3c24xx_device::lcd_render_tft_01()
 
 void s3c24xx_device::lcd_render_tft_02()
 {
-	bitmap_rgb32 &bitmap = *m_lcd_bitmap[0];
-	u32 *scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+	u32 *scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 	for (int i = 0; i < 4; i++)
 	{
 		u32 data = lcd_dma_read();
@@ -1748,7 +2038,7 @@ void s3c24xx_device::lcd_render_tft_02()
 				if (m_lcd_vpos > m_lcd_vpos_max)
 					m_lcd_vpos = m_lcd_vpos_min;
 				m_lcd_hpos = m_lcd_hpos_min;
-				scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+				scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 			}
 		}
 	}
@@ -1756,8 +2046,7 @@ void s3c24xx_device::lcd_render_tft_02()
 
 void s3c24xx_device::lcd_render_tft_04()
 {
-	bitmap_rgb32 &bitmap = *m_lcd_bitmap[0];
-	u32 *scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+	u32 *scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 	for (int i = 0; i < 4; i++)
 	{
 		u32 data = lcd_dma_read();
@@ -1772,7 +2061,7 @@ void s3c24xx_device::lcd_render_tft_04()
 				if (m_lcd_vpos > m_lcd_vpos_max)
 					m_lcd_vpos = m_lcd_vpos_min;
 				m_lcd_hpos = m_lcd_hpos_min;
-				scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+				scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 			}
 		}
 	}
@@ -1780,8 +2069,7 @@ void s3c24xx_device::lcd_render_tft_04()
 
 void s3c24xx_device::lcd_render_tft_08()
 {
-	bitmap_rgb32 &bitmap = *m_lcd_bitmap[0];
-	u32 *scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+	u32 *scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 	for (int i = 0; i < 4; i++)
 	{
 		u32 data = lcd_dma_read();
@@ -1796,7 +2084,7 @@ void s3c24xx_device::lcd_render_tft_08()
 				if (m_lcd_vpos > m_lcd_vpos_max)
 					m_lcd_vpos = m_lcd_vpos_min;
 				m_lcd_hpos = m_lcd_hpos_min;
-				scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+				scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 			}
 		}
 	}
@@ -1804,8 +2092,7 @@ void s3c24xx_device::lcd_render_tft_08()
 
 void s3c24xx_device::lcd_render_tft_16()
 {
-	bitmap_rgb32 &bitmap = *m_lcd_bitmap[0];
-	u32 *scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+	u32 *scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 	for (int i = 0; i < 4; i++)
 	{
 		u32 data = lcd_dma_read();
@@ -1820,7 +2107,7 @@ void s3c24xx_device::lcd_render_tft_16()
 				if (m_lcd_vpos > m_lcd_vpos_max)
 					m_lcd_vpos = m_lcd_vpos_min;
 				m_lcd_hpos = m_lcd_hpos_min;
-				scanline = &bitmap.pix(m_lcd_vpos, m_lcd_hpos);
+				scanline = &m_lcd_bitmap[0].pix(m_lcd_vpos, m_lcd_hpos);
 			}
 		}
 	}
@@ -1874,8 +2161,11 @@ void s3c24xx_device::video_start()
 	save_item(NAME(m_lcdpal_data));
 	save_item(NAME(m_lcd_dithpat));
 
-	m_lcd_bitmap[0] = std::make_unique<bitmap_rgb32>(m_screen->width(), m_screen->height());
-	m_lcd_bitmap[1] = std::make_unique<bitmap_rgb32>(m_screen->width(), m_screen->height());
+	for (auto &bitmap : m_lcd_bitmap)
+	{
+		m_screen->register_screen_bitmap(bitmap);
+		bitmap.fill(0);
+	}
 
 	m_cpu->space(AS_PROGRAM).cache(m_cache);
 }
@@ -1911,12 +2201,12 @@ u32 s3c24xx_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	{
 		if (m_lcd_framerate.as_hz() >= 1195)
 		{
-			bitmap_blend(bitmap, *m_lcd_bitmap[0], *m_lcd_bitmap[1]);
-			copybitmap(*m_lcd_bitmap[1], *m_lcd_bitmap[0], 0, 0, 0, 0, cliprect);
+			bitmap_blend(bitmap, m_lcd_bitmap[0], m_lcd_bitmap[1]);
+			copybitmap(m_lcd_bitmap[1], m_lcd_bitmap[0], 0, 0, 0, 0, cliprect);
 		}
 		else
 		{
-			copybitmap(bitmap, *m_lcd_bitmap[0], 0, 0, 0, 0, cliprect);
+			copybitmap(bitmap, m_lcd_bitmap[0], 0, 0, 0, 0, cliprect);
 		}
 		lcd_dma_init();
 	}
@@ -2978,16 +3268,11 @@ void s3c2410_device::check_pending_irq()
 	s3c24xx_device::check_pending_irq();
 }
 
-void s3c2410_device::check_pending_subirq()
-{
-	check_pending_irq();
-}
-
 void s3c2410_device::request_subirq(u32 int_type)
 {
 	LOGMASKED(LOG_IRQS, "request subirq %d\n", int_type);
 	m_irq_subsrcpnd |= 1 << int_type;
-	check_pending_subirq();
+	check_pending_irq();
 }
 
 void s3c2410_device::check_pending_eint()
@@ -3186,7 +3471,7 @@ void s3c2410_device::irq_subsrcpnd_w(offs_t offset, u32 data, u32 mem_mask)
 	m_irq_subsrcpnd &= ~(data & mem_mask); // clear only the bit positions of SRCPND corresponding to those set to one in the data
 	for (int which = 0; which < 3; which++)
 		uart_update_tx_irq(which);
-	check_pending_subirq();
+	check_pending_irq();
 }
 
 u32 s3c2410_device::irq_intsubmsk_r(offs_t offset, u32 mem_mask)
@@ -3200,7 +3485,7 @@ void s3c2410_device::irq_intsubmsk_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_irq_intsubmsk);
 	LOGMASKED(LOG_IRQ_REGS, "%s: irq write: INTSUBMSK = %08x & %08x\n", machine().describe_context(), data, mem_mask);
-	check_pending_subirq();
+	check_pending_irq();
 }
 
 /* PWM Timer */
@@ -6274,7 +6559,6 @@ void s3c24xx_device::iis_reset()
 	m_iis_iismod = 0;
 	m_iis_iispsr = 0;
 	m_iis_iisfcon = 0;
-	m_iis_iisfifo = 0;
 	m_iis_timer->adjust(attotime::never);
 	memset(m_iis_tx_fifo, 0, sizeof(m_iis_tx_fifo));
 	m_iis_fifo_head = 0;
@@ -6457,6 +6741,7 @@ void s3c24xx_device::rtc_reset()
 	m_rtc_almhour = 0;
 	m_rtc_almday = 1;
 	m_rtc_almmon = 1;
+	m_rtc_almyear = 0;
 	m_rtc_rtcrst = 0;
 	m_rtc_bcdsec = 0;
 	m_rtc_bcdmin = 0;
@@ -7442,7 +7727,6 @@ void s3c2410_device::nand_reset()
 	m_nand_nfconf = 0;
 	m_nand_nfcmd = 0;
 	m_nand_nfaddr = 0;
-	m_nand_nfdata = 0;
 	m_nand_nfstat = 0;
 	m_nand_nfecc = 0;
 	std::fill(std::begin(m_nand_mecc), std::end(m_nand_mecc), 0);
