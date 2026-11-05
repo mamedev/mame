@@ -66,17 +66,19 @@ end
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "machine/nandflash.h"
-#include "machine/s3c2410.h"
+#include "machine/s3c24xx.h"
 #include "screen.h"
 
 #include <cstdarg>
 
+#define LOG_ADC		(1U << 1)
+#define LOG_NAND	(1U << 2)
+
+#define VERBOSE ( 0 )
+#include "logmacro.h"
+
 
 namespace {
-
-#define PALM_Z22_BATTERY_LEVEL  75
-
-#define VERBOSE_LEVEL ( 0 )
 
 class palmz22_state : public driver_device
 {
@@ -92,45 +94,30 @@ public:
 
 	void palmz22(machine_config &config);
 
-	void init_palmz22();
-
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	void nand_command_w(uint8_t data);
+	void nand_address_w(uint8_t data);
+	uint8_t nand_data_r();
+	void nand_data_w(uint8_t data);
+	uint32_t gpio_port_r(offs_t offset);
+	void gpio_port_w(offs_t offset, uint32_t data);
+	uint32_t adc_data_r(offs_t offset);
+
+	void map(address_map &map) ATTR_COLD;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<s3c2410_device> m_s3c2410;
 	required_device<samsung_k9f5608u0dj_device> m_nand;
 
 	uint32_t m_port[8];
 
-	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
-	void s3c2410_nand_command_w(uint8_t data);
-	void s3c2410_nand_address_w(uint8_t data);
-	uint8_t s3c2410_nand_data_r();
-	void s3c2410_nand_data_w(uint8_t data);
-	uint32_t s3c2410_gpio_port_r(offs_t offset);
-	void s3c2410_gpio_port_w(offs_t offset, uint32_t data);
-	uint32_t s3c2410_core_pin_r(offs_t offset);
-	uint32_t s3c2410_adc_data_r(offs_t offset);
-
-	void map(address_map &map) ATTR_COLD;
+	static constexpr int BATTERY_LEVEL = 75;
 };
 
-
-inline void palmz22_state::verboselog(int n_level, const char *s_fmt, ...)
-{
-	if (VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[32768];
-		va_start( v, s_fmt);
-		vsprintf( buf, s_fmt, v);
-		va_end( v);
-		logerror( "%s: %s", machine().describe_context(), buf);
-	}
-}
 
 /***************************************************************************
     MACHINE HARDWARE
@@ -138,112 +125,80 @@ inline void palmz22_state::verboselog(int n_level, const char *s_fmt, ...)
 
 // NAND
 
-void palmz22_state::s3c2410_nand_command_w(uint8_t data)
+void palmz22_state::nand_command_w(uint8_t data)
 {
-	verboselog(9, "s3c2410_nand_command_w %02X\n", data);
+	LOGMASKED(LOG_NAND, "nand_command_w %02x\n", data);
 	m_nand->command_w(data);
 }
 
-void palmz22_state::s3c2410_nand_address_w(uint8_t data)
+void palmz22_state::nand_address_w(uint8_t data)
 {
-	verboselog(9, "s3c2410_nand_address_w %02X\n", data);
+	LOGMASKED(LOG_NAND, "nand_address_w %02x\n", data);
 	m_nand->address_w(data);
 }
 
-uint8_t palmz22_state::s3c2410_nand_data_r()
+uint8_t palmz22_state::nand_data_r()
 {
 	uint8_t data = m_nand->data_r();
-	verboselog(9, "s3c2410_nand_data_r %02X\n", data);
+	LOGMASKED(LOG_NAND, "nand_data_r %02x\n", data);
 	return data;
 }
 
-void palmz22_state::s3c2410_nand_data_w(uint8_t data)
+void palmz22_state::nand_data_w(uint8_t data)
 {
-	verboselog(9, "s3c2410_nand_data_w %02X\n", data);
+	LOGMASKED(LOG_NAND, "nand_data_w %02x\n", data);
 	m_nand->data_w(data);
 }
 
 /*
-uint8_t palmz22_state::s3c2410_nand_busy_r()
+uint8_t palmz22_state::nand_busy_r()
 {
     uint8_t data = m_nand->is_busy();
-    verboselog(9, "s3c2410_nand_busy_r %02X\n", data);
+    LOGMASKED(LOG_NAND, "nand_busy_r %02X\n", data);
     return data;
 }
 */
 
 // GPIO
 
-uint32_t palmz22_state::s3c2410_gpio_port_r(offs_t offset)
+uint32_t palmz22_state::gpio_port_r(offs_t offset)
 {
 	uint32_t data = m_port[offset];
 	switch (offset)
 	{
-		case S3C2410_GPIO_PORT_E :
-		{
-			data = (data & ~(3 << 1)) | (0 << 1); // bits 2..1 = LCD related? (0 = clear 4D000010 bit 3, 1 = clear 560000000 bit 22)
-			//data = 0x1F4;
-		}
+	case s3c24xx_device::GPIO_PORT_E:
+		data = (data & ~(3 << 1)) | (0 << 1); // bits 2..1 = LCD related? (0 = clear 4D000010 bit 3, 1 = clear 560000000 bit 22)
+		//data = 0x1F4;
 		break;
-		case S3C2410_GPIO_PORT_F :
-		{
-			data = (data & ~0xFF) | (ioport( "PORT-F")->read() & 0xFF);
-		}
+	case s3c24xx_device::GPIO_PORT_F:
+		data = (data & ~0xff) | (ioport("PORT-F")->read() & 0xff);
 		break;
-		case S3C2410_GPIO_PORT_G :
-		{
-			data = (data & ~(1 << 1)) | (0 << 1); // bit 1 | 'maincpu' (200B56C0): (GPIO) 56000064 -> 00000000
-			data = (data & ~(1 << 2)) | (0 << 2); // bit 2 | 'maincpu' (200B3EC4): (GPIO) 56000064 -> 00000000
-		}
+	case s3c24xx_device::GPIO_PORT_G:
+		data = (data & ~(1 << 1)) | (0 << 1); // bit 1 | 'maincpu' (200B56C0): (GPIO) 56000064 -> 00000000
+		data = (data & ~(1 << 2)) | (0 << 2); // bit 2 | 'maincpu' (200B3EC4): (GPIO) 56000064 -> 00000000
 		break;
 	}
 	return data;
 }
 
-void palmz22_state::s3c2410_gpio_port_w(offs_t offset, uint32_t data)
+void palmz22_state::gpio_port_w(offs_t offset, uint32_t data)
 {
 	m_port[offset] = data;
 }
 
-// CORE
-
-/*
-
-OM[1:0] = 00b : Enable NAND flash controller auto boot mode
-
-NAND flash memory page size should be 512Bytes.
-
-NCON : NAND flash memory address step selection
-0 : 3 Step addressing
-1 : 4 Step addressing
-
-*/
-
-uint32_t palmz22_state::s3c2410_core_pin_r(offs_t offset)
-{
-	int data = 0;
-	switch (offset)
-	{
-		case S3C2410_CORE_PIN_NCON : data = 0; break;
-		case S3C2410_CORE_PIN_OM0  : data = 0; break;
-		case S3C2410_CORE_PIN_OM1  : data = 0; break;
-	}
-	return data;
-}
-
 // ADC
 
-uint32_t palmz22_state::s3c2410_adc_data_r(offs_t offset)
+uint32_t palmz22_state::adc_data_r(offs_t offset)
 {
 	uint32_t data = 0;
 	switch (offset)
 	{
-		case 0 + 0 : data = 0x2EE + (PALM_Z22_BATTERY_LEVEL * 0xFF / 100); break;
-		case 0 + 1 : data = 0; break;
-		case 2 + 0 : data = ioport( "PENX")->read(); break;
-		case 2 + 1 : data = 0x3FF - ioport( "PENY")->read(); break;
+	case 0 + 0 : data = 0x2ee + (BATTERY_LEVEL * 0xff / 100); break;
+	case 0 + 1 : data = 0; break;
+	case 2 + 0 : data = ioport("PENX")->read(); break;
+	case 2 + 1 : data = 0x3ff - ioport("PENY")->read(); break;
 	}
-	verboselog(5,  "s3c2410_adc_data_r %08X\n", data);
+	LOGMASKED(LOG_ADC, "adc_data_r %08x\n", data);
 	return data;
 }
 
@@ -253,11 +208,11 @@ INPUT_CHANGED_MEMBER(palmz22_state::input_changed)
 {
 	if (param == 0)
 	{
-		m_s3c2410->s3c2410_touch_screen( (newval & 0x01) ? 1 : 0);
+		m_s3c2410->touch_screen(BIT(newval, 0));
 	}
 	else
 	{
-		m_s3c2410->s3c2410_request_eint( param - 1);
+		m_s3c2410->gpio_set_extint(0, newval ? 1 : 0);
 	}
 }
 
@@ -271,7 +226,7 @@ void palmz22_state::machine_start()
 void palmz22_state::machine_reset()
 {
 	m_maincpu->reset();
-	memset( m_port, 0, sizeof( m_port));
+	memset(m_port, 0, sizeof(m_port));
 }
 
 /***************************************************************************
@@ -281,15 +236,12 @@ void palmz22_state::machine_reset()
 void palmz22_state::map(address_map &map)
 {
 	map(0x30000000, 0x31ffffff).ram();
+	map(0x40000000, 0x5fffffff).m(m_s3c2410, FUNC(s3c2410_device::map));
 }
 
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
-
-void palmz22_state::init_palmz22()
-{
-}
 
 void palmz22_state::palmz22(machine_config &config)
 {
@@ -308,14 +260,17 @@ void palmz22_state::palmz22(machine_config &config)
 	S3C2410(config, m_s3c2410, 12000000);
 	m_s3c2410->set_palette_tag("palette");
 	m_s3c2410->set_screen_tag("screen");
-	m_s3c2410->core_pin_r_callback().set(FUNC(palmz22_state::s3c2410_core_pin_r));
-	m_s3c2410->gpio_port_r_callback().set(FUNC(palmz22_state::s3c2410_gpio_port_r));
-	m_s3c2410->gpio_port_w_callback().set(FUNC(palmz22_state::s3c2410_gpio_port_w));
-	m_s3c2410->adc_data_r_callback().set(FUNC(palmz22_state::s3c2410_adc_data_r));
-	m_s3c2410->nand_command_w_callback().set(FUNC(palmz22_state::s3c2410_nand_command_w));
-	m_s3c2410->nand_address_w_callback().set(FUNC(palmz22_state::s3c2410_nand_address_w));
-	m_s3c2410->nand_data_r_callback().set(FUNC(palmz22_state::s3c2410_nand_data_r));
-	m_s3c2410->nand_data_w_callback().set(FUNC(palmz22_state::s3c2410_nand_data_w));
+	m_s3c2410->om0_r_callback().set_constant(0); // OM[1:0] = 00: Enable NAND flash memory boot
+	m_s3c2410->om1_r_callback().set_constant(0);
+	m_s3c2410->ncon_r_callback().set_constant(0); // NCON = 0: Normal NAND flash (256Words/512Bytes page size, 3/4 address cycle)
+	m_s3c2410->gpio_port_r_callback().set(FUNC(palmz22_state::gpio_port_r));
+	m_s3c2410->gpio_port_w_callback().set(FUNC(palmz22_state::gpio_port_w));
+	m_s3c2410->adc_data_r_callback().set(FUNC(palmz22_state::adc_data_r));
+	m_s3c2410->nand_command_w_callback().set(FUNC(palmz22_state::nand_command_w));
+	m_s3c2410->nand_address_w_callback().set(FUNC(palmz22_state::nand_address_w));
+	m_s3c2410->nand_data_r_callback().set(FUNC(palmz22_state::nand_data_r));
+	m_s3c2410->nand_data_w_callback().set(FUNC(palmz22_state::nand_data_w));
+	m_s3c2410->nand_update_ecc_r_callback().set_constant(1);
 
 	SAMSUNG_K9F5608U0DJ(config, m_nand);
 	m_nand->rnb_wr_callback().set(m_s3c2410, FUNC(s3c2410_device::frnb_w));
@@ -351,4 +306,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 2005, palmz22, 0, 0, palmz22, palmz22, palmz22_state, init_palmz22, "Palm", "Palm Z22", MACHINE_NO_SOUND)
+COMP( 2005, palmz22, 0, 0, palmz22, palmz22, palmz22_state, empty_init, "Palm", "Palm Z22", MACHINE_NO_SOUND)

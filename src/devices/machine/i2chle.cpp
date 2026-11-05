@@ -22,9 +22,9 @@
 
 #define LOG_DATAOUT (1U << 1)
 
-#define VERBOSE (0)
+#define VERBOSE ( LOG_GENERAL )
 
-#define LOG_OUTPUT_FUNC osd_printf_info
+#define LOG_OUTPUT_FUNC device().logerror
 
 #include "logmacro.h"
 
