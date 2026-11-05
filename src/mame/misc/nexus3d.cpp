@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Scott Stone
+// copyright-holders:Peter Wilhelmsen, R.Belmont
 /************************************************************************
 
     NEXUS 3D Version 1.0 Board from Interpark
