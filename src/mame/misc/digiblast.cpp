@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, Ryan Holtz, Peter Wilhelmsen
 /*
     Nikko / Grey Innovation digiBLAST (2005)
 
@@ -242,4 +242,4 @@ ROM_END
 
 } // Anonymous namespace
 
-CONS( 2005, digiblst,  0, 0, digiblast,  digiblast,  digiblast_state, empty_init, "Nikko Entertainment B.V. / Grey Innovation", "digiBLAST", MACHINE_NOT_WORKING )
+CONS( 2005, digiblst,  0, 0, digiblast,  digiblast,  digiblast_state, empty_init, "Nikko Entertainment B.V. / Grey Innovation", "digiBLAST", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
