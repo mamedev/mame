@@ -3564,22 +3564,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/s3c2400.h,MACHINES["S3C24XX"] = true
---@src/devices/machine/s3c2410.h,MACHINES["S3C24XX"] = true
---@src/devices/machine/s3c2440.h,MACHINES["S3C24XX"] = true
+--@src/devices/machine/s3c24xx.h,MACHINES["S3C24XX"] = true
 ---------------------------------------------------
 
 if MACHINES["S3C24XX"] then
 	files {
-		MAME_DIR .. "src/devices/machine/s3c2400.cpp",
-		MAME_DIR .. "src/devices/machine/s3c2400.h",
-		MAME_DIR .. "src/devices/machine/s3c2410.cpp",
-		MAME_DIR .. "src/devices/machine/s3c2410.h",
-		MAME_DIR .. "src/devices/machine/s3c2440.cpp",
-		MAME_DIR .. "src/devices/machine/s3c2440.h",
 		MAME_DIR .. "src/devices/machine/s3c24xx.cpp",
 		MAME_DIR .. "src/devices/machine/s3c24xx.h",
-		MAME_DIR .. "src/devices/machine/s3c24xx.hxx",
 	}
 end
 
@@ -3662,6 +3653,18 @@ if MACHINES["SAA5070"] then
 	files {
 		MAME_DIR .. "src/devices/machine/saa5070.cpp",
 		MAME_DIR .. "src/devices/machine/saa5070.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/sab3019.h,MACHINES["SAB3019"] = true
+---------------------------------------------------
+
+if MACHINES["SAB3019"] then
+	files {
+		MAME_DIR .. "src/devices/machine/sab3019.cpp",
+		MAME_DIR .. "src/devices/machine/sab3019.h",
 	}
 end
 
