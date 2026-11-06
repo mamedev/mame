@@ -96,17 +96,7 @@ service mode is still accessible through F1 though
 Fix Anything Else (Palette etc.)
 
 
-Not sure about the main "global brightness" control register, I don't think it can make the palette
-completely black because of kirarast attract mode, so I'm making it cut by 50% at most.
- - brightness control also breaks other games in various places, eg gametngk everything going dark
-   when bomb is used, p47 aces intro?
-
-gametngk seems to need some kind of shadow sprites but the only difference in the sprite attributes is one of the
-    priority bits, forcing sprites of that priority to be shadows doesn't work
-tetrisp needs shadows as well, see the game selection screen.
-
-The above might be related to the second "global brightness" control register, which is 000000 in all games
-except gametngk, tetrisp, tp2m32 and gratia.
+Priority RAM effect semantics and the exact sprite coverage effect still need hardware verification.
 
 horizontal position of tx and bg tilemaps is off by 1 pixel in some games
 
@@ -128,7 +118,6 @@ missing clipping window effect in gametngk intro
 
 f1superb - network link not emulated (MCU on the F1-93159 I/O board is not dumped)
          - steering shock and seat motor outputs not hooked up
-         - priority RAM output bits 1-0 ignored, "effect" outputs drawn at half brightness
          - math coprocessor unidentified and clock unknown
 
 Jaleco Megasystem 32 Game List - thanks to Yasuhiro
@@ -503,12 +492,12 @@ u32 ms32_base_state::sound_result_r()
 
 u8 ms32_state::ms32_nvram_r8(offs_t offset)
 {
-	return m_nvram_8[offset];
+	return m_nvram[offset];
 }
 
 void ms32_state::ms32_nvram_w8(offs_t offset, u8 data)
 {
-	m_nvram_8[offset] = data;
+	m_nvram[offset] = data;
 }
 
 u8 ms32_state::ms32_priram_r8(offs_t offset)
@@ -529,6 +518,7 @@ u16 ms32_state::ms32_palram_r16(offs_t offset)
 void ms32_state::ms32_palram_w16(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_palram[offset]);
+	update_color(offset / 2);
 }
 
 u16 ms32_state::ms32_rozram_r16(offs_t offset)
@@ -1628,7 +1618,7 @@ void ms32_state::ms32(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(60000));
 
-	NVRAM(config, m_nvram_dev, nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	JALECO_MS32_SYSCTRL(config, m_sysctrl, XTAL(48'000'000), m_screen);
 	m_sysctrl->flip_screen_cb().set(FUNC(ms32_state::flipscreen_w));
@@ -2603,8 +2593,6 @@ void ms32_base_state::configure_banks()
 
 void ms32_state::init_ms32_common()
 {
-	m_nvram_8 = std::make_unique<u8[]>(0x2000);
-	m_nvram_dev->set_base(m_nvram_8.get(), 0x2000);
 	configure_banks();
 }
 

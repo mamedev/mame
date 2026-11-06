@@ -8,9 +8,7 @@
 
 /*
 
-priority should be given to
-(a) dekluding the priorities, the kludge for kirarast made it easier to emulate the rest of it until then
-(b) working out the background registers correctly ...
+The priority RAM mixer still needs hardware verification.
 */
 
 
@@ -74,11 +72,9 @@ void ms32_state::video_start()
 	m_sprram_buffer = make_unique_clear<u16[]>(m_objectram_size);
 
 	/* set up tile layers */
-	m_screen->register_screen_bitmap(m_temp_bitmap_tilemaps);
 	m_screen->register_screen_bitmap(m_temp_bitmap_sprites);
-	m_screen->register_screen_bitmap(m_temp_bitmap_sprites_pri); // not actually being used for rendering, we embed pri info in the raw colour bitmap
+	m_screen->register_screen_bitmap(m_temp_bitmap_sprites_pri); // sprite coverage bitmap
 
-	m_temp_bitmap_tilemaps.fill(0);
 	m_temp_bitmap_sprites.fill(0);
 	m_temp_bitmap_sprites_pri.fill(0);
 
@@ -89,29 +85,19 @@ void ms32_state::video_start()
 
 	// tp2m32 doesn't set the brightness registers so we need sensible defaults
 	m_brt[0] = m_brt[1] = m_brt[2] = m_brt[3] = 0;
-	m_brt_r = m_brt_g = m_brt_b = 0x100;
-	m_brt1_r = m_brt1_g = m_brt1_b = 0x100;
+	update_brightness_factors();
 	m_sprite_ctrl[0x10/4] = 0x8000;
 
 	m_screen->register_screen_bitmap(m_layer_tx);
 	m_screen->register_screen_bitmap(m_layer_bg);
 	m_screen->register_screen_bitmap(m_layer_roz);
+	m_screen->register_screen_bitmap(m_layer_road);
+	m_screen->register_screen_bitmap(m_layer_depth);
 
 	save_pointer(NAME(m_sprram_buffer), m_objectram_size);
-	save_item(NAME(m_temp_bitmap_tilemaps));
-	save_item(NAME(m_temp_bitmap_sprites));
-	save_item(NAME(m_temp_bitmap_sprites_pri));
 	save_item(NAME(m_tilemaplayoutcontrol));
 	save_item(NAME(m_brt));
-	save_item(NAME(m_brt_r));
-	save_item(NAME(m_brt_g));
-	save_item(NAME(m_brt_b));
-	save_item(NAME(m_brt1_r));
-	save_item(NAME(m_brt1_g));
-	save_item(NAME(m_brt1_b));
-	save_item(NAME(m_layer_tx));
-	save_item(NAME(m_layer_bg));
-	save_item(NAME(m_layer_roz));
+	machine().save().register_postload(save_prepost_delegate(FUNC(ms32_state::update_brightness_factors), this));
 }
 
 tilemap_t &ms32_state::create_tx_tilemap()
@@ -140,8 +126,6 @@ void f1superb_state::video_start()
 
 	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(f1superb_state::get_ms32_extra_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
 	m_extra_tilemap->set_transparent_pen(0);
-
-	m_screen->register_screen_bitmap(m_layer_road);
 
 	m_txram_latch.assign(m_txram.length(), 0);
 	save_item(NAME(m_txram_latch));
@@ -178,38 +162,25 @@ void f1superb_state::draw_line_plane(screen_device &screen, bitmap_ind16 &bitmap
 	}
 }
 
-/*
-    Per-pixel lookup in priority RAM, index layout matching the other MS32 games' tables:
-    bit 12     sprite transparent
-    bit 11     text transparent
-    bit 10     unknown, always 1 on the games checked
-    bit 9      ROZ transparent
-    bit 8      road plane transparent
-    bit 7      BG transparent
-    bits 6-3   sprite priority (attribute bits 7-4)
-    bits 2-0   line depth, colour bits 6-4 of the ROZ line, or of the road plane line where ROZ is transparent
+u16 ms32_state::priority_index(bool sprite_transparent, bool tx_transparent, bool roz_transparent, bool road_transparent, bool bg_transparent, u16 sprite_priority, u16 depth)
+{
+	return ((sprite_transparent ? 1 : 0) << 12)
+		| ((tx_transparent ? 1 : 0) << 11)
+		| (1 << 10)
+		| ((roz_transparent ? 1 : 0) << 9)
+		| ((road_transparent ? 1 : 0) << 8)
+		| ((bg_transparent ? 1 : 0) << 7)
+		| (sprite_priority << 3)
+		| depth;
+}
 
-    Output byte:
-    bit 6      backdrop (pen 0, no effects applied)
-    bits 5-3   layer select (0 sprite, 1 BG, 2 ROZ, 4 road plane, 6 text)
-    bit 2      shadow/glow disable (1 = normal, 0 = half-brightness shadow)
-    bits 1-0   brightness bank select:
-                 0 = none (used by TX text layer)
-                 1 = bank 0 only (brt[0]/brt[1]), no shadow/glow
-                 2 = bank 1 only (brt[2]/brt[3]), shadow/glow active if bit 2 clear;
-                     sprites with brt=2 get glow (white blend) instead of shadow
-                 3 = bank 0 only (brt[0]/brt[1]), shadow/glow active if bit 2 clear
-
-    Shadow (bit 2 clear) darkens non-sprite layers by half.
-    Sprites are unaffected by shadow except when brt=2, which triggers a glow
-    (white blend) effect instead.
-*/
 void f1superb_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_layer_tx.fill(0xffff, cliprect);
 	m_layer_bg.fill(0xffff, cliprect);
 	m_layer_road.fill(0xffff, cliprect);
 	m_layer_roz.fill(0xffff, cliprect);
+	m_layer_depth.fill(0, cliprect);
 
 	tx_tilemap()->draw(screen, m_layer_tx, cliprect, 0, 0);
 	bg_layer_tilemap()->draw(screen, m_layer_bg, cliprect, 0, 0);
@@ -226,6 +197,7 @@ void f1superb_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, con
 		u16 const *const bg = &m_layer_bg.pix(y);
 		u16 const *const road = &m_layer_road.pix(y);
 		u16 const *const roz = &m_layer_roz.pix(y);
+		u8 *const depth = &m_layer_depth.pix(y);
 		u32 *const dst = &bitmap.pix(y);
 		u16 const road_depth = (road_line_colour[y & 0xff] >> 4) & 7;
 		u16 const roz_depth = (roz_line_colour[y & 0xff] >> 4) & 7;
@@ -234,9 +206,9 @@ void f1superb_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, con
 		{
 			bool const s_op = (spr[x] & 0xff) != 0;
 			u16 const pri = s_op ? (spr[x] >> 12) : 0;
-			u16 const depth = (roz[x] != 0xffff) ? roz_depth : road_depth;
+			depth[x] = (roz[x] != 0xffff) ? roz_depth : road_depth;
 
-			u16 const idx = (!s_op << 12) | ((tx[x] == 0xffff) << 11) | (1 << 10) | ((roz[x] == 0xffff) << 9) | ((road[x] == 0xffff) << 8) | ((bg[x] == 0xffff) << 7) | (pri << 3) | depth;
+			u16 const idx = priority_index(!s_op, tx[x] == 0xffff, roz[x] == 0xffff, road[x] == 0xffff, bg[x] == 0xffff, pri, depth[x]);
 			u8 const code = m_priram[idx];
 
 			if (code == 0x00)
@@ -273,10 +245,10 @@ void f1superb_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, con
 
 
 /*
-    Brightness system: four 32-bit registers at 0xFCE00280, forming two RGB banks.
+    Brightness system: four 32-bit registers at 0xfce00280, forming two RGB banks.
     Each register's low 16 bits encode R (high byte) and G or B (low byte).
     The brightness multiplier is 0x100 minus the register value, so 0x00 = full
-    brightness (1.0) and 0xFF = nearly black (1/256).
+    brightness (1.0) and 0xff = nearly black (1/256).
 
     Bank 0: brt[0] (R,G) and brt[1] (B) - selected by priram brt=1 or brt=3
     Bank 1: brt[2] (R,G) and brt[3] (B) - selected by priram brt=2
@@ -298,22 +270,23 @@ void ms32_state::update_color(int color)
 	m_palette->set_pen_color(color,rgb_t(r,g,b));
 }
 
+void ms32_state::update_brightness_factors()
+{
+	m_brt_r = 0x100 - ((m_brt[0] & 0xff00) >> 8);
+	m_brt_g = 0x100 - ((m_brt[0] & 0x00ff) >> 0);
+	m_brt_b = 0x100 - ((m_brt[1] & 0x00ff) >> 0);
+	m_brt1_r = 0x100 - ((m_brt[2] & 0xff00) >> 8);
+	m_brt1_g = 0x100 - ((m_brt[2] & 0x00ff) >> 0);
+	m_brt1_b = 0x100 - ((m_brt[3] & 0x00ff) >> 0);
+}
+
 void ms32_state::ms32_brightness_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	const u32 oldword = m_brt[offset];
 	COMBINE_DATA(&m_brt[offset]);
 
 	if (m_brt[offset] != oldword)
-	{
-		// two brightness banks, selected per-pixel by priram output bits 1-0:
-		//   0 = none (TX text), 1 or 3 = bank 0 (brt[0]/brt[1]), 2 = bank 1 (brt[2]/brt[3])
-		m_brt_r = 0x100 - ((m_brt[0] & 0xff00) >> 8);
-		m_brt_g = 0x100 - ((m_brt[0] & 0x00ff) >> 0);
-		m_brt_b = 0x100 - ((m_brt[1] & 0x00ff) >> 0);
-		m_brt1_r = 0x100 - ((m_brt[2] & 0xff00) >> 8);
-		m_brt1_g = 0x100 - ((m_brt[2] & 0x00ff) >> 0);
-		m_brt1_b = 0x100 - ((m_brt[3] & 0x00ff) >> 0);
-	}
+		update_brightness_factors();
 }
 
 
@@ -362,7 +335,7 @@ void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, con
 }
 
 
-void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority)
+void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// ROZ wrapping controlled by roz_ctrl[0x40] (plane size) and roz_ctrl[0x50]:
 	// r40=0xffff extends the plane beyond the tilemap; r50 non-zero fills outside
@@ -390,6 +363,7 @@ void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rec
 	// bnstars:  0x0000 0x0000 0x0000 0x0000  0x0000        yes
 	// kirarast: 0x0000 0x0000 0x0000 0x0000  0x0000        yes
 	// wpksocv2: 0x0000 0x0000 0x0000 0x0000  0x0000        yes
+	// FIXME: p47aces, kirarast and gametngk still need comparison with hardware recordings.
 	const bool roz_wrap = ((m_roz_ctrl[0x40/4] & 0xffff) == 0) || ((m_roz_ctrl[0x50/4] & 0xffff) != 0);
 
 	if (m_roz_ctrl[0x5c/4] & 1)  /* "super" mode */
@@ -432,7 +406,7 @@ void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rec
 					(start2x+startx+offsx)<<16, (start2y+starty+offsy)<<16,
 					incxx<<8, incxy<<8, 0, 0,
 					roz_wrap,
-					0, priority);
+					0, 0);
 
 			y++;
 		}
@@ -463,7 +437,7 @@ void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rec
 				(startx+offsx)<<16, (starty+offsy)<<16,
 				incxx<<8, incxy<<8, incyx<<8, incyy<<8,
 				roz_wrap,
-				0, priority);
+				0, 0);
 	}
 }
 
@@ -505,10 +479,6 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	   tilemaps, but there's something that just doesn't fit.
 	 */
 
-	// TODO: move to a cache system
-	for (int i = 0; i < m_palette->entries(); i++) // colors 0x3000-0x3fff are not used
-		update_color(i);
-
 	scrollx = m_tx_scroll[0x00/4] + m_tx_scroll[0x08/4] + 0x18;
 	scrolly = m_tx_scroll[0x0c/4] + m_tx_scroll[0x14/4];
 	m_tx_tilemap->set_scrollx(0, scrollx);
@@ -523,12 +493,8 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 	screen.priority().fill(0, cliprect);
 
-	/* TODO: 0 is correct for gametngk */
-	m_temp_bitmap_tilemaps.fill(0, cliprect);   /* bg color */
-
 	/* clear our sprite bitmaps */
 	m_temp_bitmap_sprites.fill(0, cliprect);
-	m_temp_bitmap_sprites_pri.fill(0, cliprect);
 
 	draw_sprites(m_temp_bitmap_sprites, screen.priority(), cliprect, m_sprram_buffer.get());
 
@@ -546,10 +512,12 @@ void ms32_state::draw_tile_layers(screen_device &screen, const rectangle &clipre
 	m_layer_tx.fill(0xffff, cliprect);
 	m_layer_bg.fill(0xffff, cliprect);
 	m_layer_roz.fill(0xffff, cliprect);
+	m_layer_road.fill(0xffff, cliprect);
+	m_layer_depth.fill(0, cliprect);
 
 	m_tx_tilemap->draw(screen, m_layer_tx, cliprect, 0, 0);
 	bg_layer_tilemap()->draw(screen, m_layer_bg, cliprect, 0, 0);
-	draw_roz(screen, m_layer_roz, cliprect, 0);
+	draw_roz(screen, m_layer_roz, cliprect);
 }
 
 /*
@@ -558,25 +526,20 @@ void ms32_state::draw_tile_layers(screen_device &screen, const rectangle &clipre
     bit 11     text transparent
     bit 10     unknown, always 1 on the games checked
     bit 9      ROZ transparent
-    bit 8      road plane transparent (always 1 on games without it)
+    bit 8      road plane transparent
     bit 7      BG transparent
     bits 6-3   sprite priority (attribute bits 7-4)
-    bits 2-0   line depth, colour bits 6-4 of the ROZ line
+    bits 2-0   line depth, colour bits 6-4 of the ROZ or road line
 
     Output byte:
-    bit 6      backdrop (pen 0, no effects applied)
+    bit 6      backdrop (pen 0; brightness selection still applies, shadow does not)
     bits 5-3   layer select (0 sprite, 1 BG, 2 ROZ, 4 road plane, 6 text)
-    bit 2      shadow/glow disable (1 = normal, 0 = half-brightness shadow)
-    bits 1-0   brightness bank select:
-                 0 = none (used by TX text layer)
-                 1 = bank 0 only (brt[0]/brt[1]), no shadow/glow
-                 2 = bank 1 only (brt[2]/brt[3]), shadow/glow active if bit 2 clear;
-                     sprites with brt=2 get glow (white blend) instead of shadow
-                 3 = bank 0 only (brt[0]/brt[1]), shadow/glow active if bit 2 clear
+    bit 2      effect disable (1 = normal, 0 = half-brightness for selected non-sprite layers)
+    bits 1-0   brightness bank select (0 = none, 1/3 = bank 0, 2 = bank 1)
 
-    Shadow (bit 2 clear) darkens non-sprite layers by half.
-    Sprites are unaffected by shadow except when brt=2, which triggers a glow
-    (white blend) effect instead.
+    The sprite coverage pass applies the bit-2-clear effect to the selected
+    non-sprite layer beneath transparent sprite pixels. The exact hardware
+    effect still needs verification.
 */
 void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -588,23 +551,14 @@ void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const r
 		u16 const *const tx  = &m_layer_tx.pix(y);
 		u16 const *const bg  = &m_layer_bg.pix(y);
 		u16 const *const roz = &m_layer_roz.pix(y);
+		u16 const *const road = &m_layer_road.pix(y);
 		u32 *const dst = &bitmap.pix(y);
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			bool const s_op = (spr[x] & 0xff) != 0;
 			u16 const pri = s_op ? (spr[x] >> 12) : 0;
-			// TODO: derive depth from ROZ line colour bits 6-4 in super mode
-			u16 const depth = 0;
-
-			u16 const idx = (!s_op << 12)
-					| ((tx[x] == 0xffff) << 11)
-					| (1 << 10)
-					| ((roz[x] == 0xffff) << 9)
-					| (1 << 8) // road always transparent for non-f1superb
-					| ((bg[x] == 0xffff) << 7)
-					| (pri << 3)
-					| depth;
+			u16 const idx = priority_index(!s_op, tx[x] == 0xffff, roz[x] == 0xffff, road[x] == 0xffff, bg[x] == 0xffff, pri, 0);
 			u8 const code = m_priram[idx];
 
 			// code 0x00 = priram not yet written by the game, treat as backdrop
@@ -666,24 +620,24 @@ void ms32_state::apply_sprite_effects(screen_device &screen, bitmap_rgb32 &bitma
 		u16 const *const tx_row = &m_layer_tx.pix(y);
 		u16 const *const bg_row = &m_layer_bg.pix(y);
 		u16 const *const roz_row = &m_layer_roz.pix(y);
+		u16 const *const road_row = &m_layer_road.pix(y);
+		u8 const *const depth_row = &m_layer_depth.pix(y);
 		u32 *const dst = &bitmap.pix(y);
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			if (cov[x] == 0) continue;
-			if (spr[x] & 0xff) continue;
+			if (cov[x] == 0)
+				continue;
+			if (spr[x] & 0xff)
+				continue;
 
-			u16 const cov_pri = ((cov[x] >> 8) - 1) & 0xf;
-			u16 const idx_with = (0 << 12)
-					| ((tx_row[x] == 0xffff) << 11)
-					| (1 << 10)
-					| ((roz_row[x] == 0xffff) << 9)
-					| (1 << 8)
-					| ((bg_row[x] == 0xffff) << 7)
-					| (cov_pri << 3);
+			u16 const cov_pri = cov[x] >> 12;
+			u16 const idx_with = priority_index(false, tx_row[x] == 0xffff, roz_row[x] == 0xffff, road_row[x] == 0xffff, bg_row[x] == 0xffff, cov_pri, depth_row[x]);
 			u8 const code_with = m_priram[idx_with];
 
-			if (!BIT(code_with, 2))
+			if (code_with == 0x00 || BIT(code_with, 6) || BIT(code_with, 2))
+				continue;
+
 			{
 				rgb_t c(dst[x]);
 				if ((code_with & 3) == 2)

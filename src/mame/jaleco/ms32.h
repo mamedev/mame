@@ -67,7 +67,6 @@ public:
 	ms32_state(const machine_config &mconfig, device_type type, const char *tag) :
 		ms32_base_state(mconfig, type, tag)
 		, m_sysctrl(*this, "sysctrl")
-		, m_nvram_dev(*this, "nvram")
 		, m_screen(*this, "screen")
 		, m_sprite(*this, "sprite")
 		, m_palette(*this, "palette")
@@ -85,6 +84,7 @@ public:
 		, m_sprram(*this, "sprram", 0x10000, ENDIANNESS_LITTLE)
 		, m_bgram(*this, "bgram", 0x4000, ENDIANNESS_LITTLE)
 		, m_io_mj(*this, "KEY%u", 0U)
+		, m_nvram(*this, "nvram", 0x2000, ENDIANNESS_LITTLE)
 	{ }
 
 	void ms32(machine_config &config) ATTR_COLD;
@@ -99,7 +99,6 @@ public:
 
 protected:
 	required_device<jaleco_ms32_sysctrl_device> m_sysctrl;
-	required_device<nvram_device> m_nvram_dev;
 	required_device<screen_device> m_screen;
 	required_device<ms32_sprite_device> m_sprite;
 	required_device<palette_device> m_palette;
@@ -111,18 +110,21 @@ protected:
 	memory_share_creator<u16> m_rozram;
 	memory_share_creator<u16> m_lineram;
 	memory_share_creator<u16> m_txram;
-	bitmap_ind16 m_temp_bitmap_tilemaps;
 	bitmap_ind16 m_temp_bitmap_sprites;
 	bitmap_ind16 m_layer_tx;
 	bitmap_ind16 m_layer_bg;
 	bitmap_ind16 m_layer_roz;
+	bitmap_ind16 m_layer_road;
+	bitmap_ind8 m_layer_depth;
+
+	// Brightness registers and their derived multipliers.
 	u32 m_brt[4];
-	int m_brt_r;
-	int m_brt_g;
-	int m_brt_b;
-	int m_brt1_r;
-	int m_brt1_g;
-	int m_brt1_b;
+	s32 m_brt_r;
+	s32 m_brt_g;
+	s32 m_brt_b;
+	s32 m_brt1_r;
+	s32 m_brt1_g;
+	s32 m_brt1_b;
 
 	void flipscreen_w(int state);
 	virtual void video_start() override ATTR_COLD;
@@ -143,6 +145,7 @@ protected:
 	tilemap_t *roz_tilemap() const { return m_roz_tilemap; }
 	tilemap_t *tx_tilemap() const { return m_tx_tilemap; }
 	tilemap_t *bg_layer_tilemap() const { return (m_tilemaplayoutcontrol & 1) ? m_bg_tilemap_alt : m_bg_tilemap; }
+	static u16 priority_index(bool sprite_transparent, bool tx_transparent, bool roz_transparent, bool road_transparent, bool bg_transparent, u16 sprite_priority, u16 depth);
 	virtual tilemap_t &create_tx_tilemap() ATTR_COLD;
 	TILE_GET_INFO_MEMBER(get_ms32_roz_tile_info);
 
@@ -157,8 +160,7 @@ private:
 	memory_share_creator<u16> m_sprram;
 	memory_share_creator<u16> m_bgram;
 	optional_ioport_array<5> m_io_mj;
-
-	std::unique_ptr<u8[]> m_nvram_8;
+	memory_share_creator<u8> m_nvram;
 
 	std::unique_ptr<u16[]> m_sprram_buffer;
 	size_t m_objectram_size;
@@ -167,7 +169,7 @@ private:
 	tilemap_t *m_roz_tilemap;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg_tilemap_alt;
-	u32 m_tilemaplayoutcontrol;
+	u32 m_tilemaplayoutcontrol = 0;
 	bitmap_ind16 m_temp_bitmap_sprites_pri;
 
 	u8 ms32_nvram_r8(offs_t offset);
@@ -189,6 +191,7 @@ private:
 	void bgmode_w(u32 data);
 
 	void ms32_brightness_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void update_brightness_factors();
 	void coin_counter_w(u32 data);
 	void init_ms32_common();
 
@@ -200,7 +203,7 @@ private:
 	void update_color(int color);
 	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top);
 	void apply_sprite_effects(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority);
+	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 class f1superb_state : public ms32_state
@@ -233,7 +236,6 @@ private:
 	required_shared_ptr<u32> m_road_ctrl;
 	memory_share_creator<u16> m_road_lineram;
 	std::vector<u16> m_txram_latch;
-	bitmap_ind16 m_layer_road;
 
 	tilemap_t *m_extra_tilemap;
 
