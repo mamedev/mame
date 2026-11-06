@@ -643,12 +643,7 @@ public:
     void wgm_w(uint8_t data) { avr8_generic_t0_timer_device::wgm_w(data); }
 };
 
-
-// TODO: rename to avr8_megaavr_timer_1_device, as all classic megaAVRs share this
-class avr8_generic_t1_timer_device : public avr8_base_timer_device,
-                                     public avr8_megaavr_tifr_mixin<avr8_generic_t1_timer_device, 0, 1, 2, 3, -1>,
-                                     public avr8_megaavr_tccr_a_mixin<avr8_generic_t1_timer_device, 0, 1, 6, 7, 4, 5>,
-                                     public avr8_megaavr_timsk_mixin<avr8_generic_t1_timer_device, 0, 1, 2>
+class avr8_generic_timer_1_device : public avr8_base_timer_device
 {
     // see https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf
     // Table 16-4.
@@ -688,7 +683,7 @@ class avr8_generic_t1_timer_device : public avr8_base_timer_device,
     };
 
 public:
-    avr8_generic_t1_timer_device(const machine_config &mconfig,
+    avr8_generic_timer_1_device(const machine_config &mconfig,
         const char *tag,
         device_t *owner,
         uint32_t clock);
@@ -710,11 +705,6 @@ public:
     void icr_l_w(uint8_t data);
     uint8_t icr_l_r(); 
 
-    void tccr_b_w(uint8_t data);
-    uint8_t tccr_b_r();
-    void tccr_c_w(uint8_t data);
-    uint8_t tccr_c_r();
-    
     void tick() override;
 
     virtual bool com_mode_allows_output(uint8_t channel) override;
@@ -725,7 +715,7 @@ public:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 protected:
-    avr8_generic_t1_timer_device(const machine_config &mconfig,
+    avr8_generic_timer_1_device(const machine_config &mconfig,
         const char *tag,
         device_t *owner,
         uint32_t clock,
@@ -736,8 +726,6 @@ protected:
     uint16_t m_icr;
     
     bool m_ocr_c_enabled; // true only on devices that have 3-channel 16-bit timers
-
-
 
     virtual uint32_t get_num_bits() const override { return 16; }
 
@@ -756,6 +744,23 @@ protected:
     inline void advance_fast_pwm_icr();
     inline void advance_fast_pwm_ocr_a();
     inline void advance_pwm_ocr_a(); // same for phase-correct and phase/frequency-correct; only difference is when OCRxA is reloaded
+};
+
+class avr8_megaavr_timer_1_device : public avr8_generic_timer_1_device,
+                                    public avr8_megaavr_tifr_mixin<avr8_megaavr_timer_1_device, 0, 1, 2, 3, 5>,
+                                    public avr8_megaavr_tccr_a_mixin<avr8_megaavr_timer_1_device, 0, 1, 6, 7, 4, 5>,
+                                    public avr8_megaavr_timsk_mixin<avr8_megaavr_timer_1_device, 0, 1, 2, 5>
+{
+public:
+    avr8_megaavr_timer_1_device(const machine_config &mconfig,
+        const char *tag,
+        device_t *owner,
+        uint32_t clock);
+
+    void tccr_b_w(uint8_t data);
+    uint8_t tccr_b_r();
+    void tccr_c_w(uint8_t data);
+    uint8_t tccr_c_r();
 };
 
 /**
@@ -802,9 +807,9 @@ protected:
 
 
 class avr8_megaavr_fakertc_timer_device : public avr8_generic_fakertc_timer_device,
-                                          public avr8_megaavr_tifr_mixin<avr8_generic_t1_timer_device, 0, 1, 2, 3, -1>,
-                                          public avr8_megaavr_tccr_a_mixin<avr8_generic_t1_timer_device, 0, 1, 6, 7, 4, 5>,
-                                          public avr8_megaavr_timsk_mixin<avr8_generic_t1_timer_device, 0, 1, 2>
+                                          public avr8_megaavr_tifr_mixin<avr8_megaavr_fakertc_timer_device, 0, 1, 2, 3, -1>,
+                                          public avr8_megaavr_tccr_a_mixin<avr8_megaavr_fakertc_timer_device, 0, 1, 6, 7, 4, 5>,
+                                          public avr8_megaavr_timsk_mixin<avr8_megaavr_fakertc_timer_device, 0, 1, 2>
 {    
     // TODO: replace the mixins with proper gated register functions so that writes/reads in async mode
     // obey the busy flags, as on real hardware.
@@ -976,7 +981,8 @@ public:
 DECLARE_DEVICE_TYPE(AVR8_CLASSIC_GENERIC_TIMER_0, avr8_generic_t0_timer_device)
 DECLARE_DEVICE_TYPE(AVR8_CLASSIC_MEGAAVR_TIMER_0, avr8_megaavr_timer_0_device)
 
-DECLARE_DEVICE_TYPE(AVR8_CLASSIC_GENERIC_TIMER_1, avr8_generic_t1_timer_device)
+DECLARE_DEVICE_TYPE(AVR8_CLASSIC_GENERIC_TIMER_1, avr8_generic_timer_1_device)
+DECLARE_DEVICE_TYPE(AVR8_CLASSIC_MEGAAVR_TIMER_1, avr8_megaavr_timer_1_device)
 
 DECLARE_DEVICE_TYPE(AVR8_CLASSIC_10BIT_PRESCALER, avr8_10bit_prescaler_device)
 DECLARE_DEVICE_TYPE(AVR8_CLASSIC_OUTPUT_COMPARE_MODULATOR, avr8_output_compare_modulator_device)
