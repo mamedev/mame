@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Tomás García-Merás Capote (ClawGrip)
+// copyright-holders:Tomás García-Merás Capote
 /***************************************************************************
 
 Driver for ICE Cyclone, a redemption game for three players.
