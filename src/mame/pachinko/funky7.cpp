@@ -86,11 +86,11 @@
 
 #include "speaker.h"
 
-
-namespace {
-
 // internal artwork
 #include "funky7.lh"
+
+
+namespace {
 
 class funky7_state : public driver_device
 {

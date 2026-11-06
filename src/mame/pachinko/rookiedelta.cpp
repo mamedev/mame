@@ -91,11 +91,11 @@
 
 #include "speaker.h"
 
-
-namespace {
-
 // internal artwork
 #include "rookiedelta.lh"
+
+
+namespace {
 
 class rookiedelta_state : public driver_device
 {
