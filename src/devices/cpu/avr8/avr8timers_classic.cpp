@@ -946,11 +946,9 @@ void avr8_generic_t1_timer_device::tick()
     // this routine very obviously copypasted from timer 0.
     // remember that the GENERIC_TIMER0_CS_xx and GENERIC_TIMER1_CS_xx enums
     // can't be commoned together.
-
     if (m_prtim) return;
 
     // Tx pin is sampled on every I/O clock, so check that first
-
     if (m_cs == GENERIC_TIMER1_CS_T1_FALL || m_cs == GENERIC_TIMER1_CS_T1_RISE)
     {
         sample_t_input();
@@ -958,7 +956,6 @@ void avr8_generic_t1_timer_device::tick()
 
     if (m_cs == GENERIC_TIMER1_CS_DISABLED)
     {
-        // LOGMASKED(LOG_TIMER1_TICK, "%s: timer is disabled (m_cs == GENERIC_TIMER1_CS_DISABLED), doing nothing.\n", machine().describe_context());
         return;
     }
 
@@ -981,38 +978,57 @@ void avr8_generic_t1_timer_device::tick()
         case GENERIC_TIMER1_WGM_NORMAL:
             advance_normal();
             break;
+            
         case GENERIC_TIMER1_WGM_PWM_8_BIT:
             advance_pwm_8bit();
             break;
+
         case GENERIC_TIMER1_WGM_PWM_9_BIT:
             advance_pwm_9bit();
             break;
+
         case GENERIC_TIMER1_WGM_PWM_10_BIT:
             advance_pwm_10bit();
             break;
+
         case GENERIC_TIMER1_WGM_CTC:
             advance_ctc_ocr_a();
             break;
+
         case GENERIC_TIMER1_WGM_FAST_PWM_8_BIT:
             advance_fast_pwm_8bit();
             break;
+        
         case GENERIC_TIMER1_WGM_FAST_PWM_9_BIT:
             advance_fast_pwm_9bit();
             break;
+    
         case GENERIC_TIMER1_WGM_FAST_PWM_10_BIT:
             advance_fast_pwm_10bit();
             break;
-        // GENERIC_TIMER1_WGM_PWM_PFC_ICR1    = 0b1000, // phase/frequency correct; TOP = ICR1
-        // GENERIC_TIMER1_WGM_PWM_PFC_OCR1A   = 0b1001, // phase/frequency correct; TOP = OCR1A
-        // GENERIC_TIMER1_WGM_PWM_ICR1        = 0b1010, // phase-correct; TOP = ICR1
-        // GENERIC_TIMER1_WGM_PWM_OCR1A       = 0b1011, // phase-correct; TOP = OCR1A
-        // GENERIC_TIMER1_WGM_CTC_ICR1        = 0b1100, // CTC: count to ICR1
+        
         case GENERIC_TIMER1_WGM_FAST_PWM_ICR1:
             advance_fast_pwm_icr();
             break;
+        
         case GENERIC_TIMER1_WGM_FAST_PWM_OCRA:
             advance_fast_pwm_ocr_a();
             break;
+
+        case GENERIC_TIMER1_WGM_PWM_OCR1A:
+        case GENERIC_TIMER1_WGM_PWM_PFC_OCR1A:
+            advance_pwm_ocr_a(); // same counter behavior; OCRxA reload behavior is the only difference
+            break;
+
+        case GENERIC_TIMER1_WGM_PWM_PFC_ICR1:
+        case GENERIC_TIMER1_WGM_PWM_ICR1:
+            advance_pwm_common(m_icr); // as with OCRxA mode, only difference is when OCRxA is reloaded
+            break;
+
+        case GENERIC_TIMER1_WGM_CTC_ICR1:
+            advance_ctc_icr();
+            break;
+        
         default:
             advance_illegal_wgm_state();
             break;
@@ -1109,6 +1125,51 @@ void avr8_generic_t1_timer_device::advance_pwm_10bit()
     advance_pwm_common(0x3ff);
 }
 
+void avr8_generic_t1_timer_device::advance_pwm_ocr_a()
+{
+    bool new_counting_direction = m_dual_slope_counting_down;
+    if (is_compare_a())
+    {
+        raise_ocf_a();
+        if (!m_dual_slope_counting_down)
+        {
+            update_oc_generic_notoggle_inverse<AVR8_TIMER_CMPCHANNEL_OC_A>();            
+            new_counting_direction = true;
+        }
+        else
+        {
+            update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_A>();
+        }
+    }
+
+    if (is_compare_b())
+    {
+        raise_ocf_b();
+        if (m_dual_slope_counting_down)
+            update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_B>();
+        else
+            update_oc_generic_notoggle_inverse<AVR8_TIMER_CMPCHANNEL_OC_B>();
+    }
+
+    if (m_ocr_c_enabled && is_compare_c())
+    {
+        raise_ocf_c();
+        if (m_dual_slope_counting_down)
+            update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_C>();
+        else
+            update_oc_generic_notoggle_inverse<AVR8_TIMER_CMPCHANNEL_OC_C>();
+    }
+
+    if (m_dual_slope_counting_down && is_min_count())
+    {
+        new_counting_direction = false;
+        raise_tov();
+    }
+   
+    m_dual_slope_counting_down = new_counting_direction;
+    m_tcnt = m_dual_slope_counting_down ? prev_count() : next_count();
+}
+
 void avr8_generic_t1_timer_device::advance_fast_pwm_common(uint16_t top)
 {
     bool will_increment = true;
@@ -1163,35 +1224,22 @@ void avr8_generic_t1_timer_device::advance_fast_pwm_10bit()
     advance_fast_pwm_common(0x3ff);
 }
 
-
 void avr8_generic_t1_timer_device::advance_ctc_ocr_a()
 {
-    bool will_increment = true;
+    bool is_wrapping = false;
 
     if (will_next_count_overflow())
     {
-        // LOGMASKED(LOG_TIMER1_TICK, "%s: timer1 WGM1 CTC_OCR, TOP, new count %04x, OCR1A/B %04x/%04x, ICR1 %04x\n", machine().describe_context(), timer1_count, m_ocr1[AVR8_REG_A], m_ocr1[AVR8_REG_B], icr1);
         raise_tov();
-        // will_increment left true because next_count() below will wrap the timer
     }
 
     if (is_compare_a())
     {
-        // LOGMASKED(LOG_TIMER1_TICK, "%s: timer1 WGM1 CTC_OCR, OCR1A, new count %04x, OCR1A/B %04x/%04x, ICR1 %04x\n", machine().describe_context(), timer1_count, m_ocr1[AVR8_REG_A], m_ocr1[AVR8_REG_B], icr1);
-        
-        // explicit timer reset upon compare
-        m_tcnt = 0;
-        will_increment = false;
-
+        is_wrapping = true;
         raise_ocf_a();
         update_oc_generic<AVR8_TIMER_CMPCHANNEL_OC_A>();
     }
-    else if (m_tcnt == 0)
-    {
-        // LOGMASKED(LOG_TIMER1_TICK, "%s: timer1 WGM1 CTC_OCR, BOTTOM, new count %04x, OCR1A/B %04x/%04x, ICR1 %04x\n", machine().describe_context(), timer1_count, m_ocr1[AVR8_REG_A], m_ocr1[AVR8_REG_B], icr1);
-        clear_tov();
-    }
-
+    
     if (is_compare_b())
     {
         raise_ocf_b();
@@ -1204,47 +1252,80 @@ void avr8_generic_t1_timer_device::advance_ctc_ocr_a()
         update_oc_generic<AVR8_TIMER_CMPCHANNEL_OC_C>();
     }
 
-    if (will_increment) m_tcnt = next_count();
+    m_tcnt = is_wrapping ? 0 : next_count();
+}
+
+
+void avr8_generic_t1_timer_device::advance_ctc_icr()
+{
+    bool is_wrapping = false;
+
+    if (will_next_count_overflow())
+    {
+        raise_tov();
+    }
+
+    if (m_tcnt == m_icr)
+    {
+        is_wrapping = true;
+        raise_icf();   
+    }
+
+    if (is_compare_a())
+    {
+        raise_ocf_a();
+        update_oc_generic<AVR8_TIMER_CMPCHANNEL_OC_A>();
+    }
+    
+    if (is_compare_b())
+    {
+        raise_ocf_b();
+        update_oc_generic<AVR8_TIMER_CMPCHANNEL_OC_B>();
+    }
+    
+    if (m_ocr_c_enabled && is_compare_c())
+    {
+        raise_ocf_c();
+        update_oc_generic<AVR8_TIMER_CMPCHANNEL_OC_C>();
+    }
+
+    m_tcnt = is_wrapping ? 0 : next_count();
 }
 
 void avr8_generic_t1_timer_device::advance_fast_pwm_ocr_a()
 {
+    bool is_wrapping = false;
+
+    if (is_min_count())
+    {
+        update_oc_generic_notoggle_inverse<AVR8_TIMER_CMPCHANNEL_OC_A>();
+        update_oc_generic_notoggle_inverse<AVR8_TIMER_CMPCHANNEL_OC_B>();
+        if (m_ocr_c_enabled) update_oc_generic_notoggle_inverse<AVR8_TIMER_CMPCHANNEL_OC_C>();
+    }
+
     if (is_compare_a())
     {
         raise_tov();
-
-        // TODO: fast pwm update output pins
-
         raise_ocf_a();
 
-        m_tcnt = 0;
-    
-        // the timer's rolled over, so we have to stop here
-        // or else the timer will advance!
-        return;
-    }
-    else if (m_tcnt == 0)
-    {
-        clear_tov();
-
-        // TODO: fast pwm update output pins
+        update_oc_generic<AVR8_TIMER_CMPCHANNEL_OC_A>();
+        is_wrapping = true;
     }
 
     if (is_compare_b())
     {
-        // LOGMASKED(LOG_TIMER1_TICK, "%s: timer1 WGM1 FAST_PWM_OCR, OCR1B, new count %04x, OCR1A/B %04x/%04x, ICR1 %04x\n", machine().describe_context(), timer1_count, m_ocr1[AVR8_REG_A], m_ocr1[AVR8_REG_B], icr1);
-        
-        // TODO: update OCxB output
-        
         raise_ocf_b();
+        update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_B>();
     }
-    else if (m_tcnt == 0)
+    
+    if (m_ocr_c_enabled && is_compare_c())
     {
-        // TODO: update OCxB
+        raise_ocf_c();
+        update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_C>();
     }
 
     // in all other cases, just keep ticking the timer upwards
-    m_tcnt = next_count();
+    m_tcnt = is_wrapping ? 0 : next_count();
 }
 
 void avr8_generic_t1_timer_device::advance_fast_pwm_icr()
@@ -1310,6 +1391,8 @@ void avr8_generic_t1_timer_device::wgm_w(uint8_t data)
         case GENERIC_TIMER1_WGM_PWM_10_BIT:
         case GENERIC_TIMER1_WGM_PWM_PFC_ICR1:
         case GENERIC_TIMER1_WGM_PWM_PFC_OCR1A:
+        case GENERIC_TIMER1_WGM_PWM_OCR1A:
+        case GENERIC_TIMER1_WGM_PWM_ICR1:
             m_dual_slope_counting_down = false; // guessed
             break;
 
@@ -1333,7 +1416,7 @@ void avr8_generic_t1_timer_device::cs_w(uint8_t data)
 {
     if (data == m_cs) return;
 
-    // Like Timer 1, this always runs in sync with the I/O clock,
+    // Like Timer 0, this always runs in sync with the I/O clock,
     // and m_cs should contain the same structure.
     m_cs = BIT(data, 0, 3);
 }

@@ -752,8 +752,10 @@ protected:
     inline void advance_fast_pwm_9bit();
     inline void advance_fast_pwm_10bit();
     inline void advance_ctc_ocr_a();
+    inline void advance_ctc_icr();
     inline void advance_fast_pwm_icr();
     inline void advance_fast_pwm_ocr_a();
+    inline void advance_pwm_ocr_a(); // same for phase-correct and phase/frequency-correct; only difference is when OCRxA is reloaded
 };
 
 /**
