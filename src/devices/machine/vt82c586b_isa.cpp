@@ -50,7 +50,8 @@ vt82c586b_isa_device::vt82c586b_isa_device(const machine_config &mconfig, const 
 	// 2*h for '586A
 	// 3*h for '586B OEM Silicon
 	// 4*h for '586B Production Silicon
-	set_ids(0x11060586, 0x41, 0x060100, 0x00000000);
+	// 0x47 from https://lkml.iu.edu/0109.2/0288.html
+	set_ids(0x11060586, 0x47, 0x060100, 0x00000000);
 }
 
 void vt82c586b_isa_device::device_add_mconfig(machine_config &config)

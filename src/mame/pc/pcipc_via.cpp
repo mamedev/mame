@@ -3,14 +3,6 @@
 /*
  * Sandbox for VIA based PCs
  *
- * Using Lucky Star 5AMVP3 given we already have a mostly compatible Super I/O (ITE 8661F)
- *
- * Notes:
- * - need to map_first the IDE for make it recognize both that and floppy disks;
- * - win98se: none of the via4in1 drivers seems to actually work with this BIOS. It will return
- *   "registry error, please reboot", with CD-ROM drive becoming non-functional afterwards.
- *   winme acts mostly the same, except that it manages to install with v4.17
- *
  * TODO:
  * - win98se/win98me: resource conflict between ACPI BIOS and AGP card(s), PCI cards works fine.
  *   Bridge memory/io bases not passed properly?
@@ -18,6 +10,8 @@
  *   (workaround: open debugger window at I/O $60);
  * - win98se: ACPI has issues on power off and reboot (workaround: use restart in MSDOS mode);
  * - freedos13: APMDOS hangs system with JEMMEX preloaded, works when issued standalone;
+ * - need to map_first the IDE for make it recognize both that and floppy disks, shouldn't be
+ *   necessary (check remapping chain);
  *
  * TODO (zidabx98):
  * - expects to reset after saving to CMOS from GPIO $5042 bit 3 low;
