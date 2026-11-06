@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: Tomás García-Merás (ClawGrip)
+// copyright-holders:Tomás García-Merás Capote
 
 /***************************************************************************
 
