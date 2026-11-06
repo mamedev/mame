@@ -102,6 +102,9 @@ DEFINE_DEVICE_TYPE(CRT9007, crt9007_device, "crt9007", "SMC CRT9007 VPAC")
 #define OPERATION_MODE \
 	((m_reg[0x0b] >> 1) & 0x07)
 
+#define DOUBLE_ROW_BUFFER \
+	(OPERATION_MODE == OPERATION_MODE_DOUBLE_ROW_BUFFER)
+
 #define INTERLACE_MODE \
 	((m_reg[0x0b] >> 4) & 0x03)
 
@@ -451,16 +454,16 @@ inline attotime crt9007_device::frame_period() const
 
 
 //-------------------------------------------------
-//  update_frame_timer - the frame timer follows
-//  the last row table read of the frame, one data
-//  row earlier with a double row buffer
+//  update_frame_timer - one data row before
+//  vertical retrace with a single row buffer, two
+//  with a double (data sheet: R1A bit 0)
 //-------------------------------------------------
 
 inline void crt9007_device::update_frame_timer()
 {
 	if (!HAS_VALID_PARAMETERS) return;
 
-	int const line = m_drb_bottom - (OPERATION_MODE == OPERATION_MODE_DOUBLE_ROW_BUFFER ? SCAN_LINES_PER_DATA_ROW : 0);
+	int const line = m_drb_bottom - (DOUBLE_ROW_BUFFER ? SCAN_LINES_PER_DATA_ROW : 0);
 	m_frame_timer->adjust(screen().time_until_pos(line, 0), 0, frame_period());
 }
 
@@ -926,7 +929,7 @@ uint8_t crt9007_device::read(offs_t offset)
 
 void crt9007_device::write(offs_t offset, uint8_t data)
 {
-	int const old_mode = OPERATION_MODE;
+	bool const was_double_row_buffer = DOUBLE_ROW_BUFFER;
 
 	m_reg[offset] = data;
 
@@ -995,7 +998,9 @@ void crt9007_device::write(offs_t offset, uint8_t data)
 		LOG("CRT9007 Operation Mode: %u\n", OPERATION_MODE);
 		LOG("CRT9007 Interlace Mode: %u\n", INTERLACE_MODE);
 		LOG("CRT9007 %s Mechanism\n", PAGE_BLANK ? "Page Blank" : "Smooth Scroll");
-		if (OPERATION_MODE != old_mode)
+		// the chip double buffers this register and applies it in vertical retrace;
+		// applying it here is a simplification
+		if (DOUBLE_ROW_BUFFER != was_double_row_buffer)
 			update_frame_timer();
 		break;
 
