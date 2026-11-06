@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dirk Best, Tomás García-Merás (ClawGrip)
+// copyright-holders:Dirk Best, Tomás García-Merás Capote
 /*
     Azkoyen T series tobacco vending machines
 

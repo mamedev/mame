@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dirk Best, Tomás García-Merás (ClawGrip)
+// copyright-holders:Dirk Best, Tomás García-Merás Capote
 /*
     Azkoyen "Design" tobacco vending machines (D6, D8, D10, D12, D14, D21...)
 
