@@ -441,6 +441,21 @@ inline void crt9007_device::recompute_cursor()
 
 
 //-------------------------------------------------
+//  update_frame_timer - the frame timer follows
+//  the last row table read of the frame, one data
+//  row earlier with a double row buffer
+//-------------------------------------------------
+
+inline void crt9007_device::update_frame_timer()
+{
+	if (!HAS_VALID_PARAMETERS) return;
+
+	int const line = m_drb_bottom - (OPERATION_MODE == OPERATION_MODE_DOUBLE_ROW_BUFFER ? SCAN_LINES_PER_DATA_ROW : 0);
+	m_frame_timer->adjust(screen().time_until_pos(line, 0), 0, clocks_to_attotime(CHARACTERS_PER_HORIZONTAL_PERIOD * SCAN_LINES_PER_FRAME));
+}
+
+
+//-------------------------------------------------
 //  recompute_parameters -
 //-------------------------------------------------
 
@@ -486,8 +501,7 @@ inline void crt9007_device::recompute_parameters()
 	m_vlt_timer->adjust(screen().time_until_pos(0, m_vlt_start), 1);
 	m_drb_timer->adjust(screen().time_until_pos(0, m_vlt_end));
 
-	int frame_timer_line = m_drb_bottom - (OPERATION_MODE == OPERATION_MODE_DOUBLE_ROW_BUFFER ? SCAN_LINES_PER_DATA_ROW : 0);
-	m_frame_timer->adjust(screen().time_until_pos(frame_timer_line, 0), 0, refresh);
+	update_frame_timer();
 
 	recompute_cursor();
 }
@@ -969,6 +983,7 @@ void crt9007_device::write(offs_t offset, uint8_t data)
 		LOG("CRT9007 Operation Mode: %u\n", OPERATION_MODE);
 		LOG("CRT9007 Interlace Mode: %u\n", INTERLACE_MODE);
 		LOG("CRT9007 %s Mechanism\n", PAGE_BLANK ? "Page Blank" : "Smooth Scroll");
+		update_frame_timer();
 		break;
 
 	case 0x0c:
