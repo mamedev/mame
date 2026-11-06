@@ -34,7 +34,7 @@
  U7 = Oki
  U10 = Unpopulated socket for Max 202
 
- The UM611024AK-20 is a '128K X 8BIT HIGH SPEED CMOS SRAM' so likely the video RAM
+ The UM611024AK-20 is a '128K X 8BIT HIGH SPEED CMOS SRAM' (video RAM)
  http://www.datasheetcatalog.com/datasheets_pdf/U/T/6/1/UT611024.shtml
 
 
@@ -54,9 +54,9 @@
                     two pixels per address (high nibble = left pixel).
                     A nibble of 0xf is not written (transparency) and the palette
                     select for the written pixels comes from register fffe.
-   write fe00-ffdf  palette: 15 palettes x 16 colours, xRRRRRGGGGGBBBBB, big endian
+   write fe00-ffdf  palette: 15 palettes x 16 colours
    fff3       w     window: unknown, always 0x60
-   fff4-fff7  w     window: start address / 64 = ((offset & 3) << 8) | data
+   fff4-fff7  w     window: start address / 64
    fff8       w     window: first byte of each line
    fff9       w     window: number of lines
    fffa       w     window: last byte of each line + 1
@@ -71,7 +71,7 @@
    fffe       w     palette select (high nibble) for video RAM writes
 
  Ports:
-   P1.0-P1.2  data ROM bank / dart board matrix row select (with P1.3)
+   P1.0-P1.2  data ROM bank / dart board matrix row select (with P1.3, through the ULN2003A)
    P1.3       dart board matrix row select
    P1.4       selects which half of the 16 dart board return lines is read (2x 74LS257)
    P1.5       unknown output
@@ -79,13 +79,15 @@
    P1.7       inertia sensor input (the program writes 0 to the latch, so it always reads 0)
    P3.2       INT0: vblank
    P3.3       INT1: window operation done
-   P3.4       Test 1: Initialization menu (end game, clear credits)
-   P3.5       Test 2: Test menu
+   P3.4       initialization key switch (end game, clear credits)
+   P3.5       test key switch (test menu)
+
+ The program numbers the key switches inconsistently: the input test shows P3.4 as
+ TEST 1 and P3.5 as TEST 2, but the messages asking to turn them off swap the numbers.
 
  TODO:
  - the window save / restore probably uses the unused part of the 128KB video RAM, it's
-   kept in a separate buffer here. The time it takes is unknown.
- - screen timings are unverified (assumed PAL, 8MHz pixel clock).
+   kept in a separate buffer here.
 
 */
 
@@ -99,9 +101,11 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "dartboard.lh"
+#include "multibyte.h"
 
 #include <algorithm>
+
+#include "dartboard.lh"
 
 #define LOG_REGS   (1U << 1)
 #define LOG_WINDOW (1U << 2)
@@ -114,20 +118,19 @@
 #define LOGWINDOW(...) LOGMASKED(LOG_WINDOW, __VA_ARGS__)
 
 /*
-   Gaelco coin control with voltmeter used on Goldart machines.
+   External Gaelco coin control PCB with voltmeter used on Goldart machines.
    Includes a two-digit 7-segment display, but no other detail is known.
 */
 class goldart_coincontrol_device : public device_t
 {
 public:
-	goldart_coincontrol_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-
 	static constexpr flags_type emulation_flags() { return flags::NOT_WORKING; }
 
-protected:
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
+	goldart_coincontrol_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
@@ -141,12 +144,8 @@ void goldart_coincontrol_device::device_start()
 {
 }
 
-void goldart_coincontrol_device::device_reset()
-{
-}
-
 ROM_START(goldart_ctrl)
-	ROM_REGION( 0x2000, "mcu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "m-vg_17919_pic16c54.bin", 0x00000, 0x2000, CRC(9f27564b) SHA1(2a45188cbb6475a466c5813afb0eaabf070d90ec) )
 ROM_END
 
@@ -178,9 +177,9 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	static constexpr unsigned SCREEN_WIDTH = 384;
-	static constexpr unsigned SCREEN_HEIGHT = 288;
-	static constexpr unsigned VRAM_SIZE = 0x20000;
+	static constexpr u16 SCREEN_WIDTH = 384;
+	static constexpr u16 SCREEN_HEIGHT = 288;
+	static constexpr u32 VRAM_SIZE = 0x20000;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -257,7 +256,6 @@ u32 goldart_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 void goldart_state::vram_w(offs_t offset, u8 data)
 {
-	// two pixels per address, a nibble of 0xf is not written
 	u8 *const dst = &m_vram[offset << 1];
 
 	if ((data & 0xf0) != 0xf0)
@@ -271,7 +269,7 @@ void goldart_state::palette_w(offs_t offset, u8 data)
 {
 	m_paletteram[offset] = data;
 
-	u16 const entry = (m_paletteram[offset & ~1] << 8) | m_paletteram[offset | 1];
+	u16 const entry = get_u16be(&m_paletteram[offset & ~1]);
 	m_palette->set_pen_color(offset >> 1, pal5bit(entry >> 10), pal5bit(entry >> 5), pal5bit(entry >> 0));
 }
 
@@ -283,7 +281,6 @@ void goldart_state::window_unk_w(u8 data)
 
 void goldart_state::window_addr_w(offs_t offset, u8 data)
 {
-	// the register offset provides the upper bits of the address
 	m_window_addr = ((offset & 3) << 8) | data;
 	LOGREGS("%s: window_addr_w %03x\n", machine().describe_context(), m_window_addr);
 }
@@ -344,8 +341,8 @@ void goldart_state::control_w(u8 data)
 	{
 		window_copy(BIT(data, 2));
 
-		// completion is signalled with INT1, the copy speed is a guess (one address per pixel clock)
-		unsigned const width = (m_window_right > m_window_left) ? (m_window_right - m_window_left) : 0;
+		// one address per pixel clock (guess)
+		u8 const width = (m_window_right > m_window_left) ? (m_window_right - m_window_left) : 0;
 		m_window_timer->adjust(attotime::from_ticks((width * m_window_lines) + 1, 32_MHz_XTAL / 4));
 	}
 
@@ -355,7 +352,6 @@ void goldart_state::control_w(u8 data)
 
 u8 goldart_state::dart_r()
 {
-	// P1.0-P1.3 drive the 4 row lines (through the ULN2003A), P1.4 selects which half of the 16 return lines is read
 	u8 data = 0xff;
 
 	for (int row = 0; row < 4; row++)
@@ -423,16 +419,15 @@ static INPUT_PORTS_START( goldart )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Ultrasonic Sensor") // SENSOR ULTRASONIDOS
 
 	PORT_START("P1")
-	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED ) // outputs, must read back as 1 (port pins read as latch & input)
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED ) // outputs, must read back as 1 (the program saves and restores P1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Inertia Sensor") // SENSOR DE INERCIA
 
 	PORT_START("P3")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED ) // serial port, INT0, INT1
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Test 1 (Initialization Menu)")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Test 2 (Test Menu)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_TOGGLE PORT_NAME("Initialization Key")
+	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED ) // expanded bus /WR, /RD
 
-	// dart board matrix, DARTn = row line n / 2 (P1.0-P1.3), return lines 0-7 (n even) or 8-15 (n odd)
 	// the dartboard layout finds the targets by these names
 	PORT_START("DART0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 16")
@@ -575,7 +570,6 @@ void goldart_state::goldart(machine_config &config)
 	m_oki->set_addrmap(0, &goldart_state::oki_map);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	// External coin control PCB
 	GOLDART_COINCONTROL(config, "coin_ctrl");
 }
 
@@ -661,7 +655,7 @@ ROM_START( goldartuk )
 ROM_END
 
 
-} // Anonymous namespace
+} // anonymous namespace
 
 //    YEAR, NAME,       PARENT,  MACHINE,  INPUT,   CLASS,         INIT,       ROT,  COMPANY,             FULLNAME,                             FLAGS,                 LAYOUT
 
