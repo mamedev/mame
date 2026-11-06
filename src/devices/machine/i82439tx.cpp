@@ -14,8 +14,8 @@ void i82439tx_host_device::config_map(address_map &map)
 	map(0x52, 0x52).rw(FUNC(i82439tx_host_device::cc_r), FUNC(i82439tx_host_device::cc_w));
 	map(0x56, 0x56).rw(FUNC(i82439tx_host_device::dramec_r), FUNC(i82439tx_host_device::dramec_w));
 	map(0x57, 0x57).rw(FUNC(i82439tx_host_device::dramc_r), FUNC(i82439tx_host_device::dramc_w));
-	map(0x58, 0x5f).rw(FUNC(i82439tx_host_device::pam_r), FUNC(i82439tx_host_device::pam_w));
 	map(0x58, 0x58).rw(FUNC(i82439tx_host_device::dramt_r), FUNC(i82439tx_host_device::dramt_w));
+	map(0x59, 0x5f).rw(FUNC(i82439tx_host_device::pam_r), FUNC(i82439tx_host_device::pam_w));
 	map(0x60, 0x67).rw(FUNC(i82439tx_host_device::drb_r), FUNC(i82439tx_host_device::drb_w));
 	map(0x68, 0x68).rw(FUNC(i82439tx_host_device::drt_r), FUNC(i82439tx_host_device::drt_w));
 	map(0x69, 0x69).rw(FUNC(i82439tx_host_device::drat_r), FUNC(i82439tx_host_device::drat_w));
@@ -233,13 +233,13 @@ void i82439tx_host_device::dramt_w(uint8_t data)
 
 uint8_t i82439tx_host_device::pam_r(offs_t offset)
 {
-	return pam[offset - 1];
+	return pam[offset];
 }
 
 void i82439tx_host_device::pam_w(offs_t offset, uint8_t data)
 {
-	pam[offset - 1] = data;
-	logerror("pam[%d] = %02x\n", offset - 1, pam[offset - 1]);
+	pam[offset] = data;
+	logerror("pam[%d] = %02x\n", offset, pam[offset]);
 	remap_cb();
 }
 
