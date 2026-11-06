@@ -247,6 +247,7 @@ void wd1010_device::start_command()
 	// now busy and command in progress, clear error
 	m_status |= STATUS_BSY;
 	m_status |= STATUS_CIP;
+	m_status &= ~STATUS_WF;
 	set_error(0);
 
 	switch (m_command >> 4)
@@ -357,6 +358,11 @@ void wd1010_device::drdy_w(int state)
 
 void wd1010_device::brdy_w(int state)
 {
+	// a full buffer ends the data request of a write, even during the seek
+	if (state && !m_brdy && (m_status & STATUS_CIP) &&
+			((m_command >> 4) == CMD_WRITE_SECTOR || (m_command >> 4) == CMD_WRITE_FORMAT))
+		set_bdrq(0);
+
 	m_brdy = state;
 }
 
@@ -483,6 +489,7 @@ void wd1010_device::write(offs_t offset, uint8_t data)
 			// selected drive not ready
 			LOG("--> Drive not ready, aborting\n");
 
+			m_status &= ~STATUS_WF;
 			set_error(ERR_AC);
 			end_command();
 		}
@@ -491,6 +498,11 @@ void wd1010_device::write(offs_t offset, uint8_t data)
 			m_command = data;
 
 			start_command();
+
+			// BDRQ comes before the implied seek: a WD1010AL-00 passes the HP 9133XV self test, which polls
+			// DRQ right after the command; the FORMAT flowchart has it there too, the WRITE SECTOR one after the seek
+			if ((m_command >> 4) == CMD_WRITE_SECTOR || (m_command >> 4) == CMD_WRITE_FORMAT)
+				set_bdrq(1);
 
 			// all other command imply a seek
 			if ((m_command >> 4) != CMD_SCAN_ID)
@@ -601,7 +613,17 @@ void wd1010_device::cmd_read_sector()
 
 	LOGDATA("--> Transferring sector to buffer (lba = %08x)\n", get_lbasector(m_sector_number));
 
-	file->read(get_lbasector(m_sector_number), buffer);
+	if (!file->read(get_lbasector(m_sector_number), buffer))
+	{
+		LOG("--> Read failed, aborting\n");
+
+		m_out_bcs_cb(0);
+
+		// a sector the image lacks (or cannot read) is not found (data sheet: READ SECTOR flowchart)
+		set_error(ERR_ID);
+		end_command();
+		return;
+	}
 
 	for (int i = 0; i < 512; i++)
 		m_out_data_cb(buffer[i]);
@@ -641,11 +663,10 @@ void wd1010_device::cmd_read_sector()
 
 void wd1010_device::cmd_write_sector()
 {
-	set_bdrq(1);
-
 	// wait if the buffer isn't ready
 	if (m_brdy == 0)
 	{
+		set_bdrq(1);
 		m_write_timer->adjust(attotime::from_usec(35));
 		return;
 	}
@@ -712,7 +733,19 @@ void wd1010_device::cmd_write_sector()
 	for (int i = 0; i < 512; i++)
 		buffer[i] = m_in_data_cb();
 
-	file->write(get_lbasector(m_sector_number), buffer);
+	if (!file->write(get_lbasector(m_sector_number), buffer))
+	{
+		LOG("--> Write failed, aborting\n");
+
+		m_out_bcs_cb(0);
+		m_out_wg_cb(0);
+
+		// a write fault latches WF and aborts the command (data sheet: status register, WRITE SECTOR flowchart)
+		m_status |= STATUS_WF;
+		set_error(ERR_AC);
+		end_command();
+		return;
+	}
 
 	// save last read head and sector number
 	m_drives[drive()].head = head();
