@@ -4,8 +4,6 @@
  * Sandbox for VIA based PCs
  *
  * TODO:
- * - win98se/win98me: resource conflict between ACPI BIOS and AGP card(s), PCI cards works fine.
- *   Bridge memory/io bases not passed properly?
  * - win98se: PS/2 keyboard becomes unresponsive after a while, caused by keyboard irq stuck
  *   (workaround: open debugger window at I/O $60);
  * - win98se: ACPI has issues on power off and reboot (workaround: use restart in MSDOS mode);
@@ -247,10 +245,10 @@ void mvp3_state::mvp3(machine_config &config)
 	acpi_dev.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 	acpi_dev.sci().set("pci:07.0", FUNC(vt82c586b_isa_device::pc_acpi_w));
 
-	PCI_SLOT(config, "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, "sis6326_agp");
 
 	// 8~11 is trusted, otherwise BIOS won't map intr_line(s) properly
-	PCI_SLOT(config, "pci:1", pci_cards,  8, 0, 1, 2, 3, "sis6326_pci");
+	PCI_SLOT(config, "pci:1", pci_cards,  8, 0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards,  9, 1, 2, 3, 0, "4dwavedx");
 	PCI_SLOT(config, "pci:3", pci_cards, 10, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci:4", pci_cards, 11, 3, 0, 1, 2, nullptr);
