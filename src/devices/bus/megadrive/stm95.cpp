@@ -51,6 +51,11 @@ void md_eeprom_stm95_device::load_nvram(device_image_interface &image)
 	image.battery_load(m_legacy_nvram->base(), m_legacy_nvram->bytes(), 0xff);
 }
 
+void md_eeprom_stm95_device::unload(device_image_interface &image)
+{
+	// The EEPROM device saves its own NVRAM.
+}
+
 void md_eeprom_stm95_device::device_start()
 {
 	save_item(NAME(m_rdcnt));
