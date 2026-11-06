@@ -17,11 +17,10 @@ copyright-holders:Chiaki Tachibana
 	</element>
 
 	<element name="static_bgcolor"><rect><color red="0.0" green="0.22" blue="0.22"/> </rect> </element>
-	<element name="digit_red"><led7seg><color red="1.00" green="0.1" blue="0.15"/> </led7seg> </element>
-	<element name="digit_green"><led7seg><color red="0.10" green="1.0" blue="0.15"/> </led7seg> </element>
-	<element name="digit_yellow"><led7seg><color red="1.00" green="1.0" blue="0.15"/> </led7seg> </element>
+	<element name="digit_red"><led7seg><color red="1.00" green="0.10" blue="0.10"/> </led7seg> </element>
+	<element name="digit_green"><led7seg><color red="0.10" green="1.00" blue="0.10"/> </led7seg> </element>
 
-<!-- Define SEG background -->
+<!-- Define SEGs background -->
 
 	<element name="segbgcolor" defstate="0">
 		<disk>
@@ -29,19 +28,15 @@ copyright-holders:Chiaki Tachibana
 			<bounds x="-0.02" y="-0.03" width="1.04" height="1.06"/>
 		</disk>
 		<disk state="0">
-			<color red="0.15" green="0.15" blue="0.15"/>
+			<color red="0.25" green="0.25" blue="0.10"/>
 			<bounds x="0" y="0" width="1" height="1"/>
 		</disk>
 		<disk state="1">
-			<color red="0.80" green="0.00" blue="0.15"/>
+			<color red="0.65" green="0.25" blue="0.10"/>
 			<bounds x="0" y="0" width="1" height="1"/>
 		</disk>
 		<disk state="2">
-			<color red="0.0" green="0.80" blue="0.15"/>
-			<bounds x="0" y="0" width="1" height="1"/>
-		</disk>
-		<disk state="3">
-			<color red="0.80" green="0.80" blue="0.15"/>
+			<color red="0.24" green="0.65" blue="0.10"/>
 			<bounds x="0" y="0" width="1" height="1"/>
 		</disk>
 	</element>
@@ -262,13 +257,13 @@ copyright-holders:Chiaki Tachibana
 			<bounds left="0" right="147" top="0" bottom="100"/>
 		</element>
 
-	<!-- Digital back color -->
+	<!-- Digital SEGs back color -->
 
 		<element name="digit0_back" ref="segbgcolor">
 			<bounds x="34" y="8" width="80" height="55"/>
 		</element>
 
-	<!-- Digital -->
+	<!-- Digital SEGs -->
 
 		<element name="digit0_red" ref="digit_red">
 			<bounds x="43" y="20" width="20" height="30"/>
@@ -287,16 +282,6 @@ copyright-holders:Chiaki Tachibana
 			<bounds x="63" y="20" width="20" height="30"/>
 		</element>
 		<element name="digit2_green" ref="digit_green">
-			<bounds x="83" y="20" width="20" height="30"/>
-		</element>
-
-		<element name="digit0_yellow" ref="digit_yellow">
-			<bounds x="43" y="20" width="20" height="30"/>
-		</element>
-		<element name="digit1_yellow" ref="digit_yellow">
-			<bounds x="63" y="20" width="20" height="30"/>
-		</element>
-		<element name="digit2_yellow" ref="digit_yellow">
 			<bounds x="83" y="20" width="20" height="30"/>
 		</element>
 

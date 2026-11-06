@@ -30,6 +30,13 @@
       gameplay footage and behave as expected during normal operation.
       However, the exact display update timing is not yet fully understood
       and may differ from real hardware at the logic level.
+    - Error sounds are triggered under the following conditions:
+      - When the Attacker Sensor remains continuously ON for a specified duration.
+      - During a jackpot round, if the Attacker Sensor is not triggered at least once
+        within a specified time after passing through the V-Zone Sensor.
+    - The status display "V-ZONE" blocks balls from passing through the V-Zone sensor
+      via a solenoid when OFF (unlit), and turns ON (lit) only when passing is permitted
+      during a jackpot round.
     - Periodic interrupt frequency is approximated based on gameplay footage
       and may not reflect exact hardware timing.
 
@@ -236,13 +243,13 @@ INTERRUPT_GEN_MEMBER(rookiedelta_state::interrupt)
 		u8 bg_color;
 
 		if (tmpr && tmpg)
-			bg_color = 3;	// Yellow (Red & Green)
+			bg_color = 3;		// Yellow (Red & Green)
 		else if (tmpg)
-			bg_color = 2;	// Green
+			bg_color = 2;		// Green
 		else if (tmpr)
-			bg_color = 1;	// Red
+			bg_color = 1;		// Red
 		else
-			bg_color = 0;	// Off
+			bg_color = 0;		// Off
 
 		m_lay_digits_back[seg[i]] = bg_color;
 	}
@@ -259,11 +266,14 @@ INTERRUPT_GEN_MEMBER(rookiedelta_state::interrupt)
 
 u8 rookiedelta_state::switch_r(offs_t offset)
 {
-	const u8 selected_bank = m_bank_select & 0x07;
+	if (!machine().side_effects_disabled())
+	{
+		const u8 selected_bank = m_bank_select & 0x07;
 
-	m_lamp_data[selected_bank] = m_lamp_pending;
-	m_seg_data[selected_bank]  = m_seg_pending;
-	m_aux_data[selected_bank]  = m_aux_pending;
+		m_lamp_data[selected_bank] = m_lamp_pending;
+		m_seg_data[selected_bank]  = m_seg_pending;
+		m_aux_data[selected_bank]  = m_aux_pending;
+	}
 
 	return m_switch_data;
 }
@@ -324,7 +334,7 @@ INPUT_PORTS_END
 void rookiedelta_state::rookiedelta(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 4.096_MHz_XTAL);
+	Z80(config, m_maincpu, XTAL(4'096'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &rookiedelta_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &rookiedelta_state::io_map);
 	// Interrupt frequency is estimated from observed gameplay pacing
@@ -333,7 +343,7 @@ void rookiedelta_state::rookiedelta(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	SN76496(config, m_sn76496, 4.096_MHz_XTAL).add_route(ALL_OUTPUTS, "speaker", 0.7);
+	SN76496(config, m_sn76496, XTAL(4'096'000)).add_route(ALL_OUTPUTS, "speaker", 0.7);
 }
 
 

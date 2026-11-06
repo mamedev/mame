@@ -33,15 +33,15 @@ copyright-holders:Chiaki Tachibana
 			<bounds x="0" y="0" width="1" height="1"/>
 		</disk>
 		<disk state="1">
-			<color red="1.00" green="0.00" blue="0.15"/>
+			<color red="0.65" green="0.00" blue="0.15"/>
 			<bounds x="0" y="0" width="1" height="1"/>
 		</disk>
 		<disk state="2">
-			<color red="0.00" green="1.00" blue="0.15"/>
+			<color red="0.00" green="0.65" blue="0.15"/>
 			<bounds x="0" y="0" width="1" height="1"/>
 		</disk>
 		<disk state="3">
-			<color red="1.00" green="1.00" blue="0.15"/>
+			<color red="0.65" green="0.65" blue="0.15"/>
 			<bounds x="0" y="0" width="1" height="1"/>
 		</disk>
 	</element>
@@ -54,11 +54,11 @@ copyright-holders:Chiaki Tachibana
 			<bounds x="-0.075" y="-0.075" width="1.15" height="1.15"/>
 		</rect>
 		<rect state="0">
-			<color red="0.2" green="0.02" blue="0.03"/>
+			<color red="0.20" green="0.02" blue="0.03"/>
 			<bounds x="0" y="0" width="1" height="1"/>
 		</rect>
 		<rect state="1">
-			<color red="1.0" green="0.1" blue="0.15"/>
+			<color red="1.0" green="0.10" blue="0.15"/>
 			<bounds x="0" y="0" width="1" height="1"/>
 		</rect>
 		<text string=" LED1 ">
@@ -282,7 +282,7 @@ copyright-holders:Chiaki Tachibana
 		<disk state="1">
 			<color red="1.0" green="0.1" blue="0.15"/>
 			<bounds x="0" y="0" width="1" height="1"/>
-		</disk>
+			</disk>
 	</element>
 	<element name="def_leds2_1" defstate="0">
 		<disk>
@@ -293,7 +293,7 @@ copyright-holders:Chiaki Tachibana
 			<color red="0.2" green="0.02" blue="0.03"/>
 			<bounds x="0" y="0" width="1" height="1"/>
 		</disk>
-		<disk state="1">
+			<disk state="1">
 			<color red="1.0" green="0.1" blue="0.15"/>
 			<bounds x="0" y="0" width="1" height="1"/>
 		</disk>
@@ -307,7 +307,7 @@ copyright-holders:Chiaki Tachibana
 			<color red="0.2" green="0.02" blue="0.03"/>
 			<bounds x="0" y="0" width="1" height="1"/>
 		</disk>
-		<disk state="1">
+			<disk state="1">
 			<color red="1.0" green="0.1" blue="0.15"/>
 			<bounds x="0" y="0" width="1" height="1"/>
 		</disk>
@@ -321,7 +321,7 @@ copyright-holders:Chiaki Tachibana
 			<color red="0.2" green="0.02" blue="0.03"/>
 			<bounds x="0" y="0" width="1" height="1"/>
 		</disk>
-		<disk state="1">
+			<disk state="1">
 			<color red="1.0" green="0.5" blue="0.15"/>
 			<bounds x="0" y="0" width="1" height="1"/>
 		</disk>
@@ -335,7 +335,7 @@ copyright-holders:Chiaki Tachibana
 			<color red="0.2" green="0.02" blue="0.03"/>
 			<bounds x="0" y="0" width="1" height="1"/>
 		</disk>
-		<disk state="1">
+			<disk state="1">
 			<color red="1.0" green="0.5" blue="0.15"/>
 			<bounds x="0" y="0" width="1" height="1"/>
 		</disk>
@@ -349,7 +349,7 @@ copyright-holders:Chiaki Tachibana
 			<color red="0.2" green="0.02" blue="0.03"/>
 			<bounds x="0" y="0" width="1" height="1"/>
 		</disk>
-		<disk state="1">
+			<disk state="1">
 			<color red="0.0" green="0.8" blue="0.15"/>
 			<bounds x="0" y="0" width="1" height="1"/>
 		</disk>
@@ -363,7 +363,7 @@ copyright-holders:Chiaki Tachibana
 			<color red="0.2" green="0.02" blue="0.03"/>
 			<bounds x="0" y="0" width="1" height="1"/>
 		</disk>
-		<disk state="1">
+			<disk state="1">
 			<color red="0.0" green="0.8" blue="0.15"/>
 			<bounds x="0" y="0" width="1" height="1"/>
 		</disk>
@@ -440,7 +440,7 @@ copyright-holders:Chiaki Tachibana
 			<bounds x="89.5" y="71" width="10" height="10"/>
 		</element>
 
-	<!-- LED -->
+	<!-- LED (Side arrays) -->
 
 		<element name="leds2_0" ref="def_leds2_0">
 			<bounds x="32" y="35" width="4" height="4"/>

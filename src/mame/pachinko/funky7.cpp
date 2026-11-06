@@ -30,12 +30,16 @@
       gameplay footage and behave as expected during normal operation.
       However, the exact display update timing is not yet fully understood
       and may differ from real hardware at the logic level.
+    - Error sounds are triggered under the following conditions:
+      - When the Attacker Sensor remains continuously ON for a specified duration.
+      - During a jackpot round, if the Attacker Sensor is not triggered at least once
+        within a specified time after passing through the V-Zone Sensor.
     - Periodic interrupt frequency is approximated based on gameplay footage
       and may not reflect exact hardware timing.
 
 ****************************************************************************
 
-    Funky 7 Digital Color Table
+    Funky 7 Digital SEGs Color Table
 
          L   C   R
         --- --- ---
@@ -98,7 +102,6 @@ public:
 		, m_ioport_in(*this, "INPUT")
 		, m_lay_digits_red(*this, "digit%u_red", 0U)
 		, m_lay_digits_green(*this, "digit%u_green", 0U)
-		, m_lay_digits_yellow(*this, "digit%u_yellow", 0U)
 		, m_lay_digits_back(*this, "digit%u_back", 0U)
 		, m_lay_leds(*this, "leds%u", 0U)
 		, m_lay_lamps(*this, "lamps%u", 0U)
@@ -116,7 +119,6 @@ private:
 	required_ioport m_ioport_in;
 	output_finder<3> m_lay_digits_red;
 	output_finder<3> m_lay_digits_green;
-	output_finder<3> m_lay_digits_yellow;
 	output_finder<3> m_lay_digits_back;
 	output_finder<4> m_lay_leds;
 	output_finder<7> m_lay_lamps;
@@ -176,8 +178,8 @@ INTERRUPT_GEN_MEMBER(funky7_state::interrupt)
 	// bit6: Unused
 	// bit7: Program reset
 
-	static const u8 num1[3] = { 2, 4, 6 };			// SEG Red bank offset
-	static const u8 num2[3] = { 1, 3, 5 };			// SEG Green bank offset
+	static const u8 num1[3] = { 2, 4, 6 };		// SEG Red bank offset
+	static const u8 num2[3] = { 1, 3, 5 };		// SEG Green bank offset
 
 	m_switch_data = m_ioport_in->read();
 
@@ -198,12 +200,11 @@ INTERRUPT_GEN_MEMBER(funky7_state::interrupt)
 
 	// 7-segment background backlight illumination
 	if (BIT(m_aux_data[3], 5))
-		m_bg_color = 2;	// Green
+		m_bg_color = 2;		// Green
 	else if (BIT(m_aux_data[3], 2))
-		m_bg_color = 1;	// Red
+		m_bg_color = 1;		// Red
 	else
-		m_bg_color = 0;	// Off
-
+		m_bg_color = 0;		// Off
 
 	for (u8 i = 0; i < 3; i++)
 		m_lay_digits_back[i] = m_bg_color;
@@ -307,7 +308,7 @@ INPUT_PORTS_END
 void funky7_state::funky7(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 4.096_MHz_XTAL);
+	Z80(config, m_maincpu, XTAL(4'096'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &funky7_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &funky7_state::io_map);
 	// Interrupt frequency is estimated from observed gameplay pacing
@@ -316,7 +317,7 @@ void funky7_state::funky7(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	SN76496(config, m_sn76496, 4.096_MHz_XTAL).add_route(ALL_OUTPUTS, "speaker", 0.7);
+	SN76496(config, m_sn76496, XTAL(4'096'000)).add_route(ALL_OUTPUTS, "speaker", 0.7);
 }
 
 
