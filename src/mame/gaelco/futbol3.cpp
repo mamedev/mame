@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: Tomás García-Merás Capote (ClawGrip)
+// copyright-holders:Tomás García-Merás Capote
 
 /*
   Gaelco 'Futbol-3' hardware for kiddie rides, pinballs, and electromechanicals
