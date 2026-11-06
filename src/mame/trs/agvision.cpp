@@ -216,6 +216,7 @@ void agvision_state::agvision(machine_config &config)
 	MC6847(config, m_vdg, XTAL(14'318'181) / 4); // VClk output from MC6883
 	m_vdg->set_screen(m_screen);
 	m_vdg->hsync_wr_callback().set(m_pia_0, FUNC(pia6821_device::ca1_w));
+	m_vdg->hsync_wr_callback().append(m_sam, FUNC(sam6883_device::hs_w));
 	m_vdg->input_callback().set(FUNC(agvision_state::sam_read));
 
 	// memory controller

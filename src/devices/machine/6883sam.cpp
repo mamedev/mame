@@ -143,6 +143,15 @@ void sam6883_device::device_start()
 		map_ram(0x0000, m_ram->size() - 1, m_ram->pointer(), m_ram->pointer());
 	install_ram_views();
 
+	// Install once: RAM remapping changes the page pointers, not this write handler.
+	m_high_write_tap = m_high_view[0].install_write_tap(0x8000, 0xfeff, "sam_ram_write",
+			[this] (offs_t offset, uint8_t &data, uint8_t mem_mask)
+			{
+				uint8_t *const page = m_ram_write[offset >> 8];
+				if (page)
+					page[offset & 0xff] = data;
+			});
+
 	// save state support
 	save_item(NAME(m_sam_state));
 	save_item(NAME(m_divider));
@@ -278,15 +287,7 @@ void sam6883_device::install_ram_views()
 
 	// $8000-$FEFF in map type 1: RAM reads, and writes reach both RAM and the
 	// ROM maps (S is 1-3 for writes)
-	m_high_write_tap.remove();
 	install_ram(m_high_view[0], 0x8000, 0xfeff, 0x8000, false);
-	m_high_write_tap = m_high_view[0].install_write_tap(0x8000, 0xfeff, "sam_ram_write",
-			[this] (offs_t offset, uint8_t &data, uint8_t mem_mask)
-			{
-				uint8_t *const page = m_ram_write[offset >> 8];
-				if (page)
-					page[offset & 0xff] = data;
-			});
 
 	// taps over the views do not survive reinstalling their contents
 	if (m_ad_tap_installed)
