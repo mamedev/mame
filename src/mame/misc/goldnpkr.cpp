@@ -1511,7 +1511,7 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::phnxjokr_get_bg_tile_info)
 {
 	/*  - bits -
 	    7654 3210
-	    --xx xx--   tiles color.
+	    -xxx -x--   tiles color.
 	    ---- --x-   tiles bank.
 	    ---- ---x   tiles extended address (MSB).
 	    xx-- ----   unused.
@@ -1520,12 +1520,11 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::phnxjokr_get_bg_tile_info)
 	uint16_t const attr = m_colorram[tile_index];
 	uint16_t const code = ((attr & 1) << 8) | m_videoram[tile_index];
 	uint16_t const bank = (attr & 0x02) >> 1;      // bit 1 switch the gfx banks
-	uint16_t color = (attr & 0x3c) >> 2;           // bits 2-3-4-5 for color
 
-	if (color == 4 || color == 5)
-	{
-		color -= 2;
-	}
+	// preparing the color mask 01110100
+	uint16_t const color_high = (attr & 0x70) >> 3;
+	uint16_t const color_low = (attr & 0x04) >> 2;
+	uint16_t const color = color_high | color_low;
 
 	tileinfo.set(bank, code, color, 0);
 }
