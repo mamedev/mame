@@ -1394,12 +1394,7 @@ void mcs51_cpu_device::device_reset()
 	m_tl1 = 0;
 	m_tl0 = 0;
 
-	// set the port configurations to all 1's
-	p3_w(0xff);
-	p2_w(0xff);
-	p1_w(0xff);
-	p0_w(0xff);
-
+	// before the port writes: p3_w() drives P3.1 from TxD
 	m_uart.data_out = 0;
 	m_uart.data_in = 0;
 	m_uart.rx_clk = 0;
@@ -1409,6 +1404,12 @@ void mcs51_cpu_device::device_reset()
 	m_uart.rxbit = SIO_IDLE;
 	m_uart.rxb8 = 0;
 	m_uart.smod_div = 0;
+
+	// set the port configurations to all 1's
+	p3_w(0xff);
+	p2_w(0xff);
+	p1_w(0xff);
+	p0_w(0xff);
 
 	update_irq_prio();
 }
