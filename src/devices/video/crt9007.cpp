@@ -441,6 +441,16 @@ inline void crt9007_device::recompute_cursor()
 
 
 //-------------------------------------------------
+//  frame_period - programmed time of one frame
+//-------------------------------------------------
+
+inline attotime crt9007_device::frame_period() const
+{
+	return clocks_to_attotime(CHARACTERS_PER_HORIZONTAL_PERIOD * SCAN_LINES_PER_FRAME);
+}
+
+
+//-------------------------------------------------
 //  update_frame_timer - the frame timer follows
 //  the last row table read of the frame, one data
 //  row earlier with a double row buffer
@@ -451,7 +461,7 @@ inline void crt9007_device::update_frame_timer()
 	if (!HAS_VALID_PARAMETERS) return;
 
 	int const line = m_drb_bottom - (OPERATION_MODE == OPERATION_MODE_DOUBLE_ROW_BUFFER ? SCAN_LINES_PER_DATA_ROW : 0);
-	m_frame_timer->adjust(screen().time_until_pos(line, 0), 0, clocks_to_attotime(CHARACTERS_PER_HORIZONTAL_PERIOD * SCAN_LINES_PER_FRAME));
+	m_frame_timer->adjust(screen().time_until_pos(line, 0), 0, frame_period());
 }
 
 
@@ -469,7 +479,7 @@ inline void crt9007_device::recompute_parameters()
 	int vert_pix_total = SCAN_LINES_PER_FRAME;
 
 	// refresh rate
-	attotime refresh = clocks_to_attotime(CHARACTERS_PER_HORIZONTAL_PERIOD * vert_pix_total);
+	attotime refresh = frame_period();
 
 	// horizontal sync
 	m_hsync_start = 0;
@@ -916,6 +926,8 @@ uint8_t crt9007_device::read(offs_t offset)
 
 void crt9007_device::write(offs_t offset, uint8_t data)
 {
+	int const old_mode = OPERATION_MODE;
+
 	m_reg[offset] = data;
 
 	switch (offset)
@@ -983,7 +995,8 @@ void crt9007_device::write(offs_t offset, uint8_t data)
 		LOG("CRT9007 Operation Mode: %u\n", OPERATION_MODE);
 		LOG("CRT9007 Interlace Mode: %u\n", INTERLACE_MODE);
 		LOG("CRT9007 %s Mechanism\n", PAGE_BLANK ? "Page Blank" : "Smooth Scroll");
-		update_frame_timer();
+		if (OPERATION_MODE != old_mode)
+			update_frame_timer();
 		break;
 
 	case 0x0c:
