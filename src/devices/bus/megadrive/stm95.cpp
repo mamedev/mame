@@ -20,7 +20,6 @@ md_eeprom_stm95_device::md_eeprom_stm95_device(const machine_config &mconfig, de
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_md_cart_interface(mconfig, *this)
 	, m_stm95(*this, "eeprom")
-	, m_legacy_nvram(*this, "eeprom")
 	, m_rdcnt(0)
 {
 }
@@ -31,24 +30,9 @@ md_eeprom_stm95_device::md_eeprom_stm95_device(const machine_config &mconfig, co
 }
 
 
-ROM_START( md_eeprom_stm95 )
-	ROM_REGION(0x1000, "eeprom", ROMREGION_ERASEFF)
-ROM_END
-
-const tiny_rom_entry *md_eeprom_stm95_device::device_rom_region() const
-{
-	return ROM_NAME(md_eeprom_stm95);
-}
-
 void md_eeprom_stm95_device::device_add_mconfig(machine_config &config)
 {
 	SPI_EEPROM_M95320(config, m_stm95);
-}
-
-void md_eeprom_stm95_device::load_nvram(device_image_interface &image)
-{
-	// Import the old battery file as defaults; existing device NVRAM takes precedence.
-	image.battery_load(m_legacy_nvram->base(), m_legacy_nvram->bytes(), 0xff);
 }
 
 void md_eeprom_stm95_device::unload(device_image_interface &image)

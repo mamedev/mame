@@ -129,7 +129,6 @@ public:
 protected:
 	device_md_cart_interface(const machine_config &mconfig, device_t &device);
 
-	virtual void load_nvram(device_image_interface &image);
 	virtual void unload(device_image_interface &image) ATTR_COLD;
 
 	int m_nvram_start, m_nvram_end;

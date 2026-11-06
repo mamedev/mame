@@ -101,12 +101,6 @@ void device_md_cart_interface::nvram_alloc(size_t size)
 	m_nvram.resize(size/sizeof(uint16_t));
 }
 
-void device_md_cart_interface::load_nvram(device_image_interface &image)
-{
-	if (get_nvram_size())
-		image.battery_load(get_nvram_base(), get_nvram_size(), 0xff);
-}
-
 void device_md_cart_interface::unload(device_image_interface &image)
 {
 	if (get_nvram_size() && get_nvram_base())
@@ -348,7 +342,8 @@ std::pair<std::error_condition, std::string> base_md_cart_slot_device::call_load
 			// STEP 4: take care of SRAM.
 			setup_nvram();
 
-			m_cart->load_nvram(*this);
+			if (m_cart->get_nvram_size())
+				battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0xff);
 
 			file_logging((uint8_t *)m_cart->get_rom_base(), m_cart->get_rom_size(), m_cart->get_nvram_size());
 		}

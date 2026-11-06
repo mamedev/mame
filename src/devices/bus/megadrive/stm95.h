@@ -30,17 +30,14 @@ protected:
 	md_eeprom_stm95_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	virtual void load_nvram(device_image_interface &image) override;
 	virtual void unload(device_image_interface &image) override ATTR_COLD;
 
 private:
 	required_device<eeprom_spi_m95320_device> m_stm95;
-	required_memory_region m_legacy_nvram;
 
 	uint8_t m_bank[3];
 	int m_rdcnt;
