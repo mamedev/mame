@@ -4,6 +4,9 @@
 
 Winbond W83877TF
 
+TODO:
+- p5txla: "conflict ports on 378 2F8 3F8", doesn't print first range with wpiset 0x378,8,rw (?)
+
 **************************************************************************************************/
 
 
@@ -215,7 +218,10 @@ void w83877tf_device::remap(int space_id, offs_t start, offs_t end)
 		for (int i = 0; i < 2; i++)
 		{
 			const u16 uart_address = m_uart_ad[i];
-			m_isa->install_device(uart_address, uart_address + 7, read8sm_delegate(*m_com[i], FUNC(ns16450_device::ins8250_r)), write8sm_delegate(*m_com[i], FUNC(ns16450_device::ins8250_w)));
+			if (uart_address & 0x300)
+			{
+				m_isa->install_device(uart_address, uart_address + 7, read8sm_delegate(*m_com[i], FUNC(ns16450_device::ins8250_r)), write8sm_delegate(*m_com[i], FUNC(ns16450_device::ins8250_w)));
+			}
 		}
 
 		// needs to be done after FDC
