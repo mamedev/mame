@@ -149,10 +149,10 @@ public:
 	eeprom_spi_m95320_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
-DECLARE_DEVICE_TYPE(EEPROM_25320, eeprom_spi_25320_device)
-DECLARE_DEVICE_TYPE(EEPROM_M95010, eeprom_spi_m95010_device)
-DECLARE_DEVICE_TYPE(EEPROM_M95020, eeprom_spi_m95020_device)
-DECLARE_DEVICE_TYPE(EEPROM_M95040, eeprom_spi_m95040_device)
-DECLARE_DEVICE_TYPE(EEPROM_M95320, eeprom_spi_m95320_device)
+DECLARE_DEVICE_TYPE(SPI_EEPROM_25320, eeprom_spi_25320_device)
+DECLARE_DEVICE_TYPE(SPI_EEPROM_M95010, eeprom_spi_m95010_device)
+DECLARE_DEVICE_TYPE(SPI_EEPROM_M95020, eeprom_spi_m95020_device)
+DECLARE_DEVICE_TYPE(SPI_EEPROM_M95040, eeprom_spi_m95040_device)
+DECLARE_DEVICE_TYPE(SPI_EEPROM_M95320, eeprom_spi_m95320_device)
 
 #endif // MAME_MACHINE_EEPROMSPI_H

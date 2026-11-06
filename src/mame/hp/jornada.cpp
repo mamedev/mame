@@ -613,7 +613,7 @@ void jornada_state::jornada720(machine_config &config)
 	m_companion->i2s_out().set(m_codec, FUNC(uda1344_device::i2s_input_w));
 	m_companion->irq_out().set(m_sa_periphs, FUNC(sa1110_periphs_device::gpio_in<1>));
 
-	EEPROM_M95020(config, m_nvram);
+	SPI_EEPROM_M95020(config, m_nvram);
 
 	UDA1344(config, m_codec);
 	m_codec->l3_ack_out().set(m_companion, FUNC(sa1111_device::l3wd_in));

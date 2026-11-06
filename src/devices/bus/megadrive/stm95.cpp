@@ -42,7 +42,7 @@ const tiny_rom_entry *md_eeprom_stm95_device::device_rom_region() const
 
 void md_eeprom_stm95_device::device_add_mconfig(machine_config &config)
 {
-	EEPROM_M95320(config, m_stm95);
+	SPI_EEPROM_M95320(config, m_stm95);
 }
 
 void md_eeprom_stm95_device::load_nvram(device_image_interface &image)

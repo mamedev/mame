@@ -24,11 +24,11 @@
 #include <bit>
 
 
-DEFINE_DEVICE_TYPE(EEPROM_25320, eeprom_spi_25320_device, "25320", "SPI EEPROM 25320 (4096x8)")
-DEFINE_DEVICE_TYPE(EEPROM_M95010, eeprom_spi_m95010_device, "m95010", "SPI EEPROM M95010 (128x8)")
-DEFINE_DEVICE_TYPE(EEPROM_M95020, eeprom_spi_m95020_device, "m95020", "SPI EEPROM M95020 (256x8)")
-DEFINE_DEVICE_TYPE(EEPROM_M95040, eeprom_spi_m95040_device, "m95040", "SPI EEPROM M95040 (512x8)")
-DEFINE_DEVICE_TYPE(EEPROM_M95320, eeprom_spi_m95320_device, "m95320", "SPI EEPROM M95320 (4096x8)")
+DEFINE_DEVICE_TYPE(SPI_EEPROM_25320, eeprom_spi_25320_device, "25320", "SPI EEPROM 25320 (4096x8)")
+DEFINE_DEVICE_TYPE(SPI_EEPROM_M95010, eeprom_spi_m95010_device, "m95010", "SPI EEPROM M95010 (128x8)")
+DEFINE_DEVICE_TYPE(SPI_EEPROM_M95020, eeprom_spi_m95020_device, "m95020", "SPI EEPROM M95020 (256x8)")
+DEFINE_DEVICE_TYPE(SPI_EEPROM_M95040, eeprom_spi_m95040_device, "m95040", "SPI EEPROM M95040 (512x8)")
+DEFINE_DEVICE_TYPE(SPI_EEPROM_M95320, eeprom_spi_m95320_device, "m95320", "SPI EEPROM M95320 (4096x8)")
 
 
 eeprom_spi_base_device::eeprom_spi_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 page_bytes, u8 address_bytes) :
@@ -50,7 +50,7 @@ eeprom_spi_base_device::eeprom_spi_base_device(const machine_config &mconfig, de
 
 
 eeprom_spi_25320_device::eeprom_spi_25320_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	eeprom_spi_base_device(mconfig, EEPROM_25320, tag, owner, 32, 2)
+	eeprom_spi_base_device(mconfig, SPI_EEPROM_25320, tag, owner, 32, 2)
 {
 	size(0x1000, 8);
 	write_time(attotime::from_msec(5));
@@ -69,22 +69,22 @@ eeprom_spi_m950x0_device::eeprom_spi_m950x0_device(const machine_config &mconfig
 }
 
 eeprom_spi_m95010_device::eeprom_spi_m95010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	eeprom_spi_m950x0_device(mconfig, EEPROM_M95010, tag, owner, 0x80)
+	eeprom_spi_m950x0_device(mconfig, SPI_EEPROM_M95010, tag, owner, 0x80)
 {
 }
 
 eeprom_spi_m95020_device::eeprom_spi_m95020_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	eeprom_spi_m950x0_device(mconfig, EEPROM_M95020, tag, owner, 0x100)
+	eeprom_spi_m950x0_device(mconfig, SPI_EEPROM_M95020, tag, owner, 0x100)
 {
 }
 
 eeprom_spi_m95040_device::eeprom_spi_m95040_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	eeprom_spi_m950x0_device(mconfig, EEPROM_M95040, tag, owner, 0x200)
+	eeprom_spi_m950x0_device(mconfig, SPI_EEPROM_M95040, tag, owner, 0x200)
 {
 }
 
 eeprom_spi_m95320_device::eeprom_spi_m95320_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	eeprom_spi_base_device(mconfig, EEPROM_M95320, tag, owner, 32, 2)
+	eeprom_spi_base_device(mconfig, SPI_EEPROM_M95320, tag, owner, 32, 2)
 {
 	size(0x1000, 8);
 	write_time(attotime::from_msec(5));

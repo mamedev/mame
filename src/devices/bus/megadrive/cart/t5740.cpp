@@ -28,7 +28,7 @@ megadrive_hb_psolar_device::megadrive_hb_psolar_device(const machine_config &mco
 
 void megadrive_hb_psolar_device::device_add_mconfig(machine_config &config)
 {
-	EEPROM_M95320(config, m_spi_eeprom);
+	SPI_EEPROM_M95320(config, m_spi_eeprom);
 }
 
 void megadrive_hb_psolar_device::device_start()
