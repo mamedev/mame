@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: Tomás García-Merás Capote (ClawGrip)
+// copyright-holders:Tomás García-Merás Capote
 /********************************************************************************
 
  Driver for MCS51-based crane coinops from Compumatic.
