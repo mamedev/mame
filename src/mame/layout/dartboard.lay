@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
-copyright-holders: Tomás García-Merás Capote (ClawGrip)
+copyright-holders:Tomás García-Merás Capote
 
 Clickable dart board shared by the dart games.
 The targets are found by the names of the input fields, wherever they are:

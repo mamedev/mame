@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, Tomás García-Merás Capote (ClawGrip)
+// copyright-holders:David Haywood, Tomás García-Merás Capote
 
 /*
   _____________________________________________________________________
