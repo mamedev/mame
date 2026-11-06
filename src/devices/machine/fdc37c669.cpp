@@ -2,7 +2,7 @@
 // copyright-holders: Angelo Salese
 /**************************************************************************************************
 
-SMSC FDC37C669 PC98/PC99 complaint Super I/O
+SMSC FDC37C669 PC98/PC99 compliant Super I/O
 
 Differences between this and '665:
 - capability of setting addresses/IRQ/DRQ lines for the various devices;
@@ -12,8 +12,7 @@ Differences between this and '665:
 - aggressive <reserved> masks when writing to the CR00~CR0C base registers;
 
 TODO:
-- IRQ and DRQ selects (more akin to FDC37C93X, with custom lines named IRQ_A ~ IRQ_H and
-  DMA_A ~ DMA_C). UART can share irq by setting COM2 to 0xf;
+- Complete DMA (only floppy setting used by BIOSes so far);
 - FDD drive type;
 - PLL at CR10 (used by BIOSes);
 - GAMECS, GPIO and PWRGD;
@@ -42,10 +41,14 @@ fdc37c669_device::fdc37c669_device(const machine_config &mconfig, const char *ta
 	, m_fdc(*this, "fdc")
 	, m_lpt(*this, "lpt")
 	, m_com(*this, "com%d", 1U)
-	, m_fintr_callback(*this)
-	, m_pintr1_callback(*this)
-	, m_irq3_callback(*this)
-	, m_irq4_callback(*this)
+	, m_irqa_callback(*this)
+	, m_irqb_callback(*this)
+	, m_irqc_callback(*this)
+	, m_irqd_callback(*this)
+	, m_irqe_callback(*this)
+	, m_irqf_callback(*this)
+//	, m_irqg_callback(*this)
+	, m_irqh_callback(*this)
 	, m_txd1_callback(*this)
 	, m_ndtr1_callback(*this)
 	, m_nrts1_callback(*this)
@@ -446,13 +449,57 @@ void fdc37c669_device::config_map(address_map &map)
  * IRQ section
  */
 
-// TODO: emulate properly
+void fdc37c669_device::request_irq(int irq, int state)
+{
+	switch (irq)
+	{
+	case 1:
+		m_irqa_callback(state);
+		break;
+	case 2:
+		m_irqb_callback(state);
+		break;
+	case 3:
+		m_irqc_callback(state);
+		break;
+	case 4:
+		m_irqd_callback(state);
+		break;
+	case 5:
+		m_irqe_callback(state);
+		break;
+	case 6:
+		m_irqf_callback(state);
+		break;
+	case 8:
+		m_irqh_callback(state);
+		break;
+	}
+}
+
+void fdc37c669_device::request_dma(int dreq, int state)
+{
+	// TODO: these are DMA_A ~ DMA_C not necessarily tied to ISA bus DRQ lines
+	switch (dreq)
+	{
+//	case 1:
+//		m_isa->drq1_w(state);
+//		break;
+	case 2:
+		m_isa->drq2_w(state);
+		break;
+//	case 3:
+//		m_isa->drq3_w(state);
+//		break;
+	}
+}
+
 void fdc37c669_device::irq_floppy_w(int state)
 {
 	if (!BIT(m_cr[0], 3))
 		return;
 
-	m_fintr_callback(state);
+	request_irq(m_fdc_irq, state);
 }
 
 void fdc37c669_device::drq_floppy_w(int state)
@@ -460,7 +507,7 @@ void fdc37c669_device::drq_floppy_w(int state)
 	if (!BIT(m_cr[0], 3))
 		return;
 
-	m_isa->drq2_w(state);
+	request_dma(m_fdc_drq, state);
 }
 
 void fdc37c669_device::irq_parallel_w(int state)
@@ -468,7 +515,7 @@ void fdc37c669_device::irq_parallel_w(int state)
 	if (!BIT(m_cr[1], 2))
 		return;
 
-	m_pintr1_callback(state);
+	request_irq(m_lpt_irq, state);
 }
 
 void fdc37c669_device::irq_serial1_w(int state)
@@ -476,17 +523,7 @@ void fdc37c669_device::irq_serial1_w(int state)
 	if (!BIT(m_cr[2], 3))
 		return;
 
-//  if (BIT(m_cr[2], 0))
-//  {
-//      // COM2 ~ COM4
-//      m_irq3_callback(state);
-//  }
-//
-//  else
-//  {
-//      // COM1 ~ COM3
-//      m_irq4_callback(state);
-//  }
+	request_irq(m_com_irq[0], state);
 }
 
 void fdc37c669_device::irq_serial2_w(int state)
@@ -494,16 +531,9 @@ void fdc37c669_device::irq_serial2_w(int state)
 	if (!BIT(m_cr[2], 7))
 		return;
 
-//  if (BIT(m_cr[2], 4))
-//  {
-//      // COM1 ~ COM3
-//      m_irq3_callback(state);
-//  }
-//  else
-//  {
-//      // COM2 ~ COM4
-//      m_irq4_callback(state);
-//  }
+	// COM2 follows COM1 if config is set to 0xf
+	const u8 which = m_com_irq[1] != 0xf;
+	request_irq(m_com_irq[which], state);
 }
 
 void fdc37c669_device::txd_serial1_w(int state)

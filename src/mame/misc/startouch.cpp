@@ -106,10 +106,18 @@ static void isa_internal_devices(device_slot_interface &device)
 void startouch_state::superio_config(device_t *device)
 {
 	fdc37c669_device &fdc = *downcast<fdc37c669_device *>(device);
-	fdc.fintr().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq6_w));
-	fdc.pintr1().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq7_w));
-	fdc.irq3().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq3_w));
-	fdc.irq4().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq4_w));
+	// CR26: 20 (FDC DRQ 2 LPT DRQ 0) DMA_B / <disabled>
+	// CR27: 65 (FDC IRQ 6 LPT IRQ 5) IRQ_F / IRQ_E
+	// CR28: 43 (COM1 IRQ 4 COM2 IRQ 3) IRQ_D / IRQ_C
+	// CR29: 30 (IRQIN 0) <disabled>
+//	fdc.irq_a().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq1_w));
+//	fdc.irq_b().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq2_w));
+	fdc.irq_c().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq3_w));
+	fdc.irq_d().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq4_w));
+	fdc.irq_e().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq7_w));
+	fdc.irq_f().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq6_w));
+//	fdc.irq_h().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq8n_w));
+
 	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
 	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
 	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));

@@ -22,10 +22,15 @@ public:
 
 	void remap(int space_id, offs_t start, offs_t end) override;
 
-	auto fintr() { return m_fintr_callback.bind(); }
-	auto pintr1() { return m_pintr1_callback.bind(); }
-	auto irq3() { return m_irq3_callback.bind(); }
-	auto irq4() { return m_irq4_callback.bind(); }
+	auto irq_a() { return m_irqa_callback.bind(); }
+	auto irq_b() { return m_irqb_callback.bind(); }
+	auto irq_c() { return m_irqc_callback.bind(); }
+	auto irq_d() { return m_irqd_callback.bind(); }
+	auto irq_e() { return m_irqe_callback.bind(); }
+	auto irq_f() { return m_irqf_callback.bind(); }
+//	auto irq_g() { return m_irqg_callback.bind(); }
+	auto irq_h() { return m_irqh_callback.bind(); }
+
 	auto txd1() { return m_txd1_callback.bind(); }
 	auto ndtr1() { return m_ndtr1_callback.bind(); }
 	auto nrts1() { return m_nrts1_callback.bind(); }
@@ -60,11 +65,14 @@ private:
 	required_device<pc_lpt_device> m_lpt;
 	required_device_array<ns16550_device, 2> m_com;
 
-	devcb_write_line m_fintr_callback;
-//  devcb_write_line m_fdrq_callback;
-	devcb_write_line m_pintr1_callback; // Parallel
-	devcb_write_line m_irq3_callback; // Serial Port COM2/COM4
-	devcb_write_line m_irq4_callback; // Serial Port COM1/COM3
+	devcb_write_line m_irqa_callback;
+	devcb_write_line m_irqb_callback;
+	devcb_write_line m_irqc_callback;
+	devcb_write_line m_irqd_callback;
+	devcb_write_line m_irqe_callback;
+	devcb_write_line m_irqf_callback;
+//	devcb_write_line m_irqg_callback; // IDE, TBD
+	devcb_write_line m_irqh_callback;
 
 	devcb_write_line m_txd1_callback;
 	devcb_write_line m_ndtr1_callback;
@@ -78,6 +86,8 @@ private:
 
 	void config_map(address_map &map) ATTR_COLD;
 
+	void request_irq(int irq, int state);
+	void request_dma(int dreq, int state);
 	void irq_floppy_w(int state);
 	void drq_floppy_w(int state);
 
@@ -124,4 +134,4 @@ private:
 
 DECLARE_DEVICE_TYPE(FDC37C669, fdc37c669_device);
 
-#endif // MAME_MACHINE_FDC37C665IR_H
+#endif // MAME_MACHINE_FDC37C669_H
