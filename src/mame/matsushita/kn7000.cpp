@@ -460,6 +460,10 @@ void kn_sd_state::kn7000_map(address_map &map)
 	// updater: the CPU starts there at reset and is sent on to 0x48400000,
 	// where the driver starts it directly.
 	map(0x40000000, 0x403fffff).mirror(0x400000).rom().region("rhythm_data", 0);
+	// The board straps: a KN7000 reads 0xf8f7 with the rear switch SW701 at
+	// MIDI IN, and strap_r() takes bit 12 from that switch. The firmware lays
+	// out the wave ROMs by bits 11-10.
+	map(0x98070000, 0x98070001).r(FUNC(kn_sd_state::strap_r<0xe8f7>));
 }
 
 void kn_sd_state::kn2600_map(address_map &map)
