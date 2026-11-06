@@ -780,7 +780,7 @@ protected:
 	uint8_t m_lock_bits;
 
 	// CPU registers
-	std::unique_ptr<uint8_t []> m_r; // no longer shared because it's getting broken up
+	uint8_t m_r[0x200]; // no longer shared because it's getting broken up
 	uint32_t m_pc;
 
 	// internal CPU state

@@ -1267,10 +1267,6 @@ void avr8_base_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 
-	// allocate legacy register file; will be killed in the future
-	// when all devices and I/O registers are treated like real registers.
-	m_r = std::make_unique<uint8_t []>(0x200);
-
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_pc).callexport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC",     m_pc).callexport().noshow();
@@ -1313,6 +1309,7 @@ void avr8_base_device::device_start()
 	state_add(AVR8_R31,        "R31",       m_r[31]).mask(0xff);
 
 	// register our state for saving
+	save_item(NAME(m_r));
 	save_item(NAME(m_boot_size));
 	save_item(NAME(m_lfuses));
 	save_item(NAME(m_hfuses));
