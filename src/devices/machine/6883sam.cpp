@@ -158,6 +158,21 @@ void sam6883_device::device_start()
 
 
 //-------------------------------------------------
+//  device_stop - release view handlers while the
+//  CPU's tap bookkeeping is still alive
+//-------------------------------------------------
+
+void sam6883_device::device_stop()
+{
+	m_ad_tap.remove();
+	m_ad_tap_installed = false;
+	m_low_view[0].unmap_readwrite(0x0000, 0x7fff);
+	m_low_view[1].unmap_readwrite(0x0000, 0x7fff);
+	m_high_view[0].unmap_readwrite(0x8000, 0xfeff);
+}
+
+
+//-------------------------------------------------
 //  amap - the CPU's view of the SAM's address
 //  space
 //-------------------------------------------------
