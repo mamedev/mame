@@ -240,7 +240,7 @@ Thrill Drive 713A13  -       713A14  -
 #include "machine/x76f041.h"
 #include "sound/k056800.h"
 #include "sound/rf5c400.h"
-#include "video/voodoo.h"
+#include "video/voodoo_pci.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -261,7 +261,8 @@ public:
 		m_k001604(*this, "k001604_%u", 1U),
 		m_konppc(*this, "konppc"),
 		m_adc12138(*this, "adc12138"),
-		m_voodoo(*this, "voodoo%u", 0U),
+		m_voodoo(*this, "pci%u:00.0", 0U),
+		m_k033906(*this, "pci%u:host", 0U),
 		m_palette(*this, "palette%u", 1U),
 		m_sharc_dataram(*this, "sharc%u_dataram", 0U),
 		m_jvs_host(*this, "jvs_host"),
@@ -297,7 +298,8 @@ private:
 	required_device_array<k001604_device, 2> m_k001604;
 	required_device<konppc_device> m_konppc;
 	required_device<adc12138_device> m_adc12138;
-	required_device_array<generic_voodoo_device, 2> m_voodoo;
+	required_device_array<voodoo_pci_device, 2> m_voodoo;
+	required_device_array<k033906_device, 2> m_k033906;
 	required_device_array<palette_device, 2> m_palette;
 	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
 	required_device<konppc_jvs_host_device> m_jvs_host;
@@ -335,7 +337,7 @@ uint32_t nwktr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	int const board = m_exrgb ? 1 : 0;
 
-	m_voodoo[board]->update(bitmap, cliprect);
+	m_voodoo[board]->screen_update(screen, bitmap, cliprect);
 	m_k001604[0]->draw_front_layer(screen, bitmap, cliprect); // K001604 on slave board doesn't seem to output anything. Bug or intended?
 
 	return 0;
@@ -655,11 +657,12 @@ void nwktr_state::nwktr(machine_config &config)
 	ADC12138(config, m_adc12138);
 	m_adc12138->set_ipt_convert_callback(FUNC(nwktr_state::adc12138_input_callback));
 
-	K033906(config, "k033906_1", m_voodoo[0]);
-	K033906(config, "k033906_2", m_voodoo[1]);
-
 	// video hardware
-	VOODOO_1(config, m_voodoo[0], 50_MHz_XTAL);
+	PCI_ROOT(config, "pci0");
+	K033906(config, m_k033906[0]);
+
+	VOODOO_1_PCI(config, m_voodoo[0], 0);
+	m_voodoo[0]->set_ids(0x121a0001, 0x02, 0x040000, 0); // Konami firmware requires the multimedia class
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(2,2);
 	m_voodoo[0]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
@@ -668,7 +671,11 @@ void nwktr_state::nwktr(machine_config &config)
 	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_voodoo[0]->stall_callback().set(m_dsp[0], FUNC(adsp21062_device::write_stall));
 
-	VOODOO_1(config, m_voodoo[1], 50_MHz_XTAL);
+	PCI_ROOT(config, "pci1");
+	K033906(config, m_k033906[1]);
+
+	VOODOO_1_PCI(config, m_voodoo[1], 0);
+	m_voodoo[1]->set_ids(0x121a0001, 0x02, 0x040000, 0); // Konami firmware requires the multimedia class
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(2,2);
 	m_voodoo[1]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
@@ -703,10 +710,8 @@ void nwktr_state::nwktr(machine_config &config)
 	KONPPC(config, m_konppc);
 	m_konppc->set_dsp_tag(0, m_dsp[0]);
 	m_konppc->set_dsp_tag(1, m_dsp[1]);
-	m_konppc->set_k033906_tag(0, "k033906_1");
-	m_konppc->set_k033906_tag(1, "k033906_2");
-	m_konppc->set_voodoo_tag(0, m_voodoo[0]);
-	m_konppc->set_voodoo_tag(1, m_voodoo[1]);
+	m_konppc->set_k033906_tag(0, m_k033906[0]);
+	m_konppc->set_k033906_tag(1, m_k033906[1]);
 	m_konppc->set_texture_bank_tag(0, m_cgboard_bank[0]);
 	m_konppc->set_texture_bank_tag(1, m_cgboard_bank[1]);
 	m_konppc->set_num_boards(2);
