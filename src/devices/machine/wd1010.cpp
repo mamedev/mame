@@ -289,10 +289,21 @@ void wd1010_device::end_command()
 }
 
 //-------------------------------------------------
+//  id_found - is there an ID field for this sector
+//-------------------------------------------------
+
+bool wd1010_device::id_found(uint8_t sector)
+{
+	const auto &info = m_drives[drive()].drive->get_info();
+
+	return m_cylinder < info.cylinders && head() < info.heads && sector <= info.sectors;
+}
+
+//-------------------------------------------------
 //  get_lbasector - translate to lba
 //-------------------------------------------------
 
-int wd1010_device::get_lbasector()
+int wd1010_device::get_lbasector(uint8_t sector)
 {
 	harddisk_image_device *file = m_drives[drive()].drive;
 	const auto &info = file->get_info();
@@ -302,7 +313,7 @@ int wd1010_device::get_lbasector()
 	lbasector *= info.heads;
 	lbasector += head();
 	lbasector *= info.sectors;
-	lbasector += m_sector_number;
+	lbasector += sector;
 
 	return lbasector;
 }
@@ -311,6 +322,30 @@ int wd1010_device::get_lbasector()
 //**************************************************************************
 //  INTERFACE
 //**************************************************************************
+
+void wd1010_device::mr_w(int state)
+{
+	if (!state)
+		return;
+
+	m_seek_timer->adjust(attotime::never);
+	m_read_timer->adjust(attotime::never);
+	m_write_timer->adjust(attotime::never);
+
+	m_out_bcs_cb(0);
+	m_out_wg_cb(0);
+	set_bdrq(0);
+	set_intrq(0);
+
+	m_status &= (STATUS_RDY | STATUS_SC | STATUS_WF);
+	m_command = 0x00;
+	m_error = 0x00;
+	m_precomp = 0x00;
+	m_sector_count = 0x00;
+	m_sector_number = 0x00;
+	m_cylinder = 0x0000;
+	m_sdh = 0x00;
+}
 
 void wd1010_device::drdy_w(int state)
 {
@@ -514,7 +549,17 @@ void wd1010_device::cmd_read_sector()
 			// if there's nothing left we're done
 			if (m_sector_count == 0)
 			{
-				end_command();
+				// with I = 0 the interrupt was already given at bdrq time
+				if (BIT(m_command, 3) == 0)
+				{
+					m_out_bcr_cb(1);
+					m_out_bcr_cb(0);
+					m_status &= ~(STATUS_BSY | STATUS_CIP);
+				}
+				else
+				{
+					end_command();
+				}
 				return;
 			}
 		}
@@ -538,15 +583,11 @@ void wd1010_device::cmd_read_sector()
 		return;
 	}
 
-	const auto &info = file->get_info();
-
-	// verify that we can read
-	if (head() > info.heads)
+	if (!id_found(m_sector_number))
 	{
-		// out of range
-		LOG("--> Head out of range, aborting\n");
+		LOG("--> ID not found\n");
 
-		set_error(ERR_AC);
+		set_error(ERR_ID);
 		end_command();
 		return;
 	}
@@ -558,9 +599,9 @@ void wd1010_device::cmd_read_sector()
 
 	m_out_bcs_cb(1);
 
-	LOGDATA("--> Transferring sector to buffer (lba = %08x)\n", get_lbasector());
+	LOGDATA("--> Transferring sector to buffer (lba = %08x)\n", get_lbasector(m_sector_number));
 
-	file->read(get_lbasector(), buffer);
+	file->read(get_lbasector(m_sector_number), buffer);
 
 	for (int i = 0; i < 512; i++)
 		m_out_data_cb(buffer[i]);
@@ -622,6 +663,16 @@ void wd1010_device::cmd_write_sector()
 		return;
 	}
 
+	if ((m_command >> 4) != CMD_WRITE_FORMAT && !id_found(m_sector_number))
+	{
+		LOG("--> ID not found\n");
+
+		set_bdrq(0);
+		set_error(ERR_ID);
+		end_command();
+		return;
+	}
+
 	uint8_t buffer[512];
 
 	set_bdrq(0);
@@ -635,17 +686,33 @@ void wd1010_device::cmd_write_sector()
 
 	if ((m_command >> 4) == CMD_WRITE_FORMAT)
 	{
-		// we ignore the format specification and fill everything with 0xe5
-		std::fill(std::begin(buffer), std::end(buffer), 0xe5);
-	}
-	else
-	{
-		// get data for sector from buffer chip
+		// the buffer holds a bad block flag and a logical sector number for each sector
+		uint8_t table[512];
 		for (int i = 0; i < 512; i++)
-			buffer[i] = m_in_data_cb();
+			table[i] = m_in_data_cb();
+
+		std::fill(std::begin(buffer), std::end(buffer), 0x00);
+
+		int const count = m_sector_count ? m_sector_count : 256;
+		for (int i = 0; i < count && (i * 2 + 1) < 512; i++)
+			file->write(get_lbasector(table[i * 2 + 1]), buffer);
+
+		m_sector_count = 0;
+
+		m_drives[drive()].head = head();
+
+		m_out_bcs_cb(0);
+		m_out_wg_cb(0);
+
+		end_command();
+		return;
 	}
 
-	file->write(get_lbasector(), buffer);
+	// get data for sector from buffer chip
+	for (int i = 0; i < 512; i++)
+		buffer[i] = m_in_data_cb();
+
+	file->write(get_lbasector(m_sector_number), buffer);
 
 	// save last read head and sector number
 	m_drives[drive()].head = head();

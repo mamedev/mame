@@ -71,7 +71,7 @@ constexpr size_t DRAM_WORDS = 0x80000 / 2;
 
 // Size of the input stream FIFO, which the "request for bits" status
 // reflects.
-constexpr size_t VIDEO_FIFO_FULL = 32 * 1024;
+constexpr size_t VIDEO_FIFO_FULL = 64 * 1024;
 
 // Picture periods in 30 MHz ticks, indexed by the MPEG-1 picture_rate code.
 constexpr uint32_t FRAME_PERIOD_30MHZ[16] =
@@ -249,7 +249,7 @@ void mcd251_device::dram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 void mcd251_device::write_data(uint8_t data)
 {
 	const bool was_body = m_demux.packet_body;
-	m_demux.byte(data, m_fmv_stream);
+	m_demux.byte(data, 0xe0 | m_fmv_stream);
 
 	if (was_body)
 	{
@@ -343,6 +343,10 @@ void mcd251_device::video_decode_pending()
 		case mpeg_video::decode_result::NEED_DATA:
 			// see "request for bits"
 			m_video_needs_data = true;
+			if (m_store_decoding < 0 && taken == m_video_es.size())
+			{
+				m_pictures_in_input_fifo = m_reference_held ? 1 : 0;
+			}
 			break;
 		}
 
@@ -524,6 +528,7 @@ void mcd251_device::clear_video_fifo()
 	m_dts_fifo.clear();
 	m_next_picture_dts = 0;
 	m_pictures_in_input_fifo = 0;
+	m_display_starved = false;
 	m_latch_until_vsync = false;
 	m_latch_until_vblank = false;
 	m_single_step_latch = false;
@@ -605,15 +610,9 @@ TIMER_CALLBACK_MEMBER(mcd251_device::frame_period_tick)
 		if (!synchronous || desync > -30)
 			m_desync_satisfied = true;
 
-		// When the demuxer's SCR has run far ahead of the timestamp we are
-		// about to display there is no point correcting the frame period, so
-		// the correction is dropped.
 		const bool valid_dts = m_dts_fifo.front() != 0;
-		const bool way_out = valid_dts
-				&& mpeg_timestamp_diff(m_demux.scr, m_dts_fifo.front()) > 15000;
-
 		m_display_dts_desync =
-				(m_syscr_written && synchronous && valid_dts && !way_out) ? desync : 0;
+				(m_syscr_written && synchronous && valid_dts) ? desync : 0;
 
 		// Correct the frame period rather than skipping a picture: the queue
 		// empties faster than the disc fills it, and the NDAT that follows
@@ -676,18 +675,16 @@ void mcd251_device::vblank_w(int state)
 
 			if (!m_picture_fifo.empty())
 			{
-				// Underflow is reported as the last picture is taken with
-				// nothing behind it, counting the pictures whose start code
-				// has arrived but which the decoder has not handed back.
-				if (m_fmv_playback_active && m_picture_fifo.size() == 1
-						&& m_pictures_in_input_fifo == 0)
-				{
-					m_fmv_isr |= FMV_IRQ_NDAT;
-					LOGMASKED(LOG_VIDEO, "FMV underflow\n");
-				}
-
+				m_display_starved = false;
 				latch_display_frame();
 				m_latch_until_vblank = true;
+			}
+			else if (m_fmv_playback_active && m_pictures_in_input_fifo == 0 && !m_display_starved)
+			{
+				// underflow: a picture is due and the decoder has none
+				m_display_starved = true;
+				m_fmv_isr |= FMV_IRQ_NDAT;
+				LOGMASKED(LOG_VIDEO, "FMV underflow\n");
 			}
 		}
 

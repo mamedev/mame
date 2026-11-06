@@ -14,6 +14,8 @@
 #include "c1541.h"
 #include "c1571.h"
 
+#include "machine/6821pia.h"
+
 
 
 //**************************************************************************
@@ -66,9 +68,12 @@ protected:
 	virtual void parallel_strobe_w(int state) override;
 
 private:
-	uint8_t cia_pb_r();
-	void cia_pb_w(uint8_t data);
-	void cia_pc_w(int state);
+	void pia_pa_w(uint8_t data);
+	void pia_ca2_w(int state);
+
+	void c1571dd3_mem(address_map &map) ATTR_COLD;
+
+	required_device<pia6821_device> m_pia;
 };
 
 

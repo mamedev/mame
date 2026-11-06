@@ -35,6 +35,13 @@ protected:
 	// rather than a sub-address
 	virtual bool has_subaddress() const { return true; }
 
+	// override this to return false for devices that go on transmitting
+	// when the master does not acknowledge a byte
+	virtual bool master_nack_stops() const { return true; }
+
+	// override this for devices whose register pointer survives a STOP
+	virtual bool reset_pointer_on_stop() const;
+
 	// override these to be told about START and STOP conditions, e.g. when
 	// the device's messages are delimited rather than fixed-length
 	virtual void i2c_start() { }

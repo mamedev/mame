@@ -7,7 +7,6 @@
 
 class screen_ula_device : public device_t, public device_gfx_interface
 {
-
 public:
 	screen_ula_device &set_bram_bank5_ptr(const u8 *bram_bank5_ptr) { m_bram_bank5_ptr = bram_bank5_ptr; return *this; }
 	screen_ula_device &set_bram_bank7_ptr(const u8 *bram_bank7_ptr) { m_bram_bank7_ptr = bram_bank7_ptr; return *this; }
@@ -100,4 +99,5 @@ public:
 
 DECLARE_DEVICE_TYPE(SCREEN_ULA_PLUS, screen_ula_plus_device)
 DECLARE_DEVICE_TYPE(SCREEN_ULA_NEXT, screen_ula_next_device)
+
 #endif // MAME_SINCLAIR_SCREEN_ULA_H

@@ -108,8 +108,10 @@ private:
 	int m_c_unlatched;          // command waiting for STB
 
 	bool m_testmode;            // testmode active
+	bool m_counter_held;        // Time Set holds the time counter until Register Hold, Shift or Time Read
 
 	int const m_variant;
+	uint32_t const m_divider_steps; // steps per second of the last clock divider stage that Time Set doesn't reset
 
 	// timers
 	emu_timer *m_timer_clock;
@@ -119,6 +121,7 @@ private:
 
 	bool is_serial_mode();
 	int get_data_out();
+	void release_counter();
 };
 
 

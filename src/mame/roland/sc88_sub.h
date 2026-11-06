@@ -115,6 +115,10 @@ private:
 	std::deque<message> m_queue;
 	bool m_busy;
 	emu_timer *m_deliver_timer;
+	int m_block_src;            // source of the block in the dual port RAM, -1 when none is pending
+	u8 m_block_size;
+	bool m_block_read;          // the main CPU has read from it
+	attotime m_block_taken;     // when the main CPU took the message announcing it
 
 	u8 m_tx_rd;
 	u8 m_tx_left;

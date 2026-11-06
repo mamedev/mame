@@ -2,16 +2,17 @@
 // copyright-holders:Paul Leaman
 /***************************************************************************
 
-    Black Tiger
+Black Tiger
 
-    Driver provided by Paul Leaman
+Driver provided by Paul Leaman
+Thanks to Ishmair for providing information about the screen layout on level 3.
 
-    Thanks to Ishmair for providing information about the screen
-    layout on level 3.
-
-    Notes:
-    - sprites/tile priority is a guess. I didn't find a PROM that would simply
-      translate to the scheme I implemented.
+TODO:
+- sprites/tile priority is a guess. I didn't find a PROM that would simply
+  translate to the scheme I implemented.
+- like with sidearms, writing to the palette outside of the allowed time will
+  trigger a write error on I/O port 0 bit 2 (cleared by writing to I/O port 2)
+- sprite dma should only work inside vblank
 
 ***************************************************************************
 
@@ -138,7 +139,7 @@ Notes:
 #include "cpu/mcs51/i8051.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "machine/watchdog.h"
+#include "machine/timer.h"
 #include "sound/ymopn.h"
 #include "video/bufsprite.h"
 
@@ -227,6 +228,9 @@ private:
 	void video_control_w(uint8_t data);
 	void video_enable_w(uint8_t data);
 	void screen_layout_w(uint8_t data);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+
 	TILEMAP_MAPPER_MEMBER(bg8x4_scan);
 	TILEMAP_MAPPER_MEMBER(bg4x8_scan);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -297,6 +301,7 @@ TILE_GET_INFO_MEMBER(blktiger_state::get_bg_tile_info)
 		0,0,0,0,
 		0,0,0,0
 	};
+
 	uint8_t attr = m_scrollram[2 * tile_index + 1];
 	int color = (attr & 0x78) >> 3;
 	tileinfo.set(1,
@@ -408,25 +413,33 @@ void blktiger_state::video_control_w(uint8_t data)
 	// bit 6 flips screen
 	flip_screen_set(data & 0x40);
 
-	// bit 7 enables characters? Just a guess
+	// bit 7 enables characters
 	m_chon = ~data & 0x80;
 }
 
 void blktiger_state::video_enable_w(uint8_t data)
 {
-	// not sure which is which, but I think that bit 1 and 2 enable background and sprites
-	// bit 1 enables bg ?
+	// bit 1 enables bg
 	m_bgon = ~data & 0x02;
 
-	// bit 2 enables sprites ?
+	// bit 2 enables sprites
 	m_objon = ~data & 0x04;
 }
 
 void blktiger_state::screen_layout_w(uint8_t data)
 {
-	m_screen_layout = data;
+	m_screen_layout = data & 0x01;
 	m_bg_tilemap8x4->enable(m_screen_layout);
 	m_bg_tilemap4x8->enable(!m_screen_layout);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(blktiger_state::scanline)
+{
+	int const scanline = param;
+
+	// 2 interrupts per frame: one at vblank, and one 128 scanlines before vblank
+	if (scanline == 112 || scanline == 240)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -486,11 +499,12 @@ uint32_t blktiger_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-/**************************************************
 
-Protection comms between main cpu and i8751
+/***************************************************************************
 
-**************************************************/
+  Protection comms between main cpu and i8751
+
+***************************************************************************/
 
 uint8_t blktiger_mcu_state::from_mcu_r()
 {
@@ -515,7 +529,6 @@ void blktiger_mcu_state::to_main_w(uint8_t data)
 	LOGMCU("%02x write\n", data);
 	m_i8751_latch = data;
 }
-
 
 
 void blktiger_state::bankswitch_w(uint8_t data)
@@ -553,9 +566,9 @@ void blktiger_state::nomcu_main_io_map(address_map &map)
 	map(0x02, 0x02).portr("IN2");
 	map(0x03, 0x03).portr("DSW0").w(FUNC(blktiger_state::coinlockout_w));
 	map(0x04, 0x04).portr("DSW1").w(FUNC(blktiger_state::video_control_w));
-	map(0x05, 0x05).portr("FREEZE");
-	map(0x06, 0x06).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x07, 0x07).noprw();  // Software protection (7)
+	map(0x05, 0x05).portr("DSW2");
+	map(0x06, 0x06).w(m_spriteram, FUNC(buffered_spriteram8_device::write));
+	map(0x07, 0x07).noprw(); // Software protection (7)
 	map(0x08, 0x09).w(FUNC(blktiger_state::scrollx_w));
 	map(0x0a, 0x0b).w(FUNC(blktiger_state::scrolly_w));
 	map(0x0c, 0x0c).w(FUNC(blktiger_state::video_enable_w));
@@ -567,7 +580,7 @@ void blktiger_mcu_state::mcu_main_io_map(address_map &map)
 {
 	nomcu_main_io_map(map);
 
-	map(0x07, 0x07).rw(FUNC(blktiger_mcu_state::from_mcu_r), FUNC(blktiger_mcu_state::to_mcu_w));     // Software protection (7)
+	map(0x07, 0x07).rw(FUNC(blktiger_mcu_state::from_mcu_r), FUNC(blktiger_mcu_state::to_mcu_w)); // Software protection (7)
 }
 
 void blktiger_state::sound_map(address_map &map)
@@ -585,9 +598,9 @@ static INPUT_PORTS_START( blktiger )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // probably unused
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    // probably unused
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    // probably unused
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) // palette error flag (see TODO)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // probably unused
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -599,8 +612,8 @@ static INPUT_PORTS_START( blktiger )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    // probably unused
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // probably unused
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // probably unused
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // probably unused
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -609,8 +622,8 @@ static INPUT_PORTS_START( blktiger )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    // probably unused
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // probably unused
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // probably unused
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // probably unused
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )       PORT_DIPLOCATION( "SW1:1,2,3" )
@@ -663,8 +676,8 @@ static INPUT_PORTS_START( blktiger )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START("FREEZE")
-	PORT_DIPNAME( 0x01, 0x01, "Freeze" )    // could be VBLANK
+	PORT_START("DSW2") // SW3 is unpopulated
+	PORT_DIPNAME( 0x01, 0x01, "Freeze" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -733,18 +746,18 @@ void blktiger_state::machine_reset()
 
 void blktiger_mcu_state::machine_start()
 {
+	blktiger_state::machine_start();
+
 	save_item(NAME(m_z80_latch));
 	save_item(NAME(m_i8751_latch));
-
-	blktiger_state::machine_start();
 }
 
 void blktiger_mcu_state::machine_reset()
 {
+	blktiger_state::machine_reset();
+
 	m_z80_latch = 0;
 	m_i8751_latch = 0;
-
-	blktiger_state::machine_reset();
 }
 
 void blktiger_state::nomcu(machine_config &config)
@@ -753,18 +766,16 @@ void blktiger_state::nomcu(machine_config &config)
 	Z80(config, m_maincpu, XTAL(24'000'000) / 4); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &blktiger_state::main_prg_map);
 	m_maincpu->set_addrmap(AS_IO, &blktiger_state::nomcu_main_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(blktiger_state::irq0_line_hold));
 
 	Z80(config, m_audiocpu, XTAL(3'579'545));   // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &blktiger_state::sound_map);
 
-	WATCHDOG_TIMER(config, "watchdog");
+	TIMER(config, "scantimer").configure_scanline(FUNC(blktiger_state::scanline), "screen", 112, 128);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	screen.set_screen_update(FUNC(blktiger_state::screen_update));
-	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_blktiger);
@@ -795,7 +806,6 @@ void blktiger_mcu_state::mcu(machine_config &config)
 	m_mcu->port_in_cb<0>().set(FUNC(blktiger_mcu_state::from_main_r));
 	m_mcu->port_out_cb<0>().set(FUNC(blktiger_mcu_state::to_main_w));
 	// other ports unknown
-	//m_mcu->set_vblank_int("screen", FUNC(blktiger_mcu_state::irq0_line_hold));
 }
 
 /***************************************************************************
@@ -1071,5 +1081,6 @@ GAME( 1987, blktigerb1, blktiger, nomcu, blktiger, blktiger_state,     empty_ini
 GAME( 1987, blktigerb2, blktiger, nomcu, blktiger, blktiger_state,     empty_init,      ROT0, "bootleg", "Black Tiger (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, blkdrgon,   blktiger, mcu,   blktiger, blktiger_mcu_state, empty_init,      ROT0, "Capcom",  "Black Dragon (Japan)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1987, blkdrgonb,  blktiger, nomcu, blktiger, blktiger_state,     empty_init,      ROT0, "bootleg", "Black Dragon (bootleg)",      MACHINE_SUPPORTS_SAVE )
+
 // this board has Capcom markings (boards 87118-A-X1 / 87118-B-X1, but no MCU, a mix of bootleg Black Tiger and Black Dragon ROMs, and an address swapped sound ROM? is the latter an alternative security measure?
 GAME( 1987, blktigerb3, blktiger, nomcu, blktiger, blktiger_state,     init_blktigerb3, ROT0, "bootleg", "Black Tiger / Black Dragon (mixed bootleg?)", MACHINE_SUPPORTS_SAVE )

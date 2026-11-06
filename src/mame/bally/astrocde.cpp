@@ -422,6 +422,22 @@ int astrocde_state::votrax_speech_status_r()
 
 /*************************************
  *
+ *  IRQ acknowledge
+ *
+ *************************************/
+
+IRQ_CALLBACK_MEMBER(astrocde_state::cpu_acknowledge_irq)
+{
+	if (m_interrupt_clear_on_ack)
+	{
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+	}
+	return m_interrupt_vector;
+}
+
+
+/*************************************
+ *
  *  Memory maps
  *
  *************************************/
@@ -1213,6 +1229,7 @@ void astrocde_state::astrocade_base(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, ASTROCADE_CLOCK/4);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(astrocde_state::cpu_acknowledge_irq));
 	/* each game has its own map */
 
 	/* video hardware */

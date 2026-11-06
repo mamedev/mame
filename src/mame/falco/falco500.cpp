@@ -369,7 +369,7 @@ uint32_t falco500_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		line_height++;
 
 		// safety check to prevent writing out of bounds
-		if (y + line_height > (cliprect.max_y + 1))
+		if (y + line_height > (cliprect.bottom() + 1))
 			return 0;
 
 		if (BIT(la3, 4))

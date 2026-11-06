@@ -32,7 +32,16 @@
 
     Payload blocks are the exclusive bytes after F0 up to and including
     the checksum (the F7 is not counted); they are guarded by block semaphore bit 0/1/2 (the source), which
-    the main CPU clears after copying the block.  Bit 7 of IPCER2 marks the
+    the main CPU clears after copying the block.  It copies the block in
+    the interrupt that takes the message, into a buffer from a pool of ten
+    (v1.04: 0bc0, allocation at 0d3b).  When the pool is empty it drops the
+    message and leaves the interrupt without touching the block or the
+    semaphore (0d3f -> 0cb5); nothing clears that bit later.  The pool runs
+    dry when the main loop is busy for long, as it is after a System Mode
+    Set that changes the module mode, while exclusive keeps arriving (a
+    song's setup right behind it).  A block that was taken but not read
+    within a millisecond (the copy starts 31 us after the take) has been
+    dropped, and its semaphore is released here.  Bit 7 of IPCER2 marks the
     block as a request (RQ1) rather than a data set (DT1); the rest of the
     byte is the length either way.
 
@@ -169,6 +178,10 @@ sc88_sub_device::sc88_sub_device(const machine_config &mconfig, const char *tag,
 	, m_in_reset(false)
 	, m_busy(false)
 	, m_deliver_timer(nullptr)
+	, m_block_src(-1)
+	, m_block_size(0)
+	, m_block_read(false)
+	, m_block_taken(attotime::never)
 	, m_tx_rd(0)
 	, m_tx_left(0)
 	, m_tx_end(0)
@@ -203,6 +216,10 @@ void sc88_sub_device::device_start()
 	save_item(NAME(m_int_state));
 	save_item(NAME(m_in_reset));
 	save_item(NAME(m_busy));
+	save_item(NAME(m_block_src));
+	save_item(NAME(m_block_size));
+	save_item(NAME(m_block_read));
+	save_item(NAME(m_block_taken));
 	save_item(NAME(m_tx_rd));
 	save_item(NAME(m_tx_left));
 	save_item(NAME(m_tx_end));
@@ -227,6 +244,10 @@ void sc88_sub_device::device_reset()
 	m_queue.clear();
 	m_busy = false;
 	m_deliver_timer->adjust(attotime::never);
+	m_block_src = -1;
+	m_block_size = 0;
+	m_block_read = false;
+	m_block_taken = attotime::never;
 
 	m_dpram[TX_READ_PTR] = m_dpram[TX_WRITE_PTR] = TX_RING_START;
 	m_tx_rd = TX_RING_START;
@@ -290,7 +311,11 @@ u8 sc88_sub_device::read(offs_t offset)
 	if (offset < 0xd8)
 	{
 		if (!machine().side_effects_disabled())
+		{
 			m_flags[offset >> 3] &= ~(1 << (offset & 7));
+			if (offset < m_block_size)
+				m_block_read = true;
+		}
 		return m_dpram[offset];
 	}
 	if (offset < 0xdc)
@@ -303,6 +328,8 @@ u8 sc88_sub_device::read(offs_t offset)
 			m_ipcer[offset & 3] = 0;
 			if (offset == 0xdc && m_int_state)
 			{
+				if (m_block_src >= 0 && m_block_taken.is_never())
+					m_block_taken = machine().time();
 				// the message has been taken; the next one may follow
 				m_int_state = false;
 				m_int_cb(0);
@@ -346,7 +373,11 @@ void sc88_sub_device::write(offs_t offset, u8 data)
 		if (BIT(data, 7))
 			m_sem |= bit;
 		else
+		{
 			m_sem &= ~bit;
+			if ((data & 7) == m_block_src)
+				m_block_src = -1;
+		}
 		if (!m_busy && !m_queue.empty())
 			m_deliver_timer->adjust(attotime::from_usec(20));
 	}
@@ -483,6 +514,14 @@ void sc88_sub_device::deliver()
 	const int src = (m.flags >> 4) & 3;
 	if (!m.block.empty())
 	{
+		// a block the main CPU took but never read was dropped (its buffer pool was empty)
+		if (m_block_src >= 0 && !m_block_read && !m_block_taken.is_never() && machine().time() - m_block_taken >= attotime::from_msec(1))
+		{
+			LOG("exclusive block from source %d dropped by the main CPU (buffer pool full)\n", m_block_src);
+			m_sem &= ~(1 << m_block_src);
+			m_block_src = -1;
+		}
+
 		// the previous block of this source must have been consumed
 		if (BIT(m_sem, src))
 		{
@@ -491,6 +530,10 @@ void sc88_sub_device::deliver()
 		}
 		std::copy(m.block.begin(), m.block.end(), &m_dpram[0]);
 		m_sem |= 1 << src;
+		m_block_src = src;
+		m_block_size = m.block.size();
+		m_block_read = false;
+		m_block_taken = attotime::never;
 	}
 
 	LOGMASKED(LOG_MSG, "message %02x %02x %02x %02x%s\n", m.code, m.flags, m.d1, m.d2, m.block.empty() ? "" : " (block)");

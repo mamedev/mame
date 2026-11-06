@@ -283,6 +283,9 @@ private:
 	u8 m_scrolly[2]{};
 	u8 m_highbits = 0;
 
+	// interrupt-related
+	u8 m_irq_vector = 0;
+
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -308,8 +311,10 @@ private:
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
-	INTERRUPT_GEN_MEMBER(sub_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
+	INTERRUPT_GEN_MEMBER(sub_interrupt);
+	IRQ_CALLBACK_MEMBER(subcpu_acknowledge_irq);
 
 	void main_map(address_map &map) ATTR_COLD;
 	void main_prot_map(address_map &map) ATTR_COLD;
@@ -696,20 +701,33 @@ GFXDECODE_END
 // Main Z80 uses IM2
 TIMER_DEVICE_CALLBACK_MEMBER(airbustr_state::scanline)
 {
-	int const scanline = param;
+	if (param == 240) // vblank-out irq
+	{
+		m_irq_vector = 0xff;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+	else if (param == 64)
+	{
+		// Pandora "sprite end dma" irq? TODO: timing is likely off
+		m_irq_vector = 0xfd;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+}
 
-	if (scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
-
-	// Pandora "sprite end dma" irq? TODO: timing is likely off
-	if (scanline == 64)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfd); // Z80
+IRQ_CALLBACK_MEMBER(airbustr_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 // Sub Z80 uses IM2 too, but 0xff irq routine just contains an irq ack in it
 INTERRUPT_GEN_MEMBER(airbustr_state::sub_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd); // Z80
+	device.execute().set_input_line(0, HOLD_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(airbustr_state::subcpu_acknowledge_irq)
+{
+	return 0xfd;
 }
 
 
@@ -724,6 +742,7 @@ void airbustr_state::machine_start()
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
 	save_item(NAME(m_highbits));
+	save_item(NAME(m_irq_vector));
 }
 
 void airbustr_state::machine_reset()
@@ -733,6 +752,7 @@ void airbustr_state::machine_reset()
 	m_scrollx[1] = 0;
 	m_scrolly[1] = 0;
 	m_highbits = 0;
+	m_irq_vector = 0xff;
 }
 
 
@@ -745,11 +765,13 @@ void airbustr_state::airbustrb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &airbustr_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &airbustr_state::main_io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(airbustr_state::scanline), "screen", 0, 1);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(airbustr_state::cpu_acknowledge_irq));
 
 	Z80(config, m_subcpu, XTAL(12'000'000) / 2); // verified on PCB
 	m_subcpu->set_addrmap(AS_PROGRAM, &airbustr_state::sub_map);
 	m_subcpu->set_addrmap(AS_IO, &airbustr_state::sub_io_map);
 	m_subcpu->set_vblank_int("screen", FUNC(airbustr_state::sub_interrupt)); // nmi signal from main CPU
+	m_subcpu->set_irq_acknowledge_callback(FUNC(airbustr_state::subcpu_acknowledge_irq));
 
 	Z80(config, m_audiocpu, XTAL(12'000'000) / 2); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &airbustr_state::sound_map);

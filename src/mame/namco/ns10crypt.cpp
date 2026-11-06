@@ -33,6 +33,7 @@ in reverse order of the constituting blocks) :
 game        data regions                           RAM address
 --------    ----------------------------------     -----------
 chocovdr    [fdc000,1000000)' + [28000,1dc000)     80010000
+dicerom     [fdc000,1000000)' + [28000,dc000)      80010000
 gamshara    [fdc000,1000000)' + [28000,144000)     80010000
 gjspace     [fd4000,ff8000)'  + [28000,80000)      80010000
             + [fd0000,fd4000) + [80000,200000)
@@ -58,7 +59,9 @@ reinitializations is still unclear. mrdrilr2 does a reinitialization every time 
 hits a 0x80000-bytes multiple); gamshara does a reinitialization every 5 NAND blocks
 (16 times in total); mrdrilrg does the second one after 0x38000 bytes and then subsequent
 ones every 32 blocks (8 times in total); panikuru does one every 2 blocks up to a total
-of 16 times.
+of 16 times. dicerom reinitializes the decryption for every NAND block (54 times in total),
+writing the block counter modulo 16 as the IV; the initial state for each IV is given by
+a table (the default INIT_SBOX based initialization doesn't apply to it).
 
 The calculation of the XOR masks operate in this way: most bits are
 calculated by using linear equations over GF(2) taking as input data the bits from
@@ -79,6 +82,7 @@ on another linear formula.
 
 The bits affected by the nonlinear calculations in type-2 games are given below:
 chocovdr  -> #10
+dicerom   -> #3
 gamshara  -> #2
 gjspace   -> none
 gunbalina -> #11

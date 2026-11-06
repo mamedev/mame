@@ -149,40 +149,47 @@ uint32_t taitob_c_state::screen_update_realpunc(screen_device &screen, bitmap_rg
 		m_tc0180vcu->draw_framebuffer(m_realpunc_bitmap, cliprect, 0);
 
 	/* Copy the intermediate bitmap to the output bitmap, applying the palette */
-	for (int y = 0; y <= cliprect.max_y; y++)
-		for (int x = 0; x <= cliprect.max_x; x++)
-			bitmap.pix(y, x) = palette[m_realpunc_bitmap.pix(y, x)];
+	for (int y = 0; y <= cliprect.bottom(); y++)
+	{
+		auto const *const src = &m_realpunc_bitmap.pix(y);
+		auto *const dst = &bitmap.pix(y);
+		for (int x = 0; x <= cliprect.right(); x++)
+			dst[x] = palette[src[x]];
+	}
 
-	/* Draw the 15bpp raw CRTC frame buffer directly to the output bitmap */
 	if (BIT(m_video_ctrl, 1))
 	{
-//      scrollx = taitob_scroll[0];
-//      scrolly = taitob_scroll[1];
+		// Draw the 15bpp raw CRTC frame buffer directly to the output bitmap
+		//scrollx = taitob_scroll[0];
+		//scrolly = taitob_scroll[1];
 
 		m_hd63484->update_screen(screen, m_realpunc_bitmap, cliprect);
 
-		for (int y = 0; y <= cliprect.max_y; y++)
+		for (int y = 0; y <= cliprect.bottom(); y++)
 		{
-			for (int x = 0; x <= cliprect.max_x; x++)
+			auto const *const src = &m_realpunc_bitmap.pix(cliprect.top() + y, cliprect.left());
+			auto *const dst = &bitmap.pix(y);
+			for (int x = 0; x <= cliprect.right(); x++)
 			{
-				uint16_t const srcpix = m_realpunc_bitmap.pix(cliprect.min_y + y, cliprect.min_x + x);
-
-				int const r = (BIT(srcpix, 1)) | ((srcpix >> 11) & 0x1e);
-				int const g = (BIT(srcpix, 2)) | ((srcpix >> 7) & 0x1e);
-				int const b = (BIT(srcpix, 3)) | ((srcpix >> 3) & 0x1e);
-
+				uint16_t const srcpix = src[x];
 				if (srcpix)
-					bitmap.pix(y, x) = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
+				{
+					int const r = (BIT(srcpix, 1)) | ((srcpix >> 11) & 0x1e);
+					int const g = (BIT(srcpix, 2)) | ((srcpix >> 7) & 0x1e);
+					int const b = (BIT(srcpix, 3)) | ((srcpix >> 3) & 0x1e);
+					dst[x] = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
+				}
 			}
 		}
 	}
-	/* Draw the 15bpp raw output of the camera ADCs (TODO) */
 	else if (BIT(m_video_ctrl, 2))
 	{
-		for (int y = 0; y <= cliprect.max_y; y++)
+		// Draw the 15bpp raw output of the camera ADCs (TODO)
+		for (int y = 0; y <= cliprect.bottom(); y++)
 		{
-			for (int x = 0; x <= cliprect.max_x; x++)
-				bitmap.pix(y, x) = rgb_t(0x00, 0x00, 0x00);
+			auto *const dst = &bitmap.pix(y);
+			for (int x = 0; x <= cliprect.right(); x++)
+				dst[x] = rgb_t(0x00, 0x00, 0x00);
 		}
 	}
 
@@ -195,12 +202,14 @@ uint32_t taitob_c_state::screen_update_realpunc(screen_device &screen, bitmap_rg
 	m_tc0180vcu->tilemap_draw(screen, m_realpunc_bitmap, cliprect, 2, 0);
 
 	/* Merge the indexed layers with the output bitmap */
-	for (int y = 0; y <= cliprect.max_y; y++)
+	for (int y = 0; y <= cliprect.bottom(); y++)
 	{
-		for (int x = 0; x <= cliprect.max_x; x++)
+		auto const *const src = &m_realpunc_bitmap.pix(y);
+		auto *const dst = &bitmap.pix(y);
+		for (int x = 0; x <= cliprect.right(); x++)
 		{
-			if (m_realpunc_bitmap.pix(y, x))
-				bitmap.pix(y, x) = palette[m_realpunc_bitmap.pix(y, x)];
+			if (src[x])
+				dst[x] = palette[src[x]];
 		}
 	}
 

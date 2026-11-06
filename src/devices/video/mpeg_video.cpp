@@ -461,6 +461,7 @@ void mpeg_video::clear()
 	m_frame_rate = 0.0;
 	m_picture_rate_code = 0;
 	m_time_code = 0;
+	m_closed_group = false;
 	std::copy(
 			std::begin(s_default_intra_quantizer_matrix),
 			std::end(s_default_intra_quantizer_matrix),
@@ -510,6 +511,7 @@ void mpeg_video::register_save_state(device_t &device, int index)
 	device.save_item(m_frame_rate, "mpeg_video_frame_rate", index);
 	device.save_item(m_picture_rate_code, "mpeg_video_picture_rate_code", index);
 	device.save_item(m_time_code, "mpeg_video_time_code", index);
+	device.save_item(m_closed_group, "mpeg_video_closed_group", index);
 	device.save_item(m_sequence_header_seen, "mpeg_video_sequence_header_seen", index);
 	device.save_item(m_group_seen, "mpeg_video_group_seen", index);
 	device.save_item(m_intra_quantizer_matrix, "mpeg_video_intra_quantizer_matrix", index);
@@ -860,10 +862,11 @@ void mpeg_video::group_of_pictures()
 	const unsigned pictures = gb(6);
 	if ((hours > 23) || (minutes > 59) || (seconds > 59) || (pictures > 59))
 		throw invalid_stream();
-	gb(1); // closed GOP
+	const bool closed_group = gb(1);
 	gb(1); // broken link
 
 	m_time_code = time_code;
+	m_closed_group = closed_group;
 	m_group_seen = true;
 }
 

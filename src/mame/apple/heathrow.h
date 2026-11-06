@@ -45,6 +45,7 @@ public:
 
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
 	void set_system_id(u32 id) { m_system_id = id; }
+	void set_via_retry(bool retry) { m_via_retry = retry; } // main CPU must honor retry_access()
 
 	void cb1_w(int state);
 	void cb2_w(int state);
@@ -118,12 +119,18 @@ private:
 	attotime m_lt_timer_start;
 	u8 m_scc_rec_count;
 	u8 m_ltpc_start[2];
+	bool m_via_retry;
+	u64 m_via_access_cycle;
+	u64 m_via_last_cycle;
+	offs_t m_via_last_offset;
+	std::vector<device_execute_interface *> m_other_cpus;
 
 	u8 via_in_a();
 	u8 via_in_b();
 	void via_out_b(u8 data);
 	void hdsel_w(int hdsel);
-	void via_sync();
+	bool via_sync(offs_t offset);
+	u64 via_access_cycle(u64 cycle) const;
 	void field_interrupts();
 	void via_out_cb2(int state);
 

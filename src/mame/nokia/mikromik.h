@@ -7,8 +7,6 @@
 
 #include "mm1kb.h"
 #include "bus/nscsi/devices.h"
-#include "bus/scsi/scsihd.h"
-#include "bus/scsi/s1410.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "imagedev/floppy.h"

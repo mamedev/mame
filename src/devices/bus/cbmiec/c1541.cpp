@@ -308,7 +308,6 @@ void c1541_device_base::c1541_mem(address_map &map)
 }
 
 
-
 uint8_t c1541_device_base::via0_r(offs_t offset)
 {
 	if (!offset && !m_bus->sample_ready(*m_maincpu))
@@ -337,7 +336,7 @@ uint8_t c1541_device_base::via0_pb_r()
 	u8 data;
 
 	// data in
-	data = !m_bus->data_r() && !m_ga->atn_r();
+	data = !m_bus->data_r();
 
 	// clock in
 	data |= !m_bus->clk_r() << 2;
@@ -371,7 +370,7 @@ void c1541_device_base::via0_pb_w(uint8_t data)
 	m_iec_clk = !BIT(data, 3);
 	m_iec_data = !BIT(data, 1);
 
-	m_ga->atna_w(BIT(data, 4)); // triggers IEC sync
+	m_ga->atna_w(BIT(data, 4));
 }
 
 uint8_t c1541c_device::via0_pa_r()
@@ -492,8 +491,10 @@ void c1541_device_base::device_add_mconfig(machine_config &config)
 	connector.option_add("525ssqd", ALPS_3255190X);
 	connector.set_default_option("525ssqd");
 	connector.set_fixed(true);
+	connector.set_media_change_time(attotime::from_msec(100));
 	connector.set_formats(c1541_device_base::floppy_formats);
-	connector.enable_sound(true);
+
+	connector.enable_sound("c1541");
 }
 
 
@@ -638,7 +639,7 @@ TIMER_CALLBACK_MEMBER(c1541_device_base::mtr_on_tick)
 
 void c1541_device_base::cbm_iec_atn(int state)
 {
-	m_ga->atni_w(!state); // triggers IEC sync
+	m_ga->atni_w(!state);
 }
 
 

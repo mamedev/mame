@@ -20,7 +20,6 @@
 #include "bus/pc_kbd/pc_kbdc.h"
 
 #include "emupal.h"
-#include "softlist.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 

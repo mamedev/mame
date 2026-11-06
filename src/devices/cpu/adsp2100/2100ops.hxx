@@ -85,7 +85,10 @@ inline void adsp21xx_device::update_mstat()
 		m_alt = temp;
 	}
 	if ((m_mstat ^ m_mstat_prev) & MSTAT_TIMER)
+	{
 		m_timer_fired_cb((m_mstat & MSTAT_TIMER) != 0);
+		timer_enable_changed((m_mstat & MSTAT_TIMER) != 0);
+	}
 	if (m_mstat & MSTAT_STICKYV)
 		m_astat_clear = ~(CFLAG | NFLAG | ZFLAG);
 	else
@@ -448,8 +451,8 @@ void adsp21xx_device::write_reg3(int regnum, int32_t val)
 		case 0x05:  cntr_stack_push(); m_cntr = val & 0x3fff;       break;
 		case 0x06:  m_core.sb.s = util::sext(val, 5);               break;
 		case 0x07:  m_px = val;                                     break;
-		case 0x09:  m_sport_tx_cb(0, val, 0xffff);                  break;
-		case 0x0b:  m_sport_tx_cb(1, val, 0xffff);                  break;
+		case 0x09:  m_sport_tx_cb(0, val, 0xffff); sport_tx_written(0, val);    break;
+		case 0x0b:  m_sport_tx_cb(1, val, 0xffff); sport_tx_written(1, val);    break;
 		case 0x0c:
 			m_ifc = val;
 			if (m_chip_type >= CHIP_TYPE_ADSP2181)

@@ -77,25 +77,48 @@ public:
 	{ }
 
 	void snowbros(machine_config &config);
-	void yutnori(machine_config &config);
 
 	void init_toto();
-	void init_yutnori();
 
 protected:
 	required_device<kaneko_pandora_device> m_pandora;
 
-	u16 m_yutnori_prot_val = 0;
-
 	void snowbros_flipscreen_w(u8 data);
 	u16 toto_read(offs_t offset, u16 mem_mask = ~0);
-	void yutnori_prot_w(u16 data);
-	u16 yutnori_prot_r();
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
 	void snowbros_map(address_map &map) ATTR_COLD;
+};
+
+// with PIC for protection and sound (HLE)
+class yutnori_state : public snowbros_pandora_state
+{
+public:
+	yutnori_state(const machine_config &mconfig, device_type type, const char *tag)
+		: snowbros_pandora_state(mconfig, type, tag)
+	{ }
+
+	void yutnori(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	u16 m_yutnori_prot_val = 0;
+	bool m_yutnori_music_on = false;
+	u8 m_yutnori_voice_next = 0; // sample to play when channel m_yutnori_voice_ch finishes, 0 for none
+	u8 m_yutnori_voice_ch = 0;
+
+	void yutnori_prot_w(u16 data);
+	u16 yutnori_prot_r();
+	void yutnori_sound_hle_w(u8 data);
+	void yutnori_voice_update();
+
+	TIMER_DEVICE_CALLBACK_MEMBER(yutnori_scanline);
+
 	void yutnori_map(address_map &map) ATTR_COLD;
 };
 

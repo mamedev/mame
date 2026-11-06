@@ -194,10 +194,13 @@ INPUT_PORTS_END
 
 void cdi_state::machine_start()
 {
+	save_item(NAME(m_in4_owner));
 }
 
 void cdi_state::machine_reset()
 {
+	std::fill_n(&m_plane_ram[0][0], m_plane_ram[0].length(), 0);
+
 	uint16_t *src = &m_main_rom[0];
 	uint16_t *dst = &m_plane_ram[0][0];
 	memcpy(dst, src, 0x8);

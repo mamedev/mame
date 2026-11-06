@@ -331,33 +331,31 @@ void tc0180vcu_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap,
 		m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);    /* not much to do for tx_tilemap */
 	else
 	{
-		/*plane = 0 fg tilemap*/
-		/*plane = 1 bg tilemap*/
-		rectangle my_clip;
-
+		// plane = 0 fg tilemap
+		// plane = 1 bg tilemap
 		int const lines_per_block = 256 - (m_ctrl[2 + plane] >> 8);    /* number of lines scrolled by the same amount (per one scroll value) */
 		int const number_of_blocks = 256 / lines_per_block;   /* number of such blocks per _screen_ (256 lines) */
 
-		my_clip.min_x = cliprect.min_x;
-		my_clip.max_x = cliprect.max_x;
-
+		rectangle my_clip(cliprect);
 		for (int i = 0; i < number_of_blocks; i++)
 		{
 			int const scrollx = m_scrollram[plane * 0x200 + i * 2 * lines_per_block];
 			int const scrolly = m_scrollram[plane * 0x200 + i * 2 * lines_per_block + 1];
 
-			my_clip.min_y = i * lines_per_block;
-			my_clip.max_y = (i + 1) * lines_per_block - 1;
-
-			if (BIT(m_video_control, 4))   /*flip screen*/
+			if (BIT(m_video_control, 4))   // flip screen
 			{
-				my_clip.min_y = bitmap.height() - 1 - (i + 1) * lines_per_block - 1;
-				my_clip.max_y = bitmap.height() - 1 - i * lines_per_block;
+				my_clip.sety(
+						bitmap.height() - 1 - (i + 1) * lines_per_block - 1,
+						bitmap.height() - 1 - i * lines_per_block);
+			}
+			else
+			{
+				my_clip.sety(i * lines_per_block, (i + 1) * lines_per_block - 1);
 			}
 
 			my_clip &= cliprect;
 
-			if (my_clip.min_y <= my_clip.max_y)
+			if (my_clip.top() <= my_clip.bottom())
 			{
 				m_tilemap[tmap_num]->set_scrollx(0, -scrollx);
 				m_tilemap[tmap_num]->set_scrolly(0, -scrolly);
@@ -509,13 +507,13 @@ void tc0180vcu_device::draw_framebuffer(bitmap_ind16 &bitmap, const rectangle &c
 
 		if (BIT(m_video_control, 4))   /*flip screen*/
 		{
-			/*popmessage("1. X[%3i;%3i] Y[%3i;%3i]", myclip.min_x, myclip.max_x, myclip.min_y, myclip.max_y);*/
-			for (int y = myclip.min_y; y <= myclip.max_y; y++)
+			//popmessage("1. X[%3i;%3i] Y[%3i;%3i]", myclip.left(), myclip.right(), myclip.top(), myclip.bottom());
+			for (int y = myclip.top(); y <= myclip.bottom(); y++)
 			{
-				uint16_t const *src = &m_framebuffer[m_framebuffer_page].pix(y, myclip.min_x);
-				uint16_t *dst = &bitmap.pix(bitmap.height()-1-y, myclip.max_x);
+				uint16_t const *src = &m_framebuffer[m_framebuffer_page].pix(y, myclip.left());
+				uint16_t *dst = &bitmap.pix(bitmap.height()-1-y, myclip.right());
 
-				for (int x = myclip.min_x; x <= myclip.max_x; x++)
+				for (int x = myclip.left(); x <= myclip.right(); x++)
 				{
 					uint16_t c = *src++;
 
@@ -528,12 +526,12 @@ void tc0180vcu_device::draw_framebuffer(bitmap_ind16 &bitmap, const rectangle &c
 		}
 		else
 		{
-			for (int y = myclip.min_y; y <= myclip.max_y; y++)
+			for (int y = myclip.top(); y <= myclip.bottom(); y++)
 			{
-				uint16_t const *src = &m_framebuffer[m_framebuffer_page].pix(y, myclip.min_x);
-				uint16_t *dst = &bitmap.pix(y, myclip.min_x);
+				uint16_t const *src = &m_framebuffer[m_framebuffer_page].pix(y, myclip.left());
+				uint16_t *dst = &bitmap.pix(y, myclip.left());
 
-				for (int x = myclip.min_x; x <= myclip.max_x; x++)
+				for (int x = myclip.left(); x <= myclip.right(); x++)
 				{
 					uint16_t c = *src++;
 
@@ -549,13 +547,13 @@ void tc0180vcu_device::draw_framebuffer(bitmap_ind16 &bitmap, const rectangle &c
 	{
 		if (BIT(m_video_control, 4))   /*flip screen*/
 		{
-			/*popmessage("3. X[%3i;%3i] Y[%3i;%3i]", myclip.min_x, myclip.max_x, myclip.min_y, myclip.max_y);*/
-			for (int y = myclip.min_y ;y <= myclip.max_y; y++)
+			//popmessage("3. X[%3i;%3i] Y[%3i;%3i]", myclip.left(), myclip.right(), myclip.top(), myclip.bottom());
+			for (int y = myclip.top(); y <= myclip.bottom(); y++)
 			{
-				uint16_t const *src = &m_framebuffer[m_framebuffer_page].pix(y, myclip.min_x);
-				uint16_t *dst = &bitmap.pix(bitmap.height()-1-y, myclip.max_x);
+				uint16_t const *src = &m_framebuffer[m_framebuffer_page].pix(y, myclip.left());
+				uint16_t *dst = &bitmap.pix(bitmap.height()-1-y, myclip.right());
 
-				for (int x = myclip.min_x; x <= myclip.max_x; x++)
+				for (int x = myclip.left(); x <= myclip.right(); x++)
 				{
 					uint16_t c = *src++;
 
@@ -568,12 +566,12 @@ void tc0180vcu_device::draw_framebuffer(bitmap_ind16 &bitmap, const rectangle &c
 		}
 		else
 		{
-			for (int y = myclip.min_y; y <= myclip.max_y; y++)
+			for (int y = myclip.top(); y <= myclip.bottom(); y++)
 			{
-				uint16_t const *src = &m_framebuffer[m_framebuffer_page].pix(y, myclip.min_x);
-				uint16_t *dst = &bitmap.pix(y, myclip.min_x);
+				uint16_t const *src = &m_framebuffer[m_framebuffer_page].pix(y, myclip.left());
+				uint16_t *dst = &bitmap.pix(y, myclip.left());
 
-				for (int x = myclip.min_x; x <= myclip.max_x; x++)
+				for (int x = myclip.left(); x <= myclip.right(); x++)
 				{
 					uint16_t c = *src++;
 

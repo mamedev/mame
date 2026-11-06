@@ -148,12 +148,12 @@ uint32_t calcune_state::screen_update_calcune(screen_device &screen, bitmap_rgb3
 	const pen_t *paldata2_s = m_vdp[1]->gfx_palette_shadow()->pens();
 	const pen_t *paldata2_h = m_vdp[1]->gfx_palette_hilight()->pens();
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		const unsigned palette_per_scanline = 64 * y;
 
 		uint32_t *const dst = &bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int pix;
 

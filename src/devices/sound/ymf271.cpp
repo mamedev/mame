@@ -153,52 +153,55 @@ const uint8_t pms_k[8] = { 0, 2, 3, 4, 6, 12, 24, 48 };
 
 } // anonymous namespace
 
-// Algorithm connection tables.  For each operator position of the voice:
-// mods = bitmask of positions whose output modulates it; car = bitmask of
-// carrier positions; fbsrc = position whose output is fed back into position
-// 0 (0 = self, 2 = the S3 loop of algorithms 1/5/7/11).  Positions: 4op
-// S1,S2,S3,S4 = 0..3; 2op head,tail = 0,1; 3op S1,S2,S3 = 0..2.
-static const ymf271_device::opx_alg alg4[16] =
+struct ymf271_device::alg_tables
 {
-	{ { 0, 0x4, 0x1, 0x2 }, 0x8, 0 },   // 0: S1>S3>S2>S4
-	{ { 0, 0x4, 0x1, 0x2 }, 0x8, 2 },   // 1: same, fb loop S1>S3
-	{ { 0, 0x5, 0x0, 0x2 }, 0x8, 0 },   // 2: (S1+S3)>S2>S4
-	{ { 0, 0x4, 0x0, 0x3 }, 0x8, 0 },   // 3: (S1 + S3>S2)>S4
-	{ { 0, 0x0, 0x1, 0x6 }, 0x8, 0 },   // 4: (S1>S3 + S2)>S4
-	{ { 0, 0x0, 0x1, 0x6 }, 0x8, 2 },   // 5: same, fb loop S1>S3
-	{ { 0, 0x0, 0x1, 0x2 }, 0xC, 0 },   // 6: S1>S3, S2>S4
-	{ { 0, 0x0, 0x1, 0x2 }, 0xC, 2 },   // 7: same, fb loop S1>S3
-	{ { 0, 0x4, 0x0, 0x2 }, 0x9, 0 },   // 8: S1, S3>S2>S4
-	{ { 0, 0x0, 0x0, 0x6 }, 0x9, 0 },   // 9: S1, (S3+S2)>S4
-	{ { 0, 0x0, 0x1, 0x0 }, 0xE, 0 },   // 10: S1>S3, S2, S4
-	{ { 0, 0x0, 0x1, 0x0 }, 0xE, 2 },   // 11: same, fb loop S1>S3
-	{ { 0, 0x1, 0x1, 0x1 }, 0xE, 0 },   // 12: S1>(S2,S3,S4)
-	{ { 0, 0x4, 0x0, 0x0 }, 0xB, 0 },   // 13: S1, S3>S2, S4
-	{ { 0, 0x0, 0x1, 0x2 }, 0xD, 0 },   // 14: S1, S1>S3, S2>S4
-	{ { 0, 0x0, 0x0, 0x0 }, 0xF, 0 }    // 15: all carriers
-};
+	// Algorithm connection tables.  For each operator position of the voice:
+	// mods = bitmask of positions whose output modulates it; car = bitmask of
+	// carrier positions; fbsrc = position whose output is fed back into position
+	// 0 (0 = self, 2 = the S3 loop of algorithms 1/5/7/11).  Positions: 4op
+	// S1,S2,S3,S4 = 0..3; 2op head,tail = 0,1; 3op S1,S2,S3 = 0..2.
+	static inline const opx_alg alg4[16] =
+	{
+		{ { 0, 0x4, 0x1, 0x2 }, 0x8, 0 },   // 0: S1>S3>S2>S4
+		{ { 0, 0x4, 0x1, 0x2 }, 0x8, 2 },   // 1: same, fb loop S1>S3
+		{ { 0, 0x5, 0x0, 0x2 }, 0x8, 0 },   // 2: (S1+S3)>S2>S4
+		{ { 0, 0x4, 0x0, 0x3 }, 0x8, 0 },   // 3: (S1 + S3>S2)>S4
+		{ { 0, 0x0, 0x1, 0x6 }, 0x8, 0 },   // 4: (S1>S3 + S2)>S4
+		{ { 0, 0x0, 0x1, 0x6 }, 0x8, 2 },   // 5: same, fb loop S1>S3
+		{ { 0, 0x0, 0x1, 0x2 }, 0xc, 0 },   // 6: S1>S3, S2>S4
+		{ { 0, 0x0, 0x1, 0x2 }, 0xc, 2 },   // 7: same, fb loop S1>S3
+		{ { 0, 0x4, 0x0, 0x2 }, 0x9, 0 },   // 8: S1, S3>S2>S4
+		{ { 0, 0x0, 0x0, 0x6 }, 0x9, 0 },   // 9: S1, (S3+S2)>S4
+		{ { 0, 0x0, 0x1, 0x0 }, 0xe, 0 },   // 10: S1>S3, S2, S4
+		{ { 0, 0x0, 0x1, 0x0 }, 0xe, 2 },   // 11: same, fb loop S1>S3
+		{ { 0, 0x1, 0x1, 0x1 }, 0xe, 0 },   // 12: S1>(S2,S3,S4)
+		{ { 0, 0x4, 0x0, 0x0 }, 0xb, 0 },   // 13: S1, S3>S2, S4
+		{ { 0, 0x0, 0x1, 0x2 }, 0xd, 0 },   // 14: S1, S1>S3, S2>S4
+		{ { 0, 0x0, 0x0, 0x0 }, 0xf, 0 }    // 15: all carriers
+	};
 
-static const ymf271_device::opx_alg alg2[4] =
-{
-	{ { 0, 0x1, 0, 0 }, 0x2, 0 },   // 0: A>B
-	{ { 0, 0x1, 0, 0 }, 0x2, 1 },   // 1: A>B, fb loop
-	{ { 0, 0x0, 0, 0 }, 0x3, 0 },   // 2: A, B
-	{ { 0, 0x1, 0, 0 }, 0x3, 0 }    // 3: A, A>B
-};
+	static inline const opx_alg alg2[4] =
+	{
+		{ { 0, 0x1, 0, 0 }, 0x2, 0 },   // 0: A>B
+		{ { 0, 0x1, 0, 0 }, 0x2, 1 },   // 1: A>B, fb loop
+		{ { 0, 0x0, 0, 0 }, 0x3, 0 },   // 2: A, B
+		{ { 0, 0x1, 0, 0 }, 0x3, 0 }    // 3: A, A>B
+	};
 
-static const ymf271_device::opx_alg alg3[8] =
-{
-	{ { 0, 0x4, 0x1, 0 }, 0x2, 0 }, // 0: S1>S3>S2
-	{ { 0, 0x4, 0x1, 0 }, 0x2, 2 }, // 1: same, fb loop
-	{ { 0, 0x5, 0x0, 0 }, 0x2, 0 }, // 2: (S1+S3)>S2
-	{ { 0, 0x4, 0x0, 0 }, 0x3, 0 }, // 3: S1, S3>S2
-	{ { 0, 0x0, 0x1, 0 }, 0x6, 0 }, // 4: S1>S3, S2
-	{ { 0, 0x0, 0x1, 0 }, 0x6, 2 }, // 5: same, fb loop
-	{ { 0, 0x0, 0x0, 0 }, 0x7, 0 }, // 6: S1, S2, S3
-	{ { 0, 0x0, 0x1, 0 }, 0x7, 0 }  // 7: S1, S1>S3, S2
-};
+	static inline const opx_alg alg3[8] =
+	{
+		{ { 0, 0x4, 0x1, 0 }, 0x2, 0 }, // 0: S1>S3>S2
+		{ { 0, 0x4, 0x1, 0 }, 0x2, 2 }, // 1: same, fb loop
+		{ { 0, 0x5, 0x0, 0 }, 0x2, 0 }, // 2: (S1+S3)>S2
+		{ { 0, 0x4, 0x0, 0 }, 0x3, 0 }, // 3: S1, S3>S2
+		{ { 0, 0x0, 0x1, 0 }, 0x6, 0 }, // 4: S1>S3, S2
+		{ { 0, 0x0, 0x1, 0 }, 0x6, 2 }, // 5: same, fb loop
+		{ { 0, 0x0, 0x0, 0 }, 0x7, 0 }, // 6: S1, S2, S3
+		{ { 0, 0x0, 0x1, 0 }, 0x7, 0 }  // 7: S1, S1>S3, S2
+	};
 
-static const ymf271_device::opx_alg alg_single = { { 0, 0, 0, 0 }, 0x1, 0 };
+	static inline const opx_alg alg_single = { { 0, 0, 0, 0 }, 0x1, 0 };
+};
 
 
 // ------------------------------------------------------------------------
@@ -258,7 +261,7 @@ void ymf271_device::update_keycode(opx_slot &s, int slotnum)
 
 	if (s.wave == 7 && (slotnum & 3) == 0)
 	{
-		uint16_t fn = s.fnum & 0x7FF;
+		uint16_t fn = s.fnum & 0x7ff;
 		if (fn < 0x100)      n43 = 0;
 		else if (fn < 0x300) n43 = 1;
 		else if (fn < 0x500) n43 = 2;
@@ -269,7 +272,7 @@ void ymf271_device::update_keycode(opx_slot &s, int slotnum)
 	{
 		if (s.fnum < 0x780)      n43 = 0;
 		else if (s.fnum < 0x900) n43 = 1;
-		else if (s.fnum < 0xA80) n43 = 2;
+		else if (s.fnum < 0xa80) n43 = 2;
 		else                     n43 = 3;
 		// negative blocks: the manual's 4*Block would wrap to octave 7, but
 		// a recorded bass at block -1 (DT 7 / DT 2 on a 1:3 operator pair)
@@ -331,7 +334,7 @@ void ymf271_device::write_slot_reg(int slotnum, int reg, uint8_t data)
 	{
 	case 0x0:
 		s.ext_en = (data >> 7) & 1;
-		s.ext_out = (data >> 3) & 0xF;
+		s.ext_out = (data >> 3) & 0xf;
 		s.kon = data & 1;
 		// Every KON=1 write (re)triggers the slot: P-47 Aces writes KON=1 onto
 		// already keyed slots for note repeats, so edge-triggering would drop notes.
@@ -349,54 +352,54 @@ void ymf271_device::write_slot_reg(int slotnum, int reg, uint8_t data)
 		s.ams = (data >> 6) & 3;
 		break;
 	case 0x3:
-		s.mul = data & 0xF;
+		s.mul = data & 0xf;
 		s.dt = (data >> 4) & 7;
 		break;
 	case 0x4:
-		s.tl = data & 0x7F;
+		s.tl = data & 0x7f;
 		break;
 	case 0x5:
-		s.ar = data & 0x1F;
+		s.ar = data & 0x1f;
 		s.ks = (data >> 5) & 7;
 		break;
 	case 0x6:
-		s.d1r = data & 0x1F;
+		s.d1r = data & 0x1f;
 		break;
 	case 0x7:
-		s.d2r = data & 0x1F;
+		s.d2r = data & 0x1f;
 		break;
 	case 0x8:
-		s.rr = data & 0xF;
-		s.d1l = (data >> 4) & 0xF;
+		s.rr = data & 0xf;
+		s.d1l = (data >> 4) & 0xf;
 		break;
 	case 0x9:
 		// F-number low: commits the latched Block / F-number high nibble
 		// (manual: Block and F-Number2 must be written before F-Number1)
-		s.fnum = ((s.fnum_latch & 0x0F) << 8) | data;
+		s.fnum = ((s.fnum_latch & 0x0f) << 8) | data;
 		s.block = s.fnum_latch >> 4;
 		s.block_s = int8_t((s.block ^ 8) - 8);
 		update_keycode(s, slotnum);
 		break;
-	case 0xA:
+	case 0xa:
 		s.fnum_latch = data;
 		break;
-	case 0xB:
+	case 0xb:
 		s.wave = data & 7;
 		s.fb = (data >> 4) & 7;
 		s.accon = (data >> 7) & 1;
 		update_keycode(s, slotnum);
 		break;
-	case 0xC:
-		s.alg = data & 0xF;
+	case 0xc:
+		s.alg = data & 0xf;
 		m_groups[slotnum % 12].dirty = 1;
 		break;
-	case 0xD:
+	case 0xd:
 		s.ch_level[0] = data >> 4;
-		s.ch_level[1] = data & 0xF;
+		s.ch_level[1] = data & 0xf;
 		break;
-	case 0xE:
+	case 0xe:
 		s.ch_level[2] = data >> 4;
-		s.ch_level[3] = data & 0xF;
+		s.ch_level[3] = data & 0xf;
 		break;
 	default:
 		break;
@@ -406,7 +409,7 @@ void ymf271_device::write_slot_reg(int slotnum, int reg, uint8_t data)
 // FM function register write: bank 0..3 (S1..S4), address = reg<<4 | group nibble
 void ymf271_device::write_fm(int bank, uint8_t address, uint8_t data)
 {
-	int group = fm_tab[address & 0xF];
+	int group = fm_tab[address & 0xf];
 	int reg = address >> 4;
 	bool broadcast;
 
@@ -421,7 +424,7 @@ void ymf271_device::write_fm(int bank, uint8_t address, uint8_t data)
 	// copied to all slots of the voice.
 	switch (reg)
 	{
-	case 0x0: case 0x9: case 0xA: case 0xC: case 0xD: case 0xE:
+	case 0x0: case 0x9: case 0xa: case 0xc: case 0xd: case 0xe:
 		broadcast = true;
 		break;
 	default:
@@ -445,7 +448,7 @@ void ymf271_device::write_fm(int bank, uint8_t address, uint8_t data)
 // PCM attribute register write (bank 5)
 void ymf271_device::write_pcm(uint8_t address, uint8_t data)
 {
-	int slotnum = pcm_tab[address & 0xF];
+	int slotnum = pcm_tab[address & 0xf];
 
 	if (slotnum < 0)
 	{
@@ -456,18 +459,18 @@ void ymf271_device::write_pcm(uint8_t address, uint8_t data)
 
 	switch (address >> 4)
 	{
-	case 0x0: s.pcm_start = (s.pcm_start & 0xFFFF00) | data; break;
-	case 0x1: s.pcm_start = (s.pcm_start & 0xFF00FF) | (data << 8); break;
+	case 0x0: s.pcm_start = (s.pcm_start & 0xffff00) | data; break;
+	case 0x1: s.pcm_start = (s.pcm_start & 0xff00ff) | (data << 8); break;
 	case 0x2:
-		s.pcm_start = (s.pcm_start & 0x00FFFF) | ((data & 0x7F) << 16);
+		s.pcm_start = (s.pcm_start & 0x00ffff) | ((data & 0x7f) << 16);
 		s.pcm_altloop = data >> 7;
 		break;
-	case 0x3: s.pcm_end = (s.pcm_end & 0xFFFF00) | data; break;
-	case 0x4: s.pcm_end = (s.pcm_end & 0xFF00FF) | (data << 8); break;
-	case 0x5: s.pcm_end = (s.pcm_end & 0x00FFFF) | ((data & 0x7F) << 16); break;
-	case 0x6: s.pcm_loop = (s.pcm_loop & 0xFFFF00) | data; break;
-	case 0x7: s.pcm_loop = (s.pcm_loop & 0xFF00FF) | (data << 8); break;
-	case 0x8: s.pcm_loop = (s.pcm_loop & 0x00FFFF) | ((data & 0x7F) << 16); break;
+	case 0x3: s.pcm_end = (s.pcm_end & 0xffff00) | data; break;
+	case 0x4: s.pcm_end = (s.pcm_end & 0xff00ff) | (data << 8); break;
+	case 0x5: s.pcm_end = (s.pcm_end & 0x00ffff) | ((data & 0x7f) << 16); break;
+	case 0x6: s.pcm_loop = (s.pcm_loop & 0xffff00) | data; break;
+	case 0x7: s.pcm_loop = (s.pcm_loop & 0xff00ff) | (data << 8); break;
+	case 0x8: s.pcm_loop = (s.pcm_loop & 0x00ffff) | ((data & 0x7f) << 16); break;
 	case 0x9:
 		s.pcm_fs = data & 3;
 		s.pcm_12bit = (data >> 2) & 1;
@@ -518,9 +521,9 @@ TIMER_CALLBACK_MEMBER(ymf271_device::timer_b_expired)
 // utility register write (bank 6): sync, timers, external memory access, test
 void ymf271_device::write_util(uint8_t address, uint8_t data)
 {
-	if ((address & 0xF0) == 0x00)
+	if ((address & 0xf0) == 0x00)
 	{
-		int group = fm_tab[address & 0xF];
+		int group = fm_tab[address & 0xf];
 		if (group < 0)
 		{
 			logerror("write to invalid sync group nibble %02X (data %02X)\n", address, data);
@@ -540,7 +543,7 @@ void ymf271_device::write_util(uint8_t address, uint8_t data)
 		m_timerA = (m_timerA & 0x003) | (data << 2);
 		break;
 	case 0x11:
-		m_timerA = (m_timerA & 0x3FC) | (data & 0x03);
+		m_timerA = (m_timerA & 0x3fc) | (data & 0x03);
 		break;
 	case 0x12:
 		m_timerB = data;
@@ -567,13 +570,13 @@ void ymf271_device::write_util(uint8_t address, uint8_t data)
 		update_irq();
 		break;
 	case 0x14:
-		m_ext_address = (m_ext_address & 0xFFFF00) | data;
+		m_ext_address = (m_ext_address & 0xffff00) | data;
 		break;
 	case 0x15:
-		m_ext_address = (m_ext_address & 0xFF00FF) | (data << 8);
+		m_ext_address = (m_ext_address & 0xff00ff) | (data << 8);
 		break;
 	case 0x16:
-		m_ext_address = (m_ext_address & 0x00FFFF) | ((data & 0x7F) << 16);
+		m_ext_address = (m_ext_address & 0x00ffff) | ((data & 0x7f) << 16);
 		m_ext_rw = data >> 7;
 		// prime the read latch for the read-direction window
 		if (m_ext_rw)
@@ -582,7 +585,7 @@ void ymf271_device::write_util(uint8_t address, uint8_t data)
 	case 0x17:
 		// write to external memory (SRAM); the address is incremented before
 		// the write (previous core's reading; the documents do not say)
-		m_ext_address = (m_ext_address + 1) & 0x7FFFFF;
+		m_ext_address = (m_ext_address + 1) & 0x7fffff;
 		if (!m_ext_rw)
 			space(0).write_byte(m_ext_address, data);
 		break;
@@ -598,7 +601,7 @@ void ymf271_device::write(offs_t offset, u8 data)
 {
 	m_stream->update();
 
-	offset &= 0xF;
+	offset &= 0xf;
 	m_regs_main[offset] = data;
 
 	switch (offset)
@@ -608,7 +611,7 @@ void ymf271_device::write(offs_t offset, u8 data)
 	case 0x5: write_fm(2, m_regs_main[0x4], data); break;
 	case 0x7: write_fm(3, m_regs_main[0x6], data); break;
 	case 0x9: write_pcm(m_regs_main[0x8], data); break;
-	case 0xD: write_util(m_regs_main[0xC], data); break;
+	case 0xd: write_util(m_regs_main[0xc], data); break;
 	default:
 		// even offsets: address latches; 0xB/0xF: unused banks
 		break;
@@ -617,7 +620,7 @@ void ymf271_device::write(offs_t offset, u8 data)
 
 u8 ymf271_device::read(offs_t offset)
 {
-	offset &= 0xF;
+	offset &= 0xf;
 
 	// update stream before reading status registers
 	if (offset <= 1)
@@ -633,8 +636,7 @@ u8 ymf271_device::read(offs_t offset)
 		// its End bit is seen; a sticky flag would kill the next note started
 		// on that slot from the stale copy).
 		{
-			uint8_t ret = (m_status & 0x83) | (BIT(m_end_status, 0) << 3) | (BIT(m_end_status, 3) << 4)
-			     | (BIT(m_end_status, 6) << 5) | (BIT(m_end_status, 9) << 6);
+			uint8_t ret = (m_status & 0x83) | (bitswap<4>(m_end_status, 9, 6, 3, 0) << 3);
 			if (!machine().side_effects_disabled())
 				m_end_status &= ~0x0249;
 			return ret;
@@ -644,21 +646,19 @@ u8 ymf271_device::read(offs_t offset)
 		// end_status bit i belongs to slot 4*i: slots 4,16,28,40 = bits 1,4,7,10;
 		// slots 8,20,32,44 = bits 2,5,8,11
 		{
-			uint16_t e = m_end_status;
-			uint8_t ret = ((e >> 1) & 1) | (((e >> 4) & 1) << 1) | (((e >> 7) & 1) << 2) | (((e >> 10) & 1) << 3)
-			     | (((e >> 2) & 1) << 4) | (((e >> 5) & 1) << 5) | (((e >> 8) & 1) << 6) | (((e >> 11) & 1) << 7);
+			uint8_t ret = bitswap<8>(m_end_status, 11, 8, 5, 2, 10, 7, 4, 1);
 			if (!machine().side_effects_disabled())
-				m_end_status &= ~0x0DB6;
+				m_end_status &= ~0x0db6;
 			return ret;
 		}
 	case 0x2:
 		{
 			if (!m_ext_rw)
-				return 0xFF;
+				return 0xff;
 			uint8_t ret = m_ext_readlatch;
 			if (!machine().side_effects_disabled())
 			{
-				m_ext_address = (m_ext_address + 1) & 0x7FFFFF;
+				m_ext_address = (m_ext_address + 1) & 0x7fffff;
 				m_ext_readlatch = read_byte(m_ext_address);
 			}
 			return ret;
@@ -666,7 +666,7 @@ u8 ymf271_device::read(offs_t offset)
 	default:
 		break;
 	}
-	return 0xFF;
+	return 0xff;
 }
 
 
@@ -691,9 +691,11 @@ void ymf271_device::connect(const opx_alg &alg, const int *slots, int n)
 		opx_slot &s = m_slots[slots[p]];
 		s.c_nmod = 0;
 		for (int q = 0; q < n; q++)
-			if (alg.mods[p] & (1 << q))
+		{
+			if (BIT(alg.mods[p], q))
 				s.c_mod[s.c_nmod++] = uint8_t(slots[q]);
-		s.c_carrier = (alg.car >> p) & 1;
+		}
+		s.c_carrier = BIT(alg.car, p);
 		// the head slot takes the feedback input; its history is written by
 		// position fbsrc (itself, or S3 for the loop algorithms)
 		s.c_fbhead = (p == 0);
@@ -710,25 +712,25 @@ void ymf271_device::rebuild_group(int g)
 	{
 	case SYNC_4OP:
 		slots[0] = g; slots[1] = g + 12; slots[2] = g + 24; slots[3] = g + 36;
-		connect(alg4[m_slots[g].alg & 15], slots, 4);
+		connect(alg_tables::alg4[m_slots[g].alg & 15], slots, 4);
 		break;
 	case SYNC_2X2OP:
 		slots[0] = g; slots[1] = g + 24;
-		connect(alg2[m_slots[g].alg & 3], slots, 2);
+		connect(alg_tables::alg2[m_slots[g].alg & 3], slots, 2);
 		slots[0] = g + 12; slots[1] = g + 36;
-		connect(alg2[m_slots[g + 12].alg & 3], slots, 2);
+		connect(alg_tables::alg2[m_slots[g + 12].alg & 3], slots, 2);
 		break;
 	case SYNC_3OP_PCM:
 		slots[0] = g; slots[1] = g + 12; slots[2] = g + 24;
-		connect(alg3[m_slots[g].alg & 7], slots, 3);
+		connect(alg_tables::alg3[m_slots[g].alg & 7], slots, 3);
 		slots[0] = g + 36;
-		connect(alg_single, slots, 1);
+		connect(alg_tables::alg_single, slots, 1);
 		break;
 	default:
-		slots[0] = g;      connect(alg_single, slots, 1);
-		slots[0] = g + 12; connect(alg_single, slots, 1);
-		slots[0] = g + 24; connect(alg_single, slots, 1);
-		slots[0] = g + 36; connect(alg_single, slots, 1);
+		slots[0] = g;      connect(alg_tables::alg_single, slots, 1);
+		slots[0] = g + 12; connect(alg_tables::alg_single, slots, 1);
+		slots[0] = g + 24; connect(alg_tables::alg_single, slots, 1);
+		slots[0] = g + 36; connect(alg_tables::alg_single, slots, 1);
 		break;
 	}
 }
@@ -790,9 +792,9 @@ void ymf271_device::eg_tick(opx_slot &s)
 	else
 	{
 		s.eg_att += inc;
-		if (s.eg_att >= 0x3FF)
+		if (s.eg_att >= 0x3ff)
 		{
-			s.eg_att = 0x3FF;
+			s.eg_att = 0x3ff;
 			if (s.eg_state == EG_RELEASE)
 				s.eg_state = EG_OFF;
 		}
@@ -898,11 +900,11 @@ uint32_t ymf271_device::phase_inc(const opx_slot &s, int32_t lfo_pm)
 uint32_t ymf271_device::pcm_step(const opx_slot &s, int32_t lfo_pm)
 {
 	int64_t inc;
-	int64_t fnum = ((s.fnum & 0x7FF) | 0x800) << 7;  // 7 fraction bits for the LFO
+	int64_t fnum = ((s.fnum & 0x7ff) | 0x800) << 7;  // 7 fraction bits for the LFO
 	int dt;
 
 	if (lfo_pm != 0)
-		fnum += (int64_t((s.fnum & 0x7FF) | 0x800) * pms_k[s.pms] * lfo_pm) >> 10;
+		fnum += (int64_t((s.fnum & 0x7ff) | 0x800) * pms_k[s.pms] * lfo_pm) >> 10;
 	// fnum(q7) * 2^(block-11) * 65536 = fnum(q7) << (block + 5) >> 7
 	inc = (fnum << 16) >> (18 - s.block_s);
 	dt = detune_tab[s.keycode][s.dt & 3] << 6;  // FM units (1 << 12) / 2^6
@@ -927,7 +929,7 @@ int32_t ymf271_device::pcm_word(const opx_slot &s, uint32_t pos)
 
 	if (!s.pcm_12bit)
 	{
-		v = int8_t(read_byte((s.pcm_start + pos) & 0x7FFFFF)) << 4;
+		v = int8_t(read_byte((s.pcm_start + pos) & 0x7fffff)) << 4;
 	}
 	else
 	{
@@ -937,12 +939,12 @@ int32_t ymf271_device::pcm_word(const opx_slot &s, uint32_t pos)
 		// makes the smooth samples as much smoother than the 8-bit-only decode
 		// as true LSBs should, the swapped order makes them rougher than
 		// dropping the nibble.)
-		uint32_t addr = (s.pcm_start + (pos >> 1) * 3) & 0x7FFFFF;
+		uint32_t addr = (s.pcm_start + (pos >> 1) * 3) & 0x7fffff;
 		if (pos & 1)
 			v = (read_byte(addr + 2) << 4) | (read_byte(addr + 1) >> 4);
 		else
-			v = (read_byte(addr) << 4) | (read_byte(addr + 1) & 0x0F);
-		v = int32_t((v & 0xFFF) ^ 0x800) - 0x800;
+			v = (read_byte(addr) << 4) | (read_byte(addr + 1) & 0x0f);
+		v = int32_t((v & 0xfff) ^ 0x800) - 0x800;
 	}
 	return v;
 }
@@ -958,7 +960,7 @@ int32_t ymf271_device::pcm_sample(opx_slot &s, int slotnum, int32_t lfo_pm)
 
 	s.pcm_frac += step;
 	s.pcm_pos += s.pcm_frac >> 16;
-	s.pcm_frac &= 0xFFFF;
+	s.pcm_frac &= 0xffff;
 	if (s.pcm_pos >= s.pcm_end)
 	{
 		if (s.pcm_end > s.pcm_loop)
@@ -1109,8 +1111,8 @@ void ymf271_device::sound_stream_update(sound_stream &stream)
 				int32_t am = lfo_am(s);
 				env += (s.ams == 1) ? (am >> 1) : (s.ams == 2) ? am : (am << 1);
 			}
-			if (env > 0x3FF)
-				env = 0x3FF;
+			if (env > 0x3ff)
+				env = 0x3ff;
 
 			const int32_t pm = (s.pms && s.lfo_wave) ? lfo_pm(s) : 0;
 
@@ -1174,10 +1176,10 @@ void ymf271_device::sound_stream_update(sound_stream &stream)
 				// voice is sent to, at full level (no attenuation register)
 				if (s.ext_en)
 				{
-					if (s.ext_out & 1) acc[4] += out;
-					if (s.ext_out & 2) acc[5] += out;
-					if (s.ext_out & 4) acc[6] += out;
-					if (s.ext_out & 8) acc[7] += out;
+					if (BIT(s.ext_out, 0)) acc[4] += out;
+					if (BIT(s.ext_out, 1)) acc[5] += out;
+					if (BIT(s.ext_out, 2)) acc[6] += out;
+					if (BIT(s.ext_out, 3)) acc[7] += out;
 				}
 			}
 		}
@@ -1285,7 +1287,7 @@ void ymf271_device::device_reset()
 		opx_slot &s = m_slots[i];
 		s = opx_slot();
 		s.eg_state = EG_OFF;
-		s.eg_att = 0x3FF;
+		s.eg_att = 0x3ff;
 		s.c_fbtarget = -1;
 	}
 	for (int i = 0; i < NUM_GROUPS; i++)

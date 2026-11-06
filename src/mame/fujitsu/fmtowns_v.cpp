@@ -121,24 +121,26 @@ void towns_state::towns_crtc_refresh_mode()
 	rectangle scr(0, m_video.towns_crtc_reg[4] - m_video.towns_crtc_reg[0], 0, m_video.towns_crtc_reg[8] / 2);
 
 	// layer 0
-	m_video.towns_crtc_layerscr[0].min_x = m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[0];
-	m_video.towns_crtc_layerscr[0].min_y = (m_video.towns_crtc_reg[13] - m_video.towns_crtc_reg[6]) / 2;
-	m_video.towns_crtc_layerscr[0].max_x = m_video.towns_crtc_reg[10] - m_video.towns_crtc_reg[0];
-	m_video.towns_crtc_layerscr[0].max_y = ((m_video.towns_crtc_reg[14] - m_video.towns_crtc_reg[6]) / 2) - 1;
+	m_video.towns_crtc_layerscr[0].set(
+			m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[0],
+			m_video.towns_crtc_reg[10] - m_video.towns_crtc_reg[0],
+			(m_video.towns_crtc_reg[13] - m_video.towns_crtc_reg[6]) / 2,
+			((m_video.towns_crtc_reg[14] - m_video.towns_crtc_reg[6]) / 2) - 1);
 
 	// layer 1
-	m_video.towns_crtc_layerscr[1].min_x = m_video.towns_crtc_reg[11] - m_video.towns_crtc_reg[0];
-	m_video.towns_crtc_layerscr[1].min_y = (m_video.towns_crtc_reg[15] - m_video.towns_crtc_reg[6]) / 2;
-	m_video.towns_crtc_layerscr[1].max_x = m_video.towns_crtc_reg[12] - m_video.towns_crtc_reg[0];
-	m_video.towns_crtc_layerscr[1].max_y = ((m_video.towns_crtc_reg[16] - m_video.towns_crtc_reg[6]) / 2) - 1;
+	m_video.towns_crtc_layerscr[1].set(
+			m_video.towns_crtc_reg[11] - m_video.towns_crtc_reg[0],
+			m_video.towns_crtc_reg[12] - m_video.towns_crtc_reg[0],
+			(m_video.towns_crtc_reg[15] - m_video.towns_crtc_reg[6]) / 2,
+			((m_video.towns_crtc_reg[16] - m_video.towns_crtc_reg[6]) / 2) - 1);
 
 	// sanity checks
-	if(scr.max_x == 0 || scr.max_y == 0)
+	if(scr.right() == 0 || scr.bottom() == 0)
 		return;
-	if(scr.max_x <= scr.min_x || scr.max_y <= scr.min_y)
+	if(scr.right() <= scr.left() || scr.bottom() <= scr.top())
 		return;
 
-	m_screen->configure(scr.max_x+1,scr.max_y+1,scr,attotime::from_hz(60));
+	m_screen->configure(scr.right() + 1, scr.bottom() + 1, scr,attotime::from_hz(60));
 }
 
 uint8_t towns_state::towns_gfx_high_r(offs_t offset)
@@ -297,7 +299,7 @@ uint8_t towns_state::towns_video_cff80_r(offs_t offset)
 			{
 				uint8_t ret = 0x10;
 				uint16_t const xpos = m_screen->hpos();
-				if(xpos < m_video.towns_crtc_layerscr[0].max_x && xpos > m_video.towns_crtc_layerscr[0].min_x)
+				if(xpos < m_video.towns_crtc_layerscr[0].right() && xpos > m_video.towns_crtc_layerscr[0].left())
 					ret |= 0x80;
 				if(m_video.towns_vblank_flag != 0)
 					ret |= 0x04;
@@ -412,13 +414,13 @@ uint8_t towns_state::towns_video_440_r(offs_t offset)
 					ret |= 0x02;
 				if(ypos < (m_video.towns_crtc_reg[6] & 0x1f))
 					ret |= 0x04;
-				if(xpos < m_video.towns_crtc_layerscr[0].max_x && xpos > m_video.towns_crtc_layerscr[0].min_x)
+				if(xpos < m_video.towns_crtc_layerscr[0].right() && xpos > m_video.towns_crtc_layerscr[0].left())
 					ret |= 0x10;
-				if(xpos < m_video.towns_crtc_layerscr[1].max_x && xpos > m_video.towns_crtc_layerscr[1].min_x)
+				if(xpos < m_video.towns_crtc_layerscr[1].right() && xpos > m_video.towns_crtc_layerscr[1].left())
 					ret |= 0x20;
-				if(ypos < m_video.towns_crtc_layerscr[0].max_y && ypos > m_video.towns_crtc_layerscr[0].min_y)
+				if(ypos < m_video.towns_crtc_layerscr[0].bottom() && ypos > m_video.towns_crtc_layerscr[0].top())
 					ret |= 0x40;
-				if(ypos < m_video.towns_crtc_layerscr[1].max_y && ypos > m_video.towns_crtc_layerscr[1].min_y)
+				if(ypos < m_video.towns_crtc_layerscr[1].bottom() && ypos > m_video.towns_crtc_layerscr[1].top())
 					ret |= 0x80;
 
 				return ret;
@@ -609,7 +611,7 @@ uint8_t towns_state::towns_video_fd90_r(offs_t offset)
 			// check video position
 			xpos = m_screen->hpos();
 
-			if(xpos < m_video.towns_crtc_layerscr[0].max_x && xpos > m_video.towns_crtc_layerscr[0].min_x)
+			if(xpos < m_video.towns_crtc_layerscr[0].right() && xpos > m_video.towns_crtc_layerscr[0].left())
 				ret |= 0x02;
 			if(m_video.towns_vblank_flag)
 				ret |= 0x01;
@@ -1112,7 +1114,7 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 	off += line * linesize;
 	off &= ~1;
 
-	for(int x=rect->min_x;x<rect->max_x;x+=hzoom)
+	for(int x = rect->left(); x < rect->right(); x += hzoom)
 	{
 		int offpage;
 		int curoff;
@@ -1173,7 +1175,7 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 	off += (subpix >> 1) & ~3;
 	subpix = subpix & 7;
 
-	for(int x=rect->min_x;x<rect->max_x;x+=hzoom)
+	for(int x = rect->left(); x < rect->right(); x += hzoom)
 	{
 		off &= 0x3ffff;
 		colour = m_towns_gfxvram[off+(subpix >= 4 ? (subpix & 3)+0x40000 : subpix)];
@@ -1245,7 +1247,7 @@ void towns_state::towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const recta
 
 	off += line * linesize;
 
-	for(int x=rect->min_x;x<rect->max_x;x+=hzoom*2)
+	for(int x = rect->left(); x < rect->right(); x += hzoom * 2)
 	{
 		if(m_video.towns_video_reg[0] & 0x10)
 			off &= 0x3ffff;  // 2 layers
@@ -1280,9 +1282,9 @@ void towns_state::towns_crtc_draw_layer(bitmap_rgb32 &bitmap,const rectangle* re
 
 	if(layer == 0)
 	{
-		scanline = rect->min_y;
-		top = (scanline - m_video.towns_crtc_layerscr[0].min_y);
-		bottom = (rect->max_y - rect->min_y) + top;
+		scanline = rect->top();
+		top = scanline - m_video.towns_crtc_layerscr[0].top();
+		bottom = (rect->bottom() - rect->top()) + top;
 		zoom = ((m_video.towns_crtc_reg[27] & 0x00f0) >> 4) + 1;
 		count = top % zoom;
 		bottom /= zoom;
@@ -1329,9 +1331,9 @@ void towns_state::towns_crtc_draw_layer(bitmap_rgb32 &bitmap,const rectangle* re
 	}
 	else
 	{
-		scanline = rect->min_y;
-		top = (scanline - m_video.towns_crtc_layerscr[1].min_y);
-		bottom = (rect->max_y - rect->min_y) + top;
+		scanline = rect->top();
+		top = scanline - m_video.towns_crtc_layerscr[1].top();
+		bottom = (rect->bottom() - rect->top()) + top;
 		zoom = ((m_video.towns_crtc_reg[27] & 0xf000) >> 12) + 1;
 		count = top % zoom;
 		bottom /= zoom;

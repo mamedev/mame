@@ -14,7 +14,7 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(VT82C598MVP_HOST, vt82c598mvp_host_device, "vt82c598mvp_host", "Via VT82C598MVP \"Apollo MVP3\" Host")
+DEFINE_DEVICE_TYPE(VT82C598MVP_HOST, vt82c598mvp_host_device, "vt82c598mvp_host", "VIA VT82C598MVP \"Apollo MVP3\" Host")
 
 vt82c598mvp_host_device::vt82c598mvp_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, type, tag, owner, clock)
@@ -143,14 +143,14 @@ void vt82c598mvp_host_device::config_map(address_map &map)
 		NAME([this] () { return m_noncache_control; }),
 		NAME([this] (offs_t offset, u8 data) {
 			m_noncache_control = data & 0xf5;
-			LOG("52h: Non-Cacheable Control 2 %02x\n", data);
+			LOG("52h: Non-Cacheable Control %02x\n", data);
 		})
 	);
 	map(0x53, 0x53).lrw8(
 		NAME([this] () { return m_system_perf_control; }),
 		NAME([this] (offs_t offset, u8 data) {
 			m_system_perf_control = data & 0xf0;
-			LOG("53h: System Performance Control 2 %02x\n", data);
+			LOG("53h: System Performance Control %02x\n", data);
 		})
 	);
 	map(0x54, 0x57).lrw16(

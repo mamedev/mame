@@ -533,6 +533,7 @@ bool cbm_iec_device::sample_ready(cpu_device &cpu)
 
 	attotime const time = cpu.local_time();
 	bool ready = !m_update_timer->enabled() || (m_update_timer->expire() > time);
+	attotime stalled = attotime::never;
 
 	for (device_execute_interface *const exec : m_execs)
 	{
@@ -544,12 +545,21 @@ bool cbm_iec_device::sample_ready(cpu_device &cpu)
 
 		attotime const cycle = exec->cycles_to_attotime(1);
 		if (!cycle.is_never())
-			ready = (exec->local_time() + (cycle / 2)) > time;
+		{
+			ready = (exec->local_time() + (cycle / 2)) >= time;
+			if (!ready && ((exec->local_time() + cycle) > time))
+				stalled = cycle;
+		}
 	}
 
 	if (!ready)
 	{
-		cpu.yield();
+		// a device less than a cycle behind can only run once this slice ends
+		if (!stalled.is_never())
+		{
+			cpu.yield();
+			machine().scheduler().perfect_quantum(stalled);
+		}
 		cpu.retry_access();
 	}
 
@@ -597,6 +607,7 @@ int cbm_iec_device::get_signal(int signal, const attotime &time)
 #include "dolphindos.h"
 #include "dps1101.h"
 #include "fd2000.h"
+#include "indusgt.h"
 #include "interpod.h"
 #include "mcs801.h"
 #include "mcs810.h"
@@ -605,10 +616,12 @@ int cbm_iec_device::get_signal(int signal, const attotime &time)
 #include "mps1000.h"
 #include "mps1200.h"
 #include "mps1224.h"
+#include "mps1230.h"
 #include "mps1270a.h"
 #include "mps2020.h"
 #include "mps801.h"
 #include "mps803.h"
+#include "msdsd.h"
 #include "prodos.h"
 #include "prologicdos.h"
 #include "rapidos.h"
@@ -669,6 +682,7 @@ void cbm_iec_printer_devices(device_slot_interface &device)
 	device.option_add("mps1000", MPS1000);
 	device.option_add("mps1200", MPS1200);
 	device.option_add("mps1224", MPS1224);
+	device.option_add("mps1230", MPS1230);
 	device.option_add("mps1250", MPS1250);
 	device.option_add("mps1270a", MPS1270A);
 	device.option_add("mps2020", MPS2020);

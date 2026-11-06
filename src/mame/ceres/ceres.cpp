@@ -399,14 +399,15 @@ u32 ceres1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rec
 		offs_t offset = BIT(m_dcr, 1) ? 0x20000 : 0;
 		u32 const invert = BIT(m_dcr, 2) ? 0xffffffffU : 0;
 
-		for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
+		for (int y = screen.visible_area().top(); y <= screen.visible_area().bottom(); y++)
 		{
-			for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 32)
+			auto *const dst = &bitmap.pix(y);
+			for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x += 32)
 			{
 				u32 const data = m_vram[offset++] ^ invert;
 
 				for (unsigned i = 0; i < 32; i++)
-					bitmap.pix(y, x + i) = BIT(data, i) ? rgb_t::white() : rgb_t::black();
+					dst[x + i] = BIT(data, i) ? rgb_t::white() : rgb_t::black();
 			}
 		}
 	}

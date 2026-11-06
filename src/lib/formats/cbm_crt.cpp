@@ -141,7 +141,7 @@ static char const *const CRT_C64_SLOT_NAMES[_CRT_C64_COUNT] =
 	UNSUPPORTED,        // 70 - MultiMAX
 	UNSUPPORTED,        // 71 - Blackbox V9
 	UNSUPPORTED,        // 72 - Lt. Kernal Host Adaptor
-	UNSUPPORTED,        // 73 - RAMLink
+	"ramlink",          // 73 - RAMLink
 	UNSUPPORTED,        // 74 - Drean
 	UNSUPPORTED,        // 75 - IEEE Flash! 64
 	UNSUPPORTED,        // 76 - HES Turtle Graphics II

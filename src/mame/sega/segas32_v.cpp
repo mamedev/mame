@@ -23,15 +23,6 @@
     - Sonic while globally flipped via the service menu, fails to flip
       the "SEGA" and "SEGASONIC" sprite based logos on the title screen.
 
-    - Wrong priority cases (parenthesis for the level setup):
-      dbzvrvs: draws text layer ($e) behind sprite-based gauges ($f).
-      dbzvrvs: Shen-Long speech balloon during Piccolo ending (fixme: check levels).
-      f1lap: attract mode ranking sprite-based text ($a) vs. road ($d)
-      f1lap: attract mode map display (after aforementioned), sprite-based turn names
-      ($a) are hidden by map ($d) again;
-      (Note: Theory about these being CPU core bug(s) is debunked by the fact that latter
-       sets up via immediate opcodes)
-
     - Tilemap opaque behaviour is incorrect
 
     Information extracted from below, and from Modeler:
@@ -289,6 +280,7 @@ void segas32_state::device_start()
 	save_item(NAME(m_v60_irq_control));
 	save_item(NAME(m_sound_irq_control));
 	save_item(NAME(m_sound_irq_input));
+	save_item(NAME(m_sound_irq_vector));
 	save_item(NAME(m_sound_dummy_value));
 	save_item(NAME(m_sound_bank));
 
@@ -564,17 +556,16 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 
 	// expand our cliprect to include the bottom-right
 	tempclip = cliprect;
-	tempclip.max_x++;
-	tempclip.max_y++;
+	tempclip.inset(0, -1, 0, -1);
 
 	// create the 0th entry
-	list->extent[0][0] = tempclip.min_x;
-	list->extent[0][1] = tempclip.max_x;
+	list->extent[0][0] = tempclip.left();
+	list->extent[0][1] = tempclip.right();
 
 	// simple case if not enabled
 	if (!enable)
 	{
-		memset(&list->scan_extent[tempclip.min_y], 0, sizeof(list->scan_extent[0]) * (tempclip.max_y - tempclip.min_y));
+		memset(&list->scan_extent[tempclip.top()], 0, sizeof(list->scan_extent[0]) * (tempclip.bottom() - tempclip.top()));
 		return 1;
 	}
 
@@ -585,31 +576,31 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 	{
 		if (!flip)
 		{
-			clips[i].min_x = m_videoram[0x1ff60/2 + i * 4] & 0x1ff;
-			clips[i].min_y = m_videoram[0x1ff62/2 + i * 4] & 0x0ff;
-			clips[i].max_x = (m_videoram[0x1ff64/2 + i * 4] & 0x1ff) + 1;
-			clips[i].max_y = (m_videoram[0x1ff66/2 + i * 4] & 0x0ff) + 1;
+			clips[i].set(
+					m_videoram[0x1ff60/2 + i * 4] & 0x1ff, (m_videoram[0x1ff64/2 + i * 4] & 0x1ff) + 1,
+					m_videoram[0x1ff62/2 + i * 4] & 0x0ff, (m_videoram[0x1ff66/2 + i * 4] & 0x0ff) + 1);
 		}
 		else
 		{
 			const rectangle &visarea = screen.visible_area();
 
-			clips[i].max_x = (visarea.max_x + 1) - (m_videoram[0x1ff60/2 + i * 4] & 0x1ff);
-			clips[i].max_y = (visarea.max_y + 1) - (m_videoram[0x1ff62/2 + i * 4] & 0x0ff);
-			clips[i].min_x = (visarea.max_x + 1) - ((m_videoram[0x1ff64/2 + i * 4] & 0x1ff) + 1);
-			clips[i].min_y = (visarea.max_y + 1) - ((m_videoram[0x1ff66/2 + i * 4] & 0x0ff) + 1);
+			clips[i].set(
+					(visarea.right() + 1) - ((m_videoram[0x1ff64/2 + i * 4] & 0x1ff) + 1),
+					(visarea.right() + 1) - (m_videoram[0x1ff60/2 + i * 4] & 0x1ff),
+					(visarea.bottom() + 1) - ((m_videoram[0x1ff66/2 + i * 4] & 0x0ff) + 1),
+					(visarea.bottom() + 1) - (m_videoram[0x1ff62/2 + i * 4] & 0x0ff));
 		}
 		clips[i] &= tempclip;
 		sorted[i] = i;
 	}
 
-	// insertion sort them by min_x
+	// insertion sort them by left()
 	for (int i = 1; i < 5; i++)
 	{
 		int j = i - 1;
 		int key = sorted[i];
 
-		while (j >= 0 && clips[sorted[j]].min_x > clips[key].min_x)
+		while (j >= 0 && clips[sorted[j]].left() > clips[key].left())
 		{
 			sorted[j + 1] = sorted[j];
 			j--;
@@ -624,8 +615,8 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 		{
 			uint16_t *extent = &list->extent[i][0];
 
-			// start off with an entry at tempclip.min_x
-			*extent++ = tempclip.min_x;
+			// start off with an entry at tempclip.left()
+			*extent++ = tempclip.left();
 
 			// loop in sorted order over extents
 			for (int j = 0; j < 5; j++)
@@ -635,33 +626,33 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 					const rectangle &cur = clips[sorted[j]];
 
 					// see if this intersects our last extent
-					if (extent != &list->extent[i][1] && cur.min_x <= extent[-1])
+					if (extent != &list->extent[i][1] && cur.left() <= extent[-1])
 					{
-						if (cur.max_x > extent[-1])
-							extent[-1] = cur.max_x;
+						if (cur.right() > extent[-1])
+							extent[-1] = cur.right();
 					}
 					else
 					{
 						// otherwise, just append to the list
-						*extent++ = cur.min_x;
-						*extent++ = cur.max_x;
+						*extent++ = cur.left();
+						*extent++ = cur.right();
 					}
 				}
 			}
 
 			// append an ending entry
-			*extent++ = tempclip.max_x;
+			*extent++ = tempclip.right();
 		}
 	}
 
 	// loop over scanlines and build extents
-	for (int y = tempclip.min_y; y < tempclip.max_y; y++)
+	for (int y = tempclip.top(); y < tempclip.bottom(); y++)
 	{
 		int sect = 0;
 
 		// figure out all the clips that intersect this scanline
 		for (int i = 0; i < 5; i++)
-			if ((BIT(clipmask , i)) && y >= clips[i].min_y && y < clips[i].max_y)
+			if ((BIT(clipmask , i)) && y >= clips[i].top() && y < clips[i].bottom())
 				sect |= 1 << i;
 
 		/*
@@ -680,7 +671,7 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 			rectangle lineclips[5];
 			int linesorted[5];
 			const rectangle &visarea = screen.visible_area();
-			int line = flip ? (visarea.max_y - y) : y;
+			int line = flip ? (visarea.bottom() - y) : y;
 			uint16_t *table = &m_videoram[(m_videoram[0x1ff04/2] >> 10) * 0x400];
 
 			for (int i = 0; i < 5; i++)
@@ -701,18 +692,18 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 				}
 				else if (!flip)
 				{
-					lineclips[2].min_x = minx & 0x1ff;
-					lineclips[2].max_x = (maxx & 0x1ff) + 1;
+					lineclips[2].setx(minx & 0x1ff, (maxx & 0x1ff) + 1);
 				}
 				else
 				{
-					lineclips[2].min_x = (visarea.max_x + 1) - ((maxx & 0x1ff) + 1);
-					lineclips[2].max_x = (visarea.max_x + 1) - (minx & 0x1ff);
+					lineclips[2].setx(
+							(visarea.right() + 1) - ((maxx & 0x1ff) + 1),
+							(visarea.right() + 1) - (minx & 0x1ff));
 				}
 
 				lineclips[2] &= tempclip;
 
-				if (lineclips[2].min_x >= lineclips[2].max_x)
+				if (lineclips[2].left() >= lineclips[2].right())
 					sect &= ~(1 << 2);
 			}
 
@@ -728,18 +719,18 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 				}
 				else if (!flip)
 				{
-					lineclips[3].min_x = minx & 0x1ff;
-					lineclips[3].max_x = (maxx & 0x1ff) + 1;
+					lineclips[3].setx(minx & 0x1ff, (maxx & 0x1ff) + 1);
 				}
 				else
 				{
-					lineclips[3].min_x = (visarea.max_x + 1) - ((maxx & 0x1ff) + 1);
-					lineclips[3].max_x = (visarea.max_x + 1) - (minx & 0x1ff);
+					lineclips[3].setx(
+							(visarea.right() + 1) - ((maxx & 0x1ff) + 1),
+							(visarea.right() + 1) - (minx & 0x1ff));
 				}
 
 				lineclips[3] &= tempclip;
 
-				if (lineclips[3].min_x >= lineclips[3].max_x)
+				if (lineclips[3].left() >= lineclips[3].right())
 					sect &= ~(1 << 3);
 			}
 
@@ -754,7 +745,7 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 				int j = i - 1;
 				int key = linesorted[i];
 
-				while (j >= 0 && lineclips[linesorted[j]].min_x > lineclips[key].min_x)
+				while (j >= 0 && lineclips[linesorted[j]].left() > lineclips[key].left())
 				{
 					linesorted[j + 1] = linesorted[j];
 					j--;
@@ -763,27 +754,27 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 			}
 
 			uint16_t *extent = &list->extent[32 + y][0];
-			*extent++ = tempclip.min_x;
+			*extent++ = tempclip.left();
 			for (int j = 0; j < 5; j++)
 			{
 				if (BIT(sect, linesorted[j]))
 				{
 					const rectangle &cur = lineclips[linesorted[j]];
 
-					if (extent != &list->extent[32 + y][1] && cur.min_x <= extent[-1])
+					if (extent != &list->extent[32 + y][1] && cur.left() <= extent[-1])
 					{
-						if (cur.max_x > extent[-1])
-							extent[-1] = cur.max_x;
+						if (cur.right() > extent[-1])
+							extent[-1] = cur.right();
 					}
 					else
 					{
-						*extent++ = cur.min_x;
-						*extent++ = cur.max_x;
+						*extent++ = cur.left();
+						*extent++ = cur.right();
 					}
 				}
 			}
 
-			*extent++ = tempclip.max_x;
+			*extent++ = tempclip.right();
 
 			list->scan_extent[y] = 32 + y;
 		}
@@ -896,15 +887,15 @@ void segas32_state::update_tilemap_zoom(screen_device &screen, segas32_state::la
 	srcy -= util::sext(m_videoram[0x1ff32/2 + 2 * bgnum], (dstystep != 0x200) ? 10 : 9) * srcystep;
 
 	/* finally, account for destination top,left coordinates */
-	srcx_start += cliprect.min_x * srcxstep;
-	srcy += cliprect.min_y * srcystep;
+	srcx_start += cliprect.left() * srcxstep;
+	srcy += cliprect.top() * srcystep;
 
 	/* if we're flipped, simply adjust the start/step parameters */
 	if (flipy)
 	{
 		const rectangle &visarea = screen.visible_area();
 
-		srcy += (visarea.max_y - 2 * cliprect.min_y) * srcystep;
+		srcy += (visarea.bottom() - 2 * cliprect.top()) * srcystep;
 		srcystep = -srcystep;
 	}
 
@@ -912,19 +903,19 @@ void segas32_state::update_tilemap_zoom(screen_device &screen, segas32_state::la
 	{
 		const rectangle &visarea = screen.visible_area();
 
-		srcx_start += (visarea.max_x - 2 * cliprect.min_x) * srcxstep;
+		srcx_start += (visarea.right() - 2 * cliprect.left()) * srcxstep;
 		srcxstep = -srcxstep;
 	}
 
 	/* loop over the target rows */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t const *extents = &clip_extents.extent[clip_extents.scan_extent[y]][0];
 		uint16_t *const dst = &bitmap.pix(y);
 		bool clipdraw = clipdraw_start;
 
 		/* optimize for the case where we are clipped out */
-		if (clipdraw || extents[1] <= cliprect.max_x)
+		if (clipdraw || extents[1] <= cliprect.right())
 		{
 			int transparent = 0;
 
@@ -960,7 +951,7 @@ void segas32_state::update_tilemap_zoom(screen_device &screen, segas32_state::la
 				}
 
 				/* stop at the end */
-				if (extents[1] > cliprect.max_x)
+				if (extents[1] > cliprect.right())
 					break;
 
 				/* swap states and advance to the next extent */
@@ -968,7 +959,7 @@ void segas32_state::update_tilemap_zoom(screen_device &screen, segas32_state::la
 				extents++;
 			}
 
-			layer.transparent[y] = (transparent == cliprect.max_x - cliprect.min_x + 1);
+			layer.transparent[y] = (transparent == cliprect.width());
 		}
 		else
 			layer.transparent[y] = 1;
@@ -1034,14 +1025,14 @@ void segas32_state::update_tilemap_rowscroll(screen_device &screen, segas32_stat
 	const int yscroll = (m_videoram[0x1ff16/2 + 4 * bgnum] & 0x1ff);
 
 	/* render the tilemap into its bitmap */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t const *extents = &clip_extents.extent[clip_extents.scan_extent[y]][0];
 		uint16_t *const dst = &bitmap.pix(y);
 		bool clipdraw = clipdraw_start;
 
 		/* optimize for the case where we are clipped out */
-		if (clipdraw || extents[1] <= cliprect.max_x)
+		if (clipdraw || extents[1] <= cliprect.right())
 		{
 			int transparent = 0;
 			int srcxstep;
@@ -1050,12 +1041,12 @@ void segas32_state::update_tilemap_rowscroll(screen_device &screen, segas32_stat
 			int srcx;
 			if (!flipx)
 			{
-				srcx = cliprect.min_x + xscroll;
+				srcx = cliprect.left() + xscroll;
 				srcxstep = 1;
 			}
 			else
 			{
-				srcx = cliprect.max_x + xscroll;
+				srcx = cliprect.right() + xscroll;
 				srcxstep = -1;
 			}
 
@@ -1069,8 +1060,8 @@ void segas32_state::update_tilemap_rowscroll(screen_device &screen, segas32_stat
 			else
 			{
 				const rectangle &visarea = screen.visible_area();
-				srcy = yscroll + visarea.max_y - y;
-				ylookup = visarea.max_y - y;
+				srcy = yscroll + visarea.bottom() - y;
+				ylookup = visarea.bottom() - y;
 			}
 
 			/* apply row scroll/select */
@@ -1109,7 +1100,7 @@ void segas32_state::update_tilemap_rowscroll(screen_device &screen, segas32_stat
 				}
 
 				/* stop at the end */
-				if (extents[1] > cliprect.max_x)
+				if (extents[1] > cliprect.right())
 					break;
 
 				/* swap states and advance to the next extent */
@@ -1117,7 +1108,7 @@ void segas32_state::update_tilemap_rowscroll(screen_device &screen, segas32_stat
 				extents++;
 			}
 
-			layer.transparent[y] = (transparent == cliprect.max_x - cliprect.min_x + 1);
+			layer.transparent[y] = (transparent == cliprect.width());
 		}
 		else
 			layer.transparent[y] = 1;
@@ -1179,14 +1170,14 @@ void segas32_state::update_bitmap(screen_device &screen, segas32_state::layer_in
 	const int color = (m_videoram[0x1ff8c/2] << 4) & 0x1fff0 & ~((1 << bpp) - 1);
 
 	/* loop over target rows */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t const *extents = &clip_extents.extent[clip_extents.scan_extent[y]][0];
 		uint16_t *const dst = &bitmap.pix(y);
 		bool clipdraw = clipdraw_start;
 
 		/* optimize for the case where we are clipped out */
-		if (clipdraw || extents[1] <= cliprect.max_x)
+		if (clipdraw || extents[1] <= cliprect.right())
 		{
 			int transparent = 0;
 
@@ -1234,7 +1225,7 @@ void segas32_state::update_bitmap(screen_device &screen, segas32_state::layer_in
 				}
 
 				/* stop at the end */
-				if (extents[1] > cliprect.max_x)
+				if (extents[1] > cliprect.right())
 					break;
 
 				/* swap states and advance to the next extent */
@@ -1242,7 +1233,7 @@ void segas32_state::update_bitmap(screen_device &screen, segas32_state::layer_in
 				extents++;
 			}
 
-			layer.transparent[y] = (transparent == cliprect.max_x - cliprect.min_x + 1);
+			layer.transparent[y] = (transparent == cliprect.width());
 		}
 		else
 			layer.transparent[y] = 1;
@@ -1264,9 +1255,9 @@ void segas32_state::update_background(segas32_state::layer_info &layer, const re
 	// determine if we're flipped
 	bool flip = BIT(m_videoram[0x1ff00 / 2], 9);
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint16_t *const dst = &bitmap.pix(flip ? (cliprect.max_y - y) : y);
+		uint16_t *const dst = &bitmap.pix(flip ? (cliprect.bottom() - y) : y);
 		int color;
 
 		/* determine the color */
@@ -1280,13 +1271,13 @@ void segas32_state::update_background(segas32_state::layer_info &layer, const re
 			color = m_videoram[0x1ff5e/2] & 0x1e00;
 
 		/* if the color doesn't match, fill */
-		if ((m_bgcolor_line[y & 0x1ff] != color) || (m_prev_bgstartx[y & 0x1ff] != cliprect.min_x) || (m_prev_bgendx[y & 0x1ff] != cliprect.max_x))
+		if ((m_bgcolor_line[y & 0x1ff] != color) || (m_prev_bgstartx[y & 0x1ff] != cliprect.left()) || (m_prev_bgendx[y & 0x1ff] != cliprect.right()))
 		{
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 				dst[x] = color;
 
-			m_prev_bgstartx[y & 0x1ff] = cliprect.min_x;
-			m_prev_bgendx[y & 0x1ff] = cliprect.max_x;
+			m_prev_bgstartx[y & 0x1ff] = cliprect.left();
+			m_prev_bgendx[y & 0x1ff] = cliprect.right();
 			m_bgcolor_line[y & 0x1ff] = color;
 		}
 	}
@@ -1400,8 +1391,8 @@ void segas32_state::sprite_swap_buffers()
 
 #define sprite_draw_pixel_16(trans)                                         \
 	/* only draw if onscreen, not 0 or 15 */                                \
-	if (x >= clipin.min_x && x <= clipin.max_x &&                           \
-		(!do_clipout || x < clipout.min_x || x > clipout.max_x) &&          \
+	if (clipin.containsx(x) &&                                              \
+		!(do_clipout && clipout.containsx(x)) &&                            \
 		pix != trans)                                                       \
 	{                                                                       \
 		if (!indirect)                                                      \
@@ -1429,8 +1420,8 @@ void segas32_state::sprite_swap_buffers()
 
 #define sprite_draw_pixel_256(trans)                                        \
 	/* only draw if onscreen, not 0 or 15 */                                \
-	if (x >= clipin.min_x && x <= clipin.max_x &&                           \
-		(!do_clipout || x < clipout.min_x || x > clipout.max_x) &&          \
+	if (clipin.containsx(x) &&                                              \
+		!(do_clipout && clipout.containsx(x)) &&                            \
 		pix != trans)                                                       \
 	{                                                                       \
 		if (!indirect)                                                      \
@@ -1491,7 +1482,7 @@ int segas32_state::draw_one_sprite(uint16_t const *data, int xoffs, int yoffs, c
 	int ypos           = util::sext(data[4], 12);
 	int xpos           = util::sext(data[5], 12);
 	uint32_t addr      = data[6] | ((data[2] & 0xf000) << 4);
-	const int color    = 0x8000 | (data[7] & (bpp8 ? 0x7f00 : 0x7ff0));
+	int color          = data[7] & (bpp8 ? 0x7f00 : 0x7ff0);
 	int hzoom, vzoom;
 	int xdelta = 1, ydelta = 1;
 	int xtarget, ytarget, yacc = 0, pix, transmask;
@@ -1502,6 +1493,12 @@ int segas32_state::draw_one_sprite(uint16_t const *data, int xoffs, int yoffs, c
 	/* if hidden, or top greater than/equal to bottom, or invalid bank, punt */
 	if (srcw == 0 || srch == 0 || dstw == 0 || dsth == 0)
 		goto bail;
+
+	// sprite group modes 0-3 take the top group bit from palette bit 15, the other modes use pixel bit 15 for shadows
+	if ((m_mixer_control[(m_is_multi32 && BIT(data[3], 11))][0x4c/2] & 0x0c) == 0)
+		color |= data[7] & 0x8000;
+	else
+		color |= 0x8000;
 
 	/* determine the transparency mask for pixels */
 	transmask = transparency_masks[m_sprite_control_latched[0x08/2] & 3][m_sprite_control_latched[0x0a/2] & 3];
@@ -1573,15 +1570,15 @@ int segas32_state::draw_one_sprite(uint16_t const *data, int xoffs, int yoffs, c
 	ytarget = ypos + ydelta * dsth;
 
 	/* adjust target x for clipping */
-	if (xdelta > 0 && xtarget > clipin.max_x)
+	if (xdelta > 0 && xtarget > clipin.right())
 	{
-		xtarget = clipin.max_x + 1;
+		xtarget = clipin.right() + 1;
 		if (xpos >= xtarget)
 			goto bail;
 	}
-	if (xdelta < 0 && xtarget < clipin.min_x)
+	if (xdelta < 0 && xtarget < clipin.left())
 	{
-		xtarget = clipin.min_x - 1;
+		xtarget = clipin.left() - 1;
 		if (xpos <= xtarget)
 			goto bail;
 	}
@@ -1590,9 +1587,9 @@ int segas32_state::draw_one_sprite(uint16_t const *data, int xoffs, int yoffs, c
 	for (int y = ypos; y != ytarget; y += ydelta)
 	{
 		/* skip drawing if not within the inclusive cliprect */
-		if (y >= clipin.min_y && y <= clipin.max_y)
+		if (y >= clipin.top() && y <= clipin.bottom())
 		{
-			int do_clipout = (y >= clipout.min_y && y <= clipout.max_y);
+			bool const do_clipout = clipout.containsy(y);
 			uint16_t *const dest = &bitmap.pix(y);
 			int xacc = 0;
 
@@ -1658,7 +1655,6 @@ bail:
 
 void segas32_state::sprite_render_list()
 {
-	rectangle outerclip, clipin, clipout;
 	int xoffs = 0, yoffs = 0;
 	int numentries = 0;
 	int spritenum = 0;
@@ -1668,14 +1664,11 @@ void segas32_state::sprite_render_list()
 //  logerror("----\n");
 
 	/* compute the outer clip */
-	outerclip.min_x = outerclip.min_y = 0;
-	outerclip.max_x = BIT(m_sprite_control_latched[0x0c/2], 0) ? 415 : 319;
-	outerclip.max_y = 223;
+	rectangle outerclip(0, BIT(m_sprite_control_latched[0x0c/2], 0) ? 415 : 319, 0, 223);
 
 	/* initialize the cliprects */
-	clipin = outerclip;
-	clipout.min_x = clipout.min_y = 0;
-	clipout.max_x = clipout.max_y = -1;
+	rectangle clipin(outerclip);
+	rectangle clipout(0, -1, 0, -1);
 
 	/* now draw */
 	while (numentries++ < 0x20000/16)
@@ -1695,20 +1688,18 @@ void segas32_state::sprite_render_list()
 				/* set the inclusive cliprect */
 				if (BIT(sprite[0], 12))
 				{
-					clipin.min_y = util::sext(sprite[0], 12);
-					clipin.max_y = util::sext(sprite[1], 12);
-					clipin.min_x = util::sext(sprite[2], 12);
-					clipin.max_x = util::sext(sprite[3], 12);
+					clipin.set(
+							util::sext(sprite[2], 12), util::sext(sprite[3], 12),
+							util::sext(sprite[0], 12), util::sext(sprite[1], 12));
 					clipin &= outerclip;
 				}
 
 				/* set the exclusive cliprect */
 				if (BIT(sprite[0], 13))
 				{
-					clipout.min_y = util::sext(sprite[4], 12);
-					clipout.max_y = util::sext(sprite[5], 12);
-					clipout.min_x = util::sext(sprite[6], 12);
-					clipout.max_x = util::sext(sprite[7], 12);
+					clipout.set(
+							util::sext(sprite[6], 12), util::sext(sprite[7], 12),
+							util::sext(sprite[4], 12), util::sext(sprite[5], 12));
 				}
 
 				/* advance to the next entry */
@@ -1827,29 +1818,29 @@ void segas32_state::mix_all_layers(int which, int xoffs, bitmap_rgb32 &bitmap, c
 	rgboffs[2][2] = 0;
 
 	/* determine the sprite grouping parameters first */
-	uint8_t sprgroup_shift, sprgroup_mask, sprgroup_or;
+	uint8_t sprgroup_shift, sprgroup_mask;
 	switch (m_mixer_control[which][0x4c/2] & 0x0f)
 	{
 		default:
-		case 0x0:   sprgroup_shift = 14;    sprgroup_mask = 0x00;   sprgroup_or = 0x01; break;
-		case 0x1:   sprgroup_shift = 14;    sprgroup_mask = 0x01;   sprgroup_or = 0x02; break;
-		case 0x2:   sprgroup_shift = 13;    sprgroup_mask = 0x03;   sprgroup_or = 0x04; break;
-		case 0x3:   sprgroup_shift = 12;    sprgroup_mask = 0x07;   sprgroup_or = 0x08; break;
+		case 0x0:   sprgroup_shift = 15;    sprgroup_mask = 0x01;   break;
+		case 0x1:   sprgroup_shift = 14;    sprgroup_mask = 0x03;   break;
+		case 0x2:   sprgroup_shift = 13;    sprgroup_mask = 0x07;   break;
+		case 0x3:   sprgroup_shift = 12;    sprgroup_mask = 0x0f;   break;
 
-		case 0x4:   sprgroup_shift = 14;    sprgroup_mask = 0x01;   sprgroup_or = 0x00; break;
-		case 0x5:   sprgroup_shift = 13;    sprgroup_mask = 0x03;   sprgroup_or = 0x00; break;
-		case 0x6:   sprgroup_shift = 12;    sprgroup_mask = 0x07;   sprgroup_or = 0x00; break;
-		case 0x7:   sprgroup_shift = 11;    sprgroup_mask = 0x0f;   sprgroup_or = 0x00; break;
+		case 0x4:   sprgroup_shift = 14;    sprgroup_mask = 0x01;   break;
+		case 0x5:   sprgroup_shift = 13;    sprgroup_mask = 0x03;   break;
+		case 0x6:   sprgroup_shift = 12;    sprgroup_mask = 0x07;   break;
+		case 0x7:   sprgroup_shift = 11;    sprgroup_mask = 0x0f;   break;
 
-		case 0x8:   sprgroup_shift = 14;    sprgroup_mask = 0x01;   sprgroup_or = 0x00; break;
-		case 0x9:   sprgroup_shift = 13;    sprgroup_mask = 0x03;   sprgroup_or = 0x00; break;
-		case 0xa:   sprgroup_shift = 12;    sprgroup_mask = 0x07;   sprgroup_or = 0x00; break;
-		case 0xb:   sprgroup_shift = 11;    sprgroup_mask = 0x0f;   sprgroup_or = 0x00; break;
+		case 0x8:   sprgroup_shift = 14;    sprgroup_mask = 0x01;   break;
+		case 0x9:   sprgroup_shift = 13;    sprgroup_mask = 0x03;   break;
+		case 0xa:   sprgroup_shift = 12;    sprgroup_mask = 0x07;   break;
+		case 0xb:   sprgroup_shift = 11;    sprgroup_mask = 0x0f;   break;
 
-		case 0xc:   sprgroup_shift = 13;    sprgroup_mask = 0x01;   sprgroup_or = 0x00; break;
-		case 0xd:   sprgroup_shift = 12;    sprgroup_mask = 0x03;   sprgroup_or = 0x00; break;
-		case 0xe:   sprgroup_shift = 11;    sprgroup_mask = 0x07;   sprgroup_or = 0x00; break;
-		case 0xf:   sprgroup_shift = 10;    sprgroup_mask = 0x0f;   sprgroup_or = 0x00; break;
+		case 0xc:   sprgroup_shift = 13;    sprgroup_mask = 0x01;   break;
+		case 0xd:   sprgroup_shift = 12;    sprgroup_mask = 0x03;   break;
+		case 0xe:   sprgroup_shift = 11;    sprgroup_mask = 0x07;   break;
+		case 0xf:   sprgroup_shift = 10;    sprgroup_mask = 0x0f;   break;
 	}
 	const int sprshadowmask = BIT(m_mixer_control[which][0x4c/2], 2) ? 0x8000 : 0x0000;
 	const int sprpixmask = ((1 << sprgroup_shift) - 1) & 0x3fff;
@@ -1896,8 +1887,7 @@ void segas32_state::mix_all_layers(int which, int xoffs, bitmap_rgb32 &bitmap, c
 	/* for each possible sprite group, insert the sprites into the list at the appropriate point */
 	for (int groupnum = 0; groupnum <= sprgroup_mask; groupnum++)
 	{
-		const int effgroup = sprgroup_or | groupnum;
-		const int priority = m_mixer_control[which][0x00/2 + effgroup] & 0x0f;
+		const int priority = m_mixer_control[which][0x00/2 + groupnum] & 0x0f;
 		const int effpri = (priority << 3) | 7;
 		int sprindex = numlayers;
 		int dstnum = 0;
@@ -1914,10 +1904,10 @@ void segas32_state::mix_all_layers(int which, int xoffs, bitmap_rgb32 &bitmap, c
 		layerorder[groupnum][sprindex].index = MIXER_LAYER_SPRITES;
 		layerorder[groupnum][sprindex].effpri = effpri;
 		if ((m_mixer_control[which][0x4c/2] & 3) != 3)
-			layerorder[groupnum][sprindex].palbase = (m_mixer_control[which][0x00/2 + effgroup] & 0x00f0) << 6;
+			layerorder[groupnum][sprindex].palbase = (m_mixer_control[which][0x00/2 + groupnum] & 0x00f0) << 6;
 		else
 			layerorder[groupnum][sprindex].palbase = (m_mixer_control[which][0x4c/2] & 0x00f0) << 6;
-		layerorder[groupnum][sprindex].mixshift = (m_mixer_control[which][0x00/2 + effgroup] >> 8) & 3;
+		layerorder[groupnum][sprindex].mixshift = (m_mixer_control[which][0x00/2 + groupnum] >> 8) & 3;
 		layerorder[groupnum][sprindex].blendmask = 0;
 		layerorder[groupnum][sprindex].sprblendmask = 0;
 		layerorder[groupnum][sprindex].coloroffs = compute_color_offsets(which, BIT(m_mixer_control[which][0x3e/2], 6), BIT(m_mixer_control[which][0x4c/2], 15));
@@ -1939,29 +1929,29 @@ void segas32_state::mix_all_layers(int which, int xoffs, bitmap_rgb32 &bitmap, c
 	int sprx_start, sprdx;
 	if (BIT(m_sprite_control_latched[0x04/2], 0))
 	{
-		sprx_start = cliprect.max_x;
+		sprx_start = cliprect.right();
 		sprdx = -1;
 	}
 	else
 	{
-		sprx_start = cliprect.min_x;
+		sprx_start = cliprect.left();
 		sprdx = 1;
 	}
 
 	int spry, sprdy;
 	if (BIT(m_sprite_control_latched[0x04/2], 1))
 	{
-		spry = cliprect.max_y;
+		spry = cliprect.bottom();
 		sprdy = -1;
 	}
 	else
 	{
-		spry = cliprect.min_y;
+		spry = cliprect.top();
 		sprdy = 1;
 	}
 
 	/* loop over rows */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++, spry += sprdy)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++, spry += sprdy)
 	{
 		uint32_t *const dest = &bitmap.pix(y, xoffs);
 		uint16_t *layerbase[8];
@@ -1977,7 +1967,7 @@ void segas32_state::mix_all_layers(int which, int xoffs, bitmap_rgb32 &bitmap, c
 		layerbase[MIXER_LAYER_BACKGROUND] = get_layer_scanline(MIXER_LAYER_BACKGROUND, y);
 
 		/* loop over columns */
-		for (int x = cliprect.min_x, sprx = sprx_start; x <= cliprect.max_x; x++, sprx += sprdx)
+		for (int x = cliprect.left(), sprx = sprx_start; x <= cliprect.right(); x++, sprx += sprdx)
 		{
 			mixer_layer_info const *first;
 			int laynum, firstpix;
@@ -2244,50 +2234,50 @@ uint32_t segas32_state::screen_update_system32(screen_device &screen, bitmap_rgb
 		FILE *f = fopen("sprite.txt", "w");
 		int x, y;
 
-		for (y = visarea.min_y; y <= visarea.max_y; y++)
+		for (y = visarea.top(); y <= visarea.bottom(); y++)
 		{
 			uint16_t *src = get_layer_scanline(MIXER_LAYER_SPRITES, y);
-			for (x = visarea.min_x; x <= visarea.max_x; x++)
+			for (x = visarea.left(); x <= visarea.right(); x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
 		}
 		fclose(f);
 
 		f = fopen("nbg0.txt", "w");
-		for (y = visarea.min_y; y <= visarea.max_y; y++)
+		for (y = visarea.top(); y <= visarea.bottom(); y++)
 		{
 			uint16_t *src = get_layer_scanline(MIXER_LAYER_NBG0, y);
-			for (x = visarea.min_x; x <= visarea.max_x; x++)
+			for (x = visarea.left(); x <= visarea.right(); x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
 		}
 		fclose(f);
 
 		f = fopen("nbg1.txt", "w");
-		for (y = visarea.min_y; y <= visarea.max_y; y++)
+		for (y = visarea.top(); y <= visarea.bottom(); y++)
 		{
 			uint16_t *src = get_layer_scanline(MIXER_LAYER_NBG1, y);
-			for (x = visarea.min_x; x <= visarea.max_x; x++)
+			for (x = visarea.left(); x <= visarea.right(); x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
 		}
 		fclose(f);
 
 		f = fopen("nbg2.txt", "w");
-		for (y = visarea.min_y; y <= visarea.max_y; y++)
+		for (y = visarea.top(); y <= visarea.bottom(); y++)
 		{
 			uint16_t *src = get_layer_scanline(MIXER_LAYER_NBG2, y);
-			for (x = visarea.min_x; x <= visarea.max_x; x++)
+			for (x = visarea.left(); x <= visarea.right(); x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
 		}
 		fclose(f);
 
 		f = fopen("nbg3.txt", "w");
-		for (y = visarea.min_y; y <= visarea.max_y; y++)
+		for (y = visarea.top(); y <= visarea.bottom(); y++)
 		{
 			uint16_t *src = get_layer_scanline(MIXER_LAYER_NBG3, y);
-			for (x = visarea.min_x; x <= visarea.max_x; x++)
+			for (x = visarea.left(); x <= visarea.right(); x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
 		}
@@ -2331,8 +2321,7 @@ for (showclip = 0; showclip < 4; showclip++)
 		const int clips = (m_videoram[0x1ff06/2] >> (4 * showclip)) & 0x0f;
 		if (((m_videoram[0x1ff02/2] >> (11 + showclip)) & 1) && clips)
 		{
-			int i, x, y;
-			for (i = 0; i < 4; i++)
+			for (int i = 0; i < 4; i++)
 				if (BIT(clips, i))
 				{
 					const rectangle &visarea = screen.visible_area();
@@ -2341,31 +2330,31 @@ for (showclip = 0; showclip < 4; showclip++)
 					pen_t white = get_white_pen(screen.machine());
 					if (!flip)
 					{
-						rect.min_x = m_videoram[0x1ff60/2 + i * 4] & 0x1ff;
-						rect.min_y = m_videoram[0x1ff62/2 + i * 4] & 0x0ff;
-						rect.max_x = (m_videoram[0x1ff64/2 + i * 4] & 0x1ff) + 1;
-						rect.max_y = (m_videoram[0x1ff66/2 + i * 4] & 0x0ff) + 1;
+						rect.set(
+							m_videoram[0x1ff60/2 + i * 4] & 0x1ff, (m_videoram[0x1ff64/2 + i * 4] & 0x1ff) + 1,
+							m_videoram[0x1ff62/2 + i * 4] & 0x0ff, (m_videoram[0x1ff66/2 + i * 4] & 0x0ff) + 1);
 					}
 					else
 					{
-						rect.max_x = (visarea.max_x + 1) - (m_videoram[0x1ff60/2 + i * 4] & 0x1ff);
-						rect.max_y = (visarea.max_y + 1) - (m_videoram[0x1ff62/2 + i * 4] & 0x0ff);
-						rect.min_x = (visarea.max_x + 1) - ((m_videoram[0x1ff64/2 + i * 4] & 0x1ff) + 1);
-						rect.min_y = (visarea.max_y + 1) - ((m_videoram[0x1ff66/2 + i * 4] & 0x0ff) + 1);
+						rect.set(
+							(visarea.right() + 1) - ((m_videoram[0x1ff64/2 + i * 4] & 0x1ff) + 1),
+							(visarea.right() + 1) - (m_videoram[0x1ff60/2 + i * 4] & 0x1ff),
+							(visarea.bottom() + 1) - ((m_videoram[0x1ff66/2 + i * 4] & 0x0ff) + 1),
+							(visarea.bottom() + 1) - (m_videoram[0x1ff62/2 + i * 4] & 0x0ff));
 					}
 					sect_rect(&rect, &screen.visible_area());
 
-					if (rect.min_y <= rect.max_y && rect.min_x <= rect.max_x)
+					if (!rect.empty())
 					{
-						for (y = rect.min_y; y <= rect.max_y; y++)
+						for (int y = rect.top(); y <= rect.bottom(); y++)
 						{
-							bitmap.plot(bitmap, rect.min_x, y, white);
-							bitmap.plot(bitmap, rect.max_x, y, white);
+							bitmap.plot(bitmap, rect.left(), y, white);
+							bitmap.plot(bitmap, rect.right(), y, white);
 						}
-						for (x = rect.min_x; x <= rect.max_x; x++)
+						for (int x = rect.left(); x <= rect.right(); x++)
 						{
-							bitmap.plot(bitmap, x, rect.min_y, white);
-							bitmap.plot(bitmap, x, rect.max_y, white);
+							bitmap.plot(bitmap, x, rect.top(), white);
+							bitmap.plot(bitmap, x, rect.bottom(), white);
 						}
 					}
 				}
@@ -2429,10 +2418,10 @@ uint32_t segas32_state::multi32_update(screen_device &screen, bitmap_rgb32 &bitm
 		FILE *f = fopen("sprite.txt", "w");
 		int x, y;
 
-		for (y = visarea.min_y; y <= visarea.max_y; y++)
+		for (y = visarea.top(); y <= visarea.bottom(); y++)
 		{
 			uint16_t *src = get_layer_scanline(MIXER_LAYER_SPRITES, y);
-			for (x = visarea.min_x; x <= visarea.max_x; x++)
+			for (x = visarea.left(); x <= visarea.right(); x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
 		}

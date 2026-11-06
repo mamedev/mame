@@ -4,7 +4,6 @@
 license:CC0-1.0
 
     Atari 400 / 800 floppies
-    (skeleton list)
 
     note: many 'original' floppy images are in .atx format, whereas cracked / unprotected ones are .atr format
           .atx is unsupported, although apparently has been reverse engineered
@@ -15,6 +14,9 @@ license:CC0-1.0
 -->
 
 <softwarelist name="a800_flop" description="Atari 400 / 800 floppy disks">
+
+<!-- !Games -->
+<!-- TODO: sorting is all over the place -->
 
 	<software name="strraid2">
 		<description>Star Raiders II [Aric Wilmunder]</description>
@@ -922,6 +924,8 @@ Garbage row strip at bottom of screen
 		</part>
 	</software>
 
+<!-- !Operating Systems -->
+
 	<software name="mbasic2x">
 		<description>Microsoft BASIC II Programming Language (extensions)</description>
 		<year>1982</year>
@@ -949,23 +953,6 @@ Garbage row strip at bottom of screen
 		</part>
 	</software>
 
-	<software name="specdemo" supported="no">
-		<description>Spectraview II Demo Disk</description>
-		<!-- Disk contains Sparta DOS and won't boot in MAME, works on other emulators -->
-		<year>198?</year>
-		<publisher>Display Systems International</publisher>
-		<notes><![CDATA[
-"Error: No DOS"
-Trying to DIR in SDX returns error 144 bad sector, trying to CAR will black screen as per a800:spectra2
-]]></notes>
-		<sharedfeat name="requirement" value="a800:spectra2"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="183952">
-				<rom name="spectraview-ii demo disk.atr" size="183952" crc="50b3fb52" sha1="d3bc5b6bb03ad648b79ebb536dba4af4af078bdc"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="litedosse">
 		<description>Atari LiteDOS-SE</description>
 		<year>2022</year>
@@ -981,6 +968,54 @@ Trying to DIR in SDX returns error 144 bad sector, trying to CAR will black scre
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="TBasic UBasic (No DOS).atr" size="92176" crc="22213f8f" sha1="994787ec0b3f487aca22d943fb82d60138d6e68f"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Disk drives -->
+
+	<software name="kmkjzutl" supported="no">
+		<!-- flippy disk -->
+		<description>KMK/JŻ IDE Utilities</description>
+		<year>2011</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Utilities for [PBI] KMK/JŻ ATA card
+]]></notes>
+		<info name="author" value="Konrad Kokoszkiewicz"/>
+		<info name="author" value="Jacek Żuk"/>
+		<info name="author" value="Michał Pasiecznik"/>
+		<info name="usage" value="Hold Option key at startup to directly boot in either OSes, or issue a DOS at prompt. Follow detailed instructions in user manual for actual PBI IDE handling."/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="MyDOS 4.50 (Side A)" />
+			<dataarea name="flop" size="92176">
+				<rom name="kmkjzideutil-mydos.atr" size="92176" crc="bdf5f666" sha1="fe1d177cb80542d4fe801459eb635aecd17efe77"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="SpartaDOS 3.2d (Side B)" />
+			<dataarea name="flop" size="92176">
+				<rom name="kmkjzideutil-sparta.atr" size="92176" crc="535b3d05" sha1="c9a3d34aad2beb76eaf2898cabc92eff2a5f5e5e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="specdemo" supported="no">
+		<description>Spectraview II Demo Disk</description>
+		<!-- Disk contains Sparta DOS and won't boot in MAME, works on other emulators -->
+		<year>198?</year>
+		<publisher>Display Systems International</publisher>
+		<notes><![CDATA[
+"Error: No DOS", sorta boots if mounting a Sparta DOS floppy first then loading this on top of it
+Heavy desynced [Antic] GFXs, should require a genlock
+Trying to DIR in SDX returns error 144 bad sector, trying to CAR will black screen as per a800:spectra2
+]]></notes>
+		<sharedfeat name="requirement" value="a800:spectra2"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="183952">
+				<rom name="spectraview-ii demo disk.atr" size="183952" crc="50b3fb52" sha1="d3bc5b6bb03ad648b79ebb536dba4af4af078bdc"/>
 			</dataarea>
 		</part>
 	</software>

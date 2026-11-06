@@ -31,6 +31,8 @@ public:
 	compis_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	compis_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -46,12 +48,13 @@ protected:
 	virtual void opt0_w(int state) override;
 	virtual void opt1_w(int state) override;
 
+	required_device<i8272a_device> m_fdc;
+
 private:
 	void fdc_irq(int state);
 	void fdc_drq(int state);
 	static void floppy_formats(format_registration &fr);
 
-	required_device<i8272a_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 };
 

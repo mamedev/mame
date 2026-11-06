@@ -563,12 +563,14 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 	// the open and closed hi-hat sounds, respectively. For more info on the hat
 	// EG, see update_hat_eg().
 
-	constexpr double HAT_HPF_SCALE = RES_VOLTAGE_DIVIDER(RES_K(10), RES_R(220));  // R125, R121
+	constexpr double R125 = RES_K(10);
+	constexpr double R121 = RES_R(220);
+	constexpr double HAT_HPF_SCALE = RES_VOLTAGE_DIVIDER(R125, R121);
 	constexpr double HAT_VCA_V2I_SCALE = 0.0084;  // Converts from input voltage to output current.
 	constexpr double HAT_VCA_SCALE = -HAT_VCA_V2I_SCALE * RES_K(4.7);  // R120, inverting op-amp.
 
-	auto &hat_hpf = FILTER_RC(config, "hat_hpf");
-	hat_hpf.set_rc(filter_rc_device::HIGHPASS, RES_R(220), 0, 0, CAP_U(1));  // ~723 Hz, R121, C69
+	auto &hat_hpf = FILTER_RC(config, "hat_hpf");  // ~15.6 Hz
+	hat_hpf.set_rc(filter_rc_device::HIGHPASS, R125 + R121, 0, 0, CAP_U(1));  // C69
 	m_mux_vca[MV_HI_HAT]->add_route(0, hat_hpf, HAT_HPF_SCALE, 0);
 
 	VA_RC_EG(config, m_hat_eg).set_c(CAP_U(1));  // C71
@@ -582,14 +584,16 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 	// Two voices, each with their own ROM, address counter, 6-bit DAC, HPF,
 	// single-transistor VCA, and amplitude EG.
 
-	constexpr double CYMBAL_HPF_SCALE = RES_VOLTAGE_DIVIDER(RES_K(22), RES_R(470));  // [R59, R60], [R63, R64]
+	constexpr double CYMBAL_HPF_R1 = RES_K(22);  // [R59, R60]
+	constexpr double CYMBAL_HPF_R2 = RES_R(470);  // [R63, R64]
+	constexpr double CYMBAL_HPF_SCALE = RES_VOLTAGE_DIVIDER(CYMBAL_HPF_R1, CYMBAL_HPF_R2);
 	constexpr double CYMBAL_VCA_V2I_SCALE = 0.0043;  // Converts from input voltage to output current.
 	constexpr double CYMBAL_VCA_SCALE = -CYMBAL_VCA_V2I_SCALE * RES_K(10);  // [R62, R65], inverting op-amp.
 
 	for (int i = 0; i < CV_COUNT; ++i)
 	{
-		FILTER_RC(config, m_cymbal_hpf[i]);
-		m_cymbal_hpf[i]->set_rc(filter_rc_device::HIGHPASS, RES_R(470), 0, 0, CAP_U(1));  // ~339 Hz, [R63, R64], [C35, C34]
+		FILTER_RC(config, m_cymbal_hpf[i]);  // ~7 Hz
+		m_cymbal_hpf[i]->set_rc(filter_rc_device::HIGHPASS, CYMBAL_HPF_R1 + CYMBAL_HPF_R2, 0, 0, CAP_U(1));  // [C35, C34]
 
 		DAC_6BIT_R2R(config, m_cymbal_dac[i]).set_output_range(0, VCC);
 		m_cymbal_dac[i]->add_route(0, m_cymbal_hpf[i], CYMBAL_HPF_SCALE);

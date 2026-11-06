@@ -157,24 +157,35 @@ void argus_common_state::machine_start()
 
 TIMER_DEVICE_CALLBACK_MEMBER(argus_common_state::scanline)
 {
-	int scanline = param;
-
-	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* Z80 - RST 10h */
-
-	if(scanline == 16) // vblank-in irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* Z80 - RST 08h */
+	if(param == 240) // vblank-out irq
+	{
+		m_irq_vector = 0xd7; // RST 10h
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+	else if(param == 16) // vblank-in irq
+	{
+		m_irq_vector = 0xcf; // RST 08h
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(butasan_state::scanline)
 {
-	int scanline = param;
+	if(param == 248) // vblank-out irq
+	{
+		m_irq_vector = 0xd7; // RST 10h
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+	else if(param == 8) // vblank-in irq
+	{
+		m_irq_vector = 0xcf; // RST 08h
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+}
 
-	if(scanline == 248) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* Z80 - RST 10h */
-
-	if(scanline == 8) // vblank-in irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* Z80 - RST 08h */
+IRQ_CALLBACK_MEMBER(argus_common_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 
@@ -482,6 +493,7 @@ void argus_state::argus(machine_config &config)
 	Z80(config, m_maincpu, 5000000);           /* 4 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &argus_state::argus_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(argus_state::scanline), "screen", 0, 1);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(argus_state::cpu_acknowledge_irq));
 
 	Z80(config, m_audiocpu, 5000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &argus_state::sound_map_a);
@@ -566,6 +578,7 @@ void butasan_state::butasan(machine_config &config)
 	Z80(config, m_maincpu, 5000000);    /* 5 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &butasan_state::butasan_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(butasan_state::scanline), "screen", 0, 1);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(butasan_state::cpu_acknowledge_irq));
 
 	Z80(config, m_audiocpu, 5000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &butasan_state::sound_map_b);

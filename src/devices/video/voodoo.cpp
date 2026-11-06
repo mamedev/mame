@@ -1062,9 +1062,10 @@ void voodoo_1_device::device_post_load()
 	for (tmu_state &tm : m_tmu)
 		tm.post_load();
 
-	// recompute FBI memory FIFO to get the base pointer set
+	// restore the FBI memory FIFO base pointer; reconfiguring the FIFO would
+	// discard the entries queued when the state was saved
 	if (m_fbmem_fifo.configured())
-		recompute_fbmem_fifo();
+		m_fbmem_fifo.set_base((u32 *)(m_fbram + m_reg.fbi_init4().memory_fifo_start_row() * 0x1000));
 }
 
 
@@ -1280,7 +1281,7 @@ void voodoo_1_device::add_to_fifo(u32 offset, u32 data, u32 mem_mask)
 		}
 
 		// if we're above the HWM as a result, stall
-		if (m_reg.fbi_init0().stall_pcie_for_hwm() && m_fbmem_fifo.items() >= 2 * 32 * m_reg.fbi_init0().memory_fifo_hwm())
+		if (m_reg.fbi_init0().stall_pcie_for_hwm() && memory_fifo_free() < 32 * m_reg.fbi_init0().memory_fifo_hwm())
 		{
 			if (LOG_FIFO) logerror("VOODOO.FIFO:hit memory FIFO HWM -- stalling\n");
 			stall_cpu(STALLED_UNTIL_FIFO_LWM);
@@ -1994,7 +1995,7 @@ u32 voodoo_1_device::reg_status_r(u32 chipmask, u32 regnum)
 	if (m_reg.fbi_init0().enable_memory_fifo() == 0)
 		result |= 0xffff << 12;
 	else
-		result |= std::min(m_fbmem_fifo.space() / 2, 0xffff) << 12;
+		result |= memory_fifo_free() << 12;
 
 	// bits 30:28 are the number of pending swaps
 	result |= std::min<s32>(m_swaps_pending, 7) << 28;
@@ -3108,7 +3109,7 @@ void voodoo_1_device::check_stalled_cpu(attotime current_time)
 		// if there's room in the memory FIFO now, we can proceed
 		if (m_reg.fbi_init0().enable_memory_fifo())
 		{
-			if (m_fbmem_fifo.items() < 2 * 32 * m_reg.fbi_init0().memory_fifo_hwm())
+			if (memory_fifo_free() >= 32 * m_reg.fbi_init0().memory_fifo_hwm())
 				resume = true;
 		}
 		else if (m_pci_fifo.space() > 2 * m_reg.fbi_init0().pci_fifo_lwm())

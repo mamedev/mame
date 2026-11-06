@@ -105,23 +105,26 @@ void atarigt_state::video_start()
 
 void atarigt_state::colorram_w(offs_t address, uint16_t data, uint16_t mem_mask)
 {
-	/* update the raw data */
+	// update the raw data
 	address = (address & 0x7ffff) >> 1;
 	uint16_t const olddata = m_colorram[address];
 	COMBINE_DATA(&m_colorram[address]);
 
-	/* update the TRAM checksum */
 	if (address >= 0x10000 && address < 0x14000)
+	{
+		// update the TRAM checksum
 		m_tram_checksum += m_colorram[address] - olddata;
-
-	/* update expanded MRAM */
+	}
 	else if (address >= 0x20000 && address < 0x28000)
 	{
+		// update expanded MRAM
 		m_palette->set_pen_red_level(address & 0x7fff, (m_colorram[address] >> 8));
 		m_palette->set_pen_green_level(address & 0x7fff, (m_colorram[address] & 0xff));
 	}
 	else if (address >= 0x30000 && address < 0x38000)
+	{
 		m_palette->set_pen_blue_level(address & 0x7fff, (m_colorram[address] & 0xff));
+	}
 }
 
 
@@ -530,10 +533,52 @@ uint32_t atarigt_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 				rgb |= mram[((cra >>  5) & 0x01f)] & 0x00ff00;
 				rgb |= mram[((cra >>  0) & 0x01f)] & 0x0000ff;
 
-				/* final override */
+				/* final override — GAL 22E lightning flash effect.
+				   The color latch low 3 bits (LCR) drive two independent effects:
+				     far_fx: applied to the playfield layer only (sprites drawn over it)
+				       LCR==1 → black,  LCR==3 → wash
+				     all_fx: applied to the entire composited picture
+				       LCR==2 → black,  LCR>=4 → wash
+				   The wash function compresses each channel toward a warm white:
+				     channel/3 + bias  (R bias=149, G bias=163, B bias=144)
+				   This produces the staggered bright/dark lightning bolt flash. */
 				if (color_latch & 7)
-					if (!(pf[x] & 0x3f) || !(pf[x] & 0x2000))
-						rgb = (0xff << RSHIFT) | (0xff << GSHIFT) | (0xff << BSHIFT);
+				{
+					int const lcr = color_latch & 7;
+					int const far_fx = (lcr == 1) ? 1 : (lcr == 3) ? 2 : 0;
+					int const all_fx = (lcr == 2) ? 1 : (lcr >= 4) ? 2 : 0;
+
+					/* far_fx: only where PF is the visible source */
+					if (far_fx && !(an[x] & 0x8f) && !((mo[x] & 0x3f) && ((mo[x] & 0x800) || mgep || !(pf[x] & 0x3f))))
+					{
+						if (!(pf[x] & 0x3f) || !(pf[x] & 0x2000))
+						{
+							if (far_fx == 1)
+								rgb = 0;
+							else
+							{
+								uint32_t const r = ((rgb >> RSHIFT) & 0xff) / 3 + 149;
+								uint32_t const g = ((rgb >> GSHIFT) & 0xff) / 3 + 163;
+								uint32_t const b = ((rgb >> BSHIFT) & 0xff) / 3 + 144;
+								rgb = (r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT);
+							}
+						}
+					}
+
+					/* all_fx: every pixel */
+					if (all_fx)
+					{
+						if (all_fx == 1)
+							rgb = 0;
+						else
+						{
+							uint32_t const r = ((rgb >> RSHIFT) & 0xff) / 3 + 149;
+							uint32_t const g = ((rgb >> GSHIFT) & 0xff) / 3 + 163;
+							uint32_t const b = ((rgb >> BSHIFT) & 0xff) / 3 + 144;
+							rgb = (r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT);
+						}
+					}
+				}
 
 				dst[x] = rgb;
 			}

@@ -412,12 +412,12 @@ void bking_state::screen_vblank(int state)
 		// check for collision
 		uint8_t const *const colmask = &m_collision_detection_prom[8 * m_hit];
 
-		for (int y = rect.min_y; y <= rect.max_y; y++)
+		for (int y = rect.top(); y <= rect.bottom(); y++)
 		{
 			uint16_t const *const p0 = &m_colmap_bg.pix(y);
 			uint16_t const *const p1 = &m_colmap_ball.pix(y);
 
-			for (int x = rect.min_x; x <= rect.max_x; x++)
+			for (int x = rect.left(); x <= rect.right(); x++)
 			{
 				if (colmask[p0[x] & 7] && p1[x] & 1)
 				{

@@ -177,11 +177,6 @@ Notes:
 
 /*
 
-    TODO:
-
-    - NE555 discrete sound
-
-
     Usage
     - All variants: Boot up, then press F3, then press a letter (Q,W,E,A) to choose an inbuilt game.
     - If using a cart, boot up, press F3, then follow the instructions that came with the cart (usually press Q).
@@ -205,10 +200,12 @@ Notes:
 
 #include "emu.h"
 
+#include "nl_studio2.h"
+
 #include "cpu/cosmac/cosmac.h"
+#include "machine/netlist.h"
 #include "sound/beep.h"
 #include "sound/cdp1864.h"
-#include "sound/discrete.h"
 #include "video/cdp1861.h"
 
 #include "bus/generic/slot.h"
@@ -234,7 +231,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, CDP1802_TAG)
 		, m_rom(*this, CDP1802_TAG)
-		, m_beeper(*this, "beeper")
 		, m_vdc(*this, CDP1861_TAG)
 		, m_cart(*this, "cartslot")
 		, m_clear(*this, "CLEAR")
@@ -256,7 +252,6 @@ public:
 protected:
 	required_device<cosmac_device> m_maincpu;
 	optional_region_ptr<u8> m_rom;
-	required_device<beep_device> m_beeper;
 	optional_device<cdp1861_device> m_vdc;
 	required_device<generic_slot_device> m_cart;
 	required_ioport m_clear;
@@ -273,7 +268,6 @@ protected:
 	int clear_r();
 	int ef3_r();
 	int ef4_r();
-	void q_w(int state);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 
 	/* keyboard state */
@@ -288,6 +282,7 @@ class visicom_state : public studio2_state
 public:
 	visicom_state(const machine_config &mconfig, device_type type, const char *tag)
 		: studio2_state(mconfig, type, tag)
+		, m_beeper(*this, "beeper")
 		, m_color0_ram(*this, "color0_ram")
 		, m_color1_ram(*this, "color1_ram")
 	{ }
@@ -297,6 +292,7 @@ public:
 private:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	required_device<beep_device> m_beeper;
 	required_shared_ptr<uint8_t> m_color0_ram;
 	required_shared_ptr<uint8_t> m_color1_ram;
 
@@ -312,6 +308,7 @@ class mpt02_state : public studio2_state
 public:
 	mpt02_state(const machine_config &mconfig, device_type type, const char *tag)
 		: studio2_state(mconfig, type, tag)
+		, m_beeper(*this, "beeper")
 		, m_cti(*this, CDP1864_TAG)
 		, m_color_ram(*this, "color_ram")
 	{ }
@@ -319,6 +316,7 @@ public:
 	void mpt02(machine_config &config);
 
 private:
+	required_device<beep_device> m_beeper;
 	required_device<cdp1864_device> m_cti;
 
 	virtual void machine_start() override ATTR_COLD;
@@ -503,11 +501,6 @@ int studio2_state::ef4_r()
 	return BIT(m_b->read(), m_keylatch);
 }
 
-void studio2_state::q_w(int state)
-{
-	m_beeper->set_state(state);
-}
-
 void visicom_state::dma_w(offs_t offset, uint8_t data)
 {
 	int sx = m_screen->hpos() + 4;
@@ -687,19 +680,25 @@ void studio2_state::studio2(machine_config &config)
 	m_maincpu->clear_cb().set(FUNC(studio2_state::clear_r));
 	m_maincpu->ef3_cb().set(FUNC(studio2_state::ef3_r));
 	m_maincpu->ef4_cb().set(FUNC(studio2_state::ef4_r));
-	m_maincpu->q_cb().set(FUNC(studio2_state::q_w));
+	m_maincpu->q_cb().set("sound_nl:q", FUNC(netlist_mame_logic_input_device::write));
 	m_maincpu->dma_wr_cb().set(m_vdc, FUNC(cdp1861_device::dma_w));
+	m_maincpu->sc_cb().set(m_vdc, FUNC(cdp1861_device::sc_w));
+	m_maincpu->tpa_cb().set(m_vdc, FUNC(cdp1861_device::tpa_w));
+	m_maincpu->int_cb().set(m_vdc, FUNC(cdp1861_device::int_r));
+	m_maincpu->dma_out_cb().set(m_vdc, FUNC(cdp1861_device::dma_out_r));
+	m_maincpu->ef1_cb().set(m_vdc, FUNC(cdp1861_device::efx_r));
 
 	/* video hardware */
 	SCREEN(config, m_screen);
 	CDP1861(config, m_vdc, 1760000).set_screen(m_screen);
-	m_vdc->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
-	m_vdc->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
-	m_vdc->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 300).add_route(ALL_OUTPUTS, "mono", 1.00);
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(studio2))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:q", "Q.IN", 0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "OUTPUT").set_mult_offset(0.5, 0.0);
 
 	studio2_cartslot(config);
 }
@@ -714,17 +713,19 @@ void visicom_state::visicom(machine_config &config)
 	m_maincpu->clear_cb().set(FUNC(visicom_state::clear_r));
 	m_maincpu->ef3_cb().set(FUNC(visicom_state::ef3_r));
 	m_maincpu->ef4_cb().set(FUNC(visicom_state::ef4_r));
-	m_maincpu->q_cb().set(FUNC(visicom_state::q_w));
+	m_maincpu->q_cb().set(m_beeper, FUNC(beep_device::set_state));
 	m_maincpu->dma_wr_cb().set(FUNC(visicom_state::dma_w));
+	m_maincpu->sc_cb().set(m_vdc, FUNC(cdp1861_device::sc_w));
+	m_maincpu->tpa_cb().set(m_vdc, FUNC(cdp1861_device::tpa_w));
+	m_maincpu->int_cb().set(m_vdc, FUNC(cdp1861_device::int_r));
+	m_maincpu->dma_out_cb().set(m_vdc, FUNC(cdp1861_device::dma_out_r));
+	m_maincpu->ef1_cb().set(m_vdc, FUNC(cdp1861_device::efx_r));
 
 	/* video hardware */
 	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(visicom_state::screen_update));
 
 	CDP1861(config, m_vdc, XTAL(3'579'545)/2).set_screen(m_screen);
-	m_vdc->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
-	m_vdc->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
-	m_vdc->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -746,8 +747,13 @@ void mpt02_state::mpt02(machine_config &config)
 	m_maincpu->clear_cb().set(FUNC(mpt02_state::clear_r));
 	m_maincpu->ef3_cb().set(FUNC(mpt02_state::ef3_r));
 	m_maincpu->ef4_cb().set(FUNC(mpt02_state::ef4_r));
-	m_maincpu->q_cb().set(FUNC(mpt02_state::q_w));
+	m_maincpu->q_cb().set(m_beeper, FUNC(beep_device::set_state));
 	m_maincpu->dma_wr_cb().set(FUNC(mpt02_state::dma_w));
+	m_maincpu->sc_cb().set(m_cti, FUNC(cdp1864_device::sc_w));
+	m_maincpu->tpa_cb().set(m_cti, FUNC(cdp1864_device::tpa_w));
+	m_maincpu->int_cb().set(m_cti, FUNC(cdp1864_device::int_r));
+	m_maincpu->dma_out_cb().set(m_cti, FUNC(cdp1864_device::dma_out_r));
+	m_maincpu->ef1_cb().set(m_cti, FUNC(cdp1864_device::efx_r));
 
 	/* video/sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -756,9 +762,6 @@ void mpt02_state::mpt02(machine_config &config)
 	SCREEN(config, m_screen);
 	CDP1864(config, m_cti, 1.75_MHz_XTAL).set_screen(m_screen);
 	m_cti->inlace_cb().set_constant(0);
-	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
-	m_cti->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
-	m_cti->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
 	m_cti->rdata_cb().set(FUNC(mpt02_state::rdata_r));
 	m_cti->bdata_cb().set(FUNC(mpt02_state::bdata_r));
 	m_cti->gdata_cb().set(FUNC(mpt02_state::gdata_r));
@@ -805,12 +808,12 @@ ROM_END
 
 /* Game Drivers */
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    STATE          INIT        COMPANY     FULLNAME                                        FLAGS
-CONS( 1977, studio2,  0,       0,      studio2, studio2, studio2_state, empty_init, "RCA",      "Studio II",                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 1978, visicom,  studio2, 0,      visicom, studio2, visicom_state, empty_init, "Toshiba",  "Visicom COM-100 (Japan)",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 1978, mpt02,    studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Soundic",  "Victory MPT-02 Home TV Programmer (Austria)",  MACHINE_SUPPORTS_SAVE ) // It seems to have been sold in various countries, not only Austria
-CONS( 1978, mpt02h,   studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Hanimex",  "MPT-02 Jeu TV Programmable (France)",          MACHINE_SUPPORTS_SAVE )
-CONS( 1978, mtc9016,  studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Mustang",  "9016 Telespiel Computer (Germany)",            MACHINE_SUPPORTS_SAVE )
-CONS( 1978, shmc1200, studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Sheen",    "M1200 Micro Computer (Australia)",             MACHINE_SUPPORTS_SAVE )
-CONS( 1978, cm1200,   studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Conic",    "M-1200 (?)",                                   MACHINE_SUPPORTS_SAVE )
-CONS( 1978, apollo80, studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Academy",  "Apollo 80 (Germany)",                          MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    STATE          INIT        COMPANY     FULLNAME                               FLAGS
+CONS( 1977, studio2,  0,       0,      studio2, studio2, studio2_state, empty_init, "RCA",      "Studio II",                           MACHINE_SUPPORTS_SAVE )
+CONS( 1978, visicom,  studio2, 0,      visicom, studio2, visicom_state, empty_init, "Toshiba",  "Visicom COM-100 (Japan)",             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mpt02,    studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Soundic",  "Victory MPT-02 Home TV Programmer",   MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mpt02h,   studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Hanimex",  "MPT-02 Jeu TV Programmable (France)", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mtc9016,  studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Mustang",  "9016 Telespiel Computer (Germany)",   MACHINE_SUPPORTS_SAVE )
+CONS( 1978, shmc1200, studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Sheen",    "M1200 Micro Computer (Australia)",    MACHINE_SUPPORTS_SAVE )
+CONS( 1978, cm1200,   studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Conic",    "M-1200 (?)",                          MACHINE_SUPPORTS_SAVE )
+CONS( 1978, apollo80, studio2, 0,      mpt02,   studio2, mpt02_state,   empty_init, "Academy",  "Apollo 80 (Germany)",                 MACHINE_SUPPORTS_SAVE )

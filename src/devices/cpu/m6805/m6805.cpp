@@ -689,8 +689,28 @@ void m68hc05eg_device::device_reset()
 	rm16<false>(0x1ffe, m_pc);
 }
 
+void m68hc05eg_device::execute_set_input(int inputnum, int state)
+{
+	if (inputnum == M68HC05EG_INT_IRQ)
+	{
+		m6805_base_device::execute_set_input(inputnum, state);
+	}
+	else
+	{
+		// the timer and SCI interrupts are requested for as long as an enabled flag is set:
+		// level sensitive, so a flag still set after RTI interrupts again
+		assert(inputnum <= M68HC05EG_INT_CPI);
+		m_irq_state[inputnum] = (CLEAR_LINE != state) ? ASSERT_LINE : CLEAR_LINE;
+		if (CLEAR_LINE != state)
+			m_pending_interrupts |= 1 << inputnum;
+		else
+			m_pending_interrupts &= ~(1 << inputnum);
+	}
+}
+
 void m68hc05eg_device::interrupt_vector()
 {
+	// unlike IRQ, the timer and SCI requests stay pending until the peripheral clears its flag
 	if (BIT(m_pending_interrupts, M68HC05EG_INT_IRQ))
 	{
 		m_pending_interrupts &= ~(1 << M68HC05EG_INT_IRQ);
@@ -698,12 +718,10 @@ void m68hc05eg_device::interrupt_vector()
 	}
 	else if (BIT(m_pending_interrupts, M68HC05EG_INT_TIMER))
 	{
-		m_pending_interrupts &= ~(1 << M68HC05EG_INT_TIMER);
 		rm16<false>(0x1ff8, m_pc);
 	}
 	else if (BIT(m_pending_interrupts, M68HC05EG_INT_CPI))
 	{
-		m_pending_interrupts &= ~(1 << M68HC05EG_INT_CPI);
 		rm16<false>(0x1ff6, m_pc);
 	}
 }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="b16" description="Hitachi B16 disk images">
+
+	<software name="b16lx" supported="no">
+		<description>B16LX System Disk (MS-DOS 3.10)</description>
+		<year>199?</year>
+		<publisher>Hitachi</publisher>
+		<notes><![CDATA[
+Not extensively tested, also we technically don't have this BIOS variant
+]]></notes>
+
+		<!-- TODO: 3-mode akin to .hdm, should support both 5.25" and 3.5" (dump is from latter) -->
+		<!-- Technically not a pristine dump: has timestamps ranging from 1980 to 2013 ... -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="b16lx.dsk" size="1261568" crc="fa3044af" sha1="9b9d4b2dcd1ccc1c9506d4a74a783d7b5103e545"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

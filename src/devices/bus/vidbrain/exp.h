@@ -97,10 +97,11 @@ public:
 	videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto extres_wr_callback() { return m_write_extres.bind(); }
+	auto eject_wr_callback() { return m_write_eject.bind(); }
 
 	// computer interface
-	uint8_t bo_r(offs_t offset, int cs1, int cs2) { return m_cart ? m_cart->videobrain_bo_r(offset, cs1, cs2) : 0; }
-	void bo_w(offs_t offset, uint8_t data, int cs1, int cs2) { if (m_cart) m_cart->videobrain_bo_w(offset, data, cs1, cs2); }
+	uint8_t bo_r(offs_t offset, int cs1, int cs2) { return (m_cart && exists()) ? m_cart->videobrain_bo_r(offset, cs1, cs2) : 0; }
+	void bo_w(offs_t offset, uint8_t data, int cs1, int cs2) { if (m_cart && exists()) m_cart->videobrain_bo_w(offset, data, cs1, cs2); }
 
 	uint8_t cs1_r(offs_t offset) { return bo_r(offset + 0x1000, 0, 1); }
 	void cs1_w(offs_t offset, uint8_t data) { bo_w(offset + 0x1000, data, 0, 1); }
@@ -118,6 +119,7 @@ protected:
 
 	// device_image_interface implementation
 	virtual std::pair<std::error_condition, std::string> call_load() override;
+	virtual void call_unload() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "vidbrain_cart"; }
@@ -127,6 +129,7 @@ protected:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	devcb_write_line m_write_extres;
+	devcb_write_line m_write_eject;
 
 	device_videobrain_expansion_card_interface *m_cart;
 };

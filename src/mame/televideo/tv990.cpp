@@ -202,21 +202,21 @@ uint32_t tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 {
 	uint16_t const *const vram = (uint16_t *)m_vram.target();
 	uint8_t const *const fontram = (uint8_t *)m_fontram.target();
-	int const miny = cliprect.min_y / m_rowh;
-	int const maxy = cliprect.max_y / m_rowh;
+	int const miny = cliprect.top() / m_rowh;
+	int const maxy = cliprect.bottom() / m_rowh;
 
 	bitmap.fill(0, cliprect);
 
 	for (int y = miny; y <= maxy; y++)
 	{
-		for(int i = 7; i >= 0; i--)
+		for (int i = 7; i >= 0; i--)
 		{
 			if(!BIT(tvi1111_regs[0x1f], i))
 				continue;
 
 			int const starty = tvi1111_regs[i + 0x40] >> 8;
 			int const endy = tvi1111_regs[i + 0x40] & 0xff;
-			if((y < starty) || (y >= endy))
+			if ((y < starty) || (y >= endy))
 				continue;
 
 			uint16_t const row_offset = tvi1111_regs[i + 0x50];
@@ -224,7 +224,7 @@ uint32_t tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			int minx = tvi1111_regs[i + 0x30] >> 8;
 			int maxx = tvi1111_regs[i + 0x30] & 0xff;
 
-			if(maxx > m_width)
+			if (maxx > m_width)
 				maxx = m_width;
 
 			uint16_t const cursor_x = tvi1111_regs[0x16] - row_offset;
@@ -233,7 +233,7 @@ uint32_t tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			{
 				uint8_t chr = curchar[x - minx] >> 8;
 				uint8_t attr = curchar[x - minx] & 0xff;
-				if((attr & 2) && (m_screen->frame_number() & 32)) // blink rate?
+				if ((attr & 2) && (m_screen->frame_number() & 32)) // blink rate?
 					continue;
 
 				uint8_t const *fontptr = &fontram[(chr + (attr & 0x40 ? 256 : 0)) * 64];
@@ -241,13 +241,13 @@ uint32_t tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 				if (BIT(tvi1111_regs[0x1b], 0) && x == cursor_x)
 				{
 					uint8_t attrchg;
-					if(tvi1111_regs[0x15] & 0xff00) // what does this really mean? it looks like a mask but that doesn't work in 8line char mode
+					if (tvi1111_regs[0x15] & 0xff00) // what does this really mean? it looks like a mask but that doesn't work in 8line char mode
 						attrchg = 8;
 					else
 						attrchg = 4;
-					if(!BIT(tvi1111_regs[0x1b], 1))
+					if (!BIT(tvi1111_regs[0x1b], 1))
 						attr ^= attrchg;
-					else if(m_screen->frame_number() & 32)
+					else if (m_screen->frame_number() & 32)
 						attr ^= attrchg;
 				}
 
@@ -269,7 +269,7 @@ uint32_t tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 					uint8_t pixels = *fontptr++;
 					uint8_t pixels2 = *fontptr++;
-					if((attr & 0x8) && (chary == m_rowh - 1))
+					if ((attr & 0x8) && (chary == m_rowh - 1))
 					{
 						pixels = 0xff;
 						pixels2 = 0xff;
@@ -301,7 +301,7 @@ uint32_t tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 uint8_t tv990_state::kbdc_r(offs_t offset)
 {
-	if(offset)
+	if (offset)
 		return m_kbdc->data_r(4);
 	else
 		return m_kbdc->data_r(0);

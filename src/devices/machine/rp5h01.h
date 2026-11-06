@@ -35,7 +35,6 @@ public:
 
 	void enable_w(int state);   // /CE
 	void reset_w(int state);    // RESET
-	void cs_w(int state);       // CS
 	void clock_w(int state);    // DATA CLOCK (active low)
 	void test_w(int state);     // TEST
 	int counter_r();            // COUNTER OUT

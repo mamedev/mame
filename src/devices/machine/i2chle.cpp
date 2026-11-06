@@ -24,7 +24,7 @@
 
 #define VERBOSE (0)
 
-#define LOG_OUTPUT_FUNC osd_printf_info
+#define LOG_OUTPUT_FUNC device().logerror
 
 #include "logmacro.h"
 
@@ -49,6 +49,11 @@ i2c_hle_interface::i2c_hle_interface(const machine_config &mconfig, device_t &de
 
 i2c_hle_interface::~i2c_hle_interface()
 {
+}
+
+bool i2c_hle_interface::reset_pointer_on_stop() const
+{
+	return true;
 }
 
 void i2c_hle_interface::interface_post_start()
@@ -85,7 +90,8 @@ void i2c_hle_interface::sda_write(int state)
 				m_state = STATE_IDLE;
 				m_last_address = 0;
 				m_just_acked = false;
-				m_data_offset = 0;
+				if (reset_pointer_on_stop())
+					m_data_offset = 0;
 				i2c_stop();
 			}
 			else
@@ -246,7 +252,7 @@ void i2c_hle_interface::scl_write(int state)
 					if (m_scl)
 					{
 						// did the master ACK or NACK?
-						if (m_sda)
+						if (m_sda && master_nack_stops())
 						{
 							LOGMASKED(LOG_DATAOUT, "%s: master NACK\n", get_tag());
 							m_state = STATE_IDLE;

@@ -61,6 +61,7 @@ private:
 	inline void command_end_seq();
 	void calc_offset(int16_t x, int16_t y, uint32_t &offset, uint8_t &bit_pos);
 	int get_bpp();
+	int get_ppmc();
 	uint16_t get_dot(int16_t x, int16_t y);
 	bool set_dot(int16_t x, int16_t y, int16_t px, int16_t py);
 	bool set_dot(int16_t x, int16_t y, uint16_t color);
@@ -71,6 +72,7 @@ private:
 	void command_wpr_exec();
 	uint16_t command_rpr_exec();
 	void command_clr_exec();
+	bool command_dma_write_exec(uint16_t data, bool modify);
 	void command_cpy_exec();
 	void command_rct_exec();
 	void command_line_exec();
@@ -131,6 +133,7 @@ private:
 
 	uint16_t m_pram[0x10];
 	uint8_t m_dn;
+	int16_t m_dma_d0, m_dma_d1;
 
 	uint16_t m_ccr;
 	uint16_t m_omr;

@@ -41,7 +41,7 @@ z8002_device::z8002_device(const machine_config &mconfig, device_type type, cons
 	, m_mo_out(*this)
 	, m_ns_out(*this)
 	, m_busack_out(*this)
-	, m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_busreq_state(0), m_busack_state(0), m_mi(0), m_halt(false), m_icount(0)
+	, m_ppc(0), m_pc(0), m_pc_b15(0), m_addr_b15(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_busreq_state(0), m_busack_state(0), m_mi(0), m_halt(false), m_icount(0)
 	, m_vector_mult(vecmult)
 {
 }
@@ -130,6 +130,7 @@ uint32_t z8002_device::get_addr_operand(int opnum)
 		m_pc += 2;
 		if (get_segmented_mode())
 		{
+			m_addr_b15 = (seg >> 15) & 1;
 			if (seg & 0x8000)
 			{
 				m_op[opnum] = ((seg & 0x7f00) << 8) | m_cache.read_word(m_pc);
@@ -282,7 +283,7 @@ void z8002_device::PUSH_PC()
 
 void z8001_device::PUSH_PC()
 {
-	PUSHL(SP, make_segmented_addr(m_pc));        /* save current pc */
+	PUSHL(SP, make_segmented_pc(m_pc));        /* save current pc */
 }
 
 
@@ -293,7 +294,9 @@ uint32_t z8002_device::GET_PC(uint32_t VEC)
 
 uint32_t z8001_device::GET_PC(uint32_t VEC)
 {
-	return segmented_addr(RDMEM_L(m_data, VEC + 4));
+	const uint32_t segaddr = RDMEM_L(m_data, VEC + 4);
+	m_pc_b15 = (segaddr >> 31) & 1;
+	return segmented_addr(segaddr);
 }
 
 uint32_t z8002_device::get_reset_pc()
@@ -303,7 +306,9 @@ uint32_t z8002_device::get_reset_pc()
 
 uint32_t z8001_device::get_reset_pc()
 {
-	return segmented_addr(RDMEM_L(m_program, 4));
+	const uint32_t segaddr = RDMEM_L(m_program, 4);
+	m_pc_b15 = (segaddr >> 31) & 1;
+	return segmented_addr(segaddr);
 }
 
 uint16_t z8002_device::GET_FCW(uint32_t VEC)
@@ -457,7 +462,9 @@ uint32_t z8002_device::read_irq_vector()
 
 uint32_t z8001_device::read_irq_vector()
 {
-	return segmented_addr(RDMEM_L(m_data, VEC00 + 2 * (m_irq_vec & 0xff)));
+	const uint32_t segaddr = RDMEM_L(m_data, VEC00 + 2 * (m_irq_vec & 0xff));
+	m_pc_b15 = (segaddr >> 31) & 1;
+	return segmented_addr(segaddr);
 }
 
 
@@ -466,6 +473,8 @@ void z8002_device::clear_internal_state()
 	m_op[0] = m_op[1] = m_op[2] = m_op[3] = 0;
 	m_ppc = 0;
 	m_pc = 0;
+	m_pc_b15 = 0;
+	m_addr_b15 = 0;
 	m_psapseg = 0;
 	m_psapoff = 0;
 	m_fcw = 0;
@@ -545,6 +554,7 @@ void z8002_device::register_save_state()
 	save_item(NAME(m_op));
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_pc));
+	save_item(NAME(m_pc_b15));
 	save_item(NAME(m_psapseg));
 	save_item(NAME(m_psapoff));
 	save_item(NAME(m_fcw));

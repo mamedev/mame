@@ -192,8 +192,21 @@ private:
 	void at_speaker_set_spkrdata(uint8_t data);
 	void iochck_w(int state);
 
-	template <unsigned Which> uint8_t pc_dma8237_dack_r();
-	template <unsigned Which> void pc_dma8237_dack_w(uint8_t data);
+	uint8_t pc_dma8237_0_dack_r();
+	uint8_t pc_dma8237_1_dack_r();
+	uint8_t pc_dma8237_2_dack_r();
+	uint8_t pc_dma8237_3_dack_r();
+	uint8_t pc_dma8237_5_dack_r();
+	uint8_t pc_dma8237_6_dack_r();
+	uint8_t pc_dma8237_7_dack_r();
+	void pc_dma8237_0_dack_w(uint8_t data);
+	void pc_dma8237_1_dack_w(uint8_t data);
+	void pc_dma8237_2_dack_w(uint8_t data);
+	void pc_dma8237_3_dack_w(uint8_t data);
+	void pc_dma8237_5_dack_w(uint8_t data);
+	void pc_dma8237_6_dack_w(uint8_t data);
+	void pc_dma8237_7_dack_w(uint8_t data);
+
 	void pc_dack0_w(int state);
 	void pc_dack1_w(int state);
 	void pc_dack2_w(int state);

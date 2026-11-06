@@ -112,13 +112,14 @@ u32 blockch_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	bitmap.fill(0, cliprect);
 
 	// 96x64 background
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		auto *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			// VRAM is only 1-bit
 			int pixel = m_vram[(x << 4 & 0x1fc0) | (y >> 2 & 0x3f)] & 1;
-			bitmap.pix(y, x) = pixel ? rgb_t::white() : rgb_t::black();
+			dst[x] = pixel ? rgb_t::white() : rgb_t::black();
 		}
 	}
 

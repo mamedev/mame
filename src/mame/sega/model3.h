@@ -7,8 +7,7 @@
 
 #include "cpu/powerpc/ppc.h"
 #include "video/poly.h"
-#include "bus/scsi/scsi.h"
-#include "machine/53c810.h"
+#include "machine/mpc10x.h"
 #include "machine/eepromser.h"
 #include "machine/i8251.h"
 #include "sound/scsp.h"
@@ -19,11 +18,15 @@
 #include "315-5881_crypt.h"
 #include "dsb2.h"
 #include "dsbz80.h"
+#include "model3_pci.h"
+#include "model3_render.h"
 #include "segabill.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
+#include <span>
 
 typedef float MATRIX[4][4];
 typedef float VECTOR[4];
@@ -116,7 +119,9 @@ public:
 	model3_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_lsi53c810(*this, "lsi53c810"),
+		m_host(*this, "pci:00.0"),
+		m_graphics(*this, "pci:0d.0"),
+		m_render_adapter(*this, "real3d_renderer"),
 		m_audiocpu(*this, "audiocpu"),
 		m_scsp1(*this, "scsp1"),
 		m_eeprom(*this, "eeprom"),
@@ -134,11 +139,8 @@ public:
 		m_palette(*this, "palette"),
 		m_cryptdevice(*this, "315_5881"),
 		m_billboard(*this, "billboard"),
-		m_bank2(*this, "bank2"),
 		m_sound_bank(*this, "sound_bank")
 	{
-		m_step15_with_mpc106 = false;
-		m_step20_with_old_real3d = false;
 	}
 
 	void add_cpu_66mhz(machine_config &config);
@@ -146,7 +148,7 @@ public:
 	void add_cpu_166mhz(machine_config &config);
 
 	void add_base_devices(machine_config &config);
-	void add_scsi_devices(machine_config &config);
+	void add_pci_devices(machine_config &config, model3_real3d_pci_device::step step) ATTR_COLD;
 	void add_crypt_devices(machine_config &config);
 
 	void model3_21_5881(machine_config &config);
@@ -171,9 +173,7 @@ public:
 	void init_swtrilgy();
 	void init_scudplus();
 	void init_model3_20();
-	void init_bass();
 	void init_vs2();
-	void init_daytona2();
 	void init_eca();
 	void init_srally2();
 	void init_harleya();
@@ -185,27 +185,24 @@ public:
 	void init_swtrilgyp();
 	void init_vs29815();
 	void init_model3_10();
-	void init_vs215();
 	void init_getbass();
 	void init_scudplusa();
-	void init_dirtdvls();
 	void init_vf3();
-	void init_von2();
 	void init_lostwsga();
 	void init_oceanhun();
-	void init_dayto2pe();
 	void init_spikeout();
-	void init_magtruck();
-	void init_lamachin();
 	void init_model3_15();
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 	void dsb2_config(machine_config &config);
 
 private:
 	required_device<ppc_device> m_maincpu;
-	optional_device<lsi53c810_device> m_lsi53c810;
+	required_device<mpc10x_host_device> m_host;
+	required_device<model3_real3d_pci_device> m_graphics;
+	required_device<model3_real3d_renderer_device> m_render_adapter;
 	required_device<cpu_device> m_audiocpu;
 	required_device<scsp_device> m_scsp1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -226,7 +223,6 @@ private:
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 
 	required_device<sega_billboard_device> m_billboard;
-	memory_bank_creator m_bank2;
 	required_memory_bank m_sound_bank;
 
 	tilemap_t *m_layer4[4]{};
@@ -234,38 +230,20 @@ private:
 
 	int m_sound_irq_enable = 0;
 	emu_timer *m_sound_timer = nullptr;
-	emu_timer *m_real3d_dma_timer = nullptr;
 	emu_timer *m_scan_timer = nullptr;
 	uint8_t m_irq_enable = 0;
 	uint8_t m_irq_state = 0;
 	uint8_t m_scsi_irq_state = 0;
 	int m_crom_bank = 0;
 	int m_controls_bank = 0;
-	bool m_step15_with_mpc106 = false;
-	bool m_step20_with_old_real3d = false;
-	uint32_t m_real3d_device_id = 0;
-	int m_pci_bus = 0;
-	int m_pci_device = 0;
-	int m_pci_function = 0;
-	int m_pci_reg = 0;
-	uint32_t m_mpc105_regs[0x40]{};
-	uint32_t m_mpc105_addr = 0;
-	uint32_t m_mpc106_regs[0x40]{};
-	uint32_t m_mpc106_addr = 0;
-	uint32_t m_dma_data = 0;
-	uint32_t m_dma_status = 0;
-	uint32_t m_dma_source = 0;
-	uint32_t m_dma_dest = 0;
-	uint32_t m_dma_endian = 0;
-	uint32_t m_dma_irq = 0;
-	uint32_t m_dma_busy = 0;
 	uint64_t m_controls_2 = 0;
 	uint64_t m_controls_3 = 0;
 	uint8_t m_serial_fifo1 = 0;
 	uint8_t m_serial_fifo2 = 0;
 	int m_lightgun_reg_sel = 0;
 	int m_adc_channel = 0;
-	uint64_t m_real3d_status = 0;
+	uint32_t m_real3d_status = 0;
+	uint32_t m_dma_status = 0;
 	int m_prot_data_ptr = 0;
 	std::unique_ptr<uint32_t[]> m_vrom;
 	int m_step = 0;
@@ -284,13 +262,11 @@ private:
 	uint64_t m_layer_scroll[2];
 	std::unique_ptr<uint64_t[]> m_m3_char_ram;
 	std::unique_ptr<uint64_t[]> m_m3_tile_ram;
-	std::unique_ptr<uint32_t[]> m_texture_fifo;
-	int m_texture_fifo_pos = 0;
-	std::unique_ptr<uint16_t[]> m_texture_ram[2];
-	std::unique_ptr<uint32_t[]> m_display_list_ram;
-	std::unique_ptr<uint32_t[]> m_culling_ram;
-	std::unique_ptr<uint32_t[]> m_polygon_ram;
-	int m_real3d_display_list = 0;
+	std::span<const uint16_t> m_texture_ram[2];
+	std::span<const uint32_t> m_display_list_ram;
+	std::span<const uint32_t> m_culling_ram;
+	std::span<const uint32_t> m_polygon_ram;
+	std::span<const uint32_t> m_render_vrom;
 	rectangle m_clip3d;
 	rectangle *m_screen_clip = nullptr;
 	VECTOR3 m_parallel_light;
@@ -329,27 +305,6 @@ private:
 	void model3_vid_reg_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	void model3_palette_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t model3_palette_r(offs_t offset);
-	void real3d_display_list_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	void real3d_polygon_ram_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	void real3d_cmd_w(uint64_t data);
-	uint64_t mpc105_addr_r(offs_t offset, uint64_t mem_mask = ~0);
-	void mpc105_addr_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	uint64_t mpc105_data_r();
-	void mpc105_data_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	uint64_t mpc105_reg_r(offs_t offset);
-	void mpc105_reg_w(offs_t offset, uint64_t data);
-	void mpc105_init();
-	uint64_t mpc106_addr_r(offs_t offset, uint64_t mem_mask = ~0);
-	void mpc106_addr_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	uint64_t mpc106_data_r(offs_t offset, uint64_t mem_mask = ~0);
-	void mpc106_data_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	uint64_t mpc106_reg_r(offs_t offset);
-	void mpc106_reg_w(offs_t offset, uint64_t data);
-	void mpc106_init();
-	uint64_t scsi_r(offs_t offset, uint64_t mem_mask = ~0);
-	void scsi_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	uint64_t real3d_dma_r(offs_t offset, uint64_t mem_mask = ~0);
-	void real3d_dma_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 
 	void eeprom_w(uint8_t data);
 	uint8_t input_r();
@@ -361,33 +316,31 @@ private:
 	void model3_sys_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t model3_rtc_r(offs_t offset, uint64_t mem_mask = ~0);
 	void model3_rtc_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	uint64_t real3d_status_r(offs_t offset);
+	uint32_t real3d_status_r(offs_t offset);
+	uint32_t real3d_dma_status_r();
 	void model3_sound_w(offs_t offset, uint8_t data);
 
-	void daytona2_rombank_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	void daytona2_rombank_w(u8 bank);
 	void sound_control_w(uint8_t data);
-	uint32_t pci_device_get_reg();
-	void pci_device_set_reg(uint32_t value);
-	void configure_fast_ram();
+	int map_pci_pin(int pin);
+	void pci_irq(int line, int state);
+	void real3d_sync();
+	void real3d_invalidate(u32 page);
+	void real3d_submit(const model3_real3d_renderer_device::memory_view &view);
+	void model3_board_mem(address_map &map) ATTR_COLD;
+	void model3_crypt_mem(address_map &map) ATTR_COLD;
+	void configure_cpu() ATTR_COLD;
 	void interleave_vroms();
 
-	DECLARE_MACHINE_START(model3_10);
 	DECLARE_MACHINE_RESET(model3_10);
-	DECLARE_MACHINE_START(model3_15);
 	DECLARE_MACHINE_RESET(model3_15);
-	DECLARE_MACHINE_START(model3_20);
 	DECLARE_MACHINE_RESET(model3_20);
-	DECLARE_MACHINE_START(model3_21);
 	DECLARE_MACHINE_RESET(model3_21);
 	TIMER_CALLBACK_MEMBER(model3_sound_timer_tick);
-	TIMER_CALLBACK_MEMBER(real3d_dma_timer_callback);
 	TIMER_CALLBACK_MEMBER(scan_timer_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(model3_interrupt);
 	void model3_exit();
 	void scsp_irq(offs_t offset, uint8_t data);
-	void real3d_dma_callback(uint32_t src, uint32_t dst, int length, int byteswap);
-	uint32_t scsi_fetch(uint32_t dsp);
-	void scsi_irq_callback(int state);
 	void update_irq_state();
 	void set_irq_line(uint8_t bit, int line);
 	void model3_init(int step);
@@ -406,9 +359,6 @@ private:
 	void draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int sx, int sy, int prio);
 	void invalidate_texture(int page, int texx, int texy, int texwidth, int texheight);
 	cached_texture *get_texture(int page, int texx, int texy, int texwidth, int texheight, int format);
-	inline void write_texture16(int xpos, int ypos, int width, int height, int page, uint16_t *data);
-	inline void write_texture8(int xpos, int ypos, int width, int height, int page, int upper, int lower, uint16_t *data);
-	void real3d_upload_texture(uint32_t header, uint32_t *data);
 	void init_matrix_stack();
 	void get_top_matrix(MATRIX *out);
 	void push_matrix_stack();
@@ -416,7 +366,7 @@ private:
 	void multiply_matrix_stack(MATRIX matrix);
 	void translate_matrix_stack(float x, float y, float z);
 	void draw_model(uint32_t addr);
-	uint32_t *get_memory_pointer(uint32_t address);
+	const uint32_t *get_memory_pointer(uint32_t address);
 	void set_projection(float left, float right, float top, float bottom, float near, float far);
 	void load_matrix(int matrix_num, MATRIX *out);
 	void traverse_list4(int lod_num, uint32_t address);
@@ -425,12 +375,6 @@ private:
 	void draw_block(uint32_t address);
 	void draw_viewport(int pri, uint32_t address);
 	void real3d_traverse_display_list();
-	void real3d_display_list_end();
-	void real3d_display_list1_dma(uint32_t src, uint32_t dst, int length, int byteswap);
-	void real3d_display_list2_dma(uint32_t src, uint32_t dst, int length, int byteswap);
-	void real3d_vrom_texture_dma(uint32_t src, uint32_t dst, int length, int byteswap);
-	void real3d_texture_fifo_dma(uint32_t src, int length, int byteswap);
-	void real3d_polygon_ram_dma(uint32_t src, uint32_t dst, int length, int byteswap);
 	// machine
 	void insert_id(uint32_t id, int32_t start_bit);
 	int tap_read();

@@ -180,7 +180,8 @@ primetime_device::primetime_device(const machine_config &mconfig, const char *ta
 
 primetimeii_device::primetimeii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	primetime_device(mconfig, PRIMETIMEII, tag, owner, clock),
-	m_ata_irq(0)
+	m_ata_irq(0),
+	m_ata_irq_enables(0)
 {
 	std::fill(std::begin(m_primetimeii_regs), std::end(m_primetimeii_regs), 0);
 }
@@ -684,29 +685,31 @@ void primetimeii_device::device_start()
 {
 	primetime_device::device_start();
 	save_item(NAME(m_ata_irq));
+	save_item(NAME(m_ata_irq_enables));
 	save_item(NAME(m_primetimeii_regs));
 }
 
 void primetimeii_device::map(address_map &map)
 {
 	iosb_base::map(map);
-	map(0x0001a100, 0x0001a10f).r(FUNC(primetimeii_device::ata_regs_r)).mirror(0x00f00000);
+	map(0x0001a100, 0x0001a103).rw(FUNC(primetimeii_device::ata_regs_r), FUNC(primetimeii_device::ata_regs_w)).mirror(0x00f00000);
 }
 
 // This may actually be in F108, the boundaries between the two chips aren't completely clear
 u16 primetimeii_device::ata_regs_r(offs_t offset)
 {
-	switch (offset)
-	{
-		case 0: // special interrupt status: bit 6 = VBL IRQ, bit 5 = ATA IRQ
-			return ((m_nubus_irqs ^ 0xff) & 0x40) | (m_ata_irq << 5);
+	// special interrupt status: bit 6 = VBL IRQ, bit 5 = ATA IRQ
+	u8 status = ((m_nubus_irqs ^ 0xff) & 0x40) | (m_ata_irq << 5);
+	if (status)
+		status |= 0x80;
 
-		default:
-			LOGMASKED(LOG_IOSBREGS, "%s: Unhandled ata_regs_r @ %x\n", tag(), offset);
-			break;
-	}
+	return 0xff00 | status | m_ata_irq_enables;
+}
 
-	return 0;
+void primetimeii_device::ata_regs_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	if (ACCESSING_BITS_0_7)
+		m_ata_irq_enables = data & 0x03;
 }
 
 void primetimeii_device::ata_irq_w(int state)

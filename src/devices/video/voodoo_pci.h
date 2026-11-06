@@ -14,11 +14,23 @@
 class voodoo_pci_device : public pci_device
 {
 public:
-	template <typename T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_cpu(T &&tag)
+	{
+		m_cpu.set_tag(std::forward<T>(tag));
+		if (auto *const voodoo = m_generic_voodoo.lookup())
+			voodoo->set_cpu(m_cpu);
+	}
+	template <typename T> void set_screen(T &&tag)
+	{
+		m_screen.set_tag(std::forward<T>(tag));
+		if (auto *const voodoo = m_generic_voodoo.lookup())
+			voodoo->set_screen(m_screen);
+	}
 	void set_fbmem(int fbmem) { m_fbmem = fbmem; }
 	void set_tmumem(int tmumem0, int tmumem1) { m_tmumem0 = tmumem0; m_tmumem1 = tmumem1; }
 	void set_status_cycles(u32 cycles) { m_status_cycles = cycles; }
+	auto vblank_callback() { return m_generic_voodoo.lookup()->vblank_callback(); }
+	auto stall_callback() { return m_generic_voodoo.lookup()->stall_callback(); }
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	u32 vga_r(offs_t offset, u32 mem_mask = ~0);
