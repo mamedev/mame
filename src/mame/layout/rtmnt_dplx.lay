@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mamelayout version="2">
+  <element name="led7seg_0xne" defstate="63">
+    <led7seg>
+      <bounds x="0" y="0" width="35.1" height="48"/>
+      <color red="1" green="0.3" blue="0.1" alpha="1"/>
+    </led7seg>
+  </element>
+  <element name="led7seg_cbq7" defstate="63">
+    <led7seg>
+      <bounds x="0" y="0" width="31.59" height="48.38"/>
+      <color red="1" green="0.3" blue="0.1" alpha="1"/>
+    </led7seg>
+  </element>
+  <element name="led7seg_8k9u" defstate="63">
+    <led7seg>
+      <bounds x="0" y="0" width="32.17" height="48.55"/>
+      <color red="1" green="0.3" blue="0.1" alpha="1"/>
+    </led7seg>
+  </element>
+  <element name="led7seg_lp1f" defstate="63">
+    <led7seg>
+      <bounds x="0" y="0" width="31.58" height="48"/>
+      <color red="1" green="0.3" blue="0.1" alpha="1"/>
+    </led7seg>
+  </element>
+  <element name="led7seg_xfku" defstate="63">
+    <led7seg>
+      <bounds x="0" y="0" width="34.52" height="49.72"/>
+      <color red="1" green="0.3" blue="0.1" alpha="1"/>
+    </led7seg>
+  </element>
+  <element name="led7seg_u5jj" defstate="63">
+    <led7seg>
+      <bounds x="0" y="0" width="29.83" height="47.96"/>
+      <color red="1" green="0.3" blue="0.1" alpha="1"/>
+    </led7seg>
+  </element>
+  <element name="led7seg_fs42" defstate="63">
+    <led7seg>
+      <bounds x="0" y="0" width="30.41" height="48"/>
+      <color red="1" green="0.3" blue="0.1" alpha="1"/>
+    </led7seg>
+  </element>
+  <element name="led7seg_fkcf" defstate="63">
+    <led7seg>
+      <bounds x="0" y="0" width="24.49" height="41.72"/>
+      <color red="1" green="0.3" blue="0.1" alpha="1"/>
+    </led7seg>
+  </element>
+  <element name="led7seg_sh37" defstate="63">
+    <led7seg>
+      <bounds x="0" y="0" width="26.09" height="41.32"/>
+      <color red="1" green="0.3" blue="0.1" alpha="1"/>
+    </led7seg>
+  </element>
+  <element name="disk_6ls8">
+    <disk>
+      <bounds x="0" y="0" width="224" height="216"/>
+      <color red="1" green="1" blue="1" alpha="1"/>
+    </disk>
+  </element>
+  <element name="disk_w5mo">
+    <disk>
+      <bounds x="0" y="0" width="224" height="216"/>
+      <color red="1" green="1" blue="1" alpha="1"/>
+    </disk>
+  </element>
+  <element name="disk_fz73">
+    <disk>
+      <bounds x="0" y="0" width="224" height="216"/>
+      <color red="1" green="1" blue="1" alpha="1"/>
+    </disk>
+  </element>
+  <element name="disk_vro2">
+    <disk>
+      <bounds x="0" y="0" width="224" height="216"/>
+      <color red="1" green="1" blue="1" alpha="1"/>
+    </disk>
+  </element>
+  <element name="rect_kaos">
+    <rect>
+      <bounds x="0" y="0" width="120" height="39.34"/>
+      <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_kvu6">
+    <rect>
+      <bounds x="0" y="0" width="120" height="40.32"/>
+      <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_2n6y">
+    <rect>
+      <bounds x="0" y="0" width="120" height="38.71"/>
+      <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_p8jc">
+    <rect>
+      <bounds x="0" y="0" width="120" height="38.13"/>
+      <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_nm6a">
+    <rect>
+      <bounds x="0" y="0" width="120" height="39.28"/>
+      <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_e1i3">
+    <rect>
+      <bounds x="0" y="0" width="120" height="39.32"/>
+      <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_2zxq">
+    <rect>
+      <bounds x="0" y="0" width="120" height="39.32"/>
+      <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
+    </rect>
+  </element>
+  <element name="disk_riu9">
+    <disk>
+      <bounds x="0" y="0" width="56" height="56"/>
+      <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
+    </disk>
+  </element>
+  <element name="disk_x934">
+    <disk>
+      <bounds x="0" y="0" width="56" height="56"/>
+      <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
+    </disk>
+  </element>
+  <element name="disk_eapa">
+    <disk>
+      <bounds x="0" y="0" width="56" height="56"/>
+      <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
+    </disk>
+  </element>
+  <element name="disk_h6ad">
+    <disk>
+      <bounds x="0" y="0" width="56" height="56"/>
+      <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
+    </disk>
+  </element>
+  <element name="disk_fn7r">
+    <disk>
+      <bounds x="0" y="0" width="56" height="56"/>
+      <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
+    </disk>
+  </element>
+  <element name="disk_ps0c">
+    <disk>
+      <bounds x="0" y="0" width="56" height="56"/>
+      <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
+    </disk>
+  </element>
+  <element name="rect_3ttd">
+    <rect>
+      <bounds x="0" y="0" width="88" height="56"/>
+      <color red="0.8" green="0.8" blue="0.8" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_80be">
+    <rect>
+      <color red="0.8" green="0.8" blue="0.8" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_p82d">
+    <rect>
+      <color red="0.8" green="0.8" blue="0.8" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_c586">
+    <rect>
+      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_z6v8">
+    <rect>
+      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_52jp">
+    <rect>
+      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_2jt0">
+    <rect>
+      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_1nai">
+    <rect>
+      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_p0td">
+    <rect>
+      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_36k6">
+    <rect>
+      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_hcik">
+    <rect>
+      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_lbeh">
+    <rect>
+      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_zgp8">
+    <rect>
+      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_n7nj">
+    <rect>
+      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_9cx5">
+    <rect>
+      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
+    </rect>
+  </element>
+  <element name="text_0487">
+    <text string="6" align="0">
+      <color red="1" green="1" blue="1" alpha="1"/>
+    </text>
+  </element>
+  <element name="text_iq9r">
+    <text string="3" align="0">
+      <color red="1" green="1" blue="1" alpha="1"/>
+    </text>
+  </element>
+  <element name="text_khqm">
+    <text string="3" align="0">
+      <color red="1" green="1" blue="1" alpha="1"/>
+    </text>
+  </element>
+  <element name="text_5e69">
+    <text string="25" align="0">
+      <color red="1" green="1" blue="1" alpha="1"/>
+    </text>
+  </element>
+  <element name="text_9gb1">
+    <text string="2" align="0">
+      <color red="1" green="1" blue="1" alpha="1"/>
+    </text>
+  </element>
+  <element name="text_ijl9">
+    <text string="25" align="0">
+      <color red="1" green="1" blue="1" alpha="1"/>
+    </text>
+  </element>
+  <element name="text_k98d">
+    <text string="12" align="0">
+      <color red="1" green="1" blue="1" alpha="1"/>
+    </text>
+  </element>
+  <element name="text_57gf">
+    <text string="6" align="0">
+      <color red="1" green="1" blue="1" alpha="1"/>
+    </text>
+  </element>
+  <element name="text_ynv8">
+    <text string="50" align="0">
+      <color red="1" green="1" blue="1" alpha="1"/>
+    </text>
+  </element>
+  <element name="text_i8lo">
+    <text string="50" align="0">
+      <color red="1" green="1" blue="1" alpha="1"/>
+    </text>
+  </element>
+  <element name="text_27su">
+    <text string="50" align="0">
+      <color red="1" green="1" blue="1" alpha="1"/>
+    </text>
+  </element>
+  <element name="text_q6gr">
+    <text string="100" align="0">
+      <color red="1" green="1" blue="1" alpha="1"/>
+    </text>
+  </element>
+  <element name="text_5vsp">
+    <text string="rotamint duplex" align="0">
+      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
+    </text>
+  </element>
+  <element name="rect_ox5c">
+    <rect>
+      <color red="0.8980392156862745" green="0.6470588235294118" blue="0.0392156862745098" alpha="1"/>
+    </rect>
+  </element>
+  <element name="text_uzod">
+    <text string="start" align="0">
+      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
+    </text>
+  </element>
+  <element name="rect_fyxm">
+    <rect>
+      <color red="0.8" green="0.8" blue="0.8" alpha="1"/>
+    </rect>
+  </element>
+  <element name="text_ist0">
+    <text string="stop" align="0">
+      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
+    </text>
+  </element>
+  <element name="rect_wt5x">
+    <rect>
+      <color red="0.38823529411764707" green="0.27058823529411763" blue="0.17254901960784313" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_627j">
+    <rect>
+      <color red="0.8980392156862745" green="0.6470588235294118" blue="0.0392156862745098" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_byee">
+    <rect>
+      <color red="0.7529411764705882" green="0.7490196078431373" blue="0.7372549019607844" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_mwsw">
+    <rect>
+      <color red="0.38823529411764707" green="0.27058823529411763" blue="0.17254901960784313" alpha="1"/>
+    </rect>
+  </element>
+  <element name="rect_5dq7">
+    <rect>
+      <color red="0.38823529411764707" green="0.27058823529411763" blue="0.17254901960784313" alpha="1"/>
+    </rect>
+  </element>
+  <view name="Default">
+    <element name="bg" ref="rect_byee">
+      <bounds x="2.49" y="13.8" width="1016" height="1368"/>
+    </element>
+    <element name="bg_l" ref="rect_ox5c">
+      <bounds x="39.9" y="160" width="136" height="1160"/>
+    </element>
+    <element name="bg_m" ref="rect_wt5x">
+      <bounds x="200" y="64" width="608" height="1264"/>
+    </element>
+    <element name="bg_r_m" ref="rect_627j">
+      <bounds x="824" y="264" width="160" height="880"/>
+    </element>
+    <element name="bg_r_t" ref="rect_mwsw">
+      <bounds x="840" y="152" width="144" height="112"/>
+    </element>
+    <element name="bg_r_b" ref="rect_5dq7">
+      <bounds x="824" y="1144" width="144" height="200"/>
+    </element>
+    <element name="led7seg_coin1" ref="led7seg_0xne">
+      <bounds x="736" y="664" width="35.1" height="48"/>
+    </element>
+    <element name="led7seg_coin2" ref="led7seg_cbq7">
+      <bounds x="704" y="664" width="31.59" height="48.38"/>
+    </element>
+    <element name="led7seg_coin3" ref="led7seg_8k9u">
+      <bounds x="672" y="664" width="32.17" height="48.55"/>
+    </element>
+    <element name="led7seg_coin4" ref="led7seg_lp1f">
+      <bounds x="640" y="664" width="31.58" height="48"/>
+    </element>
+    <element name="led7seg_xfku" ref="led7seg_xfku">
+      <bounds x="328" y="664" width="34.52" height="49.72"/>
+    </element>
+    <element name="led7seg_u5jj" ref="led7seg_u5jj">
+      <bounds x="304" y="664" width="29.83" height="47.96"/>
+    </element>
+    <element name="led7seg_fs42" ref="led7seg_fs42">
+      <bounds x="272" y="664" width="30.41" height="48"/>
+    </element>
+    <element name="led7seg_chance2" ref="led7seg_fkcf">
+      <bounds x="96" y="664" width="24.49" height="41.72"/>
+    </element>
+    <element name="led7seg_chance1" ref="led7seg_sh37">
+      <bounds x="120" y="664" width="26.09" height="41.32"/>
+    </element>
+    <element name="disk_6ls8" ref="disk_6ls8">
+      <bounds x="232" y="304" width="224" height="216"/>
+    </element>
+    <element name="disk_w5mo" ref="disk_w5mo">
+      <bounds x="544" y="296" width="224" height="216"/>
+    </element>
+    <element name="disk_fz73" ref="disk_fz73">
+      <bounds x="392" y="464" width="224" height="216"/>
+    </element>
+    <element name="disk_vro2" ref="disk_vro2">
+      <bounds x="384" y="136" width="224" height="216"/>
+    </element>
+    <element name="lamp_risk1" ref="rect_kaos">
+      <bounds x="840" y="912" width="120" height="39.34"/>
+    </element>
+    <element name="lamp_risk8" ref="rect_kvu6">
+      <bounds x="840" y="664" width="120" height="40.32"/>
+    </element>
+    <element name="lamp_risk9" ref="rect_2n6y">
+      <bounds x="840" y="608" width="120" height="40.21"/>
+    </element>
+    <element name="lamp_risk10" ref="rect_p8jc">
+      <bounds x="840" y="552" width="120" height="40.13"/>
+    </element>
+    <element name="lamp_risk11" ref="rect_nm6a">
+      <bounds x="840" y="504" width="120" height="39.28"/>
+    </element>
+    <element name="lamp_risk13" ref="rect_e1i3">
+      <bounds x="840" y="392" width="120" height="39.32"/>
+    </element>
+    <element name="lamp_risk12" ref="rect_2zxq">
+      <bounds x="840" y="448" width="120" height="39.32"/>
+    </element>
+    <element name="lamp_risk3" ref="disk_riu9">
+      <bounds x="904" y="848" width="56" height="56"/>
+    </element>
+    <element name="lamp_risk2" ref="disk_x934">
+      <bounds x="840" y="848" width="56" height="56"/>
+    </element>
+    <element name="lamp_risk4" ref="disk_eapa">
+      <bounds x="840" y="784" width="56" height="56"/>
+    </element>
+    <element name="lamp_risk5" ref="disk_h6ad">
+      <bounds x="904" y="784" width="56" height="56"/>
+    </element>
+    <element name="lamp_risk7" ref="disk_fn7r">
+      <bounds x="904" y="712" width="56" height="56"/>
+    </element>
+    <element name="lamp_risk6" ref="disk_ps0c">
+      <bounds x="840" y="712" width="56" height="56"/>
+    </element>
+    <element name="btn_payout" ref="rect_3ttd">
+      <bounds x="872" y="176" width="88" height="56"/>
+    </element>
+    <element name="btn_risk" ref="rect_80be">
+      <bounds x="856" y="1168" width="88" height="56"/>
+    </element>
+    <element name="btn_start_stop" ref="rect_p82d">
+      <bounds x="856" y="1264" width="88" height="56"/>
+    </element>
+    <element name="win8" ref="rect_c586">
+      <bounds x="240" y="1064" width="120" height="72"/>
+    </element>
+    <element name="win4" ref="rect_z6v8">
+      <bounds x="240" y="1152" width="120" height="72"/>
+    </element>
+    <element name="win7" ref="rect_52jp">
+      <bounds x="368" y="1064" width="120" height="72"/>
+    </element>
+    <element name="win3" ref="rect_2jt0">
+      <bounds x="368" y="1152" width="120" height="72"/>
+    </element>
+    <element name="win6" ref="rect_1nai">
+      <bounds x="496" y="1064" width="120" height="72"/>
+    </element>
+    <element name="win2" ref="rect_p0td">
+      <bounds x="496" y="1152" width="120" height="72"/>
+    </element>
+    <element name="win5" ref="rect_36k6">
+      <bounds x="624" y="1064" width="120" height="72"/>
+    </element>
+    <element name="win1" ref="rect_hcik">
+      <bounds x="624" y="1152" width="120" height="72"/>
+    </element>
+    <element name="win11" ref="rect_lbeh">
+      <bounds x="280" y="968" width="136" height="80"/>
+    </element>
+    <element name="win10" ref="rect_zgp8">
+      <bounds x="432" y="968" width="136" height="80"/>
+    </element>
+    <element name="win9" ref="rect_n7nj">
+      <bounds x="584" y="968" width="136" height="80"/>
+    </element>
+    <element name="win12" ref="rect_9cx5">
+      <bounds x="384" y="848" width="224" height="112"/>
+    </element>
+    <element name="text_0487" ref="text_0487">
+      <bounds x="248" y="1160" width="28.96" height="32"/>
+    </element>
+    <element name="text_iq9r" ref="text_iq9r">
+      <bounds x="376" y="1160" width="28.63" height="32"/>
+    </element>
+    <element name="text_khqm" ref="text_khqm">
+      <bounds x="504" y="1160" width="28.97" height="32"/>
+    </element>
+    <element name="text_5e69" ref="text_5e69">
+      <bounds x="240" y="1072" width="56" height="32"/>
+    </element>
+    <element name="text_9gb1" ref="text_9gb1">
+      <bounds x="632" y="1160" width="28.95" height="32"/>
+    </element>
+    <element name="text_ijl9" ref="text_ijl9">
+      <bounds x="368" y="1072" width="56" height="32"/>
+    </element>
+    <element name="text_k98d" ref="text_k98d">
+      <bounds x="496" y="1072" width="56" height="32"/>
+    </element>
+    <element name="text_57gf" ref="text_57gf">
+      <bounds x="624" y="1072" width="56" height="32"/>
+    </element>
+    <element name="text_ynv8" ref="text_ynv8">
+      <bounds x="280" y="976" width="72" height="35.01"/>
+    </element>
+    <element name="text_i8lo" ref="text_i8lo">
+      <bounds x="432" y="976" width="72" height="34.9"/>
+    </element>
+    <element name="text_27su" ref="text_27su">
+      <bounds x="584" y="976" width="72" height="34.37"/>
+    </element>
+    <element name="text_q6gr" ref="text_q6gr">
+      <bounds x="400" y="880" width="120" height="49.29"/>
+    </element>
+    <element name="lamp_duplex" ref="text_5vsp">
+      <bounds x="304" y="800" width="376" height="32"/>
+    </element>
+    <element name="lamp_start" ref="text_uzod">
+      <bounds x="280" y="560" width="88" height="32"/>
+    </element>
+    <element name="lamp_stop" ref="text_ist0">
+      <bounds x="632" y="560" width="88" height="32"/>
+    </element>
+  </view>
+</mamelayout>

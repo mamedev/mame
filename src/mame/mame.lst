@@ -44611,6 +44611,9 @@ qtsbc
 @source:skeleton/rd100.cpp
 rd100
 
+@source:skeleton/pre_st95.cpp
+rtmnt_dplx
+
 @source:skeleton/rvoice.cpp
 rvoicepc
 
