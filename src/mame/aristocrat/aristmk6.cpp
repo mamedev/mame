@@ -9,14 +9,17 @@ Notes:
   will run the program up to "vidgam.c: could not set the desired video mode"
   bp 800795a, 1, {r0=0;g}
 - "v_scene.c: Could not initialize Display Manager" & "spin.c: cannot load assets",
-  both related to PLX controller not DMA-ing?
+  no video chip on PCI yet (the BIOS only probes devices 12 and 13 for the PMX1, 1033:0067);
 - 0x0001CA1E - critical error handler in BIOS, R4 - pointer to error message
+- There's no PCI host bridge: the SH-4 masters the bus through the PLX 9054 direct-master windows,
+  local registers at $13000000, I/O and configuration window at $13c00000, memory window at $04000000.
 
 TODO:
 - Identify irq sources;
 - Irq acknowledge doesn't work as intended;
-- Emulate PLX 9054 controller & PCI root;
-- PMX1 likely runs under PCI bus too, as per src/devices/bus/pci/neon250.cpp (x86 AGP card);
+- PMX1 as a PCI function in slot 12 (and 13 for the PMC video board), as per
+  src/devices/bus/pci/neon250.cpp (x86 AGP card). Until then the memory window is plain RAM;
+- 9054 IDSEL is unknown (BIOS never addresses it), placed at device 0;
 - Eventually gets to "flyback" errors, pings $12000130-$3f for strobe and/or irq enable.
   Flyback is an alias for vblank, cfr. Acorn Archimedes.
 
@@ -126,6 +129,8 @@ Crown Melbourne uses regular ASP software.
 #include "cpu/sh/sh4.h"
 #include "machine/eepromser.h"
 #include "machine/ins8250.h"
+#include "machine/pci.h"
+#include "machine/pci9054.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -140,6 +145,7 @@ public:
 		m_uart0(*this, "uart0"),
 		m_uart1(*this, "uart1"),
 		m_eeprom0(*this, "eeprom0"),
+		m_plx(*this, "pci:00.0"),
 		m_palette(*this, "palette"),
 		m_vram(*this, "vram")
 	{ }
@@ -171,6 +177,7 @@ private:
 	required_device<ns16550_device> m_uart0;
 	required_device<ns16550_device> m_uart1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom0;
+	required_device<pci9054_device> m_plx;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint64_t> m_vram;
 };
@@ -420,8 +427,9 @@ void aristmk6_state::aristmk6_map(address_map &map)
 	map(0x12000108, 0x12000127).w(FUNC(aristmk6_state::irqen_w));
 	map(0x12400010, 0x12400017).rw(m_uart1, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x12400018, 0x1240001f).rw(m_uart0, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
-//  map(0x13000000 MMIO space for PLX9054?
+	map(0x13000000, 0x130001ff).rw(m_plx, FUNC(pci9054_device::local_r), FUNC(pci9054_device::local_w));
 	map(0x13800000, 0x13800007).r(FUNC(aristmk6_state::test_r));
+	map(0x13c00000, 0x13c0ffff).rw(m_plx, FUNC(pci9054_device::dm_io_r), FUNC(pci9054_device::dm_io_w));
 }
 
 void aristmk6_state::aristmk6_port(address_map &map)
@@ -459,6 +467,9 @@ void aristmk6_state::aristmk6(machine_config &config)
 	NS16550(config, "uart1", 8_MHz_XTAL);
 
 	EEPROM_93C56_16BIT(config, m_eeprom0).default_value(0xff);
+
+	PCI_ROOT(config, "pci").set_hostless();
+	PCI9054(config, m_plx);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen"));
