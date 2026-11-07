@@ -118,6 +118,38 @@ void h89bus_right_slot_device::device_resolve_objects()
 	}
 }
 
+DEFINE_DEVICE_TYPE(H89BUS_CPU_BOARD_MOD_SLOT, h89bus_cpu_board_mod_slot_device, "h89bus_cpu_board_mod_slot", "H-89 CPU board modification slot")
+
+h89bus_cpu_board_mod_slot_device::h89bus_cpu_board_mod_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: h89bus_cpu_board_mod_slot_device(mconfig, H89BUS_CPU_BOARD_MOD_SLOT, tag, owner, clock)
+{
+}
+
+h89bus_cpu_board_mod_slot_device::h89bus_cpu_board_mod_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_single_card_slot_interface(mconfig, *this)
+	, m_h89bus(*this, finder_base::DUMMY_TAG)
+	, m_h89bus_slottag(nullptr)
+	, m_out_cpu_clock_cb(*this)
+{
+}
+
+void h89bus_cpu_board_mod_slot_device::device_start()
+{
+}
+
+void h89bus_cpu_board_mod_slot_device::device_resolve_objects()
+{
+	device_h89bus_cpu_board_mod_interface *dev = get_card_device();
+
+	if (dev)
+	{
+		dev->set_h89bus_tag(m_h89bus.target(), m_h89bus_slottag);
+		dev->m_slot = this;
+		m_h89bus->add_h89bus_cpu_board_mod(*dev);
+	}
+}
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -422,6 +454,37 @@ h89bus_device::~h89bus_device()
 
 void h89bus_device::device_start()
 {
+	m_gpp = 0;
+
+	save_item(NAME(m_gpp));
+}
+
+//-------------------------------------------------
+//  device_reset - the general purpose port is
+//  cleared on reset, every handler is called so
+//  devices can take their reset state from it
+//-------------------------------------------------
+
+void h89bus_device::device_reset()
+{
+	m_gpp = 0;
+
+	for (auto &[mask, handler] : m_gpp_handlers)
+		handler(0);
+}
+
+//-------------------------------------------------
+//  device_clock_changed - let the cards know the
+//  2 MHz bus clock line has changed speed
+//-------------------------------------------------
+
+void h89bus_device::device_clock_changed()
+{
+	for (device_h89bus_card_interface &card : m_left_device_list)
+		card.bus_clock_changed(clock());
+
+	for (device_h89bus_card_interface &card : m_right_device_list)
+		card.bus_clock_changed(clock());
 }
 
 void h89bus_device::add_h89bus_left_card(device_h89bus_left_card_interface &card)
@@ -432,6 +495,11 @@ void h89bus_device::add_h89bus_left_card(device_h89bus_left_card_interface &card
 void h89bus_device::add_h89bus_right_card(device_h89bus_right_card_interface &card)
 {
 	m_right_device_list.emplace_back(card);
+}
+
+void h89bus_device::add_h89bus_cpu_board_mod(device_h89bus_cpu_board_mod_interface &mod)
+{
+	m_cpu_mod_device_list.emplace_back(mod);
 }
 
 void h89bus_device::install_io_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler)
@@ -449,44 +517,15 @@ h89bus::addr_ranges h89bus_device::get_address_ranges(u8 select_bits, bool p506_
 	return m_io_decoder_socket->get_address_ranges(select_bits, p506_signals);
 }
 
-void h89bus_device::set_io0(int state)
+void h89bus_device::gpp_w(u8 data)
 {
-	m_io0 = state;
-}
+	u8 const changed = m_gpp ^ data;
 
-void h89bus_device::set_io1(int state)
-{
-	m_io1 = state;
-}
+	m_gpp = data;
 
-void h89bus_device::set_mem0(int state)
-{
-	m_mem0 = state;
-}
-
-void h89bus_device::set_mem1(int state)
-{
-	m_mem1 = state;
-}
-
-int h89bus_device::get_io0()
-{
-	return m_io0;
-}
-
-int h89bus_device::get_io1()
-{
-	return m_io1;
-}
-
-int h89bus_device::get_mem0()
-{
-	return m_mem0;
-}
-
-int h89bus_device::get_mem1()
-{
-	return m_mem1;
+	for (auto &[mask, handler] : m_gpp_handlers)
+		if (changed & mask)
+			handler(data);
 }
 
 void h89bus_device::set_int3_line(int state)
@@ -518,13 +557,27 @@ void h89bus_device::set_wait_line(int state)
 //  DEVICE H89BUS CARD INTERFACE
 //**************************************************************************
 
+device_h89bus_interface::device_h89bus_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "h89bus"),
+	m_h89bus_slottag(nullptr),
+	m_h89bus(nullptr)
+{
+}
+
+void device_h89bus_interface::interface_pre_start()
+{
+	if (!m_h89bus)
+	{
+		fatalerror("Can't find H-89 bus device\n");
+	}
+}
+
 //-------------------------------------------------
 //  device_h89bus_card_interface - constructor
 //-------------------------------------------------
 
 device_h89bus_card_interface::device_h89bus_card_interface(const machine_config &mconfig, device_t &device) :
-	device_interface(device, "h89bus"),
-	m_h89bus(nullptr)
+	device_h89bus_interface(mconfig, device)
 {
 }
 
@@ -535,14 +588,6 @@ device_h89bus_card_interface::device_h89bus_card_interface(const machine_config 
 
 device_h89bus_card_interface::~device_h89bus_card_interface()
 {
-}
-
-void device_h89bus_card_interface::interface_pre_start()
-{
-	if (!m_h89bus)
-	{
-		fatalerror("Can't find H-89 bus device\n");
-	}
 }
 
 device_h89bus_left_card_interface::device_h89bus_left_card_interface(const machine_config &mconfig, device_t &device) :
@@ -564,3 +609,22 @@ device_h89bus_right_card_interface::~device_h89bus_right_card_interface()
 {
 }
 
+device_h89bus_cpu_board_mod_interface::device_h89bus_cpu_board_mod_interface(const machine_config &mconfig, device_t &device) :
+	device_h89bus_interface(mconfig, device),
+	m_slot(nullptr)
+{
+}
+
+device_h89bus_cpu_board_mod_interface::~device_h89bus_cpu_board_mod_interface()
+{
+}
+
+void device_h89bus_cpu_board_mod_interface::interface_pre_start()
+{
+	device_h89bus_interface::interface_pre_start();
+
+	// the modification's clock is the CPU board's 2 MHz clock; when the slot
+	// option doesn't set one, use the bus's configured clock, which is the same
+	if (!device().clock())
+		device().set_clock(h89bus().clock());
+}

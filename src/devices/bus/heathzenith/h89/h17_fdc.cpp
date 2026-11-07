@@ -108,13 +108,19 @@ protected:
 	static constexpr u8 CTRL_STEP_COMMAND     = 6; // (Active high)
 	static constexpr u8 CTRL_WRITE_ENABLE_RAM = 7; // 0 - write protected
 
-	// USRT clock
-	static constexpr XTAL USRT_BASE_CLOCK = XTAL(12'288'000) / 6 / 16;
-	static constexpr u32  USRT_TX_CLOCK   = USRT_BASE_CLOCK.value();
+	// USRT clock is the 2 MHz bus clock divided by 16, so the board only reads
+	// and writes the disk correctly with a 2.048 MHz bus clock.
+	static constexpr u32 USRT_CLOCK_DIVIDER = 16;
+
+	u32 usrt_clock() { return h89bus().clock() / USRT_CLOCK_DIVIDER; }
 
 	// A bit cell holds an FM clock half-cell followed by a data half-cell.
-	static attotime fm_cell_time() { return attotime::from_hz(USRT_TX_CLOCK * 2); }
-	static attotime fm_bit_time()  { return attotime::from_hz(USRT_TX_CLOCK); }
+	attotime fm_cell_time() { return attotime::from_hz(usrt_clock() * 2); }
+	attotime fm_bit_time()  { return attotime::from_hz(usrt_clock()); }
+
+	void start_tx_clock();
+
+	virtual void bus_clock_changed(u32 clock) override;
 };
 
 
@@ -459,7 +465,26 @@ void heath_h17_fdc_device::device_reset()
 	m_write_gate         = false;
 	m_sync_char_received = false;
 
-	m_tx_timer->adjust(attotime::from_hz(USRT_TX_CLOCK), 0, attotime::from_hz(USRT_TX_CLOCK));
+	start_tx_clock();
+	reset_rx_separator();
+}
+
+void heath_h17_fdc_device::start_tx_clock()
+{
+	attotime const period = fm_bit_time();
+
+	m_tx_timer->adjust(period, 0, period);
+}
+
+void heath_h17_fdc_device::bus_clock_changed(u32 clock)
+{
+	LOGFUNC("%s: clock: %u\n", FUNCNAME, clock);
+
+	// before device_start(), nothing is running yet and device_reset() will start the clocks
+	if (!m_rx_timer)
+		return;
+
+	start_tx_clock();
 	reset_rx_separator();
 }
 
