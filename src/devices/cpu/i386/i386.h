@@ -29,6 +29,10 @@ public:
 	auto smiact() { return m_smiact.bind(); }
 	auto ferr() { return m_ferr_handler.bind(); }
 
+	// HACK: Advance the timestamp counter by num/den per executed cycle.
+	// For CPU instances a driver deliberately runs below their real core clock.
+	void set_tsc_cycle_ratio(uint32_t num, uint32_t den);
+
 	uint64_t debug_segbase(int params, const uint64_t *param);
 	uint64_t debug_seglimit(int params, const uint64_t *param);
 	uint64_t debug_segofftovirt(int params, const uint64_t *param);
@@ -350,7 +354,20 @@ protected:
 	uint32_t m_brand_id;
 	uint32_t m_feature_flags;
 	uint64_t m_tsc;
+	uint32_t m_tsc_num = 1, m_tsc_den = 1; // timestamp ticks per executed cycle
+	uint32_t m_tsc_rem;                    // fractional ticks carried, always < m_tsc_den
 	uint64_t m_perfctr[2];
+
+	uint64_t tsc_peek(uint32_t cycles) const
+	{
+		return m_tsc + (uint64_t(cycles) * m_tsc_num + m_tsc_rem) / m_tsc_den;
+	}
+	void tsc_advance(uint32_t cycles)
+	{
+		uint64_t const total = uint64_t(cycles) * m_tsc_num + m_tsc_rem;
+		m_tsc += total / m_tsc_den;
+		m_tsc_rem = uint32_t(total % m_tsc_den);
+	}
 
 	// FPU
 	extFloat80_t m_x87_reg[8];
