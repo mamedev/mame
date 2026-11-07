@@ -2234,7 +2234,11 @@ uint8_t mpu4vid_state::timemchn_chr_next(uint8_t state, uint8_t col)
 	const bool C0=(col>>0)&1, C1=(col>>1)&1, C2=(col>>2)&1, C3=(col>>3)&1, C4=(col>>4)&1, C5=(col>>5)&1;
 	const bool NZ=(col&0x3f)!=0, g0=!C3&&!C4, g1=C3&&!C4, g2=!C3&&C4, g3=C3&&C4, ACT=C0||C1||C2||C5;
 
-	const bool O0 = C1 || C2 || C3 || C4 || C5;  // col
+	// Inferred issue-select output: accept the supplied question issues 1-3.
+	// The boot test masks off this bit, and there is no PAL dump to establish it.
+	// O0 does not feed back into the other outputs or the question text decoder.
+	// TODO: verify the issue-select equation against the original hardware.
+	const bool O0 = C2 || C3 || C4 || C5;
 	const bool O1 = (R1 == R2) && NZ;  // latch (R1==R2)
 	const bool O2 = (R1 && g0 && ACT) || (R2 && !R3 && g2) || (C0 && !C1 && g3) || (!R4 && R5 && g1);  // mix-C
 	const bool O3 = (!R1 && g0 && ACT) || (R3 && C1 && g1) || (!R2 && !R5 && g3);  // mix-B
@@ -4252,7 +4256,7 @@ ROM_START( v4tmach3 )
 	ROM_LOAD16_BYTE( "tm20.p3",  0x020000, 0x010000,  CRC(efd3ae64) SHA1(9d2a3b65048e04842205751c6921d2550f38bd52) )
 	ROM_LOAD16_BYTE( "tm20.p4",  0x020001, 0x010000,  CRC(602ba3fb) SHA1(7243f58df9a26adfd1a149a1e60630b187787dd0) )
 	// questions can go in any slot, game detects what is installed
-	// these appear to be mismatched to the set above?
+	// Uses the inferred issue-select output in timemchn_chr_next.
 	ROM_LOAD16_BYTE( "issue3_q16" , 0x040000, 0x010000,  CRC(ce2bf15e) SHA1(29c7f2e718bce415b0b8dc6d902bf74dad6b1ef4) ) // ISSUE3 Q16
 	ROM_LOAD16_BYTE( "issue3_q17",  0x040001, 0x010000,  CRC(5cab773e) SHA1(59a235c51a975b341bdbb88e909729507408f75b) ) // ISSUE3 Q17
 	ROM_LOAD16_BYTE( "issue3_q18",  0x060000, 0x010000,  CRC(27de90b3) SHA1(625c98e555f7b627ea96653926b8917996a2fdb7) ) // ISSUE3 Q18
@@ -4270,7 +4274,7 @@ ROM_START( v4tmach3d )
 	ROM_LOAD16_BYTE( "tm20.p3",  0x020000, 0x010000,  CRC(efd3ae64) SHA1(9d2a3b65048e04842205751c6921d2550f38bd52) )
 	ROM_LOAD16_BYTE( "tm20.p4",  0x020001, 0x010000,  CRC(602ba3fb) SHA1(7243f58df9a26adfd1a149a1e60630b187787dd0) )
 	// questions can go in any slot, game detects what is installed
-	// these appear to be mismatched to the set above?
+	// Uses the inferred issue-select output in timemchn_chr_next.
 	ROM_LOAD16_BYTE( "issue3_q16" , 0x040000, 0x010000,  CRC(ce2bf15e) SHA1(29c7f2e718bce415b0b8dc6d902bf74dad6b1ef4) ) // ISSUE3 Q16
 	ROM_LOAD16_BYTE( "issue3_q17",  0x040001, 0x010000,  CRC(5cab773e) SHA1(59a235c51a975b341bdbb88e909729507408f75b) ) // ISSUE3 Q17
 	ROM_LOAD16_BYTE( "issue3_q18",  0x060000, 0x010000,  CRC(27de90b3) SHA1(625c98e555f7b627ea96653926b8917996a2fdb7) ) // ISSUE3 Q18
@@ -4288,9 +4292,9 @@ ROM_START( v4tmach2 )
 	ROM_LOAD16_BYTE( "tm20.p3",  0x020000, 0x010000,  CRC(efd3ae64) SHA1(9d2a3b65048e04842205751c6921d2550f38bd52) )
 	ROM_LOAD16_BYTE( "tm20.p4",  0x020001, 0x010000,  CRC(602ba3fb) SHA1(7243f58df9a26adfd1a149a1e60630b187787dd0) )
 	// questions can go in any slot, game detects what is installed
-	// these appear to be mismatched to the set above?
+	// Uses the inferred issue-select output in timemchn_chr_next.
 	ROM_LOAD16_BYTE( "issue2_q11" ,  0x040000, 0x010000,  CRC(e8ed736f) SHA1(e7068c550aa39a6e8f1692a16794147e996d36b4) ) // ISSUE2 Q11
-	ROM_LOAD16_BYTE( "issue2_q12" ,  0x040001, 0x010000,  BAD_DUMP CRC(adddd8a7) SHA1(73a8dd191eda2f4b41b79d4b55723731953b8970) ) // ISSUE2 Q12 // game doesn't recognize this one in any slot? bad? wrong game?
+	ROM_LOAD16_BYTE( "issue2_q12" ,  0x040001, 0x010000,  BAD_DUMP CRC(adddd8a7) SHA1(73a8dd191eda2f4b41b79d4b55723731953b8970) ) // ISSUE2 Q12 // corrupt header signature and checksum; needs redumping
 	ROM_LOAD16_BYTE( "issue2_q13" ,  0x060000, 0x010000,  CRC(3de147dd) SHA1(d2111d54d1604fe2da0133102bbfee706f8f542e) ) // ISSUE2 Q13
 	ROM_LOAD16_BYTE( "issue2_q14" ,  0x060001, 0x010000,  CRC(02abb026) SHA1(42224678e5913090c91c21672661beb8e27127a8) ) // ISSUE2 Q14
 	ROM_LOAD16_BYTE( "issue2_q15" ,  0x080000, 0x010000,  CRC(7894ac8b) SHA1(dc46bd108ac4f67a9062bb7ace91aa51f069cbc8) ) // ISSUE2 Q15
@@ -4307,9 +4311,9 @@ ROM_START( v4tmach2d )
 	ROM_LOAD16_BYTE( "tm20.p3",  0x020000, 0x010000,  CRC(efd3ae64) SHA1(9d2a3b65048e04842205751c6921d2550f38bd52) )
 	ROM_LOAD16_BYTE( "tm20.p4",  0x020001, 0x010000,  CRC(602ba3fb) SHA1(7243f58df9a26adfd1a149a1e60630b187787dd0) )
 	// questions can go in any slot, game detects what is installed
-	// these appear to be mismatched to the set above?
+	// Uses the inferred issue-select output in timemchn_chr_next.
 	ROM_LOAD16_BYTE( "issue2_q11" ,  0x040000, 0x010000,  CRC(e8ed736f) SHA1(e7068c550aa39a6e8f1692a16794147e996d36b4) ) // ISSUE2 Q11
-	ROM_LOAD16_BYTE( "issue2_q12" ,  0x040001, 0x010000,  BAD_DUMP CRC(adddd8a7) SHA1(73a8dd191eda2f4b41b79d4b55723731953b8970) ) // ISSUE2 Q12 // game doesn't recognize this one in any slot? bad? wrong game?
+	ROM_LOAD16_BYTE( "issue2_q12" ,  0x040001, 0x010000,  BAD_DUMP CRC(adddd8a7) SHA1(73a8dd191eda2f4b41b79d4b55723731953b8970) ) // ISSUE2 Q12 // corrupt header signature and checksum; needs redumping
 	ROM_LOAD16_BYTE( "issue2_q13" ,  0x060000, 0x010000,  CRC(3de147dd) SHA1(d2111d54d1604fe2da0133102bbfee706f8f542e) ) // ISSUE2 Q13
 	ROM_LOAD16_BYTE( "issue2_q14" ,  0x060001, 0x010000,  CRC(02abb026) SHA1(42224678e5913090c91c21672661beb8e27127a8) ) // ISSUE2 Q14
 	ROM_LOAD16_BYTE( "issue2_q15" ,  0x080000, 0x010000,  CRC(7894ac8b) SHA1(dc46bd108ac4f67a9062bb7ace91aa51f069cbc8) ) // ISSUE2 Q15
