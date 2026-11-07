@@ -183,7 +183,7 @@ public:
 	virtual ~device_h89bus_card_interface();
 
 	// called when the bus clock changes, such as by a CPU speed board
-	virtual void bus_clock_changed(u32 clock) {}
+	virtual void bus_clock_changed(u32 clock);
 
 protected:
 	device_h89bus_card_interface(const machine_config &mconfig, device_t &device);
@@ -236,7 +236,6 @@ public:
 
 protected:
 	device_h89bus_cpu_board_mod_interface(const machine_config &mconfig, device_t &device);
-	virtual void interface_pre_start() override;
 
 	// frequencies, in Hz, for the CPU and for the 2 MHz clock line on the bus
 	void set_cpu_clock(u32 clock);
@@ -332,13 +331,13 @@ public:
 	// construction/destruction
 	template <typename T, typename U>
 	h89bus_cpu_board_mod_slot_device(const machine_config &mconfig, T &&tag, device_t *owner, const char *sltag, U &&opts, const char *dflt)
-		: h89bus_cpu_board_mod_slot_device(mconfig, tag, owner, (uint32_t)0)
+		: h89bus_cpu_board_mod_slot_device(mconfig, tag, owner, u32(0))
 	{
 		set_options(std::forward<U>(opts), dflt, false);
 		set_h89bus_slot(std::forward<T>(sltag), tag);
 	}
 
-	h89bus_cpu_board_mod_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h89bus_cpu_board_mod_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration
 	template <typename T>
@@ -479,13 +478,12 @@ class h89bus_device : public device_t
 {
 	friend class h89bus_left_slot_device;
 	friend class h89bus_right_slot_device;
-	friend class h89bus_cpu_board_mod_slot_device;
 	friend class device_h89bus_left_card_interface;
 	friend class device_h89bus_right_card_interface;
 
 public:
 	// construction/destruction
-	h89bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	h89bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~h89bus_device();
 
 	void install_io_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler) ATTR_COLD;
@@ -522,7 +520,6 @@ protected:
 	// bus-internal handlers
 	void add_h89bus_left_card(device_h89bus_left_card_interface &card);
 	void add_h89bus_right_card(device_h89bus_right_card_interface &card);
-	void add_h89bus_cpu_board_mod(device_h89bus_cpu_board_mod_interface &mod);
 	void set_int3_line(int state);
 	void set_int4_line(int state);
 	void set_int5_line(int state);
@@ -542,7 +539,6 @@ private:
 
 	std::vector<std::reference_wrapper<device_h89bus_left_card_interface>> m_left_device_list;
 	std::vector<std::reference_wrapper<device_h89bus_right_card_interface>> m_right_device_list;
-	std::vector<std::reference_wrapper<device_h89bus_cpu_board_mod_interface>> m_cpu_mod_device_list;
 };
 
 inline void device_h89bus_right_card_interface::set_slot_int3(int state)

@@ -917,9 +917,9 @@ void h89_base_state::h89_right_p506_cards(device_slot_interface &device)
 
 void h89_base_state::h89_cpu_upgrades(device_slot_interface &device)
 {
-	device.option_add("dsm240",   H89BUS_DSM240);
-	device.option_add("gpp_4mhz", H89BUS_GPP_SPEED_4MHZ);
-	device.option_add("gpp_6mhz", H89BUS_GPP_SPEED_6MHZ);
+	device.option_add("dsm240",   H89BUS_DSM240).clock(H89_CLOCK);
+	device.option_add("gpp_4mhz", H89BUS_GPP_SPEED_4MHZ).clock(H89_CLOCK);
+	device.option_add("gpp_6mhz", H89BUS_GPP_SPEED_6MHZ).clock(H89_CLOCK);
 }
 
 void h89_base_state::cpu_clock_w(u32 clock)

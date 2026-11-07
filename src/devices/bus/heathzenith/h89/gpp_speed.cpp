@@ -27,8 +27,10 @@ class h89_gpp_speed_device : public device_t, public device_h89bus_cpu_board_mod
 protected:
 	h89_gpp_speed_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 fast_multiplier);
 
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
+private:
 	void gpp_w(u8 data);
 
 	// the fast speed as a multiple of the CPU board's 2 MHz clock

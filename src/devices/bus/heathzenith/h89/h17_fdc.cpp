@@ -85,6 +85,8 @@ protected:
 
 	bool m_installed;
 
+	u32 m_bus_clock;
+
 	attotime m_rx_cell_start;
 	attotime m_rx_scan;
 	bool     m_rx_have_clock;
@@ -430,8 +432,10 @@ void heath_h17_fdc_device::device_start()
 	m_rx_timer = timer_alloc(FUNC(heath_h17_fdc_device::rx_timer_cb), this);
 
 	m_installed = false;
+	m_bus_clock = h89bus().clock();
 
 	save_item(NAME(m_installed));
+	save_item(NAME(m_bus_clock));
 	save_item(NAME(m_motor_on));
 	save_item(NAME(m_write_gate));
 	save_item(NAME(m_sync_char_received));
@@ -464,6 +468,7 @@ void heath_h17_fdc_device::device_reset()
 	m_motor_on           = false;
 	m_write_gate         = false;
 	m_sync_char_received = false;
+	m_bus_clock          = h89bus().clock();
 
 	start_tx_clock();
 	reset_rx_separator();
@@ -480,9 +485,11 @@ void heath_h17_fdc_device::bus_clock_changed(u32 clock)
 {
 	LOGFUNC("%s: clock: %u\n", FUNCNAME, clock);
 
-	// before device_start(), nothing is running yet and device_reset() will start the clocks
-	if (!m_rx_timer)
+	// loading a state reports the clock it restored, leave the restored timing alone
+	if (clock == m_bus_clock)
 		return;
+
+	m_bus_clock = clock;
 
 	start_tx_clock();
 	reset_rx_separator();

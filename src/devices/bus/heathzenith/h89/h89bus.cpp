@@ -146,7 +146,6 @@ void h89bus_cpu_board_mod_slot_device::device_resolve_objects()
 	{
 		dev->set_h89bus_tag(m_h89bus.target(), m_h89bus_slottag);
 		dev->m_slot = this;
-		m_h89bus->add_h89bus_cpu_board_mod(*dev);
 	}
 }
 
@@ -480,6 +479,10 @@ void h89bus_device::device_reset()
 
 void h89bus_device::device_clock_changed()
 {
+	// the clock is also reported while the bus starts, before the cards are ready; they read it at reset
+	if (!started())
+		return;
+
 	for (device_h89bus_card_interface &card : m_left_device_list)
 		card.bus_clock_changed(clock());
 
@@ -495,11 +498,6 @@ void h89bus_device::add_h89bus_left_card(device_h89bus_left_card_interface &card
 void h89bus_device::add_h89bus_right_card(device_h89bus_right_card_interface &card)
 {
 	m_right_device_list.emplace_back(card);
-}
-
-void h89bus_device::add_h89bus_cpu_board_mod(device_h89bus_cpu_board_mod_interface &mod)
-{
-	m_cpu_mod_device_list.emplace_back(mod);
 }
 
 void h89bus_device::install_io_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler)
@@ -524,8 +522,10 @@ void h89bus_device::gpp_w(u8 data)
 	m_gpp = data;
 
 	for (auto &[mask, handler] : m_gpp_handlers)
+	{
 		if (changed & mask)
 			handler(data);
+	}
 }
 
 void h89bus_device::set_int3_line(int state)
@@ -590,6 +590,10 @@ device_h89bus_card_interface::~device_h89bus_card_interface()
 {
 }
 
+void device_h89bus_card_interface::bus_clock_changed(u32 clock)
+{
+}
+
 device_h89bus_left_card_interface::device_h89bus_left_card_interface(const machine_config &mconfig, device_t &device) :
 	device_h89bus_card_interface(mconfig, device)
 {
@@ -617,14 +621,4 @@ device_h89bus_cpu_board_mod_interface::device_h89bus_cpu_board_mod_interface(con
 
 device_h89bus_cpu_board_mod_interface::~device_h89bus_cpu_board_mod_interface()
 {
-}
-
-void device_h89bus_cpu_board_mod_interface::interface_pre_start()
-{
-	device_h89bus_interface::interface_pre_start();
-
-	// the modification's clock is the CPU board's 2 MHz clock; when the slot
-	// option doesn't set one, use the bus's configured clock, which is the same
-	if (!device().clock())
-		device().set_clock(h89bus().clock());
 }
