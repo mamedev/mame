@@ -122,7 +122,7 @@ private:
 	required_ioport m_io_t6;
 	required_ioport m_io_t7;
 
-	uint8_t m_adresse = 0;
+	uint8_t m_adress = 0;
 	bool m_battery = false;
 
 	uint8_t m_pio1_pb = 0xff;
@@ -151,7 +151,7 @@ private:
 
 void gse1_state::machine_start()
 {
-	save_item(NAME(m_adresse));
+	save_item(NAME(m_adress));
 	save_item(NAME(m_battery));
 	save_item(NAME(m_pio1_pb));
 	save_item(NAME(m_pio2_pa));
@@ -180,7 +180,7 @@ void gse1_state::io_map(address_map &map)
 
 void gse1_state::adresse_w(uint8_t data)
 {
-	m_adresse = data;
+	m_adress = data;
 }
 
 void gse1_state::daten_w(uint8_t data)
@@ -216,7 +216,7 @@ void gse1_state::daten_w(uint8_t data)
 	0
 	};
 
-	switch (m_adresse & 0x7f)
+	switch (m_adress & 0x7f)
 	{
 		case 0x00:
 		case 0x01:
@@ -229,7 +229,7 @@ void gse1_state::daten_w(uint8_t data)
 			for (int i = 0; i < 8; i++)
 			{
 				bool lamp_value = BIT(data, i);
-				m_lamps[m_adresse & 0x07][i] = lamp_value;
+				m_lamps[m_adress & 0x07][i] = lamp_value;
 			}
 			break;
 		case 0x10:
@@ -260,7 +260,7 @@ void gse1_state::daten_w(uint8_t data)
 			}
 			break;
 		default:
-			LOG("Unhandled write %02x to address %02x\n", data, m_adresse);
+			LOG("Unhandled write %02x to address %02x\n", data, m_adress);
 			break;
 	}
 }
@@ -269,7 +269,7 @@ uint8_t gse1_state::daten_r()
 {
 	uint8_t data = 0xff;
 
-	switch (m_adresse & 0x07)
+	switch (m_adress & 0x07)
 	{
 		case 0x06:
 			data = m_io_t6->read();
@@ -278,7 +278,7 @@ uint8_t gse1_state::daten_r()
 			data = m_io_t7->read();
 			break;
 		default:
-			LOG("Unhandled read from address %02x\n", m_adresse);
+			LOG("Unhandled read from address %02x\n", m_adress);
 			break;
 	}
 
