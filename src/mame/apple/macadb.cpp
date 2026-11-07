@@ -87,10 +87,10 @@ static INPUT_PORTS_START( macadb )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Button 1") PORT_CODE(MOUSECODE_BUTTON2)
 
 	PORT_START("MOUSE1") /* Mouse - X AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 	PORT_START("MOUSE2") /* Mouse - Y AXIS */
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 	/* This handles most of the Apple Extended ADB keyboard.  F12 defaults to the RESET/POWER key, but real F12 is avaiable to be mapped too. */
 	PORT_START("KEY0")
@@ -483,49 +483,53 @@ bool macadb_device::adb_pollmouse()
 	return (NewX != m_lastmousex) || (NewY != m_lastmousey) || (NewButton != m_lastbutton);
 }
 
-void macadb_device::adb_accummouse(u8 *MouseX, u8 *MouseY )
+void macadb_device::adb_accummouse(u8 *mouseX, u8 *mouseY )
 {
-	int MouseCountX = 0, MouseCountY = 0;
+	static const s16 HI_CLAMP = 0x3f;
+	static const s16 LO_CLAMP = -0x40;
+	u16 const newX = m_mouse1->read();
+	u16 const newY = m_mouse2->read();
+	s16 diff;
+	u8 mouseCountX = 0, mouseCountY = 0;
 
-	int const NewX = m_mouse1->read();
-	int const NewY = m_mouse2->read();
-
-//  printf("pollmouse: X %d Y %d\n", NewX, NewY);
-
-	/* see if it moved in the x coord */
-	if (NewX != m_lastmousex)
+	if (newX != m_lastmousex)
 	{
-		int diff = NewX - m_lastmousex;
+		diff = newX - m_lastmousex;
 
-		/* check for wrap */
-		if (diff > 0x80)
-			diff = 0x100-diff;
-		if  (diff < -0x80)
-			diff = -0x100-diff;
+		if (diff > HI_CLAMP) {
+			mouseCountX = HI_CLAMP;
+		}
+		else if (diff < LO_CLAMP) {
+			mouseCountX = LO_CLAMP;
+		}
+		else {
+			mouseCountX = diff;
+		}
 
-		MouseCountX += diff;
-		m_lastmousex = NewX;
+		m_lastmousex = newX;
 	}
 
-	/* see if it moved in the y coord */
-	if (NewY != m_lastmousey)
+	if (newY != m_lastmousey)
 	{
-		int diff = NewY - m_lastmousey;
+		diff = newY - m_lastmousey;
 
-		/* check for wrap */
-		if (diff > 0x80)
-			diff = 0x100-diff;
-		if  (diff < -0x80)
-			diff = -0x100-diff;
+		if (diff > HI_CLAMP) {
+			mouseCountY = HI_CLAMP;
+		}
+		else if (diff < LO_CLAMP) {
+			mouseCountY = LO_CLAMP;
+		}
+		else {
+			mouseCountY = diff;
+		}
 
-		MouseCountY += diff;
-		m_lastmousey = NewY;
+		m_lastmousey = newY;
 	}
 
 	m_lastbutton = m_mouse0->read() & 0x03;
 
-	*MouseX = (u8)MouseCountX;
-	*MouseY = (u8)MouseCountY;
+	*mouseX = mouseCountX;
+	*mouseY = mouseCountY;
 }
 
 void macadb_device::adb_talk()
