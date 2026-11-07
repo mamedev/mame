@@ -64,7 +64,7 @@ DEFINE_DEVICE_TYPE(S3C2440, s3c2440_device, "s3c2440", "Samsung S3C2440 SoC")
 							| LOG_DMA_REGS | LOG_AC97 | LOG_DMA_TIMERS | LOG_GPIO | LOG_MEMCON | LOG_USBHOST | LOG_UART | LOG_USB \
 							| LOG_WDT | LOG_I2C | LOG_I2S | LOG_RTC | LOG_SDI)
 
-#define VERBOSE				( 0 )
+#define VERBOSE             ( 0 )
 #include "logmacro.h"
 
 /***************************************************************************
@@ -3047,51 +3047,51 @@ void s3c24xx_device::check_pending_irq()
 u32 s3c2400_device::get_irq_bit_for_int_type(u32 int_type) const
 {
 	static constexpr u32 INT_TYPE_TO_BIT[INT_COUNT] = {
-		31,		// INT_ADC
-		30,		// INT_RTC
-		22,		// INT_SPI
-		~0u,	// INT_SPI0
-		~0u,	// INT_SPI1
-		~0u,	// INT_UART0
-		~0u,	// INT_UART1
-		~0u,	// INT_UART2
-		28,		// INT_UTXD0
-		29,		// INT_UTXD1
-		23,		// INT_URXD0
-		24,		// INT_URXD1
-		15,		// INT_UERR
-		28,		// INT_IIC
-		26,		// INT_USBH
-		25,		// INT_USBD
-		~0u,	// INT_24
-		~0u,	// INT_SDI
-		21,		// INT_MMC
-		17,		// INT_DMA0
-		18,		// INT_DMA1
-		19,		// INT_DMA2
-		20,		// INT_DMA3
-		~0u,	// INT_LCD
-		10,		// INT_TIMER0
-		11,		// INT_TIMER1
-		12,		// INT_TIMER2
-		13,		// INT_TIMER3
-		14,		// INT_TIMER4
-		9,		// INT_WDT
-		~0u,	// INT_NFCON
-		8,		// INT_TICK
-		~0u,	// INT_BATT_FLT
-		~0u,	// INT_6
-		~0u,	// INT_CAM
-		0,		// INT_EINT0
-		1,		// INT_EINT1
-		2,		// INT_EINT2
-		3,		// INT_EINT3
-		4,		// INT_EINT4
-		5,		// INT_EINT5
-		6,		// INT_EINT6
-		7,		// INT_EINT7
-		~0u,	// INT_EINT4_7
-		~0u		// INT_EINT8_23
+		31,     // INT_ADC
+		30,     // INT_RTC
+		22,     // INT_SPI
+		~0u,    // INT_SPI0
+		~0u,    // INT_SPI1
+		~0u,    // INT_UART0
+		~0u,    // INT_UART1
+		~0u,    // INT_UART2
+		28,     // INT_UTXD0
+		29,     // INT_UTXD1
+		23,     // INT_URXD0
+		24,     // INT_URXD1
+		15,     // INT_UERR
+		28,     // INT_IIC
+		26,     // INT_USBH
+		25,     // INT_USBD
+		~0u,    // INT_24
+		~0u,    // INT_SDI
+		21,     // INT_MMC
+		17,     // INT_DMA0
+		18,     // INT_DMA1
+		19,     // INT_DMA2
+		20,     // INT_DMA3
+		~0u,    // INT_LCD
+		10,     // INT_TIMER0
+		11,     // INT_TIMER1
+		12,     // INT_TIMER2
+		13,     // INT_TIMER3
+		14,     // INT_TIMER4
+		9,      // INT_WDT
+		~0u,    // INT_NFCON
+		8,      // INT_TICK
+		~0u,    // INT_BATT_FLT
+		~0u,    // INT_6
+		~0u,    // INT_CAM
+		0,      // INT_EINT0
+		1,      // INT_EINT1
+		2,      // INT_EINT2
+		3,      // INT_EINT3
+		4,      // INT_EINT4
+		5,      // INT_EINT5
+		6,      // INT_EINT6
+		7,      // INT_EINT7
+		~0u,    // INT_EINT4_7
+		~0u     // INT_EINT8_23
 	};
 	return INT_TYPE_TO_BIT[int_type];
 }
@@ -3099,51 +3099,51 @@ u32 s3c2400_device::get_irq_bit_for_int_type(u32 int_type) const
 u32 s3c2410_device::get_irq_bit_for_int_type(u32 int_type) const
 {
 	static constexpr u32 INT_TYPE_TO_BIT[INT_COUNT] = {
-		31,		// INT_ADC
-		30,		// INT_RTC
-		~0u,	// INT_SPI
-		22,		// INT_SPI0
-		29,		// INT_SPI1
-		28,		// INT_UART0
-		23,		// INT_UART1
-		15,		// INT_UART2
-		~0u,	// INT_UTXD0
-		~0u,	// INT_UTXD1
-		~0u,	// INT_URXD0
-		~0u,	// INT_URXD1
-		~0u,	// INT_UERR
-		27,		// INT_IIC
-		26,		// INT_USBH
-		25,		// INT_USBD
-		24,		// INT_24
-		21,		// INT_SDI
-		~0u,	// INT_MMC
-		17,		// INT_DMA0
-		18,		// INT_DMA1
-		19,		// INT_DMA2
-		20,		// INT_DMA3
-		16,		// INT_LCD
-		10,		// INT_TIMER0
-		11,		// INT_TIMER1
-		12,		// INT_TIMER2
-		13,		// INT_TIMER3
-		14,		// INT_TIMER4
-		9,		// INT_WDT
-		~0u,	// INT_NFCON
-		8,		// INT_TICK
-		7,		// INT_BATT_FLT
-		6,		// INT_6
-		~0u,	// INT_CAM
-		0,		// INT_EINT0
-		1,		// INT_EINT1
-		2,		// INT_EINT2
-		3,		// INT_EINT3
-		~0u,	// INT_EINT4
-		~0u,	// INT_EINT5
-		~0u,	// INT_EINT6
-		~0u,	// INT_EINT7
-		4,		// INT_EINT4_7
-		5		// INT_EINT8_23
+		31,     // INT_ADC
+		30,     // INT_RTC
+		~0u,    // INT_SPI
+		22,     // INT_SPI0
+		29,     // INT_SPI1
+		28,     // INT_UART0
+		23,     // INT_UART1
+		15,     // INT_UART2
+		~0u,    // INT_UTXD0
+		~0u,    // INT_UTXD1
+		~0u,    // INT_URXD0
+		~0u,    // INT_URXD1
+		~0u,    // INT_UERR
+		27,     // INT_IIC
+		26,     // INT_USBH
+		25,     // INT_USBD
+		24,     // INT_24
+		21,     // INT_SDI
+		~0u,    // INT_MMC
+		17,     // INT_DMA0
+		18,     // INT_DMA1
+		19,     // INT_DMA2
+		20,     // INT_DMA3
+		16,     // INT_LCD
+		10,     // INT_TIMER0
+		11,     // INT_TIMER1
+		12,     // INT_TIMER2
+		13,     // INT_TIMER3
+		14,     // INT_TIMER4
+		9,      // INT_WDT
+		~0u,    // INT_NFCON
+		8,      // INT_TICK
+		7,      // INT_BATT_FLT
+		6,      // INT_6
+		~0u,    // INT_CAM
+		0,      // INT_EINT0
+		1,      // INT_EINT1
+		2,      // INT_EINT2
+		3,      // INT_EINT3
+		~0u,    // INT_EINT4
+		~0u,    // INT_EINT5
+		~0u,    // INT_EINT6
+		~0u,    // INT_EINT7
+		4,      // INT_EINT4_7
+		5       // INT_EINT8_23
 	};
 	return INT_TYPE_TO_BIT[int_type];
 }
@@ -3151,50 +3151,50 @@ u32 s3c2410_device::get_irq_bit_for_int_type(u32 int_type) const
 u32 s3c2440_device::get_irq_bit_for_int_type(u32 int_type) const
 {
 	static constexpr u32 INT_TYPE_TO_BIT[INT_COUNT] = {
-		31,		// INT_ADC
-		30,		// INT_RTC
-		~0u,	// INT_SPI
-		22,		// INT_SPI0
-		29,		// INT_SPI1
-		28,		// INT_UART0
-		23,		// INT_UART1
-		15,		// INT_UART2
-		~0u,	// INT_UTXD0
-		~0u,	// INT_UTXD1
-		~0u,	// INT_URXD0
-		~0u,	// INT_URXD1
-		~0u,	// INT_UERR
-		27,		// INT_IIC
-		26,		// INT_USBH
-		25,		// INT_USBD
-		~0u,	// INT_24
-		21,		// INT_SDI
-		~0u,	// INT_MMC
-		17,		// INT_DMA0
-		18,		// INT_DMA1
-		19,		// INT_DMA2
-		20,		// INT_DMA3
-		16,		// INT_LCD
-		10,		// INT_TIMER0
-		11,		// INT_TIMER1
-		12,		// INT_TIMER2
-		13,		// INT_TIMER3
-		14,		// INT_TIMER4
-		9,		// INT_WDT
-		24,		// INT_NFCON
-		8,		// INT_TICK
-		7,		// INT_BATT_FLT
-		6,		// INT_CAM
-		0,		// INT_EINT0
-		1,		// INT_EINT1
-		2,		// INT_EINT2
-		3,		// INT_EINT3
-		~0u,	// INT_EINT4
-		~0u,	// INT_EINT5
-		~0u,	// INT_EINT6
-		~0u,	// INT_EINT7
-		4,		// INT_EINT4_7
-		5		// INT_EINT8_23
+		31,     // INT_ADC
+		30,     // INT_RTC
+		~0u,    // INT_SPI
+		22,     // INT_SPI0
+		29,     // INT_SPI1
+		28,     // INT_UART0
+		23,     // INT_UART1
+		15,     // INT_UART2
+		~0u,    // INT_UTXD0
+		~0u,    // INT_UTXD1
+		~0u,    // INT_URXD0
+		~0u,    // INT_URXD1
+		~0u,    // INT_UERR
+		27,     // INT_IIC
+		26,     // INT_USBH
+		25,     // INT_USBD
+		~0u,    // INT_24
+		21,     // INT_SDI
+		~0u,    // INT_MMC
+		17,     // INT_DMA0
+		18,     // INT_DMA1
+		19,     // INT_DMA2
+		20,     // INT_DMA3
+		16,     // INT_LCD
+		10,     // INT_TIMER0
+		11,     // INT_TIMER1
+		12,     // INT_TIMER2
+		13,     // INT_TIMER3
+		14,     // INT_TIMER4
+		9,      // INT_WDT
+		24,     // INT_NFCON
+		8,      // INT_TICK
+		7,      // INT_BATT_FLT
+		6,      // INT_CAM
+		0,      // INT_EINT0
+		1,      // INT_EINT1
+		2,      // INT_EINT2
+		3,      // INT_EINT3
+		~0u,    // INT_EINT4
+		~0u,    // INT_EINT5
+		~0u,    // INT_EINT6
+		~0u,    // INT_EINT7
+		4,      // INT_EINT4_7
+		5       // INT_EINT8_23
 	};
 	return INT_TYPE_TO_BIT[int_type];
 }
@@ -3211,21 +3211,21 @@ void s3c24xx_device::request_irq(u32 int_type)
 u32 s3c2410_device::get_int_type_for_subint(u32 subint) const
 {
 	static constexpr u32 SUBINT_TO_INT_TYPE[INT_COUNT] = {
-		INT_UART0,	// SUBINT_RXD0
-		INT_UART0,	// SUBINT_TXD0
-		INT_UART0,	// SUBINT_ERR0
-		INT_UART1,	// SUBINT_RXD1
-		INT_UART1,	// SUBINT_TXD1
-		INT_UART1,	// SUBINT_ERR1
-		INT_UART2,	// SUBINT_RXD2
-		INT_UART2,	// SUBINT_TXD2
-		INT_UART2,	// SUBINT_ERR2
-		INT_ADC,	// SUBINT_TC
-		INT_ADC,	// SUBINT_ADC
-		~0u,		// SUBINT_CAM_C
-		~0u,		// SUBINT_CAM_P
-		~0u,		// SUBINT_WDT
-		~0u,		// SUBINT_AC97
+		INT_UART0,  // SUBINT_RXD0
+		INT_UART0,  // SUBINT_TXD0
+		INT_UART0,  // SUBINT_ERR0
+		INT_UART1,  // SUBINT_RXD1
+		INT_UART1,  // SUBINT_TXD1
+		INT_UART1,  // SUBINT_ERR1
+		INT_UART2,  // SUBINT_RXD2
+		INT_UART2,  // SUBINT_TXD2
+		INT_UART2,  // SUBINT_ERR2
+		INT_ADC,    // SUBINT_TC
+		INT_ADC,    // SUBINT_ADC
+		~0u,        // SUBINT_CAM_C
+		~0u,        // SUBINT_CAM_P
+		~0u,        // SUBINT_WDT
+		~0u,        // SUBINT_AC97
 	};
 	return SUBINT_TO_INT_TYPE[subint];
 }
@@ -3233,21 +3233,21 @@ u32 s3c2410_device::get_int_type_for_subint(u32 subint) const
 u32 s3c2440_device::get_int_type_for_subint(u32 subint) const
 {
 	static constexpr u32 SUBINT_TO_INT_TYPE[INT_COUNT] = {
-		INT_UART0,	// SUBINT_RXD0
-		INT_UART0,	// SUBINT_TXD0
-		INT_UART0,	// SUBINT_ERR0
-		INT_UART1,	// SUBINT_RXD1
-		INT_UART1,	// SUBINT_TXD1
-		INT_UART1,	// SUBINT_ERR1
-		INT_UART2,	// SUBINT_RXD2
-		INT_UART2,	// SUBINT_TXD2
-		INT_UART2,	// SUBINT_ERR2
-		INT_ADC,	// SUBINT_TC
-		INT_ADC,	// SUBINT_ADC
-		INT_CAM,	// SUBINT_CAM_C
-		INT_CAM,	// SUBINT_CAM_P
-		INT_WDT,	// SUBINT_WDT
-		INT_WDT,	// SUBINT_AC97
+		INT_UART0,  // SUBINT_RXD0
+		INT_UART0,  // SUBINT_TXD0
+		INT_UART0,  // SUBINT_ERR0
+		INT_UART1,  // SUBINT_RXD1
+		INT_UART1,  // SUBINT_TXD1
+		INT_UART1,  // SUBINT_ERR1
+		INT_UART2,  // SUBINT_RXD2
+		INT_UART2,  // SUBINT_TXD2
+		INT_UART2,  // SUBINT_ERR2
+		INT_ADC,    // SUBINT_TC
+		INT_ADC,    // SUBINT_ADC
+		INT_CAM,    // SUBINT_CAM_C
+		INT_CAM,    // SUBINT_CAM_P
+		INT_WDT,    // SUBINT_WDT
+		INT_WDT,    // SUBINT_AC97
 	};
 	return SUBINT_TO_INT_TYPE[subint];
 }

@@ -10,10 +10,10 @@
     TODO: verify cartridge part numbers and spare-area dumps, EEPROM wiring,
     battery sensing, TV encoder, USB accessories and LCD timing.
 
-	The LCD gets configured at ~150Hz in LCD mode for the games, but we seem
-	to be matching documentation, is it correct?  Some games run smoother and
-	are still rate limited, others such as gormitim seem too fast.  We default
-	to TV mode.
+    The LCD gets configured at ~150Hz in LCD mode for the games, but we seem
+    to be matching documentation, is it correct?  Some games run smoother and
+    are still rate limited, others such as gormitim seem too fast.  We default
+    to TV mode.
 
 */
 
@@ -29,9 +29,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#define LOG_ADC		(1U << 2)
-#define LOG_GPIO	(1U << 3)
-#define LOG_I2C		(1U << 4)
+#define LOG_ADC     (1U << 2)
+#define LOG_GPIO    (1U << 3)
+#define LOG_I2C     (1U << 4)
 #define VERBOSE (0)
 #include "logmacro.h"
 

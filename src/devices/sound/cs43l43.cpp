@@ -9,11 +9,11 @@
 #include "emu.h"
 #include "sound/cs43l43.h"
 
-#define LOG_WRITES		(1U << 1)
-#define LOG_READS		(1U << 2)
-#define LOG_OVERRUNS	(1U << 3)
-#define LOG_SAMPLES		(1U << 4)
-#define VERBOSE			( 0 )
+#define LOG_WRITES      (1U << 1)
+#define LOG_READS       (1U << 2)
+#define LOG_OVERRUNS    (1U << 3)
+#define LOG_SAMPLES     (1U << 4)
+#define VERBOSE         ( 0 )
 #include "logmacro.h"
 
 
