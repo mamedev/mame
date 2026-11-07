@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="secoinsa20" description="SECOINSA Serie 20 hard disks">
+
+	<!--
+	Sanitized derivative rebuilt from the supplied MC1303 sector dump, not an
+	untouched distribution disk. Business files, obsolete accounts, site startup,
+	workspaces and residual sectors were cleared; original executable code remains.
+	Only the system volume is populated. Login: SISTEMA, no password.
+	Geometry: 830 cylinders, 5 heads, 32 sectors per track, 256 bytes per sector.
+	-->
+	<software name="somu62" supported="partial">
+		<description>S.O. Multi-Usuario 6.2 (sanitized system volume)</description>
+		<year>198?</year>
+		<publisher>Secoinsa</publisher>
+		<part name="hdd" interface="secoinsa20_hdd">
+			<diskarea name="harddriv">
+				<!-- Bad dump: a sanitized rebuild, not an untouched distribution disk -->
+				<disk name="somu62" sha1="6933cd9e1d4dfa027f2f273affcadc7326232834" writeable="yes" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+</softwarelist>
