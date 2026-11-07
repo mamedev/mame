@@ -88,13 +88,13 @@ uint32_t t6b79_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			{
 				uint8_t data = m_lcd_ram[src_x * 8 + y];
 				for (int b = 0; b < 8; b++)
-					bitmap.pix(x, y * 8 + b) = BIT(data, 7 - b);
+					bitmap.pix(x, y * 8 + b) = (m_contrast << 1) | BIT(data, 7 - b);
 			}
 		}
 	}
 	else
 	{
-		bitmap.fill(0, cliprect);
+		bitmap.fill(0x7f, cliprect);
 	}
 
 	return 0;
