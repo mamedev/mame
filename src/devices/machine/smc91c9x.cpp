@@ -814,11 +814,12 @@ u16 smc91c9x_device::read(offs_t offset, u16 mem_mask)
 	{
 		case B2_MMU_COMMAND:
 			// Clear busy
-			m_reg[B2_MMU_COMMAND] &= ~0x0001;
+			if (!machine().side_effects_disabled())
+				m_reg[B2_MMU_COMMAND] &= ~0x0001;
 			break;
 
 		case B2_PNR_ARR:
-			if ( ACCESSING_BITS_8_15 )
+			if (ACCESSING_BITS_8_15 && !machine().side_effects_disabled())
 			{
 				m_reg[B2_INTERRUPT] &= ~EINT_ALLOC;
 				update_ethernet_irq();
@@ -854,13 +855,13 @@ u16 smc91c9x_device::read(offs_t offset, u16 mem_mask)
 				result = buffer[addr++];
 			if ( ACCESSING_BITS_8_15 )
 				result |= buffer[addr++] << 8;
-			if ( m_reg[B2_POINTER] & 0x4000 )
+			if ((m_reg[B2_POINTER] & 0x4000) && !machine().side_effects_disabled())
 				m_reg[B2_POINTER] = (m_reg[B2_POINTER] & ~0x7ff) | (addr & 0x7ff);
 			break;
 		}
 	}
 
-	if (offset != B0_BANK)
+	if ((offset != B0_BANK) && !machine().side_effects_disabled())
 		LOG("%s:smc91c9x_r(%s) = %04X & %04X\n", machine().describe_context(), ethernet_regname[offset], result, mem_mask);
 	return result;
 }
