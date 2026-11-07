@@ -537,11 +537,11 @@ Object Control
 C106 - Generates memory output clocks to generate X-Axis Zoom for Line Buffer Writes
 C134 - Object Memory Address Generator. Sequences the sprite memory contents to the hardware.
 C135 - Checks is object is displayed on Current output line.
-C146 - Steers the Decode Object Pixel data to the correct line buffer A or B
+C146 - Steers the Decode Object Pixel data to the correct line buffer A or B (see namcos2_sprite.cpp)
 
 ROZ
 ---
-C102 - Controls CPU access to ROZ Memory Area.
+C102 - Controls CPU access to ROZ Memory Area, and generates the ROZ RAM/ROM addresses (see namcos2_roz.cpp)
 
 ***************************************************************************/
 
@@ -698,7 +698,7 @@ void namcos2_state::common_default_am(address_map &map)
 	map(0xc00000, 0xc03fff).ram().share(m_spriteram);
 	map(0xc40000, 0xc40001).rw(FUNC(namcos2_state::gfx_ctrl_r), FUNC(namcos2_state::gfx_ctrl_w));
 	map(0xc80000, 0xc9ffff).ram().w(m_ns2roz, FUNC(namcos2_roz_device::rozram_word_w)).share("rozram");
-	map(0xcc0000, 0xcc000f).ram().share("rozctrl");
+	map(0xcc0000, 0xcc000f).rw(m_ns2roz, FUNC(namcos2_roz_device::control_r), FUNC(namcos2_roz_device::control_w));
 	map(0xd00000, 0xd0000f).rw(FUNC(namcos2_state::namcos2_68k_key_r), FUNC(namcos2_state::namcos2_68k_key_w));
 }
 
@@ -1791,9 +1791,9 @@ void finallap_state::configure_namcos2_sprite_standard(machine_config &config)
 void namcos2_state::configure_namcos2_roz_standard(machine_config &config)
 {
 	NAMCOS2_ROZ(config, m_ns2roz);
+	m_ns2roz->set_screen(m_screen);
 	m_ns2roz->set_palette(m_c116);
 	m_ns2roz->set_rozram_tag("rozram");
-	m_ns2roz->set_rozctrl_tag("rozctrl");
 }
 
 void namcos2_state::base_noio(machine_config &config)
