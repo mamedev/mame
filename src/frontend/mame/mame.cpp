@@ -109,6 +109,58 @@ void mame_machine_manager::update_machine()
 	m_lua->attach_notifiers();
 }
 
+std::string mame_machine_manager::execute_lua(std::string_view code)
+{
+	if (code.empty())
+		return "Usage: monitor lua <Lua code>\n";
+	if (!m_lua)
+		return "Lua engine unavailable\n";
+
+	std::string output;
+	sol::load_result const loaded = m_lua->load_string(std::string(code));
+	if (!loaded.valid())
+	{
+		sol::error const error = loaded;
+		output = "Lua error: ";
+		output += error.what();
+		output.push_back('\n');
+		return output;
+	}
+
+	sol::protected_function function = loaded;
+	sol::environment environment = m_lua->make_environment();
+	sol::protected_function const stringify = m_lua->sol()["tostring"];
+	environment.set_function(
+			"print",
+			[&output, stringify](sol::variadic_args args)
+			{
+				bool first = true;
+				for (sol::object const &arg : args)
+				{
+					if (!first)
+						output.push_back('\t');
+					first = false;
+					auto const result = stringify(arg);
+					if (result.valid())
+						output += result.get<std::string>();
+					else
+						output += "<tostring error>";
+				}
+				output.push_back('\n');
+			});
+	sol::set_environment(environment, function);
+
+	auto const result = m_lua->invoke(function);
+	if (!result.valid())
+	{
+		sol::error const error = result;
+		output += "Lua error: ";
+		output += error.what();
+		output.push_back('\n');
+	}
+	return output;
+}
+
 
 //-------------------------------------------------
 //  split
