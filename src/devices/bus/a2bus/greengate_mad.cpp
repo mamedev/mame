@@ -88,8 +88,10 @@ void a2bus_greengate_mad_device::device_add_mconfig(machine_config &config)
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	// /16 in the ACIA gives the MIDI rate of 31250 baud
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250 * 16));
+	// No crystal on the board and no bus clock divides to it, probably an RC
+	// oscillator. Measured on one board against the 6502 at 514 kHz, which
+	// with /16 in the ACIA is about 32100 baud instead of MIDI's 31250.
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 514'000));
 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 }
