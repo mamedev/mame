@@ -45,9 +45,10 @@ public:
 	auto tcmp() { return m_tcmp_cb.bind(); }
 	auto spi_sck() { return m_sck_cb.bind(); }
 	auto spi_mosi() { return m_mosi_cb.bind(); }
-	auto spi_miso() { return m_miso_cb.bind(); }
 
-	// SS pin of the SPI (PD5, active low; variants without an SPI ignore it)
+	// SS pin of the SPI (PD5, active low; variants without an SPI ignore it).  Pushed
+	// rather than read through portd_r: the master acts on SS low at once (6.2.3).
+	// Report the same level for PD5 from portd_r.
 	void spi_ss_w(int state) { if (m_spi) m_spi->ss_w(state); }
 
 protected:
@@ -201,7 +202,6 @@ private:
 	// serial peripheral interface
 	devcb_write_line    m_sck_cb;
 	devcb_write_line    m_mosi_cb;
-	devcb_read_line     m_miso_cb;
 	bool                m_has_spi;
 
 	// serial communications interface

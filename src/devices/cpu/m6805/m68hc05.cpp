@@ -165,7 +165,6 @@ m68hc05_device::m68hc05_device(
 	, m_irq_latch(0)
 	, m_sck_cb(*this)
 	, m_mosi_cb(*this)
-	, m_miso_cb(*this, 1)
 	, m_has_spi(false)
 	, m_baud(0x00)
 	, m_sccr1(0x00)
@@ -532,7 +531,8 @@ void m68hc05_device::device_add_mconfig(machine_config &config)
 		M68HC05_SPI(config, m_spi, DERIVED_CLOCK(1, 2));
 		m_spi->sck_cb().set([this] (int state) { m_sck_cb(state); });
 		m_spi->mosi_cb().set([this] (int state) { m_mosi_cb(state); });
-		m_spi->miso_cb().set([this] () { return m_miso_cb(); });
+		// MISO is PD2 (6.2.2), sampled through portd_r
+		m_spi->miso_cb().set([this] () { return BIT(m_port_cb_r[3](0, 0x04), 2); });
 		m_spi->irq_cb().set(*this, FUNC(m68hc05_device::spi_irq_w));
 	}
 }

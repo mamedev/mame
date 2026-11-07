@@ -22,8 +22,8 @@ class m68hc05_spi_device : public device_t
 public:
 	m68hc05_spi_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	// SCK and MOSI output pins (master mode), MISO input pin, and the interrupt
-	// request towards the host MCU (level)
+	// SCK and MOSI output pins (master mode), MISO input pin (the host reads it
+	// from port D), and the interrupt request towards the host MCU (level)
 	auto sck_cb() { return m_sck_cb.bind(); }
 	auto mosi_cb() { return m_mosi_cb.bind(); }
 	auto miso_cb() { return m_miso_cb.bind(); }
