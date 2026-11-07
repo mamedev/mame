@@ -475,16 +475,16 @@ void gse1_state::gse1(machine_config &config)
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
 	Z80PIO(config, m_pio1, 4_MHz_XTAL/2);
-	m_pio1->in_pa_callback().set( FUNC(gse1_state::pio1_pa_r));
+	m_pio1->in_pa_callback().set(FUNC(gse1_state::pio1_pa_r));
 	m_pio1->out_pb_callback().set(FUNC(gse1_state::pio1_pb_w));
-	m_pio1->in_pb_callback().set( FUNC(gse1_state::pio1_pb_r));
+	m_pio1->in_pb_callback().set(FUNC(gse1_state::pio1_pb_r));
 	m_pio1->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80PIO(config, m_pio2, 4_MHz_XTAL/2);
 	m_pio2->out_pa_callback().set(FUNC(gse1_state::pio2_pa_w));
-	m_pio2->in_pa_callback().set( FUNC(gse1_state::pio2_pa_r));
+	m_pio2->in_pa_callback().set(FUNC(gse1_state::pio2_pa_r));
 	m_pio2->out_pb_callback().set(FUNC(gse1_state::pio2_pb_w));
-	m_pio2->in_pb_callback().set( FUNC(gse1_state::pio2_pb_r));
+	m_pio2->in_pb_callback().set(FUNC(gse1_state::pio2_pb_r));
 	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80CTC(config, m_ctc1, 4_MHz_XTAL/2);
