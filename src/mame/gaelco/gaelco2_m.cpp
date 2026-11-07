@@ -251,6 +251,25 @@ TIMER_DEVICE_CALLBACK_MEMBER(bang_state::bang_irq)
 
 /***************************************************************************
 
+    Salter Cardioline
+
+***************************************************************************/
+
+INPUT_CHANGED_MEMBER(saltcrdi_state::heart_rate_pulse)
+{
+	// each heartbeat clocks a flip-flop (U10B) that pulls IPL2 low to request IRQ 4, held clear while output latch Q7 (/RESINT) is low
+	if (newval && m_mainlatch->q7_r())
+		m_maincpu->set_input_line(4, ASSERT_LINE);
+}
+
+void saltcrdi_state::heart_rate_irq_clear_w(int state)
+{
+	if (!state)
+		m_maincpu->set_input_line(4, CLEAR_LINE);
+}
+
+/***************************************************************************
+
     Protection
 
 ***************************************************************************/
