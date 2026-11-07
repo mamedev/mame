@@ -579,6 +579,8 @@ void p5txla_state::winbond_superio_config(device_t *device)
 	w83877tf_device &winb = *downcast<w83877tf_device *>(device);
 	winb.set_por_hefras(1);
 	winb.set_por_hefere(1);
+	// definitely wants '0' to avoid LPT/COM conflicts at POST
+	winb.set_por_pnpcvs(0);
 	winb.irq1().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
 	winb.irq8().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq8n_w));
 	winb.irq9().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq9_w));

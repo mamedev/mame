@@ -132,6 +132,8 @@ void mvp3_state::winbond_superio_config(device_t *device)
 	w83877tf_device &winb = *downcast<w83877tf_device *>(device);
 	winb.set_por_hefras(1);
 	winb.set_por_hefere(1);
+	// assumed, doesn't make a difference either way
+	winb.set_por_pnpcvs(0);
 	winb.irq1().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq1_w));
 	winb.irq8().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq8n_w));
 	winb.irq9().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq9_w));
