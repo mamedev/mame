@@ -334,14 +334,12 @@ private:
 	void bwbvid_68k_map(address_map &map) ATTR_COLD;
 	void mpu4_68k_map_base(address_map &map) ATTR_COLD;
 	void mpu4_68k_map(address_map &map) ATTR_COLD;
-	void mpu4_68k_map_strike(address_map &map) ATTR_COLD;
 	void mpu4_vram(address_map &map) ATTR_COLD;
 	void mpu4oki_68k_map(address_map &map) ATTR_COLD;
 
 	void mpu4_6809_map(address_map &map) ATTR_COLD;
 	void mpu4_6809_german_map(address_map &map) ATTR_COLD;
 
-	uint8_t vidcharacteriser_strikeit_hack_r(offs_t offset);
 
 	void hack_bwb_startup_protection();
 
@@ -1950,12 +1948,6 @@ void mpu4vid_state::mpu4_68k_map(address_map& map)
 	map(0xffd000, 0xffd00f).rw(FUNC(mpu4vid_state::vidcharacteriser_r), FUNC(mpu4vid_state::vidcharacteriser_w)).umask16(0x00ff);
 }
 
-void mpu4vid_state::mpu4_68k_map_strike(address_map& map)
-{
-	mpu4_68k_map_base(map);
-	map(0xffd000, 0xffd00f).rw(FUNC(mpu4vid_state::vidcharacteriser_strikeit_hack_r), FUNC(mpu4vid_state::vidcharacteriser_w)).umask16(0x00ff);
-}
-
 
 void mpu4vid_state::mpu4oki_68k_map(address_map &map)
 {
@@ -2182,7 +2174,11 @@ uint8_t mpu4vid_state::strike_chr_next(uint8_t state, uint8_t col)
 	const bool g3  =  C3 &&  C4;             //                        11
 	const bool ACT = C0 || C1 || C2 || C5;   // non-reset write bits inside group g0
 
-	const bool O0 = C1 || C2 || C3 || C4 || C5; 	// bit 0  : function of the write only, independent of state
+	// The dumped PAL accepts issue 1, but the supplied questions are issue 3.
+	// Infer acceptance of issue 3 while preserving every other dumped response.
+	// This bit is masked by the boot test and is not used by the text decoder.
+	// TODO: verify the issue-select output against the PAL for issue 3 questions.
+	const bool O0 = (C1 && !C0) || C2 || C3 || C4 || C5;
 	const bool O1 = (C1 && g0) || (R1 && g2 && !C5) || (R2 && C0 && g3) || (!R3 && !C1 && g1); // bit 1
 	const bool O2 = R1 && NZ; // bit 2  : previous state bit 1, held unless reset  (latch)
 	const bool O3 = (R1 && g0 && ACT) || (R2 && !R3 && g2) || (C0 && !C1 && g3) || (!R4 && R5 && g1); // bit 3
@@ -2196,7 +2192,6 @@ uint8_t mpu4vid_state::strike_chr_next(uint8_t state, uint8_t col)
 void mpu4vid_state::mpu4_vid_strike(machine_config& config)
 {
 	mpu4_vid(config);
-	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_68k_map_strike);
 
 	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_use_pal_equation(true);
@@ -2280,7 +2275,6 @@ uint8_t mpu4vid_state::barquest_chr_next(uint8_t state, uint8_t col)
 void mpu4vid_state::mpu4_vid_barquest(machine_config& config)
 {
 	mpu4_vid(config);
-	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_68k_map_strike);
 
 	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_use_pal_equation(true);
@@ -2426,25 +2420,6 @@ uint8_t mpu4vid_state::vidcharacteriser_r(offs_t offset)
 	return ret;
 }
 
-
-uint8_t mpu4vid_state::vidcharacteriser_strikeit_hack_r(offs_t offset)
-{
-	uint8_t ret = m_characteriser->read(offset);
-	// hack for v4strike, otherwise it reports questions as invalid, even if they decode properly
-	// is this a secondary security check, or are they mismatched for the version?
-	// it writes '03' to the characteriser, (the question revision or coincidence?)
-	// but expects 00 back for that check
-	if (m_videocpu->pcbase() == 0x32c4)
-	{
-		if (m_videocpu->state_int(M68K_A4) == 0xaab54)
-		{
-			printf("%s: HACK - change Strike It Lucky question revision from %02x to 0x00\n", machine().describe_context().c_str(), ret);
-			ret = 0x00;
-		}
-	}
-
-	return ret;
-}
 
 
 /*
@@ -4444,7 +4419,7 @@ ROM_START( v4strike )
 	ROM_LOAD16_BYTE( "sil.p5",  0x080000, 0x020000,  CRC(28bced09) SHA1(7ba5013f1e0f4e921581b23c4a1d4c005a043b66) )
 	ROM_LOAD16_BYTE( "sil.p6",  0x080001, 0x020000,  CRC(6f5fc296) SHA1(bd32a937581df6b5a4f08e6ef40c37a2b4278936) )
 
-	// these appear to be mismatched to the set above, and require a hack to boot
+	// Uses the inferred issue-3 acceptance in strike_chr_next.
 	ROM_LOAD16_BYTE( "silq-1.bin",  0x0c0000, 0x020000,  CRC(03332145) SHA1(1700f76622a4b195e3ce03d89b886060d7f3ba71) ) // ISSUE3 Q1 v3.1 ('N' questions) (normal)
 	ROM_LOAD16_BYTE( "silq-2.bin",  0x0c0001, 0x020000,  CRC(9659b0cb) SHA1(c573752ef40c8501907d0e41ed2d2566a2dddcb8) ) // ISSUE3 Q2 v3.1 ('N' questions)
 	ROM_LOAD16_BYTE( "silq-3.bin",  0x100000, 0x020000,  CRC(443a6c2d) SHA1(1c111d801d76b07cdfef2b465f7ac759331f1843) ) // ISSUE3 Q3 v3.1 ('N' questions)
@@ -4466,7 +4441,7 @@ ROM_START( v4striked )
 	ROM_LOAD16_BYTE( "sil.p5",  0x080000, 0x020000,  CRC(28bced09) SHA1(7ba5013f1e0f4e921581b23c4a1d4c005a043b66) )
 	ROM_LOAD16_BYTE( "sil.p6",  0x080001, 0x020000,  CRC(6f5fc296) SHA1(bd32a937581df6b5a4f08e6ef40c37a2b4278936) )
 
-	// these appear to be mismatched to the set above, and require a hack to boot
+	// Uses the inferred issue-3 acceptance in strike_chr_next.
 	ROM_LOAD16_BYTE( "silq-1.bin",  0x0c0000, 0x020000,  CRC(03332145) SHA1(1700f76622a4b195e3ce03d89b886060d7f3ba71) ) // ISSUE3 Q1 v3.1 ('N' questions) (normal)
 	ROM_LOAD16_BYTE( "silq-2.bin",  0x0c0001, 0x020000,  CRC(9659b0cb) SHA1(c573752ef40c8501907d0e41ed2d2566a2dddcb8) ) // ISSUE3 Q2 v3.1 ('N' questions)
 	ROM_LOAD16_BYTE( "silq-3.bin",  0x100000, 0x020000,  CRC(443a6c2d) SHA1(1c111d801d76b07cdfef2b465f7ac759331f1843) ) // ISSUE3 Q3 v3.1 ('N' questions)
