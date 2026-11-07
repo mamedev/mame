@@ -40,7 +40,9 @@ DEFINE_DEVICE_TYPE(PDC20268, pdc20268_device,   "pdc20268",   "Promise PDC20268 
 
 pdc20262_device::pdc20262_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pci_card_device(mconfig, type, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
 	, m_bios(*this, "bios")
+	, m_bus_master_config("bus_master", ENDIANNESS_LITTLE, 32, 32, 0, address_map_constructor(FUNC(pdc20262_device::bus_master_map), this))
 	, m_ide1(*this, "ide1")
 	, m_ide2(*this, "ide2")
 	, m_irqs(*this, "irqs")
@@ -76,6 +78,13 @@ const tiny_rom_entry *pdc20262_device::device_rom_region() const
 	return ROM_NAME(pdc20262);
 }
 
+device_memory_interface::space_config_vector pdc20262_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_bus_master_config)
+	};
+}
+
 
 void pdc20262_device::device_add_mconfig(machine_config &config)
 {
@@ -89,6 +98,7 @@ void pdc20262_device::device_add_mconfig(machine_config &config)
 		m_irq_state |= (state << 2);
 		m_irqs->in_w<0>(state);
 	});
+	m_ide1->set_bus_master_space(*this, DEVICE_SELF, AS_PROGRAM);
 
 	BUS_MASTER_IDE_CONTROLLER(config, m_ide2).options(ata_devices, nullptr, nullptr, false);
 	m_ide2->irq_handler().set([this] (int state) {
@@ -96,6 +106,24 @@ void pdc20262_device::device_add_mconfig(machine_config &config)
 		m_irq_state |= (state << 6);
 		m_irqs->in_w<1>(state);
 	});
+	m_ide2->set_bus_master_space(*this, DEVICE_SELF, AS_PROGRAM);
+}
+
+// The IDE channels master the PCI bus through this space.  The host bridge only picks
+// the bus master space when it starts, so look it up on every access.
+void pdc20262_device::bus_master_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(FUNC(pdc20262_device::bus_master_r), FUNC(pdc20262_device::bus_master_w));
+}
+
+u8 pdc20262_device::bus_master_r(offs_t offset)
+{
+	return get_pci_busmaster_space()->read_byte(offset);
+}
+
+void pdc20262_device::bus_master_w(offs_t offset, u8 data)
+{
+	get_pci_busmaster_space()->write_byte(offset, data);
 }
 
 // $1f0
@@ -166,15 +194,6 @@ void pdc20262_device::extra_map(address_map &map)
 void pdc20262_device::device_start()
 {
 	pci_card_device::device_start();
-
-	// use the host bridge's bus master DMA space
-	address_space *const bus_master_space = get_pci_busmaster_space();
-	if (!bus_master_space)
-	{
-		throw emu_fatalerror("%s: PCI bus master address space not configured\n", tag());
-	}
-	m_ide1->set_bus_master_space(*bus_master_space);
-	m_ide2->set_bus_master_space(*bus_master_space);
 
 	add_map(8, M_IO, FUNC(pdc20262_device::ide1_command_map));
 	add_map(4, M_IO, FUNC(pdc20262_device::ide1_control_map));
