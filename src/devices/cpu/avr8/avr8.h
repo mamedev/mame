@@ -711,7 +711,7 @@ protected:
 
 	struct interrupt_condition
 	{
-		uint8_t  m_intidx; 	     // one of the INTIDX_x universal interrupt mappings
+		uint8_t  m_intidx;       // one of the INTIDX_x universal interrupt mappings
 		uint8_t  m_intvector;    // interrupt vector number
 		uint8_t  m_intondev;     // interrupt is handled by a device (m_intreg, m_intmask, m_regindex, m_regmask all ignored)
 		uint8_t  m_intreg;       // register containing interrupt enable flag
@@ -798,7 +798,7 @@ protected:
 
 	// Interrupt handling size for the AVR8s is usually 2; some devices will only use 1
 	virtual uint8_t vector_size_in_words() const { return 2; }
-	
+
 	// memory access
 	inline void push(uint8_t val);
 	inline uint8_t pop();
@@ -818,16 +818,12 @@ protected:
 	template <int Reg> uint8_t reg_r() { return m_r[Reg]; }
 	template <int Reg> void reg_w(uint8_t data) { m_r[Reg] = data; }
 
-	// also temporary.
-	// m_r needs to be allocated 0x100 bytes exactly.
-	// not doing this corrupts the heap and causes weird crashes.
-	// so give the CPU a 32-byte window with the common registers
+	// also temporary; gives CPU access to ranges of registers (should be the first 32 bytes of m_r)
 	uint8_t regs_r(offs_t offset) { return m_r[offset]; }
 	void regs_w(offs_t offset, uint8_t data) { m_r[offset] = data; }
 
-
 	void set_interrupt_line(uint8_t intidx, uint8_t state);
-	
+
 	// for callback installation in devices; they can't call set_interrupt_line directly
 	template <uint8_t IntIdx>
 	void int_line_w(uint8_t state);
@@ -837,7 +833,7 @@ protected:
 	 * set it to fire.
 	 */
 	void set_interrupt(uint8_t intidx);
-	
+
 	/**
 	 * Clear interrupt flag for the given intidx. If the interrupt was pending,
 	 * then disable it.
@@ -1077,7 +1073,7 @@ protected:
 
 	template <int Port, int Bit>
 	void set_gpio_bit(uint8_t data);
-	
+
 	// ADC
 	uint8_t adcl_r();
 	void adcl_w(uint8_t data);
@@ -1152,7 +1148,7 @@ protected:
 	void gtccr_w(uint8_t data);
 	uint8_t gtccr_r();
 
-	void megaavr_classic_base_internal_map(address_map &map);
+	void megaavr_classic_base_internal_map(address_map &map) ATTR_COLD;
 
 	// GTCCR flags, MUST BE SAVESTATE-ABLE
 	bool m_tsm;
@@ -1191,8 +1187,8 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	
-	void atmegax8_base_internal_map(address_map &map);
+
+	void atmegax8_base_internal_map(address_map &map) ATTR_COLD;
 
 };
 
