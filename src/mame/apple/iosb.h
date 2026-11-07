@@ -41,6 +41,7 @@ public:
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
 	template <typename... T> void set_scsi_tag(T &&... args) { m_ncr.set_tag(std::forward<T>(args)...); }
 	template <typename... T> void set_capella_tag(T &&... args) { m_capella.set_tag(std::forward<T>(args)...); }
+	void set_via2_sync(bool sync) { m_via2_sync = sync; }
 
 	void pb3_w(int state) { m_adb_interrupt = state; }
 	void cb1_w(int state);  // ADB clock
@@ -97,6 +98,7 @@ protected:
 private:
 	emu_timer *m_6015_timer;
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
+	bool m_via2_sync;
 	floppy_image_device *m_cur_floppy = nullptr;
 	int m_hdsel;
 	int m_adb_interrupt;
