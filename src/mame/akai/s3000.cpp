@@ -380,7 +380,7 @@ void s3000_state::floppy_led_cb(floppy_image_device *, int state)
 uint8_t s3000_state::fdc_hc365_r()
 {
 	const auto imagedev = m_floppy->get_device();
-	return (imagedev->floppy_is_hd() ? 0x04 : 0x00) | imagedev->dskchg_r();
+	return (imagedev->floppy_is_hd() ? 0x00 : 0x04) | imagedev->dskchg_r();
 }
 
 static constexpr uint8_t s3000_memory_magic[9*8] =
