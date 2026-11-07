@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Peter Wilhelmsen
 #ifndef MAME_BUS_DIGIBLAST_SLOT_H
 #define MAME_BUS_DIGIBLAST_SLOT_H
 
@@ -21,6 +21,7 @@ public:
 	virtual void i2c_scl_w(int state) = 0;
 	virtual u32 rom_size() const = 0;
 	virtual void set_rom(const u8 *data, u32 size) = 0;
+	virtual memory_region* get_default_eeprom_region() = 0;
 
 protected:
 	device_digiblast_cart_interface(const machine_config &mconfig, device_t &device);

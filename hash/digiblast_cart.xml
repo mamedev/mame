@@ -48,10 +48,14 @@ license:CC0-1.0
 			<dataarea name="rom" size="0x2100000">
 				<rom name="winx club + 5 atari games [v g] (it es).bin" size="0x2100000" crc="6b5ca82e" sha1="e934ace84ba44defb4e4c0967236ad8803837409" />
 			</dataarea>
+			<!-- requires 00 fill for the high score tables to work, ff fill (which would be the device default) gives corrupt tables, random fill crashes the game.  game doesn't initialize this -->
+			<dataarea name="eeprom" size="0x400">
+				<rom name="default_eeprom" size="0x400" crc="efb5af2e" sha1="60cacbf3d72e1e7834203da608037b1bf83b40e8" />  <!-- handcrafted -->
+			</dataarea>
 		</part>
 	</software>
 
-	<software name="wxataria" cloneof="wxatari" supported="no">
+	<software name="wxataria" cloneof="wxatari">
 		<description>Winx Club + 5 Atari Games (Italian / Spanish, set 2)</description>
 		<year>2005</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
@@ -59,6 +63,10 @@ license:CC0-1.0
 			<feature name="slot" value="nand_64m" />
 			<dataarea name="rom" size="0x4200000">
 				<rom name="winx club + 5 atari games (ita esp).bin" size="0x4200000" crc="09897866" sha1="df1b42368ae776d9028a27796874d5830bfd38c2" />
+			</dataarea>
+			<!-- requires 00 fill for the high score tables to work, ff fill (which would be the device default) gives corrupt tables, random fill crashes the game.  game doesn't initialize this -->
+			<dataarea name="eeprom" size="0x400">
+				<rom name="default_eeprom" size="0x400" crc="efb5af2e" sha1="60cacbf3d72e1e7834203da608037b1bf83b40e8" />  <!-- handcrafted -->
 			</dataarea>
 		</part>
 	</software>
@@ -73,6 +81,10 @@ license:CC0-1.0
 				<!-- SquashFS data for the launcher fails decompression independently of emulation. -->
 				<rom name="winx club + 5 atari games [v g] (nl fr de tr).bin" size="0x2100000" status="baddump" crc="eb1d8fda" sha1="f192ffe38eadcc8e3b9b59db76379806e400892f" />
 			</dataarea>
+			<!-- requires 00 fill for the high score tables to work, ff fill (which would be the device default) gives corrupt tables, random fill crashes the game.  game doesn't initialize this -->
+			<dataarea name="eeprom" size="0x400">
+				<rom name="default_eeprom" size="0x400" crc="efb5af2e" sha1="60cacbf3d72e1e7834203da608037b1bf83b40e8" />  <!-- handcrafted -->
+			</dataarea>
 		</part>
 	</software>
 
@@ -85,12 +97,17 @@ license:CC0-1.0
 			<dataarea name="rom" size="0x2100000">
 				<rom name="sponge bob 5 atari games [v g] (it es).bin" size="0x2100000" crc="69ab74c0" sha1="f454bc13b5b2cde1dcee1cc6a5861ee0e9bc032c" />
 			</dataarea>
+			<!-- requires 00 fill for the high score tables to work, ff fill (which would be the device default) gives corrupt tables, random fill crashes the game.  game doesn't initialize this -->
+			<dataarea name="eeprom" size="0x400">
+				<rom name="default_eeprom" size="0x400" crc="efb5af2e" sha1="60cacbf3d72e1e7834203da608037b1bf83b40e8" />  <!-- handcrafted -->
+			</dataarea>
 		</part>
 	</software>
 
 	<!-- Games only -->
 
-	<software name="crzyjack">
+	<!-- bad video format in TV mode? -->
+	<software name="crzyjack" supported="partial">
 		<description>Crazy Jack</description>
 		<year>200?</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
@@ -107,9 +124,13 @@ license:CC0-1.0
 		<year>200?</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
-			<feature name="slot" value="nand_64m_r" />
+			<feature name="slot" value="nand_64m" />
 			<dataarea name="rom" size="0x4200000">
 				<rom name="cuccioli cerca amici [g] (it).bin" size="0x4200000" crc="40a18574" sha1="7d5d2201a0f93b083ea32e116da8d2fe530f36f5" />
+			</dataarea>
+			<!-- requires random data to init, 00 fill won't allow saves to be created, nothing is unlocked, ff fill mame has everything unlocked, use a handcrafted default -->
+			<dataarea name="eeprom" size="0x400">
+				<rom name="default_eeprom" size="0x400" crc="24806acb" sha1="8fe4a314db0f4b12aafb3ab8cd83a9fed50ca8db" />
 			</dataarea>
 		</part>
 	</software>
@@ -131,14 +152,19 @@ license:CC0-1.0
 		<year>200?</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
-			<feature name="slot" value="nand_32m_r" />
+			<feature name="slot" value="nand_32m" />
 			<dataarea name="rom" size="0x2100000">
 				<rom name="gormiti lotta oscura [g] (it).bin" size="0x2100000" crc="d11135f5" sha1="9538995c2fd9344be1e3b64c754488fac7ad3985" />
+			</dataarea>
+			<!-- requires random data to init or doesn't allow you to create a save -->
+			<dataarea name="eeprom" size="0x400">
+				<rom name="default_eeprom" size="0x400" crc="24806acb" sha1="8fe4a314db0f4b12aafb3ab8cd83a9fed50ca8db" /> <!-- handcrafted -->
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="gormitim">
+	<!-- too fast in LCD mode? -->
+	<software name="gormitim" supported="partial">
 		<description>Gormiti Masters of the Gorm Island (Italian)</description>
 		<year>200?</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
@@ -198,14 +224,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wadehix">
+	<!-- too slow in TV mode? -->
+	<software name="wadehix" supported="partial">
 		<description>Wade Hixton's Counter Punch</description>
 		<year>200?</year>
 		<publisher>Nikko Entertainment B.V. / Grey Innovation</publisher>
 		<part name="cart" interface="digiblast_cart">
-			<feature name="slot" value="nand_16m_r" />
+			<feature name="slot" value="nand_16m" />
 			<dataarea name="rom" size="0x1080000">
 				<rom name="wade hixtons counter punch [g] (en).bin" size="0x1080000" crc="eba2a2c3" sha1="10e52e59d0be41db6f1e9ba4d895237569890c22" />
+			</dataarea>
+			<!-- requires random data to init or doesn't allow you to create a save -->
+			<dataarea name="eeprom" size="0x400">
+				<rom name="default_eeprom" size="0x400" crc="24806acb" sha1="8fe4a314db0f4b12aafb3ab8cd83a9fed50ca8db" />  <!-- handcrafted -->
 			</dataarea>
 		</part>
 	</software>

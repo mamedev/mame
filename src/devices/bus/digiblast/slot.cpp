@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Peter Wilhelmsen
 
 #include "emu.h"
 #include "slot.h"
@@ -40,6 +40,22 @@ std::pair<std::error_condition, std::string> digiblast_cart_slot_device::call_lo
 	if (size != m_cart->rom_size())
 		return std::make_pair(image_error::INVALIDLENGTH, "Image size does not match the cartridge NAND (512 data bytes and 16 spare bytes per page)");
 
+	memory_region *default_eeprom = loaded_through_softlist() ? memregion("eeprom") : nullptr;
+
+	if (default_eeprom)
+	{
+		u64 const default_eeprom_size = default_eeprom->bytes();
+		if (default_eeprom_size != 0x400)
+			return std::make_pair(image_error::INVALIDLENGTH, "Default EEPROM size must be 0x400");
+
+		memory_region* default_region = m_cart->get_default_eeprom_region();
+
+		if (default_region)
+		{
+			memcpy(default_region->base(), default_eeprom->base(), default_eeprom_size);
+		}
+	}
+
 	if (!loaded_through_softlist())
 	{
 		region = machine().memory().region_alloc(subtag("rom"), size, 1, ENDIANNESS_LITTLE);
@@ -78,11 +94,8 @@ std::string digiblast_cart_slot_device::get_default_card_software(get_default_ca
 void digiblast_cart(device_slot_interface &device)
 {
 	device.option_add_internal("nand_16m", DIGIBLAST_NAND_16M);
-	device.option_add_internal("nand_16m_r", DIGIBLAST_NAND_16M_R);
 	device.option_add_internal("nand_32m", DIGIBLAST_NAND_32M);
-	device.option_add_internal("nand_32m_r", DIGIBLAST_NAND_32M_R);
 	device.option_add_internal("nand_64m", DIGIBLAST_NAND_64M);
-	device.option_add_internal("nand_64m_r", DIGIBLAST_NAND_64M_R);
 }
 
 bool digiblast_cart_slot_device::is_reset_on_load() const noexcept

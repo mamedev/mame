@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz, Peter Wilhelmsen
+// copyright-holders:Ryan Holtz
 /***************************************************************************
 
     Cirrus Logic CS43L43 I2S Stereo DAC
