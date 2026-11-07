@@ -719,7 +719,7 @@ void primetimeii_device::map(address_map &map)
 void primetimeiii_device::map(address_map &map)
 {
 	primetimeii_device::map(map);
-	map(0x00015000, 0x00015fff).rw("asc", FUNC(asc_primetime3_device::read16), FUNC(asc_primetime3_device::write16)).mirror(0x00f00000);
+	map(0x00015000, 0x00015fff).rw(m_asc, FUNC(asc_primetime3_device::read16), FUNC(asc_primetime3_device::write16)).mirror(0x00f00000);
 }
 
 // This may actually be in F108, the boundaries between the two chips aren't completely clear

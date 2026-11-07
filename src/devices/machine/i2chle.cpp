@@ -57,6 +57,16 @@ bool i2c_hle_interface::reset_pointer_on_stop() const
 	return true;
 }
 
+bool i2c_hle_interface::one_byte_transfers() const
+{
+	return false;
+}
+
+bool i2c_hle_interface::subaddress_valid(u8 subaddress) const
+{
+	return true;
+}
+
 void i2c_hle_interface::interface_post_start()
 {
 	m_latch = m_bit = 0;

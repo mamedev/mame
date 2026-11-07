@@ -200,7 +200,7 @@ void pmac6200_state::pmac6200(machine_config &config)
 
 	F108(config, m_f108, 75_MHz_XTAL / 2); // 68040 bus speed is 37.5 MHz, same as the FSB
 	m_f108->set_maincpu_tag("maincpu");
-	m_f108->set_primetimeii_tag("primetimeiii");
+	m_f108->set_primetimeii_tag(m_primetimeiii);
 	m_f108->write_ata_irq().set(m_primetimeiii, FUNC(primetimeii_device::ata_irq_w));
 
 	NSCSI_CONNECTOR(config, "f108:scsi:0", mac_scsi_devices, nullptr);
@@ -268,7 +268,7 @@ void pmac6200_state::pmac6200(machine_config &config)
 	for (int i = 0; i < 4; i++)
 		m_dfac2->rec(i).lookup()->add_route(0, asc, 1.0);
 	// The board's reconstruction low-pass is modeled as two RC stages, with corners fitted to the line output of a Performa 6200CD
-	static const char *const LPF_TAGS[2][2] = { { "lpf1_l", "lpf_l" }, { "lpf1_r", "lpf_r" } };
+	static constexpr const char *const LPF_TAGS[2][2] = { { "lpf1_l", "lpf_l" }, { "lpf1_r", "lpf_r" } };
 	for (int ch = 0; ch < 2; ch++)
 	{
 		FILTER_RC(config, LPF_TAGS[ch][0]).set_lowpass(RES_K(1), 1.0 / (2.0 * std::numbers::pi * RES_K(1) * 2270.0))

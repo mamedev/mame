@@ -237,13 +237,14 @@ protected:
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 private:
 	enum { FIFO_A, FIFO_B, FIFO_REC };
-	static constexpr unsigned FIFO_SAMPLES = 1024;
-	static constexpr unsigned FIFO_BYTES = FIFO_SAMPLES * 2;
-	static constexpr unsigned FIFO_HALF_BYTES = FIFO_BYTES / 2;
-	static constexpr unsigned FIFO_PTR_MASK = FIFO_BYTES - 1;
+	static constexpr u32 FIFO_SAMPLES = 1024;
+	static constexpr u32 FIFO_BYTES = FIFO_SAMPLES * 2;
+	static constexpr u32 FIFO_HALF_BYTES = FIFO_BYTES / 2;
+	static constexpr u32 FIFO_PTR_MASK = FIFO_BYTES - 1;
 
 	enum
 	{
@@ -259,7 +260,9 @@ private:
 	u16 fifo_cap(int f) const;
 	void push_byte(int f, u8 data);
 	void push_sample(int f, s16 sample);
+	s16 peek_sample(int f) const;
 	s16 pop_sample(int f);
+	void set_irq_pending(u8 pending);
 	void update_status16();
 	void update_fifo_timer();
 	u8 counter_value() const;
@@ -268,13 +271,13 @@ private:
 	u16 &pointer(offs_t offset);
 	bool recording() const { return BIT(m_regs[R_PLAYRECA], 0); }
 
-	u8 m_fifo8[3][FIFO_BYTES]{};
-	u16 m_rdptr16[3]{}, m_wrptr16[3]{};
-	bool m_full[3]{};
-	u8 m_laststat = 0;
-	u8 m_irq_pending = 0;
-	u8 m_countbase = 0;
-	u16 m_rec_last = 0x8000;
+	u8 m_fifo8[3][FIFO_BYTES];
+	u16 m_rdptr16[3], m_wrptr16[3];
+	bool m_full[3];
+	u8 m_laststat;
+	u8 m_irq_pending;
+	u8 m_countbase;
+	u16 m_rec_last;
 };
 
 // device type definition

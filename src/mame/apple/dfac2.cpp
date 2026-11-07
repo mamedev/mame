@@ -24,6 +24,11 @@
 #include "emu.h"
 #include "dfac2.h"
 
+#include <algorithm>
+#include <cmath>
+#include <iterator>
+#include <string>
+
 #define VERBOSE (0)
 
 #include "logmacro.h"
@@ -61,7 +66,7 @@ dfac2_device::dfac2_device(const machine_config &mconfig, const char *tag, devic
 
 void dfac2_device::device_add_mconfig(machine_config &config)
 {
-	for (unsigned ch = 0; ch < 2; ch++)
+	for (u32 ch = 0; ch < 2; ch++)
 	{
 		const std::string filter1 = util::string_format("filter1_%u", ch);
 		const std::string filter2 = util::string_format("filter2_%u", ch);
@@ -76,7 +81,7 @@ void dfac2_device::device_add_mconfig(machine_config &config)
 			.add_route(0, *this, 1.0, ch);
 	}
 
-	for (unsigned i = 0; i < 4; i++)
+	for (u32 i = 0; i < 4; i++)
 		FILTER_VOLUME(config, m_rec[i]);
 }
 
@@ -114,7 +119,7 @@ void dfac2_device::update_controls()
 		gain *= 0.5;
 
 	const bool filter = BIT(m_regs[0x0f], 7);
-	for (unsigned ch = 0; ch < 2; ch++)
+	for (u32 ch = 0; ch < 2; ch++)
 	{
 		m_dac[ch]->set_gain(gain * ((ch && BIT(m_regs[0x0c], 7)) ? atten_table[4] : 1.0));
 		m_dac[ch]->set_route_gain(0, this, ch, filter ? 0.0 : 1.0);
@@ -124,7 +129,7 @@ void dfac2_device::update_controls()
 
 	const u8 source = m_regs[0x0e] & 7;
 	const double rec_gain = 0.5 * std::pow(10.0, (1.5 * (m_regs[0x08] & 0x1f) - 8.0) / 20.0);
-	for (unsigned i = 0; i < 4; i++)
+	for (u32 i = 0; i < 4; i++)
 		m_rec[i]->set_gain((source == ((i < 2) ? 4 : 3)) ? rec_gain : 0.0);
 }
 
@@ -155,6 +160,11 @@ void dfac2_device::update_controls()
     0x0f    - bit 7 switches in the 7kHz output filter; the other bits are input settings
     0x10    - read only: bit 5 = something plugged into sound out, bit 7 = sound in
 */
+
+bool dfac2_device::one_byte_transfers() const
+{
+	return true;
+}
 
 bool dfac2_device::subaddress_valid(u8 subaddress) const
 {

@@ -85,6 +85,9 @@
 
 #include "multibyte.h"
 
+#include <algorithm>
+#include <iterator>
+
 // device type definition
 DEFINE_DEVICE_TYPE(ASC, asc_device, "asc", "Apple Sound Chip")
 DEFINE_DEVICE_TYPE(ASC_V8, asc_v8_device, "asc_v8", "Apple Sound Chip, V8 variant")
@@ -314,7 +317,8 @@ u8 asc_base_device::read(offs_t offset)
 	}
 	else
 	{
-		m_stream->update();
+		if (!machine().side_effects_disabled())
+			m_stream->update();
 		switch (offset - 0x800)
 		{
 			case R_VERSION:
@@ -1428,6 +1432,7 @@ void asc_primetime3_device::device_reset()
 	m_regs[R_FIFOA_IRQCTRL] = m_regs[R_FIFOB_IRQCTRL] = 1;
 	m_laststat = 0;
 	m_irq_pending = 0;
+	set_irq_line(CLEAR_LINE);
 	m_countbase = 0;
 	m_rec_last = 0x8000;
 
@@ -1435,6 +1440,11 @@ void asc_primetime3_device::device_reset()
 	m_regs[R_VOLUME] = 0xee;
 
 	update_status16();
+}
+
+void asc_primetime3_device::device_post_load()
+{
+	set_irq_line(m_irq_pending ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void asc_primetime3_device::reset_fifos()
@@ -1465,12 +1475,25 @@ void asc_primetime3_device::push_sample(int f, s16 sample)
 	push_byte(f, u8(sample));
 }
 
+s16 asc_primetime3_device::peek_sample(int f) const
+{
+	return s16((m_fifo8[f][m_rdptr16[f]] << 8) | m_fifo8[f][(m_rdptr16[f] + 1) & FIFO_PTR_MASK]);
+}
+
 s16 asc_primetime3_device::pop_sample(int f)
 {
-	const s16 sample = s16((m_fifo8[f][m_rdptr16[f]] << 8) | m_fifo8[f][(m_rdptr16[f] + 1) & FIFO_PTR_MASK]);
+	const s16 sample = peek_sample(f);
 	m_rdptr16[f] = (m_rdptr16[f] + 2) & FIFO_PTR_MASK;
 	m_full[f] = false;
 	return sample;
+}
+
+void asc_primetime3_device::set_irq_pending(u8 pending)
+{
+	const bool changed = !m_irq_pending != !pending;
+	m_irq_pending = pending;
+	if (changed)
+		set_irq_line(pending ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void asc_primetime3_device::update_status16()
@@ -1500,19 +1523,19 @@ void asc_primetime3_device::update_status16()
 		st |= STAT_EMPTY_OR_FULL_B;
 	}
 
-	m_irq_pending &= st;
+	u8 pending = m_irq_pending & st;
 
 	if ((st & STAT_HALF_FULL_B) && !(m_laststat & STAT_HALF_FULL_B) && !(m_regs[R_FIFOB_IRQCTRL] & 1))
 	{
-		m_irq_pending |= STAT_HALF_FULL_B;
+		pending |= STAT_HALF_FULL_B;
 	}
 
 	if ((st & STAT_HALF_FULL_A) && !(m_laststat & STAT_HALF_FULL_A) && !(m_regs[R_FIFOA_IRQCTRL] & 1))
 	{
-		m_irq_pending |= STAT_HALF_FULL_A;
+		pending |= STAT_HALF_FULL_A;
 	}
 
-	set_irq_line(m_irq_pending ? ASSERT_LINE : CLEAR_LINE);
+	set_irq_pending(pending);
 	m_laststat = st;
 	m_regs[R_FIFOSTAT] = st;
 	update_fifo_timer();
@@ -1540,7 +1563,7 @@ u16 asc_primetime3_device::read16(offs_t offset)
 		return pop_record();
 	}
 
-	return (m_fifo8[ch][m_rdptr16[ch]] << 8) | m_fifo8[ch][(m_rdptr16[ch] + 1) & FIFO_PTR_MASK];
+	return u16(peek_sample(ch));
 }
 
 int asc_primetime3_device::pointer_fifo(offs_t offset) const
@@ -1557,14 +1580,14 @@ u16 &asc_primetime3_device::pointer(offs_t offset)
 
 u16 asc_primetime3_device::pop_record()
 {
-	if (!machine().side_effects_disabled())
+	if (machine().side_effects_disabled())
+		return (fifo_cap(FIFO_REC) >= 2) ? u16(peek_sample(FIFO_REC)) : m_rec_last;
+
+	m_stream->update();
+	if (fifo_cap(FIFO_REC) >= 2)
 	{
-		m_stream->update();
-		if (fifo_cap(FIFO_REC) >= 2)
-		{
-			m_rec_last = u16(pop_sample(FIFO_REC));
-			update_status16();
-		}
+		m_rec_last = u16(pop_sample(FIFO_REC));
+		update_status16();
 	}
 
 	return m_rec_last;
@@ -1739,12 +1762,13 @@ void asc_primetime3_device::write(offs_t offset, u8 data)
 			m_stream->update();
 			const int ch = BIT(offset, 5);
 			const u8 mask = ch ? STAT_HALF_FULL_B : STAT_HALF_FULL_A;
+			u8 pending = m_irq_pending;
 			if (data & 1)
-				m_irq_pending &= ~mask;
+				pending &= ~mask;
 			else if (m_regs[offset - 0x800] & 1)
-				m_irq_pending |= m_regs[R_FIFOSTAT] & mask;
+				pending |= m_regs[R_FIFOSTAT] & mask;
 			m_regs[offset - 0x800] = data & 1;
-			set_irq_line(m_irq_pending ? ASSERT_LINE : CLEAR_LINE);
+			set_irq_pending(pending);
 			update_fifo_timer();
 			return;
 		}
