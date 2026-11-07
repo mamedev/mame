@@ -5,24 +5,33 @@
 
 #include <algorithm>
 
+#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(I82439TX, i82439tx_host_device, "i82439tx", "Intel 82439TX northbridge")
 
 void i82439tx_host_device::config_map(address_map &map)
 {
 	pci_host_device::config_map(map);
+	map(0x10, 0x4f).noprw();
+	map(0x4f, 0x4f).rw(FUNC(i82439tx_host_device::acon_r), FUNC(i82439tx_host_device::acon_w));
 	map(0x50, 0x50).rw(FUNC(i82439tx_host_device::pcon_r), FUNC(i82439tx_host_device::pcon_w));
 	map(0x52, 0x52).rw(FUNC(i82439tx_host_device::cc_r), FUNC(i82439tx_host_device::cc_w));
+	map(0x53, 0x53).rw(FUNC(i82439tx_host_device::cec_r), FUNC(i82439tx_host_device::cec_w));
+	map(0x54, 0x55).rw(FUNC(i82439tx_host_device::sdramc_r), FUNC(i82439tx_host_device::sdramc_w));
 	map(0x56, 0x56).rw(FUNC(i82439tx_host_device::dramec_r), FUNC(i82439tx_host_device::dramec_w));
 	map(0x57, 0x57).rw(FUNC(i82439tx_host_device::dramc_r), FUNC(i82439tx_host_device::dramc_w));
 	map(0x58, 0x58).rw(FUNC(i82439tx_host_device::dramt_r), FUNC(i82439tx_host_device::dramt_w));
 	map(0x59, 0x5f).rw(FUNC(i82439tx_host_device::pam_r), FUNC(i82439tx_host_device::pam_w));
-	map(0x60, 0x67).rw(FUNC(i82439tx_host_device::drb_r), FUNC(i82439tx_host_device::drb_w));
-	map(0x68, 0x68).rw(FUNC(i82439tx_host_device::drt_r), FUNC(i82439tx_host_device::drt_w));
-	map(0x69, 0x69).rw(FUNC(i82439tx_host_device::drat_r), FUNC(i82439tx_host_device::drat_w));
+	map(0x60, 0x65).rw(FUNC(i82439tx_host_device::drb_r), FUNC(i82439tx_host_device::drb_w));
+	map(0x67, 0x67).rw(FUNC(i82439tx_host_device::drth_r), FUNC(i82439tx_host_device::drth_w));
+	map(0x68, 0x68).rw(FUNC(i82439tx_host_device::drtl_r), FUNC(i82439tx_host_device::drtl_w));
+	// map(0x70, 0x70) MTT test mode register & 0xfc
+	map(0x71, 0x71).rw(FUNC(i82439tx_host_device::esmramc_r), FUNC(i82439tx_host_device::esmramc_w));
 	map(0x72, 0x72).rw(FUNC(i82439tx_host_device::smram_r), FUNC(i82439tx_host_device::smram_w));
-	map(0x90, 0x90).rw(FUNC(i82439tx_host_device::errcmd_r), FUNC(i82439tx_host_device::errcmd_w));
-	map(0x91, 0x91).rw(FUNC(i82439tx_host_device::errsts_r), FUNC(i82439tx_host_device::errsts_w));
-	map(0x92, 0x92).r(FUNC(i82439tx_host_device::errsyn_r));
+	map(0x79, 0x79).rw(FUNC(i82439tx_host_device::mctl_r), FUNC(i82439tx_host_device::mctl_w));
 }
 
 i82439tx_host_device::i82439tx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -50,7 +59,11 @@ void i82439tx_host_device::device_start()
 	io_window_start = 0;
 	io_window_end   = 0xffff;
 	io_offset       = 0;
-	status = 0x0010;
+	// Bus Master hardwired to 1, allow setting Memory Access to 0
+	command = 0x0006;
+	command_mask = 0x0002;
+	// Medium DEVSEL#
+	status = 0x0200;
 
 	if (m_ram_dev)
 	{
@@ -62,6 +75,22 @@ void i82439tx_host_device::device_start()
 		ram.resize(ram_size/4);
 		m_ram = ram.data();
 	}
+
+	save_item(NAME(acon));
+	save_item(NAME(pcon));
+	save_item(NAME(cc));
+	save_item(NAME(cec));
+	save_item(NAME(sdramc));
+	save_item(NAME(dramec));
+	save_item(NAME(dramc));
+	save_item(NAME(dramt));
+	save_item(NAME(pam));
+	save_item(NAME(drb));
+	save_item(NAME(drt));
+	save_item(NAME(drth));
+	save_item(NAME(smram));
+	save_item(NAME(mctl));
+	save_item(NAME(smiact_n));
 }
 
 void i82439tx_host_device::reset_all_mappings()
@@ -73,19 +102,23 @@ void i82439tx_host_device::device_reset()
 {
 	pci_host_device::device_reset();
 
+	acon = 0x00;
 	pcon = 0x00;
-	cc = 0xa2;
+	// TODO: strapping option, disable cache for now
+	cc = 0x02;
+	cec = 0x14;
+	sdramc = 0x0000;
 	dramec = 0x00;
 	dramc = 0x01;
 	dramt = 0x00;
 	memset(pam, 0x00, sizeof(pam));
 	memset(drb, 0x02, sizeof(drb));
 	drt = 0x00;
-	drat = 0x00;
+	// TODO: strapping option (1 = 66 MHz)
+	drth = 0x80;
+	esmramc = 0x00;
 	smram = 0x02;
-	errcmd = 0x00;
-	errsts = 0x00;
-	errsyn = 0x00;
+	mctl = 0x00;
 	smiact_n = true;
 }
 
@@ -110,6 +143,7 @@ void i82439tx_host_device::map_extra(uint64_t memory_window_start, uint64_t memo
 				memory_space->install_ram(0x000a0000, 0x000bffff, &m_ram[0x000a0000 / 4]);
 	}
 
+	// TODO: cleanup this block
 	if(pam[1] & 0x01)
 		memory_space->install_rom      (0x000c0000, 0x000c3fff, &m_ram[0x000c0000/4]);
 	if(pam[1] & 0x02)
@@ -175,6 +209,17 @@ void i82439tx_host_device::map_extra(uint64_t memory_window_start, uint64_t memo
 }
 
 
+uint8_t i82439tx_host_device::acon_r()
+{
+	return acon;
+}
+
+void i82439tx_host_device::acon_w(uint8_t data)
+{
+	acon = data & 0x80;
+	LOG("acon = %02x -> %02x\n", data, acon);
+}
+
 uint8_t i82439tx_host_device::pcon_r()
 {
 	return pcon;
@@ -182,8 +227,8 @@ uint8_t i82439tx_host_device::pcon_r()
 
 void i82439tx_host_device::pcon_w(uint8_t data)
 {
-	pcon = data;
-	logerror("pcon = %02x\n", pcon);
+	pcon = data & 0x08;
+	LOG("pcon = %02x -> %02x\n", data, pcon);
 }
 
 uint8_t i82439tx_host_device::cc_r()
@@ -191,10 +236,45 @@ uint8_t i82439tx_host_device::cc_r()
 	return cc;
 }
 
+// xx-- ---- SCS Secondary cache (strapped)
+// 00-- ---- Cache not populated
+// 01-- ---- 256 Kbytes
+// 10-- ---- 512 Kbytes
+// 11-- ---- <reserved>
+// --xx ---- L2SRAMT L2 SRAM Type (strapped)
+// --00 ---- Pipelined Burst SRAM
+// --11 ---- Two Banks of Pipelined Burst
+// ---- x--- NAD NA Disable
+// ---- --x- SCFMI Secondary Cache Force Miss or Invalidate
+// ---- ---x FLCE First Level Cache Enable
 void i82439tx_host_device::cc_w(uint8_t data)
 {
-	cc = data;
-	logerror("cc = %02x\n", cc);
+	cc = data & 0xfb;
+	LOG("cc = %02x -> %02x\n", data, cc);
+}
+
+uint8_t i82439tx_host_device::cec_r()
+{
+	// TODO: bit 5: DRAM CACHE L2 Present (read only)
+	return cec;
+}
+
+void i82439tx_host_device::cec_w(uint8_t data)
+{
+	cec = data & 0x1f;
+	LOG("cec = %02x -> %02x\n", data, cec);
+}
+
+uint16_t i82439tx_host_device::sdramc_r()
+{
+	return sdramc;
+}
+
+void i82439tx_host_device::sdramc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&sdramc);
+	sdramc &= 0x01fa;
+	LOG("sdramc = %04x & %04x -> %04x\n", data, mem_mask, sdramc);
 }
 
 uint8_t i82439tx_host_device::dramec_r()
@@ -204,8 +284,8 @@ uint8_t i82439tx_host_device::dramec_r()
 
 void i82439tx_host_device::dramec_w(uint8_t data)
 {
-	dramec = data;
-	logerror("dramec = %02x\n", dramec);
+	dramec = data & 0x76;
+	LOG("dramec = %02x -> %02x\n", data, dramec);
 }
 
 uint8_t i82439tx_host_device::dramc_r()
@@ -215,8 +295,8 @@ uint8_t i82439tx_host_device::dramc_r()
 
 void i82439tx_host_device::dramc_w(uint8_t data)
 {
-	dramc = data;
-	logerror("dramc = %02x\n", dramc);
+	dramc = data & 0xdf;
+	LOG("dramc = %02x -> %02x\n", data, dramc);
 	remap_cb();
 }
 
@@ -227,8 +307,8 @@ uint8_t i82439tx_host_device::dramt_r()
 
 void i82439tx_host_device::dramt_w(uint8_t data)
 {
-	dramt = data;
-	logerror("dramt = %02x\n", dramt);
+	dramt = data & 0x7b;
+	LOG("dramt = %02x -> %02x\n", data, dramt);
 }
 
 uint8_t i82439tx_host_device::pam_r(offs_t offset)
@@ -239,7 +319,9 @@ uint8_t i82439tx_host_device::pam_r(offs_t offset)
 void i82439tx_host_device::pam_w(offs_t offset, uint8_t data)
 {
 	pam[offset] = data;
-	logerror("pam[%d] = %02x\n", offset, pam[offset]);
+	if (offset == 0)
+		pam[offset] &= 0xf0;
+	LOG("pam[%d] = %02x -> %02x\n", offset, data, pam[offset]);
 	remap_cb();
 }
 
@@ -250,30 +332,48 @@ uint8_t i82439tx_host_device::drb_r(offs_t offset)
 
 void i82439tx_host_device::drb_w(offs_t offset, uint8_t data)
 {
-	drb[offset] = data;
-	logerror("drb[%d] = %02x\n", offset, drb[offset]);
+	drb[offset] = data & 0x7f;
+	LOG("drb[%d] = %02x -> %02x\n", offset, data, drb[offset]);
 }
 
-uint8_t i82439tx_host_device::drt_r()
+uint8_t i82439tx_host_device::drth_r()
+{
+	return drth;
+}
+
+void i82439tx_host_device::drth_w(uint8_t data)
+{
+	// not explicitly mentioned but assume HFD not really writeable
+	drth = (data & 0x37) | (drth & 0x80);
+	LOG("drth = %02x -> %02x\n", data, drth);
+}
+
+uint8_t i82439tx_host_device::drtl_r()
 {
 	return drt;
 }
 
-void i82439tx_host_device::drt_w(uint8_t data)
+void i82439tx_host_device::drtl_w(uint8_t data)
 {
 	drt = data;
-	logerror("drt = %02x\n", drt);
+	LOG("drtl = %02x\n", drt);
 }
 
-uint8_t i82439tx_host_device::drat_r()
+uint8_t i82439tx_host_device::esmramc_r()
 {
-	return drat;
+	return esmramc;
 }
 
-void i82439tx_host_device::drat_w(uint8_t data)
+void i82439tx_host_device::esmramc_w(uint8_t data)
 {
-	drat = data;
-	logerror("drat = %02x\n", drat);
+	esmramc = data;
+	LOG("esmramc = %02x\n", esmramc);
+	// TODO: maps high SMRAM to appear at $100a'0000 ~ $100f'0000
+	if (BIT(esmramc, 7))
+	{
+		LOG("Warning H_SMRAME enabled\n");
+		// remap_cb();
+	}
 }
 
 uint8_t i82439tx_host_device::smram_r()
@@ -283,36 +383,22 @@ uint8_t i82439tx_host_device::smram_r()
 
 void i82439tx_host_device::smram_w(uint8_t data)
 {
-	smram = data;
-	logerror("smram = %02x\n", smram);
+	smram = data & 0x7f;
+	LOG("smram = %02x -> %02x\n", data, smram);
 	remap_cb();
 }
 
-uint8_t i82439tx_host_device::errcmd_r()
+uint8_t i82439tx_host_device::mctl_r()
 {
-	return errcmd;
+	return mctl;
 }
 
-void i82439tx_host_device::errcmd_w(uint8_t data)
+void i82439tx_host_device::mctl_w(uint8_t data)
 {
-	errcmd = data;
-	logerror("errcmd = %02x\n", errcmd);
-}
-
-uint8_t i82439tx_host_device::errsts_r()
-{
-	return errsts;
-}
-
-void i82439tx_host_device::errsts_w(uint8_t data)
-{
-	errsts = data;
-	logerror("errsts = %02x\n", errsts);
-}
-
-uint8_t i82439tx_host_device::errsyn_r()
-{
-	return errsyn;
+	mctl = data & 0x74;
+	// TODO: bit 6 is ACPI Control Enable
+	LOG("mctl = %02x -> %02x (ACRE=%d)\n", data, mctl, BIT(mctl, 6));
+	// remap_cb();
 }
 
 void i82439tx_host_device::smi_act_w(int state)

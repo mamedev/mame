@@ -24,6 +24,7 @@ vt82c585vp_host_device::vt82c585vp_host_device(const machine_config &mconfig, de
 vt82c585vp_host_device::vt82c585vp_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: vt82c585vp_host_device(mconfig, VT82C585VP_HOST, tag, owner, clock)
 {
+	// TODO: cross check the VPX datasheet, figure out revision numbers between VP and VPX (same PCI device)
 	set_ids_host(0x11060585, 0x00, 0x000000);
 }
 
@@ -71,11 +72,12 @@ void vt82c585vp_host_device::device_reset()
 {
 	pci_host_device::device_reset();
 
+	// I/O space, Memory Space and Bus Master always high
 	command = 0x0007;
 	// parity error response/SERR# enable/fast back-to-back
 	command_mask = 0x0340;
-	// Not provided, all "reserved" (?)
-	status = 0x0290;
+	// 66MHz Capable, Fast Back-to-Back, Medium DEVSEL#
+	status = 0x02a0;
 
 	m_cache_control_1 = m_cache_control_2 = m_system_perf_control = 0;
 	m_noncache_control = 2;
