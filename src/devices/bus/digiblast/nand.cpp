@@ -8,13 +8,11 @@
 #include "emu.h"
 #include "nand.h"
 
+#include <algorithm>
+
 DEFINE_DEVICE_TYPE(DIGIBLAST_NAND_16M,   digiblast_nand_16m_device,   "digiblast_nand_16m",   "digiBLAST 16 MiB NAND Cartridge")
 DEFINE_DEVICE_TYPE(DIGIBLAST_NAND_32M,   digiblast_nand_32m_device,   "digiblast_nand_32m",   "digiBLAST 32 MiB NAND Cartridge")
 DEFINE_DEVICE_TYPE(DIGIBLAST_NAND_64M,   digiblast_nand_64m_device,   "digiblast_nand_64m",   "digiBLAST 64 MiB NAND Cartridge")
-
-// The Atari classics require a 0x00 fill to avoid corrupt high score tables.
-// but cuccioli, gormitil and wadehix require a random fill to properly initialize
-// these are set by the software list (not possible with loose loading)
 
 ROM_START(digiblast_cart)
 	ROM_REGION(0x400, "i2cmem", ROMREGION_ERASEFF)
@@ -26,6 +24,7 @@ digiblast_nand_device::digiblast_nand_device(const machine_config &mconfig, devi
 	, m_nand(*this, "nand")
 	, m_i2cmem(*this, "i2cmem")
 	, m_slot(*this, DEVICE_SELF_OWNER)
+	, m_default_eeprom(*this, "i2cmem")
 {
 }
 
@@ -139,4 +138,14 @@ u32 digiblast_nand_device::rom_size() const
 void digiblast_nand_device::set_rom(const u8 *data, u32 size)
 {
 	m_nand->set_rom(data, size);
+}
+
+u32 digiblast_nand_device::eeprom_size() const
+{
+	return m_default_eeprom.bytes();
+}
+
+void digiblast_nand_device::set_default_eeprom(const u8 *data)
+{
+	std::copy_n(data, m_default_eeprom.bytes(), &m_default_eeprom[0]);
 }

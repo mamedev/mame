@@ -191,6 +191,9 @@ class toshiba_tc58256aft_device : public nand_device
 {
 public:
 	toshiba_tc58256aft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	toshiba_tc58256aft_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class toshiba_tc58128ft_device : public nand_device
@@ -199,7 +202,7 @@ public:
 	toshiba_tc58128ft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
-class toshiba_tc58256ft_device : public nand_device
+class toshiba_tc58256ft_device : public toshiba_tc58256aft_device
 {
 public:
 	toshiba_tc58256ft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);

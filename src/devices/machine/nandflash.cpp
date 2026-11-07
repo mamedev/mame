@@ -259,7 +259,12 @@ toshiba_tc58v64bft_device::toshiba_tc58v64bft_device(const machine_config &mconf
 }
 
 toshiba_tc58256aft_device::toshiba_tc58256aft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nand_device(mconfig, TOSHIBA_TC58256AFT, tag, owner, clock)
+	: toshiba_tc58256aft_device(mconfig, TOSHIBA_TC58256AFT, tag, owner, clock)
+{
+}
+
+toshiba_tc58256aft_device::toshiba_tc58256aft_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: nand_device(mconfig, type, tag, owner, clock)
 {
 	m_id_len = 2;
 	m_id[0] = 0x98;
@@ -270,10 +275,15 @@ toshiba_tc58256aft_device::toshiba_tc58256aft_device(const machine_config &mconf
 	m_num_pages = 32 * 2048;
 	m_col_address_cycles = 1;
 	m_row_address_cycles = 2;
-	m_sequential_row_read = 0;
+	// Sequential reads stop at the final byte (datasheet, Sequential Read (1) (2) (3)).
+	m_sequential_row_read = 1;
+	m_sequential_row_read_wrap = false;
+	m_read_time = attotime::from_usec(25);
 }
 
-// TODO: verify the bytes following the two-byte ID documented for the TC58xxxFT parts.
+// The FT datasheets document two ID bytes.  digiBLAST's U-Boot scripts compare
+// four bytes with "nidc check ... 4 98 73/75/76 00 ff" and halt on a mismatch.
+// TODO: verify the inferred trailing 00 ff response on physical FT parts.
 toshiba_tc58128ft_device::toshiba_tc58128ft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nand_device(mconfig, TOSHIBA_TC58128FT, tag, owner, clock)
 {
@@ -289,25 +299,16 @@ toshiba_tc58128ft_device::toshiba_tc58128ft_device(const machine_config &mconfig
 	m_col_address_cycles = 1;
 	m_row_address_cycles = 2;
 	m_sequential_row_read = 1;
+	m_sequential_row_read_wrap = false;
 	m_read_time = attotime::from_usec(25);
 }
 
 toshiba_tc58256ft_device::toshiba_tc58256ft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nand_device(mconfig, TOSHIBA_TC58256FT, tag, owner, clock)
+	: toshiba_tc58256aft_device(mconfig, TOSHIBA_TC58256FT, tag, owner, clock)
 {
 	m_id_len = 4;
-	m_id[0] = 0x98;
-	m_id[1] = 0x75;
 	m_id[2] = 0x00;
 	m_id[3] = 0xff;
-	m_page_data_size = 512;
-	m_page_total_size = 512 + 16;
-	m_log2_pages_per_block = compute_log2(32);
-	m_num_pages = 32 * 2048;
-	m_col_address_cycles = 1;
-	m_row_address_cycles = 2;
-	m_sequential_row_read = 1;
-	m_read_time = attotime::from_usec(25);
 }
 
 toshiba_tc58512ft_device::toshiba_tc58512ft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -325,6 +326,7 @@ toshiba_tc58512ft_device::toshiba_tc58512ft_device(const machine_config &mconfig
 	m_col_address_cycles = 1;
 	m_row_address_cycles = 3;
 	m_sequential_row_read = 1;
+	m_sequential_row_read_wrap = false;
 	m_read_time = attotime::from_usec(25);
 }
 

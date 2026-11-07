@@ -23,7 +23,8 @@ public:
 	virtual void i2c_scl_w(int state) override;
 	virtual u32 rom_size() const override;
 	virtual void set_rom(const u8 *data, u32 size) override;
-	memory_region* get_default_eeprom_region() override { return memregion("i2cmem"); }
+	virtual u32 eeprom_size() const override;
+	virtual void set_default_eeprom(const u8 *data) override;
 
 protected:
 	digiblast_nand_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -38,6 +39,7 @@ protected:
 private:
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<digiblast_cart_slot_device> m_slot;
+	required_region_ptr<u8> m_default_eeprom;
 };
 
 class digiblast_nand_16m_device : public digiblast_nand_device

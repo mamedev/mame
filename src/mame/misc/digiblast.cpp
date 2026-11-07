@@ -10,12 +10,9 @@
     TODO: verify cartridge part numbers and spare-area dumps, EEPROM wiring,
     battery sensing, TV encoder, USB accessories and LCD timing.
 
-    The LCD gets configured at ~150Hz in LCD mode for the games, but we seem
-    to be matching documentation, is it correct?  Some games run smoother and
-    are still rate limited, others such as gormitim seem too fast, hence
-	the MACHINE_IMPERFECT_TIMING flag
-
 */
+
+// FIXME: Gormiti Masters of the Gorm Island runs too fast in LCD mode.
 
 #include "emu.h"
 

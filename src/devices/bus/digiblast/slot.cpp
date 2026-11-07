@@ -45,15 +45,10 @@ std::pair<std::error_condition, std::string> digiblast_cart_slot_device::call_lo
 	if (default_eeprom)
 	{
 		u64 const default_eeprom_size = default_eeprom->bytes();
-		if (default_eeprom_size != 0x400)
-			return std::make_pair(image_error::INVALIDLENGTH, "Default EEPROM size must be 0x400");
+		if (default_eeprom_size != m_cart->eeprom_size())
+			return std::make_pair(image_error::BADSOFTWARE, "Default EEPROM size does not match the cartridge EEPROM");
 
-		memory_region* default_region = m_cart->get_default_eeprom_region();
-
-		if (default_region)
-		{
-			memcpy(default_region->base(), default_eeprom->base(), default_eeprom_size);
-		}
+		m_cart->set_default_eeprom(default_eeprom->base());
 	}
 
 	if (!loaded_through_softlist())
