@@ -1394,7 +1394,7 @@ void mcs51_cpu_device::device_reset()
 	m_tl1 = 0;
 	m_tl0 = 0;
 
-	// before the port writes: p3_w() drives P3.1 from TxD
+	// Set up the UART first: p3_w() ANDs TxD into P3.1, so it must already be idle.
 	m_uart.data_out = 0;
 	m_uart.data_in = 0;
 	m_uart.rx_clk = 0;
