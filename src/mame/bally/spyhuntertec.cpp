@@ -15,6 +15,31 @@ non-interlaced
 
 sound system appears to be the same as 'spartanxtec.cpp'
 
+The program is the original Spy Hunter code, patched to run on this hardware:
+- There is no CTC. The vblank IRQ goes to an IM 1 handler at 0xa30b, which acknowledges it
+  by writing to 0xa900, copies the scroll values to 0xa800-0xa803 and converts the original
+  sprite list at 0xf800 into the one at 0xfe00 (code, Y - 8, X, flags). The writes to the
+  original scroll, watchdog and CTC ports are still there but go nowhere.
+- The handler then runs the three original CTC interrupt handlers in a row. The main loop
+  waits for two IRQs instead of one, but the code run by the 30Hz interrupt on the original
+  (game timer, colour cycling) runs at 60Hz on this hardware.
+- The steering wheel and gas pedal are read through the sound CPU: the main CPU sends 0x04 or
+  0x14 through the sound latch and times how long IN2 bit 6 stays low.
+- The writes to the original lamp/Cheap Squeak Deluxe port go through a routine at 0xa47b that
+  turns them into sound commands. The sound CPU puts the lamp states on the AY port A outputs.
+- Palette RAM holds 8-bit colours (RRRGGGBB from bit 0 up), with each 16-colour bank stored in
+  reverse order. The routine converting the original 9-bit colours loses the low red bit.
+- The operator settings kept in NVRAM on the original come from DIP switches.
+
+The text in the Spanish set (spyhuntsp) is translated, and it uses fixed steering wheel and gas
+pedal calibration values instead of the ones kept in NVRAM.
+
+TODO:
+- Sprites are drawn from the original format list at 0xf800, as it isn't known how the
+  hardware hides the entries at 0xfe00 with Y = 0xf8 (Y = 0 in the original list) or 0xfc
+  (skipped entries).
+- Verify the CPU and AY clocks, the sound CPU IRQ frequency and the analog counter clock.
+
 */
 
 #include "emu.h"
@@ -41,24 +66,23 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_analog_timer(*this, "analog_timer"),
 		m_analog_input(*this, "AN.%u", 0),
+		m_in2(*this, "IN2"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_spriteram2(*this, "spriteram2"),
+		m_scrollram(*this, "scrollram"),
 		m_paletteram(*this, "paletteram"),
 		m_spyhunt_alpharam(*this, "spyhunt_alpha"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch(*this, "soundlatch"),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void spyhuntertec(machine_config &config);
-
-	void init_spyhuntertec();
+	void spyhuntertec(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -66,39 +90,36 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<timer_device> m_analog_timer;
 	required_ioport_array<2> m_analog_input;
+	required_ioport m_in2;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_spriteram2;
+	required_shared_ptr<uint8_t> m_scrollram;
 	required_shared_ptr<uint8_t> m_paletteram;
 	required_shared_ptr<uint8_t> m_spyhunt_alpharam;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
-
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	uint8_t m_spyhunt_sprite_color_mask = 0;
-	int16_t m_spyhunt_scroll_offset = 0;
-	int16_t m_spyhunt_scrollx = 0;
-	int16_t m_spyhunt_scrolly = 0;
-
-	int mcr_cocktail_flip = 0;
+	output_finder<5> m_lamps;
 
 	tilemap_t *m_alpha_tilemap = nullptr;
 	tilemap_t *m_bg_tilemap = nullptr;
-	void spyhuntertec_paletteram_w(offs_t offset, uint8_t data);
 
-//  uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void spyhuntertec_port04_w(uint8_t data);
-	void spyhuntertec_portf0_w(uint8_t data);
+	uint8_t m_ay1_porta = 0;
+	uint8_t m_ay2_porta = 0;
+	uint8_t m_analog_count = 0;
+
+	void spyhuntertec_map(address_map &map) ATTR_COLD;
+	void spyhuntertec_portmap(address_map &map) ATTR_COLD;
+	void spyhuntertec_sound_map(address_map &map) ATTR_COLD;
+	void spyhuntertec_sound_portmap(address_map &map) ATTR_COLD;
+
+	void spyhuntertec_paletteram_w(offs_t offset, uint8_t data);
 
 	void spyhunt_videoram_w(offs_t offset, uint8_t data);
 	void spyhunt_alpharam_w(offs_t offset, uint8_t data);
-	void spyhunt_scroll_value_w(offs_t offset, uint8_t data);
+	void irq_ack_w(uint8_t data);
 	void sound_irq_ack(uint8_t data);
-
 
 	void ay1_porta_w(uint8_t data);
 	uint8_t ay1_porta_r();
@@ -107,33 +128,29 @@ private:
 	uint8_t ay2_porta_r();
 
 	uint8_t spyhuntertec_in2_r();
-	uint8_t spyhuntertec_in3_r();
 
 	TILEMAP_MAPPER_MEMBER(spyhunt_bg_scan);
 	TILE_GET_INFO_MEMBER(spyhunt_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(spyhunt_get_alpha_tile_info);
-	void mcr3_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int code_xor, int dx, int dy, int interlaced);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(analog_count_callback);
 	void reset_analog_timer();
-
-	uint8_t m_analog_select = 0;
-	uint8_t m_analog_count = 0;
-	void spyhuntertec_map(address_map &map) ATTR_COLD;
-	void spyhuntertec_portmap(address_map &map) ATTR_COLD;
-	void spyhuntertec_sound_map(address_map &map) ATTR_COLD;
-	void spyhuntertec_sound_portmap(address_map &map) ATTR_COLD;
 };
 
 void spyhuntertec_state::ay1_porta_w(uint8_t data)
 {
-//  printf("ay1_porta_w %02x\n", data);
+	// d0: machine guns lamp, other bits unknown
+	m_lamps[4] = BIT(data, 0);
+
+	m_ay1_porta = data;
 }
 
 uint8_t spyhuntertec_state::ay1_porta_r()
 {
-//  printf("ay1_porta_r\n");
-	return 0;
+	// the sound CPU does read-modify-write on the output port
+	return m_ay1_porta;
 }
 
 void spyhuntertec_state::reset_analog_timer()
@@ -152,21 +169,25 @@ TIMER_DEVICE_CALLBACK_MEMBER(spyhuntertec_state::analog_count_callback)
 void spyhuntertec_state::ay2_porta_w(uint8_t data)
 {
 	// d7: latch analog counter on falling edge, d0 selects which one
-	if (~data & m_analog_select & 0x80)
+	if (~data & m_ay2_porta & 0x80)
 	{
 		reset_analog_timer();
 		m_analog_count = m_analog_input[data & 1]->read();
 	}
 
-	m_analog_select = data;
+	// d3-d6: lamps
+	m_lamps[1] = BIT(data, 3); // missiles
+	m_lamps[0] = BIT(data, 4); // oil slick
+	m_lamps[3] = BIT(data, 5); // smoke screen
+	m_lamps[2] = BIT(data, 6); // weapons van
+
+	m_ay2_porta = data;
 }
 
 uint8_t spyhuntertec_state::ay2_porta_r()
 {
-// read often, even if port is set to output mode
-// maybe latches something?
-//  printf("ay2_porta_r\n");
-	return 0x00; // not sure value matters
+	// the sound CPU does read-modify-write on the output port
+	return m_ay2_porta;
 }
 
 void spyhuntertec_state::spyhunt_videoram_w(offs_t offset, uint8_t data)
@@ -183,39 +204,15 @@ void spyhuntertec_state::spyhunt_alpharam_w(offs_t offset, uint8_t data)
 }
 
 
-void spyhuntertec_state::spyhunt_scroll_value_w(offs_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-		case 0:
-			/* low 8 bits of horizontal scroll */
-			m_spyhunt_scrollx = (m_spyhunt_scrollx & ~0xff) | data;
-			break;
-
-		case 1:
-			/* upper 3 bits of horizontal scroll and upper 1 bit of vertical scroll */
-			m_spyhunt_scrollx = (m_spyhunt_scrollx & 0xff) | ((data & 0x07) << 8);
-			m_spyhunt_scrolly = (m_spyhunt_scrolly & 0xff) | ((data & 0x80) << 1);
-			break;
-
-		case 2:
-			/* low 8 bits of vertical scroll */
-			m_spyhunt_scrolly = (m_spyhunt_scrolly & ~0xff) | data;
-			break;
-	}
-}
-
-
 void spyhuntertec_state::spyhuntertec_paletteram_w(offs_t offset, uint8_t data)
 {
 	m_paletteram[offset] = data;
-	offset = (offset & 0x0f) | (offset & 0x60) >> 1;
 
-	int r = (data & 0x07) >> 0;
-	int g = (data & 0x38) >> 3;
-	int b = (data & 0xc0) >> 6;
-
-	m_palette->set_pen_color(offset^0xf, rgb_t(r<<5,g<<5,b<<6));
+	// the game stores each 16-colour bank in reverse order
+	// 0x00-0x0f: alpha (only 0x0c-0x0f are used), 0x10-0x1f: sprites
+	// 0x20-0x2f: unused, 0x30-0x3f: background
+	// the game writes the same values to 0x40-0x7f
+	m_palette->set_pen_color((offset & 0x3f) ^ 0x0f, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 }
 
 
@@ -250,27 +247,18 @@ void spyhuntertec_state::video_start()
 	m_alpha_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spyhuntertec_state::spyhunt_get_alpha_tile_info)), TILEMAP_SCAN_COLS,  16,8, 32,32);
 	m_alpha_tilemap->set_transparent_pen(0);
 	m_alpha_tilemap->set_scrollx(0, 16);
-
-	save_item(NAME(m_spyhunt_sprite_color_mask));
-	save_item(NAME(m_spyhunt_scrollx));
-	save_item(NAME(m_spyhunt_scrolly));
-	save_item(NAME(m_spyhunt_scroll_offset));
-
-	mcr_cocktail_flip = 0; // TODO: this doesn't get set anywhere, code at line 322 is effectively unreachable
 }
 
 
 
 
-void spyhuntertec_state::mcr3_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int code_xor, int dx, int dy, int interlaced)
+void spyhuntertec_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_screen->priority().fill(1, cliprect);
+	screen.priority().fill(1, cliprect);
 
 	/* loop over sprite RAM */
 	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
-		int code, color, flipx, flipy, sx, sy, flags;
-
 		/* skip if zero */
 		if (m_spriteram[offs] == 0)
 			continue;
@@ -287,57 +275,40 @@ void spyhuntertec_state::mcr3_update_sprites(screen_device &screen, bitmap_ind16
 */
 
 		/* extract the bits of information */
-		flags = m_spriteram[offs + 1];
-		code = m_spriteram[offs + 2] + 256 * ((flags >> 3) & 0x01);
-		color = ~flags & color_mask;
-		flipx = flags & 0x10;
-		flipy = flags & 0x20;
-		sx = (m_spriteram[offs + 3] - 3) * 2;
-		sy = (241 - m_spriteram[offs]);
-
-		if (interlaced == 1) sy *= 2;
-
-		code ^= code_xor;
-
-		sx += dx;
-		sy += dy;
+		int const flags = m_spriteram[offs + 1];
+		int const code = m_spriteram[offs + 2] | (BIT(flags, 3) << 8);
+		int const flipx = flags & 0x10;
+		int const flipy = flags & 0x20;
+		int const sx = (m_spriteram[offs + 3] - 3) * 2 - 12;
+		int const sy = 241 - m_spriteram[offs];
 
 		/* sprites use color 0 for background pen and 8 for the 'under tile' pen.
 		    The color 8 is used to cover over other sprites. */
-		if (!mcr_cocktail_flip)
-		{
-			/* first draw the sprite, visible */
-			m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect, code, color, flipx, flipy, sx, sy,
-					screen.priority(), 0x00, 0x0101);
 
-			/* then draw the mask, behind the background but obscuring following sprites */
-			m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect, code, color, flipx, flipy, sx, sy,
-					screen.priority(), 0x02, 0xfeff);
-		}
-		else
-		{
-			/* first draw the sprite, visible */
-			m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect, code, color, !flipx, !flipy, 480 - sx, 452 - sy,
-					screen.priority(), 0x00, 0x0101);
+		/* first draw the sprite, visible */
+		m_gfxdecode->gfx(1)->prio_transmask(bitmap, cliprect, code, 0, flipx, flipy, sx, sy,
+				screen.priority(), 0x00, 0x0101);
 
-			/* then draw the mask, behind the background but obscuring following sprites */
-			m_gfxdecode->gfx(1)->prio_transmask(bitmap,cliprect, code, color, !flipx, !flipy, 480 - sx, 452 - sy,
-					screen.priority(), 0x02, 0xfeff);
-		}
+		/* then draw the mask, behind the background but obscuring following sprites */
+		m_gfxdecode->gfx(1)->prio_transmask(bitmap, cliprect, code, 0, flipx, flipy, sx, sy,
+				screen.priority(), 0x02, 0xfeff);
 	}
 }
 
 
 uint32_t spyhuntertec_state::screen_update_spyhuntertec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/* for every character in the Video RAM, check if it has been modified */
-	/* since last time and update it accordingly. */
-	m_bg_tilemap->set_scrollx(0, m_spyhunt_scrollx * 2 + m_spyhunt_scroll_offset);
-	m_bg_tilemap->set_scrolly(0, m_spyhunt_scrolly * 2);
+	// 0xa800-0xa801: vertical scroll, minus 8 (0x1ff max)
+	// 0xa802-0xa803: horizontal scroll (0x7ff max), bit 7 of 0xa803 is the vertical scroll MSB again
+	int const scrolly = ((m_scrollram[1] << 8) | m_scrollram[0]) + 8;
+	int const scrollx = ((m_scrollram[3] & 0x07) << 8) | m_scrollram[2];
+
+	m_bg_tilemap->set_scrollx(0, scrollx * 2 + 16);
+	m_bg_tilemap->set_scrolly(0, scrolly);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
-	mcr3_update_sprites(screen, bitmap, cliprect, m_spyhunt_sprite_color_mask, 0, -12, 0, 0);
+	draw_sprites(screen, bitmap, cliprect);
 
 	/* render any characters on top */
 	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -350,7 +321,8 @@ uint8_t spyhuntertec_state::spyhuntertec_in2_r()
 {
 	// it writes 04 / 14 to the sound latch (at FD00) before
 	// reading bit 6 here a minimum of 32 times.
-	// seems to be how it reads the analog controls? probably via sound CPU??
+	// the sound CPU then latches the steering wheel / gas pedal value into a counter, which
+	// counts down and clears bit 6 while it's running
 
 	/* note, these commands trigger a read from ay2_porta on the sound cpu side, followed by 2 writes
 
@@ -373,7 +345,8 @@ uint8_t spyhuntertec_state::spyhuntertec_in2_r()
 	    A38E: 3E 04         ld   a,$04
 	    A390: CD 20 A5      call $A520 << write command to sub-cpu
 
-	    -- delay loop / timeout loop for reading result? value of b doesn't get used in the end
+	    -- wait for the counter to start, then count down b until it stops
+	    -- b indexes the table at $A6B6 ($0F, the centre value, if the counter never starts)
 	    A393: 06 1F         ld   b,$1F << loop counter
 	    A395: 21 02 FC      ld   hl,$FC02
 	    loopstart:
@@ -416,16 +389,13 @@ uint8_t spyhuntertec_state::spyhuntertec_in2_r()
 
 
 	*/
-//  printf("%04x spyhuntertec_in2_r\n", m_maincpu->pc());
 
-	return (ioport("IN2")->read() & ~0x40) | ((m_analog_count == 0) ? 0x40 : 0x00);
+	return (m_in2->read() & ~0x40) | ((m_analog_count == 0) ? 0x40 : 0x00);
 }
 
-uint8_t spyhuntertec_state::spyhuntertec_in3_r()
+void spyhuntertec_state::irq_ack_w(uint8_t data)
 {
-	uint8_t ret = ioport("IN3")->read();
-//  printf("%04x spyhuntertec_in3_r\n",m_maincpu->pc());
-	return ret;
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 void spyhuntertec_state::spyhuntertec_map(address_map &map)
@@ -433,44 +403,35 @@ void spyhuntertec_state::spyhuntertec_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0xdfff).rom();
 
-	map(0xa800, 0xa8ff).ram(); // the ROM is a solid fill in these areas, and they get tested as RAM, I think they moved the 'real' scroll regs here
-	map(0xa900, 0xa9ff).ram();
+	map(0xa800, 0xa8ff).ram().share(m_scrollram); // the ROM is a solid fill here, tested as RAM
+	map(0xa900, 0xa900).w(FUNC(spyhuntertec_state::irq_ack_w));
 
-	map(0xe000, 0xe7ff).ram().w(FUNC(spyhuntertec_state::spyhunt_videoram_w)).share("videoram");
-	map(0xe800, 0xebff).mirror(0x0400).ram().w(FUNC(spyhuntertec_state::spyhunt_alpharam_w)).share("spyhunt_alpha");
-	map(0xf000, 0xf7ff).ram(); //.share("nvram");
-	map(0xf800, 0xf9ff).ram().share("spriteram"); // origional spriteram
-	map(0xfa00, 0xfa7f).mirror(0x0180).ram().w(FUNC(spyhuntertec_state::spyhuntertec_paletteram_w)).share("paletteram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(spyhuntertec_state::spyhunt_videoram_w)).share(m_videoram);
+	map(0xe800, 0xebff).mirror(0x0400).ram().w(FUNC(spyhuntertec_state::spyhunt_alpharam_w)).share(m_spyhunt_alpharam);
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf9ff).ram().share(m_spriteram); // sprite list in the original format
+	map(0xfa00, 0xfa7f).mirror(0x0180).ram().w(FUNC(spyhuntertec_state::spyhuntertec_paletteram_w)).share(m_paletteram);
 
 	map(0xfc00, 0xfc00).portr("DSW0");
 	map(0xfc01, 0xfc01).portr("DSW1");
 	map(0xfc02, 0xfc02).r(FUNC(spyhuntertec_state::spyhuntertec_in2_r));
-	map(0xfc03, 0xfc03).r(FUNC(spyhuntertec_state::spyhuntertec_in3_r));
+	map(0xfc03, 0xfc03).portr("IN3");
 
 	map(0xfd00, 0xfd00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
-	map(0xfe00, 0xffff).ram().share("spriteram2"); // actual spriteram for this hw??
-}
-
-void spyhuntertec_state::spyhuntertec_port04_w(uint8_t data)
-{
-}
-
-void spyhuntertec_state::spyhuntertec_portf0_w(uint8_t data)
-{
-	// 0x08 on startup, then 0x03, probably CTC leftovers from the original.
-	if ((data != 0x03) && (data != 0x08)) printf("spyhuntertec_portf0_w %02x\n", data);
+	map(0xfe00, 0xffff).ram(); // sprite list used by the hardware, converted from the one at 0xf800
 }
 
 void spyhuntertec_state::spyhuntertec_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x04, 0x04).w(FUNC(spyhuntertec_state::spyhuntertec_port04_w));
-	map(0x84, 0x86).w(FUNC(spyhuntertec_state::spyhunt_scroll_value_w));
-	map(0xe0, 0xe0).nopw(); // was watchdog
-//  map(0xe8, 0xe8).nopw();
-	map(0xf0, 0xf0).w(FUNC(spyhuntertec_state::spyhuntertec_portf0_w));
+	// leftover writes from the original code
+	map(0x04, 0x04).nopw(); // analog input mux, lamps, Cheap Squeak Deluxe
+	map(0x84, 0x86).nopw(); // scroll
+	map(0xe0, 0xe0).nopw(); // watchdog
+	map(0xe8, 0xe8).nopw();
+	map(0xf0, 0xf3).nopw(); // CTC
 }
 
 
@@ -509,55 +470,52 @@ void spyhuntertec_state::spyhuntertec_sound_portmap(address_map &map)
 
 
 static INPUT_PORTS_START( spyhuntertec )
+	// these replace the operator settings kept in NVRAM on the original
+	// defaults are the settings the test mode reports as standard (DSW0 0xbb, DSW1 0xa4)
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x01, "DSW0-01" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DSW0-02" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DSW0-04" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DSW0-08" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DSW0-10" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DSW0-20" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DSW0-40" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DSW0-80" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x07, 0x03, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Easy ) )    // level 1
+	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )  // level 3, default on the original
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )    // level 6
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) ) // level 9
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSW1-01" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DSW1-02" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, "Clear RAM on Reset" ) // settings, high scores and bookkeeping
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPUNUSED( 0x02, 0x00 )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, "DSW1-08" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DSW1-10" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DSW1-20" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DSW1-40" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DSW1-80" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "Game Timer" ) // named after the equivalent settings on the original, as the IRQ is twice as fast
+	PORT_DIPSETTING(    0x08, "0:45" )
+	PORT_DIPSETTING(    0x00, "1:00" )
+	PORT_DIPNAME( 0x30, 0x20, "Extra Base Every" )
+	PORT_DIPSETTING(    0x30, "25000" )
+	PORT_DIPSETTING(    0x20, "35000" )
+	PORT_DIPSETTING(    0x10, "45000" )
+	PORT_DIPSETTING(    0x00, "55000" )
+	PORT_DIPNAME( 0xc0, 0x80, "1st Extra Base" )
+	PORT_DIPSETTING(    0xc0, "25000" )
+	PORT_DIPSETTING(    0x80, "35000" )
+	PORT_DIPSETTING(    0x40, "45000" )
+	PORT_DIPSETTING(    0x00, "55000" )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Right Button / Smoke Screen")
@@ -565,33 +523,13 @@ static INPUT_PORTS_START( spyhuntertec )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Left Trigger / Missiles")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Left Button / Oil Slick")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Gear Shift") PORT_TOGGLE
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) // analog signal
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")
-	PORT_DIPNAME( 0x0001, 0x0001, "3" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Right Trigger / Machine Guns")
 
@@ -653,18 +591,17 @@ static const gfx_layout spyhuntertec_charlayout =
 
 static GFXDECODE_START( gfx_spyhuntertec )
 	GFXDECODE_ENTRY( "gfx1", 0, spyhuntertec_charlayout,  3*16, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, spyhuntertec_sprite_layout,   0*16, 4 )
-	GFXDECODE_ENTRY( "gfx3", 0, spyhuntertec_alphalayout, 4*16, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, spyhuntertec_sprite_layout,   1*16, 1 )
+	GFXDECODE_ENTRY( "gfx3", 0, spyhuntertec_alphalayout, 0*16, 1 )
 GFXDECODE_END
 
 
 
 void spyhuntertec_state::machine_start()
 {
-}
-
-void spyhuntertec_state::machine_reset()
-{
+	save_item(NAME(m_ay1_porta));
+	save_item(NAME(m_ay2_porta));
+	save_item(NAME(m_analog_count));
 }
 
 
@@ -680,7 +617,7 @@ void spyhuntertec_state::spyhuntertec(machine_config &config)
 	Z80(config, m_maincpu, 4000000); // NEC D780C-2 (rated 6MHz)
 	m_maincpu->set_addrmap(AS_PROGRAM, &spyhuntertec_state::spyhuntertec_map);
 	m_maincpu->set_addrmap(AS_IO, &spyhuntertec_state::spyhuntertec_portmap);
-	m_maincpu->set_vblank_int("screen", FUNC(spyhuntertec_state::irq0_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(spyhuntertec_state::irq0_line_assert));
 	TIMER(config, m_analog_timer).configure_generic(FUNC(spyhuntertec_state::analog_count_callback));
 
 	/* video hardware */
@@ -694,7 +631,7 @@ void spyhuntertec_state::spyhuntertec(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spyhuntertec);
-	PALETTE(config, m_palette).set_entries(64+4); // FUNC(spyhuntertec_state::spyhunt)
+	PALETTE(config, m_palette).set_entries(0x40);
 
 	Z80(config, m_audiocpu, 4000000); // SGS Z8400B1 (rated 2.5MHz?)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &spyhuntertec_state::spyhuntertec_sound_map);
@@ -911,13 +848,6 @@ ROM_START( spyhuntpr )
 	ROM_LOAD( "14.bin",  0x00000, 0x1000, CRC(87a4c130) SHA1(7792afdc36b0f3bd51c387d04d38f60c85fd2e93) )
 ROM_END
 
-
-void spyhuntertec_state::init_spyhuntertec()
-{
-	m_spyhunt_sprite_color_mask = 0x00;
-	m_spyhunt_scroll_offset = 16;
-}
-
 } // Anonymous namespace
 
 
@@ -925,6 +855,6 @@ void spyhuntertec_state::init_spyhuntertec()
 *                              Game Drivers                                *
 ***************************************************************************/
 
-//    YEAR  NAME       PARENT   MACHINE       INPUT         STATE               INIT               ROT    COMPANY                                              FULLNAME                                                             FLAGS                                        LAYOUT
-GAMEL(1985, spyhuntsp, spyhunt, spyhuntertec, spyhuntertec, spyhuntertec_state, init_spyhuntertec, ROT90, "Recreativos Franco S.A. (Bally Midway license)",    "Spy Hunter (Spain, Recreativos Franco S.A., Bally Midway license)", MACHINE_SUPPORTS_SAVE,                       layout_spyhunttec )
-GAMEL(1985, spyhuntpr, spyhunt, spyhuntertec, spyhuntertec, spyhuntertec_state, init_spyhuntertec, ROT90, "bootleg (Recreativos Franco S.A. license, Tecfri)", "Spy Hunter (Spain, Recreativos Franco S.A., Tecfri PCB)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_spyhunttec )
+//    YEAR  NAME       PARENT   MACHINE       INPUT         STATE               INIT        ROT    COMPANY                                              FULLNAME                                                             FLAGS                  LAYOUT
+GAMEL(1985, spyhuntsp, spyhunt, spyhuntertec, spyhuntertec, spyhuntertec_state, empty_init, ROT90, "Recreativos Franco S.A. (Bally Midway license)",    "Spy Hunter (Spain, Recreativos Franco S.A., Bally Midway license)", MACHINE_SUPPORTS_SAVE, layout_spyhunttec )
+GAMEL(1985, spyhuntpr, spyhunt, spyhuntertec, spyhuntertec, spyhuntertec_state, empty_init, ROT90, "bootleg (Recreativos Franco S.A. license, Tecfri)", "Spy Hunter (Spain, Recreativos Franco S.A., Tecfri PCB)",           MACHINE_SUPPORTS_SAVE, layout_spyhunttec )
