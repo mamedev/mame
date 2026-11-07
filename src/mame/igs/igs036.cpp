@@ -13,14 +13,18 @@
 #include "igs036.h"
 
 #include "cpu/arm7/arm7core.h"
+#include "machine/nvram.h"
+
+#include <algorithm>
+#include <iterator>
 
 // unknown configuration, but uses MPU not MMU, so closer to ARM946ES
 igs036_cpu_device::igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm946es_cpu_device(mconfig, IGS036, tag, owner, clock, address_map_constructor(FUNC(igs036_cpu_device::onboard_peripherals), this))
+	, m_arm_aic(*this, "arm_aic")
 	, m_read_gpio(*this, 0)
 	, m_write_gpio(*this)
 	, m_do_decrypt(*this)
-	, m_arm_aic(*this, "arm_aic")
 {
 }
 
@@ -36,6 +40,7 @@ u32 igs036_cpu_device::gpio_r()
 
 void igs036_cpu_device::gpio_w(offs_t offset, u32 data, u32 mem_mask)
 {
+	u32 const previous = m_pio_out_data;
 	if (offset == 0)
 	{
 		m_pio_out_data |= data & mem_mask;
@@ -45,7 +50,8 @@ void igs036_cpu_device::gpio_w(offs_t offset, u32 data, u32 mem_mask)
 		m_pio_out_data &= ~(data & mem_mask);
 	}
 
-	m_write_gpio(m_pio_out_data);
+	if (m_pio_out_data != previous)
+		m_write_gpio(m_pio_out_data);
 }
 
 u32 igs036_cpu_device::encryption_control_r()
@@ -56,9 +62,12 @@ u32 igs036_cpu_device::encryption_control_r()
 void igs036_cpu_device::encryption_control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// The internal ROM uploads 256 key bytes, then writes 4 here before reading
-	// the external program. Other control bits and key changes while enabled are unknown.
-	m_has_decrypted = (BIT(data, 2));
-	m_do_decrypt(m_has_decrypted);
+	// the external program. Other control bits are unknown.
+	if (BIT(mem_mask, 2))
+	{
+		m_has_decrypted = BIT(data, 2);
+		m_do_decrypt(m_has_decrypted);
+	}
 }
 
 void igs036_cpu_device::onboard_peripherals(address_map &map)
@@ -104,6 +113,9 @@ u8 igs036_cpu_device::encryption_r(offs_t offset)
 void igs036_cpu_device::encryption_w(offs_t offset, u8 data)
 {
 	m_encryption_table[offset] = data;
+	// FIXME: verify key changes while decryption is enabled on hardware.
+	if (m_has_decrypted)
+		m_do_decrypt(1);
 }
 
 

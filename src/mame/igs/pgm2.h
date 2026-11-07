@@ -5,19 +5,16 @@
 
 #pragma once
 
-#include "igs036crypt.h"
+#include "igs036.h"
 #include "pgm2_memcard.h"
 
-#include "igs036.h"
-#include "machine/nvram.h"
 #include "machine/timer.h"
-#include "sound/ymz770.h"
 
 #include "emupal.h"
 #include "screen.h"
-#include "speaker.h"
 #include "tilemap.h"
 
+#include <memory>
 
 class pgm2_state : public driver_device
 {
@@ -29,7 +26,6 @@ public:
 		m_screen(*this, "screen"),
 		m_lineram(*this, "lineram"),
 		m_sp_zoom(*this, "sp_zoom"),
-		m_mainram(*this, "mainram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_sp_videoram(*this, "sp_videoram"),
@@ -52,22 +48,22 @@ public:
 	void pgm2_lores(machine_config &config) ATTR_COLD;
 	void pgm2(machine_config &config) ATTR_COLD;
 
-	void pgm2_map(address_map &map) ATTR_COLD;
-	void pgm2_rom_map(address_map &map) ATTR_COLD;
-
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;
 
-	void restore_decrypted_rom(offs_t romoffset);
-
-	std::vector<u8> m_encrypted_copy;
+	void pgm2_map(address_map &map) ATTR_COLD;
+	void pgm2_rom_map(address_map &map) ATTR_COLD;
+	virtual void restore_decrypted_state();
+	void restore_decrypted_rom(offs_t word_offset);
 
 	required_device<igs036_cpu_device> m_maincpu;
 	required_memory_region m_mainrom;
 	required_device<screen_device> m_screen;
+
+	std::unique_ptr<u8 []> m_encrypted_copy;
 
 private:
 	u32 mcu_r(offs_t offset);
@@ -80,7 +76,6 @@ private:
 	void vbl_ack_w(u16 data);
 	void unk30120014_w(offs_t offset, u16 data);
 
-	virtual void restore_decrypted_state();
 	void decrypt(int state);
 	void sprite_encryption_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
@@ -108,7 +103,6 @@ private:
 
 	u32 m_spritekey = 0;
 	u32 m_realspritekey = 0;
-	bool m_sprite_predecrypted = false;
 
 	u8 m_shareram[0x100]{};
 	u16 m_share_bank = 0;
@@ -118,12 +112,9 @@ private:
 	u8 m_mcu_last_cmd = 0;
 	void mcu_command(bool is_command);
 
-	u32 m_pio_out_data = 0;
-
 	// devices
 	required_shared_ptr<u32> m_lineram;
 	required_shared_ptr<u32> m_sp_zoom;
-	required_shared_ptr<u32> m_mainram;
 	required_shared_ptr<u32> m_fg_videoram;
 	required_shared_ptr<u32> m_bg_videoram;
 	required_shared_ptr<u32> m_sp_videoram;
@@ -156,10 +147,12 @@ public:
 
 	void pgm2_hires(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void restore_decrypted_state() override;
 
+private:
 	struct kov3_module_key
 	{
 		u8 key[8];
@@ -177,15 +170,14 @@ private:
 	void module_clk_w(int state);
 	void decrypt_kov3_module(u32 addrxor, u16 dataxor);
 	void pgm2_module_rom_map(address_map &map) ATTR_COLD;
-	virtual void restore_decrypted_state() override;
 
 	bool m_has_decrypted_kov3_module;
 	const kov3_module_key *module_key;
 	bool module_sum_read;
 	u32 module_in_latch = 0;
 	u32 module_out_latch = 0;
-	int module_prev_state;
-	int module_clk_cnt;
+	s32 module_prev_state;
+	u32 module_clk_cnt;
 	u8 module_rcv_buf[10];
 	u8 module_send_buf[9];
 };
@@ -198,22 +190,22 @@ public:
 		m_romboard_ram(*this, "romboard_ram")
 	{ }
 
-	void init_ddpdojt() ATTR_COLD;
-
 	void pgm2_ramrom(machine_config &config) ATTR_COLD;
 
-private:
+protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void restore_decrypted_state() override;
 
+private:
 	void pgm2_ram_rom_map(address_map &map) ATTR_COLD;
-	u32 romboard_ram_r(offs_t offset, u32 mem_mask);
+	u32 romboard_ram_r(offs_t offset);
 	void romboard_ram_w(offs_t offset, u32 data, u32 mem_mask);
-
-	std::vector<u32> m_decrypted_ram_copy; // rebuilt when loading save state, doesn't need to be saved
+	u32 decrypt_ram_word(offs_t offset) const;
 
 	required_shared_ptr<u32> m_romboard_ram;
+	std::unique_ptr<u32 []> m_decrypted_ram_copy; // rebuilt after loading a save state
 };
 
 #endif // MAME_IGS_PGM2_H

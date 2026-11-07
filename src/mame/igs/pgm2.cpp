@@ -94,35 +94,47 @@
 #include "emu.h"
 #include "pgm2.h"
 
+#include "igs036crypt.h"
+
+#include "sound/ymz770.h"
+
+#include "speaker.h"
+
+#include "endianness.h"
+
+#include <algorithm>
+#include <iterator>
+#include <vector>
 
 void pgm2_state::sprite_encryption_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_spritekey);
 
-	if (!m_sprite_predecrypted)
-		m_realspritekey = bitswap<32>(m_spritekey ^ 0x90055555, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
+	m_realspritekey = bitswap<32>(m_spritekey ^ 0x90055555, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
 }
 
 
-void pgm2_state::restore_decrypted_rom(offs_t romoffset)
+void pgm2_state::restore_decrypted_rom(offs_t word_offset)
 {
 	if (m_maincpu->get_has_decrypted())
 	{
 		igs036_decryptor decrypter(m_maincpu->get_encryption_table());
-		decrypter.decrypter_rom((u16*)m_mainrom->base(), m_mainrom->bytes(), romoffset);
+		auto const rom = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(m_mainrom->base()));
+		for (u32 i = 0; i < m_mainrom->bytes() / 2; ++i)
+			rom[i] = decrypter.decrypt(rom[i], i + word_offset);
 	}
 }
 
 
 void pgm2_state::restore_decrypted_state()
 {
-	memcpy(m_mainrom->base(), &m_encrypted_copy[0], m_mainrom->bytes());
+	std::copy_n(m_encrypted_copy.get(), m_mainrom->bytes(), m_mainrom->base());
 	restore_decrypted_rom(0);
 }
 
 void kov3_state::restore_decrypted_state()
 {
-	memcpy(m_mainrom->base(), &m_encrypted_copy[0], m_mainrom->bytes());
+	std::copy_n(m_encrypted_copy.get(), m_mainrom->bytes(), m_mainrom->base());
 	if (m_has_decrypted_kov3_module)
 	{
 		decrypt_kov3_module(module_key->addr_xor, module_key->data_xor);
@@ -132,21 +144,22 @@ void kov3_state::restore_decrypted_state()
 
 void ddpdojt_state::restore_decrypted_state()
 {
-	memcpy(m_mainrom->base(), &m_encrypted_copy[0], m_mainrom->bytes());
-	memcpy(&m_decrypted_ram_copy[0], &m_romboard_ram[0], m_romboard_ram.bytes());
+	std::copy_n(m_encrypted_copy.get(), m_mainrom->bytes(), m_mainrom->base());
 
 	if (m_maincpu->get_has_decrypted())
 	{
-		igs036_decryptor decrypter(m_maincpu->get_encryption_table());
-		decrypter.decrypter_rom((u16*)&m_decrypted_ram_copy[0], m_romboard_ram.bytes(), 0);
+		for (u32 i = 0; i < m_romboard_ram.length(); ++i)
+			m_decrypted_ram_copy[i] = decrypt_ram_word(i);
 	}
+	else
+		std::copy_n(&m_romboard_ram[0], m_romboard_ram.length(), m_decrypted_ram_copy.get());
 
-	restore_decrypted_rom(m_romboard_ram.bytes());
+	restore_decrypted_rom(m_romboard_ram.bytes() / 2);
 }
 
 void pgm2_state::device_post_load()
 {
-	// make sure the encrypted area is in the correct state after we load a savestate because we don't want to have to save the whole rom.
+	// Rebuild the decrypted views from the saved key and ciphertext.
 	restore_decrypted_state();
 }
 
@@ -440,13 +453,13 @@ u16 kov3_state::module_rom_r(offs_t offset)
 {
 	if (module_sum_read && offset > 0 && offset < 5) // checksum read mode
 	{
-		if (offset == 4)
+		if (offset == 4 && !machine().side_effects_disabled())
 			module_sum_read = false;
 		u32 const offs = ((offset - 1) * 2) ^ 2;
 		return (module_key->sum[offs] ^ module_key->key[offs]) | ((module_key->sum[offs + 1] ^ module_key->key[offs + 1]) << 8);
 	}
 
-	return ((u16 *)m_mainrom->base())[offset];
+	return util::little_endian_cast<u16>(reinterpret_cast<u32 *>(m_mainrom->base()))[offset];
 }
 
 void kov3_state::module_rom_w(offs_t offset, u16 data)
@@ -456,7 +469,11 @@ void kov3_state::module_rom_w(offs_t offset, u16 data)
 	if (data == dec_val)
 	{
 		// might be wrong and normal data access enabled only after whole sequence complete
-		decrypt_kov3_module(module_key->addr_xor, module_key->data_xor);
+		if (!m_has_decrypted_kov3_module)
+		{
+			m_has_decrypted_kov3_module = true;
+			restore_decrypted_state();
+		}
 	}
 	else
 		switch (data)
@@ -538,7 +555,7 @@ void pgm2_state::pgm2_rom_map(address_map &map)
 	map(0x10000000, 0x10ffffff).rom().region("mainrom", 0); // external ROM
 }
 
-u32 ddpdojt_state::romboard_ram_r(offs_t offset, u32 mem_mask)
+u32 ddpdojt_state::romboard_ram_r(offs_t offset)
 {
 	return m_decrypted_ram_copy[offset];
 }
@@ -547,24 +564,22 @@ void ddpdojt_state::romboard_ram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_romboard_ram[offset]);
 
-	// store a copy in the decrypted buffer too
-	if (m_maincpu->get_has_decrypted())
-	{
-		// TODO: if encryption is enabled when this is written we should decrypt it
-		//       but in practice that never happens, it's a one-off copy then enable
-		//       decrypt on startup
-		logerror("%s: write to RAM with decryption enabled %04x %04x (%04x)\n", machine().describe_context(), offset, data, mem_mask);
-	}
-	else
-	{
-		m_decrypted_ram_copy[offset] = m_romboard_ram[offset];
-	}
+	// Decrypt the merged word: each cipher halfword can mix bits from both bytes.
+	m_decrypted_ram_copy[offset] = m_maincpu->get_has_decrypted() ? decrypt_ram_word(offset) : m_romboard_ram[offset];
+}
+
+u32 ddpdojt_state::decrypt_ram_word(offs_t offset) const
+{
+	igs036_decryptor const decrypter(m_maincpu->get_encryption_table());
+	u32 const data = m_romboard_ram[offset];
+	return u32(decrypter.decrypt(u16(data), offset * 2))
+			| (u32(decrypter.decrypt(u16(data >> 16), offset * 2 + 1)) << 16);
 }
 
 void ddpdojt_state::pgm2_ram_rom_map(address_map &map)
 {
 	pgm2_map(map);
-	map(0x10000000, 0x101fffff).ram().rw(FUNC(ddpdojt_state::romboard_ram_r), FUNC(ddpdojt_state::romboard_ram_w)).share("romboard_ram"); // we should also probably decrypt writes once the encryption is enabled, but the game never writes with it turned on anyway
+	map(0x10000000, 0x101fffff).ram().rw(FUNC(ddpdojt_state::romboard_ram_r), FUNC(ddpdojt_state::romboard_ram_w)).share(m_romboard_ram);
 	map(0x10200000, 0x103fffff).rom().region("mainrom", 0); // external ROM
 }
 
@@ -662,6 +677,9 @@ INPUT_PORTS_END
 
 void pgm2_state::machine_start()
 {
+	m_encrypted_copy = std::make_unique<u8 []>(m_mainrom->bytes());
+	std::copy_n(m_mainrom->base(), m_mainrom->bytes(), m_encrypted_copy.get());
+
 	save_item(NAME(m_spritekey));
 	save_item(NAME(m_realspritekey));
 	save_item(NAME(m_mcu_regs));
@@ -670,7 +688,6 @@ void pgm2_state::machine_start()
 	save_item(NAME(m_mcu_last_cmd));
 	save_item(NAME(m_shareram));
 	save_item(NAME(m_share_bank));
-	save_item(NAME(m_pio_out_data));
 }
 
 void kov3_state::machine_start()
@@ -694,16 +711,19 @@ void pgm2_state::machine_reset()
 	m_share_bank = 0;
 
 	// as the decryption is dynamic controlled by the program, restore the encrypted copy
-	memcpy(m_mainrom->base(), &m_encrypted_copy[0], m_mainrom->bytes());
+	std::copy_n(m_encrypted_copy.get(), m_mainrom->bytes(), m_mainrom->base());
+}
 
-	m_pio_out_data = 0;
+void ddpdojt_state::machine_start()
+{
+	pgm2_state::machine_start();
+	m_decrypted_ram_copy = std::make_unique<u32 []>(m_romboard_ram.length());
 }
 
 void ddpdojt_state::machine_reset()
 {
 	pgm2_state::machine_reset();
-	m_decrypted_ram_copy.resize(m_romboard_ram.bytes() / 4);
-	std::fill(std::begin(m_decrypted_ram_copy), std::end(m_decrypted_ram_copy), 0);
+	std::copy_n(&m_romboard_ram[0], m_romboard_ram.length(), m_decrypted_ram_copy.get());
 }
 
 void kov3_state::machine_reset()
@@ -715,7 +735,7 @@ void kov3_state::machine_reset()
 	module_in_latch = 0;
 	module_out_latch = 0;
 	std::fill(std::begin(module_rcv_buf), std::end(module_rcv_buf), 0);
-	std::fill(std::begin(module_send_buf), std::end(module_send_buf), 0);	
+	std::fill(std::begin(module_send_buf), std::end(module_send_buf), 0);
 	pgm2_state::machine_reset();
 }
 
@@ -1282,15 +1302,10 @@ static void sprite_colour_decode(u16* rom, int len)
 // for games with the internal ROMs fully dumped that provide the sprite key and program rom key at runtime
 void pgm2_state::common_init()
 {
-	// store off a copy of the encrypted rom so we can restore it later when needed
-	m_encrypted_copy.resize(m_mainrom->bytes());
-	memcpy(&m_encrypted_copy[0], m_mainrom->base(), m_mainrom->bytes());
-
 	u16 *src = (u16 *)memregion("sprites_mask")->base();
 
 	iga_u12_decode(src, memregion("sprites_mask")->bytes(), 0x0000);
 	iga_u16_decode(src, memregion("sprites_mask")->bytes(), 0x0000);
-	m_sprite_predecrypted = false;
 
 	src = (u16 *)memregion("sprites_colour")->base();
 	sprite_colour_decode(src, memregion("sprites_colour")->bytes());
@@ -1300,17 +1315,13 @@ void pgm2_state::common_init()
 
 void kov3_state::decrypt_kov3_module(u32 addrxor, u16 dataxor)
 {
-	u16 *src = (u16 *)m_mainrom->base();
-	u32 size = m_mainrom->bytes();
-
-	std::vector<u16> buffer(size/2);
-
-	for (int i = 0; i < size/2; i++)
-		buffer[i] = src[i^addrxor]^dataxor;
-
-	memcpy(src, &buffer[0], size);
-
-	m_has_decrypted_kov3_module = true;
+	auto const rom = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(m_mainrom->base()));
+	u32 const words = m_mainrom->bytes() / 2;
+	std::vector<u16> buffer(words);
+	for (u32 i = 0; i < words; ++i)
+		buffer[i] = rom[i ^ addrxor] ^ dataxor;
+	for (u32 i = 0; i < words; ++i)
+		rom[i] = buffer[i];
 }
 
 void kov3_state::init_kov3_104()
@@ -1353,11 +1364,6 @@ void kov3_state::init_kov3_100()
 	common_init();
 }
 
-void ddpdojt_state::init_ddpdojt()
-{
-	common_init();
-}
-
 // PGM2
 
 //华通电子/Huatong Electronics (distributor of orleg2, kov2nl in china) = 华通科技/Huatong Technology (distributor of kov3 in china),
@@ -1392,7 +1398,7 @@ GAME( 2008, kov2nl_300cn, kov2nl, pgm2,        pgm2, pgm2_state, common_init,   
 
 
 // Dodonpachi Daioujou Tamashii - should be a V200 too
-GAME( 2010, ddpdojt,      0,      pgm2_ramrom, pgm2, ddpdojt_state, init_ddpdojt,  ROT270, "IGS / Cave (Tong Li Animation license)", "DoDonPachi Dai-Ou-Jou Tamashii (V201, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2010, ddpdojt,      0,      pgm2_ramrom, pgm2, ddpdojt_state, common_init,  ROT270, "IGS / Cave (Tong Li Animation license)", "DoDonPachi Dai-Ou-Jou Tamashii (V201, China)", MACHINE_SUPPORTS_SAVE )
 
 // Knights of Valour 3 - should be a V103 and V101 too
 //三国战纪3/Sānguó zhàn jì 3 (Simplified Chinese)
