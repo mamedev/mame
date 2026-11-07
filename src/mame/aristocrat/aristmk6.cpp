@@ -124,6 +124,7 @@ Crown Melbourne uses regular ASP software.
 
 #include "emu.h"
 #include "cpu/sh/sh4.h"
+#include "machine/ds1302.h"
 #include "machine/eepromser.h"
 #include "machine/ins8250.h"
 #include "emupal.h"
@@ -139,6 +140,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_uart0(*this, "uart0"),
 		m_uart1(*this, "uart1"),
+		m_rtc(*this, "rtc"),
 		m_eeprom0(*this, "eeprom0"),
 		m_palette(*this, "palette"),
 		m_vram(*this, "vram")
@@ -153,6 +155,8 @@ private:
 	void irqen_w(offs_t offset, uint8_t data);
 	uint8_t test_r(offs_t offset);
 	void eeprom_w(uint64_t data);
+	uint8_t rtc_r();
+	void rtc_w(uint8_t data);
 	uint64_t hwver_r();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -170,6 +174,7 @@ private:
 	required_device<sh7750_device> m_maincpu;
 	required_device<ns16550_device> m_uart0;
 	required_device<ns16550_device> m_uart1;
+	required_device<ds1302_device> m_rtc;
 	required_device<eeprom_serial_93cxx_device> m_eeprom0;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint64_t> m_vram;
@@ -392,6 +397,21 @@ void aristmk6_state::eeprom_w(uint64_t data)
 	m_eeprom0->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 }
 
+// DS1302, bit-banged by the BIOS: bit 0 I/O (reads back the pin), bit 1 SCLK, bit 2 CE,
+// bit 3 drives the I/O line (clear while the BIOS reads a byte)
+uint8_t aristmk6_state::rtc_r()
+{
+	return m_rtc->io_r();
+}
+
+void aristmk6_state::rtc_w(uint8_t data)
+{
+	m_rtc->ce_w(BIT(data, 2));
+	if (BIT(data, 3))
+		m_rtc->io_w(BIT(data, 0));
+	m_rtc->sclk_w(BIT(data, 1));
+}
+
 uint64_t aristmk6_state::hwver_r()
 {
 	// hardware version/revison register
@@ -411,7 +431,7 @@ void aristmk6_state::aristmk6_map(address_map &map)
 	map(0x11000000, 0x1107ffff).ram(); // SRAM1 512KB
 	map(0x11800000, 0x1187ffff).ram(); // SRAM2 512KB
 // 12000xxx main control registers area
-//  map(0x12000000, another eeprom or SPI bus
+	map(0x12000000, 0x12000007).rw(FUNC(aristmk6_state::rtc_r), FUNC(aristmk6_state::rtc_w)).umask64(0x00000000000000ff);
 	map(0x12000010, 0x12000017).w(FUNC(aristmk6_state::eeprom_w));
 	map(0x12000078, 0x1200007f).nopw(); // watchdog ??
 	map(0x12000080, 0x12000087).nopw(); // 0-1-2 written here repeatedly, diag LED or smth ?
@@ -459,6 +479,8 @@ void aristmk6_state::aristmk6(machine_config &config)
 	NS16550(config, "uart1", 8_MHz_XTAL);
 
 	EEPROM_93C56_16BIT(config, m_eeprom0).default_value(0xff);
+
+	DS1302(config, m_rtc, 32.768_kHz_XTAL);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen"));
