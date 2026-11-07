@@ -201,11 +201,6 @@ void i82439hx_host_device::map_extra(uint64_t memory_window_start, uint64_t memo
 }
 
 
-uint8_t i82439hx_host_device::header_type_r()
-{
-	return 0x00; // from datasheet
-}
-
 void i82439hx_host_device::status_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// bits 12-14 are clear on write

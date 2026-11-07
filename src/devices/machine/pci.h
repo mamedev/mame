@@ -266,6 +266,9 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void interface_post_reset() override;
 
+	// host bridges use a type 0 header
+	virtual uint8_t header_type_r() override;
+
 	virtual device_t *bus_root() override;
 
 	uint32_t root_config_read(uint8_t bus, uint8_t device, uint16_t reg, uint32_t mem_mask);
