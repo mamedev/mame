@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "machine/m950x0.h"
+#include "machine/eepromspi.h"
 #include "machine/sa1110.h"
 #include "machine/sa1111.h"
 #include "sound/uda1344.h"
@@ -180,7 +180,7 @@ protected:
 	required_device<sa1111_device> m_companion;
 	required_device<sed1356_device> m_epson;
 	required_device<uda1344_device> m_codec;
-	required_device<m95020_device> m_nvram;
+	required_device<eeprom_spi_m95020_device> m_nvram;
 
 	required_ioport_array<3> m_kbd_ports;
 	required_ioport m_pen_x;
@@ -613,7 +613,7 @@ void jornada_state::jornada720(machine_config &config)
 	m_companion->i2s_out().set(m_codec, FUNC(uda1344_device::i2s_input_w));
 	m_companion->irq_out().set(m_sa_periphs, FUNC(sa1110_periphs_device::gpio_in<1>));
 
-	M95020(config, m_nvram);
+	SPI_EEPROM_M95020(config, m_nvram);
 
 	UDA1344(config, m_codec);
 	m_codec->l3_ack_out().set(m_companion, FUNC(sa1111_device::l3wd_in));
