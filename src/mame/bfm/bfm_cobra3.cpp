@@ -28,14 +28,18 @@
    Other title user notes:
    - Radio Times accepts £1 (5), 50p (6), 20p (7) and 10p (8).  Its left A-D
      controls use A/B/C/D, its right A-D controls use Z/X/V/N, and Start is 1.
-   - Top of the Pops and The Phrase That Pays normally accept £1 (5), 50p (6),
-     20p (7) and £2 (8).  Although their software recognises 10p and 5p codes,
-     those denominations are inhibited and are not exposed as player inputs.
+   - Top of the Pops and The Phrase That Pays accept £1 (5), 50p (6), 20p (7),
+     10p (8), 5p and £2.
    - Top of the Pops identifies its payout unit as a £1 payslide.  The Phrase
      That Pays identifies its payout unit as a £1 hopper.
    - In The Phrase That Pays, after inserting credit, A (Right) (Left Shift)
      selects the 50p game and C (Right) (X) selects the £1 game.  Spin (1)
      starts the selected game.
+   - The Phrase That Pays offers three games for £1 with a £5 jackpot when
+     DIL 3 is enabled.  Restart after changing this setting.
+   - The Phrase That Pays has separate £5 and £10 note inputs.
+     Each note gives £1 of play credit and puts the remainder in the bank.
+     The reported NV4 validator is simulated in parallel escrow mode.
 
    BTANB:
    - Pressing Test with the Back and Front Doors closed can skip or interrupt
@@ -96,37 +100,33 @@ public:
 	bfm_cobra3_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD;
 
 	void bfm_cobra3(machine_config &config) ATTR_COLD;
-	void c3_ppays(machine_config &config) ATTR_COLD;
 	void c3_telly(machine_config &config) ATTR_COLD;
 
 	int meter_sense_r();
 	ioport_value coin_acceptor_r();
-	int pound_tube_low_r();
-	int twenty_p_tube_low_r();
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
 	void machine_start() override ATTR_COLD;
-	void machine_reset() override ATTR_COLD;
 	void video_start() override ATTR_COLD;
 	void video_reset() override ATTR_COLD;
 
+	virtual void output_latch_w(u16 data, u16 mem_mask);
+	virtual u16 io_r(offs_t offset, u16 mem_mask);
+	virtual void io_w(offs_t offset, u16 data, u16 mem_mask);
+
+	required_ioport_array<5> m_strobein;
+	u16 m_output_latch;
+
 private:
-	static constexpr unsigned NVRAM_BYTES = 16 * 1024;
+	static constexpr unsigned int NVRAM_BYTES = 16 * 1024;
 
 	void update_lamps();
-	void update_diverters();
-	void lamp_latch_w(u16 data, u16 mem_mask);
 	void lamp_port_a_w(u8 data);
-	void output_latch_w(u16 data, u16 mem_mask);
 	void coin_lockouts_w(u8 enables);
-	void diverter_latch_w(u16 data, u16 mem_mask);
 
 	void volume_step(bool direction);
 	void av110_reset_strobe_w(u8 data);
 
-	u16 io_r(offs_t offset, u16 mem_mask);
-	void io_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 mem_r(offs_t offset, u16 mem_mask = ~0);
 	void mem_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
@@ -159,29 +159,85 @@ private:
 	bitmap_rgb32 m_scc_bitmap;
 
 	// Cabinet I/O
-	required_ioport_array<5> m_strobein;
 	required_ioport m_iostatus;
 	optional_ioport m_coin_inputs;
-	optional_ioport_array<2> m_initial_tube_fill;
 	required_device<meters_device> m_meters;
-	optional_device<hopper_device> m_hopper;
 	output_finder<24> m_lamps;
 	output_finder<5> m_coin_lockouts;
-	output_finder<4> m_diverters;
 
-	u8 m_active_strobe = 0;
-	u8 m_volume = 0;
-	u16 m_lamp_latch = 0;
-	u8 m_lamp_port_a = 0;
-	u16 m_output_latch = 0;
-	u16 m_diverter_latch = 0;
-	u8 m_pound_tube_level = 0;
-	u8 m_twenty_p_tube_level = 0;
-	bool m_tube_levels_initialized = false;
+	u8 m_active_strobe;
+	u8 m_volume;
+	u16 m_lamp_latch;
+	u8 m_lamp_port_a;
+};
+
+class c3_payslide_state : public bfm_cobra3_state
+{
+public:
+	c3_payslide_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD;
+
+	int pound_tube_low_r();
+	int twenty_p_tube_low_r();
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+protected:
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
+	void output_latch_w(u16 data, u16 mem_mask) override;
+
+private:
+	required_ioport_array<2> m_initial_tube_fill;
+	u8 m_pound_tube_level;
+	u8 m_twenty_p_tube_level;
+	bool m_tube_levels_initialized;
+};
+
+class c3_hopper_state : public bfm_cobra3_state
+{
+public:
+	c3_hopper_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD;
+
+	void c3_ppays(machine_config &config) ATTR_COLD;
+	ioport_value note_data_r();
+	DECLARE_INPUT_CHANGED_MEMBER(note_inserted);
+
+protected:
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
+	u16 io_r(offs_t offset, u16 mem_mask) override;
+	void io_w(offs_t offset, u16 data, u16 mem_mask) override;
+
+private:
+	enum : u8
+	{
+		NOTE_IDLE,
+		NOTE_VALIDATED_PULSE,
+		NOTE_ESCROW,
+		NOTE_ACCEPTED_PULSE,
+		NOTE_WAIT_REARM,
+		NOTE_ACCEPT_PENDING
+	};
+
+	void update_diverters();
+
+	void note_control_w(u8 data);
+	TIMER_CALLBACK_MEMBER(note_timer_expired);
+	void note_end_transfer();
+
+	required_device<hopper_device> m_hopper;
+	output_finder<4> m_diverters;
+	u16 m_diverter_latch;
+
+	emu_timer *m_note_timer;
+	u8 m_note_control;
+	u8 m_note_phase;
+	u8 m_note_mask;
 };
 
 bfm_cobra3_state::bfm_cobra3_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag)
+	, m_strobein(*this, "STROBE%u", 0)
+	, m_output_latch(0)
 	, m_maincpu(*this, "maincpu")
 	, m_cpuregion(*this, "maincpu")
 	, m_mainram(*this, "nvram", NVRAM_BYTES, ENDIANNESS_BIG)
@@ -195,37 +251,45 @@ bfm_cobra3_state::bfm_cobra3_state(const machine_config &mconfig, device_type ty
 	, m_ramdac(*this, "ramdac")
 	, m_scc66470(*this, "scc66470")
 	, m_sti3400(*this, "sti3400")
-	, m_strobein(*this, "STROBE%u", 0)
 	, m_iostatus(*this, "IOSTATUS")
 	, m_coin_inputs(*this, "COINS")
-	, m_initial_tube_fill(*this, "TUBE%u", 0U)
 	, m_meters(*this, "meters")
-	, m_hopper(*this, "hopper")
 	, m_lamps(*this, "lamp%u", 0U)
 	, m_coin_lockouts(*this, "coin_lockout%u", 0U)
+	, m_active_strobe(0)
+	, m_volume(0)
+	, m_lamp_latch(0)
+	, m_lamp_port_a(0)
+{
+}
+
+c3_payslide_state::c3_payslide_state(const machine_config &mconfig, device_type type, const char *tag)
+	: bfm_cobra3_state(mconfig, type, tag)
+	, m_initial_tube_fill(*this, "TUBE%u", 0U)
+	, m_pound_tube_level(0)
+	, m_twenty_p_tube_level(0)
+	, m_tube_levels_initialized(false)
+{
+}
+
+c3_hopper_state::c3_hopper_state(const machine_config &mconfig, device_type type, const char *tag)
+	: bfm_cobra3_state(mconfig, type, tag)
+	, m_hopper(*this, "hopper")
 	, m_diverters(*this, "diverter%u", 0U)
+	, m_diverter_latch(0)
+	, m_note_control(0)
+	, m_note_phase(NOTE_IDLE)
+	, m_note_mask(0)
 {
 }
 
 void bfm_cobra3_state::update_lamps()
 {
-	for (unsigned i = 0; i < 16; i++)
+	for (unsigned int i = 0; i < 16; i++)
 		m_lamps[i] = BIT(m_lamp_latch, i);
 
-	for (unsigned i = 0; i < 8; i++)
+	for (unsigned int i = 0; i < 8; i++)
 		m_lamps[16 + i] = BIT(m_lamp_port_a, i);
-}
-
-void bfm_cobra3_state::update_diverters()
-{
-	for (unsigned i = 0; i < 4; i++)
-		m_diverters[i] = m_hopper && BIT(m_diverter_latch, i);
-}
-
-void bfm_cobra3_state::lamp_latch_w(u16 data, u16 mem_mask)
-{
-	COMBINE_DATA(&m_lamp_latch);
-	update_lamps();
 }
 
 void bfm_cobra3_state::lamp_port_a_w(u8 data)
@@ -240,48 +304,30 @@ void bfm_cobra3_state::output_latch_w(u16 data, u16 mem_mask)
 	u16 const previous = m_output_latch;
 	COMBINE_DATA(&m_output_latch);
 
-	for (unsigned i = 0; i < 4; i++)
+	for (unsigned int i = 0; i < 4; i++)
 		m_meters->update(i, BIT(m_output_latch, i));
-
-	if (m_initial_tube_fill[0].found() && m_initial_tube_fill[1].found() && BIT(m_strobein[2]->read(), 2))
-	{
-		u8 const rising = BIT(m_output_latch, 4, 3) & BIT(~previous, 4, 3);
-
-		if (BIT(rising, 0) && m_twenty_p_tube_level) // triac A: 20p payslide
-			m_twenty_p_tube_level--;
-		if (BIT(rising, 2) && m_pound_tube_level) // triac C: £1 payslide
-			m_pound_tube_level--;
-	}
 
 	if (BIT(previous, 15) && !BIT(m_output_latch, 15))
 		volume_step(BIT(m_output_latch, 7));
 
 	m_watchdog->reset_line_w(BIT(m_output_latch, 8));
 
-	for (unsigned i = 0; i < 5; i++)
+	for (unsigned int i = 0; i < 5; i++)
 	{
 		if (BIT(m_output_latch, i + 10))
 			m_active_strobe = i;
 	}
 }
 
-void bfm_cobra3_state::diverter_latch_w(u16 data, u16 mem_mask)
+int bfm_cobra3_state::meter_sense_r()
 {
-	COMBINE_DATA(&m_diverter_latch);
-	update_diverters();
+	for (unsigned int i = 0; i < 4; i++)
+	{
+		if (m_meters->get_activity(i))
+			return 1;
+	}
 
-	if (m_hopper)
-	{
-		// TPTP calls bits 0-3 Divert 0-3.  It asserts 1 and 3 together once the
-		// recorded £1 hopper level reaches its £70 float, apparently routing
-		// further £1 coins to the cash box.
-		if (m_diverter_latch & ~0x000f)
-			LOGMASKED(LOG_UNKNOWN, "%s: unimplemented diverter output data %04x mask %04x\n", machine().describe_context(), data, mem_mask);
-	}
-	else
-	{
-		LOGMASKED(LOG_UNKNOWN, "%s: unimplemented diverter output data %04x mask %04x\n", machine().describe_context(), data, mem_mask);
-	}
+	return 0;
 }
 
 void bfm_cobra3_state::coin_lockouts_w(u8 enables)
@@ -295,15 +341,163 @@ void bfm_cobra3_state::coin_lockouts_w(u8 enables)
 		!BIT(enables, 4)  // fifth validator channel
 	};
 
-	for (unsigned channel = 0; channel < std::size(lockouts); channel++)
+	for (unsigned int channel = 0; channel < std::size(lockouts); channel++)
 		m_coin_lockouts[channel] = lockouts[channel];
 
-	// The encoded acceptor uses the fourth logical coin input for £2, which has no inhibit output.
-	unsigned const mapped_channels = m_coin_inputs.found() ? 3 : std::size(lockouts);
-	for (unsigned channel = 0; channel < mapped_channels; channel++)
+	// Follow the encoded-coin ROM tables: 5p/10p/50p use bit 2, and £1/£2 use bit 3.
+	// TODO: Verify £2 inhibit wiring; the standard BCO profile has separate £1/£2 inhibit inputs.
+	unsigned int const mapped_channels = m_coin_inputs.found() ? 3 : std::size(lockouts);
+	for (unsigned int channel = 0; channel < mapped_channels; channel++)
 		machine().bookkeeping().coin_lockout_w(channel, lockouts[channel]);
 	if (m_coin_inputs.found())
-		machine().bookkeeping().coin_lockout_w(3, false);
+	{
+		machine().bookkeeping().coin_lockout_w(3, lockouts[1]); // 10p
+		machine().bookkeeping().coin_lockout_w(4, lockouts[1]); // 5p
+		machine().bookkeeping().coin_lockout_w(5, lockouts[0]); // £2
+	}
+}
+
+ioport_value bfm_cobra3_state::coin_acceptor_r()
+{
+	// The later Cobra games decode six denominations from five acceptor lines.
+	switch (m_coin_inputs->read())
+	{
+		case 0x01: return 0x15; // £1
+		case 0x02: return 0x0b; // 50p
+		case 0x04: return 0x0d; // 20p
+		case 0x08: return 0x13; // 10p
+		case 0x10: return 0x01; // 5p
+		case 0x20: return 0x1f; // £2
+		default:   return 0x00;
+	}
+}
+
+void c3_payslide_state::output_latch_w(u16 data, u16 mem_mask)
+{
+	u16 const previous = m_output_latch;
+	bfm_cobra3_state::output_latch_w(data, mem_mask);
+
+	if (BIT(m_strobein[2]->read(), 2))
+	{
+		u8 const rising = BIT(m_output_latch, 4, 3) & BIT(~previous, 4, 3);
+
+		if (BIT(rising, 0) && m_twenty_p_tube_level) // triac A: 20p payslide
+			m_twenty_p_tube_level--;
+		if (BIT(rising, 2) && m_pound_tube_level) // triac C: £1 payslide
+			m_pound_tube_level--;
+	}
+}
+
+int c3_payslide_state::pound_tube_low_r()
+{
+	return m_pound_tube_level <= 13; // the level switch opens above £13
+}
+
+int c3_payslide_state::twenty_p_tube_low_r()
+{
+	return m_twenty_p_tube_level <= 23; // the level switch opens above £4.60
+}
+
+INPUT_CHANGED_MEMBER(c3_payslide_state::coin_inserted)
+{
+	if (!newval || !BIT(m_strobein[2]->read(), 2))
+		return;
+
+	if ((param == 100) && (m_pound_tube_level < 40)) // £40 capacity
+		m_pound_tube_level++;
+	else if ((param == 20) && (m_twenty_p_tube_level < 150)) // £30 capacity
+		m_twenty_p_tube_level++;
+}
+
+void c3_hopper_state::update_diverters()
+{
+	for (unsigned int i = 0; i < 4; i++)
+		m_diverters[i] = BIT(m_diverter_latch, i);
+}
+
+// Phrase That Pays reportedly uses an Innovative Technology NV4 in parallel escrow mode,
+// with 100 ms vend pulses and a 30-second decision period (NV4/NV5 Operations Manual GA125, pp. 14-15).
+// Bit 4 is modelled as the inverse of the validator's pin 9 (escrow control).
+void c3_hopper_state::note_control_w(u8 data)
+{
+	m_note_control = data & 0x13;
+	if (m_note_phase == NOTE_IDLE)
+		return;
+
+	// Inhibiting the denomination returns a note that has not been accepted.
+	// Once accepted, finish the vend pulse and wait for escrow to be re-armed.
+	if (((m_note_phase == NOTE_VALIDATED_PULSE) || (m_note_phase == NOTE_ESCROW)) && !(m_note_control & m_note_mask))
+	{
+		note_end_transfer();
+		return;
+	}
+
+	if ((m_note_phase == NOTE_ESCROW) && !BIT(m_note_control, 4))
+	{
+		m_note_phase = NOTE_ACCEPTED_PULSE;
+		m_note_timer->adjust(attotime::from_msec(100));
+	}
+	else if ((m_note_phase == NOTE_WAIT_REARM) && BIT(m_note_control, 4))
+	{
+		note_end_transfer();
+	}
+}
+
+ioport_value c3_hopper_state::note_data_r()
+{
+	return ((m_note_phase == NOTE_VALIDATED_PULSE) || (m_note_phase == NOTE_ACCEPTED_PULSE)) ? m_note_mask : 0;
+}
+
+INPUT_CHANGED_MEMBER(c3_hopper_state::note_inserted)
+{
+	if (!newval || (m_note_phase != NOTE_IDLE) || !BIT(m_note_control, 4) || !(m_note_control & param))
+		return;
+
+	m_note_mask = param;
+	m_note_phase = NOTE_VALIDATED_PULSE;
+	m_note_timer->adjust(attotime::from_msec(100));
+}
+
+TIMER_CALLBACK_MEMBER(c3_hopper_state::note_timer_expired)
+{
+	if (m_note_phase == NOTE_VALIDATED_PULSE)
+	{
+		if (BIT(m_note_control, 4))
+		{
+			m_note_phase = NOTE_ESCROW;
+			m_note_timer->adjust(attotime::from_seconds(30));
+		}
+		else
+		{
+			// Keep the two pulses separate when the host accepts during validation.
+			// TODO: Verify the note transport delay against hardware.
+			m_note_phase = NOTE_ACCEPT_PENDING;
+			m_note_timer->adjust(attotime::from_msec(100));
+		}
+	}
+	else if (m_note_phase == NOTE_ESCROW)
+	{
+		note_end_transfer();
+	}
+	else if (m_note_phase == NOTE_ACCEPT_PENDING)
+	{
+		m_note_phase = NOTE_ACCEPTED_PULSE;
+		m_note_timer->adjust(attotime::from_msec(100));
+	}
+	else if (m_note_phase == NOTE_ACCEPTED_PULSE)
+	{
+		if (BIT(m_note_control, 4))
+			note_end_transfer();
+		else
+			m_note_phase = NOTE_WAIT_REARM;
+	}
+}
+
+void c3_hopper_state::note_end_transfer()
+{
+	m_note_phase = NOTE_IDLE;
+	m_note_mask = 0;
+	m_note_timer->adjust(attotime::never);
 }
 
 void bfm_cobra3_state::volume_step(bool direction)
@@ -358,13 +552,6 @@ u16 bfm_cobra3_state::io_r(offs_t offset, u16 mem_mask)
 				return m_ramdac->pal_r();
 			break;
 
-		case 0x800: // Phrase That Pays hopper opto inputs
-			if (m_hopper)
-				return m_hopper->line_r() ? 0 : 0x0002;
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_UNKNOWN, "%s: unknown 0x800 input read offset %08x mask %04x\n", machine().describe_context(), offset * 2, mem_mask);
-			break;
-
 		default:
 			if (!machine().side_effects_disabled())
 				LOGMASKED(LOG_UNKNOWN, "%s: unknown I/O read offset %08x mask %04x\n", machine().describe_context(), offset * 2, mem_mask);
@@ -381,7 +568,8 @@ void bfm_cobra3_state::io_w(offs_t offset, u16 data, u16 mem_mask)
 	switch ((offset * 2) & 0xf00)
 	{
 		case 0x000:
-			lamp_latch_w(data, mem_mask);
+			COMBINE_DATA(&m_lamp_latch);
+			update_lamps();
 			break;
 
 		case 0x100:
@@ -427,22 +615,49 @@ void bfm_cobra3_state::io_w(offs_t offset, u16 data, u16 mem_mask)
 			}
 			break;
 
-		case 0x900: // coin diverter outputs
-			diverter_latch_w(data, mem_mask);
-			break;
-
-		case 0xa00: // hopper drive outputs
-		{
-			u16 const handled = m_hopper ? 0x0020 : 0x0000;
-			if (m_hopper && ACCESSING_BITS_0_7)
-				m_hopper->motor_w(BIT(data, 5));
-			if (data & mem_mask & ~handled)
-				LOGMASKED(LOG_UNKNOWN, "%s: unimplemented hopper drive output write offset %08x data %04x mask %04x\n", machine().describe_context(), offset * 2, data, mem_mask);
-			break;
-		}
-
 		default:
 			LOGMASKED(LOG_UNKNOWN, "%s: unknown I/O write offset %08x data %04x mask %04x\n", machine().describe_context(), offset * 2, data, mem_mask);
+			break;
+	}
+}
+
+u16 c3_hopper_state::io_r(offs_t offset, u16 mem_mask)
+{
+	if (((offset * 2) & 0xf00) == 0x800) // hopper opto inputs
+		return m_hopper->line_r() ? 0 : 0x0002;
+
+	return bfm_cobra3_state::io_r(offset, mem_mask);
+}
+
+void c3_hopper_state::io_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	offset &= 0x7ff;
+
+	switch ((offset * 2) & 0xf00)
+	{
+		case 0x900: // coin diverter outputs
+			COMBINE_DATA(&m_diverter_latch);
+			update_diverters();
+
+			// TPTP calls bits 0-3 Divert 0-3.  It asserts 1 and 3 together once the
+			// recorded £1 hopper level reaches its £70 float, apparently routing
+			// further £1 coins to the cash box.
+			if (m_diverter_latch & ~0x000f)
+				LOGMASKED(LOG_UNKNOWN, "%s: unimplemented diverter output data %04x mask %04x\n", machine().describe_context(), data, mem_mask);
+			break;
+
+		case 0xa00: // hopper drive and note validator outputs
+			if (ACCESSING_BITS_0_7)
+			{
+				m_hopper->motor_w(BIT(data, 5));
+				note_control_w(data);
+			}
+			if (data & mem_mask & ~0x0033)
+				LOGMASKED(LOG_UNKNOWN, "%s: unimplemented hopper drive or note validator output write offset %08x data %04x mask %04x\n", machine().describe_context(), offset * 2, data, mem_mask);
+			break;
+
+		default:
+			bfm_cobra3_state::io_w(offset, data, mem_mask);
 			break;
 	}
 }
@@ -587,22 +802,7 @@ void bfm_cobra3_state::machine_start()
 	save_item(NAME(m_lamp_latch));
 	save_item(NAME(m_lamp_port_a));
 	save_item(NAME(m_output_latch));
-	save_item(NAME(m_diverter_latch));
-	save_item(NAME(m_pound_tube_level));
-	save_item(NAME(m_twenty_p_tube_level));
-	save_item(NAME(m_tube_levels_initialized));
 	machine().save().register_postload(save_prepost_delegate(FUNC(bfm_cobra3_state::update_lamps), this));
-	machine().save().register_postload(save_prepost_delegate(FUNC(bfm_cobra3_state::update_diverters), this));
-}
-
-void bfm_cobra3_state::machine_reset()
-{
-	if (!m_tube_levels_initialized && m_initial_tube_fill[0].found() && m_initial_tube_fill[1].found())
-	{
-		m_pound_tube_level = (m_initial_tube_fill[0]->read() * 40 + 50) / 100; // £40 capacity in £1 coins
-		m_twenty_p_tube_level = (m_initial_tube_fill[1]->read() * 150 + 50) / 100; // £30 capacity in 20p coins
-		m_tube_levels_initialized = true;
-	}
 }
 
 void bfm_cobra3_state::video_start()
@@ -618,6 +818,46 @@ void bfm_cobra3_state::video_start()
 void bfm_cobra3_state::video_reset()
 {
 	m_scc_bitmap.fill(rgb_t::transparent());
+}
+
+void c3_payslide_state::machine_start()
+{
+	bfm_cobra3_state::machine_start();
+
+	save_item(NAME(m_pound_tube_level));
+	save_item(NAME(m_twenty_p_tube_level));
+	save_item(NAME(m_tube_levels_initialized));
+}
+
+void c3_payslide_state::machine_reset()
+{
+	bfm_cobra3_state::machine_reset();
+
+	if (!m_tube_levels_initialized)
+	{
+		m_pound_tube_level = (m_initial_tube_fill[0]->read() * 40 + 50) / 100; // £40 capacity in £1 coins
+		m_twenty_p_tube_level = (m_initial_tube_fill[1]->read() * 150 + 50) / 100; // £30 capacity in 20p coins
+		m_tube_levels_initialized = true;
+	}
+}
+
+void c3_hopper_state::machine_start()
+{
+	bfm_cobra3_state::machine_start();
+
+	m_note_timer = timer_alloc(FUNC(c3_hopper_state::note_timer_expired), this);
+	save_item(NAME(m_diverter_latch));
+	save_item(NAME(m_note_control));
+	save_item(NAME(m_note_phase));
+	save_item(NAME(m_note_mask));
+	machine().save().register_postload(save_prepost_delegate(FUNC(c3_hopper_state::update_diverters), this));
+}
+
+void c3_hopper_state::machine_reset()
+{
+	bfm_cobra3_state::machine_reset();
+
+	note_end_transfer();
 }
 
 void bfm_cobra3_state::bfm_cobra3(machine_config &config)
@@ -694,14 +934,6 @@ void bfm_cobra3_state::bfm_cobra3(machine_config &config)
 	METERS(config, m_meters).set_number(4);
 }
 
-void bfm_cobra3_state::c3_ppays(machine_config &config)
-{
-	bfm_cobra3(config);
-
-	// TODO: Verify the hopper pulse period against the cabinet hardware.
-	HOPPER(config, m_hopper, attotime::from_msec(100));
-}
-
 void bfm_cobra3_state::c3_telly(machine_config &config)
 {
 	bfm_cobra3(config);
@@ -709,51 +941,12 @@ void bfm_cobra3_state::c3_telly(machine_config &config)
 	m_meters->set_number(2);
 }
 
-int bfm_cobra3_state::meter_sense_r()
+void c3_hopper_state::c3_ppays(machine_config &config)
 {
-	for (unsigned i = 0; i < 4; i++)
-	{
-		if (m_meters->get_activity(i))
-			return 1;
-	}
+	bfm_cobra3(config);
 
-	return 0;
-}
-
-ioport_value bfm_cobra3_state::coin_acceptor_r()
-{
-	// The later Cobra games decode six denominations from five acceptor lines.
-	switch (m_coin_inputs->read())
-	{
-		case 0x01: return 0x15; // £1
-		case 0x02: return 0x0b; // 50p
-		case 0x04: return 0x0d; // 20p
-		case 0x08: return 0x13; // 10p
-		case 0x10: return 0x01; // 5p
-		case 0x20: return 0x1f; // £2
-		default:   return 0x00;
-	}
-}
-
-int bfm_cobra3_state::pound_tube_low_r()
-{
-	return m_pound_tube_level <= 13; // the level switch opens above £13
-}
-
-int bfm_cobra3_state::twenty_p_tube_low_r()
-{
-	return m_twenty_p_tube_level <= 23; // the level switch opens above £4.60
-}
-
-INPUT_CHANGED_MEMBER(bfm_cobra3_state::coin_inserted)
-{
-	if (!newval || !BIT(m_strobein[2]->read(), 2))
-		return;
-
-	if ((param == 100) && (m_pound_tube_level < 40)) // £40 capacity
-		m_pound_tube_level++;
-	else if ((param == 20) && (m_twenty_p_tube_level < 150)) // £30 capacity
-		m_twenty_p_tube_level++;
+	// TODO: Verify the hopper pulse period against the cabinet hardware.
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 }
 
 static INPUT_PORTS_START( bfm_cobra3 )
@@ -787,9 +980,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( cobra3_direct_coins )
 	PORT_MODIFY("IOSTATUS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("10p") PORT_IMPULSE(3)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("20p") PORT_IMPULSE(3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bfm_cobra3_state::coin_inserted), 20)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("20p") PORT_IMPULSE(3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(c3_payslide_state::coin_inserted), 20)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("50p") PORT_IMPULSE(3)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME(u8"£1") PORT_IMPULSE(3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bfm_cobra3_state::coin_inserted), 100)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME(u8"£1") PORT_IMPULSE(3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(c3_payslide_state::coin_inserted), 100)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -808,8 +1001,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( cobra3_payslide )
 	PORT_MODIFY("STROBE2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(bfm_cobra3_state::pound_tube_low_r))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(bfm_cobra3_state::twenty_p_tube_low_r))
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(c3_payslide_state::pound_tube_low_r))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(c3_payslide_state::twenty_p_tube_low_r))
 	PORT_CONFNAME( 0x04, 0x04, "Payout Unit" )
 	PORT_CONFSETTING(    0x00, "Not Fitted" )
 	PORT_CONFSETTING(    0x04, "Fitted" )
@@ -918,11 +1111,8 @@ static INPUT_PORTS_START( c3_totp )
 	PORT_INCLUDE(cobra3_standard_dils)
 
 	PORT_MODIFY("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME(u8"£1") PORT_IMPULSE(3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bfm_cobra3_state::coin_inserted), 100)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("20p") PORT_IMPULSE(3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bfm_cobra3_state::coin_inserted), 20)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME(u8"£2") PORT_IMPULSE(3)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME(u8"£1") PORT_IMPULSE(3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(c3_payslide_state::coin_inserted), 100)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("20p") PORT_IMPULSE(3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(c3_payslide_state::coin_inserted), 20)
 
 	PORT_MODIFY("STROBE0")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -942,11 +1132,6 @@ static INPUT_PORTS_START( c3_ppays )
 	PORT_INCLUDE(cobra3_encoded_coins)
 	PORT_INCLUDE(cobra3_standard_dils)
 
-	PORT_MODIFY("COINS")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME(u8"£2") PORT_IMPULSE(3)
-
 	PORT_MODIFY("STROBE0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("A (Left)") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("B (Left)") PORT_CODE(KEYCODE_B)
@@ -961,17 +1146,24 @@ static INPUT_PORTS_START( c3_ppays )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_MODIFY("STROBE3")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(c3_hopper_state::note_data_r))
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_DOOR ) PORT_NAME("Cash Door Open") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Back and Front Doors Open") PORT_CODE(KEYCODE_T) PORT_TOGGLE
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Refill/Volume Setup Mode") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 
 	PORT_MODIFY("STROBE4")
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "DIL:!03" )
+	PORT_DIPNAME( 0x04, 0x00, u8"3 Games for £1" ) PORT_DIPLOCATION("DIL:!03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, "Refill Mode Statistics" ) PORT_DIPLOCATION("DIL:!04")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "DIL:!06" )
+
+	PORT_START("NOTES")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BILL1 ) PORT_NAME(u8"£5 Note") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(c3_hopper_state::note_inserted), 0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME(u8"£10 Note") PORT_CODE(KEYCODE_U) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(c3_hopper_state::note_inserted), 0x02)
 INPUT_PORTS_END
 
 ROM_START( c3_rtime )
@@ -1227,23 +1419,23 @@ ROM_END
 
 } // anonymous namespace
 
-GAMEL(1995, c3_telly,    0,          c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (Game Number 95400021)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
-GAMEL(1995, c3_tellya,   c3_telly,   c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (Game Number 95401021)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
-GAMEL(1995, c3_tellyb,   c3_telly,   c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (Game Number 95400005)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_c3_telly) // fails to boot
-GAMEL(1995, c3_tellyc,   c3_telly,   c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (Game Number 95400013)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_c3_telly) // checksum error
+GAMEL(1995, c3_telly,    0,          c3_telly,   c3_telly, c3_payslide_state, empty_init, ROT0, "BFM", "Telly Addicts (Game Number 95400021)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
+GAMEL(1995, c3_tellya,   c3_telly,   c3_telly,   c3_telly, c3_payslide_state, empty_init, ROT0, "BFM", "Telly Addicts (Game Number 95401021)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
+GAMEL(1995, c3_tellyb,   c3_telly,   c3_telly,   c3_telly, c3_payslide_state, empty_init, ROT0, "BFM", "Telly Addicts (Game Number 95400005)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_c3_telly) // fails to boot
+GAMEL(1995, c3_tellyc,   c3_telly,   c3_telly,   c3_telly, c3_payslide_state, empty_init, ROT0, "BFM", "Telly Addicts (Game Number 95400013)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_c3_telly) // checksum error
 
-GAMEL(1995, c3_tellyns,  0,          c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts - The New Series (Game Number 95400023)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
-GAMEL(1995, c3_tellynsa, c3_tellyns, c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts - The New Series (Game Number 95401023)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
-GAMEL(1995, c3_tellynsb, c3_tellyns, c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts - The New Series (Game Number 95400007)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
+GAMEL(1995, c3_tellyns,  0,          c3_telly,   c3_telly, c3_payslide_state, empty_init, ROT0, "BFM", "Telly Addicts - The New Series (Game Number 95400023)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
+GAMEL(1995, c3_tellynsa, c3_tellyns, c3_telly,   c3_telly, c3_payslide_state, empty_init, ROT0, "BFM", "Telly Addicts - The New Series (Game Number 95401023)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
+GAMEL(1995, c3_tellynsb, c3_tellyns, c3_telly,   c3_telly, c3_payslide_state, empty_init, ROT0, "BFM", "Telly Addicts - The New Series (Game Number 95400007)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
 
-GAMEL(1996, c3_rtime,    0,          bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95400009)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
-GAMEL(1996, c3_rtimea,   c3_rtime,   bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95400063)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
-GAMEL(1996, c3_rtimeb,   c3_rtime,   bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95401063)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
-GAMEL(1996, c3_rtimec,   c3_rtime,   bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95400047)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
-GAMEL(1996, c3_rtimed,   c3_rtime,   bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "bootleg", "Radio Times (Game Number radtimes, bootleg)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime ) // hack/bootleg?
-GAMEL(1996, c3_rtimee,   c3_rtime,   bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95400017)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_c3_rtime ) // checksum error
+GAMEL(1996, c3_rtime,    0,          bfm_cobra3, c3_rtime, c3_payslide_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95400009)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
+GAMEL(1996, c3_rtimea,   c3_rtime,   bfm_cobra3, c3_rtime, c3_payslide_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95400063)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
+GAMEL(1996, c3_rtimeb,   c3_rtime,   bfm_cobra3, c3_rtime, c3_payslide_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95401063)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
+GAMEL(1996, c3_rtimec,   c3_rtime,   bfm_cobra3, c3_rtime, c3_payslide_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95400047)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
+GAMEL(1996, c3_rtimed,   c3_rtime,   bfm_cobra3, c3_rtime, c3_payslide_state, empty_init, ROT0, "bootleg", "Radio Times (Game Number radtimes, bootleg)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime ) // hack/bootleg?
+GAMEL(1996, c3_rtimee,   c3_rtime,   bfm_cobra3, c3_rtime, c3_payslide_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95400017)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_c3_rtime ) // checksum error
 
-GAMEL(1997, c3_totp,     0,          bfm_cobra3, c3_totp,  bfm_cobra3_state, empty_init, ROT0, "BFM", "Top of the Pops (Game Number 95400101)", MACHINE_SUPPORTS_SAVE, layout_c3_totp )
-GAMEL(1997, c3_totpa,    c3_totp,    bfm_cobra3, c3_totp,  bfm_cobra3_state, empty_init, ROT0, "BFM", "Top of the Pops (Game Number 95401101)", MACHINE_SUPPORTS_SAVE, layout_c3_totp )
+GAMEL(1997, c3_totp,     0,          bfm_cobra3, c3_totp,  c3_payslide_state, empty_init, ROT0, "BFM", "Top of the Pops (Game Number 95400101)", MACHINE_SUPPORTS_SAVE, layout_c3_totp )
+GAMEL(1997, c3_totpa,    c3_totp,    bfm_cobra3, c3_totp,  c3_payslide_state, empty_init, ROT0, "BFM", "Top of the Pops (Game Number 95401101)", MACHINE_SUPPORTS_SAVE, layout_c3_totp )
 
-GAMEL(1998, c3_ppays,    0,          c3_ppays,   c3_ppays, bfm_cobra3_state, empty_init, ROT0, "BFM", "The Phrase That Pays (Game Number 95400687)", MACHINE_SUPPORTS_SAVE, layout_c3_ppays )
+GAMEL(1998, c3_ppays,    0,          c3_ppays,   c3_ppays, c3_hopper_state,   empty_init, ROT0, "BFM", "The Phrase That Pays (Game Number 95400687)", MACHINE_SUPPORTS_SAVE, layout_c3_ppays )
