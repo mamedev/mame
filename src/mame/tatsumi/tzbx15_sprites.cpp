@@ -130,26 +130,24 @@ void tzbx15_device::device_add_mconfig(machine_config &config)
 
 */
 template<class BitmapClass>
-void tzbx15_device::draw_sprites_main(BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
+void tzbx15_device::draw_sprites_main(BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank, const uint16_t *ram)
 {
+	uint16_t const *const source = ram ? ram : &m_spriteram[0];
 	// Sprite data is double buffered
 	for (int offs = rambank;offs < rambank + 0x800;offs += 6)
 	{
-		int y =         m_spriteram[offs+3];
-		int x =         m_spriteram[offs+2];
-		int scale =     m_spriteram[offs+4] & 0x1ff;
-		int color =     m_spriteram[offs+1] >> 3 & 0x1ff;
-		int flip_x =    m_spriteram[offs+1] & 0x8000;
-		int flip_y =    m_spriteram[offs+1] & 0x4000;
-		int rotate =    m_spriteram[offs+5] & 0x1ff;
+		int const y =         source[offs+3];
+		int const x =         source[offs+2];
+		int const scale =     source[offs+4] & 0x1ff;
+		int const color =     source[offs+1] >> 3 & 0x1ff;
+		int const flip_x =    source[offs+1] & 0x8000;
+		int const flip_y =    source[offs+1] & 0x4000;
+		int const rotate =    source[offs+5] & 0x1ff;
 
-		int index = m_spriteram[offs];
-
-//      if (m_spriteram[offs+1]&0x7)
-//          color=machine().rand()%0xff;
+		int const index = source[offs];
 
 		/* End of sprite list marker */
-		if (index == 0xffff || m_spriteram[offs + 4] == 0xffff) // todo
+		if (index == 0xffff || source[offs + 4] == 0xffff) // todo
 			return;
 
 		if (index >= 0x4000)
@@ -312,14 +310,14 @@ void tzbx15_device::draw_sprite(BitmapClass &bitmap, const rectangle &cliprect,
 	}
 }
 
-void tzbx15_device::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
+void tzbx15_device::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int write_priority_only, int rambank, const uint16_t *ram)
 {
-	draw_sprites_main(bitmap, cliprect, write_priority_only, rambank);
+	draw_sprites_main(bitmap, cliprect, write_priority_only, rambank, ram);
 }
 
-void tzbx15_device::draw_sprites(bitmap_ind8& bitmap, const rectangle &cliprect, int write_priority_only, int rambank)
+void tzbx15_device::draw_sprites(bitmap_ind8& bitmap, const rectangle &cliprect, int write_priority_only, int rambank, const uint16_t *ram)
 {
-	draw_sprites_main(bitmap, cliprect, write_priority_only, rambank);
+	draw_sprites_main(bitmap, cliprect, write_priority_only, rambank, ram);
 }
 
 /*
