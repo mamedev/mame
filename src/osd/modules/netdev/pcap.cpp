@@ -166,8 +166,9 @@ void pcap_module::netdev_pcap::pcap_handler(u_char *user, const struct pcap_pkth
 		printf("buffer full, dropping packet\n");
 		return;
 	}
-	memcpy(ctx->m_packets[curr], bytes, h->len);
-	ctx->m_packetlens[curr] = h->len;
+	int const len = std::min<int>(h->caplen, sizeof(ctx->m_packets[curr]));
+	memcpy(ctx->m_packets[curr], bytes, len);
+	ctx->m_packetlens[curr] = len;
 	ctx->m_head.store(next, std::memory_order_release);
 }
 
