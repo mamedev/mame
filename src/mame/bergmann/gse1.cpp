@@ -83,6 +83,10 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 		, m_lamps(*this, "lamp%u%u", 0U, 0U)
 		, m_money_led(*this, "money_led%u", 0U)
+		, m_io_coin(*this, "COIN")
+		, m_io_payout(*this, "PAYOUT")
+		, m_io_t6(*this, "T6")
+		, m_io_t7(*this, "T7")
 	{
 	}
 
@@ -112,6 +116,11 @@ private:
 	output_finder<8> m_digits;
 	output_finder<8, 8> m_lamps;
 	output_finder<8> m_money_led;
+
+	required_ioport m_io_coin;
+	required_ioport m_io_payout;
+	required_ioport m_io_t6;
+	required_ioport m_io_t7;
 
 	uint8_t m_adresse = 0;
 	bool m_battery = false;
@@ -263,10 +272,10 @@ uint8_t gse1_state::daten_r()
 	switch (m_adresse & 0x07)
 	{
 		case 0x06:
-			data = ioport("T6")->read();
+			data = m_io_t6->read();
 			break;
 		case 0x07:
-			data = ioport("T7")->read();
+			data = m_io_t7->read();
 			break;
 		default:
 			LOG("Unhandled read from address %02x\n", m_adresse);
@@ -282,14 +291,14 @@ uint8_t gse1_state::pio1_pa_r()
 	// Steckerleiste 15
 	// TODO: The coin sequencing is missing
 	// Specifically PA2 and/or PA3 have to be triggered shortly after a coin passes PA5-7
-	return ioport("COIN")->read();
+	return m_io_coin->read();
 }
 
 uint8_t gse1_state::pio1_pb_r()
 {
 	// Steckerleiste 15
 	// PB5-7
-	return ioport("RETURN")->read();
+	return m_io_payout->read();
 }
 
 void gse1_state::pio1_pb_w(uint8_t data)
@@ -377,15 +386,15 @@ void gse1_state::ctc2_zc0_w(int state)
 }
 
 static INPUT_PORTS_START( gse1 )
-	PORT_START("RETURN")
-	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("PAYOUT")
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED ) // Coil outputs
 	PORT_DIPNAME( 0x20, 0x20, "Level switch 2DM" ) // Pegelschalter 2,-
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, "Level switch 5DM" ) // Pegelschalter 5,-
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Return")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Return") // Rückgabe-Taste
 
 	PORT_START("COIN")
 	PORT_DIPNAME( 0x01, 0x01, "Level switch 10Pf" ) // Pegelschalter -,10
