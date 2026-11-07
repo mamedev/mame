@@ -40,59 +40,76 @@ public:
 	win_osd_socket& operator=(win_osd_socket &&) = delete;
 
 	win_osd_socket(SOCKET s, bool l) noexcept
-		: m_socket(s)
-		, m_listening(l)
+		: m_listener(l ? s : INVALID_SOCKET)
+		, m_socket(l ? INVALID_SOCKET : s)
+		, m_eof(false)
 	{
-		assert(INVALID_SOCKET != m_socket);
+		assert(INVALID_SOCKET != s);
 	}
 
 	virtual ~win_osd_socket() override
 	{
-		closesocket(m_socket);
+		if (INVALID_SOCKET != m_socket)
+			closesocket(m_socket);
+		if (INVALID_SOCKET != m_listener)
+			closesocket(m_listener);
 	}
 
 	virtual std::error_condition read(void *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t &actual) noexcept override
 	{
+		// once the client has finished sending, watch for the next one instead
+		SOCKET const s = ((INVALID_SOCKET == m_socket) || m_eof) ? m_listener : m_socket;
+		assert(INVALID_SOCKET != s);
+
 		fd_set readfds;
 		FD_ZERO(&readfds);
-		FD_SET(m_socket, &readfds);
+		FD_SET(s, &readfds);
 
 		struct timeval timeout;
 		timeout.tv_sec = timeout.tv_usec = 0;
 
-		if (select(m_socket + 1, &readfds, nullptr, nullptr, &timeout) < 0)
+		if (select(s + 1, &readfds, nullptr, nullptr, &timeout) < 0)
 		{
 			return wsa_error_to_file_error(WSAGetLastError());
 		}
-		else if (FD_ISSET(m_socket, &readfds))
+		else if (FD_ISSET(s, &readfds))
 		{
-			if (!m_listening)
+			if (s == m_socket)
 			{
 				// connected socket
 				int const result = recv(m_socket, (char*)buffer, length, 0);
 				if (result < 0)
 				{
-					return wsa_error_to_file_error(WSAGetLastError());
+					int const err = WSAGetLastError();
+					if ((INVALID_SOCKET == m_listener) || !connection_lost(err))
+						return wsa_error_to_file_error(err);
+
+					// report a lost connection as end of file, as for one the peer closed
+					disconnect();
+					actual = 0;
+					return std::error_condition();
 				}
 				else
 				{
+					// end of file: the peer has finished sending, but may still be reading
+					if (!result && length && (INVALID_SOCKET != m_listener))
+						m_eof = true;
 					actual = result;
 					return std::error_condition();
 				}
 			}
 			else
 			{
-				// listening socket
-				SOCKET const accepted = accept(m_socket, nullptr, nullptr);
+				// listening socket - accept the next connection, replacing a client that has finished sending
+				SOCKET const accepted = accept(m_listener, nullptr, nullptr);
 				if (INVALID_SOCKET == accepted)
 				{
 					return wsa_error_to_file_error(WSAGetLastError());
 				}
 				else
 				{
-					closesocket(m_socket);
+					disconnect();
 					m_socket = accepted;
-					m_listening = false;
 					actual = 0;
 
 					return std::error_condition();
@@ -109,9 +126,22 @@ public:
 
 	virtual std::error_condition write(void const *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t &actual) noexcept override
 	{
+		if (INVALID_SOCKET == m_socket)
+		{
+			// not connected
+			actual = 0;
+			return std::errc::not_connected;
+		}
+
 		auto const result = send(m_socket, reinterpret_cast<const char *>(buffer), length, 0);
 		if (result < 0)
-			return wsa_error_to_file_error(WSAGetLastError());
+		{
+			// once the peer has finished sending, a failed write ends the connection
+			int const err = WSAGetLastError();
+			if (m_eof && connection_lost(err))
+				disconnect();
+			return wsa_error_to_file_error(err);
+		}
 
 		actual = result;
 		return std::error_condition();
@@ -175,8 +205,29 @@ public:
 	}
 
 private:
-	SOCKET  m_socket;
-	bool    m_listening;
+	static bool connection_lost(int err) noexcept
+	{
+		return
+				(WSAEINTR != err) &&
+				(WSAEWOULDBLOCK != err) &&
+				(WSAENOBUFS != err) &&
+				(WSA_NOT_ENOUGH_MEMORY != err);
+	}
+
+	void disconnect() noexcept
+	{
+		// a listening socket goes back to accepting; an outgoing connection stays as it is
+		if ((INVALID_SOCKET != m_listener) && (INVALID_SOCKET != m_socket))
+		{
+			closesocket(m_socket);
+			m_socket = INVALID_SOCKET;
+			m_eof = false;
+		}
+	}
+
+	SOCKET  m_listener; // INVALID_SOCKET for an outgoing connection
+	SOCKET  m_socket;   // INVALID_SOCKET while waiting for a connection
+	bool    m_eof;      // client has finished sending
 };
 
 } // anonymous namespace
