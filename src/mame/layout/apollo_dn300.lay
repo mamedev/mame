@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Chris Toshok
+
+The display of the Apollo DN300
+-->
+
+<mamelayout version="2">
+
+	<element name="internal_led"> <disk state="0"> <color red="1.0" green="1.0" blue="1.0" /> </disk> </element>
+	<element name="power_led"> <disk state="0"> <color red="0.0" green="1.0" blue="0.0" /> </disk> </element>
+
+	<element name="label_a"> <text string="A"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="label_b"> <text string="B"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="label_c"> <text string="C"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="label_d"> <text string="D"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+	<element name="power_label"> <text string="PWR"> <color red="1.0" green="1.0" blue="1.0" /> </text> </element>
+
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+
+	<view name="Apollo (1024x800)">
+		<screen index="0"> <bounds x="0" y="0" width="1024" height="800" /> </screen>
+
+		<element ref="background"> <bounds left="769" right="1023" top="800" bottom="844" /> </element>
+
+		<element name="label_a" ref="label_a"> <bounds left="800" right="814" top="806" bottom="822" /> </element>
+		<element name="internal_led_1" ref="internal_led"> <bounds left="818" right="830" top="808" bottom="820" /> </element>
+
+		<element name="label_b" ref="label_b"> <bounds left="838" right="850" top="806" bottom="822" /> </element>
+		<element name="internal_led_2" ref="internal_led"> <bounds left="856" right="868" top="808" bottom="820" /> </element>
+
+		<element name="label_c" ref="label_c"> <bounds left="876" right="888" top="806" bottom="822" /> </element>
+		<element name="internal_led_3" ref="internal_led"> <bounds left="894" right="906" top="808" bottom="820" /> </element>
+
+		<element name="label_d" ref="label_d"> <bounds left="914" right="926" top="806" bottom="822" /> </element>
+		<element name="internal_led_4" ref="internal_led"> <bounds left="932" right="944" top="808" bottom="820" /> </element>
+
+		<element name="power_label" ref="power_label"> <bounds left="952" right="984" top="806" bottom="822" /> </element>
+		<element name="power_led" ref="power_led"> <bounds left="990" right="1002" top="808" bottom="820" /> </element>
+	</view>
+
+</mamelayout>
