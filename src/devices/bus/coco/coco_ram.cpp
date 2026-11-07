@@ -15,10 +15,11 @@
 #include "coco_ram.h"
 #include "meb_intrf.h"
 
+#include "machine/ram.h"
+
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
-#define RAM_SIZE 1024 * 1024
 #define MEB_TAG "meb"
 
 
@@ -46,9 +47,9 @@ namespace
 			virtual void scs_write(offs_t offset, u8 data) override;
 			virtual u8 scs_read(offs_t offset) override;
 			required_device<distomeb_slot_device> m_slot;
+			required_device<ram_device> m_staticram;
 
 		private:
-			std::unique_ptr<uint8_t[]> m_staticram;
 			u32 m_offset;
 	};
 };
@@ -71,6 +72,7 @@ coco_pak_ram_device::coco_pak_ram_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, COCO_PAK_RAM, tag, owner, clock)
 	, device_cococart_interface(mconfig, *this)
 	, m_slot(*this, MEB_TAG)
+	, m_staticram(*this, "staticram")
 {
 }
 
@@ -89,6 +91,8 @@ void coco_pak_ram_device::device_add_mconfig(machine_config &config)
 {
 	DISTOMEB_SLOT(config, m_slot, DERIVED_CLOCK(1, 1), disto_meb_slot, "rtime");
 	m_slot->cart_callback().set([this](int state) { set_line_value(line::CART, state); });
+
+	RAM(config, m_staticram).set_default_size("1M").set_extra_options("256K,512K,768K").set_default_value(0);
 }
 
 
@@ -101,11 +105,9 @@ void coco_pak_ram_device::device_start()
 {
 	// initial state
 	m_offset = 0;
-	m_staticram = std::make_unique<uint8_t[]>(RAM_SIZE);
 
 	// save state
 	save_item(NAME(m_offset));
-	save_pointer(NAME(m_staticram), RAM_SIZE);
 }
 
 
@@ -143,9 +145,9 @@ void coco_pak_ram_device::scs_write(offs_t offset, u8 data)
 				m_offset = (m_offset & 0x00ffff) | (u32(data) << 16);
 				break;
 			case 3:
-				if (m_offset < RAM_SIZE)
+				if (m_offset < m_staticram->size())
 				{
-					m_staticram[m_offset] = data;
+					m_staticram->write(m_offset, data);
 				}
 				break;
 		}
@@ -182,9 +184,9 @@ u8 coco_pak_ram_device::scs_read(offs_t offset)
 				data = u8((m_offset >> 16) & 0x00ff);
 				break;
 			case 3:
-				if (m_offset < RAM_SIZE)
+				if (m_offset < m_staticram->size())
 				{
-					data = m_staticram[m_offset];
+					data = m_staticram->read(m_offset);
 				}
 				break;
 		}
