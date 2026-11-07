@@ -25,6 +25,7 @@
 // standard Cocoa headers
 #import <Cocoa/Cocoa.h>
 
+
 #endif // __OBJC__
 
 #endif // MAME_OSD_DEBUGGER_OSX_DEBUGOSX_H
