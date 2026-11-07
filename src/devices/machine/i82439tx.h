@@ -16,7 +16,7 @@ public:
 	i82439tx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, int ram_size)
 		: i82439tx_host_device(mconfig, tag, owner)
 	{
-		set_ids_host(0x80867100, 0x03, 0x00000000);
+		set_ids_host(0x80867100, 0x01, 0x00000000);
 		set_cpu_tag(std::forward<T>(cpu_tag));
 		set_ram_size(ram_size);
 	}
@@ -47,15 +47,22 @@ private:
 	std::vector<uint32_t> ram;
 	uint32_t *m_ram;
 
-	uint8_t pcon, cc, dramec, dramc, dramt;
-	uint8_t pam[7], drb[8];
-	uint8_t drt, drat, smram, errcmd, errsts, errsyn;
+	uint8_t acon, pcon, cc, cec, dramec, dramc, dramt;
+	uint16_t sdramc;
+	uint8_t pam[7], drb[6];
+	uint8_t drt, drth, esmramc, smram, mctl;
 	bool smiact_n;
 
+	uint8_t acon_r();
+	void acon_w(uint8_t data);
 	uint8_t pcon_r();
 	void pcon_w(uint8_t data);
 	uint8_t cc_r();
 	void cc_w(uint8_t data);
+	uint8_t cec_r();
+	void cec_w(uint8_t data);
+	uint16_t sdramc_r();
+	void sdramc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t dramec_r();
 	void dramec_w(uint8_t data);
 	uint8_t dramc_r();
@@ -66,17 +73,16 @@ private:
 	void pam_w(offs_t offset, uint8_t data);
 	uint8_t drb_r(offs_t offset);
 	void drb_w(offs_t offset, uint8_t data);
-	uint8_t drt_r();
-	void drt_w(uint8_t data);
-	uint8_t drat_r();
-	void drat_w(uint8_t data);
+	uint8_t drth_r();
+	void drth_w(uint8_t data);
+	uint8_t drtl_r();
+	void drtl_w(uint8_t data);
+	uint8_t esmramc_r();
+	void esmramc_w(uint8_t data);
 	uint8_t smram_r();
 	void smram_w(uint8_t data);
-	uint8_t errcmd_r();
-	void errcmd_w(uint8_t data);
-	uint8_t errsts_r();
-	void errsts_w(uint8_t data);
-	uint8_t errsyn_r();
+	uint8_t mctl_r();
+	void mctl_w(uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(I82439TX, i82439tx_host_device)
