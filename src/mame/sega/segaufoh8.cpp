@@ -36,6 +36,16 @@ Chips on PCB:
 1x SEGA 315-5296A
 1x H8/3007
 1x YAMAHA YM3438C-D
+
+ROM analysis:
+- 315-5296 PB/PC bits 4 and 3 feed the P2/P1 coin counters, adding 1 and 5
+  units respectively. PG bits 0 and 2 feed the separate service counters.
+- Coin acceptance requires player state 3. Startup currently waits for the
+  unimplemented SCI2 settings transfer, before reaching normal operation.
+- 315-5338A PF/PE receive P1/P2 display data, eight bytes twice per update.
+  The ROM's segment table uses bits 7-1 for a-g and bit 0 for the decimal
+  point. The display selection/latching hardware still needs identification;
+  do not apply the UFO21's direct digit output wiring here.
 */
 
 #include "emu.h"
@@ -47,6 +57,8 @@ Chips on PCB:
 #include "sound/ymopn.h"
 
 #include "speaker.h"
+
+#include "ufo7.lh"
 
 
 namespace {
@@ -71,8 +83,10 @@ private:
 void segaufoh8_state::program_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
-	//map(0x?00000, 0x?0007f).rw("315_5296", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0xff00);
-	//map(0x400000, 0x40001f).rw("315_5338a", FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write)).umask16(0xff00);
+	map(0x400000, 0x40001f).rw("315_5296", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0xff00);
+	map(0x400040, 0x40005f).rw("315_5338a", FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write)).umask16(0xff00);
+	map(0x400080, 0x400081).portr("DSW1").umask16(0xff00);
+	map(0x400100, 0x400107).rw("ym", FUNC(ym3438_device::read), FUNC(ym3438_device::write)).umask16(0xff00);
 }
 
 
@@ -81,21 +95,32 @@ static INPUT_PORTS_START( ufo7 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("P2 Coin (5 units)") PORT_IMPULSE(5)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("P2 Coin (1 unit)") PORT_IMPULSE(5)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Height")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Y")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 X")
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("P1 Coin (5 units)") PORT_IMPULSE(5)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("P1 Coin (1 unit)") PORT_IMPULSE(5)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Height")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Y")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 X")
+
+	// ufo7s counts PB/PC bits 3-4 as coins and PG bits 0/2 as service credits.
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("P2 Service Coin")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P1 Service Coin")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test / Accounting") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Clear / Confirm") PORT_CODE(KEYCODE_DEL)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Select / Next") PORT_CODE(KEYCODE_ENTER)
 
 	PORT_START("DSW1") // only one bank of dips on PCB, but there is a second empty space
 	PORT_DIPNAME( 0x01, 0x01, "UNK1-01" )
@@ -130,7 +155,10 @@ void segaufoh8_state::segaufoh8(machine_config &config)
 	H83007(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaufoh8_state::program_map);
 
-	SEGA_315_5296(config, "315_5296", 8_MHz_XTAL);
+	sega_315_5296_device &io(SEGA_315_5296(config, "315_5296", 8_MHz_XTAL));
+	io.in_pb_callback().set_ioport("IN1");
+	io.in_pc_callback().set_ioport("IN2");
+	io.in_pg_callback().set_ioport("SYSTEM");
 
 	SEGA_315_5338A(config, "315_5338a", 32_MHz_XTAL);
 
@@ -158,9 +186,21 @@ ROM_START( ufo7a )
 	ROM_LOAD16_WORD_SWAP( "epr-23795a.ic408", 0x00000, 0x80000, CRC(9ea1f4e9) SHA1(3503afe209156906ae7e45f12fa17fa863d7ae17) )
 ROM_END
 
+ROM_START( ufo7m )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "epr-24139.ic408", 0x00000, 0x80000, NO_DUMP )
+ROM_END
+
+ROM_START( ufo7s )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "epr-24240a.ic408", 0x00000, 0x80000, NO_DUMP )
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 2003, ufo7,  0,    segaufoh8, ufo7, segaufoh8_state, empty_init, ROT0, "Sega", "UFO Catcher 7 (rev. C)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // UFO Catch 7 V20030226 in string in ROM
-GAME( 2001, ufo7b, ufo7, segaufoh8, ufo7, segaufoh8_state, empty_init, ROT0, "Sega", "UFO Catcher 7 (rev. B)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // UFO Catch 7 V20011112 in string in ROM
-GAME( 2001, ufo7a, ufo7, segaufoh8, ufo7, segaufoh8_state, empty_init, ROT0, "Sega", "UFO Catcher 7 (rev. A)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // UFO Catch 7 V20011112 in string in ROM
+GAMEL( 2003, ufo7,  0,    segaufoh8, ufo7, segaufoh8_state, empty_init, ROT0, "Sega", "UFO Catcher 7 (rev. C)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_ufo7 ) // UFO Catch 7 V20030226 in string in ROM
+GAMEL( 2001, ufo7b, ufo7, segaufoh8, ufo7, segaufoh8_state, empty_init, ROT0, "Sega", "UFO Catcher 7 (rev. B)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_ufo7 ) // UFO Catch 7 V20011112 in string in ROM
+GAMEL( 2001, ufo7a, ufo7, segaufoh8, ufo7, segaufoh8_state, empty_init, ROT0, "Sega", "UFO Catcher 7 (rev. A)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_ufo7 ) // UFO Catch 7 V20011112 in string in ROM
+GAMEL( 2003, ufo7m, ufo7, segaufoh8, ufo7, segaufoh8_state, empty_init, ROT0, "Sega", "UFO Catcher 7 Max Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_ufo7 ) // more arm catch capability
+GAMEL( 2004, ufo7s, ufo7, segaufoh8, ufo7, segaufoh8_state, empty_init, ROT0, "Sega", "UFO Catcher 7 Second", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_ufo7 ) // second contains all previous model music
