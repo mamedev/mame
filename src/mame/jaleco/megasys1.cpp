@@ -2155,7 +2155,7 @@ void megasys1_bc_iosim_state::system_B_hayaosi1(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_bc_iosim_state::megasys1B_iosim_map);
 
-	OKIM6295(config.replace(), m_oki[0], 2000000, okim6295_device::PIN7_HIGH); /* correct speed, but unknown OSC + divider combo */
+	OKIM6295(config.replace(), m_oki[0], 4000000, okim6295_device::PIN7_HIGH); /* correct speed, but unknown OSC + divider combo */
 	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.30, 0);
 	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.30, 1);
 
