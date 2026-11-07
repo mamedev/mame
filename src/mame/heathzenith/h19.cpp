@@ -12,6 +12,7 @@
 
 #include "emu.h"
 
+#include "bus/heathzenith/h19/cards.h"
 #include "bus/heathzenith/h19/tlb.h"
 #include "bus/rs232/rs232.h"
 
@@ -36,22 +37,11 @@ private:
 
 };
 
-static void tlb_options(device_slot_interface &device)
-{
-	device.option_add("heath",      HEATH_TLB);
-	device.option_add("gp19",       HEATH_GP19);
-	device.option_add("imaginator", HEATH_IMAGINATOR);
-	device.option_add("super19",    HEATH_SUPER19);
-	device.option_add("superset",   HEATH_SUPERSET);
-	device.option_add("ultrarom",   HEATH_ULTRA);
-	device.option_add("watzman",    HEATH_WATZ);
-}
-
 void h19_state::h19(machine_config &config)
 {
 	config.set_default_layout(layout_h19);
 
-	HEATH_TLB_CONNECTOR(config, m_tlbc, tlb_options, "heath");
+	HEATH_TLB_CONNECTOR(config, m_tlbc, h19_tlb_options, "heath");
 	m_tlbc->serial_data_callback().set("dte", FUNC(rs232_port_device::write_txd));
 	m_tlbc->dtr_callback().set("dte", FUNC(rs232_port_device::write_dtr));
 	m_tlbc->rts_callback().set("dte", FUNC(rs232_port_device::write_rts));
