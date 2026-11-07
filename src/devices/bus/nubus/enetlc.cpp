@@ -38,7 +38,7 @@ protected:
 private:
 	void card_map(address_map &map);
 	u16 ethernet_mac_r(offs_t offset, u16 mem_mask);
-	u8 mac_prom(unsigned index) const;
+	u8 mac_prom(offs_t index) const;
 
 	std::string m_fulltag;
 };
@@ -134,7 +134,7 @@ void nubus_enetlctp_device::device_start()
 
 // MAC PROM is stored with a bit swizzle (IEEE standard according to SuperMario source?)
 // and must match Apple's assigned OUI block 08:00:07
-u8 nubus_enetlctp_device::mac_prom(unsigned index) const
+u8 nubus_enetlctp_device::mac_prom(offs_t index) const
 {
 	static constexpr u8 OUI[3] = { 0x08, 0x00, 0x07 };
 	return bitswap<8>((index < 3) ? OUI[index] : m_sonic->get_mac()[index], 0, 1, 2, 3, 4, 5, 6, 7);
@@ -156,7 +156,7 @@ u16 nubus_enetlctp_device::ethernet_mac_r(offs_t offset, u16 mem_mask)
 
 	if (offset < 6)
 	{
-		return mac_prom(offset) | mac_prom(offset) << 8;
+		return (mac_prom(offset) << 8) | mac_prom(offset);
 	}
 	else if (offset == 7)
 	{
