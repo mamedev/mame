@@ -3054,18 +3054,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/lpci.h,MACHINES["LPCI"] = true
----------------------------------------------------
-
-if MACHINES["LPCI"] then
-	files {
-		MAME_DIR .. "src/devices/machine/lpci.cpp",
-		MAME_DIR .. "src/devices/machine/lpci.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/pci.h,MACHINES["PCI"] = true
 ---------------------------------------------------
 
@@ -3154,8 +3142,12 @@ if MACHINES["PCI"] then
 		MAME_DIR .. "src/devices/machine/sis950_smbus.h",
 		MAME_DIR .. "src/devices/machine/sis85c496.cpp",
 		MAME_DIR .. "src/devices/machine/sis85c496.h",
+		MAME_DIR .. "src/devices/machine/vt8231_acpi.cpp",
+		MAME_DIR .. "src/devices/machine/vt8231_acpi.h",
 		MAME_DIR .. "src/devices/machine/vt8231_isa.cpp",
 		MAME_DIR .. "src/devices/machine/vt8231_isa.h",
+		MAME_DIR .. "src/devices/machine/vt82c585vp.cpp",
+		MAME_DIR .. "src/devices/machine/vt82c585vp.h",
 		MAME_DIR .. "src/devices/machine/vt82c586b_acpi.cpp",
 		MAME_DIR .. "src/devices/machine/vt82c586b_acpi.h",
 		MAME_DIR .. "src/devices/machine/vt82c586b_ide.cpp",
@@ -3547,22 +3539,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/s3c2400.h,MACHINES["S3C24XX"] = true
---@src/devices/machine/s3c2410.h,MACHINES["S3C24XX"] = true
---@src/devices/machine/s3c2440.h,MACHINES["S3C24XX"] = true
+--@src/devices/machine/s3c24xx.h,MACHINES["S3C24XX"] = true
 ---------------------------------------------------
 
 if MACHINES["S3C24XX"] then
 	files {
-		MAME_DIR .. "src/devices/machine/s3c2400.cpp",
-		MAME_DIR .. "src/devices/machine/s3c2400.h",
-		MAME_DIR .. "src/devices/machine/s3c2410.cpp",
-		MAME_DIR .. "src/devices/machine/s3c2410.h",
-		MAME_DIR .. "src/devices/machine/s3c2440.cpp",
-		MAME_DIR .. "src/devices/machine/s3c2440.h",
 		MAME_DIR .. "src/devices/machine/s3c24xx.cpp",
 		MAME_DIR .. "src/devices/machine/s3c24xx.h",
-		MAME_DIR .. "src/devices/machine/s3c24xx.hxx",
 	}
 end
 
@@ -3645,6 +3628,18 @@ if MACHINES["SAA5070"] then
 	files {
 		MAME_DIR .. "src/devices/machine/saa5070.cpp",
 		MAME_DIR .. "src/devices/machine/saa5070.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/sab3019.h,MACHINES["SAB3019"] = true
+---------------------------------------------------
+
+if MACHINES["SAB3019"] then
+	files {
+		MAME_DIR .. "src/devices/machine/sab3019.cpp",
+		MAME_DIR .. "src/devices/machine/sab3019.h",
 	}
 end
 
@@ -4858,6 +4853,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/fdc37c669.h,MACHINES["FDC37C669"] = true
+---------------------------------------------------
+
+if MACHINES["FDC37C669"] then
+	files {
+		MAME_DIR .. "src/devices/machine/fdc37c669.cpp",
+		MAME_DIR .. "src/devices/machine/fdc37c669.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pci9050.h,MACHINES["PCI9050"] = true
 ---------------------------------------------------
 
@@ -4901,6 +4908,30 @@ if MACHINES["VT82C496"] then
 	files {
 		MAME_DIR .. "src/devices/machine/vt82c496.cpp",
 		MAME_DIR .. "src/devices/machine/vt82c496.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/cx5510.h,MACHINES["CX5510"] = true
+---------------------------------------------------
+
+if MACHINES["CX5510"] then
+	files {
+		MAME_DIR .. "src/devices/machine/cx5510.cpp",
+		MAME_DIR .. "src/devices/machine/cx5510.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/vt82c505.h,MACHINES["VT82C505"] = true
+---------------------------------------------------
+
+if MACHINES["VT82C505"] then
+	files {
+		MAME_DIR .. "src/devices/machine/vt82c505.cpp",
+		MAME_DIR .. "src/devices/machine/vt82c505.h",
 	}
 end
 

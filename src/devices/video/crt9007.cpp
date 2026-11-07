@@ -20,7 +20,7 @@
     - double height cursor
     - row attributes
     - pin configuration
-    - operation modes 0,4,7
+    - operation modes 0,7
     - address modes 1,3
     - light pen
 
@@ -101,6 +101,12 @@ DEFINE_DEVICE_TYPE(CRT9007, crt9007_device, "crt9007", "SMC CRT9007 VPAC")
 
 #define OPERATION_MODE \
 	((m_reg[0x0b] >> 1) & 0x07)
+
+#define DOUBLE_ROW_BUFFER \
+	(OPERATION_MODE == OPERATION_MODE_DOUBLE_ROW_BUFFER)
+
+#define SINGLE_ROW_BUFFER \
+	(OPERATION_MODE == OPERATION_MODE_SINGLE_ROW_BUFFER)
 
 #define INTERLACE_MODE \
 	((m_reg[0x0b] >> 4) & 0x03)
@@ -183,7 +189,7 @@ enum
 {
 	OPERATION_MODE_REPETITIVE_MEMORY_ADDRESSING = 0,    // not implemented
 	OPERATION_MODE_DOUBLE_ROW_BUFFER = 1,
-	OPERATION_MODE_SINGLE_ROW_BUFFER = 4,               // not implemented
+	OPERATION_MODE_SINGLE_ROW_BUFFER = 4,               // memory timing only, not the pin configuration
 	OPERATION_MODE_ATTRIBUTE_ASSEMBLE = 7               // not implemented
 };
 
@@ -371,7 +377,7 @@ inline void crt9007_device::update_curs_timer(bool state)
 inline void crt9007_device::update_drb_timer(bool state)
 {
 	// this signal is active for 1 full scan line (VLT edge to edge) at the top scan line of each new row
-	// there is 1 extra DRB signal during the vertical retrace interval, which loads the first data row
+	// there is 1 extra DRB signal during the vertical retrace interval; a double row buffer loads the first data row with it
 	int y = screen().vpos();
 
 	int next_x = m_vlt_end;
@@ -411,6 +417,21 @@ inline void crt9007_device::update_dma_timer()
 
 
 //-------------------------------------------------
+//  start_single_row_data - with a single row
+//  buffer, the data row is addressed at the
+//  painting rate during the visible line time of
+//  its top scan line, which follows the row
+//  boundary retrace
+//-------------------------------------------------
+
+inline void crt9007_device::start_single_row_data()
+{
+	// a short retrace can carry the row table read over into the top scan line
+	m_dma_timer->adjust(screen().time_until_pos(screen().vpos() + (screen().hpos() < m_vlt_start ? 0 : 1), m_vlt_start));
+}
+
+
+//-------------------------------------------------
 //  recompute_cursor -
 //-------------------------------------------------
 
@@ -441,6 +462,31 @@ inline void crt9007_device::recompute_cursor()
 
 
 //-------------------------------------------------
+//  frame_period - programmed time of one frame
+//-------------------------------------------------
+
+inline attotime crt9007_device::frame_period() const
+{
+	return clocks_to_attotime(CHARACTERS_PER_HORIZONTAL_PERIOD * SCAN_LINES_PER_FRAME);
+}
+
+
+//-------------------------------------------------
+//  update_frame_timer - one data row before
+//  vertical retrace with a single row buffer, two
+//  with a double (data sheet: R1A bit 0)
+//-------------------------------------------------
+
+inline void crt9007_device::update_frame_timer()
+{
+	if (!HAS_VALID_PARAMETERS) return;
+
+	int const line = m_drb_bottom - (DOUBLE_ROW_BUFFER ? SCAN_LINES_PER_DATA_ROW : 0);
+	m_frame_timer->adjust(screen().time_until_pos(line, 0), 0, frame_period());
+}
+
+
+//-------------------------------------------------
 //  recompute_parameters -
 //-------------------------------------------------
 
@@ -454,7 +500,7 @@ inline void crt9007_device::recompute_parameters()
 	int vert_pix_total = SCAN_LINES_PER_FRAME;
 
 	// refresh rate
-	attotime refresh = clocks_to_attotime(CHARACTERS_PER_HORIZONTAL_PERIOD * vert_pix_total);
+	attotime refresh = frame_period();
 
 	// horizontal sync
 	m_hsync_start = 0;
@@ -486,8 +532,7 @@ inline void crt9007_device::recompute_parameters()
 	m_vlt_timer->adjust(screen().time_until_pos(0, m_vlt_start), 1);
 	m_drb_timer->adjust(screen().time_until_pos(0, m_vlt_end));
 
-	int frame_timer_line = m_drb_bottom - (OPERATION_MODE == OPERATION_MODE_DOUBLE_ROW_BUFFER ? SCAN_LINES_PER_DATA_ROW : 0);
-	m_frame_timer->adjust(screen().time_until_pos(frame_timer_line, 0), 0, refresh);
+	update_frame_timer();
 
 	recompute_cursor();
 }
@@ -715,15 +760,21 @@ TIMER_CALLBACK_MEMBER(crt9007_device::drb_update)
 	LOG("CRT9007 y %03u x %04u : DRB %u\n", screen().vpos(), screen().hpos(), m_drb);
 
 	m_write_drb(m_drb);
+	update_drb_timer(m_drb);
 
 	if (!m_drb && !DMA_DISABLE)
 	{
-		// the row buffer is loaded with the next data row during this scan line
+		// this edge starts the transfer of the next data row
 		if (!screen().vpos())
 		{
-			// the first row buffer transfer of the frame starts at the top of the display
+			// the extra DRB in vertical retrace restarts the frame from its first row
 			m_dma_addr = TABLE_START;
 			m_table_addr = TABLE_START;
+
+			// a single row buffer loads each row on its own top scan line, so this DRB
+			// transfers nothing
+			if (SINGLE_ROW_BUFFER)
+				return;
 		}
 
 		if (ADDRESS_MODE == ADDRESS_MODE_CONTIGUOUS_ROW_TABLE)
@@ -747,12 +798,17 @@ TIMER_CALLBACK_MEMBER(crt9007_device::drb_update)
 		LOG("CRT9007 DMAR 1\n");
 		m_write_dmar(ASSERT_LINE);
 
-		// the characters are transferred half a character time before the row
-		// buffer write clock, so that each one is latched by the following edge
-		m_dma_timer->adjust(clocks_to_attotime(1) / 2);
+		if (SINGLE_ROW_BUFFER && !m_table_count)
+		{
+			start_single_row_data();
+		}
+		else
+		{
+			// the first transfer comes half a character time after the edge, so that each
+			// character is latched by the row buffer write clock edge following it
+			m_dma_timer->adjust(clocks_to_attotime(1) / 2);
+		}
 	}
-
-	update_drb_timer(m_drb);
 }
 
 TIMER_CALLBACK_MEMBER(crt9007_device::dma_update)
@@ -776,6 +832,12 @@ TIMER_CALLBACK_MEMBER(crt9007_device::dma_update)
 			m_dma_addr = m_row_addr & 0x3fff;
 
 			LOG("CRT9007 Data Row Address: %04x\n", m_dma_addr);
+
+			if (SINGLE_ROW_BUFFER)
+			{
+				start_single_row_data();
+				return;
+			}
 		}
 
 		update_dma_timer();
@@ -902,6 +964,8 @@ uint8_t crt9007_device::read(offs_t offset)
 
 void crt9007_device::write(offs_t offset, uint8_t data)
 {
+	bool const was_double_row_buffer = DOUBLE_ROW_BUFFER;
+
 	m_reg[offset] = data;
 
 	switch (offset)
@@ -969,6 +1033,10 @@ void crt9007_device::write(offs_t offset, uint8_t data)
 		LOG("CRT9007 Operation Mode: %u\n", OPERATION_MODE);
 		LOG("CRT9007 Interlace Mode: %u\n", INTERLACE_MODE);
 		LOG("CRT9007 %s Mechanism\n", PAGE_BLANK ? "Page Blank" : "Smooth Scroll");
+		// the chip double buffers this register and applies it in vertical retrace;
+		// applying it here is a simplification
+		if (DOUBLE_ROW_BUFFER != was_double_row_buffer)
+			update_frame_timer();
 		break;
 
 	case 0x0c:

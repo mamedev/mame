@@ -138,19 +138,28 @@ static const XTAL timer_clks[4] = { XTAL(16'777'216), XTAL(16'777'216) / 64, XTA
 
 void gba_state::request_irq(uint32_t int_type)
 {
-	// set flag for later recovery
+	// IF latches every request; IE and IME only gate the CPU's IRQ line
 	IF_SET(int_type);
+	update_irq();
+}
 
-	// is this specific interrupt enabled?
-	int_type &= IE;
-	if (int_type != 0)
+void gba_state::update_irq()
+{
+	const bool pending = (IE & IF & 0x3fff) != 0;
+
+	// HALT ends on any enabled request, whatever IME and CPSR.I say
+	if (pending && m_halted)
 	{
-		// master enable?
-		if (IME & 1)
-		{
-			m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
-			m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
-		}
+		m_halted = false;
+		m_maincpu->resume(SUSPEND_REASON_HALT);
+	}
+
+	// the IRQ line is a level: it stays asserted until the handler acknowledges IF
+	const bool irq = pending && BIT(IME, 0);
+	if (irq != m_irq_asserted)
+	{
+		m_irq_asserted = irq;
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -440,7 +449,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 			if( ( m_timer_regs[1] & 0x0000ffff ) == 0 )
 			{
 				m_timer_regs[1] |= m_timer_reload[1];
-				if( ( m_timer_regs[1] & 0x400000 ) && ( IME != 0 ) )
+				if( m_timer_regs[1] & 0x400000 )
 				{
 					request_irq(tmr_ints[1]);
 				}
@@ -450,7 +459,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 					if( ( m_timer_regs[2] & 0x0000ffff ) == 0 )
 					{
 						m_timer_regs[2] |= m_timer_reload[2];
-						if( ( m_timer_regs[2] & 0x400000 ) && ( IME != 0 ) )
+						if( m_timer_regs[2] & 0x400000 )
 						{
 							request_irq(tmr_ints[2]);
 						}
@@ -460,7 +469,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 							if( ( m_timer_regs[3] & 0x0000ffff ) == 0 )
 							{
 								m_timer_regs[3] |= m_timer_reload[3];
-								if( ( m_timer_regs[3] & 0x400000 ) && ( IME != 0 ) )
+								if( m_timer_regs[3] & 0x400000 )
 								{
 									request_irq(tmr_ints[3]);
 								}
@@ -478,7 +487,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 			if( ( m_timer_regs[2] & 0x0000ffff ) == 0 )
 			{
 				m_timer_regs[2] |= m_timer_reload[2];
-				if( ( m_timer_regs[2] & 0x400000 ) && ( IME != 0 ) )
+				if( m_timer_regs[2] & 0x400000 )
 				{
 					request_irq(tmr_ints[2]);
 				}
@@ -488,7 +497,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 					if( ( m_timer_regs[3] & 0x0000ffff ) == 0 )
 					{
 						m_timer_regs[3] |= m_timer_reload[3];
-						if( ( m_timer_regs[3] & 0x400000 ) && ( IME != 0 ) )
+						if( m_timer_regs[3] & 0x400000 )
 						{
 							request_irq(tmr_ints[3]);
 						}
@@ -504,7 +513,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 			if( ( m_timer_regs[3] & 0x0000ffff ) == 0 )
 			{
 				m_timer_regs[3] |= m_timer_reload[3];
-				if( ( m_timer_regs[3] & 0x400000 ) && ( IME != 0 ) )
+				if( m_timer_regs[3] & 0x400000 )
 				{
 					request_irq(tmr_ints[3]);
 				}
@@ -514,17 +523,10 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 	}
 
 	// are we supposed to IRQ?
-	if ((m_timer_regs[tmr] & 0x400000) && (IME != 0))
+	if (m_timer_regs[tmr] & 0x400000)
 	{
 		request_irq(tmr_ints[tmr]);
 	}
-}
-
-TIMER_CALLBACK_MEMBER(gba_state::handle_irq)
-{
-	request_irq(IF);
-
-	m_irq_timer->adjust(attotime::never);
 }
 
 static const char *const reg_names[] = {
@@ -748,6 +750,7 @@ void gba_state::gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	uint8_t soundcnt_x = SOUNDCNT_X;
 	uint16_t siocnt = SIOCNT;
 	uint16_t dmachcnt[4] = { DMACNT_H(0), DMACNT_H(1), DMACNT_H(2), DMACNT_H(3) };
+	const uint16_t old_if = IF;
 	static const float dac_gain_table[2] = { 0.5f, 1.0f };
 	static const float psg_gain_table[4] = { 0.25f, 0.5f, 1.0f, 1.0f/* prohibited? */ };
 
@@ -1110,40 +1113,26 @@ void gba_state::gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 		case 0x0200/4:
-			if( ACCESSING_BITS_0_15 )
+			if (ACCESSING_BITS_16_31)
 			{
-#if 0
-				if (IE & IF)
-				{
-					request_irq(IF);
-				}
-#endif
+				// IF is write-1-to-acknowledge: COMBINE_DATA stored the written bits, so rebuild it from the old value
+				IF_RESET(0xffff);
+				IF_SET(old_if & ~((data & mem_mask) >> 16));
 			}
-			if( ACCESSING_BITS_16_31 )
-			{
-				IF_RESET(( data & mem_mask ) >> 16);
-
-				// if we still have interrupts, yank the IRQ line again
-				if (IF)
-				{
-					m_irq_timer->adjust(m_maincpu->clocks_to_attotime(120));
-				}
-			}
+			update_irq();
 			break;
 		case 0x0208/4:
-			if( ACCESSING_BITS_0_15 )
-			{
-				if (IF)
-				{
-					m_irq_timer->adjust(attotime::zero);
-				}
-			}
+			update_irq();
 			break;
 		case 0x0300/4:
-			if( ACCESSING_BITS_8_15 )
+			if (ACCESSING_BITS_8_15)
 			{
-				// power down commanded, halt the CPU
-				m_maincpu->spin_until_interrupt();
+				// HALT (and STOP, treated the same) waits for (IE & IF) != 0, so it is a no-op when one is already pending
+				if (!m_halted && !(IE & IF & 0x3fff))
+				{
+					m_halted = true;
+					m_maincpu->suspend(SUSPEND_REASON_HALT, true);
+				}
 			}
 			break;
 	}
@@ -1335,6 +1324,14 @@ void gba_state::machine_reset()
 	RCNT_SET(0x8000);
 	JOYSTAT_SET(0x0002);
 
+	if (m_halted)
+	{
+		m_halted = false;
+		m_maincpu->resume(SUSPEND_REASON_HALT);
+	}
+	m_irq_asserted = false;
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
+
 	m_dma_timer[0]->adjust(attotime::never);
 	m_dma_timer[1]->adjust(attotime::never, 1);
 	m_dma_timer[2]->adjust(attotime::never, 2);
@@ -1381,11 +1378,9 @@ void gba_state::machine_start()
 	m_tmr_timer[2]->adjust(attotime::never, 2);
 	m_tmr_timer[3]->adjust(attotime::never, 3);
 
-	/* and an IRQ handling timer */
-	m_irq_timer = timer_alloc(FUNC(gba_state::handle_irq), this);
-	m_irq_timer->adjust(attotime::never);
-
 	save_item(NAME(m_regs));
+	save_item(NAME(m_halted));
+	save_item(NAME(m_irq_asserted));
 	save_item(NAME(m_dma_src));
 	save_item(NAME(m_dma_dst));
 	save_item(NAME(m_dma_cnt));

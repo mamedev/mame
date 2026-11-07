@@ -2160,6 +2160,35 @@ end
 
 
 ---------------------------------------------------
+-- digiBLAST cartridges
+--@src/devices/bus/digiblast/slot.h,BUSES["DIGIBLAST"] = true
+---------------------------------------------------
+
+if BUSES["DIGIBLAST"] then
+	files {
+		MAME_DIR .. "src/devices/bus/digiblast/slot.cpp",
+		MAME_DIR .. "src/devices/bus/digiblast/slot.h",
+		MAME_DIR .. "src/devices/bus/digiblast/nand.cpp",
+		MAME_DIR .. "src/devices/bus/digiblast/nand.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/dimm/dimm.h,BUSES["DIMM"] = true
+---------------------------------------------------
+
+if BUSES["DIMM"] then
+	files {
+		MAME_DIR .. "src/devices/bus/dimm/dimm.cpp",
+		MAME_DIR .. "src/devices/bus/dimm/dimm.h",
+		MAME_DIR .. "src/devices/bus/dimm/modules.cpp",
+		MAME_DIR .. "src/devices/bus/dimm/modules.h",
+	}
+end
+
+
+---------------------------------------------------
 --
 --@src/devices/bus/dmv/dmvbus.h,BUSES["DMV"] = true
 ---------------------------------------------------
@@ -2354,6 +2383,21 @@ if BUSES["ELECTRON_CART"] then
 		MAME_DIR .. "src/devices/bus/electron/cart/stlefs.h",
 		MAME_DIR .. "src/devices/bus/electron/cart/tube.cpp",
 		MAME_DIR .. "src/devices/bus/electron/cart/tube.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/elf2/exp.h,BUSES["ELF2"] = true
+---------------------------------------------------
+
+if BUSES["ELF2"] then
+	files {
+		MAME_DIR .. "src/devices/bus/elf2/exp.cpp",
+		MAME_DIR .. "src/devices/bus/elf2/exp.h",
+		MAME_DIR .. "src/devices/bus/elf2/giant.cpp",
+		MAME_DIR .. "src/devices/bus/elf2/giant.h",
 	}
 end
 
@@ -2926,6 +2970,8 @@ if BUSES["IEEE488"] then
 		MAME_DIR .. "src/devices/bus/ieee488/hp9122c.h",
 		MAME_DIR .. "src/devices/bus/ieee488/hp9133.cpp",
 		MAME_DIR .. "src/devices/bus/ieee488/hp9133.h",
+		MAME_DIR .. "src/devices/bus/ieee488/hp9133xv.cpp",
+		MAME_DIR .. "src/devices/bus/ieee488/hp9133xv.h",
 		MAME_DIR .. "src/devices/bus/ieee488/hp9895.cpp",
 		MAME_DIR .. "src/devices/bus/ieee488/hp9895.h",
 		MAME_DIR .. "src/devices/bus/ieee488/remote488.cpp",
@@ -3308,6 +3354,8 @@ if BUSES["ISBX"] then
 		MAME_DIR .. "src/devices/bus/isbx/compis_fdc.h",
 		MAME_DIR .. "src/devices/bus/isbx/compis_hdc.cpp",
 		MAME_DIR .. "src/devices/bus/isbx/compis_hdc.h",
+		MAME_DIR .. "src/devices/bus/isbx/compis_sasi.cpp",
+		MAME_DIR .. "src/devices/bus/isbx/compis_sasi.h",
 		MAME_DIR .. "src/devices/bus/isbx/isbc_218a.cpp",
 		MAME_DIR .. "src/devices/bus/isbx/isbc_218a.h",
 	}
@@ -3426,33 +3474,6 @@ if BUSES["LEAPSTER"] then
 		MAME_DIR .. "src/devices/bus/leapster/rom.h",
 	}
 end
-
----------------------------------------------------
---
---@src/devices/bus/lpci/pci.h,BUSES["LPCI"] = true
----------------------------------------------------
-
-if BUSES["LPCI"] then
-	files {
-		MAME_DIR .. "src/devices/bus/lpci/pci.cpp",
-		MAME_DIR .. "src/devices/bus/lpci/pci.h",
-		MAME_DIR .. "src/devices/bus/lpci/cirrus.cpp",
-		MAME_DIR .. "src/devices/bus/lpci/cirrus.h",
-		MAME_DIR .. "src/devices/bus/lpci/i82371ab.cpp",
-		MAME_DIR .. "src/devices/bus/lpci/i82371ab.h",
-		MAME_DIR .. "src/devices/bus/lpci/i82371sb.cpp",
-		MAME_DIR .. "src/devices/bus/lpci/i82371sb.h",
-		MAME_DIR .. "src/devices/bus/lpci/i82439tx.cpp",
-		MAME_DIR .. "src/devices/bus/lpci/i82439tx.h",
-		MAME_DIR .. "src/devices/bus/lpci/northbridge.cpp",
-		MAME_DIR .. "src/devices/bus/lpci/northbridge.h",
-		MAME_DIR .. "src/devices/bus/lpci/southbridge.cpp",
-		MAME_DIR .. "src/devices/bus/lpci/southbridge.h",
-		MAME_DIR .. "src/devices/bus/lpci/vt82c505.cpp",
-		MAME_DIR .. "src/devices/bus/lpci/vt82c505.h",
-	}
-end
-
 
 ---------------------------------------------------
 --
@@ -6296,6 +6317,21 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/trs80m2/slot.h,BUSES["TRS80M2"] = true
+---------------------------------------------------
+
+if BUSES["TRS80M2"] then
+	files {
+		MAME_DIR .. "src/devices/bus/trs80m2/hdc.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2/hdc.h",
+		MAME_DIR .. "src/devices/bus/trs80m2/slot.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2/slot.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/tvc/tvc.h,BUSES["TVC"] = true
 ---------------------------------------------------
 
@@ -6546,6 +6582,8 @@ if BUSES["VIP"] then
 		MAME_DIR .. "src/devices/bus/vip/vp590.h",
 		MAME_DIR .. "src/devices/bus/vip/vp595.cpp",
 		MAME_DIR .. "src/devices/bus/vip/vp595.h",
+	    MAME_DIR .. "src/devices/bus/vip/vp601.cpp",
+    	MAME_DIR .. "src/devices/bus/vip/vp601.h",
 		MAME_DIR .. "src/devices/bus/vip/vp700.cpp",
 		MAME_DIR .. "src/devices/bus/vip/vp700.h",
 	}

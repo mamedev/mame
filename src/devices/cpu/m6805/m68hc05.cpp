@@ -805,7 +805,9 @@ void m68hc05_device::burn_cycles(unsigned count)
 	unsigned const increments((count + (m_prescaler & ps_mask)) >> ps_opt);
 	u32 const new_counter(u32(m_counter) + increments);
 	bool const timer_rollover(0x010000 <= new_counter);
-	bool const output_compare_match((m_ocr > m_counter) && (m_ocr <= new_counter));
+	// compare modulo 2^16 so a match at or just past rollover (including OCR = 0) isn't missed
+	u16 const ocr_delta(m_ocr - m_counter);
+	bool const output_compare_match(ocr_delta && (ocr_delta <= increments));
 	m_prescaler = (count + m_prescaler) & ps_mask;
 	m_counter = u16(new_counter);
 	if (timer_rollover)

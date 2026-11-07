@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    RCA VIP ASCII Keyboard Interface VP-620 emulation
+    RCA VIP VP-620 ASCII Keyboard Cable emulation
 
 **********************************************************************/
 
@@ -15,22 +15,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(VP620, vp620_device, "vp620", "VP-620 ASCII Keyboard")
+DEFINE_DEVICE_TYPE(VP620, vp620_device, "vp620", "VP-620 ASCII Keyboard Cable")
 
-
-//-------------------------------------------------
-//  ASCII_KEYBOARD_INTERFACE( kb_intf )
-//-------------------------------------------------
-
-void vp620_device::kb_w(uint8_t data)
-{
-	m_keydata = data;
-
-	m_slot->inst_w(0);
-	m_slot->inst_w(1);
-
-	m_keystb = ASSERT_LINE;
-}
 
 //-------------------------------------------------
 //  machine_config( vp620 )
@@ -38,8 +24,10 @@ void vp620_device::kb_w(uint8_t data)
 
 void vp620_device::device_add_mconfig(machine_config &config)
 {
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
-	keyboard.set_keyboard_callback(FUNC(vp620_device::kb_w));
+	VIP_ASCII_KEYBOARD_PORT(config, m_kb, vip_ascii_keyboards, "vp601");
+	m_kb->data_callback().set(FUNC(vp620_device::data_w));
+	m_kb->st_callback().set(FUNC(vp620_device::st_w));
+	m_kb->kd_callback().set(FUNC(vp620_device::kd_w));
 }
 
 
@@ -55,8 +43,9 @@ void vp620_device::device_add_mconfig(machine_config &config)
 vp620_device::vp620_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VP620, tag, owner, clock),
 	device_vip_byteio_port_interface(mconfig, *this),
-	m_keydata(0),
-	m_keystb(CLEAR_LINE)
+	m_kb(*this, "kb"),
+	m_data(0),
+	m_kd(false)
 {
 }
 
@@ -67,6 +56,8 @@ vp620_device::vp620_device(const machine_config &mconfig, const char *tag, devic
 
 void vp620_device::device_start()
 {
+	save_item(NAME(m_data));
+	save_item(NAME(m_kd));
 }
 
 
@@ -76,19 +67,15 @@ void vp620_device::device_start()
 
 uint8_t vp620_device::vip_in_r()
 {
-	return m_keydata;
+	return m_data;
 }
 
 
 //-------------------------------------------------
-//  vip_ef3_r - EF3 flag read
+//  vip_ef4_r - EF4 flag read
 //-------------------------------------------------
 
 int vp620_device::vip_ef4_r()
 {
-	int state = m_keystb;
-
-	m_keystb = CLEAR_LINE;
-
-	return state;
+	return m_kd;
 }

@@ -998,7 +998,7 @@ ROM_START( 19in1 )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
 	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
-	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, BAD_DUMP CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) ) // not the same flash rom as the vertical games
+	ROM_LOAD("m29dw323dt.u6", 0x000000, 0x400000, CRC(0776b62a) SHA1(055d88702592e948d27a73061b30d97da64f0352))
 
 	// EEPROM - contains security data
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
@@ -1090,7 +1090,7 @@ ROM_END
 
 GAME(2004, 4in1a,     39in1,    cpld,   39in1, _39in1_state, init_4in1a,    ROT90, "bootleg", "4 in 1 MAME bootleg (ver 3.00, PLZ-V014)",             MACHINE_IMPERFECT_SOUND)
 GAME(2004, 4in1b,     39in1,    cpld,   39in1, _39in1_state, init_4in1b,    ROT90, "bootleg", "4 in 1 MAME bootleg (PLZ-V001)",                       MACHINE_IMPERFECT_SOUND)
-GAME(2004, 19in1,     39in1,    cpld2,  39in1, _39in1_state, init_19in1,    ROT0,  "bootleg", "19 in 1 MAME bootleg (BAR-V000)",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(2004, 19in1,     0,        cpld2,  39in1, _39in1_state, init_19in1,    ROT0,  "bootleg", "19 in 1 MAME bootleg (BAR-V000)",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 GAME(2004, 39in1,     0,        cpld,   39in1, _39in1_state, init_39in1,    ROT90, "bootleg", "39 in 1 MAME bootleg (GNO-V000)",                      MACHINE_IMPERFECT_SOUND)
 GAME(2004, 48in1,     39in1,    cpld2,  39in1, _39in1_state, init_48in1,    ROT90, "bootleg", "48 in 1 MAME bootleg (ver 3.09, HPH-V000)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 GAME(2004, 48in1b,    39in1,    cpld2,  39in1, _39in1_state, init_48in1,    ROT90, "bootleg", "48 in 1 MAME bootleg (ver 3.09, HPH-V000, alt flash)", MACHINE_IMPERFECT_SOUND)

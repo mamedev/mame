@@ -28,6 +28,8 @@ static uint32_t compute_ticks_timer(emu_timer *timer, int hertz, int divisor)
 		return 0;
 
 	ret=((timer->remaining().as_double() * (double)hertz) / (double)divisor) - 1;
+	if (ret < 0)
+		return 0; // read after expiry, before the callback has run
 	return (uint32_t)ret;
 }
 
@@ -228,12 +230,15 @@ void sh34_base_device::tcr0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t old2 = m_tcr0;
 	COMBINE_DATA(&m_tcr0);
+	m_tcr0 = (m_tcr0 & ~0x100) | (m_tcr0 & old2 & 0x100); // UNF can only be cleared by writing 0
 	if (m_tstr & 1)
 	{
 		m_tcnt0 = compute_ticks_timer(m_timer[0], m_pm_clock, tcnt_div[old2 & 7]);
 		sh4_timer_recompute(0);
 	}
-	if (!(m_tcr0 & 0x20) || !(m_tcr0 & 0x100))
+	if ((m_tcr0 & 0x20) && (m_tcr0 & 0x100))
+		sh4_exception_request(SH4_INTC_TUNI0);
+	else
 		sh4_exception_unrequest(SH4_INTC_TUNI0);
 }
 
@@ -273,12 +278,15 @@ void sh34_base_device::tcr1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t old2 = m_tcr1;
 	COMBINE_DATA(&m_tcr1);
+	m_tcr1 = (m_tcr1 & ~0x100) | (m_tcr1 & old2 & 0x100); // UNF can only be cleared by writing 0
 	if (m_tstr & 2)
 	{
 		m_tcnt1 = compute_ticks_timer(m_timer[1], m_pm_clock, tcnt_div[old2 & 7]);
 		sh4_timer_recompute(1);
 	}
-	if (!(m_tcr1 & 0x20) || !(m_tcr1 & 0x100))
+	if ((m_tcr1 & 0x20) && (m_tcr1 & 0x100))
+		sh4_exception_request(SH4_INTC_TUNI1);
+	else
 		sh4_exception_unrequest(SH4_INTC_TUNI1);
 }
 
@@ -318,12 +326,15 @@ void sh34_base_device::tcr2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t old2 = m_tcr2;
 	COMBINE_DATA(&m_tcr2);
+	m_tcr2 = (m_tcr2 & ~0x100) | (m_tcr2 & old2 & 0x100); // UNF can only be cleared by writing 0
 	if (m_tstr & 4)
 	{
 		m_tcnt2 = compute_ticks_timer(m_timer[2], m_pm_clock, tcnt_div[old2 & 7]);
 		sh4_timer_recompute(2);
 	}
-	if (!(m_tcr2 & 0x20) || !(m_tcr2 & 0x100))
+	if ((m_tcr2 & 0x20) && (m_tcr2 & 0x100))
+		sh4_exception_request(SH4_INTC_TUNI2);
+	else
 		sh4_exception_unrequest(SH4_INTC_TUNI2);
 }
 

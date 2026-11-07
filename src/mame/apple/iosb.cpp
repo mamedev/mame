@@ -26,6 +26,8 @@
 #include "emu.h"
 #include "iosb.h"
 
+#include "cpu/powerpc/ppc.h"
+
 #include "formats/ap_dsk35.h"
 
 #define LOG_TURBOSCSI   (1U << 1)
@@ -53,6 +55,7 @@ static constexpr u32 C15M = (C7M * 2);
 DEFINE_DEVICE_TYPE(IOSB, iosb_device, "iosb", "Apple IOSB I/O ASIC")
 DEFINE_DEVICE_TYPE(PRIMETIME, primetime_device, "primetime", "Apple PrimeTime I/O ASIC")
 DEFINE_DEVICE_TYPE(PRIMETIMEII, primetimeii_device, "primetime2", "Apple PrimeTime II I/O ASIC")
+DEFINE_DEVICE_TYPE(PRIMETIMEIII, primetimeiii_device, "primetime3", "Apple PrimeTime III I/O ASIC")
 
 //-------------------------------------------------
 //  ADDRESS_MAP
@@ -114,6 +117,16 @@ void iosb_device::device_add_mconfig(machine_config &config)
 	m_rtc->cko_cb().set(m_via1, FUNC(via6522_device::write_ca2));
 }
 
+void primetimeiii_device::device_add_mconfig(machine_config &config)
+{
+	primetimeii_device::device_add_mconfig(config);
+
+	ASC_PRIMETIME3(config.replace(), m_asc, 45.1584_MHz_XTAL);
+	m_asc->add_route(0, "speaker", 1.0, 0);
+	m_asc->add_route(1, "speaker", 1.0, 1);
+	m_asc->irqf_callback().set(FUNC(primetimeiii_device::asc_irq));
+}
+
 //-------------------------------------------------
 //  iosb_base - constructor
 //-------------------------------------------------
@@ -154,7 +167,8 @@ iosb_base::iosb_base(const machine_config &mconfig, device_type type, const char
 	m_scsi_dma_read_cycles(3),
 	m_scsi_dma_write_cycles(3),
 	m_scsi_dma_result(0),
-	m_scsi_second_half(false)
+	m_scsi_second_half(false),
+	m_scsi_stalled(false)
 {
 	std::fill(std::begin(m_iosb_regs), std::end(m_iosb_regs), 0);
 }
@@ -179,11 +193,21 @@ primetime_device::primetime_device(const machine_config &mconfig, const char *ta
 }
 
 primetimeii_device::primetimeii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	primetime_device(mconfig, PRIMETIMEII, tag, owner, clock),
+	primetimeii_device(mconfig, PRIMETIMEII, tag, owner, clock)
+{
+}
+
+primetimeii_device::primetimeii_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	primetime_device(mconfig, type, tag, owner, clock),
 	m_ata_irq(0),
 	m_ata_irq_enables(0)
 {
 	std::fill(std::begin(m_primetimeii_regs), std::end(m_primetimeii_regs), 0);
+}
+
+primetimeiii_device::primetimeiii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	primetimeii_device(mconfig, PRIMETIMEIII, tag, owner, clock)
+{
 }
 
 //-------------------------------------------------
@@ -216,6 +240,8 @@ void iosb_base::device_start()
 	save_item(NAME(m_hdsel));
 	save_item(NAME(m_nubus_irqs));
 	save_item(NAME(m_iosb_regs));
+	save_item(NAME(m_scsi_stall_start));
+	save_item(NAME(m_scsi_stalled));
 }
 
 //-------------------------------------------------
@@ -228,6 +254,7 @@ void iosb_base::device_reset()
 	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
 
 	m_nubus_irqs = 0xff;
+	m_scsi_stalled = false;
 }
 
 TIMER_CALLBACK_MEMBER(iosb_base::mac_6015_tick)
@@ -546,11 +573,11 @@ u32 iosb_base::turboscsi_dma_r(offs_t offset, u32 mem_mask)
 	if (!m_drq)
 	{
 		// The real DAFB simply holds off /DTACK here, we simulate that
-		// by rewinding and repeating the instruction until DRQ is asserted.
-		RESTART_INSTRUCTION(m_maincpu);
-		m_maincpu->spin_until_time(attotime::from_usec(50));
+		// by rewinding and repeating the instruction until DRQ is asserted or, on the PowerPC, the access times out.
+		turboscsi_stall();
 		return 0xffff;
 	}
+	m_scsi_stalled = false;
 
 	LOGMASKED(LOG_TURBOSCSI, "dma_r mask %08x (%s)\n", mem_mask, machine().describe_context());
 
@@ -565,11 +592,11 @@ u32 iosb_base::turboscsi_dma_r(offs_t offset, u32 mem_mask)
 		if (!m_drq)
 		{
 			// The real DAFB simply holds off /DTACK here, we simulate that
-			// by rewinding and repeating the instruction until DRQ is asserted.
-			RESTART_INSTRUCTION(m_maincpu);
-			m_maincpu->spin_until_time(attotime::from_usec(50));
+			// by rewinding and repeating the instruction until DRQ is asserted or, on the PowerPC, the access times out.
+			turboscsi_stall();
 			return 0xffff;
 		}
+		m_scsi_stalled = false;
 
 		m_scsi_second_half = false;
 		m_scsi_dma_result |= m_ncr->dma16_swap_r();
@@ -625,6 +652,37 @@ void iosb_base::turboscsi_dma_w(offs_t offset, u32 data, u32 mem_mask)
 	{
 		fatalerror("IOSB: turboscsi_dma_w unhandled mask %08x\n", mem_mask);
 	}
+}
+
+void iosb_base::turboscsi_stall()
+{
+	auto *const ppc = dynamic_cast<ppc_device *>(&*m_maincpu);
+	if (!ppc)
+	{
+		RESTART_INSTRUCTION(m_maincpu);
+		m_maincpu->spin_until_time(attotime::from_usec(50));
+		return;
+	}
+
+	const attotime timeout = attotime::from_usec(40);
+
+	if (!m_scsi_stalled)
+	{
+		m_scsi_stalled = true;
+		m_scsi_stall_start = machine().time();
+	}
+
+	const attotime stalled = machine().time() - m_scsi_stall_start;
+	if (stalled >= timeout)
+	{
+		m_scsi_stalled = false;
+		m_scsi_second_half = false;
+		ppc->bus_error();
+		return;
+	}
+
+	ppc->retry_access();
+	ppc->spin_until_time(std::min(attotime::from_usec(50), timeout - stalled));
 }
 
 void iosb_base::scsi_drq_w(int state)
@@ -693,6 +751,12 @@ void primetimeii_device::map(address_map &map)
 {
 	iosb_base::map(map);
 	map(0x0001a100, 0x0001a103).rw(FUNC(primetimeii_device::ata_regs_r), FUNC(primetimeii_device::ata_regs_w)).mirror(0x00f00000);
+}
+
+void primetimeiii_device::map(address_map &map)
+{
+	primetimeii_device::map(map);
+	map(0x00015000, 0x00015fff).rw(m_asc, FUNC(asc_primetime3_device::read16), FUNC(asc_primetime3_device::write16)).mirror(0x00f00000);
 }
 
 // This may actually be in F108, the boundaries between the two chips aren't completely clear

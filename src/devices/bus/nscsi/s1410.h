@@ -25,6 +25,8 @@ public:
 	//         s->set_seek_timing(3000, 85000, 205000, 3600, 1);
 
 protected:
+	nscsi_s1410_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// error codes, returned in sense byte 0
 	enum {
 		SS_GOOD                 = 0x00,

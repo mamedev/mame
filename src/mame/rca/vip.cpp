@@ -56,19 +56,6 @@ Notes:
 
 /*
 
-    TODO:
-
-    - ASCII keyboard
-    - cassette loading
-    - 20K RAM for Floating Point BASIC
-    - VP-111 has 1K RAM, no byte I/O, no expansion
-    - VP-601/611 ASCII Keyboard (VP-601 58 keys, VP611 58 keys + 16 keys numerical keypad)
-    - VP-700 Expanded Tiny Basic Board (4 KB ROM expansion)
-
-*/
-
-/*
-
     VP-711 COSMAC MicroComputer $199
     (CDP18S711) Features RCA COSMAC microprocessor. 2K RAM, expandable to
     32K (4K on-board). Built-in cassette interface and video interface.
@@ -225,12 +212,14 @@ Usage:
     - If you load a chip-8 cart, press R twice. If it doesn't do anything you may
       need to do a hard reset, then hit R twice. R toggles between the CPU running
       or stopped. Most chip-8 (.c8) programs work, but make sure 4k RAM is enabled.
-    - There's a slot option to use Tiny Basic, this starts up, but unable to type
-      anything.
+    - For VP-700 Tiny BASIC select the "basic" expansion option and the "ascii"
+      byte I/O option, which connects a VP-601 or VP-611 keyboard.
+    - For more RAM select the "exp" expansion option and put VP-570 boards in
+      its slots, each jumpered to its own 4K block.
+    - A VP-111 with the VP-114 Expansion Kit installed is equivalent to the
+      VP-711, so use the vip driver for it.
     - Not known if (.bin) files work - don't have any for this machine.
     - (.c8x) files do not work.
-    - Cassette records and plays back, however about 10% of the data is
-      consistently loaded wrongly.
 
 */
 
@@ -260,24 +249,18 @@ enum
 //**************************************************************************
 
 //-------------------------------------------------
-//  read -
+//  board_r - on-board ROM and RAM read
 //-------------------------------------------------
 
-uint8_t vip_state::read(offs_t offset)
+uint8_t vp111_state::board_r(offs_t offset, uint8_t data, int minh)
 {
-	int cs = BIT(offset, 15) || m_8000;
-	int cdef = !((offset >= 0xc00) && (offset < 0x1000));
-	int minh = 0;
-
-	uint8_t data = m_exp->program_r(offset, cs, cdef, &minh);
-
-	if (cs)
+	if (cs(offset))
 	{
 		data = m_rom->base()[offset & 0x1ff];
 	}
-	else if (!minh)
+	else if (!minh && (offset & 0xfff) < m_ram->size())
 	{
-		data = m_ram->pointer()[offset & m_ram->mask()];
+		data = m_ram->pointer()[offset & 0xfff];
 	}
 
 	return data;
@@ -285,21 +268,51 @@ uint8_t vip_state::read(offs_t offset)
 
 
 //-------------------------------------------------
+//  board_w - on-board RAM write
+//-------------------------------------------------
+
+void vp111_state::board_w(offs_t offset, uint8_t data, int minh)
+{
+	if (!cs(offset) && !minh && (offset & 0xfff) < m_ram->size())
+	{
+		m_ram->pointer()[offset & 0xfff] = data;
+	}
+}
+
+
+//-------------------------------------------------
+//  read -
+//-------------------------------------------------
+
+uint8_t vp111_state::read(offs_t offset)
+{
+	return board_r(offset, 0xff, 0);
+}
+
+uint8_t vip_state::read(offs_t offset)
+{
+	int minh = 0;
+	uint8_t const data = m_exp->program_r(offset, cs(offset), cdef(offset), &minh);
+
+	return board_r(offset, data, minh);
+}
+
+
+//-------------------------------------------------
 //  write -
 //-------------------------------------------------
 
+void vp111_state::write(offs_t offset, uint8_t data)
+{
+	board_w(offset, data, 0);
+}
+
 void vip_state::write(offs_t offset, uint8_t data)
 {
-	int cs = BIT(offset, 15) || m_8000;
-	int cdef = !((offset >= 0xc00) && (offset < 0x1000));
 	int minh = 0;
+	m_exp->program_w(offset, data, cdef(offset), &minh);
 
-	m_exp->program_w(offset, data, cdef, &minh);
-
-	if (!cs && !minh)
-	{
-		m_ram->pointer()[offset & m_ram->mask()] = data;
-	}
+	board_w(offset, data, minh);
 }
 
 
@@ -307,26 +320,35 @@ void vip_state::write(offs_t offset, uint8_t data)
 //  io_r -
 //-------------------------------------------------
 
+uint8_t vp111_state::io_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+	{
+		if (offset == 1)
+		{
+			m_vdc->disp_on_w(1);
+			m_vdc->disp_on_w(0);
+		}
+
+		if (BIT(offset, 2))
+		{
+			m_8000 = 0;
+		}
+	}
+
+	return 0xff;
+}
+
 uint8_t vip_state::io_r(offs_t offset)
 {
 	uint8_t data = m_exp->io_r(offset);
 
-	switch (offset)
+	if (offset == 3)
 	{
-	case 1:
-		m_vdc->disp_on_w(1);
-		m_vdc->disp_on_w(0);
-		break;
-
-	case 3:
-		data = m_byteio_data;
-		break;
+		data = m_byteio_inst ? m_byteio->in_r() : m_byteio_data;
 	}
 
-	if (BIT(offset, 2))
-	{
-		m_8000 = 0;
-	}
+	vp111_state::io_r(offset);
 
 	return data;
 }
@@ -336,10 +358,8 @@ uint8_t vip_state::io_r(offs_t offset)
 //  io_w -
 //-------------------------------------------------
 
-void vip_state::io_w(offs_t offset, uint8_t data)
+void vp111_state::io_w(offs_t offset, uint8_t data)
 {
-	m_exp->io_w(offset, data);
-
 	switch (offset)
 	{
 	case 1:
@@ -350,16 +370,24 @@ void vip_state::io_w(offs_t offset, uint8_t data)
 	case 2:
 		m_keylatch = data & 0x0f;
 		break;
-
-	case 3:
-		m_byteio->out_w(data);
-		break;
 	}
 
 	if (BIT(offset, 2))
 	{
 		m_8000 = 0;
 	}
+}
+
+void vip_state::io_w(offs_t offset, uint8_t data)
+{
+	m_exp->io_w(offset, data);
+
+	if (offset == 3)
+	{
+		m_byteio->out_w(data);
+	}
+
+	vp111_state::io_w(offset, data);
 }
 
 
@@ -372,10 +400,10 @@ void vip_state::io_w(offs_t offset, uint8_t data)
 //  ADDRESS_MAP( vip_mem )
 //-------------------------------------------------
 
-void vip_state::vip_mem(address_map &map)
+void vp111_state::vip_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(FUNC(vip_state::read), FUNC(vip_state::write));
+	map(0x0000, 0xffff).rw(FUNC(vp111_state::read), FUNC(vp111_state::write));
 }
 
 
@@ -383,10 +411,10 @@ void vip_state::vip_mem(address_map &map)
 //  ADDRESS_MAP( vip_io )
 //-------------------------------------------------
 
-void vip_state::vip_io(address_map &map)
+void vp111_state::vip_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x07).rw(FUNC(vip_state::io_r), FUNC(vip_state::io_w));
+	map(0x00, 0x07).rw(FUNC(vp111_state::io_r), FUNC(vp111_state::io_w));
 }
 
 
@@ -399,9 +427,9 @@ void vip_state::vip_io(address_map &map)
 //  INPUT_PORTS( vip )
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER(vip_state::reset_w)
+INPUT_CHANGED_MEMBER(vp111_state::reset_w)
 {
-	m_exp->run_w(newval);
+	run_w(newval);
 
 	if (oldval && !newval)
 	{
@@ -409,7 +437,7 @@ INPUT_CHANGED_MEMBER(vip_state::reset_w)
 	}
 }
 
-INPUT_CHANGED_MEMBER(vip_state::beeper_w)
+INPUT_CHANGED_MEMBER(vp111_state::beeper_w)
 {
 	m_beeper->set_output_gain(0, newval ? 0.80 : 0);
 }
@@ -434,10 +462,10 @@ static INPUT_PORTS_START( vip )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("F TW") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 
 	PORT_START("RUN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vip_state::reset_w), 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vp111_state::reset_w), 0)
 
 	PORT_START("BEEPER")
-	PORT_CONFNAME( 0x01, 0x01, "Internal Speaker" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vip_state::beeper_w), 0)
+	PORT_CONFNAME( 0x01, 0x01, "Internal Speaker" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vp111_state::beeper_w), 0)
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -452,44 +480,69 @@ INPUT_PORTS_END
 //  COSMAC_INTERFACE( cosmac_intf )
 //-------------------------------------------------
 
-int vip_state::clear_r()
+int vp111_state::clear_r()
 {
 	return BIT(m_run->read(), 0);
 }
 
+int vp111_state::int_r()
+{
+	return m_vdc->int_r();
+}
+
 int vip_state::int_r()
 {
-	return m_vdc->int_r() || m_exp_int;
+	return vp111_state::int_r() || m_exp_int;
+}
+
+int vp111_state::dma_out_r()
+{
+	return m_vdc->dma_out_r();
 }
 
 int vip_state::dma_out_r()
 {
-	return m_vdc->dma_out_r() || m_exp_dma_out;
+	return vp111_state::dma_out_r() || m_exp_dma_out;
+}
+
+int vp111_state::ef1_r()
+{
+	return m_vdc->efx_r();
 }
 
 int vip_state::ef1_r()
 {
-	return m_vdc->efx_r() || m_exp->ef1_r();
+	return vp111_state::ef1_r() || m_exp->ef1_r();
 }
 
-int vip_state::ef2_r()
+int vp111_state::ef2_r()
 {
 	m_leds[LED_TAPE] = m_cassette->input() > 0 ? 1 : 0;
 
 	return (m_cassette->input() < 0) ? ASSERT_LINE : CLEAR_LINE;
 }
 
+int vp111_state::ef3_r()
+{
+	return !BIT(m_keypad->read(), m_keylatch);
+}
+
 int vip_state::ef3_r()
 {
-	return !BIT(m_keypad->read(), m_keylatch) || m_byteio_ef3 || m_exp_ef3;
+	return vp111_state::ef3_r() || m_byteio->ef3_r() || m_exp->ef3_r();
+}
+
+int vp111_state::ef4_r()
+{
+	return CLEAR_LINE;
 }
 
 int vip_state::ef4_r()
 {
-	return m_byteio_ef4 || m_exp_ef4;
+	return m_byteio->ef4_r() || m_exp->ef4_r();
 }
 
-void vip_state::q_w(int state)
+void vp111_state::q_w(int state)
 {
 	// sound output
 	m_beeper->write(NODE_01, state);
@@ -499,15 +552,36 @@ void vip_state::q_w(int state)
 
 	// tape output
 	m_cassette->output(state ? 1.0 : -1.0);
+}
 
-	// expansion
+void vip_state::q_w(int state)
+{
+	vp111_state::q_w(state);
+
+	m_byteio->q_w(state);
 	m_exp->q_w(state);
 }
 
+void vp111_state::run_w(int state)
+{
+}
+
+void vip_state::run_w(int state)
+{
+	m_exp->run_w(state);
+}
+
+
+uint32_t vp111_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	m_vdc->screen_update(screen, bitmap, cliprect);
+
+	return 0;
+}
 
 uint32_t vip_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_vdc->screen_update(screen, bitmap, cliprect);
+	vp111_state::screen_update(screen, bitmap, cliprect);
 
 	m_exp->screen_update(screen, bitmap, cliprect);
 
@@ -539,10 +613,12 @@ DISCRETE_SOUND_END
 
 void vip_state::byteio_inst_w(int state)
 {
-	if (!state)
+	if (m_byteio_inst && !state)
 	{
 		m_byteio_data = m_byteio->in_r();
 	}
+
+	m_byteio_inst = bool(state);
 }
 
 
@@ -577,7 +653,7 @@ void vip_state::exp_dma_in_w(int state)
 //  MACHINE_START( vip )
 //-------------------------------------------------
 
-void vip_state::machine_start()
+void vp111_state::machine_start()
 {
 	uint8_t *ram = m_ram->pointer();
 
@@ -595,20 +671,23 @@ void vip_state::machine_start()
 
 	// state saving
 	save_item(NAME(m_8000));
+	save_item(NAME(m_keylatch));
+}
+
+void vip_state::machine_start()
+{
+	vp111_state::machine_start();
+
+	// state saving
 	save_item(NAME(m_exp_int));
 	save_item(NAME(m_exp_dma_out));
 	save_item(NAME(m_exp_dma_in));
-	save_item(NAME(m_byteio_ef3));
-	save_item(NAME(m_byteio_ef4));
-	save_item(NAME(m_exp_ef1));
-	save_item(NAME(m_exp_ef3));
-	save_item(NAME(m_exp_ef4));
-	save_item(NAME(m_keylatch));
 	save_item(NAME(m_byteio_data));
+	save_item(NAME(m_byteio_inst));
 }
 
 
-void vip_state::machine_reset()
+void vp111_state::machine_reset()
 {
 	// reset the VDC
 	m_vdc->reset();
@@ -618,6 +697,11 @@ void vip_state::machine_reset()
 
 	// internal speaker
 	m_beeper->set_output_gain(0, m_io_beeper->read() ? 0.80 : 0);
+}
+
+void vip_state::machine_reset()
+{
+	vp111_state::machine_reset();
 
 	// clear byte I/O latch
 	m_byteio_data = 0;
@@ -628,7 +712,7 @@ void vip_state::machine_reset()
 //  QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 //-------------------------------------------------
 
-QUICKLOAD_LOAD_MEMBER(vip_state::quickload_cb)
+QUICKLOAD_LOAD_MEMBER(vp111_state::quickload_cb)
 {
 	uint8_t *ram = m_ram->pointer();
 	uint8_t *chip8_ptr = nullptr;
@@ -674,37 +758,33 @@ QUICKLOAD_LOAD_MEMBER(vip_state::quickload_cb)
 //**************************************************************************
 
 //-------------------------------------------------
-//  machine_config( vip )
+//  machine_config( vp111 )
 //-------------------------------------------------
 
-void vip_state::vip(machine_config &config)
+void vp111_state::vp111(machine_config &config)
 {
 	// basic machine hardware
 	CDP1802(config, m_maincpu, 3.52128_MHz_XTAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &vip_state::vip_mem);
-	m_maincpu->set_addrmap(AS_IO, &vip_state::vip_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vp111_state::vip_mem);
+	m_maincpu->set_addrmap(AS_IO, &vp111_state::vip_io);
 	m_maincpu->wait_cb().set_constant(1);
-	m_maincpu->clear_cb().set(FUNC(vip_state::clear_r));
-	m_maincpu->int_cb().set(FUNC(vip_state::int_r));
-	m_maincpu->dma_out_cb().set(FUNC(vip_state::dma_out_r));
-	m_maincpu->ef1_cb().set(FUNC(vip_state::ef1_r));
-	m_maincpu->ef2_cb().set(FUNC(vip_state::ef2_r));
-	m_maincpu->ef3_cb().set(FUNC(vip_state::ef3_r));
-	m_maincpu->ef4_cb().set(FUNC(vip_state::ef4_r));
-	m_maincpu->q_cb().set(FUNC(vip_state::q_w));
-	m_maincpu->dma_rd_cb().set(m_exp, FUNC(vip_expansion_slot_device::dma_r));
+	m_maincpu->clear_cb().set(FUNC(vp111_state::clear_r));
+	m_maincpu->int_cb().set(FUNC(vp111_state::int_r));
+	m_maincpu->dma_out_cb().set(FUNC(vp111_state::dma_out_r));
+	m_maincpu->ef1_cb().set(FUNC(vp111_state::ef1_r));
+	m_maincpu->ef2_cb().set(FUNC(vp111_state::ef2_r));
+	m_maincpu->ef3_cb().set(FUNC(vp111_state::ef3_r));
+	m_maincpu->ef4_cb().set(FUNC(vp111_state::ef4_r));
+	m_maincpu->q_cb().set(FUNC(vp111_state::q_w));
 	m_maincpu->dma_wr_cb().set(m_vdc, FUNC(cdp1861_device::dma_w));
-	m_maincpu->dma_wr_cb().append(m_exp, FUNC(vip_expansion_slot_device::dma_w));
 	m_maincpu->sc_cb().set(m_vdc, FUNC(cdp1861_device::sc_w));
-	m_maincpu->sc_cb().append(m_exp, FUNC(vip_expansion_slot_device::sc_w));
 	m_maincpu->tpa_cb().set(m_vdc, FUNC(cdp1861_device::tpa_w));
-	m_maincpu->tpb_cb().set(m_exp, FUNC(vip_expansion_slot_device::tpb_w));
 
 	// video hardware
 	CDP1861(config, m_vdc, 3.52128_MHz_XTAL / 2).set_screen(SCREEN_TAG);
 
 	screen_device &screen(SCREEN(config, SCREEN_TAG));
-	screen.set_screen_update(FUNC(vip_state::screen_update));
+	screen.set_screen_update(FUNC(vp111_state::screen_update));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -712,16 +792,9 @@ void vip_state::vip(machine_config &config)
 	DISCRETE(config, m_beeper, vip_discrete);
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	VIP_BYTEIO_PORT(config, m_byteio, vip_byteio_cards, nullptr);
-	m_byteio->inst_callback().set(FUNC(vip_state::byteio_inst_w));
-	VIP_EXPANSION_SLOT(config, m_exp, 3.52128_MHz_XTAL / 2, vip_expansion_cards, nullptr);
-	m_exp->int_wr_callback().set(FUNC(vip_state::exp_int_w));
-	m_exp->dma_out_wr_callback().set(FUNC(vip_state::exp_dma_out_w));
-	m_exp->dma_in_wr_callback().set(FUNC(vip_state::exp_dma_in_w));
-
 	// devices
 	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "bin,c8", attotime::from_seconds(2)));
-	quickload.set_load_callback(FUNC(vip_state::quickload_cb));
+	quickload.set_load_callback(FUNC(vp111_state::quickload_cb));
 	quickload.set_interface("chip8quik");
 	SOFTWARE_LIST(config, "quik_list").set_original("chip8_quik").set_filter("V");
 
@@ -731,19 +804,33 @@ void vip_state::vip(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("vip");
 
 	// internal ram
-	RAM(config, m_ram).set_default_size("2K").set_extra_options("4K");
+	RAM(config, m_ram).set_default_size("1K").set_extra_options("2K,3K,4K");
 }
 
 
 //-------------------------------------------------
-//  machine_config( vp111 )
+//  machine_config( vip )
 //-------------------------------------------------
 
-void vip_state::vp111(machine_config &config)
+void vip_state::vip(machine_config &config)
 {
-	vip(config);
+	vp111(config);
+
+	m_maincpu->dma_rd_cb().set(m_exp, FUNC(vip_expansion_slot_device::dma_r));
+	m_maincpu->dma_wr_cb().append(m_exp, FUNC(vip_expansion_slot_device::dma_w));
+	m_maincpu->sc_cb().append(m_exp, FUNC(vip_expansion_slot_device::sc_w));
+	m_maincpu->tpb_cb().set(m_exp, FUNC(vip_expansion_slot_device::tpb_w));
+
+	VIP_BYTEIO_PORT(config, m_byteio, vip_byteio_cards, nullptr);
+	m_byteio->inst_callback().set(FUNC(vip_state::byteio_inst_w));
+
+	VIP_EXPANSION_SLOT(config, m_exp, 3.52128_MHz_XTAL / 2, vip_expansion_cards, nullptr);
+	m_exp->int_wr_callback().set(FUNC(vip_state::exp_int_w));
+	m_exp->dma_out_wr_callback().set(FUNC(vip_state::exp_dma_out_w));
+	m_exp->dma_in_wr_callback().set(FUNC(vip_state::exp_dma_in_w));
+
 	// internal ram
-	m_ram->set_default_size("1K").set_extra_options("2K,4K");
+	m_ram->set_default_size("2K").set_extra_options("3K,4K");
 }
 
 
@@ -758,7 +845,7 @@ void vip_state::vp111(machine_config &config)
 
 ROM_START( vip )
 	ROM_REGION( 0x200, CDP1802_TAG, 0 )
-	ROM_LOAD( "cdpr566.u10", 0x0000, 0x0200, CRC(5be0a51f) SHA1(40266e6d13e3340607f8b3dcc4e91d7584287c06) )
+	ROM_LOAD( "cdpr566.u10", 0x0000, 0x0200, CRC(334f5527) SHA1(20c9bf689766c09611547db4b3c7a6911c3eb381) )
 
 	ROM_REGION( 0x200, "chip8", 0 )
 	ROM_LOAD( "chip8.bin", 0x0000, 0x0200, CRC(438ec5d5) SHA1(8aa634c239004ff041c9adbf9144bd315ab5fc77) )
@@ -780,6 +867,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME                FLAGS
-COMP( 1977, vip,   0,      0,      vip,     vip,   vip_state, empty_init, "RCA",   "Cosmac VIP (VP-711)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS )
-COMP( 1977, vp111, vip,    0,      vp111,   vip,   vip_state, empty_init, "RCA",   "Cosmac VIP (VP-111)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME                FLAGS
+COMP( 1977, vip,   0,      0,      vip,     vip,   vip_state,   empty_init, "RCA",   "Cosmac VIP (VP-711)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1977, vp111, vip,    0,      vp111,   vip,   vp111_state, empty_init, "RCA",   "Cosmac VIP (VP-111)",  MACHINE_SUPPORTS_SAVE )

@@ -112,7 +112,12 @@ ROM_START( s1410 )
 ROM_END
 
 nscsi_s1410_device::nscsi_s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nscsi_harddisk_device(mconfig, NSCSI_S1410, tag, owner, clock)
+	nscsi_s1410_device(mconfig, NSCSI_S1410, tag, owner, clock)
+{
+}
+
+nscsi_s1410_device::nscsi_s1410_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_harddisk_device(mconfig, type, tag, owner, clock)
 {
 }
 

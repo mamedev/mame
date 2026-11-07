@@ -478,10 +478,13 @@ void coco_state::coco_sound(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	// 6-bit D/A: R10-15 = 10K, 20K, 40.2K, 80.6K, 162K, 324K (according to parts list); output also controls joysticks
-	DAC_6BIT_BINARY_WEIGHTED(config, m_dac, 0).add_route(ALL_OUTPUTS, m_mux, 0.125, mc14529_device::y_sound_input(0));
+	// Use a unipolar output so DAC code zero matches the disabled sound path.
+	// Doubling the route gain preserves the peak-to-peak amplitude.
+	DAC_6BIT_BINARY_WEIGHTED(config, m_dac, 0).set_output_range(0, 1).add_route(ALL_OUTPUTS, m_mux, 0.25, mc14529_device::y_sound_input(0));
 
-	// Single-bit sound: R22 = 10K
-	DAC_1BIT(config, "sbs", 0).set_output_range(-1, 1).add_route(ALL_OUTPUTS, "speaker", 0.125);
+	// Single-bit sound: R22 = 10K.  Keep the low state at zero to avoid a
+	// startup DC step; the route gain preserves the peak-to-peak amplitude.
+	DAC_1BIT(config, "sbs", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
