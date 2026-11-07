@@ -56,6 +56,9 @@ public:
 	bool has_battery() const { return rtc_battery_backed(); }
 
 protected:
+	// device_interface overrides
+	virtual void interface_post_start() override;
+
 	static u8 convert_to_bcd(int val);
 	static int bcd_to_integer(u8 val);
 
