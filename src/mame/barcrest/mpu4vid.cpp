@@ -240,6 +240,12 @@ public:
 
 	void mpu4_vid(machine_config &config);
 	void mpu4_vid_strike(machine_config &config);
+	void mpu4_vid_turnov(machine_config &config);
+	void mpu4_vid_tmach(machine_config &config);
+	void mpu4_vid_barquest(machine_config &config);
+	void mpu4_vid_skilltrk(machine_config &config);
+	void mpu4_vid_addlad(machine_config &config);
+
 	void mpu4_vid_cheatchr(machine_config &config);
 
 	void bwbvid(machine_config &config);
@@ -335,13 +341,21 @@ private:
 	void mpu4_6809_map(address_map &map) ATTR_COLD;
 	void mpu4_6809_german_map(address_map &map) ATTR_COLD;
 
-	uint8_t vidcharacteriser_4k_lookup_r(offs_t offset);
+	uint8_t vidcharacteriser_strikeit_hack_r(offs_t offset);
 
 	void hack_bwb_startup_protection();
 
 	uint8_t mpu4_vid_bt_a00004_r(offs_t offset);
 	void mpu4_vid_bt_a00002_w(offs_t offset, uint8_t data);
 	void mpu4_vid_bt_a00008_w(offs_t offset, uint8_t data);
+
+	uint8_t turnover_chr_next(uint8_t state, uint8_t col);
+	uint8_t timemchn_chr_next(uint8_t state, uint8_t col);
+	uint8_t barquest_chr_next(uint8_t state, uint8_t col);
+	uint8_t skiltrek_chr_next(uint8_t state, uint8_t col);
+	uint8_t strike_chr_next(uint8_t state, uint8_t col);
+	uint8_t addlad_chr_next(uint8_t state, uint8_t col);
+
 	uint8_t m_bt_palbase;
 	uint8_t m_bt_which;
 	uint8_t m_btpal_r[0x100];
@@ -1939,7 +1953,7 @@ void mpu4vid_state::mpu4_68k_map(address_map& map)
 void mpu4vid_state::mpu4_68k_map_strike(address_map& map)
 {
 	mpu4_68k_map_base(map);
-	map(0xffd000, 0xffd00f).rw(FUNC(mpu4vid_state::vidcharacteriser_4k_lookup_r), FUNC(mpu4vid_state::vidcharacteriser_w)).umask16(0x00ff);
+	map(0xffd000, 0xffd00f).rw(FUNC(mpu4vid_state::vidcharacteriser_strikeit_hack_r), FUNC(mpu4vid_state::vidcharacteriser_w)).umask16(0x00ff);
 }
 
 
@@ -2152,17 +2166,170 @@ void mpu4vid_state::mpu4_vid_cheatchr(machine_config &config)
 	m_characteriser->set_allow_68k_cheat(true);
 }
 
+uint8_t mpu4vid_state::strike_chr_next(uint8_t state, uint8_t col)
+{
+	const bool R1 = (state >> 1) & 1, R2 = (state >> 2) & 1;
+	const bool R3 = (state >> 3) & 1, R4 = (state >> 4) & 1, R5 = (state >> 5) & 1;
+	// R0 (bit 0 of the previous state) is not used by the PAL.
+
+	const bool C0 = (col >> 0) & 1, C1 = (col >> 1) & 1, C2 = (col >> 2) & 1;
+	const bool C3 = (col >> 3) & 1, C4 = (col >> 4) & 1, C5 = (col >> 5) & 1;
+
+	const bool NZ  = (col & 0x3f) != 0;      // any non-reset write
+	const bool g0  = !C3 && !C4;             // column group (C4,C3) = 00
+	const bool g1  =  C3 && !C4;             //                        01
+	const bool g2  = !C3 &&  C4;             //                        10
+	const bool g3  =  C3 &&  C4;             //                        11
+	const bool ACT = C0 || C1 || C2 || C5;   // non-reset write bits inside group g0
+
+	const bool O0 = C1 || C2 || C3 || C4 || C5; 	// bit 0  : function of the write only, independent of state
+	const bool O1 = (C1 && g0) || (R1 && g2 && !C5) || (R2 && C0 && g3) || (!R3 && !C1 && g1); // bit 1
+	const bool O2 = R1 && NZ; // bit 2  : previous state bit 1, held unless reset  (latch)
+	const bool O3 = (R1 && g0 && ACT) || (R2 && !R3 && g2) || (C0 && !C1 && g3) || (!R4 && R5 && g1); // bit 3
+	const bool O4 = (R1 == R2) && NZ; // bit 4  : (previous state bit 1 == bit 2), held unless reset  (latch)
+	const bool O5 = (!R1 && g0 && ACT) || (R3 && C1 && g1) || (!R2 && !R5 && g3); // bit 5
+
+	return uint8_t((O0 << 0) | (O1 << 1) | (O2 << 2) | (O3 << 3) | (O4 << 4) | (O5 << 5));
+}
+
+
 void mpu4vid_state::mpu4_vid_strike(machine_config& config)
 {
 	mpu4_vid(config);
 	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_68k_map_strike);
 
 	MPU4_CHARACTERISER_PAL(config, m_characteriser);
-	m_characteriser->set_use_4k_table_sim(true);
+	m_characteriser->set_use_pal_equation(true);
+	m_characteriser->set_protnext_cb(FUNC(mpu4vid_state::strike_chr_next));
 }
 
+uint8_t mpu4vid_state::turnover_chr_next(uint8_t state, uint8_t col)
+{
+	const bool R1=(state>>1)&1, R2=(state>>2)&1, R3=(state>>3)&1, R4=(state>>4)&1, R5=(state>>5)&1;
+	const bool C0=(col>>0)&1, C1=(col>>1)&1, C2=(col>>2)&1, C3=(col>>3)&1, C4=(col>>4)&1, C5=(col>>5)&1;
+	const bool NZ=(col&0x3f)!=0, g0=!C3&&!C4, g1=C3&&!C4, g2=!C3&&C4, g3=C3&&C4, ACT=C0||C1||C2||C5;
 
+	const bool O0 = C1 || C2 || C3 || C4 || C5;  // col
+	const bool O1 = (R1 == R2) && NZ;  // latch (R1==R2)
+	const bool O2 = (!R1 && g0 && ACT) || (R3 && C1 && g1) || (!R2 && !R5 && g3);  // mix-B
+	const bool O3 = R1 && NZ;  // latch R1
+	const bool O4 = (R1 && g0 && ACT) || (R2 && !R3 && g2) || (C0 && !C1 && g3) || (!R4 && R5 && g1);  // mix-C
+	const bool O5 = (C1 && g0) || (R1 && g2 && !C5) || (R2 && C0 && g3) || (!R3 && !C1 && g1);  // mix-A
 
+	return uint8_t((O0<<0)|(O1<<1)|(O2<<2)|(O3<<3)|(O4<<4)|(O5<<5));
+}
+
+void mpu4vid_state::mpu4_vid_turnov(machine_config& config)
+{
+	mpu4_vid(config);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
+	m_characteriser->set_use_pal_equation(true);
+	m_characteriser->set_protnext_cb(FUNC(mpu4vid_state::turnover_chr_next));
+}
+
+uint8_t mpu4vid_state::timemchn_chr_next(uint8_t state, uint8_t col)
+{
+	const bool R1=(state>>1)&1, R2=(state>>2)&1, R3=(state>>3)&1, R4=(state>>4)&1, R5=(state>>5)&1;
+	const bool C0=(col>>0)&1, C1=(col>>1)&1, C2=(col>>2)&1, C3=(col>>3)&1, C4=(col>>4)&1, C5=(col>>5)&1;
+	const bool NZ=(col&0x3f)!=0, g0=!C3&&!C4, g1=C3&&!C4, g2=!C3&&C4, g3=C3&&C4, ACT=C0||C1||C2||C5;
+
+	const bool O0 = C1 || C2 || C3 || C4 || C5;  // col
+	const bool O1 = (R1 == R2) && NZ;  // latch (R1==R2)
+	const bool O2 = (R1 && g0 && ACT) || (R2 && !R3 && g2) || (C0 && !C1 && g3) || (!R4 && R5 && g1);  // mix-C
+	const bool O3 = (!R1 && g0 && ACT) || (R3 && C1 && g1) || (!R2 && !R5 && g3);  // mix-B
+	const bool O4 = (C1 && g0) || (R1 && g2 && !C5) || (R2 && C0 && g3) || (!R3 && !C1 && g1);  // mix-A
+	const bool O5 = R1 && NZ;  // latch R1
+
+	return uint8_t((O0<<0)|(O1<<1)|(O2<<2)|(O3<<3)|(O4<<4)|(O5<<5));
+}
+
+void mpu4vid_state::mpu4_vid_tmach(machine_config& config)
+{
+	mpu4_vid(config);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
+	m_characteriser->set_use_pal_equation(true);
+	m_characteriser->set_protnext_cb(FUNC(mpu4vid_state::timemchn_chr_next));
+}
+
+uint8_t mpu4vid_state::barquest_chr_next(uint8_t state, uint8_t col)
+{
+	const bool R1=(state>>1)&1, R2=(state>>2)&1, R3=(state>>3)&1, R4=(state>>4)&1, R5=(state>>5)&1;
+	// R0 (bit 0 of the previous state) is not used by the PAL.
+	const bool C0=(col>>0)&1, C1=(col>>1)&1, C2=(col>>2)&1, C3=(col>>3)&1, C4=(col>>4)&1, C5=(col>>5)&1;
+	const bool NZ=(col&0x3f)!=0, g0=!C3&&!C4, g1=C3&&!C4, g2=!C3&&C4, g3=C3&&C4, ACT=C0||C1||C2||C5;
+
+	const bool O0 = C1 || C2 || C3 || C4 || C5;  // col
+	const bool O1 = (R1 && g0 && ACT) || (R2 && !R3 && g2) || (C0 && !C1 && g3) || (!R4 && R5 && g1);  // mix-C
+	const bool O2 = (!R1 && g0 && ACT) || (R3 && C1 && g1) || (!R2 && !R5 && g3);  // mix-B
+	const bool O3 = (R1 == R2) && NZ;  // latch (R1==R2)
+	const bool O4 = R1 && NZ;  // latch R1
+	const bool O5 = (C1 && g0) || (R1 && g2 && !C5) || (R2 && C0 && g3) || (!R3 && !C1 && g1);  // mix-A
+
+	return uint8_t((O0<<0)|(O1<<1)|(O2<<2)|(O3<<3)|(O4<<4)|(O5<<5));
+}
+
+void mpu4vid_state::mpu4_vid_barquest(machine_config& config)
+{
+	mpu4_vid(config);
+	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_68k_map_strike);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
+	m_characteriser->set_use_pal_equation(true);
+	m_characteriser->set_protnext_cb(FUNC(mpu4vid_state::barquest_chr_next));
+}
+
+uint8_t mpu4vid_state::skiltrek_chr_next(uint8_t state, uint8_t col)
+{
+	const bool R1=(state>>1)&1, R2=(state>>2)&1, R3=(state>>3)&1, R4=(state>>4)&1, R5=(state>>5)&1;
+	const bool C0=(col>>0)&1, C1=(col>>1)&1, C2=(col>>2)&1, C3=(col>>3)&1, C4=(col>>4)&1, C5=(col>>5)&1;
+	const bool NZ=(col&0x3f)!=0, g0=!C3&&!C4, g1=C3&&!C4, g2=!C3&&C4, g3=C3&&C4, ACT=C0||C1||C2||C5;
+
+	const bool O0 = C1 || C2 || C3 || C4 || C5;  // col
+	const bool O1 = (R1 == R2) && NZ;  // latch (R1==R2)
+	const bool O2 = (!R1 && g0 && ACT) || (R3 && C1 && g1) || (!R2 && !R5 && g3);  // mix-B
+	const bool O3 = (C1 && g0) || (R1 && g2 && !C5) || (R2 && C0 && g3) || (!R3 && !C1 && g1);  // mix-A
+	const bool O4 = R1 && NZ;  // latch R1
+	const bool O5 = (R1 && g0 && ACT) || (R2 && !R3 && g2) || (C0 && !C1 && g3) || (!R4 && R5 && g1);  // mix-C
+
+	return uint8_t((O0<<0)|(O1<<1)|(O2<<2)|(O3<<3)|(O4<<4)|(O5<<5));
+}
+
+void mpu4vid_state::mpu4_vid_skilltrk(machine_config& config)
+{
+	mpu4_vid(config);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
+	m_characteriser->set_use_pal_equation(true);
+	m_characteriser->set_protnext_cb(FUNC(mpu4vid_state::skiltrek_chr_next));
+}
+
+uint8_t mpu4vid_state::addlad_chr_next(uint8_t state, uint8_t col)
+{
+	const bool R1=(state>>1)&1, R2=(state>>2)&1, R3=(state>>3)&1, R4=(state>>4)&1, R5=(state>>5)&1;
+	// R0 (bit 0 of the previous state) is not used by the PAL.
+	const bool C0=(col>>0)&1, C1=(col>>1)&1, C2=(col>>2)&1, C3=(col>>3)&1, C4=(col>>4)&1, C5=(col>>5)&1;
+	const bool NZ=(col&0x3f)!=0, g0=!C3&&!C4, g1=C3&&!C4, g2=!C3&&C4, g3=C3&&C4, ACT=C0||C1||C2||C5;
+
+	const bool O0 = C1 || C2 || C3 || C4 || C5;  // col
+	const bool O1 = (!R1 && g0 && ACT) || (R3 && C1 && g1) || (!R2 && !R5 && g3);  // mix-B
+	const bool O2 = (C1 && g0) || (R1 && g2 && !C5) || (R2 && C0 && g3) || (!R3 && !C1 && g1);  // mix-A
+	const bool O3 = R1 && NZ;  // latch R1
+	const bool O4 = (R1 && g0 && ACT) || (R2 && !R3 && g2) || (C0 && !C1 && g3) || (!R4 && R5 && g1);  // mix-C
+	const bool O5 = (R1 == R2) && NZ;  // latch (R1==R2)
+
+	return uint8_t((O0<<0)|(O1<<1)|(O2<<2)|(O3<<3)|(O4<<4)|(O5<<5));
+}
+
+void mpu4vid_state::mpu4_vid_addlad(machine_config& config)
+{
+	mpu4_vid(config);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
+	m_characteriser->set_use_pal_equation(true);
+	m_characteriser->set_protnext_cb(FUNC(mpu4vid_state::addlad_chr_next));
+}
 
 
 void mpu4vid_state::crmaze_base(machine_config &config)
@@ -2249,28 +2416,24 @@ uint8_t mpu4vid_state::vidcharacteriser_r(offs_t offset)
 	if (m_characteriser)
 		ret = m_characteriser->read(offset);
 
-	/* hack for 'invalid questions' error on time machine.. I guess it wants them to decode properly for startup check? */
-	if (m_videocpu->pcbase()==0x283a)
-	{
-		ret = 0x00;
-	}
-
 	return ret;
 }
 
 
-uint8_t mpu4vid_state::vidcharacteriser_4k_lookup_r(offs_t offset)
+uint8_t mpu4vid_state::vidcharacteriser_strikeit_hack_r(offs_t offset)
 {
 	uint8_t ret = m_characteriser->read(offset);
 	// hack for v4strike, otherwise it reports questions as invalid, even if they decode properly
 	// is this a secondary security check, or are they mismatched for the version?
 	// it writes '03' to the characteriser, (the question revision or coincidence?)
 	// but expects 00 back for that check
-
 	if (m_videocpu->pcbase() == 0x32c4)
 	{
 		if (m_videocpu->state_int(M68K_A4) == 0xaab54)
+		{
+			printf("%s: HACK - change Strike It Lucky question revision from %02x to 0x00\n", machine().describe_context().c_str(), ret);
 			ret = 0x00;
+		}
 	}
 
 	return ret;
@@ -4029,7 +4192,6 @@ ROM_END
 
 
 
-
 ROM_START( v4tmach )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
@@ -4040,11 +4202,17 @@ ROM_START( v4tmach )
 	ROM_LOAD16_BYTE( "tm20.p3",  0x020000, 0x010000,  CRC(efd3ae64) SHA1(9d2a3b65048e04842205751c6921d2550f38bd52) )
 	ROM_LOAD16_BYTE( "tm20.p4",  0x020001, 0x010000,  CRC(602ba3fb) SHA1(7243f58df9a26adfd1a149a1e60630b187787dd0) )
 	// questions can go in any slot, game detects what is installed
-	ROM_LOAD16_BYTE( "issue3_q16" , 0x040000, 0x010000,  CRC(ce2bf15e) SHA1(29c7f2e718bce415b0b8dc6d902bf74dad6b1ef4) ) // ISSUE3 Q16
-	ROM_LOAD16_BYTE( "issue3_q17",  0x040001, 0x010000,  CRC(5cab773e) SHA1(59a235c51a975b341bdbb88e909729507408f75b) ) // ISSUE3 Q17
-	ROM_LOAD16_BYTE( "issue3_q18",  0x060000, 0x010000,  CRC(27de90b3) SHA1(625c98e555f7b627ea96653926b8917996a2fdb7) ) // ISSUE3 Q18
-	ROM_LOAD16_BYTE( "issue3_q19",  0x060001, 0x010000,  CRC(083f6c65) SHA1(291ad39ee5f8eba9da293d9206b1f6a6d852f9bd) ) // ISSUE3 Q19
-	ROM_LOAD16_BYTE( "issue3_q20",  0x080000, 0x010000,  CRC(73747644) SHA1(ae252fc95c069a3c82e155220fbfcb74dd43bf89) ) // ISSUE3 Q20
+	// these appear to work
+	ROM_LOAD16_BYTE( "issue1_q1", 0x040000, 0x010000, CRC(6af4d58b) SHA1(ee547dad30cd9940f0b017caac97aeb046604f22) ) // ISSUE1 Q1
+	ROM_LOAD16_BYTE( "issue1_q2", 0x040001, 0x010000, CRC(b01b7687) SHA1(99db448d7e40c2ec16afef3c10abc8a9493f2ab4) ) // ISSUE1 Q2
+	ROM_LOAD16_BYTE( "issue1_q3", 0x060000, 0x010000, CRC(e97f14eb) SHA1(9163d11e1bc5a13d5002a13bc18b65a91e1738c7) ) // ISSUE1 Q3
+	ROM_LOAD16_BYTE( "issue1_q4", 0x060001, 0x010000, CRC(6134d918) SHA1(e4b4d6b08d94729d4dcca474d4c7bdcb267530a8) ) // ISSUE1 Q4
+	ROM_LOAD16_BYTE( "issue1_q5", 0x080000, 0x010000, CRC(6c07814b) SHA1(a97feada5cfa1bb059837b292637fbad9c7137ac) ) // ISSUE1 Q5
+	ROM_LOAD16_BYTE( "issue1_q6", 0x080001, 0x010000, CRC(5f16a536) SHA1(3435282bfb940604fb44e06dc4748e668768f286) ) // ISSUE1 Q6
+	ROM_LOAD16_BYTE( "issue1_q7", 0x0a0000, 0x010000, CRC(9afdce0b) SHA1(a969038d9ce2a2cff1e1a75959c05a3f03f08235) ) // ISSUE1 Q7
+	ROM_LOAD16_BYTE( "issue1_q8", 0x0a0001, 0x010000, CRC(f1878251) SHA1(b6a8527112bcdf21b9a0acab4d8fa507a96aaba7) ) // ISSUE1 Q8
+	ROM_LOAD16_BYTE( "issue1_q9", 0x0c0000, 0x010000, CRC(ace01faa) SHA1(79d6247a74e1bce0d76ea3788d0022d9e50173c4) ) // ISSUE1 Q9
+	ROM_LOAD16_BYTE( "issue1_q10",0x0c0001, 0x010000, CRC(021f4523) SHA1(10884665f5700c147c7035d0c98f3889917ff015) ) // ISSUE1 Q10
 ROM_END
 
 ROM_START( v4tmachd )
@@ -4057,15 +4225,21 @@ ROM_START( v4tmachd )
 	ROM_LOAD16_BYTE( "tm20.p3",  0x020000, 0x010000,  CRC(efd3ae64) SHA1(9d2a3b65048e04842205751c6921d2550f38bd52) )
 	ROM_LOAD16_BYTE( "tm20.p4",  0x020001, 0x010000,  CRC(602ba3fb) SHA1(7243f58df9a26adfd1a149a1e60630b187787dd0) )
 	// questions can go in any slot, game detects what is installed
-	ROM_LOAD16_BYTE( "issue3_q16" , 0x040000, 0x010000,  CRC(ce2bf15e) SHA1(29c7f2e718bce415b0b8dc6d902bf74dad6b1ef4) ) // ISSUE3 Q16
-	ROM_LOAD16_BYTE( "issue3_q17",  0x040001, 0x010000,  CRC(5cab773e) SHA1(59a235c51a975b341bdbb88e909729507408f75b) ) // ISSUE3 Q17
-	ROM_LOAD16_BYTE( "issue3_q18",  0x060000, 0x010000,  CRC(27de90b3) SHA1(625c98e555f7b627ea96653926b8917996a2fdb7) ) // ISSUE3 Q18
-	ROM_LOAD16_BYTE( "issue3_q19",  0x060001, 0x010000,  CRC(083f6c65) SHA1(291ad39ee5f8eba9da293d9206b1f6a6d852f9bd) ) // ISSUE3 Q19
-	ROM_LOAD16_BYTE( "issue3_q20",  0x080000, 0x010000,  CRC(73747644) SHA1(ae252fc95c069a3c82e155220fbfcb74dd43bf89) ) // ISSUE3 Q20
+	// these appear to work
+	ROM_LOAD16_BYTE( "issue1_q1", 0x040000, 0x010000, CRC(6af4d58b) SHA1(ee547dad30cd9940f0b017caac97aeb046604f22) ) // ISSUE1 Q1
+	ROM_LOAD16_BYTE( "issue1_q2", 0x040001, 0x010000, CRC(b01b7687) SHA1(99db448d7e40c2ec16afef3c10abc8a9493f2ab4) ) // ISSUE1 Q2
+	ROM_LOAD16_BYTE( "issue1_q3", 0x060000, 0x010000, CRC(e97f14eb) SHA1(9163d11e1bc5a13d5002a13bc18b65a91e1738c7) ) // ISSUE1 Q3
+	ROM_LOAD16_BYTE( "issue1_q4", 0x060001, 0x010000, CRC(6134d918) SHA1(e4b4d6b08d94729d4dcca474d4c7bdcb267530a8) ) // ISSUE1 Q4
+	ROM_LOAD16_BYTE( "issue1_q5", 0x080000, 0x010000, CRC(6c07814b) SHA1(a97feada5cfa1bb059837b292637fbad9c7137ac) ) // ISSUE1 Q5
+	ROM_LOAD16_BYTE( "issue1_q6", 0x080001, 0x010000, CRC(5f16a536) SHA1(3435282bfb940604fb44e06dc4748e668768f286) ) // ISSUE1 Q6
+	ROM_LOAD16_BYTE( "issue1_q7", 0x0a0000, 0x010000, CRC(9afdce0b) SHA1(a969038d9ce2a2cff1e1a75959c05a3f03f08235) ) // ISSUE1 Q7
+	ROM_LOAD16_BYTE( "issue1_q8", 0x0a0001, 0x010000, CRC(f1878251) SHA1(b6a8527112bcdf21b9a0acab4d8fa507a96aaba7) ) // ISSUE1 Q8
+	ROM_LOAD16_BYTE( "issue1_q9", 0x0c0000, 0x010000, CRC(ace01faa) SHA1(79d6247a74e1bce0d76ea3788d0022d9e50173c4) ) // ISSUE1 Q9
+	ROM_LOAD16_BYTE( "issue1_q10",0x0c0001, 0x010000, CRC(021f4523) SHA1(10884665f5700c147c7035d0c98f3889917ff015) ) // ISSUE1 Q10
 ROM_END
 
 
-ROM_START( v4tmach1 )
+ROM_START( v4tmach3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
 
@@ -4075,19 +4249,15 @@ ROM_START( v4tmach1 )
 	ROM_LOAD16_BYTE( "tm20.p3",  0x020000, 0x010000,  CRC(efd3ae64) SHA1(9d2a3b65048e04842205751c6921d2550f38bd52) )
 	ROM_LOAD16_BYTE( "tm20.p4",  0x020001, 0x010000,  CRC(602ba3fb) SHA1(7243f58df9a26adfd1a149a1e60630b187787dd0) )
 	// questions can go in any slot, game detects what is installed
-	ROM_LOAD16_BYTE( "issue1_q1", 0x040000, 0x010000, CRC(6af4d58b) SHA1(ee547dad30cd9940f0b017caac97aeb046604f22) ) // ISSUE1 Q1
-	ROM_LOAD16_BYTE( "issue1_q2", 0x040001, 0x010000, CRC(b01b7687) SHA1(99db448d7e40c2ec16afef3c10abc8a9493f2ab4) ) // ISSUE1 Q2
-	ROM_LOAD16_BYTE( "issue1_q3", 0x060000, 0x010000, CRC(e97f14eb) SHA1(9163d11e1bc5a13d5002a13bc18b65a91e1738c7) ) // ISSUE1 Q3
-	ROM_LOAD16_BYTE( "issue1_q4", 0x060001, 0x010000, CRC(6134d918) SHA1(e4b4d6b08d94729d4dcca474d4c7bdcb267530a8) ) // ISSUE1 Q4
-	ROM_LOAD16_BYTE( "issue1_q5", 0x080000, 0x010000, CRC(6c07814b) SHA1(a97feada5cfa1bb059837b292637fbad9c7137ac) ) // ISSUE1 Q5
-	ROM_LOAD16_BYTE( "issue1_q6", 0x080001, 0x010000, CRC(5f16a536) SHA1(3435282bfb940604fb44e06dc4748e668768f286) ) // ISSUE1 Q6
-	ROM_LOAD16_BYTE( "issue1_q7", 0x0a0000, 0x010000, CRC(9afdce0b) SHA1(a969038d9ce2a2cff1e1a75959c05a3f03f08235) ) // ISSUE1 Q7
-	ROM_LOAD16_BYTE( "issue1_q8", 0x0a0001, 0x010000, CRC(f1878251) SHA1(b6a8527112bcdf21b9a0acab4d8fa507a96aaba7) ) // ISSUE1 Q8
-	ROM_LOAD16_BYTE( "issue1_q9", 0x0c0000, 0x010000, CRC(ace01faa) SHA1(79d6247a74e1bce0d76ea3788d0022d9e50173c4) ) // ISSUE1 Q9
-	ROM_LOAD16_BYTE( "issue1_q10",0x0c0001, 0x010000, CRC(021f4523) SHA1(10884665f5700c147c7035d0c98f3889917ff015) ) // ISSUE1 Q10
+	// these appear to be mismatched to the set above?
+	ROM_LOAD16_BYTE( "issue3_q16" , 0x040000, 0x010000,  CRC(ce2bf15e) SHA1(29c7f2e718bce415b0b8dc6d902bf74dad6b1ef4) ) // ISSUE3 Q16
+	ROM_LOAD16_BYTE( "issue3_q17",  0x040001, 0x010000,  CRC(5cab773e) SHA1(59a235c51a975b341bdbb88e909729507408f75b) ) // ISSUE3 Q17
+	ROM_LOAD16_BYTE( "issue3_q18",  0x060000, 0x010000,  CRC(27de90b3) SHA1(625c98e555f7b627ea96653926b8917996a2fdb7) ) // ISSUE3 Q18
+	ROM_LOAD16_BYTE( "issue3_q19",  0x060001, 0x010000,  CRC(083f6c65) SHA1(291ad39ee5f8eba9da293d9206b1f6a6d852f9bd) ) // ISSUE3 Q19
+	ROM_LOAD16_BYTE( "issue3_q20",  0x080000, 0x010000,  CRC(73747644) SHA1(ae252fc95c069a3c82e155220fbfcb74dd43bf89) ) // ISSUE3 Q20
 ROM_END
 
-ROM_START( v4tmach1d )
+ROM_START( v4tmach3d )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
 
@@ -4097,16 +4267,12 @@ ROM_START( v4tmach1d )
 	ROM_LOAD16_BYTE( "tm20.p3",  0x020000, 0x010000,  CRC(efd3ae64) SHA1(9d2a3b65048e04842205751c6921d2550f38bd52) )
 	ROM_LOAD16_BYTE( "tm20.p4",  0x020001, 0x010000,  CRC(602ba3fb) SHA1(7243f58df9a26adfd1a149a1e60630b187787dd0) )
 	// questions can go in any slot, game detects what is installed
-	ROM_LOAD16_BYTE( "issue1_q1", 0x040000, 0x010000, CRC(6af4d58b) SHA1(ee547dad30cd9940f0b017caac97aeb046604f22) ) // ISSUE1 Q1
-	ROM_LOAD16_BYTE( "issue1_q2", 0x040001, 0x010000, CRC(b01b7687) SHA1(99db448d7e40c2ec16afef3c10abc8a9493f2ab4) ) // ISSUE1 Q2
-	ROM_LOAD16_BYTE( "issue1_q3", 0x060000, 0x010000, CRC(e97f14eb) SHA1(9163d11e1bc5a13d5002a13bc18b65a91e1738c7) ) // ISSUE1 Q3
-	ROM_LOAD16_BYTE( "issue1_q4", 0x060001, 0x010000, CRC(6134d918) SHA1(e4b4d6b08d94729d4dcca474d4c7bdcb267530a8) ) // ISSUE1 Q4
-	ROM_LOAD16_BYTE( "issue1_q5", 0x080000, 0x010000, CRC(6c07814b) SHA1(a97feada5cfa1bb059837b292637fbad9c7137ac) ) // ISSUE1 Q5
-	ROM_LOAD16_BYTE( "issue1_q6", 0x080001, 0x010000, CRC(5f16a536) SHA1(3435282bfb940604fb44e06dc4748e668768f286) ) // ISSUE1 Q6
-	ROM_LOAD16_BYTE( "issue1_q7", 0x0a0000, 0x010000, CRC(9afdce0b) SHA1(a969038d9ce2a2cff1e1a75959c05a3f03f08235) ) // ISSUE1 Q7
-	ROM_LOAD16_BYTE( "issue1_q8", 0x0a0001, 0x010000, CRC(f1878251) SHA1(b6a8527112bcdf21b9a0acab4d8fa507a96aaba7) ) // ISSUE1 Q8
-	ROM_LOAD16_BYTE( "issue1_q9", 0x0c0000, 0x010000, CRC(ace01faa) SHA1(79d6247a74e1bce0d76ea3788d0022d9e50173c4) ) // ISSUE1 Q9
-	ROM_LOAD16_BYTE( "issue1_q10",0x0c0001, 0x010000, CRC(021f4523) SHA1(10884665f5700c147c7035d0c98f3889917ff015) ) // ISSUE1 Q10
+	// these appear to be mismatched to the set above?
+	ROM_LOAD16_BYTE( "issue3_q16" , 0x040000, 0x010000,  CRC(ce2bf15e) SHA1(29c7f2e718bce415b0b8dc6d902bf74dad6b1ef4) ) // ISSUE3 Q16
+	ROM_LOAD16_BYTE( "issue3_q17",  0x040001, 0x010000,  CRC(5cab773e) SHA1(59a235c51a975b341bdbb88e909729507408f75b) ) // ISSUE3 Q17
+	ROM_LOAD16_BYTE( "issue3_q18",  0x060000, 0x010000,  CRC(27de90b3) SHA1(625c98e555f7b627ea96653926b8917996a2fdb7) ) // ISSUE3 Q18
+	ROM_LOAD16_BYTE( "issue3_q19",  0x060001, 0x010000,  CRC(083f6c65) SHA1(291ad39ee5f8eba9da293d9206b1f6a6d852f9bd) ) // ISSUE3 Q19
+	ROM_LOAD16_BYTE( "issue3_q20",  0x080000, 0x010000,  CRC(73747644) SHA1(ae252fc95c069a3c82e155220fbfcb74dd43bf89) ) // ISSUE3 Q20
 ROM_END
 
 ROM_START( v4tmach2 )
@@ -4119,6 +4285,7 @@ ROM_START( v4tmach2 )
 	ROM_LOAD16_BYTE( "tm20.p3",  0x020000, 0x010000,  CRC(efd3ae64) SHA1(9d2a3b65048e04842205751c6921d2550f38bd52) )
 	ROM_LOAD16_BYTE( "tm20.p4",  0x020001, 0x010000,  CRC(602ba3fb) SHA1(7243f58df9a26adfd1a149a1e60630b187787dd0) )
 	// questions can go in any slot, game detects what is installed
+	// these appear to be mismatched to the set above?
 	ROM_LOAD16_BYTE( "issue2_q11" ,  0x040000, 0x010000,  CRC(e8ed736f) SHA1(e7068c550aa39a6e8f1692a16794147e996d36b4) ) // ISSUE2 Q11
 	ROM_LOAD16_BYTE( "issue2_q12" ,  0x040001, 0x010000,  BAD_DUMP CRC(adddd8a7) SHA1(73a8dd191eda2f4b41b79d4b55723731953b8970) ) // ISSUE2 Q12 // game doesn't recognize this one in any slot? bad? wrong game?
 	ROM_LOAD16_BYTE( "issue2_q13" ,  0x060000, 0x010000,  CRC(3de147dd) SHA1(d2111d54d1604fe2da0133102bbfee706f8f542e) ) // ISSUE2 Q13
@@ -4137,6 +4304,7 @@ ROM_START( v4tmach2d )
 	ROM_LOAD16_BYTE( "tm20.p3",  0x020000, 0x010000,  CRC(efd3ae64) SHA1(9d2a3b65048e04842205751c6921d2550f38bd52) )
 	ROM_LOAD16_BYTE( "tm20.p4",  0x020001, 0x010000,  CRC(602ba3fb) SHA1(7243f58df9a26adfd1a149a1e60630b187787dd0) )
 	// questions can go in any slot, game detects what is installed
+	// these appear to be mismatched to the set above?
 	ROM_LOAD16_BYTE( "issue2_q11" ,  0x040000, 0x010000,  CRC(e8ed736f) SHA1(e7068c550aa39a6e8f1692a16794147e996d36b4) ) // ISSUE2 Q11
 	ROM_LOAD16_BYTE( "issue2_q12" ,  0x040001, 0x010000,  BAD_DUMP CRC(adddd8a7) SHA1(73a8dd191eda2f4b41b79d4b55723731953b8970) ) // ISSUE2 Q12 // game doesn't recognize this one in any slot? bad? wrong game?
 	ROM_LOAD16_BYTE( "issue2_q13" ,  0x060000, 0x010000,  CRC(3de147dd) SHA1(d2111d54d1604fe2da0133102bbfee706f8f542e) ) // ISSUE2 Q13
@@ -4211,11 +4379,6 @@ ROM_START( v4addlad )
 	ROM_LOAD16_BYTE( "al.q8",  0x0a0001, 0x10000,  CRC(55058a63) SHA1(cf9edef5264f4301be4ee11f221ab67a5183a603) )
 	ROM_LOAD16_BYTE( "al.q9",  0x0c0000, 0x10000,  CRC(22274191) SHA1(9bee5709edcd853e96408f37447c0f5324610903) )
 	ROM_LOAD16_BYTE( "al.qa",  0x0c0001, 0x10000,  CRC(1fe98b4d) SHA1(533afeaea42903905f6f1206bba1a023b141bdd9) )
-
-	ROM_REGION( 0x1000, "characteriser:fakechr", 0 )
-	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
-	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
-	ROM_LOAD( "addersandladders_video_mpu4.chr", 0x0000, 0x1000, CRC(2e191981) SHA1(09d57291f73bea6d87007256137d039f5d279235) )
 ROM_END
 
 ROM_START( v4addladd )
@@ -4237,11 +4400,6 @@ ROM_START( v4addladd )
 	ROM_LOAD16_BYTE( "al.q8",  0x0a0001, 0x10000,  CRC(55058a63) SHA1(cf9edef5264f4301be4ee11f221ab67a5183a603) )
 	ROM_LOAD16_BYTE( "al.q9",  0x0c0000, 0x10000,  CRC(22274191) SHA1(9bee5709edcd853e96408f37447c0f5324610903) )
 	ROM_LOAD16_BYTE( "al.qa",  0x0c0001, 0x10000,  CRC(1fe98b4d) SHA1(533afeaea42903905f6f1206bba1a023b141bdd9) )
-
-	ROM_REGION( 0x1000, "characteriser:fakechr", 0 )
-	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
-	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
-	ROM_LOAD( "addersandladders_video_mpu4.chr", 0x0000, 0x1000, CRC(2e191981) SHA1(09d57291f73bea6d87007256137d039f5d279235) )
 ROM_END
 
 ROM_START( v4addlad20 )
@@ -4263,17 +4421,10 @@ ROM_START( v4addlad20 )
 	ROM_LOAD16_BYTE( "al.q8",  0x0a0001, 0x10000,  CRC(55058a63) SHA1(cf9edef5264f4301be4ee11f221ab67a5183a603) )
 	ROM_LOAD16_BYTE( "al.q9",  0x0c0000, 0x10000,  CRC(22274191) SHA1(9bee5709edcd853e96408f37447c0f5324610903) )
 	ROM_LOAD16_BYTE( "al.qa",  0x0c0001, 0x10000,  CRC(1fe98b4d) SHA1(533afeaea42903905f6f1206bba1a023b141bdd9) )
-
-	ROM_REGION( 0x1000, "characteriser:fakechr", 0 )
-	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
-	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
-	ROM_LOAD( "addersandladders_video_mpu4.chr", 0x0000, 0x1000, CRC(2e191981) SHA1(09d57291f73bea6d87007256137d039f5d279235) )
 ROM_END
 
 
-// for video CPU
-// bp 32c4,a0 == ffd001
-// (a4 == aab54) when doing startup questions check
+
 ROM_START( v4strike )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
@@ -4286,6 +4437,7 @@ ROM_START( v4strike )
 	ROM_LOAD16_BYTE( "sil.p5",  0x080000, 0x020000,  CRC(28bced09) SHA1(7ba5013f1e0f4e921581b23c4a1d4c005a043b66) )
 	ROM_LOAD16_BYTE( "sil.p6",  0x080001, 0x020000,  CRC(6f5fc296) SHA1(bd32a937581df6b5a4f08e6ef40c37a2b4278936) )
 
+	// these appear to be mismatched to the set above, and require a hack to boot
 	ROM_LOAD16_BYTE( "silq-1.bin",  0x0c0000, 0x020000,  CRC(03332145) SHA1(1700f76622a4b195e3ce03d89b886060d7f3ba71) ) // ISSUE3 Q1 v3.1 ('N' questions) (normal)
 	ROM_LOAD16_BYTE( "silq-2.bin",  0x0c0001, 0x020000,  CRC(9659b0cb) SHA1(c573752ef40c8501907d0e41ed2d2566a2dddcb8) ) // ISSUE3 Q2 v3.1 ('N' questions)
 	ROM_LOAD16_BYTE( "silq-3.bin",  0x100000, 0x020000,  CRC(443a6c2d) SHA1(1c111d801d76b07cdfef2b465f7ac759331f1843) ) // ISSUE3 Q3 v3.1 ('N' questions)
@@ -4293,11 +4445,6 @@ ROM_START( v4strike )
 	ROM_LOAD16_BYTE( "silq-5.bin",  0x140000, 0x020000,  CRC(444c6d8e) SHA1(ae662747382b12bee77c30620fb0705312084e42) ) // ISSUE3 Q5 v3.1 ('N' questions)
 	ROM_LOAD16_BYTE( "silq-7.bin",  0x180000, 0x020000,  CRC(122f2327) SHA1(5c83f473cbfb7624f6eedd6d6521020b2b838da4) ) // ISSUE3 Q1 v3.1 ('T' questions) (true)
 	ROM_LOAD16_BYTE( "silq-6.bin",  0x1c0000, 0x020000,  CRC(0ea36fd5) SHA1(e0649c77007c092fef4cb11fdd71682c88ca82e6) ) // ISSUE3 Q1 v3.1 ('F' questions) (false)
-
-	ROM_REGION( 0x1000, "characteriser:fakechr", 0 )
-	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
-	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
-	ROM_LOAD( "strikeitlucky_video_mpu4.chr", 0x0000, 0x1000, CRC(ec529c9f) SHA1(9eb2b08afb2955b0a8fe736500888b63f07ace63) )
 ROM_END
 
 ROM_START( v4striked )
@@ -4312,6 +4459,7 @@ ROM_START( v4striked )
 	ROM_LOAD16_BYTE( "sil.p5",  0x080000, 0x020000,  CRC(28bced09) SHA1(7ba5013f1e0f4e921581b23c4a1d4c005a043b66) )
 	ROM_LOAD16_BYTE( "sil.p6",  0x080001, 0x020000,  CRC(6f5fc296) SHA1(bd32a937581df6b5a4f08e6ef40c37a2b4278936) )
 
+	// these appear to be mismatched to the set above, and require a hack to boot
 	ROM_LOAD16_BYTE( "silq-1.bin",  0x0c0000, 0x020000,  CRC(03332145) SHA1(1700f76622a4b195e3ce03d89b886060d7f3ba71) ) // ISSUE3 Q1 v3.1 ('N' questions) (normal)
 	ROM_LOAD16_BYTE( "silq-2.bin",  0x0c0001, 0x020000,  CRC(9659b0cb) SHA1(c573752ef40c8501907d0e41ed2d2566a2dddcb8) ) // ISSUE3 Q2 v3.1 ('N' questions)
 	ROM_LOAD16_BYTE( "silq-3.bin",  0x100000, 0x020000,  CRC(443a6c2d) SHA1(1c111d801d76b07cdfef2b465f7ac759331f1843) ) // ISSUE3 Q3 v3.1 ('N' questions)
@@ -4319,11 +4467,6 @@ ROM_START( v4striked )
 	ROM_LOAD16_BYTE( "silq-5.bin",  0x140000, 0x020000,  CRC(444c6d8e) SHA1(ae662747382b12bee77c30620fb0705312084e42) ) // ISSUE3 Q5 v3.1 ('N' questions)
 	ROM_LOAD16_BYTE( "silq-7.bin",  0x180000, 0x020000,  CRC(122f2327) SHA1(5c83f473cbfb7624f6eedd6d6521020b2b838da4) ) // ISSUE3 Q1 v3.1 ('T' questions) (true)
 	ROM_LOAD16_BYTE( "silq-6.bin",  0x1c0000, 0x020000,  CRC(0ea36fd5) SHA1(e0649c77007c092fef4cb11fdd71682c88ca82e6) ) // ISSUE3 Q1 v3.1 ('F' questions) (false)
-
-	ROM_REGION( 0x1000, "characteriser:fakechr", 0 )
-	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
-	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
-	ROM_LOAD( "strikeitlucky_video_mpu4.chr", 0x0000, 0x1000, CRC(ec529c9f) SHA1(9eb2b08afb2955b0a8fe736500888b63f07ace63) )
 ROM_END
 
 ROM_START( v4strike2 )
@@ -4345,11 +4488,6 @@ ROM_START( v4strike2 )
 	ROM_LOAD16_BYTE( "silq-5.bin",  0x140000, 0x020000,  CRC(444c6d8e) SHA1(ae662747382b12bee77c30620fb0705312084e42) ) // ISSUE3 Q5 v3.1 ('N' questions)
 	ROM_LOAD16_BYTE( "silq-7.bin",  0x180000, 0x020000,  CRC(122f2327) SHA1(5c83f473cbfb7624f6eedd6d6521020b2b838da4) ) // ISSUE3 Q1 v3.1 ('T' questions) (true)
 	ROM_LOAD16_BYTE( "silq-6.bin",  0x1c0000, 0x020000,  CRC(0ea36fd5) SHA1(e0649c77007c092fef4cb11fdd71682c88ca82e6) ) // ISSUE3 Q1 v3.1 ('F' questions) (false)
-
-	ROM_REGION( 0x1000, "characteriser:fakechr", 0 )
-	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
-	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
-	ROM_LOAD( "strikeitlucky_video_mpu4.chr", 0x0000, 0x1000, CRC(ec529c9f) SHA1(9eb2b08afb2955b0a8fe736500888b63f07ace63) )
 ROM_END
 
 ROM_START( v4strike2d )
@@ -4371,11 +4509,6 @@ ROM_START( v4strike2d )
 	ROM_LOAD16_BYTE( "silq-5.bin",  0x140000, 0x020000,  CRC(444c6d8e) SHA1(ae662747382b12bee77c30620fb0705312084e42) ) // ISSUE3 Q5 v3.1 ('N' questions)
 	ROM_LOAD16_BYTE( "silq-7.bin",  0x180000, 0x020000,  CRC(122f2327) SHA1(5c83f473cbfb7624f6eedd6d6521020b2b838da4) ) // ISSUE3 Q1 v3.1 ('T' questions) (true)
 	ROM_LOAD16_BYTE( "silq-6.bin",  0x1c0000, 0x020000,  CRC(0ea36fd5) SHA1(e0649c77007c092fef4cb11fdd71682c88ca82e6) ) // ISSUE3 Q1 v3.1 ('F' questions) (false)
-
-	ROM_REGION( 0x1000, "characteriser:fakechr", 0 )
-	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
-	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
-	ROM_LOAD( "strikeitlucky_video_mpu4.chr", 0x0000, 0x1000, CRC(ec529c9f) SHA1(9eb2b08afb2955b0a8fe736500888b63f07ace63) )
 ROM_END
 
 ROM_START( v4eyedwn )
@@ -4474,11 +4607,6 @@ ROM_START( v4barqst )
 	ROM_LOAD16_BYTE( "bq-iss4.p8", 0x080001, 0x010000, CRC(54007030) SHA1(65306938b2737f7423223eb0290ee69b2955176e) )
 	ROM_LOAD16_BYTE( "bq-iss4.p9", 0x0a0000, 0x010000, CRC(2971f5ca) SHA1(0de9b1d743243d6e127f5417485f1a9fa76d5399) )
 	ROM_LOAD16_BYTE( "bq-iss4.p10", 0x0a0001, 0x010000, CRC(d54f961f) SHA1(14273cf78371550dd525843b388915df567342ce) )
-
-	ROM_REGION( 0x1000, "characteriser:fakechr", 0 )
-	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
-	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
-	ROM_LOAD( "barquest.chr", 0x0000, 0x1000, CRC(bc9971fe) SHA1(902684318ad0755ee062a7f10e2c3171b5c4933f) )
 ROM_END
 
 ROM_START( v4barqstd )
@@ -4498,11 +4626,6 @@ ROM_START( v4barqstd )
 	ROM_LOAD16_BYTE( "bq-iss4.p8", 0x080001, 0x010000, CRC(54007030) SHA1(65306938b2737f7423223eb0290ee69b2955176e) )
 	ROM_LOAD16_BYTE( "bq-iss4.p9", 0x0a0000, 0x010000, CRC(2971f5ca) SHA1(0de9b1d743243d6e127f5417485f1a9fa76d5399) )
 	ROM_LOAD16_BYTE( "bq-iss4.p10", 0x0a0001, 0x010000, CRC(d54f961f) SHA1(14273cf78371550dd525843b388915df567342ce) )
-
-	ROM_REGION( 0x1000, "characteriser:fakechr", 0 )
-	// this is a state result dump of the PAL, a 64x64 table of 6-bit values, where a write sets the column index
-	// and the result of the previous read sets the row index, and a write of 00 resets the state machine?
-	ROM_LOAD( "barquest.chr", 0x0000, 0x1000, CRC(bc9971fe) SHA1(902684318ad0755ee062a7f10e2c3171b5c4933f) )
 ROM_END
 
 ROM_START( v4barqs2 )
@@ -8732,9 +8855,9 @@ GAME(  1996?,v4mated,    v4mate,   mating,     mating,   mpu4vid_state, init_mat
 // the v4addlad / v4addladd sets don't do the usual protection check, but still have the device for scrambling questions
 // same sequence as bankrollerclub
 // 00 8c 64 84 84 c4 84 84 9c f4 04 cc 24 84 c4 94 54 0c 74 0c 34 04 84 84 c4 84 9c e4 84 84 84 d4 44 84 c4 84 9c e4 84 84 84 8c 60 84 84 84 84 c4 9c f4 04 cc 24 9c f4 04 94 14 44 8c 34 04 9c 00
-GAMEL(  1989, v4addlad,   v4bios,   mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Adders and Ladders (v2.1) (MPU4 Video)",GAME_FLAGS_OK,layout_v4addlad )
-GAMEL(  1989, v4addladd,  v4addlad, mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Adders and Ladders (v2.1d) (MPU4 Video)",GAME_FLAGS_OK,layout_v4addlad )
-GAMEL(  1989, v4addlad20, v4addlad, mpu4_vid_strike,   adders,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Adders and Ladders (v2.0) (MPU4 Video)",GAME_FLAGS_OK,layout_v4addlad )
+GAMEL(  1989, v4addlad,   v4bios,   mpu4_vid_addlad,   adders,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Adders and Ladders (v2.1) (MPU4 Video)",GAME_FLAGS_OK,layout_v4addlad )
+GAMEL(  1989, v4addladd,  v4addlad, mpu4_vid_addlad,   adders,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Adders and Ladders (v2.1d) (MPU4 Video)",GAME_FLAGS_OK,layout_v4addlad )
+GAMEL(  1989, v4addlad20, v4addlad, mpu4_vid_addlad,   adders,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Adders and Ladders (v2.0) (MPU4 Video)",GAME_FLAGS_OK,layout_v4addlad )
 
 // 00 c4 c4 44 c4 44 44 c4 cc 3c 5c 7c 54 24 c4 4c b4 84 cc 34 04 4c 14 24 c4 44 cc 14 04 44 c4 4c 1c 54 2c 1c 7c d4 0c 94 04 c4 c0 4c 94 04 44 44 cc 1c 7c 7c d4 8c 1c 5c 5c 5c 7c 74 04 c4 cc 00
 GAMEL(  199?, v4strike,   v4bios,   mpu4_vid_strike,   strike,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.5) (MPU4 Video)",GAME_FLAGS_OK,layout_v4strike )
@@ -8743,28 +8866,29 @@ GAMEL(  199?, v4strike2,  v4strike, mpu4_vid_strike,   strike,   mpu4vid_state, 
 GAMEL(  199?, v4strike2d, v4strike, mpu4_vid_strike,   strike,   mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Strike it Lucky (v0.53, Datapak) (MPU4 Video)",GAME_FLAGS_OK,layout_v4strike )
 
 // 00 34 14 0c 54 04 24 34 94 94 0c 5c 6c 44 24 24 3c 6c cc 4c c4 a4 24 24 34 84 b4 1c 64 24 34 04 24 34 8c c4 b4 1c e4 24 34 14 10 84 24 34 04 24 b4 04 24 3c 74 94 0c c4 a4 24 24 34 04 34 94 00
-GAMEL(  199?, v4barqst,   v4bios,   mpu4_vid_strike,   barquest,  mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Barquest (v2.6) (MPU4 Video)",GAME_FLAGS_OK,layout_v4barqst )
-GAMEL(  199?, v4barqstd,  v4barqst, mpu4_vid_strike,   barquest,  mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Barquest (v2.6d) (MPU4 Video)",GAME_FLAGS_OK,layout_v4barqst )
+GAMEL(  199?, v4barqst,   v4bios,   mpu4_vid_barquest,   barquest,  mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Barquest (v2.6) (MPU4 Video)",GAME_FLAGS_OK,layout_v4barqst )
+GAMEL(  199?, v4barqstd,  v4barqst, mpu4_vid_barquest,   barquest,  mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Barquest (v2.6d) (MPU4 Video)",GAME_FLAGS_OK,layout_v4barqst )
 
 /* Quiz games - Questions not decoded properly on games below (no complete characteriser table) */
 
 // 00 1c 6c a4 0c 24 0c 34 94 94 44 5c 6c 24 1c ac 64 1c ec 64 0c a4 0c 24 1c ac e4 1c 2c a4 0c a4 0c 24 5c ec e4 1c ac 24 1c 6c 60 0c 34 04 0c 24 9c ec a4 4c 24 9c ec 24 0c 34 04 1c ec 24 9c 00
-GAME(  199?, v4turnov,   v4bios,    mpu4_vid_cheatchr,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4turnova,  v4turnov,  mpu4_vid_cheatchr,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.33) (MPU4 Video)",GAME_FLAGS ) // the 2nd 3 is likely be a machine type, because much like Strike It Lucky and Wize Move the pairing 68k ROM doesn't change
-GAME(  199?, v4turnovc,  v4turnov,  mpu4_vid_cheatchr,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3O) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4turnovd,  v4turnov,  mpu4_vid_cheatchr,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v?.?) (MPU4 Video)",GAME_FLAGS ) // only have a single program ROM
+GAME(  199?, v4turnov,   v4bios,    mpu4_vid_turnov,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4turnova,  v4turnov,  mpu4_vid_turnov,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.33) (MPU4 Video)",GAME_FLAGS ) // the 2nd 3 is likely be a machine type, because much like Strike It Lucky and Wize Move the pairing 68k ROM doesn't change
+GAME(  199?, v4turnovc,  v4turnov,  mpu4_vid_turnov,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3O) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4turnovd,  v4turnov,  mpu4_vid_turnov,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v?.?) (MPU4 Video)",GAME_FLAGS ) // only have a single program ROM
 
 // 00 1c cc 64 1c 4c 64 1c ec e4 0c d4 84 0c 44 2c d4 14 34 14 24 0c 44 0c 44 1c ec 54 04 0c 54 24 0c 44 9c ec e4 1c 6c 54 04 1c c8 64 1c 4c 64 1c ec 64 0c d4 04 3c 6c 44 2c 54 84 1c ec 44 3c 00
-GAME(  1990, v4skltrk,   v4bios,    mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 1)",GAME_FLAGS ) // 10 pound max
-GAME(  1990, v4skltrka,  v4skltrk,  mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 2)",GAME_FLAGS ) // 12 pound max
+GAME(  1990, v4skltrk,   v4bios,    mpu4_vid_skilltrk,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 1)",GAME_FLAGS ) // 10 pound max
+GAME(  1990, v4skltrka,  v4skltrk,  mpu4_vid_skilltrk,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 2)",GAME_FLAGS ) // 12 pound max
 
 // 00 2c 94 14 04 0c c4 0c d4 64 0c b4 04 0c 84 5c dc 9c dc 9c dc cc 84 0c 84 0c d4 04 2c c4 0c c4 0c 84 1c dc dc 8c d4 44 2c 94 20 0c a4 0c c4 0c d4 14 14 54 04 6c c4 4c c4 0c c4 2c c4 0c d4 00
-GAME(  1989, v4tmach,     v4bios,   mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 3 Questions) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmachd,    v4tmach,  mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 3 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmach1,    v4tmach,  mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 1 Questions) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmach1d,   v4tmach,  mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 1 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmach2,    v4tmach,  mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 2 Questions) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmach2d,   v4tmach,  mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 2 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach,    v4bios,    mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 1 Questions) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmachd,   v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 1 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
+// mismatched questions? (or security?)
+GAME(  1989, v4tmach3,   v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 3 Questions) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach3d,  v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 3 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach2,   v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 2 Questions) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach2d,  v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 2 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
 
 /* Quiz games - Games below are missing question ROMs */
 

@@ -12,6 +12,9 @@
 
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL, mpu4_characteriser_pal)
 
+typedef device_delegate<u8 (u8 state, u8 col)> mpu4chr_nextprot_delegate;
+
+
 class mpu4_characteriser_pal : public device_t
 {
 public:
@@ -48,10 +51,12 @@ public:
 		m_allow_68k_cheat = allow;
 	}
 
-	void set_use_4k_table_sim(bool largetable)
+	void set_use_pal_equation(bool use_equation)
 	{
-		m_is_4ksim = largetable;
+		m_is_4ksim = use_equation;
 	}
+
+	template <typename... T> void set_protnext_cb(T &&... args) { m_nextprotcb.set(std::forward<T>(args)...); }
 
 	virtual uint8_t read(offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
@@ -1426,7 +1431,7 @@ private:
 	int m_lamp_col;
 	int m_4krow;
 	bool m_is_4ksim;
-
+	mpu4chr_nextprot_delegate m_nextprotcb;
 	optional_region_ptr<uint8_t> m_protregion; // some of the simulations have a fake ROM to assist them
 
 	// debugging only!

@@ -52,7 +52,8 @@ mpu4_characteriser_pal::mpu4_characteriser_pal(const machine_config &mconfig, de
 	m_lamp_col(0),
 	m_4krow(0),
 	m_is_4ksim(false),
-	m_protregion(*this, "fakechr")
+	m_nextprotcb(*this),
+    m_protregion(*this, "fakechr")
 {
 }
 
@@ -62,6 +63,7 @@ void mpu4_characteriser_pal::device_start()
 		m_temp_debug_table[i] = 0x00;
 
 	m_temp_debug_write_count = 0;
+	m_nextprotcb.resolve();
 }
 
 void mpu4_characteriser_pal::device_reset()
@@ -178,6 +180,14 @@ void mpu4_characteriser_pal::write(offs_t offset, uint8_t data)
 
 uint8_t mpu4_characteriser_pal::protection_r()
 {
+	if (!m_nextprotcb.isnull())
+	{
+		// for paths where the PAL equations are used (currently the quiz games)
+		uint8_t ns = m_nextprotcb(m_4krow, m_prot_col);
+		m_4krow = ns;
+		return ns << 2;;
+	}
+
 	if (m_allow_6800_cheat || m_allow_6809_cheat || m_allow_68k_cheat)
 	{
 		uint8_t ret = 0x00;
@@ -242,20 +252,6 @@ uint8_t mpu4_characteriser_pal::protection_r()
 	{
 		ret = m_current_chr_table[m_prot_col];
 		logerror("%s: Characteriser protection_r WITH PASSED TABLE (returning %02x)\n", machine().describe_context(), ret);
-	}
-	else if (m_protregion)
-	{
-		ret = m_protregion[m_4krow * 64 + m_prot_col];
-
-		// if we're simulating with a 4k table, the previous write selects
-		// the next set of 64 values to use.
-		if (m_is_4ksim)
-		{
-			m_4krow = ret;
-			ret <<= 2;
-		}
-
-		logerror("%s: Characteriser protection_r WITH FAKE ROM (returning %02x)\n", machine().describe_context(), ret);
 	}
 
 	return ret;
