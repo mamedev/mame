@@ -171,10 +171,12 @@ void menu_video_options::populate()
 	{
 		// uneven stretch
 		const auto *subtext = "";
+		menu_item_color_state state(menu_item_color_state::NORMAL);
 		switch (m_config_target.scale_mode())
 		{
 		case SCALE_FRACTIONAL:
 			subtext = _("On");
+			state = menu_item_color_state::ON;
 			break;
 
 		case SCALE_FRACTIONAL_X:
@@ -187,13 +189,15 @@ void menu_video_options::populate()
 
 		case SCALE_FRACTIONAL_AUTO:
 			subtext = _("X or Y (Auto)");
+			state = menu_item_color_state::AUTO;
 			break;
 
 		case SCALE_INTEGER:
 			subtext = _("Off");
+			state = menu_item_color_state::OFF;
 			break;
 		}
-		item_append(_("Non-Integer Scaling"), subtext, FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, reinterpret_cast<void *>(ITEM_UNEVENSTRETCH));
+		item_append(_("Non-Integer Scaling"), subtext, FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, reinterpret_cast<void *>(ITEM_UNEVENSTRETCH), menu_item_type::UNKNOWN, state);
 
 		// keep aspect
 		item_append_on_off(_("Maintain Aspect Ratio"), m_config_target.keepaspect(), 0, reinterpret_cast<void *>(ITEM_KEEPASPECT));

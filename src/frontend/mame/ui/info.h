@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 
+class ui_colors;
 
 namespace ui {
 
@@ -27,7 +28,7 @@ class machine_static_info
 {
 public:
 	// construction
-	machine_static_info(const ui_options &options, machine_config const &config);
+	machine_static_info(machine_config const &config);
 
 	// overall emulation status
 	::machine_flags::type machine_flags() const noexcept { return m_flags; }
@@ -49,16 +50,14 @@ public:
 	// warning severity indications
 	bool has_warnings() const noexcept;
 	bool has_severe_warnings() const noexcept;
-	rgb_t status_color() const noexcept;
-	rgb_t warnings_color() const noexcept;
+	rgb_t status_color(ui_colors const &colors) const noexcept;
+	rgb_t warnings_color(ui_colors const &colors) const noexcept;
 
 protected:
-	machine_static_info(const ui_options &options, machine_config const &config, ioport_list const &ports);
+	machine_static_info(machine_config const &config, ioport_list const &ports);
 
 private:
-	machine_static_info(const ui_options &options, machine_config const &config, ioport_list const *ports);
-
-	const ui_options &      m_options;
+	machine_static_info(machine_config const &config, ioport_list const *ports);
 
 	// overall feature status
 	::machine_flags::type   m_flags;
