@@ -1764,10 +1764,10 @@ void atmegax0_base_device::device_add_mconfig(machine_config &config)
 	timer5.int_cb<AVR8_TIMER_INTCHANNEL_OC_A>().set(FUNC(atmegax0_base_device::int_line_w<INTIDX_OCF5A>));
 	timer5.int_cb<AVR8_TIMER_INTCHANNEL_OC_B>().set(FUNC(atmegax0_base_device::int_line_w<INTIDX_OCF5B>));
 	timer5.int_cb<AVR8_TIMER_INTCHANNEL_OC_C>().set(FUNC(atmegax0_base_device::int_line_w<INTIDX_OCF5C>));
-	m_int_ack_cbs[INTIDX_TOV4].bind().set("timer5", FUNC(avr8_megaavr_timer_1_device::int_ack_w<AVR8_TIMER_INTCHANNEL_OV>));
-	m_int_ack_cbs[INTIDX_OCF4A].bind().set("timer5", FUNC(avr8_megaavr_timer_1_device::int_ack_w<AVR8_TIMER_INTCHANNEL_OC_A>));
-	m_int_ack_cbs[INTIDX_OCF4B].bind().set("timer5", FUNC(avr8_megaavr_timer_1_device::int_ack_w<AVR8_TIMER_INTCHANNEL_OC_B>));
-	m_int_ack_cbs[INTIDX_OCF4C].bind().set("timer5", FUNC(avr8_megaavr_timer_1_device::int_ack_w<AVR8_TIMER_INTCHANNEL_OC_C>));
+	m_int_ack_cbs[INTIDX_TOV5].bind().set("timer5", FUNC(avr8_megaavr_timer_1_device::int_ack_w<AVR8_TIMER_INTCHANNEL_OV>));
+	m_int_ack_cbs[INTIDX_OCF5A].bind().set("timer5", FUNC(avr8_megaavr_timer_1_device::int_ack_w<AVR8_TIMER_INTCHANNEL_OC_A>));
+	m_int_ack_cbs[INTIDX_OCF5B].bind().set("timer5", FUNC(avr8_megaavr_timer_1_device::int_ack_w<AVR8_TIMER_INTCHANNEL_OC_B>));
+	m_int_ack_cbs[INTIDX_OCF5C].bind().set("timer5", FUNC(avr8_megaavr_timer_1_device::int_ack_w<AVR8_TIMER_INTCHANNEL_OC_C>));
 
 	// NOTE: ATmega1281/2561 do have timers 4 and 5, but no physical ports to route their output signals to.
 }
