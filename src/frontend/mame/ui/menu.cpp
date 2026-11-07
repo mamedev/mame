@@ -879,12 +879,22 @@ void menu::draw(uint32_t flags)
 					}
 
 					// customize subitem text color
+					bool is_on_off_auto = true;
 					if (!core_stricmp(pitem.subtext(), _("On")))
 						fgcolor2 = rgb_t(0x00, 0xff, 0x00);
 					else if (!core_stricmp(pitem.subtext(), _("Off")))
 						fgcolor2 = rgb_t(0xff, 0x00, 0x00);
 					else if (!core_stricmp(pitem.subtext(), _("Auto")))
 						fgcolor2 = rgb_t(0xff, 0xff, 0x00);
+					else
+						is_on_off_auto = false;
+
+					if (subitem_deemphasize && is_on_off_auto)
+					{
+						fgcolor3 = (bgcolor.brightness() < 128)
+							? fgcolor2.scale8(0.7F * 256) // 70% - deemphasized towards dark
+							: (fgcolor2 + fgcolor2.scale8(0.3F * 256)); // 130% - deemphasized towards bright
+					}
 
 					// draw the subitem right-justified
 					ui().draw_text_full(
