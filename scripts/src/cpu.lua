@@ -2848,6 +2848,8 @@ if CPUS["AVR8"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/avr8/avr8.cpp",
 		MAME_DIR .. "src/devices/cpu/avr8/avr8.h",
+		MAME_DIR .. "src/devices/cpu/avr8/avr8timers_classic.cpp",
+		MAME_DIR .. "src/devices/cpu/avr8/avr8timers_classic.h",
 	}
 end
 
