@@ -531,7 +531,7 @@ void m68hc05_device::device_add_mconfig(machine_config &config)
 		M68HC05_SPI(config, m_spi, DERIVED_CLOCK(1, 2));
 		m_spi->sck_cb().set([this] (int state) { m_sck_cb(state); });
 		m_spi->mosi_cb().set([this] (int state) { m_mosi_cb(state); });
-		// MISO is PD2 (6.2.2), sampled through portd_r
+		// MISO is PD2 (2.2.3), sampled through portd_r
 		m_spi->miso_cb().set([this] () { return BIT(m_port_cb_r[3](0, 0x04), 2); });
 		m_spi->irq_cb().set(*this, FUNC(m68hc05_device::spi_irq_w));
 	}
@@ -822,8 +822,8 @@ void m68hc05_device::add_port_state(std::array<bool, PORT_COUNT> const &ddr)
 
 void m68hc05_device::add_spi_state()
 {
-	state_add<u8>(M68HC05_SPCR, "SPCR", [this] () { return m_spi->spcr(); }, [this] (u8 data) { m_spi->set_spcr(data); }).mask(0xdf);
-	state_add<u8>(M68HC05_SPSR, "SPSR", [this] () { return m_spi->spsr(); }, [this] (u8 data) { m_spi->set_spsr(data); }).mask(0xd0);
+	state_add<u8>(M68HC05_SPCR, "SPCR", [this] () { return m_spi->spcr(); }, [this] (u8 data) { m_spi->set_spcr(data); }).mask(m68hc05_spi_device::SPCR_MASK);
+	state_add<u8>(M68HC05_SPSR, "SPSR", [this] () { return m_spi->spsr(); }, [this] (u8 data) { m_spi->set_spsr(data); }).mask(m68hc05_spi_device::SPSR_MASK);
 	state_add<u8>(M68HC05_SPDR, "SPDR", [this] () { return m_spi->spdr(); }, [this] (u8 data) { m_spi->set_spdr(data); }).mask(0xff);
 }
 

@@ -23,7 +23,10 @@ public:
 	m68hc05_spi_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 	// SCK and MOSI output pins (master mode), MISO input pin (the host reads it
-	// from port D), and the interrupt request towards the host MCU (level)
+	// from port D), and the interrupt request towards the host MCU (level).  MISO
+	// is sampled just before the capture edge, so a slave must change it on the
+	// other edge (or earlier), as a real one does: a slave model that updates MISO
+	// from the SCK callback of the capture edge itself is seen one bit late.
 	auto sck_cb() { return m_sck_cb.bind(); }
 	auto mosi_cb() { return m_mosi_cb.bind(); }
 	auto miso_cb() { return m_miso_cb.bind(); }
@@ -34,7 +37,11 @@ public:
 
 	void map(address_map &map) ATTR_COLD;
 
-	// register access for the host's debugger state (no side effects)
+	// writable bits, for the host's debugger state
+	static constexpr u8 SPCR_MASK = 0xdf;
+	static constexpr u8 SPSR_MASK = 0xd0;
+
+	// register access for the host's debugger state (no pin activity)
 	u8 spcr() const { return m_spcr; }
 	u8 spsr() const { return m_spsr; }
 	u8 spdr() const { return m_rdr; }
@@ -55,12 +62,10 @@ private:
 		SPCR_CPOL = 0x08,
 		SPCR_CPHA = 0x04,
 		SPCR_SPR  = 0x03,
-		SPCR_MASK = 0xdf,
 
 		SPSR_SPIF = 0x80,
 		SPSR_WCOL = 0x40,
-		SPSR_MODF = 0x10,
-		SPSR_MASK = 0xd0
+		SPSR_MODF = 0x10
 	};
 
 	u8 spcr_r();

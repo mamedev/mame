@@ -36,6 +36,8 @@ namespace {
 // 6.4.1: SCK is E/2, E/4, E/16 or E/32
 constexpr u8 SCK_DIVISOR[4] = { 2, 4, 16, 32 };
 
+constexpr unsigned BITS = 8;
+
 } // anonymous namespace
 
 
@@ -239,18 +241,22 @@ TIMER_CALLBACK_MEMBER(m68hc05_spi_device::tick)
 			m_in = (m_in << 1) | (m_miso_cb() ? 1 : 0);
 		write_sck(cpol() ? 0 : 1);
 		if (cpha())
-			m_mosi_cb(BIT(m_out, 7 - bit));
+			m_mosi_cb(BIT(m_out, BITS - 1 - bit));
 	}
 	else
 	{
 		if (cpha())
 			m_in = (m_in << 1) | (m_miso_cb() ? 1 : 0);
 		write_sck(cpol() ? 1 : 0);
-		if (!cpha() && bit < 7)
-			m_mosi_cb(BIT(m_out, 6 - bit));
+		if (!cpha() && (bit < (BITS - 1)))
+			m_mosi_cb(BIT(m_out, BITS - 2 - bit));
 	}
 
-	if (n < 15)
+	// a callback may have lowered SS, and the mode fault ended the transfer
+	if (!m_busy)
+		return;
+
+	if (n < (2 * BITS - 1))
 	{
 		m_timer->adjust(half_period());
 	}
@@ -275,12 +281,17 @@ attotime m68hc05_spi_device::half_period() const
 void m68hc05_spi_device::set_spcr(u8 data)
 {
 	m_spcr = data & SPCR_MASK;
+	if (!spe())
+		abort_transfer();
 	update_irq();
 }
 
 void m68hc05_spi_device::set_spsr(u8 data)
 {
+	// a flag that changes here isn't covered by an earlier SPSR read
+	u8 const old(m_spsr);
 	m_spsr = data & SPSR_MASK;
+	m_spsr_seen &= old & m_spsr;
 	update_irq();
 }
 
