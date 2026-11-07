@@ -38,6 +38,7 @@ public:
 
 	// helper functions for card devices
 	void install_declaration_rom(const char *romregion, bool mirror_all_mb = false, bool reverse_rom = false);
+	void install_declaration_rom_copy(offs_t start, offs_t end, offs_t mirror) ATTR_COLD;
 	void install_bank(offs_t start, offs_t end, void *data);
 	void install_view(offs_t start, offs_t end, memory_view &view);
 
@@ -55,6 +56,7 @@ public:
 protected:
 	device_nubus_card_interface(const machine_config &mconfig, device_t &device);
 	virtual void interface_pre_start() override;
+	void prepare_declaration_rom(const char *romregion, bool reverse_rom, bool undriven_lanes_high) ATTR_COLD;
 
 	int slotno() const { assert(m_nubus); return m_slot; }
 	nubus_device &nubus() { assert(m_nubus); return *m_nubus; }
@@ -139,7 +141,12 @@ public:
 	template <typename R, typename W> void install_device(offs_t start, offs_t end, R rhandler, W whandler, u32 mask=0xffffffff);
 	template <typename R> void install_readonly_device(offs_t start, offs_t end, R rhandler, u32 mask=0xffffffff);
 	template <typename W> void install_writeonly_device(offs_t start, offs_t end, W whandler, u32 mask=0xffffffff);
+	template <typename R, typename W> ATTR_COLD void install_mirrored_device(offs_t start, offs_t end, offs_t mirror, R rhandler, W whandler)
+	{
+		space(AS_DATA).install_readwrite_handler(start & m_addr_mask, end & m_addr_mask, 0, mirror & m_addr_mask, 0, rhandler, whandler);
+	}
 	void install_bank(offs_t start, offs_t end, void *data);
+	void install_rom(offs_t start, offs_t end, offs_t mirror, void *data) ATTR_COLD;
 	void install_view(offs_t start, offs_t end, memory_view &view);
 
 	/// \brief Installs a map for the slot's 16 MiB slot space, $Fs00'0000-$FsFF'FFFF
