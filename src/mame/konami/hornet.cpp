@@ -440,7 +440,7 @@ only has an 8-bit data bus and 12-bit address bus.
 #include "machine/x76f041.h"
 #include "sound/k056800.h"
 #include "sound/rf5c400.h"
-#include "video/voodoo_2.h"
+#include "video/voodoo_pci.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -478,10 +478,10 @@ public:
 		m_adc12138_sscope(*this, "adc12138_sscope"),
 		m_konppc(*this, "konppc"),
 		m_x76f041(*this, "security_eeprom"),
-		m_voodoo(*this, "voodoo%u", 0U),
+		m_voodoo(*this, "pci%u:00.0", 0U),
 		m_watchdog(*this, "watchdog"),
 		m_jvs_host(*this, "jvs_host"),
-		m_k033906(*this, "k033906_%u", 1U),
+		m_k033906(*this, "pci%u:host", 0U),
 		m_gn676_lan(*this, "gn676_lan"),
 		m_cgboard_bank(*this, "cgboard_%u_bank", 0U),
 		m_in(*this, "IN%u", 0U),
@@ -533,7 +533,7 @@ protected:
 	optional_device<adc12138_device> m_adc12138_sscope;
 	required_device<konppc_device> m_konppc;
 	optional_device<x76f041_device> m_x76f041;
-	optional_device_array<generic_voodoo_device, 2> m_voodoo;
+	optional_device_array<voodoo_pci_device, 2> m_voodoo;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<konppc_jvs_host_device> m_jvs_host;
 	optional_device_array<k033906_device, 2> m_k033906;
@@ -624,7 +624,7 @@ private:
 template <uint8_t Which>
 uint32_t hornet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_voodoo[Which]->update(bitmap, cliprect);
+	m_voodoo[Which]->screen_update(screen, bitmap, cliprect);
 
 	m_k037122[Which]->tile_draw(screen, bitmap, cliprect);
 
@@ -1059,7 +1059,7 @@ void hornet_state::sharc_map(address_map &map)
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_shared_sharc_r<Board>), FUNC(konppc_device::cgboard_shared_sharc_w<Board>));
 	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[Board]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[Board][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).m(m_voodoo[Board], FUNC(generic_voodoo_device::core_map));
+	map(0x2400000, 0x27fffff).rw(m_k033906[Board], FUNC(k033906_device::memory_r), FUNC(k033906_device::memory_w));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_comm_sharc_r<Board>), FUNC(konppc_device::cgboard_comm_sharc_w<Board>));
 	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::cgboard_k033906_r<Board>), FUNC(konppc_device::cgboard_k033906_w<Board>));
 	map(0x3600000, 0x37fffff).bankr(m_cgboard_bank[Board]);
@@ -1415,7 +1415,11 @@ void hornet_state::hornet(machine_config &config)
 	// PCB description at top doesn't mention any EEPROM on the base board...
 	// EEPROM_93C46_16BIT(config, "eeprom");
 
-	VOODOO_1(config, m_voodoo[0], 50_MHz_XTAL);
+	PCI_ROOT(config, "pci0");
+	K033906(config, m_k033906[0]);
+
+	VOODOO_1_PCI(config, m_voodoo[0], 0);
+	m_voodoo[0]->set_ids(0x121a0001, 0x02, 0x040000, 0); // Konami firmware requires the multimedia class
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(4,0);
 	m_voodoo[0]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
@@ -1423,8 +1427,6 @@ void hornet_state::hornet(machine_config &config)
 	m_voodoo[0]->set_cpu(m_dsp[0]);
 	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_voodoo[0]->stall_callback().set(m_dsp[0], FUNC(adsp21062_device::write_stall));
-
-	K033906(config, m_k033906[0], m_voodoo[0]);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen"));
@@ -1452,7 +1454,6 @@ void hornet_state::hornet(machine_config &config)
 	KONPPC(config, m_konppc);
 	m_konppc->set_dsp_tag(0, m_dsp[0]);
 	m_konppc->set_k033906_tag(0, m_k033906[0]);
-	m_konppc->set_voodoo_tag(0, m_voodoo[0]);
 	m_konppc->set_texture_bank_tag(0, m_cgboard_bank[0]);
 	m_konppc->set_num_boards(1);
 	m_konppc->set_cgboard_type(konppc_device::CGBOARD_TYPE_HORNET);
@@ -1521,7 +1522,11 @@ void hornet_state::sscope(machine_config &config)
 
 	m_voodoo[0]->set_screen("lscreen");
 
-	VOODOO_1(config, m_voodoo[1], 50_MHz_XTAL);
+	PCI_ROOT(config, "pci1");
+	K033906(config, m_k033906[1]);
+
+	VOODOO_1_PCI(config, m_voodoo[1], 0);
+	m_voodoo[1]->set_ids(0x121a0001, 0x02, 0x040000, 0); // Konami firmware requires the multimedia class
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(4, 0);
 	m_voodoo[1]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
@@ -1529,8 +1534,6 @@ void hornet_state::sscope(machine_config &config)
 	m_voodoo[1]->set_cpu(m_dsp[1]);
 	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 	m_voodoo[1]->stall_callback().set(m_dsp[1], FUNC(adsp21062_device::write_stall));
-
-	K033906(config, m_k033906[1], m_voodoo[1]);
 
 	// video hardware
 	config.device_remove("screen");
@@ -1551,7 +1554,6 @@ void hornet_state::sscope(machine_config &config)
 
 	m_konppc->set_dsp_tag(1, m_dsp[1]);
 	m_konppc->set_k033906_tag(1, m_k033906[1]);
-	m_konppc->set_voodoo_tag(1, m_voodoo[1]);
 	m_konppc->set_texture_bank_tag(1, m_cgboard_bank[1]);
 	m_konppc->set_num_boards(2);
 }
@@ -1560,7 +1562,8 @@ void hornet_state::sscope_voodoo2(machine_config& config)
 {
 	sscope(config);
 
-	VOODOO_2(config.replace(), m_voodoo[0], voodoo_2_device::NOMINAL_CLOCK);
+	VOODOO_2_PCI(config.replace(), m_voodoo[0], 0);
+	m_voodoo[0]->set_ids(0x121a0002, 0x02, 0x040000, 0); // Konami firmware requires the multimedia class
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(4,0);
 	m_voodoo[0]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
@@ -1569,7 +1572,8 @@ void hornet_state::sscope_voodoo2(machine_config& config)
 	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_voodoo[0]->stall_callback().set(m_dsp[0], FUNC(adsp21062_device::write_stall));
 
-	VOODOO_2(config.replace(), m_voodoo[1], voodoo_2_device::NOMINAL_CLOCK);
+	VOODOO_2_PCI(config.replace(), m_voodoo[1], 0);
+	m_voodoo[1]->set_ids(0x121a0002, 0x02, 0x040000, 0); // Konami firmware requires the multimedia class
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(4,0);
 	m_voodoo[1]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
@@ -1577,9 +1581,6 @@ void hornet_state::sscope_voodoo2(machine_config& config)
 	m_voodoo[1]->set_cpu(m_dsp[1]);
 	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 	m_voodoo[1]->stall_callback().set(m_dsp[1], FUNC(adsp21062_device::write_stall));
-
-	m_k033906[0]->set_pciid(0x0002121a); // PCI Vendor ID (0x121a = 3dfx), Device ID (0x0002 = Voodoo 2)
-	m_k033906[1]->set_pciid(0x0002121a); // PCI Vendor ID (0x121a = 3dfx), Device ID (0x0002 = Voodoo 2)
 }
 
 void sscope2_state::sscope2(machine_config &config)

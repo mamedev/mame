@@ -2175,6 +2175,21 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/dimm/dimm.h,BUSES["DIMM"] = true
+---------------------------------------------------
+
+if BUSES["DIMM"] then
+	files {
+		MAME_DIR .. "src/devices/bus/dimm/dimm.cpp",
+		MAME_DIR .. "src/devices/bus/dimm/dimm.h",
+		MAME_DIR .. "src/devices/bus/dimm/modules.cpp",
+		MAME_DIR .. "src/devices/bus/dimm/modules.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/dmv/dmvbus.h,BUSES["DMV"] = true
 ---------------------------------------------------
 
@@ -2955,6 +2970,8 @@ if BUSES["IEEE488"] then
 		MAME_DIR .. "src/devices/bus/ieee488/hp9122c.h",
 		MAME_DIR .. "src/devices/bus/ieee488/hp9133.cpp",
 		MAME_DIR .. "src/devices/bus/ieee488/hp9133.h",
+		MAME_DIR .. "src/devices/bus/ieee488/hp9133xv.cpp",
+		MAME_DIR .. "src/devices/bus/ieee488/hp9133xv.h",
 		MAME_DIR .. "src/devices/bus/ieee488/hp9895.cpp",
 		MAME_DIR .. "src/devices/bus/ieee488/hp9895.h",
 		MAME_DIR .. "src/devices/bus/ieee488/remote488.cpp",
@@ -3337,6 +3354,8 @@ if BUSES["ISBX"] then
 		MAME_DIR .. "src/devices/bus/isbx/compis_fdc.h",
 		MAME_DIR .. "src/devices/bus/isbx/compis_hdc.cpp",
 		MAME_DIR .. "src/devices/bus/isbx/compis_hdc.h",
+		MAME_DIR .. "src/devices/bus/isbx/compis_sasi.cpp",
+		MAME_DIR .. "src/devices/bus/isbx/compis_sasi.h",
 		MAME_DIR .. "src/devices/bus/isbx/isbc_218a.cpp",
 		MAME_DIR .. "src/devices/bus/isbx/isbc_218a.h",
 	}
@@ -6292,6 +6311,21 @@ if BUSES["TMC600"] then
 		MAME_DIR .. "src/devices/bus/tmc600/euro.h",
 		MAME_DIR .. "src/devices/bus/tmc600/ram.cpp",
 		MAME_DIR .. "src/devices/bus/tmc600/ram.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/trs80m2/slot.h,BUSES["TRS80M2"] = true
+---------------------------------------------------
+
+if BUSES["TRS80M2"] then
+	files {
+		MAME_DIR .. "src/devices/bus/trs80m2/hdc.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2/hdc.h",
+		MAME_DIR .. "src/devices/bus/trs80m2/slot.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2/slot.h",
 	}
 end
 

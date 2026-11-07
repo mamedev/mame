@@ -244,6 +244,12 @@ void nscsi_harddisk_device::scsi_command()
 		LOG("command INQUIRY lun=%d EVPD=%d page=%d alloc=%02x link=%02x\n",
 			lun, m_scsi_cmdbuf[1] & 1, m_scsi_cmdbuf[2], m_scsi_cmdbuf[4], m_scsi_cmdbuf[5]);
 
+		if(m_scsi_cmdbuf[1] & 1) {
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+			break;
+		}
+
 		int page = m_scsi_cmdbuf[2];
 		int size = m_scsi_cmdbuf[4];
 		switch(page) {

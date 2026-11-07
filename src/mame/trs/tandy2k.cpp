@@ -22,8 +22,7 @@
           The head unload time is already parsed into spec by C_SPECIFY but
           unused; it should drop HDL after command_end() with data_completion
     - keyboard ROM, same as earlier tandy 1000
-    - clock/mouse 8042 mcu ROM, probably same as tandy 1000 isa clock/mouse adapter
-    - sab3019 rtc
+    - clock/mouse 8041 mcu ROM, probably same as tandy 1000 isa clock/mouse adapter
 
 */
 
@@ -273,10 +272,21 @@ void tandy2k_state::clkmouse_w(offs_t offset, uint8_t data)
 				m_clkmouse_cmd[m_clkmouse_cnt++] = data;
 			switch (m_clkmouse_cmd[0])
 			{
-				case 0x01: //set time
+				case 0x01:
+					rtc_set(0, 0x00);
+					rtc_set(3, m_clkmouse_cmd[1]);
+					rtc_set(2, m_clkmouse_cmd[2]);
+					rtc_set(1, m_clkmouse_cmd[3]);
+					rtc_set(0, m_clkmouse_cmd[4] | 0x40);
 					break;
-				case 0x02: //read time
-					break;
+				case 0x02:
+					m_clkmouse_cmd[4] = 'R';
+					m_clkmouse_cmd[3] = rtc_read(3);
+					m_clkmouse_cmd[2] = rtc_read(2);
+					m_clkmouse_cmd[1] = rtc_read(1);
+					m_clkmouse_cmd[0] = rtc_read(0);
+					m_clkmouse_cnt = 5;
+					return;
 				case 0x08:
 					if(m_clkmouse_cmd[1] > 0)
 						m_clkmouse_irq |= MO_IRQ;
@@ -304,6 +314,48 @@ void tandy2k_state::clkmouse_w(offs_t offset, uint8_t data)
 			m_mouse_y = m_y_axis->read();
 			break;
 	}
+}
+
+void tandy2k_state::rtc_cbus(uint16_t bits, int count)
+{
+	m_rtc->dlen_w(1);
+
+	for (int i = 0; i < count; i++)
+	{
+		m_rtc->data_w(BIT(bits, i));
+		m_rtc->clb_w(1);
+		m_rtc->clb_w(0);
+	}
+
+	m_rtc->data_w(1);
+	m_rtc->dlen_w(0);
+	m_rtc->clb_w(1);
+	m_rtc->clb_w(0);
+}
+
+uint8_t tandy2k_state::rtc_read(int addr)
+{
+	rtc_cbus(addr << 2, 4);
+
+	uint8_t data = 0;
+
+	m_rtc->dlen_w(1);
+
+	for (int i = 0; i < 7; i++)
+	{
+		data |= m_rtc->data_r() << i;
+		m_rtc->clb_w(1);
+		m_rtc->clb_w(0);
+	}
+
+	m_rtc->dlen_w(0);
+
+	return data;
+}
+
+void tandy2k_state::rtc_set(int addr, uint8_t data)
+{
+	rtc_cbus((addr << 2) | ((data & 0x7f) << 4), 11);
 }
 
 uint8_t tandy2k_state::fldtc_r()
@@ -1305,6 +1357,8 @@ void tandy2k_state::tandy2k(machine_config &config)
 	// temporary until the tandy keyboard has a rom dump
 	TANDY2K_HLE_KEYB(config, m_pc_keyboard).keypress().set(FUNC(tandy2k_state::hle_keypress_w));
 
+	SAB3019(config, m_rtc, 32.768_kHz_XTAL);
+
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("tandy2k_flop");
 
@@ -1315,7 +1369,7 @@ void tandy2k_state::tandy2k(machine_config &config)
 void tandy2k_hd_state::tandy2k_hd(machine_config &config)
 {
 	tandy2k(config);
-	
+
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_IO, &tandy2k_hd_state::tandy2k_hd_io);
 

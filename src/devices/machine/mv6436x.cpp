@@ -11,13 +11,14 @@
 #include "emu.h"
 #include "mv6436x.h"
 
-#define LOG_PCI_CONFIG (1U << 1)
-#define LOG_PCI_MEM    (1U << 2)
-#define LOG_PCI_IO     (1U << 3)
-#define LOG_REG_READ   (1U << 4)
-#define LOG_REG_WRITE  (1U << 5)
+#define LOG_PCI_CONFIG  (1U << 1)
+#define LOG_PCI_MEM     (1U << 2)
+#define LOG_PCI_IO      (1U << 3)
+#define LOG_REG_READ    (1U << 4)
+#define LOG_REG_WRITE   (1U << 5)
+#define LOG_REG_MAPPING (1U << 6)
 
-#define VERBOSE (LOG_GENERAL | LOG_REG_WRITE | LOG_PCI_CONFIG | LOG_PCI_MEM)
+#define VERBOSE (LOG_GENERAL | LOG_REG_WRITE | LOG_PCI_CONFIG | LOG_PCI_MEM | LOG_REG_MAPPING)
 #include "logmacro.h"
 
 
@@ -32,7 +33,7 @@ DEFINE_DEVICE_TYPE(MV64361_PCI_HOST, mv64361_pci_host_device, "mv64361_pci_host"
 mv64361_device::mv64361_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MV64361, tag, owner, clock),
 	m_cpu(*this, finder_base::DUMMY_TAG),
-	m_pcihost(*this, finder_base::DUMMY_TAG, 0)
+	m_pcihost(*this, finder_base::DUMMY_TAG, 0U)
 {
 }
 
@@ -40,16 +41,33 @@ void mv64361_device::device_start()
 {
 	m_cpu_space = &m_cpu->space(AS_PROGRAM);
 
-	// 2 MB internal SRAM
-	m_sram = std::make_unique<uint8_t[]>(0x200000);
+	// 2 MBit internal SRAM
+	m_sram = std::make_unique<uint8_t[]>(0x40000);
 
-	// TODO savestates
+	// assign CS# (SDRAM) memory shares from tags
+	for (int i = 0; i < 4; i++)
+		m_cs_share[i] = !m_cs_tag[i].empty() ? memshare(m_cs_tag[i]) : nullptr;
+
+	// register for save states
+	save_item(NAME(m_regs));
+	save_pointer(NAME(m_sram), 0x40000);
+
+	// update the windows after loading state
+	machine().save().register_postload(save_prepost_delegate(FUNC(mv64361_device::update_windows), this));
 }
 
 void mv64361_device::device_reset()
 {
 	// initialize internal registers
 	m_regs[REG_CPU_CONFIG] = 0x028000ff;
+	m_regs[REG_CS0_BASE] = 0x00000000;
+	m_regs[REG_CS0_SIZE] = 0x0000007f;
+	m_regs[REG_CS1_BASE] = 0x00000080;
+	m_regs[REG_CS1_SIZE] = 0x0000007f;
+	m_regs[REG_CS2_BASE] = 0x00000100;
+	m_regs[REG_CS2_SIZE] = 0x0000007f;
+	m_regs[REG_CS3_BASE] = 0x00000180;
+	m_regs[REG_CS3_SIZE] = 0x0000007f;
 	m_regs[REG_INTERNAL_BASE] = 0x01001400;
 	m_regs[REG_BOOTCS_BASE] = 0x0000ff80;
 	m_regs[REG_BOOTCS_SIZE] = 0x0000007f;
@@ -103,12 +121,16 @@ void mv64361_device::device_reset()
 	for (int i = 0; i < 21; i++)
 		m_ranges[i].enabled = false;
 
-	map_windows();
+	update_windows();
 }
 
 void mv64361_device::register_map(address_map &map)
 {
 	map(0x0000, 0x0003).rw(FUNC(mv64361_device::cpu_config_r), FUNC(mv64361_device::cpu_config_w));
+	map(0x0008, 0x000b).rw(FUNC(mv64361_device::cs0_base_r), FUNC(mv64361_device::cs0_base_w));
+	map(0x0010, 0x0013).rw(FUNC(mv64361_device::cs0_size_r), FUNC(mv64361_device::cs0_size_w));
+	map(0x0018, 0x001b).rw(FUNC(mv64361_device::cs2_base_r), FUNC(mv64361_device::cs2_base_w));
+	map(0x0020, 0x0023).rw(FUNC(mv64361_device::cs2_size_r), FUNC(mv64361_device::cs2_size_w));
 	map(0x0048, 0x004b).rw(FUNC(mv64361_device::pci0_io_base_r), FUNC(mv64361_device::pci0_io_base_w));
 	map(0x0050, 0x0053).rw(FUNC(mv64361_device::pci0_io_size_r), FUNC(mv64361_device::pci0_io_size_w));
 	map(0x0058, 0x005b).rw(FUNC(mv64361_device::pci0_mem0_base_r), FUNC(mv64361_device::pci0_mem0_base_w));
@@ -128,6 +150,10 @@ void mv64361_device::register_map(address_map &map)
 	map(0x0108, 0x010b).rw(FUNC(mv64361_device::pci1_io_remap_r), FUNC(mv64361_device::pci1_io_remap_w));
 	map(0x0110, 0x0113).rw(FUNC(mv64361_device::pci1_mem0_remap_low_r), FUNC(mv64361_device::pci1_mem0_remap_low_w));
 	map(0x0118, 0x011b).rw(FUNC(mv64361_device::pci1_mem1_remap_low_r), FUNC(mv64361_device::pci1_mem1_remap_low_w));
+	map(0x0208, 0x020b).rw(FUNC(mv64361_device::cs1_base_r), FUNC(mv64361_device::cs1_base_w));
+	map(0x0210, 0x0213).rw(FUNC(mv64361_device::cs1_size_r), FUNC(mv64361_device::cs1_size_w));
+	map(0x0218, 0x021b).rw(FUNC(mv64361_device::cs3_base_r), FUNC(mv64361_device::cs3_base_w));
+	map(0x0220, 0x0223).rw(FUNC(mv64361_device::cs3_size_r), FUNC(mv64361_device::cs3_size_w));
 	map(0x0238, 0x023b).rw(FUNC(mv64361_device::bootcs_base_r), FUNC(mv64361_device::bootcs_base_w));
 	map(0x0240, 0x0243).rw(FUNC(mv64361_device::bootcs_size_r), FUNC(mv64361_device::bootcs_size_w));
 	map(0x0258, 0x025b).rw(FUNC(mv64361_device::pci0_mem2_base_r), FUNC(mv64361_device::pci0_mem2_base_w));
@@ -153,10 +179,10 @@ void mv64361_device::register_map(address_map &map)
 	map(0x0350, 0x0353).rw(FUNC(mv64361_device::pci1_mem2_remap_high_r), FUNC(mv64361_device::pci1_mem2_remap_high_w));
 	map(0x0358, 0x035b).rw(FUNC(mv64361_device::pci1_mem3_remap_high_r), FUNC(mv64361_device::pci1_mem3_remap_high_w));
 
-	map(0x0c78, 0x0c7b).rw(m_pcihost[0], FUNC(mv64361_pci_host_device::config_address_r), FUNC(mv64361_pci_host_device::config_address_w));
-	map(0x0c7c, 0x0c7f).rw(m_pcihost[0], FUNC(mv64361_pci_host_device::config_data_r), FUNC(mv64361_pci_host_device::config_data_w));
-	map(0x0cf8, 0x0cfb).rw(m_pcihost[1], FUNC(mv64361_pci_host_device::config_address_r), FUNC(mv64361_pci_host_device::config_address_w));
-	map(0x0cfc, 0x0cff).rw(m_pcihost[1], FUNC(mv64361_pci_host_device::config_data_r), FUNC(mv64361_pci_host_device::config_data_w));
+	map(0x0c78, 0x0c7b).rw(m_pcihost[1], FUNC(mv64361_pci_host_device::config_address_r), FUNC(mv64361_pci_host_device::config_address_w));
+	map(0x0c7c, 0x0c7f).rw(m_pcihost[1], FUNC(mv64361_pci_host_device::config_data_r), FUNC(mv64361_pci_host_device::config_data_w));
+	map(0x0cf8, 0x0cfb).rw(m_pcihost[0], FUNC(mv64361_pci_host_device::config_address_r), FUNC(mv64361_pci_host_device::config_address_w));
+	map(0x0cfc, 0x0cff).rw(m_pcihost[0], FUNC(mv64361_pci_host_device::config_data_r), FUNC(mv64361_pci_host_device::config_data_w));
 }
 
 uint32_t mv64361_device::cpu_config_r(offs_t offset, uint32_t mem_mask)
@@ -170,8 +196,154 @@ uint32_t mv64361_device::cpu_config_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::cpu_config_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "cpu_config_w: %08x\n", data);
-	m_regs[REG_CPU_CONFIG] = (data & 0xe4e3bff) | (1 << 23); // handle reserved bits
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "cpu_config_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_CPU_CONFIG]);
+	m_regs[REG_CPU_CONFIG] = (m_regs[REG_CPU_CONFIG] & 0x0e4e3bff) | (1 << 23); // handle reserved bits
+}
+
+uint32_t mv64361_device::cs0_base_r(offs_t offset, uint32_t mem_mask)
+{
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_REG_READ, "cs0_base_r\n");
+
+	return swapendian_int32(m_regs[REG_CS0_BASE]);
+}
+
+void mv64361_device::cs0_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	data = swapendian_int32(data);
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "cs0_base_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_CS0_BASE]);
+	m_regs[REG_CS0_BASE] &= 0x000fffff;
+	update_window(0);
+}
+
+uint32_t mv64361_device::cs0_size_r(offs_t offset, uint32_t mem_mask)
+{
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_REG_READ, "cs0_size_r\n");
+
+	return swapendian_int32(m_regs[REG_CS0_SIZE]);
+}
+
+void mv64361_device::cs0_size_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	data = swapendian_int32(data);
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "cs0_size_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_CS0_SIZE]);
+	m_regs[REG_CS0_SIZE] &= 0x0000ffff;
+	update_window(0);
+}
+
+uint32_t mv64361_device::cs1_base_r(offs_t offset, uint32_t mem_mask)
+{
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_REG_READ, "cs1_base_r\n");
+
+	return swapendian_int32(m_regs[REG_CS1_BASE]);
+}
+
+void mv64361_device::cs1_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	data = swapendian_int32(data);
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "cs1_base_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_CS1_BASE]);
+	m_regs[REG_CS1_BASE] &= 0x000fffff;
+	update_window(1);
+}
+
+uint32_t mv64361_device::cs1_size_r(offs_t offset, uint32_t mem_mask)
+{
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_REG_READ, "cs1_size_r\n");
+
+	return swapendian_int32(m_regs[REG_CS1_SIZE]);
+}
+
+void mv64361_device::cs1_size_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	data = swapendian_int32(data);
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "cs1_size_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_CS1_SIZE]);
+	m_regs[REG_CS1_SIZE] &= 0x0000ffff;
+	update_window(1);
+}
+
+uint32_t mv64361_device::cs2_base_r(offs_t offset, uint32_t mem_mask)
+{
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_REG_READ, "cs2_base_r\n");
+
+	return swapendian_int32(m_regs[REG_CS2_BASE]);
+}
+
+void mv64361_device::cs2_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	data = swapendian_int32(data);
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "cs2_base_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_CS2_BASE]);
+	m_regs[REG_CS2_BASE] &= 0x000fffff;
+	update_window(2);
+}
+
+uint32_t mv64361_device::cs2_size_r(offs_t offset, uint32_t mem_mask)
+{
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_REG_READ, "cs2_size_r\n");
+
+	return swapendian_int32(m_regs[REG_CS2_SIZE]);
+}
+
+void mv64361_device::cs2_size_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	data = swapendian_int32(data);
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "cs2_size_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_CS2_SIZE]);
+	m_regs[REG_CS2_SIZE] &= 0x0000ffff;
+	update_window(2);
+}
+
+uint32_t mv64361_device::cs3_base_r(offs_t offset, uint32_t mem_mask)
+{
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_REG_READ, "cs3_base_r\n");
+
+	return swapendian_int32(m_regs[REG_CS3_BASE]);
+}
+
+void mv64361_device::cs3_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	data = swapendian_int32(data);
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "cs3_base_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_CS3_BASE]);
+	m_regs[REG_CS3_BASE] &= 0x000fffff;
+	update_window(3);
+}
+
+uint32_t mv64361_device::cs3_size_r(offs_t offset, uint32_t mem_mask)
+{
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_REG_READ, "cs3_size_r\n");
+
+	return swapendian_int32(m_regs[REG_CS3_SIZE]);
+}
+
+void mv64361_device::cs3_size_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	data = swapendian_int32(data);
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "cs3_size_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_CS3_SIZE]);
+	m_regs[REG_CS3_SIZE] &= 0x0000ffff;
+	update_window(3);
 }
 
 uint32_t mv64361_device::pci0_io_base_r(offs_t offset, uint32_t mem_mask)
@@ -185,11 +357,15 @@ uint32_t mv64361_device::pci0_io_base_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci0_io_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci0_io_base_w: %08x\n", data);
-	m_regs[REG_PCI0_IO_BASE] = data & 0x030fffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci0_io_base_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI0_IO_BASE]);
+	m_regs[REG_PCI0_IO_BASE] &= 0x030fffff;
 
 	if (BIT(m_regs[REG_CPU_CONFIG], 27) == 0)
-		m_regs[REG_PCI0_IO_REMAP] = data & 0x0000fffff;
+		m_regs[REG_PCI0_IO_REMAP] = m_regs[REG_PCI0_IO_BASE] & 0x0000fffff;
+
+	update_window(9);
 }
 
 uint32_t mv64361_device::pci0_io_size_r(offs_t offset, uint32_t mem_mask)
@@ -203,8 +379,11 @@ uint32_t mv64361_device::pci0_io_size_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci0_io_size_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci0_io_size_w: %08x\n", data);
-	m_regs[REG_PCI0_IO_SIZE] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci0_io_size_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI0_IO_SIZE]);
+	m_regs[REG_PCI0_IO_SIZE] &= 0x0000ffff;
+	update_window(9);
 }
 
 uint32_t mv64361_device::pci0_mem0_base_r(offs_t offset, uint32_t mem_mask)
@@ -218,11 +397,15 @@ uint32_t mv64361_device::pci0_mem0_base_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci0_mem0_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci0_mem0_base_w: %08x\n", data);
-	m_regs[REG_PCI0_MEM0_BASE] = data & 0x030fffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci0_mem0_base_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI0_MEM0_BASE]);
+	m_regs[REG_PCI0_MEM0_BASE] &= 0x030fffff;
 
 	if (BIT(m_regs[REG_CPU_CONFIG], 27) == 0)
-		m_regs[REG_PCI0_MEM0_REMAP_LOW] = data & 0x0000fffff;
+		m_regs[REG_PCI0_MEM0_REMAP_LOW] = m_regs[REG_PCI0_MEM0_BASE] & 0x0000fffff;
+
+	update_window(10);
 }
 
 uint32_t mv64361_device::pci0_mem0_size_r(offs_t offset, uint32_t mem_mask)
@@ -236,8 +419,11 @@ uint32_t mv64361_device::pci0_mem0_size_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci0_mem0_size_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci0_mem0_size_w: %08x\n", data);
-	m_regs[REG_PCI0_MEM0_SIZE] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci0_mem0_size_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI0_MEM0_SIZE]);
+	m_regs[REG_PCI0_MEM0_SIZE] &= 0x0000ffff;
+	update_window(10);
 }
 
 uint32_t mv64361_device::internal_base_r(offs_t offset, uint32_t mem_mask)
@@ -251,8 +437,11 @@ uint32_t mv64361_device::internal_base_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::internal_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "internal_base_w: %08x\n", data);
-	m_regs[REG_INTERNAL_BASE] = data & 0x000fffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "internal_base_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_INTERNAL_BASE]);
+	m_regs[REG_INTERNAL_BASE] &= 0x000fffff;
+	update_window(20);
 }
 
 uint32_t mv64361_device::pci0_mem1_base_r(offs_t offset, uint32_t mem_mask)
@@ -266,11 +455,15 @@ uint32_t mv64361_device::pci0_mem1_base_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci0_mem1_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci0_mem1_base_w: %08x\n", data);
-	m_regs[REG_PCI0_MEM1_BASE] = data & 0x030fffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci0_mem1_base_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI0_MEM1_BASE]);
+	m_regs[REG_PCI0_MEM1_BASE] &= 0x030fffff;
 
 	if (BIT(m_regs[REG_CPU_CONFIG], 27) == 0)
-		m_regs[REG_PCI0_MEM1_REMAP_LOW] = data & 0x0000fffff;
+		m_regs[REG_PCI0_MEM1_REMAP_LOW] = m_regs[REG_PCI0_MEM1_BASE] & 0x0000fffff;
+
+	update_window(11);
 }
 
 uint32_t mv64361_device::pci0_mem1_size_r(offs_t offset, uint32_t mem_mask)
@@ -284,8 +477,11 @@ uint32_t mv64361_device::pci0_mem1_size_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci0_mem1_size_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci0_mem1_size_w: %08x\n", data);
-	m_regs[REG_PCI0_MEM1_SIZE] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci0_mem1_size_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI0_MEM1_SIZE]);
+	m_regs[REG_PCI0_MEM1_SIZE] &= 0x0000ffff;
+	update_window(11);
 }
 
 uint32_t mv64361_device::pci1_io_base_r(offs_t offset, uint32_t mem_mask)
@@ -299,11 +495,15 @@ uint32_t mv64361_device::pci1_io_base_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci1_io_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci1_io_base_w: %08x\n", data);
-	m_regs[REG_PCI1_IO_BASE] = data & 0x030fffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci1_io_base_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI1_IO_BASE]);
+	m_regs[REG_PCI1_IO_BASE] &= 0x030fffff;
 
 	if (BIT(m_regs[REG_CPU_CONFIG], 27) == 0)
-		m_regs[REG_PCI1_IO_REMAP] = data & 0x0000fffff;
+		m_regs[REG_PCI1_IO_REMAP] = m_regs[REG_PCI1_IO_BASE] & 0x0000fffff;
+
+	update_window(14);
 }
 
 uint32_t mv64361_device::pci1_io_size_r(offs_t offset, uint32_t mem_mask)
@@ -317,8 +517,11 @@ uint32_t mv64361_device::pci1_io_size_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci1_io_size_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci1_io_size_w: %08x\n", data);
-	m_regs[REG_PCI1_IO_SIZE] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci1_io_size_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI1_IO_SIZE]);
+	m_regs[REG_PCI1_IO_SIZE] &= 0x0000ffff;
+	update_window(14);
 }
 
 uint32_t mv64361_device::pci1_mem0_base_r(offs_t offset, uint32_t mem_mask)
@@ -332,11 +535,15 @@ uint32_t mv64361_device::pci1_mem0_base_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci1_mem0_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci1_mem0_base_w: %08x\n", data);
-	m_regs[REG_PCI1_MEM0_BASE] = data & 0x030fffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci1_mem0_base_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI1_MEM0_BASE]);
+	m_regs[REG_PCI1_MEM0_BASE] &= 0x030fffff;
 
 	if (BIT(m_regs[REG_CPU_CONFIG], 27) == 0)
-		m_regs[REG_PCI1_MEM0_REMAP_LOW] = data & 0x0000fffff;
+		m_regs[REG_PCI1_MEM0_REMAP_LOW] = m_regs[REG_PCI1_MEM0_BASE] & 0x0000fffff;
+
+	update_window(15);
 }
 
 uint32_t mv64361_device::pci1_mem0_size_r(offs_t offset, uint32_t mem_mask)
@@ -350,8 +557,11 @@ uint32_t mv64361_device::pci1_mem0_size_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci1_mem0_size_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci1_mem0_size_w: %08x\n", data);
-	m_regs[REG_PCI1_MEM0_SIZE] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci1_mem0_size_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI1_MEM0_SIZE]);
+	m_regs[REG_PCI1_MEM0_SIZE] &= 0x0000ffff;
+	update_window(15);
 }
 
 uint32_t mv64361_device::pci1_mem1_base_r(offs_t offset, uint32_t mem_mask)
@@ -365,11 +575,15 @@ uint32_t mv64361_device::pci1_mem1_base_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci1_mem1_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci1_mem1_base_w: %08x\n", data);
-	m_regs[REG_PCI1_MEM1_BASE] = data & 0x030fffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci1_mem1_base_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI1_MEM1_BASE]);
+	m_regs[REG_PCI1_MEM1_BASE] &= 0x030fffff;
 
 	if (BIT(m_regs[REG_CPU_CONFIG], 27) == 0)
-		m_regs[REG_PCI1_MEM1_REMAP_LOW] = data & 0x0000fffff;
+		m_regs[REG_PCI1_MEM1_REMAP_LOW] = m_regs[REG_PCI1_MEM1_BASE] & 0x0000fffff;
+
+	update_window(16);
 }
 
 uint32_t mv64361_device::pci1_mem1_size_r(offs_t offset, uint32_t mem_mask)
@@ -383,8 +597,11 @@ uint32_t mv64361_device::pci1_mem1_size_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci1_mem1_size_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci1_mem1_size_w: %08x\n", data);
-	m_regs[REG_PCI0_MEM1_SIZE] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci1_mem1_size_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI1_MEM1_SIZE]);
+	m_regs[REG_PCI1_MEM1_SIZE] &= 0x0000ffff;
+	update_window(16);
 }
 
 uint32_t mv64361_device::pci0_io_remap_r(offs_t offset, uint32_t mem_mask)
@@ -398,8 +615,10 @@ uint32_t mv64361_device::pci0_io_remap_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci0_io_remap_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci0_io_remap_w: %08x\n", data);
-	m_regs[REG_PCI0_IO_REMAP] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci0_io_remap_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI0_IO_REMAP]);
+	m_regs[REG_PCI0_IO_REMAP] &= 0x0000ffff;
 }
 
 uint32_t mv64361_device::pci0_mem0_remap_low_r(offs_t offset, uint32_t mem_mask)
@@ -413,8 +632,10 @@ uint32_t mv64361_device::pci0_mem0_remap_low_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci0_mem0_remap_low_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci0_mem0_remap_low_w: %08x\n", data);
-	m_regs[REG_PCI0_MEM0_REMAP_LOW] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci0_mem0_remap_low_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI0_MEM0_REMAP_LOW]);
+	m_regs[REG_PCI0_MEM0_REMAP_LOW] &= 0x0000ffff;
 }
 
 uint32_t mv64361_device::pci0_mem1_remap_low_r(offs_t offset, uint32_t mem_mask)
@@ -428,8 +649,10 @@ uint32_t mv64361_device::pci0_mem1_remap_low_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci0_mem1_remap_low_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci0_mem1_remap_low_w: %08x\n", data);
-	m_regs[REG_PCI0_MEM1_REMAP_LOW] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci0_mem1_remap_low_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI0_MEM1_REMAP_LOW]);
+	m_regs[REG_PCI0_MEM1_REMAP_LOW] &= 0x0000ffff;
 }
 
 uint32_t mv64361_device::pci1_io_remap_r(offs_t offset, uint32_t mem_mask)
@@ -443,8 +666,10 @@ uint32_t mv64361_device::pci1_io_remap_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci1_io_remap_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci1_io_remap_w: %08x\n", data);
-	m_regs[REG_PCI1_IO_REMAP] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci1_io_remap_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI1_IO_REMAP]);
+	m_regs[REG_PCI1_IO_REMAP] &= 0x0000ffff;
 }
 
 uint32_t mv64361_device::pci1_mem0_remap_low_r(offs_t offset, uint32_t mem_mask)
@@ -458,8 +683,10 @@ uint32_t mv64361_device::pci1_mem0_remap_low_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci1_mem0_remap_low_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci1_mem0_remap_low_w: %08x\n", data);
-	m_regs[REG_PCI1_MEM0_REMAP_LOW] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci1_mem0_remap_low_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI1_MEM0_REMAP_LOW]);
+	m_regs[REG_PCI1_MEM0_REMAP_LOW] &= 0x0000ffff;
 }
 
 uint32_t mv64361_device::pci1_mem1_remap_low_r(offs_t offset, uint32_t mem_mask)
@@ -473,8 +700,10 @@ uint32_t mv64361_device::pci1_mem1_remap_low_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci1_mem1_remap_low_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci1_mem1_remap_low_w: %08x\n", data);
-	m_regs[REG_PCI1_MEM1_REMAP_LOW] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci1_mem1_remap_low_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI1_MEM1_REMAP_LOW]);
+	m_regs[REG_PCI1_MEM1_REMAP_LOW] &= 0x0000ffff;
 }
 
 uint32_t mv64361_device::bootcs_base_r(offs_t offset, uint32_t mem_mask)
@@ -488,8 +717,11 @@ uint32_t mv64361_device::bootcs_base_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::bootcs_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "bootcs_base_w: %08x\n", data);
-	m_regs[REG_BOOTCS_BASE] = data & 0x000fffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "bootcs_base_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_BOOTCS_BASE]);
+	m_regs[REG_BOOTCS_BASE] &= 0x000fffff;
+	update_window(8);
 }
 
 uint32_t mv64361_device::bootcs_size_r(offs_t offset, uint32_t mem_mask)
@@ -503,8 +735,11 @@ uint32_t mv64361_device::bootcs_size_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::bootcs_size_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "bootcs_size_w: %08x\n", data);
-	m_regs[REG_BOOTCS_SIZE] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "bootcs_size_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_BOOTCS_SIZE]);
+	m_regs[REG_BOOTCS_SIZE] &= 0x0000ffff;
+	update_window(8);
 }
 
 uint32_t mv64361_device::pci0_mem2_base_r(offs_t offset, uint32_t mem_mask)
@@ -518,11 +753,15 @@ uint32_t mv64361_device::pci0_mem2_base_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci0_mem2_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci0_mem2_base_w: %08x\n", data);
-	m_regs[REG_PCI0_MEM2_BASE] = data & 0x030fffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci0_mem2_base_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI0_MEM2_BASE]);
+	m_regs[REG_PCI0_MEM2_BASE] &= 0x030fffff;
 
 	if (BIT(m_regs[REG_CPU_CONFIG], 27) == 0)
-		m_regs[REG_PCI0_MEM2_REMAP_LOW] = data & 0x0000fffff;
+		m_regs[REG_PCI0_MEM2_REMAP_LOW] = m_regs[REG_PCI0_MEM2_BASE] & 0x0000fffff;
+
+	update_window(12);
 }
 
 uint32_t mv64361_device::pci0_mem2_size_r(offs_t offset, uint32_t mem_mask)
@@ -536,8 +775,11 @@ uint32_t mv64361_device::pci0_mem2_size_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci0_mem2_size_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci0_mem2_size_w: %08x\n", data);
-	m_regs[REG_PCI0_MEM2_SIZE] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci0_mem2_size_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI0_MEM2_SIZE]);
+	m_regs[REG_PCI0_MEM2_SIZE] &= 0x0000ffff;
+	update_window(12);
 }
 
 uint32_t mv64361_device::sram_base_r(offs_t offset, uint32_t mem_mask)
@@ -551,8 +793,11 @@ uint32_t mv64361_device::sram_base_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::sram_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "sram_base_w: %08x\n", data);
-	m_regs[REG_SRAM_BASE] = data & 0x000fffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "sram_base_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_SRAM_BASE]);
+	m_regs[REG_SRAM_BASE] &= 0x000fffff;
+	update_window(19);
 }
 
 uint32_t mv64361_device::base_address_enable_r(offs_t offset, uint32_t mem_mask)
@@ -566,10 +811,11 @@ uint32_t mv64361_device::base_address_enable_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::base_address_enable_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "base_address_enable_w: %08x\n", data);
-	m_regs[REG_BASE_ADDRESS_ENABLE] = data & 0x001fffff;
-
-	map_windows();
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "base_address_enable_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_BASE_ADDRESS_ENABLE]);
+	m_regs[REG_BASE_ADDRESS_ENABLE] &= 0x001fffff;
+	update_windows();
 }
 
 uint32_t mv64361_device::pci0_mem3_base_r(offs_t offset, uint32_t mem_mask)
@@ -583,11 +829,15 @@ uint32_t mv64361_device::pci0_mem3_base_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci0_mem3_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci0_mem3_base_w: %08x\n", data);
-	m_regs[REG_PCI0_MEM3_BASE] = data & 0x030fffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci0_mem3_base_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI0_MEM3_BASE]);
+	m_regs[REG_PCI0_MEM3_BASE] &= 0x030fffff;
 
 	if (BIT(m_regs[REG_CPU_CONFIG], 27) == 0)
-		m_regs[REG_PCI0_MEM3_REMAP_LOW] = data & 0x0000fffff;
+		m_regs[REG_PCI0_MEM3_REMAP_LOW] = m_regs[REG_PCI0_MEM3_BASE] & 0x0000fffff;
+
+	update_window(13);
 }
 
 uint32_t mv64361_device::pci0_mem3_size_r(offs_t offset, uint32_t mem_mask)
@@ -601,8 +851,11 @@ uint32_t mv64361_device::pci0_mem3_size_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci0_mem3_size_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci0_mem3_size_w: %08x\n", data);
-	m_regs[REG_PCI0_MEM3_SIZE] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci0_mem3_size_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI0_MEM3_SIZE]);
+	m_regs[REG_PCI0_MEM3_SIZE] &= 0x0000ffff;
+	update_window(13);
 }
 
 uint32_t mv64361_device::pci1_mem2_base_r(offs_t offset, uint32_t mem_mask)
@@ -616,11 +869,15 @@ uint32_t mv64361_device::pci1_mem2_base_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci1_mem2_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci1_mem2_base_w: %08x\n", data);
-	m_regs[REG_PCI1_MEM2_BASE] = data & 0x030fffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci1_mem2_base_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI1_MEM2_BASE]);
+	m_regs[REG_PCI1_MEM2_BASE] &= 0x030fffff;
 
 	if (BIT(m_regs[REG_CPU_CONFIG], 27) == 0)
-		m_regs[REG_PCI1_MEM2_REMAP_LOW] = data & 0x0000fffff;
+		m_regs[REG_PCI1_MEM2_REMAP_LOW] = m_regs[REG_PCI1_MEM2_BASE] & 0x0000fffff;
+
+	update_window(17);
 }
 
 uint32_t mv64361_device::pci1_mem2_size_r(offs_t offset, uint32_t mem_mask)
@@ -634,8 +891,11 @@ uint32_t mv64361_device::pci1_mem2_size_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci1_mem2_size_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci1_mem2_size_w: %08x\n", data);
-	m_regs[REG_PCI1_MEM2_SIZE] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci1_mem2_size_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI1_MEM2_SIZE]);
+	m_regs[REG_PCI1_MEM2_SIZE] &= 0x0000ffff;
+	update_window(17);
 }
 
 uint32_t mv64361_device::pci1_mem3_base_r(offs_t offset, uint32_t mem_mask)
@@ -649,11 +909,15 @@ uint32_t mv64361_device::pci1_mem3_base_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci1_mem3_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci1_mem3_base_w: %08x\n", data);
-	m_regs[REG_PCI1_MEM3_BASE] = data & 0x030fffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci1_mem3_base_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI1_MEM3_BASE]);
+	m_regs[REG_PCI1_MEM3_BASE] &= 0x030fffff;
 
 	if (BIT(m_regs[REG_CPU_CONFIG], 27) == 0)
-		m_regs[REG_PCI1_MEM3_REMAP_LOW] = data & 0x0000fffff;
+		m_regs[REG_PCI1_MEM3_REMAP_LOW] = m_regs[REG_PCI1_MEM3_BASE] & 0x0000fffff;
+
+	update_window(18);
 }
 
 uint32_t mv64361_device::pci1_mem3_size_r(offs_t offset, uint32_t mem_mask)
@@ -667,8 +931,11 @@ uint32_t mv64361_device::pci1_mem3_size_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci1_mem3_size_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci1_mem3_size_w: %08x\n", data);
-	m_regs[REG_PCI1_MEM3_SIZE] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci1_mem3_size_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI1_MEM3_SIZE]);
+	m_regs[REG_PCI1_MEM3_SIZE] &= 0x0000ffff;
+	update_window(18);
 }
 
 uint32_t mv64361_device::pci0_mem2_remap_low_r(offs_t offset, uint32_t mem_mask)
@@ -682,8 +949,10 @@ uint32_t mv64361_device::pci0_mem2_remap_low_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci0_mem2_remap_low_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci0_mem2_remap_low_w: %08x\n", data);
-	m_regs[REG_PCI0_MEM2_REMAP_LOW] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci0_mem2_remap_low_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI0_MEM2_REMAP_LOW]);
+	m_regs[REG_PCI0_MEM2_REMAP_LOW] &= 0x0000ffff;
 }
 
 uint32_t mv64361_device::pci0_mem3_remap_low_r(offs_t offset, uint32_t mem_mask)
@@ -697,8 +966,10 @@ uint32_t mv64361_device::pci0_mem3_remap_low_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci0_mem3_remap_low_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci0_mem3_remap_low_w: %08x\n", data);
-	m_regs[REG_PCI0_MEM3_REMAP_LOW] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci0_mem3_remap_low_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI0_MEM3_REMAP_LOW]);
+	m_regs[REG_PCI0_MEM3_REMAP_LOW] &= 0x0000ffff;
 }
 
 uint32_t mv64361_device::pci1_mem2_remap_low_r(offs_t offset, uint32_t mem_mask)
@@ -712,8 +983,10 @@ uint32_t mv64361_device::pci1_mem2_remap_low_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci1_mem2_remap_low_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci1_mem2_remap_low_w: %08x\n", data);
-	m_regs[REG_PCI1_MEM2_REMAP_LOW] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci1_mem2_remap_low_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI1_MEM2_REMAP_LOW]);
+	m_regs[REG_PCI1_MEM2_REMAP_LOW] &= 0x0000ffff;
 }
 
 uint32_t mv64361_device::pci1_mem3_remap_low_r(offs_t offset, uint32_t mem_mask)
@@ -727,8 +1000,10 @@ uint32_t mv64361_device::pci1_mem3_remap_low_r(offs_t offset, uint32_t mem_mask)
 void mv64361_device::pci1_mem3_remap_low_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci1_mem3_remap_low_w: %08x\n", data);
-	m_regs[REG_PCI1_MEM3_REMAP_LOW] = data & 0x0000ffff;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci1_mem3_remap_low_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI1_MEM3_REMAP_LOW]);
+	m_regs[REG_PCI1_MEM3_REMAP_LOW] &= 0x0000ffff;
 }
 
 uint32_t mv64361_device::pci0_mem0_remap_high_r(offs_t offset, uint32_t mem_mask)
@@ -742,8 +1017,9 @@ uint32_t mv64361_device::pci0_mem0_remap_high_r(offs_t offset, uint32_t mem_mask
 void mv64361_device::pci0_mem0_remap_high_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci0_mem0_remap_high_w: %08x\n", data);
-	m_regs[REG_PCI0_MEM0_REMAP_HIGH] = data;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci0_mem0_remap_high_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI0_MEM0_REMAP_HIGH]);
 }
 
 uint32_t mv64361_device::pci0_mem1_remap_high_r(offs_t offset, uint32_t mem_mask)
@@ -757,8 +1033,9 @@ uint32_t mv64361_device::pci0_mem1_remap_high_r(offs_t offset, uint32_t mem_mask
 void mv64361_device::pci0_mem1_remap_high_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci0_mem1_remap_high_w: %08x\n", data);
-	m_regs[REG_PCI0_MEM1_REMAP_HIGH] = data;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci0_mem1_remap_high_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI0_MEM1_REMAP_HIGH]);
 }
 
 uint32_t mv64361_device::pci0_mem2_remap_high_r(offs_t offset, uint32_t mem_mask)
@@ -772,8 +1049,9 @@ uint32_t mv64361_device::pci0_mem2_remap_high_r(offs_t offset, uint32_t mem_mask
 void mv64361_device::pci0_mem2_remap_high_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci0_mem2_remap_high_w: %08x\n", data);
-	m_regs[REG_PCI0_MEM2_REMAP_HIGH] = data;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci0_mem2_remap_high_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI0_MEM2_REMAP_HIGH]);
 }
 
 uint32_t mv64361_device::pci0_mem3_remap_high_r(offs_t offset, uint32_t mem_mask)
@@ -787,8 +1065,9 @@ uint32_t mv64361_device::pci0_mem3_remap_high_r(offs_t offset, uint32_t mem_mask
 void mv64361_device::pci0_mem3_remap_high_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci0_mem3_remap_high_w: %08x\n", data);
-	m_regs[REG_PCI0_MEM3_REMAP_HIGH] = data;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci0_mem3_remap_high_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI0_MEM3_REMAP_HIGH]);
 }
 
 uint32_t mv64361_device::pci1_mem0_remap_high_r(offs_t offset, uint32_t mem_mask)
@@ -802,8 +1081,9 @@ uint32_t mv64361_device::pci1_mem0_remap_high_r(offs_t offset, uint32_t mem_mask
 void mv64361_device::pci1_mem0_remap_high_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci1_mem0_remap_high_w: %08x\n", data);
-	m_regs[REG_PCI1_MEM0_REMAP_HIGH] = data;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci1_mem0_remap_high_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI1_MEM0_REMAP_HIGH]);
 }
 
 uint32_t mv64361_device::pci1_mem1_remap_high_r(offs_t offset, uint32_t mem_mask)
@@ -817,8 +1097,9 @@ uint32_t mv64361_device::pci1_mem1_remap_high_r(offs_t offset, uint32_t mem_mask
 void mv64361_device::pci1_mem1_remap_high_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci1_mem1_remap_high_w: %08x\n", data);
-	m_regs[REG_PCI1_MEM1_REMAP_HIGH] = data;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci1_mem1_remap_high_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI1_MEM1_REMAP_HIGH]);
 }
 
 uint32_t mv64361_device::pci1_mem2_remap_high_r(offs_t offset, uint32_t mem_mask)
@@ -832,8 +1113,9 @@ uint32_t mv64361_device::pci1_mem2_remap_high_r(offs_t offset, uint32_t mem_mask
 void mv64361_device::pci1_mem2_remap_high_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci1_mem2_remap_high_w: %08x\n", data);
-	m_regs[REG_PCI1_MEM2_REMAP_HIGH] = data;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci1_mem2_remap_high_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI1_MEM2_REMAP_HIGH]);
 }
 
 uint32_t mv64361_device::pci1_mem3_remap_high_r(offs_t offset, uint32_t mem_mask)
@@ -847,171 +1129,228 @@ uint32_t mv64361_device::pci1_mem3_remap_high_r(offs_t offset, uint32_t mem_mask
 void mv64361_device::pci1_mem3_remap_high_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = swapendian_int32(data);
-	LOGMASKED(LOG_REG_WRITE, "pci1_mem3_remap_high_w: %08x\n", data);
-	m_regs[REG_PCI1_MEM3_REMAP_HIGH] = data;
+	mem_mask = swapendian_int32(mem_mask);
+	LOGMASKED(LOG_REG_WRITE, "pci1_mem3_remap_high_w: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_regs[REG_PCI1_MEM3_REMAP_HIGH]);
 }
 
-void mv64361_device::map_windows()
+void mv64361_device::map_window(int window)
 {
-	for (int i = 0; i < 21; i++)
+	if (BIT(m_regs[REG_BASE_ADDRESS_ENABLE], window))
+		return;
+
+	switch (window)
 	{
-		// unmap currently mapped ranges
-		if (m_ranges[i].enabled)
-		{
-			m_cpu_space->unmap_readwrite(m_ranges[i].start, m_ranges[i].end);
-			m_ranges[i].enabled = false;
-		}
-
-		if (BIT(m_regs[REG_BASE_ADDRESS_ENABLE], i) == 0)
-		{
-			m_ranges[i].enabled = true;
-
-			switch (i)
+		case 0: // CS0
 			{
-			case 0: // CS0
-				m_ranges[0].enabled = false;
-				logerror("Mapping CS0\n");
-				break;
-
-			case 1: // CS1
-				m_ranges[1].enabled = false;
-				logerror("Mapping CS1\n");
-				break;
-
-			case 2: // CS2
-				m_ranges[2].enabled = false;
-				logerror("Mapping CS2\n");
-				break;
-
-			case 3: // CS3
-				m_ranges[3].enabled = false;
-				logerror("Mapping CS3\n");
-				break;
-
-			case 4: // DEVCS0
-				m_ranges[4].enabled = false;
-				logerror("Mapping DEVCS0\n");
-				break;
-
-			case 5: // DEVCS1
-				m_ranges[5].enabled = false;
-				logerror("Mapping DEVCS1\n");
-				break;
-
-			case 6: // DEVCS2
-				m_ranges[6].enabled = false;
-				logerror("Mapping DEVCS2\n");
-				break;
-
-			case 7: // DEVCS3
-				m_ranges[7].enabled = false;
-				logerror("Mapping DEVCS3\n");
-				break;
-
-			case 8: // BOOTCS
-				m_ranges[8].start = m_regs[REG_BOOTCS_BASE] << 16;
-				m_ranges[8].end = (m_regs[REG_BOOTCS_BASE] << 16) + ((m_regs[REG_BOOTCS_SIZE] << 16) | 0xffff);
-				m_ranges[8].enabled = false;
-				logerror("MAP %08x-%08x BOOTCS (not supported)\n", m_ranges[8].start , m_ranges[8].end);
-				break;
-
-			case 9: // PCI0 I/O
-				m_ranges[9].start = m_regs[REG_PCI0_IO_BASE] << 16;
-				m_ranges[9].end = (m_regs[REG_PCI0_IO_BASE] << 16) + ((m_regs[REG_PCI0_IO_SIZE] << 16) | 0xffff);
-				logerror("MAP %08x-%08x PCI0 I/O (remap: %04x)\n", m_ranges[9].start, m_ranges[9].end, m_regs[REG_PCI0_IO_REMAP]);
-				m_cpu_space->install_read_handler (m_ranges[9].start, m_ranges[9].end, read32s_delegate(*this, FUNC(mv64361_device::pci0_io_r)));
-				m_cpu_space->install_write_handler(m_ranges[9].start, m_ranges[9].end, write32s_delegate(*this, FUNC(mv64361_device::pci0_io_w)));
-				break;
-
-			case 10: // PCI0 MEM0
-				m_ranges[10].start = m_regs[REG_PCI0_MEM0_BASE] << 16;
-				m_ranges[10].end = (m_regs[REG_PCI0_MEM0_BASE] << 16) + ((m_regs[REG_PCI0_MEM0_SIZE] << 16) | 0xffff);
-				logerror("MAP %08x-%08x PCI0 MEM0 (remap: %08x %04x)\n", m_ranges[10].start, m_ranges[10].end, m_regs[REG_PCI0_MEM0_REMAP_HIGH], m_regs[REG_PCI0_MEM0_REMAP_LOW]);
-				m_cpu_space->install_read_handler (m_ranges[10].start, m_ranges[10].end, read32s_delegate(*this, FUNC(mv64361_device::pci0_mem0_r)));
-				m_cpu_space->install_write_handler(m_ranges[10].start, m_ranges[10].end, write32s_delegate(*this, FUNC(mv64361_device::pci0_mem0_w)));
-				break;
-
-			case 11: // PCI0 MEM1
-				m_ranges[11].start = m_regs[REG_PCI0_MEM1_BASE] << 16;
-				m_ranges[11].end = (m_regs[REG_PCI0_MEM1_BASE] << 16) + ((m_regs[REG_PCI0_MEM1_SIZE] << 16) | 0xffff);
-				logerror("MAP %08x-%08x PCI0 MEM1 (remap: %08x %04x)\n", m_ranges[11].start, m_ranges[11].end, m_regs[REG_PCI0_MEM1_REMAP_HIGH], m_regs[REG_PCI0_MEM1_REMAP_LOW]);
-				m_cpu_space->install_read_handler (m_ranges[11].start, m_ranges[11].end, read32s_delegate(*this, FUNC(mv64361_device::pci0_mem1_r)));
-				m_cpu_space->install_write_handler(m_ranges[11].start, m_ranges[11].end, write32s_delegate(*this, FUNC(mv64361_device::pci0_mem1_w)));
-				break;
-
-			case 12: // PCI0 MEM2
-				m_ranges[12].start = m_regs[REG_PCI0_MEM2_BASE] << 16;
-				m_ranges[12].end = (m_regs[REG_PCI0_MEM2_BASE] << 16) + ((m_regs[REG_PCI0_MEM2_SIZE] << 16) | 0xffff);
-				logerror("MAP %08x-%08x PCI0 MEM2 (remap: %08x %04x)\n", m_ranges[12].start, m_ranges[12].end, m_regs[REG_PCI0_MEM2_REMAP_HIGH], m_regs[REG_PCI0_MEM2_REMAP_LOW]);
-				m_cpu_space->install_read_handler (m_ranges[12].start, m_ranges[12].end, read32s_delegate(*this, FUNC(mv64361_device::pci0_mem2_r)));
-				m_cpu_space->install_write_handler(m_ranges[12].start, m_ranges[12].end, write32s_delegate(*this, FUNC(mv64361_device::pci0_mem2_w)));
-				break;
-
-			case 13: // PCI0 MEM3
-				m_ranges[13].start = m_regs[REG_PCI0_MEM3_BASE] << 16;
-				m_ranges[13].end = (m_regs[REG_PCI0_MEM3_BASE] << 16) + ((m_regs[REG_PCI0_MEM3_SIZE] << 16) | 0xffff);
-				logerror("MAP %08x-%08x PCI0 MEM3 (remap: %08x %04x)\n", m_ranges[13].start, m_ranges[13].end, m_regs[REG_PCI0_MEM3_REMAP_HIGH], m_regs[REG_PCI0_MEM3_REMAP_LOW]);
-				m_cpu_space->install_read_handler (m_ranges[13].start, m_ranges[13].end, read32s_delegate(*this, FUNC(mv64361_device::pci0_mem3_r)));
-				m_cpu_space->install_write_handler(m_ranges[13].start, m_ranges[13].end, write32s_delegate(*this, FUNC(mv64361_device::pci0_mem3_w)));
-				break;
-
-			case 14: // PCI1 I/O
-				m_ranges[14].start = m_regs[REG_PCI1_IO_BASE] << 16;
-				m_ranges[14].end = (m_regs[REG_PCI1_IO_BASE] << 16) + ((m_regs[REG_PCI1_IO_SIZE] << 16) | 0xffff);
-				logerror("MAP %08x-%08x PCI1 I/O (remap: %04x)\n", m_ranges[14].start, m_ranges[14].end, m_regs[REG_PCI1_IO_REMAP]);
-				m_cpu_space->install_read_handler (m_ranges[14].start, m_ranges[14].end, read32s_delegate(*this, FUNC(mv64361_device::pci1_io_r)));
-				m_cpu_space->install_write_handler(m_ranges[14].start, m_ranges[14].end, write32s_delegate(*this, FUNC(mv64361_device::pci1_io_w)));
-				break;
-
-			case 15: // PCI1 MEM0
-				m_ranges[15].start = m_regs[REG_PCI1_MEM0_BASE] << 16;
-				m_ranges[15].end = (m_regs[REG_PCI1_MEM0_BASE] << 16) + ((m_regs[REG_PCI1_MEM0_SIZE] << 16) | 0xffff);
-				logerror("MAP %08x-%08x PCI1 MEM0 (remap: %08x %04x)\n", m_ranges[15].start, m_ranges[15].end, m_regs[REG_PCI1_MEM0_REMAP_HIGH], m_regs[REG_PCI1_MEM0_REMAP_LOW]);
-				m_cpu_space->install_read_handler (m_ranges[15].start, m_ranges[15].end, read32s_delegate(*this, FUNC(mv64361_device::pci1_mem0_r)));
-				m_cpu_space->install_write_handler(m_ranges[15].start, m_ranges[15].end, write32s_delegate(*this, FUNC(mv64361_device::pci1_mem0_w)));
-				break;
-
-			case 16: // PCI1 MEM1
-				m_ranges[16].start = m_regs[REG_PCI1_MEM1_BASE] << 16;
-				m_ranges[16].end = (m_regs[REG_PCI1_MEM1_BASE] << 16) + ((m_regs[REG_PCI1_MEM1_SIZE] << 16) | 0xffff);
-				logerror("MAP %08x-%08x PCI1 MEM1 (remap: %08x %04x)\n", m_ranges[16].start, m_ranges[16].end, m_regs[REG_PCI1_MEM1_REMAP_HIGH], m_regs[REG_PCI1_MEM1_REMAP_LOW]);
-				m_cpu_space->install_read_handler (m_ranges[16].start, m_ranges[16].end, read32s_delegate(*this, FUNC(mv64361_device::pci1_mem1_r)));
-				m_cpu_space->install_write_handler(m_ranges[16].start, m_ranges[16].end, write32s_delegate(*this, FUNC(mv64361_device::pci1_mem1_w)));
-
-				break;
-
-			case 17: // PCI1 MEM2
-				m_ranges[17].start = m_regs[REG_PCI1_MEM2_BASE] << 16;
-				m_ranges[17].end = (m_regs[REG_PCI1_MEM2_BASE] << 16) + ((m_regs[REG_PCI1_MEM2_SIZE] << 16) | 0xffff);
-				logerror("MAP %08x-%08x PCI1 MEM2 (remap: %08x %04x)\n", m_ranges[17].start, m_ranges[17].end, m_regs[REG_PCI1_MEM2_REMAP_HIGH], m_regs[REG_PCI1_MEM2_REMAP_LOW]);
-				m_cpu_space->install_read_handler (m_ranges[17].start, m_ranges[17].end, read32s_delegate(*this, FUNC(mv64361_device::pci1_mem2_r)));
-				m_cpu_space->install_write_handler(m_ranges[17].start, m_ranges[17].end, write32s_delegate(*this, FUNC(mv64361_device::pci1_mem2_w)));
-				break;
-
-			case 18: // PCI1 MEM3
-				m_ranges[18].start = m_regs[REG_PCI1_MEM3_BASE] << 16;
-				m_ranges[18].end = (m_regs[REG_PCI1_MEM3_BASE] << 16) + ((m_regs[REG_PCI1_MEM3_SIZE] << 16) | 0xffff);
-				logerror("MAP %08x-%08x PCI1 MEM3 (remap: %08x %04x)\n", m_ranges[18].start, m_ranges[18].end, m_regs[REG_PCI1_MEM3_REMAP_HIGH], m_regs[REG_PCI1_MEM3_REMAP_LOW]);
-				m_cpu_space->install_read_handler (m_ranges[18].start, m_ranges[18].end, read32s_delegate(*this, FUNC(mv64361_device::pci1_mem3_r)));
-				m_cpu_space->install_write_handler(m_ranges[18].start, m_ranges[18].end, write32s_delegate(*this, FUNC(mv64361_device::pci1_mem3_w)));
-				break;
-
-			case 19: // SRAM
-				m_ranges[19].start = m_regs[REG_SRAM_BASE] << 16;
-				m_ranges[19].end = (m_regs[REG_SRAM_BASE] << 16) + 0x1fffff;
-				logerror("MAP %08x-%08x SRAM\n", m_ranges[19].start, m_ranges[19].end);
-				m_cpu_space->install_ram(m_ranges[19].start, m_ranges[19].end, m_sram.get());
-				break;
-
-			case 20: // INTERNAL
-				m_ranges[20].start = m_regs[REG_INTERNAL_BASE] << 16;
-				m_ranges[20].end = (m_regs[REG_INTERNAL_BASE] << 16) + 0xffff;
-				logerror("MAP %08x-%08x INTERNAL\n", m_ranges[20].start, m_ranges[20].end);
-				m_cpu_space->install_device(m_ranges[20].start, m_ranges[20].end, *static_cast<mv64361_device *>(this), &mv64361_device::register_map);
-				break;
+				uint64_t const length = (uint64_t(m_regs[REG_CS0_SIZE]) + 1) << 16;
+				m_ranges[0].start = uint64_t(m_regs[REG_CS0_BASE]) << 16;
+				m_ranges[0].end = m_ranges[0].start + length - 1;
+				if (m_cs_share[0] && length <= m_cs_share[0]->bytes())
+				{
+					m_cpu_space->install_ram(m_ranges[0].start, m_ranges[0].end, m_cs_share[0]->ptr());
+					m_ranges[0].enabled = true;
+				}
+				LOGMASKED(LOG_REG_MAPPING, "MAP %08x-%08x CS0\n", m_ranges[0].start, m_ranges[0].end);
 			}
-		}
+			break;
+
+		case 1: // CS1
+			{
+				uint64_t const length = (uint64_t(m_regs[REG_CS1_SIZE]) + 1) << 16;
+				m_ranges[1].start = uint64_t(m_regs[REG_CS1_BASE]) << 16;
+				m_ranges[1].end = m_ranges[1].start + length - 1;
+				if (m_cs_share[1] && length <= m_cs_share[1]->bytes())
+				{
+					m_cpu_space->install_ram(m_ranges[1].start, m_ranges[1].end, m_cs_share[1]->ptr());
+					m_ranges[1].enabled = true;
+				}
+				LOGMASKED(LOG_REG_MAPPING, "MAP %08x-%08x CS1\n", m_ranges[1].start, m_ranges[1].end);
+			}
+			break;
+
+		case 2: // CS2
+			{
+				uint64_t const length = (uint64_t(m_regs[REG_CS2_SIZE]) + 1) << 16;
+				m_ranges[2].start = uint64_t(m_regs[REG_CS2_BASE]) << 16;
+				m_ranges[2].end = m_ranges[2].start + length - 1;
+				if (m_cs_share[2] && length <= m_cs_share[2]->bytes())
+				{
+					m_cpu_space->install_ram(m_ranges[2].start, m_ranges[2].end, m_cs_share[2]->ptr());
+					m_ranges[2].enabled = true;
+				}
+				LOGMASKED(LOG_REG_MAPPING, "MAP %08x-%08x CS2\n", m_ranges[2].start, m_ranges[2].end);
+			}
+			break;
+
+		case 3: // CS3
+			{
+				uint64_t const length = (uint64_t(m_regs[REG_CS3_SIZE]) + 1) << 16;
+				m_ranges[3].start = uint64_t(m_regs[REG_CS3_BASE]) << 16;
+				m_ranges[3].end = m_ranges[3].start + length - 1;
+				if (m_cs_share[3] && length <= m_cs_share[3]->bytes())
+				{
+					m_cpu_space->install_ram(m_ranges[3].start, m_ranges[3].end, m_cs_share[3]->ptr());
+					m_ranges[3].enabled = true;
+				}
+				LOGMASKED(LOG_REG_MAPPING, "MAP %08x-%08x CS3\n", m_ranges[3].start, m_ranges[3].end);
+			}
+			break;
+
+		case 4: // DEVCS0
+			LOGMASKED(LOG_REG_MAPPING, "Mapping DEVCS0 (not supported)\n");
+			break;
+
+		case 5: // DEVCS1
+			LOGMASKED(LOG_REG_MAPPING, "Mapping DEVCS1 (not supported)\n");
+			break;
+
+		case 6: // DEVCS2
+			LOGMASKED(LOG_REG_MAPPING, "Mapping DEVCS2 (not supported)\n");
+			break;
+
+		case 7: // DEVCS3
+			LOGMASKED(LOG_REG_MAPPING, "Mapping DEVCS3 (not supported)\n");
+			break;
+
+		case 8: // BOOTCS
+			m_ranges[8].start = m_regs[REG_BOOTCS_BASE] << 16;
+			m_ranges[8].end = (m_regs[REG_BOOTCS_BASE] << 16) + ((m_regs[REG_BOOTCS_SIZE] << 16) | 0xffff);
+			LOGMASKED(LOG_REG_MAPPING, "MAP %08x-%08x BOOTCS (not supported)\n", m_ranges[8].start, m_ranges[8].end);
+			break;
+
+		case 9: // PCI0 I/O
+			m_ranges[9].start = m_regs[REG_PCI0_IO_BASE] << 16;
+			m_ranges[9].end = (m_regs[REG_PCI0_IO_BASE] << 16) + ((m_regs[REG_PCI0_IO_SIZE] << 16) | 0xffff);
+			m_cpu_space->install_read_handler (m_ranges[9].start, m_ranges[9].end, read32s_delegate(*this, FUNC(mv64361_device::pci0_io_r)));
+			m_cpu_space->install_write_handler(m_ranges[9].start, m_ranges[9].end, write32s_delegate(*this, FUNC(mv64361_device::pci0_io_w)));
+			m_ranges[9].enabled = true;
+			LOGMASKED(LOG_REG_MAPPING, "MAP %08x-%08x PCI0 I/O (remap: %04x)\n", m_ranges[9].start, m_ranges[9].end, m_regs[REG_PCI0_IO_REMAP]);
+			break;
+
+		case 10: // PCI0 MEM0
+			m_ranges[10].start = m_regs[REG_PCI0_MEM0_BASE] << 16;
+			m_ranges[10].end = (m_regs[REG_PCI0_MEM0_BASE] << 16) + ((m_regs[REG_PCI0_MEM0_SIZE] << 16) | 0xffff);
+			m_cpu_space->install_read_handler (m_ranges[10].start, m_ranges[10].end, read32s_delegate(*this, FUNC(mv64361_device::pci0_mem0_r)));
+			m_cpu_space->install_write_handler(m_ranges[10].start, m_ranges[10].end, write32s_delegate(*this, FUNC(mv64361_device::pci0_mem0_w)));
+			m_ranges[10].enabled = true;
+			LOGMASKED(LOG_REG_MAPPING, "MAP %08x-%08x PCI0 MEM0 (remap: %08x %04x)\n", m_ranges[10].start, m_ranges[10].end, m_regs[REG_PCI0_MEM0_REMAP_HIGH], m_regs[REG_PCI0_MEM0_REMAP_LOW]);
+			break;
+
+		case 11: // PCI0 MEM1
+			m_ranges[11].start = m_regs[REG_PCI0_MEM1_BASE] << 16;
+			m_ranges[11].end = (m_regs[REG_PCI0_MEM1_BASE] << 16) + ((m_regs[REG_PCI0_MEM1_SIZE] << 16) | 0xffff);
+			m_cpu_space->install_read_handler (m_ranges[11].start, m_ranges[11].end, read32s_delegate(*this, FUNC(mv64361_device::pci0_mem1_r)));
+			m_cpu_space->install_write_handler(m_ranges[11].start, m_ranges[11].end, write32s_delegate(*this, FUNC(mv64361_device::pci0_mem1_w)));
+			m_ranges[11].enabled = true;
+			LOGMASKED(LOG_REG_MAPPING, "MAP %08x-%08x PCI0 MEM1 (remap: %08x %04x)\n", m_ranges[11].start, m_ranges[11].end, m_regs[REG_PCI0_MEM1_REMAP_HIGH], m_regs[REG_PCI0_MEM1_REMAP_LOW]);
+			break;
+
+		case 12: // PCI0 MEM2
+			m_ranges[12].start = m_regs[REG_PCI0_MEM2_BASE] << 16;
+			m_ranges[12].end = (m_regs[REG_PCI0_MEM2_BASE] << 16) + ((m_regs[REG_PCI0_MEM2_SIZE] << 16) | 0xffff);
+			m_cpu_space->install_read_handler (m_ranges[12].start, m_ranges[12].end, read32s_delegate(*this, FUNC(mv64361_device::pci0_mem2_r)));
+			m_cpu_space->install_write_handler(m_ranges[12].start, m_ranges[12].end, write32s_delegate(*this, FUNC(mv64361_device::pci0_mem2_w)));
+			m_ranges[12].enabled = true;
+			LOGMASKED(LOG_REG_MAPPING, "MAP %08x-%08x PCI0 MEM2 (remap: %08x %04x)\n", m_ranges[12].start, m_ranges[12].end, m_regs[REG_PCI0_MEM2_REMAP_HIGH], m_regs[REG_PCI0_MEM2_REMAP_LOW]);
+			break;
+
+		case 13: // PCI0 MEM3
+			m_ranges[13].start = m_regs[REG_PCI0_MEM3_BASE] << 16;
+			m_ranges[13].end = (m_regs[REG_PCI0_MEM3_BASE] << 16) + ((m_regs[REG_PCI0_MEM3_SIZE] << 16) | 0xffff);
+			m_cpu_space->install_read_handler (m_ranges[13].start, m_ranges[13].end, read32s_delegate(*this, FUNC(mv64361_device::pci0_mem3_r)));
+			m_cpu_space->install_write_handler(m_ranges[13].start, m_ranges[13].end, write32s_delegate(*this, FUNC(mv64361_device::pci0_mem3_w)));
+			m_ranges[13].enabled = true;
+			LOGMASKED(LOG_REG_MAPPING, "MAP %08x-%08x PCI0 MEM3 (remap: %08x %04x)\n", m_ranges[13].start, m_ranges[13].end, m_regs[REG_PCI0_MEM3_REMAP_HIGH], m_regs[REG_PCI0_MEM3_REMAP_LOW]);
+			break;
+
+		case 14: // PCI1 I/O
+			m_ranges[14].start = m_regs[REG_PCI1_IO_BASE] << 16;
+			m_ranges[14].end = (m_regs[REG_PCI1_IO_BASE] << 16) + ((m_regs[REG_PCI1_IO_SIZE] << 16) | 0xffff);
+			m_cpu_space->install_read_handler (m_ranges[14].start, m_ranges[14].end, read32s_delegate(*this, FUNC(mv64361_device::pci1_io_r)));
+			m_cpu_space->install_write_handler(m_ranges[14].start, m_ranges[14].end, write32s_delegate(*this, FUNC(mv64361_device::pci1_io_w)));
+			m_ranges[14].enabled = true;
+			LOGMASKED(LOG_REG_MAPPING, "MAP %08x-%08x PCI1 I/O (remap: %04x)\n", m_ranges[14].start, m_ranges[14].end, m_regs[REG_PCI1_IO_REMAP]);
+			break;
+
+		case 15: // PCI1 MEM0
+			m_ranges[15].start = m_regs[REG_PCI1_MEM0_BASE] << 16;
+			m_ranges[15].end = (m_regs[REG_PCI1_MEM0_BASE] << 16) + ((m_regs[REG_PCI1_MEM0_SIZE] << 16) | 0xffff);
+			m_cpu_space->install_read_handler (m_ranges[15].start, m_ranges[15].end, read32s_delegate(*this, FUNC(mv64361_device::pci1_mem0_r)));
+			m_cpu_space->install_write_handler(m_ranges[15].start, m_ranges[15].end, write32s_delegate(*this, FUNC(mv64361_device::pci1_mem0_w)));
+			m_ranges[15].enabled = true;
+			LOGMASKED(LOG_REG_MAPPING, "MAP %08x-%08x PCI1 MEM0 (remap: %08x %04x)\n", m_ranges[15].start, m_ranges[15].end, m_regs[REG_PCI1_MEM0_REMAP_HIGH], m_regs[REG_PCI1_MEM0_REMAP_LOW]);
+			break;
+
+		case 16: // PCI1 MEM1
+			m_ranges[16].start = m_regs[REG_PCI1_MEM1_BASE] << 16;
+			m_ranges[16].end = (m_regs[REG_PCI1_MEM1_BASE] << 16) + ((m_regs[REG_PCI1_MEM1_SIZE] << 16) | 0xffff);
+			m_cpu_space->install_read_handler (m_ranges[16].start, m_ranges[16].end, read32s_delegate(*this, FUNC(mv64361_device::pci1_mem1_r)));
+			m_cpu_space->install_write_handler(m_ranges[16].start, m_ranges[16].end, write32s_delegate(*this, FUNC(mv64361_device::pci1_mem1_w)));
+			m_ranges[16].enabled = true;
+			LOGMASKED(LOG_REG_MAPPING, "MAP %08x-%08x PCI1 MEM1 (remap: %08x %04x)\n", m_ranges[16].start, m_ranges[16].end, m_regs[REG_PCI1_MEM1_REMAP_HIGH], m_regs[REG_PCI1_MEM1_REMAP_LOW]);
+			break;
+
+		case 17: // PCI1 MEM2
+			m_ranges[17].start = m_regs[REG_PCI1_MEM2_BASE] << 16;
+			m_ranges[17].end = (m_regs[REG_PCI1_MEM2_BASE] << 16) + ((m_regs[REG_PCI1_MEM2_SIZE] << 16) | 0xffff);
+			m_cpu_space->install_read_handler (m_ranges[17].start, m_ranges[17].end, read32s_delegate(*this, FUNC(mv64361_device::pci1_mem2_r)));
+			m_cpu_space->install_write_handler(m_ranges[17].start, m_ranges[17].end, write32s_delegate(*this, FUNC(mv64361_device::pci1_mem2_w)));
+			m_ranges[17].enabled = true;
+			LOGMASKED(LOG_REG_MAPPING, "MAP %08x-%08x PCI1 MEM2 (remap: %08x %04x)\n", m_ranges[17].start, m_ranges[17].end, m_regs[REG_PCI1_MEM2_REMAP_HIGH], m_regs[REG_PCI1_MEM2_REMAP_LOW]);
+			break;
+
+		case 18: // PCI1 MEM3
+			m_ranges[18].start = m_regs[REG_PCI1_MEM3_BASE] << 16;
+			m_ranges[18].end = (m_regs[REG_PCI1_MEM3_BASE] << 16) + ((m_regs[REG_PCI1_MEM3_SIZE] << 16) | 0xffff);
+			m_cpu_space->install_read_handler (m_ranges[18].start, m_ranges[18].end, read32s_delegate(*this, FUNC(mv64361_device::pci1_mem3_r)));
+			m_cpu_space->install_write_handler(m_ranges[18].start, m_ranges[18].end, write32s_delegate(*this, FUNC(mv64361_device::pci1_mem3_w)));
+			m_ranges[18].enabled = true;
+			LOGMASKED(LOG_REG_MAPPING, "MAP %08x-%08x PCI1 MEM3 (remap: %08x %04x)\n", m_ranges[18].start, m_ranges[18].end, m_regs[REG_PCI1_MEM3_REMAP_HIGH], m_regs[REG_PCI1_MEM3_REMAP_LOW]);
+			break;
+
+		case 19: // SRAM
+			m_ranges[19].start = m_regs[REG_SRAM_BASE] << 16;
+			m_ranges[19].end = (m_regs[REG_SRAM_BASE] << 16) + 0x3ffff;
+			m_cpu_space->install_ram(m_ranges[19].start, m_ranges[19].end, m_sram.get());
+			m_ranges[19].enabled = true;
+			LOGMASKED(LOG_REG_MAPPING, "MAP %08x-%08x SRAM\n", m_ranges[19].start, m_ranges[19].end);
+			break;
+
+		case 20: // INTERNAL
+			m_ranges[20].start = m_regs[REG_INTERNAL_BASE] << 16;
+			m_ranges[20].end = (m_regs[REG_INTERNAL_BASE] << 16) + 0xffff;
+			m_cpu_space->install_device(m_ranges[20].start, m_ranges[20].end, *static_cast<mv64361_device *>(this), &mv64361_device::register_map);
+			m_ranges[20].enabled = true;
+			LOGMASKED(LOG_REG_MAPPING, "MAP %08x-%08x INTERNAL\n", m_ranges[20].start, m_ranges[20].end);
+			break;
 	}
+}
+
+void mv64361_device::unmap_window(int window)
+{
+	if (m_ranges[window].enabled)
+	{
+		m_cpu_space->unmap_readwrite(m_ranges[window].start, m_ranges[window].end);
+		m_ranges[window].enabled = false;
+	}
+}
+
+void mv64361_device::update_window(int window)
+{
+	unmap_window(window);
+	map_window(window);
+}
+
+void mv64361_device::update_windows()
+{
+	// undo current mappings
+	for (int i = 0; i < std::size(m_ranges); i++)
+		unmap_window(i);
+
+	// apply new mappings
+	for (int i = 0; i < std::size(m_ranges); i++)
+		map_window(i);
 }
 
 uint32_t mv64361_device::remap_offset(offs_t offset, uint16_t size, uint16_t remap)

@@ -25,7 +25,7 @@ vt8231_isa_device::vt8231_isa_device(const machine_config &mconfig, const char *
 	m_com1_txd_cb(*this), m_com1_dtr_cb(*this), m_com1_rts_cb(*this),
 	m_initialized(false)
 {
-	set_ids(0x11068231, 0x00, 0x060100, 0x00000000);
+	set_ids(0x11068231, 0x10, 0x060100, 0x00000000);
 }
 
 void vt8231_isa_device::device_add_mconfig(machine_config &config)
@@ -40,7 +40,11 @@ void vt8231_isa_device::device_start()
 {
 	pci_device::device_start();
 
-	// register for save states (TODO)
+	// register for save states
+	save_item(NAME(m_superio_cfg));
+	save_item(NAME(m_superio_cfg_idx));
+	save_item(NAME(m_baud_divisor));
+	save_item(NAME(m_initialized));
 }
 
 void vt8231_isa_device::device_reset()
@@ -106,6 +110,7 @@ void vt8231_isa_device::function_control_1_w(uint8_t data)
 
 void vt8231_isa_device::io_map(address_map &map)
 {
+	map(0x064, 0x067).noprw();
 	map(0x3f0, 0x3f0).rw(FUNC(vt8231_isa_device::superio_cfg_idx_r), FUNC(vt8231_isa_device::superio_cfg_idx_w));
 	map(0x3f1, 0x3f1).rw(FUNC(vt8231_isa_device::superio_cfg_data_r), FUNC(vt8231_isa_device::superio_cfg_data_w));
 }

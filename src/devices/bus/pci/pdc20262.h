@@ -48,7 +48,6 @@ private:
 	required_device<bus_master_ide_controller_device> m_ide1;
 	required_device<bus_master_ide_controller_device> m_ide2;
 	required_device<input_merger_device> m_irqs;
-	required_address_space m_bus_master_space;
 
 	u8 m_clock = 0;
 	u8 m_irq_state = 0;

@@ -44,8 +44,6 @@ pdc20262_device::pdc20262_device(const machine_config &mconfig, device_type type
 	, m_ide1(*this, "ide1")
 	, m_ide2(*this, "ide2")
 	, m_irqs(*this, "irqs")
-	// HACK: how to get to get_pci_busmaster_space()?
-	, m_bus_master_space(*this, ":maincpu", 0)
 {
 }
 
@@ -91,7 +89,6 @@ void pdc20262_device::device_add_mconfig(machine_config &config)
 		m_irq_state |= (state << 2);
 		m_irqs->in_w<0>(state);
 	});
-	m_ide1->set_bus_master_space(m_bus_master_space);
 
 	BUS_MASTER_IDE_CONTROLLER(config, m_ide2).options(ata_devices, nullptr, nullptr, false);
 	m_ide2->irq_handler().set([this] (int state) {
@@ -99,7 +96,6 @@ void pdc20262_device::device_add_mconfig(machine_config &config)
 		m_irq_state |= (state << 6);
 		m_irqs->in_w<1>(state);
 	});
-	m_ide2->set_bus_master_space(m_bus_master_space);
 }
 
 // $1f0
@@ -170,6 +166,15 @@ void pdc20262_device::extra_map(address_map &map)
 void pdc20262_device::device_start()
 {
 	pci_card_device::device_start();
+
+	// use the host bridge's bus master DMA space
+	address_space *const bus_master_space = get_pci_busmaster_space();
+	if (!bus_master_space)
+	{
+		throw emu_fatalerror("%s: PCI bus master address space not configured\n", tag());
+	}
+	m_ide1->set_bus_master_space(*bus_master_space);
+	m_ide2->set_bus_master_space(*bus_master_space);
 
 	add_map(8, M_IO, FUNC(pdc20262_device::ide1_command_map));
 	add_map(4, M_IO, FUNC(pdc20262_device::ide1_control_map));
