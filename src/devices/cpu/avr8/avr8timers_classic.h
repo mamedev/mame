@@ -296,6 +296,12 @@ protected:
     inline bool is_compare_c() { return is_compare<AVR8_TIMER_CMPCHANNEL_OC_C>(); }
     inline bool is_max_count() { return m_tcnt == max_count(); }
     inline bool is_min_count() { return m_tcnt == 0; }
+
+    // needed for cases in Timer 1 fast PWM mode where OCRxx == MAX
+    template <uint8_t Channel> inline bool is_ocr_max() { return m_ocr[Channel] == max_count(); }
+    inline bool is_ocr_a_max() { return is_ocr_max<AVR8_TIMER_CMPCHANNEL_OC_A>(); }
+    inline bool is_ocr_b_max() { return is_ocr_max<AVR8_TIMER_CMPCHANNEL_OC_B>(); }
+    inline bool is_ocr_c_max() { return is_ocr_max<AVR8_TIMER_CMPCHANNEL_OC_C>(); }
     
     // TODO: move into .cpp
     inline void reload_ocrs() { std::copy(m_ocr_buf.begin(), m_ocr_buf.end(), m_ocr.begin()); m_ocr_changed = false; }

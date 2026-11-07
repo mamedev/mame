@@ -542,21 +542,14 @@ void avr8_generic_8bit_timer_device::advance_normal()
     advance_normal_generic();
 }
 
-
 // TOP = OCRA
 // Update of OCRx is IMMEDIATE
 // TOV flag set on BOTTOM
 void avr8_generic_8bit_timer_device::advance_pwm()
 {
-    uint8_t next_count_value = m_dual_slope_counting_down ? prev_count() : next_count();
-    uint8_t count_limit = m_dual_slope_counting_down ? 0 : max_count();
-
     if (is_compare_a())
     {
-        if (m_ocr[AVR8_TIMER_CMPCHANNEL_OC_A] != max_count())
-        {
-            raise_ocf_a();
-        }
+        raise_ocf_a();
 
         if (m_dual_slope_counting_down)
         {
@@ -570,6 +563,8 @@ void avr8_generic_8bit_timer_device::advance_pwm()
 
     if (is_compare_b())
     {
+        raise_ocf_b();
+
         if (m_dual_slope_counting_down)
         {
             update_oc_generic_notoggle_inverse<AVR8_TIMER_CMPCHANNEL_OC_B>();
@@ -585,12 +580,16 @@ void avr8_generic_8bit_timer_device::advance_pwm()
         raise_tov();
     }
 
-    if (next_count_value == count_limit)
+    if (!m_dual_slope_counting_down && m_tcnt == max_count())
     {
-        m_dual_slope_counting_down = !m_dual_slope_counting_down;
+        m_dual_slope_counting_down = true;
+    }
+    else if (m_dual_slope_counting_down && is_min_count())
+    {
+        m_dual_slope_counting_down = false;
     }
 
-    m_tcnt = next_count_value;
+    m_tcnt = m_dual_slope_counting_down ? prev_count() : next_count();
 }
 
 // TOP = OCRA
@@ -626,15 +625,9 @@ void avr8_generic_8bit_timer_device::advance_ctc()
 // TOV flag set on MAX (so if OCRA is hit, no interrupt is generated)
 void avr8_generic_8bit_timer_device::advance_pwm_ocr_a()
 {
-    uint8_t next_count_value = m_dual_slope_counting_down ? prev_count() : next_count();
-
     if (is_compare_a())
     {
-        // TODO: confirm this; datasheet phrasing is a bit odd
-        if (m_ocr[AVR8_TIMER_CMPCHANNEL_OC_A] != max_count())
-        {
-            raise_ocf_a();
-        }
+        raise_ocf_a();
 
         // OCR mode has WGM02 = 1; so toggling is allowed
         if (m_dual_slope_counting_down)
@@ -649,34 +642,40 @@ void avr8_generic_8bit_timer_device::advance_pwm_ocr_a()
 
     if (is_compare_b())
     {
-        // TODO: confirm this; datasheet phrasing is a bit odd
-        if (m_ocr[AVR8_TIMER_CMPCHANNEL_OC_B] != max_count())
-        {
-            raise_ocf_b();
-        }
+        raise_ocf_b();
 
         // COMxB of 0b01 is reserved/illegal, so do not allow toggling in this mode
         if (m_dual_slope_counting_down)
         {
-            update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_A>();
+            update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_B>();
         }
         else
         {
-            update_oc_generic_notoggle_inverse<AVR8_TIMER_CMPCHANNEL_OC_A>();
+            update_oc_generic_notoggle_inverse<AVR8_TIMER_CMPCHANNEL_OC_B>();
         }
     }
 
-    if (m_dual_slope_counting_down && next_count_value == 0)
-    {
-        m_dual_slope_counting_down = !m_dual_slope_counting_down;
-    }
-    else if (is_min_count())
+    if (is_min_count())
     {
         // TOV raised at BOTTOM
         raise_tov();
     }
 
-    m_tcnt = next_count_value;
+    if (!(is_compare_a() && is_min_count()))
+    {
+        if ((m_dual_slope_counting_down && will_prev_count_reach_bottom()) ||
+            (!m_dual_slope_counting_down && is_compare_a()))
+        {
+            m_dual_slope_counting_down = !m_dual_slope_counting_down;
+        }
+
+        m_tcnt = m_dual_slope_counting_down ? prev_count() : next_count();
+    }
+    else
+    {
+        m_tcnt = 0;
+        m_dual_slope_counting_down = false;
+    }
 }
 
 // TOP = MAX
@@ -686,22 +685,16 @@ void avr8_generic_8bit_timer_device::advance_fast_pwm()
 {
     // special case: if OCRxx == TOP, then the compare match is ignored.
     // See https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf
-    // Figure 15-6 
+    // Figure 15-6
 	if (is_compare_a() && m_ocr[AVR8_TIMER_CMPCHANNEL_OC_A] != max_count())
 	{
         raise_ocf_a();
-
-        // toggle is disabled in this mode (WGMx2 is 0)
-        update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_A>();
 	}
 	
     // same as above
     if (is_compare_b() && m_ocr[AVR8_TIMER_CMPCHANNEL_OC_B] != max_count())
 	{
         raise_ocf_b();
-
-        // OCxB is set to normal value on compare; COMxB of 0b01 is reserved/illegal
-        update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_B>();
 	}
 
 	if (will_next_count_overflow())
@@ -716,6 +709,16 @@ void avr8_generic_8bit_timer_device::advance_fast_pwm()
         update_oc_generic_notoggle_inverse<AVR8_TIMER_CMPCHANNEL_OC_B>();
     }
     
+    if (is_compare_a())
+    {
+        update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_A>();
+    }
+
+    if (is_compare_b())
+    {
+        update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_B>();
+    }
+
     m_tcnt = next_count();
 }
 
@@ -727,7 +730,6 @@ void avr8_generic_8bit_timer_device::advance_fast_pwm_ocr_a()
     bool hit_top = false;
     if (is_compare_a())
     {
-        update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_A>();
         hit_top = true;
         raise_ocf_a();
         raise_tov(); // since TOP was hit and we are about to wrap
@@ -743,6 +745,12 @@ void avr8_generic_8bit_timer_device::advance_fast_pwm_ocr_a()
     {
         update_oc_generic_notoggle_inverse<AVR8_TIMER_CMPCHANNEL_OC_A>();
         update_oc_generic_notoggle_inverse<AVR8_TIMER_CMPCHANNEL_OC_B>();
+    }
+
+    // has to be done last because of an edge case where OCRxA is 0
+    if (hit_top)
+    {
+        update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_A>();
     }
 
     m_tcnt = hit_top ? 0 : next_count();
@@ -894,7 +902,6 @@ void avr8_generic_t0_timer_device::tcnt_w(uint8_t data)
     m_no_compare_this_cycle = true;
 }
 
-
 void avr8_megaavr_timer_0_device::tccr_b_w(uint8_t data)
 {
     LOGMASKED(LOG_TIMER0, "tccr_b_w: %02x\n", data);
@@ -1045,7 +1052,6 @@ void avr8_generic_timer_1_device::tick()
     m_no_compare_this_cycle = false; // because the current timer cycle has ended
 }
 
-
 void avr8_generic_timer_1_device::advance_normal()
 {
     // this is basically the same as timer 0's advance_normal(), but 16-bit.
@@ -1075,8 +1081,6 @@ void avr8_generic_timer_1_device::advance_normal()
 
 void avr8_generic_timer_1_device::advance_pwm_common(uint16_t top)
 { 
-    uint8_t next_count_value = m_dual_slope_counting_down ? prev_count() : next_count();
-   
     if (is_compare_a())
     {
         raise_ocf_a();
@@ -1104,18 +1108,21 @@ void avr8_generic_timer_1_device::advance_pwm_common(uint16_t top)
             update_oc_generic_notoggle_inverse<AVR8_TIMER_CMPCHANNEL_OC_C>();
     }
 
-    if ((m_dual_slope_counting_down && will_prev_count_reach_bottom()) ||
-        (!m_dual_slope_counting_down && next_count_value == top))
-    {
-        // toggle direction when about to hit TOP or BOTTOM
-        m_dual_slope_counting_down = !m_dual_slope_counting_down;
-    }
-    else if (is_min_count())
+    if (is_min_count())
     {
         raise_tov();
     }
 
-    m_tcnt = next_count_value;
+    if (!m_dual_slope_counting_down && m_tcnt == top)
+    {
+        m_dual_slope_counting_down = true;
+    }
+    else if (m_dual_slope_counting_down && is_min_count())
+    {
+        m_dual_slope_counting_down = false;
+    }
+
+    m_tcnt = m_dual_slope_counting_down ? prev_count() : next_count();
 }
 
 void avr8_generic_timer_1_device::advance_pwm_8bit()
@@ -1135,19 +1142,14 @@ void avr8_generic_timer_1_device::advance_pwm_10bit()
 
 void avr8_generic_timer_1_device::advance_pwm_ocr_a()
 {
-    bool new_counting_direction = m_dual_slope_counting_down;
+    uint16_t top = m_ocr[AVR8_TIMER_CMPCHANNEL_OC_A];
     if (is_compare_a())
     {
         raise_ocf_a();
-        if (!m_dual_slope_counting_down)
-        {
-            update_oc_generic_notoggle_inverse<AVR8_TIMER_CMPCHANNEL_OC_A>();            
-            new_counting_direction = true;
-        }
-        else
-        {
+        if (m_dual_slope_counting_down)
             update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_A>();
-        }
+        else
+            update_oc_generic_notoggle_inverse<AVR8_TIMER_CMPCHANNEL_OC_A>();
     }
 
     if (is_compare_b())
@@ -1168,37 +1170,36 @@ void avr8_generic_timer_1_device::advance_pwm_ocr_a()
             update_oc_generic_notoggle_inverse<AVR8_TIMER_CMPCHANNEL_OC_C>();
     }
 
-    if (m_dual_slope_counting_down && is_min_count())
+    if (is_min_count())
     {
-        new_counting_direction = false;
         raise_tov();
     }
-   
-    m_dual_slope_counting_down = new_counting_direction;
-    m_tcnt = m_dual_slope_counting_down ? prev_count() : next_count();
+
+    if (!m_dual_slope_counting_down && m_tcnt == top)
+    {
+        m_dual_slope_counting_down = true;
+    }
+    else if (m_dual_slope_counting_down && is_min_count())
+    {
+        m_dual_slope_counting_down = false;
+    }
+
+    if (!(is_compare_a() && is_min_count()))
+    {
+        m_tcnt = m_dual_slope_counting_down ? prev_count() : next_count();
+    }
+    else
+    {
+        m_tcnt = 0;
+        m_dual_slope_counting_down = false;
+    }
 }
 
 void avr8_generic_timer_1_device::advance_fast_pwm_common(uint16_t top)
 {
-    bool will_increment = true;
-
-    if (is_compare_a())
-    {
-        raise_ocf_a();
-        update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_A>();
-    }
-
-    if (is_compare_b())
-    {
-        raise_ocf_b();
-        update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_B>();
-    }
-
-    if (m_ocr_c_enabled && is_compare_c())
-    {
-        raise_ocf_c();
-        update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_C>();
-    }
+    // there is an edge case in fixed resolution mode where OCFxx interrupts will not be raised
+    // if OCRxx == MAX, but the flags will still be.
+    bool fixed_resolution = top != max_count();
 
     if (is_min_count())
     {
@@ -1207,14 +1208,42 @@ void avr8_generic_timer_1_device::advance_fast_pwm_common(uint16_t top)
         if (m_ocr_c_enabled) update_oc_generic_notoggle_inverse<AVR8_TIMER_CMPCHANNEL_OC_C>();
     }
 
+    if (is_compare_a())
+    {
+        if (!fixed_resolution || !is_ocr_a_max())
+        {
+            raise_ocf_a();
+        }
+        update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_A>();
+    }
+
+    if (is_compare_b())
+    {
+        if (!fixed_resolution || !is_ocr_b_max())
+        {
+            raise_ocf_b();
+        }
+        update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_B>();
+    }
+
+    if (m_ocr_c_enabled && is_compare_c())
+    {
+        if (!fixed_resolution || !is_ocr_c_max())
+        {
+            raise_ocf_c();
+        }
+        update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_C>();
+    }
+
     if ((m_tcnt & max_count()) == top)
     {
         raise_tov();
         m_tcnt = 0;
-        will_increment = false;
     }
-
-    if (will_increment) m_tcnt = next_count();
+    else
+    {
+        m_tcnt = next_count();
+    }
 }
 
 void avr8_generic_timer_1_device::advance_fast_pwm_8bit()
@@ -1276,7 +1305,7 @@ void avr8_generic_timer_1_device::advance_ctc_icr()
     if (m_tcnt == m_icr)
     {
         is_wrapping = true;
-        raise_icf();   
+        raise_icf();
     }
 
     if (is_compare_a())
@@ -1302,38 +1331,7 @@ void avr8_generic_timer_1_device::advance_ctc_icr()
 
 void avr8_generic_timer_1_device::advance_fast_pwm_ocr_a()
 {
-    bool is_wrapping = false;
-
-    if (is_min_count())
-    {
-        update_oc_generic_notoggle_inverse<AVR8_TIMER_CMPCHANNEL_OC_A>();
-        update_oc_generic_notoggle_inverse<AVR8_TIMER_CMPCHANNEL_OC_B>();
-        if (m_ocr_c_enabled) update_oc_generic_notoggle_inverse<AVR8_TIMER_CMPCHANNEL_OC_C>();
-    }
-
-    if (is_compare_a())
-    {
-        raise_tov();
-        raise_ocf_a();
-
-        update_oc_generic<AVR8_TIMER_CMPCHANNEL_OC_A>();
-        is_wrapping = true;
-    }
-
-    if (is_compare_b())
-    {
-        raise_ocf_b();
-        update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_B>();
-    }
-    
-    if (m_ocr_c_enabled && is_compare_c())
-    {
-        raise_ocf_c();
-        update_oc_generic_notoggle<AVR8_TIMER_CMPCHANNEL_OC_C>();
-    }
-
-    // in all other cases, just keep ticking the timer upwards
-    m_tcnt = is_wrapping ? 0 : next_count();
+    advance_fast_pwm_common(m_ocr[AVR8_TIMER_CMPCHANNEL_OC_A]);
 }
 
 void avr8_generic_timer_1_device::advance_fast_pwm_icr()
@@ -1566,7 +1564,7 @@ bool avr8_generic_timer_1_device::should_reload_ocrs()
             return (m_tcnt & max_count()) == 0x3ff; // update at TOP (=0x03ff)
 
         case GENERIC_TIMER1_WGM_PWM_ICR1:
-            return false; // (m_tcnt & max_count()) == m_icr; // update at TOP (=ICR)
+            return (m_tcnt & max_count()) == m_icr; // update at TOP (=ICR)
 
         case GENERIC_TIMER1_WGM_PWM_OCR1A:
             return (m_tcnt & max_count()) == m_ocr[AVR8_TIMER_CMPCHANNEL_OC_A]; // update at TOP (=OCRxA)
