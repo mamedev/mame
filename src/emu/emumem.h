@@ -2553,6 +2553,9 @@ public:
 
 	std::string compare(u8 width, size_t bytes, endianness_t endianness) const;
 
+	void record_mapping(size_t offset, size_t bytes);
+	std::string validate_mapping() const;
+
 private:
 	// internal state
 	std::string             m_name;                 // share name
@@ -2562,6 +2565,10 @@ private:
 	u8                      m_bitwidth;             // width of the shared region in bits
 	u8                      m_bytewidth;            // width in bytes, rounded up to a power of 2
 
+	// range tracking for validation
+	bool                    m_mapped = false;       // any range recorded?
+	size_t                  m_mapped_min = 0;       // minimum offset recorded
+	size_t                  m_mapped_max = 0;       // maximum offset + size - 1 recorded
 };
 
 
