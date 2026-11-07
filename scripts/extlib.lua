@@ -20,6 +20,7 @@ local extlibs = {
 	glm        = { "glm",       "3rdparty/glm" },
 	rapidjson  = { "rapidjson", "3rdparty/rapidjson/include" },
 	pugixml    = { "pugixml",   "3rdparty/pugixml/src" },
+	openh264   = { "openh264",  "3rdparty/openh264"},
 }
 
 -- system lib options
@@ -91,6 +92,11 @@ newoption {
 newoption {
 	trigger = "with-system-pugixml",
 	description = "Use system pugixml library",
+}
+
+newoption {
+	trigger = "with-system-openh264",
+	description = "Use system openh264 libary",
 }
 
 -- build helpers
