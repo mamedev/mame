@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+Imaged by Marcos Velasco on 2016-10-28 from an original disk donated by
+Aryldo Russo.
+-->
+<softwarelist name="i7000_flop" description="Itautec I-7000 5.25&quot; floppy disks">
+	<software name="simm">
+		<description>SIM/M V1.3 R01</description>
+		<year>1984</year>
+		<publisher>Itautec</publisher>
+		<info name="usage" value="Press E at the boot menu" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="136179">
+				<rom name="simm.imd" size="136179" crc="b86a49da" sha1="751c7afe6f895852e39743f15763928d29b70f4f" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>
