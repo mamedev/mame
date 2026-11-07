@@ -331,6 +331,9 @@ void sh_mtu_channel_device::tier_w(u8 data)
 
 u8 sh_mtu_channel_device::tsr_r()
 {
+	// Matches without an enabled interrupt only raise their flag in update_counter
+	if(!machine().side_effects_disabled())
+		update_counter();
 	return m_tsr;
 }
 
