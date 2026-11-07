@@ -105,6 +105,8 @@ private:
 	inline void update_curs_timer(bool state);
 	inline void update_drb_timer(bool state);
 	inline void update_dma_timer();
+	inline attotime frame_period() const;
+	inline void update_frame_timer();
 
 	inline void recompute_cursor();
 	inline void recompute_parameters();
