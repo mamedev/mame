@@ -1056,6 +1056,50 @@ macro   nsc800:check_interrupts
 		@take_interrupt
 	}
 
+macro   le1080a_take_interrupt
+	// Check if processor was halted
+	leave_halt();
+	// IRQ2/PFI appears to be NMI-like in one important respect on LE1080A V1:
+	// software expects LD A,I in the power-fail handler to reflect the pre-PFI
+	// IFF2 state. Preserve IFF2 for IRQ2, while IRQ1/IRQ0 keep normal IRQ semantics.
+	if (m_irq2_line_state != CLEAR_LINE && irq2_enabled()) {
+		m_iff2 = m_iff1;
+		m_iff1 = 0;
+		// 'interrupt latency' cycles
+		+ 7
+		LOGMASKED(LOG_IRQ, "%s: LE1080A IRQ2 ACCEPT vector=%04X PC=%04X\n",
+			machine().describe_context(), m_irq2_vector, pc());
+		@wm16_sp PC
+		PC = m_irq2_vector;
+		m_irq2_line_state = CLEAR_LINE;
+	} else if (m_irq1_line_state != CLEAR_LINE && irq1_enabled()) {
+		// Normal IRQ semantics for IRQ1/IRQ0.
+		m_iff1 = m_iff2 = 0;
+		// 'interrupt latency' cycles
+		+ 7
+		@wm16_sp PC
+		PC = m_irq1_vector;
+		m_irq1_line_state = CLEAR_LINE;
+	} else if (m_irq0_line_state != CLEAR_LINE && irq0_enabled()) {
+		@wm16_sp PC
+		PC = m_irq0_vector;
+		m_irq0_line_state = CLEAR_LINE;
+	} else {
+		+ 2 * m_mreq_cycles
+		;
+	}
+	WZ = PC;
+	if (m_irq0_line_state == CLEAR_LINE && m_irq1_line_state == CLEAR_LINE && m_irq2_line_state == CLEAR_LINE)
+		set_service_attention<SA_LE1080A_IRQ_ON, 0>();
+	if (HAS_LDAIR_QUIRK)
+		// reset parity flag after LD A,I or LD A,R
+		if (get_service_attention<SA_AFTER_LDAIR>()) m_f.pv_val = !0;
+
+macro   le1080a:check_interrupts
+	if (get_service_attention<SA_LE1080A_IRQ_ON>() && m_iff1 && !get_service_attention<SA_AFTER_EI>()) {
+		@le1080a_take_interrupt
+	}
+
 
 ##########################################################
 # ROP
