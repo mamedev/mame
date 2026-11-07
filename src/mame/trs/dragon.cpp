@@ -225,10 +225,10 @@ void d64plus_state::d64plus_bank_w(uint8_t data)
 
 void d64plus_state::update_ram_banks()
 {
-	uint8_t *const pram = m_pram_select ? &m_plus_ram[(m_pram_select - 1) * 0x8000] : m_ram->pointer();
-	m_sam->map_ram(0x0000, 0x7fff, pram, pram);
-	if (m_vram_select)
-		m_sam->map_ram(0x0000, 0x07ff, &m_video_ram[0], &m_video_ram[0]);
+	// entries 0-2 are standard RAM and the two extra 32K banks; entry 3 of
+	// the low bank is video RAM
+	m_sam->select_ram_bank(0x0000, m_vram_select ? 3 : m_pram_select);
+	m_sam->select_ram_bank(0x0800, m_pram_select);
 }
 
 
@@ -262,6 +262,16 @@ MC6845_UPDATE_ROW(d64plus_state::crtc_update_row)
 void d64plus_state::machine_start()
 {
 	dragon64_state::machine_start();
+
+	std::vector<std::pair<uint8_t *, uint8_t *> > low, high;
+	for (uint8_t *const pram : { m_ram->pointer(), &m_plus_ram[0x0000], &m_plus_ram[0x8000] })
+	{
+		low.emplace_back(pram, pram);
+		high.emplace_back(pram + 0x0800, pram + 0x0800);
+	}
+	low.emplace_back(&m_video_ram[0], &m_video_ram[0]);
+	m_sam->configure_ram_bank(0x0000, 0x07ff, std::move(low));
+	m_sam->configure_ram_bank(0x0800, 0x7fff, std::move(high));
 
 	save_item(NAME(m_pram_select));
 	save_item(NAME(m_vram_select));

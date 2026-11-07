@@ -63,8 +63,12 @@ void deluxecoco_state::deluxecoco_rom2(address_map &map)
 	// $C000-$FEFF
 	// the SAM installs this map at $C000, so it can't use a view
 	map(0x0000, 0x3eff).lrw8(
-			NAME([this] (offs_t offset) { return m_rom_select ? m_rom[0x4000 + offset] : m_cococart->cts_read(offset); }),
-			NAME([this] (offs_t offset, uint8_t data) { if (!m_rom_select) m_cococart->cts_write(offset, data); }));
+			NAME([this] (offs_t offset) -> uint8_t { return m_rom_select ? m_rom[0x4000 + offset] : m_cococart->cts_read(offset); }),
+			NAME([this] (offs_t offset, uint8_t data)
+			{
+				if (!m_rom_select)
+					m_cococart->cts_write(offset, data);
+			}));
 }
 
 void coco12_state::coco_io0(address_map &map)

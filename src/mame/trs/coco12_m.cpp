@@ -101,6 +101,16 @@ void deluxecoco_state::machine_start()
 {
 	coco12_state::machine_start();
 
+	// bit 2 points physical RAM $4000-$7FFF at one of the four 16K blocks
+	if (m_ram->size() >= 0x10000)
+	{
+		std::vector<std::pair<uint8_t *, uint8_t *> > blocks;
+		for (int i = 0; i < 4; i++)
+			blocks.emplace_back(m_ram->pointer() + (i * 0x4000), m_ram->pointer() + (i * 0x4000));
+		m_sam->configure_ram_bank(0x4000, 0x7fff, std::move(blocks));
+		update_ram_bank();
+	}
+
 	save_item(NAME(m_ram_bank_select));
 	save_item(NAME(m_rom_select));
 	machine().save().register_postload(save_prepost_delegate(FUNC(deluxecoco_state::update_ram_bank), this));
@@ -114,12 +124,10 @@ void deluxecoco_state::machine_start()
 
 void deluxecoco_state::update_ram_bank()
 {
-	// bit 2 points physical RAM $4000-$7FFF at one of the four 16K blocks
 	if (m_ram->size() < 0x10000)
 		return;
 
-	uint8_t *const block = m_ram->pointer() + (BIT(m_ram_bank_select, 2) ? ((m_ram_bank_select & 0x03) * 0x4000) : 0x4000);
-	m_sam->map_ram(0x4000, 0x7fff, block, block);
+	m_sam->select_ram_bank(0x4000, BIT(m_ram_bank_select, 2) ? (m_ram_bank_select & 0x03) : 1);
 }
 
 

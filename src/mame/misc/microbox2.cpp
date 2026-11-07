@@ -116,7 +116,7 @@ void microbx2_state::update_map()
 {
 	// RAM space: ROM is read over $F000-$FFFF, and over $E000-$EFFF when mapped;
 	// writes always reach RAM
-	m_sam->map_ram(0xe000, 0xefff, m_map ? &m_rom[0x0000] : &m_ram[0xe000], &m_ram[0xe000]);
+	m_sam->select_ram_bank(0xe000, m_map ? 1 : 0);
 }
 
 void microbx2_state::rom0_map(address_map &map)
@@ -217,6 +217,7 @@ void microbx2_state::machine_start()
 
 	m_sam->map_ram(0x0000, 0xffff, &m_ram[0], &m_ram[0]);
 	m_sam->map_ram(0xf000, 0xffff, &m_rom[0x1000], &m_ram[0xf000]);
+	m_sam->configure_ram_bank(0xe000, 0xefff, { { &m_ram[0xe000], &m_ram[0xe000] }, { &m_rom[0x0000], &m_ram[0xe000] } });
 	update_map();
 
 	save_item(NAME(m_eprom_addr));

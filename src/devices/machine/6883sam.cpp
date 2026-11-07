@@ -58,6 +58,9 @@
 #include "emu.h"
 #include "6883sam.h"
 
+#include <algorithm>
+#include <utility>
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -102,6 +105,7 @@ sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, d
 	, m_low_view(*this, "low_view")
 	, m_high_view(*this, "high_view")
 {
+	std::fill(std::begin(m_ram_page_bank), std::end(m_ram_page_bank), -1);
 }
 
 sam6883_friend_device_interface::sam6883_friend_device_interface(const machine_config &mconfig, device_t &device, int divider)
@@ -195,8 +199,10 @@ void sam6883_device::amap(address_map &map)
 			map(start, end).m(owner(), m_maps[select]);
 	};
 
-	// ROM1 also supplies the vectors; the ranges below cover the rest of it
+	// ROM1 also supplies the vectors at $FFE0-$FFFF (ROM1 offsets $1FE0-$1FFF);
+	// unmap the rest so gaps in the other select windows stay unmapped
 	host_map(2, 0xe000, 0xffff);
+	map(0xe000, 0xffdf).unmaprw();
 	host_map(1, 0x8000, 0x9fff);
 	host_map(2, 0xa000, 0xbfff);
 	host_map(3, 0xc000, 0xfeff);
@@ -221,18 +227,101 @@ void sam6883_device::amap(address_map &map)
 
 void sam6883_device::map_ram(offs_t start, offs_t end, uint8_t *read, uint8_t *write)
 {
+	check_ram_range(start, end);
+	set_ram_pages(start, end, read, write);
+
+	if (started())
+		install_ram_views();
+}
+
+
+//-------------------------------------------------
+//  configure_ram_bank - set up switchable
+//  physical RAM, installed once as memory banks
+//-------------------------------------------------
+
+void sam6883_device::configure_ram_bank(offs_t start, offs_t end, std::vector<std::pair<uint8_t *, uint8_t *> > entries)
+{
+	check_ram_range(start, end);
+	if (entries.empty() || (m_ram_banks.size() >= 127))
+		throw emu_fatalerror("%s: bad RAM bank $%04X-$%04X\n", tag(), start, end);
+	for (auto const &entry : entries)
+	{
+		if (!entry.first || !entry.second)
+			throw emu_fatalerror("%s: RAM bank $%04X-$%04X has a null entry\n", tag(), start, end);
+	}
+
+	int const index = m_ram_banks.size();
+	ram_bank &bank = m_ram_banks.emplace_back();
+	bank.start = start;
+	bank.end = end;
+	bank.read = machine().memory().bank_alloc(*this, util::string_format("rambank%d_r", index));
+	bank.write = machine().memory().bank_alloc(*this, util::string_format("rambank%d_w", index));
+	for (int i = 0; i < entries.size(); i++)
+	{
+		bank.read->configure_entry(i, entries[i].first);
+		bank.write->configure_entry(i, entries[i].second);
+	}
+	bank.entries = std::move(entries);
+
+	for (offs_t page = start >> 8; page <= (end >> 8); page++)
+		m_ram_page_bank[page] = index;
+	select_ram_bank(start, 0);
+
+	if (started())
+		install_ram_views();
+}
+
+
+//-------------------------------------------------
+//  select_ram_bank - switch a configured range
+//  of physical RAM
+//-------------------------------------------------
+
+void sam6883_device::select_ram_bank(offs_t start, int entry)
+{
+	int const index = m_ram_page_bank[(start >> 8) & 0xff];
+	if ((index < 0) || (m_ram_banks[index].start != start) || (entry < 0) || (entry >= m_ram_banks[index].entries.size()))
+		throw emu_fatalerror("%s: RAM bank $%04X entry %d does not exist\n", tag(), start, entry);
+
+	ram_bank &bank = m_ram_banks[index];
+	bank.read->set_entry(entry);
+	bank.write->set_entry(entry);
+	set_ram_pages(bank.start, bank.end, bank.entries[entry].first, bank.entries[entry].second);
+}
+
+
+//-------------------------------------------------
+//  check_ram_range - validate a physical RAM
+//  range
+//-------------------------------------------------
+
+void sam6883_device::check_ram_range(offs_t start, offs_t end)
+{
 	if ((start & 0xff) || ((end & 0xff) != 0xff) || (end < start) || (end > 0xffff))
 		throw emu_fatalerror("%s: RAM range $%04X-$%04X is not 256 byte aligned\n", tag(), start, end);
 
+	for (offs_t page = start >> 8; page <= (end >> 8); page++)
+	{
+		if (m_ram_page_bank[page] >= 0)
+			throw emu_fatalerror("%s: RAM range $%04X-$%04X overlaps a RAM bank\n", tag(), start, end);
+	}
+}
+
+
+//-------------------------------------------------
+//  set_ram_pages - update the page tables used
+//  by the display and RAM write tap
+//-------------------------------------------------
+
+void sam6883_device::set_ram_pages(offs_t start, offs_t end, uint8_t *read, uint8_t *write)
+{
 	for (offs_t page = start >> 8; page <= (end >> 8); page++)
 	{
 		offs_t const offset = (page << 8) - start;
 		m_ram_read[page] = read ? (read + offset) : nullptr;
 		m_ram_write[page] = write ? (write + offset) : nullptr;
 	}
-
-	if (started())
-		install_ram_views();
 }
 
 
@@ -249,9 +338,28 @@ void sam6883_device::install_ram(memory_view::memory_view_entry &entry, offs_t s
 		offs_t address = start;
 		while (address <= end)
 		{
-			uint8_t *const base = pages[(physical + address - start) >> 8];
+			offs_t const page = (physical + address - start) >> 8;
+			int const bank_index = m_ram_page_bank[page];
+			if (bank_index >= 0)
+			{
+				// switchable RAM: install the whole range as a bank
+				ram_bank const &bank = m_ram_banks[bank_index];
+				offs_t const last = address + (bank.end - bank.start);
+				if (((page << 8) != bank.start) || (last > end))
+					throw emu_fatalerror("%s: RAM bank $%04X-$%04X straddles a view\n", tag(), bank.start, bank.end);
+				if (write)
+					entry.install_write_bank(address, last, bank.write);
+				else
+					entry.install_read_bank(address, last, bank.read);
+				address = last + 1;
+				continue;
+			}
+
+			uint8_t *const base = pages[page];
 			offs_t last = std::min<offs_t>(address | 0xff, end);
-			while ((last < end) && (pages[(physical + last + 1 - start) >> 8] == (base ? (base + (last + 1 - address)) : nullptr)))
+			while ((last < end)
+					&& (m_ram_page_bank[(physical + last + 1 - start) >> 8] < 0)
+					&& (pages[(physical + last + 1 - start) >> 8] == (base ? (base + (last + 1 - address)) : nullptr)))
 				last = std::min<offs_t>(last + 0x100, end);
 
 			if (write)
@@ -483,7 +591,7 @@ void sam6883_device::update_ad_tap()
 	if (rate_ad && !m_ad_tap_installed)
 	{
 		auto const tap = [this] (offs_t offset, uint8_t &data, uint8_t mem_mask) { address_dependent_rate(offset); };
-		m_ad_tap = m_cpu->space(AS_PROGRAM).install_readwrite_tap(0x0000, 0xffff, "sam_ad_rate", tap, tap);
+		m_ad_tap = m_cpu->space(AS_PROGRAM).install_readwrite_tap(0x0000, 0xffff, "sam_ad_rate", tap, tap, &m_ad_tap);
 		m_ad_tap_installed = true;
 	}
 	else if (!rate_ad && m_ad_tap_installed)
