@@ -80,7 +80,6 @@ private:
 	void dp_mem_write(offs_t offset, u8 data);
 
 	std::unique_ptr<u8[]> m_ram;
-	u8 m_prom[16];
 };
 
 class nubus_asntmc3nb_device : public nubus_mac8390_device
@@ -176,11 +175,9 @@ void nubus_mac8390_device::device_start()
 	const u32 slotspace = get_slotspace();
 	u8 mac[6];
 	u32 num = machine().rand();
-	memset(m_prom, 0x57, 16);
 	mac[2] = 0x1b;
 	put_u24be(mac+3, num);
 	mac[0] = mac[1] = 0;  // avoid gcc warning
-	memcpy(m_prom, mac, 6);
 	m_dp83902->set_mac(mac);
 
 	m_ram = std::make_unique<u8[]>(0x10000);
@@ -215,7 +212,6 @@ void pdslc_macconilc_device::device_start()
 void nubus_mac8390_device::device_reset()
 {
 	m_dp83902->dp8390_reset(0);
-	memcpy(m_prom, &m_dp83902->get_mac()[0], 6);
 }
 
 void nubus_mac8390_device::asntm3b_ram_w(offs_t offset, u8 data)
