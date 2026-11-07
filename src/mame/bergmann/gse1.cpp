@@ -39,6 +39,9 @@ PIO 2x Z0842004PSC
 CTC 2x Z0843004PSC
 SERIAL 8251A + HD-4702 (unpopulated)
 
+Fanpage with technical details:
+http://www.baersch-online.de/tech1984.htm
+
 TODO:
 Coin sequencing (string and security sensors)
 Spinning discs (both position detection and layout)
