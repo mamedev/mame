@@ -134,9 +134,8 @@ void f108_device::device_reset()
 	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
 }
 
-u32 f108_device::rom_switch_r(offs_t offset)
+void f108_device::overlay_off()
 {
-	// disable the overlay
 	if (m_overlay && !machine().side_effects_disabled())
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -147,6 +146,12 @@ u32 f108_device::rom_switch_r(offs_t offset)
 		space.install_ram(0x00000000, memory_end & ~memory_mirror, memory_mirror, memory_data);
 		m_overlay = false;
 	}
+}
+
+u32 f108_device::rom_switch_r(offs_t offset)
+{
+	// disable the overlay
+	overlay_off();
 
 	return m_rom_ptr ? m_rom_ptr[offset & ((m_rom_size - 1) >> 2)] : 0;
 }

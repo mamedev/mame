@@ -39,6 +39,8 @@ public:
 
 	auto write_ata_irq() { return m_ata_irq.bind(); }
 
+	void overlay_off();
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
