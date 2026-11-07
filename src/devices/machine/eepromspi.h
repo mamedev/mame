@@ -16,9 +16,10 @@ public:
 	void cs_w(int state);
 	void sck_w(int state);
 	void si_w(int state) { m_si = bool(state); }
-	int so_r() const { return (m_cs || !m_hold) ? 1 : m_so; }
+	int so_r() const { return (m_cs || m_held) ? 1 : m_so; }
 	void wp_w(int state);
 	void hold_w(int state);
+	u8 access(u8 data);
 
 protected:
 	enum class write_protect_mode : u8
@@ -27,7 +28,10 @@ protected:
 		WRITE_ENABLE
 	};
 
-	eeprom_spi_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 page_bytes, u8 address_bytes);
+	eeprom_spi_base_device(
+			const machine_config &mconfig, device_type type, const char *tag, device_t *owner,
+			u32 capacity, u32 page_bytes, u8 address_bytes, u8 command_address_mask,
+			u8 status_mask, u8 status_fixed, write_protect_mode wp_mode);
 
 	// device_t implementation
 	virtual void device_validity_check(validity_checker &valid) const override ATTR_COLD;
@@ -38,13 +42,6 @@ protected:
 	virtual void nvram_default() override;
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
-
-	virtual void decode_command(u8 &command, u32 &address) const;
-
-	u8 m_command_address_bits;
-	u8 m_status_mask;
-	u8 m_status_fixed;
-	write_protect_mode m_wp_mode;
 
 private:
 	enum : u8
@@ -79,6 +76,10 @@ private:
 
 	u32 const m_page_bytes;
 	u8 const m_address_bytes;
+	u8 const m_command_address_mask;
+	u8 const m_status_mask;
+	u8 const m_status_fixed;
+	write_protect_mode const m_wp_mode;
 	std::unique_ptr<u8 []> m_page;
 	emu_timer *m_write_timer;
 	bool m_cs;
@@ -105,23 +106,10 @@ private:
 };
 
 
-class eeprom_spi_25320_device : public eeprom_spi_base_device
-{
-public:
-	eeprom_spi_25320_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
-};
-
 class eeprom_spi_m950x0_device : public eeprom_spi_base_device
 {
-public:
-	u8 access(u8 data);
-	void select_w(int selected);
-
 protected:
 	eeprom_spi_m950x0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 capacity);
-
-	virtual void decode_command(u8 &command, u32 &address) const override;
-
 };
 
 class eeprom_spi_m95010_device : public eeprom_spi_m950x0_device
@@ -149,7 +137,6 @@ public:
 	eeprom_spi_m95320_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
-DECLARE_DEVICE_TYPE(SPI_EEPROM_25320, eeprom_spi_25320_device)
 DECLARE_DEVICE_TYPE(SPI_EEPROM_M95010, eeprom_spi_m95010_device)
 DECLARE_DEVICE_TYPE(SPI_EEPROM_M95020, eeprom_spi_m95020_device)
 DECLARE_DEVICE_TYPE(SPI_EEPROM_M95040, eeprom_spi_m95040_device)

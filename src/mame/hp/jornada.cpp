@@ -159,7 +159,6 @@ protected:
 	void mcu_process_byte(u8 value);
 	void mcu_byte_received(u16 data);
 	void eeprom_data_received(u16 data);
-	void eeprom_select(int state);
 
 	enum mcu_state : int
 	{
@@ -395,11 +394,6 @@ void jornada_state::mcu_byte_received(u16 data)
 	m_mcu_rx_fifo[m_mcu_rx_count++] = value;
 }
 
-void jornada_state::eeprom_select(int state)
-{
-	m_nvram->select_w(!state);
-}
-
 void jornada_state::eeprom_data_received(u16 data)
 {
 	const u8 response = m_nvram->access((u8)data);
@@ -606,7 +600,7 @@ void jornada_state::jornada720(machine_config &config)
 
 	SA1111(config, m_companion, 3.6864_MHz_XTAL, m_maincpu);
 	m_companion->set_audio_codec_tag(m_codec);
-	m_companion->pb_out<0>().set(FUNC(jornada_state::eeprom_select));
+	m_companion->pb_out<0>().set(m_nvram, FUNC(eeprom_spi_base_device::cs_w));
 	m_companion->ssp_out().set(FUNC(jornada_state::eeprom_data_received));
 	m_companion->l3_addr_out().set(m_codec, FUNC(uda1344_device::l3_addr_w));
 	m_companion->l3_data_out().set(m_codec, FUNC(uda1344_device::l3_data_w));

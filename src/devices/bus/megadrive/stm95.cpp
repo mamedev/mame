@@ -35,11 +35,6 @@ void md_eeprom_stm95_device::device_add_mconfig(machine_config &config)
 	SPI_EEPROM_M95320(config, m_stm95);
 }
 
-void md_eeprom_stm95_device::unload(device_image_interface &image)
-{
-	// The EEPROM device saves its own NVRAM.
-}
-
 void md_eeprom_stm95_device::device_start()
 {
 	save_item(NAME(m_rdcnt));

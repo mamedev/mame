@@ -34,8 +34,6 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	virtual void unload(device_image_interface &image) override ATTR_COLD;
-
 private:
 	required_device<eeprom_spi_m95320_device> m_stm95;
 

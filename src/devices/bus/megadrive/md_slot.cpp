@@ -101,12 +101,6 @@ void device_md_cart_interface::nvram_alloc(size_t size)
 	m_nvram.resize(size/sizeof(uint16_t));
 }
 
-void device_md_cart_interface::unload(device_image_interface &image)
-{
-	if (get_nvram_size() && get_nvram_base())
-		image.battery_save(get_nvram_base(), get_nvram_size());
-}
-
 //-------------------------------------------------
 //  rom_map_setup - setup map of rom banks in 64K
 //  blocks, so to simplify ROM mirroring
@@ -546,8 +540,8 @@ std::error_condition base_md_cart_slot_device::load_nonlist()
 
 void base_md_cart_slot_device::call_unload()
 {
-	if (m_cart)
-		m_cart->unload(*this);
+	if (m_cart && m_cart->get_nvram_size())
+		battery_save(m_cart->get_nvram_base(), m_cart->get_nvram_size());
 }
 
 
