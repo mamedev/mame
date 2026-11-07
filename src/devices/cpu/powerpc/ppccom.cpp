@@ -796,6 +796,7 @@ void ppc_device::device_start()
 
 	/* register for save states */
 	save_item(NAME(m_core->pc));
+	save_item(NAME(m_checkstop));
 	save_item(NAME(m_core->r));
 	save_item(NAME(m_core->f));
 	save_item(NAME(m_core->cr));
@@ -975,6 +976,7 @@ void ppc_device::device_start()
 		/* append exception handlers for various types */
 		static_generate_exception(EXCEPTION_RESET,     true,  "exception_reset");
 		static_generate_exception(EXCEPTION_MACHCHECK, true,  "exception_machine_check");
+		static_generate_exception(EXCEPTION_MACHCHECK, false, "exception_machine_check_norecover");
 		static_generate_exception(EXCEPTION_DSI,       true,  "exception_dsi");
 		static_generate_exception(EXCEPTION_ISI,       true,  "exception_isi");
 		static_generate_exception(EXCEPTION_EI,        true,  "exception_ei");
@@ -1261,6 +1263,8 @@ void ppc_device::device_stop()
 
 void ppc_device::device_reset()
 {
+	m_checkstop = false;
+
 	// the memory accessors are generated once, after the driver has added its fast RAM regions
 	if (!m_read8[0])
 	{

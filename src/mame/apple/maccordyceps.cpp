@@ -120,13 +120,19 @@ private:
 
 
 	u32 id_r(offs_t offset, u32 mem_mask);
+	u32 comm_r();
+	void comm_w(u32 data);
 
 	u32 m_model_id;
+	u32 m_wait_comm_load, m_wait_comm_store;
 };
 
 void pmac6200_state::machine_start()
 {
 	m_f108->set_ram_info(m_ram->pointer<u32>(), m_ram->size());
+
+	m_wait_comm_load = m_maincpu->attotime_to_cycles(attotime::from_usec(72));
+	m_wait_comm_store = m_maincpu->attotime_to_cycles(attotime::from_usec(92));
 }
 
 void pmac6200_state::machine_reset()
@@ -141,6 +147,25 @@ void pmac6200_state::init_pmac6200()
 uint32_t pmac6200_state::id_r(offs_t offset, uint32_t mem_mask)
 {
 	return m_model_id;
+}
+
+u32 pmac6200_state::comm_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_maincpu->bus_error();
+		m_maincpu->adjust_icount(-int(m_wait_comm_load));
+	}
+	return 0;
+}
+
+void pmac6200_state::comm_w(u32 data)
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_maincpu->bus_error();
+		m_maincpu->adjust_icount(-int(m_wait_comm_store));
+	}
 }
 
 /***************************************************************************
@@ -162,8 +187,8 @@ void pmac6200_state::pmac6200_map(address_map &map)
 	map(0x50000000, 0x53ffffff).m(m_primetimeii, FUNC(primetime_device::map));
 	map(0x5ffffffc, 0x5fffffff).r(FUNC(pmac6200_state::id_r));
 
-	// SONIC ethernet is supposed to live here. for now, pretend it's not there
-	map(0x50f0a000, 0x50f0bfff).noprw();
+	map(0x50f08000, 0x50f09fff).lr32(NAME([] () { return ~u32(0); }));
+	map(0x50f0a000, 0x50f0bfff).rw(FUNC(pmac6200_state::comm_r), FUNC(pmac6200_state::comm_w));
 
 	// Capella-mapped devices in 64-bit address space
 	map(0x40000000, 0x403fffff).rom().region("bootrom64", 0); // HACK: should be mirrored, but doing
@@ -183,7 +208,7 @@ void pmac6200_state::pmac6200(machine_config &config)
 
 	PPC603(config, m_maincpu, 75_MHz_XTAL);
 	// BUS_RETRY: TurboSCSI stalls the CPU until DRQ
-	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS | PPCDRC_BUS_RETRY);
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS | PPCDRC_BUS_RETRY | PPCDRC_BUS_ERROR);
 	m_maincpu->set_bus_frequency(75_MHz_XTAL / 2); // FSB freq to Capella
 	m_maincpu->set_addrmap(AS_PROGRAM, &pmac6200_state::pmac6200_map);
 	config.set_perfect_quantum(m_maincpu); // chimes of death without it

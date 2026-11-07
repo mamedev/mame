@@ -103,6 +103,10 @@ private:
 	u32 m_scsi_read_cycles, m_scsi_write_cycles, m_scsi_dma_read_cycles, m_scsi_dma_write_cycles;
 	u32 m_scsi_dma_result;
 	bool m_scsi_second_half;
+	attotime m_scsi_stall_start;
+	bool m_scsi_stalled;
+
+	void turboscsi_stall();
 
 	u16 mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, u16 data, u16 mem_mask);

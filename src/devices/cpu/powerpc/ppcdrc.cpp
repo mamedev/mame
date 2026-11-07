@@ -828,6 +828,17 @@ void ppc_device::static_generate_entry_point()
 		UML_LABEL(block, awake);
 	}
 
+	if (m_drcoptions & PPCDRC_BUS_ERROR)
+	{
+		uml::code_label const running = 3;
+		UML_LOAD(block, I0, &m_checkstop, 0, SIZE_BYTE, SCALE_x1);
+		UML_TEST(block, I0, 1);
+		UML_JMPc(block, COND_Z, running);
+		UML_MOV(block, mem(&m_core->icount), 0);
+		UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);
+		UML_LABEL(block, running);
+	}
+
 	// generate a hash jump via the current mode and PC
 	UML_HASHJMP(block, mem(&m_core->mode), mem(&m_core->pc), *m_nocode);        // hashjmp <mode>,<pc>,nocode
 
@@ -1093,6 +1104,12 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
 			UML_JMPc(block, COND_NE, not_smi);
 			UML_AND(block, SPR32(SPROEA_SRR1), SPR32(SPROEA_SRR1), 0x0000ffff);
 			UML_LABEL(block, not_smi);
+		}
+
+		if (exception == EXCEPTION_MACHCHECK)
+		{
+			UML_AND(block, SPR32(SPROEA_SRR1), MSR32, 0x0000fffd);
+			UML_OR(block, SPR32(SPROEA_SRR1), SPR32(SPROEA_SRR1), 0x00040000);
 		}
 
 		// an ISI (reason flags) and a PROGRAM exception both carry their SRR1 status in the exception parameter
@@ -1893,6 +1910,9 @@ void ppc_device::generate_update_mode(drcuml_block &block)
 
 void ppc_device::generate_update_cycles(drcuml_block &block, compiler_state *compiler, uml::parameter param, bool allow_exception)
 {
+	if (compiler->checkbuserror)
+		generate_bus_error_check(block, compiler, param);
+
 	// check full interrupts if pending
 	if (compiler->checkints)
 	{
@@ -1918,6 +1938,31 @@ void ppc_device::generate_update_cycles(drcuml_block &block, compiler_state *com
 			UML_EXHc(block, COND_S, *m_out_of_cycles, param);      // exh     out_of_cycles,nextpc
 	}
 	compiler->cycles = 0;
+}
+
+
+void ppc_device::generate_bus_error_check(drcuml_block &block, compiler_state *compiler, uml::parameter param)
+{
+	uml::code_label skip, machcheck;
+
+	compiler->checkbuserror = false;
+	UML_LOAD(block, I3, &m_bus_error, 0, SIZE_BYTE, SCALE_x1);
+	UML_TEST(block, I3, 1);
+	UML_JMPc(block, COND_Z, skip = compiler->labelnum++);
+	UML_STORE(block, &m_bus_error, 0, 0, SIZE_BYTE, SCALE_x1);
+	UML_TEST(block, MSR32, MSR_ME);
+	UML_JMPc(block, COND_NZ, machcheck = compiler->labelnum++);
+	UML_STORE(block, &m_checkstop, 0, 1, SIZE_BYTE, SCALE_x1);
+	UML_MOV(block, mem(&m_core->pc), param);
+	save_fast_iregs(block);
+	save_fast_fregs(block);
+	UML_MOV(block, mem(&m_core->icount), 0);
+	UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);
+	UML_LABEL(block, machcheck);
+	UML_MOV(block, I0, param);
+	UML_MOV(block, I1, compiler->cycles);
+	UML_CALLH(block, *m_exception_norecover[EXCEPTION_MACHCHECK]);
+	UML_LABEL(block, skip);
 }
 
 
@@ -2164,6 +2209,12 @@ void ppc_device::generate_sequence_instruction(drcuml_block &block, compiler_sta
 			UML_EXHc(block, COND_Z, *m_exception[EXCEPTION_NOFPU], 0);      // exh     nofpu,0,z
 		}
 
+		if ((m_drcoptions & PPCDRC_BUS_ERROR) && (desc->reads_memory() || desc->writes_memory()))
+		{
+			UML_STORE(block, &m_bus_error, 0, 0, SIZE_BYTE, SCALE_x1);
+			compiler->checkbuserror = true;
+		}
+
 		// otherwise, unless this is a virtual no-op, it's a regular instruction
 		// compile the instruction
 		if (!generate_opcode(block, compiler, desc))
@@ -2172,6 +2223,8 @@ void ppc_device::generate_sequence_instruction(drcuml_block &block, compiler_sta
 			UML_MOV(block, mem(&m_core->arg0), desc->opptr);
 			UML_CALLC(block, cfunc_unimplemented, this);
 		}
+		if (compiler->checkbuserror)
+			generate_bus_error_check(block, compiler, desc->pc + 4);
 	}
 }
 

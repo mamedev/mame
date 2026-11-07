@@ -172,6 +172,7 @@ enum
 #define PPCDRC_STRICT_601_SELF_MODIFY 0x0010        // check for self-modifying code on 601 in the write handler (fairly large performance impact & does not work with RAM bypass)
 #define PPCDRC_MACOS_CACHE_HACK       0x0020        // HACK for Mac OS relying on data cache behavior; see ppccom_dcbz_check() for details
 #define PPCDRC_BUS_RETRY              0x0040        // honor cpu_device::retry_access() on aligned I/O instructions
+#define PPCDRC_BUS_ERROR              0x0080        // take a machine check exception when an access calls bus_error()
 
 // common sets of options
 #define PPCDRC_COMPATIBLE_OPTIONS   (PPCDRC_STRICT_VERIFY | PPCDRC_FLUSH_PC | PPCDRC_ACCURATE_SINGLES)
@@ -240,6 +241,7 @@ public:
 
 	void set_drc_cache_size(size_t bytes) { m_drcuml.set_cache_size(bytes); }
 	void ppcdrc_set_options(uint32_t options);
+	void bus_error() noexcept { m_bus_error = true; }
 	void ppcdrc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
 	void ppcdrc_add_hotspot(offs_t pc, uint32_t opcode, uint32_t cycles);
 
@@ -670,6 +672,8 @@ protected:
 	uml::code_handle *   m_nocode;                     // nocode exception handler
 	uml::code_handle *   m_out_of_cycles;              // out of cycles exception handler
 	uml::code_handle *   m_bus_retry;                  // unwind an I/O instruction the bus asked us to redo
+	bool                 m_bus_error = false;          // the bus ended the current access with an error
+	bool                 m_checkstop = false;
 	uml::code_handle *   m_tlb_mismatch;               // tlb mismatch handler
 	uml::code_handle *   m_swap_tgpr;                  // swap TGPR handler
 	uml::code_handle *   m_lsw[8][32];                 // lsw entries
@@ -729,6 +733,7 @@ protected:
 		uint32_t            cycles;                     // accumulated cycles
 		uint8_t             checkints;                  // need to check interrupts before next instruction
 		uint8_t             checksoftints;              // need to check software interrupts before next instruction
+		bool                checkbuserror;              // take a machine check if the current instruction's access bus-errored
 		uml::code_label     labelnum;                   // index for local labels
 	};
 
@@ -778,6 +783,7 @@ protected:
 	void generate_set_fmod(drcuml_block &block);
 	void generate_update_mode(drcuml_block &block);
 	void generate_update_cycles(drcuml_block &block, compiler_state *compiler, uml::parameter param, bool allow_exception);
+	void generate_bus_error_check(drcuml_block &block, compiler_state *compiler, uml::parameter param);
 	void generate_recompile_if(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc, uml::parameter flag, int exitcode);
 	void generate_translation_check(drcuml_block &block, compiler_state *compiler, const opcode_desc *seqhead, uint8_t mode);
 	void generate_checksum_block(drcuml_block &block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
