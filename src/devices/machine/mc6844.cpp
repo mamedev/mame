@@ -2,7 +2,7 @@
 // copyright-holders: Joakim Larsson Edström
 /**********************************************************************
 
-  Motorola 6844 emulation. This code is not yet ready for general use, see TODO list below
+  Motorola 6844 emulation
 
  "MC6844 — Direct Memory Access Controller
 
@@ -34,9 +34,6 @@
   The base code was ripped out of swtpc09.cpp and deviceified but similar code is also to be found
   in exidy440.cpp so copyrigt is probably shared among the authors there: Robert Justice, 68bit and
   Aaron Giles.
-
-  TODO:
-  - Memory to Device transfers
 
 **********************************************************************/
 
@@ -106,6 +103,12 @@ void mc6844_device::device_start()
 	// set our instruction counter
 	set_icountptr(m_icount);
 
+	for (auto &channel : m_m6844_channel)
+	{
+		channel.address = 0;
+		channel.counter = 0;
+	}
+
 	save_item(NAME(m_m6844_priority));
 	save_item(NAME(m_m6844_interrupt));
 	save_item(NAME(m_m6844_chain));
@@ -119,8 +122,6 @@ void mc6844_device::device_start()
 	save_item(STRUCT_MEMBER(m_m6844_channel, address));
 	save_item(STRUCT_MEMBER(m_m6844_channel, counter));
 	save_item(STRUCT_MEMBER(m_m6844_channel, control));
-	save_item(STRUCT_MEMBER(m_m6844_channel, start_address));
-	save_item(STRUCT_MEMBER(m_m6844_channel, start_counter));
 }
 
 //-------------------------------------------------
@@ -132,13 +133,17 @@ void mc6844_device::device_reset()
 	// reset the 6844
 	for (int i = 0; i < 4; i++)
 	{
-		m_m6844_channel[i].active = 0;
+		m_m6844_channel[i].active = false;
 		m_m6844_channel[i].control = 0x00;
 	}
 	m_m6844_priority = 0x00;
 	m_m6844_interrupt = 0x00;
 	m_m6844_chain = 0x00;
 	m_state = STATE_SI;
+
+	m_out_int_cb(CLEAR_LINE);
+	m_out_drq1_cb(CLEAR_LINE);
+	m_out_drq2_cb(CLEAR_LINE);
 }
 
 //-------------------------------------------------
@@ -180,7 +185,7 @@ void mc6844_device::execute_run()
 
 					// Requests on channels with an exhausted byte counter are ignored,
 					// otherwise a stale request would block the lower priority channels
-					if (m_m6844_channel[current_channel].active == 1 &&
+					if (m_m6844_channel[current_channel].active &&
 						m_m6844_channel[current_channel].counter != 0 &&
 						m_dreq[current_channel] == ASSERT_LINE)
 					{
@@ -199,7 +204,7 @@ void mc6844_device::execute_run()
 			break;
 		case STATE_S0: // Wait for BCR != 0 and Tx EN == 1
 			LOGSTATE("DMA state S0\n");
-			if (m_m6844_channel[m_current_channel].active == 1 &&
+			if (m_m6844_channel[m_current_channel].active &&
 				m_m6844_channel[m_current_channel].counter != 0)
 			{
 				m_state = STATE_S1;
@@ -238,7 +243,7 @@ void mc6844_device::execute_run()
 			break;
 		case STATE_S2: // Wait for DGRNT == 1
 			LOGSTATE("DMA state S2\n");
-			if (m_m6844_channel[m_current_channel].active != 1 ||
+			if (!m_m6844_channel[m_current_channel].active ||
 				((m_m6844_channel[m_current_channel].control & 0x06) != 0x02 && m_dreq[m_current_channel] != ASSERT_LINE))
 			{
 				// channel disabled, or single-byte request withdrawn before the grant, back off
@@ -272,7 +277,6 @@ void mc6844_device::execute_run()
 				{
 					m_m6844_channel[m_current_channel].address++;
 				}
-				m_m6844_channel[m_current_channel].address &= 0xffff;
 
 				m_m6844_channel[m_current_channel].counter--;
 
@@ -484,22 +488,18 @@ void mc6844_device::write(offs_t offset, uint8_t data)
 				if (!m_m6844_channel[i].active && (data & (1 << i)))
 				{
 					// mark us active
-					m_m6844_channel[i].active = 1;
+					m_m6844_channel[i].active = true;
 
 					// set the DMA busy bit and clear the DMA end bit
 					m_m6844_channel[i].control |= 0x40;
 					m_m6844_channel[i].control &= ~0x80;
-
-					// set the starting address, counter, and time
-					m_m6844_channel[i].start_address = m_m6844_channel[i].address;
-					m_m6844_channel[i].start_counter = m_m6844_channel[i].counter;
 				}
 
 				// if we're going inactive...
 				else if (m_m6844_channel[i].active && !(data & (1 << i)))
 				{
 					//mark us inactive
-					m_m6844_channel[i].active = 0;
+					m_m6844_channel[i].active = false;
 				}
 			}
 			break;
