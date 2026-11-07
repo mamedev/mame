@@ -133,9 +133,12 @@ private:
 	u32 id_r(offs_t offset, u32 mem_mask);
 	u32 comm_r();
 	void comm_w(u32 data);
+	void io_wait(offs_t address);
+	void add_wait(u32 cycles);
 
 	u32 m_model_id;
 	u32 m_wait_comm_load, m_wait_comm_store;
+	u32 m_wait_io, m_wait_io_long, m_wait_io_longer, m_wait_via1, m_wait_capella, m_wait_valkyrie;
 };
 
 void pmac6200_state::machine_start()
@@ -147,6 +150,58 @@ void pmac6200_state::machine_start()
 
 	m_maincpu->space(AS_PROGRAM).install_read_tap(0x41000000, 0x410fffff, "overlay_off",
 			[this] (offs_t offset, u64 &data, u64 mem_mask) { m_f108->overlay_off(); });
+
+	m_wait_io = m_maincpu->attotime_to_cycles(attotime::from_nsec(375));
+	m_wait_io_long = m_maincpu->attotime_to_cycles(attotime::from_nsec(525));
+	m_wait_io_longer = m_maincpu->attotime_to_cycles(attotime::from_nsec(690));
+	m_wait_capella = m_maincpu->attotime_to_cycles(attotime::from_nsec(160));
+	m_wait_valkyrie = m_maincpu->attotime_to_cycles(attotime::from_nsec(250));
+	m_wait_via1 = m_maincpu->attotime_to_cycles(attotime::from_nsec(350));
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	space.install_readwrite_tap(0x50000000, 0x53ffffff, "io_wait",
+			[this] (offs_t offset, u64 &data, u64 mem_mask) { io_wait(offset); },
+			[this] (offs_t offset, u64 &data, u64 mem_mask) { io_wait(offset); });
+	space.install_readwrite_tap(0xf9000000, 0xf90fffff, "vram_wait",
+			[this] (offs_t offset, u64 &data, u64 mem_mask) { add_wait(m_wait_io_long); },
+			[this] (offs_t offset, u64 &data, u64 mem_mask) { add_wait(m_wait_io_long); });
+}
+
+void pmac6200_state::add_wait(u32 cycles)
+{
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-int(cycles));
+}
+
+void pmac6200_state::io_wait(offs_t address)
+{
+	struct wait_range { offs_t start, end; u32 pmac6200_state::*wait; };
+	static constexpr wait_range PRIMETIME_WAITS[] = {
+		{ 0x00000, 0x01fff, &pmac6200_state::m_wait_via1 },      // VIA1
+		{ 0x0a000, 0x0bfff, &pmac6200_state::m_wait_io_longer }, // comm slot card
+		{ 0x0c000, 0x0dfff, &pmac6200_state::m_wait_io_long },   // SCC
+		{ 0x19000, 0x19fff, &pmac6200_state::m_wait_io_long },   // PrimeTime III registers from 0x19000
+		{ 0x1a000, 0x1a0ff, &pmac6200_state::m_wait_io_longer }, // F108 IDE
+		{ 0x1a100, 0x1a1ff, &pmac6200_state::m_wait_io_long },   // ATA interrupt register
+		{ 0x24000, 0x2bfff, &pmac6200_state::m_wait_valkyrie },  // Valkyrie
+	};
+
+	if (address >= 0x51000000)
+	{
+		add_wait(m_wait_capella);
+		return;
+	}
+
+	offs_t const primetime = address & 0x3ffff;
+	for (auto const &range : PRIMETIME_WAITS)
+	{
+		if ((primetime >= range.start) && (primetime <= range.end))
+		{
+			add_wait(this->*range.wait);
+			return;
+		}
+	}
+	add_wait(m_wait_io);
 }
 
 void pmac6200_state::machine_reset()
@@ -231,6 +286,7 @@ void pmac6200_state::pmac6200(machine_config &config)
 	F108(config, m_f108, CPU_BCLK); // 68040 bus speed, same as the FSB
 	m_f108->set_maincpu_tag("maincpu");
 	m_f108->set_primetimeii_tag(m_primetimeiii);
+	m_f108->set_scc_sync(false);
 	m_f108->write_ata_irq().set(m_primetimeiii, FUNC(primetimeii_device::ata_irq_w));
 	m_f108->set_scsi_clock(CPU_BCLK / ((15.0 / 8) + (1.0 / 2048)));
 
@@ -256,6 +312,7 @@ void pmac6200_state::pmac6200(machine_config &config)
 	m_primetimeiii->set_maincpu_tag("maincpu");
 	m_primetimeiii->set_scsi_tag("f108:ncr53c96");
 	m_primetimeiii->set_capella_tag("capella");
+	m_primetimeiii->set_via2_sync(false);
 
 	VALKYRIE(config, m_video, C32M);
 	m_video->write_irq().set(m_primetimeiii, FUNC(primetime_device::via2_irq_w<0x40>));
