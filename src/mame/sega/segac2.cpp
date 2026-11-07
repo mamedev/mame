@@ -63,7 +63,6 @@
             - Correct ROM labels for: ssonicbr, ooparts, headonch
             - Does ooparts actually use upd samples? PCB has the same rom as tfrceac
             - Is the joystick hack for ooparts unofficial, or done by Sega for location test?
-            - Puyo Puyo 2 VS link capabilities
 
     The "Print Club" boards used by Atlus are variants of the C2 board. Important differences:
             - XL2 is 52.867MHz, instead of 53.693MHz.
@@ -139,9 +138,10 @@
 
     The string would imply that there should be a Z80 system on the board, and some shared RAM.
     The 68000 side does not write a program of any sort to this IO area, so it's unlikely the
-    Z80 software is packed into the C2 code anywhere (and I cannot find the PUYO2Z80 string).
+    Z80 software is packed into the C2 code anywhere. The "PUYO2Z80" string is the board's ID,
+    which the program compares against a copy at 0x18814, followed by its own ID "PUYO268K".
 
-    How the TX/RX works is not yet understood.
+    The board is simulated by puyopuy2_link.cpp, which documents the register interface.
 
 
     Thanks: (in no particular order) to any MameDev that helped me out .. (OG, Mish etc.)
@@ -159,6 +159,8 @@
 
 #include "315_5296.h"
 #include "m50dass.h"
+#include "puyopuy2_link.h"
+#include "segac2_cn4.h"
 #include "segaipt.h"
 
 #include "cpu/m68000/m68000.h"
@@ -359,6 +361,23 @@ private:
 	int prot_func_pclubjv3(int in);
 	int prot_func_pclubjv4(int in);
 	int prot_func_pclubjv5(int in);
+};
+
+
+class puyopuy2_state : public segac2_state
+{
+public:
+	puyopuy2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: segac2_state(mconfig, type, tag)
+		, m_cn4(*this, "cn4")
+	{ }
+
+	void puyopuy2(machine_config &config) ATTR_COLD;
+
+private:
+	required_device<segac2_cn4_slot_device> m_cn4;
+
+	void puyopuy2_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -780,6 +799,12 @@ void segac2_state::segac2_map(address_map &map)
 {
 	segac_map(map);
 	map(0x880000, 0x880001).mirror(0x13fefe).w(FUNC(segac2_state::segac2_upd7759_w)).umask16(0x00ff);
+}
+
+void puyopuy2_state::puyopuy2_map(address_map &map)
+{
+	segac2_map(map);
+	map(0x880100, 0x88013f).rw(m_cn4, FUNC(segac2_cn4_slot_device::read), FUNC(segac2_cn4_slot_device::write)).umask16(0x00ff);
 }
 
 
@@ -2004,6 +2029,20 @@ void segac2_state::segac2(machine_config &config)
 	UPD7759(config, m_upd7759, XL1_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
+void puyopuy2_cn4_cards(device_slot_interface &device)
+{
+	device.option_add("link", PUYOPUY2_LINK); // four-player link board, not sold
+}
+
+void puyopuy2_state::puyopuy2(machine_config &config)
+{
+	segac2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &puyopuy2_state::puyopuy2_map);
+
+	SEGAC2_CN4_SLOT(config, m_cn4, puyopuy2_cn4_cards, nullptr);
+}
+
 void segac2_state::tfrceacjpb(machine_config &config)
 {
 	segac2(config);
@@ -3203,7 +3242,7 @@ GAME( 1994, ichirk,     ichir,    segac2,     ichir,    segac2_state,    init_ic
 GAME( 1994, ichirj,     ichir,    segac2,     ichir,    segac2_state,    init_ichirj,   ROT0,   "Sega",    "Puzzle & Action: Ichidant-R (Japan)", 0 )
 GAME( 1994, ichirjbl,   ichir,    segac,      ichir,    segac2_state,    init_ichirjbl, ROT0,   "bootleg", "Puzzle & Action: Ichidant-R (Japan) (bootleg)", 0 ) // C board, no samples
 
-GAME( 1994, puyopuy2,   0,        segac2,     puyopuy2, segac2_state,    init_puyopuy2, ROT0,   "Compile (Sega license)", "Puyo Puyo 2 (Japan)", 0 )
+GAME( 1994, puyopuy2,   0,        puyopuy2,   puyopuy2, puyopuy2_state,  init_puyopuy2, ROT0,   "Compile (Sega license)", "Puyo Puyo 2 (Japan)", 0 )
 
 GAME( 1994, zunkyou,    0,        segac2,     zunkyou,  segac2_state,    init_zunkyou,  ROT0,   "Sega", "Zunzunkyou no Yabou (Japan)", 0 )
 
