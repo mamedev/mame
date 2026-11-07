@@ -179,6 +179,7 @@ private:
 	void update_windows();
 
 	uint32_t remap_offset(offs_t offset, uint16_t size, uint16_t remap);
+	void pci_io_delay(int bus, uint32_t pci_cycles);
 
 	// pci windows installed into cpu memory space
 	uint32_t pci0_io_r(offs_t offset, uint32_t mem_mask);
