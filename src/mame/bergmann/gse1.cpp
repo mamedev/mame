@@ -306,12 +306,12 @@ void gse1_state::pio1_pb_w(uint8_t data)
 	// Steckerleiste 15
 	m_pio1_pb = data;
 	//coins out
-	machine().bookkeeping().coin_counter_w(3,BIT(m_pio1_pb,0)); // PB0 0.10DM
-	machine().bookkeeping().coin_counter_w(2,BIT(m_pio1_pb,1)); // PB1 1DM
-	machine().bookkeeping().coin_counter_w(1,BIT(m_pio1_pb,2)); // PB2 2DM
-	machine().bookkeeping().coin_counter_w(0,BIT(m_pio1_pb,3)); // PB3 5DM
+	machine().bookkeeping().coin_counter_w(3, BIT(m_pio1_pb, 0)); // PB0 0.10DM
+	machine().bookkeeping().coin_counter_w(2, BIT(m_pio1_pb, 1)); // PB1 1DM
+	machine().bookkeeping().coin_counter_w(1, BIT(m_pio1_pb, 2)); // PB2 2DM
+	machine().bookkeeping().coin_counter_w(0, BIT(m_pio1_pb, 3)); // PB3 5DM
 
-	machine().bookkeeping().coin_lockout_global_w(!BIT(m_pio1_pb,4)); // PB4 coin magnet
+	machine().bookkeeping().coin_lockout_global_w(!BIT(m_pio1_pb, 4)); // PB4 coin magnet
 }
 
 //PIO2
