@@ -2260,7 +2260,10 @@ uint8_t mpu4vid_state::barquest_chr_next(uint8_t state, uint8_t col)
 	const bool C0=(col>>0)&1, C1=(col>>1)&1, C2=(col>>2)&1, C3=(col>>3)&1, C4=(col>>4)&1, C5=(col>>5)&1;
 	const bool NZ=(col&0x3f)!=0, g0=!C3&&!C4, g1=C3&&!C4, g2=!C3&&C4, g3=C3&&C4, ACT=C0||C1||C2||C5;
 
-	const bool O0 = C1 || C2 || C3 || C4 || C5;  // col
+	// Response bit 2 checks the question issue, independently of the text decoder.
+	// The boot PAL test masks it off, so its stored responses cannot determine O0.
+	// Preserve the dumped PAL's acceptance of issues 3 and 4 (and reset on 0).
+	const bool O0 = C3 || C4 || C5 || (C0 != C1) || (C2 && (C0 || C1));
 	const bool O1 = (R1 && g0 && ACT) || (R2 && !R3 && g2) || (C0 && !C1 && g3) || (!R4 && R5 && g1);  // mix-C
 	const bool O2 = (!R1 && g0 && ACT) || (R3 && C1 && g1) || (!R2 && !R5 && g3);  // mix-B
 	const bool O3 = (R1 == R2) && NZ;  // latch (R1==R2)
