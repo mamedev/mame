@@ -59,6 +59,16 @@ msgstr "主音量"
 msgid "%1$s Volume"
 msgstr "%1$s 音量"
 
+
+#: src/frontend/mame/ui/ui.cpp:1495
+#, c-format
+msgid "%1$s Channel %d Volume"
+msgstr "%1$s 声道 %d 音量"
+
+#: src/frontend/mame/ui/ui.cpp:1486
+msgid "Global Speed"
+msgstr "全局速度"
+
 #: src/frontend/mame/ui/ui.cpp:1517
 #, c-format
 msgid "Overclock CPU %1$s"
@@ -750,6 +760,11 @@ msgstr "启动系统"
 msgid "Screen #%d"
 msgstr "画面 #%d"
 
+#: src/frontend/mame/ui/videoopt.cpp:60
+#, c-format
+msgid "Snapshot"
+msgstr "快照"
+
 #: src/frontend/mame/ui/videoopt.cpp:103
 #, c-format
 msgid "Video Options: %1$s"
@@ -778,6 +793,11 @@ msgstr "非整数缩放"
 #: src/frontend/mame/ui/videoopt.cpp:191
 msgid "Maintain Aspect Ratio"
 msgstr "维持长宽比例"
+
+#: src/frontend/mame/ui/videoopt.cpp:212 src/frontend/mame/ui/videoopt.cpp:218
+#: src/frontend/mame/ui/videoopt.cpp:221
+msgid "Hide Inactive Pointers After Delay"
+msgstr "延迟后隐藏不活跃的指针"
 
 #: src/frontend/mame/ui/videoopt.cpp:205
 msgid "Cannot change options while recording!"
@@ -897,10 +917,10 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:83
 msgid ""
-"There are known problems with this system\n"
+"There are known problems with this system:\n"
 "\n"
 msgstr ""
-"本系统已知具有下列的问题\n"
+"本系统已知具有下列的问题:\n"
 "\n"
 
 #: src/frontend/mame/ui/info.cpp:88
@@ -1015,6 +1035,21 @@ msgstr "kHz"
 #: src/frontend/mame/ui/devopt.cpp:108 src/frontend/mame/ui/devopt.cpp:190
 msgid "Hz"
 msgstr "Hz"
+
+#: src/frontend/mame/ui/info.cpp:398
+#, c-format
+msgid ""
+"%1$s\n"
+"%2$s %3$s\n"
+"Source file: %4$s\n"
+"\n"
+"CPU:\n"
+msgstr ""
+"%1$s\n"
+"%2$s %3$s\n"
+"源代码：%4$s\n"
+"\n"
+"CPU:\n"
 
 #: src/frontend/mame/ui/info.cpp:430
 msgid ""
@@ -1330,6 +1365,12 @@ msgctxt "machine-filter"
 msgid "Year"
 msgstr "年代"
 
+
+#: src/frontend/mame/ui/utils.cpp:98
+msgctxt "machine-filter"
+msgid "Source File"
+msgstr "源代码"
+
 #: src/frontend/mame/ui/utils.cpp:99
 msgctxt "machine-filter"
 msgid "Save Supported"
@@ -1521,6 +1562,10 @@ msgstr "分类文件"
 msgctxt "swlist-info"
 msgid "Software list/item"
 msgstr "软件列表/项目"
+
+#: src/frontend/mame/ui/utils.cpp:975 todo:The source code needs to be modified to support it _()?
+msgid "Select Category"
+msgstr "选择分类"
 
 #: src/frontend/mame/ui/datmenu.cpp:88 src/frontend/mame/ui/selmenu.cpp:2752
 msgid "Software List Info"
@@ -2069,6 +2114,22 @@ msgstr "整体： 未模拟保护"
 msgid "Overall: Working"
 msgstr "整体： 可以执行"
 
+
+#: src/frontend/mame/ui/simpleselgame.cpp:373
+#: src/frontend/mame/ui/selmenu.cpp:735
+msgid "Status: NOT WORKING"
+msgstr "状态： 不可执行"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:375
+#: src/frontend/mame/ui/selmenu.cpp:737
+msgid "Status: Unemulated Protection"
+msgstr "状态： 未模拟保护"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:377
+#: src/frontend/mame/ui/selmenu.cpp:739
+msgid "Status: Working"
+msgstr "状态： 可以执行"
+			
 #: src/frontend/mame/ui/simpleselgame.cpp:381
 #: src/frontend/mame/ui/selmenu.cpp:743
 msgid "Graphics: Unimplemented, "
@@ -2082,7 +2143,7 @@ msgstr "图形： 不完美， "
 #: src/frontend/mame/ui/simpleselgame.cpp:385
 #: src/frontend/mame/ui/selmenu.cpp:747
 msgid "Graphics: OK, "
-msgstr "图形： OK， "
+msgstr "图形： 正常， "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:388
 #: src/frontend/mame/ui/selmenu.cpp:750
@@ -2102,7 +2163,25 @@ msgstr "声音： 不完美"
 #: src/frontend/mame/ui/simpleselgame.cpp:394
 #: src/frontend/mame/ui/selmenu.cpp:756
 msgid "Sound: OK"
-msgstr "声音： OK"
+msgstr "声音： 正常"
+
+#: src/frontend/mame/ui/selmenu.cpp:3886
+msgid "The following ROM/disk images required for the selected system are missing or incorrect:\n\n"
+msgstr "以下所选系统所需的 ROM/磁盘镜像缺失或不正确：\n\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3888
+msgid "Required ROM/disk images for the selected system are missing or incorrect.\n\n"
+msgstr "所选系统所需的 ROM/磁盘镜像缺失或不正确.\n\n"
+
+
+#: src/frontend/mame/ui/selmenu.cpp:3907
+msgid "Required ROM/disk images for the selected software are missing or incorrect.\n\n"
+msgstr "所选软件所需的 ROM/磁盘镜像缺失或不正确.\n\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:4317
+msgid "Source File\t%1$s\n"
+msgstr "源代码\t%1$s\n"
+
 
 #: src/frontend/mame/ui/cheatopt.cpp:82 plugins/cheat/init.lua:762
 #, c-format, lua-format
@@ -2117,6 +2196,10 @@ msgstr ""
 msgid "All cheats reloaded"
 msgstr "全部作弊码已重新载入"
 
+#: src/frontend/mame/ui/cheatopt.cpp:122
+msgid "Cheat Options"
+msgstr "作弊选项"
+
 #: src/frontend/mame/ui/cheatopt.cpp:136 plugins/cheat/init.lua:709
 msgid "Reset All"
 msgstr "全部重设"
@@ -2124,6 +2207,14 @@ msgstr "全部重设"
 #: src/frontend/mame/ui/cheatopt.cpp:139 plugins/cheat/init.lua:710
 msgid "Reload All"
 msgstr "全部重新载入"
+
+#: src/frontend/mame/ui/cheatopt.cpp:154
+msgid "[no cheats found]"
+msgstr "[没有找到作弊]"
+
+#: src/frontend/mame/ui/cheatopt.cpp:162
+msgid "Enable Cheats"
+msgstr "启用作弊"
 
 #: src/frontend/mame/ui/dirmenu.cpp:40
 msgctxt "path-option"
@@ -2193,7 +2284,7 @@ msgstr "数据"
 #: src/frontend/mame/ui/dirmenu.cpp:53
 msgctxt "path-option"
 msgid "Category INIs"
-msgstr "类别初始化"
+msgstr "类别配置文件"
 
 #: src/frontend/mame/ui/dirmenu.cpp:54
 msgctxt "path-option"
@@ -2208,22 +2299,22 @@ msgstr "图标"
 #: src/frontend/mame/ui/dirmenu.cpp:56
 msgctxt "path-option"
 msgid "Control Panels"
-msgstr "控制面板"
+msgstr "操作面板"
 
 #: src/frontend/mame/ui/dirmenu.cpp:57
 msgctxt "path-option"
 msgid "Cabinets"
-msgstr "机械图"
+msgstr "机柜图"
 
 #: src/frontend/mame/ui/dirmenu.cpp:58
 msgctxt "path-option"
 msgid "Marquees"
-msgstr "贴画"
+msgstr "机柜灯牌"
 
 #: src/frontend/mame/ui/dirmenu.cpp:59
 msgctxt "path-option"
 msgid "PCBs"
-msgstr "印刷电路板"
+msgstr "电路板"
 
 #: src/frontend/mame/ui/dirmenu.cpp:60
 msgctxt "path-option"
@@ -2253,7 +2344,7 @@ msgstr "装饰图预览"
 #: src/frontend/mame/ui/dirmenu.cpp:65
 msgctxt "path-option"
 msgid "Select"
-msgstr "选关"
+msgstr "精选"
 
 #: src/frontend/mame/ui/dirmenu.cpp:66
 msgctxt "path-option"
@@ -2958,6 +3049,16 @@ msgstr "网路设备"
 
 #: src/frontend/mame/ui/mainmenu.cpp:159
 msgctxt "menu-main"
+msgid "Audio Mixer"
+msgstr "音频混合器"
+
+#: src/frontend/mame/ui/mainmenu.cpp:159
+msgctxt "menu-main"
+msgid "Audio Effects"
+msgstr "音频效果"
+
+#: src/frontend/mame/ui/mainmenu.cpp:159
+msgctxt "menu-main"
 msgid "Slider Controls"
 msgstr "参数调整"
 
@@ -2974,6 +3075,11 @@ msgstr "十字准星选项"
 #: src/frontend/mame/ui/mainmenu.cpp:167
 msgctxt "menu-main"
 msgid "Cheat"
+msgstr "作弊选项"
+
+#: src/frontend/mame/ui/mainmenu.cpp:167
+msgctxt "menu-main"
+msgid "Cheat Options"
 msgstr "作弊选项"
 
 #: src/frontend/mame/ui/mainmenu.cpp:172
@@ -3033,17 +3139,17 @@ msgstr "快照"
 #: src/frontend/mame/ui/selmenu.cpp:84
 msgctxt "selmenu-artwork"
 msgid "Cabinet"
-msgstr "机械图"
+msgstr "机柜图"
 
 #: src/frontend/mame/ui/selmenu.cpp:85
 msgctxt "selmenu-artwork"
 msgid "Control Panel"
-msgstr "控制面板"
+msgstr "操作面板"
 
 #: src/frontend/mame/ui/selmenu.cpp:86
 msgctxt "selmenu-artwork"
 msgid "PCB"
-msgstr "印刷电路板"
+msgstr "电路板"
 
 #: src/frontend/mame/ui/selmenu.cpp:87
 msgctxt "selmenu-artwork"
@@ -3098,12 +3204,12 @@ msgstr "得分"
 #: src/frontend/mame/ui/selmenu.cpp:97
 msgctxt "selmenu-artwork"
 msgid "Select"
-msgstr "选关"
+msgstr "精选"
 
 #: src/frontend/mame/ui/selmenu.cpp:98
 msgctxt "selmenu-artwork"
 msgid "Marquee"
-msgstr "贴画"
+msgstr "机柜灯牌"
 
 #: src/frontend/mame/ui/selmenu.cpp:99
 msgctxt "selmenu-artwork"
@@ -3286,7 +3392,7 @@ msgstr "图形\t不完美\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2973
 msgid "Graphics\tOK\n"
-msgstr "图形\tOK\n"
+msgstr "图形\t正常\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2976
 msgid "Sound\tNone\n"
@@ -3302,7 +3408,7 @@ msgstr "声音\t不完美\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2982
 msgid "Sound\tOK\n"
-msgstr "声音\tOK\n"
+msgstr "声音\t正常\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2985
 msgid "Capture\tUnimplemented\n"
@@ -3502,7 +3608,7 @@ msgstr "需要 CHD\t否\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3099
 msgid "Media Audit Result\tOK\n"
-msgstr "媒体校验结果\tOK\n"
+msgstr "媒体校验结果\t正常\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3101
 msgid "Media Audit Result\tBAD\n"
@@ -3514,7 +3620,7 @@ msgstr "采样文件校验结果\t不需要\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3106
 msgid "Samples Audit Result\tOK\n"
-msgstr "样本档校验结果\tOK\n"
+msgstr "样本档校验结果\t正常\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3108
 msgid "Samples Audit Result\tBAD\n"
@@ -4418,6 +4524,11 @@ msgstr "停止卷轴 3"
 msgctxt "input-name"
 msgid "Stop Reel 4"
 msgstr "停止卷轴 4"
+
+#: src/emu/inpttype.ipp:134
+msgctxt "input-name"
+msgid "Stop Reel 5"
+msgstr "停止卷轴 5"
 
 #: src/emu/inpttype.ipp:135
 msgctxt "input-name"
@@ -5479,7 +5590,7 @@ msgstr "参数调整"
 #: src/emu/inpttype.ipp:891
 msgctxt "input-name"
 msgid "Toggle UI Controls"
-msgstr ""
+msgstr "切换 UI 控件"
 
 #: src/emu/inpttype.ipp:892
 msgctxt "input-name"
@@ -5506,10 +5617,20 @@ msgctxt "input-name"
 msgid "Save State"
 msgstr "保存状态"
 
+#: src/emu/inpttype.ipp:898
+msgctxt "input-name"
+msgid "Quick Save State"
+msgstr "快速保存状态"
+
 #: src/emu/inpttype.ipp:897
 msgctxt "input-name"
 msgid "Load State"
 msgstr "载入状态"
+
+#: src/emu/inpttype.ipp:900
+msgctxt "input-name"
+msgid "Quick Load State"
+msgstr "快速载入状态"
 
 #: src/emu/inpttype.ipp:898
 msgctxt "input-name"
@@ -6535,6 +6656,894 @@ msgid ""
 msgstr ""
 "输入组合或按下 %s 取消\n"
 "%s"
+
+#: src/frontend/mame/ui/audiomix.cpp:53
+msgctxt "menu-audiomix"
+msgid "Audio Mixer"
+msgstr "音频混合器"
+
+#: src/frontend/mame/ui/audiomix.cpp:242
+msgctxt "menu-audiomix"
+msgid "No full routes available for output device %1$s"
+msgstr "输出设备 %1$s 没有可用的完整音频路由"
+
+#: src/frontend/mame/ui/audiomix.cpp:243
+msgctxt "menu-audiomix"
+msgid "No full routes available for input device %1$s"
+msgstr "输入设备 %1$s 没有可用的完整音频路由"
+
+#: src/frontend/mame/ui/audiomix.cpp:293
+msgctxt "menu-audiomix"
+msgid "No channel routes available for output device %1$s"
+msgstr "输出设备 %1$s 没有可用的声道连接路由"
+
+#: src/frontend/mame/ui/audiomix.cpp:294
+msgctxt "menu-audiomix"
+msgid "No channel routes available for input device %1$s"
+msgstr "输入设备 %1$s 没有可用的声道连接路由"
+
+#: src/frontend/mame/ui/audiomix.cpp:602
+msgctxt "menu-audiomix"
+msgid "%1$g dB"
+msgstr "%1$g 分贝"
+
+#: src/frontend/mame/ui/audiomix.cpp:641
+msgctxt "menu-audiomix"
+msgid "[mappings not initialized]"
+msgstr "[映射未初始化]"
+
+#: src/frontend/mame/ui/audiomix.cpp:689
+msgctxt "menu-audiomix"
+msgid "Add new full route"
+msgstr "添加新完整路由"
+
+#: src/frontend/mame/ui/audiomix.cpp:693
+msgctxt "menu-audiomix"
+msgid "Add new channel route"
+msgstr "添加新的声道路由"
+
+#: src/frontend/mame/ui/audiomix.cpp:711
+msgctxt "menu-audiomix"
+msgid "Output"
+msgstr "输出"
+
+#: src/frontend/mame/ui/audiomix.cpp:711
+msgctxt "menu-audiomix"
+msgid "Input"
+msgstr "输入"
+
+#: src/frontend/mame/ui/audiomix.cpp:712
+msgctxt "menu-audiomix"
+msgid "[all]"
+msgstr "[所有]"
+
+#: src/frontend/mame/ui/audiomix.cpp:716
+msgctxt "menu-audiomix"
+msgid "Device"
+msgstr "设备"
+
+#: src/frontend/mame/ui/audiomix.cpp:718
+msgctxt "menu-audiomix"
+msgid "[default]"
+msgstr "[默认]"
+
+
+#: src/frontend/mame/ui/audiomix.cpp:721
+msgctxt "menu-audiomix"
+msgid "Monitor of %1$s"
+msgstr "%1$s的监视器"
+
+#: src/frontend/mame/ui/audiomix.cpp:725
+msgctxt "menu-audiomix"
+msgid "Volume"
+msgstr "音量"
+
+#: src/frontend/mame/ui/audiomix.cpp:730
+msgctxt "menu-audiomix"
+msgid "Remove this route"
+msgstr "移除这个路由"
+
+#: src/frontend/mame/ui/audiomix.cpp:760
+msgctxt "menu-audiomix"
+msgid "Channel"
+msgstr "声道"
+
+#: src/frontend/mame/ui/audioeffects.cpp:31
+msgctxt "menu-aeffect"
+msgid "Audio Effects"
+msgstr "音频效果"
+
+#: src/frontend/mame/ui/audioeffects.cpp:186
+#, c-format
+# msgctxt "menu-aeffect"
+# msgid "%1$3.1f ms"
+# msgstr ""
+
+#: src/frontend/mame/ui/audioeffects.cpp:191
+#, c-format
+# msgctxt "menu-aeffect"
+# msgid "%u"
+# msgstr ""
+
+#: src/frontend/mame/ui/audioeffects.cpp:254
+msgctxt "menu-aeffect"
+msgid "Default"
+msgstr "默认"
+
+#: src/frontend/mame/ui/audioeffects.cpp:259
+msgctxt "menu-aeffect"
+msgid "Resampler"
+msgstr "重采样器"
+
+#: src/frontend/mame/ui/audioeffects.cpp:260
+msgctxt "menu-aeffect"
+msgid "Type"
+msgstr "类型"
+
+#: src/frontend/mame/ui/audioeffects.cpp:261
+msgctxt "menu-aeffect"
+msgid "HQ latency"
+msgstr "高质量延迟"
+
+#: src/frontend/mame/ui/audioeffects.cpp:262
+msgctxt "menu-aeffect"
+msgid "HQ filter max size"
+msgstr "高质量滤波器最大尺寸"
+
+#: src/frontend/mame/ui/audioeffects.cpp:263
+msgctxt "menu-aeffect"
+msgid "HQ filter max phases"
+msgstr "高质量滤波器最大相位"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:28
+#: src/frontend/mame/ui/audio_effect_eq.cpp:40
+#: src/frontend/mame/ui/audio_effect_filter.cpp:37
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:29
+#, c-format
+msgctxt "menu-aeffect-heading"
+msgid "%1$s (default)"
+msgstr "%1$s (默认)"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:28
+#: src/frontend/mame/ui/audio_effect_eq.cpp:40
+#: src/frontend/mame/ui/audio_effect_filter.cpp:37
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:29
+#, c-format
+msgctxt "menu-aeffect-heading"
+msgid "%1$s (%2$s)"
+msgstr "%1$s (%2$s)"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:65
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:299
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:475
+msgctxt "menu-aeffect-compressor"
+msgid "Bypass"
+msgstr "旁通"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:184
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:299
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:475
+msgctxt "menu-aeffect-compressor"
+msgid "Active"
+msgstr "有源"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:408
+#, c-format
+# msgctxt "menu-aeffect-compressor"
+# msgid "%1$.2f"
+# msgstr ""
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:413
+#, c-format
+msgctxt "menu-aeffect-compressor"
+msgid "%1$+g dB"
+msgstr "%1$+g 分贝"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:418
+#, c-format
+# msgctxt "menu-aeffect-compressor"
+# msgid "%1$.0f ms"
+# msgstr ""
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:424
+#, c-format
+# msgctxt "menu-aeffect-compressor"
+# msgid "%1$g:1"
+# msgstr ""
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:426
+msgctxt "menu-aeffect-compressor"
+msgid "Infinity:1"
+msgstr "无限:1"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:432
+msgctxt "menu-aeffect-compressor"
+msgid "Infinite"
+msgstr "无限"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:475
+msgctxt "menu-aeffect-compressor"
+msgid "Mode"
+msgstr "模式"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:476
+msgctxt "menu-aeffect-compressor"
+msgid "Threshold"
+msgstr "阀值"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:477
+msgctxt "menu-aeffect-compressor"
+msgid "Ratio"
+msgstr "比率"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:478
+msgctxt "menu-aeffect-compressor"
+msgid "Attack"
+msgstr "起音时间"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:479
+msgctxt "menu-aeffect-compressor"
+msgid "Release"
+msgstr "释音时间"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:480
+msgctxt "menu-aeffect-compressor"
+msgid "Input gain"
+msgstr "输入增益"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:481
+msgctxt "menu-aeffect-compressor"
+msgid "Output gain"
+msgstr "输出增益"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:483
+msgctxt "menu-aeffect-compressor"
+msgid "Advanced"
+msgstr "高级"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:484
+msgctxt "menu-aeffect-compressor"
+msgid "Convexity"
+msgstr "凸度"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:485
+msgctxt "menu-aeffect-compressor"
+msgid "Channel link"
+msgstr "声道联动"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:486
+msgctxt "menu-aeffect-compressor"
+msgid "Feedback"
+msgstr "反馈"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:487
+msgctxt "menu-aeffect-compressor"
+msgid "Inertia"
+msgstr "惯性"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:488
+msgctxt "menu-aeffect-compressor"
+msgid "Inertia decay"
+msgstr "惯性衰减"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:489
+msgctxt "menu-aeffect-compressor"
+msgid "Ceiling"
+msgstr "上限电平"
+
+#: src/frontend/mame/ui/audio_effect_compressor.cpp:492
+msgctxt "menu-aeffect-compressor"
+msgid "Reset All"
+msgstr "全复位"
+
+#: src/frontend/mame/ui/audio_effect_eq.cpp:353
+#, c-format
+# msgctxt "menu-aeffect-eq"
+# msgid "%1$d Hz"
+# msgstr ""
+
+#: src/frontend/mame/ui/audio_effect_eq.cpp:358
+#, c-format
+# msgctxt "menu-aeffect-eq"
+# msgid "%1$.2f"
+# msgstr ""
+
+#: src/frontend/mame/ui/audio_effect_eq.cpp:363
+#, c-format
+msgctxt "menu-aeffect-eq"
+msgid "%1$+g 分贝"
+msgstr ""
+
+#: src/frontend/mame/ui/audio_effect_eq.cpp:444
+#: src/frontend/mame/ui/audio_effect_eq.cpp:477
+#: src/frontend/mame/ui/audio_effect_eq.cpp:506
+msgctxt "menu-aeffect-eq"
+msgid "Mode"
+msgstr "模式"
+
+#: src/frontend/mame/ui/audio_effect_eq.cpp:445
+msgctxt "menu-aeffect-eq"
+msgid "Active"
+msgstr "有源"
+
+#: src/frontend/mame/ui/audio_effect_eq.cpp:445
+msgctxt "menu-aeffect-eq"
+msgid "Bypass"
+msgstr "旁通"
+
+#: src/frontend/mame/ui/audio_effect_eq.cpp:453
+msgctxt "menu-aeffect-eq"
+msgid "Frequency"
+msgstr "频率"
+
+#: src/frontend/mame/ui/audio_effect_eq.cpp:460
+msgctxt "menu-aeffect-eq"
+msgid "Q factor"
+msgstr "Q值"
+
+#: src/frontend/mame/ui/audio_effect_eq.cpp:466
+msgctxt "menu-aeffect-mode"
+msgid "Gain"
+msgstr "增益"
+
+#: src/frontend/mame/ui/audio_effect_eq.cpp:473
+msgctxt "menu-aeffect-eq"
+msgid "Low Band"
+msgstr "低频段"
+
+#: src/frontend/mame/ui/audio_effect_eq.cpp:478
+#: src/frontend/mame/ui/audio_effect_eq.cpp:507
+msgctxt "menu-aeffect-eq"
+msgid "Shelf"
+msgstr "搁架"
+
+#: src/frontend/mame/ui/audio_effect_eq.cpp:478
+#: src/frontend/mame/ui/audio_effect_eq.cpp:507
+msgctxt "menu-aeffect-eq"
+msgid "Peak"
+msgstr "峰值"
+
+#: src/frontend/mame/ui/audio_effect_eq.cpp:484
+msgctxt "menu-aeffect-eq"
+msgid "Low Mid Band"
+msgstr "中低频段"
+
+#: src/frontend/mame/ui/audio_effect_eq.cpp:490
+msgctxt "menu-aeffect-eq"
+msgid "Mid Band"
+msgstr "中频段"
+
+#: src/frontend/mame/ui/audio_effect_eq.cpp:496
+msgctxt "menu-aeffect-eq"
+msgid "High Mid Band"
+msgstr "中高频段"
+
+#: src/frontend/mame/ui/audio_effect_eq.cpp:502
+msgctxt "menu-aeffect-eq"
+msgid "High Band"
+msgstr "高频段"
+
+#: src/frontend/mame/ui/audio_effect_eq.cpp:513
+msgctxt "menu-aeffect-eq"
+msgid "Reset All"
+msgstr "全复位"
+
+#: src/frontend/mame/ui/audio_effect_filter.cpp:170
+#: src/frontend/mame/ui/audio_effect_filter.cpp:198
+#: src/frontend/mame/ui/audio_effect_filter.cpp:306
+#: src/frontend/mame/ui/audio_effect_filter.cpp:330
+#: src/frontend/mame/ui/audio_effect_filter.cpp:455
+#: src/frontend/mame/ui/audio_effect_filter.cpp:475
+msgctxt "menu-aeffect-filter"
+msgid "Bypass"
+msgstr "旁通"
+
+#: src/frontend/mame/ui/audio_effect_filter.cpp:238
+#: src/frontend/mame/ui/audio_effect_filter.cpp:273
+#: src/frontend/mame/ui/audio_effect_filter.cpp:306
+#: src/frontend/mame/ui/audio_effect_filter.cpp:330
+#: src/frontend/mame/ui/audio_effect_filter.cpp:455
+#: src/frontend/mame/ui/audio_effect_filter.cpp:475
+msgctxt "menu-aeffect-filter"
+msgid "Active"
+msgstr "有源"
+
+#: src/frontend/mame/ui/audio_effect_filter.cpp:358
+msgctxt "menu-aeffect-filter"
+msgid "DC removal"
+msgstr "直流去除"
+
+#: src/frontend/mame/ui/audio_effect_filter.cpp:358
+#: src/frontend/mame/ui/audio_effect_filter.cpp:363
+#, c-format
+# msgctxt "menu-aeffect-filter"
+# msgid "%1$d Hz"
+# msgstr ""
+
+#: src/frontend/mame/ui/audio_effect_filter.cpp:368
+#, c-format
+# msgctxt "menu-aeffect-filter"
+# msgid "%1$.2f"
+# msgstr ""
+
+#: src/frontend/mame/ui/audio_effect_filter.cpp:450
+msgctxt "menu-aeffect-filter"
+msgid "High-pass Filter"
+msgstr "高通滤波器"
+
+#: src/frontend/mame/ui/audio_effect_filter.cpp:454
+#: src/frontend/mame/ui/audio_effect_filter.cpp:474
+msgctxt "menu-aeffect-filter"
+msgid "Mode"
+msgstr "模式"
+
+#: src/frontend/mame/ui/audio_effect_filter.cpp:459
+#: src/frontend/mame/ui/audio_effect_filter.cpp:479
+msgctxt "menu-aeffect-filter"
+msgid "Cutoff frequency"
+msgstr "截止频率"
+
+#: src/frontend/mame/ui/audio_effect_filter.cpp:464
+#: src/frontend/mame/ui/audio_effect_filter.cpp:484
+msgctxt "menu-aeffect-filter"
+msgid "Q factor"
+msgstr "Q 值"
+
+#: src/frontend/mame/ui/audio_effect_filter.cpp:470
+msgctxt "menu-aeffect-filter"
+msgid "Low-pass Filter"
+msgstr "低通滤波器"
+
+#: src/frontend/mame/ui/audio_effect_filter.cpp:490
+msgctxt "menu-aeffect-filter"
+msgid "Reset All"
+msgstr "全复位"
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:74
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:369
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:699
+msgctxt "menu-aeffect-reverb"
+msgid "Bypass"
+msgstr "旁通"
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:83
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:230
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:378
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:702
+#, c-format
+msgctxt "menu-aeffect-reverb"
+msgid "%1$s (default)"
+msgstr "%1$s (默认)"
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:221
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:369
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:699
+msgctxt "menu-aeffect-reverb"
+msgid "Active"
+msgstr "有源"
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:513
+#, c-format
+# msgctxt "menu-aeffect-reverb"
+# msgid "%1$d%%"
+# msgstr ""
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:518
+#, c-format
+# msgctxt "menu-aeffect-reverb"
+# msgid "%1$d Hz"
+# msgstr ""
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:523
+#, c-format
+# msgctxt "menu-aeffect-reverb"
+# msgid "%1$5.1f ms"
+# msgstr ""
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:528
+#, c-format
+# msgctxt "menu-aeffect-reverb"
+# msgid "%1$5.2f s"
+# msgstr ""
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:533
+#, c-format
+# msgctxt "menu-aeffect-reverb"
+# msgid "%1$3.2f Hz"
+# msgstr ""
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:699
+msgctxt "menu-aeffect-reverb"
+msgid "Mode"
+msgstr "模式"
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:702
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:704
+msgctxt "menu-aeffect-reverb"
+msgid "Load preset"
+msgstr "加载预设"
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:705
+msgctxt "menu-aeffect-reverb"
+msgid "Dry level"
+msgstr "干音电平"
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:706
+msgctxt "menu-aeffect-reverb"
+msgid "Stereo width"
+msgstr "立体声宽度"
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:708
+msgctxt "menu-aeffect-reverb"
+msgid "Early Reflections"
+msgstr "早期反射"
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:709
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:716
+msgctxt "menu-aeffect-reverb"
+msgid "Room size"
+msgstr "房间大小"
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:710
+msgctxt "menu-aeffect-reverb"
+msgid "Tap setup"
+msgstr "敲击设置"
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:711
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:717
+msgctxt "menu-aeffect-reverb"
+msgid "Damping"
+msgstr "阻尼"
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:712
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:723
+msgctxt "menu-aeffect-reverb"
+msgid "Level"
+msgstr "电平"
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:713
+msgctxt "menu-aeffect-reverb"
+msgid "Send to Late"
+msgstr "发送到后期"
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:715
+msgctxt "menu-aeffect-reverb"
+msgid "Late Reflections"
+msgstr "后期反射"
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:718
+msgctxt "menu-aeffect-reverb"
+msgid "Pre-delay"
+msgstr "前延迟"
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:719
+msgctxt "menu-aeffect-reverb"
+msgid "Diffusion"
+msgstr "扩散"
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:720
+msgctxt "menu-aeffect-reverb"
+msgid "Wander"
+msgstr "漂移"
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:721
+msgctxt "menu-aeffect-reverb"
+msgid "Decay"
+msgstr "衰减"
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:722
+msgctxt "menu-aeffect-reverb"
+msgid "Spin"
+msgstr "旋转"
+
+#: src/frontend/mame/ui/audio_effect_reverb.cpp:725
+msgctxt "menu-aeffect-reverb"
+msgid "Reset All"
+msgstr "全复位"
+
+
+#: src/emu/audio_effects/aeffect.cpp:16
+msgctxt "audio-effect"
+msgid "Filters"
+msgstr "滤波"
+
+#: src/emu/audio_effects/aeffect.cpp:17
+msgctxt "audio-effect"
+msgid "Compressor"
+msgstr "压缩"
+
+#: src/emu/audio_effects/aeffect.cpp:18
+msgctxt "audio-effect"
+msgid "Reverb"
+msgstr "混响"
+
+#: src/emu/audio_effects/aeffect.cpp:19
+msgctxt "audio-effect"
+msgid "Equalizer"
+msgstr "均衡"
+
+#: src/emu/audio_effects/reverb.cpp:25
+msgctxt "audio-reverb-preset"
+msgid "Custom"
+msgstr "自定义"
+
+#: src/emu/audio_effects/reverb.cpp:26
+msgctxt "audio-reverb-preset"
+msgid "Echo Chamber"
+msgstr "回声室"
+
+#: src/emu/audio_effects/reverb.cpp:27
+msgctxt "audio-reverb-preset"
+msgid "Large Room"
+msgstr "大房间"
+
+#: src/emu/audio_effects/reverb.cpp:28
+msgctxt "audio-reverb-preset"
+msgid "Large Room Bright"
+msgstr "大房间 明亮"
+
+#: src/emu/audio_effects/reverb.cpp:29
+msgctxt "audio-reverb-preset"
+msgid "Large Room Dark"
+msgstr "大房间 昏暗"
+
+#: src/emu/audio_effects/reverb.cpp:30
+msgctxt "audio-reverb-preset"
+msgid "Large Room Drum"
+msgstr "大房间 鼓声"
+
+#: src/emu/audio_effects/reverb.cpp:31
+msgctxt "audio-reverb-preset"
+msgid "Large Room Tiled"
+msgstr "大房间 瓷砖"
+
+#: src/emu/audio_effects/reverb.cpp:32
+msgctxt "audio-reverb-preset"
+msgid "Large Room Vocal"
+msgstr "大房间 声乐"
+
+#: src/emu/audio_effects/reverb.cpp:33
+msgctxt "audio-reverb-preset"
+msgid "Large Room Wooden"
+msgstr "大房间 木质"
+
+#: src/emu/audio_effects/reverb.cpp:34
+msgctxt "audio-reverb-preset"
+msgid "Live"
+msgstr "现场"
+
+#: src/emu/audio_effects/reverb.cpp:35
+msgctxt "audio-reverb-preset"
+msgid "Long Reverb 12s"
+msgstr "长混响 12秒"
+
+#: src/emu/audio_effects/reverb.cpp:36
+msgctxt "audio-reverb-preset"
+msgid "Long Reverb 30s"
+msgstr "长混响 30秒"
+
+#: src/emu/audio_effects/reverb.cpp:37
+msgctxt "audio-reverb-preset"
+msgid "Medium Room"
+msgstr "中等房间"
+
+#: src/emu/audio_effects/reverb.cpp:38
+msgctxt "audio-reverb-preset"
+msgid "Medium Room Bright"
+msgstr "中等房间 明亮"
+
+#: src/emu/audio_effects/reverb.cpp:39
+msgctxt "audio-reverb-preset"
+msgid "Medium Room Dark"
+msgstr "中等房间 昏暗"
+
+#: src/emu/audio_effects/reverb.cpp:40
+msgctxt "audio-reverb-preset"
+msgid "Medium Room Drum"
+msgstr "中等房间 鼓声"
+
+#: src/emu/audio_effects/reverb.cpp:41
+msgctxt "audio-reverb-preset"
+msgid "Medium Room Tiled"
+msgstr "中等房间 瓷砖"
+
+#: src/emu/audio_effects/reverb.cpp:42
+msgctxt "audio-reverb-preset"
+msgid "Medium Room Vocal"
+msgstr "中等房间 声乐"
+
+#: src/emu/audio_effects/reverb.cpp:43
+msgctxt "audio-reverb-preset"
+msgid "Medium Room Wooden"
+msgstr "中等房间 木质"
+
+#: src/emu/audio_effects/reverb.cpp:44
+msgctxt "audio-reverb-preset"
+msgid "Shimmer"
+msgstr "闪烁"
+
+#: src/emu/audio_effects/reverb.cpp:45
+msgctxt "audio-reverb-preset"
+msgid "Small Room"
+msgstr "小房间"
+
+#: src/emu/audio_effects/reverb.cpp:46
+msgctxt "audio-reverb-preset"
+msgid "Small Room Bright"
+msgstr "小房间 明亮"
+
+#: src/emu/audio_effects/reverb.cpp:47
+msgctxt "audio-reverb-preset"
+msgid "Small Room Dark"
+msgstr "小房间 昏暗"
+
+#: src/emu/audio_effects/reverb.cpp:48
+msgctxt "audio-reverb-preset"
+msgid "Small Room Drum"
+msgstr "小房间 鼓声"
+
+#: src/emu/audio_effects/reverb.cpp:49
+msgctxt "audio-reverb-preset"
+msgid "Small Room Tiled"
+msgstr "小房间 瓷砖"
+
+#: src/emu/audio_effects/reverb.cpp:50
+msgctxt "audio-reverb-preset"
+msgid "Small Room Vocal"
+msgstr "小房间 声乐"
+
+#: src/emu/audio_effects/reverb.cpp:51
+msgctxt "audio-reverb-preset"
+msgid "Small Room Wooden"
+msgstr "小房间 木质"
+
+#: src/emu/audio_effects/reverb.cpp:52
+msgctxt "audio-reverb-preset"
+msgid "Tunnel"
+msgstr "隧道"
+
+#: src/emu/audio_effects/reverb.cpp:53
+msgctxt "audio-reverb-preset"
+msgid "Very Large Room"
+msgstr "非常大的房间"
+
+#: src/emu/audio_effects/reverb.cpp:54
+msgctxt "audio-reverb-preset"
+msgid "Very Large Room Bright"
+msgstr "非常大的房间 明亮"
+
+#: src/emu/audio_effects/reverb.cpp:55
+msgctxt "audio-reverb-preset"
+msgid "Very Large Room Dark"
+msgstr "非常大的房间 昏暗"
+
+#: src/emu/audio_effects/reverb.cpp:56
+msgctxt "audio-reverb-preset"
+msgid "Very Large Room Drum"
+msgstr "非常大的房间 鼓声"
+
+#: src/emu/audio_effects/reverb.cpp:57
+msgctxt "audio-reverb-preset"
+msgid "Very Large Room Tiled"
+msgstr "非常大的房间 瓷砖"
+
+#: src/emu/audio_effects/reverb.cpp:58
+msgctxt "audio-reverb-preset"
+msgid "Very Large Room Vocal"
+msgstr "非常大的房间 声乐"
+
+#: src/emu/audio_effects/reverb.cpp:59
+msgctxt "audio-reverb-preset"
+msgid "Very Large Room Wooden"
+msgstr "非常大的房间 木质"
+
+
+#: src/frontend/mame/ui/sndmenu.cpp:149
+# msgid "Compressor"
+# msgstr "压缩"
+
+#: src/frontend/mame/ui/state.cpp:221
+msgctxt "menu-savestate"
+msgid "[no saved states found]"
+msgstr "[未找到保存的状态]"
+
+#: src/frontend/mame/ui/state.cpp:226
+msgctxt "menu-savestate"
+msgid "Cancel"
+msgstr "取消"
+
+#: src/frontend/mame/ui/state.cpp:265
+msgctxt "menu-savestate" 
+msgid "Delete saved state %1$s?\nPress %2$s to delete\nPress %3$s to cancel"
+msgstr "删除保存的状态 %1$s？\n按 %2$s 删除\n按 %3$s 取消"
+
+#: src/frontend/mame/ui/state.cpp:402
+msgctxt "menu-savestate" 
+msgid "Error removing saved state file %1$s"
+msgstr "删除保存状态文件 %1$s 时出错"
+
+#: src/frontend/mame/ui/state.cpp:483
+msgctxt "menu-savestate" 
+msgid "Press %1$s to delete"
+msgstr "按 %1$s 删除"
+
+#: src/frontend/mame/ui/state.cpp:554
+msgctxt "menu-savestate"
+msgid "Load State"
+msgstr "加载状态"
+
+#: src/frontend/mame/ui/state.cpp:554
+msgctxt "menu-savestate"
+msgid "Select state to load"
+msgstr "选择状态加载"
+
+#: src/frontend/mame/ui/state.cpp:578
+msgctxt "menu-savestate"
+msgid "Save State"
+msgstr "保存状态"
+
+
+#: src/frontend/mame/ui/state.cpp:578
+msgctxt "menu-savestate"
+msgid "Press a key or joystick button, or select state to overwrite"
+msgstr "按下按键键或摇杆按钮，或选择一个状态来覆盖"
+
+
+#: src/frontend/mame/ui/miscmenu.cpp:276
+msgctxt "menu-bookkeeping"
+msgid "Uptime: %1$d:%2$02d:%3$02d\n\n"
+msgstr "运行时间: %1$d:%2$02d:%3$02d\n\n"
+
+#: src/frontend/mame/ui/miscmenu.cpp:278
+msgctxt "menu-bookkeeping"
+msgid "Uptime: %1$d:%2$02d\n\n"
+msgstr "运行时间: %1$d:%2$02d\n\n"
+
+#: src/frontend/mame/ui/miscmenu.cpp:283
+msgctxt "menu-bookkeeping"
+msgid "Tickets dispensed: %1$d\n\n"
+msgstr "已发放票数: %1$d\n\n"
+
+
+#: src/frontend/mame/ui/miscmenu.cpp:295
+msgctxt "menu-bookkeeping"
+msgid "Coin %1$c: NA (locked)\n"
+msgstr "投币 %1$c: 不可用 (锁定)\n"
+
+#: src/frontend/mame/ui/miscmenu.cpp:295
+msgctxt "menu-bookkeeping"
+msgid "Coin %1$c: NA\n"
+msgstr "投币 %1$c: 不可用\n"
+
+#: src/frontend/mame/ui/miscmenu.cpp:296
+msgctxt "menu-bookkeeping"
+msgid "Coin %1$c: %2$d (locked)\n"
+msgstr "投币 %1$c: %2$d (锁定)\n"
+
+#: src/frontend/mame/ui/miscmenu.cpp:296
+msgctxt "menu-bookkeeping"
+msgid "Coin %1$c: %2$d\n"
+msgstr "投币 %1$c: %2$d\n"
+
+#: todo:The source code needs to be modified to support it?
+# msgid "skip %d/%d"
+# msgstr "跳过 %d/%d"
+
+#: audio effects?
+msgid "Filters"
+msgstr "滤波"
+
+#: audio effects?
+msgid "Reverb"
+msgstr "混音"
+
+#: audio effects?
+msgid "Equalizer"
+msgstr "均衡"
+
+#: todo:The source code needs to be modified to support it?
+msgid "Return to Plugin Options Menu"
+msgstr "返回插件选项菜单"
 
 #~ msgctxt "input-name"
 #~ msgid "UI Toggle"
