@@ -105,8 +105,12 @@ class bus_master_ide_controller_device : public ide_controller_32_device
 {
 public:
 	bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	template <typename... T> void set_bus_master_space(T &&... args) { m_dma_space.set_tag(std::forward<T>(args)...); }
-	template <bool R> void set_bus_master_space(const address_space_finder<R> &finder) { m_dma_space.set_tag(finder); }
+	template <typename... T> void set_bus_master_space(T &&... args) { m_dma_space_finder.set_tag(std::forward<T>(args)...); }
+	template <bool R> void set_bus_master_space(const address_space_finder<R> &finder) { m_dma_space_finder.set_tag(finder); }
+
+	// for PCI cards, whose bus master space is only known once the host bridge has started;
+	// must be called before this device starts
+	void set_bus_master_space(address_space &space) { m_dma_space = &space; }
 
 	template <typename T> bus_master_ide_controller_device &master(T &&opts, const char *dflt = nullptr, bool fixed = false)
 	{
@@ -141,7 +145,8 @@ protected:
 private:
 	void execute_dma();
 
-	required_address_space m_dma_space;
+	optional_address_space m_dma_space_finder;
+	address_space *m_dma_space;
 	uint8_t m_dma_address_xor;
 
 	offs_t m_dma_address;
