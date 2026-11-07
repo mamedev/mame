@@ -2,7 +2,10 @@
 // copyright-holders:Vas Crabb
 /***************************************************************************
 
-    Capcom System QSound™
+    Capcom-Q1 DL 1425 DSP
+
+    Also mainly referred by QSound™ because it was the most common
+    implementation of QSound™ effects in arcade systems.
 
     Sixteen-channel sample player.  Previous HLE implementation by Paul
     Leaman and Miguel Angel Horna, with thanks to CAB (author of Amuse).
@@ -96,8 +99,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#define QSOUND_LLE
-#include "qsound.h"
+#define CAPCOM_Q1_LLE
+#include "capcom_q1.h"
 
 #include <algorithm>
 #include <fstream>
@@ -114,7 +117,7 @@
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(QSOUND, qsound_device, "qsound", "QSound")
+DEFINE_DEVICE_TYPE(CAPCOM_Q1, capcom_q1_device, "capcom_q1", "Capcom-Q1 DL 1425 DSP")
 
 
 // DSP internal ROM region
@@ -126,11 +129,11 @@ ROM_END
 
 
 //-------------------------------------------------
-//  qsound_device - constructor
+//  capcom_q1_device - constructor
 //-------------------------------------------------
 
-qsound_device::qsound_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, QSOUND, tag, owner, clock)
+capcom_q1_device::capcom_q1_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, CAPCOM_Q1, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
 	, m_dsp(*this, "dsp"), m_stream(nullptr)
@@ -139,40 +142,40 @@ qsound_device::qsound_device(machine_config const &mconfig, char const *tag, dev
 {
 }
 
-qsound_device::~qsound_device()
+capcom_q1_device::~capcom_q1_device()
 {
 }
 
 
-void qsound_device::qsound_w(offs_t offset, u8 data)
+void capcom_q1_device::write(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
 	case 0:
 		LOGCOMMAND(
-				"QSound: set command data[h] = %02X (%04X -> %04X)\n",
-				data, m_new_data, (m_new_data & 0x00ffU) | (u16(data) << 8));
+				"%s: set command data[h] = %02X (%04X -> %04X)\n",
+				machine().describe_context(), data, m_new_data, (m_new_data & 0x00ffU) | (u16(data) << 8));
 		m_new_data = (m_new_data & 0x00ffU) | (u16(data) << 8);
 		break;
 	case 1:
 		LOGCOMMAND(
-				"QSound: set command data[l] = %02X (%04X -> %04X)\n",
-				data, m_new_data, (m_new_data & 0xff00U) | data);
+				"%s: set command data[l] = %02X (%04X -> %04X)\n",
+				machine().describe_context(), data, m_new_data, (m_new_data & 0xff00U) | data);
 		m_new_data = (m_new_data & 0xff00U) | data;
 		break;
 	case 2:
 		m_dsp_ready = 0U;
 		machine().scheduler().synchronize(
-				timer_expired_delegate(FUNC(qsound_device::set_cmd), this),
+				timer_expired_delegate(FUNC(capcom_q1_device::set_cmd), this),
 				(unsigned(data) << 16) | m_new_data);
 		break;
 	default:
-		logerror("QSound: host write to unknown register %01X = %02X (%s)\n", offset, data, machine().describe_context());
+		logerror("%s: host write to unknown register %01X = %02X\n", machine().describe_context(), offset, data);
 	}
 }
 
 
-u8 qsound_device::qsound_r()
+u8 capcom_q1_device::read()
 {
 	return m_dsp_ready ? 0x80 : 0x00;
 }
@@ -183,7 +186,7 @@ u8 qsound_device::qsound_r()
 //  internal ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *qsound_device::device_rom_region() const
+const tiny_rom_entry *capcom_q1_device::device_rom_region() const
 {
 	return ROM_NAME( qsound );
 }
@@ -193,13 +196,13 @@ const tiny_rom_entry *qsound_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void qsound_device::device_add_mconfig(machine_config &config)
+void capcom_q1_device::device_add_mconfig(machine_config &config)
 {
 	DSP16A(config, m_dsp, DERIVED_CLOCK(1, 1));
-	m_dsp->set_addrmap(AS_IO, &qsound_device::dsp_io_map);
-	m_dsp->ock_cb().set(FUNC(qsound_device::dsp_ock_w));
-	m_dsp->pio_r_cb().set(FUNC(qsound_device::dsp_pio_r));
-	m_dsp->pio_w_cb().set(FUNC(qsound_device::dsp_pio_w));
+	m_dsp->set_addrmap(AS_IO, &capcom_q1_device::dsp_io_map);
+	m_dsp->ock_cb().set(FUNC(capcom_q1_device::dsp_ock_w));
+	m_dsp->pio_r_cb().set(FUNC(capcom_q1_device::dsp_pio_r));
+	m_dsp->pio_w_cb().set(FUNC(capcom_q1_device::dsp_pio_w));
 }
 
 
@@ -207,7 +210,7 @@ void qsound_device::device_add_mconfig(machine_config &config)
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void qsound_device::device_start()
+void capcom_q1_device::device_start()
 {
 	// hope we get good synchronisation between the DSP and the sound system
 	m_stream = stream_alloc(0, 2, clock() / 2 / 1248);
@@ -235,7 +238,7 @@ void qsound_device::device_start()
 //  device_clock_changed
 //-------------------------------------------------
 
-void qsound_device::device_clock_changed()
+void capcom_q1_device::device_clock_changed()
 {
 	m_stream->set_sample_rate(clock() / 2 / 1248);
 }
@@ -244,7 +247,7 @@ void qsound_device::device_clock_changed()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void qsound_device::device_reset()
+void capcom_q1_device::device_reset()
 {
 	// TODO: does this get automatically cleared on reset or not?
 	m_cmd_pending = 0U;
@@ -257,7 +260,7 @@ void qsound_device::device_reset()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void qsound_device::sound_stream_update(sound_stream &stream)
+void capcom_q1_device::sound_stream_update(sound_stream &stream)
 {
 	stream.fill(0, sound_stream::sample_t(m_samples[0]) * (1.0 / 32768.0));
 	stream.fill(1, sound_stream::sample_t(m_samples[1]) * (1.0 / 32768.0));
@@ -269,21 +272,21 @@ void qsound_device::sound_stream_update(sound_stream &stream)
 //  bank is changed
 //-------------------------------------------------
 
-void qsound_device::rom_bank_post_change()
+void capcom_q1_device::rom_bank_post_change()
 {
 	machine().scheduler().synchronize();
 }
 
 
 // DSP external ROM space
-void qsound_device::dsp_io_map(address_map &map)
+void capcom_q1_device::dsp_io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).mirror(0x8000).r(FUNC(qsound_device::dsp_sample_r));
+	map(0x0000, 0x7fff).mirror(0x8000).r(FUNC(capcom_q1_device::dsp_sample_r));
 }
 
 
-u16 qsound_device::dsp_sample_r(offs_t offset)
+u16 capcom_q1_device::dsp_sample_r(offs_t offset)
 {
 	// on CPS2, bit 0-7 of external ROM data is tied to ground
 	u8 const byte(read_byte((u32(m_rom_bank) << 16) | m_rom_offset));
@@ -292,7 +295,7 @@ u16 qsound_device::dsp_sample_r(offs_t offset)
 	return u16(byte) << 8;
 }
 
-void qsound_device::dsp_ock_w(int state)
+void capcom_q1_device::dsp_ock_w(int state)
 {
 	// detect active edge
 	if (bool(state) == bool(m_ock))
@@ -316,12 +319,12 @@ void qsound_device::dsp_ock_w(int state)
 		m_fsr >>= 1;
 		if (!m_fsr)
 		{
-			LOGSAMPLE("QSound: recovered channel %u sample %04X\n", m_channel, m_sr);
+			LOGSAMPLE("%s: recovered channel %u sample %04X\n", machine().describe_context(), m_channel, m_sr);
 			if (!m_channel)
 				m_stream->update();
 			m_samples[m_channel] = m_sr;
-#if 0 // enable to log PCM to a file - can be imported with "ffmpeg -f s16be -ar 24038 -ac 2 -i qsound.pcm qsound.wav"
-			static std::ofstream logfile("qsound.pcm", std::ios::binary);
+#if 0 // enable to log PCM to a file - can be imported with "ffmpeg -f s16be -ar 24038 -ac 2 -i capcom_q1.pcm capcom_q1.wav"
+			static std::ofstream logfile("capcom_q1.pcm", std::ios::binary);
 			logfile.put(u8(m_sr >> 8));
 			logfile.put(u8(m_sr));
 #endif
@@ -334,26 +337,26 @@ void qsound_device::dsp_ock_w(int state)
 	m_old = old;
 }
 
-void qsound_device::dsp_pio_w(offs_t offset, u16 data)
+void capcom_q1_device::dsp_pio_w(offs_t offset, u16 data)
 {
-	// PDX0 is used for QSound ROM offset, and PDX1 is used for ADPCM ROM offset
+	// PDX0 is used for DSP ROM offset, and PDX1 is used for ADPCM ROM offset
 	// this prevents spurious PSEL transitions between sending samples to the DAC
-	// it could still be used to have separate QSound/ADPCM ROM banks
+	// it could still be used to have separate PCM/ADPCM ROM banks
 	m_rom_bank = (m_rom_bank & 0x7fffU) | u16(offset << 15);
 	m_rom_offset = data;
 }
 
 
-u16 qsound_device::dsp_pio_r()
+u16 capcom_q1_device::dsp_pio_r()
 {
 	LOGCOMMAND(
-			"QSound: DSP PIO read returning %s = %04X\n",
+			"%s: DSP PIO read returning %s = %04X\n", machine().describe_context(),
 			m_cmd_pending ? "addr" : "data", m_cmd_pending ? m_cmd_addr : m_cmd_data);
 	if (m_cmd_pending)
 	{
 		m_cmd_pending = 0U;
 		m_dsp->set_input_line(DSP16_INT_LINE, CLEAR_LINE);
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(qsound_device::set_dsp_ready), this));
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(capcom_q1_device::set_dsp_ready), this));
 		return m_cmd_addr;
 	}
 	else
@@ -362,12 +365,12 @@ u16 qsound_device::dsp_pio_r()
 	}
 }
 
-void qsound_device::set_dsp_ready(s32 param)
+void capcom_q1_device::set_dsp_ready(s32 param)
 {
 	m_dsp_ready = 1U;
 }
 
-void qsound_device::set_cmd(s32 param)
+void capcom_q1_device::set_cmd(s32 param)
 {
 	/*
 	 *  I don't believe the data word is actually double-buffered in
@@ -387,7 +390,7 @@ void qsound_device::set_cmd(s32 param)
 	 *  command 0x11 (Gyro Man's theme).  Within two minutes, some
 	 *  channels' sample banks/offsets will likely be overwritten.
 	 */
-	LOGCOMMAND("QSound: DSP command @%02X = %04X\n", u32(param) >> 16, u16(u32(param)));
+	LOGCOMMAND("%s: DSP command @%02X = %04X\n", machine().describe_context(), u32(param) >> 16, u16(u32(param)));
 	m_cmd_addr = u16(u32(param) >> 16);
 	m_cmd_data = u16(u32(param));
 	m_cmd_pending = 1U;
