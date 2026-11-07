@@ -62,6 +62,8 @@ ToDo:
 #include "speaker.h"
 
 #include "st_mp200.lh"
+#include "st_mp200_ali.lh"
+#include "st_mp200_meteor.lh"
 
 
 namespace{
@@ -1129,11 +1131,10 @@ ROM_END
 
 
 // 6-digit
-GAME(1979,  meteorp,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Meteor (Bug fix release)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  meteorpo,   meteorp,    st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Meteor (First release)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAMEL(1979,  meteorp,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Meteor (Bug fix release)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_st_mp200_meteor )
+GAMEL(1979,  meteorpo,   meteorp,    st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Meteor (First release)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_st_mp200_meteor )
 GAME(1980,  galaxypi,   0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Galaxy",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  ali,        0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Ali",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-
+GAMEL(1980,  ali,        0,          st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Ali",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_st_mp200_ali )
 // 7-digit
 GAME(1980,  cheetah,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "Cheetah (Black Cabinet)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1980,  cheetahb,   cheetah,    st_mp200,   mp200, st_mp200_state, init_st_mp202, ROT0, "Stern",     "Cheetah (Blue Cabinet)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
