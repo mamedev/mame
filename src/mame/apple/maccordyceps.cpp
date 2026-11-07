@@ -229,6 +229,7 @@ void pmac6200_state::pmac6200(machine_config &config)
 	m_f108->set_maincpu_tag("maincpu");
 	m_f108->set_primetimeii_tag(m_primetimeiii);
 	m_f108->write_ata_irq().set(m_primetimeiii, FUNC(primetimeii_device::ata_irq_w));
+	m_f108->set_scsi_clock(CPU_BCLK / ((15.0 / 8) + (1.0 / 2048)));
 
 	NSCSI_CONNECTOR(config, "f108:scsi:0", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "f108:scsi:1", mac_scsi_devices, nullptr);
