@@ -13,6 +13,7 @@
 class digiblast_nand_device : public device_t, public device_digiblast_cart_interface
 {
 public:
+	// device_digiblast_cart_interface implementation
 	virtual u8 data_r() override;
 	virtual void data_w(u8 data) override;
 	virtual void command_w(u8 data) override;
@@ -47,7 +48,6 @@ public:
 protected:
 	digiblast_nand_16m_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-protected:
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };

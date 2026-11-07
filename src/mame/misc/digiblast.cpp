@@ -126,7 +126,8 @@ void digiblast_state::machine_start()
 uint32_t digiblast_state::adc_data_r(offs_t offset)
 {
 	const uint32_t data = 0x3ff;
-	LOGMASKED(LOG_ADC, "%s: adc_data_r(%d): %08x\n", machine().describe_context(), offset, data);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_ADC, "%s: adc_data_r(%d): %08x\n", machine().describe_context(), offset, data);
 	return data;
 }
 
@@ -146,7 +147,8 @@ int digiblast_state::i2c_sda_r()
 {
 	const bool nvram_state = m_cart->i2c_sda_r();
 	const bool state = nvram_state && m_dac_sda;
-	LOGMASKED(LOG_I2C, "%s: i2c_sda_r: %d\n", machine().describe_context(), state);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_I2C, "%s: i2c_sda_r: %d\n", machine().describe_context(), state);
 	return state;
 }
 
@@ -163,31 +165,39 @@ uint32_t digiblast_state::gpio_port_r(offs_t offset)
 	switch (offset)
 	{
 		case s3c24xx_device::GPIO_PORT_A:
-			LOGMASKED(LOG_GPIO, "%s: gpio_port_r port A: %08x\n", machine().describe_context(), data);
+			if (!machine().side_effects_disabled())
+				LOGMASKED(LOG_GPIO, "%s: gpio_port_r port A: %08x\n", machine().describe_context(), data);
 			break;
 		case s3c24xx_device::GPIO_PORT_B:
-			LOGMASKED(LOG_GPIO, "%s: gpio_port_r port B: %08x\n", machine().describe_context(), data);
+			if (!machine().side_effects_disabled())
+				LOGMASKED(LOG_GPIO, "%s: gpio_port_r port B: %08x\n", machine().describe_context(), data);
 			break;
 		case s3c24xx_device::GPIO_PORT_C:
-			LOGMASKED(LOG_GPIO, "%s: gpio_port_r port C: %08x\n", machine().describe_context(), data);
+			if (!machine().side_effects_disabled())
+				LOGMASKED(LOG_GPIO, "%s: gpio_port_r port C: %08x\n", machine().describe_context(), data);
 			break;
 		case s3c24xx_device::GPIO_PORT_D:
-			LOGMASKED(LOG_GPIO, "%s: gpio_port_r port D: %08x\n", machine().describe_context(), data);
+			if (!machine().side_effects_disabled())
+				LOGMASKED(LOG_GPIO, "%s: gpio_port_r port D: %08x\n", machine().describe_context(), data);
 			break;
 		case s3c24xx_device::GPIO_PORT_E:
-			LOGMASKED(LOG_GPIO, "%s: gpio_port_r port E: %08x\n", machine().describe_context(), data);
+			if (!machine().side_effects_disabled())
+				LOGMASKED(LOG_GPIO, "%s: gpio_port_r port E: %08x\n", machine().describe_context(), data);
 			break;
 		case s3c24xx_device::GPIO_PORT_F:
 			data = m_buttons[0]->read();
-			LOGMASKED(LOG_GPIO, "%s: gpio_port_r port F: %08x\n", machine().describe_context(), data);
+			if (!machine().side_effects_disabled())
+				LOGMASKED(LOG_GPIO, "%s: gpio_port_r port F: %08x\n", machine().describe_context(), data);
 			break;
 		case s3c24xx_device::GPIO_PORT_G:
 			data = m_buttons[1]->read();
-			LOGMASKED(LOG_GPIO, "%s: gpio_port_r port G: %08x\n", machine().describe_context(), data);
+			if (!machine().side_effects_disabled())
+				LOGMASKED(LOG_GPIO, "%s: gpio_port_r port G: %08x\n", machine().describe_context(), data);
 			break;
 		case s3c24xx_device::GPIO_PORT_H:
 			data = m_display->read();
-			LOGMASKED(LOG_GPIO, "%s: gpio_port_r port H: %08x\n", machine().describe_context(), data);
+			if (!machine().side_effects_disabled())
+				LOGMASKED(LOG_GPIO, "%s: gpio_port_r port H: %08x\n", machine().describe_context(), data);
 			break;
 	}
 	return data;
