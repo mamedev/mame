@@ -125,9 +125,9 @@
 
  The "GANCHONEW" (V1) board has no DAC: the timer 0 interrupt pulses P3.4 for
  about 23 us at the frequency of the note, a train of narrow pulses rather
- than a square wave.  Its power-on checksum reads the input ports too, so it
- only passes with all the inputs idle: resetting it while the crane rests on
- its home switches shows "EPro".
+ than a square wave.  Its power-on checksum also reads the input block at
+ 0x8000-0x9fff, which only adds up to zero whatever the inputs if both ports
+ are mirrored over it as on the later boards, so that decoding is assumed.
 
  Display: the four digits are not multiplexed, the 32 segment lines are driven
  by a serial LED driver on the "Plumadig" board.  The firmware supports two
@@ -199,13 +199,13 @@ protected:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_i2cmem(*this, "i2cmem")
-		, m_ledctrl(*this, "ledctrl")
-		, m_display(*this, "display")
 		, m_rombank(*this, "rombank")
 		, m_rom(*this, "program")
+		, m_claw(*this, "claw")
+		, m_ledctrl(*this, "ledctrl")
+		, m_display(*this, "display")
 		, m_outputs(*this, "out%u", 0U)
 		, m_motors(*this, "motor%u", 0U)
-		, m_claw(*this, "claw")
 		, m_crane_fb(*this, "crane_fb")
 		, m_crane_lr(*this, "crane_lr")
 		, m_crane_z(*this, "crane_z")
@@ -224,24 +224,25 @@ protected:
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
-	required_device<mm5448_device> m_ledctrl;
-	required_device<pwm_display_device> m_display;
 	required_memory_bank m_rombank;
 	required_region_ptr<u8> m_rom;
+	output_finder<> m_claw;
+
+	// crane position from 0.0 to 1.0: front to back, left to right and claw up to down
+	double m_pos[3] = { 0.5, 0.5, 0.1 };
+
+private:
+	required_device<mm5448_device> m_ledctrl;
+	required_device<pwm_display_device> m_display;
 	output_finder<8> m_outputs;
 	output_finder<6> m_motors;
-	output_finder<> m_claw;
 	output_finder<> m_crane_fb;
 	output_finder<> m_crane_lr;
 	output_finder<> m_crane_z;
 
-	// crane position from 0.0 to 1.0: front to back, left to right and claw up
-	// to down; starts clear of every limit switch, which the V1 checksum reads
-	double m_pos[3] = { 0.5, 0.5, 0.1 };
 	u8 m_motor_state = 0;
 	attotime m_mech_time;
 
-private:
 	void program_map(address_map &map) ATTR_COLD;
 
 	void display_output_w(u64 data);
@@ -361,7 +362,8 @@ void toyshop_state::machine_start()
 {
 	ganchonew_state::machine_start();
 
-	// EA presumably tied low: run from the external flash, not the internal one
+	// the whole program, vectors included, is in the external flash, so EA is
+	// presumably tied low (not traced on the PCB)
 	m_maincpu->space(AS_PROGRAM).install_rom(0x0000, 0xffff, &m_rom[0]);
 }
 
@@ -396,10 +398,10 @@ void ganchonew_state::ext_map(address_map &map)
 void ganchonew_v1_state::ext_map(address_map &map)
 {
 	map(0x0000, 0xffff).bankr(m_rombank);
-	map(0x8000, 0x8000).portr("IN0");
-	map(0x8001, 0x8001).portr("IN1");
-	map(0xa000, 0xa000).w(FUNC(ganchonew_v1_state::motors_w));
-	map(0xa001, 0xa001).w(FUNC(ganchonew_v1_state::outputs_w));
+	map(0x8000, 0x8000).mirror(0x1ffe).portr("IN0");
+	map(0x8001, 0x8001).mirror(0x1ffe).portr("IN1");
+	map(0xa000, 0xa000).mirror(0x1ffe).w(FUNC(ganchonew_v1_state::motors_w));
+	map(0xa001, 0xa001).mirror(0x1ffe).w(FUNC(ganchonew_v1_state::outputs_w));
 }
 
 void ganchonew_state::set_bank(u8 bank)
@@ -572,7 +574,7 @@ void ganchonew_v1_state::p3_w(u8 data)
     Inputs
 ********************************************************************************/
 
-static INPUT_PORTS_START(ganchonew)
+INPUT_PORTS_START(ganchonew)
 	PORT_START("IN0")
 	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(ganchonew_state::limits_r))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_COIN3)
@@ -586,7 +588,7 @@ static INPUT_PORTS_START(ganchonew)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)
-	PORT_CONFNAME(0x20, 0x00, "JP1 - Display Board")
+	PORT_CONFNAME(0x20, 0x00, "Display Board")
 	PORT_CONFSETTING(   0x00, "Serial LED driver (MM5450 type)")
 	PORT_CONFSETTING(   0x20, "Shift registers (not emulated)")
 	PORT_SERVICE(0x40, IP_ACTIVE_LOW)
@@ -598,7 +600,7 @@ static INPUT_PORTS_START(ganchonew)
 	PORT_BIT(0xf3, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START(ganchonew_v1)
+INPUT_PORTS_START(ganchonew_v1)
 	PORT_START("IN0")
 	PORT_BIT(0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(ganchonew_v1_state::limits_r))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)  PORT_NAME("Prize Sensor")  PORT_CODE(KEYCODE_P)
@@ -633,7 +635,6 @@ void compucranes_state::common(machine_config &config)
 
 	I2C_24C16(config, m_i2cmem);
 
-	// stands in for the unidentified MM5450 style driver, outputs 1-32 used
 	MM5448(config, m_ledctrl, 0).output_cb().set(FUNC(compucranes_state::display_output_w));
 
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
@@ -753,9 +754,7 @@ ROM_START(octopussy)
 	ROM_LOAD("24c16.ic5",   0x00000, 0x00800, BAD_DUMP CRC(1c93e051) SHA1(e1cd62da24b049377d3103f1aae088d4581789c2)) // hand built, see the notes at the top
 ROM_END
 
-/* Direct clone of the GANCHONEW PCB by OM Vending, silkscreened "CPU GRUA V2  O. M. VENDING".
-   The whole program, vectors included, is in the external flash, so the AT89S52 EA pin is
-   presumably tied low (see toyshop_state::machine_start), but it hasn't been traced on the PCB. */
+// Direct clone of the GANCHONEW PCB by OM Vending, silkscreened "CPU GRUA V2  O. M. VENDING".
 ROM_START(toyshop)
 	ROM_REGION(0x02000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("89s52.ic1",   0x00000, 0x02000, NO_DUMP)

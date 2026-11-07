@@ -5,10 +5,6 @@ copyright-holders:Tomás García-Merás Capote
 
 Compumatic "GANCHONEW" crane machines.
 
-Four 7-segment digits (plus decimal point) on the small "Plumadig" display
-board, wired to outputs 1-32 of its serial LED driver, first byte sent =
-leftmost digit.
-
 The top view shows the simulated position of the gantry (crane_lr: 0 = left,
 100 = right; crane_fb: 0 = front, 100 = back) and the claw height (crane_z:
 0 = up, 100 = down).  The prize chute is on the front left corner, which is
@@ -43,21 +39,18 @@ where the crane parks.  The top view is only illustrative, not to scale.
 		<group ref="display"><bounds x="20" y="10" width="180" height="56" /></group>
 		<element ref="txt_display"><bounds x="85" y="68" width="50" height="8" /></element>
 
-		<!-- top view of the cabinet -->
 		<element ref="txt_back"><bounds x="20" y="84" width="150" height="8" /></element>
 		<element ref="rect"><bounds x="20" y="94" width="150" height="150" /><color red="0.16" green="0.22" blue="0.30" /></element>
 		<element ref="rect"><bounds x="20" y="214" width="30" height="30" /><color red="0.02" green="0.02" blue="0.02" /></element>
 		<element ref="txt_chute"><bounds x="21" y="226" width="28" height="7" /></element>
 		<element ref="txt_front"><bounds x="20" y="246" width="150" height="8" /></element>
 
-		<!-- gantry rail, moves front/back -->
 		<element ref="rect">
 			<color red="0.75" green="0.75" blue="0.75" />
 			<animate name="crane_fb" />
 			<bounds state="0" x="20" y="228" width="150" height="2" />
 			<bounds state="100" x="20" y="108" width="150" height="2" />
 		</element>
-		<!-- trolley rail, moves left/right -->
 		<element ref="rect">
 			<color red="0.75" green="0.75" blue="0.75" />
 			<animate name="crane_lr" />
@@ -65,7 +58,6 @@ where the crane parks.  The top view is only illustrative, not to scale.
 			<bounds state="100" x="154" y="94" width="2" height="150" />
 		</element>
 
-		<!-- claw height -->
 		<element ref="txt_claw"><bounds x="176" y="84" width="30" height="8" /></element>
 		<element ref="rect"><bounds x="186" y="94" width="10" height="150" /><color red="0.25" green="0.25" blue="0.25" /></element>
 		<element ref="rect">
