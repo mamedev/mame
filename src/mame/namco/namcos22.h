@@ -395,6 +395,7 @@ protected:
 	void draw_polygons();
 	void draw_sprites();
 	void draw_sprite_group(const u32 *src, const u32 *attr, int num_sprites, int deltax, int deltay, bool y_lowres);
+	void vics_copy_sprite_data();
 	void namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void install_c74_speedup();
