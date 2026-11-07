@@ -529,7 +529,7 @@ void smc91c9x_device::recv_complete_cb(int result)
 	// Couldn't allocate memory
 	else if (result == -2)
 	{
-		m_reg[B2_INTERRUPT] |= EINT_ALLOC;
+		m_reg[B2_INTERRUPT] |= EINT_RX_OVRN;
 	}
 
 	update_ethernet_irq();
