@@ -20,7 +20,7 @@
     - double height cursor
     - row attributes
     - pin configuration
-    - operation modes 0,4,7
+    - operation modes 0,7
     - address modes 1,3
     - light pen
 
