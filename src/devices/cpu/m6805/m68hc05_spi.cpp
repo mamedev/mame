@@ -11,8 +11,10 @@
     SPIF/WCOL/MODF with their clearing sequences (6.4.2) and the SPIE
     interrupt.
 
-    Not implemented (logged when selected): slave mode.  Port D is not
-    modelled, so PD2-PD5 are not forced to read zero while SPE is set.
+    Not implemented: slave mode (logged when selected).  SCK and MOSI are not
+    released when SPE clears or on a mode fault: they keep their last level.
+    Port D reads aren't affected by SPE; 2.2.2 says only that PD2-PD5 read
+    the pins with SPE clear.
 
 ***************************************************************************/
 
@@ -22,7 +24,7 @@
 
 #define LOG_SPI     (1U << 1)
 
-//#define VERBOSE (LOG_GENERAL | LOG_SPI)
+//#define VERBOSE (LOG_SPI)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
@@ -30,16 +32,6 @@
 
 
 namespace {
-
-// SPCR bits
-constexpr u8 SPCR_SPIE  = 0x80;
-constexpr u8 SPCR_SPE   = 0x40;
-constexpr u8 SPCR_MSTR  = 0x10;
-
-// SPSR bits
-constexpr u8 SPSR_SPIF  = 0x80;
-constexpr u8 SPSR_WCOL  = 0x40;
-constexpr u8 SPSR_MODF  = 0x10;
 
 // 6.4.1: SCK is E/2, E/4, E/16 or E/32
 constexpr u8 SCK_DIVISOR[4] = { 2, 4, 16, 32 };
@@ -62,7 +54,7 @@ m68hc05_spi_device::m68hc05_spi_device(machine_config const &mconfig, char const
 	m_rdr(0x00),
 	m_out(0x00),
 	m_in(0x00),
-	m_tick(0),
+	m_half_clocks(0),
 	m_busy(false),
 	m_ss(true),
 	m_irq_state(false),
@@ -89,7 +81,7 @@ void m68hc05_spi_device::device_start()
 	save_item(NAME(m_rdr));
 	save_item(NAME(m_out));
 	save_item(NAME(m_in));
-	save_item(NAME(m_tick));
+	save_item(NAME(m_half_clocks));
 	save_item(NAME(m_busy));
 	save_item(NAME(m_ss));
 	save_item(NAME(m_irq_state));
@@ -99,8 +91,8 @@ void m68hc05_spi_device::device_start()
 void m68hc05_spi_device::device_reset()
 {
 	// table 3-1: SPE, SPIE, MSTR, SPIF, WCOL and MODF are cleared; 6.4.1: CPOL, CPHA and
-	// SPR1:0 are not affected (nor is SPDR)
-	m_spcr &= 0x0f;
+	// SPR1:0 are not affected.  SPDR is left alone too (inferred: the sheet doesn't say).
+	m_spcr &= SPCR_CPOL | SPCR_CPHA | SPCR_SPR;
 	m_spsr = 0x00;
 	m_spsr_seen = 0x00;
 
@@ -120,7 +112,13 @@ u8 m68hc05_spi_device::spcr_r()
 
 void m68hc05_spi_device::spcr_w(u8 data)
 {
-	data &= 0xdf;
+	if (machine().side_effects_disabled())
+	{
+		set_spcr(data);
+		return;
+	}
+
+	data &= SPCR_MASK;
 
 	// 6.4.2 B4: MODF clears by an SPSR read with MODF set followed by an SPCR write, and
 	// SPE and MSTR can't be set while it is set except in that sequence
@@ -142,6 +140,8 @@ void m68hc05_spi_device::spcr_w(u8 data)
 	if ((rise & SPCR_SPE) && !mstr())
 		LOGSPI("slave mode selected, not supported\n");
 
+	// inferred: clearing SPE abandons a byte in progress (6.4.1 B6 only says SPE clear
+	// disconnects the SPI from the pins)
 	if (!spe())
 		abort_transfer();
 	update_sck();
@@ -153,7 +153,7 @@ u8 m68hc05_spi_device::spsr_r()
 {
 	if (!machine().side_effects_disabled())
 		m_spsr_seen = m_spsr;
-	return m_spsr & 0xd0;
+	return m_spsr & SPSR_MASK;
 }
 
 u8 m68hc05_spi_device::spdr_r()
@@ -197,27 +197,28 @@ void m68hc05_spi_device::spdr_w(u8 data)
 		m_spsr_seen &= ~clear;
 	}
 
-	// 6.4.3: the write goes straight into the shift register
+	// 6.4.3: the write goes straight into the shift register.  Inferred: with SPE or MSTR
+	// clear it starts nothing.
 	m_out = data;
 	if (start)
 	{
-		LOGSPI("sending %02X, E/%u\n", data, SCK_DIVISOR[m_spcr & 3]);
+		LOGSPI("sending %02X, E/%u\n", data, SCK_DIVISOR[m_spcr & SPCR_SPR]);
 		m_busy = true;
-		m_tick = 0;
+		m_half_clocks = 0;
 		m_in = 0;
 
-		// 6.2.1: data is on MOSI half an SCK cycle before the first clock edge; with CPHA
-		// clear that's the MSB straight away, with CPHA set it follows with the first edge
+		// Figure 6-2: with CPHA clear the MSB is on MOSI half an SCK cycle before the first
+		// clock edge; with CPHA set it goes out on the first edge
 		if (!cpha())
 			m_mosi_cb(BIT(m_out, 7));
-		m_timer->adjust(attotime::from_ticks(SCK_DIVISOR[m_spcr & 3] / 2, clock()));
+		m_timer->adjust(half_period());
 	}
 }
 
 
 void m68hc05_spi_device::ss_w(int state)
 {
-	m_ss = state ? true : false;
+	m_ss = bool(state);
 	check_modf();
 }
 
@@ -228,7 +229,7 @@ TIMER_CALLBACK_MEMBER(m68hc05_spi_device::tick)
 	// CPHA clear: data is captured on the leading edge and the next bit goes out on the
 	// trailing one.  CPHA set: the next bit goes out on the leading edge and data is
 	// captured on the trailing one.
-	unsigned const n(m_tick++);
+	unsigned const n(m_half_clocks++);
 	unsigned const bit(n >> 1);
 
 	// MISO is sampled before the edge that captures it: the slave changes it after
@@ -251,11 +252,12 @@ TIMER_CALLBACK_MEMBER(m68hc05_spi_device::tick)
 
 	if (n < 15)
 	{
-		m_timer->adjust(attotime::from_ticks(SCK_DIVISOR[m_spcr & 3] / 2, clock()));
+		m_timer->adjust(half_period());
 	}
 	else
 	{
-		// 6.4.2 B7: the shift register moves to the receive buffer as SPIF sets
+		// 6.4.2 B7: the shift register moves to the receive buffer as SPIF sets.  Setting
+		// it at the 8th trailing edge is inferred: the sheet gives no edge.
 		m_busy = false;
 		m_rdr = m_in;
 		LOGSPI("transfer complete, received %02X\n", m_rdr);
@@ -264,15 +266,21 @@ TIMER_CALLBACK_MEMBER(m68hc05_spi_device::tick)
 }
 
 
+attotime m68hc05_spi_device::half_period() const
+{
+	return attotime::from_ticks(SCK_DIVISOR[m_spcr & SPCR_SPR] / 2, clock());
+}
+
+
 void m68hc05_spi_device::set_spcr(u8 data)
 {
-	m_spcr = data & 0xdf;
+	m_spcr = data & SPCR_MASK;
 	update_irq();
 }
 
 void m68hc05_spi_device::set_spsr(u8 data)
 {
-	m_spsr = data & 0xd0;
+	m_spsr = data & SPSR_MASK;
 	update_irq();
 }
 
@@ -318,7 +326,8 @@ void m68hc05_spi_device::update_sck()
 
 void m68hc05_spi_device::check_modf()
 {
-	// 6.2.3: a master seeing SS low becomes a slave: MODF sets, MSTR and SPE clear
+	// 6.2.3: a master seeing SS low becomes a slave: MODF sets, MSTR and SPE clear.
+	// SS is treated as a level and abandons a byte in progress (both inferred).
 	if (!m_ss && spe() && mstr())
 	{
 		LOGSPI("SS low in master mode, mode fault\n");

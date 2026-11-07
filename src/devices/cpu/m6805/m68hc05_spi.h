@@ -29,7 +29,7 @@ public:
 	auto miso_cb() { return m_miso_cb.bind(); }
 	auto irq_cb() { return m_irq_cb.bind(); }
 
-	// SS input pin (PD5), active low
+	// SS input pin (PD5), active low; high (not selected) until first written
 	void ss_w(int state);
 
 	void map(address_map &map) ATTR_COLD;
@@ -47,6 +47,22 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
+	enum : u8
+	{
+		SPCR_SPIE = 0x80,
+		SPCR_SPE  = 0x40,
+		SPCR_MSTR = 0x10,
+		SPCR_CPOL = 0x08,
+		SPCR_CPHA = 0x04,
+		SPCR_SPR  = 0x03,
+		SPCR_MASK = 0xdf,
+
+		SPSR_SPIF = 0x80,
+		SPSR_WCOL = 0x40,
+		SPSR_MODF = 0x10,
+		SPSR_MASK = 0xd0
+	};
+
 	u8 spcr_r();
 	void spcr_w(u8 data);
 	u8 spsr_r();
@@ -55,10 +71,11 @@ private:
 
 	TIMER_CALLBACK_MEMBER(tick);
 
-	bool spe() const { return BIT(m_spcr, 6); }
-	bool mstr() const { return BIT(m_spcr, 4); }
-	bool cpol() const { return BIT(m_spcr, 3); }
-	bool cpha() const { return BIT(m_spcr, 2); }
+	bool spe() const { return m_spcr & SPCR_SPE; }
+	bool mstr() const { return m_spcr & SPCR_MSTR; }
+	bool cpol() const { return m_spcr & SPCR_CPOL; }
+	bool cpha() const { return m_spcr & SPCR_CPHA; }
+	attotime half_period() const;
 
 	void set_flags(u8 mask);
 	void clear_flags(u8 mask);
@@ -79,7 +96,7 @@ private:
 	u8                  m_rdr;              // receive buffer, read through SPDR
 	u8                  m_out;              // byte being shifted out
 	u8                  m_in;               // byte being shifted in
-	u8                  m_tick;             // half SCK periods elapsed in the transfer
+	u8                  m_half_clocks;      // half SCK periods elapsed in the transfer
 	bool                m_busy;
 	bool                m_ss;
 	bool                m_irq_state;
