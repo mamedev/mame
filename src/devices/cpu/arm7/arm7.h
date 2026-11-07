@@ -797,7 +797,7 @@ public:
 	arm9_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	arm9_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint32_t archFlags, endianness_t endianness);
+	arm9_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint32_t archFlags, endianness_t endianness, address_map_constructor internal_map = address_map_constructor());
 };
 
 
@@ -829,7 +829,7 @@ public:
 	virtual uint32_t insn_fetch_word(offs_t addr) override;
 
 protected:
-	arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map = address_map_constructor());
 
 	virtual const void *insn_fetch_ptr(offs_t addr) override;
 	virtual bool drc_memory_rotates_halfwords() const override { return false; }   // LDRH aligns the address and takes the halfword as it is
@@ -901,13 +901,6 @@ protected:
 	uint32_t m_vfp_regs[32] = {};
 	uint32_t m_fpscr = 0;
 	uint32_t m_fpexc = 0;
-};
-
-class igs036_cpu_device : public arm946es_cpu_device
-{
-public:
-	// construction/destruction
-	igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class pxa250_cpu_device : public arm7_cpu_device
@@ -1093,6 +1086,5 @@ DECLARE_DEVICE_TYPE(SA110,        sa110_cpu_device)
 DECLARE_DEVICE_TYPE(SA110_BE,     sa110_be_cpu_device)
 DECLARE_DEVICE_TYPE(SA1100,       sa1100_cpu_device)
 DECLARE_DEVICE_TYPE(SA1110,       sa1110_cpu_device)
-DECLARE_DEVICE_TYPE(IGS036,       igs036_cpu_device)
 
 #endif // MAME_CPU_ARM7_ARM7_H
