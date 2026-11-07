@@ -106,26 +106,19 @@ void rm480z_state::videoram_write(offs_t offset, uint8_t data)
 
 void rm480z_state::putChar(int charnum, int x, int y, bitmap_ind16 &bitmap, bool bMonochrome) const
 {
+	const int base = m_alt_char_set ? 0x1000 : 0;
 	const int pw = (m_videomode == RM480Z_VIDEOMODE_40COL) ? 2 : 1;
 	const int ph = 1;
 	bool attrDim = false;
-	bool attrRev = false;
 
-	if (charnum > 128)
+	if ((charnum >= 129) && (m_alt_char_set || (charnum <= 191)))
 	{
-		if (m_alt_char_set)
-		{
-			charnum -= 128;
-			attrDim = true;
-			attrRev = true;
-		}
-		else if (charnum < 0xc0)
-		{
-			attrDim = true;
-		}
+		// in the alternative set characters 129-255 are dim
+		// in the regular set characters 129-191 are dim
+		attrDim = true;
 	}
 
-	int data_pos = charnum * 16;
+	int data_pos = base + charnum * 16;
 
 	for (int r = 0; r < 10; r++, data_pos++)
 	{
@@ -133,15 +126,8 @@ void rm480z_state::putChar(int charnum, int x, int y, bitmap_ind16 &bitmap, bool
 
 		for (int c = 0; c < 8; c++, data <<= 1)
 		{
-			uint8_t pixel_value;
-			if (attrRev)
-			{
-				pixel_value = BIT(data, 7) ? 0 : 2;
-			}
-			else
-			{
-				pixel_value = BIT(data, 7) ? 2 : 0;
-			}
+			uint8_t pixel_value = BIT(data, 7) ? 2 : 0;
+
 			if (attrDim && pixel_value && bMonochrome)
 			{
 				// NB only monochrome monitors support dimmed (grey) text
