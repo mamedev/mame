@@ -235,7 +235,7 @@ pos is 11.5 fixed point
 		    Word 0: Line shift for 1st set - 13.3 signed fixed point value.
 		    Word 1: Line scale - 5.11 fixed point value.  So 0x800 is 1:1, 0x400 is 1:2, etc
 		    Word 2: Line shift for 2nd set - 13.3 signed fixed point value.
-		    Word 3: ? (bit 15 is set on every line in tunnels)
+		    Word 3: Bit 15 enables the 2nd pixel set; the game sets it on tunnel and fork lines.
 
 		    The scale is shared between both pixel sets.  The 2nd set is used when the road
 		    forks into two between stages, and for the road in tunnels.  The 2nd line shift is
@@ -256,15 +256,16 @@ pos is 11.5 fixed point
 		    far off screen; in tunnels the game pushes the 1st set off screen (shift 0x87b9) and
 		    draws the road with the 2nd set and its palette, so the sum lands on screen.
 		*/
+		bool const set2_en = BIT(data[3], 15);
 		int const start1 = step ? ((-int16_t(shift) * 256) + 0x80) / step : 0x10000;
 		int const start2 = step ? ((-int16_t(uint16_t(shift + shift2)) * 256) + 0x80) / step : 0x10000;
 
 		// Pixels outside both sets take the edge pen of the outermost set on that side, from that set's palette bank
-		bool const set2_left = start2 < start1;
+		bool const set2_left = set2_en && start2 < start1;
 		int const left_col = linedata[set2_left ? 0x200 : 0] & 0xf;
 		int const left_bank = set2_left ? 32 : 0;
-		int const right_col = linedata[set2_left ? 0x7f : (0x7f + 0x200)] & 0xf;
-		int const right_bank = set2_left ? 0 : 32;
+		int const right_col = linedata[(set2_left || !set2_en) ? 0x7f : (0x7f + 0x200)] & 0xf;
+		int const right_bank = (set2_left || !set2_en) ? 0 : 32;
 
 		uint32_t *const dest = &bitmap.pix(y);
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
@@ -274,7 +275,7 @@ pos is 11.5 fixed point
 			int64_t const pos1 = int64_t(x - start1) * step;
 			int64_t const pos2 = int64_t(x - start2) * step;
 			bool const in1 = pos1 >= 0 && (pos1 >> 11) < 0x80;
-			bool const in2 = pos2 >= 0 && (pos2 >> 11) < 0x80;
+			bool const in2 = set2_en && pos2 >= 0 && (pos2 >> 11) < 0x80;
 			if (in1 && in2)
 			{
 				// Where the sets overlap, as in a fork, the higher pen appears to win so that the asphalt
@@ -298,12 +299,12 @@ pos is 11.5 fixed point
 				col = linedata[(pos2 >> 11) + 0x200] & 0xf;
 				bank = 32;
 			}
-			else if (x < start1 && x < start2)
+			else if (x < start1 && (!set2_en || x < start2))
 			{
 				col = left_col;                              // left of both sets
 				bank = left_bank;
 			}
-			else if (x >= start1 && x >= start2)
+			else if (x >= start1 && (!set2_en || x >= start2))
 			{
 				col = right_col;                             // right of both sets
 				bank = right_bank;
