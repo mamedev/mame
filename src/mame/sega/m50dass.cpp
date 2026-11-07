@@ -6,11 +6,12 @@
     Sega DASS (Dual Active Seat System) board, found on the Megalo 50 cabinet.
 
     The Megalo 50 holds up to three game boards (A, B and C) that the players choose with
-    the select buttons. This board switches between them, keeps the credits, plays its own
-    sounds, and drives the two moving seats of the deluxe cabinet. When a start button is
-    pressed it sends coin pulses to the selected board. Games that support the seats drive
-    them through their coin lockout outputs, one per seat. The seat motors are driven open
-    loop, with no position feedback.
+    the select buttons. This board switches between them, plays its own sounds, and drives
+    the two moving seats of the deluxe cabinet. It counts the coins itself and shows them on
+    its credit display: a start button spends them at the SW1 rate and sends the selected
+    board one coin pulse per credit. Games that support the seats drive them through their
+    coin lockout outputs, one per seat. The seat motors are driven open loop, with no
+    position feedback. The program reads the DIP switches only at reset.
 
     Sega PCB 837-8683 (171-6259B):
      -Z0840004PSC Z80 CPU and 8 MHz oscillator (OSC1)
@@ -93,6 +94,14 @@ u8 m50dass_device::board_inputs_r()
 
 void m50dass_device::reset_w(int state)
 {
+	// the I/O chips and the YM-2413 are presumably on the same reset line as the Z80
+	if (state)
+	{
+		m_io[0]->reset();
+		m_io[1]->reset();
+		m_ym2413->reset();
+	}
+
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 

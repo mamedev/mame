@@ -341,8 +341,9 @@ public:
 
 	void c2m50dass(machine_config &config) ATTR_COLD;
 
+	DECLARE_INPUT_CHANGED_MEMBER(cabinet_changed);
+
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
@@ -350,7 +351,7 @@ private:
 	required_ioport m_service;
 	required_ioport m_cabinet;
 
-	bool m_megalo50 = false;
+	bool megalo50() const { return BIT(m_cabinet->read(), 0); }
 
 	uint8_t io_porte_r();
 	void io_portd_w(uint8_t data);
@@ -1028,10 +1029,10 @@ static INPUT_PORTS_START( tfrceac )
 INPUT_PORTS_END
 
 
-// the seats also need SW2:1 on the DASS board and the game's moving seat setting
+// the seats also need the DASS "Board A Moving Seats" switch and the game's moving seat setting
 static INPUT_PORTS_START( megalo50 )
 	PORT_START("CABINET")
-	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(megalo50_state::cabinet_changed), 0)
 	PORT_CONFSETTING(    0x00, DEF_STR( Standard ) )
 	PORT_CONFSETTING(    0x01, "Megalo 50" )
 INPUT_PORTS_END
@@ -2068,28 +2069,25 @@ void megalo50_state::c2m50dass(machine_config &config)
 	MEGALO50_DASS(config, m_dass);
 	m_dass->p1_in_cb().set_ioport("P1");
 	m_dass->p2_in_cb().set_ioport("P2");
-	m_dass->add_route(ALL_OUTPUTS, "mono", 0.50);
-}
-
-void megalo50_state::machine_start()
-{
-	segac2_state::machine_start();
-
-	save_item(NAME(m_megalo50));
+	m_dass->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void megalo50_state::machine_reset()
 {
 	segac2_state::machine_reset();
 
-	m_megalo50 = BIT(m_cabinet->read(), 0);
-	m_dass->reset_w(!m_megalo50);
+	m_dass->reset_w(!megalo50());
+}
+
+INPUT_CHANGED_MEMBER(megalo50_state::cabinet_changed)
+{
+	m_dass->reset_w(!newval);
 }
 
 uint8_t megalo50_state::io_porte_r()
 {
 	uint8_t data = m_service->read();
-	if (m_megalo50)
+	if (megalo50())
 		data = (data & 0xc0) | bitswap<6>(m_dass->board_inputs_r(), 1, 0, 4, 5, 3, 2);
 
 	return data;
@@ -2098,7 +2096,7 @@ uint8_t megalo50_state::io_porte_r()
 void megalo50_state::io_portd_w(uint8_t data)
 {
 	// the DASS board drives the coin meters
-	if (!m_megalo50)
+	if (!megalo50())
 		segac2_state::io_portd_w(data);
 
 	m_dass->seat_w<0>(BIT(data, 2));
