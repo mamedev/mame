@@ -28,6 +28,9 @@
 
 #include "endianness.h"
 
+#include <algorithm>
+#include <iterator>
+
 #define LOG_MODE        (1U << 1)
 #define LOG_MONSENSE    (1U << 2)
 #define LOG_RAMDAC      (1U << 3)
@@ -158,7 +161,8 @@ void valkyrie_device::device_reset()
 {
 	m_video_timing = 0x80;
 	m_video_in_control = 0;
-	std::fill(&m_video_clut[0][0], &m_video_clut[0][0] + std::size(m_video_clut) * 3, 0);
+	for (auto &entry : m_video_clut)
+		std::fill(std::begin(entry), std::end(entry), 0);
 
 	// clear the MAME default palette so we don't get a weird red screen on initial startup
 	for (int i = 0; i < 256; i++)
@@ -279,7 +283,7 @@ u32 valkyrie_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 					*scanline++ = pens[pixels];
 				}
 			}
-			draw_video_window(bitmap, stride);
+			draw_video_window(bitmap, cliprect, stride);
 		}
 		break;
 
@@ -299,25 +303,26 @@ u32 valkyrie_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
-void valkyrie_device::draw_video_window(bitmap_rgb32 &bitmap, u32 stride)
+void valkyrie_device::draw_video_window(bitmap_rgb32 &bitmap, rectangle const &cliprect, u32 stride)
 {
 	if (!(m_video_in_control & VIDEO_IN_WINDOW_ACTIVE))
 		return;
 
 	auto const graphics = util::big_endian_cast<u8 const>(&m_vram[0]) + 0x1000;
-	auto const video = util::big_endian_cast<u8 const>(&m_vram[0]) + ((m_video_in_control & VIDEO_IN_BUFFER1) ? VIDEO_BUFFER1 : VIDEO_BUFFER0);
+	auto const video = util::big_endian_cast<u16 const>(&m_vram[0]) + (((m_video_in_control & VIDEO_IN_BUFFER1) ? VIDEO_BUFFER1 : VIDEO_BUFFER0) >> 1);
 	int const shift = (m_video_in_control & VIDEO_IN_PIXEL_DOUBLE) ? 1 : 0;
-	u32 const right = std::min<u32>(m_window_x + m_window_width, m_hres);
-	u32 const bottom = std::min<u32>(m_window_y + m_window_height, m_vres);
+	rectangle clip(m_window_x, m_window_x + m_window_width - 1, m_window_y, m_window_y + m_window_height - 1);
+	clip &= rectangle(0, m_hres - 1, 0, m_vres - 1);
+	clip &= cliprect;
 
-	for (u32 y = m_window_y; y < bottom; y++)
+	for (s32 y = clip.top(); y <= clip.bottom(); y++)
 	{
 		u32 const vy = m_field_y + ((y - m_window_y) >> shift);
 		if (vy >= VIDEO_BUFFER_HEIGHT)
 			break;
 
 		u32 *const scanline = &bitmap.pix(y);
-		for (u32 x = m_window_x; x < right; x++)
+		for (s32 x = clip.left(); x <= clip.right(); x++)
 		{
 			u32 const vx = m_field_x + ((x - m_window_x) >> shift);
 			if (vx >= VIDEO_BUFFER_WIDTH)
@@ -325,8 +330,7 @@ void valkyrie_device::draw_video_window(bitmap_rgb32 &bitmap, u32 stride)
 
 			if (graphics[(y * stride) + x] == m_color_key)
 			{
-				u32 const src = ((vy * VIDEO_BUFFER_WIDTH) + vx) << 1;
-				u16 const pixel = (video[src] << 8) | video[src + 1];
+				u16 const pixel = video[(vy * VIDEO_BUFFER_WIDTH) + vx];
 				scanline[x] = rgb_t(m_video_clut[BIT(pixel, 10, 5)][0], m_video_clut[BIT(pixel, 5, 5)][1], m_video_clut[BIT(pixel, 0, 5)][2]);
 			}
 		}
@@ -580,7 +584,8 @@ void valkyrie_device::ramdac_w(offs_t offset, u32 data)
 		break;
 
 	case 2:
-		m_video_clut[m_pal_address][m_pal_idx] = data;
+		if (m_pal_idx < 3)
+			m_video_clut[m_pal_address][m_pal_idx] = data;
 
 		m_pal_idx++;
 		if (m_pal_idx == 3)
@@ -689,7 +694,7 @@ void valkyrie_device::vram_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_vram[offset & (m_vram_size - 1)]);
 }
 
-offs_t valkyrie_device::video_buffer_offset(offs_t offset) const
+offs_t valkyrie_device::video_buffer_offset(offs_t offset)
 {
 	u32 const row = BIT(offset, 8, 8);
 	u32 const column = BIT(offset, 0, 8) << 2;

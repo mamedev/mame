@@ -60,8 +60,8 @@ private:
 	u16 m_window_x, m_window_y, m_window_width, m_window_height, m_field_x, m_field_y;
 	u8 m_video_clut[256][3];
 
-	void draw_video_window(bitmap_rgb32 &bitmap, u32 stride);
-	offs_t video_buffer_offset(offs_t offset) const;
+	void draw_video_window(bitmap_rgb32 &bitmap, rectangle const &cliprect, u32 stride);
+	static offs_t video_buffer_offset(offs_t offset);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
