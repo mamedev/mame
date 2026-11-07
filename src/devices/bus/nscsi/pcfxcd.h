@@ -29,6 +29,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void scsi_command() override;
+	virtual void return_no_cd() override;           // NOT READY, the cover is open
+	virtual void return_media_changed() override;   // UNIT ATTENTION, disc changed
 	virtual bool scsi_command_done(u8 command, u8 length) override;   // c0h-ffh are 10 bytes
 	virtual void scsi_abort() override;                               // stops CD-DA
 	virtual uint8_t scsi_get_data(int id, int pos) override;

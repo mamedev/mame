@@ -102,6 +102,9 @@ DEFINE_DEVICE_TYPE(CRT9007, crt9007_device, "crt9007", "SMC CRT9007 VPAC")
 #define OPERATION_MODE \
 	((m_reg[0x0b] >> 1) & 0x07)
 
+#define DOUBLE_ROW_BUFFER \
+	(OPERATION_MODE == OPERATION_MODE_DOUBLE_ROW_BUFFER)
+
 #define INTERLACE_MODE \
 	((m_reg[0x0b] >> 4) & 0x03)
 
@@ -441,6 +444,31 @@ inline void crt9007_device::recompute_cursor()
 
 
 //-------------------------------------------------
+//  frame_period - programmed time of one frame
+//-------------------------------------------------
+
+inline attotime crt9007_device::frame_period() const
+{
+	return clocks_to_attotime(CHARACTERS_PER_HORIZONTAL_PERIOD * SCAN_LINES_PER_FRAME);
+}
+
+
+//-------------------------------------------------
+//  update_frame_timer - one data row before
+//  vertical retrace with a single row buffer, two
+//  with a double (data sheet: R1A bit 0)
+//-------------------------------------------------
+
+inline void crt9007_device::update_frame_timer()
+{
+	if (!HAS_VALID_PARAMETERS) return;
+
+	int const line = m_drb_bottom - (DOUBLE_ROW_BUFFER ? SCAN_LINES_PER_DATA_ROW : 0);
+	m_frame_timer->adjust(screen().time_until_pos(line, 0), 0, frame_period());
+}
+
+
+//-------------------------------------------------
 //  recompute_parameters -
 //-------------------------------------------------
 
@@ -454,7 +482,7 @@ inline void crt9007_device::recompute_parameters()
 	int vert_pix_total = SCAN_LINES_PER_FRAME;
 
 	// refresh rate
-	attotime refresh = clocks_to_attotime(CHARACTERS_PER_HORIZONTAL_PERIOD * vert_pix_total);
+	attotime refresh = frame_period();
 
 	// horizontal sync
 	m_hsync_start = 0;
@@ -486,8 +514,7 @@ inline void crt9007_device::recompute_parameters()
 	m_vlt_timer->adjust(screen().time_until_pos(0, m_vlt_start), 1);
 	m_drb_timer->adjust(screen().time_until_pos(0, m_vlt_end));
 
-	int frame_timer_line = m_drb_bottom - (OPERATION_MODE == OPERATION_MODE_DOUBLE_ROW_BUFFER ? SCAN_LINES_PER_DATA_ROW : 0);
-	m_frame_timer->adjust(screen().time_until_pos(frame_timer_line, 0), 0, refresh);
+	update_frame_timer();
 
 	recompute_cursor();
 }
@@ -902,6 +929,8 @@ uint8_t crt9007_device::read(offs_t offset)
 
 void crt9007_device::write(offs_t offset, uint8_t data)
 {
+	bool const was_double_row_buffer = DOUBLE_ROW_BUFFER;
+
 	m_reg[offset] = data;
 
 	switch (offset)
@@ -969,6 +998,10 @@ void crt9007_device::write(offs_t offset, uint8_t data)
 		LOG("CRT9007 Operation Mode: %u\n", OPERATION_MODE);
 		LOG("CRT9007 Interlace Mode: %u\n", INTERLACE_MODE);
 		LOG("CRT9007 %s Mechanism\n", PAGE_BLANK ? "Page Blank" : "Smooth Scroll");
+		// the chip double buffers this register and applies it in vertical retrace;
+		// applying it here is a simplification
+		if (DOUBLE_ROW_BUFFER != was_double_row_buffer)
+			update_frame_timer();
 		break;
 
 	case 0x0c:

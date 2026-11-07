@@ -414,7 +414,7 @@ std::error_condition cdrom_file::read_partial_sector(void *dest, uint32_t lbasec
 		if (cdtoc.tracks[tracknum].pgdatasize != 0)
 			chdsector += cdtoc.tracks[tracknum].pregap;
 
-		sourcefileoffset += chdsector * bytespersector + startoffs;
+		sourcefileoffset += uint64_t(chdsector) * bytespersector + startoffs;
 
 		if (EXTRA_VERBOSE)
 			osd_printf_verbose("Reading %u bytes from sector %d from track %d at offset %lu\n", (unsigned)length, chdsector, tracknum + 1, (unsigned long)sourcefileoffset);

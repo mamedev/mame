@@ -651,8 +651,8 @@ OP( 0x78, i_js      ) { JMP( SF);               CLKS(4,4,3,8); }
 OP( 0x79, i_jns     ) { JMP(!SF);               CLKS(4,4,3,8); }
 OP( 0x7a, i_jp      ) { JMP( PF);               CLKS(4,4,3,8); }
 OP( 0x7b, i_jnp     ) { JMP(!PF);               CLKS(4,4,3,8); }
-OP( 0x7c, i_jl      ) { JMP((SF!=OF)&&(!ZF));   CLKS(4,4,3,8); }
-OP( 0x7d, i_jnl     ) { JMP((ZF)||(SF==OF));    CLKS(4,4,3,8); }
+OP( 0x7c, i_jl      ) { JMP(SF!=OF);            CLKS(4,4,3,8); }
+OP( 0x7d, i_jnl     ) { JMP(SF==OF);            CLKS(4,4,3,8); }
 OP( 0x7e, i_jle     ) { JMP((ZF)||(SF!=OF));    CLKS(4,4,3,8); }
 OP( 0x7f, i_jnle    ) { JMP((SF==OF)&&(!ZF));   CLKS(4,4,3,8); }
 

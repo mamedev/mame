@@ -2132,6 +2132,35 @@ ROM_START( mjgottub )
 	ROM_LOAD( "19.7j", 0x1e0000, 0x20000, CRC(5048733d) SHA1(6aee991343ce6bb6ce34141a6daac8f770fac7f9) )
 ROM_END
 
+ROM_START( bakuhato )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
+	ROM_LOAD( "1.4d",  0x00000,  0x10000, CRC(7ce01bae) SHA1(6fe5896888fc181becce4821e45e6749a1c85868) )
+
+	// NOTE: following is not yet dumped
+	// assume same as mjgottub/bakuhatu but with changed label.position
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
+	ROM_LOAD( "3.4t",  0x00000,  0x10000, CRC(1a8970df) SHA1(f10cfde4ec1833a9945535275e90627ca39915f7) )
+	ROM_LOAD( "2.4s",  0x10000,  0x10000, CRC(686450e3) SHA1(84d26ffcad622c6fb4fe1407c8d04c13bd65514e) )
+
+	ROM_REGION( 0x280000, "gfx1", 0 ) /* gfx */
+	ROM_LOAD( "4.9a",  0x000000, 0x20000, CRC(58528909) SHA1(ee481ded7a3dbae01e16fd12f9fe806976e87a7f) )
+	ROM_LOAD( "5.9b",  0x020000, 0x20000, CRC(d09ad54d) SHA1(0489d9b0755356dd14a05469228cc44784dd7c91) )
+	ROM_LOAD( "6.9d",  0x040000, 0x20000, CRC(40346785) SHA1(cb1e51bbd56c68990fee1ba61c04949a65a1ffd1) )
+	ROM_LOAD( "7.9e",  0x060000, 0x20000, CRC(772a6753) SHA1(c35e5a5126c6694a64db4944b0b08109c63912d3) )
+	ROM_LOAD( "8.9f",  0x080000, 0x20000, CRC(3ab6b0b5) SHA1(050306f67aa58f825e7f43d35cfe62dc95fdd7af) )
+	ROM_LOAD( "9.9j",  0x0a0000, 0x20000, CRC(5b1ca742) SHA1(20ae246d9785cfe69f7b826629ab11c3a70374d1) )
+	ROM_LOAD( "10.9k", 0x0c0000, 0x20000, CRC(f177fae1) SHA1(8b9f7fbd078053eb780297a38905e4b7ac9b7ffd) )
+	ROM_LOAD( "11.9l", 0x0e0000, 0x20000, CRC(e9003e4d) SHA1(26ace6abbbb093c0d5d5bfbfae3eb60b23f9304c) )
+	ROM_LOAD( "12.9n", 0x100000, 0x20000, CRC(c08d835e) SHA1(d2617ba8ec6685c72c53c5bb5b42b89edd9affae) )
+	ROM_LOAD( "13.9p", 0x120000, 0x20000, CRC(ae3cbba7) SHA1(925672cdd362be0ec13db3189ec35aadde178045) )
+	ROM_LOAD( "14.7a", 0x140000, 0x20000, CRC(1c402b12) SHA1(52004a8b0b72a751dcfa3462d56b81f6b044b88d) )
+	ROM_LOAD( "15.7b", 0x160000, 0x20000, CRC(7bb49eaf) SHA1(4d3fe901ab89a4ba4f5a3c34d1594f558a7097ae) )
+	ROM_LOAD( "16.7d", 0x180000, 0x20000, CRC(d0844179) SHA1(c3ad5dff2a8b364f321020a3b62adebcb7522f93) )
+	ROM_LOAD( "17.7e", 0x1a0000, 0x20000, CRC(5fe47077) SHA1(3f666d79898f0ae12497a0564ed0065e481a4788) )
+	ROM_LOAD( "18.7f", 0x1c0000, 0x20000, CRC(9eab0682) SHA1(62e4aebdc144a1944cebdd6c8bbf7089a0dbafef) )
+	ROM_LOAD( "19.7j", 0x1e0000, 0x20000, CRC(2b14cd5e) SHA1(4457a2fb9767eb4217b72b18dcc336f13766656d) )
+ROM_END
+
 ROM_START( av2mj1bb )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.bin",      0x00000, 0x10000, CRC(df0f03fb) SHA1(e6c2d6905b507611782bbd29f4d5fcd378a0a993) )
@@ -2191,5 +2220,6 @@ GAME( 1991, vanilla,  0,        vanilla,  vanilla,  nbmj8991_state, empty_init, 
 GAME( 1991, finalbny, vanilla,  finalbny, finalbny, nbmj8991_state, init_finalbny, ROT180, "Nichibutsu", "Mahjong Final Bunny (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, qmhayaku, 0,        qmhayaku, qmhayaku, nbmj8991_state, empty_init,    ROT180, "Nichibutsu", "Quiz-Mahjong Hayaku Yatteyo! (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mjgottub, 0,        mjgottub, mjgottub, nbmj8991_state, empty_init,    ROT180, "Nichibutsu", "Medal Mahjong Gottsu ee-kanji (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bakuhato, mjgottub, mjgottub, mjgottub, nbmj8991_state, empty_init, ROT0,    "Nichibutsu",                          "Mahjong Bakuhatsu Junjouden (Japan, older HW)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, av2mj1bb, 0,        av2mj1bb, av2mj1bb, nbmj8991_state, empty_init,    ROT0,   "Miki Syouji / AV Japan", "AV2Mahjong No.1 Bay Bridge no Seijo (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, av2mj2rg, 0,        av2mj2rg, av2mj2rg, nbmj8991_state, empty_init,    ROT0,   "Miki Syouji / AV Japan", "AV2Mahjong No.2 Rouge no Kaori (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -972,6 +972,8 @@ bool floppy_image_device::twosid_r()
 	// Shugart TS# on pin 30, derived from index-hole position); the answer
 	// must come from the media itself, not from whether the host happens to
 	// have written to head 1 yet.  An unformatted SSSD diskette is still SS.
+	if (m_sides == 1)
+		return true;
 	if (!m_image)
 		return false;
 	switch (m_image->get_variant()) {

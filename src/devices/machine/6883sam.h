@@ -155,8 +155,21 @@ private:
 	bool                        m_counter_bit4_input = false;
 	bool                        m_counter_bit5_input = false;
 
+	// address dependent rate timing, in fast CPU cycles
+	uint64_t                    m_ad_base = 0;      // a slow cycle boundary
+	uint64_t                    m_ad_slow_end = ~uint64_t(0); // end of the last slow access
+
 	// typically called by CPU
 	void internal_write(offs_t offset, uint8_t data);
+
+	// In address dependent rate mode, $0000-$7FFF and $FF00-$FF1F are slow
+	ATTR_FORCE_INLINE void address_dependent_rate(offs_t offset)
+	{
+		if ((m_sam_state & (SAM_STATE_R1|SAM_STATE_R0)) == SAM_STATE_R0
+				&& !machine().side_effects_disabled())
+			address_dependent_cycle(offset < 0x8000 || (offset & 0xffe0) == 0xff00);
+	}
+	void address_dependent_cycle(bool slow);
 
 	// Divider outputs clock B4 and B5 on falling edges, including mode writes.
 	void counter_reset(uint16_t address);

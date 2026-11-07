@@ -11,20 +11,10 @@
 
 TODO:
 
-    - keyboard repeat
-    - shift lock is not PORT_TOGGLE, instead RS flipflop
-    - tone generator
-    - cassette serial clock
     - eprom programmer
-    - power off
 
 Cassette considerations
 
-    - It operates at 4883 baud but may not be fully compatible with real
-      hardware. A partial translation of the available text seems to
-      indicate an overcomplicated and unreliable interface. The one
-      implemented is 100% reliable at the same speed. I've been unable
-      to locate any real recordings to compare against.
     - To save a range of memory: S name start end
     - To load it back: L name
     - To save an unnamed file: S "" start end
@@ -45,18 +35,22 @@ Cassette considerations
 
 void amu880_state::scan_keyboard()
 {
-	uint8_t data = m_key_row[m_key_a8 ? m_key_d6 : m_key_d7]->read();
+	uint8_t data = m_key_row[m_key_d6]->read();
 
-	int a8 = (data & 0x0f) == 0x0f;
-
-	if (m_key_a8 && !a8)
+	if ((data & 0x0f) != 0x0f)
 	{
 		m_key_d7 = m_key_d6;
 		m_key_a4 = !(BIT(data, 1) && BIT(data, 3));
 		m_key_a5 = !(BIT(data, 2) && BIT(data, 3));
-	}
 
-	m_key_a8 = a8;
+		if (!m_key_down)
+		{
+			m_key_down = true;
+			m_key_repeat_timer->adjust(attotime::from_msec(500), 0, attotime::from_hz(30));
+		}
+
+		m_key_release_timer->adjust(attotime::from_usec(12700));
+	}
 
 	m_key_d6++;
 
@@ -64,6 +58,30 @@ void amu880_state::scan_keyboard()
 	{
 		m_key_d6 = 0;
 	}
+}
+
+TIMER_CALLBACK_MEMBER(amu880_state::key_release)
+{
+	m_key_down = false;
+	m_key_repeat = true;
+	m_key_repeat_timer->adjust(attotime::never);
+}
+
+TIMER_CALLBACK_MEMBER(amu880_state::key_repeat)
+{
+	m_key_repeat = !m_key_repeat;
+}
+
+INPUT_CHANGED_MEMBER(amu880_state::shift_changed)
+{
+	uint8_t special = m_special->read();
+
+	if (!BIT(special, 2))
+		m_shift_lock = true;
+	else if (!BIT(special, 1))
+		m_shift_lock = false;
+
+	m_shift_led = m_shift_lock;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(amu880_state::keyboard_tick)
@@ -90,12 +108,66 @@ uint8_t amu880_state::keyboard_r(offs_t offset)
 	uint8_t special = m_special->read();
 
 	int ctrl = BIT(special, 0);
-	int shift = BIT(special, 2) & BIT(special, 1);
+	int shift = BIT(special, 1) && !m_shift_lock;
+	int a8 = !(m_key_down && m_key_repeat);
 	int ab0 = BIT(offset, 0);
 
-	uint16_t address = (ab0 << 9) | (m_key_a8 << 8) | (ctrl << 7) | (shift << 6) | (m_key_a5 << 5) | (m_key_a4 << 4) | m_key_d7;
+	uint16_t address = (ab0 << 9) | (a8 << 8) | (ctrl << 7) | (shift << 6) | (m_key_a5 << 5) | (m_key_a4 << 4) | m_key_d7;
 
 	return m_kb_rom->base()[address];
+}
+
+uint8_t amu880_state::power_off_r()
+{
+	if (!machine().side_effects_disabled())
+		power_off_clock(0);
+
+	return 0xff;
+}
+
+void amu880_state::power_off_w(uint8_t data)
+{
+	power_off_clock(1);
+}
+
+void amu880_state::power_off_clock(int rd)
+{
+	bool const was_pending = m_poweroff_sr == 3;
+
+	m_poweroff_sr = ((m_poweroff_sr << 1) | rd) & 3;
+
+	bool const pending = m_poweroff_sr == 3;
+
+	if (!pending)
+		m_poweroff_timer->adjust(attotime::never);
+	else if (!was_pending)
+		m_poweroff_timer->adjust(attotime::from_seconds(18));
+
+	m_poweroff_led = pending;
+}
+
+TIMER_CALLBACK_MEMBER(amu880_state::power_off)
+{
+	machine().schedule_exit();
+}
+
+void amu880_state::tone_w(offs_t offset, uint8_t data)
+{
+	m_tone_on = (offset & 3) != 0;
+}
+
+TIMER_CALLBACK_MEMBER(amu880_state::tone_tick)
+{
+	m_tone_q = m_tone_on ? !m_tone_q : true;
+	m_speaker->level_w(m_tone_q);
+}
+
+uint8_t amu880_state::boot_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		m_boot.disable();
+
+	return m_rom[0xf000 + offset];
 }
 
 /* Memory Maps */
@@ -107,15 +179,17 @@ void amu880_state::amu880_mem(address_map &map)
 	map(0xe800, 0xefff).ram().share("video_ram");
 	map(0xf000, 0xfbff).rom();
 	map(0xfc00, 0xffff).ram();
+	map(0x0000, 0xffff).view(m_boot);
+	m_boot[0](0x0000, 0xefff).lr8(NAME([] () -> uint8_t { return 0x00; })).nopw();
+	m_boot[0](0xf000, 0xfbff).r(FUNC(amu880_state::boot_r));
 }
 
 void amu880_state::amu880_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-//  map(0x00, 0x00).mirror(0x03).w(FUNC(amu880_state::power_off_w));
-//  map(0x04, 0x04).mirror(0x02).w(FUNC(amu880_state::tone_off_w));
-//  map(0x05, 0x05).mirror(0x02).w(FUNC(amu880_state::tone_on_w));
+	map(0x00, 0x00).rw(FUNC(amu880_state::power_off_r), FUNC(amu880_state::power_off_w));
+	map(0x04, 0x07).w(FUNC(amu880_state::tone_w));
 	map(0x08, 0x09).mirror(0x02).r(FUNC(amu880_state::keyboard_r));
 	map(0x0c, 0x0f).rw(Z80PIO2_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x10, 0x13).rw(Z80PIO1_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
@@ -222,10 +296,27 @@ static INPUT_PORTS_START( amu880 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_START("CASSETTE")
+	PORT_DIPNAME( 0x01, 0x00, "Playback Phase" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, "Inverted" )
+	PORT_DIPNAME( 0x02, 0x02, "Monoflop Preset A" )
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x02, "1" )
+	PORT_DIPNAME( 0x04, 0x00, "Monoflop Preset B" )
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x04, "1" )
+	PORT_DIPNAME( 0x08, 0x08, "Monoflop Preset C" )
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x08, "1" )
+	PORT_DIPNAME( 0x10, 0x00, "Monoflop Preset D" )
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x10, "1" )
+
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(amu880_state::shift_changed), 0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(amu880_state::shift_changed), 0)
 INPUT_PORTS_END
 
 /* Video */
@@ -268,30 +359,47 @@ void amu880_state::ctc_z0_w(int state)
 
 void amu880_state::ctc_z2_w(int state)
 {
-	/* cassette clock @ 39kHz */
-	if (state)
+	if (state && !m_cass_t)
 	{
-		m_cnt++;
-		switch (m_cnt & 7) // divide by 8 to get 4883Hz
+		uint8_t const config = m_cass_config->read();
+
+		if (m_rx_mono)
 		{
-			case 0:
-				m_cassette->output(m_cassbit ? 1.0 : -1.0);
-				break;
-			case 2:
-				m_sio->txca_w(0);
-				m_sio->rxca_w(0);
-				break;
-			case 4:
-				m_sio->txca_w(1);
-				m_sio->rxca_w(1);
-				break;
-			case 6:
-				m_sio->rxa_w((m_cassette->input() > 0.04) ? 1 : 0);
-				break;
-			default:
-				break;
+			if (m_rx_count)
+			{
+				m_rx_count--;
+			}
+			else
+			{
+				m_rx_mono = false;
+				m_rx_count = BIT(config, 1, 4);
+			}
 		}
+
+		double const level = m_cassette->input();
+
+		bool rxd = m_rx_d;
+		if (level > 0.04)
+			rxd = false;
+		else if (level < -0.04)
+			rxd = true;
+
+		if (rxd != m_rx_d)
+		{
+			m_rx_d = rxd;
+			m_rx_mono = true;
+		}
+
+		m_sio->rxa_w(m_rx_d == BIT(config, 0));
+		m_sio->rxca_w(BIT(m_rx_count, 2));
+
+		m_tx_count = (m_tx_count + 1) & 7;
+		m_txc = BIT(m_tx_count, 2);
+		m_sio->txca_w(m_txc);
+		update_cassette();
 	}
+
+	m_cass_t = state;
 }
 
 /* Z80-SIO Interface */
@@ -299,6 +407,12 @@ void amu880_state::ctc_z2_w(int state)
 void amu880_state::cassette_w(int state)
 {
 	m_cassbit = state;
+	update_cassette();
+}
+
+void amu880_state::update_cassette()
+{
+	m_cassette->output((m_cassbit != m_txc) ? 1.0 : -1.0);
 }
 
 /* Z80 Daisy Chain */
@@ -316,12 +430,44 @@ static const z80_daisy_config amu880_daisy_chain[] =
 
 void amu880_state::machine_start()
 {
+	m_key_release_timer = timer_alloc(FUNC(amu880_state::key_release), this);
+	m_key_repeat_timer = timer_alloc(FUNC(amu880_state::key_repeat), this);
+	m_tone_timer = timer_alloc(FUNC(amu880_state::tone_tick), this);
+	m_poweroff_timer = timer_alloc(FUNC(amu880_state::power_off), this);
+
+	m_tone_timer->adjust(attotime::from_hz(1300), 0, attotime::from_hz(1300));
+
 	/* register for state saving */
 	save_item(NAME(m_key_d6));
 	save_item(NAME(m_key_d7));
 	save_item(NAME(m_key_a4));
 	save_item(NAME(m_key_a5));
-	save_item(NAME(m_key_a8));
+	save_item(NAME(m_key_down));
+	save_item(NAME(m_key_repeat));
+	save_item(NAME(m_shift_lock));
+	save_item(NAME(m_poweroff_sr));
+	save_item(NAME(m_tone_on));
+	save_item(NAME(m_tone_q));
+	save_item(NAME(m_cass_t));
+	save_item(NAME(m_tx_count));
+	save_item(NAME(m_txc));
+	save_item(NAME(m_cassbit));
+	save_item(NAME(m_rx_d));
+	save_item(NAME(m_rx_mono));
+	save_item(NAME(m_rx_count));
+}
+
+void amu880_state::machine_reset()
+{
+	m_boot.select(0);
+
+	m_poweroff_sr = 0;
+	m_poweroff_timer->adjust(attotime::never);
+	m_poweroff_led = 0;
+	m_tone_on = false;
+
+	m_rx_mono = false;
+	m_rx_count = BIT(m_cass_config->read(), 1, 4);
 }
 
 /* Machine Driver */
@@ -365,6 +511,7 @@ void amu880_state::amu880(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
 	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, XTAL(10'000'000)/4));
@@ -417,4 +564,4 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT        COMPANY                   FULLNAME                                      FLAGS */
-COMP( 1983, amu880, 0,      0,      amu880, amu880, amu880_state, empty_init, "Militaerverlag der DDR", "Ausbaufaehiger Mikrocomputer mit dem U 880", MACHINE_NO_SOUND )
+COMP( 1983, amu880, 0,      0,      amu880, amu880, amu880_state, empty_init, "Militaerverlag der DDR", "Ausbaufaehiger Mikrocomputer mit dem U 880", MACHINE_IMPERFECT_SOUND )

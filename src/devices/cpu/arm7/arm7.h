@@ -384,6 +384,7 @@ protected:
 	void drc_remapped();
 	void drc_check_fastram();
 	bool drc_prefetch_after_remap();
+	bool drc_host_word(offs_t address, uint32_t &word);
 	bool drc_prefetch_after_store();
 	void drc_prefetch_fill(offs_t pc, const uint32_t *words, uint32_t count);
 	bool drc_prefetch_pending();
@@ -492,6 +493,8 @@ protected:
 	std::unordered_set<offs_t> m_drc_volatile;  // instructions whose word keeps changing: the interpreter's, fetched as they run
 	std::unordered_map<offs_t, std::pair<uint32_t, uint32_t>> m_drc_prefetch;   // per ARM memory instruction (by the next address): the next two words as compiled
 	std::unordered_map<offs_t, prefetch_window> m_drc_window;   // per exit inside a store's prefetch window: the words fetched before it wrote
+	offs_t m_drc_control_next;  // after a control write that flushes the cache: the address after the MCR (~0 when none)
+	uint32_t m_drc_control_words[2];    // the words the prefetch had taken there, through the old translation
 	bool m_drc_prefetched;      // the interpreter's prefetch buffer holds words from before a store or a change to the map
 	bool m_drc_cache_dirty;
 	bool m_drc_fastram_stale;   // the address map changed since drc_check_fastram()

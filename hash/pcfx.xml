@@ -140,6 +140,7 @@ Randomly pop ups SFXs at the end of dialogues during gameplay (including ones wi
 ]]></notes>
 		<info name="alt_title" value="デア ラングリッサーＦＸ"/>
 		<info name="barcode" value="4 904323 270224"/>
+		<info name="release" value="19960426"/>
 		<info name="serial" value="FXNHE618"/>
 		<!-- NEC ID: 79753612 -->
 		<part name="cdrom" interface="cdrom">
@@ -203,7 +204,7 @@ Optional [mouse] support
 		<info name="alt_title" value="ファーランドストーリーFX"/>
 		<info name="barcode" value="4 904323 270200"/>
 		<info name="developer" value="TGL"/>
-		<info name="release" value="19961025"/>
+		<info name="release" value="19961108"/> <!-- some sources have this as 19961025? -->
 		<info name="serial" value="FXNHE628"/>
 		<!-- alt serial: 78983151 -->
 		<part name="cdrom" interface="cdrom">
@@ -244,6 +245,7 @@ Not extensively tested
 ]]></notes>
 		<info name="alt_title" value="ふしぎの国のアンジェリーク"/>
 		<info name="barcode" value="4 904323 270330"/>
+		<info name="release" value="19961011"/>
 		<info name="serial" value="FXNHE632"/>
 		<!-- alt serial: 78983261 -->
 		<part name="cdrom" interface="cdrom">
@@ -553,6 +555,7 @@ Disc 2 is intended for a Win32 OS on PC-98 or DOS/V machines
 ]]></notes>
 		<info name="alt_title" value="んーにゅー ～ＰＣ－ＦＸＧＡゲームが遊べる創れる本～"/>
 		<info name="barcode" value="4904323270170"/>
+		<info name="release" value="19960712"/>
 		<info name="serial" value="08486501"/>
 		<!-- GANHE001A + GANHE001B -->
 		<part name="cdrom1" interface="cdrom">
@@ -576,6 +579,7 @@ Disc 2 is intended for a Win32 OS on PC-98 or DOS/V machines
 Bundled with PC-FXGA
 ]]></notes>
 		<info name="barcode" value="4 904323 240074"/>
+		<info name="release" value="19951208?"/>
 		<!-- NEC ID: 79753599 -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">

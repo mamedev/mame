@@ -40,7 +40,6 @@
         - color graphics
         - 8087
         - programmable keyboard
-    - SASI hard disk (units 4-5)
     - QIC-02 streamer tape
 
 */
