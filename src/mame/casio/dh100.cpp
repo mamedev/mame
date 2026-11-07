@@ -103,7 +103,7 @@ static INPUT_PORTS_START(dh100)
 	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED ) PORT_CONDITION("EXTRA", 0x1, EQUALS, 0x0)
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_NAME("Vibrato") PORT_TOGGLE PORT_CONDITION("EXTRA", 0x1, EQUALS, 0x1)
 
-//  TODO: support this when filter BJTs are modeled in the netlist
+//  TODO: support this when filter JFETs are modeled in the netlist
 //  PORT_START("OFFSET")
 //  PORT_ADJUSTER( 50, "Filter Offset (VR3)" )  NETLIST_ANALOG_PORT_CHANGED("sound_nl", "offset")
 INPUT_PORTS_END
