@@ -18,14 +18,14 @@
 //**************************************************************************
 
 // devices
-DEFINE_DEVICE_TYPE(MM5740,    mm5740_device,    "mm5740",    "MM5740 Keyboard Encoder")
+DEFINE_DEVICE_TYPE(MM5740AAC, mm5740aac_device, "mm5740aac", "MM5740AAC Keyboard Encoder")
 DEFINE_DEVICE_TYPE(MM5740AAE, mm5740aae_device, "mm5740aae", "MM5740AAE Keyboard Encoder")
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-ROM_START( mm5740 )
+ROM_START( mm5740aac )
 	ROM_REGION(0x1c2, "internal", 0)
 	ROM_LOAD("mm5740aac.ic1", 0x000, 0x1c2, CRC(aed404d3) SHA1(e7b9feba5f789f388d27820b5f3fa591d41b4ab1))
 ROM_END
@@ -41,9 +41,9 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *mm5740_device::device_rom_region() const
+const tiny_rom_entry *mm5740aac_device::device_rom_region() const
 {
-	return ROM_NAME( mm5740 );
+	return ROM_NAME( mm5740aac );
 }
 
 const tiny_rom_entry *mm5740aae_device::device_rom_region() const
@@ -56,11 +56,6 @@ const tiny_rom_entry *mm5740aae_device::device_rom_region() const
 //  mm5740_device - constructor
 //-------------------------------------------------
 
-mm5740_device::mm5740_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	mm5740_device(mconfig, MM5740, tag, owner, clock)
-{
-}
-
 mm5740_device::mm5740_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_read_x(*this, 0x3ff),
@@ -68,6 +63,11 @@ mm5740_device::mm5740_device(const machine_config &mconfig, device_type type, co
 	m_read_control(*this, 0),
 	m_write_data_ready(*this),
 	m_rom(*this, "internal")
+{
+}
+
+mm5740aac_device::mm5740aac_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	mm5740_device(mconfig, MM5740AAC, tag, owner, clock)
 {
 }
 
@@ -96,6 +96,7 @@ void mm5740_device::device_start()
 {
 	std::fill(std::begin(m_x_mask), std::end(m_x_mask), 0);
 	m_b = -1;
+	m_offset = 0;
 	m_repeat = false;
 	m_last_repeat = false;
 

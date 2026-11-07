@@ -48,33 +48,36 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
+#include <memory>
+
 
 namespace {
 
 // 100 character times per line (80 visible), 15,494 Hz.
 // 256 lines per frame (192 visible), 60.5 Hz.
-static constexpr XTAL MASTER_CLOCK          = XTAL(12'395'000);
-static constexpr int  DOTS_PER_CHAR         = 8;
-static constexpr int  CHARS_PER_SCAN_TOTAL  = 100;
-static constexpr int  LINES_PER_FRAME       = 256;
-static constexpr int  SCAN_LINES            = 16;   // per character row
-static constexpr int  ROWS                  = 12;
-static constexpr int  BLOCKS                = 4;
-static constexpr int  BLOCK_CHARS           = 20;
-static constexpr int  ROW_CHARS             = BLOCKS * BLOCK_CHARS;
-static constexpr int  VISIBLE_LINES         = ROWS * SCAN_LINES;
-static constexpr int  TPU_CYCLE_LINES       = 8;    // one complete TPU cycle
+constexpr XTAL MASTER_CLOCK          = 12.395_MHz_XTAL;
+constexpr int  DOTS_PER_CHAR         = 8;
+constexpr int  CHARS_PER_SCAN_TOTAL  = 100;
+constexpr int  LINES_PER_FRAME       = 256;
+constexpr int  SCAN_LINES            = 16;   // per character row
+constexpr int  ROWS                  = 12;
+constexpr int  BLOCKS                = 4;
+constexpr int  BLOCK_CHARS           = 20;
+constexpr int  ROW_CHARS             = BLOCKS * BLOCK_CHARS;
+constexpr int  VISIBLE_LINES         = ROWS * SCAN_LINES;
+constexpr int  TPU_CYCLE_LINES       = 8;    // one complete TPU cycle
 
 // 4800 baud (16x) clock is the character clock / 20 (IC215 QA).
 // The I/O board divides it down to 300, and 110 (1200 / 11).
-static constexpr u32 BAUD_4800_DIVISOR = DOTS_PER_CHAR * 20;
+constexpr u32 BAUD_4800_DIVISOR = DOTS_PER_CHAR * 20;
 
-static constexpr u8 CHAR_BEL = 0x07;
-static constexpr u8 CHAR_BS  = 0x08;
-static constexpr u8 CHAR_LF  = 0x0a;
-static constexpr u8 CHAR_CR  = 0x0d;
-static constexpr u8 CHAR_SP  = 0x20;
-static constexpr u8 CHAR_DEL = 0x7f;
+constexpr u8 CHAR_BEL = 0x07;
+constexpr u8 CHAR_BS  = 0x08;
+constexpr u8 CHAR_LF  = 0x0a;
+constexpr u8 CHAR_CR  = 0x0d;
+constexpr u8 CHAR_SP  = 0x20;
+constexpr u8 CHAR_DEL = 0x7f;
 
 class h9_state : public driver_device
 {
@@ -132,6 +135,39 @@ private:
 	static constexpr u8 MODE_BAUD_RATE   = 0x10;
 	static constexpr u8 MODE_OFF_LINE    = 0x20;
 	static constexpr u8 MODE_FULL_DUPLEX = 0x40;
+
+	// IC702 PLA inputs I1-I14
+	static constexpr u32 PLA_XPEU      = 1 << 0;    // UART transmit buffer empty
+	static constexpr u32 PLA_XBEP      = 1 << 1;    // parallel output buffer empty
+	static constexpr u32 PLA_DUPLEX    = 1 << 2;    // half duplex
+	static constexpr u32 PLA_CCR       = 1 << 3;    // control character or rubout
+	static constexpr u32 PLA_ADDRESS   = 1 << 4;    // character can be written into the RAM
+	static constexpr u32 PLA_OB2       = 1 << 5;
+	static constexpr u32 PLA_1C_DAV    = 1 << 6;
+	static constexpr u32 PLA_QN        = 1 << 7;    // transmit page character not loaded
+	static constexpr u32 PLA_DAVPK     = 1 << 8;    // parallel or keyboard data available
+	static constexpr u32 PLA_DAVU      = 1 << 9;    // UART data available
+	static constexpr u32 PLA_CR        = 1 << 10;
+	static constexpr u32 PLA_CRFF      = 1 << 11;
+	static constexpr u32 PLA_XPN       = 1 << 12;   // not transmit page
+	static constexpr u32 PLA_LF        = 1 << 13;
+
+	// IC702 PLA outputs O1-O8
+	static constexpr u32 PLA_LOAD_UART_N    = 1 << 0;
+	static constexpr u32 PLA_LOAD_PARALLEL  = 1 << 1;
+	static constexpr u32 PLA_OB2_XP_LOAD_N  = 1 << 2;
+	static constexpr u32 PLA_CLR_QN_N       = 1 << 3;
+	static constexpr u32 PLA_RESELECT_RAM_N = 1 << 4;
+	static constexpr u32 PLA_O_CCR          = 1 << 5;
+	static constexpr u32 PLA_O_LF           = 1 << 6;
+	static constexpr u32 PLA_XBE            = 1 << 7;
+
+	// special character latch
+	static constexpr u8 SPECIAL_CCR  = 0x01;
+	static constexpr u8 SPECIAL_LF   = 0x02;
+	static constexpr u8 SPECIAL_CR   = 0x04;
+	static constexpr u8 SPECIAL_BS   = 0x08;
+	static constexpr u8 SPECIAL_DAVU = 0x10;    // data came from the UART
 
 	required_device<screen_device>     m_screen;
 	required_device<ay31015_device>    m_uart;
@@ -195,7 +231,8 @@ private:
 	u8   m_special;         // special character latch (IC720)
 
 	// serial
-	int  m_rxd;
+	u8   m_rxd;
+	u8   m_txd;
 	u32  m_baud_clock;
 	bool m_tsb;
 
@@ -216,39 +253,6 @@ private:
 	static u16 ram_addr(u8 row, u8 blk, u8 col) { return row * ROW_CHARS + blk * BLOCK_CHARS + col; }
 	u16  cursor_addr() const { return ram_addr(m_cur_row, m_cur_blk, m_cur_col); }
 	u16  display_addr(int line, int col) const;
-
-	// IC702 PLA inputs I1-I14
-	static constexpr u32 PLA_XPEU      = 1 << 0;    // UART transmit buffer empty
-	static constexpr u32 PLA_XBEP      = 1 << 1;    // parallel output buffer empty
-	static constexpr u32 PLA_DUPLEX    = 1 << 2;    // half duplex
-	static constexpr u32 PLA_CCR       = 1 << 3;    // control character or rubout
-	static constexpr u32 PLA_ADDRESS   = 1 << 4;    // character can be written into the RAM
-	static constexpr u32 PLA_OB2       = 1 << 5;
-	static constexpr u32 PLA_1C_DAV    = 1 << 6;
-	static constexpr u32 PLA_QN        = 1 << 7;    // transmit page character not loaded
-	static constexpr u32 PLA_DAVPK     = 1 << 8;    // parallel or keyboard data available
-	static constexpr u32 PLA_DAVU      = 1 << 9;    // UART data available
-	static constexpr u32 PLA_CR        = 1 << 10;
-	static constexpr u32 PLA_CRFF      = 1 << 11;
-	static constexpr u32 PLA_XPN       = 1 << 12;   // not transmit page
-	static constexpr u32 PLA_LF        = 1 << 13;
-
-	// IC702 PLA outputs O1-O8
-	static constexpr u32 PLA_LOAD_UART_N    = 1 << 0;
-	static constexpr u32 PLA_LOAD_PARALLEL  = 1 << 1;
-	static constexpr u32 PLA_OB2_XP_LOAD_N  = 1 << 2;
-	static constexpr u32 PLA_CLR_QN_N       = 1 << 3;
-	static constexpr u32 PLA_RESELECT_RAM_N = 1 << 4;
-	static constexpr u32 PLA_O_CCR          = 1 << 5;
-	static constexpr u32 PLA_O_LF           = 1 << 6;
-	static constexpr u32 PLA_XBE            = 1 << 7;
-
-	// special character latch
-	static constexpr u8 SPECIAL_CCR  = 0x01;
-	static constexpr u8 SPECIAL_LF   = 0x02;
-	static constexpr u8 SPECIAL_CR   = 0x04;
-	static constexpr u8 SPECIAL_BS   = 0x08;
-	static constexpr u8 SPECIAL_DAVU = 0x10;    // data came from the UART
 
 	u8   ic728_r(int pulse) const;
 	u8   ic730_r() const;
@@ -313,7 +317,7 @@ u32 h9_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const r
 	bool const show_cursor = !plot && (!m_hold_screen || blink);
 	u16 const cursor       = cursor_addr();
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		int const line = y / SCAN_LINES;
 		int const scan = y % SCAN_LINES;
@@ -446,10 +450,7 @@ TIMER_CALLBACK_MEMBER(h9_state::bell_off)
 
 template <unsigned N> u16 h9_state::kbd_x_r()
 {
-	// X1 is not connected; the ports have Y1-Y7 in bits 0-6 and Y10 in bit 7
-	if (N < 2)
-		return 0x3ff;
-
+	// the ports have Y1-Y7 in bits 0-6 and Y10 in bit 7
 	u8 const data = m_keys[N - 2]->read();
 	return ~((data & 0x7f) | ((data & 0x80) << 2)) & 0x3ff;
 }
@@ -481,7 +482,7 @@ void h9_state::update_repeat()
 	int const bit   = 3 - (m_config->read() & 0x03);
 	bool const line = (m_mods->read() & MOD_REPT) && BIT(m_frame, bit);
 
-	m_kbdenc->repeat_line_w(line ? ASSERT_LINE : CLEAR_LINE);
+	m_kbdenc->repeat_line_w(line);
 	m_repeat_line = line;
 }
 
@@ -672,7 +673,9 @@ void h9_state::tpu_cycle_0()
 	// 0C - put the data on the bus
 	u8 data;
 	if (davu)
+	{
 		data = m_uart->receive();
+	}
 	else if (davpk)
 	{
 		data      = m_kbd_data;
@@ -689,7 +692,9 @@ void h9_state::tpu_cycle_0()
 		data = m_crff ? CHAR_LF : m_eolff ? CHAR_CR : m_ram[cursor_addr()];
 	}
 	else
+	{
 		return;
+	}
 
 	// special character detector - plot mode skips the special movements
 	u8 const ch    = data & 0x7f;
@@ -753,6 +758,8 @@ void h9_state::tpu_cycle_1()
 		}
 		else if (m_special & SPECIAL_CR)
 		{
+			// assumed: in long form a carriage return also clears the block
+			// counter, which the manual does not say
 			m_cur_col = 0;
 			if (!short_form())
 				m_cur_blk = 0;
@@ -762,12 +769,12 @@ void h9_state::tpu_cycle_1()
 			prom_count_20(false);
 		}
 
+		// a line feed also resets the CR flip-flop
 		if (m_special & SPECIAL_LF)
+		{
 			prom_count_12(true, ic724_r(c730, 1));
-
-		// a line feed resets the CR flip-flop
-		if (m_special & SPECIAL_LF)
 			m_crff = false;
+		}
 
 		// clear the transmit page flip-flop after an echo (full duplex) or
 		// any count up (half duplex)
@@ -949,12 +956,19 @@ int h9_state::uart_si_r()
 void h9_state::update_txd()
 {
 	// break forces a space, off line forces a mark
+	u8 txd;
 	if (mode(MODE_OFF_LINE))
-		m_rs232->write_txd(1);
+		txd = 1;
 	else if (m_func->read() & FUNC_BREAK)
-		m_rs232->write_txd(0);
+		txd = 0;
 	else
-		m_rs232->write_txd(m_uart->so_r());
+		txd = m_uart->so_r();
+
+	if (txd != m_txd)
+	{
+		m_txd = txd;
+		m_rs232->write_txd(txd);
+	}
 }
 
 
@@ -964,15 +978,16 @@ void h9_state::update_txd()
 
 void h9_state::machine_start()
 {
-	m_ram        = std::make_unique<u8[]>(1024);
+	m_ram        = make_unique_clear<u8 []>(1024);
 
 	m_tpu_timer  = timer_alloc(FUNC(h9_state::tpu_cycle), this);
 	m_bell_timer = timer_alloc(FUNC(h9_state::bell_off), this);
 
 	// the UART resets before machine_reset() and reads the mode keys through
-	// update_txd()
+	// update_txd(); an impossible m_txd forces the first write
 	m_mode_keys  = 0;
 	m_rxd        = 1;
+	m_txd        = 0xff;
 	m_baud_clock = 0;
 	m_tsb        = false;
 	m_frame      = 0;
@@ -1005,6 +1020,7 @@ void h9_state::machine_start()
 	save_item(NAME(m_count));
 	save_item(NAME(m_special));
 	save_item(NAME(m_rxd));
+	save_item(NAME(m_txd));
 	save_item(NAME(m_baud_clock));
 	save_item(NAME(m_tsb));
 }
@@ -1034,13 +1050,13 @@ void h9_state::machine_reset()
 	m_count         = false;
 	m_special       = 0;
 
-	// UART: 8 data bits, no parity
+	// UART: 8 data bits, no parity. Setting the pins needs the input
+	// ports, which can't be read in machine_start().
 	m_uart->write_swe(0);
 	m_uart->write_np(1);
 	m_uart->write_eps(1);
 	m_uart->write_nb1(1);
 	m_uart->write_nb2(1);
-	m_uart->write_tsb(m_tsb);
 	m_uart->write_cs(1);
 
 	update_config();
@@ -1223,7 +1239,7 @@ void h9_state::h9(machine_config &config)
 	// Heath 443-767 at IC402. Clocked by the 4800 baud clock.
 	// Scan rate based on debounce capacitor C405 (0.001 uF)
 	MM5740AAE(config, m_kbdenc, mm5740_device::calc_effective_clock_key_debounce(1000));
-	m_kbdenc->x_cb<1>().set(FUNC(h9_state::kbd_x_r<1>));
+	// X1 is not connected
 	m_kbdenc->x_cb<2>().set(FUNC(h9_state::kbd_x_r<2>));
 	m_kbdenc->x_cb<3>().set(FUNC(h9_state::kbd_x_r<3>));
 	m_kbdenc->x_cb<4>().set(FUNC(h9_state::kbd_x_r<4>));

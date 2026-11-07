@@ -79,10 +79,8 @@ Vgg                  18          -12V
 class mm5740_device : public device_t
 {
 public:
-	mm5740_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
 	// public interface
-	u16 b_r();
+	u16  b_r();
 
 	template <unsigned N> auto x_cb() { return m_read_x[N - 1].bind(); }
 	auto shift_cb() { return m_read_shift.bind(); }
@@ -94,21 +92,21 @@ public:
 	static u32 calc_effective_clock_key_debounce(u32 capacitance);
 
 protected:
-	// for devices with a different internal ROM
 	mm5740_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	// each mask version supplies its internal ROM
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD = 0;
 
 	TIMER_CALLBACK_MEMBER(perform_scan);
 
 private:
 	devcb_read16::array<9> m_read_x;
-	devcb_read_line m_read_shift;
-	devcb_read_line m_read_control;
-	devcb_write_line m_write_data_ready;
+	devcb_read_line        m_read_shift;
+	devcb_read_line        m_read_control;
+	devcb_write_line       m_write_data_ready;
 
 	required_memory_region m_rom; // Internal ROM
 
@@ -123,6 +121,15 @@ private:
 	emu_timer *m_scan_timer;      // keyboard scan timer
 };
 
+class mm5740aac_device : public mm5740_device
+{
+public:
+	mm5740aac_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+};
+
 class mm5740aae_device : public mm5740_device
 {
 public:
@@ -134,7 +141,10 @@ protected:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(MM5740,    mm5740_device)
+DECLARE_DEVICE_TYPE(MM5740AAC, mm5740aac_device)
 DECLARE_DEVICE_TYPE(MM5740AAE, mm5740aae_device)
+
+// MM5740 is an alias for MM5740AAC until the H19 switches over
+inline constexpr auto &MM5740 = MM5740AAC;
 
 #endif // MAME_MACHINE_MM5740_H
