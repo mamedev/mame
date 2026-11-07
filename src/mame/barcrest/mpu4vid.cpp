@@ -353,6 +353,7 @@ private:
 	uint8_t skiltrek_chr_next(uint8_t state, uint8_t col);
 	uint8_t strike_chr_next(uint8_t state, uint8_t col);
 	uint8_t addlad_chr_next(uint8_t state, uint8_t col);
+	uint8_t mating_chr_next(uint8_t state, uint8_t col);
 
 	uint8_t m_bt_palbase;
 	uint8_t m_bt_which;
@@ -2363,11 +2364,39 @@ void mpu4vid_state::vid_oki(machine_config &config)
 
 }
 
+uint8_t mpu4vid_state::mating_chr_next(uint8_t state, uint8_t col)
+{
+	const bool R1 = (state >> 1) & 1, R2 = (state >> 2) & 1;
+	const bool R3 = (state >> 3) & 1, R4 = (state >> 4) & 1, R5 = (state >> 5) & 1;
+	// R0 does not feed back into the recovered output functions.
+	const bool C0 = (col >> 0) & 1, C1 = (col >> 1) & 1, C2 = (col >> 2) & 1;
+	const bool C3 = (col >> 3) & 1, C4 = (col >> 4) & 1, C5 = (col >> 5) & 1;
+	const bool NZ = (col & 0x3f) != 0;
+	const bool g0 = !C3 && !C4, g1 = C3 && !C4, g2 = !C3 && C4, g3 = C3 && C4;
+	const bool ACT = C0 || C1 || C2 || C5;
+
+	// O1-O5 match the ROM's protection test (table at 0x4f6).
+	// O0 is masked off by that test and its hardware equation is unknown.
+	// Use the common family function provisionally; it cannot affect O1-O5.
+	const bool O0 = C1 || C2 || C3 || C4 || C5;
+	const bool O1 = (R1 == R2) && NZ;
+	const bool O2 = (!R1 && g0 && ACT) || (R3 && C1 && g1) || (!R2 && !R5 && g3);
+	const bool O3 = (C1 && g0) || (R1 && g2 && !C5) || (R2 && C0 && g3) || (!R3 && !C1 && g1);
+	const bool O4 = (R1 && g0 && ACT) || (R2 && !R3 && g2) || (C0 && !C1 && g3) || (!R4 && R5 && g1);
+	const bool O5 = R1 && NZ;
+
+	return uint8_t((O0 << 0) | (O1 << 1) | (O2 << 2) | (O3 << 3) | (O4 << 4) | (O5 << 5));
+}
+
 void mpu4vid_state::mating(machine_config &config)
 {
-	crmaze(config);
+	crmaze_base(config);
 	vid_oki(config);
 	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4oki_68k_map);
+
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
+	m_characteriser->set_use_pal_equation(true);
+	m_characteriser->set_protnext_cb(FUNC(mpu4vid_state::mating_chr_next));
 }
 
 
@@ -2444,8 +2473,6 @@ void mpu4vid_state::init_crmaze_flutter()
 void mpu4vid_state::init_mating()
 {
 	m_reels = 0;//currently no hybrid games
-
-	// TODOxx: m_current_chr_table = mating_data;
 }
 
 void mpu4vid_state::init_skiltrek()
