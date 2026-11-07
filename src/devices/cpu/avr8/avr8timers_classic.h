@@ -154,6 +154,9 @@ public:
 	template <uint8_t Channel> void int_en_w(uint8_t data);
 	template <uint8_t Channel> uint8_t int_en_r() { return m_int_en[Channel]; }
 
+
+	void set_ocr_channel_c_enabled(bool enabled) { m_ocr_c_enabled = enabled; }
+
 	/**
 	 * Writes the PRTIMx value (1 = shutdown, 0 = run).
 	 *
@@ -271,6 +274,8 @@ protected:
 
 	uint32_t m_max;
 
+	bool m_ocr_c_enabled; // true only on devices that have 3-channel 16-bit timers
+
 	// OCxx output callbacks when enabling/disabling the outputs
 	// so downstream GPIO drivers and other devices can react.
 	devcb_write_line::array<AVR8_TIMER_CMPCHANNEL_MAX> m_oc_en_w_cbs; // OCxx enable outputs
@@ -335,6 +340,14 @@ protected:
 	// then sets the TOV interrupt flag upon wrap to zero.
 	// This does not implement the OCxx toggles; subclasses must do that.
 	void advance_normal_generic();
+
+
+	/**
+	 * Generic implementation of the phase-correct PWM modes.
+	 */
+	inline void advance_pwm_generic(uint16_t top, bool ocr_a_toggling);
+	
+	inline void advance_pwm_ocr_a_generic();
 
 	/**
 	 * Updates the OC channel (assuming its output has already been enabled).
@@ -534,7 +547,7 @@ enum : uint8_t
 		 * Phase Correct PWM Mode (WGM 0b001): Count from 0x00 to 0xff, then count
 		 * down from 0xff to 0x00.
 		 */
-		GENERIC_8BIT_TIMER_WGM_PWM               = 0b001,
+		GENERIC_8BIT_TIMER_WGM_PWM           = 0b001,
 
 		/**
 		 * CTC (Clear Timer on Compare) mode (WGM 0b010): Similar to normal mode, but it counts from 0
@@ -586,6 +599,9 @@ protected:
 	inline void advance_pwm_ocr_a();
 	inline void advance_fast_pwm();
 	inline void advance_fast_pwm_ocr_a();
+
+	virtual bool com_mode_allows_output(uint8_t channel) override;
+
 
 	void force_oc0a(); // force OC0A output as if comparison happened; does not set interrupt flag
 	void force_oc0b(); // force OC0B output as if comparison happened; does not set interrupt flag
@@ -702,8 +718,6 @@ public:
 		device_t *owner,
 		uint32_t clock);
 
-	void set_ocr_channel_c_enabled(bool enabled) { m_ocr_c_enabled = enabled; }
-
 	void tcnt_h_w(uint8_t data);
 	uint8_t tcnt_h_r();
 	void tcnt_l_w(uint8_t data);
@@ -749,7 +763,7 @@ protected:
 	inline void advance_pwm_8bit();
 	inline void advance_pwm_9bit();
 	inline void advance_pwm_10bit();
-	inline void advance_fast_pwm_common(uint16_t top);
+	inline void advance_fast_pwm_common(uint16_t top, bool ocr_a_toggling);
 	inline void advance_fast_pwm_8bit();
 	inline void advance_fast_pwm_9bit();
 	inline void advance_fast_pwm_10bit();
