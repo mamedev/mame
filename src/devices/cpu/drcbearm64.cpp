@@ -5293,7 +5293,7 @@ void drcbe_arm64::op_fload(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else
 	{
-		const a64::Gp indreg = TEMP_REG1.x();
+		const a64::Gp indreg = TEMP_REG3.x();
 		if (indp.is_int_register())
 			a.sxtw(indreg, indp.get_register_int(4));
 		else if ((std::endian::native == std::endian::big) && indp.is_cold_register())
@@ -5330,7 +5330,7 @@ void drcbe_arm64::op_fstore(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else
 	{
-		const a64::Gp indreg = TEMP_REG1.x();
+		const a64::Gp indreg = TEMP_REG3.x();
 		if (indp.is_int_register())
 			a.sxtw(indreg, indp.get_register_int(4));
 		else if ((std::endian::native == std::endian::big) && indp.is_cold_register())

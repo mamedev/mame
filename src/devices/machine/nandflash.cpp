@@ -16,6 +16,8 @@
 
 #include "formats/imageutl.h"
 
+#include <algorithm>
+
 ALLOW_SAVE_TYPE(nand_device::sm_mode_t)
 ALLOW_SAVE_TYPE(nand_device::pointer_sm_mode_t)
 
@@ -30,6 +32,9 @@ DEFINE_DEVICE_TYPE(SAMSUNG_K9LAG08U0M,  samsung_k9lag08u0m_device,  "samsung_k9l
 DEFINE_DEVICE_TYPE(SAMSUNG_K9F2G08U0M,  samsung_k9f2g08u0m_device,  "samsung_k9f2g08u0m",  "Samsung K9F2G08U0M")
 DEFINE_DEVICE_TYPE(TOSHIBA_TC58V64BFT,  toshiba_tc58v64bft_device,  "toshiba_tc58v64bft",  "Toshiba TC58V64BFT")
 DEFINE_DEVICE_TYPE(TOSHIBA_TC58256AFT,  toshiba_tc58256aft_device,  "toshiba_tc58256aft",  "Toshiba TC58256AFT")
+DEFINE_DEVICE_TYPE(TOSHIBA_TC58128FT,   toshiba_tc58128ft_device,   "toshiba_tc58128ft",   "Toshiba TC58128FT")
+DEFINE_DEVICE_TYPE(TOSHIBA_TC58256FT,   toshiba_tc58256ft_device,   "toshiba_tc58256ft",   "Toshiba TC58256FT")
+DEFINE_DEVICE_TYPE(TOSHIBA_TC58512FT,   toshiba_tc58512ft_device,   "toshiba_tc58512ft",   "Toshiba TC58512FT")
 DEFINE_DEVICE_TYPE(GENERALPLUS_GPR27P512A,  generalplus_gpr27p512a,  "generalplus_gpr27p512a",  "GeneralPlus GPR27P512A")
 DEFINE_DEVICE_TYPE(SANDISK_NAND_128MB_512_DEVICE,  sandisk_nand_128mb_512_device,  "sandisk_nand_128mb_512",  "Sandisk 128Mbyte NAND (512+16 block size)") // found on JAKKS Pacific units, part number was erased
 DEFINE_DEVICE_TYPE(SANDISK_NAND_256MB_512_DEVICE,  sandisk_nand_256mb_512_device,  "sandisk_nand_256mb_512",  "Sandisk 256Mbyte NAND (512+16 block size)") // found on JAKKS Pacific units, part number was erased
@@ -46,6 +51,9 @@ nand_device::nand_device(const machine_config &mconfig, device_type type, const 
 	: device_t(mconfig, type, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	m_region(*this, DEVICE_SELF),
+	m_rom(nullptr),
+	m_rom_size(0),
+	m_read_timer(nullptr),
 	m_page_data_size(0),
 	m_page_total_size(0),
 	m_num_pages(0),
@@ -251,7 +259,12 @@ toshiba_tc58v64bft_device::toshiba_tc58v64bft_device(const machine_config &mconf
 }
 
 toshiba_tc58256aft_device::toshiba_tc58256aft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nand_device(mconfig, TOSHIBA_TC58256AFT, tag, owner, clock)
+	: toshiba_tc58256aft_device(mconfig, TOSHIBA_TC58256AFT, tag, owner, clock)
+{
+}
+
+toshiba_tc58256aft_device::toshiba_tc58256aft_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: nand_device(mconfig, type, tag, owner, clock)
 {
 	m_id_len = 2;
 	m_id[0] = 0x98;
@@ -262,7 +275,59 @@ toshiba_tc58256aft_device::toshiba_tc58256aft_device(const machine_config &mconf
 	m_num_pages = 32 * 2048;
 	m_col_address_cycles = 1;
 	m_row_address_cycles = 2;
-	m_sequential_row_read = 0;
+	// Sequential reads stop at the final byte (datasheet, Sequential Read (1) (2) (3)).
+	m_sequential_row_read = 1;
+	m_sequential_row_read_wrap = false;
+	m_read_time = attotime::from_usec(25);
+}
+
+// The FT datasheets document two ID bytes.  digiBLAST's U-Boot scripts compare
+// four bytes with "nidc check ... 4 98 73/75/76 00 ff" and halt on a mismatch.
+// TODO: verify the inferred trailing 00 ff response on physical FT parts.
+toshiba_tc58128ft_device::toshiba_tc58128ft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nand_device(mconfig, TOSHIBA_TC58128FT, tag, owner, clock)
+{
+	m_id_len = 4;
+	m_id[0] = 0x98;
+	m_id[1] = 0x73;
+	m_id[2] = 0x00;
+	m_id[3] = 0xff;
+	m_page_data_size = 512;
+	m_page_total_size = 512 + 16;
+	m_log2_pages_per_block = compute_log2(32);
+	m_num_pages = 32 * 1024;
+	m_col_address_cycles = 1;
+	m_row_address_cycles = 2;
+	m_sequential_row_read = 1;
+	m_sequential_row_read_wrap = false;
+	m_read_time = attotime::from_usec(25);
+}
+
+toshiba_tc58256ft_device::toshiba_tc58256ft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: toshiba_tc58256aft_device(mconfig, TOSHIBA_TC58256FT, tag, owner, clock)
+{
+	m_id_len = 4;
+	m_id[2] = 0x00;
+	m_id[3] = 0xff;
+}
+
+toshiba_tc58512ft_device::toshiba_tc58512ft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nand_device(mconfig, TOSHIBA_TC58512FT, tag, owner, clock)
+{
+	m_id_len = 4;
+	m_id[0] = 0x98;
+	m_id[1] = 0x76;
+	m_id[2] = 0x00;
+	m_id[3] = 0xff;
+	m_page_data_size = 512;
+	m_page_total_size = 512 + 16;
+	m_log2_pages_per_block = compute_log2(32);
+	m_num_pages = 32 * 4096;
+	m_col_address_cycles = 1;
+	m_row_address_cycles = 3;
+	m_sequential_row_read = 1;
+	m_sequential_row_read_wrap = false;
+	m_read_time = attotime::from_usec(25);
 }
 
 generalplus_gpr27p512a::generalplus_gpr27p512a(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -313,6 +378,7 @@ sandisk_nand_256mb_512_device::sandisk_nand_256mb_512_device(const machine_confi
 
 void nand_device::device_start()
 {
+	m_read_timer = timer_alloc(FUNC(nand_device::read_complete), this);
 	m_data_uid_ptr = nullptr; // smartmed cruft
 	m_feeprom_data = std::make_unique<uint8_t[]>(m_page_total_size * m_num_pages);
 	m_pagereg = std::make_unique<uint8_t[]>(m_page_total_size);
@@ -321,14 +387,26 @@ void nand_device::device_start()
 	save_item(NAME(m_pointer_mode));
 	save_item(NAME(m_page_addr));
 	save_item(NAME(m_byte_addr));
+	save_item(NAME(m_addr_load_ptr));
+	save_item(NAME(m_program_byte_count));
 	save_item(NAME(m_busy_until));
 	save_item(NAME(m_status));
 	save_item(NAME(m_accumulated_status));
 	save_item(NAME(m_mode_3065));
+
+	// SmartMedia allocates its buffers later, when the image determines the geometry.
+	if (m_num_pages)
+	{
+		save_pointer(NAME(m_feeprom_data), m_page_total_size * m_num_pages);
+		save_pointer(NAME(m_pagereg), m_page_total_size);
+	}
 }
 
 void nand_device::device_reset()
 {
+	m_read_timer->adjust(attotime::never);
+	m_addr_load_ptr = 0;
+	m_program_byte_count = 0;
 	m_mode = SM_M_INIT;
 	m_pointer_mode = SM_PM_A;
 	m_page_addr = 0;
@@ -343,21 +421,11 @@ void nand_device::device_reset()
 
 void nand_device::nvram_default()
 {
-	if (m_region.found())
-	{
-		// Copy from region if it exists
-		uint32_t bytes = m_region->bytes();
-
-		if (bytes > m_page_total_size * m_num_pages)
-			bytes = m_page_total_size * m_num_pages;
-
-		for (offs_t offs = 0; offs < bytes; offs++)
-			m_feeprom_data[offs] = m_region->as_u8(offs);
-
-		return;
-	}
-
-	memset(&m_feeprom_data[0], 0xff, m_page_total_size * m_num_pages);
+	std::fill_n(m_feeprom_data.get(), nand_size(), 0xff);
+	if (m_rom)
+		std::copy_n(m_rom, std::min(m_rom_size, nand_size()), m_feeprom_data.get());
+	else if (m_region.found())
+		std::copy_n(m_region->base(), std::min(m_region->bytes(), nand_size()), m_feeprom_data.get());
 }
 
 bool nand_device::nvram_read(util::read_stream &file)
@@ -392,6 +460,24 @@ int nand_device::is_busy()
 	return (m_status & 0x40) == 0;
 }
 
+void nand_device::begin_read()
+{
+	m_write_rnb(0);
+	if (m_read_time != attotime::never)
+	{
+		m_busy_until = machine().time() + m_read_time;
+		m_read_timer->adjust(m_read_time);
+	}
+	else
+		m_write_rnb(1);
+}
+
+TIMER_CALLBACK_MEMBER(nand_device::read_complete)
+{
+	m_busy_until = attotime::never;
+	m_write_rnb(1);
+}
+
 void nand_device::command_w(uint8_t data)
 {
 	if (!is_present())
@@ -400,6 +486,7 @@ void nand_device::command_w(uint8_t data)
 	switch (data)
 	{
 	case 0xff: // Reset
+		m_read_timer->adjust(attotime::never);
 		m_busy_until = attotime::never;
 		m_mode = SM_M_INIT;
 		m_pointer_mode = SM_PM_A;
@@ -458,8 +545,13 @@ void nand_device::command_w(uint8_t data)
 		{
 			m_status = (m_status & 0x80) | m_accumulated_status;
 			// logerror( "nandflash: program, page_addr %08X\n", m_page_addr);
-			for (int i = 0; i < m_page_total_size; i++)
-				m_feeprom_data[m_page_addr * m_page_total_size + i] &= m_pagereg[i];
+			if ((m_page_addr < m_num_pages) && !is_protected())
+			{
+				for (uint32_t i = 0; i < m_page_total_size; i++)
+					m_feeprom_data[m_page_addr * m_page_total_size + i] &= m_pagereg[i];
+			}
+			else
+				m_status |= 1;
 			m_status |= 0x40;
 			if (data == 0x15)
 				m_accumulated_status = m_status & 0x1f;
@@ -487,7 +579,12 @@ void nand_device::command_w(uint8_t data)
 		else
 		{
 			m_status &= 0x80;
-			memset(m_feeprom_data.get() + ((m_page_addr & (-1 << m_log2_pages_per_block)) * m_page_total_size), 0xFF, (size_t)(1 << m_log2_pages_per_block) * m_page_total_size);
+			const uint32_t block_pages = 1U << m_log2_pages_per_block;
+			const uint32_t first_page = m_page_addr & ~(block_pages - 1);
+			if ((block_pages <= m_num_pages) && (first_page <= m_num_pages - block_pages) && !is_protected())
+				std::fill_n(m_feeprom_data.get() + first_page * m_page_total_size, block_pages * m_page_total_size, 0xff);
+			else
+				m_status |= 1;
 			// logerror( "nandflash: erase, page_addr %08X, offset %08X, length %08X\n", m_page_addr, (m_page_addr & (-1 << m_log2_pages_per_block)) * m_page_total_size, (1 << m_log2_pages_per_block) * m_page_total_size);
 			m_status |= 0x40;
 			m_mode = SM_M_INIT;
@@ -528,11 +625,7 @@ void nand_device::command_w(uint8_t data)
 			}
 			else
 			{
-				m_write_rnb(0);
-				if (m_read_time != attotime::never)
-					m_busy_until = machine().time() + m_read_time;
-				else
-					m_write_rnb(1);
+				begin_read();
 			}
 		}
 		break;
@@ -567,11 +660,7 @@ void nand_device::command_w(uint8_t data)
 		}
 		else
 		{
-			m_write_rnb(0);
-			if (m_read_time != attotime::never)
-				m_busy_until = machine().time() + m_read_time;
-			else
-				m_write_rnb(1);
+			begin_read();
 		}
 		break;
 	case 0x85: // Random Data Input
@@ -645,9 +734,8 @@ void nand_device::address_w(uint8_t data)
 		m_addr_load_ptr++;
 		// Small-page reads start after the final address, without a confirm command.
 		if ((m_mode == SM_M_READ) && (m_col_address_cycles == 1)
-			&& (m_addr_load_ptr == m_col_address_cycles + m_row_address_cycles)
-			&& (m_read_time != attotime::never))
-			m_busy_until = machine().time() + m_read_time;
+			&& (m_addr_load_ptr == m_col_address_cycles + m_row_address_cycles))
+			begin_read();
 		break;
 	case SM_M_ERASE:
 		if (m_addr_load_ptr < m_row_address_cycles)
@@ -740,8 +828,7 @@ uint8_t nand_device::data_r()
 					m_page_addr++;
 					if (m_page_addr == m_num_pages)
 						m_page_addr = 0;
-					if (m_read_time != attotime::never)
-						m_busy_until = machine().time() + m_read_time;
+					begin_read();
 				}
 			}
 		}
@@ -785,7 +872,7 @@ void nand_device::data_w(uint8_t data)
 		break;
 	case SM_M_PROGRAM:
 	case SM_M_RANDOM_DATA_INPUT:
-		if (m_program_byte_count++ < m_page_total_size)
+		if ((m_program_byte_count++ < m_page_total_size) && (m_byte_addr < m_page_total_size))
 		{
 			m_pagereg[m_byte_addr] = data;
 		}

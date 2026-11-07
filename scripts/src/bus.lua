@@ -2160,6 +2160,20 @@ end
 
 
 ---------------------------------------------------
+-- digiBLAST cartridges
+--@src/devices/bus/digiblast/slot.h,BUSES["DIGIBLAST"] = true
+---------------------------------------------------
+
+if BUSES["DIGIBLAST"] then
+	files {
+		MAME_DIR .. "src/devices/bus/digiblast/slot.cpp",
+		MAME_DIR .. "src/devices/bus/digiblast/slot.h",
+		MAME_DIR .. "src/devices/bus/digiblast/nand.cpp",
+		MAME_DIR .. "src/devices/bus/digiblast/nand.h",
+	}
+end
+
+---------------------------------------------------
 --
 --@src/devices/bus/dimm/dimm.h,BUSES["DIMM"] = true
 ---------------------------------------------------
