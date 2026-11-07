@@ -51,6 +51,8 @@ public:
 	void field_sync(int state);
 
 	void coco(machine_config &config);
+	void coco1(machine_config &config);
+	void coco2(machine_config &config);
 	void cocoh(machine_config &config);
 	void coco2b(machine_config &config);
 	void coco2bh(machine_config &config);
@@ -63,6 +65,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 	// PIA1
+	uint8_t coco1_pia1_pa_r();
 	virtual void pia1_pb_w(uint8_t data) override;
 
 	sam6883_device &sam() { return *m_sam; }
