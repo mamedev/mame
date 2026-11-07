@@ -139,7 +139,7 @@ void apple2_cards(device_slot_interface &device)
 	device.option_add("corvus", A2BUS_CORVUS);                 // Corvus flat-cable HDD interface (see notes in a2corvus.c)
 	device.option_add("mcms1", A2BUS_MCMS1);                   // Mountain Computer Music System, card 1 of 2
 	device.option_add("mcms2", A2BUS_MCMS2);                   // Mountain Computer Music System, card 2 of 2.  must be in card 1's slot + 1!
-	device.option_add("ds3", A2BUS_DS3);                       // Greengate DS:3 Digital Sampler (must be in slot 5)
+	device.option_add("ds3", A2BUS_GREENGATE_DS3);             // Greengate DS:3 Digital Sampler (must be in slot 5)
 	device.option_add("ds3mad", A2BUS_GREENGATE_MAD);          // Greengate MAD board, DS:3 MIDI + voice levels (slot 4)
 	device.option_add("dx1", A2BUS_DX1);                       // Decillonix DX-1 sampler card
 	device.option_add("tm2ho", A2BUS_TIMEMASTERHO);            // Applied Engineering TimeMaster II H.O.
@@ -226,7 +226,7 @@ void apple2e_cards(device_slot_interface &device)
 	device.option_add("corvus", A2BUS_CORVUS);                 // Corvus flat-cable HDD interface (see notes in a2corvus.c)
 	device.option_add("mcms1", A2BUS_MCMS1);                   // Mountain Computer Music System, card 1 of 2
 	device.option_add("mcms2", A2BUS_MCMS2);                   // Mountain Computer Music System, card 2 of 2.  must be in card 1's slot + 1!
-	device.option_add("ds3", A2BUS_DS3);                       // Greengate DS:3 Digital Sampler (must be in slot 5)
+	device.option_add("ds3", A2BUS_GREENGATE_DS3);             // Greengate DS:3 Digital Sampler (must be in slot 5)
 	device.option_add("ds3mad", A2BUS_GREENGATE_MAD);          // Greengate MAD board, DS:3 MIDI + voice levels (slot 4)
 	device.option_add("dx1", A2BUS_DX1);                       // Decillonix DX-1 sampler card
 	device.option_add("tm2ho", A2BUS_TIMEMASTERHO);            // Applied Engineering TimeMaster II H.O.

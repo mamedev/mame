@@ -47,13 +47,16 @@
 
 namespace {
 
-class a2bus_ds3_device:
+class a2bus_greengate_ds3_device:
 		public device_t,
 		public device_a2bus_card_interface
 {
 public:
-	a2bus_ds3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, A2BUS_DS3, tag, owner, clock),
+	static constexpr feature_type unemulated_features() { return feature::MICROPHONE; }
+	static constexpr feature_type imperfect_features() { return feature::TIMING; }
+
+	a2bus_greengate_ds3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+		device_t(mconfig, A2BUS_GREENGATE_DS3, tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this),
 		m_dmac(*this, "dmac"),
 		m_via(*this, "via"),
@@ -81,8 +84,8 @@ protected:
 	virtual void reset_from_bus() override;
 
 private:
-	template <unsigned N> void stc_out_w(int state);
-	template <unsigned N> void dac_w(uint8_t data);
+	template <uint32_t N> void stc_out_w(int state);
+	template <uint32_t N> void dac_w(uint8_t data);
 	uint8_t dma_mem_r(offs_t offset) { return slot_dma_read(offset); }
 	uint8_t keyboard_r();
 	void adc_start();
@@ -126,30 +129,30 @@ INPUT_PORTS_START( ds3 )
 	DS3_GROUP(8)
 INPUT_PORTS_END
 
-void a2bus_ds3_device::reset_from_bus()
+void a2bus_greengate_ds3_device::reset_from_bus()
 {
 	// /RES from the slot goes to the 6844 and the 6522
 	m_dmac->reset();
 	m_via->reset();
 }
 
-ioport_constructor a2bus_ds3_device::device_input_ports() const
+ioport_constructor a2bus_greengate_ds3_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( ds3 );
 }
 
-void a2bus_ds3_device::device_add_mconfig(machine_config &config)
+void a2bus_greengate_ds3_device::device_add_mconfig(machine_config &config)
 {
 	// IC3_CLK (6844 E, 6522 PHI2) is the bus PHI0, which averages 65 cycles
 	// per 456 7M periods because of the long cycle on each scan line. The
 	// 6522 timers set the sequencer tempo, and the usual 1.0218 MHz
 	// approximation plays 0.13% fast against a recording of real hardware.
 	MC6844(config, m_dmac, DERIVED_CLOCK(65, 456));
-	m_dmac->in_memr_callback().set(FUNC(a2bus_ds3_device::dma_mem_r));
-	m_dmac->out_iow_callback<0>().set(FUNC(a2bus_ds3_device::dac_w<0>));
-	m_dmac->out_iow_callback<1>().set(FUNC(a2bus_ds3_device::dac_w<1>));
-	m_dmac->out_iow_callback<2>().set(FUNC(a2bus_ds3_device::dac_w<2>));
-	m_dmac->out_iow_callback<3>().set(FUNC(a2bus_ds3_device::dac_w<3>));
+	m_dmac->in_memr_callback().set(FUNC(a2bus_greengate_ds3_device::dma_mem_r));
+	m_dmac->out_iow_callback<0>().set(FUNC(a2bus_greengate_ds3_device::dac_w<0>));
+	m_dmac->out_iow_callback<1>().set(FUNC(a2bus_greengate_ds3_device::dac_w<1>));
+	m_dmac->out_iow_callback<2>().set(FUNC(a2bus_greengate_ds3_device::dac_w<2>));
+	m_dmac->out_iow_callback<3>().set(FUNC(a2bus_greengate_ds3_device::dac_w<3>));
 	// the bus arbitration state machine grants the next 6502 cycle
 	m_dmac->out_drq1_callback().set(m_dmac, FUNC(mc6844_device::dgrnt_w));
 	// /IRQ//DEND
@@ -157,7 +160,7 @@ void a2bus_ds3_device::device_add_mconfig(machine_config &config)
 
 	MOS6522(config, m_via, DERIVED_CLOCK(65, 456));
 	m_via->writepa_handler().set([this] (uint8_t data) { m_group = data; });
-	m_via->readpb_handler().set(FUNC(a2bus_ds3_device::keyboard_r));
+	m_via->readpb_handler().set(FUNC(a2bus_greengate_ds3_device::keyboard_r));
 	m_via->irq_handler().set([this] (int state) {
 		if (state)
 			raise_slot_irq();
@@ -167,10 +170,10 @@ void a2bus_ds3_device::device_add_mconfig(machine_config &config)
 
 	// clocked from the bus 7M signal
 	AM9513(config, m_stc, DERIVED_CLOCK(1, 1));
-	m_stc->out1_cb().set(FUNC(a2bus_ds3_device::stc_out_w<0>));
-	m_stc->out2_cb().set(FUNC(a2bus_ds3_device::stc_out_w<1>));
-	m_stc->out3_cb().set(FUNC(a2bus_ds3_device::stc_out_w<2>));
-	m_stc->out4_cb().set(FUNC(a2bus_ds3_device::stc_out_w<3>));
+	m_stc->out1_cb().set(FUNC(a2bus_greengate_ds3_device::stc_out_w<0>));
+	m_stc->out2_cb().set(FUNC(a2bus_greengate_ds3_device::stc_out_w<1>));
+	m_stc->out3_cb().set(FUNC(a2bus_greengate_ds3_device::stc_out_w<2>));
+	m_stc->out4_cb().set(FUNC(a2bus_greengate_ds3_device::stc_out_w<3>));
 	// OUT5 is the ZN448 conversion clock
 
 	// four separate outputs on the original, mixed here
@@ -179,16 +182,16 @@ void a2bus_ds3_device::device_add_mconfig(machine_config &config)
 		DAC_8BIT_R2R(config, dac).set_output_range(-1.0, 1.0).add_route(ALL_OUTPUTS, "speaker", 0.25); // ZN428E
 }
 
-void a2bus_ds3_device::device_start()
+void a2bus_greengate_ds3_device::device_start()
 {
-	m_adc_timer = timer_alloc(FUNC(a2bus_ds3_device::adc_done), this);
+	m_adc_timer = timer_alloc(FUNC(a2bus_greengate_ds3_device::adc_done), this);
 
 	save_item(NAME(m_group));
 	save_item(NAME(m_adc_data));
 	save_item(NAME(m_stc_out));
 }
 
-void a2bus_ds3_device::device_reset()
+void a2bus_greengate_ds3_device::device_reset()
 {
 	// all AM9513 SRC and GATE inputs are tied high on the card
 	m_stc->gate1_w(1);
@@ -211,34 +214,36 @@ void a2bus_ds3_device::device_reset()
 	m_via->write_cb2(1); // ZN448 /BUSY idle
 }
 
-template <unsigned N>
-void a2bus_ds3_device::stc_out_w(int state)
+template <uint32_t N>
+void a2bus_greengate_ds3_device::stc_out_w(int state)
 {
 	// rising edge of the timer output sets the request latch
 	if (state && !BIT(m_stc_out, N))
-		m_dmac->dreq_w<N>(ASSERT_LINE);
+		m_dmac->dreq_w<N>(1);
 
 	m_stc_out = (m_stc_out & ~(1 << N)) | ((state ? 1 : 0) << N);
 }
 
-template <unsigned N>
-void a2bus_ds3_device::dac_w(uint8_t data)
+template <uint32_t N>
+void a2bus_greengate_ds3_device::dac_w(uint8_t data)
 {
 	// /DACENn latches the DAC and clears the matching request latch
 	m_dac[N]->write(data);
-	m_dmac->dreq_w<N>(CLEAR_LINE);
+	m_dmac->dreq_w<N>(0);
 }
 
-uint8_t a2bus_ds3_device::keyboard_r()
+uint8_t a2bus_greengate_ds3_device::keyboard_r()
 {
 	uint8_t data = 0xff;
 	for (int g = 0; g < 8; g++)
+	{
 		if (!BIT(m_group, g))
 			data &= m_keys[g]->read();
+	}
 	return data;
 }
 
-void a2bus_ds3_device::adc_start()
+void a2bus_greengate_ds3_device::adc_start()
 {
 	// ZN448 needs 9 clock periods, the clock comes from AM9513 OUT5
 	// which isn't tracked, so assume a typical conversion time
@@ -247,24 +252,24 @@ void a2bus_ds3_device::adc_start()
 	m_adc_timer->adjust(attotime::from_usec(10));
 }
 
-TIMER_CALLBACK_MEMBER(a2bus_ds3_device::adc_done)
+TIMER_CALLBACK_MEMBER(a2bus_greengate_ds3_device::adc_done)
 {
 	m_via->write_cb2(1);
 }
 
-uint8_t a2bus_ds3_device::read_c0nx(uint8_t offset)
+uint8_t a2bus_greengate_ds3_device::read_c0nx(uint8_t offset)
 {
 	if (!machine().side_effects_disabled())
 		adc_start();
 	return get_open_bus();
 }
 
-void a2bus_ds3_device::write_c0nx(uint8_t offset, uint8_t data)
+void a2bus_greengate_ds3_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	adc_start();
 }
 
-uint8_t a2bus_ds3_device::read_cnxx(uint8_t offset)
+uint8_t a2bus_greengate_ds3_device::read_cnxx(uint8_t offset)
 {
 	switch ((offset >> 5) & 3) // A7 not decoded
 	{
@@ -276,7 +281,7 @@ uint8_t a2bus_ds3_device::read_cnxx(uint8_t offset)
 	}
 }
 
-void a2bus_ds3_device::write_cnxx(uint8_t offset, uint8_t data)
+void a2bus_greengate_ds3_device::write_cnxx(uint8_t offset, uint8_t data)
 {
 	switch ((offset >> 5) & 3) // A7 not decoded
 	{
@@ -294,4 +299,4 @@ void a2bus_ds3_device::write_cnxx(uint8_t offset, uint8_t data)
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_DS3, device_a2bus_card_interface, a2bus_ds3_device, "a2ds3", "Greengate DS:3 Digital Sampler")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_GREENGATE_DS3, device_a2bus_card_interface, a2bus_greengate_ds3_device, "a2ggds3", "Greengate DS:3 Digital Sampler")
