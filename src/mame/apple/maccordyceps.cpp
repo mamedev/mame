@@ -17,8 +17,11 @@
     causing freezes on early production boards, and this machine became
     a perennial contender in the discussion of "worst Mac ever made".
 
-    The later 5260/100 and 5260/120 upgrade the CPU to a 603e and substitute
-    the PrimeTime II for the PrimeTime III, which adds 16-bit audio.
+    The PrimeTime II I/O ASIC with 8-bit audio is in the 5200/6200 developer
+    note, but Apple says only a limited number of early 5200s shipped with it.
+    PrimeTime III, 343S1189, which adds 16-bit audio, is in the rest of the
+    family, including the measured Performa 6200CD. The later 5260/100 and
+    5260/120 upgrade the CPU to a 603e.
     It is not to be confused with the 6360/160, which is a complete redesign
     and has nothing to do with the Cordyceps architecture.
 
@@ -55,8 +58,12 @@
 #include "machine/input_merger.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
+#include "sound/flt_rc.h"
 
 #include "softlist_dev.h"
+#include "speaker.h"
+
+#include <numbers>
 
 #define C32M 31.3344_MHz_XTAL
 
@@ -70,7 +77,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_capella(*this, "capella"),
 		m_f108(*this, "f108"),
-		m_primetimeii(*this, "primetimeii"),
+		m_primetimeiii(*this, "primetimeiii"),
 		m_dfac2(*this, "dfac2"),
 		m_video(*this, "valkyrie"),
 		m_adbbus(*this, "adb"),
@@ -91,7 +98,7 @@ private:
 	required_device<ppc603_device> m_maincpu;
 	required_device<capella_device> m_capella;
 	required_device<f108_device> m_f108;
-	required_device<primetimeii_device> m_primetimeii;
+	required_device<primetimeiii_device> m_primetimeiii;
 	required_device<dfac2_device> m_dfac2;
 	required_device<valkyrie_device> m_video;
 	required_device<adb_bus_device> m_adbbus;
@@ -120,13 +127,19 @@ private:
 
 
 	u32 id_r(offs_t offset, u32 mem_mask);
+	u32 comm_r();
+	void comm_w(u32 data);
 
 	u32 m_model_id;
+	u32 m_wait_comm_load, m_wait_comm_store;
 };
 
 void pmac6200_state::machine_start()
 {
 	m_f108->set_ram_info(m_ram->pointer<u32>(), m_ram->size());
+
+	m_wait_comm_load = m_maincpu->attotime_to_cycles(attotime::from_usec(72));
+	m_wait_comm_store = m_maincpu->attotime_to_cycles(attotime::from_usec(92));
 }
 
 void pmac6200_state::machine_reset()
@@ -141,6 +154,25 @@ void pmac6200_state::init_pmac6200()
 uint32_t pmac6200_state::id_r(offs_t offset, uint32_t mem_mask)
 {
 	return m_model_id;
+}
+
+u32 pmac6200_state::comm_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_maincpu->bus_error();
+		m_maincpu->adjust_icount(-int(m_wait_comm_load));
+	}
+	return 0;
+}
+
+void pmac6200_state::comm_w(u32 data)
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_maincpu->bus_error();
+		m_maincpu->adjust_icount(-int(m_wait_comm_store));
+	}
 }
 
 /***************************************************************************
@@ -159,11 +191,11 @@ void pmac6200_state::pmac6200_map(address_map &map)
 	// 68040 bus includes main RAM, with the expected bottlenecks
 	map(0x00000000, 0xffffffff).m(m_f108, FUNC(f108_device::map));
 	map(0x00000000, 0xffffffff).m(m_video, FUNC(valkyrie_device::map));
-	map(0x50000000, 0x53ffffff).m(m_primetimeii, FUNC(primetime_device::map));
+	map(0x50000000, 0x53ffffff).m(m_primetimeiii, FUNC(primetime_device::map));
 	map(0x5ffffffc, 0x5fffffff).r(FUNC(pmac6200_state::id_r));
 
-	// SONIC ethernet is supposed to live here. for now, pretend it's not there
-	map(0x50f0a000, 0x50f0bfff).noprw();
+	map(0x50f08000, 0x50f09fff).lr32(NAME([] () { return ~u32(0); }));
+	map(0x50f0a000, 0x50f0bfff).rw(FUNC(pmac6200_state::comm_r), FUNC(pmac6200_state::comm_w));
 
 	// Capella-mapped devices in 64-bit address space
 	map(0x40000000, 0x403fffff).rom().region("bootrom64", 0); // HACK: should be mirrored, but doing
@@ -183,7 +215,7 @@ void pmac6200_state::pmac6200(machine_config &config)
 
 	PPC603(config, m_maincpu, 75_MHz_XTAL);
 	// BUS_RETRY: TurboSCSI stalls the CPU until DRQ
-	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS | PPCDRC_BUS_RETRY);
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS | PPCDRC_BUS_RETRY | PPCDRC_BUS_ERROR);
 	m_maincpu->set_bus_frequency(75_MHz_XTAL / 2); // FSB freq to Capella
 	m_maincpu->set_addrmap(AS_PROGRAM, &pmac6200_state::pmac6200_map);
 	config.set_perfect_quantum(m_maincpu); // chimes of death without it
@@ -193,8 +225,8 @@ void pmac6200_state::pmac6200(machine_config &config)
 
 	F108(config, m_f108, 75_MHz_XTAL / 2); // 68040 bus speed is 37.5 MHz, same as the FSB
 	m_f108->set_maincpu_tag("maincpu");
-	m_f108->set_primetimeii_tag("primetimeii");
-	m_f108->write_ata_irq().set(m_primetimeii, FUNC(primetimeii_device::ata_irq_w));
+	m_f108->set_primetimeii_tag(m_primetimeiii);
+	m_f108->write_ata_irq().set(m_primetimeiii, FUNC(primetimeii_device::ata_irq_w));
 
 	NSCSI_CONNECTOR(config, "f108:scsi:0", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "f108:scsi:1", mac_scsi_devices, nullptr);
@@ -202,8 +234,10 @@ void pmac6200_state::pmac6200(machine_config &config)
 	NSCSI_CONNECTOR(config, "f108:scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^^primetimeii:speaker", 1.0, 0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^^primetimeii:speaker", 1.0, 1);
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^^dfac2", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^^dfac2", 1.0, 1);
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^^dfac2:rec_0", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^^dfac2:rec_1", 1.0);
 		});
 	NSCSI_CONNECTOR(config, "f108:scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "f108:scsi:5", mac_scsi_devices, nullptr);
@@ -212,13 +246,13 @@ void pmac6200_state::pmac6200(machine_config &config)
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("PPC603");
 
-	PRIMETIMEII(config, m_primetimeii, 75_MHz_XTAL / 2); // guessed
-	m_primetimeii->set_maincpu_tag("maincpu");
-	m_primetimeii->set_scsi_tag("f108:ncr53c96");
-	m_primetimeii->set_capella_tag("capella");
+	PRIMETIMEIII(config, m_primetimeiii, 75_MHz_XTAL / 2); // guessed
+	m_primetimeiii->set_maincpu_tag("maincpu");
+	m_primetimeiii->set_scsi_tag("f108:ncr53c96");
+	m_primetimeiii->set_capella_tag("capella");
 
 	VALKYRIE(config, m_video, C32M);
-	m_video->write_irq().set(m_primetimeii, FUNC(primetime_device::via2_irq_w<0x40>));
+	m_video->write_irq().set(m_primetimeiii, FUNC(primetime_device::via2_irq_w<0x40>));
 
 	ADB_BUS(config, m_adbbus);
 	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
@@ -230,8 +264,8 @@ void pmac6200_state::pmac6200(machine_config &config)
 	m_cuda->poweroff_callback().set(FUNC(pmac6200_state::cuda_power_w));
 	m_cuda->reset_callback().set(FUNC(pmac6200_state::cuda_reset_w));
 	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
-	m_cuda->via_clock_callback().set(m_primetimeii, FUNC(primetime_device::cb1_w));
-	m_cuda->via_data_callback().set(m_primetimeii, FUNC(primetime_device::cb2_w));
+	m_cuda->via_clock_callback().set(m_primetimeiii, FUNC(primetime_device::cb1_w));
+	m_cuda->via_data_callback().set(m_primetimeiii, FUNC(primetime_device::cb2_w));
 	m_cuda->nmi_callback().set(FUNC(pmac6200_state::nmi_irq));
 	m_adbbus->out_adb_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
 	m_adbbus->out_poweron_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
@@ -246,15 +280,33 @@ void pmac6200_state::pmac6200(machine_config &config)
 
 	m_video->sda_callback().set(sda_merger, FUNC(input_merger_device::in_w<1>));
 
-	APPLE_DFAC2(config, m_dfac2, 22257);
+	APPLE_DFAC2(config, m_dfac2);
 	m_dfac2->sda_callback().set(sda_merger, FUNC(input_merger_device::in_w<2>));
 	m_cuda->iic_scl_callback().append(m_dfac2, FUNC(dfac2_device::scl_write));
 	m_cuda->iic_sda_callback().append(m_dfac2, FUNC(dfac2_device::sda_write));
 
-	m_primetimeii->pb3_callback().set(m_cuda, FUNC(cuda_device::get_treq));
-	m_primetimeii->pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
-	m_primetimeii->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
-	m_primetimeii->write_cb2().set(m_cuda, FUNC(cuda_device::set_via_data));
+	asc_base_device &asc = *m_primetimeiii->subdevice<asc_base_device>("asc");
+	asc.reset_routes();
+	asc.add_route(0, m_dfac2->dac(0), 1.0);
+	asc.add_route(1, m_dfac2->dac(1), 1.0);
+	MICROPHONE(config, "sound_in", 2).front().add_route(0, m_dfac2->rec(2), 1.0).add_route(1, m_dfac2->rec(3), 1.0);
+	for (int i = 0; i < 4; i++)
+		m_dfac2->rec(i).lookup()->add_route(0, asc, 1.0);
+	// The board's reconstruction low-pass is modeled as two RC stages, with corners fitted to the line output of a Performa 6200CD
+	static constexpr const char *const LPF_TAGS[2][2] = { { "lpf1_l", "lpf_l" }, { "lpf1_r", "lpf_r" } };
+	for (int ch = 0; ch < 2; ch++)
+	{
+		FILTER_RC(config, LPF_TAGS[ch][0]).set_lowpass(RES_K(1), 1.0 / (2.0 * std::numbers::pi * RES_K(1) * 2270.0))
+			.add_route(0, LPF_TAGS[ch][1], 1.0);
+		FILTER_RC(config, LPF_TAGS[ch][1]).set_lowpass(RES_K(1), 1.0 / (2.0 * std::numbers::pi * RES_K(1) * 11723.0))
+			.add_route(0, "primetimeiii:speaker", 1.0, ch);
+		m_dfac2->add_route(ch, LPF_TAGS[ch][0], 1.0);
+	}
+
+	m_primetimeiii->pb3_callback().set(m_cuda, FUNC(cuda_device::get_treq));
+	m_primetimeiii->pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
+	m_primetimeiii->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
+	m_primetimeiii->write_cb2().set(m_cuda, FUNC(cuda_device::set_via_data));
 
 	// per the Apple Developer Notes, the PDS expansion card only appears at fe.
 	// note that this PDS implementation is broken on real hardware because
