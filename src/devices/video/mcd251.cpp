@@ -57,21 +57,10 @@ constexpr int PAUSE_DELAY_TICKS = 100;
 constexpr uint16_t DISPLAY_RATE_PAL  = 0x0708;
 constexpr uint16_t DISPLAY_RATE_NTSC = 0x05dc;
 
-// The decoded picture queue.  The real chip only has RAM for about three
-// pictures; queuing more keeps the decode rate steady.
-constexpr size_t MAX_PICTURES = 8;
-
 // the largest picture the decoder accepts, and a YCbCr 4:2:0 store for it
 constexpr int MAX_PICTURE_WIDTH = 768;
 constexpr int MAX_PICTURE_HEIGHT = 576;
 constexpr size_t PICTURE_STORE_BYTES = size_t((MAX_PICTURE_WIDTH + 15) & ~15) * ((MAX_PICTURE_HEIGHT + 15) & ~15) * 3 / 2;
-
-// The chip drives 4 Mbit of DRAM directly, 256K words.
-constexpr size_t DRAM_WORDS = 0x80000 / 2;
-
-// Size of the input stream FIFO, which the "request for bits" status
-// reflects.
-constexpr size_t VIDEO_FIFO_FULL = 64 * 1024;
 
 // Picture periods in 30 MHz ticks, indexed by the MPEG-1 picture_rate code.
 constexpr uint32_t FRAME_PERIOD_30MHZ[16] =
@@ -116,21 +105,18 @@ mcd251_device::~mcd251_device()
 
 void mcd251_device::device_start()
 {
-	m_dram = std::make_unique<uint16_t []>(DRAM_WORDS);
-	std::fill_n(m_dram.get(), DRAM_WORDS, 0);
-
 	m_video = std::make_unique<mpeg_video>(MAX_PICTURE_WIDTH, MAX_PICTURE_HEIGHT);
 	for (picture_store &store : m_store)
 		store.ycbcr = std::make_unique<uint8_t []>(PICTURE_STORE_BYTES);
+	for (picture &pic : m_pictures)
+		pic.rgb = std::make_unique<uint32_t []>(size_t(MAX_PICTURE_WIDTH) * MAX_PICTURE_HEIGHT);
 
 	m_tim_timer = timer_alloc(FUNC(mcd251_device::tim_tick), this);
 	m_start_video_timer = timer_alloc(FUNC(mcd251_device::start_video_tick), this);
 	m_pause_video_timer = timer_alloc(FUNC(mcd251_device::pause_video_tick), this);
 	m_frame_timer = timer_alloc(FUNC(mcd251_device::frame_period_tick), this);
 
-	m_picture_fifo.reserve(MAX_PICTURES);
-
-	save_pointer(NAME(m_dram), DRAM_WORDS);
+	save_item(NAME(m_dram));
 	save_item(NAME(m_fmv_isr));
 	save_item(NAME(m_fmv_ier));
 	save_item(NAME(m_fmv_ivec));
@@ -142,9 +128,100 @@ void mcd251_device::device_start()
 	save_item(NAME(m_fmv_frame_rate));
 	save_item(NAME(m_fmv_tcnt));
 	save_item(NAME(m_fmv_stream));
+	save_item(NAME(m_fmv_dsp_enable));
+	save_item(NAME(m_fmv_playback_active));
+	save_item(NAME(m_fmv_decoder_active));
+	save_item(NAME(m_fmv_slow_motion));
+	save_item(NAME(m_image_width));
+	save_item(NAME(m_image_height));
+	save_item(NAME(m_image_rt));
+	save_item(NAME(m_video_ctrl_y_offset));
+	save_item(NAME(m_video_ctrl_x_offset));
+	save_item(NAME(m_video_ctrl_y_active));
+	save_item(NAME(m_video_ctrl_x_active));
+	save_item(NAME(m_video_ctrl_y_display));
+	save_item(NAME(m_video_ctrl_x_display));
+	save_item(NAME(m_video_ctrl_window_width));
+	save_item(NAME(m_video_ctrl_window_height));
+	save_item(NAME(m_video_ctrl_decoder_offset_y));
+	save_item(NAME(m_video_ctrl_decoder_offset_x));
+	save_item(NAME(m_latched_display_offset_x));
+	save_item(NAME(m_latched_display_offset_y));
+	save_item(NAME(m_latched_window_offset_x));
+	save_item(NAME(m_latched_window_offset_y));
+	save_item(NAME(m_latched_window_width));
+	save_item(NAME(m_latched_window_height));
+	save_item(NAME(m_register_update_latch));
+	save_item(NAME(m_register_update_scroll));
+	save_item(NAME(m_show_video));
+	save_item(NAME(m_stale_display));
 	save_item(NAME(m_dclk_origin));
 	save_item(NAME(m_fmv_dclk_offset));
+	save_item(NAME(m_syscr_written));
+	save_item(NAME(m_next_picture_dts));
+	save_item(NAME(m_display_slot));
+	save_item(NAME(m_display_valid));
+	save_item(NAME(m_decoder_width));
+	save_item(NAME(m_decoder_height));
+	save_item(NAME(m_decoder_timecode));
+	save_item(NAME(m_decoder_frameperiod_90khz));
+	save_item(NAME(m_decoder_frameperiod_rawhdr));
+	save_item(NAME(m_frame_period_30mhz));
+	save_item(NAME(m_display_dts_desync));
+	save_item(NAME(m_desync_satisfied));
+	save_item(NAME(m_latch_until_vsync));
+	save_item(NAME(m_latch_until_vblank));
+	save_item(NAME(m_single_step_latch));
+	save_item(NAME(m_pictures_in_input_fifo));
+	save_item(NAME(m_display_starved));
+	save_item(NAME(m_video_startcode_shift));
+	save_item(NAME(m_video_needs_data));
+	save_item(NAME(m_store_newest));
+	save_item(NAME(m_store_older));
+	save_item(NAME(m_reference_held));
+	save_item(NAME(m_store_decoding));
+	save_item(NAME(m_store_forward));
+	save_item(NAME(m_store_backward));
+	save_item(NAME(m_pending_seq));
+	save_item(NAME(m_pending_gop));
+	save_item(NAME(m_gop_search));
+	save_item(NAME(m_seq_search));
+	save_item(NAME(m_skip_decoding));
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_video_es));
+	save_item(NAME(m_video_es_head));
+	save_item(NAME(m_video_es_tail));
+	save_item(NAME(m_dts_fifo.items));
+	save_item(NAME(m_dts_fifo.head));
+	save_item(NAME(m_dts_fifo.count));
+	save_item(NAME(m_picture_fifo.items));
+	save_item(NAME(m_picture_fifo.head));
+	save_item(NAME(m_picture_fifo.count));
+	register_picture_info(m_display_info, "display_info", 0);
+	for (int i = 0; i < std::size(m_store); i++)
+	{
+		save_pointer(NAME(m_store[i].ycbcr), PICTURE_STORE_BYTES, i);
+		register_picture_info(m_store[i].info, "store_info", i);
+	}
+	for (int i = 0; i < std::size(m_pictures); i++)
+	{
+		save_pointer(NAME(m_pictures[i].rgb), size_t(MAX_PICTURE_WIDTH) * MAX_PICTURE_HEIGHT, i);
+		register_picture_info(m_pictures[i].info, "picture_info", i);
+	}
 	m_demux.register_save_state(*this);
+	m_video->register_save_state(*this);
+}
+
+void mcd251_device::register_picture_info(picture_info &info, const char *name, int index)
+{
+	const std::string prefix(name);
+	save_item(info.width, (prefix + ".width").c_str(), index);
+	save_item(info.height, (prefix + ".height").c_str(), index);
+	save_item(info.video_status, (prefix + ".video_status").c_str(), index);
+	save_item(info.timecode, (prefix + ".timecode").c_str(), index);
+	save_item(info.frameperiod_rawhdr, (prefix + ".frameperiod_rawhdr").c_str(), index);
+	save_item(info.first_intra_of_gop, (prefix + ".first_intra_of_gop").c_str(), index);
+	save_item(info.first_intra_of_seq, (prefix + ".first_intra_of_seq").c_str(), index);
 }
 
 void mcd251_device::device_reset()
@@ -191,6 +268,9 @@ void mcd251_device::device_reset()
 	m_register_update_latch = false;
 	m_register_update_scroll = false;
 	m_show_video = false;
+	m_stale_display = false;
+	m_display_valid = false;
+	m_display_slot = -1;
 
 	m_dclk_origin = machine().time();
 	m_fmv_dclk_offset = 0;
@@ -253,7 +333,14 @@ void mcd251_device::write_data(uint8_t data)
 
 	if (was_body)
 	{
-		m_video_es.push_back(data);
+		if (m_video_es_tail == VIDEO_ES_SIZE)
+		{
+			std::copy(&m_video_es[m_video_es_head], &m_video_es[m_video_es_tail], &m_video_es[0]);
+			m_video_es_tail -= m_video_es_head;
+			m_video_es_head = 0;
+		}
+		if (m_video_es_tail < VIDEO_ES_SIZE)
+			m_video_es[m_video_es_tail++] = data;
 
 		// pictures are counted as they enter the input FIFO;
 		// PICS_IN_FIFO reports them before they decode
@@ -261,6 +348,8 @@ void mcd251_device::write_data(uint8_t data)
 		if (m_video_startcode_shift == 0x00000100)
 		{
 			m_pictures_in_input_fifo++;
+			if (m_dts_fifo.full())
+				m_dts_fifo.pop_front();
 			m_dts_fifo.push_back(m_next_picture_dts);
 			m_next_picture_dts = 0;
 		}
@@ -309,7 +398,7 @@ void mcd251_device::video_decode_pending()
 		int width = 0, height = 0;
 		double frame_rate = 0;
 		mpeg_video::decode_result result = m_video->decode(
-				std::span<const uint8_t>(m_video_es.data() + taken, m_video_es.size() - taken),
+				std::span<const uint8_t>(&m_video_es[m_video_es_head + taken], video_es_size() - taken),
 				consumed, video_buffers(), width, height, frame_rate);
 		taken += consumed;
 
@@ -343,7 +432,7 @@ void mcd251_device::video_decode_pending()
 		case mpeg_video::decode_result::NEED_DATA:
 			// see "request for bits"
 			m_video_needs_data = true;
-			if (m_store_decoding < 0 && taken == m_video_es.size())
+			if (m_store_decoding < 0 && taken == video_es_size())
 			{
 				m_pictures_in_input_fifo = m_reference_held ? 1 : 0;
 			}
@@ -353,7 +442,9 @@ void mcd251_device::video_decode_pending()
 		if (m_video_needs_data)
 			break;
 	}
-	m_video_es.erase(m_video_es.begin(), m_video_es.begin() + taken);
+	m_video_es_head += uint32_t(taken);
+	if (m_video_es_head == m_video_es_tail)
+		video_es_clear();
 }
 
 void mcd251_device::video_picture_header(int width, int height)
@@ -392,6 +483,15 @@ void mcd251_device::video_picture_header(int width, int height)
 	m_pending_seq |= m_video->picture_follows_sequence_header();
 	m_pending_gop |= m_video->picture_follows_sequence_header() || m_video->picture_follows_group();
 
+	if (m_gop_search && type == mpeg_video::picture_type::I && (m_seq_search ? m_pending_seq : m_pending_gop))
+		m_gop_search = false;
+	m_skip_decoding = m_gop_search;
+	if (m_skip_decoding)
+	{
+		m_store_decoding = m_store_forward = m_store_backward = 2;
+		return;
+	}
+
 	picture_info &info = m_store[m_store_decoding].info;
 	info.width = uint16_t(width);
 	info.height = uint16_t(height);
@@ -414,6 +514,13 @@ void mcd251_device::video_picture_decoded()
 	const int decoded = m_store_decoding;
 	m_store_decoding = -1;
 
+	if (m_skip_decoding)
+	{
+		m_skip_decoding = false;
+		drop_picture();
+		return;
+	}
+
 	const picture_info &info = m_store[decoded].info;
 	m_decoder_width = info.width;
 	m_decoder_height = info.height;
@@ -434,7 +541,11 @@ void mcd251_device::video_picture_decoded()
 
 	if (decoded == 2)
 	{
-		queue_picture(m_store[decoded]);
+		// TODO: broken_link (ISO/IEC 11172-2 2.4.3.4) is ignored; its leading B pictures are shown
+		if (m_store_older < 0 && !m_video->closed_group())
+			drop_picture();
+		else
+			queue_picture(m_store[decoded]);
 	}
 	else
 	{
@@ -462,12 +573,26 @@ void mcd251_device::release_held_reference()
 	}
 }
 
+int mcd251_device::free_picture_slot()
+{
+	for (;;)
+	{
+		for (int slot = 0; slot < std::size(m_pictures); slot++)
+		{
+			if (slot != m_display_slot && !m_picture_fifo.contains(uint8_t(slot)))
+				return slot;
+		}
+		LOGMASKED(LOG_VIDEO, "FMV picture queue full, oldest picture dropped\n");
+		m_picture_fifo.pop_front();
+	}
+}
+
 void mcd251_device::queue_picture(const picture_store &store)
 {
-	picture pic;
+	const int slot = free_picture_slot();
+	picture &pic = m_pictures[slot];
 	pic.info = store.info;
 	const int width = pic.info.width, height = pic.info.height;
-	pic.rgb = std::make_unique<uint32_t []>(size_t(width) * height);
 
 	const int luma_pitch = (width + 15) & ~15;
 	const int chroma_pitch = luma_pitch / 2;
@@ -475,14 +600,27 @@ void mcd251_device::queue_picture(const picture_store &store)
 	const uint8_t *const cb_plane = y_plane + size_t(luma_pitch) * ((height + 15) & ~15);
 	const uint8_t *const cr_plane = cb_plane + size_t(chroma_pitch) * (((height + 15) & ~15) / 2);
 
+	const int chroma_width = (width + 1) / 2;
+	const int chroma_height = (height + 1) / 2;
+	int cb_row[MAX_PICTURE_WIDTH / 2], cr_row[MAX_PICTURE_WIDTH / 2];
+
 	// ITU-R BT.601, studio range, in 16.16 fixed point
 	for (int y = 0; y < height; y++)
 	{
+		const int cy = y >> 1;
+		const int ny = std::clamp((y & 1) ? cy + 1 : cy - 1, 0, chroma_height - 1);
+		for (int i = 0; i < chroma_width; i++)
+		{
+			cb_row[i] = 3 * cb_plane[cy * chroma_pitch + i] + cb_plane[ny * chroma_pitch + i];
+			cr_row[i] = 3 * cr_plane[cy * chroma_pitch + i] + cr_plane[ny * chroma_pitch + i];
+		}
+
 		for (int x = 0; x < width; x++)
 		{
-			const int c = (y >> 1) * chroma_pitch + (x >> 1);
-			const int cr = cr_plane[c] - 128;
-			const int cb = cb_plane[c] - 128;
+			const int cx = x >> 1;
+			const int nx = std::clamp((x & 1) ? cx + 1 : cx - 1, 0, chroma_width - 1);
+			const int cr = ((3 * cr_row[cx] + cr_row[nx] + 8) >> 4) - 128;
+			const int cb = ((3 * cb_row[cx] + cb_row[nx] + 8) >> 4) - 128;
 			const int r = (cr * 104597) >> 16;
 			const int g = (cb * 25674 + cr * 53278) >> 16;
 			const int b = (cb * 132201) >> 16;
@@ -494,7 +632,15 @@ void mcd251_device::queue_picture(const picture_store &store)
 		}
 	}
 
-	m_picture_fifo.push_back(std::move(pic));
+	m_picture_fifo.push_back(uint8_t(slot));
+	if (m_pictures_in_input_fifo)
+		m_pictures_in_input_fifo--;
+}
+
+void mcd251_device::drop_picture()
+{
+	if (!m_dts_fifo.empty())
+		m_dts_fifo.pop_front();
 	if (m_pictures_in_input_fifo)
 		m_pictures_in_input_fifo--;
 }
@@ -511,18 +657,19 @@ void mcd251_device::video_flush_stalled()
 void mcd251_device::reset_video_decoder()
 {
 	m_video->reset_input();
-	m_video_es.clear();
+	video_es_clear();
 	m_store_newest = m_store_older = -1;
 	m_store_decoding = m_store_forward = m_store_backward = -1;
 	m_reference_held = false;
 	m_pending_seq = m_pending_gop = false;
+	m_skip_decoding = false;
 }
 
 void mcd251_device::clear_video_fifo()
 {
 	reset_video_decoder();
 	m_video_needs_data = false;
-	m_video_es.clear();
+	video_es_clear();
 
 	m_picture_fifo.clear();
 	m_dts_fifo.clear();
@@ -532,6 +679,8 @@ void mcd251_device::clear_video_fifo()
 	m_latch_until_vsync = false;
 	m_latch_until_vblank = false;
 	m_single_step_latch = false;
+	m_gop_search = false;
+	m_seq_search = false;
 	m_desync_satisfied = false;
 	m_display_dts_desync = 0;
 }
@@ -572,8 +721,13 @@ void mcd251_device::restart_frame_timer()
 	// The picture period less 2048 ticks per unit of DTS desync, in 24 bits:
 	// the correction has to wrap, since computing it wider let a large
 	// negative desync stretch a frame past a second and stall the display.
-	int64_t period = (int64_t(m_frame_period_30mhz) - 1
-			- int64_t(m_display_dts_desync) * 2048) & 0xffffff;
+	// A positive desync stops at the shortest period instead, since wrapping
+	// there would turn a display that is late into one long frame.
+	int64_t period = int64_t(m_frame_period_30mhz) - 1 - int64_t(m_display_dts_desync) * 2048;
+
+	if (m_display_dts_desync > 0 && period < 1200)
+		period = 1200;
+	period &= 0xffffff;
 
 	// slow motion is a 1..8 divisor on the display rate
 	if (m_fmv_slow_motion > 1)
@@ -607,16 +761,15 @@ TIMER_CALLBACK_MEMBER(mcd251_device::frame_period_tick)
 		else if (desync < -0x4000)
 			desync += 0x8000;
 
-		if (!synchronous || desync > -30)
-			m_desync_satisfied = true;
-
-		const bool valid_dts = m_dts_fifo.front() != 0;
-		m_display_dts_desync =
-				(m_syscr_written && synchronous && valid_dts) ? desync : 0;
-
 		// Correct the frame period rather than skipping a picture: the queue
 		// empties faster than the disc fills it, and the NDAT that follows
 		// makes the driver pause, which ends playback.
+		const bool valid_dts = m_dts_fifo.front() != 0;
+		if (!synchronous || !valid_dts || desync > -30)
+			m_desync_satisfied = true;
+
+		m_display_dts_desync =
+				(m_syscr_written && synchronous && valid_dts) ? desync : 0;
 	}
 	else
 	{
@@ -635,14 +788,15 @@ void mcd251_device::latch_display_frame()
 	if (m_picture_fifo.empty())
 		return;
 
-	m_display = std::move(m_picture_fifo.front());
-	m_picture_fifo.erase(m_picture_fifo.begin());
+	m_display_slot = m_picture_fifo.front();
+	m_picture_fifo.pop_front();
 	m_display_valid = true;
+	m_stale_display = false;
 
 	if (!m_dts_fifo.empty())
-		m_dts_fifo.erase(m_dts_fifo.begin());
+		m_dts_fifo.pop_front();
 
-	m_display_info = m_display.info;
+	m_display_info = m_pictures[m_display_slot].info;
 }
 
 void mcd251_device::vblank_w(int state)
@@ -741,33 +895,41 @@ void mcd251_device::vblank_w(int state)
 //  VIDEO OUTPUT
 //**************************************************************************
 
-// x and y are the chip's own pixel coordinates, counted from the start of
-// active video.
-bool mcd251_device::video_pixel(int x, int y, uint32_t &argb) const
+// y is the chip's own line number, counted from the start of active video.
+void mcd251_device::video_line(int y, uint32_t *line, int count) const
 {
-	if (!m_show_video || !m_display_valid || !m_display.rgb)
+	if (!m_show_video || !m_display_valid || m_display_slot < 0)
 	{
-		return false;
+		std::fill_n(line, count, 0);
+		return;
+	}
+	const picture &display = m_pictures[m_display_slot];
+
+	const int sy = y - int(m_latched_display_offset_y);
+	const int py = sy + int(m_latched_window_offset_y);
+	if (sy < 0 || (m_latched_window_height && sy >= int(m_latched_window_height)) || py < 0 || py >= int(display.info.height))
+	{
+		std::fill_n(line, count, 0);
+		return;
 	}
 
-	const int sx = x - int(m_latched_display_offset_x);
-	const int sy = y - int(m_latched_display_offset_y);
+	// the chip pixels [first, last) whose window and picture positions are both in range
+	const int offset_x = int(m_latched_display_offset_x);
+	const int shift_x = int(m_latched_window_offset_x) - offset_x;
+	int first = std::max(offset_x, -shift_x);
+	int last = std::min(count / 2, int(display.info.width) - shift_x);
+	if (m_latched_window_width)
+		last = std::min(last, offset_x + int(m_latched_window_width));
+	first = std::clamp(first, 0, count / 2);
+	last = std::max(last, first);
 
-	if (sx < 0 || sy < 0)
-		return false;
-	if (m_latched_window_width && sx >= int(m_latched_window_width))
-		return false;
-	if (m_latched_window_height && sy >= int(m_latched_window_height))
-		return false;
-
-	const int px = sx + int(m_latched_window_offset_x);
-	const int py = sy + int(m_latched_window_offset_y);
-
-	if (px < 0 || py < 0 || px >= int(m_display.info.width) || py >= int(m_display.info.height))
-		return false;
-
-	argb = m_display.rgb[size_t(py) * m_display.info.width + px];
-	return true;
+	std::fill_n(line, first * 2, 0);
+	const uint32_t *const row = &display.rgb[size_t(py) * display.info.width];
+	for (int x = first; x < last; x++)
+	{
+		line[x * 2] = line[x * 2 + 1] = row[x + shift_x];
+	}
+	std::fill(line + last * 2, line + count, 0);
 }
 
 //**************************************************************************
@@ -853,7 +1015,7 @@ uint16_t mcd251_device::regs_r(offs_t offset, uint16_t mem_mask)
 		// gating it on the picture queue, or dropping it while the decoder is
 		// starved mid picture, stops the driver feeding, and the CD play
 		// buffers are then never released.
-		data = (m_video_es.size() < VIDEO_FIFO_FULL || m_video_needs_data)
+		data = (video_es_size() < VIDEO_FIFO_FULL || m_video_needs_data)
 				? 0x2000 : 0;
 		break;
 
@@ -1012,11 +1174,17 @@ void mcd251_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			m_demux.reset();
 			// the decoder is briefly disabled, then enabled again
 			m_fmv_dsp_enable = true;
+			if (m_stale_display)
+			{
+				m_display_valid = false;
+				m_stale_display = false;
+			}
 		}
 
-		if (data & SYSCMD_GOPSEARCH)
+		if (data & (SYSCMD_GOPSEARCH | SYSCMD_SEQSEARCH))
 		{
-			// handled implicitly: the decoder resumes at the next picture
+			m_gop_search = true;
+			m_seq_search = (data & SYSCMD_SEQSEARCH) != 0;
 		}
 
 		if (data & SYSCMD_DEC_ON)
@@ -1062,13 +1230,15 @@ void mcd251_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		}
 
 		if (data & VIDCMD_HIDE)
+		{
 			m_show_video = false;
-
-		if (data & VIDCMD_SHOW)
+			m_stale_display = m_display_valid;
+		}
+		// VMPEG driver: HIDE|VIDON at /mv init ($e51afa), VIDON alone at play start ($e5243c)
+		if ((data & (VIDCMD_SHOW | VIDCMD_SHOWNEXT)) || ((data & (VIDCMD_VIDON | VIDCMD_HIDE)) == VIDCMD_VIDON))
+		{
 			m_show_video = true;
-
-		if (data & VIDCMD_SHOWNEXT)
-			m_show_video = true;
+		}
 		break;
 
 	case 0x063: // SYS_SCR
@@ -1116,9 +1286,18 @@ void mcd251_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_fmv_frame_rate = data;
 		break;
 
-	case 0x001: m_image_width = data; break;
-	case 0x002: m_image_height = data; break;
-	case 0x003: m_image_rt = data; break;
+	case 0x001:
+		m_image_width = data;
+		m_video->set_sequence(m_image_width, m_image_height, m_image_rt & 0x0f);
+		break;
+	case 0x002:
+		m_image_height = data;
+		m_video->set_sequence(m_image_width, m_image_height, m_image_rt & 0x0f);
+		break;
+	case 0x003:
+		m_image_rt = data;
+		m_video->set_sequence(m_image_width, m_image_height, m_image_rt & 0x0f);
+		break;
 
 	case 0x062: // stream number, 0-15 per mv_selstrm()
 		LOGMASKED(LOG_FMV, "FMV stream %04x\n", data);
