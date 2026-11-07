@@ -199,15 +199,45 @@ void pmd85_state::c2717_update_memory()
 
 		m_bank[1]->set_base(m_rom);
 		m_bank[2]->set_base(ram + 0x4000);
-		m_bank[3]->set_base(m_rom);
-		m_bank[4]->set_base(ram + 0xc000);
+		m_bank[3]->set_entry(0);
 	}
 	else
 	{
 		space.install_write_bank(0x0000, 0x3fff, m_bank[1]);
 		m_bank[1]->set_base(ram);
 		m_bank[2]->set_base(ram + 0x4000);
+		m_bank[3]->set_entry(m_c2717_ram_at_8000 ? 1 : 0);
 	}
+}
+
+/*******************************************************************************
+
+    Consul 2717 0xc000-0xffff remapping
+
+    Only 48 of the 64 bytes of each video line are displayed.  With motherboard
+    8255 PC7 set (as at power-up), CPU accesses to 0xc000-0xffff are folded
+    into the 16 hidden bytes of each line, giving 4 KB of RAM that is never
+    displayed: address bits 5-4 are forced high, and their inverse moves to
+    bits 13-12.
+
+*******************************************************************************/
+
+uint16_t pmd85_state::c2717_remap_addr(offs_t offset) const
+{
+	uint16_t const addr = 0xc000 + offset;
+	if (!m_c2717_remapped)
+		return addr;
+	return (addr & 0xcfcf) | ((~addr & 0x0030) << 8) | 0x0030;
+}
+
+uint8_t pmd85_state::c2717_hi_r(offs_t offset)
+{
+	return m_ram->pointer()[c2717_remap_addr(offset)];
+}
+
+void pmd85_state::c2717_hi_w(offs_t offset, uint8_t data)
+{
+	m_ram->pointer()[c2717_remap_addr(offset)] = data;
 }
 
 /*******************************************************************************
@@ -249,6 +279,31 @@ void pmd85_state::ppi0_portc_w(uint8_t data)
 	m_leds[PMD85_LED_2] = BIT(data, 3);
 	//m_leds[PMD85_LED_3] = BIT(data, 2);
 	m_speaker->level_w(BIT(data, 2));
+}
+
+void pmd85_state::c2717_ppi0_portc_w(uint8_t data)
+{
+	ppi0_portc_w(data);
+
+	// Consul 2717: PC5 selects the 384x256 screen, PC6 maps RAM instead of
+	// ROM for reading at 0x8000-0xbfff, and PC7 enables the 0xc000-0xffff
+	// remapping.
+	bool const width384 = BIT(data, 5);
+	if (width384 != m_c2717_width384)
+	{
+		m_screen->update_partial(m_screen->vpos());
+		m_c2717_width384 = width384;
+		c2717_update_screen();
+	}
+
+	bool const ram = BIT(data, 6);
+	if (ram != m_c2717_ram_at_8000)
+	{
+		m_c2717_ram_at_8000 = ram;
+		c2717_update_memory();
+	}
+
+	m_c2717_remapped = BIT(data, 7);
 }
 
 /*******************************************************************************
@@ -459,6 +514,10 @@ uint8_t pmd85_state::io_r(offs_t offset)
 		return 0xff;
 	}
 
+	// the DS 2717 takes C8-CF, over the ROM module 8255 mirror
+	if (m_ds2717 && ((offset & 0xf8) == 0xc8))
+		return m_ds2717->read(offset & 0x07);
+
 	switch (offset & 0x0c)
 	{
 		case 0x04:  /* Motherboard */
@@ -512,6 +571,12 @@ void pmd85_state::io_w(offs_t offset, uint8_t data)
 	{
 		m_startup_mem_map = 0;
 		(this->*update_memory)();
+	}
+
+	if (m_ds2717 && ((offset & 0xf8) == 0xc8))
+	{
+		m_ds2717->write(offset & 0x07, data);
+		return;
 	}
 
 	switch (offset & 0x0c)
@@ -784,9 +849,36 @@ void pmd85_state::machine_start()
 	save_item(NAME(m_ppi_port_outputs));
 	save_item(NAME(m_startup_mem_map));
 	save_item(NAME(m_pmd853_memory_mapping));
+	save_item(NAME(m_c2717_ram_at_8000));
+	save_item(NAME(m_c2717_remapped));
+	save_item(NAME(m_c2717_width384));
 	save_item(NAME(m_previous_level));
 	save_item(NAME(m_clk_level));
 	save_item(NAME(m_clk_level_tape));
 	save_item(NAME(m_model));
+
+	if (m_model == C2717)
+	{
+		m_bank[3]->configure_entry(0, m_rom);
+		m_bank[3]->configure_entry(1, m_ram->pointer() + 0x8000);
+
+		// writes to 0x8000-0xbfff always reach RAM
+		m_maincpu->space(AS_PROGRAM).install_writeonly(0x8000, 0xbfff, m_ram->pointer() + 0x8000);
+	}
+}
+
+void pmd85_state::device_post_load()
+{
+	(this->*update_memory)();
+	if (m_model == C2717)
+		c2717_update_screen();
+}
+
+// The 384-pixel mode shows 8 instead of 6 pixels of each of the 48 bytes of a
+// line with a faster dot clock, in the same picture width.
+void pmd85_state::c2717_update_screen()
+{
+	int const width = m_c2717_width384 ? 384 : 288;
+	m_screen->configure(width, 256, rectangle(0, width - 1, 0, 256 - 1), m_screen->frame_period());
 }
 

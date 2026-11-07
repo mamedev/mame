@@ -593,7 +593,9 @@ void i8255_device::set_mode(uint8_t data)
 	if (port_mode(PORT_A) == MODE_OUTPUT)
 	{
 		m_out_pa_cb((offs_t)0, m_output[PORT_A]);
-		m_ibf[PORT_A] = 1; // correct? needed by SAM Coupe Blue Alpha sampler
+		// correct? needed by SAM Coupe Blue Alpha sampler; a mode set leaves IBF clear in mode 2
+		if (group_mode(GROUP_A) != MODE_2)
+			m_ibf[PORT_A] = 1;
 	}
 	else
 	{
