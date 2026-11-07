@@ -30937,6 +30937,9 @@ diamondk
 diamondko
 goldnchp
 
+@source:misc/digiblast.cpp
+digiblst
+
 @source:misc/discoboy.cpp
 discoboy
 discoboyp
@@ -44069,9 +44072,6 @@ modulab
 @source:skeleton/digel804.cpp
 digel804
 ep804
-
-@source:skeleton/digiblast.cpp
-digiblst
 
 @source:skeleton/digijet.cpp
 digijet
