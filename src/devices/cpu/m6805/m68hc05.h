@@ -55,7 +55,7 @@ public:
 
 	// SCI TDO and RDI pins (PD1, PD0); only on variants with an SCI
 	auto sci_tdo() { return m_sci.lookup()->tdo_cb(); }
-	void sci_rdi_w(int state) { if (m_sci) m_sci->rx_w(state); }
+	void sci_rdi_w(int state) { if (m_sci) m_sci->rdi_w(state); }
 
 protected:
 	// state index constants

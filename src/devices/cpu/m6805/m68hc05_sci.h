@@ -16,10 +16,8 @@
 
 #pragma once
 
-#include "diserial.h"
 
-
-class m68hc05_sci_device : public device_t, public device_serial_interface
+class m68hc05_sci_device : public device_t
 {
 public:
 	// implemented bits, for the host's debugger state
@@ -29,14 +27,17 @@ public:
 
 	m68hc05_sci_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	// TxD output pin (TDO) and the interrupt request towards the host MCU (level); the
-	// RxD input pin (RDI) is rx_w from device_serial_interface
+	// TDO output pin and the interrupt request towards the host MCU (level)
 	auto tdo_cb() { return m_tdo_cb.bind(); }
 	auto irq_cb() { return m_irq_cb.bind(); }
 
+	// RDI input pin
+	void rdi_w(int state);
+
 	void map(address_map &map) ATTR_COLD;
 
-	// register access for the host's debugger state (no transmitter or receiver activity)
+	// register access for the host's debugger state (no transmitter or receiver activity,
+	// except that a new rate restarts the bit clock)
 	u8 baud() const { return m_baud; }
 	u8 sccr1() const { return m_sccr1; }
 	u8 sccr2() const { return m_sccr2; }
@@ -52,10 +53,6 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
-
-	virtual void rcv_complete() override;
-	virtual void tra_callback() override;
-	virtual void tra_complete() override;
 
 private:
 	enum : u8
@@ -88,11 +85,22 @@ private:
 		SCSR_RX_FLAGS = SCSR_RDRF | SCSR_IDLE | SCSR_OR | SCSR_NF | SCSR_FE
 	};
 
-	// what the line timer is timing
-	enum : int
+	// what the transmit shifter is sending
+	enum : u8
 	{
-		LINE_PREAMBLE,
-		LINE_STOP
+		TX_IDLE,
+		TX_FRAME,
+		TX_PREAMBLE,
+		TX_BREAK,
+		TX_MARK         // the high bit after a break
+	};
+
+	// what the receiver is doing
+	enum : u8
+	{
+		RX_IDLE,        // waiting for a start edge
+		RX_ARTIFICIAL,  // waiting for the anticipated start after a framing error
+		RX_FRAME        // sampling a start bit and the frame after it
 	};
 
 	u8 baud_r();
@@ -105,26 +113,39 @@ private:
 	u8 scdr_r();
 	void scdr_w(u8 data);
 
-	TIMER_CALLBACK_MEMBER(line_done);
+	TIMER_CALLBACK_MEMBER(tx_tick);
+	TIMER_CALLBACK_MEMBER(rx_sample);
+	TIMER_CALLBACK_MEMBER(idle_detected);
 
 	bool te() const { return m_sccr2 & SCCR2_TE; }
 	bool re() const { return m_sccr2 & SCCR2_RE; }
-	bool tx_busy() const { return !is_transmit_register_empty() || m_preamble_active; }
+	bool rwu() const { return m_sccr2 & SCCR2_RWU; }
+	unsigned frame_bits() const { return (m_sccr1 & SCCR1_M) ? 11 : 10; }
+
+	u32 rt_ticks() const;
+	attotime tick_time(u64 ticks) const;
+	u64 next_tick(attotime const &t, u32 period) const;
+	void restart_clock();
 
 	void set_flags(u8 mask);
 	void clear_flags(u8 mask);
 	void update_irq();
-	u32 divisor() const;
-	attotime bit_time() const;
 	void update_rate(bool force = false);
-	void set_bit_time();
-	void start_frame();
-	void start_stop_bit();
-	void start_preamble();
+
+	void set_tdo(int state);
+	void tx_kick();
+	void tx_next();
+
+	void rx_start(u64 rt1);
+	void rx_schedule();
+	void rx_frame_done(bool stop);
+	void arm_idle(attotime const &from);
 
 	devcb_write_line    m_tdo_cb;
 	devcb_write_line    m_irq_cb;
-	emu_timer           *m_line_timer;
+	emu_timer           *m_tx_timer;
+	emu_timer           *m_rx_timer;
+	emu_timer           *m_idle_timer;
 
 	u8                  m_baud;
 	u8                  m_sccr1;
@@ -132,12 +153,31 @@ private:
 	u8                  m_scsr, m_scsr_seen;
 	u8                  m_rdr;              // receive data register, read through SCDR
 	u8                  m_tdr;              // transmit data register, written through SCDR
-	bool                m_tdr_full;         // TDR holds a byte not yet moved to the shifter
-	bool                m_preamble_active;  // idle frame in progress
-	bool                m_preamble_pending; // TE rose while a frame was in the shifter
-	bool                m_stop_active;      // stop bit of the last frame in progress
 	bool                m_irq_state;
-	u32                 m_divisor;          // E clocks per bit time
+
+	attotime            m_epoch;            // the bit and RT clocks start here
+	u32                 m_rt;               // E clocks per RT tick
+
+	// transmitter
+	bool                m_tdr_full;         // TDR holds a byte not yet moved to the shifter
+	bool                m_preamble_pending; // TE rose: a preamble goes out next
+	bool                m_break_pending;    // SBK rose: a break goes out next
+	u8                  m_tx_state;
+	u16                 m_tx_shift;         // bits still to send, LSB first
+	u8                  m_tx_count;
+	int                 m_tdo;
+
+	// receiver
+	int                 m_rdi;
+	attotime            m_rdi_rise;         // when RDI last went high
+	bool                m_line_idle;        // an idle line has been detected
+	bool                m_idle_armed;       // IDLE may set (once after each RDRF)
+	u8                  m_rx_state;
+	u64                 m_rx_rt1;           // RT1 of the start bit, in E clocks from m_epoch
+	u8                  m_rx_sample;        // next sample: 0-3 start verification, then 3 per bit
+	u8                  m_rx_votes;         // high samples for the current bit (or verification)
+	bool                m_rx_noise;
+	u16                 m_rx_shift;
 };
 
 DECLARE_DEVICE_TYPE(M68HC05_SCI, m68hc05_sci_device)
