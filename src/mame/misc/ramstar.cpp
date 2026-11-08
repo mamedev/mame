@@ -241,9 +241,6 @@ void ramstar_state::machine_start()
 
 void ramstar_state::machine_reset()
 {
-	// TODO: the mcs51 core drives TXD low from its first reset until it transmits; the real pin idles high
-	m_dacia->write_rxd1(1);
-
 	m_raster_timer->adjust(attotime::never);
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 

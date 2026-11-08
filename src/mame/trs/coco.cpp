@@ -158,6 +158,10 @@ void coco_state::machine_reset()
 	m_dac_output = 0;
 	m_pia0_pa_buffer = 0;
 	m_vhd_select = 0;
+
+	// PIA1 CB2 is an input at reset, leaving SNDEN low.  The mux resets
+	// after the PIA, so establish the disabled sound path here.
+	m_mux->inhibit_y_w(1);
 }
 
 

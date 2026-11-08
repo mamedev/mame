@@ -26916,7 +26916,8 @@ xmenua
 
 @source:konami/yiear.cpp
 yiear
-yiear2
+yiearg
+yieari
 
 @source:konami/zr107.cpp
 jetwave
@@ -30937,6 +30938,9 @@ diamondk
 diamondko
 goldnchp
 
+@source:misc/digiblast.cpp
+digiblst
+
 @source:misc/discoboy.cpp
 discoboy
 discoboyp
@@ -32105,6 +32109,7 @@ ngoldb
 olym65bj
 olym65wc
 op5cards
+phnxjokr
 pmpoker
 poker91
 pokerdub
@@ -32718,6 +32723,8 @@ fruitstbf
 fruitstbg
 fruitstbh
 fruitstbi
+fruitstbj
+fruitstbk
 goldnjkr
 goldnjkra
 
@@ -37791,6 +37798,7 @@ tosh1000
 bmanroul
 fishingm
 ggconnie
+junghero
 smf
 
 @source:pce/paranoia.cpp
@@ -40861,6 +40869,11 @@ bbddza
 ddz1
 ddz2
 ddz2a
+ddz2b
+ddz2c
+ddz2d
+ddz2e
+ddz2f
 djddz
 djddza
 fkddzz80
@@ -44063,9 +44076,6 @@ modulab
 digel804
 ep804
 
-@source:skeleton/digiblast.cpp
-digiblst
-
 @source:skeleton/digijet.cpp
 digijet
 
@@ -45654,6 +45664,7 @@ coolbi
 modcart
 
 @source:subsino/subsino2.cpp
+bigboss
 bishjan
 blushark
 dongshiz

@@ -3121,6 +3121,8 @@ if MACHINES["PCI"] then
 		MAME_DIR .. "src/devices/machine/sis950_smbus.h",
 		MAME_DIR .. "src/devices/machine/sis85c496.cpp",
 		MAME_DIR .. "src/devices/machine/sis85c496.h",
+		MAME_DIR .. "src/devices/machine/vt8231_acpi.cpp",
+		MAME_DIR .. "src/devices/machine/vt8231_acpi.h",
 		MAME_DIR .. "src/devices/machine/vt8231_isa.cpp",
 		MAME_DIR .. "src/devices/machine/vt8231_isa.h",
 		MAME_DIR .. "src/devices/machine/vt82c585vp.cpp",
@@ -4825,6 +4827,18 @@ if MACHINES["FDC37C665IR"] then
 	files {
 		MAME_DIR .. "src/devices/machine/fdc37c665ir.cpp",
 		MAME_DIR .. "src/devices/machine/fdc37c665ir.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/fdc37c669.h,MACHINES["FDC37C669"] = true
+---------------------------------------------------
+
+if MACHINES["FDC37C669"] then
+	files {
+		MAME_DIR .. "src/devices/machine/fdc37c669.cpp",
+		MAME_DIR .. "src/devices/machine/fdc37c669.h",
 	}
 end
 

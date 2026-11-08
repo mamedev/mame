@@ -28,6 +28,9 @@
 
 #include "endianness.h"
 
+#include <algorithm>
+#include <iterator>
+
 #define LOG_MODE        (1U << 1)
 #define LOG_MONSENSE    (1U << 2)
 #define LOG_RAMDAC      (1U << 3)
@@ -59,6 +62,18 @@ enum
 	VALKYRIEREG_VIDEO_FIELD_Y_PIXEL = 0x84, // 16-bit
 };
 
+enum : u8
+{
+	VIDEO_IN_PIXEL_DOUBLE   = 0x02,
+	VIDEO_IN_WINDOW_ACTIVE  = 0x20,
+	VIDEO_IN_BUFFER1        = 0x40
+};
+
+static constexpr u32 VIDEO_BUFFER0 = 0x97800;
+static constexpr u32 VIDEO_BUFFER1 = 0xc0000;
+static constexpr u32 VIDEO_BUFFER_WIDTH = 320;
+static constexpr u32 VIDEO_BUFFER_HEIGHT = 240;
+
 
 
 //-------------------------------------------------
@@ -71,6 +86,7 @@ void valkyrie_device::map(address_map &map)
 	map(0x50f24000, 0x50f25fff).rw(FUNC(valkyrie_device::ramdac_r), FUNC(valkyrie_device::ramdac_w));
 
 	map(0xf9000000, 0xf90fffff).rw(FUNC(valkyrie_device::vram_r), FUNC(valkyrie_device::vram_w));
+	map(0xf9300000, 0xf937ffff).rw(FUNC(valkyrie_device::video_buffer_r), FUNC(valkyrie_device::video_buffer_w));
 }
 
 void valkyrie_device::valkyriear_map(address_map &map)
@@ -95,7 +111,9 @@ valkyrie_device::valkyrie_device(const machine_config &mconfig, const char *tag,
 	m_vram_offset(0), m_monitor_id(0),
 	m_base(0), m_stride(1024), m_video_timing(0x80), m_int_status(0), m_hres(0), m_vres(0), m_htotal(0), m_vtotal(0),
 	m_config(0), m_vbl_enabled(false),
-	m_M(1), m_N(1), m_P(1)
+	m_M(1), m_N(1), m_P(1),
+	m_video_in_control(0), m_color_key(0),
+	m_window_x(0), m_window_y(0), m_window_width(0), m_window_height(0), m_field_x(0), m_field_y(0)
 {
 }
 
@@ -125,6 +143,15 @@ void valkyrie_device::device_start()
 	save_item(NAME(m_M));
 	save_item(NAME(m_N));
 	save_item(NAME(m_P));
+	save_item(NAME(m_video_in_control));
+	save_item(NAME(m_color_key));
+	save_item(NAME(m_window_x));
+	save_item(NAME(m_window_y));
+	save_item(NAME(m_window_width));
+	save_item(NAME(m_window_height));
+	save_item(NAME(m_field_x));
+	save_item(NAME(m_field_y));
+	save_item(NAME(m_video_clut));
 	save_pointer(NAME(m_vram), m_vram_size);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(valkyrie_device::recalc_mode), this));
@@ -133,6 +160,9 @@ void valkyrie_device::device_start()
 void valkyrie_device::device_reset()
 {
 	m_video_timing = 0x80;
+	m_video_in_control = 0;
+	for (auto &entry : m_video_clut)
+		std::fill(std::begin(entry), std::end(entry), 0);
 
 	// clear the MAME default palette so we don't get a weird red screen on initial startup
 	for (int i = 0; i < 256; i++)
@@ -253,6 +283,7 @@ u32 valkyrie_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 					*scanline++ = pens[pixels];
 				}
 			}
+			draw_video_window(bitmap, cliprect, stride);
 		}
 		break;
 
@@ -272,6 +303,40 @@ u32 valkyrie_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
+void valkyrie_device::draw_video_window(bitmap_rgb32 &bitmap, rectangle const &cliprect, u32 stride)
+{
+	if (!(m_video_in_control & VIDEO_IN_WINDOW_ACTIVE))
+		return;
+
+	auto const graphics = util::big_endian_cast<u8 const>(&m_vram[0]) + 0x1000;
+	auto const video = util::big_endian_cast<u16 const>(&m_vram[0]) + (((m_video_in_control & VIDEO_IN_BUFFER1) ? VIDEO_BUFFER1 : VIDEO_BUFFER0) >> 1);
+	int const shift = (m_video_in_control & VIDEO_IN_PIXEL_DOUBLE) ? 1 : 0;
+	rectangle clip(m_window_x, m_window_x + m_window_width - 1, m_window_y, m_window_y + m_window_height - 1);
+	clip &= rectangle(0, m_hres - 1, 0, m_vres - 1);
+	clip &= cliprect;
+
+	for (s32 y = clip.top(); y <= clip.bottom(); y++)
+	{
+		u32 const vy = m_field_y + ((y - m_window_y) >> shift);
+		if (vy >= VIDEO_BUFFER_HEIGHT)
+			break;
+
+		u32 *const scanline = &bitmap.pix(y);
+		for (s32 x = clip.left(); x <= clip.right(); x++)
+		{
+			u32 const vx = m_field_x + ((x - m_window_x) >> shift);
+			if (vx >= VIDEO_BUFFER_WIDTH)
+				break;
+
+			if (graphics[(y * stride) + x] == m_color_key)
+			{
+				u16 const pixel = video[(vy * VIDEO_BUFFER_WIDTH) + vx];
+				scanline[x] = rgb_t(m_video_clut[BIT(pixel, 10, 5)][0], m_video_clut[BIT(pixel, 5, 5)][1], m_video_clut[BIT(pixel, 0, 5)][2]);
+			}
+		}
+	}
+}
+
 u8 valkyrie_device::regs_r(offs_t offset)
 {
 	switch (offset)
@@ -283,7 +348,7 @@ u8 valkyrie_device::regs_r(offs_t offset)
 			return m_mode;
 
 		case VALKYRIEREG_CONFIG: // config
-			return m_config;
+			return (m_config & 0x7f) | ((m_screen->hblank() || m_screen->vblank()) ? 0x80 : 0);
 
 		case VALKYRIEREG_VBLANK:
 			return m_screen->vblank();
@@ -321,6 +386,14 @@ u8 valkyrie_device::regs_r(offs_t offset)
 	}
 
 	return 0;
+}
+
+static void write_half(u16 &reg, offs_t offset, u8 data)
+{
+	if (BIT(offset, 0))
+		reg = (reg & 0xff00) | data;
+	else
+		reg = (reg & 0x00ff) | (data << 8);
 }
 
 void valkyrie_device::regs_w(offs_t offset, u8 data)
@@ -377,30 +450,37 @@ void valkyrie_device::regs_w(offs_t offset, u8 data)
 			break;
 
 		case VALKYRIEREG_VIDEO_IN_CONTROL:    // video in control
+			m_video_in_control = data;
 			break;
 
 		case VALKYRIEREG_VIDEO_WINDOW_XPOS:   // video window X position
 		case VALKYRIEREG_VIDEO_WINDOW_XPOS+1:
+			write_half(m_window_x, offset, data);
 			break;
 
 		case VALKYRIEREG_VIDEO_WINDOW_YPOS:   // video window Y position
 		case VALKYRIEREG_VIDEO_WINDOW_YPOS+1:
+			write_half(m_window_y, offset, data);
 			break;
 
 		case VALKYRIEREG_VIDEO_WINDOW_WIDTH:   // video window width
 		case VALKYRIEREG_VIDEO_WINDOW_WIDTH+1:
+			write_half(m_window_width, offset, data);
 			break;
 
 		case VALKYRIEREG_VIDEO_WINDOW_HEIGHT:   // video window height
 		case VALKYRIEREG_VIDEO_WINDOW_HEIGHT+1:
+			write_half(m_window_height, offset, data);
 			break;
 
 		case VALKYRIEREG_VIDEO_FIELD_X_PIXEL:   // video field starting X pixel
 		case VALKYRIEREG_VIDEO_FIELD_X_PIXEL+1:
+			write_half(m_field_x, offset, data);
 			break;
 
 		case VALKYRIEREG_VIDEO_FIELD_Y_PIXEL:   // video field starting Y pixel
 		case VALKYRIEREG_VIDEO_FIELD_Y_PIXEL+1:
+			write_half(m_field_y, offset, data);
 			break;
 
 		default:
@@ -504,6 +584,22 @@ void valkyrie_device::ramdac_w(offs_t offset, u32 data)
 		break;
 
 	case 2:
+		if (m_pal_idx < 3)
+			m_video_clut[m_pal_address][m_pal_idx] = data;
+
+		m_pal_idx++;
+		if (m_pal_idx == 3)
+		{
+			m_pal_idx = 0;
+			m_pal_address++;
+		}
+		break;
+
+	case 3:
+		m_color_key = data;
+		break;
+
+	default:
 		LOGMASKED(LOG_RAMDAC, "%02x to DAC @ %x\n", data, offset);
 		break;
 	}
@@ -596,6 +692,24 @@ u32 valkyrie_device::vram_r(offs_t offset)
 void valkyrie_device::vram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset & (m_vram_size - 1)]);
+}
+
+offs_t valkyrie_device::video_buffer_offset(offs_t offset)
+{
+	u32 const row = BIT(offset, 8, 8);
+	u32 const column = BIT(offset, 0, 8) << 2;
+
+	return ((BIT(offset, 16) ? VIDEO_BUFFER1 : VIDEO_BUFFER0) + (row * (VIDEO_BUFFER_WIDTH << 1)) + column) >> 2;
+}
+
+u32 valkyrie_device::video_buffer_r(offs_t offset)
+{
+	return m_vram[video_buffer_offset(offset)];
+}
+
+void valkyrie_device::video_buffer_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_vram[video_buffer_offset(offset)]);
 }
 
 void valkyrie_device::recalc_ints()

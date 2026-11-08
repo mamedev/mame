@@ -3,21 +3,13 @@
 /*
  * Sandbox for VIA based PCs
  *
- * Using Lucky Star 5AMVP3 given we already have a mostly compatible Super I/O (ITE 8661F)
- *
- * Notes:
- * - need to map_first the IDE for make it recognize both that and floppy disks;
- * - win98se: none of the via4in1 drivers seems to actually work with this BIOS. It will return
- *   "registry error, please reboot", with CD-ROM drive becoming non-functional afterwards.
- *   winme acts mostly the same, except that it manages to install with v4.17
- *
  * TODO:
- * - win98se/win98me: resource conflict between ACPI BIOS and AGP card(s), PCI cards works fine.
- *   Bridge memory/io bases not passed properly?
  * - win98se: PS/2 keyboard becomes unresponsive after a while, caused by keyboard irq stuck
  *   (workaround: open debugger window at I/O $60);
  * - win98se: ACPI has issues on power off and reboot (workaround: use restart in MSDOS mode);
  * - freedos13: APMDOS hangs system with JEMMEX preloaded, works when issued standalone;
+ * - need to map_first the IDE for make it recognize both that and floppy disks, shouldn't be
+ *   necessary (check remapping chain);
  *
  * TODO (zidabx98):
  * - expects to reset after saving to CMOS from GPIO $5042 bit 3 low;
@@ -140,6 +132,8 @@ void mvp3_state::winbond_superio_config(device_t *device)
 	w83877tf_device &winb = *downcast<w83877tf_device *>(device);
 	winb.set_por_hefras(1);
 	winb.set_por_hefere(1);
+	// assumed, doesn't make a difference either way
+	winb.set_por_pnpcvs(0);
 	winb.irq1().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq1_w));
 	winb.irq8().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq8n_w));
 	winb.irq9().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq9_w));
@@ -253,10 +247,10 @@ void mvp3_state::mvp3(machine_config &config)
 	acpi_dev.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 	acpi_dev.sci().set("pci:07.0", FUNC(vt82c586b_isa_device::pc_acpi_w));
 
-	PCI_SLOT(config, "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, "sis6326_agp");
 
 	// 8~11 is trusted, otherwise BIOS won't map intr_line(s) properly
-	PCI_SLOT(config, "pci:1", pci_cards,  8, 0, 1, 2, 3, "sis6326_pci");
+	PCI_SLOT(config, "pci:1", pci_cards,  8, 0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards,  9, 1, 2, 3, 0, "4dwavedx");
 	PCI_SLOT(config, "pci:3", pci_cards, 10, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci:4", pci_cards, 11, 3, 0, 1, 2, nullptr);
