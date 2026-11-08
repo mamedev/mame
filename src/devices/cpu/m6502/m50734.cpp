@@ -242,9 +242,12 @@ bool m50734_device::dme_active() const
 	return BIT(m_p0_function, 5) && BIT(m_port_direction[0], 5);
 }
 
+// Of the (zp),Y instructions only LDA and STA strobe DME; ORA, AND, EOR, ADC, CMP
+// and SBC (zp),Y read program memory
 u8 m50734_device::read_data(u16 adr)
 {
-	if (dme_active())
+	bool const alu_idy = (m_IR & 0x1f) == 0x11 && m_IR != 0xb1;
+	if (dme_active() && !alu_idy)
 		return m_data.read_interruptible(adr);
 	else
 		return m740_device::read(adr);
