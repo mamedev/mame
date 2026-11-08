@@ -525,12 +525,15 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 
 	if ((m_maincpu->get_fc() & 4) == 0)				// User mode access updates map_control from write latch
 	{
-			if ((m_latched_map_control & 0x1f) != (m_map_control & 0x1f))
-			{
-				LOGMASKED(LOG_MMU,"memory_r: m_map_control updated 0x%04x\n", m_latched_map_control);
-			}
+		if ((m_latched_map_control & 0x1f) != (m_map_control & 0x1f))
+		{
+			LOGMASKED(LOG_MMU,"memory_r: m_map_control updated 0x%04x\n", m_latched_map_control);
+		}
+		if (!machine().side_effects_disabled()
+		{
 			m_map_control &= ~0x1f;
 			m_map_control |= m_latched_map_control & 0x1f;
+		}
 	}
 
 	const offs_t offset0 = offset;
@@ -539,30 +542,33 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 	// not in buserr interrupt, only in User mode, and VM enabled
 	if (!m_inbuserr && (m_maincpu->get_fc() & 4) == 0 && BIT(m_map_control, MAP_VM_ENABLE))
 	{
-		// is !cpuWr
-		m_map_control &= ~(1 << MAP_CPU_WR);
-
-		// skip guards in debug reads
-		// selftest expects fail if page.pid != map_control.pid
-		if (!machine().side_effects_disabled() && BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7))
+		if (!machine().side_effects_disabled()
 		{
-			m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
+			// is !cpuWr
+			m_map_control &= ~(1 << MAP_CPU_WR);
 
-			// FIXME: if this is a prefetch, it will be cancelled in src/devices/cpu/m68000/m68kcpu.h, but we've changed m_map_control..
-			m_inbuserr = true;
+			// skip guards in debug reads
+			// selftest expects fail if page.pid != map_control.pid
+			if (BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7))
+			{
+				m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
 
-			LOGMASKED(LOG_MMU,"memory_r: %06x: bus error: PTE_PID(%d) != mapcntl_PID(%d) fc(%d) pc(%08x) berr(%d) map_control(%02x) latch(%02x)\n", offset<<1,
-				BIT(m_map[offset >> 11], 11, 3), m_map_control & 7, m_maincpu->get_fc(), m_maincpu->pc(),
-				m_inbuserr, m_map_control, m_latched_map_control);
-			m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), true, m_maincpu->get_fc(), true);
+				// FIXME: if this is a prefetch, it will be cancelled in src/devices/cpu/m68000/m68kcpu.h, but we've changed m_map_control..
+				m_inbuserr = true;
 
-			mem_mask = 0;
-			return 0;
+				LOGMASKED(LOG_MMU,"memory_r: %06x: bus error: PTE_PID(%d) != mapcntl_PID(%d) fc(%d) pc(%08x) berr(%d) map_control(%02x) latch(%02x)\n", offset<<1,
+					BIT(m_map[offset >> 11], 11, 3), m_map_control & 7, m_maincpu->get_fc(), m_maincpu->pc(),
+					m_inbuserr, m_map_control, m_latched_map_control);
+				m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), true, m_maincpu->get_fc(), true);
 
-		}
-		else
-		{
-			m_map_control |= 1 << MAP_BLOCK_ACCESS;
+				mem_mask = 0;
+				return 0;
+
+			}
+			else
+			{
+				m_map_control |= 1 << MAP_BLOCK_ACCESS;
+			}
 		}
 
 		//LOG("memory_r: map %08x => paddr(%08x) fc(%d) pc(%08x)\n", OFF16_TO_OFF8(offset), OFF16_TO_OFF8(BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11), m_maincpu->get_fc(), m_maincpu->pc());
@@ -594,12 +600,15 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if ((m_maincpu->get_fc() & 4) == 0)		// User mode access updates map_control from write latch
 	{
-			if ((m_latched_map_control & 0x1f) != (m_map_control & 0x1f))
-			{
-				LOGMASKED(LOG_MMU,"memory_w: m_map_control updated 0x%04x\n", m_latched_map_control);
-			}
+		if ((m_latched_map_control & 0x1f) != (m_map_control & 0x1f))
+		{
+			LOGMASKED(LOG_MMU,"memory_w: m_map_control updated 0x%04x\n", m_latched_map_control);
+		}
+		if (!machine().side_effects_disabled()
+		{
 			m_map_control &= ~0x1f;
 			m_map_control |= m_latched_map_control & 0x1f;
+		}
 	}
 
 	const offs_t offset0 = offset;
@@ -608,55 +617,57 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 	if (BIT(m_map_control, MAP_VM_ENABLE) && (m_maincpu->get_fc() & 4) == 0) // only in User mode
 	{
 		//LOG("memory_w: m_map(0x%04x)\n", m_map[offset >> 11]);
-
-		// is cpuWr
-		if (!m_inbuserr)
-			m_map_control |= 1 << MAP_CPU_WR;
-
-		// matching pid?
-		if (!machine().side_effects_disabled() && (BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7)))
+		if (!machine().side_effects_disabled())
 		{
+			// is cpuWr
 			if (!m_inbuserr)
-			{
-				// NB active low
-				m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
+				m_map_control |= 1 << MAP_CPU_WR;
 
-				LOGMASKED(LOG_MMU,"memory_w: %06x bus error: PTE_PID(%d) != mapcntl_PID(%d) fc(%d)\n", OFF16_TO_OFF8(offset), BIT(m_map[offset >> 11], 11, 3), (m_map_control & 7), m_maincpu->get_fc());
-				m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), false, m_maincpu->get_fc(), true);
+			// matching pid?
+			if ((BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7)))
+			{
+				if (!m_inbuserr)
+				{
+					// NB active low
+					m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
+
+					LOGMASKED(LOG_MMU,"memory_w: %06x bus error: PTE_PID(%d) != mapcntl_PID(%d) fc(%d)\n", OFF16_TO_OFF8(offset), BIT(m_map[offset >> 11], 11, 3), (m_map_control & 7), m_maincpu->get_fc());
+					m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), false, m_maincpu->get_fc(), true);
+				}
+
+				m_inbuserr = true;
+			}
+			else if (!m_inbuserr)
+			{
+				m_map_control |= 1 << MAP_BLOCK_ACCESS;
 			}
 
-			m_inbuserr = true;
+			if (m_inbuserr)
+				mem_mask = 0;	// disable write
+
+			// write-enabled page?
+			if (mem_mask && BIT(m_map[offset >> 11], 14) == 0)
+			{
+				m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
+
+				m_inbuserr = true;
+
+				LOGMASKED(LOG_MMU,"memory_w:  %06x bus error: READONLY fc(%d) pc(%08x)\n", OFF16_TO_OFF8(offset), m_maincpu->get_fc(), m_maincpu->pc());
+				m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), false, m_maincpu->get_fc(), true);
+
+				mem_mask = 0;	// disable write
+				return;
+			}
+
+			// mark page dirty (NB before we overwrite offset)
+			if (mem_mask)
+			{
+				if (!(m_map[offset >> 11] & 0x8000))
+					LOGMASKED(LOG_MMU,"memory_w: DIRTY m_map(0x%04x) m_map_control(%02x) berr(%d) fc(%d)\n", m_map[offset >> 11], m_map_control, m_inbuserr, m_maincpu->get_fc());
+				m_map[offset >> 11] |= 0x8000;
+			}
 		}
-		else if (!m_inbuserr)
-		{
-			m_map_control |= 1 << MAP_BLOCK_ACCESS;
-		}
-
-		if (m_inbuserr)
-			mem_mask = 0;	// disable write
-
-		// write-enabled page?
-		if (!machine().side_effects_disabled() && mem_mask && BIT(m_map[offset >> 11], 14) == 0)
-		{
-			m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
-
-			m_inbuserr = true;
-
-			LOGMASKED(LOG_MMU,"memory_w:  %06x bus error: READONLY fc(%d) pc(%08x)\n", OFF16_TO_OFF8(offset), m_maincpu->get_fc(), m_maincpu->pc());
-			m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), false, m_maincpu->get_fc(), true);
-
-			mem_mask = 0;	// disable write
-			return;
-		}
-
-		// mark page dirty (NB before we overwrite offset)
-		if (mem_mask)
-		{
-			if (!(m_map[offset >> 11] & 0x8000))
-				LOGMASKED(LOG_MMU,"memory_w: DIRTY m_map(0x%04x) m_map_control(%02x) berr(%d) fc(%d)\n", m_map[offset >> 11], m_map_control, m_inbuserr, m_maincpu->get_fc());
-			m_map[offset >> 11] |= 0x8000;
-		}
-
+		
 		//if (mem_mask)
 		//	LOG("memory_w: map %08x => paddr(%08x) berr(%d) fc(%d) pc(%08x)\n",OFF16_TO_OFF8(offset), OFF16_TO_OFF8(BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11), m_inbuserr, m_maincpu->get_fc(), m_maincpu->pc());
 
@@ -664,19 +675,22 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 #endif
 
-	// NB byte memory limit, offset is *word* offset
-	if (offset >= m_ram_size_words && offset < OFF8_TO_OFF16(0x600000) && !machine().side_effects_disabled())
+	if (!machine().side_effects_disabled())
 	{
-		LOGMASKED(LOG_MMU,"memory_w: bus error: NOMEM %08x fc(%d)\n", OFF16_TO_OFF8(offset), m_maincpu->get_fc());
-		m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), false, m_maincpu->get_fc(), true);
-	}
+		// NB byte memory limit, offset is *word* offset
+		if (offset >= m_ram_size_words && offset < OFF8_TO_OFF16(0x600000) && !machine().side_effects_disabled())
+		{
+			LOGMASKED(LOG_MMU,"memory_w: bus error: NOMEM %08x fc(%d)\n", OFF16_TO_OFF8(offset), m_maincpu->get_fc());
+			m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), false, m_maincpu->get_fc(), true);
+		}
 
-	if (m_inbuserr && (m_maincpu->get_fc() & 4))
-	{
-		LOGMASKED(LOG_MMU,"berr reset(w) %06x\n", OFF16_TO_OFF8(offset));
-		m_inbuserr = false;
+		if (m_inbuserr && (m_maincpu->get_fc() & 4))
+		{
+			LOGMASKED(LOG_MMU,"berr reset(w) %06x\n", OFF16_TO_OFF8(offset));
+			m_inbuserr = false;
+		}
 	}
-
+	
 	m_vm->write16(offset, data, mem_mask);
 }
 
@@ -833,11 +847,18 @@ u16 tek440x_state::fpu_r(offs_t offset)
 	{
 		case 2:
 		case 3:
-			result = m_fpu->slow_read();
+			if (!machine().side_effects_disabled())
+			{
+				result = m_fpu->slow_read();
+			else
+			{
+				// page 2.1.72   FPC.pal:   IF (/Wr*FPSel) /D.15 = /FP.15*/Busy
+				result = 0x8000;
+			}
 			break;
 
 		case 4:
-			if (m_fpu_finished)
+			if (!machine().side_effects_disabled() && m_fpu_finished)
 			{
 				result = m_fpu->slow_status();
 				LOGMASKED(LOG_FPU_RD, "fpu_r: status = 0x%04x\n", result);
@@ -984,26 +1005,41 @@ u8 tek440x_state::mouse_r(offs_t offset)
 	{
 		case 0:
 			ans = ~(m_old_mouse_x - m_mouse_x);
-			m_old_mouse_x = m_mouse_x;
+			if (!machine().side_effects_disabled())
+			{
+				m_old_mouse_x = m_mouse_x;
+			}
 			break;
 		case 2:
 			ans = ~(m_old_mouse_y - m_mouse_y);
-			m_old_mouse_y = m_mouse_y;
+			if (!machine().side_effects_disabled())
+			{
+				m_old_mouse_y = m_mouse_y;
+			}
 			ans ^= (m_diag & 15);
 			break;
 		case 4:
-			m_mouse_btns <<= 3;
-			m_mouse_btns |=  m_mousebtn->read() & 7;		// selftest xor diag register with it
+			if (!machine().side_effects_disabled())
+			{
+				m_mouse_btns <<= 3;
+				m_mouse_btns |=  m_mousebtn->read() & 7;		// selftest xor diag register with it
+			}
 			ans = m_mouse_btns & 0x1f;
 			ans ^= (m_diag & 15) << 3;
 			ans |= 0x80;									// VCC from calender(?)
 			break;
 		case 6:
-			mouseupdate();
+			if (!machine().side_effects_disabled())
+			{
+				mouseupdate();
+			}
 			break;
 
 		default:
-			m_old_mouse_x = m_old_mouse_y = 0;
+			if (!machine().side_effects_disabled())
+			{
+				m_old_mouse_x = m_old_mouse_y = 0;
+			}
 			break;
 	}
 
@@ -1063,16 +1099,19 @@ void tek440x_state::timer_irq(int state)
 {
 	LOGMASKED(LOG_IRQ,"%10s: irq1_raise %04x\n", machine().time().as_string(8), state);
 
-	if (state == 0)
+	if (!machine().side_effects_disabled())
 	{
-		//LOG("M68K_IRQ_1 assert\n");
-		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+		if (state == 0)
+		{
+			//LOG("M68K_IRQ_1 assert\n");
+			m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 
-		m_u244latch = true;
-	}
-	else
-	{
-		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+			m_u244latch = true;
+		}
+		else
+		{
+			m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+		}
 	}
 }
 
@@ -1081,11 +1120,14 @@ u16 tek440x_state::timer_r(offs_t offset)
 {
 	LOGMASKED(LOG_TIMER_RD,"%10s: timer_r %08x pc(%08x)\n", machine().time().as_string(8), offset, m_maincpu->pc());
 
-	//if (m_u244latch)
+	if (!machine().side_effects_disabled())
 	{
-		LOGMASKED(LOG_IRQ,"timer_r: M68K_IRQ_1 clear\n");
-		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-		m_u244latch = false;
+		//if (m_u244latch)
+		{
+			LOGMASKED(LOG_IRQ,"timer_r: M68K_IRQ_1 clear\n");
+			m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+			m_u244latch = false;
+		}
 	}
 
 	return m_timer->read16(offset);
