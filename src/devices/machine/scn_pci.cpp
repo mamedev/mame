@@ -566,6 +566,12 @@ void scn_pci_device::rcvr_sync()
 
 void scn_pci_device::rcvr_update(bool internal, bool output_1x)
 {
+	// The SCN2641 is asynchronous-only and defines mode 00 as invalid.  In
+	// particular, its cleared reset value must not invoke the PCI/EPCI
+	// synchronous receiver before the mode registers have been initialized.
+	if (m_is_aci && (m_mode[0] & 0x03) == 0)
+		return;
+
 	bool local_loopback = (m_command & 0xc0) == 0x80;
 	bool rxd = local_loopback ? m_txd : m_rxd;
 	bool sync_mode = (m_mode[0] & 0x03) == 0;
@@ -877,6 +883,11 @@ void scn_pci_device::tx_load(u8 data)
 
 void scn_pci_device::xmtr_update(bool internal, bool output_1x)
 {
+	// The SCN2641 is asynchronous-only and remains idle while its cleared
+	// mode register contains the invalid 00 mode.
+	if (m_is_aci && (m_mode[0] & 0x03) == 0)
+		return;
+
 	bool sync_mode = (m_mode[0] & 0x03) == 0;
 	bool local_loopback = (m_command & 0xc0) == 0x80;
 	if ((internal && !sync_mode) || BIT(m_mode[0], 1))
