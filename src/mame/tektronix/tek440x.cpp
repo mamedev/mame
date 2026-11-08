@@ -163,21 +163,6 @@ public:
 		m_map_control_ptr = map_control;
 		m_map_ptr = map;
 	}
-
-	uint32_t get_D7()
-	{
-		return m68010_device::m_dar[7];
-	}
-
-	uint32_t get_A0()
-	{
-		return m68010_device::m_dar[8];
-	}
-	uint32_t get_A4()
-	{
-		return m68010_device::m_dar[12];
-	}
-
 };
 
 DEFINE_DEVICE_TYPE(M68010_TEKMMU, m68010_tekmmu_device, "mc68010_tekmmu", "MC68010 with Tek4404 custom MMU")
@@ -242,7 +227,7 @@ public:
 		m_kb_tdata(true),
 		m_kb_rclamp(false),
 		m_kb_loop(false),
-		m_fpu_finished(0),
+		m_fpu_finished(false),
 		m_videocntl(0),
 		m_mouse(0),
 		m_mouse_btns(0),
@@ -413,6 +398,19 @@ void tek440x_state::machine_start()
 
 	m_inbuserr = false;
 
+	m_ram_ptr = (uint16_t *)m_ram->pointer();
+	m_ram_size = m_ram->size();
+	
+	m_ram_size_words = OFF8_TO_OFF16(m_ram_size);
+	LOG("RAM config: 0x%08x bytes, 0x%08x words => %p\n",m_ram_size, m_ram_size_words, m_ram_ptr);
+	
+	address_space &space = m_vm->space(AS_PROGRAM);
+	const u32 memory_end = m_ram_size - 1;
+	void *memory_data = m_ram_ptr;
+	offs_t memory_mirror = memory_end & ~memory_end;
+
+	space.install_ram(0x00000000, memory_end & ~memory_mirror, memory_mirror, memory_data);
+
 	m_maincpu->space(AS_PROGRAM).install_write_tap(0x7be002, 0x7be003, "led_tap", [this](offs_t offset, u16 &data, u16 mem_mask)
 		{ m_led_disk = !(data & 0x18);});
 
@@ -436,19 +434,6 @@ void tek440x_state::machine_start()
 
 void tek440x_state::machine_reset()
 {
-	m_ram_ptr = (uint16_t *)m_ram->pointer();
-	m_ram_size = m_ram->size();
-
-	m_ram_size_words = OFF8_TO_OFF16(m_ram_size);
-	LOG("RAM config: 0x%08x bytes, 0x%08x words => %p\n",m_ram_size, m_ram_size_words, m_ram_ptr);
-
-	address_space &space = m_vm->space(AS_PROGRAM);
-	const u32 memory_end = m_ram_size - 1;
-	void *memory_data = m_ram_ptr;
-	offs_t memory_mirror = memory_end & ~memory_end;
-
-	space.install_ram(0x00000000, memory_end & ~memory_mirror, memory_mirror, memory_data);
-
 	m_boot = true;
 	diag_w(0);
 	m_u244latch = false;
@@ -456,9 +441,10 @@ void tek440x_state::machine_reset()
 	m_keyboard->kdo_w(1);
 	mapcntl_w(0);
 	videocntl_w(0);
-	m_vint_enable = 0;
+
 	m_videoaddr = 0x600000;
-	
+	m_vint_enable = 0;
+
 	m_novram->recall(ASSERT_LINE);
 	m_novram->recall(CLEAR_LINE);
 }
@@ -482,9 +468,9 @@ u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	int pan = (m_videocntl & 15) ^ 15;
 
 	u16 woffset = m_videoaddr - 0xffe9;  // why 0xffe9 is TL..OS uses same magic number
-
-	u16 const *video_ram_last = m_vram + 0xffff;
 	
+	u16 const *video_ram_last = m_vram + 0xffff;
+
 	//LOG("screen_update: 0x%04x\n", woffset);
 	for (int y = 0; y < 480; y++)
 	{
@@ -527,15 +513,15 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 
 	if ((m_maincpu->get_fc() & 4) == 0)				// User mode access updates map_control from write latch
 	{
-		if ((m_latched_map_control & 0x1f) != (m_map_control & 0x1f))
-		{
-			LOGMASKED(LOG_MMU,"memory_r: m_map_control updated 0x%04x\n", m_latched_map_control);
-		}
-		if (!machine().side_effects_disabled())
-		{
-			m_map_control &= ~0x1f;
-			m_map_control |= m_latched_map_control & 0x1f;
-		}
+			if ((m_latched_map_control & 0x1f) != (m_map_control & 0x1f))
+			{
+				LOGMASKED(LOG_MMU,"memory_r: m_map_control updated 0x%04x\n", m_latched_map_control);
+			}
+			if (!machine().side_effects_disabled())
+			{
+				m_map_control &= ~0x1f;
+				m_map_control |= (m_latched_map_control & 0x1f);
+			}
 	}
 
 	const offs_t offset0 = offset;
@@ -559,7 +545,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 				m_inbuserr = true;
 
 				LOGMASKED(LOG_MMU,"memory_r: %06x: bus error: PTE_PID(%d) != mapcntl_PID(%d) fc(%d) pc(%08x) berr(%d) map_control(%02x) latch(%02x)\n", offset<<1,
-					BIT(m_map[offset >> 11], 11, 3), m_map_control & 7, m_maincpu->get_fc(), m_maincpu->pc(),
+					BIT(m_map[offset >> 11], 11, 3), (m_map_control & 7), m_maincpu->get_fc(), m_maincpu->pc(),
 					m_inbuserr, m_map_control, m_latched_map_control);
 				m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), true, m_maincpu->get_fc(), true);
 
@@ -569,7 +555,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 			}
 			else
 			{
-				m_map_control |= 1 << MAP_BLOCK_ACCESS;
+				m_map_control |= (1 << MAP_BLOCK_ACCESS);
 			}
 		}
 
@@ -616,15 +602,15 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 	const offs_t offset0 = offset;
 
 #ifdef USE_MMU_INLINE
-	if (BIT(m_map_control, MAP_VM_ENABLE) && (m_maincpu->get_fc() & 4) == 0) // only in User mode
+	if (((m_maincpu->get_fc() & 4) == 0) && BIT(m_map_control, MAP_VM_ENABLE))	// only in User mode
 	{
 		//LOG("memory_w: m_map(0x%04x)\n", m_map[offset >> 11]);
 		if (!machine().side_effects_disabled())
 		{
 			// is cpuWr
 			if (!m_inbuserr)
-				m_map_control |= 1 << MAP_CPU_WR;
-
+				m_map_control |= (1 << MAP_CPU_WR);
+					
 			// matching pid?
 			if ((BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7)))
 			{
@@ -641,22 +627,22 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 			}
 			else if (!m_inbuserr)
 			{
-				m_map_control |= 1 << MAP_BLOCK_ACCESS;
+				m_map_control |= (1 << MAP_BLOCK_ACCESS);
 			}
-
+			
 			if (m_inbuserr)
 				mem_mask = 0;	// disable write
 
 			// write-enabled page?
-			if (mem_mask && BIT(m_map[offset >> 11], 14) == 0)
+			if (mem_mask && (BIT(m_map[offset >> 11], 14) == 0))
 			{
 				m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
-
+				
 				m_inbuserr = true;
 
 				LOGMASKED(LOG_MMU,"memory_w:  %06x bus error: READONLY fc(%d) pc(%08x)\n", OFF16_TO_OFF8(offset), m_maincpu->get_fc(), m_maincpu->pc());
 				m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), false, m_maincpu->get_fc(), true);
-
+				
 				mem_mask = 0;	// disable write
 				return;
 			}
@@ -960,8 +946,8 @@ void tek440x_state::diag_w(u8 data)
 // copied from stkbd.cpp
 int tek440x_state::mouseupdate()
 {
-	const int mouse_xya[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
-	const int mouse_xyb[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
+constexpr int mouse_xya[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
+constexpr int mouse_xyb[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
 
 	uint8_t x = m_mousex->read();
 	uint8_t y = m_mousey->read();
@@ -1142,11 +1128,14 @@ void tek440x_state::timer_w(offs_t offset, u16 data)
 	LOGMASKED(LOG_TIMER_WR, "timer_w %08x %04x pc(%08x)\n", OFF16_TO_OFF8(offset), data, m_maincpu->pc());
 	m_timer->write16(offset, data);
 
-	//if (m_u244latch)
+	if (!machine().side_effects_disabled())
 	{
-		LOGMASKED(LOG_IRQ,"timer_w: M68K_IRQ_1 clear\n");
-		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-		m_u244latch = false;
+		//if (m_u244latch)
+		{
+			LOGMASKED(LOG_IRQ,"timer_w: M68K_IRQ_1 clear\n");
+			m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+			m_u244latch = false;
+		}
 	}
 }
 
@@ -1235,7 +1224,7 @@ void tek440x_state::logical_map(address_map &map)
 	map(0x000000, 0x7fffff).rw(FUNC(tek440x_state::memory_r), FUNC(tek440x_state::memory_w));
 
 #ifdef USE_MMU_INLINE
-	map(0x800000, 0xbfffff).rw(FUNC(tek440x_state::map_r), FUNC(tek440x_state::map_w));
+	map(0x800000, 0xffffff).rw(FUNC(tek440x_state::map_r), FUNC(tek440x_state::map_w));
 #endif
 }
 
@@ -1486,4 +1475,5 @@ ROM_END
  *************************************/
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME                               FLAGS
 COMP( 1984, tek4404, 0,      0,      tek4404, tek4404, tek440x_state, empty_init, "Tektronix", "4404 Artificial Intelligence System", MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_TIMING )
+
 
