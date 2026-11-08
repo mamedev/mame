@@ -492,7 +492,7 @@ u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 		for (int x = 0; x < 640; x += 16)
 		{
 			u16 const word = *(video_ram++);
-			u16 const word2 = *(video_ram);
+			u16 const word2 = *(video_ram & 0x61ffff);
 			u32 dword = ((word << 16) | word2) ^ invert;
 			for (int b = 0; b < 16; b++)
 			{
