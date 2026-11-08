@@ -32,11 +32,11 @@ private:
 	TIMER_CALLBACK_MEMBER(transfer);
 	required_address_space m_dma;
 	devcb_write_line m_irq;
-	emu_timer *m_timer = nullptr;
-	u32 m_channels[8][5]{};
-	u32 m_config = 0, m_sync = 0;
-	u16 m_requests = 0, m_soft[4]{};
-	u8 m_terminal = 0, m_errors = 0;
+	emu_timer *m_timer;
+	u32 m_channels[8][5];
+	u32 m_config, m_sync;
+	u16 m_requests, m_soft[4];
+	u8 m_terminal, m_errors;
 };
 DECLARE_DEVICE_TYPE(IGS38_DMA, igs38_dma_device)
 DEFINE_DEVICE_TYPE(IGS38_DMA, igs38_dma_device, "igs38_dma", "IGS38 PL080 DMA")

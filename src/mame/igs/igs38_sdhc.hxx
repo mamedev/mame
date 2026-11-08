@@ -44,18 +44,18 @@ private:
 	required_address_space m_dma;
 	devcb_read8 m_dma_permissions;
 	devcb_write_line m_irq;
-	char const *m_card_region = nullptr;
-	chd_file *m_card = nullptr;
-	emu_timer *m_command_timer = nullptr, *m_transfer_timer = nullptr;
-	u32 m_regs[0x200 / 4]{};
-	u8 m_table[512]{}, m_key[5]{}, m_tt_control = 0;
-	u8 m_card_state = 0, m_speed = 0;
-	bool m_app_command = false, m_busy_command = false;
-	bool m_data_active = false, m_storage = false, m_paused = false;
-	u32 m_command = 0, m_argument = 0, m_remaining = 0, m_done = 0;
-	u64 m_card_offset = 0;
-	u16 m_block_size = 0, m_buffer_pos = 0, m_buffer_size = 0;
-	u8 m_buffer[512]{};
+	char const *m_card_region;
+	chd_file *m_card;
+	emu_timer *m_command_timer, *m_transfer_timer;
+	u32 m_regs[0x200 / 4];
+	u8 m_table[512], m_key[5], m_tt_control;
+	u8 m_card_state, m_speed;
+	bool m_app_command, m_busy_command;
+	bool m_data_active, m_storage, m_paused;
+	u32 m_command, m_argument, m_remaining, m_done;
+	u64 m_card_offset;
+	u16 m_block_size, m_buffer_pos, m_buffer_size;
+	u8 m_buffer[512];
 };
 
 DEFINE_DEVICE_TYPE(IGS38_SDHC, igs38_sdhc_device, "igs38_sdhc", "IGS38 SDHC host")
@@ -65,6 +65,8 @@ igs38_sdhc_device::igs38_sdhc_device(machine_config const &mconfig, char const *
 		, m_dma(*this, finder_base::DUMMY_TAG, -1)
 		, m_dma_permissions(*this, 0)
 		, m_irq(*this)
+		, m_card_region(nullptr)
+		, m_card(nullptr)
 {
 }
 

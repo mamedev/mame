@@ -37,11 +37,11 @@ private:
 	TIMER_CALLBACK_MEMBER(tick);
 
 	static u8 reverse(u8 b) { return bitswap<8>(b, 0, 1, 2, 3, 4, 5, 6, 7); }
-	u8 m_regs[8][7]{};
-	u8 m_time[7]{}, m_transfer[7]{};
-	u8 m_command = 0, m_pos = 0, m_length = 0;
-	bool m_selected = false, m_read = false;
-	emu_timer *m_timer = nullptr;
+	u8 m_regs[8][7];
+	u8 m_time[7], m_transfer[7];
+	u8 m_command, m_pos, m_length;
+	bool m_selected, m_read;
+	emu_timer *m_timer;
 };
 DECLARE_DEVICE_TYPE(PGM3_S35390A, pgm3_s35390a_device)
 DEFINE_DEVICE_TYPE(PGM3_S35390A, pgm3_s35390a_device, "pgm3_s35390a", "PGM3 S-35390A RTC")

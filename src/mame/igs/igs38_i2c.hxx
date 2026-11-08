@@ -34,13 +34,13 @@ private:
 	TIMER_CALLBACK_MEMBER(complete);
 	devcb_write_line m_irq, m_stop, m_acknowledge;
 	devcb_read8 m_transmit, m_receive;
-	emu_timer *m_timer = nullptr;
-	u32 m_regs[11]{};
-	u32 m_pclk = 0;
-	u64 m_clocks_left = 0;
-	attotime m_started = attotime::zero;
-	u8 m_command = 0, m_data = 0;
-	bool m_active = false, m_tx = false, m_ack_pending = false;
+	emu_timer *m_timer;
+	u32 m_regs[11];
+	u32 m_pclk;
+	u64 m_clocks_left;
+	attotime m_started;
+	u8 m_command, m_data;
+	bool m_active, m_tx, m_ack_pending;
 };
 
 DEFINE_DEVICE_TYPE(IGS38_I2C, igs38_i2c_device, "igs38_i2c", "IGS38 I2C master")

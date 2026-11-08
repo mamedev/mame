@@ -26,10 +26,10 @@ private:
 	void crypt(u8 *block, bool encrypt);
 	devcb_read8 m_dips;
 	devcb_read32 m_buttons;
-	u8 m_input[256]{}, m_output[512]{};
-	u16 m_input_count = 0, m_output_count = 0, m_output_pos = 0;
-	bool m_selected = false, m_packet = false, m_escape = false;
-	u8 m_mode = 1, m_period = 50, m_counters[4]{};
+	u8 m_input[256], m_output[512];
+	u16 m_input_count, m_output_count, m_output_pos;
+	bool m_selected, m_packet, m_escape;
+	u8 m_mode, m_period, m_counters[4];
 	required_region_ptr<uint8_t> m_iokey;
 };
 

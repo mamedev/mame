@@ -39,14 +39,14 @@ private:
 	TIMER_CALLBACK_MEMBER(ddc_complete);
 	devcb_read_line m_hpd;
 	devcb_write_line m_irq;
-	emu_timer *m_ddc_timer = nullptr;
-	u8 m_regs[2][256]{};
-	u8 m_fifo[32]{};
-	u8 m_fifo_head = 0, m_fifo_count = 0;
-	u8 m_pointer = 0;
-	u8 m_ddc_command = 0, m_ddc_header = 0, m_ddc_offset = 0, m_ddc_count = 0, m_ddc_segment = 0;
-	bool m_selected = false, m_read = false, m_subaddress = false;
-	bool m_connected = false, m_input_video = false;
+	emu_timer *m_ddc_timer;
+	u8 m_regs[2][256];
+	u8 m_fifo[32];
+	u8 m_fifo_head, m_fifo_count;
+	u8 m_pointer;
+	u8 m_ddc_command, m_ddc_header, m_ddc_offset, m_ddc_count, m_ddc_segment;
+	bool m_selected, m_read, m_subaddress;
+	bool m_connected, m_input_video;
 	static const u8 EDID[256];
 };
 

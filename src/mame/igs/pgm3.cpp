@@ -158,11 +158,11 @@ private:
 
 	required_address_space m_dma;
 	devcb_read8 m_dma_permissions;
-	u32 m_regs[0x184 / 4]{};
-	u32 m_context[16]{};
-	u32 m_fifo[FIFO_DEPTH]{};
-	u8 m_fifo_head = 0;
-	u8 m_fifo_count = 0;
+	u32 m_regs[0x184 / 4];
+	u32 m_context[16];
+	u32 m_fifo[FIFO_DEPTH];
+	u8 m_fifo_head;
+	u8 m_fifo_count;
 };
 
 DEFINE_DEVICE_TYPE(IGS38_SPACC, igs38_spacc_device, "igs38_spacc", "IGS38 SPAcc (AES boot subset)")
@@ -537,17 +537,17 @@ private:
 	required_device<hantro_g1_device> m_hantro;
 	required_device_array<igs38_dma_device, 2> m_dma;
 	required_device<igs38_i2s_device> m_i2s;
-	bool m_vic_irq[2]{}, m_vic_fiq[2]{};
+	bool m_vic_irq[2], m_vic_fiq[2];
 	required_ioport m_boot_config;
 	required_ioport m_gpio1b;
 	memory_view m_boot_view;
-	u32 m_scu[0x78 / 4]{};
-	u8 m_boot_latched = 0;
-	bool m_scu_reset_pending = false;
-	u8 m_gpio[7][0x78 / 4]{};
-	u8 m_gpio_previous[7][2]{};
-	u8 m_gpio_pending[7][2]{};
-	u32 m_lcd[0x100 / 4]{};
+	u32 m_scu[0x78 / 4];
+	u8 m_boot_latched;
+	bool m_scu_reset_pending;
+	u8 m_gpio[7][0x78 / 4];
+	u8 m_gpio_previous[7][2];
+	u8 m_gpio_pending[7][2];
+	u32 m_lcd[0x100 / 4];
 };
 
 
@@ -746,11 +746,11 @@ template <unsigned Bank> void pgm3_state::gpio_w(offs_t offset, u32 data, u32 me
 
 u8 pgm3_state::spacc_dma_permissions(offs_t address)
 {
-	if (address < 0x10000000)
+	if (address < 0x10'000'000)
 		return (m_boot_view.entry() == 1 || m_boot_view.entry() == 2) ? 3 : 1;
-	if (address >= 0x10000000 && address <= 0x1007ffff)
+	if (address >= 0x10'000'000 && address <= 0x10'07f'fff)
 		return 1;
-	if ((address >= 0x28000000 && address <= 0x2801ffff) || address >= 0x80000000)
+	if ((address >= 0x28'000'000 && address <= 0x28'01f'fff) || address >= 0x80'000'000)
 		return 3;
 	return 0;
 }
@@ -1039,7 +1039,7 @@ u32 pgm3_state::screen_update_pgm3(screen_device &screen, bitmap_rgb32 &bitmap, 
 	// prevents an invalid DMA address from causing MMIO reads during scanout.
 	u32 const base = m_lcd[0x20 / 4];
 	u64 const end = u64(base) + u64(width) * height * (rgb888 ? 4 : 2);
-	if (base < 0x80000000 || end > ((base < 0x90000000) ? 0x90000000ULL : 0xc0000000ULL))
+	if (base < 0x80'000'000 || end > ((base < 0x90'000'000) ? 0x90'000'000ULL : 0xc00'000'00ULL))
 		return 0;
 	u32 const *const source = reinterpret_cast<u32 const *>(m_maincpu->space(AS_PROGRAM).get_read_ptr(base));
 	if (!source)
@@ -1154,7 +1154,7 @@ void pgm3_state::pgm3(machine_config &config)
 	m_i2c[2]->irq_callback().set(m_vic[0], FUNC(vic_pl192_device::irq_w<18>));
 
 	for (unsigned i = 0; i < 2; ++i)
-		IGS38_SPI(config, m_spi[i], 100000000);
+		IGS38_SPI(config, m_spi[i], 100'000'000);
 	m_spi[0]->irq_callback().set(m_vic[0], FUNC(vic_pl192_device::irq_w<13>));
 	m_spi[1]->irq_callback().set(m_vic[0], FUNC(vic_pl192_device::irq_w<14>));
 
@@ -1199,13 +1199,13 @@ void pgm3_state::pgm3(machine_config &config)
 
 	for (unsigned i = 0; i < 2; ++i)
 	{
-		IGS38_DMA(config, m_dma[i], 100000000); // AHB arbitration timing is approximate.
+		IGS38_DMA(config, m_dma[i], 100'000'000); // AHB arbitration timing is approximate.
 		m_dma[i]->set_dma_space(m_maincpu, AS_PROGRAM);
 	}
 	m_dma[0]->irq_callback().set(m_vic[1], FUNC(vic_pl192_device::irq_w<5>));
 	m_dma[1]->irq_callback().set(m_vic[1], FUNC(vic_pl192_device::irq_w<6>));
 
-	IGS38_I2S(config, m_i2s, 11289600); // MCLK supplied by the board's Linux platform data.
+	IGS38_I2S(config, m_i2s, 11'289'600); // MCLK supplied by the board's Linux platform data.
 	m_i2s->irq_callback().set(m_vic[0], FUNC(vic_pl192_device::irq_w<19>));
 	m_i2s->dma_callback().set(m_dma[0], FUNC(igs38_dma_device::request_w));
 

@@ -26,11 +26,11 @@ private:
 	TIMER_CALLBACK_MEMBER(expired);
 	TIMER_CALLBACK_MEMBER(pulse_end);
 	devcb_write_line m_irq;
-	emu_timer *m_expiry = nullptr, *m_pulse = nullptr;
-	u32 m_load = 0, m_control = 2, m_pclk = 0;
-	u64 m_ticks_left = 0;
-	attotime m_started = attotime::zero;
-	bool m_pending = false, m_edge_active = false;
+	emu_timer *m_expiry, *m_pulse;
+	u32 m_load, m_control, m_pclk;
+	u64 m_ticks_left;
+	attotime m_started;
+	bool m_pending, m_edge_active;
 };
 
 DEFINE_DEVICE_TYPE(IGS38_TIMER, igs38_timer_device, "igs38_timer", "IGS38 internal timer")

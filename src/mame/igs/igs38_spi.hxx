@@ -29,11 +29,11 @@ private:
 	devcb_write16 m_transmit;
 	devcb_read16 m_receive;
 	devcb_write8 m_select;
-	emu_timer *m_timer = nullptr;
-	u32 m_regs[18]{};
-	u16 m_tx[8]{}, m_rx[8]{};
-	u8 m_tx_head = 0, m_tx_count = 0, m_rx_head = 0, m_rx_count = 0;
-	u32 m_tx_remaining = 0, m_rx_remaining = 0;
+	emu_timer *m_timer;
+	u32 m_regs[18];
+	u16 m_tx[8], m_rx[8];
+	u8 m_tx_head, m_tx_count, m_rx_head, m_rx_count;
+	u32 m_tx_remaining, m_rx_remaining;
 };
 DECLARE_DEVICE_TYPE(IGS38_SPI, igs38_spi_device)
 DEFINE_DEVICE_TYPE(IGS38_SPI, igs38_spi_device, "igs38_spi", "IGS38 SPI controller")
