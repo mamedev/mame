@@ -83,7 +83,7 @@
 #define LOG_TIMER_WR	(1U << 8)
 #define LOG_VIDEO		(1U << 9)
 
-#define VERBOSE (LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 
