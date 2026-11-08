@@ -62,7 +62,7 @@ public:
 	auto cblank_callback() { return m_write_cblank.bind(); }
 	auto slg_callback() { return m_write_slg.bind(); }
 	auto sld_callback() { return m_write_sld.bind(); }
-	auto sl_callback() { return m_write_sl.bind(); } // SL3-SL0 with pin configuration 0
+	auto sl_callback() { return m_write_sl.bind(); } // SL3-SL0: single row buffer, pin configurations 0 and 2 (table 5)
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -111,6 +111,7 @@ private:
 	inline attotime frame_period() const;
 	inline void update_frame_timer();
 
+	inline void update_curs_output();
 	inline void recompute_cursor();
 	inline void recompute_parameters();
 

@@ -17,8 +17,8 @@
     - interlaced mode
     - smooth scroll
     - page blank
-    - double height cursor
-    - row attributes
+    - double height/width cursor (2 CCLK wide, both rows of a double height row)
+    - row attributes in sequential and linked list addressing
     - pin configuration
     - operation modes 0,7
     - address modes 1,3
@@ -433,6 +433,17 @@ inline void crt9007_device::start_single_row_data()
 
 
 //-------------------------------------------------
+//  update_curs_output - CURS carries both the
+//  cursor and the double height/width marker
+//-------------------------------------------------
+
+inline void crt9007_device::update_curs_output()
+{
+	m_write_curs(m_curs || m_row_attr_curs);
+}
+
+
+//-------------------------------------------------
 //  recompute_cursor -
 //-------------------------------------------------
 
@@ -455,7 +466,7 @@ inline void crt9007_device::recompute_cursor()
 	{
 		m_curs = false;
 
-		m_write_curs(0);
+		update_curs_output();
 	}
 
 	update_curs_timer(false);
@@ -645,9 +656,11 @@ void crt9007_device::device_reset()
 	m_write_curs(0);
 
 	// VLT = 0
+	m_vlt = false;
 	m_write_vlt(0);
 
 	// DRB = 1
+	m_drb = true;
 	m_write_drb(1);
 
 	// INT = 0
@@ -668,6 +681,10 @@ void crt9007_device::device_reset()
 	m_paint_attr = 0;
 	m_row_line = 0;
 	m_row_attr_curs = false;
+	m_row_attr_curs_timer->adjust(attotime::never);
+
+	// 28-31 (SL3-SL0) = 0
+	m_write_sl(0);
 
 	// 29 (WBEN) = 0
 	m_write_wben(0);
@@ -761,7 +778,7 @@ TIMER_CALLBACK_MEMBER(crt9007_device::vlt_update)
 		if (m_row_attr_curs)
 		{
 			m_row_attr_curs = false;
-			m_write_curs(m_curs);
+			update_curs_output();
 		}
 
 		// DRB is active through the top scan line of a data row
@@ -776,7 +793,9 @@ TIMER_CALLBACK_MEMBER(crt9007_device::vlt_update)
 		}
 
 		// the scan line counter advances every other scan line on double height
-		// rows, from 0 for the top half and from N/2 for the bottom half
+		// rows, from 0 for the top half and from N/2 for the bottom half; fig. 7
+		// has SL3-SL0 change 5 CCLK after the VLT trailing edge, simplified here
+		// to just before the VLT leading edge, by which time they are stable
 		unsigned sl = m_row_line;
 		if (m_paint_attr == 2)
 			sl = m_row_line / 2;
@@ -802,7 +821,7 @@ TIMER_CALLBACK_MEMBER(crt9007_device::cursor_update)
 
 	LOG("CRT9007 y %03u x %04u : CURS %u\n", screen().vpos(), screen().hpos(), m_curs);
 
-	m_write_curs(m_curs);
+	update_curs_output();
 
 	update_curs_timer(m_curs);
 }
@@ -830,6 +849,11 @@ TIMER_CALLBACK_MEMBER(crt9007_device::drb_update)
 			m_dma_addr = TABLE_START;
 			m_table_addr = TABLE_START;
 
+			// no row is painted from the entry read past the end of the row table,
+			// so the retrace and the first row start without attributes
+			m_next_attr = 0;
+			m_pending_attr = 0;
+
 			// a single row buffer loads each row on its own top scan line, so this DRB
 			// transfers nothing
 			if (SINGLE_ROW_BUFFER)
@@ -845,7 +869,9 @@ TIMER_CALLBACK_MEMBER(crt9007_device::drb_update)
 		}
 		else
 		{
+			// TODO attributes from the auxiliary address registers
 			m_table_count = 0;
+			m_next_attr = 0;
 		}
 
 		// start DMA burst sequence
@@ -956,19 +982,17 @@ TIMER_CALLBACK_MEMBER(crt9007_device::frame_update)
 TIMER_CALLBACK_MEMBER(crt9007_device::row_attr_curs_update)
 {
 	// CURS during horizontal retrace tells external logic to halve the dot rate on the
-	// following scan line; it lasts until the VLT leading edge, or for 1 CCLK with a
-	// double row buffer (tables 1 and 2)
+	// following scan line; with a double row buffer it lasts 1 CCLK (table 2, fig. 9),
+	// with a single row buffer until the VLT leading edge (table 2, and fig. 7 for the
+	// following scan lines too, though the text there says 1 CCLK)
 	m_row_attr_curs = bool(param);
-	if (m_row_attr_curs)
-	{
-		m_write_curs(1);
-		if (DOUBLE_ROW_BUFFER)
-			m_row_attr_curs_timer->adjust(clocks_to_attotime(1), 0);
-	}
-	else
-	{
-		m_write_curs(m_curs);
-	}
+
+	LOG("CRT9007 y %03u x %04u : row attribute CURS %u\n", screen().vpos(), screen().hpos(), m_row_attr_curs);
+
+	update_curs_output();
+
+	if (m_row_attr_curs && DOUBLE_ROW_BUFFER)
+		m_row_attr_curs_timer->adjust(clocks_to_attotime(1), 0);
 }
 
 
