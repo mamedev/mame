@@ -126,6 +126,7 @@ public:
 	auto out_irqc_callback() { return m_out_irqc_cb.bind(); }
 	auto out_irqd_callback() { return m_out_irqd_cb.bind(); }
 	auto out_irqe_callback() { return m_out_irqe_cb.bind(); }
+	auto read_bus_error_callback() { return m_bus_error_cb.bind(); }
 
 	typedef enum NUBUS_MODE_T
 	{
@@ -198,6 +199,7 @@ protected:
 	template <u32 Base> void bus_memory_w(offs_t offset, u32 data, u32 mem_mask);
 	template <u32 Base> u32 host_memory_r(offs_t offset, u32 mem_mask);
 	template <u32 Base> void host_memory_w(offs_t offset, u32 data, u32 mem_mask);
+	template <u32 Base> u32 bus_error_r(offs_t offset, u32 mem_mask);
 
 	// internal state
 	required_address_space m_space;
@@ -210,6 +212,7 @@ protected:
 	devcb_write_line    m_out_irqc_cb;
 	devcb_write_line    m_out_irqd_cb;
 	devcb_write_line    m_out_irqe_cb;
+	devcb_read32        m_bus_error_cb;
 
 	std::vector<std::reference_wrapper<device_nubus_card_interface> > m_device_list;
 

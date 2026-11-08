@@ -131,13 +131,15 @@ private:
 
 
 	u32 id_r(offs_t offset, u32 mem_mask);
+	void bus_error(u32 wait);
 	u32 comm_r();
 	void comm_w(u32 data);
+	u32 bus_error_pds_r();
 	void io_wait(offs_t address);
 	void add_wait(u32 cycles);
 
 	u32 m_model_id;
-	u32 m_wait_comm_load, m_wait_comm_store;
+	u32 m_wait_comm_load, m_wait_comm_store, m_wait_berr_pds;
 	u32 m_wait_io, m_wait_io_long, m_wait_io_longer, m_wait_via1, m_wait_capella, m_wait_valkyrie;
 };
 
@@ -147,6 +149,7 @@ void pmac6200_state::machine_start()
 
 	m_wait_comm_load = m_maincpu->attotime_to_cycles(attotime::from_usec(72));
 	m_wait_comm_store = m_maincpu->attotime_to_cycles(attotime::from_usec(92));
+	m_wait_berr_pds = m_maincpu->attotime_to_cycles(attotime::from_usec(71));
 
 	m_maincpu->space(AS_PROGRAM).install_read_tap(0x41000000, 0x410fffff, "overlay_off",
 			[this] (offs_t offset, u64 &data, u64 mem_mask) { m_f108->overlay_off(); });
@@ -218,23 +221,30 @@ uint32_t pmac6200_state::id_r(offs_t offset, uint32_t mem_mask)
 	return m_model_id;
 }
 
-u32 pmac6200_state::comm_r()
+void pmac6200_state::bus_error(u32 wait)
 {
 	if (!machine().side_effects_disabled())
 	{
 		m_maincpu->bus_error();
-		m_maincpu->adjust_icount(-int(m_wait_comm_load));
+		m_maincpu->adjust_icount(-int(wait));
 	}
+}
+
+u32 pmac6200_state::comm_r()
+{
+	bus_error(m_wait_comm_load);
 	return 0;
 }
 
 void pmac6200_state::comm_w(u32 data)
 {
-	if (!machine().side_effects_disabled())
-	{
-		m_maincpu->bus_error();
-		m_maincpu->adjust_icount(-int(m_wait_comm_store));
-	}
+	bus_error(m_wait_comm_store);
+}
+
+u32 pmac6200_state::bus_error_pds_r()
+{
+	bus_error(m_wait_berr_pds);
+	return 0;
 }
 
 /***************************************************************************
@@ -371,11 +381,12 @@ void pmac6200_state::pmac6200(machine_config &config)
 	m_primetimeiii->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
 	m_primetimeiii->write_cb2().set(m_cuda, FUNC(cuda_device::set_via_data));
 
-	// per the Apple Developer Notes, the PDS expansion card only appears at fe.
-	// note that this PDS implementation is broken on real hardware because
-	// of the use of a PowerPC chip, so accelerators will cause problems.
-	//
-	// TODO: PDS is to be added later because of said 68k/PPC incompatibility.
+	nubus_device &nubus(NUBUS(config, "pds"));
+	nubus.set_space(m_maincpu, AS_PROGRAM);
+	nubus.set_bus_mode(nubus_device::nubus_mode_t::QUADRA_DAFB);
+	nubus.read_bus_error_callback().set(FUNC(pmac6200_state::bus_error_pds_r));
+	nubus.out_irqe_callback().set(m_primetimeiii, FUNC(primetime_device::via2_irq_w<0x20>));
+	NUBUS_SLOT(config, "lcpds", "pds", mac_pdslc_cards, nullptr);
 
 	MAC_COMM_SLOT(config, "comm", m_maincpu, AS_PROGRAM, mac_comm_cards, nullptr)
 		.irq_cb().set(m_primetimeiii, FUNC(primetime_device::via2_irq_w<0x01>));

@@ -85,6 +85,7 @@ nubus_device::nubus_device(const machine_config &mconfig, device_type type, cons
 	m_out_irqc_cb(*this),
 	m_out_irqd_cb(*this),
 	m_out_irqe_cb(*this),
+	m_bus_error_cb(*this, 0),
 	m_bus_mode(nubus_mode_t::NORMAL),
 	m_addr_mask(0xffffffff)
 {
@@ -131,6 +132,11 @@ void nubus_device::device_start()
 
 			this->space(AS_DATA).install_read_handler(0x00000000, 0x3fffffff, emu::rw_delegate(*this, FUNC(nubus_device::host_memory_r<0x00000000>)));
 			this->space(AS_DATA).install_write_handler(0x00000000, 0x3fffffff, emu::rw_delegate(*this, FUNC(nubus_device::host_memory_w<0x00000000>)));
+			if (!m_bus_error_cb.isunset())
+			{
+				this->space(AS_DATA).install_read_handler(0xa0000000, 0xefffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_error_r<0xa0000000>)));
+				this->space(AS_DATA).install_read_handler(0xfa000000, 0xfeffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_error_r<0xfa000000>)));
+			}
 			break;
 
 		// Original LC PDS omits A28, A29, and A30 so in 32-bit mode, 0xfxxxxxxx addresses appear here as 0x8xxxxxxx.
@@ -221,6 +227,12 @@ template u32    nubus_device::bus_memory_r<0x80000000>(offs_t offset, u32 mem_ma
 template void   nubus_device::bus_memory_w<0x80000000>(offs_t offset, u32 data, u32 mem_mask);
 template u32    nubus_device::bus_memory_r<0x80e00000>(offs_t offset, u32 mem_mask);
 template void   nubus_device::bus_memory_w<0x80e00000>(offs_t offset, u32 data, u32 mem_mask);
+
+template <u32 Base>
+u32 nubus_device::bus_error_r(offs_t offset, u32 mem_mask)
+{
+	return m_bus_error_cb((Base >> 2) + offset, mem_mask);
+}
 
 template <typename R, typename W>
 void nubus_device::install_device(offs_t start, offs_t end, R rhandler, W whandler, u32 mask)
@@ -395,6 +407,9 @@ void device_nubus_card_interface::interface_pre_start()
 	{
 		fatalerror("Can't find NuBus device\n");
 	}
+
+	if (!m_nubus->started())
+		throw device_missing_dependencies();
 }
 
 void device_nubus_card_interface::install_declaration_rom_copy(offs_t start, offs_t end, offs_t mirror)
