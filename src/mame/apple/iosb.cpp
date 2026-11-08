@@ -64,12 +64,12 @@ DEFINE_DEVICE_TYPE(PRIMETIMEIII, primetimeiii_device, "primetime3", "Apple Prime
 void iosb_base::map(address_map &map)
 {
 	map(0x00000000, 0x00001fff).rw(FUNC(iosb_base::mac_via_r), FUNC(iosb_base::mac_via_w)).mirror(0x00fc0000);
-	map(0x00002000, 0x00003fff).rw(FUNC(iosb_base::mac_via2_r), FUNC(iosb_base::mac_via2_w)).mirror(0x00f00000);
+	map(0x00002000, 0x00003fff).mirror(m_io_mirror).rw(FUNC(iosb_base::mac_via2_r), FUNC(iosb_base::mac_via2_w));
 	map(0x00010000, 0x000100ff).rw(FUNC(iosb_base::turboscsi_r), FUNC(iosb_base::turboscsi_w)).mirror(0x00fc0000);
 	map(0x00010100, 0x00010103).rw(FUNC(iosb_base::turboscsi_dma_r), FUNC(iosb_base::turboscsi_dma_w)).select(0x00fc0000);
-	map(0x00014000, 0x00014fff).rw(m_asc, FUNC(asc_base_device::read), FUNC(asc_base_device::write)).mirror(0x00f00000);
-	map(0x00018000, 0x00019fff).rw(FUNC(iosb_base::iosb_regs_r), FUNC(iosb_base::iosb_regs_w)).mirror(0x00f00000);
-	map(0x0001e000, 0x0001ffff).rw(FUNC(iosb_base::swim_r), FUNC(iosb_base::swim_w)).mirror(0x00f00000);
+	map(0x00014000, 0x00014fff).mirror(m_io_mirror).rw(m_asc, FUNC(asc_base_device::read), FUNC(asc_base_device::write));
+	map(0x00018000, 0x00019fff).mirror(m_io_mirror).rw(FUNC(iosb_base::iosb_regs_r), FUNC(iosb_base::iosb_regs_w));
+	map(0x0001e000, 0x0001ffff).mirror(m_io_mirror).rw(FUNC(iosb_base::swim_r), FUNC(iosb_base::swim_w));
 
 	// IOSB always gives an ID of "0x2BAD", the VIA I/O pins determine the rest
 	map(0x0fff0000, 0x0fffffff).lr32(NAME([](offs_t offset) { return 0xa55a2bad; }));
@@ -131,7 +131,7 @@ void primetimeiii_device::device_add_mconfig(machine_config &config)
 //  iosb_base - constructor
 //-------------------------------------------------
 
-iosb_base::iosb_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+iosb_base::iosb_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, offs_t io_mirror) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_adb_st(*this),
 	m_cb1(*this),
@@ -151,6 +151,7 @@ iosb_base::iosb_base(const machine_config &mconfig, device_type type, const char
 	m_asc(*this, "asc"),
 	m_fdc(*this, "fdc"),
 	m_floppy(*this, "fdc:%d", 0U),
+	m_io_mirror(io_mirror),
 	m_nubus_irqs(0xff),
 	m_via_interrupt(0),
 	m_via2_interrupt(0),
@@ -174,13 +175,13 @@ iosb_base::iosb_base(const machine_config &mconfig, device_type type, const char
 }
 
 iosb_device::iosb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	iosb_base(mconfig, IOSB, tag, owner, clock),
+	iosb_base(mconfig, IOSB, tag, owner, clock, 0x00f00000),
 	m_rtc(*this,"rtc")
 {
 }
 
-primetime_device::primetime_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	iosb_base(mconfig, type, tag, owner, clock),
+primetime_device::primetime_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, offs_t io_mirror) :
+	iosb_base(mconfig, type, tag, owner, clock, io_mirror),
 	write_pb4(*this),
 	write_pb5(*this),
 	read_pb3(*this, 0)
@@ -188,17 +189,18 @@ primetime_device::primetime_device(const machine_config &mconfig, device_type ty
 }
 
 primetime_device::primetime_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	primetime_device(mconfig, PRIMETIME, tag, owner, clock)
+	primetime_device(mconfig, PRIMETIME, tag, owner, clock, 0x00f00000)
 {
 }
 
 primetimeii_device::primetimeii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	primetimeii_device(mconfig, PRIMETIMEII, tag, owner, clock)
+	primetimeii_device(mconfig, PRIMETIMEII, tag, owner, clock, 0x00f00000, 0x00f00000)
 {
 }
 
-primetimeii_device::primetimeii_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	primetime_device(mconfig, type, tag, owner, clock),
+primetimeii_device::primetimeii_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, offs_t io_mirror, offs_t ata_mirror) :
+	primetime_device(mconfig, type, tag, owner, clock, io_mirror),
+	m_ata_mirror(ata_mirror),
 	m_ata_irq(0),
 	m_ata_irq_enables(0)
 {
@@ -206,7 +208,7 @@ primetimeii_device::primetimeii_device(const machine_config &mconfig, device_typ
 }
 
 primetimeiii_device::primetimeiii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	primetimeii_device(mconfig, PRIMETIMEIII, tag, owner, clock)
+	primetimeii_device(mconfig, PRIMETIMEIII, tag, owner, clock, 0x00fc0000, 0)
 {
 }
 
@@ -750,13 +752,13 @@ void primetimeii_device::device_start()
 void primetimeii_device::map(address_map &map)
 {
 	iosb_base::map(map);
-	map(0x0001a100, 0x0001a103).rw(FUNC(primetimeii_device::ata_regs_r), FUNC(primetimeii_device::ata_regs_w)).mirror(0x00f00000);
+	map(0x00f1a100 & ~m_ata_mirror, 0x00f1a103 & ~m_ata_mirror).mirror(m_ata_mirror).rw(FUNC(primetimeii_device::ata_regs_r), FUNC(primetimeii_device::ata_regs_w));
 }
 
 void primetimeiii_device::map(address_map &map)
 {
 	primetimeii_device::map(map);
-	map(0x00015000, 0x00015fff).rw(m_asc, FUNC(asc_primetime3_device::read16), FUNC(asc_primetime3_device::write16)).mirror(0x00f00000);
+	map(0x00015000, 0x00015fff).mirror(m_io_mirror).rw(m_asc, FUNC(asc_primetime3_device::read16), FUNC(asc_primetime3_device::write16));
 }
 
 // This may actually be in F108, the boundaries between the two chips aren't completely clear
