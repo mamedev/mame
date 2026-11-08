@@ -3233,6 +3233,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/pl080.h,MACHINES["PL080"] = true
+---------------------------------------------------
+
+if MACHINES["PL080"] then
+	files {
+		MAME_DIR .. "src/devices/machine/pl080.cpp",
+		MAME_DIR .. "src/devices/machine/pl080.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pla.h,MACHINES["PLA"] = true
 ---------------------------------------------------
 
@@ -3534,6 +3546,18 @@ if MACHINES["S3520CF"] then
 	files {
 		MAME_DIR .. "src/devices/machine/s3520cf.cpp",
 		MAME_DIR .. "src/devices/machine/s3520cf.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/s35390a.h,MACHINES["S35390A"] = true
+---------------------------------------------------
+
+if MACHINES["S35390A"] then
+	files {
+		MAME_DIR .. "src/devices/machine/s35390a.cpp",
+		MAME_DIR .. "src/devices/machine/s35390a.h",
 	}
 end
 

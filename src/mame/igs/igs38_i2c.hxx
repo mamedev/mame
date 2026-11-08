@@ -6,9 +6,8 @@
 class igs38_i2c_device : public device_t
 {
 public:
-	igs38_i2c_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
-	void map(address_map &map);
-	void set_pclk(u32 hz);
+	igs38_i2c_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	void map(address_map &map) ATTR_COLD;
 
 	auto irq_callback() { return m_irq.bind(); }
 
@@ -20,18 +19,21 @@ public:
 	auto acknowledge_callback() { return m_acknowledge.bind(); }
 
 protected:
-	void device_start() override ATTR_COLD;
-	void device_reset() override ATTR_COLD;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_clock_changed() override;
 
 private:
-	u32 read(offs_t offset);
-	void write(offs_t offset, u32 data, u32 mem_mask = ~0U);
+	template <u32 Register> u32 register_r() { return m_regs[Register]; }
+	template <u32 Register> void register_w(offs_t offset, u32 data, u32 mem_mask = ~0U);
 	void reset_bus();
 	void command(u8 data);
 	void schedule();
 	void update_irq();
 	u64 remaining() const;
 	TIMER_CALLBACK_MEMBER(complete);
+
 	devcb_write_line m_irq, m_stop, m_acknowledge;
 	devcb_read8 m_transmit, m_receive;
 	emu_timer *m_timer;
@@ -40,29 +42,43 @@ private:
 	u64 m_clocks_left;
 	attotime m_started;
 	u8 m_command, m_data;
-	bool m_active, m_tx, m_ack_pending;
+	bool m_active, m_tx, m_ack_pending, m_irq_state;
 };
 
-DEFINE_DEVICE_TYPE(IGS38_I2C, igs38_i2c_device, "igs38_i2c", "IGS38 I2C master")
+DEFINE_DEVICE_TYPE_PRIVATE(IGS38_I2C, igs38_i2c_device, igs38_i2c_device, "igs38_i2c", "IGS38 I2C master")
 
 igs38_i2c_device::igs38_i2c_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-		: device_t(mconfig, IGS38_I2C, tag, owner, clock)
-		, m_irq(*this)
-		, m_stop(*this)
-		, m_acknowledge(*this)
-		, m_transmit(*this, 1)
-		, m_receive(*this, 0xff)
+	: device_t(mconfig, IGS38_I2C, tag, owner, clock)
+	, m_irq(*this)
+	, m_stop(*this)
+	, m_acknowledge(*this)
+	, m_transmit(*this, 1)
+	, m_receive(*this, 0xff)
 {
 }
 
 void igs38_i2c_device::map(address_map &map)
 {
-	map(0x00, 0x2b).rw(FUNC(igs38_i2c_device::read), FUNC(igs38_i2c_device::write));
+	map(0x00, 0x03).r(FUNC(igs38_i2c_device::register_r<0>)).w(FUNC(igs38_i2c_device::register_w<0>));
+	map(0x04, 0x07).r(FUNC(igs38_i2c_device::register_r<1>)).nopw();
+	map(0x08, 0x0b).r(FUNC(igs38_i2c_device::register_r<2>)).w(FUNC(igs38_i2c_device::register_w<2>));
+	map(0x0c, 0x0f).r(FUNC(igs38_i2c_device::register_r<3>)).nopw();
+	map(0x10, 0x13).r(FUNC(igs38_i2c_device::register_r<4>)).w(FUNC(igs38_i2c_device::register_w<4>));
+	map(0x14, 0x17).r(FUNC(igs38_i2c_device::register_r<5>)).w(FUNC(igs38_i2c_device::register_w<5>));
+	map(0x18, 0x1b).r(FUNC(igs38_i2c_device::register_r<6>)).w(FUNC(igs38_i2c_device::register_w<6>));
+	map(0x1c, 0x1f).r(FUNC(igs38_i2c_device::register_r<7>)).w(FUNC(igs38_i2c_device::register_w<7>));
+	map(0x20, 0x23).r(FUNC(igs38_i2c_device::register_r<8>)).nopw();
+	map(0x24, 0x27).r(FUNC(igs38_i2c_device::register_r<9>)).w(FUNC(igs38_i2c_device::register_w<9>));
+	map(0x28, 0x2b).r(FUNC(igs38_i2c_device::register_r<10>)).w(FUNC(igs38_i2c_device::register_w<10>));
 }
 
 void igs38_i2c_device::device_start()
 {
 	m_timer = timer_alloc(FUNC(igs38_i2c_device::complete), this);
+	m_pclk = clock();
+	m_active = m_irq_state = false;
+	m_clocks_left = 0;
+	m_started = machine().time();
 	save_item(NAME(m_regs));
 	save_item(NAME(m_pclk));
 	save_item(NAME(m_clocks_left));
@@ -72,13 +88,15 @@ void igs38_i2c_device::device_start()
 	save_item(NAME(m_active));
 	save_item(NAME(m_tx));
 	save_item(NAME(m_ack_pending));
-	machine().save().register_postload(save_prepost_delegate(FUNC(igs38_i2c_device::update_irq), this));
+	save_item(NAME(m_irq_state));
 }
 
 void igs38_i2c_device::device_reset()
 {
 	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 	m_regs[4] = 0x3ff;
+	m_data = 0;
+	m_tx = false;
 	reset_bus();
 }
 
@@ -96,7 +114,12 @@ void igs38_i2c_device::reset_bus()
 
 void igs38_i2c_device::update_irq()
 {
-	m_irq(bool(m_regs[5] & m_regs[6] & 0xff));
+	bool const irq = bool(m_regs[5] & m_regs[6] & 0xff);
+	if (m_irq_state != irq)
+	{
+		m_irq_state = irq;
+		m_irq(irq);
+	}
 }
 
 u64 igs38_i2c_device::remaining() const
@@ -110,15 +133,15 @@ u64 igs38_i2c_device::remaining() const
 void igs38_i2c_device::schedule()
 {
 	m_started = machine().time();
-	m_timer->adjust(m_active && m_pclk ? attotime::from_ticks(std::max<u64>(m_clocks_left, 1), m_pclk) : attotime::never);
+	m_timer->adjust((m_active && m_pclk) ? attotime::from_ticks(std::max<u64>(m_clocks_left, 1), m_pclk) : attotime::never);
 }
 
-void igs38_i2c_device::set_pclk(u32 hz)
+void igs38_i2c_device::device_clock_changed()
 {
-	if (hz != m_pclk)
+	if (clock() != m_pclk)
 	{
 		m_clocks_left = remaining();
-		m_pclk = hz;
+		m_pclk = clock();
 		schedule();
 	}
 }
@@ -139,8 +162,8 @@ void igs38_i2c_device::command(u8 data)
 	m_regs[7] = m_command & 7;
 	if (data & 1)
 		m_regs[8] |= 1;
-	unsigned const divisor = (((m_regs[10] >> 3) & 7) + 1) << ((m_regs[10] & 7) + 1);
-	unsigned const clocks = ((data & 2) ? 1 : ((data & 1) || m_tx ? 9 : 8)) + (m_ack_pending ? 1 : 0);
+	u32 const divisor = (((m_regs[10] >> 3) & 7) + 1) << ((m_regs[10] & 7) + 1);
+	u32 const clocks = ((data & 2) ? 1 : (((data & 1) || m_tx) ? 9 : 8)) + (m_ack_pending ? 1 : 0);
 	m_clocks_left = u64(clocks) * 5 * divisor;
 	m_active = true;
 	schedule();
@@ -173,26 +196,24 @@ TIMER_CALLBACK_MEMBER(igs38_i2c_device::complete)
 	update_irq();
 }
 
-u32 igs38_i2c_device::read(offs_t offset)
-{
-	return m_regs[offset];
-}
-
-void igs38_i2c_device::write(offs_t offset, u32 data, u32 mem_mask)
+template <u32 Register>
+void igs38_i2c_device::register_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	static constexpr u32 MASKS[11] = { 0xff, 0, 0xff, 0, 0x3ff, 0xff, 0xff, 7, 0, 0x1f, 0x1ff };
-	mem_mask &= MASKS[offset];
-	if (offset == 6)
+	mem_mask &= MASKS[Register];
+	if constexpr (Register == 6)
+	{
 		m_regs[6] &= data | ~mem_mask; // write zero to clear
-	else if (offset == 7)
+	}
+	else if constexpr (Register == 7)
 	{
 		command(data & mem_mask);
 		return;
 	}
 	else
 	{
-		COMBINE_DATA(&m_regs[offset]);
-		if ((offset == 10 && ((m_regs[10] & 0xc0) != 0x40)) || (offset == 9 && !(m_regs[9] & 4)))
+		COMBINE_DATA(&m_regs[Register]);
+		if ((Register == 10 && ((m_regs[10] & 0xc0) != 0x40)) || (Register == 9 && !(m_regs[9] & 4)))
 			reset_bus();
 	}
 	update_irq();
