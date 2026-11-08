@@ -69,6 +69,8 @@
 
 namespace { // anonymous namespace
 
+constexpr XTAL CPU_BCLK = C32M * 43 / 36;
+
 class pmac6200_state : public driver_device
 {
 public:
@@ -214,20 +216,21 @@ void pmac6200_state::pmac6200(machine_config &config)
 {
 	m_model_id = 0xa55a2250;
 
-	PPC603(config, m_maincpu, 75_MHz_XTAL);
+	PPC603(config, m_maincpu, CPU_BCLK * 2);
 	// BUS_RETRY: TurboSCSI stalls the CPU until DRQ
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS | PPCDRC_BUS_RETRY | PPCDRC_BUS_ERROR);
-	m_maincpu->set_bus_frequency(75_MHz_XTAL / 2); // FSB freq to Capella
+	m_maincpu->set_bus_frequency(CPU_BCLK); // FSB freq to Capella
 	m_maincpu->set_addrmap(AS_PROGRAM, &pmac6200_state::pmac6200_map);
 	config.set_perfect_quantum(m_maincpu); // chimes of death without it
 
-	CAPELLA(config, m_capella, 75_MHz_XTAL);
+	CAPELLA(config, m_capella, CPU_BCLK * 2);
 	m_capella->set_maincpu_tag("maincpu");
 
-	F108(config, m_f108, 75_MHz_XTAL / 2); // 68040 bus speed is 37.5 MHz, same as the FSB
+	F108(config, m_f108, CPU_BCLK); // 68040 bus speed, same as the FSB
 	m_f108->set_maincpu_tag("maincpu");
 	m_f108->set_primetimeii_tag(m_primetimeiii);
 	m_f108->write_ata_irq().set(m_primetimeiii, FUNC(primetimeii_device::ata_irq_w));
+	m_f108->set_scsi_clock(CPU_BCLK / ((15.0 / 8) + (1.0 / 2048)));
 
 	NSCSI_CONNECTOR(config, "f108:scsi:0", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "f108:scsi:1", mac_scsi_devices, nullptr);
@@ -247,7 +250,7 @@ void pmac6200_state::pmac6200(machine_config &config)
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("PPC603");
 
-	PRIMETIMEIII(config, m_primetimeiii, 75_MHz_XTAL / 2); // guessed
+	PRIMETIMEIII(config, m_primetimeiii, CPU_BCLK);
 	m_primetimeiii->set_maincpu_tag("maincpu");
 	m_primetimeiii->set_scsi_tag("f108:ncr53c96");
 	m_primetimeiii->set_capella_tag("capella");
