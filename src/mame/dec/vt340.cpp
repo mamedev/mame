@@ -36,8 +36,8 @@
         machine rather than general-purpose memory arbitration.
       * With the available V1.1 cartridge, CPU2 publishes a transient startup
         checkpoint before CPU1 starts waiting for it.  Native firmware then
-        takes its approximately 100.8-second fallback path; no ROM patch is
-        applied by this driver.
+        takes its approximately 100.8-second fallback path.  A default-off
+        configuration option skips the missed checkpoint for interactive use.
       * DC323/Viper fidelity limits are documented in video/dc323.cpp.
 
     Not modeled:
@@ -192,6 +192,7 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
 		m_dc323(*this, "dc323"),
+		m_startup(*this, "STARTUP"),
 		m_cpu2banks_rom(*this, "cpu2banks"),
 		m_shared_ram(*this, "shared_ram", 0x10000, ENDIANNESS_LITTLE),
 		m_bitmap_ram(*this, "bitmap_ram", BITMAP_POST_SIZE, ENDIANNESS_LITTLE)
@@ -263,6 +264,7 @@ private:
 	required_device<eeprom_parallel_2804_device> m_eeprom;
 	required_device<screen_device> m_screen;
 	required_device<dc323_device> m_dc323;
+	required_ioport m_startup;
 	required_region_ptr<u8> m_cpu2banks_rom;
 	memory_share_creator<u8> m_shared_ram;
 	memory_share_creator<u8> m_bitmap_ram;
@@ -331,6 +333,7 @@ private:
 	u8 cpu2_p3_r();
 	bool dc323_post_bitmap_selected() const;
 	void release_dc323_post();
+	void apply_startup_rom_patch();
 	int dc7051_diagnostic_vsync_r() const;
 	u16 dc7051_raster_line_r() const;
 	void dc7051_post_load();
@@ -1019,6 +1022,7 @@ void vt340_state::trace_exit()
 
 void vt340_state::machine_reset()
 {
+	apply_startup_rom_patch();
 	m_cpu1_p3 = 0xff;
 	m_cpu2_p3 = 0xff;
 	m_cpu1_p1 = 0xff;
@@ -1075,6 +1079,28 @@ void vt340_state::machine_reset()
 	m_printer_uart->dcd_w(0);
 	m_cpu2->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
 	LOGMASKED(LOG_PORTS, "VT340 reset: CPU1 E1/E2, CPU2 E3/E4 selected\n");
+}
+
+void vt340_state::apply_startup_rom_patch()
+{
+	u8 *const rom = memregion("cpu1low")->base();
+
+	// The original firmware writes pending value 10, then waits for a transient
+	// zero checkpoint at 3A18.  With the available V1.1 ROM set, CPU2 publishes
+	// that zero before CPU1 installs the sentinel, so the terminal takes the
+	// 100.8-second fallback loop.  This optional ROM patch writes zero at the
+	// same decision point instead.  The following 3A31 loop still waits for
+	// CPU2's genuine nonzero result and 3A3A still requires success value 80.
+	if (BIT(m_startup->read(), 0))
+		rom[0x3a0c] = 0x00; // MOV A,00 at 3A0B
+	else
+		rom[0x3a0c] = 0x10; // MOV A,10 at 3A0B
+
+	// Preserve the native rotate/XOR ROM checksum after either selection.
+	u8 checksum = 0x07;
+	for (u32 address = 0; address < 0x7fff; address++)
+		checksum = u8((rom[address] << 1) | (rom[address] >> 7)) ^ checksum;
+	rom[0x7fff] = u8((checksum >> 1) | (checksum << 7));
 }
 
 void vt340_state::vt340(machine_config &config)
@@ -1161,6 +1187,14 @@ void vt340_state::vt340(machine_config &config)
 }
 
 
+static INPUT_PORTS_START(vt340)
+	PORT_START("STARTUP")
+	PORT_CONFNAME(0x01, 0x00, "Startup Checkpoint Workaround")
+	PORT_CONFSETTING(0x00, "Original ROM Wait (~120 Seconds)")
+	PORT_CONFSETTING(0x01, "Skip Missed Checkpoint")
+INPUT_PORTS_END
+
+
 ROM_START(vt340)
 	// Malcolm Macleod dumped E1-E5 from a physical VT340 cartridge using an
 	// Arduino reader.  The published files have a one-byte address lag and do
@@ -1197,4 +1231,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1987, vt340, 0, 0, vt340, 0, vt340_state, init_vt340, "Digital Equipment Corporation", "VT340 Video Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1987, vt340, 0, 0, vt340, vt340, vt340_state, init_vt340, "Digital Equipment Corporation", "VT340 Video Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
