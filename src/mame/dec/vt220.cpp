@@ -145,6 +145,7 @@ private:
 	offs_t lbf_addr(bool chr, u8 lba) const;
 	u8 lbf_out(bool chr, u8 lba) const;
 	int video_col(int x) const;
+	bool in_row(int x) const;
 	u8 dot(int col, int x, int line, bool &bold, bool &blink) const;
 	u8 video_out(int x, int y, bool &bold, bool &blink) const;
 
@@ -228,6 +229,14 @@ int vt220a_state::video_col(int x) const
 	return (dx < 0) ? -1 : dx / timing().width;
 }
 
+bool vt220a_state::in_row(int x) const
+{
+	// CBLANK H blanks the video (TM 6.2.3) for the whole retrace (CRT9007 datasheet, pin 35), but the
+	// CRT9007 model's CBLANK covers only sync: blank outside the row's characters here
+	const int col = video_col(x);
+	return col >= 0 && col < timing().cols;
+}
+
 u8 vt220a_state::vram_r(offs_t offset)
 {
 	// screen and attribute RAM see the same address; during VLT of a data row's top scan line the
@@ -302,12 +311,11 @@ u8 vt220a_state::dot(int col, int x, int line, bool &bold, bool &blink) const
 
 u8 vt220a_state::video_out(int x, int y, bool &bold, bool &blink) const
 {
-	// the video stream at beam position x, y: nothing before VLT or with DIS VIDEO H (OP7)
+	// the video stream at beam position x, y: nothing outside the row or with DIS VIDEO H (OP7)
 	bold = blink = false;
-	const int col = video_col(x);
-	if (col < 0 || BIT(m_duart_op, 7))
+	if (!in_row(x) || BIT(m_duart_op, 7))
 		return 0;
-	return dot(col, (x - m_vlt_x) % timing().width, y - m_row_y, bold, blink);
+	return dot(video_col(x), (x - m_vlt_x) % timing().width, y - m_row_y, bold, blink);
 }
 
 u8 vt220a_state::duart_r(offs_t offset)
@@ -318,16 +326,21 @@ u8 vt220a_state::duart_r(offs_t offset)
 		// (CBLANK or DIS VIDEO), TVB H on IP3 is E45 NOR of the video and the two intensity lines.
 		// Sampled when the CPU reads the input port, so the IPCR change bits only update then.
 		const int x = m_screen->hpos(), y = m_screen->vpos();
+		const bool blank = m_cblank || BIT(m_duart_op, 7) || !in_row(x); // OP7 DIS VIDEO H
 		bool bold = false, blink = false;
-		const bool video = !m_cblank && video_out(x, y, bold, blink);
+		const bool video = !blank && video_out(x, y, bold, blink);
 		m_duart->ip3_w(!(video || bold || blink));
-		m_duart->ip4_w(!(m_cblank || BIT(m_duart_op, 7))); // OP7 DIS VIDEO H
+		m_duart->ip4_w(!blank);
 	}
 	return m_duart->read(offset);
 }
 
 void vt220a_state::p1_w(u8 data)
 {
+	// LBF DISABLE H (P1.3) and CHRG SEL H (P1.5) change the video; DMA L (P1.0) changes with every row
+	// load, whose top scan line is painted as it loads
+	if ((m_p1 ^ data) & 0x28)
+		m_screen->update_partial(m_screen->vpos());
 	// DMA L (P1.0) falling edge loads the character address latch into the line buffer
 	if (BIT(m_p1, 0) && !BIT(data, 0) && !BIT(data, 3))
 	{
@@ -435,7 +448,10 @@ u8 vt220a_state::chargen_r(offs_t offset)
 void vt220a_state::chargen_w(offs_t offset, u8 data)
 {
 	if (BIT(m_conf, 3) && BIT(m_conf, 2))
+	{
+		m_screen->update_partial(m_screen->vpos());
 		m_softchar[((lbf_out(true, m_lba) & 0x7f) << 4) | offset] = data;
+	}
 }
 
 /* Input ports */
@@ -491,14 +507,13 @@ uint32_t vt220_state::screen_update_vt220(screen_device &screen, bitmap_ind16 &b
 
 uint32_t vt220a_state::screen_update_vt220a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const int xend = m_vlt_x + timing().cols * timing().width; // end of the row
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		u16 *const pix = &bitmap.pix(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			bool bold, blink;
-			pix[x] = (x < xend && video_out(x, y, bold, blink)) ? 1 + blink + (bold << 1) : 0;
+			pix[x] = video_out(x, y, bold, blink) ? 1 + blink + (bold << 1) : 0;
 		}
 	}
 	return 0;
@@ -560,15 +575,18 @@ void vt220a_state::vt220a(machine_config &config)
 	m_maincpu->port_in_cb<1>().set(FUNC(vt220a_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(vt220a_state::p1_w));
 
-	// T5 character clock: dot clock / dots per character; 80 columns at power-up, set_columns switches
+	// T5 character clock: dot clock / dots per character; set_columns switches on 132 COL H (OP4), which the
+	// DUART's reset sets high (OPR cleared) until the firmware writes OPR
 	constexpr col_timing t = TIMING_80;
 	CRT9007(config, m_crtc, t.dot / t.width);
 	m_crtc->set_addrmap(0, &vt220a_state::vt220a_vram);
 	m_crtc->set_character_width(t.width);
 	m_crtc->set_screen(m_screen);
 	m_screen->set_raw(t.dot, t.htotal * t.width, t.hdelay * t.width, (t.hdelay + t.cols) * t.width, VTOTAL, VSTART, VSTART + VVIS);
-	m_crtc->vs_callback().set_inputline(m_maincpu, MCS51_T0_LINE);
-	m_crtc->hs_callback().set_inputline(m_maincpu, MCS51_T1_LINE);
+	// VS and HS are active low (CRT9007 pins 12, 13) and wired straight to T0 and T1; the 8051 counts their
+	// falling edges, and an asserted mcs51 input line is a low pin
+	m_crtc->vs_callback().set_inputline(m_maincpu, MCS51_T0_LINE).invert();
+	m_crtc->hs_callback().set_inputline(m_maincpu, MCS51_T1_LINE).invert();
 	m_crtc->drb_callback().set(FUNC(vt220a_state::drb_w));
 	m_crtc->vlt_callback().set(FUNC(vt220a_state::vlt_w));
 	m_crtc->cblank_callback().set(FUNC(vt220a_state::cblank_w));
