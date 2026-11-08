@@ -163,8 +163,6 @@ m68hc05_device::m68hc05_device(
 	, m_port_irq_state(false)
 	, m_irq_line_state(false)
 	, m_irq_latch(0)
-	, m_sck_cb(*this)
-	, m_mosi_cb(*this)
 	, m_has_spi(false)
 	, m_baud(0x00)
 	, m_sccr1(0x00)
@@ -529,8 +527,6 @@ void m68hc05_device::device_add_mconfig(machine_config &config)
 	{
 		// the SPI runs from the internal processor clock, half the oscillator frequency
 		M68HC05_SPI(config, m_spi, DERIVED_CLOCK(1, 2));
-		m_spi->sck_cb().set([this] (int state) { m_sck_cb(state); });
-		m_spi->mosi_cb().set([this] (int state) { m_mosi_cb(state); });
 		// MISO is PD2 (2.2.3), sampled through portd_r
 		m_spi->miso_cb().set([this] () { return BIT(m_port_cb_r[3](0, 0x04), 2); });
 		m_spi->irq_cb().set(*this, FUNC(m68hc05_device::spi_irq_w));

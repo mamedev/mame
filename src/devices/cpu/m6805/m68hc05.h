@@ -43,8 +43,9 @@ public:
 	auto portc_w() { return m_port_cb_w[2].bind(); }
 	auto portd_w() { return m_port_cb_w[3].bind(); }
 	auto tcmp() { return m_tcmp_cb.bind(); }
-	auto spi_sck() { return m_sck_cb.bind(); }
-	auto spi_mosi() { return m_mosi_cb.bind(); }
+	// SPI SCK and MOSI pins (PD4, PD3); only on variants with an SPI
+	auto spi_sck() { return m_spi.lookup()->sck_cb(); }
+	auto spi_mosi() { return m_spi.lookup()->mosi_cb(); }
 
 	// SS pin of the SPI (PD5, active low; variants without an SPI ignore it).  Pushed
 	// rather than read through portd_r: the master acts on SS low at once (6.2.3).
@@ -200,8 +201,6 @@ private:
 	u8                  m_irq_latch;
 
 	// serial peripheral interface
-	devcb_write_line    m_sck_cb;
-	devcb_write_line    m_mosi_cb;
 	bool                m_has_spi;
 
 	// serial communications interface

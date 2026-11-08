@@ -20,6 +20,10 @@
 class m68hc05_spi_device : public device_t
 {
 public:
+	// writable bits, for the host's debugger state
+	static constexpr u8 SPCR_MASK = 0xdf;
+	static constexpr u8 SPSR_MASK = 0xd0;
+
 	m68hc05_spi_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 	// SCK and MOSI output pins (master mode), MISO input pin (the host reads it
@@ -36,10 +40,6 @@ public:
 	void ss_w(int state);
 
 	void map(address_map &map) ATTR_COLD;
-
-	// writable bits, for the host's debugger state
-	static constexpr u8 SPCR_MASK = 0xdf;
-	static constexpr u8 SPSR_MASK = 0xd0;
 
 	// register access for the host's debugger state (no pin activity)
 	u8 spcr() const { return m_spcr; }
@@ -105,7 +105,7 @@ private:
 	bool                m_busy;
 	bool                m_ss;
 	bool                m_irq_state;
-	int                 m_sck;              // SCK level last driven, -1 if never
+	s8                  m_sck;              // SCK level last driven, -1 if never
 };
 
 DECLARE_DEVICE_TYPE(M68HC05_SPI, m68hc05_spi_device)

@@ -36,7 +36,7 @@ namespace {
 // 6.4.1: SCK is E/2, E/4, E/16 or E/32
 constexpr u8 SCK_DIVISOR[4] = { 2, 4, 16, 32 };
 
-constexpr unsigned BITS = 8;
+constexpr u32 BITS = 8;
 
 } // anonymous namespace
 
@@ -140,7 +140,7 @@ void m68hc05_spi_device::spcr_w(u8 data)
 	u8 const rise(data & ~m_spcr);
 	m_spcr = data;
 	if ((rise & SPCR_SPE) && !mstr())
-		LOGSPI("slave mode selected, not supported\n");
+		logerror("%s: slave mode selected, not supported\n", machine().describe_context());
 
 	// inferred: clearing SPE abandons a byte in progress (6.4.1 B6 only says SPE clear
 	// disconnects the SPI from the pins)
@@ -177,7 +177,7 @@ void m68hc05_spi_device::spdr_w(u8 data)
 	// 6.4.2 B6: a write while a transfer is under way sets WCOL and is lost
 	if (m_busy)
 	{
-		LOGSPI("write SPDR %02X during transfer, write collision\n", data);
+		LOGSPI("%s: write SPDR %02X during transfer, write collision\n", machine().describe_context(), data);
 		set_flags(SPSR_WCOL);
 		return;
 	}
@@ -185,7 +185,7 @@ void m68hc05_spi_device::spdr_w(u8 data)
 	// 6.4.2 B7: writes are inhibited while SPIF is set until SPSR has been read
 	if ((m_spsr & SPSR_SPIF) && !(m_spsr_seen & SPSR_SPIF))
 	{
-		LOGSPI("write SPDR %02X inhibited, SPIF not acknowledged\n", data);
+		LOGSPI("%s: write SPDR %02X inhibited, SPIF not acknowledged\n", machine().describe_context(), data);
 		return;
 	}
 
@@ -231,8 +231,8 @@ TIMER_CALLBACK_MEMBER(m68hc05_spi_device::tick)
 	// CPHA clear: data is captured on the leading edge and the next bit goes out on the
 	// trailing one.  CPHA set: the next bit goes out on the leading edge and data is
 	// captured on the trailing one.
-	unsigned const n(m_half_clocks++);
-	unsigned const bit(n >> 1);
+	u32 const n(m_half_clocks++);
+	u32 const bit(n >> 1);
 
 	// MISO is sampled before the edge that captures it: the slave changes it after
 	if (!BIT(n, 0))
