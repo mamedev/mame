@@ -23,7 +23,7 @@ namespace bus::heathzenith::h19 {
 namespace {
 
 /**
- *  Heath TLB with Super19 ROM
+ * Heath TLB with Super19 ROM
  */
 class heath_super19_tlb_device : public heath_tlb_device
 {
@@ -36,7 +36,7 @@ protected:
 };
 
 /**
- *  Heath TLB with the super19 ROM plus SigmaSoft Interactive Graphics Controller
+ * Heath TLB with the Super19 ROM plus SigmaSoft Interactive Graphics Controller
  */
 class heath_igc_super19_tlb_device : public heath_igc_tlb_device
 {
@@ -48,12 +48,11 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
+INPUT_PORTS_START( super19 )
+	PORT_INCLUDE( tlb )
 
-static INPUT_PORTS_START( super19 )
-  PORT_INCLUDE( tlb )
-
-  PORT_MODIFY("SW401")
-	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")                                   PORT_DIPLOCATION("SW401:1,2,3,4")
+	PORT_MODIFY("SW401")
+	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")          PORT_DIPLOCATION("SW401:1,2,3,4")
 	PORT_DIPSETTING(    0x01, "110")
 	PORT_DIPSETTING(    0x02, "150")
 	PORT_DIPSETTING(    0x03, "300")
@@ -68,7 +67,7 @@ static INPUT_PORTS_START( super19 )
 	PORT_DIPSETTING(    0x0c, "9600")
 	PORT_DIPSETTING(    0x0d, "19200")
 	PORT_DIPSETTING(    0x0e, "38400")
-	PORT_DIPNAME( 0x70, 0x00, "8 bit mode")                                  PORT_DIPLOCATION("SW401:5,6,7")
+	PORT_DIPNAME( 0x70, 0x00, "8 bit mode")         PORT_DIPLOCATION("SW401:5,6,7")
 	PORT_DIPSETTING(    0x00, "Mode A/0 - 8th bit ignored, sent as 0")
 	PORT_DIPSETTING(    0x10, "Mode B/1 - 8th bit ignored, sent as 1")
 	PORT_DIPSETTING(    0x20, "Mode C/2 - 8 bit escape mode")
@@ -77,20 +76,20 @@ static INPUT_PORTS_START( super19 )
 	PORT_DIPSETTING(    0x50, "Mode F/5 - 8 bit data mode, invert 8th bit")
 	PORT_DIPSETTING(    0x60, "7 bit data with odd parity, 8th bit ignored on input")
 	PORT_DIPSETTING(    0x70, "7 bit data with even parity, 8th bit ignored on input")
-	PORT_DIPNAME( 0x80, 0x80, "Duplex")                                      PORT_DIPLOCATION("SW401:8")
+	PORT_DIPNAME( 0x80, 0x80, "Duplex")             PORT_DIPLOCATION("SW401:8")
 	PORT_DIPSETTING(    0x00, "Half")
 	PORT_DIPSETTING(    0x80, "Full")
 
 	PORT_MODIFY("SW402")
-	PORT_DIPNAME( 0x02, 0x00, "Transmit mode")                               PORT_DIPLOCATION("SW402:2")
+	PORT_DIPNAME( 0x02, 0x00, "Transmit mode")      PORT_DIPLOCATION("SW402:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x02, "Slow")
-	PORT_DIPNAME( 0x80, 0x00, "DEC Keypad Codes")                            PORT_DIPLOCATION("SW402:8")
+	PORT_DIPNAME( 0x80, 0x00, "DEC Keypad Codes")   PORT_DIPLOCATION("SW402:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( igc_super19 )
+INPUT_PORTS_START( igc_super19 )
 	PORT_INCLUDE( super19 )
 
 	PORT_INCLUDE( igc_common )
@@ -98,7 +97,7 @@ INPUT_PORTS_END
 
 
 ROM_START( super19 )
-	// Super-19 ROM
+	// Super19 ROM
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "2732_super19_h447.u437",           0x0000, 0x1000, CRC(6c51aaa6) SHA1(5e368b39fe2f1af44a905dc474663198ab630117))
 
@@ -113,12 +112,12 @@ ROM_END
 
 
 /**
- * Super-19 ROM
+ * Super19 ROM
  *
  * Developed by ATG Systems
  */
-heath_super19_tlb_device::heath_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	heath_tlb_device(mconfig, HEATH_SUPER19, tag, owner, clock)
+heath_super19_tlb_device::heath_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: heath_tlb_device(mconfig, HEATH_SUPER19, tag, owner, clock)
 {
 }
 
@@ -134,11 +133,10 @@ ioport_constructor heath_super19_tlb_device::device_input_ports() const
 
 
 /**
- * SigmaSoft and Systems IGC plus TLB with Super-19 ROM
- *
+ * SigmaSoft and Systems IGC plus TLB with Super19 ROM
  */
-heath_igc_super19_tlb_device::heath_igc_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	heath_igc_tlb_device(mconfig, HEATH_IGC_SUPER19, tag, owner, clock)
+heath_igc_super19_tlb_device::heath_igc_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: heath_igc_tlb_device(mconfig, HEATH_IGC_SUPER19, tag, owner, clock)
 {
 }
 
@@ -156,5 +154,5 @@ ioport_constructor heath_igc_super19_tlb_device::device_input_ports() const
 
 } // namespace bus::heathzenith::h19
 
-DEFINE_DEVICE_TYPE_PRIVATE(HEATH_SUPER19, device_heath_tlb_card_interface, bus::heathzenith::h19::heath_super19_tlb_device, "heath_super19_tlb", "Heath Terminal Logic Board w/Super19 ROM")
-DEFINE_DEVICE_TYPE_PRIVATE(HEATH_IGC_SUPER19, device_heath_tlb_card_interface, bus::heathzenith::h19::heath_igc_super19_tlb_device, "heath_igc_super19_tlb_device", "Heath Terminal Logic Board w/ Super19 ROM plus SigmaSoft Interactive Graphics Controller")
+DEFINE_DEVICE_TYPE_PRIVATE(HEATH_SUPER19,     device_heath_tlb_card_interface, bus::heathzenith::h19::heath_super19_tlb_device,     "heath_super19_tlb",     "Heath Terminal Logic Board w/ Super19 ROM")
+DEFINE_DEVICE_TYPE_PRIVATE(HEATH_IGC_SUPER19, device_heath_tlb_card_interface, bus::heathzenith::h19::heath_igc_super19_tlb_device, "heath_igc_super19_tlb", "Heath Terminal Logic Board w/ Super19 ROM plus SigmaSoft Interactive Graphics Controller")

@@ -29,14 +29,14 @@
 namespace bus::heathzenith::h19 {
 
 // Clocks
-constexpr XTAL MASTER_CLOCK = XTAL(12'288'000);
+constexpr XTAL MASTER_CLOCK = 12.288_MHz_XTAL;
 
 constexpr XTAL H19_3MHZ     = MASTER_CLOCK / 4;
 
 INPUT_PORTS_EXTERN( tlb );
 
 /**
- *  Standard Heath Terminal logic board
+ * Standard Heath Terminal logic board
  */
 class heath_tlb_device : public device_t,
 						 public device_heath_tlb_card_interface
@@ -84,11 +84,11 @@ protected:
 	TIMER_CALLBACK_MEMBER(bell_off);
 
 	// keyboard
-	u8 kbd_key_r();
-	u8 kbd_flags_r();
-	u16 translate_mm5740_b(u16 b);
-	int mm5740_shift_r();
-	int mm5740_control_r();
+	u8   kbd_key_r();
+	u8   kbd_flags_r();
+	u16  translate_mm5740_b(u16 b);
+	int  mm5740_shift_r();
+	int  mm5740_control_r();
 	void mm5740_data_ready_w(int state);
 
 	// serial port
@@ -117,20 +117,20 @@ protected:
 	required_ioport                 m_kbspecial;
 	required_device<clock_device>   m_repeat_clock;
 
-	emu_timer                      *m_key_click_timer;
-	emu_timer                      *m_bell_timer;
+	emu_timer *m_key_click_timer;
+	emu_timer *m_bell_timer;
 
-	u8                              m_transchar;
-	bool                            m_strobe;
-	bool                            m_key_click_active;
-	bool                            m_bell_active;
-	bool                            m_reset_pending;
-	bool                            m_right_shift;
-	bool                            m_reset_key;
-	bool                            m_keyboard_irq_raised;
-	bool                            m_serial_irq_raised;
-	bool                            m_break_key_irq_raised;
-	bool                            m_allow_vsync_nmi;
+	u8   m_transchar;
+	bool m_strobe;
+	bool m_key_click_active;
+	bool m_bell_active;
+	bool m_reset_pending;
+	bool m_right_shift;
+	bool m_reset_key;
+	bool m_keyboard_irq_raised;
+	bool m_serial_irq_raised;
+	bool m_break_key_irq_raised;
+	bool m_allow_vsync_nmi;
 };
 
 } // namespace bus::heathzenith::h19

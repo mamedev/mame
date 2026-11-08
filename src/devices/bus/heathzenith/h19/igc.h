@@ -22,15 +22,15 @@ namespace bus::heathzenith::h19 {
 INPUT_PORTS_EXTERN( igc_common );
 
 /**
- *  Heath TLB plus SigmaSoft Interactive Graphics Controller
+ * Heath TLB plus SigmaSoft Interactive Graphics Controller
  */
 class heath_igc_tlb_device : public heath_tlb_device
 {
 public:
 	heath_igc_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
+	virtual u8   sigma_r(u8 offset) override;
 	virtual void sigma_w(u8 offset, u8 data) override;
-	virtual u8 sigma_r(u8 offset) override;
 
 protected:
 	heath_igc_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
@@ -42,10 +42,11 @@ protected:
 
 	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
 
-	virtual void sigma_ctrl_w(u8 data);
-	virtual u8 sigma_ctrl_r();
+private:
+	u8   sigma_ctrl_r();
+	void sigma_ctrl_w(u8 data);
 
-	u8 sigma_video_mem_r();
+	u8   sigma_video_mem_r();
 	void sigma_video_mem_w(u8 val);
 
 	void sigma_io_lo_addr_w(u8 val);
@@ -54,25 +55,30 @@ protected:
 	void sigma_window_lo_addr_w(u8 val);
 	void sigma_window_hi_addr_w(u8 val);
 
+	void update_fill();
+	void igc_vsync_w(int val);
 
-	std::unique_ptr<u8[]>   m_p_graphic_ram;
+	std::unique_ptr<u8[]> m_p_graphic_ram;
 
 	// Control Register
-	bool                    m_pixel_video_enabled;
-	bool                    m_character_video_disabled;
-	bool                    m_video_invert_enabled;
-	bool                    m_alternate_character_set_enabled;
-	bool                    m_video_fill_enabled;
-	bool                    m_read_address_increment_disabled;
-	u8                      m_memory_bank_select;
+	bool m_pixel_video_enabled;
+	bool m_character_video_disabled;
+	bool m_video_invert_enabled;
+	bool m_alternate_character_set_enabled;
+	bool m_video_fill_enabled;
+	bool m_read_address_increment_disabled;
+	u8   m_memory_bank_select;
 
-	u8                      m_data_reg;
+	u8   m_data_reg;
 
-	u16                     m_io_address;
-	u16                     m_window_address;
-private:
+	u16  m_io_address;
+	u16  m_window_address;
+
+	// automatic video memory fill in progress
+	attotime m_fill_start;
+	u64      m_fill_count;
+
 	required_ioport m_joystick1, m_joystick2;
-
 };
 
 } // namespace bus::heathzenith::h19

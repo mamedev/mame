@@ -22,7 +22,7 @@ namespace bus::heathzenith::h19 {
 namespace {
 
 /**
- *  Heath TLB with Superset ROM
+ * Heath TLB with Superset ROM
  */
 class heath_superset_tlb_device : public heath_tlb_device
 {
@@ -36,28 +36,28 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
+	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
+
+	virtual u8   crtc_reg_r(offs_t reg) override;
+	virtual void crtc_reg_w(offs_t reg, u8 val) override;
+
+private:
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
-
-	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
 
 	void dtr_internal(int data);
 	void out1_internal(int data);
 	void out2_internal(int data);
 
-	virtual u8 crtc_reg_r(offs_t reg) override;
-	virtual void crtc_reg_w(offs_t reg, u8 val) override;
-
 	u8   m_selected_char_set;
 	bool m_reverse_video_disabled;
 };
 
-
-static INPUT_PORTS_START( superset )
+INPUT_PORTS_START( superset )
 	PORT_INCLUDE( tlb )
 
 	PORT_MODIFY("SW401")
-	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")                                   PORT_DIPLOCATION("SW401:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")     PORT_DIPLOCATION("SW401:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "75")
 	PORT_DIPSETTING(    0x01, "110")
 	PORT_DIPSETTING(    0x02, "150")
@@ -74,18 +74,28 @@ static INPUT_PORTS_START( superset )
 	PORT_DIPSETTING(    0x0d, "19200")
 	PORT_DIPSETTING(    0x0e, "38400")
 	PORT_DIPSETTING(    0x0f, "134.5")
-	PORT_DIPNAME( 0x10, 0x10, "Duplex")                                      PORT_DIPLOCATION("SW401:5")
+	// The manual's S401 diagram draws the leader lines for switches 5-8 in reverse. These
+	// settings follow the firmware.
+	PORT_DIPNAME( 0x10, 0x00, "Parity")        PORT_DIPLOCATION("SW401:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "Parity Type")   PORT_DIPLOCATION("SW401:6")
+	PORT_DIPSETTING(    0x00, "Odd")
+	PORT_DIPSETTING(    0x20, "Even")
+	PORT_DIPNAME( 0x40, 0x00, "Word Length")   PORT_DIPLOCATION("SW401:7")
+	PORT_DIPSETTING(    0x00, "8-bit" )
+	PORT_DIPSETTING(    0x40, "7-bit" )
+	PORT_DIPNAME( 0x80, 0x80, "Duplex")        PORT_DIPLOCATION("SW401:8")
 	PORT_DIPSETTING(    0x00, "Half")
 	PORT_DIPSETTING(    0x80, "Full")
-	PORT_DIPNAME( 0x20, 0x00, "Word Length")                                 PORT_DIPLOCATION("SW401:6")
-	PORT_DIPSETTING(    0x00, "8-bit" )
-	PORT_DIPSETTING(    0x20, "7-bit" )
-	PORT_DIPNAME( 0x40, 0x00, "Parity Type")                                 PORT_DIPLOCATION("SW401:7")
-	PORT_DIPSETTING(    0x00, DEF_STR( None )  )
-	PORT_DIPSETTING(    0x40, "Even")
-	PORT_DIPNAME( 0x80, 0x80, "Parity")                                      PORT_DIPLOCATION("SW401:8")
-	PORT_DIPSETTING(    0x00, "Disabled")
-	PORT_DIPSETTING(    0x80, "Enabled")
+
+	// part of the Superset upgrade was to upgrade the CPU to 3 MHz
+	PORT_MODIFY("CONFIG")
+	PORT_CONFNAME(0x03, 0x01, "CPU Clock")
+	PORT_CONFSETTING(   0x00, "2 MHz")
+	PORT_CONFSETTING(   0x01, "3 MHz")
+	PORT_CONFSETTING(   0x02, "4 MHz")
+	PORT_CONFSETTING(   0x03, "6 MHz")
 INPUT_PORTS_END
 
 
@@ -113,9 +123,8 @@ ROM_END
  *
  * Developed by TMSI
  */
-heath_superset_tlb_device::heath_superset_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	heath_tlb_device(mconfig, HEATH_SUPERSET, tag, owner, clock),
-	m_selected_char_set(0)
+heath_superset_tlb_device::heath_superset_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: heath_tlb_device(mconfig, HEATH_SUPERSET, tag, owner, clock)
 {
 }
 
@@ -144,8 +153,10 @@ void heath_superset_tlb_device::device_start()
 	heath_tlb_device::device_start();
 
 	save_item(NAME(m_selected_char_set));
+	save_item(NAME(m_reverse_video_disabled));
 
-	m_selected_char_set = 0;
+	m_selected_char_set      = 0;
+	m_reverse_video_disabled = false;
 }
 
 void heath_superset_tlb_device::mem_map(address_map &map)
@@ -237,6 +248,10 @@ MC6845_UPDATE_ROW(heath_superset_tlb_device::crtc_update_row)
 	}
 }
 
+// Install manual directs user to bend 8250 pins 31, 33, and 34 out of socket, so
+// DTR is unconnected. Any host ROMs that wait for DSR, such as the Kres KMR-100,
+// don't get past start-up.
+
 // DTR (pin 33) to A14 (pin 27) of 27256 ROM
 void heath_superset_tlb_device::dtr_internal(int data)
 {
@@ -249,7 +264,7 @@ void heath_superset_tlb_device::out1_internal(int data)
 	m_selected_char_set = (m_selected_char_set & 0x09) | ((data & 0x01) << 1);
 }
 
-// OUT2 (pin 31) to A11? on board
+// OUT2 (pin 31) to A11 on board
 void heath_superset_tlb_device::out2_internal(int data)
 {
 	m_selected_char_set = (m_selected_char_set & 0x0a) | (data & 0x01);
@@ -259,4 +274,4 @@ void heath_superset_tlb_device::out2_internal(int data)
 
 } // namespace bus::heathzenith::h19
 
-DEFINE_DEVICE_TYPE_PRIVATE(HEATH_SUPERSET, device_heath_tlb_card_interface, bus::heathzenith::h19::heath_superset_tlb_device, "heath_superset_tlb", "Heath Terminal Logic Board w/Superset ROM")
+DEFINE_DEVICE_TYPE_PRIVATE(HEATH_SUPERSET, device_heath_tlb_card_interface, bus::heathzenith::h19::heath_superset_tlb_device, "heath_superset_tlb", "Heath Terminal Logic Board w/ Superset ROM")

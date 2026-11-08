@@ -51,18 +51,18 @@
 
 namespace bus::heathzenith::h19 {
 
-// DOT clocks
-static constexpr XTAL BASE_DOT_CLOCK   = MASTER_CLOCK;
-
 // Standard H19 used a 2.048 MHz clock for Z80
-static constexpr XTAL H19_CLOCK        = MASTER_CLOCK / 6;
-static constexpr XTAL H19_4MHZ         = MASTER_CLOCK / 3;
-static constexpr XTAL H19_6MHZ         = MASTER_CLOCK / 2;
+static constexpr XTAL H19_CLOCK      = MASTER_CLOCK / 6;
+static constexpr XTAL H19_4MHZ       = MASTER_CLOCK / 3;
+static constexpr XTAL H19_6MHZ       = MASTER_CLOCK / 2;
 
-static constexpr XTAL INS8250_CLOCK    = MASTER_CLOCK / 4;
+// DOT clocks
+static constexpr XTAL BASE_DOT_CLOCK = MASTER_CLOCK;
+
+static constexpr XTAL INS8250_CLOCK  = MASTER_CLOCK / 4;
 
 // Beep Frequency is 1 KHz
-static constexpr XTAL H19_BEEP_FRQ     = (H19_CLOCK / 2048);
+static constexpr XTAL H19_BEEP_FRQ   = (H19_CLOCK / 2048);
 
 // Capacitor value in pF
 static constexpr u32 H19_KEY_DEBOUNCE_CAPACITOR = 5000;
@@ -75,29 +75,29 @@ static constexpr u8 KB_STATUS_KEYBOARD_STROBE_MASK = 0x80;
 
 
 /**
- * original Heath H19 functionality
+ * Original Heath H19 functionality
  */
-heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	heath_tlb_device(mconfig, HEATH_TLB, tag, owner, clock)
+heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: heath_tlb_device(mconfig, HEATH_TLB, tag, owner, clock)
 {
 }
 
-heath_tlb_device::heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_heath_tlb_card_interface(mconfig, *this),
-	m_maincpu(*this, "maincpu"),
-	m_screen(*this, "screen"),
-	m_palette(*this, "palette"),
-	m_crtc(*this, "crtc"),
-	m_p_videoram(*this, "videoram"),
-	m_p_chargen(*this, "chargen"),
-	m_config(*this, "CONFIG"),
-	m_ace(*this, "ins8250"),
-	m_beep(*this, "beeper"),
-	m_mm5740(*this, "mm5740"),
-	m_kbdrom(*this, "keyboard"),
-	m_kbspecial(*this, "MODIFIERS"),
-	m_repeat_clock(*this, "repeatclock")
+heath_tlb_device::heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_heath_tlb_card_interface(mconfig, *this)
+	, m_maincpu(*this, "maincpu")
+	, m_screen(*this, "screen")
+	, m_palette(*this, "palette")
+	, m_crtc(*this, "crtc")
+	, m_p_videoram(*this, "videoram")
+	, m_p_chargen(*this, "chargen")
+	, m_config(*this, "CONFIG")
+	, m_ace(*this, "ins8250")
+	, m_beep(*this, "beeper")
+	, m_mm5740(*this, "mm5740")
+	, m_kbdrom(*this, "keyboard")
+	, m_kbspecial(*this, "MODIFIERS")
+	, m_repeat_clock(*this, "repeatclock")
 {
 }
 
@@ -166,6 +166,7 @@ void heath_tlb_device::device_start()
 	save_item(NAME(m_break_key_irq_raised));
 	save_item(NAME(m_allow_vsync_nmi));
 
+	m_transchar            = 0;
 	m_strobe               = false;
 	m_key_click_active     = false;
 	m_bell_active          = false;
@@ -191,10 +192,14 @@ void heath_tlb_device::device_start()
 
 void heath_tlb_device::device_reset()
 {
-	m_strobe           = false;
-	m_key_click_active = false;
-	m_bell_active      = false;
-	m_allow_vsync_nmi  = false;
+	m_strobe              = false;
+	m_keyboard_irq_raised = false;
+	m_key_click_active    = false;
+	m_bell_active         = false;
+	m_allow_vsync_nmi     = false;
+
+	// clearing the keyboard strobe also clears its interrupt
+	set_irq_line();
 
 	ioport_value const cfg(m_config->read());
 
@@ -259,10 +264,13 @@ u16 heath_tlb_device::translate_mm5740_b(u16 b)
 
 u8 heath_tlb_device::kbd_key_r()
 {
-	m_strobe              = false;
-	m_keyboard_irq_raised = false;
+	if (!machine().side_effects_disabled())
+	{
+		m_strobe              = false;
+		m_keyboard_irq_raised = false;
 
-	set_irq_line();
+		set_irq_line();
+	}
 
 	// high bit is for control key pressed, this is handled in the ROM,
 	// no processing needed.
@@ -577,7 +585,7 @@ INPUT_PORTS_START( tlb )
 	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc")        PORT_CODE(KEYCODE_ESC)        PORT_CHAR(27)
 
 	PORT_START("SW401")
-	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")                                   PORT_DIPLOCATION("SW401:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")        PORT_DIPLOCATION("SW401:1,2,3,4")
 	PORT_DIPSETTING(    0x01, "110")
 	PORT_DIPSETTING(    0x02, "150")
 	PORT_DIPSETTING(    0x03, "300")
@@ -591,41 +599,41 @@ INPUT_PORTS_START( tlb )
 	PORT_DIPSETTING(    0x0b, "7200")
 	PORT_DIPSETTING(    0x0c, "9600")
 	PORT_DIPSETTING(    0x0d, "19200")
-	PORT_DIPNAME( 0x30, 0x00, "Parity")                                      PORT_DIPLOCATION("SW401:5,6")
+	PORT_DIPNAME( 0x30, 0x00, "Parity")           PORT_DIPLOCATION("SW401:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x10, "Odd")
 	PORT_DIPSETTING(    0x20, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x30, "Even")
-	PORT_DIPNAME( 0x40, 0x00, "Parity Type")                                 PORT_DIPLOCATION("SW401:7")
+	PORT_DIPNAME( 0x40, 0x00, "Parity Type")      PORT_DIPLOCATION("SW401:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x40, "Stick")
-	PORT_DIPNAME( 0x80, 0x80, "Duplex")                                      PORT_DIPLOCATION("SW401:8")
+	PORT_DIPNAME( 0x80, 0x80, "Duplex")           PORT_DIPLOCATION("SW401:8")
 	PORT_DIPSETTING(    0x00, "Half")
 	PORT_DIPSETTING(    0x80, "Full")
 
 	PORT_START("SW402")
-	PORT_DIPNAME( 0x01, 0x00, "Cursor")                                      PORT_DIPLOCATION("SW402:1")
+	PORT_DIPNAME( 0x01, 0x00, "Cursor")           PORT_DIPLOCATION("SW402:1")
 	PORT_DIPSETTING(    0x00, "Underline")
 	PORT_DIPSETTING(    0x01, "Block")
-	PORT_DIPNAME( 0x02, 0x00, "Keyclick")                                    PORT_DIPLOCATION("SW402:2")
+	PORT_DIPNAME( 0x02, 0x00, "Keyclick")         PORT_DIPLOCATION("SW402:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x04, 0x00, "Wrap at EOL")                                 PORT_DIPLOCATION("SW402:3")
+	PORT_DIPNAME( 0x04, 0x00, "Wrap at EOL")      PORT_DIPLOCATION("SW402:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, "Auto LF on CR")                               PORT_DIPLOCATION("SW402:4")
+	PORT_DIPNAME( 0x08, 0x00, "Auto LF on CR")    PORT_DIPLOCATION("SW402:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x00, "Auto CR on LF")                               PORT_DIPLOCATION("SW402:5")
+	PORT_DIPNAME( 0x10, 0x00, "Auto CR on LF")    PORT_DIPLOCATION("SW402:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, "Mode")                                        PORT_DIPLOCATION("SW402:6")
+	PORT_DIPNAME( 0x20, 0x00, "Mode")             PORT_DIPLOCATION("SW402:6")
 	PORT_DIPSETTING(    0x00, "Heath/VT52")
 	PORT_DIPSETTING(    0x20, "ANSI")
-	PORT_DIPNAME( 0x40, 0x00, "Keypad Shifted")                              PORT_DIPLOCATION("SW402:7")
+	PORT_DIPNAME( 0x40, 0x00, "Keypad Shifted")   PORT_DIPLOCATION("SW402:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x00, "Refresh")                                     PORT_DIPLOCATION("SW402:8")
+	PORT_DIPNAME( 0x80, 0x00, "Refresh")          PORT_DIPLOCATION("SW402:8")
 	PORT_DIPSETTING(    0x00, "60Hz")
 	PORT_DIPSETTING(    0x80, "50Hz")
 
@@ -635,7 +643,7 @@ INPUT_PORTS_START( tlb )
 	PORT_CONFSETTING(   0x01, "3 MHz")
 	PORT_CONFSETTING(   0x02, "4 MHz")
 	PORT_CONFSETTING(   0x03, "6 MHz")
-	PORT_CONFNAME(0x0C, 0x00, "CRT Color")
+	PORT_CONFNAME(0x0c, 0x00, "CRT Color")
 	PORT_CONFSETTING(   0x00, "Green")
 	PORT_CONFSETTING(   0x04, "White")
 	PORT_CONFSETTING(   0x08, "Amber")
@@ -713,14 +721,14 @@ void heath_tlb_device::device_add_mconfig(machine_config &config)
 	SCREEN(config, m_screen).set_color(rgb_t::green());
 	// based on the H19 ROM code for 60 Hz
 	m_screen->set_raw(BASE_DOT_CLOCK, 768, 32, 672, 270, 0, 250);
-	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_h19);
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	// MC 6845 uses a character clock, divide the DOT clock by 8.
 	MC6845(config, m_crtc, BASE_DOT_CLOCK / 8);
-	m_crtc->set_screen("screen");
+	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(heath_tlb_device::crtc_update_row));

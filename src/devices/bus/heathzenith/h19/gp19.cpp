@@ -23,20 +23,19 @@ namespace bus::heathzenith::h19 {
 
 namespace {
 
-static constexpr XTAL GP19_DOT_CLOCK_1 = XTAL(20'282'000);   // 132 columns
-static constexpr XTAL GP19_DOT_CLOCK_2 = XTAL(12'292'000);   // 80 columns
-static constexpr XTAL GP19_DOT_CLOCK_3 = XTAL(10'644'000);   // Graphics mode
-
+constexpr XTAL GP19_DOT_CLOCK_1 = 20.282_MHz_XTAL;   // 132 columns
+constexpr XTAL GP19_DOT_CLOCK_2 = 12.292_MHz_XTAL;   // 80 columns
+constexpr XTAL GP19_DOT_CLOCK_3 = 10.644_MHz_XTAL;   // Graphics mode
 
 /**
- *  Heath TLB plus Northwest Digital Systems GP-19
+ * Heath TLB plus Northwest Digital Systems GP-19
  */
 class heath_gp19_tlb_device : public heath_tlb_device
 {
 public:
-	heath_gp19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
-
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
+	heath_gp19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
@@ -45,12 +44,13 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
+	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
+
+private:
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
 	void latch_u5_w(u8 data);
-
-	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
 
 	bool m_char_gen_a11;
 	bool m_graphic_mode;
@@ -58,8 +58,7 @@ protected:
 	bool m_reverse_video;
 };
 
-
-static INPUT_PORTS_START( gp19 )
+INPUT_PORTS_START( gp19 )
 	PORT_INCLUDE( tlb )
 
 	PORT_MODIFY("SW402")
@@ -114,8 +113,8 @@ ROM_END
 /**
  * Northwest Digital Systems GP-19 add-in board
  */
-heath_gp19_tlb_device::heath_gp19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	heath_tlb_device(mconfig, HEATH_GP19, tag, owner, clock)
+heath_gp19_tlb_device::heath_gp19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: heath_tlb_device(mconfig, HEATH_GP19, tag, owner, clock)
 {
 }
 
@@ -149,11 +148,13 @@ void heath_gp19_tlb_device::device_start()
 
 void heath_gp19_tlb_device::mem_map(address_map &map)
 {
+	map.unmap_value_high();
+
 	// ROMs 1, 2, 3
-	map(0x0000, 0x02fff).rom();
+	map(0x0000, 0x2fff).rom();
 
 	// Optional external board - Program ROM 4(not aware if any ever existed), external I/O
-	// map(0x3000, 0x03fff).rom();
+	// map(0x3000, 0x3fff).rom();
 
 	map(0x4000, 0x40ff).mirror(0x3f00).ram();
 	map(0x6000, 0x67ff).mirror(0x1800).ram();
@@ -177,11 +178,11 @@ void heath_gp19_tlb_device::io_map(address_map &map)
 /**
  * U5 Latch
  *
- *  Q0 Graph/character H
- *  Q1 132/80 columns H
- *  Q2 Reverse Screen H
- *  Q3 Alt Character L
- *  Q4-Q7 LED indicators (debug LEDs on circuit board)
+ * Q0 Graph/character H
+ * Q1 132/80 columns H
+ * Q2 Reverse Screen H
+ * Q3 Alt Character L
+ * Q4-Q7 LED indicators (debug LEDs on circuit board)
  */
 void heath_gp19_tlb_device::latch_u5_w(u8 data)
 {

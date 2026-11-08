@@ -5,7 +5,7 @@
   Heathkit Terminal Logic Board (TLB) plus Cleveland Codonics Imaginator I-100
 
   Not Currently Implemented
-    - Support for Tektronics Emulation (missing ROM image)
+    - Support for Tektronix Emulation (missing ROM image)
 
 ****************************************************************************/
 
@@ -22,7 +22,7 @@ namespace bus::heathzenith::h19 {
 namespace {
 
 /**
- *  Heath TLB plus Cleveland Codonics Imaginator-100
+ * Heath TLB plus Cleveland Codonics Imaginator I-100
  */
 class heath_imaginator_tlb_device : public heath_tlb_device
 {
@@ -34,16 +34,21 @@ protected:
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
+	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
+	virtual void set_irq_line() override;
+
+private:
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
-	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
 	void crtc_hsync_w(int val);
 
 	IRQ_CALLBACK_MEMBER(irq_ack_cb);
 
+	void update_tap_6000h();
 	void tap_6000h();
 	void tap_8000h();
 
@@ -52,24 +57,21 @@ protected:
 
 	void display_enable_w(offs_t reg, u8 val);
 	void config_irq_w(offs_t reg, u8 val);
-	void nop_w(offs_t reg, u8 val);
-	virtual void set_irq_line() override;
 
-	required_memory_bank            m_mem_bank;
-	required_shared_ptr<u8>         m_p_graphic_ram;
-	memory_passthrough_handler      m_tap_6000h;
+	required_memory_bank       m_mem_bank;
+	required_shared_ptr<u8>    m_p_graphic_ram;
+	memory_passthrough_handler m_tap_6000h;
 
-	u8                              m_im2_val;
+	u8   m_im2_val;
 
-	bool                            m_alphanumeric_mode_active;
-	bool                            m_graphics_mode_active;
+	bool m_alphanumeric_mode_active;
+	bool m_graphics_mode_active;
 
-	bool                            m_allow_tlb_interrupts;
-	bool                            m_allow_imaginator_interrupts;
+	bool m_allow_tlb_interrupts;
+	bool m_allow_imaginator_interrupts;
 
-	bool                            m_hsync_irq_raised;
+	bool m_hsync_irq_raised;
 };
-
 
 ROM_START( imaginator )
 	// Program code
@@ -97,7 +99,7 @@ ROM_END
 
 
 /**
- * Cleveland Codonics Imaginator-100 (I-100) add-in board
+ * Cleveland Codonics Imaginator I-100 add-in board
  *
  *    Memory Range     Description
  *   -----------------------------------------------------------------
@@ -111,12 +113,11 @@ ROM_END
  *
  * New interrupt source
  *   - horizontal retrace interrupt
- *
  */
-heath_imaginator_tlb_device::heath_imaginator_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	heath_tlb_device(mconfig, HEATH_IMAGINATOR, tag, owner, clock),
-	m_mem_bank(*this,      "membank"),
-	m_p_graphic_ram(*this, "graphicram")
+heath_imaginator_tlb_device::heath_imaginator_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: heath_tlb_device(mconfig, HEATH_IMAGINATOR, tag, owner, clock)
+	, m_mem_bank(*this,      "membank")
+	, m_p_graphic_ram(*this, "graphicram")
 {
 }
 
@@ -142,6 +143,8 @@ void heath_imaginator_tlb_device::device_start()
 	save_item(NAME(m_allow_imaginator_interrupts));
 	save_item(NAME(m_hsync_irq_raised));
 
+	m_hsync_irq_raised = false;
+
 	m_mem_bank->configure_entries(0, 2, memregion("maincpu")->base(), 0x2000);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x8000, 0xbfff, "irq_update",
@@ -151,20 +154,16 @@ void heath_imaginator_tlb_device::device_start()
 
 void heath_imaginator_tlb_device::device_reset()
 {
+	// set_irq_line() is called from the base device_reset()
+	allow_tlb_intr();
+
 	heath_tlb_device::device_reset();
 
 	m_mem_bank->set_entry(1);
-	m_tap_6000h.remove();
-	m_tap_6000h = m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x6000, 0x7fff, "mem_map_update",
-			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } },
-			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } });
+	update_tap_6000h();
 
 	m_alphanumeric_mode_active = true;
 	m_graphics_mode_active     = false;
-
-	m_hsync_irq_raised         = false;
-
-	allow_tlb_intr();
 }
 
 void heath_imaginator_tlb_device::mem_map(address_map &map)
@@ -190,6 +189,27 @@ void heath_imaginator_tlb_device::mem_map(address_map &map)
 
 	// Alphanumeric RAM
 	map(0xe000, 0xe7ff).mirror(0x1800).ram().share(m_p_videoram);
+}
+
+void heath_imaginator_tlb_device::device_post_load()
+{
+	heath_tlb_device::device_post_load();
+
+	// the bank is saved, but not whether the tap that switches it is installed
+	update_tap_6000h();
+}
+
+// The GCP ROM is mapped at 0x0000 after reset until the first access at 0x6000-0x7fff
+void heath_imaginator_tlb_device::update_tap_6000h()
+{
+	m_tap_6000h.remove();
+
+	if (m_mem_bank->entry() == 1)
+	{
+		m_tap_6000h = m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x6000, 0x7fff, "mem_map_update",
+				[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } },
+				[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } });
+	}
 }
 
 void heath_imaginator_tlb_device::tap_6000h()
@@ -237,7 +257,7 @@ void heath_imaginator_tlb_device::io_map(address_map &map)
 	map(0x30, 0x30).select(0xc0).mirror(0x0f).w(FUNC(heath_imaginator_tlb_device::display_enable_w));
 
 	// Avoids writes to TLB when a4 is high on unused
-	map(0x50, 0x50).select(0x80).mirror(0x0f).w(FUNC(heath_imaginator_tlb_device::nop_w));
+	map(0x50, 0x50).mirror(0x8f).nopw();
 }
 
 IRQ_CALLBACK_MEMBER(heath_imaginator_tlb_device::irq_ack_cb)
@@ -263,10 +283,6 @@ void heath_imaginator_tlb_device::display_enable_w(offs_t reg, u8 val)
 {
 	m_alphanumeric_mode_active = bool(BIT(reg, 7));
 	m_graphics_mode_active     = bool(BIT(reg, 6));
-}
-
-void heath_imaginator_tlb_device::nop_w(offs_t, u8)
-{
 }
 
 const tiny_rom_entry *heath_imaginator_tlb_device::device_rom_region() const
@@ -299,7 +315,7 @@ MC6845_UPDATE_ROW(heath_imaginator_tlb_device::crtc_update_row)
 				output |= m_p_chargen[(chr << 4) | ra] ^ inv;
 			}
 
-			if (m_graphics_mode_active && (x > 7 ) && (x < 73))
+			if (m_graphics_mode_active && (x > 7) && (x < 73))
 			{
 				output |= m_p_graphic_ram[((y * 64) + (x - 8)) & 0x3fff];
 			}
@@ -326,9 +342,9 @@ void heath_imaginator_tlb_device::crtc_hsync_w(int val)
 void heath_imaginator_tlb_device::set_irq_line()
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0,
-		(m_allow_imaginator_interrupts && m_hsync_irq_raised) ||
-		(m_allow_tlb_interrupts && (m_keyboard_irq_raised || m_serial_irq_raised || m_break_key_irq_raised)) ?
-		 ASSERT_LINE : CLEAR_LINE);
+		((m_allow_imaginator_interrupts && m_hsync_irq_raised) ||
+		 (m_allow_tlb_interrupts && (m_keyboard_irq_raised || m_serial_irq_raised || m_break_key_irq_raised))) ?
+		ASSERT_LINE : CLEAR_LINE);
 }
 
 } // anonymous namespace

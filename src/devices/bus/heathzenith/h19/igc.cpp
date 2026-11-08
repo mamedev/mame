@@ -26,14 +26,13 @@
 
 #define LOGREG(...)        LOGMASKED(LOG_REG, __VA_ARGS__)
 
-#ifdef _MSC_VER
-#define FUNCNAME __func__
-#else
-#define FUNCNAME __PRETTY_FUNCTION__
-#endif
-
 
 namespace bus::heathzenith::h19 {
+
+// Automatic fill writes one byte per IGC memory cycle. The memory cycle rate is
+// an estimate, not from the documentation: it fills a 64K bank in about 43 ms,
+// and the manual gives about 50 ms.
+static constexpr XTAL IGC_FILL_CLOCK = MASTER_CLOCK / 8;
 
 INPUT_PORTS_START( igc_common )
 	PORT_START("joystick_p1")
@@ -49,12 +48,11 @@ INPUT_PORTS_START( igc_common )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(2)
-
 INPUT_PORTS_END
 
 namespace {
 
-static INPUT_PORTS_START( igc )
+INPUT_PORTS_START( igc )
 	PORT_INCLUDE( tlb )
 
 	PORT_INCLUDE( igc_common )
@@ -65,18 +63,16 @@ INPUT_PORTS_END
 
 /**
  * SigmaSoft Interactive Graphics Controller (IGC)
- *
- *
  */
-heath_igc_tlb_device::heath_igc_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	heath_igc_tlb_device(mconfig, HEATH_IGC, tag, owner, clock)
+heath_igc_tlb_device::heath_igc_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: heath_igc_tlb_device(mconfig, HEATH_IGC, tag, owner, clock)
 {
 }
 
-heath_igc_tlb_device::heath_igc_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
-	heath_tlb_device(mconfig, type, tag, owner, clock),
-	m_joystick1(*this, "joystick_p1"),
-	m_joystick2(*this, "joystick_p2")
+heath_igc_tlb_device::heath_igc_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: heath_tlb_device(mconfig, type, tag, owner, clock)
+	, m_joystick1(*this, "joystick_p1")
+	, m_joystick2(*this, "joystick_p2")
 {
 }
 
@@ -90,14 +86,15 @@ void heath_igc_tlb_device::device_add_mconfig(machine_config &config)
 	heath_tlb_device::device_add_mconfig(config);
 
 	m_crtc->set_update_row_callback(FUNC(heath_igc_tlb_device::crtc_update_row));
+	m_crtc->out_vsync_callback().set(FUNC(heath_igc_tlb_device::igc_vsync_w));
 }
 
 void heath_igc_tlb_device::device_start()
 {
 	heath_tlb_device::device_start();
 
-	m_p_graphic_ram = make_unique_clear<u8[]>(0x3ffff);
-	save_pointer(NAME(m_p_graphic_ram), 0x3ffff);
+	m_p_graphic_ram = make_unique_clear<u8[]>(0x40000);
+	save_pointer(NAME(m_p_graphic_ram), 0x40000);
 
 	save_item(NAME(m_data_reg));
 	save_item(NAME(m_pixel_video_enabled));
@@ -109,12 +106,20 @@ void heath_igc_tlb_device::device_start()
 	save_item(NAME(m_memory_bank_select));
 	save_item(NAME(m_io_address));
 	save_item(NAME(m_window_address));
+	save_item(NAME(m_fill_start));
+	save_item(NAME(m_fill_count));
+
+	m_video_fill_enabled = false;
+	m_fill_start         = attotime::zero;
+	m_fill_count         = 0;
 }
 
 void heath_igc_tlb_device::device_reset()
 {
 	heath_tlb_device::device_reset();
 
+	// hardware master reset clears all of the registers, stopping any fill in progress
+	m_video_fill_enabled = false;
 	sigma_ctrl_w(0);
 	m_data_reg       = 0x00;
 	m_io_address     = 0x0000;
@@ -179,7 +184,12 @@ u8 heath_igc_tlb_device::sigma_r(u8 offset)
 
 void heath_igc_tlb_device::sigma_ctrl_w(u8 data)
 {
-	LOGREG("%s: data: %02x\n", FUNCNAME, data);
+	LOGREG("%s: ctrl_w %02x\n", machine().describe_context(), data);
+
+	// finish any fill in progress with the current bank before it changes
+	update_fill();
+
+	bool const fill_was_enabled = m_video_fill_enabled;
 
 	m_pixel_video_enabled             = bool(BIT(data, 0));
 	m_character_video_disabled        = bool(BIT(data, 1));
@@ -188,11 +198,58 @@ void heath_igc_tlb_device::sigma_ctrl_w(u8 data)
 	m_video_fill_enabled              = bool(BIT(data, 4));
 	m_read_address_increment_disabled = bool(BIT(data, 5));
 
-	m_memory_bank_select              = bitswap<2>(data, 6, 7);
+	m_memory_bank_select              = BIT(data, 6, 2);
 
-	if (m_video_fill_enabled)
+	if (m_video_fill_enabled && !fill_was_enabled)
 	{
-		std::fill_n(&m_p_graphic_ram[(m_memory_bank_select << 16) & 0x3ffff], 0x10000, m_data_reg);
+		m_fill_start = machine().time();
+		m_fill_count = 0;
+	}
+}
+
+/**
+ * Automatic video memory fill
+ *
+ * While the fill bit is set, every memory cycle writes the data register to the
+ * selected bank at the I/O address and increments the I/O address. The writes
+ * that have happened since the last update are applied here.
+ */
+void heath_igc_tlb_device::update_fill()
+{
+	if (!m_video_fill_enabled)
+	{
+		return;
+	}
+
+	u64 const total = (machine().time() - m_fill_start).as_ticks(IGC_FILL_CLOCK);
+	u64 const count = total - m_fill_count;
+	u32 const bank  = m_memory_bank_select << 16;
+
+	m_fill_count = total;
+
+	if (count >= 0x10000)
+	{
+		// a full pass covers the whole bank
+		std::fill_n(&m_p_graphic_ram[bank], 0x10000, m_data_reg);
+		m_io_address += u16(count);
+	}
+	else
+	{
+		for (u32 i = 0; i < count; i++)
+		{
+			m_p_graphic_ram[bank | m_io_address++] = m_data_reg;
+		}
+	}
+}
+
+// the vertical sync drives the NMI, and also brings any fill in progress up to date
+void heath_igc_tlb_device::igc_vsync_w(int val)
+{
+	crtc_vsync_w(val);
+
+	if (val)
+	{
+		update_fill();
 	}
 }
 
@@ -207,16 +264,21 @@ u8 heath_igc_tlb_device::sigma_ctrl_r()
 	ret_val |= m_video_fill_enabled              ? 0x10 : 0x00;
 	ret_val |= m_read_address_increment_disabled ? 0x20 : 0x00;
 
-	ret_val |= bitswap<2>(m_memory_bank_select, 0, 1) << 6;
+	ret_val |= m_memory_bank_select << 6;
 
-	LOGREG("%s: ret_val: %02x\n", FUNCNAME, ret_val);
+	if (!machine().side_effects_disabled())
+	{
+		LOGREG("%s: ctrl_r %02x\n", machine().describe_context(), ret_val);
+	}
 
 	return ret_val;
 }
 
 void heath_igc_tlb_device::sigma_video_mem_w(u8 data)
 {
-	LOGREG("%s: data: %02x\n", FUNCNAME, data);
+	LOGREG("%s: video_mem_w %02x\n", machine().describe_context(), data);
+
+	update_fill();
 
 	m_data_reg                                                     = data;
 
@@ -225,6 +287,11 @@ void heath_igc_tlb_device::sigma_video_mem_w(u8 data)
 
 u8 heath_igc_tlb_device::sigma_video_mem_r()
 {
+	if (!machine().side_effects_disabled())
+	{
+		update_fill();
+	}
+
 	// control whether m_io_address is incremented during a read
 	u32 addr = (m_read_address_increment_disabled || machine().side_effects_disabled()) ?
 		((m_memory_bank_select << 16) + m_io_address) :
@@ -235,28 +302,32 @@ u8 heath_igc_tlb_device::sigma_video_mem_r()
 
 void heath_igc_tlb_device::sigma_io_lo_addr_w(u8 data)
 {
-	LOGREG("%s: data: %02x\n", FUNCNAME, data);
+	LOGREG("%s: io_lo_addr_w %02x\n", machine().describe_context(), data);
+
+	update_fill();
 
 	m_io_address = (m_io_address & 0xff00) | data;
 }
 
 void heath_igc_tlb_device::sigma_io_hi_addr_w(u8 data)
 {
-	LOGREG("%s: data: %02x\n", FUNCNAME, data);
+	LOGREG("%s: io_hi_addr_w %02x\n", machine().describe_context(), data);
+
+	update_fill();
 
 	m_io_address = (data << 8) | (m_io_address & 0x00ff);
 }
 
 void heath_igc_tlb_device::sigma_window_lo_addr_w(u8 data)
 {
-	LOGREG("%s: data: %02x\n", FUNCNAME, data);
+	LOGREG("%s: window_lo_addr_w %02x\n", machine().describe_context(), data);
 
 	m_window_address = (m_window_address & 0xff00) | data;
 }
 
 void heath_igc_tlb_device::sigma_window_hi_addr_w(u8 data)
 {
-	LOGREG("%s: data: %02x\n", FUNCNAME, data);
+	LOGREG("%s: window_hi_addr_w %02x\n", machine().describe_context(), data);
 
 	m_window_address = (data << 8) | (m_window_address & 0x00ff);
 }
@@ -289,6 +360,8 @@ MC6845_UPDATE_ROW(heath_igc_tlb_device::crtc_update_row)
 				output |= m_p_chargen[(chr << 4) | ra] ^ inv;
 			}
 
+			// Pixel video is always from bank 0, the bank select bits only affect data I/O.
+			// Bank 2 is also displayed in bank interlace mode, which is not implemented.
 			if (m_pixel_video_enabled)
 			{
 				output |= m_p_graphic_ram[(((y * 80) + x) + m_window_address) & 0xffff];
@@ -310,4 +383,4 @@ MC6845_UPDATE_ROW(heath_igc_tlb_device::crtc_update_row)
 
 } // namespace bus::heathzenith::h19
 
-DEFINE_DEVICE_TYPE_PRIVATE(HEATH_IGC, device_heath_tlb_card_interface, bus::heathzenith::h19::heath_igc_tlb_device, "heath_igc_tlb_device", "Heath Terminal Logic Board plus SigmaSoft Interactive Graphics Controller")
+DEFINE_DEVICE_TYPE_PRIVATE(HEATH_IGC, device_heath_tlb_card_interface, bus::heathzenith::h19::heath_igc_tlb_device, "heath_igc_tlb", "Heath Terminal Logic Board plus SigmaSoft Interactive Graphics Controller")
