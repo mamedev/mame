@@ -267,8 +267,24 @@ ROM_END
 
 ROM_START( pcd5h )
 	ROM_REGION32_LE(0x20000, "pci:01.0:xbus_flash", 0)
-	ROM_SYSTEM_BIOS(0, "v103", "PhoenixBIOS 4.04 Rev. 1.03.842")
-	ROMX_LOAD( "pcd-5h.bin", 0x00000, 0x20000, CRC(520f9b00) SHA1(f1dab8ae6f635a6941d0091ff44a811fe35a89a9), ROM_BIOS(0))
+	// Siemens Nixdorf System Board D842
+	// PhoenixBIOS 4.04 core, unpacks its own video BIOS into C000 shadow RAM
+	ROM_SYSTEM_BIOS(0, "v107", "PhoenixBIOS 4.04 Rev. 1.07.842")
+	ROMX_LOAD( "d842_107.bin", 0x00000, 0x20000, CRC(c812e98f) SHA1(b9252d6c01fa13841410a412f5ce69147baee3ff), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v106", "PhoenixBIOS 4.04 Rev. 1.06.842")
+	ROMX_LOAD( "d842_106.bin", 0x00000, 0x20000, CRC(8b8eb093) SHA1(315e302b28588924e9fd5594f61c119bb6b7470a), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "v105", "PhoenixBIOS 4.04 Rev. 1.05.842")
+	ROMX_LOAD( "d842_105.bin", 0x00000, 0x20000, CRC(ce92d70c) SHA1(2eddc391c7575f8f21f5c5e78aa45f6c4152a347), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "v103", "PhoenixBIOS 4.04 Rev. 1.03.842") // Not from TheRetroWeb
+	ROMX_LOAD( "d842_103.bin", 0x00000, 0x20000, CRC(520f9b00) SHA1(f1dab8ae6f635a6941d0091ff44a811fe35a89a9), ROM_BIOS(3))
+	// PhoenixBIOS Pentium 1.03 core, Tseng video BIOS in the first 32KB
+	// TODO: This is currently not mapping correctly
+	ROM_SYSTEM_BIOS(4, "v110p", "PhoenixBIOS Pentium 1.03 Rev. 1.10.842")
+	ROMX_LOAD( "d842_110p.bin", 0x00000, 0x20000, CRC(7b7a6504) SHA1(5ad01bf7e23ed0553136e885e72d8c9f207567b3), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(5, "v109p", "PhoenixBIOS Pentium 1.03 Rev. 1.09.842")
+	ROMX_LOAD( "d842_109p.bin", 0x00000, 0x20000, CRC(0bf194f7) SHA1(0ca0590cf1c02bde20b87558680957563e375616), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(6, "v103p", "PhoenixBIOS Pentium 1.03 Rev. 1.03.842")
+	ROMX_LOAD( "d842_103p.bin", 0x00000, 0x20000, CRC(d8657b04) SHA1(8f3a188ad083cb3b591a31df8e7e05b639eb5f10), ROM_BIOS(6))
 ROM_END
 
 ROM_START( sy029c2 )
