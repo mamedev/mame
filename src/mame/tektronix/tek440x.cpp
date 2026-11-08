@@ -388,14 +388,27 @@ void tek440x_state::machine_start()
 	save_item(NAME(m_boot));
 	save_item(NAME(m_map_control));
 	save_item(NAME(m_latched_map_control));
+	save_item(NAME(m_inbuserr));
 	save_item(NAME(m_kb_rdata));
 	save_item(NAME(m_kb_tdata));
 	save_item(NAME(m_kb_rclamp));
 	save_item(NAME(m_kb_loop));
 
+	save_item(NAME(m_videoaddr));
 	save_item(NAME(m_videocntl));
 	save_item(NAME(m_diag));
 
+	save_item(NAME(m_fpu_finished));
+	save_item(NAME(m_printer_pc));
+	
+	save_item(NAME(m_mouse));
+	save_item(NAME(m_mouse_btns));
+	save_item(NAME(m_mouse_x));
+	save_item(NAME(m_mouse_y));
+	save_item(NAME(m_old_mouse_x));
+	save_item(NAME(m_old_mouse_y));
+	
+	
 	m_inbuserr = false;
 
 	m_ram_ptr = (uint16_t *)m_ram->pointer();
