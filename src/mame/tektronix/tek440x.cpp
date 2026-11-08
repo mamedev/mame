@@ -17,20 +17,20 @@
         * MC68681 DUART / timer (3.6864 MHz clock) (serial channel A = keyboard, channel B = RS-232 port)
         * AM9513 timer (source of timer IRQ)
         * NCR5385 SCSI controller
-		* 8255 Centronics printer interface
-		* X2210 NVRAM
+        * 8255 Centronics printer interface
+        * X2210 NVRAM
 
         Video is a 640x480 1bpp window on a 1024x1024 VRAM area; smooth panning around that area
         is possible as is flat-out changing the scanout address.
 
-    IRQ levels:	(see Figure 2.1-8)
+    IRQ levels: (see Figure 2.1-8)
         7 = Debug (NMI)
         6 = VBL
         5 = UART
         4 = Spare (exp slots)
         3 = SCSI
         2 = DMA (ethernet)
-        1 = Timer	(and Printer)
+        1 = Timer   (and Printer)
         0 = Unused
 
     MMU info:
@@ -73,15 +73,15 @@
 
 #include "tek4404.lh"
 
-#define LOG_MMU			(1U << 1)
-#define LOG_FPU_FINISH	(1U << 2)
-#define LOG_FPU_RD		(1U << 3)
-#define LOG_FPU_WR		(1U << 4)
-#define LOG_SCSI		(1U << 5)
-#define LOG_IRQ			(1U << 6)
-#define LOG_TIMER_RD	(1U << 7)
-#define LOG_TIMER_WR	(1U << 8)
-#define LOG_VIDEO		(1U << 9)
+#define LOG_MMU         (1U << 1)
+#define LOG_FPU_FINISH  (1U << 2)
+#define LOG_FPU_RD      (1U << 3)
+#define LOG_FPU_WR      (1U << 4)
+#define LOG_SCSI        (1U << 5)
+#define LOG_IRQ         (1U << 6)
+#define LOG_TIMER_RD    (1U << 7)
+#define LOG_TIMER_WR    (1U << 8)
+#define LOG_VIDEO       (1U << 9)
 
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
@@ -97,7 +97,7 @@ constexpr int MAP_CPU_WR = 7;
 constexpr offs_t OFF8_TO_OFF16(offs_t x) { return x >> 1; }
 constexpr offs_t OFF16_TO_OFF8(offs_t x) { return x << 1; }
 
-constexpr offs_t MAXRAM = 0x400000;	// +3MB
+constexpr offs_t MAXRAM = 0x400000; // +3MB
 
 // do MMU translation inside memory_r / memory_w
 #define USE_MMU_INLINE
@@ -122,7 +122,7 @@ public:
 	{
 		m68000_musashi_device::device_reset();
 		LOG("m68010_tekmmu_device::device_reset: setting emmu\n");
-		set_emmu_enable(true);		// sets m_instruction_restart=true
+		set_emmu_enable(true);      // sets m_instruction_restart=true
 	}
 };
 
@@ -143,7 +143,7 @@ public:
 	// experiment for slowing target device (based on 1.2MBps)
 	virtual attotime scsi_data_byte_period() override { return attotime::from_nsec(820); }
 
-	static constexpr feature_type imperfect_features() { return feature::DISK; }	// ncr5385 timing lockup
+	static constexpr feature_type imperfect_features() { return feature::DISK; }    // ncr5385 timing lockup
 };
 
 DEFINE_DEVICE_TYPE(NSCSI_ADAPTEC, nscsi_adaptec_device, "scsi_adaptec", "Adaptec 4000 5.25 Inch Winchester Disk Controller")
@@ -173,7 +173,7 @@ public:
 		m_prom(*this, "bootrom"),
 		m_ram(*this, RAM_TAG),
 		m_vram(*this, "vram"),
-		m_map(*this, "map", 0x1000, ENDIANNESS_BIG),		// 2k 16-bit entries
+		m_map(*this, "map", 0x1000, ENDIANNESS_BIG),        // 2k 16-bit entries
 		m_map_view(*this, "map"),
 		m_mousex(*this, "MOUSEX"),
 		m_mousey(*this, "MOUSEY"),
@@ -301,8 +301,8 @@ private:
 
 	bool m_boot;
 	u8 m_map_control;
-	u8 m_latched_map_control;		// latched until user mode access (page 2.1-54)
-	u8 m_vint_enable;				// VIntEn also used to hold U4438 in reset state
+	u8 m_latched_map_control;       // latched until user mode access (page 2.1-54)
+	u8 m_vint_enable;               // VIntEn also used to hold U4438 in reset state
 
 	u8 m_printer_pc;
 	bool m_kb_rdata;
@@ -361,23 +361,23 @@ void tek440x_state::machine_start()
 
 	save_item(NAME(m_fpu_finished));
 	save_item(NAME(m_printer_pc));
-	
+
 	save_item(NAME(m_mouse));
 	save_item(NAME(m_mouse_btns));
 	save_item(NAME(m_mouse_x));
 	save_item(NAME(m_mouse_y));
 	save_item(NAME(m_old_mouse_x));
 	save_item(NAME(m_old_mouse_y));
-	
-	
+
+
 	m_inbuserr = false;
 
 	m_ram_ptr = (uint16_t *)m_ram->pointer();
 	m_ram_size = m_ram->size();
-	
+
 	m_ram_size_words = OFF8_TO_OFF16(m_ram_size);
 	LOG("RAM config: 0x%08x bytes, 0x%08x words => %p\n",m_ram_size, m_ram_size_words, m_ram_ptr);
-	
+
 	address_space &space = m_vm->space(AS_PROGRAM);
 	const u32 memory_end = m_ram_size - 1;
 	void *memory_data = m_ram_ptr;
@@ -389,7 +389,7 @@ void tek440x_state::machine_start()
 		{ m_led_disk = !(data & 0x18);});
 
 	m_maincpu->space(AS_PROGRAM).install_write_tap(0x740000, 0x747fff, "leds_tap", [this](offs_t offset, u16 &data, u16 mem_mask)
-		{ 	LOG("LED %c%c%c%c\n",data & 8 ? '*' : '-',data & 4 ? '*' : '-',data & 2 ? '*' : '-',data & 1 ? '*' : '-');
+		{   LOG("LED %c%c%c%c\n",data & 8 ? '*' : '-',data & 4 ? '*' : '-',data & 2 ? '*' : '-',data & 1 ? '*' : '-');
 			m_leds[0] = BIT(data, 0); m_leds[1] = BIT(data, 1); m_leds[2] = BIT(data, 2); m_leds[3] = BIT(data, 3);
 		});
 
@@ -440,7 +440,7 @@ u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	int pan = (m_videocntl & 15) ^ 15;
 
 	u16 woffset = m_videoaddr - 0xffe9;  // why 0xffe9 is TL..OS uses same magic number
-	
+
 	u16 const *video_ram_last = m_vram + 0xffff;
 
 	//LOG("screen_update: 0x%04x\n", woffset);
@@ -483,7 +483,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 	if (m_boot)
 		return m_prom[offset & 0x3fff];
 
-	if ((m_maincpu->get_fc() & 4) == 0)				// User mode access updates map_control from write latch
+	if ((m_maincpu->get_fc() & 4) == 0)             // User mode access updates map_control from write latch
 	{
 			if ((m_latched_map_control & 0x1f) != (m_map_control & 0x1f))
 			{
@@ -558,7 +558,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 
 void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if ((m_maincpu->get_fc() & 4) == 0)		// User mode access updates map_control from write latch
+	if ((m_maincpu->get_fc() & 4) == 0)     // User mode access updates map_control from write latch
 	{
 		if ((m_latched_map_control & 0x1f) != (m_map_control & 0x1f))
 		{
@@ -574,7 +574,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 	const offs_t offset0 = offset;
 
 #ifdef USE_MMU_INLINE
-	if (((m_maincpu->get_fc() & 4) == 0) && BIT(m_map_control, MAP_VM_ENABLE))	// only in User mode
+	if (((m_maincpu->get_fc() & 4) == 0) && BIT(m_map_control, MAP_VM_ENABLE))  // only in User mode
 	{
 		//LOG("memory_w: m_map(0x%04x)\n", m_map[offset >> 11]);
 		if (!machine().side_effects_disabled())
@@ -582,7 +582,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 			// is cpuWr
 			if (!m_inbuserr)
 				m_map_control |= (1 << MAP_CPU_WR);
-					
+
 			// matching pid?
 			if ((BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7)))
 			{
@@ -601,21 +601,21 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 			{
 				m_map_control |= (1 << MAP_BLOCK_ACCESS);
 			}
-			
+
 			if (m_inbuserr)
-				mem_mask = 0;	// disable write
+				mem_mask = 0;   // disable write
 
 			// write-enabled page?
 			if (mem_mask && (BIT(m_map[offset >> 11], 14) == 0))
 			{
 				m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
-				
+
 				m_inbuserr = true;
 
 				LOGMASKED(LOG_MMU,"memory_w:  %06x bus error: READONLY fc(%d) pc(%08x)\n", OFF16_TO_OFF8(offset), m_maincpu->get_fc(), m_maincpu->pc());
 				m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), false, m_maincpu->get_fc(), true);
-				
-				mem_mask = 0;	// disable write
+
+				mem_mask = 0;   // disable write
 				return;
 			}
 
@@ -627,9 +627,9 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 				m_map[offset >> 11] |= 0x8000;
 			}
 		}
-		
+
 		//if (mem_mask)
-		//	LOG("memory_w: map %08x => paddr(%08x) berr(%d) fc(%d) pc(%08x)\n",OFF16_TO_OFF8(offset), OFF16_TO_OFF8(BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11), m_inbuserr, m_maincpu->get_fc(), m_maincpu->pc());
+		//  LOG("memory_w: map %08x => paddr(%08x) berr(%d) fc(%d) pc(%08x)\n",OFF16_TO_OFF8(offset), OFF16_TO_OFF8(BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11), m_inbuserr, m_maincpu->get_fc(), m_maincpu->pc());
 
 		offset = BIT(offset, 0, 11) | (BIT(m_map[offset >> 11], 0, 11) << 11);
 	}
@@ -650,7 +650,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 			m_inbuserr = false;
 		}
 	}
-	
+
 	m_vm->write16(offset, data, mem_mask);
 }
 
@@ -859,7 +859,7 @@ u8 tek440x_state::videocntl_r()
 	if (m_screen->vblank())
 		ans |= 0x20;
 	else
-		ans |= 0x10;		// should be VAD.04; this allows VIDEO_selftest to pass
+		ans |= 0x10;        // should be VAD.04; this allows VIDEO_selftest to pass
 
 	if (m_screen->hblank())
 		ans |= 0x40;
@@ -983,11 +983,11 @@ u8 tek440x_state::mouse_r(offs_t offset)
 			if (!machine().side_effects_disabled())
 			{
 				m_mouse_btns <<= 3;
-				m_mouse_btns |=  m_mousebtn->read() & 7;		// selftest xor diag register with it
+				m_mouse_btns |=  m_mousebtn->read() & 7;        // selftest xor diag register with it
 			}
 			ans = m_mouse_btns & 0x1f;
 			ans ^= (m_diag & 15) << 3;
-			ans |= 0x80;									// VCC from calender(?)
+			ans |= 0x80;                                    // VCC from calender(?)
 			break;
 		case 6:
 			if (!machine().side_effects_disabled())
@@ -1283,10 +1283,10 @@ static INPUT_PORTS_START( tek4404 )
 	PORT_BIT( 0x00ff, 0, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
 
 	PORT_START("MOUSEBTN")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mouse Button 1") PORT_CODE(MOUSECODE_BUTTON1)		// left
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mouse Button 2") PORT_CODE(MOUSECODE_BUTTON2)		// right
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mouse Button 1") PORT_CODE(MOUSECODE_BUTTON1)       // left
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mouse Button 2") PORT_CODE(MOUSECODE_BUTTON2)       // right
 	// FIXME: why does this not work?
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mouse Button 3") PORT_CODE(MOUSECODE_BUTTON3)		// middle
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mouse Button 3") PORT_CODE(MOUSECODE_BUTTON3)       // middle
 INPUT_PORTS_END
 
 /*************************************
@@ -1333,13 +1333,13 @@ void tek440x_state::tek4404(machine_config &config)
 	m_screen->set_screen_update(FUNC(tek440x_state::screen_update));
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set([this](int state)
-    {
+	{
 		LOGMASKED(LOG_IRQ,"%10s: vblank(%d) vint(%d)\n", machine().time().as_string(8), state, m_vint_enable);
 		if (state && m_vint_enable)
 		{
 			m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
 		}
-    });
+	});
 	PALETTE(config, "palette", FUNC(tek440x_state::palette),2);
 
 	MOS6551(config, m_acia, 40_MHz_XTAL / 4 / 10);
