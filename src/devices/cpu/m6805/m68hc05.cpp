@@ -432,14 +432,15 @@ void m68hc05_device::baud_w(u8 data)
 
 u8 m68hc05_device::sccr1_r()
 {
-	return m_sccr1 & 0xd1;
+	// 5.7.2: R8 (b7), T8 (b6), M (b4), WAKE (b3)
+	return m_sccr1 & 0xd8;
 }
 
 void m68hc05_device::sccr1_w(u8 data)
 {
 	if (BIT(data, 4) && !BIT(m_sccr1, 4))
 		logerror("m68hc05: 9-bit SCI characters selected (SCCR1 M), not supported\n");
-	m_sccr1 = (m_sccr1 & 0x80) | (data & 0x51);
+	m_sccr1 = (m_sccr1 & 0x80) | (data & 0x58);
 }
 
 u8 m68hc05_device::sccr2_r()
@@ -826,7 +827,7 @@ void m68hc05_device::add_spi_state()
 void m68hc05_device::add_sci_state()
 {
 	state_add(M68HC05_BAUD, "BAUD", m_baud).mask(0x37);
-	state_add(M68HC05_SCCR1, "SCCR1", m_sccr1).mask(0xd1);
+	state_add(M68HC05_SCCR1, "SCCR1", m_sccr1).mask(0xd8);
 	state_add(M68HC05_SCCR2, "SCCR2", m_sccr2).mask(0xff);
 	state_add(M68HC05_SCSR, "SCSR", m_scsr).mask(0xfe);
 	state_add(M68HC05_SCDR, "SCDR", m_scdr).mask(0xff);
@@ -974,6 +975,7 @@ void m68hc05c4_device::device_start()
 	add_port_state(std::array<bool, PORT_COUNT>{{ true, true, true, false }});
 	add_timer_state();
 	add_spi_state();
+	add_sci_state();
 }
 
 
@@ -1117,6 +1119,7 @@ void m68hc705c4a_device::device_start()
 	add_port_state(std::array<bool, PORT_COUNT>{{ true, true, true, false }});
 	add_timer_state();
 	add_spi_state();
+	add_sci_state();
 	add_ncop_state();
 
 	state_add(M68HC705C8A_OPTION, "OPTION", m_option).mask(0xff);
@@ -1213,6 +1216,7 @@ void m68hc705c8a_device::device_start()
 	add_port_state(std::array<bool, PORT_COUNT>{{ true, true, true, false }});
 	add_timer_state();
 	add_spi_state();
+	add_sci_state();
 	add_pcop_state();
 	add_ncop_state();
 
@@ -1404,6 +1408,7 @@ void m68hc05l9_device::device_start()
 
 	add_port_state(std::array<bool, PORT_COUNT>{{ true, true, true, false }});
 	add_timer_state();
+	add_sci_state();
 }
 
 
@@ -1487,6 +1492,7 @@ void m68hc05l11_device::device_start()
 
 	add_port_state(std::array<bool, PORT_COUNT>{{ true, true, true, false }});
 	add_timer_state();
+	add_sci_state();
 }
 
 
