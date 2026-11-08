@@ -162,6 +162,8 @@ kn2400_tonegen_device::kn2400_tonegen_device(const machine_config &mconfig, cons
 // Plane 0x09, indexes 0-1: pitch. Bit 16 is the index, bits 15-0 the data;
 // 0x400 per semitone, 0x1e200 is C7 for a sample of exponent 9. A pitch write
 // keys a voice that is not keyed.
+// FIXME: the octave of 0x1e200 is inferred; the pitch class is checked against
+// the firmware's notes
 // FIXME: key-on by a pitch write is inferred from the firmware's writes, and
 // would restart a releasing voice on a pitch bend
 // Plane 0x3f: status. 0xfc08 + g reads which of voices 16g-16g+15 still sound;
@@ -174,14 +176,15 @@ kn2400_tonegen_device::kn2400_tonegen_device(const machine_config &mconfig, cons
 // reverse flag << 9 | exponent << 4 | 8-bit flag << 3 | K), B (the first sample
 // word, in units of 16 words from the page start) and a copy of the record's
 // second word. Entry 0's record follows the directory, so its A is four times
-// the entry count. Words 1 and up of the record are [flags:2][code:6][value:8]:
-// a value of 0x80 or more is a segment of 256 - value granules of 2^(K+4)
-// samples; flag bit 0 puts the loop start at the end of the segment, bit 1 the
-// loop end. A loop end ends the record, as do both flags on any word. A loop
-// end with no loop start loops from the first sample. Without a loop end the
-// loop is the granule after the loop start, which is the end of the last
-// segment when no segment sets it. 8-bit samples are scaled by 2^(-b/2) for b
-// in bits 2-0 of their segment's code.
+// the entry count. Words 1 and up of the record are [flags:2][code:6][value:8],
+// each a run of granules of 2^(K+4) samples: 256 - value of them for a value of
+// 0x80 or more, one for any other value. Flag bit 0 puts the loop start at the
+// end of the run, bit 1 the loop end; both flags end the record. A loop end
+// ends the record too. A loop end with no loop start loops from the first
+// sample. Without a loop end the loop is the record's last granule. 8-bit
+// samples are scaled by 2^(-b/2) for b in bits 2-0 of their run's code.
+// FIXME: what the chip does after a record's last granule, and the gain law,
+// are inferred
 //
 // FIXME: the reverse flag is inferred from the one entry that sets it, the
 // Reverse Cymbal: its B is minus the last unit of the ride cymbal's recording,
@@ -270,31 +273,32 @@ void kn7000_tonegen_device::parse_samples()
 			for (int k = 1; k < 1024; k++)
 			{
 				const uint16_t w = wave_word(base + a + k);
-				if (BIT(w, 0, 8) >= 0x80)
-				{
-					pos += (0x100 - BIT(w, 0, 8)) * granule;
-					gain = std::exp2(-0.5f * BIT(w, 8, 3));
-					if (s.is8)
-						s.gain.emplace_back(pos, gain);
-					if (BIT(w, 14) && !have_start)
-					{
-						s.loop_start = pos;
-						have_start = true;
-					}
-					if (BIT(w, 15))
-					{
-						s.loop_end = pos;
-						have_end = true;
-						break;
-					}
-				}
+				const uint8_t value = BIT(w, 0, 8);
+				pos += (value >= 0x80 ? (0x100 - value) : 1) * granule;
+				gain = std::exp2(-0.5f * BIT(w, 8, 3));
+				if (s.is8)
+					s.gain.emplace_back(pos, gain);
 				if (BIT(w, 14, 2) == 3)
 					break;
+				if (BIT(w, 14) && !have_start)
+				{
+					s.loop_start = pos;
+					have_start = true;
+				}
+				if (BIT(w, 15))
+				{
+					s.loop_end = pos;
+					have_end = true;
+					break;
+				}
 			}
-			if (!have_start)
-				s.loop_start = have_end ? 0 : pos;
-			if (!have_end || s.loop_end <= s.loop_start)
-				s.loop_end = s.loop_start + granule;
+			if (!have_end)
+			{
+				s.loop_end = std::max(pos, granule);
+				s.loop_start = s.loop_end - granule;
+			}
+			else if (!have_start)
+				s.loop_start = 0;
 			if (s.is8)
 			{
 				s.gain.emplace_back(~uint32_t(0), gain);
