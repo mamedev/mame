@@ -241,10 +241,15 @@ public:
 		m_kb_tdata(true),
 		m_kb_rclamp(false),
 		m_kb_loop(false),
+		m_videocntl(0),
+		m_printer_pc(0),
+		m_fpu_finished(0),
 		m_mouse(0),
 		m_mouse_btns(0),
 		m_mouse_x(0),
 		m_mouse_y(0),
+		m_old_mouse_x(0),
+		m_old_mouse_y(0),
 		m_mouse_px(PHASE_STATIC),
 		m_mouse_py(PHASE_STATIC),
 		m_mouse_pc(0)
@@ -451,9 +456,9 @@ void tek440x_state::machine_reset()
 	m_keyboard->kdo_w(1);
 	mapcntl_w(0);
 	videocntl_w(0);
-
 	m_vint_enable = 0;
-
+	m_videoaddr = 0x600000;
+	
 	m_novram->recall(ASSERT_LINE);
 	m_novram->recall(CLEAR_LINE);
 }
