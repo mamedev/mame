@@ -483,6 +483,8 @@ u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	u16 woffset = m_videoaddr - 0xffe9;  // why 0xffe9 is TL..OS uses same magic number
 
+	u16 const *video_ram_last = m_vram + 0xffff;
+	
 	//LOG("screen_update: 0x%04x\n", woffset);
 	for (int y = 0; y < 480; y++)
 	{
@@ -492,7 +494,7 @@ u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 		for (int x = 0; x < 640; x += 16)
 		{
 			u16 const word = *(video_ram++);
-			u16 const word2 = *(video_ram & 0x61ffff);
+			u16 const word2 = video_ram < video_ram_last ? *(video_ram) : 0;
 			u32 dword = ((word << 16) | word2) ^ invert;
 			for (int b = 0; b < 16; b++)
 			{
