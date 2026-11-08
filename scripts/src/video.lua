@@ -211,6 +211,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/cat6613.h,VIDEOS["CAT6613"] = true
+--------------------------------------------------
+
+if VIDEOS["CAT6613"] then
+	files {
+		MAME_DIR .. "src/devices/video/cat6613.cpp",
+		MAME_DIR .. "src/devices/video/cat6613.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/cdp1861.h,VIDEOS["CDP1861"] = true
 --------------------------------------------------
 
