@@ -91,7 +91,8 @@ f108_device::f108_device(const machine_config &mconfig, const char *tag, device_
 	m_scc(*this, "scc"),
 	m_rom(*this, finder_base::DUMMY_TAG),
 	m_ata_irq(*this),
-	m_overlay(false)
+	m_overlay(false),
+	m_scc_sync(true)
 {
 }
 
@@ -230,14 +231,16 @@ void f108_device::ata_data_w(offs_t offset, u32 data, u32 mem_mask)
 
 u16 f108_device::scc_r(offs_t offset)
 {
-	m_primetimeii->via_sync();
+	if (m_scc_sync && !machine().side_effects_disabled())
+		m_primetimeii->via_sync();
 	u16 result = m_scc->dc_ab_r(offset);
 	return (result << 8) | result;
 }
 
 void f108_device::scc_w(offs_t offset, u16 data)
 {
-	m_primetimeii->via_sync();
+	if (m_scc_sync)
+		m_primetimeii->via_sync();
 	m_scc->dc_ab_w(offset, data >> 8);
 }
 
