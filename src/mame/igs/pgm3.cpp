@@ -854,6 +854,7 @@ static INPUT_PORTS_START( pgm3 )
 INPUT_PORTS_END
 
 // LCDC scanout subset: page 0, little-endian RGB565 or XRGB8888 in DDR.
+// Sample the framebuffer once per frame; scanline register latching is not modelled.
 // YUV and page switching are not implemented. Frame completion drives the
 // page-read interrupt. FIFO fill and pixel-clock/porch timing are approximate.
 u32 pgm3_state::lcd_status_r()
@@ -940,7 +941,6 @@ void pgm3_state::lcd_map(address_map &map)
 
 void pgm3_state::lcd_register_w(u32 reg, u32 data, u32 mem_mask)
 {
-	m_screen->update_partial(m_screen->vpos());
 	COMBINE_DATA(&m_lcd[reg]);
 	if (reg == 0 && !BIT(m_lcd[0], 0))
 		m_lcd[0x40 / 4] = 0;
