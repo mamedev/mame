@@ -631,7 +631,7 @@ void ms32_state::apply_sprite_effects(screen_device &screen, bitmap_rgb32 &bitma
 			if (spr[x] & 0xff)
 				continue;
 
-			u16 const cov_pri = cov[x] >> 12;
+			u16 const cov_pri = ((cov[x] >> 8) - 1) & 0xf;
 			u16 const idx_with = priority_index(false, tx_row[x] == 0xffff, roz_row[x] == 0xffff, road_row[x] == 0xffff, bg_row[x] == 0xffff, cov_pri, depth_row[x]);
 			u8 const code_with = m_priram[idx_with];
 
