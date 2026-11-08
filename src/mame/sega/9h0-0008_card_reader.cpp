@@ -9,12 +9,11 @@
 *******************************************************************************/
 
 #include "emu.h"
-
 #include "9h0-0008_card_reader.h"
-#include "9h0-0008_iox.h"
 
 #define VERBOSE (0)
 #include "logmacro.h"
+
 
 DEFINE_DEVICE_TYPE(BEENA_CARD_READER, sega_beena_card_reader_device, "sega_beena_card_reader", "Sega Beena Card Reader")
 DEFINE_DEVICE_TYPE(BEENA_CARD_READER_2061, sega_beena_card_reader_2061_device, "sega_beena_card_reader_2061", "Sega Beena Card Reader RD2061")
@@ -79,45 +78,49 @@ void sega_beena_card_reader_device::device_reset()
 
 u32 sega_beena_card_reader_device::read(bool is_enabled)
 {
-	if (machine().side_effects_disabled() || !is_enabled) {
+	if (!is_enabled) {
 		return 0x18;
 	}
 
 	if (m_card_state == START_WRITE_DATA) {
-		LOG("start write card: hold %d\n", m_card_hold_i);
-		m_card_hold_i--;
-		if (m_card_hold_i == 0) {
-			m_card_hold_i = m_num_hold;
-			m_card_data_i = 0;
-			m_card_status = 0;
-			m_card_state = WRITE_DATA;
+		if (!machine().side_effects_disabled()) {
+			LOG("start write card: hold %d\n", m_card_hold_i);
+			m_card_hold_i--;
+			if (m_card_hold_i == 0) {
+				m_card_hold_i = m_num_hold;
+				m_card_data_i = 0;
+				m_card_status = 0;
+				m_card_state = WRITE_DATA;
+			}
 		}
 
 		return 0x18 | (1 << 5);
 	}
 
 	if (m_card_state == WRITE_DATA) {
-		u8 data_bit = (m_card_data >> (m_num_bits - 1 - m_card_data_i)) & 1;
-		LOG("write card: bit %d -> %d (sync %d)\n", m_card_data_i, data_bit, m_card_status);
+		const u8 data_bit = BIT(m_card_data, m_num_bits - 1 - m_card_data_i);
+		if (!machine().side_effects_disabled()) {
+			LOG("write card: bit %d -> %d (sync %d)\n", m_card_data_i, data_bit, m_card_status);
 
-		m_card_hold_i--;
-		if (m_card_hold_i == 0) {
-			m_card_hold_i = m_num_hold;
-			m_card_status ^= 1;
+			m_card_hold_i--;
+			if (m_card_hold_i == 0) {
+				m_card_hold_i = m_num_hold;
+				m_card_status ^= 1;
 
-			// If barcodes stripes have spacing between them, each read bit takes 2 sync bits to be parsed.
-			if (m_is_sync_cycle) {
-				if (m_card_status == 0) {
+				// If barcodes stripes have spacing between them, each read bit takes 2 sync bits to be parsed.
+				if (m_is_sync_cycle) {
+					if (m_card_status == 0) {
+						m_card_data_i++;
+					}
+				} else {
 					m_card_data_i++;
 				}
-			} else {
-				m_card_data_i++;
-			}
 
-			if (m_card_data_i == m_num_bits) {
-				m_card_data_i = 0;
-				m_card_status = 0;
-				m_card_state = IDLE;
+				if (m_card_data_i == m_num_bits) {
+					m_card_data_i = 0;
+					m_card_status = 0;
+					m_card_state = IDLE;
+				}
 			}
 		}
 

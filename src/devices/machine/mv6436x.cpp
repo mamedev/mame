@@ -112,14 +112,20 @@ void mv64361_device::device_reset()
 	m_regs[REG_BASE_ADDRESS_ENABLE] = 0x00000000;
 
 	// pegasos2 specific override (TODO: make generic)
-	m_regs[REG_INTERNAL_BASE] = 0x0100f100;
+	m_regs[REG_INTERNAL_BASE] = 0x0100f100; // DevAD[5] pulled high
+
+	// presumely these values are pulled from the configuration eeprom
 	m_regs[REG_PCI1_IO_BASE] = 0x0100fe00;
 	m_regs[REG_PCI1_IO_SIZE] = 0x000000ff;
 	m_regs[REG_PCI1_IO_REMAP] = 0x00000000;
+	m_regs[REG_PCI1_MEM1_BASE] = 0x0100fd00;
+	m_regs[REG_PCI1_MEM1_SIZE] = 0x000000ff;
+	m_regs[REG_PCI1_MEM1_REMAP_LOW] = 0x00000000;
+	m_regs[REG_PCI1_MEM1_REMAP_HIGH] = 0x00000000;
 	m_regs[REG_BASE_ADDRESS_ENABLE] = 0x00efbfff;
 
-	for (int i = 0; i < 21; i++)
-		m_ranges[i].enabled = false;
+	for (auto &range : m_ranges)
+		range.enabled = false;
 
 	update_windows();
 }
@@ -1355,18 +1361,33 @@ void mv64361_device::update_windows()
 
 uint32_t mv64361_device::remap_offset(offs_t offset, uint16_t size, uint16_t remap)
 {
-	uint32_t size_mask = (size << 16) | 0xffff;
-	return (offset & size_mask) | ((remap << 16) & ~size_mask);
+	uint32_t const size_mask = (uint32_t(size) << 14) | 0x3fff;
+	return (offset & size_mask) | ((uint32_t(remap) << 14) & ~size_mask);
+}
+
+void mv64361_device::pci_io_delay(int bus, uint32_t pci_cycles)
+{
+	uint32_t const pci_clock = m_pcihost[bus]->clock();
+	if (pci_clock && !machine().side_effects_disabled())
+	{
+		// basic PCI latency emulation: address, turnaround (for reads) and data
+		// the pegasos2 serial console breaks when there are no delays (and the CPU frequency is high enough)
+		uint64_t const cpu_cycles = (uint64_t(m_cpu->clock()) * pci_cycles + pci_clock - 1) / pci_clock;
+		m_cpu->adjust_icount(-int(cpu_cycles));
+	}
 }
 
 uint32_t mv64361_device::pci0_io_r(offs_t offset, uint32_t mem_mask)
 {
-	return m_pcihost[0]->io_r(remap_offset(offset, m_regs[REG_PCI0_IO_SIZE], m_regs[REG_PCI0_IO_REMAP]), mem_mask);
+	uint32_t const data = m_pcihost[0]->io_r(remap_offset(offset, m_regs[REG_PCI0_IO_SIZE], m_regs[REG_PCI0_IO_REMAP]), mem_mask);
+	pci_io_delay(0, 3);
+	return data;
 }
 
 void mv64361_device::pci0_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_pcihost[0]->io_w(remap_offset(offset, m_regs[REG_PCI0_IO_SIZE], m_regs[REG_PCI0_IO_REMAP]), data, mem_mask);
+	pci_io_delay(0, 2);
 }
 
 uint32_t mv64361_device::pci0_mem0_r(offs_t offset, uint32_t mem_mask)
@@ -1411,12 +1432,15 @@ void mv64361_device::pci0_mem3_w(offs_t offset, uint32_t data, uint32_t mem_mask
 
 uint32_t mv64361_device::pci1_io_r(offs_t offset, uint32_t mem_mask)
 {
-	return m_pcihost[1]->io_r(remap_offset(offset, m_regs[REG_PCI1_IO_SIZE], m_regs[REG_PCI1_IO_REMAP]), mem_mask);
+	uint32_t const data = m_pcihost[1]->io_r(remap_offset(offset, m_regs[REG_PCI1_IO_SIZE], m_regs[REG_PCI1_IO_REMAP]), mem_mask);
+	pci_io_delay(1, 3);
+	return data;
 }
 
 void mv64361_device::pci1_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_pcihost[1]->io_w(remap_offset(offset, m_regs[REG_PCI1_IO_SIZE], m_regs[REG_PCI1_IO_REMAP]), data, mem_mask);
+	pci_io_delay(1, 2);
 }
 
 uint32_t mv64361_device::pci1_mem0_r(offs_t offset, uint32_t mem_mask)

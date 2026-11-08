@@ -26916,7 +26916,8 @@ xmenua
 
 @source:konami/yiear.cpp
 yiear
-yiear2
+yiearg
+yieari
 
 @source:konami/zr107.cpp
 jetwave
@@ -30937,6 +30938,9 @@ diamondk
 diamondko
 goldnchp
 
+@source:misc/digiblast.cpp
+digiblst
+
 @source:misc/discoboy.cpp
 discoboy
 discoboyp
@@ -32719,6 +32723,8 @@ fruitstbf
 fruitstbg
 fruitstbh
 fruitstbi
+fruitstbj
+fruitstbk
 goldnjkr
 goldnjkra
 
@@ -44069,9 +44075,6 @@ modulab
 @source:skeleton/digel804.cpp
 digel804
 ep804
-
-@source:skeleton/digiblast.cpp
-digiblst
 
 @source:skeleton/digijet.cpp
 digijet
