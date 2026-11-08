@@ -1209,7 +1209,17 @@ void scn_pci_device::write_mode(u8 data)
 				logerror("%s: Invalid synchronous mode configured\n", machine().describe_context());
 		}
 
-		// Old value of MR1 is transferred to MR2 (undocumented but verified on HW)
+		// Old value of MR1 is transferred to MR2 on the PCI/EPCI (undocumented
+		// but verified on hardware).  The asynchronous-only SCN2641 has
+		// independent mode registers, and software may program MR2 before MR1.
+		if (m_is_aci)
+		{
+			m_mode[0] = data;
+			if (!machine().side_effects_disabled())
+				m_mode_pointer = 1;
+			return;
+		}
+
 		std::swap(m_mode[0], data);
 	}
 
