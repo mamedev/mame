@@ -20,10 +20,10 @@ executed or interpreted on the host system.
 
 Many UML instruction have multiple instruction sizes.  Integer
 instructions default to 32-bit size.  Adding a ``D`` or ``d`` prefix to
-the mnemonic changes to 64-bit size (double word).  Floating point
+the mnemonic selects 64-bit size (double word).  Floating point
 instructions use the mnemonic prefix/suffix ``FS`` or ``fs`` for
-IEEE 754 32-bit format (single precision) or or the prefix/suffix ``FD``
-or ``fd`` for IEEE 754 64-bit format (double precision).
+IEEE 754 32-bit format (single precision) or the prefix/suffix ``FD`` or
+``fd`` for IEEE 754 64-bit format (double precision).
 
 
 .. _umlinst-special:
