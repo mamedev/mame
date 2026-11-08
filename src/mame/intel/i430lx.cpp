@@ -33,6 +33,7 @@ TODO:
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
+#include "bus/pci/et4kw32p.h"
 #include "bus/pci/pci_slot.h"
 //#include "bus/rs232/hlemouse.h"
 //#include "bus/rs232/null_modem.h"
@@ -57,19 +58,23 @@ class i430lx_state : public driver_device
 {
 public:
 	i430lx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_rtc(*this, "rtc")
-		, m_flash(*this, "pci:02.0:xbus_flash")
-		, m_keybc(*this, "pci:02.0:xbus_keybc")
-		, m_at_con(*this, "at_con")
-//      , m_ide(*this, "pci:02.0:xbus_ide%u", 0U)
+		: i430lx_state(mconfig, type, tag, "pci:02.0:xbus_flash", "pci:02.0:xbus_keybc")
 	{ }
 
 	void i430nx(machine_config &config) ATTR_COLD;
 	void sy029c2(machine_config &config) ATTR_COLD;
 
 protected:
+	i430lx_state(const machine_config &mconfig, device_type type, const char *tag, const char *flash_tag, const char *keybc_tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_rtc(*this, "rtc")
+		, m_flash(*this, flash_tag)
+		, m_keybc(*this, keybc_tag)
+		, m_at_con(*this, "at_con")
+//      , m_ide(*this, "pci:02.0:xbus_ide%u", 0U)
+	{ }
+
 //  void i430lx(machine_config &config) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
@@ -80,9 +85,18 @@ protected:
 	//required_device_array<ide_controller_32_device, 2> m_ide;
 
 	void x86_softlists(machine_config &config);
-private:
 	void main_io(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
+};
+
+class pcd5h_state : public i430lx_state
+{
+public:
+	pcd5h_state(const machine_config &mconfig, device_type type, const char *tag)
+		: i430lx_state(mconfig, type, tag, "pci:01.0:xbus_flash", "pci:01.0:xbus_keybc")
+	{ }
+
+	void pcd5h(machine_config &config) ATTR_COLD;
 };
 
 
@@ -181,6 +195,63 @@ void i430lx_state::sy029c2(machine_config &config)
 	ISA16_SLOT(config, "isa5", 0, "pci:02.0:isabus", pc_isa16_cards, nullptr, false);
 }
 
+// Siemens Nixdorf PCD-5H, System Board name is D842
+void pcd5h_state::pcd5h(machine_config &config)
+{
+	PENTIUM(config, m_maincpu, 75'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcd5h_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &pcd5h_state::main_io);
+	m_maincpu->set_irq_acknowledge_callback("pci:01.0:pic0", FUNC(pic8259_device::inta_cb));
+//  m_maincpu->smiact().set("pci:00.0", FUNC(i82434nx_pcmc_device::smi_act_w));
+
+	DS12885(config, m_rtc, XTAL(32'768));
+	m_rtc->set_binary(true);
+
+	PCI_ROOT(config, "pci");
+	I82434NX_PCMC(config, "pci:00.0", "maincpu", 64*1024*1024);
+
+	i82378zb_sio_device &isa(I82378ZB_SIO(config, "pci:01.0", 0, "maincpu"));
+	//isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
+	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
+	isa.cpureset().set_inputline("maincpu", INPUT_LINE_RESET);
+	isa.rtcale().set([this](u8 data) { m_rtc->address_w(data); });
+	isa.rtccs_read().set([this]() { return m_rtc->data_r(); });
+	isa.rtccs_write().set([this](u8 data) { m_rtc->data_w(data); });
+
+	// X-Bus devices
+	// TODO: unknown flash type, just to get a 0x20000 sized one
+	AMD_29F010(config, m_flash);
+
+	AT_KEYBOARD_CONTROLLER(config, m_keybc, XTAL(12'000'000));
+	m_keybc->hot_res().set("pci:01.0", FUNC(i82378zb_sio_device::cpu_reset_w));
+	m_keybc->gate_a20().set("pci:01.0", FUNC(i82378zb_sio_device::cpu_a20_w));
+	m_keybc->kbd_irq().set("pci:01.0", FUNC(i82378zb_sio_device::pc_irq1_w));
+	m_keybc->kbd_clk().set(m_at_con, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_keybc->kbd_data().set(m_at_con, FUNC(pc_kbdc_device::data_write_from_mb));
+
+	PC_KBDC(config, m_at_con, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
+	m_at_con->out_clock_cb().set(m_keybc, FUNC(at_keyboard_controller_device::kbd_clk_w));
+	m_at_con->out_data_cb().set(m_keybc, FUNC(at_keyboard_controller_device::kbd_data_w));
+
+//  IDE_CONTROLLER_32(config, m_ide[0]).options(ata_devices, "hdd", nullptr, false);
+//  m_ide[0]->irq_handler().set("pci:01.0", FUNC(i82378zb_sio_device::pc_irq14_w));
+//
+//  IDE_CONTROLLER_32(config, m_ide[1]).options(ata_devices, "cdrom", nullptr, false);
+//  m_ide[1]->irq_handler().set("pci:01.0", FUNC(i82378zb_sio_device::pc_irq15_w));
+
+	// 4x ISA slots and 1x PCI slot on the bus extension card
+	ISA16_SLOT(config, "isa1", 0, "pci:01.0:isabus", pc_isa16_cards, "fdc_smc", false);
+	ISA16_SLOT(config, "isa2", 0, "pci:01.0:isabus", pc_isa16_cards, "ide", false);
+	ISA16_SLOT(config, "isa3", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
+
+	PCI_SLOT(config, "pci:1", pci_cards, 12, 0, 2, 1, 3, nullptr);
+
+	ET4KW32P_PCI(config, "pci:03.0");
+
+	x86_softlists(config);
+}
+
 ROM_START( ga586ip )
 	ROM_REGION32_LE(0x20000, "pci:02.0:xbus_flash", 0)
 	// 05/06/96-NEPTUNE-2A59AG01-00
@@ -192,6 +263,12 @@ ROM_START( ga586ip )
 	// 10/18/94-NEPTUNE-2A59AG01-00
 	ROM_SYSTEM_BIOS(2, "v18",  "GA-586IP V1.8 (4.50)")
 	ROMX_LOAD( "ip.18",  0x00000, 0x20000, CRC(45c4c162) SHA1(8b3183fa8c2be91e3889eea8612e6e7ec6dac97e), ROM_BIOS(2))
+ROM_END
+
+ROM_START( pcd5h )
+	ROM_REGION32_LE(0x20000, "pci:01.0:xbus_flash", 0)
+	ROM_SYSTEM_BIOS(0, "v103", "PhoenixBIOS 4.04 Rev. 1.03.842")
+	ROMX_LOAD( "pcd-5h.bin", 0x00000, 0x20000, CRC(520f9b00) SHA1(f1dab8ae6f635a6941d0091ff44a811fe35a89a9), ROM_BIOS(0))
 ROM_END
 
 ROM_START( sy029c2 )
@@ -208,5 +285,6 @@ ROM_END
 // ...
 
 // NX chipset
-COMP( 1994, ga586ip, 0, 0,      i430nx,  0, i430lx_state, empty_init, "Gigabyte",  "GA-586IP (Intel I430NX Neptune chipset)", MACHINE_NOT_WORKING )
-COMP( 1994, sy029c2, 0, 0,      sy029c2, 0, i430lx_state, empty_init, "Soyo",      "SY-029C2 (Intel I430NX Neptune chipset)", MACHINE_NOT_WORKING )
+COMP( 1994, ga586ip, 0, 0,      i430nx,  0, i430lx_state, empty_init, "Gigabyte",        "GA-586IP (Intel I430NX Neptune chipset)", MACHINE_NOT_WORKING )
+COMP( 1995, pcd5h,   0, 0,      pcd5h,   0, pcd5h_state,  empty_init, "Siemens Nixdorf", "PCD-5H (Intel I430NX Neptune chipset)",   MACHINE_NOT_WORKING )
+COMP( 1994, sy029c2, 0, 0,      sy029c2, 0, i430lx_state, empty_init, "Soyo",            "SY-029C2 (Intel I430NX Neptune chipset)", MACHINE_NOT_WORKING )
