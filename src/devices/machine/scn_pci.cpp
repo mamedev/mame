@@ -1376,7 +1376,7 @@ void scn_pci_device::write_command(u8 data)
 		}
 
 		// Error reset command is not latched
-		data &= 0xef;
+		m_command &= 0xef;
 	}
 
 	if (!rx_enabled)
