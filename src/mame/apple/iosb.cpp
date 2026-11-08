@@ -270,7 +270,8 @@ TIMER_CALLBACK_MEMBER(iosb_base::mac_6015_tick)
 
 uint8_t iosb_base::via_in_a()
 {
-	u8 result = m_pa1() << 1;
+	u8 result = 0x80; // PA7
+	result |= m_pa1() << 1;
 	result |= m_pa2() << 2;
 	result |= m_pa4() << 4;
 	result |= m_pa6() << 6;
