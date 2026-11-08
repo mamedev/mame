@@ -295,6 +295,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/dc323.h,VIDEOS["DC323"] = true
+--------------------------------------------------
+
+if VIDEOS["DC323"] then
+	files {
+		MAME_DIR .. "src/devices/video/dc323.cpp",
+		MAME_DIR .. "src/devices/video/dc323.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/dl1416.h,VIDEOS["DL1416"] = true
 --------------------------------------------------
 

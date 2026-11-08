@@ -18348,6 +18348,9 @@ vt240
 vt320
 vt330
 
+@source:dec/vt340.cpp
+vt340
+
 @source:dec/vt520.cpp
 vt420
 vt520
