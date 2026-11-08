@@ -19,7 +19,7 @@
     - Joystick
 
     TODO:
-    - Everything
+    - Almost everything
 
     Notes:
     - Designed by bplan GmbH
@@ -28,6 +28,7 @@
 
 #include "emu.h"
 #include "bus/dimm/dimm.h"
+#include "bus/pci/pci_slot.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/input_merger.h"
@@ -117,8 +118,15 @@ DEVICE_INPUT_DEFAULTS_END
 
 void pegasos2_state::pegasos2(machine_config &config)
 {
-	PPC604(config, m_maincpu, 100000000); // wrong cpu/clock
+	PPC750(config, m_maincpu, 600'000'000); // TODO: PowerPC 750CXe
+	m_maincpu->set_bus_frequency(133'333'333);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pegasos2_state::mem_map);
+
+	DDR_SDRAM_SLOT(config, m_dimm[0], "infineon_256mb_pc333").set_address(0x56);
+	m_dimm[0]->sda_cb().set(m_smbus_data, FUNC(input_merger_device::in_w<1>));
+
+	DDR_SDRAM_SLOT(config, m_dimm[1], nullptr).set_address(0x57);
+	m_dimm[1]->sda_cb().set(m_smbus_data, FUNC(input_merger_device::in_w<2>));
 
 	MV64361(config, m_syscon, m_maincpu, "pci0:00.0", "pci1:00.0");
 	m_syscon->set_cs_tag(0, "^dimm1:rank0");
@@ -127,10 +135,16 @@ void pegasos2_state::pegasos2(machine_config &config)
 	m_syscon->set_cs_tag(3, "^dimm0:rank1");
 
 	PCI_ROOT(config, "pci0");
-	MV64361_PCI_HOST(config, "pci0:00.0");
+	MV64361_PCI_HOST(config, "pci0:00.0", 66'666'666);
+
+	PCI_SLOT(config, "pci0:1", agp_cards, 1, 0, 1, 2, 3, nullptr);
 
 	PCI_ROOT(config, "pci1");
-	MV64361_PCI_HOST(config, "pci1:00.0");
+	MV64361_PCI_HOST(config, "pci1:00.0", 33'333'333);
+
+	PCI_SLOT(config, "pci1:2", pci_cards, 7, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci1:3", pci_cards, 6, 2, 3, 0, 1, nullptr);
+	PCI_SLOT(config, "pci1:4", pci_cards, 5, 3, 0, 1, 2, nullptr);
 
 	vt8231_isa_device &isa(VT8231_ISA(config, "pci1:0c.0"));
 	isa.com1_txd_cb().set("com1", FUNC(rs232_port_device::write_txd));
@@ -144,14 +158,10 @@ void pegasos2_state::pegasos2(machine_config &config)
 	acpi.smbdt1_cb().append(m_dimm[0], FUNC(ddr_sdram_slot_device::sda_w));
 	acpi.smbdt1_cb().append(m_dimm[1], FUNC(ddr_sdram_slot_device::sda_w));
 
-	DDR_SDRAM_SLOT(config, m_dimm[0], "infineon_256mb_pc333").set_address(0x56);
-	m_dimm[0]->sda_cb().set(m_smbus_data, FUNC(input_merger_device::in_w<1>));
-
-	DDR_SDRAM_SLOT(config, m_dimm[1], nullptr).set_address(0x57);
-	m_dimm[1]->sda_cb().set(m_smbus_data, FUNC(input_merger_device::in_w<2>));
-
 	INPUT_MERGER_ALL_HIGH(config, m_smbus_data);
 	m_smbus_data->output_handler().set(acpi, FUNC(vt8231_acpi_device::smbdt1_w));
+
+	// IEEE 1394: PCI device 1, INTA# -> INTD
 
 	rs232_port_device &com1(RS232_PORT(config, "com1", default_rs232_devices, "terminal"));
 	com1.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(com1_defaults));
@@ -170,8 +180,11 @@ void pegasos2_state::pegasos2(machine_config &config)
 
 ROM_START( pegasos2 )
 	ROM_REGION(0x80000, "maincpu", ROMREGION_64BIT | ROMREGION_BE)
-	// extracted from 'up050404'
-	ROM_LOAD("pegasos2.rom", 0x00000, 0x80000, CRC(7e992266) SHA1(08dc28afb3d10fb223376a28eebfd07c9f8df9fa))
+	ROM_DEFAULT_BIOS("v11")
+	ROM_SYSTEM_BIOS( 0, "v11", "1.1 2004-04-05" ) // extracted from 'up050404'
+	ROMX_LOAD("pegasos2_11_2004_04_05.rom", 0x00000, 0x80000, CRC(7e992266) SHA1(08dc28afb3d10fb223376a28eebfd07c9f8df9fa), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "v12", "1.2 2004-10-08" ) // from 'update_1.2_08.10.2004.gz'
+	ROMX_LOAD("pegasos2_12_2004-10-08.rom", 0x00000, 0x80000, CRC(125cd766) SHA1(f031142b7990df741dca06f89dcd84fc5f24a2a9), ROM_BIOS(1) )
 ROM_END
 
 

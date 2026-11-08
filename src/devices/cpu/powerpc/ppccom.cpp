@@ -1320,6 +1320,14 @@ void ppc_device::device_reset()
 		uint32_t const ratio = m_system_clock ? ((uint64_t(clock()) * 4 + m_system_clock) / (uint64_t(m_system_clock) * 2)) : 0;
 		m_core->spr[SPR603_HID1] = (ratio < std::size(pll_cfg)) ? (uint32_t(pll_cfg[ratio]) << 28) : 0;
 	}
+	else if (m_flavor == PPC_MODEL_750)
+	{
+		// The 740/750 HID1 register is different from the 603e
+		// Source: MPC750 hardware specifications, table 17 (indexed by twice the CPU:bus ratio)
+		static constexpr uint8_t pll_cfg[17] = {0, 0, 0x3, 0, 0, 0, 0x8, 0xe, 0xa, 0x7, 0xb, 0x9, 0xd, 0x5, 0x2, 0x1, 0xc};
+		uint32_t const ratio = m_system_clock ? ((uint64_t(clock()) * 4 + m_system_clock) / (uint64_t(m_system_clock) * 2)) : 0;
+		m_core->spr[SPR603_HID1] = (ratio < std::size(pll_cfg)) ? (uint32_t(pll_cfg[ratio]) << 28) : 0;
+	}
 
 	// time base starts here
 	m_tb_zero_cycles = total_cycles();
@@ -2406,6 +2414,16 @@ void ppc_device::ppccom_execute_mtspr()
 				return;
 			case SPR4XX_TBHI:
 				set_timebase((get_timebase() & ~u64(0x00000000ffffffffU)) | ((uint64_t)(m_core->param1 & 0x00ffffff) << 32));
+				return;
+		}
+	}
+
+	if (m_flavor == PPC_MODEL_750)
+	{
+		switch (m_core->param0)
+		{
+			/* read-only */
+			case SPR603_HID1:
 				return;
 		}
 	}
