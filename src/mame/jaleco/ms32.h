@@ -117,15 +117,6 @@ protected:
 	bitmap_ind16 m_layer_road;
 	bitmap_ind8 m_layer_depth;
 
-	// Brightness registers and their derived multipliers.
-	u32 m_brt[4];
-	s32 m_brt_r;
-	s32 m_brt_g;
-	s32 m_brt_b;
-	s32 m_brt1_r;
-	s32 m_brt1_g;
-	s32 m_brt1_b;
-
 	void flipscreen_w(int state);
 	virtual void video_start() override ATTR_COLD;
 	virtual void draw_tile_layers(screen_device &screen, const rectangle &cliprect);
@@ -160,6 +151,16 @@ private:
 	memory_share_creator<u16> m_sprram;
 	memory_share_creator<u16> m_bgram;
 	optional_ioport_array<5> m_io_mj;
+
+	// Brightness registers and their derived multipliers.
+	u32 m_brt[4];
+	s32 m_brt_r;
+	s32 m_brt_g;
+	s32 m_brt_b;
+	s32 m_brt1_r;
+	s32 m_brt1_g;
+	s32 m_brt1_b;
+
 	memory_share_creator<u8> m_nvram;
 
 	std::unique_ptr<u16[]> m_sprram_buffer;

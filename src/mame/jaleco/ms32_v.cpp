@@ -537,9 +537,9 @@ void ms32_state::draw_tile_layers(screen_device &screen, const rectangle &clipre
     bit 2      effect disable (1 = normal, 0 = half-brightness for selected non-sprite layers)
     bits 1-0   brightness bank select (0 = none, 1/3 = bank 0, 2 = bank 1)
 
-    The sprite coverage pass applies the bit-2-clear effect to the selected
-    non-sprite layer beneath transparent sprite pixels. The exact hardware
-    effect still needs verification.
+    When the sprite input is selected, the coverage pass applies the bit-2-clear
+    effect to the composited pixel beneath transparent sprite pixels. The exact
+    hardware effect still needs verification.
 */
 void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -631,11 +631,16 @@ void ms32_state::apply_sprite_effects(screen_device &screen, bitmap_rgb32 &bitma
 			if (spr[x] & 0xff)
 				continue;
 
-			u16 const cov_pri = ((cov[x] >> 8) - 1) & 0xf;
+			u16 const cov_pri = cov[x] >> 12;
 			u16 const idx_with = priority_index(false, tx_row[x] == 0xffff, roz_row[x] == 0xffff, road_row[x] == 0xffff, bg_row[x] == 0xffff, cov_pri, depth_row[x]);
 			u8 const code_with = m_priram[idx_with];
 
 			if (code_with == 0x00 || BIT(code_with, 6) || BIT(code_with, 2))
+				continue;
+
+			// Coverage can act as an effect mask when the sprite input is selected.
+			// A selected tile layer must not turn transparent sprite padding into a shadow.
+			if (code_with & 0x38)
 				continue;
 
 			{
