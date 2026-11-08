@@ -156,6 +156,7 @@ device_rs232_port_interface::~device_rs232_port_interface()
 
 #include "adsp2181ekl.h"
 #include "auto3a.h"
+#include "bus/centronics/hp_lj3p.h"
 #include "ie15.h"
 #include "heath_h19.h"
 #include "hlemouse.h"
@@ -183,6 +184,7 @@ void default_rs232_devices(device_slot_interface &device)
 	device.option_add("adsp2181ekl",   ADSP2181EKL);
 	device.option_add("auto3a",        SERIAL_TERMINAL_AUTO3A);
 	device.option_add("dec_loopback",  DEC_RS232_LOOPBACK);
+	device.option_add("hplj3p",        HP_LJ3P);
 	device.option_add("h19",           SERIAL_TERMINAL_H19);
 	device.option_add("ie15",          SERIAL_TERMINAL_IE15);
 	device.option_add("keyboard",      SERIAL_KEYBOARD);

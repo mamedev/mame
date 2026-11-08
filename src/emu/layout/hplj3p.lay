@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:rfka01
+HP LaserJet IIIP: paper and control panel
+-->
+<mamelayout version="2">
+	<element name="case"><rect><color red="0.89" green="0.87" blue="0.80" /></rect></element>
+	<element name="case_dark"><rect><color red="0.80" green="0.78" blue="0.71" /></rect></element>
+	<element name="bezel"><rect><color red="0.70" green="0.69" blue="0.64" /></rect></element>
+	<element name="lcd_back"><rect><color red="0.62" green="0.74" blue="0.62" /></rect></element>
+	<element name="key" defstate="0">
+		<rect state="0"><color red="0.95" green="0.93" blue="0.82" /></rect>
+		<rect state="1"><color red="0.80" green="0.78" blue="0.66" /></rect>
+	</element>
+	<element name="led_green" defstate="0">
+		<rect state="0"><color red="0.20" green="0.28" blue="0.20" /></rect>
+		<rect state="1"><color red="0.30" green="1.00" blue="0.30" /></rect>
+	</element>
+	<element name="led_amber" defstate="0">
+		<rect state="0"><color red="0.32" green="0.26" blue="0.16" /></rect>
+		<rect state="1"><color red="1.00" green="0.70" blue="0.15" /></rect>
+	</element>
+	<element name="t_online"><text string="ON LINE"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="t_reset"><text string="Reset"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="t_menu"><text string="MENU"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="t_fonts"><text string="Print Fonts"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="t_enter"><text string="ENTER"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="t_test"><text string="Test"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="t_ff"><text string="FORM FEED"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="t_cont"><text string="Continue"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="t_alt"><text string="Alt"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="t_plus"><text string="+"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="t_minus"><text string="-"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="t_model"><text string="HP LaserJet IIIP" align="1"><color red="0.30" green="0.30" blue="0.34" /></text></element>
+
+	<view name="Paper and Control Panel">
+		<screen tag="paper"><bounds x="0" y="0" width="637" height="877" /></screen>
+
+		<element ref="case"><bounds x="650" y="0" width="420" height="300" /></element>
+		<element ref="case_dark"><bounds x="650" y="0" width="420" height="6" /></element>
+		<element ref="t_model"><bounds x="670" y="250" width="300" height="28" /></element>
+
+		<!-- indicators left of the key rows -->
+		<element name="hplj3p_online_led" ref="led_green"><bounds x="668" y="58" width="8" height="34" /></element>
+		<element name="hplj3p_formfeed_led" ref="led_amber"><bounds x="668" y="128" width="8" height="34" /></element>
+
+		<!-- keys: primary function above, Alt function below -->
+		<element ref="key" inputtag="KEYS" inputmask="0x01"><bounds x="686" y="50" width="80" height="50" /></element>
+		<element ref="t_online"><bounds x="690" y="56" width="72" height="16" /></element>
+		<element ref="t_reset"><bounds x="690" y="78" width="72" height="14" /></element>
+		<element ref="key" inputtag="KEYS" inputmask="0x04"><bounds x="776" y="50" width="80" height="50" /></element>
+		<element ref="t_menu"><bounds x="780" y="56" width="72" height="16" /></element>
+		<element ref="t_fonts"><bounds x="780" y="78" width="72" height="14" /></element>
+		<element ref="key" inputtag="KEYS" inputmask="0x08"><bounds x="866" y="50" width="80" height="50" /></element>
+		<element ref="t_enter"><bounds x="870" y="56" width="72" height="16" /></element>
+		<element ref="t_test"><bounds x="870" y="78" width="72" height="14" /></element>
+
+		<element ref="key" inputtag="KEYS" inputmask="0x02"><bounds x="686" y="120" width="80" height="50" /></element>
+		<element ref="t_ff"><bounds x="690" y="126" width="72" height="16" /></element>
+		<element ref="t_cont"><bounds x="690" y="148" width="72" height="14" /></element>
+		<element ref="key" inputtag="KEYS" inputmask="0x20"><bounds x="776" y="120" width="80" height="50" /></element>
+		<element ref="t_alt"><bounds x="780" y="134" width="72" height="18" /></element>
+		<element ref="key" inputtag="KEYS" inputmask="0x10"><bounds x="866" y="120" width="80" height="50" /></element>
+		<element ref="t_plus"><bounds x="870" y="124" width="72" height="20" /></element>
+		<element ref="t_minus"><bounds x="870" y="146" width="72" height="20" /></element>
+
+		<!-- display: two lines of eight characters -->
+		<element ref="bezel"><bounds x="958" y="62" width="100" height="44" /></element>
+		<element ref="lcd_back"><bounds x="962" y="66" width="92" height="36" /></element>
+		<screen tag="lcd"><bounds x="964" y="68" width="88" height="31" /></screen>
+	</view>
+
+	<view name="Control Panel">
+		<element ref="case"><bounds x="0" y="0" width="420" height="220" /></element>
+		<element name="hplj3p_online_led" ref="led_green"><bounds x="18" y="58" width="8" height="34" /></element>
+		<element name="hplj3p_formfeed_led" ref="led_amber"><bounds x="18" y="128" width="8" height="34" /></element>
+		<element ref="key" inputtag="KEYS" inputmask="0x01"><bounds x="36" y="50" width="80" height="50" /></element>
+		<element ref="t_online"><bounds x="40" y="56" width="72" height="16" /></element>
+		<element ref="t_reset"><bounds x="40" y="78" width="72" height="14" /></element>
+		<element ref="key" inputtag="KEYS" inputmask="0x04"><bounds x="126" y="50" width="80" height="50" /></element>
+		<element ref="t_menu"><bounds x="130" y="56" width="72" height="16" /></element>
+		<element ref="t_fonts"><bounds x="130" y="78" width="72" height="14" /></element>
+		<element ref="key" inputtag="KEYS" inputmask="0x08"><bounds x="216" y="50" width="80" height="50" /></element>
+		<element ref="t_enter"><bounds x="220" y="56" width="72" height="16" /></element>
+		<element ref="t_test"><bounds x="220" y="78" width="72" height="14" /></element>
+		<element ref="key" inputtag="KEYS" inputmask="0x02"><bounds x="36" y="120" width="80" height="50" /></element>
+		<element ref="t_ff"><bounds x="40" y="126" width="72" height="16" /></element>
+		<element ref="t_cont"><bounds x="40" y="148" width="72" height="14" /></element>
+		<element ref="key" inputtag="KEYS" inputmask="0x20"><bounds x="126" y="120" width="80" height="50" /></element>
+		<element ref="t_alt"><bounds x="130" y="134" width="72" height="18" /></element>
+		<element ref="key" inputtag="KEYS" inputmask="0x10"><bounds x="216" y="120" width="80" height="50" /></element>
+		<element ref="t_plus"><bounds x="220" y="124" width="72" height="20" /></element>
+		<element ref="t_minus"><bounds x="220" y="146" width="72" height="20" /></element>
+		<element ref="bezel"><bounds x="308" y="62" width="100" height="44" /></element>
+		<element ref="lcd_back"><bounds x="312" y="66" width="92" height="36" /></element>
+		<screen tag="lcd"><bounds x="314" y="68" width="88" height="31" /></screen>
+	</view>
+</mamelayout>

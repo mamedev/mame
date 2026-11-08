@@ -130,6 +130,7 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 #include "epson_rx80.h"
 #include "hardlock.h"
 #include "hasp_savquest.h"
+#include "hp_lj3p.h"
 #include "neomania_adapter.h"
 #include "mz1p16.h"
 #include "nec_p72.h"
@@ -152,6 +153,7 @@ void centronics_devices(device_slot_interface &device)
 	device.option_add("lx810l", EPSON_LX810L);
 	device.option_add("ap2000", EPSON_AP2000);
 	device.option_add("rx80", EPSON_RX80);
+	device.option_add("hplj3p", HP_LJ3P);
 	device.option_add("p72", NEC_P72);
 	device.option_add("printer", CENTRONICS_PRINTER);
 	device.option_add("digiblst", CENTRONICS_DIGIBLASTER);
