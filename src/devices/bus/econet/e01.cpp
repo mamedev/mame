@@ -34,30 +34,13 @@
 
 */
 
-/*
-
-    TODO:
-
-    - centronics strobe
-    - econet clock speed select
-    - ADLC interrupts
-    - ECONET device
-    - artwork
-    - hard disk
-
-        E20: Rodime RO652 (-chs 306,4,17,512)
-        E40S: Rodime RO3057S (-chs 680,5,26,512)
-        E60S:
-
-*/
-
 #include "emu.h"
 #include "e01.h"
-
-#include "bus/scsi/scsihd.h"
-#include "softlist_dev.h"
-
+#include "bus/nscsi/devices.h"
 #include "formats/afs_dsk.h"
+#include "machine/nscsi_bus.h"
+#include "machine/rescap.h"
+#include "softlist_dev.h"
 
 
 //**************************************************************************
@@ -70,7 +53,6 @@
 #define MC6854_TAG      "mc6854"
 #define HD146818_TAG    "hd146818"
 #define CENTRONICS_TAG  "centronics"
-#define SCSIBUS_TAG     "scsi"
 
 
 
@@ -82,7 +64,7 @@ DEFINE_DEVICE_TYPE(ECONET_E01,  econet_e01_device,  "econet_e01",  "Acorn FileSt
 DEFINE_DEVICE_TYPE(ECONET_E01S, econet_e01s_device, "econet_e01s", "Acorn FileStore E01S")
 
 econet_e01s_device::econet_e01s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: econet_e01_device(mconfig, ECONET_E01S, tag, owner, clock, TYPE_E01S)
+	: econet_e01_device(mconfig, ECONET_E01S, tag, owner, clock)
 {
 }
 
@@ -93,8 +75,6 @@ econet_e01s_device::econet_e01s_device(const machine_config &mconfig, const char
 
 ROM_START( e01 )
 	ROM_REGION( 0x10000, R65C102_TAG, 0 )
-	//ROM_DEFAULT_BIOS("v131")
-	//ROM_SYSTEM_BIOS( 0, "v131", "V 1.31" )
 	ROM_LOAD( "0254,205-04 e01 fs",  0x0000, 0x8000, CRC(ae666c76) SHA1(0954119eb5cd09cdbadf76d60d812aa845838d5a) )
 	ROM_LOAD( "0254,205-03 e01 mos", 0x8000, 0x8000, CRC(a13e8014) SHA1(6f44a1a48108c60a64a1774cb30c1a59c4a6a199) )
 ROM_END
@@ -106,11 +86,11 @@ ROM_END
 
 ROM_START( e01s )
 	ROM_REGION( 0x10000, R65C102_TAG, 0 )
-	//ROM_DEFAULT_BIOS("v140")
-	//ROM_SYSTEM_BIOS( 0, "v133", "V 1.33" ) // 0282,008-02 e01s rom
-	ROM_LOAD( "e01sv133.rom",  0x0000, 0x10000, CRC(2a4a0032) SHA1(54ad68ceae44992293ccdd64ec88ad8520deec22) ) // which label?
-	//ROM_SYSTEM_BIOS( 1, "v140", "V 1.40" )
-	ROM_LOAD( "e01sv140.rom",  0x0000, 0x10000, CRC(5068fe86) SHA1(9b8740face15b5541e2375b3054988af00757931) ) // which label?
+	ROM_DEFAULT_BIOS("v140")
+	ROM_SYSTEM_BIOS( 0, "v133", "v1.33" ) // 0282,008-02 e01s rom
+	ROMX_LOAD( "e01sv133.rom", 0x0000, 0x10000, CRC(2a4a0032) SHA1(54ad68ceae44992293ccdd64ec88ad8520deec22), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "v140", "v1.40" )
+	ROMX_LOAD( "e01sv140.rom", 0x0000, 0x10000, CRC(5068fe86) SHA1(9b8740face15b5541e2375b3054988af00757931), ROM_BIOS(1) )
 ROM_END
 
 
@@ -120,15 +100,12 @@ ROM_END
 
 const tiny_rom_entry *econet_e01_device::device_rom_region() const
 {
-	switch (m_variant)
-	{
-	default:
-	case TYPE_E01:
-		return ROM_NAME( e01 );
+	return ROM_NAME( e01 );
+}
 
-	case TYPE_E01S:
-		return ROM_NAME( e01s );
-	}
+const tiny_rom_entry *econet_e01s_device::device_rom_region() const
+{
+	return ROM_NAME( e01s );
 }
 
 
@@ -160,6 +137,19 @@ void econet_e01_device::econet_data_w(int state)
 	m_econet->data_w(this, state);
 }
 
+void econet_e01_device::adlc_rts_w(int state)
+{
+	m_econet->rts_w(this, state);
+}
+
+void econet_e01_device::clk_det_w(int state)
+{
+	m_clk_present = state;
+
+	m_adlc->set_dcd(!state);
+	m_adlc->set_cts(!(m_clk_present && m_data_valid));
+}
+
 void econet_e01_device::via_irq_w(int state)
 {
 	m_via_irq = state;
@@ -169,12 +159,19 @@ void econet_e01_device::via_irq_w(int state)
 
 void econet_e01_device::clk_en_w(int state)
 {
-	m_clk_en = state;
+	m_clk_en = !state;
+
+	update_econet_clk();
 }
 
 void econet_e01_device::floppy_formats_afs(format_registration &fr)
 {
 	fr.add(FLOPPY_AFS_FORMAT);
+}
+
+static void e01_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
 }
 
 void econet_e01_device::fdc_irq_w(int state)
@@ -191,27 +188,37 @@ void econet_e01_device::fdc_drq_w(int state)
 	update_interrupts();
 }
 
+void econet_e01_device::fdc_hld_w(int state)
+{
+	m_fdc_hld = state;
+
+	m_fdc->set_force_ready(state);
+
+	for (auto &connector : m_floppy)
+		if (connector->get_device())
+			connector->get_device()->mon_w(!state);
+
+	update_floppy();
+}
+
 void econet_e01_device::scsi_bsy_w(int state)
 {
-	m_scsi_ctrl_in->write_bit1(state);
-
 	if (state)
-	{
-		m_scsibus->write_sel(0);
-	}
+		m_scsi->sel_w(0);
 }
 
 void econet_e01_device::scsi_req_w(int state)
 {
-	m_scsi_ctrl_in->write_bit5(state);
-
 	if (!state)
-	{
-		m_scsibus->write_ack(0);
-	}
+		m_scsi->ack_w(0);
 
 	m_hdc_irq = !state;
 	update_interrupts();
+}
+
+void econet_e01_device::scsi_io_w(int state)
+{
+	m_scsi->write(state ? 0 : m_scsi_data);
 }
 
 
@@ -223,7 +230,7 @@ void econet_e01_device::e01_mem(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(econet_e01_device::read), FUNC(econet_e01_device::write));
 	map(0xfc00, 0xfc00).mirror(0x00c3).w(m_rtc, FUNC(mc146818_device::address_w));
-	map(0xfc04, 0xfc04).mirror(0x00c3).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w));
+	map(0xfc04, 0xfc04).mirror(0x00c3).rw(FUNC(econet_e01_device::rtc_data_r), FUNC(econet_e01_device::rtc_data_w));
 	map(0xfc08, 0xfc08).mirror(0x00c0).r(FUNC(econet_e01_device::ram_select_r)).w(FUNC(econet_e01_device::floppy_w));
 	map(0xfc0c, 0xfc0f).mirror(0x00c0).rw(WD2793_TAG, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
 	map(0xfc10, 0xfc1f).mirror(0x00c0).m(R6522_TAG, FUNC(via6522_device::map));
@@ -232,7 +239,7 @@ void econet_e01_device::e01_mem(address_map &map)
 	map(0xfc28, 0xfc28).mirror(0x00c3).rw(FUNC(econet_e01_device::network_irq_enable_r), FUNC(econet_e01_device::network_irq_enable_w));
 	map(0xfc2c, 0xfc2c).mirror(0x00c3).portr(m_flap);
 	map(0xfc30, 0xfc30).mirror(0x00c0).rw(FUNC(econet_e01_device::hdc_data_r), FUNC(econet_e01_device::hdc_data_w));
-	map(0xfc31, 0xfc31).mirror(0x00c0).r("scsi_ctrl_in", FUNC(input_buffer_device::read));
+	map(0xfc31, 0xfc31).mirror(0x00c0).r(FUNC(econet_e01_device::hdc_status_r));
 	map(0xfc32, 0xfc32).mirror(0x00c0).w(FUNC(econet_e01_device::hdc_select_w));
 	map(0xfc33, 0xfc33).mirror(0x00c0).w(FUNC(econet_e01_device::hdc_irq_enable_w));
 }
@@ -254,26 +261,32 @@ void econet_e01_device::device_add_mconfig(machine_config &config)
 	// devices
 	via6522_device &via(R65C22(config, R6522_TAG, 8_MHz_XTAL / 4));
 	via.writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
+	via.ca2_handler().set(m_centronics, FUNC(centronics_device::write_strobe));
+	via.cb2_handler().set(FUNC(econet_e01_device::clk_en_w));
 	via.irq_handler().set(FUNC(econet_e01_device::via_irq_w));
 
 	MC6854(config, m_adlc);
 	m_adlc->out_irq_cb().set(FUNC(econet_e01_device::adlc_irq_w));
 	m_adlc->out_txd_cb().set(FUNC(econet_e01_device::econet_data_w));
+	m_adlc->out_rts_cb().set(FUNC(econet_e01_device::adlc_rts_w));
+
+	TTL74123(config, m_clk_det, RES_K(39), CAP_N(2.2));
+	m_clk_det->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	m_clk_det->set_a_pin_value(0);
+	m_clk_det->set_clear_pin_value(1);
+	m_clk_det->out_cb().set(FUNC(econet_e01_device::clk_det_w));
 
 	WD2793(config, m_fdc, 8_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(econet_e01_device::fdc_irq_w));
 	m_fdc->drq_wr_callback().set(FUNC(econet_e01_device::fdc_drq_w));
+	m_fdc->hld_wr_callback().set(FUNC(econet_e01_device::fdc_hld_w));
+	m_fdc->enmf_rd_callback().set_constant(0);
 
-	for (int i = 0; i < 2; i++)
-	{
-		FLOPPY_CONNECTOR(config, m_floppy[i]);
-		m_floppy[i]->option_add("35dd", FLOPPY_35_DD);
-		m_floppy[i]->set_default_option("35dd");
-		m_floppy[i]->set_formats(floppy_formats_afs);
-	}
+	FLOPPY_CONNECTOR(config, m_floppy[0], e01_floppies, "35dd", floppy_formats_afs).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], e01_floppies, "35dd", floppy_formats_afs).enable_sound(true);
 
-	software_list_device &softlist(SOFTWARE_LIST(config, "flop_ls_e01"));
-	softlist.set_original("e01_flop");
+	SOFTWARE_LIST(config, "flop_ls_e01").set_original("e01_flop");
+	SOFTWARE_LIST(config, "hdd_ls_e01").set_original("e01_hdd");
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(R6522_TAG, FUNC(via6522_device::write_ca1));
@@ -281,23 +294,16 @@ void econet_e01_device::device_add_mconfig(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	SCSI_PORT(config, m_scsibus);
-	m_scsibus->set_data_input_buffer(m_scsi_data_in);
-	m_scsibus->msg_handler().set(m_scsi_ctrl_in, FUNC(input_buffer_device::write_bit0));
-	m_scsibus->bsy_handler().set(FUNC(econet_e01_device::scsi_bsy_w)); // bit1
-	// bit 2 0
-	// bit 3 0
-	// bit 4 NIRQ
-	m_scsibus->req_handler().set(FUNC(econet_e01_device::scsi_req_w)); // bit5
-	m_scsibus->io_handler().set(m_scsi_ctrl_in, FUNC(input_buffer_device::write_bit6));
-	m_scsibus->cd_handler().set(m_scsi_ctrl_in, FUNC(input_buffer_device::write_bit7));
-	m_scsibus->set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-
-	OUTPUT_LATCH(config, m_scsi_data_out);
-	m_scsibus->set_output_latch(*m_scsi_data_out);
-
-	INPUT_BUFFER(config, m_scsi_data_in);
-	INPUT_BUFFER(config, m_scsi_ctrl_in);
+	NSCSI_BUS(config, "scsi");
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "e01_hd");
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:7", default_scsi_devices, "scsicb", true)
+		.option_add_internal("scsicb", NSCSI_CB)
+		.machine_config([this] (device_t *device) {
+			downcast<nscsi_callback_device &>(*device).bsy_callback().set(*this, FUNC(econet_e01_device::scsi_bsy_w));
+			downcast<nscsi_callback_device &>(*device).req_callback().set(*this, FUNC(econet_e01_device::scsi_req_w));
+			downcast<nscsi_callback_device &>(*device).io_callback().set(*this, FUNC(econet_e01_device::scsi_io_w));
+		});
 
 	// internal ram
 	RAM(config, m_ram);
@@ -318,6 +324,20 @@ static INPUT_PORTS_START( e01 )
 	PORT_DIPNAME( 0x80, 0x00, "SW3")
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x80, DEF_STR( On ) )
+
+	PORT_START("LINKS")
+	PORT_CONFNAME( 0x08, 0x00, "Econet Clock Mark")
+	PORT_CONFSETTING( 0x00, "1 us (J3)" )
+	PORT_CONFSETTING( 0x08, "2 us (J4)" )
+	PORT_CONFNAME( 0x01, 0x01, "J5")
+	PORT_CONFSETTING( 0x00, "Fitted" )
+	PORT_CONFSETTING( 0x01, "Open" )
+	PORT_CONFNAME( 0x02, 0x02, "J6")
+	PORT_CONFSETTING( 0x00, "Fitted" )
+	PORT_CONFSETTING( 0x02, "Open" )
+	PORT_CONFNAME( 0x04, 0x00, "J7")
+	PORT_CONFSETTING( 0x00, "Fitted" )
+	PORT_CONFSETTING( 0x04, "Open" )
 INPUT_PORTS_END
 
 
@@ -384,39 +404,45 @@ inline void econet_e01_device::hdc_irq_enable(int enabled)
 //-------------------------------------------------
 
 econet_e01_device::econet_e01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: econet_e01_device(mconfig, ECONET_E01, tag, owner, clock, TYPE_E01)
+	: econet_e01_device(mconfig, ECONET_E01, tag, owner, clock)
 {
 }
 
 
-econet_e01_device::econet_e01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant)
+econet_e01_device::econet_e01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_econet_interface(mconfig, *this)
 	, m_maincpu(*this, R65C102_TAG)
 	, m_fdc(*this, WD2793_TAG)
 	, m_adlc(*this, MC6854_TAG)
+	, m_clk_det(*this, "clk_det")
 	, m_rtc(*this, HD146818_TAG)
 	, m_ram(*this, RAM_TAG)
-	, m_scsibus(*this, SCSIBUS_TAG)
-	, m_scsi_data_out(*this, "scsi_data_out")
-	, m_scsi_data_in(*this, "scsi_data_in")
-	, m_scsi_ctrl_in(*this, "scsi_ctrl_in")
+	, m_scsi(*this, "scsi:7:scsicb")
 	, m_floppy(*this, WD2793_TAG":%u", 0U)
 	, m_rom(*this, R65C102_TAG)
 	, m_centronics(*this, CENTRONICS_TAG)
 	, m_flap(*this, "FLAP")
+	, m_links(*this, "LINKS")
 	, m_led(*this, "led_0")
-	, m_adlc_ie(0)
-	, m_hdc_ie(0)
-	, m_rtc_irq(CLEAR_LINE)
-	, m_via_irq(CLEAR_LINE)
-	, m_hdc_irq(CLEAR_LINE)
-	, m_fdc_irq(CLEAR_LINE)
-	, m_fdc_drq(CLEAR_LINE)
-	, m_adlc_irq(CLEAR_LINE)
-	, m_clk_en(0)
+	, m_adlc_ie(false)
+	, m_hdc_ie(false)
+	, m_rtc_irq(false)
+	, m_via_irq(false)
+	, m_hdc_irq(false)
+	, m_fdc_irq(false)
+	, m_scsi_data(0)
+	, m_fdc_drq(false)
+	, m_adlc_irq(false)
+	, m_clk_present(false)
+	, m_data_valid(false)
+	, m_fdc_hld(false)
+	, m_floppy_sel(0)
+	, m_floppy_side(false)
+	, m_clk_en(false)
+	, m_clk_tc(true)
+	, m_rtc_ce(false)
 	, m_ram_en(false)
-	, m_variant(variant)
 	, m_clk_timer(nullptr)
 {
 }
@@ -436,8 +462,29 @@ void econet_e01_device::device_start()
 	save_item(NAME(m_rtc_irq));
 	save_item(NAME(m_via_irq));
 	save_item(NAME(m_hdc_irq));
+	save_item(NAME(m_scsi_data));
+	save_item(NAME(m_fdc_irq));
 	save_item(NAME(m_fdc_drq));
 	save_item(NAME(m_adlc_irq));
+	save_item(NAME(m_clk_present));
+	save_item(NAME(m_data_valid));
+	save_item(NAME(m_clk_en));
+	save_item(NAME(m_clk_tc));
+	save_item(NAME(m_rtc_ce));
+	save_item(NAME(m_ram_en));
+	save_item(NAME(m_fdc_hld));
+	save_item(NAME(m_floppy_sel));
+	save_item(NAME(m_floppy_side));
+}
+
+
+//-------------------------------------------------
+//  device_post_load - device-specific post load
+//-------------------------------------------------
+
+void econet_e01_device::device_post_load()
+{
+	update_floppy();
 }
 
 
@@ -447,8 +494,10 @@ void econet_e01_device::device_start()
 
 void econet_e01_device::device_reset()
 {
-	m_clk_timer->adjust(attotime::zero, 0, attotime::from_hz(200000));
+	m_clk_timer->adjust(attotime::zero);
 	m_ram_en = false;
+
+	floppy_w(0);
 }
 
 
@@ -458,11 +507,28 @@ void econet_e01_device::device_reset()
 
 TIMER_CALLBACK_MEMBER(econet_e01_device::clk_tick)
 {
-	if (m_clk_en)
-	{
-		m_econet->clk_w(this, 1);
-		m_econet->clk_w(this, 0);
-	}
+	uint8_t const links = m_links->read();
+	attotime const cp = attotime::from_ticks(BIT(links, 3) ? 4 : 2, 8_MHz_XTAL / 4);
+	unsigned const load = 8 | (links & 0x07);
+
+	if (load == 15)
+		m_clk_tc = true;
+	else
+		m_clk_tc = !m_clk_tc;
+
+	update_econet_clk();
+
+	m_clk_timer->adjust(m_clk_tc ? cp : cp * (15 - load));
+}
+
+
+//-------------------------------------------------
+//  update_econet_clk - drive the Econet clock
+//-------------------------------------------------
+
+void econet_e01_device::update_econet_clk()
+{
+	m_econet->clk_w(this, m_clk_en ? m_clk_tc : 1);
 }
 
 
@@ -532,18 +598,15 @@ void econet_e01_device::floppy_w(uint8_t data)
 	*/
 
 	// floppy select
-	floppy_image_device *floppy = nullptr;
-
-	if (!BIT(data, 0)) floppy = m_floppy[0]->get_device();
-	if (!BIT(data, 1)) floppy = m_floppy[1]->get_device();
-
-	m_fdc->set_floppy(floppy);
+	m_floppy_sel = data & 0x03;
 
 	// floppy side select
-	if (floppy) floppy->ss_w(BIT(data, 2));
+	m_floppy_side = BIT(data, 2);
 
-	// TODO NVRAM select
-	//mc146818_stby_w(m_rtc, BIT(data, 3));
+	update_floppy();
+
+	// NVRAM select
+	m_rtc_ce = BIT(data, 3);
 
 	// floppy density
 	m_fdc->dden_w(BIT(data, 4));
@@ -555,6 +618,49 @@ void econet_e01_device::floppy_w(uint8_t data)
 
 	// mode LED
 	m_led = BIT(data, 7);
+}
+
+
+//-------------------------------------------------
+//  update_floppy - drive select is gated by HLD
+//-------------------------------------------------
+
+void econet_e01_device::update_floppy()
+{
+	floppy_image_device *floppy = nullptr;
+
+	if (m_fdc_hld)
+	{
+		if (BIT(m_floppy_sel, 0)) floppy = m_floppy[0]->get_device();
+		if (BIT(m_floppy_sel, 1)) floppy = m_floppy[1]->get_device();
+	}
+
+	m_fdc->set_floppy(floppy);
+
+	for (auto &connector : m_floppy)
+		if (connector->get_device())
+			connector->get_device()->ss_w(m_floppy_side);
+}
+
+
+//-------------------------------------------------
+//  rtc_data_r -
+//-------------------------------------------------
+
+uint8_t econet_e01_device::rtc_data_r()
+{
+	return m_rtc_ce ? m_rtc->data_r() : 0;
+}
+
+
+//-------------------------------------------------
+//  rtc_data_w -
+//-------------------------------------------------
+
+void econet_e01_device::rtc_data_w(uint8_t data)
+{
+	if (m_rtc_ce)
+		m_rtc->data_w(data);
 }
 
 
@@ -610,10 +716,44 @@ void econet_e01_device::network_irq_enable_w(uint8_t data)
 
 uint8_t econet_e01_device::hdc_data_r()
 {
-	uint8_t data = m_scsi_data_in->read();
+	uint8_t data = m_scsi->read();
 
 	if (!machine().side_effects_disabled())
-		m_scsibus->write_ack(1);
+		m_scsi->ack_w(1);
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  hdc_status_r -
+//-------------------------------------------------
+
+uint8_t econet_e01_device::hdc_status_r()
+{
+	/*
+
+	    bit     description
+
+	    0       MSG
+	    1       BSY
+	    2       0
+	    3       0
+	    4       NIRQ
+	    5       REQ
+	    6       I/O
+	    7       C/D
+
+	*/
+
+	uint8_t data = 0;
+
+	data |= m_scsi->msg_r();
+	data |= m_scsi->bsy_r() << 1;
+	data |= !(m_hdc_ie && m_hdc_irq) << 4;
+	data |= m_scsi->req_r() << 5;
+	data |= m_scsi->io_r() << 6;
+	data |= m_scsi->cd_r() << 7;
 
 	return data;
 }
@@ -625,9 +765,10 @@ uint8_t econet_e01_device::hdc_data_r()
 
 void econet_e01_device::hdc_data_w(uint8_t data)
 {
-	m_scsi_data_out->write(data);
-
-	m_scsibus->write_ack(1);
+	m_scsi_data = data;
+	if (!m_scsi->io_r())
+		m_scsi->write(data);
+	m_scsi->ack_w(1);
 }
 
 
@@ -637,7 +778,9 @@ void econet_e01_device::hdc_data_w(uint8_t data)
 
 void econet_e01_device::hdc_select_w(uint8_t data)
 {
-	m_scsibus->write_sel(1);
+	// SEL is left set after an unanswered selection, and nscsi targets only sample it on an edge
+	m_scsi->sel_w(0);
+	m_scsi->sel_w(1);
 }
 
 
@@ -662,11 +805,24 @@ void econet_e01_device::econet_data(int state)
 
 
 //-------------------------------------------------
-//  econet_clk_w -
+//  econet_valid -
+//-------------------------------------------------
+
+void econet_e01_device::econet_valid(int state)
+{
+	m_data_valid = state;
+
+	m_adlc->set_cts(!(m_clk_present && m_data_valid));
+}
+
+
+//-------------------------------------------------
+//  econet_clk -
 //-------------------------------------------------
 
 void econet_e01_device::econet_clk(int state)
 {
 	m_adlc->rxc_w(state);
 	m_adlc->txc_w(state);
+	m_clk_det->b_w(state);
 }

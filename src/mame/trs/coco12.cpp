@@ -478,10 +478,13 @@ void coco_state::coco_sound(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	// 6-bit D/A: R10-15 = 10K, 20K, 40.2K, 80.6K, 162K, 324K (according to parts list); output also controls joysticks
-	DAC_6BIT_BINARY_WEIGHTED(config, m_dac, 0).add_route(ALL_OUTPUTS, m_mux, 0.125, mc14529_device::y_sound_input(0));
+	// Use a unipolar output so DAC code zero matches the disabled sound path.
+	// Doubling the route gain preserves the peak-to-peak amplitude.
+	DAC_6BIT_BINARY_WEIGHTED(config, m_dac, 0).set_output_range(0, 1).add_route(ALL_OUTPUTS, m_mux, 0.25, mc14529_device::y_sound_input(0));
 
-	// Single-bit sound: R22 = 10K
-	DAC_1BIT(config, "sbs", 0).set_output_range(-1, 1).add_route(ALL_OUTPUTS, "speaker", 0.125);
+	// Single-bit sound: R22 = 10K.  Keep the low state at zero to avoid a
+	// startup DC step; the route gain preserves the peak-to-peak amplitude.
+	DAC_1BIT(config, "sbs", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
@@ -605,10 +608,16 @@ void coco12_state::coco(machine_config &config)
 	m_screen->set_screen_update(m_vdg, FUNC(mc6847_base_device::screen_update));
 
 	MC6847(config, m_vdg, XTAL(14'318'181) / 4); // VClk output from MC6883
+	// Hardware captures show two extra DA0 transitions on a CoCo 1 with a
+	// '783 SAM, but not on a CoCo 2B with a 6847T1 and '785 SAM.  A PAL
+	// CoCo report agrees with the CoCo 1; Dragon reports do not show it.
+	// TODO: The cause and exact timing remain uncertain: VDG, SAM or board.
+	m_vdg->set_field_sync_extra_transitions(true);
 	m_vdg->set_screen(m_screen);
 	m_vdg->hsync_wr_callback().set(FUNC(coco12_state::horizontal_sync));
 	m_vdg->fsync_wr_callback().set(FUNC(coco12_state::field_sync));
 	m_vdg->input_callback().set(FUNC(coco12_state::sam_read));
+	m_sam->video_flush_callback().set(FUNC(coco12_state::vdg_flush));
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("4K,16K,32K");
@@ -679,6 +688,7 @@ void coco12_state::coco2b(machine_config &config)
 	coco(config);
 
 	MC6847T1(config.replace(), m_vdg, XTAL(14'318'181) / 4);
+	m_vdg->set_field_sync_extra_transitions(false);
 	m_vdg->set_screen(m_screen);
 	m_vdg->hsync_wr_callback().set(FUNC(coco12_state::horizontal_sync));
 	m_vdg->fsync_wr_callback().set(FUNC(coco12_state::field_sync));

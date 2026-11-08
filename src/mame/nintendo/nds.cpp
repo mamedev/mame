@@ -158,7 +158,7 @@ nds_state::nds_state(const machine_config &mconfig, device_type type, const char
 	m_rtc_io(0),
 	m_gba_mode(false),
 	m_total_lines(TOTAL_LINES), m_visible_lines(VISIBLE_LINES),
-	m_gba_soundregs{}, m_gba_waitcnt(0), m_gba_bios_prefetch(0), m_gba_fifo{},
+	m_gba_soundregs{}, m_gba_waitcnt(0), m_gba_fifo{},
 	m_auxspicnt(0), m_auxspidata(0),
 	m_romctrl(0),
 	m_card_command{}, m_cartdata_len(0), m_card_cpu(1),
@@ -353,9 +353,17 @@ uint16_t nds_state::ipcfifo_cnt_r()
 	return data;
 }
 
+// the IPC registers change once the other CPU has caught up (the CPUs run in steps of 64 cycles)
 template <int Cpu>
 void nds_state::ipcfifo_cnt_w(uint16_t data)
 {
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(nds_state::ipcfifo_cnt_sync<Cpu>), this), data);
+}
+
+template <int Cpu>
+TIMER_CALLBACK_MEMBER(nds_state::ipcfifo_cnt_sync)
+{
+	const uint16_t data = uint16_t(param);
 	const bool old_send_empty_irq = BIT(m_ipcfifocnt[Cpu], 2) && (m_ipcfifo_count[Cpu] == 0);
 	const bool old_recv_irq = BIT(m_ipcfifocnt[Cpu], 10) && (m_ipcfifo_count[Cpu ^ 1] != 0);
 
@@ -388,6 +396,13 @@ void nds_state::ipcfifo_cnt_w(uint16_t data)
 template <int Cpu>
 void nds_state::ipcfifo_send(uint32_t data)
 {
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(nds_state::ipcfifo_send_sync<Cpu>), this), int32_t(data));
+}
+
+template <int Cpu>
+TIMER_CALLBACK_MEMBER(nds_state::ipcfifo_send_sync)
+{
+	const uint32_t data = uint32_t(param);
 	if (!BIT(m_ipcfifocnt[Cpu], 15))
 	{
 		return;
@@ -1209,6 +1224,13 @@ uint32_t nds_state::ipcsync_r(offs_t offset, uint32_t mem_mask)
 template <int Cpu>
 void nds_state::ipcsync_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(nds_state::ipcsync_sync<Cpu>), this), data & 0xffff);
+}
+
+template <int Cpu>
+TIMER_CALLBACK_MEMBER(nds_state::ipcsync_sync)
+{
+	const uint32_t data = uint32_t(param);
 	const int remote = Cpu ^ 1;
 
 	LOGMASKED(LOG_IPC, "CPU%d: %04x to IPCSYNC\n", Cpu, data & 0xffff);
@@ -2408,6 +2430,7 @@ void nds_state::install_gba_map()
 	space.unmap_readwrite(0x00000000, 0xffffffff);
 
 	space.install_read_handler(0x00000000, 0x00003fff, read32s_delegate(*this, FUNC(nds_state::gba_bios_r)));
+	m_arm7->set_fetch_shadow(0x00000000, 0x00003fff);       // the BIOS protection returns the last opcode fetched there
 	space.nop_write(0x00000000, 0x00003fff);
 	space.install_read_handler(0x00004000, 0x01ffffff, read32s_delegate(*this, FUNC(nds_state::gba_open_bus_r)));
 	space.install_read_handler(0x10000000, 0xffffffff, read32s_delegate(*this, FUNC(nds_state::gba_open_bus_r)));
@@ -2509,23 +2532,14 @@ uint32_t nds_state::gba_pak_r(offs_t offset)
 
 uint32_t nds_state::gba_bios_r(offs_t offset, uint32_t mem_mask)
 {
-	const uint32_t pc = m_arm7->pc();
-	if (pc >= 0x4000)
+	if (m_arm7->pc() >= 0x4000)
 	{
 		// The BIOS can only be read while executing from it; other reads return the most recently
 		// fetched BIOS opcode as per GBATEK.
-		return m_gba_bios_prefetch;
+		return m_arm7->fetch_shadow();
 	}
 
-	const uint32_t data = get_u32le(&m_gbabios[offset << 2]);
-
-	// The core prefetches 2 words ahead of the PC like the real pipeline, so PC+8
-	if (((offset << 2) == ((pc & ~3) + 8)) && !machine().side_effects_disabled())
-	{
-		m_gba_bios_prefetch = data;
-	}
-
-	return data;
+	return get_u32le(&m_gbabios[offset << 2]);
 }
 
 // Reads from unused address space return the most recently prefetched opcode.
@@ -2909,6 +2923,10 @@ uint32_t nds_state::gba_memctrl_r()
 
 void nds_state::machine_start()
 {
+	// the recompilers access main RAM in place: the ARM9 all of it, the ARM7 the 256K that is EWRAM in GBA mode too
+	m_arm9->arm7drc_add_fastram(0x02000000, 0x023fffff, false, memshare("mainram")->ptr());
+	m_arm7->arm7drc_add_fastram(0x02000000, 0x0203ffff, false, memshare("mainram")->ptr());
+
 	for (int i = 0; i < 8; i++)
 	{
 		m_dma_timer[i] = timer_alloc(FUNC(nds_state::dma_complete), this);
@@ -2932,7 +2950,6 @@ void nds_state::machine_start()
 	save_item(STRUCT_MEMBER(m_gba_fifo, sample));
 	save_item(STRUCT_MEMBER(m_gba_fifo, word));
 	save_item(NAME(m_gba_waitcnt));
-	save_item(NAME(m_gba_bios_prefetch));
 
 	// the card decrypts KEY1 commands with the same Blowfish tables the BIOS encrypts them with
 	m_ndscart->set_key1_table(memregion("arm7")->base() + 0x30);
@@ -3065,9 +3082,9 @@ void nds_state::nds(machine_config &config)
 	m_arm9->set_high_vectors();
 	m_arm9->set_addrmap(AS_PROGRAM, &nds_state::nds_arm9_map);
 
-	// the two CPUs communicate through shared RAM and the IPC registers,
-	// so they need to be kept in lockstep
-	config.set_perfect_quantum(m_arm9);
+	// the two CPUs communicate through shared RAM and the IPC registers, so they run
+	// in steps of 64 cycles of the 33 MHz clock (the bound melonDS uses too)
+	config.set_maximum_quantum(attotime::from_hz(MASTER_CLOCK / 64));
 
 	// WRAM
 	ADDRESS_MAP_BANK(config, "nds7wram").set_map(&nds_state::nds7_wram_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x10000);

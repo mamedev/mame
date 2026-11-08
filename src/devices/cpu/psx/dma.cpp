@@ -270,7 +270,10 @@ void psxdma_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 					// pSX's CD DMA size calc formula
 					int oursize = (dma->n_blockcontrol >> 16);
 					oursize = (oursize > 1) ? oursize : 1;
-					oursize *= (dma->n_blockcontrol & 0xffff);
+					if ((dma->n_blockcontrol & 0xffff) != 0)
+						oursize *= (dma->n_blockcontrol & 0xffff);
+					else
+						oursize = 0x10000; // a word count of 0 transfers 0x10000 words
 
 					dma->fn_read(m_ram, n_address, oursize);
 					dma_finished(index);
@@ -321,18 +324,19 @@ void psxdma_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 					index == 6)
 				{
 					LOGDMA("%s dma 6 reverse clear %08x %08x\n", machine().describe_context(), dma->n_base, dma->n_blockcontrol);
-					if (n_size > 0)
+					// a word count of 0 transfers 0x10000 words
+					n_size = dma->n_blockcontrol & 0xffff;
+					if (n_size == 0)
+						n_size = 0x10000;
+					n_size--;
+					while (n_size > 0)
 					{
+						n_nextaddress = (n_address - 4) & 0xffffff;
+						m_ram[n_address / 4] = n_nextaddress;
+						n_address = n_nextaddress;
 						n_size--;
-						while (n_size > 0)
-						{
-							n_nextaddress = (n_address - 4) & 0xffffff;
-							m_ram[n_address / 4] = n_nextaddress;
-							n_address = n_nextaddress;
-							n_size--;
-						}
-						m_ram[n_address / 4] = 0xffffff;
 					}
+					m_ram[n_address / 4] = 0xffffff;
 					dma_start_timer(index, 2150);
 				}
 				else

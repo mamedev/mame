@@ -8,6 +8,7 @@
 #pragma once
 
 #include "pci.h"
+#include "ram.h"
 
 class i82439hx_host_device : public pci_host_device {
 public:
@@ -29,6 +30,8 @@ public:
 
 	template <typename T> void set_cpu_tag(T &&tag) { cpu.set_tag(std::forward<T>(tag)); }
 	void set_ram_size(int ram_size);
+	// take size and memory from a RAM device instead of set_ram_size
+	template <typename T> void set_ram_tag(T &&tag) { m_ram_dev.set_tag(std::forward<T>(tag)); }
 
 	void smi_act_w(int state);
 
@@ -50,7 +53,9 @@ protected:
 private:
 	int ram_size;
 	required_device<device_memory_interface> cpu;
+	optional_device<ram_device> m_ram_dev;
 	std::vector<uint32_t> ram;
+	uint32_t *m_ram;
 
 	uint8_t latency_timer, bist;
 	uint8_t acon, pcon, cc, dramec, dramc, dramt;
@@ -58,7 +63,6 @@ private:
 	uint8_t drt, drat, smram, errcmd, errsts, errsyn;
 	int smiact_n;
 
-	virtual uint8_t header_type_r() override;
 	void status_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	virtual uint8_t latency_timer_r() override;
 	void latency_timer_w(uint8_t data);

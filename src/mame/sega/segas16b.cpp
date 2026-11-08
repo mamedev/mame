@@ -3511,6 +3511,27 @@ static INPUT_PORTS_START( wb3 )
 INPUT_PORTS_END
 
 
+void wfishing_state::machine_start()
+{
+	segas16b_state::machine_start();
+
+	save_item(NAME(m_handle_dir));
+}
+
+// the reel handle's encoder phase clocks the direction (HANDLE RIGHT or HANDLE LEFT) from the other phase
+void wfishing_state::handle_pulse_w(int state)
+{
+	if (state)
+		m_handle_dir = m_handle_encoder->pl_r() ? 0x10 : 0x08;
+}
+
+// P1 bit 3 is the encoder phase, bits 6 and 7 the direction (returned as bits 0, 3 and 4)
+ioport_value wfishing_state::handle_r()
+{
+	return (m_handle_encoder->mn_r() ? 0x01 : 0x00) | m_handle_dir;
+}
+
+
 static INPUT_PORTS_START( wfishing ) // dips taken from test mode
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -3524,13 +3545,18 @@ static INPUT_PORTS_START( wfishing ) // dips taken from test mode
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x36, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xc8, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(wfishing_state::handle_r))
 
 	PORT_START("UNUSED")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) // TODO: 'rod upper' and 'rod lower' are read here. TODO: Where are 'handle left' and 'handle right'?
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED ) // ROD UPPER and ROD LOWER: position switches of the motor-driven rod (not emulated)
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("HANDLE")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(8) PORT_NAME("Reel Handle") PORT_CHANGED_MEMBER("handle", FUNC(quadencoder_device::changed), 0)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME(    0x0f, 0x0f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
@@ -4439,6 +4465,14 @@ void dfjail_state::dfjail(machine_config &config)
 	config.device_remove("upd");
 
 	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.25); // AD7533KN
+}
+
+void wfishing_state::wfishing(machine_config &config)
+{
+	system16b_5797(config);
+
+	QUADENCODER(config, m_handle_encoder);
+	m_handle_encoder->write_mn().set(FUNC(wfishing_state::handle_pulse_w));
 }
 
 
@@ -10299,7 +10333,7 @@ GAME( 1988, wb34,       wb3,      system16b_fd1094,      wb3,      segas16b_stat
 GAME( 1988, wb33,       wb3,      system16b_fd1094,      wb3,      segas16b_state, init_generic_5704,       ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 3, World, System 16B) (FD1094 317-0089)", 0 )
 GAME( 1988, wb32,       wb3,      system16b_fd1094,      wb3,      segas16b_state, init_generic_5358,       ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 2, Japan, System 16B) (FD1094 317-0085)", 0 )
 
-GAME( 1996, wfishing,   0,        system16b_5797,        wfishing, segas16b_state, init_generic_5797,       ROT0,   "Sega", "Wanpaku Fishing", MACHINE_NOT_WORKING ) // needs correct controls
+GAME( 1996, wfishing,   0,        wfishing,              wfishing, wfishing_state, init_generic_5797,       ROT0,   "Sega", "Wanpaku Fishing", 0 )
 
 GAME( 1989, wrestwar,   0,        system16b_i8751,       wrestwar, segas16b_state, init_generic_5704,       ROT270, "Sega", "Wrestle War (set 3, World) (8751 317-0103)", 0 )
 GAME( 1989, wrestwar2,  wrestwar, system16b_fd1094,      wrestwar, segas16b_state, init_generic_5704,       ROT270, "Sega", "Wrestle War (set 2, World) (FD1094 317-0102)", 0 )

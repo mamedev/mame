@@ -12,11 +12,13 @@
 #pragma once
 
 #include "exp.h"
+#include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 #include "machine/6850acia.h"
 #include "machine/adc0808.h"
 #include "machine/z80ctc.h"
 #include "machine/ram.h"
+#include "sound/dac.h"
 
 
 
@@ -47,10 +49,14 @@ protected:
 	virtual void mreq_w(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh) override;
 	virtual uint8_t iorq_r(offs_t offset, uint8_t data, bool &prtov) override;
 	virtual void iorq_w(offs_t offset, uint8_t data, bool &prtov) override;
+	virtual void busak_w(int state) override;
 
 private:
 	void acia_interrupt(int state);
+	void ctc_z0_w(int state);
+	void ctc_z1_w(int state);
 	void ctc_z2_w(int state);
+	void centronics_ack_w(int state);
 	void adc_eoc_w(int state);
 	void exp_int_w(int state);
 
@@ -62,11 +68,19 @@ private:
 	uint8_t paged_r(offs_t offset);
 	void paged_w(offs_t offset, uint8_t data);
 	void update_interrupt();
+	void update_enrg2();
+	void update_dac();
+	void update_sound();
+	void user_w(uint8_t data);
 
 	required_device<z80ctc_device> m_ctc;
 	required_device<acia6850_device> m_acia;
 	required_device<adc0809_device> m_adc;
 	required_device<newbrain_expansion_slot_device> m_exp;
+	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
+	required_device<mc1408_device> m_dac;
+	required_device_array<dac_1bit_device, 2> m_tone;
 	required_memory_region m_rom;
 	required_device<ram_device> m_ram;
 	required_ioport m_sw;
@@ -76,11 +90,13 @@ private:
 	uint8_t m_pr[16];
 	uint8_t m_psr;
 	uint8_t m_enrg2;
-	uint8_t m_user;
-	uint8_t m_dac;
+	uint8_t m_anout;
 	int m_aciaint;
 	int m_anint;
 	bool m_expint;
+	bool m_centint;
+	bool m_rck;
+	bool m_tck;
 };
 
 

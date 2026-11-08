@@ -2,17 +2,9 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Grundy NewBrain Expansion Interface Module emulation
+    Grundy NewBrain Disk Controller emulation
 
 **********************************************************************/
-
-/*
-
-    TODO:
-
-    - bus request/acknowledge arbitration with the computer
-
-*/
 
 #include "emu.h"
 #include "fdc.h"
@@ -73,8 +65,8 @@ const tiny_rom_entry *newbrain_fdc_device::device_rom_region() const
 void newbrain_fdc_device::newbrain_fdc_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).mirror(0x6000).rom().region(Z80_TAG, 0);
-	map(0x8000, 0xffff).rw(FUNC(newbrain_fdc_device::window_r), FUNC(newbrain_fdc_device::window_w));
+	map(0x0000, 0x1fff).rom().region(Z80_TAG, 0);
+	map(0x2000, 0xffff).rw(FUNC(newbrain_fdc_device::window_r), FUNC(newbrain_fdc_device::window_w));
 }
 
 
@@ -115,6 +107,7 @@ void newbrain_fdc_device::device_add_mconfig(machine_config &config)
 
 	UPD765A(config, m_fdc, 8'000'000, false, true);
 	m_fdc->intrq_wr_callback().set(FUNC(newbrain_fdc_device::fdc_int_w));
+	m_fdc->drq_wr_callback().set(FUNC(newbrain_fdc_device::fdc_drq_w));
 
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", newbrain_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", newbrain_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
@@ -149,7 +142,11 @@ newbrain_fdc_device::newbrain_fdc_device(const machine_config &mconfig, const ch
 	m_mpm(0),
 	m_fdc_att(0),
 	m_fdc_int(0),
-	m_pa15(0)
+	m_pa15(0),
+	m_extbusrq(false),
+	m_extbusrqd(false),
+	m_busak(false),
+	m_busakd(false)
 {
 }
 
@@ -160,12 +157,19 @@ newbrain_fdc_device::newbrain_fdc_device(const machine_config &mconfig, const ch
 
 void newbrain_fdc_device::device_start()
 {
+	m_busrq_timer = timer_alloc(FUNC(newbrain_fdc_device::busrq_tick), this);
+	m_busak_timer = timer_alloc(FUNC(newbrain_fdc_device::busak_tick), this);
+
 	save_item(NAME(m_paging));
 	save_item(NAME(m_ma16));
 	save_item(NAME(m_mpm));
 	save_item(NAME(m_fdc_att));
 	save_item(NAME(m_fdc_int));
 	save_item(NAME(m_pa15));
+	save_item(NAME(m_extbusrq));
+	save_item(NAME(m_extbusrqd));
+	save_item(NAME(m_busak));
+	save_item(NAME(m_busakd));
 }
 
 
@@ -176,6 +180,11 @@ void newbrain_fdc_device::device_start()
 void newbrain_fdc_device::device_reset()
 {
 	io_dec_w(0);
+
+	m_extbusrqd = false;
+	m_busak = false;
+	m_busrq_timer->adjust(attotime::never);
+	m_slot->busrq_w(0);
 }
 
 
@@ -224,12 +233,20 @@ void newbrain_fdc_device::mreq_w(offs_t offset, uint8_t data, bool &romov, int &
 
 uint8_t newbrain_fdc_device::window_r(offs_t offset)
 {
-	offs_t addr = (m_pa15 << 15) | offset;
+	if (!bus_request())
+		return 0xff;
+
+	offs_t addr = (m_pa15 << 15) | ((offset + 0x2000) & 0x7fff);
+	uint8_t data;
 
 	if (m_paging)
-		return m_slot->host_paged_r((m_ma16 << 16) | addr);
+		data = m_slot->host_paged_r((m_ma16 << 16) | addr);
+	else
+		data = m_slot->host_mreq_r(addr);
 
-	return m_slot->host_mreq_r(addr);
+	bus_release();
+
+	return data;
 }
 
 
@@ -239,12 +256,99 @@ uint8_t newbrain_fdc_device::window_r(offs_t offset)
 
 void newbrain_fdc_device::window_w(offs_t offset, uint8_t data)
 {
-	offs_t addr = (m_pa15 << 15) | offset;
+	if (!bus_request())
+		return;
+
+	offs_t addr = (m_pa15 << 15) | ((offset + 0x2000) & 0x7fff);
 
 	if (m_paging)
 		m_slot->host_paged_w((m_ma16 << 16) | addr, data);
 	else
 		m_slot->host_mreq_w(addr, data);
+
+	bus_release();
+}
+
+
+//-------------------------------------------------
+//  bus_request - hold the controller in WAIT
+//  until the computer has granted its bus
+//-------------------------------------------------
+
+bool newbrain_fdc_device::bus_request()
+{
+	if (m_busakd || machine().side_effects_disabled())
+		return true;
+
+	if (!m_extbusrq)
+	{
+		m_extbusrq = true;
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+		m_busrq_timer->adjust(m_maincpu->cycles_to_attotime(1), 1);
+		machine().scheduler().perfect_quantum(attotime::from_usec(100));
+	}
+
+	m_maincpu->defer_access();
+
+	return false;
+}
+
+
+//-------------------------------------------------
+//  bus_release - end of an external access
+//-------------------------------------------------
+
+void newbrain_fdc_device::bus_release()
+{
+	if (machine().side_effects_disabled() || !m_extbusrq)
+		return;
+
+	m_extbusrq = false;
+	m_busakd = false;
+	m_busak_timer->adjust(attotime::never);
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+	m_busrq_timer->adjust(m_maincpu->cycles_to_attotime(1), 0);
+}
+
+
+//-------------------------------------------------
+//  busrq_tick - request synchronized to CX
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(newbrain_fdc_device::busrq_tick)
+{
+	m_extbusrqd = bool(param);
+	m_slot->busrq_w(param);
+
+	if (m_extbusrqd && m_busak)
+		m_busak_timer->adjust(m_maincpu->cycles_to_attotime(2));
+}
+
+
+//-------------------------------------------------
+//  busak_w - bus acknowledge from the computer
+//-------------------------------------------------
+
+void newbrain_fdc_device::busak_w(int state)
+{
+	m_busak = bool(state);
+
+	if (m_busak && m_extbusrqd)
+		m_busak_timer->adjust(m_maincpu->cycles_to_attotime(2));
+}
+
+
+//-------------------------------------------------
+//  busak_tick - acknowledge synchronized to CX
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(newbrain_fdc_device::busak_tick)
+{
+	if (m_extbusrq && m_busak)
+	{
+		m_busakd = true;
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+	}
 }
 
 
@@ -307,6 +411,18 @@ void newbrain_fdc_device::moton(int state)
 void newbrain_fdc_device::fdc_int_w(int state)
 {
 	m_fdc_int = state;
+}
+
+
+//-------------------------------------------------
+//  fdc_drq_w -
+//-------------------------------------------------
+
+void newbrain_fdc_device::fdc_drq_w(int state)
+{
+	// every data byte is moved through the computer bus
+	if (state)
+		machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 
@@ -393,6 +509,7 @@ void newbrain_fdc_device::io_dec_w(uint8_t data)
 	if (!BIT(data, 5))
 	{
 		fdc_auxiliary_w(0);
+		bus_release();
 	}
 
 	m_maincpu->set_input_line(INPUT_LINE_RESET, BIT(data, 5) ? CLEAR_LINE : ASSERT_LINE);

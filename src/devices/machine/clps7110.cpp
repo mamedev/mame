@@ -68,6 +68,7 @@ void clps711x_device::device_start()
 	m_timer[0] = timer_alloc(FUNC(clps711x_device::update_timer), this);
 	m_timer[1] = timer_alloc(FUNC(clps711x_device::update_timer), this);
 	m_rtc_ticker = timer_alloc(FUNC(clps711x_device::update_rtc), this);
+	m_codec_timer = timer_alloc(FUNC(clps711x_device::update_codec), this);
 
 	m_buzzer_tog = 0;
 
@@ -126,6 +127,7 @@ void clps711x_device::device_reset()
 	std::fill(std::begin(m_port_ddr), std::end(m_port_ddr), 0);
 
 	m_rtc_ticker->adjust(attotime::from_hz(64), 0, attotime::from_hz(64));
+	m_codec_timer->adjust(attotime::from_hz(8000), 0, attotime::from_hz(8000));
 }
 
 void clps711x_device::extfiq_w(int state)
@@ -168,6 +170,15 @@ void clps711x_device::eint3_w(int state)
 		m_int_status |= (1 << IRQ_EINT3);
 	else
 		m_int_status &= ~(1 << IRQ_EINT3);
+
+	check_interrupts();
+}
+
+void clps711x_device::medchg_w(int state)
+{
+	// level triggered, active high
+	if (state)
+		m_int_status |= (1 << IRQ_MCINT);
 
 	check_interrupts();
 }
@@ -221,6 +232,33 @@ TIMER_CALLBACK_MEMBER(clps711x_device::update_rtc)
 	}
 
 	check_interrupts();
+}
+
+TIMER_CALLBACK_MEMBER(clps711x_device::update_codec)
+{
+	if (BIT(m_syscon[0], 13)) // Enable CODEC data output
+	{
+		if (!m_codec_tx.empty())
+			m_pcm_out(m_codec_tx.dequeue());
+
+		if (m_codec_tx.queue_length() == 8)
+		{
+			m_int_status |= 1 << IRQ_CSINT;
+			check_interrupts();
+		}
+	}
+
+	if (BIT(m_syscon[0], 14)) // Enable CODEC data input
+	{
+		if (!m_codec_rx.full())
+			m_codec_rx.enqueue(m_pcm_in());
+
+		if (m_codec_rx.queue_length() == 8)
+		{
+			m_int_status |= 1 << IRQ_CSINT;
+			check_interrupts();
+		}
+	}
 }
 
 
@@ -289,10 +327,10 @@ uint32_t clps711x_device::periphs_r(offs_t offset, uint32_t mem_mask)
 
 	case REG_SYSFLG1:
 		data = m_sysflg1 | (m_rtcdiv << 16);
+		data |= (m_codec_rx.empty() ? 1 : 0) << 24;
+		data |= (m_codec_tx.full()  ? 1 : 0) << 25;
 		//data |= (1 << 1);
-		//data |= (m_rtcdiv << 16);
 		//data |= (1 << 8);
-		//data |= (1 << 22);
 		//data |= (1 << 24);
 		LOGMASKED(LOG_PWR, "%s: read  SYSFLG1 = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
@@ -339,6 +377,7 @@ uint32_t clps711x_device::periphs_r(offs_t offset, uint32_t mem_mask)
 		LOGMASKED(LOG_INT, "%s: read  PMPCON  = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case REG_CODR:
+		data = m_codec_rx.dequeue();
 		LOGMASKED(LOG_CODEC, "%s: read  CODR    = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		break;
 	case REG_UARTDR1:
@@ -549,6 +588,7 @@ void clps711x_device::periphs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		break;
 	case REG_CODR:
 		LOGMASKED(LOG_CODEC, "%s: write CODR    = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_codec_tx.enqueue(data & 0xff);
 		break;
 	case REG_UARTDR1:
 		LOGMASKED(LOG_UART, "%s: write UARTDR1 = %08x & %08x\n", machine().describe_context(), data, mem_mask);

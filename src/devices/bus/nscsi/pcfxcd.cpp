@@ -8,6 +8,10 @@
     ddh/deh (10-byte CDBs from c0h up) and their LBA, BCD M:S:F and BCD
     track address modes.
 
+    The drive is top-loading, so it refuses eject commands. An unloaded
+    image reads as the cover open, and loading one is closing the cover
+    with a disc in.
+
     The vendor commands are shared with the PC-8801-30, PC Engine CD-ROM²
     and CDR-35 drives, but the responses here are the DRIVE:FX ones; a
     common NEC drive base is left for the rework of the PC-8801-30 /
@@ -48,8 +52,12 @@ const attotime BUS_BYTE_TIME = attotime::from_hz(1'500'000);
 constexpr u32 READ_AHEAD_SECTORS = 32;
 constexpr u32 SECTOR_BYTES = 2048;
 
-// NEC additional sense code for audio commands while no audio is playing (the BIOS CD
-// player expects it from pause/resume when stopped, and retries the command on any other)
+// NEC additional sense codes (sub error class and code, GMAKER SCSI command reference 5-3)
+constexpr u16 NEC_SKC_DISC_EJECT = 0x0d00;          // NOT READY: the cover is open
+constexpr u16 NEC_SKC_TOP_LOADING = 0x2700;         // ILLEGAL REQUEST: eject on a top-loading drive
+constexpr u16 NEC_SKC_DISC_CHANGED = 0x2800;        // UNIT ATTENTION
+// audio commands while no audio is playing (the BIOS CD player expects it from pause/resume
+// when stopped, and retries the command on any other)
 constexpr u16 NEC_SKC_AUDIO_NOT_PLAYING = 0x2c00;
 
 } // anonymous namespace
@@ -197,6 +205,17 @@ void nscsi_cdrom_pcfx_device::scsi_abort()
 	m_sector_wait = attotime::zero;
 }
 
+// the BIOS tells the cover open (0dh) from no disc (0bh) by the sense code
+void nscsi_cdrom_pcfx_device::return_no_cd()
+{
+	report_condition(SK_NOT_READY, NEC_SKC_DISC_EJECT);
+}
+
+void nscsi_cdrom_pcfx_device::return_media_changed()
+{
+	report_condition(SK_UNIT_ATTENTION, NEC_SKC_DISC_CHANGED);
+}
+
 // start a read of the given number of sectors, the first due one sector time from now
 void nscsi_cdrom_pcfx_device::start_read(u32 blocks)
 {
@@ -216,11 +235,21 @@ void nscsi_cdrom_pcfx_device::scsi_command()
 	m_read_left = m_read_buffered = 0;
 	m_sector_wait = attotime::zero;
 
-	if (!image->exists() && m_scsi_cmdbuf[0] != SC_INQUIRY && m_scsi_cmdbuf[0] != SC_REQUEST_SENSE)
+	// REQUEST SENSE returns the pending sense data, which the media change check would replace
+	if (m_scsi_cmdbuf[0] == SC_REQUEST_SENSE)
 	{
-		return_no_cd();   // NOT READY / MEDIUM NOT PRESENT
+		nscsi_full_device::scsi_command();
 		return;
 	}
+
+	// a disc change is reported once there is a disc again, until then the cover is open
+	if (!image->exists() && m_scsi_cmdbuf[0] != SC_INQUIRY)
+	{
+		return_no_cd();
+		return;
+	}
+	if (check_media_change())
+		return;
 
 	switch (m_scsi_cmdbuf[0])
 	{
@@ -338,17 +367,57 @@ void nscsi_cdrom_pcfx_device::scsi_command()
 			break;
 
 		case 0x0d:  // NEC: no operation
-		case 0xdb:  // NEC: set stop time
+			LOGCMD("0x0d NEC No Operation\n");
 			scsi_status_complete(SS_GOOD);
 			break;
 
 		case 0xd8: nec_set_audio_start_position(); break;
 		case 0xd9: nec_set_audio_end_position(); break;
 		case 0xda: nec_pause(); break;
+		case 0xdb:
+			// TODO: stub
+			LOGCMD("0xdb NEC Set Stop Time\n");
+			scsi_status_complete(SS_GOOD);
+			break;
+		case 0xdc:  // NEC: eject
+			LOGCMD("0xdc NEC Eject Immed=%d\n", BIT(m_scsi_cmdbuf[1], 0));
+			report_condition(SK_ILLEGAL_REQUEST, NEC_SKC_TOP_LOADING);
+			break;
 		case 0xdd: nec_read_subq(); break;
 		case 0xde: nec_get_dir_info(); break;
 
+		// the BIOS CD player ejects with LoEj set; refused, it stops the drive and waits for
+		// the cover to open. IMMED is ignored, status is returned when the command is done
+		case SC_START_STOP_UNIT:
+		{
+			const bool loej = BIT(m_scsi_cmdbuf[4], 1);
+			const bool start = BIT(m_scsi_cmdbuf[4], 0);
+			LOGCMD("0x1b Start/Stop Unit Immed=%d LoEj=%d Start=%d\n", BIT(m_scsi_cmdbuf[1], 0), loej, start);
+
+			if (loej)
+			{
+				report_condition(SK_ILLEGAL_REQUEST, NEC_SKC_TOP_LOADING);
+			}
+			else if (start)
+			{
+				scsi_status_complete(SS_GOOD);
+			}
+			else if (m_cdda_status != CDDA_STOPPED)
+			{
+				cdda->stop_audio();
+				set_cdda_status(CDDA_STOPPED);
+				scsi_status_complete(SS_GOOD);
+			}
+			else
+			{
+				// a stop while no audio is playing is CHECK CONDITION, the sense code is not given
+				report_condition(SK_ILLEGAL_REQUEST, NEC_SKC_AUDIO_NOT_PLAYING);
+			}
+			break;
+		}
+
 		default:
+			// TODO: this should log potentially unhandled commands by the parent
 			nscsi_cdrom_device::scsi_command();
 			break;
 	}
@@ -448,7 +517,7 @@ void nscsi_cdrom_pcfx_device::scsi_play_audio(u32 start, u32 end)
 			return;
 		}
 
-		LOGCMD("SCSI audio play %d-%d\n", start, end);
+		LOGCDDA("SCSI audio play %d-%d\n", start, end);
 		m_cdda_loop = false;
 		cdda->set_output_gain(ALL_OUTPUTS, 1.0);
 		cdda->pause_audio(0);

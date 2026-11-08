@@ -258,6 +258,22 @@ void huc6230_device::device_start()
 	save_item(NAME(m_vca_wait));
 }
 
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void huc6230_device::device_reset()
+{
+	// R10-R16 are cleared: ADPCM reset released, no interpolation, all ADPCM and line volumes fully attenuated
+	m_stream->update();
+	m_adpcm_control = 0;
+	for (auto &channel : m_adpcm_channel)
+		channel = adpcm_channel{ 0, 0, 0, 0, 0, 0 };
+	m_pcm_lvol = m_pcm_rvol = 0;
+	for (int i = 0; i < 2; i++)
+		m_vca_level[i] = m_vca_target[i] = m_vca_wait[i] = 0;
+}
+
 void huc6230_device::device_clock_changed()
 {
 	m_stream->set_sample_rate(clock() / 6);

@@ -25,8 +25,6 @@ files {
 	MAME_DIR .. "src/devices/machine/nvram.h",
 	MAME_DIR .. "src/devices/machine/ram.cpp",
 	MAME_DIR .. "src/devices/machine/ram.h",
-	MAME_DIR .. "src/devices/machine/legscsi.cpp",
-	MAME_DIR .. "src/devices/machine/legscsi.h",
 	MAME_DIR .. "src/devices/machine/sdlc.cpp",
 	MAME_DIR .. "src/devices/machine/sdlc.h",
 	MAME_DIR .. "src/devices/machine/terminal.cpp",
@@ -294,6 +292,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ncr53c810.h,MACHINES["NCR53C810"] = true
+---------------------------------------------------
+
+if MACHINES["NCR53C810"] then
+	MACHINES["NSCSI"] = true
+	files {
+		MAME_DIR .. "src/devices/machine/ncr53c810.cpp",
+		MAME_DIR .. "src/devices/machine/ncr53c810.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ncr5385.h,MACHINES["NCR5385"] = true
 ---------------------------------------------------
 
@@ -314,19 +325,6 @@ if MACHINES["NEO_ZMC"] then
 	files {
 		MAME_DIR .. "src/devices/machine/neo_zmc.cpp",
 		MAME_DIR .. "src/devices/machine/neo_zmc.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/53c810.h,MACHINES["LSI53C810"] = true
----------------------------------------------------
-
-if MACHINES["LSI53C810"] then
-	MACHINES["SCSI"] = true
-	files {
-		MAME_DIR .. "src/devices/machine/53c810.cpp",
-		MAME_DIR .. "src/devices/machine/53c810.h",
 	}
 end
 
@@ -2045,6 +2043,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/jz4755.h,MACHINES["JZ4755"] = true
+---------------------------------------------------
+
+if MACHINES["JZ4755"] then
+	files {
+		MAME_DIR .. "src/devices/machine/jz4755.cpp",
+		MAME_DIR .. "src/devices/machine/jz4755.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/k033906.h,MACHINES["K033906"] = true
 ---------------------------------------------------
 
@@ -2354,6 +2364,18 @@ if MACHINES["MACSECONDS"] then
 	files {
 		MAME_DIR .. "src/devices/machine/macseconds.cpp",
 		MAME_DIR .. "src/devices/machine/macseconds.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/max186.h,MACHINES["MAX186"] = true
+---------------------------------------------------
+
+if MACHINES["MAX186"] then
+	files {
+		MAME_DIR .. "src/devices/machine/max186.cpp",
+		MAME_DIR .. "src/devices/machine/max186.h",
 	}
 end
 
@@ -2735,6 +2757,19 @@ if MACHINES["MM74C922"] then
 end
 
 ---------------------------------------------------
+-- Panasonic MN664031A CD-ROM/SCSI controller
+--@src/devices/machine/mn66403.h,MACHINES["MN66403"] = true
+---------------------------------------------------
+
+if MACHINES["MN66403"] then
+	MACHINES["NSCSI"] = true
+	files {
+		MAME_DIR .. "src/devices/machine/mn66403.cpp",
+		MAME_DIR .. "src/devices/machine/mn66403.h",
+	}
+end
+
+---------------------------------------------------
 --
 --@src/devices/machine/mos6526.h,MACHINES["MOS6526"] = true
 ---------------------------------------------------
@@ -2945,6 +2980,19 @@ if MACHINES["NSCSI"] then
 end
 
 ---------------------------------------------------
+-- Novatek NT3580F sound controller
+--@src/devices/machine/nt3580.h,MACHINES["NT3580"] = true
+---------------------------------------------------
+
+if MACHINES["NT3580"] then
+	files {
+		MAME_DIR .. "src/devices/machine/nt3580.cpp",
+		MAME_DIR .. "src/devices/machine/nt3580.h",
+	}
+end
+
+
+---------------------------------------------------
 --
 --@src/devices/machine/pcf8573.h,MACHINES["PCF8573"] = true
 ---------------------------------------------------
@@ -3006,18 +3054,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/lpci.h,MACHINES["LPCI"] = true
----------------------------------------------------
-
-if MACHINES["LPCI"] then
-	files {
-		MAME_DIR .. "src/devices/machine/lpci.cpp",
-		MAME_DIR .. "src/devices/machine/lpci.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/pci.h,MACHINES["PCI"] = true
 ---------------------------------------------------
 
@@ -3072,8 +3108,12 @@ if MACHINES["PCI"] then
 		MAME_DIR .. "src/devices/machine/lpc-rtc.h",
 		MAME_DIR .. "src/devices/machine/lpc-pit.cpp",
 		MAME_DIR .. "src/devices/machine/lpc-pit.h",
+		MAME_DIR .. "src/devices/machine/mpc105.cpp",
+		MAME_DIR .. "src/devices/machine/mpc105.h",
 		MAME_DIR .. "src/devices/machine/mpc106.cpp",
 		MAME_DIR .. "src/devices/machine/mpc106.h",
+		MAME_DIR .. "src/devices/machine/mpc10x.cpp",
+		MAME_DIR .. "src/devices/machine/mpc10x.h",
 		MAME_DIR .. "src/devices/machine/mv6436x.cpp",
 		MAME_DIR .. "src/devices/machine/mv6436x.h",
 		MAME_DIR .. "src/devices/machine/vrc4373.cpp",
@@ -3102,8 +3142,12 @@ if MACHINES["PCI"] then
 		MAME_DIR .. "src/devices/machine/sis950_smbus.h",
 		MAME_DIR .. "src/devices/machine/sis85c496.cpp",
 		MAME_DIR .. "src/devices/machine/sis85c496.h",
+		MAME_DIR .. "src/devices/machine/vt8231_acpi.cpp",
+		MAME_DIR .. "src/devices/machine/vt8231_acpi.h",
 		MAME_DIR .. "src/devices/machine/vt8231_isa.cpp",
 		MAME_DIR .. "src/devices/machine/vt8231_isa.h",
+		MAME_DIR .. "src/devices/machine/vt82c585vp.cpp",
+		MAME_DIR .. "src/devices/machine/vt82c585vp.h",
 		MAME_DIR .. "src/devices/machine/vt82c586b_acpi.cpp",
 		MAME_DIR .. "src/devices/machine/vt82c586b_acpi.h",
 		MAME_DIR .. "src/devices/machine/vt82c586b_ide.cpp",
@@ -3495,22 +3539,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/s3c2400.h,MACHINES["S3C24XX"] = true
---@src/devices/machine/s3c2410.h,MACHINES["S3C24XX"] = true
---@src/devices/machine/s3c2440.h,MACHINES["S3C24XX"] = true
+--@src/devices/machine/s3c24xx.h,MACHINES["S3C24XX"] = true
 ---------------------------------------------------
 
 if MACHINES["S3C24XX"] then
 	files {
-		MAME_DIR .. "src/devices/machine/s3c2400.cpp",
-		MAME_DIR .. "src/devices/machine/s3c2400.h",
-		MAME_DIR .. "src/devices/machine/s3c2410.cpp",
-		MAME_DIR .. "src/devices/machine/s3c2410.h",
-		MAME_DIR .. "src/devices/machine/s3c2440.cpp",
-		MAME_DIR .. "src/devices/machine/s3c2440.h",
 		MAME_DIR .. "src/devices/machine/s3c24xx.cpp",
 		MAME_DIR .. "src/devices/machine/s3c24xx.h",
-		MAME_DIR .. "src/devices/machine/s3c24xx.hxx",
 	}
 end
 
@@ -3593,6 +3628,18 @@ if MACHINES["SAA5070"] then
 	files {
 		MAME_DIR .. "src/devices/machine/saa5070.cpp",
 		MAME_DIR .. "src/devices/machine/saa5070.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/sab3019.h,MACHINES["SAB3019"] = true
+---------------------------------------------------
+
+if MACHINES["SAB3019"] then
+	files {
+		MAME_DIR .. "src/devices/machine/sab3019.cpp",
+		MAME_DIR .. "src/devices/machine/sab3019.h",
 	}
 end
 
@@ -3803,7 +3850,7 @@ end
 --
 ---------------------------------------------------
 
-if BUSES["ATA"] or BUSES["SCSI"] then
+if BUSES["ATA"] then
 	MACHINES["T10"] = true
 end
 
@@ -3811,8 +3858,6 @@ if MACHINES["T10"] then
 	files {
 		MAME_DIR .. "src/devices/machine/t10mmc.cpp",
 		MAME_DIR .. "src/devices/machine/t10mmc.h",
-		MAME_DIR .. "src/devices/machine/t10sbc.cpp",
-		MAME_DIR .. "src/devices/machine/t10sbc.h",
 		MAME_DIR .. "src/devices/machine/t10spc.cpp",
 		MAME_DIR .. "src/devices/machine/t10spc.h",
 	}
@@ -4808,6 +4853,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/fdc37c669.h,MACHINES["FDC37C669"] = true
+---------------------------------------------------
+
+if MACHINES["FDC37C669"] then
+	files {
+		MAME_DIR .. "src/devices/machine/fdc37c669.cpp",
+		MAME_DIR .. "src/devices/machine/fdc37c669.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pci9050.h,MACHINES["PCI9050"] = true
 ---------------------------------------------------
 
@@ -4851,6 +4908,30 @@ if MACHINES["VT82C496"] then
 	files {
 		MAME_DIR .. "src/devices/machine/vt82c496.cpp",
 		MAME_DIR .. "src/devices/machine/vt82c496.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/cx5510.h,MACHINES["CX5510"] = true
+---------------------------------------------------
+
+if MACHINES["CX5510"] then
+	files {
+		MAME_DIR .. "src/devices/machine/cx5510.cpp",
+		MAME_DIR .. "src/devices/machine/cx5510.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/vt82c505.h,MACHINES["VT82C505"] = true
+---------------------------------------------------
+
+if MACHINES["VT82C505"] then
+	files {
+		MAME_DIR .. "src/devices/machine/vt82c505.cpp",
+		MAME_DIR .. "src/devices/machine/vt82c505.h",
 	}
 end
 

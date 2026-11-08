@@ -10,7 +10,7 @@ Z80C0006PEC or equivalent
 6264 RAM (manufacturer and latency may vary)
 62256 RAM (manufacturer and latency may vary)
 Altera MAX EPM3256AOC208-10
-93C46 EEPROM or Watchdata e2829 ESAM
+93C46 EEPROM, 24C01-style I2C EEPROM or Watchdata e2829 ESAM
 U6295 (Oki M6295 clone)
 
 TODO:
@@ -20,7 +20,8 @@ TODO:
   action keys, scanned as a 5-row matrix selected through port a0).  The games
   use it instead of the direct controls when test mode switch 1 (EEPROM byte
   0x38 on bbddz/djddz/wakenz80, 0x36 on ddz2) is OFF
-- dump the lucky168 and ddz1 secure chips if possible
+- dump the lucky168, ddz1 and ddz2b-e secure chips if possible
+- ddz2f: verify the bank decoding and the EEPROM type against the PCB
 - verify display timing, sound clock and remaining I/O against hardware
 */
 
@@ -31,6 +32,7 @@ TODO:
 
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
+#include "machine/i2cmem.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
 
@@ -60,6 +62,8 @@ public:
 		m_in0(*this, "IN0")
 	{ }
 
+	void init_ddz2() ATTR_COLD;
+
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -78,6 +82,7 @@ protected:
 	void decrypt_pljh() ATTR_COLD;
 	void decrypt_jzuanshi() ATTR_COLD;
 	void decrypt_wakenz80() ATTR_COLD;
+	void decrypt_ddz2f() ATTR_COLD;
 	void descramble_tiles(uint16_t *tiles, uint32_t count, uint16_t xor_mask, int r_field, int g_field, int b_field) ATTR_COLD;
 	void descramble_djddza_tiles() ATTR_COLD;
 
@@ -126,7 +131,6 @@ public:
 	void pljh(machine_config &config) ATTR_COLD;
 
 	void init_bbddz() ATTR_COLD;
-	void init_ddz2() ATTR_COLD;
 	void init_djddza() ATTR_COLD;
 	void init_djddz() ATTR_COLD;
 	void init_pljh() ATTR_COLD;
@@ -139,7 +143,7 @@ private:
 };
 
 
-// lucky168, ddz1: the 93C46 lines drive a secure chip speaking T=0 instead
+// lucky168, ddz1, ddz2b-e: the 93C46 lines drive a secure chip speaking T=0 instead
 class sealy_z80_esam_state : public sealy_z80_state
 {
 public:
@@ -163,6 +167,24 @@ private:
 
 	// the host drives the I/O line through either of the two low bits
 	void esam_io_w(uint8_t data) { m_esam->io_w(BIT(data, 0) | BIT(data, 1)); }
+};
+
+
+// ddz2f: I2C EEPROM on the same lines as the 93C46, scrambled program ROM
+class sealy_z80_i2c_state : public sealy_z80_state
+{
+public:
+	sealy_z80_i2c_state(const machine_config &mconfig, device_type type, const char *tag) :
+		sealy_z80_state(mconfig, type, tag)
+	{ }
+
+	void ddz2f(machine_config &config) ATTR_COLD;
+
+	void init_ddz2f() ATTR_COLD;
+
+private:
+	void program_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -368,6 +390,22 @@ void sealy_z80_esam_state::io_map(address_map &map)
 }
 
 
+void sealy_z80_i2c_state::program_map(address_map &map)
+{
+	dizhu_program_map(map);
+	dizhu_protection_map(map);
+	map(0x6ff0, 0x6ff0).portr("I2CIN");
+}
+
+void sealy_z80_i2c_state::io_map(address_map &map)
+{
+	common_io_map(map);
+	map(0x50, 0x50).portw("I2CSCL");
+	map(0x60, 0x60).portw("I2CWC"); // cleared around each access, set otherwise
+	map(0xe0, 0xe0).portw("I2CSDA");
+}
+
+
 void sealy_z80_jzuanshi_state::program_map(address_map &map)
 {
 	alt_program_map(map);
@@ -412,6 +450,21 @@ static INPUT_PORTS_START( sealy_esam )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("esam", FUNC(sealy_z80_esam_device::rst_w))
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sealy_i2c )
+	PORT_START("I2CIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("I2CSDA")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::write_sda))
+
+	PORT_START("I2CSCL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::write_scl))
+
+	PORT_START("I2CWC")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::write_wc))
+INPUT_PORTS_END
+
 // Direct controls, used when test mode switch 1 is ON (as in the default EEPROMs).
 // Functions observed running bbddz, djddz and ddz2; the bonus game confirm only
 // on bbddz.  The original button legends are unknown.
@@ -444,6 +497,11 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ddz1 )
 	PORT_INCLUDE(sealy_esam)
+	PORT_INCLUDE(dizhu_controls)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ddz2f )
+	PORT_INCLUDE(sealy_i2c)
 	PORT_INCLUDE(dizhu_controls)
 INPUT_PORTS_END
 
@@ -589,6 +647,17 @@ void sealy_z80_esam_state::ddz1(machine_config &config)
 }
 
 
+void sealy_z80_i2c_state::ddz2f(machine_config &config)
+{
+	sealy_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sealy_z80_i2c_state::program_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &sealy_z80_i2c_state::dizhu_opcodes_map);
+	m_maincpu->set_addrmap(AS_IO, &sealy_z80_i2c_state::io_map);
+
+	I2C_24C01(config, "i2cmem");
+}
+
+
 void sealy_z80_jzuanshi_state::jzuanshi(machine_config &config)
 {
 	sealy_base(config);
@@ -613,6 +682,24 @@ ROM_START( bbddz )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "u9", 0x00000, 0x80000, CRC(249b1a34) SHA1(94af1a9c64fb7d06a7510d527c176b2fa6845885) ) // 29f040
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46", 0x00, 0x80, BAD_DUMP CRC(6ca3a909) SHA1(2f55f4040bcab30387d7cc7fecbdcf4d5762a3ed) ) // default with standard control panel
+ROM_END
+
+// only program ROM differs
+ROM_START( bbddza )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "rom3.u11", 0x00000, 0x20000, CRC(f26f88f2) SHA1(49d4a880739704a3a4296b5ca14f0fcb49d6f059) )
+
+	ROM_REGION16_LE( 0x200000, "bgtiles", 0 )
+	ROM_LOAD( "rom2.u18", 0x000000, 0x200000, CRC(1ee033bb) SHA1(14ab0702e17add44dfc82ce21dd5a37c05a1b2a2) )
+
+	ROM_REGION16_LE( 0x200000, "fgtiles", 0 )
+	ROM_LOAD( "rom1.u21", 0x000000, 0x200000, CRC(937e9e76) SHA1(95907ddadc2bf260d88a391ab1f61e8931ec7cc3) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "rom4.u13", 0x00000, 0x80000, CRC(249b1a34) SHA1(94af1a9c64fb7d06a7510d527c176b2fa6845885) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "93c46", 0x00, 0x80, BAD_DUMP CRC(6ca3a909) SHA1(2f55f4040bcab30387d7cc7fecbdcf4d5762a3ed) ) // default with standard control panel
@@ -670,6 +757,95 @@ ROM_START( ddz2a )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "93c46", 0x00, 0x80, BAD_DUMP CRC(25e71bc6) SHA1(af3cfd71e949cba4605316225e35c0629522ca22) ) // default with standard control panel
+ROM_END
+
+ROM_START( ddz2b )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "ddz-ql.u11", 0x00000, 0x20000, CRC(f9c876d5) SHA1(a43a3d3062a54f75d4c1f4bbf803098bf66d287d) )
+
+	ROM_REGION16_LE( 0x200000, "bgtiles", 0 )
+	ROM_LOAD( "83e0.u18", 0x000000, 0x200000, CRC(b746bb2c) SHA1(54338eb8d180d439a0c63f2987af5dc59862d1e8) )
+
+	ROM_REGION16_LE( 0x200000, "fgtiles", 0 )
+	ROM_LOAD( "fa42.u21", 0x000000, 0x200000, CRC(c62be0a4) SHA1(1cbfecba43b475f1a175f69fda498e662ac26720) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "4.u23", 0x00000, 0x40000, BAD_DUMP CRC(e089cf82) SHA1(567736b1418b86ea35e29fb9f8a408436c8a03c8) ) // not dumped, taken from ddz2
+
+	// key and PIN taken from the program, file contents set for the standard control panel
+	ROM_REGION( 0x120, "esam", 0 )
+	ROM_LOAD( "esam.bin", 0x000, 0x120, BAD_DUMP CRC(f546a196) SHA1(a752371be8e5a5edd908c5ae9df6e9fa970692cc) ) // reconstructed, not dumped
+ROM_END
+
+ROM_START( ddz2c )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "72b5.u11", 0x00000, 0x20000, CRC(4a5b31b5) SHA1(0c9da63f3fc0e006ed276b49096f401441f532d1) )
+
+	ROM_REGION16_LE( 0x200000, "bgtiles", 0 )
+	ROM_LOAD( "83e0.u18", 0x000000, 0x200000, CRC(b746bb2c) SHA1(54338eb8d180d439a0c63f2987af5dc59862d1e8) )
+
+	ROM_REGION16_LE( 0x200000, "fgtiles", 0 )
+	ROM_LOAD( "fa42.u21", 0x000000, 0x200000, CRC(c62be0a4) SHA1(1cbfecba43b475f1a175f69fda498e662ac26720) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "4.u23", 0x00000, 0x40000, BAD_DUMP CRC(e089cf82) SHA1(567736b1418b86ea35e29fb9f8a408436c8a03c8) ) // not dumped, taken from ddz2
+
+	// key and PIN taken from the program, file contents set for the standard control panel
+	ROM_REGION( 0x120, "esam", 0 )
+	ROM_LOAD( "esam.bin", 0x000, 0x120, BAD_DUMP CRC(f546a196) SHA1(a752371be8e5a5edd908c5ae9df6e9fa970692cc) ) // reconstructed, not dumped
+ROM_END
+
+ROM_START( ddz2d )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "rake30.u11", 0x00000, 0x20000, CRC(97c85d5c) SHA1(adfe4a80f176c0917ef36f76a2a8d96a3875f331) )
+
+	ROM_REGION16_LE( 0x200000, "bgtiles", 0 )
+	ROM_LOAD( "83e0.u18", 0x000000, 0x200000, CRC(b746bb2c) SHA1(54338eb8d180d439a0c63f2987af5dc59862d1e8) )
+
+	ROM_REGION16_LE( 0x200000, "fgtiles", 0 )
+	ROM_LOAD( "fa42.u21", 0x000000, 0x200000, CRC(c62be0a4) SHA1(1cbfecba43b475f1a175f69fda498e662ac26720) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "4.u23", 0x00000, 0x40000, BAD_DUMP CRC(e089cf82) SHA1(567736b1418b86ea35e29fb9f8a408436c8a03c8) ) // not dumped, taken from ddz2
+
+	// key and PIN taken from the program, file contents set for the standard control panel
+	ROM_REGION( 0x120, "esam", 0 )
+	ROM_LOAD( "esam.bin", 0x000, 0x120, BAD_DUMP CRC(f546a196) SHA1(a752371be8e5a5edd908c5ae9df6e9fa970692cc) ) // reconstructed, not dumped
+ROM_END
+
+ROM_START( ddz2e )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "rake30a.u11", 0x00000, 0x20000, CRC(a63b8502) SHA1(e49e8a1ea77a74f44603d1de80069b0424a95099) )
+
+	ROM_REGION16_LE( 0x200000, "bgtiles", 0 )
+	ROM_LOAD( "83e0.u18", 0x000000, 0x200000, CRC(b746bb2c) SHA1(54338eb8d180d439a0c63f2987af5dc59862d1e8) )
+
+	ROM_REGION16_LE( 0x200000, "fgtiles", 0 )
+	ROM_LOAD( "fa42.u21", 0x000000, 0x200000, CRC(c62be0a4) SHA1(1cbfecba43b475f1a175f69fda498e662ac26720) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "4.u23", 0x00000, 0x40000, BAD_DUMP CRC(e089cf82) SHA1(567736b1418b86ea35e29fb9f8a408436c8a03c8) ) // not dumped, taken from ddz2
+
+	// key and PIN taken from the program, file contents set for the standard control panel
+	ROM_REGION( 0x120, "esam", 0 )
+	ROM_LOAD( "esam.bin", 0x000, 0x120, BAD_DUMP CRC(f546a196) SHA1(a752371be8e5a5edd908c5ae9df6e9fa970692cc) ) // reconstructed, not dumped
+ROM_END
+
+ROM_START( ddz2f )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "rake30.u14", 0x00000, 0x20000, CRC(bf1ecc66) SHA1(86265408ce90e8af71d0b6ae1879a90372899af5) )
+
+	ROM_REGION16_LE( 0x200000, "bgtiles", 0 )
+	ROM_LOAD( "83e0.u18", 0x000000, 0x200000, CRC(b746bb2c) SHA1(54338eb8d180d439a0c63f2987af5dc59862d1e8) )
+
+	ROM_REGION16_LE( 0x200000, "fgtiles", 0 )
+	ROM_LOAD( "fa42.u21", 0x000000, 0x200000, CRC(c62be0a4) SHA1(1cbfecba43b475f1a175f69fda498e662ac26720) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "4.u23", 0x00000, 0x40000, BAD_DUMP CRC(e089cf82) SHA1(567736b1418b86ea35e29fb9f8a408436c8a03c8) ) // not dumped, taken from ddz2
+
+	ROM_REGION( 0x80, "i2cmem", 0 )
+	ROM_LOAD( "24c01", 0x00, 0x80, BAD_DUMP CRC(25e71bc6) SHA1(af3cfd71e949cba4605316225e35c0629522ca22) ) // default with standard control panel
 ROM_END
 
 ROM_START( djddza )
@@ -805,7 +981,8 @@ A5 and A3 pick one of four different pairs on pljh.  A0-A2 never take part, so
 the same transform applies to aligned groups of bytes.  ddz1 uses yet another
 selector table, jzuanshi the Dou Dizhu pairs with the opcode and data roles
 exchanged, wakenz80 the Dou Dizhu pairs with different opcode XOR values for
-pairs 0 and 1.
+pairs 0 and 1.  ddz2f selects among eight opcode transforms with A12, A10, A8,
+A7 and A4 and, independently, among eight data transforms with A9, A6 and A5.
 */
 
 // opcode fetches, Dou Dizhu boards and lucky168
@@ -1031,6 +1208,83 @@ void sealy_z80_state::decrypt_jzuanshi()
 	}
 }
 
+// opcode fetches, ddz2f
+uint8_t ddz2f_decrypt_opcode(uint8_t data, uint8_t key)
+{
+	switch (key)
+	{
+		default:
+		case 0: return bitswap<8>(data ^ 0x00, 5, 6, 3, 4, 7, 1, 2, 0);
+		case 1: return bitswap<8>(data ^ 0x02, 0, 6, 3, 4, 5, 1, 2, 7);
+		case 2: return bitswap<8>(data ^ 0x13, 6, 7, 3, 5, 4, 1, 2, 0);
+		case 3: return bitswap<8>(data ^ 0x31, 7, 6, 0, 4, 5, 1, 2, 3);
+		case 4: return bitswap<8>(data ^ 0x32, 3, 6, 7, 5, 4, 1, 2, 0);
+		case 5: return bitswap<8>(data ^ 0x32, 7, 6, 3, 4, 5, 1, 2, 0);
+		case 6: return bitswap<8>(data ^ 0x92, 6, 7, 5, 4, 3, 1, 2, 0);
+		case 7: return bitswap<8>(data ^ 0x92, 7, 5, 6, 4, 3, 2, 1, 0);
+	}
+}
+
+// ordinary reads, ddz2f, indexed by bitswap<3>(offset, 9, 6, 5)
+uint8_t ddz2f_decrypt_data(uint8_t data, uint8_t key)
+{
+	switch (key)
+	{
+		default:
+		case 0: return bitswap<8>(data ^ 0x98, 5, 3, 2, 6, 4, 1, 0, 7);
+		case 1: return bitswap<8>(data ^ 0x52, 7, 3, 6, 5, 4, 0, 1, 2);
+		case 2: return bitswap<8>(data ^ 0x22, 2, 3, 7, 4, 6, 5, 0, 1);
+		case 3: return bitswap<8>(data ^ 0x38, 2, 3, 0, 1, 6, 7, 5, 4);
+		case 4: return bitswap<8>(data ^ 0x92, 6, 5, 2, 7, 4, 1, 0, 3);
+		case 5: return bitswap<8>(data ^ 0x31, 7, 6, 1, 0, 4, 3, 2, 5);
+		case 6: return bitswap<8>(data ^ 0x2a, 2, 3, 4, 6, 0, 1, 5, 7);
+		case 7: return bitswap<8>(data ^ 0x65, 0, 2, 7, 6, 1, 5, 4, 3);
+	}
+}
+
+// opcode transform used for each value of bitswap<5>(offset, 12, 10, 8, 7, 4)
+constexpr uint8_t DDZ2F_OPCODE_SELECTORS[32] =
+{
+	6, 4, 5, 0, 2, 4, 1, 0,
+	7, 6, 3, 5, 2, 7, 1, 3,
+	6, 6, 5, 5, 7, 2, 3, 1,
+	2, 4, 1, 0, 7, 4, 3, 0,
+};
+
+// The selectors use the offsets in the dumped ROM.  After decrypting, the ROM is
+// put in the order the CPU sees it:
+// - A4, A8, A10 and A12 are scrambled as a function of themselves
+// - the banked window reads 16K further into the ROM than on the other Dou Dizhu
+//   boards (bank 2 is the ROM's fourth 16K block, and so on); the third block only
+//   holds encrypted zeros, so banks 2-7 are rotated to keep the common bank decoding
+void sealy_z80_state::decrypt_ddz2f()
+{
+	uint8_t *const rom = memregion("maincpu")->base();
+	const uint32_t length = memregion("maincpu")->bytes();
+
+	// XOR to apply to the offset, indexed by bitswap<4>(offset, 12, 10, 8, 4)
+	static constexpr uint16_t ADDRESS_XOR[16] =
+	{
+		0x1010, 0x0100, 0x0400, 0x0400, 0x1000, 0x0400, 0x1400, 0x0110,
+		0x0410, 0x1400, 0x1100, 0x0410, 0x1500, 0x0100, 0x0500, 0x0400,
+	};
+
+	std::vector<uint8_t> buffer(rom, rom + length);
+	m_decrypted_opcodes = std::make_unique<uint8_t[]>(length);
+
+	for (uint32_t a = 0; a < length; a++)
+	{
+		uint32_t dest = a ^ ADDRESS_XOR[bitswap<4>(a, 12, 10, 8, 4)];
+		if ((dest & 0x1c000) == 0x08000)
+			dest += 0x14000;
+		else if ((dest & 0x1c000) > 0x08000)
+			dest -= 0x4000;
+
+		m_decrypted_opcodes[dest] = ddz2f_decrypt_opcode(buffer[a], DDZ2F_OPCODE_SELECTORS[bitswap<5>(a, 12, 10, 8, 7, 4)]);
+		rom[dest] = ddz2f_decrypt_data(buffer[a], bitswap<3>(a, 9, 6, 5));
+	}
+}
+
 // Convert the stored tile words to the common format: BGR555 with bit 15 kept as
 // the opacity flag.  The *_field arguments give the 5-bit field (0 = bits 0-4,
 // 1 = bits 5-9, 2 = bits 10-14) holding each component once the XOR is removed.
@@ -1064,7 +1318,7 @@ void sealy_z80_eeprom_state::init_bbddz()
 	descramble_tiles(&m_bgtiles[0], m_bgtiles.length(), 0x0000, 1, 0, 2);
 }
 
-void sealy_z80_eeprom_state::init_ddz2()
+void sealy_z80_state::init_ddz2()
 {
 	decrypt_dizhu(DIZHU_SELECTORS);
 }
@@ -1092,6 +1346,11 @@ void sealy_z80_esam_state::init_lucky168()
 	decrypt_dizhu(LUCKY168_SELECTORS);
 }
 
+void sealy_z80_i2c_state::init_ddz2f()
+{
+	decrypt_ddz2f();
+}
+
 void sealy_z80_jzuanshi_state::init_jzuanshi()
 {
 	decrypt_jzuanshi();
@@ -1112,10 +1371,16 @@ void sealy_z80_eeprom_state::init_wakenz80()
 } // anonymous namespace
 
 
-GAME( 2005, bbddz,    0,     sealy,    djddz,    sealy_z80_eeprom_state,   init_bbddz,    ROT0, "Sealy", "Bai Bian Dou Dizhu",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2005, bbddz,    0,     sealy,    djddz,    sealy_z80_eeprom_state,   init_bbddz,    ROT0, "Sealy", "Bai Bian Dou Dizhu (set 1)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2005, bbddza,   bbddz, sealy,    djddz,    sealy_z80_eeprom_state,   init_bbddz,    ROT0, "Sealy", "Bai Bian Dou Dizhu (set 2)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2002, ddz1,     0,     ddz1,     ddz1,     sealy_z80_esam_state,     init_ddz1,     ROT0, "Sealy", "Dou Dizhu (Sealy)",                        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2003, ddz2,     0,     sealy,    djddz,    sealy_z80_eeprom_state,   init_ddz2,     ROT0, "Sealy", "Dou Dizhu II (set 1)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2003, ddz2a,    ddz2,  sealy,    djddz,    sealy_z80_eeprom_state,   init_ddz2,     ROT0, "Sealy", "Dou Dizhu II (set 2)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, ddz2b,    ddz2,  ddz1,     ddz1,     sealy_z80_esam_state,     init_ddz2,     ROT0, "Sealy", "Dou Dizhu II (set 3, ESAM)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, ddz2c,    ddz2,  ddz1,     ddz1,     sealy_z80_esam_state,     init_ddz2,     ROT0, "Sealy", "Dou Dizhu II (set 4, ESAM)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, ddz2d,    ddz2,  ddz1,     ddz1,     sealy_z80_esam_state,     init_ddz2,     ROT0, "Sealy", "Dou Dizhu II (set 5, ESAM)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, ddz2e,    ddz2,  ddz1,     ddz1,     sealy_z80_esam_state,     init_ddz2,     ROT0, "Sealy", "Dou Dizhu II (set 6, ESAM)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, ddz2f,    ddz2,  ddz2f,    ddz2f,    sealy_z80_i2c_state,      init_ddz2f,    ROT0, "Sealy", "Dou Dizhu II (set 7, I2C EEPROM)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2004, djddz,    0,     sealy,    djddz,    sealy_z80_eeprom_state,   init_djddz,    ROT0, "Sealy", "Dingji Dou Dizhu (set 1)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2004, djddza,   djddz, sealy,    djddz,    sealy_z80_eeprom_state,   init_djddza,   ROT0, "Sealy", "Dingji Dou Dizhu (set 2)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2004, fkddzz80, 0,     sealy,    djddz,    sealy_z80_eeprom_state,   init_djddza,   ROT0, "Sealy", "Fengkuang Dou Dizhu (Z80-based hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

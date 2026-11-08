@@ -20,6 +20,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "machine/sab3019.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
@@ -76,6 +77,7 @@ public:
 		m_hires_ram(*this, "hires_ram"),
 		m_char_ram(*this, "char_ram", 0x1000, ENDIANNESS_LITTLE),
 		m_pc_keyboard(*this, "pc_keyboard"),
+		m_rtc(*this, "rtc"),
 		m_dma_mux(0),
 		m_kbdclk(0),
 		m_kbddat(0),
@@ -154,6 +156,7 @@ public:
 	required_shared_ptr<uint16_t> m_hires_ram;
 	memory_share_creator<uint8_t> m_char_ram;
 	required_device<pc_keyboard_device> m_pc_keyboard; // temporary until the tandy keyboard has a rom dump
+	required_device<sab3019_device> m_rtc;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -199,6 +202,9 @@ public:
 	void kbddat_w(int state);
 	uint8_t clkmouse_r(offs_t offset);
 	void clkmouse_w(offs_t offset, uint8_t data);
+	void rtc_cbus(uint16_t bits, int count);
+	uint8_t rtc_read(int addr);
+	void rtc_set(int addr, uint8_t data);
 	uint8_t irq_callback(offs_t offset);
 	void fdc_drq_w(int state);
 	void fdc_hdl_w(int state);
@@ -304,9 +310,9 @@ public:
 		m_hdc(*this, "hdc")
 	{
 	}
-	
+
 	void tandy2k_hd(machine_config &config);
-	
+
 protected:
 	required_device<tandy2k_hdc_device> m_hdc;
 

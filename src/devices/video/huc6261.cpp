@@ -12,7 +12,8 @@
     VSync changes 30 master cycles after HSync would go low.
 
     TODO:
-    - Interlace and 7MHz dot clock alignment with the KING/RAINBOW layers
+    - 1/2 dot shift in interlace mode (DCC = 3)
+    - 7MHz dot clock alignment with the KING/RAINBOW layers
 
 **********************************************************************/
 
@@ -28,9 +29,6 @@
 static constexpr unsigned HUC6261_HSYNC_LENGTH = 237;
 static constexpr unsigned HUC6261_HSYNC_START  = (huc6261_device::WPF - HUC6261_HSYNC_LENGTH);
 
-constexpr unsigned huc6261_device::WPF;
-constexpr unsigned huc6261_device::LPF;
-
 DEFINE_DEVICE_TYPE(HUC6261, huc6261_device, "huc6261", "Hudson HuC6261 VCE")
 
 
@@ -41,12 +39,15 @@ huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, d
 	, m_huc6272(*this, finder_base::DUMMY_TAG)
 	, m_last_h(0)
 	, m_last_v(0)
-	, m_height(0)
+	, m_height(LPF)
+	, m_interlace(false)
+	, m_odd_field(false)
 	, m_palette{0}
 	, m_address(0)
 	, m_palette_latch(0)
 	, m_register(0)
 	, m_control(0)
+	, m_control_reg(0)
 	, m_priority{0}
 	, m_pixels_per_clock(0)
 	, m_pixel_data{0}
@@ -244,20 +245,49 @@ u32 huc6261_device::mix_pixel(u16 vdc0, u16 vdc1, u32 king, u32 rainbow) const
 		out_is_layer = true;
 	}
 
-	// front cellophane: the cellophane colour over everything
+	// front cellophane: the cellophane colour over everything, shown as is where every layer is transparent
 	if (cello_mode == 3)
-		out = cello_blend(m_cello_coeff[0], palette_yuv888_entry(m_cello_colour), m_cello_coeff[1], out);
+		out = out_is_layer ? cello_blend(m_cello_coeff[0], palette_yuv888_entry(m_cello_colour), m_cello_coeff[1], out) : palette_yuv888_entry(m_cello_colour);
 
 	return yuv888_to_rgb(out);
 }
 
+// the screen counts at twice the master clock, so a screen line is half a display line
+std::pair<int, int> huc6261_device::beam_position() const
+{
+	const u32 clocks = (u32(screen().vpos()) * WPF + screen().hpos()) / 2;
+	return std::make_pair(int(clocks / WPF), int(clocks % WPF));
+}
+
+attotime huc6261_device::time_until_beam(int v, int h) const
+{
+	const u32 pos = (u32(v) * WPF + h) * 2;
+	return screen().time_until_pos(pos / WPF, pos % WPF);
+}
+
+// interlace starts with the odd field, then the fields alternate
+void huc6261_device::start_frame()
+{
+	const bool interlace = BIT(m_control, 1);
+	m_odd_field = interlace && (!m_interlace || !m_odd_field);
+	m_interlace = interlace;
+}
+
 TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 {
-	const int vpos = screen().vpos();
-	const int hpos = screen().hpos();
+	const auto [vpos, hpos] = beam_position();
 	int h = m_last_h;
 	int v = m_last_v;
-	u32 *bitmap_line = &m_bmp.pix(v);
+
+	// each display line covers two bitmap rows: both when not interlaced, the odd field on the lower one
+	u32 *bitmap_line = nullptr;
+	u32 *bitmap_line2 = nullptr;
+	auto set_rows = [this, &v, &bitmap_line, &bitmap_line2] ()
+	{
+		bitmap_line = &m_bmp.pix(v * 2 + (m_odd_field ? 1 : 0));
+		bitmap_line2 = m_interlace ? nullptr : &m_bmp.pix(v * 2 + 1);
+	};
+	set_rows();
 
 	// KING dots are 4 master clocks wide in both dot clock modes
 	const int king_start = BIT(m_control, 3) ? KING_START_7MHZ : KING_START_5MHZ;
@@ -283,6 +313,8 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 		}
 
 		bitmap_line[h] = m_pixel_rgb;
+		if (bitmap_line2)
+			bitmap_line2[h] = m_pixel_rgb;
 
 		m_pixel_clock = (m_pixel_clock + 1) % m_pixels_per_clock;
 		h = (h + 1) % WPF;
@@ -292,23 +324,7 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 		case HUC6261_HSYNC_START:       /* Start of HSync */
 			m_huc6270[0]->hsync_changed(0);
 			m_huc6270[1]->hsync_changed(0);
-//          if (v == 0)
-//          {
-//              /* Check if the screen should be resized */
-//              m_height = LPF - (m_blur ? 1 : 0);
-//              if (m_height != video_screen_get_height(m_screen))
-//              {
-//                  rectangle visible_area;
-//
-//                  /* TODO: Set proper visible area parameters */
-//                  visible_area.min_x = 64;
-//                  visible_area.min_y = 18;
-//                  visible_area.max_x = 64 + 1024 + 64 - 1;
-//                  visible_area.max_y = 18 + 242 - 1;
-//
-//                  video_screen_configure(m_screen, WPF, m_height, &visible_area, HZ_TO_ATTOSECONDS(device->clock / (WPF * m_height)));
-//              }
-//          }
+			m_huc6272->rainbow_hsync();
 			break;
 
 		case 0:     /* End of HSync */
@@ -316,7 +332,29 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 			m_huc6270[1]->hsync_changed(1);
 			m_pixel_clock = 0;
 			v = (v + 1) % m_height;
-			bitmap_line = &m_bmp.pix(v);
+			if (v == 0)
+			{
+				m_control = m_control_reg;
+				m_pixels_per_clock = BIT(m_control, 3) ? 3 : 4;
+				start_frame();
+			}
+			else
+			{
+				m_control = (m_control & 0x80ff) | (m_control_reg & 0x7f00);
+			}
+
+			// the frame length (DCC 01 = 262 lines, otherwise 263) is applied at the start of vblank,
+			// where the screen can be reconfigured without moving the beam
+			if (v == 260)
+			{
+				const int height = ((m_control & 3) == 1) ? 262 : 263;
+				if (height != m_height)
+				{
+					m_height = height;
+					screen().configure(WPF, m_height * 2, screen().visible_area(), attotime::from_ticks(u64(WPF) * m_height, clock()));
+				}
+			}
+			set_rows();
 			start_line(v);
 			break;
 
@@ -386,7 +424,7 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 		}
 	}
 
-	m_timer->adjust(screen().time_until_pos(v, h));
+	m_timer->adjust(time_until_beam(v, h));
 }
 
 
@@ -447,10 +485,11 @@ u16 huc6261_device::read(offs_t offset)
 		/* Status info */
 		case 0x00:
 			{
-				const u16 vpos = screen().vpos();
-				const u16 hpos = screen().hpos();
+				const auto [vpos, hpos] = beam_position();
 
 				data = (vpos << 5) | (m_register & 0x1f);
+				if (m_odd_field)
+					data |= 0x4000;
 
 				if (vpos >= 22 && vpos < 262 && hpos < HUC6261_HSYNC_START)
 				{
@@ -464,7 +503,7 @@ u16 huc6261_device::read(offs_t offset)
 			switch (m_register)
 			{
 				case 0x00:
-					data = m_control;
+					data = m_control_reg;
 					break;
 
 				case 0x01:
@@ -481,12 +520,47 @@ u16 huc6261_device::read(offs_t offset)
 					}
 					break;
 
+				case 0x04:
+				case 0x05:
+				case 0x06:
+				case 0x07:
+					data = m_palette_offset[m_register & 3];
+					break;
+
 				case 0x08:
 					data = m_priority[4] | (m_priority[5] << 4) | (m_priority[6] << 8);
 					break;
 
 				case 0x09:
 					data = m_priority[0] | (m_priority[1] << 4) | (m_priority[2] << 8) | (m_priority[3] << 12);
+					break;
+
+				case 0x0a:
+				case 0x0b:
+				case 0x0c:
+					data = m_chroma_key[m_register - 0x0a];
+					break;
+
+				case 0x0d:
+					data = m_cello_colour;
+					break;
+
+				// games fade by reading the cellophane registers back and stepping them (dknight4)
+				case 0x0e:
+					data = m_cello_enable;
+					break;
+
+				case 0x0f:
+					data = m_cello_sprite_mask;
+					break;
+
+				case 0x10:
+				case 0x11:
+				case 0x12:
+				case 0x13:
+				case 0x14:
+				case 0x15:
+					data = m_cello_coeff[m_register - 0x10];
 					break;
 			}
 			break;
@@ -502,7 +576,7 @@ void huc6261_device::write(offs_t offset, u16 data)
 	{
 		/* Register */
 		case 0x00:
-			m_register = data;
+			m_register = data & 0x1f;
 			break;
 
 		case 0x01:
@@ -521,10 +595,10 @@ void huc6261_device::write(offs_t offset, u16 data)
 				// ---- ---- -x-- ---- Number of BG colors?: 0 - 16, 1 - 256
 				// ---- ---- ---- x--- Dot clock: 0 - 5MHz, 1 - 7MHz
 				// ---- ---- ---- -x-- Synchronization: 0 - internal, 1 - external
-				// ---- ---- ---- --xx Screen height: 00 - 262 lines, 01 - 263 lines, 10 - interlace, 11 - unknown/undefined
+				// ---- ---- ---- --xx Screen height: 00 - 263 lines, 01 - 262 lines, 10 - interlace, 11 - interlace with 1/2 dot shift
+				// bits 8-14 take effect from the next line, the others from the next frame
 				case 0x00:
-					m_control = data;
-					m_pixels_per_clock = BIT(data, 3) ? 3 : 4;
+					m_control_reg = data;
 					break;
 
 				// Palette address
@@ -548,9 +622,12 @@ void huc6261_device::write(offs_t offset, u16 data)
 				case 0x05:
 				// King BG 2 & 3
 				case 0x06:
-				// <unused> & Rainbow
-				case 0x07:
 					m_palette_offset[m_register & 3] = data;
+					break;
+
+				// <unused> & Rainbow, only the low byte is used
+				case 0x07:
+					m_palette_offset[3] = data & 0xff;
 					break;
 
 				// Priority 0
@@ -622,21 +699,24 @@ void huc6261_device::device_start()
 {
 	m_timer = timer_alloc(FUNC(huc6261_device::update_events), this);
 
-	m_bmp.allocate(WPF, LPF);
+	m_bmp.allocate(WPF, SCREEN_LPF);
 
 	save_item(NAME(m_last_h));
 	save_item(NAME(m_last_v));
 	save_item(NAME(m_height));
+	save_item(NAME(m_interlace));
+	save_item(NAME(m_odd_field));
 	save_item(NAME(m_palette));
 	save_item(NAME(m_palette_latch));
+	save_item(NAME(m_palette_offset));
 	save_item(NAME(m_address));
 	save_item(NAME(m_register));
 	save_item(NAME(m_control));
+	save_item(NAME(m_control_reg));
 	save_item(NAME(m_priority));
 	save_item(NAME(m_pixels_per_clock));
 	save_item(NAME(m_pixel_data));
 	save_item(NAME(m_pixel_clock));
-	save_item(NAME(m_bmp));
 	save_item(NAME(m_pixel_rgb));
 	save_item(NAME(m_king_line));
 	save_item(NAME(m_rainbow_line));
@@ -651,9 +731,22 @@ void huc6261_device::device_start()
 
 void huc6261_device::device_reset()
 {
+	// all registers are cleared except R0F, which is set to FFh
 	m_register = 0;
+	m_control = 0;
+	m_control_reg = 0;
+	m_address = 0;
+	m_palette_latch = 0;
+	std::fill(std::begin(m_palette_offset), std::end(m_palette_offset), 0);
+	std::fill(std::begin(m_priority), std::end(m_priority), 0);
 	m_pixels_per_clock = 4;
-	m_height = 263;
+	m_interlace = false;
+	m_odd_field = false;
+	if (m_height != 263)
+	{
+		m_height = 263;
+		screen().configure(WPF, SCREEN_LPF, screen().visible_area(), attotime::from_ticks(u64(WPF) * LPF, clock()));
+	}
 	m_pixel_clock = 0;
 
 	memset(m_palette, 0, sizeof(m_palette));
@@ -663,11 +756,12 @@ void huc6261_device::device_reset()
 	std::fill(std::begin(m_chroma_key), std::end(m_chroma_key), 0);
 	m_cello_colour = 0;
 	m_cello_enable = 0;
-	m_cello_sprite_mask = 0;
+	m_cello_sprite_mask = 0xff;
 	std::fill(std::begin(m_cello_coeff), std::end(m_cello_coeff), 0);
 	std::fill(std::begin(m_layer_rank), std::end(m_layer_rank), 0);
 
-	m_last_v = screen().vpos();
-	m_last_h = screen().hpos();
-	m_timer->adjust(screen().time_until_pos((screen().vpos() + 1) % 263, 0));
+	const auto [v, h] = beam_position();
+	m_last_v = v;
+	m_last_h = h;
+	m_timer->adjust(time_until_beam((v + 1) % m_height, 0));
 }

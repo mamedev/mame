@@ -34,10 +34,13 @@ public:
 		m_ncr1.lookup()->irq_handler_cb().set(m_primetimeii, FUNC(primetime_device::scsi_irq_w));
 		m_ncr1.lookup()->drq_handler_cb().set(m_primetimeii, FUNC(primetime_device::scsi_drq_w));
 	}
+	void set_scsi_clock(const XTAL &clock) { m_ncr1.lookup()->set_clock(clock); }
 	template <typename... T> void set_rom_tag(T &&... args) { m_rom.set_tag(std::forward<T>(args)...); }
 	void set_ram_info(u32 *ram, u32 size);
 
 	auto write_ata_irq() { return m_ata_irq.bind(); }
+
+	void overlay_off();
 
 protected:
 	// device-level overrides

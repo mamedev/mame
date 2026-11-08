@@ -11,8 +11,10 @@
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/m68000/m68000.h"
 #include "bus/centronics/ctronics.h"
+#include "bus/trs80m2/slot.h"
 #include "imagedev/floppy.h"
 #include "machine/am9519.h"
+#include "machine/input_merger.h"
 #include "machine/ram.h"
 #include "trs80m2kb.h"
 #include "machine/wd_fdc.h"
@@ -57,7 +59,9 @@ public:
 		m_kb(*this, TRS80M2_KEYBOARD_TAG),
 		m_rom(*this, Z80_TAG),
 		m_char_rom(*this, MC6845_TAG),
-		m_video_ram(*this, "video_ram", 0x800, ENDIANNESS_LITTLE)
+		m_video_ram(*this, "video_ram", 0x800, ENDIANNESS_LITTLE),
+		m_dmarq(*this, "dmarq"),
+		m_slot(*this, "slot%u", 1U)
 	{
 	}
 
@@ -90,7 +94,6 @@ public:
 	void write_centronics_perror(int state);
 
 	void trs80m2(machine_config &config);
-	void m68000_mem(address_map &map) ATTR_COLD;
 	void z80_io(address_map &map) ATTR_COLD;
 	void z80_mem(address_map &map) ATTR_COLD;
 protected:
@@ -98,6 +101,14 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void video_start() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
+
+	void select_floppy();
+
+	virtual uint8_t bus_r(offs_t offset);
+	virtual void bus_w(offs_t offset, uint8_t data);
+
+	void card_cage(machine_config &config, uint32_t slots) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
@@ -117,6 +128,11 @@ protected:
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
 	memory_share_creator<uint8_t> m_video_ram;
+	required_device<input_merger_device> m_dmarq;
+	optional_device_array<trs80m2_slot_device, 4> m_slot;
+
+	// floppy state
+	uint8_t m_drvslt = 0xff;
 
 	// memory state
 	int m_boot_rom;
@@ -149,6 +165,8 @@ public:
 		: trs80m2_state(mconfig, type, tag)
 		, m_subcpu(*this, M68000_TAG)
 		, m_uic(*this, AM9519A_TAG)
+		, m_m68k_ram(*this, "m68k_ram")
+		, m_config(*this, "CONFIG")
 	{
 	}
 
@@ -157,13 +175,39 @@ public:
 
 	void trs80m16(machine_config &config);
 	void m16_z80_io(address_map &map) ATTR_COLD;
+	void m68000_mem(address_map &map) ATTR_COLD;
+	void m68000_user_mem(address_map &map) ATTR_COLD;
+	void m68000_cpu_space(address_map &map) ATTR_COLD;
+
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	required_device<cpu_device> m_subcpu;
+	virtual uint8_t bus_r(offs_t offset) override;
+	virtual void bus_w(offs_t offset, uint8_t data) override;
+
+private:
+	uint16_t timeout_r();
+	void timeout_w(uint16_t data);
+	uint16_t user_r(offs_t offset, uint16_t mem_mask);
+	void user_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t iack_r();
+
+	offs_t z80_window_address(offs_t offset) const;
+	bool translate(offs_t &offset);
+	void pulse_ireq(int line);
+
+	required_device<m68000_device> m_subcpu;
 	required_device<am9519_device> m_uic;
+	required_device<ram_device> m_m68k_ram;
+	required_ioport m_config;
 
+	address_space *m_m68k_space = nullptr;
+	memory_access<24, 1, 0, ENDIANNESS_BIG>::specific m_m68k_program;
 	uint16_t m_ual = 0;
+	uint8_t m_tcl = 0;
+	bool m_burst = true;
+	bool m_z80_master = false;
 	uint8_t m_limit[2];
 	uint8_t m_offset[2];
 };

@@ -566,7 +566,7 @@ void _3do_state::green_config(machine_config &config)
 void _3do_state::_3do(machine_config &config)
 {
 	/* Basic machine hardware */
-	ARM7_BE(config, m_maincpu, XTAL(50'000'000)/4); // DA86C06020XV
+	ARM60_BE(config, m_maincpu, XTAL(50'000'000)/4).set_config_pins(true, true); // DA86C06020XV, PROG32 and DATA32 high
 	m_maincpu->set_addrmap(AS_PROGRAM, &_3do_state::main_mem);
 	m_maincpu->set_dasm_override(std::function(&portfolio_dasm_override), "portfolio_dasm_override");
 
@@ -590,7 +590,7 @@ void _3do_state::_3do(machine_config &config)
 void _3do_state::_3do_pal(machine_config &config)
 {
 	/* Basic machine hardware */
-	ARM7_BE(config, m_maincpu, XTAL(50'000'000)/4);
+	ARM60_BE(config, m_maincpu, XTAL(50'000'000)/4).set_config_pins(true, true);
 	m_maincpu->set_addrmap(AS_PROGRAM, &_3do_state::main_mem);
 	m_maincpu->set_dasm_override(std::function(&portfolio_dasm_override), "portfolio_dasm_override");
 

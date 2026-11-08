@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders: Angelo Salese
+
+Layout for Russian Roulette / Vegas Roulette
+
+This is a functional approximation given the few refs are very low quality.
+Real cabinet seems to have some fancy text near the buttons, alternating red and blue text over
+pink boxes. Lamps themselves are push button square lamps with unknown ON state.
+Start aligns outside the screen canvas, to the left.
+-->
+<mamelayout version="2">
+	<element name="L1" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="1.0" />
+		</rect>
+	</element>
+
+	<element name="L2" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="1.0" />
+		</rect>
+	</element>
+
+	<element name="L3" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="1.0" />
+		</rect>
+	</element>
+
+	<element name="L4" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="1.0" />
+		</rect>
+	</element>
+
+	<element name="L5" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="1.0" />
+		</rect>
+	</element>
+
+	<element name="L6" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="1.0" />
+		</rect>
+	</element>
+
+	<element name="L7" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="1.0" />
+		</rect>
+	</element>
+
+	<element name="L8" defstate="1">
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.3" blue="1.0" />
+		</rect>
+	</element>
+
+	<view name="Button Lamps">
+		<screen index="0">
+			<bounds x="0.5" y="0" width="3" height="4" />
+		</screen>
+		<element name="lamp8" ref="L1">
+			<bounds x="0" y="4.25" width="0.25" height="0.25" />
+		</element>
+		<element name="lamp1" ref="L2">
+			<bounds x="0.600" y="4.25" width="0.25" height="0.25" />
+		</element>
+		<element name="lamp2" ref="L3">
+			<bounds x="1.025" y="4.25" width="0.25" height="0.25" />
+		</element>
+		<element name="lamp3" ref="L4">
+			<bounds x="1.450" y="4.25" width="0.25" height="0.25" />
+		</element>
+		<element name="lamp4" ref="L5">
+			<bounds x="1.875" y="4.25" width="0.25" height="0.25" />
+		</element>
+		<element name="lamp5" ref="L6">
+			<bounds x="2.300" y="4.25" width="0.25" height="0.25" />
+		</element>
+		<element name="lamp6" ref="L7">
+			<bounds x="2.725" y="4.25" width="0.25" height="0.25" />
+		</element>
+		<element name="lamp7" ref="L8">
+			<bounds x="3.150" y="4.25" width="0.25" height="0.25" />
+		</element>
+	</view>
+</mamelayout>

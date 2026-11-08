@@ -15,6 +15,7 @@
 
 #include "util/strformat.h" // string_format
 
+#include <algorithm>
 #include <memory>
 #include <vector>
 
@@ -135,10 +136,10 @@ protected:
 private:
 	pcap_module &m_module;
 	pcap_t *m_p;
+	uint8_t m_pktbuf[2048];
 #ifdef SDLMAME_MACOSX
 	pthread_t m_thread;
 	pcap_t *p;
-	uint8_t m_pktbuf[2048];
 
 	uint8_t m_packets[32][1600];
 	int m_packetlens[32];
@@ -165,8 +166,9 @@ void pcap_module::netdev_pcap::pcap_handler(u_char *user, const struct pcap_pkth
 		printf("buffer full, dropping packet\n");
 		return;
 	}
-	memcpy(ctx->m_packets[curr], bytes, h->len);
-	ctx->m_packetlens[curr] = h->len;
+	int const len = std::min<int>(h->caplen, sizeof(ctx->m_packets[curr]));
+	memcpy(ctx->m_packets[curr], bytes, len);
+	ctx->m_packetlens[curr] = len;
 	ctx->m_head.store(next, std::memory_order_release);
 }
 
@@ -247,14 +249,18 @@ int pcap_module::netdev_pcap::recv_dev(uint8_t **buf)
 		return 0;
 
 	memcpy(m_pktbuf, m_packets[curr], m_packetlens[curr]);
-	int ret = m_packetlens[curr];
+	int const len = m_packetlens[curr];
 	m_tail.store((curr + 1) & 0x1f, std::memory_order_release);
-	*buf = m_pktbuf;
-	return ret;
 #else
 	struct pcap_pkthdr *header;
-	return ((*m_module.pcap_next_ex_dl)(m_p, &header, (const u_char **)buf) == 1) ? header->len : 0;
+	const u_char *data;
+	if ((*m_module.pcap_next_ex_dl)(m_p, &header, &data) != 1)
+		return 0;
+	int const len = std::min<int>(header->caplen, sizeof(m_pktbuf) - 4);
+	memcpy(m_pktbuf, data, len);
 #endif
+	*buf = m_pktbuf;
+	return finalise_frame(m_pktbuf, len);
 }
 
 pcap_module::netdev_pcap::~netdev_pcap()

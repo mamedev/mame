@@ -45,6 +45,7 @@ public:
 	}
 
 	uint8_t sam_read(offs_t offset);
+	void vdg_flush(int state);
 
 	void horizontal_sync(int state);
 	void field_sync(int state);

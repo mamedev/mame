@@ -793,8 +793,8 @@ struct model2_state::raster_state
 	}
 
 //  u32             mode = 0;                       // bit 0 = Test Mode, bit 2 = Switch 60Hz(1)/30Hz(0) operation
-	u16 *           texture_rom = nullptr;          // Texture ROM pointer
-	u32             texture_rom_mask = 0;           // Texture ROM mask
+	u16 const *     texture_rom = nullptr;          // Texture ROM data
+	u32             texture_rom_mask = 0;           // Texture ROM address mask
 	int16_t         viewport[4] = { 0, 0, 0, 0 };   // View port (startx,starty,endx,endy)
 	int16_t         center[4][2] = { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }; // Centers (eye 0[x,y],1[x,y],2[x,y],3[x,y])
 	u16             center_sel = 0;                 // Selected center
@@ -836,8 +836,8 @@ struct model2_state::geo_state
 
 	raster_state *      raster = nullptr;
 	u32                 mode = 0;                   // bit 0 = Enable Specular, bit 1 = Calculate Normals
-	u32 *               polygon_rom = nullptr;      // Polygon ROM pointer
-	u32                 polygon_rom_mask = 0;       // Polygon ROM mask
+	u32 const *         polygon_rom = nullptr;      // Polygon ROM data
+	u32                 polygon_rom_mask = 0;       // Polygon ROM address mask
 	u32                 mesh_begin = 0x30100;
 	u32                 mesh_current = 0x30100;
 	u32                 mesh_texture_start = 0x80c000;

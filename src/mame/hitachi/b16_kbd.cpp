@@ -12,7 +12,9 @@ TODO:
 
 #include "emu.h"
 #include "b16_kbd.h"
+
 #include "machine/keyboard.ipp"
+
 
 DEFINE_DEVICE_TYPE(B16_KBD, b16_kbd_device, "b16_kbd", "Hitachi B16 Keyboard")
 
@@ -22,6 +24,13 @@ b16_kbd_device::b16_kbd_device(const machine_config &mconfig, const char *tag, d
 	, m_modifiers(*this, "MODIFIERS")
 	, m_lock_keys(*this, "LOCKS")
 	, m_irq_cb(*this)
+	, m_fifo{ }
+	, m_last_code(0)
+	, m_head(0)
+	, m_count(0)
+	, m_modifier_state(0)
+	, m_lock_pressed(0)
+	, m_lock_state(0)
 {
 }
 

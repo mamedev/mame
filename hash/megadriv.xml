@@ -6005,7 +6005,7 @@ Unsupported [Menacer] peripheral
 		<year>1993</year>
 		<publisher>Arena</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_nbajam_alt"/>
+			<feature name="slot" value="rom_nbajam"/>
 			<feature name="pcb" value="670120 REV 2"/>
 			<feature name="u1" value="NBA JAM GEN VER 1.00"/>  <!-- also found pic (from US cart?) with rom marked "GEN NBA JAM 9402 VER 1.00 S285" -->
 			<feature name="u2" value="DV74ALS138N"/>
@@ -6025,7 +6025,7 @@ Unsupported [Menacer] peripheral
 		<publisher>Acclaim Japan</publisher>
 		<info name="alt_title" value="NBA ジャム"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_nbajam_alt"/>
+			<feature name="slot" value="rom_nbajam"/>
 			<feature name="pcb" value="171-6568C"/>
 			<feature name="pcb2" value="837-9952"/>
 			<feature name="ic1" value="27c4000"/>
@@ -25042,7 +25042,7 @@ No [EEPROM] save
 		<publisher>Arena</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U,PAL"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_nbajam_alt"/>
+			<feature name="slot" value="rom_nbajam"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="nba jam (euro, usa) (v1.1).bin" size="2097152" crc="eb8360e6" sha1="55f2b26a932c69b2c7cb4f24f56b43f24f113a7c"/>
 			</dataarea>
@@ -25058,7 +25058,7 @@ No [EEPROM] save
 		<info name="alt_title" value="NBA ジャム"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_nbajam_alt"/>
+			<feature name="slot" value="rom_nbajam"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="nba jam (jpn).bin" size="2097152" crc="a6c6305a" sha1="2a88b2e1ecf115fa6246397d829448b755a5385e"/>
 			</dataarea>
@@ -25070,7 +25070,7 @@ No [EEPROM] save
 		<year>1993</year>
 		<publisher>Arena</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_nbajam_alt"/>
+			<feature name="slot" value="rom_nbajam"/>
 			<feature name="pcb" value="SGEP2A AW REV. A"/>
 			<feature name="u3" value="74HC139AP"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">

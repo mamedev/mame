@@ -38,6 +38,7 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
+	void mr_w(int state);
 	void drdy_w(int state);
 	void brdy_w(int state);
 	void sc_w(int state);
@@ -100,6 +101,7 @@ private:
 	attotime get_stepping_rate();
 	void start_command();
 	void end_command();
+	bool id_found(uint8_t sector);
 	int get_lbasector(uint8_t sector);
 
 	// extract values from sdh

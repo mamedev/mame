@@ -17,7 +17,7 @@
         27  Set     M0  Memory Size
         26  Clear   M0  Memory Size
         25  Set     R1  MPU Rate            00: Slow    10: Fast
-        24  Clear   R1  MPU Rate            01: Dual    11: Fast
+        24  Clear   R1  MPU Rate            01: A.D.    11: Fast
         23  Set     R0  MPU Rate
         22  Clear   R0  MPU Rate
         21  Set     P1  Page #1             0: Low      1: High
@@ -44,7 +44,8 @@
          0  Clear   V0  VDG Mode
 
     All parts of the SAM are fully emulated except R1/R0 (the changes in the
-    MPU rate are approximated) and M1/M0
+    MPU rate are approximated; the loss of VDG and refresh cycles in fast
+    mode is not emulated) and M1/M0
 
 ***************************************************************************/
 
@@ -109,6 +110,7 @@ sam6883_friend_device_interface::sam6883_friend_device_interface(const machine_c
 	, m_cpu(device, finder_base::DUMMY_TAG)
 	, m_sam_state(0x0000)
 	, m_divider(divider)
+	, m_video_flush_cb(device)
 {
 }
 
@@ -154,6 +156,10 @@ void sam6883_device::device_start()
 	save_item(NAME(m_counter));
 	save_item(NAME(m_counter_xdiv));
 	save_item(NAME(m_counter_ydiv));
+	save_item(NAME(m_counter_bit4_input));
+	save_item(NAME(m_counter_bit5_input));
+	save_item(NAME(m_ad_base));
+	save_item(NAME(m_ad_slow_end));
 }
 
 
@@ -163,6 +169,8 @@ void sam6883_device::device_start()
 
 uint8_t sam6883_device::read(offs_t offset)
 {
+	address_dependent_rate(offset);
+
 	bool mode_64k = (m_sam_state & SAM_STATE_M1) == SAM_STATE_M1;
 	if (offset < (mode_64k && (m_sam_state & SAM_STATE_TY) ? 0xff00 : 0x8000))
 	{
@@ -200,6 +208,8 @@ uint8_t sam6883_device::read(offs_t offset)
 
 void sam6883_device::write(offs_t offset, uint8_t data)
 {
+	address_dependent_rate(offset);
+
 	bool mode_64k = (m_sam_state & SAM_STATE_M1) == SAM_STATE_M1;
 	if (offset < 0x8000)
 	{
@@ -243,9 +253,7 @@ void sam6883_device::write(offs_t offset, uint8_t data)
 
 void sam6883_device::device_reset()
 {
-	m_counter = 0;
-	m_counter_xdiv = 0;
-	m_counter_ydiv = 0;
+	counter_reset(0);
 	m_sam_state = 0x0000;
 	update_state();
 }
@@ -348,20 +356,56 @@ void sam6883_friend_device_interface::update_cpu_clock()
 	//      $FFD6   (clear) R0
 	//
 	// R1:R0 formed the following states:
-	//      00  - slow          0.89 MHz
-	//      01  - dual speed    ???
-	//      1x  - fast          1.78 MHz
+	//      00  - slow          0.89 MHz (crystal / 16)
+	//      01  - address dependent
+	//      1x  - fast          1.78 MHz (crystal / 8)
 	//
-	// R1 controlled whether the video addressing was speeded up and R0
-	// did the same for the CPU.  On pre-CoCo 3 machines, setting R1 caused
-	// the screen to display garbage because the M6847 could not display
-	// fast enough.
+	// In address dependent mode, $0000-$7FFF and $FF00-$FF1F are accessed
+	// at the slow rate and all other addresses at the fast rate.  The CPU
+	// is clocked at the fast rate and the MC6883 stretches slow accesses
+	// (see sam6883_device::address_dependent_cycle).
 	//
-	// TODO:  Make the overclock more accurate.  In dual speed, ROM was a fast
-	// access but RAM was not.  I don't know how to simulate this.
+	// Fast mode steals the time normally used for VDG and refresh access.
+	// On pre-CoCo 3 machines, setting R1 caused the screen to display
+	// garbage because the M6847 is not given access to RAM.
 
 	int speed = (m_sam_state & (SAM_STATE_R1|SAM_STATE_R0)) / SAM_STATE_R0;
 	m_cpu->owner()->set_unscaled_clock(device().clock() / (m_divider * (speed ? 2 : 4)));
+}
+
+
+
+//-------------------------------------------------
+//  address_dependent_cycle - time one MPU bus
+//  cycle in address dependent rate mode
+//-------------------------------------------------
+
+// The CPU is clocked at the fast rate (8 oscillator periods per cycle), and
+// the MPU calls here once per bus cycle, dead cycles included, after the
+// cycle has been counted.  Measured on a CoCo 1 (MC6883) and a CoCo 2B
+// (SN74LS785):
+//  - a slow access starts on a slow cycle boundary (16 oscillator periods)
+//  - the cycle following a slow access also lasts a full slow period
+
+void sam6883_device::address_dependent_cycle(bool slow)
+{
+	uint64_t start = m_cpu->total_cycles() - 1;
+	int extra = 0;
+
+	if (slow)
+	{
+		if ((start - m_ad_base) & 1)
+			extra++;
+		extra++;
+		m_ad_slow_end = start + extra + 1;
+	}
+	else if (start == m_ad_slow_end)
+	{
+		extra++;
+	}
+
+	if (extra)
+		m_cpu->adjust_icount(-extra);
 }
 
 
@@ -375,14 +419,27 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 	// data is ignored
 	(void)data;
 
+	// Record elapsed video with the old V bits, even for same-value writes.
+	if (offset < 6)
+		m_video_flush_cb(1);
+
 	// alter the SAM state
+	uint8_t old_mode = m_sam_state & 7;
 	uint16_t xorval = alter_sam_state(offset);
+	if (xorval & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2))
+		counter_mode_changed(old_mode);
 
 	// based on the mask, apply effects
 	if (xorval & (SAM_STATE_TY|SAM_STATE_M1|SAM_STATE_M0|SAM_STATE_P1))
 		update_memory();
 	if (xorval & (SAM_STATE_R1|SAM_STATE_R0))
+	{
 		update_cpu_clock();
+
+		// this write ends on a slow cycle boundary
+		m_ad_base = m_cpu->total_cycles();
+		m_ad_slow_end = ~uint64_t(0);
+	}
 
 	if (xorval & (SAM_STATE_F6|SAM_STATE_F5|SAM_STATE_F4|SAM_STATE_F3|SAM_STATE_F2|SAM_STATE_F1|SAM_STATE_F0))
 	{
@@ -430,13 +487,130 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 
 
 //-------------------------------------------------
+//  display counter divider network
+//-------------------------------------------------
+
+// The dividers run even when their outputs are not selected. Mode writes
+// reconnect clock inputs, so a high-to-low transition can advance the address
+// immediately. See the hardware investigations by Ciaran Anscomb and Stewart
+// Orchard: https://www.6809.org.uk/dev/tm002/ (and its linked counter model).
+
+void sam6883_device::counter_reset(uint16_t address)
+{
+	m_counter = address;
+	m_counter_xdiv[0] = m_counter_xdiv[1] = 0;
+	m_counter_ydiv[0] = m_counter_ydiv[1] = m_counter_ydiv[2] = 0;
+	m_counter_bit4_input = false;
+	m_counter_bit5_input = false;
+}
+
+
+bool sam6883_device::counter_x_output() const
+{
+	switch (m_sam_state & 7)
+	{
+	case 1: return BIT(m_counter_xdiv[1], 1); // /3
+	case 3: return BIT(m_counter_xdiv[0], 0); // /2
+	default: return BIT(m_counter, 3);
+	}
+}
+
+
+bool sam6883_device::counter_y_output() const
+{
+	switch (m_sam_state & 7)
+	{
+	case 0: return BIT(m_counter_ydiv[2], 1); // /3 followed by /4
+	case 2: return BIT(m_counter_ydiv[1], 1); // /3
+	case 4: return BIT(m_counter_ydiv[0], 0); // /2
+	default: return BIT(m_counter, 4);
+	}
+}
+
+
+void sam6883_device::counter_update_bit3(bool falling)
+{
+	if (falling)
+	{
+		m_counter_xdiv[0] ^= 1;
+		m_counter_xdiv[1] = (m_counter_xdiv[1] + 1) % 3;
+	}
+	counter_set_bit4_input(counter_x_output());
+}
+
+
+void sam6883_device::counter_update_bit4(bool falling)
+{
+	if (falling)
+	{
+		m_counter_ydiv[0] ^= 1;
+		bool old_div3_output = BIT(m_counter_ydiv[1], 1);
+		m_counter_ydiv[1] = (m_counter_ydiv[1] + 1) % 3;
+		if (old_div3_output && !BIT(m_counter_ydiv[1], 1))
+			m_counter_ydiv[2] = (m_counter_ydiv[2] + 1) & 3;
+	}
+	counter_set_bit5_input(counter_y_output());
+}
+
+
+void sam6883_device::counter_set_bit4_input(bool level)
+{
+	bool falling = m_counter_bit4_input && !level;
+	m_counter_bit4_input = level;
+	if (falling)
+	{
+		m_counter ^= 0x0010;
+		counter_update_bit4(!BIT(m_counter, 4));
+	}
+}
+
+
+void sam6883_device::counter_set_bit5_input(bool level)
+{
+	bool falling = m_counter_bit5_input && !level;
+	m_counter_bit5_input = level;
+	if (falling)
+		m_counter += 0x0020;
+}
+
+
+void sam6883_device::counter_mode_changed(uint8_t old_mode)
+{
+	static constexpr uint8_t x_divisors[8] = { 1, 3, 1, 2, 1, 1, 1, 1 };
+	static constexpr uint8_t y_divisors[8] = { 12, 1, 3, 1, 2, 1, 1, 1 };
+	uint8_t new_mode = m_sam_state & 7;
+	uint8_t old_y = y_divisors[old_mode];
+	uint8_t new_y = y_divisors[new_mode];
+	uint8_t old_x = x_divisors[old_mode];
+	uint8_t new_x = x_divisors[new_mode];
+
+	// The Y selector settles first. Switching between /12 and /3 briefly
+	// selects low; switching between /12 and /2 briefly selects raw B4.
+	if (old_y != new_y)
+	{
+		if ((old_y == 12 && new_y == 3) || (old_y == 3 && new_y == 12))
+			counter_set_bit5_input(false);
+		else if ((old_y == 12 && new_y == 2) || (old_y == 2 && new_y == 12))
+			counter_set_bit5_input(BIT(m_counter, 4));
+		counter_set_bit5_input(counter_y_output());
+	}
+
+	// Changing between the two divided X clocks briefly selects low.
+	if (old_x != new_x)
+	{
+		if ((old_x == 2 && new_x == 3) || (old_x == 3 && new_x == 2))
+			counter_set_bit4_input(false);
+		counter_set_bit4_input(counter_x_output());
+	}
+}
+
+
+//-------------------------------------------------
 //  horizontal_sync
 //-------------------------------------------------
 
 void sam6883_device::horizontal_sync()
 {
-	bool carry;
-
 	// When horizontal sync occurs, bits B1-B3 or B1-B4 may be cleared (except in DMA mode).  The catch
 	// is that the SAM's counter is a chain of flip-flops.  Clearing the counter can cause carries to
 	// occur just as they can when the counter is bumped.
@@ -450,22 +624,26 @@ void sam6883_device::horizontal_sync()
 		case 0x03:
 		case 0x05:
 			// these SAM modes clear bits B1-B3
-			carry = (m_counter & 0x0008) ? true : false;
+		{
+			bool falling = BIT(m_counter, 3);
 			m_counter &= ~0x000F;
-			if (carry)
-				counter_carry_bit3();
+			counter_update_bit3(falling);
 			break;
+		}
 
 		case 0x00:
 		case 0x02:
 		case 0x04:
 		case 0x06:
 			// clear bits B1-B4
-			carry = (m_counter & 0x0010) ? true : false;
+		{
+			bool falling = BIT(m_counter, 4);
 			m_counter &= ~0x001F;
-			if (carry)
-				counter_carry_bit4();
+			// B3 clearing is not clocked through X in these modes.
+			m_counter_bit4_input = false;
+			counter_update_bit4(falling);
 			break;
+		}
 
 		case 0x07:
 			// DMA mode - do nothing

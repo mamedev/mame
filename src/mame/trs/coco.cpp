@@ -158,6 +158,10 @@ void coco_state::machine_reset()
 	m_dac_output = 0;
 	m_pia0_pa_buffer = 0;
 	m_vhd_select = 0;
+
+	// PIA1 CB2 is an input at reset, leaving SNDEN low.  The mux resets
+	// after the PIA, so establish the disabled sound path here.
+	m_mux->inhibit_y_w(1);
 }
 
 
@@ -1251,7 +1255,7 @@ void coco_diecom_light_gun::lightgun_clock(int clock)
 		if (half_state > 7)
 		{
 			/* bit shift timer data on half states 8 thru 15 */
-			if (m_horizontal_clock_count & (1 << (half_state - 7)))
+			if (m_horizontal_clock_count & (1 << (half_state - 8)))
 			{
 				m_output_h |= 0x01;
 			}
@@ -1271,13 +1275,28 @@ void coco_diecom_light_gun::lightgun_clock(int clock)
 		/* while in full state 15, prepare to check next video frame for a hit */
 		if (m_adaptor_state == 15)
 		{
-			int dclg_vpos = m_v_port->read() + 12;
-			// this clock starts at zero at the left edge of the screen,
-			// and rolls over every scanline
-			m_horizontal_clock_count = m_h_port->read();
+			// the gun position is in visible screen pixels, matching the crosshair;
+			// Diecom software expects the hit to register 10 scanlines after
+			// the beam passes the target (calibrated with Iron Forest)
+			const rectangle &visarea = m_host.get_screen()->visible_area();
+			int dclg_vpos = visarea.top() + m_v_port->read() + 10;
+			int dclg_hpos = visarea.left() + m_h_port->read();
 
-			int horizontal_pixel = ((m_horizontal_clock_count - 105.0) / (420.0 - 110.0)) * (639.0 - 0.0) + 0.0;
-			attotime dclg_time = m_host.get_screen()->time_until_pos(dclg_vpos, horizontal_pixel);
+			// this clock runs at half the pixel clock and rolls over every
+			// scanline.  Diecom software disagrees on its value at the left
+			// edge of the 640 pixel wide active area (40 pixels into the
+			// screen).  Both games share the same reading routine and
+			// subtract a constant from the clock to get a 0-319 X position:
+			//   Iron Forest subtracts 107  -> use 107 here to be exact
+			//   Medieval Madness subtracts 99 -> use 99 here to be exact
+			// Both draw sprites at the same screen position, so no single
+			// value suits both.  103 splits the difference, leaving each game
+			// 4 clocks (8 screen pixels) off in opposite directions.  The
+			// cause is unknown; one guess is the games were calibrated on
+			// different GIME revisions.
+			m_horizontal_clock_count = (dclg_hpos - 40) / 2 + 103;
+
+			attotime dclg_time = m_host.get_screen()->time_until_pos(dclg_vpos, dclg_hpos);
 			m_host.adjust_host_joy_timer(m_base_slot+1, dclg_time);
 
 		}
