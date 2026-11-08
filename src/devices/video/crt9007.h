@@ -62,7 +62,8 @@ public:
 	auto cblank_callback() { return m_write_cblank.bind(); }
 	auto slg_callback() { return m_write_slg.bind(); }
 	auto sld_callback() { return m_write_sld.bind(); }
-	auto sl_callback() { return m_write_sl.bind(); } // SL3-SL0: single row buffer, pin configurations 0 and 2 (table 5)
+	// SL3-SL0: single row buffer, pin configurations 0 and 2 (table 5)
+	auto sl_callback() { return m_write_sl.bind(); }
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -176,7 +177,6 @@ private:
 	uint16_t m_dma_burst;
 	uint8_t m_dma_delay;
 	bool m_dma_first;
-	bool m_dma_double_width;
 
 	// double height/width attributes (row table address bits 15, 14) of the row last
 	// fetched, of the row before it, and of the row being painted

@@ -17,7 +17,7 @@
     - interlaced mode
     - smooth scroll
     - page blank
-    - double height/width cursor (2 CCLK wide, both rows of a double height row)
+    - double height/width cursor (2 CCLK wide, may span both rows of a double height row)
     - row attributes in sequential and linked list addressing
     - pin configuration
     - operation modes 0,7
@@ -413,7 +413,7 @@ inline void crt9007_device::update_dma_timer()
 {
 	// TODO burst count and burst delay
 	// double height/width rows are addressed every other character clock
-	m_dma_timer->adjust(clocks_to_attotime((!m_table_count && m_dma_double_width) ? 2 : 1));
+	m_dma_timer->adjust(clocks_to_attotime((!m_table_count && m_next_attr) ? 2 : 1));
 }
 
 
@@ -620,7 +620,6 @@ void crt9007_device::device_start()
 	save_item(NAME(m_dma_burst));
 	save_item(NAME(m_dma_delay));
 	save_item(NAME(m_dma_first));
-	save_item(NAME(m_dma_double_width));
 	save_item(NAME(m_next_attr));
 	save_item(NAME(m_pending_attr));
 	save_item(NAME(m_paint_attr));
@@ -675,7 +674,6 @@ void crt9007_device::device_reset()
 	m_table_count = 0;
 	m_dma_count = 0;
 	m_dma_first = false;
-	m_dma_double_width = false;
 	m_next_attr = 0;
 	m_pending_attr = 0;
 	m_paint_attr = 0;
@@ -683,7 +681,7 @@ void crt9007_device::device_reset()
 	m_row_attr_curs = false;
 	m_row_attr_curs_timer->adjust(attotime::never);
 
-	// 28-31 (SL3-SL0) = 0
+	// SL3-SL0 (pins 28-31 in pin configurations 0 and 2) = 0
 	m_write_sl(0);
 
 	// 29 (WBEN) = 0
@@ -840,7 +838,6 @@ TIMER_CALLBACK_MEMBER(crt9007_device::drb_update)
 		// with a double row buffer the row fetched now is painted after the one
 		// fetched last time, which starts with this scan line
 		m_pending_attr = m_next_attr;
-		m_dma_double_width = false;
 
 		// this edge starts the transfer of the next data row
 		if (!screen().vpos())
@@ -895,6 +892,12 @@ TIMER_CALLBACK_MEMBER(crt9007_device::drb_update)
 			m_dma_timer->adjust(clocks_to_attotime(1) / 2);
 		}
 	}
+	else if (!m_drb)
+	{
+		// with DMA disabled no row is fetched, so none carries an attribute
+		m_next_attr = 0;
+		m_pending_attr = 0;
+	}
 }
 
 TIMER_CALLBACK_MEMBER(crt9007_device::dma_update)
@@ -917,14 +920,11 @@ TIMER_CALLBACK_MEMBER(crt9007_device::dma_update)
 			m_table_addr = m_dma_addr;
 			m_dma_addr = m_row_addr & 0x3fff;
 
-			// row table address bits 15, 14: 01 double width, 10 double height top
-			// half, 11 bottom half; all of them address half as many characters
+			// row table address bits 15, 14: 01 double width, 10 double height double
+			// width top half, 11 bottom half; all of them address half as many characters
 			m_next_attr = m_row_addr >> 14;
 			if (m_next_attr)
-			{
-				m_dma_double_width = true;
 				m_dma_count = CHARACTERS_PER_DATA_ROW / 2;
-			}
 
 			// CURS signals a double height/width top scan line 1 CCLK after the
 			// high byte of the row table is read
@@ -984,10 +984,11 @@ TIMER_CALLBACK_MEMBER(crt9007_device::row_attr_curs_update)
 	// CURS during horizontal retrace tells external logic to halve the dot rate on the
 	// following scan line; with a double row buffer it lasts 1 CCLK (table 2, fig. 9),
 	// with a single row buffer until the VLT leading edge (table 2, and fig. 7 for the
-	// following scan lines too, though the text there says 1 CCLK)
+	// following scan lines too, though the p. 345 text says 1 CCLK)
 	m_row_attr_curs = bool(param);
 
-	LOG("CRT9007 y %03u x %04u : row attribute CURS %u\n", screen().vpos(), screen().hpos(), m_row_attr_curs);
+	LOG("CRT9007 y %03u x %04u : row attribute CURS %u\n",
+			screen().vpos(), screen().hpos(), m_row_attr_curs);
 
 	update_curs_output();
 
