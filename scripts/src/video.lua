@@ -1806,6 +1806,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/um487f.h,VIDEOS["UM487F"] = true
+--------------------------------------------------
+
+if VIDEOS["UM487F"] then
+	files {
+		MAME_DIR .. "src/devices/video/um487f.cpp",
+		MAME_DIR .. "src/devices/video/um487f.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/upd3301.h,VIDEOS["UPD3301"] = true
 --------------------------------------------------
 
