@@ -50,6 +50,8 @@
 
 #include "bus/adb/adb.h"
 #include "bus/adb/cards.h"
+#include "bus/maccomm/cards.h"
+#include "bus/maccomm/maccomm.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
@@ -317,6 +319,9 @@ void pmac6200_state::pmac6200(machine_config &config)
 	// of the use of a PowerPC chip, so accelerators will cause problems.
 	//
 	// TODO: PDS is to be added later because of said 68k/PPC incompatibility.
+
+	MAC_COMM_SLOT(config, "comm", m_maincpu, AS_PROGRAM, mac_comm_cards, nullptr)
+		.irq_cb().set(m_primetimeiii, FUNC(primetime_device::via2_irq_w<0x01>));
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("8M");

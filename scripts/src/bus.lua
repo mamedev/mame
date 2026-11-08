@@ -3491,6 +3491,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/maccomm/maccomm.h,BUSES["MACCOMM"] = true
+---------------------------------------------------
+
+if BUSES["MACCOMM"] then
+	files {
+		MAME_DIR .. "src/devices/bus/maccomm/cards.cpp",
+		MAME_DIR .. "src/devices/bus/maccomm/cards.h",
+		MAME_DIR .. "src/devices/bus/maccomm/maccomm.cpp",
+		MAME_DIR .. "src/devices/bus/maccomm/maccomm.h",
+		MAME_DIR .. "src/devices/bus/maccomm/sonicsmc.cpp",
+		MAME_DIR .. "src/devices/bus/maccomm/sonicsmc.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/mackbd/mackbd.h,BUSES["MACKBD"] = true
 ---------------------------------------------------
 
