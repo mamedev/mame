@@ -527,14 +527,15 @@ enum
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ATMEGA88,   atmega88_device,   "atmega88",   "Atmel ATmega88")
-DEFINE_DEVICE_TYPE(ATMEGA168,  atmega168_device,  "atmega168",  "Atmel ATmega168")
-DEFINE_DEVICE_TYPE(ATMEGA328,  atmega328_device,  "atmega328",  "Atmel ATmega328")
-DEFINE_DEVICE_TYPE(ATMEGA32U4, atmega32u4_device, "atmega32u4", "Atmel ATmega32U4")
-DEFINE_DEVICE_TYPE(ATMEGA644,  atmega644_device,  "atmega644",  "Atmel ATmega644")
-DEFINE_DEVICE_TYPE(ATMEGA1284, atmega1284_device, "atmega1284", "Atmel ATmega1284")
-DEFINE_DEVICE_TYPE(ATMEGA1280, atmega1280_device, "atmega1280", "Atmel ATmega1280")
-DEFINE_DEVICE_TYPE(ATMEGA2560, atmega2560_device, "atmega2560", "Atmel ATmega2560")
+DEFINE_DEVICE_TYPE(ATMEGA88,    atmega88_device,    "atmega88",    "Atmel ATmega88")
+DEFINE_DEVICE_TYPE(ATMEGA168,   atmega168_device,   "atmega168",   "Atmel ATmega168")
+DEFINE_DEVICE_TYPE(ATMEGA328,   atmega328_device,   "atmega328",   "Atmel ATmega328")
+DEFINE_DEVICE_TYPE(ATMEGA168PB, atmega168pb_device, "atmega168pb", "Atmel ATmega168PB")
+DEFINE_DEVICE_TYPE(ATMEGA32U4,  atmega32u4_device,  "atmega32u4",  "Atmel ATmega32U4")
+DEFINE_DEVICE_TYPE(ATMEGA644,   atmega644_device,   "atmega644",   "Atmel ATmega644")
+DEFINE_DEVICE_TYPE(ATMEGA1284,  atmega1284_device,  "atmega1284",  "Atmel ATmega1284")
+DEFINE_DEVICE_TYPE(ATMEGA1280,  atmega1280_device,  "atmega1280",  "Atmel ATmega1280")
+DEFINE_DEVICE_TYPE(ATMEGA2560,  atmega2560_device,  "atmega2560",  "Atmel ATmega2560")
 
 //**************************************************************************
 //  INTERNAL ADDRESS MAP
@@ -754,6 +755,25 @@ void atmega328_device::atmega328_internal_map(address_map &map)
 
 	// TODO: reenable when datamaps are all removed from drivers
 	// map(0x0100, 0x08ff).ram();
+}
+
+void atmegax8pb_base_device::atmegax8pb_base_internal_map(address_map &map)
+{
+	atmegax8_base_internal_map(map);
+
+	// this series adds a 4-bit port E
+	map(0x002c, 0x002c).r(FUNC(atmegax8pb_base_device::pin_r<4>));
+	map(0x002d, 0x002d).rw(FUNC(atmegax8pb_base_device::reg_r<DDRE>), FUNC(atmegax8pb_base_device::ddr_w<GPIOE>));
+	map(0x002e, 0x002e).rw(FUNC(atmegax8pb_base_device::gpio_r<GPIOE>), FUNC(atmegax8pb_base_device::port_w<GPIOE>));
+
+	// TODO: SNOBRx at 0x00F0-0x00F8
+}
+
+void atmega168pb_device::atmega168pb_internal_map(address_map &map)
+{
+	atmegax8pb_base_internal_map(map);
+
+	// TODO: install RAM
 }
 
 void atmegaxu4_base_device::atmegaxu4_base_internal_map(address_map &map)
@@ -1005,6 +1025,24 @@ atmega168_device::atmega168_device(const machine_config &mconfig, const char *ta
 
 atmega328_device::atmega328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: atmegax8_base_device(mconfig, tag, owner, clock, ATMEGA328, 0x3fff, address_map_constructor(FUNC(atmega328_device::atmega328_internal_map), this))
+{
+}
+
+//-------------------------------------------------
+//  atmegax8pb_base_device - constructor
+//-------------------------------------------------
+
+atmegax8pb_base_device::atmegax8pb_base_device(const machine_config &mconfig, const char *tag, device_t *owner,uint32_t clock, const device_type type, uint32_t address_mask, address_map_constructor internal_map)
+	: atmegax8_base_device(mconfig, tag, owner, clock, type, address_mask, internal_map)
+{
+}
+
+//-------------------------------------------------
+//  atmega168pb_base_device - constructor
+//-------------------------------------------------
+
+atmega168pb_device::atmega168pb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: atmegax8pb_base_device(mconfig, tag, owner, clock, ATMEGA168PB, 0x1fff, address_map_constructor(FUNC(atmega168pb_device::atmega168pb_internal_map), this))
 {
 }
 
@@ -1327,6 +1365,11 @@ void atmegax8_base_device::device_start()
 	megaavr_classic_base_device::device_start();
 }
 
+void atmegax8pb_base_device::device_start()
+{
+	atmegax8_base_device::device_start();
+}
+
 void atmegax0_base_device::device_start()
 {
 	megaavr_classic_base_device::device_start();
@@ -1438,6 +1481,11 @@ void atmegax8_base_device::device_reset()
 	megaavr_classic_base_device::device_reset();
 }
 
+void atmegax8pb_base_device::device_reset()
+{
+	atmegax8_base_device::device_reset();
+}
+
 void atmegax0_base_device::device_reset()
 {
 	megaavr_classic_base_device::device_reset();
@@ -1540,6 +1588,13 @@ void atmegax8_base_device::device_add_mconfig(machine_config &config)
 	atimer2->oc_toggle_w_cb<AVR8_TIMER_CMPCHANNEL_OC_B>().set(&atmegax8_base_device::toggle_gpio_bit<GPIOD, 3>, "toggle_gpio_bit_pd3");
 }
 
+// ATMegax8PB series (ATMega48PB, ATMega88PB, ATMega168PB)
+void atmegax8pb_base_device::device_add_mconfig(machine_config &config)
+{
+	atmegax8_base_device::device_add_mconfig(config);
+
+	// TODO: install additional serial interfaces that this series has
+}
 
 // ATMegaxU4 series (ATMega16U4, ATMega32U4)
 void atmegaxu4_base_device::device_add_mconfig(machine_config &config)

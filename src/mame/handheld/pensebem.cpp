@@ -144,7 +144,7 @@ private:
 	uint8_t m_port_d = 0;
 	uint8_t m_port_e = 0;
 
-	required_device<atmega168_device> m_maincpu;
+	required_device<atmega168pb_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<4> m_keyb_rows;
@@ -273,7 +273,7 @@ INPUT_PORTS_END
 void pensebem2017_state::pensebem2017(machine_config &config)
 {
 	/* CPU */
-	ATMEGA168(config, m_maincpu, 16_MHz_XTAL); /* Actual chip is an Atmel ATMEGA168PB */
+	ATMEGA168PB(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pensebem2017_state::prg_map);
 	m_maincpu->set_addrmap(AS_DATA, &pensebem2017_state::data_map);
 	m_maincpu->set_eeprom_tag("eeprom");

@@ -1200,14 +1200,15 @@ protected:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(ATMEGA88,   atmega88_device)
-DECLARE_DEVICE_TYPE(ATMEGA168,  atmega168_device)
-DECLARE_DEVICE_TYPE(ATMEGA328,  atmega328_device)
-DECLARE_DEVICE_TYPE(ATMEGA32U4, atmega32u4_device)
-DECLARE_DEVICE_TYPE(ATMEGA644,  atmega644_device)
-DECLARE_DEVICE_TYPE(ATMEGA1284, atmega1284_device)
-DECLARE_DEVICE_TYPE(ATMEGA1280, atmega1280_device)
-DECLARE_DEVICE_TYPE(ATMEGA2560, atmega2560_device)
+DECLARE_DEVICE_TYPE(ATMEGA88,    atmega88_device)
+DECLARE_DEVICE_TYPE(ATMEGA168,   atmega168_device)
+DECLARE_DEVICE_TYPE(ATMEGA328,   atmega328_device)
+DECLARE_DEVICE_TYPE(ATMEGA168PB, atmega168pb_device)
+DECLARE_DEVICE_TYPE(ATMEGA32U4,  atmega32u4_device)
+DECLARE_DEVICE_TYPE(ATMEGA644,   atmega644_device)
+DECLARE_DEVICE_TYPE(ATMEGA1284,  atmega1284_device)
+DECLARE_DEVICE_TYPE(ATMEGA1280,  atmega1280_device)
+DECLARE_DEVICE_TYPE(ATMEGA2560,  atmega2560_device)
 
 
 ///////////////////////////////////////////////////////////////
@@ -1283,6 +1284,45 @@ protected:
 	virtual uint8_t eearh_mask() const override { return 0x03; } // 1024-byte EEPROM
 };
 
+///////////////////////////////////////////////////////////////
+// ATMegax8PB series devices, which add Port E
+// and another serial interface.
+//
+// ATMega48PB, ATMega88PB and ATMega168PB are the same family.
+// ATMega328PB is significantly different, with two more timers.
+///////////////////////////////////////////////////////////////
+
+class atmegax8pb_base_device : public atmegax8_base_device
+{
+protected:
+	// construction/destruction
+	atmegax8pb_base_device(const machine_config &mconfig,
+						 const char *tag,
+						 device_t *owner,
+						 uint32_t clock,
+						 const device_type type,
+						 uint32_t address_mask,
+						 address_map_constructor internal_map);
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void atmegax8pb_base_internal_map(address_map &map) ATTR_COLD;
+
+};
+
+
+// ======================> atmega168pb_device
+class atmega168pb_device : public atmegax8pb_base_device
+{
+public:
+	// construction/destruction
+	atmega168pb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void atmega168pb_internal_map(address_map &map) ATTR_COLD;
+
+};
 
 ///////////////////////////////////////////////////////////////
 // Classic ATMegaxU4 series devices
