@@ -9,11 +9,7 @@
 *******************************************************************************/
 
 #include "emu.h"
-
 #include "9h0-0008_iox.h"
-
-#include "rendutil.h"
-#include "softlist_dev.h"
 
 
 device_sega_9h0_0008_iox_slot_interface::device_sega_9h0_0008_iox_slot_interface(const machine_config &mconfig, device_t &device) :

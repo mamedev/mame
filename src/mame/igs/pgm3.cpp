@@ -41,6 +41,9 @@
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
+#include "video/hantro_g1.h"
+#include "video/mali200.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -56,7 +59,9 @@ public:
 	pgm3_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_mainram(*this, "mainram")
+		m_mainram(*this, "mainram"),
+		m_mali(*this, "mali"),
+		m_hantro(*this, "hantro")
 	{ }
 
 	void pgm3(machine_config &config) ATTR_COLD;
@@ -76,6 +81,8 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u32> m_mainram;
+	required_device<mali200_device> m_mali;
+	required_device<hantro_g1_device> m_hantro;
 };
 
 void pgm3_state::decryptaes(const uint8_t *key, const uint8_t *iv, int source, int dest, int length)
@@ -172,6 +179,12 @@ void pgm3_state::pgm3(machine_config &config)
 	screen.set_screen_update(FUNC(pgm3_state::screen_update_pgm3));
 	screen.screen_vblank().set(FUNC(pgm3_state::screen_vblank_pgm3));
 	screen.set_palette("palette");
+
+	MALI200(config, m_mali, 200'000'000);
+	m_mali->set_dma_space(m_maincpu, AS_PROGRAM);
+
+	HANTRO_G1(config, m_hantro, 200'000'000); // functional timing; clock unverified
+	m_hantro->set_dma_space(m_maincpu, AS_PROGRAM);
 
 	PALETTE(config, "palette").set_entries(0x1000);
 }

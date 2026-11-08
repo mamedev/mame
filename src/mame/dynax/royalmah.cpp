@@ -4709,6 +4709,36 @@ ROM_START( janputera ) // FRM-03 + PS-101 PCBs
 	ROM_LOAD( "prom",  0x0000, 0x0020, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
 ROM_END
 
+// PS-101 PCB. Same program as janputer, except for the first ROM and the credits in the last one
+ROM_START( janputerb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "6",          0x0000, 0x1000, CRC(049df210) SHA1(044ec6f3f6d7ef9bf02c77bb3a66024b2c80054f) )
+	ROM_LOAD( "5",          0x1000, 0x1000, CRC(7aef9937) SHA1(57fcd4e970586bf110291126ea003c3ceee0b556) )
+	ROM_LOAD( "3",          0x2000, 0x1000, CRC(0709934e) SHA1(f0f00502e015fce1ec85e31b9b0a2cd924c38839) )
+	ROM_LOAD( "2",          0x3000, 0x1000, CRC(538cbe03) SHA1(8634332d883033a5800901be664036c08fced61b) )
+	ROM_LOAD( "1",          0x4000, 0x1000, CRC(17217c0f) SHA1(91b89ca3092eef4fe0b2bcf8ff0c5edb578aa626) )
+	ROM_LOAD( "101sub.ic6", 0x5000, 0x1000, CRC(29a2377d) SHA1(42685519b6022173e4d32341c378da61377ac6d9) )
+	ROM_LOAD( "101sub.ic7", 0x6000, 0x1000, CRC(02185dea) SHA1(361f330a0478256ee09f8c6c5b64f64b02f370fe) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom",  0x0000, 0x0020, BAD_DUMP CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) ) // not dumped for this set, taken from janputera
+ROM_END
+
+// PS-101 PCB
+ROM_START( janputerc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1",     0x0000, 0x1000, CRC(8286b94f) SHA1(b4495d017474b30d81422618d2255c874d515088) )
+	ROM_LOAD( "2",     0x1000, 0x1000, CRC(7aef9937) SHA1(57fcd4e970586bf110291126ea003c3ceee0b556) )
+	ROM_LOAD( "3",     0x2000, 0x1000, CRC(0709934e) SHA1(f0f00502e015fce1ec85e31b9b0a2cd924c38839) )
+	ROM_LOAD( "4",     0x3000, 0x1000, CRC(538cbe03) SHA1(8634332d883033a5800901be664036c08fced61b) )
+	ROM_LOAD( "5",     0x4000, 0x1000, CRC(e03740ec) SHA1(c4c7c2178b2f416881961e158c3bd182803c257e) )
+	ROM_LOAD( "6",     0x5000, 0x1000, CRC(29a2377d) SHA1(42685519b6022173e4d32341c378da61377ac6d9) )
+	ROM_LOAD( "7.sub", 0x6000, 0x1000, CRC(3960b2e4) SHA1(56348e5d16b90fd737af88cc798cf8d35d7cc6d8) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom",  0x0000, 0x0020, BAD_DUMP CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) ) // not dumped for this set, taken from janputera
+ROM_END
+
 /*
 this set comes from a loose set of ROMs, so no PCB info available
 has hacked out 'OU PART 1' and 'ULY 1 1983 BY SHONAN' strings
@@ -6749,6 +6779,8 @@ GAME( 1983,  janyoup2702, royalmj,  janyoup2, janyoup2,   royalmah_state,       
 GAME( 1985,  tahjong,     royalmj,  tahjong,  tahjong,    royalmah_prgbank_state, init_tahjong,  ROT0,   "Bally Pond / Nasco",         "Tahjong Yakitori (ver. 2-1)",           0 ) // 1985 Jun. 17
 GAME( 1981,  janputer,    0,        royalmah, royalmah,   royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Denshi Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Royal Mahjong, set 1)", 0 ) // metadata info from MT05392
 GAME( 1981,  janputera,   janputer, royalmah, royalmah,   royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Denshi Ltd. / Ever Denshi)", "New Double Bet Mahjong (bootleg of Royal Mahjong, set 2)", 0 )
+GAME( 1981,  janputerb,   janputer, royalmah, royalmah,   royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Denshi Ltd. / ST Elc / Moco)", "New Double Bet Mahjong (bootleg of Royal Mahjong, set 3)", 0 )
+GAME( 1981,  janputerc,   janputer, royalmah, royalmah,   royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Denshi Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Royal Mahjong, set 4)", 0 )
 GAME( 1990,  akamj,       0,        ippatsu,  ippatsu,    royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Electronics)", "Aka Mahjong (Double Bet, ver 1 19)", 0 )
 GAME( 1990,  akamja,      akamj,    ippatsu,  ippatsu,    royalmah_state,         empty_init,    ROT0,   "bootleg (Paradise Electronics)", "Aka Mahjong (Double Bet, ver 1 16)", 0 )
 GAME( 1984,  rkjanoh2,    0,        rkjanoh2, royalmah,   royalmah_prgbank_state, init_chalgirl, ROT0,   "SNK / Dyna Corp",            "Royal King Jang Oh 2 (v4.00 1984 Jun 10th)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // never seems to set the palette bank?

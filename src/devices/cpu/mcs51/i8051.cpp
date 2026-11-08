@@ -252,9 +252,9 @@ u8 mcs51_cpu_device::sbuf_r()
 
 void mcs51_cpu_device::sbuf_w(u8 data)
 {
-	m_sbuf = data;
-	LOGMASKED(LOG_TX, "tx byte 0x%02x\n", m_sbuf);
-	m_uart.data_out = m_sbuf;
+	// SBUF is two registers: writes load the transmitter, reads (sbuf_r) the receive buffer
+	LOGMASKED(LOG_TX, "tx byte 0x%02x\n", data);
+	m_uart.data_out = data;
 	m_uart.txbit = SIO_START;
 }
 
@@ -1394,12 +1394,7 @@ void mcs51_cpu_device::device_reset()
 	m_tl1 = 0;
 	m_tl0 = 0;
 
-	// set the port configurations to all 1's
-	p3_w(0xff);
-	p2_w(0xff);
-	p1_w(0xff);
-	p0_w(0xff);
-
+	// Set up the UART first: p3_w() ANDs TxD into P3.1, so it must already be idle.
 	m_uart.data_out = 0;
 	m_uart.data_in = 0;
 	m_uart.rx_clk = 0;
@@ -1409,6 +1404,12 @@ void mcs51_cpu_device::device_reset()
 	m_uart.rxbit = SIO_IDLE;
 	m_uart.rxb8 = 0;
 	m_uart.smod_div = 0;
+
+	// set the port configurations to all 1's
+	p3_w(0xff);
+	p2_w(0xff);
+	p1_w(0xff);
+	p0_w(0xff);
 
 	update_irq_prio();
 }

@@ -16,7 +16,7 @@ SFF8038i v1.0 compliant
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(VT82C586B_IDE, vt82c586b_ide_device, "vt82c586b_ide", "VT82C586B \"PIPC\" IDE")
+DEFINE_DEVICE_TYPE(VT82C586B_IDE, vt82c586b_ide_device, "vt82c586b_ide", "VIA VT82C586B \"PIPC\" IDE")
 
 vt82c586b_ide_device::vt82c586b_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, VT82C586B_IDE, tag, owner, clock)
@@ -26,8 +26,9 @@ vt82c586b_ide_device::vt82c586b_ide_device(const machine_config &mconfig, const 
 	, m_irq_sec_callback(*this)
 {
 	// pclass programmable
-	// TODO: revision is a laconic "Code for IDE Controller Logic Block", no value given
-	set_ids(0x11060571, 0x41, 0x01018a, 0x00000000);
+	// revision is a laconic "Code for IDE Controller Logic Block", no value given
+	// 0x06 from https://lkml.iu.edu/0109.2/0288.html
+	set_ids(0x11060571, 0x06, 0x01018a, 0x00000000);
 }
 
 void vt82c586b_ide_device::device_start()

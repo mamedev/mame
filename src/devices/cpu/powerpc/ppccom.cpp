@@ -796,6 +796,7 @@ void ppc_device::device_start()
 
 	/* register for save states */
 	save_item(NAME(m_core->pc));
+	save_item(NAME(m_checkstop));
 	save_item(NAME(m_core->r));
 	save_item(NAME(m_core->f));
 	save_item(NAME(m_core->cr));
@@ -975,6 +976,7 @@ void ppc_device::device_start()
 		/* append exception handlers for various types */
 		static_generate_exception(EXCEPTION_RESET,     true,  "exception_reset");
 		static_generate_exception(EXCEPTION_MACHCHECK, true,  "exception_machine_check");
+		static_generate_exception(EXCEPTION_MACHCHECK, false, "exception_machine_check_norecover");
 		static_generate_exception(EXCEPTION_DSI,       true,  "exception_dsi");
 		static_generate_exception(EXCEPTION_ISI,       true,  "exception_isi");
 		static_generate_exception(EXCEPTION_EI,        true,  "exception_ei");
@@ -1261,6 +1263,8 @@ void ppc_device::device_stop()
 
 void ppc_device::device_reset()
 {
+	m_checkstop = false;
+
 	// the memory accessors are generated once, after the driver has added its fast RAM regions
 	if (!m_read8[0])
 	{
@@ -1313,6 +1317,14 @@ void ppc_device::device_reset()
 		// initialize the 603e HID1 register; PC0-PC3 are a read-only view of the PLL_CFG pins
 		// PLL_CFG0-3 encodings indexed by twice the CPU:bus ratio (0 = no such setting)
 		static constexpr uint8_t pll_cfg[13] = {0, 0, 0x1, 0xc, 0x4, 0x6, 0x8, 0xe, 0xa, 0x7, 0xb, 0x9, 0xd};
+		uint32_t const ratio = m_system_clock ? ((uint64_t(clock()) * 4 + m_system_clock) / (uint64_t(m_system_clock) * 2)) : 0;
+		m_core->spr[SPR603_HID1] = (ratio < std::size(pll_cfg)) ? (uint32_t(pll_cfg[ratio]) << 28) : 0;
+	}
+	else if (m_flavor == PPC_MODEL_750)
+	{
+		// The 740/750 HID1 register is different from the 603e
+		// Source: MPC750 hardware specifications, table 17 (indexed by twice the CPU:bus ratio)
+		static constexpr uint8_t pll_cfg[17] = {0, 0, 0x3, 0, 0, 0, 0x8, 0xe, 0xa, 0x7, 0xb, 0x9, 0xd, 0x5, 0x2, 0x1, 0xc};
 		uint32_t const ratio = m_system_clock ? ((uint64_t(clock()) * 4 + m_system_clock) / (uint64_t(m_system_clock) * 2)) : 0;
 		m_core->spr[SPR603_HID1] = (ratio < std::size(pll_cfg)) ? (uint32_t(pll_cfg[ratio]) << 28) : 0;
 	}
@@ -2402,6 +2414,16 @@ void ppc_device::ppccom_execute_mtspr()
 				return;
 			case SPR4XX_TBHI:
 				set_timebase((get_timebase() & ~u64(0x00000000ffffffffU)) | ((uint64_t)(m_core->param1 & 0x00ffffff) << 32));
+				return;
+		}
+	}
+
+	if (m_flavor == PPC_MODEL_750)
+	{
+		switch (m_core->param0)
+		{
+			/* read-only */
+			case SPR603_HID1:
 				return;
 		}
 	}
