@@ -357,6 +357,7 @@ void tek440x_state::machine_start()
 
 	save_item(NAME(m_videoaddr));
 	save_item(NAME(m_videocntl));
+	save_item(NAME(m_vint_enable));
 	save_item(NAME(m_diag));
 
 	save_item(NAME(m_fpu_finished));
