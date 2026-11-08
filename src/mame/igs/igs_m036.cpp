@@ -4,6 +4,90 @@
 /* IGS Gambling games using IGS036 CPU
    pgm2.cpp also uses this CPU
 
+   Preliminary emulation for the sets with dumped internal ROMs:
+   - The original ARM boot code uploads the key and checks the program ROM.
+     The cipher hardware uses igs036_decryptor, as on PGM2; no boot checks are patched.
+   - Atmel-style AIC and timer counters; vblank uses IRQ2, TC0-2 use IRQ6-8.
+   - Packed 7bpp sprites, provisional RLE, RGB555 palette, 512x240 / 800x600 video.
+   - Several external bus layouts, GPIO input matrices, TT5665 / banked M6295.
+   - Battery-backed SRAM, coin hoppers and Hou Ye Leyuan's ticket dispenser.
+
+   TODO: correct compressed/animated sprites (especially HD), zoom/blending,
+   display control, verify CPU/peripheral clocks, complete timer modes, serial
+   links, real-time timer, lamps/counters and remaining DIP settings. Mechanical
+   payout timing is provisional; alternate control modes still need checking.
+
+   The 20 MHz oscillator is documented on several boards; the CPU's internal
+   PLL/multiplier has not been established. PGM2's 100 MHz is also marked unknown.
+   HD boards provisionally use 100 MHz: their ROMs select 0x1b rather than 0x18
+   at 0xfffffa0c, and 20 MHz leaves Hou Ye Leyuan's sprite rebuild unfinished
+   on alternate frames. The register's PLL/divider fields still need decoding.
+
+   Is the video hardware here part of IGS036 that goes unused by PGM2?
+
+   Operator password recovery
+   --------------------------
+   These fixed recovery sequences were traced in the decrypted external program
+   ROMs and verified through the original menus for the revisions listed below.
+   They are distinct from the operator's configurable password. ROM addresses
+   refer to the decrypted CPU view, not necessarily plaintext in the ROM dump.
+
+   Joystick codes use the on-screen digit legend, not keyboard number keys:
+     0 = Start, 1 = S1, 2 = S2/Bet, 3 = S3,
+     4 = Up, 5 = Down, 6 = Left, 7 = Right.
+   Press and release each button separately.
+
+     Set       Revision   Joystick code   Recovery sequence in ROM
+     cjddzsp   V122CN     22775047        0x1007c248
+     cjbq      V205CN     22775047        0x10072c4c
+     dahuaxy   V201CN     22775047        0x1007b0a8
+     zjddz     V204CN     22775047        0x1009b984
+     xyddz     V216CN     22775047        0x100dad70
+     hlddz     V104CN     22775047        0x1009b870
+     cjgdy     V110CN     54163274        0x10066224
+     mjzhizun  S100CN     13120021        0x10068174
+     lhtb      S101CN     21301330        0x100536f8
+     sydh      V104CN     24064400        0x1006f648
+     lhfy      V206CN     55543210        0x10091618
+     slqzsp    V104CN     31123132        0x1004c39c
+     qhzb      V100CN     31123132        0x100412f8
+
+   Mahjong controls:
+     slqzsp V104CN: A, H, K, D, H, C, M, B  (ROM 0x1004c394)
+     qhzb   V100CN: A, H, K, D, H, C, M, B  (ROM 0x100412f0)
+     jhzb   V113CN: Bet, Kan, Start, Chi, Kan, Kan, Start, Start
+                   (ROM 0x100297d4; select Mahjong controls and restart).
+   The jhzb recovery sequence is not directly enterable with its default
+   joystick mapping.
+
+   hyleyuan S103CN:
+     Test, Test, Test, Service Key, Service Key, Test, Test, Test
+     (ROM 0x1003b86c).
+
+   Enter these sequences at System Adjustment / System Settings, reached from
+   Bookkeeping (Test for hyleyuan). Most open Set/Change Password directly.
+   slqzsp, qhzb and lhfy accept the code and then offer Bet to change it;
+   hyleyuan opens a Continue / Set Password menu. Enter the new eight-button
+   sequence twice, as prompted. In slqzsp/qhzb Mahjong mode, Bookkeeping -> F
+   selects System Adjustment; joystick mode uses Down and S1. In jhzb Mahjong
+   mode, Kan/Pon move up/down and Bet selects System Settings.
+
+   Verified initial-state sequences with fresh NVRAM:
+     slqzsp:  Start eight times opens first-time password setup.
+     cjddzsp: Start eight times is accepted; Bet opens Change Password.
+     hyleyuan: Test eight times (the initial stored password).
+   These initial sequences are not recovery codes for a changed password.
+
+   Configurable passwords are eight bytes of button IDs or digit indices in
+   external RAM at 0x20000000, persisted by the "mainram" NVRAM device. slqzsp
+   and qhzb use 0x200002d8 for Mahjong and 0x200002e0 for joystick, with the
+   password-set flag at 0x200002d4. Normal emulator exit saves this bank.
+   Changing passwords through the menus and accepting them after a cold restart
+   was verified in slqzsp and cjddzsp; their fixed recovery codes also remain
+   usable after a configurable password has been set.
+
+   No password route or recovery code has been confirmed for huoqilin or jxry.
+
 <Chaoji Da Heng 2>
 cjdh2.zip
 ---------------------------------------------------
@@ -60,9 +144,12 @@ check more info and photo from cjdh2.zip!!!
 
 #include "emu.h"
 
+#include "igs036.h"
 #include "igs036crypt.h"
+#include "igsmahjong.h"
 
-#include "cpu/arm7/arm7.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/okim6295.h"
 #include "sound/tt5665.h"
 
@@ -70,63 +157,1002 @@ check more info and photo from cjdh2.zip!!!
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+#include "multibyte.h"
+
+#include <algorithm>
+#include <iterator>
+#include <memory>
+#include <vector>
+
 
 namespace {
 
-class igs_m036_state : public driver_device
+class m036_state : public driver_device
 {
 public:
-	igs_m036_state(const machine_config &mconfig, device_type type, const char *tag)
+	m036_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
-	void igs_m036_tt(machine_config &config) ATTR_COLD;
-	void igs_m036(machine_config &config) ATTR_COLD;
+	void m036_tt(machine_config &config) ATTR_COLD;
+	void m036(machine_config &config) ATTR_COLD;
 
-	void init_igs_m036() ATTR_COLD;
+	void init_m036() ATTR_COLD;
 	template <const uint8_t (&Key)[0x100]> void init_key() ATTR_COLD;
 	void init_mghammer() ATTR_COLD;
 
 private:
-	uint32_t screen_update_igs_m036(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_m036(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<igs036_cpu_device> m_maincpu;
 
 	void pgm_create_dummy_internal_arm_region() ATTR_COLD;
 
-	void igs_m036_map(address_map &map) ATTR_COLD;
+	void m036_map(address_map &map) ATTR_COLD;
 };
 
 
+// Common IGS036 peripherals for boards with a dumped internal ROM.
+class m036_base_state : public driver_device
+{
+public:
+	void init_jxry() ATTR_COLD;
+
+protected:
+	m036_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
+		m_external_rom(*this, "user1"),
+		m_gfx(*this, "gfx"),
+		m_spriteram(*this, "spriteram"),
+		m_paletteram(*this, "paletteram"),
+		m_service(*this, "SERVICE"),
+		m_direct(*this, "DIRECT"),
+		m_keys(*this, "KEY%u", 0U),
+		m_dsw(*this, "DSW%u", 1U) { }
+
+	// driver_device implementation
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
+
+	void base_config(machine_config &config) ATTR_COLD;
+	void m036_boot_map(address_map &map) ATTR_COLD;
+
+	template <bool Wide> u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u16 keys_r(u16 select);
+	u32 inputs_r();
+	u8 dips_r(offs_t offset);
+	u32 dips_packed_r();
+	void key_select_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
+	void gpio_outputs_w(u32 data);
+
+	required_device<igs036_cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_memory_region m_external_rom;
+	required_region_ptr<u8> m_gfx;
+	required_shared_ptr<u32> m_spriteram;
+	required_shared_ptr<u32> m_paletteram;
+	required_ioport m_service;
+	required_ioport m_direct;
+	required_ioport_array<5> m_keys;
+	required_ioport_array<3> m_dsw;
+
+	u32 m_pio_out;
+	u16 m_key_select;
+
+private:
+	std::unique_ptr<u8 []> m_encrypted_copy;
+
+	void restore_decrypted_state();
+	void decrypt(int state);
+
+	void screen_vblank(int state);
+};
+
+class hopper_state : public m036_base_state
+{
+public:
+	int hopper_r() { return m_hopper->line_r(); }
+
+protected:
+	required_device<hopper_device> m_hopper;
+
+	hopper_state(const machine_config &mconfig, device_type type, const char *tag)
+		: m036_base_state(mconfig, type, tag),
+		m_hopper(*this, "hopper") { }
+
+	void hopper_config(machine_config &config) ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	void gpio_hopper_w(u32 data);
+};
+
+class m036_oki_state : public hopper_state
+{
+public:
+	m036_oki_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hopper_state(mconfig, type, tag),
+		m_oki(*this, "oki"),
+		m_oki_rom(*this, "oki"),
+		m_oki_banks(*this, "oki_bank%u", 0U) { }
+
+	void m036_boot(machine_config &config) ATTR_COLD;
+	void m036_oki_2mhz(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	required_device<okim6295_device> m_oki;
+	required_region_ptr<u8> m_oki_rom;
+	required_memory_bank_array<2> m_oki_banks;
+
+	void m036_oki_boot_map(address_map &map) ATTR_COLD;
+	void oki_rom_map(address_map &map) ATTR_COLD;
+	void oki_banks_w(u8 data);
+};
+
+class m036_tt_state : public hopper_state
+{
+public:
+	m036_tt_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hopper_state(mconfig, type, tag),
+		m_tt5665(*this, "tt5665") { }
+
+	void m036_tt_boot(machine_config &config) ATTR_COLD;
+	void m036_sydh(machine_config &config) ATTR_COLD;
+	void m036_sram(machine_config &config) ATTR_COLD;
+	void m036_cjgdy(machine_config &config) ATTR_COLD;
+
+protected:
+	required_device<tt5665_device> m_tt5665;
+
+	void tt_config(machine_config &config) ATTR_COLD;
+
+private:
+	void m036_tt_boot_map(address_map &map) ATTR_COLD;
+	void sydh_map(address_map &map) ATTR_COLD;
+	void extra_sram_map(address_map &map) ATTR_COLD;
+};
+
+class m036_mj_state : public m036_tt_state
+{
+public:
+	m036_mj_state(const machine_config &mconfig, device_type type, const char *tag)
+		: m036_tt_state(mconfig, type, tag) { }
+
+	void m036_mjzhizun(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	u16 m_secondary_select;
+
+	void mjzhizun_map(address_map &map) ATTR_COLD;
+	void outputs_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
+};
+
+class m036_hd_base_state : public m036_base_state
+{
+protected:
+	required_device<tt5665_device> m_tt5665;
+	required_ioport_array<5> m_scan;
+
+	m036_hd_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: m036_base_state(mconfig, type, tag),
+		m_tt5665(*this, "tt5665"),
+		m_scan(*this, "SCAN%u", 0U) { }
+
+	void hd_config(machine_config &config) ATTR_COLD;
+	template <u32 Rows> u32 scan_inputs_r();
+};
+
+class m036_hd_state : public m036_hd_base_state
+{
+public:
+	m036_hd_state(const machine_config &mconfig, device_type type, const char *tag)
+		: m036_hd_base_state(mconfig, type, tag),
+		m_hopper(*this, "hopper") { }
+
+	void m036_hd(machine_config &config) ATTR_COLD;
+	int hopper_r() { return m_hopper->line_r(); }
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	required_device<hopper_device> m_hopper;
+	u16 m_secondary_select;
+
+	void hd_map(address_map &map) ATTR_COLD;
+	u32 gpio_inputs_r();
+	void outputs_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
+};
+
+class m036_hyleyuan_state : public m036_hd_base_state
+{
+public:
+	m036_hyleyuan_state(const machine_config &mconfig, device_type type, const char *tag)
+		: m036_hd_base_state(mconfig, type, tag),
+		m_ticket(*this, "ticket") { }
+
+	void m036_hyleyuan(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	required_device<ticket_dispenser_device> m_ticket;
+
+	void hyleyuan_map(address_map &map) ATTR_COLD;
+};
 
 
-uint32_t igs_m036_state::screen_update_igs_m036(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m036_state::screen_update_m036(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-void igs_m036_state::igs_m036_map(address_map &map)
-{
-	map(0x00000000, 0x00003fff).rom(); // Internal ROM
-	map(0x08000000, 0x081fffff).rom().region("user1", 0); // not 100% sure it maps here.
 
+template <bool Wide>
+u32 m036_base_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(rgb_t::black(), cliprect);
+	// Convert each palette entry once, rather than for every opaque pixel.
+	u32 colours[0x2000];
+	for (u32 i = 0; i < std::size(colours); ++i)
+	{
+		u32 const colour = m_paletteram[i];
+		colours[i] = rgb_t(pal5bit(colour >> 10), pal5bit(colour >> 5), pal5bit(colour));
+	}
+
+	// Four packed 7bpp pixels per 32-bit word. In compressed sprites the top
+	// nibble is a repeat count (0 = one group, 15 = sixteen groups).
+	// The 800x600 boards fetch two consecutive words from four 16-bit ROMs.
+	// TODO: zoom, blending, priority and display/window control.
+	u32 const half = m_gfx.bytes() / 2;
+	constexpr u32 GROUPS_PER_ADDRESS = Wide ? 2 : 1;
+	constexpr u32 PIXELS_PER_ADDRESS = GROUPS_PER_ADDRESS * 4;
+	auto const read_group = [this, half] (u32 address, u32 index, bool reverse)
+	{
+		u32 const offset = (reverse ? address - index / GROUPS_PER_ADDRESS : address + index / GROUPS_PER_ADDRESS) * 2;
+		u32 const lane = (index % GROUPS_PER_ADDRESS) ^ (reverse ? GROUPS_PER_ADDRESS - 1 : 0);
+		u32 const low_base = Wide ? lane * half : half;
+		u32 const high_base = Wide ? low_base + half / 2 : 0;
+		if (offset + 1 >= (Wide ? half / 2 : half))
+			return 0U;
+		return u32(get_u16le(&m_gfx[low_base + offset])) | (u32(get_u16le(&m_gfx[high_base + offset])) << 16);
+	};
+
+	for (u32 i = 0; i < 0x1000; i += 4)
+	{
+		u32 const pos = m_spriteram[i];
+		u32 const size = m_spriteram[i + 1];
+		u32 const attr = m_spriteram[i + 2];
+		if (attr & 0x7400'0000) // attribute modes not yet understood
+			continue;
+
+		int const x = util::sext(pos >> 16, 11);
+		int const y = util::sext(pos, 11);
+		u32 const width = ((size & 0x1ff) + 1) * PIXELS_PER_ADDRESS;
+		u32 const height = ((size >> 16) & 0x7ff) + 1;
+		if (x > cliprect.right() || y > cliprect.bottom() || x + int(width) <= cliprect.left() || y + int(height) <= cliprect.top())
+			continue;
+		u32 const address = (attr & 0xffff) | (m_spriteram[i + 3] & 0x03ff'0000);
+		u32 const palette = ((attr >> 16) & 0x3f) * 0x80;
+		bool const compressed = !BIT(attr, 27);
+		bool const reverse = !BIT(attr, 25);
+		bool const flipx = !BIT(attr, 24);
+		u32 const *const pens = &colours[palette];
+		u32 index = 0, pixels = 0;
+		u32 repeats = 0;
+
+		// Raw sprites can seek straight to the first visible row. RLE sprites
+		// must consume the preceding groups to preserve runs crossing a row.
+		u32 const first_y = compressed ? 0 : std::max(0, cliprect.top() - y);
+		index = first_y * (width / 4);
+		for (u32 sy = first_y; sy < height && y + int(sy) <= cliprect.bottom(); ++sy)
+		{
+			int const dy = y + int(sy);
+			u32 *const dest = (dy >= cliprect.top()) ? &bitmap.pix(dy) : nullptr;
+			for (u32 sx = 0; sx < width; sx += 4)
+			{
+				if (!repeats)
+				{
+					pixels = read_group(address, index++, reverse);
+					repeats = compressed ? (pixels >> 28) + 1 : 1;
+					// Put the four pens in left-to-right order for the hot draw path.
+					if (reverse != flipx)
+						pixels = ((pixels >> 21) & 0x000'007f) | ((pixels >> 7) & 0x000'3f80)
+								| ((pixels << 7) & 0x01f'c000) | ((pixels << 21) & 0xfe0'0000);
+				}
+				--repeats;
+				int const dx = x + int(flipx ? width - 4 - sx : sx);
+				if (dy < cliprect.top() || dx > cliprect.right() || dx + 3 < cliprect.left())
+					continue;
+				if (dx >= cliprect.left() && dx + 3 <= cliprect.right())
+				{
+					if (u8 const pen = (pixels >>  0) & 0x7f)
+						dest[dx] = pens[pen];
+					if (u8 const pen = (pixels >>  7) & 0x7f)
+						dest[dx + 1] = pens[pen];
+					if (u8 const pen = (pixels >> 14) & 0x7f)
+						dest[dx + 2] = pens[pen];
+					if (u8 const pen = (pixels >> 21) & 0x7f)
+						dest[dx + 3] = pens[pen];
+				}
+				else
+				{
+					for (u32 p = 0; p < 4; ++p)
+					{
+						u8 const pen = (pixels >> (p * 7)) & 0x7f;
+						if (pen && dx + int(p) >= cliprect.left() && dx + int(p) <= cliprect.right())
+							dest[dx + int(p)] = pens[pen];
+					}
+				}
+			}
+		}
+	}
+	return 0;
 }
 
-static INPUT_PORTS_START( igs_m036 )
+
+void m036_base_state::machine_start()
+{
+	m_encrypted_copy = std::make_unique<u8 []>(m_external_rom->bytes());
+	std::copy_n(m_external_rom->base(), m_external_rom->bytes(), m_encrypted_copy.get());
+
+	save_item(NAME(m_key_select));
+	save_item(NAME(m_pio_out));
+}
+
+
+void m036_base_state::machine_reset()
+{
+	m_key_select = 0xffff;
+	m_pio_out = 0;
+	restore_decrypted_state();
+}
+
+
+void m036_base_state::device_post_load()
+{
+	restore_decrypted_state();
+}
+
+void m036_base_state::decrypt(int state)
+{
+	restore_decrypted_state();
+}
+
+void m036_base_state::restore_decrypted_state()
+{
+	std::copy_n(m_encrypted_copy.get(), m_external_rom->bytes(), m_external_rom->base());
+	if (m_maincpu->get_has_decrypted())
+	{
+		igs036_decryptor decrypter(m_maincpu->get_encryption_table());
+		auto const rom = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(m_external_rom->base()));
+		for (u32 i = 0; i < m_external_rom->bytes() / 2; ++i)
+			rom[i] = decrypter.decrypt(rom[i], i);
+	}
+}
+
+void hopper_state::machine_reset()
+{
+	m036_base_state::machine_reset();
+	m_hopper->motor_w(0);
+}
+
+void hopper_state::gpio_hopper_w(u32 data)
+{
+	gpio_outputs_w(data);
+	m_hopper->motor_w(!BIT(data, 2));
+}
+
+void m036_oki_state::machine_start()
+{
+	hopper_state::machine_start();
+	for (auto &bank : m_oki_banks)
+	{
+		for (u32 entry = 0; entry < 16; ++entry)
+			bank->configure_entry(entry, &m_oki_rom[(entry * 0x2'0000) % m_oki_rom.bytes()]);
+	}
+}
+
+void m036_oki_state::machine_reset()
+{
+	hopper_state::machine_reset();
+	oki_banks_w(0);
+}
+
+void m036_oki_state::oki_banks_w(u8 data)
+{
+	m_oki_banks[0]->set_entry(BIT(data, 0, 4));
+	m_oki_banks[1]->set_entry(BIT(data, 4, 4));
+}
+
+void m036_oki_state::oki_rom_map(address_map &map)
+{
+	map(0x0'0000, 0x1'ffff).bankr(m_oki_banks[0]);
+	map(0x2'0000, 0x3'ffff).bankr(m_oki_banks[1]);
+}
+
+u16 m036_base_state::keys_r(u16 select)
+{
+	u16 keys = 0xffff;
+	for (u32 row = 0; row < m_keys.size(); ++row)
+	{
+		if (!BIT(select, row))
+			keys &= m_keys[row]->read() | 0xffc0;
+	}
+	return keys;
+}
+
+u32 m036_base_state::inputs_r()
+{
+	return m_service->read() | (u32(m_direct->read() & keys_r(m_key_select)) << 16);
+}
+
+u8 m036_base_state::dips_r(offs_t offset)
+{
+	return (offset < 6 && !BIT(offset, 0)) ? m_dsw[offset / 2]->read() : 0xff;
+}
+
+u32 m036_base_state::dips_packed_r()
+{
+	return m_dsw[0]->read() | (m_dsw[1]->read() << 8) | (m_dsw[2]->read() << 16) | 0xff00'0000;
+}
+
+void m036_base_state::key_select_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_key_select);
+}
+
+void m036_base_state::gpio_outputs_w(u32 data)
+{
+	m_pio_out = data;
+}
+
+template <u32 Rows>
+u32 m036_hd_base_state::scan_inputs_r()
+{
+	u16 result = 0xffff;
+	for (u32 row = 0; row < Rows; ++row)
+	{
+		if (!BIT(m_pio_out, 8 + row))
+			result &= m_scan[row]->read() | 0xff00;
+	}
+	return result;
+}
+
+u32 m036_hd_state::gpio_inputs_r()
+{
+	u16 result = scan_inputs_r<5>();
+	if (!BIT(m_pio_out, 10))
+		result &= keys_r(m_secondary_select >> 5);
+	return result;
+}
+
+void m036_hd_state::outputs_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_secondary_select);
+	if (BIT(mem_mask, 2))
+		m_hopper->motor_w(BIT(m_secondary_select, 2));
+}
+
+void m036_hd_state::machine_start()
+{
+	m036_hd_base_state::machine_start();
+	save_item(NAME(m_secondary_select));
+}
+
+void m036_hd_state::machine_reset()
+{
+	m036_hd_base_state::machine_reset();
+	m_secondary_select = 0xffff;
+	m_hopper->motor_w(0);
+}
+
+void m036_mj_state::outputs_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_secondary_select);
+	m_key_select = BIT(m_secondary_select, 9, 5);
+	if (BIT(mem_mask, 2))
+		m_hopper->motor_w(BIT(m_secondary_select, 2));
+}
+
+void m036_mj_state::machine_start()
+{
+	m036_tt_state::machine_start();
+	save_item(NAME(m_secondary_select));
+}
+
+void m036_mj_state::machine_reset()
+{
+	m036_tt_state::machine_reset();
+	m_secondary_select = 0xffff;
+}
+
+void m036_hyleyuan_state::machine_reset()
+{
+	m036_hd_base_state::machine_reset();
+	m_ticket->motor_w(0);
+}
+
+
+
+void m036_base_state::screen_vblank(int state)
+{
+	// The internal ROM acknowledges this latched source through the AIC.
+	if (state)
+	{
+		m_maincpu->set_aic_irq(2, ASSERT_LINE);
+	}
+}
+
+
+void m036_state::m036_map(address_map &map)
+{
+	map(0x08000000, 0x081fffff).rom().region("user1", 0); // not 100% sure it maps here.
+}
+
+void m036_base_state::m036_boot_map(address_map &map)
+{
+
+	// Video RAM ranges cleared by the internal ROM. Only basic sprites are drawn.
+	// Unlike PGM2, this board uses 0x03xxxxxx, not 0x30xxxxxx, for video/I/O.
+	map(0x0300'0000, 0x0300'3fff).ram().share(m_spriteram);
+	map(0x0310'0000, 0x0310'7fff).ram().share(m_paletteram); // xRGB555 in low 16 bits of each word
+	map(0x0320'0000, 0x0320'0bff).ram();
+	map(0x0340'0000, 0x0340'0003).r(FUNC(m036_base_state::inputs_r));
+	map(0x0330'0000, 0x0330'0003).nopw();
+	map(0x0334'0000, 0x0334'0003).nopw();
+	map(0x0338'0000, 0x0338'004b).nopw();
+	map(0x0350'0000, 0x0350'0003).nopw();
+	map(0x0352'0000, 0x0352'0003).lr32(NAME([] () -> u32 { return 1; })); // TODO: video ready/busy timing
+	map(0x0354'0000, 0x0354'0003).nopw();
+	map(0x0356'0000, 0x0356'0003).nopw();
+
+	map(0x1000'0000, 0x101f'ffff).rom().region("user1", 0);
+	// External SRAM also holds settings, credits and bookkeeping. The startup
+	// code reinitializes its working areas but preserves valid accounting data.
+	map(0x2000'0000, 0x2001'ffff).ram().share("mainram"); // stacks at the top
+
+	map(0x3000'0000, 0x3000'0003).umask32(0xffff'0000).w(FUNC(m036_base_state::key_select_w));
+	map(0x3000'0004, 0x3000'0007).lr32(NAME([] () -> u32 { return 0xffff'ffff; }));
+	map(0x3000'0008, 0x3000'000f).r(FUNC(m036_base_state::dips_r));
+
+	map(0x5000'0004, 0x5000'0007).nopw(); // overridden for sydh's output at byte address 0x50000006
+}
+
+
+void m036_tt_state::m036_tt_boot_map(address_map &map)
+{
+	m036_boot_map(map);
+	map(0x4000'0000, 0x4000'0003).umask32(0x0000'00ff).rw(m_tt5665, FUNC(tt5665_device::csl_r), FUNC(tt5665_device::csl_w));
+	map(0x5000'0000, 0x5000'0003).umask32(0x0000'00ff).rw(m_tt5665, FUNC(tt5665_device::csr_r), FUNC(tt5665_device::csr_w));
+}
+
+
+void m036_oki_state::m036_oki_boot_map(address_map &map)
+{
+	m036_boot_map(map);
+	map(0x4000'0000, 0x4000'0003).umask32(0x0000'00ff).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x3000'0000, 0x3000'0003).umask32(0x0000'00ff).w(FUNC(m036_oki_state::oki_banks_w));
+	// Later OKI boards move the two DIP banks here.
+	map(0x5000'0000, 0x5000'0003).portr(m_dsw[0]);
+	map(0x6000'0000, 0x6000'0003).portr(m_dsw[1]);
+}
+
+
+void m036_tt_state::sydh_map(address_map &map)
+{
+	m036_boot_map(map);
+	map(0x4000'0004, 0x4000'0007).umask32(0xffff'0000).lr16(NAME([this] () -> u16 { return m_dsw[2]->read(); }));
+	map(0x4000'0008, 0x4000'000b).umask32(0xffff'0000).lr16(NAME([this] () -> u16 { return m_dsw[1]->read(); }));
+	map(0x4000'000c, 0x4000'000f).portr(m_dsw[0]);
+	map(0x5000'0004, 0x5000'0007).umask32(0x00ff'0000).lw8(NAME([this] (u8 data) { m_hopper->motor_w(BIT(data, 2)); }));
+	map(0x5000'0008, 0x5000'000f).nopw(); // TODO: lamps/counters
+	map(0x6000'000c, 0x6000'000f).umask32(0x0000'00ff).rw(m_tt5665, FUNC(tt5665_device::csl_r), FUNC(tt5665_device::csl_w));
+	map(0x6000'0008, 0x6000'000b).umask32(0x00ff'0000).rw(m_tt5665, FUNC(tt5665_device::csr_r), FUNC(tt5665_device::csr_w));
+}
+
+
+void m036_hd_state::hd_map(address_map &map)
+{
+	m036_boot_map(map);
+	map(0x0340'0000, 0x0340'0003).r(FUNC(m036_hd_state::dips_packed_r));
+
+	map(0x4000'0000, 0x4000'0003).umask32(0x0000'00ff).rw(m_tt5665, FUNC(tt5665_device::csl_r), FUNC(tt5665_device::csl_w));
+	map(0x4020'0000, 0x4020'0003).umask32(0x0000'00ff).rw(m_tt5665, FUNC(tt5665_device::csr_r), FUNC(tt5665_device::csr_w));
+
+	map(0x5000'0000, 0x5000'0007).r(FUNC(m036_hd_state::dips_r));
+	map(0x5000'0000, 0x5000'0003).umask32(0x0000'ffff).w(FUNC(m036_hd_state::outputs_w));
+	map(0x5020'0000, 0x5020'0003).umask32(0x0000'ffff).w(FUNC(m036_hd_state::key_select_w));
+}
+
+
+void m036_hyleyuan_state::hyleyuan_map(address_map &map)
+{
+	m036_boot_map(map);
+	map(0x3000'0000, 0x3000'0003).umask32(0x0000'00ff).rw(m_tt5665, FUNC(tt5665_device::csl_r), FUNC(tt5665_device::csl_w));
+	map(0x4000'0000, 0x4000'0003).umask32(0x0000'00ff).rw(m_tt5665, FUNC(tt5665_device::csr_r), FUNC(tt5665_device::csr_w));
+	map(0x5000'0000, 0x5000'0003).lr32(NAME([] () -> u32 { return 0xffff'ffff; })).nopw();
+	map(0x6000'0000, 0x6000'000f).lr32(NAME([] () -> u32 { return 0xffff'ffff; })).nopw(); // TODO: remaining daughterboard I/O
+	// Bit 1 drives the ticket motor; the return sensor is on scan row 3, bit 5.
+	// Without sensor pulses the game stops the motor after five seconds and
+	// displays the ticket-dispenser fault with the unpaid count.
+	map(0x6000'0000, 0x6000'0003).umask32(0x0000'00ff).lw8(NAME([this] (u8 data) { m_ticket->motor_w(BIT(data, 1)); }));
+}
+
+void m036_mj_state::mjzhizun_map(address_map &map)
+{
+	m036_boot_map(map);
+
+	map(0x0340'0000, 0x0340'0003).lr32(NAME([this] () -> u32 {
+		return (dips_packed_r() & 0x00ff'ffff) | (u32(m_direct->read() & keys_r(m_key_select)) << 24);
+	}));
+
+	map(0x3000'0000, 0x3000'0003).portr(m_service);
+
+	map(0x3000'0000, 0x3000'0003).umask32(0x0000'ffff).w(FUNC(m036_mj_state::outputs_w));
+	map(0x3001'0000, 0x3001'0003).lr32(NAME([] () -> u32 { return 0xffff'ffff; })).nopw();
+
+	map(0x4000'0000, 0x4000'0003).umask32(0x0000'00ff).rw(m_tt5665, FUNC(tt5665_device::csl_r), FUNC(tt5665_device::csl_w));
+	map(0x4001'0000, 0x4001'0003).umask32(0x0000'00ff).rw(m_tt5665, FUNC(tt5665_device::csr_r), FUNC(tt5665_device::csr_w));
+
+	map(0x5000'0000, 0x5000'0003).nopw(); // TODO: sound sample banking?
+}
+
+
+void m036_tt_state::extra_sram_map(address_map &map)
+{
+	m036_tt_boot_map(map);
+	// U19: the program tests all 32 KiB and keeps bookkeeping data here.
+	map(0x6000'0000, 0x6000'7fff).ram().share("extra_nvram");
+}
+
+
+static INPUT_PORTS_START( m036 )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( hopper )
+	PORT_INCLUDE(igs_mahjong_matrix)
+
+	// Service assignments verified against slqzsp's input test and ROM table.
+	PORT_START("SERVICE")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_SERVICE_NO_TOGGLE(0x0002, IP_ACTIVE_LOW)
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(5)
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_START1) PORT_NAME("Start (Joystick)")
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)
+	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("S1")
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("S2")
+	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("S3")
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT)
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN)
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT)
+	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(hopper_state::hopper_r))
+
+	PORT_START("DIRECT")
+	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("DSW1")
+	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown)) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(0x01, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x02, 0x02, DEF_STR(Unknown)) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(0x02, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x04, 0x04, DEF_STR(Unknown)) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(0x04, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x08, 0x08, DEF_STR(Unknown)) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(0x08, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x10, 0x10, DEF_STR(Unknown)) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(0x10, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x20, 0x20, DEF_STR(Unknown)) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(0x20, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x40, 0x40, DEF_STR(Unknown)) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(0x40, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x80, 0x80, DEF_STR(Unknown)) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(0x80, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+
+	PORT_START("DSW2")
+	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown)) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(0x01, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x02, 0x02, DEF_STR(Unknown)) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(0x02, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x04, 0x04, DEF_STR(Unknown)) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(0x04, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x08, 0x08, DEF_STR(Unknown)) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(0x08, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x10, 0x10, DEF_STR(Unknown)) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(0x10, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x20, 0x20, DEF_STR(Unknown)) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(0x20, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x40, 0x40, DEF_STR(Unknown)) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(0x40, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x80, 0x80, DEF_STR(Unknown)) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(0x80, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+
+	PORT_START("DSW3")
+	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown)) PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(0x01, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x02, 0x02, DEF_STR(Unknown)) PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(0x02, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x04, 0x04, DEF_STR(Unknown)) PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(0x04, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x08, 0x08, DEF_STR(Unknown)) PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(0x08, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x10, 0x10, DEF_STR(Unknown)) PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(0x10, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x20, 0x20, DEF_STR(Unknown)) PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(0x20, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x40, 0x40, DEF_STR(Unknown)) PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(0x40, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x80, 0x80, DEF_STR(Unknown)) PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(0x80, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( jxry )
+	PORT_INCLUDE(hopper)
+	// Default JAMMA control mode, verified in the game's logical input table.
+	PORT_MODIFY("SERVICE")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(hopper_state::hopper_r))
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT)
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_LOW)
+	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH)
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP)
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE)
+	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT)
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(5)
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_POKER_HOLD4)
+	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN)
+	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_POKER_HOLD3)
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_POKER_HOLD5)
+	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_BET)
+	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK)
+	PORT_MODIFY("DIRECT")
+	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_START1)
+	PORT_SERVICE_NO_TOGGLE(0x0002, IP_ACTIVE_LOW)
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_POKER_HOLD1)
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_POKER_HOLD2)
+	PORT_BIT(0xfff0, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( m036_hd )
+	PORT_INCLUDE(hopper)
+	PORT_MODIFY("SERVICE")
+	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("SCAN0")
+	PORT_SERVICE_NO_TOGGLE(0x01, IP_ACTIVE_LOW)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(5)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1)
+	PORT_START("SCAN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON3)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(m036_hd_state::hopper_r))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_START("SCAN2")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_START("SCAN3")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_START("SCAN4")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( hyleyuan )
+	PORT_INCLUDE(m036_hd)
+	// The application uses the extended key IDs 0x4b-0x4e. The earlier
+	// mahjong-style key table is shared library code, not this game's panel.
+	PORT_MODIFY("KEY0")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_MODIFY("KEY1")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_MODIFY("KEY2")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_MODIFY("KEY3")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_MODIFY("KEY4")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_MODIFY("SCAN0")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_MODIFY("SCAN1")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_MODIFY("SCAN2")
+	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Left Button")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Right Button")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_NAME("Service Key")
+	PORT_SERVICE_NO_TOGGLE(0x80, IP_ACTIVE_LOW)
+	PORT_MODIFY("SCAN3")
+	// Coin and ticket filters sample this row separately from the key table.
+	PORT_BIT(0xde, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1) PORT_IMPULSE(5)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("ticket", FUNC(ticket_dispenser_device::line_r))
 INPUT_PORTS_END
 
 
-void igs_m036_state::igs_m036(machine_config &config)
+
+// DIP functions read from the games' own test screens. Unidentified switches
+// use their physical locations; link and accounting settings need further tests.
+static INPUT_PORTS_START( ddz )
+	PORT_INCLUDE(hopper)
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME(0x01, 0x01, DEF_STR(Demo_Sounds)) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x01, DEF_STR(On))
+	PORT_DIPNAME(0x02, 0x02, "Controls") PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(0x02, "Joystick")
+	PORT_DIPSETTING(0x00, "Mahjong")
+	PORT_DIPNAME(0x04, 0x04, "Continue") PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x04, DEF_STR(On))
+	PORT_DIPNAME(0x08, 0x08, "Alarm Sound") PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x08, DEF_STR(On))
+	PORT_DIPNAME(0x10, 0x10, "Automatic Pass") PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x10, DEF_STR(On))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ddz_hd )
+	PORT_INCLUDE(m036_hd)
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME(0x01, 0x01, DEF_STR(Demo_Sounds)) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x01, DEF_STR(On))
+	PORT_DIPNAME(0x02, 0x02, "Controls") PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(0x02, "Joystick")
+	PORT_DIPSETTING(0x00, "Mahjong")
+	PORT_DIPNAME(0x04, 0x04, "Continue") PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x04, DEF_STR(On))
+	PORT_DIPNAME(0x08, 0x08, "Alarm Sound") PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x08, DEF_STR(On))
+	PORT_DIPNAME(0x10, 0x10, "Automatic Pass") PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x10, DEF_STR(On))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cjgdy )
+	PORT_INCLUDE(ddz)
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME(0x10, 0x10, "Automatic Pass") PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(0x10, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cjbq )
+	PORT_INCLUDE(hopper)
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME(0x01, 0x01, DEF_STR(Demo_Sounds)) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x01, DEF_STR(On))
+	PORT_DIPNAME(0x02, 0x02, "Continue") PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x02, DEF_STR(On))
+	PORT_DIPNAME(0x04, 0x04, "Controls") PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(0x04, "Joystick")
+	PORT_DIPSETTING(0x00, "Mahjong")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( lhfy )
+	PORT_INCLUDE(m036_hd)
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME(0x01, 0x01, DEF_STR(Demo_Sounds)) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x01, DEF_STR(On))
+	PORT_DIPNAME(0x02, 0x02, "Controls") PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(0x02, "Joystick")
+	PORT_DIPSETTING(0x00, "Mahjong")
+	PORT_DIPNAME(0x04, 0x04, "Continue") PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x04, DEF_STR(On))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( jhzb )
+	PORT_INCLUDE(hopper)
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME(0x01, 0x01, "Controls") PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(0x01, "Joystick")
+	PORT_DIPSETTING(0x00, "Mahjong")
+	PORT_DIPNAME(0x02, 0x02, DEF_STR(Demo_Sounds)) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x02, DEF_STR(On))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( lhtb )
+	PORT_INCLUDE(hopper)
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME(0x01, 0x01, "Controls") PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(0x01, "Joystick")
+	PORT_DIPSETTING(0x00, "Mahjong")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( sydh )
+	PORT_INCLUDE(hopper)
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME(0x01, 0x01, "Controls") PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(0x01, "Joystick")
+	PORT_DIPSETTING(0x00, "Mahjong")
+	PORT_DIPNAME(0x02, 0x02, DEF_STR(Demo_Sounds)) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x02, DEF_STR(On))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( qhzb )
+	PORT_INCLUDE(hopper)
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME(0x40, 0x40, DEF_STR(Demo_Sounds)) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x40, DEF_STR(On))
+	PORT_DIPNAME(0x80, 0x80, "Controls") PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(0x80, "Mahjong")
+	PORT_DIPSETTING(0x00, "Joystick")
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME(0x04, 0x04, "Continue") PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x04, DEF_STR(On))
+INPUT_PORTS_END
+
+
+
+void m036_state::m036(machine_config &config)
 {
 	IGS036(config, m_maincpu, 20_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m036_state::igs_m036_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m036_state::m036_map);
 
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0, 256-1);
-	screen.set_screen_update(FUNC(igs_m036_state::screen_update_igs_m036));
+	screen.set_screen_update(FUNC(m036_state::screen_update_m036));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_entries(0x200);
@@ -136,23 +1162,138 @@ void igs_m036_state::igs_m036(machine_config &config)
 }
 
 
-void igs_m036_state::igs_m036_tt(machine_config &config)
+void m036_state::m036_tt(machine_config &config)
 {
 	IGS036(config, m_maincpu, 20_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m036_state::igs_m036_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m036_state::m036_map);
 
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0, 256-1);
-	screen.set_screen_update(FUNC(igs_m036_state::screen_update_igs_m036));
+	screen.set_screen_update(FUNC(m036_state::screen_update_m036));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_entries(0x200);
 
 	SPEAKER(config, "speaker").front_center();
 	TT5665(config, "tt5665", 4.952_MHz_XTAL, tt5665_device::ss_state::SS_HIGH, 0).add_route(1, "speaker", 1.0);
+}
+
+
+void m036_base_state::base_config(machine_config &config)
+{
+	IGS036(config, m_maincpu, 20_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m036_base_state::m036_boot_map);
+	m_maincpu->set_gpio_r().set_ioport(m_service);
+	m_maincpu->set_gpio_w().set(FUNC(m036_base_state::gpio_outputs_w));
+	m_maincpu->set_do_decrypt().set(FUNC(m036_base_state::decrypt));
+
+	SCREEN(config, m_screen);
+	// FIXME: pixel clock and blanking intervals are not known.
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 511, 0, 239);
+	m_screen->set_screen_update(FUNC(m036_base_state::screen_update<false>));
+	m_screen->screen_vblank().set(FUNC(m036_base_state::screen_vblank));
+
+	NVRAM(config, "mainram", nvram_device::DEFAULT_ALL_0);
+	SPEAKER(config, "speaker").front_center();
+}
+
+void hopper_state::hopper_config(machine_config &config)
+{
+	base_config(config);
+	HOPPER(config, m_hopper, attotime::from_msec(100)); // mechanical period is provisional
+}
+
+void m036_oki_state::m036_boot(machine_config &config)
+{
+	hopper_config(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m036_oki_state::m036_oki_boot_map);
+	m_maincpu->set_gpio_w().set(FUNC(m036_oki_state::gpio_hopper_w));
+	OKIM6295(config, m_oki, 1'000'000, okim6295_device::PIN7_LOW); // clock and pin 7 not verified
+	m_oki->set_addrmap(0, &m036_oki_state::oki_rom_map);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
+
+void m036_oki_state::m036_oki_2mhz(machine_config &config)
+{
+	m036_boot(config);
+	// FIXME: clock and pin 7 require measurement; 2 MHz gives the expected sample pitch.
+	m_oki->set_clock(2'000'000);
+}
+
+void m036_tt_state::tt_config(machine_config &config)
+{
+	hopper_config(config);
+	TT5665(config, m_tt5665, 4.952_MHz_XTAL, tt5665_device::ss_state::SS_HIGH, 0);
+	m_tt5665->add_route(ALL_OUTPUTS, "speaker", 0.5);
+}
+
+void m036_tt_state::m036_tt_boot(machine_config &config)
+{
+	tt_config(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m036_tt_state::m036_tt_boot_map);
+	m_maincpu->set_gpio_w().set(FUNC(m036_tt_state::gpio_hopper_w));
+}
+
+void m036_tt_state::m036_sydh(machine_config &config)
+{
+	tt_config(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m036_tt_state::sydh_map);
+	m_maincpu->set_gpio_w().set(FUNC(m036_tt_state::gpio_hopper_w));
+}
+
+void m036_tt_state::m036_sram(machine_config &config)
+{
+	m036_tt_boot(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m036_tt_state::extra_sram_map);
+	NVRAM(config, "extra_nvram", nvram_device::DEFAULT_ALL_0);
+}
+
+void m036_tt_state::m036_cjgdy(machine_config &config)
+{
+	m036_sram(config);
+	// FIXME: oscillator and S1/S0/SS wiring require verification; DAOL uses the /2 divider.
+	m_tt5665->config_s0_s1(1);
+}
+
+void m036_mj_state::m036_mjzhizun(machine_config &config)
+{
+	tt_config(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m036_mj_state::mjzhizun_map);
+}
+
+void m036_hd_base_state::hd_config(machine_config &config)
+{
+	base_config(config);
+	m_maincpu->set_clock(100'000'000); // provisional PLL clock, as in PGM2
+	m_screen->set_size(800, 600);
+	m_screen->set_visarea(0, 799, 0, 599);
+	m_screen->set_screen_update(FUNC(m036_hd_base_state::screen_update<true>));
+	TT5665(config, m_tt5665, 4.952_MHz_XTAL, tt5665_device::ss_state::SS_HIGH, 0);
+	m_tt5665->add_route(ALL_OUTPUTS, "speaker", 0.5);
+}
+
+void m036_hd_state::m036_hd(machine_config &config)
+{
+	hd_config(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m036_hd_state::hd_map);
+	m_maincpu->set_gpio_r().set(FUNC(m036_hd_state::gpio_inputs_r));
+
+	HOPPER(config, m_hopper, attotime::from_msec(100)); // mechanical period is provisional
+}
+
+void m036_hyleyuan_state::m036_hyleyuan(machine_config &config)
+{
+	hd_config(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m036_hyleyuan_state::hyleyuan_map);
+	m_maincpu->set_gpio_r().set(FUNC(m036_hyleyuan_state::scan_inputs_r<4>));
+
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100)); // mechanical period is provisional
 }
 
 
@@ -448,7 +1589,10 @@ ROM_START( lhfy )
 	ROM_REGION( 0x10000000, "gfx", 0 )
 	// 4x 64MB flash ROMs (U1, U2, U3, U4) mounted onto a custom SODIMM at CN1 with a sticker "CG V206CN"
 	ROM_LOAD( "cg_v206cn.u1", 0x0000000, 0x4000000, CRC(6abd4a31) SHA1(6c5eefc3671c4192a689cb1e82605e65fec44384) )
-	ROM_LOAD( "cg_v206cn.u2", 0x4000000, 0x4000000, CRC(b37e94b2) SHA1(da9e8b38070412a1b4057ddaf1df65878f3e135a) )
+	// Suspect read corruption at the starts of 0x800-byte blocks: this lane alone
+	// produces periodic dots in raw sprites, and compressed image lengths disagree.
+	// FIXME: independent redump required to confirm the suspected corruption.
+	ROM_LOAD( "cg_v206cn.u2", 0x4000000, 0x4000000, BAD_DUMP CRC(b37e94b2) SHA1(da9e8b38070412a1b4057ddaf1df65878f3e135a) )
 	ROM_LOAD( "cg_v206cn.u3", 0x8000000, 0x4000000, CRC(b379503c) SHA1(fc7d5c4afcef6a7448cc6547fa73e51378a67b3d) )
 	ROM_LOAD( "cg_v206cn.u4", 0xc000000, 0x4000000, CRC(f96be9f1) SHA1(fe957af2e31007b570c4f4b707400a87be1b4301) )
 ROM_END
@@ -546,13 +1690,10 @@ ROM_END
 
 
 // 金花争霸 (Jīn Huā Zhēngbà)
-ROM_START( jhzb )
+ROM_START( jhzb ) // Has an Altera EPM CPLD
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "jhzb_igs036.bin", 0x0000, 0x4000, CRC(5436812e) SHA1(f579044b3984598013648a637611e6041cd6055e) ) // stickered K7
-
-	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
-	ROM_LOAD( "xa", 0x00000, 0x10000, NO_DUMP )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v113cn.u17", 0x000000, 0x200000, CRC(1c08099b) SHA1(125a5302935e8bef8d4a4d8a6db748110bcab692) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
@@ -567,13 +1708,10 @@ ROM_END
 
 
 // 吉祥如意 (Jíxiáng Rúyì)
-ROM_START( jxry )
+ROM_START( jxry ) // Has an Altera EPM CPLD, stickered IL U14
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "jxry_igs036.bin", 0x0000, 0x4000, CRC(cb1d4974) SHA1(c1a29330f2f844d514841d1e30eeec9a28743084) ) // stickered A3
-
-	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) stickered IL U14
-	ROM_LOAD( "xa", 0x00000, 0x10000, NO_DUMP )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v-116cn.u20", 0x000000, 0x200000, CRC(a8cd3431) SHA1(b978b2e27fc106a02213b6aa42620fbf287a4d24) )
@@ -588,13 +1726,10 @@ ROM_END
 
 
 // 双龙抢珠特别版 (Shuāng Lóng Qiǎng Zhū Tèbié Bǎn)
-ROM_START( slqzsp )
+ROM_START( slqzsp ) // Has an Altera EPM CPLD, stickered IU U23
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "slqzsp_igs036.bin", 0x0000, 0x4000, CRC(b294079b) SHA1(5f1e63e302497fd8c9144fbc5c128cac215b28ec) ) // stickered F8
-
-	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) stickered IU U23
-	ROM_LOAD( "xa", 0x00000, 0x10000, NO_DUMP )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v104cn.u18", 0x000000, 0x200000, CRC(7819aa1a) SHA1(c63b375916d0009e065b6239bcc752a56d2ee127) )
@@ -609,13 +1744,10 @@ ROM_END
 
 
 // 鲨鱼大亨 (Shāyú Dàhēng)
-ROM_START( sydh ) // PCB-0802-03-JL
+ROM_START( sydh ) // PCB-0802-03-JL. Has an Altera EPM CPLD
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "sydh_igs036.bin", 0x0000, 0x4000, CRC(2f581a7a) SHA1(783ddb2876e56f096288ec6a1166949299fa4bc5) ) // stickered C3
-
-	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
-	ROM_LOAD( "xa", 0x00000, 0x10000, NO_DUMP )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v-104cn.u20", 0x000000, 0x200000, CRC(43219633) SHA1(0f709c700c661f20a3f47c6df5a35aff9eb05bc6) )
@@ -624,19 +1756,16 @@ ROM_START( sydh ) // PCB-0802-03-JL
 	ROM_LOAD( "v-104cn.u31", 0x000000, 0x800000, CRC(794a4ebf) SHA1(b6ea2228fc943dc65514d113c36a1e9d69564e9a) ) // 1xxxxxxxxxxxxxxxxxxxxxx = 0x00
 
 	ROM_REGION( 0x1000000, "gfx", 0 )
-	ROM_LOAD( "v-104cn.u33", 0x000000, 0x800000, CRC(cd8a1633) SHA1(2f63167fe282fc648d9e22c6a32d593f41546ba3) )
-	ROM_LOAD( "v-104cn.u34", 0x800000, 0x800000, CRC(cb33469a) SHA1(cf2c52ccc688880574452bc806b80519eeff0298) )
+	ROM_LOAD( "v-104cn.u33", 0x800000, 0x800000, CRC(cd8a1633) SHA1(2f63167fe282fc648d9e22c6a32d593f41546ba3) )
+	ROM_LOAD( "v-104cn.u34", 0x000000, 0x800000, CRC(cb33469a) SHA1(cf2c52ccc688880574452bc806b80519eeff0298) )
 ROM_END
 
 
 // 逍遥斗地主 (Xiāoyáo Dòu Dìzhǔ)
-ROM_START( xyddz )
+ROM_START( xyddz ) // Has an Altera EPM CPLD
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "xyddz_igs036.bin", 0x0000, 0x4000, CRC(865e7daf) SHA1(1fc1c43f94394a5a03b268a1113c0af03d8f9a44) ) // stickered K8
-
-	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
-	ROM_LOAD( "xa", 0x00000, 0x10000, NO_DUMP )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "xyddz.u18", 0x000000, 0x200000, CRC(5c569b88) SHA1(760bb48bb4739ae6f34921b8ed499174a8960001) )
@@ -645,8 +1774,8 @@ ROM_START( xyddz )
 	ROM_LOAD( "m2401.u27", 0x000000, 0x800000, CRC(cfaa177a) SHA1(b1ba246a51c6ec451bcd04392460f7a7ccb75cda) )
 
 	ROM_REGION( 0x1000000, "gfx", 0 )
-	ROM_LOAD( "m2403-cg0-l.u30", 0x000000, 0x800000, CRC(3065ee91) SHA1(9bb1a0a739c244513f7785305aff13c9314a5d16) )
-	ROM_LOAD( "s2402-cg0-h.u28", 0x800000, 0x800000, CRC(b0f43dd4) SHA1(5d82fdf3bd5eef1791e7204a040ede06c6028187) )
+	ROM_LOAD( "m2403-cg0-l.u30", 0x800000, 0x800000, CRC(3065ee91) SHA1(9bb1a0a739c244513f7785305aff13c9314a5d16) )
+	ROM_LOAD( "s2402-cg0-h.u28", 0x000000, 0x800000, CRC(b0f43dd4) SHA1(5d82fdf3bd5eef1791e7204a040ede06c6028187) )
 ROM_END
 
 
@@ -772,8 +1901,8 @@ ROM_START( huoqilin )
 
 	ROM_REGION( 0x1400000, "gfx", 0 )
 	ROM_LOAD( "v103cn.u22", 0x0000000, 0x0800000, CRC(910a8c1f) SHA1(e69b9d84d62d1ea57567b8a81aac2213f3da94dc) )
-	ROM_LOAD( "v103cn.u24", 0x0800000, 0x0800000, CRC(a520af26) SHA1(7b05b739f8fd8548f85155246374aea8e1223aba) )
-	ROM_LOAD( "v103cn.u28", 0x1000000, 0x0200000, CRC(cf3691b5) SHA1(fb283568d0fbb79d52ce028f24d4fd67aaae4f2a) )
+	ROM_LOAD( "v103cn.u24", 0x0a00000, 0x0800000, CRC(a520af26) SHA1(7b05b739f8fd8548f85155246374aea8e1223aba) )
+	ROM_LOAD( "v103cn.u28", 0x0800000, 0x0200000, CRC(cf3691b5) SHA1(fb283568d0fbb79d52ce028f24d4fd67aaae4f2a) )
 	ROM_LOAD( "v103cn.u30", 0x1200000, 0x0200000, CRC(1eb6463e) SHA1(2979d7ef627ffbddd1c5236d4dcc1b622a2a9a38) )
 ROM_END
 
@@ -786,7 +1915,7 @@ ROM_START( hyleyuan )
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "s_103cn.u24", 0x000000, 0x200000, CRC(248aa7e3) SHA1(d24ef32021dc03d9ae875f53767d742c91dd7d78) )
 
-	ROM_REGION( 0x800000, "oki", 0 ) // samples
+	ROM_REGION( 0x800000, "tt5665", 0 ) // samples
 	ROM_LOAD( "sp.u39", 0x000000, 0x800000, CRC(27ae2ffb) SHA1(1ce14d426157012a56c7d03c361b0a5d0599b2e1) )
 
 	ROM_REGION( 0x10000000, "gfx", 0 )
@@ -857,7 +1986,7 @@ ROM_START( qiaojidm )
 ROM_END
 
 
-void igs_m036_state::pgm_create_dummy_internal_arm_region()
+void m036_state::pgm_create_dummy_internal_arm_region()
 {
 	uint16_t *temp16 = (uint16_t *)memregion("maincpu")->base();
 	for (int i = 0; i < 0x4000 / 2; i += 2)
@@ -890,29 +2019,38 @@ void igs_m036_state::pgm_create_dummy_internal_arm_region()
 
 }
 
-void igs_m036_state::init_igs_m036()
+void m036_state::init_m036()
 {
 	pgm_create_dummy_internal_arm_region();
 }
 
 template <const uint8_t (&Key)[0x100]>
-void igs_m036_state::init_key()
+void m036_state::init_key()
 {
-	init_igs_m036();
+	init_m036();
 
 	igs036_decryptor decrypter(Key);
 	decrypter.decrypter_rom((uint16_t*)memregion("user1")->base(), memregion("user1")->bytes(), 0);
 }
 
-void igs_m036_state::init_mghammer()
+void m036_state::init_mghammer()
 {
-	init_igs_m036();
+	init_m036();
 
 	igs036_decryptor decrypter(mghammer_key);
 	decrypter.decrypter_rom((uint16_t*)memregion("user1")->base(), memregion("user1")->bytes(), 0);
 
 	igs036_decryptor decrypter2(mghammer_io_key);
 	decrypter2.decrypter_rom((uint16_t*)memregion("io")->base(), memregion("io")->bytes(), 0);
+}
+
+
+void m036_base_state::init_jxry()
+{
+	// Same byte-address permutation as sdwx's tile ROMs on IGS017/031.
+	std::vector<u8> const original(&m_gfx[0], &m_gfx[0] + m_gfx.bytes());
+	for (u32 i = 0; i < m_gfx.bytes(); ++i)
+		m_gfx[i] = original[(i & ~0x7ffU) | bitswap<11>(i, 7, 8, 6, 10, 9, 5, 4, 3, 2, 1, 0)];
 }
 
 } // anonymous namespace
@@ -924,62 +2062,71 @@ void igs_m036_state::init_mghammer()
 
 ***************************************************************************/
 
-GAME( 200?, cjdh2,    0,     igs_m036,    igs_m036, igs_m036_state, init_key<cjdh2_key>,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, cjdh2a,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_key<cjdh2_key>,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CNA)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, cjdh2b,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_key<cjdh2_key>,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CNB)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, cjdh2c,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_key<cjdh2_key>,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V215CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, cjdh2d,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_key<cjdh2_key>,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CN, alternate GFX ROMs)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+// sets with OKI6295 for sound, 512x240 resolution
 
-GAME( 200?, cjddzsp,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<cjddzsp_key>,  ROT0, "IGS",           "Super Dou Di Zhu Special (V122CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, jhzb,     0,     m036_oki_2mhz, jhzb,     m036_oki_state,      empty_init,      ROT0, "IGS",           "Jin Hua Zhengba (V113CN)", MACHINE_NOT_WORKING )
 
-GAME( 2007, qhzb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<qhzb_key>,     ROT0, "IGS",           "Que Huang Zhengba (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, jxry,     0,     m036_oki_2mhz, jxry,     m036_oki_state,      init_jxry,       ROT0, "IGS",           "Jixiang Ruyi (V116CN)", MACHINE_NOT_WORKING )
 
-GAME( 2009, lhtb,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<lhtb_key>,     ROT0, "IGS",           "Long Hu Tebie Ban (S101CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 龍虎特別版 - Lónghǔ tèbié bǎn
+GAME( 200?, huoqilin, 0,     m036_oki_2mhz, jxry,     m036_oki_state,      init_jxry,       ROT0, "IGS",           "Huo Qilin (V116CN)", MACHINE_NOT_WORKING )
 
-GAME( 2010, lhzb3in1, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<lhzb3in1_key>, ROT0, "IGS",           "Long Hu Zhengba San He Yi (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 龙虎争霸三合一
+GAME( 200?, dahuaxy,  0,     m036_boot,     hopper,   m036_oki_state,      empty_init,      ROT0, "IGS",           "Dahua Xiyou (V201CN)", MACHINE_NOT_WORKING )
 
-GAME( 200?, igsm312,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<m312cn_key>,   ROT0, "IGS",           "unknown 'IGS 6POKER2' game (V312CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // there's very little code and no gfx ROMs, might be a 'set/clear' chip for a gambling game.
+// sets with a TT5665 for sound, 512x240 resolution
 
-GAME( 200?, super70s, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036,          ROT0, "IGS",           "Super 70's (V100US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjddzsp,  0,     m036_tt_boot,  ddz,      m036_tt_state,       empty_init,      ROT0, "IGS",           "Super Dou Di Zhu Special (V122CN)", MACHINE_NOT_WORKING )
 
-GAME( 200?, jhzb,     0,     igs_m036,    igs_m036, igs_m036_state, init_igs_m036,          ROT0, "IGS",           "Jin Hua Zhengba (V113CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, qhzb,     0,     m036_tt_boot,  qhzb,     m036_tt_state,       empty_init,      ROT0, "IGS",           "Que Huang Zhengba (V100CN)", MACHINE_NOT_WORKING )
 
-GAME( 200?, jxry,     0,     igs_m036,    igs_m036, igs_m036_state, init_key<jxry_key>,     ROT0, "IGS",           "Jixiang Ruyi (V116CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2009, lhtb,     0,     m036_tt_boot,  lhtb,     m036_tt_state,       empty_init,      ROT0, "IGS",           "Long Hu Tebie Ban (S101CN)", MACHINE_NOT_WORKING ) // 龍虎特別版 - Lónghǔ tèbié bǎn
 
-GAME( 200?, dahuaxy,  0,     igs_m036,    igs_m036, igs_m036_state, init_key<dahuaxy_key>,  ROT0, "IGS",           "Dahua Xiyou (V201CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2008, slqzsp,   0,     m036_tt_boot,  qhzb,     m036_tt_state,       empty_init,      ROT0, "IGS",           "Shuang Long Qiang Zhu Tebie Ban (V104CN)", MACHINE_NOT_WORKING )
 
-GAME( 200?, huoqilin, 0,     igs_m036,    igs_m036, igs_m036_state, init_igs_m036,          ROT0, "IGS",           "Huo Qilin (V116CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, sydh,     0,     m036_sydh,     sydh,     m036_tt_state,       empty_init,      ROT0, "IGS",           "Shayu Daheng (V104CN)", MACHINE_NOT_WORKING )
 
-GAME( 2008, slqzsp,   0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<slqzsp_key>,   ROT0, "IGS",           "Shuang Long Qiang Zhu Tebie Ban (V104CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, xyddz,    0,     m036_sram,     ddz,      m036_tt_state,       empty_init,      ROT0, "IGS",           "Xiaoyao Dou Dizhu (V216CN)", MACHINE_NOT_WORKING )
 
-GAME( 200?, sydh,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<sydh_key>,     ROT0, "IGS",           "Shayu Daheng (V104CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjbq,     0,     m036_tt_boot,  cjbq,     m036_tt_state,       empty_init,      ROT0, "IGS",           "Chaoji Bie Qi (V205CN)", MACHINE_NOT_WORKING )
 
-GAME( 200?, xyddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<xyddz_key>,    ROT0, "IGS",           "Xiaoyao Dou Dizhu (V216CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2009, cjgdy,    0,     m036_cjgdy,    cjgdy,    m036_tt_state,       empty_init,      ROT0, "IGS",           "Chaoji Gan Dengyan (V110CN)", MACHINE_NOT_WORKING )
 
-GAME( 200?, cjbq,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<cjbq_key>,     ROT0, "IGS",           "Chaoji Bie Qi (V205CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, xydn,     0,     m036_cjgdy,    cjgdy,    m036_tt_state,       empty_init,      ROT0, "IGS",           "Xiyou Douniu (S110CN)",  MACHINE_NOT_WORKING )
 
-GAME( 200?, cjjl,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<cjjl_key>,     ROT0, "IGS",           "Chaoji Jielong (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2010, mjzhizun, 0,     m036_mjzhizun, lhtb,     m036_mj_state,       empty_init,      ROT0, "IGS",           "Majiang Zhizun (S100CN)", MACHINE_NOT_WORKING )
 
-GAME( 2009, cjgdy,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<cjgdy_key>,    ROT0, "IGS",           "Chaoji Gan Dengyan (V110CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+// sets with a TT5665 for sound and 800x600 display
 
-GAME( 200?, xydn,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<xydn_key>,     ROT0, "IGS",           "Xiyou Douniu (S110CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2010, lhfy,     0,     m036_hd,       lhfy,     m036_hd_state,       empty_init,      ROT0, "IGS",           "Long Hu Feng Yun Gao Qing Ban (V206CN)", MACHINE_NOT_WORKING )
 
-GAME( 2010, mjzhizun, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<mjzhizun_key>, ROT0, "IGS",           "Majiang Zhizun (S100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2010, hlddz,    0,     m036_hd,       ddz_hd,   m036_hd_state,       empty_init,      ROT0, "IGS",           "Huanle Dou Dizhu (V104CN)", MACHINE_NOT_WORKING )
 
-GAME( 2010, lhfy,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<lhfy_key>,     ROT0, "IGS",           "Long Hu Feng Yun Gao Qing Ban (V206CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2010, zjddz,    0,     m036_hd,       ddz_hd,   m036_hd_state,       empty_init,      ROT0, "IGS",           "Zhongji Dou Dizhu (V204CN)", MACHINE_NOT_WORKING )
 
-GAME( 2010, hlddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<hlddz_key>,    ROT0, "IGS",           "Huanle Dou Dizhu (V104CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2009, hyleyuan, 0,     m036_hyleyuan, hyleyuan, m036_hyleyuan_state, empty_init,      ROT90, "IGS",           "Hou Ye Leyuan (S103CN)", MACHINE_NOT_WORKING )
 
-GAME( 2010, zjddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<zjddz_key>,    ROT0, "IGS",           "Zhongji Dou Dizhu (V204CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 2010, lhzbgqb,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<lhzbgqb_key>,  ROT0, "IGS",           "Long Hu Zhengba Gao Qing Ban (V105CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+// sets with no IGS036 ROM dump
 
-GAME( 201?, hyleyuan, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<hyleyuan_key>, ROT0, "IGS",           "Hou Ye Leyuan (S103CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjdh2,    0,     m036,    m036, m036_state, init_key<cjdh2_key>,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjdh2a,   cjdh2, m036,    m036, m036_state, init_key<cjdh2_key>,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CNA)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjdh2b,   cjdh2, m036,    m036, m036_state, init_key<cjdh2_key>,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CNB)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjdh2c,   cjdh2, m036,    m036, m036_state, init_key<cjdh2_key>,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V215CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjdh2d,   cjdh2, m036,    m036, m036_state, init_key<cjdh2_key>,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CN, alternate GFX ROMs)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 201?, xcjnh,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<xcjnh_key>,    ROT0, "IGS",           "Xiaochou Jianianhua (S100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, super70s, 0,     m036_tt, m036, m036_state, init_m036,          ROT0, "IGS",           "Super 70's (V100US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 201?, hlqqq,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<hlqqq_key>,    ROT0, "IGS",           "Huanle Qiao Qiao Qiao (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2010, lhzb3in1, 0,     m036_tt, m036, m036_state, init_key<lhzb3in1_key>, ROT0, "IGS",           "Long Hu Zhengba San He Yi (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 龙虎争霸三合一
 
-GAME( 201?, qiaojidm, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036,          ROT0, "IGS",           "Qiaoji Da Maoxian (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, igsm312,  0,     m036_tt, m036, m036_state, init_key<m312cn_key>,   ROT0, "IGS",           "unknown 'IGS 6POKER2' game (V312CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // there's very little code and no gfx ROMs, might be a 'set/clear' chip for a gambling game.
 
-GAME( 2015, mghammer, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_mghammer,          ROT0, "IGS / Enheart", "Medal Get Hammer (V100JP)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // but has S033CN strings?
+GAME( 200?, cjjl,     0,     m036_tt, m036, m036_state, init_key<cjjl_key>,     ROT0, "IGS",           "Chaoji Jielong (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+GAME( 2010, lhzbgqb,  0,     m036_tt, m036, m036_state, init_key<lhzbgqb_key>,  ROT0, "IGS",           "Long Hu Zhengba Gao Qing Ban (V105CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+GAME( 201?, xcjnh,    0,     m036_tt, m036, m036_state, init_key<xcjnh_key>,    ROT0, "IGS",           "Xiaochou Jianianhua (S100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+GAME( 201?, hlqqq,    0,     m036_tt, m036, m036_state, init_key<hlqqq_key>,    ROT0, "IGS",           "Huanle Qiao Qiao Qiao (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+GAME( 201?, qiaojidm, 0,     m036_tt, m036, m036_state, init_m036,          ROT0, "IGS",           "Qiaoji Da Maoxian (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+GAME( 2015, mghammer, 0,     m036_tt, m036, m036_state, init_mghammer,          ROT0, "IGS / Enheart", "Medal Get Hammer (V100JP)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // but has S033CN strings?
