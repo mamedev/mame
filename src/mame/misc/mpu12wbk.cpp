@@ -1309,8 +1309,8 @@ ROM_END
 
 /*
   Fruit Star Bonus (Ver 8.20MB-STK, Steiermark)
-  MPU11 Number: 6091.
-  Date: ???
+  MPU Number: 6091.
+  Date: 6/99
 
   Program flash ROM is inside a CPU epoxy block
   with M6809 CPU and one PLD.
@@ -1516,7 +1516,7 @@ GAMEL( 1996, fruitstbd, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12
 GAMEL( 1996, fruitstbh, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.30UNG-25, set 1)",            0,      layout_fruitstb )
 GAMEL( 1996, fruitstbi, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.30UNG-25, set 2)",            0,      layout_fruitstb )
 GAMEL( 1999, fruitstbe, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.23PSTK, Steiermark)",         0,      layout_fruitstb )
-GAMEL( 199?, fruitstbk, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.20MB-STK, Steiermark)",       0,      layout_fruitstb )
+GAMEL( 1999, fruitstbk, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.20MB-STK, Steiermark)",       0,      layout_fruitstb )
 GAMEL( 1997, fruitstbf, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.17BGL-3, Burgenland, set 1)", 0,      layout_fruitstb )
 GAMEL( 1997, fruitstbg, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.17BGL-3, Burgenland, set 2)", 0,      layout_fruitstb )
 GAMEL( 1996, goldnjkr,  0,        mpu12wbk, goldnjkr, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Golden Joker (Ver 16.06UNG-25, set 1)",               0,      layout_goldnjkr )
