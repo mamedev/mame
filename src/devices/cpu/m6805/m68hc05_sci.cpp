@@ -24,6 +24,9 @@
     - A frame's start bit goes out a bit time after the byte moves to the
       shifter, so a byte written during a stop bit stretches that stop bit,
       and the line idles 11 bit times after a 10 bit preamble.
+    - A waiting byte moves to the shifter, setting TDRE, as the last frame's
+      stop bit starts; 5.7.1 only says "after the current byte in the shift
+      register has been transmitted".
     - TC stays as it was while the preamble goes out; the data sheet only
       says when it sets.
     - A BAUD change in mid-frame ends the frame (diserial drops it): the
@@ -36,6 +39,8 @@
       the preamble when TE is set.
     - SCDR's two registers are left alone by reset (table 3-1 doesn't list
       them).
+    - RE is only checked as a frame completes, so a frame that started while
+      RE was clear is received if RE is set before its stop bit.
 
 ***************************************************************************/
 

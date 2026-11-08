@@ -24,7 +24,6 @@ class m68hc05_sci_device : public device_t, public device_serial_interface
 public:
 	// implemented bits, for the host's debugger state
 	static constexpr u8 BAUD_MASK = 0x37;
-	static constexpr u8 BAUD_SCR = 0x07;
 	static constexpr u8 SCCR1_MASK = 0xd8;
 	static constexpr u8 SCSR_MASK = 0xfe;
 
@@ -61,6 +60,8 @@ protected:
 private:
 	enum : u8
 	{
+		BAUD_SCR    = 0x07,
+
 		SCCR1_R8    = 0x80,
 		SCCR1_T8    = 0x40,
 		SCCR1_M     = 0x10,
