@@ -112,11 +112,12 @@ private:
 
 	struct sample_info
 	{
-		uint32_t start = 0;                 // first wave word
+		uint32_t start = 0;                 // first wave word; reversed, one past the last
 		uint32_t loop_start = 0;            // in samples
 		uint32_t loop_end = 0;
 		uint8_t exponent = 0;
 		bool is8 = false;                   // two 8-bit samples per word
+		bool reverse = false;               // plays from start - 1 down
 		bool valid = false;
 		uint32_t loop_seg = 0;              // 8-bit: the gain segment of loop_start
 		std::vector<std::pair<uint32_t, float>> gain;  // 8-bit: segment end, gain

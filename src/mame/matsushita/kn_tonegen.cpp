@@ -44,7 +44,7 @@ void kn_tonegen_base_device::wave_bus_map(address_map &map)
 
 void kn_tonegen_base_device::device_start()
 {
-	for (unsigned i = 0; i < std::size(m_wave); i++)
+	for (uint32_t i = 0; i < std::size(m_wave); i++)
 	{
 		space(i).install_rom(0, m_wave_rom[i]->bytes() / 2 - 1, m_wave_rom[i]->base());
 		space(i).cache(m_wave[i]);
@@ -168,19 +168,25 @@ kn2400_tonegen_device::kn2400_tonegen_device(const machine_config &mconfig, cons
 // 0xfc02 | ch << 4 reads the envelope level of channel ch, 13 bits.
 //
 // The chip reads its pair of wave ROMs as a stream of 16-bit words: word 2n is
-// word n of the Y ROM, word 2n+1 word n of the X ROM. The stream holds 16
-// pages of 0x100000 words, each starting with a directory of four words per
-// entry: A (the entry's segment record, in words from the page start), P
-// (0x1000 | exponent << 4 | 8-bit flag << 3 | K), B (the first sample word, in
-// units of 16 words from the page start) and a copy of the record's second
-// word. Entry 0's record follows the directory, so its A is four times the
-// entry count. Words 1 and up of the record are [flags:2][code:6][value:8]: a
-// value of 0x80 or more is a segment of 256 - value granules of 2^(K+4)
+// word n of the Y ROM, word 2n+1 word n of the X ROM. The stream holds 16 pages
+// of 0x100000 words, each starting with a directory of four words per entry: A
+// (the entry's segment record, in words from the page start), P (0x1000 |
+// reverse flag << 9 | exponent << 4 | 8-bit flag << 3 | K), B (the first sample
+// word, in units of 16 words from the page start) and a copy of the record's
+// second word. Entry 0's record follows the directory, so its A is four times
+// the entry count. Words 1 and up of the record are [flags:2][code:6][value:8]:
+// a value of 0x80 or more is a segment of 256 - value granules of 2^(K+4)
 // samples; flag bit 0 puts the loop start at the end of the segment, bit 1 the
-// loop end. A loop end ends the record, as do both flags on any word. Without
-// a loop end the loop is the granule after the loop start, which is the end of
-// the last segment when no segment sets it. 8-bit samples are scaled by
-// 2^(-b/2) for b in bits 2-0 of their segment's code.
+// loop end. A loop end ends the record, as do both flags on any word. A loop
+// end with no loop start loops from the first sample. Without a loop end the
+// loop is the granule after the loop start, which is the end of the last
+// segment when no segment sets it. 8-bit samples are scaled by 2^(-b/2) for b
+// in bits 2-0 of their segment's code.
+//
+// FIXME: the reverse flag is inferred from the one entry that sets it, the
+// Reverse Cymbal: its B is minus the last unit of the ride cymbal's recording,
+// so the chip is taken to negate its address counter, and unit -(B + n) holds
+// samples 16n to 16n + 15 (32n to 32n + 31 when 8-bit), read last first.
 
 kn7000_tonegen_device::kn7000_tonegen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: kn_tonegen_base_device(mconfig, KN7000_TONEGEN, tag, owner, clock, 2)
@@ -195,7 +201,7 @@ void kn7000_tonegen_device::device_start()
 
 	// FIXME: the rate byte's law is fitted to the firmware's envelopes, not measured
 	const double rate = m_stream->sample_rate();
-	for (unsigned r = 0; r < std::size(m_attack_time); r++)
+	for (uint32_t r = 0; r < std::size(m_attack_time); r++)
 	{
 		const double tau = 13.0 * std::exp2(-double(r) / 20.0);
 		m_attack_time[r] = tau * rate;
@@ -252,9 +258,11 @@ void kn7000_tonegen_device::parse_samples()
 			const uint32_t granule = 1 << (BIT(p, 0, 3) + 4);
 
 			sample_info s;
-			s.start = base + b * 16;
+			s.reverse = BIT(p, 9);
+			// reversed: one past the last word of unit -B
+			s.start = base + (s.reverse ? (((0x10000 - b) & 0xffff) + 1) : b) * 16;
 			s.is8 = BIT(p, 3);
-			s.exponent = BIT(p, 4, 8);
+			s.exponent = BIT(p, 4, 5);
 
 			uint32_t pos = 0;
 			bool have_start = false, have_end = false;
@@ -284,7 +292,7 @@ void kn7000_tonegen_device::parse_samples()
 					break;
 			}
 			if (!have_start)
-				s.loop_start = pos;
+				s.loop_start = have_end ? 0 : pos;
 			if (!have_end || s.loop_end <= s.loop_start)
 				s.loop_end = s.loop_start + granule;
 			if (s.is8)
@@ -294,7 +302,7 @@ void kn7000_tonegen_device::parse_samples()
 			}
 
 			const uint32_t needed = s.is8 ? ((s.loop_end + 1) / 2) : s.loop_end;
-			s.valid = uint64_t(s.start) + needed + 1 < STREAM_WORDS;
+			s.valid = s.reverse ? (s.start >= base + needed + 1) : (uint64_t(s.start) + needed + 1 < STREAM_WORDS);
 			m_samples.emplace_back(std::move(s));
 		}
 	}
@@ -304,9 +312,10 @@ void kn7000_tonegen_device::parse_samples()
 double kn7000_tonegen_device::fetch(const sample_info &s, uint32_t i, uint32_t seg)
 {
 	if (!s.is8)
-		return int16_t(wave_word(s.start + i));
-	const uint16_t w = wave_word(s.start + (i >> 1));
-	const int8_t b = int8_t(BIT(i, 0) ? (w >> 8) : w);
+		return int16_t(wave_word(s.reverse ? (s.start - 1 - i) : (s.start + i)));
+	const uint32_t byte = s.reverse ? (2 * s.start - 1 - i) : (2 * s.start + i);
+	const uint16_t w = wave_word(byte >> 1);
+	const int8_t b = int8_t(BIT(byte, 0) ? (w >> 8) : w);
 	return b * 256.0 * s.gain[seg].second;
 }
 
@@ -356,7 +365,7 @@ void kn7000_tonegen_device::tg_write(uint16_t addr, uint16_t data)
 	kn_tonegen_base_device::tg_write(addr, data);
 
 	const int v = BIT(addr, 4, 6);
-	const unsigned index = BIT(addr, 0, 4);
+	const uint32_t index = BIT(addr, 0, 4);
 	switch (BIT(addr, 10, 6))
 	{
 	case 0x00:
@@ -388,7 +397,7 @@ uint16_t kn7000_tonegen_device::tg_read(uint16_t addr)
 
 	m_stream->update();
 	const int ch = BIT(addr, 4, 6);
-	const unsigned index = BIT(addr, 0, 4);
+	const uint32_t index = BIT(addr, 0, 4);
 	if (ch == 0 && index >= 0x8 && index <= 0xb)
 	{
 		uint16_t bits = 0;
