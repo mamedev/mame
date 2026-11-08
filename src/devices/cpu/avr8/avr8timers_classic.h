@@ -789,6 +789,9 @@ public:
 	uint8_t tccr_b_r();
 	void tccr_c_w(uint8_t data);
 	uint8_t tccr_c_r();
+
+	void ctrl_regs_w(offs_t offset, uint8_t data);
+	uint8_t ctrl_regs_r(offs_t offset);
 };
 
 /**

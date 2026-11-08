@@ -33,8 +33,8 @@
     | ATMega 324,  | Generic | Generic | 8-bit   |  n/a    |  n/a    |  n/a    |
     | 644          | timer 0 | timer 1 | fakeRTC |         |         |         |
     |--------------|---------|---------|---------|---------|---------|---------|
-    | ATMega 1284, | Generic | Generic | 8-bit   | Generic |  n/a    |  n/a    |
-    | 2564         | timer 0 | timer 1 | fakeRTC | timer 1 |         |         |
+    | ATMega 1284  | Generic | Generic | 8-bit   | Generic |  n/a    |  n/a    |
+    |              | timer 0 | timer 1 | fakeRTC | timer 1 |         |         |
     |--------------|---------|---------|---------|---------|---------|---------|
 
     The most common timer types are implementations of a generic 8-bit and 16-bit design.
@@ -1728,6 +1728,91 @@ uint8_t avr8_megaavr_timer_1_device::tccr_c_r()
 	// all zero; FOCxA, FOCxB, FOCxC bits will flip to 0 when written
 	return 0;
 }
+
+uint8_t avr8_megaavr_timer_1_device::ctrl_regs_r(offs_t offset)
+{
+	switch (offset & 0x0f)
+	{
+		case 0x00:
+			return tccr_a_r();
+		case 0x01:
+			return tccr_b_r();
+		case 0x02:
+			return tccr_c_r();
+		case 0x03:
+			return 0xff; // reserved
+		case 0x04:
+			return tcnt_l_r();
+		case 0x05:
+			return tcnt_h_r();
+		case 0x06:
+			return icr_l_r();
+		case 0x07:
+			return icr_h_r();
+		case 0x08:
+			return ocr_l_r<AVR8_TIMER_CMPCHANNEL_OC_A>();
+		case 0x09:
+			return ocr_h_r<AVR8_TIMER_CMPCHANNEL_OC_A>();
+		case 0x0a:
+			return ocr_l_r<AVR8_TIMER_CMPCHANNEL_OC_B>();
+		case 0x0b:
+			return ocr_h_r<AVR8_TIMER_CMPCHANNEL_OC_B>();
+		case 0x0c:
+			return m_ocr_c_enabled ? ocr_l_r<AVR8_TIMER_CMPCHANNEL_OC_C>() : 0xff;
+		case 0x0d:
+			return m_ocr_c_enabled ? ocr_h_r<AVR8_TIMER_CMPCHANNEL_OC_C>() : 0xff;
+		default:
+			return 0xff;
+	}
+}
+
+void avr8_megaavr_timer_1_device::ctrl_regs_w(offs_t offset, uint8_t data)
+{
+		switch (offset & 0x0f)
+	{
+		case 0x00:
+			tccr_a_w(data);
+			break;
+		case 0x01:
+			tccr_b_w(data);
+			break;
+		case 0x02:
+			tccr_c_w(data);
+			break;
+		case 0x04:
+			tcnt_l_w(data);
+			break;
+		case 0x05:
+			tcnt_h_w(data);
+			break;
+		case 0x06:
+			icr_l_w(data);
+			break;
+		case 0x07:
+			icr_h_w(data);
+			break;
+		case 0x08:
+			ocr_l_w<AVR8_TIMER_CMPCHANNEL_OC_A>(data);
+			break;
+		case 0x09:
+			ocr_h_w<AVR8_TIMER_CMPCHANNEL_OC_A>(data);
+			break;
+		case 0x0a:
+			ocr_l_w<AVR8_TIMER_CMPCHANNEL_OC_B>(data);
+			break;
+		case 0x0b:
+			ocr_h_w<AVR8_TIMER_CMPCHANNEL_OC_B>(data);
+		case 0x0c:
+			if (m_ocr_c_enabled) ocr_l_w<AVR8_TIMER_CMPCHANNEL_OC_C>(data);
+			break;
+		case 0x0d:
+			if (m_ocr_c_enabled) ocr_h_w<AVR8_TIMER_CMPCHANNEL_OC_C>(data);
+			break;
+		default:
+			break;
+	}
+}
+
 
 bool avr8_generic_timer_1_device::should_reload_ocrs()
 {

@@ -534,6 +534,48 @@ protected:
 		ATMEGA644_INT_SPM_RDY
 	};
 
+	// ATMega1284 adds Timer 3 vectors, but the official datasheet is so sloppily copypasted
+	// that it doesn't define them.
+	// iom1284.h and iom1284p.h from avr-libc correctly define the Timer 3 vectors.
+	enum : uint8_t
+	{
+		ATMEGA1284_INT_RESET = 0,
+		ATMEGA1284_INT_INT0,
+		ATMEGA1284_INT_INT1,
+		ATMEGA1284_INT_INT2,
+		ATMEGA1284_INT_PCINT0,
+		ATMEGA1284_INT_PCINT1,
+		ATMEGA1284_INT_PCINT2,
+		ATMEGA1284_INT_PCINT3,
+		ATMEGA1284_INT_WDT,
+		ATMEGA1284_INT_T2COMPA,
+		ATMEGA1284_INT_T2COMPB,
+		ATMEGA1284_INT_T2OVF,
+		ATMEGA1284_INT_T1CAPT,
+		ATMEGA1284_INT_T1COMPA,
+		ATMEGA1284_INT_T1COMPB,
+		ATMEGA1284_INT_T1OVF,
+		ATMEGA1284_INT_T0COMPA,
+		ATMEGA1284_INT_T0COMPB,
+		ATMEGA1284_INT_T0OVF,
+		ATMEGA1284_INT_SPI_STC,
+		ATMEGA1284_INT_USART_RX,
+		ATMEGA1284_INT_USART_UDRE,
+		ATMEGA1284_INT_USART_TX,
+		ATMEGA1284_INT_ADC,
+		ATMEGA1284_INT_EE_RDY,
+		ATMEGA1284_INT_ANALOG_COMP,
+		ATMEGA1284_INT_TWI,
+		ATMEGA1284_INT_SPM_RDY,
+		ATMEGA1284_INT_USART1_RX,
+		ATMEGA1284_INT_USART1_UDRE,
+		ATMEGA1284_INT_USART1_TX,
+		ATMEGA1284_INT_T3CAPT,
+		ATMEGA1284_INT_T3COMPA,
+		ATMEGA1284_INT_T3COMPB,
+		ATMEGA1284_INT_T3OVF,
+	};
+
 	// Interrupt vectors for the ATMega640, 1280, 1281, 2560, 2561 series.
 	// Vector size is 2 words (=4 bytes).
 	// See https://content.arduino.cc/assets/ATmega640-1280-1281-2560-2561-Datasheet-DS40002211A.pdf
@@ -949,6 +991,7 @@ protected:
 	static const interrupt_condition s_int_conditions[];
 	static const interrupt_condition s_mega640_int_conditions[];
 	static const interrupt_condition s_mega644_int_conditions[];
+	static const interrupt_condition s_mega1284_int_conditions[];
 	static const interrupt_condition s_mega32u4_int_conditions[];
 
 	// override this in subclasses and return the intended int_conditions tables above.
@@ -1340,10 +1383,12 @@ public:
 	// construction/destruction
 	atmega1284_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
 	void atmega1284_internal_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual const interrupt_condition* interrupt_conditions() override { return s_mega644_int_conditions; }
+	virtual const interrupt_condition* interrupt_conditions() override { return s_mega1284_int_conditions; }
 	virtual bool pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const override;
 	virtual void spi_pins(uint8_t &mosi_mask, uint8_t &miso_mask, uint8_t &sck_mask) const override
 	{
@@ -1353,7 +1398,6 @@ protected:
 	}
 	virtual uint8_t eearh_mask() const override { return 0x0f; } // 4096-byte EEPROM
 };
-
 
 ///////////////////////////////////////////////////////////////
 // Classic ATMegax0 series devices
