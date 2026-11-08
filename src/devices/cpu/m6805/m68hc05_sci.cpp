@@ -23,14 +23,17 @@
     the interrupt enables.
 
     Inferred or approximate:
+    - RDI is followed edge by edge rather than sampled at every RT tick, so
+      a pulse shorter than an RT tick still restarts idle line detection.
     - An idle line is RDI high for a whole frame (10 or 11 bit times) after
       a stop bit or after RDI rises.  IDLE is first possible after the first
       RDRF.  "RWU cannot be set if the line is idle" is taken to mean while
       an idle line has been detected.
     - Break needs TE.  A byte written to SCDR while TE is clear is held,
       and goes out after the preamble when TE is set.
-    - TC stays as it was while a preamble or break goes out; the data sheet
-      only says when it sets.
+    - TC stays as it was while a preamble or break goes out, and sets after
+      the high bit that follows a break; the data sheet only says when it
+      sets.
     - A rate change restarts the RT clock: a bit being sent ends a new bit
       time later, and a byte being received is dropped.
     - RDI reads high until it is driven.  TDO isn't released to high
@@ -80,21 +83,25 @@ m68hc05_sci_device::m68hc05_sci_device(machine_config const &mconfig, char const
 	m_tdr(0x00),
 	m_irq_state(false),
 	m_epoch(attotime::zero),
-	m_rt(1),
+	m_rt_clocks(1),
 	m_tdr_full(false),
 	m_preamble_pending(false),
 	m_break_pending(false),
+	m_tx_scheduled(false),
+	m_tx_tick(0),
 	m_tx_state(TX_IDLE),
 	m_tx_shift(0),
 	m_tx_count(0),
 	m_tdo(1),
 	m_rdi(1),
 	m_rdi_rise(attotime::zero),
+	m_rdi_fall(attotime::zero),
 	m_line_idle(false),
 	m_idle_armed(false),
 	m_rx_state(RX_IDLE),
 	m_rx_rt1(0),
-	m_rx_sample(0),
+	m_rx_bits(10),
+	m_rx_step(0),
 	m_rx_votes(0),
 	m_rx_noise(false),
 	m_rx_shift(0)
@@ -127,21 +134,25 @@ void m68hc05_sci_device::device_start()
 	save_item(NAME(m_tdr));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_epoch));
-	save_item(NAME(m_rt));
+	save_item(NAME(m_rt_clocks));
 	save_item(NAME(m_tdr_full));
 	save_item(NAME(m_preamble_pending));
 	save_item(NAME(m_break_pending));
+	save_item(NAME(m_tx_scheduled));
+	save_item(NAME(m_tx_tick));
 	save_item(NAME(m_tx_state));
 	save_item(NAME(m_tx_shift));
 	save_item(NAME(m_tx_count));
 	save_item(NAME(m_tdo));
 	save_item(NAME(m_rdi));
 	save_item(NAME(m_rdi_rise));
+	save_item(NAME(m_rdi_fall));
 	save_item(NAME(m_line_idle));
 	save_item(NAME(m_idle_armed));
 	save_item(NAME(m_rx_state));
 	save_item(NAME(m_rx_rt1));
-	save_item(NAME(m_rx_sample));
+	save_item(NAME(m_rx_bits));
+	save_item(NAME(m_rx_step));
 	save_item(NAME(m_rx_votes));
 	save_item(NAME(m_rx_noise));
 	save_item(NAME(m_rx_shift));
@@ -162,6 +173,7 @@ void m68hc05_sci_device::device_reset()
 	m_tdr_full = false;
 	m_preamble_pending = false;
 	m_break_pending = false;
+	m_tx_scheduled = false;
 	m_tx_state = TX_IDLE;
 	m_tx_count = 0;
 	m_tx_timer->adjust(attotime::never);
@@ -203,24 +215,19 @@ void m68hc05_sci_device::rdi_w(int state)
 		return;
 	}
 
+	m_rdi_fall = now;
 	m_idle_timer->adjust(attotime::never);
 	m_line_idle = false;
-	if (!re() || !clock())
-		return;
-
-	u64 const rt1(next_tick(now, m_rt));
 	if (m_rx_state == RX_IDLE)
 	{
-		// figure 5-2: three high samples before RT1
-		if ((rt1 >= 3 * m_rt) && (tick_time(rt1 - 3 * m_rt) >= m_rdi_rise))
-			rx_start(rt1);
+		try_start(now);
 	}
-	else if (m_rx_state == RX_ARTIFICIAL)
+	else if ((m_rx_state == RX_ARTIFICIAL) && re() && clock())
 	{
 		// 5.5: the start qualifiers are forced, and the start bit is accepted no sooner
 		// than it's anticipated
 		m_rx_timer->adjust(attotime::never);
-		rx_start(std::max(rt1, m_rx_rt1));
+		rx_start(std::max(next_tick(now, m_rt_clocks), m_rx_rt1));
 	}
 }
 
@@ -299,9 +306,7 @@ void m68hc05_sci_device::sccr2_w(u8 data)
 	if (rise & SCCR2_SBK)
 		m_break_pending = true;
 
-	if (rise & (SCCR2_TE | SCCR2_SBK))
-		tx_kick();
-
+	tx_kick();
 	update_irq();
 }
 
@@ -343,8 +348,7 @@ void m68hc05_sci_device::scdr_w(u8 data)
 		m_scsr_seen &= ~clear;
 	}
 
-	if (m_tdr_full && te())
-		tx_kick();
+	tx_kick();
 }
 
 
@@ -370,15 +374,15 @@ void m68hc05_sci_device::set_scsr(u8 data)
 }
 
 
-u32 m68hc05_sci_device::rt_ticks() const
+u32 m68hc05_sci_device::rt_clocks() const
 {
 	// 5.7.5: a bit time is 16 * SCP * 2^SCR E clocks, so an RT tick is SCP * 2^SCR
 	return u32(SCP_DIVISOR[(m_baud >> 4) & 3]) << (m_baud & BAUD_SCR);
 }
 
-attotime m68hc05_sci_device::tick_time(u64 ticks) const
+attotime m68hc05_sci_device::tick_time(u64 clocks) const
 {
-	return m_epoch + attotime::from_ticks(ticks, clock());
+	return m_epoch + attotime::from_ticks(clocks, clock());
 }
 
 u64 m68hc05_sci_device::next_tick(attotime const &t, u32 period) const
@@ -393,31 +397,45 @@ u64 m68hc05_sci_device::next_tick(attotime const &t, u32 period) const
 	return n;
 }
 
+void m68hc05_sci_device::adjust_at(emu_timer &timer, attotime const &when)
+{
+	attotime const now(machine().time());
+	timer.adjust((when > now) ? (when - now) : attotime::zero);
+}
+
 void m68hc05_sci_device::restart_clock()
 {
 	m_epoch = machine().time();
-	m_rt = rt_ticks();
+	m_rt_clocks = rt_clocks();
 }
 
 void m68hc05_sci_device::update_rate(bool force)
 {
-	if (!force && (rt_ticks() == m_rt))
+	if (!force && (rt_clocks() == m_rt_clocks))
 		return;
 	restart_clock();
-	LOGSCI("bit time %u E clocks\n", 16 * m_rt);
-	if (!clock())
-		return;
+	LOGSCI("bit time %u E clocks\n", bit_clocks());
 
-	// a block in progress carries on at the new rate from here; a byte being received is
-	// dropped (inferred, the data sheet doesn't cover a rate change in mid-frame)
-	if (m_tx_timer->enabled())
-		m_tx_timer->adjust(attotime::from_ticks(16 * m_rt, clock()));
-	if (m_rx_state != RX_IDLE)
+	// a byte being received is dropped (inferred, the data sheet doesn't cover a rate
+	// change in mid-frame)
+	m_rx_timer->adjust(attotime::never);
+	m_rx_state = RX_IDLE;
+	m_idle_timer->adjust(attotime::never);
+
+	if (!clock())
 	{
-		m_rx_timer->adjust(attotime::never);
-		m_rx_state = RX_IDLE;
+		m_tx_scheduled = false;
+		m_tx_timer->adjust(attotime::never);
+		return;
 	}
-	if (m_rdi && m_idle_timer->enabled())
+
+	// a block in progress carries on at the new rate from here, and anything waiting
+	// starts on the new clock
+	if (m_tx_scheduled || (m_tx_state != TX_IDLE))
+		tx_schedule(bit_clocks());
+	else
+		tx_kick();
+	if (m_rdi && !m_line_idle)
 		arm_idle(machine().time());
 }
 
@@ -463,15 +481,21 @@ void m68hc05_sci_device::set_tdo(int state)
 void m68hc05_sci_device::tx_kick()
 {
 	// something to send while the shifter is idle: start at the next bit boundary
-	if ((m_tx_state == TX_IDLE) && !m_tx_timer->enabled() && clock())
-	{
-		attotime const now(machine().time());
-		m_tx_timer->adjust(tick_time(next_tick(now, 16 * m_rt)) - now);
-	}
+	bool const waiting(m_tdr_full || m_preamble_pending || m_break_pending || (m_sccr2 & SCCR2_SBK));
+	if (te() && waiting && (m_tx_state == TX_IDLE) && !m_tx_scheduled && clock())
+		tx_schedule(next_tick(machine().time(), bit_clocks()));
+}
+
+void m68hc05_sci_device::tx_schedule(u64 tick)
+{
+	m_tx_tick = tick;
+	m_tx_scheduled = true;
+	adjust_at(*m_tx_timer, tick_time(tick));
 }
 
 TIMER_CALLBACK_MEMBER(m68hc05_sci_device::tx_tick)
 {
+	m_tx_scheduled = false;
 	if (!m_tx_count)
 		tx_next();
 
@@ -480,7 +504,7 @@ TIMER_CALLBACK_MEMBER(m68hc05_sci_device::tx_tick)
 		set_tdo(m_tx_shift & 1);
 		m_tx_shift >>= 1;
 		m_tx_count--;
-		m_tx_timer->adjust(attotime::from_ticks(16 * m_rt, clock()));
+		tx_schedule(m_tx_tick + bit_clocks());
 	}
 }
 
@@ -540,11 +564,24 @@ void m68hc05_sci_device::tx_next()
 }
 
 
+void m68hc05_sci_device::try_start(attotime const &fall)
+{
+	// figure 5-2: RT1 is the first sample to see the line low, after three high samples
+	if (!re() || !clock())
+		return;
+
+	u64 const rt1(next_tick(fall, m_rt_clocks));
+	attotime const qualified(m_rdi_rise + attotime::from_ticks(u64(QUALIFIERS) * m_rt_clocks, clock()));
+	if (qualified <= tick_time(rt1))
+		rx_start(std::max(rt1, next_tick(machine().time(), m_rt_clocks)));
+}
+
 void m68hc05_sci_device::rx_start(u64 rt1)
 {
 	m_rx_state = RX_FRAME;
 	m_rx_rt1 = rt1;
-	m_rx_sample = 0;
+	m_rx_bits = frame_bits();
+	m_rx_step = 0;
 	m_rx_votes = 0;
 	m_rx_noise = false;
 	m_rx_shift = 0;
@@ -554,95 +591,109 @@ void m68hc05_sci_device::rx_start(u64 rt1)
 
 void m68hc05_sci_device::rx_schedule()
 {
-	// samples 0-3 are RT1 and the verification samples RT3, RT5 and RT7 (figure 5-2), then
-	// each bit is sampled at RT8, RT9 and RT10 of its bit time (figure 5-3)
+	// RT1 and the verification samples RT3, RT5 and RT7 (figure 5-2), then RT8, RT9 and
+	// RT10 of each bit (figure 5-3)
 	unsigned offset;
-	if (m_rx_sample < 4)
-		offset = m_rx_sample * 2;
+	if (m_rx_step < START_SAMPLES)
+	{
+		offset = m_rx_step * 2;
+	}
 	else
-		offset = ((m_rx_sample - 4) / 3) * 16 + 7 + ((m_rx_sample - 4) % 3);
+	{
+		unsigned const n(m_rx_step - START_SAMPLES);
+		offset = (n / BIT_SAMPLES) * RT_PER_BIT + FIRST_BIT_SAMPLE + (n % BIT_SAMPLES);
+	}
+	adjust_at(*m_rx_timer, tick_time(m_rx_rt1 + u64(offset) * m_rt_clocks));
+}
 
-	attotime const now(machine().time());
-	attotime const when(tick_time(m_rx_rt1 + u64(offset) * m_rt));
-	m_rx_timer->adjust((when > now) ? (when - now) : attotime::zero);
+void m68hc05_sci_device::rx_idle()
+{
+	// back to looking for a start bit; a falling edge seen while busy may already be one
+	m_rx_state = RX_IDLE;
+	if (m_rdi)
+		arm_idle(m_rdi_rise);
+	else
+		try_start(m_rdi_fall);
 }
 
 TIMER_CALLBACK_MEMBER(m68hc05_sci_device::rx_sample)
 {
 	if (m_rx_state == RX_ARTIFICIAL)
 	{
-		// 5.5: the anticipated start; a low line here is taken as the start bit
+		// 5.5: at the anticipated start, a low line is the start bit; a high one leaves the
+		// forced qualifiers in place for the next falling edge
 		if (!m_rdi)
+		{
 			rx_start(m_rx_rt1);
+		}
+		else
+		{
+			attotime const forced(tick_time(m_rx_rt1) - attotime::from_ticks(u64(QUALIFIERS) * m_rt_clocks, clock()));
+			m_rdi_rise = std::min(m_rdi_rise, forced);
+			m_rx_state = RX_IDLE;
+		}
 		return;
 	}
 
-	unsigned const n(m_rx_sample);
-	if (!n)
+	unsigned const step(m_rx_step);
+	m_rx_votes += m_rdi;
+	if (!step)
 	{
 		// RT1 must see the line low
 		if (m_rdi)
 		{
-			m_rx_state = RX_IDLE;
-			arm_idle(m_rdi_rise);
+			rx_idle();
 			return;
 		}
+		m_rx_votes = 0;
 	}
-	else if (n < 4)
+	else if (step < START_SAMPLES)
 	{
-		m_rx_votes += m_rdi;
-		if (n == 3)
+		if (step == (START_SAMPLES - 1))
 		{
 			// 5.4: at least two of the three verification samples low, or it was noise on
 			// an idle line; one high sample sets NF
 			if (m_rx_votes >= 2)
 			{
-				m_rx_state = RX_IDLE;
-				if (m_rdi)
-					arm_idle(m_rdi_rise);
+				rx_idle();
 				return;
 			}
 			m_rx_noise = m_rx_votes != 0;
 			m_rx_votes = 0;
 		}
 	}
-	else
+	else if (((step - START_SAMPLES) % BIT_SAMPLES) == (BIT_SAMPLES - 1))
 	{
-		m_rx_votes += m_rdi;
-		if (((n - 4) % 3) == 2)
-		{
-			// 5.4: the majority of three samples, NF when they don't agree
-			unsigned const bit((n - 4) / 3);
-			bool const high(m_rx_votes >= 2);
-			if (m_rx_votes && (m_rx_votes < 3))
-				m_rx_noise = true;
-			m_rx_votes = 0;
+		// 5.4: the majority of three samples, NF when they don't agree
+		unsigned const bit((step - START_SAMPLES) / BIT_SAMPLES);
+		bool const high(m_rx_votes >= 2);
+		if (m_rx_votes && (m_rx_votes < BIT_SAMPLES))
+			m_rx_noise = true;
+		m_rx_votes = 0;
 
-			if ((bit + 1) == frame_bits())
-			{
-				rx_frame_done(high);
-				return;
-			}
-			else if (bit && high)
-			{
-				m_rx_shift |= 1U << (bit - 1);
-			}
+		if ((bit + 1) == m_rx_bits)
+		{
+			rx_frame_done(high);
+			return;
+		}
+		else if (bit && high)
+		{
+			m_rx_shift |= 1U << (bit - 1);
 		}
 	}
 
-	m_rx_sample++;
+	m_rx_step++;
 	rx_schedule();
 }
 
 void m68hc05_sci_device::rx_frame_done(bool stop)
 {
-	unsigned const bits(frame_bits());
+	bool const nine(m_rx_bits == 11);
 	bool const fe(!stop);
 	bool const brk(fe && !m_rx_shift);
-	u64 const next_rt1(m_rx_rt1 + u64(16 * bits) * m_rt);
-	m_rx_state = RX_IDLE;
+	u64 const next_rt1(m_rx_rt1 + u64(m_rx_bits) * bit_clocks());
 
-	bool const address(m_rx_shift & ((m_sccr1 & SCCR1_M) ? 0x100 : 0x080));
+	bool const address(m_rx_shift & (nine ? 0x100 : 0x080));
 	if (rwu())
 	{
 		// 5.3: a sleeping receiver sets no flags; with address mark wake-up, a frame with
@@ -663,7 +714,7 @@ void m68hc05_sci_device::rx_frame_done(bool stop)
 		{
 			LOGSCI("received %03X%s%s\n", m_rx_shift, fe ? (brk ? " (break)" : " (framing error)") : "", m_rx_noise ? " (noise)" : "");
 			m_rdr = u8(m_rx_shift);
-			if (m_sccr1 & SCCR1_M)
+			if (nine)
 				m_sccr1 = (m_sccr1 & ~SCCR1_R8) | (BIT(m_rx_shift, 8) ? SCCR1_R8 : 0);
 			m_idle_armed = true;
 			set_flags(SCSR_RDRF | (m_rx_noise ? SCSR_NF : 0) | (fe ? SCSR_FE : 0));
@@ -676,25 +727,25 @@ void m68hc05_sci_device::rx_frame_done(bool stop)
 		// where it's anticipated
 		m_rx_state = RX_ARTIFICIAL;
 		m_rx_rt1 = next_rt1;
-		attotime const now(machine().time());
-		attotime const when(tick_time(next_rt1));
-		m_rx_timer->adjust((when > now) ? (when - now) : attotime::zero);
+		adjust_at(*m_rx_timer, tick_time(next_rt1));
+	}
+	else
+	{
+		// a start edge may already have come late in the stop bit; after a break, the line
+		// has to go high before the next start bit
+		m_rx_state = RX_IDLE;
+		if (!fe && !m_rdi)
+			try_start(m_rdi_fall);
 	}
 
-	// a break needs the line to go high before the next start bit, which the start
-	// qualifiers already require
 	if (m_rdi)
 		arm_idle(std::max(m_rdi_rise, tick_time(next_rt1)));
 }
 
 void m68hc05_sci_device::arm_idle(attotime const &from)
 {
-	if (!clock())
-		return;
-
-	attotime const now(machine().time());
-	attotime const when(from + attotime::from_ticks(u64(16 * frame_bits()) * m_rt, clock()));
-	m_idle_timer->adjust((when > now) ? (when - now) : attotime::zero);
+	if (clock())
+		adjust_at(*m_idle_timer, from + attotime::from_ticks(u64(frame_bits()) * bit_clocks(), clock()));
 }
 
 TIMER_CALLBACK_MEMBER(m68hc05_sci_device::idle_detected)

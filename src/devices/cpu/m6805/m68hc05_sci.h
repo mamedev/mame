@@ -37,7 +37,7 @@ public:
 	void map(address_map &map) ATTR_COLD;
 
 	// register access for the host's debugger state (no transmitter or receiver activity,
-	// except that a new rate restarts the bit clock)
+	// except that a new rate restarts the RT clock)
 	u8 baud() const { return m_baud; }
 	u8 sccr1() const { return m_sccr1; }
 	u8 sccr2() const { return m_sccr2; }
@@ -103,6 +103,13 @@ private:
 		RX_FRAME        // sampling a start bit and the frame after it
 	};
 
+	// receiver sampling (figures 5-2 and 5-3), in RT ticks
+	static constexpr unsigned RT_PER_BIT = 16;
+	static constexpr unsigned QUALIFIERS = 3;           // high samples needed before RT1
+	static constexpr unsigned START_SAMPLES = 4;        // RT1, then RT3, RT5 and RT7
+	static constexpr unsigned BIT_SAMPLES = 3;          // RT8, RT9 and RT10
+	static constexpr unsigned FIRST_BIT_SAMPLE = 7;     // RT8, counted from RT1
+
 	u8 baud_r();
 	void baud_w(u8 data);
 	u8 sccr1_r();
@@ -122,9 +129,11 @@ private:
 	bool rwu() const { return m_sccr2 & SCCR2_RWU; }
 	unsigned frame_bits() const { return (m_sccr1 & SCCR1_M) ? 11 : 10; }
 
-	u32 rt_ticks() const;
-	attotime tick_time(u64 ticks) const;
+	u32 rt_clocks() const;
+	u32 bit_clocks() const { return RT_PER_BIT * m_rt_clocks; }
+	attotime tick_time(u64 clocks) const;
 	u64 next_tick(attotime const &t, u32 period) const;
+	void adjust_at(emu_timer &timer, attotime const &when);
 	void restart_clock();
 
 	void set_flags(u8 mask);
@@ -134,10 +143,13 @@ private:
 
 	void set_tdo(int state);
 	void tx_kick();
+	void tx_schedule(u64 tick);
 	void tx_next();
 
+	void try_start(attotime const &fall);
 	void rx_start(u64 rt1);
 	void rx_schedule();
+	void rx_idle();
 	void rx_frame_done(bool stop);
 	void arm_idle(attotime const &from);
 
@@ -155,13 +167,15 @@ private:
 	u8                  m_tdr;              // transmit data register, written through SCDR
 	bool                m_irq_state;
 
-	attotime            m_epoch;            // the bit and RT clocks start here
-	u32                 m_rt;               // E clocks per RT tick
+	attotime            m_epoch;            // the RT clock starts here
+	u32                 m_rt_clocks;        // E clocks per RT tick
 
 	// transmitter
 	bool                m_tdr_full;         // TDR holds a byte not yet moved to the shifter
 	bool                m_preamble_pending; // TE rose: a preamble goes out next
 	bool                m_break_pending;    // SBK rose: a break goes out next
+	bool                m_tx_scheduled;     // m_tx_timer is due at m_tx_tick
+	u64                 m_tx_tick;          // next bit boundary, in E clocks from m_epoch
 	u8                  m_tx_state;
 	u16                 m_tx_shift;         // bits still to send, LSB first
 	u8                  m_tx_count;
@@ -170,11 +184,13 @@ private:
 	// receiver
 	int                 m_rdi;
 	attotime            m_rdi_rise;         // when RDI last went high
+	attotime            m_rdi_fall;         // when RDI last went low
 	bool                m_line_idle;        // an idle line has been detected
 	bool                m_idle_armed;       // IDLE may set (once after each RDRF)
 	u8                  m_rx_state;
 	u64                 m_rx_rt1;           // RT1 of the start bit, in E clocks from m_epoch
-	u8                  m_rx_sample;        // next sample: 0-3 start verification, then 3 per bit
+	u8                  m_rx_bits;          // frame length, latched at the start bit
+	u8                  m_rx_step;          // next sample: START_SAMPLES, then BIT_SAMPLES per bit
 	u8                  m_rx_votes;         // high samples for the current bit (or verification)
 	bool                m_rx_noise;
 	u16                 m_rx_shift;
