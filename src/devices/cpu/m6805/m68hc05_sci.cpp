@@ -28,8 +28,10 @@
       says when it sets.
     - A BAUD change in mid-frame ends the frame (diserial drops it): the
       line goes high and the frame ends a bit time later.  A byte being
-      received is dropped too.  A preamble or stop bit in progress keeps its
-      old length.
+      received is dropped too, and diserial keeps its receive clock phase, so
+      the next byte received after a reset or rate change that cut one short
+      can be sampled at the bit boundaries.  A preamble or stop bit in
+      progress keeps its old length.
     - A byte written to SCDR while TE is clear is held, and goes out after
       the preamble when TE is set.
     - SCDR's two registers are left alone by reset (table 3-1 doesn't list
