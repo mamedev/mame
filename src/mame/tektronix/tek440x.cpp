@@ -106,40 +106,10 @@ DECLARE_DEVICE_TYPE(M68010_TEKMMU, m68010_tekmmu_device)
 
 class m68010_tekmmu_device : public m68010_device
 {
-	// HACK
-	u8 *m_map_control_ptr = nullptr;
-	u16 *m_map_ptr = nullptr;
-
 public:
 	m68010_tekmmu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 		m68010_device::m68010_device(mconfig, M68010_TEKMMU, tag, owner, clock)
 	{
-	}
-
-	void init_cpu_m68010(void)
-	{
-		LOG("m68010_tekmmu_device::init_cpu_m68010\n");
-		init_cpu_common();
-		m_cpu_type         = CPU_TYPE_010;
-
-		init16(*m_program, *m_oprogram);
-		m_sr_mask          = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
-		m_state_table      = m68ki_instruction_state_table[2];
-		m_cyc_instruction  = m68ki_cycles[2];
-		m_cyc_exception    = m68ki_exception_cycle_table[2];
-		m_cyc_bcc_notake_b = -4;
-		m_cyc_bcc_notake_w = 0;
-		m_cyc_dbcc_f_noexp = 0;
-		m_cyc_dbcc_f_exp   = 6;
-		m_cyc_scc_r_true   = 0;
-		m_cyc_movem_w      = 4;
-		m_cyc_movem_l      = 8;
-		m_cyc_shift        = 2;
-		m_cyc_reset        = 130;
-		m_has_pmmu         = 0;
-		m_has_fpu          = 0;
-
-		define_state();
 	}
 
 	void device_start() override
@@ -153,15 +123,6 @@ public:
 		m68000_musashi_device::device_reset();
 		LOG("m68010_tekmmu_device::device_reset: setting emmu\n");
 		set_emmu_enable(true);		// sets m_instruction_restart=true
-	}
-
-public:
-	void linktoMMU(u8 *map_control, u16 *map)
-	{
-		LOG("m68010_tekmmu_device::linktoMMU: control(%p) map(%p) m_emmu_enabled(%d)\n", map_control, map, m_emmu_enabled);
-
-		m_map_control_ptr = map_control;
-		m_map_ptr = map;
 	}
 };
 
@@ -431,8 +392,6 @@ void tek440x_state::machine_start()
 		{ 	LOG("LED %c%c%c%c\n",data & 8 ? '*' : '-',data & 4 ? '*' : '-',data & 2 ? '*' : '-',data & 1 ? '*' : '-');
 			m_leds[0] = BIT(data, 0); m_leds[1] = BIT(data, 1); m_leds[2] = BIT(data, 2); m_leds[3] = BIT(data, 3);
 		});
-
-	m_maincpu->linktoMMU(&m_map_control, &m_map[0]);
 
 	// AB is this needed for external MMU?
 	m_maincpu->set_emmu_enable(true);
