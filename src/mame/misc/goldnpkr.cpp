@@ -597,6 +597,46 @@
   5 -> CTRL -> DOWN -> CTRL -> DOWN -> CTRL -> DOWN -> CTRL -> DOWN -> CTRL -> DOWN
 
 
+  * Toukyuu System Poker
+
+  Press key 0 to enter the books/meters.
+  You can see the normal meters and the DIP switches state.
+
+  Pressing HOLD1, you can enter the "Analiz-2" screen,
+  where you can see the following meters:
+
+  GAME   IN
+  GAME   OUT
+  WUP    IN
+  WUP    TAKE
+  GAME   TAKE
+  GAME   COUNT
+  WIN    COUNT
+  WUP    COUNT
+  BET1   IN
+  BET1   OUT
+  BET2   IN
+  BET2   OUT
+  BET2   COUNT
+  WUP    WIN
+  WUP    LOSS
+  13K    COUNT
+  777    COUNT
+  FEVER  ODDS
+  TURBO1 HIT
+  TURBO2 HIT
+  TURBO  COUNT
+  DOUBLE TURBO
+  TURBO  ODDS
+  PROGR  COUNT
+  PROGR  ODDS
+ 
+  You can exit to the game pressing:
+  - HOLD2 (you will exit to the normal game)
+  - HOLD3 (you will exit to the "auto take" game)
+  - HOLD5 (you will exit to the game type you had before)
+
+
 ************************************************************************************
 
 
@@ -16569,4 +16609,4 @@ GAME(  198?, wing90pkr, goldnpkr, wing_w90, wing_w90, goldnpkr_state, empty_init
 
 GAMEL( 198?, phnxjokr,  0,        phnxjokr, phnxjokr, goldnpkr_state, empty_init,    ROT0,   "STP",                      "Phoenix Joker (STP, UCGS-80 PCB)",        0,                layout_goldnpkr )  // no lamps. layout for clickable controls only.
 
-GAMEL( 1986, touksysp,  0,        touksysp, touksysp, goldnpkr_state, init_touk,     ROT0,   "<unknown>",                "Toukyuu System Poker (encrypted)",        0,                layout_goldnpkr )  // no lamps. layout for clickable controls only.
+GAMEL( 1986, touksysp,  0,        touksysp, touksysp, goldnpkr_state, init_touk,     ROT0,   "<unknown>",                "Toukyuu System Poker (ROM: NO4313)",      0,                layout_goldnpkr )  // no lamps. layout for clickable controls only.
