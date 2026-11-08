@@ -29,12 +29,12 @@ private:
 	devcb_write_line m_irq;
 	devcb_write8 m_request;
 	devcb_read32 m_gain;
-	sound_stream *m_stream = nullptr;
-	emu_timer *m_timer = nullptr;
+	sound_stream *m_stream;
+	emu_timer *m_timer;
 	static constexpr unsigned FIFO_SIZE = 32;
-	u32 m_regs[8]{}, m_fifo[FIFO_SIZE]{};
-	u8 m_head = 0, m_count = 0, m_byte = 0;
-	s16 m_output[2]{};
+	u32 m_regs[8], m_fifo[FIFO_SIZE];
+	u8 m_head, m_count, m_byte;
+	s16 m_output[2];
 };
 DECLARE_DEVICE_TYPE(IGS38_I2S, igs38_i2s_device)
 DEFINE_DEVICE_TYPE(IGS38_I2S, igs38_i2s_device, "igs38_i2s", "IGS38 I2S audio controller")
