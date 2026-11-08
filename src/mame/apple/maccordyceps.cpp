@@ -140,6 +140,9 @@ void pmac6200_state::machine_start()
 
 	m_wait_comm_load = m_maincpu->attotime_to_cycles(attotime::from_usec(72));
 	m_wait_comm_store = m_maincpu->attotime_to_cycles(attotime::from_usec(92));
+
+	m_maincpu->space(AS_PROGRAM).install_read_tap(0x41000000, 0x410fffff, "overlay_off",
+			[this] (offs_t offset, u64 &data, u64 mem_mask) { m_f108->overlay_off(); });
 }
 
 void pmac6200_state::machine_reset()
@@ -198,10 +201,8 @@ void pmac6200_state::pmac6200_map(address_map &map)
 	map(0x50f0a000, 0x50f0bfff).rw(FUNC(pmac6200_state::comm_r), FUNC(pmac6200_state::comm_w));
 
 	// Capella-mapped devices in 64-bit address space
-	map(0x40000000, 0x403fffff).rom().region("bootrom64", 0); // HACK: should be mirrored, but doing
-	map(0x40800000, 0x40bfffff).rom().region("bootrom64", 0); // .mirror(0x0fc00000) crashes the bootrom
-
-	map(0xffc00000, 0xffffffff).rom().region("bootrom64", 0);
+	map(0x40000000, 0x403fffff).mirror(0x0fc00000).rom().region("bootrom64", 0);
+	map(0xff000000, 0xff3fffff).mirror(0x00c00000).rom().region("bootrom64", 0);
 
 	map(0x00000000, 0xffffffff).m(m_capella, FUNC(capella_device::map));
 }

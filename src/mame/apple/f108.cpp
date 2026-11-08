@@ -36,10 +36,10 @@ void f108_device::map(address_map &map)
 {
 	map(0x40000000, 0x400fffff).r(FUNC(f108_device::rom_switch_r)).mirror(0x0ff00000).nopw();
 	map(0x5000c000, 0x5000dfff).rw(FUNC(f108_device::scc_r), FUNC(f108_device::scc_w)).mirror(0x00fc0000);
-	map(0x5001a000, 0x5001a01f).rw(m_ata, FUNC(ata_interface_device::cs0_swap_r), FUNC(ata_interface_device::cs0_swap_w)).umask32(0xffff0000).mirror(0x00fc0000);
-	map(0x5001a000, 0x5001a003).rw(FUNC(f108_device::ata_data_r), FUNC(f108_device::ata_data_w)).mirror(0x00fc0000);
-	map(0x5001a020, 0x5001a03f).rw(m_ata, FUNC(ata_interface_device::cs1_swap_r), FUNC(ata_interface_device::cs1_swap_w)).umask32(0xffff0000).mirror(0x00fc0000);
-	map(0x5001a040, 0x5001a04b).rw(FUNC(f108_device::ata_timing_r), FUNC(f108_device::ata_timing_w)).mirror(0x00fc0000);
+	map(0x50f1a000, 0x50f1a01f).umask32(0xffff0000).rw(m_ata, FUNC(ata_interface_device::cs0_swap_r), FUNC(ata_interface_device::cs0_swap_w));
+	map(0x50f1a000, 0x50f1a003).rw(FUNC(f108_device::ata_data_r), FUNC(f108_device::ata_data_w));
+	map(0x50f1a020, 0x50f1a03f).umask32(0xffff0000).rw(m_ata, FUNC(ata_interface_device::cs1_swap_r), FUNC(ata_interface_device::cs1_swap_w));
+	map(0x50f1a040, 0x50f1a04b).rw(FUNC(f108_device::ata_timing_r), FUNC(f108_device::ata_timing_w));
 	map(0xf9000000, 0xf90fffff).ram();  // VRAM
 }
 
@@ -134,9 +134,8 @@ void f108_device::device_reset()
 	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
 }
 
-u32 f108_device::rom_switch_r(offs_t offset)
+void f108_device::overlay_off()
 {
-	// disable the overlay
 	if (m_overlay && !machine().side_effects_disabled())
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -147,6 +146,12 @@ u32 f108_device::rom_switch_r(offs_t offset)
 		space.install_ram(0x00000000, memory_end & ~memory_mirror, memory_mirror, memory_data);
 		m_overlay = false;
 	}
+}
+
+u32 f108_device::rom_switch_r(offs_t offset)
+{
+	// disable the overlay
+	overlay_off();
 
 	return m_rom_ptr ? m_rom_ptr[offset & ((m_rom_size - 1) >> 2)] : 0;
 }
