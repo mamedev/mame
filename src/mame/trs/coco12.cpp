@@ -37,12 +37,7 @@
 
 void coco12_state::coco_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(m_sam, FUNC(sam6883_device::read), FUNC(sam6883_device::write));
-}
-
-void coco12_state::coco_ram(address_map &map)
-{
-	// mapped by configure_sam
+	map(0x0000, 0xffff).m(m_sam, FUNC(sam6883_device::amap));
 }
 
 void coco12_state::coco_rom0(address_map &map)
@@ -66,10 +61,14 @@ void coco12_state::coco_rom2(address_map &map)
 void deluxecoco_state::deluxecoco_rom2(address_map &map)
 {
 	// $C000-$FEFF
-	map(0x0000, 0x3eff).view(m_rom_view);
-
-	m_rom_view[0](0x0000, 0x3eff).rw(m_cococart, FUNC(cococart_slot_device::cts_read), FUNC(cococart_slot_device::cts_write));
-	m_rom_view[1](0x0000, 0x3eff).rom().region(MAINCPU_TAG, 0x4000).nopw();
+	// the SAM installs this map at $C000, so it can't use a view
+	map(0x0000, 0x3eff).lrw8(
+			NAME([this] (offs_t offset) -> uint8_t { return m_rom_select ? m_rom[0x4000 + offset] : m_cococart->cts_read(offset); }),
+			NAME([this] (offs_t offset, uint8_t data)
+			{
+				if (!m_rom_select)
+					m_cococart->cts_write(offset, data);
+			}));
 }
 
 void coco12_state::coco_io0(address_map &map)
@@ -568,7 +567,7 @@ void coco12_state::coco(machine_config &config)
 	m_pia_1->irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<1>));
 
 	SAM6883(config, m_sam, XTAL(14'318'181), m_maincpu);
-	m_sam->set_addrmap(0, &coco12_state::coco_ram);
+	m_sam->set_ram(m_ram);
 	m_sam->set_addrmap(1, &coco12_state::coco_rom0);
 	m_sam->set_addrmap(2, &coco12_state::coco_rom1);
 	m_sam->set_addrmap(3, &coco12_state::coco_rom2);

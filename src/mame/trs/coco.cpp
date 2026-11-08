@@ -472,14 +472,28 @@ uint8_t coco_state::pia1_pb_r()
 	// We only need to specify the input lines here
 	uint32_t ram_size = m_ram->size();
 
-	//  For the CoCo 1, the logic has been changed to only select 64K rams
-	//  if there is more than 16K of memory, as the Color Basic 1.0 rom
-	//  can only configure 4K or 16K ram banks (as documented in "Color
-	//  Basic Unreveled"), doing this allows this  allows the coco driver
-	//  to access 32K of ram, and also allows the cocoe driver to access
-	//  the full 64K, as this uses Color Basic 1.2, which can configure 64K rams
-	bool memory_sense = (ram_size >= 0x4000 && ram_size <= 0x7fff)
-		|| (ram_size >= 0x8000 && (m_pia_0->b_output() & 0x40));
+	//  RAMSZ is strapped for the RAM chips fitted:
+	//
+	//      4K chips (4K, 8K)       grounded
+	//      16K chips (16K)         pulled high
+	//      64K chips (32K, 64K+)   PIA0 PB6, a keyboard column strobe
+	//
+	//  32K machines use 64K chips with one working half.  Color BASIC
+	//  reads RAMSZ to choose the SAM memory size:
+	//
+	//      1.0         PB6 high: low = 4K, high = 16K
+	//      1.1, 1.2    PB6 high then low: low = 4K, high/high = 16K,
+	//                  high/low = 64K
+	//      1.3         PB6 low: low = 64K, high = 16K
+	//
+	//  So BASIC 1.0 uses 16K on a 64K machine, as on hardware.
+	bool memory_sense;
+	if (ram_size < 0x4000)
+		memory_sense = false;
+	else if (ram_size < 0x8000)
+		memory_sense = true;
+	else
+		memory_sense = BIT(m_pia_0->b_output(), 6);
 
 	// serial in (PB0)
 	bool serial_in = (m_rs232 != nullptr) && (m_rs232->rxd_r() ? true : false);
