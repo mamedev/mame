@@ -1232,7 +1232,7 @@ void tek440x_state::logical_map(address_map &map)
 	map(0x000000, 0x7fffff).rw(FUNC(tek440x_state::memory_r), FUNC(tek440x_state::memory_w));
 
 #ifdef USE_MMU_INLINE
-	map(0x800000, 0xbfffff).rw(FUNC(tek440x_state::map_r), FUNC(tek440x_state::map_w)).mirror(0x400000);
+	map(0x800000, 0xbfffff).rw(FUNC(tek440x_state::map_r), FUNC(tek440x_state::map_w));
 #endif
 }
 
