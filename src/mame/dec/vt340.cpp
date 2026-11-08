@@ -137,10 +137,20 @@ static_assert(output_map_address(0x6) == 0x6);
 static_assert(output_map_address(0x9) == 0x9);
 static_assert(output_map_address(0xe) == 0x7);
 
-bool should_log_xdata(offs_t offset, u16 &trace_events, u16 &io_trace_events)
+bool should_log_xdata(offs_t offset, u32 &trace_events, u32 &io_trace_events)
 {
 	bool const io_access = ((offset & 0xfff0) == 0x7ff0) || (offset >= 0xf000);
-	return (trace_events++ < 256) || (io_access && (io_trace_events++ < 512));
+	bool const log_trace = trace_events < 256;
+	if (trace_events != std::numeric_limits<u32>::max())
+		++trace_events;
+
+	if (log_trace || !io_access)
+		return log_trace;
+
+	bool const log_io = io_trace_events < 512;
+	if (io_trace_events != std::numeric_limits<u32>::max())
+		++io_trace_events;
+	return log_io;
 }
 
 // Match the active communication setup produced by the recovered E80 image.
@@ -282,10 +292,10 @@ private:
 	u16 m_palette_gb_valid = 0;
 	bool m_display_dirty = true;
 	u64 m_display_dirty_through = 0;
-	u16 m_cpu1_trace_events = 0;
-	u16 m_cpu2_trace_events = 0;
-	u16 m_cpu1_io_trace_events = 0;
-	u16 m_cpu2_io_trace_events = 0;
+	u32 m_cpu1_trace_events = 0;
+	u32 m_cpu2_trace_events = 0;
+	u32 m_cpu1_io_trace_events = 0;
+	u32 m_cpu2_io_trace_events = 0;
 	emu_timer *m_dc7051_horizontal_timer = nullptr;
 	emu_timer *m_dc7051_scanline_timer = nullptr;
 	emu_timer *m_dc7051_frame_timer = nullptr;
@@ -584,7 +594,28 @@ void vt340_state::cpu2_xdata_w(offs_t offset, u8 data)
 	// BAD3 through BAD0 to V0CS through V3CS respectively (BAD5 separately
 	// drives OPADDS).
 	if (selects(offset, VIPER_SELECT_BASE, BOARD_REGISTER_MASK))
+	{
 		m_dc323->viper_select_w(bitswap<4>(data, 0, 1, 2, 3));
+
+		// Graphics initialization finishes its F072 control sequence with FF
+		// just before exercising the separately addressed bitmap store.
+		if (!m_dc323_post_done && (offset == 0xf072) && (data == 0xff))
+		{
+			m_dc323_post_mode = DC323_POST_ARMED;
+			if (m_dat9_bus_phase == DAT9_WAIT_DC323_RESET)
+				m_dat9_bus_phase = DAT9_WAIT_DC323_STATUS;
+		}
+		// The second board-control initialization terminates DC323 reset.  DAT9
+		// is released high for one status sample, then the DC323 supplies the
+		// low completion phase before leaving the shared net to the processors.
+		else if ((m_dat9_bus_phase == DAT9_WAIT_DC323_STATUS) &&
+			(offset == VIPER_SELECT_BASE) && (data == 0x00))
+		{
+			m_dat9_bus_phase = DAT9_DC323_STATUS_HIGH;
+			update_dat9_input();
+		}
+		return;
+	}
 
 	// F0E0 selects a timing-generator signal onto P1.0 for the firmware's
 	// measured horizontal/vertical timing diagnostics.
@@ -594,24 +625,6 @@ void vt340_state::cpu2_xdata_w(offs_t offset, u8 data)
 		return;
 	}
 
-	// Graphics initialization finishes its F072 control sequence with FF just
-	// before exercising the separately addressed bitmap store.
-	if (!m_dc323_post_done && (offset == 0xf072) && (data == 0xff))
-	{
-		m_dc323_post_mode = DC323_POST_ARMED;
-		if (m_dat9_bus_phase == DAT9_WAIT_DC323_RESET)
-			m_dat9_bus_phase = DAT9_WAIT_DC323_STATUS;
-		return;
-	}
-	// The second board-control initialization terminates DC323 reset.  DAT9 is
-	// released high for one status sample, then the DC323 supplies the low
-	// completion phase before leaving the shared net to the processor ports.
-	if ((m_dat9_bus_phase == DAT9_WAIT_DC323_STATUS) && (offset == VIPER_SELECT_BASE) && (data == 0x00))
-	{
-		m_dat9_bus_phase = DAT9_DC323_STATUS_HIGH;
-		update_dat9_input();
-		return;
-	}
 	if (selects(offset, PALETTE_RG_BASE, BOARD_REGISTER_MASK))
 	{
 		unsigned const index = offset & 0x0f;
