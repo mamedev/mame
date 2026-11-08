@@ -23,8 +23,15 @@
     the interrupt enables.
 
     Inferred or approximate:
-    - RDI is followed edge by edge rather than sampled at every RT tick, so
-      a pulse shorter than an RT tick still restarts idle line detection.
+    - RDI is followed edge by edge rather than sampled at every RT tick:
+      the three high samples before RT1 are RDI high for three RT ticks
+      before it, and a pulse shorter than an RT tick still restarts idle
+      line detection.  A start edge that comes while a frame is being
+      sampled is taken up when the frame ends or is rejected, up to one RT
+      tick late.  Reset, setting RE and a rate change start the high
+      samples afresh.
+    - A flag set again while it's already set doesn't undo an SCSR read
+      that saw it.
     - An idle line is RDI high for a whole frame (10 or 11 bit times) after
       a stop bit or after RDI rises.  IDLE is first possible after the first
       RDRF.  "RWU cannot be set if the line is idle" is taken to mean while
@@ -186,7 +193,10 @@ void m68hc05_sci_device::device_reset()
 	m_rx_timer->adjust(attotime::never);
 	m_idle_timer->adjust(attotime::never);
 	if (m_rdi)
-		arm_idle(machine().time());
+	{
+		m_rdi_rise = machine().time();
+		arm_idle(m_rdi_rise);
+	}
 
 	m_irq_state = false;
 	m_irq_cb(0);
@@ -222,11 +232,10 @@ void m68hc05_sci_device::rdi_w(int state)
 	{
 		try_start(now);
 	}
-	else if ((m_rx_state == RX_ARTIFICIAL) && re() && clock())
+	else if (m_rx_state == RX_ARTIFICIAL)
 	{
 		// 5.5: the start qualifiers are forced, and the start bit is accepted no sooner
 		// than it's anticipated
-		m_rx_timer->adjust(attotime::never);
 		rx_start(std::max(next_tick(now, m_rt_clocks), m_rx_rt1));
 	}
 }
@@ -282,7 +291,7 @@ void m68hc05_sci_device::sccr2_w(u8 data)
 		m_sccr2 &= ~SCCR2_RWU;
 
 	// 5.7.3 B2: the receiver is disabled while RE is clear; once enabled, it looks for an
-	// idle line from scratch
+	// idle line and start qualifiers from scratch
 	if (fall & SCCR2_RE)
 	{
 		m_rx_timer->adjust(attotime::never);
@@ -291,7 +300,8 @@ void m68hc05_sci_device::sccr2_w(u8 data)
 	if ((rise & SCCR2_RE) && m_rdi)
 	{
 		m_line_idle = false;
-		arm_idle(machine().time());
+		m_rdi_rise = machine().time();
+		arm_idle(m_rdi_rise);
 	}
 
 	// 5.7.3 B3: setting TE from a cleared state sends a preamble, after the block in
@@ -435,16 +445,23 @@ void m68hc05_sci_device::update_rate(bool force)
 		tx_schedule(bit_clocks());
 	else
 		tx_kick();
-	if (m_rdi && !m_line_idle)
-		arm_idle(machine().time());
+	if (m_rdi)
+	{
+		// samples on the old clock don't count towards a start bit
+		m_rdi_rise = machine().time();
+		if (!m_line_idle)
+			arm_idle(m_rdi_rise);
+	}
 }
 
 
 void m68hc05_sci_device::set_flags(u8 mask)
 {
-	// a flag set by the hardware after an SCSR read isn't covered by that read
+	// a flag set by the hardware after an SCSR read isn't covered by that read, unless it
+	// was set already
+	u8 const fresh(mask & ~m_scsr);
 	m_scsr |= mask;
-	m_scsr_seen &= ~mask;
+	m_scsr_seen &= ~fresh;
 	update_irq();
 }
 
@@ -457,7 +474,8 @@ void m68hc05_sci_device::clear_flags(u8 mask)
 void m68hc05_sci_device::update_irq()
 {
 	// 5.7.3: TIE & TDRE, TCIE & TC, RIE & (RDRF | OR), ILIE & IDLE; NF and FE request
-	// nothing of their own
+	// nothing of their own.  The enables sit at the same bit positions as their flags.
+	static_assert((SCCR2_TIE == SCSR_TDRE) && (SCCR2_TCIE == SCSR_TC) && (SCCR2_RIE == SCSR_RDRF) && (SCCR2_ILIE == SCSR_IDLE));
 	bool const state(
 			(m_scsr & m_sccr2 & (SCSR_TDRE | SCSR_TC | SCSR_RDRF | SCSR_IDLE)) ||
 			((m_scsr & SCSR_OR) && (m_sccr2 & SCCR2_RIE)));
@@ -518,7 +536,7 @@ void m68hc05_sci_device::tx_next()
 		LOGSCI("preamble\n");
 		m_preamble_pending = false;
 		m_tx_state = TX_PREAMBLE;
-		m_tx_shift = 0xffff;
+		m_tx_shift = make_bitmask<u16>(frame_bits());
 		m_tx_count = frame_bits();
 	}
 	else if (te() && (m_break_pending || (m_sccr2 & SCCR2_SBK)))
@@ -527,14 +545,14 @@ void m68hc05_sci_device::tx_next()
 		LOGSCI("break\n");
 		m_break_pending = false;
 		m_tx_state = TX_BREAK;
-		m_tx_shift = 0x0000;
+		m_tx_shift = 0;
 		m_tx_count = frame_bits();
 	}
 	else if (after_break)
 	{
 		// 5.7.3 B0: at least one high bit after a break
 		m_tx_state = TX_MARK;
-		m_tx_shift = 0x0001;
+		m_tx_shift = 1;
 		m_tx_count = 1;
 	}
 	else if (te() && m_tdr_full)
@@ -542,13 +560,13 @@ void m68hc05_sci_device::tx_next()
 		// 5.7.1: TDR moves to the shifter, and TDRE sets (5.7.4 B7); start bit, eight
 		// data bits LSB first, T8 with M set, stop bit
 		LOGSCI("sending %02X\n", m_tdr);
+		unsigned const bits(frame_bits());
 		m_tdr_full = false;
 		m_tx_state = TX_FRAME;
-		if (m_sccr1 & SCCR1_M)
-			m_tx_shift = (u16(m_tdr) << 1) | ((m_sccr1 & SCCR1_T8) ? 0x200 : 0x000) | 0x400;
-		else
-			m_tx_shift = (u16(m_tdr) << 1) | 0x200;
-		m_tx_count = frame_bits();
+		m_tx_shift = (u16(m_tdr) << 1) | (1U << (bits - 1));
+		if ((m_sccr1 & SCCR1_M) && (m_sccr1 & SCCR1_T8))
+			m_tx_shift |= 1U << (bits - 2);
+		m_tx_count = bits;
 		set_flags(SCSR_TDRE);
 	}
 	else
