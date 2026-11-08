@@ -116,6 +116,7 @@ private:
 	u32 divisor() const;
 	attotime bit_time() const;
 	void update_rate(bool force = false);
+	void set_bit_time();
 	void start_frame();
 	void start_stop_bit();
 	void start_preamble();

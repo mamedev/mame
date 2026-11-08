@@ -17,7 +17,8 @@
     bit verification and majority vote (5.4), so NF never sets, and it
     doesn't recover from a framing error as 5.5 describes: it waits for the
     next falling edge.  TDO isn't released to high impedance when TE clears:
-    it stays high.
+    it stays high.  The SCI doesn't take over PD0 and PD1: the host's port D
+    is unaffected by RE and TE.
 
     Inferred or approximate:
     - A frame's start bit goes out a bit time after the byte moves to the
@@ -26,8 +27,11 @@
     - TC stays as it was while the preamble goes out; the data sheet only
       says when it sets.
     - A BAUD change in mid-frame ends the frame (diserial drops it): the
-      line goes high and the frame ends a bit time later.  A preamble or
-      stop bit in progress keeps its old length.
+      line goes high and the frame ends a bit time later.  A byte being
+      received is dropped too.  A preamble or stop bit in progress keeps its
+      old length.
+    - A byte written to SCDR while TE is clear is held, and goes out after
+      the preamble when TE is set.
     - SCDR's two registers are left alone by reset (table 3-1 doesn't list
       them).
 
@@ -114,7 +118,7 @@ void m68hc05_sci_device::device_reset()
 	m_baud &= BAUD_SCR;
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	m_divisor = divisor();
-	set_rate(bit_time());
+	set_bit_time();
 
 	// table 3-1: TE, RE, TIE, TCIE, RIE, ILIE, RWU, SBK and the receive flags are cleared,
 	// TDRE and TC set; 5.7.2: R8, T8, M and WAKE are not affected
@@ -323,6 +327,7 @@ TIMER_CALLBACK_MEMBER(m68hc05_sci_device::line_done)
 
 void m68hc05_sci_device::set_baud(u8 data)
 {
+	// a new rate ends a frame in progress, as a software write does
 	m_baud = data & BAUD_MASK;
 	update_rate();
 }
@@ -391,16 +396,27 @@ void m68hc05_sci_device::update_rate(bool force)
 		bool const busy(!is_transmit_register_empty());
 		m_divisor = div;
 		LOGSCI("bit time %u E clocks\n", m_divisor);
-		set_rate(bit_time());
+		set_bit_time();
 
 		// diserial drops the frame in the shifter: release the line and end the frame a bit
-		// time later (inferred, the data sheet doesn't cover a rate change in mid-frame)
+		// time later (inferred, the data sheet doesn't cover a rate change in mid-frame).  The
+		// line timer is idle: a preamble or stop bit only runs with the shifter empty.
 		if (busy)
 		{
 			m_tdo_cb(1);
 			start_stop_bit();
 		}
 	}
+}
+
+void m68hc05_sci_device::set_bit_time()
+{
+	set_rate(bit_time());
+
+	// diserial shifts a bit on each rising edge of its half-rate clock, and the phase it's
+	// left in decides whether a frame's start bit comes a half or a whole bit time after
+	// the byte moves to the shifter; keep it a whole bit time
+	tx_clock_w(1);
 }
 
 void m68hc05_sci_device::start_frame()
