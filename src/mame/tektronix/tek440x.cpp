@@ -1070,6 +1070,7 @@ void tek440x_state::timer_irq(int state)
 			m_u244latch = true;
 		}
 		else
+		if (m_u244latch)
 		{
 			m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 		}
@@ -1083,7 +1084,7 @@ u16 tek440x_state::timer_r(offs_t offset)
 
 	if (!machine().side_effects_disabled())
 	{
-		//if (m_u244latch)
+		if (m_u244latch)
 		{
 			LOGMASKED(LOG_IRQ,"timer_r: M68K_IRQ_1 clear\n");
 			m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
