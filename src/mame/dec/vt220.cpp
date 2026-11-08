@@ -115,6 +115,10 @@ private:
 	bool m_132col = false;
 	std::unique_ptr<u8[]> m_softchar;
 	std::unique_ptr<u8[]> m_lbf;
+	int m_host_txd = 1;
+	int m_host_rxd = 1;
+	int m_kbd_rxd = 1;
+
 	void p1_w(u8 data);
 	void conf_w(u8 data);
 	void duart_out_w(u8 data);
@@ -122,17 +126,15 @@ private:
 	const col_timing &timing() const { return m_132col ? TIMING_132 : TIMING_80; }
 	void char_addr_w(u8 data);
 	offs_t lbf_addr(bool chr, u8 lba) const;
-	u8 char_code() const;
-	u8 dot(int col, int dot, int line, bool &bold, bool &blink) const;
+	u8 lbf_out(bool chr, u8 lba) const;
+	u8 dot(int col, int x, int line, bool &bold, bool &blink) const;
+	u8 video_out(int x, int y, bool &bold, bool &blink) const;
 	u8 duart_r(offs_t offset);
 	u8 vram_r(offs_t offset);
 	void vlt_w(int state);
 	void host_txd_w(int state);
 	void host_rxd_w(int state);
 	u8 p1_r();
-	int m_host_txd = 1;
-	int m_host_rxd = 1;
-	int m_kbd_rxd = 1;
 	void drb_w(int state);
 	int video_col(int x) const;
 	void cblank_w(int state);
@@ -183,11 +185,13 @@ offs_t vt220_state::lbf_addr(bool chr, u8 lba) const
 	return (m_lbf_bank << 9) | (chr ? 0x100 : 0) | lba;
 }
 
-u8 vt220_state::char_code() const
+u8 vt220_state::lbf_out(bool chr, u8 lba) const
 {
-	// CHRG LATCH2 (E20) takes the character address latch (E19) while LBF DISABLE H (P1.3) is high,
-	// otherwise the line buffer output
-	return BIT(m_p1, 3) ? m_char_addr : m_lbf[lbf_addr(true, m_lba)];
+	// CHRG LATCH2 (E20) takes the character address latch (E19), and the attribute path the attribute
+	// latch (E21), while LBF DISABLE H (P1.3) is high, otherwise the line buffer output
+	if (BIT(m_p1, 3))
+		return chr ? m_char_addr : m_atr_latch;
+	return m_lbf[lbf_addr(chr, lba)];
 }
 
 void vt220_state::vt220a_vram(address_map &map)
@@ -198,8 +202,9 @@ void vt220_state::vt220a_vram(address_map &map)
 
 int vt220_state::video_col(int x) const
 {
-	// the line buffer address counter is cleared by VLT and clocked by T5
-	return (x - m_vlt_x) / timing().width;
+	// the line buffer address counter is cleared by VLT and clocked by T5; -1 before VLT
+	const int dx = x - m_vlt_x;
+	return (dx < 0) ? -1 : dx / timing().width;
 }
 
 u8 vt220_state::vram_r(offs_t offset)
@@ -207,7 +212,7 @@ u8 vt220_state::vram_r(offs_t offset)
 	// screen and attribute RAM see the same address; during VLT of a data row's top scan line the
 	// row goes into the line buffer, if the CPU has granted the bus (DMA L, P1.0, drives TSC high)
 	const u8 chr = m_screen_ram[offset & 0x0fff];
-	if (m_vlt && !BIT(m_p1, 0) && !BIT(m_p1, 3) && !BIT(m_conf, 2))
+	if (m_vlt && !BIT(m_p1, 0) && !BIT(m_p1, 3) && !BIT(m_conf, 2) && !machine().side_effects_disabled())
 	{
 		const int col = video_col(m_screen->hpos());
 		if (!m_drb && !m_row_loading)
@@ -253,15 +258,16 @@ u8 vt220_state::dot(int col, int x, int line, bool &bold, bool &blink) const
 	// EN CHR GEN RW H is set, otherwise the video side walks the row
 	const bool cpu = BIT(m_conf, 2);
 	const u8 lba = cpu ? m_lba : u8(col);
-	const u8 chr = BIT(m_p1, 3) ? m_char_addr : m_lbf[lbf_addr(true, lba)];
-	const u8 atr = BIT(m_p1, 3) ? m_atr_latch : m_lbf[lbf_addr(false, lba)];
+	const u8 chr = lbf_out(true, lba);
+	const u8 atr = lbf_out(false, lba);
 	const bool alt = cpu ? BIT(m_conf, 3) : BIT(atr, 3);
 
 	// AD7 BLINK (E38 NAND with DUART BLINK H), AD6 BOLD, AD5 REV (low for reverse), AD4 UL, AD3 ALT SEL
 	bold = BIT(atr, 6);
 	blink = !(BIT(m_duart_op, 3) && BIT(atr, 7));
 
-	if (line >= 10)
+	// scan lines of the last loaded row only
+	if (line < 0 || line >= 10)
 		return 0;
 	const u8 bits = alt ? m_softchar[((chr & 0x7f) << 4) | line] : m_chargen[(BIT(m_p1, 5) << 12) | (chr << 4) | line];
 
@@ -273,19 +279,28 @@ u8 vt220_state::dot(int col, int x, int line, bool &bold, bool &blink) const
 	return on ^ BIT(m_conf, 0) ^ !BIT(atr, 5);
 }
 
+u8 vt220_state::video_out(int x, int y, bool &bold, bool &blink) const
+{
+	// the video stream at beam position x, y: nothing before VLT or with DIS VIDEO H (OP7)
+	bold = blink = false;
+	const int col = video_col(x);
+	if (col < 0 || BIT(m_duart_op, 7))
+		return 0;
+	return dot(col, (x - m_vlt_x) % timing().width, y - m_row_y, bold, blink);
+}
+
 u8 vt220_state::duart_r(offs_t offset)
 {
 	if (offset == 0x0d && !machine().side_effects_disabled())
 	{
 		// self-test status taps on the video output (sheet 5): TBLK on IP4 is low while blanked
-		// (CBLANK or DIS VIDEO), TVB H on IP3 is E45 NOR of the video and the two intensity lines
+		// (CBLANK or DIS VIDEO), TVB H on IP3 is E45 NOR of the video and the two intensity lines.
+		// Sampled when the CPU reads the input port, so the IPCR change bits only update then.
 		const int x = m_screen->hpos(), y = m_screen->vpos();
-		const bool blank = m_cblank || BIT(m_duart_op, 7); // OP7 DIS VIDEO H
-		bool bold = false, blink = false, video = false;
-		if (!blank)
-			video = dot(video_col(x), (x - m_vlt_x) % timing().width, y - m_row_y, bold, blink);
+		bool bold = false, blink = false;
+		const bool video = !m_cblank && video_out(x, y, bold, blink);
 		m_duart->ip3_w(!(video || bold || blink));
-		m_duart->ip4_w(!blank);
+		m_duart->ip4_w(!(m_cblank || BIT(m_duart_op, 7))); // OP7 DIS VIDEO H
 	}
 	return m_duart->read(offset);
 }
@@ -364,7 +379,8 @@ void vt220_state::duart_out_w(u8 data)
 	m_duart_op = data;
 	if (m_host)
 	{
-		// the modem signals are active high here and active low on the RS-232 port
+		// modem signals active high at the DUART, as the TM's DUART block diagram shows them (inferred:
+		// the schematic's 9636/9639 symbols leave it open), and active low on the RS-232 port
 		m_host->write_rts(!BIT(data, 0)); // OP0 RTS H
 		m_host->write_dtr(!BIT(data, 1)); // OP1 DTR H
 		m_host->write_spds(!BIT(data, 2)); // OP2 SPD SEL H
@@ -397,15 +413,16 @@ void vt220_state::char_addr_w(u8 data)
 u8 vt220_state::chargen_r(offs_t offset)
 {
 	// ALT SEL H selects the soft character RAM; otherwise CHRG SEL H (P1.5) is the ROM's MSB
+	const u8 chr = lbf_out(true, m_lba);
 	if (BIT(m_conf, 3))
-		return m_softchar[((char_code() & 0x7f) << 4) | offset];
-	return m_chargen[(BIT(m_p1, 5) << 12) | (char_code() << 4) | offset];
+		return m_softchar[((chr & 0x7f) << 4) | offset];
+	return m_chargen[(BIT(m_p1, 5) << 12) | (chr << 4) | offset];
 }
 
 void vt220_state::chargen_w(offs_t offset, u8 data)
 {
 	if (BIT(m_conf, 3) && BIT(m_conf, 2))
-		m_softchar[((char_code() & 0x7f) << 4) | offset] = data;
+		m_softchar[((lbf_out(true, m_lba) & 0x7f) << 4) | offset] = data;
 }
 
 /* Input ports */
@@ -456,20 +473,14 @@ uint32_t vt220_state::screen_update_vt220(screen_device &screen, bitmap_ind16 &b
 
 uint32_t vt220_state::screen_update_vt220a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const int width = timing().width;
-	const int cols = timing().cols;
+	const int xend = m_vlt_x + timing().cols * timing().width; // end of the row
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		u16 *const pix = &bitmap.pix(y);
-		const int line = y - m_row_y;
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			bool bold, blink;
-			const int col = video_col(x);
-			if (line < 0 || col < 0 || col >= cols || BIT(m_duart_op, 7) || !dot(col, (x - m_vlt_x) % width, line, bold, blink))
-				pix[x] = 0;
-			else
-				pix[x] = 1 + blink + (bold << 1);
+			pix[x] = (x < xend && video_out(x, y, bold, blink)) ? 1 + blink + (bold << 1) : 0;
 		}
 	}
 	return 0;
@@ -503,9 +514,9 @@ void vt220_state::vt220(machine_config &config)
 	LK201(config, m_kbd);
 	m_kbd->tx_handler().set([this] (int state) { m_kbd_rxd = state; });
 
-	scn2681_device &duart(SCN2681(config, m_duart, XTAL(3'686'400)));
-	duart.irq_cb().set_inputline("maincpu", MCS51_INT1_LINE);
-	duart.outport_cb().set(FUNC(vt220_state::duart_out_w));
+	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
+	m_duart->irq_cb().set_inputline(m_maincpu, MCS51_INT1_LINE);
+	m_duart->outport_cb().set(FUNC(vt220_state::duart_out_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, m_screen));
@@ -545,7 +556,7 @@ void vt220_state::vt220a(machine_config &config)
 	m_crtc->vlt_callback().set(FUNC(vt220_state::vlt_w));
 	X2212(config, m_nvr); // E17
 
-	// TM table 5-1: channel A host (J3, EIA or 20 mA), channel B printer
+	// TM table 5-1: channel A host (J3, EIA or 20 mA), channel B printer; modem lines as in duart_out_w
 	m_duart->a_tx_cb().set(FUNC(vt220_state::host_txd_w));
 	m_duart->b_tx_cb().set(m_printer, FUNC(rs232_port_device::write_txd));
 
