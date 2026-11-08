@@ -52,7 +52,7 @@
     the half where A22 is low, and the program the half where it is high.
 
     TODO:
-      - dump the rhythm and picture ROMs listed as NO_DUMP below
+      - dump the ROMs still listed as NO_DUMP below
 
 ***************************************************************************/
 
@@ -544,8 +544,9 @@ u16 kn_state::kbd_fifo_r()
 	return data;
 }
 
-// The SD mailbox in the sub tone generator's window. With nothing attached, a
-// write still raises the sub tone generator's interrupt.
+// The SD mailbox at 0x9805000c, in the window of the tone generator at
+// 0x98050000 (the main one on the KN7000). With nothing attached, a write
+// still raises TGS.INT2.
 // FIXME: what clears TGS.INT2 is unknown; it is held until the CPU accepts it
 u16 kn_state::sdmbx_r()
 {
@@ -667,8 +668,8 @@ void kn_sd_state::sd_update_carddetect()
 }
 
 // The firmware talks SPI (mode 3) to the card a byte at a time through this
-// mailbox; each write clocks a byte out and the reply in, then raises the sub
-// tone generator's interrupt. A deselected card leaves DO pulled up.
+// mailbox; each write clocks a byte out and the reply in, then raises
+// TGS.INT2. A deselected card leaves DO pulled up.
 void kn_sd_state::sd_sdmbx_w(u16 data)
 {
 	m_sd_leds[0] = 1;
@@ -1250,7 +1251,9 @@ ROM_START(kn7000)
 
 	// Read through the tone generators' wave ROM test port, as the firmware's
 	// own test reads them: byte 2n and 2n+1 are the low and high byte of word n.
-	// Each byte sum matches the one that test expects.
+	// Each byte sum matches the one that test expects. The sums cannot see a
+	// swapped address line; the sample directory at the start of each page
+	// decodes at these offsets.
 	ROM_REGION(0x1000000, "waveform_main_y", 0)
 	ROM_LOAD("c3cbqd000002.ic203", 0x000000, 0x1000000, CRC(77211876) SHA1(f2d01ffd020c39a3f5b9d6c3275b1855c5a3d1a6))
 
