@@ -64,12 +64,40 @@ public:
 	vt220_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_ram(*this, RAM_TAG),
-		m_crtc(*this, "crtc"),
 		m_screen(*this, "screen"),
 		m_duart(*this, "duart"),
-		m_nvr(*this, "nvr"),
 		m_kbd(*this, "lk201"),
+		m_ram(*this, RAM_TAG)
+	{ }
+
+	void vt220(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+	required_device<i8051_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<scn2681_device> m_duart;
+	required_device<lk201_device> m_kbd;
+	required_device<ram_device> m_ram;
+
+private:
+	int m_kbd_rxd = 1;
+
+	uint32_t screen_update_vt220(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void vt220_data(address_map &map) ATTR_COLD;
+	void vt220_mem(address_map &map) ATTR_COLD;
+};
+
+class vt220a_state : public vt220_state
+{
+public:
+	vt220a_state(const machine_config &mconfig, device_type type, const char *tag) :
+		vt220_state(mconfig, type, tag),
+		m_crtc(*this, "crtc"),
+		m_nvr(*this, "nvr"),
 		m_host(*this, "host"),
 		m_printer(*this, "printer"),
 		m_chargen(*this, "chargen"),
@@ -77,71 +105,64 @@ public:
 		m_attr_ram(*this, "attr_ram")
 	{ }
 
-	void vt220(machine_config &config);
 	void vt220a(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
-	uint32_t screen_update_vt220(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_vt220a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void vt220a_palette(palette_device &palette) const;
-	required_device<i8051_device> m_maincpu;
-	required_device<ram_device> m_ram;
-	optional_device<crt9007_device> m_crtc;
-	required_device<screen_device> m_screen;
-	required_device<scn2681_device> m_duart;
-	optional_device<x2212_device> m_nvr;
-	required_device<lk201_device> m_kbd;
-	optional_device<rs232_port_device> m_host;
-	optional_device<rs232_port_device> m_printer;
+
+private:
+	required_device<crt9007_device> m_crtc;
+	required_device<x2212_device> m_nvr;
+	required_device<rs232_port_device> m_host;
+	required_device<rs232_port_device> m_printer;
 	required_region_ptr<u8> m_chargen;
-	optional_shared_ptr<u8> m_screen_ram;
-	optional_shared_ptr<u8> m_attr_ram;
+	required_shared_ptr<u8> m_screen_ram;
+	required_shared_ptr<u8> m_attr_ram;
+
 	u8 m_p1 = 0xff;
+	u8 m_conf = 0;
+	u8 m_duart_op = 0xff;
 	u8 m_char_addr = 0;
 	u8 m_atr_latch = 0;
-	u8 m_duart_op = 0xff;
+	u8 m_lba = 0;
+	u8 m_lbf_bank = 0;
+	bool m_132col = false;
 	int m_row_y = 0;
 	int m_vlt_x = 0;
 	bool m_vlt = false;
 	bool m_drb = true;
 	bool m_row_loading = false;
 	bool m_cblank = true;
-	u8 m_conf = 0;
-	u8 m_lba = 0;
-	u8 m_lbf_bank = 0;
-	bool m_132col = false;
-	std::unique_ptr<u8[]> m_softchar;
-	std::unique_ptr<u8[]> m_lbf;
 	int m_host_txd = 1;
 	int m_host_rxd = 1;
-	int m_kbd_rxd = 1;
+	std::unique_ptr<u8[]> m_softchar;
+	std::unique_ptr<u8[]> m_lbf;
 
-	void p1_w(u8 data);
-	void conf_w(u8 data);
-	void duart_out_w(u8 data);
-	void set_columns();
+	void vt220a_palette(palette_device &palette) const;
+	uint32_t screen_update_vt220a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	const col_timing &timing() const { return m_132col ? TIMING_132 : TIMING_80; }
-	void char_addr_w(u8 data);
+	void set_columns();
 	offs_t lbf_addr(bool chr, u8 lba) const;
 	u8 lbf_out(bool chr, u8 lba) const;
+	int video_col(int x) const;
 	u8 dot(int col, int x, int line, bool &bold, bool &blink) const;
 	u8 video_out(int x, int y, bool &bold, bool &blink) const;
-	u8 duart_r(offs_t offset);
-	u8 vram_r(offs_t offset);
-	void vlt_w(int state);
-	void host_txd_w(int state);
-	void host_rxd_w(int state);
+
 	u8 p1_r();
-	void drb_w(int state);
-	int video_col(int x) const;
-	void cblank_w(int state);
+	void p1_w(u8 data);
+	void conf_w(u8 data);
+	void char_addr_w(u8 data);
 	u8 chargen_r(offs_t offset);
 	void chargen_w(offs_t offset, u8 data);
-	void vt220_data(address_map &map) ATTR_COLD;
-	void vt220_mem(address_map &map) ATTR_COLD;
+	u8 duart_r(offs_t offset);
+	void duart_out_w(u8 data);
+	void host_txd_w(int state);
+	void host_rxd_w(int state);
+	u8 vram_r(offs_t offset);
+	void vlt_w(int state);
+	void drb_w(int state);
+	void cblank_w(int state);
+
 	void vt220a_data(address_map &map) ATTR_COLD;
 	void vt220a_mem(address_map &map) ATTR_COLD;
 	void vt220a_vram(address_map &map) ATTR_COLD;
@@ -153,7 +174,7 @@ void vt220_state::vt220_mem(address_map &map)
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 }
 
-void vt220_state::vt220a_mem(address_map &map)
+void vt220a_state::vt220a_mem(address_map &map)
 {
 	map(0x0000, 0xffff).rom().region("maincpu", 0);
 }
@@ -165,27 +186,27 @@ void vt220_state::vt220_data(address_map &map)
 	map(0x3800, 0x380f).mirror(0xc7f0).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
 }
 
-void vt220_state::vt220a_data(address_map &map)
+void vt220a_state::vt220a_data(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x2000, 0x2fff).mirror(0xc000).ram().share("screen_ram"); // RAM 0/1 (A000-AFFF in the technical manual)
-	map(0x3000, 0x300f).mirror(0xc7f0).r(FUNC(vt220_state::duart_r)).w(m_duart, FUNC(scn2681_device::write)); // B7F0-B7FF
+	map(0x3000, 0x300f).mirror(0xc7f0).r(FUNC(vt220a_state::duart_r)).w(m_duart, FUNC(scn2681_device::write)); // B7F0-B7FF
 	map(0x8000, 0x8fff).mirror(0x4000).ram().share("attr_ram"); // attribute RAM 0/1
-	map(0x0800, 0x0800).mirror(0x47ff).w(FUNC(vt220_state::char_addr_w)); // 0FFF
-	map(0x0000, 0x0000).mirror(0x47ff).w(FUNC(vt220_state::conf_w)); // 07FF
+	map(0x0800, 0x0800).mirror(0x47ff).w(FUNC(vt220a_state::char_addr_w)); // 0FFF
+	map(0x0000, 0x0000).mirror(0x47ff).w(FUNC(vt220a_state::conf_w)); // 07FF
 	map(0x1000, 0x103f).mirror(0x47c0).rw(m_crtc, FUNC(crt9007_device::read), FUNC(crt9007_device::write)); // 1700-17FF
 	map(0x1800, 0x1800).mirror(0x47ff).nopw(); // 1FFF RESET TIM L: strobe resetting the timing generator, data ignored
 	map(0x9000, 0x90ff).mirror(0x4700).rw(m_nvr, FUNC(x2212_device::read), FUNC(x2212_device::write)); // 9700-97FF
-	map(0x9800, 0x980f).mirror(0x47f0).rw(FUNC(vt220_state::chargen_r), FUNC(vt220_state::chargen_w)); // 9FF0-9FFF
+	map(0x9800, 0x980f).mirror(0x47f0).rw(FUNC(vt220a_state::chargen_r), FUNC(vt220a_state::chargen_w)); // 9FF0-9FFF
 }
 
-offs_t vt220_state::lbf_addr(bool chr, u8 lba) const
+offs_t vt220a_state::lbf_addr(bool chr, u8 lba) const
 {
 	// E14 (2016): A10/A9 BNKS1/BNKS0, A8 ATR/CHR (high for character), A7-A0 LBA
 	return (m_lbf_bank << 9) | (chr ? 0x100 : 0) | lba;
 }
 
-u8 vt220_state::lbf_out(bool chr, u8 lba) const
+u8 vt220a_state::lbf_out(bool chr, u8 lba) const
 {
 	// CHRG LATCH2 (E20) takes the character address latch (E19), and the attribute path the attribute
 	// latch (E21), while LBF DISABLE H (P1.3) is high, otherwise the line buffer output
@@ -194,20 +215,20 @@ u8 vt220_state::lbf_out(bool chr, u8 lba) const
 	return m_lbf[lbf_addr(chr, lba)];
 }
 
-void vt220_state::vt220a_vram(address_map &map)
+void vt220a_state::vt220a_vram(address_map &map)
 {
 	// CRT9007 VA0-VA13 drive the CPU address bus during DMA
-	map(0x0000, 0x3fff).r(FUNC(vt220_state::vram_r));
+	map(0x0000, 0x3fff).r(FUNC(vt220a_state::vram_r));
 }
 
-int vt220_state::video_col(int x) const
+int vt220a_state::video_col(int x) const
 {
 	// the line buffer address counter is cleared by VLT and clocked by T5; -1 before VLT
 	const int dx = x - m_vlt_x;
 	return (dx < 0) ? -1 : dx / timing().width;
 }
 
-u8 vt220_state::vram_r(offs_t offset)
+u8 vt220a_state::vram_r(offs_t offset)
 {
 	// screen and attribute RAM see the same address; during VLT of a data row's top scan line the
 	// row goes into the line buffer, if the CPU has granted the bus (DMA L, P1.0, drives TSC high)
@@ -231,14 +252,14 @@ u8 vt220_state::vram_r(offs_t offset)
 	return chr;
 }
 
-void vt220_state::vlt_w(int state)
+void vt220a_state::vlt_w(int state)
 {
 	if (state && !m_vlt)
 		m_vlt_x = m_screen->hpos();
 	m_vlt = state;
 }
 
-void vt220_state::drb_w(int state)
+void vt220a_state::drb_w(int state)
 {
 	// DRB is active low for the scan line that loads a data row, and drives DMA REQ L on INT0
 	m_drb = state;
@@ -247,12 +268,12 @@ void vt220_state::drb_w(int state)
 	m_maincpu->set_input_line(MCS51_INT0_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
-void vt220_state::cblank_w(int state)
+void vt220a_state::cblank_w(int state)
 {
 	m_cblank = state;
 }
 
-u8 vt220_state::dot(int col, int x, int line, bool &bold, bool &blink) const
+u8 vt220a_state::dot(int col, int x, int line, bool &bold, bool &blink) const
 {
 	// one dot of the video stream: E30 gives the CPU the line buffer address and ALT SEL while
 	// EN CHR GEN RW H is set, otherwise the video side walks the row
@@ -279,7 +300,7 @@ u8 vt220_state::dot(int col, int x, int line, bool &bold, bool &blink) const
 	return on ^ BIT(m_conf, 0) ^ !BIT(atr, 5);
 }
 
-u8 vt220_state::video_out(int x, int y, bool &bold, bool &blink) const
+u8 vt220a_state::video_out(int x, int y, bool &bold, bool &blink) const
 {
 	// the video stream at beam position x, y: nothing before VLT or with DIS VIDEO H (OP7)
 	bold = blink = false;
@@ -289,7 +310,7 @@ u8 vt220_state::video_out(int x, int y, bool &bold, bool &blink) const
 	return dot(col, (x - m_vlt_x) % timing().width, y - m_row_y, bold, blink);
 }
 
-u8 vt220_state::duart_r(offs_t offset)
+u8 vt220a_state::duart_r(offs_t offset)
 {
 	if (offset == 0x0d && !machine().side_effects_disabled())
 	{
@@ -305,7 +326,7 @@ u8 vt220_state::duart_r(offs_t offset)
 	return m_duart->read(offset);
 }
 
-void vt220_state::p1_w(u8 data)
+void vt220a_state::p1_w(u8 data)
 {
 	// DMA L (P1.0) falling edge loads the character address latch into the line buffer
 	if (BIT(m_p1, 0) && !BIT(data, 0) && !BIT(data, 3))
@@ -314,18 +335,15 @@ void vt220_state::p1_w(u8 data)
 		m_lbf[lbf_addr(false, m_lba)] = m_atr_latch;
 	}
 	// NVR RECALL L (P1.1) and NVR STORE L (P1.2); the X2212 core takes them active high
-	if (m_nvr)
-	{
-		m_nvr->recall(!BIT(data, 1));
-		m_nvr->store(!BIT(data, 2));
-	}
+	m_nvr->recall(!BIT(data, 1));
+	m_nvr->store(!BIT(data, 2));
 	// RESET CRT L (P1.6)
-	if (m_crtc && BIT(m_p1, 6) && !BIT(data, 6))
+	if (BIT(m_p1, 6) && !BIT(data, 6))
 		m_crtc->reset();
 	m_p1 = data;
 }
 
-void vt220_state::conf_w(u8 data)
+void vt220a_state::conf_w(u8 data)
 {
 	// E26 (LS174) latches BAD0-5, bit order per firmware self-test (reverse of the sheet 2 Q labels):
 	// 0 NORM FIELD, 1 LBA CLRS, 2 EN CHR GEN RW, 3 ALT SEL, 4 RESET CMM, 5 LBA CLKS
@@ -335,7 +353,7 @@ void vt220_state::conf_w(u8 data)
 		m_duart->reset();
 	// E32 selects the host interface: E33 passes HOST TXD to the EIA driver only with ENA EIA,
 	// and the receive gating takes EIA RXD only then (20 mA loop not emulated: idles marking)
-	if (m_host && BIT(data, 6) != BIT(m_conf, 6))
+	if (BIT(data, 6) != BIT(m_conf, 6))
 	{
 		m_host->write_txd(BIT(data, 6) ? 1 : m_host_txd);
 		m_duart->rx_a_w(BIT(data, 6) ? 1 : m_host_rxd);
@@ -348,52 +366,47 @@ void vt220_state::conf_w(u8 data)
 		else if (BIT(m_conf, 5) && !BIT(data, 5))
 			m_lba++;
 	}
-	if (m_crtc)
-		m_screen->update_partial(m_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 	m_conf = data;
 }
 
-void vt220_state::host_txd_w(int state)
+void vt220a_state::host_txd_w(int state)
 {
 	m_host_txd = state;
 	m_host->write_txd(BIT(m_conf, 6) ? 1 : state);
 }
 
-void vt220_state::host_rxd_w(int state)
+void vt220a_state::host_rxd_w(int state)
 {
 	m_host_rxd = state;
 	if (!BIT(m_conf, 6))
 		m_duart->rx_a_w(state);
 }
 
-u8 vt220_state::p1_r()
+u8 vt220a_state::p1_r()
 {
 	// P1.7 CAR DET H from the EIA receiver; the rest are outputs or the PROD TEST pull-up
-	return m_host ? (0x7f | (!m_host->dcd_r() << 7)) : 0xff;
+	return 0x7f | (!m_host->dcd_r() << 7);
 }
 
-void vt220_state::duart_out_w(u8 data)
+void vt220a_state::duart_out_w(u8 data)
 {
-	if (m_crtc)
-		m_screen->update_partial(m_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 	m_duart_op = data;
-	if (m_host)
-	{
-		// modem signals active high at the DUART, as the TM's DUART block diagram shows them (inferred:
-		// the schematic's 9636/9639 symbols leave it open), and active low on the RS-232 port
-		m_host->write_rts(!BIT(data, 0)); // OP0 RTS H
-		m_host->write_dtr(!BIT(data, 1)); // OP1 DTR H
-		m_host->write_spds(!BIT(data, 2)); // OP2 SPD SEL H
-	}
+	// modem signals active high at the DUART, as the TM's DUART block diagram shows them (inferred:
+	// the schematic's 9636/9639 symbols leave it open), and active low on the RS-232 port
+	m_host->write_rts(!BIT(data, 0)); // OP0 RTS H
+	m_host->write_dtr(!BIT(data, 1)); // OP1 DTR H
+	m_host->write_spds(!BIT(data, 2)); // OP2 SPD SEL H
 	m_lbf_bank = (data >> 5) & 3; // OP5/OP6 BNK S0/S1
-	if (m_crtc && BIT(data, 4) != m_132col)
+	if (BIT(data, 4) != m_132col)
 	{
 		m_132col = BIT(data, 4); // OP4 132 COL H
 		set_columns();
 	}
 }
 
-void vt220_state::set_columns()
+void vt220a_state::set_columns()
 {
 	const col_timing &t = timing();
 	const int htotal = t.htotal * t.width;
@@ -403,14 +416,14 @@ void vt220_state::set_columns()
 	m_crtc->set_character_width(t.width);
 }
 
-void vt220_state::char_addr_w(u8 data)
+void vt220a_state::char_addr_w(u8 data)
 {
 	// E19 latches the character address from BAD0-7 and E21 the attribute from AD3-7
 	m_char_addr = data;
 	m_atr_latch = data & 0xf8;
 }
 
-u8 vt220_state::chargen_r(offs_t offset)
+u8 vt220a_state::chargen_r(offs_t offset)
 {
 	// ALT SEL H selects the soft character RAM; otherwise CHRG SEL H (P1.5) is the ROM's MSB
 	const u8 chr = lbf_out(true, m_lba);
@@ -419,7 +432,7 @@ u8 vt220_state::chargen_r(offs_t offset)
 	return m_chargen[(BIT(m_p1, 5) << 12) | (chr << 4) | offset];
 }
 
-void vt220_state::chargen_w(offs_t offset, u8 data)
+void vt220a_state::chargen_w(offs_t offset, u8 data)
 {
 	if (BIT(m_conf, 3) && BIT(m_conf, 2))
 		m_softchar[((lbf_out(true, m_lba) & 0x7f) << 4) | offset] = data;
@@ -431,30 +444,35 @@ INPUT_PORTS_END
 
 void vt220_state::machine_start()
 {
+	save_item(NAME(m_kbd_rxd));
+}
+
+void vt220a_state::machine_start()
+{
+	vt220_state::machine_start();
+
 	m_softchar = make_unique_clear<u8[]>(0x800);
 	m_lbf = make_unique_clear<u8[]>(0x800);
 
 	save_item(NAME(m_p1));
-	save_item(NAME(m_char_addr));
 	save_item(NAME(m_conf));
+	save_item(NAME(m_duart_op));
+	save_item(NAME(m_char_addr));
+	save_item(NAME(m_atr_latch));
 	save_item(NAME(m_lba));
 	save_item(NAME(m_lbf_bank));
 	save_item(NAME(m_132col));
-	save_item(NAME(m_atr_latch));
-	save_item(NAME(m_duart_op));
 	save_item(NAME(m_row_y));
 	save_item(NAME(m_vlt_x));
 	save_item(NAME(m_vlt));
 	save_item(NAME(m_drb));
 	save_item(NAME(m_row_loading));
+	save_item(NAME(m_cblank));
 	save_item(NAME(m_host_txd));
 	save_item(NAME(m_host_rxd));
-	save_item(NAME(m_kbd_rxd));
-	save_item(NAME(m_cblank));
-	if (m_crtc)
-		machine().save().register_postload(save_prepost_delegate(FUNC(vt220_state::set_columns), this));
 	save_pointer(NAME(m_softchar), 0x800);
 	save_pointer(NAME(m_lbf), 0x800);
+	machine().save().register_postload(save_prepost_delegate(FUNC(vt220a_state::set_columns), this));
 }
 
 void vt220_state::machine_reset()
@@ -471,7 +489,7 @@ uint32_t vt220_state::screen_update_vt220(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-uint32_t vt220_state::screen_update_vt220a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vt220a_state::screen_update_vt220a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const int xend = m_vlt_x + timing().cols * timing().width; // end of the row
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -486,7 +504,7 @@ uint32_t vt220_state::screen_update_vt220a(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-void vt220_state::vt220a_palette(palette_device &palette) const
+void vt220a_state::vt220a_palette(palette_device &palette) const
 {
 	// E49 open-collector NANDs of the video with TBLK L into R17 1.8K, with BLINK ATR into R15 2.7K and
 	// with BOLD ATR into R16 2K (sheet 5); intensity taken as the summed conductance
@@ -516,7 +534,6 @@ void vt220_state::vt220(machine_config &config)
 
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
 	m_duart->irq_cb().set_inputline(m_maincpu, MCS51_INT1_LINE);
-	m_duart->outport_cb().set(FUNC(vt220_state::duart_out_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, m_screen));
@@ -533,35 +550,37 @@ void vt220_state::vt220(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("16K");
 }
 
-void vt220_state::vt220a(machine_config &config)
+void vt220a_state::vt220a(machine_config &config)
 {
 	vt220(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &vt220_state::vt220a_mem);
-	m_maincpu->set_addrmap(AS_DATA, &vt220_state::vt220a_data);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt220a_state::vt220a_mem);
+	m_maincpu->set_addrmap(AS_DATA, &vt220a_state::vt220a_data);
 
 	// P1.4 PROD TEST is low only with the factory fixture on J1-1
-	m_maincpu->port_in_cb<1>().set(FUNC(vt220_state::p1_r));
-	m_maincpu->port_out_cb<1>().set(FUNC(vt220_state::p1_w));
+	m_maincpu->port_in_cb<1>().set(FUNC(vt220a_state::p1_r));
+	m_maincpu->port_out_cb<1>().set(FUNC(vt220a_state::p1_w));
 
 	// T5 character clock: dot clock / dots per character; 80 columns at power-up, set_columns switches
 	constexpr col_timing t = TIMING_80;
 	CRT9007(config, m_crtc, t.dot / t.width);
-	m_crtc->set_addrmap(0, &vt220_state::vt220a_vram);
+	m_crtc->set_addrmap(0, &vt220a_state::vt220a_vram);
 	m_crtc->set_character_width(t.width);
 	m_crtc->set_screen(m_screen);
 	m_screen->set_raw(t.dot, t.htotal * t.width, t.hdelay * t.width, (t.hdelay + t.cols) * t.width, VTOTAL, VSTART, VSTART + VVIS);
 	m_crtc->vs_callback().set_inputline(m_maincpu, MCS51_T0_LINE);
 	m_crtc->hs_callback().set_inputline(m_maincpu, MCS51_T1_LINE);
-	m_crtc->drb_callback().set(FUNC(vt220_state::drb_w));
-	m_crtc->vlt_callback().set(FUNC(vt220_state::vlt_w));
+	m_crtc->drb_callback().set(FUNC(vt220a_state::drb_w));
+	m_crtc->vlt_callback().set(FUNC(vt220a_state::vlt_w));
+	m_crtc->cblank_callback().set(FUNC(vt220a_state::cblank_w));
 	X2212(config, m_nvr); // E17
 
 	// TM table 5-1: channel A host (J3, EIA or 20 mA), channel B printer; modem lines as in duart_out_w
-	m_duart->a_tx_cb().set(FUNC(vt220_state::host_txd_w));
+	m_duart->outport_cb().set(FUNC(vt220a_state::duart_out_w));
+	m_duart->a_tx_cb().set(FUNC(vt220a_state::host_txd_w));
 	m_duart->b_tx_cb().set(m_printer, FUNC(rs232_port_device::write_txd));
 
 	RS232_PORT(config, m_host, default_rs232_devices, nullptr);
-	m_host->rxd_handler().set(FUNC(vt220_state::host_rxd_w));
+	m_host->rxd_handler().set(FUNC(vt220a_state::host_rxd_w));
 	m_host->cts_handler().set(m_duart, FUNC(scn2681_device::ip0_w)).invert(); // CTS H
 	m_host->dsr_handler().set(m_duart, FUNC(scn2681_device::ip1_w)).invert(); // DSR H
 	m_host->si_handler().set(m_duart, FUNC(scn2681_device::ip2_w)).invert(); // SPD IND H
@@ -570,10 +589,8 @@ void vt220_state::vt220a(machine_config &config)
 	m_printer->rxd_handler().set(m_duart, FUNC(scn2681_device::rx_b_w));
 	m_printer->dsr_handler().set(m_duart, FUNC(scn2681_device::ip5_w)).invert(); // PTR DSR H
 
-	m_crtc->cblank_callback().set(FUNC(vt220_state::cblank_w));
-	m_screen->set_screen_update(FUNC(vt220_state::screen_update_vt220a));
-	m_screen->set_palette("palette_a");
-	PALETTE(config, "palette_a", FUNC(vt220_state::vt220a_palette), 5);
+	m_screen->set_screen_update(FUNC(vt220a_state::screen_update_vt220a));
+	PALETTE(config.replace(), "palette", FUNC(vt220a_state::vt220a_palette), 5);
 }
 
 /* ROM definitions */
@@ -615,6 +632,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY                          FULLNAME               FLAGS */
-COMP( 1983, vt220,  0,      0,      vt220,   vt220, vt220_state, empty_init, "Digital Equipment Corporation", "VT220 (Version 2.3)", MACHINE_NOT_WORKING )
-COMP( 1983, vt220a, vt220,  0,      vt220a,  vt220, vt220_state, empty_init, "Digital Equipment Corporation", "VT220 (Version 2.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE         INIT        COMPANY                          FULLNAME               FLAGS */
+COMP( 1983, vt220,  0,      0,      vt220,   vt220, vt220_state,  empty_init, "Digital Equipment Corporation", "VT220 (Version 2.3)", MACHINE_NOT_WORKING )
+COMP( 1983, vt220a, vt220,  0,      vt220a,  vt220, vt220a_state, empty_init, "Digital Equipment Corporation", "VT220 (Version 2.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
