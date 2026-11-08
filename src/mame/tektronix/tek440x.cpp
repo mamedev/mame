@@ -531,7 +531,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 		{
 			LOGMASKED(LOG_MMU,"memory_r: m_map_control updated 0x%04x\n", m_latched_map_control);
 		}
-		if (!machine().side_effects_disabled()
+		if (!machine().side_effects_disabled())
 		{
 			m_map_control &= ~0x1f;
 			m_map_control |= m_latched_map_control & 0x1f;
@@ -544,7 +544,7 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 	// not in buserr interrupt, only in User mode, and VM enabled
 	if (!m_inbuserr && (m_maincpu->get_fc() & 4) == 0 && BIT(m_map_control, MAP_VM_ENABLE))
 	{
-		if (!machine().side_effects_disabled()
+		if (!machine().side_effects_disabled())
 		{
 			// is !cpuWr
 			m_map_control &= ~(1 << MAP_CPU_WR);
@@ -606,7 +606,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 		{
 			LOGMASKED(LOG_MMU,"memory_w: m_map_control updated 0x%04x\n", m_latched_map_control);
 		}
-		if (!machine().side_effects_disabled()
+		if (!machine().side_effects_disabled())
 		{
 			m_map_control &= ~0x1f;
 			m_map_control |= m_latched_map_control & 0x1f;
@@ -852,6 +852,7 @@ u16 tek440x_state::fpu_r(offs_t offset)
 			if (!machine().side_effects_disabled())
 			{
 				result = m_fpu->slow_read();
+			}
 			else
 			{
 				// page 2.1.72   FPC.pal:   IF (/Wr*FPSel) /D.15 = /FP.15*/Busy
