@@ -14,8 +14,22 @@
     Not implemented (logged when selected): 9-bit characters (M, T8, R8),
     receiver wake-up (RWU, WAKE) and break (SBK).  IDLE never sets.  The
     receiver is a plain diserial receiver without the 16x oversampled start
-    bit verification and majority vote (5.4), so NF never sets.  TDO isn't
-    released to high impedance when TE clears: it stays high.
+    bit verification and majority vote (5.4), so NF never sets, and it
+    doesn't recover from a framing error as 5.5 describes: it waits for the
+    next falling edge.  TDO isn't released to high impedance when TE clears:
+    it stays high.
+
+    Inferred or approximate:
+    - A frame's start bit goes out a bit time after the byte moves to the
+      shifter, so a byte written during a stop bit stretches that stop bit,
+      and the line idles 11 bit times after a 10 bit preamble.
+    - TC stays as it was while the preamble goes out; the data sheet only
+      says when it sets.
+    - A BAUD change in mid-frame ends the frame (diserial drops it): the
+      line goes high and the frame ends a bit time later.  A preamble or
+      stop bit in progress keeps its old length.
+    - SCDR's two registers are left alone by reset (table 3-1 doesn't list
+      them).
 
 ***************************************************************************/
 
@@ -30,6 +44,14 @@
 #include "logmacro.h"
 
 #define LOGSCI(...)     LOGMASKED(LOG_SCI, __VA_ARGS__)
+
+
+namespace {
+
+// 5.7.5: SCP1:0 divide the internal processor clock by 1, 3, 4 or 13
+constexpr u8 SCP_DIVISOR[4] = { 1, 3, 4, 13 };
+
+} // anonymous namespace
 
 
 DEFINE_DEVICE_TYPE(M68HC05_SCI, m68hc05_sci_device, "m68hc05_sci", "Motorola M68HC05 SCI")
@@ -88,10 +110,14 @@ void m68hc05_sci_device::device_start()
 
 void m68hc05_sci_device::device_reset()
 {
-	// table 3-1: TE, RE, TIE, TCIE, RIE, ILIE, RWU, SBK, the receive flags and SCP1:0 are
-	// cleared, TDRE and TC set; 5.7.5: SCR2:0 are not affected.  SCCR1 and the data
-	// registers aren't listed, so they are left alone (inferred).
-	m_baud &= 0x07;
+	// table 3-1: SCP1:0 are cleared; 5.7.5: SCR2:0 are not affected.  The shifters stop.
+	m_baud &= BAUD_SCR;
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	m_divisor = divisor();
+	set_rate(bit_time());
+
+	// table 3-1: TE, RE, TIE, TCIE, RIE, ILIE, RWU, SBK and the receive flags are cleared,
+	// TDRE and TC set; 5.7.2: R8, T8, M and WAKE are not affected
 	m_sccr2 = 0x00;
 	m_scsr = SCSR_TDRE | SCSR_TC;
 	m_scsr_seen = 0x00;
@@ -101,12 +127,6 @@ void m68hc05_sci_device::device_reset()
 	m_preamble_pending = false;
 	m_stop_active = false;
 	m_line_timer->adjust(attotime::never);
-
-	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	m_divisor = 0;
-	update_rate();
-	transmit_register_reset();
-	receive_register_reset();
 	m_tdo_cb(1);
 
 	m_irq_state = false;
@@ -115,40 +135,46 @@ void m68hc05_sci_device::device_reset()
 
 void m68hc05_sci_device::device_clock_changed()
 {
-	if (m_line_timer) // not before start
-	{
-		m_divisor = 0;
-		update_rate();
-	}
+	if (started())
+		update_rate(true);
 }
 
 
 u8 m68hc05_sci_device::baud_r()
 {
-	return m_baud & BAUD_MASK;
+	return m_baud;
 }
 
 void m68hc05_sci_device::baud_w(u8 data)
 {
+	if (machine().side_effects_disabled())
+	{
+		set_baud(data);
+		return;
+	}
+
 	m_baud = data & BAUD_MASK;
 	update_rate();
 }
 
 u8 m68hc05_sci_device::sccr1_r()
 {
-	return m_sccr1 & SCCR1_MASK;
+	return m_sccr1;
 }
 
 void m68hc05_sci_device::sccr1_w(u8 data)
 {
 	u8 const rise(data & ~m_sccr1);
-	if (rise & SCCR1_M)
-		logerror("%s: 9-bit characters selected (SCCR1 M), not supported\n", machine().describe_context());
-	if (rise & SCCR1_WAKE)
-		logerror("%s: address mark wake-up selected (SCCR1 WAKE), not supported\n", machine().describe_context());
+	if (!machine().side_effects_disabled())
+	{
+		if (rise & SCCR1_M)
+			logerror("%s: 9-bit characters selected (SCCR1 M), not supported\n", machine().describe_context());
+		if (rise & SCCR1_WAKE)
+			logerror("%s: address mark wake-up selected (SCCR1 WAKE), not supported\n", machine().describe_context());
+	}
 
-	// R8 (b7) is read only
-	m_sccr1 = (m_sccr1 & 0x80) | (data & SCCR1_MASK & 0x7f);
+	// R8 is read only
+	m_sccr1 = (m_sccr1 & SCCR1_R8) | (data & SCCR1_MASK & ~SCCR1_R8);
 }
 
 u8 m68hc05_sci_device::sccr2_r()
@@ -158,6 +184,12 @@ u8 m68hc05_sci_device::sccr2_r()
 
 void m68hc05_sci_device::sccr2_w(u8 data)
 {
+	if (machine().side_effects_disabled())
+	{
+		set_sccr2(data);
+		return;
+	}
+
 	u8 const rise(data & ~m_sccr2);
 	m_sccr2 = data;
 
@@ -168,12 +200,10 @@ void m68hc05_sci_device::sccr2_w(u8 data)
 
 	// 5.7.3 B3: setting TE from a cleared state sends a preamble, after the byte in the
 	// shifter if there is one
-	if (rise & SCCR2_TE)
+	if ((rise & SCCR2_TE) && !m_preamble_active)
 	{
 		LOGSCI("%s: transmitter enabled\n", machine().describe_context());
-		if (m_preamble_active)
-			;
-		else if (tx_busy() || m_stop_active)
+		if (tx_busy() || m_stop_active)
 			m_preamble_pending = true;
 		else
 			start_preamble();
@@ -186,7 +216,7 @@ u8 m68hc05_sci_device::scsr_r()
 {
 	if (!machine().side_effects_disabled())
 		m_scsr_seen = m_scsr;
-	return m_scsr & SCSR_MASK;
+	return m_scsr;
 }
 
 u8 m68hc05_sci_device::scdr_r()
@@ -222,7 +252,8 @@ void m68hc05_sci_device::scdr_w(u8 data)
 
 	if (te() && m_tdr_full && !tx_busy() && !m_preamble_pending)
 	{
-		// a frame may follow the last one's stop bit straight away
+		// during the last frame's stop bit, the new frame's start bit goes out a bit time
+		// after this write, stretching the stop bit (inferred)
 		if (m_stop_active)
 		{
 			m_stop_active = false;
@@ -264,17 +295,12 @@ void m68hc05_sci_device::tra_callback()
 void m68hc05_sci_device::tra_complete()
 {
 	// diserial calls this as the stop bit starts.  A byte waiting in TDR starts its frame
-	// now: its start bit goes out a bit time later, after the stop bit.  Otherwise the
+	// now, and its start bit goes out a bit time later, after the stop bit.  Otherwise the
 	// line is timed to the end of the stop bit.
 	if (te() && m_tdr_full && !m_preamble_pending)
-	{
 		start_frame();
-	}
 	else
-	{
-		m_stop_active = true;
-		m_line_timer->adjust(attotime::from_ticks(m_divisor, clock()), LINE_STOP);
-	}
+		start_stop_bit();
 }
 
 TIMER_CALLBACK_MEMBER(m68hc05_sci_device::line_done)
@@ -345,21 +371,35 @@ void m68hc05_sci_device::update_irq()
 	}
 }
 
-void m68hc05_sci_device::update_rate()
+
+u32 m68hc05_sci_device::divisor() const
 {
-	// 5.7.5: a bit time is 16 * SCP * 2^SCR E clocks, SCP being 1, 3, 4 or 13
-	static constexpr u8 PRESCALE[4] = { 1, 3, 4, 13 };
-	u32 const divisor(16 * PRESCALE[(m_baud >> 4) & 3] << (m_baud & 7));
-	if (divisor != m_divisor)
+	// 5.7.5: a bit time is 16 * SCP * 2^SCR E clocks
+	return (16 * SCP_DIVISOR[(m_baud >> 4) & 3]) << (m_baud & BAUD_SCR);
+}
+
+attotime m68hc05_sci_device::bit_time() const
+{
+	return attotime::from_ticks(m_divisor, clock());
+}
+
+void m68hc05_sci_device::update_rate(bool force)
+{
+	u32 const div(divisor());
+	if (force || (div != m_divisor))
 	{
-		// diserial drops the frame in the shifter on a rate change: end it here (inferred,
-		// the data sheet doesn't say what a rate change in mid-frame does)
 		bool const busy(!is_transmit_register_empty());
-		m_divisor = divisor;
+		m_divisor = div;
 		LOGSCI("bit time %u E clocks\n", m_divisor);
-		set_rate(clock(), m_divisor);
+		set_rate(bit_time());
+
+		// diserial drops the frame in the shifter: release the line and end the frame a bit
+		// time later (inferred, the data sheet doesn't cover a rate change in mid-frame)
 		if (busy)
-			tra_complete();
+		{
+			m_tdo_cb(1);
+			start_stop_bit();
+		}
 	}
 }
 
@@ -372,6 +412,12 @@ void m68hc05_sci_device::start_frame()
 	set_flags(SCSR_TDRE);
 }
 
+void m68hc05_sci_device::start_stop_bit()
+{
+	m_stop_active = true;
+	m_line_timer->adjust(bit_time(), LINE_STOP);
+}
+
 void m68hc05_sci_device::start_preamble()
 {
 	// 5.7.3 B3: ten (eleven with M) bit times of idle line before the data; the line is
@@ -379,5 +425,5 @@ void m68hc05_sci_device::start_preamble()
 	LOGSCI("preamble\n");
 	m_preamble_pending = false;
 	m_preamble_active = true;
-	m_line_timer->adjust(attotime::from_ticks(u64(m_divisor) * ((m_sccr1 & SCCR1_M) ? 11 : 10), clock()), LINE_PREAMBLE);
+	m_line_timer->adjust(bit_time() * ((m_sccr1 & SCCR1_M) ? 11 : 10), LINE_PREAMBLE);
 }

@@ -24,6 +24,7 @@ class m68hc05_sci_device : public device_t, public device_serial_interface
 public:
 	// implemented bits, for the host's debugger state
 	static constexpr u8 BAUD_MASK = 0x37;
+	static constexpr u8 BAUD_SCR = 0x07;
 	static constexpr u8 SCCR1_MASK = 0xd8;
 	static constexpr u8 SCSR_MASK = 0xfe;
 
@@ -60,6 +61,8 @@ protected:
 private:
 	enum : u8
 	{
+		SCCR1_R8    = 0x80,
+		SCCR1_T8    = 0x40,
 		SCCR1_M     = 0x10,
 		SCCR1_WAKE  = 0x08,
 
@@ -110,9 +113,11 @@ private:
 	void set_flags(u8 mask);
 	void clear_flags(u8 mask);
 	void update_irq();
-	void update_rate();
-	void next_frame();
+	u32 divisor() const;
+	attotime bit_time() const;
+	void update_rate(bool force = false);
 	void start_frame();
+	void start_stop_bit();
 	void start_preamble();
 
 	devcb_write_line    m_tdo_cb;

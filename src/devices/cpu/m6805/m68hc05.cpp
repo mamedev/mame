@@ -787,7 +787,6 @@ u8 m68hc05_device::port_value(unsigned offset) const
 	return (m_port_latch[offset] & m_port_ddr[offset]) | (m_port_input[offset] & ~m_port_ddr[offset]);
 }
 
-
 void m68hc05_device::spi_irq_w(int state)
 {
 	if (state)
