@@ -4,7 +4,12 @@
 
     DEC VT220
 
-    30/06/2009 Skeleton driver.
+    vt220a (Version 2.1, models A-C) follows the Technical Manual and the
+    schematic: CRT9007 with the line buffer, character generator and soft
+    characters, X2212 NVR, host and printer ports, and the LK201.  The
+    CRT9007 has no smooth scroll yet, so smooth scroll moves a row at a time.
+    vt220 (Version 2.3, probably models D-F) shows nothing: its video, NVR
+    and memory map beyond the RAM and DUART are not known.
 
     The VT220 exists in two major hardware revisions. The Pocket Service
     Guide has separate lists of components for earlier and later models,
@@ -45,6 +50,13 @@
 
 
 namespace {
+
+// vt220a video timing as the firmware programs the CRT9007, for 80 and 132 columns: dot clock
+// (Y3, Y4), dots per character, horizontal total and delay in characters, visible characters
+struct col_timing { XTAL dot; int width, htotal, hdelay, cols; };
+constexpr col_timing TIMING_80 { 15.288_MHz_XTAL, 10, 98, 12, 80 };
+constexpr col_timing TIMING_132 { 22.896_MHz_XTAL, 9, 163, 22, 132 };
+constexpr int VTOTAL = 260, VSTART = 16, VVIS = 240; // vertical delay (R05 - 1), then 24 rows of 10 scan lines
 
 class vt220_state : public driver_device
 {
@@ -107,6 +119,7 @@ private:
 	void conf_w(u8 data);
 	void duart_out_w(u8 data);
 	void set_columns();
+	const col_timing &timing() const { return m_132col ? TIMING_132 : TIMING_80; }
 	void char_addr_w(u8 data);
 	offs_t lbf_addr(bool chr, u8 lba) const;
 	u8 char_code() const;
@@ -186,7 +199,7 @@ void vt220_state::vt220a_vram(address_map &map)
 int vt220_state::video_col(int x) const
 {
 	// the line buffer address counter is cleared by VLT and clocked by T5
-	return (x - m_vlt_x) / (m_132col ? 9 : 10);
+	return (x - m_vlt_x) / timing().width;
 }
 
 u8 vt220_state::vram_r(offs_t offset)
@@ -270,7 +283,7 @@ u8 vt220_state::duart_r(offs_t offset)
 		const bool blank = m_cblank || BIT(m_duart_op, 7); // OP7 DIS VIDEO H
 		bool bold = false, blink = false, video = false;
 		if (!blank)
-			video = dot(video_col(x), (x - m_vlt_x) % (m_132col ? 9 : 10), y - m_row_y, bold, blink);
+			video = dot(video_col(x), (x - m_vlt_x) % timing().width, y - m_row_y, bold, blink);
 		m_duart->ip3_w(!(video || bold || blink));
 		m_duart->ip4_w(!blank);
 	}
@@ -366,17 +379,12 @@ void vt220_state::duart_out_w(u8 data)
 
 void vt220_state::set_columns()
 {
-	// dot clock 22.896 MHz (Y4) at 9 dots per character for 132 columns, 15.288 MHz (Y3) at 10 for 80;
-	// horizontal totals are as the firmware programs the CRT9007
-	const XTAL dot = m_132col ? 22.896_MHz_XTAL : 15.288_MHz_XTAL;
-	const int width = m_132col ? 9 : 10;
-	const int htotal = (m_132col ? 163 : 98) * width;
-	const int hstart = (m_132col ? 22 : 12) * width; // horizontal delay as programmed
-	const int hvis = (m_132col ? 132 : 80) * width;
-	const int vstart = 16; // vertical delay as programmed (R05 - 1), then 24 rows of 10 scan lines
-	m_screen->configure(htotal, 260, rectangle(hstart, hstart + hvis - 1, vstart, vstart + 240 - 1), attotime::from_ticks(htotal * 260, dot));
-	m_crtc->set_unscaled_clock(dot / width);
-	m_crtc->set_character_width(width);
+	const col_timing &t = timing();
+	const int htotal = t.htotal * t.width;
+	const int hstart = t.hdelay * t.width;
+	m_screen->configure(htotal, VTOTAL, rectangle(hstart, hstart + t.cols * t.width - 1, VSTART, VSTART + VVIS - 1), attotime::from_ticks(htotal * VTOTAL, t.dot));
+	m_crtc->set_unscaled_clock(t.dot / t.width);
+	m_crtc->set_character_width(t.width);
 }
 
 void vt220_state::char_addr_w(u8 data)
@@ -448,8 +456,8 @@ uint32_t vt220_state::screen_update_vt220(screen_device &screen, bitmap_ind16 &b
 
 uint32_t vt220_state::screen_update_vt220a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const int width = m_132col ? 9 : 10;
-	const int cols = m_132col ? 132 : 80;
+	const int width = timing().width;
+	const int cols = timing().cols;
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		u16 *const pix = &bitmap.pix(y);
@@ -487,8 +495,7 @@ void vt220_state::vt220(machine_config &config)
 	I8051(config, m_maincpu, XTAL(11'059'200)); // from schematic for earlier version
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt220_state::vt220_mem);
 	m_maincpu->set_addrmap(AS_DATA, &vt220_state::vt220_data);
-	m_maincpu->port_in_cb<1>().set_constant(0xff); // P1.4 PROD TEST low only from factory fixture on J1-1
-	m_maincpu->port_out_cb<1>().set(FUNC(vt220_state::p1_w));
+	m_maincpu->port_in_cb<1>().set_constant(0); // ???
 
 	// TM 4.2.8: LK201 on the 8051 UART, through EIA drivers and receivers at both ends
 	m_maincpu->port_in_cb<3>().set([this] () -> u8 { return 0xfe | m_kbd_rxd; }); // P3.0 RXD from KBR
@@ -521,12 +528,17 @@ void vt220_state::vt220a(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt220_state::vt220a_mem);
 	m_maincpu->set_addrmap(AS_DATA, &vt220_state::vt220a_data);
 
-	// T5 character clock: 15.288 MHz (Y3) / 10 dots at 80 columns; 22.896 MHz (Y4) / 9 at 132 not yet switched
-	CRT9007(config, m_crtc, 15.288_MHz_XTAL / 10);
+	// P1.4 PROD TEST is low only with the factory fixture on J1-1
+	m_maincpu->port_in_cb<1>().set(FUNC(vt220_state::p1_r));
+	m_maincpu->port_out_cb<1>().set(FUNC(vt220_state::p1_w));
+
+	// T5 character clock: dot clock / dots per character; 80 columns at power-up, set_columns switches
+	constexpr col_timing t = TIMING_80;
+	CRT9007(config, m_crtc, t.dot / t.width);
 	m_crtc->set_addrmap(0, &vt220_state::vt220a_vram);
-	m_crtc->set_character_width(10);
+	m_crtc->set_character_width(t.width);
 	m_crtc->set_screen(m_screen);
-	m_screen->set_raw(15.288_MHz_XTAL, 980, 120, 920, 260, 16, 256);
+	m_screen->set_raw(t.dot, t.htotal * t.width, t.hdelay * t.width, (t.hdelay + t.cols) * t.width, VTOTAL, VSTART, VSTART + VVIS);
 	m_crtc->vs_callback().set_inputline(m_maincpu, MCS51_T0_LINE);
 	m_crtc->hs_callback().set_inputline(m_maincpu, MCS51_T1_LINE);
 	m_crtc->drb_callback().set(FUNC(vt220_state::drb_w));
@@ -534,7 +546,6 @@ void vt220_state::vt220a(machine_config &config)
 	X2212(config, m_nvr); // E17
 
 	// TM table 5-1: channel A host (J3, EIA or 20 mA), channel B printer
-	m_maincpu->port_in_cb<1>().set(FUNC(vt220_state::p1_r));
 	m_duart->a_tx_cb().set(FUNC(vt220_state::host_txd_w));
 	m_duart->b_tx_cb().set(m_printer, FUNC(rs232_port_device::write_txd));
 
@@ -585,7 +596,7 @@ ROM_START(vt220a)
 	// this ROM is listed in the schematics
 	ROM_LOAD("23-247e4.e13", 0x0000, 0x2000, NO_DUMP)
 #endif
-	ROM_LOAD("23-348e4.e13", 0x0000, 0x2000, CRC(994f3e37) SHA1(fe72a9fe9adb3a24743a6288d88ae07570cfea9a)) // this can maybe be read as well as a read/writable ram for custom characters which lives ?above? it in chargen address space by setting a bit in a config register. I haven't figured out where in 8051 address space it appears when readable nor where the ram appears.
+	ROM_LOAD("23-348e4.e13", 0x0000, 0x2000, CRC(994f3e37) SHA1(fe72a9fe9adb3a24743a6288d88ae07570cfea9a)) // CPU reads at 9800 (chargen_r), the soft character RAM there with ALT SEL
 ROM_END
 
 } // anonymous namespace
