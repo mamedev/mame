@@ -151,13 +151,13 @@ void lk201_device::device_add_mconfig(machine_config &config)
 	m_maincpu->portc_r().set_constant(0x00);
 	m_maincpu->portc_w().set([this] (offs_t, uint8_t data, uint8_t mask) { portc_w(data, mask); });
 
-	// the SPI shifts those registers
+	// the SPI shifts those registers; MISO is PD2, which the SPI samples through the port D read
 	m_maincpu->spi_sck().set([this] (int state) { sck_w(state); });
 	m_maincpu->spi_mosi().set([this] (int state) { mosi_w(state); });
-	m_maincpu->spi_miso().set([this] () { return miso_r(); });
+	m_maincpu->portd_r().set([this] () { return portd_r(); });
 
 	// the SCI is the serial line to the host
-	m_maincpu->tdo().set([this] (int state) { m_tx_handler(state); });
+	m_maincpu->sci_tdo().set([this] (int state) { m_tx_handler(state); });
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_speaker, 2000); // clocked by a 555 timer at E8, the volume of the beep is controllable by: (8051 model) P2.0 thru P2.3, or (6805 model) the upper 4 bits of the LED data latch
@@ -465,8 +465,6 @@ lk201_device::lk201_device(const machine_config &mconfig, const char *tag, devic
 
 void lk201_device::device_start()
 {
-	m_beep_hold = timer_alloc(FUNC(lk201_device::beep_hold_done), this);
-
 	save_item(NAME(m_rows));
 	save_item(NAME(m_kbd_load));
 	save_item(NAME(m_latch_strobe));
@@ -474,7 +472,6 @@ void lk201_device::device_start()
 	save_item(NAME(m_mosi));
 	save_item(NAME(m_kbd_sr));
 	save_item(NAME(m_led_sr));
-	save_item(NAME(m_beep_on));
 }
 
 
@@ -493,8 +490,6 @@ void lk201_device::device_reset()
 	m_mosi = 0;
 	m_kbd_sr = 0;
 	m_led_sr = 0;
-	m_beep_on = false;
-	m_beep_hold->adjust(attotime::never);
 
 	update_latch();
 }
@@ -583,23 +578,13 @@ void lk201_device::update_latch()
 	case 0x90: level = 7; break; // 1
 	default: level = -1; break;
 	}
-	// Beeps shorter than about 20 ms don't come out of the sound system, and a key click is
-	// 2 ms, so a beep is held for at least 25 ms (not something the hardware does).
-	m_beep_on = level >= 0;
-	if (m_beep_on)
+	if (level >= 0)
 	{
 		m_speaker->set_state(1);
-		m_speaker->set_output_gain(0, level ? (100 - (12 * level)) / 100.0f : 100.0f);
-		m_beep_hold->adjust(attotime::from_msec(25));
+		m_speaker->set_output_gain(0, (100 - (12 * level)) / 100.0f);
 	}
-	else if (!m_beep_hold->enabled())
+	else
 	{
 		m_speaker->set_state(0);
 	}
-}
-
-TIMER_CALLBACK_MEMBER(lk201_device::beep_hold_done)
-{
-	if (!m_beep_on)
-		m_speaker->set_state(0);
 }

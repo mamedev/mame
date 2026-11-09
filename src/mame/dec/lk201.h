@@ -39,7 +39,7 @@ public:
 
 	// serial line to and from the host, through the MCU's SCI
 	auto tx_handler() { return m_tx_handler.bind(); }
-	void rx_w(int state) { m_maincpu->rdi_w(state); }
+	void rx_w(int state) { m_maincpu->sci_rdi_w(state); }
 
 protected:
 	// device-level overrides
@@ -54,13 +54,11 @@ private:
 	void portc_w(uint8_t data, uint8_t mask);
 	void sck_w(int state);
 	void mosi_w(int state) { m_mosi = state; }
-	int miso_r() { return BIT(m_kbd_sr, 7); }
+	uint8_t portd_r() { return BIT(m_kbd_sr, 7) << 2; } // PD2 is MISO
 
 	uint8_t scan_matrix();
 	void update_matrix_load();
 	void update_latch();
-
-	TIMER_CALLBACK_MEMBER(beep_hold_done);
 
 	required_device<m68hc05c4_device> m_maincpu;
 	required_device<beep_device> m_speaker;
@@ -79,8 +77,6 @@ private:
 	int m_mosi;
 	uint8_t m_kbd_sr;       // matrix column input shift register
 	uint8_t m_led_sr;       // LED and bell volume output shift register
-	emu_timer *m_beep_hold;
-	bool m_beep_on;
 
 	devcb_write_line m_tx_handler;
 };
