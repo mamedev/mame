@@ -1056,9 +1056,12 @@ protected:
 	// device_execute_interface overrides
 	virtual void execute_run() override;
 
+	// Tick all synchronous peripherals attached to this MCU by one clk_io cycle.
+	virtual void tick_peripherals();
+
 	// address maps
 	void base_internal_map(address_map &map) ATTR_COLD;
-
+	
 	// Miscellaneous registers
 
 	// TODO: which regs are common on the classic AVR8s?
@@ -1161,7 +1164,6 @@ protected:
 	// timers
 	optional_device_array<avr8_base_timer_device, 6> m_timers; // optional, because some timers will almost certainly not be present
 	required_device<avr8_10bit_prescaler_device> m_syncprescale;
-	optional_device<avr8_fakertc_async_controller_device> m_asyncunit;
 };
 
 // ======================> megaavr_classic_base_device
@@ -1188,15 +1190,47 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// GTCCR on most of the classic megaAVRs is pretty much the same
-	void gtccr_w(uint8_t data);
-	uint8_t gtccr_r();
+	virtual void gtccr_w(uint8_t data);
+	virtual uint8_t gtccr_r();
 
 	void megaavr_classic_base_internal_map(address_map &map) ATTR_COLD;
 
 	// GTCCR flags, MUST BE SAVESTATE-ABLE
 	bool m_tsm;
-	bool m_psrasy;
 	bool m_psrsync;
+};
+
+
+// ======================> megaavr_classic_with_async_unit_base_device
+
+// Subdevices of the classic megaAVRs that include the common timer 2 async unit go through here.
+class megaavr_classic_with_async_unit_base_device : public megaavr_classic_base_device
+{
+
+protected:
+	megaavr_classic_with_async_unit_base_device(const machine_config &mconfig,
+												const char *tag,
+												device_t *owner,
+												uint32_t clock,
+												const device_type type,
+												uint32_t address_mask,
+												address_map_constructor internal_map);
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	virtual void tick_peripherals() override;
+
+	virtual void gtccr_w(uint8_t data) override;
+	virtual uint8_t gtccr_r() override;
+
+	void megaavr_classic_with_async_unit_base_internal_map(address_map &map) ATTR_COLD;
+
+	// GTCCR flags, MUST BE SAVESTATE-ABLE
+	bool m_psrasy;
+
+	required_device<avr8_megaavr_fakertc_async_controller_device> m_asyncunit;
 };
 
 // device type definition
@@ -1215,7 +1249,7 @@ DECLARE_DEVICE_TYPE(ATMEGA2560,  atmega2560_device)
 // Classic ATMegax8 series devices
 ///////////////////////////////////////////////////////////////
 
-class atmegax8_base_device : public megaavr_classic_base_device
+class atmegax8_base_device : public megaavr_classic_with_async_unit_base_device
 {
 protected:
 	// construction/destruction
@@ -1373,7 +1407,7 @@ protected:
 // Classic ATMegax4 series devices
 ///////////////////////////////////////////////////////////////
 
-class atmegax4_base_device : public megaavr_classic_base_device
+class atmegax4_base_device : public megaavr_classic_with_async_unit_base_device
 {
 protected:
 	// construction/destruction
@@ -1444,7 +1478,7 @@ protected:
 // Not to be confused with the modern megaAVR 0-series
 ///////////////////////////////////////////////////////////////
 
-class atmegax0_base_device : public megaavr_classic_base_device
+class atmegax0_base_device : public megaavr_classic_with_async_unit_base_device
 {
 protected:
 	// construction/destruction

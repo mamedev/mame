@@ -909,6 +909,9 @@ public:
 	 */
 	void set_exclk_source_to_crystal_timer(bool exclk_from_crystal) { m_exclk_from_crystal = exclk_from_crystal; }
 
+	void sync_w(uint8_t data);
+	uint8_t sync_r();
+
 	template <typename T> void set_child_timer_tag(T &&tag) { m_child_timer.set_tag(std::forward<T>(tag)); }
 
 	// device-level overrides
@@ -941,6 +944,8 @@ protected:
 	TIMER_CALLBACK_MEMBER(external_crystal_tick);
 	void update_crystal_state();
 	inline bool using_external_crystal() { return m_as2 && (m_exclk || m_exclk_from_crystal); }
+
+	virtual void tick_common();
 };
 
 // the classic megaAVRs and legacy AVRs both have an ASSR register, but its
@@ -948,14 +953,42 @@ protected:
 // bunch of other registers
 class avr8_megaavr_fakertc_async_controller_device : public avr8_fakertc_async_controller_device
 {
+	// In the order listed in the datasheet:
+	// https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf
+	// 18.11.8.
+	//
+	// All of these conveniently are in a different order than the actual registers as they appear in memory.
+	enum {
+		MEGAAVR_ASYNC_REG_TCCR_A = 0,
+		MEGAAVR_ASYNC_REG_TCCR_B = 1,
+		MEGAAVR_ASYNC_REG_OCR_B = 2,
+		MEGAAVR_ASYNC_REG_OCR_A = 3,
+		MEGAAVR_ASYNC_REG_TCNT = 4,
+
+		MEGAAVR_ASYNC_REG_MAX,
+	};
+
 public:
 	avr8_megaavr_fakertc_async_controller_device(const machine_config &mconfig,
 		const char *tag,
 		device_t *owner,
 		uint32_t clock);
 
+	uint8_t m_async_regs[MEGAAVR_ASYNC_REG_MAX];
+	uint8_t m_async_update_busy_reg;
+	
 	void assr_w(uint8_t data);
 	uint8_t assr_r();
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void ctrl_regs_w(offs_t offset, uint8_t data);
+	uint8_t ctrl_regs_r(offs_t offset);
+
+protected:
+	virtual void tick_common() override;
 };
 
 #if 0
