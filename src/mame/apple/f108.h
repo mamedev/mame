@@ -37,6 +37,7 @@ public:
 	void set_scsi_clock(const XTAL &clock) { m_ncr1.lookup()->set_clock(clock); }
 	template <typename... T> void set_rom_tag(T &&... args) { m_rom.set_tag(std::forward<T>(args)...); }
 	void set_ram_info(u32 *ram, u32 size);
+	void set_scc_sync(bool sync) { m_scc_sync = sync; }
 
 	auto write_ata_irq() { return m_ata_irq.bind(); }
 
@@ -71,6 +72,7 @@ private:
 	devcb_write_line m_ata_irq;
 
 	bool m_overlay;
+	bool m_scc_sync;
 	u8 m_ata_active, m_ata_recovery;
 	u32 *m_ram_ptr, *m_rom_ptr;
 	u32 m_ram_size, m_rom_size;

@@ -157,6 +157,7 @@ iosb_base::iosb_base(const machine_config &mconfig, device_type type, const char
 	m_via2_interrupt(0),
 	m_scc_interrupt(0),
 	m_last_taken_interrupt(-1),
+	m_via2_sync(true),
 	m_cur_floppy(nullptr),
 	m_hdsel(0),
 	m_adb_interrupt(0),
@@ -466,7 +467,7 @@ void iosb_base::mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 u8 iosb_base::mac_via2_r(offs_t offset)
 {
-	if (!machine().side_effects_disabled())
+	if (!machine().side_effects_disabled() && m_via2_sync)
 		via_sync();
 
 	u8 data = m_via2->read(offset);
@@ -475,7 +476,8 @@ u8 iosb_base::mac_via2_r(offs_t offset)
 
 void iosb_base::mac_via2_w(offs_t offset, u8 data)
 {
-	via_sync();
+	if (m_via2_sync)
+		via_sync();
 
 	m_via2->write(offset, data);
 }

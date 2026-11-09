@@ -4843,6 +4843,8 @@ if BUSES["PCI"] then
 		MAME_DIR .. "src/devices/bus/pci/ds2416.h",
 		MAME_DIR .. "src/devices/bus/pci/ess_maestro.cpp",
 		MAME_DIR .. "src/devices/bus/pci/ess_maestro.h",
+		MAME_DIR .. "src/devices/bus/pci/et4kw32p.cpp",
+		MAME_DIR .. "src/devices/bus/pci/et4kw32p.h",
 		MAME_DIR .. "src/devices/bus/pci/geforce.cpp",
 		MAME_DIR .. "src/devices/bus/pci/geforce.h",
 		MAME_DIR .. "src/devices/bus/pci/mga2064w.cpp",

@@ -5,8 +5,6 @@
 Winbond W83977TF
 
 TODO:
-- PoC for a generic (LPC) Super I/O type, consider abstracting common points with fdc37c93x;
-- DRQ (savquest enables DRQ3 for LPT)
 - Hookup LPT modes;
 - subclass for megadrive magistr16 system (uses w83977f/w83977af)
 

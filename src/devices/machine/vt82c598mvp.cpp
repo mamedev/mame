@@ -124,6 +124,9 @@ u8 vt82c598mvp_host_device::capptr_r()
 void vt82c598mvp_host_device::config_map(address_map &map)
 {
 	pci_host_device::config_map(map);
+	// clear unused ranges
+	map(0x14, 0x33).noprw();
+	map(0x38, 0x4f).noprw();
 	map(0x50, 0x50).lrw8(
 		NAME([this] () { return m_cache_control_1; }),
 		NAME([this] (offs_t offset, u8 data) {
