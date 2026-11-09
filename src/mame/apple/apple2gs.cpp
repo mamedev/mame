@@ -2468,7 +2468,8 @@ u8 apple2gs_state::c800_r(offs_t offset)
 
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		m_cnxx_slot = CNXX_UNCLAIMED;
+		if (!m_intcxrom)
+			m_cnxx_slot = CNXX_UNCLAIMED;
 		m_intc8rom = false;
 	}
 
@@ -2488,17 +2489,19 @@ u8 apple2gs_state::c800_r(offs_t offset)
 
 void apple2gs_state::c800_w(offs_t offset, u8 data)
 {
-	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
+	const int internal = (m_intcxrom) || (m_intc8rom);
+
+	if ((!internal) && (m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
 		slow_cycle();
 		m_slotdevice[m_cnxx_slot]->write_c800(offset&0xfff, data);
 	}
 
-	if (offset == 0x7ff)
+	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		m_cnxx_slot = CNXX_UNCLAIMED;
+		if (!m_intcxrom)
+			m_cnxx_slot = CNXX_UNCLAIMED;
 		m_intc8rom = false;
-		return;
 	}
 }
 
