@@ -7253,8 +7253,8 @@ Fails [tape] loading after pressing joy fire on title screen
 			<dataarea name="cass" size="547742">
 				<rom name="Ivan_'Ironman'_Stewart's_Super_Off_Road.tap" size="547742" crc="63bf1d3c" sha1="a5bfd6f7fd0a3741f4c8c252f582a53aba4a6676" />
 			</dataarea>
-    </part>
-</software>
+		</part>
+	</software>
 
 	<software name="jacknipr">
 		<description>Jack the Nipper</description>
