@@ -104,11 +104,11 @@ private:
 	};
 
 	// receiver sampling (figures 5-2 and 5-3), in RT ticks
-	static constexpr unsigned RT_PER_BIT = 16;
-	static constexpr unsigned QUALIFIERS = 3;           // high samples needed before RT1
-	static constexpr unsigned START_SAMPLES = 4;        // RT1, then RT3, RT5 and RT7
-	static constexpr unsigned BIT_SAMPLES = 3;          // RT8, RT9 and RT10
-	static constexpr unsigned FIRST_BIT_SAMPLE = 7;     // RT8, counted from RT1
+	static constexpr u32 RT_PER_BIT = 16;
+	static constexpr u32 QUALIFIERS = 3;           // high samples needed before RT1
+	static constexpr u32 START_SAMPLES = 4;        // RT1, then RT3, RT5 and RT7
+	static constexpr u32 BIT_SAMPLES = 3;          // RT8, RT9 and RT10
+	static constexpr u32 FIRST_BIT_SAMPLE = 7;     // RT8, counted from RT1
 
 	u8 baud_r();
 	void baud_w(u8 data);
@@ -127,7 +127,7 @@ private:
 	bool te() const { return m_sccr2 & SCCR2_TE; }
 	bool re() const { return m_sccr2 & SCCR2_RE; }
 	bool rwu() const { return m_sccr2 & SCCR2_RWU; }
-	unsigned frame_bits() const { return (m_sccr1 & SCCR1_M) ? 11 : 10; }
+	u32 frame_bits() const { return (m_sccr1 & SCCR1_M) ? 11 : 10; }
 
 	u32 rt_clocks() const;
 	u32 bit_clocks() const { return RT_PER_BIT * m_rt_clocks; }
@@ -179,10 +179,10 @@ private:
 	u8                  m_tx_state;
 	u16                 m_tx_shift;         // bits still to send, LSB first
 	u8                  m_tx_count;
-	int                 m_tdo;
+	u8                  m_tdo;
 
 	// receiver
-	int                 m_rdi;
+	u8                  m_rdi;
 	attotime            m_rdi_rise;         // when RDI last went high
 	attotime            m_rdi_fall;         // when RDI last went low
 	bool                m_line_idle;        // an idle line has been detected

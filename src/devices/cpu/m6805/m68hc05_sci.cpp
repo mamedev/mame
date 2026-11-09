@@ -45,7 +45,8 @@
       time later, and a byte being received is dropped.
     - RDI reads high until it is driven.  TDO isn't released to high
       impedance when TE clears: it stays high.  The SCI doesn't take over
-      PD0 and PD1 from the host's port D.
+      PD0 and PD1 from the host's port D, though 2.2.2 has them read zero
+      with RE and TE set.
     - SCDR's two registers are left alone by reset (table 3-1 doesn't list
       them).
 
@@ -53,6 +54,8 @@
 
 #include "emu.h"
 #include "m68hc05_sci.h"
+
+#include <algorithm>
 
 
 #define LOG_SCI     (1U << 1)
@@ -248,14 +251,7 @@ u8 m68hc05_sci_device::baud_r()
 
 void m68hc05_sci_device::baud_w(u8 data)
 {
-	if (machine().side_effects_disabled())
-	{
-		set_baud(data);
-		return;
-	}
-
-	m_baud = data & BAUD_MASK;
-	update_rate();
+	set_baud(data);
 }
 
 u8 m68hc05_sci_device::sccr1_r()
@@ -313,7 +309,7 @@ void m68hc05_sci_device::sccr2_w(u8 data)
 	}
 
 	// 5.7.3 B0: setting SBK sends a break, even if it's cleared again straight away
-	if (rise & SCCR2_SBK)
+	if ((rise & SCCR2_SBK) && te())
 		m_break_pending = true;
 
 	tx_kick();
@@ -560,7 +556,7 @@ void m68hc05_sci_device::tx_next()
 		// 5.7.1: TDR moves to the shifter, and TDRE sets (5.7.4 B7); start bit, eight
 		// data bits LSB first, T8 with M set, stop bit
 		LOGSCI("sending %02X\n", m_tdr);
-		unsigned const bits(frame_bits());
+		u32 const bits(frame_bits());
 		m_tdr_full = false;
 		m_tx_state = TX_FRAME;
 		m_tx_shift = (u16(m_tdr) << 1) | (1U << (bits - 1));
@@ -611,14 +607,14 @@ void m68hc05_sci_device::rx_schedule()
 {
 	// RT1 and the verification samples RT3, RT5 and RT7 (figure 5-2), then RT8, RT9 and
 	// RT10 of each bit (figure 5-3)
-	unsigned offset;
+	u32 offset;
 	if (m_rx_step < START_SAMPLES)
 	{
 		offset = m_rx_step * 2;
 	}
 	else
 	{
-		unsigned const n(m_rx_step - START_SAMPLES);
+		u32 const n(m_rx_step - START_SAMPLES);
 		offset = (n / BIT_SAMPLES) * RT_PER_BIT + FIRST_BIT_SAMPLE + (n % BIT_SAMPLES);
 	}
 	adjust_at(*m_rx_timer, tick_time(m_rx_rt1 + u64(offset) * m_rt_clocks));
@@ -653,7 +649,7 @@ TIMER_CALLBACK_MEMBER(m68hc05_sci_device::rx_sample)
 		return;
 	}
 
-	unsigned const step(m_rx_step);
+	u32 const step(m_rx_step);
 	m_rx_votes += m_rdi;
 	if (!step)
 	{
@@ -683,7 +679,7 @@ TIMER_CALLBACK_MEMBER(m68hc05_sci_device::rx_sample)
 	else if (((step - START_SAMPLES) % BIT_SAMPLES) == (BIT_SAMPLES - 1))
 	{
 		// 5.4: the majority of three samples, NF when they don't agree
-		unsigned const bit((step - START_SAMPLES) / BIT_SAMPLES);
+		u32 const bit((step - START_SAMPLES) / BIT_SAMPLES);
 		bool const high(m_rx_votes >= 2);
 		if (m_rx_votes && (m_rx_votes < BIT_SAMPLES))
 			m_rx_noise = true;
