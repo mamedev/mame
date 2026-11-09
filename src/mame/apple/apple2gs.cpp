@@ -364,6 +364,7 @@ private:
 	u8 c300_r(offs_t offset);
 	u8 c300_int_r(offs_t offset);
 	void c300_w(offs_t offset, u8 data);
+	void c300_int_w(offs_t offset, u8 data);
 	u8 c800_r(offs_t offset);
 	void c800_w(offs_t offset, u8 data);
 	u8 inh_r(offs_t offset);
@@ -2442,6 +2443,7 @@ void apple2gs_state::c100_w(offs_t offset, u8 data)
 	}
 }
 
+u8 apple2gs_state::c300_r(offs_t offset) { return read_slot_rom(3, offset); }
 u8 apple2gs_state::c300_int_r(offs_t offset)
 {
 	if ((!m_slotc3rom) && !machine().side_effects_disabled())
@@ -2452,8 +2454,14 @@ u8 apple2gs_state::c300_int_r(offs_t offset)
 	return read_int_rom(0x3c300, offset);
 }
 
-u8 apple2gs_state::c300_r(offs_t offset)  { return read_slot_rom(3, offset); }
 void apple2gs_state::c300_w(offs_t offset, u8 data) { write_slot_rom(3, offset, data); }
+void apple2gs_state::c300_int_w(offs_t offset, u8 data)
+{
+	if ((!m_slotc3rom) && !machine().side_effects_disabled())
+	{
+		m_intc8rom = true;
+	}
+}
 
 u8 apple2gs_state::c800_r(offs_t offset)
 {
@@ -3352,7 +3360,7 @@ void apple2gs_state::vectors_map(address_map &map)
 void apple2gs_state::c300bank_map(address_map &map)
 {
 	map(0x0000, 0x00ff).rw(FUNC(apple2gs_state::c300_r), FUNC(apple2gs_state::c300_w));
-	map(0x0100, 0x01ff).r(FUNC(apple2gs_state::c300_int_r)).nopw();
+	map(0x0100, 0x01ff).rw(FUNC(apple2gs_state::c300_int_r), FUNC(apple2gs_state::c300_int_w));
 }
 
 void apple2gs_state::a2gs_es5503_map(address_map &map)
