@@ -73,32 +73,17 @@
 
   Same video, sound and memory mapping as 4 En Raya, with an MK48Z02
   zeropower RAM instead of the 6116 and different I/O, worked out from the
-  program:
+  program. The DIP switch numbers are a guess. Port 0x33 bit 3 seems to be
+  the AY-3-8910 reset: it's pulsed low before the sound chip is initialised.
 
-  port 0x00 (in):
-    bit 0     - serial data from the coin and buttons shift register
-    bit 1     - missed dart sensor (active high)
-    bits 2-7  - DIP switches (the switch numbers in the inputs are a guess)
+  The program clocks the coin and buttons shift register before each read,
+  so it never sees input 7. The test mode calls the buttons PULSADOR 1 and
+  PULSADOR 2, and names lamps 0-2 as the dart board spotlight and the lights
+  of both buttons.
 
-  ports 0x01-0x02 (in): dart board matrix, 16 targets per row.
-
-  port 0x33 (out), shared with the AY-3-8910 control:
-    bit 3     - seems to be the AY-3-8910 reset: it's pulsed low before the
-                sound chip is initialised
-    bit 6     - dart board row select enable, bits 7 and 5 select the row
-    bit 6 low, bit 7 high: coin and buttons shift register, bit 5 loads
-                the inputs, a rising edge on bit 7 shifts them
-    bits 6-7 low: lamps shift register, bit 4 is shifted in on a rising
-                edge of bit 5
-
-  The program clocks the coin and buttons register before each read, so it
-  never sees input 7 and finds coin, button 1 and button 2 on inputs 0-2.
-  The lamps (active low) are, from shift register bit 0, the dart board
-  spotlight and the lights of buttons 1 and 2, as named by the test mode.
-
-  Turning on the service mode DIP switch runs a RAM test, which clears the
-  NVRAM, followed by screen, button, lamp, dart board and sound tests (button
-  1 steps through them). The price setup DIP switch shows the credits needed
+  The service mode DIP switch runs a RAM test, which clears the NVRAM,
+  followed by screen, button, lamp, dart board and sound tests (button 1
+  steps through them). The price setup DIP switch shows the credits needed
   by each game at boot: button 1 changes the value, button 2 accepts it.
 
 ***************************************************************************
@@ -463,7 +448,6 @@ void spadarts_state::control_w(uint8_t data)
 
 	if (BIT(data, 7))
 	{
-		// coin and buttons shift register
 		if (BIT(data, 5))
 			m_buttons_shift = m_buttons->read();
 		else if (!BIT(old, 7))
@@ -471,7 +455,6 @@ void spadarts_state::control_w(uint8_t data)
 	}
 	else if (BIT(data, 5) && !BIT(old, 5))
 	{
-		// lamps shift register
 		m_lamps_shift = (m_lamps_shift << 1) | BIT(data, 4);
 		for (int i = 0; i < 3; i++)
 			m_lamps[i] = BIT(~m_lamps_shift, i);
@@ -619,9 +602,8 @@ static INPUT_PORTS_START( spadarts )
 	PORT_DIPNAME( 0x40, 0x40, "Price Setup" )           PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW1:8" ) // clears the NVRAM
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW1:8" )
 
-	// read serially through port 0 bit 0, the test mode calls the buttons PULSADOR 1 and PULSADOR 2
 	PORT_START("BUTTONS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Button 1 (Select / Instructions)")
@@ -951,7 +933,7 @@ void spadarts_state::spadarts(machine_config &config)
 	m_maincpu->set_clock(8.412_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_IO, &spadarts_state::spadarts_portmap);
 
-	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0); // MK48Z02
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
 	m_ay->set_clock(8.412_MHz_XTAL / 4);
 }
