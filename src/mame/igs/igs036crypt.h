@@ -29,28 +29,12 @@ private:
 };
 
 extern const uint8_t m312cn_key[0x100];
-extern const uint8_t cjddzsp_key[0x100];
 extern const uint8_t cjdh2_key[0x100];
 extern const uint8_t bubucar_key[0x100];
-extern const uint8_t qhzb_key[0x100];
-extern const uint8_t lhtb_key[0x100];
 extern const uint8_t lhzb3in1_key[0x100];
-extern const uint8_t jxry_key[0x100];
-extern const uint8_t dahuaxy_key[0x100];
-extern const uint8_t slqzsp_key[0x100];
-extern const uint8_t sydh_key[0x100];
-extern const uint8_t xyddz_key[0x100];
-extern const uint8_t cjbq_key[0x100];
-extern const uint8_t cjgdy_key[0x100];
-extern const uint8_t xydn_key[0x100];
-extern const uint8_t mjzhizun_key[0x100];
-extern const uint8_t lhfy_key[0x100];
 extern const uint8_t lhzbgqb_key[0x100];
 extern const uint8_t mghammer_key[0x100];
 extern const uint8_t mghammer_io_key[0x100];
-extern const uint8_t zjddz_key[0x100];
-extern const uint8_t hyleyuan_key[0x100];
-extern const uint8_t hlddz_key[0x100];
 extern const uint8_t cjjl_key[0x100];
 extern const uint8_t xcjnh_key[0x100];
 extern const uint8_t hlqqq_key[0x100];

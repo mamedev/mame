@@ -38,8 +38,8 @@ TODO:
 #define LOGGPIO(...)   LOGMASKED(LOG_GPIO, __VA_ARGS__)
 #define LOGPMTR(...)   LOGMASKED(LOG_PMTMR, __VA_ARGS__)
 
-DEFINE_DEVICE_TYPE(VT82C586B_ACPI, vt82c586b_acpi_device, "vt82c586b_acpi", "VT82C586B \"PIPC\" Power Management and ACPI")
-DEFINE_DEVICE_TYPE(ACPI_PIPC, acpi_pipc_device, "acpi_pipc", "ACPI PIPC")
+DEFINE_DEVICE_TYPE(VT82C586B_ACPI, vt82c586b_acpi_device, "vt82c586b_acpi", "VIA VT82C586B \"PIPC\" Power Management and ACPI")
+DEFINE_DEVICE_TYPE(ACPI_PIPC, acpi_pipc_device, "acpi_pipc", "VIA ACPI PIPC")
 
 vt82c586b_acpi_device::vt82c586b_acpi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, type, tag, owner, clock)

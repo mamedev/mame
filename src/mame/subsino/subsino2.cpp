@@ -4311,10 +4311,33 @@ ROM_START( goldenti )
 	ROM_LOAD( "ds1971.bin", 0x00, 0x28, CRC(bcb1a630) SHA1(3ebd6f85b7267e86dc5458996978f3e22b71a214) )
 ROM_END
 
+ROM_START( bigboss )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // H8/3044
+	// the H8 on this PCB is marked "SUBSINO CP002 / 6433044A63F" and its internal ROM hasn't been
+	// dumped: the CRC-16 table at 0x100e is built with a different polynomial there, so the external ROM checksum check at
+	// 0x000344 fails and the game hangs. bp 340,1,{ER6=00080458;g} bypasses it for now.
+	ROM_LOAD( "ss9689_6433044a22f.u16", 0x000000, 0x008000, BAD_DUMP CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
+	ROM_LOAD( "big_boss_alpha_1_v108.u21", 0x080000, 0x040000, CRC(6fe041bd) SHA1(40d535978f5537e90f53bc4003fb3e7cb165b913) )
+	ROM_RELOAD(                            0x0c0000, 0x040000 )
+
+	ROM_REGION( 0x400000, "tilemap", 0 )
+	ROM_LOAD16_BYTE( "big_boss_alpha_3_v105.u43", 0x000000, 0x200000, CRC(64f4930f) SHA1(f2573e191543b6d8ab4f7efb56a2542249359f12) )
+	ROM_LOAD16_BYTE( "big_boss_alpha_4_v105.u44", 0x000001, 0x200000, CRC(e4e58813) SHA1(6caffbf16f8fd16d99e80c7a97036a3866986d35) )
+
+	ROM_REGION( 0x100000, "ss9x04", 0 )
+	ROM_LOAD( "big_boss_alpha_2_v100.u9", 0x000000, 0x100000, CRC(7de0b076) SHA1(f3f5fded8aac7415719bedd27f35140c37503062) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(46e11848) SHA1(aac9eebfdfc219ece58778fe07d1640d1a5d3d96) ) // AI-reconstructed
+ROM_END
+
 // 董事长 (Dǒngshìzhǎng)
 ROM_START( dongshiz ) // default password is all bet
 	ROM_REGION( 0x100000, "maincpu", 0 ) // H8/3044
-	ROM_LOAD( "ss9689_6433044a22f.u16",  0x000000, 0x008000, CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
+	// the H8 on this PCB is different (probably the same as bigboss)and its internal ROM hasn't been
+	// dumped:  the CRC-16 table at 0x100e is built with a different polynomial there, so the external ROM checksum check at 
+	// 0x000344 fails and the game hangs. bp 340,1,{ER6=00081f78;g} bypasses it for now.
+	ROM_LOAD( "ss9689_6433044a22f.u16", 0x000000, 0x008000, BAD_DUMP CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
 	ROM_LOAD( "mrboss_china_1_v212.u21", 0x080000, 0x040000, CRC(6148ea97) SHA1(7231b470b6279315e94f26ea7729340854f339a7) )
 	ROM_RELOAD(                          0x0c0000, 0x040000 )
 
@@ -4390,4 +4413,5 @@ GAME( 200?, treamary,    0,        bishjan,  bishjan,  subsino2_state, empty_ini
 
 GAME( 200?, goldenti,    0,        humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Golden Treasure Island (Ver. Alpha 100)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
 
-GAME( 2005, dongshiz,    0,        new2001,  humlan,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Dongshizhang (China, Ver. 212)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // incomplete DS dump, fails start up check
+GAME( 2005, bigboss,     0,        new2001,  humlan,   subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Big Boss (Ver. Alpha 208)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005, dongshiz,    bigboss,  new2001,  humlan,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Dongshizhang (China, Ver. 212)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // incomplete DS dump, fails start up check

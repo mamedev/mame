@@ -597,6 +597,46 @@
   5 -> CTRL -> DOWN -> CTRL -> DOWN -> CTRL -> DOWN -> CTRL -> DOWN -> CTRL -> DOWN
 
 
+  * Toukyuu System Poker
+
+  Press key 0 to enter the books/meters.
+  You can see the normal meters and the DIP switches state.
+
+  Pressing HOLD1, you can enter the "Analiz-2" screen,
+  where you can see the following meters:
+
+  GAME   IN
+  GAME   OUT
+  WUP    IN
+  WUP    TAKE
+  GAME   TAKE
+  GAME   COUNT
+  WIN    COUNT
+  WUP    COUNT
+  BET1   IN
+  BET1   OUT
+  BET2   IN
+  BET2   OUT
+  BET2   COUNT
+  WUP    WIN
+  WUP    LOSS
+  13K    COUNT
+  777    COUNT
+  FEVER  ODDS
+  TURBO1 HIT
+  TURBO2 HIT
+  TURBO  COUNT
+  DOUBLE TURBO
+  TURBO  ODDS
+  PROGR  COUNT
+  PROGR  ODDS
+ 
+  You can exit to the game pressing:
+  - HOLD2 (you will exit to the normal game)
+  - HOLD3 (you will exit to the "auto take" game)
+  - HOLD5 (you will exit to the game type you had before)
+
+
 ************************************************************************************
 
 
@@ -1070,8 +1110,8 @@
   - Final cleanup.
 
   - dep 9801 sets:
-    - 2 more banks of switches
-    - lfhouse inputs
+     - lfhouse inputs & redump GFX ROMs for missing bitplanes.
+
 
 ************************************************************************************/
 
@@ -1154,12 +1194,14 @@ public:
 	void kmhpan(machine_config &config) ATTR_COLD;
 	void unkicpf40(machine_config &config) ATTR_COLD;
 	void wing_w90(machine_config &config) ATTR_COLD;
+	void phnxjokr(machine_config &config) ATTR_COLD;
 	void dash_a37(machine_config &config) ATTR_COLD;
 	void dynplus(machine_config &config) ATTR_COLD;
 	void dynchance(machine_config &config) ATTR_COLD;
 	void lfhouse(machine_config &config) ATTR_COLD;
 	void unkdep(machine_config &config) ATTR_COLD;
 	void smb_be4k(machine_config &config) ATTR_COLD;
+	void touksysp(machine_config &config) ATTR_COLD;
 
 	void init_vkdlswwh() ATTR_COLD;
 	void init_icp1db() ATTR_COLD;
@@ -1193,6 +1235,7 @@ public:
 	void init_dynplus() ATTR_COLD;
 	void init_dynchance() ATTR_COLD;
 	void init_unkdep() ATTR_COLD;
+	void init_touk() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -1201,6 +1244,8 @@ protected:
 	void lamps_a_w(uint8_t data);
 	void sound_w(uint8_t data);
 	void mux_w(uint8_t data);
+	void phnxjokr_mux_w(uint8_t data);
+	void test_w(uint8_t data);
 
 	void goldnpkr_videoram_w(offs_t offset, uint8_t data);
 	void goldnpkr_colorram_w(offs_t offset, uint8_t data);
@@ -1210,6 +1255,7 @@ protected:
 	void witchcrd_palette(palette_device &palette) const ATTR_COLD;
 	void super21p_palette(palette_device &palette) const ATTR_COLD;
 	void wing_w90_palette(palette_device &palette) const ATTR_COLD;
+	void phnxjokr_palette(palette_device &palette) const ATTR_COLD;
 
 	void goldnpkr_base(machine_config &config) ATTR_COLD;
 
@@ -1221,7 +1267,7 @@ protected:
 	required_shared_ptr<uint8_t> m_colorram;
 
 	required_device<cpu_device> m_maincpu;
-	required_device_array<pia6821_device, 2> m_pia;
+	optional_device_array<pia6821_device, 2> m_pia;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -1242,12 +1288,14 @@ private:
 	TILE_GET_INFO_MEMBER(super21p_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wing_w90_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(kmhpan_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(phnxjokr_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(smb_be4k_get_bg_tile_info);
 	void goldnpkr_palette(palette_device &palette) const ATTR_COLD;
 	DECLARE_VIDEO_START(wcrdxtnd);
 	DECLARE_VIDEO_START(super21p);
 	DECLARE_VIDEO_START(wing_w90);
 	DECLARE_VIDEO_START(kmhpan);
+	DECLARE_VIDEO_START(phnxjokr);
 	DECLARE_VIDEO_START(smb_be4k);
 	void wcrdxtnd_palette(palette_device &palette) const ATTR_COLD;
 	DECLARE_MACHINE_START(mondial);
@@ -1280,6 +1328,9 @@ private:
 	void lfhouse_map(address_map &map) ATTR_COLD;
 	void unkdep_map(address_map &map) ATTR_COLD;
 	void dep_9801_opcodes_map(address_map &map) ATTR_COLD;
+	void phnxjokr_map(address_map &map) ATTR_COLD;
+	void touksysp_map(address_map &map) ATTR_COLD;
+	void touksysp_opcodes_map(address_map &map) ATTR_COLD;
 
 	optional_device<ticket_dispenser_device> m_hopper;
 	optional_device<ay8910_device> m_ay8910;
@@ -1501,6 +1552,28 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::smb_be4k_get_bg_tile_info)
 	tileinfo.set(bank, code, color, 0);
 }
 
+TILE_GET_INFO_MEMBER(goldnpkr_state::phnxjokr_get_bg_tile_info)
+{
+	/*  - bits -
+	    7654 3210
+	    -xxx -x--   tiles color.
+	    ---- --x-   tiles bank.
+	    ---- ---x   tiles extended address (MSB).
+	    xx-- ----   unused.
+	*/
+
+	uint16_t const attr = m_colorram[tile_index];
+	uint16_t const code = ((attr & 1) << 8) | m_videoram[tile_index];
+	uint16_t const bank = (attr & 0x02) >> 1;      // bit 1 switch the gfx banks
+
+	// preparing the color mask 01110100
+	uint16_t const color_high = (attr & 0x70) >> 3;
+	uint16_t const color_low = (attr & 0x04) >> 2;
+	uint16_t const color = color_high | color_low;
+
+	tileinfo.set(bank, code, color, 0);
+}
+
 
 void goldnpkr_state::video_start()
 {
@@ -1530,6 +1603,11 @@ VIDEO_START_MEMBER(goldnpkr_state, kmhpan)
 VIDEO_START_MEMBER(goldnpkr_state, smb_be4k)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldnpkr_state::smb_be4k_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+}
+
+VIDEO_START_MEMBER(goldnpkr_state, phnxjokr)
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldnpkr_state::phnxjokr_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -1721,6 +1799,30 @@ void goldnpkr_state::wing_w90_palette(palette_device &palette) const
 }
 
 
+void goldnpkr_state::phnxjokr_palette(palette_device &palette) const
+{
+/*  Three 82S129 bipolar PROMs (256x4), one per color channel.
+
+    7654 3210
+    ---- xxxx   color component.
+    xxxx ----   unused.
+
+*/
+	uint8_t const *const color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
+
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int const r = pal4bit(color_prom[i]);
+		int const g = pal4bit(color_prom[i + 0x100]);
+		int const b = pal4bit(color_prom[i + 0x200]);
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+
 /*******************************************
 *               R/W Handlers               *
 *******************************************/
@@ -1784,6 +1886,9 @@ void goldnpkr_state::mux_w(uint8_t data)
 	m_lamps[6] = !BIT(data, 1); // hopper motor 2
 	m_lamps[7] = !BIT(data, 2); // diverter
 	m_lamps[8] = !BIT(data, 3); // coin lockout
+
+//	logerror("m_mux_data:%02x\n", m_mux_data );
+
 }
 
 void lespendu_state::lespendu_mux_w(uint8_t data)
@@ -1800,6 +1905,25 @@ void lespendu_state::lespendu_mux_w(uint8_t data)
 void goldnpkr_state::mux_port_w(uint8_t data)
 {
 	m_pia0_PA_data = data;
+}
+
+void goldnpkr_state::phnxjokr_mux_w(uint8_t data)
+{
+	// bit 0 - bit 1 -> Hopper
+	m_hopper->motor_w(BIT(~data, 0) && BIT(~data, 1));
+
+	m_lamps[5] = !BIT(data, 0);  // hopper motor 1 - to be confirmed
+	m_lamps[6] = !BIT(data, 1);  // hopper motor 2 - to be confirmed
+
+	// ay-3-8910 management
+	if (BIT(data, 7))
+		m_ay8910->data_address_w(BIT(data, 6), m_ay8910_data);
+
+	m_ay8910_control = data;
+
+	m_mux_data = (data << 2) & 0xf0;  // bits 0x3c not inv. 
+
+//	logerror("m_mux_data:%02x\n", m_mux_data );
 }
 
 
@@ -1932,6 +2056,14 @@ void goldnpkr_state::sound_w(uint8_t data)
 	// discrete sound is connected to PIA1, portA: bits 0-3
 	m_discrete->write(NODE_01, data >> 3 & 0x01);
 	m_discrete->write(NODE_10, data & 0x07);
+}
+
+
+void goldnpkr_state::test_w(uint8_t data)
+{
+	// general purpose write test
+
+	logerror("written data:%02x\n", data );
 }
 
 
@@ -2157,9 +2289,6 @@ void goldnpkr_state::smb_be4k_map(address_map &map)
 }
 
 
-
-
-
 void lespendu_state::lespendu_map(address_map &map)
 {
 	map.global_mask(0x7fff);
@@ -2296,6 +2425,40 @@ void goldnpkr_state::unkdep_map(address_map &map)
 }
 
 void goldnpkr_state::dep_9801_opcodes_map(address_map &map)
+{
+	map(0x8000, 0xffff).rom().share(m_decrypted_opcodes);
+}
+
+void goldnpkr_state::phnxjokr_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+
+	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
+	map(0x2000, 0x2000).r(FUNC(goldnpkr_state::goldnpkr_mux_port_r));
+	map(0x4000, 0x7fff).rom();
+}
+
+
+void goldnpkr_state::touksysp_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x6000, 0x6000).portr("SW2");
+	map(0x6800, 0x6800).portr("SW3");
+	map(0x8000, 0xffff).rom();
+}
+
+void goldnpkr_state::touksysp_opcodes_map(address_map &map)
 {
 	map(0x8000, 0xffff).rom().share(m_decrypted_opcodes);
 }
@@ -5181,6 +5344,114 @@ static INPUT_PORTS_START( icp_etg )  // ICP-1 w/daughterboard
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( phnxjokr )
+/*
+  Multiplexed - 4x6bits
+
+  E1B5: AD 46 08 lda $0846
+  E1B8: 29 3F    and #$3f
+  E1BA: 09 C0    ora #$c0
+  E1BC: 8D 46 08 sta $0846
+
+  This matrix reads 6 bits per row,
+  instead of the original 5 bits from
+  Bonanza Golden Poker and others.  
+
+*/	
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Meters")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )    PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-0 Bit 5") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )          PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )     PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-1 Bit 5") PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-2 Bit 5") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-3 Bit 0") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-3 Bit 1") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )          PORT_IMPULSE(3) PORT_NAME("Note 1 In")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_IMPULSE(3) PORT_NAME("Coin In")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )          PORT_IMPULSE(3) PORT_NAME("Note 2 In")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-3 Bit 5") PORT_CODE(KEYCODE_P)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW1")  // AY8910 portA
+	PORT_DIPNAME( 0x01, 0x01, "2-Card Open Mode" )      PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "2-Card Open Type" )      PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, "Manual (HOLD Buttons)" )
+	PORT_DIPSETTING(    0x00, "Auto Open" )
+	PORT_DIPNAME( 0x04, 0x04, "Royal Flush" )           PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, "OK" )
+	PORT_DIPSETTING(    0x00, "Lose" )
+	PORT_DIPNAME( 0x08, 0x08, "Credit Limit" )          PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Credit Limit Value" )    PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, "200" )
+	PORT_DIPSETTING(    0x00, "500" )
+	PORT_DIPNAME( 0x20, 0x20, "Straight Flush Payout" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, "100" )
+	PORT_DIPSETTING(    0x00, "150" )
+	PORT_DIPNAME( 0x40, 0x40, "Double-Up Rate" )        PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, "90%" )
+	PORT_DIPSETTING(    0x00, "80%" )
+	PORT_DIPNAME( 0x80, 0x80, "Double-Up Joker" )       PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, "Few" )
+	PORT_DIPSETTING(    0x00, "Many" )
+
+	PORT_START("SW2")  // AY8910 portB
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPSETTING(    0x00, "1 Coin / 1 Credit (Note1: 2, Note2: 20)" )
+	PORT_DIPSETTING(    0x01, "1 Coin / 1 Credit (Note1: 5, Note2: 50)" )
+	PORT_DIPSETTING(    0x02, "1 Coin / 1 Credit (Note1: 10, Note2: 100)" )
+	PORT_DIPSETTING(    0x03, "1 Coin / 2 Credits (Note1: 20, Note2: 200)" )
+	PORT_DIPSETTING(    0x04, "1 Coin / 3 Credits (Note1: 30, Note2: 300)" )
+	PORT_DIPSETTING(    0x05, "1 Coin / 4 Credits (Note1: 40, Note2: 400)" )
+	PORT_DIPSETTING(    0x06, "1 Coin / 5 Credits (Note1: 50, Note2: 500)" )
+	PORT_DIPSETTING(    0x07, "1 Coin / 10 Credits (Note1: 100, Note2: 1000)" )
+	PORT_DIPNAME( 0x08, 0x08, "Max Bet" )               PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, "10 (Payout Limit 10,000)" )
+	PORT_DIPSETTING(    0x00, "20 (Payout Limit 20,000)" )
+	PORT_DIPNAME( 0x10, 0x10, "Main Game Joker" )       PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, "Few" )
+	PORT_DIPSETTING(    0x00, "Many" )
+	PORT_DIPNAME( 0xe0, 0xe0, "Main Game Pay Rate" )    PORT_DIPLOCATION("SW2:6,7,8")
+	PORT_DIPSETTING(    0xe0, "90% (80~95%)" )
+	PORT_DIPSETTING(    0xc0, "90% (85~99%)" )
+	PORT_DIPSETTING(    0xa0, "80% (70~85%)" )
+	PORT_DIPSETTING(    0x80, "80% (75~89%)" )
+	PORT_DIPSETTING(    0x60, "70% (60~75%)" )
+	PORT_DIPSETTING(    0x40, "70% (65~79%)" )
+	PORT_DIPSETTING(    0x20, "60% (50~65%)" )
+	PORT_DIPSETTING(    0x00, "60% (55~69%)" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( dash_a37 )
 	PORT_INCLUDE( goldnpkr )
 
@@ -5601,6 +5872,81 @@ static INPUT_PORTS_START( smb_be4k )
 	PORT_DIPNAME( 0x80, 0x00, "Top Hand" )          PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( touksysp )
+	PORT_INCLUDE( goldnpkr )
+
+	PORT_MODIFY("SW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2") // $6000
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW3") // $6800
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW3:3,4,5")
+	PORT_DIPSETTING(    0x00, "Coin: 1; Note1: 1; Note2: 1" )
+	PORT_DIPSETTING(    0x0c, "Coin: 1; Note1: 5; Note2: 10" )
+	PORT_DIPSETTING(    0x1c, "Coin: 1; Note1: 10; Note2: 5" )
+	PORT_DIPSETTING(    0x18, "Coin: 2; Note1: 20; Note2: 10" )
+	PORT_DIPSETTING(    0x08, "Coin: 5; Note1: 25; Note2: 50" )
+	PORT_DIPSETTING(    0x14, "Coin: 5; Note1: 50; Note2: 25" )
+	PORT_DIPSETTING(    0x04, "Coin: 10; Note1: 50; Note2: 100" )
+	PORT_DIPSETTING(    0x10, "Coin: 10; Note1: 100; Note2: 50" )
+
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -6327,6 +6673,46 @@ void goldnpkr_state::wing_w90(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SN76489A(config, m_snsnd, MASTER_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 2.0);
 }
+
+
+void goldnpkr_state::phnxjokr(machine_config &config)
+{
+	goldnpkr_base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::phnxjokr_map);
+	
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::ay8910_data_r));
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::ay8910_data_w));
+	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::phnxjokr_mux_w));
+	
+	config.device_remove("pia1");
+
+	// video hardware
+	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, phnxjokr)
+	m_palette->set_init(FUNC(goldnpkr_state::phnxjokr_palette));  // 3-PROM system
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	AY8910(config, m_ay8910, MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.00);  // guess
+	m_ay8910->port_a_read_callback().set_ioport("SW1");
+	m_ay8910->port_b_read_callback().set_ioport("SW2");
+}
+
+
+void goldnpkr_state::touksysp(machine_config &config)
+{
+	goldnpkr_base(config);
+	
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::touksysp_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &goldnpkr_state::touksysp_opcodes_map);
+
+	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::test_w));
+
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+	
+}	
 
 
 void blitz_state::megadpkr(machine_config &config)
@@ -14678,6 +15064,51 @@ ROM_START( gp_ped42_70 )
 ROM_END
 
 /*
+  Phoenix Joker
+  STP
+
+  PCB marked UCGS-80
+
+  This hardware was figured out through reverse-engineering.
+
+  Only one PIA device, driving a AY-3-8910
+  for sounds and two DIP switches banks.
+
+  The color system has three 4-bit bipolar PROMs.
+  One for each RGB channel.
+
+*/
+ROM_START( phnxjokr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.ic4", 0x4000, 0x4000, CRC(bd889cfa) SHA1(1d62dfd66186dfc4a5d32bca99eecab10e7a5ff2) )  // duped halves
+	ROM_IGNORE(                0x4000 )
+
+	ROM_REGION( 0x8000, "gfxpool", 0 )
+	ROM_LOAD( "2.ic30", 0x0000, 0x4000, CRC(4cd7c987) SHA1(65dec9bab644bb8e597e8ad9d6c7d0ae2d917b9f) )  // 1st and 2nd bitplanes. duped halves
+	ROM_IGNORE(                 0x4000 )
+	ROM_LOAD( "3.ic38", 0x4000, 0x4000, CRC(d2714443) SHA1(01d812053edcc0f8612fb7e2e63bd23ed74c207e) )  // 3rd bitplane (the rest is blank)
+	ROM_IGNORE(                 0x4000 )
+
+//  Two banks of $1000 (extended gfx using bit0), 3 bitplanes each.
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_COPY( "gfxpool", 0x4000, 0x0000, 0x1000 ) // src-dest-size (data)  3.ic38, block 0
+	ROM_COPY( "gfxpool", 0x2000, 0x1000, 0x1000 ) // src-dest-size (data)  2.ic30, block 2
+	ROM_COPY( "gfxpool", 0x0000, 0x2000, 0x1000 ) // src-dest-size (data)  2.ic30, block 0
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_COPY( "gfxpool", 0x5000, 0x0000, 0x1000 ) // src-dest-size (data)  3.ic38, block 1
+	ROM_COPY( "gfxpool", 0x3000, 0x1000, 0x1000 ) // src-dest-size (data)  2.ic30, block 3
+	ROM_COPY( "gfxpool", 0x1000, 0x2000, 0x1000 ) // src-dest-size (data)  2.ic30, block 1
+
+//  Three 82S129, one per RGB channel.
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "129.ic31", 0x0000, 0x0100, CRC(c2054f92) SHA1(be6c9ca2ceef74766c8079fb5a6f6980a30ed4a8) )  // red
+	ROM_LOAD( "129.ic32", 0x0100, 0x0100, CRC(c68a7472) SHA1(e251b43617385cfe068805503b3cda34f803a673) )  // green
+	ROM_LOAD( "129.ic33", 0x0200, 0x0100, CRC(5f500adf) SHA1(25fb932a36d7751739d24324a553c3ace1013d66) )  // blue
+ROM_END
+
+
+/*
   DEP 9801 M encrypted platform.
 
   1x R6502P
@@ -14845,7 +15276,7 @@ ROM_END
 
 ROM_START( dynchancf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dp1.i223.bin", 0x8000, 0x8000, CRC(ee722c55) SHA1(924444e5c07a2b521386cf36a54be31bfbfe612c) )
+	ROM_LOAD( "1.ic4", 0x8000, 0x8000, CRC(ee722c55) SHA1(924444e5c07a2b521386cf36a54be31bfbfe612c) )
 
 	ROM_REGION( 0x8000, "gfxpool", 0 )
 	ROM_LOAD( "mk2.5l", 0x0000, 0x4000, CRC(ac69168b) SHA1(cc425aea0bc7ac5337bb79c8a63176621c8606f5) )
@@ -15130,6 +15561,38 @@ ROM_START( potnpkrq )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "prom.bin",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/*
+  Toukyuu System Poker
+  Encrypted system.
+
+  1986
+
+  Poker system with Fever, Turbo,
+  Autotake, and other features.
+
+  Only opcodes are encrypted.
+  Data is unencrypted.
+
+*/
+ROM_START( touksysp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "4313.sub", 0x8000, 0x8000, CRC(59588696) SHA1(88c421747e1146e0d5df21f398166eb3178c843e) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(              0x0000, 0x1000, 0x0000 )
+	ROM_LOAD( "chars.bin", 0x1000, 0x0800, BAD_DUMP CRC(2c53493f) SHA1(9e71db51499294bb4b16e7d8013e5daf6f1f9d18) )  // char ROM loaned from unkicpf80
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "pk1.4", 0x0000, 0x0800, CRC(c40dfcee) SHA1(095cf657d4ad5f39b8cc79c9aed6ac444b671b77) )
+	ROM_CONTINUE(      0x0000, 0x0800)    // using the second half
+	ROM_LOAD( "pk2.6", 0x0800, 0x0800, CRC(5d4fa4a2) SHA1(133ebc04168c724b8dbf64e77e01db10dd742905) ) 
+	ROM_CONTINUE(      0x0800, 0x0800)    // using the second half
+	ROM_LOAD( "pk4.9", 0x1000, 0x0800, CRC(0667b801) SHA1(b878c5ef792f6dada3d81787d6691d526d6a761b) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "prom.n03", 0x0000, 0x0100, CRC(fa17f40a) SHA1(fac057888c6f75415d86d93e6d0700f5b4b5d3ee) )
 ROM_END
 
 
@@ -15853,6 +16316,20 @@ void goldnpkr_state::init_unkdep()
 	}
 }
 
+
+void goldnpkr_state::init_touk()
+{
+	// the program needs the opcodes XORed by 0x02
+	uint8_t *rom = memregion("maincpu")->base() + 0x8000;
+
+	for (int i = 0x0000; i <= 0x8000; i++)
+	{
+		// only opcodes are encrypted
+		m_decrypted_opcodes[i] = rom[i] ^ 0x02;
+	}	
+}
+
+
 } // anonymous namespace
 
 
@@ -16129,3 +16606,7 @@ GAME(  198?, icproul,   0,        icproul,  icproul,  goldnpkr_state, empty_init
 GAME(  199?, kmhpan,    0,        kmhpan,   kmhpan,   goldnpkr_state, empty_init,    ROT0,   "PAN Electronics",          "Kaimen Hu (PAN Electronics)",             MACHINE_IMPERFECT_COLORS )  // needs proper palette decoding
 
 GAME(  198?, wing90pkr, goldnpkr, wing_w90, wing_w90, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Wing W90 poker (Wing 8510-A W90-3 PCB)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )  // bad gfx dump
+
+GAMEL( 198?, phnxjokr,  0,        phnxjokr, phnxjokr, goldnpkr_state, empty_init,    ROT0,   "STP",                      "Phoenix Joker (STP, UCGS-80 PCB)",        0,                layout_goldnpkr )  // no lamps. layout for clickable controls only.
+
+GAMEL( 1986, touksysp,  0,        touksysp, touksysp, goldnpkr_state, init_touk,     ROT0,   "<unknown>",                "Toukyuu System Poker (ROM: NO4313)",      0,                layout_goldnpkr )  // no lamps. layout for clickable controls only.

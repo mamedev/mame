@@ -61,18 +61,20 @@ void voodoo_pci_device::config_map(address_map &map)
 
 voodoo_pci_device::voodoo_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: pci_device(mconfig, type, tag, owner, clock),
-	  m_generic_voodoo(*this, "voodoo"), m_cpu(*this, finder_base::DUMMY_TAG), m_screen(*this, finder_base::DUMMY_TAG), m_fbmem(2), m_tmumem0(0), m_tmumem1(0)
+	  m_generic_voodoo(*this, "voodoo"), m_cpu(*this, finder_base::DUMMY_TAG), m_screen(*this, finder_base::DUMMY_TAG), m_fbmem(2), m_tmumem0(0), m_tmumem1(0), m_status_cycles(0)
 {
 }
 
 voodoo_1_pci_device::voodoo_1_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: voodoo_pci_device(mconfig, VOODOO_1_PCI, tag, owner, clock), m_voodoo(*this, "voodoo")
 {
+	set_ids(0x121a0001, 0x02, 0x000000, 0x000000); // backward compatible non-VGA device
 }
 
 voodoo_2_pci_device::voodoo_2_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: voodoo_pci_device(mconfig, VOODOO_2_PCI, tag, owner, clock), m_voodoo(*this, "voodoo")
 {
+	set_ids(0x121a0002, 0x02, 0x038000, 0x000000); // fb_addr_a[6] selects 0x040000 for multimedia devices
 }
 
 voodoo_banshee_pci_device::voodoo_banshee_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
@@ -109,9 +111,6 @@ void voodoo_pci_device::device_start()
 
 void voodoo_1_pci_device::device_start()
 {
-	// NOTE: class code = 0 (backward compatible non-VGA device)
-	set_ids(0x121a0001, 0x02, 0x000000, 0x000000);
-
 	voodoo_pci_device::device_start();
 
 	add_map(16 * 1024 * 1024, M_MEM | M_PREF, *m_voodoo, FUNC(voodoo_1_device::core_map));
@@ -132,9 +131,6 @@ void voodoo_1_pci_device::device_start()
 
 void voodoo_2_pci_device::device_start()
 {
-	// TODO: straps class code from fb_addr_a[6] (if =1 then 0x040000)
-	set_ids(0x121a0002, 0x02, 0x038000, 0x000000);
-
 	voodoo_pci_device::device_start();
 
 	add_map(16 * 1024 * 1024, M_MEM | M_PREF, *m_voodoo, FUNC(voodoo_2_device::core_map));

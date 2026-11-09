@@ -18,7 +18,6 @@
 void coco12_state::machine_start()
 {
 	coco_state::machine_start();
-	configure_sam();
 
 	// right joystick
 	m_joy_handlers[0] = std::make_unique<coco_joy_standard>(*this, 0, ioport(JOYSTICK_BUTTONS_TAG));
@@ -46,20 +45,6 @@ void coco12_state::horizontal_sync(int state)
 void coco12_state::field_sync(int state)
 {
 	pia_0().cb1_w(state);
-}
-
-
-
-//-------------------------------------------------
-//  coco12_state::configure_sam
-//-------------------------------------------------
-
-void coco12_state::configure_sam()
-{
-	offs_t ramsize = m_ram->size();
-	m_sam->space(0).install_ram(0, ramsize - 1, m_ram->pointer());
-	if (ramsize < 65536)
-		m_sam->space(0).nop_readwrite(ramsize, 0xffff);
 }
 
 
@@ -115,26 +100,34 @@ void coco12_state::pia1_pb_w(uint8_t data)
 void deluxecoco_state::machine_start()
 {
 	coco12_state::machine_start();
-	configure_sam();
 
-	m_ram_view.disable();
-	m_rom_view.select(0);
+	// bit 2 points physical RAM $4000-$7FFF at one of the four 16K blocks
+	if (m_ram->size() >= 0x10000)
+	{
+		std::vector<std::pair<uint8_t *, uint8_t *> > blocks;
+		for (int i = 0; i < 4; i++)
+			blocks.emplace_back(m_ram->pointer() + (i * 0x4000), m_ram->pointer() + (i * 0x4000));
+		m_sam->configure_ram_bank(0x4000, 0x7fff, std::move(blocks));
+		update_ram_bank();
+	}
+
+	save_item(NAME(m_ram_bank_select));
+	save_item(NAME(m_rom_select));
+	machine().save().register_postload(save_prepost_delegate(FUNC(deluxecoco_state::update_ram_bank), this));
 }
 
 
 
 //-------------------------------------------------
-//  deluxecoco_state::configure_sam
+//  deluxecoco_state::update_ram_bank
 //-------------------------------------------------
 
-void deluxecoco_state::configure_sam()
+void deluxecoco_state::update_ram_bank()
 {
-	m_sam->space(0).install_view(0x4000, 0x7fff, m_ram_view);
+	if (m_ram->size() < 0x10000)
+		return;
 
-	m_ram_view[0].install_ram(0x4000, 0x7fff, m_ram->pointer() + 0x0000);
-	m_ram_view[1].install_ram(0x4000, 0x7fff, m_ram->pointer() + 0x4000);
-	m_ram_view[2].install_ram(0x4000, 0x7fff, m_ram->pointer() + 0x8000);
-	m_ram_view[3].install_ram(0x4000, 0x7fff, m_ram->pointer() + 0xc000);
+	m_sam->select_ram_bank(0x4000, BIT(m_ram_bank_select, 2) ? (m_ram_bank_select & 0x03) : 1);
 }
 
 
@@ -146,12 +139,10 @@ void deluxecoco_state::ff30_write(offs_t offset, uint8_t data)
 {
 	if (offset == 0)
 	{
-		if (BIT(data, 2))
-			m_ram_view.select(data & 0x03);
-		else
-			m_ram_view.disable();
+		m_ram_bank_select = data & 0x07;
+		update_ram_bank();
 
-		m_rom_view.select(BIT(data, 7));
+		m_rom_select = BIT(data, 7);
 
 		if (BIT(data, 6))
 		{

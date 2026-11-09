@@ -12,11 +12,12 @@
 
 #pragma once
 
+#include "9h0-0008_iox.h"
+
 #include <string>
 #include <system_error>
 #include <utility>
 
-#include "9h0-0008_iox.h"
 
 class sega_9h0_0008_card_device : public sega_9h0_0008_iox_slot_device, public device_image_interface
 {
