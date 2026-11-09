@@ -101,7 +101,7 @@ private:
 	attotime get_stepping_rate();
 	void start_command();
 	void end_command();
-	bool id_found(uint8_t sector);
+	bool id_found();
 	int get_lbasector(uint8_t sector);
 
 	// extract values from sdh
