@@ -86,6 +86,7 @@ DEFINE_DEVICE_TYPE(HD6345,   hd6345_device,   "hd6345",   "Hitachi HD6345 CRTC-I
 mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this, false)
+	, m_reset_blanks_frame(false)
 	, m_line_counter_mask(0x7f)
 	, m_interlace_fields(false)
 	, m_latch_row_end(false)
@@ -115,6 +116,9 @@ mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, co
 mc6845_device::mc6845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6845_device(mconfig, MC6845, tag, owner, clock)
 {
+	// the Motorola sheet holds DE and CURSOR off for a frame after RESET;
+	// also stands in for Hitachi HD46505R parts, which follow it here
+	m_reset_blanks_frame = true;
 }
 
 
@@ -864,13 +868,14 @@ void mc6845_device::reset_w(int state)
 			return;
 		set_de(false);
 	}
-	else if (m_has_valid_parameters)
+	else if (m_has_valid_parameters || m_display_off)
 	{
-		// scan timing starts at the first line of a frame (R6545-1, SY6545;
-		// the HD46505R starts the display at once).  The MC6845 holds DE and
-		// CURSOR off until a frame has been displayed.  frame_start() is
-		// skipped: it moves the screen origin, which a CRTC reset every row
-		// would do every row.
+		// scan timing starts at release (R6545-1, SY6545); starting at the
+		// first line of a frame, at R12/R13, is inferred.  The MC6845 holds
+		// DE and CURSOR off until a frame has been displayed; the 6545 sheets
+		// describe no such hold.  With R1 or R6 at 0 the sync timing still
+		// runs, so it restarts too.  frame_start() is skipped: it moves the
+		// screen origin, which a CRTC reset every row would do every row.
 		m_reset_blank = m_reset_blanks_frame;
 		start_line(begin_frame());
 	}
@@ -1090,7 +1095,6 @@ void mc6845_device::device_start()
 	m_supports_status_reg_d6 = false;
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
-	m_reset_blanks_frame = true;
 	m_has_valid_parameters = false;
 	m_display_off = false;
 	m_display_off_columns = 0;
@@ -1224,6 +1228,7 @@ void mc6845_device::device_validity_check(validity_checker &valid) const
 mc6845_1_device::mc6845_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6845_device(mconfig, MC6845_1, tag, owner, clock)
 {
+	m_reset_blanks_frame = true;
 }
 
 void mc6845_1_device::device_start()
@@ -1236,7 +1241,6 @@ void mc6845_1_device::device_start()
 	m_supports_status_reg_d6 = false;
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
-	m_reset_blanks_frame = true;
 }
 
 /*
@@ -1259,7 +1263,6 @@ void r6545_1_device::device_start()
 	m_supports_status_reg_d6 = true;
 	m_supports_status_reg_d7 = true;
 	m_supports_transparent = true;
-	m_reset_blanks_frame = false;
 }
 
 /*
@@ -1282,7 +1285,6 @@ void c6545_1_device::device_start()
 	m_supports_status_reg_d6 = true;
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
-	m_reset_blanks_frame = false;
 }
 
 /*
@@ -1305,7 +1307,6 @@ void sy6545_1_device::device_start()
 	m_supports_status_reg_d6 = true;
 	m_supports_status_reg_d7 = true;
 	m_supports_transparent = true;
-	m_reset_blanks_frame = false;
 }
 
 /*
@@ -1328,7 +1329,6 @@ void sy6845e_device::device_start()
 	m_supports_status_reg_d6 = true;
 	m_supports_status_reg_d7 = true;
 	m_supports_transparent = true;
-	m_reset_blanks_frame = false;
 }
 
 /*
@@ -1351,7 +1351,6 @@ void ams40489_device::device_start()
 	m_supports_status_reg_d6 = false;
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
-	m_reset_blanks_frame = false;
 }
 
 /*
@@ -1379,7 +1378,6 @@ void hd6845s_device::device_start()
 	m_supports_status_reg_d6 = false;
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
-	m_reset_blanks_frame = false;
 
 	// Non-interlace Mode, Interlace Sync Mode - When total number of rasters is RN, RN-1 shall be programmed.
 	m_noninterlace_adjust = 1;

@@ -121,8 +121,8 @@ public:
 	uint8_t get_ra();
 
 	// RESET pin (active low): the counters clear and the outputs go low,
-	// the registers are kept; release starts a frame at R12/R13.  The
-	// MOS 8563's own draw counters are not reset.
+	// the registers are kept; release starts a frame at R12/R13 (inferred).
+	// The MOS 8563's own draw counters are not reset.
 	void reset_w(int state);
 
 	/* simulates the LO->HI clocking of the light pen pin (pin 3) */
