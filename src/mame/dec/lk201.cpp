@@ -108,6 +108,9 @@ ________|D7  |D6  |D5  |D4 |D3 |D2 |D1 |D0
 #include "lk201.h"
 #include "speaker.h"
 
+#include <algorithm>
+#include <iterator>
+
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
@@ -139,25 +142,22 @@ ROM_END
 
 void lk201_device::device_add_mconfig(machine_config &config)
 {
-	M68HC05C4(config, m_maincpu, XTAL(4'000'000)); // clock verified by Lord_Nightmare
+	M68HC05C4(config, m_maincpu, 4_MHz_XTAL); // clock verified by Lord_Nightmare
 
 	// key matrix rows are driven from ports A and B and PC0-PC1, PC6 loads the matrix columns
 	// into a shift register and PC7 strobes the LED and bell volume latch
-	m_maincpu->porta_w().set([this] (offs_t, uint8_t data, uint8_t mask) { rows_w(0, data, mask); });
-	m_maincpu->portb_w().set([this] (offs_t, uint8_t data, uint8_t mask) { rows_w(1, data, mask); });
-	// PC4-PC5 are read back against strobes on PC0, PC1, PC6 and PC7 to form the keyboard
-	// variant code that follows the power-up ID byte; they read 0 on this keyboard (LK201-AA).
-	// Which of PC2-PC5 are pulled up and which down isn't known, so inputs all read low.
+	m_maincpu->porta_w().set(FUNC(lk201_device::rows_w<0>));
+	m_maincpu->portb_w().set(FUNC(lk201_device::rows_w<1>));
+	// The firmware reads PC4-PC5 back against strobes on PC0, PC1, PC6 and PC7 to form the
+	// keyboard variant code that follows the power-up ID byte.  Inferred: the board's pull-ups
+	// on PC2-PC5 aren't known, so all inputs read low, which gives variant code 0.
 	m_maincpu->portc_r().set_constant(0x00);
-	m_maincpu->portc_w().set([this] (offs_t, uint8_t data, uint8_t mask) { portc_w(data, mask); });
+	m_maincpu->portc_w().set(FUNC(lk201_device::portc_w));
 
 	// the SPI shifts those registers; MISO is PD2, which the SPI samples through the port D read
-	m_maincpu->spi_sck().set([this] (int state) { sck_w(state); });
-	m_maincpu->spi_mosi().set([this] (int state) { mosi_w(state); });
-	m_maincpu->portd_r().set([this] () { return portd_r(); });
-
-	// the SCI is the serial line to the host
-	m_maincpu->sci_tdo().set([this] (int state) { m_tx_handler(state); });
+	m_maincpu->spi_sck().set(FUNC(lk201_device::sck_w));
+	m_maincpu->spi_mosi().set(FUNC(lk201_device::mosi_w));
+	m_maincpu->portd_r().set(FUNC(lk201_device::portd_r));
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_speaker, 2000); // clocked by a 555 timer at E8, the volume of the beep is controllable by: (8051 model) P2.0 thru P2.3, or (6805 model) the upper 4 bits of the LED data latch
@@ -454,8 +454,7 @@ lk201_device::lk201_device(const machine_config &mconfig, const char *tag, devic
 	m_led_wait(*this, "led_wait"),
 	m_led_compose(*this, "led_compose"),
 	m_led_lock(*this, "led_lock"),
-	m_led_hold(*this, "led_hold"),
-	m_tx_handler(*this)
+	m_led_hold(*this, "led_hold")
 {
 }
 
@@ -466,8 +465,8 @@ lk201_device::lk201_device(const machine_config &mconfig, const char *tag, devic
 void lk201_device::device_start()
 {
 	save_item(NAME(m_rows));
-	save_item(NAME(m_kbd_load));
-	save_item(NAME(m_latch_strobe));
+	save_item(NAME(m_pc6));
+	save_item(NAME(m_pc7));
 	save_item(NAME(m_sck));
 	save_item(NAME(m_mosi));
 	save_item(NAME(m_kbd_sr));
@@ -484,8 +483,8 @@ void lk201_device::device_reset()
 	// the pins are inputs until the firmware configures them; the load and strobe inputs
 	// are assumed to read high then (the board isn't known)
 	std::fill(std::begin(m_rows), std::end(m_rows), 0);
-	m_kbd_load = true;
-	m_latch_strobe = true;
+	m_pc6 = true;
+	m_pc7 = true;
 	m_sck = false;
 	m_mosi = 0;
 	m_kbd_sr = 0;
@@ -503,9 +502,9 @@ void lk201_device::device_reset()
 // with a key down in them read high.
 uint8_t lk201_device::scan_matrix()
 {
-	uint32_t const rows(uint32_t(m_rows[0]) | (uint32_t(m_rows[1]) << 8) | (uint32_t(m_rows[2] & 0x03) << 16));
+	uint32_t const rows(uint32_t(m_rows[0]) | (uint32_t(m_rows[1]) << 8) | (uint32_t(m_rows[2]) << 16));
 	uint8_t columns = 0;
-	for (unsigned i = 0; i < m_kbd.size(); i++)
+	for (u32 i = 0; i < m_kbd.size(); i++)
 	{
 		if (BIT(rows, i))
 			columns |= m_kbd[i]->read();
@@ -516,28 +515,29 @@ uint8_t lk201_device::scan_matrix()
 // The matrix columns go to a parallel-in shift register that loads while PC6 is low.
 void lk201_device::update_matrix_load()
 {
-	if (!m_kbd_load)
+	if (!m_pc6)
 		m_kbd_sr = scan_matrix();
 }
 
-void lk201_device::rows_w(unsigned port, uint8_t data, uint8_t mask)
+template <u32 N> void lk201_device::rows_w(offs_t offset, uint8_t data, uint8_t mask)
 {
-	m_rows[port] = data & mask;
+	m_rows[N] = data & mask;
 	update_matrix_load();
 }
 
-void lk201_device::portc_w(uint8_t data, uint8_t mask)
+void lk201_device::portc_w(offs_t offset, uint8_t data, uint8_t mask)
 {
 	m_rows[2] = data & mask & 0x03;
 
 	bool const load(BIT(data | ~mask, 6));
 	bool const strobe(BIT(data | ~mask, 7));
-	m_kbd_load = load;
+	m_pc6 = load;
 	update_matrix_load();
 
-	// PC7 falling latches the output shift register
-	bool const latch(m_latch_strobe && !strobe);
-	m_latch_strobe = strobe;
+	// PC7 falling latches the output shift register (the edge is inferred: the firmware only
+	// pulses it low then high)
+	bool const latch(m_pc7 && !strobe);
+	m_pc7 = strobe;
 	if (latch)
 		update_latch();
 }
@@ -550,7 +550,7 @@ void lk201_device::sck_w(int state)
 	m_sck = state;
 	if (rising)
 	{
-		if (m_kbd_load)
+		if (m_pc6)
 			m_kbd_sr <<= 1;
 		m_led_sr = (m_led_sr << 1) | m_mosi;
 	}
@@ -581,6 +581,7 @@ void lk201_device::update_latch()
 	if (level >= 0)
 	{
 		m_speaker->set_state(1);
+		// 12% per level is unsourced; the real taper hasn't been measured
 		m_speaker->set_output_gain(0, (100 - (12 * level)) / 100.0f);
 	}
 	else

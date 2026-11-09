@@ -11,7 +11,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-
 // ======================> m6805_base_device
 
 // Used by core CPU interface
@@ -304,7 +303,6 @@ protected:
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_program16;
 	memory_access<13, 0, 0, ENDIANNESS_BIG>::specific m_program13;
 };
-
 
 #define M6805_IRQ_LINE      0
 

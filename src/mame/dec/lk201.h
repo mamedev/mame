@@ -10,22 +10,6 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define LK_CMD_LEDS_ON          0x13    /* light LEDs - 1st param: led bitmask */
-#define LK_CMD_LEDS_OFF         0x11    /* turn off LEDs */
-
-#define LK_CMD_DIS_KEYCLK       0x99    /* disable the keyclick */
-#define LK_CMD_ENB_KEYCLK       0x1b    /* enable the keyclick - 1st param: volume */
-#define LK_CMD_DIS_CTLCLK       0xb9    /* disable the Ctrl keyclick */
-#define LK_CMD_ENB_CTLCLK       0xbb    /* enable the Ctrl keyclick */
-#define LK_CMD_SOUND_CLK        0x9f    /* emit a keyclick  - 1st param: volume */
-#define LK_CMD_DIS_BELL         0xa1    /* disable the bell */
-#define LK_CMD_ENB_BELL         0x23    /* enable the bell - 1st param: volume */
-#define LK_CMD_BELL             0xa7    /* emit a bell - 1st param: volume */
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -38,7 +22,7 @@ public:
 	lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// serial line to and from the host, through the MCU's SCI
-	auto tx_handler() { return m_tx_handler.bind(); }
+	auto tx_handler() { return m_maincpu.lookup()->sci_tdo(); }
 	void rx_w(int state) { m_maincpu->sci_rdi_w(state); }
 
 protected:
@@ -50,11 +34,11 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void rows_w(unsigned port, uint8_t data, uint8_t mask);
-	void portc_w(uint8_t data, uint8_t mask);
+	template <u32 N> void rows_w(offs_t offset, uint8_t data, uint8_t mask);
+	void portc_w(offs_t offset, uint8_t data, uint8_t mask);
 	void sck_w(int state);
 	void mosi_w(int state) { m_mosi = state; }
-	uint8_t portd_r() { return BIT(m_kbd_sr, 7) << 2; } // PD2 is MISO
+	uint8_t portd_r() { return 0x20 | (BIT(m_kbd_sr, 7) << 2); } // PD2 is MISO; PD5 is /SS, inferred high (the firmware never reads port D)
 
 	uint8_t scan_matrix();
 	void update_matrix_load();
@@ -71,14 +55,12 @@ private:
 	output_finder<> m_led_hold;
 
 	uint8_t m_rows[3];      // key matrix row drivers on ports A, B and C (bits 0 and 1 only)
-	bool m_kbd_load;        // PC6 level
-	bool m_latch_strobe;    // PC7 level
+	bool m_pc6;             // matrix load, active low
+	bool m_pc7;             // LED and bell volume latch strobe
 	bool m_sck;
-	int m_mosi;
+	u8 m_mosi;
 	uint8_t m_kbd_sr;       // matrix column input shift register
 	uint8_t m_led_sr;       // LED and bell volume output shift register
-
-	devcb_write_line m_tx_handler;
 };
 
 // device type definition
