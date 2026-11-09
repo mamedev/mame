@@ -2263,11 +2263,9 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			m_rombank = (data & 0x02);
 			m_intcxrom = (data & 0x01);
 
-			// update the aux state
-			auxbank_update();
-
-			// update LC state
 			lcrom_update();
+			auxbank_update();
+			update_slotrom_banks();
 			break;
 
 		default:
