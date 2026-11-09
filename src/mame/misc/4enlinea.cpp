@@ -238,6 +238,7 @@
 
 #include "emu.h"
 
+#include "bus/isa/isa.h"
 #include "cpu/z80/z80.h"
 #include "machine/i2cmem.h"
 #include "machine/nvram.h"
@@ -255,26 +256,49 @@
 
 namespace {
 
+// The UM487F is soldered to the board, which has no ISA bus
+class isa8_sysi_video_device : public device_t, public device_isa8_card_interface
+{
+public:
+	isa8_sysi_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	auto hsync_callback() { return m_video.lookup()->hsync_callback(); }
+
+protected:
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	// A15 = 1 selects the CGA video memory window of the UM487F
+	uint8_t vram_r(offs_t offset) { return m_video->mem_r(0x8000 + offset); }
+	void vram_w(offs_t offset, uint8_t data) { m_video->mem_w(0x8000 + offset, data); }
+	rgb_t rgbi_to_rgb(uint8_t rgbi);
+
+	required_device<um487f_device> m_video;
+};
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(ISA8_SYSI_VIDEO, isa8_sysi_video_device, isa8_sysi_video_device, "isa_sysi_video", "Compumatic System I UM487F video")
+
+
+namespace {
+
 class sysi_state : public driver_device
 {
 protected:
 	sysi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_video(*this, "um487f")
 		, m_ay(*this, "aysnd")
 		, m_eeprom(*this, "eeprom")
 	{ }
 
 	void hcga_config(machine_config &config) ATTR_COLD;
 
-	// A15 = 1 selects the CGA video memory window of the UM487F
-	uint8_t vram_r(offs_t offset) { return m_video->mem_r(0x8000 + offset); }
-	void vram_w(offs_t offset, uint8_t data) { m_video->mem_w(0x8000 + offset, data); }
-	rgb_t rgbi_to_rgb(uint8_t rgbi);
-
 	required_device<z80_device> m_maincpu;
-	required_device<um487f_device> m_video;
 	required_device<ay8910_device> m_ay;
 	required_device<i2cmem_device> m_eeprom;
 };
@@ -594,7 +618,6 @@ uint8_t _4enlinea_state::ay_portb_r()
 void _4enlinea_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).rw(FUNC(_4enlinea_state::vram_r), FUNC(_4enlinea_state::vram_w));
 	map(0xc000, 0xdfff).ram();
 
 	map(0xe000, 0xe001).r(FUNC(_4enlinea_state::link_r));
@@ -603,8 +626,6 @@ void _4enlinea_state::main_map(address_map &map)
 void _4enlinea_state::main_portmap(address_map &map)
 {
 	map.global_mask(0x3ff);
-
-	map(0x3b0, 0x3df).rw(m_video, FUNC(um487f_device::io_r), FUNC(um487f_device::io_w));
 }
 
 void _4enlinea_state::master_map(address_map &map)
@@ -678,19 +699,19 @@ uint8_t k7_state::ay_portb_r()
 void k7_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).rw(FUNC(k7_state::vram_r), FUNC(k7_state::vram_w));
 	map(0xc000, 0xdfff).bankr(m_rombank);
 	map(0xe000, 0xffff).ram().share("nvram");
 }
 
 void k7_state::io_map(address_map &map)
 {
-	map(0x0000, 0x0000).mirror(0xfc00).w(FUNC(k7_state::out0_w));
-	map(0x0001, 0x0001).mirror(0xfc00).portr("IN1").w(FUNC(k7_state::out1_w));
+	map.global_mask(0x3ff);
+
+	map(0x0000, 0x0000).w(FUNC(k7_state::out0_w));
+	map(0x0001, 0x0001).portr("IN1").w(FUNC(k7_state::out1_w));
 	map(0x0100, 0x0100).w(m_ay, FUNC(ay8910_device::address_w));
 	map(0x0101, 0x0101).r(m_ay, FUNC(ay8910_device::data_r));
 	map(0x0102, 0x0102).w(m_ay, FUNC(ay8910_device::data_w));
-	map(0x03b0, 0x03df).mirror(0xfc00).rw(m_video, FUNC(um487f_device::io_r), FUNC(um487f_device::io_w));
 }
 
 
@@ -716,7 +737,7 @@ void k7olym30_state::k7olym30_out1_w(uint8_t data)
 void k7olym30_state::k7olym30_io_map(address_map &map)
 {
 	io_map(map);
-	map(0x0001, 0x0001).mirror(0xfc00).rw(FUNC(k7olym30_state::k7olym30_in1_r), FUNC(k7olym30_state::k7olym30_out1_w));
+	map(0x0001, 0x0001).rw(FUNC(k7olym30_state::k7olym30_in1_r), FUNC(k7olym30_state::k7olym30_out1_w));
 }
 
 
@@ -738,8 +759,8 @@ void sprtdart_state::sprtdart_out1_w(uint8_t data)
 void sprtdart_state::sprtdart_io_map(address_map &map)
 {
 	io_map(map);
-	map(0x0000, 0x0000).mirror(0xfc00).w(FUNC(sprtdart_state::sprtdart_out0_w));
-	map(0x0001, 0x0001).mirror(0xfc00).w(FUNC(sprtdart_state::sprtdart_out1_w));
+	map(0x0000, 0x0000).w(FUNC(sprtdart_state::sprtdart_out0_w));
+	map(0x0001, 0x0001).w(FUNC(sprtdart_state::sprtdart_out1_w));
 }
 
 
@@ -1028,10 +1049,17 @@ void sprtdart_state::machine_reset()
 
 
 /***********************************
-*         Machine Drivers          *
+*          Video Hardware          *
 ***********************************/
 
-void sysi_state::hcga_config(machine_config &config)
+isa8_sysi_video_device::isa8_sysi_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ISA8_SYSI_VIDEO, tag, owner, clock)
+	, device_isa8_card_interface(mconfig, *this)
+	, m_video(*this, "um487f")
+{
+}
+
+void isa8_sysi_video_device::device_add_mconfig(machine_config &config)
 {
 	// the UM487F reconfigures it from its CRTC registers
 	screen_device &screen(SCREEN(config, "screen"));
@@ -1040,7 +1068,15 @@ void sysi_state::hcga_config(machine_config &config)
 
 	UM487F(config, m_video, 14.318181_MHz_XTAL); // MOSC (MGA clock) tied to GND
 	m_video->set_screen("screen");
-	m_video->set_rgbi_callback(FUNC(sysi_state::rgbi_to_rgb));
+	m_video->set_rgbi_callback(FUNC(isa8_sysi_video_device::rgbi_to_rgb));
+}
+
+void isa8_sysi_video_device::device_start()
+{
+	set_isa_device();
+
+	m_isa->install_memory(0x8000, 0xbfff, read8sm_delegate(*this, FUNC(isa8_sysi_video_device::vram_r)), write8sm_delegate(*this, FUNC(isa8_sysi_video_device::vram_w)));
+	m_isa->install_device(0x03b0, 0x03df, read8sm_delegate(*m_video, FUNC(um487f_device::io_r)), write8sm_delegate(*m_video, FUNC(um487f_device::io_w)));
 }
 
 /*
@@ -1051,10 +1087,29 @@ void sysi_state::hcga_config(machine_config &config)
   TODO: the dual CPU boards have the transistor footprints bypassed by
   jumpers, assume the same levels.
 */
-rgb_t sysi_state::rgbi_to_rgb(uint8_t rgbi)
+rgb_t isa8_sysi_video_device::rgbi_to_rgb(uint8_t rgbi)
 {
 	uint8_t const level = BIT(rgbi, 3) ? 0x80 : 0xff; // guess: half level when loaded
 	return rgb_t(BIT(rgbi, 2) ? level : 0, BIT(rgbi, 1) ? level : 0, BIT(rgbi, 0) ? level : 0);
+}
+
+
+/***********************************
+*         Machine Drivers          *
+***********************************/
+
+void sysi_isa8_cards(device_slot_interface &device)
+{
+	device.option_add_internal("sysi_video", ISA8_SYSI_VIDEO);
+}
+
+void sysi_state::hcga_config(machine_config &config)
+{
+	isa8_device &isa(ISA8(config, "isa"));
+	isa.set_memspace(m_maincpu, AS_PROGRAM);
+	isa.set_iospace(m_maincpu, AS_IO);
+
+	ISA8_SLOT(config, "board1", 0, "isa", sysi_isa8_cards, "sysi_video", true);
 }
 
 void _4enlinea_state::_4enlinea(machine_config &config)
@@ -1121,7 +1176,10 @@ void k7_state::k7_olym(machine_config &config)
 	   them, with the same timings as Sport Darts (IRQ routine every 16
 	   horizontal syncs) and the Compumatic master CPU (100 ticks per second).
 	   The CM3080 subboard has two HEF4020 ripple counters. */
-	m_video->hsync_callback().set(FUNC(k7_state::hsync_w));
+	subdevice<isa8_slot_device>("board1")->set_option_machine_config("sysi_video", [this] (device_t *device)
+	{
+		downcast<isa8_sysi_video_device &>(*device).hsync_callback().set(*this, FUNC(k7_state::hsync_w));
+	});
 
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, m_ay, 14.318181_MHz_XTAL / 8); // Winbond WF19054
@@ -1147,7 +1205,10 @@ void sprtdart_state::sprtdart(machine_config &config)
 	   The CM3080 derives /INT from the UM487F clock, it has no horizontal sync
 	   input, but the IRQ handler counts the IRQs from the vertical retrace to
 	   change the background color at a given raster line. */
-	m_video->hsync_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0, ASSERT_LINE); // TODO: polarity
+	subdevice<isa8_slot_device>("board1")->set_option_machine_config("sysi_video", [this] (device_t *device)
+	{
+		downcast<isa8_sysi_video_device &>(*device).hsync_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0, ASSERT_LINE); // TODO: polarity
+	});
 }
 
 
