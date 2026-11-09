@@ -132,12 +132,12 @@
 
 namespace {
 
-class ppstation_state : public driver_device
+class ppstatn_state : public driver_device
 {
 public:
 	static constexpr feature_type unemulated_features() { return feature::CAMERA | feature::PRINTER; }
 
-	ppstation_state(const machine_config &mconfig, device_type type, const char *tag) :
+	ppstatn_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
@@ -157,7 +157,7 @@ public:
 		m_side_light(*this, "side_light")
 	{ }
 
-	void ppstation(machine_config &config) ATTR_COLD;
+	void ppstatn(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -216,7 +216,7 @@ private:
 };
 
 
-void ppstation_state::machine_start()
+void ppstatn_state::machine_start()
 {
 	save_item(NAME(m_irqctrl));
 	save_item(NAME(m_vidregs));
@@ -235,7 +235,7 @@ void ppstation_state::machine_start()
 	}
 }
 
-void ppstation_state::machine_reset()
+void ppstatn_state::machine_reset()
 {
 	m_irqctrl = 0;
 	m_maincpu->set_input_line(4, CLEAR_LINE);
@@ -252,7 +252,7 @@ void ppstation_state::machine_reset()
 ***************************************************************************/
 
 template <int Chip>
-void ppstation_state::colorram_w(offs_t offset, u32 data, u32 mem_mask)
+void ppstatn_state::colorram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_colorram[Chip][offset]);
 	u32 const v = m_colorram[Chip][offset];
@@ -260,27 +260,27 @@ void ppstation_state::colorram_w(offs_t offset, u32 data, u32 mem_mask)
 }
 
 template <int Chip>
-u16 ppstation_state::vidregs_r(offs_t offset)
+u16 ppstatn_state::vidregs_r(offs_t offset)
 {
 	return m_vidregs[Chip][offset & 0x7f];
 }
 
 template <int Chip>
-void ppstation_state::vidregs_w(offs_t offset, u16 data, u16 mem_mask)
+void ppstatn_state::vidregs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vidregs[Chip][offset & 0x7f]);
 }
 
 // the self test selects one of 1024 2KB banks with e03028 / e43028 and reads the tile ROM back here
 template <int Chip>
-u32 ppstation_state::gfxrom_window_r(offs_t offset)
+u32 ppstatn_state::gfxrom_window_r(offs_t offset)
 {
 	u8 const *const rom = m_gfxrom[Chip]->base();
 	u32 const base = (((vidreg(0xe03028 + (Chip * 0x40000)) & 0x3ff) * 0x800) + (offset * 4)) & (m_gfxrom[Chip]->bytes() - 1);
 	return get_u32be(&rom[base]);
 }
 
-void ppstation_state::draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, u32 base, int rows, int palbase)
+void ppstatn_state::draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, u32 base, int rows, int palbase)
 {
 	gfx_element *const gfx = m_gfxdecode->gfx(chip);
 	u32 const *const vram = &m_vidram[chip][base / 4];
@@ -333,7 +333,7 @@ void ppstation_state::draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect
     Larger sprites use the usual Konami interleaved cell order. The list is
     terminated by entries whose byte +2 is 0 and byte +3 is 0xff.
 */
-void ppstation_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void ppstatn_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static constexpr u8 XOFFSET[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
 	static constexpr u8 YOFFSET[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
@@ -411,7 +411,7 @@ inline u16 test_pattern_pen(int x, int y, int width, int height, int base)
 	return base + std::min(7, (x * 8) / width);
 }
 
-u32 ppstation_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 ppstatn_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// The tilemap RAM is addressed linearly with 64 entries per row. The program draws its
 	// "layer 2" (panels, frames, keyboards) at 0x8000 (64x128 tiles) and its "layer 1" (text,
@@ -446,7 +446,7 @@ u32 ppstation_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-void ppstation_state::vblank_w(int state)
+void ppstatn_state::vblank_w(int state)
 {
 	if (!state)
 		return;
@@ -467,7 +467,7 @@ void ppstation_state::vblank_w(int state)
     Main CPU
 ***************************************************************************/
 
-void ppstation_state::irqctrl_w(offs_t offset, u16 data, u16 mem_mask)
+void ppstatn_state::irqctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// bit 7 is toggled continuously (watchdog kick)
 	// bits 4, 5 and 0 are cleared and set again by the level 4, 5 and 6 handlers (enable / acknowledge)
@@ -481,7 +481,7 @@ void ppstation_state::irqctrl_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 // output latch at 380000 (D31-24), bit assignment from the OUTPUT CHECK screen
-void ppstation_state::outputs_w(u8 data)
+void ppstatn_state::outputs_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // coin counter
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // paper out (print) counter
@@ -493,12 +493,12 @@ void ppstation_state::outputs_w(u8 data)
 }
 
 // video mixer / camera control at e80000, see screen_update
-u32 ppstation_state::mixer_r()
+u32 ppstatn_state::mixer_r()
 {
 	return m_mixer;
 }
 
-void ppstation_state::mixer_w(offs_t offset, u32 data, u32 mem_mask)
+void ppstatn_state::mixer_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_mixer);
 }
@@ -518,7 +518,7 @@ void ppstation_state::mixer_w(offs_t offset, u32 data, u32 mem_mask)
               written once before a frame is read back.
       3c000c  secondary status, read by the level 6 handler (bit 4 tested)
 */
-u8 ppstation_state::printer_r(offs_t offset)
+u8 ppstatn_state::printer_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -545,7 +545,7 @@ u8 ppstation_state::printer_r(offs_t offset)
 	return 0;
 }
 
-void ppstation_state::printer_w(offs_t offset, u8 data)
+void ppstatn_state::printer_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -560,17 +560,17 @@ void ppstation_state::printer_w(offs_t offset, u8 data)
 	}
 }
 
-void ppstation_state::main_map(address_map &map)
+void ppstatn_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom().region("maincpu", 0);
 	map(0x100000, 0x17ffff).ram();
-	map(0x340000, 0x340001).w(FUNC(ppstation_state::irqctrl_w));
+	map(0x340000, 0x340001).w(FUNC(ppstatn_state::irqctrl_w));
 	map(0x340004, 0x340007).lr32(NAME([this] () -> u32 { return u32(m_inputs[1]->read()) << 16; })); // DIP switches
 	map(0x340008, 0x34000b).lr32(NAME([this] () -> u32 { return u32(m_inputs[0]->read()) << 16; }));
 	map(0x360000, 0x360003).umask32(0xff00'0000).r(m_soundstatus, FUNC(generic_latch_8_device::read)); // status byte from the sound CPU
-	map(0x380000, 0x380003).umask32(0xff00'0000).w(FUNC(ppstation_state::outputs_w)); // lamps and counters
+	map(0x380000, 0x380003).umask32(0xff00'0000).w(FUNC(ppstatn_state::outputs_w)); // lamps and counters
 	map(0x3a0000, 0x3a0003).nopw(); // self test stage / error code on the low byte, bits 8-10 set by the video code
-	map(0x3c0000, 0x3c000f).umask32(0xff00'0000).rw(FUNC(ppstation_state::printer_r), FUNC(ppstation_state::printer_w));
+	map(0x3c0000, 0x3c000f).umask32(0xff00'0000).rw(FUNC(ppstatn_state::printer_r), FUNC(ppstatn_state::printer_w));
 	map(0x3e0000, 0x3e0003).umask32(0xffff'0000).w(m_soundlatch, FUNC(generic_latch_16_device::write)); // command word to the sound CPU, polled by its main loop
 	map(0x400000, 0x7fffff).rom().region("data", 0); // b03 on D31-16, b04 on D15-0
 	map(0xa00000, 0xafffff).umask32(0xffff'0000).ram(); // "PRINT RAM"
@@ -579,17 +579,17 @@ void ppstation_state::main_map(address_map &map)
 
 	// video chip A
 	map(0xe00000, 0xe3ffff).ram().share(m_vidram[0]);
-	map(0xe02000, 0xe02fff).ram().w(FUNC(ppstation_state::colorram_w<0>)).share(m_colorram[0]);
-	map(0xe03000, 0xe030ff).rw(FUNC(ppstation_state::vidregs_r<0>), FUNC(ppstation_state::vidregs_w<0>));
-	map(0xe03800, 0xe03fff).r(FUNC(ppstation_state::gfxrom_window_r<0>));
+	map(0xe02000, 0xe02fff).ram().w(FUNC(ppstatn_state::colorram_w<0>)).share(m_colorram[0]);
+	map(0xe03000, 0xe030ff).rw(FUNC(ppstatn_state::vidregs_r<0>), FUNC(ppstatn_state::vidregs_w<0>));
+	map(0xe03800, 0xe03fff).r(FUNC(ppstatn_state::gfxrom_window_r<0>));
 
 	// video chip B
 	map(0xe40000, 0xe7ffff).ram().share(m_vidram[1]);
-	map(0xe42000, 0xe42fff).ram().w(FUNC(ppstation_state::colorram_w<1>)).share(m_colorram[1]);
-	map(0xe43000, 0xe430ff).rw(FUNC(ppstation_state::vidregs_r<1>), FUNC(ppstation_state::vidregs_w<1>));
-	map(0xe43800, 0xe43fff).r(FUNC(ppstation_state::gfxrom_window_r<1>));
+	map(0xe42000, 0xe42fff).ram().w(FUNC(ppstatn_state::colorram_w<1>)).share(m_colorram[1]);
+	map(0xe43000, 0xe430ff).rw(FUNC(ppstatn_state::vidregs_r<1>), FUNC(ppstatn_state::vidregs_w<1>));
+	map(0xe43800, 0xe43fff).r(FUNC(ppstatn_state::gfxrom_window_r<1>));
 
-	map(0xe80000, 0xe80003).rw(FUNC(ppstation_state::mixer_r), FUNC(ppstation_state::mixer_w)); // video mixer / camera control
+	map(0xe80000, 0xe80003).rw(FUNC(ppstatn_state::mixer_r), FUNC(ppstatn_state::mixer_w)); // video mixer / camera control
 	map(0xe80004, 0xe8001f).noprw();
 	map(0xf00000, 0xf0001f).nopw(); // camera interfaces? 16-bit registers, written at reset and once per frame
 	map(0xf40000, 0xf4001f).nopw();
@@ -601,7 +601,7 @@ void ppstation_state::main_map(address_map &map)
     Sound CPU
 ***************************************************************************/
 
-void ppstation_state::sound_map(address_map &map)
+void ppstatn_state::sound_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().region("soundcpu", 0);
 	map(0x080000, 0x083fff).ram();
@@ -613,7 +613,7 @@ void ppstation_state::sound_map(address_map &map)
 }
 
 
-INPUT_PORTS_START( ppstation )
+INPUT_PORTS_START( ppstatn )
 	PORT_START("IN0") // read at 340008
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN1 ) // counted on release, held for 5 seconds -> coin selector error
@@ -676,20 +676,20 @@ INPUT_PORTS_START( ppstation )
 INPUT_PORTS_END
 
 
-GFXDECODE_START( gfx_ppstation )
+GFXDECODE_START( gfx_ppstatn )
 	GFXDECODE_ENTRY( "gfx_a", 0, gfx_8x8x4_packed_lsb, 0,    64 )
 	GFXDECODE_ENTRY( "gfx_b", 0, gfx_8x8x4_packed_lsb, 1024, 64 )
 GFXDECODE_END
 
 
-void ppstation_state::ppstation(machine_config &config)
+void ppstatn_state::ppstatn(machine_config &config)
 {
 	// basic machine hardware
 	M68EC020(config, m_maincpu, 50_MHz_XTAL / 2); // 25 MHz rated part, 50 MHz oscillator; divider is a guess
-	m_maincpu->set_addrmap(AS_PROGRAM, &ppstation_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ppstatn_state::main_map);
 
 	M68000(config, m_soundcpu, 50_MHz_XTAL / 6); // 68EC000FN8, divider is a guess
-	m_soundcpu->set_addrmap(AS_PROGRAM, &ppstation_state::sound_map);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &ppstatn_state::sound_map);
 
 	GENERIC_LATCH_16(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 6);
@@ -703,11 +703,11 @@ void ppstation_state::ppstation(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(512, 408);
 	m_screen->set_visarea(0, 496 - 1, 0, 384 - 1); // the tilemap frames and the sprites need this much; registers e03030-e0303a (1a1, 17f, 306, 149, f8, 180a) are probably the real timings
-	m_screen->set_screen_update(FUNC(ppstation_state::screen_update));
+	m_screen->set_screen_update(FUNC(ppstatn_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(ppstation_state::vblank_w));
+	m_screen->screen_vblank().set(FUNC(ppstatn_state::vblank_w));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ppstation);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ppstatn);
 	PALETTE(config, m_palette).set_entries(2048 + 16); // the last 16 are the stand-in camera picture
 
 	// sound hardware
@@ -719,7 +719,7 @@ void ppstation_state::ppstation(machine_config &config)
 }
 
 
-ROM_START( ppstation )
+ROM_START( ppstatn )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // HN27C4096 EPROMs on the CPU board
 	ROM_LOAD32_WORD_SWAP( "657a01.12c", 0x000000, 0x080000, CRC(eb42a415) SHA1(3f03868a0d152c20705b94ea1143499f4f8646f7) )
 	ROM_LOAD32_WORD_SWAP( "657a02.14c", 0x000002, 0x080000, CRC(5cafe0a7) SHA1(cdc22cec9b760257623347cba4cbf3e9036415a7) )
@@ -750,4 +750,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1996, ppstation, 0, ppstation, ppstation, ppstation_state, empty_init, ROT0, "Konami", "Puri Puri Station", MACHINE_NOT_WORKING ) // requires camera and printer emulation
+GAME( 1996, ppstatn, 0, ppstatn, ppstatn, ppstatn_state, empty_init, ROT0, "Konami", "Puri Puri Station", MACHINE_NOT_WORKING ) // requires camera and printer emulation
