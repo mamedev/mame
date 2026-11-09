@@ -539,7 +539,7 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "machine/msm6253.h"
 #include "machine/upd4701.h"
 #include "315_5296.h"
-#include "radmdlxmc.h"
+#include "837_7753.h"
 #include "sound/cdda.h"
 #include "sound/rf5c68.h"
 #include "sound/ymopn.h"
@@ -2803,7 +2803,7 @@ public:
 	void sega_system32_radm(machine_config &config) ATTR_COLD;
 
 private:
-	required_device<radmdlxmc_device> m_drivebd;
+	required_device<sega_837_7753_device> m_drivebd;
 	required_ioport m_cabinet;
 
 	bool deluxe() const { return BIT(m_cabinet->read(), 0); }
@@ -2885,12 +2885,12 @@ void segas32_radm_state::sega_system32_radm(machine_config &config)
 {
 	sega_system32_analog(config);
 
-	RADM_DLX_MOVCTRL(config, m_drivebd);
+	SEGA_837_7753(config, m_drivebd);
 	m_drivebd->lamps_cb().set(FUNC(segas32_radm_state::drivebd_lamps_w));
 
 	sega_315_5296_device &io_chip(*subdevice<sega_315_5296_device>("mainpcb:io_chip"));
 	io_chip.in_pc_callback().set(FUNC(segas32_radm_state::io_portc_r));
-	io_chip.out_pc_callback().set(m_drivebd, FUNC(radmdlxmc_device::data_w));
+	io_chip.out_pc_callback().set(m_drivebd, FUNC(sega_837_7753_device::data_w));
 	io_chip.out_pd_callback().append(FUNC(segas32_radm_state::drivebd_strobe_w)).bit(4);
 	io_chip.out_pg_callback().set(FUNC(segas32_radm_state::io_portg_w));
 }

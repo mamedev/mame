@@ -50,7 +50,7 @@
 *******************************************************************************************/
 
 #include "emu.h"
-#include "radmdlxmc.h"
+#include "837_7753.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
@@ -73,10 +73,10 @@ constexpr s32 BANK_CENTER = 16; // half width of the center sensor vane
 } // anonymous namespace
 
 
-DEFINE_DEVICE_TYPE(RADM_DLX_MOVCTRL, radmdlxmc_device, "radmdlxmc", "Sega Rad Mobile Deluxe Cabinet Moving Control")
+DEFINE_DEVICE_TYPE(SEGA_837_7753, sega_837_7753_device, "sega_837_7753", "Sega 837-7753 Drive Board")
 
-radmdlxmc_device::radmdlxmc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, RADM_DLX_MOVCTRL, tag, owner, clock)
+sega_837_7753_device::sega_837_7753_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, SEGA_837_7753, tag, owner, clock)
 	, m_maincpu(*this, "maincpu")
 	, m_pit1(*this, "pit1")
 	, m_upd4701(*this, "upd4701")
@@ -94,10 +94,10 @@ radmdlxmc_device::radmdlxmc_device(const machine_config &mconfig, const char *ta
 {
 }
 
-void radmdlxmc_device::device_start()
+void sega_837_7753_device::device_start()
 {
 	attotime const period = attotime::from_hz(MOTION_RATE);
-	timer_alloc(FUNC(radmdlxmc_device::motion_tick), this)->adjust(period, 0, period);
+	timer_alloc(FUNC(sega_837_7753_device::motion_tick), this)->adjust(period, 0, period);
 
 	save_item(NAME(m_host_addr));
 	save_item(NAME(m_host_data));
@@ -108,7 +108,7 @@ void radmdlxmc_device::device_start()
 	save_item(NAME(m_motor_pos));
 }
 
-u8 radmdlxmc_device::data_r()
+u8 sega_837_7753_device::data_r()
 {
 	// the board only drives the data lines during a read strobe
 	if (m_host_strobe || !BIT(m_host_addr, 7))
@@ -117,17 +117,17 @@ u8 radmdlxmc_device::data_r()
 	return m_ram[m_host_addr & 0x7f];
 }
 
-void radmdlxmc_device::data_w(u8 data)
+void sega_837_7753_device::data_w(u8 data)
 {
 	m_host_data = data;
 }
 
-void radmdlxmc_device::addr_w(u8 data)
+void sega_837_7753_device::addr_w(u8 data)
 {
 	m_host_addr = data;
 }
 
-void radmdlxmc_device::strobe_w(int state)
+void sega_837_7753_device::strobe_w(int state)
 {
 	if (!state && m_host_strobe && !BIT(m_host_addr, 7))
 		m_ram[m_host_addr & 0x7f] = m_host_data;
@@ -135,19 +135,19 @@ void radmdlxmc_device::strobe_w(int state)
 	m_host_strobe = state;
 }
 
-IRQ_CALLBACK_MEMBER(radmdlxmc_device::irq_ack)
+IRQ_CALLBACK_MEMBER(sega_837_7753_device::irq_ack)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	return 0xff;
 }
 
-void radmdlxmc_device::timer_irq_w(int state)
+void sega_837_7753_device::timer_irq_w(int state)
 {
 	if (!state)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-u8 radmdlxmc_device::switches_r()
+u8 sega_837_7753_device::switches_r()
 {
 	// d4: low on over-current, d5: low on over-temperature
 	s32 const pos = bank_position();
@@ -162,13 +162,13 @@ u8 radmdlxmc_device::switches_r()
 	return data;
 }
 
-void radmdlxmc_device::drive_enable_w(u8 data)
+void sega_837_7753_device::drive_enable_w(u8 data)
 {
 	// d0: driving left, d1: driving right, both clear to stop the motor; d4-d6 always set
 	m_drive_enable = data;
 }
 
-void radmdlxmc_device::pit1_w(offs_t offset, u8 data)
+void sega_837_7753_device::pit1_w(offs_t offset, u8 data)
 {
 	m_pit1->write(offset, data);
 
@@ -177,7 +177,7 @@ void radmdlxmc_device::pit1_w(offs_t offset, u8 data)
 		m_pwm_duty = data;
 }
 
-TIMER_CALLBACK_MEMBER(radmdlxmc_device::motion_tick)
+TIMER_CALLBACK_MEMBER(sega_837_7753_device::motion_tick)
 {
 	// more than 50% duty drives left; either PA0/PA1 enables both ways, as the vibration needs it
 	double const drive = (m_drive_enable & 0x03) ? ((127.0 - m_pwm_duty) / 128.0) : 0.0;
@@ -203,44 +203,44 @@ TIMER_CALLBACK_MEMBER(radmdlxmc_device::motion_tick)
 	m_bank_motor = s32(std::lround(drive * 128.0));
 }
 
-s32 radmdlxmc_device::bank_position() const
+s32 sega_837_7753_device::bank_position() const
 {
 	return s32(std::floor(m_motor_pos / GEAR_RATIO));
 }
 
-ioport_value radmdlxmc_device::bank_encoder_r()
+ioport_value sega_837_7753_device::bank_encoder_r()
 {
 	return bank_position() & 0xfff;
 }
 
-ioport_value radmdlxmc_device::motor_encoder_r()
+ioport_value sega_837_7753_device::motor_encoder_r()
 {
 	return s32(std::floor(m_motor_pos)) & 0xfff;
 }
 
-void radmdlxmc_device::program_map(address_map &map)
+void sega_837_7753_device::program_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8003).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x8100, 0x8103).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x8200, 0x8203).rw("pit0", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
-	map(0x8300, 0x8303).r(m_pit1, FUNC(pit8254_device::read)).w(FUNC(radmdlxmc_device::pit1_w));
+	map(0x8300, 0x8303).r(m_pit1, FUNC(pit8254_device::read)).w(FUNC(sega_837_7753_device::pit1_w));
 	map(0x8400, 0x8403).r(m_upd4701, FUNC(upd4701_device::read_xy));
 	map(0x8600, 0x8600).nopw(); // over-current latch reset
 	map(0x8c00, 0x8c03).nopw(); // monitor: motor speed, bank position, target and drive
 	map(0xc000, 0xdfff).ram().share(m_ram);
 }
 
-void radmdlxmc_device::device_add_mconfig(machine_config &config)
+void sega_837_7753_device::device_add_mconfig(machine_config &config)
 {
 	Z80(config, m_maincpu, 8_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &radmdlxmc_device::program_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(radmdlxmc_device::irq_ack));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sega_837_7753_device::program_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(sega_837_7753_device::irq_ack));
 
 	// PC3 toggles on every interrupt, probably the MB3773 watchdog clock
 	i8255_device &ppi0(I8255(config, "ppi0"));
-	ppi0.out_pa_callback().set(FUNC(radmdlxmc_device::drive_enable_w));
-	ppi0.in_pb_callback().set(FUNC(radmdlxmc_device::switches_r));
+	ppi0.out_pa_callback().set(FUNC(sega_837_7753_device::drive_enable_w));
+	ppi0.in_pb_callback().set(FUNC(sega_837_7753_device::switches_r));
 	ppi0.in_pc_callback().set_ioport("DSW");
 
 	i8255_device &ppi1(I8255(config, "ppi1"));
@@ -251,7 +251,7 @@ void radmdlxmc_device::device_add_mconfig(machine_config &config)
 	pit0.set_clk<0>(8_MHz_XTAL / 2);
 	pit0.set_clk<1>(8_MHz_XTAL / 1024); // SFTYCLK jumper set to 8K
 	pit0.set_clk<2>(8_MHz_XTAL / 1024);
-	pit0.out_handler<0>().set(FUNC(radmdlxmc_device::timer_irq_w));
+	pit0.out_handler<0>().set(FUNC(sega_837_7753_device::timer_irq_w));
 
 	PIT8254(config, m_pit1);
 
@@ -260,7 +260,7 @@ void radmdlxmc_device::device_add_mconfig(machine_config &config)
 	m_upd4701->set_porty_tag("MOTOR");
 }
 
-static INPUT_PORTS_START(radmdlxmc)
+static INPUT_PORTS_START(sega_837_7753)
 	PORT_START("DSW")
 	PORT_DIPNAME(0x30, 0x00, "Motion Strength") PORT_DIPLOCATION("DSW:1,2")
 	PORT_DIPSETTING(   0x20, DEF_STR(Low))
@@ -279,21 +279,23 @@ static INPUT_PORTS_START(radmdlxmc)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Sensor C (Base Right Rear)")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Sensor D (Base Left)")
 	PORT_BIT(0x70, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN) // low: random motion, host ignored
+	PORT_CONFNAME(0x80, 0x80, "Random Motion") // ignores the host when enabled; physical source unknown
+	PORT_CONFSETTING(   0x80, DEF_STR(No))
+	PORT_CONFSETTING(   0x00, DEF_STR(Yes))
 
 	PORT_START("BANK")
-	PORT_BIT(0xfff, 0x000, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(radmdlxmc_device::bank_encoder_r))
+	PORT_BIT(0xfff, 0x000, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(sega_837_7753_device::bank_encoder_r))
 
 	PORT_START("MOTOR")
-	PORT_BIT(0xfff, 0x000, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(radmdlxmc_device::motor_encoder_r))
+	PORT_BIT(0xfff, 0x000, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(sega_837_7753_device::motor_encoder_r))
 INPUT_PORTS_END
 
-ioport_constructor radmdlxmc_device::device_input_ports() const
+ioport_constructor sega_837_7753_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME(radmdlxmc);
+	return INPUT_PORTS_NAME(sega_837_7753);
 }
 
-ROM_START(radmdlxmc)
+ROM_START(sega_837_7753)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("epr-13686a.bin", 0x0000, 0x8000, CRC(317a2857) SHA1(e0788dc7a7d214d9c4d26b24e44c1a0dc9ae477c)) // "RAD MOBILE DELUX CABINET MOVING CONTROL"
 
@@ -303,7 +305,7 @@ ROM_START(radmdlxmc)
 	ROM_LOAD("315-5475-03a_peel18cv8p.ic37", 0x2aa, 0x155, NO_DUMP)
 ROM_END
 
-const tiny_rom_entry *radmdlxmc_device::device_rom_region() const
+const tiny_rom_entry *sega_837_7753_device::device_rom_region() const
 {
-	return ROM_NAME(radmdlxmc);
+	return ROM_NAME(sega_837_7753);
 }

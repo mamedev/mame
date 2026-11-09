@@ -1,18 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomás García-Merás Capote
 
-#ifndef MAME_SEGA_RADMDLXMC_H
-#define MAME_SEGA_RADMDLXMC_H
+#ifndef MAME_SEGA_837_7753_H
+#define MAME_SEGA_837_7753_H
 
 #pragma once
 
 #include "machine/pit8253.h"
 #include "machine/upd4701.h"
 
-class radmdlxmc_device : public device_t
+class sega_837_7753_device : public device_t
 {
 public:
-	radmdlxmc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	sega_837_7753_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto lamps_cb() { return m_lamps_cb.bind(); }
 
@@ -60,6 +60,6 @@ private:
 	s32 bank_position() const;
 };
 
-DECLARE_DEVICE_TYPE(RADM_DLX_MOVCTRL, radmdlxmc_device)
+DECLARE_DEVICE_TYPE(SEGA_837_7753, sega_837_7753_device)
 
-#endif // MAME_SEGA_RADMDLXMC_H
+#endif // MAME_SEGA_837_7753_H
