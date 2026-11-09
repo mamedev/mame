@@ -9,11 +9,15 @@
 #pragma once
 
 #include "cpu/m6809/m6809.h"
+#include "machine/output_latch.h"
 #include "machine/pit8253.h"
 #include "sound/cem3372.h"
+#include "sound/cem3374.h"
 #include "sound/flt_rc.h"
 #include "sound/mixer.h"
 #include "sound/va_eg.h"
+#include "sound/va_ops.h"
+#include "sound/va_vca.h"
 
 DECLARE_DEVICE_TYPE(XPANDER_VOICE, xpander_voice_device)
 DECLARE_DEVICE_TYPE(XPANDER_VOICEBOARD, xpandervb_device)
@@ -44,9 +48,8 @@ protected:
 	void sound_stream_update(sound_stream &stream) override;
 
 private:
-	static double vcf_freq_cv(double vcff);
-
-	void update_osc2_mix();
+	void update_osc_mix(int osc_idx);
+	void update_fm();
 	void update_filter_mode();
 	void update_pan();
 
@@ -66,31 +69,42 @@ private:
 		NUM_CVS
 	};
 
+	enum osc_index
+	{
+		OSC1 = 0,
+		OSC2
+	};
+
 	static const char *const CV_NAMES[NUM_CVS];
-	static const double RX40;
-	static const double CX33;
+	static const double RX56;
+	static const double CX37;
 
 	device_sound_interface *const m_noise;
 
+	required_device<output_latch_device> m_latch1;
 	required_device_array<va_smooth_sh_device, 9> m_sh;
-	required_device<filter_rc_device> m_osc2_mixer;
+
+	required_device<filter_rc_device> m_vco_fm_hpf;
+	required_device_array<cem3374_device, 2> m_osc;
+	required_device_array<filter_rc_device, 2> m_osc_mixer;
+	required_device<va_vca_device> m_mdac;
+
+	required_device<filter_rc_device> m_vcf_fm_hpf;
 	required_device<cem3372_vcf_device> m_vcf;
 	required_device<filter_rc_device> m_vcf_out4;
 	required_device<mixer_device> m_pole_mixer;
+
 	required_device<cem3372_vca_device> m_vca;
 	required_device<filter_rc_device> m_out;
 
-	output_finder<> m_fm_mdac;  // Latch connected to AD7523/MP7523.
-	output_finder<> m_saw1;
-	output_finder<> m_saw2;
-	output_finder<> m_tri1;
-	output_finder<> m_tri2;
-	output_finder<> m_vcofm;
-	output_finder<> m_sync;
+	std::array<bool, 2> m_tri;  // UX 10 (CD4016) pin 12 and 13
+	std::array<bool, 2> m_saw;  // UX 10 (CD4016) pin 6 and 5
+	bool m_vco_fm;  // UX14 (CD4053) pin 9
+	bool m_noi;  // UX14 (CD4053) pin 11
 
-	bool m_noi;  // UX14 pin11 (CD4053)
-	u8 m_filter_mode;
-	u8 m_pan;
+	u8 m_fm_amt;  // UX03 (74LS374)
+	u8 m_filter_mode;  // UX01 (74HC374) Q0-Q3
+	u8 m_pan;  // UX01 (74HC374) Q5-Q7
 
 	std::array<double, NUM_CVS> m_cv;
 	std::array<bool, NUM_CVS - 1> m_fast;  // `-1` because RES does not support fast updates.

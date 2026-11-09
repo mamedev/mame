@@ -48,20 +48,26 @@ active-high (active == true).
 #define LOG_DAC         (1U << 3)
 #define LOG_DAC_VERBOSE (1U << 4)
 #define LOG_OSC_MIX     (1U << 5)
-#define LOG_FILTER_MODE (1U << 6)
-#define LOG_PAN         (1U << 7)
+#define LOG_FM          (1U << 6)
+#define LOG_FILTER_MODE (1U << 7)
+#define LOG_PAN         (1U << 8)
 
-#define VERBOSE (0)
-//#define LOG_OUTPUT_FUNC osd_printf_info
+#define VERBOSE (0)//(LOG_GENERAL | LOG_OSC_MIX | LOG_PAN | LOG_FILTER_MODE)  // TODO DEBUG
+#define LOG_OUTPUT_FUNC osd_printf_info  // TODO DEBUG
 
 #include "logmacro.h"
+
+constexpr double VPLUS = 12.0;
+constexpr double VMINUS = -12.0;
+constexpr double VREF4 = 4.0;
 
 
 // *** xpander_voice_device ***
 
-// Note: the X in component designations refers to the voice number. For example,
-// UX03 refers to U103 for voice 1, U203 for voice 2, and so on. Component
-// designations apply to the voice board unless otherwise noted.
+// Note: Similar to the schematics, the X in component designations refers to
+// the voice number. For example, UX03 refers to U103 for voice 1, U203 for
+// voice 2, and so on. Component designations refer to the voice board unless
+// otherwise noted.
 
 const char *const xpander_voice_device::CV_NAMES[xpander_voice_device::NUM_CVS] =
 {
@@ -70,29 +76,31 @@ const char *const xpander_voice_device::CV_NAMES[xpander_voice_device::NUM_CVS] 
 	"PW1", "VCA", "VOLA", "VCOF1", "VOLB", "VCFF", "PW2", "VCOF2", "RES"
 };
 
-// VCF input B DC block.
-const double xpander_voice_device::RX40 = RES_R(680);
-const double xpander_voice_device::CX33 = CAP_U(2.2);
+// VCF channel A and B DC block.
+const double xpander_voice_device::RX56 = RES_R(680);  // [channel B: RX40]
+const double xpander_voice_device::CX37 = CAP_U(2.2);  // [channel B: CX33]
 
 xpander_voice_device::xpander_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, device_sound_interface *noise)
 	: device_t(mconfig, XPANDER_VOICE, tag, owner, 0)
 	, device_sound_interface(mconfig, *this)
 	, m_noise(noise)
+	, m_latch1(*this, "latch_1")
 	, m_sh(*this, "sample_and_hold_%u", 0U)
-	, m_osc2_mixer(*this, "osc2_mix")
+	, m_vco_fm_hpf(*this, "vco_fm_hpf")
+	, m_osc(*this, "osc%u", 1U)
+	, m_osc_mixer(*this, "osc%u_mixer", 1U)
+	, m_mdac(*this, "mdac")
+	, m_vcf_fm_hpf(*this, "vcf_fm_hpf")
 	, m_vcf(*this, "vcf")
 	, m_vcf_out4(*this, "vcf_out4_dcblock")
 	, m_pole_mixer(*this, "pole_mixer")
 	, m_vca(*this, "vca")
 	, m_out(*this, "out")
-	, m_fm_mdac(*this, "fm_mdac")
-	, m_saw1(*this, "saw1")
-	, m_saw2(*this, "saw2")
-	, m_tri1(*this, "tri1")
-	, m_tri2(*this, "tri2")
-	, m_vcofm(*this, "vcofm")
-	, m_sync(*this, "sync")
+	, m_tri({false, false})
+	, m_saw({false, false})
+	, m_vco_fm(false)
 	, m_noi(false)
+	, m_fm_amt(0)
 	, m_filter_mode(0)
 	, m_pan(3)
 {
@@ -109,27 +117,143 @@ void xpander_voice_device::device_add_mconfig(machine_config &config)
 {
 	// Schematic: xpander and matrix-12 voice board, sheet 3 of 4.
 
+	OUTPUT_LATCH(config, m_latch1);  // UX02 (74HC174)
+	m_latch1->bit_handler<0>().set([this] (int state) { m_vco_fm = state; update_fm(); });
+	m_latch1->bit_handler<1>().set([this] (int state) { m_saw[OSC2] = state; update_osc_mix(OSC2); });
+	m_latch1->bit_handler<2>().set([this] (int state) { m_tri[OSC1] = state; update_osc_mix(OSC1); });
+	m_latch1->bit_handler<3>().set([this] (int state) { m_osc[OSC2]->set_sync_enabled(state); });
+	m_latch1->bit_handler<4>().set([this] (int state) { m_tri[OSC2] = state; update_osc_mix(OSC2); });
+	m_latch1->bit_handler<5>().set([this] (int state) { m_saw[OSC1] = state; update_osc_mix(OSC1); });
+
 	// A set of smoothing sample & hold (S&H) circuits provide control voltages
 	// to the CEM3372 and CEM3374. 8 (out of 9) of those have the ability to
 	// bypass smoothing.
 	for (auto &sh : m_sh)  // UX06, UX07, UX08 and surrounding passive components.
 		VA_SMOOTH_SH(config, sh, RES_M(1), CAP_U(0.033), CAP_U(0.0068));
 
-	// TODO: Route VCO control S&Hs once VCOs are implemented. For now, just
-	// route them to the output, with 0 gain, so that they have a sink.
-	for (int unimplemented : {CV_VCOF1, CV_PW1, CV_VCOF2, CV_PW2})
-		m_sh[unimplemented]->add_route(0, *this, 0.0);
 
-	// TODO: Add oscillators 1 and 2.
+	// *** Oscillators ***
 
+	constexpr int PW_CV_IDX[2] = {CV_PW1, CV_PW2};
+	constexpr int FREQ_CV_IDX[2] = {CV_VCOF1, CV_VCOF2};
+	constexpr const char *FREQ_CV_NAME[2] = {"vco1_freq_cv", "vco2_freq_cv"};
+	device_sound_interface *freq_cv[2] = {nullptr, nullptr};
+
+	// Oscillator 1 is mapped to the CEM3374's oscillator B, and oscillator 2 to A.
+	constexpr cem3374_device::osc OSC_SIDE[2] = {cem3374_device::osc::B, cem3374_device::osc::A};
+
+	for (const int i : {OSC1, OSC2})
+	{
+		// Component designations refer to osc 1.
+		// [component designations in square brackets refer to osc 2].
+
+		constexpr double RX26 = RES_K(4.22);  // [RX21] 1%
+		constexpr double RX27 = RES_R(100);  // [RX22] 1%
+
+		// Frequency control.
+		m_sh[FREQ_CV_IDX[i]]->add_route(0, FREQ_CV_NAME[i], RES_VOLTAGE_DIVIDER(RX26, RX27));
+		freq_cv[i] = &FILTER_RC(config, FREQ_CV_NAME[i])
+			.set_lowpass(RES_2_PARALLEL(RX26, RX27), CAP_U(0.1))  // CX29[CX24]
+			.add_route(0, m_osc[i], 1.0, cem3374_device::INPUT_FREQ_CTRL);
+
+		// Pulse width control.
+		m_sh[PW_CV_IDX[i]]->add_route(0, m_osc[i], 1.0, cem3374_device::INPUT_PW_CTRL);
+
+		// Each of the two CEM3374 oscillators produces a triangle and sawtooth
+		// wave. The sawtooth outputs are processed by comparators to generate
+		// the pulse waves. Route gains computed in update_osc_mix().
+		CEM3374(config, m_osc[i], OSC_SIDE[i], VPLUS, CAP_P(1000))  // UX09B[UX09A], CX28[CX22] (POLY)
+			.configure_vthresh(VREF4)
+			.configure_pulse_cmp(RES_VOLTAGE_DIVIDER(RES_K(100), RES_K(100)))  // RX49[RX38] (1%), RX50[RX39] (1%)
+			.configure_pulse_from_tri(false)  // The pulse waveform is derived from the sawtooth waveform.
+			.configure_pulse_range(0.0, VPLUS - 1.5)  // Range: 0 to max output voltage of TL082.
+			.add_route(cem3374_device::OUTPUT_PULSE, m_osc_mixer[i], 0.0)
+			.add_route(cem3374_device::OUTPUT_RAMP, m_osc_mixer[i], 0.0)
+			.add_route(cem3374_device::OUTPUT_TRIANGLE, m_osc_mixer[i], 0.0);
+
+		// The 3 waveforms are mixed passively (see update_osc_mix()),
+		// dc-blocked, and fed to the CEM3372 (input channels A and B).
+		// R will be adjusted in update_osc_mix().
+		FILTER_RC(config, m_osc_mixer[i])  // ~1.6-7.8 Hz [1.6-23.6 Hz]
+			.set_rc(filter_rc_device::HIGHPASS, RX56, 0, 0, CX37);  // [RX40, CX33]
+	}
+
+	// Oscillator 1 reference current (Iref): The sum of a fixed current and,
+	// when vco-fm is enabled, the attenuated triangle output of oscillator 2.
+	constexpr double RX28 = RES_K(422);  // 1%
+	VA_CONST(config, "osc1_iref_fixed")
+		.set_value(VREF4)
+		.add_route(0, m_osc[OSC1], 1.0 / RES_K(806), cem3374_device::INPUT_FREQ_REF);  // RX29 (1%)
+	FILTER_RC(config, m_vco_fm_hpf)
+		.set_rc(filter_rc_device::HIGHPASS, RX28, 0, 0, CAP_U(0.1))  // CX27
+		.add_route(0, m_osc[OSC1], 1.0 / RX28, cem3374_device::INPUT_FREQ_REF);
+
+	// Iref for oscillator 2 is set to a fixed value.
+	m_osc[OSC2]->set_freq_ref(VREF4 / RES_K(806));  // RX23 (1%)
+
+	// Oscillator 2 can be synced to oscillator 1. But oscillator 2 can also
+	// modulate the frequency of oscillator 1 ("vco-fm"). This creates a circular
+	// dependency that is not possible to represent with sound devices.
+	//
+	// To break the circular dependency, create a virtual oscillator 1 with the
+	// same parameters and the same frequency control input as osc 1, but
+	// without the frequency modulation input, and use it as the sync source for
+	// oscillator 2.
+	//
+	// When either (or neither of) sync or vco-fm are enabled, the effect will
+	// match the real hardware. However, when both are enabled, it will be a bit
+	// different.
+	freq_cv[OSC1]->add_route(0, "virtual_osc1", 1.0, cem3374_device::INPUT_FREQ_CTRL);
+	CEM3374(config, "virtual_osc1", OSC_SIDE[OSC1], VPLUS, CAP_P(1000))  // CX28 (POLY)
+		.configure_vthresh(VREF4)
+		.set_freq_ref(VREF4 / RES_K(806))  // RX29 (1%)
+		.add_route(cem3374_device::OUTPUT_FREQ, m_osc[OSC2], 1.0, cem3374_device::INPUT_SYNC_FREQ);
+
+	// The triangle output of oscillator 2 can be used to modulate the frequency
+	// of either the filter or oscillator 1. An MDAC controls the amount of FM.
+	m_osc[OSC2]->add_route(cem3374_device::OUTPUT_TRIANGLE, "mdac_dcblock", 1.0);
+	FILTER_RC(config, "mdac_dcblock")
+		.set_rc(filter_rc_device::HIGHPASS, RES_K(20), 0, 0, CAP_U(2.2))  // AD7523 input R, CX02
+		.add_route(0, m_mdac, 1.0);
+	VA_VCA(config, m_mdac)  // UX04 (AD7523)
+		.add_route(0, m_vcf_fm_hpf, 0.0)  // Gain computed in update_fm().
+		.add_route(0, m_vco_fm_hpf, 0.0); // Same.
+
+	// The noise source, which is common to all voices, is mixed passively with
+	// the rest of the osc 2 waveforms. See update_osc_mix().
 	if (m_noise)
-		m_noise->add_route(0, m_osc2_mixer, 1.0);  // UX14 (CD4053) pin 13
+		m_noise->add_route(0, m_osc_mixer[OSC2], 1.0);  // UX14 (CD4053) pin 13
 
-	// The 3 outputs of oscillator 2 and the noise source (common to all voices)
-	// are mixed passively (see update_osc2_mix()), dc-blocked, and fed to
-	// channel B of the CEM3372.
-	FILTER_RC(config, m_osc2_mixer)  // R will be adjusted in update_osc2_mix().
-		.set_rc(filter_rc_device::HIGHPASS, RX40, 0, 0, CX33);
+
+	// *** Filter ***
+
+	// A resistor network mixes the VCF frequency CV and filter FM signals, and
+	// converts the result to the range required by the CEM3372 frequency
+	// control input.
+	//
+	// MDAC OUT --- CX34 --- VCFFM --- RX55 ---+
+	//                        VCFF --- RX53 ---+--- CEM3372 FREQ CV
+	//                         -5V --- RX52 ---+
+	//                         GND --- RX54 ---+
+
+	constexpr double CX34 = CAP_U(0.1);
+	constexpr double RX55 = RES_K(39);
+	constexpr double RX53 = RES_K(38.3);  // 1%
+	constexpr double RX52 = RES_K(196);  // 1%
+	constexpr double RX54 = RES_K(1);  // 1%
+
+	FILTER_RC(config, m_vcf_fm_hpf)
+		.set_rc(filter_rc_device::HIGHPASS, RX55 + RES_3_PARALLEL(RX53, RX52, RX54), 0, 0, CX34)
+		.add_route(0, "vcf_freq_cv", RES_VOLTAGE_DIVIDER(RX55, RES_3_PARALLEL(RX53, RX52, RX54)));
+
+	// Note that CX34 and the resistor network form a high-shelf-cut filter
+	// for the VCFF signal. However, the attenuation is miniscule (-0.20 dB max)
+	// and only applies to high frequencies, and VCFF is usually slow-changing.
+	// So this is not modeled here.
+	m_sh[CV_VCFF]->add_route(0, "vcf_freq_cv", RES_VOLTAGE_DIVIDER(RX53, RES_3_PARALLEL(RX55, RX52, RX54)));
+
+	auto &vcf_freq_cv = VA_SCALE_OFFSET(config, "vcf_freq_cv")
+		.set_offset(-5.0 * RES_VOLTAGE_DIVIDER(RX52, RES_3_PARALLEL(RX55, RX53, RX54)));
 
 	// Filtering is done by the CEM3372, a 4-pole resonant low-pass filter. The
 	// Xpander implements 15 filter modes out of that by mixing signals from the
@@ -141,11 +265,11 @@ void xpander_voice_device::device_add_mconfig(machine_config &config)
 
 	cem3372_vcf_device::stream_inputs vcf_inputs =
 	{
-		.channel_a = nullptr,  // TODO: implement.
-		.channel_b = m_osc2_mixer,
+		.channel_a = m_osc_mixer[OSC1],
+		.channel_b = m_osc_mixer[OSC2],
 		.level_a = m_sh[CV_VOLA],
 		.level_b = m_sh[CV_VOLB],
-		.freq_cv = m_sh[CV_VCFF],
+		.freq_cv = &vcf_freq_cv,
 		.res_cv = m_sh[CV_RES],
 	};
 
@@ -168,32 +292,31 @@ void xpander_voice_device::device_add_mconfig(machine_config &config)
 	FILTER_RC(config, m_vcf_out4)  // ~4.1 Hz
 		.set_rc(filter_rc_device::HIGHPASS, R_VCFOUT, 0, 0, CAP_U(2.2))  // CX48
 		.add_route(0, m_pole_mixer, 0.0);  // Gain computed in update_filter_mode().
-
 	MIXER(config, m_pole_mixer)  // UX17 (CD4051) and resistors to its left.
 		.add_route(0, "vca_in_dcblock", -RES_K(68));  // RX66
 
 	// The voltage output of the pole mixer is dc-blocked and converted to a
 	// current, and fed to the VCA section of the CEM3372.
-
 	constexpr double RX62 = RES_K(33);
 	FILTER_RC(config, "vca_in_dcblock")  // ~2.2 Hz
 		.set_rc(filter_rc_device::HIGHPASS, RX62, 0, 0, CAP_U(2.2))  // CX47
 		.add_route(0, m_vca, 1.0 / RX62, cem3372_vca_device::INPUT_AUDIO);
 
+
+	// *** VCA / output ***
+
 	// The VCA level CV is further smoothed by a low-pass filter, before being
-	// fed to the corresponding input of the CEM3372.
+	// fed to the gain input of the CEM3372.
 	m_sh[CV_VCA]->add_route(0, "vca_cv_lpf", 1.0);
 	FILTER_RC(config, "vca_cv_lpf")  // ~159 Hz
 		.set_lowpass(RES_K(10), CAP_U(0.1))  // RX51, CX40
 		.add_route(0, m_vca, 1.0, cem3372_vca_device::INPUT_GAIN);
 
-	// Finally, the current output of the VCA will be converted to a voltage,
+	// Finally, the current output of the VCA is converted to a voltage,
 	// dc-blocked, and fed to the pan circuit.
-
 	CEM3372_VCA(config, m_vca)  // UX12
 		.configure_inv_opamp_voltage_output(RES_K(33))  // UX16 (TL081), RX70
 		.add_route(0, m_out, 1.0);
-
 	FILTER_RC(config, m_out)  // 7.3-9.8 Hz
 		// Route gains and filter R will be computed in update_pan().
 		.set_rc(filter_rc_device::HIGHPASS, RES_K(10), 0, 0, CAP_U(2.2))  // CX49
@@ -205,7 +328,11 @@ void xpander_voice_device::device_start()
 {
 	stream_alloc(2, 2, machine().sample_rate());
 
+	save_item(NAME(m_tri));
+	save_item(NAME(m_saw));
+	save_item(NAME(m_vco_fm));
 	save_item(NAME(m_noi));
+	save_item(NAME(m_fm_amt));
 	save_item(NAME(m_filter_mode));
 	save_item(NAME(m_pan));
 	save_item(NAME(m_cv));
@@ -214,7 +341,9 @@ void xpander_voice_device::device_start()
 
 void xpander_voice_device::device_reset()
 {
-	update_osc2_mix();
+	update_osc_mix(OSC1);
+	update_osc_mix(OSC2);
+	update_fm();
 	update_filter_mode();
 	update_pan();
 }
@@ -227,29 +356,24 @@ void xpander_voice_device::sound_stream_update(sound_stream &stream)
 
 double xpander_voice_device::cem3374_tempco_v() const
 {
-	// The CEM3374 has an on-chip temperature sensor which generates a voltage
-	// on pin 10. This can be used for temperature compensation of the
-	// oscillator frequency CVs. For now, just returning the nominal value
-	// according to the datasheet.
-	return 2.5;
+	return m_osc[OSC1]->v_tempco();
 }
 
-void xpander_voice_device::latch0_w(u8 data)  // UX03, 74LS374.
+void xpander_voice_device::latch0_w(u8 data)  // UX03 (74LS374)
 {
-	m_fm_mdac = data;
+	if (data != m_fm_amt)
+	{
+		m_fm_amt = data;
+		update_fm();
+	}
 }
 
-void xpander_voice_device::latch1_w(u8 data)  // UX02, 74HC174.
+void xpander_voice_device::latch1_w(u8 data)  // UX02 (74HC174)
 {
-	m_vcofm = BIT(data, 0);
-	m_saw2 = BIT(data, 1);
-	m_tri1 = BIT(data, 2);
-	m_sync = BIT(data, 3);
-	m_tri2 = BIT(data, 4);
-	m_saw2 = BIT(data, 5);
+	m_latch1->write(data);
 }
 
-void xpander_voice_device::latch2_w(u8 data)  // UX01, 74HC374.
+void xpander_voice_device::latch2_w(u8 data)  // UX01 (74HC374)
 {
 	const u8 new_filter_mode = BIT(data, 0, 4);
 	if (new_filter_mode != m_filter_mode)
@@ -262,7 +386,7 @@ void xpander_voice_device::latch2_w(u8 data)  // UX01, 74HC374.
 	if (new_noi != m_noi)
 	{
 		m_noi = new_noi;
-		update_osc2_mix();
+		update_osc_mix(OSC2);
 	}
 
 	const u8 new_pan = BIT(data, 5, 3);
@@ -280,9 +404,6 @@ void xpander_voice_device::set_cv(u8 cv_index, double cv, bool fast)
 
 	m_cv[cv_index] = cv;
 	m_fast[cv_index] = fast;
-
-	if (cv_index == CV_VCFF)
-		cv = vcf_freq_cv(cv);
 
 	if (fast)
 		m_sh[cv_index]->sample_fast(cv);
@@ -305,43 +426,129 @@ void xpander_voice_device::sh_hold()
 		sh->hold();
 }
 
-double xpander_voice_device::vcf_freq_cv(double vcff)
+void xpander_voice_device::update_osc_mix(int osc_idx)
 {
-	// Schematic: xpander and matrix-12 voice board, sheet 3 of 4, middle.
+	assert(osc_idx == OSC1 || osc_idx == OSC2);
 
-	// The sampled VCF frequency CV is converted to the range required by the
-	// CEM3372 frequency control input.
+	// Schematic: xpander and matrix-12 voice board, sheet 3 of 4, between the
+	// CEM3374 and CEM3372. Look for UX10 and UX11.
 
-	constexpr double RX52 = RES_K(196);  // 1%
-	constexpr double RX53 = RES_K(38.3);  // 1%
-	constexpr double RX54 = RES_K(1);  // 1%
+	// The oscillator waveforms and noise are mixed passively. So enabling or
+	// disabling a waveform affects the volume of all other active frameworks.
+	// furthermore, the effective R of the dc-block filter changes accordingly.
 
-	return vcff * RES_VOLTAGE_DIVIDER(RX53, RES_2_PARALLEL(RX52, RX54)) +
-		   -5.0 * RES_VOLTAGE_DIVIDER(RX52, RES_2_PARALLEL(RX53, RX54));
-}
+	constexpr double RX45 = RES_K(100);  // osc 2: RX33
+	constexpr double RX44 = RES_K(10);   // osc 2: RX32
+	constexpr double RX46 = RES_K(47);   // osc 2: RX34
+	constexpr double RX47 = RES_K(3.3);  // osc 2: RX35
 
-void xpander_voice_device::update_osc2_mix()  // Channel B input to the VCF.
-{
-	// The effective R of the dcblock filter will depend on which channel B
-	// inputs are enabled.
-	double r_dcblock = RX40;
+	// Resistance is really only present when the pulse wave is disabled, or for
+	// the duration it is high, because of diodes DX05 (osc1) and DX04 (osc 2).
+	// But treating the resistance as always present for simplicity. This only
+	// has a miniscule effect on the calculations below, because this resistance
+	// is combined in parallel with much smaller resistances.
+	constexpr double R_PULSE = RES_K(360);  // osc1: RX48, osc 2: RX37
+
+	constexpr double R_SAW_ON = RX47 + RES_3_PARALLEL(RX45, RX44, RX46);
+	constexpr double R_SAW_OFF = RX47 + RX46;
+	constexpr double R_TRI = RES_K(47);  // osc 1: RX42, osc 2: RX31
+	constexpr double R_NOISE = RES_K(3.3);  // RX61 - only relevant to osc 2 mixer
+
+	cem3374_device *const osc = m_osc[osc_idx];
+	filter_rc_device *const mixer = m_osc_mixer[osc_idx];
+	const bool saw = m_saw[osc_idx];
+	const bool tri = m_tri[osc_idx];
+	const bool noi = (osc_idx == OSC2) && m_noi;  // The noise source is attached to the osc 2 mixer.
+
+	double r_bottom = RX56;
+	if (saw)
+		r_bottom = RES_2_PARALLEL(r_bottom, R_SAW_ON);
+	else
+		r_bottom = RES_2_PARALLEL(r_bottom, R_SAW_OFF);
+	if (tri)
+		r_bottom = RES_2_PARALLEL(r_bottom, R_TRI);
+	if (noi)
+		r_bottom = RES_2_PARALLEL(r_bottom, R_NOISE);
+
+	double r_dcblock_in = R_PULSE;
+	const double pulse_gain = RES_VOLTAGE_DIVIDER(R_PULSE, r_bottom);
+	osc->set_route_gain(cem3374_device::OUTPUT_PULSE, mixer, 0, pulse_gain);
+
+	double saw_gain = 0;
+	if (saw)
+	{
+		double r_bottom = RES_2_PARALLEL(RX56, R_PULSE);
+		if (tri)
+			r_bottom = RES_2_PARALLEL(r_bottom, R_TRI);
+		if (noi)
+			r_bottom = RES_2_PARALLEL(r_bottom, R_NOISE);
+
+		r_dcblock_in = RES_2_PARALLEL(r_dcblock_in, R_SAW_ON);
+		saw_gain = RES_VOLTAGE_DIVIDER(RX45, RES_3_PARALLEL(RX44, RX46, RX47 + r_bottom)) *
+				   RES_VOLTAGE_DIVIDER(RX47, r_bottom);
+	}
+	else
+	{
+		r_dcblock_in = RES_2_PARALLEL(r_dcblock_in, R_SAW_OFF);
+	}
+	osc->set_route_gain(cem3374_device::OUTPUT_RAMP, mixer, 0, saw_gain);
+
+	double tri_gain = 0;
+	if (tri)
+	{
+		double r_bottom = RES_2_PARALLEL(RX56, R_PULSE);
+		if (saw)
+			r_bottom = RES_2_PARALLEL(r_bottom, R_SAW_ON);
+		else
+			r_bottom = RES_2_PARALLEL(r_bottom, R_SAW_OFF);
+		if (noi)
+			r_bottom = RES_2_PARALLEL(r_bottom, R_NOISE);
+
+		r_dcblock_in = RES_2_PARALLEL(r_dcblock_in, R_TRI);
+		tri_gain = RES_VOLTAGE_DIVIDER(R_TRI, r_bottom);
+	}
+	osc->set_route_gain(cem3374_device::OUTPUT_TRIANGLE, mixer, 0, tri_gain);
 
 	double noise_gain = 0;
-	if (m_noi)
+	if (osc_idx == OSC2)
 	{
-		// Resistance of noise circuit on the processor board.
-		constexpr double R_NOISE_SOURCE = RES_2_PARALLEL(RES_K(10), RES_R(47));
+		if (noi)
+		{
+			double r_bottom = RES_2_PARALLEL(RX56, R_PULSE);
+			if (saw)
+				r_bottom = RES_2_PARALLEL(r_bottom, R_SAW_ON);
+			else
+				r_bottom = RES_2_PARALLEL(r_bottom, R_SAW_OFF);
+			if (tri)
+				r_bottom = RES_2_PARALLEL(r_bottom, R_TRI);
 
-		constexpr double RX61 = RES_K(3.3);
-		r_dcblock += RX61 + R_NOISE_SOURCE;
-		noise_gain = RES_VOLTAGE_DIVIDER(RX61, RX40);
+			r_dcblock_in = RES_2_PARALLEL(r_dcblock_in,  R_NOISE);
+			noise_gain = RES_VOLTAGE_DIVIDER(R_NOISE, r_bottom);
+		}
+		m_noise->set_route_gain(0, mixer, 0, noise_gain);
 	}
-	m_noise->set_route_gain(0, m_osc2_mixer, 0, noise_gain);
 
-	m_osc2_mixer->filter_rc_set_RC(filter_rc_device::HIGHPASS, r_dcblock, 0, 0, CX33);
+	const double r_dcblock = RX56 + r_dcblock_in;
+	mixer->filter_rc_set_RC(filter_rc_device::HIGHPASS, r_dcblock, 0, 0, CX37);
 
-	LOGMASKED(LOG_OSC_MIX, "%s: Osc 2 - noise: %f, dcblock: %f Hz\n",
-			  tag(), noise_gain, 1.0 / (2.0 * std::numbers::pi_v<double> * r_dcblock * CX33));
+	const double freq_dcblock = 1.0 / (2.0 * std::numbers::pi_v<double> * r_dcblock * CX37);
+	LOGMASKED(LOG_OSC_MIX, "%s: Osc %d - pulse: %f, saw: %f, tri: %f, noise: %f, r_dcblock: %f - %f Hz\n",
+			  tag(), osc_idx + 1, pulse_gain, saw_gain, tri_gain, noise_gain, r_dcblock, freq_dcblock);
+}
+
+void xpander_voice_device::update_fm()
+{
+	// An MDAC (UX04, AD7523) scales the triangle output of osc 2.
+	// From the datasheet: Vout = -Vref * (data / 256)
+	m_mdac->set_fixed_gain_cv(-double(m_fm_amt) / 256.0);
+
+	// A switch (UX14, CD4053) routes the MDAC's output either to the filter,
+	// for exponential FM of its cutoff frequency, or to oscillator 1, for
+	// linear FM of its frequency.
+	m_mdac->set_route_gain(0, m_vcf_fm_hpf, 0, m_vco_fm ? 0.0 : 1.0);
+	m_mdac->set_route_gain(0, m_vco_fm_hpf, 0, m_vco_fm ? 1.0 : 0.0);
+
+	LOGMASKED(LOG_FM, "%s: FM vco: %d, vcf: %d, amount: %u\n", tag(), m_vco_fm, !m_vco_fm, m_fm_amt);
 }
 
 void xpander_voice_device::update_filter_mode()
@@ -415,7 +622,7 @@ void xpander_voice_device::update_filter_mode()
 		{ RES_K(100), RES_K(100), -1,           -1,         },  // RX95, RX71, NC,   NC
 	};
 
-	const std::pair<device_sound_interface *, int> mix_inputs[4] =
+	const std::pair<device_sound_interface *, int> mix_inputs[STAGE_COUNT] =
 	{
 		{ m_vcf.target(), cem3372_vcf_device::OUTPUT_CAP1 },
 		{ m_vcf.target(), cem3372_vcf_device::OUTPUT_CAP2 },
@@ -507,7 +714,7 @@ namespace {
 
 ROM_START(xpandervb)
 	// The only known difference between firmware versions 1.4 and 1.6 is that
-	// 1.4 tries to detect the revision of the voice board, whereas v1.6 skips
+	// 1.4 tries to detect the revision of the voice board, whereas 1.6 skips
 	// that check and assumes it is revision D, apparently because the check
 	// became unreliable as components aged.
 
@@ -532,7 +739,7 @@ double xpandervb_device::DAC_VREF_SCALER = 1.0 + RES_K(2.43) / RES_K(1);
 // A 4V reference generated by D805, R856, R857, R854, U815C is then scaled by
 // R853 and R855. This is the DAC voltage reference used when generating CVs
 // other than those for oscillator frequencies.
-double xpandervb_device::DEFAULT_DAC_VREF = 4.0 * RES_VOLTAGE_DIVIDER(RES_K(18.2), RES_K(10)) * DAC_VREF_SCALER;
+double xpandervb_device::DEFAULT_DAC_VREF = VREF4 * RES_VOLTAGE_DIVIDER(RES_K(18.2), RES_K(10)) * DAC_VREF_SCALER;
 
 xpandervb_device::xpandervb_device(const machine_config &mconfig, const char *tag, device_t *owner, device_sound_interface *noise)
 	: device_t(mconfig, XPANDER_VOICEBOARD, tag, owner, 0)

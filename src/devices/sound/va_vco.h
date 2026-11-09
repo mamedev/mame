@@ -37,9 +37,18 @@ class va_vco_device : public device_t, public device_sound_interface
 public:
 	enum input
 	{
-		// Frequency in Hz. Subclasses can change the control type by overriding ctrl2freq().
+		// Frequency in Hz. Subclasses can change the control type, for instance
+		// to a control voltage or current, by overriding ctrl2freq(). Can be
+		// provided as a fixed value instead, via set_freq_ctrl().
 		INPUT_FREQ_CTRL = 0,
-		// Pulse width fraction (0-1). Subclasses can change the control type by overriding ctrl2pw().
+		// Frequency reference input. Ignored in this class. Subclasses can use
+		// this to incorporate a reference current or similar control, by
+		// overriding ctrl2freq(). Can be provided as a fixed value instead, via
+		// set_freq_ref().
+		INPUT_FREQ_REF,
+		// Pulse width fraction (0-1). Subclasses can change the control type,
+		// for instance to a control voltage, by overriding ctrl2pw(). Can be
+		// provided as a fixed value instead, via set_pw_ctrl().
 		INPUT_PW_CTRL,
 		// Frequency of the sync oscillator.
 		INPUT_SYNC_FREQ,
@@ -57,7 +66,7 @@ public:
 		OUTPUT_RAMP,  // AKA sawtooth
 		// Starts at {max}, flips to {min} once the pulse width is reached, and
 		// resets to {max} at the end of the cycle. Using configure_pulse_dc_comp()
-		// might change the range output range. See its documentation.
+		// might change the output range. See its documentation.
 		OUTPUT_PULSE,
 		// Typically connected to INPUT_SYNC_FREQ of the synchronized oscillator.
 		OUTPUT_FREQ,
@@ -104,8 +113,8 @@ public:
 	//
 	// The phase of the pulse differs between these configurations. The center
 	// of a triangle-derived pulse will match the middle of the oscillator phase.
-	// This difference in phase has the following effects:
 	//
+	// This difference in phase has the following effects:
 	// * Modulating the pulse width of a ramp-derived pulse will affect its
 	//   pitch to some extent, whereas pitch remains stable in the triangle-
 	//   derived pulse.
@@ -116,15 +125,13 @@ public:
 	// See sync_type enum.
 	va_vco_device &configure_sync_type(sync_type type) ATTR_COLD;
 
-	// Sets the frequency in Hz. Subclasses can change the input type (e.g. to
-	// a control current) by overriding ctrl2freq(). Cannot be used when
-	// INPUT_FREQ_CTRL is connected.
-	void set_freq_ctrl(float freq_ctrl);
-
-	// Sets the pulse width fraction (0-1). Subclasses can change the input type
-	// (e.g. to a control voltage) by overriding ctrl2pw(). Cannot be used when
-	// INPUT_PW_CTRL is connected.
-	void set_pw_ctrl(float pw_ctrl);
+	// These setters are alternatives to the INPUT_FREQ_CTRL, INPUT_FREQ_REF and
+	// INPUT_PW_CTRL streams, respectively. They can be used when streaming
+	// control is not needed. Must not be used when the corresponding stream
+	// inputs are connected. Can also be called at configuration time.
+	va_vco_device &set_freq_ctrl(float freq_ctrl);
+	va_vco_device &set_freq_ref(float freq_ref);
+	va_vco_device &set_pw_ctrl(float pw_ctrl);
 
 	// Can only be used if a sync type has been configured.
 	void set_sync_enabled(bool enabled);
@@ -142,14 +149,19 @@ protected:
 	va_vco_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
 
 	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 	void sound_stream_update(sound_stream &stream) override;
 
 	// Subclasses can override these, to support voltage or current control of
 	// the oscillator frequency and pulse width.
-	virtual float ctrl2freq(float freq_ctrl) const;
+	virtual float ctrl2freq(float freq_ctrl, float freq_ref) const;
 	virtual float ctrl2pw(float pw_ctrl) const;
 
 	void update_stream();
+
+	float freq_ref();
+
+	bool pulse_from_tri() const { return m_pulse_tri; }
 
 private:
 	// Information about an oscillator sync event.
@@ -174,7 +186,7 @@ private:
 		float post_sync_disc_phase = 0.0F;
 	};
 
-	void set_freq_ctrl_internal(float freq_cc);
+	void set_freq_ctrl_internal(float freq_ctrl, float freq_ref);
 	void set_pw_ctrl_internal(float pw_cv);
 
 	float poly_blep(float phase) const;
@@ -219,6 +231,7 @@ private:
 
 	// state
 	float m_freq_ctrl;
+	float m_freq_ref;
 	float m_freq;
 	float m_pw_ctrl;
 	float m_pw;

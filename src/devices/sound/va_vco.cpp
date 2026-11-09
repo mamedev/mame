@@ -29,6 +29,7 @@ va_vco_device::va_vco_device(const machine_config &mconfig, device_type type, co
 	, m_pulse_tri(false)
 	, m_sync_type(SYNC_TYPE_NONE)
 	, m_freq_ctrl(std::numeric_limits<float>::quiet_NaN())
+	, m_freq_ref(std::numeric_limits<float>::quiet_NaN())
 	, m_freq(10.0F)
 	, m_pw_ctrl(std::numeric_limits<float>::quiet_NaN())
 	, m_pw(0.5F)
@@ -83,7 +84,7 @@ va_vco_device &va_vco_device::configure_sync_type(sync_type type)
 	return *this;
 }
 
-float va_vco_device::ctrl2freq(float freq_ctrl) const
+float va_vco_device::ctrl2freq(float freq_ctrl, float freq_ref) const
 {
 	return freq_ctrl;
 }
@@ -99,12 +100,13 @@ void va_vco_device::update_stream()
 		m_stream->update();
 }
 
-void va_vco_device::set_freq_ctrl_internal(float freq_ctrl)
+void va_vco_device::set_freq_ctrl_internal(float freq_ctrl, float freq_ref)
 {
-	if (freq_ctrl == m_freq_ctrl)
+	if (freq_ctrl == m_freq_ctrl && freq_ref == m_freq_ref)
 		return;
 	m_freq_ctrl = freq_ctrl;
-	m_freq = ctrl2freq(freq_ctrl);
+	m_freq_ref = freq_ref;
+	m_freq = ctrl2freq(m_freq_ctrl, m_freq_ref);
 	m_step = m_freq / float(m_stream->sample_rate());
 }
 
@@ -116,23 +118,58 @@ void va_vco_device::set_pw_ctrl_internal(float pw_ctrl)
 	m_pw = ctrl2pw(pw_ctrl);
 }
 
-void va_vco_device::set_freq_ctrl(float freq_ctrl)
+va_vco_device &va_vco_device::set_freq_ctrl(float freq_ctrl)
 {
-	if (!m_stream)  // Need to know the sample rate.
-		fatalerror("%s: set_freq_ctrl() cannot be called before device_start().\n", tag());
+	if (BIT(get_sound_requested_inputs_mask(), INPUT_FREQ_CTRL))
+		fatalerror("%s: set_freq_ctrl() called even though INPUT_FREQ_CTRL is connected\n", tag());
+
 	if (freq_ctrl == m_freq_ctrl)
-		return;
-	m_stream->update();
-	set_freq_ctrl_internal(freq_ctrl);
+		return *this;
+
+	if (m_stream)
+	{
+		m_stream->update();
+		set_freq_ctrl_internal(freq_ctrl, m_freq_ref);
+	}
+	else
+	{
+		m_freq_ctrl = freq_ctrl;
+	}
+	return *this;
 }
 
-void va_vco_device::set_pw_ctrl(float pw_ctrl)
+va_vco_device &va_vco_device::set_freq_ref(float freq_ref)
 {
+	if (BIT(get_sound_requested_inputs_mask(), INPUT_FREQ_REF))
+		fatalerror("%s: set_freq_ref() called even though INPUT_FREQ_REF is connected\n", tag());
+
+	if (freq_ref == m_freq_ref)
+		return *this;
+
+	if (m_stream)
+	{
+		m_stream->update();
+		set_freq_ctrl_internal(m_freq_ctrl, freq_ref);
+	}
+	else
+	{
+		m_freq_ref = freq_ref;
+	}
+	return *this;
+}
+
+va_vco_device &va_vco_device::set_pw_ctrl(float pw_ctrl)
+{
+	if (BIT(get_sound_requested_inputs_mask(), INPUT_PW_CTRL))
+		fatalerror("%s: set_pw_ctrl() called even though INPUT_PW_CTRL is connected\n", tag());
+
 	if (pw_ctrl == m_pw_ctrl)
-		return;
+		return *this;
+
 	if (m_stream)
 		m_stream->update();
 	set_pw_ctrl_internal(pw_ctrl);
+	return *this;
 }
 
 void va_vco_device::set_sync_enabled(bool enabled)
@@ -150,9 +187,18 @@ void va_vco_device::set_sync_enabled(bool enabled)
 
 float va_vco_device::freq()
 {
-	if (BIT(get_sound_requested_inputs_mask(), INPUT_FREQ_CTRL))
+	assert(m_stream);  // m_freq is only computed after the device starts running.
+	const u64 inputs_mask = get_sound_requested_inputs_mask();
+	if (BIT(inputs_mask, INPUT_FREQ_CTRL) || BIT(inputs_mask, INPUT_FREQ_REF))
 		m_stream->update();
 	return m_freq;
+}
+
+float va_vco_device::freq_ref()
+{
+	if (BIT(get_sound_requested_inputs_mask(), INPUT_FREQ_REF) && m_stream)
+		m_stream->update();
+	return m_freq_ref;
 }
 
 attotime va_vco_device::ramp_time_to_thresh(float threshold)
@@ -178,6 +224,7 @@ void va_vco_device::device_start()
 {
 	m_stream = stream_alloc(get_sound_requested_inputs(), get_sound_requested_outputs(), machine().sample_rate());
 	save_item(NAME(m_freq_ctrl));
+	save_item(NAME(m_freq_ref));
 	save_item(NAME(m_freq));
 	save_item(NAME(m_pw_ctrl));
 	save_item(NAME(m_pw));
@@ -190,6 +237,17 @@ void va_vco_device::device_start()
 	save_item(NAME(m_sync_phase));
 	save_item(NAME(m_sync_step));
 	save_item(NAME(m_last_sample_time));
+}
+
+void va_vco_device::device_reset()
+{
+	// Force recomputation of the frequency, to take into account any frequency
+	// inputs set at configuration time. No-op on subsequent resets.
+	const float freq_ctrl = m_freq_ctrl;
+	const float freq_ref = m_freq_ref;
+	m_freq_ctrl = std::numeric_limits<float>::quiet_NaN();
+	m_freq_ref = std::numeric_limits<float>::quiet_NaN();
+	set_freq_ctrl_internal(freq_ctrl, freq_ref);
 }
 
 // Implementation is based on:
@@ -421,15 +479,19 @@ void va_vco_device::sound_stream_update(sound_stream &stream)
 	constexpr float PULSE_RESET_JUMP = 2.0F;  // Resets from -1 to 1.
 	constexpr float PULSE_FLIP_JUMP = -2.0F;  // Flips from 1 to -1.
 
-	const bool streaming_freq = BIT(get_sound_requested_inputs_mask(), INPUT_FREQ_CTRL);
-	const bool streaming_pw = BIT(get_sound_requested_inputs_mask(), INPUT_PW_CTRL);
-	const bool streaming_sync = BIT(get_sound_requested_inputs_mask(), INPUT_SYNC_FREQ);
+	const u64 inputs_mask = get_sound_requested_inputs_mask();
+	const bool streaming_freq_ctrl = BIT(inputs_mask, INPUT_FREQ_CTRL);
+	const bool streaming_freq_ref = BIT(inputs_mask, INPUT_FREQ_REF);
+	const bool streaming_freq = streaming_freq_ctrl || streaming_freq_ref;
+	const bool streaming_pw = BIT(inputs_mask, INPUT_PW_CTRL);
+	const bool streaming_sync = BIT(inputs_mask, INPUT_SYNC_FREQ);
 	assert(!m_sync || streaming_sync);
 
-	const bool tri_out = BIT(get_sound_requested_outputs_mask(), OUTPUT_TRIANGLE);
-	const bool ramp_out = BIT(get_sound_requested_outputs_mask(), OUTPUT_RAMP);
-	const bool pulse_out = BIT(get_sound_requested_outputs_mask(), OUTPUT_PULSE);
-	const bool freq_out = BIT(get_sound_requested_outputs_mask(), OUTPUT_FREQ);
+	const u64 outputs_mask = get_sound_requested_outputs_mask();
+	const bool tri_out = BIT(outputs_mask, OUTPUT_TRIANGLE);
+	const bool ramp_out = BIT(outputs_mask, OUTPUT_RAMP);
+	const bool pulse_out = BIT(outputs_mask, OUTPUT_PULSE);
+	const bool freq_out = BIT(outputs_mask, OUTPUT_FREQ);
 
 	const int n = stream.samples();
 	const float sample_rate_inv = 1.0F / float(m_stream->sample_rate());
@@ -438,7 +500,11 @@ void va_vco_device::sound_stream_update(sound_stream &stream)
 	for (int i = 0; i < n; ++i)
 	{
 		if (streaming_freq)
-			set_freq_ctrl_internal(stream.get(INPUT_FREQ_CTRL, i));
+		{
+			const float freq_ctrl = streaming_freq_ctrl ? stream.get(INPUT_FREQ_CTRL, i) : m_freq_ctrl;
+			const float freq_ref = streaming_freq_ref ? stream.get(INPUT_FREQ_REF, i) : m_freq_ref;
+			set_freq_ctrl_internal(freq_ctrl, freq_ref);
+		}
 		if (streaming_pw)
 			set_pw_ctrl_internal(stream.get(INPUT_PW_CTRL, i));
 		if (streaming_sync)
