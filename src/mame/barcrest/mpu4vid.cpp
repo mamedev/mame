@@ -238,49 +238,48 @@ public:
 	{
 	}
 
-	void mpu4_vid(machine_config &config);
-	void mpu4_vid_strike(machine_config &config);
-	void mpu4_vid_turnov(machine_config &config);
-	void mpu4_vid_tmach(machine_config &config);
-	void mpu4_vid_barquest(machine_config &config);
-	void mpu4_vid_skilltrk(machine_config &config);
-	void mpu4_vid_addlad(machine_config &config);
+	void mpu4_vid(machine_config &config) ATTR_COLD;
+	void mpu4_vid_strike(machine_config &config) ATTR_COLD;
+	void mpu4_vid_turnov(machine_config &config) ATTR_COLD;
+	void mpu4_vid_tmach(machine_config &config) ATTR_COLD;
+	void mpu4_vid_barquest(machine_config &config) ATTR_COLD;
+	void mpu4_vid_skilltrk(machine_config &config) ATTR_COLD;
+	void mpu4_vid_addlad(machine_config &config) ATTR_COLD;
 
-	void mpu4_vid_cheatchr(machine_config &config);
+	void mpu4_vid_cheatchr(machine_config &config) ATTR_COLD;
 
-	void bwbvid(machine_config &config);
+	void bwbvid(machine_config &config) ATTR_COLD;
 
-	void crmaze_base(machine_config &config);
-	void crmaze(machine_config &config);
+	void crmaze_base(machine_config &config) ATTR_COLD;
+	void crmaze(machine_config &config) ATTR_COLD;
 
-	void bwbvid_oki(machine_config &config);
-	void bwbvid_oki_bt471(machine_config &config);
+	void bwbvid_oki(machine_config &config) ATTR_COLD;
+	void bwbvid_oki_bt471(machine_config &config) ATTR_COLD;
 
-	void bwbvid_oki_bt471_german(machine_config &config);
+	void bwbvid_oki_bt471_german(machine_config &config) ATTR_COLD;
 
-	void mating(machine_config &config);
-	void vid_oki(machine_config &config);
+	void mating(machine_config &config) ATTR_COLD;
+	void vid_oki(machine_config &config) ATTR_COLD;
 
-	void init_v4barqst2();
-	void init_quidgrid();
-	void init_v4barqst();
-	void init_timemchn();
-	void init_v4opt3();
-	void init_eyesdown();
+	void init_v4barqst2() ATTR_COLD;
+	void init_quidgrid() ATTR_COLD;
+	void init_v4barqst() ATTR_COLD;
+	void init_timemchn() ATTR_COLD;
+	void init_v4opt3() ATTR_COLD;
+	void init_eyesdown() ATTR_COLD;
 
-	void init_crmaze();
-	void init_crmaze_flutter();
+	void init_crmaze() ATTR_COLD;
+	void init_crmaze_flutter() ATTR_COLD;
 
 
-	void init_prizeinv();
-	void init_strikeit();
-	void init_v4wize();
-	void init_turnover();
-	//void init_adders();
-	void init_mating();
-	void init_skiltrek();
-	void init_cybcas();
-	void init_bwbhack();
+	void init_prizeinv() ATTR_COLD;
+	void init_strikeit() ATTR_COLD;
+	void init_v4wize() ATTR_COLD;
+	void init_turnover() ATTR_COLD;
+	void init_mating()  ATTR_COLD;
+	void init_skiltrek()  ATTR_COLD;
+	void init_cybcas() ATTR_COLD;
+	void init_bwbhack() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
