@@ -152,6 +152,7 @@ public:
 	{ }
 
 	void gl4000(machine_config &config);
+	void genio2000(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -876,6 +877,14 @@ void gl4004_state::gl4000(machine_config &config)
 	SOFTWARE_LIST(config, "misterx_cart").set_compatible("misterx");
 }
 
+void gl4004_state::genio2000(machine_config &config)
+{
+	gl4000(config);
+
+	// Read with a frequency counter, exact derivation unknown
+	m_maincpu->set_clock(6'131'790);
+}
+
 /* ROM definition */
 ROM_START( pc2000 )
 	ROM_REGION( 0x40000, "bios", 0 )
@@ -910,6 +919,15 @@ ROM_END
 ROM_START( gl4000 )
 	ROM_REGION(0x80000, "bios", 0)
 	ROM_LOAD( "27-5480-00",   0x000000, 0x040000, CRC(8de047d3) SHA1(bb1d869954773bb7b8b51caa54531015d6b751ec) )
+ROM_END
+
+ROM_START( genio2000 )
+	ROM_REGION(0x80000, "bios", 0)
+	// 128 KiB dump, mirrored to fill the 512 KiB region
+	ROM_LOAD( "27-5575-00", 0x000000, 0x020000, CRC(7a9d7b8a) SHA1(76e41bc3b19f3f0c0ae4605257ba4ee9d812659f) )
+	ROM_RELOAD( 0x020000, 0x020000 )
+	ROM_RELOAD( 0x040000, 0x020000 )
+	ROM_RELOAD( 0x060000, 0x020000 )
 ROM_END
 
 ROM_START( gl4004 )
@@ -960,6 +978,7 @@ COMP( 1994, gl2000c,  gl2000, 0,     gl2000,    pc2000,  pc2000_state, empty_ini
 COMP( 1995, gl2000p,  gl2000, 0,     gl2000,    pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 2000 Plus",                MACHINE_NOT_WORKING )
 COMP( 1996, gl3000s,  0,      0,     gl3000s,   gl3000s, gl3000s_state,empty_init, "Video Technology",        "Genius Leader 3000S (Germany)",          MACHINE_NOT_WORKING )
 COMP( 1994, gl4000,   0,      0,     gl4000,    pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Leader 4000 Quadro (Germany)",    MACHINE_NOT_WORKING )
+COMP( 199?, genio2000, gl4000, 0,     genio2000, pc2000,  gl4004_state, empty_init, "Video Technology",        "Genio 2000 (Spain)",                     MACHINE_NOT_WORKING )
 COMP( 1996, gl4004,   0,      0,     gl4000,    pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Leader 4004 Quadro L (Germany)",  MACHINE_NOT_WORKING )
 COMP( 1997, gl5000,   0,      0,     gl5000,    gl3000s, gl3000s_state,empty_init, "Video Technology",        "Genius Leader 5000 (Germany)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 COMP( 1997, gl5005x,  0,      0,     pc2000,    pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 5005X (Germany)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
