@@ -160,6 +160,7 @@ const double XTAL::known_xtals[] = {
 	  8'053'000, // 8.053_MHz_XTAL         Mad Motor
 	  8'200'000, // 8.2_MHz_XTAL           Universal Mr. Do - Model 8021 PCB
 	  8'388'000, // 8.388_MHz_XTAL         Nintendo Game Boy Color
+	  8'412'000, // 8.412_MHz_XTAL         IDSA Spanish Darts
 	  8'448'000, // 8.448_MHz_XTAL         Banpresto's Note Chance - Used to drive OKI M6295 chips, usually with /8 divider
 	  8'467'200, // 8.4672_MHz_XTAL        Subsino's Ying Hua Lian
 	  8'664'000, // 8.664_MHz_XTAL         Touchmaster

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Tomasz Slanina, Roberto Fresca, Tomás García-Merás Capote (ClawGrip)
+// copyright-holders:Tomasz Slanina, Roberto Fresca, Tomás García-Merás Capote
 /***************************************************************************
 
   IDSA 4 En Raya.
@@ -93,7 +93,8 @@
 
   The program clocks the coin and buttons register before each read, so it
   never sees input 7 and finds coin, button 1 and button 2 on inputs 0-2.
-  The lamps are the dart board spotlight and the lights of both buttons.
+  The lamps (active low) are, from shift register bit 0, the dart board
+  spotlight and the lights of buttons 1 and 2, as named by the test mode.
 
   Turning on the service mode DIP switch runs a RAM test, which clears the
   NVRAM, followed by screen, button, lamp, dart board and sound tests (button
@@ -441,7 +442,6 @@ void _4enraya_state::fenraya_custom_map_w(offs_t offset, uint8_t data)
 
 uint8_t spadarts_state::matrix_r(offs_t offset)
 {
-	// the dart board is scanned as four rows of 16 targets, bit 6 of the control latch enables the row select
 	if (!BIT(m_control, 6))
 		return 0xff;
 
@@ -453,19 +453,17 @@ void spadarts_state::control_w(uint8_t data)
 	uint8_t const old = m_control;
 	m_control = data;
 
-	// bits 0-2: AY-3-8910 bus control, bit 3: probably AY-3-8910 reset
 	if (!BIT(data, 3))
 		m_ay->reset_w();
 	else
 		sound_control_w(data);
 
-	// bits 4-7 are shared by the dart board row select and two shift registers (exact wiring unknown)
 	if (BIT(data, 6))
 		return;
 
 	if (BIT(data, 7))
 	{
-		// coin and buttons: bit 5 loads the parallel inputs, a rising edge on bit 7 shifts them towards bit 7 (read on port 0 bit 0)
+		// coin and buttons shift register
 		if (BIT(data, 5))
 			m_buttons_shift = m_buttons->read();
 		else if (!BIT(old, 7))
@@ -473,8 +471,7 @@ void spadarts_state::control_w(uint8_t data)
 	}
 	else if (BIT(data, 5) && !BIT(old, 5))
 	{
-		// lamps (active low): bit 4 is shifted in on a rising edge of bit 5, MSB first
-		// 0: dart board spotlight, 1: button 1, 2: button 2 (named by the test mode), 3-7: unused
+		// lamps shift register
 		m_lamps_shift = (m_lamps_shift << 1) | BIT(data, 4);
 		for (int i = 0; i < 3; i++)
 			m_lamps[i] = BIT(~m_lamps_shift, i);
@@ -604,9 +601,6 @@ static INPUT_PORTS_START( 4enraya )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
-#define SPADARTS_DART(mask, name) \
-	PORT_BIT( mask, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME(name)
-
 // the dartboard layout finds the targets by these names
 static INPUT_PORTS_START( spadarts )
 	PORT_START("IN0")
@@ -635,76 +629,76 @@ static INPUT_PORTS_START( spadarts )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("MATRIX0")
-	SPADARTS_DART( 0x0001, "Dart Triple 7" )
-	SPADARTS_DART( 0x0002, "Dart Double 19" )
-	SPADARTS_DART( 0x0004, "Dart Double 3" )
-	SPADARTS_DART( 0x0008, "Dart Triple 19" )
-	SPADARTS_DART( 0x0010, "Dart Triple 3" )
-	SPADARTS_DART( 0x0020, "Dart Single 19" )
-	SPADARTS_DART( 0x0040, "Dart Single 3" )
-	SPADARTS_DART( 0x0080, "Dart Triple 17" )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 7")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 19")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 3")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 19")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 3")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 19")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 3")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 17")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
-	SPADARTS_DART( 0x0200, "Dart Double 16" )
-	SPADARTS_DART( 0x0400, "Dart Triple 16" )
-	SPADARTS_DART( 0x0800, "Dart Double 7" )
-	SPADARTS_DART( 0x1000, "Dart Single 7" )
-	SPADARTS_DART( 0x2000, "Dart Single 17" )
-	SPADARTS_DART( 0x4000, "Dart Single 16" )
-	SPADARTS_DART( 0x8000, "Dart Double 17" )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 16")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 16")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 7")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 7")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 17")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 16")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 17")
 
 	PORT_START("MATRIX1")
-	SPADARTS_DART( 0x0001, "Dart Triple 15" )
-	SPADARTS_DART( 0x0002, "Dart Double 10" )
-	SPADARTS_DART( 0x0004, "Dart Double 6" )
-	SPADARTS_DART( 0x0008, "Dart Triple 10" )
-	SPADARTS_DART( 0x0010, "Dart Triple 6" )
-	SPADARTS_DART( 0x0020, "Dart Single 10" )
-	SPADARTS_DART( 0x0040, "Dart Single 6" )
-	SPADARTS_DART( 0x0080, "Dart Triple 13" )
-	SPADARTS_DART( 0x0100, "Dart Double Bull" )
-	SPADARTS_DART( 0x0200, "Dart Double 2" )
-	SPADARTS_DART( 0x0400, "Dart Triple 2" )
-	SPADARTS_DART( 0x0800, "Dart Double 15" )
-	SPADARTS_DART( 0x1000, "Dart Single 15" )
-	SPADARTS_DART( 0x2000, "Dart Single 13" )
-	SPADARTS_DART( 0x4000, "Dart Single 2" )
-	SPADARTS_DART( 0x8000, "Dart Double 13" )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 15")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 10")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 6")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 10")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 6")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 10")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 6")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 13")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double Bull")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 2")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 2")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 15")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 15")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 13")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 2")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 13")
 
 	PORT_START("MATRIX2")
-	SPADARTS_DART( 0x0001, "Dart Triple 18" )
-	SPADARTS_DART( 0x0002, "Dart Double 1" )
-	SPADARTS_DART( 0x0004, "Dart Double 20" )
-	SPADARTS_DART( 0x0008, "Dart Triple 1" )
-	SPADARTS_DART( 0x0010, "Dart Triple 20" )
-	SPADARTS_DART( 0x0020, "Dart Single 1" )
-	SPADARTS_DART( 0x0040, "Dart Single 20" )
-	SPADARTS_DART( 0x0080, "Dart Triple 5" )
-	SPADARTS_DART( 0x0100, "Dart Single Bull" )
-	SPADARTS_DART( 0x0200, "Dart Double 4" )
-	SPADARTS_DART( 0x0400, "Dart Triple 4" )
-	SPADARTS_DART( 0x0800, "Dart Double 18" )
-	SPADARTS_DART( 0x1000, "Dart Single 18" )
-	SPADARTS_DART( 0x2000, "Dart Single 5" )
-	SPADARTS_DART( 0x4000, "Dart Single 4" )
-	SPADARTS_DART( 0x8000, "Dart Double 5" )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 18")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 1")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 20")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 1")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 20")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 1")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 20")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 5")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single Bull")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 4")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 4")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 18")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 18")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 5")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 4")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 5")
 
 	PORT_START("MATRIX3")
-	SPADARTS_DART( 0x0001, "Dart Triple 9" )
-	SPADARTS_DART( 0x0002, "Dart Double 14" )
-	SPADARTS_DART( 0x0004, "Dart Double 11" )
-	SPADARTS_DART( 0x0008, "Dart Triple 14" )
-	SPADARTS_DART( 0x0010, "Dart Triple 11" )
-	SPADARTS_DART( 0x0020, "Dart Single 14" )
-	SPADARTS_DART( 0x0040, "Dart Single 11" )
-	SPADARTS_DART( 0x0080, "Dart Triple 8" )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 9")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 14")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 11")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 14")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 11")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 14")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 11")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 8")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
-	SPADARTS_DART( 0x0200, "Dart Double 12" )
-	SPADARTS_DART( 0x0400, "Dart Triple 12" )
-	SPADARTS_DART( 0x0800, "Dart Double 9" )
-	SPADARTS_DART( 0x1000, "Dart Single 9" )
-	SPADARTS_DART( 0x2000, "Dart Single 8" )
-	SPADARTS_DART( 0x4000, "Dart Single 12" )
-	SPADARTS_DART( 0x8000, "Dart Double 8" )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 12")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 12")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 9")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 9")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 8")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 12")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 8")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( unkpacg )
@@ -954,9 +948,12 @@ void spadarts_state::spadarts(machine_config &config)
 {
 	_4enraya(config);
 
+	m_maincpu->set_clock(8.412_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_IO, &spadarts_state::spadarts_portmap);
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0); // MK48Z02
+
+	m_ay->set_clock(8.412_MHz_XTAL / 4);
 }
 
 
