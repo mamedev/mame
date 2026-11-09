@@ -4,6 +4,25 @@
 
 Williams The Predators (prototype)
 
+The main board uses an Am2910 and four 512-byte control PROMs to service
+four raster/vector slave boards. The 68000 supplies a microprogram entry
+address, coordinates, vector count and source address for each station.
+The slave-board rasterizer is modelled with six-bit binary rate multipliers
+fed by sine/cosine PROMs, drawing ROM vectors into packed 4bpp framebuffers.
+
+Known program bugs:
+- The program attempts to store bonus-time adjustments at ROM addresses
+  $0c9c/$0ca0/$0cac from $ca2a/$ca08/$ca4c. Settings persist in NVRAM but
+  awards use fixed ROM values: minor 1:00, major 2:00 and time capsule 0:30.
+- The time-addition helper at $8fbc adds BCD $40 with X still set after a
+  seconds sum of 100 or more, adding an extra second (e.g. 0:59 + 0:55 = 1:55).
+
+TODO:
+- Refine inferred video clocks and slave-bus handshakes if more documentary
+  evidence becomes available; no hardware is available for measurements.
+- The SC firmware processes the inputs, but the remote serial transmitters
+  and host snapshot handshake are represented at the packet level.
+
 */
 
 #include "emu.h"
@@ -13,6 +32,7 @@ Williams The Predators (prototype)
 #include "cpu/mcs48/mcs48.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
+#include "machine/am2910.h"
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
@@ -24,6 +44,8 @@ Williams The Predators (prototype)
 #include "speaker.h"
 
 #include <algorithm>
+#include <array>
+#include <iterator>
 
 
 DECLARE_DEVICE_TYPE(WILLIAMS_PREDATORS_SOUND, williams_pred_sound_device)
@@ -129,6 +151,8 @@ public:
 		m_screen(*this, { "hawk", "falcon", "eagle", "condor" }), // show screen names
 		m_palette(*this, "palette%u", 0U),
 		m_ptm(*this, "ptm"),
+		m_sequencer(*this, "sequencer"),
+		m_microcode(*this, "am2910"),
 		m_blit_length(*this, "blitlength"),
 		m_blit_yoffs(*this, "blityoffs"),
 		m_blit_attr(*this, "blitattr"),
@@ -150,8 +174,8 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	// 4 mono sounds better than 4 stereo
-	static constexpr bool USE_MONO_SPEAKERS = true;
+	// Estimated sequencer/slave clock; not established by the recovered ROMs.
+	static constexpr uint32_t VIDEO_CLOCK = 4'000'000;
 
 	// move into a screen device?
 	struct screen_state
@@ -167,20 +191,18 @@ private:
 		uint16_t m_xmin;
 		uint16_t m_xmax;
 		uint8_t m_vram_page;
-		uint8_t m_busy;
-		uint8_t m_swap;
+		bool m_busy;
+		bool m_swap;
+		bool m_ready;
 	};
 
-	screen_state m_screen_state[4];
-	uint8_t m_screen_irq_mask;
-
-	emu_timer *m_blit_done_timer;
-
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_i8035;
+	required_device<i8035_device> m_i8035;
 	required_device_array<screen_device, 4> m_screen;
 	required_device_array<palette_device, 4> m_palette;
 	required_device<ptm6840_device> m_ptm;
+	required_device<am2910_device> m_sequencer;
+	required_region_ptr<uint8_t> m_microcode;
 	required_region_ptr<uint8_t> m_blit_length;
 	required_region_ptr<uint8_t> m_blit_yoffs;
 	required_region_ptr<uint8_t> m_blit_attr;
@@ -194,25 +216,51 @@ private:
 	required_device_array<williams_pred_sound_device, 8> m_predsnd;
 	memory_share_array_creator<u8, 4> m_vram;
 
+	screen_state m_screen_state[4];
+	uint8_t m_screen_irq_mask;
+
+	// SC firmware output latches, committed after the ninth MOVX write.
+	uint8_t m_input_latch[9];
+	uint8_t m_input_pending[9];
+	bool m_input_request;
+	uint8_t m_remote_packet[3][7];
+	uint8_t m_remote_pos[3];
+	bool m_remote_idle[3];
+	uint8_t m_serial_mode;
+	uint8_t m_serial_command;
+	bool m_serial_expect_mode;
+
+	emu_timer *m_blit_done_timer[4];
+	emu_timer *m_microcode_timer;
+	uint16_t m_microcode_pc = 0;
+
 	template <int N>
 	void vblank_write_line(int state);
 
 	TIMER_CALLBACK_MEMBER(draw_complete);
+	TIMER_CALLBACK_MEMBER(microcode_step);
+	void microcode_address_w(uint16_t data);
+	void wake_sequencer();
 
 	void blit_param_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void blit_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void blit_ctrl_w(uint8_t data);
 
-	void update_main_irqs(void);
+	void update_main_irqs();
 	void request_vram_swap(int screen);
 	void clear_vram(int screen);
 	void set_clipping_region(int screen);
 	void do_blit(int screen);
-	void execute_draw_cmd(int screen);
 	void draw_line(int screen, int startx, int starty, int valctab, int valstab, int length, int color);
-	void write_4bpp_pixel(int screen, int x, int y, uint8_t pix, int wrap);
+	void write_4bpp_pixel(int screen, int x, int y, uint8_t pix);
 	void draw_cmd_finished(int screen);
 	void screen_start(int screen) ATTR_COLD;
 	uint16_t player_input_r(offs_t offset);
+	TIMER_CALLBACK_MEMBER(request_input);
+	TIMER_CALLBACK_MEMBER(publish_input);
+	uint8_t joystick_r(uint32_t player);
+	uint8_t sc_io_r(offs_t offset);
+	void sc_io_w(offs_t offset, uint8_t data);
+	std::array<uint8_t, 7> make_input_packet(uint32_t remote);
 	void sound_w(offs_t offset, uint16_t data);
 
 	void main_map(address_map &map) ATTR_COLD;
@@ -226,21 +274,22 @@ private:
 template <int N>
 uint32_t predators_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int color_base = 16;
+	// The lower half of both colour PROMs is entirely black: A4 low would
+	// blank the output, not select another set of game colours. Visible
+	// pixels use A4 high; the board's blanking connections are unknown.
+	constexpr int COLOR_BASE = 0x10;
 	uint8_t const *const vram = m_vram[N] + (m_screen_state[N].m_vram_page ? 0 : 0x10000);
 	pen_t const *const paldata = m_palette[N]->pens();
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); ++y)
 	{
-		uint8_t const *src = &vram[y * 512/2 + cliprect.min_x / 2];
-		uint32_t *dest = &bitmap.pix(y, cliprect.min_x & ~1);
+		uint8_t const *const src = &vram[y * 256];
+		uint32_t *dest = &bitmap.pix(y, cliprect.left());
 
-		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.left(); x <= cliprect.right(); ++x)
 		{
-			uint8_t const color = *src++;
-
-			*dest++ = paldata[((color >> 4) & 0x0f) + color_base];
-			*dest++ = paldata[((color >> 0) & 0x0f) + color_base];
+			uint8_t const color = BIT(src[x / 2], BIT(x, 0) ? 0 : 4, 4);
+			*dest++ = paldata[color + COLOR_BASE];
 		}
 	}
 	return 0;
@@ -255,28 +304,31 @@ void predators_state::vblank_write_line(int state)
 
 		if (s_state.m_swap)
 		{
+			// Finish displaying the old front buffer before it becomes the draw page.
+			m_screen[N]->update_partial(m_screen[N]->visible_area().bottom());
 			s_state.m_vram_page ^= 1;
-			s_state.m_swap = 0;
-			draw_cmd_finished(N);
+			s_state.m_swap = false;
+			wake_sequencer();
 		}
 	}
 }
 
 void predators_state::draw_cmd_finished(int screen)
 {
-	m_screen_state[screen].m_busy = 0;
+	m_screen_state[screen].m_busy = false;
 	update_main_irqs();
 }
 
 TIMER_CALLBACK_MEMBER(predators_state::draw_complete)
 {
-	draw_cmd_finished(param);
+	m_screen_state[param].m_ready = true;
+	wake_sequencer();
 }
 
-void predators_state::write_4bpp_pixel(int screen, int x, int y, uint8_t pix, int wrap)
+void predators_state::write_4bpp_pixel(int screen, int x, int y, uint8_t pix)
 {
-	constexpr int width = 512;
-	constexpr int height = 256;
+	constexpr int WIDTH = 512;
+	constexpr int HEIGHT = 256;
 	screen_state &s_state = m_screen_state[screen];
 
 	x -= 256;
@@ -285,16 +337,17 @@ void predators_state::write_4bpp_pixel(int screen, int x, int y, uint8_t pix, in
 	if (y < 0 || x < 0)
 		return;
 
-	if (y >= height || x >= width)
+	if (y >= HEIGHT || x >= WIDTH)
 		return;
 
-	if (x >= (s_state.m_xmin * 2) && x <= (s_state.m_xmax * 2))
+	// Both nibbles of the last byte are inside the clipping window.
+	if ((x >> 1) >= s_state.m_xmin && (x >> 1) <= s_state.m_xmax)
 	{
 		pix &= 0xf;
 
 		uint8_t *const vram = &m_vram[screen][s_state.m_vram_page ? 0x10000 : 0];
 
-		int const offs = (y * width + x) / 2;
+		int const offs = (y * WIDTH + x) / 2;
 
 		if (x & 1)
 			vram[offs] = (vram[offs] & 0xf0) | pix;
@@ -303,22 +356,30 @@ void predators_state::write_4bpp_pixel(int screen, int x, int y, uint8_t pix, in
 	}
 }
 
-/* TODO: This is inaccurate */
 void predators_state::draw_line(int screen, int startx, int starty, int valctab, int valstab, int length, int color)
 {
-	// pre-increment?
-	int drawx = valctab & 0x7f, drawy = valstab & 0x7f;
+	// The six magnitude bits drive binary rate multipliers. A 7497 emits
+	// pulses at counter values 0,2,4,... for B5, 1,5,9,... for B4, through
+	// to 31 for B0. All outputs are inactive at count 63.
+	// The counters start at zero for each vector; plot before stepping.
+	int const dx = BIT(valctab, 7) ? -1 : 1;
+	int const dy = BIT(valstab, 7) ? -1 : 1;
 
 	for (int j = 0; j < length; ++j)
 	{
-		int const xscreen = (valctab & 0x80) ? (startx - (drawx >> 6)) : (startx + (drawx >> 6));
-		int const yscreen = (valstab & 0x80) ? (starty - (drawy >> 6)) : (starty + (drawy >> 6));
+		write_4bpp_pixel(screen, startx, starty, color);
 
-		write_4bpp_pixel(screen, xscreen, yscreen, color, 0);
-
-		drawx += valctab & 0x7f;
-		drawy += valstab & 0x7f;
-
+		for (int bit = 0; bit < 6; ++bit)
+		{
+			if ((j & util::make_bitmask<int>(bit + 1)) == util::make_bitmask<int>(bit))
+			{
+				if (BIT(valctab, 5 - bit))
+					startx += dx;
+				if (BIT(valstab, 5 - bit))
+					starty += dy;
+				break;
+			}
+		}
 	}
 }
 
@@ -332,36 +393,36 @@ void predators_state::request_vram_swap(int screen)
 
 	    * Size (always 1)
 	*/
-	s_state.m_swap = 1;
-	s_state.m_busy = 1;
+	s_state.m_swap = true;
+	s_state.m_busy = true;
 }
 
 void predators_state::clear_vram(int screen)
 {
 	screen_state &s_state = m_screen_state[screen];
-	/*
-	    VRAM clear?
-
-	    Valid parameters:
-
-	    * X
-	    * Size (always 1)
-	    * Source (always 0)
-	*/
-
-	uint8_t *const vram = &m_vram[screen][s_state.m_vram_page ? 0x10000 : 0];
-
-	/* Clear the active video page with respect to the clipping region */
-	// TODO: Understand X parameter
-	for (int y = 0; y < 256; ++y)
+	// The 68000 routine at $1426e derives the clear origin from the clip
+	// minimum: X = $100 + 2*xmin. $11280 sets source/count/X but leaves Y
+	// unchanged, so Y is not a clear coordinate. Clear from X to the clip
+	// maximum over all rows; the extent beyond normal software usage is
+	// inferred. The game always selects source zero (black).
+	int const first = std::max(int(s_state.m_reg1_xmax) - 0x100, int(s_state.m_xmin) * 2);
+	int const last = int(s_state.m_xmax) * 2 + 1;
+	uint32_t bytes = 0;
+	if (first <= last)
 	{
-		int bytes = (s_state.m_xmax - s_state.m_xmin) + 1;
-		std::fill_n(&vram[y * 512 / 2 + s_state.m_xmin], bytes, 0);
+		uint8_t *const vram = &m_vram[screen][s_state.m_vram_page ? 0x10000 : 0];
+		bytes = (last / 2 - first / 2 + 1) * 256;
+		for (int y = 0; y < 256; ++y)
+		{
+			uint8_t *const dest = &vram[y * 256];
+			// Preserve the first pixel if the clear starts on an odd column.
+			if (first & 1)
+				dest[first / 2] &= 0xf0;
+			std::fill_n(dest + (first + 1) / 2, (last + 1) / 2 - (first + 1) / 2, 0);
+		}
 	}
-
-	s_state.m_busy = 1;
-
-	m_blit_done_timer->adjust(attotime::from_usec(5), screen);
+	s_state.m_ready = false;
+	m_blit_done_timer[screen]->adjust(attotime::from_ticks(std::max(bytes, 1U), VIDEO_CLOCK), screen);
 }
 
 void predators_state::set_clipping_region(int screen)
@@ -376,96 +437,98 @@ void predators_state::set_clipping_region(int screen)
 	    * Y
 	    * Size (always 1)
 	*/
-	s_state.m_xmax = s_state.m_reg1_xmax;
-	s_state.m_xmin = s_state.m_reg2_xmin;
-
-	s_state.m_busy = 1;
-	m_blit_done_timer->adjust(attotime::from_usec(1), screen);
+	s_state.m_xmax = s_state.m_reg1_xmax & 0xff;
+	s_state.m_xmin = s_state.m_reg2_xmin & 0xff;
 }
 
 void predators_state::do_blit(int screen)
 {
 	screen_state &s_state = m_screen_state[screen];
-	int blit_x = s_state.m_reg1_xmax;
-	int blit_y = s_state.m_reg2_xmin;
-	uint16_t blit_size = s_state.m_reg3_blit_size;
-	uint16_t blit_src = s_state.m_reg4_blit_src;
+	uint16_t const source = s_state.m_reg4_blit_src++;
+	uint8_t const length = m_blit_length[source];
+	int const x = s_state.m_reg1_xmax + int8_t(m_blit_xoffs[source]);
+	int const y = s_state.m_reg2_xmin + int8_t(m_blit_yoffs[source]);
+	uint8_t const angle = m_blit_attr[source];
+	uint8_t const color = (m_blit_color[source >> 1] >> (BIT(source, 0) * 4)) & 0x0f;
 
-	for (int i = 0; i < blit_size; ++i)
-	{
-		int const offset = blit_src + i;
-		uint8_t const length = m_blit_length[offset];
-		int8_t const extray = m_blit_yoffs[offset];
-		uint8_t const attr = m_blit_attr[offset];
-		int8_t const extrax = m_blit_xoffs[offset];
-		uint8_t color;
+	// Each vector has signed offsets, an 8-bit angle, a clock count and a
+	// packed colour nibble. Angle 0 points up on the rotated display, 0x40
+	// right, 0x80 down, and 0xc0 left. The length counts input clocks to the
+	// rate multipliers, rather than distinct pixels written to video RAM.
+	// Transfer one vector before the microprogram services the next station.
+	draw_line(screen, x, y, m_sincos[screen][angle], m_sincos[screen][angle + 0x100], length, color);
 
-		/* Colour data is packed into half sized rom with 2 * 4 bits in each byte */
-		if ((blit_src + i) & 1)
-		{
-			color = m_blit_color[offset >> 1] & 0xf0;
-			color >>= 4;
-		}
-		else
-		{
-			color = m_blit_color[offset >> 1] & 0x0f;
-		}
-
-		/* (relative to vertical orientation)
-		        line drawing.. it's an actual angle!! upper 4 bits shown in diagram below
-
-		    e     f    0   1      2
-		    . -        -        -
-		    .   \      |      /
-		    d     \    |    /     3
-		    .       \  |  /
-		    m         \|/
-		    c <------- o -------> 4
-		    .         /|\
-		    .       /  |  \
-		    b     /    |    \     5
-		    .   /      |      \
-		    . -        -        -
-		    a    9    8    7     6
-
-		    note, the length attribute is NOT in pixels(!) it's the real line length
-		*/
-
-		int const valctab = m_sincos[screen][(attr & 0xff)];
-		int const valstab = m_sincos[screen][(attr & 0xff) + 0x100];
-
-		draw_line(screen, blit_x + extrax, blit_y + extray, valctab, valstab, length, color);
-	}
-
-	s_state.m_busy = 1;
-	m_blit_done_timer->adjust(attotime::from_usec(5), screen);
+	s_state.m_ready = false;
+	m_blit_done_timer[screen]->adjust(attotime::from_ticks(length + 1, VIDEO_CLOCK), screen);
 }
 
-void predators_state::execute_draw_cmd(int screen)
+void predators_state::microcode_address_w(uint16_t data)
 {
+	m_microcode_pc = data & 0x1ff;
+}
+
+void predators_state::wake_sequencer()
+{
+	if (!m_microcode_timer->enabled())
+		m_microcode_timer->adjust(attotime::zero);
+}
+
+TIMER_CALLBACK_MEMBER(predators_state::microcode_step)
+{
+	// Four 512 x 8 PROMs form the control word. U280 supplies the branch
+	// address, U283[7:4] the Am2910 instruction, and U282[1:0] the station.
+	// The remaining strobes are inferred from the repeated PROM routines;
+	// the slave-board data path and bus handshakes still need schematics.
+	uint8_t const branch = m_microcode[m_microcode_pc + 0x000];
+	uint8_t const control = m_microcode[m_microcode_pc + 0x200];
+	uint8_t const select = m_microcode[m_microcode_pc + 0x400];
+	uint8_t const sequence = m_microcode[m_microcode_pc + 0x600];
+	uint32_t const screen = select & 3;
 	screen_state &s_state = m_screen_state[screen];
-	uint8_t const trigger = s_state.m_reg0_trigger;
 
-	// 4 cases for each command but screen comes from offset
-	// 4 work units?
-	switch (trigger)
+	// U283[2:1] selects unconditional, vector-count-zero, or station
+	// unavailable (no CPU request, slave still drawing, or swap pending).
+	bool condition = true;
+	switch ((sequence >> 1) & 3)
 	{
-	case 0x12: case 0x1a: case 0x22: case 0x2a:
-		clear_vram(screen);
-		break;
-
-	case 0x32: case 0x37: case 0x3c: case 0x41:
-		request_vram_swap(screen);
-		break;
-
-	case 0x46: case 0x48: case 0x4a: case 0x4c:
-		set_clipping_region(screen);
-		break;
-
-	case 0x4e: case 0x56: case 0x5e: case 0x66:
-		do_blit(screen);
-		break;
+		case 1:
+			condition = !s_state.m_reg3_blit_size;
+			break;
+		case 2:
+			condition = !s_state.m_busy || !s_state.m_ready || s_state.m_swap;
+			break;
 	}
+
+	if (!BIT(control, 0))
+		request_vram_swap(screen);
+	if (!BIT(control, 1) && BIT(sequence, 0))
+		set_clipping_region(screen);
+	if (BIT(control, 6) && BIT(select, 2) && BIT(sequence, 0))
+	{
+		if (BIT(control, 4))
+			do_blit(screen);
+		else
+			clear_vram(screen);
+	}
+	if (BIT(control, 7) && !BIT(select, 3))
+		draw_cmd_finished(screen);
+	if (BIT(select, 6) && BIT(select, 5) && s_state.m_reg3_blit_size)
+		--s_state.m_reg3_blit_size;
+
+	m_sequencer->i_w(sequence >> 4);
+	m_sequencer->d_w((sequence >> 4) == 2 ? s_state.m_reg0_trigger : branch);
+	m_sequencer->rld_w(BIT(sequence, 3));
+	m_sequencer->ci_w(1);
+	m_sequencer->ccen_w(0);
+	m_sequencer->cc_w(!condition);
+	m_sequencer->cp_w(0);
+	m_sequencer->cp_w(1);
+
+	// Skip idle polling, preserving the sequencer's position. CPU writes,
+	// slave completion and vertical blanking restart it as necessary.
+	if (m_microcode_pc != 5 || std::any_of(std::begin(m_screen_state), std::end(m_screen_state),
+			[] (screen_state const &s) { return s.m_busy && s.m_ready && !s.m_swap; }))
+		m_microcode_timer->adjust(attotime::from_ticks(1, VIDEO_CLOCK));
 }
 
 void predators_state::blit_param_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -474,8 +537,8 @@ void predators_state::blit_param_w(offs_t offset, uint16_t data, uint16_t mem_ma
 	    Each screen has its own blit registers:
 
 	    40,2,4,6 = Command and trigger (Byte)
-	    50,2,4,6 = Dest. Y (Word)
-	    60,2,4,6 = Dest. X (Word)
+	    50,2,4,6 = Dest. X / clipping maximum (Word)
+	    60,2,4,6 = Dest. Y / clipping minimum (Word)
 	    70,2,4,6 = Size (Byte)
 	    80,2,4,6 = Image address (Word)
 	*/
@@ -495,24 +558,30 @@ void predators_state::blit_param_w(offs_t offset, uint16_t data, uint16_t mem_ma
 	switch (byte_offset)
 	{
 		case 0x40:
-			s_state.m_reg0_trigger = data;
-			execute_draw_cmd(screen);
+			if (ACCESSING_BITS_0_7)
+			{
+				s_state.m_reg0_trigger = data;
+				s_state.m_busy = true;
+				update_main_irqs();
+				wake_sequencer();
+			}
 			break;
 
 		case 0x50:
-			s_state.m_reg1_xmax = data;
+			COMBINE_DATA(&s_state.m_reg1_xmax);
 			break;
 
 		case 0x60:
-			s_state.m_reg2_xmin = data;
+			COMBINE_DATA(&s_state.m_reg2_xmin);
 			break;
 
 		case 0x70:
-			s_state.m_reg3_blit_size = data;
+			if (ACCESSING_BITS_0_7)
+				s_state.m_reg3_blit_size = data;
 			break;
 
 		case 0x80:
-			s_state.m_reg4_blit_src = data;
+			COMBINE_DATA(&s_state.m_reg4_blit_src);
 			break;
 
 		default:
@@ -521,13 +590,13 @@ void predators_state::blit_param_w(offs_t offset, uint16_t data, uint16_t mem_ma
 	}
 }
 
-void predators_state::blit_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void predators_state::blit_ctrl_w(uint8_t data)
 {
-	m_screen_irq_mask = (data >> 8) & 0xf;
+	m_screen_irq_mask = data & 0xf;
 	update_main_irqs();
 }
 
-void predators_state::update_main_irqs(void)
+void predators_state::update_main_irqs()
 {
 	m_maincpu->set_input_line(2, ((m_screen_irq_mask & 1) && !m_screen_state[0].m_busy) ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(3, ((m_screen_irq_mask & 2) && !m_screen_state[1].m_busy) ? ASSERT_LINE : CLEAR_LINE);
@@ -627,16 +696,134 @@ static INPUT_PORTS_START( predators )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT ) PORT_NAME("Player 4 (Condor) Slam") // slam??
 INPUT_PORTS_END
 
+// The SC ROM samples one local panel and receives three remote panels through
+// 8251-style registers. Seven bytes carry the low nibbles of joystick/buttons/
+// status, then their high nibbles, then a checksum. Each byte's high nibble is
+// its sequence number (0..6). The checksum makes the sum of all data nibbles zero.
+// No remote transmitter firmware is supplied, so only this packet interface is
+// modelled. Characters are made available when polled, with a receive-idle interval
+// between packets so the firmware can consume the completed sample. Bit timing and
+// the electrical handshake are not known. The 8035 still executes the actual
+// packet validation, local switch debounce and event accumulation routines.
+uint8_t predators_state::joystick_r(uint32_t player)
+{
+	// The 68000 table at $354c decodes these to 6, 5, 4, 3, 2, 1, 0.
+	// $d is one of the encodings accepted for position 2; the original
+	// transmitter circuitry is unknown.
+	constexpr uint8_t TRANSLATE49[7] = { 0x0, 0x1, 0x2, 0x7, 0xd, 0x9, 0x8 };
+	return (uint32_t(TRANSLATE49[m_sticky[player]->read() >> 4]) << 4) | TRANSLATE49[m_stickx[player]->read() >> 4];
+}
+
+std::array<uint8_t, 7> predators_state::make_input_packet(uint32_t remote)
+{
+	uint8_t const values[3] = { joystick_r(remote + 1), uint8_t(m_general[remote + 1]->read()), 0 };
+	std::array<uint8_t, 7> packet{};
+	uint32_t sum = 0;
+	for (uint32_t i = 0; i < 6; ++i)
+	{
+		uint8_t const nibble = (values[i % 3] >> (i < 3 ? 0 : 4)) & 0x0f;
+		packet[i] = (i << 4) | nibble;
+		sum += nibble;
+	}
+	packet[6] = 0x60 | ((-sum) & 0x0f);
+	return packet;
+}
+
+uint8_t predators_state::sc_io_r(offs_t offset)
+{
+	if (offset == 0x0c)
+		return m_general[0]->read() & 0x0f;
+
+	if ((offset & 3) <= 1 && offset < 0x0c)
+	{
+		bool const enabled = (m_serial_mode & 3) && BIT(m_serial_command, 2);
+		uint32_t const remote = 2 - (offset >> 2); // $08 Falcon, $04 Eagle, $00 Condor
+		if (BIT(offset, 0))
+		{
+			bool const ready = enabled && !m_remote_idle[remote];
+			if (!machine().side_effects_disabled())
+				m_remote_idle[remote] = false;
+			return 0x05 | (ready ? 0x02 : 0x00); // TxRDY, TxEMPTY, RxRDY
+		}
+		if (!enabled)
+			return 0xff;
+
+		if (!m_remote_pos[remote])
+		{
+			auto const packet = make_input_packet(remote);
+			if (machine().side_effects_disabled())
+				return packet[0];
+			std::copy(packet.begin(), packet.end(), std::begin(m_remote_packet[remote]));
+		}
+		uint8_t const result = m_remote_packet[remote][m_remote_pos[remote]];
+		if (!machine().side_effects_disabled())
+		{
+			m_remote_pos[remote] = (m_remote_pos[remote] + 1) % 7;
+			m_remote_idle[remote] = !m_remote_pos[remote];
+		}
+		return result;
+	}
+	return 0xff;
+}
+
+void predators_state::sc_io_w(offs_t offset, uint8_t data)
+{
+	if (offset < 9)
+	{
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(predators_state::publish_input), this),
+				(uint32_t(data) << 4) | offset);
+	}
+	else if (offset == 0x0c)
+	{
+		// The receive error path sends the failing channel's RAM address.
+		if (data >= 0x22 && data <= 0x2a && (data & 3) == 2)
+			m_remote_pos[(data - 0x22) / 4] = 0;
+	}
+	else if (offset == 0x0d)
+	{
+		// Broadcast USART control. ROM initialization is 00,00,00,40,4e,27:
+		// reset, asynchronous 8N1 /16 mode, then enable receive/transmit.
+		if (m_serial_expect_mode)
+		{
+			m_serial_mode = data;
+			m_serial_expect_mode = false;
+		}
+		else if (BIT(data, 6))
+		{
+			m_serial_expect_mode = true;
+			m_serial_command = 0;
+			std::fill(std::begin(m_remote_pos), std::end(m_remote_pos), 0);
+			std::fill(std::begin(m_remote_idle), std::end(m_remote_idle), false);
+		}
+		else
+		{
+			m_serial_command = data;
+		}
+	}
+}
+
 uint16_t predators_state::player_input_r(offs_t offset)
 {
-	if (offset & 1)
+	// T1 allows the firmware to publish an input snapshot ($199-$1cd).
+	// Request the next snapshot on a host read, returning the current one.
+	// Commit all nine bytes together to avoid torn joystick/button pairs.
+	if (!machine().side_effects_disabled())
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(predators_state::request_input), this));
+	return m_input_latch[offset];
+}
+
+TIMER_CALLBACK_MEMBER(predators_state::request_input)
+{
+	m_input_request = true;
+}
+
+TIMER_CALLBACK_MEMBER(predators_state::publish_input)
+{
+	m_input_pending[param & 0x0f] = param >> 4;
+	if ((param & 0x0f) == 8)
 	{
-		return m_general[offset >> 1]->read();
-	}
-	else
-	{
-		constexpr uint8_t translate49[7] = { 0x0, 0x1, 0x2, 0x7, 0xa, 0x9, 0x8 };
-		return (translate49[m_sticky[offset >> 1]->read() >> 4] << 4) | translate49[m_stickx[offset >> 1]->read() >> 4];
+		std::copy(std::begin(m_input_pending), std::end(m_input_pending), std::begin(m_input_latch));
+		m_input_request = false;
 	}
 }
 
@@ -659,7 +846,7 @@ void predators_state::main_map(address_map &map)
 
 	map(0x800020, 0x80002f).w(FUNC(predators_state::sound_w));
 
-	map(0xa00000, 0xa00001).w(FUNC(predators_state::blit_ctrl_w));
+	map(0xa00000, 0xa00001).umask16(0xff00).w(FUNC(predators_state::blit_ctrl_w));
 
 	map(0xc00000, 0xc003ff).ram().share("nvram");
 	map(0xfe0000, 0xffffff).ram();
@@ -672,7 +859,7 @@ void predators_state::slave_map(address_map &map)
 
 void predators_state::slave_io_map(address_map &map)
 {
-	map(0x0000, 0x000f).ram();
+	map(0x0000, 0x000f).rw(FUNC(predators_state::sc_io_r), FUNC(predators_state::sc_io_w));
 }
 
 void predators_state::screen_start(int screen)
@@ -718,15 +905,28 @@ void predators_state::machine_start()
 	save_item(STRUCT_MEMBER(m_screen_state, m_vram_page));
 	save_item(STRUCT_MEMBER(m_screen_state, m_busy));
 	save_item(STRUCT_MEMBER(m_screen_state, m_swap));
+	save_item(STRUCT_MEMBER(m_screen_state, m_ready));
+	save_item(NAME(m_microcode_pc));
 
 	save_item(NAME(m_screen_irq_mask));
+	save_item(NAME(m_input_latch));
+	save_item(NAME(m_input_pending));
+	save_item(NAME(m_input_request));
+	save_item(NAME(m_remote_packet));
+	save_item(NAME(m_remote_pos));
+	save_item(NAME(m_remote_idle));
+	save_item(NAME(m_serial_mode));
+	save_item(NAME(m_serial_command));
+	save_item(NAME(m_serial_expect_mode));
 
 	screen_start(0);
 	screen_start(1);
 	screen_start(2);
 	screen_start(3);
 
-	m_blit_done_timer = timer_alloc(FUNC(predators_state::draw_complete), this);
+	for (auto &timer : m_blit_done_timer)
+		timer = timer_alloc(FUNC(predators_state::draw_complete), this);
+	m_microcode_timer = timer_alloc(FUNC(predators_state::microcode_step), this);
 }
 
 void predators_state::machine_reset()
@@ -741,14 +941,31 @@ void predators_state::machine_reset()
 		s_state.m_xmin = 0;
 		s_state.m_xmax = 0;
 		s_state.m_vram_page = 0;
-		s_state.m_busy = 0;
-		s_state.m_swap = 0;
+		s_state.m_busy = false;
+		s_state.m_swap = false;
+		s_state.m_ready = true;
 	}
 
 	for (auto &vram : m_vram)
 		std::fill(std::begin(vram), std::end(vram), 0);
 
+	std::fill(std::begin(m_input_latch), std::end(m_input_latch), 0);
+	std::fill(std::begin(m_input_pending), std::end(m_input_pending), 0);
+	for (auto &packet : m_remote_packet)
+		std::fill(std::begin(packet), std::end(packet), 0);
+	std::fill(std::begin(m_remote_pos), std::end(m_remote_pos), 0);
+	std::fill(std::begin(m_remote_idle), std::end(m_remote_idle), false);
+	m_input_request = true;
+	m_serial_mode = 0;
+	m_serial_command = 0;
+	m_serial_expect_mode = true;
+
 	m_screen_irq_mask = 0;
+	m_microcode_pc = 0;
+	for (auto &timer : m_blit_done_timer)
+		timer->adjust(attotime::never);
+	m_microcode_timer->adjust(attotime::zero);
+	update_main_irqs();
 }
 
 void predators_state::predators(machine_config &config)
@@ -758,6 +975,9 @@ void predators_state::predators(machine_config &config)
 
 	PTM6840(config, m_ptm, XTAL(8'000'000)/10);
 	m_ptm->irq_callback().set_inputline("maincpu", 1);
+
+	AM2910(config, m_sequencer);
+	m_sequencer->y().set(FUNC(predators_state::microcode_address_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -781,42 +1001,26 @@ void predators_state::predators(machine_config &config)
 	m_screen[3]->set_screen_update(FUNC(predators_state::screen_update<3>));
 	m_screen[3]->screen_vblank().set(FUNC(predators_state::vblank_write_line<3>));
 
-	if (USE_MONO_SPEAKERS)
-	{
-		SPEAKER(config, "hawk_mono").front_center();
-		SPEAKER(config, "falcon_mono").front_center();
-		SPEAKER(config, "eagle_mono").front_center();
-		SPEAKER(config, "condor_mono").front_center();
+	SPEAKER(config, "hawk_mono").front_center();
+	SPEAKER(config, "falcon_mono").front_center();
+	SPEAKER(config, "eagle_mono").front_center();
+	SPEAKER(config, "condor_mono").front_center();
 
-		WILLIAMS_PREDATORS_SOUND(config, m_predsnd[0]).add_route(ALL_OUTPUTS, "hawk_mono", 1.0, 0); // hawk0
-		WILLIAMS_PREDATORS_SOUND(config, m_predsnd[1]).add_route(ALL_OUTPUTS, "falcon_mono", 1.0, 0); // falcon0
-		WILLIAMS_PREDATORS_SOUND(config, m_predsnd[2]).add_route(ALL_OUTPUTS, "eagle_mono", 1.0, 0); // eagle0
-		WILLIAMS_PREDATORS_SOUND(config, m_predsnd[3]).add_route(ALL_OUTPUTS, "condor_mono", 1.0, 0); // condor0
-		WILLIAMS_PREDATORS_SOUND(config, m_predsnd[4]).add_route(ALL_OUTPUTS, "hawk_mono", 1.0, 0); // hawk1
-		WILLIAMS_PREDATORS_SOUND(config, m_predsnd[5]).add_route(ALL_OUTPUTS, "falcon_mono", 1.0, 0); // falcon1
-		WILLIAMS_PREDATORS_SOUND(config, m_predsnd[6]).add_route(ALL_OUTPUTS, "eagle_mono", 1.0, 0); // eagle1
-		WILLIAMS_PREDATORS_SOUND(config, m_predsnd[7]).add_route(ALL_OUTPUTS, "condor_mono", 1.0, 0); // condor1
-	}
-	else
-	{
-		SPEAKER(config, "hawk_stereo", 2).front();
-		SPEAKER(config, "falcon_stereo", 2).front();
-		SPEAKER(config, "eagle_stereo", 2).front();
-		SPEAKER(config, "condor_stereo", 2).front();
+	WILLIAMS_PREDATORS_SOUND(config, m_predsnd[0]).add_route(ALL_OUTPUTS, "hawk_mono", 1.0, 0); // hawk0
+	WILLIAMS_PREDATORS_SOUND(config, m_predsnd[1]).add_route(ALL_OUTPUTS, "falcon_mono", 1.0, 0); // falcon0
+	WILLIAMS_PREDATORS_SOUND(config, m_predsnd[2]).add_route(ALL_OUTPUTS, "eagle_mono", 1.0, 0); // eagle0
+	WILLIAMS_PREDATORS_SOUND(config, m_predsnd[3]).add_route(ALL_OUTPUTS, "condor_mono", 1.0, 0); // condor0
+	WILLIAMS_PREDATORS_SOUND(config, m_predsnd[4]).add_route(ALL_OUTPUTS, "hawk_mono", 1.0, 0); // hawk1
+	WILLIAMS_PREDATORS_SOUND(config, m_predsnd[5]).add_route(ALL_OUTPUTS, "falcon_mono", 1.0, 0); // falcon1
+	WILLIAMS_PREDATORS_SOUND(config, m_predsnd[6]).add_route(ALL_OUTPUTS, "eagle_mono", 1.0, 0); // eagle1
+	WILLIAMS_PREDATORS_SOUND(config, m_predsnd[7]).add_route(ALL_OUTPUTS, "condor_mono", 1.0, 0); // condor1
 
-		WILLIAMS_PREDATORS_SOUND(config, m_predsnd[0]).add_route(ALL_OUTPUTS, "hawk_stereo", 1.0, 0); // hawk0
-		WILLIAMS_PREDATORS_SOUND(config, m_predsnd[1]).add_route(ALL_OUTPUTS, "falcon_stereo", 1.0, 0); // falcon0
-		WILLIAMS_PREDATORS_SOUND(config, m_predsnd[2]).add_route(ALL_OUTPUTS, "eagle_stereo", 1.0, 0); // eagle0
-		WILLIAMS_PREDATORS_SOUND(config, m_predsnd[3]).add_route(ALL_OUTPUTS, "condor_stereo", 1.0, 0); // condor0
-		WILLIAMS_PREDATORS_SOUND(config, m_predsnd[4]).add_route(ALL_OUTPUTS, "hawk_stereo", 1.0, 1); // hawk1
-		WILLIAMS_PREDATORS_SOUND(config, m_predsnd[5]).add_route(ALL_OUTPUTS, "falcon_stereo", 1.0, 1); // falcon1
-		WILLIAMS_PREDATORS_SOUND(config, m_predsnd[6]).add_route(ALL_OUTPUTS, "eagle_stereo", 1.0, 1); // eagle1
-		WILLIAMS_PREDATORS_SOUND(config, m_predsnd[7]).add_route(ALL_OUTPUTS, "condor_stereo", 1.0, 1); // condor1
-	}
-
-	I8035(config, m_i8035, XTAL(8'000'000)/4);
+	I8035(config, m_i8035, 2'000'000); // estimated
 	m_i8035->set_addrmap(AS_PROGRAM, &predators_state::slave_map);
 	m_i8035->set_addrmap(AS_IO, &predators_state::slave_io_map);
+	m_i8035->p1_in_cb().set([this] () -> uint8_t { return joystick_r(0); });
+	m_i8035->p2_in_cb().set([this] () -> uint8_t { return m_general[0]->read() | 0x0f; });
+	m_i8035->t1_in_cb().set([this] () -> int { return int(m_input_request); });
 }
 
 
@@ -855,11 +1059,11 @@ ROM_START( predtors )
 	//ROM_REGION( 0x117, "pal", 0 )
 	//ROM_LOAD( "u254",   0x0000, 0x117, CRC(8ce4ff25) SHA1(9cbdd85b83eda7f1814e4c0930c4d47ec920a1bf) )
 
-	ROM_REGION( 0x20000, "am2910", 0 ) // microcode for the am2910??
+	ROM_REGION( 0x800, "am2910", 0 ) // four byte-wide slices of the microprogram
 	ROM_LOAD( "u280.bin",   0x0000, 0x200, CRC(835d733a) SHA1(2ea0fe5698a34206e8fc0166e2af4e066d864866) )
-	ROM_LOAD( "u281.bin",   0x0000, 0x200, CRC(700b24c1) SHA1(790aa04717e86828974afaa2ac743f37afa11021) )
-	ROM_LOAD( "u282.bin",   0x0000, 0x200, CRC(a5005f9a) SHA1(b33ccdc433d299fe3495f5fb2a5e604d8712881f) )
-	ROM_LOAD( "u283.bin",   0x0000, 0x200, CRC(8368a869) SHA1(86b2562106d894b63a529ae11c6d7a27347d3654) )
+	ROM_LOAD( "u281.bin",   0x0200, 0x200, CRC(700b24c1) SHA1(790aa04717e86828974afaa2ac743f37afa11021) )
+	ROM_LOAD( "u282.bin",   0x0400, 0x200, CRC(a5005f9a) SHA1(b33ccdc433d299fe3495f5fb2a5e604d8712881f) )
+	ROM_LOAD( "u283.bin",   0x0600, 0x200, CRC(8368a869) SHA1(86b2562106d894b63a529ae11c6d7a27347d3654) )
 
 	/**********************************************************************************************************************
 	  Roms from SC board below
