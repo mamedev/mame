@@ -6,6 +6,7 @@
 #pragma once
 
 #include "m6805.h"
+#include "m68hc05_sci.h"
 #include "m68hc05_spi.h"
 
 #include <array>
@@ -51,6 +52,10 @@ public:
 	// rather than read through portd_r: the master acts on SS low at once (6.2.3).
 	// Report the same level for PD5 from portd_r.
 	void spi_ss_w(int state) { if (m_spi) m_spi->ss_w(state); }
+
+	// SCI TDO and RDI pins (PD1, PD0); only on variants with an SCI
+	auto sci_tdo() { return m_sci.lookup()->tdo_cb(); }
+	void sci_rdi_w(int state) { if (m_sci) m_sci->rdi_w(state); }
 
 protected:
 	// state index constants
@@ -127,15 +132,6 @@ protected:
 	void ocr_w(offs_t offset, u8 data);
 	u8 timer_r(offs_t offset);
 
-	u8 baud_r();
-	void baud_w(u8 data);
-	u8 sccr1_r();
-	void sccr1_w(u8 data);
-	u8 sccr2_r();
-	void sccr2_w(u8 data);
-	u8 scsr_r();
-	u8 scdr_r();
-	void scdr_w(u8 data);
 	void set_ncope(bool state) { m_ncope = state ? 1 : 0; }
 	void coprst_w(u8 data);
 	u8 copcr_r();
@@ -144,6 +140,9 @@ protected:
 
 	// variants with an SPI at $0A-$0C call this from their constructor and map m_spi there
 	void enable_spi() { m_has_spi = true; }
+
+	// variants with an SCI at $0D-$11 call this from their constructor and map m_sci there
+	void enable_sci() { m_has_sci = true; }
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
@@ -167,12 +166,13 @@ protected:
 	void add_ncop_state();
 
 	optional_device<m68hc05_spi_device> m_spi;
+	optional_device<m68hc05_sci_device> m_sci;
 
 private:
 	u8 port_value(unsigned offset) const;
 	void update_port_irq();
-	void update_sci_irq();
 	void spi_irq_w(int state);
+	void sci_irq_w(int state);
 
 	bool    tcr_icie() const    { return BIT(m_tcr, 7); }
 	bool    tcr_ocie() const    { return BIT(m_tcr, 6); }
@@ -204,11 +204,8 @@ private:
 	bool                m_has_spi;
 
 	// serial communications interface
-	u8                  m_baud;
-	u8                  m_sccr1;
-	u8                  m_sccr2;
-	u8                  m_scsr, m_scsr_seen;
-	u8                  m_scdr;
+	bool                m_has_sci;
+
 	// timer/counter
 	devcb_write_line    m_tcmp_cb;
 	bool                m_tcap_state;
