@@ -126,6 +126,7 @@ private:
 
 	bool te() const { return m_sccr2 & SCCR2_TE; }
 	bool re() const { return m_sccr2 & SCCR2_RE; }
+	bool break_wanted() const { return m_break_pending || (m_sccr2 & SCCR2_SBK); }
 	bool rwu() const { return m_sccr2 & SCCR2_RWU; }
 	u32 frame_bits() const { return (m_sccr1 & SCCR1_M) ? 11 : 10; }
 

@@ -36,8 +36,10 @@
       a stop bit or after RDI rises.  IDLE is first possible after the first
       RDRF.  "RWU cannot be set if the line is idle" is taken to mean while
       an idle line has been detected.
-    - Break needs TE.  A byte written to SCDR while TE is clear is held,
-      and goes out after the preamble when TE is set.
+    - Break needs TE: SBK rising queues one only with TE set, and SBK
+      already held when TE rises sends one after the preamble.  A byte
+      written to SCDR while TE is clear is held, and goes out after the
+      preamble when TE is set.
     - TC stays as it was while a preamble or break goes out, and sets after
       the high bit that follows a break; the data sheet only says when it
       sets.
@@ -383,7 +385,7 @@ void m68hc05_sci_device::set_scsr(u8 data)
 u32 m68hc05_sci_device::rt_clocks() const
 {
 	// 5.7.5: a bit time is 16 * SCP * 2^SCR E clocks, so an RT tick is SCP * 2^SCR
-	return u32(SCP_DIVISOR[(m_baud >> 4) & 3]) << (m_baud & BAUD_SCR);
+	return u32(SCP_DIVISOR[BIT(m_baud, 4, 2)]) << (m_baud & BAUD_SCR);
 }
 
 attotime m68hc05_sci_device::tick_time(u64 clocks) const
@@ -495,7 +497,7 @@ void m68hc05_sci_device::set_tdo(int state)
 void m68hc05_sci_device::tx_kick()
 {
 	// something to send while the shifter is idle: start at the next bit boundary
-	bool const waiting(m_tdr_full || m_preamble_pending || m_break_pending || (m_sccr2 & SCCR2_SBK));
+	bool const waiting(m_tdr_full || m_preamble_pending || break_wanted());
 	if (te() && waiting && (m_tx_state == TX_IDLE) && !m_tx_scheduled && clock())
 		tx_schedule(next_tick(machine().time(), bit_clocks()));
 }
@@ -535,7 +537,7 @@ void m68hc05_sci_device::tx_next()
 		m_tx_shift = make_bitmask<u16>(frame_bits());
 		m_tx_count = frame_bits();
 	}
-	else if (te() && (m_break_pending || (m_sccr2 & SCCR2_SBK)))
+	else if (te() && break_wanted())
 	{
 		// 5.7.3 B0: 10 or 11 zeros, repeated while SBK stays set
 		LOGSCI("break\n");
@@ -707,7 +709,7 @@ void m68hc05_sci_device::rx_frame_done(bool stop)
 	bool const brk(fe && !m_rx_shift);
 	u64 const next_rt1(m_rx_rt1 + u64(m_rx_bits) * bit_clocks());
 
-	bool const address(m_rx_shift & (nine ? 0x100 : 0x080));
+	bool const address(BIT(m_rx_shift, nine ? 8 : 7));
 	if (rwu())
 	{
 		// 5.3: a sleeping receiver sets no flags; with address mark wake-up, a frame with
