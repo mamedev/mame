@@ -43,6 +43,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "lk201.h"
 
 #include "bus/rs232/rs232.h"
@@ -52,8 +53,11 @@
 #include "machine/ram.h"
 #include "machine/x2212.h"
 #include "video/crt9007.h"
+
 #include "emupal.h"
 #include "screen.h"
+
+#include <algorithm>
 
 
 namespace {
@@ -149,7 +153,7 @@ private:
 	u8 m_lbf[0x800] = { };
 
 	void vt220a_palette(palette_device &palette) const ATTR_COLD;
-	uint32_t screen_update_vt220a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_vt220a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	const col_timing &timing() const { return m_132col ? TIMING_132 : TIMING_80; }
 	void set_columns();
 	offs_t lbf_addr(bool chr, u8 lba) const;
@@ -210,9 +214,9 @@ void vt220a_state::vt220a_data(address_map &map)
 	map(0x0800, 0x0800).mirror(0x47ff).w(FUNC(vt220a_state::char_addr_w)); // 0fff
 	map(0x1000, 0x103f).mirror(0x47c0).rw(m_crtc, FUNC(crt9007_device::read), FUNC(crt9007_device::write)); // 1700-17ff
 	map(0x1800, 0x1800).mirror(0x47ff).nopw(); // 1fff RESET TIM L: strobe resetting the timing generator, data ignored
-	map(0x2000, 0x2fff).mirror(0xc000).ram().share("screen_ram"); // RAM 0/1, a000-afff
+	map(0x2000, 0x2fff).mirror(0xc000).ram().share(m_screen_ram); // RAM 0/1, a000-afff
 	map(0x3000, 0x300f).mirror(0xc7f0).r(FUNC(vt220a_state::duart_r)).w(m_duart, FUNC(scn2681_device::write)); // b7f0-b7ff
-	map(0x8000, 0x8fff).mirror(0x4000).ram().share("attr_ram"); // attribute RAM 0/1
+	map(0x8000, 0x8fff).mirror(0x4000).ram().share(m_attr_ram); // attribute RAM 0/1
 	map(0x9000, 0x90ff).mirror(0x4700).rw(m_nvr, FUNC(x2212_device::read), FUNC(x2212_device::write)); // 9700-97ff
 	map(0x9800, 0x980f).mirror(0x47f0).rw(FUNC(vt220a_state::chargen_r), FUNC(vt220a_state::chargen_w)); // 9ff0-9fff
 }
@@ -308,7 +312,7 @@ void vt220a_state::sl_w(u8 data)
 
 void vt220a_state::curs_w(int state)
 {
-	// CURS H outside VLT sets the cursor skew F/F for a double width line (TM 6.2.7.1)
+	// CURS H outside VLT sets the cursor skew F/F for a double width line (TM 6.2.6.1)
 	if (state && !m_vlt)
 		m_dw = true;
 }
@@ -347,8 +351,8 @@ u8 vt220a_state::dot(int col, int x, int line, bool &bold, bool &blink_n) const
 	bold = BIT(atr, 6);
 	blink_n = !(BIT(m_duart_op, 3) && BIT(atr, 7));
 
-	// scan lines of the last loaded row only
-	if (line < 0 || line >= 10)
+	// past the character cell, or 0xff before any VLT
+	if (line >= 10)
 		return 0;
 	const u8 bits = char_row(alt, chr, line);
 
@@ -357,7 +361,7 @@ u8 vt220a_state::dot(int col, int x, int line, bool &bold, bool &blink_n) const
 	if (BIT(atr, 4) && line >= 8) // UL ATR gated with SC3: scan lines 9 and 10
 		on = true;
 	// reverse: NORM FIELD H XOR REV ATR (E46)
-	return on ^ BIT(m_conf, 0) ^ !BIT(atr, 5);
+	return (on ? 1 : 0) ^ BIT(m_conf, 0) ^ (BIT(atr, 5) ? 0 : 1);
 }
 
 u8 vt220a_state::video_out(int x, int y, bool &bold, bool &blink_n) const
@@ -400,10 +404,11 @@ void vt220a_state::p1_w(u8 data)
 		m_lbf[lbf_addr(true, m_lba)] = m_char_addr;
 		m_lbf[lbf_addr(false, m_lba)] = m_atr_latch;
 	}
-	// NVR RECALL L (P1.1) and NVR STORE L (P1.2); the X2212 core takes them active high, and
-	// RECALL holds off STORE (TM 4.2.9)
+	// NVR RECALL L (P1.1) and NVR STORE L (P1.2); the X2212 core takes them active high, and a
+	// STORE edge has no effect during RECALL (TM 4.2.9), so RECALL ending doesn't start one
 	m_nvr->recall(!BIT(data, 1));
-	m_nvr->store(!BIT(data, 2) && BIT(data, 1));
+	if (BIT(m_p1, 2) != BIT(data, 2))
+		m_nvr->store(!BIT(data, 2) && BIT(data, 1));
 	// RESET CRT L (P1.6)
 	if (BIT(m_p1, 6) && !BIT(data, 6))
 		m_crtc->reset();
@@ -462,12 +467,6 @@ void vt220a_state::duart_out_w(u8 data)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_duart_op = data;
-	// modem signals low when asserted at the DUART pins, as on the RS-232 port: the firmware drops
-	// DTR by driving OP1 high, and reads DSR, SPD IND and PTR DSR asserted as input port bits low
-	// (opposite to the TM's H signal names; the sense here comes from the firmware)
-	m_host->write_rts(BIT(data, 0)); // OP0 RTS
-	m_host->write_dtr(BIT(data, 1)); // OP1 DTR
-	m_host->write_spds(BIT(data, 2)); // OP2 SPD SEL
 	if (BIT(data, 4) != m_132col)
 	{
 		m_132col = BIT(data, 4); // OP4 132 COL H
@@ -526,7 +525,7 @@ void vt220a_state::machine_start()
 {
 	vt220_state::machine_start();
 
-	memset(m_line_sl, 0xff, sizeof(m_line_sl));
+	std::fill_n(m_line_sl, VTOTAL, 0xff);
 
 	save_item(NAME(m_p1));
 	save_item(NAME(m_conf));
@@ -575,7 +574,7 @@ uint32_t vt220_state::screen_update_vt220(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-uint32_t vt220a_state::screen_update_vt220a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 vt220a_state::screen_update_vt220a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
@@ -583,7 +582,7 @@ uint32_t vt220a_state::screen_update_vt220a(screen_device &screen, bitmap_ind16 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			bool bold, blink_n;
-			pix[x] = video_out(x, y, bold, blink_n) ? 1 + blink_n + (bold << 1) : 0;
+			pix[x] = video_out(x, y, bold, blink_n) ? 1 + (blink_n ? 1 : 0) + (bold ? 2 : 0) : 0;
 		}
 	}
 	return 0;
@@ -611,7 +610,8 @@ void vt220_state::vt220(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &vt220_state::vt220_data);
 	m_maincpu->port_in_cb<1>().set_constant(0); // ???
 
-	// TM 4.2.8: LK201 on the 8051 UART, through EIA drivers and receivers at both ends
+	// LK201 on the 8051 UART, through EIA drivers and receivers at both
+	// ends (TM 4.2.8 for models A-C, schematic 54-17036 for D-F)
 	m_maincpu->port_in_cb<3>().set([this] () -> u8 { return 0xfe | m_kbd_rxd; }); // P3.0 RXD from KBR
 	m_maincpu->port_out_cb<3>().set(m_kbd, FUNC(lk201_device::rx_w)).bit(1); // P3.1 TXD to KBT
 	LK201(config, m_kbd);
@@ -664,8 +664,14 @@ void vt220a_state::vt220a(machine_config &config)
 	m_crtc->cblank_callback().set(FUNC(vt220a_state::cblank_w));
 	X2212(config, m_nvr); // E17
 
-	// TM table 5-1: channel A host (J3, EIA or 20 mA), channel B printer; modem lines as in duart_out_w
+	// TM figure 5-4: channel A host (J3, EIA or 20 mA), channel B printer.  Modem signals are low when
+	// asserted at the DUART pins, as on the RS-232 port: the firmware drops DTR by driving OP1 high, and
+	// reads DSR, SPD IND and PTR DSR asserted as input port bits low (opposite to the TM's H signal
+	// names; the sense here comes from the firmware)
 	m_duart->outport_cb().set(FUNC(vt220a_state::duart_out_w));
+	m_duart->outport_cb().append(m_host, FUNC(rs232_port_device::write_rts)).bit(0); // OP0 RTS
+	m_duart->outport_cb().append(m_host, FUNC(rs232_port_device::write_dtr)).bit(1); // OP1 DTR
+	m_duart->outport_cb().append(m_host, FUNC(rs232_port_device::write_spds)).bit(2); // OP2 SPD SEL
 	m_duart->a_tx_cb().set(FUNC(vt220a_state::host_txd_w));
 	m_duart->b_tx_cb().set(m_printer, FUNC(rs232_port_device::write_txd));
 
