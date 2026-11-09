@@ -1188,7 +1188,7 @@ void mac128_state::mac512ke(machine_config &config)
 	applefdintf_device::add_35(config, m_floppy[0]);
 	applefdintf_device::add_35(config, m_floppy[1]);
 
-	SCC85C30(config, m_scc, C7M);
+	SCC85C30(config, m_scc, C3_7M);
 	m_scc->configure_channels(C3_7M.value(), 0, C3_7M.value(), 0);
 	m_scc->out_int_callback().set(FUNC(mac128_state::set_scc_interrupt));
 	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
