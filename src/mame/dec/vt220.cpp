@@ -398,19 +398,19 @@ void vt220a_state::host_rxd_w(int state)
 
 u8 vt220a_state::p1_r()
 {
-	// P1.7 CAR DET H from the EIA receiver; the rest are outputs or the PROD TEST pull-up
-	return 0x7f | (!m_host->dcd_r() << 7);
+	// P1.7 CAR DET from the EIA receiver, low when asserted; the rest are outputs or the PROD TEST pull-up
+	return 0x7f | (m_host->dcd_r() << 7);
 }
 
 void vt220a_state::duart_out_w(u8 data)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_duart_op = data;
-	// modem signals active high at the DUART, as the TM's DUART block diagram shows them (inferred:
-	// the schematic's 9636/9639 symbols leave it open), and active low on the RS-232 port
-	m_host->write_rts(!BIT(data, 0)); // OP0 RTS H
-	m_host->write_dtr(!BIT(data, 1)); // OP1 DTR H
-	m_host->write_spds(!BIT(data, 2)); // OP2 SPD SEL H
+	// modem signals low when asserted at the DUART pins, as on the RS-232 port: the firmware drops
+	// DTR by driving OP1 high, and reads DSR, SPD IND and PTR DSR asserted as input port bits low
+	m_host->write_rts(BIT(data, 0)); // OP0 RTS
+	m_host->write_dtr(BIT(data, 1)); // OP1 DTR
+	m_host->write_spds(BIT(data, 2)); // OP2 SPD SEL
 	m_lbf_bank = (data >> 5) & 3; // OP5/OP6 BNK S0/S1
 	if (BIT(data, 4) != m_132col)
 	{
@@ -489,6 +489,9 @@ void vt220a_state::machine_start()
 	save_pointer(NAME(m_softchar), 0x800);
 	save_pointer(NAME(m_lbf), 0x800);
 	machine().save().register_postload(save_prepost_delegate(FUNC(vt220a_state::set_columns), this));
+
+	// TM table 5-2: PTR DTR is on whenever the terminal is powered
+	m_printer->write_dtr(0);
 }
 
 void vt220_state::machine_reset()
@@ -599,13 +602,13 @@ void vt220a_state::vt220a(machine_config &config)
 
 	RS232_PORT(config, m_host, default_rs232_devices, nullptr);
 	m_host->rxd_handler().set(FUNC(vt220a_state::host_rxd_w));
-	m_host->cts_handler().set(m_duart, FUNC(scn2681_device::ip0_w)).invert(); // CTS H
-	m_host->dsr_handler().set(m_duart, FUNC(scn2681_device::ip1_w)).invert(); // DSR H
-	m_host->si_handler().set(m_duart, FUNC(scn2681_device::ip2_w)).invert(); // SPD IND H
+	m_host->cts_handler().set(m_duart, FUNC(scn2681_device::ip0_w)); // CTS
+	m_host->dsr_handler().set(m_duart, FUNC(scn2681_device::ip1_w)); // DSR
+	m_host->si_handler().set(m_duart, FUNC(scn2681_device::ip2_w)); // SPD IND
 
 	RS232_PORT(config, m_printer, default_rs232_devices, nullptr);
 	m_printer->rxd_handler().set(m_duart, FUNC(scn2681_device::rx_b_w));
-	m_printer->dsr_handler().set(m_duart, FUNC(scn2681_device::ip5_w)).invert(); // PTR DSR H
+	m_printer->dsr_handler().set(m_duart, FUNC(scn2681_device::ip5_w)); // PTR DSR
 
 	m_screen->set_screen_update(FUNC(vt220a_state::screen_update_vt220a));
 	PALETTE(config.replace(), "palette", FUNC(vt220a_state::vt220a_palette), 5);
