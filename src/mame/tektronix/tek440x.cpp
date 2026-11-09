@@ -82,6 +82,7 @@
 #define LOG_TIMER_RD    (1U << 7)
 #define LOG_TIMER_WR    (1U << 8)
 #define LOG_VIDEO       (1U << 9)
+#define LOG_LANCE       (1U << 10)
 
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
@@ -1364,11 +1365,11 @@ void tek440x_state::tek4404(machine_config &config)
 
 	m_lance->dma_in().set([this](offs_t offset) {
 		u16 data = m_vm->read16(OFF8_TO_OFF16(offset));
-		//LOG("dma_in 0x%08x => %04x\n",offset,data);
+		LOGMASKED(LOG_LANCE, "dma_in 0x%08x => %04x\n",offset,data);
 		return data;
 	});
 	m_lance->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) {
-		//LOG("dma_out 0x%08x <= %04x\n",offset, data);
+		LOGMASKED(LOG_LANCE, "dma_out 0x%08x <= %04x\n",offset, data);
 		return m_vm->write16(OFF8_TO_OFF16(offset),data, mem_mask);
 	});
 
