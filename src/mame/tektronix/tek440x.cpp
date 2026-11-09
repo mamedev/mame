@@ -415,7 +415,7 @@ void tek440x_state::machine_reset()
 	mapcntl_w(0);
 	videocntl_w(0);
 
-	m_videoaddr = 0x600000;
+	m_videoaddr = 0;
 	m_vint_enable = 0;
 
 	m_novram->recall(ASSERT_LINE);
