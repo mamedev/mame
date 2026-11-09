@@ -106,6 +106,7 @@ void mos8563_device::device_start()
 	m_supports_status_reg_d5 = true;
 	m_supports_status_reg_d6 = true;
 	m_supports_status_reg_d7 = true;
+	m_reset_blanks_frame = false;
 	m_update_ready_bit = 1;
 
 	m_char_blink_state = false;

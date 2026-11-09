@@ -663,6 +663,7 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 		if (m_adjust_counter == m_vert_total_adj)
 		{
 			m_field = field_raster ? (m_field ^ 1) : 0;
+			m_reset_blank = false;
 			if (begin_frame())
 				new_vsync = true;
 
@@ -698,7 +699,9 @@ bool mc6845_device::begin_frame()
 // HSYNC edges and the end-of-line callback
 void mc6845_device::start_line(bool new_vsync)
 {
-	if (m_line_enable_ff)
+	bool const display = m_line_enable_ff && !m_reset_blank;
+
+	if (display)
 	{
 		/* Schedule DE off signal change */
 		m_de_off_timer->adjust(cclks_to_attotime(m_horiz_disp));
@@ -725,7 +728,7 @@ void mc6845_device::start_line(bool new_vsync)
 	set_vsync(new_vsync);
 	if (m_reset_held) // the VSYNC callback asserted RESET
 		return;
-	set_de(m_line_enable_ff ? true : false);
+	set_de(display);
 }
 
 
@@ -820,9 +823,12 @@ void mc6845_device::reset_w(int state)
 
 	if (held)
 	{
-		// every counter, the blink counter included, stops and clears, and
-		// every output goes low; the registers are kept.  Not modelled for
-		// the MOS 8563's own draw counters.
+		// every counter stops and clears and every output goes low; the
+		// registers are kept.  Clearing the cursor blink counter too is
+		// inferred: no sheet names it.  Not modelled: the minimum hold of
+		// one CCLK, and the MC6845 and HD46505R test mode (RESET with LPSTB
+		// high; there is no LPSTB level input here, so it reads low).  Not
+		// reset: the MOS 8563's own draw counters.
 		m_line_timer->adjust(attotime::never);
 		m_de_off_timer->adjust(attotime::never);
 		m_cursor_on_timer->adjust(attotime::never);
@@ -842,9 +848,13 @@ void mc6845_device::reset_w(int state)
 		m_cursor_blink_count = 0;
 		m_cursor_state = false;
 		m_cursor_x = -1;
+		m_reset_blank = false;
 
 		// state first, then the callbacks, which may act on it; stop if one
 		// releases RESET, which has then started a line
+		set_cur(false);
+		if (!m_reset_held)
+			return;
 		set_hsync(false);
 		if (!m_reset_held)
 			return;
@@ -852,18 +862,16 @@ void mc6845_device::reset_w(int state)
 			set_vsync(false);
 		if (!m_reset_held)
 			return;
-		set_cur(false);
-		if (!m_reset_held)
-			return;
 		set_de(false);
 	}
 	else if (m_has_valid_parameters)
 	{
-		// scan timing starts at the first line of a frame (R6545-1, SY6545).
-		// DE starts at once, though the MC6845 sheet holds DE and CURSOR off
-		// until a frame has been displayed.  frame_start() is skipped: it
-		// moves the screen origin, which a CRTC reset every row would do
-		// every row.
+		// scan timing starts at the first line of a frame (R6545-1, SY6545;
+		// the HD46505R starts the display at once).  The MC6845 holds DE and
+		// CURSOR off until a frame has been displayed.  frame_start() is
+		// skipped: it moves the screen origin, which a CRTC reset every row
+		// would do every row.
+		m_reset_blank = m_reset_blanks_frame;
 		start_line(begin_frame());
 	}
 }
@@ -1082,15 +1090,21 @@ void mc6845_device::device_start()
 	m_supports_status_reg_d6 = false;
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
+	m_reset_blanks_frame = true;
 	m_has_valid_parameters = false;
 	m_display_off = false;
 	m_display_off_columns = 0;
 	m_display_disabled_msg_shown = false;
 	m_line_enable_ff = false;
 	m_vsync_ff = 0;
+	m_character_counter = 0;
+	m_hsync_width_counter = 0;
 	m_raster_counter = 0;
 	m_field = 0;
 	m_row_end = false;
+	m_adjust_counter = 0;
+	m_vsync_width_counter = 0;
+	m_reset_blank = false;
 	m_adjust_active = 0;
 	m_horiz_sync_pos = 1;
 	m_vert_sync_pos = 1;
@@ -1161,6 +1175,7 @@ void mc6845_device::device_start()
 	save_item(NAME(m_line_address));
 	save_item(NAME(m_cursor_x));
 	save_item(NAME(m_reset_held));
+	save_item(NAME(m_reset_blank));
 	save_item(NAME(m_has_valid_parameters));
 	save_item(NAME(m_display_off));
 	save_item(NAME(m_display_off_columns));
@@ -1221,6 +1236,7 @@ void mc6845_1_device::device_start()
 	m_supports_status_reg_d6 = false;
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
+	m_reset_blanks_frame = true;
 }
 
 /*
@@ -1243,6 +1259,7 @@ void r6545_1_device::device_start()
 	m_supports_status_reg_d6 = true;
 	m_supports_status_reg_d7 = true;
 	m_supports_transparent = true;
+	m_reset_blanks_frame = false;
 }
 
 /*
@@ -1265,6 +1282,7 @@ void c6545_1_device::device_start()
 	m_supports_status_reg_d6 = true;
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
+	m_reset_blanks_frame = false;
 }
 
 /*
@@ -1287,6 +1305,7 @@ void sy6545_1_device::device_start()
 	m_supports_status_reg_d6 = true;
 	m_supports_status_reg_d7 = true;
 	m_supports_transparent = true;
+	m_reset_blanks_frame = false;
 }
 
 /*
@@ -1309,6 +1328,7 @@ void sy6845e_device::device_start()
 	m_supports_status_reg_d6 = true;
 	m_supports_status_reg_d7 = true;
 	m_supports_transparent = true;
+	m_reset_blanks_frame = false;
 }
 
 /*
@@ -1331,6 +1351,7 @@ void ams40489_device::device_start()
 	m_supports_status_reg_d6 = false;
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
+	m_reset_blanks_frame = false;
 }
 
 /*
@@ -1358,6 +1379,7 @@ void hd6845s_device::device_start()
 	m_supports_status_reg_d6 = false;
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
+	m_reset_blanks_frame = false;
 
 	// Non-interlace Mode, Interlace Sync Mode - When total number of rasters is RN, RN-1 shall be programmed.
 	m_noninterlace_adjust = 1;
