@@ -194,7 +194,7 @@ void m68hc05pge_device::device_add_mconfig(machine_config &config)
 	// the SPI runs from the internal processor clock, half the oscillator frequency
 	M68HC05_SPI(config, m_spi, DERIVED_CLOCK(1, 2));
 	m_spi->miso_cb().set([this] () { return m_spi_miso; });
-	m_spi->irq_cb().set([this] (int state) { set_input_line(M68HC05PGE_INT_SPI, state); });
+	m_spi->irq_cb().set_inputline(*this, M68HC05PGE_INT_SPI);
 }
 
 device_memory_interface::space_config_vector m68hc05pge_device::memory_space_config() const
