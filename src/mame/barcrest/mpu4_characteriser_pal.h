@@ -1425,7 +1425,6 @@ private:
 	u8 m_lamp_col;
 	u8 m_4krow;
 	nextprot_delegate m_nextprotcb;
-	optional_region_ptr<uint8_t> m_protregion; // some of the simulations have a fake ROM to assist them
 
 	// debugging only!
 	static constexpr bool IDENTIFICATION_HELPER = false;

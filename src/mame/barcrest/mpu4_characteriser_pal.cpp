@@ -51,8 +51,7 @@ mpu4_characteriser_pal::mpu4_characteriser_pal(const machine_config &mconfig, de
 	m_current_lamp_table(nullptr),
 	m_lamp_col(0),
 	m_4krow(0),
-	m_nextprotcb(*this),
-    m_protregion(*this, "fakechr")
+	m_nextprotcb(*this)
 {
 }
 
@@ -245,7 +244,7 @@ uint8_t mpu4_characteriser_pal::protection_r()
 	}
 
 	// not cheating, but no table set
-	if (!m_current_chr_table && !m_protregion)
+	if (!m_current_chr_table)
 	{
 		logerror("%s: Characteriser protection_r WITH NO TABLE\n", machine().describe_context());
 		return 0x00;
@@ -265,29 +264,20 @@ uint8_t mpu4_characteriser_pal::protection_r()
 
 uint8_t mpu4_characteriser_pal::lamp_scramble_r()
 {
-	if (!m_current_lamp_table && !m_protregion)
+	uint8_t ret = 0x00;
+	if (!m_current_lamp_table)
 	{
-		uint8_t ret = machine().rand();
+		ret = machine().rand();
 		logerror("%s: Characteriser lamp_scramble_r WITH NO TABLE (table offset %02x, returning %02x)\n", machine().describe_context(), m_lamp_col, ret);
 		return ret;
 	}
 	else
 	{
-		uint8_t ret = 0x00;
-
-		if (m_current_lamp_table)
-		{
-			ret = m_current_lamp_table[m_lamp_col];
-			logerror("%s: Characteriser lamp_scramble_r WITH PASSED TABLE (table offset %02x, returning %02x)\n", machine().describe_context(), m_lamp_col, ret);
-		}
-		else if (m_protregion)
-		{
-			ret = m_protregion[m_lamp_col + 64];
-			logerror("%s: Characteriser lamp_scramble_r WITH FAKE ROM (table offset %02x, returning %02x)\n", machine().describe_context(), m_lamp_col, ret);
-		}
-
-		return ret;
+		ret = m_current_lamp_table[m_lamp_col];
+		logerror("%s: Characteriser lamp_scramble_r WITH PASSED TABLE (table offset %02x, returning %02x)\n", machine().describe_context(), m_lamp_col, ret);
 	}
+
+	return ret;
 }
 
 uint8_t mpu4_characteriser_pal::read(offs_t offset)
