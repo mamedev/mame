@@ -750,4 +750,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1996, ppstatn, 0, ppstatn, ppstatn, ppstatn_state, empty_init, ROT0, "Konami", "Puri Puri Station", MACHINE_NOT_WORKING ) // requires camera and printer emulation
+GAME( 1996, ppstatn, 0, ppstatn, ppstatn, ppstatn_state, empty_init, ROT0, "Konami", "Puri Puri Station", MACHINE_NOT_WORKING )
