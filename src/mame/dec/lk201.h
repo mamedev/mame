@@ -34,13 +34,13 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	template <u32 N> void rows_w(offs_t offset, uint8_t data, uint8_t mask);
-	void portc_w(offs_t offset, uint8_t data, uint8_t mask);
+	template <u32 N> void rows_w(offs_t offset, u8 data, u8 mask);
+	void portc_w(offs_t offset, u8 data, u8 mask);
 	void sck_w(int state);
 	void mosi_w(int state) { m_mosi = state; }
-	uint8_t portd_r() { return 0x20 | (BIT(m_kbd_sr, 7) << 2); } // PD2 is MISO; PD5 is /SS, inferred high (the firmware never reads port D)
+	u8 portd_r() { return 0x20 | (BIT(m_kbd_sr, 7) << 2); } // PD2 is MISO; PD5 is /SS, inferred high (the firmware never reads port D)
 
-	uint8_t scan_matrix();
+	u8 scan_matrix();
 	void update_matrix_load();
 	void update_latch();
 
@@ -54,13 +54,13 @@ private:
 	output_finder<> m_led_lock;
 	output_finder<> m_led_hold;
 
-	uint8_t m_rows[3];      // key matrix row drivers on ports A, B and C (bits 0 and 1 only)
+	u8 m_rows[3];           // key matrix row drivers on ports A, B and C (bits 0 and 1 only)
 	bool m_pc6;             // matrix load, active low
 	bool m_pc7;             // LED and bell volume latch strobe
 	bool m_sck;
 	u8 m_mosi;
-	uint8_t m_kbd_sr;       // matrix column input shift register
-	uint8_t m_led_sr;       // LED and bell volume output shift register
+	u8 m_kbd_sr;            // matrix column input shift register
+	u8 m_led_sr;            // LED and bell volume output shift register
 };
 
 // device type definition

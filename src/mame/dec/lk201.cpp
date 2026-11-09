@@ -485,7 +485,7 @@ void lk201_device::device_reset()
 	std::fill(std::begin(m_rows), std::end(m_rows), 0);
 	m_pc6 = true;
 	m_pc7 = true;
-	m_sck = false;
+	m_sck = true; // the firmware's SPI mode idles SCK high
 	m_mosi = 0;
 	m_kbd_sr = 0;
 	m_led_sr = 0;
@@ -500,10 +500,10 @@ void lk201_device::device_reset()
 
 // A row is driven while its pin is an output set high; the columns of all driven rows
 // with a key down in them read high.
-uint8_t lk201_device::scan_matrix()
+u8 lk201_device::scan_matrix()
 {
-	uint32_t const rows(uint32_t(m_rows[0]) | (uint32_t(m_rows[1]) << 8) | (uint32_t(m_rows[2]) << 16));
-	uint8_t columns = 0;
+	u32 const rows(u32(m_rows[0]) | (u32(m_rows[1]) << 8) | (u32(m_rows[2]) << 16));
+	u8 columns = 0;
 	for (u32 i = 0; i < m_kbd.size(); i++)
 	{
 		if (BIT(rows, i))
@@ -512,23 +512,26 @@ uint8_t lk201_device::scan_matrix()
 	return columns;
 }
 
-// The matrix columns go to a parallel-in shift register that loads while PC6 is low.
+// The matrix columns go to a parallel-in shift register that loads while PC6 is low
+// (inferred: no schematic of the 6805 board).
 void lk201_device::update_matrix_load()
 {
 	if (!m_pc6)
 		m_kbd_sr = scan_matrix();
 }
 
-template <u32 N> void lk201_device::rows_w(offs_t offset, uint8_t data, uint8_t mask)
+template <u32 N> void lk201_device::rows_w(offs_t offset, u8 data, u8 mask)
 {
 	m_rows[N] = data & mask;
 	update_matrix_load();
 }
 
-void lk201_device::portc_w(offs_t offset, uint8_t data, uint8_t mask)
+void lk201_device::portc_w(offs_t offset, u8 data, u8 mask)
 {
 	m_rows[2] = data & mask & 0x03;
 
+	// PC6 and PC7 are taken as high while they're inputs (see device_reset), though portc_r
+	// reports every input low
 	bool const load(BIT(data | ~mask, 6));
 	bool const strobe(BIT(data | ~mask, 7));
 	m_pc6 = load;
@@ -543,7 +546,7 @@ void lk201_device::portc_w(offs_t offset, uint8_t data, uint8_t mask)
 }
 
 // SCK is common to both shift registers: they shift on the rising edge, the input one
-// only when not loading.
+// only when not loading (inferred too).
 void lk201_device::sck_w(int state)
 {
 	bool const rising(state && !m_sck);
