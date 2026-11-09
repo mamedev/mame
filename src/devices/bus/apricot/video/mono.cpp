@@ -111,6 +111,8 @@ void apricot_mono_display_device::device_reset()
 	m_portb = 0xff;
 	m_portc = 0xff;
 	m_portx = 0xff;
+
+	m_crtc->reset_w(BIT(m_portb, 0));
 }
 
 
