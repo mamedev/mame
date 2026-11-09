@@ -90,6 +90,7 @@ protected:
 	tilemap_t *m_bg_tilemap = nullptr;
 
 	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void main_map(address_map &map) ATTR_COLD;
 	virtual void update_scroll();
 	virtual void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -109,6 +110,8 @@ private:
 	uint8_t m_palette_bank = 0;
 	tilemap_t *m_fg_tilemap = nullptr;
 
+	uint8_t m_irq_vector = 0xff;
+
 	void fgvideoram_w(offs_t offset, uint8_t data);
 	void bgvideoram_w(offs_t offset, uint8_t data);
 	void control_w(uint8_t data);
@@ -122,6 +125,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	IRQ_CALLBACK_MEMBER(maincpu_acknowledge_irq);
+	IRQ_CALLBACK_MEMBER(audiocpu_acknowledge_irq);
 
 	void sound_map(address_map &map) ATTR_COLD;
 };
@@ -246,6 +251,11 @@ void vulgus_state::video_start()
 	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 47);
 
 	save_item(NAME(m_palette_bank));
+}
+
+void vulgus_state::machine_start()
+{
+	save_item(NAME(m_irq_vector));
 }
 
 void _1942iti_state::machine_start()
@@ -390,12 +400,28 @@ TIMER_DEVICE_CALLBACK_MEMBER(vulgus_state::scanline)
 	// RST 08h at scanline 109 (unused)
 	// RST 10h at scanline 240 (vblank)
 	if (irq & 8)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc7 | (irq << 3 & 0x18));
+	{
+		m_irq_vector = 0xc7 | (irq << 3 & 0x18);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
 
 	// 8 audio interrupts per frame
 	if (irq & 4)
-		m_audiocpu->set_input_line(0, HOLD_LINE);
+		m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
+
+IRQ_CALLBACK_MEMBER(vulgus_state::maincpu_acknowledge_irq)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+	return m_irq_vector;
+}
+
+IRQ_CALLBACK_MEMBER(vulgus_state::audiocpu_acknowledge_irq)
+{
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
+	return 0xff;
+}
+
 
 void vulgus_state::main_map(address_map &map)
 {
@@ -645,9 +671,11 @@ void vulgus_state::vulgus(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, 12_MHz_XTAL / 4); // 3 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &vulgus_state::main_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(vulgus_state::maincpu_acknowledge_irq));
 
 	Z80(config, m_audiocpu, 12_MHz_XTAL / 4); // 3 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &vulgus_state::sound_map);
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(vulgus_state::audiocpu_acknowledge_irq));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(vulgus_state::scanline), "screen", 0, 1);
 

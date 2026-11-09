@@ -178,8 +178,10 @@ uint16_t k1801vp128_device::read(offs_t offset)
 				floppy_info &fi = flopi[selected_drive];
 				if (fi.main_state == WRITE_DATA)
 				{
+					const attotime now = machine().time();
 					// semi-read mode
 					live_abort();
+					fi.dev->write_end(now);
 					fi.main_state = READ_DATA;
 					fi.sub_state = SCAN_ID;
 					read_data_continue(fi);
@@ -618,6 +620,12 @@ void k1801vp128_device::write_data_start(floppy_info &fi)
 	fi.main_state = WRITE_DATA;
 	fi.sub_state = WAIT_INDEX_DONE;
 	m_sr &= ~CSR_R_CRC;
+	if (fi.dev)
+	{
+		const attotime now = machine().time();
+		fi.dev->set_write_splice(now);
+		fi.dev->write_start(now);
+	}
 	write_data_continue(fi);
 }
 

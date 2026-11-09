@@ -1350,7 +1350,7 @@ The same coordinate system is used for both layouts.
 				for i, viewname in ipairs({"Full", "Compact", "Edit"}) do
 					mgr = slider_manager:new(file.views[viewname])
 
-					mgr:add_knob("volume_knob", "volume_knob", 1.6, HORIZONTAL, "volume_knob_dot")
+					mgr:add_knob("volume_knob", "volume_knob", 1.4, HORIZONTAL, "volume_knob_dot")
 					mgr:get_layout_item("volume_knob_value"):set_color_callback(
 						function()
 							return emu.render_color(0, 0, 0, 0)
@@ -1358,7 +1358,7 @@ The same coordinate system is used for both layouts.
 
 					for i = 1, 6 do
 						local knob_id = "encoder_knob_" .. i
-						mgr:add_encoder(knob_id, knob_id, 0.8, HORIZONTAL, knob_id .. "_dot")
+						mgr:add_encoder(knob_id, knob_id, 1.0, HORIZONTAL, knob_id .. "_dot")
 					end
 
 					mgr:get_layout_item("plugin_warning"):set_state(0)

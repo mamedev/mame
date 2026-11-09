@@ -132,6 +132,7 @@ public:
 
 	auto irq_wr_callback() { return m_write_irq.bind(); }
 	auto aec_wr_callback() { return m_write_aec.bind(); }
+	template <typename T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 
 	// cartridge interface
 	plus4_expansion_window &c1l() { return m_root->m_c1l; }
@@ -139,6 +140,7 @@ public:
 	plus4_expansion_window &c2l() { return m_root->m_c2l; }
 	plus4_expansion_window &c2h() { return m_root->m_c2h; }
 	plus4_expansion_window &io() { return m_root->m_io; }
+	cpu_device &cpu() { return *m_root->m_cpu; }
 
 	void irq_w(int state) { m_write_irq(state); }
 	void aec_w(int state) { m_write_aec(state); }
@@ -166,6 +168,7 @@ private:
 	plus4_expansion_slot_device *find_root(device_t *owner);
 
 	plus4_expansion_slot_device *const m_root;
+	optional_device<cpu_device> m_cpu;
 
 	plus4_expansion_window m_c1l;
 	plus4_expansion_window m_c1h;

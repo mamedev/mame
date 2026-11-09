@@ -176,8 +176,7 @@
 	uresult2 = uresult % tmp;                            \
 	uresult /= tmp;                                      \
 	bool overflow = uresult > 0xff;                      \
-	if (m_has_div_quirk)                                 \
-		m_CarryVal = m_OverVal = !overflow;              \
+	divu_flags(uresult2, tmp, false, overflow);          \
 	if (overflow)                                        \
 		nec_interrupt(NEC_DIVIDE_VECTOR, BRK);           \
 	if (!overflow || m_chip_type == V33_TYPE) {          \
@@ -191,8 +190,7 @@
 	result2 = result % (int16_t)((int8_t)tmp);           \
 	result /= (int16_t)((int8_t)tmp);                    \
 	bool overflow = result > 0x7f || result < -0x7f;     \
-	if (m_has_div_quirk)                                 \
-		m_CarryVal = m_OverVal = !overflow;              \
+	div_flags(result, false, overflow);                  \
 	if (overflow)                                        \
 		nec_interrupt(NEC_DIVIDE_VECTOR, BRK);           \
 	if (!overflow || m_chip_type == V33_TYPE) {          \
@@ -206,8 +204,7 @@
 	uresult2 = uresult % tmp;                            \
 	uresult /= tmp;                                      \
 	bool overflow = uresult > 0xffff;                    \
-	if (m_has_div_quirk)                                 \
-		m_CarryVal = m_OverVal = !overflow;              \
+	divu_flags(uresult2, tmp, true, overflow);           \
 	if (overflow)                                        \
 		nec_interrupt(NEC_DIVIDE_VECTOR, BRK);           \
 	if (!overflow || m_chip_type == V33_TYPE) {          \
@@ -218,11 +215,10 @@
 
 #define DIVW {                                           \
 	result = ((uint32_t)Wreg(DW) << 16) + Wreg(AW);      \
-	result2 = result % (int32_t)((int16_t)tmp);          \
-	result /= (int32_t)((int16_t)tmp);                   \
+	result2 = int64_t(result) % int16_t(tmp);            \
+	result = int64_t(result) / int16_t(tmp);             \
 	bool overflow = result > 0x7fff || result < -0x7fff; \
-	if (m_has_div_quirk)                                 \
-		m_CarryVal = m_OverVal = !overflow;              \
+	div_flags(result, true, overflow);                   \
 	if (overflow)                                        \
 		nec_interrupt(NEC_DIVIDE_VECTOR, BRK);           \
 	if (!overflow || m_chip_type == V33_TYPE) {          \

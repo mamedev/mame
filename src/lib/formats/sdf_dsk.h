@@ -13,23 +13,29 @@
 
 #pragma once
 
-#include "flopimg.h"
+#include "dmk_dsk.h"
 
 /**************************************************************************/
 
-class sdf_format : public floppy_image_format_t
+class sdf_format : public dmk_format
 {
 public:
 	sdf_format();
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
-	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const override;
 
 	virtual const char *name() const noexcept override;
 	virtual const char *description() const noexcept override;
 	virtual const char *extensions() const noexcept override;
 
 protected:
+	virtual bool write_image(util::random_read_write &io, int tracks, int heads, bool initial_mfm,
+		std::vector<decoded_track> &data) const override;
+	virtual bool read_header(util::random_read &io, disk_header &disk) const override;
+	virtual bool read_track(util::random_read &io, const disk_header &disk, int track, int head,
+		std::vector<uint8_t> &data, std::vector<int> &dams) const override;
+
 	static constexpr int HEADER_SIZE  = 512;
 	static constexpr int TRACK_HEADER_SIZE  = 256;
 	static constexpr int TRACK_SIZE  = 6250;

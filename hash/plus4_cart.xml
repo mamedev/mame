@@ -152,6 +152,9 @@ license:CC0-1.0
 		<description>Diag 264 (v0.97, PAL)</description>
 		<year>2012</year>
 		<publisher>crock</publisher>
+		<sharedfeat name="tape_default" value="diag264"/>
+		<sharedfeat name="iec8_default" value="diag264"/>
+		<sharedfeat name="user_default" value="diag264"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="cart" interface="plus4_cart">
@@ -165,6 +168,9 @@ license:CC0-1.0
 		<description>Diag 264 (v0.97, NTSC)</description>
 		<year>2012</year>
 		<publisher>crock</publisher>
+		<sharedfeat name="tape_default" value="diag264"/>
+		<sharedfeat name="iec8_default" value="diag264"/>
+		<sharedfeat name="user_default" value="diag264"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 
 		<part name="cart" interface="plus4_cart">

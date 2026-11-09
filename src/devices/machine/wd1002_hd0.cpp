@@ -31,7 +31,13 @@ enum : uint8_t {
 // SDH register fields
 enum : uint8_t {
 	SDH_HEAD  = 0x07, // head select
-	SDH_DRIVE = 0x18  // drive select (collapsed to the single board drive)
+	SDH_DRIVE = 0x18  // drive select
+};
+
+// WD1010 status register bits
+enum : uint8_t {
+	STATUS_CIP = 0x02, // command in progress
+	STATUS_BSY = 0x80  // controller busy
 };
 
 } // anonymous namespace
@@ -49,6 +55,7 @@ wd1002_hd0_device::wd1002_hd0_device(const machine_config &mconfig, device_type 
 	, m_hdd(*this, "hdc:0")
 	, m_intrq_cb(*this)
 	, m_sector_bytes(BUFFER_SIZE)
+	, m_read_busy(false)
 {
 }
 
@@ -60,7 +67,7 @@ void wd1002_hd0_device::device_add_mconfig(machine_config &config)
 	m_hdc->out_bcr_callback().set(FUNC(wd1002_hd0_device::bcr_w));
 	m_hdc->in_data_callback().set(FUNC(wd1002_hd0_device::buf_in));
 	m_hdc->out_data_callback().set(FUNC(wd1002_hd0_device::buf_out));
-	HARDDISK(config, "hdc:0", 0); // drive 0 (the WD1010 finds it as its subdevice "0")
+	HARDDISK(config, "hdc:0", "st506_hdd"); // drive 0 (the WD1010 finds it as its subdevice "0")
 }
 
 void wd1002_hd0_device::device_start()
@@ -70,6 +77,7 @@ void wd1002_hd0_device::device_start()
 	save_pointer(NAME(m_buf), BUFFER_SIZE);
 	save_item(NAME(m_ptr));
 	save_item(NAME(m_sector_bytes));
+	save_item(NAME(m_read_busy));
 }
 
 void wd1002_hd0_device::device_reset()
@@ -77,6 +85,7 @@ void wd1002_hd0_device::device_reset()
 	m_hdc->drdy_w(m_hdd->exists() ? 1 : 0);          // drive ready once its CHD is mounted
 	m_hdc->sc_w(1);                                  // seek complete (heads at a known track)
 	m_ptr = 0;
+	m_read_busy = false;
 	// the buffer-full point follows the drive's sector size (128/256/512), the same
 	// size the WD1010 transfers; this is what lets one board serve 256-byte machines
 	// (TRS-80, EM-II rigid) and 512-byte ones (Kaypro) without a rebuild.
@@ -94,7 +103,11 @@ uint8_t wd1002_hd0_device::read(offs_t offset)
 			m_ptr++;
 		return data;
 	}
-	return m_hdc->read(offset); // 1-7 -> WD1010 task file
+	uint8_t data = m_hdc->read(offset); // 1-7 -> WD1010 task file
+	// the host is held off until the WD1010 has ended the read and rewound the buffer counter
+	if (offset == 7 && m_read_busy && (data & STATUS_CIP))
+		data |= STATUS_BSY;
+	return data;
 }
 
 void wd1002_hd0_device::write(offs_t offset, uint8_t data)
@@ -109,15 +122,15 @@ void wd1002_hd0_device::write(offs_t offset, uint8_t data)
 	if (offset == 6) // SDH: head select feeds the WD1010 via head_w
 	{
 		m_hdc->head_w(data & SDH_HEAD);
-		// single-drive board: collapse the drive-select onto the one configured drive
-		// so the controller always finds it (matches the Kaypro drive-select latch).
-		data &= ~SDH_DRIVE;
+		// only drive 0 is fitted; the other drive selects find no READY
+		m_hdc->drdy_w((!(data & SDH_DRIVE) && m_hdd->exists()) ? 1 : 0);
 	}
 	if (offset == 7) // command
 	{
 		m_hdc->brdy_w(0);
 		m_ptr = 0;
 		uint8_t const cmd = data & 0xf0;
+		m_read_busy = (cmd == CMD_READ_SECTOR);
 		// Only the WD1010's own opcodes reach the chip.  Board-level / diagnostic commands --
 		// e.g. the WD1002 controller self-test (0x90), which the host issues before it touches a
 		// drive -- are serviced by the WD1015 front-end and must NOT reach the WD1010, which has

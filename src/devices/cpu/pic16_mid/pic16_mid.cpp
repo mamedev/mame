@@ -461,7 +461,6 @@ void pic16_mid_device::device_start()
 	m_inst_cycles = 0;
 	m_status_write_protect = TO_FLAG | PD_FLAG;
 	m_stack_pointer = 0;
-	m_debugger_temp = 0;
 	m_portb_mismatch_detect = 0xff;
 	m_sleeping = false;
 
@@ -504,15 +503,41 @@ void pic16_mid_device::device_start()
 	save_item(NAME(m_sleeping));
 
 	// debugger
-	state_add(PIC16_MID_PC,     "PC",   m_PC).mask(PC_MASK).formatstr("%04X");
-	state_add(PIC16_MID_W,      "W",    m_W).formatstr("%02X");
-	state_add(PIC16_MID_ALU,    "ALU",  m_ALU).formatstr("%02X");
-	state_add(PIC16_MID_CONFIG, "CNF",  m_CONFIG).formatstr("%04X");
-	state_add(PIC16_MID_PSCL,   "PSCL", m_debugger_temp).callimport().formatstr("%3s");
+	state_add(PIC16_MID_CONFIG, "CONFIG", m_CONFIG).formatstr("%04X").readonly();
+	state_add(PIC16_MID_PC,     "PC",     m_PC).mask(PC_MASK).formatstr("%04X");
+	state_add(PIC16_MID_FSR,    "FSR",    m_FSR).formatstr("%02X");
+	state_add(PIC16_MID_PCLATH, "PCLATH", m_PCLATH).mask(0x1f).formatstr("%02X");
 
-	state_add(STATE_GENPC,     "GENPC",    m_PC).noshow();
-	state_add(STATE_GENPCBASE, "CURPC",    m_PREVPC).noshow();
-	state_add(STATE_GENFLAGS,  "GENFLAGS", m_OPTION).formatstr("%13s").noshow();
+	state_add<u8>(PIC16_MID_BANK, "BANK",
+		[this]() -> u8 { return (m_STATUS >> 5) & 0x03; },
+		[this](u8 data) { m_STATUS = (m_STATUS & ~(RP1_FLAG | RP0_FLAG)) | (data << 5); }
+	).mask((m_status_mask >> 5) & 0x03).formatstr("%01X");
+
+	state_add(PIC16_MID_W, "W", m_W).formatstr("%02X");
+
+	state_add<u8>(PIC16_MID_PRESCALER, "PRESCALER",
+		[this]() -> u8 { return m_prescaler & 0xff; },
+		[this](u8 data) { m_prescaler = data; }
+	).formatstr("%2s");
+
+	state_add(PIC16_MID_LATCHA,   "LATCHA",   m_port_data[PORTA]).mask(m_porta_mask).formatstr("%02X").readonly();
+	state_add(PIC16_MID_LATCHB,   "LATCHB",   m_port_data[PORTB]).formatstr("%02X").readonly();
+	state_add(PIC16_MID_STACKPTR, "STACKPTR", m_stack_pointer).mask(0x07).formatstr("%01X");
+	state_add(PIC16_MID_STACK0,   "STACK0",   m_STACK[0]).mask(PC_MASK).formatstr("%04X");
+	state_add(PIC16_MID_STACK1,   "STACK1",   m_STACK[1]).mask(PC_MASK).formatstr("%04X");
+	state_add(PIC16_MID_STACK2,   "STACK2",   m_STACK[2]).mask(PC_MASK).formatstr("%04X");
+	state_add(PIC16_MID_STACK3,   "STACK3",   m_STACK[3]).mask(PC_MASK).formatstr("%04X");
+	state_add(PIC16_MID_STACK4,   "STACK4",   m_STACK[4]).mask(PC_MASK).formatstr("%04X");
+	state_add(PIC16_MID_STACK5,   "STACK5",   m_STACK[5]).mask(PC_MASK).formatstr("%04X");
+	state_add(PIC16_MID_STACK6,   "STACK6",   m_STACK[6]).mask(PC_MASK).formatstr("%04X");
+	state_add(PIC16_MID_STACK7,   "STACK7",   m_STACK[7]).mask(PC_MASK).formatstr("%04X");
+	state_add(PIC16_MID_SLEEP,    "SLEEP",    m_sleeping).formatstr("%01X").readonly();
+
+	state_add<u8>(PIC16_MID_WDT, "WDT", []() -> u8 { return 0; }).formatstr("%11s");
+
+	state_add(STATE_GENPC,        "GENPC",    m_PC).noshow();
+	state_add(STATE_GENPCBASE,    "CURPC",    m_PREVPC).noshow();
+	state_add(STATE_GENFLAGS,     "GENFLAGS", m_STATUS).mask(m_status_mask).formatstr("%8s").noshow();
 
 	set_icountptr(m_icount);
 }
@@ -631,44 +656,29 @@ void pic16f6xxa_device::device_reset()
 //  DEBUGGER
 //**************************************************************************
 
-void pic16_mid_device::state_import(const device_state_entry &entry)
-{
-	switch (entry.index())
-	{
-		case PIC16_MID_PSCL:
-			m_prescaler = m_debugger_temp;
-			break;
-	}
-}
-
-void pic16_mid_device::state_export(const device_state_entry &entry)
-{
-	switch (entry.index())
-	{
-	}
-}
-
 void pic16_mid_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
-		case PIC16_MID_PSCL:
-			str = string_format("%c%02X", ((m_OPTION & 0x08) ? 'W' : 'T'), m_prescaler);
+		case STATE_GENFLAGS:
+			str = string_format("%c %c%c %c%c%c",
+				BIT(m_STATUS, 7) ? 'I' : '.',
+				BIT(m_STATUS, 4) ? 'T' : '.',
+				BIT(m_STATUS, 3) ? 'P' : '.',
+				BIT(m_STATUS, 2) ? 'Z' : '.',
+				BIT(m_STATUS, 1) ? 'D' : '.',
+				BIT(m_STATUS, 0) ? 'C' : '.');
 			break;
 
-		case STATE_GENFLAGS:
-			str = string_format("%01x%c%c%c%c%c %c%c%c%03x",
-				(m_STATUS & 0xe0) >> 5,
-				m_STATUS & 0x10 ? '.':'O',      // WDT Overflow
-				m_STATUS & 0x08 ? 'P':'D',      // Power/Down
-				m_STATUS & 0x04 ? 'Z':'.',      // Zero
-				m_STATUS & 0x02 ? 'c':'b',      // Nibble Carry/Borrow
-				m_STATUS & 0x01 ? 'C':'B',      // Carry/Borrow
+		case PIC16_MID_PRESCALER:
+			str = (m_OPTION & PSA_FLAG) ? "--" : string_format("%02X", m_prescaler & 0xff);
+			break;
 
-				m_OPTION & 0x20 ? 'C':'T',    // Counter/Timer
-				m_OPTION & 0x10 ? 'N':'P',    // Negative/Positive
-				m_OPTION & 0x08 ? 'W':'T',    // WatchDog/Timer
-				m_OPTION & 0x08 ? (1<<(m_OPTION&7)) : (2<<(m_OPTION&7)));
+		case PIC16_MID_WDT:
+			{
+				const attotime remaining = m_wdt_timer->remaining();
+				str = remaining.is_never() ? "disabled" : string_format("%.3f ms", remaining.as_double() * 1000.0);
+			}
 			break;
 	}
 }
@@ -1079,6 +1089,7 @@ void pic16_mid_device::porta_w(u8 data)
 	data &= m_porta_mask;
 	const u8 mask = u8(~m_port_tris[PORTA]) & m_porta_mask;
 	m_port_data[PORTA] = data;
+
 	m_write_port[PORTA](PORTA, data & mask, mask);
 }
 
@@ -1089,7 +1100,8 @@ u8 pic16_mid_device::portb_r()
 	data |= (u8(~m_port_tris[PORTB]) & m_port_data[PORTB]);
 
 	// reading PORTB updates the change detection latch for RB7:RB4
-	m_portb_mismatch_detect = data & 0xf0;
+	if (!machine().side_effects_disabled())
+		m_portb_mismatch_detect = data & 0xf0;
 
 	return data;
 }
@@ -1102,6 +1114,7 @@ void pic16_mid_device::portb_w(u8 data)
 
 	const u8 mask = u8(~m_port_tris[PORTB]);
 	m_port_data[PORTB] = data;
+
 	m_write_port[PORTB](PORTB, data & mask, mask);
 }
 

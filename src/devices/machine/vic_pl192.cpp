@@ -6,7 +6,7 @@
 #include "emu.h"
 #include "vic_pl192.h"
 
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(PL190_VIC, vic_pl190_device, "vic_pl190", "ARM PL190 VIC")
@@ -39,32 +39,43 @@ vic_upd800468_device::vic_upd800468_device(const machine_config &mconfig, const 
 
 vic_pl192_device::vic_pl192_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: vic_pl190_device(mconfig, PL192_VIC, tag, owner, clock)
+	, m_daisy_vector(*this, 0)
 {
 	num_vectors = 32;
 }
 
 void vic_pl190_device::device_start()
 {
+	raw_intr = 0;
+	m_irq_state = m_fiq_state = false;
 	save_item(NAME(raw_intr));
 	save_item(NAME(intr_select));
 	save_item(NAME(intr_en));
 	save_item(NAME(soft_intr));
 	save_item(NAME(vectaddr));
+	save_item(NAME(vectctl));
 	save_item(NAME(defaddress));
 	save_item(NAME(vicaddress));
 	save_item(NAME(priority_mask));
 	save_item(NAME(priority));
 	save_item(NAME(protection));
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_fiq_state));
 
 	m_irq_sync_timer = timer_alloc(FUNC(vic_pl190_device::irq_sync_tick), this);
+	m_out_irq_func(0);
+	m_out_fiq_func(0);
 }
 
 void vic_pl192_device::device_start()
 {
 	vic_pl190_device::device_start();
 
+	m_daisy_irq = m_daisy_fiq = false;
 	save_item(NAME(sw_priority_mask));
 	save_item(NAME(daisy_priority));
+	save_item(NAME(m_daisy_irq));
+	save_item(NAME(m_daisy_fiq));
 }
 
 void vic_pl190_device::device_reset()
@@ -80,11 +91,14 @@ void vic_pl190_device::device_reset()
 		vectaddr[i] = 0;
 		vectctl[i] = 0;
 	}
+	m_irq_sync_timer->adjust(attotime::zero);
 }
 
 void vic_pl192_device::device_reset()
 {
+	u32 const inputs = raw_intr;
 	vic_pl190_device::device_reset();
+	raw_intr = inputs;
 
 	sw_priority_mask = 0xffff;
 	daisy_priority = 0xf;
@@ -151,7 +165,7 @@ void vic_pl192_device::map(address_map &map)
 	map(0x028, 0x028).rw(FUNC(vic_pl192_device::daisy_priority_r), FUNC(vic_pl192_device::daisy_priority_w)).umask32(0x000000ff);
 	map(0x100, 0x17f).rw(FUNC(vic_pl190_device::vect_addr_r), FUNC(vic_pl190_device::vect_addr_w));
 	map(0x200, 0x27f).rw(FUNC(vic_pl190_device::vect_ctl_r), FUNC(vic_pl190_device::vect_ctl_w));
-	map(0xf00, 0xf03).rw(FUNC(vic_pl190_device::cur_vect_addr_r), FUNC(vic_pl190_device::cur_vect_addr_w));
+	map(0xf00, 0xf03).rw(FUNC(vic_pl192_device::cur_vect_addr_r), FUNC(vic_pl190_device::cur_vect_addr_w));
 	map(0xfe0, 0xfe0).lr8([this](offs_t offset) { return periph_id[0]; }, "periph_id0").umask32(0x000000ff);
 	map(0xfe4, 0xfe4).lr8([this](offs_t offset) { return periph_id[1]; }, "periph_id1").umask32(0x000000ff);
 	map(0xfe8, 0xfe8).lr8([this](offs_t offset) { return periph_id[2]; }, "periph_id2").umask32(0x000000ff);
@@ -164,17 +178,27 @@ void vic_pl192_device::map(address_map &map)
 
 TIMER_CALLBACK_MEMBER(vic_pl190_device::irq_sync_tick)
 {
-	u32 intrs = (raw_intr | soft_intr) & intr_en;
+	update_interrupts();
+}
 
-	if (intrs & intr_select)
-		m_out_fiq_func(1);
-	else
-		m_out_fiq_func(0);
+void vic_pl190_device::update_interrupts()
+{
+	u32 const intrs = (raw_intr | soft_intr) & intr_en;
+	set_interrupt_outputs(bool(intrs & ~intr_select & priority_mask), bool(intrs & intr_select));
+}
 
-	if (intrs & ~intr_select & priority_mask)
-		m_out_irq_func(1);
-	else
-		m_out_irq_func(0);
+void vic_pl190_device::set_interrupt_outputs(bool irq, bool fiq)
+{
+	if (m_fiq_state != fiq)
+	{
+		m_fiq_state = fiq;
+		m_out_fiq_func(fiq);
+	}
+	if (m_irq_state != irq)
+	{
+		m_irq_state = irq;
+		m_out_irq_func(irq);
+	}
 }
 
 void vic_pl190_device::set_irq_line(int irq, int state)
@@ -192,17 +216,17 @@ void vic_pl190_device::set_irq_line(int irq, int state)
 
 u32 vic_pl190_device::irq_status_r()
 {
-	return raw_intr & ~intr_select;
+	return (raw_intr | soft_intr) & intr_en & ~intr_select;
 }
 
 u32 vic_pl190_device::fiq_status_r()
 {
-	return raw_intr & intr_select;
+	return (raw_intr | soft_intr) & intr_en & intr_select;
 }
 
 u32 vic_pl190_device::raw_intr_r()
 {
-	return raw_intr;
+	return raw_intr | soft_intr;
 }
 
 u32 vic_pl190_device::int_select_r()
@@ -303,6 +327,7 @@ u32 vic_pl190_device::vect_ctl_r(offs_t offset)
 void vic_pl190_device::vect_ctl_w(offs_t offset, u32 data)
 {
 	vectctl[offset] = data;
+	m_irq_sync_timer->adjust(attotime::zero);
 }
 
 void vic_pl190_device::update_vector()
@@ -360,6 +385,7 @@ u16 vic_pl192_device::sw_priority_r()
 void vic_pl192_device::sw_priority_w(u16 data)
 {
 	sw_priority_mask = data;
+	m_irq_sync_timer->adjust(attotime::zero);
 }
 
 u8 vic_pl192_device::daisy_priority_r()
@@ -370,33 +396,85 @@ u8 vic_pl192_device::daisy_priority_r()
 void vic_pl192_device::daisy_priority_w(u8 data)
 {
 	daisy_priority = data & 0xf;
+	m_irq_sync_timer->adjust(attotime::zero);
+}
+
+void vic_pl192_device::daisy_irq_w(int state)
+{
+	if (m_daisy_irq != bool(state))
+	{
+		m_daisy_irq = bool(state);
+		m_irq_sync_timer->adjust(attotime::zero);
+	}
+}
+
+void vic_pl192_device::daisy_fiq_w(int state)
+{
+	if (m_daisy_fiq != bool(state))
+	{
+		m_daisy_fiq = bool(state);
+		m_irq_sync_timer->adjust(attotime::zero);
+	}
+}
+
+u8 vic_pl192_device::pending_interrupt() const
+{
+	u32 const intrs = (raw_intr | soft_intr) & intr_en & ~intr_select;
+	u8 selected = NO_IRQ;
+	u8 selected_priority = priority;
+	for (u8 i = 0; i < num_vectors; ++i)
+	{
+		u8 const level = vectctl[i] & 0xf;
+		if (BIT(intrs, i) && BIT(sw_priority_mask, level) && level < selected_priority)
+		{
+			selected = i;
+			selected_priority = level;
+		}
+	}
+	// Local sources precede the daisy input at the same programmed priority.
+	if (m_daisy_irq && BIT(sw_priority_mask, daisy_priority) && daisy_priority < selected_priority)
+		selected = DAISY_IRQ;
+	return selected;
+}
+
+u32 vic_pl192_device::vector_r()
+{
+	u8 const selected = pending_interrupt();
+	if (selected < num_vectors)
+		return vectaddr[selected];
+	if (selected == DAISY_IRQ)
+		return m_daisy_vector();
+	return vicaddress;
+}
+
+u32 vic_pl192_device::cur_vect_addr_r()
+{
+	if (machine().side_effects_disabled())
+		return vector_r();
+	update_vector();
+	return vicaddress;
 }
 
 void vic_pl192_device::update_vector()
 {
-	u32 intrs = (raw_intr | soft_intr) & intr_en & ~intr_select;
-	u32 newmask = 0;
-
-	// see if there's a higher priority active interrupt to take
-	for (u8 i = 0; i < num_vectors; i++)
+	u8 const selected = pending_interrupt();
+	if (selected < num_vectors)
 	{
-		u8 new_prio = vectctl[i] & 0xf;
-		if (BIT(sw_priority_mask, new_prio) && BIT(intrs, i) && new_prio < priority)
-		{
-			// this interrupt is enabled and pending, take it
-			priority = new_prio;
-			vicaddress = vectaddr[i];
-		}
+		vicaddress = vectaddr[selected];
+		priority = vectctl[selected] & 0xf;
 	}
-
-	// update priority_mask to only allow higher priority interrupts
-	for (u8 i = 0; i < num_vectors; i++)
+	else if (selected == DAISY_IRQ)
 	{
-		u8 new_prio = vectctl[i] & 0xf;
-		if (BIT(sw_priority_mask, new_prio) && new_prio < priority)
-		{
-			newmask |= (1 << i);
-		}
+		vicaddress = m_daisy_vector();
+		priority = daisy_priority;
 	}
-	priority_mask = newmask;
+	m_irq_sync_timer->adjust(attotime::zero);
+}
+
+void vic_pl192_device::update_interrupts()
+{
+	bool const irq = pending_interrupt() != NO_IRQ;
+	if (irq)
+		vicaddress = vector_r();
+	set_interrupt_outputs(irq, m_daisy_fiq || bool((raw_intr | soft_intr) & intr_en & intr_select));
 }

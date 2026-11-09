@@ -9,6 +9,10 @@
 #include "emu.h"
 #include "mos8563.h"
 
+#include "screen.h"
+
+#include <algorithm>
+
 #define LOG_REGS    (1U << 1)
 
 //#define VERBOSE (LOG_REGS)
@@ -95,13 +99,14 @@ void mos8563_device::device_start()
 	/* create the timers */
 	m_block_copy_timer = timer_alloc(FUNC(mos8563_device::block_copy_tick), this);
 
+	m_line_counter_mask = 0xff;
+	m_interlace_fields = true;
+	m_latch_row_end = true;
+	m_supports_vert_sync_width = true;
 	m_supports_status_reg_d5 = true;
 	m_supports_status_reg_d6 = true;
 	m_supports_status_reg_d7 = true;
 	m_update_ready_bit = 1;
-
-	// default update_row delegate
-	m_update_row_cb.set(*this, FUNC(mos8563_device::vdc_update_row));
 
 	m_char_blink_state = false;
 	m_char_blink_count = 0;
@@ -120,10 +125,32 @@ void mos8563_device::device_start()
 	m_de_begin = 0;
 	m_de_end = 0;
 	m_draw_ra = 0;
+	m_draw_row_ra = 0;
+	m_draw_row = 0;
+	m_draw_addr = 0;
 	m_attr_row_addr = 0;
 	m_bitmap_addr = 0;
 	m_dram_refresh = 0;
 	m_sync_polarity = 0;
+	m_frame_started = false;
+	m_line_index = 0;
+	m_frame_lines = 0;
+	m_field_lines = 0;
+	m_screen_line = 0;
+	m_retrace_lines = 0;
+	m_latched_disp_addr = 0;
+	m_latched_attr_addr = 0;
+	m_frame_disp_addr = 0;
+	m_frame_attr_addr = 0;
+	m_start_addr_latched = false;
+	m_vsync_seen = false;
+
+	std::fill_n(m_line_addr, LINE_COUNT, 0);
+	std::fill_n(m_line_bitmap_addr, LINE_COUNT, 0);
+	std::fill_n(m_line_attr_addr, LINE_COUNT, 0);
+	std::fill_n(m_line_ra, LINE_COUNT, 0);
+	std::fill_n(m_line_shown, LINE_COUNT, false);
+	std::fill_n(m_line_field, LINE_COUNT, 0);
 
 	m_revision = 1;
 
@@ -171,6 +198,9 @@ void mos8563_device::device_start()
 	save_item(NAME(m_de_begin));
 	save_item(NAME(m_de_end));
 	save_item(NAME(m_draw_ra));
+	save_item(NAME(m_draw_row_ra));
+	save_item(NAME(m_draw_row));
+	save_item(NAME(m_draw_addr));
 	save_item(NAME(m_attr_row_addr));
 	save_item(NAME(m_bitmap_addr));
 	save_item(NAME(m_dram_refresh));
@@ -179,6 +209,24 @@ void mos8563_device::device_start()
 	save_item(NAME(m_clk_scale));
 	save_item(NAME(m_char_blink_state));
 	save_item(NAME(m_char_blink_count));
+	save_item(NAME(m_frame_started));
+	save_item(NAME(m_line_index));
+	save_item(NAME(m_frame_lines));
+	save_item(NAME(m_field_lines));
+	save_item(NAME(m_screen_line));
+	save_item(NAME(m_retrace_lines));
+	save_item(NAME(m_latched_disp_addr));
+	save_item(NAME(m_latched_attr_addr));
+	save_item(NAME(m_frame_disp_addr));
+	save_item(NAME(m_frame_attr_addr));
+	save_item(NAME(m_start_addr_latched));
+	save_item(NAME(m_vsync_seen));
+	save_item(NAME(m_line_addr));
+	save_item(NAME(m_line_bitmap_addr));
+	save_item(NAME(m_line_attr_addr));
+	save_item(NAME(m_line_ra));
+	save_item(NAME(m_line_shown));
+	save_item(NAME(m_line_field));
 }
 
 void mos8568_device::device_start()
@@ -199,6 +247,14 @@ void mos8563_device::device_reset()
 }
 
 void mos8568_device::device_reset() { mos8563_device::device_reset(); }
+
+
+void mos8563_device::device_post_load()
+{
+	mc6845_device::device_post_load();
+
+	update_screen_geometry();
+}
 
 
 //-------------------------------------------------
@@ -313,6 +369,11 @@ void mos8563_device::register_w(uint8_t data)
 {
 	LOGREGS("%s:MOS8563 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
 
+	bool const display_reg = (m_register_address_latch < 0x10) || ((m_register_address_latch > 0x13) && (m_register_address_latch < 0x1e)) || (m_register_address_latch > 0x21);
+
+	if (display_reg && has_screen())
+		screen().update_partial(screen().vpos());
+
 	switch (m_register_address_latch)
 	{
 		case 0x00:  m_horiz_char_total =   data & 0xff; break;
@@ -426,52 +487,245 @@ void mos8563_device::update_cursor_state()
 }
 
 
-uint8_t mos8563_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void mos8563_device::update_screen_geometry()
 {
-	if (y == 0)
+	if (!has_screen() || !m_has_valid_parameters || (m_frame_lines < 2))
+		return;
+
+	int const width = m_horiz_pix_total;
+	int const height = interlace_video() ? (m_frame_lines * 2) : m_frame_lines;
+
+	// a monitor shows neither the vertical sync pulse nor its retrace after it
+	int const vsync_lines = (m_sync_width >> 4) ? (m_sync_width >> 4) : 16;
+	int const visible_lines = std::max(m_frame_lines - vsync_lines - RETRACE_LINES, 2);
+
+	// nor the horizontal blanking around the sync pulse, which ends at x = 0
+	int const min_x = std::min<int>(RETRACE_DOTS, width - 2);
+	int const max_x = std::max<int>(min_x, width - (m_hsync_off_pos - m_hsync_on_pos) - FRONT_PORCH_DOTS - 1);
+	rectangle const visarea(min_x, max_x, 0, (interlace_video() ? (visible_lines * 2) : visible_lines) - 1);
+	attotime const refresh = cclks_to_attotime((m_horiz_char_total + 1) * m_frame_lines);
+
+	if ((width != screen().width()) || (height != screen().height()) || (visarea != screen().visible_area()) || (refresh != screen().frame_period()))
+		screen().configure(width, height, visarea, refresh);
+
+	if (interlace_video() && ((m_field_bitmap.width() != width) || (m_field_bitmap.height() != height)))
 	{
-		m_draw_ra = m_vert_scroll & 0x1f;
-		m_attr_row_addr = m_attribute_addr;
-		m_bitmap_addr = m_current_disp_addr + (m_vert_scroll & 0x1f) * (m_horiz_disp + m_row_addr_incr);
+		m_field_bitmap.allocate(width, height);
+		m_field_bitmap.fill(pen(m_color & 0x0f));
+	}
+}
+
+
+void mos8563_device::configure_screen(int width, int height, const rectangle &visarea, const attotime &refresh)
+{
+	if (!m_frame_lines)
+		mc6845_device::configure_screen(width, height, visarea, refresh);
+}
+
+
+void mos8563_device::frame_start()
+{
+	if (m_frame_started)
+	{
+		int const lines = m_line_index + 1;
+
+		m_frame_lines = interlace_video() ? std::min(lines, m_field_lines) : lines;
+		m_field_lines = lines;
 	}
 
-	uint8_t ra = m_draw_ra;
+	m_frame_started = true;
+	m_line_index = -1;
 
-	int cursor_visible = check_cursor_visible(ra, m_current_disp_addr);
-	int8_t cursor_x = cursor_visible ? (m_cursor_addr - m_current_disp_addr) : -1;
-	int de = (y <= m_max_visible_y) ? 1 : 0;
-	int vbp = m_vert_pix_total - m_vsync_off_pos;
-	if (vbp < 0) vbp = 0;
-	int hbp = m_horiz_pix_total - m_hsync_off_pos;
-	if (hbp < 0) hbp = 0;
+	m_frame_disp_addr = m_start_addr_latched ? m_latched_disp_addr : m_disp_start_addr;
+	m_frame_attr_addr = m_start_addr_latched ? m_latched_attr_addr : m_attribute_addr;
+	m_start_addr_latched = false;
 
-	m_update_row_cb(bitmap, cliprect, HSS_BITMAP ? m_bitmap_addr : m_current_disp_addr, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp);
+	if (!m_vsync_seen)
+	{
+		m_screen_line = 0;
+		update_screen_geometry();
+
+		if (has_screen())
+			screen().reset_origin();
+	}
+
+	m_vsync_seen = false;
+}
+
+
+void mos8563_device::set_vsync(int state)
+{
+	bool const vsync_end = m_vsync && !state;
+
+	mc6845_device::set_vsync(state);
+
+	if (!m_line_enable_ff && !m_start_addr_latched)
+	{
+		m_latched_disp_addr = m_disp_start_addr;
+		m_latched_attr_addr = m_attribute_addr;
+		m_start_addr_latched = true;
+	}
+
+	if (vsync_end)
+	{
+		m_vsync_seen = true;
+		m_retrace_lines = RETRACE_LINES + 1;
+	}
+
+	if (m_retrace_lines && !--m_retrace_lines)
+	{
+		// called once per scanline, so the screen origin moves to the first line the monitor shows after its retrace
+		m_screen_line = 0;
+		update_screen_geometry();
+
+		if (has_screen())
+			screen().reset_origin();
+	}
+
+	start_draw_line();
+}
+
+
+void mos8563_device::reload_draw_counters()
+{
+	int const field = interlace_video() ? m_field : 0;
+
+	m_draw_ra = ((m_vert_scroll & 0x1f) + field) & 0x1f;
+	m_draw_row_ra = field;
+	m_draw_row = 0;
+
+	m_draw_addr = m_frame_disp_addr;
+
+	if (!(field && HSS_BITMAP))
+	{
+		if (interlace_video() && HSS_BITMAP)
+			m_attr_row_addr = m_frame_attr_addr - (m_horiz_disp + m_row_addr_incr);
+		else
+			m_attr_row_addr = m_frame_attr_addr - ((m_vert_char_total == 0xff) ? m_horiz_disp : 0);
+		m_bitmap_addr = m_draw_addr + (m_vert_scroll & 0x1f) * (m_horiz_disp + m_row_addr_incr);
+	}
+}
+
+
+void mos8563_device::advance_draw_line()
+{
+	bool const interlace = interlace_video();
+	uint8_t const ra = m_draw_ra;
 
 	m_bitmap_addr = (m_bitmap_addr + m_horiz_disp + m_row_addr_incr) & 0xffff;
 
-	if (ra == m_max_ras_addr)
+	if (interlace ? ((ra >= m_max_ras_addr) || ((ra + 1) == m_max_ras_addr)) : (ra == m_max_ras_addr))
 	{
-		m_draw_ra = 0;
-		m_current_disp_addr = (m_current_disp_addr + m_horiz_disp + m_row_addr_incr) & 0xffff;
+		m_draw_ra = interlace ? (~(ra ^ m_max_ras_addr) & 1) : 0;
+		m_draw_addr = (m_draw_addr + m_horiz_disp + m_row_addr_incr) & 0xffff;
 		m_attr_row_addr = (m_attr_row_addr + m_horiz_disp + m_row_addr_incr) & 0xffff;
 	}
 	else
 	{
-		m_draw_ra = (ra + 1) & 0x1f;
+		m_draw_ra = (ra + (interlace ? 2 : 1)) & 0x1f;
 	}
 
-	return ra;
+	if (interlace ? ((m_draw_row_ra >= m_max_ras_addr) || ((m_draw_row_ra + 1) == m_max_ras_addr)) : (m_draw_row_ra == m_max_ras_addr))
+	{
+		m_draw_row_ra = interlace ? (~(m_draw_row_ra ^ m_max_ras_addr) & 1) : 0;
+		m_draw_row++;
+	}
+	else
+	{
+		m_draw_row_ra = (m_draw_row_ra + (interlace ? 2 : 1)) & 0x1f;
+	}
+}
+
+
+void mos8563_device::start_draw_line()
+{
+	if (m_line_index < LINE_COUNT)
+		m_line_index++;
+
+	if (!m_line_index)
+		reload_draw_counters();
+
+	bool const shown = m_draw_row < m_vert_disp;
+
+	if (m_screen_line < LINE_COUNT)
+	{
+		m_line_addr[m_screen_line] = m_draw_addr;
+		m_line_bitmap_addr[m_screen_line] = m_bitmap_addr;
+		m_line_attr_addr[m_screen_line] = m_attr_row_addr;
+		m_line_ra[m_screen_line] = m_draw_ra;
+		m_line_shown[m_screen_line] = shown;
+		m_line_field[m_screen_line] = m_field;
+		m_screen_line++;
+	}
+
+	if (shown)
+	{
+		advance_draw_line();
+	}
+	else
+	{
+		// FIXME: fitted, not from hardware: in interlace the address counter runs into the row after R6, all but its last line, unless R6 = R4
+		bool const extra_row = interlace_video() && (m_vert_disp < m_vert_char_total) && (m_draw_row == m_vert_disp);
+		bool const row_last_line = (m_draw_row_ra >= m_max_ras_addr) || ((m_draw_row_ra + 1) == m_max_ras_addr);
+
+		if (extra_row && !row_last_line)
+			advance_draw_line();
+	}
+}
+
+
+void mos8563_device::draw_line(int line, int row, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	if ((line >= LINE_COUNT) || !m_line_shown[line])
+		return;
+
+	uint16_t const addr = m_line_addr[line];
+	uint8_t const ra = m_line_ra[line];
+	bool const cursor_visible = check_cursor_visible(ra, addr);
+	int8_t const cursor_x = cursor_visible ? (m_cursor_addr - addr) : -1;
+	int const hbp = std::max(m_horiz_pix_total - m_hsync_off_pos, 0);
+
+	draw_row(bitmap, cliprect, HSS_BITMAP ? m_line_bitmap_addr[line] : addr, m_line_attr_addr[line], ra, row, cursor_x, hbp);
 }
 
 
 uint32_t mos8563_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(pen(m_color & 0x0f), cliprect);
+	bool const interlace = interlace_video() && (m_field_bitmap.height() == screen.height());
+	bitmap_rgb32 &dest = interlace ? m_field_bitmap : bitmap;
+	rgb_t const border = pen(m_color & 0x0f);
 
-	if (((m_de_begin > m_horiz_char_total) || (m_de_begin == m_de_end)) && (m_de_end <= m_horiz_char_total))
-		return 0;
+	if (!interlace)
+		bitmap.fill(border, cliprect);
 
-	return mc6845_device::screen_update(screen, bitmap, cliprect);
+	if (m_has_valid_parameters)
+	{
+		bool const blank = ((m_de_begin > m_horiz_char_total) || (m_de_begin == m_de_end)) && (m_de_end <= m_horiz_char_total);
+
+		for (int row = cliprect.min_y; row <= cliprect.max_y; row++)
+		{
+			if (interlace)
+			{
+				// the field that continues the bitmap address is woven half a line above the one that reloads it
+				if (((row >> 1) >= LINE_COUNT) || ((row & 1) == m_line_field[row >> 1]))
+					continue;
+
+				dest.plot_box(cliprect.min_x, row, cliprect.width(), 1, border);
+
+				if (!blank)
+					draw_line(row >> 1, row, dest, cliprect);
+			}
+			else if (!blank)
+			{
+				draw_line(row, row, dest, cliprect);
+			}
+		}
+	}
+
+	if (interlace)
+		copybitmap(bitmap, m_field_bitmap, 0, 0, 0, 0, cliprect);
+
+	return 0;
 }
 
 
@@ -500,8 +754,10 @@ bool mos8563_device::semigraphics_gap(uint8_t r22)
 }
 
 
-MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
+void mos8563_device::draw_row(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t ma, uint16_t attr_row_addr, uint8_t ra, int y, int8_t cursor_x, int hbp)
 {
+	int const x_count = m_horiz_disp;
+
 	uint8_t cth = (m_horiz_char >> 4) + (HSS_DBL ? 0 : 1);
 	uint8_t cdv = m_vert_char_disp;
 
@@ -537,7 +793,8 @@ MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 	int const gap_total = (m_horiz_char >> 4) - 6;
 	uint8_t const d2mask = (gap_total > (HSS_DBL ? 2 : 1)) ? ~(0xff >> std::min(gap_total, 8)) : 0x00;
 
-	for (int column = 0; column < x_count; column++)
+	// one character beyond R1 is fetched to fill the pixels uncovered at the right edge by the horizontal smooth scroll
+	for (int column = 0; column <= x_count; column++)
 	{
 		uint8_t code = read_videoram(ma + column);
 		uint8_t attr = 0;
@@ -547,7 +804,7 @@ MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 
 		if (HSS_ATTR)
 		{
-			offs_t attr_addr = m_attr_row_addr + column;
+			offs_t attr_addr = attr_row_addr + column;
 			attr = read_videoram(attr_addr);
 		}
 
@@ -614,8 +871,8 @@ MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 			int x = (m_horiz_scroll & 0x0f) - cth + 1 + (column * cth) + bit;
 			int color = BIT((bit < 8) ? data : gap, 7 - (bit & 7)) ? fg : bg;
 
-			if (x >= 0 && x < x_count * cth && bitmap.cliprect().contains(hbp + x, vbp + y))
-				bitmap.pix(vbp + y, hbp + x) = pen(de ? color : (m_color & 0x0f));
+			if (x >= 0 && x < x_count * cth && cliprect.contains(hbp + x, y))
+				bitmap.pix(y, hbp + x) = pen(color);
 		}
 	}
 }

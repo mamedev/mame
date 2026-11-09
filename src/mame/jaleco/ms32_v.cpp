@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_bg_tile_info)
 	tileinfo.set(1,tileno,colour,0);
 }
 
-TILE_GET_INFO_MEMBER(ms32_f1superbattle_state::get_latched_tx_tile_info)
+TILE_GET_INFO_MEMBER(f1superb_state::get_latched_tx_tile_info)
 {
 	const int tileno = m_txram_latch[tile_index *2]   & 0xffff;
 	const int colour = m_txram_latch[tile_index *2+1] & 0x000f;
@@ -52,7 +52,7 @@ TILE_GET_INFO_MEMBER(ms32_f1superbattle_state::get_latched_tx_tile_info)
 	tileinfo.set(2,tileno,colour,0);
 }
 
-TILE_GET_INFO_MEMBER(ms32_f1superbattle_state::get_ms32_extra_tile_info)
+TILE_GET_INFO_MEMBER(f1superb_state::get_ms32_extra_tile_info)
 {
 	const int tileno = m_road_vram[tile_index *2]   & 0xffff;
 	const int colour = m_road_vram[tile_index *2+1] & 0x000f;
@@ -112,21 +112,21 @@ tilemap_t &ms32_state::create_roz_tilemap()
 	return machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_roz_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
 }
 
-tilemap_t &ms32_f1superbattle_state::create_tx_tilemap()
+tilemap_t &f1superb_state::create_tx_tilemap()
 {
-	return machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_f1superbattle_state::get_latched_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	return machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(f1superb_state::get_latched_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 }
 
-tilemap_t &ms32_f1superbattle_state::create_roz_tilemap()
+tilemap_t &f1superb_state::create_roz_tilemap()
 {
-	return machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_f1superbattle_state::get_ms32_roz_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
+	return machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(f1superb_state::get_ms32_roz_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
 }
 
-void ms32_f1superbattle_state::video_start()
+void f1superb_state::video_start()
 {
 	ms32_state::video_start();
 
-	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_f1superbattle_state::get_ms32_extra_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
+	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(f1superb_state::get_ms32_extra_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
 	m_extra_tilemap->set_transparent_pen(0);
 
 	m_screen->register_screen_bitmap(m_layer_tx);
@@ -138,7 +138,7 @@ void ms32_f1superbattle_state::video_start()
 	save_item(NAME(m_txram_latch));
 }
 
-void ms32_f1superbattle_state::draw_line_plane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, u16 const *vram, u16 const *lineram, u32 const *ctrl, bool wrap, u16 *line_colour)
+void f1superb_state::draw_line_plane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, u16 const *vram, u16 const *lineram, u32 const *ctrl, bool wrap, u16 *line_colour)
 {
 	int const startx = util::sext((ctrl[0x00/4] & 0xffff) | ((ctrl[0x04/4] & 3) << 16), 18);
 	int const starty = util::sext((ctrl[0x08/4] & 0xffff) | ((ctrl[0x0c/4] & 3) << 16), 18);
@@ -183,7 +183,7 @@ void ms32_f1superbattle_state::draw_line_plane(screen_device &screen, bitmap_ind
     Output: bits 5-3 select the layer (0 sprite, 1 BG, 2 ROZ, 4 road plane, 6 text), bit 6 selects the backdrop.
     TODO: bit 2 clear is approximated as half brightness, bits 1-0 are ignored
 */
-void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void f1superb_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_layer_tx.fill(0xffff, cliprect);
 	m_layer_bg.fill(0xffff, cliprect);

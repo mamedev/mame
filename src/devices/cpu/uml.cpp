@@ -237,7 +237,7 @@ opcode_info const instruction::s_opcode_info_table[OP_MAX] =
 //-------------------------------------------------
 
 uml::code_handle::code_handle(drcuml_state &drcuml, const char *name)
-	: m_code(drcuml.cache().alloc_near<drccodeptr>())
+	: m_code(drcuml.cache_alloc_near<drccodeptr>())
 	, m_string(name)
 	, m_drcuml(drcuml)
 {
@@ -255,7 +255,7 @@ uml::code_handle::code_handle(drcuml_state &drcuml, const char *name)
 void uml::code_handle::set_codeptr(drccodeptr code)
 {
 	assert(*m_code == nullptr);
-	assert_in_cache(m_drcuml.cache(), code);
+	assert(m_drcuml.cache_contains_pointer(code));
 	*m_code = code;
 }
 
@@ -1713,10 +1713,10 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 					else
 						util::stream_format(buffer, "[%s+$%X]", symbol, symoffset);
 				}
-				else if (drcuml != nullptr && drcuml->cache().contains_pointer(param.memory()))
+				else if (drcuml && drcuml->cache_contains_pointer(param.memory()))
 				{
 					// cache memory
-					util::stream_format(buffer, "[+$%X]", u32(uintptr_t(drccodeptr(param.memory()) - drcuml->cache().near())));
+					util::stream_format(buffer, "[+$%X]", uintptr_t(drcuml->cache_pointer_offset(param.memory())));
 				}
 				else
 				{

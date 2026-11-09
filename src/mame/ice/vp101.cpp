@@ -434,7 +434,7 @@ public:
 			m_native_list(false)
 	{ }
 
-	void vp101(machine_config &config);
+	void vp101(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -894,7 +894,7 @@ void vp10x_state::ppc_boot()
 void vp10x_state::update_irqs()
 {
 	// which CPU IP line (2-6, i.e. MIPS3_IRQ0-4) each status bit is routed to
-	static constexpr uint8_t ROUTING[11] = { 0, 1, 1, 0, 2, 3, 4, 3, 0, 3, 3 };
+	constexpr uint8_t ROUTING[11] = { 0, 1, 1, 0, 2, 3, 4, 3, 0, 3, 3 };
 
 	uint32_t lines = 0;
 	const uint32_t active = m_int_status & m_int_enable;

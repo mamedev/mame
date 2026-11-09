@@ -30,8 +30,10 @@ TODO:
 **************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6809/m6809.h"
 #include "sound/beep.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -45,16 +47,25 @@ public:
 	destiny_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_beeper(*this, "beeper")
+		m_beeper(*this, "beeper"),
+		m_rombank(*this, "rombank")
 	{ }
 
-	void destiny(machine_config &config);
+	void destiny(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;
+
+	required_memory_bank m_rombank;
 
 	char m_led_array[21];
 
@@ -68,29 +79,23 @@ private:
 	void sound_w(offs_t offset, uint8_t data);
 
 	void main_map(address_map &map) ATTR_COLD;
-protected:
-	// driver_device overrides
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
-public:
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
-/*Temporary,to show something on screen...*/
+// Temporary,to show something on screen...
 
 void destiny_state::video_start()
 {
-	uint8_t i;
-	for(i=0;i<20;i++)
+	for (uint8_t i = 0; i < 20; i++)
 		m_led_array[i] = 0x20;
 	m_led_array[20] = 0;
 }
 
 uint32_t destiny_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	popmessage("%s",m_led_array);
+	popmessage("%s", m_led_array);
 	return 0;
 }
 
@@ -132,7 +137,7 @@ uint8_t destiny_state::display_ready_r()
 
 void destiny_state::display_w(uint8_t data)
 {
-	/* this is preliminary, just fills a string and doesn't support control codes etc. */
+	// this is preliminary, just fills a string and doesn't support control codes etc.
 
 	// scroll the data
 	for (int i = 0; i < 19; i++)
@@ -155,7 +160,7 @@ void destiny_state::out_w(uint8_t data)
 void destiny_state::bank_select_w(uint8_t data)
 {
 	// d0-d2 and d4: bank (but only up to 4 banks supported)
-	membank("bank1")->set_base(memregion("answers")->base() + 0x6000 * (data & 3));
+	m_rombank->set_entry(data & 3);
 }
 
 INPUT_CHANGED_MEMBER(destiny_state::coin_inserted)
@@ -177,7 +182,7 @@ void destiny_state::sound_w(offs_t offset, uint8_t data)
 
 void destiny_state::main_map(address_map &map)
 {
-	map(0x0000, 0x5fff).bankr("bank1");
+	map(0x0000, 0x5fff).bankr(m_rombank);
 	map(0x8000, 0x87ff).ram();
 	map(0x9000, 0x9000).rw(FUNC(destiny_state::printer_status_r), FUNC(destiny_state::firq_ack_w));
 	map(0x9001, 0x9001).portr("SYSTEM").w(FUNC(destiny_state::nmi_ack_w));
@@ -262,6 +267,9 @@ INPUT_PORTS_END
 
 void destiny_state::machine_start()
 {
+	m_rombank->configure_entries(0, 4, memregion("answers")->base(), 0x6000);
+
+	save_item(NAME(m_led_array));
 }
 
 void destiny_state::machine_reset()
@@ -269,17 +277,18 @@ void destiny_state::machine_reset()
 	bank_select_w(0);
 }
 
+
 void destiny_state::destiny(machine_config &config)
 {
-	/* basic machine hardware */
-	M6809(config, m_maincpu, XTAL(4'000'000)/2);
+	// basic machine hardware
+	M6809(config, m_maincpu, XTAL(4'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &destiny_state::main_map);
 	m_maincpu->set_periodic_int(FUNC(destiny_state::irq0_line_hold), attotime::from_hz(50)); // timer irq controls update speed, frequency needs to be determined yet (2MHz through three 74LS390)
 
-	/* video hardware (dummy) */
+	// video hardware (dummy)
 	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(6*16, 9*2);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(destiny_state::screen_update));
@@ -287,8 +296,9 @@ void destiny_state::destiny(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
+
 	BEEP(config, m_beeper, 800); // TODO: determine exact frequency thru schematics
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
@@ -324,4 +334,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1983, destiny, 0, destiny,  destiny, destiny_state, empty_init, ROT0, "Data East Corporation", "Destiny: The Fortuneteller (USA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_PRINTER )
+GAME( 1983, destiny, 0, destiny,  destiny, destiny_state, empty_init, ROT0, "Data East Corporation", "Destiny: The Fortuneteller (USA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )

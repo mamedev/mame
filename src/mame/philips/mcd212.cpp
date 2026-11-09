@@ -13,11 +13,7 @@
 
 STATUS:
 
-- Just enough for the Mono-I CD-i board to work somewhat properly.
-
-TODO:
-
-- QHY DYUV Image Decoder
+- Mostly working. Some timing issues.
 
 *******************************************************************************/
 
@@ -109,147 +105,136 @@ void mcd212_device::update_matte_arrays()
 template <int Path>
 void mcd212_device::set_register(uint8_t reg, uint32_t value)
 {
+	if (reg >= 0x80 && reg < 0xc0) // CLUT 0 - 63
+	{
+		const uint8_t clut_index = m_clut_bank[Path] * 0x40 + (reg - 0x80);
+		LOGMASKED(LOG_CLUT, "%s: Path %d: CLUT[%d] = %08x\n", machine().describe_context(), Path, clut_index, value);
+		m_clut[clut_index] = value & 0x00fcfcfc;
+		return;
+	}
+
+	LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path %d: ", machine().describe_context(), screen().vpos(), Path);
+
 	switch (reg)
 	{
-		case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87: // CLUT 0 - 63
-		case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
-		case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97:
-		case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
-		case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
-		case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
-		case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
-		case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
-			{
-				const uint8_t clut_index = m_clut_bank[Path] * 0x40 + (reg - 0x80);
-				LOGMASKED(LOG_CLUT, "%s: Path %d: CLUT[%d] = %08x\n", machine().describe_context(), Path, clut_index, value);
-				m_clut[clut_index] = value & 0x00fcfcfc;
-			}
-			break;
 		case 0xc0: // Image Coding Method
 			if (Path == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Path 0: Image Coding Method = %08x\n", machine().describe_context(), value);
+				LOGMASKED(LOG_REGISTERS, "Image Coding Method = %08x\n", value);
 				m_image_coding_method = value;
 			}
 			break;
 		case 0xc1: // Transparency Control
 			if (Path == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path 0: Transparency Control = %08x\n", machine().describe_context(), screen().vpos(), value);
+				LOGMASKED(LOG_REGISTERS, "Transparency Control = %08x\n", value);
 				m_transparency_control = value;
 			}
 			break;
 		case 0xc2: // Plane Order
 			if (Path == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path 0: Plane Order = %08x\n", machine().describe_context(), screen().vpos(), value & 7);
+				LOGMASKED(LOG_REGISTERS, "Plane Order = %08x\n", value & 7);
 				m_plane_order = value & 0x00000007;
 			}
 			break;
 		case 0xc3: // CLUT Bank Register
-			LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path %d: CLUT Bank Register = %08x\n", machine().describe_context(), screen().vpos(), Path, value & 3);
+			LOGMASKED(LOG_REGISTERS, "CLUT Bank Register = %08x\n", value & 3);
 			m_clut_bank[Path] = Path ? (2 | (value & 0x00000001)) : (value & 0x00000003);
 			break;
 		case 0xc4: // Transparent Color A
 			if (Path == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path 0: Transparent Color A = %08x\n", machine().describe_context(), screen().vpos(), value);
+				LOGMASKED(LOG_REGISTERS, "Transparent Color A = %08x\n", value);
 				m_transparent_color[0] = value & 0x00fcfcfc;
 			}
 			break;
 		case 0xc6: // Transparent Color B
 			if (Path == 1)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path 1: Transparent Color B = %08x\n", machine().describe_context(), screen().vpos(), value);
+				LOGMASKED(LOG_REGISTERS, "Transparent Color B = %08x\n", value);
 				m_transparent_color[1] = value & 0x00fcfcfc;
 			}
 			break;
 		case 0xc7: // Mask Color A
 			if (Path == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path 0: Mask Color A = %08x\n", machine().describe_context(), screen().vpos(), value);
+				LOGMASKED(LOG_REGISTERS, "Mask Color A = %08x\n", value);
 				m_mask_color[0] = value & 0x00fcfcfc;
 			}
 			break;
 		case 0xc9: // Mask Color B
 			if (Path == 1)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path 1: Mask Color B = %08x\n", machine().describe_context(), screen().vpos(), value);
+				LOGMASKED(LOG_REGISTERS, "Mask Color B = %08x\n", value);
 				m_mask_color[1] = value & 0x00fcfcfc;
 			}
 			break;
 		case 0xca: // Delta YUV Absolute Start Value A
 			if (Path == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path 0: Delta YUV Absolute Start Value A = %08x\n", machine().describe_context(), screen().vpos(), value);
+				LOGMASKED(LOG_REGISTERS, "Delta YUV Absolute Start Value A = %08x\n", value);
 				m_dyuv_abs_start[0] = value;
 			}
 			break;
 		case 0xcb: // Delta YUV Absolute Start Value B
 			if (Path == 1)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path 1: Delta YUV Absolute Start Value B = %08x\n", machine().describe_context(), screen().vpos(), value);
+				LOGMASKED(LOG_REGISTERS, "Delta YUV Absolute Start Value B = %08x\n", value);
 				m_dyuv_abs_start[1] = value;
 			}
 			break;
 		case 0xcd: // Cursor Position
 			if (Path == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path 0: Cursor Position = %08x\n", machine().describe_context(), screen().vpos(), value);
+				LOGMASKED(LOG_REGISTERS, "Cursor Position = %08x\n", value);
 				m_cursor_position = value;
 			}
 			break;
 		case 0xce: // Cursor Control
 			if (Path == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path 0: Cursor Control = %08x\n", machine().describe_context(), screen().vpos(), value);
+				LOGMASKED(LOG_REGISTERS, "Cursor Control = %08x\n", value);
 				m_cursor_control = value;
 			}
 			break;
 		case 0xcf: // Cursor Pattern
 			if (Path == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path 0: Cursor Pattern[%d] = %04x\n", machine().describe_context(), screen().vpos(), (value >> 16) & 0x000f, value & 0x0000ffff);
+				LOGMASKED(LOG_REGISTERS, "Cursor Pattern[%d] = %04x\n", (value >> 16) & 0x000f, value & 0x0000ffff);
 				m_cursor_pattern[(value >> 16) & 0x000f] = value & 0x0000ffff;
 			}
 			break;
-		case 0xd0: // matte Control 0-7
-		case 0xd1:
-		case 0xd2:
-		case 0xd3:
-		case 0xd4:
-		case 0xd5:
-		case 0xd6:
-		case 0xd7:
-			LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path %d: matte Control %d = %08x\n", machine().describe_context(), screen().vpos(), Path, reg & 7, value);
+		case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7:// matte Control 0-7
+			LOGMASKED(LOG_REGISTERS, "matte Control %d = %08x\n", reg & 7, value);
 			m_matte_control[reg & 7] = value;
 			update_matte_arrays();
 			break;
 		case 0xd8: // Backdrop Color
 			if (Path == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path 0: Backdrop Color = %08x\n", machine().describe_context(), screen().vpos(), value);
+				LOGMASKED(LOG_REGISTERS, "Backdrop Color = %08x\n", value);
 				m_backdrop_color = value;
 			}
 			break;
 		case 0xd9: // Mosaic Pixel Hold Factor A
 			if (Path == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path 0: Mosaic Pixel Hold Factor A = %08x\n", machine().describe_context(), screen().vpos(), value);
+				LOGMASKED(LOG_REGISTERS, "Mosaic Pixel Hold Factor A = %08x\n", value);
 				m_mosaic_hold[0] = value;
 			}
 			break;
 		case 0xda: // Mosaic Pixel Hold Factor B
 			if (Path == 1)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path 1: Mosaic Pixel Hold Factor B = %08x\n", machine().describe_context(), screen().vpos(), value);
+				LOGMASKED(LOG_REGISTERS, "Mosaic Pixel Hold Factor B = %08x\n", value);
 				m_mosaic_hold[1] = value;
 			}
 			break;
 		case 0xdb: // Weight Factor A
 			if (Path == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path 0: Weight Factor A = %08x\n", machine().describe_context(), screen().vpos(), value);
+				LOGMASKED(LOG_REGISTERS, "Weight Factor A = %08x\n", value);
 				m_weight_factor[0][0] = value & 0x3f;
 				update_matte_arrays();
 			}
@@ -257,7 +242,7 @@ void mcd212_device::set_register(uint8_t reg, uint32_t value)
 		case 0xdc: // Weight Factor B
 			if (Path == 1)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path 1: Weight Factor B = %08x\n", machine().describe_context(), screen().vpos(), value);
+				LOGMASKED(LOG_REGISTERS, "Weight Factor B = %08x\n", value);
 				m_weight_factor[1][0] = value & 0x3f;
 				update_matte_arrays();
 			}
@@ -1158,10 +1143,10 @@ int mcd212_device::ram_dtack_cycle_count()
 
 	const int x = screen().hpos();
 	const int y = screen().vpos() / 2;
-	const bool x_outside_active_display = (x >= 408);
+	const bool x_outside_active_display = (x > screen().visible_area().right());
 
 	// No contending for Ch.1/Ch.2 timing slots during the final 8-pixel area on all lines
-	if (x >= 472)
+	if (x >= screen().width() - 16)
 		return 2;
 
 	// No contending for Ch.1/Ch.2 timing slots during the free-run area of ICA lines

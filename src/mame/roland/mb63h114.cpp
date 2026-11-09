@@ -11,7 +11,7 @@
     SCO1 (36) to CLK0 (37) to obtain the standard 1.6 MHz master clock.
     This is divided to produce 100, 50, 25 and 12.5 kHz outputs on A (3),
     B (5), C (7) and D (4). These outputs are normally connected to the
-    XCK0–XCK7 inputs (56–57, 59–64), upper address lines and chip selects
+    XCK0–XCK7 inputs (56–57, 59–64), upper address lines and chip selects
     of sample mask ROMs, and 40H151 multiplexers and demultiplexers, but
     may also be used to drive other circuits.
 

@@ -18,12 +18,15 @@
 */
 
 #include "emu.h"
+
+#include "mb63h149.h"
+
 #include "cpu/mcs96/i8x9x.h"
 #include "machine/bankdev.h"
-#include "mb63h149.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "video/msm6222b.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -69,8 +72,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void d10(machine_config &config);
-	void d110(machine_config &config);
+	void d10(machine_config &config) ATTR_COLD;
+	void d110(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -88,7 +91,7 @@ private:
 	uint8_t port0_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
-	void d10_palette(palette_device &palette) const;
+	void d10_palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void d10_map(address_map &map) ATTR_COLD;
@@ -198,7 +201,7 @@ void roland_d10_state::midi_w(uint8_t data)
 
 TIMER_DEVICE_CALLBACK_MEMBER(roland_d10_state::midi_timer_cb)
 {
-	const static uint8_t midi_data[3] = { 0x91, 0x40, 0x7f };
+	constexpr uint8_t midi_data[3] = { 0x91, 0x40, 0x7f };
 	m_midi = midi_data[m_midi_pos++];
 	logerror("midi_in %02x\n", m_midi);
 	m_maincpu->serial_w(m_midi);

@@ -143,8 +143,6 @@ void kmkide_ata_device::ide_cs1_w(offs_t offset, u8 data)
 	if (offset == 0)
 	{
 		m_latch[1] = data;
-		//uint16_t ide_data = m_latch[1] | (data);
-		//m_ata->cs0_w(0, ide_data);
 		return;
 	}
 	m_ata->cs1_w(offset, data);

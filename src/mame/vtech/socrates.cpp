@@ -1591,7 +1591,7 @@ ROM_START(socrates)
 	ROM_LOAD("speech_eng_vsm1.bin", 0x0000, 0x4000, CRC(888e3ddd) SHA1(33af6a21ba6d826071c9d48557b1c9012752570b)) // 16k in serial rom
 	ROM_LOAD("speech_eng_vsm2.bin", 0x4000, 0x4000, CRC(de4ac89d) SHA1(3dfa853b02df756a9b72def94a39310992ee11c7)) // 16k in serial rom
 	ROM_LOAD("speech_eng_vsm3.bin", 0x8000, 0x4000, CRC(972384aa) SHA1(ffcb1d633ca6bffc7f481ec505da447e5b847f16)) // 16k in serial rom
-	ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
+	ROM_FILL(0xc000, 0x4000, 0xff) // last vsm isn't present, FF fill
 ROM_END
 
 ROM_START(socratfc)
@@ -1603,13 +1603,11 @@ ROM_START(socratfc)
 	ROM_LOAD("tmp42c40p1844.u6", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
 	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
-	ROM_LOAD("speech_fra_internal.bin", 0x0000, 0x2000, NO_DUMP)
+	ROM_LOAD("speech_fra_internal.bin", 0x0000, 0x2000, CRC(d08310a3) SHA1(43a3ac3f8206a3bd11d9ac8bac1e93031f935523) )
 
 	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // speech serial modules outside of the speech chip but still on speech cart
-	ROM_LOAD("speech_fra_vsm1.bin", 0x0000, 0x4000, NO_DUMP) // 16k in serial rom
-	ROM_LOAD("speech_fra_vsm2.bin", 0x4000, 0x4000, NO_DUMP) // 16k in serial rom
-	ROM_LOAD("speech_fra_vsm3.bin", 0x8000, 0x4000, NO_DUMP) // 16k in serial rom
-	ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
+	ROM_LOAD("speech_fra_vsm1.bin", 0x0000, 0x4000, CRC(b1146420) SHA1(a2738a017b8257fe0f82731883e90d87a7232560) ) // 16k in serial rom
+	ROM_FILL(0x4000, 0xc000, 0xff) // last 3 vsms aren't present, FF fill
 ROM_END
 
 ROM_START(profweis)

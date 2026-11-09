@@ -426,6 +426,8 @@ void dp83932c_device::send_complete_cb(int result)
 
 		m_reg[TCR] |= TCR_PTX;
 	}
+	else
+		m_reg[TCR] |= TCR_PTX | TCR_NCRS | TCR_CRSL;
 
 	// write descriptor status
 	write_bus_word(EA(m_reg[UTDA], m_reg[TTDA]), m_reg[TCR] & TCR_TPS);

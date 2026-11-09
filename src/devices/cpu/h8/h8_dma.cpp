@@ -716,12 +716,12 @@ u16 h8s_dma_channel_device::channel_flags(int submodule) const
 			res |= h8_dma_state::MODE_16;
 		if(!BIT(m_dmacr, 13))
 			res |= h8_dma_state::SOURCE_IDLE;
-		else if(!BIT(m_dmacr, 14))
+		else if(BIT(m_dmacr, 14))
 			res |= h8_dma_state::SOURCE_DECREMENT;
 
 		if(!BIT(m_dmacr, 5))
 			res |= h8_dma_state::DEST_IDLE;
-		else if(!BIT(m_dmacr, 6))
+		else if(BIT(m_dmacr, 6))
 			res |= h8_dma_state::DEST_DECREMENT;
 
 		if(!BIT(m_dmacr, 12))

@@ -62,7 +62,6 @@ private:
 	required_device<intelfsh8_device> biosrom;
 	uint32_t ram_size = 0;
 
-	virtual uint8_t header_type_r() override;
 	uint8_t unknown_r();
 	void unknown_w(uint8_t data);
 	uint32_t ram_size_r();

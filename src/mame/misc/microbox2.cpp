@@ -45,9 +45,10 @@ public:
 	microbx2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_sam(*this, "sam")
 		, m_epromdisc(*this, "epromdisc")
 		, m_ram(*this, "ram", 0x10000, ENDIANNESS_BIG)
-		, m_map_view(*this, "map_view")
+		, m_rom(*this, "maincpu")
 		, m_pia1(*this, "pia1")
 		, m_video_ram(*this, "video_ram")
 		, m_fdc(*this, "fdc")
@@ -65,9 +66,10 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<sam6883_device> m_sam;
 	required_region_ptr<uint8_t> m_epromdisc;
 	memory_share_creator<uint8_t> m_ram;
-	memory_view m_map_view;
+	required_region_ptr<uint8_t> m_rom;
 	required_device<pia6821_device> m_pia1;
 	required_shared_ptr<uint16_t> m_video_ram;
 	required_device<wd1770_device> m_fdc;
@@ -80,7 +82,6 @@ private:
 	UPD7220_DISPLAY_PIXELS_MEMBER(display_pixels);
 
 	void mem_map(address_map &map) ATTR_COLD;
-	void ram_map(address_map &map) ATTR_COLD;
 	void rom0_map(address_map &map) ATTR_COLD;
 	void rom1_map(address_map &map) ATTR_COLD;
 	void rom2_map(address_map &map) ATTR_COLD;
@@ -97,7 +98,10 @@ private:
 	void pia2_pb_w(uint8_t data);
 	void pia2_pc_w(uint8_t data);
 
+	void update_map();
+
 	uint8_t m_keydata;
+	bool m_map = false;
 	uint16_t m_eprom_addr;
 	int m_ls393_input;
 };
@@ -105,16 +109,14 @@ private:
 
 void microbx2_state::mem_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw("sam", FUNC(sam6883_device::read), FUNC(sam6883_device::write));
+	map(0x0000, 0xffff).m(m_sam, FUNC(sam6883_device::amap));
 }
 
-void microbx2_state::ram_map(address_map &map)
+void microbx2_state::update_map()
 {
-	// $0000-$FEFF
-	map(0x0000, 0xffff).ram().share("ram");
-	map(0xe000, 0xefff).view(m_map_view);
-	m_map_view[0](0xe000, 0xefff).rom().region("maincpu", 0x0000);
-	map(0xf000, 0xffff).rom().region("maincpu", 0x1000);
+	// RAM space: ROM is read over $F000-$FFFF, and over $E000-$EFFF when mapped;
+	// writes always reach RAM
+	m_sam->select_ram_bank(0xe000, m_map ? 1 : 0);
 }
 
 void microbx2_state::rom0_map(address_map &map)
@@ -213,7 +215,14 @@ void microbx2_state::machine_start()
 {
 	m_ls393_input = 1;
 
+	m_sam->map_ram(0x0000, 0xffff, &m_ram[0], &m_ram[0]);
+	m_sam->map_ram(0xf000, 0xffff, &m_rom[0x1000], &m_ram[0xf000]);
+	m_sam->configure_ram_bank(0xe000, 0xefff, { { &m_ram[0xe000], &m_ram[0xe000] }, { &m_rom[0x0000], &m_ram[0xe000] } });
+	update_map();
+
 	save_item(NAME(m_eprom_addr));
+	save_item(NAME(m_map));
+	machine().save().register_postload(save_prepost_delegate(FUNC(microbx2_state::update_map), this));
 }
 
 
@@ -236,10 +245,8 @@ void microbx2_state::pia1_pb_w(uint8_t data)
 	m_fdc->dden_w(BIT(data, 1));
 
 	// bit 2: map
-	if (BIT(data, 2))
-		m_map_view.select(0);
-	else
-		m_map_view.disable();
+	m_map = BIT(data, 2);
+	update_map();
 
 	// bit 3: sounder
 	m_beeper->set_state(BIT(data, 3));
@@ -310,8 +317,8 @@ void microbx2_state::microbx2(machine_config &config)
 	gdc.set_display_pixels(FUNC(microbx2_state::display_pixels));
 	gdc.set_screen("screen");
 
-	sam6883_device &sam(SAM6883(config, "sam", 16_MHz_XTAL, m_maincpu));
-	sam.set_addrmap(0, &microbx2_state::ram_map);  // RAM at $0000
+	SAM6883(config, m_sam, 16_MHz_XTAL, m_maincpu);
+	sam6883_device &sam(*m_sam);
 	sam.set_addrmap(1, &microbx2_state::rom0_map); // RAM at $8000
 	sam.set_addrmap(2, &microbx2_state::rom1_map); // RAM at $A000
 	sam.set_addrmap(3, &microbx2_state::rom2_map); // RAM at $C000

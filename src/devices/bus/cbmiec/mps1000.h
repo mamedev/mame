@@ -13,6 +13,8 @@
 
 #include "cbmiec.h"
 
+#include "cpu/upd7810/upd7810.h"
+
 
 
 //**************************************************************************
@@ -24,17 +26,21 @@
 class mps1000_device : public device_t, public device_cbm_iec_interface
 {
 public:
+	static constexpr flags_type emulation_flags() { return flags::NOT_WORKING; }
+
 	// construction/destruction
 	mps1000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	static constexpr flags_type emulation_flags() { return flags::NOT_WORKING; }
-
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
-
-	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+private:
+	required_device<upd7810_device> m_maincpu;
+
+	void mps1000_mem(address_map &map) ATTR_COLD;
 };
 
 

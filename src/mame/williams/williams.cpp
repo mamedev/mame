@@ -2258,6 +2258,7 @@ ROM_START( defence )
 	ROM_LOAD( "defcmnda.snd", 0xf800, 0x0800, CRC(f122d9c9) SHA1(70092fc354a2efbe7365be922fa36309b50d5c6f) )
 ROM_END
 
+// Also found on a PCB with 2732 EPROMs instead of 2716, each one holding a whole 4 KB bank (unused halves are blank).
 ROM_START( defenderom )
 	ROM_REGION( 0x3000, "maincpu", ROMREGION_BE )
 	ROM_LOAD( "rom1.bin",  0x0000, 0x1000, CRC(8c04602b) SHA1(a8ed5afd0b276cebb479b1717666eaabbf75c6a5) )
@@ -2268,8 +2269,8 @@ ROM_START( defenderom )
 	ROM_LOAD( "rom10.bin", 0x0000, 0x0800, CRC(12e2bd1c) SHA1(c2fdf2fced003a0acf037aa6fab141b04c1c81bd) )
 	ROM_LOAD( "rom7.bin",  0x0800, 0x0800, CRC(19e1ac79) SHA1(02925bbfab103304d097d778bda1b169b5f98d9c) )
 	ROM_LOAD( "rom9.bin",  0x1000, 0x0800, CRC(b8ac5966) SHA1(df9ff8c6585f67dc55e54f07f6ec51158aa35ac3) )
-	ROM_LOAD( "rom6.bin",  0x1800, 0x0800, BAD_DUMP CRC(9deaf6d9) SHA1(59b018ba0f3fe6eadfd387dc180ac281460358bc) ) // Bad on the dumped PCB, borrowed from 'defenseb'
-	ROM_LOAD( "rom8.bin",  0x2000, 0x0800, BAD_DUMP CRC(339e092e) SHA1(2f89951dbe55d80df43df8dcf497171f73e726d3) ) // Bad on the dumped PCB, borrowed from 'defenseb'
+	ROM_LOAD( "rom6.bin",  0x1800, 0x0800, CRC(9deaf6d9) SHA1(59b018ba0f3fe6eadfd387dc180ac281460358bc) )
+	ROM_LOAD( "rom8.bin",  0x2000, 0x0800, CRC(4af2142f) SHA1(a3c50003eedddc1b810f7fb4e90029a85c207abd) )
 	ROM_LOAD( "rom5.bin",  0x2800, 0x0800, CRC(871f75a0) SHA1(4ded757dbb375a703e930bd0c46281c0d8479a0c) )
 	ROM_LOAD( "rom4.bin",  0x6000, 0x0800, CRC(65f4efd1) SHA1(a960fd1559ed74b81deba434391e49fc6ec389ca) )
 

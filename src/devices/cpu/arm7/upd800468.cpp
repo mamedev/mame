@@ -125,7 +125,7 @@ void upd800468_device::upd800468_map(address_map &map)
 
 upd800468_device::upd800468_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm7_cpu_device(mconfig, UPD800468, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_LITTLE)
-	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, address_map_constructor(FUNC(upd800468_device::upd800468_map), this))
+	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, 32, 12, address_map_constructor(FUNC(upd800468_device::upd800468_map), this))
 	, m_vic(*this, "vic")
 	, m_timer(*this, "timer%u", 0)
 	, m_kbd(*this, "kbd")

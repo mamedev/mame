@@ -51,32 +51,13 @@ Notes:
 
 */
 
-/*
-
-    TODO:
-
-    - SC-3000 return instruction referenced by R when reading ports 60-7f,e0-ff
-    - connect PSG /READY signal to Z80 WAIT
-    - accurate video timing
-    - SH-400 racing controller
-    - SF-7000 serial comms
-
-*/
-
-
 #include "emu.h"
 
-#include "bus/centronics/ctronics.h"
-#include "bus/rs232/rs232.h"
 #include "bus/sega8/sega8_slot.h"
 #include "bus/sg1000_exp/sg1000exp.h"
 #include "bus/sms_ctrl/controllers.h"
 #include "bus/sms_ctrl/smsctrl.h"
 #include "cpu/z80/z80.h"
-#include "imagedev/floppy.h"
-#include "machine/i8251.h"
-#include "machine/i8255.h"
-#include "machine/upd765.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 
@@ -84,19 +65,12 @@ Notes:
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#include "formats/sf7000_dsk.h"
-
 
 namespace {
 
 #define Z80_TAG         "z80"
 #define SN76489AN_TAG   "sn76489an"
-#define UPD765_TAG      "upd765"
-#define UPD8251_TAG     "upd8251"
-#define UPD9255_TAG     "upd9255"
-#define UPD9255_1_TAG   "upd9255_1" // "upd9255_0" is being used by sk1100 device
 #define TMS9918A_TAG    "tms9918a"
-#define RS232_TAG       "rs232"
 
 class sg1000_state_base : public driver_device
 {
@@ -104,6 +78,8 @@ public:
 	sg1000_state_base(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
+		m_vdp(*this, TMS9918A_TAG),
+		m_psg(*this, SN76489AN_TAG),
 		m_rom(*this, Z80_TAG),
 		m_cart(*this, "slot"),
 		m_sgexpslot(*this, "sgexp")
@@ -111,6 +87,8 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
+	required_device<tms9928a_device> m_vdp;
+	required_device<sn76489a_device> m_psg;
 	required_memory_region m_rom;
 	optional_device<sega8_cart_slot_device> m_cart;
 	required_device<sg1000_expansion_slot_device> m_sgexpslot;
@@ -137,6 +115,8 @@ protected:
 
 	uint8_t peripheral_r(offs_t offset);
 	void peripheral_w(offs_t offset, uint8_t data);
+	uint8_t sc3000_io_r(offs_t offset);
+	void sc3000_io_w(offs_t offset, uint8_t data);
 
 	void sg1000_map(address_map &map) ATTR_COLD;
 	void sg1000_io_map(address_map &map) ATTR_COLD;
@@ -193,40 +173,6 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 	void sc3000_base(machine_config &config);
-};
-
-class sf7000_state : public sc3000_state
-{
-public:
-	sf7000_state(const machine_config &mconfig, device_type type, const char *tag) :
-		sc3000_state(mconfig, type, tag),
-		m_fdc(*this, UPD765_TAG),
-		m_centronics(*this, "centronics"),
-		m_floppy0(*this, UPD765_TAG ":0:3ssdd"),
-		m_romview(*this, "romview")
-	{ }
-
-	void sf7000(machine_config &config);
-
-private:
-	required_device<upd765a_device> m_fdc;
-	required_device<centronics_device> m_centronics;
-	required_device<floppy_image_device> m_floppy0;
-
-	memory_view m_romview;
-
-	int m_centronics_busy = 0;
-
-	virtual void machine_start() override ATTR_COLD;
-
-	void write_centronics_busy(int state);
-	uint8_t ppi_pa_r();
-	void ppi_pc_w(uint8_t data);
-
-	void sf7000_io_map(address_map &map) ATTR_COLD;
-	void sf7000_map(address_map &map) ATTR_COLD;
-
-	static void floppy_formats(format_registration &fr);
 };
 
 /***************************************************************************
@@ -335,50 +281,37 @@ void sg1000_state::sc3000_map(address_map &map)
     ADDRESS_MAP( sc3000_io_map )
 -------------------------------------------------*/
 
+uint8_t sg1000_state::sc3000_io_r(offs_t offset)
+{
+	uint8_t data = m_cart->read_io(offset);
+
+	if (!BIT(offset, 6))
+		data &= m_vdp->read(offset & 1);
+
+	if (!BIT(offset, 5))
+		data &= peripheral_r(offset & 3);
+
+	return data;
+}
+
+void sg1000_state::sc3000_io_w(offs_t offset, uint8_t data)
+{
+	m_cart->write_io(offset, data);
+
+	if (!BIT(offset, 7))
+		m_psg->write(data);
+
+	if (!BIT(offset, 6))
+		m_vdp->write(offset & 1, data);
+
+	if (!BIT(offset, 5))
+		peripheral_w(offset & 3, data);
+}
+
 void sg1000_state::sc3000_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(m_cart, FUNC(sega8_cart_slot_device::read_io), FUNC(sega8_cart_slot_device::write_io));
-	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-	map(0xbe, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::read), FUNC(tms9918a_device::write));
-	map(0xdc, 0xdf).rw(FUNC(sg1000_state::peripheral_r), FUNC(sg1000_state::peripheral_w));
-}
-
-/* This is how the I/O ports are really mapped, but MAME does not support overlapping ranges
-void sg1000_state::sc3000_io_map(address_map &map)
-{
-    map.global_mask(0xff);
-    map(0x00, 0x00).mirror(0xdf).rw(UPD9255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
-    map(0x00, 0x00).mirror(0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-    map(0x00, 0x01).mirror(0xae).rw(TMS9918A_TAG, FUNC(tms9918a_device::read), FUNC(tms9918a_device::write));
-    map(0x60, 0x60).mirror(0x9f).r(FUNC(sg1000_state::sc3000_r_r));
-}
-*/
-
-/*-------------------------------------------------
-    ADDRESS_MAP( sf7000_map )
--------------------------------------------------*/
-
-void sf7000_state::sf7000_map(address_map &map)
-{
-	map(0x0000, 0xffff).ram();
-	map(0x0000, 0x3fff).view(m_romview);
-	m_romview[0](0x0000, 0x3fff).rom().region(Z80_TAG, 0);
-}
-
-/*-------------------------------------------------
-    ADDRESS_MAP( sf7000_io_map )
--------------------------------------------------*/
-
-void sf7000_state::sf7000_io_map(address_map &map)
-{
-	map.global_mask(0xff);
-	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
-	map(0xbe, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::read), FUNC(tms9918a_device::write));
-	map(0xdc, 0xdf).rw(FUNC(sf7000_state::peripheral_r), FUNC(sf7000_state::peripheral_w));
-	map(0xe0, 0xe1).m(m_fdc, FUNC(upd765a_device::map));
-	map(0xe4, 0xe7).rw(UPD9255_1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xe8, 0xe9).rw(UPD8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x00, 0xff).rw(FUNC(sg1000_state::sc3000_io_r), FUNC(sg1000_state::sc3000_io_w));
 }
 
 /***************************************************************************
@@ -484,117 +417,9 @@ static INPUT_PORTS_START( sc3000 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sg1000_state::trigger_nmi), 0)
 INPUT_PORTS_END
 
-/*-------------------------------------------------
-    INPUT_PORTS( sf7000 )
--------------------------------------------------*/
-
-static INPUT_PORTS_START( sf7000 )
-	PORT_INCLUDE( sc3000 )
-
-	PORT_START("BAUD")
-	PORT_CONFNAME( 0x07, 0x05, "Baud rate")
-	PORT_CONFSETTING( 0x00, "9600 baud" )
-	PORT_CONFSETTING( 0x01, "4800 baud" )
-	PORT_CONFSETTING( 0x02, "2400 baud" )
-	PORT_CONFSETTING( 0x03, "1200 baud" )
-	PORT_CONFSETTING( 0x04, "600 baud" )
-	PORT_CONFSETTING( 0x05, "300 baud" )
-INPUT_PORTS_END
-
 /***************************************************************************
     DEVICE CONFIGURATION
 ***************************************************************************/
-
-/*-------------------------------------------------
-    I8255 INTERFACE
--------------------------------------------------*/
-
-void sf7000_state::write_centronics_busy(int state)
-{
-	m_centronics_busy = state;
-}
-
-uint8_t sf7000_state::ppi_pa_r()
-{
-	/*
-	    Signal  Description
-
-	    PA0     INT from FDC
-	    PA1     BUSY from Centronics printer
-	    PA2     INDEX from FDD
-	    PA3
-	    PA4
-	    PA5
-	    PA6
-	    PA7
-	*/
-
-	uint8_t data = 0;
-
-	data |= m_fdc->get_irq() ? 0x01 : 0x00;
-	data |= m_centronics_busy << 1;
-	data |= m_floppy0->idx_r() << 2;
-
-	return data;
-}
-
-void sf7000_state::ppi_pc_w(uint8_t data)
-{
-	/*
-	    Signal  Description
-
-	    PC0     /INUSE signal to FDD (drives LED?)
-	    PC1     /MOTOR ON signal to FDD
-	    PC2     TC signal to FDC
-	    PC3     RESET signal to FDC
-	    PC4     not connected
-	    PC5     not connected
-	    PC6     /ROM SEL (switch between IPL ROM and RAM)
-	    PC7     /STROBE to Centronics printer
-	*/
-
-	if (!BIT(data, 0))
-		m_fdc->set_floppy(m_floppy0);
-	else
-		m_fdc->set_floppy(nullptr);
-
-	/* floppy motor */
-	m_floppy0->mon_w(BIT(data, 1));
-
-	/* FDC terminal count */
-	m_fdc->tc_w(BIT(data, 2));
-
-	/* FDC reset */
-	m_fdc->reset_w(BIT(data, 3));
-
-	/* ROM selection */
-	if (BIT(data, 6))
-		m_romview.disable();
-	else
-		m_romview.select(0);
-
-	/* printer strobe */
-	m_centronics->write_strobe(BIT(data, 7));
-}
-
-/*-------------------------------------------------
-    upd765_interface sf7000_upd765_interface
--------------------------------------------------*/
-
-void sf7000_state::floppy_formats(format_registration &fr)
-{
-	fr.add_mfm_containers();
-	fr.add(FLOPPY_SF7000_FORMAT);
-}
-
-/*-------------------------------------------------
-    floppy_interface sf7000_floppy_interface
--------------------------------------------------*/
-
-static void sf7000_floppies(device_slot_interface &device)
-{
-	device.option_add("3ssdd", FLOPPY_3_SSDD);
-}
 
 /*-------------------------------------------------
     MACHINE_START( sg1000 )
@@ -637,9 +462,9 @@ void sc3000_state::machine_start()
 {
 	sg1000_state_base::machine_start();
 
-	if (m_cart && m_cart->exists() && (m_cart->get_type() == SEGA8_BASIC_L3 || m_cart->get_type() == SEGA8_MUSIC_EDITOR
+	if (m_cart && (m_cart->dsram() || (m_cart->exists() && (m_cart->get_type() == SEGA8_BASIC_L3 || m_cart->get_type() == SEGA8_MUSIC_EDITOR
 								|| m_cart->get_type() == SEGA8_DAHJEE_TYPEA || m_cart->get_type() == SEGA8_DAHJEE_TYPEB
-								|| m_cart->get_type() == SEGA8_MULTICART || m_cart->get_type() == SEGA8_MEGACART))
+								|| m_cart->get_type() == SEGA8_MULTICART || m_cart->get_type() == SEGA8_MEGACART))))
 	{
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8sm_delegate(*m_cart, FUNC(sega8_cart_slot_device::read_ram)));
 		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, write8sm_delegate(*m_cart, FUNC(sega8_cart_slot_device::write_ram)));
@@ -650,18 +475,6 @@ void sc3000_state::machine_start()
 
 	m_ctrlports[0]->out_w(0x7f, 0x00);
 	m_ctrlports[1]->out_w(0x7f, 0x00);
-}
-
-
-/*-------------------------------------------------
-    MACHINE_START( sf7000 )
--------------------------------------------------*/
-
-void sf7000_state::machine_start()
-{
-	sc3000_state::machine_start();
-
-	save_item(NAME(m_centronics_busy));
 }
 
 /***************************************************************************
@@ -684,7 +497,9 @@ void sg1000_state_base::sg1000_base(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SN76489A(config, SN76489AN_TAG, 10.738635_MHz_XTAL / 3).add_route(ALL_OUTPUTS, "mono", 1.00);
+	SN76489A(config, m_psg, 10.738635_MHz_XTAL / 3);
+	m_psg->ready_cb().set_inputline(m_maincpu, Z80_INPUT_LINE_WAIT).invert();
+	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("sg1000");
@@ -768,7 +583,7 @@ void sc3000_state::sc3000(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &sc3000_state::sc3000_io_map);
 
 	/* cartridge */
-	SC3000_CART_SLOT(config, m_cart, sg1000_cart, nullptr).set_must_be_loaded(true);
+	SC3000_CART_SLOT(config, m_cart, sc3000_cart, nullptr);
 }
 
 void sc3000_state::sc3000pal(machine_config &config)
@@ -787,51 +602,6 @@ void sc3000_state::sc3000pal(machine_config &config)
 	m_sgexpslot->set_default_option("sk1100e");
 }
 
-/*-------------------------------------------------
-    machine_config( sf7000 )
--------------------------------------------------*/
-
-void sf7000_state::sf7000(machine_config &config)
-{
-	// FIXME: this thing is actually a cartridge slot peripheral for the SC-3000 and shouldn't be a separate machine
-
-	sc3000_base(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &sf7000_state::sf7000_map);
-	m_maincpu->set_addrmap(AS_IO, &sf7000_state::sf7000_io_map);
-
-	/* devices */
-	i8255_device &ppi(I8255(config, UPD9255_1_TAG));
-	ppi.in_pa_callback().set(FUNC(sf7000_state::ppi_pa_r));
-	ppi.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::write));
-	ppi.out_pc_callback().set(FUNC(sf7000_state::ppi_pc_w));
-	ppi.tri_pc_callback().set_constant(0x8f); // /ROM SEL must be active after reset
-
-	i8251_device &upd8251(I8251(config, UPD8251_TAG, 4.9152_MHz_XTAL / 2));
-	upd8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
-	upd8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
-	upd8251.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
-
-	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(UPD8251_TAG, FUNC(i8251_device::write_rxd));
-	rs232.cts_handler().set(UPD8251_TAG, FUNC(i8251_device::write_cts));
-	rs232.dsr_handler().set(UPD8251_TAG, FUNC(i8251_device::write_dsr));
-
-	UPD765A(config, m_fdc, 16_MHz_XTAL / 4); // clocked through SED9420C
-	m_fdc->set_ready_line_connected(true); // or disconnected by split pad?
-	m_fdc->set_select_lines_connected(false); // FIXME: actually connected according to schematics
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", sf7000_floppies, "3ssdd", sf7000_state::floppy_formats);
-
-	CENTRONICS(config, m_centronics, centronics_devices, "printer");
-	m_centronics->busy_handler().set(FUNC(sf7000_state::write_centronics_busy));
-
-	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
-	m_centronics->set_output_latch(cent_data_out);
-
-	/* software lists */
-	SOFTWARE_LIST(config, "flop_list").set_original("sf7000");
-}
-
 /***************************************************************************
     ROMS
 ***************************************************************************/
@@ -845,11 +615,6 @@ ROM_END
 #define rom_sc3000 rom_sg1000
 
 #define rom_sc3000pal rom_sg1000
-
-ROM_START( sf7000 )
-	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
-	ROM_LOAD( "ipl.rom", 0x0000, 0x2000, CRC(d76810b8) SHA1(77339a6db2593aadc638bed77b8e9bed5d9d87e3) )
-ROM_END
 
 ROM_START( omv1000 )
 	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
@@ -878,4 +643,3 @@ CONS( 1984, omv2000,   sg1000, 0,      omv2000,   omv2000, omv2000_state, empty_
 // PAL/SECAM versions of SC-3000 were distributed by Yeno in France, by John Sands Electronics in Australia and by Grandstand Leisure in New Zealand.
 COMP( 1983, sc3000,    0,      sg1000, sc3000,    sc3000,  sc3000_state,  empty_init, "Sega",             "SC-3000 (NTSC)",                           MACHINE_SUPPORTS_SAVE )
 COMP( 1983, sc3000pal, sc3000, 0,      sc3000pal, sc3000,  sc3000_state,  empty_init, "Sega",             "SC-3000 (PAL)",                            MACHINE_SUPPORTS_SAVE )
-COMP( 1983, sf7000,    sc3000, 0,      sf7000,    sf7000,  sf7000_state,  empty_init, "Sega",             "SC-3000/Super Control Station SF-7000",    MACHINE_SUPPORTS_SAVE )

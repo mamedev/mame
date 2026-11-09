@@ -155,8 +155,8 @@ namespace {
 class galivan_state : public driver_device
 {
 public:
-	galivan_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag)
+	galivan_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_videoram(*this, "videoram")
 		, m_spriteram(*this, "spriteram")
@@ -172,13 +172,9 @@ public:
 		, m_sprpalbank(*this, "sprpalbank_prom")
 	{ }
 
-	void galivan(machine_config &config);
+	void galivan(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
-
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<buffered_spriteram8_device> m_spriteram;
@@ -196,8 +192,11 @@ protected:
 	// video-related
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_tx_tilemap = nullptr;
-	uint8_t m_shift_scroll = 0U; //youmab
 	uint32_t m_shift_val = 0U;
+
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void sound_command_w(uint8_t data);
 
@@ -206,7 +205,7 @@ protected:
 
 	void io_map(address_map &map) ATTR_COLD;
 
-	void common(machine_config &config);
+	void common(machine_config &config) ATTR_COLD;
 
 private:
 	uint8_t m_scrollx[2]{}, m_scrolly[2]{};
@@ -230,12 +229,12 @@ private:
 class dangarj_state : public galivan_state
 {
 public:
-	dangarj_state(const machine_config &mconfig, device_type type, const char *tag) :
-		galivan_state(mconfig, type, tag),
-		m_prot(*this, "prot_chip")
+	dangarj_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galivan_state(mconfig, type, tag)
+		, m_prot(*this, "prot_chip")
 	{ }
 
-	void dangarj(machine_config &config);
+	void dangarj(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<nb1412m2_device> m_prot;
@@ -246,21 +245,24 @@ private:
 class ninjemak_state : public galivan_state
 {
 public:
-	ninjemak_state(const machine_config &mconfig, device_type type, const char *tag) :
-		galivan_state(mconfig, type, tag)
+	ninjemak_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galivan_state(mconfig, type, tag)
 		, m_nb1414m4(*this, "nb1414m4")
 	{ }
 
-	void ninjemak(machine_config &config);
+	void ninjemak(machine_config &config) ATTR_COLD;
 
 protected:
+	uint16_t m_scrollx = 0U;
+	uint16_t m_scrolly = 0U;
+	uint8_t m_dispdisable = 0U;
+
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-	uint16_t m_scrollx = 0U;
-	uint16_t m_scrolly = 0U;
-	uint8_t m_dispdisable = 0U;
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void palette(palette_device &palette) const ATTR_COLD;
 
 	void main_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
@@ -271,27 +273,52 @@ private:
 	void blit_trigger_w(uint8_t data);
 	void vblank_ack_w(uint8_t data);
 	void gfxbank_w(uint8_t data);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+};
+
+class youmat_state : public ninjemak_state
+{
+public:
+	youmat_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ninjemak_state(mconfig, type, tag)
+	{ }
+
+	void youmat(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	uint8_t m_scroll[4]{};
+
+	void gfxbank_w(uint8_t data);
+	TILEMAP_MAPPER_MEMBER(bg_scan);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void youmat_main_map(address_map &map) ATTR_COLD;
+	void youmat_io_map(address_map &map) ATTR_COLD;
 };
 
 class youmab_state : public ninjemak_state
 {
 public:
-	youmab_state(const machine_config &mconfig, device_type type, const char *tag) :
-		ninjemak_state(mconfig, type, tag)
+	youmab_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ninjemak_state(mconfig, type, tag)
 		, m_extra_rombank(*this, "extra_rombank")
 	{ }
 
-	void youmab(machine_config &config);
+	void youmab(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_memory_bank m_extra_rombank;
+
+	uint8_t m_shift_scroll = 0U;
 
 	void extra_bank_w(uint8_t data);
 	uint8_t _8a_r();
@@ -500,6 +527,22 @@ TILE_GET_INFO_MEMBER(ninjemak_state::get_tx_tile_info)
 			0);
 }
 
+// the background map ROMs hold the 512x32 map as four 128x32 strips
+TILEMAP_MAPPER_MEMBER(youmat_state::bg_scan)
+{
+	return ((col & 0x180) << 5) | (row << 7) | (col & 0x7f);
+}
+
+TILE_GET_INFO_MEMBER(youmat_state::get_tx_tile_info)
+{
+	uint8_t const attr = m_videoram[tile_index + 0x400];
+	uint16_t const code = m_videoram[tile_index] | ((attr & 0x03) << 8);
+	tileinfo.set(0,
+			code,
+			(attr & 0x1c) >> 2,
+			0);
+}
+
 
 
 /***************************************************************************
@@ -524,6 +567,14 @@ void ninjemak_state::video_start()
 	m_tx_tilemap->set_transparent_pen(15);
 }
 
+void youmat_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(youmat_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(youmat_state::bg_scan)), 16, 16, 512, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(youmat_state::get_tx_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+
+	m_tx_tilemap->set_transparent_pen(15);
+}
+
 
 
 /***************************************************************************
@@ -542,8 +593,8 @@ void galivan_state::videoram_w(offs_t offset, uint8_t data)
 void galivan_state::gfxbank_w(uint8_t data)
 {
 	// bits 0 and 1 coin counters
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	machine().bookkeeping().coin_counter_w(1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 
 	// bit 2 flip screen
 	flip_screen_set(data & 0x04);
@@ -551,14 +602,14 @@ void galivan_state::gfxbank_w(uint8_t data)
 	// bit 7 selects one of two ROM banks for c000-dfff
 	m_rombank->set_entry((data & 0x80) >> 7);
 
-	//  logerror("%s port 40 = %02x\n", machine().describe_context(), data);
+	//logerror("%s port 40 = %02x\n", machine().describe_context(), data);
 }
 
 void ninjemak_state::gfxbank_w(uint8_t data)
 {
 	// bits 0 and 1 coin counters
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	machine().bookkeeping().coin_counter_w(1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 
 	// bit 2 flip screen
 	flip_screen_set(data & 0x04);
@@ -577,14 +628,26 @@ void ninjemak_state::gfxbank_w(uint8_t data)
 	{
 		char mess[80];
 		int btz[8];
-		int offs;
 
-		for (offs = 0; offs < 8; offs++) btz[offs] = (((data >> offs) & 0x01) ? 1 : 0);
+		for (int offs = 0; offs < 8; offs++) btz[offs] = BIT(data, offs);
 
 		sprintf(mess, "BK:%01X%01X S:%01X B:%01X T:%01X FF:%01X C2:%01X C1:%01X", btz[7], btz[6], btz[5], btz[4], btz[3], btz[2], btz[1], btz[0]);
 		popmessage(mess);
 	}
 #endif
+}
+
+void youmat_state::gfxbank_w(uint8_t data)
+{
+	// bits 0 and 1 coin counters
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+
+	// bit 2 flip screen
+	flip_screen_set(data & 0x04);
+
+	// bits 7 and 6 select one of four ROM banks for c000-dfff (the program sets bit 4 along with bit 6)
+	m_rombank->set_entry(bitswap<2>(data, 6, 7));
 }
 
 
@@ -698,6 +761,22 @@ uint32_t ninjemak_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
+uint32_t youmat_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->set_scrollx(0, m_scroll[0] | ((m_scroll[1] & 0x0f) << 8) | ((m_scroll[3] & 0x0c) << 10));
+	m_bg_tilemap->set_scrolly(0, m_scroll[2] | ((m_scroll[3] & 0x03) << 8));
+
+	if (BIT(m_scroll[1], 6))
+		bitmap.fill(0, cliprect);
+	else
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	draw_sprites(bitmap, cliprect);
+	if (!BIT(m_scroll[1], 7))
+		m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
 
 void galivan_state::sound_command_w(uint8_t data)
 {
@@ -745,6 +824,13 @@ void ninjemak_state::main_map(address_map &map)
 	map(0xe200, 0xffff).ram();
 }
 
+void youmat_state::youmat_main_map(address_map &map)
+{
+	ninjemak_state::main_map(map);
+
+	map(0xc800, 0xcfff).w(FUNC(youmat_state::videoram_w)); // text RAM mirror
+}
+
 void galivan_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
@@ -786,6 +872,15 @@ void ninjemak_state::io_map(address_map &map)
 	map(0x85, 0x85).portr("DSW2").w(FUNC(ninjemak_state::sound_command_w));
 	map(0x86, 0x86).w(FUNC(ninjemak_state::blit_trigger_w));
 	map(0x87, 0x87).w(FUNC(ninjemak_state::vblank_ack_w));
+}
+
+void youmat_state::youmat_io_map(address_map &map)
+{
+	galivan_state::io_map(map);
+
+	map(0x40, 0x40).w(FUNC(youmat_state::gfxbank_w));
+	map(0x41, 0x44).lw8(NAME([this] (offs_t offset, uint8_t data) { m_scroll[offset] = data; }));
+	map(0x46, 0x46).nopw(); // 1414M4 trigger on the Nichibutsu board
 }
 
 void youmab_state::main_map(address_map &map)
@@ -1082,6 +1177,33 @@ static INPUT_PORTS_START( ninjemak )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( youmat )
+	PORT_INCLUDE( galivan )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)" )   PORT_DIPLOCATION("SW2:8") // only with 10 credits
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 
 static const gfx_layout spritelayout =
@@ -1137,12 +1259,21 @@ void ninjemak_state::machine_start()
 	save_item(NAME(m_dispdisable));
 }
 
+void youmat_state::machine_start()
+{
+	ninjemak_state::machine_start();
+
+	save_item(NAME(m_scroll));
+}
+
 void youmab_state::machine_start()
 {
 	ninjemak_state::machine_start();
 
 	m_extra_rombank->configure_entries(0, 2, memregion("extra_banked_rom")->base(), 0x4000);
 	m_extra_rombank->set_entry(0);
+
+	save_item(NAME(m_shift_scroll));
 }
 
 void galivan_state::machine_reset()
@@ -1262,6 +1393,20 @@ void ninjemak_state::ninjemak(machine_config &config)
 	m_screen->set_screen_update(FUNC(ninjemak_state::screen_update));
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ninjemak);
 	PALETTE(config, m_palette, FUNC(ninjemak_state::palette), 8*16+16*16+256*16, 256);
+}
+
+void youmat_state::youmat(machine_config &config)
+{
+	common(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &youmat_state::youmat_main_map);
+	m_maincpu->set_addrmap(AS_IO, &youmat_state::youmat_io_map);
+
+	// video hardware
+	m_screen->set_screen_update(FUNC(youmat_state::screen_update));
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ninjemak);
+	PALETTE(config, m_palette, FUNC(youmat_state::palette), 8*16+16*16+256*16, 256);
 }
 
 void youmab_state::youmab(machine_config &config)
@@ -1622,48 +1767,6 @@ ROM_START( ninjemak )
 	ROM_LOAD( "yncp-7f.bin",  0x00000, 0x0100, CRC(262d0809) SHA1(a67281af02cef082023c0d7d57e3824aeef67450) ) // sprite palette bank
 ROM_END
 
-/* Galivan hardware. Two PCBs:
-   231086-B: Silkscreened "Tecfri S.A.", "Nichibutsu" and "Made in Spain", with a small sub-board.
-   281286-A: With two small sub-boards, labeled "61212/1" and "61212/2". */
-ROM_START( ninjemat )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "10.e19",       0x00000, 0x8000, CRC(804e7e4c) SHA1(d10edc6b2e283a8b0c8621645949ad70196a0dd6) )
-	ROM_LOAD( "9.e17",        0x08000, 0x4000, CRC(55d8f1a1) SHA1(886ed255007faf67908e8af3e52d7447c9eb260b) )
-	ROM_LOAD( "8.e16",        0x10000, 0x4000, CRC(8c5782da) SHA1(2673eae866e9c1e1832f2525c167972b147d2147) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // sound CPU code
-	ROM_LOAD( "16.e13",       0x00000, 0x4000, CRC(dd7e0be2) SHA1(32c63f1dde9561b7fce7e9dba7d34511fdd7d0b0) )
-	ROM_LOAD( "15.e15",       0x04000, 0x8000, CRC(236c9824) SHA1(498b8cdcae74c24421408ca7795d2787a7553e17) )
-
-	ROM_REGION( 0x08000, "chars", 0 )
-	ROM_LOAD( "7.c7",         0x00000, 0x8000, CRC(d13c22db) SHA1(38e992f2c5f425b20d20fec64d6ab979e72e0e3c) )
-
-	ROM_REGION( 0x20000, "tiles", 0 )
-	ROM_LOAD( "4.a6",         0x00000, 0x8000, CRC(655f0a58) SHA1(8ffe73cec68d52c7b09651b546289613d6d4dde4) )
-	ROM_LOAD( "3.a4",         0x08000, 0x8000, CRC(b4416f53) SHA1(c2253518318aac2710aac5e83f8df84945ada2ce) )
-	ROM_LOAD( "2.a3",         0x10000, 0x8000, CRC(955b5c45) SHA1(936bfe2599228dd0861bbcfe15152ac5e9b906d1) )
-	ROM_LOAD( "1.a1",         0x18000, 0x8000, CRC(bbd2e51c) SHA1(51bc266cf8161610204e5d98e56346b1d8d3c009) )
-
-	ROM_REGION( 0x20000, "sprites", 0 )
-	ROM_LOAD( "12.a4",        0x00000, 0x8000, CRC(3cb41a2d) SHA1(7535bd5fa6b6ee71617e06ee690da29ccce7560e) )
-	ROM_LOAD( "11.a6",        0x08000, 0x8000, CRC(e487754c) SHA1(3d6ef9a995a72856f24ca7384f55028d53b909c4) )
-	ROM_LOAD( "14.a1",        0x10000, 0x8000, CRC(a354129b) SHA1(4b36e6fcd0782898d687f6927c76c8ec7a2f5315) )
-	ROM_LOAD( "13.a3",        0x18000, 0x8000, CRC(7e52abd4) SHA1(476449c57dc2d5803c604acc8a45bfefd3327b06) )
-
-	ROM_REGION( 0x8000, "bgtiles", 0 )
-	ROM_LOAD( "5.c1",         0x00000, 0x4000, CRC(e8469d44) SHA1(a015e4f67597fca438ed4c714b9854615e5d59b7) )
-	ROM_LOAD( "6.c3",         0x04000, 0x4000, CRC(163a024e) SHA1(bb4c78f5e231e8e9c9556790d94972b963b1480e) )
-
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "7114.a9",      0x00000, 0x0100, CRC(001a762e) SHA1(5d3783162bd23b09291ee380e2968d1c6ff0267e) ) // red
-	ROM_LOAD( "7114.a10",     0x00100, 0x0100, CRC(30556466) SHA1(caa1a941d3a2651504acc1ea3ae14de921e1975a) ) // green
-	ROM_LOAD( "7114.a11",     0x00200, 0x0100, CRC(1fe3d4fd) SHA1(6f1f432667ec1d7286149ccde6790b74499aa50a) ) // blue
-	ROM_LOAD( "7114.c2",      0x00300, 0x0100, CRC(23bade78) SHA1(7e2de5eb08d888f97830807b6dbe85d09bb3b7f8) ) // sprite lookup table
-
-	ROM_REGION( 0x0100, "sprpalbank_prom", 0 )
-	ROM_LOAD( "7114.a7",      0x00000, 0x0100, CRC(6d17bab4) SHA1(55dc38ef2dd9a76398abdc7a5171850530c20023) ) // sprite palette bank
-ROM_END
-
 ROM_START( youma )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "ync-1.bin",    0x00000, 0x8000, CRC(0552adab) SHA1(183cf88d288875fbb2b60e2712e5a1671511351d) )
@@ -1746,6 +1849,50 @@ ROM_START( youma2 )
 
 	ROM_REGION( 0x0100, "sprpalbank_prom", 0 )
 	ROM_LOAD( "bpr.7f",       0x00000, 0x0100, CRC(262d0809) SHA1(a67281af02cef082023c0d7d57e3824aeef67450) ) // sprite palette bank
+ROM_END
+
+/* Galivan hardware. Two PCBs:
+   231086-B: Silkscreened "Tecfri S.A.", "Nichibutsu" and "Made in Spain", with a small sub-board.
+   281286-A: With two small sub-boards, labeled "61212/1" and "61212/2".
+   There's no 1414M4: the program draws the text layer itself, and its test mode was removed
+   (the service switch restarts the game). */
+ROM_START( youmat )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "10.e19",       0x00000, 0x8000, CRC(804e7e4c) SHA1(d10edc6b2e283a8b0c8621645949ad70196a0dd6) )
+	ROM_LOAD( "9.e17",        0x08000, 0x4000, CRC(55d8f1a1) SHA1(886ed255007faf67908e8af3e52d7447c9eb260b) )
+	ROM_LOAD( "8.e16",        0x10000, 0x8000, CRC(26ae2305) SHA1(e1fed6c72593c9a8770f4955a64bf8de6b0f05fa) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // sound CPU code
+	ROM_LOAD( "16.e13",       0x00000, 0x4000, CRC(dd7e0be2) SHA1(32c63f1dde9561b7fce7e9dba7d34511fdd7d0b0) )
+	ROM_LOAD( "15.e15",       0x04000, 0x8000, CRC(236c9824) SHA1(498b8cdcae74c24421408ca7795d2787a7553e17) )
+
+	ROM_REGION( 0x08000, "chars", 0 )
+	ROM_LOAD( "7.c7",         0x00000, 0x8000, CRC(d13c22db) SHA1(38e992f2c5f425b20d20fec64d6ab979e72e0e3c) )
+
+	ROM_REGION( 0x20000, "tiles", 0 )
+	ROM_LOAD( "4.a6",         0x00000, 0x8000, CRC(655f0a58) SHA1(8ffe73cec68d52c7b09651b546289613d6d4dde4) )
+	ROM_LOAD( "3.a4",         0x08000, 0x8000, CRC(934e1703) SHA1(451f8d01d9035d91c969cdc3fb582a00007da7df) )
+	ROM_LOAD( "2.a3",         0x10000, 0x8000, CRC(955b5c45) SHA1(936bfe2599228dd0861bbcfe15152ac5e9b906d1) )
+	ROM_LOAD( "1.a1",         0x18000, 0x8000, CRC(bbd2e51c) SHA1(51bc266cf8161610204e5d98e56346b1d8d3c009) )
+
+	ROM_REGION( 0x20000, "sprites", 0 )
+	ROM_LOAD( "12.a4",        0x00000, 0x8000, CRC(3cb41a2d) SHA1(7535bd5fa6b6ee71617e06ee690da29ccce7560e) )
+	ROM_LOAD( "11.a6",        0x08000, 0x8000, CRC(e487754c) SHA1(3d6ef9a995a72856f24ca7384f55028d53b909c4) )
+	ROM_LOAD( "14.a1",        0x10000, 0x8000, CRC(a354129b) SHA1(4b36e6fcd0782898d687f6927c76c8ec7a2f5315) )
+	ROM_LOAD( "13.a3",        0x18000, 0x8000, CRC(7e52abd4) SHA1(476449c57dc2d5803c604acc8a45bfefd3327b06) )
+
+	ROM_REGION( 0x8000, "bgtiles", 0 )
+	ROM_LOAD( "5.c1",         0x00000, 0x4000, CRC(e8469d44) SHA1(a015e4f67597fca438ed4c714b9854615e5d59b7) )
+	ROM_LOAD( "6.c3",         0x04000, 0x4000, CRC(163a024e) SHA1(bb4c78f5e231e8e9c9556790d94972b963b1480e) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "7114.a11",     0x00000, 0x0100, CRC(1fe3d4fd) SHA1(6f1f432667ec1d7286149ccde6790b74499aa50a) ) // red
+	ROM_LOAD( "7114.a10",     0x00100, 0x0100, CRC(30556466) SHA1(caa1a941d3a2651504acc1ea3ae14de921e1975a) ) // green
+	ROM_LOAD( "7114.a9",      0x00200, 0x0100, CRC(001a762e) SHA1(5d3783162bd23b09291ee380e2968d1c6ff0267e) ) // blue
+	ROM_LOAD( "7114.c2",      0x00300, 0x0100, CRC(23bade78) SHA1(7e2de5eb08d888f97830807b6dbe85d09bb3b7f8) ) // sprite lookup table
+
+	ROM_REGION( 0x0100, "sprpalbank_prom", 0 )
+	ROM_LOAD( "7114.a7",      0x00000, 0x0100, CRC(6d17bab4) SHA1(55dc38ef2dd9a76398abdc7a5171850530c20023) ) // sprite palette bank
 ROM_END
 
 ROM_START( youmab )
@@ -1916,8 +2063,8 @@ GAME( 1986, dangarb,  dangar,   galivan,  dangar2,  galivan_state,  empty_init, 
 GAME( 1986, dangarbt, dangar,   galivan,  dangarb,  galivan_state,  empty_init,  ROT270, "bootleg",                     "Ufo Robo Dangar (9/26/1986, bootleg set 2)",          MACHINE_SUPPORTS_SAVE ) // directly patched at entry point 0x9d44
 
 GAME( 1986, ninjemak, 0,        ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Ninja Emaki (US)",                                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1986, ninjemat, ninjemak, galivan,  galivan,  ninjemak_state, empty_init,  ROT270, "Nichibutsu (Tecfri license)", "Ninja Emaki (Tecfri license)",                        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1986, youma,    ninjemak, ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Youma Ninpou Chou (Japan)",                           MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1986, youma2,   ninjemak, ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Youma Ninpou Chou (Japan, alt)",                      MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1986, youmat,   ninjemak, youmat,   youmat,   youmat_state,   empty_init,  ROT270, "Nichibutsu (Tecfri license)", "Youma Ninpou Chou (Tecfri license)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1986, youmab,   ninjemak, youmab,   ninjemak, youmab_state,   empty_init,  ROT270, "bootleg",                     "Youma Ninpou Chou (Game Electronics bootleg, set 1)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // player is invincible
 GAME( 1986, youmab2,  ninjemak, youmab,   ninjemak, youmab_state,   empty_init,  ROT270, "bootleg",                     "Youma Ninpou Chou (Game Electronics bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // ""

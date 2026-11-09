@@ -43,7 +43,7 @@ public:
 		, m_cart(*this, "cartslot")
 	{ }
 
-	void pockchalv1(machine_config &config);
+	void pockchalv1(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

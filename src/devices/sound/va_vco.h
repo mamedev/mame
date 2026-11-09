@@ -7,6 +7,8 @@
 #pragma once
 
 DECLARE_DEVICE_TYPE(VA_VCO, va_vco_device)
+DECLARE_DEVICE_TYPE(VA_NOISE, va_noise_device)
+
 
 // A virtual analog oscillator. Can be configured to emulate a variety of
 // oscillator architectures.
@@ -229,6 +231,22 @@ private:
 	float m_sync_phase;  // 0-1
 	float m_sync_step;
 	attotime m_last_sample_time;
+};
+
+
+// Noise generator. Meant for emulating semiconductor-based noise sources, such
+// as reverse-biased transistors or diodes.
+class va_noise_device : public device_t, public device_sound_interface
+{
+public:
+	va_noise_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
+
+protected:
+	void device_start() override ATTR_COLD;
+	void sound_stream_update(sound_stream &stream) override;
+
+private:
+	sound_stream *m_stream;
 };
 
 #endif  // MAME_SOUND_VA_VCO_H

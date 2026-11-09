@@ -17,6 +17,8 @@
 #include "amiga.h"
 #include "gayle.h"
 
+#include "bus/amiga/clockport/cards.h"
+#include "bus/amiga/clockport/clockport.h"
 #include "bus/amiga/cpuslot/cpuslot.h"
 #include "bus/amiga/keyboard/keyboard.h"
 #include "bus/amiga/zorro/zorro.h"
@@ -551,7 +553,6 @@ public:
 		: amiga_state(mconfig, type, tag)
 		, m_gayle(*this, "gayle")
 		, m_pcmcia(*this, "pcmcia")
-		, m_gayle_int2(0)
 	{ }
 
 	void gayle_int2_w(int state);
@@ -586,11 +587,13 @@ public:
 		: amiga_state(mconfig, type, tag)
 		, m_gayle(*this, "gayle")
 		, m_pcmcia(*this, "pcmcia")
-		, m_gayle_int2(0)
+		, m_clockport(*this, "clockport")
+		, m_clockport_int6(0)
 	{ }
 
 	void gayle_int2_w(int state);
 	void gayle_int6_w(int state);
+	void clockport_int6_w(int state);
 
 	void init_pal();
 	void init_ntsc();
@@ -603,15 +606,18 @@ public:
 
 protected:
 	// amiga_state overrides
+	virtual void machine_start() override ATTR_COLD;
 	virtual bool int2_pending() override;
 	virtual bool int6_pending() override;
 
 private:
 	required_device<gayle_device> m_gayle;
 	required_device<pccard_slot_device> m_pcmcia;
+	required_device<amiga_clockport_device> m_clockport;
 
-	int m_gayle_int2;
-	int m_gayle_int6;
+	u8 m_gayle_int2;
+	u8 m_gayle_int6;
+	u8 m_clockport_int6;
 };
 
 class a4000_state : public amiga_state
@@ -1502,7 +1508,7 @@ bool a1200_state::int2_pending()
 
 bool a1200_state::int6_pending()
 {
-	return m_cia_1_irq || m_gayle_int6;
+	return m_cia_1_irq || m_gayle_int6 || m_clockport_int6;
 }
 
 void a1200_state::gayle_int2_w(int state)
@@ -1514,6 +1520,21 @@ void a1200_state::gayle_int2_w(int state)
 void a1200_state::gayle_int6_w(int state)
 {
 	m_gayle_int6 = state;
+	update_int6();
+}
+
+void a1200_state::machine_start()
+{
+	amiga_state::machine_start();
+
+	save_item(NAME(m_gayle_int2));
+	save_item(NAME(m_gayle_int6));
+	save_item(NAME(m_clockport_int6));
+}
+
+void a1200_state::clockport_int6_w(int state)
+{
+	m_clockport_int6 = state;
 	update_int6();
 }
 
@@ -2022,11 +2043,11 @@ void a1200_state::a1200_mem(address_map &map)
 	map(0xb80000, 0xbeffff).noprw(); // reserved (cdtv)
 	map(0xbf0000, 0xbfffff).rw(FUNC(a1200_state::cia_r), FUNC(a1200_state::gayle_cia_w));
 	map(0xc00000, 0xd7ffff).noprw(); // slow mem
-	map(0xd80000, 0xd8ffff).noprw(); // spare chip select
+	map(0xd80000, 0xd8003f).mirror(0xffc0).umask32(0x00ff0000).rw(m_clockport, FUNC(amiga_clockport_device::spare_r), FUNC(amiga_clockport_device::spare_w)); // spare chip select
 	map(0xd90000, 0xd9ffff).noprw(); // arcnet chip select
 	map(0xda0000, 0xdaffff).m("gayle", FUNC(gayle_device::register_map));
 	map(0xdb0000, 0xdbffff).noprw(); // reserved (external ide)
-	map(0xdc0000, 0xdcffff).noprw(); // rtc
+	map(0xdc0000, 0xdc003f).mirror(0xffc0).umask32(0x00ff0000).rw(m_clockport, FUNC(amiga_clockport_device::rtc_r), FUNC(amiga_clockport_device::rtc_w)); // rtc
 	map(0xdd0000, 0xddffff).noprw(); // reserved (dma controller)
 	map(0xde0000, 0xdeffff).rw("gayle", FUNC(gayle_device::gayle_id_r), FUNC(gayle_device::gayle_id_w));
 	map(0xdf0000, 0xdfffff).m(m_chipset, FUNC(address_map_bank_device::amap32));
@@ -2828,6 +2849,8 @@ void a1200_state::a1200(machine_config &config)
 	m_pcmcia->bvd1().set("gayle", FUNC(gayle_device::cc_bvd1_w));
 	m_pcmcia->bvd2().set("gayle", FUNC(gayle_device::cc_bvd2_w));
 	m_pcmcia->wp().set("gayle", FUNC(gayle_device::cc_wp_w));
+
+	AMIGA_CLOCKPORT(config, m_clockport, amiga_clockport_cards, nullptr).int6_handler().set(FUNC(a1200_state::clockport_int6_w));
 
 	// software
 	SOFTWARE_LIST(config, "aga_list").set_original("amigaaga_flop");

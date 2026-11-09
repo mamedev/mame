@@ -472,6 +472,7 @@ const double XTAL::known_xtals[] = {
 	 39'710'000, // 39.71_MHz_XTAL         Wyse WY-60 132-column display clock
 	 40'000'000, // 40_MHz_XTAL            -
 	 40'210'000, // 40.21_MHz_XTAL         Fairlight CMI IIx
+	 40'960'000, // 40.96_MHz_XTAL         Roland DEP-5 / RE-3 reverb DSP
 	 41'539'000, // 41.539_MHz_XTAL        IBM PS/2 132-column text mode
 	 42'000'000, // 42_MHz_XTAL            BMC A-00211 - Popo Bear
 	 42'105'200, // 42.1052_MHz_XTAL       NEC PC-88xx
@@ -484,7 +485,7 @@ const double XTAL::known_xtals[] = {
 	 44'452'800, // 44.4528_MHz_XTAL       TeleVideo 965
 	 44'900'000, // 44.9_MHz_XTAL          IBM 8514 1024x768 43.5Hz graphics
 	 45'000'000, // 45_MHz_XTAL            Eolith with Hyperstone CPUs
-	 45'158'400, // 45.1584_MHz_XTAL       Philips CD-i CDIC, Sega Model 2A video, Sega Model 3 CPU
+	 45'158'400, // 45.1584_MHz_XTAL       Philips CD-i CDIC, Sega Model 2A video, Sega Model 3 CPU, Power Macintosh 5200/6200 sound
 	 45'619'200, // 45.6192_MHz_XTAL       DEC VK100
 	 45'830'400, // 45.8304_MHz_XTAL       Microterm 5510
 	 46'615'120, // 46.61512_MHz_XTAL      Soundblaster 16 PCM base clock
@@ -512,6 +513,7 @@ const double XTAL::known_xtals[] = {
 	 54'285'700, // 54.2857_MHz_XTAL       Qume QVT-82
 	 55'000'000, // 55_MHz_XTAL            Eolith Vega
 	 56'000'000, // 56_MHz_XTAL            ARM7500 based Belatra slot machines
+	 57'242'400, // 57.2424_MHz_XTAL       Gunpey
 	 57'272'727, // 57.272727_MHz_XTAL     Psikyo SH2 with /2 divider (16x NTSC subcarrier)
 	 57'283'200, // 57.2832_MHz_XTAL       Macintosh IIci RBV, 15-inch portrait display
 	 58'000'000, // 58_MHz_XTAL            Magic Reel (Play System)
@@ -527,6 +529,7 @@ const double XTAL::known_xtals[] = {
 	 68'850'000, // 68.85_MHz_XTAL         Wyse WY-50
 	 69'196'800, // 69.1968_MHz_XTAL       DEC VCB0x/VAXstation dot clock
 	 69'551'990, // 69.55199_MHz_XTAL      Sharp X68000 31.5kHz video
+	 70'700'000, // 70.7_MHz_XTAL          Sony NWB-512 Framebuffer
 	 72'000'000, // 72_MHz_XTAL            Aristocrat MKV
 	 72'576'000, // 72.576_MHz_XTAL        Centipede, Millipede, Missile Command, Let's Go Bowling "Multipede"
 	 73'728'000, // 73.728_MHz_XTAL        Ms. Pac-Man/Galaga 20th Anniversary

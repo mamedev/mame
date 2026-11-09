@@ -151,7 +151,6 @@ REF. 970429
 #include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68020.h"
 
-#include "emupal.h"
 #include "speaker.h"
 
 #include "speedup.lh"
@@ -961,9 +960,6 @@ void gaelco3d_state::gaelco3d(machine_config &config)
 	m_screen->set_size(576, 432);
 	m_screen->set_visarea(0, 575, 0, 431);
 	m_screen->set_screen_update(FUNC(gaelco3d_state::screen_update));
-	m_screen->set_palette("palette");
-
-	PALETTE(config, "palette", palette_device::RGB_555);
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();

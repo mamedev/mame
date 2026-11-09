@@ -951,6 +951,7 @@ B-2007 : Innovative Computing
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1931" />
+		<sharedfeat name="joy1_default" value="pad"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
@@ -3149,7 +3150,7 @@ B-2007 : Innovative Computing
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1921" />
-		<info name="usage" value="Game Paddles required" />
+		<sharedfeat name="joy1_default" value="pad"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
@@ -3165,7 +3166,7 @@ B-2007 : Innovative Computing
 		<year>1982</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1921" />
-		<info name="usage" value="Game Paddles required" />
+		<sharedfeat name="joy1_default" value="pad"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
@@ -3258,7 +3259,7 @@ B-2007 : Innovative Computing
 		<year>1981</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1911" />
-		<info name="usage" value="Game Paddles required" />
+		<sharedfeat name="joy1_default" value="pad"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
@@ -3272,7 +3273,7 @@ B-2007 : Innovative Computing
 		<year>1981</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-1911" />
-		<info name="usage" value="Game Paddles required" />
+		<sharedfeat name="joy1_default" value="pad"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">

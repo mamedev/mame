@@ -1,35 +1,93 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods, R. Belmont
+// copyright-holders:R. Belmont, Nathan Woods
 /***************************************************************************
 
-    drivers/bebox.c
+    drivers/bebox.cpp
+    Emulation by R. Belmont, based on a skeleton by Nathan Woods
 
-    BeBox
+    The BeBox is a dual-CPU PowerPC-based personal computer developed by
+    Be Inc, a company founded by Jean-Louis Gassée after he left Apple.
+    BeOS was considered to be the top candidate for Apple's next-generation
+    operating system after the Copland project failed.
 
 ***************************************************************************/
 
-/* Core includes */
 #include "emu.h"
 #include "bebox.h"
 
-/* Components */
-#include "bus/lpci/cirrus.h"
-#include "bus/lpci/mpc105.h"
-#include "bus/scsi/scsi.h"
-#include "sound/ymopl.h"
-#include "machine/mc146818.h"
+#include "bus/nscsi/devices.h"
+#include "bus/pci/clgd543x_alpine.h"
+#include "bus/pci/ncr53c810.h"
+#include "machine/i82091aa.h"
 #include "machine/pckeybrd.h"
-#include "video/pc_vga_cirrus.h"
+#include "sound/ymopl.h"
 
 #include "speaker.h"
 
-/* Devices */
-#include "bus/scsi/scsicd.h"
-#include "bus/scsi/scsihd.h"
-#include "machine/8042kbdc.h"
 
-uint8_t bebox_state::at_dma8237_1_r(offs_t offset) { return m_dma8237[1]->read(offset / 2); }
-void bebox_state::at_dma8237_1_w(offs_t offset, uint8_t data) { m_dma8237[1]->write(offset / 2, data); }
+namespace {
+
+// separate from the driver so the joysticks follow the 8042's mouse in player order
+class bebox_joyport_device : public device_t
+{
+public:
+	bebox_joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	virtual void device_start() override ATTR_COLD { }
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+};
+
+INPUT_PORTS_START( bebox_joyport )
+	PORT_START("JOYBUTTONS")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(3)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(3)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(4)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(4)
+
+	PORT_START("JOY0")
+	PORT_BIT(0xfff, 0x800, IPT_AD_STICK_X) PORT_MINMAX(0, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_PLAYER(1)
+
+	PORT_START("JOY1")
+	PORT_BIT(0xfff, 0x800, IPT_AD_STICK_Y) PORT_MINMAX(0, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_PLAYER(1)
+
+	PORT_START("JOY2")
+	PORT_BIT(0xfff, 0x800, IPT_AD_STICK_X) PORT_MINMAX(0, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_PLAYER(2)
+
+	PORT_START("JOY3")
+	PORT_BIT(0xfff, 0x800, IPT_AD_STICK_Y) PORT_MINMAX(0, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_PLAYER(2)
+
+	PORT_START("JOY4")
+	PORT_BIT(0xfff, 0x800, IPT_AD_STICK_X) PORT_MINMAX(0, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_PLAYER(3)
+
+	PORT_START("JOY5")
+	PORT_BIT(0xfff, 0x800, IPT_AD_STICK_Y) PORT_MINMAX(0, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_PLAYER(3)
+
+	PORT_START("JOY6")
+	PORT_BIT(0xfff, 0x800, IPT_AD_STICK_X) PORT_MINMAX(0, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_PLAYER(4)
+
+	PORT_START("JOY7")
+	PORT_BIT(0xfff, 0x800, IPT_AD_STICK_Y) PORT_MINMAX(0, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_PLAYER(4)
+INPUT_PORTS_END
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(BEBOX_JOYPORT, bebox_joyport_device, bebox_joyport_device, "bebox_joyport", "BeBox joystick ports")
+
+bebox_joyport_device::bebox_joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, BEBOX_JOYPORT, tag, owner, clock)
+{
+}
+
+ioport_constructor bebox_joyport_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(bebox_joyport);
+}
+
 
 void bebox_state::main_mem(address_map &map)
 {
@@ -39,88 +97,27 @@ void bebox_state::main_mem(address_map &map)
 	map(0x7FFFF3F0, 0x7FFFF3F7).rw(FUNC(bebox_state::bebox_crossproc_interrupts_r), FUNC(bebox_state::bebox_crossproc_interrupts_w));
 	map(0x7FFFF4F0, 0x7FFFF4F7).w(FUNC(bebox_state::bebox_processor_resets_w));
 
-	map(0x80000000, 0x8000001F).rw(m_dma8237[0], FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-	map(0x80000020, 0x8000003F).rw(m_pic8259[0], FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x80000040, 0x8000005f).rw(m_pit8254, FUNC(pit8254_device::read), FUNC(pit8254_device::write));
-	map(0x80000060, 0x8000006F).rw("kbdc", FUNC(kbdc8042_device::data_r), FUNC(kbdc8042_device::data_w));
-	map(0x80000070, 0x8000007F).w("rtc", FUNC(mc146818_device::address_w)).umask64(0xff00ff00ff00ff00);
-	map(0x80000070, 0x8000007F).rw("rtc", FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask64(0x00ff00ff00ff00ff);
-	map(0x80000080, 0x8000009F).rw(FUNC(bebox_state::bebox_page_r), FUNC(bebox_state::bebox_page_w));
-	map(0x800000A0, 0x800000BF).rw(m_pic8259[1], FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x800000C0, 0x800000DF).rw(FUNC(bebox_state::at_dma8237_1_r), FUNC(bebox_state::at_dma8237_1_w));
-	map(0x800001F0, 0x800001F7).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w));
-	map(0x800002F8, 0x800002FF).rw("ns16550_1", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
-	map(0x80000380, 0x80000387).rw("ns16550_2", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
-	map(0x80000388, 0x8000038F).rw("ns16550_3", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
-	map(0x800003B0, 0x800003DF).m(m_vga, FUNC(cirrus_gd5446_vga_device::io_map));
-	map(0x800003F0, 0x800003F7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
-	map(0x800003F0, 0x800003F7).m(m_smc37c78, FUNC(smc37c78_device::map));
-	map(0x800003F8, 0x800003FF).rw("ns16550_0", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
-	map(0x80000480, 0x8000048F).rw(FUNC(bebox_state::bebox_80000480_r), FUNC(bebox_state::bebox_80000480_w));
-	map(0x80000CF8, 0x80000CFF).rw(m_pcibus, FUNC(pci_bus_device::read_64be), FUNC(pci_bus_device::write_64be));
-	//map(0x800042E8, 0x800042EF).w("cirrus", FUNC(cirrus_device::cirrus_42E8_w));
-
 	map(0xBFFFFFF0, 0xBFFFFFFF).r(FUNC(bebox_state::bebox_interrupt_ack_r));
-	map(0xC00A0000, 0xC00BFFFF).rw(m_vga, FUNC(cirrus_gd5446_vga_device::mem_r), FUNC(cirrus_gd5446_vga_device::mem_w));
-	map(0xC1000000, 0xC11FFFFF).rw(m_vga, FUNC(cirrus_gd5446_vga_device::mem_linear_r), FUNC(cirrus_gd5446_vga_device::mem_linear_w));
 	map(0xFFF00000, 0xFFF03FFF).bankr("bank2");
 	map(0xFFF04000, 0xFFFFFFFF).rw(FUNC(bebox_state::bebox_flash_r), FUNC(bebox_state::bebox_flash_w));
 }
 
-// The following is a gross hack to let the BeBox boot ROM identify the processors correctly.
-// This needs to be done in a better way if someone comes up with one.
-
-uint64_t bebox_state::bb_slave_64be_r(offs_t offset, uint64_t mem_mask)
+// Board devices outside the 82378/82091 pair.
+void bebox_state::io_map(address_map &map)
 {
-	// 2e94 is the real address, 2e84 is where the PC appears to be under full DRC
-	if ((m_ppc[1]->pc() == 0xfff02e94) || (m_ppc[1]->pc() == 0xfff02e84))
-	{
-		return 0x108000ff;  // indicate slave CPU
-	}
-
-	return m_pcibus->read_64be(offset, mem_mask);
+	map(0x0060, 0x0060).rw(m_kbdc, FUNC(kbdc8042_device::port60_r), FUNC(kbdc8042_device::port60_w));
+	map(0x0064, 0x0064).rw(m_kbdc, FUNC(kbdc8042_device::port64_r), FUNC(kbdc8042_device::port64_w));
+	map(0x0360, 0x0361).rw(FUNC(bebox_state::adc_control_r), FUNC(bebox_state::adc_control_w));
+	map(0x0362, 0x0363).r(FUNC(bebox_state::adc_data_r));
+	map(0x036e, 0x036f).rw(FUNC(bebox_state::joy_mux_r), FUNC(bebox_state::joy_mux_w));
+	map(0x0380, 0x0387).rw(m_uart[0], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
+	map(0x0388, 0x038f).rw(m_uart[1], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
+	map(0x0397, 0x0397).r(FUNC(bebox_state::joy_buttons_r));
 }
 
-void bebox_state::slave_mem(address_map &map)
+static void bebox_superio(device_slot_interface &device)
 {
-	main_mem(map);
-	map(0x80000cf8, 0x80000cff).r(FUNC(bebox_state::bb_slave_64be_r));
-	map(0x80000cf8, 0x80000cff).w(m_pcibus, FUNC(pci_bus_device::write_64be));
-}
-
-#define BYTE_REVERSE32(x)       (((x >> 24) & 0xff) | \
-								((x >> 8) & 0xff00) | \
-								((x << 8) & 0xff0000) | \
-								((x << 24) & 0xff000000))
-
-uint32_t bebox_state::scsi_fetch(uint32_t dsp)
-{
-	const uint32_t result = m_ppc[0]->space(AS_PROGRAM).read_dword(dsp & 0x7FFFFFFF);
-	return BYTE_REVERSE32(result);
-}
-
-
-void bebox_state::scsi_irq_callback(int state)
-{
-	bebox_set_irq_bit(21, state);
-}
-
-
-void bebox_state::scsi_dma_callback(uint32_t src, uint32_t dst, int length, int byteswap)
-{
-}
-
-void bebox_state::mpc105_config(device_t *device)
-{
-	mpc105_device &mpc105 = *downcast<mpc105_device *>(device);
-	mpc105.set_cpu(":ppc1");
-	mpc105.set_bank_base_default(0);
-}
-
-void bebox_state::cirrus_config(device_t *device)
-{
-	pci_cirrus_svga_device &cirruspci = *downcast<pci_cirrus_svga_device *>(device);
-	cirruspci.set_vga(m_vga);
+	device.option_add_internal("aip", I82091AA);
 }
 
 /*************************************
@@ -132,67 +129,15 @@ void bebox_state::cirrus_config(device_t *device)
 void bebox_state::bebox_keyboard_interrupt(int state)
 {
 	bebox_set_irq_bit(16, state);
-	m_pic8259[0]->ir1_w(state);
-}
-
-pci_connector_device &bebox_state::add_pci_slot(machine_config &config, const char *tag, size_t index, const char *default_tag)
-{
-	pci_connector_device &pcislot(PCI_CONNECTOR(config, tag, index));
-	pcislot.option_add("mpc105", MPC105);
-	pcislot.option_add("cirrus", PCI_CIRRUS_SVGA);
-	pcislot.set_default_option(default_tag);
-	pcislot.set_fixed(true);
-	return pcislot;
+	m_sio->pc_irq1_w(state);
 }
 
 void bebox_state::bebox_peripherals(machine_config &config)
 {
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	PIT8254(config, m_pit8254);
-	m_pit8254->set_clk<0>(4772720/4); /* heartbeat IRQ */
-	m_pit8254->set_clk<1>(4772720/4); /* dram refresh */
-	m_pit8254->set_clk<2>(4772720/4); /* pio port c pin 4, and speaker polling */
-	m_pit8254->out_handler<0>().set(FUNC(bebox_state::bebox_timer0_w));
-	m_pit8254->out_handler<2>().set("kbdc", FUNC(kbdc8042_device::write_out2));
-
-	AM9517A(config, m_dma8237[0], XTAL(14'318'181)/3);
-	m_dma8237[0]->out_hreq_callback().set(FUNC(bebox_state::bebox_dma_hrq_changed));
-	m_dma8237[0]->out_eop_callback().set(FUNC(bebox_state::bebox_dma8237_out_eop));
-	m_dma8237[0]->in_memr_callback().set(FUNC(bebox_state::bebox_dma_read_byte));
-	m_dma8237[0]->out_memw_callback().set(FUNC(bebox_state::bebox_dma_write_byte));
-	m_dma8237[0]->in_ior_callback<2>().set(m_smc37c78, FUNC(smc37c78_device::dma_r));
-	m_dma8237[0]->out_iow_callback<2>().set(m_smc37c78, FUNC(smc37c78_device::dma_w));
-	m_dma8237[0]->out_dack_callback<0>().set(FUNC(bebox_state::pc_dack0_w));
-	m_dma8237[0]->out_dack_callback<1>().set(FUNC(bebox_state::pc_dack1_w));
-	m_dma8237[0]->out_dack_callback<2>().set(FUNC(bebox_state::pc_dack2_w));
-	m_dma8237[0]->out_dack_callback<3>().set(FUNC(bebox_state::pc_dack3_w));
-
-	AM9517A(config, m_dma8237[1], XTAL(14'318'181)/3);
-
-	PIC8259(config, m_pic8259[0]);
-	m_pic8259[0]->out_int_callback().set(FUNC(bebox_state::bebox_pic8259_master_set_int_line));
-	m_pic8259[0]->in_sp_callback().set_constant(1);
-	m_pic8259[0]->read_slave_ack_callback().set(m_pic8259[1], FUNC(pic8259_device::acknowledge));
-
-	PIC8259(config, m_pic8259[1]);
-	m_pic8259[1]->out_int_callback().set(FUNC(bebox_state::bebox_pic8259_slave_set_int_line));
-	m_pic8259[1]->in_sp_callback().set_constant(0);
-
-	NS16550(config, "ns16550_0");   /* TODO: Verify model */
-	NS16550(config, "ns16550_1");   /* TODO: Verify model */
-	NS16550(config, "ns16550_2");   /* TODO: Verify model */
-	NS16550(config, "ns16550_3");   /* TODO: Verify model */
-
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update(m_vga, FUNC(cirrus_gd5446_vga_device::screen_update));
-
-	// was GD5428, assume mistake (GD5446 is PCI)
-	CIRRUS_GD5446_VGA(config, m_vga);
-	m_vga->set_screen("screen");
-	m_vga->set_vram_size(0x200000);
+	NS16550(config, m_uart[0], 1.8432_MHz_XTAL).out_int_callback().set([this] (int state) { bebox_set_irq_bit(25, state); });
+	NS16550(config, m_uart[1], 1.8432_MHz_XTAL).out_int_callback().set([this] (int state) { bebox_set_irq_bit(24, state); });
 
 	speaker_device &speaker(SPEAKER(config, "mono"));
 	speaker.front_center();
@@ -201,51 +146,70 @@ void bebox_state::bebox_peripherals(machine_config &config)
 	ym3812.add_route(ALL_OUTPUTS, speaker, 1.0);
 
 	FUJITSU_29F016A(config, "flash");
+	MAX186(config, m_adc).set_input_callback(FUNC(bebox_state::adc_input));
 
-	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
-	scsibus.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-	scsibus.set_slot_device(2, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_3));
+	pci_root_device &pci(PCI_ROOT(config, "pci"));
+	pci.set_pin_mapper(pci_pin_mapper(*this, FUNC(bebox_state::map_pci_pin)));
+	pci.set_irq_handler(pci_irq_handler(*this, FUNC(bebox_state::pci_irq_w)));
+	MPC105(config, m_mpc105, mpc105_host_device::MAP_TYPE_A, m_ppc[0], nullptr);
+	m_mpc105->set_secondary_cpu_tag(m_ppc[1]);
+	GD5434_PCI(config, "pci:01.0");
 
-	lsi53c810_device &scsictrl(LSI53C810(config, "lsi53c810"));
-	scsictrl.set_irq_callback(FUNC(bebox_state::scsi_irq_callback));
-	scsictrl.set_dma_callback(FUNC(bebox_state::scsi_dma_callback));
-	scsictrl.set_fetch_callback(FUNC(bebox_state::scsi_fetch));
-	scsictrl.set_scsi_port("scsi");
+	ncr53c810_pci_device &ncr(NCR53C810_PCI(config, "pci:0c.0", 33'000'000));
+	ncr.set_irq_map(21);
+	nscsi_bus_device &scsi(NSCSI_BUS(config, "scsi"));
+	scsi.set_external_device(7, ncr.scripts());
+	for (u32 id = 0; id != 7; ++id)
+		NSCSI_CONNECTOR(config, util::string_format("scsi:%u", id).c_str(), default_scsi_devices,
+			id == 0 ? "harddisk" : id == 3 ? "cdrom" : nullptr);
 
-	ide_controller_device &idectrl(IDE_CONTROLLER(config, "ide"));
-	idectrl.options(ata_devices, "hdd", nullptr, false);
-	idectrl.irq_handler().set(FUNC(bebox_state::bebox_ide_interrupt));
+	I82378ZB_SIO(config, m_sio, 0, m_ppc[0]);
+	m_sio->intr().set([this] (int state) { bebox_set_irq_bit(5, state); });
+	m_sio->rtcale().set(m_rtc, FUNC(mc146818_device::address_w));
+	m_sio->rtccs_read().set(m_rtc, FUNC(mc146818_device::data_r));
+	m_sio->rtccs_write().set(m_rtc, FUNC(mc146818_device::data_w));
 
-	/* pci */
-	PCI_BUS(config, m_pcibus);
-	m_pcibus->set_busnum(0);
+	// These lines also feed the BeBox's interrupt-source register, before PIC masking.
+	isa16_device &isa(*subdevice<isa16_device>("pci:0b.0:isabus"));
+	isa.irq3_callback().append([this] (int state) { bebox_set_irq_bit(26, state); });
+	isa.irq4_callback().append([this] (int state) { bebox_set_irq_bit(27, state); });
+	isa.irq5_callback().append([this] (int state) { bebox_set_irq_bit(14, state); });
+	isa.irq6_callback().append([this] (int state) { bebox_set_irq_bit(13, state); });
+	isa.irq7_callback().append([this] (int state) { bebox_set_irq_bit(12, state); });
+	isa.irq2_callback().append([this] (int state) { bebox_set_irq_bit(11, state); });
+	isa.irq10_callback().append([this] (int state) { bebox_set_irq_bit(10, state); });
+	isa.irq11_callback().append([this] (int state) { bebox_set_irq_bit(9, state); });
+	isa.irq12_callback().append([this] (int state) { bebox_set_irq_bit(8, state); });
+	isa.irq14_callback().append([this] (int state) { bebox_set_irq_bit(7, state); });
+	isa.irq15_callback().append([this] (int state) { bebox_set_irq_bit(6, state); });
 
-	pci_connector_device &pcislot0 = add_pci_slot(config, "pcibus:0", 0, "mpc105");
-	pcislot0.set_option_machine_config("mpc105", [this](device_t *device) { mpc105_config(device); });
-	pci_connector_device &pcislot1 = add_pci_slot(config, "pcibus:1", 1, "cirrus");
-	pcislot1.set_option_machine_config("cirrus", [this](device_t *device) { cirrus_config(device); });
+	ISA16_SLOT(config, "superio", 0, m_isabus, bebox_superio, "aip", true).set_option_machine_config("aip", [this] (device_t *device)
+	{
+		downcast<i82091aa_device &>(*device).set_config_address(0x398);
+		downcast<i82091aa_device &>(*device).set_ide_tag(m_ide);
+		device->subdevice<floppy_connector>("fdc:1")->set_default_option(nullptr);
+	});
 
-	/*PCI_BUS_LEGACY_DEVICE(12, nullptr, scsi53c810_pci_read, scsi53c810_pci_write)*/
+	IDE_CONTROLLER(config, m_ide);
+	m_ide->options(ata_devices, "hdd", nullptr, false);
+	m_ide->irq_handler().set(m_isabus, FUNC(isa16_device::irq14_w));
 
-	SMC37C78(config, m_smc37c78, 24'000'000);
-	m_smc37c78->intrq_wr_callback().set(FUNC(bebox_state::fdc_interrupt));
-	m_smc37c78->drq_wr_callback().set(m_dma8237[0], FUNC(am9517a_device::dreq2_w));
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->irq().set(m_sio, FUNC(i82378zb_sio_device::pc_irq8n_w));
+	m_rtc->irq().append([this] (int state) { bebox_set_irq_bit(15, state); });
 
-	floppy_connector &fdc(FLOPPY_CONNECTOR(config, "smc37c78:0"));
-	fdc.option_add("35hd", FLOPPY_35_HD);
-	fdc.set_default_option("35hd");
-	fdc.set_formats(floppy_image_device::default_pc_floppy_formats);
+	KBDC8042(config, m_kbdc);
+	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_PS2);
+	m_kbdc->set_interrupt_type(kbdc8042_device::KBDC8042_DOUBLE);
+	m_kbdc->system_reset_callback().set_inputline(m_ppc[0], INPUT_LINE_RESET);
+	m_kbdc->input_buffer_full_callback().set(FUNC(bebox_state::bebox_keyboard_interrupt));
+	m_kbdc->input_buffer_full_mouse_callback().set(m_isabus, FUNC(isa16_device::irq12_w));
+	m_kbdc->set_keyboard_tag("at_keyboard");
 
-	MC146818(config, "rtc", 32.768_kHz_XTAL);
+	BEBOX_JOYPORT(config, "joyport");
 
-	kbdc8042_device &kbdc(KBDC8042(config, "kbdc"));
-	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
-	kbdc.system_reset_callback().set_inputline(m_ppc[0], INPUT_LINE_RESET);
-	kbdc.input_buffer_full_callback().set(FUNC(bebox_state::bebox_keyboard_interrupt));
-	kbdc.set_keyboard_tag("at_keyboard");
-
-	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 1));
-	at_keyb.keypress().set("kbdc", FUNC(kbdc8042_device::keyboard_w));
+	at_keyboard_device &at_keyb(AT_KEYB(config, "at_keyboard", pc_keyboard_device::KEYBOARD_TYPE::AT, 2));
+	at_keyb.keypress().set(m_kbdc, FUNC(kbdc8042_device::keyboard_w));
 
 	/* internal ram */
 	RAM(config, m_ram);
@@ -259,7 +223,7 @@ void bebox_state::bebox(machine_config &config)
 	m_ppc[0]->set_addrmap(AS_PROGRAM, &bebox_state::main_mem);
 
 	PPC603(config, m_ppc[1], 66000000);  /* 66 MHz */
-	m_ppc[1]->set_addrmap(AS_PROGRAM, &bebox_state::slave_mem);
+	m_ppc[1]->set_addrmap(AS_PROGRAM, &bebox_state::main_mem);
 
 	bebox_peripherals(config);
 }
@@ -270,28 +234,27 @@ void bebox_state::bebox2(machine_config &config)
 	m_ppc[0]->set_addrmap(AS_PROGRAM, &bebox_state::main_mem);
 
 	PPC603E(config, m_ppc[1], 133000000);  /* 133 MHz */
-	m_ppc[1]->set_addrmap(AS_PROGRAM, &bebox_state::slave_mem);
+	m_ppc[1]->set_addrmap(AS_PROGRAM, &bebox_state::main_mem);
 
 	bebox_peripherals(config);
 }
 
-static INPUT_PORTS_START( bebox )
-INPUT_PORTS_END
-
 ROM_START(bebox)
 	ROM_REGION(0x00200000, "user1", ROMREGION_64BIT | ROMREGION_BE)
-	ROM_LOAD( "bootmain.rom", 0x000000, 0x20000, CRC(df2d19e0) SHA1(da86a7d23998dc953dd96a2ac5684faaa315c701) )
+	ROM_SYSTEM_BIOS(0, "v11d7", "Be Boot ROM 1.1d7")
+	ROMX_LOAD("bootmain.rom", 0x000000, 0x20000, CRC(df2d19e0) SHA1(da86a7d23998dc953dd96a2ac5684faaa315c701), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "r3", "BeOS Release 3 boot ROM")
+	// /beos/etc/bebox_bootmain.image from the PowerPC Release 3 CD.
+	ROMX_LOAD("r3_bebox_bootmain.image", 0x000000, 0x5c155, CRC(13fcec34) SHA1(f7c1585680865c2fbdb22cc7f1cbd484e679de63), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "r4", "BeOS Release 4 boot ROM")
+	// /beos/etc/bebox_bootmain.image from the PowerPC Release 4 CD.
+	ROMX_LOAD("r4_bebox_bootmain.image", 0x000000, 0x4ec05, CRC(49ea7676) SHA1(ec073c6216ec6e97a75d31358a67747292787c7a), ROM_BIOS(2))
 	ROM_REGION(0x4000, "user2", ROMREGION_64BIT | ROMREGION_BE)
 	ROM_LOAD( "bootnub.rom", 0x000000, 0x4000, CRC(5348d09a) SHA1(1b637a3d7a2b072aa128dd5c037bbb440d525c1a) )
 ROM_END
 
-ROM_START(bebox2)
-	ROM_REGION(0x00200000, "user1", ROMREGION_64BIT | ROMREGION_BE)
-	ROM_LOAD( "bootmain.rom", 0x000000, 0x20000, CRC(df2d19e0) SHA1(da86a7d23998dc953dd96a2ac5684faaa315c701) )
-	ROM_REGION(0x4000, "user2", ROMREGION_64BIT | ROMREGION_BE)
-	ROM_LOAD( "bootnub.rom", 0x000000, 0x4000, CRC(5348d09a) SHA1(1b637a3d7a2b072aa128dd5c037bbb440d525c1a) )
-ROM_END
+#define rom_bebox2 rom_bebox
 
 /*    YEAR   NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME */
-COMP( 1995,  bebox,  0,      0,      bebox,   bebox, bebox_state, init_bebox, "Be Inc", "BeBox Dual603-66",  MACHINE_NOT_WORKING )
-COMP( 1996,  bebox2, bebox,  0,      bebox2,  bebox, bebox_state, init_bebox, "Be Inc", "BeBox Dual603-133", MACHINE_NOT_WORKING )
+COMP( 1995,  bebox,  0,      0,      bebox,   0,     bebox_state, init_bebox, "Be Inc", "BeBox Dual603-66",  MACHINE_NOT_WORKING )
+COMP( 1996,  bebox2, bebox,  0,      bebox2,  0,     bebox_state, init_bebox, "Be Inc", "BeBox Dual603-133", MACHINE_NOT_WORKING )

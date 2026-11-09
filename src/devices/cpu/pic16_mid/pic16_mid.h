@@ -13,11 +13,26 @@
 
 enum
 {
-	PIC16_MID_PC = 1,
+	PIC16_MID_CONFIG = 1,
+	PIC16_MID_PC,
+	PIC16_MID_FSR,
+	PIC16_MID_PCLATH,
+	PIC16_MID_BANK,
 	PIC16_MID_W,
-	PIC16_MID_ALU,
-	PIC16_MID_PSCL,
-	PIC16_MID_CONFIG
+	PIC16_MID_PRESCALER,
+	PIC16_MID_LATCHA,
+	PIC16_MID_LATCHB,
+	PIC16_MID_STACKPTR,
+	PIC16_MID_STACK0,
+	PIC16_MID_STACK1,
+	PIC16_MID_STACK2,
+	PIC16_MID_STACK3,
+	PIC16_MID_STACK4,
+	PIC16_MID_STACK5,
+	PIC16_MID_STACK6,
+	PIC16_MID_STACK7,
+	PIC16_MID_SLEEP,
+	PIC16_MID_WDT
 };
 
 // input lines
@@ -62,8 +77,6 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry) override;
-	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
@@ -152,9 +165,6 @@ private:
 	// i/o handlers
 	devcb_read8::array<2> m_read_port;
 	devcb_write8::array<2> m_write_port;
-
-	// For debugger
-	int m_debugger_temp;
 
 	// opcode table entry
 	typedef void (pic16_mid_device::*pic16_ophandler)();

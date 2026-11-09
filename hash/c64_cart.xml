@@ -13,17 +13,14 @@ license:CC0-1.0
     - Turbo Master CPU (R65C02P4 @ 4.09 MHz)
     - Turbo Process Accelerator (65C816P-4  @ 50kHz-4MHz)
     - Flash 8 (65816 @ 8 MHz, 4/8 MB RAM)
-    - CMD SuperCPU 64 (65C816S, 64 KB RAM)
     - Data 20 Z-80 Video Pak (Z80, 80 column video)
 
     Serial I/O:
     - HART (8251)
 
     RAM expansions:
-    - CMD RAMLink
     - CMD RAMDrive
     - CMD REU 1750XL
-    - Commodore REU 1700/1750/1764
     - Rex RAM-Floppy 256K
     - Rex Goliath 1MB
     - RAM-Cart
@@ -872,91 +869,6 @@ Black screen, self modifies code in the 0x100-0x14f range
 		</part>
 	</software>
 
-	<software name="ramlink" supported="no">
-		<description>RAMLink</description>
-		<year>1990</year>
-		<publisher>Creative Micro Designs</publisher>
-
-		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ramlink" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
-
-			<dataarea name="rom" size="0x10000">
-				<rom name="ramlink1.bin" size="0x8000" crc="da953716" sha1="adde7308c7155fc1942c98b674189e89f4965f91" offset="0x0000" />
-				<rom name="ramlink2.bin" size="0x8000" crc="ab8b6dda" sha1="e35e776387bd8b9ab16bacff70c2a3f3ef9b65bd" offset="0x8000" />
-			</dataarea>
-		</part>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="ramlink-1.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ramlink140" cloneof="ramlink" supported="no">
-		<description>RAMLink v1.40</description>
-		<year>1990</year>
-		<publisher>Creative Micro Designs</publisher>
-
-		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ramlink" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
-
-			<dataarea name="rom" size="0x10000">
-				<rom name="cmd_ramlink_dos_v140.bin" size="0x10000" crc="31d1c877" sha1="fe536cb7a14c8ecbac55ef2799267855f1447d9f" />
-			</dataarea>
-		</part>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="ramlink-1.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ramlink201" cloneof="ramlink" supported="no">
-		<description>RAMLink v2.01</description>
-		<year>1990</year>
-		<publisher>Creative Micro Designs</publisher>
-
-		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ramlink" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
-
-			<dataarea name="rom" size="0x10000">
-				<rom name="cmd_ramlink_dosv201.bin" size="0x10000" crc="9810f48d" sha1="aafb1c66ea6f7d131675f6c948461ca1dc56c1e7"/>
-			</dataarea>
-		</part>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="ramlink-1.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="grappler" supported="no">
 		<description>Grappler CD</description>
 		<year>1984</year>
@@ -1386,7 +1298,7 @@ Black screen, self modifies code in the 0x100-0x14f range
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 
-			<dataarea name="roml" size="0xa0000">
+			<dataarea name="roml" size="0x100000">
 				<rom name="rom-menu.bin" size="0xa0000" crc="a3842c0d" sha1="a147584a959034c8a5679e72c183c82f7e876fd6" />
 			</dataarea>
 		</part>
@@ -1674,7 +1586,7 @@ Black screen, self modifies code in the 0x100-0x14f range
 		<year>1983</year>
 		<publisher>Spinnaker Software</publisher>
 		<info name="serial" value="ABZ-C6" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -1770,7 +1682,7 @@ Black screen, self modifies code in the 0x100-0x14f range
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-001-04" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -2143,7 +2055,7 @@ Cannot select (s)ingle or (a)ll events, no key press recognized
 		<description>Donkey Kong</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -2184,7 +2096,7 @@ Cannot select (s)ingle or (a)ll events, no key press recognized
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64???" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -2668,7 +2580,7 @@ Some erratic chars in playfield [VIC] GFXMODE=1, fixes on soft reset
 Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fear"
 ]]></notes>
 		<info name="serial" value="C-64613" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3126,7 +3038,7 @@ Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fe
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-104-04" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3181,7 +3093,7 @@ Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fe
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-007-04" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3210,7 +3122,7 @@ Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fe
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-002-04" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
@@ -3228,7 +3140,7 @@ Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fe
 Blue strips on title screen in place of tyres, mixes [VIC] GFXMODE=2 and 3
 Broken gameplay gfx, [VIC] GFXMODE=3
 ]]></notes>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3242,7 +3154,7 @@ Broken gameplay gfx, [VIC] GFXMODE=3
 		<description>Pitstop (alt)</description>
 		<year>1983</year>
 		<publisher>Epyx</publisher>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3257,7 +3169,7 @@ Broken gameplay gfx, [VIC] GFXMODE=3
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 		<info name="serial" value="RX8536" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3271,7 +3183,7 @@ Broken gameplay gfx, [VIC] GFXMODE=3
 		<description>Popeye</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3511,7 +3423,7 @@ Broken gameplay gfx, [VIC] GFXMODE=3
 		<notes><![CDATA[
 Glitchy [VIC] status bar GFXMODE switches on gameplay
 ]]></notes>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
@@ -4168,7 +4080,7 @@ Starts a 2 players game even if 1p is chosen?
 Erratic [VIC] collsion detection, warps and invincibility bonuses can kill player instead.
 ]]></notes>
 		<info name="serial" value="DC-101-04" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -6764,27 +6676,6 @@ Fails [MOS6526], [SID] and [cassette] checks
 		</part>
 	</software>
 
-	<software name="ide64">
-		<description>IDE64 (v4.1, IDEDOS v0.90)</description>
-		<year>2019</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-
-		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ide64" />
-
-			<dataarea name="ide64:u3" size="0x20000">
-				<rom name="idedos20190819.rom" size="0x20000" crc="8792bf2d" sha1="1b97505b07aaea1ed4404e5f5ac7550ec02854b7" />
-			</dataarea>
-		</part>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="idedos_util.d64" size="174848" crc="94f27ea4" sha1="1119da8fd7304e3cea4d37828a4ce53a0f6bad09" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pop">
 		<description>Prince of Persia (v1.1)</description>
 		<year>2011</year>
@@ -7119,36 +7010,6 @@ Fails [MOS6526], [SID] and [cassette] checks
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
 				<rom name="koalapainter" size="0x4000" crc="cc75a06d" sha1="4707fe57b0575415a2c258392355941c130fcc80"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tibdd001">
-		<description>Disc Drive DD-001 (v1.1)</description>
-		<year>1991</year>
-		<publisher>TIB</publisher>
-		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="tibdd001" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
-
-			<dataarea name="roml" size="0x2000">
-				<rom name="rom_dd001_v1.1.bin" size="0x2000" crc="d266b628" sha1="24d178560dad3d955ebbe15f4274d966e031142d"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tibdd001a" cloneof="tibdd001">
-		<description>Disc Drive DD-001 (v1.0)</description>
-		<year>1991</year>
-		<publisher>TIB</publisher>
-		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="tibdd001" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
-
-			<dataarea name="roml" size="0x2000">
-				<rom name="rom_dd001_v1.0.bin" size="0x2000" crc="58f83983" sha1="f18cfb42c8e2c9152e18b129d01408f702271363"/>
 			</dataarea>
 		</part>
 	</software>

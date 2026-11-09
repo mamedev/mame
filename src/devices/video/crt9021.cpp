@@ -128,44 +128,39 @@ void crt9021_device::device_start()
 
 
 //-------------------------------------------------
-//  ld_sh_w - load/shift
+//  ld_sh_rise - load/shift rising edge
 //-------------------------------------------------
 
-void crt9021_device::ld_sh_w(int state)
+void crt9021_device::ld_sh_rise()
 {
-	LOG("CRT9021 LD/SH: %u\n", state);
+	LOG("CRT9021 LD/SH rising edge\n");
 
-	if (!m_ld_sh && state)
+	// shift in scanline data
+	if (!m_slg)
 	{
-		// shift in scanline data
-		if (!m_slg)
-		{
-			m_sl >>= 1;
-			m_sl |= m_sld << 3;
-		}
-
-		// latch data
-		if (m_retbl)
-		{
-			m_sr = 0;
-		}
-		else
-		{
-			m_sr = m_chabl ? 0 : m_data;
-
-			if (m_revid) m_sr ^= 0xff;
-		}
-
-		// latch attributes
-		if (m_atten)
-		{
-			// TODO
-		}
-
-		m_display_cb(m_bitmap, screen().vpos(), screen().hpos(), m_sr, m_intout);
+		m_sl >>= 1;
+		m_sl |= m_sld << 3;
 	}
 
-	m_ld_sh = state;
+	// latch data
+	if (m_retbl)
+	{
+		m_sr = 0;
+	}
+	else
+	{
+		m_sr = m_chabl ? 0 : m_data;
+
+		if (m_revid) m_sr ^= 0xff;
+	}
+
+	// latch attributes
+	if (m_atten)
+	{
+		// TODO
+	}
+
+	m_display_cb(m_bitmap, m_sr, m_intout);
 }
 
 

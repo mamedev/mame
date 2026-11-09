@@ -12,6 +12,7 @@
 #include "machine/am79c940.h"
 #include "machine/applefdintf.h"
 #include "machine/ncr53c90.h"
+#include "machine/upd72070.h"
 #include "sound/dac.h"
 
 #include "speaker.h"
@@ -25,6 +26,7 @@ public:
 	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
 	void set_scsi_device(ncr53c94_device *device) { m_ncr = device; }
 	template <typename T> void set_mace_tag(T &&tag) { m_mace.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_fdc_tag(T &&tag) { m_fdc.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_dsp_tag(T &&tag) { m_dsp.set_tag(std::forward<T>(tag)); }
 
 	// interface routines
@@ -56,6 +58,7 @@ public:
 	void via_sync();
 
 	void scsi_drq_w(int state);
+	void fdc_drq_w(int state);
 	void enet_irq_w(int state);
 	void enet_tx_drq_w(int state);
 	void enet_rx_drq_w(int state);
@@ -95,13 +98,18 @@ private:
 	void recalc_via2_irqs();
 
 	u16 dma_ctrl_r(offs_t offset);
-	void dma_ctrl_w(offs_t offset, u16 data);
+	void dma_ctrl_w(offs_t offset, u16 data, u16 mem_mask);
 	u32 dma_set_r(offs_t offset);
 	void dma_set_w(offs_t offset, u32 data, u32 mem_mask);
 	void enet_dma_kick();
 	bool enet_dma_ready(int channel) const;
 	void enet_dma_complete(int channel);
 	TIMER_CALLBACK_MEMBER(enet_dma_tick);
+	bool fdc_dma_ready() const;
+	void fdc_dma_kick();
+	void fdc_dma_flush();
+	void fdc_dma_complete();
+	TIMER_CALLBACK_MEMBER(fdc_dma_tick);
 	void recalc_dma_irqs();
 	void recalc_lv3();
 	void recalc_lv4();
@@ -111,7 +119,6 @@ private:
 	uint8_t via_in_a();
 	uint8_t via2_in_a();
 	uint32_t scc_fake_r();
-	uint32_t newage_fake_r();
 	void via_out_a(uint8_t data);
 	void field_interrupts();
 	void via_out_cb1(int state);
@@ -166,6 +173,12 @@ private:
 	bool m_enet_tx_drq, m_enet_rx_drq;
 	u16 m_enet_rx_offset;
 	u8 m_enet_rx_status;
+	optional_device<upd72070_device> m_fdc;
+	emu_timer *m_fdc_timer;
+	bool m_fdc_drq;
+	bool m_fdc_servicing;
+	u32 m_fdc_fifo;
+	u8 m_fdc_fifo_count;
 
 	required_address_space m_space;
 	ncr53c94_device *m_ncr;

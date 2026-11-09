@@ -323,7 +323,7 @@
 #include "bus/ata/ataintf.h"
 #include "bus/ata/hdd.h"
 #include "cpu/powerpc/ppc.h"
-#include "machine/lpci.h"
+#include "machine/mpc105.h"
 #include "machine/timekpr.h"
 #include "sound/dmadac.h"
 #include "sound/rf5c400.h"
@@ -525,11 +525,11 @@ public:
 		m_ata(*this, "ata"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_legacy_pci(*this, "pcibus"),
+		m_host(*this, "pci:00.0"),
 		m_jvs_host(*this, "jvs_host"),
 		m_dmadac(*this, "dac%u", 1U),
 		m_generic_paletteram_32(*this, "paletteram"),
-		m_main_ram(*this, "main_ram"),
+		m_main_ram(*this, "main_ram", 0x800000, ENDIANNESS_BIG), // TODO: Verify the physical RAM size.
 		m_sub_ram(*this, "sub_ram"),
 		m_gfx_ram0(*this, "gfx_main_ram_0"),
 		m_gfx_ram1(*this, "gfx_main_ram_1"),
@@ -546,11 +546,11 @@ public:
 	required_device<ata_interface_device> m_ata;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<pci_bus_legacy_device> m_legacy_pci;
+	required_device<mpc105_host_device> m_host;
 	required_device<konppc_jvs_host_device> m_jvs_host;
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
-	required_shared_ptr<uint64_t> m_main_ram;
+	memory_share_creator<uint64_t> m_main_ram;
 	required_shared_ptr<uint32_t> m_sub_ram;
 	required_shared_ptr<uint64_t> m_gfx_ram0;
 	required_shared_ptr<uint64_t> m_gfx_ram1;
@@ -676,11 +676,6 @@ public:
 	void cobra_sub_map(address_map &map) ATTR_COLD;
 
 	void rf5c400_map(address_map &map) ATTR_COLD;
-
-	uint32_t mpc106_pci_r(int function, int reg, uint32_t mem_mask);
-	void mpc106_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
-
-	uint32_t m_mpc106_regs[256/4];
 };
 
 void cobra_renderer::render_color_scan(int32_t scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
@@ -1218,23 +1213,6 @@ void cobra_state::gfxfifo_out_event_callback(cobra_fifo::EventType event)
 // 0x02: S2M FIFO
 // 0x04: Vblank?
 
-uint32_t cobra_state::mpc106_pci_r(int function, int reg, uint32_t mem_mask)
-{
-	//printf("MPC106: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
-
-	switch (reg)
-	{
-	}
-
-	return m_mpc106_regs[reg/4];
-}
-
-void cobra_state::mpc106_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
-{
-	//printf("MPC106: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
-	COMBINE_DATA(&m_mpc106_regs[reg/4]);
-}
-
 uint64_t cobra_state::main_fifo_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
@@ -1542,9 +1520,6 @@ TIMER_CALLBACK_MEMBER(cobra_state::mailbox_release)
 
 void cobra_state::cobra_main_map(address_map &map)
 {
-	map(0x00000000, 0x003fffff).ram().share("main_ram");
-	map(0x07c00000, 0x07ffffff).ram();
-	map(0x80000cf8, 0x80000cff).rw(m_legacy_pci, FUNC(pci_bus_legacy_device::read_64be), FUNC(pci_bus_legacy_device::write_64be));
 	map(0xc0000000, 0xc03fffff).ram().share("gfx_main_ram_0");              // GFX board main ram, bank 0
 	map(0xc7c00000, 0xc7ffffff).ram().share("gfx_main_ram_1");              // GFX board main ram, bank 1
 	map(0xfff00000, 0xfff7ffff).rom().region("user1", 0);                   /* Boot ROM */
@@ -2957,6 +2932,11 @@ INTERRUPT_GEN_MEMBER(cobra_state::cobra_vblank)
 
 void cobra_state::machine_start()
 {
+	m_host->set_ram_info(reinterpret_cast<uint8_t *>(&m_main_ram[0]), m_main_ram.bytes());
+
+	// The GFX board's shared RAM takes priority over the host's PCI memory window.
+	m_maincpu->space(AS_PROGRAM).install_device(0, 0xffffffff, *this, &cobra_state::cobra_main_map);
+
 	/* configure fast RAM regions for DRC */
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, false, m_main_ram);
 
@@ -3025,8 +3005,8 @@ void cobra_state::cobra(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(55005));
 
-	PCI_BUS_LEGACY(config, m_legacy_pci, 0, 0);
-	m_legacy_pci->set_device(0, FUNC(cobra_state::mpc106_pci_r), FUNC(cobra_state::mpc106_pci_w));
+	PCI_ROOT(config, "pci");
+	MPC105(config, m_host, mpc105_host_device::MAP_TYPE_A, m_maincpu, nullptr);
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 	m_ata->irq_handler().set(FUNC(cobra_state::ide_interrupt));

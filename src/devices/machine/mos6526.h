@@ -74,7 +74,9 @@ public:
 	void tod_w(int state);
 
 protected:
-	mos6526_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	enum class model : uint8_t { CIA6526, CIA6526A, CIA8520 };
+
+	mos6526_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, model variant);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -85,27 +87,27 @@ protected:
 
 	// On the 6526 the ICR read's clear window is held a little longer for the
 	// Timer B flag bit, so a flag set right after a read is swallowed
-	virtual bool icr_read_loses_tb() const { return true; }
+	const bool m_icr_read_loses_tb;
 
 	// On the later chips the read bits are only driven to zero a cycle after the
 	// read, so one more read still sees the flags it cleared
-	virtual bool icr_read_sticky() const { return false; }
+	const bool m_icr_read_sticky;
 
 	// The 6526 latches IR through one more stage than the later chips, so its
 	// IRQ - and the IR bit an ICR read returns - lags theirs by a cycle
-	virtual bool irq_one_cycle_early() const { return false; }
+	const bool m_irq_one_cycle_early;
 
 	// On the 8520 a timer-high write force-loads and starts a stopped one-shot timer
-	virtual bool timer_hi_starts_oneshot() const { return false; }
+	const bool m_timer_hi_starts_oneshot;
 
 	// The 8520 latches the interrupt sources a cycle after they form
-	virtual bool irq_sources_delayed() const { return false; }
+	const bool m_irq_sources_delayed;
 
 	// The 8520's time-of-day is a plain binary counter, so it has no unused
 	// register bits and powers up at zero rather than 01:00:00.0
-	virtual uint8_t tod_mask(int offset) const;
-	virtual uint32_t tod_reset_value() const { return 0x01000000UL; }
-	virtual uint8_t cra_mask() const { return 0xef; }
+	const uint32_t m_tod_mask;
+	const uint32_t m_tod_reset_value;
+	const uint8_t m_cra_mask;
 
 	int m_icount;
 	int m_tod_clock;
@@ -239,27 +241,17 @@ class mos6526a_device : public mos6526_device
 {
 public:
 	mos6526a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual bool icr_read_loses_tb() const override { return false; }
-	virtual bool icr_read_sticky() const override { return true; }
-	virtual bool irq_one_cycle_early() const override { return true; }
 };
 
 
 // ======================> mos8521_device
 
+// modelled as the 6526A: the two share these differences from the 6526, but
+// what else separates them has not been established
 class mos8521_device : public mos6526_device
 {
 public:
 	mos8521_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	// modelled as the 6526A: the two share these differences from the 6526, but
-	// what else separates them has not been established
-	virtual bool icr_read_loses_tb() const override { return false; }
-	virtual bool icr_read_sticky() const override { return true; }
-	virtual bool irq_one_cycle_early() const override { return true; }
 };
 
 
@@ -275,14 +267,6 @@ public:
 
 protected:
 	virtual void clock_tod() override;
-	virtual bool icr_read_loses_tb() const override { return false; }
-	virtual bool icr_read_sticky() const override { return true; }
-	virtual bool irq_one_cycle_early() const override { return true; }
-	virtual bool timer_hi_starts_oneshot() const override { return true; }
-	virtual bool irq_sources_delayed() const override { return true; }
-	virtual uint8_t tod_mask(int offset) const override { return 0xff; }
-	virtual uint32_t tod_reset_value() const override { return 0; }
-	virtual uint8_t cra_mask() const override { return 0x6f; }
 };
 
 

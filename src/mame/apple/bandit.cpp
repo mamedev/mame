@@ -105,7 +105,22 @@ void applpsx_host_device::device_start()
 	m_cpu_space->install_read_handler(0xf8000000, 0xf800006f, emu::rw_delegate(*this, FUNC(applpsx_host_device::regs_r)));
 	m_cpu_space->install_write_handler(0xf8000000, 0xf800006f, emu::rw_delegate(*this, FUNC(applpsx_host_device::regs_w)));
 
-	m_sys_config = 0x03000000;
+	// set the bus clock readback bits: 0 = 38 MHz, 1 = 33 MHz, 2 = 40 MHz, 3 = 50 MHz
+	u32 bus_speed = 3;
+	if (clock() < 35'500'000)
+	{
+		bus_speed = 1;
+	}
+	else if (clock() < 39'000'000)
+	{
+		bus_speed = 0;
+	}
+	else if (clock() < 45'000'000)
+	{
+		bus_speed = 2;
+	}
+
+	m_sys_config = 0x03000000 | bus_speed;
 }
 
 u64 applpsx_host_device::regs_r(offs_t offset, u64 mem_mask)
