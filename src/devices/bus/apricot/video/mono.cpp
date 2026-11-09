@@ -111,8 +111,18 @@ void apricot_mono_display_device::device_reset()
 	m_portb = 0xff;
 	m_portc = 0xff;
 	m_portx = 0xff;
+}
 
-	m_crtc->reset_w(BIT(m_portb, 0));
+//-------------------------------------------------
+//  device_reset_after_children - release the
+//  CRTC once it has reset
+//-------------------------------------------------
+
+void apricot_mono_display_device::device_reset_after_children()
+{
+	// port B bit 0 resets high, releasing the CRTC; after the CRTC's own
+	// reset, which would otherwise undo the line the release starts
+	m_crtc->reset_w(1);
 }
 
 
