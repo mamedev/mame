@@ -831,9 +831,11 @@ void mc6845_device::reset_w(int state)
 		// every counter stops and clears and every output goes low; the
 		// registers are kept.  Clearing the cursor blink counter too is
 		// inferred: no sheet names it.  Not modelled: the minimum hold of
-		// one CCLK, and the MC6845 and HD46505R test mode (RESET with LPSTB
-		// high; there is no LPSTB level input here, so it reads low).  Not
-		// reset: the MOS 8563's own draw counters.
+		// one CCLK; RESET with LPSTB high, which is a test mode on the
+		// MC6845 and ignored by the HD46505R (there is no LPSTB level input
+		// here, so it reads low); HSYNC being undefined until R2 is written
+		// (MC6845).  Not reset: the MOS 8563's own draw counters.
+
 		// disabled, not rescheduled: the restart paths test enabled()
 		m_line_timer->enable(false);
 		m_de_off_timer->enable(false);
@@ -882,6 +884,12 @@ void mc6845_device::reset_w(int state)
 		// screen origin, which a CRTC reset every row would do every row.
 		m_reset_hold_active = m_reset_hold_frame;
 		start_line(reload_frame_counters());
+	}
+	else
+	{
+		// nothing to scan yet: recompute_parameters() starts the line timer
+		// once the registers are valid, so leave the power-up state for it
+		m_line_enable_ff = false;
 	}
 }
 
@@ -1198,6 +1206,8 @@ void mc6845_device::device_reset()
 	m_out_hsync_cb(false);
 
 	m_out_vsync_cb(false);
+
+	m_reset_hold_active = false;
 
 	if (!m_line_timer->enabled() && m_has_valid_parameters && !m_reset_held)
 	{

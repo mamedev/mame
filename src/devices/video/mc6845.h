@@ -205,8 +205,8 @@ protected:
 	uint8_t   m_adjust_active;
 	uint16_t  m_line_address;
 	int16_t   m_cursor_x;
-	bool      m_reset_held;     // RESET pin low
-	bool      m_reset_hold_active; // first frame after RESET, DE and CURSOR held off
+	bool      m_reset_held;         // RESET pin low
+	bool      m_reset_hold_active;  // first frame after RESET, DE and CURSOR held off
 
 	/* timers */
 	emu_timer *m_line_timer;
