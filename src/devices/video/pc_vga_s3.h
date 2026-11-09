@@ -88,7 +88,7 @@ protected:
 	} s3;
 	virtual uint16_t offset() override;
 
-	virtual void s3_define_video_mode(void);
+	virtual void recompute_params() override;
 	virtual bool get_interlace_mode() override { return BIT(s3.cr42, 5); }
 
 private:

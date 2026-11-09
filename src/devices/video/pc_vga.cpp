@@ -1612,6 +1612,8 @@ uint32_t vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 void vga_device::recompute_params_clock(int divisor, int xtal)
 {
+	assert(divisor > 0);
+	assert(xtal > 0);
 	int vblank_period, hblank_period;
 	// if not in graphic mode and not Clocking Mode bit 0 select 9 dots per charset
 	uint8_t hclock_m = !vga.gc.alpha_dis && !BIT(vga.sequencer.data[1], 0) ? 9 : 8;
