@@ -16,7 +16,6 @@
 #include "sound/flt_rc.h"
 #include "sound/mixer.h"
 #include "sound/va_eg.h"
-#include "sound/va_ops.h"
 #include "sound/va_vca.h"
 
 DECLARE_DEVICE_TYPE(XPANDER_VOICE, xpander_voice_device)

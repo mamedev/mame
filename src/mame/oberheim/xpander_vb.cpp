@@ -39,6 +39,7 @@ active-high (active == true).
 #include "emu.h"
 #include "xpander_vb.h"
 #include "machine/rescap.h"
+#include "sound/va_ops.h"
 
 #include <numbers>
 #include <utility>
