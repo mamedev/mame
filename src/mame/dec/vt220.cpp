@@ -128,8 +128,11 @@ private:
 	u8 m_lba = 0;
 	u8 m_lbf_bank = 0;
 	bool m_132col = false;
-	int m_row_y = 0;
 	int m_vlt_x = 0;
+	u8 m_sl = 0;
+	bool m_dw = false; // cursor skew F/F: double width scan line
+	u8 m_line_sl[VTOTAL]; // per scan line: SL3-SL0 (0xff before any VLT) and double width
+	u8 m_line_dw[VTOTAL] = { };
 	bool m_vlt = false;
 	bool m_drb = true;
 	bool m_row_loading = false;
@@ -145,8 +148,9 @@ private:
 	void set_columns();
 	offs_t lbf_addr(bool chr, u8 lba) const;
 	u8 lbf_out(bool chr, u8 lba) const;
-	int video_col(int x) const;
-	bool in_row(int x) const;
+	int video_col(int x, bool dw) const;
+	int video_dot(int x, bool dw) const;
+	bool in_row(int x, bool dw) const;
 	u8 dot(int col, int x, int line, bool &bold, bool &blink) const;
 	u8 video_out(int x, int y, bool &bold, bool &blink) const;
 
@@ -162,6 +166,8 @@ private:
 	void host_rxd_w(int state);
 	u8 vram_r(offs_t offset);
 	void vlt_w(int state);
+	void sl_w(u8 data);
+	void curs_w(int state);
 	void drb_w(int state);
 	void cblank_w(int state);
 
@@ -223,19 +229,26 @@ void vt220a_state::vt220a_vram(address_map &map)
 	map(0x0000, 0x3fff).r(FUNC(vt220a_state::vram_r));
 }
 
-int vt220a_state::video_col(int x) const
+int vt220a_state::video_col(int x, bool dw) const
 {
-	// the line buffer address counter is cleared by VLT and clocked by T5; -1 before VLT
+	// the line buffer address counter is cleared by VLT and clocked by T5, -1 before VLT; on double
+	// width lines the INH gate holds off every other character load, so it advances at half rate
 	const int dx = x - m_vlt_x;
-	return (dx < 0) ? -1 : dx / timing().width;
+	return (dx < 0) ? -1 : (dx >> (dw ? 1 : 0)) / timing().width;
 }
 
-bool vt220a_state::in_row(int x) const
+int vt220a_state::video_dot(int x, bool dw) const
+{
+	// and the INH F/F shifts each dot twice
+	return ((x - m_vlt_x) >> (dw ? 1 : 0)) % timing().width;
+}
+
+bool vt220a_state::in_row(int x, bool dw) const
 {
 	// CBLANK H blanks the video (TM 6.2.3) for the whole retrace (CRT9007 datasheet, pin 35), but the
 	// CRT9007 model's CBLANK covers only sync: blank outside the row's characters here
-	const int col = video_col(x);
-	return col >= 0 && col < timing().cols;
+	const int col = video_col(x, dw);
+	return col >= 0 && col < (timing().cols >> (dw ? 1 : 0));
 }
 
 u8 vt220a_state::vram_r(offs_t offset)
@@ -245,12 +258,11 @@ u8 vt220a_state::vram_r(offs_t offset)
 	const u8 chr = m_screen_ram[offset & 0x0fff];
 	if (m_vlt && !BIT(m_p1, 0) && !BIT(m_p1, 3) && !BIT(m_conf, 2) && !machine().side_effects_disabled())
 	{
-		const int col = video_col(m_screen->hpos());
+		const int col = video_col(m_screen->hpos(), m_dw);
 		if (!m_drb && !m_row_loading)
 		{
 			// top scan line of a data row: it is painted live as the line buffer loads
 			m_screen->update_partial(m_screen->vpos() - 1);
-			m_row_y = m_screen->vpos();
 			m_row_loading = true;
 		}
 		if (col >= 0 && col < 0x100)
@@ -265,8 +277,31 @@ u8 vt220a_state::vram_r(offs_t offset)
 void vt220a_state::vlt_w(int state)
 {
 	if (state && !m_vlt)
+	{
+		// the chargen scan line comes from the CRT9007's SL3-SL0, set during the retrace before
+		const int y = m_screen->vpos();
 		m_vlt_x = m_screen->hpos();
+		m_line_sl[y] = m_sl;
+		m_line_dw[y] = m_dw;
+	}
+	else if (!state && m_vlt)
+	{
+		// CGBLANK resets the cursor skew F/F at the start of each retrace
+		m_dw = false;
+	}
 	m_vlt = state;
+}
+
+void vt220a_state::sl_w(u8 data)
+{
+	m_sl = data;
+}
+
+void vt220a_state::curs_w(int state)
+{
+	// CURS H outside VLT sets the cursor skew F/F for a double width line (TM 6.2.7.1)
+	if (state && !m_vlt)
+		m_dw = true;
 }
 
 void vt220a_state::drb_w(int state)
@@ -314,9 +349,10 @@ u8 vt220a_state::video_out(int x, int y, bool &bold, bool &blink) const
 {
 	// the video stream at beam position x, y: nothing outside the row or with DIS VIDEO H (OP7)
 	bold = blink = false;
-	if (!in_row(x) || BIT(m_duart_op, 7))
+	const bool dw = m_line_dw[y];
+	if (!in_row(x, dw) || BIT(m_duart_op, 7))
 		return 0;
-	return dot(video_col(x), (x - m_vlt_x) % timing().width, y - m_row_y, bold, blink);
+	return dot(video_col(x, dw), video_dot(x, dw), m_line_sl[y], bold, blink);
 }
 
 u8 vt220a_state::duart_r(offs_t offset)
@@ -327,7 +363,7 @@ u8 vt220a_state::duart_r(offs_t offset)
 		// (CBLANK or DIS VIDEO), TVB H on IP3 is E45 NOR of the video and the two intensity lines.
 		// Sampled when the CPU reads the input port, so the IPCR change bits only update then.
 		const int x = m_screen->hpos(), y = m_screen->vpos();
-		const bool blank = m_cblank || BIT(m_duart_op, 7) || !in_row(x); // OP7 DIS VIDEO H
+		const bool blank = m_cblank || BIT(m_duart_op, 7) || !in_row(x, m_line_dw[y]); // OP7 DIS VIDEO H
 		bool bold = false, blink = false;
 		const bool video = !blank && video_out(x, y, bold, blink);
 		m_duart->ip3_w(!(video || bold || blink));
@@ -479,6 +515,7 @@ void vt220a_state::machine_start()
 
 	m_softchar = make_unique_clear<u8[]>(0x800);
 	m_lbf = make_unique_clear<u8[]>(0x800);
+	memset(m_line_sl, 0xff, sizeof(m_line_sl));
 
 	save_item(NAME(m_p1));
 	save_item(NAME(m_conf));
@@ -488,8 +525,11 @@ void vt220a_state::machine_start()
 	save_item(NAME(m_lba));
 	save_item(NAME(m_lbf_bank));
 	save_item(NAME(m_132col));
-	save_item(NAME(m_row_y));
 	save_item(NAME(m_vlt_x));
+	save_item(NAME(m_sl));
+	save_item(NAME(m_dw));
+	save_item(NAME(m_line_sl));
+	save_item(NAME(m_line_dw));
 	save_item(NAME(m_vlt));
 	save_item(NAME(m_drb));
 	save_item(NAME(m_row_loading));
@@ -513,7 +553,7 @@ void vt220_state::machine_reset()
 void vt220a_state::machine_reset()
 {
 	vt220_state::machine_reset();
-	m_row_y = 0;
+	m_dw = false;
 	m_row_loading = false;
 }
 
@@ -610,6 +650,8 @@ void vt220a_state::vt220a(machine_config &config)
 	m_crtc->hs_callback().set_inputline(m_maincpu, MCS51_T1_LINE).invert();
 	m_crtc->drb_callback().set(FUNC(vt220a_state::drb_w));
 	m_crtc->vlt_callback().set(FUNC(vt220a_state::vlt_w));
+	m_crtc->sl_callback().set(FUNC(vt220a_state::sl_w));
+	m_crtc->curs_callback().set(FUNC(vt220a_state::curs_w));
 	m_crtc->cblank_callback().set(FUNC(vt220a_state::cblank_w));
 	X2212(config, m_nvr); // E17
 
