@@ -490,8 +490,9 @@ void vt220a_state::machine_start()
 	save_pointer(NAME(m_lbf), 0x800);
 	machine().save().register_postload(save_prepost_delegate(FUNC(vt220a_state::set_columns), this));
 
-	// TM table 5-2: PTR DTR is on whenever the terminal is powered
+	// TM table 5-2: the printer port DTR and RTS are on whenever the terminal is powered
 	m_printer->write_dtr(0);
+	m_printer->write_rts(0);
 }
 
 void vt220_state::machine_reset()
