@@ -5,33 +5,8 @@
 
 #pragma once
 
+#include "cpu/m6805/m68hc05.h"
 #include "sound/beep.h"
-
-#include "diserial.h"
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define LK_CMD_LEDS_ON          0x13    /* light LEDs - 1st param: led bitmask */
-#define LK_CMD_LEDS_OFF         0x11    /* turn off LEDs */
-
-#define LK_CMD_DIS_KEYCLK       0x99    /* disable the keyclick */
-#define LK_CMD_ENB_KEYCLK       0x1b    /* enable the keyclick - 1st param: volume */
-#define LK_CMD_DIS_CTLCLK       0xb9    /* disable the Ctrl keyclick */
-#define LK_CMD_ENB_CTLCLK       0xbb    /* enable the Ctrl keyclick */
-#define LK_CMD_SOUND_CLK        0x9f    /* emit a keyclick  - 1st param: volume */
-#define LK_CMD_DIS_BELL         0xa1    /* disable the bell */
-#define LK_CMD_ENB_BELL         0x23    /* enable the bell - 1st param: volume */
-#define LK_CMD_BELL             0xa7    /* emit a bell - 1st param: volume */
-
-// TCR - Timer Compare Register
-#define TCR_OCIE 0x40 // Bit 6 (output compare IRQ enable)
-#define TCR_OLVL 0x01 // Bit 1 (output level)
-
-// TSR - Timer Status Register
-#define TSR_OCFL 0x40 // TSR (68HC05 output compare flag)
 
 
 //**************************************************************************
@@ -40,26 +15,16 @@
 
 // ======================> lk201_device
 
-class lk201_device : public device_t, public device_serial_interface
+class lk201_device : public device_t
 {
 public:
 	// construction/destruction
 	lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	uint8_t ddr_r(offs_t offset);
-	void ddr_w(offs_t offset, uint8_t data);
-	uint8_t ports_r(offs_t offset);
-	void ports_w(offs_t offset, uint8_t data);
-	uint8_t sci_r(offs_t offset);
-	void sci_w(offs_t offset, uint8_t data);
-	uint8_t spi_r(offs_t offset);
-	void spi_w(offs_t offset, uint8_t data);
-	uint8_t timer_r(offs_t offset);
-	void timer_w(offs_t offset, uint8_t data);
+	// serial line to and from the host, through the MCU's SCI
+	auto tx_handler() { return m_maincpu.lookup()->sci_tdo(); }
+	void rx_w(int state) { m_maincpu->sci_rdi_w(state); }
 
-	auto tx_handler() { return m_tx_handler.bind(); }
-
-	void lk201_map(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -68,49 +33,18 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	// device_serial overrides
-	virtual void rcv_complete() override;    // Rx completed receiving byte
-	virtual void tra_complete() override;    // Tx completed sending byte
-	virtual void tra_callback() override;    // Tx send bit
-
-	TIMER_CALLBACK_MEMBER(timer_irq);
-	TIMER_CALLBACK_MEMBER(beeper_off);
-
 private:
-	uint8_t ddrs[3];
-	uint8_t ports[3];
-	uint8_t led_data;
-	uint8_t kbd_data;
+	template <u32 N> void rows_w(offs_t offset, u8 data, u8 mask);
+	void portc_w(offs_t offset, u8 data, u8 mask);
+	void sck_w(int state);
+	void mosi_w(int state) { m_mosi = state; }
+	u8 portd_r() { return 0x20 | (BIT(m_kbd_sr, 7) << 2); } // PD2 is MISO; PD5 is /SS, inferred high (the firmware never reads port D)
 
-	union {
-		struct {
-			uint8_t tcr;
-			uint8_t tsr;
-			uint8_t icrh;
-			uint8_t icrl;
-			uint8_t ocrh;
-			uint8_t ocrl;
-			uint8_t crh;
-			uint8_t crl;
-			uint8_t acrh;
-			uint8_t acrl;
-		};
-		uint8_t regs[10];
-	} m_timer;
+	u8 scan_matrix();
+	void update_matrix_load();
+	void update_latch();
 
-	emu_timer *m_count;
-	emu_timer *m_beeper;
-
-	uint8_t sci_ctl2;
-	uint8_t sci_status;
-	uint8_t sci_tdr;        // transmit data register, waiting for the shift register
-	bool sci_tdr_full;
-	//uint8_t sci_data;
-
-	uint8_t spi_status;
-	uint8_t spi_data;
-
-	required_device<cpu_device> m_maincpu;
+	required_device<m68hc05c4_device> m_maincpu;
 	required_device<beep_device> m_speaker;
 
 	required_ioport_array<18> m_kbd;
@@ -120,13 +54,13 @@ private:
 	output_finder<> m_led_lock;
 	output_finder<> m_led_hold;
 
-	void send_port(uint8_t offset, uint8_t data);
-	void update_interrupts();
-	void update_timer_interrupt();
-
-	int m_kbd_state;
-
-	devcb_write_line m_tx_handler;
+	u8 m_rows[3];           // key matrix row drivers on ports A, B and C (bits 0 and 1 only)
+	bool m_pc6;             // matrix load, active low
+	bool m_pc7;             // LED and bell volume latch strobe
+	bool m_sck;
+	u8 m_mosi;
+	u8 m_kbd_sr;            // matrix column input shift register
+	u8 m_led_sr;            // LED and bell volume output shift register
 };
 
 // device type definition

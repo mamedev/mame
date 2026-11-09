@@ -11,8 +11,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-DECLARE_DEVICE_TYPE(M68HC05EG, m68hc05eg_device)
-
 // ======================> m6805_base_device
 
 // Used by core CPU interface
@@ -306,35 +304,6 @@ protected:
 	memory_access<13, 0, 0, ENDIANNESS_BIG>::specific m_program13;
 };
 
-
-// ======================> m68hc05eg_device
-
-class m68hc05eg_device : public m6805_base_device
-{
-public:
-	// construction/destruction
-	m68hc05eg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	// device-level overrides
-	virtual void device_reset() override ATTR_COLD;
-
-	virtual void execute_set_input(int inputnum, int state) override;
-	virtual void interrupt_vector() override;
-
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override;
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override;
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-};
-
 #define M6805_IRQ_LINE      0
-
-/****************************************************************************
- * 68HC05EG section
- ****************************************************************************/
-
-#define M68HC05EG_INT_IRQ   (M6805_IRQ_LINE)
-#define M68HC05EG_INT_TIMER (M6805_IRQ_LINE+1)
-#define M68HC05EG_INT_CPI   (M6805_IRQ_LINE+2)
 
 #endif // MAME_CPU_M6805_M6805_H
