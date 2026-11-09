@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:AJR, Tomás García-Merás Capote (ClawGrip)
+// copyright-holders:AJR, Tomás García-Merás Capote
+
 /*******************************************************************************
     Driver for Automatics Pasqual darts with CRT display.
   ________________________________________________________________________________
@@ -34,18 +35,12 @@
   |                                                               |CD40208E|      |
   |_______________________________________________________________________________|
 
-  The dart board is a 16x4 matrix: the columns are selected (active low) through
-  8255 port A (columns 0-7) and port C (columns 8-15), and the rows are read on the
-  AY-3-8910 port B upper nibble. The 93C46 shares the 8255 lines (CS, CLK and DI on
-  port A, DO on port C bit 0). The program only writes "automatics PASQUAL S.A." to
-  it and reads it back on every boot, hanging if it doesn't match.
+  The program only writes "automatics PASQUAL S.A." to the EEPROM and reads it
+  back on every boot, hanging if it doesn't match.
 
-  The cabinet has three lamps on the left of the monitor (TIRE DARDOS, RETIRE DARDOS
-  and FINAL PARTIDA) and four buttons on the right (Up, Down, Select and Cancel), the
-  first three with lamps that blink while the game is waiting for them.
-
-  tecnodargr reads a missed dart sensor and lets a DIP switch select the game prices,
-  tecnodar has no sensor and uses that DIP switch to double the value of the coins.
+  The cabinet has three lamps on the left of the monitor and four buttons on the
+  right. The lamps of the Up, Down and Select buttons blink while the game is
+  waiting for them.
 
 *******************************************************************************/
 
@@ -80,7 +75,7 @@ public:
 	{
 	}
 
-	void tecnodar(machine_config &config);
+	void tecnodar(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -121,7 +116,7 @@ void tecnodar_state::machine_start()
 
 void tecnodar_state::bank_w(offs_t offset, u8 data)
 {
-	m_rombank->set_entry((offset & 0x0c) >> 2 | (offset & 0x01) << 2);
+	m_rombank->set_entry(BIT(offset, 2, 2) | (BIT(offset, 0) << 2));
 }
 
 u8 tecnodar_state::inputs_r()
@@ -175,11 +170,11 @@ void tecnodar_state::ppi_pc_w(u8 data)
 void tecnodar_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("program", 0);
-	map(0x4000, 0x7fff).bankr("rombank");
+	map(0x4000, 0x7fff).bankr(m_rombank);
 	map(0x8002, 0x8002).select(0x60).rw(FUNC(tecnodar_state::ppi_r), FUNC(tecnodar_state::ppi_w));
-	map(0x8004, 0x8004).w("psg", FUNC(ay8910_device::data_w));
-	map(0x8008, 0x8008).r("psg", FUNC(ay8910_device::data_r));
-	map(0x800c, 0x800c).w("psg", FUNC(ay8910_device::address_w));
+	map(0x8004, 0x8004).w(m_psg, FUNC(ay8910_device::data_w));
+	map(0x8008, 0x8008).r(m_psg, FUNC(ay8910_device::data_r));
+	map(0x800c, 0x800c).w(m_psg, FUNC(ay8910_device::address_w));
 	map(0x8010, 0x8011).rw("vdp", FUNC(tms9129_device::read), FUNC(tms9129_device::write));
 	map(0xc000, 0xc7ff).ram();
 }
@@ -191,11 +186,8 @@ void tecnodar_state::io_map(address_map &map)
 }
 
 
-#define TECNODAR_DART(mask, name) \
-	PORT_BIT(mask, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME(name)
-
 static INPUT_PORTS_START(tecnodar)
-	PORT_START("IN0") // AY-3-8910 port A
+	PORT_START("IN0")
 	PORT_DIPNAME(0x01, 0x01, "Automatic Play") // throws random darts, and shows the bookkeeping instead of the records
 	PORT_DIPSETTING(0x01, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
@@ -213,109 +205,108 @@ static INPUT_PORTS_START(tecnodar)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Down")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("IN1") // AY-3-8910 port B, the dart matrix rows are on the upper nibble
+	PORT_START("IN1")
 	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_COIN1) PORT_NAME("Coin 1 (100 Pts)")
 	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_COIN2) PORT_NAME("Coin 2 (500 Pts)")
 	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Cancel")
 
-	// dart board matrix, DARTn = column n, bits 0-3 = AY-3-8910 port B bits 4-7
 	// the layout finds the targets by these names
 	PORT_START("DART0")
-	TECNODAR_DART(0x1, "Dart Triple 17")
-	TECNODAR_DART(0x2, "Dart Triple 13")
-	TECNODAR_DART(0x4, "Dart Triple 5")
-	TECNODAR_DART(0x8, "Dart Triple 8")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 17")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 13")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 5")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 8")
 
 	PORT_START("DART1")
-	TECNODAR_DART(0x1, "Dart Triple 3")
-	TECNODAR_DART(0x2, "Dart Triple 6")
-	TECNODAR_DART(0x4, "Dart Triple 20")
-	TECNODAR_DART(0x8, "Dart Triple 11")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 3")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 6")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 20")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 11")
 
 	PORT_START("DART2")
-	TECNODAR_DART(0x1, "Dart Triple 19")
-	TECNODAR_DART(0x2, "Dart Triple 10")
-	TECNODAR_DART(0x4, "Dart Triple 1")
-	TECNODAR_DART(0x8, "Dart Triple 14")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 19")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 10")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 1")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 14")
 
 	PORT_START("DART3")
-	TECNODAR_DART(0x1, "Dart Triple 7")
-	TECNODAR_DART(0x2, "Dart Triple 15")
-	TECNODAR_DART(0x4, "Dart Triple 18")
-	TECNODAR_DART(0x8, "Dart Triple 9")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 7")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 15")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 18")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 9")
 
 	PORT_START("DART4")
-	TECNODAR_DART(0x1, "Dart Triple 16")
-	TECNODAR_DART(0x2, "Dart Triple 2")
-	TECNODAR_DART(0x4, "Dart Triple 4")
-	TECNODAR_DART(0x8, "Dart Triple 12")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 16")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 2")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 4")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 12")
 
 	PORT_START("DART5")
 	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN) // scored as a 0 point dart
-	TECNODAR_DART(0x2, "Dart Double Bull")
-	TECNODAR_DART(0x4, "Dart Single Bull")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double Bull")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single Bull")
 	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN) // scored as a 0 point dart
 
 	PORT_START("DART6")
-	TECNODAR_DART(0x1, "Dart Single 17")
-	TECNODAR_DART(0x2, "Dart Single 13")
-	TECNODAR_DART(0x4, "Dart Single 5")
-	TECNODAR_DART(0x8, "Dart Single 8")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 17")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 13")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 5")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 8")
 
 	PORT_START("DART7")
-	TECNODAR_DART(0x1, "Dart Double 17")
-	TECNODAR_DART(0x2, "Dart Double 13")
-	TECNODAR_DART(0x4, "Dart Double 5")
-	TECNODAR_DART(0x8, "Dart Double 8")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 17")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 13")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 5")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 8")
 
 	PORT_START("DART8")
-	TECNODAR_DART(0x1, "Dart Single 3")
-	TECNODAR_DART(0x2, "Dart Single 6")
-	TECNODAR_DART(0x4, "Dart Single 20")
-	TECNODAR_DART(0x8, "Dart Single 11")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 3")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 6")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 20")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 11")
 
 	PORT_START("DART9")
-	TECNODAR_DART(0x1, "Dart Double 3")
-	TECNODAR_DART(0x2, "Dart Double 6")
-	TECNODAR_DART(0x4, "Dart Double 20")
-	TECNODAR_DART(0x8, "Dart Double 11")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 3")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 6")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 20")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 11")
 
 	PORT_START("DART10")
-	TECNODAR_DART(0x1, "Dart Single 19")
-	TECNODAR_DART(0x2, "Dart Single 10")
-	TECNODAR_DART(0x4, "Dart Single 1")
-	TECNODAR_DART(0x8, "Dart Single 14")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 19")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 10")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 1")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 14")
 
 	PORT_START("DART11")
-	TECNODAR_DART(0x1, "Dart Double 19")
-	TECNODAR_DART(0x2, "Dart Double 10")
-	TECNODAR_DART(0x4, "Dart Double 1")
-	TECNODAR_DART(0x8, "Dart Double 14")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 19")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 10")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 1")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 14")
 
 	PORT_START("DART12")
-	TECNODAR_DART(0x1, "Dart Single 7")
-	TECNODAR_DART(0x2, "Dart Single 15")
-	TECNODAR_DART(0x4, "Dart Single 18")
-	TECNODAR_DART(0x8, "Dart Single 9")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 7")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 15")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 18")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 9")
 
 	PORT_START("DART13")
-	TECNODAR_DART(0x1, "Dart Double 7")
-	TECNODAR_DART(0x2, "Dart Double 15")
-	TECNODAR_DART(0x4, "Dart Double 18")
-	TECNODAR_DART(0x8, "Dart Double 9")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 7")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 15")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 18")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 9")
 
 	PORT_START("DART14")
-	TECNODAR_DART(0x1, "Dart Single 16")
-	TECNODAR_DART(0x2, "Dart Single 2")
-	TECNODAR_DART(0x4, "Dart Single 4")
-	TECNODAR_DART(0x8, "Dart Single 12")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 16")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 2")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 4")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 12")
 
 	PORT_START("DART15")
-	TECNODAR_DART(0x1, "Dart Double 16")
-	TECNODAR_DART(0x2, "Dart Double 2")
-	TECNODAR_DART(0x4, "Dart Double 4")
-	TECNODAR_DART(0x8, "Dart Double 12")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 16")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 2")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 4")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 12")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(tecnodargr)
@@ -357,8 +348,6 @@ void tecnodar_state::tecnodar(machine_config &config)
 	m_psg->port_a_read_callback().set_ioport("IN0");
 	m_psg->port_b_read_callback().set(FUNC(tecnodar_state::inputs_r));
 	m_psg->add_route(ALL_OUTPUTS, "mono", 0.50);
-
-	config.set_default_layout(layout_tecnodar);
 }
 
 
@@ -391,5 +380,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1991, tecnodar,   0,        tecnodar, tecnodar,   tecnodar_state, empty_init, ROT0, "Automatics Pasqual",                    "Tecnodarts",                            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE)
-GAME(1991, tecnodargr, tecnodar, tecnodar, tecnodargr, tecnodar_state, empty_init, ROT0, "Automatics Pasqual / Recreativos G.R.", "Tecnodarts (Recreativos G.R. license)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE)
+GAMEL(1991, tecnodar,   0,        tecnodar, tecnodar,   tecnodar_state, empty_init, ROT0, "Automatics Pasqual",                    "Tecnodarts",                            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_tecnodar)
+GAMEL(1991, tecnodargr, tecnodar, tecnodar, tecnodargr, tecnodar_state, empty_init, ROT0, "Automatics Pasqual / Recreativos G.R.", "Tecnodarts (Recreativos G.R. license)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_tecnodar)
