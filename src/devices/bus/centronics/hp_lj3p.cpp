@@ -222,10 +222,10 @@ private:
 	// parallel host interface: data latch at 200001, latch full on 3e0006 bit 10
 	// and IRQ 2.  200000 written (the firmware's routines at 143e0-14494):
 	// bit 15 ready for data (BUSY while clear or while the latch is full),
-	// bit 7 ACK pulse, bit 6 /PERROR, bit 5 /FAULT, bit 4 SELECT (inverted
-	// and active low as the routines set and clear them; bit 6 clears without
-	// paper, bit 4 off line), bits 0, 1 and 3 serial interface outputs
-	// (bit 0 DTR through an inverting driver, the others not known)
+	// bit 7 ACK pulse, bit 6 PERROR (set without paper and while off line),
+	// bit 5 /FAULT, bit 4 set while off line or initialising (SELECT low),
+	// bits 0, 1 and 3 serial interface outputs (bit 0 DTR through an
+	// inverting driver, the others not known)
 	u16 m_pctrl;
 	u8 m_pdata;
 	bool m_pfull;
@@ -599,8 +599,8 @@ void hp_lj3p_base::update_parallel()
 	// the interrupt is only requested while the formatter accepts data
 	m_maincpu->set_input_line(M68K_IRQ_2, (m_pfull && BIT(m_pctrl, 15)) ? ASSERT_LINE : CLEAR_LINE);
 	out_busy((m_pfull || !BIT(m_pctrl, 15)) ? 1 : 0);
-	out_select(BIT(m_pctrl, 4));
-	out_perror(BIT(m_pctrl, 6) ? 0 : 1);
+	out_select(BIT(m_pctrl, 4) ? 0 : 1);
+	out_perror(BIT(m_pctrl, 6));
 	out_fault(BIT(m_pctrl, 5));
 	out_dtr(BIT(m_pctrl, 0));
 }
