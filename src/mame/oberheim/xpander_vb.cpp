@@ -52,8 +52,8 @@ active-high (active == true).
 #define LOG_FILTER_MODE (1U << 7)
 #define LOG_PAN         (1U << 8)
 
-#define VERBOSE (0)//(LOG_GENERAL | LOG_OSC_MIX | LOG_PAN | LOG_FILTER_MODE)  // TODO DEBUG
-#define LOG_OUTPUT_FUNC osd_printf_info  // TODO DEBUG
+#define VERBOSE (0)
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
