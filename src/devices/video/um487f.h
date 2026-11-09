@@ -27,10 +27,6 @@ public:
 	// MGA base clock fed to the MOSC pin (16.257 MHz), 0 if the pin is not connected
 	void set_mga_clock(uint32_t clock) { m_mga_clock = clock; }
 	void set_mga_clock(const XTAL &clock) { m_mga_clock = clock.value(); }
-	// state of the SWS/SWR mode straps at power on (true = MGA mode)
-	void set_mga_mode(bool mga) { m_strap_mga = mga; }
-	// SW3: allow switching between CGA and MGA modes by software
-	void set_mode_change_enable(bool enable) { m_strap_change_enable = enable; }
 	// external character generator ROM (8 KiB, 2764 style) fed through CD0-CD7
 	template <typename T> void set_chargen(T &&tag) { m_chargen.set_tag(std::forward<T>(tag)); }
 	// RGBI (bit 3 = IOUT ... bit 0 = BOUT) to monitor color conversion done by the board
@@ -39,6 +35,10 @@ public:
 
 	auto hsync_callback() { return m_hsync_cb.bind(); }
 	auto vsync_callback() { return m_vsync_cb.bind(); }
+
+	// display mode select inputs, active high (SWS = CGA, SWR = MGA)
+	void sws_w(int state) { m_sws = state != 0; }
+	void swr_w(int state) { m_swr = state != 0; }
 
 	// CPU interface
 	// I/O space 0x3b0-0x3df (offset 0x00-0x2f), A0-A9 are decoded and AEN must be active
@@ -126,10 +126,10 @@ private:
 
 	// configuration
 	uint32_t m_mga_clock;
-	bool m_strap_mga;
-	bool m_strap_change_enable;
 
 	// internal state
+	bool m_sws;
+	bool m_swr;
 	bool m_mga;             // current display mode
 	uint8_t m_mode;
 	uint8_t m_color;

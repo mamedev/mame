@@ -14,25 +14,26 @@
     signal of the CPU interface of the embedded 6845, it doesn't take part
     in the video timing.
 
-    The printer port registers (3BC-3BE) belong to an external UM82C11, the
-    UM487F only decodes its chip select.
+    The printer port registers (3BC-3BE) belong to an external UM82C11, enabled
+    through the PSW input. The UM487F only decodes its chip select (82C11CSB),
+    so the host maps the printer port.
 
     Status register bit 7 (vertical sync, active low) is documented only for
     MGA mode, but all the known CGA mode games wait on it for the vertical
     retrace.
 
-    The display mode is selected at power on with the SWS (CGA) / SWR (MGA)
-    inputs. When allowed by SW3, software can switch it setting the "enable
-    change mode" bit of the mode control register first, and then writing
-    the new mode to bit 6 of the configuration register.
+    The SWS (CGA) and SWR (MGA) inputs select the display mode on reset. The
+    datasheet application circuit feeds them through SW1 and SW3, either from
+    +5V or from the reset signal. Software can only change the mode while both
+    are low, setting the "enable change mode" bit of the mode control register
+    first, and then writing the new mode to bit 6 of the configuration register.
 
     The character generator ROM is addressed as in the datasheet application
-    circuit (a 2764 with A11 = CRA3 and A12 = JMPO), which matches the layout
-    of the usual PC MDA/CGA font ROMs.
+    circuit (a 2764 with A11 = CRA3 and A12 = JMPO). With the IBM font ROM this
+    selects its MDA font and its alternate CGA font.
 
     TODO:
     - The status register video dot (MGA) is faked.
-    - Printer port chip select (82C11CSB) and PSW input.
     - IORDY wait states for flicker free CPU access.
     - Border (overscan) color.
     - Composite and monochrome monitor outputs.
@@ -40,7 +41,6 @@
       generator bit order.
     - The datasheet only lists 3x4/3x5 for the CRTC, the mirrors at 3x0-3x7
       are a guess.
-    - Verify the CGA text, 640x200 and MGA modes with real software.
 
 ***************************************************************************/
 
@@ -76,8 +76,8 @@ um487f_device::um487f_device(const machine_config &mconfig, const char *tag, dev
 	, m_vsync_cb(*this)
 	, m_rgbi_cb(*this)
 	, m_mga_clock(0)
-	, m_strap_mga(false)
-	, m_strap_change_enable(true)
+	, m_sws(true)
+	, m_swr(false)
 	, m_mga(false)
 	, m_mode(0)
 	, m_color(0)
@@ -106,9 +106,6 @@ void um487f_device::device_add_mconfig(machine_config &config)
 
 void um487f_device::device_start()
 {
-	if (m_strap_mga && !m_mga_clock)
-		logerror("MGA mode selected at power on, but no MGA clock\n");
-
 	// default: IBM 5153 compatible monitor (dark yellow shown as brown)
 	m_rgbi_cb.resolve();
 	for (int i = 0; i < 16; i++)
@@ -137,6 +134,8 @@ void um487f_device::device_start()
 
 	std::fill(std::begin(m_palette_lut_2bpp), std::end(m_palette_lut_2bpp), 0);
 
+	save_item(NAME(m_sws));
+	save_item(NAME(m_swr));
 	save_item(NAME(m_mga));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_color));
@@ -149,7 +148,12 @@ void um487f_device::device_start()
 
 void um487f_device::device_reset()
 {
-	m_mga = m_strap_mga;
+	if (m_sws != m_swr)
+		m_mga = m_swr;
+
+	if (m_mga && !m_mga_clock)
+		logerror("MGA mode selected on reset, but no MGA clock\n");
+
 	m_mode = 0;
 	m_color = 0;
 	m_config = m_mga ? 0 : CONFIG_CGA;
@@ -570,7 +574,7 @@ void um487f_device::config_w(uint8_t data)
 	screen().update_partial(screen().vpos());
 
 	bool const mga = !(data & CONFIG_CGA);
-	if ((mga != m_mga) && m_strap_change_enable && (m_mode & MODE_CHANGE))
+	if ((mga != m_mga) && !m_sws && !m_swr && (m_mode & MODE_CHANGE))
 	{
 		LOGMODE("%s: switching to %s mode\n", machine().describe_context(), mga ? "MGA" : "CGA");
 		if (mga && !m_mga_clock)
