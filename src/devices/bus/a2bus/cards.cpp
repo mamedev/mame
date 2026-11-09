@@ -89,6 +89,7 @@ void apple2_slot0_cards(device_slot_interface &device)
 	device.option_add("romcard", A2BUS_ROMCARDUSER);    // Apple II ROM Card that loads a custom ROM image
 	device.option_add("romcardfp", A2BUS_ROMCARDFP);    // Apple II ROM Card with Autostart Monitor + Applesoft BASIC
 	device.option_add("romcardint", A2BUS_ROMCARDINT);  // Apple II ROM Card with Autostart Monitor + Integer BASIC
+	device.option_add("romcardforth", A2BUS_ROMCARDFORTH); // Apple II ROM Card with Autostart Monitor + FORTH
 }
 
 void apple2_cards(device_slot_interface &device)

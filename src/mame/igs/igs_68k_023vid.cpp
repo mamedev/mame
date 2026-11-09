@@ -1,15 +1,14 @@
 // license:BSD-3-Clause
-// copyright-holders: David Haywood
+// copyright-holders:David Haywood,Peter Wilhelmsen
 
 /*
 IGS games based on M68000 + IGS023 for video.
 PGM-like but with different sound hardware.
 
 TODO:
-* identify sound hardware
-* identify where the M6502 core is contained
+* verify NT3580 peripherals and NT3570 synthesis against hardware
 * complete inputs for xypmd
-* add inputs for xypmda
+* complete panel inputs, hopper outputs and DIP switches for xypmda
 */
 
 
@@ -18,9 +17,10 @@ TODO:
 #include "igs023_video.h"
 //#include "igs025.h"
 
-#include "cpu/m6502/m6502.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/nt3580.h"
 #include "machine/timer.h"
+#include "sound/nt3570.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -35,6 +35,7 @@ public:
 	igs_68k_023vid_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "subcpu"),
 		m_screen(*this, "screen"),
 		m_video(*this, "igs023"),
 		m_mainram(*this, "sram"),
@@ -43,26 +44,14 @@ public:
 	{ }
 
 	void xypmd(machine_config &config) ATTR_COLD;
-	void xypmda(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
-private:
-	u16 unknown_r() { return (machine().rand() & 0x0010) | 0xffcf; } // 0x0010 seems to be sound CPU status
-	u16 unknown2_r() { return 0xffff; }
-	u16 input_r();
-
-	void screen_vblank(int state);
-	void screen_vblank_xypmda(int state);
-
 	void main_program_base_map(address_map &map) ATTR_COLD;
-	void main_program_xypmd_map(address_map &map) ATTR_COLD;
-	void main_program_xypmda_map(address_map &map) ATTR_COLD;
-
-	void sub_program_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<nt3580_device> m_soundcpu;
 	required_device<screen_device> m_screen;
 	required_device<igs023_video_device> m_video;
 	required_shared_ptr<uint16_t> m_mainram;
@@ -70,13 +59,54 @@ private:
 	required_ioport m_in0;
 	required_ioport_array<2> m_dsw;
 
+	u8 m_io_select = 0;
+
+private:
+	u16 sound_status_r() { return 0xff00 | m_soundcpu->host_status_r(); }
+	u16 input_r();
+	void io_data_w(u8 data);
+
+	void screen_vblank(int state);
+
+	void main_program_xypmd_map(address_map &map) ATTR_COLD;
+
 	u8 m_input_sel = 0;
+};
+
+class xypmda_state : public igs_68k_023vid_state
+{
+public:
+	xypmda_state(const machine_config &mconfig, device_type type, const char *tag) :
+		igs_68k_023vid_state(mconfig, type, tag),
+		m_joystick(*this, "IN%u", 1U)
+	{ }
+
+	void xypmda(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	u16 input_xypmda_r();
+	void io_data_xypmda_w(u8 data);
+	void screen_vblank_xypmda(int state);
+	void main_program_xypmda_map(address_map &map) ATTR_COLD;
+
+	required_ioport_array<2> m_joystick;
+	u8 m_dsw_select = 0xff;
 };
 
 
 void igs_68k_023vid_state::machine_start()
 {
 	save_item(NAME(m_input_sel));
+	save_item(NAME(m_io_select));
+}
+
+void xypmda_state::machine_start()
+{
+	igs_68k_023vid_state::machine_start();
+	save_item(NAME(m_dsw_select));
 }
 
 
@@ -96,7 +126,7 @@ void igs_68k_023vid_state::screen_vblank(int state)
 	}
 }
 
-void igs_68k_023vid_state::screen_vblank_xypmda(int state)
+void xypmda_state::screen_vblank_xypmda(int state)
 {
 	// Apart from IRQ2 all other IRQs point to exceptions
 
@@ -112,6 +142,47 @@ void igs_68k_023vid_state::screen_vblank_xypmda(int state)
 	}
 }
 
+
+void igs_68k_023vid_state::io_data_w(u8 data)
+{
+	m_input_sel = data;
+	if (m_io_select == 1)
+		// V401 board: strobe on bit 0, /reset on bit 1.
+		m_soundcpu->host_control_w(data << 1);
+}
+
+void xypmda_state::io_data_xypmda_w(u8 data)
+{
+	if (m_io_select == 1)
+		// Earlier board: strobe on bit 1, /reset on bit 2.
+		m_soundcpu->host_control_w(data);
+	else if (m_io_select == 2)
+		m_dsw_select = data;
+}
+
+u16 xypmda_state::input_xypmda_r()
+{
+	// The host selects DIP banks with output register 2, then reads register 0.
+	// Coin/service inputs are read separately through register 3.
+	if (m_io_select == 0)
+	{
+		u16 data = 0xffff;
+		for (unsigned i = 0; i < 2; i++)
+		{
+			if (!BIT(m_dsw_select, i))
+				data &= m_dsw[i]->read();
+		}
+		return data;
+	}
+	else if (m_io_select == 3)
+	{
+		return m_in0->read();
+	}
+	else
+	{
+		return 0xffff;
+	}
+}
 
 u16 igs_68k_023vid_state::input_r() // TODO: not totally correct
 {
@@ -142,66 +213,62 @@ void igs_68k_023vid_state::main_program_xypmd_map(address_map &map)
 	main_program_base_map(map);
 
 	map(0x080000, 0x08ffff).ram(); // why is this tested like it was mainram / spriteram? bug in code?
+	map(0x080000, 0x080001).umask16(0x00ff).w(m_soundcpu, FUNC(nt3580_device::host_data_w));
 
-	map(0x090000, 0x090001).r(FUNC(igs_68k_023vid_state::unknown_r));
+	map(0x090000, 0x090001).r(FUNC(igs_68k_023vid_state::sound_status_r));
 	map(0x090018, 0x090019).portr("IN1");
 
 	// 025 or just I/O?
-	map(0x0c0000, 0x0c0001).nopr().nopw();
-	map(0x0c0002, 0x0c0003).r(FUNC(igs_68k_023vid_state::input_r)).lw16(NAME([this] (uint16_t data) { m_input_sel = data & 0xff; }));
+	map(0x0c0000, 0x0c0001).nopr();
+	map(0x0c0000, 0x0c0001).umask16(0x00ff).lw8(NAME([this] (u8 data) { m_io_select = data; }));
+	map(0x0c0002, 0x0c0003).r(FUNC(igs_68k_023vid_state::input_r));
+	map(0x0c0002, 0x0c0003).umask16(0x00ff).w(FUNC(igs_68k_023vid_state::io_data_w));
 }
 
-void igs_68k_023vid_state::main_program_xypmda_map(address_map &map)
+void xypmda_state::main_program_xypmda_map(address_map &map)
 {
 	main_program_base_map(map);
 
 	// I/O / IGS025 etc. is different here
-	map(0x080100, 0x080101).r(FUNC(igs_68k_023vid_state::unknown_r));
-	map(0x080120, 0x080121).portr("IN1");
-	map(0x080200, 0x080201).nopw();
+	map(0x080100, 0x080101).lr16(NAME([this] () -> u16 { return 0xff00 | m_soundcpu->host_status_r(); }));
+	// Joystick inputs are on the upper byte; each player's eight switches
+	// correspond to the P1J/P2J entries in the game's TEST I/O table.
+	map(0x080110, 0x080111).lr16(NAME([this] () -> u16 { return (m_joystick[1]->read() << 8) | 0x00ff; }));
+	map(0x080120, 0x080121).lr16(NAME([this] () -> u16 { return (m_joystick[0]->read() << 8) | 0x00ff; }));
+	map(0x080200, 0x080201).umask16(0x00ff).w(m_soundcpu, FUNC(nt3580_device::host_data_w));
 
-	map(0x0a0000, 0x0a0001).r(FUNC(igs_68k_023vid_state::unknown2_r));
-	map(0x0a0002, 0x0a0003).r(FUNC(igs_68k_023vid_state::unknown2_r));
+	map(0x0a0000, 0x0a0001).portr("COINS");
+	map(0x0a0002, 0x0a0003).lr16(NAME([] () -> u16 { return 0xffff; }));
 
 	// definitely the same as 0x0c0000 on the parent
-	map(0x0e0000, 0x0e0001).nopr().nopw();
-	map(0x0e0002, 0x0e0003).nopw().portr("IN0");
-}
-
-void igs_68k_023vid_state::sub_program_map(address_map &map)
-{
-	map(0x0000, 0x03ff).ram();
-
-	map(0x4200, 0x46ff).ram();
-
-	map(0xc000, 0xc000).noprw();
-	map(0xc001, 0xc001).nopw();
-
-	map(0xe000, 0xffff).rom().region("subcpu", 0x0000);
+	map(0x0e0000, 0x0e0001).nopr();
+	map(0x0e0000, 0x0e0001).umask16(0x00ff).lw8(NAME([this] (u8 data) { m_io_select = data; }));
+	map(0x0e0002, 0x0e0003).r(FUNC(xypmda_state::input_xypmda_r));
+	map(0x0e0002, 0x0e0003).umask16(0x00ff).w(FUNC(xypmda_state::io_data_xypmda_w));
 }
 
 
 static INPUT_PORTS_START( xypmd )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
@@ -227,6 +294,58 @@ static INPUT_PORTS_START( xypmd )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( xypmda )
+	PORT_INCLUDE(xypmd)
+
+	PORT_MODIFY("IN0")
+	// TEST I/O identifies bit 4 as P2J_START and bit 5 as P1J_START.
+	// Coin, key-in and key-out switches are on the separate 0x0a0000 port.
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("%p Bet")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("%p Double Up")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("%p Cancel")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 )        PORT_PLAYER(1) PORT_NAME("%p Payout")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_PLAYER(2) PORT_NAME("%p Bet")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_PLAYER(2) PORT_NAME("%p Double Up")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 )        PORT_PLAYER(2) PORT_NAME("%p Cancel")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 )        PORT_PLAYER(2) PORT_NAME("%p Payout")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("COINS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Hopper Switch")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Hopper Switch")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P2 Key In")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("P2 Key Out")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME(0x10, 0x10, "Players") PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(   0x00, "1")
+	PORT_DIPSETTING(   0x10, "2")
+	PORT_DIPNAME(0x60, 0x40, DEF_STR(Controls)) PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPSETTING(   0x60, "Panel")
+	PORT_DIPSETTING(   0x40, DEF_STR(Joystick))
+INPUT_PORTS_END
+
 
 void igs_68k_023vid_state::xypmd(machine_config &config)
 {
@@ -234,8 +353,7 @@ void igs_68k_023vid_state::xypmd(machine_config &config)
 	M68000(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_68k_023vid_state::main_program_xypmd_map);
 
-	m6502_device &subcpu(M6502(config, "subcpu", 8_MHz_XTAL)); // TODO: something M6502 derived (data.u13 is M6502 derived code)
-	subcpu.set_addrmap(AS_PROGRAM, &igs_68k_023vid_state::sub_program_map);
+	NT3580(config, m_soundcpu, 8_MHz_XTAL);
 
 	//IGS025(config, "igs025");
 
@@ -256,16 +374,21 @@ void igs_68k_023vid_state::xypmd(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	// TODO: is sound provided by the two Novatek chips?
+	nt3570_device &sound(NT3570(config, "nt3570", 8_MHz_XTAL));
+	m_soundcpu->sound_read_callback().set(sound, FUNC(nt3570_device::read));
+	m_soundcpu->sound_write_callback().set(sound, FUNC(nt3570_device::write));
+	sound.set_device_rom_tag("samples");
+	sound.irq_callback().set(m_soundcpu, FUNC(nt3580_device::sound_irq_w));
+	sound.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void igs_68k_023vid_state::xypmda(machine_config &config)
+void xypmda_state::xypmda(machine_config &config)
 {
 	xypmd(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs_68k_023vid_state::main_program_xypmda_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &xypmda_state::main_program_xypmda_map);
 
-	m_screen->screen_vblank().set(FUNC(igs_68k_023vid_state::screen_vblank_xypmda));
+	m_screen->screen_vblank().set(FUNC(xypmda_state::screen_vblank_xypmda));
 }
 /*
 Xingyun Paomadi Super, IGS, 2003
@@ -326,7 +449,7 @@ ROM_START( xypmd )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "v-401cn.u26", 0x00000, 0x80000, CRC(84f4f46c) SHA1(c04d3aaf531caba6cdf8296570ce24964bd7a077) ) // version string at 0x360dc
 
-	ROM_REGION( 0x10000, "subcpu", 0 ) // TODO: sound related? almost empty
+	ROM_REGION( 0x10000, "subcpu", 0 ) // NT3580 external program, first 8 KiB mapped at E000
 	ROM_LOAD( "data.u13", 0x00000, 0x10000, CRC(7c0d8c8f) SHA1(d36ae4749fd248c399741f2024f2f44cf22536b8) ) // 111xxxxxxxxxxxxx = 0x00
 
 	ROM_REGION( 0x200000, "igs023",  0 )
@@ -364,7 +487,7 @@ ROM_START( xypmda )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "prg.u36", 0x00000, 0x80000, CRC(99d6c58c) SHA1(c8db8689c18ef05ad52ef0476033b62f778e6abf) ) // no version string
 
-	ROM_REGION( 0x10000, "subcpu", 0 ) // TODO: sound related? almost empty
+	ROM_REGION( 0x10000, "subcpu", 0 ) // NT3580 external program, first 8 KiB mapped at E000
 	ROM_LOAD( "data.u33", 0x00000, 0x10000, CRC(5e3e3558) SHA1(ca9cdb4e8d124b4a7341ef6597c7ccdbbe124138) ) // 111xxxxxxxxxxxxx = 0x00
 
 	ROM_REGION( 0x200000, "igs023",  0 )
@@ -387,5 +510,5 @@ ROM_END
 
 
 
-GAME( 2003, xypmd,  0,     xypmd,  xypmd, igs_68k_023vid_state, empty_init, ROT0, "IGS", "Xingyun Paomadi Super (V401CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, xypmda, xypmd, xypmda, xypmd, igs_68k_023vid_state, empty_init, ROT0, "IGS", "Xingyun Paomadi (unknown ver)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2003, xypmd,  0,     xypmd,  xypmd,  igs_68k_023vid_state, empty_init, ROT0, "IGS", "Xingyun Paomadi Super (V401CN)", MACHINE_NOT_WORKING ) // sample ROM undumped
+GAME( 1999, xypmda, xypmd, xypmda, xypmda, xypmda_state,         empty_init, ROT0, "IGS", "Xingyun Paomadi (unknown ver)",  MACHINE_NOT_WORKING )

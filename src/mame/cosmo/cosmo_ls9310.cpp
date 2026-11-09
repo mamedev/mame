@@ -446,7 +446,23 @@ ROM_START( exfever )
 	ROM_LOAD16_BYTE( "c4_cosmo.c4", 0x00001, 0x80000, CRC(41249567) SHA1(ee49fad6bc3a0cf809d118bb20a523c5f5fa3aaa) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
+ROM_START( exfevera ) // minor differences
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ex-h_l4a_cosmo.l4", 0x00000, 0x20000, CRC(b1dffbab) SHA1(405ed38c9226fb68fcae9236c0f540633998aa67) )
+	ROM_IGNORE(                                    0x60000 ) // same data repeated
+	ROM_LOAD16_BYTE( "ex-h_p4a_cosmo.p4", 0x00001, 0x20000, CRC(3f059a4a) SHA1(16396c42bd145399864a048aec537c4f035bb47b) )
+	ROM_IGNORE(                                    0x60000 ) // same data repeated
+
+	ROM_REGION( 0x80000, "fgtiles", 0 )
+	ROM_LOAD( "ex-h.h4", 0x00000, 0x80000, CRC(7c1303d1) SHA1(48d7033f1a05b188dd6608f8b35ec58018d5f44a) ) // handwritten label
+
+	ROM_REGION( 0x100000, "bgtiles", 0 )
+	ROM_LOAD16_BYTE( "a4_cosmo.a4", 0x00000, 0x80000, CRC(19a96be6) SHA1(a6324cac9200824f9cc9b59f8bd8f9495571265d) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "c4_cosmo.c4", 0x00001, 0x80000, CRC(41249567) SHA1(ee49fad6bc3a0cf809d118bb20a523c5f5fa3aaa) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1993, exfever, 0, exfever, exfever, cosmo68k_state, empty_init, ROT0, "Cosmo", "Exciting Fever", MACHINE_NOT_WORKING )
+GAME( 1993, exfever,  0,       exfever, exfever, cosmo68k_state, empty_init, ROT0, "Cosmo", "Exciting Fever (set 1)", MACHINE_NOT_WORKING )
+GAME( 1993, exfevera, exfever, exfever, exfever, cosmo68k_state, empty_init, ROT0, "Cosmo", "Exciting Fever (set 2)", MACHINE_NOT_WORKING )

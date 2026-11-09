@@ -162,6 +162,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 	void towns_base(machine_config &config) ATTR_COLD;
+	void towns_scsi(machine_config &config) ATTR_COLD;
 
 	static void floppy_formats(format_registration &fr);
 

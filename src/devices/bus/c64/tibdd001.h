@@ -37,6 +37,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_c64_expansion_card_interface overrides
@@ -48,6 +49,7 @@ private:
 
 	required_device<upd765_family_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
+	required_region_ptr<uint8_t> m_rom;
 
 	void motor_w(int state) { m_floppy->get_device()->mon_w(!state); }
 };

@@ -6,7 +6,8 @@
 
     TODO:
 
-    - road layer, has twelve rotation registers!
+    - verify the sky gradient mapping and the ground start line timing against hardware (both are
+      inferred from the game's code)
 
 ***************************************************************************/
 
@@ -21,6 +22,8 @@
 #include "machine/nvram.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include <algorithm>
 
 namespace {
 
@@ -67,8 +70,7 @@ private:
 	void apache3_v30_map(address_map &map) ATTR_COLD;
 	void apache3_z80_map(address_map &map) ATTR_COLD;
 
-	void draw_sky(bitmap_rgb32 &bitmap, const rectangle &cliprect, int palette_base, int start_offset);
-	[[maybe_unused]] void draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect);
+	void draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect);
 
 	required_device<m68000_base_device> m_subcpu;
 	required_device<cpu_device> m_subcpu2;
@@ -79,10 +81,10 @@ private:
 
 	required_ioport m_vr1;
 
-	uint16_t m_apache3_rotate_ctrl[12];
+	uint16_t m_apache3_rotate_ctrl[12]{};
 	int m_apache3_rot_idx;
-	std::unique_ptr<uint8_t[]> m_apache3_road_x_ram;
-	uint8_t m_apache3_road_z;
+	int16_t m_apache3_road_x_ram[256]{};
+	uint8_t m_apache3_road_z = 0;
 };
 
 
@@ -93,93 +95,80 @@ void apache3_state::apache3_road_z_w(uint16_t data)
 
 void apache3_state::apache3_road_x_w(offs_t offset, uint8_t data)
 {
-	// Note: Double buffered. Yes, this is correct :)
-	m_apache3_road_x_ram[data] = offset;
+	// The Z80 puts the value on the address bus and the ground row on the data bus: a 12-bit
+	// signed horizontal offset per row of the ground pattern (address bits 12-14 look like its sign extension)
+	m_apache3_road_x_ram[data] = util::sext(offset, 12);
 }
 
-void apache3_state::draw_sky(bitmap_rgb32 &bitmap,const rectangle &cliprect, int palette_base, int start_offset)
-{
-	// all TODO
-	if (start_offset&0x8000)
-		start_offset=-(0x10000 - start_offset);
+/*
+    Ground and sky
 
-	start_offset=-start_offset;
+    The 68000 writes 12 words per frame to the TZ2213 accumulators (code at 0x8e06). They appear
+    to form three 24-bit accumulators with 8 fractional bits, each stepped per pixel and per line
+    (rN is the Nth word written):
 
-	start_offset-=48;
-	for (int y=0; y<256; y++) {
-		for (int x=0; x<320; x++) {
-			int col=palette_base + y + start_offset;
-			if (col<palette_base) col=palette_base;
-			if (col>palette_base+127) col=palette_base+127;
+      horizontal  start r0:r4 (low byte of r0 = bits 16-23, r4 = bits 0-15), +r2 per pixel, +r6 per line
+      sky         start r1:r5 (r1 = bits 8-23, low byte of r5 = bits 0-7),   +r3 per pixel, +r7 per line
+      ground      start r9:r10 (r9 = bits 8-23, low byte of r10 = bits 0-7), +r8 per pixel, +r11 per line
 
-			bitmap.pix(y, x) = m_palette->pen(col);
-		}
-	}
-}
-
-/* Draw the sky and ground, applying rotation (eventually). Experimental! */
+    The per-pixel and per-line steps appear to be the cos and sin of the bank angle (scaled 1.0 for
+    the ground, by a game-set sky scale for the sky, and with an extra shear term for the horizontal
+    accumulator). The ground accumulator is the distance below the horizon, which picks a row of
+    the ground pattern RAM (512 pixels x 256 rows, 2 bits per pixel, pre-scaled for perspective and
+    mirrored about the centre). Above the horizon the same accumulator goes negative and its low 7
+    bits appear to address the sky gradient (palette entries 0x100-0x17f): one entry per line, the
+    lightest at the horizon. The gradient keeps the same height whatever the pitch, while the words
+    the game writes for the sky accumulator follow it, so they do not appear to select the gradient.
+*/
 void apache3_state::draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect)
 {
-	if (0)
+	// 24-bit accumulator: a 16-bit word in bits 8-23 plus the low byte of another word in bits 0-7
+	auto const acc24 = [] (uint16_t hi, uint16_t lo) { return util::sext((uint32_t(hi) << 8) | (lo & 0xff), 24); };
+	int32_t const h0 = util::sext((uint32_t(m_apache3_rotate_ctrl[0] & 0xff) << 16) | m_apache3_rotate_ctrl[4], 24);
+	int32_t const g0 = acc24(m_apache3_rotate_ctrl[9], m_apache3_rotate_ctrl[10]);
+	int32_t const h_dx = int16_t(m_apache3_rotate_ctrl[2]), h_dy = int16_t(m_apache3_rotate_ctrl[6]);
+	int32_t const g_dx = int16_t(m_apache3_rotate_ctrl[8]), g_dy = int16_t(m_apache3_rotate_ctrl[11]);
+
+	pen_t const *const pens = m_palette->pens();
+
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint16_t gva = 0x180; // TODO
-		uint8_t sky_val = m_apache3_rotate_ctrl[1] & 0xff;
-
-		for (int y = cliprect.top(); y <= cliprect.bottom(); ++y)
+		uint32_t *const dest = &dst.pix(y);
+		int32_t h = h0 + y * h_dy + cliprect.left() * h_dx;
+		int32_t g = g0 + y * g_dy + cliprect.left() * g_dx;
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			uint16_t rgdb = 0;//m_apache3_road_x_ram[gva & 0xff];
-			uint16_t gha = 0xf60; // test
-			int ln = (((m_apache3_prom[gva & 0x7f] & 0x7f) + (m_apache3_road_z & 0x7f)) >> 5) & 3;
-
-			if (gva & 0x100)
+			int const row = g >> 8;
+			if (row < 0)
 			{
-				/* Sky */
-				for (int x = cliprect.left(); x <= cliprect.right(); ++x)
-				{
-					dst.pix(y, x) = m_palette->pen(0x100 + (sky_val & 0x7f));
-
-					/* Update horizontal counter? */
-					gha = (gha + 1) & 0xfff;
-				}
+				// sky: one gradient entry per line above the horizon, stopping at the darkest
+				dest[x] = pens[0x100 + std::max(row + 0x80, 0)];
 			}
 			else
 			{
-				/* Ground */
-				for (int x = cliprect.left(); x <= cliprect.right(); ++x)
+				int const r = std::min(row, 0xff);
+				int hval = util::sext((h >> 8) + m_apache3_road_x_ram[r], 12);
+				bool const side = (hval < 0);
+				if (side)
+					hval = ~hval;
+				int pix = 0;
+				if (hval < 0x200)
 				{
-					uint16_t hval = (rgdb + gha) & 0xfff; // Not quite
-
-					if (hval & 0x800)
-						hval ^= 0x1ff; // TEST
-					//else
-						//hval = hval;
-
-					uint8_t pixels = m_apache3_g_ram[(((gva & 0xff) << 7) | ((hval >> 2) & 0x7f))];
-					int pix_sel = hval & 3;
-
-					uint8_t colour = (pixels >> (pix_sel << 1)) & 3;
-					colour = (BIT(hval, 11) << 4) | (colour << 2) | ln;
-
-					/* Draw the pixel */
-					dst.pix(y, x) = m_palette->pen(0x200 + colour);
-
-					/* Update horizontal counter */
-					gha = (gha + 1) & 0xfff;
+					uint8_t const pixels = m_apache3_g_ram[(r << 7) | (hval >> 2)] & 0xff;
+					pix = (pixels >> ((hval & 3) << 1)) & 3;
 				}
+				int const ln = ((m_apache3_prom[r] + m_apache3_road_z) >> 5) & 3;
+				dest[x] = pens[0x200 + (side ? 0x10 : 0) + (pix << 2) + ln];
 			}
-
-			/* Update sky counter */
-			sky_val++;
-			gva = (gva + 1) & 0x1ff;
+			h += h_dx;
+			g += g_dx;
 		}
 	}
 }
-
 
 void apache3_state::video_start()
 {
 	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(apache3_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
-	m_apache3_road_x_ram = std::make_unique<uint8_t[]>(512);
 
 	m_tx_layer->set_transparent_pen(0);
 }
@@ -193,9 +182,8 @@ uint32_t apache3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	bitmap.fill(m_palette->pen(0), cliprect);
 	screen.priority().fill(0, cliprect);
 	m_sprites->draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
-	draw_sky(bitmap, cliprect, 256, m_apache3_rotate_ctrl[1]);
+	draw_ground(bitmap, cliprect);
 	apply_shadow_bitmap(bitmap,cliprect,screen.priority(), 0);
-//  draw_ground(bitmap, cliprect);
 	m_sprites->draw_sprites(bitmap,cliprect,0, (m_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
 	m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
@@ -349,7 +337,7 @@ void apache3_state::apache3_z80_map(address_map &map)
 
 static INPUT_PORTS_START( apache3 )
 	PORT_START("IN0")
-	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Trigger" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Power" )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -387,12 +375,12 @@ static INPUT_PORTS_START( apache3 )
 	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6") /* Listed as "Always On" */
 	PORT_DIPSETTING(    0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7") /* Listed as "Not Used" */
-	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8") /* Listed as "Always On" */
-	PORT_DIPSETTING(    0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Use Throttle" ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x0040, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0080, 0x0000, "Disable Coins" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x0080, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x0700, 0x0000, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x0200, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x0100, DEF_STR( 2C_1C ) )
@@ -470,7 +458,8 @@ void apache3_state::apache3(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_raw(apache3_state::CLOCK_2 / 8, 400, 0, 320, 272, 0, 240); // TODO: Hook up CRTC
+	// The game programs the HD6445 for 50 x 35 characters of 8 x 8 (400 x 280), 40 x 30 visible
+	screen.set_raw(apache3_state::CLOCK_2 / 8, 400, 0, 320, 280, 0, 240); // TODO: Hook up CRTC
 	screen.set_screen_update(FUNC(apache3_state::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, 0);
 
@@ -661,12 +650,14 @@ void apache3_state::init_apache3()
 
 	save_item(NAME(m_apache3_rot_idx));
 	save_item(NAME(m_apache3_rotate_ctrl));
+	save_item(NAME(m_apache3_road_x_ram));
+	save_item(NAME(m_apache3_road_z));
 
 	// TODO: ym2151_set_port_write_handler for CT1/CT2 outputs
 }
 
 } // anonymous namespace
 
-GAME( 1988, apache3,   0,        apache3,   apache3,  apache3_state,  init_apache3,  ROT0, "Tatsumi", "Apache 3 (rev F)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev F CPU code
-GAME( 1988, apache3a,  apache3,  apache3,   apache3,  apache3_state,  init_apache3,  ROT0, "Tatsumi", "Apache 3 (rev E)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev C & E CPU code
-GAME( 1988, apache3b,  apache3,  apache3,   apache3,  apache3_state,  init_apache3,  ROT0, "Tatsumi (Kana Corporation license)", "Apache 3 (Kana Corporation license, rev G)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // Rev C & G CPU code
+GAME( 1988, apache3,   0,        apache3,   apache3,  apache3_state,  init_apache3,  ROT0, "Tatsumi", "Apache 3 (rev F)", MACHINE_IMPERFECT_GRAPHICS ) // Rev F CPU code
+GAME( 1988, apache3a,  apache3,  apache3,   apache3,  apache3_state,  init_apache3,  ROT0, "Tatsumi", "Apache 3 (rev E)", MACHINE_IMPERFECT_GRAPHICS ) // Rev C & E CPU code
+GAME( 1988, apache3b,  apache3,  apache3,   apache3,  apache3_state,  init_apache3,  ROT0, "Tatsumi (Kana Corporation license)", "Apache 3 (Kana Corporation license, rev G)", MACHINE_IMPERFECT_GRAPHICS ) // Rev C & G CPU code

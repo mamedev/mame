@@ -2285,8 +2285,8 @@ ROM_START( 3super8 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "prgrom.bin", 0x00000, 0x20000, CRC(37c85dfe) SHA1(56bd2fb859b17dda1e675a385b6bcd6867ecceb0)  )
 
-	ROM_REGION( 0x1000, "pic", 0 )
-	ROM_LOAD( "pic16c65a-20-p", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION16_LE( 0x4010, "pic", ROMREGION_ERASEFF )
+	ROM_LOAD( "pic16c65a-20-p", 0x0000, 0x4010, NO_DUMP )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 )
 	ROM_LOAD( "1.bin", 0x00000, 0x40000, BAD_DUMP CRC(d9d3e21e) SHA1(2f3f07ca427d9f56f0ff143d15d95cbf15255e33) ) // sldh

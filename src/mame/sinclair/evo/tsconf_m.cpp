@@ -15,10 +15,10 @@
 #define VM v_mode(BIT(m_regs[V_CONFIG], 0, 2))
 
 static constexpr rectangle screen_area[4] = {
-	rectangle(tsconf_state::with_hblank(52), tsconf_state::with_hblank(256 + 51), tsconf_state::with_vblank(48), tsconf_state::with_vblank(192 + 47)), // 52|256|52 x 48-192-48
-	rectangle(tsconf_state::with_hblank(20), tsconf_state::with_hblank(320 + 19), tsconf_state::with_vblank(44), tsconf_state::with_vblank(200 + 43)), // 20|320|20 x 44-200-44
-	rectangle(tsconf_state::with_hblank(20), tsconf_state::with_hblank(320 + 19), tsconf_state::with_vblank(24), tsconf_state::with_vblank(240 + 23)), // 20|320|20 x 24-240-24
-	rectangle(tsconf_state::with_hblank(00), tsconf_state::with_hblank(360 - 01), tsconf_state::with_vblank(00), tsconf_state::with_vblank(288 - 01))  // 00|360|00 x 00-288-00
+	rectangle(tsconf_state::with_hblank(52) << 1, (tsconf_state::with_hblank(256 + 51) << 1) | 1, tsconf_state::with_vblank(48), tsconf_state::with_vblank(192 + 47)), // 52|256|52 x 48-192-48
+	rectangle(tsconf_state::with_hblank(20) << 1, (tsconf_state::with_hblank(320 + 19) << 1) | 1, tsconf_state::with_vblank(44), tsconf_state::with_vblank(200 + 43)), // 20|320|20 x 44-200-44
+	rectangle(tsconf_state::with_hblank(20) << 1, (tsconf_state::with_hblank(320 + 19) << 1) | 1, tsconf_state::with_vblank(24), tsconf_state::with_vblank(240 + 23)), // 20|320|20 x 24-240-24
+	rectangle(tsconf_state::with_hblank(00) << 1, (tsconf_state::with_hblank(360 - 01) << 1) | 1, tsconf_state::with_vblank(00), tsconf_state::with_vblank(288 - 01))  // 00|360|00 x 00-288-00
 };
 
 enum v_mode : u8
@@ -43,10 +43,7 @@ static constexpr rgb_t from_pwm(u16 pwm15)
 
 rectangle tsconf_state::get_screen_area()
 {
-	rectangle info = screen_area[BIT(m_regs[V_CONFIG], 6, 2)];
-	if (VM == VM_TXT)
-		info.set_width(info.width() << 1);
-	return info;
+	return screen_area[BIT(m_regs[V_CONFIG], 6, 2)];
 }
 
 void tsconf_state::tsconf_update_bank0()
@@ -79,12 +76,8 @@ void tsconf_state::update_io(int dos)
 
 void tsconf_state::tsconf_update_video_mode()
 {
-	rectangle visarea = screen_area[3];
 	if (VM == VM_TXT)
 	{
-		// scale screen for Text Mode
-		rectangle origin_screen = screen_area[BIT(m_regs[V_CONFIG], 6, 2)];
-		visarea.set_width(visarea.width() + origin_screen.width());
 		m_gfxdecode->gfx(TM_TS_CHAR)->set_source(m_ram->pointer() + PAGE4K(m_regs[V_PAGE] ^ 0x01));
 		m_ts_tilemap[TM_TS_CHAR]->mark_all_dirty();
 	}
@@ -93,8 +86,6 @@ void tsconf_state::tsconf_update_video_mode()
 	m_ts_tilemap[TM_TILES0]->set_scrolldy(get_screen_area().top(), 0);
 	m_ts_tilemap[TM_TILES1]->set_scrolldx(get_screen_area().left(), 0);
 	m_ts_tilemap[TM_TILES1]->set_scrolldy(get_screen_area().top(), 0);
-
-	m_screen->configure(visarea.right() + 1, visarea.bottom() + 1, visarea, m_screen->frame_period());
 }
 
 u8 tsconf_state::get_border_color(u16 hpos, u16 vpos)
@@ -146,7 +137,8 @@ Layered as:
 */
 void tsconf_state::tsconf_update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (!BIT(m_regs[V_CONFIG], 5))
+	const u8 layers_en = ~m_io_layers->read();
+	if (!BIT(m_regs[V_CONFIG], 5) && BIT(layers_en, 2))
 	{
 		if (VM == VM_ZX)
 		{
@@ -169,21 +161,21 @@ void tsconf_state::tsconf_update_screen(screen_device &screen, bitmap_rgb32 &bit
 	if (!BIT(m_regs[V_CONFIG], 4))
 	{
 		screen.priority().fill(0, cliprect);
-		if (BIT(m_regs[TS_CONFIG], 5))
+		if (BIT(m_regs[TS_CONFIG], 5) && BIT(layers_en, 1))
 		{
 			m_ts_tilemap[TM_TILES0]->draw(
 					screen, bitmap, cliprect,
 					BIT(m_regs[TS_CONFIG], 2) ? TILEMAP_DRAW_ALL_CATEGORIES : TILEMAP_DRAW_CATEGORY(1), 1, 0);
 		}
 
-		if (BIT(m_regs[TS_CONFIG], 6))
+		if (BIT(m_regs[TS_CONFIG], 6) && BIT(layers_en, 1))
 		{
 			m_ts_tilemap[TM_TILES1]->draw(
 					screen, bitmap, cliprect,
 					BIT(m_regs[TS_CONFIG], 3) ? TILEMAP_DRAW_ALL_CATEGORIES : TILEMAP_DRAW_CATEGORY(1), 2, 0);
 		}
 
-		if (BIT(m_regs[TS_CONFIG], 7))
+		if (BIT(m_regs[TS_CONFIG], 7) && BIT(layers_en, 0))
 		{
 			draw_sprites(screen, bitmap, get_screen_area());
 		}
@@ -199,19 +191,30 @@ void tsconf_state::tsconf_draw_zx(screen_device &screen, bitmap_rgb32 &bitmap, c
 	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
 		u16 hpos = cliprect.left();
-		u16 x = hpos - get_screen_area().left();
+		u16 x = (hpos - get_screen_area().left()) >> 1;
 		u16 y = vpos - get_screen_area().top();
 		u8 *scr = &screen_location[((y & 7) << 8) | ((y & 0x38) << 2) | ((y & 0xc0) << 5) | (x >> 3)];
 		u8 *attr = &attrs_location[((y & 0xf8) << 2) | (x >> 3)];
 		u32 *pix = &(bitmap.pix(vpos, hpos));
+		bool off2 = (hpos - get_screen_area().left()) & 1; // starts from the second half of the doubled pixel
 		while (hpos <= cliprect.right())
 		{
 			u16 ink = pal_offset | ((*attr >> 3) & 0x08) | (*attr & 0x07);
 			u16 pap = pal_offset | ((*attr >> 3) & 0x0f);
 			u8 pix8 = (invert_attrs && (*attr & 0x80)) ? ~*scr : *scr;
 
-			for (u8 b = 0x80 >> (x & 0x07); b != 0 && hpos <= cliprect.right(); b >>= 1, x++, hpos++)
-				*pix++ = m_palette->pen_color((pix8 & b) ? ink : pap);
+			for (u8 b = 0x80 >> (x & 0x07); b != 0 && hpos <= cliprect.right(); b >>= 1, x++, hpos += 2, pix += 2)
+			{
+				pix[0] = m_palette->pen_color((pix8 & b) ? ink : pap);
+				if (!off2 && hpos < cliprect.right())
+					pix[1] = pix[0];
+				if (off2)
+				{
+					hpos -= 1;
+					pix -= 1;
+					off2 = false;
+				}
+			}
 			scr++;
 			attr++;
 		}
@@ -250,41 +253,41 @@ void tsconf_state::tsconf_draw_gfx(bitmap_rgb32 &bitmap, const rectangle &clipre
 	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
 		u16 y_offset = (OFFS_512(G_Y_OFFS_L) + m_gfx_y_frame_offset + vpos) & 0x1ff;
-		u16 x_offset = (OFFS_512(G_X_OFFS_L) + (cliprect.left() - get_screen_area().left())) & 0x1ff;
+		u16 x_offset = (OFFS_512(G_X_OFFS_L) + ((cliprect.left() - get_screen_area().left()) >> 1)) & 0x1ff;
 		u8 *video_location = m_ram->pointer() + get_vpage_offset() + ((y_offset * 512 + x_offset) >> (2 - VM));
 		u32 *bm = &(bitmap.pix(vpos, cliprect.left()));
-		s16 width = cliprect.width();
-		if (VM == VM_16C)
+		bool half = (cliprect.left() - get_screen_area().left()) & 1; // starts from the second half of the doubled pixel
+		u16 hpos = cliprect.left();
+		while (hpos <= cliprect.right())
 		{
-			if (x_offset & 1)
-			{
-				*bm++ = m_palette->pen_color(pal_offset | (*video_location++ & 0x0f));
-				x_offset++;
-				width--;
-			}
-			for (; width > 0; width -= 2, x_offset += 2)
+			rgb_t pen;
+			if (VM == VM_16C)
 			{
 				if (x_offset == 512)
 					video_location -= 256;
-				u8 pix = *video_location++;
-				rgb_t pen = m_palette->pen_color(pal_offset | (pix >> 4));
-				*bm++ = pen;
-				if (width != 1)
-				{
-					pen = m_palette->pen_color(pal_offset | (pix & 0x0f));
-					*bm++ = pen;
-				}
+				const u8 pix = *video_location;
+				pen = m_palette->pen_color(pal_offset | ((x_offset & 1) ? (pix & 0x0f) : (pix >> 4)));
+				if (x_offset & 1)
+					video_location++;
 			}
-		}
-		else // VM_256C
-		{
-			for (; width > 0; width--, x_offset++)
+			else // VM_256C
 			{
 				if (x_offset == 512)
 					video_location -= 512;
-				rgb_t pen = m_palette->pen_color(*video_location++);
-				*bm++ = pen;
+				pen = m_palette->pen_color(*video_location++);
 			}
+
+			*bm++ = pen;
+			hpos++;
+			if (!half && hpos <= cliprect.right())
+			{
+				*bm++ = pen;
+				hpos++;
+			}
+			else if (half)
+				half = false;
+
+			x_offset++;
 		}
 	}
 }
@@ -322,7 +325,6 @@ void tsconf_state::draw_sprites(screen_device &screen_d, bitmap_rgb32 &bitmap, c
 				const bool flipy = BIT(*sinfo++, 7);
 				s16 x = *sinfo++;
 				x |= BIT(*sinfo, 0) << 8;
-				x += screen.left() - (x >= screen.width() ? 512 : 0);
 				const u8 width8 = BIT(*sinfo, 1, 3);
 				const bool flipx = BIT(*sinfo++, 7);
 				u16 code = *sinfo++;
@@ -334,14 +336,14 @@ void tsconf_state::draw_sprites(screen_device &screen_d, bitmap_rgb32 &bitmap, c
 				for (auto iy = y; iy <= y + height8 * 8; iy = iy + 8)
 				{
 					u8 tile_col = (code % 64) + flipx * width8;
-					for (auto ix = x; ix <= x + width8 * 8; ix = ix + 8)
+					for (auto ix = x; ix <= x + width8 * 8; ix += 8)
 					{
 						sprite_data spr = {};
 						spr.code = (tile_row % 64) * 64 + (tile_col % 64);
 						spr.color = pal;
 						spr.flipx = flipx;
 						spr.flipy = flipy;
-						spr.destx = ix;
+						spr.destx = screen.left() + (ix << 1) - ((ix << 1) >= screen.width() ? (512 << 1) : 0);
 						spr.desty = iy;
 						spr.pmask = pmask;
 
@@ -358,9 +360,9 @@ void tsconf_state::draw_sprites(screen_device &screen_d, bitmap_rgb32 &bitmap, c
 	// Higher Sprite draws on top. Iterate backwards.
 	for (auto spr = m_sprites_cache.rbegin(); spr != m_sprites_cache.rend(); ++spr)
 	{
-		m_gfxdecode->gfx(TM_SPRITES)->prio_transpen(bitmap, cliprect,
+		m_gfxdecode->gfx(TM_SPRITES)->prio_zoom_transpen(bitmap, cliprect,
 			spr->code, spr->color, spr->flipx, spr->flipy, spr->destx, spr->desty,
-			screen_d.priority(), spr->pmask, 0);
+			0x20000, 0x10000, screen_d.priority(), spr->pmask, 0);
 	}
 
 }
@@ -374,7 +376,7 @@ attotime tsconf_state::copper_until_pos_r(u16 pos)
 		case 0b10: // x
 			{
 				const int vpos = m_screen->vpos();
-				const int x = (mode == 0b11) ? screen_area[3].right() + 1 : ((pos & 0xff) << 1);
+				const int x = (mode == 0b11) ? screen_area[3].right() + 1 : ((pos & 0xff) << 2);
 				if (m_screen->hpos() < x)
 					return m_screen->time_until_pos(vpos, x);
 				else
@@ -468,6 +470,7 @@ void tsconf_state::ram_page_write(u8 page, offs_t offset, u8 data)
 			const int raw_offset = tiles_offset_to_raw(t0_offset);
 			m_tiles_raw[0][raw_offset] = data >> 4;
 			m_tiles_raw[0][raw_offset + 1] = data & 0x0f;
+			m_gfxdecode->gfx(TM_TILES0)->mark_all_dirty();
 			m_ts_tilemap[TM_TILES0]->mark_all_dirty();
 		}
 
@@ -477,6 +480,7 @@ void tsconf_state::ram_page_write(u8 page, offs_t offset, u8 data)
 			const int raw_offset = tiles_offset_to_raw(t1_offset);
 			m_tiles_raw[1][raw_offset] = data >> 4;
 			m_tiles_raw[1][raw_offset + 1] = data & 0x0f;
+			m_gfxdecode->gfx(TM_TILES1)->mark_all_dirty();
 			m_ts_tilemap[TM_TILES1]->mark_all_dirty();
 		}
 	}
@@ -513,6 +517,12 @@ u16 tsconf_state::spi_read16()
 {
 	const u16 data_hi = tsconf_port_57_zctr_r() << 8;
 	return data_hi | tsconf_port_57_zctr_r();
+}
+
+void tsconf_state::spi_write16(u16 data)
+{
+	tsconf_port_57_zctr_w(data >> 8);
+	tsconf_port_57_zctr_w(data & 0xff);
 }
 
 void tsconf_state::cram_write(u16 offset, u8 data)
@@ -860,7 +870,8 @@ void tsconf_state::tsconf_port_77_zctr_w(u8 data)
 
 u8 tsconf_state::tsconf_port_77_zctr_r()
 {
-	return 0x02 | (m_sdcard->get_card_present() ? 0x00 : 0x01);
+	return (m_sdcard->get_card_readonly() ? 0x02 : 0x00)
+		| (m_sdcard->get_card_present() ? 0x00 : 0x01);
 }
 
 void tsconf_state::tsconf_port_57_zctr_w(u8 data)
@@ -911,6 +922,11 @@ IRQ_CALLBACK_MEMBER(tsconf_state::irq_vector)
 		m_int_mask &= ~4;
 		vector = 0xfb;
 	}
+	else if (m_int_mask & 8)
+	{
+		m_int_mask &= ~8;
+		vector = 0xf9;
+	}
 
 	if (!m_int_mask)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
@@ -923,6 +939,21 @@ TIMER_CALLBACK_MEMBER(tsconf_state::irq_off)
 	m_int_mask &= ~1;
 }
 
+void tsconf_state::uart_int_w(int state)
+{
+	if (state)
+	{
+		m_int_mask |= 8;
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	}
+	else
+	{
+		m_int_mask &= ~8;
+		if (!m_int_mask)
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	}
+}
+
 void tsconf_state::update_frame_timer()
 {
 	u16 vpos = OFFS_512(VS_INT_L);
@@ -930,7 +961,7 @@ void tsconf_state::update_frame_timer()
 	attotime next;
 	if (vpos <= 319 && hpos <= 223)
 	{
-		next = m_screen->time_until_pos(vpos, hpos << 1);
+		next = m_screen->time_until_pos(vpos, hpos << 2);
 		if (next >= m_screen->frame_period())
 		{
 			next = attotime::zero;
@@ -1011,12 +1042,12 @@ TIMER_CALLBACK_MEMBER(tsconf_state::irq_scanline)
 
 		case T0_X_OFFSET_L:
 		case T0_X_OFFSET_H:
-			m_ts_tilemap[TM_TILES0]->set_scrollx(OFFS_512(T0_X_OFFSET_L));
+			m_ts_tilemap[TM_TILES0]->set_scrollx(OFFS_512(T0_X_OFFSET_L) << 1);
 			break;
 
 		case T1_X_OFFSET_L:
 		case T1_X_OFFSET_H:
-			m_ts_tilemap[TM_TILES1]->set_scrollx(OFFS_512(T1_X_OFFSET_L));
+			m_ts_tilemap[TM_TILES1]->set_scrollx(OFFS_512(T1_X_OFFSET_L) << 1);
 			break;
 
 		case G_X_OFFS_L:

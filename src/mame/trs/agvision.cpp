@@ -98,7 +98,6 @@ private:
 	void io1_map(address_map &map) ATTR_COLD;
 	void boot_map(address_map &map) ATTR_COLD;
 	void ff20_write(offs_t offset, uint8_t data);
-	void configure_sam();
 	uint8_t pia0_pa_r();
 	void pia0_cb2_w(int state);
 	TIMER_CALLBACK_MEMBER(timer_elapsed);
@@ -217,10 +216,12 @@ void agvision_state::agvision(machine_config &config)
 	MC6847(config, m_vdg, XTAL(14'318'181) / 4); // VClk output from MC6883
 	m_vdg->set_screen(m_screen);
 	m_vdg->hsync_wr_callback().set(m_pia_0, FUNC(pia6821_device::ca1_w));
+	m_vdg->hsync_wr_callback().append(m_sam, FUNC(sam6883_device::hs_w));
 	m_vdg->input_callback().set(FUNC(agvision_state::sam_read));
 
 	// memory controller
 	SAM6883(config, m_sam, XTAL(14'318'181), m_maincpu);
+	m_sam->set_ram(m_ram);
 	m_sam->set_addrmap(2, &agvision_state::rom_map);            // ROM at $A000
 	m_sam->set_addrmap(3, &agvision_state::static_ram_map);     // RAM at $C000
 	m_sam->set_addrmap(4, &agvision_state::io0_map);            //  IO at $FF00
@@ -240,7 +241,7 @@ void agvision_state::agvision(machine_config &config)
 
 void agvision_state::mem_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(m_sam, FUNC(sam6883_device::read), FUNC(sam6883_device::write));
+	map(0x0000, 0xffff).m(m_sam, FUNC(sam6883_device::amap));
 }
 
 void agvision_state::rom_map(address_map &map)
@@ -279,8 +280,6 @@ void agvision_state::boot_map(address_map &map)
 
 void agvision_state::machine_start()
 {
-	configure_sam();
-
 	save_item(NAME(m_cd));
 	m_pia_0->cb1_w(0);
 	m_timer = timer_alloc(FUNC(agvision_state::timer_elapsed), this);
@@ -310,18 +309,6 @@ void agvision_state::ff20_write(offs_t offset, uint8_t data)
 	m_vdg->gm1_w(BIT(data,2));
 	m_vdg->gm2_w(BIT(data,1));
 	m_vdg->ag_w(BIT(data,0));
-}
-
-//-------------------------------------------------
-//  configure_sam
-//-------------------------------------------------
-
-void agvision_state::configure_sam()
-{
-	offs_t ramsize = m_ram->size();
-	m_sam->space(0).install_ram(0, ramsize - 1, m_ram->pointer());
-	if (ramsize < 65536)
-		m_sam->space(0).nop_readwrite(ramsize, 0xffff);
 }
 
 //-------------------------------------------------

@@ -25,6 +25,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "rotaryf.lh"
+
 
 namespace {
 
@@ -317,4 +319,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1979, rotaryf, 0, rotaryf, rotaryf, rotaryf_state, empty_init, ROT270, "Kasco", "Rotary Fighter", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1979, rotaryf, 0, rotaryf, rotaryf, rotaryf_state, empty_init, ROT270, "Kasco", "Rotary Fighter", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_rotaryf )

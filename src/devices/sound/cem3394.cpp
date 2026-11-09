@@ -201,7 +201,7 @@ void cem3394_device::device_add_mconfig(machine_config &config)
 		// constant as resonance increases. The value below was selected by trial
 		// and error, to qualitatively match the preceding statement.
 		.configure_bass_gain_comp(0.2)
-		.add_route(0, "ac_couple", 1.0);
+		.add_route(va_lpf4_device::OUTPUT_LPF4, "ac_couple", 1.0);
 
 	// Set up AC coupling.
 	constexpr double R_AC = 11E3;  // internal AC coupling resistor

@@ -6,9 +6,9 @@
 
     All five machines are built around a Panasonic MN103002A (MN1030 series),
     running Panasonic's "MILK" object framework. LCD, control panel, floppy, SD
-    and MIDI are emulated. The tone generators' registers are decoded, but they
-    produce no sound: the wave ROMs are undumped and the ADSP-21065L effects
-    DSP is not emulated.
+    and MIDI are emulated. The KN7000's tone generators play their wave ROMs;
+    the other models' wave ROMs are undumped, so their tone generators are
+    silent. The ADSP-21065L effects DSP is not emulated.
 
     Design notes: https://arqueologiadigital.github.io/technics-docs/kn7000-driver-internals/
 
@@ -38,11 +38,13 @@
     manuals do not give the frequency of X1, so their core clocks are inferred
     from the KN6000 and KN6500 rather than documented.
 
-    The KN7000's program and table ROMs are not chip reads. They are payloads
-    from Panasonic's own firmware update disks, and they validate against the
-    checksums that Panasonic ships alongside them: the update descriptor files
-    carry a 32-bit sum over the whole payload plus 16-bit sums of each 256 KiB
-    block, and every block matches.
+    Except for v1.3, the KN7000's program and table ROMs are not chip reads.
+    They are payloads from Panasonic's own firmware update disks, and they
+    validate against the checksums that Panasonic ships alongside them: the
+    update descriptor files carry a 32-bit sum over the whole payload plus
+    16-bit sums of each 256 KiB block, and every block matches. No update disk
+    for v1.3 is known; that set was read from an instrument's flash by its own
+    CPU.
 
     A note on the KN7000's IC16/IC17: these are one pair of 4 MiB flash devices
     on CPU address lines A2-A22, so together they span 8 MiB. Address line A22
@@ -50,7 +52,7 @@
     the half where A22 is low, and the program the half where it is high.
 
     TODO:
-      - dump the wave, rhythm and picture ROMs listed as NO_DUMP below
+      - dump the ROMs still listed as NO_DUMP below
 
 ***************************************************************************/
 
@@ -63,17 +65,16 @@
 #include "bus/midi/midi.h"
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
+#include "bus/technics/kn6000/kn6000_expansion.h"
 #include "cpu/mn10300/mn10300.h"
 #include "imagedev/floppy.h"
-#include "machine/input_merger.h"
 #include "machine/intelfsh.h"
 #include "machine/spi_sdcard.h"
 #include "machine/upd765.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
-
-#include "multibyte.h"
 
 #include <algorithm>
 #include <iterator>
@@ -148,11 +149,8 @@ public:
 		, m_lcdbuf(*this, "lcdbuf")
 		, m_customflash(*this, "custom_data")
 		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:0")
 		, m_midi_uart(*this, "midi_uart%u", 0U)
-		, m_wave_main_y(*this, "waveform_main_y")
-		, m_wave_main_x(*this, "waveform_main_x")
-		, m_wave_sub_y(*this, "waveform_sub_y")
-		, m_wave_sub_x(*this, "waveform_sub_x")
 		, m_dial(*this, "DIAL")
 		, m_rearsw(*this, "REARSW")
 		, m_volmain(*this, "VOL_MAIN")
@@ -172,14 +170,13 @@ protected:
 	void kn_common(machine_config &config) ATTR_COLD;
 	void kn24_common(machine_config &config) ATTR_COLD;
 	void custom_flash_add(machine_config &config) ATTR_COLD;
-	void fdc_add(machine_config &config) ATTR_COLD;
+	void fdc_add(machine_config &config, bool drq_on_irq1) ATTR_COLD;
 	void configure_cpanel() ATTR_COLD;
 	void configure_tonegen() ATTR_COLD;
 	void common_map(address_map &map) ATTR_COLD;
 	void table_map(address_map &map) ATTR_COLD;
 	void fdc_map(address_map &map) ATTR_COLD;
-	template <int Tg> void tg_map(address_map &map, offs_t base) ATTR_COLD;
-	void single_tg_map(address_map &map) ATTR_COLD;
+	void tg_map(address_map &map) ATTR_COLD;
 	void kn24_map(address_map &map) ATTR_COLD;
 	template <u16 Straps> u16 strap_r();
 
@@ -192,6 +189,10 @@ protected:
 	required_device<kn_tonegen_base_device> m_tonegen;
 
 	u16 m_sdmbx_out = 0xff;
+	u16 m_gpio8004 = 0xffff;
+
+	u16 gpio8004_r();
+	void gpio8004_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 private:
 	enum { SIO_PANEL = 0, SIO_MIDI1 = 1, SIO_MIDI2 = 2 };
@@ -199,11 +200,8 @@ private:
 	required_shared_ptr<u32> m_lcdbuf;
 	optional_device<fujitsu_29lv160b_device> m_customflash;
 	optional_device<n82077aa_device> m_fdc;
+	optional_device<floppy_connector> m_floppy;
 	required_device_array<kn7000_sio_uart_device, 2> m_midi_uart;
-	optional_memory_region m_wave_main_y;
-	optional_memory_region m_wave_main_x;
-	optional_memory_region m_wave_sub_y;
-	optional_memory_region m_wave_sub_x;
 	required_ioport m_dial;
 	required_ioport m_rearsw;
 	required_ioport m_volmain;
@@ -214,9 +212,11 @@ private:
 	u16 m_kbd_fifo[64];
 	u8 m_kbd_head = 0;
 	u8 m_kbd_tail = 0;
-	u16 m_tg_addr[2];
-	u16 m_tg_wave_bank[2];
-	u16 m_tg_wave_addr[2];
+
+	bool m_fdc_drq_on_irq1 = false;
+	u8 m_fdc_drq = 0;
+	u8 m_fdd_index = 0;
+	emu_timer *m_fdd_index_timer = nullptr;
 
 	void kn2400_map(address_map &map) ATTR_COLD;
 
@@ -224,15 +224,16 @@ private:
 
 	template <u32 Base> u16 io_r(offs_t offset, u16 mem_mask = ~0);
 	template <u32 Base> void io_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	template <int Tg> void tg_addr_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	template <int Tg> void tg_data_w(u16 data);
-	template <int Tg> void tg_wave_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	template <int Tg> void tg_wave_addr_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	template <int Tg> u16 tg_wave_data_r();
 	u16 kbd_fifo_r();
 	u16 sdmbx_r();
 	void sdmbx_w(u16 data);
 	void update_volume();
+	void fdc_drq_w(int state);
+	u8 fdc_dack_r();
+	void fdc_dack_w(u8 data);
+	void fdd_loaded(floppy_image_device *floppy);
+	void fdd_unloaded(floppy_image_device *floppy);
+	TIMER_CALLBACK_MEMBER(fdd_index_poll);
 };
 
 
@@ -248,7 +249,6 @@ public:
 		, m_sd_leds(*this, "sd_led%u", 0U)
 	{ }
 
-	void kn7000(machine_config &config) ATTR_COLD;
 	void kn2600(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(sd_cover_changed);
@@ -256,6 +256,9 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	void sd_add(machine_config &config) ATTR_COLD;
+	void sd_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<spi_sdcard_device> m_sdcard;
@@ -266,12 +269,8 @@ private:
 	emu_timer *m_sd_insert_timer = nullptr; // the power-on card-detect hack, see machine_reset()
 	emu_timer *m_sd_inuse_off = nullptr;
 	u8 m_sd_miso = 1; // the card's DO line
-	u16 m_gpio8004 = 0xffff;
 	u32 m_sdport = 0;
 
-	void sd_add(machine_config &config) ATTR_COLD;
-	void sd_map(address_map &map) ATTR_COLD;
-	void kn7000_map(address_map &map) ATTR_COLD;
 	void kn2600_map(address_map &map) ATTR_COLD;
 
 	void sd_update_carddetect();
@@ -280,10 +279,27 @@ private:
 	void sd_card_changed(int state);
 	u32 sdport_r();
 	void sdport_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	u16 gpio8004_r();
-	void gpio8004_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void sd_gpio8004_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	TIMER_CALLBACK_MEMBER(sd_insert);
 	TIMER_CALLBACK_MEMBER(sd_inuse_off);
+};
+
+
+// SX-KN7000: a second tone generator
+class kn7000_state : public kn_sd_state
+{
+public:
+	kn7000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: kn_sd_state(mconfig, type, tag)
+		, m_tonegen_sub(*this, "tonegen_sub")
+	{ }
+
+	void kn7000(machine_config &config) ATTR_COLD;
+
+private:
+	required_device<kn7000_tonegen_device> m_tonegen_sub;
+
+	void kn7000_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -295,6 +311,7 @@ public:
 		: kn_state(mconfig, type, tag)
 		, m_program(*this, "program")
 		, m_libram(*this, "libram")
+		, m_exp(*this, "exp")
 	{ }
 
 	void kn6000(machine_config &config) ATTR_COLD;
@@ -305,6 +322,7 @@ protected:
 private:
 	required_region_ptr<u32> m_program;
 	required_shared_ptr<u32> m_libram;
+	required_device<kn6000_expansion_connector> m_exp;
 
 	void kn6000_map(address_map &map) ATTR_COLD;
 };
@@ -350,24 +368,10 @@ void kn_state::common_map(address_map &map)
 	map(0x98070000, 0x98070001).r(FUNC(kn_state::strap_r<0x8006>));
 }
 
-// A tone generator's window: register address and data, and the wave ROM
-// bank, address and data that the service mode's wave ROM test uses
-template <int Tg>
-void kn_state::tg_map(address_map &map, offs_t base)
+// The main tone generator's window, the only one on most models
+void kn_state::tg_map(address_map &map)
 {
-	map(base + 0x0, base + 0x1).w(FUNC(kn_state::tg_addr_w<Tg>));
-	map(base + 0x2, base + 0x3).w(FUNC(kn_state::tg_data_w<Tg>));
-	map(base + 0x4, base + 0x7).nopw();     // initialisation writes, not decoded
-	map(base + 0x6, base + 0x7).w(FUNC(kn_state::tg_wave_bank_w<Tg>));
-	map(base + 0x10, base + 0x13).nopw();
-	map(base + 0x8, base + 0x9).w(FUNC(kn_state::tg_wave_addr_w<Tg>));
-	map(base + 0xa, base + 0xb).r(FUNC(kn_state::tg_wave_data_r<Tg>));
-}
-
-// The models with one tone generator have it at 0x98050000
-void kn_state::single_tg_map(address_map &map)
-{
-	tg_map<0>(map, 0x98050000);
+	map(0x98050000, 0x98050013).m(m_tonegen, FUNC(kn_tonegen_base_device::map));
 }
 
 // The KN6000 and KN7000 boards: table data below the program. On the KN7000 both
@@ -386,12 +390,13 @@ void kn_state::kn24_map(address_map &map)
 {
 	common_map(map);
 	map(0x48000000, 0x483fffff).rom().region("table_data", 0);
-	single_tg_map(map);
+	tg_map(map);
 }
 
 void kn_state::fdc_map(address_map &map)
 {
-	map(0x98010000, 0x98010003).rw(m_fdc, FUNC(n82077aa_device::dma_r), FUNC(n82077aa_device::dma_w));
+	map(0x36008004, 0x36008005).rw(FUNC(kn_state::gpio8004_r), FUNC(kn_state::gpio8004_w));
+	map(0x98010000, 0x98010003).rw(FUNC(kn_state::fdc_dack_r), FUNC(kn_state::fdc_dack_w));
 	map(0x98020004, 0x98020004).rw(m_fdc, FUNC(n82077aa_device::dor_r), FUNC(n82077aa_device::dor_w));
 	map(0x98020008, 0x98020008).rw(m_fdc, FUNC(n82077aa_device::msr_r), FUNC(n82077aa_device::dsr_w));
 	map(0x9802000a, 0x9802000a).rw(m_fdc, FUNC(n82077aa_device::fifo_r), FUNC(n82077aa_device::fifo_w));
@@ -407,24 +412,41 @@ void kn_state::kn2400_map(address_map &map)
 void kn6000_state::kn6000_map(address_map &map)
 {
 	table_map(map);
-	single_tg_map(map);
+	tg_map(map);
 	fdc_map(map);
 }
 
 void kn_sd_state::sd_map(address_map &map)
 {
-	map(0x36008004, 0x36008005).rw(FUNC(kn_sd_state::gpio8004_r), FUNC(kn_sd_state::gpio8004_w));
+	map(0x36008004, 0x36008005).rw(FUNC(kn_sd_state::gpio8004_r), FUNC(kn_sd_state::sd_gpio8004_w));
 	map(0x9805000c, 0x9805000d).w(FUNC(kn_sd_state::sd_sdmbx_w));
 	map(0x9cc00008, 0x9cc0000b).rw(FUNC(kn_sd_state::sdport_r), FUNC(kn_sd_state::sdport_w));
 }
 
-void kn_sd_state::kn7000_map(address_map &map)
+void kn7000_state::kn7000_map(address_map &map)
 {
 	table_map(map);
-	tg_map<0>(map, 0x98040000);
-	tg_map<1>(map, 0x98050000);
+	// The firmware's wave ROM test calls the tone generator at 0x98050000 the
+	// main one (IC203/IC204), as on the single tone generator models
+	tg_map(map);
+	map(0x98040000, 0x98040013).m(m_tonegen_sub, FUNC(kn_tonegen_base_device::map));
 	fdc_map(map);
+	// IC19, the picture ROM: the Slide Show's 100 PRESET pictures. Its top
+	// address pin is grounded through JP10, and the half the CPU can reach
+	// holds one 2 MB image, so the 8 MB window shows it four times.
+	map(0x57800000, 0x579fffff).mirror(0x600000).rom().region("picture", 0);
 	sd_map(map);
+	// IC18, the rhythm data ROM, answers on CS0. Its address pins take A1-A21
+	// and its top one is set by JP7, so 4 MB of the 64 Mbit part is visible and
+	// repeats at 0x40400000. The firmware finds its "Technics Rhythms" resource
+	// at 0x40010000. The first 64 KB is the instrument's boot code and flash
+	// updater: the CPU starts there at reset and is sent on to 0x48400000,
+	// where the driver starts it directly.
+	map(0x40000000, 0x403fffff).mirror(0x400000).rom().region("rhythm_data", 0);
+	// The board straps: a KN7000 reads 0xf8f7 with the rear switch SW701 at
+	// MIDI IN, and strap_r() takes bit 12 from that switch. The firmware lays
+	// out the wave ROMs by bits 11-10.
+	map(0x98070000, 0x98070001).r(FUNC(kn7000_state::strap_r<0xe8f7>));
 }
 
 void kn_sd_state::kn2600_map(address_map &map)
@@ -454,49 +476,6 @@ void kn_state::io_w(offs_t offset, u16 data, u16 mem_mask)
 	LOGMASKED(LOG_UNEMULATED, "%s: unemulated write %08x = %04x & %04x\n", machine().describe_context(), Base + (offset << 1), data, mem_mask);
 }
 
-// Each tone generator takes a register address, then its data
-template <int Tg>
-void kn_state::tg_addr_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	COMBINE_DATA(&m_tg_addr[Tg]);
-}
-
-template <int Tg>
-void kn_state::tg_data_w(u16 data)
-{
-	m_tonegen->tg_write(Tg, m_tg_addr[Tg], data);
-}
-
-// The service mode's wave ROM test latches a bank at base+6 and a word address
-// at base+8, then reads the sample word at base+a.
-template <int Tg>
-void kn_state::tg_wave_bank_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	COMBINE_DATA(&m_tg_wave_bank[Tg]);
-}
-
-template <int Tg>
-void kn_state::tg_wave_addr_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	COMBINE_DATA(&m_tg_wave_addr[Tg]);
-}
-
-template <int Tg>
-u16 kn_state::tg_wave_data_r()
-{
-	const u32 bank = m_tg_wave_bank[Tg] & 0x7fff;           // bit 15 is an enable
-	const u32 word = (m_tg_wave_addr[Tg] >> 1) & 0x3fff;
-	memory_region *const rgn = BIT(m_tg_wave_addr[Tg], 0)
-			? (Tg ? m_wave_sub_x.target() : m_wave_main_x.target())
-			: (Tg ? m_wave_sub_y.target() : m_wave_main_y.target());
-	if (!rgn)
-		return 0xffff;
-	const u32 a = (bank * 0x4000 + word) * 2;
-	if (a + 1 >= rgn->bytes())
-		return 0xffff;
-	return get_u16le(rgn->base() + a);
-}
-
 // The key bed's event FIFO: the key index in the low byte, bit 7 set on
 // release, and the velocity in the high byte
 u16 kn_state::kbd_fifo_r()
@@ -509,8 +488,9 @@ u16 kn_state::kbd_fifo_r()
 	return data;
 }
 
-// The SD mailbox in the sub tone generator's window. With nothing attached, a
-// write still raises the sub tone generator's interrupt.
+// The SD mailbox at 0x9805000c, in the window of the tone generator at
+// 0x98050000 (the main one on the KN7000). With nothing attached, a write
+// still raises TGS.INT2.
 // FIXME: what clears TGS.INT2 is unknown; it is held until the CPU accepts it
 u16 kn_state::sdmbx_r()
 {
@@ -552,6 +532,76 @@ void kn_state::update_volume()
 	m_tonegen->set_output_gain(ALL_OUTPUTS, v * v);
 }
 
+// An output latch. Bit 4 is the floppy controller's terminal count, active low:
+// the firmware asserts it itself at the end of a sector transfer (the KN6000
+// around a dummy read of the DMA acknowledge port, the KN7000 after moving the
+// last byte).
+u16 kn_state::gpio8004_r()
+{
+	return m_gpio8004;
+}
+
+void kn_state::gpio8004_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_gpio8004);
+	if (m_fdc)
+		m_fdc->tc_w(BIT(~m_gpio8004, 4));
+}
+
+// The floppy controller's DRQ runs DMA channel 0. On the KN7000 and KN2400 the
+// firmware also reads it as IRQ1: its end-of-transfer handler waits there, with
+// the interrupt disabled, for the request of the last byte, which it moves itself.
+void kn_state::fdc_drq_w(int state)
+{
+	m_fdc_drq = state;
+	m_maincpu->dma_req_w(state);
+	if (m_fdc_drq_on_irq1)
+		m_maincpu->set_input_line(mn10300_device::IRQ1, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+// A DMA acknowledge cycle moves a byte only while the controller requests one.
+// The KN6000's end-of-transfer handler makes one more, a dummy read: after a read
+// DRQ is already low, but during a format it takes sector ID bytes out of the
+// FIFO and the formatted disk comes out unreadable.
+u8 kn_state::fdc_dack_r()
+{
+	return m_fdc_drq ? m_fdc->dma_r() : 0xff;
+}
+
+void kn_state::fdc_dack_w(u8 data)
+{
+	if (m_fdc_drq)
+		m_fdc->dma_w(data);
+}
+
+// The drive's INDEX pulse reaches the CPU on IRQ7. The firmware counts a disk
+// with the disk-change flag set as present only if an index interrupt arrived
+// recently, so without it a disk inserted while the machine runs is never seen.
+// The controller owns the drive's index callback, so the line is sampled, only
+// while a disk is in the drive.
+void kn_state::fdd_loaded(floppy_image_device *floppy)
+{
+	m_fdd_index_timer->adjust(attotime::from_usec(500), 0, attotime::from_usec(500));
+}
+
+void kn_state::fdd_unloaded(floppy_image_device *floppy)
+{
+	m_fdd_index_timer->adjust(attotime::never);
+	m_fdd_index = 0;
+	m_maincpu->set_input_line(mn10300_device::IRQ7, CLEAR_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(kn_state::fdd_index_poll)
+{
+	floppy_image_device *const floppy = m_floppy->get_device();
+	const u8 index = floppy ? floppy->idx_r() : 0;
+	if (index != m_fdd_index)
+	{
+		m_fdd_index = index;
+		m_maincpu->set_input_line(mn10300_device::IRQ7, index ? ASSERT_LINE : CLEAR_LINE);
+	}
+}
+
 // The SD slot has a hinged cover, and the firmware reads card-detect through
 // the cover switch: high on IRQ4 means no card or cover open.
 void kn_sd_state::sd_update_carddetect()
@@ -562,8 +612,8 @@ void kn_sd_state::sd_update_carddetect()
 }
 
 // The firmware talks SPI (mode 3) to the card a byte at a time through this
-// mailbox; each write clocks a byte out and the reply in, then raises the sub
-// tone generator's interrupt. A deselected card leaves DO pulled up.
+// mailbox; each write clocks a byte out and the reply in, then raises
+// TGS.INT2. A deselected card leaves DO pulled up.
 void kn_sd_state::sd_sdmbx_w(u16 data)
 {
 	m_sd_leds[0] = 1;
@@ -607,15 +657,10 @@ void kn_sd_state::sdport_w(offs_t offset, u32 data, u32 mem_mask)
 	m_sd_leds[1] = (m_sdport & 0xc0) ? 1 : 0;
 }
 
-u16 kn_sd_state::gpio8004_r()
-{
-	return m_gpio8004;
-}
-
 // Bit 1 is the card's SPI chip select, active low
-void kn_sd_state::gpio8004_w(offs_t offset, u16 data, u16 mem_mask)
+void kn_sd_state::sd_gpio8004_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_gpio8004);
+	gpio8004_w(offset, data, mem_mask);
 	m_sdcard->spi_ss_w(BIT(~m_gpio8004, 1));
 }
 
@@ -702,23 +747,33 @@ u32 kn_state::screen_update_gray(screen_device &screen, bitmap_rgb32 &bitmap, co
 void kn_state::machine_start()
 {
 	std::fill(std::begin(m_kbd_fifo), std::end(m_kbd_fifo), 0);
-	std::fill(std::begin(m_tg_addr), std::end(m_tg_addr), 0);
-	std::fill(std::begin(m_tg_wave_bank), std::end(m_tg_wave_bank), 0);
-	std::fill(std::begin(m_tg_wave_addr), std::end(m_tg_wave_addr), 0);
 
 	save_item(NAME(m_kbd_fifo));
 	save_item(NAME(m_kbd_head));
 	save_item(NAME(m_kbd_tail));
-	save_item(NAME(m_tg_addr));
-	save_item(NAME(m_tg_wave_bank));
-	save_item(NAME(m_tg_wave_addr));
 	save_item(NAME(m_sdmbx_out));
 	save_item(NAME(m_sdspi_rate));
+	save_item(NAME(m_gpio8004));
+	save_item(NAME(m_fdc_drq));
+	save_item(NAME(m_fdd_index));
+
+	m_fdd_index_timer = timer_alloc(FUNC(kn_state::fdd_index_poll), this);
+	if (m_floppy && m_floppy->get_device())
+	{
+		floppy_image_device *const floppy = m_floppy->get_device();
+		floppy->setup_load_cb(floppy_image_device::load_cb(&kn_state::fdd_loaded, this));
+		floppy->setup_unload_cb(floppy_image_device::unload_cb(&kn_state::fdd_unloaded, this));
+		if (floppy->exists())
+			fdd_loaded(floppy);
+	}
 }
 
 void kn_state::machine_reset()
 {
 	update_volume();
+	m_gpio8004 = 0xffff;
+	if (m_fdc)
+		m_fdc->tc_w(0);
 }
 
 void kn_sd_state::machine_start()
@@ -729,7 +784,6 @@ void kn_sd_state::machine_start()
 	m_sd_inuse_off = timer_alloc(FUNC(kn_sd_state::sd_inuse_off), this);
 
 	save_item(NAME(m_sd_miso));
-	save_item(NAME(m_gpio8004));
 	save_item(NAME(m_sdport));
 }
 
@@ -746,7 +800,6 @@ void kn_sd_state::machine_reset()
 	else
 		m_sd_insert_timer->enable(false);
 
-	m_gpio8004 = 0xffff;
 	m_sdcard->spi_ss_w(0);
 	m_sdcard->spi_clock_w(1);           // mode 3: the clock idles high
 }
@@ -758,6 +811,7 @@ void kn6000_state::machine_start()
 {
 	kn_state::machine_start();
 	std::copy_n(&m_program[0], m_program.length(), &m_libram[0]);
+	m_exp->program_map(m_maincpu->space(AS_PROGRAM));
 }
 
 
@@ -937,17 +991,19 @@ void kn_state::custom_flash_add(machine_config &config)
 	FUJITSU_29LV160B(config, m_customflash);
 }
 
-void kn_state::fdc_add(machine_config &config)
+void kn_state::fdc_add(machine_config &config, bool drq_on_irq1)
 {
-	// IC103: a custom part (C1DB00000607) compatible with the N82077AA
+	// IC103: a custom part (C1DB00000607) compatible with the N82077AA. INTRQ goes to
+	// IRQ2, whose handler issues the Sense Interrupt Status that ends a seek; DRQ drives
+	// the on-chip DMA controller's channel 0, which moves the sector data through the FDC
+	// data port at 0x98010000. Terminal count comes from the output latch at 0x36008004,
+	// not from the channel. (The schematic prints INTRQ as IRQ1, but the board wires it to
+	// IRQ2 - follow the wire.)
 	N82077AA(config, m_fdc, 24'000'000);
-	// INTRQ and DRQ share IRQ1: the firmware moves each sector byte through the
-	// DACK slot at 0x98010000 from its interrupt handler
-	input_merger_device &fdc_irq(INPUT_MERGER_ANY_HIGH(config, "fdc_irq"));
-	fdc_irq.output_handler().set_inputline(m_maincpu, mn10300_device::IRQ1);
-	m_fdc->intrq_wr_callback().set(fdc_irq, FUNC(input_merger_device::in_w<0>));
-	m_fdc->drq_wr_callback().set(fdc_irq, FUNC(input_merger_device::in_w<1>));
-	FLOPPY_CONNECTOR(config, "fdc:0", kn_floppies, "35hd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
+	m_fdc->drq_wr_callback().set(FUNC(kn_state::fdc_drq_w));
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, mn10300_device::IRQ2);
+	m_fdc_drq_on_irq1 = drq_on_irq1;
+	FLOPPY_CONNECTOR(config, m_floppy, kn_floppies, "35hd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 }
 
 void kn_state::configure_cpanel()
@@ -974,18 +1030,26 @@ void kn_sd_state::sd_add(machine_config &config)
 	m_sdcard->card_present_callback().set(FUNC(kn_sd_state::sd_card_changed));
 }
 
-void kn_sd_state::kn7000(machine_config &config)
+void kn7000_state::kn7000(machine_config &config)
 {
 	kn_common(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &kn_sd_state::kn7000_map);
-	m_screen->set_screen_update(FUNC(kn_sd_state::screen_update_rgb565));
+	m_maincpu->set_addrmap(AS_PROGRAM, &kn7000_state::kn7000_map);
+	m_screen->set_screen_update(FUNC(kn7000_state::screen_update_rgb565));
 	KN7000_CPANEL(config, m_cpanel);
 	configure_cpanel();
-	KN7000_TONEGEN(config, m_tonegen);
+	// X201: the schematic prints 16.9944 MHz and the part number reads 16.93 MHz;
+	// 16.9344 MHz is 384 times 44.1 kHz
+	KN7000_TONEGEN(config, m_tonegen, 16.9344_MHz_XTAL);
 	configure_tonegen();
+	// IC205 runs at the main's rate; its output goes into the main's SDSUB
+	// inputs
+	KN7000_TONEGEN(config, m_tonegen_sub, 16.9344_MHz_XTAL);
+	m_tonegen_sub->add_route(0, m_tonegen, 1.0, 0);
+	m_tonegen_sub->add_route(1, m_tonegen, 1.0, 1);
 	custom_flash_add(config);
-	fdc_add(config);
+	fdc_add(config, true);
 	sd_add(config);
+	SOFTWARE_LIST(config, "flop_list").set_original("kn7000_flop");
 	config.set_default_layout(layout_kn7000);
 }
 
@@ -1000,7 +1064,13 @@ void kn6000_state::kn6000(machine_config &config)
 	KN6000_TONEGEN(config, m_tonegen);
 	configure_tonegen();
 	custom_flash_add(config);
-	fdc_add(config);
+	fdc_add(config, false);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("kn6000_flop");
+
+	// FIXME: connect DRQ; the firmware services it in interrupt group 0x0f, whose source is not emulated
+
+	KN6000_EXPANSION(config, m_exp, kn6000_expansion_intf, nullptr);
 }
 
 void kn_state::kn24_common(machine_config &config)
@@ -1022,7 +1092,7 @@ void kn_state::kn2400(machine_config &config)
 {
 	kn24_common(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kn_state::kn2400_map);
-	fdc_add(config);
+	fdc_add(config, true);
 }
 
 // FIXME: identified as a KN2600, the firmware runs its SD start-up and then leaves
@@ -1073,61 +1143,87 @@ void kn_sd_state::kn2600(machine_config &config)
 ***************************************************************************/
 
 ROM_START(kn7000)
+	// The program (IC16/IC17) and table (same pair, A22 selects) flash are
+	// reconstructed from Panasonic's system-update floppies and verified against
+	// the checksums shipped on them (SMCK*.INF), except the SP7001 set (see below)
+	// and v13, which was read from an instrument's flash.
+	//
+	// Each version carries the PROGRAM and TABLE build numbers the instrument
+	// prints on its hidden SOFT VERSION screen:
+	//     sp7001  PROGRAM 942 / TABLE 83   Key Soft Service SD PLUG-iN
+	//     v16     PROGRAM 941 / TABLE 84   fully SMCK-verified
+	//     v15     PROGRAM 935 / TABLE 84   fully SMCK-verified
+	//     v14     PROGRAM 929 / TABLE 84   only update floppy 2 survives (floppy 1 NO_DUMP)
+	//     v13     PROGRAM 893 / TABLE 80   read from an instrument's flash
 	ROM_REGION32_LE(0x400000, "program", 0)
-	ROM_LOAD32_WORD("kn7000_program_even.ic17", 0x000000, 0x200000, CRC(529b87ce) SHA1(f198fd9a9ea31a454acfe7be0eb935beca6771b1))
-	ROM_LOAD32_WORD("kn7000_program_odd.ic16",  0x000002, 0x200000, CRC(a36e6222) SHA1(721d4469dc5f692f7a2c16c556b2e21115df19f6))
+	ROM_DEFAULT_BIOS("v16")
+
+	// Its SMCK checksum predates the final payload and does not match, so this set is
+	// declared as distributed rather than SMCK-verified.
+	ROM_SYSTEM_BIOS(0, "sp7001", "Program v1.6 PLUG-iN (build 942, SP7001 V1.0 2003-08-23) / Table (build 83)")
+	ROMX_LOAD("kn7000_program_even_sp7001_b942.ic17", 0x000000, 0x200000, CRC(4c91678f) SHA1(a436c851fe6514047b0c5496d394880a9894889c), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	ROMX_LOAD("kn7000_program_odd_sp7001_b942.ic16", 0x000002, 0x200000, CRC(7a7990ec) SHA1(3020ed66636674c67a456bfd8f2fb80a7196f2e1), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "v16", "Program v1.6 (build 941) / Table (build 84)")
+	ROMX_LOAD("kn7000_program_even_v1.6_b941.ic17", 0x000000, 0x200000, CRC(529b87ce) SHA1(f198fd9a9ea31a454acfe7be0eb935beca6771b1), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("kn7000_program_odd_v1.6_b941.ic16", 0x000002, 0x200000, CRC(a36e6222) SHA1(721d4469dc5f692f7a2c16c556b2e21115df19f6), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(2, "v15", "Program v1.5 (build 935) / Table (build 84)")
+	ROMX_LOAD("kn7000_program_even_v1.5_b935.ic17", 0x000000, 0x200000, CRC(b0e97495) SHA1(a3be879b855add10b9f4aa922e753593d3a48883), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
+	ROMX_LOAD("kn7000_program_odd_v1.5_b935.ic16", 0x000002, 0x200000, CRC(6f26836d) SHA1(aa9175097ae5e0d2395da1353702f24cf6c839a7), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS(3, "v14", "Program v1.4 (build 929, floppy 1 undumped) / Table (build 84)")
+	ROMX_LOAD("kn7000_program_even_v1.4_b929_lower.ic17", 0x000000, 0x100000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
+	ROMX_LOAD("kn7000_program_odd_v1.4_b929_lower.ic16",  0x000002, 0x100000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
+	ROMX_LOAD("kn7000_program_even_v1.4_b929_upper.ic17", 0x200000, 0x100000, CRC(787d3781) SHA1(86c0dc56e7b7671e83bf59ff6b88feebe2f55b5c), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
+	ROMX_LOAD("kn7000_program_odd_v1.4_b929_upper.ic16",  0x200002, 0x100000, CRC(5f951af4) SHA1(1752a82e75b064fba8facf3c159ac0d8f827b944), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
+
+	ROM_SYSTEM_BIOS(4, "v13", "Program v1.3 (build 893) / Table (build 80)")
+	ROMX_LOAD("kn7000_program_even_v1.3_b893.ic17", 0x000000, 0x200000, CRC(e30502d3) SHA1(3c4e91c8473ca5ca7170fdb00bb45972255c1f85), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(4))
+	ROMX_LOAD("kn7000_program_odd_v1.3_b893.ic16", 0x000002, 0x200000, CRC(4233c444) SHA1(276fe9c7bf8f5eabdbec66895e87d7dee928af8c), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(4))
 
 	ROM_REGION32_LE(0x400000, "table_data", 0)
-	ROM_LOAD32_WORD("kn7000_table_even.ic17", 0x000000, 0x200000, CRC(005a6db2) SHA1(2f4112ea9b039b17b5ada6952b7646adae8d9dd6))
-	ROM_LOAD32_WORD("kn7000_table_odd.ic16",  0x000002, 0x200000, CRC(7e1a312e) SHA1(435b597b926ebac56d4710bcae25b635a59a9ce5))
+	ROMX_LOAD("kn7000_table_even_sp7001_b83.ic17", 0x000000, 0x200000, CRC(ce5abecd) SHA1(1557acfbe5e887a661be9269050b1d14031a8afa), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	ROMX_LOAD("kn7000_table_odd_sp7001_b83.ic16", 0x000002, 0x200000, CRC(7c953378) SHA1(f535d3c2e4d3dd2aa9ef854636b582795b1df821), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	ROMX_LOAD("kn7000_table_even_b84.ic17", 0x000000, 0x200000, CRC(005a6db2) SHA1(2f4112ea9b039b17b5ada6952b7646adae8d9dd6), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("kn7000_table_odd_b84.ic16", 0x000002, 0x200000, CRC(7e1a312e) SHA1(435b597b926ebac56d4710bcae25b635a59a9ce5), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("kn7000_table_even_b84.ic17", 0x000000, 0x200000, CRC(005a6db2) SHA1(2f4112ea9b039b17b5ada6952b7646adae8d9dd6), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
+	ROMX_LOAD("kn7000_table_odd_b84.ic16", 0x000002, 0x200000, CRC(7e1a312e) SHA1(435b597b926ebac56d4710bcae25b635a59a9ce5), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
+	ROMX_LOAD("kn7000_table_even_b84.ic17", 0x000000, 0x200000, CRC(005a6db2) SHA1(2f4112ea9b039b17b5ada6952b7646adae8d9dd6), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
+	ROMX_LOAD("kn7000_table_odd_b84.ic16", 0x000002, 0x200000, CRC(7e1a312e) SHA1(435b597b926ebac56d4710bcae25b635a59a9ce5), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
+	ROMX_LOAD("kn7000_table_even_b80.ic17", 0x000000, 0x200000, CRC(d09d32a5) SHA1(2d7e02370fbcdf79c64f7f5720f412d28d05174f), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(4))
+	ROMX_LOAD("kn7000_table_odd_b80.ic16", 0x000002, 0x200000, CRC(946dac36) SHA1(c86abfc6880523414facafe21f8f4ab32cae1c7d), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(4))
 
-	ROM_REGION(0x1000000, "waveform_main_y", 0)
-	ROM_LOAD("c3cbqd000002.ic203", 0x000000, 0x1000000, NO_DUMP)
+	// Read through the tone generators' wave ROM test port, as the firmware's
+	// own test reads them: byte 2n and 2n+1 are the low and high byte of word n.
+	// Each byte sum matches the one that test expects. The sums cannot see a
+	// swapped address line; the sample directory at the start of each page
+	// decodes at these offsets.
+	ROM_REGION16_LE(0x1000000, "tonegen:waveform_y", 0)
+	ROM_LOAD("c3cbqd000002.ic203", 0x000000, 0x1000000, CRC(77211876) SHA1(f2d01ffd020c39a3f5b9d6c3275b1855c5a3d1a6))
 
-	ROM_REGION(0x1000000, "waveform_main_x", 0)
-	ROM_LOAD("c3cbqd000001.ic204", 0x000000, 0x1000000, NO_DUMP)
+	ROM_REGION16_LE(0x1000000, "tonegen:waveform_x", 0)
+	ROM_LOAD("c3cbqd000001.ic204", 0x000000, 0x1000000, CRC(e8c00b73) SHA1(f6da330c14cd3bdfc7c19092bd20d188e3ef0600))
 
-	ROM_REGION(0x1000000, "waveform_sub_y", 0)
-	ROM_LOAD("c3cbqd000004.ic207", 0x000000, 0x1000000, NO_DUMP)
+	ROM_REGION16_LE(0x1000000, "tonegen_sub:waveform_y", 0)
+	ROM_LOAD("c3cbqd000004.ic207", 0x000000, 0x1000000, CRC(bc2cb635) SHA1(729bb2dd6aebd2932de6960363a554b89ffc171a))
 
-	ROM_REGION(0x1000000, "waveform_sub_x", 0)
-	ROM_LOAD("c3cbqd000003.ic208", 0x000000, 0x1000000, NO_DUMP)
+	ROM_REGION16_LE(0x1000000, "tonegen_sub:waveform_x", 0)
+	ROM_LOAD("c3cbqd000003.ic208", 0x000000, 0x1000000, CRC(9ac58de0) SHA1(fb48cbc5334f5221ea882d63a58a22f9466e78c7))
 
-	ROM_REGION(0x800000, "rhythm_data", 0)
-	ROM_LOAD("c3cbnd000046.ic18", 0x000000, 0x800000, NO_DUMP)
+	// The half of the chip that JP7 selects, as the CPU reads it. The dumped
+	// instrument was not opened, so the part is assumed: early units fit the
+	// IC20 flash at this site instead, which the CPU sees as the same 4 MB.
+	ROM_REGION32_LE(0x400000, "rhythm_data", 0)
+	ROM_LOAD("c3cbnd000046.ic18", 0x000000, 0x400000, CRC(a0c23466) SHA1(2dc71f5082063cd6b21e4ed16acd67e9d326a79f))
 
-	ROM_REGION(0x800000, "picture", 0)
-	ROM_LOAD("c3cbmd000098.ic19", 0x000000, 0x800000, NO_DUMP)
+	// The 2 MB the CPU sees; the chip's other half is out of its reach
+	ROM_REGION32_LE(0x200000, "picture", 0)
+	ROM_LOAD("c3cbmd000098.ic19", 0x000000, 0x200000, CRC(3372cb5c) SHA1(9631dedfc501b8c11bb93efa2d99750e3c84465a))
 
-	// The custom flash holds user data, and is populated from a floppy rather than
-	// programmed at the factory: the firmware inflates the CTMINI payload from an
-	// "Initial Data Disk" and writes it verbatim to offset 0x20000, which is the top
-	// 30 of the 64 KiB sectors.  Nothing is written below that, so the boot sectors
-	// are left erased here.
-	//
-	// The images below are therefore not chip dumps.  Each is the exact content the
-	// firmware places in the device for one published data set, so a part programmed
-	// from that floppy reads back as declared.  They are offered as a BIOS choice
-	// because a real instrument holds exactly one of them at a time.
+	// Preloaded with factory default (same as the contents of `Initial Data Disk`)
 	ROM_REGION(0x200000, "custom_data", ROMREGION_ERASEFF)
-	ROM_SYSTEM_BIOS(0, "ctmini",  "Initial Data Disk (factory default)")
-	ROMX_LOAD("01ctmini.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(2a133ea7) SHA1(67b2a0fe8154c4d15557399a86bf0d0b49813ced), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "custm1",  "Custom Data: Blue Bayou")
-	ROMX_LOAD("01custm1.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(c1c69b67) SHA1(4cd5fe37871984a4b470b1a12b835c9bc41f37f5), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "custm2",  "Custom Data: Piano Player")
-	ROMX_LOAD("02custm2.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(8170c2d3) SHA1(6c85b616a9acc3a7ecc1b49a70f138c0d9442086), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(3, "custm3",  "Custom Data: Jazz Organ Soloist")
-	ROMX_LOAD("03custm3.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(5a7cc504) SHA1(d5722a1129134383bf643d20b4e0866c3089fc36), ROM_BIOS(3))
-	ROM_SYSTEM_BIOS(4, "custm4",  "Custom Data: Bob's Band")
-	ROMX_LOAD("04custm4.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(1f1c195e) SHA1(25822a3ad726df49882cdd0066424600fb70ea14), ROM_BIOS(4))
-	ROM_SYSTEM_BIOS(5, "custm5",  "Custom Data: Traditional Melody")
-	ROMX_LOAD("01custm5.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(ac264469) SHA1(11d32c3d293a23a511a76297647758046cd8ccc9), ROM_BIOS(5))
-	ROM_SYSTEM_BIOS(6, "custm6",  "Custom Data: Jogeh 1")
-	ROMX_LOAD("02custm6.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(174cea4c) SHA1(54f2bac0551a8d43dc1a87fe24a13c545169a326), ROM_BIOS(6))
-	ROM_SYSTEM_BIOS(7, "custm7",  "Custom Data: Vibraphone")
-	ROMX_LOAD("03custm7.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(aa14a0ed) SHA1(e1bdfbbbe78353003af5ed01866be87d799523bb), ROM_BIOS(7))
-	ROM_SYSTEM_BIOS(8, "custm8",  "Custom Data: Italian Accordion 7")
-	ROMX_LOAD("04custm8.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(18753233) SHA1(f4722d93ff3f31c6d8c25f757968d796e4eb57ca), ROM_BIOS(8))
+	ROM_LOAD("01ctmini.ic21", 0x020000, 0x1e0000, CRC(2a133ea7) SHA1(67b2a0fe8154c4d15557399a86bf0d0b49813ced))
 
 	ROM_REGION(0x80000, "sdcard_cpu", 0)
 	ROM_LOAD("c3fbkd000162.ic414", 0x000000, 0x80000, NO_DUMP)
@@ -1158,11 +1254,11 @@ ROM_START(kn6000)
 	ROM_LOAD32_WORD("qsigx3c16008.ic13", 0x000000, 0x200000, NO_DUMP)
 	ROM_LOAD32_WORD("qsigx3c16007.ic14", 0x000002, 0x200000, NO_DUMP)
 
-	ROM_REGION(0x1000000, "waveform_main_y", 0)
+	ROM_REGION16_LE(0x1000000, "tonegen:waveform_y", 0)
 	ROM_LOAD("qsigx3c64004.ic205", 0x000000, 0x800000, NO_DUMP)
 	ROM_LOAD("qsigx3c64006.ic207", 0x800000, 0x800000, NO_DUMP)
 
-	ROM_REGION(0x1000000, "waveform_main_x", 0)
+	ROM_REGION16_LE(0x1000000, "tonegen:waveform_x", 0)
 	ROM_LOAD("qsigx3c64005.ic206", 0x000000, 0x800000, NO_DUMP)
 	ROM_LOAD("qsigx3c64007.ic208", 0x800000, 0x800000, NO_DUMP)
 
@@ -1216,12 +1312,12 @@ ROM_START(kn6500)
 	ROM_LOAD32_WORD("c3fbmd000069.ic13", 0x000000, 0x200000, NO_DUMP)
 	ROM_LOAD32_WORD("c3fbmd000068.ic14", 0x000002, 0x200000, NO_DUMP)
 
-	ROM_REGION(0x1800000, "waveform_main_y", 0)
+	ROM_REGION16_LE(0x1800000, "tonegen:waveform_y", 0)
 	ROM_LOAD("qsigx3c64004.ic205", 0x0000000, 0x800000, NO_DUMP)
 	ROM_LOAD("qsigx3c64006.ic207", 0x0800000, 0x800000, NO_DUMP)
 	ROM_LOAD("qsigx3c64020.ic209", 0x1000000, 0x800000, NO_DUMP)
 
-	ROM_REGION(0x1800000, "waveform_main_x", 0)
+	ROM_REGION16_LE(0x1800000, "tonegen:waveform_x", 0)
 	ROM_LOAD("qsigx3c64005.ic206", 0x0000000, 0x800000, NO_DUMP)
 	ROM_LOAD("qsigx3c64007.ic208", 0x0800000, 0x800000, NO_DUMP)
 	ROM_LOAD("qsigx3c64019.ic210", 0x1000000, 0x800000, NO_DUMP)
@@ -1281,10 +1377,10 @@ ROM_END
 	ROM_REGION(0x800000, "rhythm_data", 0) \
 	ROM_LOAD("c3zbng000023.ic14", 0x000000, 0x800000, NO_DUMP) \
 	\
-	ROM_REGION(0x800000, "waveform_main_y", 0) \
+	ROM_REGION16_LE(0x800000, "tonegen:waveform_y", 0) \
 	ROM_LOAD("c3zbp0000003.ic302", 0x000000, 0x800000, NO_DUMP) \
 	\
-	ROM_REGION(0x800000, "waveform_main_x", 0) \
+	ROM_REGION16_LE(0x800000, "tonegen:waveform_x", 0) \
 	ROM_LOAD("c3zbp0000004.ic303", 0x000000, 0x800000, NO_DUMP)
 
 ROM_START(kn2400)
@@ -1303,7 +1399,7 @@ ROM_END
 
 
 //   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY     FULLNAME      FLAGS
-SYST(2002, kn7000, 0,      0,      kn7000,  kn_sd, kn_sd_state,  empty_init, "Technics", "SX-KN7000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST(2002, kn7000, 0,      0,      kn7000,  kn_sd, kn7000_state, empty_init, "Technics", "SX-KN7000", MACHINE_NOT_WORKING)
 SYST(1999, kn6000, 0,      0,      kn6000,  kn,    kn6000_state, empty_init, "Technics", "SX-KN6000", ROT180 | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 SYST(2001, kn6500, 0,      0,      kn6000,  kn,    kn6000_state, empty_init, "Technics", "SX-KN6500", ROT180 | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 SYST(2000, kn2400, 0,      0,      kn2400,  kn,    kn_state,     empty_init, "Technics", "SX-KN2400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

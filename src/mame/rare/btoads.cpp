@@ -38,12 +38,13 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_bsmt(*this, "bsmt"),
 		m_tlc34076(*this, "tlc34076"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen")
+	{ }
 
 	int main_to_sound_r();
 	int sound_to_main_r();
 
-	void btoads(machine_config &config);
+	void btoads(machine_config &config) ATTR_COLD;
 
 protected:
 	// driver_device overrides
@@ -273,7 +274,7 @@ uint16_t btoads_state::vram_fg_draw_r(offs_t offset)
 
 void btoads_state::render_sprite_row(uint16_t *sprite_source, uint32_t address)
 {
-	int const flipxor = ((*m_sprite_control >> 10) & 1) ? 0xffff : 0x0000;
+	int const flipxor = BIT(*m_sprite_control, 10) ? 0xffff : 0x0000;
 	int const width = (~*m_sprite_control & 0x1ff) + 2;
 	int const color = (~*m_sprite_control >> 8) & 0xf0;
 	int srcoffs = m_sprite_source_offs << 8;

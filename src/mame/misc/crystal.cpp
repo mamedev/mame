@@ -684,7 +684,7 @@ ROM_END
 ROM_START( crysking )
 	CRYSBIOS
 
-	ROM_REGION(0x4280, "pic", 0) // PIC16F84A? - not dumped
+	ROM_REGION16_LE(0x4280, "pic", 0) // PIC16F84A? - not dumped
 	// Label: "dgSMART-PR3  MAGIC EYES"
 	ROM_LOAD("crysking_pic16f84a.u14", 0x0000, 0x4280, NO_DUMP)
 
@@ -697,7 +697,7 @@ ROM_END
 ROM_START( evosocc )
 	CRYSBIOS
 
-	ROM_REGION(0x4280, "pic", 0) // PIC16F84A? - not dumped
+	ROM_REGION16_LE(0x4280, "pic", 0) // PIC16F84A? - not dumped
 	// Label: "MAGICEYES  dgSMART-PR2  0134HAH"
 	ROM_LOAD("evosocc_pic16f84a.u14", 0x0000, 0x4280, NO_DUMP)
 
@@ -710,7 +710,7 @@ ROM_END
 ROM_START( topbladv )
 	CRYSBIOS
 
-	ROM_REGION(0x4300, "pic", 0) // PIC16F628A
+	ROM_REGION16_LE(0x4300, "pic", 0) // PIC16F628A
 	// Label: "MAGICEYES  dgSMART-PR2  0134HAG"
 	ROM_LOAD("top_blade_v_pic16f628a.u14", 0x0000, 0x4300, CRC(9cdea57b) SHA1(884156085f9e780cdf719aedc2e8a0fd5983613b))
 
@@ -722,7 +722,7 @@ ROM_START( officeye )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // bios (not the standard one)
 	ROM_LOAD("bios.u14",  0x000000, 0x020000, CRC(ffc57e90) SHA1(6b6a17fd4798dea9c7b880f3063be8494e7db302) )
 
-	ROM_REGION( 0x4280, "pic", 0) // PIC16F84A
+	ROM_REGION16_LE( 0x4280, "pic", 0) // PIC16F84A
 	ROM_LOAD("office_yeo_in_cheon_ha_pic16f84a.u14", 0x0000, 0x4280, CRC(7561cdf5) SHA1(eade592823a110019b4af81a7dc56d01f7d6589f))
 
 	ROM_REGION32_LE( 0x2000000, "flash", 0 )
@@ -733,7 +733,7 @@ ROM_END
 ROM_START( donghaer )
 	CRYSBIOS
 
-	ROM_REGION(0x4280, "pic", 0) // PIC16F84A? - not dumped
+	ROM_REGION16_LE(0x4280, "pic", 0) // PIC16F84A? - not dumped
 	// Label: "MAGICEYES  dgSMART-PR2  0134HAF"
 	ROM_LOAD("donghaer_pic16f84a.u14", 0x0000, 0x4280, NO_DUMP)
 
@@ -769,7 +769,7 @@ ROM_END
 ROM_START( maldaiza )
 	CRYSBIOS
 
-	ROM_REGION(0x4280, "pic", 0) // PIC16F84A? - not dumped
+	ROM_REGION16_LE(0x4280, "pic", 0) // PIC16F84A? - not dumped
 	ROM_LOAD("maldaliza_pic16f84a.bin", 0x0000, 0x4280, NO_DUMP)
 
 	ROM_REGION32_LE( 0x2000000, "flash", 0 )

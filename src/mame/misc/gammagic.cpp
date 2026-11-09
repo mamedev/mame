@@ -99,9 +99,6 @@ void gammagic_state::v8000_map(address_map &map)
 	//map(0x500010, 0x50001f).rw("asc", FUNC(i82510_device::read), FUNC(i82510_device::write)).umask32(0xff00ff00);
 }
 
-static INPUT_PORTS_START( gammagic )
-INPUT_PORTS_END
-
 static void isa_internal_devices(device_slot_interface &device)
 {
 	device.option_add("fdc37c93x", FDC37C93X);
@@ -251,5 +248,5 @@ ROM_END
 ***************************************************************************/
 
 
-GAME( 1999, gammagic,  0,        gammagic, gammagic, gammagic_state, empty_init, ROT0, "Bally Gaming Co.", "Game Magic",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, 99bottles, gammagic, gammagic, gammagic, gammagic_state, empty_init, ROT0, "Bally Gaming Co.", "99 Bottles of Beer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, gammagic,  0,        gammagic, 0, gammagic_state, empty_init, ROT0, "Bally Gaming Co.", "Game Magic",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, 99bottles, gammagic, gammagic, 0, gammagic_state, empty_init, ROT0, "Bally Gaming Co.", "99 Bottles of Beer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )

@@ -258,7 +258,6 @@ void xxmissio_state::status_m_w(uint8_t data)
 
 		case 0x40:
 			m_status &= ~0x08;
-			//m_subcpu->set_input_line_and_vector(0, HOLD_LINE, 0x10);
 			m_subcpu->set_input_line(0, HOLD_LINE);
 			break;
 
@@ -282,7 +281,6 @@ void xxmissio_state::status_s_w(uint8_t data)
 
 		case 0x80:
 			m_status &= ~0x04;
-			// m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x10);
 			m_maincpu->set_input_line(0, HOLD_LINE);
 			break;
 	}
@@ -291,7 +289,6 @@ void xxmissio_state::status_s_w(uint8_t data)
 IRQ_CALLBACK_MEMBER(xxmissio_state::vector_r)
 {
 	// TODO: both CPUs runs in IM 1, where is this coming from? Schematics or misunderstanding?
-	// cfr. the two commented out _vector calls above
 	return 0x10;
 }
 

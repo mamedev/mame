@@ -166,6 +166,7 @@ plus4_expansion_slot_device::plus4_expansion_slot_device(const machine_config &m
 	m_write_aec(*this),
 	m_card(nullptr),
 	m_root(find_root(owner)),
+	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_c1l(*this, "c1l", 0x8000, 0xbfff, 0x18000),
 	m_c1h(*this, "c1h", 0xc000, 0xffff, 0x1c000, 0x3c00, 0x3f1f),
 	m_c2l(*this, "c2l", 0x8000, 0xbfff, 0x18000),

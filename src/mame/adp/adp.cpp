@@ -165,8 +165,8 @@ Quick Jack administration/service mode:
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "video/bt48x.h"
 #include "video/hd63484.h"
-#include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -183,6 +183,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
 		m_acrtc(*this, "acrtc"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_nvram(*this, "nvram"),
 		m_in0(*this, "IN0")
@@ -204,7 +205,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
 	required_device<hd63484_device> m_acrtc;
-	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	required_device<device_palette_interface> m_palette;
 	required_device<nvram_device> m_nvram;
 	required_ioport m_in0;
 
@@ -226,7 +228,6 @@ private:
 	void fstation_mem(address_map &map) ATTR_COLD;
 	void funland_mem(address_map &map) ATTR_COLD;
 	void quickjac_mem(address_map &map) ATTR_COLD;
-	void ramdac_map(address_map &map) ATTR_COLD;
 	void skattv_mem(address_map &map) ATTR_COLD;
 	void skattva_mem(address_map &map) ATTR_COLD;
 };
@@ -340,9 +341,7 @@ void adp_state::funland_mem(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x400000, 0x40001f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
 	map(0x800080, 0x800083).rw(m_acrtc, FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
-	map(0x800089, 0x800089).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x80008b, 0x80008b).w("ramdac", FUNC(ramdac_device::pal_w));
-	map(0x80008d, 0x80008d).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x800088, 0x80008f).m(m_palette, FUNC(bt481_device::map)).umask16(0x00ff);
 	map(0x800100, 0x800101).portr(m_in0);
 	map(0x800140, 0x800143).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff); //18b too
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
@@ -560,13 +559,13 @@ void adp_state::quickjac(machine_config &config)
 	MSM6242(config, "rtc", XTAL(32'768));
 	//rtc.out_int_handler().set(FUNC(adp_state::rtc_irq));
 
-	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(384, 280);
-	screen.set_visarea_full();
-	screen.set_screen_update("acrtc", FUNC(hd63484_device::update_screen));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(384, 280);
+	m_screen->set_visarea_full();
+	m_screen->set_screen_update("acrtc", FUNC(hd63484_device::update_screen));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(adp_state::adp_palette), 0x10);
 
@@ -597,20 +596,13 @@ void adp_state::fashiong(machine_config &config)
 	m_acrtc->set_addrmap(0, &adp_state::fashiong_hd63484_map);
 }
 
-void adp_state::ramdac_map(address_map &map)
-{
-	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
-}
-
 void adp_state::funland(machine_config &config)
 {
 	quickjac(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &adp_state::funland_mem);
 
-	PALETTE(config.replace(), m_palette, palette_device::BLACK, 0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
-	ramdac.set_addrmap(0, &adp_state::ramdac_map);
+	BT481(config.replace(), m_palette);
 
 	m_acrtc->set_addrmap(0, &adp_state::fstation_hd63484_map);
 	m_acrtc->set_auto_configure_screen(false);
@@ -618,15 +610,17 @@ void adp_state::funland(machine_config &config)
 
 void adp_state::fstation(machine_config &config)
 {
-	funland(config);
+	quickjac(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &adp_state::fstation_mem);
 
-	screen_device &screen(*subdevice<screen_device>("screen"));
-	screen.set_size(640, 480);
-	screen.set_visarea_full();
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea_full();
 
-	m_palette->set_init(FUNC(adp_state::fstation_palette));
+	PALETTE(config.replace(), m_palette, FUNC(adp_state::fstation_palette), 0x100);
+
+	m_acrtc->set_addrmap(0, &adp_state::fstation_hd63484_map);
+	m_acrtc->set_auto_configure_screen(false);
 }
 
 

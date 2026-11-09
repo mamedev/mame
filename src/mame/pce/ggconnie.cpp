@@ -451,10 +451,10 @@ void ggconnie_state::ggconnie(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "speaker", 1.00, 1);
 }
 
-ROM_START(ggconnie)
+ROM_START( ggconnie )
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD( "prg0_u3_ver.2.bin", 0x00000, 0x80000, CRC(5e104855) SHA1(3ab2b1ec1fc3aefbb57d9b2ba272e75b34b69383) )
-	ROM_LOAD( "prg1_u4.bin", 0x80000, 0x80000, CRC(513f0b18) SHA1(44c61dc1a06bb4c8b4840ea6a372f92114888490) )
+	ROM_LOAD( "prg1_u4.bin",       0x80000, 0x80000, CRC(513f0b18) SHA1(44c61dc1a06bb4c8b4840ea6a372f92114888490) )
 	// u5 not populated
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -462,7 +462,7 @@ ROM_START(ggconnie)
 ROM_END
 
 // TODO: verify OKI banking, hopper, lamps
-ROM_START(smf)
+ROM_START( smf )
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD( "smf03.u3", 0x000000, 0x80000, CRC(2435ff3d) SHA1(4de1c5c2ed4ce2be5f3bb3fd31e176c8e24c7155) ) // 27c040
 	ROM_LOAD( "smf05.u4", 0x080000, 0x80000, CRC(7c477ae1) SHA1(ecdc1bf7052121f4ce3ef222c0f51d72057a3a2b) ) // 27c040
@@ -477,7 +477,7 @@ ROM_START(smf)
 	ROM_LOAD( "gal16v8b.u8", 0x400, 0x117, NO_DUMP )
 ROM_END
 
-ROM_START(fishingm)
+ROM_START( fishingm )
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD( "fim03-u3.bin", 0x000000, 0x80000, CRC(d70db2fc) SHA1(9f2f417665089da7d745dfcb311e97818b1d3c11) )
 	ROM_LOAD( "fim05-u4.bin", 0x080000, 0x80000, CRC(1bd8344f) SHA1(4e082d40af83fb5f6313c61ffbc47bc71373a9cf) )
@@ -492,7 +492,7 @@ ROM_START(fishingm)
 	ROM_LOAD( "gal16v8b.u8", 0x400, 0x117, NO_DUMP )
 ROM_END
 
-ROM_START(bmanroul)
+ROM_START( bmanroul )
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD( "bon_prg0.u3", 0x000000, 0x80000, CRC(0db0960d) SHA1(59cbd9d87608894d8965268c1a0eb81d55a6d742) )
 	ROM_LOAD( "bon_prg1.u4", 0x080000, 0x80000, CRC(412fd212) SHA1(35f8e94076beff9a637f508f74a89315f02de130) )
@@ -507,6 +507,21 @@ ROM_START(bmanroul)
 	ROM_LOAD( "gal16v8b.u8", 0x400, 0x117, NO_DUMP )
 ROM_END
 
+ROM_START( junghero )
+	ROM_REGION( 0x180000, "maincpu", 0 )
+	ROM_LOAD( "juh03_u3.u3", 0x000000, 0x80000, CRC(f949947c) SHA1(6703995967b4bbd71be6171e87321d3c12167120) )
+	ROM_LOAD( "juh05_u4.u4", 0x080000, 0x80000, CRC(55e6c6db) SHA1(598c5e97f063f08bd29da9a230307994d112ccf6) )
+	ROM_LOAD( "juh04_u5.u5", 0x100000, 0x80000, CRC(ef513c46) SHA1(5b89b2bc068b56fbbfb910e87ab8f5e12178d001) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "juh01_u31.u31", 0x00000, 0x80000, CRC(01ee3b11) SHA1(f78e15ebb11ccdb4e6361149d9a03bb0f46c613a) )
+
+	ROM_REGION( 0x600, "plds", 0 ) // protected
+	ROM_LOAD( "gal16v8b.u6", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8b.u7", 0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8b.u8", 0x400, 0x117, NO_DUMP )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -514,3 +529,4 @@ GAME( 1996, ggconnie, 0, ggconnie, ggconnie, ggconnie_state, init_pce_common, RO
 GAME( 1996, bmanroul, 0, ggconnie, bmanroul, ggconnie_state, init_pce_common, ROT0, "Eighting (Hudson Soft license)", "Bomberman Misobon Roulette (961028 JPN)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // "
 GAME( 1997, smf,      0, ggconnie, smf,      ggconnie_state, init_pce_common, ROT0, "Eighting (Capcom license)", "Super Medal Fighters (Japan 970228)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Throws Hopper Jam when using COIN1, sound
 GAME( 1997, fishingm, 0, ggconnie, fishingm, ggconnie_state, init_pce_common, ROT0, "Capcom", "Fishing Master (971107 JPN)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Hopper Jam Error
+GAME( 1997, junghero, 0, ggconnie, smf,      ggconnie_state, init_pce_common, ROT0, "Capcom", "Jungle Hero (Japan 970627)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Throws Hopper Jam when using COIN1, sound

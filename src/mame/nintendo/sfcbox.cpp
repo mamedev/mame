@@ -256,13 +256,13 @@ void sfcbox_state::snes_map_0_w(uint8_t data)
 {
 	const char *const rom_socket[4] = { "ROM5", "ROM1/7/12", "ROM3/9", "IC23" };
 
-	printf("%s ROM Socket\n",rom_socket[data & 3]);
-	printf("%02x ROM Slot\n",(data & 4) >> 2);
-	printf("%02x SRAM Enable\n",(data & 8) >> 3);
-	printf("%02x SRAM Slot\n",(data & 0x10) >> 4);
-	printf("%02x DSP Enable\n",(data & 0x20) >> 5);
-	printf("%02x DSP Slot\n",(data & 0x40) >> 6);
-	printf("%s ROM / DSP / SRAM maps\n",(data & 0x80) ? "HiROM" : "LoROM");
+	logerror("%s ROM Socket\n", rom_socket[data & 3]);
+	logerror("%02x ROM Slot\n", (data & 4) >> 2);
+	logerror("%02x SRAM Enable\n", (data & 8) >> 3);
+	logerror("%02x SRAM Slot\n", (data & 0x10) >> 4);
+	logerror("%02x DSP Enable\n", (data & 0x20) >> 5);
+	logerror("%02x DSP Slot\n", (data & 0x40) >> 6);
+	logerror("%s ROM / DSP / SRAM maps\n", (data & 0x80) ? "HiROM" : "LoROM");
 }
 
 void sfcbox_state::snes_map_1_w(uint8_t data)
@@ -271,10 +271,10 @@ void sfcbox_state::snes_map_1_w(uint8_t data)
 	const char *const rom_dsp_sram[4] = {   "Reserved?", "GSU", "LoROM", "HiROM" };
 	const char *const sram_size[4] = {  "2K", "8K", "Reserved?", "32K" };
 
-	printf("%s ROM / DSP SRAM map 2\n",rom_dsp_sram[data & 3]);
-	printf("%08x SRAM base\n",((data & 0xc) >> 2)*0x8000);
-	printf("%02x GSU Slot\n",((data & 0x10) >> 4));
-	printf("%s SRAM Size\n",sram_size[((data & 0xc0) >> 6)]);
+	logerror("%s ROM / DSP SRAM map 2\n",rom_dsp_sram[data & 3]);
+	logerror("%08x SRAM base\n", ((data & 0xc) >> 2) * 0x8000);
+	logerror("%02x GSU Slot\n", ((data & 0x10) >> 4));
+	logerror("%s SRAM Size\n",sram_size[((data & 0xc0) >> 6)]);
 }
 
 void sfcbox_state::sfcbox_io(address_map &map)
@@ -489,14 +489,13 @@ void sfcbox_state::sfcbox(machine_config &config)
 	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); }); // lambda because overloaded function name
 	m_ppu->set_screen("screen");
 
-	// SFCBOX
+	// OSD portion
+	// TODO: mix with snes output
 	screen_device &osd(SCREEN(config, "osd"));
 	osd.set_refresh_hz(60);
 	osd.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-//  osd.set_size(24*12+22, 12*18+22);
-//  osd.set_visarea(0*8, 24*12-1, 0*8, 12*18-1);
-	osd.set_size(24*16+22, 12*16+22);
-	osd.set_visarea(0*8, 24*16-1, 0*8, 12*16-1);
+	osd.set_size(24 * 12 + 22, 12 * 18 + 22);
+	osd.set_visarea(0 * 8, 24 * 12 - 1, 0 * 8, 12 * 18 - 1);
 	osd.set_screen_update(FUNC(sfcbox_state::screen_update));
 }
 

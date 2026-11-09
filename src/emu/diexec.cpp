@@ -397,8 +397,6 @@ void device_execute_interface::interface_post_start()
 	device().save_item(NAME(m_localtime));
 
 	// it's more efficient and causes less clutter to save these this way
-	device().save_item(STRUCT_MEMBER(m_input, m_stored_vector));
-	device().save_item(STRUCT_MEMBER(m_input, m_curvector));
 	device().save_item(STRUCT_MEMBER(m_input, m_curstate));
 
 	// fill in the input states and IRQ callback information
@@ -624,8 +622,6 @@ void device_execute_interface::pulse_input_line(int irqline, const attotime &dur
 device_execute_interface::device_input::device_input()
 	: m_execute(nullptr)
 	, m_linenum(0)
-	, m_stored_vector(0)
-	, m_curvector(0)
 	, m_curstate(CLEAR_LINE)
 	, m_qindex(0)
 {
@@ -653,7 +649,6 @@ void device_execute_interface::device_input::start(device_execute_interface &exe
 
 void device_execute_interface::device_input::reset()
 {
-	m_curvector = m_stored_vector = m_execute->default_irq_vector(m_linenum);
 }
 
 
@@ -662,11 +657,11 @@ void device_execute_interface::device_input::reset()
 //  execution via timer
 //-------------------------------------------------
 
-void device_execute_interface::device_input::set_state_synced(int state, int vector)
+void device_execute_interface::device_input::set_state_synced(int state)
 {
-	LOG(("set_state_synced('%s',%d,%d,%02x)\n", m_execute->device().tag(), m_linenum, state, vector));
+	LOG(("set_state_synced('%s',%d,%d)\n", m_execute->device().tag(), m_linenum, state));
 
-	if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linenum, state, (vector == USE_STORED_VECTOR) ? 0 : vector);
+	if (TEMPLOG) printf("setline(%s,%d,%d)\n", m_execute->device().tag(), m_linenum, state);
 	assert(state == ASSERT_LINE || state == HOLD_LINE || state == CLEAR_LINE);
 
 	// if we're full of events, flush the queue and log a message
@@ -682,9 +677,7 @@ void device_execute_interface::device_input::set_state_synced(int state, int vec
 	// enqueue the event
 	if (event_index < std::size(m_queue))
 	{
-		if (vector == USE_STORED_VECTOR)
-			vector = m_stored_vector;
-		m_queue[event_index] = (state & 0xff) | (vector << 8);
+		m_queue[event_index] = state & 0xff;
 
 		// if this is the first one, set the timer
 		if (event_index == 0)
@@ -708,8 +701,7 @@ TIMER_CALLBACK_MEMBER(device_execute_interface::device_input::empty_event_queue)
 
 		// set the input line state and vector
 		m_curstate = input_event & 0xff;
-		m_curvector = input_event >> 8;
-		if (TEMPLOG) printf(" (%d,%d)\n", m_curstate, m_curvector);
+		if (TEMPLOG) printf(" (%d)\n", m_curstate);
 
 		assert(m_curstate == ASSERT_LINE || m_curstate == HOLD_LINE || m_curstate == CLEAR_LINE);
 
@@ -779,7 +771,7 @@ TIMER_CALLBACK_MEMBER(device_execute_interface::device_input::empty_event_queue)
 
 int device_execute_interface::device_input::default_irq_callback()
 {
-	int const vector = m_curvector;
+	int const vector = m_execute->default_irq_vector(m_linenum);
 
 	// if the IRQ state is HOLD_LINE, clear it
 	if (m_curstate == HOLD_LINE)

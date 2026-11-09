@@ -309,7 +309,7 @@ void c1571_device::via1_pb_w(uint8_t data)
 	m_ga->mtr_w(BIT(data, 2));
 
 	// stepper motor
-	m_ga->stp_w(data & 0x03); // TODO actually STP1=0, STP0=!(PB0^PB1), Y0=PB1, Y2=!PB1
+	m_ga->stp_w(data & 0x03);
 
 	// activity LED
 	m_leds[LED_ACT] = BIT(data, 3);

@@ -21,7 +21,7 @@
 #include "cpu/arm7/arm7.h"
 #include "machine/fs8806.h"
 #include "machine/nandflash.h"
-#include "machine/s3c2440.h"
+#include "machine/s3c24xx.h"
 #include "sound/dac.h"
 #include "screen.h"
 #include "speaker.h"
@@ -56,6 +56,24 @@ public:
 	void hapyfish(machine_config &config);
 
 private:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	void main_map(address_map &map) ATTR_COLD;
+
+	uint32_t gpio_port_r(offs_t offset);
+	void gpio_port_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void nand_command_w(uint8_t data);
+	void nand_address_w(uint8_t data);
+	uint8_t nand_data_r();
+	void nand_data_w(uint8_t data);
+	void i2s_data_w(offs_t offset, uint16_t data);
+	uint32_t adc_data_r();
+	void fs8806_sda_w(int state) { m_i2c_sda_in = state; }
+
+	void i2c_scl_write(bool clk);
+	void i2c_sda_write(int data);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<s3c2440_device> m_s3c2440;
 	required_device<fs8806_device> m_fs8806;
@@ -71,21 +89,6 @@ private:
 	bool m_nand_select = false;
 
 	uint8_t m_input_select = 0;
-
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	uint32_t s3c2440_gpio_port_r(offs_t offset);
-	void s3c2440_gpio_port_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t s3c2440_core_pin_r(offs_t offset);
-	void s3c2440_nand_command_w(uint8_t data);
-	void s3c2440_nand_address_w(uint8_t data);
-	uint8_t s3c2440_nand_data_r();
-	void s3c2440_nand_data_w(uint8_t data);
-	void s3c2440_i2s_data_w(offs_t offset, uint16_t data);
-	uint32_t s3c2440_adc_data_r();
-	void fs8806_sda_w(int state) { m_i2c_sda_in = state; }
-
-	void hapyfish_map(address_map &map) ATTR_COLD;
 };
 
 /***************************************************************************
@@ -94,33 +97,33 @@ private:
 
 // GPIO
 
-uint32_t hapyfish_state::s3c2440_gpio_port_r(offs_t offset)
+uint32_t hapyfish_state::gpio_port_r(offs_t offset)
 {
 	uint32_t data = m_port[offset];
 	switch (offset)
 	{
-		case S3C2440_GPIO_PORT_A:
+		case s3c24xx_device::GPIO_PORT_A:
 			LOGMASKED(LOG_GPIO, "%s: Read GPIO A: %08x\n", machine().describe_context(), data);
 			break;
 
-		case S3C2440_GPIO_PORT_B:
+		case s3c24xx_device::GPIO_PORT_B:
 			LOGMASKED(LOG_GPIO, "%s: Read GPIO B: %08x\n", machine().describe_context(), data);
 			break;
 
-		case S3C2440_GPIO_PORT_C:
+		case s3c24xx_device::GPIO_PORT_C:
 			LOGMASKED(LOG_GPIO, "%s: Read GPIO C: %08x\n", machine().describe_context(), data);
 			break;
 
-		case S3C2440_GPIO_PORT_D:
+		case s3c24xx_device::GPIO_PORT_D:
 			LOGMASKED(LOG_GPIO, "%s: Read GPIO D: %08x\n", machine().describe_context(), data);
 			break;
 
-		case S3C2440_GPIO_PORT_E:
+		case s3c24xx_device::GPIO_PORT_E:
 			data = m_i2c_sda_in << 15;
 			LOGMASKED(LOG_GPIO, "%s: Read GPIO E: %08x\n", machine().describe_context(), data);
 			break;
 
-		case S3C2440_GPIO_PORT_F:
+		case s3c24xx_device::GPIO_PORT_F:
 			data = 0xff;
 			if (m_input_select < 6)
 			{
@@ -129,7 +132,7 @@ uint32_t hapyfish_state::s3c2440_gpio_port_r(offs_t offset)
 			LOGMASKED(LOG_GPIO, "%s: Read GPIO F: %08x\n", machine().describe_context(), data);
 			break;
 
-		case S3C2440_GPIO_PORT_G:
+		case s3c24xx_device::GPIO_PORT_G:
 			data = (data & ~(1 << 13)) | (1 << 13); // [nand] 1 = 2048 byte page  (if ncon = 1)
 			data = (data & ~(1 << 14)) | (1 << 14); // [nand] 1 = 5 address cycle (if ncon = 1)
 			data = (data & ~(1 << 15)) | (0 << 15); // [nand] 0 = 8-bit bus width (if ncon = 1)
@@ -137,18 +140,18 @@ uint32_t hapyfish_state::s3c2440_gpio_port_r(offs_t offset)
 			LOGMASKED(LOG_GPIO, "%s: Read GPIO G: %08x\n", machine().describe_context(), data);
 			break;
 
-		case S3C2440_GPIO_PORT_H:
+		case s3c24xx_device::GPIO_PORT_H:
 			LOGMASKED(LOG_GPIO, "%s: Read GPIO H: %08x\n", machine().describe_context(), data);
 			break;
 
-		case S3C2440_GPIO_PORT_J:
+		case s3c24xx_device::GPIO_PORT_J:
 			LOGMASKED(LOG_GPIO, "%s: Read GPIO J: %08x\n", machine().describe_context(), data);
 			break;
 	}
 	return data;
 }
 
-void hapyfish_state::s3c2440_gpio_port_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void hapyfish_state::gpio_port_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// tout2/gb2 -> uda1341ts l3mode
 	// tout3/gb3 -> uda1341ts l3data
@@ -159,23 +162,23 @@ void hapyfish_state::s3c2440_gpio_port_w(offs_t offset, uint32_t data, uint32_t 
 	m_port[offset] = data;
 	switch (offset)
 	{
-		case S3C2440_GPIO_PORT_A:
+		case s3c24xx_device::GPIO_PORT_A:
 			LOGMASKED(LOG_GPIO, "%s: Write GPIO A: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 
-		case S3C2440_GPIO_PORT_B:
+		case s3c24xx_device::GPIO_PORT_B:
 			LOGMASKED(LOG_GPIO, "%s: Write GPIO B: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 
-		case S3C2440_GPIO_PORT_C:
+		case s3c24xx_device::GPIO_PORT_C:
 			LOGMASKED(LOG_GPIO, "%s: Write GPIO C: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 
-		case S3C2440_GPIO_PORT_D:
+		case s3c24xx_device::GPIO_PORT_D:
 			LOGMASKED(LOG_GPIO, "%s: Write GPIO D: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 
-		case S3C2440_GPIO_PORT_E:
+		case s3c24xx_device::GPIO_PORT_E:
 			LOGMASKED(LOG_GPIO, "%s: Write GPIO E: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 
 			// FS8806 I2C on bits 15 (SDA) and 14 (SCL)
@@ -196,19 +199,19 @@ void hapyfish_state::s3c2440_gpio_port_w(offs_t offset, uint32_t data, uint32_t 
 			}
 			break;
 
-		case S3C2440_GPIO_PORT_F:
+		case s3c24xx_device::GPIO_PORT_F:
 			LOGMASKED(LOG_GPIO, "%s: Write GPIO F: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 
-		case S3C2440_GPIO_PORT_G:
+		case s3c24xx_device::GPIO_PORT_G:
 			LOGMASKED(LOG_GPIO, "%s: Write GPIO G: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 
-		case S3C2440_GPIO_PORT_H:
+		case s3c24xx_device::GPIO_PORT_H:
 			LOGMASKED(LOG_GPIO, "%s: Write GPIO H: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 
-		case S3C2440_GPIO_PORT_J:
+		case s3c24xx_device::GPIO_PORT_J:
 			LOGMASKED(LOG_GPIO, "%s: Write GPIO J: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			if (BIT(mem_mask, 11))
 			{
@@ -218,33 +221,9 @@ void hapyfish_state::s3c2440_gpio_port_w(offs_t offset, uint32_t data, uint32_t 
 	}
 }
 
-// CORE
-
-/*
-
-OM[1:0] = 00: Enable NAND flash memory boot
-
-NCON: NAND flash memory selection (Normal / Advance)
-0: Normal NAND flash (256Words/512Bytes page size, 3/4 address cycle)
-1: Advance NAND flash (1KWords/2KBytes page size, 4/5 address cycle)
-
-*/
-
-uint32_t hapyfish_state::s3c2440_core_pin_r(offs_t offset)
-{
-	int data = 0;
-	switch (offset)
-	{
-		case S3C2440_CORE_PIN_NCON : data = 1; break;
-		case S3C2440_CORE_PIN_OM0  : data = 0; break;
-		case S3C2440_CORE_PIN_OM1  : data = 0; break;
-	}
-	return data;
-}
-
 // NAND
 
-void hapyfish_state::s3c2440_nand_command_w(uint8_t data)
+void hapyfish_state::nand_command_w(uint8_t data)
 {
 	if (m_nand_select)
 		m_nand->command_w(data);
@@ -252,7 +231,7 @@ void hapyfish_state::s3c2440_nand_command_w(uint8_t data)
 		m_nand2->command_w(data);
 }
 
-void hapyfish_state::s3c2440_nand_address_w(uint8_t data)
+void hapyfish_state::nand_address_w(uint8_t data)
 {
 	if (m_nand_select)
 		m_nand->address_w(data);
@@ -260,7 +239,7 @@ void hapyfish_state::s3c2440_nand_address_w(uint8_t data)
 		m_nand2->address_w(data);
 }
 
-uint8_t hapyfish_state::s3c2440_nand_data_r()
+uint8_t hapyfish_state::nand_data_r()
 {
 	if (m_nand_select)
 		return m_nand->data_r();
@@ -268,7 +247,7 @@ uint8_t hapyfish_state::s3c2440_nand_data_r()
 		return m_nand2->data_r();
 }
 
-void hapyfish_state::s3c2440_nand_data_w(uint8_t data)
+void hapyfish_state::nand_data_w(uint8_t data)
 {
 	if (m_nand_select)
 		m_nand->data_w(data);
@@ -278,7 +257,7 @@ void hapyfish_state::s3c2440_nand_data_w(uint8_t data)
 
 // I2S
 
-void hapyfish_state::s3c2440_i2s_data_w(offs_t offset, uint16_t data)
+void hapyfish_state::i2s_data_w(offs_t offset, uint16_t data)
 {
 	if (offset)
 		m_ldac->write(data);
@@ -288,7 +267,7 @@ void hapyfish_state::s3c2440_i2s_data_w(offs_t offset, uint16_t data)
 
 // ADC
 
-uint32_t hapyfish_state::s3c2440_adc_data_r()
+uint32_t hapyfish_state::adc_data_r()
 {
 	uint32_t data = 0;
 	LOGMASKED(LOG_ADC, "%s: ADC data read: %08x\n", machine().describe_context(), data);
@@ -321,9 +300,10 @@ void hapyfish_state::machine_reset()
     ADDRESS MAPS
 ***************************************************************************/
 
-void hapyfish_state::hapyfish_map(address_map &map)
+void hapyfish_state::main_map(address_map &map)
 {
 	map(0x30000000, 0x37ffffff).ram();
+	map(0x40000000, 0x5fffffff).m(m_s3c2440, FUNC(s3c2440_device::map));
 }
 
 /***************************************************************************
@@ -333,7 +313,7 @@ void hapyfish_state::hapyfish_map(address_map &map)
 void hapyfish_state::hapyfish(machine_config &config)
 {
 	ARM920T(config, m_maincpu, 100000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &hapyfish_state::hapyfish_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hapyfish_state::main_map);
 
 	PALETTE(config, "palette").set_entries(32768);
 
@@ -351,15 +331,19 @@ void hapyfish_state::hapyfish(machine_config &config)
 	S3C2440(config, m_s3c2440, 12000000);
 	m_s3c2440->set_palette_tag("palette");
 	m_s3c2440->set_screen_tag("screen");
-	m_s3c2440->core_pin_r_callback().set(FUNC(hapyfish_state::s3c2440_core_pin_r));
-	m_s3c2440->gpio_port_r_callback().set(FUNC(hapyfish_state::s3c2440_gpio_port_r));
-	m_s3c2440->gpio_port_w_callback().set(FUNC(hapyfish_state::s3c2440_gpio_port_w));
-	m_s3c2440->adc_data_r_callback().set(FUNC(hapyfish_state::s3c2440_adc_data_r));
-	m_s3c2440->i2s_data_w_callback().set(FUNC(hapyfish_state::s3c2440_i2s_data_w));
-	m_s3c2440->nand_command_w_callback().set(FUNC(hapyfish_state::s3c2440_nand_command_w));
-	m_s3c2440->nand_address_w_callback().set(FUNC(hapyfish_state::s3c2440_nand_address_w));
-	m_s3c2440->nand_data_r_callback().set(FUNC(hapyfish_state::s3c2440_nand_data_r));
-	m_s3c2440->nand_data_w_callback().set(FUNC(hapyfish_state::s3c2440_nand_data_w));
+
+	m_s3c2440->om0_r_callback().set_constant(0); // OM[1:0] = 00: Enable NAND flash memory boot
+	m_s3c2440->om1_r_callback().set_constant(0);
+	m_s3c2440->ncon_r_callback().set_constant(1); // NCON = 1: Advance NAND flash (1KWords/2KBytes page size, 4/5 address cycle)
+	m_s3c2440->gpio_port_r_callback().set(FUNC(hapyfish_state::gpio_port_r));
+	m_s3c2440->gpio_port_w_callback().set(FUNC(hapyfish_state::gpio_port_w));
+	m_s3c2440->adc_data_r_callback().set(FUNC(hapyfish_state::adc_data_r));
+	m_s3c2440->i2s_data_w_callback().set(FUNC(hapyfish_state::i2s_data_w));
+	m_s3c2440->nand_command_w_callback().set(FUNC(hapyfish_state::nand_command_w));
+	m_s3c2440->nand_address_w_callback().set(FUNC(hapyfish_state::nand_address_w));
+	m_s3c2440->nand_data_r_callback().set(FUNC(hapyfish_state::nand_data_r));
+	m_s3c2440->nand_data_w_callback().set(FUNC(hapyfish_state::nand_data_w));
+	m_s3c2440->nand_update_ecc_r_callback().set_constant(1);
 
 	FS8806(config, m_fs8806);
 	m_fs8806->set_key(0x05598147'd51583c2ULL); // from InitFS8806Lib() in the kernel

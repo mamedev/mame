@@ -13,7 +13,7 @@
 -- Dynamic recompiler objects
 --------------------------------------------------
 
-DRC_CPUS = { "ADSP21062", "DSP16", "DSPP", "E1", "MB86235", "MIPS3", "POWERPC", "SH", "SWP30", "UNSP" }
+DRC_CPUS = { "ADSP21062", "ARM7", "DSP16", "DSPP", "E1", "MB86235", "MIPS3", "POWERPC", "SH", "SWP30", "UNSP" }
 CPU_INCLUDE_DRC = false
 for i, v in ipairs(DRC_CPUS) do
 	if (CPUS[v]~=null) then
@@ -182,9 +182,11 @@ if CPUS["ARM7"] then
 		MAME_DIR .. "src/devices/cpu/arm7/upd800468.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7core.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7core.hxx",
-		MAME_DIR .. "src/devices/cpu/arm7/arm7drc.hxx",
+		MAME_DIR .. "src/devices/cpu/arm7/arm7drc.cpp",
+		MAME_DIR .. "src/devices/cpu/arm7/arm7drcops.cpp",
+		MAME_DIR .. "src/devices/cpu/arm7/arm7fe.cpp",
+		MAME_DIR .. "src/devices/cpu/arm7/arm7fe.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7help.h",
-		MAME_DIR .. "src/devices/cpu/arm7/arm7tdrc.hxx",
 		MAME_DIR .. "src/devices/cpu/arm7/cecalls.hxx",
 		MAME_DIR .. "src/devices/cpu/arm7/arm1176.hxx",
 		MAME_DIR .. "src/devices/cpu/arm7/arm1176vfp.hxx",
@@ -957,6 +959,8 @@ if CPUS["SH"] then
 		MAME_DIR .. "src/devices/cpu/sh/sh4dmac.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh4fe.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh4fe.h",
+		MAME_DIR .. "src/devices/cpu/sh/sh4fpu.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh4fpu.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh4regs.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh4tmu.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh4tmu.h",
@@ -1008,6 +1012,8 @@ if CPUS["SH"] then
 		MAME_DIR .. "src/devices/cpu/sh/sh7604_wdt.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh7604.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh7604.h",
+		MAME_DIR .. "src/devices/cpu/sh/sh7709_scif.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh7709_scif.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh7709s.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh7709s.cpp",
 	}
@@ -1261,6 +1267,8 @@ if CPUS["MCS51"] then
 		MAME_DIR .. "src/devices/cpu/mcs51/mcs51ops.cpp",
 		MAME_DIR .. "src/devices/cpu/mcs51/i8052.cpp",
 		MAME_DIR .. "src/devices/cpu/mcs51/i8052.h",
+		MAME_DIR .. "src/devices/cpu/mcs51/dw8051.cpp",
+		MAME_DIR .. "src/devices/cpu/mcs51/dw8051.h",
 		MAME_DIR .. "src/devices/cpu/mcs51/i80c51.cpp",
 		MAME_DIR .. "src/devices/cpu/mcs51/i80c51.h",
 		MAME_DIR .. "src/devices/cpu/mcs51/i80c52.cpp",
@@ -1402,6 +1410,23 @@ if CPUS["I386"] then
 		MAME_DIR .. "src/devices/cpu/i386/x87priv.h",
 		MAME_DIR .. "src/devices/cpu/i386/cpuidmsrs.hxx",
 	}
+end
+
+--------------------------------------------------
+-- Intel 82750PB
+--@src/devices/cpu/i750/i750.h,CPUS["I750"] = true
+--------------------------------------------------
+
+if CPUS["I750"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/i750/i750.cpp",
+		MAME_DIR .. "src/devices/cpu/i750/i750.h",
+	}
+end
+
+if opt_tool(CPUS, "I750") then
+	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/i750/i750d.cpp")
+	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/i750/i750d.h")
 end
 
 --------------------------------------------------
@@ -2130,6 +2155,10 @@ if CPUS["M6805"] then
 		MAME_DIR .. "src/devices/cpu/m6805/m68705.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05.cpp",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05.h",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05_sci.cpp",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05_sci.h",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05_spi.cpp",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05_spi.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05e1.cpp",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05e1.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05pge.cpp",
@@ -2837,15 +2866,15 @@ end
 --------------------------------------------------
 
 if CPUS["T6M53"] then
-    files {
-        MAME_DIR .. "src/devices/cpu/t6m53/t6m53.cpp",
-        MAME_DIR .. "src/devices/cpu/t6m53/t6m53.h",
-    }
+	files {
+		MAME_DIR .. "src/devices/cpu/t6m53/t6m53.cpp",
+		MAME_DIR .. "src/devices/cpu/t6m53/t6m53.h",
+	}
 end
 
 if opt_tool(CPUS, "T6M53") then
-    table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/t6m53/t6m53_dasm.cpp")
-    table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/t6m53/t6m53_dasm.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/t6m53/t6m53_dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/t6m53/t6m53_dasm.h")
 end
 
 --------------------------------------------------
@@ -4154,6 +4183,23 @@ end
 if opt_tool(CPUS, "ROMP") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/romp/rompdasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/romp/rompdasm.h")
+end
+
+--------------------------------------------------
+-- Konami 056734 (ESC)
+--@src/devices/cpu/k056734/k056734.h,CPUS["K056734"] = true
+--------------------------------------------------
+
+if CPUS["K056734"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/k056734/k056734.cpp",
+		MAME_DIR .. "src/devices/cpu/k056734/k056734.h",
+	}
+end
+
+if opt_tool(CPUS, "K056734") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/k056734/k056734d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/k056734/k056734d.h")
 end
 
 --------------------------------------------------

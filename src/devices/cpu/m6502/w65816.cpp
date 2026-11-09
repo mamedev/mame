@@ -24,6 +24,7 @@ w65816_device::w65816_device(const machine_config &mconfig, device_type type, co
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_wdm_w(*this),
 	m_sync_w(*this),
+	m_rdy_w(*this),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 24),
 	m_sprogram_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 24),
 	m_vector_config("vectors", ENDIANNESS_LITTLE, 8, 5),
@@ -106,6 +107,9 @@ void w65816_device::init()
 	save_item(NAME(m_nmi_pending));
 	save_item(NAME(m_irq_taken));
 	save_item(NAME(m_inhibit_interrupts));
+	save_item(NAME(m_vda));
+	save_item(NAME(m_vpa));
+	save_item(NAME(m_wai));
 
 	set_icountptr(m_icount);
 
@@ -141,6 +145,8 @@ void w65816_device::init()
 	m_irq_taken = false;
 	m_sync = false;
 	m_inhibit_interrupts = false;
+	m_wai = false;
+	set_bus_valid(false, false);
 }
 
 void w65816_device::device_reset()
@@ -165,6 +171,10 @@ void w65816_device::device_reset()
 	m_sync = false;
 	m_sync_w(CLEAR_LINE);
 	m_inhibit_interrupts = false;
+	if(m_wai)
+		m_rdy_w(ASSERT_LINE);
+	m_wai = false;
+	set_bus_valid(false, false);
 }
 
 uint32_t w65816_device::execute_min_cycles() const noexcept

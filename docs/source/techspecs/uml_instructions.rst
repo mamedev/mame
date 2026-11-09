@@ -20,10 +20,10 @@ executed or interpreted on the host system.
 
 Many UML instruction have multiple instruction sizes.  Integer
 instructions default to 32-bit size.  Adding a ``D`` or ``d`` prefix to
-the mnemonic changes to 64-bit size (double word).  Floating point
+the mnemonic selects 64-bit size (double word).  Floating point
 instructions use the mnemonic prefix/suffix ``FS`` or ``fs`` for
-IEEE 754 32-bit format (single precision) or or the prefix/suffix ``FD``
-or ``fd`` for IEEE 754 64-bit format (double precision).
+IEEE 754 32-bit format (single precision) or the prefix/suffix ``FD`` or
+``fd`` for IEEE 754 64-bit format (double precision).
 
 
 .. _umlinst-special:
@@ -257,9 +257,9 @@ Operands
 
 handle (code handle)
     The code handle to bind to the current location.  The handle must
-    already be allocated, and must not have been bound since the last
-    generated code reset (all handles are implicitly unbound when
-    resetting the generated code cache).
+    already be allocated, and must not currently be bound.  (All handles
+    bound to locations in transient code are implicitly unbound when
+    resetting the transient portion of the generated code cache.)
 
 Flags
 ^^^^^
@@ -371,7 +371,13 @@ unordered (U)
 CALLH
 ~~~~~
 
-Call the subroutine beginning at the specified code handle.
+Call the subroutine beginning at the specified code handle.  The handle
+must be allocated before the code to call it is generated, but does not
+need to be associated with a subroutine entry point (using the
+:ref:`HANDLE <umlinst-handle>` instruction) until the subroutine call is
+executed.  Note that it may be possible to generate more efficient
+code if the handle is associated with a subroutine entry point before
+the code calling it is generated.
 
 +-------------------------+--------------------------------------+
 | Disassembly             | Usage                                |
@@ -418,7 +424,12 @@ EXH
 Set the ``EXP`` register and call the subroutine beginning at the
 specified code handle.  The ``EXP`` register is a 32-bit special
 function register that may be retrieved with the :ref:`GETEXP
-<umlinst-getexp>` instruction.
+<umlinst-getexp>` instruction.  The handle must be allocated before the
+code to call it is generated, but does not need to be associated with a
+subroutine entry point (using the :ref:`HANDLE <umlinst-handle>`
+instruction) until the subroutine call is executed.  Note that it may be
+possible to generate more efficient code if the handle is associated
+with a subroutine entry point before the code calling it is generated.
 
 +-----------------------------+-----------------------------------------+
 | Disassembly                 | Usage                                   |
@@ -521,6 +532,13 @@ frames are unwound in either case.
 This is usually used to jump to the generated code corresponding to the
 emulated code at a particular address when it is not known to be in the
 current generated code block or when the mode changes.
+
+The handle must be allocated before the code to call it is generated,
+but does not need to be associated with a subroutine entry point (using
+the :ref:`HANDLE <umlinst-handle>` instruction) until the subroutine
+call is executed.  Note that it may be possible to generate more
+efficient code if the handle is associated with a subroutine entry point
+before the code calling it is generated.
 
 +----------------------------+-----------------------------------------+
 | Disassembly                | Usage                                   |

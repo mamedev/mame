@@ -51,6 +51,7 @@ Laggy [joystick] fire button (half the times won't trigger)
 		<year>1992</year>
 		<publisher>Accolade</publisher>
 		<info name="developer" value="Flair Software" />
+		<sharedfeat name="iec8_default" value="fd2000"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1658880">
 				<rom name="elvira_ii_mistress_of_the_dark_1992_flair_software.d2m" size="1658880" crc="4eada167" sha1="03fc4eae44187826cf06e54610f525621e1b7cc3"/>
@@ -209,17 +210,13 @@ Laggy [joystick] fire button (half the times won't trigger)
 		</part>
 	</software>
 
-	<software name="metaldst" supported="no">
+	<software name="metaldst">
 		<description>Metal Dust</description>
 		<year>2012</year>
 		<publisher>Protovision</publisher>
-		<notes><![CDATA[
-[1581] or [.d81] ?FILE NOT FOUND ERROR
-[SuperCPU] resets to PC=0, in brk-land
-]]></notes>
-
 		<sharedfeat name="compatibility" value="PAL"/>
-		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
+		<sharedfeat name="exp_default" value="supercpu"/>
+		<sharedfeat name="iec8_default" value="c1581"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -250,13 +247,14 @@ Laggy [joystick] fire button (half the times won't trigger)
 		</part>
 	</software>
 
-	<software name="metaldstf" cloneof="metaldst" supported="no">
+	<software name="metaldstf" cloneof="metaldst">
 		<description>Metal Dust (FD-4000)</description>
 		<year>2005</year>
 		<publisher>Protovision</publisher>
 
 		<sharedfeat name="compatibility" value="PAL"/>
-		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
+		<sharedfeat name="exp_default" value="supercpu"/>
+		<sharedfeat name="iec8_default" value="fd4000"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3317760">
@@ -392,6 +390,37 @@ Hi-score table is corrupt (dump really?)
 
 <!-- !Applications -->
 
+	<software name="modplay">
+		<description>MODPlay 64 (v1.2e)</description>
+		<year>2007</year>
+		<publisher>Digital Audio Concepts</publisher>
+		<sharedfeat name="iec8_default" value="c1581"/>
+		<sharedfeat name="user_default" value="digimax"/>
+		<sharedfeat name="exp_default" value="reu1764"/>
+		<sharedfeat name="sid_default" value="dual8580"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="modplay12e_fix.d81" size="819200" crc="f0727880" sha1="1806bd417524aa54a585b34a8045ac5954f57f21"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="modplay12" cloneof="modplay">
+		<description>MODPlay 64 (v1.2, SuperCPU)</description>
+		<year>2000</year>
+		<publisher>Digital Audio Concepts</publisher>
+		<sharedfeat name="iec8_default" value="c1581"/>
+		<sharedfeat name="exp_default" value="supercpu"/>
+		<sharedfeat name="exp:supercpu:exp_default" value="reu1764"/>
+		<sharedfeat name="user_default" value="digimax"/>
+		<sharedfeat name="sid_default" value="dual8580"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="modplay64v1.2.d81" size="819200" crc="6da02adc" sha1="b18372d957a03f3e22a49ca8c15c5dca0640ae53"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dolphdos3">
 		<description>Dolphin DOS 3.0 Tooldisk (Germany)</description>
 		<year>1990</year>
@@ -399,6 +428,18 @@ Hi-score table is corrupt (dump really?)
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="dolphin_dos_3.0_original_tooldisk_1990.d64" size="174848" crc="dc48f29d" sha1="05a1b386ff91255c95d02ea9491340c6c6f80fe1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digitlzr">
+		<description>Digitizer Datasette</description>
+		<year>19??</year>
+		<publisher>Fantasy Cracking Service</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="digitalizator.d64" size="174848" crc="02a9e65d" sha1="15620b792f7ebc30a8e0a2babb843bc1913e47a5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -433,8 +474,8 @@ Hi-score table is corrupt (dump really?)
 		<description>SpeakEasy</description>
 		<year>1983</year>
 		<publisher>Personal Peripheral Products</publisher>
+		<sharedfeat name="exp_default" value="speakez"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		<sharedfeat name="requirement" value="c64_cart:speakez"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="speakeasy.d64" size="174848" crc="702cc20c" sha1="d9a19213809e2b51ee55fac9687b55bddaa86871"/>
@@ -693,6 +734,7 @@ Hi-score table is corrupt (dump really?)
 		<description>Commodore 1764 RAM Expansion Utility Disk</description>
 		<year>1987</year>
 		<publisher>Commodore</publisher>
+		<sharedfeat name="exp_default" value="reu1764"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="1764 RAM Expansion Utility Disk"/>
@@ -713,6 +755,7 @@ Hi-score table is corrupt (dump really?)
 		<description>Commodore 1351 Mouse Utility Disk</description>
 		<year>1986</year>
 		<publisher>Commodore</publisher>
+		<sharedfeat name="joy1_default" value="c1351"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Commodore 1351 Mouse Utility Disk"/>
@@ -733,7 +776,7 @@ Hi-score table is corrupt (dump really?)
 		<description>Professional-DOS - VTS Release Demo</description>
 		<year>1987</year>
 		<publisher>VTS Data</publisher>
-		<sharedfeat name="requirement" value="iec8:c1541pd"/>
+		<sharedfeat name="iec8_default" value="c1541pd"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
@@ -746,11 +789,24 @@ Hi-score table is corrupt (dump really?)
 		<description>ICT Hard-Disk Utilities v2</description>
 		<year>1987</year>
 		<publisher>InConTrol</publisher>
-		<sharedfeat name="requirement" value="iec8:minichief"/>
+		<sharedfeat name="iec8_default" value="minichief"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="ictutili.d64" size="174848" crc="b9677d38" sha1="5add8d2618183f9145a00068dd20fe86928f9c35"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ide64utl">
+		<description>IDEDOS Utilities</description>
+		<year>2019</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="exp_default" value="ide64"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="idedos_util.d64" size="174848" crc="94f27ea4" sha1="1119da8fd7304e3cea4d37828a4ce53a0f6bad09"/>
 			</dataarea>
 		</part>
 	</software>
@@ -900,10 +956,60 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
+	<software name="mcs810">
+		<description>Commodore MCS 810 Color Printer Utility Disk</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="mcs810.d64" size="174848" crc="ae17a501" sha1="a775f51605e4f14d47ccb600172c6aaef10d3732"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="okimat20">
+		<description>Okimate 20 Utility Disk</description>
+		<year>198?</year>
+		<publisher>Okidata</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="okimate20.d64" size="174848" crc="c56524f2" sha1="01f84f2bb706eab7b839cb926a6f8a68cfac5105"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prologic">
+		<description>Prologic-DOS</description>
+		<year>1987</year>
+		<publisher>REX Data Technology</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="prologic.d64" size="174848" crc="488bc786" sha1="03e671e274e9de88b5c46a7514f980128a9efc2c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scpuutil">
+		<description>CMD SuperCPU Utilities</description>
+		<year>1990</year>
+		<publisher>CMD</publisher>
+		<sharedfeat name="exp_default" value="supercpu"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="scpu-1.d64" size="174848" crc="caad286d" sha1="2c1258505148763f13ab2fcdaf247138a933817e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="swiftlnk">
 		<description>CMD SwiftLink</description>
 		<year>1990</year>
 		<publisher>CMD</publisher>
+		<sharedfeat name="exp_default" value="swiftlink"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 Side 1"/>
@@ -976,6 +1082,26 @@ Hi-score table is corrupt (dump really?)
 			<feature name="part_id" value="GEOS Utilities"/>
 			<dataarea name="flop" size="174848">
 				<rom name="hd_geos_utils.d64" size="174848" crc="fd2ae57a" sha1="c132ab9b534aa51236c6622c0a37746b2f5a59ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ramlink">
+		<description>CMD RAMLink Utilities</description>
+		<year>1990</year>
+		<publisher>CMD</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="RL Utilities"/>
+			<dataarea name="flop" size="174848">
+				<rom name="ramlink-1.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="RL GEOS Utilities"/>
+			<dataarea name="flop" size="174848">
+				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1136,6 +1262,7 @@ Hi-score table is corrupt (dump really?)
 		<description>LUnix Next Generation (v0.21, REU)</description>
 		<year>2004</year>
 		<publisher>LNG-Project</publisher>
+		<sharedfeat name="exp_default" value="reu1750"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1270,7 +1397,7 @@ Hi-score table is corrupt (dump really?)
 		<description>Games and Utility Disc (v1.1)</description>
 		<year>1991</year>
 		<publisher>TIB</publisher>
-		<sharedfeat name="requirement" value="c64_cart:tibdd001"/>
+		<sharedfeat name="exp_default" value="tibdd001"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -1282,14 +1409,10 @@ Hi-score table is corrupt (dump really?)
 <!-- !Demos -->
 
 	<!-- https://www.youtube.com/watch?v=HiWbKQ_gUKQ -->
-	<software name="2ndreal" supported="partial">
+	<software name="2ndreal">
 		<description>Second Reality</description>
 		<year>1997</year>
 		<publisher>Smash Designs &amp; The Obsessed Maniacs</publisher>
-		<notes><![CDATA[
-LOAD "SECOND REALITY*",8
-Runs until disk side change prompt
-]]></notes>
 		<info name="usage" value="Set SID as soundcard in selection screen (press right ctrl 3 times then enter key)" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
@@ -1309,7 +1432,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=ZJThHmbOlCw -->
-	<software name="codeboys" supported="no">
+	<software name="codeboys">
 		<description>Codeboys &amp; Endians</description>
 		<year>2025</year>
 		<publisher>Booze Design</publisher>
@@ -1329,11 +1452,12 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
-	<software name="crazydem" supported="no">
+	<software name="crazydem">
 		<description>Crazy Demo</description>
 		<year>2024</year>
 		<publisher>Wyndex</publisher>
-		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
+		<sharedfeat name="exp_default" value="supercpu"/>
+		<sharedfeat name="iec8_default" value="c1581"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1343,7 +1467,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=aNN_OSYS6-Y -->
-	<software name="cycle" supported="no">
+	<software name="cycle">
 		<description>Cycle</description>
 		<year>2004</year>
 		<publisher>Booze Design</publisher>
@@ -1356,7 +1480,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=tfHazZp5CMU -->
-	<software name="democoder" supported="no">
+	<software name="democoder">
 		<description>The Demo Coder</description>
 		<year>2024</year>
 		<publisher>Fairlight</publisher>
@@ -1369,7 +1493,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=8b_B0qAZVYQ -->
-	<software name="gorbabst" supported="no">
+	<software name="gorbabst">
 		<description>Gorba Boost</description>
 		<year>2025</year>
 		<publisher>Gorbat Soft</publisher>
@@ -1382,7 +1506,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=4mtVDLxgb4A -->
-	<software name="hat" supported="no">
+	<software name="hat">
 		<description>The Hat</description>
 		<year>2026</year>
 		<publisher>Fairlight &amp; Genesis Project</publisher>
@@ -1403,7 +1527,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=3aJzSySfCZM -->
-	<software name="mojo" supported="no">
+	<software name="mojo">
 		<description>Mojo</description>
 		<year>2023</year>
 		<publisher>Bonzai &amp; Pretzel Logic</publisher>
@@ -1438,7 +1562,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=BM8anS_5nbA -->
-	<software name="musikrs" supported="no">
+	<software name="musikrs">
 		<description>Musik Run/Stop</description>
 		<year>2014</year>
 		<publisher>Mahoney</publisher>
@@ -1480,10 +1604,11 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=GqEI0T_WoAw -->
-	<software name="nextrnd" supported="no">
+	<software name="nextrnd">
 		<description>Next Round</description>
 		<year>2026</year>
 		<publisher>Performers</publisher>
+		<sharedfeat name="user_default" value="digimax"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side 1"/>
@@ -1493,9 +1618,9 @@ Runs until disk side change prompt
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side 2"/>
+			<feature name="part_id" value="Side 2 (Digimax)"/>
 			<dataarea name="flop" size="174848">
-				<rom name="round2.d64" size="174848" crc="3815e5c3" sha1="7274341c1ea51c490643b5624683fcc351f9faf9"/>
+				<rom name="round2_digimax.d64" size="174848" crc="29b11be2" sha1="ba893591852cd0550c4297663347f544b1211624"/>
 			</dataarea>
 		</part>
 
@@ -1514,9 +1639,9 @@ Runs until disk side change prompt
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Side 2 (Digimax)"/>
+			<feature name="part_id" value="Side 2"/>
 			<dataarea name="flop" size="174848">
-				<rom name="round2_digimax.d64" size="174848" crc="29b11be2" sha1="ba893591852cd0550c4297663347f544b1211624"/>
+				<rom name="round2.d64" size="174848" crc="3815e5c3" sha1="7274341c1ea51c490643b5624683fcc351f9faf9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1548,7 +1673,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=Sj6ZEwjK1DU -->
-	<software name="nobounds" supported="no">
+	<software name="nobounds">
 		<description>No Bounds</description>
 		<year>2023</year>
 		<publisher>Genesis Project</publisher>
@@ -1569,7 +1694,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=x6SfThtldFY -->
-	<software name="otech3" supported="no">
+	<software name="otech3">
 		<description>O-Tech People III</description>
 		<year>2025</year>
 		<publisher>Fairlight</publisher>
@@ -1581,8 +1706,24 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=1mQWEF6Tt0Y -->
+	<software name="popelprm">
+		<description>Popel Premiere</description>
+		<year>1999</year>
+		<publisher>CyberpunX</publisher>
+		<sharedfeat name="exp_default" value="supercpu"/>
+		<sharedfeat name="sid_default" value="dual8580"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="popel_premiere.d64" size="174848" crc="f69e3a85" sha1="e12a494e1426e24207e892f975aa214eedd7e155"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- https://www.youtube.com/watch?v=aK8l6_iJWKM -->
-	<software name="rebirth" supported="no">
+	<software name="rebirth">
 		<description>Rebirth</description>
 		<year>2021</year>
 		<publisher>Finnish Gold</publisher>
@@ -1595,12 +1736,12 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=vS8LAQbR-DY -->
-	<software name="scpukick" supported="no">
+	<software name="scpukick">
 		<description>SuperCPU Kicks!</description>
 		<year>1999</year>
 		<publisher>DMAgic</publisher>
+		<sharedfeat name="exp_default" value="supercpu"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
@@ -1621,8 +1762,37 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<software name="scpukickf" cloneof="scpukick">
+		<description>SuperCPU Kicks! (FD-2000)</description>
+		<year>1999</year>
+		<publisher>DMAgic</publisher>
+		<sharedfeat name="exp_default" value="supercpu"/>
+		<sharedfeat name="iec8_default" value="fd2000"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1658880">
+				<rom name="scpukick.d2m" size="1658880" crc="93abb04a" sha1="0e479cf6cddb0bfee00b7e01c14481d1e78a4dae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=ZLkWufDcDNU -->
+	<software name="scpuplsm">
+		<description>SuperCPU Plasma Intro</description>
+		<year>2015</year>
+		<publisher>Genesis Project</publisher>
+		<sharedfeat name="exp_default" value="supercpu"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="scpuintro_gp.d64" size="174848" crc="f7d99d90" sha1="df999d840168f36555f9651794f82c01cbd73b3c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- https://www.youtube.com/watch?v=-9nHNUlqMyQ -->
-	<software name="sledge" supported="no">
+	<software name="sledge">
 		<description>Christmas Megademo</description>
 		<year>2020</year>
 		<publisher>Atlantis &amp; Bonzai &amp; Genesis Project &amp; Lethargy &amp; Offence</publisher>
@@ -1657,7 +1827,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=1QXf1RKzlQc -->
-	<software name="trip" supported="no">
+	<software name="trip">
 		<description>The Trip</description>
 		<year>2025</year>
 		<publisher>Fairlight</publisher>
@@ -1678,7 +1848,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=GjDReXe9T3w -->
-	<software name="vicious2" supported="no">
+	<software name="vicious2">
 		<description>Vicious Sid 2</description>
 		<year>2012</year>
 		<publisher>The Noisy Bunch</publisher>
@@ -1699,7 +1869,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=BT2rrzg_XIc -->
-	<software name="violator" supported="no">
+	<software name="violator">
 		<description>The Violators</description>
 		<year>2025</year>
 		<publisher>Censor Design</publisher>
@@ -1720,7 +1890,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=E5l9ecCeKPw -->
-	<software name="weanomaly" supported="no">
+	<software name="weanomaly">
 		<description>We Are The Anomaly</description>
 		<year>2025</year>
 		<publisher>Extend &amp; Genesis Project</publisher>
@@ -1741,7 +1911,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=Y89aByVpBFs -->
-	<software name="witmat2" supported="no">
+	<software name="witmat2">
 		<description>What Is The Matrix 2</description>
 		<year>2024</year>
 		<publisher>Censor Design</publisher>
@@ -1754,7 +1924,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=lQDBSzChPjk -->
-	<software name="wonder14" supported="no">
+	<software name="wonder14">
 		<description>Wonderland XIV</description>
 		<year>2023</year>
 		<publisher>Censor Design</publisher>

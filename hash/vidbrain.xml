@@ -29,11 +29,14 @@ Entertainment Series:
 
 <!-- Communications Series (orange) -->
 
-	<software name="timeshar" supported="no">
+	<software name="timeshar">
 		<description>Timeshare</description>
 		<year>1978</year>
 		<publisher>VideoBrain Computer Company</publisher>
 		<info name="serial" value="CM01"/>
+		<info name="usage" value="Requires Expander 2 or a 300 baud modem on the Expander 1 MODEM jack"/>
+		<sharedfeat name="acc_default" value="expander1"/>
+		<sharedfeat name="acc:expander1:modem_default" value="null_modem"/>
 		<part name="cart" interface="vidbrain_cart">
 			<feature name="slot" value="timeshare" />
 			<dataarea name="rom" size="0x800">
@@ -201,6 +204,7 @@ Entertainment Series:
 		<year>1978</year>
 		<publisher>VideoBrain Computer Company</publisher>
 		<info name="serial" value="APL/S"/>
+		<sharedfeat name="acc_default" value="expander1"/>
 		<part name="cart" interface="vidbrain_cart">
 			<feature name="slot" value="comp_language" />
 			<dataarea name="rom" size="0x4000">
@@ -233,6 +237,7 @@ Entertainment Series:
 		<year>1978</year>
 		<publisher>VideoBrain Computer Company</publisher>
 		<info name="serial" value="VB-1000"/>
+		<sharedfeat name="acc_default" value="expander1"/>
 		<part name="cart" interface="vidbrain_cart">
 			<feature name="slot" value="money_minder" />
 			<dataarea name="rom" size="0x1000">
@@ -242,11 +247,18 @@ Entertainment Series:
 		</part>
 	</software>
 
-	<software name="infoman" supported="no">
+	<software name="infoman">
 		<description>Information Manager (prototype)</description>
 		<year>1978</year>
 		<publisher>VideoBrain Computer Company</publisher>
+		<notes><![CDATA[
+Requires Expander 1. Files are stored on the RECORD deck (cassette2) and read back from the PLAYBACK deck (cassette1).
+Type commands as whole words and confirm each entry with NEXT. Shift is a toggle, so press SHIFT before and after typing digits.
+ENTER: type the file name, then define the fields (name, length, type A or M). Press SPECIAL to end the field list and Y to confirm, then type the records. Press SPECIAL to end the file.
+REVIEW: type the file name to read the file back from the PLAYBACK deck.
+]]></notes>
 		<info name="serial" value="VB-1200"/>
+		<sharedfeat name="acc_default" value="expander1"/>
 		<part name="cart" interface="vidbrain_cart">
 			<feature name="slot" value="info_manager" />
 			<dataarea name="rom" size="0x2000">
