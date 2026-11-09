@@ -109,6 +109,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<crt9007_device> m_crtc;
@@ -341,15 +342,17 @@ void vt220a_state::p1_w(u8 data)
 	// load, whose top scan line is painted as it loads
 	if ((m_p1 ^ data) & 0x28)
 		m_screen->update_partial(m_screen->vpos());
-	// DMA L (P1.0) falling edge loads the character address latch into the line buffer
-	if (BIT(m_p1, 0) && !BIT(data, 0) && !BIT(data, 3))
+	// DMA L (P1.0) falling edge loads the character address latch into the line buffer, only while
+	// EN CHR GEN RW H gives the access mux to the CPU (TM 6.2.4.1); a row load's DMA grant doesn't
+	if (BIT(m_p1, 0) && !BIT(data, 0) && !BIT(data, 3) && BIT(m_conf, 2))
 	{
 		m_lbf[lbf_addr(true, m_lba)] = m_char_addr;
 		m_lbf[lbf_addr(false, m_lba)] = m_atr_latch;
 	}
-	// NVR RECALL L (P1.1) and NVR STORE L (P1.2); the X2212 core takes them active high
+	// NVR RECALL L (P1.1) and NVR STORE L (P1.2); the X2212 core takes them active high, and
+	// RECALL holds off STORE (TM 4.2.9)
 	m_nvr->recall(!BIT(data, 1));
-	m_nvr->store(!BIT(data, 2));
+	m_nvr->store(!BIT(data, 2) && BIT(data, 1));
 	// RESET CRT L (P1.6)
 	if (BIT(m_p1, 6) && !BIT(data, 6))
 		m_crtc->reset();
@@ -431,13 +434,20 @@ void vt220a_state::set_columns()
 
 void vt220a_state::char_addr_w(u8 data)
 {
-	// E19 latches the character address from BAD0-7 and E21 the attribute from AD3-7
-	m_char_addr = data;
-	m_atr_latch = data & 0xf8;
+	// E19 latches the character address from BAD0-7 and E21 the attribute from AD3-7, only with
+	// CPU access of the video logic enabled by EN CHR GEN RW H (TM table 4-2)
+	if (BIT(m_conf, 2))
+	{
+		m_char_addr = data;
+		m_atr_latch = data & 0xf8;
+	}
 }
 
 u8 vt220a_state::chargen_r(offs_t offset)
 {
+	// enabled by EN CHR GEN RW H (TM table 4-2), otherwise nothing drives the bus
+	if (!BIT(m_conf, 2))
+		return 0xff;
 	// ALT SEL H selects the soft character RAM; otherwise CHRG SEL H (P1.5) is the ROM's MSB
 	const u8 chr = lbf_out(true, m_lba);
 	if (BIT(m_conf, 3))
@@ -498,6 +508,13 @@ void vt220a_state::machine_start()
 void vt220_state::machine_reset()
 {
 	memset(m_ram->pointer(),0,16*1024);
+}
+
+void vt220a_state::machine_reset()
+{
+	vt220_state::machine_reset();
+	m_row_y = 0;
+	m_row_loading = false;
 }
 
 void vt220_state::video_start()
