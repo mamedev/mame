@@ -4251,6 +4251,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/upd72070.h,MACHINES["UPD72070"] = true
+---------------------------------------------------
+
+if MACHINES["UPD72070"] then
+	files {
+		MAME_DIR .. "src/devices/machine/upd72070.cpp",
+		MAME_DIR .. "src/devices/machine/upd72070.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/upd765.h,MACHINES["UPD765"] = true
 ---------------------------------------------------
 
