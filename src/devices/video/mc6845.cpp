@@ -833,12 +833,14 @@ void mc6845_device::reset_w(int state)
 		// one CCLK, and the MC6845 and HD46505R test mode (RESET with LPSTB
 		// high; there is no LPSTB level input here, so it reads low).  Not
 		// reset: the MOS 8563's own draw counters.
-		m_line_timer->adjust(attotime::never);
-		m_de_off_timer->adjust(attotime::never);
-		m_cursor_on_timer->adjust(attotime::never);
-		m_cursor_off_timer->adjust(attotime::never);
-		m_hsync_on_timer->adjust(attotime::never);
-		m_hsync_off_timer->adjust(attotime::never);
+		// disabled, not adjusted to never: recompute_parameters(),
+		// device_reset() and update_counters() test enabled()
+		m_line_timer->enable(false);
+		m_de_off_timer->enable(false);
+		m_cursor_on_timer->enable(false);
+		m_cursor_off_timer->enable(false);
+		m_hsync_on_timer->enable(false);
+		m_hsync_off_timer->enable(false);
 		m_character_counter = 0;
 		m_hsync_width_counter = 0;
 		m_raster_counter = 0;
