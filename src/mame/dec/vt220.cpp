@@ -11,6 +11,12 @@
     vt220 (Version 2.3, probably models D-F) shows nothing: its video, NVR
     and memory map beyond the RAM and DUART are not known.
 
+    TODO (vt220a):
+    - smooth scroll
+    - the 20 mA host loop
+    - CTS gating (MC68681 MR2 bit 4)
+    - LK201 save states, then MACHINE_SUPPORTS_SAVE
+
     The VT220 exists in two major hardware revisions. The Pocket Service
     Guide has separate lists of components for earlier and later models,
     with the following being those that differ:
@@ -38,6 +44,7 @@
 
 #include "emu.h"
 #include "lk201.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/mcs51/i8051.h"
 //#include "machine/eepromser.h"
@@ -84,7 +91,7 @@ protected:
 	required_device<ram_device> m_ram;
 
 private:
-	int m_kbd_rxd = 1;
+	u8 m_kbd_rxd = 1;
 
 	uint32_t screen_update_vt220(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vt220_data(address_map &map) ATTR_COLD;
@@ -105,7 +112,7 @@ public:
 		m_attr_ram(*this, "attr_ram")
 	{ }
 
-	void vt220a(machine_config &config);
+	void vt220a(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -126,9 +133,8 @@ private:
 	u8 m_char_addr = 0;
 	u8 m_atr_latch = 0;
 	u8 m_lba = 0;
-	u8 m_lbf_bank = 0;
 	bool m_132col = false;
-	int m_vlt_x = 0;
+	s16 m_vlt_x = 0;
 	u8 m_sl = 0;
 	bool m_dw = false; // cursor skew F/F: double width scan line
 	u8 m_line_sl[VTOTAL]; // per scan line: SL3-SL0 (0xff before any VLT) and double width
@@ -137,12 +143,12 @@ private:
 	bool m_drb = true;
 	bool m_row_loading = false;
 	bool m_cblank = true;
-	int m_host_txd = 1;
-	int m_host_rxd = 1;
-	std::unique_ptr<u8[]> m_softchar;
-	std::unique_ptr<u8[]> m_lbf;
+	u8 m_host_txd = 1;
+	u8 m_host_rxd = 1;
+	u8 m_softchar[0x800] = { };
+	u8 m_lbf[0x800] = { };
 
-	void vt220a_palette(palette_device &palette) const;
+	void vt220a_palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update_vt220a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	const col_timing &timing() const { return m_132col ? TIMING_132 : TIMING_80; }
 	void set_columns();
@@ -151,8 +157,11 @@ private:
 	int video_col(int x, bool dw) const;
 	int video_dot(int x, bool dw) const;
 	bool in_row(int x, bool dw) const;
-	u8 dot(int col, int x, int line, bool &bold, bool &blink) const;
-	u8 video_out(int x, int y, bool &bold, bool &blink) const;
+	static offs_t soft_addr(u8 chr, int line) { return ((chr & 0x7f) << 4) | line; }
+	u8 char_row(bool alt, u8 chr, int line) const;
+	u8 dot(int col, int x, int line, bool &bold, bool &blink_n) const;
+	u8 video_out(int x, int y, bool &bold, bool &blink_n) const;
+	void write_host_txd(u8 conf) { m_host->write_txd(BIT(conf, 6) ? 1 : m_host_txd); }
 
 	u8 p1_r();
 	void p1_w(u8 data);
@@ -197,21 +206,21 @@ void vt220_state::vt220_data(address_map &map)
 void vt220a_state::vt220a_data(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x2000, 0x2fff).mirror(0xc000).ram().share("screen_ram"); // RAM 0/1 (A000-AFFF in the technical manual)
-	map(0x3000, 0x300f).mirror(0xc7f0).r(FUNC(vt220a_state::duart_r)).w(m_duart, FUNC(scn2681_device::write)); // B7F0-B7FF
+	map(0x0000, 0x0000).mirror(0x47ff).w(FUNC(vt220a_state::conf_w)); // 07ff in the technical manual, as the rest
+	map(0x0800, 0x0800).mirror(0x47ff).w(FUNC(vt220a_state::char_addr_w)); // 0fff
+	map(0x1000, 0x103f).mirror(0x47c0).rw(m_crtc, FUNC(crt9007_device::read), FUNC(crt9007_device::write)); // 1700-17ff
+	map(0x1800, 0x1800).mirror(0x47ff).nopw(); // 1fff RESET TIM L: strobe resetting the timing generator, data ignored
+	map(0x2000, 0x2fff).mirror(0xc000).ram().share("screen_ram"); // RAM 0/1, a000-afff
+	map(0x3000, 0x300f).mirror(0xc7f0).r(FUNC(vt220a_state::duart_r)).w(m_duart, FUNC(scn2681_device::write)); // b7f0-b7ff
 	map(0x8000, 0x8fff).mirror(0x4000).ram().share("attr_ram"); // attribute RAM 0/1
-	map(0x0800, 0x0800).mirror(0x47ff).w(FUNC(vt220a_state::char_addr_w)); // 0FFF
-	map(0x0000, 0x0000).mirror(0x47ff).w(FUNC(vt220a_state::conf_w)); // 07FF
-	map(0x1000, 0x103f).mirror(0x47c0).rw(m_crtc, FUNC(crt9007_device::read), FUNC(crt9007_device::write)); // 1700-17FF
-	map(0x1800, 0x1800).mirror(0x47ff).nopw(); // 1FFF RESET TIM L: strobe resetting the timing generator, data ignored
-	map(0x9000, 0x90ff).mirror(0x4700).rw(m_nvr, FUNC(x2212_device::read), FUNC(x2212_device::write)); // 9700-97FF
-	map(0x9800, 0x980f).mirror(0x47f0).rw(FUNC(vt220a_state::chargen_r), FUNC(vt220a_state::chargen_w)); // 9FF0-9FFF
+	map(0x9000, 0x90ff).mirror(0x4700).rw(m_nvr, FUNC(x2212_device::read), FUNC(x2212_device::write)); // 9700-97ff
+	map(0x9800, 0x980f).mirror(0x47f0).rw(FUNC(vt220a_state::chargen_r), FUNC(vt220a_state::chargen_w)); // 9ff0-9fff
 }
 
 offs_t vt220a_state::lbf_addr(bool chr, u8 lba) const
 {
 	// E14 (2016): A10/A9 BNKS1/BNKS0, A8 ATR/CHR (high for character), A7-A0 LBA
-	return (m_lbf_bank << 9) | (chr ? 0x100 : 0) | lba;
+	return (BIT(m_duart_op, 5, 2) << 9) | (chr ? 0x100 : 0) | lba; // OP5/OP6 BNK S0/S1
 }
 
 u8 vt220a_state::lbf_out(bool chr, u8 lba) const
@@ -318,7 +327,13 @@ void vt220a_state::cblank_w(int state)
 	m_cblank = state;
 }
 
-u8 vt220a_state::dot(int col, int x, int line, bool &bold, bool &blink) const
+u8 vt220a_state::char_row(bool alt, u8 chr, int line) const
+{
+	// ALT SEL H selects the soft character RAM; otherwise CHRG SEL H (P1.5) is the ROM's MSB
+	return alt ? m_softchar[soft_addr(chr, line)] : m_chargen[(BIT(m_p1, 5) << 12) | (chr << 4) | line];
+}
+
+u8 vt220a_state::dot(int col, int x, int line, bool &bold, bool &blink_n) const
 {
 	// one dot of the video stream: E30 gives the CPU the line buffer address and ALT SEL while
 	// EN CHR GEN RW H is set, otherwise the video side walks the row
@@ -330,12 +345,12 @@ u8 vt220a_state::dot(int col, int x, int line, bool &bold, bool &blink) const
 
 	// AD7 BLINK (E38 NAND with DUART BLINK H), AD6 BOLD, AD5 REV (low for reverse), AD4 UL, AD3 ALT SEL
 	bold = BIT(atr, 6);
-	blink = !(BIT(m_duart_op, 3) && BIT(atr, 7));
+	blink_n = !(BIT(m_duart_op, 3) && BIT(atr, 7));
 
 	// scan lines of the last loaded row only
 	if (line < 0 || line >= 10)
 		return 0;
-	const u8 bits = alt ? m_softchar[((chr & 0x7f) << 4) | line] : m_chargen[(BIT(m_p1, 5) << 12) | (chr << 4) | line];
+	const u8 bits = char_row(alt, chr, line);
 
 	// MSB first; each lit dot is stretched into the next (TM 6.2.4), so a lit dot 7 lights the first fill dot
 	bool on = (x < 8 && BIT(bits, 7 - x)) || (x > 0 && x <= 8 && BIT(bits, 8 - x));
@@ -345,14 +360,14 @@ u8 vt220a_state::dot(int col, int x, int line, bool &bold, bool &blink) const
 	return on ^ BIT(m_conf, 0) ^ !BIT(atr, 5);
 }
 
-u8 vt220a_state::video_out(int x, int y, bool &bold, bool &blink) const
+u8 vt220a_state::video_out(int x, int y, bool &bold, bool &blink_n) const
 {
 	// the video stream at beam position x, y: nothing outside the row or with DIS VIDEO H (OP7)
-	bold = blink = false;
+	bold = blink_n = false;
 	const bool dw = m_line_dw[y];
 	if (!in_row(x, dw) || BIT(m_duart_op, 7))
 		return 0;
-	return dot(video_col(x, dw), video_dot(x, dw), m_line_sl[y], bold, blink);
+	return dot(video_col(x, dw), video_dot(x, dw), m_line_sl[y], bold, blink_n);
 }
 
 u8 vt220a_state::duart_r(offs_t offset)
@@ -364,9 +379,9 @@ u8 vt220a_state::duart_r(offs_t offset)
 		// Sampled when the CPU reads the input port, so the IPCR change bits only update then.
 		const int x = m_screen->hpos(), y = m_screen->vpos();
 		const bool blank = m_cblank || BIT(m_duart_op, 7) || !in_row(x, m_line_dw[y]); // OP7 DIS VIDEO H
-		bool bold = false, blink = false;
-		const bool video = !blank && video_out(x, y, bold, blink);
-		m_duart->ip3_w(!(video || bold || blink));
+		bool bold = false, blink_n = false;
+		const bool video = !blank && video_out(x, y, bold, blink_n);
+		m_duart->ip3_w(!(video || bold || blink_n));
 		m_duart->ip4_w(!blank);
 	}
 	return m_duart->read(offset);
@@ -407,7 +422,9 @@ void vt220a_state::conf_w(u8 data)
 	// and the receive gating takes EIA RXD only then (20 mA loop not emulated: idles marking)
 	if (BIT(data, 6) != BIT(m_conf, 6))
 	{
-		m_host->write_txd(BIT(data, 6) ? 1 : m_host_txd);
+		if (BIT(data, 6))
+			logerror("%s: 20 mA host loop selected, not emulated\n", machine().describe_context());
+		write_host_txd(data);
 		m_duart->rx_a_w(BIT(data, 6) ? 1 : m_host_rxd);
 	}
 	// with EN CHR GEN RW H set, E30 gives the CPU the line buffer address counter (E7, LS393)
@@ -425,7 +442,7 @@ void vt220a_state::conf_w(u8 data)
 void vt220a_state::host_txd_w(int state)
 {
 	m_host_txd = state;
-	m_host->write_txd(BIT(m_conf, 6) ? 1 : state);
+	write_host_txd(m_conf);
 }
 
 void vt220a_state::host_rxd_w(int state)
@@ -447,10 +464,10 @@ void vt220a_state::duart_out_w(u8 data)
 	m_duart_op = data;
 	// modem signals low when asserted at the DUART pins, as on the RS-232 port: the firmware drops
 	// DTR by driving OP1 high, and reads DSR, SPD IND and PTR DSR asserted as input port bits low
+	// (opposite to the TM's H signal names; the sense here comes from the firmware)
 	m_host->write_rts(BIT(data, 0)); // OP0 RTS
 	m_host->write_dtr(BIT(data, 1)); // OP1 DTR
 	m_host->write_spds(BIT(data, 2)); // OP2 SPD SEL
-	m_lbf_bank = (data >> 5) & 3; // OP5/OP6 BNK S0/S1
 	if (BIT(data, 4) != m_132col)
 	{
 		m_132col = BIT(data, 4); // OP4 132 COL H
@@ -484,11 +501,7 @@ u8 vt220a_state::chargen_r(offs_t offset)
 	// enabled by EN CHR GEN RW H (TM table 4-2), otherwise nothing drives the bus
 	if (!BIT(m_conf, 2))
 		return 0xff;
-	// ALT SEL H selects the soft character RAM; otherwise CHRG SEL H (P1.5) is the ROM's MSB
-	const u8 chr = lbf_out(true, m_lba);
-	if (BIT(m_conf, 3))
-		return m_softchar[((chr & 0x7f) << 4) | offset];
-	return m_chargen[(BIT(m_p1, 5) << 12) | (chr << 4) | offset];
+	return char_row(BIT(m_conf, 3), lbf_out(true, m_lba), offset);
 }
 
 void vt220a_state::chargen_w(offs_t offset, u8 data)
@@ -496,7 +509,7 @@ void vt220a_state::chargen_w(offs_t offset, u8 data)
 	if (BIT(m_conf, 3) && BIT(m_conf, 2))
 	{
 		m_screen->update_partial(m_screen->vpos());
-		m_softchar[((lbf_out(true, m_lba) & 0x7f) << 4) | offset] = data;
+		m_softchar[soft_addr(lbf_out(true, m_lba), offset)] = data;
 	}
 }
 
@@ -513,8 +526,6 @@ void vt220a_state::machine_start()
 {
 	vt220_state::machine_start();
 
-	m_softchar = make_unique_clear<u8[]>(0x800);
-	m_lbf = make_unique_clear<u8[]>(0x800);
 	memset(m_line_sl, 0xff, sizeof(m_line_sl));
 
 	save_item(NAME(m_p1));
@@ -523,7 +534,6 @@ void vt220a_state::machine_start()
 	save_item(NAME(m_char_addr));
 	save_item(NAME(m_atr_latch));
 	save_item(NAME(m_lba));
-	save_item(NAME(m_lbf_bank));
 	save_item(NAME(m_132col));
 	save_item(NAME(m_vlt_x));
 	save_item(NAME(m_sl));
@@ -536,9 +546,8 @@ void vt220a_state::machine_start()
 	save_item(NAME(m_cblank));
 	save_item(NAME(m_host_txd));
 	save_item(NAME(m_host_rxd));
-	save_pointer(NAME(m_softchar), 0x800);
-	save_pointer(NAME(m_lbf), 0x800);
-	machine().save().register_postload(save_prepost_delegate(FUNC(vt220a_state::set_columns), this));
+	save_item(NAME(m_softchar));
+	save_item(NAME(m_lbf));
 
 	// TM table 5-2: the printer port DTR and RTS are on whenever the terminal is powered
 	m_printer->write_dtr(0);
@@ -568,13 +577,13 @@ uint32_t vt220_state::screen_update_vt220(screen_device &screen, bitmap_ind16 &b
 
 uint32_t vt220a_state::screen_update_vt220a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u16 *const pix = &bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			bool bold, blink;
-			pix[x] = video_out(x, y, bold, blink) ? 1 + blink + (bold << 1) : 0;
+			bool bold, blink_n;
+			pix[x] = video_out(x, y, bold, blink_n) ? 1 + blink_n + (bold << 1) : 0;
 		}
 	}
 	return 0;
@@ -584,11 +593,11 @@ void vt220a_state::vt220a_palette(palette_device &palette) const
 {
 	// E49 open-collector NANDs of the video with TBLK L into R17 1.8K, with BLINK ATR into R15 2.7K and
 	// with BOLD ATR into R16 2K (sheet 5); intensity taken as the summed conductance
-	const double g[4] = { 1 / 1.8, 1 / 1.8 + 1 / 2.7, 1 / 1.8 + 1 / 2.0, 1 / 1.8 + 1 / 2.7 + 1 / 2.0 };
+	constexpr double G[4] = { 1 / 1.8, 1 / 1.8 + 1 / 2.7, 1 / 1.8 + 1 / 2.0, 1 / 1.8 + 1 / 2.7 + 1 / 2.0 };
 	palette.set_pen_color(0, rgb_t::black());
 	for (int i = 0; i < 4; i++)
 	{
-		const u8 v = u8(255 * g[i] / g[3]);
+		const u8 v = u8(255 * G[i] / G[3]);
 		palette.set_pen_color(1 + i, rgb_t(v, v, v));
 	}
 }
@@ -604,7 +613,7 @@ void vt220_state::vt220(machine_config &config)
 
 	// TM 4.2.8: LK201 on the 8051 UART, through EIA drivers and receivers at both ends
 	m_maincpu->port_in_cb<3>().set([this] () -> u8 { return 0xfe | m_kbd_rxd; }); // P3.0 RXD from KBR
-	m_maincpu->port_out_cb<3>().set([this] (u8 data) { m_kbd->rx_w(BIT(data, 1)); }); // P3.1 TXD to KBT
+	m_maincpu->port_out_cb<3>().set(m_kbd, FUNC(lk201_device::rx_w)).bit(1); // P3.1 TXD to KBT
 	LK201(config, m_kbd);
 	m_kbd->tx_handler().set([this] (int state) { m_kbd_rxd = state; });
 
