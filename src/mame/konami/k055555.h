@@ -15,6 +15,7 @@
 #define K55_COLSEL_1        3   // layer C, D color depth
 #define K55_COLSEL_2        4   // object, S1 color depth
 #define K55_COLSEL_3        5   // S2, S3 color depth
+#define K55_COLCHG_ON       6   // layer A, B pen priority enable
 
 #define K55_PRIINP_0        7   // layer A pri 0
 #define K55_PRIINP_1        8   // layer A pri 1

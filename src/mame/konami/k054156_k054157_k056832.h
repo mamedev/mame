@@ -94,6 +94,7 @@ public:
 	void set_layer_association(int status);
 	int get_layer_association() { return m_layer_association; }
 	void set_layer_offs(int layer, s32 offsx, s32 offsy);
+	void set_pen_split(const int *threshold, const u8 *penmask);
 	void set_lsram_page(int logical_page, s32 physical_page, s32 physical_offset);
 	int is_irq_enabled(int irqline);
 	void read_avac(int &mode, int &data);
@@ -152,6 +153,7 @@ private:
 	u8        m_all_lines_dirty[K056832_PAGE_COUNT];
 	u8        m_page_tile_mode[K056832_PAGE_COUNT];
 	s32       m_last_colorbase[K056832_PAGE_COUNT];
+	s32       m_page_pen_split[K056832_PAGE_COUNT];
 	u8        m_layer_tile_mode[8];
 	s32       m_default_layer_association;
 	s32       m_layer_association;

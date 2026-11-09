@@ -359,6 +359,25 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		shdprisel = m_k055555->K055555_read_register(K55_SHD_PRI_SEL);
 	}
 
+	// COLPRI (see p.62): layer A/B pens above COLPRI take PRI 1 where COLCHG ON has the layer's bit
+	int pen_split[4] = { -1, -1, -1, -1 };
+	u8 pen_mask[4] = { 0xff, 0xff, 0xff, 0xff };
+	u8 split_pri[2] = { 0, 0 };
+	if (m_gx_primode != -1)
+	{
+		const u8 colchg = m_k055555->K055555_read_register(K55_COLCHG_ON);
+		const u8 colsel = m_k055555->K055555_read_register(K55_COLSEL_0);
+		for (int i = 0; i < 2; i++)
+		{
+			if (!BIT(colchg, i)) continue;
+			const int depth = 4 + std::min(int(colsel >> (i * 4) & 7), 4);
+			pen_mask[i] = (1 << depth) - 1;
+			pen_split[i] = m_k055555->K055555_read_register(i ? K55_PRIINP_5 : K55_PRIINP_2);
+			split_pri[i] = m_k055555->K055555_read_register(i ? K55_PRIINP_4 : K55_PRIINP_1);
+		}
+	}
+	m_k056832->set_pen_split(pen_split, pen_mask);
+
 	// SHDPRISEL filters shadows by different priority comparison methods (see detail on p.66)
 	// conditions 1 and 2 are handled by gx_draw_deferred_shadows, 0 is UNIMPLEMENTED
 	bool shadowon[3];
@@ -464,6 +483,12 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 				continue;
 			}
 			const u32 order = layerpri[i] << 24;
+			if (offs == -1 && code < 2 && pen_split[code] >= 0)
+			{
+				objpool.emplace_back(GX_OBJ{ order, offs, code, 1 });
+				objpool.emplace_back(GX_OBJ{ u32(split_pri[code]) << 24, offs, code, 0 });
+				continue;
+			}
 			const int color = 0;
 			objpool.emplace_back(GX_OBJ{ order, offs, code, color });
 		}
@@ -695,7 +720,7 @@ void konamigx_state::konamigx_mixer_draw(
 					}
 					continue;
 				case -1:
-					gx_draw_basic_tilemaps(screen, bitmap, cliprect, mixerflags, code, order >> 24);
+					gx_draw_basic_tilemaps(screen, bitmap, cliprect, mixerflags, code, order >> 24, color);
 					continue;
 				case -2:
 				case -4:
@@ -744,7 +769,7 @@ void konamigx_state::gx_draw_deferred_shadows(screen_device &screen, bitmap_rgb3
 	}
 }
 
-void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, u8 layer, u8 pri)
+void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, u8 layer, u8 pri, u8 part)
 {
 	const u8 disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 
@@ -755,7 +780,7 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 	const u8 layer2 = layer << 1;
 	const u8 j = mixerflags >> layer2 & 3;
 
-	u32 flags = 0;
+	u32 flags = part ? TILEMAP_DRAW_LAYER1 : TILEMAP_DRAW_LAYER0;
 	if (BIT(mixerflags, layer + 12)) flags |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
 
 	// what the layer records as the topmost screen for gx_draw_deferred_shadows:
