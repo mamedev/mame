@@ -12,14 +12,13 @@
 
 DECLARE_DEVICE_TYPE(MPU4_CHARACTERISER_PAL, mpu4_characteriser_pal)
 
-typedef device_delegate<u8 (u8 state, u8 col)> mpu4chr_nextprot_delegate;
-
-
 class mpu4_characteriser_pal : public device_t
 {
 public:
 	// construction/destruction
 	mpu4_characteriser_pal(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	using nextprot_delegate = device_delegate<u8 (u8 state, u8 col)>;
 
 	template <typename T> void set_cpu_tag(T &&tag)
 	{
@@ -49,11 +48,6 @@ public:
 	void set_allow_68k_cheat(bool allow)
 	{
 		m_allow_68k_cheat = allow;
-	}
-
-	void set_use_pal_equation(bool use_equation)
-	{
-		m_is_4ksim = use_equation;
 	}
 
 	template <typename... T> void set_protnext_cb(T &&... args) { m_nextprotcb.set(std::forward<T>(args)...); }
@@ -1412,7 +1406,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	uint8_t* m_current_chr_table;
-	int m_prot_col;
+	u8 m_prot_col;
 
 private:
 
@@ -1428,10 +1422,9 @@ private:
 	bool m_allow_68k_cheat;
 
 	const uint8_t* m_current_lamp_table;
-	int m_lamp_col;
-	int m_4krow;
-	bool m_is_4ksim;
-	mpu4chr_nextprot_delegate m_nextprotcb;
+	u8 m_lamp_col;
+	u8 m_4krow;
+	nextprot_delegate m_nextprotcb;
 	optional_region_ptr<uint8_t> m_protregion; // some of the simulations have a fake ROM to assist them
 
 	// debugging only!

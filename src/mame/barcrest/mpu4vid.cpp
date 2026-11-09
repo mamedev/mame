@@ -2195,7 +2195,6 @@ void mpu4vid_state::mpu4_vid_strike(machine_config& config)
 	mpu4_vid(config);
 
 	MPU4_CHARACTERISER_PAL(config, m_characteriser);
-	m_characteriser->set_use_pal_equation(true);
 	m_characteriser->set_protnext_cb(FUNC(mpu4vid_state::strike_chr_next));
 }
 
@@ -2220,7 +2219,6 @@ void mpu4vid_state::mpu4_vid_turnov(machine_config& config)
 	mpu4_vid(config);
 
 	MPU4_CHARACTERISER_PAL(config, m_characteriser);
-	m_characteriser->set_use_pal_equation(true);
 	m_characteriser->set_protnext_cb(FUNC(mpu4vid_state::turnover_chr_next));
 }
 
@@ -2249,7 +2247,6 @@ void mpu4vid_state::mpu4_vid_tmach(machine_config& config)
 	mpu4_vid(config);
 
 	MPU4_CHARACTERISER_PAL(config, m_characteriser);
-	m_characteriser->set_use_pal_equation(true);
 	m_characteriser->set_protnext_cb(FUNC(mpu4vid_state::timemchn_chr_next));
 }
 
@@ -2278,7 +2275,6 @@ void mpu4vid_state::mpu4_vid_barquest(machine_config& config)
 	mpu4_vid(config);
 
 	MPU4_CHARACTERISER_PAL(config, m_characteriser);
-	m_characteriser->set_use_pal_equation(true);
 	m_characteriser->set_protnext_cb(FUNC(mpu4vid_state::barquest_chr_next));
 }
 
@@ -2303,7 +2299,6 @@ void mpu4vid_state::mpu4_vid_skilltrk(machine_config& config)
 	mpu4_vid(config);
 
 	MPU4_CHARACTERISER_PAL(config, m_characteriser);
-	m_characteriser->set_use_pal_equation(true);
 	m_characteriser->set_protnext_cb(FUNC(mpu4vid_state::skiltrek_chr_next));
 }
 
@@ -2329,7 +2324,6 @@ void mpu4vid_state::mpu4_vid_addlad(machine_config& config)
 	mpu4_vid(config);
 
 	MPU4_CHARACTERISER_PAL(config, m_characteriser);
-	m_characteriser->set_use_pal_equation(true);
 	m_characteriser->set_protnext_cb(FUNC(mpu4vid_state::addlad_chr_next));
 }
 
@@ -2395,7 +2389,6 @@ void mpu4vid_state::mating(machine_config &config)
 	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4oki_68k_map);
 
 	MPU4_CHARACTERISER_PAL(config, m_characteriser);
-	m_characteriser->set_use_pal_equation(true);
 	m_characteriser->set_protnext_cb(FUNC(mpu4vid_state::mating_chr_next));
 }
 
@@ -4200,7 +4193,6 @@ ROM_START( v4sklcsh )
 ROM_END
 
 
-
 ROM_START( v4tmach )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	VID_BIOS
@@ -4211,17 +4203,11 @@ ROM_START( v4tmach )
 	ROM_LOAD16_BYTE( "tm20.p3",  0x020000, 0x010000,  CRC(efd3ae64) SHA1(9d2a3b65048e04842205751c6921d2550f38bd52) )
 	ROM_LOAD16_BYTE( "tm20.p4",  0x020001, 0x010000,  CRC(602ba3fb) SHA1(7243f58df9a26adfd1a149a1e60630b187787dd0) )
 	// questions can go in any slot, game detects what is installed
-	// these appear to work
-	ROM_LOAD16_BYTE( "issue1_q1", 0x040000, 0x010000, CRC(6af4d58b) SHA1(ee547dad30cd9940f0b017caac97aeb046604f22) ) // ISSUE1 Q1
-	ROM_LOAD16_BYTE( "issue1_q2", 0x040001, 0x010000, CRC(b01b7687) SHA1(99db448d7e40c2ec16afef3c10abc8a9493f2ab4) ) // ISSUE1 Q2
-	ROM_LOAD16_BYTE( "issue1_q3", 0x060000, 0x010000, CRC(e97f14eb) SHA1(9163d11e1bc5a13d5002a13bc18b65a91e1738c7) ) // ISSUE1 Q3
-	ROM_LOAD16_BYTE( "issue1_q4", 0x060001, 0x010000, CRC(6134d918) SHA1(e4b4d6b08d94729d4dcca474d4c7bdcb267530a8) ) // ISSUE1 Q4
-	ROM_LOAD16_BYTE( "issue1_q5", 0x080000, 0x010000, CRC(6c07814b) SHA1(a97feada5cfa1bb059837b292637fbad9c7137ac) ) // ISSUE1 Q5
-	ROM_LOAD16_BYTE( "issue1_q6", 0x080001, 0x010000, CRC(5f16a536) SHA1(3435282bfb940604fb44e06dc4748e668768f286) ) // ISSUE1 Q6
-	ROM_LOAD16_BYTE( "issue1_q7", 0x0a0000, 0x010000, CRC(9afdce0b) SHA1(a969038d9ce2a2cff1e1a75959c05a3f03f08235) ) // ISSUE1 Q7
-	ROM_LOAD16_BYTE( "issue1_q8", 0x0a0001, 0x010000, CRC(f1878251) SHA1(b6a8527112bcdf21b9a0acab4d8fa507a96aaba7) ) // ISSUE1 Q8
-	ROM_LOAD16_BYTE( "issue1_q9", 0x0c0000, 0x010000, CRC(ace01faa) SHA1(79d6247a74e1bce0d76ea3788d0022d9e50173c4) ) // ISSUE1 Q9
-	ROM_LOAD16_BYTE( "issue1_q10",0x0c0001, 0x010000, CRC(021f4523) SHA1(10884665f5700c147c7035d0c98f3889917ff015) ) // ISSUE1 Q10
+	ROM_LOAD16_BYTE( "issue3_q16" , 0x040000, 0x010000,  CRC(ce2bf15e) SHA1(29c7f2e718bce415b0b8dc6d902bf74dad6b1ef4) ) // ISSUE3 Q16
+	ROM_LOAD16_BYTE( "issue3_q17",  0x040001, 0x010000,  CRC(5cab773e) SHA1(59a235c51a975b341bdbb88e909729507408f75b) ) // ISSUE3 Q17
+	ROM_LOAD16_BYTE( "issue3_q18",  0x060000, 0x010000,  CRC(27de90b3) SHA1(625c98e555f7b627ea96653926b8917996a2fdb7) ) // ISSUE3 Q18
+	ROM_LOAD16_BYTE( "issue3_q19",  0x060001, 0x010000,  CRC(083f6c65) SHA1(291ad39ee5f8eba9da293d9206b1f6a6d852f9bd) ) // ISSUE3 Q19
+	ROM_LOAD16_BYTE( "issue3_q20",  0x080000, 0x010000,  CRC(73747644) SHA1(ae252fc95c069a3c82e155220fbfcb74dd43bf89) ) // ISSUE3 Q20
 ROM_END
 
 ROM_START( v4tmachd )
@@ -4234,49 +4220,6 @@ ROM_START( v4tmachd )
 	ROM_LOAD16_BYTE( "tm20.p3",  0x020000, 0x010000,  CRC(efd3ae64) SHA1(9d2a3b65048e04842205751c6921d2550f38bd52) )
 	ROM_LOAD16_BYTE( "tm20.p4",  0x020001, 0x010000,  CRC(602ba3fb) SHA1(7243f58df9a26adfd1a149a1e60630b187787dd0) )
 	// questions can go in any slot, game detects what is installed
-	// these appear to work
-	ROM_LOAD16_BYTE( "issue1_q1", 0x040000, 0x010000, CRC(6af4d58b) SHA1(ee547dad30cd9940f0b017caac97aeb046604f22) ) // ISSUE1 Q1
-	ROM_LOAD16_BYTE( "issue1_q2", 0x040001, 0x010000, CRC(b01b7687) SHA1(99db448d7e40c2ec16afef3c10abc8a9493f2ab4) ) // ISSUE1 Q2
-	ROM_LOAD16_BYTE( "issue1_q3", 0x060000, 0x010000, CRC(e97f14eb) SHA1(9163d11e1bc5a13d5002a13bc18b65a91e1738c7) ) // ISSUE1 Q3
-	ROM_LOAD16_BYTE( "issue1_q4", 0x060001, 0x010000, CRC(6134d918) SHA1(e4b4d6b08d94729d4dcca474d4c7bdcb267530a8) ) // ISSUE1 Q4
-	ROM_LOAD16_BYTE( "issue1_q5", 0x080000, 0x010000, CRC(6c07814b) SHA1(a97feada5cfa1bb059837b292637fbad9c7137ac) ) // ISSUE1 Q5
-	ROM_LOAD16_BYTE( "issue1_q6", 0x080001, 0x010000, CRC(5f16a536) SHA1(3435282bfb940604fb44e06dc4748e668768f286) ) // ISSUE1 Q6
-	ROM_LOAD16_BYTE( "issue1_q7", 0x0a0000, 0x010000, CRC(9afdce0b) SHA1(a969038d9ce2a2cff1e1a75959c05a3f03f08235) ) // ISSUE1 Q7
-	ROM_LOAD16_BYTE( "issue1_q8", 0x0a0001, 0x010000, CRC(f1878251) SHA1(b6a8527112bcdf21b9a0acab4d8fa507a96aaba7) ) // ISSUE1 Q8
-	ROM_LOAD16_BYTE( "issue1_q9", 0x0c0000, 0x010000, CRC(ace01faa) SHA1(79d6247a74e1bce0d76ea3788d0022d9e50173c4) ) // ISSUE1 Q9
-	ROM_LOAD16_BYTE( "issue1_q10",0x0c0001, 0x010000, CRC(021f4523) SHA1(10884665f5700c147c7035d0c98f3889917ff015) ) // ISSUE1 Q10
-ROM_END
-
-
-ROM_START( v4tmach3 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	VID_BIOS
-
-	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD16_BYTE( "tm20.p1",  0x000000, 0x010000,  CRC(6919697c) SHA1(786d7b9ab218dbf54ff839d1f83580c409c725b3) )
-	ROM_LOAD16_BYTE( "tm20.p2",  0x000001, 0x010000,  CRC(d13b56e4) SHA1(623e73995da93c07b51ce0a5843dba1f853529dd) )
-	ROM_LOAD16_BYTE( "tm20.p3",  0x020000, 0x010000,  CRC(efd3ae64) SHA1(9d2a3b65048e04842205751c6921d2550f38bd52) )
-	ROM_LOAD16_BYTE( "tm20.p4",  0x020001, 0x010000,  CRC(602ba3fb) SHA1(7243f58df9a26adfd1a149a1e60630b187787dd0) )
-	// questions can go in any slot, game detects what is installed
-	// Uses the inferred issue-select output in timemchn_chr_next.
-	ROM_LOAD16_BYTE( "issue3_q16" , 0x040000, 0x010000,  CRC(ce2bf15e) SHA1(29c7f2e718bce415b0b8dc6d902bf74dad6b1ef4) ) // ISSUE3 Q16
-	ROM_LOAD16_BYTE( "issue3_q17",  0x040001, 0x010000,  CRC(5cab773e) SHA1(59a235c51a975b341bdbb88e909729507408f75b) ) // ISSUE3 Q17
-	ROM_LOAD16_BYTE( "issue3_q18",  0x060000, 0x010000,  CRC(27de90b3) SHA1(625c98e555f7b627ea96653926b8917996a2fdb7) ) // ISSUE3 Q18
-	ROM_LOAD16_BYTE( "issue3_q19",  0x060001, 0x010000,  CRC(083f6c65) SHA1(291ad39ee5f8eba9da293d9206b1f6a6d852f9bd) ) // ISSUE3 Q19
-	ROM_LOAD16_BYTE( "issue3_q20",  0x080000, 0x010000,  CRC(73747644) SHA1(ae252fc95c069a3c82e155220fbfcb74dd43bf89) ) // ISSUE3 Q20
-ROM_END
-
-ROM_START( v4tmach3d )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	VID_BIOS
-
-	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD16_BYTE( "tmd.p1",   0x000000, 0x010000,  CRC(e21045e0) SHA1(c4d0e80970ec8558db777a882edc5a0c80767375) )
-	ROM_LOAD16_BYTE( "tm20.p2",  0x000001, 0x010000,  CRC(d13b56e4) SHA1(623e73995da93c07b51ce0a5843dba1f853529dd) )
-	ROM_LOAD16_BYTE( "tm20.p3",  0x020000, 0x010000,  CRC(efd3ae64) SHA1(9d2a3b65048e04842205751c6921d2550f38bd52) )
-	ROM_LOAD16_BYTE( "tm20.p4",  0x020001, 0x010000,  CRC(602ba3fb) SHA1(7243f58df9a26adfd1a149a1e60630b187787dd0) )
-	// questions can go in any slot, game detects what is installed
-	// Uses the inferred issue-select output in timemchn_chr_next.
 	ROM_LOAD16_BYTE( "issue3_q16" , 0x040000, 0x010000,  CRC(ce2bf15e) SHA1(29c7f2e718bce415b0b8dc6d902bf74dad6b1ef4) ) // ISSUE3 Q16
 	ROM_LOAD16_BYTE( "issue3_q17",  0x040001, 0x010000,  CRC(5cab773e) SHA1(59a235c51a975b341bdbb88e909729507408f75b) ) // ISSUE3 Q17
 	ROM_LOAD16_BYTE( "issue3_q18",  0x060000, 0x010000,  CRC(27de90b3) SHA1(625c98e555f7b627ea96653926b8917996a2fdb7) ) // ISSUE3 Q18
@@ -4294,14 +4237,12 @@ ROM_START( v4tmach2 )
 	ROM_LOAD16_BYTE( "tm20.p3",  0x020000, 0x010000,  CRC(efd3ae64) SHA1(9d2a3b65048e04842205751c6921d2550f38bd52) )
 	ROM_LOAD16_BYTE( "tm20.p4",  0x020001, 0x010000,  CRC(602ba3fb) SHA1(7243f58df9a26adfd1a149a1e60630b187787dd0) )
 	// questions can go in any slot, game detects what is installed
-	// Uses the inferred issue-select output in timemchn_chr_next.
 	ROM_LOAD16_BYTE( "issue2_q11" ,  0x040000, 0x010000,  CRC(e8ed736f) SHA1(e7068c550aa39a6e8f1692a16794147e996d36b4) ) // ISSUE2 Q11
 	ROM_LOAD16_BYTE( "issue2_q12" ,  0x040001, 0x010000,  BAD_DUMP CRC(adddd8a7) SHA1(73a8dd191eda2f4b41b79d4b55723731953b8970) ) // ISSUE2 Q12 // corrupt header signature and checksum; needs redumping
 	ROM_LOAD16_BYTE( "issue2_q13" ,  0x060000, 0x010000,  CRC(3de147dd) SHA1(d2111d54d1604fe2da0133102bbfee706f8f542e) ) // ISSUE2 Q13
 	ROM_LOAD16_BYTE( "issue2_q14" ,  0x060001, 0x010000,  CRC(02abb026) SHA1(42224678e5913090c91c21672661beb8e27127a8) ) // ISSUE2 Q14
 	ROM_LOAD16_BYTE( "issue2_q15" ,  0x080000, 0x010000,  CRC(7894ac8b) SHA1(dc46bd108ac4f67a9062bb7ace91aa51f069cbc8) ) // ISSUE2 Q15
 ROM_END
-
 
 ROM_START( v4tmach2d )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -4313,13 +4254,57 @@ ROM_START( v4tmach2d )
 	ROM_LOAD16_BYTE( "tm20.p3",  0x020000, 0x010000,  CRC(efd3ae64) SHA1(9d2a3b65048e04842205751c6921d2550f38bd52) )
 	ROM_LOAD16_BYTE( "tm20.p4",  0x020001, 0x010000,  CRC(602ba3fb) SHA1(7243f58df9a26adfd1a149a1e60630b187787dd0) )
 	// questions can go in any slot, game detects what is installed
-	// Uses the inferred issue-select output in timemchn_chr_next.
 	ROM_LOAD16_BYTE( "issue2_q11" ,  0x040000, 0x010000,  CRC(e8ed736f) SHA1(e7068c550aa39a6e8f1692a16794147e996d36b4) ) // ISSUE2 Q11
 	ROM_LOAD16_BYTE( "issue2_q12" ,  0x040001, 0x010000,  BAD_DUMP CRC(adddd8a7) SHA1(73a8dd191eda2f4b41b79d4b55723731953b8970) ) // ISSUE2 Q12 // corrupt header signature and checksum; needs redumping
 	ROM_LOAD16_BYTE( "issue2_q13" ,  0x060000, 0x010000,  CRC(3de147dd) SHA1(d2111d54d1604fe2da0133102bbfee706f8f542e) ) // ISSUE2 Q13
 	ROM_LOAD16_BYTE( "issue2_q14" ,  0x060001, 0x010000,  CRC(02abb026) SHA1(42224678e5913090c91c21672661beb8e27127a8) ) // ISSUE2 Q14
 	ROM_LOAD16_BYTE( "issue2_q15" ,  0x080000, 0x010000,  CRC(7894ac8b) SHA1(dc46bd108ac4f67a9062bb7ace91aa51f069cbc8) ) // ISSUE2 Q15
 ROM_END
+
+ROM_START( v4tmach1 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "tm20.p1",  0x000000, 0x010000,  CRC(6919697c) SHA1(786d7b9ab218dbf54ff839d1f83580c409c725b3) )
+	ROM_LOAD16_BYTE( "tm20.p2",  0x000001, 0x010000,  CRC(d13b56e4) SHA1(623e73995da93c07b51ce0a5843dba1f853529dd) )
+	ROM_LOAD16_BYTE( "tm20.p3",  0x020000, 0x010000,  CRC(efd3ae64) SHA1(9d2a3b65048e04842205751c6921d2550f38bd52) )
+	ROM_LOAD16_BYTE( "tm20.p4",  0x020001, 0x010000,  CRC(602ba3fb) SHA1(7243f58df9a26adfd1a149a1e60630b187787dd0) )
+	// questions can go in any slot, game detects what is installed
+	ROM_LOAD16_BYTE( "issue1_q1", 0x040000, 0x010000, CRC(6af4d58b) SHA1(ee547dad30cd9940f0b017caac97aeb046604f22) ) // ISSUE1 Q1
+	ROM_LOAD16_BYTE( "issue1_q2", 0x040001, 0x010000, CRC(b01b7687) SHA1(99db448d7e40c2ec16afef3c10abc8a9493f2ab4) ) // ISSUE1 Q2
+	ROM_LOAD16_BYTE( "issue1_q3", 0x060000, 0x010000, CRC(e97f14eb) SHA1(9163d11e1bc5a13d5002a13bc18b65a91e1738c7) ) // ISSUE1 Q3
+	ROM_LOAD16_BYTE( "issue1_q4", 0x060001, 0x010000, CRC(6134d918) SHA1(e4b4d6b08d94729d4dcca474d4c7bdcb267530a8) ) // ISSUE1 Q4
+	ROM_LOAD16_BYTE( "issue1_q5", 0x080000, 0x010000, CRC(6c07814b) SHA1(a97feada5cfa1bb059837b292637fbad9c7137ac) ) // ISSUE1 Q5
+	ROM_LOAD16_BYTE( "issue1_q6", 0x080001, 0x010000, CRC(5f16a536) SHA1(3435282bfb940604fb44e06dc4748e668768f286) ) // ISSUE1 Q6
+	ROM_LOAD16_BYTE( "issue1_q7", 0x0a0000, 0x010000, CRC(9afdce0b) SHA1(a969038d9ce2a2cff1e1a75959c05a3f03f08235) ) // ISSUE1 Q7
+	ROM_LOAD16_BYTE( "issue1_q8", 0x0a0001, 0x010000, CRC(f1878251) SHA1(b6a8527112bcdf21b9a0acab4d8fa507a96aaba7) ) // ISSUE1 Q8
+	ROM_LOAD16_BYTE( "issue1_q9", 0x0c0000, 0x010000, CRC(ace01faa) SHA1(79d6247a74e1bce0d76ea3788d0022d9e50173c4) ) // ISSUE1 Q9
+	ROM_LOAD16_BYTE( "issue1_q10",0x0c0001, 0x010000, CRC(021f4523) SHA1(10884665f5700c147c7035d0c98f3889917ff015) ) // ISSUE1 Q10
+ROM_END
+
+ROM_START( v4tmach1d )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	VID_BIOS
+
+	ROM_REGION( 0x800000, "video", 0 )
+	ROM_LOAD16_BYTE( "tmd.p1",   0x000000, 0x010000,  CRC(e21045e0) SHA1(c4d0e80970ec8558db777a882edc5a0c80767375) )
+	ROM_LOAD16_BYTE( "tm20.p2",  0x000001, 0x010000,  CRC(d13b56e4) SHA1(623e73995da93c07b51ce0a5843dba1f853529dd) )
+	ROM_LOAD16_BYTE( "tm20.p3",  0x020000, 0x010000,  CRC(efd3ae64) SHA1(9d2a3b65048e04842205751c6921d2550f38bd52) )
+	ROM_LOAD16_BYTE( "tm20.p4",  0x020001, 0x010000,  CRC(602ba3fb) SHA1(7243f58df9a26adfd1a149a1e60630b187787dd0) )
+	// questions can go in any slot, game detects what is installed
+	ROM_LOAD16_BYTE( "issue1_q1", 0x040000, 0x010000, CRC(6af4d58b) SHA1(ee547dad30cd9940f0b017caac97aeb046604f22) ) // ISSUE1 Q1
+	ROM_LOAD16_BYTE( "issue1_q2", 0x040001, 0x010000, CRC(b01b7687) SHA1(99db448d7e40c2ec16afef3c10abc8a9493f2ab4) ) // ISSUE1 Q2
+	ROM_LOAD16_BYTE( "issue1_q3", 0x060000, 0x010000, CRC(e97f14eb) SHA1(9163d11e1bc5a13d5002a13bc18b65a91e1738c7) ) // ISSUE1 Q3
+	ROM_LOAD16_BYTE( "issue1_q4", 0x060001, 0x010000, CRC(6134d918) SHA1(e4b4d6b08d94729d4dcca474d4c7bdcb267530a8) ) // ISSUE1 Q4
+	ROM_LOAD16_BYTE( "issue1_q5", 0x080000, 0x010000, CRC(6c07814b) SHA1(a97feada5cfa1bb059837b292637fbad9c7137ac) ) // ISSUE1 Q5
+	ROM_LOAD16_BYTE( "issue1_q6", 0x080001, 0x010000, CRC(5f16a536) SHA1(3435282bfb940604fb44e06dc4748e668768f286) ) // ISSUE1 Q6
+	ROM_LOAD16_BYTE( "issue1_q7", 0x0a0000, 0x010000, CRC(9afdce0b) SHA1(a969038d9ce2a2cff1e1a75959c05a3f03f08235) ) // ISSUE1 Q7
+	ROM_LOAD16_BYTE( "issue1_q8", 0x0a0001, 0x010000, CRC(f1878251) SHA1(b6a8527112bcdf21b9a0acab4d8fa507a96aaba7) ) // ISSUE1 Q8
+	ROM_LOAD16_BYTE( "issue1_q9", 0x0c0000, 0x010000, CRC(ace01faa) SHA1(79d6247a74e1bce0d76ea3788d0022d9e50173c4) ) // ISSUE1 Q9
+	ROM_LOAD16_BYTE( "issue1_q10",0x0c0001, 0x010000, CRC(021f4523) SHA1(10884665f5700c147c7035d0c98f3889917ff015) ) // ISSUE1 Q10
+ROM_END
+
 
 ROM_START( v4mate )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -4446,7 +4431,6 @@ ROM_START( v4strike )
 	ROM_LOAD16_BYTE( "sil.p5",  0x080000, 0x020000,  CRC(28bced09) SHA1(7ba5013f1e0f4e921581b23c4a1d4c005a043b66) )
 	ROM_LOAD16_BYTE( "sil.p6",  0x080001, 0x020000,  CRC(6f5fc296) SHA1(bd32a937581df6b5a4f08e6ef40c37a2b4278936) )
 
-	// Uses the inferred issue-3 acceptance in strike_chr_next.
 	ROM_LOAD16_BYTE( "silq-1.bin",  0x0c0000, 0x020000,  CRC(03332145) SHA1(1700f76622a4b195e3ce03d89b886060d7f3ba71) ) // ISSUE3 Q1 v3.1 ('N' questions) (normal)
 	ROM_LOAD16_BYTE( "silq-2.bin",  0x0c0001, 0x020000,  CRC(9659b0cb) SHA1(c573752ef40c8501907d0e41ed2d2566a2dddcb8) ) // ISSUE3 Q2 v3.1 ('N' questions)
 	ROM_LOAD16_BYTE( "silq-3.bin",  0x100000, 0x020000,  CRC(443a6c2d) SHA1(1c111d801d76b07cdfef2b465f7ac759331f1843) ) // ISSUE3 Q3 v3.1 ('N' questions)
@@ -4468,7 +4452,6 @@ ROM_START( v4striked )
 	ROM_LOAD16_BYTE( "sil.p5",  0x080000, 0x020000,  CRC(28bced09) SHA1(7ba5013f1e0f4e921581b23c4a1d4c005a043b66) )
 	ROM_LOAD16_BYTE( "sil.p6",  0x080001, 0x020000,  CRC(6f5fc296) SHA1(bd32a937581df6b5a4f08e6ef40c37a2b4278936) )
 
-	// Uses the inferred issue-3 acceptance in strike_chr_next.
 	ROM_LOAD16_BYTE( "silq-1.bin",  0x0c0000, 0x020000,  CRC(03332145) SHA1(1700f76622a4b195e3ce03d89b886060d7f3ba71) ) // ISSUE3 Q1 v3.1 ('N' questions) (normal)
 	ROM_LOAD16_BYTE( "silq-2.bin",  0x0c0001, 0x020000,  CRC(9659b0cb) SHA1(c573752ef40c8501907d0e41ed2d2566a2dddcb8) ) // ISSUE3 Q2 v3.1 ('N' questions)
 	ROM_LOAD16_BYTE( "silq-3.bin",  0x100000, 0x020000,  CRC(443a6c2d) SHA1(1c111d801d76b07cdfef2b465f7ac759331f1843) ) // ISSUE3 Q3 v3.1 ('N' questions)
@@ -8878,8 +8861,6 @@ GAMEL(  199?, v4strike2d, v4strike, mpu4_vid_strike,   strike,   mpu4vid_state, 
 GAMEL(  199?, v4barqst,   v4bios,   mpu4_vid_barquest,   barquest,  mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Barquest (v2.6) (MPU4 Video)",GAME_FLAGS_OK,layout_v4barqst )
 GAMEL(  199?, v4barqstd,  v4barqst, mpu4_vid_barquest,   barquest,  mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Barquest (v2.6d) (MPU4 Video)",GAME_FLAGS_OK,layout_v4barqst )
 
-/* Quiz games - Questions not decoded properly on games below (no complete characteriser table) */
-
 // 00 1c 6c a4 0c 24 0c 34 94 94 44 5c 6c 24 1c ac 64 1c ec 64 0c a4 0c 24 1c ac e4 1c 2c a4 0c a4 0c 24 5c ec e4 1c ac 24 1c 6c 60 0c 34 04 0c 24 9c ec a4 4c 24 9c ec 24 0c 34 04 1c ec 24 9c 00
 GAME(  199?, v4turnov,   v4bios,    mpu4_vid_turnov,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4turnova,  v4turnov,  mpu4_vid_turnov,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.33) (MPU4 Video)",GAME_FLAGS ) // the 2nd 3 is likely be a machine type, because much like Strike It Lucky and Wize Move the pairing 68k ROM doesn't change
@@ -8891,13 +8872,12 @@ GAME(  1990, v4skltrk,   v4bios,    mpu4_vid_skilltrk,   skiltrek, mpu4vid_state
 GAME(  1990, v4skltrka,  v4skltrk,  mpu4_vid_skilltrk,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 2)",GAME_FLAGS ) // 12 pound max
 
 // 00 2c 94 14 04 0c c4 0c d4 64 0c b4 04 0c 84 5c dc 9c dc 9c dc cc 84 0c 84 0c d4 04 2c c4 0c c4 0c 84 1c dc dc 8c d4 44 2c 94 20 0c a4 0c c4 0c d4 14 14 54 04 6c c4 4c c4 0c c4 2c c4 0c d4 00
-GAME(  1989, v4tmach,    v4bios,    mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 1 Questions) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmachd,   v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 1 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
-// mismatched questions? (or security?)
-GAME(  1989, v4tmach3,   v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 3 Questions) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmach3d,  v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 3 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach,    v4bios,    mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 3 Questions) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmachd,   v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 3 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
 GAME(  1989, v4tmach2,   v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 2 Questions) (MPU4 Video)",GAME_FLAGS )
 GAME(  1989, v4tmach2d,  v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 2 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach1,   v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 1 Questions) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach1d,  v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 1 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
 
 /* Quiz games - Games below are missing question ROMs */
 

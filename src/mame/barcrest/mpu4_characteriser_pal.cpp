@@ -51,7 +51,6 @@ mpu4_characteriser_pal::mpu4_characteriser_pal(const machine_config &mconfig, de
 	m_current_lamp_table(nullptr),
 	m_lamp_col(0),
 	m_4krow(0),
-	m_is_4ksim(false),
 	m_nextprotcb(*this),
     m_protregion(*this, "fakechr")
 {
@@ -64,6 +63,10 @@ void mpu4_characteriser_pal::device_start()
 
 	m_temp_debug_write_count = 0;
 	m_nextprotcb.resolve();
+
+	save_item(NAME(m_prot_col));
+	save_item(NAME(m_4krow));
+	save_item(NAME(m_lamp_col));
 }
 
 void mpu4_characteriser_pal::device_reset()
@@ -97,7 +100,7 @@ void mpu4_characteriser_pal::protection_w(uint8_t data)
 	}
 	else
 	{
-		if (m_is_4ksim)
+		if (!m_nextprotcb.isnull())
 		{
 			m_prot_col = data & 0x3f; // 6-bit writes (upper 2 bits unused)
 		}
@@ -184,8 +187,11 @@ uint8_t mpu4_characteriser_pal::protection_r()
 	{
 		// for paths where the PAL equations are used (currently the quiz games)
 		uint8_t ns = m_nextprotcb(m_4krow, m_prot_col);
-		m_4krow = ns;
-		return ns << 2;;
+
+		if (!machine().side_effects_disabled())
+			m_4krow = ns;
+
+		return ns << 2;
 	}
 
 	if (m_allow_6800_cheat || m_allow_6809_cheat || m_allow_68k_cheat)
