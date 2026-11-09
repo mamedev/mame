@@ -1917,6 +1917,8 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x06:  // INTCXROMOFF
+			if (m_intcxrom)
+				m_intc8rom = false; // undocumented behavior, differs from IIe
 			m_intcxrom = false;
 			update_slotrom_banks();
 			break;
@@ -2254,6 +2256,9 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x68: // STATEREG
+			if (m_intcxrom && !(data & 0x01))
+				m_intc8rom = false; // undocumented behavior, differs from IIe
+
 			m_altzp = (data & 0x80);
 			m_video->scr_w(data & 0x40);
 			m_ramrd = (data & 0x20);
