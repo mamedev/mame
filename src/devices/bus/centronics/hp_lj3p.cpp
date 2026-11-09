@@ -54,8 +54,9 @@ Additional notes
     Canon engine with the MP tray and the optional lower cassette as
     configuration settings, the glyph/rule merger and the band video output.
     Printed pages are saved as PNG files (300 dpi) in the snapshot
-    directory and shown in a paper view, which the layout shows next to
-    the control panel (display, six keys, On Line and Form Feed indicators).
+    directory and shown in a paper view; the layout puts the control panel
+    (display, six keys, On Line and Form Feed indicators) under the paper,
+    with the computer's first screen on the left.
 
     Implementation notes:
     - serial port: MC6850 compatible ACIA at 300000 on IRQ 6; the baud rate

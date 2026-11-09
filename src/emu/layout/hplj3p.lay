@@ -2,7 +2,7 @@
 <!--
 license:CC0-1.0
 copyright-holders:rfka01
-HP LaserJet IIIP: paper and control panel
+HP LaserJet IIIP: computer, paper and control panel
 -->
 <mamelayout version="2">
 	<element name="case"><rect><color red="0.89" green="0.87" blue="0.80" /></rect></element>
@@ -34,66 +34,52 @@ HP LaserJet IIIP: paper and control panel
 	<element name="t_minus"><text string="-"><color red="0.15" green="0.15" blue="0.15" /></text></element>
 	<element name="t_model"><text string="HP LaserJet IIIP" align="1"><color red="0.30" green="0.30" blue="0.34" /></text></element>
 
-	<view name="Paper and Control Panel">
-		<screen tag="paper"><bounds x="0" y="0" width="637" height="877" /></screen>
-
-		<element ref="case"><bounds x="650" y="0" width="420" height="300" /></element>
-		<element ref="case_dark"><bounds x="650" y="0" width="420" height="6" /></element>
-		<element ref="t_model"><bounds x="670" y="250" width="300" height="28" /></element>
+	<!-- control panel, as wide as the paper view -->
+	<group name="panel">
+		<element ref="case"><bounds x="0" y="0" width="637" height="200" /></element>
+		<element ref="case_dark"><bounds x="0" y="0" width="637" height="6" /></element>
 
 		<!-- indicators left of the key rows -->
-		<element name="hplj3p_online_led" ref="led_green"><bounds x="668" y="58" width="8" height="34" /></element>
-		<element name="hplj3p_formfeed_led" ref="led_amber"><bounds x="668" y="128" width="8" height="34" /></element>
+		<element name="hplj3p_online_led" ref="led_green"><bounds x="24" y="30" width="10" height="56" /></element>
+		<element name="hplj3p_formfeed_led" ref="led_amber"><bounds x="24" y="114" width="10" height="56" /></element>
 
 		<!-- keys: primary function above, Alt function below -->
-		<element ref="key" inputtag="KEYS" inputmask="0x01"><bounds x="686" y="50" width="80" height="50" /></element>
-		<element ref="t_online"><bounds x="690" y="56" width="72" height="16" /></element>
-		<element ref="t_reset"><bounds x="690" y="78" width="72" height="14" /></element>
-		<element ref="key" inputtag="KEYS" inputmask="0x04"><bounds x="776" y="50" width="80" height="50" /></element>
-		<element ref="t_menu"><bounds x="780" y="56" width="72" height="16" /></element>
-		<element ref="t_fonts"><bounds x="780" y="78" width="72" height="14" /></element>
-		<element ref="key" inputtag="KEYS" inputmask="0x08"><bounds x="866" y="50" width="80" height="50" /></element>
-		<element ref="t_enter"><bounds x="870" y="56" width="72" height="16" /></element>
-		<element ref="t_test"><bounds x="870" y="78" width="72" height="14" /></element>
+		<element ref="key" inputtag="KEYS" inputmask="0x01"><bounds x="46" y="24" width="110" height="68" /></element>
+		<element ref="t_online"><bounds x="52" y="32" width="98" height="22" /></element>
+		<element ref="t_reset"><bounds x="52" y="62" width="98" height="18" /></element>
+		<element ref="key" inputtag="KEYS" inputmask="0x04"><bounds x="168" y="24" width="110" height="68" /></element>
+		<element ref="t_menu"><bounds x="174" y="32" width="98" height="22" /></element>
+		<element ref="t_fonts"><bounds x="174" y="62" width="98" height="18" /></element>
+		<element ref="key" inputtag="KEYS" inputmask="0x08"><bounds x="290" y="24" width="110" height="68" /></element>
+		<element ref="t_enter"><bounds x="296" y="32" width="98" height="22" /></element>
+		<element ref="t_test"><bounds x="296" y="62" width="98" height="18" /></element>
 
-		<element ref="key" inputtag="KEYS" inputmask="0x02"><bounds x="686" y="120" width="80" height="50" /></element>
-		<element ref="t_ff"><bounds x="690" y="126" width="72" height="16" /></element>
-		<element ref="t_cont"><bounds x="690" y="148" width="72" height="14" /></element>
-		<element ref="key" inputtag="KEYS" inputmask="0x20"><bounds x="776" y="120" width="80" height="50" /></element>
-		<element ref="t_alt"><bounds x="780" y="134" width="72" height="18" /></element>
-		<element ref="key" inputtag="KEYS" inputmask="0x10"><bounds x="866" y="120" width="80" height="50" /></element>
-		<element ref="t_plus"><bounds x="870" y="124" width="72" height="20" /></element>
-		<element ref="t_minus"><bounds x="870" y="146" width="72" height="20" /></element>
+		<element ref="key" inputtag="KEYS" inputmask="0x02"><bounds x="46" y="108" width="110" height="68" /></element>
+		<element ref="t_ff"><bounds x="52" y="116" width="98" height="22" /></element>
+		<element ref="t_cont"><bounds x="52" y="146" width="98" height="18" /></element>
+		<element ref="key" inputtag="KEYS" inputmask="0x20"><bounds x="168" y="108" width="110" height="68" /></element>
+		<element ref="t_alt"><bounds x="174" y="130" width="98" height="24" /></element>
+		<element ref="key" inputtag="KEYS" inputmask="0x10"><bounds x="290" y="108" width="110" height="68" /></element>
+		<element ref="t_plus"><bounds x="296" y="112" width="98" height="28" /></element>
+		<element ref="t_minus"><bounds x="296" y="144" width="98" height="28" /></element>
 
 		<!-- display: two lines of eight characters -->
-		<element ref="bezel"><bounds x="958" y="62" width="100" height="44" /></element>
-		<element ref="lcd_back"><bounds x="962" y="66" width="92" height="36" /></element>
-		<screen tag="lcd"><bounds x="964" y="68" width="88" height="31" /></screen>
+		<element ref="bezel"><bounds x="420" y="30" width="196" height="82" /></element>
+		<element ref="lcd_back"><bounds x="426" y="36" width="184" height="70" /></element>
+		<screen tag="lcd"><bounds x="430" y="40" width="176" height="62" /></screen>
+
+		<element ref="t_model"><bounds x="420" y="140" width="196" height="30" /></element>
+	</group>
+
+	<!-- the computer's first screen (index 0), assumed 4:3, left of the paper -->
+	<view name="Computer, Paper and Control Panel">
+		<screen index="0"><bounds x="0" y="0" width="1449" height="1087" /></screen>
+		<screen tag="paper"><bounds x="1459" y="0" width="637" height="877" /></screen>
+		<group ref="panel"><bounds x="1459" y="887" width="637" height="200" /></group>
 	</view>
 
-	<view name="Control Panel">
-		<element ref="case"><bounds x="0" y="0" width="420" height="220" /></element>
-		<element name="hplj3p_online_led" ref="led_green"><bounds x="18" y="58" width="8" height="34" /></element>
-		<element name="hplj3p_formfeed_led" ref="led_amber"><bounds x="18" y="128" width="8" height="34" /></element>
-		<element ref="key" inputtag="KEYS" inputmask="0x01"><bounds x="36" y="50" width="80" height="50" /></element>
-		<element ref="t_online"><bounds x="40" y="56" width="72" height="16" /></element>
-		<element ref="t_reset"><bounds x="40" y="78" width="72" height="14" /></element>
-		<element ref="key" inputtag="KEYS" inputmask="0x04"><bounds x="126" y="50" width="80" height="50" /></element>
-		<element ref="t_menu"><bounds x="130" y="56" width="72" height="16" /></element>
-		<element ref="t_fonts"><bounds x="130" y="78" width="72" height="14" /></element>
-		<element ref="key" inputtag="KEYS" inputmask="0x08"><bounds x="216" y="50" width="80" height="50" /></element>
-		<element ref="t_enter"><bounds x="220" y="56" width="72" height="16" /></element>
-		<element ref="t_test"><bounds x="220" y="78" width="72" height="14" /></element>
-		<element ref="key" inputtag="KEYS" inputmask="0x02"><bounds x="36" y="120" width="80" height="50" /></element>
-		<element ref="t_ff"><bounds x="40" y="126" width="72" height="16" /></element>
-		<element ref="t_cont"><bounds x="40" y="148" width="72" height="14" /></element>
-		<element ref="key" inputtag="KEYS" inputmask="0x20"><bounds x="126" y="120" width="80" height="50" /></element>
-		<element ref="t_alt"><bounds x="130" y="134" width="72" height="18" /></element>
-		<element ref="key" inputtag="KEYS" inputmask="0x10"><bounds x="216" y="120" width="80" height="50" /></element>
-		<element ref="t_plus"><bounds x="220" y="124" width="72" height="20" /></element>
-		<element ref="t_minus"><bounds x="220" y="146" width="72" height="20" /></element>
-		<element ref="bezel"><bounds x="308" y="62" width="100" height="44" /></element>
-		<element ref="lcd_back"><bounds x="312" y="66" width="92" height="36" /></element>
-		<screen tag="lcd"><bounds x="314" y="68" width="88" height="31" /></screen>
+	<view name="Paper and Control Panel">
+		<screen tag="paper"><bounds x="0" y="0" width="637" height="877" /></screen>
+		<group ref="panel"><bounds x="0" y="887" width="637" height="200" /></group>
 	</view>
 </mamelayout>
