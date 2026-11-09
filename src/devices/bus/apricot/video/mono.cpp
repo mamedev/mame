@@ -212,7 +212,7 @@ void apricot_mono_display_device::portb_w(uint8_t data)
 	// ---4----  video mode (alphanumeric/graphics)
 	// ----3---  display on
 	// -----21-  not used
-	// -------0  crtc reset
+	// -------0  crtc reset (active low)
 
 	m_portb = data;
 

@@ -156,7 +156,7 @@ protected:
 	bool m_supports_status_reg_d6;
 	bool m_supports_status_reg_d7;
 	bool m_supports_transparent;
-	bool m_reset_blanks_frame;  // DE and CURSOR off for the first frame after RESET
+	bool m_reset_hold_frame;  // DE and CURSOR off for the first frame after RESET
 
 	/* register file */
 	uint8_t   m_horiz_char_total;     /* 0x00 */
@@ -206,7 +206,7 @@ protected:
 	uint16_t  m_line_address;
 	int16_t   m_cursor_x;
 	bool      m_reset_held;     // RESET pin low
-	bool      m_reset_blank;    // first frame after RESET, DE and CURSOR held off
+	bool      m_reset_hold_active; // first frame after RESET, DE and CURSOR held off
 
 	/* timers */
 	emu_timer *m_line_timer;
@@ -252,7 +252,7 @@ protected:
 	bool is_row_end() const;
 	virtual bool check_cursor_visible(uint16_t ra, uint16_t line_addr);
 	TIMER_CALLBACK_MEMBER(handle_line_timer);
-	bool begin_frame();
+	bool reload_frame_counters();
 	void start_line(bool new_vsync);
 	TIMER_CALLBACK_MEMBER(de_off_tick);
 	TIMER_CALLBACK_MEMBER(cursor_on);
