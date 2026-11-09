@@ -3439,6 +3439,28 @@ ROM_START( queenbee123a )
 	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(c29dbf56) SHA1(3a8b4578bbfe994c2f42f6352ae5dd5dc22831a2) )
 ROM_END
 
+ROM_START( queenbee124a )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // H8/3044
+	// the H8 on this PCB is marked "SUBSINO SS2000 / 6433044A54F" and its internal ROM hasn't been
+	// dumped: the CRC-16 table at 0x100e is built with a different polynomial there, so the external ROM checksum check at
+	// 0x000344 fails and the game hangs. bp 340,1,{ER6=00082e1e;g} bypasses it for now.
+	ROM_LOAD( "ss9689_6433044a22f.u16",        0x000000, 0x008000, BAD_DUMP CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
+	ROM_LOAD( "queen_bee_c2_alpha1_v124a.u21", 0x080000, 0x040000, CRC(d771d5b0) SHA1(a5dc0b05f612e05e151ea3041440e9b53f813058) )
+	ROM_FILL(                                  0x0c0000, 0x040000, 0xff )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD16_BYTE( "queen-bee_alpha_3_v200.u43", 0x000001, 0x100000, CRC(7ef42192) SHA1(2f2b1143ce60b6b868bd3466634cff297c9a335f) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_IGNORE(                                              0x100000 )
+	ROM_LOAD16_BYTE( "queen-bee_alpha_4_v200.u44", 0x000000, 0x100000, CRC(7d135b7b) SHA1(71da2db3913198c709591e9640ab5ab9c0b404f8) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_IGNORE(                                              0x100000 )
+
+	ROM_REGION( 0x80000, "ss9x04", 0 )
+	ROM_LOAD( "queen-bee_alpha_2_v200.u9", 0x000000, 0x80000, CRC(c7cda990) SHA1(193144fe0c31fc8342bd44aa4899bf15f0bc399d) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(c29dbf56) SHA1(3a8b4578bbfe994c2f42f6352ae5dd5dc22831a2) )
+ROM_END
+
 ROM_START( queenbee107u )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // H8/3044
 	ROM_LOAD( "ss9689_6433044a22f.u16", 0x000000, 0x008000, CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
@@ -4335,7 +4357,7 @@ ROM_END
 ROM_START( dongshiz ) // default password is all bet
 	ROM_REGION( 0x100000, "maincpu", 0 ) // H8/3044
 	// the H8 on this PCB is different (probably the same as bigboss)and its internal ROM hasn't been
-	// dumped:  the CRC-16 table at 0x100e is built with a different polynomial there, so the external ROM checksum check at 
+	// dumped:  the CRC-16 table at 0x100e is built with a different polynomial there, so the external ROM checksum check at
 	// 0x000344 fails and the game hangs. bp 340,1,{ER6=00081f78;g} bypasses it for now.
 	ROM_LOAD( "ss9689_6433044a22f.u16", 0x000000, 0x008000, BAD_DUMP CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
 	ROM_LOAD( "mrboss_china_1_v212.u21", 0x080000, 0x040000, CRC(6148ea97) SHA1(7231b470b6279315e94f26ea7729340854f339a7) )
@@ -4394,6 +4416,7 @@ GAME( 2006, xplan,       0,        xplan,    xplan,    subsino2_state, empty_ini
 GAME( 2001, queenbee,    0,        humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Queen Bee (Ver. 114)",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
 GAME( 2001, queenbee117a,queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Queen Bee (Ver. 117)",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
 GAME( 2001, queenbee123a,queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Queen Bee (Ver. 123A)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
+GAME( 2001, queenbee124a,queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Queen Bee (Ver. 124A-C2)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
 GAME( 2001, queenbee107u,queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (USA, Ver. 107)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
 GAME( 2001, queenbeeb,   queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (Brazil, Ver. 202)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues, only program ROM available
 GAME( 2001, queenbeei,   queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (Israel, Ver. 100)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues, only program ROM available

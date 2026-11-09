@@ -1388,7 +1388,23 @@ ROM_START( cjdh2d ) // PCB-0674-03-IK. IGS036 + M6295 compatible + Altera EPM303
 ROM_END
 
 
-ROM_START( cjddzsp )
+ROM_START( cjddzsp ) // IGS PCB-0825-02-IU-2. Uses an unemulated DigiArt AM001 ADPCM & MP3 sound chip
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "cjddzsp_igs036.bin", 0x00000, 0x4000, CRC(1146d5f4) SHA1(910662ac3c1d3f3f94abdf0f654a2fb5d96b7b97) )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "cjddzsp_s127cn.u18",  0x000000, 0x200000, CRC(9840aa30) SHA1(98131721981ad1e7bfa1d0da56c3c406e9de26c2) )
+
+	ROM_REGION( 0x800000, "tt5665", 0 ) // samples
+	ROM_LOAD( "cjddzsp_s122cn.u27", 0x000000, 0x800000, CRC(bfd4b347) SHA1(3618793f45ae473812b421363eb30a78886c39c5) )
+
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROM_LOAD( "cjddzsp_s122cn.u28",  0x000000, 0x800000, CRC(c1dd1809) SHA1(ee542a661ae486f766f2353430dd1116dcb3c321) )
+	ROM_LOAD( "cjddzsp_s127cn.u30",  0x800000, 0x800000, CRC(08bab0db) SHA1(76bf0bbe921e13cc4fd3c1b7835c7c6ce90c7587) )
+ROM_END
+
+ROM_START( cjddzsp122cn )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "cjddzsp_igs036.bin", 0x00000, 0x4000, CRC(1146d5f4) SHA1(910662ac3c1d3f3f94abdf0f654a2fb5d96b7b97) )
@@ -1396,12 +1412,12 @@ ROM_START( cjddzsp )
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "cjddzsp_s122cn.u18",  0x000000, 0x200000, CRC(4a42aad6) SHA1(96805e5bfbd50686177fe50020229ea8787ade17) )
 
-	ROM_REGION( 0x800100, "tt5665", 0 ) // samples
-	ROM_LOAD( "cjddzsp_s122cn.u27", 0x000000, 0x800100, CRC(797e5ba3) SHA1(784fae513ac8cfd1143f0d0ce0936f74e2e64e48))
+	ROM_REGION( 0x800000, "tt5665", 0 ) // samples
+	ROM_LOAD( "cjddzsp_s122cn.u27", 0x000000, 0x800000, CRC(66e7e482) SHA1(452eae795238fb41dbd9521405b11ff09dd97205) )
 
-	ROM_REGION( 0x800100*2, "gfx", 0 )
-	ROM_LOAD( "cjddzsp_s122cn.u28",  0x000000, 0x800100, CRC(d0441a6b) SHA1(e1c948f94472398aa5887963cf8e87be28dd66e0) )
-	ROM_LOAD( "cjddzsp_s122cn.u30",  0x800100, 0x800100, CRC(e0e02a57) SHA1(96074a5226dd24d0bc150adff7324b5349cb5dc2) )
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROM_LOAD( "cjddzsp_s122cn.u28",  0x000000, 0x800000, CRC(c1dd1809) SHA1(ee542a661ae486f766f2353430dd1116dcb3c321) )
+	ROM_LOAD( "cjddzsp_s122cn.u30",  0x800000, 0x800000, CRC(cb82eaeb) SHA1(938258a8e96c0266d368dbc7c8cf6af110b1a3f1) )
 ROM_END
 
 
@@ -1949,9 +1965,9 @@ ROM_END
 ROM_START( hlqqq )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "igs036", 0x0000, 0x4000, NO_DUMP )
+	ROM_LOAD( "hlqqq_igs036.bin", 0x0000, 0x4000, CRC(9a752539) SHA1(38d40b344b308bc24e93b6fbd7e38f52089fc58b) )
 
-	ROM_REGION32_LE( 0x800000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "hlqqq_v100cn.u26", 0x000000, 0x200000, CRC(39fb6a4c) SHA1(fc391b74910c26c6b46c218dc387ca539fc4949f) )
 
 	ROM_REGION( 0x1000000, "oki", 0 ) // samples
@@ -1972,7 +1988,7 @@ ROM_START( qiaojidm )
 	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "igs036", 0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION32_LE( 0x800000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "qiaojidm_v100cn.u33", 0x000000, 0x200000, CRC(7eb744cd) SHA1(25976322f84001c56e053cf7d925b8a01184b50a) )
 
 	ROM_REGION( 0x800000, "oki", 0 ) // samples
@@ -2064,69 +2080,74 @@ void m036_base_state::init_jxry()
 
 // sets with OKI6295 for sound, 512x240 resolution
 
-GAME( 200?, jhzb,     0,     m036_oki_2mhz, jhzb,     m036_oki_state,      empty_init,      ROT0, "IGS",           "Jin Hua Zhengba (V113CN)", MACHINE_NOT_WORKING )
+GAME( 200?, jhzb,         0,       m036_oki_2mhz, jhzb,     m036_oki_state,      empty_init,      ROT0, "IGS",           "Jin Hua Zhengba (V113CN)", MACHINE_NOT_WORKING )
 
-GAME( 200?, jxry,     0,     m036_oki_2mhz, jxry,     m036_oki_state,      init_jxry,       ROT0, "IGS",           "Jixiang Ruyi (V116CN)", MACHINE_NOT_WORKING )
+GAME( 200?, jxry,         0,       m036_oki_2mhz, jxry,     m036_oki_state,      init_jxry,       ROT0, "IGS",           "Jixiang Ruyi (V116CN)", MACHINE_NOT_WORKING )
 
-GAME( 200?, huoqilin, 0,     m036_oki_2mhz, jxry,     m036_oki_state,      init_jxry,       ROT0, "IGS",           "Huo Qilin (V116CN)", MACHINE_NOT_WORKING )
+GAME( 200?, huoqilin,     0,       m036_oki_2mhz, jxry,     m036_oki_state,      init_jxry,       ROT0, "IGS",           "Huo Qilin (V116CN)", MACHINE_NOT_WORKING )
 
-GAME( 200?, dahuaxy,  0,     m036_boot,     hopper,   m036_oki_state,      empty_init,      ROT0, "IGS",           "Dahua Xiyou (V201CN)", MACHINE_NOT_WORKING )
+GAME( 200?, dahuaxy,      0,       m036_boot,     hopper,   m036_oki_state,      empty_init,      ROT0, "IGS",           "Dahua Xiyou (V201CN)", MACHINE_NOT_WORKING )
+
+// sets with a AM001 for sound, 512x240 resolution
+
+GAME( 200?, cjddzsp,      0,       m036_tt_boot,  ddz,      m036_tt_state,       empty_init,      ROT0, "IGS",           "Super Dou Di Zhu Special (V127CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // sets with a TT5665 for sound, 512x240 resolution
 
-GAME( 200?, cjddzsp,  0,     m036_tt_boot,  ddz,      m036_tt_state,       empty_init,      ROT0, "IGS",           "Super Dou Di Zhu Special (V122CN)", MACHINE_NOT_WORKING )
+GAME( 200?, cjddzsp122cn, cjddzsp, m036_tt_boot,  ddz,      m036_tt_state,       empty_init,      ROT0, "IGS",           "Super Dou Di Zhu Special (V122CN)", MACHINE_NOT_WORKING )
 
-GAME( 2007, qhzb,     0,     m036_tt_boot,  qhzb,     m036_tt_state,       empty_init,      ROT0, "IGS",           "Que Huang Zhengba (V100CN)", MACHINE_NOT_WORKING )
+GAME( 2007, qhzb,         0,       m036_tt_boot,  qhzb,     m036_tt_state,       empty_init,      ROT0, "IGS",           "Que Huang Zhengba (V100CN)", MACHINE_NOT_WORKING )
 
-GAME( 2009, lhtb,     0,     m036_tt_boot,  lhtb,     m036_tt_state,       empty_init,      ROT0, "IGS",           "Long Hu Tebie Ban (S101CN)", MACHINE_NOT_WORKING ) // 龍虎特別版 - Lónghǔ tèbié bǎn
+GAME( 2009, lhtb,         0,       m036_tt_boot,  lhtb,     m036_tt_state,       empty_init,      ROT0, "IGS",           "Long Hu Tebie Ban (S101CN)", MACHINE_NOT_WORKING ) // 龍虎特別版 - Lónghǔ tèbié bǎn
 
-GAME( 2008, slqzsp,   0,     m036_tt_boot,  qhzb,     m036_tt_state,       empty_init,      ROT0, "IGS",           "Shuang Long Qiang Zhu Tebie Ban (V104CN)", MACHINE_NOT_WORKING )
+GAME( 2008, slqzsp,       0,       m036_tt_boot,  qhzb,     m036_tt_state,       empty_init,      ROT0, "IGS",           "Shuang Long Qiang Zhu Tebie Ban (V104CN)", MACHINE_NOT_WORKING )
 
-GAME( 200?, sydh,     0,     m036_sydh,     sydh,     m036_tt_state,       empty_init,      ROT0, "IGS",           "Shayu Daheng (V104CN)", MACHINE_NOT_WORKING )
+GAME( 200?, sydh,         0,       m036_sydh,     sydh,     m036_tt_state,       empty_init,      ROT0, "IGS",           "Shayu Daheng (V104CN)", MACHINE_NOT_WORKING )
 
-GAME( 200?, xyddz,    0,     m036_sram,     ddz,      m036_tt_state,       empty_init,      ROT0, "IGS",           "Xiaoyao Dou Dizhu (V216CN)", MACHINE_NOT_WORKING )
+GAME( 200?, xyddz,        0,       m036_sram,     ddz,      m036_tt_state,       empty_init,      ROT0, "IGS",           "Xiaoyao Dou Dizhu (V216CN)", MACHINE_NOT_WORKING )
 
-GAME( 200?, cjbq,     0,     m036_tt_boot,  cjbq,     m036_tt_state,       empty_init,      ROT0, "IGS",           "Chaoji Bie Qi (V205CN)", MACHINE_NOT_WORKING )
+GAME( 200?, cjbq,         0,       m036_tt_boot,  cjbq,     m036_tt_state,       empty_init,      ROT0, "IGS",           "Chaoji Bie Qi (V205CN)", MACHINE_NOT_WORKING )
 
-GAME( 2009, cjgdy,    0,     m036_cjgdy,    cjgdy,    m036_tt_state,       empty_init,      ROT0, "IGS",           "Chaoji Gan Dengyan (V110CN)", MACHINE_NOT_WORKING )
+GAME( 2009, cjgdy,        0,       m036_cjgdy,    cjgdy,    m036_tt_state,       empty_init,      ROT0, "IGS",           "Chaoji Gan Dengyan (V110CN)", MACHINE_NOT_WORKING )
 
-GAME( 200?, xydn,     0,     m036_cjgdy,    cjgdy,    m036_tt_state,       empty_init,      ROT0, "IGS",           "Xiyou Douniu (S110CN)",  MACHINE_NOT_WORKING )
+GAME( 200?, xydn,         0,       m036_cjgdy,    cjgdy,    m036_tt_state,       empty_init,      ROT0, "IGS",           "Xiyou Douniu (S110CN)",  MACHINE_NOT_WORKING )
 
-GAME( 2010, mjzhizun, 0,     m036_mjzhizun, lhtb,     m036_mj_state,       empty_init,      ROT0, "IGS",           "Majiang Zhizun (S100CN)", MACHINE_NOT_WORKING )
+GAME( 2010, mjzhizun,     0,       m036_mjzhizun, lhtb,     m036_mj_state,       empty_init,      ROT0, "IGS",           "Majiang Zhizun (S100CN)", MACHINE_NOT_WORKING )
 
 // sets with a TT5665 for sound and 800x600 display
 
-GAME( 2010, lhfy,     0,     m036_hd,       lhfy,     m036_hd_state,       empty_init,      ROT0, "IGS",           "Long Hu Feng Yun Gao Qing Ban (V206CN)", MACHINE_NOT_WORKING )
+GAME( 2010, lhfy,         0,       m036_hd,       lhfy,     m036_hd_state,       empty_init,      ROT0, "IGS",           "Long Hu Feng Yun Gao Qing Ban (V206CN)", MACHINE_NOT_WORKING )
 
-GAME( 2010, hlddz,    0,     m036_hd,       ddz_hd,   m036_hd_state,       empty_init,      ROT0, "IGS",           "Huanle Dou Dizhu (V104CN)", MACHINE_NOT_WORKING )
+GAME( 2010, hlddz,        0,       m036_hd,       ddz_hd,   m036_hd_state,       empty_init,      ROT0, "IGS",           "Huanle Dou Dizhu (V104CN)", MACHINE_NOT_WORKING )
 
-GAME( 2010, zjddz,    0,     m036_hd,       ddz_hd,   m036_hd_state,       empty_init,      ROT0, "IGS",           "Zhongji Dou Dizhu (V204CN)", MACHINE_NOT_WORKING )
+GAME( 2010, zjddz,        0,       m036_hd,       ddz_hd,   m036_hd_state,       empty_init,      ROT0, "IGS",           "Zhongji Dou Dizhu (V204CN)", MACHINE_NOT_WORKING )
 
-GAME( 2009, hyleyuan, 0,     m036_hyleyuan, hyleyuan, m036_hyleyuan_state, empty_init,      ROT90, "IGS",           "Hou Ye Leyuan (S103CN)", MACHINE_NOT_WORKING )
+GAME( 2009, hyleyuan,     0,       m036_hyleyuan, hyleyuan, m036_hyleyuan_state, empty_init,      ROT90, "IGS",          "Hou Ye Leyuan (S103CN)", MACHINE_NOT_WORKING )
 
+// sets with missing GFX ROM dumps
+
+GAME( 201?, hlqqq,        0,       m036_hd,       ddz_hd,   m036_hd_state,       empty_init,      ROT0, "IGS",           "Huanle Qiao Qiao Qiao (V100CN)", MACHINE_NOT_WORKING )
 
 // sets with no IGS036 ROM dump
 
-GAME( 200?, cjdh2,    0,     m036,    m036, m036_state, init_key<cjdh2_key>,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, cjdh2a,   cjdh2, m036,    m036, m036_state, init_key<cjdh2_key>,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CNA)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, cjdh2b,   cjdh2, m036,    m036, m036_state, init_key<cjdh2_key>,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CNB)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, cjdh2c,   cjdh2, m036,    m036, m036_state, init_key<cjdh2_key>,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V215CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, cjdh2d,   cjdh2, m036,    m036, m036_state, init_key<cjdh2_key>,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CN, alternate GFX ROMs)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjdh2,        0,       m036,    m036, m036_state, init_key<cjdh2_key>,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjdh2a,       cjdh2,   m036,    m036, m036_state, init_key<cjdh2_key>,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CNA)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjdh2b,       cjdh2,   m036,    m036, m036_state, init_key<cjdh2_key>,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CNB)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjdh2c,       cjdh2,   m036,    m036, m036_state, init_key<cjdh2_key>,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V215CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjdh2d,       cjdh2,   m036,    m036, m036_state, init_key<cjdh2_key>,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CN, alternate GFX ROMs)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 200?, super70s, 0,     m036_tt, m036, m036_state, init_m036,          ROT0, "IGS",           "Super 70's (V100US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, super70s,     0,       m036_tt, m036, m036_state, init_m036,          ROT0, "IGS",           "Super 70's (V100US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 2010, lhzb3in1, 0,     m036_tt, m036, m036_state, init_key<lhzb3in1_key>, ROT0, "IGS",           "Long Hu Zhengba San He Yi (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 龙虎争霸三合一
+GAME( 2010, lhzb3in1,     0,       m036_tt, m036, m036_state, init_key<lhzb3in1_key>, ROT0, "IGS",           "Long Hu Zhengba San He Yi (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 龙虎争霸三合一
 
-GAME( 200?, igsm312,  0,     m036_tt, m036, m036_state, init_key<m312cn_key>,   ROT0, "IGS",           "unknown 'IGS 6POKER2' game (V312CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // there's very little code and no gfx ROMs, might be a 'set/clear' chip for a gambling game.
+GAME( 200?, igsm312,      0,       m036_tt, m036, m036_state, init_key<m312cn_key>,   ROT0, "IGS",           "unknown 'IGS 6POKER2' game (V312CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // there's very little code and no gfx ROMs, might be a 'set/clear' chip for a gambling game.
 
-GAME( 200?, cjjl,     0,     m036_tt, m036, m036_state, init_key<cjjl_key>,     ROT0, "IGS",           "Chaoji Jielong (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjjl,         0,       m036_tt, m036, m036_state, init_key<cjjl_key>,     ROT0, "IGS",           "Chaoji Jielong (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 2010, lhzbgqb,  0,     m036_tt, m036, m036_state, init_key<lhzbgqb_key>,  ROT0, "IGS",           "Long Hu Zhengba Gao Qing Ban (V105CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2010, lhzbgqb,      0,       m036_tt, m036, m036_state, init_key<lhzbgqb_key>,  ROT0, "IGS",           "Long Hu Zhengba Gao Qing Ban (V105CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 201?, xcjnh,    0,     m036_tt, m036, m036_state, init_key<xcjnh_key>,    ROT0, "IGS",           "Xiaochou Jianianhua (S100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 201?, xcjnh,        0,       m036_tt, m036, m036_state, init_key<xcjnh_key>,    ROT0, "IGS",           "Xiaochou Jianianhua (S100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 201?, hlqqq,    0,     m036_tt, m036, m036_state, init_key<hlqqq_key>,    ROT0, "IGS",           "Huanle Qiao Qiao Qiao (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 201?, qiaojidm,     0,       m036_tt, m036, m036_state, init_m036,          ROT0, "IGS",           "Qiaoji Da Maoxian (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 201?, qiaojidm, 0,     m036_tt, m036, m036_state, init_m036,          ROT0, "IGS",           "Qiaoji Da Maoxian (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-
-GAME( 2015, mghammer, 0,     m036_tt, m036, m036_state, init_mghammer,          ROT0, "IGS / Enheart", "Medal Get Hammer (V100JP)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // but has S033CN strings?
+GAME( 2015, mghammer,     0,       m036_tt, m036, m036_state, init_mghammer,          ROT0, "IGS / Enheart", "Medal Get Hammer (V100JP)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // but has S033CN strings?
