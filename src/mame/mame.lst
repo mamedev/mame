@@ -21452,6 +21452,9 @@ hpz80unk
 @source:hp/jornada.cpp
 jorn720
 
+@source:hp/laserjet3p.cpp
+laserjet3p
+
 @source:huangyeh/hy-268a.cpp
 xycs
 

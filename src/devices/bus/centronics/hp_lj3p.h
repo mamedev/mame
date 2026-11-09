@@ -2,10 +2,7 @@
 // copyright-holders:rfka01
 /**********************************************************************
 
-    HP LaserJet IIIP laser printer emulation
-
-    The printer has a Centronics parallel and an RS-232C serial interface
-    built in; it can be connected to either.
+    HP LaserJet IIIP on a Centronics port
 
 **********************************************************************/
 
@@ -15,9 +12,7 @@
 #pragma once
 
 #include "ctronics.h"
-#include "bus/rs232/rs232.h"
 
-// device type declaration: one device for a parallel or a serial port
-DECLARE_DEVICE_TYPE(HP_LJ3P, device_t)
+DECLARE_DEVICE_TYPE(CENTRONICS_HP_LJ3P, device_centronics_peripheral_interface)
 
 #endif // MAME_BUS_CENTRONICS_HP_LJ3P_H

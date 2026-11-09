@@ -2,7 +2,7 @@
 <!--
 license:CC0-1.0
 copyright-holders:rfka01
-HP LaserJet IIIP: computer, paper and control panel
+HP LaserJet IIIP: paper and control panel
 -->
 <mamelayout version="2">
 	<element name="case"><rect><color red="0.89" green="0.87" blue="0.80" /></rect></element>
@@ -70,13 +70,6 @@ HP LaserJet IIIP: computer, paper and control panel
 
 		<element ref="t_model"><bounds x="420" y="140" width="196" height="30" /></element>
 	</group>
-
-	<!-- the computer's first screen (index 0), assumed 4:3, left of the paper -->
-	<view name="Computer, Paper and Control Panel">
-		<screen index="0"><bounds x="0" y="0" width="1449" height="1087" /></screen>
-		<screen tag="paper"><bounds x="1459" y="0" width="637" height="877" /></screen>
-		<group ref="panel"><bounds x="1459" y="887" width="637" height="200" /></group>
-	</view>
 
 	<view name="Paper and Control Panel">
 		<screen tag="paper"><bounds x="0" y="0" width="637" height="877" /></screen>

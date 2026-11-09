@@ -1846,13 +1846,11 @@ if BUSES["CENTRONICS"] then
 		{ MAME_DIR .. "src/devices/bus/centronics/epson_ex800.cpp",  GEN_DIR .. "emu/layout/ex800.lh" },
 		{ MAME_DIR .. "src/devices/bus/centronics/epson_lx800.cpp",  GEN_DIR .. "emu/layout/lx800.lh" },
 		{ MAME_DIR .. "src/devices/bus/centronics/epson_lx810l.cpp", GEN_DIR .. "emu/layout/lx800.lh" },
-		{ MAME_DIR .. "src/devices/bus/centronics/hp_lj3p.cpp",      GEN_DIR .. "emu/layout/hplj3p.lh" },
 		{ MAME_DIR .. "src/devices/bus/centronics/smartboard.cpp",   GEN_DIR .. "emu/layout/smartboard.lh" },
 	}
 
 	custombuildtask {
 		layoutbuildtask("emu/layout", "ex800"),
-		layoutbuildtask("emu/layout", "hplj3p"),
 		layoutbuildtask("emu/layout", "lx800"),
 		layoutbuildtask("emu/layout", "smartboard"),
 	}
@@ -5302,6 +5300,8 @@ if BUSES["RS232"] then
 		MAME_DIR .. "src/devices/bus/rs232/exorterm.h",
 		MAME_DIR .. "src/devices/bus/rs232/heath_h19.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/heath_h19.h",
+		MAME_DIR .. "src/devices/bus/rs232/hp_lj3p.cpp",
+		MAME_DIR .. "src/devices/bus/rs232/hp_lj3p.h",
 		MAME_DIR .. "src/devices/bus/rs232/hlemouse.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/hlemouse.h",
 		MAME_DIR .. "src/devices/bus/rs232/ie15.cpp",

@@ -1656,6 +1656,28 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/hp_lj3p.h,MACHINES["HP_LJ3P"] = true
+---------------------------------------------------
+
+if MACHINES["HP_LJ3P"] then
+	files {
+		MAME_DIR .. "src/devices/machine/hp_lj3p.cpp",
+		MAME_DIR .. "src/devices/machine/hp_lj3p.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/machine/hp_lj3p.cpp", GEN_DIR .. "emu/layout/hplj3p.lh" },
+		{ MAME_DIR .. "src/devices/machine/hp_lj3p.cpp", GEN_DIR .. "emu/layout/hplj3p_host.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "hplj3p"),
+		layoutbuildtask("emu/layout", "hplj3p_host"),
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/hp_taco.h,MACHINES["HP_TACO"] = true
 ---------------------------------------------------
 
