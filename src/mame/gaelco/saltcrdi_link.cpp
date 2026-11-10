@@ -39,7 +39,8 @@
   bytes with the other instance over TCP.
 
   To use this:
-  * Enable Link Simulation in MAME's Machine Configuration menu.
+  * Enable Link Simulation in MAME's Machine Configuration menu.  The
+    link is started when the system is reset.
   * Start one instance in listening mode by setting comm_localhost to
     the listening address and comm_remotehost to an empty string.
   * Start the other instance in connecting mode by setting
@@ -98,7 +99,7 @@ constexpr u8 data_lines(int bit)
 constexpr unsigned SETTLE_USEC = 10;
 constexpr unsigned POLL_MSEC = 1;
 
-constexpr u16 RESET_POLLS = 20;
+constexpr u16 RESET_POLLS = 20; // the game reads the lines at least once every 7 ms
 constexpr u16 YIELD_POLLS = 50;
 constexpr u16 TIMEOUT_POLLS = 1000;
 
@@ -537,6 +538,22 @@ void saltcrdi_link_device::device_reset()
 }
 
 
+void saltcrdi_link_device::device_post_load()
+{
+	// the network connection isn't part of the saved state
+	if (m_context)
+	{
+		m_poll_timer->adjust(attotime::from_msec(POLL_MSEC), 0, attotime::from_msec(POLL_MSEC));
+	}
+	else
+	{
+		m_poll_timer->reset();
+		m_tx_pending = false;
+		enter_state(STATE_OFFLINE, LINES_END);
+	}
+}
+
+
 TIMER_CALLBACK_MEMBER(saltcrdi_link_device::settle)
 {
 	if (m_context)
@@ -584,7 +601,8 @@ void saltcrdi_link_device::update()
 		break;
 
 	case STATE_RESET:
-		if ((LINES_IDLE == m_board_lines) || (RESET_POLLS <= m_stall))
+		// the main board's acknowledge looks the same as idle, so its lines don't show it has given up
+		if (RESET_POLLS <= m_stall)
 			enter_state(STATE_IDLE, LINES_IDLE);
 		break;
 
@@ -724,7 +742,7 @@ void saltcrdi_link_device::enter_state(u8 state, u8 lines)
 
 void saltcrdi_link_device::abort_transfer()
 {
-	// drive both lines low until the main board gives up, like disconnecting the cable
+	// drive both lines low long enough for the main board to give up, like disconnecting the cable
 	LOG("Aborting transfer in state %u\n", m_state);
 	enter_state(STATE_RESET, LINES_END);
 }
