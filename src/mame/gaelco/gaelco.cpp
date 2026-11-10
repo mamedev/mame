@@ -204,6 +204,12 @@ void gaelco_state::maniacsq_map(address_map &map)
 	map(0xff0000, 0xffffff).ram();                                                                // Work RAM
 }
 
+void salter_state::salter_map(address_map &map)
+{
+	maniacsq_map(map);
+	map(0x70000b, 0x70000b).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
+}
+
 void xorwflat_state::xorwflat_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
@@ -495,7 +501,10 @@ static INPUT_PORTS_START( sltpcycld )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN ) // bits 0 and 3: serial link for linked play, not emulated
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("link", FUNC(saltcrdi_link_device::control_r))
+	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("link", FUNC(saltcrdi_link_device::data_r))
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -889,6 +898,19 @@ void gaelco_state::maniacsq(machine_config &config)
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH)); // pin 7 not verified
 	oki.set_addrmap(0, &gaelco_state::oki_map);
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void salter_state::salter(machine_config &config)
+{
+	maniacsq(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &salter_state::salter_map);
+
+	LS259(config, m_outlatch);
+	// Q0 and Q2: serial link to I/O board (brake level), not emulated
+	m_outlatch->q_out_cb<1>().set(m_link, FUNC(saltcrdi_link_device::control_w));
+	m_outlatch->q_out_cb<3>().set(m_link, FUNC(saltcrdi_link_device::data_w));
+
+	SALTCRDI_LINK(config, m_link);
 }
 
 void xorwflat_state::xorwflat(machine_config &config)
@@ -1849,13 +1871,13 @@ GAME( 1992, thoopna,   thoop,    thoop,    thoop,    thoop_state,    empty_init,
 GAME( 1992, thoopnna,  thoop,    thoop,    thoop,    thoop_state,    empty_init, ROT0, "Gaelco",        "Thunder Hoop (non North America, ver. X, checksum 00000020, set 1)", MACHINE_SUPPORTS_SAVE ) // 09/Jun/1992
 GAME( 1992, thoopnnaa, thoop,    thoop,    thoop,    thoop_state,    empty_init, ROT0, "Gaelco",        "Thunder Hoop (non North America, ver. X, checksum 00000020, set 2)", MACHINE_SUPPORTS_SAVE ) // Non North America but with FBI screen ??
 
-GAME( 199?, sltpcycld, sltpcycl, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older hardware, ver. 1.0, checksum BAE7)",      MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 199?, sltpcycle, sltpcycl, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older hardware, ver. 1.0, checksum 5678)",      MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 199?, sltpcyclf, sltpcycl, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older hardware, ver. 1.0, checksum 1AF9)",      MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 199?, sltpcycld, sltpcycl, salter,   sltpcycld, salter_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older hardware, ver. 1.0, checksum BAE7)",      MACHINE_SUPPORTS_SAVE )
+GAME( 199?, sltpcycle, sltpcycl, salter,   sltpcycld, salter_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older hardware, ver. 1.0, checksum 5678)",      MACHINE_SUPPORTS_SAVE )
+GAME( 199?, sltpcyclf, sltpcycl, salter,   sltpcycld, salter_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older hardware, ver. 1.0, checksum 1AF9)",      MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, sltpstepb, sltpstep, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older hardware, ver. 1.0, checksum 8E5A)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 199?, sltpstepc, sltpstep, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older hardware, ver. 1.0, checksum 8BF3)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1996, sltpstepd, sltpstep, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older hardware, ver. 1.0, checksum 6D94)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN ) // 2/Jul/1996  .
+GAME( 199?, sltpstepb, sltpstep, salter,   sltpcycld, salter_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older hardware, ver. 1.0, checksum 8E5A)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, sltpstepc, sltpstep, salter,   sltpcycld, salter_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older hardware, ver. 1.0, checksum 8BF3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, sltpstepd, sltpstep, salter,   sltpcycld, salter_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older hardware, ver. 1.0, checksum 6D94)", MACHINE_SUPPORTS_SAVE ) // 2/Jul/1996  .
 
 /* Not 100% sure it belongs here, but fairly close. Boots at least but video regs seem incorrect, and sound hardware is different.
    Set was being marked as from a 'flat' PCB, which is how the gaelco.cpp family of boards is referred to.
