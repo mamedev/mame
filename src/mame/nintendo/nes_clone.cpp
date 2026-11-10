@@ -293,8 +293,7 @@ public:
 		nes_clone_state(mconfig, type, tag),
 		m_nametables(*this, "nametable%u", 0),
 		m_chrbank(*this, "chrbank"),
-		m_prgbank0(*this, "prgbank0"),
-		m_prgbank1(*this, "prgbank1")
+		m_prgbank(*this, "prgbank%u", 0)
 	{ }
 
 	void nes_clone_2pathlet(machine_config &config) ATTR_COLD;
@@ -317,8 +316,7 @@ private:
 
 	memory_bank_array_creator<4> m_nametables;
 	required_memory_bank m_chrbank;
-	required_memory_bank m_prgbank0;
-	required_memory_bank m_prgbank1;
+	required_memory_bank_array<2> m_prgbank;
 };
 
 
@@ -1749,8 +1747,8 @@ void nes_clone_2pathlet_state::machine_start()
 	nes_clone_state::machine_start();
 
 	m_chrbank->configure_entries(0, 8, memregion("gfx1")->base(), 0x2000);
-	m_prgbank0->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
-	m_prgbank1->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
+	m_prgbank[0]->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
+	m_prgbank[1]->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
 
 	m_nt_ram = std::make_unique<u8[]>(0x800);
 
@@ -1788,14 +1786,14 @@ void nes_clone_2pathlet_state::update_banks()
 	if (m_8800 & 0x10)
 	{
 		u8 prgbank = (m_8800 & 0xc0) >> 6;
-		m_prgbank0->set_entry((prgbank << 1));
-		m_prgbank1->set_entry((prgbank << 1)+1);
+		m_prgbank[0]->set_entry((prgbank << 1));
+		m_prgbank[1]->set_entry((prgbank << 1) + 1);
 	}
 	else
 	{
 		u8 prgbank = (m_8800 & 0xe0) >> 5;
-		m_prgbank0->set_entry(prgbank);
-		m_prgbank1->set_entry(prgbank);
+		m_prgbank[0]->set_entry(prgbank);
+		m_prgbank[1]->set_entry(prgbank);
 	}
 
 	if (m_8800 & 0x08)
@@ -1812,7 +1810,6 @@ void nes_clone_2pathlet_state::update_banks()
 		m_nametables[2]->set_entry(0);
 		m_nametables[3]->set_entry(1);
 	}
-
 }
 
 void nes_clone_2pathlet_state::nes_clone_2pathlet_map(address_map &map)
@@ -1821,8 +1818,8 @@ void nes_clone_2pathlet_state::nes_clone_2pathlet_map(address_map &map)
 	map(0x6000, 0x6000).r(FUNC(nes_clone_2pathlet_state::menu_6000_r));
 	map(0x8000, 0x8000).w(FUNC(nes_clone_2pathlet_state::bank_8000_w));
 	map(0x8800, 0x8800).w(FUNC(nes_clone_2pathlet_state::bank_8800_w));
-	map(0x8000, 0xbfff).bankr(m_prgbank0);
-	map(0xc000, 0xffff).bankr(m_prgbank1);
+	map(0x8000, 0xbfff).bankr(m_prgbank[0]);
+	map(0xc000, 0xffff).bankr(m_prgbank[1]);
 }
 
 void nes_clone_2pathlet_state::nes_ppu_map(address_map &map)
