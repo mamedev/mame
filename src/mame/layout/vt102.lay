@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+
+Basic display of LEDs for the DEC VT102
+-->
+
+<mamelayout version="2">
+
+	<element name="red_led">
+		<disk state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="ON_LINE">
+		<text string="ON LINE">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="LOCAL">
+		<text string="OFF LINE">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="KBDLOCKED">
+		<text string="KBDLOCKED">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="L1">
+		<text string="CTS">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="L2">
+		<text string="DSR">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="L3">
+		<text string="INSERT">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="L4">
+		<text string="L1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<view name="Keyboard LEDs">
+		<bounds left="0" top="0" right="1024" bottom="870" />
+
+		<screen index="0">
+			<bounds x="0" y="0" width="1024" height="768" />
+		</screen>
+
+		<element name="online_txt" ref="ON_LINE">
+			<bounds left="0" right="100" top="800" bottom="820" />
+		</element>
+		<element name="online_led" ref="red_led">
+			<bounds left="40" right="60" top="830" bottom="850" />
+		</element>
+
+		<element name="local_txt" ref="LOCAL">
+			<bounds left="100" right="200" top="800" bottom="820" />
+		</element>
+		<element name="local_led" ref="red_led">
+			<bounds left="140" right="160" top="830" bottom="850" />
+		</element>
+
+		<element name="locked_txt" ref="KBDLOCKED">
+			<bounds left="200" right="300" top="800" bottom="820" />
+		</element>
+		<element name="locked_led" ref="red_led">
+			<bounds left="240" right="260" top="830" bottom="850" />
+		</element>
+
+		<element name="l1_txt" ref="L1">
+			<bounds left="300" right="400" top="800" bottom="820" />
+		</element>
+		<element name="l1_led" ref="red_led">
+			<bounds left="340" right="360" top="830" bottom="850" />
+		</element>
+
+		<element name="l2_txt" ref="L2">
+			<bounds left="400" right="500" top="800" bottom="820" />
+		</element>
+		<element name="l2_led" ref="red_led">
+			<bounds left="440" right="460" top="830" bottom="850" />
+		</element>
+
+		<element name="l3_txt" ref="L3">
+			<bounds left="500" right="600" top="800" bottom="820" />
+		</element>
+		<element name="l3_led" ref="red_led">
+			<bounds left="540" right="560" top="830" bottom="850" />
+		</element>
+
+		<element name="l4_txt" ref="L4">
+			<bounds left="600" right="700" top="800" bottom="820" />
+		</element>
+		<element name="l4_led" ref="red_led">
+			<bounds left="640" right="660" top="830" bottom="850" />
+		</element>
+	</view>
+
+</mamelayout>
