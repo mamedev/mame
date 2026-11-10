@@ -464,6 +464,7 @@ protected:
 
 		INTIDX_ICF1,
 
+		INTIDX_OCF1C,
 		INTIDX_OCF1B,
 		INTIDX_OCF1A,
 		INTIDX_TOV1,
@@ -480,24 +481,22 @@ protected:
 		INTIDX_INT1,
 
 	//------ TODO: review this --------
+		INTIDX_OCF3C,
 		INTIDX_OCF3B,
 		INTIDX_OCF3A,
 		INTIDX_TOV3,
 
+		INTIDX_OCF4C,
 		INTIDX_OCF4B,
 		INTIDX_OCF4A,
 		INTIDX_TOV4,
 
+		INTIDX_OCF5C,
 		INTIDX_OCF5B,
 		INTIDX_OCF5A,
 		INTIDX_TOV5,
-	//---------------------------------
 
-		// new guys free of the old legacy crap
-		INTIDX_OCF1C,
-		INTIDX_OCF3C,
-		INTIDX_OCF4C,
-		INTIDX_OCF5C,
+	//---------------------------------
 
 		INTIDX_COUNT
 	};
@@ -834,7 +833,8 @@ protected:
 	int m_icount;
 
 	// Interrupt handling tables
-	uint8_t m_int_statuses[INTIDX_COUNT];   // persistent, must be savestate-able
+	uint32_t m_int_statuses[4];           // bitfields in order of vectors
+	uint8_t m_vector_to_intidx_lut[256];  // vector ID -> intidx lookup to tables below (0 = unmapped)
 	devcb_write_line::array<INTIDX_COUNT> m_int_ack_cbs; // rebuilt at device_start
 	std::unique_ptr<interrupt_condition[]> m_int_conditions_table; // rebuilt at device_start
 

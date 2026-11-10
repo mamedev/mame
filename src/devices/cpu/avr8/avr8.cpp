@@ -1321,7 +1321,6 @@ void avr8_base_device::device_start()
 	populate_shift_flag_cache();
 
 	populate_interrupt_condition_table();
-	std::fill_n(m_int_statuses, INTIDX_COUNT, 0);
 	save_item(NAME(m_int_statuses));
 }
 
@@ -1445,13 +1444,7 @@ void avr8_base_device::device_reset()
 
 	m_sleeping = false;
 	m_sei_delay_pending = false;
-
-	// clear any pending interrupts (the register zero loop above will have already
-	// acknowledged any pending and disabled any that could have fired)
-	for (int i = 0; i < INTIDX_COUNT; i++)
-	{
-		m_int_statuses[i] = 0;
-	}
+	std::memset(m_int_statuses, 0, sizeof(m_int_statuses));
 }
 
 void avr8_device::device_reset()
@@ -1951,7 +1944,13 @@ void avr8_base_device::set_interrupt_line(uint8_t intidx, uint8_t state)
 		fatalerror("tried to set/clear unmapped interrupt %d\n", intidx);
 	}
 
-	m_int_statuses[intidx] = state != 0;
+	int vector_bitpos = condition.m_intvector & 31;
+	int vector_arrpos = condition.m_intvector >> 5;
+
+	if (state)
+		m_int_statuses[vector_arrpos] |= (1 << vector_bitpos);
+	else
+		m_int_statuses[vector_arrpos] &= ~(1 << vector_bitpos);
 }
 
 template<uint8_t IntIdx>
@@ -2009,9 +2008,6 @@ void avr8_base_device::clear_interrupt(uint8_t intidx)
 
 void avr8_base_device::fire_interrupts()
 {
-	int interrupt_winner_idx = -1;
-	bool interrupt_firing = false;
-
 	if (BIT(m_r[SREG], SREG_I) == 0)
 	{
 		return;
@@ -2035,57 +2031,81 @@ void avr8_base_device::fire_interrupts()
 	//
 	// - There should never be a case where we need a tiebreaker, i.e., every interrupt
 	//   should be mapped to its own unique vector.
-	for (int i = 0; i < INTIDX_COUNT; i++)
-	{
-		if (!m_int_statuses[i]) continue;
 
-		interrupt_condition condition = m_int_conditions_table[i];
-		if (!(0 <= condition.m_intidx && condition.m_intidx < INTIDX_COUNT))
+
+	int pending_vector_array_slot = -1;
+	for (int i = 0; i < 4; i++)
+	{
+		if (m_int_statuses[i] == 0) continue;
+		pending_vector_array_slot = i;
+		break;
+	}
+
+	if (pending_vector_array_slot == -1)
+	{
+		return;
+	}
+
+	// An interrupt flag is set within this bitfield.
+	// Search from lowest-to-highest priority to find its vector,
+	// remembering the lowest (relative to 0) wins.
+	int pending_vector_bit_slot = -1;
+	for (int i = 0; i < 32; i++)
+	{
+		if (!(m_int_statuses[pending_vector_array_slot] & (1 << i))) continue;
+		pending_vector_bit_slot = i;
+		break;
+	}
+
+	int vector = (pending_vector_array_slot * 32) + pending_vector_bit_slot;
+
+	uint8_t intidx = m_vector_to_intidx_lut[vector];
+
+	if (intidx == 0)
+	{
+		for (int i = 0; i < 256; i++)
 		{
-			fatalerror("interrupt %d set to fire, but wasn't mapped to anything", i);
+			printf("vector %d -> %d\n", i, m_vector_to_intidx_lut[i]);
 		}
 
-		if (!condition.m_intondev && !(m_r[condition.m_intreg] & condition.m_intmask))
+		fatalerror("?!?!?! vector %d -> intidx 0!!!\n", vector);
+	}
+	
+	if (!(0 <= intidx && intidx < INTIDX_COUNT))
+	{
+		fatalerror("interrupt vector %d set to fire, but no interrupt condition was mapped to it", vector);
+		return;
+	}
+
+	// printf("vector %d -> intidx %d\n", vector, intidx);
+
+	interrupt_condition condition = m_int_conditions_table[intidx];
+
+	if (!condition.m_intondev)
+	{
+		// legacy not-devicified interrupt, to be phased out in the future
+		if (!(m_r[condition.m_intreg] & condition.m_intmask))
 		{
 			logerror("%s: avr8 standard interrupt %d scheduled but its enable flag at %02x is cleared\n",
-					 machine().describe_context(),
-					 i,
-					 condition.m_intreg
-					 );
-			continue;
+						machine().describe_context(),
+						intidx,
+						condition.m_intreg
+						);
+			return;
 		}
 
-		interrupt_firing = true;
-		if (interrupt_winner_idx == -1)
-		{
-			interrupt_winner_idx = i;
-		}
-		else if (condition.m_intvector >= m_int_conditions_table[interrupt_winner_idx].m_intvector)
-		{
-			LOGMASKED(LOG_INTERRUPTS, "interrupt %d already losing the race, currently winning is %d\n", i, interrupt_winner_idx);
-		}
-		else
-		{
-			LOGMASKED(LOG_INTERRUPTS, "interrupt %d now losing the race, currently winning is %d\n", i, interrupt_winner_idx);
-			interrupt_winner_idx = i;
-		}
 	}
 
-	if (interrupt_firing)
-	{
-		LOGMASKED(LOG_INTERRUPTS, "interrupt %d won the race, firing it.\n", interrupt_winner_idx);
+	m_r[SREG] &= ~SREG_MASK_I;
+	push((m_pc >> 1) & 0x00ff);
+	push((m_pc >> 9) & 0x00ff);
+	// TODO: 24-bit address pushes for 2560 and friends that use bigger flash space
 
-		m_r[SREG] &= ~SREG_MASK_I;
-		push((m_pc >> 1) & 0x00ff);
-		push((m_pc >> 9) & 0x00ff);
-		// TODO: 24-bit address pushes for 2560 and friends that use bigger flash space
+	m_pc = vector * (2 * vector_size_in_words());
 
-		m_pc = m_int_conditions_table[interrupt_winner_idx].m_intvector * (2 * vector_size_in_words());
+	m_sleeping = false;
 
-		m_sleeping = false;
-
-		clear_interrupt(interrupt_winner_idx);
-	}
+	clear_interrupt(intidx);
 }
 
 inline bool avr8_base_device::interrupt_condition_entry_is_terminator(interrupt_condition condition)
@@ -2099,18 +2119,23 @@ inline bool avr8_base_device::interrupt_condition_entry_is_terminator(interrupt_
 void avr8_base_device::populate_interrupt_condition_table()
 {
 	const avr8_base_device::interrupt_condition* int_conds = interrupt_conditions();
-
 	m_int_conditions_table = std::make_unique<avr8_base_device::interrupt_condition[]>(INTIDX_COUNT);
+
+	for (int i = 0; i < 256; i++)
+	{
+		m_vector_to_intidx_lut[i] = INTIDX_COUNT;
+	}
 
 	for (int i = 0; i < INTIDX_COUNT; i++)
 	{
-		// unwire all vectors by default
 		m_int_conditions_table[i].m_intidx = INTIDX_COUNT;
 	}
 
 	for (int i = 0; !interrupt_condition_entry_is_terminator(int_conds[i]); i++)
 	{
-		std::memcpy(&m_int_conditions_table[int_conds[i].m_intidx], &int_conds[i], sizeof(avr8_base_device::interrupt_condition));
+		interrupt_condition cond = int_conds[i];
+		std::memcpy(&m_int_conditions_table[cond.m_intidx], &cond, sizeof(avr8_base_device::interrupt_condition));
+		m_vector_to_intidx_lut[cond.m_intvector] = cond.m_intidx;
 	}
 }
 
