@@ -25,14 +25,12 @@ Tektronix 4404 Artificial Intelligence System.
 	</element>
 	<view name="Graphics">
 		<bounds x="0" y="0" width="640" height="496" />
-		
 		<screen index="0">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
 		<element name="spacer" ref="static_black">
 			<bounds x="0" y="480" width="640" height="16" />
 		</element>
-
 		<element name="led0" ref="led_round">
 			<bounds x="46" y="484" width="8" height="8" />
 		</element>
