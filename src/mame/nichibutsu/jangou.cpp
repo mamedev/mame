@@ -1300,7 +1300,7 @@ ROM_START( roylcrdn )
 	ROM_REGION( 0x10000, "gfx", 0 )
 	ROM_LOAD( "chrgen.cr1", 0x0000, 0x1000, CRC(935d0e1c) SHA1(0d5b067f6931585c8138b211cf73e5f585af8101) )
 	ROM_LOAD( "chrgen.cr2", 0x1000, 0x1000, CRC(4429362e) SHA1(0bbb6dedf919e0453be2db6343827c5787d139f3) )
-	ROM_LOAD( "chrgen.cr3", 0x2000, 0x1000, CRC(dc059cc9) SHA1(3041e83b9a265adfe4e1da889ae6a18593de0894) )
+	ROM_LOAD( "chrgen.cr3", 0x2000, 0x1000, CRC(f1e6b7e0) SHA1(b7105031372ae7773d3b4a42ec87b9cca113e6ac) )  // replaced with a better dump
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "mb7051.3h",  0x0000, 0x0020, CRC(cb6f1aec) SHA1(84136393f9cf8bd836123a31483e9a746ca00cdc) )

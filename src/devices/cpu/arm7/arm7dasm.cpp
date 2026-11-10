@@ -29,6 +29,8 @@
 void arm7_disassembler::WritePadding(std::ostream &stream, std::streampos start_position)
 {
 	std::streamoff difference = stream.tellp() - start_position;
+	if (difference >= 8)
+		stream << ' ';
 	for (std::streamoff i = difference; i < 8; i++)
 		stream << ' ';
 }
@@ -225,6 +227,380 @@ static const char *const pConditionCodeTable[16] =
 	"GT","LE","","NV"
 };
 
+bool arm7_disassembler::dasm_armv6(std::ostream &stream, u32 opcode, const char *condition, std::streampos start_position, u32 &flags)
+{
+	if (opcode >= 0xf0000000)
+	{
+		if (opcode == 0xf57ff01f)
+			stream << "CLREX";
+		else if ((opcode & 0xfffffdff) == 0xf1010000)
+		{
+			stream << "SETEND";
+			WritePadding(stream, start_position);
+			stream << (BIT(opcode, 9) ? "BE" : "LE");
+		}
+		else if ((opcode & 0xfff1fe20) == 0xf1000000)
+		{
+			unsigned const imod = (opcode >> 18) & 3;
+			bool const mode = BIT(opcode, 17);
+			if (imod == 1 || (!mode && (opcode & 31)) || (imod ? !(opcode & 0x1c0) : (!mode || (opcode & 0x1c0))))
+				return false;
+			util::stream_format(stream, "CPS%s", imod == 3 ? "ID" : imod == 2 ? "IE" : "");
+			WritePadding(stream, start_position);
+			if (BIT(opcode, 8))
+				stream << 'a';
+			if (BIT(opcode, 7))
+				stream << 'i';
+			if (BIT(opcode, 6))
+				stream << 'f';
+			if (mode)
+				util::stream_format(stream, "%s#0x%X", imod ? ", " : "", opcode & 31);
+		}
+		else if ((opcode & 0xfe5fffe0) == 0xf84d0500)
+		{
+			util::stream_format(stream, "SRS%c%c", BIT(opcode, 23) ? 'I' : 'D', BIT(opcode, 24) ? 'B' : 'A');
+			WritePadding(stream, start_position);
+			util::stream_format(stream, "SP%s, #0x%X", BIT(opcode, 21) ? "!" : "", opcode & 31);
+		}
+		else if ((opcode & 0xfe50ffff) == 0xf8100a00)
+		{
+			util::stream_format(stream, "RFE%c%c", BIT(opcode, 23) ? 'I' : 'D', BIT(opcode, 24) ? 'B' : 'A');
+			WritePadding(stream, start_position);
+			util::stream_format(stream, "R%d%s", (opcode >> 16) & 15, BIT(opcode, 21) ? "!" : "");
+			flags = STEP_OUT;
+		}
+		else
+			return false;
+		return true;
+	}
+
+	unsigned const rd = (opcode >> 12) & 15, rn = (opcode >> 16) & 15, rm = opcode & 15;
+	if ((opcode & 0x0f800ff0) == 0x01800f90)
+	{
+		bool const load = BIT(opcode, 20);
+		unsigned const kind = (opcode >> 21) & 3;
+		if (rn == 15 || rd == 15 || (load ? rm != 15 : rm == 15) || (kind == 1 && ((load ? rd : rm) & 1)))
+			return false;
+		static const char *const SUFFIXES[] = { "", "D", "B", "H" };
+		util::stream_format(stream, "%s%s%s", load ? "LDREX" : "STREX", SUFFIXES[kind], condition);
+		WritePadding(stream, start_position);
+		util::stream_format(stream, "R%d, ", rd);
+		if (!load)
+			util::stream_format(stream, "R%d, ", rm);
+		if (kind == 1)
+			util::stream_format(stream, "R%d, ", (load ? rd : rm) + 1);
+		util::stream_format(stream, "[R%d]", rn);
+		return true;
+	}
+	if ((opcode & 0x0ff000f0) == 0x00400090)
+	{
+		util::stream_format(stream, "UMAAL%s", condition);
+		WritePadding(stream, start_position);
+		util::stream_format(stream, "R%d, R%d, R%d, R%d", rd, rn, rm, (opcode >> 8) & 15);
+		return true;
+	}
+	return dasm_armv6_media(stream, opcode, condition, start_position);
+}
+
+bool arm7_disassembler::dasm_armv6_media(std::ostream &stream, u32 opcode, const char *condition, std::streampos start_position)
+{
+	unsigned const rd = (opcode >> 12) & 15, rn = (opcode >> 16) & 15, rm = opcode & 15, rs = (opcode >> 8) & 15;
+	u32 const reverse = opcode & 0x0fff0ff0;
+	if (reverse == 0x06bf0f30 || reverse == 0x06bf0fb0 || reverse == 0x06ff0fb0)
+	{
+		util::stream_format(stream, "%s%s", reverse == 0x06bf0f30 ? "REV" : reverse == 0x06bf0fb0 ? "REV16" : "REVSH", condition);
+		WritePadding(stream, start_position);
+		util::stream_format(stream, "R%d, R%d", rd, rm);
+	}
+	else if ((opcode & 0x0f8003f0) == 0x06800070 && ((opcode >> 20) & 3) != 1)
+	{
+		unsigned const kind = (opcode >> 20) & 3, rotate = ((opcode >> 10) & 3) * 8;
+		util::stream_format(stream, "%cXT%s%s%s", BIT(opcode, 22) ? 'U' : 'S', rn == 15 ? "" : "A",
+				kind == 0 ? "B16" : kind == 2 ? "B" : "H", condition);
+		WritePadding(stream, start_position);
+		util::stream_format(stream, "R%d, ", rd);
+		if (rn != 15)
+			util::stream_format(stream, "R%d, ", rn);
+		util::stream_format(stream, "R%d", rm);
+		if (rotate)
+			util::stream_format(stream, ", ROR #%d", rotate);
+	}
+	else if ((opcode & 0x0ff00030) == 0x06800010)
+	{
+		util::stream_format(stream, "PKH%s%s", BIT(opcode, 6) ? "TB" : "BT", condition);
+		WritePadding(stream, start_position);
+		util::stream_format(stream, "R%d, R%d, R%d", rd, rn, rm);
+		WriteShiftCount(stream, BIT(opcode, 6) ? 2 : 0, (opcode >> 7) & 31, true);
+	}
+	else if ((opcode & 0x0fa00030) == 0x06a00010 || (opcode & 0x0fb00ff0) == 0x06a00f30)
+	{
+		bool const half = (opcode & 0x0fb00ff0) == 0x06a00f30, uns = BIT(opcode, 22);
+		util::stream_format(stream, "%cSAT%s%s", uns ? 'U' : 'S', half ? "16" : "", condition);
+		WritePadding(stream, start_position);
+		util::stream_format(stream, "R%d, #%d, R%d", rd, ((opcode >> 16) & (half ? 15 : 31)) + (uns ? 0 : 1), rm);
+		if (!half)
+			WriteShiftCount(stream, BIT(opcode, 6) ? 2 : 0, (opcode >> 7) & 31, true);
+	}
+	else if ((opcode & 0x0ff00ff0) == 0x06800fb0)
+	{
+		util::stream_format(stream, "SEL%s", condition);
+		WritePadding(stream, start_position);
+		util::stream_format(stream, "R%d, R%d, R%d", rd, rn, rm);
+	}
+	else if ((opcode & 0x0f800f10) == 0x06000f10)
+	{
+		unsigned const group = (opcode >> 20) & 7, op = (opcode >> 5) & 7;
+		if (!(group & 3) || op == 5 || op == 6)
+			return false;
+		static const char *const PREFIXES[] = { "", "S", "Q", "SH", "", "U", "UQ", "UH" };
+		static const char *const OPERATIONS[] = { "ADD16", "ASX", "SAX", "SUB16", "ADD8", "", "", "SUB8" };
+		util::stream_format(stream, "%s%s%s", PREFIXES[group], OPERATIONS[op], condition);
+		WritePadding(stream, start_position);
+		util::stream_format(stream, "R%d, R%d, R%d", rd, rn, rm);
+	}
+	else if ((opcode & 0x0fb00090) == 0x07000010)
+	{
+		bool const wide = BIT(opcode, 22), sub = BIT(opcode, 6);
+		util::stream_format(stream, "%s%s%s", wide ? (sub ? "SMLSLD" : "SMLALD")
+				: rd == 15 ? (sub ? "SMUSD" : "SMUAD") : (sub ? "SMLSD" : "SMLAD"), BIT(opcode, 5) ? "X" : "", condition);
+		WritePadding(stream, start_position);
+		if (wide)
+			util::stream_format(stream, "R%d, R%d, R%d, R%d", rd, rn, rm, rs);
+		else
+		{
+			util::stream_format(stream, "R%d, R%d, R%d", rn, rm, rs);
+			if (rd != 15)
+				util::stream_format(stream, ", R%d", rd);
+		}
+	}
+	else if ((opcode & 0x0ff000d0) == 0x07500010 || (opcode & 0x0ff000d0) == 0x075000d0)
+	{
+		if (BIT(opcode, 7) && rd == 15)
+			return false;
+		util::stream_format(stream, "%s%s%s", BIT(opcode, 7) ? "SMMLS" : rd == 15 ? "SMMUL" : "SMMLA", BIT(opcode, 5) ? "R" : "", condition);
+		WritePadding(stream, start_position);
+		util::stream_format(stream, "R%d, R%d, R%d", rn, rm, rs);
+		if (rd != 15)
+			util::stream_format(stream, ", R%d", rd);
+	}
+	else if ((opcode & 0x0ff000f0) == 0x07800010)
+	{
+		util::stream_format(stream, "%s%s", rd == 15 ? "USAD8" : "USADA8", condition);
+		WritePadding(stream, start_position);
+		util::stream_format(stream, "R%d, R%d, R%d", rn, rm, rs);
+		if (rd != 15)
+			util::stream_format(stream, ", R%d", rd);
+	}
+	else
+		return false;
+	return true;
+}
+
+bool arm7_disassembler::dasm_thumbv6(std::ostream &stream, u16 opcode, std::streampos start_position)
+{
+	if ((opcode & 0xff00) == 0xb200 || ((opcode & 0xff00) == 0xba00 && ((opcode >> 6) & 3) != 2))
+	{
+		static const char *const EXTEND[] = { "SXTH", "SXTB", "UXTH", "UXTB" };
+		static const char *const REVERSE[] = { "REV", "REV16", "", "REVSH" };
+		stream << (BIT(opcode, 11) ? REVERSE : EXTEND)[(opcode >> 6) & 3];
+		WritePadding(stream, start_position);
+		util::stream_format(stream, "R%d, R%d", opcode & 7, (opcode >> 3) & 7);
+	}
+	else if ((opcode & 0xfff7) == 0xb650)
+	{
+		stream << "SETEND";
+		WritePadding(stream, start_position);
+		stream << (BIT(opcode, 3) ? "BE" : "LE");
+	}
+	else if ((opcode & 0xffe8) == 0xb660 && (opcode & 7))
+	{
+		stream << (BIT(opcode, 4) ? "CPSID" : "CPSIE");
+		WritePadding(stream, start_position);
+		if (BIT(opcode, 2))
+			stream << 'a';
+		if (BIT(opcode, 1))
+			stream << 'i';
+		if (BIT(opcode, 0))
+			stream << 'f';
+	}
+	else
+		return false;
+	return true;
+}
+
+bool arm7_disassembler::dasm_vfp_transfer(std::ostream &stream, u32 opcode, const char *condition, std::streampos start_position)
+{
+	unsigned const rd = (opcode >> 12) & 15, rn = (opcode >> 16) & 15, rm = opcode & 15;
+	bool const load = BIT(opcode, 20), dp = BIT(opcode, 8);
+	if ((opcode & 0x0f000010) == 0x0e000010 && !dp)
+	{
+		if ((opcode & 0x00e0007f) == 0x10 && rd != 15)
+		{
+			util::stream_format(stream, "VMOV%s", condition);
+			WritePadding(stream, start_position);
+			unsigned const sn = rn * 2 + BIT(opcode, 7);
+			if (load)
+				util::stream_format(stream, "R%d, S%d", rd, sn);
+			else
+				util::stream_format(stream, "S%d, R%d", sn, rd);
+			return true;
+		}
+		if ((opcode & 0x00e000ff) == 0x00e00010)
+		{
+			static const char *const SYSTEM_REGISTERS[] = { "FPSID", "FPSCR", nullptr, nullptr, nullptr, nullptr,
+					"MVFR1", "MVFR0", "FPEXC", "FPINST", "FPINST2" };
+			if (rn >= std::size(SYSTEM_REGISTERS) || !SYSTEM_REGISTERS[rn] || (rd == 15 && !(load && rn == 1)))
+				return false;
+			util::stream_format(stream, "%s%s", load ? "VMRS" : "VMSR", condition);
+			WritePadding(stream, start_position);
+			if (!load)
+				util::stream_format(stream, "%s, R%d", SYSTEM_REGISTERS[rn], rd);
+			else if (rd == 15)
+				stream << "APSR_nzcv, FPSCR";
+			else
+				util::stream_format(stream, "R%d, %s", rd, SYSTEM_REGISTERS[rn]);
+			return true;
+		}
+	}
+	else if ((opcode & 0x0fe000d0) == 0x0c400010)
+	{
+		unsigned const sm = rm * 2 + BIT(opcode, 5);
+		if (rd == 15 || rn == 15 || (dp ? BIT(opcode, 5) : sm == 31))
+			return false;
+		util::stream_format(stream, "VMOV%s", condition);
+		WritePadding(stream, start_position);
+		if (load)
+			util::stream_format(stream, "R%d, R%d, ", rd, rn);
+		if (dp)
+			util::stream_format(stream, "D%d", rm);
+		else
+			util::stream_format(stream, "S%d, S%d", sm, sm + 1);
+		if (!load)
+			util::stream_format(stream, ", R%d, R%d", rd, rn);
+		return true;
+	}
+	return false;
+}
+
+bool arm7_disassembler::dasm_vfp_data(std::ostream &stream, u32 opcode, const char *condition, std::streampos start_position)
+{
+	bool const dp = BIT(opcode, 8);
+	unsigned const rd = (opcode >> 12) & 15, rn = (opcode >> 16) & 15, rm = opcode & 15;
+	unsigned const sd = rd * 2 + BIT(opcode, 22), sn = rn * 2 + BIT(opcode, 7), sm = rm * 2 + BIT(opcode, 5);
+	unsigned const d = dp ? rd : sd, n = dp ? rn : sn, m = dp ? rm : sm;
+	unsigned const operation = (opcode >> 20) & 0xb;
+	char const reg = dp ? 'D' : 'S';
+	unsigned const precision = dp ? 64 : 32;
+	if (operation <= 3 || (operation == 8 && !BIT(opcode, 6)))
+	{
+		if (dp && (opcode & 0x004000a0))
+			return false; // VFP2 has D0-D15, not the VFP3 D16-D31 bank.
+		static const char *const OPERATIONS[] = { "VMLA", "VMLS", "VNMLS", "VNMLA", "VMUL", "VNMUL", "VADD", "VSUB" };
+		util::stream_format(stream, "%s%s.F%d", operation == 8 ? "VDIV" : OPERATIONS[operation * 2 + BIT(opcode, 6)], condition, precision);
+		WritePadding(stream, start_position);
+		util::stream_format(stream, "%c%d, %c%d, %c%d", reg, d, reg, n, reg, m);
+		return true;
+	}
+	if (operation != 11 || !BIT(opcode, 6))
+		return false;
+	if (rn <= 1)
+	{
+		if (dp && (opcode & 0x00400020))
+			return false;
+		static const char *const OPERATIONS[] = { "VMOV", "VABS", "VNEG", "VSQRT" };
+		util::stream_format(stream, "%s%s.F%d", OPERATIONS[rn * 2 + BIT(opcode, 7)], condition, precision);
+		WritePadding(stream, start_position);
+		util::stream_format(stream, "%c%d, %c%d", reg, d, reg, m);
+	}
+	else if (rn == 4 || rn == 5)
+	{
+		if ((dp && (opcode & 0x00400020)) || (rn == 5 && (opcode & 0x2f)))
+			return false;
+		util::stream_format(stream, "VCMP%s%s.F%d", BIT(opcode, 7) ? "E" : "", condition, precision);
+		WritePadding(stream, start_position);
+		util::stream_format(stream, "%c%d, ", reg, d);
+		if (rn == 5)
+			stream << "#0.0";
+		else
+			util::stream_format(stream, "%c%d", reg, m);
+	}
+	else if (rn == 7 && BIT(opcode, 7))
+	{
+		if (BIT(opcode, dp ? 5 : 22))
+			return false;
+		util::stream_format(stream, "VCVT%s.F%d.F%d", condition, dp ? 32 : 64, precision);
+		WritePadding(stream, start_position);
+		if (dp)
+			util::stream_format(stream, "S%d, D%d", sd, rm);
+		else
+			util::stream_format(stream, "D%d, S%d", rd, sm);
+	}
+	else if (rn == 8)
+	{
+		if (dp && BIT(opcode, 22))
+			return false;
+		util::stream_format(stream, "VCVT%s.F%d.%c32", condition, precision, BIT(opcode, 7) ? 'S' : 'U');
+		WritePadding(stream, start_position);
+		util::stream_format(stream, "%c%d, S%d", reg, d, sm);
+	}
+	else if (rn == 12 || rn == 13)
+	{
+		if (dp && BIT(opcode, 5))
+			return false;
+		util::stream_format(stream, "VCVT%s%s.%c32.F%d", BIT(opcode, 7) ? "" : "R", condition, rn == 13 ? 'S' : 'U', precision);
+		WritePadding(stream, start_position);
+		util::stream_format(stream, "S%d, %c%d", sd, reg, m);
+	}
+	else
+		return false;
+	return true;
+}
+
+bool arm7_disassembler::dasm_vfp(std::ostream &stream, u32 opcode, const char *condition, std::streampos start_position)
+{
+	if (((opcode >> 8) & 14) != 10)
+		return false;
+	if (dasm_vfp_transfer(stream, opcode, condition, start_position))
+		return true;
+	if ((opcode & 0x0f000010) == 0x0e000000)
+		return dasm_vfp_data(stream, opcode, condition, start_position);
+	// Unrecognized double-register transfers must not become VLDM/VSTM.
+	if ((opcode & 0x0e000000) != 0x0c000000 || (opcode & 0x0fe00000) == 0x0c400000)
+		return false;
+	bool const dp = BIT(opcode, 8), load = BIT(opcode, 20), pre = BIT(opcode, 24), up = BIT(opcode, 23), wb = BIT(opcode, 21);
+	unsigned const rd = (opcode >> 12) & 15, rn = (opcode >> 16) & 15;
+	unsigned const first = dp ? rd : rd * 2 + BIT(opcode, 22), count = (opcode & 255) >> (dp ? 1 : 0);
+	char const reg = dp ? 'D' : 'S';
+	if (dp && BIT(opcode, 22))
+		return false;
+	if (pre && !wb)
+	{
+		util::stream_format(stream, "%s%s", load ? "VLDR" : "VSTR", condition);
+		WritePadding(stream, start_position);
+		util::stream_format(stream, "%c%d, [R%d", reg, first, rn);
+		unsigned const offset = (opcode & 255) * 4;
+		if (offset || !up)
+			util::stream_format(stream, ", #%s%s%X", up ? "" : "-", offset > 9 ? "0x" : "", offset);
+		stream << ']';
+	}
+	else
+	{
+		if (!count || first + count > (dp ? 16 : 32) || !(up ? !pre : (pre && wb)) || (wb && rn == 15))
+			return false;
+		// Odd doubleword counts encode the VFP2 extended register-save form.
+		if (dp && BIT(opcode, 0))
+			util::stream_format(stream, "%s%sX%s", load ? "FLDM" : "FSTM", up ? "IA" : "DB", condition);
+		else
+			util::stream_format(stream, "%s%s%s", load ? "VLDM" : "VSTM", up ? "IA" : "DB", condition);
+		WritePadding(stream, start_position);
+		util::stream_format(stream, "R%d%s, {%c%d", rn, wb ? "!" : "", reg, first);
+		if (count > 1)
+			util::stream_format(stream, "-%c%d", reg, first + count - 1);
+		stream << '}';
+	}
+	return true;
+}
+
 u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t opcode )
 {
 	static const char *const pOperation[16] =
@@ -238,6 +614,20 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 	uint32_t dasmflags = 0;
 	std::streampos start_position = stream.tellp();
 	const u8 arch = m_config->get_arch_rev();
+	if (arch >= 6 && dasm_armv6(stream, opcode, pConditionCode, start_position, dasmflags))
+		return 4 | dasmflags | SUPPORTED;
+	if (m_config->get_vfp_flag() && opcode < 0xf0000000 && dasm_vfp(stream, opcode, pConditionCode, start_position))
+		return 4 | SUPPORTED;
+
+	// Decode double-register transfers before the overlapping LDC/STC space.
+	if (arch >= 5 && (opcode & 0x0fe00000) == 0x0c400000 && (opcode < 0xf0000000 || arch >= 6))
+	{
+		util::stream_format(stream, "%s%s", BIT(opcode, 20) ? "MRRC" : "MCRR", opcode >= 0xf0000000 ? "2" : pConditionCode);
+		WritePadding(stream, start_position);
+		util::stream_format(stream, "p%d, %d, R%d, R%d, c%d", (opcode >> 8) & 15, (opcode >> 4) & 15,
+				(opcode >> 12) & 15, (opcode >> 16) & 15, opcode & 15);
+		return 4 | SUPPORTED;
+	}
 
 	if( arch >= 3 && (opcode&0xfe000000)==0xfa000000 ) //bits 31-25 == 1111 101 (BLX - v5)
 	{
@@ -774,12 +1164,12 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 		//Register Transfer
 		if(opcode&0x10)
 		{
-			DasmCoProc_RT(stream, opcode, pConditionCode, start_position);
+			DasmCoProc_RT(stream, opcode, arch >= 5 && opcode >= 0xf0000000 ? "2" : pConditionCode, start_position);
 		}
 		//Data Op
 		else
 		{
-			DasmCoProc_DO(stream, opcode, pConditionCode, start_position);
+			DasmCoProc_DO(stream, opcode, arch >= 5 && opcode >= 0xf0000000 ? "2" : pConditionCode, start_position);
 		}
 	}
 	else if( (opcode&0x0f000000) == 0x0f000000 )    //bits 27-24 == 1111
@@ -803,6 +1193,8 @@ u32 arm7_disassembler::thumb_disasm(std::ostream &stream, uint32_t pc, uint16_t 
 {
 	std::streampos start_position = stream.tellp();
 	uint32_t dasmflags = 0;
+	if (m_config->get_arch_rev() >= 6 && dasm_thumbv6(stream, opcode, start_position))
+		return 2 | SUPPORTED;
 
 //  uint32_t readword;
 	uint32_t addr;

@@ -262,9 +262,9 @@ u8 mcs51_cpu_device::sbuf_r()
 
 void mcs51_cpu_device::sbuf_w(u8 data)
 {
-	m_sbuf = data;
-	LOGMASKED(LOG_TX, "tx byte 0x%02x\n", m_sbuf);
-	m_uart.data_out = m_sbuf;
+	// SBUF is two registers: writes load the transmitter, reads (sbuf_r) the receive buffer
+	LOGMASKED(LOG_TX, "tx byte 0x%02x\n", data);
+	m_uart.data_out = data;
 	m_uart.txbit = SIO_START;
 }
 
@@ -276,6 +276,7 @@ u8 mcs51_cpu_device::ie_r()
 void mcs51_cpu_device::ie_w(u8 data)
 {
 	m_ie = data;
+	m_irq_delayed = 0xff;
 }
 
 u8 mcs51_cpu_device::ip_r()
@@ -287,6 +288,7 @@ void mcs51_cpu_device::ip_w(u8 data)
 {
 	m_ip = data;
 	update_irq_prio();
+	m_irq_delayed = 0xff;
 }
 
 u8 mcs51_cpu_device::p0_r()
@@ -327,7 +329,9 @@ u8 mcs51_cpu_device::p3_r()
 	return m_rwm ? m_p3 :
 		(m_p3 | m_forced_inputs[3]) & m_port_in_cb[3]()
 		& ~(BIT(m_last_line_state, MCS51_INT0_LINE) ? 4 : 0)
-		& ~(BIT(m_last_line_state, MCS51_INT1_LINE) ? 8 : 0);
+		& ~(BIT(m_last_line_state, MCS51_INT1_LINE) ? 8 : 0)
+		& ~(BIT(m_last_line_state, MCS51_T0_LINE) ? 0x10 : 0)
+		& ~(BIT(m_last_line_state, MCS51_T1_LINE) ? 0x20 : 0);
 }
 
 void mcs51_cpu_device::p3_w(u8 data)
@@ -787,6 +791,19 @@ void mcs51_cpu_device::transmit_receive(int source)
 }
 
 
+bool mcs51_cpu_device::timer1_split_uses_input() const
+{
+	return false;
+}
+
+bool mcs51_cpu_device::timer_running(u32 timer) const
+{
+	bool const running = BIT(m_tcon, timer ? TCON_TR1 : TCON_TR0)
+		|| (timer && (m_tmod & 3) == 3 && timer1_split_uses_input());
+	return running && (!BIT(m_tmod, timer ? TMOD_GATE1 : TMOD_GATE0)
+		|| !BIT(m_last_line_state, timer ? MCS51_INT1_LINE : MCS51_INT0_LINE));
+}
+
 void mcs51_cpu_device::update_timer_t0(int cycles)
 {
 	int mode = (BIT(m_tmod, TMOD_M0_1) << 1) | BIT(m_tmod, TMOD_M0_0);
@@ -800,10 +817,8 @@ void mcs51_cpu_device::update_timer_t0(int cycles)
 		// taken, reset
 		m_t0_cnt = 0;
 
-		/* TODO: Not sure about IE0. The manual specifies INT0=high,
-		 * which in turn means CLEAR_LINE.
-		 * IE0 may be edge triggered depending on IT0 */
-		if (BIT(m_tmod, TMOD_GATE0) && !BIT(m_tcon, TCON_IE0))
+		// INT0 is active low; GATE uses its pin level, independently of IE0.
+		if (BIT(m_tmod, TMOD_GATE0) && BIT(m_last_line_state, MCS51_INT0_LINE))
 			delta = 0;
 
 		switch (mode)
@@ -882,9 +897,9 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 	u8 mode_0 = (BIT(m_tmod, TMOD_M0_1) << 1) | BIT(m_tmod, TMOD_M0_0);
 	u32 count;
 
-	if (mode_0 != 3)
+	if (mode_0 != 3 || timer1_split_uses_input())
 	{
-		if (BIT(m_tcon, TCON_TR1))
+		if (BIT(m_tcon, TCON_TR1) || mode_0 == 3)
 		{
 			u32 overflow = 0;
 
@@ -894,10 +909,8 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 			// taken, reset
 			m_t1_cnt = 0;
 
-			/* TODO: Not sure about IE0. The manual specifies INT0=high,
-			 * which in turn means CLEAR_LINE. Change to access last_state?
-			 * IE0 may be edge triggered depending on IT0 */
-			if (BIT(m_tmod, TMOD_GATE1) && !BIT(m_tcon, TCON_IE1))
+			// INT1 is active low; GATE uses its pin level, independently of IE1.
+			if (BIT(m_tmod, TMOD_GATE1) && BIT(m_last_line_state, MCS51_INT1_LINE))
 				delta = 0;
 
 			switch (mode)
@@ -930,7 +943,8 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 			}
 			if (overflow)
 			{
-				set_tf1(1);
+				if (mode_0 != 3)
+					set_tf1(1);
 				transmit_receive(1);
 			}
 		}
@@ -1018,16 +1032,36 @@ bool mcs51_cpu_device::manage_idle_on_interrupt(u8 ints)
 	return false;
 }
 
-void mcs51_cpu_device::check_irqs()
+u8 mcs51_cpu_device::pending_irq_flags(u8 int_mask)
 {
 	u8 ints = (BIT(m_tcon, TCON_IE0) | (BIT(m_tcon, TCON_TF0) << 1) | (BIT(m_tcon, TCON_IE1) << 2) | (BIT(m_tcon, TCON_TF1) << 3) | ((BIT(m_scon, SCON_RI) | BIT(m_scon, SCON_TI)) << 4));
+	irqs_complete_and_mask(ints, int_mask);
+	return ints;
+}
+
+u8 mcs51_cpu_device::interrupt_mask()
+{
+	return BIT(m_ie, IE_A) ? m_ie : 0;
+}
+
+void mcs51_cpu_device::interrupt_taken()
+{
+	m_inst_cycles += 2;
+}
+
+void mcs51_cpu_device::check_irqs()
+{
 	u8 int_vec = 0;
 	int priority_request = -1;
 
 	// Abort if all interrupts disabled or none pending
-	u8 int_mask = BIT(m_ie, IE_A) ? m_ie : 0x00;
+	u8 ints = pending_irq_flags(interrupt_mask());
 
-	irqs_complete_and_mask(ints, int_mask);
+	// Flags are sampled in one machine cycle and polled in the next, so a flag
+	// set in the last cycle of an instruction is only seen after the next one.
+	// RETI and IE/IP writes inhibit every source for that polling cycle.
+	ints &= ~m_irq_delayed;
+	m_irq_delayed = 0;
 
 	if (!ints)
 		return;
@@ -1073,12 +1107,12 @@ void mcs51_cpu_device::check_irqs()
 		standard_irq_callback(1, m_pc);
 	}
 
+	// the next opcode is fetched in the polling cycle and then discarded
+	m_program.read_byte(m_pc);
+
 	// Save current pc to stack, set pc to new interrupt vector
 	push_pc();
 	m_pc = int_vec;
-
-	// interrupts take 24 cycles
-	m_inst_cycles += 2;
 
 	// Set current Irq & Priority being serviced
 	m_cur_irq_prio = priority_request;
@@ -1118,21 +1152,30 @@ void mcs51_cpu_device::check_irqs()
 		// case V_PFI:
 		// no flags are cleared, PFW is reset by software, this has the same vector as V_TF2.
 	}
+	interrupt_taken();
+}
+
+void mcs51_cpu_device::update_peripherals()
+{
+	update_timer_t0(1);
+	update_timer_t1(1);
+	update_timer_t2(1);
+	transmit_receive(0);
 }
 
 void mcs51_cpu_device::burn_cycles(int cycles)
 {
 	while (cycles--)
 	{
+		u8 const before = cycles ? 0 : pending_irq_flags(0xff);
+
 		m_icount--;
 
-		// update timers
-		update_timer_t0(1);
-		update_timer_t1(1);
-		update_timer_t2(1);
+		update_peripherals();
 
-		// check and update status of serial port
-		transmit_receive(0);
+		// remember flags raised in the instruction's last cycle
+		if (!cycles)
+			m_irq_delayed |= pending_irq_flags(0xff) & ~before;
 	}
 }
 
@@ -1185,12 +1228,12 @@ void mcs51_cpu_device::handle_irq(int irqline, int state, u32 new_state, u32 tr_
 			break;
 
 		case MCS51_T0_LINE:
-			if (BIT(tr_state, MCS51_T0_LINE) && BIT(m_tcon, TCON_TR0))
+			if (BIT(tr_state, MCS51_T0_LINE) && timer_running(0))
 				m_t0_cnt++;
 			break;
 
 		case MCS51_T1_LINE:
-			if (BIT(tr_state, MCS51_T1_LINE) && BIT(m_tcon, TCON_TR1))
+			if (BIT(tr_state, MCS51_T1_LINE) && timer_running(1))
 				m_t1_cnt++;
 			break;
 	}
@@ -1221,6 +1264,16 @@ void mcs51_cpu_device::handle_ta_window()
 {
 }
 
+bool mcs51_cpu_device::instruction_enabled() const
+{
+	return !(m_has_pd && BIT(m_pcon, PCON_IDL) && !BIT(m_pcon, PCON_PD));
+}
+
+void mcs51_cpu_device::prepare_instruction(u8 op)
+{
+	m_inst_cycles += mcs51_cycles[op];
+}
+
 // Execute cycles
 void mcs51_cpu_device::execute_run()
 {
@@ -1238,13 +1291,13 @@ void mcs51_cpu_device::execute_run()
 		}
 
 		// if not idling, process next opcode
-		if (!(m_has_pd && BIT(m_pcon, PCON_IDL) && !BIT(m_pcon, PCON_PD)))
+		if (instruction_enabled())
 		{
 			m_ppc = m_pc;
 			debugger_instruction_hook(m_pc);
 			u8 op = m_program.read_byte(m_pc++);
 
-			m_inst_cycles += mcs51_cycles[op];
+			prepare_instruction(op);
 			execute_op(op);
 		}
 		else
@@ -1279,13 +1332,12 @@ void mcs51_cpu_device::device_start()
 	save_item(NAME(m_last_line_state));
 	save_item(NAME(m_t0_cnt));
 	save_item(NAME(m_t1_cnt));
-	save_item(NAME(m_t2_cnt));
-	save_item(NAME(m_t2ex_cnt));
 	save_item(NAME(m_cur_irq_prio));
 	save_item(NAME(m_irq_active));
 	save_item(NAME(m_irq_prio));
 	save_item(NAME(m_last_op));
 	save_item(NAME(m_last_bit));
+	save_item(NAME(m_irq_delayed));
 
 	save_item(NAME(m_dptr));
 	save_item(NAME(m_acc));
@@ -1382,14 +1434,13 @@ void mcs51_cpu_device::device_reset()
 	m_last_line_state = 0;
 	m_t0_cnt = 0;
 	m_t1_cnt = 0;
-	m_t2_cnt = 0;
-	m_t2ex_cnt = 0;
 
 	// Flag as NO IRQ in Progress
 	m_irq_active = 0;
 	m_cur_irq_prio = -1;
 	m_last_op = 0;
 	m_last_bit = 0;
+	m_irq_delayed = 0;
 
 	// these are all defined reset states
 	m_rwm = 0;
@@ -1412,28 +1463,23 @@ void mcs51_cpu_device::device_reset()
 	m_tl1 = 0;
 	m_tl0 = 0;
 
-	// release RXD before driving the ports
+	// Set up the UART first: p3_w() ANDs RxD and TxD into P3.0 and P3.1, so they must already be idle.
+	m_uart.data_out = 0;
+	m_uart.data_in = 0;
+	m_uart.rx_clk = 0;
+	m_uart.tx_clk = 0;
+	m_uart.txbit = SIO_IDLE;
+	m_uart.txd = 1;
 	m_uart.rxd = 1;
+	m_uart.rxbit = SIO_IDLE;
+	m_uart.rxb8 = 0;
+	m_uart.smod_div = 0;
 
 	// set the port configurations to all 1's
 	p3_w(0xff);
 	p2_w(0xff);
 	p1_w(0xff);
 	p0_w(0xff);
-
-	m_uart.data_out = 0;
-	m_uart.data_in = 0;
-	m_uart.rx_clk = 0;
-	m_uart.tx_clk = 0;
-	m_uart.txbit = SIO_IDLE;
-	// TODO: TXD should also be released before driving the ports, as P3.1 reads
-	// low on the first reset otherwise (m_uart.txd isn't initialized until here),
-	// but that changes what drivers listening to TXD see at power on, so it has
-	// to be checked against them first
-	m_uart.txd = 1;
-	m_uart.rxbit = SIO_IDLE;
-	m_uart.rxb8 = 0;
-	m_uart.smod_div = 0;
 
 	update_irq_prio();
 }

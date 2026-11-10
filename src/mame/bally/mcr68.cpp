@@ -303,8 +303,7 @@ void mcr68_state::mcr68_update_sprites(screen_device &screen, bitmap_ind16 &bitm
 	rectangle sprite_clip = m_screen->visible_area();
 
 	/* adjust for clipping */
-	sprite_clip.min_x += m_sprite_clip;
-	sprite_clip.max_x -= m_sprite_clip;
+	sprite_clip.insetx(m_sprite_clip, m_sprite_clip);
 	sprite_clip &= cliprect;
 
 	screen.priority().fill(1, sprite_clip);

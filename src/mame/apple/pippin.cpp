@@ -29,9 +29,9 @@
 #include "bus/adb/adb.h"
 #include "bus/adb/cards.h"
 #include "bus/nscsi/cd.h"
+#include "bus/nscsi/cr504.h"
 #include "bus/nscsi/devices.h"
 #include "cpu/powerpc/ppc.h"
-#include "cpu/mn1880/mn1880.h"
 #include "machine/input_merger.h"
 #include "machine/intelfsh.h"
 #include "machine/ram.h"
@@ -70,8 +70,6 @@ public:
 
 private:
 	void pippin_map(address_map &map) ATTR_COLD;
-	void cdmcu_mem(address_map &map) ATTR_COLD;
-	void cdmcu_data(address_map &map) ATTR_COLD;
 
 	void cuda_reset_w(int state);
 
@@ -165,32 +163,6 @@ void pippin_state::flash_w(offs_t offset, u8 data)
 	m_flash->write(offset, bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
 }
 
-void pippin_state::cdmcu_mem(address_map &map)
-{
-	map(0x0000, 0xffff).rom().region("cdrom", 0);
-}
-
-void pippin_state::cdmcu_data(address_map &map)
-{
-	map(0x0000, 0x0001).noprw();
-	map(0x0003, 0x0003).noprw();
-	map(0x0004, 0x0008).nopw();
-	map(0x0008, 0x0008).nopr();
-	map(0x0009, 0x0009).noprw();
-	map(0x000f, 0x000f).noprw();
-	map(0x001f, 0x0021).nopw();
-	map(0x0031, 0x0031).noprw();
-	map(0x0033, 0x0033).nopw();
-	map(0x0036, 0x0036).noprw();
-	map(0x0060, 0x031f).ram();
-	map(0x802a, 0x802a).nopw();
-	map(0x802f, 0x8034).nopw();
-	map(0x8032, 0x8032).nopr();
-	map(0x8035, 0x8035).lr8(NAME([]() { return 0x40; }));
-	map(0x8037, 0x8037).noprw();
-	map(0x8038, 0x8039).nopw();
-}
-
 /* Input ports */
 static INPUT_PORTS_START( pippin )
 INPUT_PORTS_END
@@ -220,11 +192,18 @@ void pippin_state::pippin(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config([](device_t *device)
+	nscsi_connector &cdslot(NSCSI_CONNECTOR(config, "scsi:3"));
+	cdslot.option_add("cr504", CR504).machine_config([](device_t *device)
+	{
+		downcast<cr504_device &>(*device).add_route(0, "^^speaker", 1.0, 0);
+		downcast<cr504_device &>(*device).add_route(1, "^^speaker", 1.0, 1);
+	});
+	cdslot.option_add("cdrom", NSCSI_CDROM_APPLE).machine_config([](device_t *device)
 	{
 		device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
 		device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
 	});
+	cdslot.set_default_option("cdrom");
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
@@ -287,11 +266,6 @@ void pippin_state::pippin(machine_config &config)
 	m_grandcentral->pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
 	m_grandcentral->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
 	m_grandcentral->cb2_callback().set(m_cuda, FUNC(cuda_device::set_via_data));
-
-	mn1880_device &cdmcu(MN1880(config, "cdmcu", 8388608)); // type and clock unknown
-	cdmcu.set_addrmap(AS_PROGRAM, &pippin_state::cdmcu_mem);
-	cdmcu.set_addrmap(AS_DATA, &pippin_state::cdmcu_data);
-	cdmcu.set_disable();
 }
 
 /* ROM definition */
@@ -326,9 +300,6 @@ ROM_START( pippin )
 
 	ROM_SYSTEM_BIOS(4, "pre", "Kinka pre-release")
 	ROMX_LOAD( "kinka-pre.rom", 0x000000, 0x400000, CRC(4ff875e6) SHA1(eb8739cab1807c6c7c51acc7f4a3afc1f9c6ddbb),ROM_BIOS(4) )
-
-	ROM_REGION( 0x10000, "cdrom", 0 ) /* MATSUSHITA CR504-L OEM */
-	ROM_LOAD( "504par4.0i.ic7", 0x0000, 0x10000, CRC(25f7dd46) SHA1(ec3b3031742807924c6259af865e701827208fec) )
 ROM_END
 
 /* Driver */

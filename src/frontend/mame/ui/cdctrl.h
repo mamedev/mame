@@ -15,17 +15,17 @@
 
 #include "ui/devctrl.h"
 
-#include "imagedev/cdplayer.h"
+#include "imagedev/cdromimg.h"
 
 #include "notifier.h"
 
 
 namespace ui {
 
-class menu_cd_control : public menu_device_control<cd_player_device>
+class menu_cd_control : public menu_device_control<device_cd_player_interface, cd_player_interface_enumerator>
 {
 public:
-	menu_cd_control(mame_ui_manager &mui, render_target &target, cd_player_device *device);
+	menu_cd_control(mame_ui_manager &mui, render_target &target, device_cd_player_interface *device);
 	virtual ~menu_cd_control() override;
 
 private:

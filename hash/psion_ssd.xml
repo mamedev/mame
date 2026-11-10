@@ -241,7 +241,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="games1" supported="partial">
+	<software name="games1">
 		<description>Games 1</description>
 		<year>1993</year>
 		<publisher>Psion</publisher>
@@ -253,7 +253,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="games2" supported="partial">
+	<software name="games2">
 		<description>Games 2</description>
 		<year>1993</year>
 		<publisher>Psion</publisher>
@@ -265,7 +265,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="games3a" supported="partial">
+	<software name="games3a">
 		<description>Games 3a</description>
 		<year>1995</year>
 		<publisher>Psion</publisher>
@@ -338,7 +338,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="paint" supported="partial">
+	<software name="paint">
 		<description>Paint &amp; Compose</description>
 		<year>1994</year>
 		<publisher>Widget Software</publisher>
@@ -411,7 +411,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="sienademo" supported="partial">
+	<software name="sienademo">
 		<description>Siena Demonstration</description>
 		<year>1996</year>
 		<publisher>Psion</publisher>
@@ -483,7 +483,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wgames3" supported="partial">
+	<software name="wgames3">
 		<description>Widget Games Pack 3</description>
 		<year>1995</year>
 		<publisher>Widget Software</publisher>

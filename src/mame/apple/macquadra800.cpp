@@ -90,8 +90,6 @@ private:
 	required_device<ncr53c96_device> m_ncr1;
 	required_device<dp83932c_device> m_sonic;
 
-	u8 m_mac[6];
-
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
@@ -104,22 +102,16 @@ private:
 	void mac_scc_2_w(offs_t offset, u16 data) { m_iosb->via_sync(); m_scc->dc_ab_w(offset, data >> 8); }
 
 	u8 ethernet_mac_r(offs_t offset);
+	u8 mac_prom(offs_t index) const;
 };
 
 void quadra800_state::machine_start()
 {
 	m_djmemc->set_ram_info(m_ram->pointer<u32>(), m_ram->size());
 
-	// MAC PROM is stored with a bit swizzle and must match one of 2
-	// Apple-assigned OUI blocks 00:05:02 or 08:00:07
-	const std::array<u8, 6> &MAC = m_sonic->get_mac();
-	m_mac[0] = bitswap<8>(0x08, 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[1] = bitswap<8>(0x00, 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[2] = bitswap<8>(0x07, 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[3] = bitswap<8>(MAC[3], 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[4] = bitswap<8>(MAC[4], 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[5] = bitswap<8>(MAC[5], 0, 1, 2, 3, 7, 6, 5, 4);
-	m_sonic->set_mac(&m_mac[0]);
+	u32 const num = machine().rand();
+	u8 const mac[6] = { 0x08, 0x00, 0x07, u8(num >> 16), u8(num >> 8), u8(num) };
+	m_sonic->set_mac(mac);
 }
 
 void quadra800_state::machine_reset()
@@ -130,11 +122,19 @@ void quadra800_state::init_macqd800()
 {
 }
 
+// MAC PROM is stored with a bit swizzle and must match one of 2
+// Apple-assigned OUI blocks 00:05:02 or 08:00:07
+u8 quadra800_state::mac_prom(offs_t index) const
+{
+	static constexpr u8 OUI[3] = { 0x08, 0x00, 0x07 };
+	return bitswap<8>((index < 3) ? OUI[index] : m_sonic->get_mac()[index], 0, 1, 2, 3, 4, 5, 6, 7);
+}
+
 u8 quadra800_state::ethernet_mac_r(offs_t offset)
 {
 	if (offset < 6)
 	{
-		return m_mac[offset];
+		return mac_prom(offset);
 	}
 	else if (offset == 7)
 	{
@@ -142,7 +142,7 @@ u8 quadra800_state::ethernet_mac_r(offs_t offset)
 
 		for (int i = 0; i < 6; i++)
 		{
-			xor_total ^= (u8)m_mac[i];
+			xor_total ^= mac_prom(i);
 		}
 
 		return xor_total ^ 0xff;

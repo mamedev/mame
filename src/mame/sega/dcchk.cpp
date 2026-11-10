@@ -308,7 +308,8 @@ void dcchk_state::dcchk(machine_config &config)
 
 	SPEAKER(config, "md_speaker", 2).front();
 
-	YM2612(config, m_opn, md_master_xtal / 7);
+	// should be MD2 VA4 equivalent
+	YM3438(config, m_opn, md_master_xtal / 7);
 	m_opn->add_route(0, "md_speaker", 0.50, 0);
 	m_opn->add_route(1, "md_speaker", 0.50, 1);
 

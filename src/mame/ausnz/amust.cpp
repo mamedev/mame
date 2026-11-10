@@ -141,6 +141,7 @@ private:
 	void machine_reset() override ATTR_COLD;
 	void machine_start() override ATTR_COLD;
 	void do_int();
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
 	u8 m_port04 = 0U;
 	u8 m_port06 = 0U;
@@ -239,10 +240,15 @@ void amust_state::do_int()
 		|| (BIT(m_port0a, 5) && m_drq))        // when reading from floppy, only do it when DRQ is high.
 	{
 		//printf("%X,%X,%X ",m_port0a,sync,m_drq);
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0x00); // Z80
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE); // Z80
 	}
 	else
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(amust_state::cpu_acknowledge_irq)
+{
+	return 0x00;
 }
 
 void amust_state::drq_w(int state)
@@ -463,6 +469,7 @@ void amust_state::amust(machine_config &config)
 	Z80(config, m_maincpu, XTAL(16'000'000) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &amust_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &amust_state::io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(amust_state::cpu_acknowledge_irq));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));

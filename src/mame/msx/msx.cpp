@@ -255,7 +255,6 @@ void msx_state::machine_reset()
 
 void msx_state::machine_start()
 {
-	m_maincpu->set_input_line_vector(0, 0xff); // Z80
 	m_maincpu->z80_set_m1_cycles(4+1); // 1 WAIT CLK per M1
 
 	save_item(NAME(m_psg_b));

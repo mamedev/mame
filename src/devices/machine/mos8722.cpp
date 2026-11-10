@@ -43,8 +43,8 @@ DEFINE_DEVICE_TYPE(MOS8722, mos8722_device, "mos8722", "MOS 8722 MMU")
 
 
 // RAM configuration register
-static const offs_t RCR_BOTTOM_ADDRESS[4] = { 0x0400, 0x1000, 0x0400, 0x1000 };
-static const offs_t RCR_TOP_ADDRESS[4] =    { 0xf000, 0xf000, 0xe000, 0xc000 };
+static const offs_t RCR_BOTTOM_ADDRESS[4] = { 0x0400, 0x1000, 0x2000, 0x4000 };
+static const offs_t RCR_TOP_ADDRESS[4] =    { 0xfc00, 0xf000, 0xe000, 0xc000 };
 
 #define RCR_SHARE       (m_reg[RCR] & 0x03)
 #define RCR_BOTTOM      BIT(m_reg[RCR], 2)
@@ -86,6 +86,9 @@ mos8722_device::mos8722_device(const machine_config &mconfig, const char *tag, d
 
 void mos8722_device::device_start()
 {
+	save_item(NAME(m_reg));
+	save_item(NAME(m_p0h_latch));
+	save_item(NAME(m_p1h_latch));
 }
 
 

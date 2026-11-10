@@ -1498,7 +1498,8 @@ Image Fight has serious [VDP1] [VDP2] video bugs (missing layers, misaligned lay
 		<year>1997</year>
 		<publisher>NCS</publisher>
 		<notes><![CDATA[
-Throws a not ready [CD-Block] transfer fatalerror when reaching gameplay
+Throws a not ready [CD-Block] transfer fatalerror when reaching gameplay (check commands, may be missing a CD_STAT_WAIT somewhere)
+[VDP2] draws with bad scaling around the third attract cycle
 ]]></notes>
 		<info name="serial" value="T-2501G"/>
 		<info name="release" value="19970221"/>
@@ -6097,11 +6098,14 @@ https://mametesters.org/view.php?id=7417
 		</part>
 	</software>
 
-	<!-- Identifying Riglordsaga 2 (Japan) (2M)... -->
 	<software name="riglord2" supported="no">
 		<description>Riglordsaga 2 (Japan, 2M)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Crashes during now loading screen, [CD-Block] (fixed)
+Not extensively tested
+]]></notes>
 		<info name="serial" value="GS-9084"/>
 		<info name="release" value="19961108"/>
 		<info name="alt_title" value="リグロード サーガ2"/>
@@ -6496,7 +6500,7 @@ Not extensively tested
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
 Doesn't draw the Sega Ages logo at boot [VDP2?]
-Sets [CD-Block] HIRM with DCHG, wants the A-Bus irq if user hits the tray open
+Sets [CD-Block] HIRM with DCHG, wants the A-Bus irq if user hits tray open button
 Stack Columns: playback the wrong redbook track in gameplay [CD-Block]
 Not extensively tested
 ]]></notes>
@@ -6819,11 +6823,13 @@ Black screen after loading of a new game, requires raster effect support in [VDP
 		</part>
 	</software>
 
-	<!-- Identifying Shanghai - Banri no Choujou (Japan) (1M)... -->
 	<software name="shangban" cloneof="shanghtt" supported="no">
-		<description>Shanghai - Banri no Choujou (Japan, 1M)</description>
+		<description>Shanghai: Banri no Choujou (Japan, 1M)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
+		<notes><![CDATA[
+[CD-Block] Black screen, regressed around 0.289 ~ 0.290
+]]></notes>
 		<info name="serial" value="T-1505G"/>
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="上海 万里の長城"/>
@@ -6835,11 +6841,13 @@ Black screen after loading of a new game, requires raster effect support in [VDP
 		</part>
 	</software>
 
-	<!-- Identifying Shanghai - Banri no Choujou (Japan) (Rev A)... -->
 	<software name="shangbana" cloneof="shanghtt" supported="no">
-		<description>Shanghai - Banri no Choujou (Japan, rev A)</description>
+		<description>Shanghai: Banri no Choujou (Japan, rev A)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
+		<notes><![CDATA[
+(as shangban)
+]]></notes>
 		<info name="serial" value="T-1505G"/>
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="上海 万里の長城"/>
@@ -7815,7 +7823,8 @@ Runs too slow (presumably same issue as pfght)
 		<year>1996</year>
 		<publisher>Micro Cabin</publisher>
 		<notes><![CDATA[
-Crashes after now loading screen, [CD-Block]
+Crashes after now loading screen, [CD-Block] (fixed)
+Not extensively tested
 ]]></notes>
 		<info name="serial" value="T-5202G"/>
 		<info name="release" value="19960531"/>
@@ -13987,11 +13996,14 @@ Black screen, [CD-Block]
 		</part>
 	</software>
 
-	<!-- Identifying Yoshimoto Mah-jong Club (JAP) (DW0474)... -->
 	<software name="yoshimj" supported="no">
 		<description>Yoshimoto Mahjong Club (Japan)</description>
 		<year>1998</year>
 		<publisher>Psikyo</publisher>
+		<notes><![CDATA[
+No BGM sound in main menu [SCSP] or [CD-Block]
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-20403G"/>
 		<info name="release" value="19981217"/>
 		<info name="alt_title" value="よしもと麻雀倶楽部"/>
@@ -14831,7 +14843,7 @@ Not extensively tested
 	<software name="bptennisj" cloneof="bptennis" supported="no">
 		<description>Break Point (Japan)</description>
 		<year>1997</year>
-		<publisher>Pack-In Video</publisher>
+		<publisher>Pack-in-Video</publisher>
 		<notes><![CDATA[
 Not extensively tested
 ]]></notes>
@@ -15660,7 +15672,7 @@ TODO: how to reload with [mouse]?
 		<publisher>Takara</publisher>
 		<notes><![CDATA[
 [CD-Block] attempts to playback a redbook on title screen, goes silent
-Heavy 3D corruption in gameplay [SCUDSP]
+Not extensively tested
 Optional unsupported Mascon device
 ]]></notes>
 		<info name="serial" value="T-10317G"/>
@@ -16258,11 +16270,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- FMV playback is very glitchy [CD-Block] -->
 	<software name="fifa96j" cloneof="fifa96" supported="no">
 		<description>FIFA Soccer 96 (Japan)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts Victor</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-10606G"/>
 		<info name="release" value="19960315"/>
 		<info name="alt_title" value="FIFAサッカー96"/>
@@ -17493,7 +17507,7 @@ Allegedly should enable [VDP2] RGB1 with RGB0 disabled
 	<software name="hyprsecs" supported="no">
 		<description>Hyper Securities S (Japan)</description>
 		<year>1997</year>
-		<publisher>Pack-In Video</publisher>
+		<publisher>Pack-in-Video</publisher>
 		<info name="serial" value="T-9105G"/>
 		<info name="release" value="19970207"/>
 		<info name="alt_title" value="はいぱあセキュリティーズS"/>
@@ -18454,7 +18468,7 @@ Glitchy Tecnosoft logo, [SCUDSP]
 		<year>1996</year>
 		<publisher>Electronic Arts Victor</publisher>
 		<notes><![CDATA[
-[CD-Block] black screen at startup, crashes
+Has unusable [VDP2]? cockpit view, draws steering wheel in sky with other views
 Known to use [SCUDSP]
 ]]></notes>
 		<info name="serial" value="T-10613G"/>
@@ -18645,7 +18659,7 @@ Known to use [SCUDSP]
 	<software name="pinbgrafj" cloneof="pinbgraf" supported="no">
 		<description>Pinball Graffiti (Japan)</description>
 		<year>1996</year>
-		<publisher>Pack-In Video</publisher>
+		<publisher>Pack-in-Video</publisher>
 		<info name="serial" value="T-9101G"/>
 		<info name="release" value="19960712"/>
 		<info name="alt_title" value="ピンボールグラフィティ"/>
@@ -19451,7 +19465,6 @@ Not extensively tested
 		<year>1996</year>
 		<publisher>BMG Victor</publisher>
 		<notes><![CDATA[
-[CD-Block] Hangs on initial FMV (press A button to bypass)
 Was known to draw smiles as enemy shadows, https://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=101474#Post101474 (assume fixed)
 Not extensively tested
 ]]></notes>
@@ -19482,11 +19495,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying Shanghai - Haonri no Choujou (T-1505G)... -->
 	<software name="shangbanb" cloneof="shanghtt" supported="no">
-		<description>Shanghai - Banri no Choujou (Japan, alt)</description>
+		<description>Shanghai: Banri no Choujou (Japan, alt)</description>
 		<year>1995</year>
 		<publisher>Sunsoft</publisher>
+		<notes><![CDATA[
+(as shangban)
+]]></notes>
 		<info name="serial" value="T-1505G"/>
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="上海 万里の長城"/>
@@ -21346,7 +21361,7 @@ Eventually crashes with a divide by zero, [VDP1] timings?
 	<software name="wangan" cloneof="highway2" supported="no">
 		<description>Wangan Dead Heat (Japan)</description>
 		<year>1995</year>
-		<publisher>Pack-In Video</publisher>
+		<publisher>Pack-in-Video</publisher>
 		<info name="serial" value="T-9102G"/>
 		<info name="release" value="19951215"/>
 		<info name="alt_title" value="湾岸デッドヒート"/>
@@ -29274,7 +29289,7 @@ Not extensively tested (should work after curfad reject fix)
 		<year>1996?</year>
 		<publisher>Samsung</publisher>
 		<notes><![CDATA[
-Has no audio redbook playback [CD-Block]
+Audio (redbook?) playback [CD-Block] starts after a bunch of seconds, gets corrupted over time
 Not extensively tested
 ]]></notes>
 		<info name="serial" value="MK-81049-08"/>
@@ -36722,8 +36737,7 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying dw-sat-0815-Shanghai_TripleThreat-usa... -->
-	<software name="shanghtt" supported="no">
+	<software name="shanghtt" supported="yes">
 		<description>Shanghai: Triple Threat (USA)</description>
 		<year>1995</year>
 		<publisher>Activision</publisher>

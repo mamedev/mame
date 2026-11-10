@@ -94,7 +94,7 @@ void raiden2cop_device::LEGACY_execute_130e_cupsoc(int offset, uint16_t data)
 	}
 	else
 	{
-		cop_angle = (int)(atan(double(dy) / double(dx)) * 128.0 / std::numbers::pi);
+		cop_angle = int(atan(double(dy) / double(dx)) * 128.0 / std::numbers::pi);
 		if (dx < 0)
 			cop_angle += 0x80;
 
@@ -143,7 +143,7 @@ void raiden2cop_device::execute_2288(int offset, uint16_t data)
 		cop_angle = 0;
 	}
 	else {
-		cop_angle = (int)(atan(double(dx) / double(dy)) * 128 / std::numbers::pi);
+		cop_angle = int(atan(double(dx) / double(dy)) * 128 / std::numbers::pi);
 		if (dy < 0)
 			cop_angle += 0x80;
 	}
@@ -183,7 +183,7 @@ void raiden2cop_device::execute_338e(int offset, uint16_t data, bool is_yflip)
 		cop_angle = 0;
 	}
 	else {
-		cop_angle = (int)(atan(double(dx) / double(dy)) * 128 / std::numbers::pi);
+		cop_angle = int(atan(double(dx) / double(dy)) * 128 / std::numbers::pi);
 		if (dy < 0)
 			cop_angle += 0x80;
 
@@ -223,7 +223,7 @@ void raiden2cop_device::execute_3b30(int offset, uint16_t data)
 
 	dx = dx >> 16;
 	dy = dy >> 16;
-	cop_dist = sqrt((double)(dx*dx + dy*dy));
+	cop_dist = sqrt(double(dx*dx + dy*dy));
 
 	LOGMASKED(LOG_TRIGONOMETRY, "cmd %04x: dx = %d dy = %d dist = %08x \n",data,dx >> 16,dy >> 16,cop_dist);
 
@@ -692,7 +692,7 @@ void raiden2cop_device::LEGACY_execute_e30e(int offset, uint16_t data)
 		cop_angle = 0;
 	}
 	else {
-		cop_angle = (int)(atan(double(dy) / double(dx)) * 128.0 / std::numbers::pi);
+		cop_angle = int(atan(double(dy) / double(dx)) * 128.0 / std::numbers::pi);
 		if (dx < 0)
 			cop_angle += 0x80;
 
@@ -774,7 +774,7 @@ void raiden2cop_device::execute_3b30_latched(int offset, uint16_t data)
 	int dy = m_LEGACY_r0 >> 16;
 	int dx = m_LEGACY_r1 >> 16;
 
-	cop_dist = sqrt((double)(dx * dx + dy * dy));
+	cop_dist = sqrt(double(dx * dx + dy * dy));
 
 	if (data & 0x0080)
 		cop_write_word(cop_regs[0] + (data & 0x200 ? 0x3a : 0x38), cop_dist);
@@ -795,7 +795,7 @@ void raiden2cop_device::LEGACY_execute_e30e_cupsoc(int offset, uint16_t data)
 	}
 	else
 	{
-		cop_angle = (int)(atan(double(dy) / double(dx)) * 128.0 / std::numbers::pi);
+		cop_angle = int(atan(double(dy) / double(dx)) * 128.0 / std::numbers::pi);
 		if (dx < 0)
 			cop_angle += 0x80;
 
@@ -867,7 +867,7 @@ void raiden2cop_device::LEGACY_execute_130e(int offset, uint16_t data)
 		cop_angle = 0;
 	}
 	else {
-		cop_angle = (int)(atan(double(dy) / double(dx)) * 128.0 / std::numbers::pi);
+		cop_angle = int(atan(double(dy) / double(dx)) * 128.0 / std::numbers::pi);
 		if (dx < 0)
 			cop_angle += 0x80;
 	}
@@ -886,7 +886,7 @@ void raiden2cop_device::LEGACY_execute_3b30(int offset, uint16_t data)
 
 	dx >>= 16;
 	dy >>= 16;
-	cop_dist = sqrt((double)(dx*dx + dy*dy));
+	cop_dist = sqrt(double(dx*dx + dy*dy));
 
 	if (data & 0x80)
 		m_host_space->write_word(cop_regs[0] + (0x38), cop_dist);
@@ -913,7 +913,7 @@ void raiden2cop_device::LEGACY_execute_42c2(int offset, uint16_t data)
 		/* TODO: recheck if cop_scale still masks at 3 with this command */
 		dx >>= 11 + cop_scale;
 		dy >>= 11 + cop_scale;
-		cop_dist_raw = sqrt((double)(dx*dx + dy*dy));
+		cop_dist_raw = sqrt(double(dx*dx + dy*dy));
 
 		res = cop_dist_raw;
 		res /= div;

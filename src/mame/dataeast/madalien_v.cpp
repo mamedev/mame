@@ -154,13 +154,13 @@ void madalien_state::draw_edges(screen_device &screen, bitmap_ind16 &bitmap, con
 
 	if (flip)
 	{
-		clip_edge1.min_y = *m_edge1_pos | 0x80;
-		clip_edge2.max_y = (*m_edge2_pos & 0x7f) ^ 0x7f;
+		clip_edge1.sety(*m_edge1_pos | 0x80, clip_edge1.bottom());
+		clip_edge2.sety(clip_edge2.top(), ~*m_edge2_pos & 0x7f);
 	}
 	else
 	{
-		clip_edge1.max_y = (*m_edge1_pos & 0x7f) ^ 0x7f;
-		clip_edge2.min_y = *m_edge2_pos | 0x80;
+		clip_edge1.sety(clip_edge1.top(), ~*m_edge1_pos & 0x7f);
+		clip_edge2.sety(*m_edge2_pos | 0x80, clip_edge2.bottom());
 	}
 
 	clip_edge1 &= cliprect;
@@ -255,9 +255,6 @@ uint32_t madalien_state::screen_update_madalien(screen_device &screen, bitmap_in
 	*/
 	if (scroll_mode != 1 || *m_video_flags & 2)
 	{
-		int x;
-		int y;
-
 		int min_x = 0;
 		int max_x = 0xff;
 
@@ -274,10 +271,13 @@ uint32_t madalien_state::screen_update_madalien(screen_device &screen, bitmap_in
 			min_x = 0xff - max_x_save;
 		}
 
-		for (y = cliprect.top(); y <= cliprect.bottom(); y++)
-			for (x = min_x; x <= max_x; x++)
-				if ((x >= cliprect.left()) && (x <= cliprect.right()))
-					bitmap.pix(y, x) |= 8;
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+		{
+			auto *const dst = &bitmap.pix(y);
+			for (int x = min_x; x <= max_x; x++)
+				if (cliprect.containsx(x))
+					dst[x] |= 8;
+		}
 	}
 
 	draw_headlight(bitmap, cliprect, flip);

@@ -17,6 +17,8 @@
 
 #include "emu.h"
 
+#include "mulcd.h"
+
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "cpu/h8/h83003.h"
@@ -24,7 +26,6 @@
 #include "sound/adc.h"
 #include "sound/swp00.h"
 
-#include "mulcd.h"
 #include "speaker.h"
 
 #include "mu50.lh"
@@ -75,7 +76,7 @@ public:
 		, m_adc(*this, "adc%u", 0U)
 	{ }
 
-	void mu50(machine_config &config);
+	void mu50(machine_config &config) ATTR_COLD;
 
 private:
 	enum {
@@ -310,11 +311,11 @@ void mu50_state::mu50(machine_config &config)
 
 ROM_START( mu50 )
 	ROM_REGION( 0x80000, "mu50cpu", 0 )
-	ROM_SYSTEM_BIOS( 0, "bios0", "xr174c0 (v1.05, Aug. 21, 1995)" )
+	ROM_SYSTEM_BIOS( 0, "v105", "xr174c0 (v1.05, Aug. 21, 1995)" )
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "xr174c0.ic7", 0x000000, 0x080000, CRC(902520a4) SHA1(9ca892920598f9fdf08544dac4c0e54e7d46ee3c) )
-	ROM_SYSTEM_BIOS( 1, "bios1", "? (v1.04, May 22, 1995)" )
+	ROM_SYSTEM_BIOS( 1, "v104", "? (v1.04, May 22, 1995)" )
 	ROM_LOAD16_WORD_SWAP_BIOS( 1, "yamaha_mu50.bin", 0x000000, 0x080000, CRC(507168ad) SHA1(58c41f10d292cac35ef0e8f93029fbc4685df586) )
-	ROM_SYSTEM_BIOS( 2, "bios2", "xq332e0 (v1.02, Apr 20, 1995)" )
+	ROM_SYSTEM_BIOS( 2, "v102", "xq332e0 (v1.02, Apr 20, 1995)" )
 	ROM_LOAD16_WORD_SWAP_BIOS( 2, "xq332e0.bin", 0x000000, 0x080000, CRC(6fe5bdf5) SHA1(74bb630f8cc575e059cc52cd43b3310e09f26a49) )
 
 	ROM_REGION( 0x400000, "swp00", 0 )

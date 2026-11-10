@@ -16,8 +16,17 @@
     16-bit stereo sound input and output are supported as is video input
     from NTSC, PAL, and SECAM sources.
 
+    The AT&T DSP3210 is a full bus master on the 68040 bus (physical
+    addresses only): it sees DRAM at 0, one alias of the host I/O space
+    ($F0000000-$F07FFFFF -> $50800000+, through which the Real Time
+    Manager hands it the PSC's sndPhase register), and bus-errors on
+    everything else.  Reset comes from the PSC's DSPOVERRUN latch, the
+    frame interrupt from the PSC's sound engine on IR1N (acknowledged on
+    IACK1), and the DSP rings the host by toggling BIO0.  There is no
+    host window into the DSP: all exchange goes through shared DRAM.
+
     TODO:
-    - DSP3210 core
+    - Sound input from a real source (the PSC feeds converter noise)
     - Probably other things
 
 ****************************************************************************/
@@ -37,13 +46,15 @@
 #include "bus/nubus/cards.h"
 #include "bus/nubus/nubus.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/dsp32/dsp32.h"
+#include "cpu/dsp32/dsp3210.h"
 #include "cpu/m68000/m68040.h"
 #include "machine/am79c940.h"
+#include "machine/applefdintf.h"
 #include "machine/ncr53c90.h"
 #include "machine/nscsi_bus.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
+#include "machine/upd72070.h"
 #include "machine/z80scc.h"
 
 #include "softlist_dev.h"
@@ -63,6 +74,7 @@ public:
 		m_ymca(*this, "ymca"),
 		m_psc(*this, "psc"),
 		m_mace(*this, "mace"),
+		m_fdc(*this, "fdc"),
 		m_civic(*this, "civic"),
 		m_adbbus(*this, "adb"),
 		m_cuda(*this, "cuda"),
@@ -70,6 +82,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_scsibus(*this, "scsi"),
 		m_ncr(*this, "ncr53c94"),
+		m_dsp(*this, "dsp"),
 		m_enet_prom{},
 		m_enet_prom_initialized(false)
 	{
@@ -85,6 +98,7 @@ private:
 	required_device<ymca_device> m_ymca;
 	required_device<psc_device> m_psc;
 	required_device<am79c940_device> m_mace;
+	required_device<upd72070_device> m_fdc;
 	required_device<civic_device> m_civic;
 	required_device<adb_bus_device> m_adbbus;
 	required_device<cuda_device> m_cuda;
@@ -92,6 +106,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<ncr53c94_device> m_ncr;
+	required_device<dsp3210_device> m_dsp;
 	std::array<u8, 8> m_enet_prom;
 	bool m_enet_prom_initialized;
 
@@ -105,12 +120,20 @@ private:
 	u8 scsi_r(offs_t offset);
 	void scsi_w(offs_t offset, u8 data);
 	u8 enet_prom_r(offs_t offset);
+
+	void dsp_map(address_map &map) ATTR_COLD;
+	u32 dsp_io_r(offs_t offset, u32 mem_mask);
+	void dsp_io_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 dsp_fault_r(offs_t offset);
+	void dsp_fault_w(offs_t offset, u32 data);
 };
 
 void quadraav_state::machine_start()
 {
 	m_ymca->set_ram_info((u32 *) m_ram->pointer(), m_ram->size());
 	m_psc->set_scsi_device(m_ncr);
+	// the DSP sees DRAM at its physical addresses
+	m_dsp->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
 	// Use the same Apple OUI convention as the NuBus Ethernet cards.  The
 	// configuration manager persists this address and allows user overrides.
 	const u32 suffix = machine().rand();
@@ -176,6 +199,35 @@ u8 quadraav_state::enet_prom_r(offs_t offset)
 	return bitswap<8>(m_enet_prom[index], 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
+// the DSP's alias of the host I/O space
+u32 quadraav_state::dsp_io_r(offs_t offset, u32 mem_mask)
+{
+	return m_maincpu->space(AS_PROGRAM).read_dword(0x5080'0000 + (offset << 2), mem_mask);
+}
+
+void quadraav_state::dsp_io_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	m_maincpu->space(AS_PROGRAM).write_dword(0x5080'0000 + (offset << 2), data, mem_mask);
+}
+
+// nothing else answers the DSP: a bus error, which the DSP kernel's own
+// handlers turn into an 'xbus' crash dump
+u32 quadraav_state::dsp_fault_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+	{
+		logerror("DSP bus error reading %08x\n", offset << 2);
+		m_dsp->bus_error();
+	}
+	return 0;
+}
+
+void quadraav_state::dsp_fault_w(offs_t offset, u32 data)
+{
+	logerror("DSP bus error writing %08x = %08x\n", offset << 2, data);
+	m_dsp->bus_error();
+}
+
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
@@ -187,10 +239,20 @@ void quadraav_state::quadraav_map(address_map &map)
 
 	map(0x50f04000, 0x50f05fff).rw(FUNC(quadraav_state::scc_r), FUNC(quadraav_state::scc_w));
 	map(0x50f08000, 0x50f0807f).r(FUNC(quadraav_state::enet_prom_r));
+	// NewAge native registers 4 and 5, on the second byte of each longword.
+	map(0x50f2a101, 0x50f2a101).rw(m_fdc, FUNC(upd72070_device::status_r), FUNC(upd72070_device::rate_w));
+	map(0x50f2a141, 0x50f2a141).rw(m_fdc, FUNC(upd72070_device::data_r), FUNC(upd72070_device::data_w));
 	map(0x50f18000, 0x50f180ff).rw(FUNC(quadraav_state::scsi_r), FUNC(quadraav_state::scsi_w));
 	map(0x50f1c000, 0x50f1c1ff).lrw8(
 		NAME([this](offs_t offset) { return m_mace->read(offset >> 4); }),
 		NAME([this](offs_t offset, u8 data) { m_mace->write(offset >> 4, data); }));
+}
+
+// DRAM is installed over the fault handler in machine_start, once its size is known
+void quadraav_state::dsp_map(address_map &map)
+{
+	map(0x0000'0000, 0xffff'ffff).rw(FUNC(quadraav_state::dsp_fault_r), FUNC(quadraav_state::dsp_fault_w));
+	map(0xf000'0000, 0xf07f'ffff).rw(FUNC(quadraav_state::dsp_io_r), FUNC(quadraav_state::dsp_io_w));
 }
 
 /***************************************************************************
@@ -220,6 +282,22 @@ void quadraav_state::macqd840(machine_config &config)
 	m_psc->set_maincpu_tag("maincpu");
 	m_psc->set_space("maincpu", AS_PROGRAM);
 	m_psc->set_mace_tag("mace");
+	m_psc->set_fdc_tag("fdc");
+	m_psc->set_dsp_tag("dsp");
+
+	UPD72070(config, m_fdc, 24_MHz_XTAL).set_xb_clock(C15M.value());
+	m_fdc->irq_cb().set(m_psc, FUNC(psc_device::fdc_irq_w));
+	m_fdc->drq_cb().set(m_psc, FUNC(psc_device::fdc_drq_w));
+	// TC is tied low; Apple software terminates transfers with EOT.
+	FLOPPY_CONNECTOR(config, "fdc:0", applefdintf_device::floppies_35, "35hd", applefdintf_device::formats_35);
+
+	// BIO7 = BIO4 = 0: processor mode, on-chip window at $50030000, fetch
+	// from external memory at 0 - the boot ROM is never used
+	DSP3210(config, m_dsp, 66.6667_MHz_XTAL);
+	m_dsp->set_addrmap(AS_PROGRAM, &quadraav_state::dsp_map);
+	m_dsp->set_reset_straps(0);
+	m_dsp->bio_out_cb().set(m_psc, FUNC(psc_device::dsp_bio_w));
+	m_dsp->iack_cb<1>().set(m_psc, FUNC(psc_device::dsp_iack1_w));
 
 	AM79C940(config, m_mace, 0);
 	m_mace->irq_out().set(m_psc, FUNC(psc_device::enet_irq_w));
@@ -296,6 +374,9 @@ void quadraav_state::macqd840(machine_config &config)
 	m_ram->set_default_size("8M");
 	m_ram->set_extra_options("16M,32M,64M,96M,128M,192M,256M,320M,384M,512M,640M");
 
+	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
+	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68040");
 }
@@ -307,24 +388,20 @@ void quadraav_state::macqd660(machine_config &config)
 	// Set the machine ID.
 	m_ymca->set_cpu_id(0xb);
 
+	m_dsp->set_clock(55'500'000);
+
 	// The 660AV uses a completely different clock generator for ? reason.
 	m_civic->use_icd_clockgen();
 }
 
 ROM_START( macqd840av )
 	ROM_REGION32_BE(0x200000, "bootrom", 0)
-	ROM_SYSTEM_BIOS(0, "default", "Version 10F3")
-	ROMX_LOAD( "5bf10fd1.bin", 0x000000, 0x200000, CRC(6973886c) SHA1(532d8cb9c928eb6f3c264561b17bee9a02aad9bb), ROM_BIOS(0) )
-
-	// Chime plays incorrectly and no system boots; all AV enablers check explicitly for 1.0F3.
-	// Yet this came from hardware, didn't it?
-	ROM_SYSTEM_BIOS(1, "newer", "Version 10F5")
-	ROMX_LOAD("87d3c814.bin", 0x000000, 0x200000, CRC(3c20c24f) SHA1(d372bf2edff36cf510ab9f6280fe7ed0773c430e), ROM_BIOS(1))
+	ROM_LOAD( "5bf10fd1.bin", 0x000000, 0x200000, CRC(6973886c) SHA1(532d8cb9c928eb6f3c264561b17bee9a02aad9bb))
 ROM_END
 
 #define rom_macqd660av rom_macqd840av
 
 } // anonymous namespace
 
-COMP( 1993, macqd840av, 0, 0, macqd840, macqdav, quadraav_state, empty_init,  "Apple Computer", "Macintosh Quadra 840AV", MACHINE_NOT_WORKING)
-COMP( 1993, macqd660av, macqd840av, 0, macqd660, macqdav, quadraav_state, empty_init,  "Apple Computer", "Macintosh Quadra 660AV", MACHINE_NOT_WORKING)
+COMP( 1993, macqd840av, 0, 0, macqd840, macqdav, quadraav_state, empty_init,  "Apple Computer", "Macintosh Quadra 840AV", MACHINE_SUPPORTS_SAVE)
+COMP( 1993, macqd660av, macqd840av, 0, macqd660, macqdav, quadraav_state, empty_init,  "Apple Computer", "Macintosh Quadra 660AV", MACHINE_SUPPORTS_SAVE)

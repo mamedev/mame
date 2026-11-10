@@ -69,6 +69,7 @@ private:
 	void pm7200_map(address_map &map) ATTR_COLD;
 
 	void cuda_reset_w(int state);
+	void cuda_power_w(int state);
 
 	u32 nvram_addr_r(offs_t offset, u32 mem_mask);
 	void nvram_addr_w(offs_t offset, u32 data, u32 mem_mask);
@@ -80,7 +81,7 @@ private:
 
 	void slot_irq_handler(int line, int state);
 
-	required_device<ppc_device> m_maincpu;
+	required_device<ppc601_device> m_maincpu;
 	required_device<pci_root_device> m_pci_root;
 	required_device<bandit_host_device> m_bandit;
 	required_device<grandcentral_device> m_grandcentral;
@@ -161,6 +162,14 @@ void catalyst_state::pm7200_map(address_map &map)
 	map(0xffc0'0000, 0xffff'ffff).rom().region("bootrom", 0);
 }
 
+void catalyst_state::cuda_power_w(int state)
+{
+	if (state)
+	{
+		machine().schedule_exit();
+	}
+}
+
 void catalyst_state::cuda_reset_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
@@ -233,6 +242,7 @@ INPUT_PORTS_END
 void catalyst_state::pm7200(machine_config &config)
 {
 	PPC601(config, m_maincpu, 75_MHz_XTAL);
+	m_maincpu->set_rtc_clock(31.3344_MHz_XTAL / 4);
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS | PPCDRC_MACOS_CACHE_HACK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &catalyst_state::pm7200_map);
 
@@ -327,6 +337,7 @@ void catalyst_state::pm7200(machine_config &config)
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->set_default_bios_tag("341s0060");
 	m_cuda->reset_callback().set(FUNC(catalyst_state::cuda_reset_w));
+	m_cuda->poweroff_callback().set(FUNC(catalyst_state::cuda_power_w));
 	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_cuda->via_clock_callback().set(m_grandcentral, FUNC(heathrow_device::cb1_w));
 	m_cuda->via_data_callback().set(m_grandcentral, FUNC(heathrow_device::cb2_w));

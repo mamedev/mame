@@ -214,13 +214,14 @@ u32 blockout_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	copybitmap(bitmap, m_tmpbitmap, 0, 0, 0, 0, cliprect);
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		auto *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			const u16 d = m_frontvideoram[((y & 0xff) << 6) + ((x & 0x1ff) >> 3)];
-			if (d & (1 << (7 - (x & 7))))
-				bitmap.pix(y, x) = color;
+			if (BIT(d, ~x & 7))
+				dst[x] = color;
 		}
 	}
 

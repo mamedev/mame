@@ -78,20 +78,21 @@ uint32_t isa8_cga_tetriskr_device::screen_update(screen_device &screen, bitmap_r
 
 	bitmap.fill(rgb_t::black(), cliprect);
 
-	for(int y=cliprect.min_y;y<=cliprect.max_y;y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
+		auto *const dst = &bitmap.pix(y);
 		int yi = y % 8;
 		int yj = y / 8;
-		for(int x=cliprect.min_x;x<=cliprect.max_x;x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int xi = x % 8;
 			int xj = x / 8;
 			uint8_t color = 0;
 			/* TODO: first byte seems bogus? */
-			for(int pen_i = 0;pen_i<4;pen_i++)
-				color |= ((m_bg[yj*320/8+xj+(pen_i*0x20000)+yi*0x400+m_bg_bank*0x2000+1] >> (7-xi)) & 1) << pen_i;
+			for (int pen_i = 0; pen_i < 4; pen_i++)
+				color |= BIT(m_bg[yj*320/8+xj+(pen_i*0x20000)+yi*0x400+m_bg_bank*0x2000+1], 7-xi) << pen_i;
 
-			bitmap.pix(y, x) = m_palette->pen(color);
+			dst[x] = m_palette->pen(color);
 		}
 	}
 

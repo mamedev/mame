@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+
+<!-- TourVisión V4 marquee: a selection lamp and a score (bonus time) counter for each slot, plus the play time display -->
+
+	<element name="digit" defstate="0"><led7seg /></element>
+	<element name="lamp" defstate="0">
+		<rect state="0"><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect state="1" />
+	</element>
+	<element name="rect"><rect /></element>
+	<element name="text_score"><text string="Score" /></element>
+	<element name="text_time1"><text string="Tiempo" /></element>
+	<element name="text_time2"><text string="de Juego" /></element>
+	<element name="text_slot1"><text string="1" /></element>
+	<element name="text_slot2"><text string="2" /></element>
+	<element name="text_slot3"><text string="3" /></element>
+	<element name="text_slot4"><text string="4" /></element>
+
+	<group name="marquee">
+		<element ref="rect"><bounds x="0" y="0" width="400" height="96" /><color red="0.55" green="0.08" blue="0.06" /></element>
+
+		<!-- game selection lamps -->
+		<repeat count="4">
+			<param name="n" start="0" increment="1" />
+			<param name="slot" start="1" increment="1" />
+			<param name="x" start="6" increment="98" />
+			<element name="lamp~n~" ref="lamp"><bounds x="~x~" y="6" width="94" height="44" /><color red="1.0" green="0.85" blue="0.35" /></element>
+			<element ref="text_slot~slot~"><bounds x="~x~" y="10" width="94" height="36" /><color red="0.1" green="0.1" blue="0.1" /></element>
+		</repeat>
+
+		<!-- score counters, two on each side of the play time display -->
+		<repeat count="2">
+			<param name="n" start="0" increment="1" />
+			<param name="x" start="12" increment="80" />
+			<element ref="rect"><bounds x="~x~" y="56" width="56" height="24" /><color red="0.0" green="0.0" blue="0.0" /></element>
+			<repeat count="4">
+				<param name="d" start="3" increment="-1" />
+				<param name="dx" start="~x~" increment="13" />
+				<element name="score~n~_digit~d~" ref="digit"><bounds x="~dx~" y="58" width="12" height="20" /><color red="1.0" green="0.15" blue="0.1" /></element>
+			</repeat>
+			<element ref="text_score"><bounds x="~x~" y="81" width="56" height="12" /></element>
+		</repeat>
+
+		<repeat count="2">
+			<param name="n" start="2" increment="1" />
+			<param name="x" start="252" increment="80" />
+			<element ref="rect"><bounds x="~x~" y="56" width="56" height="24" /><color red="0.0" green="0.0" blue="0.0" /></element>
+			<repeat count="4">
+				<param name="d" start="3" increment="-1" />
+				<param name="dx" start="~x~" increment="13" />
+				<element name="score~n~_digit~d~" ref="digit"><bounds x="~dx~" y="58" width="12" height="20" /><color red="1.0" green="0.15" blue="0.1" /></element>
+			</repeat>
+			<element ref="text_score"><bounds x="~x~" y="81" width="56" height="12" /></element>
+		</repeat>
+
+		<!-- play time -->
+		<element ref="rect"><bounds x="166" y="52" width="68" height="44" /><color red="0.1" green="0.5" blue="0.2" /></element>
+		<element ref="text_time1"><bounds x="166" y="53" width="68" height="9" /></element>
+		<element ref="rect"><bounds x="172" y="62" width="56" height="24" /><color red="0.0" green="0.0" blue="0.0" /></element>
+		<repeat count="4">
+			<param name="d" start="3" increment="-1" />
+			<param name="dx" start="174" increment="13" />
+			<element name="time_digit~d~" ref="digit"><bounds x="~dx~" y="64" width="12" height="20" /><color red="1.0" green="0.15" blue="0.1" /></element>
+		</repeat>
+		<element ref="text_time2"><bounds x="166" y="86" width="68" height="9" /></element>
+	</group>
+
+	<view name="Marquee">
+		<group ref="marquee"><bounds x="0" y="0" width="400" height="96" /></group>
+		<screen index="0"><bounds x="0" y="100" width="400" height="300" /></screen>
+	</view>
+
+	<view name="Marquee (Below Screen)">
+		<screen index="0"><bounds x="0" y="0" width="400" height="300" /></screen>
+		<group ref="marquee"><bounds x="0" y="304" width="400" height="96" /></group>
+	</view>
+</mamelayout>

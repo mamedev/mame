@@ -26,6 +26,7 @@ public:
 		virtual ~config() = default;
 		virtual bool get_t_flag() const = 0;
 		virtual u8 get_arch_rev() const = 0;    // ARM architecture version: < 3 selects the ARM2/ARM3 view (TEQP etc., no v3+ encodings)
+		virtual bool get_vfp_flag() const { return false; }
 	};
 
 	arm7_disassembler(config *conf);
@@ -46,6 +47,12 @@ private:
 	void WriteRegisterOperand1( std::ostream &stream, u32 opcode );
 	void WriteRegisterList( std::ostream &stream, u16 operand );
 	void WriteBranchAddress( std::ostream &stream, u32 pc, u32 opcode, bool h_bit );
+	bool dasm_armv6(std::ostream &stream, u32 opcode, const char *condition, std::streampos start_position, u32 &flags);
+	bool dasm_armv6_media(std::ostream &stream, u32 opcode, const char *condition, std::streampos start_position);
+	bool dasm_thumbv6(std::ostream &stream, u16 opcode, std::streampos start_position);
+	bool dasm_vfp(std::ostream &stream, u32 opcode, const char *condition, std::streampos start_position);
+	bool dasm_vfp_transfer(std::ostream &stream, u32 opcode, const char *condition, std::streampos start_position);
+	bool dasm_vfp_data(std::ostream &stream, u32 opcode, const char *condition, std::streampos start_position);
 	u32 arm7_disasm( std::ostream &stream, u32 pc, u32 opcode );
 	u32 thumb_disasm(std::ostream &stream, u32 pc, u16 opcode);
 };

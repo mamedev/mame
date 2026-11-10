@@ -21,25 +21,15 @@
 
 ****************************************************************************/
 
-/*
-
-    TODO:
-
-    - verify whether feeding a 0xff-filled 2K binary file as cart allows
-      to write back correctly EPROM or not
-
-*/
-
 #include "emu.h"
+
+#include "beta_eprom.h"
 
 #include "cpu/m6502/m6502.h"
 #include "imagedev/floppy.h"
 #include "machine/mos6530.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
-
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 
 #include "speaker.h"
 
@@ -78,9 +68,6 @@ protected:
 	uint8_t riot_pb_r();
 	void riot_pb_w(uint8_t data);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_beta_eprom);
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(unload_beta_eprom);
-
 	TIMER_CALLBACK_MEMBER(led_refresh);
 
 	void beta_mem(address_map &map) ATTR_COLD;
@@ -88,7 +75,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<generic_slot_device> m_eprom;
+	required_device<beta_eprom_device> m_eprom;
 	required_ioport_array<4> m_q;
 	output_finder<6> m_digits;
 	output_finder<2> m_leds;
@@ -99,7 +86,6 @@ private:
 	uint16_t m_eprom_addr = 0;
 	uint8_t m_eprom_data = 0;
 	uint8_t m_old_data = 0;
-	std::vector<uint8_t> m_eprom_rom{};
 
 	/* display state */
 	uint8_t m_ls145_p = 0;
@@ -200,7 +186,7 @@ uint8_t beta_state::riot_pa_r()
 	default:
 		if (!m_eprom_oe && !m_eprom_ce)
 		{
-			data = m_eprom_rom[m_eprom_addr & 0x7ff];
+			data = m_eprom->read(m_eprom_addr & 0x7ff);
 			popmessage("EPROM read %04x = %02x\n", m_eprom_addr & 0x7ff, data);
 		}
 	}
@@ -287,31 +273,10 @@ void beta_state::riot_pb_w(uint8_t data)
 	if (BIT(data, 6) && (!BIT(m_old_data, 7) && BIT(data, 7)))
 	{
 		popmessage("EPROM write %04x = %02x\n", m_eprom_addr & 0x7ff, m_eprom_data);
-		m_eprom_rom[m_eprom_addr & 0x7ff] &= m_eprom_data;
+		m_eprom->program(m_eprom_addr & 0x7ff, m_eprom_data);
 	}
 
 	m_old_data = data;
-}
-
-/* EPROM socket */
-
-DEVICE_IMAGE_LOAD_MEMBER(beta_state::load_beta_eprom)
-{
-	uint32_t const size = m_eprom->common_get_size("rom");
-
-	if (size != 0x800)
-		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (only 2K cartridges are supported)");
-
-	m_eprom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_eprom->common_load_rom(m_eprom->get_rom_base(), size, "rom");
-
-	return std::make_pair(std::error_condition(), std::string());
-}
-
-DEVICE_IMAGE_UNLOAD_MEMBER(beta_state::unload_beta_eprom)
-{
-	if (!image.loaded_through_softlist())
-		image.fwrite(&m_eprom_rom[0], 0x800);
 }
 
 /* Machine Initialization */
@@ -320,23 +285,12 @@ void beta_state::machine_start()
 {
 	m_led_refresh_timer = timer_alloc(FUNC(beta_state::led_refresh), this);
 
-	m_eprom_rom.resize(0x800);
-
-	if (!m_eprom->exists())
-		memset(&m_eprom_rom[0], 0xff, 0x800);
-	else
-	{
-		std::string region_tag;
-		memcpy(&m_eprom_rom[0], memregion(region_tag.assign(m_eprom->tag()).append(GENERIC_ROM_REGION_TAG).c_str())->base(), 0x800);
-	}
-
 	// state saving
 	save_item(NAME(m_eprom_oe));
 	save_item(NAME(m_eprom_ce));
 	save_item(NAME(m_eprom_addr));
 	save_item(NAME(m_eprom_data));
 	save_item(NAME(m_old_data));
-	save_item(NAME(m_eprom_rom));
 	save_item(NAME(m_ls145_p));
 	save_item(NAME(m_segment));
 }
@@ -365,9 +319,7 @@ void beta_state::beta(machine_config &config)
 	m6532.irq_wr_callback().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	/* EPROM socket */
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, EPROM_TAG, generic_plain_slot, nullptr, "bin,rom"));
-	cartslot.set_device_load(FUNC(beta_state::load_beta_eprom));
-	cartslot.set_device_unload(FUNC(beta_state::unload_beta_eprom));
+	BETA_EPROM(config, m_eprom);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256");

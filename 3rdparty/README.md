@@ -1,6 +1,6 @@
 # **3rdparty** #
 
-aescbc - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
+aes128cbc, aes128ecb, aes192cbc, aes192ecb, aes256cbc, aes256ecb - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 asio - [Boost Software License](http://www.boost.org/LICENSE_1_0.txt)
 
@@ -50,6 +50,8 @@ minimp3 - [Creative Commons Zero v1.0 Universal](https://creativecommons.org/pub
 
 nanosvg - [zlib license](http://opensource.org/licenses/Zlib)
 
+openh264 - [The BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause)
+
 portaudio - [The MIT License (MIT)](http://opensource.org/licenses/MIT) explanation at [their site](http://www.portaudio.com/license.html)
 
 portmidi - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
@@ -57,6 +59,8 @@ portmidi - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 pugixml - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 rapidjson - [The MIT License (MIT)](http://opensource.org/licenses/MIT), [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause) (msinttypes), JSON license (JSON_checker)
+
+residfp - [The GNU General Public License, version 2 or later](https://opensource.org/licenses/GPL-2.0)
 
 softfloat3 - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 

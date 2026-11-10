@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="victor9k_hdd" description="Victor 9000 / ACT Sirius 1 hard disks">
+
+	<software name="msdos31">
+		<description>MS-DOS 3.1</description>
+		<year>1986</year>
+		<publisher>Victor Technologies</publisher>
+
+		<!-- Tandom TM502 -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="msdos31" sha1="c2c0a54a736a3cb5e055d40ccf46f3ee34e31659" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

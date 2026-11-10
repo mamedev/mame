@@ -19356,4 +19356,16 @@ Hangs at credits screen
 		</part>
 	</software>
 
+	<software name="cbmaga">
+		<description>Commodore Advanced Graphics Adapter</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="CommodoreAdvancedGraphicsAdapter.img" size="184320" crc="d65ee897" sha1="06272536e2b5603ae7bce259e2c002ba5a28ad8b"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

@@ -244,6 +244,12 @@ void nscsi_harddisk_device::scsi_command()
 		LOG("command INQUIRY lun=%d EVPD=%d page=%d alloc=%02x link=%02x\n",
 			lun, m_scsi_cmdbuf[1] & 1, m_scsi_cmdbuf[2], m_scsi_cmdbuf[4], m_scsi_cmdbuf[5]);
 
+		if(m_scsi_cmdbuf[1] & 1) {
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+			break;
+		}
+
 		int page = m_scsi_cmdbuf[2];
 		int size = m_scsi_cmdbuf[4];
 		switch(page) {
@@ -474,6 +480,13 @@ void nscsi_harddisk_device::scsi_command()
 				m_scsi_cmdbuf[pos++] = ' ';
 				break;
 			}
+
+			case 0x38: // cache control page (vendor-specific)
+				m_scsi_cmdbuf[pos++] = 0x38; // !PS, page id
+				m_scsi_cmdbuf[pos++] = 0x0e; // page length
+				std::fill_n(&m_scsi_cmdbuf[pos], 14, 0);
+				pos += 14;
+				break;
 
 			default:
 				if (page != 0x3f) {

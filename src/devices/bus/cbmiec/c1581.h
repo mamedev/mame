@@ -63,7 +63,8 @@ private:
 		LED_ACT
 	};
 
-	TIMER_CALLBACK_MEMBER(iec_sync_tick);
+	void update_iec();
+	uint8_t cia_r(offs_t offset);
 
 	void cnt_w(int state);
 	void sp_w(int state);
@@ -89,8 +90,6 @@ private:
 	bool m_sp_out;               // fast serial data out
 	bool m_cnt_out;              // fast serial clock out
 	bool m_iec_clk;              // IEC clock line state
-	
-	emu_timer *m_iec_sync_timer;
 };
 
 

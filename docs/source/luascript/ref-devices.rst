@@ -605,25 +605,20 @@ cassette.length (read-only)
 
 .. _luascript-ref-cdplayerdev:
 
-Audio CD player device
-----------------------
+Audio CD player interface
+-------------------------
 
-Wraps MAME’s ``cd_player_device`` class, representing an audio CD player whose
-output is fed to the emulated system, for example through a cassette or
-joystick port adapter.
+Wraps MAME’s ``device_cd_player_interface`` class which is a mix-in implemented
+by devices containing a hand-operated audio CD player whose output is fed to the
+emulated system, for example through a cassette or joystick port adapter.
 
 Instantiation
 ~~~~~~~~~~~~~
 
 manager.machine.cdplayers[tag]
     Gets an audio CD player device by tag relative to the root machine device,
-    or ``nil`` if no such device exists or it is not an audio CD player device.
-
-Base classes
-~~~~~~~~~~~~
-
-* :ref:`luascript-ref-device`
-* :ref:`luascript-ref-diimage`
+    or ``nil`` if no such device exists or it does not contain an audio CD
+    player.
 
 Methods
 ~~~~~~~
@@ -660,6 +655,10 @@ cdplayer.position (read-only)
 cdplayer.length (read-only)
     The length of the current track as a floating-point number in units of
     seconds, or zero (0) if no disc image is mounted.
+cdplayer.device (read-only)
+    The underlying :ref:`device <luascript-ref-device>`.
+cdplayer.image (read-only)
+    The :ref:`CD image device <luascript-ref-diimage>` holding the disc.
 
 
 .. _luascript-ref-diimage:

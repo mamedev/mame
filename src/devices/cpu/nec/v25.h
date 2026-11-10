@@ -137,6 +137,9 @@ private:
 	uint8_t   m_no_interrupt;
 	uint8_t   m_halted;
 	uint32_t  m_rep_params;
+	bool      m_io_retry;
+	bool      m_io_word_pending;
+	uint8_t   m_io_word_latch;
 
 	// timer related
 	uint16_t  m_TM0, m_MD0, m_TM1, m_MD1;
@@ -357,6 +360,8 @@ private:
 	uint16_t v25_read_word(unsigned a);
 	void v25_write_byte(unsigned a, uint8_t d);
 	void v25_write_word(unsigned a, uint16_t d);
+	uint16_t io_read_word(offs_t a);
+	void io_write_word(offs_t a, uint16_t v);
 
 	uint8_t start_rep();
 	void cont_rep();
@@ -364,6 +369,15 @@ private:
 	void do_repc(uint8_t next);
 	void do_repne(uint8_t next);
 	void do_repe(uint8_t next);
+	bool has_v30_quirks() const { return false; }
+	void decimal_adjust(bool subtract);
+	void ascii_adjust(bool subtract);
+	void packed_decimal(bool subtract, bool store);
+	void bitfield_flags(unsigned position, unsigned length, bool extract);
+	void mul_flags(uint32_t low, bool word);
+	void divu_flags(uint32_t remainder, uint32_t divisor, bool word, bool overflow);
+	void div_flags(int32_t quotient, bool word, bool overflow);
+	void shift_rotate(uint32_t value, uint8_t modrm, uint8_t count, bool word, bool count_one);
 
 	void i_add_br8();
 	void i_add_wr16();

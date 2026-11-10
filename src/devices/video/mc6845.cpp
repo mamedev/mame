@@ -84,6 +84,9 @@ DEFINE_DEVICE_TYPE(HD6345,   hd6345_device,   "hd6345",   "Hitachi HD6345 CRTC-I
 mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this, false)
+	, m_line_counter_mask(0x7f)
+	, m_interlace_fields(false)
+	, m_latch_row_end(false)
 	, m_line_timer(nullptr)
 	, m_show_border_area(true)
 	, m_noninterlace_adjust(0)
@@ -383,17 +386,25 @@ void mc6845_device::recompute_parameters(bool postload)
 				horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, refresh.as_hz());
 			LOGRAW("screen.set_raw(%lu, %d, 0, %d, %d, 0, %d);\n", this->clock() * m_hpixels_per_column, horiz_pix_total, max_visible_x + 1, vert_pix_total, max_visible_y + 1);
 
-			if (has_screen())
-				screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+			configure_screen(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 			if (!m_reconfigure_cb.isnull())
 				m_reconfigure_cb(horiz_pix_total, vert_pix_total, visarea, refresh,
 						hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos);
 
 			m_has_valid_parameters = true;
+			m_display_off = false;
 		}
 		else
+		{
+			// Horizontal or Vertical Displayed of 0 never enables DE, so nothing is displayed but the
+			// sync timing carries on (e.g. the H19 Superset ROM screen saver sets R1 to 0). Keep the
+			// current screen configuration and let the driver draw it with DE inactive.
+			if (m_has_valid_parameters)
+				m_display_off_columns = (m_max_visible_x + 1) / m_hpixels_per_column;
+			m_display_off = ((m_horiz_disp == 0) || (m_vert_disp == 0)) && (m_has_valid_parameters || m_display_off);
 			m_has_valid_parameters = false;
+		}
 
 		m_horiz_pix_total = horiz_pix_total;
 		m_vert_pix_total = vert_pix_total;
@@ -452,6 +463,20 @@ void mc6845_device::set_hsync(int state)
 		m_hsync = state;
 		m_out_hsync_cb(m_hsync);
 	}
+}
+
+
+void mc6845_device::configure_screen(int width, int height, const rectangle &visarea, const attotime &refresh)
+{
+	if (has_screen())
+		screen().configure(width, height, visarea, refresh);
+}
+
+
+void mc6845_device::frame_start()
+{
+	if (has_screen())
+		screen().reset_origin();
 }
 
 
@@ -569,6 +594,16 @@ bool hd6845s_device::check_cursor_visible(uint16_t ra, uint16_t line_addr)
 }
 
 
+bool mc6845_device::is_row_end() const
+{
+	// For rudimentary 'interlace and video' support without m_interlace_fields, m_raster_counter increments by 1 rather than the correct 2.
+	if (m_interlace_fields && MODE_INTERLACE_AND_VIDEO)
+		return (m_raster_counter >= m_max_ras_addr) || ((m_raster_counter + 1) == m_max_ras_addr);
+	else
+		return m_raster_counter == m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust) - 1;
+}
+
+
 TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 {
 	bool new_vsync = m_vsync;
@@ -592,10 +627,9 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 		}
 	}
 
-	// For rudimentary 'interlace and video' support, m_raster_counter increments by 1 rather than the correct 2.
-	// The correct test would be:
-	// if (m_raster_counter == (MODE_INTERLACE_AND_VIDEO ? m_max_ras_addr + 1 : m_max_ras_addr))
-	if (m_raster_counter == m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust) - 1)
+	bool const field_raster = m_interlace_fields && MODE_INTERLACE_AND_VIDEO;
+
+	if (m_latch_row_end ? m_row_end : is_row_end())
 	{
 		/* Check if we have reached the end of the vertical area */
 		if (m_line_counter == m_vert_char_total)
@@ -604,8 +638,8 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 			m_adjust_active = 1;
 		}
 
-		m_raster_counter = 0;
-		m_line_counter = (m_line_counter + 1) & 0x7f;
+		m_raster_counter = field_raster ? (~(m_raster_counter ^ m_max_ras_addr) & 1) : 0;
+		m_line_counter = (m_line_counter + 1) & m_line_counter_mask;
 		m_line_address = (m_line_address + m_horiz_disp) & 0x3fff;
 
 		if (match_line())
@@ -613,9 +647,7 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 	}
 	else
 	{
-		// For rudimentary 'interlace and video' support, m_raster_counter increments by 1 rather than the correct 2.
-		// m_raster_counter = (m_raster_counter + (MODE_INTERLACE_AND_VIDEO ? 2 : 1)) & 0x1f;
-		m_raster_counter = (m_raster_counter + 1) & 0x1f;
+		m_raster_counter = (m_raster_counter + (field_raster ? 2 : 1)) & 0x1f;
 	}
 
 	if (m_adjust_active)
@@ -624,7 +656,8 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 		if (m_adjust_counter == m_vert_total_adj)
 		{
 			m_adjust_active = 0;
-			m_raster_counter = 0;
+			m_field = field_raster ? (m_field ^ 1) : 0;
+			m_raster_counter = m_field;
 			m_line_counter = 0;
 			m_line_address = m_disp_start_addr;
 			m_line_enable_ff = true;
@@ -638,8 +671,7 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 			/* also update the cursor state now */
 			update_cursor_state();
 
-			if (has_screen())
-				screen().reset_origin();
+			frame_start();
 		}
 		else
 		{
@@ -661,6 +693,8 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 			m_cursor_on_timer->adjust(cclks_to_attotime(m_cursor_x));
 		}
 	}
+
+	m_row_end = is_row_end();
 
 	/* Schedule HSYNC on signal */
 	m_hsync_on_timer->adjust(cclks_to_attotime(m_horiz_sync_pos));
@@ -887,19 +921,33 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		/* call the set up function if any */
 		m_begin_update_cb(bitmap, cliprect);
 
-		if (cliprect.min_y == 0)
+		if (cliprect.top() == 0)
 		{
 			/* read the start address at the beginning of the frame */
 			m_current_disp_addr = m_disp_start_addr;
 		}
 
 		/* for each row in the visible region */
-		for (uint16_t y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (uint16_t y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			this->draw_scanline(y, bitmap, cliprect);
 		}
 
 		/* call the tear down function if any */
+		m_end_update_cb(bitmap, cliprect);
+	}
+	else if (m_display_off)
+	{
+		uint16_t const char_height = m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust);
+		int const vbp = std::max(m_vert_pix_total - m_vsync_off_pos, 0);
+		int const hbp = std::max(m_horiz_pix_total - m_hsync_off_pos, 0);
+
+		m_begin_update_cb(bitmap, cliprect);
+
+		/* DE is never asserted, so the driver decides what an inactive display looks like */
+		for (uint16_t y = cliprect.top(); y <= cliprect.bottom(); y++)
+			m_update_row_cb(bitmap, cliprect, m_disp_start_addr, y % char_height, y, m_display_off_columns, -1, 0, hbp, vbp);
+
 		m_end_update_cb(bitmap, cliprect);
 	}
 	else
@@ -951,10 +999,14 @@ void mc6845_device::device_start()
 	m_supports_status_reg_d7 = false;
 	m_supports_transparent = false;
 	m_has_valid_parameters = false;
+	m_display_off = false;
+	m_display_off_columns = 0;
 	m_display_disabled_msg_shown = false;
 	m_line_enable_ff = false;
 	m_vsync_ff = 0;
 	m_raster_counter = 0;
+	m_field = 0;
+	m_row_end = false;
 	m_adjust_active = 0;
 	m_horiz_sync_pos = 1;
 	m_vert_sync_pos = 1;
@@ -1015,6 +1067,8 @@ void mc6845_device::device_start()
 	save_item(NAME(m_hsync_width_counter));
 	save_item(NAME(m_line_counter));
 	save_item(NAME(m_raster_counter));
+	save_item(NAME(m_field));
+	save_item(NAME(m_row_end));
 	save_item(NAME(m_adjust_counter));
 	save_item(NAME(m_vsync_width_counter));
 	save_item(NAME(m_line_enable_ff));
@@ -1023,6 +1077,8 @@ void mc6845_device::device_start()
 	save_item(NAME(m_line_address));
 	save_item(NAME(m_cursor_x));
 	save_item(NAME(m_has_valid_parameters));
+	save_item(NAME(m_display_off));
+	save_item(NAME(m_display_off_columns));
 }
 
 

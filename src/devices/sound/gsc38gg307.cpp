@@ -48,6 +48,8 @@ constexpr size_t AUDIO_BUFFER_SIZE = 64 * 1024;
 // another frame.
 constexpr size_t MP2_FRAME_BYTES = 1024;
 
+constexpr size_t DECODE_AHEAD_SAMPLES = 2 * 1152;
+
 } // anonymous namespace
 
 //**************************************************************************
@@ -69,7 +71,7 @@ gsc38gg307_device::~gsc38gg307_device()
 void gsc38gg307_device::device_start()
 {
 	m_audio_es = std::make_unique<uint8_t []>(AUDIO_BUFFER_SIZE);
-	m_audio = std::make_unique<mpeg_audio>(m_audio_es.get(), mpeg_audio::L2, false, 0);
+	m_audio = std::make_unique<mpeg_audio>(m_audio_es.get(), mpeg_audio::L1 | mpeg_audio::L2, false, 0);
 
 	m_stream = stream_alloc(0, 2, 44100);
 	m_audio_timer = timer_alloc(FUNC(gsc38gg307_device::audio_tick), this);
@@ -143,7 +145,7 @@ uint32_t gsc38gg307_device::fma_dclk() const
 void gsc38gg307_device::write_data(uint8_t data)
 {
 	const bool was_body = m_demux.packet_body;
-	m_demux.byte(data, m_fma_stream);
+	m_demux.byte(data, 0xc0 | m_fma_stream);
 
 	if (was_body)
 	{
@@ -205,29 +207,35 @@ void gsc38gg307_device::audio_es_write(const uint8_t *data, size_t length)
 
 void gsc38gg307_device::audio_decode_pending()
 {
-	// layer II bit rates in kbit/s and sample rates in Hz
-	static constexpr int BITRATES[16] = { 0, 32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 0 };
+	// layer I and layer II bit rates in kbit/s and sample rates in Hz
+	static constexpr int BITRATES_L1[16] = { 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 0 };
+	static constexpr int BITRATES_L2[16] = { 0, 32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 0 };
 	static constexpr int SAMPLE_RATES[4] = { 44100, 48000, 32000, 0 };
 
 	// keep roughly a quarter second of samples queued
 	while (audio_available() < 44100 / 4 && audio_es_available() >= 4)
 	{
-		// Find an MPEG-1 layer II frame header on a byte boundary.  The frame
-		// length is 144 * bitrate / sample rate plus the padding byte, and
-		// the next frame starts there whatever the decoder read of this one.
+		// Find an MPEG-1 layer I or layer II frame header on a byte boundary.
+		// The frame length is 12 * bitrate / sample rate four byte slots for
+		// layer I, 144 * bitrate / sample rate bytes for layer II, plus the
+		// padding slot, and the next frame starts there whatever the decoder
+		// read of this one.
 		const uint8_t *const header = &m_audio_es[m_audio_es_head];
-		const int bitrate = BITRATES[header[2] >> 4];
+		const bool layer1 = BIT(header[1], 1);
+		const int bitrate = (layer1 ? BITRATES_L1 : BITRATES_L2)[header[2] >> 4];
 		const int sample_rate = SAMPLE_RATES[(header[2] >> 2) & 3];
 		const bool mono = (header[3] >> 6) == 3;
-		// the decoder has no parameters for these combinations
-		const bool allowed = mono ? (bitrate <= 192) : (bitrate != 32 && bitrate != 48 && bitrate != 56 && bitrate != 80);
-		if (header[0] != 0xff || (header[1] & 0xfe) != 0xfc || !bitrate || !sample_rate || !allowed)
+		// the layer II decoder has no parameters for these combinations
+		const bool allowed = layer1 || (mono ? (bitrate <= 192) : (bitrate != 32 && bitrate != 48 && bitrate != 56 && bitrate != 80));
+		if (header[0] != 0xff || (header[1] & 0xfc) != 0xfc || !bitrate || !sample_rate || !allowed)
 		{
 			m_audio_es_head++;
 			continue;
 		}
 
-		const size_t frame_bytes = size_t(144000) * bitrate / sample_rate + BIT(header[2], 1);
+		const size_t frame_bytes = layer1
+				? (size_t(12000) * bitrate / sample_rate + BIT(header[2], 1)) * 4
+				: size_t(144000) * bitrate / sample_rate + BIT(header[2], 1);
 		if (audio_es_available() < frame_bytes)
 			break;
 
@@ -414,7 +422,18 @@ uint16_t gsc38gg307_device::regs_r(offs_t offset, uint16_t mem_mask)
 	switch (offset)
 	{
 	case 0x00: data = m_fma_cmd; break;
-	case 0x01: data = 0x0200 | m_fma_status; break;
+	case 0x01:
+		data = 0x0200 | m_fma_status;
+		if (!machine().side_effects_disabled())
+		{
+			m_stream->update();
+		}
+		if (audio_available() <= DECODE_AHEAD_SAMPLES && audio_es_available() < MP2_FRAME_BYTES)
+		{
+			data &= ~FMA_DEC;
+		}
+		break;
+
 	case 0x02: data = 0x0007; break;
 	case 0x03: data = 0x0900; break;
 	case 0x04: data = m_fma_stream; break;

@@ -37,6 +37,7 @@ public:
 	void via_pa_w(uint8_t data);
 	uint8_t via_pb_r();
 	void via_pb_w(uint8_t data);
+	uint8_t via_r(offs_t offset);
 	uint8_t rtc_r(offs_t offset);
 	void via_cb1_w(int state);
 	void via_cb2_w(int state);
@@ -88,8 +89,7 @@ private:
 	bool m_iec_clk = 1;
 	bool m_iec_data = 1;
 
-	emu_timer *m_iec_sync_timer;
-	TIMER_CALLBACK_MEMBER(iec_sync_tick);
+	void update_iec();
 };
 
 

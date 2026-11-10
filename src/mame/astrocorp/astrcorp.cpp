@@ -1739,7 +1739,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(astrocorp_state::irq_2_4_scanline_cb)
 {
 	int scanline = param;
 
-	if (scanline == m_screen->visible_area().max_y + 1) // vblank-in?
+	if (scanline == m_screen->visible_area().bottom() + 1) // vblank-in?
 		m_maincpu->set_input_line(4, HOLD_LINE); // sprites, sound, i/o
 
 	if (scanline == 0) // vblank-out?
@@ -1817,7 +1817,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zoo_state::irq_1_2_scanline_cb)
 	// NOTE: in astoneag title screen, if the IRQ levels are swapped, a timing issue causes the SP to overwrite the palette data
 	//       before it's written to the RAMDAC, causing corrupt colors
 
-	if (scanline == m_screen->visible_area().max_y + 1) // vblank-in?
+	if (scanline == m_screen->visible_area().bottom() + 1) // vblank-in?
 		m_maincpu->set_input_line(1, HOLD_LINE); // palette
 
 	if (scanline == 0) // vblank-out?

@@ -21,6 +21,7 @@ public:
 	{
 		TYPE_1801,
 		TYPE_1802,
+		TYPE_1804,
 		TYPE_1805
 	};
 
@@ -48,7 +49,7 @@ private:
 	offs_t short_skip(offs_t pc);
 	offs_t long_skip(offs_t pc);
 
-	void disassemble_68(std::ostream &stream, offs_t base_pc, offs_t &pc, const data_buffer &opcodes, const data_buffer &params);
+	uint32_t disassemble_68(std::ostream &stream, offs_t base_pc, offs_t &pc, const data_buffer &opcodes, const data_buffer &params);
 
 	config *const m_config;
 };

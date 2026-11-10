@@ -19,6 +19,7 @@
 #include "buddha.h"
 #include "merlin.h"
 #include "oktagon2008.h"
+#include "peggyplus.h"
 #include "picasso2.h"
 #include "rainbow2.h"
 #include "ripple.h"
@@ -42,6 +43,7 @@ void zorro2_cards(device_slot_interface &device)
 	device.option_add("buddha", AMIGA_BUDDHA);
 	device.option_add("merlin", AMIGA_MERLIN);
 	device.option_add("oktagon2008", AMIGA_OKTAGON2008);
+	device.option_add("peggyplus", AMIGA_PEGGYPLUS);
 	device.option_add("picasso2p", AMIGA_PICASSO2P);
 	device.option_add("rainbow2", AMIGA_RAINBOW2);
 	device.option_add("framemaster", AMIGA_FRAMEMASTER);

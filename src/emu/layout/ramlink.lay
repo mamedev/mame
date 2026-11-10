@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Curt Coder
+CMD RAMLink control panel layout
+-->
+<mamelayout version="2">
+
+	<element name="case">
+		<rect><color red="0.89" green="0.89" blue="0.86" /></rect>
+	</element>
+
+	<element name="lbl_error"><text string="ERROR"><color red="0.15" green="0.35" blue="0.85" /></text></element>
+	<element name="lbl_access"><text string="ACCESS"><color red="0.15" green="0.35" blue="0.85" /></text></element>
+	<element name="lbl_activity"><text string="ACTIVITY"><color red="0.15" green="0.35" blue="0.85" /></text></element>
+	<element name="lbl_enable"><text string="ENABLE" align="2"><color red="0.15" green="0.35" blue="0.85" /></text></element>
+	<element name="lbl_disable"><text string="DISABLE" align="1"><color red="0.15" green="0.35" blue="0.85" /></text></element>
+	<element name="lbl_normal"><text string="NORMAL" align="2"><color red="0.15" green="0.35" blue="0.85" /></text></element>
+	<element name="lbl_direct"><text string="DIRECT" align="1"><color red="0.15" green="0.35" blue="0.85" /></text></element>
+
+	<element name="led" defstate="0">
+		<disk state="1"><color red="1.0" green="1.0" blue="1.0" /></disk>
+		<disk state="0"><color red="0.32" green="0.32" blue="0.32" /></disk>
+	</element>
+
+	<element name="btn_reset">
+		<rect><color red="0.15" green="0.35" blue="0.85" /></rect>
+		<rect state="0"><bounds x="0.04" y="0.04" width="0.92" height="0.92" /><color red="0.96" green="0.96" blue="0.94" /></rect>
+		<rect state="1"><bounds x="0.04" y="0.04" width="0.92" height="0.92" /><color red="0.75" green="0.75" blue="0.72" /></rect>
+		<text string="RESET"><bounds x="0.1" y="0.38" width="0.8" height="0.24" /><color red="0.15" green="0.35" blue="0.85" /></text>
+	</element>
+	<element name="btn_swap8">
+		<rect><color red="0.15" green="0.35" blue="0.85" /></rect>
+		<rect state="0"><bounds x="0.04" y="0.04" width="0.92" height="0.92" /><color red="0.96" green="0.96" blue="0.94" /></rect>
+		<rect state="1"><bounds x="0.04" y="0.04" width="0.92" height="0.92" /><color red="0.75" green="0.75" blue="0.72" /></rect>
+		<text string="SWAP 8"><bounds x="0.1" y="0.38" width="0.8" height="0.24" /><color red="0.15" green="0.35" blue="0.85" /></text>
+	</element>
+	<element name="btn_swap9">
+		<rect><color red="0.15" green="0.35" blue="0.85" /></rect>
+		<rect state="0"><bounds x="0.04" y="0.04" width="0.92" height="0.92" /><color red="0.96" green="0.96" blue="0.94" /></rect>
+		<rect state="1"><bounds x="0.04" y="0.04" width="0.92" height="0.92" /><color red="0.75" green="0.75" blue="0.72" /></rect>
+		<text string="SWAP 9"><bounds x="0.1" y="0.38" width="0.8" height="0.24" /><color red="0.15" green="0.35" blue="0.85" /></text>
+	</element>
+
+	<element name="toggle_left_on" defstate="1">
+		<disk><bounds x="0.167" y="0.0" width="0.667" height="1.0" /><color red="0.55" green="0.55" blue="0.55" /></disk>
+		<disk><bounds x="0.333" y="0.25" width="0.333" height="0.5" /><color red="0.78" green="0.78" blue="0.78" /></disk>
+		<rect state="1"><bounds x="0.08" y="0.4" width="0.42" height="0.2" /><color red="0.85" green="0.85" blue="0.85" /></rect>
+		<disk state="1"><bounds x="0.0" y="0.35" width="0.2" height="0.3" /><color red="0.92" green="0.92" blue="0.92" /></disk>
+		<rect state="0"><bounds x="0.5" y="0.4" width="0.42" height="0.2" /><color red="0.85" green="0.85" blue="0.85" /></rect>
+		<disk state="0"><bounds x="0.8" y="0.35" width="0.2" height="0.3" /><color red="0.92" green="0.92" blue="0.92" /></disk>
+	</element>
+	<element name="toggle_left_off" defstate="0">
+		<disk><bounds x="0.167" y="0.0" width="0.667" height="1.0" /><color red="0.55" green="0.55" blue="0.55" /></disk>
+		<disk><bounds x="0.333" y="0.25" width="0.333" height="0.5" /><color red="0.78" green="0.78" blue="0.78" /></disk>
+		<rect state="0"><bounds x="0.08" y="0.4" width="0.42" height="0.2" /><color red="0.85" green="0.85" blue="0.85" /></rect>
+		<disk state="0"><bounds x="0.0" y="0.35" width="0.2" height="0.3" /><color red="0.92" green="0.92" blue="0.92" /></disk>
+		<rect state="1"><bounds x="0.5" y="0.4" width="0.42" height="0.2" /><color red="0.85" green="0.85" blue="0.85" /></rect>
+		<disk state="1"><bounds x="0.8" y="0.35" width="0.2" height="0.3" /><color red="0.92" green="0.92" blue="0.92" /></disk>
+	</element>
+
+	<group name="panel">
+		<element ref="case"><bounds x="0" y="0" width="300" height="520" /></element>
+
+		<element ref="btn_reset" inputtag="BUTTONS" inputmask="0x04"><bounds x="130" y="20" width="70" height="70" /></element>
+		<element name="led1" ref="led"><bounds x="226" y="46" width="24" height="24" /><color red="1.0" green="0.10" blue="0.15" /></element>
+		<element ref="lbl_error"><bounds x="203" y="74" width="70" height="14" /></element>
+
+		<element name="led2" ref="led"><bounds x="226" y="116" width="24" height="24" /><color red="0.20" green="1.0" blue="0.70" /></element>
+		<element ref="lbl_access"><bounds x="203" y="144" width="70" height="14" /></element>
+
+		<element name="led0" ref="led"><bounds x="226" y="186" width="24" height="24" /><color red="0.20" green="1.0" blue="0.70" /></element>
+		<element ref="lbl_activity"><bounds x="198" y="214" width="80" height="14" /></element>
+
+		<element ref="btn_swap9" inputtag="BUTTONS" inputmask="0x02"><bounds x="130" y="240" width="70" height="70" /></element>
+		<element name="led4" ref="led"><bounds x="226" y="263" width="24" height="24" /><color red="1.0" green="0.10" blue="0.15" /></element>
+
+		<element ref="btn_swap8" inputtag="BUTTONS" inputmask="0x01"><bounds x="130" y="320" width="70" height="70" /></element>
+		<element name="led3" ref="led"><bounds x="226" y="343" width="24" height="24" /><color red="1.0" green="0.10" blue="0.15" /></element>
+
+		<element ref="lbl_enable"><bounds x="61" y="413" width="70" height="14" /></element>
+		<element ref="toggle_left_on" inputtag="SWITCHES" inputmask="0x01" inputraw="yes"><bounds x="135" y="400" width="60" height="40" /></element>
+		<element ref="lbl_disable"><bounds x="199" y="413" width="80" height="14" /></element>
+
+		<element ref="lbl_normal"><bounds x="61" y="468" width="70" height="14" /></element>
+		<element ref="toggle_left_off" inputtag="SWITCHES" inputmask="0x02" inputraw="yes"><bounds x="135" y="455" width="60" height="40" /></element>
+		<element ref="lbl_direct"><bounds x="199" y="468" width="70" height="14" /></element>
+	</group>
+
+	<view name="Control Panel">
+		<group ref="panel"><bounds x="0" y="0" width="300" height="520" /></group>
+	</view>
+
+</mamelayout>

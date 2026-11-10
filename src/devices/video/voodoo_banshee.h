@@ -133,6 +133,7 @@ protected:
 
 	// rendering
 	void execute_blit(u32 data);
+	void screen_to_screen_blit(u32 srcx, u32 srcy);
 
 	// internal state
 	u32 m_lfb_base;                              // configured LFB base

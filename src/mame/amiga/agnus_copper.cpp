@@ -113,6 +113,8 @@ void agnus_copper_device::device_reset()
 	m_dma_copen = false;
 	m_resync_pending = false;
 	m_copper_list = 0;
+	m_pending_data = 0;
+	m_pending_offset = 0;
 	// TODO: latches states on soft reset
 }
 

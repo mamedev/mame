@@ -403,6 +403,7 @@ protected:
 	void hirq_schedule();
 	virtual void write_joy_latch(uint8_t data);
 	virtual void wrio_write(uint8_t data);
+	virtual void hblank_w(int state) { }
 	inline uint8_t snes_rom_access(uint32_t offset);
 
 	void snes_init_ram();

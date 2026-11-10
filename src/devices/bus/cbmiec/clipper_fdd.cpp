@@ -62,10 +62,23 @@ void clipper_fdd_device::mem_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
 	map(0x1400, 0x1401).mirror(0x03fe).m(m_fdc, FUNC(upd765a_device::map));
-	map(0x1800, 0x180f).mirror(0x03f0).m(m_via, FUNC(via6522_device::map));
+	map(0x1800, 0x180f).mirror(0x03f0).r(FUNC(clipper_fdd_device::via_r)).w(m_via, FUNC(via6522_device::write));
 	map(0x1c00, 0x1c00).mirror(0x03ff).rw(FUNC(clipper_fdd_device::latch_r), FUNC(clipper_fdd_device::latch_w));
 	map(0x8000, 0xbfff).rw(FUNC(clipper_fdd_device::tc_r), FUNC(clipper_fdd_device::tc_w));
 	map(0xc000, 0xffff).rom().region(M6502_TAG, 0);
+}
+
+
+//-------------------------------------------------
+//  via_r -
+//-------------------------------------------------
+
+uint8_t clipper_fdd_device::via_r(offs_t offset)
+{
+	if (!offset && !m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
+	return m_via->read(offset);
 }
 
 
@@ -125,15 +138,15 @@ void clipper_fdd_device::via_pb_w(uint8_t data)
 	m_iec_clk = !BIT(data, 3);
 	m_atna = BIT(data, 4);
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 
 //-------------------------------------------------
-//  iec_sync_tick -
+//  update_iec -
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER(clipper_fdd_device::iec_sync_tick)
+void clipper_fdd_device::update_iec()
 {
 	m_via->write_ca1(!m_bus->atn_r());
 
@@ -258,7 +271,6 @@ clipper_fdd_device::clipper_fdd_device(const machine_config &mconfig, const char
 
 void clipper_fdd_device::device_start()
 {
-	m_iec_sync_timer = timer_alloc(FUNC(clipper_fdd_device::iec_sync_tick), this);
 	m_mtr_on_timer = timer_alloc(FUNC(clipper_fdd_device::mtr_on_tick), this);
 
 	save_item(NAME(m_iec_clk));
@@ -295,7 +307,7 @@ TIMER_CALLBACK_MEMBER(clipper_fdd_device::mtr_on_tick)
 
 void clipper_fdd_device::cbm_iec_atn(int state)
 {
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 

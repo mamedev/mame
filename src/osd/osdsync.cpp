@@ -92,7 +92,7 @@ int osd_get_num_processors(bool heavy_mt)
 	return 1;
 #else
 	unsigned int threads = std::thread::hardware_concurrency();
-	// max out at 4 for now since scaling above that seems to do poorly
+	// Fine-grained high-frequency queues scale poorly beyond four processors.
 	return heavy_mt ? threads : std::min(std::thread::hardware_concurrency(), 4U);
 #endif
 }
@@ -137,7 +137,7 @@ struct osd_work_queue
 {
 	osd_work_queue()
 		: list(nullptr)
-		, tailptr(nullptr)
+		, tail(nullptr)
 		, free(nullptr)
 		, items(0)
 		, livethreads(0)
@@ -156,8 +156,9 @@ struct osd_work_queue
 	}
 
 	std::mutex          lock;           // lock for protecting the queue
+	std::condition_variable work_available; // coarse queues use a shared work predicate
 	std::atomic<osd_work_item *> list;  // list of items in the queue
-	osd_work_item ** volatile tailptr;  // pointer to the tail pointer of work items in the queue
+	osd_work_item *     tail;           // last pending item, protected by lock
 	std::atomic<osd_work_item *> free;  // free list of work items
 	std::atomic<int32_t>  items;          // items in the queue
 	std::atomic<int32_t>  livethreads;    // number of live threads
@@ -211,10 +212,11 @@ int osd_num_processors = 0;
 //  FUNCTION PROTOTYPES
 //============================================================
 
-static int effective_num_processors(bool heavy_mt);
+static int effective_num_processors(int flags);
 static void *worker_thread_entry(void *param);
 static void worker_thread_process(osd_work_queue *queue, work_thread_info *thread);
 static bool queue_has_list_items(osd_work_queue *queue);
+static osd_work_item *queue_multiple(osd_work_queue *queue, osd_work_callback callback, int32_t numitems, void *parambase, int32_t paramstep, uint32_t flags, bool indirect);
 
 //============================================================
 //  osd_thread_adjust_priority
@@ -251,7 +253,7 @@ int thread_adjust_priority(std::thread *thread, int adjust)
 osd_work_queue *osd_work_queue_alloc(int flags)
 {
 	int threadnum;
-	int numprocs = effective_num_processors(!(flags & WORK_QUEUE_FLAG_HIGH_FREQ));
+	int numprocs = effective_num_processors(flags);
 	osd_work_queue *queue;
 	int osdthreadnum = 0;
 	int allocthreadnum;
@@ -261,7 +263,6 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	queue = new osd_work_queue();
 
 	// initialize basic queue members
-	queue->tailptr = (osd_work_item **)&queue->list;
 	queue->flags = flags;
 
 	// determine how many threads to create...
@@ -281,7 +282,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 #endif
 
 	// clamp to the maximum
-	queue->threads = std::min(threadnum, WORK_MAX_THREADS);
+	queue->threads = std::clamp(threadnum, 0, WORK_MAX_THREADS - ((flags & WORK_QUEUE_FLAG_MULTI) ? 1 : 0));
 
 	// allocate memory for thread array (+1 to count the calling thread if WORK_QUEUE_FLAG_MULTI)
 	if (flags & WORK_QUEUE_FLAG_MULTI)
@@ -337,6 +338,10 @@ int osd_work_queue_items(osd_work_queue *queue)
 	return queue->items;
 }
 
+int osd_work_queue_thread_count(osd_work_queue *queue)
+{
+	return queue->threads;
+}
 
 //============================================================
 //  osd_work_queue_wait
@@ -401,7 +406,11 @@ void osd_work_queue_free(osd_work_queue *queue)
 	}
 
 	// signal all the threads to exit
-	queue->exiting = true;
+	{
+		std::lock_guard<std::mutex> lock(queue->lock);
+		queue->exiting = true;
+	}
+	queue->work_available.notify_all();
 	for (int threadnum = 0; threadnum < queue->threads; threadnum++)
 	{
 		work_thread_info *thread = queue->thread[threadnum];
@@ -473,11 +482,30 @@ void osd_work_queue_free(osd_work_queue *queue)
 
 
 //============================================================
+//  osd_work_item_queue_list
+//============================================================
+
+osd_work_item *osd_work_item_queue_list(osd_work_queue *queue, osd_work_callback callback, int32_t numitems, void *const *params, uint32_t flags)
+{
+	return queue_multiple(queue, callback, numitems, const_cast<void **>(params), sizeof(*params), flags, true);
+}
+
+
+//============================================================
 //  osd_work_item_queue_multiple
 //============================================================
 
 osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_callback callback, int32_t numitems, void *parambase, int32_t paramstep, uint32_t flags)
 {
+	return queue_multiple(queue, callback, numitems, parambase, paramstep, flags, false);
+}
+
+static osd_work_item *queue_multiple(osd_work_queue *queue, osd_work_callback callback, int32_t numitems, void *parambase, int32_t paramstep, uint32_t flags, bool indirect)
+{
+	if (numitems <= 0)
+	{
+		return nullptr;
+	}
 	osd_work_item *itemlist = nullptr, *lastitem = nullptr;
 	osd_work_item **item_tailptr = &itemlist;
 	int itemnum;
@@ -512,7 +540,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		// fill in the basics
 		item->next = nullptr;
 		item->callback = callback;
-		item->param = parambase;
+		item->param = indirect ? *static_cast<void *const *>(parambase) : parambase;
 		item->result = nullptr;
 		item->flags = flags;
 
@@ -523,19 +551,40 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		parambase = (uint8_t *)parambase + paramstep;
 	}
 
+	int wake = 0;
 	// enqueue the whole thing within the critical section
 	{
 		std::lock_guard<std::mutex> lock(queue->lock);
-		*queue->tailptr = itemlist;
-		queue->tailptr = item_tailptr;
+		// Account for callbacks before publishing them to workers. The head is also
+		// observed outside this lock by spinning workers and must be stored atomically.
+		queue->items += numitems;
+		if (queue->tail)
+		{
+			queue->tail->next = itemlist;
+		}
+		else
+		{
+			queue->list = itemlist;
+		}
+		queue->tail = lastitem;
+		wake = std::min(numitems, int(queue->threads) - queue->livethreads.load());
 	}
 
-	// increment the number of items in the queue
-	queue->items += numitems;
 	add_to_stat(queue->itemsqueued, numitems);
 
 	// look for free threads to do the work
-	if (queue->livethreads < queue->threads)
+	if (queue->flags & WORK_QUEUE_FLAG_COARSE)
+	{
+		// Publication and a worker's transition to sleep use the same mutex. An
+		// already active worker rechecks the predicate before parking, so it cannot
+		// miss work even when this calculation finds no additional workers needed.
+		for (int index = 0; index < wake; ++index)
+		{
+			queue->work_available.notify_one();
+			add_to_stat(queue->setevents, 1);
+		}
+	}
+	else if (queue->livethreads < queue->threads)
 	{
 		int threadnum;
 
@@ -638,9 +687,14 @@ void osd_work_item_release(osd_work_item *item)
 //  effective_num_processors
 //============================================================
 
-static int effective_num_processors(bool heavy_mt)
+static int effective_num_processors(int flags)
 {
-	int physprocs = osd_get_num_processors(heavy_mt);
+	const bool high_freq = flags & WORK_QUEUE_FLAG_HIGH_FREQ;
+	// Coarse callbacks amortize scheduling costs and park idle workers. Allow
+	// up to eight processors automatically while retaining the fine-grained cap.
+	const int physprocs = (high_freq && (flags & WORK_QUEUE_FLAG_COARSE))
+			? std::min(osd_get_num_processors(true), 8)
+			: osd_get_num_processors(!high_freq);
 
 	// osd_num_processors == 0 for 'auto'
 	if (osd_num_processors > 0)
@@ -671,6 +725,29 @@ static void *worker_thread_entry(void *param)
 {
 	auto *thread = (work_thread_info *)param;
 	osd_work_queue &queue = thread->queue;
+
+	if (queue.flags & WORK_QUEUE_FLAG_COARSE)
+	{
+		std::unique_lock<std::mutex> lock(queue.lock);
+		while (true)
+		{
+			begin_timing(thread->waittime);
+			queue.work_available.wait(lock, [&queue]()
+			{
+				return queue.exiting || (queue.list.load() != nullptr);
+			});
+			end_timing(thread->waittime);
+			if (queue.exiting)
+			{
+				return nullptr;
+			}
+			++queue.livethreads;
+			lock.unlock();
+			worker_thread_process(&queue, thread);
+			lock.lock();
+			--queue.livethreads;
+		}
+	}
 
 	// loop until we exit
 	for ( ;; )
@@ -756,7 +833,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 				{
 					queue->list = item->next;
 					if (queue->list.load() == nullptr)
-						queue->tailptr = (osd_work_item **)&queue->list;
+						queue->tail = nullptr;
 				}
 			}
 		}

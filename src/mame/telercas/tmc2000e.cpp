@@ -361,6 +361,11 @@ void tmc2000e_state::tmc2000e(machine_config &config)
 	m_maincpu->ef3_cb().set(FUNC(tmc2000e_state::ef3_r));
 	m_maincpu->q_cb().set(FUNC(tmc2000e_state::q_w));
 	m_maincpu->dma_wr_cb().set(FUNC(tmc2000e_state::dma_w));
+	m_maincpu->sc_cb().set(m_cti, FUNC(cdp1864_device::sc_w));
+	m_maincpu->tpa_cb().set(m_cti, FUNC(cdp1864_device::tpa_w));
+	m_maincpu->int_cb().set(m_cti, FUNC(cdp1864_device::int_r));
+	m_maincpu->dma_out_cb().set(m_cti, FUNC(cdp1864_device::dma_out_r));
+	m_maincpu->ef1_cb().set(m_cti, FUNC(cdp1864_device::efx_r));
 
 	// video hardware
 	SCREEN(config, SCREEN_TAG);
@@ -369,9 +374,6 @@ void tmc2000e_state::tmc2000e(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	CDP1864(config, m_cti, 1.75_MHz_XTAL).set_screen(SCREEN_TAG);
 	m_cti->inlace_cb().set_constant(0);
-	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
-	m_cti->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
-	m_cti->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
 	m_cti->rdata_cb().set(FUNC(tmc2000e_state::rdata_r));
 	m_cti->bdata_cb().set(FUNC(tmc2000e_state::bdata_r));
 	m_cti->gdata_cb().set(FUNC(tmc2000e_state::gdata_r));

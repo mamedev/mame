@@ -36,10 +36,10 @@ void f108_device::map(address_map &map)
 {
 	map(0x40000000, 0x400fffff).r(FUNC(f108_device::rom_switch_r)).mirror(0x0ff00000).nopw();
 	map(0x5000c000, 0x5000dfff).rw(FUNC(f108_device::scc_r), FUNC(f108_device::scc_w)).mirror(0x00fc0000);
-	map(0x5001a000, 0x5001a01f).rw(m_ata, FUNC(ata_interface_device::cs0_swap_r), FUNC(ata_interface_device::cs0_swap_w)).umask32(0xffff0000).mirror(0x00fc0000);
-	map(0x5001a000, 0x5001a003).rw(FUNC(f108_device::ata_data_r), FUNC(f108_device::ata_data_w)).mirror(0x00fc0000);
-	map(0x5001a020, 0x5001a03f).rw(m_ata, FUNC(ata_interface_device::cs1_swap_r), FUNC(ata_interface_device::cs1_swap_w)).umask32(0xffff0000).mirror(0x00fc0000);
-	// a040 is probably a configuration register based on later Apple ATA implementations, but the values written don't make sense
+	map(0x50f1a000, 0x50f1a01f).umask32(0xffff0000).rw(m_ata, FUNC(ata_interface_device::cs0_swap_r), FUNC(ata_interface_device::cs0_swap_w));
+	map(0x50f1a000, 0x50f1a003).rw(FUNC(f108_device::ata_data_r), FUNC(f108_device::ata_data_w));
+	map(0x50f1a020, 0x50f1a03f).umask32(0xffff0000).rw(m_ata, FUNC(ata_interface_device::cs1_swap_r), FUNC(ata_interface_device::cs1_swap_w));
+	map(0x50f1a040, 0x50f1a04b).rw(FUNC(f108_device::ata_timing_r), FUNC(f108_device::ata_timing_w));
 	map(0xf9000000, 0xf90fffff).ram();  // VRAM
 }
 
@@ -55,7 +55,7 @@ void f108_device::device_add_mconfig(machine_config &config)
 	NSCSI_BUS(config, m_scsibus);
 	// ... bus devices to be populated by drivers ...
 
-	NCR53C96(config, m_ncr1, 40_MHz_XTAL);
+	NCR53C96(config, m_ncr1, DERIVED_CLOCK(1, 2));
 	m_scsibus->set_external_device(7, m_ncr1);
 	m_ncr1->set_busmd(ncr53c96_device::BUSMD_1);
 
@@ -69,12 +69,12 @@ void f108_device::device_add_mconfig(machine_config &config)
 	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
 	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
-	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
+	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w)).invert();
 
 	rs232_port_device &rs232b(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
-	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
+	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w)).invert();
 }
 
 //-------------------------------------------------
@@ -91,7 +91,8 @@ f108_device::f108_device(const machine_config &mconfig, const char *tag, device_
 	m_scc(*this, "scc"),
 	m_rom(*this, finder_base::DUMMY_TAG),
 	m_ata_irq(*this),
-	m_overlay(false)
+	m_overlay(false),
+	m_scc_sync(true)
 {
 }
 
@@ -101,8 +102,13 @@ f108_device::f108_device(const machine_config &mconfig, const char *tag, device_
 
 void f108_device::device_start()
 {
-	m_rom_ptr = &m_rom[0];
-	m_rom_size = m_rom.length() << 2;
+	m_rom_ptr = m_rom ? &m_rom[0] : nullptr;
+	m_rom_size = m_rom ? m_rom.length() << 2 : 0;
+
+	m_ata_active = 0;
+	m_ata_recovery = 0;
+	save_item(NAME(m_ata_active));
+	save_item(NAME(m_ata_recovery));
 }
 
 //-------------------------------------------------
@@ -113,8 +119,14 @@ void f108_device::device_reset()
 {
 	m_overlay = true;
 
-	// put ROM mirror at 0
 	address_space &space = m_maincpu->space(AS_PROGRAM);
+	if (!m_rom_ptr)
+	{
+		space.unmap_readwrite(0x00000000, 0x003fffff);
+		return;
+	}
+
+	// put ROM mirror at 0
 	const u32 memory_size = std::min((u32)0x400000, m_rom_size);
 	const u32 memory_end = memory_size - 1;
 	offs_t memory_mirror = memory_end & ~(memory_size - 1);
@@ -123,9 +135,8 @@ void f108_device::device_reset()
 	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
 }
 
-u32 f108_device::rom_switch_r(offs_t offset)
+void f108_device::overlay_off()
 {
-	// disable the overlay
 	if (m_overlay && !machine().side_effects_disabled())
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -136,8 +147,14 @@ u32 f108_device::rom_switch_r(offs_t offset)
 		space.install_ram(0x00000000, memory_end & ~memory_mirror, memory_mirror, memory_data);
 		m_overlay = false;
 	}
+}
 
-	return m_rom_ptr[offset & ((m_rom_size - 1) >> 2)];
+u32 f108_device::rom_switch_r(offs_t offset)
+{
+	// disable the overlay
+	overlay_off();
+
+	return m_rom_ptr ? m_rom_ptr[offset & ((m_rom_size - 1) >> 2)] : 0;
 }
 
 void f108_device::set_ram_info(u32 *ram, u32 size)
@@ -149,6 +166,37 @@ void f108_device::set_ram_info(u32 *ram, u32 size)
 void f108_device::ata_irq_w(int state)
 {
 	m_ata_irq(state);
+}
+
+u8 f108_device::ata_timing_r(offs_t offset)
+{
+	switch (offset & ~2)
+	{
+		case 1:
+			return 0x20;
+
+		case 5:
+			return m_ata_active;
+
+		case 9:
+			return m_ata_recovery;
+	}
+
+	return 0xff;
+}
+
+void f108_device::ata_timing_w(offs_t offset, u8 data)
+{
+	switch (offset & ~2)
+	{
+		case 5:
+			m_ata_active = data & 0x3f;
+			break;
+
+		case 9:
+			m_ata_recovery = data & 0x0f;
+			break;
+	}
 }
 
 u32 f108_device::ata_data_r(offs_t offset, u32 mem_mask)
@@ -183,14 +231,16 @@ void f108_device::ata_data_w(offs_t offset, u32 data, u32 mem_mask)
 
 u16 f108_device::scc_r(offs_t offset)
 {
-	m_primetimeii->via_sync();
+	if (m_scc_sync && !machine().side_effects_disabled())
+		m_primetimeii->via_sync();
 	u16 result = m_scc->dc_ab_r(offset);
 	return (result << 8) | result;
 }
 
 void f108_device::scc_w(offs_t offset, u16 data)
 {
-	m_primetimeii->via_sync();
+	if (m_scc_sync)
+		m_primetimeii->via_sync();
 	m_scc->dc_ab_w(offset, data >> 8);
 }
 

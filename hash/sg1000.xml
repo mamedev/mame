@@ -2154,7 +2154,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="safarihu" supported="no">
+	<software name="safarihu">
 		<description>Safari Hunting (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -2167,7 +2167,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="safarihut" cloneof="safarihu" supported="no">
+	<software name="safarihut" cloneof="safarihu">
 		<description>Safari Hunting (Taiwan)</description>
 		<year>1983?</year>
 		<publisher>Aaronix</publisher>

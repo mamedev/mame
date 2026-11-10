@@ -34,13 +34,13 @@ enum : unsigned
 };
 
 
-inline std::string_view cd_state_string(cd_player_device &device)
+inline std::string_view cd_state_string(device_cd_player_interface &device)
 {
 	switch (device.state())
 	{
-	case cd_player_device::transport::PLAYING:
+	case device_cd_player_interface::transport::PLAYING:
 		return _("playing");
-	case cd_player_device::transport::PAUSED:
+	case device_cd_player_interface::transport::PAUSED:
 		return _("paused");
 	default:
 		return _("stopped");
@@ -48,10 +48,10 @@ inline std::string_view cd_state_string(cd_player_device &device)
 }
 
 
-inline std::string cd_position_string(cd_player_device &device)
+inline std::string cd_position_string(device_cd_player_interface &device)
 {
-	u32 const elapsed = device.track_elapsed_frames() / cd_player_device::FRAMES_PER_SECOND;
-	u32 const length = device.track_length_frames() / cd_player_device::FRAMES_PER_SECOND;
+	u32 const elapsed = device.track_elapsed_frames() / device_cd_player_interface::FRAMES_PER_SECOND;
+	u32 const length = device.track_length_frames() / device_cd_player_interface::FRAMES_PER_SECOND;
 	return util::string_format(_("Track %1$02d/%2$02d  %3$02d:%4$02d / %5$02d:%6$02d"),
 			device.track(), device.track_count(),
 			elapsed / 60, elapsed % 60,
@@ -69,8 +69,8 @@ inline std::string cd_position_string(cd_player_device &device)
 //  ctor
 //-------------------------------------------------
 
-menu_cd_control::menu_cd_control(mame_ui_manager &mui, render_target &target, cd_player_device *device)
-	: menu_device_control<cd_player_device>(mui, target, device)
+menu_cd_control::menu_cd_control(mame_ui_manager &mui, render_target &target, device_cd_player_interface *device)
+	: menu_device_control<device_cd_player_interface, cd_player_interface_enumerator>(mui, target, device)
 	, m_status_item_index(-1)
 {
 	set_heading(_("CD Player Control"));
@@ -97,16 +97,16 @@ void menu_cd_control::populate()
 	if (current_device())
 	{
 		// repopulate the menu if an image is mounted or unmounted
-		m_notifier = current_device()->add_media_change_notifier(
+		m_notifier = current_device()->cd_image().add_media_change_notifier(
 				[this] (device_image_interface::media_change_event ev)
 				{
 					reset(reset_options::REMEMBER_POSITION);
 				});
 
 		// name of disc
-		item_append(current_display_name(), current_device()->exists() ? current_device()->filename() : _("No Disc Image loaded"), current_display_flags(), (void *)CDCMD_SELECT);
+		item_append(current_display_name(), current_device()->cd_image().exists() ? current_device()->cd_image().filename() : _("No Disc Image loaded"), current_display_flags(), (void *)CDCMD_SELECT);
 
-		if (current_device()->exists())
+		if (current_device()->cd_image().exists())
 		{
 			m_status_item_index = item_append(std::string(cd_state_string(*current_device())), cd_position_string(*current_device()), 0, (void *)CDCMD_STATUS);
 
@@ -182,7 +182,7 @@ bool menu_cd_control::handle(event const *ev)
 	}
 
 	// update status
-	if ((0 <= m_status_item_index) && current_device() && current_device()->exists())
+	if ((0 <= m_status_item_index) && current_device() && current_device()->cd_image().exists())
 	{
 		menu_item &status_item(item(m_status_item_index));
 		status_item.set_text(cd_state_string(*current_device()));

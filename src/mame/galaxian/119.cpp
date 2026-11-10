@@ -125,9 +125,9 @@ void _119_state::sprites_clip(screen_device &screen, rectangle &cliprect)
 {
 	rectangle clip = screen.visible_area();
 	if (m_flipscreen_x)
-		clip.min_x += (64 * m_x_scale);
+		clip.insetx(64 * m_x_scale, 0);
 	else
-		clip.max_x -= (64 * m_x_scale);
+		clip.insetx(0, 64 * m_x_scale);
 
 	cliprect &= clip;
 }

@@ -194,7 +194,7 @@ void ics2115_device::device_reset()
 		elem.osc.acc = 0;
 		elem.osc.start = 0;
 		elem.osc.end = 0;
-		elem.osc_ctrl.value = 0;
+		elem.osc_ctrl.value = 2;
 		elem.osc.saddr = 0;
 		elem.vol.acc = 0;
 		elem.vol.incr = 0;
@@ -279,9 +279,6 @@ int ics2115_device::ics2115_voice::update_volume_envelope()
 		ret = 1;
 	}
 
-	if (osc_conf.bitflags.eightbit)
-		return ret;
-
 	if (vol_ctrl.bitflags.loop)
 	{
 		if (bc)
@@ -326,7 +323,7 @@ int ics2115_device::ics2115_voice::update_volume_envelope()
 int ics2115_device::ics2115_voice::update_oscillator()
 {
 	int ret = 0;
-	if (osc_conf.bitflags.stop)
+	if (!playing())
 		return ret;
 	if (osc_conf.bitflags.invert)
 	{
@@ -367,7 +364,6 @@ int ics2115_device::ics2115_voice::update_oscillator()
 	else
 	{
 		osc_ctrl.bitflags.done = true;
-		osc_conf.bitflags.stop = true;
 		if (!osc_conf.bitflags.invert)
 			osc.acc = osc.end;
 		else
@@ -397,7 +393,7 @@ s32 ics2115_device::get_sample(ics2115_voice& voice)
 		sample1 = m_ulaw[read_sample(voice, curaddr)];
 		sample2 = m_ulaw[read_sample(voice, curaddr + 1)];
 	}
-	else if (voice.osc_conf.bitflags.eightbit)
+	else if (!voice.osc_conf.bitflags.sixteenbit)
 	{
 		sample1 = (s8(read_sample(voice, curaddr))) << 8;
 		sample2 = (s8(read_sample(voice, curaddr + 1))) << 8;
@@ -425,7 +421,7 @@ s32 ics2115_device::get_sample(ics2115_voice& voice)
 
 bool ics2115_device::ics2115_voice::playing()
 {
-	return (osc_ctrl.value == 0) && !(osc_conf.bitflags.stop);
+	return !osc_ctrl.bitflags.done && !osc_ctrl.bitflags.stop;
 }
 
 int ics2115_device::fill_output(ics2115_voice& voice, sound_stream &stream)
@@ -866,10 +862,9 @@ void ics2115_device::reg_write(u16 data, u16 mem_mask)
 #ifdef ICS2115_ISOLATE
 					if (m_osc_select == ICS2115_ISOLATE)
 #endif
-					if (!voice.osc_conf.bitflags.stop || !voice.vol_ctrl.bitflags.stop)
+					if (!voice.vol_ctrl.bitflags.stop)
 						LOGVOICE("%s: [%02d STOP]\n", machine().describe_context(), m_osc_select);
 					//try to key it off as well!
-					voice.osc_conf.bitflags.stop = true;
 					voice.vol_ctrl.bitflags.stop = true;
 				}
 				else

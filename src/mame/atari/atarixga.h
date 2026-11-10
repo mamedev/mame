@@ -182,7 +182,6 @@ private:
 	};
 
 	static uint16_t key_offset(offs_t index);
-	void set_character(uint16_t data);
 
 	fpga_mode m_mode;
 	uint16_t m_taps;

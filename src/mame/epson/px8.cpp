@@ -930,4 +930,4 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS */
-COMP( 1984, px8,  0,      0,      px8,     px8,   px8_state, empty_init, "Epson", "PX-8",   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, px8,  0,      0,      px8,     px8,   px8_state, empty_init, "Epson", "PX-8",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

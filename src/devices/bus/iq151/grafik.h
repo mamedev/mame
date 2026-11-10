@@ -23,12 +23,10 @@ public:
 	iq151_grafik_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// iq151cart_interface overrides
 	virtual void io_read(offs_t offset, uint8_t &data) override;
@@ -41,6 +39,7 @@ private:
 	void y_write(uint8_t data);
 	void control_w(uint8_t data);
 
+	memory_share_creator<uint8_t> m_videoram;
 	required_device<i8255_device> m_ppi8255;
 
 	uint8_t       m_posx;     // horizontal position
@@ -51,11 +50,10 @@ private:
 	uint8_t       m_ev;       // enable video out
 	uint8_t       m_ex;
 	uint8_t       m_sel;      // enable vram access
-	uint8_t       m_videoram[0x4000];
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(IQ151_GRAFIK, iq151_grafik_device)
 
 #endif // MAME_BUS_IQ151_GRAFIK_H

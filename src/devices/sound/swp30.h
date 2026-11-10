@@ -347,7 +347,6 @@ private:
 	std::array<s32,     4> m_adc;
 
 	meg_state *m_meg;
-	drc_cache m_drccache;
 	std::unique_ptr<drcuml_state> m_drcuml;
 	uml::code_handle *m_meg_drc_entry;
 	uml::code_handle *m_meg_drc_nocode;

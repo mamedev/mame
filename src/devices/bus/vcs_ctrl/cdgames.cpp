@@ -15,14 +15,18 @@
 #include "emu.h"
 #include "cdgames.h"
 
+#include <algorithm>
+#include <cmath>
+
 
 DEFINE_DEVICE_TYPE(VCS_CD_ADAPTER, vcs_cd_adapter_device, "vcs_cdgames", "CD Games Pack adapter")
 
 
 vcs_cd_adapter_device::vcs_cd_adapter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VCS_CD_ADAPTER, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
 	device_vcs_control_port_interface(mconfig, *this),
-	m_cd(*this, "cdrom"),
+	device_cdda_player_interface(mconfig, *this),
 	m_edge_timer{ nullptr, nullptr },
 	m_comparator{ { 512 }, { 512 } },
 	m_joy(0xff)
@@ -31,13 +35,12 @@ vcs_cd_adapter_device::vcs_cd_adapter_device(const machine_config &mconfig, cons
 
 void vcs_cd_adapter_device::device_add_mconfig(machine_config &config)
 {
-	CD_PLAYER(config, m_cd);
-	m_cd->set_interface("cdrom");
-	m_cd->set_sample_callback(FUNC(vcs_cd_adapter_device::sample_w));
+	add_cd_player(config);
 }
 
 void vcs_cd_adapter_device::device_start()
 {
+	stream_alloc(2, 0, SAMPLE_RATE_INPUT_ADAPTIVE, STREAM_SYNCHRONOUS);
 	m_edge_timer[0] = timer_alloc(FUNC(vcs_cd_adapter_device::line_edge), this);
 	m_edge_timer[1] = timer_alloc(FUNC(vcs_cd_adapter_device::line_edge), this);
 
@@ -46,16 +49,21 @@ void vcs_cd_adapter_device::device_start()
 	save_item(NAME(m_joy));
 }
 
-void vcs_cd_adapter_device::sample_w(s16 left, s16 right)
+void vcs_cd_adapter_device::sound_stream_update(sound_stream &stream)
 {
 	static constexpr uint8_t LINE[2] = { LINE_FIRE, LINE_UP };
-	s16 const sample[2] = { left, right };
 
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
-		double position;
-		if (m_comparator[i].update(sample[i], position))
-			m_edge_timer[i]->adjust(attotime(0, attoseconds_t(position * HZ_TO_ATTOSECONDS(cd_player_device::SAMPLE_RATE))), (m_comparator[i].state() ? EDGE_HIGH : 0) | LINE[i]);
+		for (int ch = 0; ch < 2; ch++)
+		{
+			double position;
+			if (m_comparator[ch].update(std::lround(stream.get(ch, i) * 32768.0f), position))
+			{
+				double const delay = std::max(position + i + 1 - stream.samples(), 0.0);
+				m_edge_timer[ch]->adjust(attotime(0, attoseconds_t(delay * HZ_TO_ATTOSECONDS(stream.sample_rate()))), (m_comparator[ch].state() ? EDGE_HIGH : 0) | LINE[ch]);
+			}
+		}
 	}
 }
 

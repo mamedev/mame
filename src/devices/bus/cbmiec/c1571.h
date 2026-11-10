@@ -49,6 +49,7 @@ public:
 	uint8_t via0_pb_r();
 	void via0_pb_w(uint8_t data);
 
+	uint8_t via0_r(offs_t offset);
 	uint8_t via1_r(offs_t offset);
 	void via1_w(offs_t offset, uint8_t data);
 	uint8_t via1_pb_r();
@@ -92,7 +93,6 @@ protected:
 		LED_ACT
 	};
 
-	TIMER_CALLBACK_MEMBER(iec_sync_tick);
 	virtual void update_iec();
 
 	required_device<cpu_device> m_maincpu;
@@ -115,8 +115,6 @@ protected:
 	bool m_cnt_out;                          // fast serial clock out
 	bool m_iec_atn;
 	bool m_iec_clk;
-
-	emu_timer *m_iec_sync_timer;
 };
 
 

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: Angelo Salese, David Haywood, Lysiwyg, Philip Bennett
+// copyright-holders: Angelo Salese, David Haywood, Philip Bennett
 /*
 
 Williams The Predators (prototype)

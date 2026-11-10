@@ -53,7 +53,6 @@ crtc186_device::crtc186_device(const machine_config &mconfig, const char *tag, d
 	m_vpac(*this, "crt9007"),
 	m_drb0(*this, "crt9212_0"),
 	m_drb1(*this, "crt9212_1"),
-	m_timer_vidldsh(*this, "vidldsh"),
 	m_sio(*this, "i8251"),
 	m_kb(*this, "kb"),
 	m_ctrl(*this, "control"),
@@ -121,8 +120,6 @@ void crtc186_device::device_add_mconfig(machine_config &config)
 	m_drb1->set_wen2(1);
 	m_drb1->dout().set(FUNC(crtc186_device::drb_attr_w));
 
-	TIMER(config, "vidldsh").configure_generic(FUNC(crtc186_device::vidldsh_tick));
-
 	LS259(config, m_ctrl);
 	m_ctrl->q_out_cb<0>().set(FUNC(crtc186_device::cpl_w));
 	m_ctrl->q_out_cb<1>().set(FUNC(crtc186_device::blc_w));
@@ -151,6 +148,12 @@ void crtc186_device::device_start()
 
 	m_screen->register_screen_bitmap(m_bitmap);
 
+	m_line_timer = timer_alloc(FUNC(crtc186_device::line_tick), this);
+
+	m_char_time = attotime::never;
+	m_line_start = attotime::never;
+	m_line_end = attotime::never;
+
 	m_bus->memspace().install_ram(0xd0000, 0xd3fff, m_video_ram);
 	m_bus->memspace().install_read_tap(0xd8000, 0xdbfff, "charrom", [this](offs_t offset, uint16_t &data, uint16_t mem_mask) {
 		if (ACCESSING_BITS_0_7) {
@@ -177,6 +180,11 @@ void crtc186_device::device_start()
 	save_item(NAME(m_col));
 	save_item(NAME(m_row));
 	save_item(NAME(m_scanline));
+	save_item(NAME(m_hold));
+	save_item(NAME(m_char_time));
+	save_item(NAME(m_char_period));
+	save_item(NAME(m_line_start));
+	save_item(NAME(m_line_end));
 }
 
 void crtc186_device::device_reset()
@@ -195,6 +203,9 @@ void crtc186_device::device_reset()
 
 	// the control latch outputs are cleared on reset, which does not invoke the callbacks
 	m_cpl = m_blc = m_mode = m_modeg = m_c70_50 = m_cru = m_crb = false;
+
+	m_char_time = attotime::never;
+	m_line_end = attotime::never;
 
 	set_vidldsh_timer();
 }
@@ -240,6 +251,8 @@ void crtc186_device::vpac_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint8_t crtc186_device::videoram_r(offs_t offset)
 {
+	vidldsh_update();
+
 	u16 data = m_video_ram[offset & 0x1fff];
 
 	// character
@@ -253,6 +266,8 @@ uint8_t crtc186_device::videoram_r(offs_t offset)
 
 void crtc186_device::vpac_vlt_w(int state)
 {
+	vidldsh_update();
+
 	m_drb0->ren_w(state);
 	m_drb0->clrcnt_w(state);
 
@@ -262,6 +277,8 @@ void crtc186_device::vpac_vlt_w(int state)
 
 void crtc186_device::vpac_drb_w(int state)
 {
+	vidldsh_update();
+
 	m_drb = bool(state);
 
 	m_drb0->tog_w(state);
@@ -270,6 +287,8 @@ void crtc186_device::vpac_drb_w(int state)
 
 void crtc186_device::vpac_wben_w(int state)
 {
+	vidldsh_update();
+
 	m_drb0->wen1_w(state);
 	m_drb1->wen1_w(state);
 }
@@ -280,11 +299,15 @@ void crtc186_device::vpac_cblank_w(int state)
 
 void crtc186_device::vpac_curs_w(int state)
 {
+	vidldsh_update();
+
 	m_curs = bool(state);
 }
 
 void crtc186_device::vpac_vs_w(int state)
 {
+	vidldsh_update();
+
 	// the end of the vertical retrace arms the frame start, which is taken at the
 	// data row boundary of the first data row
 	if (state && !m_vs)
@@ -332,17 +355,49 @@ void crtc186_device::drb_attr_w(uint8_t data)
 
 void crtc186_device::set_vidldsh_timer()
 {
+	vidldsh_update();
+
 	const XTAL busdotclk = XTAL(35'452'500) / (m_mode ? 2 : 1);
 	const XTAL vidcclk = busdotclk / character_width();
 
 	m_vpac->set_character_width(character_width());
 	m_vpac->set_unscaled_clock(vidcclk);
 
+	m_char_period = attotime::from_hz(vidcclk);
+
 	// the character time is locked to the start of the scan line
-	m_timer_vidldsh->adjust(m_screen->time_until_pos(0, 0), 0, attotime::from_hz(vidcclk));
+	m_hold = true;
+	m_line_timer->adjust(m_screen->time_until_pos(0, 0), 0);
 }
 
-void crtc186_device::draw_character(int x, int y)
+TIMER_CALLBACK_MEMBER( crtc186_device::line_tick )
+{
+	vidldsh_update();
+
+	int const next = (param + 1) % m_screen->height();
+	attotime const until = m_screen->time_until_pos(next, 0);
+
+	if (!param)
+		m_hold = false;
+
+	m_line_start = machine().time();
+	m_line_end = m_line_start + until;
+	m_char_time = m_hold ? attotime::never : m_line_start;
+	m_line_timer->adjust(until, next);
+}
+
+void crtc186_device::vidldsh_update()
+{
+	attotime const now = machine().time();
+
+	while (m_char_time <= now && m_char_time < m_line_end)
+	{
+		vidldsh_tick(m_char_time);
+		m_char_time += m_char_period;
+	}
+}
+
+void crtc186_device::draw_character(int x, int y, const attotime &time)
 {
 	rectangle const &visarea = m_screen->visible_area();
 
@@ -363,7 +418,7 @@ void crtc186_device::draw_character(int x, int y)
 	u8 const vidd = m_char_rom->base()[char_addr & 0x1fff];
 
 	// the cursor and the blinking characters blink at 2 Hz
-	bool const blink = !BIT(machine().time().as_ticks(4), 0);
+	bool const blink = !BIT(time.as_ticks(4), 0);
 
 	// attributes
 	bool const lnel = BIT(m_vidat, 1);
@@ -418,13 +473,11 @@ void crtc186_device::draw_character(int x, int y)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( crtc186_device::vidldsh_tick )
+void crtc186_device::vidldsh_tick(const attotime &time)
 {
 	// the character time is locked to the raster, so the first character time of
 	// the scan line is the one at the start of the line
-	int const x = m_screen->hpos();
-
-	if (!x)
+	if (time == m_line_start)
 	{
 		if (!m_drb)
 		{
@@ -468,7 +521,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( crtc186_device::vidldsh_tick )
 	{
 		// the row buffer outputs one character for each character time of the
 		// visible line time
-		draw_character(m_col * character_width(), m_scanline);
+		draw_character(m_col * character_width(), m_scanline, time);
 
 		m_col++;
 	}

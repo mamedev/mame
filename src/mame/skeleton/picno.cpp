@@ -80,19 +80,19 @@ void picno_state::picno(machine_config &config)
 }
 
 ROM_START( picno )
-	ROM_REGION(0x8000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD( "hd6435328f10.u5", 0x00000, 0x08000, NO_DUMP ) // internal rom
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD( "hd6435328f10.u5", 0x00000, 0x08000, CRC(41c381ab) SHA1(d4ab3e932fd513f0ef9d9f03097e59a8d3baffdc) ) // internal rom
 
 	ROM_REGION(0x80000, "roms", 0)
-	ROM_LOAD( "rx001-z8-v3j.u2", 0x00000, 0x80000, CRC(e3c8929d) SHA1(1716f09b0a594b3782d257330282d77b6ca6fa0d) ) //HN62334BP
+	ROM_LOAD( "rx001-z8-v3j.u2", 0x00000, 0x80000, CRC(e3c8929d) SHA1(1716f09b0a594b3782d257330282d77b6ca6fa0d) ) // HN62334BP
 ROM_END
 
 ROM_START( picno2 )
-	ROM_REGION(0x8000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD( "hd6435328f10.u5", 0x00000, 0x08000, NO_DUMP ) // internal rom
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD( "hd6435328f10.u5", 0x00000, 0x08000, CRC(8c36c7f9) SHA1(9aa7672738f6b7d82557792ce12cd70335278673) ) // internal rom
 
 	ROM_REGION(0x80000, "roms", 0)
-	ROM_LOAD( "rx001-z8-v4j.u2", 0x00000, 0x80000, CRC(ae89a9a5) SHA1(51ed458ffd151e19019beb23517263efce4be272) ) //HN62334BP
+	ROM_LOAD( "rx001-z8-v4j.u2", 0x00000, 0x80000, CRC(ae89a9a5) SHA1(51ed458ffd151e19019beb23517263efce4be272) ) // HN62334BP
 ROM_END
 
 } // anonymous namespace

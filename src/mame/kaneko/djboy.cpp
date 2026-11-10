@@ -220,6 +220,7 @@ private:
 	void screen_vblank(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
 	void maincpu_am(address_map &map) ATTR_COLD;
 	void maincpu_port_am(address_map &map) ATTR_COLD;
@@ -258,6 +259,9 @@ private:
 	u8 m_videoreg = 0;
 	u8 m_scrollx = 0;
 	u8 m_scrolly = 0;
+
+	// interrupt-related
+	u8 m_irq_vector = 0;
 
 	// Kaneko BEAST state
 	u8 m_beast_p[4]{};
@@ -601,14 +605,22 @@ GFXDECODE_END
 // Main Z80 uses IM2
 TIMER_DEVICE_CALLBACK_MEMBER(djboy_state::scanline)
 {
-	int const scanline = param;
+	if (param == 240) // vblank-out irq
+	{
+		m_irq_vector = 0xfd;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+	else if (param == 64)
+	{
+		// Pandora "sprite end dma" irq? TODO: timing is clearly off, attract mode relies on this
+		m_irq_vector = 0xff;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+}
 
-	if (scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfd); // Z80
-
-	// Pandora "sprite end dma" irq? TODO: timing is clearly off, attract mode relies on this
-	if (scanline == 64)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+IRQ_CALLBACK_MEMBER(djboy_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 void djboy_state::machine_start()
@@ -627,6 +639,8 @@ void djboy_state::machine_start()
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
 
+	save_item(NAME(m_irq_vector));
+
 	// Kaneko BEAST
 	save_item(NAME(m_beast_p));
 }
@@ -636,6 +650,7 @@ void djboy_state::machine_reset()
 	m_videoreg = 0;
 	m_scrollx = 0;
 	m_scrolly = 0;
+	m_irq_vector = 0xff;
 }
 
 void djboy_state::djboy(machine_config &config)
@@ -644,6 +659,7 @@ void djboy_state::djboy(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &djboy_state::maincpu_am);
 	m_maincpu->set_addrmap(AS_IO, &djboy_state::maincpu_port_am);
 	TIMER(config, "scantimer").configure_scanline(FUNC(djboy_state::scanline), "screen", 0, 1);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(djboy_state::cpu_acknowledge_irq));
 
 	Z80(config, m_subcpu, 12_MHz_XTAL / 2); // 6.000MHz, verified
 	m_subcpu->set_addrmap(AS_PROGRAM, &djboy_state::subcpu_am);

@@ -403,6 +403,14 @@ public:
 		m_key_row = data;
 	}
 
+	uint8_t via0_r(offs_t offset)
+	{
+		if (!offset && !m_iec->sample_ready(*m_maincpu))
+			return 0xff;
+
+		return m_via0->read(offset);
+	}
+
 	uint8_t via0_pb_r()
 	{
 		uint8_t data = 0;
@@ -603,7 +611,7 @@ void clcd_state::clcd_mem(address_map &map)
 	map(0x4000, 0x7fff).rw(m_bankdev[1], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
 	map(0x8000, 0xbfff).rw(m_bankdev[2], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
 	map(0xc000, 0xf7ff).rw(m_bankdev[3], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xf800, 0xf80f).mirror(0x70).m(m_via0, FUNC(via6522_device::map));
+	map(0xf800, 0xf80f).mirror(0x70).r(FUNC(clcd_state::via0_r)).w(m_via0, FUNC(via6522_device::write));
 	map(0xf880, 0xf88f).mirror(0x70).m("via1", FUNC(via6522_device::map));
 	map(0xf980, 0xf983).mirror(0x7c).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xfa00, 0xffff).rom().region("maincpu", 0x1fa00);

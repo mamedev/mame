@@ -361,8 +361,6 @@ uint8_t tpi6525_device::read(offs_t offset)
 				if (BIT(m_air, i))
 				{
 					data = 1 << i;
-					m_air &= ~(1 << i);
-					m_irq_latch &= ~(1 << i);
 					break;
 				}
 			}
@@ -370,11 +368,30 @@ uint8_t tpi6525_device::read(offs_t offset)
 		else
 		{
 			data = m_air;
+		}
+
+		if (machine().side_effects_disabled())
+			break;
+
+		if (PRIORIZED_INTERRUPTS)
+		{
+			uint8_t const ack = m_air ? data : 0;
+			m_air &= ~ack;
+			m_irq_latch &= ~ack;
+		}
+		else
+		{
+			m_irq_latch &= ~m_air;
 			m_air = 0;
-			m_irq_latch &= 0xe0;
 		}
 
 		clear_interrupt();
+
+		if (!PRIORIZED_INTERRUPTS)
+		{
+			m_air = m_irq_latch & m_ddr_c & 0x1f;
+			set_interrupt();
+		}
 		break;
 
 	}
@@ -431,7 +448,14 @@ void tpi6525_device::write(offs_t offset, uint8_t data)
 		m_ddr_c = data;
 
 		if (!INTERRUPT_MODE)
+		{
 			m_out_pc_cb((offs_t)0, (m_port_c & m_ddr_c) | (m_ddr_c ^ 0xff));
+		}
+		else if (!PRIORIZED_INTERRUPTS)
+		{
+			m_air |= m_irq_latch & m_ddr_c & 0x1f;
+			set_interrupt();
+		}
 		break;
 
 	case 6:

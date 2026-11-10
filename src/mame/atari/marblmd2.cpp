@@ -101,13 +101,13 @@ uint32_t marblmd2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_vad->playfield().draw(screen, m_tempbitmap, cliprect, 0, 0x00);
 	bitmap_ind16 &mobitmap = m_vad->mob().bitmap();
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t const *const src = &m_tempbitmap.pix(y);
 		uint16_t *const dst = &bitmap.pix(y);
 
 		// top bit of the gfxdata appears to be priority, so we don't want it in the render bitmap
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			dst[x] = src[x] & 0x007f;
 		}
@@ -353,6 +353,7 @@ void marblmd2_state::marblmd2(machine_config &config)
 	m_jsa->set_swapped_coins(true);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("600010").bit(6);
+	m_jsa->set_oki_bankregion("jsa:oki");
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -383,7 +384,7 @@ ROM_START( marblmd2 )
 	ROM_LOAD( "mo1h.14p", 0x60000, 0x20000, CRC(317a03fb) SHA1(23a7cfe7c5601c858e8b346de31441788c7a8e97) )
 
 	// loading based on batman, there are 2 unpopulated positions on the PCB
-	ROM_REGION( 0x80000, "jsa:oki1", 0 )
+	ROM_REGION( 0x80000, "jsa:oki", 0 )
 	ROM_LOAD( "sound.19e",  0x00000, 0x20000, CRC(e916bef7) SHA1(e07ddc8a3e1656d7307b767e692cf4a575ca47a3) )
 	ROM_LOAD( "sound.12e",  0x60000, 0x20000, CRC(bab2f8e5) SHA1(bbe2d693d40e5eeba315fe7b6380a2030b66f23e) )
 ROM_END

@@ -86,7 +86,6 @@ protected:
 
 	signed short xa_last[4];
 	bool status_enabled, xa_playing, cdda_playing;
-	int xa_voll, xa_volr, changed_xa_vol;
 	voiceinfo *voice;
 	std::unique_ptr<sample_cache * []> cache;
 	float samples_per_frame;

@@ -1818,7 +1818,8 @@ void upd7220_device::update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		for (y = sy; y < sy + len; y++)
 		{
 			uint32_t const addr = sad + (y * m_pitch);
-			m_draw_text_cb(bitmap, addr, (y * m_lr) + m_vbp, wd, m_pitch, m_lr, m_dc, m_ead, m_ctop, m_cbot);
+			// TODO: count by lines and handle char row splits
+			m_draw_text_cb(bitmap, addr, (y * m_lr) + m_vbp, wd, m_pitch, m_lr, m_dc, m_ead, m_ctop, m_cbot, 0, m_lr);
 		}
 
 		sy = y + 1;
@@ -1912,17 +1913,27 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 		{
 			if(m_lr)
 			{
-				for(y = 0; y < len; y += m_lr)
+				int tline = tsy % m_lr;
+				for(y = 0; y < len; y += m_lr - tline, tline = 0)
 				{
-					uint32_t const addr = (sad & 0x3ffff) + ((y / m_lr) * m_pitch);
-					int yval = y * zoom + (tsy + m_vbp);
-					m_draw_text_cb(bitmap, addr, yval, wd, m_pitch, m_lr, m_dc, m_ead, m_ctop, m_cbot);
+					uint32_t const addr = (sad & 0x3ffff) + (((y + (tsy % m_lr)) / m_lr) * m_pitch);
+					int yval = (tsy + y) * zoom + m_vbp;
+					int bline = m_lr;
+					bool done = false;
+					if((y + m_lr) > len)
+					{
+						bline = m_lr - ((tsy + len) % m_lr);
+						y = len;
+						done = true;
+					}
+					m_draw_text_cb(bitmap, addr, yval, wd, m_pitch, m_lr, m_dc, m_ead, m_ctop, m_cbot, tline, bline);
+					if(done) break;
 				}
 			}
 		}
 
 		if (m_lr)
-			tsy += y * zoom;
+			tsy += y;
 		bsy += y * zoom;
 	}
 }

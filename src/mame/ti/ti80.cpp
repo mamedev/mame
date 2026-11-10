@@ -7,11 +7,13 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "emupal.h"
-#include "screen.h"
+
 #include "bus/ti8x/ti8x.h"
 #include "cpu/t6m53/t6m53.h"
 #include "video/t6b79.h"
+
+#include "emupal.h"
+#include "screen.h"
 
 
 namespace {
@@ -19,21 +21,21 @@ namespace {
 class ti80_state : public driver_device
 {
 public:
-	ti80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag), 
-          m_maincpu(*this, "maincpu"),
-          m_link_port(*this, "linkport"),
-          m_btn_cols(*this, "COL%u", 0U)
+	ti80_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+        m_maincpu(*this, "maincpu"),
+        m_link_port(*this, "linkport"),
+        m_btn_cols(*this, "COL%u", 0U)
 	{
 	}
 
 	void ti80(machine_config &config);
-    
+
 private:
 	required_device<t6m53_device> m_maincpu;
     required_device<ti8x_link_port_device> m_link_port;
 	required_ioport_array<7> m_btn_cols;
-    
+
     void mem(address_map &map);
     uint8_t btns_r(offs_t cols);
     void palette(palette_device &palette) const;
@@ -41,13 +43,13 @@ private:
 
 void ti80_state::mem(address_map &map)
 {
-    map(0x0000, 0x3FFD).rom();
-    map(0x3FFE, 0x3FFE).rw("t6b79", FUNC(t6b79_device::control_read), FUNC(t6b79_device::control_write));
-    map(0x3FFF, 0x3FFF).rw("t6b79", FUNC(t6b79_device::data_read), FUNC(t6b79_device::data_write));
-    map(0x4000, 0x4000).mirror(0x0FFE).rw("t6b79", FUNC(t6b79_device::control_read), FUNC(t6b79_device::control_write));
-    map(0x4001, 0x4001).mirror(0x0FFE).rw("t6b79", FUNC(t6b79_device::data_read), FUNC(t6b79_device::data_write));
-    map(0x5000, 0x6FFF).ram();
-    map(0x8000, 0xFFFF).rom();
+    map(0x0000, 0x3ffd).rom();
+    map(0x3ffe, 0x3ffe).rw("t6b79", FUNC(t6b79_device::control_read), FUNC(t6b79_device::control_write));
+    map(0x3fff, 0x3fff).rw("t6b79", FUNC(t6b79_device::data_read), FUNC(t6b79_device::data_write));
+    map(0x4000, 0x4000).mirror(0x0ffe).rw("t6b79", FUNC(t6b79_device::control_read), FUNC(t6b79_device::control_write));
+    map(0x4001, 0x4001).mirror(0x0ffe).rw("t6b79", FUNC(t6b79_device::data_read), FUNC(t6b79_device::data_write));
+    map(0x5000, 0x6fff).ram();
+    map(0x8000, 0xffff).rom();
 }
 
 static INPUT_PORTS_START (ti80)
@@ -134,7 +136,7 @@ void ti80_state::ti80(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti80_state::mem);
     m_maincpu->btn_rows().set(FUNC(ti80_state::btns_r));
     m_maincpu->on_btn().set_ioport("ON");
-  
+
 	screen_device &screen(SCREEN(config, "screen").set_lcd());
     screen.set_refresh_hz(60);
 	screen.set_size(64, 48);
@@ -143,9 +145,9 @@ void ti80_state::ti80(machine_config &config)
     T6B79(config, "t6b79");
 	screen.set_screen_update("t6b79", FUNC(t6b79_device::screen_update));
     m_maincpu->lcd_stb().set("t6b79", FUNC(t6b79_device::stb_write));
-    
+
 	PALETTE(config, "palette", FUNC(ti80_state::palette), 2, 2);
-	screen.set_palette("palette"); 
+	screen.set_palette("palette");
 
     // The link port is only present on viewscreen TI-80s, which have the exact same ROMs as a regular TI-80.
 	TI8X_LINK_PORT(config, m_link_port, default_ti8x_link_devices, nullptr);
@@ -154,8 +156,6 @@ void ti80_state::ti80(machine_config &config)
     m_maincpu->ring_in().set(m_link_port, FUNC(ti8x_link_port_device::ring_r));
     m_maincpu->tip_in().set(m_link_port, FUNC(ti8x_link_port_device::tip_r));
 }
-
-} // anonymous namespace
 
 ROM_START (ti80)
     ROM_REGION( 0x10000, "maincpu", 0)
@@ -169,6 +169,8 @@ ROM_START (ti80)
     ROMX_LOAD( "ti80v4.u1", 0x0000, 0x4000, CRC(5961a60c) SHA1(cb106586620d528007ea9dc04f46d7d3f5c25aeb), ROM_BIOS(1) )
 	ROMX_LOAD( "ti80v4.u2", 0x8000, 0x8000, CRC(f5c9edf9) SHA1(0e4bba1825f4d53f65957814f3a999f8d92a7ce4), ROM_BIOS(1) )
 ROM_END
+
+} // anonymous namespace
 
 //    YEAR  NAME   PARENT   COMPAT  MACHINE   INPUT  STATE       INIT        COMPANY              FULLNAME    FLAGS
 COMP( 1995, ti80,  0,       0,      ti80,     ti80,  ti80_state, empty_init, "Texas Instruments", "TI-80",    MACHINE_NO_SOUND_HW )

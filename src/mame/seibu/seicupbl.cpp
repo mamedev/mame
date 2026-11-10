@@ -196,7 +196,7 @@ void seicupbl_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 
 		/* heated barrel hardware seems to need 0x1ff with 0x100 sign bit for sprite wrap,
 		   this doesn't work on denjin makai as the visible area is larger */
-		if (cliprect.max_x<(320 - 1))
+		if (cliprect.right()<(320 - 1))
 		{
 			x &= 0x1ff;
 			y &= 0x1ff;

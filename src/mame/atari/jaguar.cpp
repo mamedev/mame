@@ -21,9 +21,9 @@
     To do:
         * Untangle CoJag from Jagaur console, split drivers;
         * (CoJag) map out unused RAM per-game via memory_nop_read/write
-        * (Jaguar) support is very poor, most games aren't properly playable
-          or have severe performance issues or crashes related to the unsafe
-          blitter code. Please refer to jaguar SW list file for more details.
+        * (Jaguar) requires cart conversion to bus slot and proper blitter
+          phrase mode to considered marked working.
+        * (Jaguar) Split PAL variant into own romset.
         * The code (GPU/DSP access) should probably be refactored around the
           16-bit interface from the plain 68k, the driver currently uses
           trampoline functions due to the original driver being entirely

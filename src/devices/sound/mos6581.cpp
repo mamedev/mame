@@ -1,22 +1,27 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods, Curt Coder
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     MOS 6581/8580 Sound Interface Device emulation
+
+    The actual sound generation is provided by the reSIDfp engine.
 
 **********************************************************************/
 
 #include "emu.h"
 #include "mos6581.h"
-#include "sid.h"
 
+#include "residfp/residfp.h"
+
+#include <algorithm>
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 0
+// the sinc resampler requires 125*clock/sample_rate < 16384
+static constexpr int MIN_SAMPLE_RATE = 8000;
 
 
 
@@ -38,19 +43,18 @@ DEFINE_DEVICE_TYPE(MOS8580, mos8580_device, "mos8580", "MOS 8580 SID")
 //  mos6581_device - constructor
 //-------------------------------------------------
 
-mos6581_device::mos6581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+mos6581_device::mos6581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_read_potx(*this, 0xff)
 	, m_read_poty(*this, 0xff)
 	, m_stream(nullptr)
-	, m_variant(variant)
-
+	, m_sid_state_size(0)
 {
 }
 
 mos6581_device::mos6581_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos6581_device(mconfig, MOS6581, tag, owner, clock, TYPE_6581)
+	: mos6581_device(mconfig, MOS6581, tag, owner, clock)
 {
 }
 
@@ -58,134 +62,27 @@ mos6581_device::~mos6581_device()
 {
 }
 
+
 //-------------------------------------------------
 //  mos8580_device - constructor
 //-------------------------------------------------
 
 mos8580_device::mos8580_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos6581_device(mconfig, MOS8580, tag, owner, clock, TYPE_8580)
+	: mos6581_device(mconfig, MOS8580, tag, owner, clock)
 {
 }
 
+
 //-------------------------------------------------
-//  save_state - add save states
+//  configure_sampling - set up the resampler for
+//  the current clock and stream rate
 //-------------------------------------------------
 
-void mos6581_device::save_state(SID6581_t *token)
+void mos6581_device::configure_sampling()
 {
-	save_item(NAME(token->type));
-	save_item(NAME(token->clock));
-
-	save_item(NAME(token->PCMfreq));
-	save_item(NAME(token->PCMsid));
-	save_item(NAME(token->PCMsidNoise));
-
-	save_item(NAME(token->reg));
-	//save_item(NAME(token->sidKeysOn));
-	//save_item(NAME(token->sidKeysOff));
-
-	save_item(NAME(token->masterVolume));
-	save_item(NAME(token->masterVolumeAmplIndex));
-
-	save_item(NAME(token->filter.Enabled));
-	save_item(NAME(token->filter.Type));
-	save_item(NAME(token->filter.CurType));
-	save_item(NAME(token->filter.Dy));
-	save_item(NAME(token->filter.ResDy));
-	save_item(NAME(token->filter.Value));
-
-	for (int v = 0; v < m_token->max_voices; v++)
-	{
-		save_item(NAME(token->optr[v].reg), v);
-
-		save_item(NAME(token->optr[v].SIDfreq), v);
-		save_item(NAME(token->optr[v].SIDpulseWidth), v);
-		save_item(NAME(token->optr[v].SIDctrl), v);
-		save_item(NAME(token->optr[v].SIDAD), v);
-		save_item(NAME(token->optr[v].SIDSR), v);
-
-		save_item(NAME(token->optr[v].sync), v);
-
-		save_item(NAME(token->optr[v].pulseIndex), v);
-		save_item(NAME(token->optr[v].newPulseIndex), v);
-
-		save_item(NAME(token->optr[v].curSIDfreq), v);
-		save_item(NAME(token->optr[v].curNoiseFreq), v);
-
-		save_item(NAME(token->optr[v].output), v);
-		//save_item(NAME(token->optr[v].outputMask), v);
-
-		save_item(NAME(token->optr[v].filtVoiceMask), v);
-		save_item(NAME(token->optr[v].filtEnabled), v);
-		save_item(NAME(token->optr[v].filtLow), v);
-		save_item(NAME(token->optr[v].filtRef), v);
-		save_item(NAME(token->optr[v].filtIO), v);
-
-		save_item(NAME(token->optr[v].cycleLenCount), v);
-#if defined(DIRECT_FIXPOINT)
-		save_item(NAME(token->optr[v].cycleLen.l), v);
-		save_item(NAME(token->optr[v].cycleAddLen.l), v);
-#else
-		save_item(NAME(token->optr[v].cycleAddLenPnt), v);
-		save_item(NAME(token->optr[v].cycleLen), v);
-		save_item(NAME(token->optr[v].cycleLenPnt), v);
-#endif
-
-#if defined(DIRECT_FIXPOINT)
-		save_item(NAME(token->optr[v].waveStep.l), v);
-		save_item(NAME(token->optr[v].waveStepAdd.l), v);
-#else
-		save_item(NAME(token->optr[v].waveStep), v);
-		save_item(NAME(token->optr[v].waveStepAdd), v);
-		save_item(NAME(token->optr[v].waveStepPnt), v);
-		save_item(NAME(token->optr[v].waveStepAddPnt), v);
-#endif
-		save_item(NAME(token->optr[v].waveStepOld), v);
-		for (int n = 0; n < 2; n++)
-		{
-			save_item(NAME(token->optr[v].wavePre[n].len), v | (n << 4));
-#if defined(DIRECT_FIXPOINT)
-			save_item(NAME(token->optr[v].wavePre[n].stp), v | (n << 4));
-#else
-			save_item(NAME(token->optr[v].wavePre[n].pnt), v | (n << 4));
-			save_item(NAME(token->optr[v].wavePre[n].stp), v | (n << 4));
-#endif
-		}
-
-#if defined(DIRECT_FIXPOINT)
-		save_item(NAME(token->optr[v].noiseReg.l), v);
-#else
-		save_item(NAME(token->optr[v].noiseReg), v);
-#endif
-		save_item(NAME(token->optr[v].noiseStep), v);
-		save_item(NAME(token->optr[v].noiseStepAdd), v);
-		save_item(NAME(token->optr[v].noiseOutput), v);
-		save_item(NAME(token->optr[v].noiseIsLocked), v);
-
-		save_item(NAME(token->optr[v].ADSRctrl), v);
-		//save_item(NAME(token->optr[v].gateOnCtrl), v);
-		//save_item(NAME(token->optr[v].gateOffCtrl), v);
-
-#ifdef SID_FPUENVE
-		save_item(NAME(token->optr[v].fenveStep), v);
-		save_item(NAME(token->optr[v].fenveStepAdd), v);
-		save_item(NAME(token->optr[v].enveStep), v);
-#elif defined(DIRECT_FIXPOINT)
-		save_item(NAME(token->optr[v].enveStep.l), v);
-		save_item(NAME(token->optr[v].enveStepAdd.l), v);
-#else
-		save_item(NAME(token->optr[v].enveStep), v);
-		save_item(NAME(token->optr[v].enveStepAdd), v);
-		save_item(NAME(token->optr[v].enveStepPnt), v);
-		save_item(NAME(token->optr[v].enveStepAddPnt), v);
-#endif
-		save_item(NAME(token->optr[v].enveVol), v);
-		save_item(NAME(token->optr[v].enveSusVol), v);
-		save_item(NAME(token->optr[v].enveShortAttackCount), v);
-	}
-
-	save_item(NAME(token->optr3_outputmask));
+	m_sid->setSamplingParameters(double(clock()), reSIDfp::RESAMPLE, double(m_stream->sample_rate()));
 }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -193,20 +90,31 @@ void mos6581_device::save_state(SID6581_t *token)
 
 void mos6581_device::device_start()
 {
+	if (!clock())
+		throw emu_fatalerror("%s: a clock is required\n", tag());
+
 	// create sound stream
-	m_stream = stream_alloc(0, 1, machine().sample_rate());
+	m_stream = stream_alloc(0, 1, std::max(machine().sample_rate(), MIN_SAMPLE_RATE));
 
 	// initialize SID engine
-	m_token = std::make_unique<SID6581_t>();
-	m_token->device = this;
-	m_token->mixer_channel = m_stream;
-	m_token->PCMfreq = machine().sample_rate();
-	m_token->clock = clock();
-	m_token->type = m_variant;
+	m_sid = std::make_unique<reSIDfp::residfp>();
+	m_sid->setChipModel((type() == MOS8580) ? reSIDfp::CSG8580 : reSIDfp::MOS6581);
+	m_sid->enableFilter(true);
 
-	m_token->init();
-	sidInitWaveformTables(m_variant);
-	save_state(m_token.get());
+	// these are the values the filter models are constructed with; setting them
+	// explicitly keeps them out of the save state as uninitialized data
+	m_sid->setFilter6581Curve(0.5);
+	m_sid->setFilter6581Range(19.0 / 39.0);
+	m_sid->setFilter8580Curve(0.5);
+	m_sid->enableOld6581caps(false);
+
+	configure_sampling();
+	m_sid->reset();
+
+	m_sid_state_size = m_sid->stateSize();
+	m_sid_state = make_unique_clear<uint8_t []>(m_sid_state_size);
+
+	save_pointer(NAME(m_sid_state), m_sid_state_size);
 }
 
 
@@ -216,7 +124,35 @@ void mos6581_device::device_start()
 
 void mos6581_device::device_reset()
 {
-	m_token->reset();
+	m_stream->update();
+
+	m_sid->reset();
+}
+
+
+//-------------------------------------------------
+//  device_clock_changed - called if the clock
+//  changes
+//-------------------------------------------------
+
+void mos6581_device::device_clock_changed()
+{
+	if (!m_sid || !clock())
+		return;
+
+	m_stream->update();
+
+	configure_sampling();
+}
+
+
+//-------------------------------------------------
+//  device_pre_save - device-specific pre-save
+//-------------------------------------------------
+
+void mos6581_device::device_pre_save()
+{
+	m_sid->saveState(reinterpret_cast<char *>(m_sid_state.get()), m_sid_state_size);
 }
 
 
@@ -226,7 +162,7 @@ void mos6581_device::device_reset()
 
 void mos6581_device::device_post_load()
 {
-	m_token->postload();
+	m_sid->restoreState(reinterpret_cast<char *>(m_sid_state.get()), m_sid_state_size);
 }
 
 
@@ -237,7 +173,24 @@ void mos6581_device::device_post_load()
 
 void mos6581_device::sound_stream_update(sound_stream &stream)
 {
-	m_token->fill_buffer(stream);
+	int const samples = stream.samples();
+
+	if (!samples)
+		return;
+
+	if (!clock())
+	{
+		stream.fill(0, 0.0);
+		return;
+	}
+
+	if (m_buffer.size() < unsigned(samples))
+		m_buffer.resize(samples);
+
+	m_sid->clock(m_buffer.data(), samples);
+
+	for (int sample = 0; sample < samples; sample++)
+		stream.put_int(0, sample, m_buffer[sample], 32768);
 }
 
 
@@ -247,24 +200,32 @@ void mos6581_device::sound_stream_update(sound_stream &stream)
 
 uint8_t mos6581_device::read(offs_t offset)
 {
-	uint8_t data;
+	offset &= 0x1f;
 
-	switch (offset & 0x1f)
+	if (machine().side_effects_disabled())
+	{
+		switch (offset)
+		{
+		case 0x19: return m_read_potx(0);
+		case 0x1a: return m_read_poty(0);
+		default:   return m_sid->peek(offset);
+		}
+	}
+
+	m_stream->update();
+
+	switch (offset)
 	{
 	case 0x19:
-		data = m_read_potx(0);
+		m_sid->setPaddle(m_read_potx(0), m_sid->peek(0x1a));
 		break;
 
 	case 0x1a:
-		data = m_read_poty(0);
-		break;
-
-	default:
-		data = m_token->port_r(machine(), offset);
+		m_sid->setPaddle(m_sid->peek(0x19), m_read_poty(0));
 		break;
 	}
 
-	return data;
+	return m_sid->read(offset);
 }
 
 
@@ -274,5 +235,7 @@ uint8_t mos6581_device::read(offs_t offset)
 
 void mos6581_device::write(offs_t offset, uint8_t data)
 {
-	m_token->port_w(offset, data);
+	m_stream->update();
+
+	m_sid->write(offset & 0x1f, data);
 }

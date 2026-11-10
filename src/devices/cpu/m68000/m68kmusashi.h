@@ -178,6 +178,18 @@ protected:
 	std::array<u32, 25> m_fpu_frame; // 68040 revision $41 busy FSAVE frame
 	bool m_restart_instruction; /* Indicates the instruction should be restarted */
 
+	// 68010 format-8 RR=1: handler already ran the faulted cycle (DIB).
+	static constexpr int M68K_RERUN_ENTRIES = 2;
+	u32 m_rerun_pc;
+	u32 m_rerun_count;
+	struct
+	{
+		u32 address;
+		u32 size;
+		u32 data;
+		u32 write;
+	} m_rerun[M68K_RERUN_ENTRIES];
+
 	/* Clocks required for instructions / exceptions */
 	u32 m_cyc_bcc_notake_b;
 	u32 m_cyc_bcc_notake_w;

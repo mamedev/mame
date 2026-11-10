@@ -3,8 +3,7 @@
 /**************************************************************************************************
 
 TODO:
-- wlzb crashes strong with ACRTC, plenty of unsupported features (starting with COMMAND_DWT);
-- wlfx hangs strong with ACRTC, plenty of unsupported features (starting with area detection);
+- wlzb, wlfx: ACRTC graphics
 - OKI bank (standard 0/0x40000 layout);
 - I/Os;
 
@@ -164,9 +163,9 @@ void hy9802_state::ramdac_map(address_map &map)
 
 void hy9802_state::hd63484_map(address_map &map)
 {
-	// TODO: likely banked, also writes
-	map(0x00000, 0xfffff).rom().region("tiles", 0);
-	map(0x00000, 0xfffff).ram().writeonly(); // TODO: just here to avoid spamming the log
+	// TODO: Fix banks
+	map(0x00000, 0x3ffff).ram();
+	map(0x40000, 0xfffff).rom().region("tiles", 0); 
 }
 
 
@@ -245,6 +244,7 @@ void hy9802_state::wlzb(machine_config &config)
 	RAMDAC(config, "ramdac", "palette").set_addrmap(0, &hy9802_state::ramdac_map);
 
 	HD63484(config, m_acrtc, 22_MHz_XTAL / 4).set_addrmap(0, &hy9802_state::hd63484_map);
+	m_acrtc->set_auto_configure_screen(false);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline("audiocpu", INPUT_LINE_NMI);

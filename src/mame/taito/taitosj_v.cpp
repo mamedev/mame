@@ -399,16 +399,15 @@ void taitosj_state::calculate_sprite_areas(int *sprites_on, rectangle *sprite_ar
 			maxx = minx + 15;
 			maxy = miny + 15;
 
-			sprite_areas[which].min_x = minx;
-			sprite_areas[which].max_x = maxx;
-			sprite_areas[which].min_y = miny;
-			sprite_areas[which].max_y = maxy;
+			sprite_areas[which].set(minx, maxx, miny, maxy);
 
 			sprites_on[which] = 1;
 		}
-		// sprite is off
 		else
+		{
+			// sprite is off
 			sprites_on[which] = 0;
+		}
 
 		// check for bitmap bounds to avoid illegal memory access
 		sprite_areas[which] &= m_sprite_layer_collbitmap2[0].cliprect();
@@ -425,10 +424,10 @@ int taitosj_state::check_sprite_layer_bitpattern(int which, rectangle *sprite_ar
 	int check_layer_2 = *m_video_mode & layer_enable_mask[1];
 	int check_layer_3 = *m_video_mode & layer_enable_mask[2];
 
-	int minx = sprite_areas[which].min_x;
-	int miny = sprite_areas[which].min_y;
-	int maxx = sprite_areas[which].max_x + 1;
-	int maxy = sprite_areas[which].max_y + 1;
+	int minx = sprite_areas[which].left();
+	int miny = sprite_areas[which].top();
+	int maxx = sprite_areas[which].right() + 1;
+	int maxy = sprite_areas[which].bottom() + 1;
 
 	int flip_x = (m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 2] & 0x01) ^ GLOBAL_FLIP_X;
 	int flip_y = (m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 2] & 0x02) ^ GLOBAL_FLIP_Y;

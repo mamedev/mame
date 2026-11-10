@@ -15,7 +15,8 @@ DEFINE_DEVICE_TYPE(ISA8_LPT, isa8_lpt_device, "isa_lpt", "Printer Adapter")
 isa8_lpt_device::isa8_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISA8_LPT, tag, owner, clock),
 	device_isa8_card_interface(mconfig, *this),
-	m_is_primary(false)
+	m_is_primary(false),
+	m_reset_done(false)
 {
 }
 
@@ -45,6 +46,14 @@ void isa8_lpt_device::device_start()
 void isa8_lpt_device::device_reset()
 {
 	m_is_primary = (ioport("DSW")->read() & 1) ? false : true;
+	m_reset_done = true;
+	remap(AS_IO, 0, 0xffff);
+}
+
+void isa8_lpt_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id != AS_IO || !m_reset_done)
+		return;
 	pc_lpt_device &lpt(*subdevice<pc_lpt_device>("lpt"));
 	if (m_is_primary)
 		m_isa->install_device(0x0378, 0x037b, read8sm_delegate(lpt, FUNC(pc_lpt_device::read)), write8sm_delegate(lpt, FUNC(pc_lpt_device::write)));

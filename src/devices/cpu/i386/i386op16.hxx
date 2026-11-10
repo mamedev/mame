@@ -1295,7 +1295,7 @@ void i386_device::i386_mov_rm16_r16()      // Opcode 0x89
 		STORE_RM16(modrm, src);
 		CYCLES(CYCLES_MOV_REG_REG);
 	} else {
-		uint32_t ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1,2);
 		src = LOAD_REG16(modrm);
 		WRITE16(ea, src);
 		CYCLES(CYCLES_MOV_REG_MEM);
@@ -1311,7 +1311,7 @@ void i386_device::i386_mov_r16_rm16()      // Opcode 0x8b
 		STORE_REG16(modrm, src);
 		CYCLES(CYCLES_MOV_REG_REG);
 	} else {
-		uint32_t ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0,2);
 		src = READ16(ea);
 		STORE_REG16(modrm, src);
 		CYCLES(CYCLES_MOV_MEM_REG);
@@ -1326,7 +1326,7 @@ void i386_device::i386_mov_rm16_i16()      // Opcode 0xc7
 		STORE_RM16(modrm, value);
 		CYCLES(CYCLES_MOV_IMM_REG);
 	} else {
-		uint32_t ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1,2);
 		uint16_t value = FETCH16();
 		WRITE16(ea, value);
 		CYCLES(CYCLES_MOV_IMM_MEM);
@@ -1343,9 +1343,9 @@ void i386_device::i386_mov_ax_m16()        // Opcode 0xa1
 	}
 	/* TODO: Not sure if this is correct... */
 	if( m_segment_prefix ) {
-		ea = i386_translate(m_segment_override, offset, 0 );
+		ea = i386_translate(m_segment_override, offset, 0, 2 );
 	} else {
-		ea = i386_translate(DS, offset, 0 );
+		ea = i386_translate(DS, offset, 0, 2 );
 	}
 	REG16(AX) = READ16(ea);
 	CYCLES(CYCLES_MOV_MEM_ACC);
@@ -1361,9 +1361,9 @@ void i386_device::i386_mov_m16_ax()        // Opcode 0xa3
 	}
 	/* TODO: Not sure if this is correct... */
 	if( m_segment_prefix ) {
-		ea = i386_translate(m_segment_override, offset, 1 );
+		ea = i386_translate(m_segment_override, offset, 1, 2 );
 	} else {
-		ea = i386_translate(DS, offset, 1 );
+		ea = i386_translate(DS, offset, 1, 2 );
 	}
 	WRITE16(ea, REG16(AX) );
 	CYCLES(CYCLES_MOV_ACC_MEM);

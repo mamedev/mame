@@ -110,7 +110,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	TIMER_CALLBACK_MEMBER(advance_counters);
+	TIMER_CALLBACK_MEMBER(counter_timer);
 
 	bool is_reset() const { return (m_register[MASTER_INTERRUPT_CONTROL] & MICR_RESET) != 0; }
 
@@ -392,6 +392,11 @@ protected:
 	bool counter_external_trigger(int id);
 	bool counter_external_gate(int id);
 	bool counter_gated(int id);
+	bool counter_running(int id);
+	u32 counter_ticks(int id);
+	void advance_counters();
+	void sync_counters();
+	void update_counter_timer();
 	void count(int id);
 	void trigger(int id);
 	void gate(int id, int state);
@@ -424,8 +429,10 @@ protected:
 
 	// timers
 	emu_timer *m_timer;
+	u64 m_tick;
 	u16 m_counter[3];
 	bool m_counter_error[3];
+	bool m_load_pending[3];
 };
 
 // ======================> z8036_device

@@ -279,28 +279,29 @@ void m57_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, con
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// from 128 to 255: wrapped
-	for (int y = 128; y <= cliprect.max_y; y++)
+	for (int y = 128; y <= cliprect.bottom(); y++)
 	{
 		int16_t const scrolly = m_scrollram[y] + (m_scrollram[y + 0x100] << 8);
+		auto *const dst = &bitmap.pix(y);
 
 		if (scrolly >= 0)
 		{
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
-				if ((x + scrolly) <= cliprect.max_x)
-					bitmap.pix(y, x) = bitmap.pix(y, x + scrolly);
+				if ((x + scrolly) <= cliprect.right())
+					dst[x] = dst[x + scrolly];
 				else
-					bitmap.pix(y, x) = bitmap.pix(y, cliprect.max_x);
+					dst[x] = dst[cliprect.right()];
 			}
 		}
 		else
 		{
-			for (int x = cliprect.max_x; x >= cliprect.min_x; x--)
+			for (int x = cliprect.right(); x >= cliprect.left(); x--)
 			{
-				if ((x + scrolly) >= cliprect.min_x)
-					bitmap.pix(y, x) = bitmap.pix(y, x + scrolly);
+				if ((x + scrolly) >= cliprect.left())
+					dst[x] = dst[x + scrolly];
 				else
-					bitmap.pix(y, x) = bitmap.pix(y, cliprect.min_x);
+					dst[x] = dst[cliprect.left()];
 			}
 		}
 	}
