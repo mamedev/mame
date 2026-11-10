@@ -680,9 +680,10 @@ void megaavr_classic_with_async_unit_base_device::megaavr_classic_with_async_uni
 {
 	megaavr_classic_base_internal_map(map);
 
-	map(0x0037, 0x0037).rw("asyncunit:atimer", FUNC(avr8_megaavr_fakertc_timer_device::tifr_r), FUNC(avr8_megaavr_fakertc_timer_device::tifr_w));
-	map(0x0070, 0x0070).rw("asyncunit:atimer", FUNC(avr8_megaavr_fakertc_timer_device::timsk_r), FUNC(avr8_megaavr_fakertc_timer_device::timsk_w));
-	map(0x00b0, 0x00b7).rw("asyncunit", FUNC(avr8_megaavr_fakertc_async_controller_device::ctrl_regs_r), FUNC(avr8_megaavr_fakertc_async_controller_device::ctrl_regs_w));
+	// TODO: probably proxy these through the async unit. it's ugly otherwise
+	map(0x0037, 0x0037).rw("asyncunit:atimer", FUNC(avr8_megaavr_async_8bit_timer_device::tifr_r), FUNC(avr8_megaavr_async_8bit_timer_device::tifr_w));
+	map(0x0070, 0x0070).rw("asyncunit:atimer", FUNC(avr8_megaavr_async_8bit_timer_device::timsk_r), FUNC(avr8_megaavr_async_8bit_timer_device::timsk_w));
+	map(0x00b0, 0x00b7).rw("asyncunit", FUNC(avr8_megaavr_async_timer_unit_device::ctrl_regs_r), FUNC(avr8_megaavr_async_timer_unit_device::ctrl_regs_w));
 }
 
 void atmegax8_base_device::atmegax8_base_internal_map(address_map &map)
@@ -942,8 +943,8 @@ void atmegax0_base_device::atmegax0_base_internal_map(address_map &map)
 	map(0x0102, 0x0102).rw(FUNC(avr8_device::gpio_r<GPIOH>), FUNC(avr8_device::port_w<GPIOH>));
 
 	map(0x0103, 0x0103).r(FUNC(avr8_device::pin_r<8>));
-	map(0x0104, 0x0104).rw(FUNC(atmegax0_base_device::reg_r<DDRH>), FUNC(avr8_device::ddr_w<GPIOH>));
-	map(0x0105, 0x0105).rw(FUNC(avr8_device::gpio_r<GPIOH>), FUNC(avr8_device::port_w<GPIOH>));
+	map(0x0104, 0x0104).rw(FUNC(atmegax0_base_device::reg_r<DDRJ>), FUNC(avr8_device::ddr_w<GPIOJ>));
+	map(0x0105, 0x0105).rw(FUNC(avr8_device::gpio_r<GPIOJ>), FUNC(avr8_device::port_w<GPIOJ>));
 
 	map(0x0106, 0x0106).r(FUNC(avr8_device::pin_r<9>));
 	map(0x0107, 0x0107).rw(FUNC(atmegax0_base_device::reg_r<DDRK>), FUNC(avr8_device::ddr_w<GPIOK>));
@@ -1561,13 +1562,13 @@ void megaavr_classic_with_async_unit_base_device::device_add_mconfig(machine_con
 
 	// TODO: There is actually interrupt latency when running in async mode of 3 CPU cycles
 	// plus one async clock cycle. For now, just route interrupts directly to the timer
-	auto atimer = asyncunit.subdevice<avr8_megaavr_fakertc_timer_device>("atimer");
+	auto atimer = asyncunit.subdevice<avr8_megaavr_async_8bit_timer_device>("atimer");
 	atimer->int_cb<AVR8_TIMER_INTCHANNEL_OV>().set(FUNC(megaavr_classic_with_async_unit_base_device::int_line_w<INTIDX_TOV2>));
 	atimer->int_cb<AVR8_TIMER_INTCHANNEL_OC_A>().set(FUNC(megaavr_classic_with_async_unit_base_device::int_line_w<INTIDX_OCF2A>));
 	atimer->int_cb<AVR8_TIMER_INTCHANNEL_OC_B>().set(FUNC(megaavr_classic_with_async_unit_base_device::int_line_w<INTIDX_OCF2B>));
-	m_int_ack_cbs[INTIDX_TOV2].bind().set("asyncunit:atimer", FUNC(avr8_megaavr_fakertc_timer_device::int_ack_w<AVR8_TIMER_INTCHANNEL_OV>));
-	m_int_ack_cbs[INTIDX_OCF2A].bind().set("asyncunit:atimer", FUNC(avr8_megaavr_fakertc_timer_device::int_ack_w<AVR8_TIMER_INTCHANNEL_OC_A>));
-	m_int_ack_cbs[INTIDX_OCF2B].bind().set("asyncunit:atimer", FUNC(avr8_megaavr_fakertc_timer_device::int_ack_w<AVR8_TIMER_INTCHANNEL_OC_B>));
+	m_int_ack_cbs[INTIDX_TOV2].bind().set("asyncunit:atimer", FUNC(avr8_megaavr_async_8bit_timer_device::int_ack_w<AVR8_TIMER_INTCHANNEL_OV>));
+	m_int_ack_cbs[INTIDX_OCF2A].bind().set("asyncunit:atimer", FUNC(avr8_megaavr_async_8bit_timer_device::int_ack_w<AVR8_TIMER_INTCHANNEL_OC_A>));
+	m_int_ack_cbs[INTIDX_OCF2B].bind().set("asyncunit:atimer", FUNC(avr8_megaavr_async_8bit_timer_device::int_ack_w<AVR8_TIMER_INTCHANNEL_OC_B>));
 }
 
 // ATMegax8 series (ATMega88, ATMega168, ATMega328)
@@ -1594,7 +1595,7 @@ void atmegax8_base_device::device_add_mconfig(machine_config &config)
 
 	// Timer 2: 8-bit fake RTC
 	// Timer 2 signals: OC2A = PB2, OC2B = PD3
-	auto atimer2 = m_asyncunit.target()->subdevice<avr8_megaavr_fakertc_timer_device>("atimer");
+	auto atimer2 = m_asyncunit.target()->subdevice<avr8_megaavr_async_8bit_timer_device>("atimer");
 	atimer2->oc_w_cb<AVR8_TIMER_CMPCHANNEL_OC_A>().set(&atmegax8_base_device::set_gpio_bit<GPIOB, 2>, "set_gpio_bit_pb2");
 	atimer2->oc_toggle_w_cb<AVR8_TIMER_CMPCHANNEL_OC_A>().set(&atmegax8_base_device::toggle_gpio_bit<GPIOB, 2>, "toggle_gpio_bit_pb2");
 	atimer2->oc_w_cb<AVR8_TIMER_CMPCHANNEL_OC_B>().set(&atmegax8_base_device::set_gpio_bit<GPIOD, 3>, "set_gpio_bit_pd3");
@@ -1701,7 +1702,7 @@ void atmegax0_base_device::device_add_mconfig(machine_config &config)
 	// Timer 2: 8-bit fake RTC
 	// Timer 2 signals: OC2A = PB4, OC2B = PH6
 	// TOSC1 = PG4, TOSC2 = PG3
-	auto atimer2 = m_asyncunit.target()->subdevice<avr8_megaavr_fakertc_timer_device>("atimer");
+	auto atimer2 = m_asyncunit.target()->subdevice<avr8_megaavr_async_8bit_timer_device>("atimer");
 	atimer2->oc_w_cb<AVR8_TIMER_CMPCHANNEL_OC_A>().set(&atmegax0_base_device::set_gpio_bit<GPIOB, 4>, "set_gpio_bit_pb4");
 	atimer2->oc_toggle_w_cb<AVR8_TIMER_CMPCHANNEL_OC_A>().set(&atmegax0_base_device::toggle_gpio_bit<GPIOB, 4>, "toggle_gpio_bit_pb4");
 	atimer2->oc_w_cb<AVR8_TIMER_CMPCHANNEL_OC_B>().set(&atmegax0_base_device::set_gpio_bit<GPIOH, 6>, "set_gpio_bit_ph6");
@@ -1793,7 +1794,7 @@ void atmegax4_base_device::device_add_mconfig(machine_config &config)
 	// Timer 2: 8-bit fake RTC
 	// Timer 2 signals: OC2A = PD7, OC2B = PD6
 	// TOSC1 = PC6, TOSC2 = PC7
-	auto atimer2 = m_asyncunit.target()->subdevice<avr8_megaavr_fakertc_timer_device>("atimer");
+	auto atimer2 = m_asyncunit.target()->subdevice<avr8_megaavr_async_8bit_timer_device>("atimer");
 	atimer2->oc_w_cb<AVR8_TIMER_CMPCHANNEL_OC_A>().set(&atmegax4_base_device::set_gpio_bit<GPIOD, 7>, "set_gpio_bit_pd7");
 	atimer2->oc_toggle_w_cb<AVR8_TIMER_CMPCHANNEL_OC_A>().set(&atmegax4_base_device::toggle_gpio_bit<GPIOD, 7>, "toggle_gpio_bit_pd7");
 	atimer2->oc_w_cb<AVR8_TIMER_CMPCHANNEL_OC_B>().set(&atmegax4_base_device::set_gpio_bit<GPIOD, 6>, "set_gpio_bit_pd6");

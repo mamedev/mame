@@ -800,10 +800,10 @@ public:
  * it operates more or less identically to Timer 0, with the same
  * WGM modes.
  */
-class avr8_generic_fakertc_timer_device : public avr8_generic_8bit_timer_device
+class avr8_generic_async_8bit_timer_device : public avr8_generic_8bit_timer_device
 {
 public:
-	avr8_generic_fakertc_timer_device(const machine_config &mconfig,
+	avr8_generic_async_8bit_timer_device(const machine_config &mconfig,
 		const char *tag,
 		device_t *owner,
 		uint32_t clock);
@@ -827,7 +827,7 @@ public:
 	uint8_t tcnt_r() { return m_tcnt & 0xff; }
 
 protected:
-	avr8_generic_fakertc_timer_device(const machine_config &mconfig,
+	avr8_generic_async_8bit_timer_device(const machine_config &mconfig,
 		const char *tag,
 		device_t *owner,
 		uint32_t clock,
@@ -837,17 +837,17 @@ protected:
 };
 
 
-class avr8_megaavr_fakertc_timer_device : public avr8_generic_fakertc_timer_device,
-										  public avr8_megaavr_tifr_mixin<avr8_megaavr_fakertc_timer_device, 0, 1, 2, 3, -1>,
-										  public avr8_megaavr_tccr_a_mixin<avr8_megaavr_fakertc_timer_device, 0, 1, 6, 7, 4, 5>,
-										  public avr8_megaavr_timsk_mixin<avr8_megaavr_fakertc_timer_device, 0, 1, 2>
+class avr8_megaavr_async_8bit_timer_device : public avr8_generic_async_8bit_timer_device,
+										  	public avr8_megaavr_tifr_mixin<avr8_megaavr_async_8bit_timer_device, 0, 1, 2, 3, -1>,
+										  	public avr8_megaavr_tccr_a_mixin<avr8_megaavr_async_8bit_timer_device, 0, 1, 6, 7, 4, 5>,
+										  	public avr8_megaavr_timsk_mixin<avr8_megaavr_async_8bit_timer_device, 0, 1, 2>
 {
 	// TODO: replace the mixins with proper gated register functions so that writes/reads in async mode
 	// obey the busy flags, as on real hardware.
 	// for now, we just let changes through immediately.
 
 public:
-	avr8_megaavr_fakertc_timer_device(const machine_config &mconfig,
+	avr8_megaavr_async_8bit_timer_device(const machine_config &mconfig,
 		const char *tag,
 		device_t *owner,
 		uint32_t clock);
@@ -864,10 +864,10 @@ public:
  * this unit cannot be more than 1/4th of the CPU clock. We don't enforce this
  * as the CPU core's state is not really our business.
  */
-class avr8_fakertc_async_controller_device : public device_t
+class avr8_async_timer_unit_device : public device_t
 {
 public:
-	avr8_fakertc_async_controller_device(const machine_config &mconfig,
+	avr8_async_timer_unit_device(const machine_config &mconfig,
 		const char *tag,
 		device_t *owner,
 		uint32_t clock);
@@ -920,7 +920,7 @@ public:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 protected:
-	avr8_fakertc_async_controller_device(const machine_config &mconfig,
+	avr8_async_timer_unit_device(const machine_config &mconfig,
 		const char *tag,
 		device_t *owner,
 		uint32_t clock,
@@ -936,7 +936,7 @@ protected:
 	bool m_exclk_from_crystal;
 
 	required_device<avr8_10bit_prescaler_device> m_prescaler;
-	required_device<avr8_generic_fakertc_timer_device> m_child_timer;
+	required_device<avr8_generic_async_8bit_timer_device> m_child_timer;
 
 	emu_timer *m_external_crystal_timer;
 	attotime m_external_crystal_period;
@@ -951,7 +951,7 @@ protected:
 // the classic megaAVRs and legacy AVRs both have an ASSR register, but its
 // bit layout is different because the legacy AVRs lack EXCLK mode and a
 // bunch of other registers
-class avr8_megaavr_fakertc_async_controller_device : public avr8_fakertc_async_controller_device
+class avr8_megaavr_async_timer_unit_device : public avr8_async_timer_unit_device
 {
 	// In the order listed in the datasheet:
 	// https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf
@@ -969,7 +969,7 @@ class avr8_megaavr_fakertc_async_controller_device : public avr8_fakertc_async_c
 	};
 
 public:
-	avr8_megaavr_fakertc_async_controller_device(const machine_config &mconfig,
+	avr8_megaavr_async_timer_unit_device(const machine_config &mconfig,
 		const char *tag,
 		device_t *owner,
 		uint32_t clock);
@@ -1051,10 +1051,10 @@ DECLARE_DEVICE_TYPE(AVR8_CLASSIC_MEGAAVR_TIMER_1, avr8_megaavr_timer_1_device)
 DECLARE_DEVICE_TYPE(AVR8_CLASSIC_10BIT_PRESCALER, avr8_10bit_prescaler_device)
 DECLARE_DEVICE_TYPE(AVR8_CLASSIC_OUTPUT_COMPARE_MODULATOR, avr8_output_compare_modulator_device)
 
-DECLARE_DEVICE_TYPE(AVR8_CLASSIC_FAKE_RTC_ASYNC_CONTROLLER, avr8_fakertc_async_controller_device)
-DECLARE_DEVICE_TYPE(AVR8_CLASSIC_MEGAAVR_FAKE_RTC_ASYNC_CONTROLLER, avr8_megaavr_fakertc_async_controller_device)
+DECLARE_DEVICE_TYPE(AVR8_CLASSIC_FAKE_RTC_ASYNC_CONTROLLER, avr8_async_timer_unit_device)
+DECLARE_DEVICE_TYPE(AVR8_CLASSIC_MEGAAVR_FAKE_RTC_ASYNC_CONTROLLER, avr8_megaavr_async_timer_unit_device)
 
-DECLARE_DEVICE_TYPE(AVR8_CLASSIC_GENERIC_FAKE_RTC_TIMER, avr8_generic_fakertc_timer_device)
-DECLARE_DEVICE_TYPE(AVR8_CLASSIC_MEGAAVR_FAKE_RTC_TIMER, avr8_megaavr_fakertc_timer_device)
+DECLARE_DEVICE_TYPE(AVR8_CLASSIC_GENERIC_FAKE_RTC_TIMER, avr8_generic_async_8bit_timer_device)
+DECLARE_DEVICE_TYPE(AVR8_CLASSIC_MEGAAVR_FAKE_RTC_TIMER, avr8_megaavr_async_8bit_timer_device)
 
 #endif // MAME_CPU_AVR8_AVR8TIMERS_CLASSIC_H

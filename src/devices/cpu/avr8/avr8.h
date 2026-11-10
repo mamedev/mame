@@ -1230,7 +1230,7 @@ protected:
 	// GTCCR flags, MUST BE SAVESTATE-ABLE
 	bool m_psrasy;
 
-	required_device<avr8_megaavr_fakertc_async_controller_device> m_asyncunit;
+	required_device<avr8_megaavr_async_timer_unit_device> m_asyncunit;
 };
 
 // device type definition

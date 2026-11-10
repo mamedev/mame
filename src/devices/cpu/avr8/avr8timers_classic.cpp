@@ -145,10 +145,10 @@ DEFINE_DEVICE_TYPE(AVR8_CLASSIC_MEGAAVR_TIMER_1, avr8_megaavr_timer_1_device, "c
 DEFINE_DEVICE_TYPE(AVR8_CLASSIC_10BIT_PRESCALER, avr8_10bit_prescaler_device, "avr8presc", "Classic AVR8 10-bit prescaler");
 DEFINE_DEVICE_TYPE(AVR8_CLASSIC_OUTPUT_COMPARE_MODULATOR, avr8_output_compare_modulator_device, "avr8ocm", "Classic AVR8 Output Compare Modulator");
 
-DEFINE_DEVICE_TYPE(AVR8_CLASSIC_GENERIC_FAKE_RTC_TIMER, avr8_generic_fakertc_timer_device, "cavr8frtct", "Classic AVR8 asynchronous 8-bit timer");
-DEFINE_DEVICE_TYPE(AVR8_CLASSIC_MEGAAVR_FAKE_RTC_TIMER, avr8_megaavr_fakertc_timer_device, "cmegaavrfrtct", "Classic megaAVR asynchronous 8-bit timer");
-DEFINE_DEVICE_TYPE(AVR8_CLASSIC_FAKE_RTC_ASYNC_CONTROLLER, avr8_fakertc_async_controller_device, "cavr8frtcc", "Classic AVR8 asynchronous timer control unit");
-DEFINE_DEVICE_TYPE(AVR8_CLASSIC_MEGAAVR_FAKE_RTC_ASYNC_CONTROLLER, avr8_megaavr_fakertc_async_controller_device, "cmegaavrfrtcc", "Classic megaAVR asynchronous timer control unit");
+DEFINE_DEVICE_TYPE(AVR8_CLASSIC_GENERIC_FAKE_RTC_TIMER, avr8_generic_async_8bit_timer_device, "cavr8frtct", "Classic AVR8 generic asynchronous 8-bit timer");
+DEFINE_DEVICE_TYPE(AVR8_CLASSIC_MEGAAVR_FAKE_RTC_TIMER, avr8_megaavr_async_8bit_timer_device, "cmegaavrfrtct", "Classic megaAVR asynchronous 8-bit timer");
+DEFINE_DEVICE_TYPE(AVR8_CLASSIC_FAKE_RTC_ASYNC_CONTROLLER, avr8_async_timer_unit_device, "cavr8frtcc", "Classic AVR8 asynchronous timer unit");
+DEFINE_DEVICE_TYPE(AVR8_CLASSIC_MEGAAVR_FAKE_RTC_ASYNC_CONTROLLER, avr8_megaavr_async_timer_unit_device, "cmegaavrfrtcc", "Classic megaAVR asynchronous timer unit");
 
 ///////////////////////////////////////////////////////////////
 // BASE TIMER
@@ -1859,7 +1859,7 @@ bool avr8_generic_timer_1_device::should_reload_ocrs()
 // FAKE RTC TIMER 2
 ///////////////////////////////////////////////////////////////
 
-avr8_generic_fakertc_timer_device::avr8_generic_fakertc_timer_device(const machine_config &mconfig,
+avr8_generic_async_8bit_timer_device::avr8_generic_async_8bit_timer_device(const machine_config &mconfig,
 	const char *tag,
 	device_t *owner,
 	uint32_t clock,
@@ -1868,14 +1868,22 @@ avr8_generic_fakertc_timer_device::avr8_generic_fakertc_timer_device(const machi
 { }
 
 
-avr8_generic_fakertc_timer_device::avr8_generic_fakertc_timer_device(const machine_config &mconfig,
+avr8_generic_async_8bit_timer_device::avr8_generic_async_8bit_timer_device(const machine_config &mconfig,
 	const char *tag,
 	device_t *owner,
 	uint32_t clock) :
-	avr8_generic_fakertc_timer_device(mconfig, tag, owner, clock, AVR8_CLASSIC_GENERIC_FAKE_RTC_TIMER)
+	avr8_generic_async_8bit_timer_device(mconfig, tag, owner, clock, AVR8_CLASSIC_GENERIC_FAKE_RTC_TIMER)
 { }
 
-void avr8_generic_fakertc_timer_device::tick()
+
+avr8_megaavr_async_8bit_timer_device::avr8_megaavr_async_8bit_timer_device(const machine_config &mconfig,
+	const char *tag,
+	device_t *owner,
+	uint32_t clock) :
+	avr8_generic_async_8bit_timer_device(mconfig, tag, owner, clock, AVR8_CLASSIC_MEGAAVR_FAKE_RTC_TIMER)
+{ }
+
+void avr8_generic_async_8bit_timer_device::tick()
 {
 	// TODO: this is WRONG. PRTIM is ignored if the timer is in asynchronous mode
 	if (m_prtim) return;
@@ -1898,7 +1906,7 @@ void avr8_generic_fakertc_timer_device::tick()
 	advance();
 }
 
-void avr8_generic_fakertc_timer_device::cs_w(uint8_t data)
+void avr8_generic_async_8bit_timer_device::cs_w(uint8_t data)
 {
 	// same workflow as Timer 0, but remember that the CS enum is different
 	// and a debuglog function here would need to print different strings
@@ -1907,14 +1915,14 @@ void avr8_generic_fakertc_timer_device::cs_w(uint8_t data)
 	m_cs = BIT(data, 0, 3);
 }
 
-void avr8_generic_fakertc_timer_device::tcnt_w(uint8_t data)
+void avr8_generic_async_8bit_timer_device::tcnt_w(uint8_t data)
 {
 	// CPU writes override any compare matches for the current timer clock cycle
 	m_tcnt = data;
 	m_no_compare_this_cycle = true;
 }
 
-void avr8_megaavr_fakertc_timer_device::tccr_b_w(uint8_t data)
+void avr8_megaavr_async_8bit_timer_device::tccr_b_w(uint8_t data)
 {
 	if (BIT(data,7)) force_oc0a();
 	if (BIT(data,6)) force_oc0b();
@@ -1922,28 +1930,22 @@ void avr8_megaavr_fakertc_timer_device::tccr_b_w(uint8_t data)
 	wgm_w(BIT(wgm_r(),0,2) | BIT(data,3) << 2);
 }
 
-uint8_t avr8_megaavr_fakertc_timer_device::tccr_b_r()
+uint8_t avr8_megaavr_async_8bit_timer_device::tccr_b_r()
 {
 	// the FOCxx bits always read as zero; they are never stored.
 	return cs_r() | (BIT(wgm_r(),2) << 3);
 }
 
-avr8_megaavr_fakertc_timer_device::avr8_megaavr_fakertc_timer_device(const machine_config &mconfig,
-	const char *tag,
-	device_t *owner,
-	uint32_t clock) :
-	avr8_generic_fakertc_timer_device(mconfig, tag, owner, clock, AVR8_CLASSIC_MEGAAVR_FAKE_RTC_TIMER)
-{ }
 
 ///////////////////////////////////////////////////////////////
 // FAKE RTC ASYNCHRONOUS CLOCK MODULE
 ///////////////////////////////////////////////////////////////
 
-avr8_fakertc_async_controller_device::avr8_fakertc_async_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	avr8_fakertc_async_controller_device(mconfig, tag, owner, clock, AVR8_CLASSIC_FAKE_RTC_ASYNC_CONTROLLER)
+avr8_async_timer_unit_device::avr8_async_timer_unit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	avr8_async_timer_unit_device(mconfig, tag, owner, clock, AVR8_CLASSIC_FAKE_RTC_ASYNC_CONTROLLER)
 {}
 
-avr8_fakertc_async_controller_device::avr8_fakertc_async_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type device_type) :
+avr8_async_timer_unit_device::avr8_async_timer_unit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type device_type) :
 	device_t(mconfig, device_type, tag, owner, clock),
 	m_prescaler(*this, "prescaler"),
 	m_child_timer(*this, "atimer"),
@@ -1951,7 +1953,7 @@ avr8_fakertc_async_controller_device::avr8_fakertc_async_controller_device(const
 {}
 
 
-void avr8_fakertc_async_controller_device::device_start()
+void avr8_async_timer_unit_device::device_start()
 {
 	save_item(NAME(m_external_crystal_period));
 	save_item(NAME(m_as2));
@@ -1959,18 +1961,18 @@ void avr8_fakertc_async_controller_device::device_start()
 	save_item(NAME(m_tosc_last_state));
 	save_item(NAME(m_clk_io));
 	save_item(NAME(m_exclk_from_crystal));
-	m_external_crystal_timer = timer_alloc(FUNC(avr8_fakertc_async_controller_device::external_crystal_tick), this);
+	m_external_crystal_timer = timer_alloc(FUNC(avr8_async_timer_unit_device::external_crystal_tick), this);
 }
 
-void avr8_megaavr_fakertc_async_controller_device::device_start()
+void avr8_megaavr_async_timer_unit_device::device_start()
 {
-	avr8_fakertc_async_controller_device::device_start();
+	avr8_async_timer_unit_device::device_start();
 
 	save_item(NAME(m_async_regs));
 	save_item(NAME(m_async_update_busy_reg));
 } 
 
-void avr8_fakertc_async_controller_device::device_reset()
+void avr8_async_timer_unit_device::device_reset()
 {
 	m_exclk = false;
 	m_as2 = false;
@@ -1978,9 +1980,9 @@ void avr8_fakertc_async_controller_device::device_reset()
 	m_clk_io = false;
 }
 
-void avr8_megaavr_fakertc_async_controller_device::device_reset()
+void avr8_megaavr_async_timer_unit_device::device_reset()
 {
-	avr8_fakertc_async_controller_device::device_reset();
+	avr8_async_timer_unit_device::device_reset();
 	for (int i = 0; i < MEGAAVR_ASYNC_REG_MAX; i++)
 	{
 		m_async_regs[i] = 0;
@@ -1989,23 +1991,23 @@ void avr8_megaavr_fakertc_async_controller_device::device_reset()
 	m_async_update_busy_reg = 0;
 }
 
-void avr8_fakertc_async_controller_device::device_add_mconfig(machine_config &config)
+void avr8_async_timer_unit_device::device_add_mconfig(machine_config &config)
 {
 	AVR8_CLASSIC_10BIT_PRESCALER(config, m_prescaler, 0);
 
 	// subclasses or external devices have to create the timer for us
 }
 
-void avr8_megaavr_fakertc_async_controller_device::device_add_mconfig(machine_config &config)
+void avr8_megaavr_async_timer_unit_device::device_add_mconfig(machine_config &config)
 {
-	avr8_fakertc_async_controller_device::device_add_mconfig(config);
+	avr8_async_timer_unit_device::device_add_mconfig(config);
 
 	auto &atimer(AVR8_CLASSIC_MEGAAVR_FAKE_RTC_TIMER(config, "atimer", 0));
 	set_child_timer_tag(atimer);
 	atimer.set_upstream_prescaler_tag(m_prescaler);
 }
 
-void avr8_fakertc_async_controller_device::clk_io_w(uint8_t data)
+void avr8_async_timer_unit_device::clk_io_w(uint8_t data)
 {
 	bool new_state = data != 0;
 	if (new_state == m_clk_io) return;
@@ -2019,7 +2021,7 @@ void avr8_fakertc_async_controller_device::clk_io_w(uint8_t data)
 	}
 }
 
-void avr8_fakertc_async_controller_device::tosc_w(uint8_t data)
+void avr8_async_timer_unit_device::tosc_w(uint8_t data)
 {
 	bool new_state = data != 0;
 	if (new_state == m_tosc_last_state) return;
@@ -2031,7 +2033,7 @@ void avr8_fakertc_async_controller_device::tosc_w(uint8_t data)
 	}
 }
 
-void avr8_fakertc_async_controller_device::sync_w(uint8_t data)
+void avr8_async_timer_unit_device::sync_w(uint8_t data)
 {
 	// if in synchronous mode, sync just goes right through to the prescaler
 	if (!m_as2)
@@ -2040,36 +2042,37 @@ void avr8_fakertc_async_controller_device::sync_w(uint8_t data)
 		return;
 	}
 
+	// TODO: async case. probably buffers it somewhere, doublecheck datasheets
 }
 
-uint8_t avr8_fakertc_async_controller_device::sync_r()
+uint8_t avr8_async_timer_unit_device::sync_r()
 {
 	return m_prescaler->sync_r();
 }
 
-void avr8_fakertc_async_controller_device::set_external_crystal_frequency(attotime period)
+void avr8_async_timer_unit_device::set_external_crystal_frequency(attotime period)
 {
 	m_external_crystal_period = period;
 }
 
-void avr8_fakertc_async_controller_device::as2_w(uint8_t data)
+void avr8_async_timer_unit_device::as2_w(uint8_t data)
 {
 	m_as2 = data != 0;
 	update_crystal_state();
 }
 
-void avr8_fakertc_async_controller_device::exclk_w(uint8_t data)
+void avr8_async_timer_unit_device::exclk_w(uint8_t data)
 {
 	m_exclk = data != 0;
 	update_crystal_state();
 }
 
-void avr8_fakertc_async_controller_device::update_crystal_state()
+void avr8_async_timer_unit_device::update_crystal_state()
 {
 	m_external_crystal_timer->adjust(using_external_crystal() ? m_external_crystal_period : attotime::never);
 }
 
-TIMER_CALLBACK_MEMBER(avr8_fakertc_async_controller_device::external_crystal_tick)
+TIMER_CALLBACK_MEMBER(avr8_async_timer_unit_device::external_crystal_tick)
 {
 	if (!using_external_crystal()) return;
 
@@ -2078,25 +2081,25 @@ TIMER_CALLBACK_MEMBER(avr8_fakertc_async_controller_device::external_crystal_tic
 	update_crystal_state();
 }
 
-void avr8_fakertc_async_controller_device::tick_common()
+void avr8_async_timer_unit_device::tick_common()
 {
 	m_prescaler->tick();
 	m_child_timer->tick();
 }
 
-avr8_megaavr_fakertc_async_controller_device::avr8_megaavr_fakertc_async_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	avr8_fakertc_async_controller_device(mconfig, tag, owner, clock, AVR8_CLASSIC_MEGAAVR_FAKE_RTC_ASYNC_CONTROLLER)
+avr8_megaavr_async_timer_unit_device::avr8_megaavr_async_timer_unit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	avr8_async_timer_unit_device(mconfig, tag, owner, clock, AVR8_CLASSIC_MEGAAVR_FAKE_RTC_ASYNC_CONTROLLER)
 {}
 
-void avr8_megaavr_fakertc_async_controller_device::tick_common()
+void avr8_megaavr_async_timer_unit_device::tick_common()
 {
 	if (!m_as2)
 	{
-		avr8_fakertc_async_controller_device::tick_common();
+		avr8_async_timer_unit_device::tick_common();
 		return;
 	}
 
-	auto timer = static_cast<avr8_megaavr_fakertc_timer_device*>(m_child_timer.target());
+	auto timer = static_cast<avr8_megaavr_async_8bit_timer_device*>(m_child_timer.target());
 	
 	// The datasheets say that it takes two async timer clock cycles for
 	// these to take effect. However, the datasheets also list all the edge
@@ -2136,24 +2139,24 @@ void avr8_megaavr_fakertc_async_controller_device::tick_common()
 		m_async_update_busy_reg &= ~(1 << MEGAAVR_ASYNC_REG_OCR_B);
 	}
 
-	avr8_fakertc_async_controller_device::tick_common();
+	avr8_async_timer_unit_device::tick_common();
 }
 
-void avr8_megaavr_fakertc_async_controller_device::assr_w(uint8_t data)
+void avr8_megaavr_async_timer_unit_device::assr_w(uint8_t data)
 {
 	// busy status bits are read only
 	as2_w(BIT(data, 5));
 	exclk_w(BIT(data, 6));
 }
 
-uint8_t avr8_megaavr_fakertc_async_controller_device::assr_r()
+uint8_t avr8_megaavr_async_timer_unit_device::assr_r()
 {
 	return m_async_update_busy_reg | (m_as2 << 5) | (m_exclk << 6);
 }
 
-void avr8_megaavr_fakertc_async_controller_device::ctrl_regs_w(offs_t offset, uint8_t data)
+void avr8_megaavr_async_timer_unit_device::ctrl_regs_w(offs_t offset, uint8_t data)
 {	
-	auto timer = static_cast<avr8_megaavr_fakertc_timer_device*>(m_child_timer.target());
+	auto timer = static_cast<avr8_megaavr_async_8bit_timer_device*>(m_child_timer.target());
 	switch(offset & 7)
 	{
 		case 0:
@@ -2213,7 +2216,7 @@ void avr8_megaavr_fakertc_async_controller_device::ctrl_regs_w(offs_t offset, ui
 	}
 }
 
-uint8_t avr8_megaavr_fakertc_async_controller_device::ctrl_regs_r(offs_t offset)
+uint8_t avr8_megaavr_async_timer_unit_device::ctrl_regs_r(offs_t offset)
 {
 	// ATMegax8 series datasheet, 18.11.8:
 	// TCNTx is returned directly, OCR2x and TCCR2x values are returned from the
