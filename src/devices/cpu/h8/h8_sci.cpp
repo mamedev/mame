@@ -641,22 +641,30 @@ void h8_sci_device::tx_sync_step()
 {
 	LOGMASKED(LOG_STATE, "tx_sync_step bit=%d\n", m_tx_bit);
 	if(!m_tx_bit) {
-		m_tx_state = ST_IDLE;
-		clock_stop(CLK_TX);
-		m_cpu->do_sci_tx(m_id, 1);
-		if(m_scr & SCR_TEIE)
-			m_intc->internal_interrupt(m_tei_int);
-
-		// if there's more to send, start the transmitter
-		if((m_scr & SCR_TE) && !(m_ssr & SSR_TDRE))
-			tx_start();
-		else
+		// if there's more to send, load it and continue back-to-back on this same
+		// clock edge; otherwise stop (SCK stays high between transfers)
+		if((m_scr & SCR_TE) && !(m_ssr & SSR_TDRE)) {
+			m_ssr |= SSR_TDRE;
+			m_tsr = m_tdr;
+			m_tx_parity = m_smr & SMR_OE ? 0 : 1;
+			LOGMASKED(LOG_DATA, "start transmit %02x '%c'\n", m_tsr, m_tsr >= 32 && m_tsr < 127 ? m_tsr : '.');
+			if(m_scr & SCR_TIE)
+				m_intc->internal_interrupt(m_txi_int);
+			m_tx_bit = 8;
+		} else {
+			m_tx_state = ST_IDLE;
+			clock_stop(CLK_TX);
+			m_cpu->do_sci_tx(m_id, 1);
+			if(m_scr & SCR_TEIE)
+				m_intc->internal_interrupt(m_tei_int);
 			m_ssr |= SSR_TEND;
-	} else {
-		m_cpu->do_sci_tx(m_id, m_tsr & 1);
-		m_tsr >>= 1;
-		m_tx_bit--;
+			return;
+		}
 	}
+
+	m_cpu->do_sci_tx(m_id, m_tsr & 1);
+	m_tsr >>= 1;
+	m_tx_bit--;
 }
 
 void h8_sci_device::rx_start()
