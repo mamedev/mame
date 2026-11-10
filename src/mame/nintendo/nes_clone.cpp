@@ -291,24 +291,34 @@ class nes_clone_2pathlet_state : public nes_clone_state
 public:
 	nes_clone_2pathlet_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_clone_state(mconfig, type, tag),
-		m_gfxrom(*this, "gfx1")
+		m_nametables(*this, "nametable%u", 0),
+		m_chrbank(*this, "chrbank"),
+		m_prgbank0(*this, "prgbank0"),
+		m_prgbank1(*this, "prgbank1")
 	{ }
 
 	void nes_clone_2pathlet(machine_config &config) ATTR_COLD;
 
 private:
 	void nes_clone_2pathlet_map(address_map &map) ATTR_COLD;
+	void nes_ppu_map(address_map &map);
+
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	uint8_t rom_r(offs_t offset);
-	uint8_t vrom_r(offs_t offset);
+
 	uint8_t menu_6000_r();
+	void update_banks();
 	void bank_8000_w(uint8_t data);
 	void bank_8800_w(uint8_t data);
+
 	uint8_t m_8000;
 	uint8_t m_8800;
+	std::unique_ptr<u8[]> m_nt_ram;
 
-	required_region_ptr<uint8_t> m_gfxrom;
+	memory_bank_array_creator<4> m_nametables;
+	required_memory_bank m_chrbank;
+	required_memory_bank m_prgbank0;
+	required_memory_bank m_prgbank1;
 };
 
 
@@ -1731,14 +1741,23 @@ void nes_clone_2pathlet_state::machine_reset()
 	nes_clone_state::machine_reset();
 	m_8000 = 0;
 	m_8800 = 0;
+	update_banks();
 }
 
 void nes_clone_2pathlet_state::machine_start()
 {
 	nes_clone_state::machine_start();
 
-	m_ppu->space(AS_PROGRAM).install_read_handler(0x0000, 0x1fff, read8sm_delegate(*this, FUNC(nes_clone_2pathlet_state::vrom_r)));
+	m_chrbank->configure_entries(0, 8, memregion("gfx1")->base(), 0x2000);
+	m_prgbank0->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
+	m_prgbank1->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
 
+	m_nt_ram = std::make_unique<u8[]>(0x800);
+
+	for (int i = 0; i < 4; i++)
+		m_nametables[i]->configure_entries(0, 2, &m_nt_ram[0], 0x400);
+
+	save_pointer(NAME(m_nt_ram), 0x800);
 	save_item(NAME(m_8000));
 	save_item(NAME(m_8800));
 }
@@ -1747,6 +1766,53 @@ void nes_clone_2pathlet_state::nes_clone_2pathlet(machine_config &config)
 {
 	nes_clone(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_2pathlet_state::nes_clone_2pathlet_map);
+
+	m_ppu->set_addrmap(AS_PROGRAM, &nes_clone_2pathlet_state::nes_ppu_map);
+}
+
+void nes_clone_2pathlet_state::update_banks()
+{
+	u8 chrbank = 0;
+	if (m_8000 & 0x80)
+	{
+		chrbank = m_8800 & 0x03;
+	}
+	else
+	{
+		chrbank = m_8000 & 0x03;
+	}
+	chrbank |= m_8800 & 0x04;
+
+	m_chrbank->set_entry(chrbank);
+
+	if (m_8800 & 0x10)
+	{
+		u8 prgbank = (m_8800 & 0xc0) >> 6;
+		m_prgbank0->set_entry((prgbank << 1));
+		m_prgbank1->set_entry((prgbank << 1)+1);
+	}
+	else
+	{
+		u8 prgbank = (m_8800 & 0xe0) >> 5;
+		m_prgbank0->set_entry(prgbank);
+		m_prgbank1->set_entry(prgbank);
+	}
+
+	if (m_8800 & 0x08)
+	{
+		m_nametables[0]->set_entry(0);
+		m_nametables[1]->set_entry(0);
+		m_nametables[2]->set_entry(1);
+		m_nametables[3]->set_entry(1);
+	}
+	else
+	{
+		m_nametables[0]->set_entry(0);
+		m_nametables[1]->set_entry(1);
+		m_nametables[2]->set_entry(0);
+		m_nametables[3]->set_entry(1);
+	}
+
 }
 
 void nes_clone_2pathlet_state::nes_clone_2pathlet_map(address_map &map)
@@ -1755,7 +1821,19 @@ void nes_clone_2pathlet_state::nes_clone_2pathlet_map(address_map &map)
 	map(0x6000, 0x6000).r(FUNC(nes_clone_2pathlet_state::menu_6000_r));
 	map(0x8000, 0x8000).w(FUNC(nes_clone_2pathlet_state::bank_8000_w));
 	map(0x8800, 0x8800).w(FUNC(nes_clone_2pathlet_state::bank_8800_w));
-	map(0x8000, 0xffff).r(FUNC(nes_clone_2pathlet_state::rom_r));
+	map(0x8000, 0xbfff).bankr(m_prgbank0);
+	map(0xc000, 0xffff).bankr(m_prgbank1);
+}
+
+void nes_clone_2pathlet_state::nes_ppu_map(address_map &map)
+{
+	map(0x0000, 0x1fff).bankr(m_chrbank);
+	map(0x2000, 0x23ff).bankrw(m_nametables[0]);
+	map(0x2400, 0x27ff).bankrw(m_nametables[1]);
+	map(0x2800, 0x2bff).bankrw(m_nametables[2]);
+	map(0x2c00, 0x2fff).bankrw(m_nametables[3]);
+
+	map(0x3f00, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
 }
 
 uint8_t nes_clone_2pathlet_state::menu_6000_r()
@@ -1763,24 +1841,16 @@ uint8_t nes_clone_2pathlet_state::menu_6000_r()
 	return 0xff;
 }
 
-uint8_t nes_clone_2pathlet_state::vrom_r(offs_t offset)
-{
-	return m_gfxrom[offset];
-}
-
-uint8_t nes_clone_2pathlet_state::rom_r(offs_t offset)
-{
-	return m_mainrom[offset];
-}
-
 void nes_clone_2pathlet_state::bank_8000_w(uint8_t data)
 {
 	m_8000 = data;
+	update_banks();
 }
 
 void nes_clone_2pathlet_state::bank_8800_w(uint8_t data)
 {
 	m_8800 = data;
+	update_banks();
 }
 
 /**************************************************
