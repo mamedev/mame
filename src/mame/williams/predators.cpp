@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: Angelo Salese, David Haywood, Philip Bennett
+// copyright-holders: Angelo Salese, David Haywood, Philip Bennett, Peter Wilhelmsen
 /*
 
 Williams The Predators (prototype)
@@ -258,8 +258,11 @@ private:
 	TIMER_CALLBACK_MEMBER(request_input);
 	TIMER_CALLBACK_MEMBER(publish_input);
 	uint8_t joystick_r(uint32_t player);
-	uint8_t sc_io_r(offs_t offset);
-	void sc_io_w(offs_t offset, uint8_t data);
+	void input_latch_w(offs_t offset, uint8_t data);
+	uint8_t local_switches_r();
+	template <uint32_t N> uint8_t serial_r(offs_t offset);
+	void serial_error_w(uint8_t data);
+	void serial_control_w(uint8_t data);
 	std::array<uint8_t, 7> make_input_packet(uint32_t remote);
 	void sound_w(offs_t offset, uint16_t data);
 
@@ -304,8 +307,6 @@ void predators_state::vblank_write_line(int state)
 
 		if (s_state.m_swap)
 		{
-			// Finish displaying the old front buffer before it becomes the draw page.
-			m_screen[N]->update_partial(m_screen[N]->visible_area().bottom());
 			s_state.m_vram_page ^= 1;
 			s_state.m_swap = false;
 			wake_sequencer();
@@ -729,76 +730,73 @@ std::array<uint8_t, 7> predators_state::make_input_packet(uint32_t remote)
 	return packet;
 }
 
-uint8_t predators_state::sc_io_r(offs_t offset)
+void predators_state::input_latch_w(offs_t offset, uint8_t data)
 {
-	if (offset == 0x0c)
-		return m_general[0]->read() & 0x0f;
-
-	if ((offset & 3) <= 1 && offset < 0x0c)
-	{
-		bool const enabled = (m_serial_mode & 3) && BIT(m_serial_command, 2);
-		uint32_t const remote = 2 - (offset >> 2); // $08 Falcon, $04 Eagle, $00 Condor
-		if (BIT(offset, 0))
-		{
-			bool const ready = enabled && !m_remote_idle[remote];
-			if (!machine().side_effects_disabled())
-				m_remote_idle[remote] = false;
-			return 0x05 | (ready ? 0x02 : 0x00); // TxRDY, TxEMPTY, RxRDY
-		}
-		if (!enabled)
-			return 0xff;
-
-		if (!m_remote_pos[remote])
-		{
-			auto const packet = make_input_packet(remote);
-			if (machine().side_effects_disabled())
-				return packet[0];
-			std::copy(packet.begin(), packet.end(), std::begin(m_remote_packet[remote]));
-		}
-		uint8_t const result = m_remote_packet[remote][m_remote_pos[remote]];
-		if (!machine().side_effects_disabled())
-		{
-			m_remote_pos[remote] = (m_remote_pos[remote] + 1) % 7;
-			m_remote_idle[remote] = !m_remote_pos[remote];
-		}
-		return result;
-	}
-	return 0xff;
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(predators_state::publish_input), this),
+			(uint32_t(data) << 4) | offset);
 }
 
-void predators_state::sc_io_w(offs_t offset, uint8_t data)
+uint8_t predators_state::local_switches_r()
 {
-	if (offset < 9)
+	return m_general[0]->read() & 0x0f;
+}
+
+template <uint32_t N>
+uint8_t predators_state::serial_r(offs_t offset)
+{
+	bool const enabled = (m_serial_mode & 3) && BIT(m_serial_command, 2);
+	if (BIT(offset, 0))
 	{
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(predators_state::publish_input), this),
-				(uint32_t(data) << 4) | offset);
+		bool const ready = enabled && !m_remote_idle[N];
+		if (!machine().side_effects_disabled())
+			m_remote_idle[N] = false;
+		return 0x05 | (ready ? 0x02 : 0x00); // TxRDY, TxEMPTY, RxRDY
 	}
-	else if (offset == 0x0c)
+	if (!enabled)
+		return 0xff;
+
+	if (!m_remote_pos[N])
 	{
-		// The receive error path sends the failing channel's RAM address.
-		if (data >= 0x22 && data <= 0x2a && (data & 3) == 2)
-			m_remote_pos[(data - 0x22) / 4] = 0;
+		auto const packet = make_input_packet(N);
+		if (machine().side_effects_disabled())
+			return packet[0];
+		std::copy(packet.begin(), packet.end(), std::begin(m_remote_packet[N]));
 	}
-	else if (offset == 0x0d)
+	uint8_t const result = m_remote_packet[N][m_remote_pos[N]];
+	if (!machine().side_effects_disabled())
 	{
-		// Broadcast USART control. ROM initialization is 00,00,00,40,4e,27:
-		// reset, asynchronous 8N1 /16 mode, then enable receive/transmit.
-		if (m_serial_expect_mode)
-		{
-			m_serial_mode = data;
-			m_serial_expect_mode = false;
-		}
-		else if (BIT(data, 6))
-		{
-			m_serial_expect_mode = true;
-			m_serial_command = 0;
-			std::fill(std::begin(m_remote_pos), std::end(m_remote_pos), 0);
-			std::fill(std::begin(m_remote_idle), std::end(m_remote_idle), false);
-		}
-		else
-		{
-			m_serial_command = data;
-		}
+		m_remote_pos[N] = (m_remote_pos[N] + 1) % 7;
+		m_remote_idle[N] = !m_remote_pos[N];
+	}
+	return result;
+}
+
+void predators_state::serial_error_w(uint8_t data)
+{
+	// The receive error path sends the failing channel's RAM address.
+	if (data >= 0x22 && data <= 0x2a && (data & 3) == 2)
+		m_remote_pos[(data - 0x22) / 4] = 0;
+}
+
+void predators_state::serial_control_w(uint8_t data)
+{
+	// Broadcast USART control. ROM initialization is 00,00,00,40,4e,27:
+	// reset, asynchronous 8N1 /16 mode, then enable receive/transmit.
+	if (m_serial_expect_mode)
+	{
+		m_serial_mode = data;
+		m_serial_expect_mode = false;
+	}
+	else if (BIT(data, 6))
+	{
+		m_serial_expect_mode = true;
+		m_serial_command = 0;
+		std::fill(std::begin(m_remote_pos), std::end(m_remote_pos), 0);
+		std::fill(std::begin(m_remote_idle), std::end(m_remote_idle), false);
+	}
+	else
+	{
+		m_serial_command = data;
 	}
 }
 
@@ -859,7 +857,13 @@ void predators_state::slave_map(address_map &map)
 
 void predators_state::slave_io_map(address_map &map)
 {
-	map(0x0000, 0x000f).rw(FUNC(predators_state::sc_io_r), FUNC(predators_state::sc_io_w));
+	map.unmap_value_high();
+	map(0x0000, 0x0008).w(FUNC(predators_state::input_latch_w));
+	map(0x0000, 0x0001).r(FUNC(predators_state::serial_r<2>)); // Condor
+	map(0x0004, 0x0005).r(FUNC(predators_state::serial_r<1>)); // Eagle
+	map(0x0008, 0x0009).r(FUNC(predators_state::serial_r<0>)); // Falcon
+	map(0x000c, 0x000c).rw(FUNC(predators_state::local_switches_r), FUNC(predators_state::serial_error_w));
+	map(0x000d, 0x000d).w(FUNC(predators_state::serial_control_w));
 }
 
 void predators_state::screen_start(int screen)
