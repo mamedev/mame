@@ -24,6 +24,9 @@
 #include <algorithm>
 #include <atomic>
 #include <iterator>
+#include <optional>
+#include <string>
+#include <string_view>
 
 
 namespace {
@@ -195,6 +198,26 @@ auto make_bitmap_specific_type(sol::table registry, char const *name)
 	result.set_function("plot_box", &T::plot_box);
 	result["bpp"] = sol::property(&T::bpp);
 	return result;
+}
+
+
+//-------------------------------------------------
+//  pointer_type_from_string - convert a string
+//  to osd::ui_event_handler::pointer
+//-------------------------------------------------
+
+std::optional<osd::ui_event_handler::pointer> pointer_type_from_string(std::string_view str)
+{
+	if (str == "unknown")
+		return osd::ui_event_handler::pointer::UNKNOWN;
+	else if (str == "mouse")
+		return osd::ui_event_handler::pointer::MOUSE;
+	else if (str == "pen")
+		return osd::ui_event_handler::pointer::PEN;
+	else if (str == "touch")
+		return osd::ui_event_handler::pointer::TOUCH;
+	else
+		return std::nullopt;
 }
 
 } // anonymous namespace
@@ -1119,6 +1142,42 @@ void lua_engine::initialize_render(sol::table &emu)
 	target_type["visibility_mask"] = sol::property(&render_target::visibility_mask);
 	target_type["screen_overlay"] = sol::property(&render_target::screen_overlay_enabled, &render_target::set_screen_overlay_enabled);
 	target_type["zoom_to_screen"] = sol::property(&render_target::zoom_to_screen, &render_target::set_zoom_to_screen);
+	target_type.set_function(
+			"push_pointer_update",
+			[] (render_target &t, sol::this_state s, std::string_view type, u16 ptrid, u16 device, s32 x, s32 y, u32 buttons, u32 pressed, u32 released, s16 clicks)
+			{
+				auto const ptrtype(pointer_type_from_string(type));
+				if (t.hidden())
+					luaL_error(s, "Cannot push pointer events to a hidden render target");
+				else if (!ptrtype)
+					luaL_error(s, "Invalid pointer type '%s'", std::string(type).c_str());
+				else
+					t.push_pointer_update(*ptrtype, ptrid, device, x, y, buttons, pressed, released, clicks);
+			});
+	target_type.set_function(
+			"push_pointer_leave",
+			[] (render_target &t, sol::this_state s, std::string_view type, u16 ptrid, u16 device, s32 x, s32 y, u32 released, s16 clicks)
+			{
+				auto const ptrtype(pointer_type_from_string(type));
+				if (t.hidden())
+					luaL_error(s, "Cannot push pointer events to a hidden render target");
+				else if (!ptrtype)
+					luaL_error(s, "Invalid pointer type '%s'", std::string(type).c_str());
+				else
+					t.push_pointer_leave(*ptrtype, ptrid, device, x, y, released, clicks);
+			});
+	target_type.set_function(
+			"push_pointer_abort",
+			[] (render_target &t, sol::this_state s, std::string_view type, u16 ptrid, u16 device, s32 x, s32 y, u32 released, s16 clicks)
+			{
+				auto const ptrtype(pointer_type_from_string(type));
+				if (t.hidden())
+					luaL_error(s, "Cannot push pointer events to a hidden render target");
+				else if (!ptrtype)
+					luaL_error(s, "Invalid pointer type '%s'", std::string(type).c_str());
+				else
+					t.push_pointer_abort(*ptrtype, ptrid, device, x, y, released, clicks);
+			});
 
 
 	auto render_container_type = sol().registry().new_usertype<render_container>("render_container", sol::no_constructor);
