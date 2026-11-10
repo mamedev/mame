@@ -15,6 +15,7 @@ TODO:
 - Mix-in wave engine output to AC'97 input;
 - wavetsr.com can't find a free IRQ for SB emulation under DOS;
 - Soundblaster, FM and MPU-401 are emulated by the 4dwave sound engine;
+\- winamp redbook audio uses Legacy DMA functions, just for metering (currently blanked) or more?
 - Support for 4DWAVE-NX (minor upgrade with extra TLB, scatter-gather and SPDIF interface)
 
 Notes:

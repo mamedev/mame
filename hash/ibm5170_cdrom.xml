@@ -5966,7 +5966,7 @@ https://www.pcgamingwiki.com/wiki/Primal_Rage
 		<publisher>GT Interactive</publisher>
 		<notes><![CDATA[
 Untested multiplayer options
-Looks too dark on s3_764 (verify)
+Looks too dark, needs bumped brightness (verify)
 ]]></notes>
 		<info name="developer" value="id Software" />
 		<info name="language" value="English" />
