@@ -162,6 +162,8 @@ void h8_device::device_start()
 	save_item(NAME(m_TMP1));
 	save_item(NAME(m_TMP2));
 	save_item(NAME(m_TMPR));
+	save_item(NAME(m_dma_dest));
+	save_item(NAME(m_dma_mode16));
 
 	save_item(NAME(m_inst_state));
 	save_item(NAME(m_inst_substate));

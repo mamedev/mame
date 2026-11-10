@@ -5963,9 +5963,55 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( pk5_07sb )
-	PORT_INCLUDE( goldnpkr )
+/*
+  Multiplexed - 4x6bits
 
-	PORT_MODIFY("SW1")
+  This matrix reads 6 bits per row,
+  instead of the original 5 bits from
+  Bonanza Golden Poker and others.  
+
+*/	
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Meters")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )    PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-0 Bit 5") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )          PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )     PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-1 Bit 5") PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-2 Bit 5") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-3 Bit 0") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-3 Bit 1") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )          PORT_IMPULSE(3) PORT_NAME("Note 1 In")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_IMPULSE(3) PORT_NAME("Coin In")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )          PORT_IMPULSE(3) PORT_NAME("Note 2 In")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-3 Bit 5") PORT_CODE(KEYCODE_P)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -6024,16 +6070,15 @@ static INPUT_PORTS_START( pk5_07sb )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW3:6,7,8")
+	PORT_DIPSETTING(    0xe0, "1 Coin: 1 Credit;   1 Note: 10 Credits" )  // 1/10
+	PORT_DIPSETTING(    0xc0, "1 Coin: 2 Credits;  1 Note: 20 Credits" )  // 2/20
+	PORT_DIPSETTING(    0x60, "1 Coin: 5 Credits;  1 Note: 10 Credits" )  // 5/10
+	PORT_DIPSETTING(    0xa0, "1 Coin: 5 Credits;  1 Note: 50 Credits" )  // 5/50
+	PORT_DIPSETTING(    0x40, "1 Coin: 10 Credits; 1 Note: 20 Credits" )  // 10/20
+	PORT_DIPSETTING(    0x80, "1 Coin: 10 Credits; 1 Note: 100 Credits" ) // 10/100
+	PORT_DIPSETTING(    0x20, "1 Coin: 25 Credits; 1 Note: 50 Credits" )  // 25/50
+	PORT_DIPSETTING(    0x00, "1 Coin: 50 Credits; 1 Note: 100 Credits" ) // 50/100
 INPUT_PORTS_END
 
 
@@ -7187,6 +7232,29 @@ ROM_END
 ROM_START( goldnpkh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "spf.12a", 0x4000, 0x4000, CRC(22963c83) SHA1(ac9e66f0c548011aac88b9f32a924995ba3651e4) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "u38_5a.bin", 0x4000, 0x2000, CRC(32705e1d) SHA1(84f9305af38179985e0224ae2ea54c01dfef6e12) )    // char ROM
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "u43_2a.bin", 0x0000, 0x2000, CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "u40_4a.bin", 0x2000, 0x2000, CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    // cards deck gfx, bitplane2
+	ROM_COPY( "gfx1",   0x4800, 0x4000, 0x0800 )    // cards deck gfx, bitplane3. found in the 2nd quarter of the char rom
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10n.7d",       0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+
+/* Bonanza Golden Poker Double Up.
+   Original software & hardware.
+
+   Alt set.
+*/
+ROM_START( goldnpki )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ups31h.002",  0x4000, 0x4000, CRC(ccad6d14) SHA1(344179584f73ddda6b0f590734c9dfb8432ccdbf) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_FILL(               0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes
@@ -15693,7 +15761,21 @@ ROM_START( touksysp )
 	ROM_LOAD( "prom.n03", 0x0000, 0x0100, CRC(fa17f40a) SHA1(fac057888c6f75415d86d93e6d0700f5b4b5d3ee) )
 ROM_END
 
+/*
+  Fever Poker?
+  pk5_07sb
 
+  Encrypted program.
+
+  Daughterboard with:
+
+  Rockwell R6502.
+  1x program ROM
+  1x SRAM.
+  2x 8-DSW banks.
+  Some TTLs
+
+*/
 ROM_START( pk5_07sb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pk5_07sb.bin",  0x0000, 0x8000, CRC(8aee7c49) SHA1(0d0a30a0ed75869ceef45d65ffa5099fbf636421) )
@@ -16482,6 +16564,7 @@ GAMEL( 1983, goldnpke,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init
 GAMEL( 1983, goldnpkf,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Intercoast (bootleg)",     "Golden Poker Double Up (bootleg, set 4)",    0,                layout_goldnpkr )
 GAMEL( 1983, goldnpkg,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Golden Poker Double Up (bootleg, set 5)",    0,                layout_goldnpkr )
 GAMEL( 1983, goldnpkh,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (tearoom*sara hack)", 0,                layout_goldnpkr )
+GAMEL( 1981, goldnpki,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (alt set)",           0,                layout_goldnpkr )
 
 GAMEL( 198?, videtron,  0,        goldnpkr, videtron, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Videotron Poker (cards selector, set 1)",    0,                layout_goldnpkr )
 GAMEL( 198?, videtron2, videtron, goldnpkr, videtron, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Videotron Poker (cards selector, set 2)",    0,                layout_goldnpkr )
@@ -16742,7 +16825,5 @@ GAME(  199?, kmhpan,    0,        kmhpan,   kmhpan,   goldnpkr_state, empty_init
 GAME(  198?, wing90pkr, goldnpkr, wing_w90, wing_w90, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Wing W90 poker (Wing 8510-A W90-3 PCB)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )  // bad gfx dump
 
 GAMEL( 198?, phnxjokr,  0,        phnxjokr, phnxjokr, goldnpkr_state, empty_init,    ROT0,   "STP",                      "Phoenix Joker (STP, UCGS-80 PCB)",        0,                layout_goldnpkr )  // no lamps. layout for clickable controls only.
-
 GAMEL( 1986, touksysp,  0,        touksysp, touksysp, goldnpkr_state, init_touk,     ROT0,   "<unknown>",                "Toukyuu System Poker (ROM: NO4313)",      0,                layout_goldnpkr )  // no lamps. layout for clickable controls only.
-
 GAMEL( 198?, pk5_07sb,  goldnpkr, pk5_07sb, pk5_07sb, goldnpkr_state, init_pk5sb,    ROT0,   "<unknown>",                "Fever Poker (pk5-07sb, encrypted)",       0,                layout_goldnpkr )  // no lamps. layout for clickable controls only.

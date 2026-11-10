@@ -29,6 +29,119 @@ DSPs and other emulated devices.  A recompiler uses several components:
   the host system.
 
 
+.. _umlarch-cache:
+
+The recompiler cache
+~~~~~~~~~~~~~~~~~~~~
+
+The recompiler cache is a contiguous area of virtual memory used to
+store generated code and associated data.  The desired cache size can be
+calling ``set_cache_size``, but the size cannot be changed after
+initialisation.  If possible, a cache size large enough to hold a
+typical working set for the emulated system should be used.  If the
+cache is too small, the transient portion of the cache will need to be
+flushed very frequently, and performance will suffer due to the need to
+constantly regenerate code.
+
+With the exception of a few UML instructions specifically for loading
+and storing data (:ref:`LOAD <umlinst-load>`,
+:ref:`LOADS <umlinst-loads>`, :ref:`STORE <umlinst-store>`,
+:ref:`RESTORE <umlinst-store>` and :ref:`SAVE <umlinst-save>`),
+generated code can only access data located within the recompiler cache.
+
+The recompiler cache is divided into multiple areas, which are used to
+store different kinds of code and data.  The layout of the cache is
+illustrated below, with the lowest address at the top and the highest
+address at the bottom.
+
+.. image:: images/drccache.svg
+    :align: center
+    :alt: Recompiler cache layout
+
+The *near cache* is a fixed-size area (currently 128 KiB) starting at
+the lowest address in the cache.  Data close to the start of the near
+cache is most efficient to access from generated code.  Recompilers
+should store frequently used data in the near cache.
+
+Objects may be allocated in the near cache by calling
+``cache_alloc_near``.  This function may also be used to allocate arrays
+of objects that are trivially constructible and destructible in the near
+cache.
+
+The portion of the recompiler cache immediately following the near
+cache is used to store *invariant* data and generated code.  Memory used
+for invariant data and generated code cannot be reclaimed for the
+lifetime of the recompiler.  For this reason, it should be used for
+generated code and associated data that only depends on static
+configuration and won’t need to change.  The invariant portion of the
+recompiler cache grows toward higher addresses.
+
+Trivially destructible objects may be allocated in invariant portion of
+the cache by calling ``cache_alloc_invariant``.  This function may also
+be used to allocate arrays of objects that are trivially constructible
+and destructible in the invariant portion of cache.  Note that after
+allocating any memory in the transient portion of the cache, it is no
+longer possible to allocate memory in the invariant portion of the cache
+until the transient portion of the cache is cleared (by calling
+``reset``).
+
+The invariant portion of the recompiler cache is followed by the portion
+used to store *transient* data and generated code.  This area is used to
+store translated emulated code and associated data.  The transient
+portion of the recompiler cache grows toward higher addresses.  The
+transient portion of the cache may be cleared by calling ``reset``.
+
+Trivially destructible objects may be allocated in transient portion of
+the cache by calling ``cache_alloc_transient``.  This function may also
+be used to allocate arrays of objects that are trivially constructible
+and destructible in the transient portion of cache.  Note that all
+objects in the transient portion of the cache become invalid after
+calling ``reset`` to clear the transient portion of the cache.
+
+The area immediately preceding end of the recompiler cache (highest
+addresses in the cache) is used for storing *permanent* objects.  The
+permanent object area grows toward lower addresses.
+
+Objects may be allocated in the permanent object area of the cache by
+calling ``cache_alloc``.  This function may also be used to allocate
+arrays of objects that are trivially constructible and destructible in
+the permanent object area of the cache.
+
+Note that destructors **will not be called automatically** for objects
+in the recompiler cache.  If you allocate objects in the recompiler
+cache that are not trivially destructible (by calling ``cache_alloc``
+or ``cache_alloc_near``), you must ensure the destructors are called
+before the memory is deallocated or the recompiler cache is destroyed.
+
+As the recompiler cache does not use the default allocator,
+``operator delete`` and ``operator delete[]`` **must not** be invoked
+for pointers to memory allocated from the cache.  Memory for objects in
+the near cache and the permanent object area of the cache may be
+deallocated by calling ``cache_dealloc``, passing the pointer and the
+size of the allocation as arguments.  The allocation size must be
+correct.  There are some limitations on how deallocated memory is
+reclaimed.  Memory from large allocations is never reclaimed, adjacent
+deallocated areas may not be consolidated, and the permanent object area
+never shrinks.  These limitations must be considered if you frequently
+deallocate cache memory.
+
+Calling generated code may result in any previously allocated memory in
+the invariant and transient portions of the recompiler cache becoming
+read-only.  For this reason, the invariant and transient portions of the
+cache should only be used to store data that does not need to change
+after code generation is complete.  Data that needs to be modified must
+be stored in the near cache or the permanent object area of the cache.
+
+Back-ends generally allocate objects in the near cache for storing data
+like virtual machine state and data tables required on the critical
+path.  Code handles consume space from the near cache.  Tables for
+associating modes and emulated program counter values with generated
+code are stored in the permanent object area of the cache.  (See the
+section on :ref:`flow control <umlarch-flow>` for more information on
+these concepts.)  Back-ends also generate utility code in the invariant
+and transient portions of the cache.
+
+
 .. _umlarch-vm:
 
 The UML virtual machine
@@ -41,9 +154,12 @@ The virtual machine has the following architectural registers:
 Integer registers
     Ten general-purpose integer registers, named ``I0`` to ``I9``.  Each
     register holds a 64-bit binary value.  Values are interpreted as
-    unsigned integers, or two’s complement signed integers.  When used
-    as the destination for operations that produce 32-bit results, the
-    most significant 32 bits of the register are cleared (set to zero).
+    unsigned integers or two’s complement signed integers.  The least
+    significant 32 bits are used as input to operations that expect
+    32-bit values.  When used as the destination for operations that
+    produce 32-bit results, the value is stored in the least significant
+    32 bits of the register and the most significant 32 bits of the
+    register are cleared (set to zero).
 Floating point registers
     Ten general-purpose floating point registers, named ``F0`` to
     ``F9``.  Each register may hold a 32-bit value or a 64-bit value,
@@ -53,9 +169,22 @@ Floating point registers
     for an operation expecting a 64-bit value or using a register
     containing a 64-bit value as an input for an operation expecting a
     32-bit value is undefined.
+
+    Floating point registers may be used to hold arbitrary binary
+    values.  Instructions that copy, load or store data to or from
+    floating point registers make no changes to the binary data.
 Condition code register
     The condition code register consists of five flags: carry (C),
     overflow (V), zero (Z), sign (S) and unordered (U).
+
+    The condition codes are tested by conditional jump, subroutine
+    call/return, C function call, and integer/floating point copy
+    instructions (:ref:`JMP <umlinst-jmp>`,
+    :ref:`CALLH <umlinst-callh>`, :ref:`EXH <umlinst-exh>`,
+    :ref:`RET <umlinst-ret>`, :ref:`CALLC <umlinst-callc>`,
+    :ref:`SET <umlinst-set>`, :ref:`MOV <umlinst-mov>` and
+    :ref:`FMOV <umlinst-fmov>`).
+    :ref:`Sixteen conditions <umlinst-conditions>` are supported.
 Exception register
     A special-function register, named ``EXP``, which holds a 32-bit
     binary value.  UML instructions are provided to set the value of
@@ -89,20 +218,8 @@ Unordered (U)
     Set to indicate an unordered result for a floating point comparison
     (at least one of the inputs is not a number).
 
-The condition codes are tested by conditional jump, subroutine
-call/return, C function call, and integer/floating point copy
-instructions (:ref:`JMP <umlinst-jmp>`, :ref:`CALLH <umlinst-callh>`,
-:ref:`EXH <umlinst-exh>`, :ref:`RET <umlinst-ret>`,
-:ref:`CALLC <umlinst-callc>`, :ref:`SET <umlinst-set>`,
-:ref:`MOV <umlinst-mov>` and :ref:`FMOV <umlinst-fmov>`).
-:ref:`Sixteen conditions <umlinst-conditions>` are supported.
-
 A subroutine call stack is provided, with support for at least sixteen
 levels of nested subroutine calls.
-
-General-purpose floating point registers may be used to hold arbitrary
-binary values.  Instructions that copy, load or store data to or from
-floating point registers make no changes to the binary data.
 
 Note that the general-purpose integer and floating point registers may
 not all have the same performance characteristics.  When this is the
@@ -116,6 +233,14 @@ the registers ``I0`` to ``I3`` and ``F0`` to ``F5`` are “fast”
 registers, and all higher-numbered registers should be expected to have
 poorer relative performance.
 
+All register values are undefined on entering generated code, and all
+register values are lost when exiting from generated code.  There is no
+way to retrieve or set register values from outside generated code.  All
+registers besides the condition codes are preserved when calling C
+functions or memory access handlers from generated code (the condition
+codes are left undefined after calling C functions or memory access
+handlers).
+
 
 .. _umlarch-blocks:
 
@@ -128,9 +253,10 @@ blocks, created by calling ``begin_invariant_block``, persist for the
 lifetime of the recompiler; transient blocks, created by calling
 ``begin_block``, persist until the next time the transient portion of
 the recompiler cache is cleared (by calling ``reset``).  After
-generating a transient block, it is not possible to generate additional
-invariant blocks until the transient portion of the recompiler cache is
-cleared.
+generating a transient block or allocating objects in the transient
+portion of the recompiler cache, it is not possible to generate
+additional invariant blocks until the transient portion of the
+recompiler cache is cleared.
 
 Invariant blocks should be used for code that only depends on static
 configuration and won’t need to change for the lifetime of the
@@ -206,6 +332,31 @@ This allows for creation of mutually recursive subroutines.  Note that
 it may be possible to generate more efficient subroutine call code if
 the handle is associated with a subroutine entry point before the code
 to call it is generated.
+
+Jumping based on a mode and emulated program counter value
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A location in a transient block is associated with a mode and emulated
+program counter value using the :ref:`HASH <umlinst-hash>` instruction.
+If the mode and emulated program counter value are already associated
+with a location when code for the :ref:`HASH <umlinst-hash>` instruction
+is generated, the association will be replaced.  If the transient
+portion of the recompiler cache is cleared (by calling ``reset``), all
+associations will be cleared. Note that :ref:`HASH <umlinst-hash>`
+instructions are not permitted in invariant blocks.
+
+The :ref:`HASHJMP <umlinst-hashjmp>` instruction takes a mode, an
+emulated program counter value and a code handle as operands.  The
+instruction unwinds the subroutine call stack, and then either jumps to
+the location currently associated with the mode and emulated program
+counter value, or calls the subroutine associated with the code handle
+if no location is currently associated with the mode and emulated
+program counter value.
+
+The :ref:`HASHJMP <umlinst-hashjmp>` instruction may jump to a location
+within the same code block, or a location within a different code block.
+The :ref:`HASHJMP <umlinst-hashjmp>` instruction is permitted in both
+persistent and transient blocks.
 
 Exiting from generated code
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

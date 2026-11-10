@@ -236,7 +236,7 @@ opcode_info const instruction::s_opcode_info_table[OP_MAX] =
 //  code_handle - constructor
 //-------------------------------------------------
 
-uml::code_handle::code_handle(drcuml_state &drcuml, const char *name)
+uml::code_handle::code_handle(drcuml_state &drcuml, std::string_view name)
 	: m_code(drcuml.cache_alloc_near<drccodeptr>())
 	, m_string(name)
 	, m_drcuml(drcuml)
