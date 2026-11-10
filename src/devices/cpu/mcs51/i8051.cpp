@@ -515,7 +515,6 @@ u8 mcs51_cpu_device::p3_pins() const
 
 void mcs51_cpu_device::set_serial_pins(u8 rxd, u8 txd)
 {
-	// only notify the port when the pins really change
 	u8 const old = p3_pins();
 	m_uart.rxd = rxd;
 	m_uart.txd = txd;
@@ -535,38 +534,40 @@ void mcs51_cpu_device::transmit_receive_mode0()
 		break;
 
 	case SIO_START:
-		// SEND goes active a machine cycle after writing SBUF, putting bit 0 on RXD
-		set_serial_pins(BIT(m_uart.data_out, 0), m_uart.txd);
+		// one full machine cycle elapses between writing SBUF and activating SEND
 		m_uart.txbit = SIO_DATA0;
 		return;
 
-	case SIO_DATA0: case SIO_DATA1: case SIO_DATA2: case SIO_DATA3:
-	case SIO_DATA4: case SIO_DATA5: case SIO_DATA6: case SIO_DATA7:
-		{
-			unsigned const bit = m_uart.txbit - SIO_DATA0;
-			LOGMASKED(LOG_TX, "tx bit %u data %d (%s)\n", bit, BIT(m_uart.data_out, bit), machine().time().to_string());
-			set_serial_pins(m_uart.rxd, 0);
-			set_serial_pins(m_uart.rxd, 1);
-
-			// the next bit is shifted out at S6P2, RXD is released after the last one
-			if (bit < 7)
-			{
-				set_serial_pins(BIT(m_uart.data_out, bit + 1), 1);
-				m_uart.txbit++;
-			}
-			else
-			{
-				set_serial_pins(1, 1);
-				m_uart.txbit = SIO_STOP;
-			}
-		}
+	case SIO_DATA0:
+		// SEND puts bit 0 on RXD
+		LOGMASKED(LOG_TX, "tx bit 0 data %d (%s)\n", BIT(m_uart.data_out, 0), machine().time().to_string());
+		set_serial_pins(BIT(m_uart.data_out, 0), m_uart.txd);
+		m_uart.txbit = SIO_DATA1;
 		return;
 
-	case SIO_STOP:
-		// TI is set at S1P1 of the tenth machine cycle after writing SBUF
-		LOGMASKED(LOG_TX, "tx done (%s)\n", machine().time().to_string());
-		set_ti(1);
-		m_uart.txbit = SIO_IDLE;
+	case SIO_DATA1: case SIO_DATA2: case SIO_DATA3: case SIO_DATA4:
+	case SIO_DATA5: case SIO_DATA6: case SIO_DATA7: case SIO_STOP:
+		// the clock rises at S6P1, then the next bit is shifted out at S6P2
+		set_serial_pins(m_uart.rxd, 0);
+		set_serial_pins(m_uart.rxd, 1);
+		if (m_uart.txbit == SIO_STOP)
+		{
+			// SEND is deactivated and TI set at S1P1 of the tenth machine cycle after writing SBUF
+			LOGMASKED(LOG_TX, "tx done (%s)\n", machine().time().to_string());
+			set_serial_pins(1, 1);
+			set_ti(1);
+			m_uart.txbit = SIO_IDLE;
+		}
+		else
+		{
+			u8 const bit = m_uart.txbit - SIO_DATA0;
+			LOGMASKED(LOG_TX, "tx bit %u data %d (%s)\n", bit, BIT(m_uart.data_out, bit), machine().time().to_string());
+			set_serial_pins(BIT(m_uart.data_out, bit), 1);
+			if (m_uart.txbit == SIO_DATA7)
+				m_uart.txbit = SIO_STOP;
+			else
+				m_uart.txbit++;
+		}
 		return;
 
 	default: // left over by the UART modes, kept as it was
@@ -575,36 +576,46 @@ void mcs51_cpu_device::transmit_receive_mode0()
 
 	switch (m_uart.rxbit)
 	{
-	case SIO_DATA0: case SIO_DATA1: case SIO_DATA2: case SIO_DATA3:
-	case SIO_DATA4: case SIO_DATA5: case SIO_DATA6: case SIO_DATA7:
+	case SIO_DATA0:
+		// the receive shift register is loaded at S6P2, and RECEIVE goes active
+		// in the next clock phase
+		m_uart.rxbit = SIO_DATA1;
+		break;
+
+	case SIO_DATA1: case SIO_DATA2: case SIO_DATA3: case SIO_DATA4:
+	case SIO_DATA5: case SIO_DATA6: case SIO_DATA7: case SIO_STOP:
 		{
+			u8 const bit = (m_uart.rxbit == SIO_STOP) ? 7 : (m_uart.rxbit - SIO_DATA1);
 			set_serial_pins(1, 0);
 
 			// RXD is sampled at S5P2, before the clock rises
 			int const data = BIT(m_port_in_cb[3](), 0);
-			LOGMASKED(LOG_RX, "rx bit %d data %d (%s)\n", m_uart.rxbit - SIO_DATA0, data, machine().time().to_string());
+			LOGMASKED(LOG_RX, "rx bit %u data %d (%s)\n", bit, data, machine().time().to_string());
 			if (data)
-				m_uart.data_in |= 1U << (m_uart.rxbit - SIO_DATA0);
+				m_uart.data_in |= 1U << bit;
 
 			set_serial_pins(1, 1);
-			if (m_uart.rxbit == SIO_DATA7)
+			if (m_uart.rxbit == SIO_STOP)
+			{
+				// the last shift loads SBUF, RI is set at S1P1 of the tenth machine cycle
+				LOGMASKED(LOG_RX, "rx byte 0x%02x (%s)\n", m_uart.data_in, machine().time().to_string());
+				m_sbuf = m_uart.data_in;
+				set_ri(1);
+				m_uart.rxbit = SIO_IDLE;
+			}
+			else if (m_uart.rxbit == SIO_DATA7)
+			{
 				m_uart.rxbit = SIO_STOP;
+			}
 			else
+			{
 				m_uart.rxbit++;
+			}
 		}
 		break;
 
-	case SIO_STOP:
-		// SBUF is loaded and RI set at S1P1 of the tenth machine cycle
-		LOGMASKED(LOG_RX, "rx byte 0x%02x (%s)\n", m_uart.data_in, machine().time().to_string());
-		m_sbuf = m_uart.data_in;
-		set_ri(1);
-		m_uart.rxbit = SIO_IDLE;
-		break;
-
 	default: // idle, or left over by the UART modes and kept as it was
-		// reception starts when REN is set with RI clear, RECEIVE goes active
-		// a machine cycle later, so RI is set at the same point as TI would be
+		// reception starts when REN is set with RI clear
 		if (BIT(m_scon, SCON_REN) && !BIT(m_scon, SCON_RI))
 		{
 			m_uart.data_in = 0;
