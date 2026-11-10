@@ -147,7 +147,7 @@ void vt100_video_device::device_reset()
 	m_last_scroll = 0;
 
 	m_blink_flip_flop = 0;
-	m_reverse_field = 0;
+	m_reverse_field = 1; // off: the DC012's power-up state isn't documented; dark until the firmware sets it
 	m_basic_attribute = 0;
 
 	m_columns = 80;
@@ -178,7 +178,7 @@ void rainbow_video_device::device_reset()
 	m_last_scroll = 0;
 
 	m_blink_flip_flop = 0;
-	m_reverse_field = 0;
+	m_reverse_field = 1; // off: the DC012's power-up state isn't documented; dark until the firmware sets it
 	m_basic_attribute = 0;
 
 	m_columns = 80;
@@ -445,6 +445,7 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 
 // ATTRIBUTES:   No attributes = 0x0E
 // 1 = display char. in REVERSE   (encoded as 1 in attribute) HIGH ACTIVE
+//     (UNDERLINE instead when the DC012's basic attribute selects underline)
 // 0 = display char. in BOLD      (encoded as 2 in attribute) LOW ACTIVE
 // 0 = display char. w. BLINK     (encoded as 4 in attribute) LOW ACTIVE
 // 0 = display char. w. UNDERLINE (encoded as 8 in attribute) LOW ACTIVE
@@ -476,9 +477,10 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 	// reverse field XOR reverse video.  The base attribute (character bit 7)
 	// is reverse video or underline as the basic attribute flip-flop selects
 	// (4.6.3.8).  m_reverse_field is 0 when reverse field is on.
-	if (!m_basic_attribute && invert)
-		underline = true;
-	invert = (m_basic_attribute && invert) ^ !m_reverse_field;
+	bool const reverse_field = !m_reverse_field;
+	bool const reverse_video = m_basic_attribute && invert;
+	bool const underlined = underline || (!m_basic_attribute && invert);
+	bool const reversed = reverse_video != reverse_field;
 
 	// intensities: 0 off, 1 dim, 2 normal, 3 bright
 	// reverse: black character on dim (normal when bold) background
@@ -486,8 +488,8 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 	// blink lowers a non-reverse character one step, and shows a reverse one
 	// in its non-reverse form
 	bool const blink_on = blink && m_blink_flip_flop;
-	bool const reverse = invert && !blink_on;
-	int const fg_intensity = reverse ? 0 : (bold + 2 - ((blink_on && !invert) ? 1 : 0));
+	bool const reverse = reversed && !blink_on;
+	int const fg_intensity = reverse ? 0 : (bold + 2 - ((blink_on && !reversed) ? 1 : 0));
 	int const back_intensity = reverse ? (bold + 1) : 0;
 
 	bool double_width = (display_type != 3) ? true : false; // all except normal: double width
@@ -546,14 +548,14 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 		line = m_char_rom[(code << 4) + j]; // code * 16
 
 		// underline: the 9th scan takes the character intensity (black when reverse)
-		if (underline && (i == 8))
+		if (underlined && (i == 8))
 			line = 0xff;
 
 		for (int b = 0; b < 8; b++) // 0..7
 		{
 			if (blank)
 			{
-				bit = !m_reverse_field;
+				bit = reverse_field;
 			}
 			else
 			{
@@ -795,7 +797,7 @@ void rainbow_video_device::video_blanking(bitmap_ind16 &bitmap, const rectangle 
 {
 	// 'In reverse screen mode, termination forces the beam to the screen background intensity'
 	// Background intensity means 'dim' (1) according to one source.
-	bitmap.fill(m_reverse_field ? 0 : 1, cliprect);
+	bitmap.fill(!m_reverse_field ? 1 : 0, cliprect); // m_reverse_field is 0 when reverse field is on
 }
 
 #define MHFU_IS_ENABLED 1
