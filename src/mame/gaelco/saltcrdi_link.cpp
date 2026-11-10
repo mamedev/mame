@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Vas Crabb, ClawGrip
+// copyright-holders:Vas Crabb, Tomás García-Merás Capote
 /***********************************************************************
 
   High-level simulation of the Salter Cardioline link.

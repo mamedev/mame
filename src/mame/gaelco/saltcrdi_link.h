@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Vas Crabb, ClawGrip
+// copyright-holders:Vas Crabb, Tomás García-Merás Capote
 #ifndef MAME_GAELCO_SALTCRDI_LINK_H
 #define MAME_GAELCO_SALTCRDI_LINK_H
 
