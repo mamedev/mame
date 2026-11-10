@@ -1203,6 +1203,7 @@ public:
 	void smb_be4k(machine_config &config) ATTR_COLD;
 	void touksysp(machine_config &config) ATTR_COLD;
 	void pk5_07sb(machine_config &config) ATTR_COLD;
+	void jokerush(machine_config &config) ATTR_COLD;
 
 	void init_vkdlswwh() ATTR_COLD;
 	void init_icp1db() ATTR_COLD;
@@ -1238,6 +1239,7 @@ public:
 	void init_unkdep() ATTR_COLD;
 	void init_touk() ATTR_COLD;
 	void init_pk5sb() ATTR_COLD;
+	void init_jokerush() ATTR_COLD; 
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -1334,6 +1336,7 @@ private:
 	void touksysp_map(address_map &map) ATTR_COLD;
 	void touksysp_opcodes_map(address_map &map) ATTR_COLD;
 	void pk5_07sb_map(address_map &map) ATTR_COLD;
+	void jokerush_map(address_map &map) ATTR_COLD;
 
 	optional_device<ticket_dispenser_device> m_hopper;
 	optional_device<ay8910_device> m_ay8910;
@@ -2458,7 +2461,7 @@ void goldnpkr_state::phnxjokr_map(address_map &map)
 
 void goldnpkr_state::touksysp_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x0000, 0x07ff).ram().share("nvram");  // battery backed RAM
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -2476,6 +2479,15 @@ void goldnpkr_state::touksysp_opcodes_map(address_map &map)
 }
 
 
+void goldnpkr_state::jokerush_map(address_map &map)
+{
+	common_io_map(map);
+
+	map(0x0000, 0x07ff).ram().share("nvram");  // battery backed RAM
+	map(0x8000, 0xffff).rom();
+}
+
+
 void blitz_state::megadpkr_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram(); //.share("nvram");   // battery backed RAM
@@ -2483,14 +2495,6 @@ void blitz_state::megadpkr_map(address_map &map)
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-
-/*  There is another set of PIAs controlled by the code.
-    Maybe they are just mirrors...
-    FIXME: this comment and commented code doesn't make sense - the video RAM is in this range
-
-    map(0x10f4, 0x10f7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-    map(0x10f8, 0x10fb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-*/
 	map(0x1000, 0x13ff).ram().w(FUNC(blitz_state::goldnpkr_videoram_w)).share(m_videoram);
 	map(0x1800, 0x1bff).ram().w(FUNC(blitz_state::goldnpkr_colorram_w)).share(m_colorram);
 
@@ -2498,6 +2502,7 @@ void blitz_state::megadpkr_map(address_map &map)
 	map(0x4000, 0x7fff).view(m_overlay);
 	m_overlay[0](0x4000, 0x7fff).r(FUNC(blitz_state::cpubank_decrypt_r<0x0000>)).nopw();
 	m_overlay[1](0x4000, 0x7fff).r(FUNC(blitz_state::cpubank_decrypt_r<0x4000>)).nopw();
+
 	map(0x8000, 0xbfff).nopr().w(FUNC(blitz_state::mcu_command_w));
 	map(0xc000, 0xffff).rom();
 }
@@ -6806,7 +6811,6 @@ void goldnpkr_state::wing_w90(machine_config &config)
 	SN76489A(config, m_snsnd, MASTER_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 2.0);
 }
 
-
 void goldnpkr_state::phnxjokr(machine_config &config)
 {
 	goldnpkr_base(config);
@@ -6830,7 +6834,6 @@ void goldnpkr_state::phnxjokr(machine_config &config)
 	m_ay8910->port_b_read_callback().set_ioport("SW2");
 }
 
-
 void goldnpkr_state::touksysp(machine_config &config)
 {
 	goldnpkr_base(config);
@@ -6841,10 +6844,10 @@ void goldnpkr_state::touksysp(machine_config &config)
 
 	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::test_w));
 
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 }	
-
 
 void goldnpkr_state::pk5_07sb(machine_config &config)
 {
@@ -6853,6 +6856,23 @@ void goldnpkr_state::pk5_07sb(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::pk5_07sb_map);
 
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}	
+
+void goldnpkr_state::jokerush(machine_config &config)
+{
+	goldnpkr_base(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::jokerush_map);
+
+	// video hardware
+	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, smb_be4k)
+	m_gfxdecode->set_info(gfx_smb_be4k);
+
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 }	
@@ -6897,6 +6917,7 @@ void blitz_state::megadpkr(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
+
 
 void goldnpkr_state::dash_a37(machine_config &config)
 {
@@ -15794,6 +15815,48 @@ ROM_START( pk5_07sb )
 	ROM_LOAD( "tbp24s10n.7d",       0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
+/*
+  Joker Rush!!
+  SMH-803-J encrypted hardware.
+
+  Poker game with jokers
+  and additional features.
+
+  4 GFX banks.
+
+*/  
+ROM_START( jokerush )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jr.sub", 0x8000, 0x8000, CRC(36b7bd79) SHA1(3c9e432ee512be6e5d329ab89e6e5d587924c53f) ) 
+
+	ROM_REGION( 0x8000, "gfxpool", 0 )
+	ROM_LOAD( "1.5l", 0x0000, 0x4000, CRC(1949c708) SHA1(f909caa7b1b6b30ca6c75ade162ae0975227f6ad) )
+	ROM_LOAD( "2.5n", 0x4000, 0x4000, CRC(dce7c83a) SHA1(8fec2fbf5dcde1c1a22952f0214e92548d97a550) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
+	ROM_COPY( "gfxpool", 0x0000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x5000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
+	ROM_COPY( "gfxpool", 0x1800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x5800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx3", 0 )  // title
+	ROM_COPY( "gfxpool", 0x0000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x6000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // jokers + numbers box
+	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x6800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "prom.2m",    0x0000, 0x0100, CRC(c4dcb312) SHA1(777c5c557a8623dd3db7dc558888f3f44ade1890) )
+ROM_END
+
 
 /*********************************************
 *                Driver Init                 *
@@ -16545,6 +16608,14 @@ void goldnpkr_state::init_pk5sb()
 	}
 }
 
+void goldnpkr_state::init_jokerush()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (offs_t i = 0x9000; i < 0x10000; i++)
+		rom[i] = bitswap<8>(rom[i], 7, 6, 0, 4, 3, 2, 1, 5) ^ 0x14;
+}
+
 
 } // anonymous namespace
 
@@ -16827,3 +16898,5 @@ GAME(  198?, wing90pkr, goldnpkr, wing_w90, wing_w90, goldnpkr_state, empty_init
 GAMEL( 198?, phnxjokr,  0,        phnxjokr, phnxjokr, goldnpkr_state, empty_init,    ROT0,   "STP",                      "Phoenix Joker (STP, UCGS-80 PCB)",        0,                layout_goldnpkr )  // no lamps. layout for clickable controls only.
 GAMEL( 1986, touksysp,  0,        touksysp, touksysp, goldnpkr_state, init_touk,     ROT0,   "<unknown>",                "Toukyuu System Poker (ROM: NO4313)",      0,                layout_goldnpkr )  // no lamps. layout for clickable controls only.
 GAMEL( 198?, pk5_07sb,  goldnpkr, pk5_07sb, pk5_07sb, goldnpkr_state, init_pk5sb,    ROT0,   "<unknown>",                "Fever Poker (pk5-07sb, encrypted)",       0,                layout_goldnpkr )  // no lamps. layout for clickable controls only.
+GAMEL( 198?, jokerush,  0,        jokerush, goldnpkr, goldnpkr_state, init_jokerush, ROT0,   "<unknown>",                "Joker Rush!! (SMH-803-J)",                0,                layout_goldnpkr )  // no lamps. layout for clickable controls only.
+
