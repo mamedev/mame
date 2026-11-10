@@ -501,7 +501,7 @@ static INPUT_PORTS_START( sltpcycld )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("link", FUNC(saltcrdi_link_device::control_r))
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("link", FUNC(saltcrdi_link_device::clock_r))
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("link", FUNC(saltcrdi_link_device::data_r))
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -907,7 +907,7 @@ void salter_state::salter(machine_config &config)
 
 	LS259(config, m_outlatch);
 	// Q0 and Q2: serial link to I/O board (brake level), not emulated
-	m_outlatch->q_out_cb<1>().set(m_link, FUNC(saltcrdi_link_device::control_w));
+	m_outlatch->q_out_cb<1>().set(m_link, FUNC(saltcrdi_link_device::clock_w));
 	m_outlatch->q_out_cb<3>().set(m_link, FUNC(saltcrdi_link_device::data_w));
 
 	SALTCRDI_LINK(config, m_link);

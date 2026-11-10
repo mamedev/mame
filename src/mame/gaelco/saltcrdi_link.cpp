@@ -6,27 +6,28 @@
 
   Two machines can be connected to race against each other (the
   "2 CONTRINCANTES" option when selecting the opponent).  Each main
-  board drives two lines, called control and data here, through
-  outputs of an addressable latch, and reads the other machine's lines
-  on two input bits.  Both lines are inverted at the receiving end,
-  and unconnected inputs read high, which looks the same as the other
-  machine driving both lines low.
+  board drives a clock line and a data line through outputs of an
+  addressable latch (CLOCKOUT2 and DATAOUT2 in the schematics of the
+  REF. 970410 board), and reads the other machine's lines on two input
+  bits (CLOCKIN2 and DATAIN2).  An input bit reads the inverse of the
+  other machine's latch output, and unconnected inputs read high,
+  which looks the same as the other machine driving both lines low.
 
   Both lines are high when idle.  Bytes are transferred one bit at a
   time, least significant bit first, using a four-phase handshake:
 
-  Sender              Receiver
-  control=0 data=1                        request
-                      control=1 data=0    ready
-  control=1 data=~D                       data bit
-                      control=1 data=1    acknowledge
-  control=0 data=1                        request next bit
+  Sender            Receiver
+  clock=0 data=1                      request
+                    clock=1 data=0    ready
+  clock=1 data=~D                     data bit
+                    clock=1 data=1    acknowledge
+  clock=0 data=1                      request next bit
   ...
-                      control=0 data=0    end (instead of eighth
-                                          acknowledge)
-  control=0 data=0                        end
-                      control=1 data=1    idle
-  control=1 data=1                        idle
+                    clock=0 data=0    end (instead of eighth
+                                      acknowledge)
+  clock=0 data=0                      end
+                    clock=1 data=1    idle
+  clock=1 data=1                      idle
 
   The game polls the lines and only acts on a value after reading it
   twice in a row.  If both machines start sending at the same time, a
@@ -85,7 +86,7 @@
 
 namespace {
 
-// lines driven by each side: bit 0 is control, bit 1 is data
+// lines driven by each side: bit 0 is clock, bit 1 is data
 constexpr u8 LINES_END = 0x00;
 constexpr u8 LINES_READY = 0x01;
 constexpr u8 LINES_REQUEST = 0x02;
@@ -93,13 +94,13 @@ constexpr u8 LINES_IDLE = 0x03; // also used to acknowledge a bit
 
 constexpr u8 data_lines(int bit)
 {
-	return bit ? 0x01 : 0x03; // control high, data inverted
+	return bit ? 0x01 : 0x03; // clock high, data inverted
 }
 
 constexpr unsigned SETTLE_USEC = 10;
 constexpr unsigned POLL_MSEC = 1;
 
-constexpr u16 RESET_POLLS = 20; // the game reads the lines at least once every 7 ms
+constexpr u16 RESET_POLLS = 20; // the games read the lines at least once every 10 ms
 constexpr u16 YIELD_POLLS = 50;
 constexpr u16 TIMEOUT_POLLS = 1000;
 
@@ -451,7 +452,7 @@ saltcrdi_link_device::~saltcrdi_link_device()
 }
 
 
-void saltcrdi_link_device::control_w(int state)
+void saltcrdi_link_device::clock_w(int state)
 {
 	m_board_lines = (m_board_lines & 0x02) | (state ? 0x01 : 0x00);
 	m_settle_timer->adjust(attotime::from_usec(SETTLE_USEC));
@@ -465,7 +466,7 @@ void saltcrdi_link_device::data_w(int state)
 }
 
 
-int saltcrdi_link_device::control_r()
+int saltcrdi_link_device::clock_r()
 {
 	return BIT(~m_peer_lines, 0);
 }

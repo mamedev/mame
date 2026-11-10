@@ -14,10 +14,10 @@ public:
 	saltcrdi_link_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 	~saltcrdi_link_device();
 
-	void control_w(int state);
+	void clock_w(int state);
 	void data_w(int state);
 
-	int control_r();
+	int clock_r();
 	int data_r();
 
 protected:
