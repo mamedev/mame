@@ -8799,6 +8799,34 @@ ROM_START( witchgmeb )
 	ROM_LOAD( "82s137_epoxy.bin",   0x0100, 0x0400, CRC(4ae3ecf5) SHA1(e1e540ae13e7ce5ac6391f325160ec997ea6cc2f) ) // original epoxy block PROM
 ROM_END
 
+/*
+  Witch Game (Video Klein)
+  Video Klein original.
+
+  Program WG12T1FL
+
+*/
+ROM_START( witchgmec )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wg12t1fl",   0x0000, 0x8000, CRC(e051ba1f) SHA1(1b524c60fb44cfa644ba3bb8abea05b9cfcd4cbf) )  // epoxy block program ROM
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "1.2a",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_FILL(           0x0800, 0x0800, 0x0000 ) // filling the bitplane
+	ROM_LOAD( "2.4a",   0x1000, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_FILL(           0x1800, 0x0800, 0x0000 ) // filling the bitplane
+	ROM_LOAD( "3.5a",   0x2000, 0x1000, CRC(8a17d1a7) SHA1(488e4eae287b05923bd6b378574e91cfe49d8c24) )  // char ROM
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x2000, 0x0000 )    // filling the R-G bitplanes
+	ROM_COPY( "gfx2",   0x2800, 0x2000, 0x0800 )    // srctag, srcoffs, offset, length
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s137f.box",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+
+	ROM_REGION( 0x0100, "proms2", 0 )
+	ROM_LOAD( "tbp24s10n.2c",   0x0000, 0x0100, CRC(7c2aa098) SHA1(539ff9239b1b553b3883c9f0223aafcf217f9fc7) )
+ROM_END
 
 /*
   Joker Card (witch game)
@@ -16785,6 +16813,8 @@ GAME(  199?, witchcrdj, witchcrd, witchcdj, witchcrd, goldnpkr_state, init_icp1d
 GAMEL( 1991, witchgme,  0,        witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (WG12T1)",                        0,                   layout_goldnpkr )
 GAMEL( 1997, witchgmea, witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (WG12T1E)",                       MACHINE_NOT_WORKING, layout_goldnpkr )
 GAMEL( 1997, witchgmeb, witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (WG12T1F)",                       MACHINE_NOT_WORKING, layout_goldnpkr )
+GAMEL( 1997, witchgmec, witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (WG12T1FL)",                      MACHINE_NOT_WORKING, layout_goldnpkr )
+
 
 GAME(  199?, jokercar,  witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Joker Card (witch game)",                    0 )
 
