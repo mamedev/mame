@@ -19,6 +19,16 @@ Render bounds
 Wraps MAME’s ``render_bounds`` class, which represents a rectangle using
 floating-point coordinates.
 
+Render target coordinates are used for :ref:`layout item
+<luascript-ref-renderlayitem>` bounds and the pointer positions supplied to
+:ref:`layout view <luascript-ref-renderlayview>` pointer callbacks.  In render
+target coordinates, (0, 0) is the top left corner and (1, 1) is the bottom right
+corner of the visible area of the current view (when zoom to screen area is
+enabled, this is the area covered by the view’s screens, and other items may lie
+outside it), so the X and Y scales are not necessarily equal.  These are not the
+same as the view units used in layout files, or the output pixels used by
+:ref:`render targets <luascript-ref-rendertarget>`.
+
 Instantiation
 ~~~~~~~~~~~~~
 
@@ -1121,8 +1131,8 @@ view:set_pointer_updated_callback(cb)
       lifetime of a pointer).
     * The device ID for grouping pointers to recognise multi-touch gestures
       (non-negative integer).
-    * Horizontal position in layout coordinates.
-    * Vertical position in layout coordinates.
+    * Horizontal position in render target coordinates.
+    * Vertical position in render target coordinates.
     * A bit mask representing the currently pressed buttons.
     * A bit mask representing the buttons that were pressed in this update.
     * A bit mask representing the buttons that were released in this update.
@@ -1140,8 +1150,8 @@ view:set_pointer_left_callback(cb)
       receiving this notification.
     * The device ID for grouping pointers to recognise multi-touch gestures
       (non-negative integer).
-    * Horizontal position in layout coordinates.
-    * Vertical position in layout coordinates.
+    * Horizontal position in render target coordinates.
+    * Vertical position in render target coordinates.
     * A bit mask representing the buttons that were released in this update.
     * The click count (positive for multi-click actions, or negative if a click
       is turned into a hold or drag).
@@ -1157,8 +1167,8 @@ view:set_pointer_aborted_callback(cb)
       receiving this notification.
     * The device ID for grouping pointers to recognise multi-touch gestures
       (non-negative integer).
-    * Horizontal position in layout coordinates.
-    * Vertical position in layout coordinates.
+    * Horizontal position in render target coordinates.
+    * Vertical position in render target coordinates.
     * A bit mask representing the buttons that were released in this update.
     * The click count (positive for multi-click actions, or negative if a click
       is turned into a hold or drag).
