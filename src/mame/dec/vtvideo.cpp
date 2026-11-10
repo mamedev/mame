@@ -147,7 +147,7 @@ void vt100_video_device::device_reset()
 	m_last_scroll = 0;
 
 	m_blink_flip_flop = 0;
-	m_reverse_field = 1; // off: the DC012's power-up state isn't documented; dark until the firmware sets it
+	m_reverse_field = 1; // off; the DC012's power-up state isn't documented
 	m_basic_attribute = 0;
 
 	m_columns = 80;
@@ -178,7 +178,7 @@ void rainbow_video_device::device_reset()
 	m_last_scroll = 0;
 
 	m_blink_flip_flop = 0;
-	m_reverse_field = 1; // off: the DC012's power-up state isn't documented; dark until the firmware sets it
+	m_reverse_field = 1; // off; the DC012's power-up state isn't documented
 	m_basic_attribute = 0;
 
 	m_columns = 80;
@@ -296,13 +296,13 @@ void vt100_video_device::dc012_w(offs_t offset, uint8_t data)
 		case 0x0c:
 			// set basic attribute to underline / blink flip-flop off
 			m_blink_flip_flop = 0;
-			m_basic_attribute = 0; // (VT-100 without AVO): reverse video is interpreted as underline (basic_attribute 0)
+			m_basic_attribute = 0; // base attribute (character bit 7) shown as underline
 			break;
 
 		case 0x0d:
 			// (DEC Rainbow 100 DEFAULT) : reverse video with 24 lines / blink flip-flop off
 			m_blink_flip_flop = 0;
-			m_basic_attribute = 1; // (VT-100 without AVO): reverse video is interpreted as reverse (basic_attribute 1)
+			m_basic_attribute = 1; // base attribute (character bit 7) shown as reverse video
 
 			if (m_height_MAX == 25) break; //  Abort on VT-100 for now.
 
@@ -476,7 +476,7 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 	// VT100 technical manual (EK-VT100-TM-003) table 4-6-4: reverse =
 	// reverse field XOR reverse video.  The base attribute (character bit 7)
 	// is reverse video or underline as the basic attribute flip-flop selects
-	// (4.6.3.8).  m_reverse_field is 0 when reverse field is on.
+	// (4.6.3.8).
 	bool const reverse_field = !m_reverse_field;
 	bool const reverse_video = m_basic_attribute && invert;
 	bool const underlined = underline || (!m_basic_attribute && invert);
@@ -797,7 +797,7 @@ void rainbow_video_device::video_blanking(bitmap_ind16 &bitmap, const rectangle 
 {
 	// 'In reverse screen mode, termination forces the beam to the screen background intensity'
 	// Background intensity means 'dim' (1) according to one source.
-	bitmap.fill(!m_reverse_field ? 1 : 0, cliprect); // m_reverse_field is 0 when reverse field is on
+	bitmap.fill(!m_reverse_field ? 1 : 0, cliprect);
 }
 
 #define MHFU_IS_ENABLED 1
