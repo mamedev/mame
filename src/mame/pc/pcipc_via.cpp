@@ -46,8 +46,10 @@
 #include "machine/vt82c586b_usb.h"
 #include "machine/vt82c598mvp.h"
 #include "machine/w83877tf.h"
+#include "sound/cdda.h"
 
 #include "softlist_dev.h"
+#include "speaker.h"
 
 namespace {
 
@@ -210,6 +212,13 @@ void mvp3_state::vp(machine_config &config)
 	x86_softlists(config);
 }
 
+// TODO: this needs to be routed as user option, and chained to sound card for audio mixing
+static void cdrom_config(device_t *device)
+{
+	device->subdevice<cdda_device>("cdda")->add_route(0, ":headphone", 0.25, 0);
+	device->subdevice<cdda_device>("cdda")->add_route(1, ":headphone", 0.25, 1);
+}
+
 void mvp3_state::mvp3(machine_config &config)
 {
 	// Socket 7 / PGA321
@@ -238,6 +247,9 @@ void mvp3_state::mvp3(machine_config &config)
 	vt82c586b_ide_device &ide(VT82C586B_IDE(config, "pci:07.1", 0, "maincpu"));
 	ide.irq_pri().set("pci:07.0", FUNC(vt82c586b_isa_device::pc_ide0_w));
 	ide.irq_sec().set("pci:07.0", FUNC(vt82c586b_isa_device::pc_ide1_w));
+
+	SPEAKER(config, "headphone", 2).front();
+	ide.subdevice<bus_master_ide_controller_device>("ide2")->slot(0).set_option_machine_config("cdrom", cdrom_config);
 
 	VT82C586B_USB (config, "pci:07.2", 0);
 
