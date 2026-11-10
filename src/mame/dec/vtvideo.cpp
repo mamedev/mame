@@ -472,8 +472,13 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 	// * SCREEN ATTRIBUTES (see VT-180 manual 6-30) *
 	// 'reverse field' = reverse video over entire screen
 
-	// Truth table: TABLE 4-6-4 / VT100 technical manual.
-	invert = invert ^ m_reverse_field ^ m_basic_attribute;
+	// VT100 technical manual (EK-VT100-TM-003) table 4-6-4: reverse =
+	// reverse field XOR reverse video.  The base attribute (character bit 7)
+	// is reverse video or underline as the basic attribute flip-flop selects
+	// (4.6.3.8).  m_reverse_field is 0 when reverse field is on.
+	if (!m_basic_attribute && invert)
+		underline = true;
+	invert = (m_basic_attribute && invert) ^ !m_reverse_field;
 
 	// intensities: 0 off, 1 dim, 2 normal, 3 bright
 	// reverse: black character on dim (normal when bold) background
@@ -548,7 +553,7 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 		{
 			if (blank)
 			{
-				bit = m_reverse_field ^ m_basic_attribute;
+				bit = !m_reverse_field;
 			}
 			else
 			{
@@ -790,7 +795,7 @@ void rainbow_video_device::video_blanking(bitmap_ind16 &bitmap, const rectangle 
 {
 	// 'In reverse screen mode, termination forces the beam to the screen background intensity'
 	// Background intensity means 'dim' (1) according to one source.
-	bitmap.fill(((m_reverse_field ^ m_basic_attribute) ? 1 : 0), cliprect);
+	bitmap.fill(m_reverse_field ? 0 : 1, cliprect);
 }
 
 #define MHFU_IS_ENABLED 1
