@@ -187,7 +187,8 @@ bool dp8390_device::address_match(uint8_t const *buf) const {
 		// multicast
 		if (!(m_regs.rcr & 8))
 			return false;
-		uint32_t const crc = util::crc32_creator::simple(buf, 6) >> 26;
+		// The MAR index is the top six bits of the uncomplemented MSB-first CRC.
+		uint32_t const crc = bitswap<6>(~uint32_t(util::crc32_creator::simple(buf, 6)), 0, 1, 2, 3, 4, 5);
 		return BIT(m_regs.mar[crc >> 3], crc & 7);
 	}
 	// promiscuous or physical
