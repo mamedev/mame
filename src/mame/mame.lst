@@ -35173,6 +35173,9 @@ explorapro
 @source:ncr/dmv.cpp
 dmv
 
+@source:ncr/ncr9010.cpp
+ncr9010
+
 @source:nec/apc.cpp
 apc
 
