@@ -266,23 +266,27 @@ class nes_clone_9in1_state : public nes_clone_state
 public:
 	nes_clone_9in1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_clone_state(mconfig, type, tag),
-		m_gfxrom(*this, "gfx1")
+		m_chrbank(*this, "chrbank"),
+		m_prgbank(*this, "prgbank%u", 0)
 	{ }
 
 	void nes_clone_9in1(machine_config &config) ATTR_COLD;
 
 private:
 	void nes_clone_9in1_map(address_map &map) ATTR_COLD;
+	void nes_ppu_map(address_map &map);
+
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	uint8_t rom_r(offs_t offset);
-	uint8_t vrom_r(offs_t offset);
+
+	void update_banks();
 	void bank_6000_w(uint8_t data);
 	void bank_6004_w(uint8_t data);
 	uint8_t m_6000;
 	uint8_t m_6004;
 
-	required_region_ptr<uint8_t> m_gfxrom;
+	required_memory_bank m_chrbank;
+	required_memory_bank_array<2> m_prgbank;
 };
 
 
@@ -1681,15 +1685,20 @@ void nes_clone_rumblstn_state::bank_8000_w(uint8_t data)
 void nes_clone_9in1_state::machine_reset()
 {
 	nes_clone_state::machine_reset();
-	m_6000 = 0;
-	m_6004 = 0;
+	// don't change banks on reset, the program handles this
 }
 
 void nes_clone_9in1_state::machine_start()
 {
 	nes_clone_state::machine_start();
 
-	m_ppu->space(AS_PROGRAM).install_read_handler(0x0000, 0x1fff, read8sm_delegate(*this, FUNC(nes_clone_9in1_state::vrom_r)));
+	m_chrbank->configure_entries(0, 8, memregion("gfx1")->base(), 0x2000);
+	m_prgbank[0]->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
+	m_prgbank[1]->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
+
+	m_6000 = 0;
+	m_6004 = 0;
+	update_banks();
 
 	save_item(NAME(m_6000));
 	save_item(NAME(m_6004));
@@ -1699,6 +1708,16 @@ void nes_clone_9in1_state::nes_clone_9in1(machine_config &config)
 {
 	nes_clone(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_9in1_state::nes_clone_9in1_map);
+
+	m_ppu->set_addrmap(AS_PROGRAM, &nes_clone_9in1_state::nes_ppu_map);
+}
+
+void nes_clone_9in1_state::nes_ppu_map(address_map &map)
+{
+	map(0x0000, 0x1fff).bankr(m_chrbank);
+	map(0x2000, 0x23ff).mirror(0x0800).ram();
+	map(0x2400, 0x27ff).mirror(0x0800).ram();
+	map(0x3f00, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
 }
 
 void nes_clone_9in1_state::nes_clone_9in1_map(address_map &map)
@@ -1706,27 +1725,43 @@ void nes_clone_9in1_state::nes_clone_9in1_map(address_map &map)
 	nes_clone_basemap(map);
 	map(0x6000, 0x6000).w(FUNC(nes_clone_9in1_state::bank_6000_w));
 	map(0x6004, 0x6004).w(FUNC(nes_clone_9in1_state::bank_6004_w));
-	map(0x8000, 0xffff).r(FUNC(nes_clone_9in1_state::rom_r));
+	map(0x8000, 0xbfff).bankr(m_prgbank[0]);
+	map(0xc000, 0xffff).bankr(m_prgbank[1]);
 }
 
-uint8_t nes_clone_9in1_state::vrom_r(offs_t offset)
+void nes_clone_9in1_state::update_banks()
 {
-	return m_gfxrom[offset];
-}
+	u8 chrbank = (m_6000 & 0x70) >> 4;
+	m_chrbank->set_entry(chrbank);
 
-uint8_t nes_clone_9in1_state::rom_r(offs_t offset)
-{
-	return m_mainrom[offset];
+	u8 prgbank = (m_6004 & 0x18) >> 3;
+	prgbank ^= 3;
+
+	if (m_6004 & 0x40)
+	{
+		// 32k mode
+		m_prgbank[0]->set_entry(prgbank << 1);
+		m_prgbank[1]->set_entry((prgbank << 1)+1);
+	}
+	else
+	{
+		// 16k mode
+		u8 lowbit = (m_6004 & 0x20) >> 5;
+		m_prgbank[0]->set_entry((prgbank << 1) | lowbit);
+		m_prgbank[1]->set_entry((prgbank << 1) | lowbit);
+	}
 }
 
 void nes_clone_9in1_state::bank_6000_w(uint8_t data)
 {
 	m_6000 = data;
+	update_banks();
 }
 
 void nes_clone_9in1_state::bank_6004_w(uint8_t data)
 {
 	m_6004 = data;
+	update_banks();
 }
 
 
@@ -1835,7 +1870,11 @@ void nes_clone_2pathlet_state::nes_ppu_map(address_map &map)
 
 uint8_t nes_clone_2pathlet_state::menu_6000_r()
 {
-	return 0xff;
+	// returning 0x01 here gives a 4-in-1 menu with
+	// Olympic, Soccer, Bomb Jack (Mighty Bomb Jack) and Tetris (Tetris 2)
+	// however this was not exposed on the unit, and the controller lacks inputs
+	// needed for the non-Olmypic titles.
+	return 0x00;
 }
 
 void nes_clone_2pathlet_state::bank_8000_w(uint8_t data)
