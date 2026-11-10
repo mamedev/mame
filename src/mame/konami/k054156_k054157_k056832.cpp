@@ -1661,12 +1661,15 @@ void k056832_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, c
 }
 
 // Split each layer's pens between tilemap layers 0 and 1 (Konami GX's K055555 COLPRI)
-void k056832_device::set_pen_split(const int *threshold, const u8 *penmask)
+u8 k056832_device::set_pen_split(const int (&threshold)[4], const u8 (&penmask)[4])
 {
+	u8 split_layers = 0;
 	for (int i = 0; i < K056832_PAGE_COUNT; i++)
 	{
 		const int layer = m_layer_association ? m_layer_assoc_with_page[i] : -1;
 		const s32 split = (layer >= 0 && threshold[layer] >= 0) ? ((penmask[layer] << 8) | threshold[layer]) : -1;
+		if (split >= 0)
+			split_layers |= 1 << layer;
 		if (split == m_page_pen_split[i])
 			continue;
 		m_page_pen_split[i] = split;
@@ -1676,6 +1679,7 @@ void k056832_device::set_pen_split(const int *threshold, const u8 *penmask)
 			m_tilemap[i]->map_pen_to_layer(0, pen, back ? TILEMAP_PIXEL_LAYER1 : TILEMAP_PIXEL_LAYER0);
 		}
 	}
+	return split_layers;
 }
 
 void k056832_device::tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, u32 flags, u32 priority, u8 priority_mask)

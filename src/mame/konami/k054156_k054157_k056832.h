@@ -94,7 +94,7 @@ public:
 	void set_layer_association(int status);
 	int get_layer_association() { return m_layer_association; }
 	void set_layer_offs(int layer, s32 offsx, s32 offsy);
-	void set_pen_split(const int *threshold, const u8 *penmask);
+	u8 set_pen_split(const int (&threshold)[4], const u8 (&penmask)[4]);
 	void set_lsram_page(int logical_page, s32 physical_page, s32 physical_offset);
 	int is_irq_enabled(int irqline);
 	void read_avac(int &mode, int &data);
