@@ -137,6 +137,7 @@ Medium size chip with heat sink on it
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
 #include "machine/gt64xxx.h"
+#include "machine/nvram.h"
 #include "machine/pci.h"
 #include "sound/dac.h"
 #include "video/voodoo_pci.h"
@@ -258,6 +259,8 @@ private:
 
 void magictg_state::machine_start()
 {
+	subdevice<nvram_device>("sram")->set_base(m_sram, 0x3000);
+
 	save_item(NAME(m_track_last));
 	save_item(NAME(m_sram));
 	save_item(NAME(m_cpld_irq_status));
@@ -607,6 +610,8 @@ void magictg_state::magictg(machine_config &config)
 	m_adsp->sport_dt<0>().set(m_dac[0], FUNC(dac_16bit_r2r_twos_complement_device::write));
 	m_adsp->sport_dt<1>().set(m_dac[1], FUNC(dac_16bit_r2r_twos_complement_device::write));
 
+	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_1);
+
 	SPEAKER(config, "speaker", 2).front();
 
 	// AD1866R dual DAC; SPORT1 is clocked and framed by SPORT0
@@ -659,6 +664,9 @@ ROM_START( magictg )
 
 	ROM_REGION( 0x400000, "pci:09.0:key", 0 )
 	ROM_LOAD( "magic.k0.u20", 0x000000, 0x400000, CRC(63ab0e9e) SHA1(c4f0b009860ee499496ed7fc1f14ef1e221c1085) )
+
+	ROM_REGION( 0x3000, "sram", 0 )
+	ROM_LOAD( "sram", 0x0000, 0x3000, CRC(42059d39) SHA1(c5561d6def1c5712530ecc2f301ce363e6bb70cd) )
 ROM_END
 
 ROM_START( magictga )
