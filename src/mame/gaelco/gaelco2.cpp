@@ -460,8 +460,8 @@ static INPUT_PORTS_START( saltcrdi ) // dipswitches are on the REVERSE side of t
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN ) // DATAIN, serial link to I/O board (brake level)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN ) // CLOCKIN, serial link to I/O board (brake level)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN ) // DATAIN2, serial link for linked play
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // CLOCKIN2, serial link for linked play
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("link", FUNC(saltcrdi_link_device::data_r)) // DATAIN2
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("link", FUNC(saltcrdi_link_device::clock_r)) // CLOCKIN2
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) // pedal (SEN-VEL)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) // green (PUL-NEGRO in schematics)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) // red (PUL-ROJO)
@@ -512,9 +512,14 @@ void saltcrdi_state::saltcrdi(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(saltcrdi_state::irq6_line_hold));
 
 	LS259(config, m_mainlatch); // U1
-	// Q0-Q3: DATAOUT, CLOCKOUT, DATAOUT2 and CLOCKOUT2 through an inverting driver (serial links, not emulated)
+	// Q0-Q3 go through an inverting driver
+	// Q0-Q1: DATAOUT and CLOCKOUT, serial link to I/O board (brake level), not emulated
+	m_mainlatch->q_out_cb<2>().set(m_link, FUNC(saltcrdi_link_device::data_w)); // DATAOUT2
+	m_mainlatch->q_out_cb<3>().set(m_link, FUNC(saltcrdi_link_device::clock_w)); // CLOCKOUT2
 	// Q4-Q6: not connected
 	m_mainlatch->q_out_cb<7>().set(FUNC(saltcrdi_state::heart_rate_irq_clear_w)); // /RESINT
+
+	SALTCRDI_LINK(config, m_link);
 
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
@@ -3384,10 +3389,10 @@ GAME( 1999, jungleani,   0,         srollnd,          play2000, gaelco2_state,  
    Pro Reclimber Tele Cardioline has the same PCB and ROMs as Pro Cycle Tele Cardioline.
    There are other devices in Cardioline series but they don't use displays and aren't on Gaelco hardware. */
 
-GAME( 2000, sltpcycl,   0,          saltcrdi,         saltcrdi, saltcrdi_state,     init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 02AB)",      MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN ) // 18/Jan/2000
-GAME( 1999, sltpcycla,  sltpcycl,   saltcrdi,         saltcrdi, saltcrdi_state,     init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum DECA)",      MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN ) // 20/Nov/1999
-GAME( 1997, sltpcyclb,  sltpcycl,   saltcrdi,         saltcrdi, saltcrdi_state,     init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 3523)",      MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN ) // 07/Apr/1997
-GAME( 199?, sltpcyclc,  sltpcycl,   saltcrdi,         saltcrdi, saltcrdi_state,     init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, unknown version)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN ) // missing GFX ROMs
+GAME( 2000, sltpcycl,   0,          saltcrdi,         saltcrdi, saltcrdi_state,     init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 02AB)",      MACHINE_NO_SOUND_HW ) // 18/Jan/2000
+GAME( 1999, sltpcycla,  sltpcycl,   saltcrdi,         saltcrdi, saltcrdi_state,     init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum DECA)",      MACHINE_NO_SOUND_HW ) // 20/Nov/1999
+GAME( 1997, sltpcyclb,  sltpcycl,   saltcrdi,         saltcrdi, saltcrdi_state,     init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 3523)",      MACHINE_NO_SOUND_HW ) // 07/Apr/1997
+GAME( 199?, sltpcyclc,  sltpcycl,   saltcrdi,         saltcrdi, saltcrdi_state,     init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, unknown version)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW ) // missing GFX ROMs
 
-GAME( 1998, sltpstep,   0,          saltcrdi,         saltcrdi, saltcrdi_state,     init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, V.1.0, checksum 2B83)", MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN ) // 23/Jan/1998
-GAME( 1997, sltpstepa,  sltpstep,   saltcrdi,         saltcrdi, saltcrdi_state,     init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, V.1.0, checksum F208)", MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN ) // 07/Apr/1997
+GAME( 1998, sltpstep,   0,          saltcrdi,         saltcrdi, saltcrdi_state,     init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, V.1.0, checksum 2B83)", MACHINE_NO_SOUND_HW ) // 23/Jan/1998
+GAME( 1997, sltpstepa,  sltpstep,   saltcrdi,         saltcrdi, saltcrdi_state,     init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, V.1.0, checksum F208)", MACHINE_NO_SOUND_HW ) // 07/Apr/1997

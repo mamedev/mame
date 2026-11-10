@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "saltcrdi_link.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/74259.h"
 #include "machine/eepromser.h"
@@ -178,12 +180,13 @@ private:
 	bool m_clr_gun_int = false;
 };
 
-// with heart rate sensor
+// with heart rate sensor and link
 class saltcrdi_state : public gaelco2_state
 {
 public:
 	saltcrdi_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gaelco2_state(mconfig, type, tag)
+		gaelco2_state(mconfig, type, tag),
+		m_link(*this, "link")
 	{ }
 
 	void saltcrdi(machine_config &config) ATTR_COLD;
@@ -191,6 +194,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(heart_rate_pulse);
 
 private:
+	required_device<saltcrdi_link_device> m_link;
+
 	void heart_rate_irq_clear_w(int state);
 
 	void saltcrdi_map(address_map &map) ATTR_COLD;
