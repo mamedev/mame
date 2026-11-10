@@ -734,8 +734,10 @@ void hp_lj3p_device::save_page()
 	// each page goes to a PNG file in the snapshot directory (300 dpi)
 	emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	std::error_condition const filerr = machine().video().open_next(file, "png");
-	if (!filerr)
-		util::png_write_bitmap(file, nullptr, m_page, 0, nullptr);
+	if (filerr)
+		return;
+	util::png_write_bitmap(file, nullptr, m_page, 0, nullptr);
+	machine().popmessage("printer page saved as %s", file.filename());
 }
 
 u32 hp_lj3p_device::paper_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
