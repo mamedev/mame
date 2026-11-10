@@ -227,7 +227,6 @@ void dp8390_device::recv(uint8_t *buf, int len) {
 	m_regs.isr |= 1;
 	m_regs.curr = (offset >> 8) + ((offset & 0xff)?1:0);
 	if(m_regs.curr == m_regs.pstop) m_regs.curr = m_regs.pstart;
-	len += 4;
 	m_mem_write_cb((offs_t)start, m_regs.rsr);
 	m_mem_write_cb((offs_t)start+1, m_regs.curr);
 	m_mem_write_cb((offs_t)start+2, len & 0xff);
