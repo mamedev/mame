@@ -640,9 +640,37 @@ void coco12_state::coco(machine_config &config)
 	COCO_VHD(config, m_vhd_1, m_maincpu);
 }
 
-void coco12_state::cocoh(machine_config &config)
+// On the discrete CoCo 1 circuit, PB1 drives the sound common through
+// R22 (10 kohm). With cassette sound selected, the MC14529 conducts back
+// into CIN and switches the inverting cassette comparator. SALT isolates
+// these signals on the CoCo 2/3. Model the logic levels here; the resistor
+// network's loading of an external cassette signal is not simulated.
+uint8_t coco12_state::coco1_pia1_pa_r()
+{
+	if (m_mux->channel_connected(mc14529_device::SEL_Y, 1))
+		return 0xfe | !BIT(m_pia_1->b_output(), 1);
+
+	return pia1_pa_r();
+}
+
+void coco12_state::coco1(machine_config &config)
 {
 	coco(config);
+	m_pia_1->readpa_handler().set(FUNC(coco12_state::coco1_pia1_pa_r));
+}
+
+void coco12_state::coco2(machine_config &config)
+{
+	coco(config);
+	m_ram->set_default_size("64K").set_extra_options("16K");
+
+	// The CoCo 1's extra DA0 transitions offset DMA-mode video on the CoCo 2.
+	m_vdg->set_field_sync_extra_transitions(false);
+}
+
+void coco12_state::cocoh(machine_config &config)
+{
+	coco1(config);
 
 	HD6309E(config.replace(), m_maincpu, DERIVED_CLOCK(1, 1));
 	m_maincpu->set_addrmap(AS_PROGRAM, &coco12_state::coco_mem);
@@ -685,6 +713,7 @@ void deluxecoco_state::deluxecoco(machine_config &config)
 void coco12_state::coco2b(machine_config &config)
 {
 	coco(config);
+	m_ram->set_default_size("64K").set_extra_options("16K");
 
 	MC6847T1(config.replace(), m_vdg, XTAL(14'318'181) / 4);
 	m_vdg->set_field_sync_extra_transitions(false);
@@ -771,6 +800,9 @@ ROM_START(deluxecoco)
 	ROM_LOAD("adv073-2_u24.rom", 0x6000, 0x2000, CRC(61411227) SHA1(c3aba0eb359f7f40d40d7947f72c9ecae6e0525d))
 ROM_END
 
+// The original CoCo 2 supports the same BASIC ROM revisions as the CoCo 1.
+#define rom_coco2 rom_coco
+
 ROM_START(coco2b)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
 	ROM_LOAD("bas13.rom",    0x2000, 0x2000, CRC(d8f4d15e) SHA1(28b92bebe35fa4f026a084416d6ea3b1552b63d3))
@@ -831,8 +863,9 @@ ROM_END
 //**************************************************************************
 
 //    YEAR   NAME        PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                         FULLNAME                               FLAGS
-COMP( 1980,  coco,       0,      0,      coco,       coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 1/2",                  MACHINE_SUPPORTS_SAVE )
-COMP( 19??,  cocoh,      coco,   0,      cocoh,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 1/2 (HD6309)",         MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
+COMP( 1980,  coco,       0,      0,      coco1,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 1",                    MACHINE_SUPPORTS_SAVE )
+COMP( 19??,  cocoh,      coco,   0,      cocoh,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 1 (HD6309)",           MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
+COMP( 1983,  coco2,      coco,   0,      coco2,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2",                    MACHINE_SUPPORTS_SAVE )
 COMP( 1983,  deluxecoco, coco,   0,      deluxecoco, deluxecoco, deluxecoco_state, empty_init, "Tandy Radio Shack",            "Deluxe Color Computer",               MACHINE_SUPPORTS_SAVE )
 COMP( 1985?, coco2b,     coco,   0,      coco2b,     coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2B",                   MACHINE_SUPPORTS_SAVE )
 COMP( 19??,  coco2bh,    coco,   0,      coco2bh,    coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2B (HD6309)",          MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
