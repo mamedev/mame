@@ -1095,7 +1095,7 @@ void debug_imgui::refresh_filelist()
 
 void debug_imgui::refresh_typelist()
 {
-	auto *fd = static_cast<floppy_image_device *>(m_dialog_image);
+	auto *fd = dynamic_cast<floppy_image_device *>(m_dialog_image);
 
 	m_typelist.clear();
 	if(m_dialog_image->formatlist().empty())
