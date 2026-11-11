@@ -2060,17 +2060,6 @@ void avr8_base_device::fire_interrupts()
 	int vector = (pending_vector_array_slot * 32) + pending_vector_bit_slot;
 
 	uint8_t intidx = m_vector_to_intidx_lut[vector];
-
-	if (intidx == 0)
-	{
-		for (int i = 0; i < 256; i++)
-		{
-			printf("vector %d -> %d\n", i, m_vector_to_intidx_lut[i]);
-		}
-
-		fatalerror("?!?!?! vector %d -> intidx 0!!!\n", vector);
-	}
-	
 	if (!(0 <= intidx && intidx < INTIDX_COUNT))
 	{
 		fatalerror("interrupt vector %d set to fire, but no interrupt condition was mapped to it", vector);
