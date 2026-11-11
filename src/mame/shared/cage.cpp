@@ -602,6 +602,9 @@ void atari_cage_device::control_w(uint16_t data)
 	if (!(m_control & 3))
 	{
 		m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		// Reset discards the pending host command as well as its interrupt.
+		// Leaving IRQ0 asserted makes the boot loader select RAM instead of ROM.
+		m_cpu->set_input_line(TMS320C3X_IRQ0, CLEAR_LINE);
 		m_cpu->set_input_line(TMS320C3X_IRQ1, ASSERT_LINE);
 
 		m_dma_enabled = 0;
