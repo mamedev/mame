@@ -118,17 +118,17 @@ uint8_t nsc810_device::read(offs_t offset)
 		switch (offset & 0x1f)
 		{
 		case REG_PORTA:
-			res = m_portA_latch &= m_ddrA;
+			res = m_portA_latch & m_ddrA;
 			res |= (m_portA_r() & ~m_ddrA);
 			//LOG("NSC810: Port A data read %02x\n", res);
 			break;
 		case REG_PORTB:
-			res = m_portB_latch &= m_ddrB;
+			res = m_portB_latch & m_ddrB;
 			res |= (m_portB_r() & ~m_ddrB);
 			//LOG("NSC810: Port B data read %02x\n", res);
 			break;
 		case REG_PORTC:
-			res = m_portC_latch &= m_ddrC;
+			res = m_portC_latch & m_ddrC;
 			res |= (m_portC_r() & ~m_ddrC);
 			//LOG("NSC810: Port C data read %02x\n", res);
 			break;
@@ -191,17 +191,17 @@ void nsc810_device::write(offs_t offset, uint8_t data)
 		switch (offset & 0x1f)
 		{
 		case REG_PORTA:
-			m_portA_latch = data & ~m_ddrA;
+			m_portA_latch = data;
 			m_portA_w((0xff & ~m_ddrA) | (data & m_ddrA));
 			LOG("NSC810: Port A data write %02x\n", data);
 			break;
 		case REG_PORTB:
-			m_portB_latch = data & ~m_ddrB;
+			m_portB_latch = data;
 			m_portB_w((0xff & ~m_ddrB) | (data & m_ddrB));
 			LOG("NSC810: Port B data write %02x\n", data);
 			break;
 		case REG_PORTC:
-			m_portC_latch = data & ~m_ddrC;
+			m_portC_latch = data;
 			m_portC_w((0xff & ~m_ddrC) | (data & m_ddrC));
 			LOG("NSC810: Port C data write %02x\n", data);
 			break;
