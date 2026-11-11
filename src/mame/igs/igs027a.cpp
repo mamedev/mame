@@ -60,6 +60,7 @@ void igs027a_cpu_device::device_start()
 	save_item(NAME(m_fiq_enable));
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_pending));
+	save_item(NAME(m_irq_status));
 }
 
 void igs027a_cpu_device::device_reset()
@@ -71,6 +72,7 @@ void igs027a_cpu_device::device_reset()
 	m_fiq_enable = 0x01; // superkds and fearless never write to 0x4000'0014 but expect FIQ to be triggered
 	m_irq_enable = 0xff;
 	m_irq_pending = 0xff;
+	m_irq_status = 0xff;
 
 	set_irq(0);
 }
@@ -152,9 +154,11 @@ void igs027a_cpu_device::timer_rate_w(offs_t offset, u8 data)
 
 u8 igs027a_cpu_device::irq_pending_r()
 {
-	u8 const result = m_irq_pending;
+	// TODO: verify acknowledgement semantics, including the write to 0x7000'0108 on extradrw
+	u8 const result = (m_irq_pending != 0xff) ? m_irq_pending : m_irq_status;
 	if (!machine().side_effects_disabled())
 	{
+		m_irq_status = result;
 		m_irq_pending = 0xff;
 		set_irq(0);
 	}
