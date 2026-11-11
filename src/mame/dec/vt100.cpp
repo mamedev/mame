@@ -486,9 +486,9 @@ void vt100_state::vt101(machine_config &config)
 	vt100(config);
 
 	// The VT101/VT102 board (MP-01066 sheet 1) ties GRAPHICS FLAG L and
-	// EVEN FIELD L high.  ADVANCED VIDEO L is pulled up by R8; jumper W5
-	// grounds it on the VT102 and VT131, whose AVO is built onto the board.
-	// The VT101 leaves W5 out, so it reports no AVO.
+	// EVEN FIELD L high.  The VT102 and VT131 always have the AVO built onto
+	// the board, and jumper W5 grounds ADVANCED VIDEO L to report it.  The
+	// VT101 has no AVO and leaves W5 out, so R8 pulls the line high.
 	m_options = 0;
 	m_even_field_high = true;
 
@@ -511,7 +511,7 @@ void vt100_state::vt102(machine_config &config)
 {
 	vt101(config);
 
-	m_options |= OPT_AVO; // W5 fitted: AVO built onto the board
+	m_options |= OPT_AVO; // always built in; W5 fitted
 
 	m_maincpu->set_addrmap(AS_IO, &vt100_state::vt102_io);
 
