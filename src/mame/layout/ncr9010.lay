@@ -6,31 +6,20 @@ copyright-holders:rfka01
 NCR 9010: screen with the front panel to its right (flex drive status,
 MONIT key, COMM and POWER lamps), optionally the CCM indicator board
 that plugs onto the Common Control Module inside the cabinet.
+
+Elements are white or grey and get their colour from the instance.
 -->
 <mamelayout version="2">
 
-	<!-- housing and panel -->
-	<element name="bezel"><rect><color red="0.80" green="0.79" blue="0.74" /></rect></element>
-	<element name="panel"><rect><color red="0.09" green="0.09" blue="0.09" /></rect></element>
-	<element name="subpanel"><rect><color red="0.14" green="0.14" blue="0.14" /></rect></element>
-	<element name="slot"><rect><color red="0.04" green="0.04" blue="0.04" /></rect></element>
-	<element name="logo">
-		<rect><color red="0.55" green="0.55" blue="0.55" /></rect>
-		<text string="NCR"><color red="0.15" green="0.15" blue="0.15" /></text>
+	<!-- plain shapes, coloured per instance -->
+	<element name="rect"><rect><color red="1.0" green="1.0" blue="1.0" /></rect></element>
+	<element name="lamp" defstate="0">
+		<disk state="0"><color red="0.22" green="0.22" blue="0.22" /></disk>
+		<disk state="1"><color red="1.0" green="1.0" blue="1.0" /></disk>
 	</element>
-
-	<!-- lamps -->
-	<element name="led_green" defstate="0">
-		<disk state="0"><color red="0.05" green="0.18" blue="0.05" /></disk>
-		<disk state="1"><color red="0.25" green="1.00" blue="0.25" /></disk>
-	</element>
-	<element name="led_red" defstate="0">
-		<disk state="0"><color red="0.22" green="0.04" blue="0.04" /></disk>
-		<disk state="1"><color red="1.00" green="0.15" blue="0.10" /></disk>
-	</element>
-	<element name="led_bar" defstate="0">
-		<rect state="0"><color red="0.28" green="0.05" blue="0.05" /></rect>
-		<rect state="1"><color red="1.00" green="0.12" blue="0.08" /></rect>
+	<element name="lamp_bar" defstate="0">
+		<rect state="0"><color red="0.28" green="0.28" blue="0.28" /></rect>
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
 	</element>
 
 	<!-- MONIT key (clickable) and the power rocker (decoration) -->
@@ -44,101 +33,96 @@ that plugs onto the Common Control Module inside the cabinet.
 		<rect><bounds x="0.08" y="0.12" width="0.84" height="0.76" /><color red="0.05" green="0.05" blue="0.05" /></rect>
 	</element>
 
-	<!-- panel lettering -->
-	<element name="t_status"><text string="FLEX DRIVE STATUS"><color red="0.85" green="0.85" blue="0.85" /></text></element>
-	<element name="t_ready"><text string="READY" align="1"><color red="0.85" green="0.85" blue="0.85" /></text></element>
-	<element name="t_busy"><text string="BUSY" align="1"><color red="0.85" green="0.85" blue="0.85" /></text></element>
-	<element name="t_monit"><text string="MONIT"><color red="0.85" green="0.85" blue="0.85" /></text></element>
-	<element name="t_comm"><text string="COMM"><color red="0.85" green="0.85" blue="0.85" /></text></element>
-	<element name="t_power"><text string="POWER"><color red="0.85" green="0.85" blue="0.85" /></text></element>
-	<element name="t_on"><text string="1"><color red="0.85" green="0.85" blue="0.85" /></text></element>
-	<element name="t_off"><text string="0"><color red="0.85" green="0.85" blue="0.85" /></text></element>
-	<element name="t_bright"><text string="&#x2013;  BRIGHTNESS  +"><color red="0.85" green="0.85" blue="0.85" /></text></element>
-	<element name="t_0"><text string="0"><color red="0.85" green="0.85" blue="0.85" /></text></element>
-	<element name="t_1"><text string="1"><color red="0.85" green="0.85" blue="0.85" /></text></element>
-	<element name="t_2"><text string="2"><color red="0.85" green="0.85" blue="0.85" /></text></element>
-	<element name="t_3"><text string="3"><color red="0.85" green="0.85" blue="0.85" /></text></element>
-
-	<!-- CCM indicator board (ASSY 348-0001499) -->
-	<element name="ccm_pcb"><rect><color red="0.74" green="0.66" blue="0.42" /></rect></element>
-	<element name="ccm_title"><text string="CCM INDICATOR  348-0001499" align="1"><color red="0.30" green="0.22" blue="0.08" /></text></element>
-	<element name="t_run"><text string="RUN"><color red="0.30" green="0.22" blue="0.08" /></text></element>
-	<element name="t_17"><text string="17"><color red="0.30" green="0.22" blue="0.08" /></text></element>
-	<element name="t_16"><text string="16"><color red="0.30" green="0.22" blue="0.08" /></text></element>
-	<element name="t_15"><text string="15"><color red="0.30" green="0.22" blue="0.08" /></text></element>
-	<element name="t_14"><text string="14"><color red="0.30" green="0.22" blue="0.08" /></text></element>
-	<element name="t_13"><text string="13"><color red="0.30" green="0.22" blue="0.08" /></text></element>
-	<element name="t_12"><text string="12"><color red="0.30" green="0.22" blue="0.08" /></text></element>
-	<element name="t_11"><text string="11"><color red="0.30" green="0.22" blue="0.08" /></text></element>
-	<element name="t_10"><text string="10"><color red="0.30" green="0.22" blue="0.08" /></text></element>
+	<!-- lettering, white -->
+	<element name="t_n"><text string="N" /></element>
+	<element name="t_c"><text string="C" /></element>
+	<element name="t_r"><text string="R" /></element>
+	<element name="t_status"><text string="FLEX DRIVE STATUS" /></element>
+	<element name="t_ready"><text string="READY" align="1" /></element>
+	<element name="t_busy"><text string="BUSY" align="1" /></element>
+	<element name="t_monit"><text string="MONIT" /></element>
+	<element name="t_comm"><text string="COMM" /></element>
+	<element name="t_power"><text string="POWER" /></element>
+	<element name="t_bright"><text string="&#x2013;  BRIGHTNESS  +" /></element>
+	<element name="t_run"><text string="RUN" /></element>
+	<element name="t_ccm"><text string="CCM INDICATOR  348-0001499" align="1" /></element>
+	<repeat count="4">
+		<param name="n" start="0" increment="1" />
+		<element name="t_~n~"><text string="~n~" /></element>
+	</repeat>
+	<repeat count="8">
+		<param name="n" start="10" increment="1" />
+		<element name="t_~n~"><text string="~n~" /></element>
+	</repeat>
 
 	<group name="front_panel">
 		<bounds x="0" y="0" width="150" height="300" />
-		<element ref="panel"><bounds x="0" y="0" width="150" height="300" /></element>
-		<element ref="logo"><bounds x="98" y="12" width="40" height="14" /></element>
+		<element ref="rect"><bounds x="0" y="0" width="150" height="300" /><color red="0.09" green="0.09" blue="0.09" /></element>
+		<element ref="rect"><bounds x="98" y="12" width="40" height="14" /><color red="0.55" green="0.55" blue="0.55" /></element>
+		<!-- one element per letter, evenly spaced -->
+		<element ref="t_n"><bounds x="103" y="13" width="10" height="12" /><color red="0.15" green="0.15" blue="0.15" /></element>
+		<element ref="t_c"><bounds x="113" y="13" width="10" height="12" /><color red="0.15" green="0.15" blue="0.15" /></element>
+		<element ref="t_r"><bounds x="123" y="13" width="10" height="12" /><color red="0.15" green="0.15" blue="0.15" /></element>
 
-		<element ref="subpanel"><bounds x="10" y="96" width="130" height="70" /></element>
-		<element ref="t_status"><bounds x="48" y="99" width="84" height="7" /></element>
-		<element ref="t_0"><bounds x="53" y="108" width="8" height="6" /></element>
-		<element ref="t_1"><bounds x="73" y="108" width="8" height="6" /></element>
-		<element ref="t_2"><bounds x="93" y="108" width="8" height="6" /></element>
-		<element ref="t_3"><bounds x="113" y="108" width="8" height="6" /></element>
-		<element ref="t_ready"><bounds x="16" y="121" width="30" height="6" /></element>
-		<element ref="t_busy"><bounds x="16" y="144" width="30" height="6" /></element>
+		<!-- flex drive status -->
+		<element ref="rect"><bounds x="10" y="96" width="130" height="70" /><color red="0.14" green="0.14" blue="0.14" /></element>
+		<element ref="t_status"><bounds x="48" y="99" width="84" height="7" /><color red="0.85" green="0.85" blue="0.85" /></element>
+		<element ref="t_ready"><bounds x="16" y="121" width="30" height="6" /><color red="0.85" green="0.85" blue="0.85" /></element>
+		<element ref="t_busy"><bounds x="16" y="144" width="30" height="6" /><color red="0.85" green="0.85" blue="0.85" /></element>
 		<repeat count="4">
 			<param name="n" start="0" increment="1" />
 			<param name="x" start="53" increment="20" />
-			<element ref="led_green" name="flex_ready~n~"><bounds x="~x~" y="119" width="8" height="8" /></element>
-			<element ref="led_red" name="flex_busy~n~"><bounds x="~x~" y="142" width="8" height="8" /></element>
+			<element ref="t_~n~"><bounds x="~x~" y="108" width="8" height="6" /><color red="0.85" green="0.85" blue="0.85" /></element>
+			<element ref="lamp" name="flex_ready~n~"><bounds x="~x~" y="119" width="8" height="8" /><color red="0.25" green="1.0" blue="0.25" /></element>
+			<element ref="lamp" name="flex_busy~n~"><bounds x="~x~" y="142" width="8" height="8" /><color red="1.0" green="0.15" blue="0.10" /></element>
 		</repeat>
 
-		<element ref="subpanel"><bounds x="10" y="170" width="130" height="86" /></element>
-		<element ref="led_red" name="comm_led"><bounds x="73" y="176" width="8" height="8" /></element>
-		<element ref="t_comm"><bounds x="63" y="186" width="28" height="6" /></element>
-		<element ref="led_red" name="power_led"><bounds x="113" y="176" width="8" height="8" /></element>
-		<element ref="t_power"><bounds x="101" y="186" width="32" height="6" /></element>
-		<element ref="t_monit"><bounds x="16" y="186" width="30" height="6" /></element>
+		<!-- MONIT, COMM, POWER -->
+		<element ref="rect"><bounds x="10" y="170" width="130" height="86" /><color red="0.14" green="0.14" blue="0.14" /></element>
+		<element ref="lamp" name="comm_led"><bounds x="73" y="176" width="8" height="8" /><color red="1.0" green="0.15" blue="0.10" /></element>
+		<element ref="t_comm"><bounds x="63" y="186" width="28" height="6" /><color red="0.85" green="0.85" blue="0.85" /></element>
+		<element ref="lamp" name="power_led"><bounds x="113" y="176" width="8" height="8" /><color red="1.0" green="0.15" blue="0.10" /></element>
+		<element ref="t_power"><bounds x="101" y="186" width="32" height="6" /><color red="0.85" green="0.85" blue="0.85" /></element>
+		<element ref="t_monit"><bounds x="16" y="186" width="30" height="6" /><color red="0.85" green="0.85" blue="0.85" /></element>
 		<element ref="monit_key" inputtag="PANEL" inputmask="0x01"><bounds x="22" y="195" width="16" height="22" /></element>
-		<element ref="t_on"><bounds x="91" y="194" width="5" height="6" /></element>
-		<element ref="t_off"><bounds x="91" y="213" width="5" height="6" /></element>
+		<element ref="t_1"><bounds x="91" y="194" width="5" height="6" /><color red="0.85" green="0.85" blue="0.85" /></element>
+		<element ref="t_0"><bounds x="91" y="213" width="5" height="6" /><color red="0.85" green="0.85" blue="0.85" /></element>
 		<element ref="rocker"><bounds x="99" y="196" width="28" height="20" /></element>
-		<element ref="t_bright"><bounds x="40" y="234" width="76" height="6" /></element>
+		<element ref="t_bright"><bounds x="40" y="234" width="76" height="6" /><color red="0.85" green="0.85" blue="0.85" /></element>
 
-		<element ref="slot"><bounds x="10" y="262" width="130" height="28" /></element>
+		<!-- disk slot -->
+		<element ref="rect"><bounds x="10" y="262" width="130" height="28" /><color red="0.04" green="0.04" blue="0.04" /></element>
 	</group>
 
 	<group name="ccm_indicator">
 		<bounds x="0" y="0" width="150" height="40" />
-		<element ref="ccm_pcb"><bounds x="0" y="0" width="150" height="40" /></element>
-		<element ref="ccm_title"><bounds x="6" y="30" width="138" height="6" /></element>
-		<element ref="t_17"><bounds x="6" y="5" width="10" height="6" /></element>
-		<element ref="t_16"><bounds x="19" y="5" width="10" height="6" /></element>
-		<element ref="t_15"><bounds x="32" y="5" width="10" height="6" /></element>
-		<element ref="t_14"><bounds x="45" y="5" width="10" height="6" /></element>
-		<element ref="t_13"><bounds x="62" y="5" width="10" height="6" /></element>
-		<element ref="t_12"><bounds x="75" y="5" width="10" height="6" /></element>
-		<element ref="t_11"><bounds x="88" y="5" width="10" height="6" /></element>
-		<element ref="t_10"><bounds x="101" y="5" width="10" height="6" /></element>
-		<element ref="led_bar" name="ccm_led7"><bounds x="7" y="13" width="8" height="10" /></element>
-		<element ref="led_bar" name="ccm_led6"><bounds x="20" y="13" width="8" height="10" /></element>
-		<element ref="led_bar" name="ccm_led5"><bounds x="33" y="13" width="8" height="10" /></element>
-		<element ref="led_bar" name="ccm_led4"><bounds x="46" y="13" width="8" height="10" /></element>
-		<element ref="led_bar" name="ccm_led3"><bounds x="63" y="13" width="8" height="10" /></element>
-		<element ref="led_bar" name="ccm_led2"><bounds x="76" y="13" width="8" height="10" /></element>
-		<element ref="led_bar" name="ccm_led1"><bounds x="89" y="13" width="8" height="10" /></element>
-		<element ref="led_bar" name="ccm_led0"><bounds x="102" y="13" width="8" height="10" /></element>
-		<element ref="led_red" name="ccm_run"><bounds x="124" y="14" width="8" height="8" /></element>
-		<element ref="t_run"><bounds x="120" y="5" width="16" height="6" /></element>
+		<element ref="rect"><bounds x="0" y="0" width="150" height="40" /><color red="0.74" green="0.66" blue="0.42" /></element>
+		<element ref="t_ccm"><bounds x="6" y="30" width="138" height="6" /><color red="0.30" green="0.22" blue="0.08" /></element>
+		<!-- LEDs "17".."10" = bits 7-0, a gap between the two nibbles -->
+		<repeat count="2">
+			<param name="nb" start="7" increment="-4" />
+			<param name="nn" start="17" increment="-4" />
+			<param name="nx" start="6" increment="56" />
+			<repeat count="4">
+				<param name="bit" start="~nb~" increment="-1" />
+				<param name="n" start="~nn~" increment="-1" />
+				<param name="x" start="~nx~" increment="13" />
+				<element ref="t_~n~"><bounds x="~x~" y="5" width="10" height="6" /><color red="0.30" green="0.22" blue="0.08" /></element>
+				<element ref="lamp_bar" name="ccm_led~bit~"><bounds x="~x~" y="13" width="8" height="10" /><color red="1.0" green="0.12" blue="0.08" /></element>
+			</repeat>
+		</repeat>
+		<element ref="t_run"><bounds x="120" y="5" width="16" height="6" /><color red="0.30" green="0.22" blue="0.08" /></element>
+		<element ref="lamp" name="ccm_run"><bounds x="124" y="14" width="8" height="8" /><color red="1.0" green="0.15" blue="0.10" /></element>
 	</group>
 
 	<view name="Screen + Front Panel">
-		<element ref="bezel"><bounds x="0" y="0" width="580" height="320" /></element>
+		<element ref="rect"><bounds x="0" y="0" width="580" height="320" /><color red="0.80" green="0.79" blue="0.74" /></element>
 		<screen index="0"><bounds x="10" y="10" width="400" height="300" /></screen>
 		<group ref="front_panel"><bounds x="420" y="10" width="150" height="300" /></group>
 	</view>
 
 	<view name="Screen + Front Panel + CCM Indicator">
-		<element ref="bezel"><bounds x="0" y="0" width="580" height="370" /></element>
+		<element ref="rect"><bounds x="0" y="0" width="580" height="370" /><color red="0.80" green="0.79" blue="0.74" /></element>
 		<screen index="0"><bounds x="10" y="10" width="400" height="300" /></screen>
 		<group ref="front_panel"><bounds x="420" y="10" width="150" height="300" /></group>
 		<group ref="ccm_indicator"><bounds x="420" y="320" width="150" height="40" /></group>
