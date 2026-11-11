@@ -92,7 +92,7 @@ protected:
 	required_device<palette_device> m_palette;
 
 private:
-	u8 m_kbd_rxd = 1;
+	bool m_kbd_rxd = true;
 
 	uint32_t screen_update_vt220(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vt220_data(address_map &map) ATTR_COLD;
@@ -139,14 +139,14 @@ private:
 	u8 m_sl = 0;
 	bool m_dw = false; // cursor skew F/F: double width scan line
 	u8 m_line_sl[VTOTAL]; // per scan line: SL3-SL0 (0xff without VLT last frame) and double width
-	u8 m_line_dw[VTOTAL] = { };
+	bool m_line_dw[VTOTAL] = { };
 	bool m_line_vlt[VTOTAL] = { }; // VLT seen this frame
 	bool m_vlt = false;
 	bool m_drb = true;
 	bool m_row_loading = false;
 	bool m_cblank = true;
-	u8 m_host_txd = 1;
-	u8 m_host_rxd = 1;
+	bool m_host_txd = true;
+	bool m_host_rxd = true;
 	u8 m_softchar[0x800] = { };
 	u8 m_lbf[0x800] = { };
 
@@ -167,7 +167,6 @@ private:
 	void sync_video() { m_screen->update_partial(m_screen->vpos()); }
 	void lbf_load(u8 lba, u8 chr, u8 atr) { m_lbf[lbf_addr(true, lba)] = chr; m_lbf[lbf_addr(false, lba)] = atr; }
 
-	u8 p1_r();
 	void p1_w(u8 data);
 	void conf_w(u8 data);
 	void char_addr_w(u8 data);
@@ -296,7 +295,7 @@ void vt220a_state::vs_w(int state)
 			if (!m_line_vlt[y])
 			{
 				m_line_sl[y] = 0xff;
-				m_line_dw[y] = 0;
+				m_line_dw[y] = false;
 			}
 		}
 		std::fill_n(m_line_vlt, VTOTAL, false);
@@ -372,7 +371,7 @@ u8 vt220a_state::dot(int col, int x, int line, bool &bold, bool &blink_n) const
 		return 0;
 	const u8 bits = char_row(alt, chr, line);
 
-	// MSB first; each lit dot is stretched into the next (TM 6.2.4), so a lit dot 7 lights the first fill dot
+	// MSB first; each lit dot is stretched into the next (TM 6.2.6.2), so a lit dot 7 lights the first fill dot
 	bool on = (x < 8 && BIT(bits, 7 - x)) || (x > 0 && x <= 8 && BIT(bits, 8 - x));
 	if (BIT(atr, 4) && line >= 8) // UL ATR gated with SC3: scan lines 9 and 10
 		on = true;
@@ -469,12 +468,6 @@ void vt220a_state::host_rxd_w(int state)
 	m_host_rxd = state;
 	if (!BIT(m_conf, 6))
 		m_duart->rx_a_w(state);
-}
-
-u8 vt220a_state::p1_r()
-{
-	// P1.7 CAR DET from the EIA receiver, low when asserted; the rest are outputs or the PROD TEST pull-up
-	return 0x7f | (m_host->dcd_r() << 7);
 }
 
 void vt220a_state::duart_out_w(u8 data)
@@ -646,8 +639,10 @@ void vt220a_state::vt220a(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt220a_state::vt220a_mem);
 	m_maincpu->set_addrmap(AS_DATA, &vt220a_state::vt220a_data);
 
-	// P1.4 PROD TEST is low only with the factory fixture on J1-1
-	m_maincpu->port_in_cb<1>().set(FUNC(vt220a_state::p1_r));
+	// P1.7 CAR DET from the EIA receiver, low when asserted; P1.4 PROD TEST is pulled up, low only with the
+	// factory fixture on J1-1; the rest are outputs
+	m_maincpu->port_in_cb<1>().set_constant(0x7f).mask(0x7f);
+	m_maincpu->port_in_cb<1>().append(m_host, FUNC(rs232_port_device::dcd_r)).lshift(7);
 	m_maincpu->port_out_cb<1>().set(FUNC(vt220a_state::p1_w));
 
 	// T5 character clock: dot clock / dots per character; set_columns switches on 132 COL H (OP4), which the
@@ -672,7 +667,7 @@ void vt220a_state::vt220a(machine_config &config)
 	m_crtc->cblank_callback().set(FUNC(vt220a_state::cblank_w));
 	X2212(config, m_nvr); // E17
 
-	// TM figure 5-4: channel A host (J3, EIA or 20 mA), channel B printer.  Modem signals are low when
+	// TM figure 5-4: channel A host (J2, EIA or 20 mA), channel B printer.  Modem signals are low when
 	// asserted at the DUART pins, as on the RS-232 port: the firmware drops DTR by driving OP1 high, and
 	// reads DSR, SPD IND and PTR DSR asserted as input port bits low (opposite to the TM's H signal
 	// names; the sense here comes from the firmware)
