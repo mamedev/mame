@@ -254,6 +254,10 @@
 #include "ds9_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_DS2717_DSK
+#include "ds2717_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_SDF_DSK
 #include "sdf_dsk.h"
 #endif
@@ -564,6 +568,10 @@
 
 #ifdef HAS_FORMATS_PK8020_DSK
 #include "pk8020_dsk.h"
+#endif
+
+#ifdef HAS_FORMATS_PMD32_DSK
+#include "pmd32_dsk.h"
 #endif
 
 #ifdef HAS_FORMATS_PMD_CAS
@@ -1539,6 +1547,13 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Tesla");
 #ifdef HAS_FORMATS_PMD_CAS
 	en.add(pmd85_cassette_formats); // pmd_cas.h
+#endif
+#ifdef HAS_FORMATS_PMD32_DSK
+	en.add(FLOPPY_PMD32_FORMAT); // pmd32_dsk.h
+	en.add(FLOPPY_PMD32_C2717_FORMAT); // pmd32_dsk.h
+#endif
+#ifdef HAS_FORMATS_DS2717_DSK
+	en.add(FLOPPY_DS2717_FORMAT); // ds2717_dsk.h
 #endif
 
 	en.category("Microkey");

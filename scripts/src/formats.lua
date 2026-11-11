@@ -878,6 +878,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/ds2717_dsk.h,FORMATS["DS2717_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "DS2717_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/ds2717_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/ds2717_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/sdf_dsk.h,FORMATS["SDF_DSK"] = true
 --------------------------------------------------
 
@@ -1761,6 +1773,18 @@ if opt_tool(FORMATS, "PK8020_DSK") then
 	files {
 		MAME_DIR.. "src/lib/formats/pk8020_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/pk8020_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/pmd32_dsk.h,FORMATS["PMD32_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "PMD32_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/pmd32_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/pmd32_dsk.h",
 	}
 end
 
