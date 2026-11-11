@@ -1,0 +1,235 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Tomás García-Merás Capote (ClawGrip)
+-->
+<mamelayout version="2">
+
+	<element name="nothing"><rect><color alpha="0" /></rect></element>
+
+	<element name="shifter" defstate="0">
+		<rect>
+			<bounds left="0" right="32" top="0" bottom="64" />
+			<color red="0.85" green="0.4" blue="0.3" />
+		</rect>
+		<rect>
+			<bounds left="2" right="30" top="2" bottom="62" />
+			<color red="0.14" green="0.17" blue="0.2" />
+		</rect>
+		<rect>
+			<bounds left="14" right="18" top="15" bottom="49" />
+			<color red="0.44" green="0.47" blue="0.5" />
+		</rect>
+		<disk>
+			<bounds left="14" right="18" top="13" bottom="17" />
+			<color red="0.44" green="0.47" blue="0.5" />
+		</disk>
+		<disk>
+			<bounds left="14" right="18" top="47" bottom="51" />
+			<color red="0.44" green="0.47" blue="0.5" />
+		</disk>
+		<text string="LOW" state="0">
+			<bounds left="3" right="29" top="2" bottom="12" />
+			<color red="1.0" green="1.0" blue="0.4" />
+		</text>
+		<text string="LOW" state="1">
+			<bounds left="3" right="29" top="2" bottom="12" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+
+		<text string="HIGH" state="0">
+			<bounds left="3" right="29" top="52" bottom="62" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+		<text string="HIGH" state="1">
+			<bounds left="3" right="29" top="52" bottom="62" />
+			<color red="1.0" green="1.0" blue="0.4" />
+		</text>
+		<disk state="0">
+			<bounds left="9" right="23" top="14" bottom="28" />
+			<color red="0.85" green="0.4" blue="0.3" />
+		</disk>
+		<disk state="1">
+			<bounds left="9" right="23" top="36" bottom="50" />
+			<color red="0.85" green="0.4" blue="0.3" />
+		</disk>
+	</element>
+
+	<element name="strip">
+		<rect>
+			<color red="0.10" green="0.11" blue="0.13" />
+		</rect>
+	</element>
+
+	<element name="lamp" defstate="0">
+		<disk state="0">
+			<color red="0.25" green="0.22" blue="0.14" />
+		</disk>
+		<disk state="1">
+			<color red="1.00" green="0.90" blue="0.50" />
+		</disk>
+	</element>
+
+	<element name="motor_state" defstate="0">
+		<rect state="0">
+			<color red="0.22" green="0.22" blue="0.24" />
+		</rect>
+		<text state="0" string="MOTOR OFF">
+			<color red="0.60" green="0.60" blue="0.62" />
+		</text>
+		<rect state="1">
+			<color red="0.10" green="0.55" blue="0.15" />
+		</rect>
+		<text state="1" string="MOTOR ON">
+			<color red="1.00" green="1.00" blue="1.00" />
+		</text>
+	</element>
+
+	<element name="lbl_start">
+		<text string="START LAMP" align="1"><color red="0.85" green="0.85" blue="0.85" /></text>
+	</element>
+	<element name="lbl_lights1">
+		<text string="LIGHTS 1" align="1"><color red="0.85" green="0.85" blue="0.85" /></text>
+	</element>
+	<element name="lbl_lights2">
+		<text string="LIGHTS 2" align="1"><color red="0.85" green="0.85" blue="0.85" /></text>
+	</element>
+
+	<group name="outputs">
+		<bounds x="0" y="0" width="640" height="32" />
+		<element ref="strip">
+			<bounds x="0" y="0" width="640" height="32" />
+		</element>
+
+		<element name="lamp0" ref="lamp">
+			<bounds x="8" y="6" width="20" height="20" />
+		</element>
+		<element ref="lbl_start">
+			<bounds x="34" y="8" width="120" height="16" />
+		</element>
+
+		<element name="lamp1" ref="lamp">
+			<bounds x="168" y="6" width="20" height="20" />
+		</element>
+		<element ref="lbl_lights1">
+			<bounds x="194" y="8" width="100" height="16" />
+		</element>
+
+		<element name="lamp2" ref="lamp">
+			<bounds x="308" y="6" width="20" height="20" />
+		</element>
+		<element ref="lbl_lights2">
+			<bounds x="334" y="8" width="100" height="16" />
+		</element>
+
+		<element name="motor" ref="motor_state">
+			<bounds x="500" y="4" width="132" height="24" />
+		</element>
+	</group>
+
+	<view name="Outputs + Shifter-R Overlay" showpointers="no">
+		<screen index="0">
+			<bounds x="0" y="0" width="640" height="480" />
+		</screen>
+
+		<collection name="Outputs">
+			<group ref="outputs">
+				<bounds x="0" y="484" width="640" height="32" />
+			</group>
+		</collection>
+
+		<collection name="Shifter">
+			<element ref="shifter" inputtag="IN0" inputmask="0x80">
+				<bounds x="606" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN0" inputmask="0x80">
+					<bounds x="606" y="414" width="32" height="64" />
+				</element>
+			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="606" y="414" width="32" height="64" />
+			</element>
+		</collection>
+	</view>
+	<view name="Outputs + Shifter-R Off-Screen" showpointers="no">
+		<screen index="0">
+			<bounds x="0" y="0" width="640" height="480" />
+		</screen>
+
+		<collection name="Outputs">
+			<group ref="outputs">
+				<bounds x="0" y="484" width="640" height="32" />
+			</group>
+		</collection>
+
+		<collection name="Shifter">
+			<element ref="shifter" inputtag="IN0" inputmask="0x80">
+				<bounds x="648" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN0" inputmask="0x80">
+					<bounds x="648" y="414" width="32" height="64" />
+				</element>
+			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="648" y="414" width="32" height="64" />
+			</element>
+		</collection>
+	</view>
+	<view name="Outputs + Shifter-L Overlay" showpointers="no">
+		<screen index="0">
+			<bounds x="0" y="0" width="640" height="480" />
+		</screen>
+
+		<collection name="Outputs">
+			<group ref="outputs">
+				<bounds x="0" y="484" width="640" height="32" />
+			</group>
+		</collection>
+
+		<collection name="Shifter">
+			<element ref="shifter" inputtag="IN0" inputmask="0x80">
+				<bounds x="2" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN0" inputmask="0x80">
+					<bounds x="2" y="414" width="32" height="64" />
+				</element>
+			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="2" y="414" width="32" height="64" />
+			</element>
+		</collection>
+	</view>
+	<view name="Outputs + Shifter-L Off-Screen" showpointers="no">
+		<screen index="0">
+			<bounds x="0" y="0" width="640" height="480" />
+		</screen>
+
+		<collection name="Outputs">
+			<group ref="outputs">
+				<bounds x="0" y="484" width="640" height="32" />
+			</group>
+		</collection>
+
+		<collection name="Shifter">
+			<element ref="shifter" inputtag="IN0" inputmask="0x80">
+				<bounds x="-40" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN0" inputmask="0x80">
+					<bounds x="-40" y="414" width="32" height="64" />
+				</element>
+			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="-40" y="414" width="32" height="64" />
+			</element>
+		</collection>
+	</view>
+
+</mamelayout>

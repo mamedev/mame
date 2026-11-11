@@ -80,7 +80,7 @@ ROM_END
 
 // Arcade games
 
-/* Monkey Jump. Android-based arcade from the Spanish company Falgas.
+/* Monkey Jump. Android-based arcade from the Spanish company Falgàs.
    Has a separate I/O board, with a PIC18F46K22, connected by USB to the Cubieboard4 (using a RS-232 to USB adapter).
    More info: https://www.recreativas.org/monkey-jump-4029-falgas */
 ROM_START( monkyjmp )
@@ -97,4 +97,4 @@ ROM_END
 COMP( 20??, cubibrd4, 0, 0, cubiecca80, cubiecca80, cubiecca80_state, empty_init, "Cubietech Limited", "Cubieboard4 (CC A-20)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // Arcade games
-GAME( 20??, monkyjmp, 0, cubiecca80, cubiecca80, cubiecca80_state, empty_init, ROT90, "Falgas", "Monkey Jump", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 20??, monkyjmp, 0, cubiecca80, cubiecca80, cubiecca80_state, empty_init, ROT90, u8"Falgàs", "Monkey Jump", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
