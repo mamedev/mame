@@ -620,6 +620,32 @@ static INPUT_PORTS_START( danzkara )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( 2pathlet )
+	PORT_START("IO0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x7e, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+
+	PORT_START("IO1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x7e, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( nvbaseb )
+	PORT_START("IO0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Swing")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("IO1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 // TODO: verify directional inputs and input polarity
 static INPUT_PORTS_START( vtvppong )
 	PORT_START("IO0")
@@ -1601,7 +1627,7 @@ void nes_clone_twindncr_state::nes_clone_twindncr_map(address_map &map)
 
 void nes_clone_twindncr_state::update_banks()
 {
-	int bank = ((m_bankregs[0] & 0x06) >> 1) | ((m_bankregs[1] & 0x03) << 2);
+	u8 bank = BIT(m_bankregs[0], 1, 2) | (BIT(m_bankregs[1], 0, 2) << 2);
 	m_prgbank->set_entry(bank);
 }
 
@@ -1644,8 +1670,8 @@ void nes_clone_rumblstn_state::nes_clone_rumblstn(machine_config &config)
 void nes_clone_rumblstn_state::nes_ppu_map(address_map &map)
 {
 	map(0x0000, 0x1fff).bankr(m_chrbank);
-	map(0x2000, 0x23ff).mirror(0x0800).ram();
-	map(0x2400, 0x27ff).mirror(0x0800).ram();
+	map(0x2000, 0x23ff).mirror(0x0400).ram();
+	map(0x2800, 0x2bff).mirror(0x0400).ram();
 	map(0x3f00, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
 }
 
@@ -1659,9 +1685,9 @@ void nes_clone_rumblstn_state::nes_clone_rumblstn_map(address_map &map)
 
 void nes_clone_rumblstn_state::update_banks()
 {
-	int chrbank = ((m_6000 & 0xf0) >> 1) | ((m_8000 & 0x70) >> 4);
+	int chrbank = (BIT(m_6000, 4, 4) << 3) | BIT(m_8000, 4, 3);
 	m_chrbank->set_entry(chrbank);
-	int prgbank = ((m_6000 & 0x0f) << 1) | (m_8000 & 0x01);
+	int prgbank = (BIT(m_6000, 0, 4) << 1) | BIT(m_8000, 0);
 	m_prgbank->set_entry(prgbank);
 }
 
@@ -1731,10 +1757,10 @@ void nes_clone_9in1_state::nes_clone_9in1_map(address_map &map)
 
 void nes_clone_9in1_state::update_banks()
 {
-	u8 chrbank = (m_6000 & 0x70) >> 4;
+	u8 chrbank = BIT(m_6000, 4, 3);
 	m_chrbank->set_entry(chrbank);
 
-	u8 prgbank = (m_6004 & 0x18) >> 3;
+	u8 prgbank = BIT(m_6004, 3, 2);
 	prgbank ^= 3;
 
 	if (m_6004 & 0x40)
@@ -1746,7 +1772,7 @@ void nes_clone_9in1_state::update_banks()
 	else
 	{
 		// 16k mode
-		u8 lowbit = (m_6004 & 0x20) >> 5;
+		u8 lowbit = BIT(m_6004, 5);
 		m_prgbank[0]->set_entry((prgbank << 1) | lowbit);
 		m_prgbank[1]->set_entry((prgbank << 1) | lowbit);
 	}
@@ -1806,32 +1832,32 @@ void nes_clone_2pathlet_state::nes_clone_2pathlet(machine_config &config)
 void nes_clone_2pathlet_state::update_banks()
 {
 	u8 chrbank = 0;
-	if (m_8000 & 0x80)
+	if (BIT(m_8000, 7))
 	{
-		chrbank = m_8800 & 0x03;
+		chrbank = BIT(m_8800, 0, 2);
 	}
 	else
 	{
-		chrbank = m_8000 & 0x03;
+		chrbank = BIT(m_8000, 0, 2);
 	}
-	chrbank |= m_8800 & 0x04;
+	chrbank |=  BIT(m_8800, 2) << 2;
 
 	m_chrbank->set_entry(chrbank);
 
-	if (m_8800 & 0x10)
+	if (BIT(m_8800, 4))
 	{
-		u8 prgbank = (m_8800 & 0xc0) >> 6;
+		u8 prgbank = BIT(m_8800, 6, 2);
 		m_prgbank[0]->set_entry((prgbank << 1));
 		m_prgbank[1]->set_entry((prgbank << 1) + 1);
 	}
 	else
 	{
-		u8 prgbank = (m_8800 & 0xe0) >> 5;
+		u8 prgbank = BIT(m_8800, 5, 3);
 		m_prgbank[0]->set_entry(prgbank);
 		m_prgbank[1]->set_entry(prgbank);
 	}
 
-	if (m_8800 & 0x08)
+	if (BIT(m_8800, 3))
 	{
 		m_nametables[0]->set_entry(0);
 		m_nametables[1]->set_entry(0);
@@ -1933,8 +1959,8 @@ void nes_clone_nvbaseb_state::nes_ppu_map(address_map &map)
 void nes_clone_nvbaseb_state::bank_w(offs_t offset, uint8_t data)
 {
 	// data written doesn't matter, only offset
-	m_chrbank->set_entry((offset & 0x38) >> 3);
-	m_prgbank->set_entry(offset & 0x07);
+	m_chrbank->set_entry(BIT(offset, 3, 3));
+	m_prgbank->set_entry(BIT(offset, 0, 3));
 }
 
 
@@ -2127,7 +2153,8 @@ CONS( 2004, afbm7800,  0,  0,  nes_clone_afbm7800,    nes_clone, nes_clone_afbm7
 
 CONS( 200?, dnce2000, 0, 0, nes_clone_dnce2000, dnce2000, nes_clone_dnce2000_state, empty_init, "Shenzhen Soyin Electric Appliance Ind. Co., Ltd.", "Dance 2000 / Hot 2000 (Jin Bao TV Dancing Carpet, SY-2000-04)", 0 )
 
-CONS( 200?, glkdance, 0, 0, nes_clone_dnce2000, dnce2000, nes_clone_dnce2000_state, empty_init, "Gold Leopard King", "GLK Dance", 0 )
+// similar to "nes mc_dance" but with English title
+CONS( 200?, glkdance, 0, 0, nes_clone_dnce2000, dnce2000, nes_clone_dnce2000_state, empty_init, "Gold Leopard King", "GLK Dance (36-in-1)", 0 )
 
 CONS( 200?, flshdnce, 0, 0, nes_clone_dnce2000, dnce2000, nes_clone_dnce2000_state, empty_init, "<unknown>", "Dance 2000 / Flash Dance", 0 ) // Flash Dance on box, Dance 2000 on title screen
 
@@ -2145,8 +2172,6 @@ CONS( 200?, nytsudo,      0,  0,  nes_clone_sudoku, papsudok, nes_clone_sudoku_s
 CONS( 200?, vtvppong, 0,  0, nes_clone_afbm7800, vtvppong, nes_clone_vtvppong_state, init_vtvppong, "<unknown>", "Virtual TV Ping Pong", MACHINE_NOT_WORKING )
 
 CONS( 200?, pjoypj001, 0, 0, nes_clone_afbm7800, nes_clone, nes_clone_taikee_new_state, empty_init, "Trump Grand", "PowerJoy (PJ001, NES based plug & play)", MACHINE_NOT_WORKING )
-
-//
 
 /*
     Dancing Export by Daidaixing (aka TimeTop)
@@ -2181,12 +2206,13 @@ CONS( 200?, pv95in1, 0, 0, nes_clone_afbm7800, nes_clone, nes_clone_taikee_new_s
 // mapper at 500x? has custom sound rather than standard NES APU or VTxx sounds, possibly an extra MCU or sound chip in the unit (see https://www.youtube.com/watch?v=OsydFoHW3Lc )
 CONS( 200?, popstar, 0, 0, nes_clone_popstar, nes_clone, nes_clone_popstar_state, empty_init, "<unknown>", "Popstar Karaoke", MACHINE_NOT_WORKING )
 
-CONS( 2005, rumblstn, 0, 0, nes_clone_rumblstn, nes_clone, nes_clone_rumblstn_state, empty_init, "<unknown>", "Rumble Station", 0 )
+CONS( 2005, rumblstn, 0, 0, nes_clone_rumblstn, nes_clone, nes_clone_rumblstn_state, empty_init, "<unknown>", "Rumble Station 15-in-1", 0 )
 
 // box art makes this look like a 16-bit game, but it's a simple NES clone
 // title on box is Grand Slam Baseball, onscreen is Home Run Baseball
-CONS( 2005, nvbaseb, 0, 0, nes_clone_nvbaseb, nes_clone, nes_clone_nvbaseb_state, empty_init, "N-Vision", "Grand Slam Baseball (Home Run Baseball)", 0 )
+CONS( 2005, nvbaseb, 0, 0, nes_clone_nvbaseb, nvbaseb, nes_clone_nvbaseb_state, empty_init, "N-Vision", "Grand Slam Baseball (Home Run Baseball)", 0 )
 
-CONS( 2005, 2pathlet, 0, 0, nes_clone_2pathlet, nes_clone, nes_clone_2pathlet_state, empty_init, "<unknown>", "2 Player Athletics", 0 )
+CONS( 2005, 2pathlet, 0, 0, nes_clone_2pathlet, 2pathlet, nes_clone_2pathlet_state, empty_init, "<unknown>", "2 Player Athletics", 0 )
 
-CONS( 2005, nes9in1, 0, 0, nes_clone_9in1, nes_clone, nes_clone_9in1_state, empty_init, "<unknown>", "unknown 9-in-1 TV Game Console", 0 )
+// Game 6 '3 Eyes Boy' is the same as Game 9 'Conquerok' except it starts on level 3
+CONS( 2005, nes9in1, 0, 0, nes_clone_9in1, nes_clone, nes_clone_9in1_state, empty_init, "<unknown>", "unknown 9-in-1 NES-based TV Game Console", 0 )
