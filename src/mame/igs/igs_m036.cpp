@@ -306,6 +306,7 @@ public:
 	void m036_sydh(machine_config &config) ATTR_COLD;
 	void m036_sram(machine_config &config) ATTR_COLD;
 	void m036_cjgdy(machine_config &config) ATTR_COLD;
+	void m036_am001(machine_config &config) ATTR_COLD;
 
 protected:
 	required_device<tt5665_device> m_tt5665;
@@ -316,6 +317,7 @@ private:
 	void m036_tt_boot_map(address_map &map) ATTR_COLD;
 	void sydh_map(address_map &map) ATTR_COLD;
 	void extra_sram_map(address_map &map) ATTR_COLD;
+	void am001_map(address_map &map) ATTR_COLD;
 };
 
 class m036_mj_state : public m036_tt_state
@@ -811,6 +813,15 @@ void m036_mj_state::mjzhizun_map(address_map &map)
 }
 
 
+void m036_tt_state::am001_map(address_map &map)
+{
+	m036_tt_boot_map(map);
+	// S127CN reads the DIP banks here when the board ID input (bit 31 at 0x03400000)
+	// is high, and from 0x30000008 otherwise. The same input selects AM001 or TT5665 sound.
+	map(0x3000'0000, 0x3000'0007).r(FUNC(m036_tt_state::dips_r));
+}
+
+
 void m036_tt_state::extra_sram_map(address_map &map)
 {
 	m036_tt_boot_map(map);
@@ -1254,6 +1265,12 @@ void m036_tt_state::m036_sram(machine_config &config)
 	NVRAM(config, "extra_nvram", nvram_device::DEFAULT_ALL_0);
 }
 
+void m036_tt_state::m036_am001(machine_config &config)
+{
+	m036_tt_boot(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m036_tt_state::am001_map);
+}
+
 void m036_tt_state::m036_cjgdy(machine_config &config)
 {
 	m036_sram(config);
@@ -1401,7 +1418,7 @@ ROM_START( cjddzsp ) // IGS PCB-0825-02-IU-2. Uses an unemulated DigiArt AM001 A
 
 	ROM_REGION( 0x1000000, "gfx", 0 )
 	ROM_LOAD( "cjddzsp_s122cn.u28",  0x000000, 0x800000, CRC(c1dd1809) SHA1(ee542a661ae486f766f2353430dd1116dcb3c321) )
-	ROM_LOAD( "cjddzsp_s127cn.u30",  0x800000, 0x800000, CRC(08bab0db) SHA1(76bf0bbe921e13cc4fd3c1b7835c7c6ce90c7587) )
+	ROM_LOAD( "cjddzsp_s127cn.u30",  0x800000, 0x800000, CRC(cb82eaeb) SHA1(938258a8e96c0266d368dbc7c8cf6af110b1a3f1) )
 ROM_END
 
 ROM_START( cjddzsp122cn )
@@ -2090,7 +2107,7 @@ GAME( 200?, dahuaxy,      0,       m036_boot,     hopper,   m036_oki_state,     
 
 // sets with a AM001 for sound, 512x240 resolution
 
-GAME( 200?, cjddzsp,      0,       m036_tt_boot,  ddz,      m036_tt_state,       empty_init,      ROT0, "IGS",           "Super Dou Di Zhu Special (V127CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjddzsp,      0,       m036_am001,    ddz,      m036_tt_state,       empty_init,      ROT0, "IGS",           "Super Dou Di Zhu Special (V127CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // sets with a TT5665 for sound, 512x240 resolution
 
