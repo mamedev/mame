@@ -44,10 +44,10 @@ namespace {
 class dsm240_device : public device_t, public device_h89bus_cpu_board_mod_interface
 {
 public:
-	dsm240_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
 	// JJ1 wait states aren't emulated
 	static constexpr feature_type imperfect_features() { return feature::TIMING; }
+
+	dsm240_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// device_t implementation
@@ -62,7 +62,6 @@ private:
 	static constexpr u32 MULTIPLIER_4MHZ = 2;
 
 	void write(u8 data);
-	u8 read();
 
 	void update_speeds();
 
@@ -115,11 +114,6 @@ void dsm240_device::write(u8 data)
 	update_speeds();
 }
 
-u8 dsm240_device::read()
-{
-	return 0xff;
-}
-
 void dsm240_device::device_start()
 {
 	m_installed = false;
@@ -135,7 +129,6 @@ void dsm240_device::device_reset()
 	if (!m_installed)
 	{
 		h89bus().install_io_device(DSM240_ADDR, DSM240_ADDR,
-			read8smo_delegate(*this, FUNC(dsm240_device::read)),
 			write8smo_delegate(*this, FUNC(dsm240_device::write)));
 
 		m_installed = true;

@@ -84,7 +84,6 @@
 
 #pragma once
 
-#include "emu.h"
 #include <functional>
 #include <utility>
 #include <vector>
@@ -95,8 +94,8 @@
 
 namespace h89bus
 {
-	typedef std::pair<u8, u8> addr_range;
-	typedef std::vector<addr_range> addr_ranges;
+	using addr_range = std::pair<u8, u8>;
+	using addr_ranges = std::vector<addr_range>;
 
 	enum io_select_lines : u8
 	{
@@ -327,6 +326,9 @@ DECLARE_DEVICE_TYPE(H89BUS_RIGHT_SLOT, h89bus_right_slot_device)
 
 class h89bus_cpu_board_mod_slot_device : public device_t, public device_single_card_slot_interface<device_h89bus_cpu_board_mod_interface>
 {
+	// only the modification installed in this slot can change the CPU clock
+	friend class device_h89bus_cpu_board_mod_interface;
+
 public:
 	// construction/destruction
 	template <typename T, typename U>
@@ -362,9 +364,6 @@ protected:
 	const char *m_h89bus_slottag;
 
 private:
-	// only the modification installed in this slot can change the CPU clock
-	friend class device_h89bus_cpu_board_mod_interface;
-
 	void set_cpu_clock(u32 clock) { m_out_cpu_clock_cb(clock); }
 
 	devcb_write32 m_out_cpu_clock_cb;
@@ -488,6 +487,7 @@ public:
 
 	void install_io_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler) ATTR_COLD;
 	void install_io_device(offs_t start, offs_t end, read8smo_delegate rhandler, write8smo_delegate whandler) ATTR_COLD;
+	void install_io_device(offs_t start, offs_t end, write8smo_delegate whandler) ATTR_COLD;
 	h89bus::addr_ranges get_address_ranges(u8 select_bits, bool p506_signals = false) ATTR_COLD;
 
 	// general purpose port (port 0xf2) latch; its lines (h89bus::gpp_lines) are pushed only to

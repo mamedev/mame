@@ -510,6 +510,11 @@ void h89bus_device::install_io_device(offs_t start, offs_t end, read8smo_delegat
 	m_io_space->install_readwrite_handler(start, end, rhandler, whandler);
 }
 
+void h89bus_device::install_io_device(offs_t start, offs_t end, write8smo_delegate whandler)
+{
+	m_io_space->install_write_handler(start, end, whandler);
+}
+
 h89bus::addr_ranges h89bus_device::get_address_ranges(u8 select_bits, bool p506_signals)
 {
 	return m_io_decoder_socket->get_address_ranges(select_bits, p506_signals);

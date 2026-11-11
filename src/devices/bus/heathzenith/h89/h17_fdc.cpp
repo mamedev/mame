@@ -51,6 +51,8 @@ public:
 
 	[[maybe_unused]] void side_select_w(int state);
 
+	virtual void bus_clock_changed(u32 clock) override;
+
 protected:
 	static constexpr u8 MAX_FLOPPY_DRIVES = 3;
 
@@ -121,8 +123,6 @@ protected:
 	attotime fm_bit_time()  { return attotime::from_hz(usrt_clock()); }
 
 	void start_tx_clock();
-
-	virtual void bus_clock_changed(u32 clock) override;
 };
 
 
