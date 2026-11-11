@@ -153,6 +153,7 @@ ROM_START( metamaq2 )
 	ROMX_LOAD("repetier-fw-metamaquina2-2013-10-15.bin", 0x0000, 0x102c8, CRC(520134bd) SHA1(dfe2251aad06972f237eb4920ce14ccb32da5af0), ROM_BIOS(11))
 
 	// Bootloader is stk500boot, as described on https://reprap.org/wiki/Rambo_development
+	// Marked BAD_DUMP because it's not from real hardware; a real dump should replace this.
 	ROM_LOAD( "stk500boot_v2_mega2560.bin", 0x3e000, 0x1d1e, BAD_DUMP CRC(14a27e35) SHA1(01d7e1e143286f23f7bc9c1d7eec1acf69fa0c45) )
 
 	/* on-die 4kbyte eeprom */
