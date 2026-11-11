@@ -121,27 +121,26 @@ public:
 			{
 				// listening socket - accept the next connection, replacing a client that has finished sending
 				int const accepted = ::accept(m_listener, nullptr, nullptr);
-				if (accepted < 0)
-				{
-					return std::error_condition(errno, std::generic_category());
-				}
-				else
+				if (accepted >= 0)
 				{
 					disconnect();
 					suppress_sigpipe(accepted);
 					m_sock = accepted;
+					m_eof = false;
 					actual = 0;
 
 					return std::error_condition();
 				}
+
+				std::error_condition const err(errno, std::generic_category());
+				if (!accept_retry(err))
+					return err;
 			}
 		}
-		else
-		{
-			// no data available
-			actual = 0;
-			return std::errc::operation_would_block;
-		}
+
+		// no data available - end of file while the last client is gone or has finished sending
+		actual = 0;
+		return m_eof ? std::error_condition() : std::errc::operation_would_block;
 	}
 
 	virtual std::error_condition write(void const *buffer, std::uint64_t offset, std::uint32_t count, std::uint32_t &actual) noexcept override
@@ -193,20 +192,37 @@ private:
 				(std::errc::not_enough_memory != err);
 	}
 
+	static bool accept_retry(std::error_condition const &err) noexcept
+	{
+		// the client went away before it was accepted, or (Linux) accept()
+		// passed on a network error pending on the new connection
+		return
+				(std::errc::connection_aborted == err) ||
+				(std::errc::interrupted == err) ||
+				(std::errc::operation_would_block == err) ||
+				(std::errc::resource_unavailable_try_again == err) ||
+				(std::errc::protocol_error == err) ||
+				(std::errc::network_down == err) ||
+				(std::errc::network_unreachable == err) ||
+				(std::errc::host_unreachable == err) ||
+				(std::errc::no_protocol_option == err) ||
+				(std::errc::operation_not_supported == err);
+	}
+
 	void disconnect() noexcept
 	{
-		// a listening socket goes back to accepting; an outgoing connection stays as it is
-		if ((m_listener >= 0) && (m_sock >= 0))
+		// drop the client; reads report end of file until the next one is accepted
+		if (m_sock >= 0)
 		{
 			::close(m_sock);
 			m_sock = -1;
-			m_eof = false;
 		}
+		m_eof = true;
 	}
 
 	int     m_listener; // -1 for an outgoing connection
 	int     m_sock;     // -1 while waiting for a connection
-	bool    m_eof;      // client has finished sending
+	bool    m_eof;      // client has finished sending or is gone
 };
 
 

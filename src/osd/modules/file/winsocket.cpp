@@ -102,26 +102,25 @@ public:
 			{
 				// listening socket - accept the next connection, replacing a client that has finished sending
 				SOCKET const accepted = accept(m_listener, nullptr, nullptr);
-				if (INVALID_SOCKET == accepted)
-				{
-					return wsa_error_to_file_error(WSAGetLastError());
-				}
-				else
+				if (INVALID_SOCKET != accepted)
 				{
 					disconnect();
 					m_socket = accepted;
+					m_eof = false;
 					actual = 0;
 
 					return std::error_condition();
 				}
+
+				int const err = WSAGetLastError();
+				if (!accept_retry(err))
+					return wsa_error_to_file_error(err);
 			}
 		}
-		else
-		{
-			// no data available
-			actual = 0;
-			return std::errc::operation_would_block;
-		}
+
+		// no data available - end of file while the last client is gone or has finished sending
+		actual = 0;
+		return m_eof ? std::error_condition() : std::errc::operation_would_block;
 	}
 
 	virtual std::error_condition write(void const *buffer, std::uint64_t offset, std::uint32_t length, std::uint32_t &actual) noexcept override
@@ -214,20 +213,30 @@ private:
 				(WSA_NOT_ENOUGH_MEMORY != err);
 	}
 
+	static bool accept_retry(int err) noexcept
+	{
+		// the client went away before it was accepted
+		return
+				(WSAECONNRESET == err) ||
+				(WSAECONNABORTED == err) ||
+				(WSAEINTR == err) ||
+				(WSAEWOULDBLOCK == err);
+	}
+
 	void disconnect() noexcept
 	{
-		// a listening socket goes back to accepting; an outgoing connection stays as it is
-		if ((INVALID_SOCKET != m_listener) && (INVALID_SOCKET != m_socket))
+		// drop the client; reads report end of file until the next one is accepted
+		if (INVALID_SOCKET != m_socket)
 		{
 			closesocket(m_socket);
 			m_socket = INVALID_SOCKET;
-			m_eof = false;
 		}
+		m_eof = true;
 	}
 
 	SOCKET  m_listener; // INVALID_SOCKET for an outgoing connection
 	SOCKET  m_socket;   // INVALID_SOCKET while waiting for a connection
-	bool    m_eof;      // client has finished sending
+	bool    m_eof;      // client has finished sending or is gone
 };
 
 } // anonymous namespace
