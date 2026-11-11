@@ -260,7 +260,9 @@ void tsconf_state::device_post_load()
 	m_sprites_cache.clear();
 	copy_tiles_to_raw(m_ram->pointer() + ((m_regs[SG_PAGE] & 0xf8) << 14), m_sprites_raw.target());
 	copy_tiles_to_raw(m_ram->pointer() + ((m_regs[T0_G_PAGE] & 0xf8) << 14), m_tiles_raw[0].target());
+	m_gfxdecode->gfx(TM_TILES0)->mark_all_dirty();
 	copy_tiles_to_raw(m_ram->pointer() + ((m_regs[T1_G_PAGE] & 0xf8) << 14), m_tiles_raw[1].target());
+	m_gfxdecode->gfx(TM_TILES1)->mark_all_dirty();
 }
 
 INPUT_PORTS_START( tsconf )
