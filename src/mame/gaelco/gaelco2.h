@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "saltcrdi_link.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/74259.h"
 #include "machine/eepromser.h"
@@ -38,7 +40,6 @@ public:
 	void alighunt(machine_config &config) ATTR_COLD;
 	void alighunt_d5002fp(machine_config &config) ATTR_COLD;
 	void maniacsq(machine_config &config) ATTR_COLD;
-	void saltcrdi(machine_config &config) ATTR_COLD;
 
 	void init_alighunt() ATTR_COLD;
 	void init_luckyclrs() ATTR_COLD;
@@ -91,7 +92,6 @@ private:
 	void alighunt_map(address_map &map) ATTR_COLD;
 	void maniacsq_map(address_map &map) ATTR_COLD;
 	void play2000_map(address_map &map) ATTR_COLD;
-	void saltcrdi_map(address_map &map) ATTR_COLD;
 	void srollnd_map(address_map &map) ATTR_COLD;
 };
 
@@ -178,6 +178,27 @@ private:
 	required_ioport_array<2> m_light_y;
 
 	bool m_clr_gun_int = false;
+};
+
+// with heart rate sensor and link
+class saltcrdi_state : public gaelco2_state
+{
+public:
+	saltcrdi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		gaelco2_state(mconfig, type, tag),
+		m_link(*this, "link")
+	{ }
+
+	void saltcrdi(machine_config &config) ATTR_COLD;
+
+	DECLARE_INPUT_CHANGED_MEMBER(heart_rate_pulse);
+
+private:
+	required_device<saltcrdi_link_device> m_link;
+
+	void heart_rate_irq_clear_w(int state);
+
+	void saltcrdi_map(address_map &map) ATTR_COLD;
 };
 
 // with ADC
