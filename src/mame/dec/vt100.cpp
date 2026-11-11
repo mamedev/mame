@@ -474,7 +474,7 @@ void vt100_state::vt101(machine_config &config)
 
 	// 5414185 board (MP-01066 sheet 1): ADVANCED VIDEO L has an R8 pull-up
 	// and W5 to ground, W5 fitted only on the VT102/VT131; GRAPHICS FLAG L
-	// and EVEN FIELD L are tied high on all variants
+	// and EVEN FIELD L are tied high on this board
 	m_flags = FLAG_NO_AVO | FLAG_NO_GRAPHICS | FLAG_ODD_FIELD;
 
 	I8085A(config.replace(), m_maincpu, XTAL(24'073'400) / 4);
