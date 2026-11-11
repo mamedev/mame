@@ -1587,10 +1587,10 @@ void atmegax8_base_device::device_add_mconfig(machine_config &config)
 	// TODO: T1
 
 	// Timer 2: 8-bit fake RTC
-	// Timer 2 signals: OC2A = PB2, OC2B = PD3
+	// Timer 2 signals: OC2A = PB3, OC2B = PD3
 	auto atimer2 = m_asyncunit.target()->subdevice<avr8_megaavr_async_8bit_timer_device>("atimer");
-	atimer2->oc_w_cb<AVR8_TIMER_CMPCHANNEL_OC_A>().set(&atmegax8_base_device::set_gpio_bit<GPIOB, 2>, "set_gpio_bit_pb2");
-	atimer2->oc_toggle_w_cb<AVR8_TIMER_CMPCHANNEL_OC_A>().set(&atmegax8_base_device::toggle_gpio_bit<GPIOB, 2>, "toggle_gpio_bit_pb2");
+	atimer2->oc_w_cb<AVR8_TIMER_CMPCHANNEL_OC_A>().set(&atmegax8_base_device::set_gpio_bit<GPIOB, 3>, "set_gpio_bit_pb3");
+	atimer2->oc_toggle_w_cb<AVR8_TIMER_CMPCHANNEL_OC_A>().set(&atmegax8_base_device::toggle_gpio_bit<GPIOB, 3>, "toggle_gpio_bit_pb3");
 	atimer2->oc_w_cb<AVR8_TIMER_CMPCHANNEL_OC_B>().set(&atmegax8_base_device::set_gpio_bit<GPIOD, 3>, "set_gpio_bit_pd3");
 	atimer2->oc_toggle_w_cb<AVR8_TIMER_CMPCHANNEL_OC_B>().set(&atmegax8_base_device::toggle_gpio_bit<GPIOD, 3>, "toggle_gpio_bit_pd3");
 }
@@ -2065,9 +2065,7 @@ void avr8_base_device::fire_interrupts()
 		fatalerror("interrupt vector %d set to fire, but no interrupt condition was mapped to it", vector);
 		return;
 	}
-
-	// printf("vector %d -> intidx %d\n", vector, intidx);
-
+	
 	interrupt_condition condition = m_int_conditions_table[intidx];
 
 	if (!condition.m_intondev)

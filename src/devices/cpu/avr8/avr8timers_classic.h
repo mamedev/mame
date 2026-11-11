@@ -761,8 +761,8 @@ protected:
 
 class avr8_megaavr_timer_1_device : public avr8_generic_timer_1_device,
 									public avr8_megaavr_tifr_mixin<avr8_megaavr_timer_1_device, 0, 1, 2, 3, 5>,
-									public avr8_megaavr_tccr_a_mixin<avr8_megaavr_timer_1_device, 0, 1, 6, 7, 4, 5>,
-									public avr8_megaavr_timsk_mixin<avr8_megaavr_timer_1_device, 0, 1, 2, 5>
+									public avr8_megaavr_tccr_a_mixin<avr8_megaavr_timer_1_device, 0, 1, 6, 7, 4, 5, 2, 3>,
+									public avr8_megaavr_timsk_mixin<avr8_megaavr_timer_1_device, 0, 1, 2, 3, 5>
 {
 public:
 	avr8_megaavr_timer_1_device(const machine_config &mconfig,

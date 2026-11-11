@@ -889,17 +889,14 @@ void avr8_generic_8bit_timer_device::force_oc0b()
 
 bool avr8_generic_8bit_timer_device::com_mode_allows_output(uint8_t channel)
 {
-	// SET/CLEAR modes get their outputs enabled so just return in that case
-	if (m_com[channel] == AVR8_TIMER_COM_SET || m_com[channel] == AVR8_TIMER_COM_CLEAR)
-	{
-		return true;
-	}
-
-	// Outputs will obviously be disabled in normal mode
-	if (m_com[channel] == AVR8_TIMER_COM_NORMAL)
-	{
+	// Output is never enabled in normal mode (disconnects OCxx altogether),
+	// and the 8-bit timers don't have a channel C
+	if (channel == AVR8_TIMER_CMPCHANNEL_OC_C || m_com[channel] == AVR8_TIMER_COM_NORMAL)
 		return false;
-	}
+
+	// SET/CLEAR modes always enable the output
+	if (m_com[channel] == AVR8_TIMER_COM_SET || m_com[channel] == AVR8_TIMER_COM_CLEAR)
+		return true;
 
 	if (channel == AVR8_TIMER_CMPCHANNEL_OC_A)
 	{
@@ -908,7 +905,7 @@ bool avr8_generic_8bit_timer_device::com_mode_allows_output(uint8_t channel)
 		// Tables 15-3, 15-4.
 		if (m_wgm == GENERIC_8BIT_TIMER_WGM_FAST_PWM || m_wgm == GENERIC_8BIT_TIMER_WGM_PWM)
 		{
-			logerror("%s: attempt to switch 8-bit timer COMxA to TOGGLE in a mode that doesn't support it (m_wgm=0x%02x)\n",
+			logerror("%s: 8-bit timer COMxA set to TOGGLE in a mode that doesn't support it (m_wgm=0x%02x)\n",
 				machine().describe_context(),
 				m_wgm);
 			return false;
@@ -917,8 +914,11 @@ bool avr8_generic_8bit_timer_device::com_mode_allows_output(uint8_t channel)
 		return true;
 	}
 
-	// OCxB and OCxC are disconnected in toggle mode for all WGM modes on this timer
-	logerror("%s: attempt to switch 8-bit timer COMxx to TOGGLE on a channel that doesn't support it\n",
+	// for all others, OCxB is only allowed to toggle on the non-PWM modes
+	if (m_wgm == GENERIC_8BIT_TIMER_WGM_NORMAL || m_wgm == GENERIC_8BIT_TIMER_WGM_CTC)
+		return true;
+
+	logerror("%s: 8-bit timer COMxB set to TOGGLE in a mode that doesn't support it (m_wgm=0x%02x)\n",
 				machine().describe_context(),
 				m_wgm);
 	return false;
@@ -938,7 +938,7 @@ void avr8_generic_8bit_timer_device::wgm_w(uint8_t data)
 {
 	if (m_wgm == data) return;
 
-	m_wgm = BIT(data, 0, 2);
+	m_wgm = BIT(data, 0, 3); // value from 0-7
 
 	// output lines will switch when WGM switches, so rewrite COM modes
 	com_w<AVR8_TIMER_CMPCHANNEL_OC_A>(com_r<AVR8_TIMER_CMPCHANNEL_OC_A>());
