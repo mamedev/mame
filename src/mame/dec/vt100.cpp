@@ -153,34 +153,41 @@ void vt100_state::vt180_mem(address_map &map)
 	map(0x2000, 0xffff).ram();
 }
 
-// VT101/VT102/VT131 board (5414185), from the MP-01066 print set.  The
-// memory decoder (E60, sheet 2) looks only at A13 and A15, so A14 is ignored
-// and everything repeats at +4000.
+// VT101/VT102/VT131 board (5414185), from MP-01066, the VT101 Family Field
+// Maintenance Print Set.  The memory decoder (E60, sheet 2) looks only at A13
+// and A15, so A14 is ignored and everything repeats at +4000.
 //
-// The VT101 has 3K of RAM at 2000-2BFF, the same as a VT100 without the AVO.
-// Sheet 6, fitted only on the VT102 and VT131, adds what the AVO gives a
-// VT100: RAM up to 2FFF, attribute RAM at 3000-3FFF and ROM sockets at
-// 8000-BFFF.  Nothing on the VT101 board answers in those ranges; reading
-// them as all ones is an assumption.
+// The VT101 has 3K of RAM at 2000-2BFF, the 3K a VT100 has without the AVO.
+// The VT102 and VT131 have what the AVO adds to a VT100: RAM up to 2FFF (a
+// fourth RAM position on sheet 1 and the jumpers on sheet 2), and attribute
+// RAM at 3000-3FFF and ROM sockets at 8000-BFFF (sheet 6, fitted only on the
+// VT102 and VT131).
 void vt100_state::vt101_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).mirror(0x4000).rom(); // 8K firmware ROM
-	map(0x2000, 0x2bff).mirror(0x4000).ram().share("p_ram"); // screen and scratch RAM
+	map(0x2000, 0x2bff).mirror(0x4000).ram().share(m_p_ram); // screen and scratch RAM
+	// Nothing on the VT101 board answers here, but the firmware still writes
+	// screen and attribute bytes up to 3FFF, as with an AVO, and reads the
+	// cursor cell's attribute and the option ROM area.  Reading all ones is an
+	// assumption.
+	map(0x2c00, 0x3fff).mirror(0x4000).noprw();
+	map(0x8000, 0xbfff).mirror(0x4000).noprw();
 }
 
 void vt100_state::vt102_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).mirror(0x4000).rom(); // 8K firmware ROM
-	// screen and scratch RAM: two 2K x 8 parts, with W31 fitted as on the
-	// VT102/VT131 (sheet 2 RAM jumper table)
-	map(0x2000, 0x2fff).mirror(0x4000).ram().share("p_ram");
+	// screen and scratch RAM: two 2K x 8 parts.  W31 is fitted on the
+	// VT102/VT131; it grounds A10 at the RAM decoder, which selects 2K x 8
+	// parts (sheet 2 RAM jumper table).
+	map(0x2000, 0x2fff).mirror(0x4000).ram().share(m_p_ram);
 	// one attribute nibble per screen RAM byte (underline, blink, bold, alternate
 	// character set), in four 1K x 4 2114s
-	map(0x3000, 0x3fff).mirror(0x4000).ram().share("attr_ram").r(FUNC(vt100_state::attr_ram_r));
-	// option ROMs: the VT102 and VT131 firmware put theirs at 8000-9FFF and
-	// A000-BFFF; jumpers on sheet 6 can place the four sockets otherwise
+	map(0x3000, 0x3fff).mirror(0x4000).ram().share(m_attr_ram).r(FUNC(vt100_state::attr_ram_r));
+	// option ROMs: 8K (E69) at 8000 on both, and on the VT131 2K (E67) at A000;
+	// jumpers on sheet 6 can place the four sockets otherwise
 	map(0x8000, 0xbfff).mirror(0x4000).rom();
 }
 
@@ -361,7 +368,8 @@ u8 vt100_state::video_ram_r(offs_t offset)
 	// The video fetches from 2000 up: characters below 3000 and their
 	// attributes 1000 above them.  On the VT102/VT131 the attributes are in
 	// their own RAM.  Past the end of the RAM a model has fitted, return all
-	// ones as for an empty bus (an assumption, see vt101_mem).
+	// ones as for an empty bus (an assumption, see vt101_mem); the attribute
+	// bits are active low, so that means no attributes.
 	if (m_attr_ram && (offset >= 0x1000))
 		return attr_ram_r(offset & 0x0fff);
 	return (offset < m_p_ram.bytes()) ? m_p_ram[offset] : 0xff;
@@ -369,7 +377,8 @@ u8 vt100_state::video_ram_r(offs_t offset)
 
 u8 vt100_state::attr_ram_r(offs_t offset)
 {
-	// only D0-D3 reach the bus (buffers E38 and E1); E51 pulls D4-D7 high (sheet 6)
+	// only D0-D3 reach the bus (buffers E38 and E1); the pull-up pack E51
+	// holds D4-D7 high (sheet 6)
 	return m_attr_ram[offset] | 0xf0;
 }
 
