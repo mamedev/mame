@@ -101,7 +101,7 @@ private:
 	required_device<rs232_port_device> m_rs232;
 	optional_device<ins8250_device> m_printer_uart;
 	required_shared_ptr<u8> m_p_ram;
-	optional_shared_ptr<u8> m_attr_ram; // VT102/VT131 attribute RAM, 4 bits wide
+	optional_shared_ptr<u8> m_attr_ram; // VT102/VT131 only
 
 	required_ioport m_phosphor;
 	u8 m_options = 0; // set by each model's machine config
@@ -113,6 +113,7 @@ private:
 	u8 printer_r(offs_t offset);
 	void printer_w(offs_t offset, u8 data);
 	u8 video_ram_r(offs_t offset);
+	u8 attr_ram_r(offs_t offset);
 	void uart_clock_w(u8 data);
 
 	virtual void machine_start() override ATTR_COLD;
@@ -120,13 +121,13 @@ private:
 	u32 screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(vt102_irq_callback);
 	void vt100_mem(address_map &map) ATTR_COLD;
+	void vt101_mem(address_map &map) ATTR_COLD;
+	void vt102_mem(address_map &map) ATTR_COLD;
 	void vt100_io(address_map &map) ATTR_COLD;
 	void vt102_io(address_map &map) ATTR_COLD;
 	void stp_mem(address_map &map) ATTR_COLD;
 	void stp_io(address_map &map) ATTR_COLD;
 	void vt180_mem(address_map &map) ATTR_COLD;
-	void vt101_mem(address_map &map) ATTR_COLD;
-	void vt102_mem(address_map &map) ATTR_COLD;
 	void vt180_io(address_map &map) ATTR_COLD;
 };
 
@@ -152,26 +153,35 @@ void vt100_state::vt180_mem(address_map &map)
 	map(0x2000, 0xffff).ram();
 }
 
-// VT101/VT102/VT131 board (5414185, MP-01066).  The decoder E60 uses only
-// A13 and A15, so A14 is ignored and everything repeats at +4000.  The VT101
-// has 3K of RAM, like a VT100 without the AVO.  Sheet 6, fitted only on the
-// VT102 and VT131, adds 1K more RAM at 2C00, the attribute RAM and two ROM
-// sockets above 8000.
+// VT101/VT102/VT131 board (5414185), from the MP-01066 print set.  The
+// memory decoder (E60, sheet 2) looks only at A13 and A15, so A14 is ignored
+// and everything repeats at +4000.
+//
+// The VT101 has 3K of RAM at 2000-2BFF, the same as a VT100 without the AVO.
+// Sheet 6, fitted only on the VT102 and VT131, adds what the AVO gives a
+// VT100: RAM up to 2FFF, attribute RAM at 3000-3FFF and ROM sockets at
+// 8000-BFFF.  Nothing on the VT101 board answers in those ranges; reading
+// them as all ones is an assumption.
 void vt100_state::vt101_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).mirror(0x4000).rom(); // XE71
-	map(0x2000, 0x2bff).mirror(0x4000).ram().share("p_ram"); // E59, E58, E57
+	map(0x0000, 0x1fff).mirror(0x4000).rom(); // 8K firmware ROM
+	map(0x2000, 0x2bff).mirror(0x4000).ram().share("p_ram"); // screen and scratch RAM
 }
 
 void vt100_state::vt102_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).mirror(0x4000).rom(); // XE71
-	map(0x2000, 0x2fff).mirror(0x4000).ram().share("p_ram"); // E59, E58, E57, E56
-	// 2114s E52-E55 are 4 bits wide; E51 pulls the upper data lines high
-	map(0x3000, 0x3fff).mirror(0x4000).lr8(NAME([this] (offs_t offset) { return m_attr_ram[offset] | 0xf0; })).writeonly().share("attr_ram");
-	map(0x8000, 0xbfff).mirror(0x4000).rom(); // XE69 at 8000, XE67 at A000
+	map(0x0000, 0x1fff).mirror(0x4000).rom(); // 8K firmware ROM
+	// screen and scratch RAM: two 2K x 8 parts, with W31 fitted as on the
+	// VT102/VT131 (sheet 2 RAM jumper table)
+	map(0x2000, 0x2fff).mirror(0x4000).ram().share("p_ram");
+	// one attribute nibble per screen RAM byte (underline, blink, bold, alternate
+	// character set), in four 1K x 4 2114s
+	map(0x3000, 0x3fff).mirror(0x4000).ram().share("attr_ram").r(FUNC(vt100_state::attr_ram_r));
+	// option ROMs: the VT102 and VT131 firmware put theirs at 8000-9FFF and
+	// A000-BFFF; jumpers on sheet 6 can place the four sockets otherwise
+	map(0x8000, 0xbfff).mirror(0x4000).rom();
 }
 
 void vt100_state::vt180_io(address_map &map)
@@ -348,10 +358,19 @@ void vt100_state::machine_reset()
 
 u8 vt100_state::video_ram_r(offs_t offset)
 {
-	// the video fetches 2000-3FFF; the VT101/VT102 board has less RAM there
+	// The video fetches from 2000 up: characters below 3000 and their
+	// attributes 1000 above them.  On the VT102/VT131 the attributes are in
+	// their own RAM.  Past the end of the RAM a model has fitted, return all
+	// ones as for an empty bus (an assumption, see vt101_mem).
 	if (m_attr_ram && (offset >= 0x1000))
-		return m_attr_ram[offset & 0x0fff] | 0xf0;
+		return attr_ram_r(offset & 0x0fff);
 	return (offset < m_p_ram.bytes()) ? m_p_ram[offset] : 0xff;
+}
+
+u8 vt100_state::attr_ram_r(offs_t offset)
+{
+	// the 2114s drive only D0-D3 (through E38); E51 pulls D4-D7 high (sheet 6)
+	return m_attr_ram[offset] | 0xf0;
 }
 
 void vt100_state::uart_clock_w(u8 data)
@@ -543,7 +562,6 @@ void vt100_state::vt102(machine_config &config)
 	m_options |= OPT_AVO; // always built in; W5 fitted
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt100_state::vt102_mem);
-
 	m_maincpu->set_addrmap(AS_IO, &vt100_state::vt102_io);
 
 	ins8250_device &printuart(INS8250(config, "printuart", XTAL(24'073'400) / 16));
