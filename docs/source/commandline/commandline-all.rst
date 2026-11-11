@@ -4050,6 +4050,38 @@ Core Misc Options
 
             mame mslug -bios unibios33
 
+.. _mame-commandline-ram:
+
+**-ram** *[<size>][,<fill>]*
+
+    Specifies the size and initial contents of RAM for systems that use the
+    generic RAM device. The size must be one the system supports; use
+    **-listslots** to see them. If it is left out, the default size is used.
+
+    Systems with more than one generic RAM device have a slot option for each
+    one, named after the device, such as **-ext:ssc:staticram**. The fill only
+    applies to the device it is specified for. A driver may overwrite the
+    initial contents when it starts or resets.
+
+    The fill may be one of the following:
+
+    * ``zero`` fills RAM with 00 bytes.
+    * ``ones`` fills RAM with FF bytes.
+    * ``random`` fills RAM with pseudo-random bytes.
+    * Two hexadecimal digits, such as ``55``, fill RAM with that byte.
+    * Four hexadecimal digits, such as ``00ff``, alternate between the two bytes.
+      They may be followed by a colon and a decimal run length, such as
+      ``00ff:64``, to fill that many bytes with each value before alternating.
+
+    The default is to use the fill selected by the driver, which is FF bytes if
+    the driver does not select one.
+
+    Example:
+        .. code-block:: bash
+
+            mame coco3 -ram 2m,00ff
+            mame coco -ram ,00ff:64
+
 .. _mame-commandline-cheat:
 
 **-[no]cheat** / **-[no]c**
