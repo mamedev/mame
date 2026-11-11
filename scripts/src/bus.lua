@@ -1830,6 +1830,8 @@ if BUSES["CENTRONICS"] then
 		MAME_DIR .. "src/devices/bus/centronics/nec_p72.h",
 		MAME_DIR .. "src/devices/bus/centronics/nlq401.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/nlq401.h",
+		MAME_DIR .. "src/devices/bus/centronics/nx1020.cpp",
+		MAME_DIR .. "src/devices/bus/centronics/nx1020.h",
 		MAME_DIR .. "src/devices/bus/centronics/pc6022.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/pc6022.h",
 		MAME_DIR .. "src/devices/bus/centronics/printer.cpp",
@@ -1846,12 +1848,14 @@ if BUSES["CENTRONICS"] then
 		{ MAME_DIR .. "src/devices/bus/centronics/epson_ex800.cpp",  GEN_DIR .. "emu/layout/ex800.lh" },
 		{ MAME_DIR .. "src/devices/bus/centronics/epson_lx800.cpp",  GEN_DIR .. "emu/layout/lx800.lh" },
 		{ MAME_DIR .. "src/devices/bus/centronics/epson_lx810l.cpp", GEN_DIR .. "emu/layout/lx800.lh" },
+		{ MAME_DIR .. "src/devices/bus/centronics/nx1020.cpp",       GEN_DIR .. "emu/layout/nx1020.lh" },
 		{ MAME_DIR .. "src/devices/bus/centronics/smartboard.cpp",   GEN_DIR .. "emu/layout/smartboard.lh" },
 	}
 
 	custombuildtask {
 		layoutbuildtask("emu/layout", "ex800"),
 		layoutbuildtask("emu/layout", "lx800"),
+		layoutbuildtask("emu/layout", "nx1020"),
 		layoutbuildtask("emu/layout", "smartboard"),
 	}
 end
