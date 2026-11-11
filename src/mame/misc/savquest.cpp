@@ -110,6 +110,7 @@ private:
 	void savquest_map(address_map &map) ATTR_COLD;
 
 	static void winbond_superio_config(device_t *device);
+	static void sblaster_config(device_t *device);
 };
 
 
@@ -123,30 +124,7 @@ void savquest_state::savquest_io(address_map &map)
 	map.unmap_value_high();
 }
 
-// cabinet controls, read by the GCI board on serport0 (kept in the driver so they stay player 1)
 static INPUT_PORTS_START( savquest )
-	// bits are GCI buttons 1-7, bit 7 is the coin input (the credit counter)
-	PORT_START("PANEL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // Roar
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Instant Credit")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Operator")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
-
-	// GCI buttons 11 and 12 (13-16 are the unused second stick and spares)
-	PORT_START("STICK_BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // Bite (trigger)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Charge (thumb)
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("STICK_X")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
-
-	PORT_START("STICK_Y")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
 /*
@@ -181,6 +159,7 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual void received_byte(u8 byte) override;
 
@@ -226,14 +205,44 @@ private:
 
 savquest_gci_device::savquest_gci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	buffered_rs232_device<64>(mconfig, SAVQUEST_GCI, tag, owner, clock),
-	m_panel(*this, ":PANEL"),
-	m_stick_buttons(*this, ":STICK_BUTTONS"),
-	m_stick_x(*this, ":STICK_X"),
-	m_stick_y(*this, ":STICK_Y"),
+	m_panel(*this, "PANEL"),
+	m_stick_buttons(*this, "STICK_BUTTONS"),
+	m_stick_x(*this, "STICK_X"),
+	m_stick_y(*this, "STICK_Y"),
 	m_lamps(*this, "lamp%u", 1U)
 {
 }
 
+// cabinet controls
+static INPUT_PORTS_START( savquest_gci )
+	// bits are GCI buttons 1-7, bit 7 is the coin input (the credit counter)
+	PORT_START("PANEL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // Roar
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Instant Credit")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Operator")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	// GCI buttons 11 and 12 (13-16 are the unused second stick and spares)
+	PORT_START("STICK_BUTTONS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // Bite (trigger)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Charge (thumb)
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("STICK_X")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
+
+	PORT_START("STICK_Y")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
+INPUT_PORTS_END
+
+ioport_constructor savquest_gci_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(savquest_gci);
+}
 
 void savquest_gci_device::device_start()
 {
@@ -488,6 +497,11 @@ void savquest_state::winbond_superio_config(device_t *device)
 	centronics->set_fixed(true);
 }
 
+void savquest_state::sblaster_config(device_t *device)
+{
+	device->subdevice<pc_joy_device>("pc_joy")->set_default_option(nullptr); // no joystick on the game port
+}
+
 
 void savquest_state::savquest(machine_config &config)
 {
@@ -519,7 +533,7 @@ void savquest_state::savquest(machine_config &config)
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
 	// TODO: awe64 by default
-	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, "sblaster_16", false);
+	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, "sblaster_16", false).set_option_machine_config("sblaster_16", sblaster_config);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
