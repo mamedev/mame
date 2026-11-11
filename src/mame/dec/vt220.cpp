@@ -74,7 +74,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_duart(*this, "duart"),
-		m_kbd(*this, "lk201")
+		m_kbd(*this, "lk201"),
+		m_palette(*this, "palette")
 	{ }
 
 	void vt220(machine_config &config);
@@ -88,6 +89,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<scn2681_device> m_duart;
 	required_device<lk201_device> m_kbd;
+	required_device<palette_device> m_palette;
 
 private:
 	u8 m_kbd_rxd = 1;
@@ -162,6 +164,8 @@ private:
 	u8 dot(int col, int x, int line, bool &bold, bool &blink_n) const;
 	u8 video_out(int x, int y, bool &bold, bool &blink_n) const;
 	void write_host_txd(u8 conf) { m_host->write_txd(BIT(conf, 6) ? 1 : m_host_txd); }
+	void sync_video() { m_screen->update_partial(m_screen->vpos()); }
+	void lbf_load(u8 lba, u8 chr, u8 atr) { m_lbf[lbf_addr(true, lba)] = chr; m_lbf[lbf_addr(false, lba)] = atr; }
 
 	u8 p1_r();
 	void p1_w(u8 data);
@@ -276,10 +280,7 @@ u8 vt220a_state::vram_r(offs_t offset)
 			m_row_loading = true;
 		}
 		if (col >= 0 && col < 0x100)
-		{
-			m_lbf[lbf_addr(true, col)] = chr;
-			m_lbf[lbf_addr(false, col)] = m_attr_ram[offset & 0x0fff];
-		}
+			lbf_load(u8(col), chr, m_attr_ram[offset & 0x0fff]);
 	}
 	return chr;
 }
@@ -376,7 +377,7 @@ u8 vt220a_state::dot(int col, int x, int line, bool &bold, bool &blink_n) const
 	if (BIT(atr, 4) && line >= 8) // UL ATR gated with SC3: scan lines 9 and 10
 		on = true;
 	// reverse: NORM FIELD H XOR REV ATR (E46)
-	return (on ? 1 : 0) ^ BIT(m_conf, 0) ^ (BIT(atr, 5) ? 0 : 1);
+	return (on ? 1 : 0) ^ BIT(m_conf, 0) ^ BIT(~atr, 5);
 }
 
 u8 vt220a_state::video_out(int x, int y, bool &bold, bool &blink_n) const
@@ -408,17 +409,15 @@ u8 vt220a_state::duart_r(offs_t offset)
 
 void vt220a_state::p1_w(u8 data)
 {
-	// LBF DISABLE H (P1.3) and CHRG SEL H (P1.5) change the video; DMA L (P1.0) changes with every row
-	// load, whose top scan line is painted as it loads
-	if ((m_p1 ^ data) & 0x28)
-		m_screen->update_partial(m_screen->vpos());
 	// DMA L (P1.0) falling edge loads the character address latch into the line buffer, only while
 	// EN CHR GEN RW H gives the access mux to the CPU (TM 6.2.4.1); a row load's DMA grant doesn't
-	if (BIT(m_p1, 0) && !BIT(data, 0) && !BIT(data, 3) && BIT(m_conf, 2))
-	{
-		m_lbf[lbf_addr(true, m_lba)] = m_char_addr;
-		m_lbf[lbf_addr(false, m_lba)] = m_atr_latch;
-	}
+	const bool load = BIT(m_p1, 0) && !BIT(data, 0) && !BIT(data, 3) && BIT(m_conf, 2);
+	// that load, LBF DISABLE H (P1.3) and CHRG SEL H (P1.5) change the video; DMA L alone changes with
+	// every row load, whose top scan line is painted as it loads
+	if (load || ((m_p1 ^ data) & 0x28))
+		sync_video();
+	if (load)
+		lbf_load(m_lba, m_char_addr, m_atr_latch);
 	// NVR RECALL L (P1.1) and NVR STORE L (P1.2); the X2212 core takes them active high, and a
 	// STORE edge has no effect during RECALL (TM 4.2.9), so RECALL ending doesn't start one
 	m_nvr->recall(!BIT(data, 1));
@@ -435,6 +434,7 @@ void vt220a_state::conf_w(u8 data)
 	// E26 (LS174) latches BAD0-5, bit order per firmware self-test (reverse of the sheet 2 Q labels):
 	// 0 NORM FIELD, 1 LBA CLRS, 2 EN CHR GEN RW, 3 ALT SEL, 4 RESET CMM, 5 LBA CLKS
 	// E32 F/F latches BAD6: set for ENA 20mA, reset for ENA EIA
+	sync_video();
 	// RESET CMM H resets the DUART
 	if (BIT(data, 4) && !BIT(m_conf, 4))
 		m_duart->reset();
@@ -455,7 +455,6 @@ void vt220a_state::conf_w(u8 data)
 		else if (BIT(m_conf, 5) && !BIT(data, 5))
 			m_lba++;
 	}
-	m_screen->update_partial(m_screen->vpos());
 	m_conf = data;
 }
 
@@ -480,7 +479,7 @@ u8 vt220a_state::p1_r()
 
 void vt220a_state::duart_out_w(u8 data)
 {
-	m_screen->update_partial(m_screen->vpos());
+	sync_video();
 	m_duart_op = data;
 	if (BIT(data, 4) != m_132col)
 	{
@@ -495,8 +494,8 @@ void vt220a_state::set_columns()
 	const int htotal = t.htotal * t.width;
 	const int hstart = t.hdelay * t.width;
 	m_screen->configure(htotal, VTOTAL, rectangle(hstart, hstart + t.cols * t.width - 1, VSTART, VSTART + VVIS - 1), attotime::from_ticks(htotal * VTOTAL, t.dot));
-	m_crtc->set_unscaled_clock(t.dot / t.width);
 	m_crtc->set_character_width(t.width);
+	m_crtc->set_unscaled_clock(t.dot / t.width);
 }
 
 void vt220a_state::char_addr_w(u8 data)
@@ -505,6 +504,7 @@ void vt220a_state::char_addr_w(u8 data)
 	// CPU access of the video logic enabled by EN CHR GEN RW H (TM table 4-2)
 	if (BIT(m_conf, 2))
 	{
+		sync_video(); // the latches reach the video while LBF DISABLE H (P1.3) is high
 		m_char_addr = data;
 		m_atr_latch = data & 0xf8;
 	}
@@ -522,7 +522,7 @@ void vt220a_state::chargen_w(offs_t offset, u8 data)
 {
 	if (BIT(m_conf, 3) && BIT(m_conf, 2))
 	{
-		m_screen->update_partial(m_screen->vpos());
+		sync_video();
 		m_softchar[soft_addr(lbf_out(true, m_lba), offset)] = data;
 	}
 }
@@ -563,16 +563,16 @@ void vt220a_state::machine_start()
 	save_item(NAME(m_host_rxd));
 	save_item(NAME(m_softchar));
 	save_item(NAME(m_lbf));
+
+	// TM table 5-2: the printer port DTR and RTS are on whenever the terminal is powered
+	m_printer->write_dtr(0);
+	m_printer->write_rts(0);
 }
 
 void vt220a_state::machine_reset()
 {
 	m_dw = false;
 	m_row_loading = false;
-
-	// TM table 5-2: the printer port DTR and RTS are on whenever the terminal is powered
-	m_printer->write_dtr(0);
-	m_printer->write_rts(0);
 }
 
 uint32_t vt220_state::screen_update_vt220(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -607,7 +607,6 @@ void vt220a_state::vt220a_palette(palette_device &palette) const
 	}
 }
 
-
 void vt220_state::vt220_common(machine_config &config)
 {
 	I8051(config, m_maincpu, 11.0592_MHz_XTAL); // from schematic for earlier version
@@ -636,9 +635,9 @@ void vt220_state::vt220(machine_config &config)
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
 	screen.set_screen_update(FUNC(vt220_state::screen_update_vt220));
-	screen.set_palette("palette");
+	screen.set_palette(m_palette);
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 }
 
 void vt220a_state::vt220a(machine_config &config)
@@ -695,8 +694,8 @@ void vt220a_state::vt220a(machine_config &config)
 	m_printer->dsr_handler().set(m_duart, FUNC(scn2681_device::ip5_w)); // PTR DSR
 
 	m_screen->set_screen_update(FUNC(vt220a_state::screen_update_vt220a));
-	m_screen->set_palette("palette");
-	PALETTE(config, "palette", FUNC(vt220a_state::vt220a_palette), 5);
+	m_screen->set_palette(m_palette);
+	PALETTE(config, m_palette, FUNC(vt220a_state::vt220a_palette), 5);
 }
 
 /* ROM definitions */
