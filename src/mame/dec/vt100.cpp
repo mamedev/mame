@@ -72,6 +72,7 @@ public:
 		m_rs232(*this, "rs232"),
 		m_printer_uart(*this, "printuart"),
 		m_p_ram(*this, "p_ram"),
+		m_attr_ram(*this, "attr_ram"),
 		m_phosphor(*this, "phosphor")
 	{
 	}
@@ -100,6 +101,7 @@ private:
 	required_device<rs232_port_device> m_rs232;
 	optional_device<ins8250_device> m_printer_uart;
 	required_shared_ptr<u8> m_p_ram;
+	optional_shared_ptr<u8> m_attr_ram; // VT102/VT131 attribute RAM, 4 bits wide
 
 	required_ioport m_phosphor;
 	u8 m_options = 0; // set by each model's machine config
@@ -123,6 +125,8 @@ private:
 	void stp_mem(address_map &map) ATTR_COLD;
 	void stp_io(address_map &map) ATTR_COLD;
 	void vt180_mem(address_map &map) ATTR_COLD;
+	void vt101_mem(address_map &map) ATTR_COLD;
+	void vt102_mem(address_map &map) ATTR_COLD;
 	void vt180_io(address_map &map) ATTR_COLD;
 };
 
@@ -146,6 +150,28 @@ void vt100_state::vt180_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0xffff).ram();
+}
+
+// VT101/VT102/VT131 board (5414185, MP-01066).  The decoder E60 uses only
+// A13 and A15, so A14 is ignored and everything repeats at +4000.  The VT101
+// has 3K of RAM, like a VT100 without the AVO.  Sheet 6, fitted only on the
+// VT102 and VT131, adds 1K more RAM at 2C00, the attribute RAM and two ROM
+// sockets above 8000.
+void vt100_state::vt101_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).mirror(0x4000).rom(); // XE71
+	map(0x2000, 0x2bff).mirror(0x4000).ram().share("p_ram"); // E59, E58, E57
+}
+
+void vt100_state::vt102_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).mirror(0x4000).rom(); // XE71
+	map(0x2000, 0x2fff).mirror(0x4000).ram().share("p_ram"); // E59, E58, E57, E56
+	// 2114s E52-E55 are 4 bits wide; E51 pulls the upper data lines high
+	map(0x3000, 0x3fff).mirror(0x4000).lr8(NAME([this] (offs_t offset) { return m_attr_ram[offset] | 0xf0; })).writeonly().share("attr_ram");
+	map(0x8000, 0xbfff).mirror(0x4000).rom(); // XE69 at 8000, XE67 at A000
 }
 
 void vt100_state::vt180_io(address_map &map)
@@ -322,7 +348,10 @@ void vt100_state::machine_reset()
 
 u8 vt100_state::video_ram_r(offs_t offset)
 {
-	return m_p_ram[offset];
+	// the video fetches 2000-3FFF; the VT101/VT102 board has less RAM there
+	if (m_attr_ram && (offset >= 0x1000))
+		return m_attr_ram[offset & 0x0fff] | 0xf0;
+	return (offset < m_p_ram.bytes()) ? m_p_ram[offset] : 0xff;
 }
 
 void vt100_state::uart_clock_w(u8 data)
@@ -493,7 +522,7 @@ void vt100_state::vt101(machine_config &config)
 	m_even_field_high = true;
 
 	I8085A(config.replace(), m_maincpu, XTAL(24'073'400) / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &vt100_state::vt100_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt100_state::vt101_mem);
 	m_maincpu->set_addrmap(AS_IO, &vt100_state::vt100_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(vt100_state::vt102_irq_callback));
 
@@ -512,6 +541,8 @@ void vt100_state::vt102(machine_config &config)
 	vt101(config);
 
 	m_options |= OPT_AVO; // always built in; W5 fitted
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt100_state::vt102_mem);
 
 	m_maincpu->set_addrmap(AS_IO, &vt100_state::vt102_io);
 
