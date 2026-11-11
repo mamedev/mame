@@ -213,13 +213,13 @@ lamp outputs to equal name-panel sections are also reconstructions.
 				{ item = view.items["coin_pound_label"], output = file.device:output("coin_lockout0") },
 				{ item = view.items["coin_50p_label"], output = file.device:output("coin_lockout1") },
 				{ item = view.items["coin_20p_label"], output = file.device:output("coin_lockout2") },
-				{ item = view.items["coin_10p_label"], output = file.device:output("coin_lockout3") },
-				{ item = view.items["coin_5p_label"], output = file.device:output("coin_lockout4") }
+				{ item = view.items["coin_10p_label"], output = file.device:output("coin_lockout1") },
+				{ item = view.items["coin_5p_label"], output = file.device:output("coin_lockout1") },
+				{ item = view.items["coin_two_pounds_label"], output = file.device:output("coin_lockout0") }
 			}
 			for _, label in pairs(coin_labels) do
 				label.item:set_element_state_callback(coin_label_state_callback(label, coin_acceptor_lamp))
 			end
-			view.items["coin_two_pounds_label"]:set_element_state_callback(state_callback(coin_acceptor_lamp))
 
 			local previous_time = emu.attotime(machine.time)
 			view:set_prepare_items_callback(function ()
