@@ -157,11 +157,11 @@ void vt100_state::vt180_mem(address_map &map)
 // Maintenance Print Set.  The memory decoder (E60, sheet 2) looks only at A13
 // and A15, so A14 is ignored and everything repeats at +4000.
 //
-// The VT101 has 3K of RAM at 2000-2BFF, the 3K a VT100 has without the AVO.
-// The VT102 and VT131 have what the AVO adds to a VT100: RAM up to 2FFF (a
-// fourth RAM position on sheet 1 and the jumpers on sheet 2), and attribute
-// RAM at 3000-3FFF and ROM sockets at 8000-BFFF (sheet 6, fitted only on the
-// VT102 and VT131).
+// The VT101 has 3K of RAM at 2000-2BFF, the 3K a VT100 has without its
+// Advanced Video Option (AVO).  The VT102 and VT131 have on the board what
+// the AVO adds to a VT100: RAM up to 2FFF (set by the RAM jumpers on sheet
+// 2), attribute RAM at 3000-3FFF, and ROM sockets at 8000-BFFF.  The last two
+// are on sheet 6, which is fitted only on the VT102 and VT131.
 void vt100_state::vt101_mem(address_map &map)
 {
 	map.unmap_value_high();
@@ -177,11 +177,10 @@ void vt100_state::vt101_mem(address_map &map)
 
 void vt100_state::vt102_mem(address_map &map)
 {
-	map.unmap_value_high();
 	map(0x0000, 0x1fff).mirror(0x4000).rom(); // 8K firmware ROM
-	// screen and scratch RAM: two 2K x 8 parts.  W31 is fitted on the
-	// VT102/VT131; it grounds A10 at the RAM decoder, which selects 2K x 8
-	// parts (sheet 2 RAM jumper table).
+	// Screen and scratch RAM, 4K.  W31, fitted on the VT102/VT131, grounds A10
+	// at the RAM decoder so that it selects 2K x 8 parts (sheet 2 RAM jumper
+	// table).
 	map(0x2000, 0x2fff).mirror(0x4000).ram().share(m_p_ram);
 	// one attribute nibble per screen RAM byte (underline, blink, bold, alternate
 	// character set), in four 1K x 4 2114s
@@ -918,7 +917,7 @@ ROM_START( vt125 ) // This is from bitsavers and vt100.net, as the vt125 schemat
 ROM_END
 #endif
 
-ROM_START( vt101 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 mainboard
+ROM_START( vt101 ) // p/n 5414185-00 'unupgradable/low cost' vt101/vt102/vt131 mainboard
 // does not have integrated STP or AVO populated
 // 8085 based instead of I8080
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
