@@ -422,7 +422,7 @@ void galaxold_state::scrambleo_map(address_map &map)
 
 
 
-void galaxold_state::_4in1_map(address_map &map)
+void galaxold_state::_4funin1_map(address_map &map)
 {
 	map(0x0000, 0x3fff).bankr("bank1");    // banked game code
 	map(0x4000, 0x47ff).ram();
@@ -446,7 +446,7 @@ void galaxold_state::_4in1_map(address_map &map)
 	map(0x7007, 0x7007).w(FUNC(galaxold_state::galaxold_flip_screen_y_w));
 	map(0x7800, 0x78ff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0x7800, 0x78ff).w("cust", FUNC(galaxian_sound_device::pitch_w));
-	map(0x8000, 0x8000).w(FUNC(galaxold_state::_4in1_bank_w));
+	map(0x8000, 0x8000).w(FUNC(galaxold_state::_4funin1_bank_w));
 	map(0xc000, 0xdfff).rom();     // fixed menu code
 }
 
@@ -1159,14 +1159,14 @@ static INPUT_PORTS_START( scrambleo )
 INPUT_PORTS_END
 
 template <int Mask>
-int galaxold_state::_4in1_fake_port_r()
+int galaxold_state::_4funin1_fake_port_r()
 {
 	static const char *const portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
 
-	return (ioport(portnames[m_4in1_bank])->read() & Mask) ? 1 : 0;
+	return (ioport(portnames[m_4funin1_bank])->read() & Mask) ? 1 : 0;
 }
 
-static INPUT_PORTS_START( 4in1 )
+static INPUT_PORTS_START( 4funin1 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
@@ -1186,18 +1186,18 @@ static INPUT_PORTS_START( 4in1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxold_state::_4in1_fake_port_r<0x40>))   // See fake ports
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxold_state::_4in1_fake_port_r<0x80>))   // See fake ports
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxold_state::_4funin1_fake_port_r<0x40>))   // See fake ports
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxold_state::_4funin1_fake_port_r<0x80>))   // See fake ports
 
 	PORT_START("DSW0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxold_state::_4in1_fake_port_r<0x01>))   // See fake ports
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxold_state::_4in1_fake_port_r<0x02>))   // See fake ports
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxold_state::_4funin1_fake_port_r<0x01>))   // See fake ports
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxold_state::_4funin1_fake_port_r<0x02>))   // See fake ports
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )         // 2 when continue (Scramble PT2)
 	PORT_DIPSETTING(    0x04, "5" )         // 2 when continue (Scramble PT2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxold_state::_4in1_fake_port_r<0x08>))   // See fake ports
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxold_state::_4in1_fake_port_r<0x10>))   // See fake ports
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxold_state::_4in1_fake_port_r<0x20>))   // fake ports
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxold_state::_4funin1_fake_port_r<0x08>))   // See fake ports
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxold_state::_4funin1_fake_port_r<0x10>))   // See fake ports
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(galaxold_state::_4funin1_fake_port_r<0x20>))   // fake ports
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("FAKE1")      // The Ghost Muncher PT3 - FAKE DSW0 (bits 0 to 5) and IN1 (bits 6 and 7)
@@ -1770,7 +1770,7 @@ static const gfx_layout pacmanbl_spritelayout =
 };
 #endif
 
-static const gfx_layout _4in1_charlayout =
+static const gfx_layout _4funin1_charlayout =
 {
 	8,8,
 	1024,
@@ -1780,7 +1780,7 @@ static const gfx_layout _4in1_charlayout =
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
 };
-static const gfx_layout _4in1_spritelayout =
+static const gfx_layout _4funin1_spritelayout =
 {
 	16,16,
 	256,
@@ -1804,9 +1804,9 @@ static GFXDECODE_START( gfx_gmgalax )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxold_spritelayout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( gfx_4in1 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, _4in1_charlayout,      0, 8 )
-	GFXDECODE_ENTRY( "gfx1", 0x4000, _4in1_spritelayout,    0, 8 )
+static GFXDECODE_START( gfx_4funin1 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, _4funin1_charlayout,      0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0x4000, _4funin1_spritelayout,    0, 8 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_dkingjrv )
@@ -2008,15 +2008,15 @@ void galaxold_state::scrambleo(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxold_state::scrambleo_map);
 }
 
-void galaxold_state::_4in1(machine_config &config)
+void galaxold_state::_4funin1(machine_config &config)
 {
 	galaxian(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &galaxold_state::_4in1_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxold_state::_4funin1_map);
 
 	// video hardware
-	m_gfxdecode->set_info(gfx_4in1);
+	m_gfxdecode->set_info(gfx_4funin1);
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,pisces)
 }
@@ -2455,7 +2455,7 @@ ROM_START( scrabbleo )
 	ROM_LOAD( "74s288.bin",      0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
-ROM_START( 4in1 )
+ROM_START( 4funin1 )
 	ROM_REGION( 0x20000, "maincpu", 0 )   // 64k for code  64k for banked code, encrypted
 	// Menu Code, Fixed at 0xc000 - 0xdfff
 	ROM_LOAD( "rom1a",        0xc000, 0x1000, CRC(ce1af4d9) SHA1(260d81cb703ab33fa5f282454214dea06e59a5d6) )
@@ -2995,7 +2995,7 @@ GAME( 1981, scramb3,   scramble, scramb3,   scramb2,   galaxold_state, empty_ini
 GAME( 1981, scrambler, scramble, scrambler, scrambler, galaxold_state, empty_init,     ROT90,  "bootleg (Reben S.A.)",          "Scramble (Reben S.A. Spanish bootleg)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scrambleo, scramble, scrambleo, scrambleo, galaxold_state, empty_init,     ROT90,  "bootleg (Okapi)",               "Scramble (Okapi bootleg)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scrabbleo, scramble, scrambler, scrambler, galaxold_state, empty_init,     ROT90,  "bootleg (Okapi?)",              "Scrabble (Spanish bootleg of Scramble)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1981, 4in1,      0,        _4in1,     4in1,      galaxold_state, init_4in1,      ROT90,  "Armenia / Food and Fun",        "4 Fun in 1",                                               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, 4funin1,   0,        _4funin1,  4funin1,   galaxold_state, init_4funin1,   ROT90,  "Armenia / Food and Fun",        "4 Fun in 1",                                               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dkongjrm,  dkongjr,  dkongjrm,  dkongjrm,  galaxold_state, empty_init,     ROT90,  "bootleg",                       "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 1)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dkongjrmc, dkongjr,  dkongjrmc, dkongjrmc, galaxold_state, empty_init,     ROT90,  "bootleg (Centromatic)",         "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 2)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // sprites leave artifacts
 GAME( 1982, tazzmang,  tazmania, tazzmang,  tazzmang,  galaxold_state, empty_init,     ROT90,  "bootleg",                       "Tazz-Mania (bootleg on Galaxian hardware)",                MACHINE_SUPPORTS_SAVE )
