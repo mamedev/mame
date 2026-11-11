@@ -444,7 +444,8 @@ inline void crt9007_device::update_curs_output()
 
 
 //-------------------------------------------------
-//  recompute_cursor -
+//  compute_cursor_position - work out the beam
+//  positions of the cursor from the registers
 //-------------------------------------------------
 
 inline void crt9007_device::compute_cursor_position()
@@ -458,6 +459,12 @@ inline void crt9007_device::compute_cursor_position()
 	m_curs_top = VERTICAL_DELAY + (VERTICAL_CURSOR * SCAN_LINES_PER_DATA_ROW);
 	m_curs_bottom = m_curs_top + SCAN_LINES_PER_DATA_ROW - 1;
 }
+
+
+//-------------------------------------------------
+//  recompute_cursor - recompute the cursor
+//  position and restart the cursor timer
+//-------------------------------------------------
 
 inline void crt9007_device::recompute_cursor()
 {
@@ -505,9 +512,9 @@ inline void crt9007_device::update_frame_timer()
 
 //-------------------------------------------------
 //  compute_geometry - work out the beam positions
-//  of the sync, visible line time, data row and
-//  cursor edges from the registers, without
-//  touching any timer or output
+//  of the sync, visible line time and data row
+//  edges from the registers, without touching any
+//  timer or output
 //-------------------------------------------------
 
 inline void crt9007_device::compute_geometry()
@@ -527,8 +534,6 @@ inline void crt9007_device::compute_geometry()
 	// vertical sync
 	m_vsync_start = 0;
 	m_vsync_end = VERTICAL_SYNC_WIDTH;
-
-	compute_cursor_position();
 }
 
 
@@ -727,12 +732,11 @@ void crt9007_device::device_reset()
 
 void crt9007_device::device_post_load()
 {
-	// The timers and output levels were restored with the rest of the state, at
-	// their saved point in the frame; restarting the timers here would move
-	// them to the top of the frame.  Only the beam positions derived from the
-	// registers, which aren't saved, need working out again.
-	if (HAS_VALID_PARAMETERS)
-		compute_geometry();
+	// The timers and output levels are saved and restored with the rest of the
+	// state.  Only the beam positions, which are worked out from the registers
+	// and not saved, are rebuilt here.
+	compute_geometry();
+	compute_cursor_position();
 }
 
 

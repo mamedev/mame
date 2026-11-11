@@ -152,18 +152,18 @@ private:
 	bool m_lpstb;
 
 	// runtime variables, do not state save
-	int m_vsync_start;
-	int m_vsync_end;
-	int m_hsync_start;
-	int m_hsync_end;
-	int m_vlt_start;
-	int m_vlt_end;
-	int m_vlt_bottom;
-	int m_curs_start;
-	int m_curs_end;
-	int m_curs_top;
-	int m_curs_bottom;
-	int m_drb_bottom;
+	int m_vsync_start = 0;
+	int m_vsync_end = 0;
+	int m_hsync_start = 0;
+	int m_hsync_end = 0;
+	int m_vlt_start = 0;
+	int m_vlt_end = 0;
+	int m_vlt_bottom = 0;
+	int m_curs_start = 0;
+	int m_curs_end = 0;
+	int m_curs_top = 0;
+	int m_curs_bottom = 0;
+	int m_drb_bottom = 0;
 	//int m_wben;
 	//int m_slg;
 	//int m_sld;
