@@ -1,0 +1,9 @@
+steps:
+  build:
+    image: registry.fedoraproject.org/fedora:latest
+    when:
+      event: [push, pull_request]
+    commands:
+      - dnf --assumeyes install gcc-c++ meson
+      - meson setup _build-dir
+      - meson dist -C _build-dir

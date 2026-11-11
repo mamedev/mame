@@ -8,7 +8,7 @@
 
 #include "multibyte.h"
 
-#include "openh264/codec/api/wels/codec_api.h"
+#include "noopenh264/codec/api/wels/codec_api.h"
 
 #include <algorithm>
 #include <memory>
