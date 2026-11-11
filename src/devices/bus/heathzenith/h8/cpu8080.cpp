@@ -277,9 +277,6 @@ void h_8_cpu_8080_device::io_map(address_map &map)
 ROM_START( h8 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
 
-	// H17 floppy ROM is on a separate card, keeping it documented here until that card is implemented.
-	// ROM_LOAD( "2716_444-19_h17.rom", 0x1800, 0x0800,     CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
-
 	ROM_SYSTEM_BIOS(0, "pam8", "Standard PAM8")
 	ROMX_LOAD( "2708_444-13_pam8.rom", 0x0000, 0x0400,   CRC(e0745513) SHA1(0e170077b6086be4e5cd10c17e012c0647688c39), ROM_BIOS(0) )
 
