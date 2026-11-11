@@ -12,18 +12,14 @@
       fallbacks to AWE32 and SB16;
     \- to workaround: attrib -R C:\IMMERSIA\BIN\IMMOS.BAT then edit file to swap sound card
 
-    - When switching gfx mode during boot routine it still sets a terminal debug mode (with cut down screen portions)
-      instead of normal Voodoo drawing. Culprit may be an I/O port reading or a Voodoo bug;
+    - GCI controls board:
+    \- version strings are guesses (the game accepts them);
+    \- joystick reports are sent when the stick moves, real board behaviour unknown;
+    \- stick axis directions unverified;
 
-    - Aforementioned debug mode shows that it can't find several assets on loading;
-
-    - When game boots it does extensive CPUID checks, more copy protection tied to the CPU serial it has been installed on?
-
-    - currently asserts by selecting a s3 video bank above 1M (register 0x6a) Update: fixed?
-
+    Notes:
     - The version is labeled "SQ05" in the filesystem but has the 1999 release year.
-      Other components are labeled "v0.5", but the game doesn't boot far enough to see if
-      any graphics have version information. There appears to also be a "Savage Quest 2.1" which
+      Other components are labeled "v0.5". There appears to also be a "Savage Quest 2.1" which
       is undumped.
 
     PCI list:
@@ -132,7 +128,7 @@ static INPUT_PORTS_START( savquest )
 	// bits are GCI buttons 1-7, bit 7 is the coin input (the credit counter)
 	PORT_START("PANEL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Roar")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // Roar
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -142,8 +138,9 @@ static INPUT_PORTS_START( savquest )
 
 	// GCI buttons 11 and 12 (13-16 are the unused second stick and spares)
 	PORT_START("STICK_BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Bite (Trigger)")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Charge (Thumb)")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // Bite (trigger)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // Charge (thumb)
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("STICK_X")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
@@ -175,8 +172,6 @@ INPUT_PORTS_END
 
     Button numbers follow the game's event map: 2 Roar, 4 Start, 6 Instant Credit, 7 Operator,
     11 Bite (trigger), 12 Charge (thumb).
-    TODO: version strings are guesses (the game accepts them); joystick reports are sent when the stick moves,
-    real board behaviour unknown; stick axis directions unverified.
 */
 class savquest_gci_device : public buffered_rs232_device<64>
 {
