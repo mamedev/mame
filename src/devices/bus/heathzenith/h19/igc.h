@@ -58,6 +58,8 @@ private:
 	void update_fill();
 	void igc_vsync_w(int val);
 
+	required_ioport m_joystick1, m_joystick2;
+
 	std::unique_ptr<u8[]> m_p_graphic_ram;
 
 	// Control Register
@@ -77,8 +79,6 @@ private:
 	// automatic video memory fill in progress
 	attotime m_fill_start;
 	u64      m_fill_count;
-
-	required_ioport m_joystick1, m_joystick2;
 };
 
 } // namespace bus::heathzenith::h19

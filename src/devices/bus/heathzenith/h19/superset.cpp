@@ -132,7 +132,7 @@ void heath_superset_tlb_device::device_add_mconfig(machine_config &config)
 {
 	heath_tlb_device::device_add_mconfig(config);
 
-	// part of the Superset upgrade was to upgrade the CPU to 3 MHz.
+	// part of the Superset upgrade was to upgrade set the CPU speed to 3 MHz.
 	m_maincpu->set_clock(H19_3MHZ);
 	m_maincpu->set_addrmap(AS_PROGRAM, &heath_superset_tlb_device::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &heath_superset_tlb_device::io_map);
