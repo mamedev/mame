@@ -76,13 +76,20 @@ public:
 	{
 	}
 
-	void vt100(machine_config &config);
-	void vt100ac(machine_config &config);
-	void vt101(machine_config &config);
-	void vt102(machine_config &config);
-	void vt180(machine_config &config);
+	void vt100(machine_config &config) ATTR_COLD;
+	void vt100ac(machine_config &config) ATTR_COLD;
+	void vt101(machine_config &config) ATTR_COLD;
+	void vt102(machine_config &config) ATTR_COLD;
+	void vt105(machine_config &config) ATTR_COLD;
+	void vt180(machine_config &config) ATTR_COLD;
 
 private:
+	// Options fitted to this model, reported to the firmware through the
+	// flag buffer (E42).  flags_r() turns them into the bus bits.
+	static constexpr u8 OPT_AVO = 0x01; // Advanced Video Option
+	static constexpr u8 OPT_GRAPHICS = 0x02; // VT105 waveform graphics board
+	static constexpr u8 OPT_STP = 0x04; // option on the Standard Terminal Port
+
 	required_device<cpu_device> m_maincpu;
 	required_device<vt100_video_device> m_crtc;
 	required_device<vt100_keyboard_device> m_keyboard;
@@ -95,6 +102,8 @@ private:
 	required_shared_ptr<u8> m_p_ram;
 
 	required_ioport m_phosphor;
+	u8 m_options = 0; // set by each model's machine config
+	bool m_even_field_high = false; // VT101/VT102 board wires EVEN FIELD L to +5 V
 
 	u8 flags_r();
 	u8 modem_r();
@@ -145,19 +154,31 @@ void vt100_state::vt180_io(address_map &map)
 	map.global_mask(0xff);
 }
 
+// Flag buffer E42, read at port 42 (basic video schematic D-CS-5413009):
 // 0 - XMIT flag H
-// 1 - Advance Video L
-// 2 - Graphics Flag L
-// 3 - Option present H
-// 4 - Even field L
+// 1 - Advanced Video L: low when an AVO is fitted.  The VT100 and VT101
+//     firmware use it to decide how much RAM to test.
+// 2 - Graphics Flag L: low when a graphics board is fitted
+// 3 - Option Present H: high when an option on the STP is fitted
+// 4 - Even Field L: low on the VT100 board (without interlace every field
+//     is even); wired high on the VT101/VT102 board.  The firmware never
+//     reads it.
 // 5 - NVR data H
 // 6 - LBA 7 H
 // 7 - Keyboard TBMT H
+// The firmware reports bits 1-3 in its reply to DA (ESC [ c) as
+// ESC [ ? 1 ; N c, adding 1 for an STP option, 2 for an AVO and 4 for a
+// graphics board.
 u8 vt100_state::flags_r()
 {
 	u8 ret = 0;
 
 	ret |= m_pusart->txrdy_r();
+	// ADVANCED VIDEO L and GRAPHICS FLAG L read high when nothing drives them
+	ret |= (m_options & OPT_AVO) ? 0 : 0x02;
+	ret |= (m_options & OPT_GRAPHICS) ? 0 : 0x04;
+	ret |= (m_options & OPT_STP) ? 0x08 : 0;
+	ret |= m_even_field_high ? 0x10 : 0;
 	ret |= !m_nvr->data_r() << 5;
 	ret |= m_crtc->lba7_r() << 6;
 	ret |= m_kbduart->tbmt_r() << 7;
@@ -335,6 +356,8 @@ GFXDECODE_END
 
 void vt100_state::vt100(machine_config &config)
 {
+	m_options = OPT_AVO;
+
 	/* basic machine hardware */
 	I8080(config, m_maincpu, XTAL(24'883'200) / 9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt100_state::vt100_mem);
@@ -407,6 +430,8 @@ void vt100_state::vt100ac(machine_config &config)
 {
 	vt100(config);
 
+	m_options |= OPT_STP;
+
 	i8085a_cpu_device &stpcpu(I8085A(config, "stpcpu", 4915200));
 	stpcpu.set_addrmap(AS_PROGRAM, &vt100_state::stp_mem);
 	stpcpu.set_addrmap(AS_IO, &vt100_state::stp_io);
@@ -445,9 +470,27 @@ void vt100_state::vt180(machine_config &config)
 	z80cpu.set_io_map(&vt100_state::vt180_io);
 }
 
+// VT105: the M7071 waveform graphics board pulls GRAPHICS FLAG low to say
+// it is fitted, then drives it high while busy storing a character
+// (TM-003 6.4.1).  The board isn't emulated, so the flag stays low:
+// fitted and never busy.
+void vt100_state::vt105(machine_config &config)
+{
+	vt100(config);
+
+	m_options |= OPT_GRAPHICS;
+}
+
 void vt100_state::vt101(machine_config &config)
 {
 	vt100(config);
+
+	// The VT101/VT102 board (MP-01066 sheet 1) ties GRAPHICS FLAG L and
+	// EVEN FIELD L high.  The VT102 and VT131 always have the AVO built onto
+	// the board, and jumper W5 grounds ADVANCED VIDEO L to report it.  The
+	// VT101 has no AVO and leaves W5 out, so R8 pulls the line high.
+	m_options = 0;
+	m_even_field_high = true;
 
 	I8085A(config.replace(), m_maincpu, XTAL(24'073'400) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt100_state::vt100_mem);
@@ -467,6 +510,8 @@ void vt100_state::vt101(machine_config &config)
 void vt100_state::vt102(machine_config &config)
 {
 	vt101(config);
+
+	m_options |= OPT_AVO; // always built in; W5 fitted
 
 	m_maincpu->set_addrmap(AS_IO, &vt100_state::vt102_io);
 
@@ -898,7 +943,7 @@ COMP( 1979, vt100ac, vt100,  0,      vt100ac, vt100, vt100_state, empty_init, "D
 COMP( 1981, vt101,   vt102,  0,      vt101,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT101",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
 COMP( 1981, vt102,   0,      0,      vt102,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT102",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
 //COMP( 1979, vt103,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT103",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1978, vt105,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT105",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1978, vt105,   vt100,  0,      vt105,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT105",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
 //COMP( 1978, vt110,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT110",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
 //COMP( 1981, vt125,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT125",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
 COMP( 1981, vt131,   vt102,  0,      vt102,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT131",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
