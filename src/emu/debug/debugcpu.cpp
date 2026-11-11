@@ -979,6 +979,14 @@ void device_debug::instruction_hook(offs_t curpc)
 				registerpoint_check();
 		}
 	}
+	else if (debugcpu.is_stopped() && (m_flags & DEBUG_FLAG_LIVE_BP) != 0)
+	{
+		// a stop already pending (a vblank, a time, the end of a step) lands on this
+		// instruction: it still executes once the debugger resumes, so its breakpoints are
+		// evaluated, but an action resuming execution must not cancel the stop asked for
+		breakpoint_check(curpc);
+		debugcpu.set_execution_stopped();
+	}
 
 	// if we are supposed to halt, do it now
 	if (debugcpu.is_stopped())
