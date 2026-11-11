@@ -44,6 +44,17 @@ void rm480z_state::vblank_callback(screen_device &screen, bool vblank_state)
 	m_ctc->trg3(vblank_state);
 }
 
+void rm480z_state::z80_m1_w(uint8_t data)
+{
+	if (m_nmi_en)
+	{
+		// increment counter when NMIEN is active
+		m_nmi_counter++;
+		// trigger NMI after the 8th instruction to service front panel "single-step" debugging command
+		m_maincpu->set_input_line(INPUT_LINE_NMI, (m_nmi_counter == 8) ? ASSERT_LINE : CLEAR_LINE);
+	}
+}
+
 void rm480z_state::control_port_write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0xff)
@@ -67,7 +78,15 @@ void rm480z_state::control_port_write(offs_t offset, uint8_t data)
 		{
 			m_view.select(page);
 		}
+
 		m_kbd_reset = !BIT(data, 6);
+
+		m_nmi_en = BIT(data, 2);
+		if (!m_nmi_en)
+		{
+			// reset counter when NMIEN becomes inactive
+			m_nmi_counter = 0;
+		}
 		break;
 	}
 	case 2:
@@ -233,6 +252,9 @@ void rm480z_state::machine_reset()
 	m_hrg_mem_open = false;
 	m_video_inhibit = false;
 	m_hrg_inhibit = false;
+
+	m_nmi_counter = 0;
+	m_nmi_en = false;
 
 	m_kbd_reset = true;
 	m_kbd_ready = false;
