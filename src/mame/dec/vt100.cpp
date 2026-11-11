@@ -459,8 +459,10 @@ void vt100_state::vt180(machine_config &config)
 	z80cpu.set_io_map(&vt100_state::vt180_io);
 }
 
-// VT105: the M7071 waveform graphics board holds GRAPHICS FLAG low while
-// ready (TM-003 6.4.1); the board isn't emulated, so it is always ready
+// VT105: the M7071 waveform graphics board pulls GRAPHICS FLAG low to say
+// it is fitted, then drives it high while busy storing a character
+// (TM-003 6.4.1).  The board isn't emulated, so the flag stays low:
+// fitted and never busy.
 void vt100_state::vt105(machine_config &config)
 {
 	vt100(config);
