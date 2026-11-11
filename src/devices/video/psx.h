@@ -48,6 +48,7 @@ protected:
 	static constexpr unsigned MID_LEVEL = (MAX_LEVEL / 2) << 8;
 	static constexpr unsigned MAX_SHADE = 0x100;
 	static constexpr unsigned MID_SHADE = 0x80;
+	static constexpr unsigned MAX_DITHER = 8; // dither offsets are -4 to +3, a slice is selected by ( offset & 7 )
 
 	// construction/destruction
 	psxgpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -201,7 +202,7 @@ private:
 	};
 
 	void updatevisiblearea();
-	void decode_tpage( uint32_t tpage );
+	void decode_tpage( uint32_t tpage, bool drawmode );
 	void FlatPolygon( int n_points );
 	void FlatTexturedPolygon( int n_points );
 	void GouraudPolygon( int n_points );
@@ -230,6 +231,7 @@ private:
 	int32_t n_ix;
 	int32_t n_iy;
 	int32_t n_ti;
+	int32_t n_dtd;
 
 	uint32_t n_vramx;
 	uint32_t n_vramy;
@@ -265,16 +267,18 @@ private:
 
 	uint16_t *p_p_vram[ 1024 ];
 
-	uint16_t p_n_redshade[ MAX_LEVEL * MAX_SHADE ];
-	uint16_t p_n_greenshade[ MAX_LEVEL * MAX_SHADE ];
-	uint16_t p_n_blueshade[ MAX_LEVEL * MAX_SHADE ];
+	uint32_t p_n_dither[ 2 ][ 4 ][ 4 ];
+
+	uint16_t p_n_redshade[ MAX_DITHER * MAX_LEVEL * MAX_SHADE ];
+	uint16_t p_n_greenshade[ MAX_DITHER * MAX_LEVEL * MAX_SHADE ];
+	uint16_t p_n_blueshade[ MAX_DITHER * MAX_LEVEL * MAX_SHADE ];
 	uint16_t p_n_redlevel[ 0x10000 ];
 	uint16_t p_n_greenlevel[ 0x10000 ];
 	uint16_t p_n_bluelevel[ 0x10000 ];
 
-	uint16_t p_n_f025[ MAX_LEVEL * MAX_SHADE ];
-	uint16_t p_n_f05[ MAX_LEVEL * MAX_SHADE ];
-	uint16_t p_n_f1[ MAX_LEVEL * MAX_SHADE ];
+	uint16_t p_n_f025[ MAX_DITHER * MAX_LEVEL * MAX_SHADE ];
+	uint16_t p_n_f05[ MAX_DITHER * MAX_LEVEL * MAX_SHADE ];
+	uint16_t p_n_f1[ MAX_DITHER * MAX_LEVEL * MAX_SHADE ];
 	uint16_t p_n_redb05[ 0x10000 ];
 	uint16_t p_n_greenb05[ 0x10000 ];
 	uint16_t p_n_blueb05[ 0x10000 ];
