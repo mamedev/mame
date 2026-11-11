@@ -82,6 +82,7 @@
 #define LOG_TIMER_RD    (1U << 7)
 #define LOG_TIMER_WR    (1U << 8)
 #define LOG_VIDEO       (1U << 9)
+#define LOG_LANCE       (1U << 10)
 
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
@@ -312,7 +313,7 @@ private:
 
 	bool m_fpu_finished;
 
-	u16 m_videoaddr;
+	u16 m_videobase_offset;
 	u8 m_videocntl;
 	u8 m_diag;
 
@@ -355,7 +356,7 @@ void tek440x_state::machine_start()
 	save_item(NAME(m_kb_rclamp));
 	save_item(NAME(m_kb_loop));
 
-	save_item(NAME(m_videoaddr));
+	save_item(NAME(m_videobase_offset));
 	save_item(NAME(m_videocntl));
 	save_item(NAME(m_vint_enable));
 	save_item(NAME(m_diag));
@@ -415,7 +416,7 @@ void tek440x_state::machine_reset()
 	mapcntl_w(0);
 	videocntl_w(0);
 
-	m_videoaddr = 0;
+	m_videobase_offset = 0;
 	m_vint_enable = 0;
 
 	m_novram->recall(ASSERT_LINE);
@@ -440,7 +441,7 @@ u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	u32 invert = BIT(m_videocntl, 4) ? 0 : -1;
 	int pan = (m_videocntl & 15) ^ 15;
 
-	u16 woffset = m_videoaddr - 0xffe9;  // why 0xffe9 is TL..OS uses same magic number
+	u16 woffset = m_videobase_offset - 0xffe9;  // why 0xffe9 is TL..OS uses same magic number
 
 	u16 const *video_ram_last = m_vram + 0xffff;
 
@@ -843,13 +844,13 @@ u16 tek440x_state::fpu_r(offs_t offset)
 u16 tek440x_state::videoaddr_r(offs_t offset)
 {
 	LOGMASKED(LOG_VIDEO, "videoaddr_r %08x\n", offset);
-	return m_videoaddr;
+	return m_videobase_offset;
 }
 
 void tek440x_state::videoaddr_w(offs_t offset, u16 data)
 {
 	LOGMASKED(LOG_VIDEO, "videoaddr_w %08x <= %04x\n", offset, data);
-	m_videoaddr = data;
+	m_videobase_offset = data;
 }
 
 u8 tek440x_state::videocntl_r()
@@ -1364,11 +1365,11 @@ void tek440x_state::tek4404(machine_config &config)
 
 	m_lance->dma_in().set([this](offs_t offset) {
 		u16 data = m_vm->read16(OFF8_TO_OFF16(offset));
-		//LOG("dma_in 0x%08x => %04x\n",offset,data);
+		LOGMASKED(LOG_LANCE, "dma_in 0x%08x => %04x\n",offset,data);
 		return data;
 	});
 	m_lance->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) {
-		//LOG("dma_out 0x%08x <= %04x\n",offset, data);
+		LOGMASKED(LOG_LANCE, "dma_out 0x%08x <= %04x\n",offset, data);
 		return m_vm->write16(OFF8_TO_OFF16(offset),data, mem_mask);
 	});
 

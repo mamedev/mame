@@ -290,14 +290,14 @@ void wd1010_device::end_command()
 }
 
 //-------------------------------------------------
-//  id_found - is there an ID field for this sector
+//  id_found - is there an ID field on this track
 //-------------------------------------------------
 
-bool wd1010_device::id_found(uint8_t sector)
+bool wd1010_device::id_found()
 {
 	const auto &info = m_drives[drive()].drive->get_info();
 
-	return m_cylinder < info.cylinders && head() < info.heads && sector <= info.sectors;
+	return m_cylinder < info.cylinders && head() < info.heads;
 }
 
 //-------------------------------------------------
@@ -595,7 +595,7 @@ void wd1010_device::cmd_read_sector()
 		return;
 	}
 
-	if (!id_found(m_sector_number))
+	if (!id_found())
 	{
 		LOG("--> ID not found\n");
 
@@ -684,7 +684,7 @@ void wd1010_device::cmd_write_sector()
 		return;
 	}
 
-	if ((m_command >> 4) != CMD_WRITE_FORMAT && !id_found(m_sector_number))
+	if ((m_command >> 4) != CMD_WRITE_FORMAT && !id_found())
 	{
 		LOG("--> ID not found\n");
 

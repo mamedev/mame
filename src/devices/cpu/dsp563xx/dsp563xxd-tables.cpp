@@ -3635,7 +3635,7 @@ const u8 dsp563xx_disassembler::t_npar[0x100000] = {
 	187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,10,10,10,0,0,0,0,
-	76,76,76,76,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,206,206,206,206,0,0,0,0,
 	187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,
 	187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,187,
@@ -26853,18 +26853,18 @@ const u8 dsp563xx_disassembler::t_npar[0x100000] = {
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,98,0,98,0,98,0,98,0,98,0,98,0,0,0,0,0,98,0,98,0,98,0,98,0,98,0,98,0,
+	0,0,0,0,98,98,98,98,98,98,98,98,98,98,98,98,0,0,0,0,98,98,98,98,98,98,98,98,98,98,98,98,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,100,0,100,0,100,0,100,0,100,0,100,0,0,0,0,0,100,0,100,0,100,0,100,0,100,0,100,0,
+	0,0,0,0,100,100,100,100,100,100,100,100,100,100,100,100,0,0,0,0,100,100,100,100,100,100,100,100,100,100,100,100,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,104,0,104,0,104,0,104,0,104,0,104,0,0,0,0,0,104,0,104,0,104,0,104,0,104,0,104,0,
-	0,0,0,0,104,0,104,0,104,0,104,0,104,0,104,0,0,0,0,0,104,0,104,0,104,0,104,0,104,0,104,0,
-	0,0,0,0,104,0,104,0,104,0,104,0,104,0,104,0,0,0,0,0,104,0,104,0,104,0,104,0,104,0,104,0,
+	0,0,0,0,104,104,104,104,104,104,104,104,104,104,104,104,0,0,0,0,104,104,104,104,104,104,104,104,104,104,104,104,
+	0,0,0,0,104,104,104,104,104,104,104,104,104,104,104,104,0,0,0,0,104,104,104,104,104,104,104,104,104,104,104,104,
+	0,0,0,0,104,104,104,104,104,104,104,104,104,104,104,104,0,0,0,0,104,104,104,104,104,104,104,104,104,104,104,104,
 	0,0,0,0,151,151,151,151,151,151,151,151,151,151,151,151,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -26885,7 +26885,7 @@ const u8 dsp563xx_disassembler::t_npar[0x100000] = {
 	11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,
 	11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,141,141,141,141,141,141,141,141,141,141,141,141,
+	76,76,76,76,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,141,141,141,141,141,141,141,141,141,141,141,141,
 	0,0,0,0,203,203,203,203,203,203,203,203,203,203,203,203,0,0,0,0,143,143,143,143,143,143,143,143,143,143,143,143,
 	0,0,0,0,12,12,12,12,12,12,12,12,12,12,12,12,0,0,0,0,12,12,12,12,12,12,12,12,12,12,12,12,
 	0,0,0,0,14,14,14,14,14,14,14,14,14,14,14,14,0,0,0,0,14,14,14,14,14,14,14,14,14,14,14,14,
@@ -34896,12 +34896,13 @@ const char *const dsp563xx_disassembler::ts_xyc[2] = { "x", "y" };
 const char *const dsp563xx_disassembler::ts_ss[4] = { "ss", nullptr, "su", "uu" };
 const char *const dsp563xx_disassembler::ts_ss1[2] = { "su", "uu" };
 const char *const dsp563xx_disassembler::ts_sign[2] = { "+", "-" };
-const char *const dsp563xx_disassembler::ts_damo4_a[16] = { "x0", "y0", "x1", "y1", "x1", "y1", "x0", "y0", "x0", "y0", "x1", "y1", "y1", "x0", "y0", "x1" };
-const char *const dsp563xx_disassembler::ts_damo4_b[16] = { "x0", "y0", "x0", "y0", "x1", "y1", "x1", "y1", "y1", "x0", "y0", "x1", "x0", "y0", "x1", "y1" };
+const char *const dsp563xx_disassembler::ts_damo4_a[16] = { "x0", "y0", "x1", "y1", "x0", "y0", "x1", "y1", "x1", "y1", "x0", "y0", "y1", "x0", "y0", "x1" };
+const char *const dsp563xx_disassembler::ts_damo4_b[16] = { "x0", "y0", "x0", "y0", "y1", "x0", "y0", "x1", "x1", "y1", "x1", "y1", "x0", "y0", "x1", "y1" };
 const char *const dsp563xx_disassembler::ts_agu[16] = { "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "n0", "n1", "n2", "n3", "n4", "n5", "n6", "n7" };
 const char *const dsp563xx_disassembler::ts_damo1_a[8] = { "x0", "y0", "x1", "y1", "x0", "y0", "x1", "y1" };
 const char *const dsp563xx_disassembler::ts_damo1_b[8] = { "x0", "y0", "x0", "y0", "y1", "x0", "y0", "x1" };
 const char *const dsp563xx_disassembler::ts_damo2[4] = { "y1", "x0", "y0", "x1" };
+const char *const dsp563xx_disassembler::ts_qq2[4] = { "x0", "y0", "x1", "y1" };
 
 std::string dsp563xx_disassembler::disasm_ipar(u8 kipar, u32 opcode, u32 exv, u32 pc)
 {
@@ -35100,13 +35101,13 @@ std::string dsp563xx_disassembler::disasm_npar(u8 knpar, u32 opcode, u32 exv, u3
 	case 95: return "enddo";
 	case 96: return util::string_format("eor #$%02x,%s", BIT(opcode, 8, 6), ts_acc[BIT(opcode, 3, 1)]);
 	case 97: return util::string_format("eor #$%06x,%s", exv, ts_acc[BIT(opcode, 3, 1)]);
-	case 98: return util::string_format("extract %s,%s,d", ts_actrl[BIT(opcode, 1, 3)], ts_acc[BIT(opcode, 4, 1)]);
+	case 98: return util::string_format("extract %s,%s,%s", ts_actrl[BIT(opcode, 1, 3)], ts_acc[BIT(opcode, 4, 1)], ts_acc[BIT(opcode, 0, 1)]);
 	case 99: return util::string_format("extract #$%06x,%s,%s", exv, ts_acc[BIT(opcode, 4, 1)], ts_acc[BIT(opcode, 0, 1)]);
-	case 100: return util::string_format("extractu %s,%s,d", ts_actrl[BIT(opcode, 1, 3)], ts_acc[BIT(opcode, 4, 1)]);
+	case 100: return util::string_format("extractu %s,%s,%s", ts_actrl[BIT(opcode, 1, 3)], ts_acc[BIT(opcode, 4, 1)], ts_acc[BIT(opcode, 0, 1)]);
 	case 101: return util::string_format("extractu #$%06x,%s,%s", exv, ts_acc[BIT(opcode, 4, 1)], ts_acc[BIT(opcode, 0, 1)]);
 	case 102: return "illegal";
 	case 103: return util::string_format("inc %s", ts_acc[BIT(opcode, 0, 1)]);
-	case 104: return util::string_format("insert %s,%s,d", ts_actrl[BIT(opcode, 1, 3)], ts_dao3b[BIT(opcode, 4, 3)]);
+	case 104: return util::string_format("insert %s,%s,%s", ts_actrl[BIT(opcode, 1, 3)], ts_dao3b[BIT(opcode, 4, 3)], ts_acc[BIT(opcode, 0, 1)]);
 	case 105: return util::string_format("insert #$%06x,%s,%s", exv, ts_dao3b[BIT(opcode, 4, 3)], ts_acc[BIT(opcode, 0, 1)]);
 	case 106: return util::string_format("j%s $%06x", ts_cc[BIT(opcode, 12, 4)], BIT(opcode, 0, 12));
 	case 107: return util::string_format("j%s %s", ts_cc[BIT(opcode, 0, 4)], ts_eam1[BIT(opcode, 8, 6)]);
@@ -35149,10 +35150,10 @@ std::string dsp563xx_disassembler::disasm_npar(u8 knpar, u32 opcode, u32 exv, u3
 	case 144: return util::string_format("lua %s,%s", ts_eam4[BIT(opcode, 8, 5)], ts_fvbr1[BIT(opcode, 0, 5)]);
 	case 145: return util::string_format("lua (%s%s$%x),%s", ts_ar[BIT(opcode, 8, 3)], BIT(opcode, 13) ? "-" : "+", std::abs(util::sext(bitswap<7>(opcode, 13, 12, 11, 7, 6, 5, 4), 7)), ts_agu[BIT(opcode, 0, 4)]);
 	case 146: return util::string_format("mac %s%s,#$%x,%s", ts_sign[BIT(opcode, 2, 1)], ts_damo2[BIT(opcode, 4, 2)], 0x800000 >> BIT(opcode, 8, 5), ts_acc[BIT(opcode, 3, 1)]);
-	case 147: return util::string_format("maci %s#$%06x,%s,%s", ts_sign[BIT(opcode, 2, 1)], exv, ts_damo2[BIT(opcode, 4, 2)], ts_acc[BIT(opcode, 3, 1)]);
+	case 147: return util::string_format("maci %s#$%06x,%s,%s", ts_sign[BIT(opcode, 2, 1)], exv, ts_qq2[BIT(opcode, 4, 2)], ts_acc[BIT(opcode, 3, 1)]);
 	case 148: return util::string_format("mac%s %s%s,%s,%s", ts_ss1[BIT(opcode, 6, 1)], ts_sign[BIT(opcode, 4, 1)], ts_damo4_a[BIT(opcode, 0, 4)], ts_damo4_b[BIT(opcode, 0, 4)], ts_acc[BIT(opcode, 5, 1)]);
 	case 149: return util::string_format("maccr %s%s,#$%x,%s", ts_sign[BIT(opcode, 2, 1)], ts_damo2[BIT(opcode, 4, 2)], 0x800000 >> BIT(opcode, 8, 5), ts_acc[BIT(opcode, 3, 1)]);
-	case 150: return util::string_format("macri %s#$%06x,%s,%s", ts_sign[BIT(opcode, 2, 1)], exv, ts_damo2[BIT(opcode, 4, 2)], ts_acc[BIT(opcode, 3, 1)]);
+	case 150: return util::string_format("macri %s#$%06x,%s,%s", ts_sign[BIT(opcode, 2, 1)], exv, ts_qq2[BIT(opcode, 4, 2)], ts_acc[BIT(opcode, 3, 1)]);
 	case 151: return util::string_format("merge %s,%s", ts_dao3[BIT(opcode, 1, 3)], ts_acc[BIT(opcode, 0, 1)]);
 	case 152: return util::string_format("movec %s:%s,%s", ts_xyc[BIT(opcode, 6, 1)], ts_eam1[BIT(opcode, 8, 6)], ts_fvbr2[BIT(opcode, 0, 5)]);
 	case 153: return util::string_format("movec %s,%s:%s", ts_fvbr2[BIT(opcode, 0, 5)], ts_xyc[BIT(opcode, 6, 1)], ts_eam1[BIT(opcode, 8, 6)]);
@@ -35201,9 +35202,9 @@ std::string dsp563xx_disassembler::disasm_npar(u8 knpar, u32 opcode, u32 exv, u3
 	case 196: return util::string_format("movep y:$%06x,%s", 0xffff80 + bitswap<6>(opcode, 6, 4, 3, 2, 1, 0), ts_sbr[BIT(opcode, 8, 6)]);
 	case 197: return util::string_format("mpy %s%s,#$%x,%s", ts_sign[BIT(opcode, 2, 1)], ts_damo2[BIT(opcode, 4, 2)], 0x800000 >> BIT(opcode, 8, 5), ts_acc[BIT(opcode, 3, 1)]);
 	case 198: return util::string_format("mpy%s %s%s,%s,%s", ts_ss1[BIT(opcode, 6, 1)], ts_sign[BIT(opcode, 4, 1)], ts_damo4_a[BIT(opcode, 0, 4)], ts_damo4_b[BIT(opcode, 0, 4)], ts_acc[BIT(opcode, 5, 1)]);
-	case 199: return util::string_format("mpyi %s#$%06x,%s,%s", ts_sign[BIT(opcode, 2, 1)], exv, ts_damo2[BIT(opcode, 4, 2)], ts_acc[BIT(opcode, 3, 1)]);
+	case 199: return util::string_format("mpyi %s#$%06x,%s,%s", ts_sign[BIT(opcode, 2, 1)], exv, ts_qq2[BIT(opcode, 4, 2)], ts_acc[BIT(opcode, 3, 1)]);
 	case 200: return util::string_format("mpyr %s%s,#$%x,%s", ts_sign[BIT(opcode, 2, 1)], ts_damo2[BIT(opcode, 4, 2)], 0x800000 >> BIT(opcode, 8, 5), ts_acc[BIT(opcode, 3, 1)]);
-	case 201: return util::string_format("mpyri %s#$%06x,%s,%s", ts_sign[BIT(opcode, 2, 1)], exv, ts_damo2[BIT(opcode, 4, 2)], ts_acc[BIT(opcode, 3, 1)]);
+	case 201: return util::string_format("mpyri %s#$%06x,%s,%s", ts_sign[BIT(opcode, 2, 1)], exv, ts_qq2[BIT(opcode, 4, 2)], ts_acc[BIT(opcode, 3, 1)]);
 	case 202: return util::string_format("norm %s,%s", ts_ar[BIT(opcode, 8, 3)], ts_acc[BIT(opcode, 3, 1)]);
 	case 203: return util::string_format("normf %s,%s", ts_actrl[BIT(opcode, 1, 3)], ts_acc[BIT(opcode, 0, 1)]);
 	case 204: return util::string_format("or #$%02x,%s", BIT(opcode, 8, 6), ts_acc[BIT(opcode, 3, 1)]);

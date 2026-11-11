@@ -194,6 +194,9 @@ protected:
 	u32 m_TMP1, m_TMP2;
 	u32 m_TMPR;             // For debugger ER register import
 
+	u32 m_dma_dest;
+	bool m_dma_mode16;
+
 	bool m_has_exr, m_has_mac, m_has_trace, m_supports_advanced, m_mode_advanced, m_mode_a20, m_mac_saturating;
 	bool m_has_hc; // GT913's CCR bit 5 is I, not H
 
