@@ -369,7 +369,7 @@ u8 vt100_state::video_ram_r(offs_t offset)
 
 u8 vt100_state::attr_ram_r(offs_t offset)
 {
-	// the 2114s drive only D0-D3 (through E38); E51 pulls D4-D7 high (sheet 6)
+	// only D0-D3 reach the bus (buffers E38 and E1); E51 pulls D4-D7 high (sheet 6)
 	return m_attr_ram[offset] | 0xf0;
 }
 
