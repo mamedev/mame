@@ -136,8 +136,9 @@ private:
 	s16 m_vlt_x = 0;
 	u8 m_sl = 0;
 	bool m_dw = false; // cursor skew F/F: double width scan line
-	u8 m_line_sl[VTOTAL]; // per scan line: SL3-SL0 (0xff before any VLT) and double width
+	u8 m_line_sl[VTOTAL]; // per scan line: SL3-SL0 (0xff without VLT last frame) and double width
 	u8 m_line_dw[VTOTAL] = { };
+	bool m_line_vlt[VTOTAL] = { }; // VLT seen this frame
 	bool m_vlt = false;
 	bool m_drb = true;
 	bool m_row_loading = false;
@@ -173,6 +174,7 @@ private:
 	void host_txd_w(int state);
 	void host_rxd_w(int state);
 	u8 vram_r(offs_t offset);
+	void vs_w(int state);
 	void vlt_w(int state);
 	void sl_w(u8 data);
 	void curs_w(int state);
@@ -282,6 +284,24 @@ u8 vt220a_state::vram_r(offs_t offset)
 	return chr;
 }
 
+void vt220a_state::vs_w(int state)
+{
+	// a scan line that had no VLT in the frame now ending shows nothing; the others keep their SL and
+	// double width until their next VLT, as a mid-line partial update may draw them before it
+	if (!state)
+	{
+		for (int y = 0; y < VTOTAL; y++)
+		{
+			if (!m_line_vlt[y])
+			{
+				m_line_sl[y] = 0xff;
+				m_line_dw[y] = 0;
+			}
+		}
+		std::fill_n(m_line_vlt, VTOTAL, false);
+	}
+}
+
 void vt220a_state::vlt_w(int state)
 {
 	if (state && !m_vlt)
@@ -291,6 +311,7 @@ void vt220a_state::vlt_w(int state)
 		m_vlt_x = m_screen->hpos();
 		m_line_sl[y] = m_sl;
 		m_line_dw[y] = m_dw;
+		m_line_vlt[y] = true;
 	}
 	else if (!state && m_vlt)
 	{
@@ -345,7 +366,7 @@ u8 vt220a_state::dot(int col, int x, int line, bool &bold, bool &blink_n) const
 	bold = BIT(atr, 6);
 	blink_n = !(BIT(m_duart_op, 3) && BIT(atr, 7));
 
-	// past the character cell, or 0xff before any VLT
+	// past the character cell, or 0xff without VLT
 	if (line >= 10)
 		return 0;
 	const u8 bits = char_row(alt, chr, line);
@@ -533,6 +554,7 @@ void vt220a_state::machine_start()
 	save_item(NAME(m_dw));
 	save_item(NAME(m_line_sl));
 	save_item(NAME(m_line_dw));
+	save_item(NAME(m_line_vlt));
 	save_item(NAME(m_vlt));
 	save_item(NAME(m_drb));
 	save_item(NAME(m_row_loading));
@@ -641,6 +663,7 @@ void vt220a_state::vt220a(machine_config &config)
 	// VS and HS are active low (CRT9007 pins 12, 13) and wired straight to T0 and T1; the 8051 counts their
 	// falling edges, and an asserted mcs51 input line is a low pin
 	m_crtc->vs_callback().set_inputline(m_maincpu, MCS51_T0_LINE).invert();
+	m_crtc->vs_callback().append(FUNC(vt220a_state::vs_w));
 	m_crtc->hs_callback().set_inputline(m_maincpu, MCS51_T1_LINE).invert();
 	m_crtc->drb_callback().set(FUNC(vt220a_state::drb_w));
 	m_crtc->drb_callback().append_inputline(m_maincpu, MCS51_INT0_LINE).invert(); // DMA REQ L
