@@ -1391,8 +1391,6 @@ void duart_channel::device_reset()
 	write_CR(0x30); // reset Tx
 	write_CR(0x40); // reset errors
 
-	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-
 	tx_baud_rate = rx_baud_rate = 0;
 	CSR = 0;
 	m_tx_break = false;
