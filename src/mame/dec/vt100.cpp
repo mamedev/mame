@@ -80,6 +80,7 @@ public:
 	void vt100ac(machine_config &config);
 	void vt101(machine_config &config);
 	void vt102(machine_config &config);
+	void vt105(machine_config &config);
 	void vt180(machine_config &config);
 
 private:
@@ -95,6 +96,12 @@ private:
 	required_shared_ptr<u8> m_p_ram;
 
 	required_ioport m_phosphor;
+	// flag buffer (E42 on the VT100 board) inputs fixed by the model
+	static constexpr u8 FLAG_NO_AVO = 0x02;       // ADVANCED VIDEO L, pulled up
+	static constexpr u8 FLAG_NO_GRAPHICS = 0x04;  // GRAPHICS FLAG L, pulled up
+	static constexpr u8 FLAG_STP = 0x08;          // OPTION PRESENT H
+	static constexpr u8 FLAG_ODD_FIELD = 0x10;    // EVEN FIELD L
+	u8 m_flags = FLAG_NO_GRAPHICS;
 
 	u8 flags_r();
 	u8 modem_r();
@@ -153,9 +160,15 @@ void vt100_state::vt180_io(address_map &map)
 // 5 - NVR data H
 // 6 - LBA 7 H
 // 7 - Keyboard TBMT H
+// D0 XMIT FLAG H, D1 ADVANCED VIDEO L, D2 GRAPHICS FLAG L, D3 OPTION
+// PRESENT H (STP), D4 EVEN FIELD L, D5 NVR DATA H, D6 LBA 7 H,
+// D7 KBD TBMT H (E42, D-CS-5413009 basic video schematic).  The firmware sizes
+// its RAM test and builds its DA reply (ESC [ ? 1 ; N c, N = STP 1 +
+// AVO 2 + graphics 4) from D1-D3.  EVEN FIELD stays low: every field
+// is even when not interlaced, and the firmware never reads it.
 u8 vt100_state::flags_r()
 {
-	u8 ret = 0;
+	u8 ret = m_flags;
 
 	ret |= m_pusart->txrdy_r();
 	ret |= !m_nvr->data_r() << 5;
@@ -241,6 +254,7 @@ static INPUT_PORTS_START( vt100 )
 	PORT_CONFSETTING(0x01, "Amber")
 	PORT_CONFSETTING(0x02, "White")
 INPUT_PORTS_END
+
 
 u32 vt100_state::screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -335,6 +349,7 @@ GFXDECODE_END
 
 void vt100_state::vt100(machine_config &config)
 {
+
 	/* basic machine hardware */
 	I8080(config, m_maincpu, XTAL(24'883'200) / 9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt100_state::vt100_mem);
@@ -407,6 +422,8 @@ void vt100_state::vt100ac(machine_config &config)
 {
 	vt100(config);
 
+	m_flags |= FLAG_STP;
+
 	i8085a_cpu_device &stpcpu(I8085A(config, "stpcpu", 4915200));
 	stpcpu.set_addrmap(AS_PROGRAM, &vt100_state::stp_mem);
 	stpcpu.set_addrmap(AS_IO, &vt100_state::stp_io);
@@ -445,9 +462,23 @@ void vt100_state::vt180(machine_config &config)
 	z80cpu.set_io_map(&vt100_state::vt180_io);
 }
 
+// VT105: the M7071 waveform graphics board holds GRAPHICS FLAG low while
+// ready (TM-003 6.4.1); the board isn't emulated, so it is always ready
+void vt100_state::vt105(machine_config &config)
+{
+	vt100(config);
+
+	m_flags &= ~FLAG_NO_GRAPHICS;
+}
+
 void vt100_state::vt101(machine_config &config)
 {
 	vt100(config);
+
+	// 5414185 board (MP-01066 sheet 1): ADVANCED VIDEO L has an R8 pull-up
+	// and W5 to ground, W5 fitted only on the VT102/VT131; GRAPHICS FLAG L
+	// and EVEN FIELD L are tied high on all variants
+	m_flags = FLAG_NO_AVO | FLAG_NO_GRAPHICS | FLAG_ODD_FIELD;
 
 	I8085A(config.replace(), m_maincpu, XTAL(24'073'400) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt100_state::vt100_mem);
@@ -467,6 +498,8 @@ void vt100_state::vt101(machine_config &config)
 void vt100_state::vt102(machine_config &config)
 {
 	vt101(config);
+
+	m_flags &= ~FLAG_NO_AVO; // W5 in: integrated AVO
 
 	m_maincpu->set_addrmap(AS_IO, &vt100_state::vt102_io);
 
@@ -898,7 +931,7 @@ COMP( 1979, vt100ac, vt100,  0,      vt100ac, vt100, vt100_state, empty_init, "D
 COMP( 1981, vt101,   vt102,  0,      vt101,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT101",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
 COMP( 1981, vt102,   0,      0,      vt102,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT102",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
 //COMP( 1979, vt103,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT103",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1978, vt105,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT105",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1978, vt105,   vt100,  0,      vt105,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT105",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
 //COMP( 1978, vt110,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT110",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
 //COMP( 1981, vt125,   vt100,  0,      vt100,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT125",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
 COMP( 1981, vt131,   vt102,  0,      vt102,   vt100, vt100_state, empty_init, "Digital Equipment Corporation", "VT131",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
