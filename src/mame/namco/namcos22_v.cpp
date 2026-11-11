@@ -1579,6 +1579,9 @@ void namcos22_state::screen_vblank(int state)
 		if (m_skipped_this_frame)
 			render_frame_active();
 		m_skipped_this_frame = machine().video().skip_this_frame();
+
+		if (m_is_ss22)
+			vics_copy_sprite_data();
 	}
 }
 
@@ -1780,95 +1783,64 @@ void namcos22_state::draw_sprites()
 	const int base = m_spriteram[0] & 0xffff; // alpines/alpinr2b
 	int num_sprites = ((m_spriteram[1] >> 16) - base) + 1;
 
-	// airco22b doesn't use spriteset #1
-	if (m_gametype == NAMCOS22_AIR_COMBAT22)
-		num_sprites = 0;
-
 	if (sprites_on && num_sprites > 0 && num_sprites < 0x400)
 	{
 		src = &m_spriteram[0x04000/4 + base*4];
 		attr = &m_spriteram[0x20000/4 + base*2];
 		draw_sprite_group(src, attr, num_sprites, deltax, deltay, y_lowres);
 	}
-
-	/* VICS RAM provides two additional banks (also many unknown regs here) */
-	/*
-	0x940000 -x------       sprite chip busy?
-	0x940018 xxxx----       clr.w   $940018.l
-
-	0x940030 xxxxxxxx       0x0600000 - misc control
-	0x940034 xxxxxxxx       0x3070b0f
-
-	0x940040 xxxxxxxx       sprite attribute size             high bit means busy?
-	0x940048 xxxxxxxx       sprite attribute list baseaddr    high bit means busy?
-	0x940050 xxxxxxxx       sprite color size                 high bit means busy?
-	0x940058 xxxxxxxx       sprite color list baseaddr        high bit means busy?
-
-	0x940060..0x94007c      set#2
-	*/
-
-	sprites_on = BIT(~m_vics_control[0x30/4], 24);
-	y_lowres = BIT(~m_vics_control[0x30/4], 26);
-
-	// where do the games store the number of sprites to be processed by vics???
-	// the current default implementation (using spritelist size) is clearly wrong and causes problems in dirtdash and airco22b
-	num_sprites = m_vics_control[0x40/4] >> 4 & 0x1ff; // no +1
-
-	// dirtdash sprite list starts at xxx4, number of sprites is stored in xxx0, it doesn't use set#2
-	if (m_gametype == NAMCOS22_DIRT_DASH)
-		num_sprites = (m_vics_data[(m_vics_control[0x48/4] & 0x4000)/4] & 0xff) + 1;
-
-	if (sprites_on && num_sprites > 0)
-	{
-		src = &m_vics_data[(m_vics_control[0x48/4] & 0xffff)/4];
-		attr = &m_vics_data[(m_vics_control[0x58/4] & 0xffff)/4];
-		draw_sprite_group(src, attr, num_sprites, deltax, deltay, y_lowres);
-	}
-
-	num_sprites = m_vics_control[0x60/4] >> 4 & 0x1ff; // no +1
-
-	// airco22b number of sprites for set#2 is stored in set#1 - it does not use set 1, or main set for sprites
-	if (m_gametype == NAMCOS22_AIR_COMBAT22)
-	{
-		sprites_on = BIT(~m_vics_data[(m_vics_control[0x48/4] & 0xffff)/4], 16);
-		num_sprites = (m_vics_data[(m_vics_control[0x48/4] & 0xffff)/4+1] >> 16) + 1;
-	}
-
-	if (sprites_on && num_sprites > 0)
-	{
-		src = &m_vics_data[(m_vics_control[0x68/4] & 0xffff)/4];
-		attr = &m_vics_data[(m_vics_control[0x78/4] & 0xffff)/4];
-		draw_sprite_group(src, attr, num_sprites, deltax, deltay, y_lowres);
-	}
 }
 
 u32 namcos22s_state::namcos22s_vics_control_r(offs_t offset)
 {
-	u32 ret = m_vics_control[offset];
-
-	switch (offset*4)
-	{
-		// reg 0, status register?
-		// high byte is read in timecris and lower half is expected to be 0
-		case 0x00:
-			ret = 0;
-			break;
-
-		// sprite attr/color size regs: high bit is busy/ready?
-		// dirtdash reads these and waits for it to become 0
-		case 0x40: case 0x50: case 0x60: case 0x70:
-			ret &= 0x7fffffff;
-			break;
-
-		default:
-			break;
-	}
-	return ret;
+	if (offset == 0)  // reg 0, status register? high byte is read in timecris and lower half is expected to be 0
+		return 0;
+	else
+		return m_vics_control[offset];
 }
 
 void namcos22s_state::namcos22s_vics_control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_vics_control[offset]);
+}
+
+void namcos22_state::vics_copy_sprite_data()
+{
+	/* VICS provides a 64kB buffer for the main CPU to write sprite data during active display
+	   During vblank it copies data to the sprite chip (C374); up to four blocks may be copied
+
+	0x940000 -x------       VICS/sprite chip busy? (timecris)
+	0x940018 xxxx----       cleared to 0 (timecris)
+	0x940030 xxxxxxxx       set to 0x06000000
+	0x940034 xxxxxxxx       set to 0x03070b0f
+	0x940038 xxxxxxxx       cleared to 0
+
+	0x940040-0x94007f       four sets of registers, four 32-bit words each
+	x------- -------- -------- --------  cleared when transfer complete? (dirtdash reads high bit and waits until clear)
+	-x------ -------- -------- --------  0 to copy to sprite RAM, 1 to copy to attribute RAM
+	----xxxx -------- -------- --------  size of transfer in bytes
+	-------- xxxxxxxx -------- --------  unknown; set to 0x04000000 when initialized/inactive, 0x00010000 when active
+	-------- -------- ----xxxx --------  VICS RAM source address
+	-------- -------- -------- ----xxxx  sprite/attribute RAM destination address
+	*/
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	for (int offset = 0x40; offset < 0x80; offset += 0x10)
+	{
+		if ((m_vics_control[offset / 4] & 0xf0000000) == 0)
+			continue;
+
+		int size = m_vics_control[(offset + 0x0) / 4] & 0xffff;
+		int src = (m_vics_control[(offset + 0x8) / 4] & 0xffff) | 0x900000;
+		int dst = (m_vics_control[(offset + 0xc) / 4] & 0xffff) | ((m_vics_control[offset / 4] & 0x1000000) ? 0x9a0000 : 0x980000);
+
+		// VICS RAM and sprite RAM are both 16-bit
+		for (int i = 0; i < size; i += 2)
+			space.write_word(dst + i, space.read_word(src + i));
+
+		m_vics_control[offset / 4] &= ~0xf0000000;
+	}
 }
 
 
