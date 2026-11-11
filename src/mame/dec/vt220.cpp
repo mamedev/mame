@@ -47,9 +47,7 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/mcs51/i8051.h"
-//#include "machine/eepromser.h"
 #include "machine/mc68681.h"
-#include "machine/ram.h"
 #include "machine/x2212.h"
 #include "video/crt9007.h"
 
@@ -76,22 +74,20 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_duart(*this, "duart"),
-		m_kbd(*this, "lk201"),
-		m_ram(*this, RAM_TAG)
+		m_kbd(*this, "lk201")
 	{ }
 
 	void vt220(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
+
+	void vt220_common(machine_config &config) ATTR_COLD;
 
 	required_device<i8051_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<scn2681_device> m_duart;
 	required_device<lk201_device> m_kbd;
-	required_device<ram_device> m_ram;
 
 private:
 	u8 m_kbd_rxd = 1;
@@ -552,20 +548,10 @@ void vt220a_state::machine_start()
 	m_printer->write_rts(0);
 }
 
-void vt220_state::machine_reset()
-{
-	memset(m_ram->pointer(),0,16*1024);
-}
-
 void vt220a_state::machine_reset()
 {
-	vt220_state::machine_reset();
 	m_dw = false;
 	m_row_loading = false;
-}
-
-void vt220_state::video_start()
-{
 }
 
 uint32_t vt220_state::screen_update_vt220(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -601,13 +587,9 @@ void vt220a_state::vt220a_palette(palette_device &palette) const
 }
 
 
-void vt220_state::vt220(machine_config &config)
+void vt220_state::vt220_common(machine_config &config)
 {
-	/* basic machine hardware */
-	I8051(config, m_maincpu, XTAL(11'059'200)); // from schematic for earlier version
-	m_maincpu->set_addrmap(AS_PROGRAM, &vt220_state::vt220_mem);
-	m_maincpu->set_addrmap(AS_DATA, &vt220_state::vt220_data);
-	m_maincpu->port_in_cb<1>().set_constant(0); // ???
+	I8051(config, m_maincpu, 11.0592_MHz_XTAL); // from schematic for earlier version
 
 	// LK201 on the 8051 UART, through EIA drivers and receivers at both
 	// ends (TM 4.2.8 for models A-C, schematic 54-17036 for D-F)
@@ -618,8 +600,15 @@ void vt220_state::vt220(machine_config &config)
 
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
 	m_duart->irq_cb().set_inputline(m_maincpu, MCS51_INT1_LINE);
+}
 
-	/* video hardware */
+void vt220_state::vt220(machine_config &config)
+{
+	vt220_common(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt220_state::vt220_mem);
+	m_maincpu->set_addrmap(AS_DATA, &vt220_state::vt220_data);
+	m_maincpu->port_in_cb<1>().set_constant(0); // ???
+
 	screen_device &screen(SCREEN(config, m_screen));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
@@ -629,14 +618,11 @@ void vt220_state::vt220(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-
-	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("16K");
 }
 
 void vt220a_state::vt220a(machine_config &config)
 {
-	vt220(config);
+	vt220_common(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt220a_state::vt220a_mem);
 	m_maincpu->set_addrmap(AS_DATA, &vt220a_state::vt220a_data);
 
@@ -651,6 +637,7 @@ void vt220a_state::vt220a(machine_config &config)
 	m_crtc->set_addrmap(0, &vt220a_state::vt220a_vram);
 	m_crtc->set_character_width(t.width);
 	m_crtc->set_screen(m_screen);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(t.dot, t.htotal * t.width, t.hdelay * t.width, (t.hdelay + t.cols) * t.width, VTOTAL, VSTART, VSTART + VVIS);
 	// VS and HS are active low (CRT9007 pins 12, 13) and wired straight to T0 and T1; the 8051 counts their
 	// falling edges, and an asserted mcs51 input line is a low pin
@@ -685,7 +672,8 @@ void vt220a_state::vt220a(machine_config &config)
 	m_printer->dsr_handler().set(m_duart, FUNC(scn2681_device::ip5_w)); // PTR DSR
 
 	m_screen->set_screen_update(FUNC(vt220a_state::screen_update_vt220a));
-	PALETTE(config.replace(), "palette", FUNC(vt220a_state::vt220a_palette), 5);
+	m_screen->set_palette("palette");
+	PALETTE(config, "palette", FUNC(vt220a_state::vt220a_palette), 5);
 }
 
 /* ROM definitions */
