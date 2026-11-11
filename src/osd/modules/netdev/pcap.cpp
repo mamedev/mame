@@ -163,7 +163,7 @@ void pcap_module::netdev_pcap::pcap_handler(u_char *user, const struct pcap_pkth
 	int const next = (curr + 1) & 0x1f;
 	if (ctx->m_tail.load(std::memory_order_acquire) == next)
 	{
-		printf("buffer full, dropping packet\n");
+		osd_printf_verbose("buffer full, dropping packet\n");
 		return;
 	}
 	int const len = std::min<int>(h->caplen, sizeof(ctx->m_packets[curr]));
