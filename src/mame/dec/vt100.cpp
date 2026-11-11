@@ -173,8 +173,8 @@ u8 vt100_state::flags_r()
 {
 	u8 ret = 0;
 
-	// each line reads high when nothing drives it low
 	ret |= m_pusart->txrdy_r();
+	// ADVANCED VIDEO L and GRAPHICS FLAG L read high when nothing drives them
 	ret |= (m_options & OPT_AVO) ? 0 : 0x02;
 	ret |= (m_options & OPT_GRAPHICS) ? 0 : 0x04;
 	ret |= (m_options & OPT_STP) ? 0x08 : 0;
