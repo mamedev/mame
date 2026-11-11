@@ -298,6 +298,20 @@ end
 
 
 ---------------------------------------------------
+-- Cirrus Logic CS4341 Stereo DAC
+--@src/devices/sound/cs4341.h,SOUNDS["CS4341"] = true
+---------------------------------------------------
+
+if (SOUNDS["CS4341"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/cs4341.cpp",
+		MAME_DIR .. "src/devices/sound/cs4341.h",
+	}
+end
+
+
+
+---------------------------------------------------
 -- Cirrus Logic CS43L43 I2S Stereo DAC
 --@src/devices/sound/cs43l43.h,SOUNDS["CS43L43"] = true
 ---------------------------------------------------
