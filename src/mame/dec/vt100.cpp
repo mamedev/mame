@@ -84,11 +84,10 @@ public:
 	void vt180(machine_config &config) ATTR_COLD;
 
 private:
-	// flag buffer (E42) inputs fixed by the model
-	static constexpr u8 FLAG_NO_AVO = 0x02; // ADVANCED VIDEO L, pulled up
-	static constexpr u8 FLAG_NO_GRAPHICS = 0x04; // GRAPHICS FLAG L, pulled up
-	static constexpr u8 FLAG_STP = 0x08; // OPTION PRESENT H
-	static constexpr u8 FLAG_ODD_FIELD = 0x10; // EVEN FIELD L
+	// options fitted, reported in the flag buffer (E42)
+	static constexpr u8 OPT_AVO = 0x01;
+	static constexpr u8 OPT_GRAPHICS = 0x02;
+	static constexpr u8 OPT_STP = 0x04; // an option on the STP
 
 	required_device<cpu_device> m_maincpu;
 	required_device<vt100_video_device> m_crtc;
@@ -102,7 +101,8 @@ private:
 	required_shared_ptr<u8> m_p_ram;
 
 	required_ioport m_phosphor;
-	u8 m_flags = 0; // set per model by the machine config
+	u8 m_options = 0; // set per model by the machine config
+	bool m_even_field_high = false; // the 5414185 board ties EVEN FIELD L high
 
 	u8 flags_r();
 	u8 modem_r();
@@ -158,16 +158,22 @@ void vt100_state::vt180_io(address_map &map)
 // 1 - Advanced Video L: the VT100/VT101 firmware sizes its RAM test from it
 // 2 - Graphics Flag L
 // 3 - Option present H: asserted by an option on the STP
-// 4 - Even field L: low, every field is even when not interlaced; not read
+// 4 - Even field L: low on the VT100 board, every field is even when not
+//     interlaced; tied high on the 5414185 board; not read
 // 5 - NVR data H
 // 6 - LBA 7 H
 // 7 - Keyboard TBMT H
 // The DA reply, ESC [ ? 1 ; N c, has N = STP 1 + AVO 2 + graphics 4.
 u8 vt100_state::flags_r()
 {
-	u8 ret = m_flags;
+	u8 ret = 0;
 
+	// the option lines are pulled up when nothing drives them
 	ret |= m_pusart->txrdy_r();
+	ret |= (m_options & OPT_AVO) ? 0 : 0x02;
+	ret |= (m_options & OPT_GRAPHICS) ? 0 : 0x04;
+	ret |= (m_options & OPT_STP) ? 0x08 : 0;
+	ret |= m_even_field_high ? 0x10 : 0;
 	ret |= !m_nvr->data_r() << 5;
 	ret |= m_crtc->lba7_r() << 6;
 	ret |= m_kbduart->tbmt_r() << 7;
@@ -345,7 +351,7 @@ GFXDECODE_END
 
 void vt100_state::vt100(machine_config &config)
 {
-	m_flags = FLAG_NO_GRAPHICS; // AVO fitted
+	m_options = OPT_AVO;
 
 	/* basic machine hardware */
 	I8080(config, m_maincpu, XTAL(24'883'200) / 9);
@@ -419,7 +425,7 @@ void vt100_state::vt100ac(machine_config &config)
 {
 	vt100(config);
 
-	m_flags |= FLAG_STP;
+	m_options |= OPT_STP;
 
 	i8085a_cpu_device &stpcpu(I8085A(config, "stpcpu", 4915200));
 	stpcpu.set_addrmap(AS_PROGRAM, &vt100_state::stp_mem);
@@ -467,7 +473,7 @@ void vt100_state::vt105(machine_config &config)
 {
 	vt100(config);
 
-	m_flags &= ~FLAG_NO_GRAPHICS;
+	m_options |= OPT_GRAPHICS;
 }
 
 void vt100_state::vt101(machine_config &config)
@@ -477,7 +483,8 @@ void vt100_state::vt101(machine_config &config)
 	// 5414185 board (MP-01066 sheet 1): ADVANCED VIDEO L has an R8 pull-up
 	// and W5 to ground, W5 fitted only on the VT102/VT131; GRAPHICS FLAG L
 	// and EVEN FIELD L are tied high on this board
-	m_flags = FLAG_NO_AVO | FLAG_NO_GRAPHICS | FLAG_ODD_FIELD;
+	m_options = 0;
+	m_even_field_high = true;
 
 	I8085A(config.replace(), m_maincpu, XTAL(24'073'400) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt100_state::vt100_mem);
@@ -498,7 +505,7 @@ void vt100_state::vt102(machine_config &config)
 {
 	vt101(config);
 
-	m_flags &= ~FLAG_NO_AVO; // W5 in: integrated AVO
+	m_options |= OPT_AVO; // W5 fitted
 
 	m_maincpu->set_addrmap(AS_IO, &vt100_state::vt102_io);
 
