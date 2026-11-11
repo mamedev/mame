@@ -209,24 +209,31 @@ void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 	downcast<windows_osd_interface&>(machine().osd()).poll_input_modules(false);
 
 	// get and process messages
-	MSG message;
-	GetMessage(&message, nullptr, 0, 0);
-
-	switch (message.message)
+	const DWORD WAIT_MILLISECONDS = 10;
+	DWORD result = MsgWaitForMultipleObjectsEx(0, nullptr, WAIT_MILLISECONDS, QS_ALLINPUT, MWMO_INPUTAVAILABLE);
+	if (result == WAIT_OBJECT_0)
 	{
-	// check for F10 -- we need to capture that ourselves
-	case WM_SYSKEYDOWN:
-	case WM_SYSKEYUP:
-		if (message.wParam == VK_F4 && message.message == WM_SYSKEYDOWN)
-			SendMessage(GetAncestor(GetFocus(), GA_ROOT), WM_CLOSE, 0, 0);
-		if (message.wParam == VK_F10)
-			SendMessage(GetAncestor(GetFocus(), GA_ROOT), (message.message == WM_SYSKEYDOWN) ? WM_KEYDOWN : WM_KEYUP, message.wParam, message.lParam);
-		break;
+		// the following loop is equivalent to the QT:  qApp->processEvents(QEventLoop::AllEvents, 1);
+		MSG message;
+		while (PeekMessage(&message, nullptr, 0, 0, PM_REMOVE))
+		{
+			switch (message.message)
+			{
+			// check for F10 -- we need to capture that ourselves
+			case WM_SYSKEYDOWN:
+			case WM_SYSKEYUP:
+				if (message.wParam == VK_F4 && message.message == WM_SYSKEYDOWN)
+					SendMessage(GetAncestor(GetFocus(), GA_ROOT), WM_CLOSE, 0, 0);
+				if (message.wParam == VK_F10)
+					SendMessage(GetAncestor(GetFocus(), GA_ROOT), (message.message == WM_SYSKEYDOWN) ? WM_KEYDOWN : WM_KEYUP, message.wParam, message.lParam);
+				break;
 
-	// process everything else
-	default:
-		winwindow_dispatch_message(*m_machine, message);
-		break;
+			// process everything else
+			default:
+				winwindow_dispatch_message(*m_machine, message);
+				break;
+			}
+		}
 	}
 
 	// mark the debugger as active

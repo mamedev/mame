@@ -170,7 +170,7 @@ void debug_qt::wait_for_debugger(device_t &device, bool firststop)
 	m_mainwindow->setProcessor(&device);
 
 	// Run our own QT event loop
-	osd_sleep(osd_ticks_per_second() / 1000 * 50);
+	osd_sleep(osd_ticks_per_second() / 1000 * 10);
 	qApp->processEvents(QEventLoop::AllEvents, 1);
 
 #if defined(_WIN32) && !defined(SDLMAME_WIN32)
