@@ -71,11 +71,13 @@ void hy268a_state::program_map(address_map &map)
 
 	map(0x000000, 0x07ffff).rom();
 	map(0x110020, 0x110021).portr("IN0");
+	map(0x110040, 0x110043).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
 	map(0x170000, 0x170003).rw("acrtc", FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
 	map(0x170009, 0x170009).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x17000b, 0x17000b).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x17000d, 0x17000d).w("ramdac", FUNC(ramdac_device::mask_w));
 	map(0x1f0000, 0x1f7fff).ram();
+
 }
 
 void hy268a_state::ramdac_map(address_map &map)
