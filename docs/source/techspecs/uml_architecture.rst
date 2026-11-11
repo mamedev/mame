@@ -32,7 +32,7 @@ DSPs and other emulated devices.  A recompiler uses several components:
 .. _umlarch-cache:
 
 The recompiler cache
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 The recompiler cache is a contiguous area of virtual memory used to
 store generated code and associated data.  The desired cache size can be
@@ -133,13 +133,13 @@ after code generation is complete.  Data that needs to be modified must
 be stored in the near cache or the permanent object area of the cache.
 
 Back-ends generally allocate objects in the near cache for storing data
-like virtual machine state and data tables required on the critical
-path.  Code handles consume space from the near cache.  Tables for
-associating modes and emulated program counter values with generated
-code are stored in the permanent object area of the cache.  (See the
-section on :ref:`flow control <umlarch-flow>` for more information on
-these concepts.)  Back-ends also generate utility code in the invariant
-and transient portions of the cache.
+like virtual machine state and tables required on the critical path.
+Code handles consume space from the near cache.  Tables for associating
+modes and emulated program counter values with generated code are stored
+in the permanent object area of the cache.  (See the section on
+:ref:`flow control <umlarch-flow>` for more information on these
+concepts.)  Back-ends also generate utility code in the invariant and
+transient portions of the cache.
 
 
 .. _umlarch-vm:
@@ -271,6 +271,51 @@ or :ref:`EXIT <umlinst-exit>` instruction will be used to transfer
 control at the end of a block of translated code or subroutine).  See
 the section on :ref:`flow control <umlarch-flow>` for more details.
 
+Macros are provided for appending UML instructions to code blocks.  The
+recompiler calls ``end`` to indicate that a code block is complete.
+This causes the back-end to translate the block to its preferred form
+for execution or interpretation in the recompiler cache.  If the free
+space in the cache is exhausted, an instance of
+``drcuml_block::abort_compilation`` will be thrown.  If this happens
+while translating emulated code, the recompiler typically responds by
+calling ``reset`` to clear the transient portion of the recompiler cache
+and then building the code block again.
+
+The recompiler **must not** delete code blocks.  When the recompiler has
+finished building a code block, it must call ``end`` to cause the
+back-end to translate the block, or ``abort`` to discard the block.
+Calling ``abort`` will result in an instance of
+``drcuml_block::abort_compilation`` to be thrown.
+
+
+.. _umlarch-mapvar:
+
+Map variables
+-------------
+
+The ten map variables, named ``M0`` to ``M9``, hold 32-bit binary
+values.  At the beginning of a code block, all map variables are set to
+zero.  Map variables may be used as source operands where an integer
+immediate value is permitted.  If a 64-bit value is expected, the value
+of the map variable is extended to 64 bits with zeroes.
+
+The :ref:`MAPVAR <umlinst-mapvar>` instruction is used to assign a new
+value to a map variable.  The values of map variables depend on *the
+location in the code block*.  An instruction will always see the value
+of the map variable set by the nearest preceding
+:ref:`MAPVAR <umlinst-mapvar>` instruction in the block (or zero if
+there is no such instruction), even if the instruction was reached by
+jumping forward over the :ref:`MAPVAR <umlinst-mapvar>` instruction in
+question, or jumping backwards to a location following it.
+
+It is also possible to use the :ref:`RECOVER <umlinst-recover>`
+instruction from within a subroutine to retrieve the value of a map
+variable at the location of the call instruction in the outermost
+generated code frame.  This is often used to retrieve the emulated
+program counter value when dispatching emulated exceptions.  Note that
+this instruction may be very expensive to execute, and it should not be
+used in frequently-executed code paths.
+
 
 .. _umlarch-flow:
 
@@ -304,8 +349,8 @@ Subroutines
 
 Recompilers refer to generated subroutine entry points using *code
 handles*, represented by the ``uml::code_handle`` class and allocated
-by calling ``handle_alloc``.  Code handles are allocated from the near
-cache.  The recompiler must not free any code handles, they remain valid
+by calling ``handle_alloc``.  Code handles consume space in the near
+cache.  The recompiler must not delete code handles, they remain valid
 for the lifetime of the recompiler.
 
 A subroutine entry point is created and associated with a code handle
