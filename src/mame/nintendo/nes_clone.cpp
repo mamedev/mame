@@ -2206,7 +2206,7 @@ CONS( 200?, pv95in1, 0, 0, nes_clone_afbm7800, nes_clone, nes_clone_taikee_new_s
 // mapper at 500x? has custom sound rather than standard NES APU or VTxx sounds, possibly an extra MCU or sound chip in the unit (see https://www.youtube.com/watch?v=OsydFoHW3Lc )
 CONS( 200?, popstar, 0, 0, nes_clone_popstar, nes_clone, nes_clone_popstar_state, empty_init, "<unknown>", "Popstar Karaoke", MACHINE_NOT_WORKING )
 
-CONS( 2005, rumblstn, 0, 0, nes_clone_rumblstn, nes_clone, nes_clone_rumblstn_state, empty_init, "<unknown>", "Rumble Station 15-in-1", 0 )
+CONS( 2005, rumblstn, 0, 0, nes_clone_rumblstn, nes_clone, nes_clone_rumblstn_state, empty_init, "Systema / Pelican / Color Dreams", "Rumble Station 15-in-1", 0 )
 
 // box art makes this look like a 16-bit game, but it's a simple NES clone
 // title on box is Grand Slam Baseball, onscreen is Home Run Baseball
