@@ -11,6 +11,7 @@
 #pragma once
 
 #include "gaelcrpt.h"
+#include "saltcrdi_link.h"
 
 #include "machine/gen_latch.h"
 #include "machine/74259.h"
@@ -131,6 +132,22 @@ private:
 
 	void bigkarnk_map(address_map &map) ATTR_COLD;
 	void bigkarnk_snd_map(address_map &map) ATTR_COLD;
+};
+
+class salter_state : public gaelco_state
+{
+public:
+	salter_state(const machine_config &mconfig, device_type type, const char *tag) :
+		gaelco_state(mconfig, type, tag),
+		m_link(*this, "link")
+	{ }
+
+	void salter(machine_config &config) ATTR_COLD;
+
+private:
+	required_device<saltcrdi_link_device> m_link;
+
+	void salter_map(address_map &map) ATTR_COLD;
 };
 
 class squash_state : public gaelco_state
