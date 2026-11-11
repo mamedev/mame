@@ -152,6 +152,12 @@ void h8500_intc_device::internal_interrupt(int vector)
 	update_irq_state();
 }
 
+void h8500_intc_device::clear_interrupt(int vector)
+{
+	m_pending_irqs[vector >> 5] &= ~(1U << (vector & 31));
+	update_irq_state();
+}
+
 int h8500_intc_device::interrupt_taken(int vector)
 {
 	// DTC is not yet supported.  Warn if it's being triggered.

@@ -58,6 +58,7 @@ void dsp56362_device::x_map(address_map &map)
 {
 	map(0x000000, 0x0015ff).ram();
 	map(0xffff90, 0xffff94).m(m_shi, FUNC(dsp5636x_shi_device::map));
+	map(0xffffb3, 0xffffb3).lr32(NAME([]() -> u32 { return 0; })); // ESAI status
 	map(0xffffc2, 0xffffc7).m(m_hi08, FUNC(hi08_device::map));
 }
 

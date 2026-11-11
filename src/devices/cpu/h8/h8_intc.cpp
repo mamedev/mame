@@ -88,6 +88,12 @@ void h8_intc_device::internal_interrupt(int vector)
 	}
 }
 
+void h8_intc_device::clear_interrupt(int vector)
+{
+	m_pending_irqs[vector >> 5] &= ~(1 << (vector & 31));
+	update_irq_state();
+}
+
 void h8_intc_device::set_input(int inputnum, int state)
 {
 	if(inputnum == INPUT_LINE_NMI) {
@@ -468,10 +474,4 @@ void gt913_intc_device::device_reset()
 	h8_intc_device::device_reset();
 
 	m_ier = 0x01;
-}
-
-void gt913_intc_device::clear_interrupt(int vector)
-{
-	m_pending_irqs[vector >> 5] &= ~(1 << (vector & 31));
-	update_irq_state();
 }

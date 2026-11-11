@@ -171,6 +171,15 @@ void h8_sci_device::scr_w(u8 data)
 		m_intc->internal_interrupt(m_rxi_int);
 	if((delta & SCR_RIE) && (m_scr & SCR_RIE) && has_recv_error())
 		m_intc->internal_interrupt(m_eri_int);
+
+	if((delta & SCR_TIE) && !(m_scr & SCR_TIE))
+		m_intc->clear_interrupt(m_txi_int);
+	if((delta & SCR_TEIE) && !(m_scr & SCR_TEIE))
+		m_intc->clear_interrupt(m_tei_int);
+	if((delta & SCR_RIE) && !(m_scr & SCR_RIE)) {
+		m_intc->clear_interrupt(m_rxi_int);
+		m_intc->clear_interrupt(m_eri_int);
+	}
 }
 
 u8 h8_sci_device::scr_r()
