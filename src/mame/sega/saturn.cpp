@@ -8194,6 +8194,9 @@ void saturn_state::vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rectang
 		}
 
 
+		uint8_t const alpha = current_tilemap.alpha;
+		if (!(current_tilemap.transparency & STV_TRANSPARENCY_ALPHA))
+			current_tilemap.alpha = 0;
 		uint8_t const colour_calculation_enabled = current_tilemap.colour_calculation_enabled;
 		current_tilemap.colour_calculation_enabled = 0;
 //      window_control = current_tilemap.window_control;
@@ -8251,6 +8254,7 @@ void saturn_state::vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rectang
 			// stop profiling USER1
 		}
 
+		current_tilemap.alpha = alpha;
 		current_tilemap.colour_calculation_enabled = colour_calculation_enabled;
 		if ( colour_calculation_enabled )
 		{
