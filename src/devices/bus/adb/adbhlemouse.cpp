@@ -3,6 +3,8 @@
 
 // High-level Apple Desktop Bus mouse
 
+#include <algorithm>
+
 #include "emu.h"
 #include "adbhlemouse.h"
 
@@ -34,11 +36,11 @@ private:
 	required_ioport m_mouse_y;
 
 	u8 m_last_buttons;
-	u8 m_last_x;
-	u8 m_last_y;
+	u16 m_last_x;
+	u16 m_last_y;
 	u8 m_pending_buttons;
-	u8 m_pending_x;
-	u8 m_pending_y;
+	u16 m_pending_x;
+	u16 m_pending_y;
 	bool m_report_pending;
 };
 
@@ -49,10 +51,10 @@ static INPUT_PORTS_START(adb_hle_mouse)
 	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("MOUSEX")
-	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT(0xffff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 	PORT_START("MOUSEY")
-	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+	PORT_BIT(0xffff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 adb_hle_mouse_device::adb_hle_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -102,15 +104,18 @@ unsigned adb_hle_mouse_device::adb_talk(u8 reg, std::span<u8> data)
 	}
 
 	u8 const buttons = m_buttons->read() & 0x03;
-	u8 const x = m_mouse_x->read();
-	u8 const y = m_mouse_y->read();
+	u16 const x = m_mouse_x->read();
+	u16 const y = m_mouse_y->read();
+
 	if ((buttons == m_last_buttons) && (x == m_last_x) && (y == m_last_y))
 	{
 		return 0;
 	}
 
-	s8 const delta_x = s8(x - m_last_x);
-	s8 const delta_y = s8(y - m_last_y);
+	s16 constexpr MIN_DELTA = -0x40;
+	s16 constexpr MAX_DELTA = 0x3f;
+	s16 const delta_x = std::clamp(s16(x - m_last_x), MIN_DELTA, MAX_DELTA);
+	s16 const delta_y = std::clamp(s16(y - m_last_y), MIN_DELTA, MAX_DELTA);
 	data[0] = (BIT(~buttons, 0) << 7) | (u8(delta_y) & 0x7f);
 	data[1] = (BIT(~buttons, 1) << 7) | (u8(delta_x) & 0x7f);
 
