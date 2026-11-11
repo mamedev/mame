@@ -314,11 +314,10 @@ void vt220a_state::curs_w(int state)
 
 void vt220a_state::drb_w(int state)
 {
-	// DRB is active low for the scan line that loads a data row, and drives DMA REQ L on INT0
+	// DRB is active low for the scan line that loads a data row
 	m_drb = state;
 	if (state)
 		m_row_loading = false;
-	m_maincpu->set_input_line(MCS51_INT0_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void vt220a_state::cblank_w(int state)
@@ -644,6 +643,7 @@ void vt220a_state::vt220a(machine_config &config)
 	m_crtc->vs_callback().set_inputline(m_maincpu, MCS51_T0_LINE).invert();
 	m_crtc->hs_callback().set_inputline(m_maincpu, MCS51_T1_LINE).invert();
 	m_crtc->drb_callback().set(FUNC(vt220a_state::drb_w));
+	m_crtc->drb_callback().append_inputline(m_maincpu, MCS51_INT0_LINE).invert(); // DMA REQ L
 	m_crtc->vlt_callback().set(FUNC(vt220a_state::vlt_w));
 	m_crtc->sl_callback().set(FUNC(vt220a_state::sl_w));
 	m_crtc->curs_callback().set(FUNC(vt220a_state::curs_w));
