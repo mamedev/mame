@@ -423,9 +423,10 @@ int sh34_base_device::sh4_dma_data(struct sh4_device_dma *s)
 // called by drivers when an external device takes data from a channel in on-demand data transfer mode
 // (DMAOR.DDT) set for external request, single address mode, memory to device.  'count' is in transfer
 // units; each unit goes in one element of 'buffer' (a 32-byte unit fills four).  Returns the units read
-// and completes the channel when its count reaches zero.
-uint32_t sh34_base_device::sh4_dma_external_read(int channel, uint64_t *buffer, uint32_t count)
+// and completes the channel when its count reaches zero; 'done' tells whether this call completed it.
+uint32_t sh34_base_device::sh4_dma_external_read(int channel, uint64_t *buffer, uint32_t count, bool &done)
 {
+	done = false;
 	uint32_t *sar, *dmatcr;
 	uint32_t chcr;
 	switch (channel)
@@ -506,6 +507,7 @@ uint32_t sh34_base_device::sh4_dma_external_read(int channel, uint64_t *buffer, 
 	{
 		m_dma_timer_active[channel] = 1;
 		m_dma_timer[channel]->adjust(attotime::zero, channel);
+		done = true;
 	}
 	return count;
 }
