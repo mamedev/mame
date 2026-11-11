@@ -204,9 +204,15 @@ void hp_lj3p_device::device_start()
 	std::fill(std::begin(m_video), std::end(m_video), 0);
 	m_print_timer = timer_alloc(FUNC(hp_lj3p_device::print_step), this);
 	m_line_timer = timer_alloc(FUNC(hp_lj3p_device::video_line), this);
-	// system tick on level 3: the firmware counts 167 ticks per second (source and acknowledge not known)
+	// system tick on level 3 (source not known): the firmware converts
+	// milliseconds to ticks as ms * 100 / 167 and back (routines at 12f00 and
+	// 12ecc), i.e. 1.67 ms per tick.  Its software timers count every second
+	// tick; with this rate a sheet counts as delivered about 21 seconds after
+	// it was started (which turns the Form Feed indicator off and lets On Line
+	// pressed during printing take effect) and the indicators flash at 1 Hz
+	// (assumed rate, not measured)
 	m_tick_timer = timer_alloc(FUNC(hp_lj3p_device::tick), this);
-	attotime const tick = attotime::from_hz(32_MHz_XTAL / 192000);
+	attotime const tick = attotime::from_hz(600);
 	m_tick_timer->adjust(tick, 0, tick);
 	m_blt_dest = m_blt_row = m_blt_ptr = 0;
 	m_blt_ctrl = m_blt_mask = m_blt_mode = m_blt_spill = 0;
