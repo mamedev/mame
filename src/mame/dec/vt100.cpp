@@ -84,10 +84,11 @@ public:
 	void vt180(machine_config &config) ATTR_COLD;
 
 private:
-	// options fitted, reported in the flag buffer (E42)
-	static constexpr u8 OPT_AVO = 0x01;
-	static constexpr u8 OPT_GRAPHICS = 0x02;
-	static constexpr u8 OPT_STP = 0x04; // an option on the STP
+	// Options fitted to this model, reported to the firmware through the
+	// flag buffer (E42).  flags_r() turns them into the bus bits.
+	static constexpr u8 OPT_AVO = 0x01; // Advanced Video Option
+	static constexpr u8 OPT_GRAPHICS = 0x02; // VT105 waveform graphics board
+	static constexpr u8 OPT_STP = 0x04; // option on the Standard Terminal Port
 
 	required_device<cpu_device> m_maincpu;
 	required_device<vt100_video_device> m_crtc;
@@ -101,8 +102,8 @@ private:
 	required_shared_ptr<u8> m_p_ram;
 
 	required_ioport m_phosphor;
-	u8 m_options = 0; // set per model by the machine config
-	bool m_even_field_high = false; // the 5414185 board ties EVEN FIELD L high
+	u8 m_options = 0; // set by each model's machine config
+	bool m_even_field_high = false; // VT101/VT102 board wires EVEN FIELD L to +5 V
 
 	u8 flags_r();
 	u8 modem_r();
@@ -153,22 +154,26 @@ void vt100_state::vt180_io(address_map &map)
 	map.global_mask(0xff);
 }
 
-// Flag buffer E42 (D-CS-5413009 basic video schematic):
+// Flag buffer E42, read at port 42 (basic video schematic D-CS-5413009):
 // 0 - XMIT flag H
-// 1 - Advanced Video L: the VT100/VT101 firmware sizes its RAM test from it
-// 2 - Graphics Flag L
-// 3 - Option present H: asserted by an option on the STP
-// 4 - Even field L: low on the VT100 board, every field is even when not
-//     interlaced; tied high on the 5414185 board; not read
+// 1 - Advanced Video L: low when an AVO is fitted.  The VT100 and VT101
+//     firmware use it to decide how much RAM to test.
+// 2 - Graphics Flag L: low when a graphics board is fitted
+// 3 - Option Present H: high when an option on the STP is fitted
+// 4 - Even Field L: low on the VT100 board (without interlace every field
+//     is even); wired high on the VT101/VT102 board.  The firmware never
+//     reads it.
 // 5 - NVR data H
 // 6 - LBA 7 H
 // 7 - Keyboard TBMT H
-// The DA reply, ESC [ ? 1 ; N c, has N = STP 1 + AVO 2 + graphics 4.
+// The firmware reports bits 1-3 in its reply to DA (ESC [ c) as
+// ESC [ ? 1 ; N c, adding 1 for an STP option, 2 for an AVO and 4 for a
+// graphics board.
 u8 vt100_state::flags_r()
 {
 	u8 ret = 0;
 
-	// the option lines are pulled up when nothing drives them
+	// each line reads high when nothing drives it low
 	ret |= m_pusart->txrdy_r();
 	ret |= (m_options & OPT_AVO) ? 0 : 0x02;
 	ret |= (m_options & OPT_GRAPHICS) ? 0 : 0x04;
@@ -480,9 +485,10 @@ void vt100_state::vt101(machine_config &config)
 {
 	vt100(config);
 
-	// 5414185 board (MP-01066 sheet 1): ADVANCED VIDEO L has an R8 pull-up
-	// and W5 to ground, W5 fitted only on the VT102/VT131; GRAPHICS FLAG L
-	// and EVEN FIELD L are tied high on this board
+	// The VT101/VT102 board (MP-01066 sheet 1) ties GRAPHICS FLAG L and
+	// EVEN FIELD L high.  ADVANCED VIDEO L is pulled up by R8; jumper W5
+	// grounds it on the VT102 and VT131, whose AVO is built onto the board.
+	// The VT101 leaves W5 out, so it reports no AVO.
 	m_options = 0;
 	m_even_field_high = true;
 
@@ -505,7 +511,7 @@ void vt100_state::vt102(machine_config &config)
 {
 	vt101(config);
 
-	m_options |= OPT_AVO; // W5 fitted
+	m_options |= OPT_AVO; // W5 fitted: AVO built onto the board
 
 	m_maincpu->set_addrmap(AS_IO, &vt100_state::vt102_io);
 
