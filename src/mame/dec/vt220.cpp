@@ -11,7 +11,7 @@
     vt220 (Version 2.3, probably models D-F) shows nothing: its video, NVR
     and memory map beyond the RAM and DUART are not known.
 
-    TODO (vt220a):
+    TODO: (vt220a)
     - smooth scroll
     - the 20 mA host loop
     - CTS gating (MC68681 MR2 bit 4)
@@ -255,8 +255,8 @@ int vt220a_state::video_dot(int x, bool dw) const
 
 bool vt220a_state::in_row(int x, bool dw) const
 {
-	// CBLANK H blanks the video (TM 6.2.3) for the whole retrace (CRT9007 datasheet, pin 35), but the
-	// CRT9007 model's CBLANK covers only sync: blank outside the row's characters here
+	// CBLANK H blanks the video (TM 6.2.3) for the whole retrace (CRT9007 datasheet, pin 35)
+	// FIXME: the CRT9007 model's CBLANK covers only sync, so blank outside the row's characters here
 	const int col = video_col(x, dw);
 	return col >= 0 && col < (timing().cols >> (dw ? 1 : 0));
 }
@@ -563,16 +563,16 @@ void vt220a_state::machine_start()
 	save_item(NAME(m_host_rxd));
 	save_item(NAME(m_softchar));
 	save_item(NAME(m_lbf));
-
-	// TM table 5-2: the printer port DTR and RTS are on whenever the terminal is powered
-	m_printer->write_dtr(0);
-	m_printer->write_rts(0);
 }
 
 void vt220a_state::machine_reset()
 {
 	m_dw = false;
 	m_row_loading = false;
+
+	// TM table 5-2: the printer port DTR and RTS are on whenever the terminal is powered
+	m_printer->write_dtr(0);
+	m_printer->write_rts(0);
 }
 
 uint32_t vt220_state::screen_update_vt220(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -587,7 +587,7 @@ u32 vt220a_state::screen_update_vt220a(screen_device &screen, bitmap_ind16 &bitm
 		u16 *const pix = &bitmap.pix(y);
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			bool bold, blink_n;
+			bool bold = false, blink_n = false;
 			pix[x] = video_out(x, y, bold, blink_n) ? 1 + (blink_n ? 1 : 0) + (bold ? 2 : 0) : 0;
 		}
 	}
