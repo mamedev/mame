@@ -76,12 +76,12 @@ public:
 	{
 	}
 
-	void vt100(machine_config &config);
-	void vt100ac(machine_config &config);
-	void vt101(machine_config &config);
-	void vt102(machine_config &config);
+	void vt100(machine_config &config) ATTR_COLD;
+	void vt100ac(machine_config &config) ATTR_COLD;
+	void vt101(machine_config &config) ATTR_COLD;
+	void vt102(machine_config &config) ATTR_COLD;
 	void vt105(machine_config &config) ATTR_COLD;
-	void vt180(machine_config &config);
+	void vt180(machine_config &config) ATTR_COLD;
 
 private:
 	// flag buffer (E42) inputs fixed by the model
