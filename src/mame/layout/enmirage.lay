@@ -45,6 +45,27 @@ copyright-holders:tim lindner
 	<element name="button_black"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="button_white"><rect><color red="0.978" green="0.888" blue="0.825" /></rect></element>
 
+	<!-- Music keyboard -->
+	<element name="key_white" defstate="0">
+		<rect><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="0"><bounds x="0.04" y="0" width="0.92" height="0.99" /><color red="0.96" green="0.95" blue="0.92" /></rect>
+		<rect state="1"><bounds x="0.04" y="0" width="0.92" height="0.99" /><color red="0.70" green="0.70" blue="0.68" /></rect>
+	</element>
+	<element name="key_black" defstate="0">
+		<rect state="0"><color red="0.08" green="0.08" blue="0.08" /></rect>
+		<rect state="1"><color red="0.40" green="0.40" blue="0.40" /></rect>
+	</element>
+	<!-- Pitch and mod wheels -->
+	<element name="wheel_body"><rect><color red="0.02" green="0.02" blue="0.02" /></rect></element>
+	<element name="wheel_face"><rect><color red="0.22" green="0.22" blue="0.22" /></rect></element>
+	<element name="wheel_knob"><rect><color red="0.62" green="0.62" blue="0.62" /></rect></element>
+	<element name="wheel_center"><rect><color red="0.40" green="0.40" blue="0.40" /></rect></element>
+	<element name="invisible_rect"><rect><color alpha="0" /></rect></element>
+	<element name="label_PITCH"><text string="PITCH"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="label_MOD"><text string="MOD"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+
+	<element name="keybed"><rect><color red="0.1" green="0.1" blue="0.1" /></rect></element>
+
 	<element name="led_segement" defstate="0">
 		<rect state="0"><color red="0.85" green="0.87" blue="0.36" alpha="0.1" /></rect>
 		<rect state="1"><color red="0.85" green="0.87" blue="0.36" /></rect>
@@ -56,7 +77,7 @@ copyright-holders:tim lindner
 	</element>
 
 	<view name="Default Layout">
-		<bounds left="0" top="0" right="1000" bottom="437" />
+		<bounds left="-110" top="0" right="1000" bottom="627" />
 
 		<!-- bezel -->
 		<element ref="background">
@@ -205,6 +226,270 @@ copyright-holders:tim lindner
 			<bounds left="122" top="138" right="130" bottom="146" />
 		</element>
 
+		<!-- Music keyboard: 61 keys, C2-C7 -->
+		<element ref="keybed"><bounds x="-110" y="0" width="110" height="627" /></element>
+		<element ref="keybed"><bounds x="0" y="437" width="1000" height="190" /></element>
+		<element ref="key_white" inputtag="kbd0" inputmask="0x01"><bounds x="32" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd0" inputmask="0x04"><bounds x="58" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd0" inputmask="0x10"><bounds x="84" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd0" inputmask="0x20"><bounds x="110" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd0" inputmask="0x80"><bounds x="136" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd1" inputmask="0x02"><bounds x="162" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd1" inputmask="0x08"><bounds x="188" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd1" inputmask="0x10"><bounds x="214" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd1" inputmask="0x40"><bounds x="240" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd2" inputmask="0x01"><bounds x="266" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd2" inputmask="0x02"><bounds x="292" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd2" inputmask="0x08"><bounds x="318" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd2" inputmask="0x20"><bounds x="344" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd2" inputmask="0x80"><bounds x="370" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd3" inputmask="0x01"><bounds x="396" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd3" inputmask="0x04"><bounds x="422" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd3" inputmask="0x10"><bounds x="448" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd3" inputmask="0x20"><bounds x="474" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd3" inputmask="0x80"><bounds x="500" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd4" inputmask="0x02"><bounds x="526" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd4" inputmask="0x08"><bounds x="552" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd4" inputmask="0x10"><bounds x="578" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd4" inputmask="0x40"><bounds x="604" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd5" inputmask="0x01"><bounds x="630" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd5" inputmask="0x02"><bounds x="656" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd5" inputmask="0x08"><bounds x="682" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd5" inputmask="0x20"><bounds x="708" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd5" inputmask="0x80"><bounds x="734" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd6" inputmask="0x01"><bounds x="760" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd6" inputmask="0x04"><bounds x="786" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd6" inputmask="0x10"><bounds x="812" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd6" inputmask="0x20"><bounds x="838" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd6" inputmask="0x80"><bounds x="864" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd7" inputmask="0x02"><bounds x="890" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd7" inputmask="0x08"><bounds x="916" y="447" width="26" height="170" /></element>
+		<element ref="key_white" inputtag="kbd7" inputmask="0x10"><bounds x="942" y="447" width="26" height="170" /></element>
+		<element ref="key_black" inputtag="kbd0" inputmask="0x02"><bounds x="50" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd0" inputmask="0x08"><bounds x="76" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd0" inputmask="0x40"><bounds x="128" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd1" inputmask="0x01"><bounds x="154" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd1" inputmask="0x04"><bounds x="180" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd1" inputmask="0x20"><bounds x="232" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd1" inputmask="0x80"><bounds x="258" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd2" inputmask="0x04"><bounds x="310" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd2" inputmask="0x10"><bounds x="336" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd2" inputmask="0x40"><bounds x="362" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd3" inputmask="0x02"><bounds x="414" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd3" inputmask="0x08"><bounds x="440" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd3" inputmask="0x40"><bounds x="492" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd4" inputmask="0x01"><bounds x="518" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd4" inputmask="0x04"><bounds x="544" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd4" inputmask="0x20"><bounds x="596" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd4" inputmask="0x80"><bounds x="622" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd5" inputmask="0x04"><bounds x="674" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd5" inputmask="0x10"><bounds x="700" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd5" inputmask="0x40"><bounds x="726" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd6" inputmask="0x02"><bounds x="778" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd6" inputmask="0x08"><bounds x="804" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd6" inputmask="0x40"><bounds x="856" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd7" inputmask="0x01"><bounds x="882" y="447" width="16" height="105" /></element>
+		<element ref="key_black" inputtag="kbd7" inputmask="0x04"><bounds x="908" y="447" width="16" height="105" /></element>
+		<element ref="wheel_body"><bounds x="-100" y="462" width="40" height="140" /></element>
+		<element ref="wheel_face"><bounds x="-94" y="467" width="28" height="130" /></element>
+		<element ref="wheel_center"><bounds x="-94" y="531" width="28" height="2" /></element>
+		<element id="slider_pitch_wheel" ref="invisible_rect"><bounds x="-94" y="467" width="28" height="130" /></element>
+		<element id="slider_knob_pitch_wheel" ref="wheel_knob">
+			<animate inputtag="pitch" inputmask="0xffff" />
+			<bounds state="100" x="-94" y="467" width="28" height="20" />
+			<bounds state="0" x="-94" y="577" width="28" height="20" />
+		</element>
+		<element ref="wheel_body"><bounds x="-55" y="462" width="40" height="140" /></element>
+		<element ref="wheel_face"><bounds x="-49" y="467" width="28" height="130" /></element>
+		<element id="slider_mod_wheel" ref="invisible_rect"><bounds x="-49" y="467" width="28" height="130" /></element>
+		<element id="slider_knob_mod_wheel" ref="wheel_knob">
+			<animate inputtag="mod" inputmask="0xffff" />
+			<bounds state="100" x="-49" y="467" width="28" height="20" />
+			<bounds state="0" x="-49" y="577" width="28" height="20" />
+		</element>
+		<element ref="label_PITCH"><bounds x="-105" y="605" width="50" height="16" /></element>
+		<element ref="label_MOD"><bounds x="-60" y="605" width="50" height="16" /></element>
 	</view>
 
+
+	<script><![CDATA[
+		file:set_resolve_tags_callback(
+			function()
+				for view_name, view in pairs(file.views) do
+					install_slider_callbacks(view)
+					add_vertical_slider(view, "slider_pitch_wheel", "slider_knob_pitch_wheel", "pitch")
+					add_vertical_slider(view, "slider_mod_wheel", "slider_knob_mod_wheel", "mod")
+					set_spring_value("slider_pitch_wheel", 50)
+				end
+			end)
+
+		-----------------------------------------------------------------------
+		-- Slider and knob library starts.
+		-- Can be copied as-is to other layouts.
+		-----------------------------------------------------------------------
+		local widgets = {}   -- Stores slider and knob information.
+		local pointers = {}  -- Tracks pointer state.
+
+		-- The knob's Y position must be animated using <animate inputtag="{port_name}">.
+		-- The click area's vertical size must exactly span the range of the
+		-- knob's movement.
+		function add_vertical_slider(view, clickarea_id, knob_id, port_name)
+			table.insert(widgets, {
+				clickarea   = get_layout_item(view, clickarea_id),
+				slider_knob = get_layout_item(view, knob_id),
+				field       = get_port_field(port_name),
+				is_knob     = false })
+		end
+
+		-- A sweep between the attached field's min and max values requires
+		-- moving the pointer by `scale * clickarea.height` pixes.
+		function add_simplecounter_knob(view, clickarea_id, port_name, scale)
+			table.insert(widgets, {
+				clickarea = get_layout_item(view, clickarea_id),
+				field     = get_port_field(port_name),
+				is_knob   = true,
+				scale     = scale })
+		end
+
+		function get_layout_item(view, item_id)
+			local item = view.items[item_id]
+			if item == nil then
+				emu.print_error("Layout element: '" .. item_id .. "' not found.")
+			end
+			return item
+		end
+
+		function get_port_field(port_name)
+			local port = file.device:ioport(port_name)
+			if port == nil then
+				emu.print_error("Port: '" .. port_name .. "' not found.")
+				return nil
+			end
+			local field = nil
+			for k, val in pairs(port.fields) do
+				field = val
+				break
+			end
+			if field == nil then
+				emu.print_error("Port: '" .. port_name .."' does not seem to be an IPT_ADJUSTER.")
+				return nil
+			end
+			return field
+		end
+
+		-- Local extension: widgets with a spring_value return to it when
+		-- released, like a spring-loaded pitch wheel.
+		function set_spring_value(clickarea_id, value)
+			for i = 1, #widgets do
+				if widgets[i].clickarea and widgets[i].clickarea.id == clickarea_id then
+					widgets[i].spring_value = value
+				end
+			end
+		end
+
+		function release_pointer(id)
+			local pointer = pointers[id]
+			pointers[id] = nil
+			if pointer then
+				local widget = widgets[pointer.selected_widget]
+				if widget.spring_value then
+					widget.field.user_value = widget.spring_value
+				end
+			end
+		end
+
+		local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
+			-- If a button is not pressed, reset the state of the current pointer.
+			if btn & 1 == 0 then
+				release_pointer(id)
+				return
+			end
+
+			-- If a button was just pressed, find the affected widget, if any.
+			if dn & 1 ~= 0 then
+				for i = 1, #widgets do
+					local found, relative
+					if widgets[i].slider_knob and widgets[i].slider_knob.bounds:includes(x, y) then
+						found = true
+						relative = true
+					elseif widgets[i].clickarea.bounds:includes(x, y) then
+						found = true
+						relative = false
+					end
+					if found then
+						pointers[id] = {
+							selected_widget = i,
+							relative = relative,
+							start_y = y,
+							start_value = widgets[i].field.user_value }
+						break
+					end
+				end
+			end
+
+			-- If there is no widget selected by the current pointer, we are done.
+			if pointers[id] == nil then
+				return
+			end
+
+			-- A widget is selected. Update its state based on the pointer's Y
+			-- position. It is assumed the attached IO field is an IPT_ADJUSTER.
+
+			local pointer = pointers[id]
+			local widget = widgets[pointer.selected_widget]
+
+			local min_value = widget.field.minvalue
+			local max_value = widget.field.maxvalue
+			local value_range = max_value - min_value
+
+			local new_value
+			if widget.is_knob then
+				local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
+				new_value = pointer.start_value + (pointer.start_y - y) * step_y
+			else
+				local knob_half_height = widget.slider_knob.bounds.height / 2
+				local min_y = widget.clickarea.bounds.y0 + knob_half_height
+				local max_y = widget.clickarea.bounds.y1 - knob_half_height
+
+				if pointer.relative then
+					-- User clicked on the knob. The new value will depend on how
+					--  much the knob was dragged.
+					new_value = pointer.start_value - value_range * (y - pointer.start_y) / (max_y - min_y)
+				else
+					-- User clicked elsewhere on the slider. The new value will depend on
+					-- the absolute position of the click.
+					new_value = max_value - value_range * (y - min_y) / (max_y - min_y)
+				end
+			end
+
+			new_value = math.floor(new_value + 0.5)
+			if new_value < min_value then new_value = min_value end
+			if new_value > max_value then new_value = max_value end
+			widget.field.user_value = new_value
+		end
+
+		local function pointer_left(type, id, dev, x, y, up, cnt)
+			release_pointer(id)
+		end
+
+		local function pointer_aborted(type, id, dev, x, y, up, cnt)
+			release_pointer(id)
+		end
+
+		local function forget_pointers()
+			for id, _ in pairs(pointers) do
+				release_pointer(id)
+			end
+		end
+
+		function install_slider_callbacks(view)
+			view:set_pointer_updated_callback(pointer_updated)
+			view:set_pointer_left_callback(pointer_left)
+			view:set_pointer_aborted_callback(pointer_aborted)
+			view:set_forget_pointers_callback(forget_pointers)
+		end
+		-----------------------------------------------------------------------
+		-- Slider and knob library ends.
+		-----------------------------------------------------------------------
+	]]></script>
 </mamelayout>
