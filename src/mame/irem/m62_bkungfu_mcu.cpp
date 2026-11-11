@@ -175,6 +175,60 @@
 
 */
 
+/*
+	10/11/2026 - Steve Ellenoff
+	Modified behavior of both clear screen blitter & load level commands to (more) accurately
+	display the "wipe" effects seen on the real pcb via YouTube video: https://www.youtube.com/watch?v=vw55No8b4Wc&t=16s.
+
+	"Clear Command"
+	Previously the clear screen command completed instantly thus never displaying the top->bottom
+	transistion where the rows are cleared with the new color over the course of ~6 YouTube frames.
+	M62 refresh rate of 56.338028 (17750us) / 30 FPS YouTube = 1.878 x 6 Frames = 11.26 => 12 M62 Frames.
+	The clear command clears 64x32 tiles in vram @ 2 bytes per tile but also written @ 2 bytes per tile.
+	Thus 64x32*(2/2) = 2048 write commands to clear all tilemap vram.
+	12 Frames => 213,000us / 2048 bytes of vram = 104us - 2us overhead = 102us timer interval.
+
+	"Load Level Command"
+	The load level changes are more involved as although the previous code attempted to simulate the
+	left->right wipe effect correctly, two issues were not accurate compared to the video.
+	The most obvious issue was sprites appearing and game play continuing during the transistion, rather
+	than at its completion. To address this, I removed the call to complete(0) for command 1 and placed
+	it at the completion of all load_next timer callback calls. The main cpu is in a spin loop after calling
+	the command and immediately draws sprites and begins the level, thus the hardware's actual delay is not
+	respected. Forcing the completion status to the end of actual timed drawing resolves this.
+
+	The other issue was the timing of the left->right wipe as the background tiles replace the cleared
+	black screen compared to the video. I observed the following timing by single stepping the video.
+	After the screen is cleared to black, the HUD is drawn first.
+	1) From HUD first appearance to first full BG Tile Column:   4 YT Frames =  7.5 =>  8 M62 Frames
+	2) From 1st BG Tile Column to Player Sprite taking 1st step: 8 YT Frames = 15.0 => 15 M62 Frames
+	3) Total Transition Time: 23 M62 Frames
+
+	To improve the transition, I modified the behavior of decoding and drawing the tilemaps.
+	The first obvious issue was that there was a long delay before the BG tiles appeared.
+	The real pcb displays tiles in just 8 M62 frames. To resolve this, I had to modify how the
+	tiles are decoded and displayed. Rather than decode and display sequentially using the timed event,
+	I added a private array which stores all the decoded level data immediately upon load level command 1.
+	This was done to avoid modifying the original decode handling.
+
+	The timed callback handler now writes tilemap data from the stored data but instead of starting at
+	column 0 and drawing to the last column in the row, it begins at a column near the right most section
+	of the full tilemap since that is what is shown when the level is first drawn. Through trial and error
+	a starting column value was chosen that mimics the 8 frame delay timing we need to recreate the
+	hardware's perceived timing as seen in the video. This repeats for all rows, thus only drawing the
+	"visible" tiles and tiles to the right of it offscreen. Once all rows have completed, the complete(0)
+	method is called to inform the main cpu the mcu is done drawing the level data. The main cpu breaks out
+	of its spin loop and then sends blitter command 2 and begins drawing sprites. 
+
+	Bitter command 2 handling was modified to immediately populate the columns we didn't copy to tilemap ram
+	in the timer callback to ensure the full 256x32 tilemap has all the level data it needs before the
+	level begins.
+
+	Last but not least the timed tilemap callback now draws 2 columns at a time instead of the original 4.
+	YT video clearly draws 4 BG tile columns each frame, but YT frames are rougly double M62 Frames, so
+	in reality each M62 frame should only draw 2 columns at a time.
+*/
+
 #include "emu.h"
 #include "m62_bkungfu_mcu.h"
 
@@ -230,6 +284,9 @@ void bkungfu_mcu_device::device_start()
 	save_item(NAME(m_leveldraw_column));
 	save_item(NAME(m_leveldraw_number));
 	m_leveldraw_timer = timer_alloc(FUNC(bkungfu_mcu_device::leveldraw_next), this);
+	save_item(NAME(m_clear_position));
+	m_clear_timer = timer_alloc(FUNC(bkungfu_mcu_device::clear_tilemap_next), this);
+	save_item(NAME(m_tilemap_data));
 }
 
 void bkungfu_mcu_device::device_reset()
@@ -251,6 +308,9 @@ void bkungfu_mcu_device::device_reset()
 	m_leveldraw_column = 0;
 	m_leveldraw_number = 0;
 	m_leveldraw_timer->adjust(attotime::never);
+	m_clear_position = 0;
+	m_clear_timer->adjust(attotime::never);
+	std::fill(std::begin(m_tilemap_data), std::end(m_tilemap_data), 0);
 }
 
 void bkungfu_mcu_device::clear()
@@ -446,16 +506,31 @@ void bkungfu_mcu_device::draw_credits_continue()
 	vram_page_w((position + 3) & 0x0fff, attribute);
 }
 
+TIMER_CALLBACK_MEMBER(bkungfu_mcu_device::clear_tilemap_next)
+{
+	vram_page_w(m_clear_position, m_mailbox[2]);
+	vram_page_w(m_clear_position + 1, m_mailbox[1]);
+	m_clear_position += 2;
+
+	if (m_clear_position < 0x1000)
+	{
+		m_clear_timer->adjust(attotime::from_usec(CLEAR_TILEMAP_STEP_USEC));
+	}
+	else
+	{
+		m_clear_timer->adjust(attotime::never);
+		complete(0);
+		clear();
+	}
+}
+
 void bkungfu_mcu_device::clear_tilemap()
 {
 	if (!m_running)
 		return;
 
-	for (uint16_t position = 0; position < 0x1000; position += 2)
-	{
-		vram_page_w(position, m_mailbox[2]);
-		vram_page_w(position + 1, m_mailbox[1]);
-	}
+	m_clear_position = 0;
+	m_clear_timer->adjust(attotime::from_usec(CLEAR_TILEMAP_STEP_USEC));
 }
 
 void bkungfu_mcu_device::execute_slot(uint8_t slot)
@@ -588,13 +663,39 @@ void bkungfu_mcu_device::draw_object(uint8_t id)
 	}
 }
 
+void bkungfu_mcu_device::store_level_tilemap_data()
+{
+	m_leveldraw_row = 0;
+	m_leveldraw_column = 0;
+	while (m_leveldraw_column < TILEMAP_COLS / 4)	// 4 tiles generated each call below
+	{
+		draw_level_strip(m_leveldraw_column, m_leveldraw_row);
+		if (++m_leveldraw_row == TILEMAP_ROWS)
+		{
+			m_leveldraw_row = 0;
+			m_leveldraw_column++;
+		}
+	}
+}
+
+void bkungfu_mcu_device::write_data_to_tilemap(int column, int row)
+{
+	int const offset = ((row + 6) * 256 + column * DRAW_TILEMAP_COLS) * 2;
+	for (int x = 0; x < DRAW_TILEMAP_COLS; x++)
+	{
+		m_tilemap_ram_w(offset + x * 2,     m_tilemap_data[offset + x * 2]);
+		m_tilemap_ram_w(offset + x * 2 + 1, m_tilemap_data[offset + x * 2 + 1]);
+	}
+}
+
 void bkungfu_mcu_device::draw_level_column_row(int column, int row, uint8_t tile, uint8_t attr)
 {
 	int const offset = ((row + 6) * 256 + column * 4) * 2;
 	for (int x = 0; x < 4; x++)
 	{
-		m_tilemap_ram_w(offset + x * 2, tile);
-		m_tilemap_ram_w(offset + x * 2 + 1, attr);
+		// Store to tilemap data rather than immediately to tilemap ram write handler
+		m_tilemap_data[offset + x * 2] = tile;
+		m_tilemap_data[offset + x * 2 + 1] = attr;
 	}
 }
 
@@ -661,38 +762,61 @@ void bkungfu_mcu_device::draw_level_strip(int column, int row)
 	{
 		int const stream = band * 2 + x / 2;
 		int const index = bandrow * 2 + x % 2;
-		m_tilemap_ram_w(offset + x * 2, tiles[stream][index]);
-		m_tilemap_ram_w(offset + x * 2 + 1, attrs[stream][index]);
+		// Store to tilemap data rather than immediately to tilemap ram write handler
+		m_tilemap_data[offset + x * 2] = tiles[stream][index];
+		m_tilemap_data[offset + x * 2 + 1] = attrs[stream][index];
 	}
 }
 
 TIMER_CALLBACK_MEMBER(bkungfu_mcu_device::leveldraw_next)
 {
-	draw_level_strip(m_leveldraw_column, m_leveldraw_row);
-	if (++m_leveldraw_row == 26)
+	// Copy current row & column from tilemap data to tilemap ram write handler
+	write_data_to_tilemap(m_leveldraw_column, m_leveldraw_row);
+
+	if (++m_leveldraw_row == TILEMAP_ROWS)
 	{
 		m_leveldraw_row = 0;
 		m_leveldraw_column++;
 	}
-	if (m_leveldraw_column != 0x38)
-		m_leveldraw_timer->adjust(attotime::from_usec(LEVEL_DRAW_STEP_USEC));
+
+	if (m_leveldraw_column < TILEMAP_COLS / DRAW_TILEMAP_COLS)
+		m_leveldraw_timer->adjust(attotime::from_usec(LEVEL_DRAW_STEP_USEC * DRAW_TILEMAP_COLS));
 	else
 		complete(0);
 }
 
 void bkungfu_mcu_device::command_w(uint8_t command)
 {
+	int start_col = START_DRAW_COL / DRAW_TILEMAP_COLS;
 	switch (command)
 	{
+	// Begin level drawing, cpu will poll for 0xfe completion status before drawing sprites and continuing on
 	case 0x01:
 		m_leveldraw_number = m_mailbox[1];
-		complete(0);
+
+		// Write entire level tilemap data to preserve existing decoding logic
+		store_level_tilemap_data();
+
+		// Use timer to copy from tilemap data to tilemap ram write handler at starting column
+		m_leveldraw_row = 0;
+		m_leveldraw_column = start_col;
+		m_leveldraw_timer->adjust(attotime::zero);
 		break;
 
+	// Called after 0x01 completes, but cpu doesn't read any response from mcu so behavior unknown
 	case 0x02:
+		// Copy the remaining tilemap data to tilemap ram write handler
 		m_leveldraw_row = 0;
 		m_leveldraw_column = 0;
-		m_leveldraw_timer->adjust(attotime::from_usec(LEVEL_DRAW_STEP_USEC));
+		while (m_leveldraw_column < start_col)
+		{
+			write_data_to_tilemap(m_leveldraw_column, m_leveldraw_row);
+			if (++m_leveldraw_row == TILEMAP_ROWS)
+			{
+				m_leveldraw_row = 0;
+				m_leveldraw_column++;
+			}
+		}
 		break;
 
 	case 0x05:
@@ -703,8 +827,6 @@ void bkungfu_mcu_device::command_w(uint8_t command)
 
 	case 0x08:
 		clear_tilemap();
-		clear();
-		complete(0);
 		break;
 
 	case 0x0a:

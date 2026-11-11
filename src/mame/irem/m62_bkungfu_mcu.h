@@ -30,9 +30,18 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	// 56 columns * 26 rows at 175 usec is about 14 M62 video frames,
-	// matching the observed firmware-backed loading cadence.
-	static constexpr int LEVEL_DRAW_STEP_USEC = 175;
+	// 56 columns * 26 rows (1456 tiles) at 280usec is about 23 M62 video frames (408250us),
+	// matching the video frame timing observed from the real pcb video on YouTube.
+	// To get the bg tiles to draw after 8 frames, must speed up the timer by 18usec per call, 
+	// in-conjunction with using starting draw column of 170 below.
+	static constexpr int LEVEL_DRAW_STEP_USEC = 262;
+	static constexpr int TILEMAP_ROWS = 26;
+	static constexpr int TILEMAP_COLS = 224;	// 56 x 4 = 224 ( columns per row )
+	static constexpr int START_DRAW_COL = 170;	// First column to draw using timed handler  => 128 + 32 + 16 - 6
+	static constexpr int DRAW_TILEMAP_COLS = 2;	// Draw 2 columns at a time to match video
+
+	// Clear Screen takes ~6 frames of 30FPS video of real pcb = ~102us steps for 64x32 vram
+	static constexpr int CLEAR_TILEMAP_STEP_USEC = 102;
 
 	void update_slot(uint8_t slot);
 	void execute_slot(uint8_t slot);
@@ -52,8 +61,11 @@ private:
 	void write_lifebar(int xbase, int ybase, uint8_t energy, bool boss);
 	void write_floor_dot(int which, bool lit);
 	void vram_page_w(offs_t offset, uint8_t data);
+	void write_data_to_tilemap(int column, int row);
+	void store_level_tilemap_data();
 
 	TIMER_CALLBACK_MEMBER(leveldraw_next);
+	TIMER_CALLBACK_MEMBER(clear_tilemap_next);
 
 	devcb_write8 m_tilemap_ram_w;
 	devcb_write8 m_mailbox_out_w;
@@ -75,8 +87,11 @@ private:
 	uint8_t m_leveldraw_row;
 	uint8_t m_leveldraw_column;
 	uint8_t m_leveldraw_number;
+	uint32_t m_clear_position;
 	emu_timer *m_leveldraw_timer;
+	emu_timer* m_clear_timer;
 	required_region_ptr<uint8_t> m_data_rom;
+	uint8_t m_tilemap_data[256*32*2];
 };
 
 #endif // MAME_IREM_M62_BKUNGFU_MCU_H
