@@ -36670,8 +36670,10 @@ accord
 cexpert
 
 @source:novag/cforte.cpp
+cforte
 cfortea
 cforteb
+cfortec
 
 @source:novag/cnchess.cpp
 cnchess
