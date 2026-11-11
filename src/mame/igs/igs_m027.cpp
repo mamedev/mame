@@ -2261,6 +2261,35 @@ INPUT_PORTS_START( extradrw )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( xyxcxysj )
+	PORT_INCLUDE(base)
+
+	PORT_MODIFY("PORTB")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) // Key Out
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   // Small
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  // Big
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   // Bet
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )       // Start
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )  // Take Score
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  // Continue Play
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // Payout
+
+	PORT_MODIFY("PORTC")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5) // Coin In
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  // Hold 4
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) // Key In
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  // Hold 3
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  // Hold 5
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )   // Test
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  // Hold 1
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  // Hold 2
+
+	PORT_START("PLAYER")
+	PORT_BIT( 0x00002, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // Hopper Sensor
+	PORT_BIT( 0x00008, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) // Bookkeeping
+	PORT_BIT( 0xffff5, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( gonefsh )
 	// preliminary - games seems to lack an input test and settings are locked out with password
 
@@ -2959,6 +2988,11 @@ void igs_m027_state::xyxcxysj(machine_config &config)
 	m027_1ppi<true>(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::xyxcxysj_map);
+	m_maincpu->in_port().set_ioport("PLAYER");
+
+	m_ppi[0]->out_pa_callback().set(m_hopper, FUNC(hopper_device::motor_w)).bit(4);
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	DS1643(config, "rtc"); // should be fully compatible with M48T18
 }
@@ -5063,7 +5097,7 @@ GAME(  2000, tshs101,       tshs,     tshs101,      tshs101,       igs_m027_stat
 GAME(  2004, tswx,          0,        tct2p,        tswxp,         igs_m027_state, init_tswx,     ROT0, "IGS", "Taishan Wuxian (V309CN)", MACHINE_NOT_WORKING )
 GAME(  2006, tswxp,         0,        tct2p,        tswxp,         igs_m027_state, init_tswxp,    ROT0, "IGS", "Taishan Wuxian Jiaqiang Ban (V101CN)", 0 )
 GAME(  2000, mgfx,          0,        mgzz,         mgfx,          igs_m027_state, init_mgfx,     ROT0, "IGS", "Manguan Fuxing (V104T)", 0 )
-GAME(  2004, xyxcxysj,      0,        xyxcxysj,     base,          igs_m027_state, init_xyxcxysj, ROT0, "IGS", "Xingyun Xiaochou / Xingyun Shouji (V233CN)", MACHINE_NOT_WORKING ) // IRQ problems
+GAME(  2004, xyxcxysj,      0,        xyxcxysj,     xyxcxysj,      igs_m027_state, init_xyxcxysj, ROT0, "IGS", "Xingyun Xiaochou / Xingyun Shouji (V233CN)", MACHINE_NOT_WORKING ) // interrupt acknowledgement and peripherals
 // this has a 2nd 8255
 GAME(  2001, extradrw,      0,        extradrw,     extradrw,      igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING ) // interrupt acknowledgement and peripherals
 // these have an IGS025 protection device instead of the 8255
