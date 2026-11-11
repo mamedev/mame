@@ -119,6 +119,7 @@ Video generation is like dkong/dkongjr. However, pixel clock is 24MHZ.
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
+#include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/z80dma.h"
@@ -145,6 +146,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_z80dma(*this, "z80dma"),
@@ -157,7 +159,10 @@ public:
 	{ }
 
 	void mario_base(machine_config &config);
+	void mario_braze(machine_config &config);
 	void mario(machine_config &config);
+
+	void init_mariohs();
 
 	DECLARE_INPUT_CHANGED_MEMBER(adjust_palette) { set_palette(newval); }
 
@@ -191,6 +196,9 @@ protected:
 	void vblank_irq(int state);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
+	uint8_t braze_eeprom_r();
+	void braze_eeprom_w(uint8_t data);
+	void braze_decrypt_rom(uint8_t *dest);
 
 	// address maps
 	void base_map(address_map &map) ATTR_COLD;
@@ -203,6 +211,7 @@ protected:
 	// devices
 	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<z80dma_device> m_z80dma;
@@ -214,6 +223,7 @@ protected:
 	optional_region_ptr<uint8_t> m_soundrom;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
+	std::unique_ptr<uint8_t[]> m_decrypted;
 
 	// video state
 	uint8_t m_gfx_bank = 0;
@@ -492,6 +502,58 @@ void mario_state::palette(palette_device &palette)
 	set_palette(0);
 }
 
+void mario_state::mario_braze(machine_config &config)
+{
+	mario(config);
+
+	EEPROM_93C46_8BIT(config, "eeprom");
+}
+
+uint8_t mario_state::braze_eeprom_r()
+{
+	return m_eeprom->do_read();
+}
+
+void mario_state::braze_eeprom_w(uint8_t data)
+{
+	m_eeprom->di_write(data & 0x01);
+	m_eeprom->cs_write(data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write(data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void mario_state::braze_decrypt_rom(uint8_t *dest)
+{
+	uint8_t oldbyte,newbyte;
+	uint8_t *ROM;
+	uint32_t mem;
+	uint32_t newmem;
+
+	ROM = memregion("braze")->base();
+
+	for (mem=0;mem<0x10000;mem++)
+	{
+		oldbyte = ROM[mem];
+
+		newmem = ((bitswap<8>((mem >> 8),7,2,3,1,0,6,4,5))<<8) | (mem & 0xff);
+		newbyte = bitswap<8>(oldbyte, 1,4,5,7,6,0,3,2);
+
+		dest[newmem] = newbyte;
+	}
+}
+
+void mario_state::init_mariohs()
+{
+	m_decrypted = std::make_unique<uint8_t[]>(0x10000);
+
+	braze_decrypt_rom(m_decrypted.get());
+
+	m_maincpu->space(AS_PROGRAM).install_rom(0x0000, 0x5fff, m_decrypted.get());
+	m_maincpu->space(AS_PROGRAM).install_rom(0x8000, 0xffff, m_decrypted.get() + 0x8000);
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	space.install_read_handler(0xc000, 0xc000, read8smo_delegate(*this, FUNC(mario_state::braze_eeprom_r)));
+	space.install_write_handler(0xc000, 0xc000, write8smo_delegate(*this, FUNC(mario_state::braze_eeprom_w)));
+}
 
 /*************************************
  *
@@ -954,6 +1016,42 @@ ROM_START( mario ) // TMA1-05 CPU, TMA1-03-VIDEO
 	ROM_LOAD( "tma1-c-5b.5b",     0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) )
 ROM_END
 
+ROM_START( mariohs )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tma1-c-7f_e-1.7f", 0x0000, 0x2000, CRC(c0c6e014) SHA1(36a04f9ca1c2a583477cb8a6f2ef94e044e08296) )
+	ROM_LOAD( "tma1-c-7e_e-3.7e", 0x2000, 0x2000, CRC(b09ab857) SHA1(35b91cd1c4c3dd2d543a1ea8ff7b951715727792) )
+	ROM_LOAD( "tma1-c-7d_e-1.7d", 0x4000, 0x2000, CRC(dcceb6c1) SHA1(b19804e69ce2c98cf276c6055c3a250316b96b45) )
+	ROM_LOAD( "tma1-c-7c_e-3.7c", 0xf000, 0x1000, CRC(0d31bd1c) SHA1(a2e238470ba2ea3c81225fec687f61f047c68c59) )
+
+	ROM_REGION( 0x10000, "braze", 0 )
+	ROM_LOAD( "mario_13.bin",       0x0000, 0x8000, CRC(64540502) SHA1(6732d0b64e5978a47496c5f1363d43a2c13ac1aa) ) /* Version 1.3 */
+	ROM_RELOAD( 0x8000, 0x8000 )
+
+	ROM_REGION( 0x0800, "audiocpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "m58715-051p.5l",   0x0000, 0x0800, NO_DUMP ) // internal rom
+
+	ROM_REGION( 0x1000, "soundrom", 0 )
+	ROM_LOAD( "tma1-c-6k_e.6k",   0x0000, 0x1000, CRC(06b9ff85) SHA1(111a29bcb9cda0d935675fa26eca6b099a88427f) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "tma1-v-3f.3f",     0x0000, 0x1000, CRC(28b0c42c) SHA1(46749568aff88a28c3b6a1ac423abd1b90742a4d) )
+	ROM_LOAD( "tma1-v-3j.3j",     0x1000, 0x1000, CRC(0c8cc04d) SHA1(15fae47d701dc1ef15c943cee6aa991776ecffdf) )
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "tma1-v.7m.7m",     0x0000, 0x1000, CRC(d01c0e2c) SHA1(cd6cc9d69c36db15543601f5da2abf109cde43c9) )
+	ROM_LOAD( "tma1-v-7n.7n",     0x1000, 0x1000, CRC(4f3a1f47) SHA1(0747d693b9482f6dd28b0bc484fd1d3e29d35654) )
+	ROM_LOAD( "tma1-v-7p.7p",     0x2000, 0x1000, CRC(56be6ccd) SHA1(15a6e16c189d45f72761ebcbe9db5001bdecd659) )
+	ROM_LOAD( "tma1-v.7s.7s",     0x3000, 0x1000, CRC(ff856e6f) SHA1(2bc9ff18bb1842e8de2bc61ac828f1b175290bed) )
+	ROM_LOAD( "tma1-v-7t.7t",     0x4000, 0x1000, CRC(641f0008) SHA1(589fe108c7c11278fd897f2ded8f0498bc149cfd) )
+	ROM_LOAD( "tma1-v.7u.7u",     0x5000, 0x1000, CRC(d2dbeb75) SHA1(676cf3e15252cd0d9e926ca15c3aa0caa39be269) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "tma1-c-4p.4p",     0x0000, 0x0200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801) )
+
+	ROM_REGION( 0x0020, "decoder_prom", 0 ) // main cpu memory map decoding prom
+	ROM_LOAD( "tma1-c-5b.5b",     0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) )
+ROM_END
+
 ROM_START( mariog )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tma1-c-7f_g.7f", 0x0000, 0x2000, CRC(c0c6e014) SHA1(36a04f9ca1c2a583477cb8a6f2ef94e044e08296) )
@@ -1117,9 +1215,10 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mario,   0,     mario, mario,  mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, revision E)",    MACHINE_SUPPORTS_SAVE ) // newest US revision
-GAME( 1983, mariog,  mario, mario, mario,  mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, revision G)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mariof,  mario, mario, mariof, mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, revision F)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, marioj,  mario, mario, marioj, mario_state, empty_init, ROT0, "Nintendo",            "Mario Bros. (Japan, revision C)", MACHINE_SUPPORTS_SAVE ) // probably newer than US revision E
-GAME( 1983, marioja, mario, mario, mariof, mario_state, empty_init, ROT0, "Nintendo",            "Mario Bros. (Japan, older)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1983, masao,   mario, masao, mario,  masao_state, empty_init, ROT0, "bootleg",             "Masao",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mario,   0,     mario,       mario,  mario_state, empty_init,   ROT0, "Nintendo of America",       "Mario Bros. (US, revision E)",           MACHINE_SUPPORTS_SAVE ) // newest US revision
+GAME( 1983, mariog,  mario, mario,       mario,  mario_state, empty_init,   ROT0, "Nintendo of America",       "Mario Bros. (US, revision G)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mariof,  mario, mario,       mariof, mario_state, empty_init,   ROT0, "Nintendo of America",       "Mario Bros. (US, revision F)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, marioj,  mario, mario,       marioj, mario_state, empty_init,   ROT0, "Nintendo",                  "Mario Bros. (Japan, revision C)",        MACHINE_SUPPORTS_SAVE ) // probably newer than US revision E
+GAME( 1983, marioja, mario, mario,       mariof, mario_state, empty_init,   ROT0, "Nintendo",                  "Mario Bros. (Japan, older)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1983, masao,   mario, masao,       mario,  masao_state, empty_init,   ROT0, "bootleg",                   "Masao",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 2001, mariohs, mario, mario_braze, mario,  mario_state, init_mariohs, ROT0, "hack (Braze Technologies)", "Mario Bros. High Score Kit (hack,V1.3)", MACHINE_SUPPORTS_SAVE )
