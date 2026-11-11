@@ -125,30 +125,19 @@
 #include "emu.h"
 #include "avr8timers_classic.h"
 
-#define LOG_TIMER0          (1U << 0)
-#define LOG_TIMER0_TICK     (1U << 1)
-#define LOG_TIMER1          (1U << 2)
-#define LOG_TIMER1_TICK     (1U << 3)
+DEFINE_DEVICE_TYPE(AVR8_CLASSIC_GENERIC_TIMER_0, avr8_generic_t0_timer_device, "cavr8gent0", "Classic AVR8 generic 8-bit timer 0")
+DEFINE_DEVICE_TYPE(AVR8_CLASSIC_MEGAAVR_TIMER_0, avr8_megaavr_timer_0_device,  "cmegaavrt0", "Classic megaAVR Timer 0")
 
-#define LOG_INT_ACKS (1 << 4)
+DEFINE_DEVICE_TYPE(AVR8_CLASSIC_GENERIC_TIMER_1, avr8_generic_timer_1_device, "cavr8gent1", "Classic AVR8 generic 16-bit timer")
+DEFINE_DEVICE_TYPE(AVR8_CLASSIC_MEGAAVR_TIMER_1, avr8_megaavr_timer_1_device, "cmegaavrt1", "Classic megaAVR 16-bit timer")
 
-#define VERBOSE             (LOG_TIMER1 | LOG_TIMER1_TICK)
-//#define LOG_OUTPUT_FUNC     osd_printf_info
-#include "logmacro.h"
+DEFINE_DEVICE_TYPE(AVR8_CLASSIC_10BIT_PRESCALER, avr8_10bit_prescaler_device, "cavr8presc", "Classic AVR8 10-bit prescaler")
+DEFINE_DEVICE_TYPE(AVR8_CLASSIC_OUTPUT_COMPARE_MODULATOR, avr8_output_compare_modulator_device, "cavr8ocm", "Classic AVR8 output compare modulator")
 
-DEFINE_DEVICE_TYPE(AVR8_CLASSIC_GENERIC_TIMER_0, avr8_generic_t0_timer_device, "cavr8gent0", "Classic AVR8 generic 8-bit timer 0");
-DEFINE_DEVICE_TYPE(AVR8_CLASSIC_MEGAAVR_TIMER_0, avr8_megaavr_timer_0_device,  "cmegaavrt0", "Classic megaAVR Timer 0");
-
-DEFINE_DEVICE_TYPE(AVR8_CLASSIC_GENERIC_TIMER_1, avr8_generic_timer_1_device, "cavr8gent1", "Classic AVR8 generic 16-bit timer");
-DEFINE_DEVICE_TYPE(AVR8_CLASSIC_MEGAAVR_TIMER_1, avr8_megaavr_timer_1_device, "cmegaavrt1", "Classic megaAVR 16-bit timer");
-
-DEFINE_DEVICE_TYPE(AVR8_CLASSIC_10BIT_PRESCALER, avr8_10bit_prescaler_device, "avr8presc", "Classic AVR8 10-bit prescaler");
-DEFINE_DEVICE_TYPE(AVR8_CLASSIC_OUTPUT_COMPARE_MODULATOR, avr8_output_compare_modulator_device, "avr8ocm", "Classic AVR8 Output Compare Modulator");
-
-DEFINE_DEVICE_TYPE(AVR8_CLASSIC_GENERIC_FAKE_RTC_TIMER, avr8_generic_async_8bit_timer_device, "cavr8frtct", "Classic AVR8 generic asynchronous 8-bit timer");
-DEFINE_DEVICE_TYPE(AVR8_CLASSIC_MEGAAVR_FAKE_RTC_TIMER, avr8_megaavr_async_8bit_timer_device, "cmegaavrfrtct", "Classic megaAVR asynchronous 8-bit timer");
-DEFINE_DEVICE_TYPE(AVR8_CLASSIC_FAKE_RTC_ASYNC_CONTROLLER, avr8_async_timer_unit_device, "cavr8frtcc", "Classic AVR8 asynchronous timer unit");
-DEFINE_DEVICE_TYPE(AVR8_CLASSIC_MEGAAVR_FAKE_RTC_ASYNC_CONTROLLER, avr8_megaavr_async_timer_unit_device, "cmegaavrfrtcc", "Classic megaAVR asynchronous timer unit");
+DEFINE_DEVICE_TYPE(AVR8_CLASSIC_GENERIC_FAKE_RTC_TIMER, avr8_generic_async_8bit_timer_device, "cavr8frtct", "Classic AVR8 generic asynchronous 8-bit timer")
+DEFINE_DEVICE_TYPE(AVR8_CLASSIC_MEGAAVR_FAKE_RTC_TIMER, avr8_megaavr_async_8bit_timer_device, "cmegaavrfrtct", "Classic megaAVR asynchronous 8-bit timer")
+DEFINE_DEVICE_TYPE(AVR8_CLASSIC_FAKE_RTC_ASYNC_CONTROLLER, avr8_async_timer_unit_device, "cavr8frtcc", "Classic AVR8 asynchronous timer unit")
+DEFINE_DEVICE_TYPE(AVR8_CLASSIC_MEGAAVR_FAKE_RTC_ASYNC_CONTROLLER, avr8_megaavr_async_timer_unit_device, "cmegaavrfrtcc", "Classic megaAVR asynchronous timer unit")
 
 ///////////////////////////////////////////////////////////////
 // BASE TIMER
@@ -158,6 +147,7 @@ avr8_base_timer_device::avr8_base_timer_device(const machine_config &mconfig, de
 	device_t(mconfig, type, tag, owner, clock),
 	m_upstream_prescaler(*this, finder_base::DUMMY_TAG),
 	m_int_cbs(*this),
+	m_ocr_c_enabled(false),
 	m_oc_en_w_cbs(*this),
 	m_oc_w_cbs(*this),
 	m_oc_toggle_w_cbs(*this)
@@ -237,7 +227,8 @@ void avr8_base_timer_device::int_en_w(uint8_t data)
 	if (!m_int_cbs[Channel].isunset()) m_int_cbs[Channel](m_int_en[Channel] && m_int[Channel]);
 }
 
-// if you remove these, then i hope you like linker errors...
+// declare these all in advance so the compiler drops the definitions in place;
+// otherwise there will be linker errors down the line.
 template void avr8_base_timer_device::int_w<AVR8_TIMER_INTCHANNEL_OV>(uint8_t);
 template void avr8_base_timer_device::int_w<AVR8_TIMER_INTCHANNEL_OC_A>(uint8_t);
 template void avr8_base_timer_device::int_w<AVR8_TIMER_INTCHANNEL_OC_B>(uint8_t);
@@ -270,18 +261,11 @@ void avr8_base_timer_device::clear_int()
 	if (m_int_en[Channel] && !m_int_cbs[Channel].isunset()) m_int_cbs[Channel](0);
 }
 
-void avr8_base_timer_device::clk_io_w(uint8_t data)
-{
-	if (!m_clk_io && data != 0)
-	{
-		tick();
-	}
-	m_clk_io = data != 0;
-}
-
 void avr8_base_timer_device::advance_illegal_wgm_state()
 {
-	logerror("%s: advance timer on illegal/unimplemented wgm state %02x\n", machine().describe_context(), m_wgm);
+	// TODO: this replicates the old timer subsystem behavior, but isn't hardware accurate.
+	// if some software tries using illegal timer modes, then they'll need to be supported.
+	m_tcnt = next_count();
 }
 
 void avr8_base_timer_device::advance_normal_generic()
@@ -331,22 +315,15 @@ void avr8_base_timer_device::advance_pwm_generic(uint16_t top, bool ocr_a_toggli
 	}
 
 	if (is_min_count())
-	{
 		raise_tov();
-	}
 
 	if (!m_dual_slope_counting_down && m_tcnt == top)
-	{
 		m_dual_slope_counting_down = true;
-	}
 	else if (m_dual_slope_counting_down && is_min_count())
-	{
 		m_dual_slope_counting_down = false;
-	}
 
 	m_tcnt = m_dual_slope_counting_down ? prev_count() : next_count();
 }
-
 
 void avr8_base_timer_device::advance_pwm_ocr_a_generic()
 {
@@ -379,18 +356,12 @@ void avr8_base_timer_device::advance_pwm_ocr_a_generic()
 	}
 
 	if (is_min_count())
-	{
 		raise_tov();
-	}
 
 	if (!m_dual_slope_counting_down && m_tcnt == top)
-	{
 		m_dual_slope_counting_down = true;
-	}
 	else if (m_dual_slope_counting_down && is_min_count())
-	{
 		m_dual_slope_counting_down = false;
-	}
 
 	if (!(is_compare_a() && is_min_count()))
 	{
@@ -404,21 +375,22 @@ void avr8_base_timer_device::advance_pwm_ocr_a_generic()
 }
 
 template <uint8_t Channel,
-			uint8_t SetState,
-			uint8_t ClearState,
-			bool Toggling>
+		  uint8_t SetState,
+		  uint8_t ClearState,
+		  bool Toggling>
 void avr8_base_timer_device::update_oc()
 {
 	if (m_com[Channel] == AVR8_TIMER_COM_NORMAL) return;
 
-	if (m_oc_w_cbs[Channel].isunset() || m_oc_toggle_w_cbs[Channel].isunset())
-	{
+	if (m_oc_w_cbs[Channel].isunset() || m_oc_toggle_w_cbs[Channel].isunset()) 
 		return;
-	}
 
-	if (Toggling && m_com[Channel] == AVR8_TIMER_COM_TOGGLE) m_oc_toggle_w_cbs[Channel](1);
-	else if (m_com[Channel] == AVR8_TIMER_COM_CLEAR) m_oc_w_cbs[Channel](ClearState);
-	else if (m_com[Channel] == AVR8_TIMER_COM_SET) m_oc_w_cbs[Channel](SetState);
+	if (Toggling && m_com[Channel] == AVR8_TIMER_COM_TOGGLE)
+		m_oc_toggle_w_cbs[Channel](1);
+	else if (m_com[Channel] == AVR8_TIMER_COM_CLEAR)
+		m_oc_w_cbs[Channel](ClearState);
+	else if (m_com[Channel] == AVR8_TIMER_COM_SET)
+		m_oc_w_cbs[Channel](SetState);
 }
 
 template <uint8_t Channel>
@@ -535,13 +507,9 @@ void avr8_output_compare_modulator_device::update_outputs()
 	if (m_compare_out_en_a && m_compare_out_en_b)
 	{
 		if (m_port_bit)
-		{
 			m_gpio_bit_w_wb(m_compare_out_a | m_compare_out_b);
-		}
 		else
-		{
 			m_gpio_bit_w_wb(m_compare_out_a & m_compare_out_b);
-		}
 		return;
 	}
 
@@ -562,13 +530,10 @@ void avr8_output_compare_modulator_device::compare_out_en_a_w(uint8_t data)
 	bool old = m_compare_out_en_a;
 	m_compare_out_en_a = data != 0;
 
+	// when one output channel is enabled, the existing PORTx bit is latched
+	// but no longer forwarded.
 	if (!old && m_compare_out_en_a && !m_compare_out_en_b)
-	{
-		// when one output channel is enabled, the existing PORTx bit is latched
-		// but no longer forwarded.
-		// not sure of behavior when both COMxx signals are set at the same time...
 		m_compare_out_a = m_port_bit;
-	}
 
 	update_outputs();
 }
@@ -959,16 +924,42 @@ bool avr8_generic_8bit_timer_device::com_mode_allows_output(uint8_t channel)
 	return false;
 }
 
+template <uint8_t Channel>
+void avr8_generic_8bit_timer_device::ocr_w(uint8_t data)
+{
+	m_ocr_buf[Channel] = data;
+	m_ocr_changed = true;
+}
+
+template void avr8_generic_8bit_timer_device::ocr_w<AVR8_TIMER_CMPCHANNEL_OC_A>(uint8_t);
+template void avr8_generic_8bit_timer_device::ocr_w<AVR8_TIMER_CMPCHANNEL_OC_B>(uint8_t);
+
 void avr8_generic_8bit_timer_device::wgm_w(uint8_t data)
 {
 	if (m_wgm == data) return;
 
-	logerror("%s: switch wgm to %02x\n", machine().describe_context(), data);
-	m_wgm = data;
+	m_wgm = BIT(data, 0, 2);
 
 	// output lines will switch when WGM switches, so rewrite COM modes
 	com_w<AVR8_TIMER_CMPCHANNEL_OC_A>(com_r<AVR8_TIMER_CMPCHANNEL_OC_A>());
 	com_w<AVR8_TIMER_CMPCHANNEL_OC_B>(com_r<AVR8_TIMER_CMPCHANNEL_OC_B>());
+
+	switch (m_wgm)
+	{
+		case GENERIC_8BIT_TIMER_WGM_NORMAL:
+		case GENERIC_8BIT_TIMER_WGM_PWM:
+		case GENERIC_8BIT_TIMER_WGM_CTC:
+		case GENERIC_8BIT_TIMER_WGM_FAST_PWM:
+		case GENERIC_8BIT_TIMER_WGM_PWM_OCR_A:
+		case GENERIC_8BIT_TIMER_WGM_FAST_PWM_OCR_A:
+			break;
+
+		default:
+			logerror("%s: switched to illegal WGM mode %02x\n",
+					 machine().describe_context(),
+					 m_wgm);
+			break;
+	}
 }
 
 bool avr8_generic_8bit_timer_device::should_reload_ocrs()
@@ -1021,21 +1012,16 @@ void avr8_generic_t0_timer_device::tick()
 {
 	if (m_prtim) return;
 
-	if (m_cs == GENERIC_TIMER0_CS_T0_FALL || m_cs == GENERIC_TIMER0_CS_T0_RISE)
-	{
-		sample_t_input();
-	}
+	// TODO: behavior here is wrong (on real hardware, Tx is sampled on every clk_io cycle).
+	// the Tx pin sampling will have to go into a GPIO mux in the future.
+	if (m_cs == GENERIC_TIMER0_CS_T0_FALL || m_cs == GENERIC_TIMER0_CS_T0_RISE) sample_t_input();
+	
+	if (m_cs == GENERIC_TIMER0_CS_DISABLED) return;
 
-	if (m_cs == GENERIC_TIMER0_CS_DISABLED)
-	{
-		// LOGMASKED(LOG_TIMER0_TICK, "%s: timer is disabled (m_cs == GENERIC_TIMER0_CS_DISABLED), doing nothing.\n", machine().describe_context());
-		return;
-	}
-
-	if (m_cs == GENERIC_TIMER0_CS_PRESCALE_DIV8 && !(m_upstream_prescaler->taps_r() & avr8_10bit_prescaler_device::AVR8_PRESCALER_TAPMASK_DIV8)) return;
-	if (m_cs == GENERIC_TIMER0_CS_PRESCALE_DIV64 && !(m_upstream_prescaler->taps_r() & avr8_10bit_prescaler_device::AVR8_PRESCALER_TAPMASK_DIV64)) return;
-	if (m_cs == GENERIC_TIMER0_CS_PRESCALE_DIV256 && !(m_upstream_prescaler->taps_r() & avr8_10bit_prescaler_device::AVR8_PRESCALER_TAPMASK_DIV256)) return;
-	if (m_cs == GENERIC_TIMER0_CS_PRESCALE_DIV1024 && !(m_upstream_prescaler->taps_r() & avr8_10bit_prescaler_device::AVR8_PRESCALER_TAPMASK_DIV1024)) return;
+	if (m_cs == GENERIC_TIMER0_CS_PRESCALE_DIV8 && !(m_upstream_prescaler->taps_r() & 8)) return;
+	if (m_cs == GENERIC_TIMER0_CS_PRESCALE_DIV64 && !(m_upstream_prescaler->taps_r() & 64)) return;
+	if (m_cs == GENERIC_TIMER0_CS_PRESCALE_DIV256 && !(m_upstream_prescaler->taps_r() & 256)) return;
+	if (m_cs == GENERIC_TIMER0_CS_PRESCALE_DIV1024 && !(m_upstream_prescaler->taps_r() & 1024)) return;
 	if (m_cs == GENERIC_TIMER0_CS_T0_FALL && !m_t_falling) return;
 	if (m_cs == GENERIC_TIMER0_CS_T0_RISE && !m_t_rising) return;
 	// GENERIC_TIMER0_CS_DIRECT = just fall through
@@ -1062,8 +1048,6 @@ void avr8_generic_t0_timer_device::tcnt_w(uint8_t data)
 
 void avr8_megaavr_timer_0_device::tccr_b_w(uint8_t data)
 {
-	LOGMASKED(LOG_TIMER0, "tccr_b_w: %02x\n", data);
-
 	if (BIT(data,7)) force_oc0a();
 	if (BIT(data,6)) force_oc0b();
 	cs_w(BIT(data,0,3));
@@ -1092,8 +1076,7 @@ avr8_generic_timer_1_device::avr8_generic_timer_1_device(const machine_config &m
 	device_t *owner,
 	uint32_t clock,
 	const device_type device_type) :
-	avr8_base_timer_device(mconfig, device_type, tag, owner, clock),
-	m_ocr_c_enabled(false) // has to be set manually after construct
+	avr8_base_timer_device(mconfig, device_type, tag, owner, clock)
 { }
 
 avr8_megaavr_timer_1_device::avr8_megaavr_timer_1_device(const machine_config &mconfig,
@@ -1126,14 +1109,10 @@ void avr8_generic_timer_1_device::tick()
 
 	// Tx pin is sampled on every I/O clock, so check that first
 	if (m_cs == GENERIC_TIMER1_CS_T1_FALL || m_cs == GENERIC_TIMER1_CS_T1_RISE)
-	{
 		sample_t_input();
-	}
 
 	if (m_cs == GENERIC_TIMER1_CS_DISABLED)
-	{
 		return;
-	}
 
 	if (m_cs == GENERIC_TIMER1_CS_PRESCALE_DIV8 && !(m_upstream_prescaler->taps_r() & avr8_10bit_prescaler_device::AVR8_PRESCALER_TAPMASK_DIV8)) return;
 	if (m_cs == GENERIC_TIMER1_CS_PRESCALE_DIV64 && !(m_upstream_prescaler->taps_r() & avr8_10bit_prescaler_device::AVR8_PRESCALER_TAPMASK_DIV64)) return;
@@ -1148,7 +1127,6 @@ void avr8_generic_timer_1_device::tick()
 		reload_ocrs();
 	}
 
-	// LOGMASKED(LOG_TIMER1_TICK, "%s: running wgm callback %d\n", machine().describe_context(), m_wgm);
 	switch (m_wgm)
 	{
 		case GENERIC_TIMER1_WGM_NORMAL:
@@ -1626,7 +1604,6 @@ uint8_t avr8_generic_timer_1_device::tcnt_h_r()
 void avr8_generic_timer_1_device::tcnt_l_w(uint8_t data)
 {
 	m_tcnt = (m_temp << 8) | data;
-	// LOGMASKED(LOG_TIMER1, "%s: tcnt changing to %04x\n", machine().describe_context(), m_tcnt);
 }
 
 uint8_t avr8_generic_timer_1_device::tcnt_l_r()
@@ -1641,7 +1618,6 @@ void avr8_generic_timer_1_device::ocr_h_w(uint8_t data)
 {
 	// Channel doesn't matter here because data always ends up in the temp register.
 	// however, you can use it for debuglogging.
-	// LOGMASKED(LOG_TIMER1, "%s: OCRx%cH setting temp register to %02x\n", machine().describe_context(), 'A' + Channel, data);
 	m_temp = data;
 }
 
@@ -1654,7 +1630,7 @@ void avr8_generic_timer_1_device::ocr_l_w(uint8_t data)
 {
 	m_ocr_buf[Channel] = (m_temp << 8) | data;
 	m_ocr_changed = true;
-	// LOGMASKED(LOG_TIMER1, "%s: OCR %c switching to %04x\n", machine().describe_context(), 'A' + Channel, m_ocr_buf[Channel]);
+	
 }
 
 template void avr8_generic_timer_1_device::ocr_l_w<AVR8_TIMER_CMPCHANNEL_OC_A>(uint8_t data);
@@ -1674,7 +1650,6 @@ uint8_t avr8_generic_timer_1_device::icr_h_r()
 void avr8_generic_timer_1_device::icr_l_w(uint8_t data)
 {
 	m_icr = (m_temp << 8) | data;
-	LOGMASKED(LOG_TIMER1, "%s: ICR switching to %04x\n", machine().describe_context(), m_icr);
 }
 
 uint8_t avr8_generic_timer_1_device::icr_l_r()
@@ -1959,7 +1934,6 @@ void avr8_async_timer_unit_device::device_start()
 	save_item(NAME(m_as2));
 	save_item(NAME(m_exclk));
 	save_item(NAME(m_tosc_last_state));
-	save_item(NAME(m_clk_io));
 	save_item(NAME(m_exclk_from_crystal));
 	m_external_crystal_timer = timer_alloc(FUNC(avr8_async_timer_unit_device::external_crystal_tick), this);
 }
@@ -1977,7 +1951,6 @@ void avr8_async_timer_unit_device::device_reset()
 	m_exclk = false;
 	m_as2 = false;
 	m_tosc_last_state = false;
-	m_clk_io = false;
 }
 
 void avr8_megaavr_async_timer_unit_device::device_reset()
@@ -2007,17 +1980,12 @@ void avr8_megaavr_async_timer_unit_device::device_add_mconfig(machine_config &co
 	atimer.set_upstream_prescaler_tag(m_prescaler);
 }
 
-void avr8_async_timer_unit_device::clk_io_w(uint8_t data)
+void avr8_async_timer_unit_device::clk_io_tick()
 {
-	bool new_state = data != 0;
-	if (new_state == m_clk_io) return;
-	m_clk_io = new_state;
-
 	// in synchronous mode, the rising edge of the clock ticks the timer
-	if (!m_as2 && m_clk_io)
+	if (!m_as2)
 	{
 		tick_common();
-		return;
 	}
 }
 

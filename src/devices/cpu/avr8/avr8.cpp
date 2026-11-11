@@ -3156,8 +3156,7 @@ void megaavr_classic_with_async_unit_base_device::tick_peripherals()
 		}
 	}
 
-	m_asyncunit->clk_io_w(1);
-	m_asyncunit->clk_io_w(0);
+	m_asyncunit->clk_io_tick();
 }
 
 // explicit instantiations so external devices can call pin_w<Port>() to report input pin changes

@@ -463,7 +463,6 @@ protected:
 		INTIDX_TOV0,
 
 		INTIDX_ICF1,
-
 		INTIDX_OCF1C,
 		INTIDX_OCF1B,
 		INTIDX_OCF1A,
@@ -481,16 +480,19 @@ protected:
 		INTIDX_INT1,
 
 	//------ TODO: review this --------
+		INTIDX_ICF3,
 		INTIDX_OCF3C,
 		INTIDX_OCF3B,
 		INTIDX_OCF3A,
 		INTIDX_TOV3,
 
+		INTIDX_ICF4,
 		INTIDX_OCF4C,
 		INTIDX_OCF4B,
 		INTIDX_OCF4A,
 		INTIDX_TOV4,
 
+		INTIDX_ICF5,
 		INTIDX_OCF5C,
 		INTIDX_OCF5B,
 		INTIDX_OCF5A,
@@ -754,7 +756,7 @@ protected:
 	{
 		uint8_t  m_intidx;       // one of the INTIDX_x universal interrupt mappings
 		uint8_t  m_intvector;    // interrupt vector number
-		uint8_t  m_intondev;     // interrupt is handled by a device (m_intreg, m_intmask, m_regindex, m_regmask all ignored)
+		bool     m_intondev;     // interrupt is handled by a device (m_intreg, m_intmask, m_regindex, m_regmask all ignored)
 		uint8_t  m_intreg;       // register containing interrupt enable flag
 		uint8_t  m_intmask;      // bitmask for the interrupt enable flag itself
 		uint8_t  m_regindex;     // event indication register containing event flag e.g., TOV0
@@ -821,7 +823,7 @@ protected:
 	uint8_t m_lock_bits;
 
 	// CPU registers
-	uint8_t m_r[0x200]; // no longer shared because it's getting broken up
+	uint8_t m_r[0x200]; // TODO: this is a legacy item; it will be truncated or outright removed in the future
 	uint32_t m_pc;
 
 	// internal CPU state
@@ -1084,7 +1086,6 @@ protected:
 	void didr0_w(uint8_t data);
 	void didr1_w(uint8_t data);
 	void didr2_w(uint8_t data);
-	void assr_w(uint8_t data);
 	void twbr_w(uint8_t data);
 	uint8_t twsr_r();
 	void twsr_w(uint8_t data);

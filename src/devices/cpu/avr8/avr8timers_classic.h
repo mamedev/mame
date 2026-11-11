@@ -212,13 +212,6 @@ public:
 
 	uint8_t cs_r() { return m_cs; }
 
-	/**
-	 * Change clk_io line state. clk_io is fed from the master clock generator
-	 * and is tied to the AVR8 CPU clock. If the timer is configured to be
-	 * synchronous, then the rising edge of clk_io will cause the timer to tick().
-	 */
-	virtual void clk_io_w(uint8_t data);
-
 	template <typename T> void set_upstream_prescaler_tag(T &&tag) { m_upstream_prescaler.set_tag(std::forward<T>(tag)); }
 
 protected:
@@ -269,8 +262,6 @@ protected:
 	bool m_no_compare_this_cycle; // set if TCNTx is written; blocks compare operation on current timer cycle
 
 	bool m_ocr_changed;
-
-	bool m_clk_io; // clk_io signal; derived from master clock. typically the same as the CPU clcok
 
 	uint32_t m_max;
 
@@ -577,9 +568,7 @@ enum : uint8_t
 		GENERIC_8BIT_TIMER_WGM_FAST_PWM_OCR_A = 0b111,
 	};
 
-	// TODO: move to .cpp
-	template <uint8_t Channel> void ocr_w(uint8_t data) { m_ocr_buf[Channel] = data; m_ocr_changed = true; }
-
+	template <uint8_t Channel> void ocr_w(uint8_t data);
 	template <uint8_t Channel> uint8_t ocr_r() { return m_ocr[Channel]; }
 
 	void wgm_w(uint8_t data);
@@ -602,14 +591,12 @@ protected:
 
 	virtual bool com_mode_allows_output(uint8_t channel) override;
 
-
 	void force_oc0a(); // force OC0A output as if comparison happened; does not set interrupt flag
 	void force_oc0b(); // force OC0B output as if comparison happened; does not set interrupt flag
 
 	virtual uint32_t get_num_bits() const override { return 8; }
 
 	inline bool should_reload_ocrs();
-
 };
 
 class avr8_generic_t0_timer_device : public avr8_generic_8bit_timer_device
@@ -637,8 +624,8 @@ public:
 
 	void tcnt_w(uint8_t data);
 	uint8_t tcnt_r() { return m_tcnt & 0xff; }
-	void cs_w(uint8_t data) override;
-
+	
+	virtual void cs_w(uint8_t data) override;
 protected:
 	avr8_generic_t0_timer_device(const machine_config &mconfig,
 								 const char *tag,
@@ -752,8 +739,6 @@ protected:
 	uint8_t m_temp; // temporary register for 16-bit accesses
 
 	uint16_t m_icr;
-
-	bool m_ocr_c_enabled; // true only on devices that have 3-channel 16-bit timers
 
 	virtual uint32_t get_num_bits() const override { return 16; }
 
@@ -896,9 +881,9 @@ public:
 
 	/**
 	 * clk_io input. If AS2=0 (default), then the prescaler will be ticked
-	 * on the rising edge of this signal.
+	 * on the rising edge of this signal. This only simulates a rising-edge condition.
 	 */
-	void clk_io_w(uint8_t data);
+	void clk_io_tick();
 
 	/**
 	 * Changes the clock source for EXCLK mode to run from the crystal timer.
