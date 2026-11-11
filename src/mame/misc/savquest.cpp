@@ -531,19 +531,21 @@ void savquest_state::savquest(machine_config &config)
 	ACPI_PIIX4   (config, "pci:07.3:acpi");
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
-	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
-	// TODO: awe64 by default
-	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, "sblaster_16", false).set_option_machine_config("sblaster_16", sblaster_config);
-	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-
 	// the GCI controls board talks to the PC on COM1
+	// configured before the Super I/O so the cabinet controls stay player 1: the keyboard controller
+	// in the W83977TF always has PS/2 mouse inputs, and controller inputs are numbered in device order
 	rs232_port_device &serport0(RS232_PORT(config, "serport0", savquest_com, "gci"));
 	serport0.rxd_handler().set("board4:w83977tf", FUNC(w83977tf_device::rxd1_w));
 	serport0.dcd_handler().set("board4:w83977tf", FUNC(w83977tf_device::ndcd1_w));
 	serport0.dsr_handler().set("board4:w83977tf", FUNC(w83977tf_device::ndsr1_w));
 	serport0.ri_handler().set("board4:w83977tf", FUNC(w83977tf_device::nri1_w));
 	serport0.cts_handler().set("board4:w83977tf", FUNC(w83977tf_device::ncts1_w));
+
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
+	// TODO: awe64 by default
+	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, "sblaster_16", false).set_option_machine_config("sblaster_16", sblaster_config);
+	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	rs232_port_device &serport1(RS232_PORT(config, "serport1", default_rs232_devices, nullptr));
 	serport1.rxd_handler().set("board4:w83977tf", FUNC(w83977tf_device::rxd2_w));
