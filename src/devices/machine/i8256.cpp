@@ -866,12 +866,10 @@ void i8256_device::write_p1(uint8_t data)
 
 uint8_t i8256_device::read_port1()
 {
-	// Special-function inputs read the saved output latch, not the pin.
+	// Output and control pins read the saved output latch, not the pin.
 	const uint8_t input = m_in_p1_cb.isunset() ? m_port1_input : m_in_p1_cb(0);
-	const uint8_t special_inputs = port1_special_input_mask();
-	const uint8_t output = test_clock_enabled() ?
-			(port1_output() & ~0x10) | (m_port1_int & 0x10) : port1_output();
-	return (input & ~(port1_output_mask() | special_inputs)) | output | (m_port1_int & special_inputs);
+	const uint8_t latch_mask = m_port1_control | port1_special_input_mask() | (port2_handshake_mode() ? 0x03 : 0x00);
+	return (input & ~latch_mask) | (m_port1_int & latch_mask);
 }
 
 uint8_t i8256_device::port1_special_input_mask() const
