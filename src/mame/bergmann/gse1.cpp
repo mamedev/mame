@@ -180,7 +180,7 @@ void gse1_state::adresse_w(uint8_t data)
 
 void gse1_state::daten_w(uint8_t data)
 {
-	enum : u8
+	enum : uint8_t
 	{
 		_A = 1 << 0,
 		_B = 1 << 1,
@@ -192,7 +192,7 @@ void gse1_state::daten_w(uint8_t data)
 		_H = 1 << 7
 	};
 
-	static constexpr u8 CD4511[16] = {
+	static constexpr uint8_t CD4511[16] = {
 	_A | _B | _C | _D | _E | _F,
 	_B | _C,
 	_A | _B | _D | _E | _G,
