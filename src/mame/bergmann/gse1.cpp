@@ -348,10 +348,10 @@ uint8_t gse1_state::pio2_pb_r()
 
 void gse1_state::pio2_pb_w(uint8_t data)
 {
+	// Steckerleiste 16
 	bool motor_reset = BIT(data, 6);
 	bool motor_switch = BIT(data, 7);
 	LOG("MOTOR reset: %02x, switch: %02x\n", motor_reset, motor_switch);
-	// Steckerleiste 16
 }
 
 //CTC
