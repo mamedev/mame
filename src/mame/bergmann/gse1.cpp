@@ -136,7 +136,6 @@ private:
 	uint8_t daten_r();
 
 	uint8_t pio1_pa_r();
-	uint8_t pio1_pb_r();
 	void pio1_pb_w(uint8_t data);
 	uint8_t pio2_pb_r();
 	void pio2_pb_w(uint8_t data);
@@ -286,13 +285,6 @@ uint8_t gse1_state::pio1_pa_r()
 	// TODO: The coin sequencing is missing
 	// Specifically PA2 and/or PA3 have to be triggered shortly after a coin passes PA5-7
 	return m_io_coin->read();
-}
-
-uint8_t gse1_state::pio1_pb_r()
-{
-	// Steckerleiste 15 - J15
-	// PB5-7
-	return m_io_payout->read();
 }
 
 void gse1_state::pio1_pb_w(uint8_t data)
@@ -446,7 +438,7 @@ void gse1_state::gse1(machine_config &config)
 	Z80PIO(config, m_pio1, 4_MHz_XTAL / 2);
 	m_pio1->in_pa_callback().set(FUNC(gse1_state::pio1_pa_r));
 	m_pio1->out_pb_callback().set(FUNC(gse1_state::pio1_pb_w));
-	m_pio1->in_pb_callback().set(FUNC(gse1_state::pio1_pb_r));
+	m_pio1->in_pb_callback().set_ioport("PAYOUT");
 	m_pio1->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80PIO(config, m_pio2, 4_MHz_XTAL / 2);
