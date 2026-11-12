@@ -603,7 +603,7 @@ void i8256_device::write(offs_t offset, uint8_t data)
 			if (BIT(data, I8256_CMD3_SET))
 				m_command3 |= data & 0x7f;
 			else
-				m_command3 &= ~(data & 0x7f);
+				m_command3 &= ~(data & 0x72); // RST, SBRK and END are set-only
 
 			if (BIT(m_command3, I8256_CMD3_RST))
 			{
