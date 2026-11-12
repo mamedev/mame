@@ -1098,9 +1098,11 @@ void i8256_device::write_rxd(int state)
 void i8256_device::write_cts(int state)
 {
 	state = state ? 1 : 0;
+	const bool falling = m_cts && !state;
+	m_cts = state;
 	if (state)
 		m_cts_counter = 0;
-	else if (m_cts &&
+	else if (falling &&
 		!(m_status & I8256_STATUS_TB_EMPTY))
 	{
 		const uint16_t minimum_stop = (m_stop_sel == I8256_STOP_075) ? stop_length() : m_divide / 2;
@@ -1109,12 +1111,17 @@ void i8256_device::write_cts(int state)
 			(m_tx_state == I8256_STATE_STOP && m_tx_counter >= minimum_stop))
 		{
 			if (m_stop_sel == I8256_STOP_075 || (m_command2 & 0x0f) == I8256_BAUD_TXC)
+			{
 				m_cts_pending = true;
+				// In 0.75-stop mode, an eligible edge starts the next frame immediately.
+				if (m_stop_sel == I8256_STOP_075 && !m_tx_break &&
+					!BIT(m_command3, I8256_CMD3_SBRK) && !BIT(m_command3, I8256_CMD3_TBRK))
+					start_transmit();
+			}
 			else
 				m_cts_counter = m_divide / 32;
 		}
 	}
-	m_cts = state;
 }
 
 void i8256_device::write_rxc(int state)
