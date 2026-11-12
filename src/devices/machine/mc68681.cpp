@@ -1391,6 +1391,10 @@ void duart_channel::device_reset()
 	write_CR(0x30); // reset Tx
 	write_CR(0x40); // reset errors
 
+	// spec says these are cleared to zero on reset
+	MR1 = 0;
+	set_MR2(0);
+	
 	tx_baud_rate = rx_baud_rate = 0;
 	CSR = 0;
 	m_tx_break = false;
