@@ -342,7 +342,7 @@ void savquest_gci_device::command(std::string_view body)
 	static constexpr std::pair<char, size_t> s_commands[] = { { '0', 2 }, { '9', 2 }, { 'Q', 3 }, { 'L', 6 }, { '3', 6 }, { 'C', 2 } };
 	auto const found = std::find_if(std::begin(s_commands), std::end(s_commands), [c = body[1]] (auto const &e) { return e.first == c; });
 	if (found == std::end(s_commands))
-		return; // acknowledgements of our reports (ZP, ZH), and commands this cabinet does not use
+		return; // acknowledgements of our reports (ZP, ZH), and commands not implemented here
 	if (body.size() != found->second)
 	{
 		logerror("dropped frame with wrong length: %s\n", std::string(body));
@@ -532,8 +532,8 @@ void savquest_state::savquest(machine_config &config)
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
 	// the GCI controls board talks to the PC on COM1
-	// configured before the Super I/O so the cabinet controls stay player 1: the keyboard controller
-	// in the W83977TF always has PS/2 mouse inputs, and controller inputs are numbered in device order
+	// Map GCI before Super I/O so that input enumeration doesn't map keyboard/mouse first.
+	// FIXME: an inconvenient actually fixable by getting rid of 8042kbdc use in W83977TF
 	rs232_port_device &serport0(RS232_PORT(config, "serport0", savquest_com, "gci"));
 	serport0.rxd_handler().set("board4:w83977tf", FUNC(w83977tf_device::rxd1_w));
 	serport0.dcd_handler().set("board4:w83977tf", FUNC(w83977tf_device::ndcd1_w));
