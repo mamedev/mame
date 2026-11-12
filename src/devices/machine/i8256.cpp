@@ -405,6 +405,12 @@ TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
 
 void i8256_device::update_int()
 {
+	// EXTINT is level sensitive, unlike the latched internal requests.
+	if (m_extint && BIT(m_int_enable, I8256_INT_EXTINT))
+		m_int_request |= 1 << I8256_INT_EXTINT;
+	else
+		m_int_request &= ~(1 << I8256_INT_EXTINT);
+
 	const bool state = m_int_request != 0;
 
 	if (state)
@@ -467,8 +473,7 @@ void i8256_device::write_extint(int state)
 		return;
 
 	m_extint = state;
-	if (state)
-		request_interrupt(I8256_INT_EXTINT);
+	update_int();
 }
 
 //**************************************************************************
@@ -666,6 +671,7 @@ void i8256_device::write(offs_t offset, uint8_t data)
 			break;
 		case I8256_REG_INTEN: // set interrupts
 			m_int_enable |= data;
+			update_int();
 			break;
 		case I8256_REG_INTAD: // reset interrupts
 			m_int_enable &= ~data;
