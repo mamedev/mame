@@ -50,7 +50,83 @@ ioport_constructor pc_basic_joy_device::device_input_ports() const
 }
 
 /*
+ * Gravis PC GamePad
  *
+ * https://www.pcgamingwiki.com/wiki/Controller:Gravis_PC_GamePad
+ * https://dosdays.co.uk/topics/Manufacturers/gravis_controllers.php#gamepad
+ *
+ * Original d-pad / 4 buttons setup. Joystick can be mounted on top of the d-pad thru a central screw.
+ *
+ *          ‖
+ * /---\_2__^_______
+ * |                \
+ * |  |          B  |
+ * | -o-        R G |
+ * |  |          Y  |
+ * \_____1_____     |
+ *             \----/
+ *
+ * 1. Button Switch for autofire
+ * 2. Control Switch for left handed operation
+ *
+ * win95 can handle this with with either "2-axis, 2/4-button joystick" or the specific
+ * "Gravis GamePad" option (which essentially is just an alias)
+ *
+ */
+
+DEFINE_DEVICE_TYPE(PC_GRAVIS_GAMEPAD, pc_joy_gravis_gamepad_device, "pc_gamepad", "Gravis PC GamePad")
+
+pc_joy_gravis_gamepad_device::pc_joy_gravis_gamepad_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+	: pc_basic_joy_device(mconfig, PC_GRAVIS_GAMEPAD, tag, owner, clock)
+{
+}
+
+static INPUT_PORTS_START( pc_gamepad )
+	// TODO: has two separate switch modes
+	// Autofire rate is unknown, assumed to be divided from the base stime.
+//  PORT_START("config")
+//  PORT_CONFNAME(0x01, 0x01, "Operational Mode (Button Switch)")
+//  PORT_CONFSETTING(   0x00, "2 Button with autofire")
+//  PORT_CONFSETTING(   0x01, "4 Button")
+	// Layout swaps directions, doable with a XOR if anyone has the need for it ...
+//  PORT_CONFNAME(0x02, 0x02, "Layout (Control Switch)")
+//  PORT_CONFSETTING(   0x00, "Left Handed")
+//  PORT_CONFSETTING(   0x02, "Right Handed")
+
+	// TODO: enumeration gets a 2 with %p use
+	PORT_START("btn")
+	// colors are trusted over GRAVUTIL test
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Button A (Red)") PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Button B (Blue)") PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Button C (Yellow)") PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Button D (Green)") PORT_PLAYER(1)
+	// autofire layout
+//  PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Button A (Red)") PORT_PLAYER(1)
+//  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Button B (Yellow)") PORT_PLAYER(1)
+//  PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Button A-turbo (Blue)") PORT_PLAYER(1)
+//  PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Button B-turbo (Green)") PORT_PLAYER(1)
+
+	PORT_START("x1")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_MINMAX(1,0xff) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(1)
+
+	PORT_START("y1")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_MINMAX(1,0xff) PORT_CODE_DEC(KEYCODE_UP) PORT_CODE_INC(KEYCODE_DOWN) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH) PORT_PLAYER(1)
+
+	PORT_START("x2")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("y2")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+ioport_constructor pc_joy_gravis_gamepad_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( pc_gamepad );
+}
+
+/*
  * Interact Magnum 6 Game Controller
  *
  * Flight stick, default with 6 buttons, has alternative modes with extra throttle and X view

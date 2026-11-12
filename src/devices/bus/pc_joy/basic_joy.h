@@ -35,6 +35,17 @@ private:
 	required_ioport m_y2;
 };
 
+class pc_joy_gravis_gamepad_device : public pc_basic_joy_device
+{
+public:
+	pc_joy_gravis_gamepad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	// autofire mode
+	static constexpr feature_type imperfect_features() { return feature::CONTROLS; }
+
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+};
+
 class pc_joy_magnum6_device : public pc_basic_joy_device
 {
 public:
@@ -49,7 +60,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
-DECLARE_DEVICE_TYPE(PC_BASIC_JOY, pc_basic_joy_device)
-DECLARE_DEVICE_TYPE(PC_MAGNUM6_STICK, pc_joy_magnum6_device)
+DECLARE_DEVICE_TYPE(PC_BASIC_JOY,      pc_basic_joy_device)
+DECLARE_DEVICE_TYPE(PC_GRAVIS_GAMEPAD, pc_joy_gravis_gamepad_device)
+DECLARE_DEVICE_TYPE(PC_MAGNUM6_STICK,  pc_joy_magnum6_device)
 
 #endif // MAME_BUS_PC_JOY_BASIC_JOY_H
