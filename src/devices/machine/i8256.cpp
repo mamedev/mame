@@ -645,6 +645,10 @@ void i8256_device::write(offs_t offset, uint8_t data)
 		case I8256_REG_TIMER4:
 		case I8256_REG_TIMER5:
 			m_timers[reg - I8256_REG_TIMER1] = data;
+			if (reg == I8256_REG_TIMER4 && BIT(m_mode, I8256_MODE_T24))
+				m_timers[1] = 0xff;
+			else if (reg == I8256_REG_TIMER5 && BIT(m_mode, I8256_MODE_T35))
+				m_timers[2] = 0xff;
 			break;
 		case I8256_REG_STATUS: // modification register
 			m_modification = data & 0x7f;
