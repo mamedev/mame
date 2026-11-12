@@ -186,6 +186,9 @@ public:
 	// required operation overrides
 	void run() { execute_run(); }
 
+	// multiprocessor support
+	virtual void signal_external_write(offs_t physical_address, u32 length) { }
+
 	// deliberately ambiguous functions; if you have the execute interface just use it
 	device_execute_interface &execute() { return *this; }
 
