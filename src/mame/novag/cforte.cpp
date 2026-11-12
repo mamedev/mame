@@ -277,27 +277,27 @@ void cforte_state::cforte(machine_config &config)
 
 ROM_START( cforte )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("forte_b_l.bin", 0x0000, 0x8000, CRC(e3d194a1) SHA1(80457580d7c57e07895fd14bfdaf14b30952afca) )
-	ROM_LOAD("forte_b_h.bin", 0x8000, 0x8000, CRC(dd824be8) SHA1(cd8666b6b525887f9fc48a730b71ceabcf07f3b9) )
+	ROM_LOAD("forte_b_l.u3", 0x0000, 0x8000, CRC(e3d194a1) SHA1(80457580d7c57e07895fd14bfdaf14b30952afca) )
+	ROM_LOAD("forte_b_h.u2", 0x8000, 0x8000, CRC(dd824be8) SHA1(cd8666b6b525887f9fc48a730b71ceabcf07f3b9) )
 ROM_END
 
 ROM_START( cfortea ) // s/n 2449xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("617_l", 0x0000, 0x8000, CRC(c4c64094) SHA1(0eceaf8e960d6939e26bdcfef2286d73d77bfde2) ) // NEC D27C256AD-12
-	ROM_LOAD("617_h", 0x8000, 0x8000, CRC(f4144764) SHA1(be14f1b6c0cba0bdd1b9838cde6d632d7a860a17) ) // "
+	ROM_LOAD("617_l.u3", 0x0000, 0x8000, CRC(c4c64094) SHA1(0eceaf8e960d6939e26bdcfef2286d73d77bfde2) ) // NEC D27C256AD-12
+	ROM_LOAD("617_h.u2", 0x8000, 0x8000, CRC(f4144764) SHA1(be14f1b6c0cba0bdd1b9838cde6d632d7a860a17) ) // "
 ROM_END
 
 ROM_START( cforteb ) // s/n 2438xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("a_903_l", 0x0000, 0x8000, CRC(01e7e306) SHA1(6a2b982bb0f412a63f5d3603958dd863e38669d9) ) // NEC D27C256AD-12
-	ROM_LOAD("a_903_h", 0x8000, 0x8000, CRC(c5a5573f) SHA1(7e11eb2f3d96bc41386a14a19635427a386ec1ec) ) // "
+	ROM_LOAD("a_903_l.u3", 0x0000, 0x8000, CRC(01e7e306) SHA1(6a2b982bb0f412a63f5d3603958dd863e38669d9) ) // NEC D27C256AD-12
+	ROM_LOAD("a_903_h.u2", 0x8000, 0x8000, CRC(c5a5573f) SHA1(7e11eb2f3d96bc41386a14a19635427a386ec1ec) ) // "
 ROM_END
 
 ROM_START( cfortec ) // s/n 2420xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	// difference between a_903_l and 903_l is 1 bit, dump confirmed from 2 pcbs
-	ROM_LOAD("903_l", 0x0000, 0x8000, CRC(19a5f1df) SHA1(3982605d55d92e48426f46984b956f08feb3d8ff) ) // NEC D27C256D-15
-	ROM_LOAD("903_h", 0x8000, 0x8000, CRC(d90e324e) SHA1(3541f4ef109ffe0f5520d6b5df0968aa53eb5342) ) // "
+	ROM_LOAD("903_l.u3", 0x0000, 0x8000, CRC(19a5f1df) SHA1(3982605d55d92e48426f46984b956f08feb3d8ff) ) // NEC D27C256D-15
+	ROM_LOAD("903_h.u2", 0x8000, 0x8000, CRC(d90e324e) SHA1(3541f4ef109ffe0f5520d6b5df0968aa53eb5342) ) // "
 ROM_END
 
 } // anonymous namespace
