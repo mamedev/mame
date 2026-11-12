@@ -217,6 +217,8 @@ void i8256_device::device_start()
 	m_port1_int = 0;
 	m_port2_int = 0;
 	std::fill(std::begin(m_timers), std::end(m_timers), 0);
+	m_timer4_read_latch = 0;
+	m_timer5_read_latch = 0;
 
 	save_item(NAME(m_command1));
 	save_item(NAME(m_command2));
@@ -232,6 +234,10 @@ void i8256_device::device_start()
 	save_item(NAME(m_port1_int));
 	save_item(NAME(m_port2_int));
 	save_item(NAME(m_timers));
+	save_item(NAME(m_timer4_read_latch));
+	save_item(NAME(m_timer5_read_latch));
+	save_item(NAME(m_timer4_read_latched));
+	save_item(NAME(m_timer5_read_latched));
 
 	save_item(NAME(m_data_bits));
 	save_item(NAME(m_parity_enable));
@@ -268,6 +274,8 @@ void i8256_device::device_reset()
 	m_command2 = 0;
 	m_command3 = 0;
 	m_mode = 0;
+	m_timer4_read_latched = false;
+	m_timer5_read_latched = false;
 	m_port1_control = 0;
 	m_modification = 0;
 
@@ -502,11 +510,32 @@ uint8_t i8256_device::read(offs_t offset)
 		case I8256_REG_PORT2:
 			return p2_r();
 		case I8256_REG_TIMER1:
+			return m_timers[0];
 		case I8256_REG_TIMER2:
 		case I8256_REG_TIMER3:
 		case I8256_REG_TIMER4:
 		case I8256_REG_TIMER5:
-			return m_timers[reg - I8256_REG_TIMER1];
+		{
+			const int timer = reg - I8256_REG_TIMER1;
+			const bool timer4 = reg == I8256_REG_TIMER2 || reg == I8256_REG_TIMER4;
+			if (!BIT(m_mode, timer4 ? I8256_MODE_T24 : I8256_MODE_T35))
+				return m_timers[timer];
+
+			const bool high = reg == I8256_REG_TIMER4 || reg == I8256_REG_TIMER5;
+			uint16_t &latch = timer4 ? m_timer4_read_latch : m_timer5_read_latch;
+			bool &latched = timer4 ? m_timer4_read_latched : m_timer5_read_latched;
+			if (high && !latched && !machine().side_effects_disabled())
+			{
+				const int low = timer4 ? 1 : 2;
+				latch = (uint16_t(m_timers[low + 2]) << 8) | m_timers[low];
+				latched = true;
+			}
+
+			const uint8_t data = latched ? BIT(latch, high ? 8 : 0, 8) : m_timers[timer];
+			if (!high && !machine().side_effects_disabled())
+				latched = false;
+			return data;
+		}
 		case I8256_REG_STATUS:
 		{
 			const uint8_t status = m_status;
@@ -616,6 +645,10 @@ void i8256_device::write(offs_t offset, uint8_t data)
 			break;
 		case I8256_REG_MODE:
 			m_mode = data;
+			if (!BIT(m_mode, I8256_MODE_T24))
+				m_timer4_read_latched = false;
+			if (!BIT(m_mode, I8256_MODE_T35))
+				m_timer5_read_latched = false;
 			break;
 		case I8256_REG_PORT1C:
 			m_port1_control = data;
@@ -645,6 +678,10 @@ void i8256_device::write(offs_t offset, uint8_t data)
 		case I8256_REG_TIMER4:
 		case I8256_REG_TIMER5:
 			m_timers[reg - I8256_REG_TIMER1] = data;
+			if (reg == I8256_REG_TIMER2 || reg == I8256_REG_TIMER4)
+				m_timer4_read_latched = false;
+			else if (reg == I8256_REG_TIMER3 || reg == I8256_REG_TIMER5)
+				m_timer5_read_latched = false;
 			if (reg == I8256_REG_TIMER4 && BIT(m_mode, I8256_MODE_T24))
 				m_timers[1] = 0xff;
 			else if (reg == I8256_REG_TIMER5 && BIT(m_mode, I8256_MODE_T35))

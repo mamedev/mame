@@ -111,6 +111,10 @@ private:
 	uint8_t m_port1_int, m_port2_int;
 	uint8_t m_timers[5];
 
+	// cascaded timer snapshots captured by reading the high byte
+	uint16_t m_timer4_read_latch, m_timer5_read_latch;
+	bool m_timer4_read_latched, m_timer5_read_latched;
+
 	// serial frame settings
 	uint8_t m_data_bits;
 	bool m_parity_enable, m_parity_even;
