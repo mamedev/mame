@@ -149,7 +149,6 @@ private:
 	void ctc1_zc0_w(int state);
 	void ctc1_zc1_w(int state);
 	void ctc1_zc2_w(int state);
-	void ctc2_zc0_w(int state);
 };
 
 void gse1_state::machine_start()
@@ -382,13 +381,6 @@ void gse1_state::ctc1_zc2_w(int state)
 	LOG("Middle motor: %d\n", state);
 }
 
-void gse1_state::ctc2_zc0_w(int state)
-{
-	m_ctc2->trg1(state);
-	m_ctc2->trg2(state);
-	m_ctc2->trg3(state);
-}
-
 static INPUT_PORTS_START( gse1 )
 	PORT_START("PAYOUT")
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED ) // Coil outputs
@@ -498,7 +490,9 @@ void gse1_state::gse1(machine_config &config)
 	m_ctc1->zc_callback<2>().set(FUNC(gse1_state::ctc1_zc2_w));
 
 	Z80CTC(config, m_ctc2, 4_MHz_XTAL/2);
-	m_ctc2->zc_callback<0>().set(FUNC(gse1_state::ctc2_zc0_w));
+	m_ctc2->zc_callback<0>().set(m_ctc2, FUNC(z80ctc_device::trg1));
+	m_ctc2->zc_callback<0>().append(m_ctc2, FUNC(z80ctc_device::trg2));
+	m_ctc2->zc_callback<0>().append(m_ctc2, FUNC(z80ctc_device::trg3));
 	m_ctc2->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_usec(341000)); // 47uF x 22k x 0,33
