@@ -440,33 +440,33 @@ static const z80_daisy_config daisy_chain[] =
 
 void gse1_state::gse1(machine_config &config)
 {
-	Z80(config, m_maincpu, 4_MHz_XTAL/2);
+	Z80(config, m_maincpu, 4_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gse1_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &gse1_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
-	Z80PIO(config, m_pio1, 4_MHz_XTAL/2);
+	Z80PIO(config, m_pio1, 4_MHz_XTAL / 2);
 	m_pio1->in_pa_callback().set(FUNC(gse1_state::pio1_pa_r));
 	m_pio1->out_pb_callback().set(FUNC(gse1_state::pio1_pb_w));
 	m_pio1->in_pb_callback().set(FUNC(gse1_state::pio1_pb_r));
 	m_pio1->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	Z80PIO(config, m_pio2, 4_MHz_XTAL/2);
+	Z80PIO(config, m_pio2, 4_MHz_XTAL / 2);
 	m_pio2->out_pa_callback().set(FUNC(gse1_state::pio2_pa_w));
 	m_pio2->in_pa_callback().set(FUNC(gse1_state::pio2_pa_r));
 	m_pio2->out_pb_callback().set(FUNC(gse1_state::pio2_pb_w));
 	m_pio2->in_pb_callback().set(FUNC(gse1_state::pio2_pb_r));
 	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	Z80CTC(config, m_ctc1, 4_MHz_XTAL/2);
+	Z80CTC(config, m_ctc1, 4_MHz_XTAL / 2);
 	m_ctc1->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc1->zc_callback<0>().set(FUNC(gse1_state::ctc1_zc0_w));
 	m_ctc1->zc_callback<1>().set(FUNC(gse1_state::ctc1_zc1_w));
 	m_ctc1->zc_callback<2>().set(FUNC(gse1_state::ctc1_zc2_w));
 
-	Z80CTC(config, m_ctc2, 4_MHz_XTAL/2);
+	Z80CTC(config, m_ctc2, 4_MHz_XTAL / 2);
 	m_ctc2->zc_callback<0>().set(m_ctc2, FUNC(z80ctc_device::trg1));
 	m_ctc2->zc_callback<0>().append(m_ctc2, FUNC(z80ctc_device::trg2));
 	m_ctc2->zc_callback<0>().append(m_ctc2, FUNC(z80ctc_device::trg3));
