@@ -73,6 +73,10 @@ private:
 	void update_timer_rate();
 	uint8_t read_port1();
 	void write_port1(uint8_t data);
+	uint8_t port1_output_mask() const;
+	uint8_t port1_output() const;
+	bool port2_handshake_mode() const;
+	void set_port2_handshake(bool state);
 	uint8_t read_port2();
 	void write_port2(uint8_t data);
 	uint8_t port2_output_mask() const;
@@ -113,6 +117,8 @@ private:
 	uint8_t m_status;
 	uint8_t m_rx_buffer, m_tx_buffer;
 	uint8_t m_port1_int, m_port2_int;
+	uint8_t m_port2_input_latch;
+	bool m_port2_handshake;
 	uint8_t m_timers[5];
 	uint8_t m_timer5_reload;
 	bool m_timer5_running;

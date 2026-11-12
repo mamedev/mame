@@ -225,6 +225,8 @@ void i8256_device::device_start()
 	m_tx_buffer = 0;
 	m_port1_int = 0;
 	m_port2_int = 0;
+	m_port2_input_latch = 0;
+	m_port2_handshake = true;
 	std::fill(std::begin(m_timers), std::end(m_timers), 0);
 	m_timer4_read_latch = 0;
 	m_timer5_read_latch = 0;
@@ -243,6 +245,8 @@ void i8256_device::device_start()
 	save_item(NAME(m_tx_buffer));
 	save_item(NAME(m_port1_int));
 	save_item(NAME(m_port2_int));
+	save_item(NAME(m_port2_input_latch));
+	save_item(NAME(m_port2_handshake));
 	save_item(NAME(m_timers));
 	save_item(NAME(m_timer5_reload));
 	save_item(NAME(m_timer5_running));
@@ -286,7 +290,7 @@ void i8256_device::device_start()
 
 void i8256_device::device_reset()
 {
-	const bool port1_output = m_port1_control != 0;
+	const bool port1_output = port1_output_mask() != 0;
 	const bool port2_output = port2_output_mask() != 0;
 
 	m_command1 = 0;
@@ -324,6 +328,7 @@ void i8256_device::soft_reset()
 	m_int_request = 0;
 	m_int_service = 0;
 	update_int();
+	set_port2_handshake(true);
 
 	m_rx_state = I8256_STATE_START;
 	m_rx_counter = 0;
@@ -356,6 +361,9 @@ void i8256_device::update_timer_rate()
 // timer interrupts are automatically disabled when the request is generated
 void i8256_device::request_timer_interrupt(int level)
 {
+	// Port 2 handshaking replaces Timer 5 as the level 7 interrupt source.
+	if (level == I8256_INT_TIMER5 && port2_handshake_mode())
+		return;
 	request_interrupt(level);
 	m_int_enable &= ~(1 << level);
 }
@@ -696,9 +704,13 @@ void i8256_device::write(offs_t offset, uint8_t data)
 		case I8256_REG_MODE:
 		{
 			const uint8_t old_mask = port2_output_mask();
+			const uint8_t old_p1_mask = port1_output_mask();
+			const uint8_t old_p1_output = port1_output();
 			if (!BIT(m_mode, I8256_MODE_T5C) && BIT(data, I8256_MODE_T5C))
 				m_timer5_running = false;
 			m_mode = data;
+			if (old_p1_mask != port1_output_mask() || old_p1_output != port1_output())
+				m_out_p1_cb(0, port1_output());
 			const uint8_t mask = port2_output_mask();
 			if (old_mask != mask)
 				m_out_p2_cb(0, m_port2_int & mask);
@@ -711,8 +723,10 @@ void i8256_device::write(offs_t offset, uint8_t data)
 		case I8256_REG_PORT1C:
 			if (m_port1_control != data)
 			{
+				const uint8_t old_mask = port1_output_mask();
 				m_port1_control = data;
-				m_out_p1_cb(0, m_port1_int & m_port1_control);
+				if (old_mask != port1_output_mask())
+					m_out_p1_cb(0, port1_output());
 			}
 			break;
 		case I8256_REG_INTEN: // set interrupts
@@ -786,6 +800,18 @@ void i8256_device::write_p1(uint8_t data)
 	const uint8_t rising = data & ~m_port1_input;
 	const uint8_t falling = ~data & m_port1_input;
 	m_port1_input = data;
+	if (port2_handshake_mode())
+	{
+		// STB asserts IBF low; ACK releases OBF high. Both interrupt on the rising edge.
+		if (BIT(falling, 0))
+			set_port2_handshake((m_mode & 0x07) == I8256_PORT2C_HO);
+		if (BIT(rising, 0))
+		{
+			if ((m_mode & 0x07) == I8256_PORT2C_HI)
+				m_port2_input_latch = m_in_p2_cb(0);
+			request_interrupt(I8256_INT_TIMER5);
+		}
+	}
 	if (BIT(falling, 5) && BIT(m_mode, I8256_MODE_T5C))
 	{
 		m_timers[4] = m_timer5_reload;
@@ -805,16 +831,43 @@ uint8_t i8256_device::read_port1()
 {
 	// control bit 1 = output (read from latch), 0 = input (read from callback)
 	const uint8_t input = m_in_p1_cb.isunset() ? m_port1_input : m_in_p1_cb(0);
-	return (input & ~m_port1_control) | (m_port1_int & m_port1_control);
+	return (input & ~port1_output_mask()) | port1_output();
+}
+
+uint8_t i8256_device::port1_output_mask() const
+{
+	return port2_handshake_mode() ? (m_port1_control & ~0x03) | 0x02 : m_port1_control;
+}
+
+uint8_t i8256_device::port1_output() const
+{
+	if (port2_handshake_mode())
+		return (m_port1_int & m_port1_control & ~0x03) | (m_port2_handshake ? 0x02 : 0x00);
+	return m_port1_int & m_port1_control;
+}
+
+bool i8256_device::port2_handshake_mode() const
+{
+	return (m_mode & 0x07) == I8256_PORT2C_HI || (m_mode & 0x07) == I8256_PORT2C_HO;
+}
+
+void i8256_device::set_port2_handshake(bool state)
+{
+	if (m_port2_handshake != state)
+	{
+		m_port2_handshake = state;
+		if (port2_handshake_mode())
+			m_out_p1_cb(0, port1_output());
+	}
 }
 
 void i8256_device::write_port1(uint8_t data)
 {
 	// all bits are latched; input pins output the latch if the direction is changed later
-	const uint8_t changed = (m_port1_int ^ data) & m_port1_control;
+	const uint8_t changed = (m_port1_int ^ data) & m_port1_control & (port2_handshake_mode() ? 0xfc : 0xff);
 	m_port1_int = data;
 	if (changed)
-		m_out_p1_cb(0, m_port1_int & m_port1_control);
+		m_out_p1_cb(0, port1_output());
 }
 
 uint8_t i8256_device::read_port2()
@@ -830,10 +883,13 @@ uint8_t i8256_device::read_port2()
 		case I8256_PORT2C_OO:
 			return m_port2_int;
 		case I8256_PORT2C_HI:
-			// TODO: byte handshake input (STB/IBF on port 1)
-			return m_in_p2_cb(0);
+		{
+			const uint8_t data = m_port2_input_latch;
+			if (!machine().side_effects_disabled())
+				set_port2_handshake(true);
+			return data;
+		}
 		case I8256_PORT2C_HO:
-			// TODO: byte handshake output (ACK/OBF on port 1)
 			return m_port2_int;
 		case I8256_PORT2C_TEST:
 			// TODO: test mode places the baud rate generator output on port 1 P14
@@ -852,6 +908,8 @@ void i8256_device::write_port2(uint8_t data)
 	m_port2_int = data;
 	if (changed)
 		m_out_p2_cb(0, m_port2_int & mask);
+	if ((m_mode & 0x07) == I8256_PORT2C_HO)
+		set_port2_handshake(false);
 }
 
 uint8_t i8256_device::port2_output_mask() const
@@ -861,7 +919,8 @@ uint8_t i8256_device::port2_output_mask() const
 		case I8256_PORT2C_IO: return 0x0f;
 		case I8256_PORT2C_OI: return 0xf0;
 		case I8256_PORT2C_OO: return 0xff;
-		default: // TODO: input and handshake modes
+		case I8256_PORT2C_HO: return 0xff;
+		default:
 			return 0;
 	}
 }
