@@ -914,7 +914,7 @@ void i8256_device::update_port1_output(uint8_t old_mask, uint8_t old_output)
 bool i8256_device::test_clock_enabled() const
 {
 	return (m_mode & 0x07) == I8256_PORT2C_TEST && BIT(m_port1_control, 4) &&
-			(m_command2 & 0x0f) > I8256_BAUD_TXC32;
+			internal_baud_enabled();
 }
 
 void i8256_device::update_test_clock()
@@ -1200,7 +1200,7 @@ void i8256_device::output_rxc(int state)
 
 void i8256_device::check_break_in()
 {
-	if (BIT(m_command1, I8256_CMD1_BRKI) && (m_command2 & 0x0f) > I8256_BAUD_TXC32)
+	if (BIT(m_command1, I8256_CMD1_BRKI) && internal_baud_enabled())
 	{
 		const uint8_t input = port1_input();
 		if (!BIT(input, 6))
@@ -1223,7 +1223,7 @@ void i8256_device::start_transmit()
 		m_tx_bits = 0;
 		m_status &= ~I8256_STATUS_TR_EMPTY;
 		m_tx_state = I8256_STATE_DATA;
-		if ((m_command2 & 0x0f) > I8256_BAUD_TXC32)
+		if (internal_baud_enabled())
 			output_txc(0);
 		output_txd(0);
 	}
@@ -1254,7 +1254,7 @@ void i8256_device::start_transmit()
 		m_status &= ~I8256_STATUS_TR_EMPTY;
 		request_interrupt(I8256_INT_TX);
 		m_tx_state = I8256_STATE_DATA;
-		if ((m_command2 & 0x0f) > I8256_BAUD_TXC32)
+		if (internal_baud_enabled())
 			output_txc(0);
 		output_txd(0); // start bit
 	}
@@ -1269,7 +1269,7 @@ void i8256_device::transmitter_tick()
 
 	m_tx_counter++;
 
-	if ((m_command2 & 0x0f) > I8256_BAUD_TXC32)
+	if (internal_baud_enabled())
 	{
 		// TxC falls at bit boundaries and rises at bit centres. A fractional
 		// final stop bit returns high before the next start resets the phase.
@@ -1352,6 +1352,11 @@ void i8256_device::transmitter_tick()
 //  SERIAL CLOCKING
 //**************************************************************************
 
+bool i8256_device::internal_baud_enabled() const
+{
+	return (m_command2 & 0x0f) > I8256_BAUD_TXC32;
+}
+
 attotime i8256_device::baud_clock_period(int multiplier) const
 {
 	// Baud rates are nominal at a 1.024 MHz prescaled system clock.
@@ -1432,7 +1437,7 @@ void i8256_device::write_txc(int state)
 	m_txc = state;
 
 	const uint8_t baud = m_command2 & 0x0f;
-	if (baud > I8256_BAUD_TXC32)
+	if (internal_baud_enabled())
 		return; // TxC is an output when the internal baud rate generator is used
 
 	if (state)
