@@ -38,7 +38,7 @@ protected:
 
 	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
 
-	virtual u8   crtc_reg_r(offs_t reg) override;
+	virtual u8 crtc_reg_r(offs_t reg) override;
 	virtual void crtc_reg_w(offs_t reg, u8 val) override;
 
 private:
@@ -49,7 +49,7 @@ private:
 	void out1_internal(int data);
 	void out2_internal(int data);
 
-	u8   m_selected_char_set;
+	u8 m_selected_char_set;
 	bool m_reverse_video_disabled;
 };
 
@@ -89,7 +89,7 @@ INPUT_PORTS_START( superset )
 	PORT_DIPSETTING(    0x00, "Half")
 	PORT_DIPSETTING(    0x80, "Full")
 
-	// part of the Superset upgrade was to upgrade the CPU to 3 MHz
+	// part of the Superset upgrade was to set the CPU to 3 MHz
 	PORT_MODIFY("CONFIG")
 	PORT_CONFNAME(0x03, 0x01, "CPU Clock")
 	PORT_CONFSETTING(   0x00, "2 MHz")
@@ -132,8 +132,6 @@ void heath_superset_tlb_device::device_add_mconfig(machine_config &config)
 {
 	heath_tlb_device::device_add_mconfig(config);
 
-	// part of the Superset upgrade was to upgrade set the CPU speed to 3 MHz.
-	m_maincpu->set_clock(H19_3MHZ);
 	m_maincpu->set_addrmap(AS_PROGRAM, &heath_superset_tlb_device::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &heath_superset_tlb_device::io_map);
 

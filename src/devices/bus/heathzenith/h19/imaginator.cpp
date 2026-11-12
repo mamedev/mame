@@ -62,7 +62,7 @@ private:
 	required_shared_ptr<u8>    m_p_graphic_ram;
 	memory_passthrough_handler m_tap_6000h;
 
-	u8   m_im2_val;
+	u8 m_im2_val;
 
 	bool m_alphanumeric_mode_active;
 	bool m_graphics_mode_active;

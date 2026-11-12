@@ -29,7 +29,7 @@ class heath_igc_tlb_device : public heath_tlb_device
 public:
 	heath_igc_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	virtual u8   sigma_r(u8 offset) override;
+	virtual u8 sigma_r(u8 offset) override;
 	virtual void sigma_w(u8 offset, u8 data) override;
 
 protected:
@@ -43,10 +43,10 @@ protected:
 	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
 
 private:
-	u8   sigma_ctrl_r();
+	u8 sigma_ctrl_r();
 	void sigma_ctrl_w(u8 data);
 
-	u8   sigma_video_mem_r();
+	u8 sigma_video_mem_r();
 	void sigma_video_mem_w(u8 val);
 
 	void sigma_io_lo_addr_w(u8 val);
@@ -69,16 +69,16 @@ private:
 	bool m_alternate_character_set_enabled;
 	bool m_video_fill_enabled;
 	bool m_read_address_increment_disabled;
-	u8   m_memory_bank_select;
+	u8 m_memory_bank_select;
 
-	u8   m_data_reg;
+	u8 m_data_reg;
 
-	u16  m_io_address;
-	u16  m_window_address;
+	u16 m_io_address;
+	u16 m_window_address;
 
 	// automatic video memory fill in progress
 	attotime m_fill_start;
-	u64      m_fill_count;
+	u64 m_fill_count;
 };
 
 } // namespace bus::heathzenith::h19

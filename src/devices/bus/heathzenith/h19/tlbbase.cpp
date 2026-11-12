@@ -61,7 +61,7 @@ static constexpr XTAL BASE_DOT_CLOCK = MASTER_CLOCK;
 
 static constexpr XTAL INS8250_CLOCK  = MASTER_CLOCK / 4;
 
-// Beep Frequency is 1 KHz
+// Beep Frequency is 1 kHz
 static constexpr XTAL H19_BEEP_FRQ   = (H19_CLOCK / 2048);
 
 // Capacitor value in pF

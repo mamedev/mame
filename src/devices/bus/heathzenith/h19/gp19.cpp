@@ -191,7 +191,7 @@ void heath_gp19_tlb_device::latch_u5_w(u8 data)
 	m_reverse_video = bool(BIT(data, 2));
 	m_char_gen_a11  = bool(BIT(data, 3));
 
-	// TODO handle LED indicators
+	// TODO: handle LED indicators
 
 	if (m_graphic_mode)
 	{

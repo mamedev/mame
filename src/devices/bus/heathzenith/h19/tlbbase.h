@@ -84,11 +84,11 @@ protected:
 	TIMER_CALLBACK_MEMBER(bell_off);
 
 	// keyboard
-	u8   kbd_key_r();
-	u8   kbd_flags_r();
-	u16  translate_mm5740_b(u16 b);
-	int  mm5740_shift_r();
-	int  mm5740_control_r();
+	u8 kbd_key_r();
+	u8 kbd_flags_r();
+	u16 translate_mm5740_b(u16 b);
+	int mm5740_shift_r();
+	int mm5740_control_r();
 	void mm5740_data_ready_w(int state);
 
 	// serial port
@@ -120,7 +120,7 @@ protected:
 	emu_timer *m_key_click_timer;
 	emu_timer *m_bell_timer;
 
-	u8   m_transchar;
+	u8 m_transchar;
 	bool m_strobe;
 	bool m_key_click_active;
 	bool m_bell_active;

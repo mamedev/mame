@@ -161,10 +161,10 @@ u8 heath_igc_tlb_device::sigma_r(u8 offset)
 		val = sigma_video_mem_r();
 		break;
 	case 1:
-		// TODO - Low pen address
+		// TODO: Low pen address
 		break;
 	case 2:
-		// TODO - High pen address
+		// TODO: High pen address
 		break;
 	case 3:
 		// Left input device
@@ -356,7 +356,7 @@ MC6845_UPDATE_ROW(heath_igc_tlb_device::crtc_update_row)
 					chr &= 0x7f;
 				}
 
-				// TODO handle alt font
+				// TODO: handle alt font
 				output |= m_p_chargen[(chr << 4) | ra] ^ inv;
 			}
 

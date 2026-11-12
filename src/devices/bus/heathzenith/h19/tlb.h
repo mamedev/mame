@@ -26,7 +26,7 @@ public:
 	virtual void cts_in_w(int state) {}
 
 	// optional SigmaSet operations
-	virtual u8   sigma_r(u8 offset) { return 0x00; }
+	virtual u8 sigma_r(u8 offset) { return 0x00; }
 	virtual void sigma_w(u8 offset, u8 data) {}
 
 protected:
@@ -73,7 +73,7 @@ public:
 	void reset_out(int data) { m_reset(data); }
 
 	// optional SigmaSet IGC operations
-	u8   sigma_r(u8 offset) { return (m_tlb) ? m_tlb->sigma_r(offset) : 0x00; }
+	u8 sigma_r(u8 offset) { return (m_tlb) ? m_tlb->sigma_r(offset) : 0x00; }
 	void sigma_w(u8 offset, u8 data) { if (m_tlb) m_tlb->sigma_w(offset, data); }
 
 protected:
