@@ -425,7 +425,7 @@ static INPUT_PORTS_START( gse1 )
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:1" )
 INPUT_PORTS_END
 
-static const z80_daisy_config daisy_chain[] =
+static constexpr z80_daisy_config DAISY_CHAIN[] =
 {
 	{ "ctc1" },
 	{ "pio1" },
@@ -439,7 +439,7 @@ void gse1_state::gse1(machine_config &config)
 	Z80(config, m_maincpu, 4_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gse1_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &gse1_state::io_map);
-	m_maincpu->set_daisy_config(daisy_chain);
+	m_maincpu->set_daisy_config(DAISY_CHAIN);
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
