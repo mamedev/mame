@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <limits>
 
 #define LOG_SETUP (1U << 1)
 #define LOG_RX    (1U << 2)
@@ -874,7 +875,9 @@ void i8256_device::receiver_tick()
 
 				if (m_rxd)
 				{
-					m_rx_shift |= 1 << m_rx_bits;
+					// Mid-frame format changes can leave the bit count beyond the shift register.
+					if (m_rx_bits < std::numeric_limits<uint16_t>::digits)
+						m_rx_shift |= uint16_t(1) << m_rx_bits;
 					m_rx_parity = !m_rx_parity;
 				}
 				m_rx_bits++;
