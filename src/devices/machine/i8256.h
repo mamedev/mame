@@ -136,6 +136,7 @@ private:
 	uint8_t m_rx_bits;
 	uint16_t m_rx_shift;
 	bool m_rx_parity;
+	bool m_rx_tx_active;
 
 	// transmitter
 	uint8_t m_tx_state;

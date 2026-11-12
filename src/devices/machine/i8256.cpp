@@ -260,6 +260,7 @@ void i8256_device::device_start()
 	save_item(NAME(m_rx_bits));
 	save_item(NAME(m_rx_shift));
 	save_item(NAME(m_rx_parity));
+	save_item(NAME(m_rx_tx_active));
 
 	save_item(NAME(m_tx_state));
 	save_item(NAME(m_tx_counter));
@@ -306,6 +307,7 @@ void i8256_device::soft_reset()
 	m_rx_bits = 0;
 	m_rx_shift = 0;
 	m_rx_parity = false;
+	m_rx_tx_active = false;
 
 	m_tx_state = I8256_STATE_START;
 	m_tx_counter = 0;
@@ -782,6 +784,12 @@ uint16_t i8256_device::rx_sample_point() const
 
 void i8256_device::receiver_tick()
 {
+	// Track transmitter activity from start bit detection to the stop bit sample.
+	if (m_rx_state == I8256_STATE_START && !m_rx_counter)
+		m_rx_tx_active = false;
+	if (!(m_status & I8256_STATUS_TR_EMPTY))
+		m_rx_tx_active = true;
+
 	m_rx_counter++;
 
 	switch (m_rx_state)
@@ -866,8 +874,10 @@ void i8256_device::receiver_tick()
 					{
 						// in transmission mode FE indicates that the transmitter
 						// was active during the reception of a character
-						if (!(m_status & I8256_STATUS_TR_EMPTY))
+						if (m_rx_tx_active)
 							m_status |= I8256_STATUS_FRAMING_ERROR;
+						else
+							m_status &= ~I8256_STATUS_FRAMING_ERROR;
 					}
 					else if (fe)
 						m_status |= I8256_STATUS_FRAMING_ERROR;
@@ -1004,6 +1014,12 @@ void i8256_device::transmitter_tick()
 			}
 			break;
 	}
+
+	// TxC may run independently of RxC, so latch activity between receiver ticks.
+	if (!(m_status & I8256_STATUS_TR_EMPTY) &&
+		(m_rx_state == I8256_STATE_DATA || m_rx_state == I8256_STATE_STOP ||
+			(m_rx_state == I8256_STATE_START && m_rx_counter)))
+		m_rx_tx_active = true;
 }
 
 //**************************************************************************
