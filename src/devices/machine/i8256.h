@@ -60,14 +60,6 @@ public:
 	void write_cts(int state);
 	void write_extint(int state);
 	void write_p1(uint8_t data);
-	void write_p12(int state);
-	void write_p13(int state);
-	void write_p17(int state);
-
-	uint8_t p1_r();
-	void    p1_w(uint8_t data);
-	uint8_t p2_r();
-	void    p2_w(uint8_t data);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -79,6 +71,10 @@ private:
 
 	void soft_reset();
 	void update_timer_rate();
+	uint8_t read_port1();
+	void write_port1(uint8_t data);
+	uint8_t read_port2();
+	void write_port2(uint8_t data);
 
 	void count_timer(int i);
 	void request_timer_interrupt(int level);

@@ -508,9 +508,9 @@ uint8_t i8256_device::read(offs_t offset)
 				m_status &= ~I8256_STATUS_RB_FULL;
 			return m_rx_buffer;
 		case I8256_REG_PORT1:
-			return p1_r();
+			return read_port1();
 		case I8256_REG_PORT2:
-			return p2_r();
+			return read_port2();
 		case I8256_REG_TIMER1:
 			return m_timers[0];
 		case I8256_REG_TIMER2:
@@ -669,10 +669,10 @@ void i8256_device::write(offs_t offset, uint8_t data)
 			m_status &= ~I8256_STATUS_TB_EMPTY;
 			break;
 		case I8256_REG_PORT1:
-			p1_w(data);
+			write_port1(data);
 			break;
 		case I8256_REG_PORT2:
-			p2_w(data);
+			write_port2(data);
 			break;
 		case I8256_REG_TIMER1:
 		case I8256_REG_TIMER2:
@@ -715,36 +715,21 @@ void i8256_device::write_p1(uint8_t data)
 		request_interrupt(I8256_INT_TIMER2);
 }
 
-void i8256_device::write_p12(int state)
-{
-	write_p1((m_port1_input & ~0x04) | (state ? 0x04 : 0x00));
-}
-
-void i8256_device::write_p13(int state)
-{
-	write_p1((m_port1_input & ~0x08) | (state ? 0x08 : 0x00));
-}
-
-void i8256_device::write_p17(int state)
-{
-	write_p1((m_port1_input & ~0x80) | (state ? 0x80 : 0x00));
-}
-
-uint8_t i8256_device::p1_r()
+uint8_t i8256_device::read_port1()
 {
 	// control bit 1 = output (read from latch), 0 = input (read from callback)
 	const uint8_t input = m_in_p1_cb.isunset() ? m_port1_input : m_in_p1_cb(0);
 	return (input & ~m_port1_control) | (m_port1_int & m_port1_control);
 }
 
-void i8256_device::p1_w(uint8_t data)
+void i8256_device::write_port1(uint8_t data)
 {
 	// all bits are latched; input pins output the latch if the direction is changed later
 	m_port1_int = data;
 	m_out_p1_cb(0, m_port1_int & m_port1_control);
 }
 
-uint8_t i8256_device::p2_r()
+uint8_t i8256_device::read_port2()
 {
 	switch (m_mode & 0x07)
 	{
@@ -772,7 +757,7 @@ uint8_t i8256_device::p2_r()
 	}
 }
 
-void i8256_device::p2_w(uint8_t data)
+void i8256_device::write_port2(uint8_t data)
 {
 	m_port2_int = data;
 	switch (m_mode & 0x07)
