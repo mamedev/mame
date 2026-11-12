@@ -339,9 +339,16 @@ uint8_t gse1_state::pio2_pb_r()
 void gse1_state::pio2_pb_w(uint8_t data)
 {
 	// Steckerleiste 16 - J16
+	// TODO: The corsar manual mentions unplugging the coin return cable (Stecker 24)
+	// and replacing it with the printer then placing the service switch in position 4
+	// is this serial?
+	bool printer3 = BIT(data, 1);
+	bool printer4 = BIT(data, 2);
+	// TODO: control the motors
 	bool motor_reset = BIT(data, 6);
 	bool motor_switch = BIT(data, 7);
 	LOG("MOTOR reset: %02x, switch: %02x\n", motor_reset, motor_switch);
+	LOG("PRINTER 3: %02x, 4: %02x\n", printer3, printer4);
 }
 
 //CTC
