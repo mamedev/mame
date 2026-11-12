@@ -128,10 +128,6 @@ private:
 	uint8_t m_adress = 0;
 	bool m_battery = false;
 
-	uint8_t m_pio1_pb = 0xff;
-	uint8_t m_pio2_pa = 0xff;
-	uint8_t m_pio2_pb = 0xff;
-
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
@@ -155,9 +151,6 @@ void gse1_state::machine_start()
 {
 	save_item(NAME(m_adress));
 	save_item(NAME(m_battery));
-	save_item(NAME(m_pio1_pb));
-	save_item(NAME(m_pio2_pa));
-	save_item(NAME(m_pio2_pb));
 }
 
 void gse1_state::mem_map(address_map &map)
@@ -307,30 +300,26 @@ uint8_t gse1_state::pio1_pb_r()
 void gse1_state::pio1_pb_w(uint8_t data)
 {
 	// Steckerleiste 15
-	m_pio1_pb = data;
 	//coins out
-	machine().bookkeeping().coin_counter_w(3, BIT(m_pio1_pb, 0)); // PB0 0.10DM
-	machine().bookkeeping().coin_counter_w(2, BIT(m_pio1_pb, 1)); // PB1 1DM
-	machine().bookkeeping().coin_counter_w(1, BIT(m_pio1_pb, 2)); // PB2 2DM
-	machine().bookkeeping().coin_counter_w(0, BIT(m_pio1_pb, 3)); // PB3 5DM
+	machine().bookkeeping().coin_counter_w(3, BIT(data, 0)); // PB0 0.10DM
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 1)); // PB1 1DM
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 2)); // PB2 2DM
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 3)); // PB3 5DM
 
-	machine().bookkeeping().coin_lockout_global_w(!BIT(m_pio1_pb, 4)); // PB4 coin magnet
+	machine().bookkeeping().coin_lockout_global_w(!BIT(data, 4)); // PB4 coin magnet
 }
 
 //PIO2
 uint8_t gse1_state::pio2_pa_r()
 {
 	// Steckerleiste 17
-	uint8_t data = m_pio2_pa;
 	// The only input here is the battery status
-	data = m_battery ? data | 0x80 : data & ~0x80; //PA7 from IC1
-	return data;
+	return m_battery ? 0xff : 0x7f;
 }
 
 void gse1_state::pio2_pa_w(uint8_t data)
 {
 	// Steckerleiste 17
-	m_pio2_pa = data;
 	m_led = BIT(data, 0);
 	// 1 NC
 	m_dac_alarm_l->write(BIT(data, 2));
@@ -343,8 +332,9 @@ void gse1_state::pio2_pa_w(uint8_t data)
 uint8_t gse1_state::pio2_pb_r()
 {
 	// Steckerleiste 16
-	uint8_t data = m_pio2_pb;
+	uint8_t data = 0xff;
 	// Motor sync
+	// TODO: get these from the reels/discs
 	bool motor_right = false;
 	bool motor_middle = false;
 	bool motor_left = false;
@@ -358,7 +348,6 @@ uint8_t gse1_state::pio2_pb_r()
 
 void gse1_state::pio2_pb_w(uint8_t data)
 {
-	m_pio2_pb = data;
 	bool motor_reset = BIT(data, 6);
 	bool motor_switch = BIT(data, 7);
 	LOG("MOTOR reset: %02x, switch: %02x\n", motor_reset, motor_switch);
