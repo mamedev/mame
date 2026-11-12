@@ -1184,7 +1184,7 @@ void i8256_device::output_rxc(int state)
 
 void i8256_device::check_break_in()
 {
-	if (BIT(m_command1, I8256_CMD1_BRKI))
+	if (BIT(m_command1, I8256_CMD1_BRKI) && (m_command2 & 0x0f) > I8256_BAUD_TXC32)
 	{
 		const uint8_t input = m_in_p1_cb.isunset() ? m_port1_input : m_in_p1_cb(0);
 		if (!BIT(input, 6))
