@@ -250,6 +250,7 @@ ppc_device::ppc_device(
 	, m_drcuml(*this, CACHE_SIZE + sizeof(internal_ppc_state))
 	, m_drcfe(nullptr)
 	, m_drcoptions(0)
+	, m_track_physical_code(false)
 	, m_reservation_mask(~uint32_t(reservation_size - 1))
 	, m_dasm(powerpc_disassembler())
 {
@@ -583,6 +584,7 @@ void ppc_device::device_start()
 
 	// init bitmap of which logical pages have compiled code
 	m_codepage_bits.assign(CODEPAGE_SIZE, 0);    // 0x1'0000'0000 / 4096 = 0x10'0000
+	m_physpage_bits.assign(CODEPAGE_SIZE, 0);
 
 	m_entry = nullptr;
 	m_nocode = nullptr;
@@ -1253,6 +1255,34 @@ void ppc_device::state_string_export(const device_state_entry &entry, std::strin
 
 void ppc_device::device_stop()
 {
+}
+
+
+/*-------------------------------------------------
+    device_post_load - rebuild the DRC mode,
+    which is only updated when the MSR changes
+-------------------------------------------------*/
+
+void ppc_device::device_post_load()
+{
+	// same as generate_update_mode()
+	const u32 msr = m_core->msr;
+	u32 mode = (m_flavor == PPC_MODEL_601) ? BIT(m_core->spr[SPR603_HID0], 3) : (msr & MSR_LE);
+
+	if ((m_cap & PPCCAP_OEA) || (m_flavor == PPC_MODEL_403GCX))
+	{
+		mode |= (msr & MSROEA_DR) ? 0x02 : 0;
+	}
+
+	if (m_cap & PPCCAP_4XX)
+	{
+		mode |= (msr & MSR4XX_PE) ? 0x02 : 0;
+	}
+	mode |= (msr & MSR_PR) ? 0x04 : 0;
+	m_core->mode = mode;
+
+	// the compiled code may be for different memory contents
+	m_cache_dirty = true;
 }
 
 

@@ -20140,7 +20140,7 @@ zigzagb2
 rockclim
 
 @source:galaxian/galaxold.cpp
-4in1
+4funin1
 bullsdrtg
 devilfshv
 dingov
@@ -21649,6 +21649,7 @@ cm1codara
 cm1codarb
 cm1spa
 cmast91
+cmast91g
 cmast97
 cmast97a
 cmast97b
@@ -29623,8 +29624,8 @@ rs3230
 48in1a
 48in1b
 48in1c
+4in1
 4in1a
-4in1b
 60in1
 fruitwld
 fruitwlda
@@ -36672,7 +36673,9 @@ cexpert
 
 @source:novag/cforte.cpp
 cfortea
+cfortea1
 cforteb
+cforteb1
 
 @source:novag/cnchess.cpp
 cnchess

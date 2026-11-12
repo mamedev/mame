@@ -70,7 +70,7 @@ public:
 	output_finder<2> m_leds;
 
 	int m_irq_line = 0;
-	uint8_t m_4in1_bank = 0U;
+	uint8_t m_4funin1_bank = 0U;
 	tilemap_t *m_bg_tilemap = nullptr;
 	int m_spriteram2_present = 0;
 	uint8_t m_gfxbank[5]{};
@@ -127,7 +127,7 @@ public:
 	void galaxold_leds_w(offs_t offset, uint8_t data);
 	uint8_t scramblb_protection_1_r();
 	uint8_t scramblb_protection_2_r();
-	void _4in1_bank_w(uint8_t data);
+	void _4funin1_bank_w(uint8_t data);
 	void racknrol_tiles_bank_w(offs_t offset, uint8_t data);
 	void galaxold_videoram_w(offs_t offset, uint8_t data);
 	uint8_t galaxold_videoram_r(offs_t offset);
@@ -147,13 +147,13 @@ public:
 	void galaxold_7474_9m_2_q_callback(int state);
 	void galaxold_7474_9m_1_callback(int state);
 	uint8_t rescueb_a002_r() { return 0xfc; }
-	template <int Mask> int _4in1_fake_port_r();
+	template <int Mask> int _4funin1_fake_port_r();
 	template <int Mask> int vpool_lives_r();
 	template <int Mask> ioport_value dkongjrm_coinage_r();
 
 	void init_bullsdrtg();
 	void init_ladybugg();
-	void init_4in1();
+	void init_4funin1();
 	void init_superbikg();
 	void init_dkingjrv();
 
@@ -255,7 +255,7 @@ public:
 	void machine_reset_common(int line);
 	void galaxian(machine_config &config);
 	void galaxold_base(machine_config &config);
-	void _4in1(machine_config &config);
+	void _4funin1(machine_config &config);
 	void racknrol(machine_config &config);
 	void hunchbkg(machine_config &config);
 	void videotron(machine_config &config);
@@ -279,7 +279,7 @@ public:
 	void mooncrst(machine_config &config);
 	void galaxian_audio(machine_config &config);
 	void mooncrst_audio(machine_config &config);
-	void _4in1_map(address_map &map) ATTR_COLD;
+	void _4funin1_map(address_map &map) ATTR_COLD;
 	void bullsdrtg_data_map(address_map &map) ATTR_COLD;
 	void devilfshv_map(address_map &map) ATTR_COLD;
 	void dingov_map(address_map &map) ATTR_COLD;

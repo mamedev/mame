@@ -97,8 +97,8 @@ public:
 	void base(machine_config &config) ATTR_COLD;
 	void iam(machine_config &config) ATTR_COLD;
 
+	void init_4in1() ATTR_COLD;
 	void init_4in1a() ATTR_COLD;
-	void init_4in1b() ATTR_COLD;
 	void init_19in1() ATTR_COLD;
 	void init_39in1() ATTR_COLD;
 	void init_48in1() ATTR_COLD;
@@ -207,7 +207,7 @@ void _39in1_state::machine_reset()
        0   1   1   protection data port
        1   -   -   protection command port
 
-    The I.A.M. slots are the same as 4in1a/4in1b, at 04100040-0410007e:
+    The I.A.M. slots are the same as 4in1/4in1a, at 04100040-0410007e:
     reads return the challenge state in the high nibble and an 8-entry signature
     indexed by A3-A5 in the low nibble, while writes clock the state.  They check
     the signature eight times and then run four challenge rounds, and a failure
@@ -222,7 +222,7 @@ void _39in1_state::machine_reset()
              indexed by A3-A5, 1 selects the challenge/response register
       bit 6  what a write to the data port does to that register
 
-    4in1a and 4in1b use an earlier part with no command port at all.  There the
+    4in1 and 4in1a use an earlier part with no command port at all.  There the
     register is only the top nibble of the data port and the signature is always
     in the bottom nibble, so the games can read both at once and no mode bit is
     needed.
@@ -627,11 +627,11 @@ static const cpld_prot PROT_39IN1 = {
 	{ 5, 1, 2, 7, 6, 4, 3, 0 }, { 0, 7, 2, 4, 6, 3, 5, 1 }, 0xff, 0xff, true };
 
 // the earlier part only keeps the top nibble and has no command port
-static const cpld_prot PROT_4IN1A = {
+static const cpld_prot PROT_4IN1 = {
 	{ 0x03, 0x00, 0x0f, 0x04, 0x07, 0x0b, 0x06, 0x05 },
 	{ 4, 2, 0, 7, 1, 3, 5, 6 }, { 4, 6, 5, 7, 0, 1, 2, 3 }, 0xd0, 0xf0, false };
 
-static const cpld_prot PROT_4IN1B = {
+static const cpld_prot PROT_4IN1A = {
 	{ 0x0e, 0x04, 0x00, 0x02, 0x01, 0x00, 0x0c, 0x01 },
 	{ 5, 2, 4, 7, 0, 1, 3, 6 }, { 6, 7, 4, 5, 0, 1, 2, 3 }, 0x20, 0xf0, false };
 
@@ -689,20 +689,20 @@ static const cpld2_key PROT_PLUTUS = {
 	  { 7, prot_value_bit(0) }, { 1, prot_value_bit(5) }, { 4, prot_value_bit(4) }, { 0, prot_state_bit(2) } },
 	{ 11, 7, 6, 5, 4, 3, 2, 1 }, true };
 
-void _39in1_state::init_4in1a()
+void _39in1_state::init_4in1()
 {
 	static const cpld_key key = { { 6, 0, 2, 1, 7, 5, 4, 3 }, 0x64, { { 3, 0x40 }, { 4, 0x08 }, { 5, 0x20 }, { 6, 0x80 } } };
 	decrypt(key);
-	set_protection(PROT_4IN1A);
+	set_protection(PROT_4IN1);
 }
 
 // rodent shares this key: the whole 0a00-0ffff gap in its ROM descrambles to ff
-static const cpld_key KEY_4IN1B = { { 2, 4, 0, 6, 7, 3, 1, 5 }, 0x32, { { 3, 0x08 }, { 4, 0x80 }, { 5, 0x10 }, { 6, 0x04 } } };
+static const cpld_key KEY_4IN1A = { { 2, 4, 0, 6, 7, 3, 1, 5 }, 0x32, { { 3, 0x08 }, { 4, 0x80 }, { 5, 0x10 }, { 6, 0x04 } } };
 
-void _39in1_state::init_4in1b()
+void _39in1_state::init_4in1a()
 {
-	decrypt(KEY_4IN1B);
-	set_protection(PROT_4IN1B);
+	decrypt(KEY_4IN1A);
+	set_protection(PROT_4IN1A);
 }
 
 void _39in1_state::init_19in1()
@@ -762,7 +762,7 @@ void _39in1_state::init_48in1c() { init_48in1(); } // same encryption as 48in1
 // of the page tables the loader happens to build.
 void _39in1_state::init_rodent()
 {
-	decrypt(KEY_4IN1B);
+	decrypt(KEY_4IN1A);
 
 	m_maincpu->space(AS_PROGRAM).install_read_tap(0xa071048c, 0xa071048f, "rodent_vector_wipe",
 			[] (offs_t offset, u32 &data, u32 mem_mask) { data = 0xe1a00000; });
@@ -960,21 +960,21 @@ ROM_START( 60in1 )
 	ROM_LOAD16_WORD_SWAP( "60in1_eeprom.u32", 0x000, 0x200, CRC(54af5973) SHA1(30aca7790458f4be906f7fa7c74206e16d9fc36f) )
 ROM_END
 
-ROM_START( 4in1a )
+ROM_START( 4in1 )
 	// main program, encrypted
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "plz-v014_ver300.bin", 0x000000, 0x080000, CRC(775f101d) SHA1(8a299a67b487518ba2e2cb5334347b93f8640190) )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
 	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
-	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) ) // confirmed same flash rom as 39 in 1,   CGC-NP203 string
+	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) ) // confirmed same flash rom as 39 in 1, CGC-NP203 string
 
 	// EEPROM - contains security data
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
 	ROM_LOAD16_WORD_SWAP( "4in1_eeprom.bin", 0x000, 0x200, CRC(df1724f7) SHA1(07814aee3622f4bb8bada938f2a93fae791d6e31) )
 ROM_END
 
-ROM_START( 4in1b )
+ROM_START( 4in1a )
 	// main program, encrypted
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "pzv001-4.bin", 0x000000, 0x080000, CRC(7679a95f) SHA1(56c20fa7d086560b76477b42208cb43d42adba41) )
@@ -1088,8 +1088,8 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(2004, 4in1a,     39in1,    cpld,   39in1, _39in1_state, init_4in1a,    ROT90, "bootleg", "4 in 1 MAME bootleg (ver 3.00, PLZ-V014)",             MACHINE_IMPERFECT_SOUND)
-GAME(2004, 4in1b,     39in1,    cpld,   39in1, _39in1_state, init_4in1b,    ROT90, "bootleg", "4 in 1 MAME bootleg (PLZ-V001)",                       MACHINE_IMPERFECT_SOUND)
+GAME(2004, 4in1,      39in1,    cpld,   39in1, _39in1_state, init_4in1,     ROT90, "bootleg", "4 in 1 MAME bootleg (ver 3.00, PLZ-V014)",             MACHINE_IMPERFECT_SOUND)
+GAME(2004, 4in1a,     39in1,    cpld,   39in1, _39in1_state, init_4in1a,    ROT90, "bootleg", "4 in 1 MAME bootleg (PLZ-V001)",                       MACHINE_IMPERFECT_SOUND)
 GAME(2004, 19in1,     0,        cpld2,  39in1, _39in1_state, init_19in1,    ROT0,  "bootleg", "19 in 1 MAME bootleg (BAR-V000)",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 GAME(2004, 39in1,     0,        cpld,   39in1, _39in1_state, init_39in1,    ROT90, "bootleg", "39 in 1 MAME bootleg (GNO-V000)",                      MACHINE_IMPERFECT_SOUND)
 GAME(2004, 48in1,     39in1,    cpld2,  39in1, _39in1_state, init_48in1,    ROT90, "bootleg", "48 in 1 MAME bootleg (ver 3.09, HPH-V000)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
