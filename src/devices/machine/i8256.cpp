@@ -1028,6 +1028,10 @@ void i8256_device::transmitter_tick()
 			{
 				m_tx_counter = 0;
 
+				// SBRK clears after the last data bit, allowing another break to be queued.
+				if (m_tx_break && m_tx_bits == m_data_bits)
+					m_command3 &= ~(1 << I8256_CMD3_SBRK);
+
 				if (m_tx_bits < m_data_bits)
 				{
 					const int bit = m_tx_break ? 0 : BIT(m_tx_shift, m_tx_bits);
@@ -1056,12 +1060,7 @@ void i8256_device::transmitter_tick()
 				m_tx_counter = 0;
 				m_tx_state = I8256_STATE_START;
 
-				if (m_tx_break)
-				{
-					// SBRK is automatically cleared after one character time of break
-					m_command3 &= ~(1 << I8256_CMD3_SBRK);
-					m_tx_break = false;
-				}
+				m_tx_break = false;
 
 				m_status |= I8256_STATUS_TR_EMPTY;
 				// TRE generates an interrupt when the transmitter register finished
