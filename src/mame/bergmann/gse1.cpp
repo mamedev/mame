@@ -472,7 +472,7 @@ void gse1_state::gse1(machine_config &config)
 	m_ctc2->zc_callback<0>().append(m_ctc2, FUNC(z80ctc_device::trg3));
 	m_ctc2->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_usec(341000)); // 47uF x 22k x 0,33
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_usec(341'220)); // 47uF x 22k x 0,33
 
 	config.set_default_layout(layout_croyal1);
 
