@@ -120,7 +120,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<t11_device> m_maincpu;
+	required_device<lsi11_device> m_maincpu;
 	required_device<dl11_device> m_dl11;
 	required_device<rs232_port_device> m_rs232;
 	required_device<qbus_device> m_qbus;
@@ -130,11 +130,16 @@ private:
 	void pdp11_mem(address_map &map) ATTR_COLD;
 	void pdp11qb_mem(address_map &map) ATTR_COLD;
 	void sms1000_mem_188(address_map &map) ATTR_COLD;
+
+	void reset_w(int state);
 };
 
 void pdp11_state::pdp11_mem(address_map &map)
 {
 	map.unmap_value_high();
+	map(0000000, 0177777).lrw16(
+		NAME([this](offs_t offset) { if (!machine().side_effects_disabled()) m_maincpu->pulse_input_line(t11_device::BUS_ERROR, attotime::zero); return 0; }),
+		NAME([this](offs_t offset, u16 data) { m_maincpu->pulse_input_line(t11_device::BUS_ERROR, attotime::zero); }));
 	map(0x0000, 0xdfff).ram();  // RAM
 	map(0xea00, 0xfeff).rom();
 	map(0xff70, 0xff77).rw(m_dl11, FUNC(dl11_device::read), FUNC(dl11_device::write));
@@ -275,6 +280,8 @@ void pdp11_state::machine_reset()
 		maincpu[0xf600 + (i-0x100)*2 + 1] = (nib1 << 4) + nib2;
 		maincpu[0xf600 + (i-0x100)*2 + 0] = (nib3 << 4) + nib4;
 	}
+
+	reset_w(ASSERT_LINE);
 }
 
 void pdp11_state::load9312prom(uint8_t *desc, uint8_t *src, int size)
@@ -330,13 +337,30 @@ MACHINE_RESET_MEMBER(pdp11_state,pdp11qb)
 	m_maincpu->set_state_int(T11_PC, 0xea00);
 }
 
+static const z80_daisy_config daisy_chain[] =
+{
+       { "dl11" },
+       { "qbus" },
+       { nullptr }
+};
+
+void pdp11_state::reset_w(int state)
+{
+	if (state == ASSERT_LINE)
+	{
+		m_dl11->reset();
+		m_qbus->init_w();
+	}
+}
 
 void pdp11_state::pdp11(machine_config &config)
 {
 	/* basic machine hardware */
-	T11(config, m_maincpu, 4'000'000); // Need proper CPU here
+	LSI11(config, m_maincpu, 4'000'000); // Need proper CPU here
 	m_maincpu->set_initial_mode(6 << 13);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pdp11_state::pdp11_mem);
+	m_maincpu->set_daisy_config(daisy_chain);
+	m_maincpu->out_reset().set(FUNC(pdp11_state::reset_w));
 
 	DL11(config, m_dl11, XTAL(4'608'000));
 	m_dl11->set_rxc(9600);
@@ -344,9 +368,8 @@ void pdp11_state::pdp11(machine_config &config)
 	m_dl11->set_rxvec(060);
 	m_dl11->set_txvec(064);
 	m_dl11->txd_wr_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
-// future
-//  m_dl11->txrdy_wr_callback().set_inputline(m_maincpu, t11_device::CP0_LINE);
-//  m_dl11->rxrdy_wr_callback().set_inputline(m_maincpu, t11_device::CP0_LINE);
+	m_dl11->txrdy_wr_callback().set_inputline(m_maincpu, t11_device::VEC_LINE);
+	m_dl11->rxrdy_wr_callback().set_inputline(m_maincpu, t11_device::VEC_LINE);
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal");
 	m_rs232->rxd_handler().set(m_dl11, FUNC(dl11_device::rx_w));
@@ -354,7 +377,9 @@ void pdp11_state::pdp11(machine_config &config)
 	RX01(config, "rx01");
 	QBUS(config, m_qbus, 0);
 	m_qbus->set_space(m_maincpu, AS_PROGRAM);
-	m_qbus->birq4().set_inputline(m_maincpu, t11_device::CP0_LINE);
+	m_qbus->bus_error_callback().set([this] (int state) { m_maincpu->pulse_input_line(t11_device::BUS_ERROR, attotime::zero); });
+	m_qbus->bevnt().set_inputline(m_maincpu, t11_device::CP2_LINE);
+	m_qbus->birq4().set_inputline(m_maincpu, t11_device::VEC_LINE);
 	QBUS_SLOT(config, "qbus" ":1", qbus_cards, "pc11");
 	QBUS_SLOT(config, "qbus" ":2", qbus_cards, nullptr);
 	QBUS_SLOT(config, "qbus" ":3", qbus_cards, nullptr);
@@ -484,7 +509,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  CLASS        INIT        COMPANY                          FULLNAME                            FLAGS */
-COMP( 197?, pdp11ub,  0,       0,      pdp11,    pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Unibus](M9301-YA)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 197?, pdp11ub2, pdp11ub, 0,      pdp11ub2, pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Unibus](M9312)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 198?, pdp11qb,  pdp11ub, 0,      pdp11qb,  pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Q-BUS] (M7195 - MXV11-B)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1987, sms1000,  0,       0,      sms1000,  pdp11, pdp11_state, empty_init, "Scientific Micro Systems",      "SMS-1000",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 197?, pdp11ub,  0,       0,      pdp11,    pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Unibus](M9301-YA)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 197?, pdp11ub2, pdp11ub, 0,      pdp11ub2, pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Unibus](M9312)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 198?, pdp11qb,  pdp11ub, 0,      pdp11qb,  pdp11, pdp11_state, empty_init, "Digital Equipment Corporation", "PDP-11 [Q-BUS] (M7195 - MXV11-B)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1987, sms1000,  0,       0,      sms1000,  pdp11, pdp11_state, empty_init, "Scientific Micro Systems",      "SMS-1000",                         MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

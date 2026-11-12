@@ -45,6 +45,7 @@ DEFINE_DEVICE_TYPE(K1801VM2, k1801vm2_device, "k1801vm2", "K1801VM2")
  * Not implemented:
  *
  * instruction timing, microcode-related insns, HALT state and ODT,
+ * use of DATIO (read-modify-write) cycle in MTPS and EIS insns,
  * traps: double bus error and bus error on vector fetch.
  */
 lsi11_device::lsi11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
