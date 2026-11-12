@@ -537,7 +537,7 @@ void ncr53c90_device::step(bool timeout)
 
 	case DISC_SEL_ATN_SEND_BYTE:
 		if(c == CD_SELECT_ATN_STOP) {
-			seq = 2;
+			seq = 1;
 			function_bus_complete();
 		} else {
 			state = DISC_SEL_WAIT_REQ;
@@ -891,17 +891,17 @@ uint8_t ncr53c90_device::command_r()
 void ncr53c90_device::command_w(uint8_t data)
 {
 	LOG("command_w %02x command_pos %d (%s)\n", data, command_pos, machine().describe_context());
-	if(command_pos == 2) {
-		status |= S_GROSS_ERROR;
-		check_irq();
-		return;
-	}
 	/*
 	 * Note the RESET chip and RESET SCSI Bus commands execute as soon as they are loaded into
 	 * the top of the Command Register.
 	 */
 	if((data & 0x7f) == CM_RESET || (data & 0x7f) == CM_RESET_BUS)
 		command_pos = 0;
+	else if(command_pos == 2) {
+		status |= S_GROSS_ERROR;
+		check_irq();
+		return;
+	}
 
 	command[command_pos++] = data;
 	if(command_pos == 1)
@@ -969,6 +969,7 @@ void ncr53c90_device::start_command()
 	case CM_RESET_BUS:
 		LOGMASKED(LOG_COMMAND, "Reset SCSI bus\n");
 		state = BUSRESET_WAIT_INT;
+		mode = MODE_D;
 		m_scsi_bus->ctrl_w(m_scsi_refid, S_RST, S_RST);
 		delay(130);
 		break;
@@ -1199,7 +1200,7 @@ uint8_t ncr53c90_device::dma_r()
 
 	uint8_t r = fifo_pop();
 
-	if ((sync_offset != 0) || ((m_scsi_bus->ctrl_r() & S_PHASE_MASK) != S_PHASE_DATA_IN))
+	if ((sync_offset != 0) || (xfr_phase != S_PHASE_DATA_IN))
 	{
 		decrement_tcounter();
 	}
@@ -1341,7 +1342,7 @@ u16 ncr53c94_device::dma16_r()
 		memmove(fifo, fifo + 2, fifo_pos);
 
 		// update drq
-		if ((sync_offset != 0) || ((m_scsi_bus->ctrl_r() & S_PHASE_MASK) != S_PHASE_DATA_IN))
+		if ((sync_offset != 0) || (xfr_phase != S_PHASE_DATA_IN))
 		{
 			decrement_tcounter(2);
 		}

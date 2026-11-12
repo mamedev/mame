@@ -26,6 +26,7 @@ Dansk Datahistorisk Forening - http://datamuseum.dk/
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
+#include "machine/clock.h"
 #include "machine/input_merger.h"
 #include "machine/mc6844.h"
 #include "machine/mc6854.h"
@@ -37,7 +38,6 @@ Dansk Datahistorisk Forening - http://datamuseum.dk/
 #include "screen.h"
 
 //#include "bus/rs232/rs232.h"
-//#include "machine/clock.h"
 
 #define LOG_IO    (1U << 1)
 #define LOG_NVRAM (1U << 2)
@@ -461,6 +461,11 @@ void alfaskop4110_state::alfaskop4110(machine_config &config)
 	m_tia_adlc->out_irq_cb().set("irq7", FUNC(input_merger_device::in_w<7>));
 	m_tia_adlc->out_rdsr_cb().set([this](bool state){ LOGDMA("TIA ADLC RDSR: %d\n", state); m_tia_dma->dreq_w<1>(state); });
 	m_tia_adlc->out_tdsr_cb().set([this](bool state){ LOGDMA("TIA ADLC TDSR: %d\n", state); m_tia_dma->dreq_w<0>(state); });
+
+	// FIXME: ADLC clock source unknown, rate of the old internal MC6854 timer used
+	clock_device &tia_adlc_clock(CLOCK(config, "tia_adlc_clock", 500'000));
+	tia_adlc_clock.signal_handler().set(m_tia_adlc, FUNC(mc6854_device::txc_w));
+	tia_adlc_clock.signal_handler().append(m_tia_adlc, FUNC(mc6854_device::rxc_w));
 
 	MC6844(config, m_tia_dma, XTAL(19'170'000) / 18);
 	//m_tia_dma->out_int_callback().set([this](bool state){ LOGDMA("TIA DMA IRQ: %d\n", state); }); // Used as DEND (end of dma) towards the ADLC through some logic

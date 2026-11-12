@@ -22,6 +22,8 @@
   * Lucky Roulette Plus (6-players, Spanish, set 1),            1990, unknown manufacturer.
   * Lucky Roulette Plus (6-players, Spanish, set 2),            1990, unknown manufacturer.
   * Monte (4-players Spanish cards game. Prototype, encrypted), 1989, Miky SRL.
+  * Rula (6-players roulette, encrypted),                       1991, Miky SRL.
+
 
   Special thanks to Rob Ragon for his invaluable cooperation.
 
@@ -49,6 +51,19 @@
   (note that this one has 6 horses instead of 7).
 
   It has four independent coin slots of 10-francs each.
+
+
+  * Rula
+  Miky SRL
+
+  6-players spanish roulette. Encrypted.
+
+  This game was designed to be presented in horizontal way, with a LEDs
+  roulette at the top of the playfield.
+
+  The first boot always shows a blue screen with "Falso Arranque". This
+  is related to a fail check against the NVRAM. Just reset and the game
+  will generate a new one and start normally.
 
 
 **************************************************************************
@@ -326,6 +341,7 @@
 
 #include "re800.lh"
 #include "luckyrlt.lh"
+#include "rula_v.lh"
 
 
 namespace {
@@ -377,6 +393,8 @@ private:
 	uint8_t mux_port_r();
 	void mux_port_w(uint8_t data);
 	void rula_mux_w(uint8_t data);
+	void rula_led_col_w(uint8_t data);
+	void rula_led_row_w(uint8_t data);
 	void wc_meters_w(uint8_t data);
 	void blitter_execute(int x, int y, int color, int width, int flag);
 	void corona_palette(palette_device &palette) const;
@@ -410,6 +428,8 @@ private:
 	uint8_t m_lamp = 0;
 	uint8_t m_lamp_old = 0;
 	uint8_t m_input_selector = 0;
+	uint8_t m_led_col = 0;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<screen_device> m_screen;
@@ -645,6 +665,51 @@ void corona_state::rula_mux_w(uint8_t data)
 }
 
 
+void corona_state::rula_led_col_w(uint8_t data)
+{
+/*  Roulette LEDs matrix (37 LEDs, 6 columns x 7 rows).
+
+    Port $E9: column strobe (active low, one column at a time).
+    Port $EF: row data (active high, one row at a time).
+
+    The program at $1E12 lights a single LED at a time, with
+    LED = (column * 7) + row, in the 0-36 range. The index
+    follows the position in the wheel (the number table at $B294
+    is the european wheel order).
+
+    HEX: 00 20 0F 13 04 15 02 19 11 22 06 1B 0D 24 0B 1E 08 17 0A 05 18 10 21 01 14 0E 1F 09 16 12 1D 07 1C 0C 23 03 1A
+    DEC: 00 32 15 19 04 21 02 25 17 34 06 27 13 36 11 30 08 23 10 05 24 16 33 01 20 14 31 09 22 18 29 07 28 12 35 03 26
+*/
+	m_led_col = ~data & 0x3f;
+}
+
+void corona_state::rula_led_row_w(uint8_t data)
+{
+	int col = -1;
+	int row = -1;
+
+	for (int i = 0; i < 6; i++)
+		if (BIT(m_led_col, i))
+			col = i;
+
+	for (int i = 0; i < 7; i++)
+		if (BIT(data, i))
+			row = i;
+
+	if (col >= 0 && row >= 0)
+	{
+		const uint8_t led = (col * 7) + row;
+
+		m_lamps[m_lamp_old] = 0;
+		m_lamps[led] = 1;
+		m_lamp_old = led;
+//      popmessage("LED: %02d", led);
+	}
+	else
+		m_lamps[m_lamp_old] = 0;
+}
+
+
 void corona_state::wc_meters_w(uint8_t data)
 {
 /*  - bits -
@@ -861,11 +926,11 @@ void corona_state::re800_sound_cpu_io_map(address_map &map)
 }
 
 
-/* Lucky Roulette
+/* Lucky Roulette Plus
 
   Blitter: F0-F4
   Status:  F5
-  Ball:    F9
+  Ball:    F9   (inverted LED-matrix)
 
   F8       R-   DIP switches?
   FA       R-   DIP switches?
@@ -960,11 +1025,11 @@ void corona_state::rula_cpu_io_map(address_map &map)
 
 	map(0xd8, 0xd8).w(FUNC(corona_state::rula_mux_w));          // mux selector & meters
 	map(0xdf, 0xdf).w(FUNC(corona_state::sound_latch_w));
-//	map(0xe9, 0xe9).nopw();                                     // related to ball. still not understood
+	map(0xe9, 0xe9).w(FUNC(corona_state::rula_led_col_w));      // roulette LEDs matrix column
 	map(0xeb, 0xeb).r(FUNC(corona_state::mux_port_r));
 	map(0xed, 0xed).portr("DSW2");
 	map(0xee, 0xee).portr("DSW1");
-//	map(0xef, 0xef).nopw();                                     // related to ball. still not understood
+	map(0xef, 0xef).w(FUNC(corona_state::rula_led_row_w));      // roulette LEDs matrix row
 }
 
 
@@ -2139,7 +2204,8 @@ ROM_START(monte)
 ROM_END
 
 /*
-  Rula (roulette)
+  Rula
+  LEDs roulette
   Miki SRL.
   1991.
 
@@ -2148,7 +2214,8 @@ ROM_END
   Program is encrypted.
 
   Notes:
-  blitter and inputs seems mapped as winner81.
+  This game was designed to be installed horizontally,
+  with 3 controls sets for each side of the table.
 
 */
 ROM_START(rula)
@@ -2200,4 +2267,4 @@ GAMEL( 1991, luckyrlta, luckyrlt, luckyrlta, luckyrlt, corona_state, empty_init,
 
 // Miky SRL games
 GAME(  1989, monte,     0,        monte,     monte,    corona_state, init_monte, ROT0,   "Miky SRL",                 "Monte (4-players Spanish cards game. Prototype, encrypted)", 0 )
-GAME(  1991, rula,      0,        rula,      rula,     corona_state, init_monte, ROT90,  "Miky SRL",                 "Rula (6-players roulette, encrypted)",            MACHINE_NOT_WORKING )
+GAMEL( 1991, rula,      0,        rula,      rula,     corona_state, init_monte, ROT90,  "Miky SRL",                 "Rula (6-players roulette, encrypted)",            0,                        layout_rula_v )

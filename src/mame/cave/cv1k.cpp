@@ -230,17 +230,17 @@ public:
 		m_idlepc(0)
 	{ }
 
-	void cv1k(machine_config &config);
-	void cv1k_d(machine_config &config);
-	void cv1k_touch(machine_config &config);
+	void cv1k(machine_config &config) ATTR_COLD;
+	void cv1k_d(machine_config &config) ATTR_COLD;
+	void cv1k_touch(machine_config &config) ATTR_COLD;
 
-	void init_mushisam();
-	void init_ibara();
-	void init_espgal2();
-	void init_mushitam();
-	void init_pinkswts();
-	void init_deathsml();
-	void init_ddpdfk();
+	void init_mushisam() ATTR_COLD;
+	void init_ibara() ATTR_COLD;
+	void init_espgal2() ATTR_COLD;
+	void init_mushitam() ATTR_COLD;
+	void init_pinkswts() ATTR_COLD;
+	void init_deathsml() ATTR_COLD;
+	void init_ddpdfk() ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -612,6 +612,7 @@ void cv1k_state::cv1k(machine_config &config)
 void cv1k_state::cv1k_d(machine_config &config)
 {
 	cv1k(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &cv1k_state::cv1k_d_map);
 	m_blitter->set_mainramsize(0x1000000);
 }

@@ -22,10 +22,7 @@
           The head unload time is already parsed into spec by C_SPECIFY but
           unused; it should drop HDL after command_end() with data_completion
     - keyboard ROM, same as earlier tandy 1000
-    - 2000HD hard disk controller DMA acknowledge at 0x0e0-0x0ff, not used by
-      Tandy MS-DOS 2.11, which moves sectors through the buffer with the CPU
-    - clock/mouse 8042 mcu ROM, probably same as tandy 1000 isa clock/mouse adapter
-    - sab3019 rtc
+    - clock/mouse 8041 mcu ROM, probably same as tandy 1000 isa clock/mouse adapter
 
 */
 
@@ -275,10 +272,21 @@ void tandy2k_state::clkmouse_w(offs_t offset, uint8_t data)
 				m_clkmouse_cmd[m_clkmouse_cnt++] = data;
 			switch (m_clkmouse_cmd[0])
 			{
-				case 0x01: //set time
+				case 0x01:
+					rtc_set(0, 0x00);
+					rtc_set(3, m_clkmouse_cmd[1]);
+					rtc_set(2, m_clkmouse_cmd[2]);
+					rtc_set(1, m_clkmouse_cmd[3]);
+					rtc_set(0, m_clkmouse_cmd[4] | 0x40);
 					break;
-				case 0x02: //read time
-					break;
+				case 0x02:
+					m_clkmouse_cmd[4] = 'R';
+					m_clkmouse_cmd[3] = rtc_read(3);
+					m_clkmouse_cmd[2] = rtc_read(2);
+					m_clkmouse_cmd[1] = rtc_read(1);
+					m_clkmouse_cmd[0] = rtc_read(0);
+					m_clkmouse_cnt = 5;
+					return;
 				case 0x08:
 					if(m_clkmouse_cmd[1] > 0)
 						m_clkmouse_irq |= MO_IRQ;
@@ -306,6 +314,48 @@ void tandy2k_state::clkmouse_w(offs_t offset, uint8_t data)
 			m_mouse_y = m_y_axis->read();
 			break;
 	}
+}
+
+void tandy2k_state::rtc_cbus(uint16_t bits, int count)
+{
+	m_rtc->dlen_w(1);
+
+	for (int i = 0; i < count; i++)
+	{
+		m_rtc->data_w(BIT(bits, i));
+		m_rtc->clb_w(1);
+		m_rtc->clb_w(0);
+	}
+
+	m_rtc->data_w(1);
+	m_rtc->dlen_w(0);
+	m_rtc->clb_w(1);
+	m_rtc->clb_w(0);
+}
+
+uint8_t tandy2k_state::rtc_read(int addr)
+{
+	rtc_cbus(addr << 2, 4);
+
+	uint8_t data = 0;
+
+	m_rtc->dlen_w(1);
+
+	for (int i = 0; i < 7; i++)
+	{
+		data |= m_rtc->data_r() << i;
+		m_rtc->clb_w(1);
+		m_rtc->clb_w(0);
+	}
+
+	m_rtc->dlen_w(0);
+
+	return data;
+}
+
+void tandy2k_state::rtc_set(int addr, uint8_t data)
+{
+	rtc_cbus((addr << 2) | ((data & 0x7f) << 4), 11);
 }
 
 uint8_t tandy2k_state::fldtc_r()
@@ -390,7 +440,7 @@ void tandy2k_state::tandy2k_io(address_map &map)
 	map(0x00052, 0x00052).mirror(0x8).r(FUNC(tandy2k_state::kbint_clr_r));
 	map(0x00060, 0x00063).mirror(0xc).rw(m_pic0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x00070, 0x00073).mirror(0xc).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x00080, 0x00080).mirror(0xe).rw(m_fdc, FUNC(i8272a_device::dma_r), FUNC(i8272a_device::dma_w));
+	map(0x00080, 0x00080).mirror(0x1e).rw(m_fdc, FUNC(i8272a_device::dma_r), FUNC(i8272a_device::dma_w));
 	map(0x00100, 0x0017f).rw(m_vpac, FUNC(crt9007_device::read), FUNC(crt9007_device::write)).umask16(0x00ff);
 	map(0x00100, 0x0017f).w(FUNC(tandy2k_state::addr_ctrl_w)).umask16(0xff00);
 	map(0x00180, 0x00180).r(FUNC(tandy2k_state::hires_status_r)).umask16(0x00ff);
@@ -1028,6 +1078,13 @@ void tandy2k_state::fdc_hdl_w(int state)
 	m_floppy1->mon_w(!state);
 }
 
+// Hard disk controller
+
+void tandy2k_hd_state::hdc_bdrq_w(int state)
+{
+	dma_request(3, state);
+}
+
 void tandy2k_state::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
@@ -1300,6 +1357,8 @@ void tandy2k_state::tandy2k(machine_config &config)
 	// temporary until the tandy keyboard has a rom dump
 	TANDY2K_HLE_KEYB(config, m_pc_keyboard).keypress().set(FUNC(tandy2k_state::hle_keypress_w));
 
+	SAB3019(config, m_rtc, 32.768_kHz_XTAL);
+
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("tandy2k_flop");
 
@@ -1310,13 +1369,14 @@ void tandy2k_state::tandy2k(machine_config &config)
 void tandy2k_hd_state::tandy2k_hd(machine_config &config)
 {
 	tandy2k(config);
-	
+
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_IO, &tandy2k_hd_state::tandy2k_hd_io);
 
 	// WD1010 (u18) and WD1100-11 (u12) hard disk controller with a Tandon TM502 drive
-	// INTRQ is not connected, the MS-DOS driver polls the status register
 	TANDY2K_HDC(config, m_hdc);
+	m_hdc->intrq_wr_callback().set(m_pic0, FUNC(pic8259_device::ir6_w));
+	m_hdc->bdrq_wr_callback().set(FUNC(tandy2k_hd_state::hdc_bdrq_w));
 
 	// software lists
 	SOFTWARE_LIST(config, "hdd_list").set_original("tandy2k_hdd");

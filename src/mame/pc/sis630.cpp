@@ -196,6 +196,7 @@ Notes on possible shutms11 BIOS bugs:
 #include "machine/sis950_lpc.h"
 #include "machine/sis950_smbus.h"
 
+#include "softlist_dev.h"
 
 namespace {
 
@@ -308,7 +309,7 @@ void sis630_state::sis630(machine_config &config)
 
 	// 3 expansion PCI slots (PC104+)
 	// "pci:09.x" to "pci:12.x"?
-	PCI_SLOT(config, "pci:1", pci_cards, 9,  0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:1", pci_cards,  9, 0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards, 10, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci:3", pci_cards, 11, 2, 3, 0, 1, nullptr);
 
@@ -340,6 +341,14 @@ void sis630_state::sis630(machine_config &config)
 	// FIXME: determine ISA bus clock
 //  ISA16_SLOT(config, "isa1", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
 //  ISA16_SLOT(config, "isa2", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
+
+	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
+	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+	SOFTWARE_LIST(config, "win_cdrom_list").set_original("generic_cdrom").set_filter("ibmpc");
+	SOFTWARE_LIST(config, "at_hdd_list").set_original("ibm5170_hdd");
+	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 }
 
 void sis630_state::asuspolo(machine_config &config)

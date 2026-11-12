@@ -1321,11 +1321,13 @@ void naomi_state::naomi_map(address_map &map)
 	map(0x0c000000, 0x0dffffff).mirror(0xa2000000).ram().share("dc_ram");
 
 	/* Area 4 */
-	map(0x10000000, 0x107fffff).mirror(0x02000000).w(m_powervr2, FUNC(powervr2_device::ta_fifo_poly_w));
+	map(0x10000000, 0x107fffff).w(m_powervr2, FUNC(powervr2_device::ta_fifo_poly_w));
 	map(0x10800000, 0x10ffffff).w(m_powervr2, FUNC(powervr2_device::ta_fifo_yuv_w));
-	map(0x11000000, 0x11ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath0_w)); // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
-	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
-	map(0x13000000, 0x13ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath1_w)); // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
+	map(0x11000000, 0x11ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath0_w));
+
+	map(0x12000000, 0x127fffff).w(m_powervr2, FUNC(powervr2_device::ta_fifo_poly_w));
+	map(0x12800000, 0x12ffffff).w(m_powervr2, FUNC(powervr2_device::ta_fifo_yuv_w));
+	map(0x13000000, 0x13ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath1_w));
 
 	/* Area 5 */
 	//map(0x14000000, 0x17ffffff).noprw(); // MPX Ext.
@@ -2052,6 +2054,32 @@ static INPUT_PORTS_START( crackndj )
 	PORT_BIT( 0xff00, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(50) PORT_PLAYER(2) PORT_NAME("Turntable R")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dygolf )
+	PORT_INCLUDE( naomi_mie )
+
+	PORT_START("TILT")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
+	// Up / Down buttons labeled with "⚪ 📹" / "📹 ⚪" respectively, where circle is a golf ball.
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Up Button")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Down Button")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Left Button")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Right Button")
+	PORT_BIT( 0x43ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("R0")
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
+
+	PORT_START("R1")
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_REVERSE PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( monkeyba )
 	PORT_INCLUDE( naomi_mie )
 
@@ -2360,6 +2388,37 @@ static INPUT_PORTS_START( smarinef )
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tduno )
+	PORT_INCLUDE( naomi_mie )
+
+	PORT_START("TILT")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("LX")
+	// TODO: somehow mirrored by default in ntvmys
+	PORT_BIT( 0x0fff, 0x0800, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("LY")
+	PORT_BIT( 0x0fff, 0x0800, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("LHIT")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+
+	// 31 kHz is optional in tduno, mandatory in tduno2/ntvmys
+	PORT_MODIFY("MIE.5")
+	PORT_DIPNAME( 0x01, 0x01, "Monitor" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "31 kHz" )
+	PORT_DIPSETTING(    0x00, "15 kHz" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( initd )
 	PORT_INCLUDE( naomi_mie )
 
@@ -2388,6 +2447,87 @@ static INPUT_PORTS_START( initd )
 
 	PORT_START("A2")
 	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff00) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("MIE.5")
+	PORT_DIPNAME( 0x01, 0x01, "Monitor" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "31 kHz" )
+	PORT_DIPSETTING(    0x00, "15 kHz" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( soulsurf )
+	PORT_INCLUDE( naomi_mie )
+
+	PORT_START("TILT")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left Button")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Right Button")
+	// sensor mat
+	// 0x disconnected (will moan in game with this state)
+	// 10 off
+	// 11 on
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_OTHER )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x7c9f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	// TODO: check if selected axes makes sense
+	// cfr. calibration for rationale, notice that it goes as board PoV (so right is left, rear is front)
+	PORT_START("A0")
+	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_PLAYER(1) PORT_NAME("Board Swing")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A1")
+	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_PLAYER(2) PORT_NAME("Board Roll")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A2")
+	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_PLAYER(1) PORT_NAME("Board Pitch")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("MIE.5")
+	PORT_DIPNAME( 0x01, 0x01, "Monitor" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "31 kHz" )
+	PORT_DIPSETTING(    0x00, "15 kHz" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( wldrider )
+	PORT_INCLUDE( naomi_mie )
+
+	PORT_START("TILT")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Push")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Pull")
+	PORT_BIT( 0x73ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	// NOTE: needs to be calibrated in volume settings
+	PORT_START("A0")
+	PORT_BIT( 0xff00, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Handlebar")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A1")
+	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL ) PORT_MINMAX(0x00,0xff00) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Accelerator")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A2")
+	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff00) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Front Brake")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A3")
+	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL3 ) PORT_MINMAX(0x00,0xff00) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Rear Brake")
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("MIE.5")
@@ -2997,6 +3137,18 @@ void naomi_state::naomim1_anpanman2(machine_config &config)
 }
 
 /*
+ * Naomi M1 Shootout Pool Prize
+ */
+
+void naomi_state::naomim1_shootpl(machine_config &config)
+{
+	naomim1_hop(config);
+
+	sega_837_13938_device &sega938(SEGA_837_13938(config, "837_13938", "mie"));
+	sega938.set_rotary_tags("R0", "R1", "R2", "R3");
+}
+
+/*
  * Naomi M2 with Keyboard controllers
  */
 
@@ -3100,6 +3252,56 @@ void naomi_state::naomim2_smarinef(machine_config &config)
 	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", "mie"));
 	sega837.set_port_tags("TILT", "P1", "P2", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "OUTPUT");
 	sega837.set_analog_bits(0);
+
+	sega_837_13938_device &sega938(SEGA_837_13938(config, "837_13938", "mie"));
+	sega938.set_rotary_tags("R0", "R1", "R2", "R3");
+}
+
+/*
+ * Naomi M2 Touch de Uno
+ */
+
+void naomi_state::naomim2_tduno(machine_config &config)
+{
+	naomim2(config);
+
+	sega_837_13844_device &sega844(SEGA_837_13844(config, "837_13844", "mie"));
+	sega844.set_lightgun_tags("LX", "LY", "LHIT");
+	sega844.set_lightgun_count(1);
+}
+
+/*
+ * Naomi M1 Touch de Uno 2
+ */
+
+void naomi_state::naomim1_tduno2(machine_config &config)
+{
+	naomim1(config);
+
+	sega_837_13844_device &sega844(SEGA_837_13844(config, "837_13844", "mie"));
+	sega844.set_lightgun_tags("LX", "LY", "LHIT");
+	sega844.set_lightgun_count(1);
+}
+
+/*
+ * Naomi GD Dynamite Golf
+ */
+
+void naomi_state::naomigd_dygolf(machine_config &config)
+{
+	naomigd(config);
+
+	sega_837_13938_device &sega938(SEGA_837_13938(config, "837_13938", "mie"));
+	sega938.set_rotary_tags("R0", "R1", "R2", "R3");
+}
+
+/*
+ * Naomi M2 Dynamite Golf prototype
+ */
+
+void naomi_state::naomim2_dygolfp(machine_config &config)
+{
+	naomim2(config);
 
 	sega_837_13938_device &sega938(SEGA_837_13938(config, "837_13938", "mie"));
 	sega938.set_rotary_tags("R0", "R1", "R2", "R3");
@@ -4914,7 +5116,8 @@ ROM_START( ntvmys )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x9800000, "rom_board", ROMREGION_ERASEFF )
+	// NOTE: would crash in service mode (sh34_base_device::sh4_dma_ddt) if we don't extend the range
+	ROM_REGION( 0x10000000, "rom_board", ROMREGION_ERASEFF )
 	ROM_LOAD( "epr-23419a.ic22", 0x000000, 0x200000, CRC(8639d1e5) SHA1(bdc062c3ccf4282f9d7dc2ba07e3b52befb955a4) )
 	ROM_RELOAD(                  0x200000, 0x200000 )
 	ROM_LOAD( "rom1.ic1s",    0x0800000, 0x800000, CRC(5f11a3ec) SHA1(2a0059ed852b3d70ec3ddf4e9800b7ce90225a69) )
@@ -7917,6 +8120,8 @@ ROM_END
 
 ROM_START( kick4csh )
 	NAOMI_BIOS
+	ROM_DEFAULT_BIOS("bios8")
+	// TODO: needs 1p set
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0x9000000, "rom_board", ROMREGION_ERASEFF)
@@ -11482,7 +11687,7 @@ void naomi_state::init_hotd2()
 /* 0004    */ GAME( 1999, ringout,   naomi,    naomim2_ringout, ringout,   naomi_state, init_naomi,   ROT0, "Sega", "Ring Out 4x4 (Rev A)", GAME_FLAGS )
 /* 0005    */ GAME( 1999, alpilotj,  naomi,    naomim2, alpilota,naomi_state, init_naomi,   ROT0, "Sega", "Airline Pilots (Japan, Rev A)", GAME_FLAGS ) // have "Japan Airlines" (JAL) logos and texts on airplanes, deluxe/multiboard setup uses specific BIOS "airlbios"
 /* 0007    */ GAME( 1999, ggram2,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Giant Gram: All Japan Pro Wrestling 2 (Japan)", GAME_FLAGS )
-/* 0008    */ GAME( 1999, tduno,     naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Touch de Uno! / Unou Nouryoku Check Machine (Japan)", GAME_FLAGS )
+/* 0008    */ GAME( 1999, tduno,     naomi,    naomim2_tduno, tduno,   naomi_state, init_naomi,   ROT0, "Sega", "Touch de Uno! / Unou Nouryoku Check Machine (Japan)", GAME_FLAGS )
 /* 0010    */ GAME( 1999, vs2_2ko,   vs2_2k,   naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua Striker 2 Ver. 2000", GAME_FLAGS ) // revision is not known, might be Rev A or B instead of no Rev
 /* 0010    */ GAME( 1999, vs2_2k,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua Striker 2 Ver. 2000 (Rev C)", GAME_FLAGS )
 /* 0011    */ GAME( 1999, toyfight,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega / Anchor Inc.", "Toy Fighter", GAME_FLAGS )
@@ -11500,7 +11705,7 @@ void naomi_state::init_hotd2()
 /* none    */ GAME( 1999, virnbapa,  virnba,   naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua NBA (prototype, 15.11)", GAME_FLAGS )
 /* 0021    */ GAME( 2000, virnbao,   virnba,   naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua NBA", GAME_FLAGS )
 /* 0021-01 */ GAME( 2000, virnba,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua NBA (USA)", GAME_FLAGS )
-/* 0022    */ GAME( 2000, tduno2,    naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Touch de Uno! 2 (Japan)", GAME_FLAGS )
+/* 0022    */ GAME( 2000, tduno2,    naomi,    naomim1_tduno2, tduno,   naomi_state, init_naomi,   ROT0, "Sega", "Touch de Uno! 2 (Japan)", GAME_FLAGS )
 /* 0023    */ GAME( 2000, 18wheelro, 18wheelr, naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler: American Pro Trucker (deluxe)", GAME_FLAGS )
 /* 0023    */ GAME( 2000, 18wheelr,  naomi,    naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler: American Pro Trucker (deluxe, Rev A)", GAME_FLAGS )
 /* 0023    */ GAME( 2000, 18wheelrt, 18wheelr, naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler: American Pro Trucker (deluxe, Rev T)", GAME_FLAGS )
@@ -11516,7 +11721,7 @@ void naomi_state::init_hotd2()
 /* 0035    */ GAME( 2000, sstrkfgta, sstrkfgt, naomim2, sstrkfgt,naomi_state, init_naomi,   ROT0, "Sega", "Sega Strike Fighter (Rev A, no training mode)", GAME_FLAGS )
 /* 0036    */ GAME( 2000, 18wheels,  18wheelr, naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler: American Pro Trucker (standard)", GAME_FLAGS )
 /* 0037    */ GAME( 2000, 18wheelu,  18wheelr, naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler: American Pro Trucker (upright)", GAME_FLAGS )
-/* 0038    */ GAME( 2000, ntvmys,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega / NTV", "Nittere Shiki! Mirai Yosou Studio / NTV Future Forecast Studio (Japan, Rev A)", GAME_FLAGS) // 日テレ式未来予想スタジオ
+/* 0038    */ GAME( 2000, ntvmys,    naomi,    naomim2_tduno, tduno,   naomi_state, init_naomi,   ROT0, "Sega / NTV", "Nittere Shiki! Mirai Yosou Studio / NTV Future Forecast Studio (Japan, Rev A)", GAME_FLAGS) // 日テレ式未来予想スタジオ
 /* 0039    */ GAME( 2000, gram2000,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Giant Gram 2000", GAME_FLAGS )
 /* 0040    */ GAME( 2000, wwfroyal,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "WWF Royal Rumble", GAME_FLAGS )
 /* 0041    */ GAME( 2000, slasho,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Slashout", GAME_FLAGS )
@@ -11559,7 +11764,7 @@ void naomi_state::init_hotd2()
 /* 0122    */ GAME( 2003, shorsepl,  shorsep,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress (live, Rev A)", GAME_FLAGS )
 /* 0123    */ GAME( 2003, shorsep,   naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT270,"Sega", "Star Horse Progress (satellite, Rev A)", GAME_FLAGS )
 /* 0126    */ GAME( 2003, oinori,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Oinori-daimyoujin Matsuri", GAME_FLAGS )
-/* 0128    */ GAME( 2003, shootpl,   naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Shootout Pool Prize (Export) / Shootout Pool The Medal (Japan, Rev A)", GAME_FLAGS )
+/* 0128    */ GAME( 2003, shootpl,   naomi,    naomim1_shootpl, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Shootout Pool Prize (Export) / Shootout Pool The Medal (Japan, Rev A)", GAME_FLAGS )
 /* 0130    */ GAME( 2002, hopper,    naomi,    naomi,   naomi,   naomi_state, init_naomi,   ROT0, "Sega", "SWP Hopper Board", GAME_FLAGS )
 /* 0132    */ GAME( 2003, mushi2k3,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2003 Second (Japan)", GAME_FLAGS )
 /* 0136    */ GAME( 2004, shootplm,  naomi,    naomim1_hop, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Shootout Pool Prize (Export) / Shootout Pool The Medal (Japan) Version B", GAME_FLAGS ) // Build: 23 Jan 2004
@@ -11599,12 +11804,12 @@ void naomi_state::init_hotd2()
 // 0xxx Star Horse 2002 (whole set)
 
 /* Cartridge prototypes of games released on GD-ROM */
-/* none */ GAME( 2001, dygolfp,   dygolf,   naomim2, naomi, naomi_state, init_naomi, ROT0, "Sega", "Virtua Golf / Dynamic Golf (prototype)", GAME_FLAGS )
+/* none */ GAME( 2001, dygolfp,   dygolf,   naomim2_dygolfp, dygolf, naomi_state, init_naomi, ROT0, "Sega", "Virtua Golf / Dynamic Golf (prototype)", GAME_FLAGS )
 /* none */ GAME( 2003, puyofevp,  puyofev,  naomim1, naomi, naomi_state, init_naomi, ROT0, "Sega", "Puyo Puyo Fever (prototype ver 0.01)", GAME_FLAGS )
 /* none */ GAME( 2001, vathletep, vathlete, naomim2, naomi, naomi_state, init_naomi, ROT0, "Sega", "Virtua Athletics / Virtua Athlete (prototype)", GAME_FLAGS )
 
 /* 840-xxxxx (Sega Naomi 2 cart games) */
-/* 0046 */ GAME( 2001, wldrider, naomi2,  naomi2m2, naomi, naomi2_state, init_naomi2,   ROT0, "Wow Entertainment / Sega", "Wild Riders", GAME_FLAGS )
+/* 0046 */ GAME( 2001, wldrider, naomi2,  naomi2m2, wldrider, naomi2_state, init_naomi2,   ROT0, "Wow Entertainment / Sega", "Wild Riders", GAME_FLAGS )
 /* 0061 */ GAME( 2001, vstrik3co,vstrik3c,naomi2m2, naomi, naomi2_state, init_naomi2,   ROT0, "Amusement Vision / Sega",  "Virtua Striker 3 (World)", GAME_FLAGS ) // not for Japan
 /* 0061 */ GAME( 2001, vstrik3c, naomi2,  naomi2m2, naomi, naomi2_state, init_naomi2,   ROT0, "Amusement Vision / Sega",  "Virtua Striker 3 (World, Rev B)", GAME_FLAGS ) // not for Japan
 /* 0062 */ GAME( 2001, clubkrto, clubkrt, naomi2m2, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart: European Session", GAME_FLAGS )
@@ -11614,7 +11819,7 @@ void naomi_state::init_hotd2()
 /* 0080 */ GAME( 2002, vf4cart,  naomi2,  naomi2m2, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Virtua Fighter 4 (World)", GAME_FLAGS ) // not for Japan
 /* none */ GAME( 2002, kingrt66p,kingrt66,naomi2m2, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "The King of Route 66 (prototype)", GAME_FLAGS )
 /* 0087 */ GAME( 2002, kingrt66, naomi2,  naomi2m2, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "The King of Route 66 (Rev A)", GAME_FLAGS )
-/* 0095 */ GAME( 2002, soulsurf, naomi2,  naomi2m2, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Soul Surfer (Rev A)", GAME_FLAGS )
+/* 0095 */ GAME( 2002, soulsurf, naomi2,  naomi2m2, soulsurf, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Soul Surfer (Rev A)", GAME_FLAGS )
 /* 0106 */ GAME( 2002, vf4evoct, naomi2,  naomi2m1, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Virtua Fighter 4: Evolution (World)", GAME_FLAGS ) // not for Japan
 /* 0129 */ GAME( 2003, clubkprz, naomi2,  naomi2m1, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart Prize (Export, Japan, Rev A)", GAME_FLAGS )
 /* 0137 */ GAME( 2004, clubkpzb, naomi2,  naomi2m1, naomi, naomi2_state, init_naomi2,   ROT0, "Sega",                     "Club Kart Prize Version B (Export, Japan)", GAME_FLAGS )
@@ -11695,7 +11900,7 @@ void naomi_state::init_hotd2()
 // 0007
 /* 0008  */ GAME( 2001, monkeyba, naomigd, naomigd,  monkeyba,naomi_state, init_naomigd, ROT0, "Sega", "Monkey Ball (GDS-0008)", GAME_FLAGS )
 // 0009  Dynamic Golf / Virtua Golf (GDS-0009)
-/* 0009A */ GAME( 2001, dygolf,   naomigd, naomigd,  naomi,   naomi_state, init_naomigd, ROT0, "Sega", "Virtua Golf / Dynamic Golf (Rev A) (GDS-0009A)", GAME_FLAGS )
+/* 0009A */ GAME( 2001, dygolf,   naomigd, naomigd_dygolf,  dygolf,   naomi_state, init_naomigd, ROT0, "Sega", "Virtua Golf / Dynamic Golf (Rev A) (GDS-0009A)", GAME_FLAGS )
 /* 0010  */ GAME( 2001, wsbbgd,   naomigd, naomigd,  dybbnao, naomi_state, init_naomigd, ROT0, "Sega", "World Series Baseball / Super Major League (GDS-0010)", GAME_FLAGS )
 /* 0011  */ GAME( 2001, vtennisg, naomigd, naomigd,  naomi,   naomi_state, init_naomigd, ROT0, "Sega", "Virtua Tennis / Power Smash (GDS-0011)", GAME_FLAGS )
 /* 0012  */ GAME( 2001, vf4o,     vf4,     naomi2gd, naomi,   naomi2_state, init_naomi2,  ROT0, "Sega", "Virtua Fighter 4 (GDS-0012)", GAME_FLAGS )

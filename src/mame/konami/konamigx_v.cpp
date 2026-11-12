@@ -469,7 +469,9 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		}
 	}
 
-	const u32 start_addr = m_type3_spriteram_bank ? 0x800 : 0;
+	// The sets with the ESC double-buffer the sprite list as well as Type 3
+	const bool alt_bank = m_type3_spriteram_bank || (m_type2_spritebank_enable && BIT(m_gx_wrport1_0, 6));
+	const u32 start_addr = alt_bank ? 0x800 : 0;
 
 	for (int x = 0; x < 256; ++x)
 	{

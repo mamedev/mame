@@ -168,10 +168,12 @@ public:
 
 	// function registration
 	void register_presave(save_prepost_delegate func);
+	void register_preload(save_prepost_delegate func);
 	void register_postload(save_prepost_delegate func);
 
 	// callback dispatching
 	void dispatch_presave();
+	void dispatch_preload();
 	void dispatch_postload();
 
 	// generic memory registration
@@ -340,6 +342,7 @@ private:
 	std::vector<std::unique_ptr<state_entry>>    m_entry_list;       // list of registered entries
 	std::vector<std::unique_ptr<ram_state>>      m_ramstate_list;    // list of ram states
 	std::vector<std::unique_ptr<state_callback>> m_presave_list;     // list of pre-save functions
+	std::vector<std::unique_ptr<state_callback>> m_preload_list;     // list of pre-load functions
 	std::vector<std::unique_ptr<state_callback>> m_postload_list;    // list of post-load functions
 };
 

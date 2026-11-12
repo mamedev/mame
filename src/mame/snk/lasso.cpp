@@ -82,11 +82,11 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
-	void base(machine_config &config);
-	void wwjgtin(machine_config &config);
-	void lasso(machine_config &config);
-	void chameleo(machine_config &config);
-	void pinbo(machine_config &config);
+	void base(machine_config &config) ATTR_COLD;
+	void wwjgtin(machine_config &config) ATTR_COLD;
+	void lasso(machine_config &config) ATTR_COLD;
+	void chameleo(machine_config &config) ATTR_COLD;
+	void pinbo(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
@@ -131,9 +131,9 @@ private:
 	TILE_GET_INFO_MEMBER(lasso_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wwjgtin_get_track_tile_info);
 	TILE_GET_INFO_MEMBER(pinbo_get_bg_tile_info);
-	void lasso_palette(palette_device &palette) const;
+	void lasso_palette(palette_device &palette) const ATTR_COLD;
 	DECLARE_VIDEO_START(wwjgtin);
-	void wwjgtin_palette(palette_device &palette) const;
+	void wwjgtin_palette(palette_device &palette) const ATTR_COLD;
 	DECLARE_VIDEO_START(pinbo);
 	uint32_t screen_update_lasso(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_chameleo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

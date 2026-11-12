@@ -244,6 +244,8 @@ uint8_t z180asci_channel_base::rdr_r()
 			m_fifo_rd = (m_fifo_rd + 1) & 3;
 			if (m_fifo_rd == m_fifo_wr) // empty
 				m_asci_stat &= ~Z180_STAT_RDRF;
+			else if (m_asci_stat & Z180_STAT_RIE)
+				m_irq = 1;
 		}
 	}
 	return m_asci_rdr;

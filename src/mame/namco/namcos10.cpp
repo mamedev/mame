@@ -1976,7 +1976,7 @@ void namcos10_memn_state::ns10_dicerom(machine_config &config)
 				0xa7409cc4, 0x9ce04a6c, 0x78a4971c, 0xd064ca6c, 0x2a205184, 0x0f80c1b4, 0x5d04072c, 0x66a4d184,
 				0xebc41cc4, 0xce648cf4, 0xb940da5c, 0x82e00cf4, 0x430441b4, 0x1180872c, 0x3420171c, 0xf5c45a5c,
 			};
-			return values[iv];
+			return values[iv & 0x0f];
 		},
 	});
 }
@@ -2261,7 +2261,7 @@ void namcos10_memn_state::ns10_keroro(machine_config &config)
 				0x0000, 0x0602, 0x0302, 0x0101, 0x0203, 0x0802, 0x0603, 0x0303,
 				0x0001, 0x0803, 0x0501, 0x0500, 0x0202, 0x0100, 0x0401, 0x0400,
 			};
-			return values[iv];
+			return values[iv & 0x0f];
 		}
 	});
 }
@@ -2411,7 +2411,7 @@ void namcos10_memn_state::ns10_mrdrilrg(machine_config &config)
 				0x0000, 0x0000, 0x0000, 0x2000, 0x801a, 0x6000, 0x0002, 0x0000,
 				0x0000, 0x0018, 0x0000, 0x0420, 0x0000, 0x8800, 0x0000, 0xc000,
 			};
-			return values[iv];
+			return values[iv & 0x0f];
 		}
 	});
 }
@@ -2506,7 +2506,7 @@ void namcos10_memn_state::ns10_panikuru(machine_config &config)
 				0x0000, 0x020e, 0x0412, 0x0411, 0x0204, 0x001b, 0x0009, 0x0207,
 				0x2040, 0x2440, 0x0012, 0x0001, 0x0614, 0x000a, 0x0214, 0x041b,
 			};
-			return values[iv];
+			return values[iv & 0x0f];
 		}
 	});
 }
@@ -3301,7 +3301,7 @@ void namcos10_memp3_state::ns10_squizchs(machine_config &config)
 				UNKNOWN, 0x9000,  0x9101,  UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
 				UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
 			};
-			return values[iv];
+			return values[iv & 0x0f];
 		}
 	});
 }

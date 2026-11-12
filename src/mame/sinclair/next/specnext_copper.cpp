@@ -160,6 +160,7 @@ std::unique_ptr<util::disasm_interface> specnext_copper_device::create_disassemb
 
 void specnext_copper_device::device_start()
 {
+	memset(m_listram, 0, 0x400 * 2);
 	m_timer = timer_alloc(FUNC(specnext_copper_device::timer_callback), this);
 	m_frame_timer = timer_alloc(FUNC(specnext_copper_device::frame_timer_callback), this);
 
@@ -175,7 +176,6 @@ void specnext_copper_device::device_reset()
 {
 	m_timer->reset();
 	m_frame_timer->reset();
-	memset(m_listram, 0, sizeof(m_listram));
 
 	m_copper_en = 0b00;
 	m_copper_list_addr = 0x0000;

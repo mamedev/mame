@@ -108,7 +108,7 @@ void powervr2_device::ta_map(address_map &map)
 	map(0x0130, 0x0133).rw(FUNC(powervr2_device::ta_isp_limit_r), FUNC(powervr2_device::ta_isp_limit_w));
 	map(0x0134, 0x0137).r(FUNC(powervr2_device::ta_next_opb_r));
 	map(0x0138, 0x013b).r(FUNC(powervr2_device::ta_itp_current_r));
-// 13c = ta_glob_tile_clip
+	map(0x013c, 0x013f).rw(FUNC(powervr2_device::ta_glob_tile_clip_r), FUNC(powervr2_device::ta_glob_tile_clip_w));
 	map(0x0140, 0x0143).rw(FUNC(powervr2_device::ta_alloc_ctrl_r), FUNC(powervr2_device::ta_alloc_ctrl_w));
 	map(0x0144, 0x0147).rw(FUNC(powervr2_device::ta_list_init_r), FUNC(powervr2_device::ta_list_init_w));
 	map(0x0148, 0x014b).rw(FUNC(powervr2_device::ta_yuv_tex_base_r), FUNC(powervr2_device::ta_yuv_tex_base_w));
@@ -121,6 +121,7 @@ void powervr2_device::ta_map(address_map &map)
 	map(0x1000, 0x1fff).rw(FUNC(powervr2_device::palette_r), FUNC(powervr2_device::palette_w));
 }
 
+// TODO: this stuff belongs to the System Bus block, not here.
 void powervr2_device::pd_dma_map(address_map &map)
 {
 	map(0x00, 0x03).rw(FUNC(powervr2_device::sb_pdstap_r), FUNC(powervr2_device::sb_pdstap_w));
@@ -980,16 +981,17 @@ void powervr2_device::softreset_w(offs_t offset, uint32_t data, uint32_t mem_mas
 	COMBINE_DATA(&softreset);
 	if (softreset & 1) {
 		LOGTACMD("TA soft reset\n");
-		listtype_used=0;
+		listtype_used = 0;
 	}
 	if (softreset & 2) {
 		LOGTACMD("Core Pipeline soft reset\n");
 
 		if (start_render_received == 1) {
 			wait_for_render();
-			for (int a=0;a < NUM_BUFFERS;a++)
+			for (int a = 0; a < NUM_BUFFERS; a++) {
 				if (grab[a].busy == 1)
 					grab[a].busy = 0;
+			}
 
 			start_render_received = 0;
 		}
@@ -1009,12 +1011,11 @@ void powervr2_device::startrender_w(address_space &space, uint32_t data)
 	wait_for_render();
 
 	// select buffer to draw using param_base
-	for (int a=0;a < NUM_BUFFERS;a++) {
+	for (int a = 0; a < NUM_BUFFERS; a++) {
 		if ((grab[a].ispbase == param_base) && (grab[a].valid == 1) && (grab[a].busy == 0)) {
 			grab[a].busy = 1;
 			renderselect = a;
-			start_render_received=1;
-
+			start_render_received = 1;
 
 			grab[a].fbwsof1 = fb_w_sof1;
 			grab[a].fbwsof2 = fb_w_sof2;
@@ -1024,16 +1025,17 @@ void powervr2_device::startrender_w(address_space &space, uint32_t data)
 			m_render.fb_r_ctrl = fb_r_ctrl;
 			m_render.fb_w_sof1 = fb_w_sof1;
 			m_render.fb_w_linestride = fb_w_linestride;
-			// TODO: read ISP/TSP command from isp_background_t instead of assuming Gourad-shaded
-			// full-screen polygon.
-			m_render.background = space.read_dword(m_framebuffer_base+(param_base&0xf00000)+((isp_backgnd_t&0xfffff8)>>1)+(3+3)*4);
+			// TODO: can go out of bounds reading the framebuffer space
+			// Old note (outdated?): read ISP/TSP command from isp_backgnd_t instead of always
+			// assuming Gouraud shaded full-screen polygon.
+			m_render.background = space.read_dword(m_framebuffer_base + (param_base & 0xf00000) + ((isp_backgnd_t & 0xfffff8) >> 1) + (3 + 3) * 4);
 			m_render.debug_dip_status = debug_dip_status;
 			std::copy(std::begin(palette), std::end(palette), std::begin(m_render.palette));
 			m_render.tiles.clear();
 
 			/* collect the tiles to copy to the framebuffer once the render is done (really the rendering should be per tile too) */
 			int sizera = fpu_param_cfg & 0x200000 ? 6 : 5;
-			int offsetra=region_base;
+			int offsetra = region_base;
 
 			//printf("base is %08x\n", offsetra);
 
@@ -1042,28 +1044,30 @@ void powervr2_device::startrender_w(address_space &space, uint32_t data)
 			for (;;) {
 				uint32_t st[6];
 
-				st[0]=space.read_dword((m_framebuffer_base+0x00+offsetra));
-				st[1]=space.read_dword((m_framebuffer_base+0x04+offsetra)); // Opaque List Pointer
-				st[2]=space.read_dword((m_framebuffer_base+0x08+offsetra)); // Opaque Modifier Volume List Pointer
-				st[3]=space.read_dword((m_framebuffer_base+0x0c+offsetra)); // Translucent List Pointer
-				st[4]=space.read_dword((m_framebuffer_base+0x10+offsetra)); // Translucent Modifier Volume List Pointer
+				st[0] = space.read_dword((m_framebuffer_base + 0x00 + offsetra));
+				st[1] = space.read_dword((m_framebuffer_base + 0x04 + offsetra)); // Opaque List Pointer
+				st[2] = space.read_dword((m_framebuffer_base + 0x08 + offsetra)); // Opaque Modifier Volume List Pointer
+				st[3] = space.read_dword((m_framebuffer_base + 0x0c + offsetra)); // Translucent List Pointer
+				st[4] = space.read_dword((m_framebuffer_base + 0x10 + offsetra)); // Translucent Modifier Volume List Pointer
 
 				if (sizera == 6) {
-					st[5] = space.read_dword((m_framebuffer_base+0x14+offsetra)); // Punch Through List Pointer
-					offsetra+=0x18;
+					st[5] = space.read_dword((m_framebuffer_base + 0x14 + offsetra)); // Punch Through List Pointer
+					offsetra += 0x18;
 				} else  {
 					st[5] = 0;
-					offsetra+=0x14;
+					offsetra += 0x14;
 				}
 
 				{
-					int x = ((st[0]&0x000000fc)>>2)*32;
-					int y = ((st[0]&0x00003f00)>>8)*32;
+					int x = ((st[0] & 0x000000fc) >> 2) * 32;
+					int y = ((st[0] & 0x00003f00) >> 8) * 32;
+
 					//printf("tiledata %08x %d %d - %08x %08x %08x %08x %08x\n",st[0],x,y,st[1],st[2],st[3],st[4],st[5]);
 
+					// HACK: following causes issues when attempting to user tile clip at very least
 					// should render to the accumulation buffer here using pointers we filled in when processing the data
 					// sent to the TA.  HOWEVER, we don't process the TA data and create the real format object lists, so
-					// instead just use these co-ordinates to copy data from our fake full-screnen accumnulation buffer into
+					// instead just use these co-ordinates to copy data from our fake full-screen accumulation buffer into
 					// the framebuffer
 
 					m_render.tiles.push_back((y << 16) | x);
@@ -1104,7 +1108,6 @@ void powervr2_device::startrender_w(address_space &space, uint32_t data)
 			// 500k is definitely too slow for them: it fires the isp/tsp completion at
 			// vbl-in and expect that it completes after some time that vbl-out kicks in,
 			// in order to have enough time to execute logic stuff in the meantime.
-//          const u64 isp_completion = sanitycount * 25 + 500000;
 			const u64 isp_completion = sanitycount * 25 + 2000000;
 			LOGIRQ("[%d] ISP end of render start %d in %d cycles\n",
 				screen().frame_number(), screen().vpos(), isp_completion
@@ -1118,6 +1121,8 @@ void powervr2_device::startrender_w(address_space &space, uint32_t data)
 void *powervr2_device::render_thread_callback(void *param, int threadid)
 {
 	powervr2_device *const pvr = reinterpret_cast<powervr2_device *>(param);
+	// TODO: isn't this supposed to be screen size clipped (to not mention user clipping?)
+	// also note: it's completely ignored by render_group_to_accumulation_buffer class inside
 	const rectangle clip(0, 1023, 0, 1023);
 
 	pvr->render_to_accumulation_buffer(*pvr->fake_accumulationbuffer_bitmap, clip);
@@ -1144,7 +1149,10 @@ void powervr2_device::wait_for_render(bool discard)
 	{
 		for (const uint32_t tile : m_render.tiles)
 		{
-			pvr_accumulationbuffer_to_framebuffer(tile & 0xffff, tile >> 16);
+			const int x = tile & 0xffff;
+			const int y = tile >> 16;
+
+			pvr_accumulationbuffer_to_framebuffer(x, y);
 		}
 	}
 	grab[renderselect].busy = 0;
@@ -1523,9 +1531,9 @@ uint32_t powervr2_device::spg_status_r()
 	// FIXME: following is just a wild guess
 	uint32_t blank = ((screen().vpos() >= spg_vbstart) || (screen().vpos() < spg_vbend) ||
 					(screen().hpos() >= spg_hbstart) || (screen().hpos() < spg_hbend)) ? 0 : 1;
-	if(vo_control & 4) { blank^=1; }
-	if(vo_control & 2) { vsync^=1; }
-	if(vo_control & 1) { hsync^=1; }
+	if(vo_control & 4) { blank ^= 1; }
+	if(vo_control & 2) { vsync ^= 1; }
+	if(vo_control & 1) { hsync ^= 1; }
 
 	return (vsync << 13) | (hsync << 12) | (blank << 11) | (fieldnum << 10) | (screen().vpos() & 0x3ff);
 }
@@ -1581,6 +1589,22 @@ uint32_t powervr2_device::ta_itp_current_r()
 	return ta_itp_current;
 }
 
+uint32_t powervr2_device::ta_glob_tile_clip_r()
+{
+	return ta_glob_tile_clip;
+}
+
+void powervr2_device::ta_glob_tile_clip_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	COMBINE_DATA(&ta_glob_tile_clip);
+	// TODO: 0x000e0013 most often, except transitional 0xfffe'ffff at startup (illegal)
+	logerror("TA_GLOB_TILE_CLIP: %08x (%d x %d)\n",
+		ta_glob_tile_clip,
+		((ta_glob_tile_clip & 0x0000'003f) + 1) * 32,
+		(((ta_glob_tile_clip >> 16) & 0xf) + 1) * 32
+	);
+}
+
 uint32_t powervr2_device::ta_alloc_ctrl_r()
 {
 	return ta_alloc_ctrl;
@@ -1600,10 +1624,10 @@ void powervr2_device::ta_list_init_w(uint32_t data)
 {
 	if(data & 0x80000000) {
 		auto profile = g_profiler.start(PROFILER_USER2);
-		tafifo_pos=0;
-		tafifo_mask=7;
-		tafifo_vertexwords=8;
-		tafifo_listtype= DISPLAY_LIST_NONE;
+		tafifo_pos         = 0;
+		tafifo_mask        = 7;
+		tafifo_vertexwords = 8;
+		tafifo_listtype    = DISPLAY_LIST_NONE;
 
 		LOGTACMD("list init ol=(%08x, %08x) isp=(%08x, %08x), alloc=%08x obp=%08x\n",
 			ta_ol_base, ta_ol_limit,
@@ -1617,10 +1641,10 @@ void powervr2_device::ta_list_init_w(uint32_t data)
 		alloc_ctrl_OPB_Mode = ta_alloc_ctrl & 0x100000; // 0 up 1 down
 		alloc_ctrl_PT_OPB = (4 << ((ta_alloc_ctrl >> 16) & 3)) & 0x38; // number of 32 bit words (0,8,16,32)
 		alloc_ctrl_TM_OPB = (4 << ((ta_alloc_ctrl >> 12) & 3)) & 0x38;
-		alloc_ctrl_T_OPB = (4 << ((ta_alloc_ctrl >> 8) & 3)) & 0x38;
+		alloc_ctrl_T_OPB =  (4 << ((ta_alloc_ctrl >> 8) & 3)) & 0x38;
 		alloc_ctrl_OM_OPB = (4 << ((ta_alloc_ctrl >> 4) & 3)) & 0x38;
-		alloc_ctrl_O_OPB = (4 << ((ta_alloc_ctrl >> 0) & 3)) & 0x38;
-		listtype_used |= (1+4);
+		alloc_ctrl_O_OPB =  (4 << ((ta_alloc_ctrl >> 0) & 3)) & 0x38;
+		listtype_used |= (1 + 4);
 		// the render thread may still be reading the list that is about to be reused
 		if (m_render_request && (grab[renderselect].ispbase == ta_isp_base))
 		{
@@ -1629,41 +1653,44 @@ void powervr2_device::ta_list_init_w(uint32_t data)
 		// use ta_isp_base and select buffer for grab data
 		grabsel = -1;
 		// try to find already used buffer but not busy
-		for (int a=0;a < NUM_BUFFERS;a++)
+		for (int a = 0; a < NUM_BUFFERS; a++)
 			if ((grab[a].ispbase == ta_isp_base) && (grab[a].busy == 0) && (grab[a].valid == 1)) {
-				grabsel=a;
+				grabsel = a;
 				break;
 			}
 
 		// try a buffer not used yet
-		if (grabsel < 0)
-			for (int a=0;a < NUM_BUFFERS;a++)
+		if (grabsel < 0) {
+			for (int a = 0; a < NUM_BUFFERS; a++) {
 				if (grab[a].valid == 0) {
-					grabsel=a;
+					grabsel = a;
 					break;
 				}
+			}
+		}
 
 		// find a non busy buffer starting from the last one used
 		if (grabsel < 0)
 		{
 			// any buffer can be picked from here on, including the one being rendered
 			wait_for_render();
-			for (int a=0;a < 3;a++)
-				if (grab[(grabsellast+1+a) & 3].busy == 0) {
-					grabsel=(grabsellast+1+a) & 3;
+			for (int a = 0; a < 3; a++) {
+				if (grab[(grabsellast + 1 + a) & 3].busy == 0) {
+					grabsel = (grabsellast + 1 + a) & 3;
 					break;
 				}
+			}
 		}
 
 		if (grabsel < 0)
 			throw emu_fatalerror("powervr2_device::ta_list_init_w: TA grabber error B!");
-		grabsellast=grabsel;
-		grab[grabsel].ispbase=ta_isp_base;
-		grab[grabsel].busy=0;
-		grab[grabsel].valid=1;
-		grab[grabsel].verts_size=0;
+		grabsellast = grabsel;
+		grab[grabsel].ispbase    = ta_isp_base;
+		grab[grabsel].busy       = 0;
+		grab[grabsel].valid      = 1;
+		grab[grabsel].verts_size = 0;
 		for (int group = 0; group < DISPLAY_LIST_COUNT; group++) {
-			grab[grabsel].groups[group].strips_size=0;
+			grab[grabsel].groups[group].strips_size = 0;
 		}
 	}
 }
@@ -1694,9 +1721,9 @@ void powervr2_device::ta_yuv_tex_ctrl_w(offs_t offset, uint32_t data, uint32_t m
 	COMBINE_DATA(&ta_yuv_tex_ctrl);
 
 	ta_yuv_v_size = (((ta_yuv_tex_ctrl >> 8) & 0x3f) + 1) * 16;
-	ta_yuv_u_size = ((ta_yuv_tex_ctrl & 0x3f) + 1) * 16;
+	ta_yuv_u_size = (( ta_yuv_tex_ctrl       & 0x3f) + 1) * 16;
 
-	if (ta_yuv_tex_ctrl & 0x01010000)
+	if (ta_yuv_tex_ctrl & 0x0101'0000)
 		throw emu_fatalerror("YUV422 mode selected %08x", ta_yuv_tex_ctrl);
 }
 
@@ -1710,8 +1737,8 @@ uint32_t powervr2_device::ta_yuv_tex_cnt_r()
 
 void powervr2_device::ta_list_cont_w(uint32_t data)
 {
-	if(data & 0x80000000) {
-		tafifo_listtype= DISPLAY_LIST_NONE; // no list being received
+	if(data & 0x8000'0000) {
+		tafifo_listtype = DISPLAY_LIST_NONE; // no list being received
 		listtype_used |= (1+4);
 	}
 }
@@ -1772,9 +1799,9 @@ void powervr2_device::update_screen_format()
 
 	// Sanitize
 	if(visarea.max_x >= spg_hsize)
-		visarea.max_x = spg_hsize-1;
+		visarea.max_x = spg_hsize - 1;
 	if(visarea.max_y >= spg_vsize)
-		visarea.max_y = spg_vsize-1;
+		visarea.max_y = spg_vsize - 1;
 	if(visarea.min_x > visarea.max_x)
 		visarea.min_x = visarea.max_x;
 	if(visarea.min_y > visarea.max_y)
@@ -1942,26 +1969,26 @@ void powervr2_device::process_ta_fifo()
 	// 5 sprite
 	// 6 reserved
 	// 7 vertex
-	paratype=(paracontrol >> 5) & 7;
-	endofstrip=(paracontrol >> 4) & 1;
-	listtype=(paracontrol >> 0) & 7;
+	paratype   = (paracontrol >> 5) & 7;
+	endofstrip = (paracontrol >> 4) & 1;
+	listtype   = (paracontrol >> 0) & 7;
 	if ((paratype >= 4) && (paratype <= 6))
 	{
 		global_paratype = paratype;
 		// Group Control
-		groupcontrol=(tafifo_buff[0] >> 16) & 0xff;
-		groupen=(groupcontrol >> 7) & 1;
-		striplen=(groupcontrol >> 2) & 3;
-		userclip=(groupcontrol >> 0) & 3;
+		groupcontrol   = (tafifo_buff[0] >> 16) & 0xff;
+		groupen        = (groupcontrol >> 7) & 1;
+		striplen       = (groupcontrol >> 2) & 3;
+		user_tile_mode = (groupcontrol >> 0) & 3;
 		// Obj Control
-		objcontrol=(tafifo_buff[0] >> 0) & 0xffff;
-		shadow=(objcontrol >> 7) & 1;
-		volume=(objcontrol >> 6) & 1;
-		coltype=(objcontrol >> 4) & 3;
-		texture=(objcontrol >> 3) & 1;
-		offset_color_enable=texture ? (objcontrol >> 2) & 1 : 0;
-		gouraud=(objcontrol >> 1) & 1;
-		uv16bit=(objcontrol >> 0) & 1;
+		objcontrol     = (tafifo_buff[0] >> 0) & 0xffff;
+		shadow         = (objcontrol >> 7) & 1;
+		volume         = (objcontrol >> 6) & 1;
+		coltype        = (objcontrol >> 4) & 3;
+		texture        = (objcontrol >> 3) & 1;
+		offset_color_enable = texture ? (objcontrol >> 2) & 1 : 0;
+		gouraud        = (objcontrol >> 1) & 1;
+		uv16bit        = (objcontrol >> 0) & 1;
 	}
 
 	// check if we need 8 words more
@@ -1985,7 +2012,7 @@ void powervr2_device::process_ta_fifo()
 			}
 		}
 		// decide number of words when not a vertex
-		tafifo_vertexwords=pvr_wordsvertex[parameterconfig];
+		tafifo_vertexwords = pvr_wordsvertex[parameterconfig];
 		if ((paratype == 4) && ((listtype != 1) && (listtype != 3)))
 			if (pvr_wordspolygon[parameterconfig] == 16)
 			{
@@ -2043,7 +2070,7 @@ void powervr2_device::process_ta_fifo()
 
 		/* Process transfer FIFO done irqs here */
 		//printf("%d %d\n",tafifo_listtype,screen().vpos());
-		// FIXME: timing of these
+		// FIXME: timing of these, and narrow to one common timer anyway.
 		switch (tafifo_listtype)
 		{
 			case DISPLAY_LIST_OPAQUE:
@@ -2063,12 +2090,20 @@ void powervr2_device::process_ta_fifo()
 				break;
 		}
 		tafifo_listtype = DISPLAY_LIST_NONE; // no list being received
-		listtype_used |= (2+8);
+		listtype_used |= (2 + 8);
 	}
 	else if (paratype == 1)
 	{
 		LOGTATILE("Para Type 1 User Tile Clip\n");
-		LOGTATILE(" (%d , %d)-(%d , %d)\n", tafifo_buff[4], tafifo_buff[5], tafifo_buff[6], tafifo_buff[7]);
+
+		user_tile_clip.set(
+			(tafifo_buff[4] & 0x3f) * 32,
+			((tafifo_buff[6] & 0x3f) + 1) * 32,
+			(tafifo_buff[5] & 0xf) * 32,
+			((tafifo_buff[7] & 0xf) + 1) * 32
+		);
+		// TODO: make cliprect to actually have a printable version on its own
+		LOGTATILE("(%d , %d) - (%d , %d)\n", user_tile_clip.left(), user_tile_clip.right(), user_tile_clip.top(), user_tile_clip.bottom());
 	}
 	else if (paratype == 2)
 	{
@@ -2100,40 +2135,40 @@ void powervr2_device::process_ta_fifo()
 
 		if ((paratype == 4) || (paratype == 5))
 		{ // quad or polygon
-			depthcomparemode=(tafifo_buff[1] >> 29) & 7;
-			cullingmode=(tafifo_buff[1] >> 27) & 3;
-			zwritedisable=(tafifo_buff[1] >> 26) & 1;
-			cachebypass=(tafifo_buff[1] >> 21) & 1;
-			dcalcctrl=(tafifo_buff[1] >> 20) & 1;
-			volumeinstruction=(tafifo_buff[1] >> 29) & 7;
+			depthcomparemode = (tafifo_buff[1] >> 29) & 7;
+			cullingmode      = (tafifo_buff[1] >> 27) & 3;
+			zwritedisable    = (tafifo_buff[1] >> 26) & 1;
+			cachebypass      = (tafifo_buff[1] >> 21) & 1;
+			dcalcctrl        = (tafifo_buff[1] >> 20) & 1;
+			volumeinstruction= (tafifo_buff[1] >> 29) & 7;
 
 			//textureusize=1 << (3+((tafifo_buff[2] >> 3) & 7));
 			//texturevsize=1 << (3+(tafifo_buff[2] & 7));
-			texturesizes=tafifo_buff[2] & 0x3f;
-			blend_mode = tafifo_buff[2] >> 26;
-			srcselect=(tafifo_buff[2] >> 25) & 1;
-			dstselect=(tafifo_buff[2] >> 24) & 1;
-			fogcontrol=(tafifo_buff[2] >> 22) & 3;
-			colorclamp=(tafifo_buff[2] >> 21) & 1;
-			use_alpha = (tafifo_buff[2] >> 20) & 1;
-			ignoretexalpha=(tafifo_buff[2] >> 19) & 1;
-			flipuv=(tafifo_buff[2] >> 17) & 3;
-			clampuv=(tafifo_buff[2] >> 15) & 3;
-			filtermode=(tafifo_buff[2] >> 13) & 3;
-			sstexture=(tafifo_buff[2] >> 12) & 1;
-			mmdadjust=(tafifo_buff[2] >> 8) & 1;
-			tsinstruction=(tafifo_buff[2] >> 6) & 3;
+			texturesizes   = tafifo_buff[2] & 0x3f;
+			blend_mode     = tafifo_buff[2] >> 26;
+			srcselect      = (tafifo_buff[2] >> 25) & 1;
+			dstselect      = (tafifo_buff[2] >> 24) & 1;
+			fogcontrol     = (tafifo_buff[2] >> 22) & 3;
+			colorclamp     = (tafifo_buff[2] >> 21) & 1;
+			use_alpha      = (tafifo_buff[2] >> 20) & 1;
+			ignoretexalpha = (tafifo_buff[2] >> 19) & 1;
+			flipuv         = (tafifo_buff[2] >> 17) & 3;
+			clampuv        = (tafifo_buff[2] >> 15) & 3;
+			filtermode     = (tafifo_buff[2] >> 13) & 3;
+			sstexture      = (tafifo_buff[2] >> 12) & 1;
+			mmdadjust      = (tafifo_buff[2] >> 8) & 1;
+			tsinstruction  = (tafifo_buff[2] >> 6) & 3;
 			if (texture == 1)
 			{
-				textureaddress=(tafifo_buff[3] & 0x1FFFFF) << 3;
-				scanorder=(tafifo_buff[3] >> 26) & 1;
-				pixelformat=(tafifo_buff[3] >> 27) & 7;
-				mipmapped=(tafifo_buff[3] >> 31) & 1;
-				vqcompressed=(tafifo_buff[3] >> 30) & 1;
-				strideselect=(tafifo_buff[3] >> 25) & 1;
-				paletteselector=(tafifo_buff[3] >> 21) & 0x3F;
+				textureaddress  = (tafifo_buff[3] & 0x1f'ffff) << 3;
+				scanorder       = (tafifo_buff[3] >> 26) & 1;
+				pixelformat     = (tafifo_buff[3] >> 27) & 7;
+				mipmapped       = (tafifo_buff[3] >> 31) & 1;
+				vqcompressed    = (tafifo_buff[3] >> 30) & 1;
+				strideselect    = (tafifo_buff[3] >> 25) & 1;
+				paletteselector = (tafifo_buff[3] >> 21) & 0x3F;
 
-				LOGTATILE(" Texture at %08x format %d\n", (tafifo_buff[3] & 0x1FFFFF) << 3, pixelformat);
+				LOGTATILE(" Texture at %08x format %d\n", (tafifo_buff[3] & 0x1f'ffff) << 3, pixelformat);
 			}
 			if (use_alpha == 0)
 			{
@@ -2196,7 +2231,7 @@ void powervr2_device::process_ta_fifo()
 					tv[3].w = u2f(tafifo_buff[0x9]);
 					tv[2].x = u2f(tafifo_buff[0xa]);
 					tv[2].y = u2f(tafifo_buff[0xb]);
-					tv[2].w = tv[0].w+tv[3].w-tv[1].w;
+					tv[2].w = tv[0].w + tv[3].w - tv[1].w;
 
 					if (texture == 1)
 					{
@@ -2289,11 +2324,11 @@ void powervr2_device::process_ta_fifo()
 					/* -- this is also wildly inaccurate! */
 					vert *tv = &rd->verts[rd->verts_size];
 
-					tv->x=u2f(tafifo_buff[1]);
-					tv->y=u2f(tafifo_buff[2]);
-					tv->w=u2f(tafifo_buff[3]);
-					tv->u=u2f(tafifo_buff[4]);
-					tv->v=u2f(tafifo_buff[5]);
+					tv->x = u2f(tafifo_buff[1]);
+					tv->y = u2f(tafifo_buff[2]);
+					tv->w = u2f(tafifo_buff[3]);
+					tv->u = u2f(tafifo_buff[4]);
+					tv->v = u2f(tafifo_buff[5]);
 					memcpy(tv->b, vert_base_color, sizeof(tv->b));
 					memcpy(tv->o, vert_offset_color, sizeof(tv->o));
 
@@ -2380,12 +2415,13 @@ void powervr2_device::ta_fifo_yuv_w(uint8_t data)
 				// pitch is given by U size (320 for luptype, 512 for ss2005/kurucham)
 				dst_addr+= ((ta_yuv_v_ptr + y) * ta_yuv_u_size * 2);
 
-				u = yuv_fifo[0x00+(x>>1)+((y>>1)*8)];
-				v = yuv_fifo[0x40+(x>>1)+((y>>1)*8)];
-				y0 = yuv_fifo[0x80+((x&8) ? 0x40 : 0x00)+((y&8) ? 0x80 : 0x00)+(x&6)+((y&7)*8)];
-				y1 = yuv_fifo[0x80+((x&8) ? 0x40 : 0x00)+((y&8) ? 0x80 : 0x00)+(x&6)+((y&7)*8)+1];
+				// TODO: optimize shifting
+				u  = yuv_fifo[0x00 + (x >> 1) + ((y >> 1) * 8)];
+				v  = yuv_fifo[0x40 + (x >> 1) + ((y >> 1) * 8)];
+				y0 = yuv_fifo[0x80 + ((x & 8) ? 0x40 : 0x00) + ((y & 8) ? 0x80 : 0x00) + (x & 6) + ((y & 7) *8)];
+				y1 = yuv_fifo[0x80 + ((x & 8) ? 0x40 : 0x00) + ((y & 8) ? 0x80 : 0x00) + (x & 6) + ((y & 7) *8) + 1];
 
-				*(uint8_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + BYTE8_XOR_LE(dst_addr)) = u;
+				*(uint8_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + BYTE8_XOR_LE(dst_addr))   = u;
 				*(uint8_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + BYTE8_XOR_LE(dst_addr+1)) = y0;
 				*(uint8_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + BYTE8_XOR_LE(dst_addr+2)) = v;
 				*(uint8_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + BYTE8_XOR_LE(dst_addr+3)) = y1;
@@ -2400,14 +2436,16 @@ void powervr2_device::ta_fifo_yuv_w(uint8_t data)
 			if(ta_yuv_v_ptr == ta_yuv_v_size)
 			{
 				ta_yuv_v_ptr = 0;
-				// TODO: actual timings
-				yuv_timer_end->adjust(m_cpu->cycles_to_attotime((ta_yuv_u_size/16)*(ta_yuv_v_size/16)*0x180));
+				// TODO: actual timings, from device clock not from CPU
+				yuv_timer_end->adjust(m_cpu->cycles_to_attotime((ta_yuv_u_size / 16) * (ta_yuv_v_size / 16) * 0x180));
 			}
 		}
 	}
 }
 
 // SB_LMMODE0
+// access to texture / framebuffer memory (either 32-bit or 64-bit area - cannot be written directly,
+// only through dma / store queue)
 void powervr2_device::ta_texture_directpath0_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	const uint32_t address = (offset << 3) & (dc_texture_ram.bytes() - 1);
@@ -2417,9 +2455,11 @@ void powervr2_device::ta_texture_directpath0_w(offs_t offset, uint64_t data, uin
 	}
 
 	// That's not in the pvr control address space, it's in g2's
+	// TODO: handle properly (dispatch as 32-bit when enabled, has no business with framebuffer RAM)
+	// - should be used by WinCE
 	//  int mode = pvrctrl_regs[SB_LMMODE0]&1;
 	int mode = 0;
-	if (mode&1)
+	if (mode & 1)
 	{
 		printf("ta_texture_directpath0_w 32-bit access!\n");
 		COMBINE_DATA(&dc_framebuffer_ram[offset]);
@@ -2430,6 +2470,7 @@ void powervr2_device::ta_texture_directpath0_w(offs_t offset, uint64_t data, uin
 	}
 }
 
+// TODO: merge with above
 // SB_LMMODE1
 void powervr2_device::ta_texture_directpath1_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
@@ -2442,7 +2483,7 @@ void powervr2_device::ta_texture_directpath1_w(offs_t offset, uint64_t data, uin
 	// That's not in the pvr control address space, it's in g2's
 	//  int mode = pvrctrl_regs[SB_LMMODE1]&1;
 	int mode = 0;
-	if (mode&1)
+	if (mode & 1)
 	{
 		printf("ta_texture_directpath1_w 32-bit access!\n");
 		COMBINE_DATA(&dc_framebuffer_ram[offset]);
@@ -2490,14 +2531,17 @@ void powervr2_device::computedilated()
 {
 	int a,b;
 
-	for (b=0;b <= 14;b++)
-		for (a=0;a < 1024;a++) {
-			dilated0[b][a]=dilate0(a,b);
-			dilated1[b][a]=dilate1(a,b);
+	for (b = 0; b <= 14; b++) {
+		for (a = 0; a < 1024; a++) {
+			dilated0[b][a] = dilate0(a, b);
+			dilated1[b][a] = dilate1(a, b);
 		}
-	for (b=0;b <= 7;b++)
-		for (a=0;a <= 7;a++)
-			dilatechose[(b << 3) + a]=3+(a < b ? a : b);
+	}
+
+	for (b = 0; b <= 7; b++) {
+		for (a = 0; a <= 7; a++)
+			dilatechose[(b << 3) + a] = 3 + (a < b ? a : b);
+	}
 }
 
 inline uint32_t powervr2_device::sample_nontextured(texinfo *ti, float u, float v, uint32_t offset_color, uint32_t base_color)
@@ -2512,9 +2556,9 @@ inline uint32_t powervr2_device::sample_textured(texinfo *ti, float u, float v, 
 	uint32_t c = (this->*(ti->r))(ti, u, v);
 	if (bilinear)
 	{
-		uint32_t c1 = (this->*(ti->r))(ti, u+1.0f, v);
-		uint32_t c2 = (this->*(ti->r))(ti, u+1.0f, v+1.0f);
-		uint32_t c3 = (this->*(ti->r))(ti, u, v+1.0f);
+		uint32_t c1 = (this->*(ti->r))(ti, u + 1.0f, v);
+		uint32_t c2 = (this->*(ti->r))(ti, u + 1.0f, v + 1.0f);
+		uint32_t c3 = (this->*(ti->r))(ti, u,        v + 1.0f);
 		c = bilinear_filter(c, c1, c2, c3, u, v);
 	}
 
@@ -2597,9 +2641,9 @@ inline void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, int
 
 	// Target the pixel center
 	ddx = xxl + 0.5f - xl;
-	ul += ddx*dudx;
-	vl += ddx*dvdx;
-	wl += ddx*dwdx;
+	ul += ddx * dudx;
+	vl += ddx * dvdx;
+	wl += ddx * dwdx;
 	for (idx = 0; idx < 4; idx++) {
 		bl[idx] += ddx * dbdx[idx];
 		offl[idx] += ddx * dodx[idx];
@@ -3012,13 +3056,13 @@ void powervr2_device::render_group_to_accumulation_buffer(bitmap_rgb32 &bitmap,c
 
 	//printf("drawtest!\n");
 
-	int rs=renderselect;
+	int rs = renderselect;
 
 	struct poly_group *grp = grab[rs].groups + group_no;
 
-	int ns=grp->strips_size;
+	int ns = grp->strips_size;
 
-	for (int cs=0;cs < ns;cs++)
+	for (int cs = 0; cs < ns; cs++)
 	{
 		strip *ts = &grp->strips[cs];
 		int sv = ts->svert;
@@ -3027,18 +3071,17 @@ void powervr2_device::render_group_to_accumulation_buffer(bitmap_rgb32 &bitmap,c
 		if(ev == -1)
 			continue;
 
-		for(i=sv; i <= ev; i++)
+		for(i = sv; i <= ev; i++)
 		{
 			vert *tv = grab[rs].verts + i;
 			tv->u = tv->u * ts->ti.sizex * tv->w;
 			tv->v = tv->v * ts->ti.sizey * tv->w;
 		}
 
-		for(i=sv; i <= ev-2; i++)
+		for(i = sv; i <= ev - 2; i++)
 		{
-			if (!(m_render.debug_dip_status&0x2))
-				render_tri<group_no>(bitmap, &ts->ti, grab[rs].verts + i);
-
+			//if (!(m_render.debug_dip_status&0x2))
+			render_tri<group_no>(bitmap, &ts->ti, grab[rs].verts + i);
 		}
 	}
 }
@@ -3591,7 +3634,7 @@ void powervr2_device::pvr_accumulationbuffer_to_framebuffer(int x,int y)
 	}
 }
 
-void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &cliprect)
+void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int dy,xi;
 	uint8_t interlace_on = ((spg_control & 0x10) >> 4);
@@ -3607,8 +3650,8 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 	if (!enable) return;
 
 	// only for rgb565 framebuffer
-	xi=((fb_r_size & 0x3ff)+1) << 1;
-	dy=((fb_r_size >> 10) & 0x3ff)+1;
+	xi = ((fb_r_size & 0x3ff) + 1) << 1;
+	dy = ((fb_r_size >> 10) & 0x3ff) + 1;
 
 	dy++;
 	dy*=2; // probably depends on interlace mode, fields etc...
@@ -3616,10 +3659,10 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 //  popmessage("%d %d %d %d %d",ystart_f1,ystart_f2,interlace_on,spg_vblank & 0x3ff,(spg_vblank >> 16) & 0x3ff);
 
 #if 0
-	fbclip.min_x = hstart;
-	fbclip.min_y = ystart_f1;
-	fbclip.max_x = hstart + (xi << ((vo_control & 0x100) >> 8));
-	fbclip.max_y = ystart_f1 + dy;
+	// TODO: wrong for suchie3 at very least
+	const rectangle fbclip = {
+		hstart, ystart_f1, hstart + (xi << ((vo_control & 0x100) >> 8)), ystart_f1 + dy
+	};
 
 	popmessage("%d %d %d %d",fbclip.min_x,fbclip.min_y,fbclip.max_x,fbclip.max_y);
 #endif
@@ -3974,35 +4017,6 @@ bool powervr2_device::rendered_at(int x, int y) const
 
 uint32_t powervr2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	/******************
-	  MAME note
-	*******************
-
-	The video update function should NOT be generating interrupts, setting timers or doing _anything_ the game might be able to detect
-	as it will be called at different times depending on frameskip etc.
-
-	Rendering should happen when the hardware requests it, to the framebuffer(s)
-
-	Everything else should depend on timers.
-
-	******************/
-
-//  static int useframebuffer=1;
-//  const rectangle &visarea = screen.visible_area();
-
-	// copy our fake framebuffer bitmap (where things have been rendered) to the screen
-#if 0
-	for (int y = visarea->min_y ; y <= visarea->max_y ; y++)
-	{
-		for (int x = visarea->min_x ; x <= visarea->max_x ; x++)
-		{
-			uint32_t const *const src = &fake_accumulationbuffer_bitmap->pix(y, x);
-			uint32_t *const dst = &bitmap.pix(y, x);
-			dst[0] = src[0];
-		}
-	}
-#endif
-
 	//FIXME: additional Chroma bit
 	bitmap.fill(rgb_t(0xff, (vo_border_col >> 16) & 0xff,
 							(vo_border_col >> 8 ) & 0xff,
@@ -4039,8 +4053,8 @@ TIMER_CALLBACK_MEMBER(powervr2_device::pvr_dma_irq)
 	irq_cb(DMA_PVR_IRQ);
 }
 
-/* used so far by usagiym and sprtjam */
-// TODO: very inaccurate
+// - usagiym and sprtjam known test cases
+// TODO: rewrite along moving out of here
 void powervr2_device::pvr_dma_execute(address_space &space)
 {
 	uint32_t src,dst,size;
@@ -4098,9 +4112,9 @@ INPUT_PORTS_START( powervr2 )
 	PORT_CONFNAME( 0x01, 0x00, "Bilinear Filtering" )
 	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_CONFNAME( 0x02, 0x00, "Disable Render Calls" )
-	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( Yes ) )
+//	PORT_CONFNAME( 0x02, 0x00, "Disable Render Calls" )
+//	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
+//	PORT_CONFSETTING(    0x02, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 ioport_constructor powervr2_device::device_input_ports() const
@@ -4274,6 +4288,7 @@ void powervr2_device::device_start()
 	save_item(NAME(ta_isp_limit));
 	save_item(NAME(ta_next_opb));
 	save_item(NAME(ta_itp_current));
+	save_item(NAME(ta_glob_tile_clip));
 	save_item(NAME(ta_alloc_ctrl));
 	save_item(NAME(ta_next_opb_init));
 	save_item(NAME(ta_yuv_tex_base));

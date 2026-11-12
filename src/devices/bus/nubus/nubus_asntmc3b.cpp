@@ -5,6 +5,7 @@
   Asante MC3NB NuBus Ethernet card (DP83902) (NuBus)
   Apple NuBus Ethernet Card (DP8390) (NuBus)
   Farallon EtherMac 30i-TH (DP83901) (SE/30 and IIsi PDS)
+  Farallon EtherMac LC-TP (Farallon 8390 ASIC) (LC PDS)
 
   The declaration ROM calls the Farallon PDS card "EtherMac 30i-TH", but that
   full name doesn't appear anywhere user-visible unless you're using software
@@ -52,6 +53,11 @@ ROM_START( macconilc )
 	ROM_LOAD( "asante_maccon_lc_mcilc_1.1.bin", 0x000000, 0x004000, CRC(b95940be) SHA1(317255bcb552ef43f43f85109706ed860baaf6dc) )
 ROM_END
 
+ROM_START( ethermaclc )
+	ROM_REGION(0x4000, MAC8390_ROM_REGION, 0)
+	ROM_LOAD( "5000112-00-01.u3", 0x000000, 0x004000, CRC(bd6bad74) SHA1(600ccec6f564da7cda9dda3afac48ca1413d705d) )
+ROM_END
+
 class nubus_mac8390_device : public device_t,
 							 public device_nubus_card_interface
 {
@@ -67,6 +73,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
+	virtual void install_map() ATTR_COLD;
+
 	u8 asntm3b_ram_r(offs_t offset);
 	void asntm3b_ram_w(offs_t offset, u8 data);
 	u32 dp_r(offs_t offset, u32 mem_mask = ~0);
@@ -80,7 +88,6 @@ private:
 	void dp_mem_write(offs_t offset, u8 data);
 
 	std::unique_ptr<u8[]> m_ram;
-	u8 m_prom[16];
 };
 
 class nubus_asntmc3nb_device : public nubus_mac8390_device
@@ -116,6 +123,32 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 };
 
+class pdslc_ethermaclc_device : public nubus_mac8390_device
+{
+public:
+	pdslc_ethermaclc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void install_map() override ATTR_COLD;
+
+private:
+	u32 regs_r(offs_t offset)
+	{
+		u32 const data = m_dp83902->cs_read(~offset & 0xf);
+		return (data << 24) | (data << 8) | 0x0001'0001;
+	}
+	void regs_w(offs_t offset, u32 data, u32 mem_mask)
+	{
+		if (ACCESSING_BITS_24_31)
+			m_dp83902->cs_write(~offset & 0xf, data >> 24);
+		else if (ACCESSING_BITS_8_15)
+			m_dp83902->cs_write(~offset & 0xf, data >> 8);
+		else
+			logerror("%s: 8390 register %x write %08x & %08x ignored\n", machine().describe_context(), ~offset & 0xf, data, mem_mask);
+	}
+};
+
 void nubus_mac8390_device::device_add_mconfig(machine_config &config)
 {
 	DP8390D(config, m_dp83902);
@@ -142,6 +175,11 @@ const tiny_rom_entry *pds030_ethermac30i_device::device_rom_region() const
 const tiny_rom_entry *pdslc_macconilc_device::device_rom_region() const
 {
 	return ROM_NAME(macconilc);
+}
+
+const tiny_rom_entry *pdslc_ethermaclc_device::device_rom_region() const
+{
+	return ROM_NAME(ethermaclc);
 }
 
 nubus_mac8390_device::nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
@@ -171,21 +209,29 @@ pdslc_macconilc_device::pdslc_macconilc_device(const machine_config &mconfig, co
 {
 }
 
+pdslc_ethermaclc_device::pdslc_ethermaclc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	nubus_mac8390_device(mconfig, PDSLC_ETHERMACLC, tag, owner, clock)
+{
+}
+
 void nubus_mac8390_device::device_start()
 {
-	const u32 slotspace = get_slotspace();
 	u8 mac[6];
 	u32 num = machine().rand();
-	memset(m_prom, 0x57, 16);
 	mac[2] = 0x1b;
 	put_u24be(mac+3, num);
 	mac[0] = mac[1] = 0;  // avoid gcc warning
-	memcpy(m_prom, mac, 6);
 	m_dp83902->set_mac(mac);
 
 	m_ram = std::make_unique<u8[]>(0x10000);
 	save_pointer(NAME(m_ram), 0x10000);
 
+	install_map();
+}
+
+void nubus_mac8390_device::install_map()
+{
+	const u32 slotspace = get_slotspace();
 	install_declaration_rom(MAC8390_ROM_REGION);
 
 //  printf("[ASNTMC3NB %p] slotspace = %x\n", this, slotspace);
@@ -212,10 +258,24 @@ void pdslc_macconilc_device::device_start()
 	nubus_mac8390_device::device_start();
 }
 
+void pdslc_ethermaclc_device::install_map()
+{
+	set_pds_slot(0xe);
+	prepare_declaration_rom(MAC8390_ROM_REGION, false, true);
+
+	u32 const slotspace = get_slotspace();
+	for (u32 const base : { slotspace, get_super_slotspace() })
+	{
+		offs_t const mirror = (base == slotspace) ? 0x00fc'0000 : 0x0ffc'0000;
+		nubus().install_mirrored_device(base + 0x10000, base + 0x1ffff, mirror, read8sm_delegate(*this, FUNC(pdslc_ethermaclc_device::asntm3b_ram_r)), write8sm_delegate(*this, FUNC(pdslc_ethermaclc_device::asntm3b_ram_w)));
+		nubus().install_mirrored_device(base + 0x20000, base + 0x2ffff, mirror, read32sm_delegate(*this, FUNC(pdslc_ethermaclc_device::regs_r)), write32s_delegate(*this, FUNC(pdslc_ethermaclc_device::regs_w)));
+		install_declaration_rom_copy(base + 0x30000, base + 0x37fff, mirror | 0x8000);
+	}
+}
+
 void nubus_mac8390_device::device_reset()
 {
 	m_dp83902->dp8390_reset(0);
-	memcpy(m_prom, &m_dp83902->get_mac()[0], 6);
 }
 
 void nubus_mac8390_device::asntm3b_ram_w(offs_t offset, u8 data)
@@ -295,3 +355,4 @@ DEFINE_DEVICE_TYPE_PRIVATE(NUBUS_ASNTMC3NB, device_nubus_card_interface, nubus_a
 DEFINE_DEVICE_TYPE_PRIVATE(NUBUS_APPLEENET, device_nubus_card_interface, nubus_appleenet_device, "nb_aenet", "Apple NuBus Ethernet card")
 DEFINE_DEVICE_TYPE_PRIVATE(PDS030_ETHERMAC30I, device_nubus_card_interface, pds030_ethermac30i_device, "pds30_emac", "Farallon EtherMac 30i-TH Ethernet card")
 DEFINE_DEVICE_TYPE_PRIVATE(PDSLC_MACCONILC, device_nubus_card_interface, pdslc_macconilc_device, "pdslc_macconlc", "Asante MacCON i LC Ethernet card")
+DEFINE_DEVICE_TYPE_PRIVATE(PDSLC_ETHERMACLC, device_nubus_card_interface, pdslc_ethermaclc_device, "pdslc_emaclc", "Farallon EtherMac LC-TP Ethernet card")

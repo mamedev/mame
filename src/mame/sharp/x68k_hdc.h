@@ -97,6 +97,8 @@ public:
 	// construction/destruction
 	x68k_hdc_image_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
+	auto drq_callback() { return m_drq_callback.bind(); }
+
 	// device_image_interface implementation
 	virtual const char *file_extensions() const noexcept override { return "hdf"; }
 	virtual const char *image_type_name() const noexcept override { return "sasihd"; }
@@ -124,6 +126,7 @@ private:
 	u16 m_transfer_byte_count = 0;
 	u16 m_transfer_byte_total = 0;
 	emu_timer *m_req_timer = nullptr;
+	devcb_write_line m_drq_callback;
 };
 
 // device type definition

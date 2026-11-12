@@ -119,6 +119,13 @@ public:
 	void a1_w(int state) { address_w(1, state); }
 	int current_address() { return m_address; }
 
+	// The selected analog switch conducts in either direction. This reports
+	// electrical connectivity (after tSW), independently of audio crossfading.
+	bool channel_connected(unsigned selector, unsigned channel) const
+	{
+		return !m_inhibit[selector] && (m_address == channel);
+	}
+
 	// per-selector active-high inhibit
 	void inhibit_x_w(int state);
 	void inhibit_y_w(int state);

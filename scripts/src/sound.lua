@@ -286,6 +286,20 @@ end
 
 
 ---------------------------------------------------
+-- Cirrus Logic CS43L43 I2S Stereo DAC
+--@src/devices/sound/cs43l43.h,SOUNDS["CS43L43"] = true
+---------------------------------------------------
+
+if (SOUNDS["CS43L43"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/cs43l43.cpp",
+		MAME_DIR .. "src/devices/sound/cs43l43.h",
+	}
+end
+
+
+
+---------------------------------------------------
 -- Creative Labs CT1741 SB16 DSP
 --@src/devices/sound/ct1741.h,SOUNDS["CT1741"] = true
 ---------------------------------------------------
@@ -870,6 +884,19 @@ if SOUNDS["IMAADPCM"] then
 	}
 end
 
+
+
+---------------------------------------------------
+-- Novatek NT3570F sound generator
+--@src/devices/sound/nt3570.h,SOUNDS["NT3570"] = true
+---------------------------------------------------
+
+if SOUNDS["NT3570"] then
+	files {
+		MAME_DIR .. "src/devices/sound/nt3570.cpp",
+		MAME_DIR .. "src/devices/sound/nt3570.h",
+	}
+end
 
 
 ---------------------------------------------------
@@ -1634,6 +1661,18 @@ if SOUNDS["AD1848"] then
 	files {
 		MAME_DIR .. "src/devices/sound/ad1848.cpp",
 		MAME_DIR .. "src/devices/sound/ad1848.h",
+	}
+end
+
+---------------------------------------------------
+-- AD1859
+--@src/devices/sound/ad1859.h,SOUNDS["AD1859"] = true
+---------------------------------------------------
+
+if SOUNDS["AD1859"] then
+	files {
+		MAME_DIR .. "src/devices/sound/ad1859.cpp",
+		MAME_DIR .. "src/devices/sound/ad1859.h",
 	}
 end
 

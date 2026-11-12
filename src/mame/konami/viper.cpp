@@ -397,7 +397,7 @@ The golf club acts like a LED gun. PCB power input is 12V.
 #include "machine/ds2430a.h"
 #include "machine/ins8250.h"
 #include "machine/k056230.h"
-#include "machine/lpci.h"
+#include "machine/pci.h"
 #include "machine/timekpr.h"
 #include "machine/timer.h"
 #include "sound/dmadac.h"
@@ -426,9 +426,209 @@ The golf club acts like a LED gun. PCB power input is 12V.
 
 namespace {
 
+// MPC8240 PCI host, config space only
+class viper_host_device : public pci_host_device
+{
+public:
+	viper_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	// config address/data ports as seen from the big-endian 64-bit CPU bus
+	uint64_t cfg_addr_r() { return uint64_t(swapendian_int32(config_address)) << 32; }
+	void cfg_addr_w(uint64_t data) { config_address_w(0, swapendian_int32(uint32_t(data >> 32))); }
+	uint64_t cfg_data_r() { return uint64_t(swapendian_int32(config_data_r(0))) << 32; }
+	void cfg_data_w(uint64_t data) { config_data_w(0, swapendian_int32(uint32_t(data >> 32))); }
+
+protected:
+	enum
+	{
+		AS_PCI_MEM = 1,
+		AS_PCI_IO = 2
+	};
+
+	virtual void device_start() override ATTR_COLD;
+
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
+
+	virtual void config_map(address_map &map) override ATTR_COLD;
+
+private:
+	address_space_config m_pci_mem_config;
+	address_space_config m_pci_io_config;
+
+	uint32_t m_regs[256/4];
+};
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(VIPER_HOST, viper_host_device, viper_host_device, "viper_host", "Motorola MPC8240 PCI host (Viper)")
+
+viper_host_device::viper_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_host_device(mconfig, VIPER_HOST, tag, owner, clock)
+	, m_pci_mem_config("pci_mem", ENDIANNESS_LITTLE, 32, 32)
+	, m_pci_io_config("pci_io", ENDIANNESS_LITTLE, 32, 32)
+{
+}
+
+device_memory_interface::space_config_vector viper_host_device::memory_space_config() const
+{
+	auto r = pci_bridge_device::memory_space_config();
+	r.emplace_back(std::make_pair(AS_PCI_MEM, &m_pci_mem_config));
+	r.emplace_back(std::make_pair(AS_PCI_IO, &m_pci_io_config));
+	return r;
+}
+
+void viper_host_device::device_start()
+{
+	pci_host_device::device_start();
+
+	// the Voodoo 3 is mapped by the driver, keep the PCI side off the CPU space
+	set_spaces(&space(AS_PCI_MEM), &space(AS_PCI_IO));
+	memory_window_start = 0;
+	memory_window_end   = 0xffffffff;
+	memory_offset       = 0;
+	io_window_start = 0;
+	io_window_end   = 0xffffffff;
+	io_offset       = 0;
+
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
+	save_item(NAME(m_regs));
+}
+
+void viper_host_device::config_map(address_map &map)
+{
+	// plain register file, the header is not decoded either
+	map(0x00, 0xff).lrw32(
+			NAME([this] (offs_t offset) -> uint32_t { return m_regs[offset]; }),
+			NAME([this] (offs_t offset, uint32_t data, uint32_t mem_mask) { COMBINE_DATA(&m_regs[offset]); }));
+}
+
+
+namespace {
+
+// 3dfx Voodoo 3 config space, the card is mapped by the driver
+class viper_voodoo3_pci_device : public pci_device
+{
+public:
+	viper_voodoo3_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+
+	virtual void config_map(address_map &map) override ATTR_COLD;
+
+private:
+	uint32_t m_regs[0x100];
+
+	uint32_t reg_r(offs_t offset);
+	void reg_w(offs_t offset, uint32_t data);
+};
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(VIPER_VOODOO3_PCI, viper_voodoo3_pci_device, viper_voodoo3_pci_device, "viper_voodoo3_pci", "3dfx Voodoo 3 PCI config (Viper)")
+
+viper_voodoo3_pci_device::viper_voodoo3_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, VIPER_VOODOO3_PCI, tag, owner, clock)
+{
+}
+
+void viper_voodoo3_pci_device::device_start()
+{
+	pci_device::device_start();
+
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
+	save_item(NAME(m_regs));
+}
+
+void viper_voodoo3_pci_device::config_map(address_map &map)
+{
+	map(0x00, 0xff).rw(FUNC(viper_voodoo3_pci_device::reg_r), FUNC(viper_voodoo3_pci_device::reg_w));
+}
+
+uint32_t viper_voodoo3_pci_device::reg_r(offs_t offset)
+{
+	const int reg = offset * 4;
+	switch (reg)
+	{
+		case 0x00:      // PCI Vendor ID (0x121a = 3dfx), Device ID (0x0005 = Voodoo 3)
+			return 0x0005121a;
+		case 0x08:      // Device class code
+			return 0x03000000;
+		case 0x10:      // memBaseAddr0
+			return m_regs[0x10/4];
+		case 0x14:      // memBaseAddr1
+			return m_regs[0x14/4];
+		case 0x18:      // memBaseAddr1
+			return m_regs[0x18/4];
+		case 0x40:      // fabId
+			return m_regs[0x40/4];
+		case 0x50:      // cfgScratch
+			return m_regs[0x50/4];
+
+		default:
+			throw emu_fatalerror("voodoo3_pci_r: %08X at %s\n", reg, machine().describe_context());
+	}
+}
+
+void viper_voodoo3_pci_device::reg_w(offs_t offset, uint32_t data)
+{
+//  printf("voodoo3_pci_w: %08X, %08X\n", reg, data);
+
+	const int reg = offset * 4;
+	switch (reg)
+	{
+		case 0x04:      // Command register
+			m_regs[0x04/4] = data;
+			break;
+		case 0x10:      // memBaseAddr0
+			if (data == 0xffffffff)
+			{
+				m_regs[0x10/4] = 0xfe000000;
+			}
+			else
+			{
+				m_regs[0x10/4] = data;
+			}
+			break;
+		case 0x14:      // memBaseAddr1
+			if (data == 0xffffffff)
+			{
+				m_regs[0x14/4] = 0xfe000008;
+			}
+			else
+			{
+				m_regs[0x14/4] = data;
+			}
+			break;
+		case 0x18:      // ioBaseAddr
+			if (data == 0xffffffff)
+			{
+				m_regs[0x18/4] = 0xffffff01;
+			}
+			else
+			{
+				m_regs[0x18/4] = data;
+			}
+			break;
+		case 0x3c:      // InterruptLine
+			break;
+		case 0x40:      // fabId
+			m_regs[0x40/4] = data;
+			break;
+		case 0x50:      // cfgScratch
+			m_regs[0x50/4] = data;
+			break;
+
+		default:
+			throw emu_fatalerror("voodoo3_pci_w: %08X, %08X at %s\n", data, reg, machine().describe_context());
+	}
+}
+
 #define PCI_CLOCK           (XTAL(33'868'800))
 #define SDRAM_CLOCK         (PCI_CLOCK * 3) // Main SDRAMs run at 100 MHz
 #define TIMER_CLOCK         (SDRAM_CLOCK / 8)
+
+namespace {
 
 class viper_state : public driver_device
 {
@@ -441,7 +641,7 @@ public:
 		m_duart_com(*this, "duart_com"),
 		m_lanc(*this, "lanc"),
 		m_ata(*this, "ata"),
-		m_lpci(*this, "pcibus"),
+		m_pcihost(*this, "pci:00.0"),
 		m_ds2430(*this, "ds2430"),
 		m_ds2430_ext(*this, "ds2430_ext"),
 		m_workram(*this, "workram"),
@@ -491,10 +691,6 @@ private:
 	void unk1a_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	void unk1b_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 
-	uint64_t pci_config_addr_r();
-	void pci_config_addr_w(uint64_t data);
-	uint64_t pci_config_data_r();
-	void pci_config_data_w(uint64_t data);
 	uint64_t cf_card_data_r(offs_t offset, uint64_t mem_mask = ~0);
 	void cf_card_data_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t cf_card_r(offs_t offset, uint64_t mem_mask = ~0);
@@ -511,10 +707,6 @@ private:
 
 	void voodoo_vblank(int state);
 	void voodoo_pciint(int state);
-
-	//the following two arrays need to stay public til the legacy PCI bus is removed
-	uint32_t m_voodoo3_pci_reg[0x100];
-	uint32_t m_mpc8240_regs[256/4];
 
 	void viper_map(address_map &map) ATTR_COLD;
 	void viper_ppp_map(address_map &map) ATTR_COLD;
@@ -629,7 +821,7 @@ private:
 	required_device<pc16552_device> m_duart_com;
 	required_device<k056230_device> m_lanc;
 	required_device<ata_interface_device> m_ata;
-	required_device<pci_bus_legacy_device> m_lpci;
+	required_device<viper_host_device> m_pcihost;
 	required_device<ds2430a_device> m_ds2430;
 	optional_device<ds2430a_device> m_ds2430_ext;
 	required_shared_ptr<uint64_t> m_workram;
@@ -638,11 +830,6 @@ private:
 	required_ioport_array<4> m_gun_input;
 	optional_ioport_array<4> m_io_ppp_sensors;
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
-
-	uint32_t mpc8240_pci_r(int function, int reg, uint32_t mem_mask);
-	void mpc8240_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
-	uint32_t voodoo3_pci_r(int function, int reg, uint32_t mem_mask);
-	void voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 };
 
 class viper_subscreen_state : public viper_state
@@ -725,44 +912,6 @@ static inline void write64be_with_32sle_device_handler(write32s_delegate handler
 	if (ACCESSING_BITS_32_63)
 		handler(offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
-
-/*****************************************************************************/
-
-uint32_t viper_state::mpc8240_pci_r(int function, int reg, uint32_t mem_mask)
-{
-	switch (reg)
-	{
-	}
-	return m_mpc8240_regs[reg/4];
-}
-
-void viper_state::mpc8240_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
-{
-	COMBINE_DATA(&m_mpc8240_regs[reg/4]);
-}
-
-
-uint64_t viper_state::pci_config_addr_r()
-{
-	return m_lpci->read_64be(0, 0xffffffff00000000U);
-}
-
-void viper_state::pci_config_addr_w(uint64_t data)
-{
-	m_lpci->write_64be(0, data, 0xffffffff00000000U);
-}
-
-uint64_t viper_state::pci_config_data_r()
-{
-	return m_lpci->read_64be(1, 0x00000000ffffffffU) << 32;
-}
-
-void viper_state::pci_config_data_w(uint64_t data)
-{
-	m_lpci->write_64be(1, data >> 32, 0x00000000ffffffffU);
-}
-
-
 
 /*****************************************************************************/
 // MPC8240 Embedded Programmable Interrupt Controller (EPIC)
@@ -1456,83 +1605,6 @@ void viper_state::ata_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 	}
 }
 
-uint32_t viper_state::voodoo3_pci_r(int function, int reg, uint32_t mem_mask)
-{
-	switch (reg)
-	{
-		case 0x00:      // PCI Vendor ID (0x121a = 3dfx), Device ID (0x0005 = Voodoo 3)
-			return 0x0005121a;
-		case 0x08:      // Device class code
-			return 0x03000000;
-		case 0x10:      // memBaseAddr0
-			return m_voodoo3_pci_reg[0x10/4];
-		case 0x14:      // memBaseAddr1
-			return m_voodoo3_pci_reg[0x14/4];
-		case 0x18:      // memBaseAddr1
-			return m_voodoo3_pci_reg[0x18/4];
-		case 0x40:      // fabId
-			return m_voodoo3_pci_reg[0x40/4];
-		case 0x50:      // cfgScratch
-			return m_voodoo3_pci_reg[0x50/4];
-
-		default:
-			throw emu_fatalerror("voodoo3_pci_r: %08X at %08X\n", reg, m_maincpu->pc());
-	}
-}
-
-void viper_state::voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
-{
-//  printf("voodoo3_pci_w: %08X, %08X\n", reg, data);
-
-	switch (reg)
-	{
-		case 0x04:      // Command register
-			m_voodoo3_pci_reg[0x04/4] = data;
-			break;
-		case 0x10:      // memBaseAddr0
-			if (data == 0xffffffff)
-			{
-				m_voodoo3_pci_reg[0x10/4] = 0xfe000000;
-			}
-			else
-			{
-				m_voodoo3_pci_reg[0x10/4] = data;
-			}
-			break;
-		case 0x14:      // memBaseAddr1
-			if (data == 0xffffffff)
-			{
-				m_voodoo3_pci_reg[0x14/4] = 0xfe000008;
-			}
-			else
-			{
-				m_voodoo3_pci_reg[0x14/4] = data;
-			}
-			break;
-		case 0x18:      // ioBaseAddr
-			if (data == 0xffffffff)
-			{
-				m_voodoo3_pci_reg[0x18/4] = 0xffffff01;
-			}
-			else
-			{
-				m_voodoo3_pci_reg[0x18/4] = data;
-			}
-			break;
-		case 0x3c:      // InterruptLine
-			break;
-		case 0x40:      // fabId
-			m_voodoo3_pci_reg[0x40/4] = data;
-			break;
-		case 0x50:      // cfgScratch
-			m_voodoo3_pci_reg[0x50/4] = data;
-			break;
-
-		default:
-			throw emu_fatalerror("voodoo3_pci_w: %08X, %08X at %08X\n", data, reg, m_maincpu->pc());
-	}
-}
-
 uint64_t viper_state::voodoo3_io_r(offs_t offset, uint64_t mem_mask)
 {
 	return read64be_with_32sle_device_handler(read32s_delegate(*m_voodoo, FUNC(voodoo_3_device::read_io)), offset, mem_mask);
@@ -1763,8 +1835,8 @@ void viper_state::viper_map(address_map &map)
 	map(0x84000000, 0x85ffffff).rw(FUNC(viper_state::voodoo3_lfb_r), FUNC(viper_state::voodoo3_lfb_w));
 	// I/O space, Voodoo 3 sets 0x00800001 as BAR2
 	map(0xfe800000, 0xfe8000ff).rw(FUNC(viper_state::voodoo3_io_r), FUNC(viper_state::voodoo3_io_w));
-	map(0xfec00000, 0xfedfffff).rw(FUNC(viper_state::pci_config_addr_r), FUNC(viper_state::pci_config_addr_w));
-	map(0xfee00000, 0xfeefffff).rw(FUNC(viper_state::pci_config_data_r), FUNC(viper_state::pci_config_data_w));
+	map(0xfec00000, 0xfedfffff).rw(m_pcihost, FUNC(viper_host_device::cfg_addr_r), FUNC(viper_host_device::cfg_addr_w));
+	map(0xfee00000, 0xfeefffff).rw(m_pcihost, FUNC(viper_host_device::cfg_data_r), FUNC(viper_host_device::cfg_data_w));
 	// 0xff000000, 0xff000fff - cf_card_data_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff200000, 0xff200fff - cf_card_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff300000, 0xff300fff - ata_r/w (installed in DRIVER_INIT(viperhd))
@@ -2448,8 +2520,6 @@ void viper_state::machine_start()
 	/* configure fast RAM regions for DRC */
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x00ffffff, false, m_workram);
 
-	save_item(NAME(m_voodoo3_pci_reg));
-	save_item(NAME(m_mpc8240_regs));
 	save_item(NAME(m_cf_card_ide));
 	save_item(NAME(m_unk_serial_bit_w));
 	save_item(NAME(m_unk_serial_cmd));
@@ -2483,9 +2553,6 @@ void viper_state::machine_start()
 
 	m_unk_serial_bit_w = 0;
 	std::fill(std::begin(m_unk_serial_regs), std::end(m_unk_serial_regs), 0);
-
-	std::fill(std::begin(m_voodoo3_pci_reg), std::end(m_voodoo3_pci_reg), 0);
-	std::fill(std::begin(m_mpc8240_regs), std::end(m_mpc8240_regs), 0);
 }
 
 void viper_state::machine_reset()
@@ -2526,9 +2593,9 @@ void viper_state::viper(machine_config &config)
 
 	DS2430A(config, m_ds2430);
 
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device( 0, FUNC(viper_state::mpc8240_pci_r), FUNC(viper_state::mpc8240_pci_w));
-	pcibus.set_device(12, FUNC(viper_state::voodoo3_pci_r), FUNC(viper_state::voodoo3_pci_w));
+	PCI_ROOT(config, "pci");
+	VIPER_HOST(config, "pci:00.0");
+	VIPER_VOODOO3_PCI(config, "pci:0c.0");
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 

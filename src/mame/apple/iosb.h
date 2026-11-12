@@ -23,9 +23,6 @@
 class iosb_base :  public device_t
 {
 public:
-	// construction/destruction
-	iosb_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
-
 	// interface routines
 	auto write_adb_st() { return m_adb_st.bind(); } // ADB state
 	auto write_cb1() { return m_cb1.bind(); }   // ADB clock
@@ -44,6 +41,7 @@ public:
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
 	template <typename... T> void set_scsi_tag(T &&... args) { m_ncr.set_tag(std::forward<T>(args)...); }
 	template <typename... T> void set_capella_tag(T &&... args) { m_capella.set_tag(std::forward<T>(args)...); }
+	void set_via2_sync(bool sync) { m_via2_sync = sync; }
 
 	void pb3_w(int state) { m_adb_interrupt = state; }
 	void cb1_w(int state);  // ADB clock
@@ -63,10 +61,14 @@ public:
 	void turboscsi_dma_w(offs_t offset, u32 data, u32 mem_mask);
 
 protected:
+	iosb_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, offs_t io_mirror);
+
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void asc_irq(int state);
 
 	virtual uint8_t via_in_b();
 	virtual void via_out_b(uint8_t data);
@@ -86,6 +88,7 @@ protected:
 	required_device<asc_base_device> m_asc;
 	required_device<applefdintf_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
+	offs_t const m_io_mirror;
 
 
 	u16 m_iosb_regs[0x20];
@@ -95,6 +98,7 @@ protected:
 private:
 	emu_timer *m_6015_timer;
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
+	bool m_via2_sync;
 	floppy_image_device *m_cur_floppy = nullptr;
 	int m_hdsel;
 	int m_adb_interrupt;
@@ -103,6 +107,10 @@ private:
 	u32 m_scsi_read_cycles, m_scsi_write_cycles, m_scsi_dma_read_cycles, m_scsi_dma_write_cycles;
 	u32 m_scsi_dma_result;
 	bool m_scsi_second_half;
+	attotime m_scsi_stall_start;
+	bool m_scsi_stalled;
+
+	void turboscsi_stall();
 
 	u16 mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, u16 data, u16 mem_mask);
@@ -118,7 +126,6 @@ private:
 	void via2_out_b(uint8_t data);
 	void via1_irq(int state);
 	void via2_irq(int state);
-	void asc_irq(int state);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 
 	void phases_w(uint8_t phases);
@@ -152,7 +159,6 @@ class primetime_device : public iosb_base
 {
 public:
 	// construction/destruction
-	primetime_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 	primetime_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	auto pb4_callback() { return write_pb4.bind(); }
@@ -160,6 +166,8 @@ public:
 	auto pb3_callback() { return read_pb3.bind(); }
 
 protected:
+	primetime_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, offs_t io_mirror);
+
 	virtual uint8_t via_in_b() override;
 	virtual void via_out_b(uint8_t data) override;
 
@@ -180,20 +188,35 @@ public:
 	void ata_irq_w(int state);
 
 protected:
+	primetimeii_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, offs_t io_mirror, offs_t ata_mirror);
+
 	virtual void device_start() override ATTR_COLD;
 
 private:
 	u16 ata_regs_r(offs_t offset);
 	void ata_regs_w(offs_t offset, u16 data, u16 mem_mask);
 
+	offs_t const m_ata_mirror;
 	s32 m_ata_irq;
 	u8 m_ata_irq_enables;
 	u16 m_primetimeii_regs[0x20];
+};
+
+class primetimeiii_device : public primetimeii_device
+{
+public:
+	primetimeiii_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void map(address_map &map) override ATTR_COLD;
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(IOSB, iosb_device)
 DECLARE_DEVICE_TYPE(PRIMETIME, primetime_device)
 DECLARE_DEVICE_TYPE(PRIMETIMEII, primetimeii_device)
+DECLARE_DEVICE_TYPE(PRIMETIMEIII, primetimeiii_device)
 
 #endif // MAME_APPLE_IOSB_H

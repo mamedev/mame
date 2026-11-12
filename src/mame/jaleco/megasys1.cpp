@@ -101,8 +101,6 @@ RAM             RW      0e0000-0effff*        <               <
                                 Issues / To Do
                                 --------------
 
-- Hook up microcontroller for peekaboo (connected differently to other games).
-
 - Making the M6295 status register return 0 fixes the music tempo in
   avspirit, 64street, astyanax etc. but makes most of the effects in
   hachoo disappear! Define SOUND_HACK to 0 to turn this hack off
@@ -179,6 +177,21 @@ void megasys1_bc_iomcu_state::machine_start()
 
 void megasys1_typea_state::machine_start()
 {
+}
+
+void megasys1_typed_state::machine_start()
+{
+	save_item(NAME(m_mcu_p2));
+	save_item(NAME(m_mcu_p3));
+}
+
+void megasys1_typed_state::machine_reset()
+{
+	megasys1_state::machine_reset();
+
+	// the MCU holds the main CPU in reset until it's ready
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_mcu_p3 = 0xff;
 }
 
 void megasys1_typea_state::machine_reset()
@@ -626,7 +639,7 @@ void megasys1_typed_state::megasys1D_map(address_map &map)
 	map(0x0e8000, 0x0ebfff).ram().w(m_tmap[0], FUNC(megasys1_tilemap_device::write)).share("scroll1");
 	map(0x0f0000, 0x0f0001).portr("SYSTEM");
 	map(0x0f8001, 0x0f8001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-//  map(0x100000, 0x100001); // protection
+	map(0x100000, 0x100001).rw(FUNC(megasys1_typed_state::mcu_r), FUNC(megasys1_typed_state::mcu_w)).umask16(0x00ff);
 	map(0x1f0000, 0x1fffff).ram() /*.w(FUNC(megasys1_typed_state::ram_w))*/ .share(m_ram);
 }
 
@@ -1829,31 +1842,44 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Peek-a-Boo! Custom I/O
+ *  Peek-a-Boo! MCU
  *
  *************************************/
 
-
-/* Read the input ports, through a protection device */
-u16 megasys1_typed_state::protection_peekaboo_r()
+u8 megasys1_typed_state::mcu_r()
 {
-	switch (m_protection_val)
-	{
-		case 0x02:  return 0x03;
-		case 0x51:  return m_io_p1->read();
-		case 0x52:  return m_io_p2->read();
-		default:    return m_protection_val;
-	}
+	return m_mcu_p2;
 }
 
-void megasys1_typed_state::protection_peekaboo_w(offs_t offset, u16 data, u16 mem_mask)
+void megasys1_typed_state::mcu_w(u8 data)
 {
-	COMBINE_DATA(&m_protection_val);
+	m_mculatch->write(data);
+	m_mcu->pulse_input_line(INPUT_LINE_IRQ0, attotime::from_ticks(1, m_maincpu->clock()));
+}
 
-	if ((m_protection_val & 0x90) == 0x90)
-		m_okibank->set_entry(m_protection_val & 7);
+void megasys1_typed_state::mcu_p2_w(u8 data)
+{
+	m_mcu_p2 = data;
+}
 
-	m_maincpu->set_input_line(4, HOLD_LINE);
+void megasys1_typed_state::mcu_p3_w(u8 data)
+{
+	// the MCU drops P3 bit 6 when its reply is ready
+	if (BIT(m_mcu_p3, 6) && !BIT(data, 6))
+	{
+		m_maincpu->set_input_line(4, HOLD_LINE);
+	}
+	m_mcu_p3 = data;
+}
+
+void megasys1_typed_state::mcu_p4_w(u8 data)
+{
+	m_okibank->set_entry(data & 7);
+}
+
+void megasys1_typed_state::mcu_p6_w(u8 data)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*************************************
@@ -2192,6 +2218,17 @@ void megasys1_typed_state::system_D(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &megasys1_typed_state::megasys1D_map);
 	m_maincpu->set_vblank_int("screen", FUNC(megasys1_typed_state::megasys1D_irq));
 
+	TMP91640(config, m_mcu, XTAL(8'000'000));
+	m_mcu->port_read<1>().set(m_mculatch, FUNC(generic_latch_8_device::read));
+	m_mcu->port_write<2>().set(FUNC(megasys1_typed_state::mcu_p2_w));
+	m_mcu->port_write<3>().set(FUNC(megasys1_typed_state::mcu_p3_w));
+	m_mcu->port_write<4>().set(FUNC(megasys1_typed_state::mcu_p4_w));
+	m_mcu->port_write<6>().set(FUNC(megasys1_typed_state::mcu_p6_w));
+	m_mcu->an_read<0>().set_ioport("P1");
+	m_mcu->an_read<1>().set_ioport("P2");
+
+	GENERIC_LATCH_8(config, m_mculatch);
+
 	/* video hardware */
 	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(56.18); // same as nmk16.cpp based on YT videos.
@@ -2200,6 +2237,7 @@ void megasys1_typed_state::system_D(machine_config &config)
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(megasys1_typed_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(megasys1_typed_state::screen_vblank));
+	m_screen->screen_vblank().append_inputline(m_mcu, INPUT_LINE_IRQ1); // INT1 programmed for falling edge, presumably /VBLANK
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_abc);
@@ -4320,7 +4358,7 @@ Jaleco board no. PB-92127A
   CPU: Motorola 68000P10
 Sound: OKI M6295
   OSC: 8Mhz
-  MCU: MO-92033 (unknown type with internal rom)
+  MCU: MO-92033 (TMP91640 with internal ROM)
 
 interrupts:
     1]      506>    rte
@@ -5270,11 +5308,6 @@ void megasys1_typed_state::init_peekaboo()
 
 	m_okibank->configure_entry(7, &ROM[0x20000]);
 	m_okibank->configure_entries(0, 7, &ROM[0x20000], 0x20000);
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100000, 0x100001, read16smo_delegate(*this, FUNC(megasys1_typed_state::protection_peekaboo_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16s_delegate(*this, FUNC(megasys1_typed_state::protection_peekaboo_w)));
-
-	save_item(NAME(m_protection_val));
 }
 
 

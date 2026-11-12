@@ -21,6 +21,7 @@ MAME’s source or working on scripts that run within the MAME framework.
     floppy
     nscsi
     m6502
+    uml_architecture
     uml_instructions
     poly_manager
     audio_effects

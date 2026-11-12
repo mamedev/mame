@@ -19,8 +19,7 @@
 sh_common_execution::sh_common_execution(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_sh2_state(nullptr)
-	, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
-	, m_drcuml(nullptr)
+	, m_drcuml()
 	, m_drcoptions(0)
 	, m_entry(nullptr)
 	, m_read8(nullptr)
@@ -37,9 +36,8 @@ sh_common_execution::sh_common_execution(const machine_config &mconfig, device_t
 
 void sh_common_execution::device_start()
 {
-	/* allocate the implementation-specific state from the full cache */
-	m_cache.allocate_cache(mconfig().options().drc_rwx());
-	m_sh2_state = m_cache.alloc_near<internal_sh2_state>();
+	// TODO: allow this to be avoided if recompiler is disabled
+	drc_start();
 
 	save_item(NAME(m_sh2_state->pc));
 	save_item(NAME(m_sh2_state->sr));
@@ -129,7 +127,11 @@ void sh_common_execution::drc_start()
 
 	/* initialize the UML generator */
 	uint32_t flags = 0;
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 1, 32, 1, COMPILE_FORWARDS_BYTES);
+	m_drcuml = std::make_unique<drcuml_state>(*this, CACHE_SIZE + sizeof(internal_sh2_state));
+	m_drcuml->initialize(flags, 1, 32, 1, COMPILE_FORWARDS_BYTES);
+
+	/* allocate the implementation-specific state from the full cache */
+	m_sh2_state = m_drcuml->cache_alloc_near<internal_sh2_state>();
 
 	/* add symbols for our stuff */
 	m_drcuml->symbol_add(&m_sh2_state->pc, sizeof(m_sh2_state->pc), "pc");

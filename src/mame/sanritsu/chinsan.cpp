@@ -97,8 +97,7 @@ public:
 		chinsan_state(mconfig, type, tag),
 		m_adpcm(*this, "adpcm"),
 		m_opbank(*this, "opbank"),
-		m_adpcm_rom(*this, "adpcm"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes", 0x18000, ENDIANNESS_LITTLE)
+		m_adpcm_rom(*this, "adpcm")
 	{ }
 
 	void init_chinsan() ATTR_COLD;
@@ -114,7 +113,8 @@ private:
 
 	required_memory_bank m_opbank;
 	required_region_ptr<uint8_t> m_adpcm_rom;
-	memory_share_creator<uint8_t> m_decrypted_opcodes;
+
+	std::unique_ptr<uint8_t[]> m_decrypted_opcodes;
 
 	uint32_t m_adpcm_pos = 0;
 	uint8_t m_adpcm_idle = 1;
@@ -474,8 +474,8 @@ void chinsan_adpcm_state::machine_start()
 {
 	chinsan_state::machine_start();
 
-	membank("opfixed")->set_base(&m_decrypted_opcodes[0]);
-	m_opbank->configure_entries(0, 4, &m_decrypted_opcodes[0x8000], 0x4000);
+	membank("opfixed")->set_base(m_decrypted_opcodes.get());
+	m_opbank->configure_entries(0, 4, m_decrypted_opcodes.get() + 0x8000, 0x4000);
 
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_idle));
@@ -501,7 +501,8 @@ void chinsan_adpcm_state::machine_reset()
 
 void chinsan_adpcm_state::init_chinsan()
 {
-	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), &m_decrypted_opcodes[0], 0x18000);
+	m_decrypted_opcodes = std::make_unique<uint8_t[]>(0x18000);
+	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), m_decrypted_opcodes.get(), 0x18000);
 }
 
 

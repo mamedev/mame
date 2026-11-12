@@ -21,7 +21,7 @@ VT82C586B PCIC ISA section
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(VT82C586B_ISA, vt82c586b_isa_device, "vt82c586b_isa", "VT82C586B \"PIPC\" PCI-to-ISA bridge")
+DEFINE_DEVICE_TYPE(VT82C586B_ISA, vt82c586b_isa_device, "vt82c586b_isa", "VIA VT82C586B \"PIPC\" PCI-to-ISA bridge")
 
 vt82c586b_isa_device::vt82c586b_isa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, type, tag, owner, clock)
@@ -50,7 +50,8 @@ vt82c586b_isa_device::vt82c586b_isa_device(const machine_config &mconfig, const 
 	// 2*h for '586A
 	// 3*h for '586B OEM Silicon
 	// 4*h for '586B Production Silicon
-	set_ids(0x11060586, 0x41, 0x060100, 0x00000000);
+	// 0x47 from https://lkml.iu.edu/0109.2/0288.html
+	set_ids(0x11060586, 0x47, 0x060100, 0x00000000);
 }
 
 void vt82c586b_isa_device::device_add_mconfig(machine_config &config)
@@ -773,17 +774,17 @@ uint8_t vt82c586b_isa_device::pc_dma8237_0_dack_r() { return m_isabus->dack_r(0)
 uint8_t vt82c586b_isa_device::pc_dma8237_1_dack_r() { return m_isabus->dack_r(1); }
 uint8_t vt82c586b_isa_device::pc_dma8237_2_dack_r() { return m_isabus->dack_r(2); }
 uint8_t vt82c586b_isa_device::pc_dma8237_3_dack_r() { return m_isabus->dack_r(3); }
-uint8_t vt82c586b_isa_device::pc_dma8237_5_dack_r() { return m_isabus->dack_r(5); }
-uint8_t vt82c586b_isa_device::pc_dma8237_6_dack_r() { return m_isabus->dack_r(6); }
-uint8_t vt82c586b_isa_device::pc_dma8237_7_dack_r() { return m_isabus->dack_r(7); }
+uint8_t vt82c586b_isa_device::pc_dma8237_5_dack_r() { uint16_t ret = m_isabus->dack16_r(5); m_dma_high_byte = ret & 0xff00; return ret; }
+uint8_t vt82c586b_isa_device::pc_dma8237_6_dack_r() { uint16_t ret = m_isabus->dack16_r(6); m_dma_high_byte = ret & 0xff00; return ret; }
+uint8_t vt82c586b_isa_device::pc_dma8237_7_dack_r() { uint16_t ret = m_isabus->dack16_r(7); m_dma_high_byte = ret & 0xff00; return ret; }
 
 void vt82c586b_isa_device::pc_dma8237_0_dack_w(uint8_t data) { m_isabus->dack_w(0, data); }
 void vt82c586b_isa_device::pc_dma8237_1_dack_w(uint8_t data) { m_isabus->dack_w(1, data); }
 void vt82c586b_isa_device::pc_dma8237_2_dack_w(uint8_t data) { m_isabus->dack_w(2, data); }
 void vt82c586b_isa_device::pc_dma8237_3_dack_w(uint8_t data) { m_isabus->dack_w(3, data); }
-void vt82c586b_isa_device::pc_dma8237_5_dack_w(uint8_t data) { m_isabus->dack_w(5, data); }
-void vt82c586b_isa_device::pc_dma8237_6_dack_w(uint8_t data) { m_isabus->dack_w(6, data); }
-void vt82c586b_isa_device::pc_dma8237_7_dack_w(uint8_t data) { m_isabus->dack_w(7, data); }
+void vt82c586b_isa_device::pc_dma8237_5_dack_w(uint8_t data) { m_isabus->dack16_w(5, m_dma_high_byte | data); }
+void vt82c586b_isa_device::pc_dma8237_6_dack_w(uint8_t data) { m_isabus->dack16_w(6, m_dma_high_byte | data); }
+void vt82c586b_isa_device::pc_dma8237_7_dack_w(uint8_t data) { m_isabus->dack16_w(7, m_dma_high_byte | data); }
 
 void vt82c586b_isa_device::at_dma8237_out_eop(int state)
 {
