@@ -22060,6 +22060,56 @@ ROM_START( cmast91 )
 	ROM_LOAD( "pld4.bin", 0x0600, 0x0104, NO_DUMP )
 ROM_END
 
+// CM 91 German hack
+// German texts and different paytable.
+ROM_START( cmast91g )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cmast91g.bin",  0x00000, 0x01000, CRC(bd53f478) SHA1(e226c60f0569b129f99ebb6c71e974ecbefb05f5) )
+	ROM_CONTINUE(0x1000,0x1000)
+	ROM_CONTINUE(0x4000,0x1000)
+	ROM_CONTINUE(0x5000,0x1000)
+	ROM_CONTINUE(0x2000,0x1000)
+	ROM_CONTINUE(0x3000,0x1000)
+	ROM_CONTINUE(0x6000,0x1000)
+	ROM_CONTINUE(0x7000,0x1000)
+	ROM_CONTINUE(0x8000,0x1000)
+	ROM_CONTINUE(0x9000,0x1000)
+	ROM_CONTINUE(0xa000,0x1000)
+	ROM_CONTINUE(0xb000,0x1000)
+	ROM_CONTINUE(0xc000,0x1000)
+	ROM_CONTINUE(0xd000,0x1000)
+	ROM_CONTINUE(0xe000,0x1000)
+	ROM_CONTINUE(0xf000,0x1000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.bin",  0x00000, 0x8000, CRC(1edf1f1d) SHA1(558fa01f1efd7f6541047d3930bdce0974bae5b0) )
+	ROM_LOAD( "6.bin",  0x08000, 0x8000, CRC(13582e74) SHA1(27e318542606b8e8d38250749ba996402d314abd) )
+	ROM_LOAD( "5.bin",  0x10000, 0x8000, CRC(28ff88cc) SHA1(46bc0407be857e8348159735b60cfb660f047a56) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "4.bin",  0x00000, 0x8000, CRC(0dbabaa2) SHA1(44235b19dac1c996e2166672b03f6e3888ecbefa) )
+	ROM_LOAD( "3.bin",  0x08000, 0x8000, CRC(dc77d04a) SHA1(d8656130cde54d4bb96307899f6d607867e49e6c) )
+	ROM_LOAD( "1.bin",  0x10000, 0x8000, CRC(71bdab69) SHA1(d2c594ed88d6368df15b623c48eecc1c219b839e) )
+	ROM_LOAD( "2.bin",  0x18000, 0x8000, CRC(201d1e90) SHA1(c3c5224646b777f98ee35d146136788029b1782d) )
+
+	ROM_REGION( 0x40000, "user1", 0 )  // girls GFX
+	ROM_LOAD( "9.bin",  0x00000, 0x40000, CRC(92342276) SHA1(f9436752f2ec67cf873fd01c729c7c113dc18be0) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "p1.bin", 0x0000, 0x0100, CRC(ac529f04) SHA1(5bc92e50c85bb23e609172cc15c430ddea7fdcb5) )
+	ROM_LOAD( "p2.bin", 0x0100, 0x0100, CRC(3febce95) SHA1(c7c0fec0fb024ebf7d7365a09d28ba3d0037b0b4) )
+	ROM_LOAD( "p3.bin", 0x0200, 0x0100, CRC(99dbdf19) SHA1(3680335406f63289f8d9a81b4cd163e4aa0c14d4) )
+
+	ROM_REGION( 0x100, "proms2", 0 )  // screen layout?
+	ROM_LOAD( "p4.bin", 0x0000, 0x0100, CRC(72212427) SHA1(e87a91f28284313c706ebb8175a3586780636e31) )
+
+	ROM_REGION( 0x800, "plds", 0 )  // all 16L8 type, protected
+	ROM_LOAD( "pld1.bin", 0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "pld2.bin", 0x0200, 0x0104, NO_DUMP )
+	ROM_LOAD( "pld3.bin", 0x0400, 0x0104, NO_DUMP )
+	ROM_LOAD( "pld4.bin", 0x0600, 0x0104, NO_DUMP )
+ROM_END
+
 /*
   Cuty Line Limited
   Dyna CLLB
@@ -34649,6 +34699,7 @@ GAMEL( 1991, animalhs,    0,          animalhs, animalhs,  cmaster_state, init_a
 GAMEL( 1991, animalhsa,   animalhs,   animalhs, animalhs,  cmaster_state, init_animalhs,   ROT0, "Suns Co Ltd.",       "Animal House (V1.0, set 2)",                 0,                   layout_animalhs )
 
 GAME(  1991, cmast91,     0,          cmast91,  cmast91,  cmaster_state,  init_cmast91,    ROT0, "Dyna",               "Cherry Master '91 (ver.1.30)",               0 )
+GAME(  1991, cmast91g,    cmast91,    cmast91,  cmast91,  cmaster_state,  init_cmast91,    ROT0, "hack (TV Games)",    "Cherry Master '91 (ver.92311, German hack)", 0 )
 GAMEL( 1991, cll,         0,          cmast91,  cmast91,  cmaster_state,  init_cll,        ROT0, "Dyna / TAB Austria", "Cuty Line Limited (ver.1.30, CLLB)",         0,                   layout_cmv4 ) // needs verifying dips, missing girls
 GAMEL( 1991, clla,        cll,        cmast91,  cmast91,  cmaster_state,  init_cll,        ROT0, "Dyna / TAB Austria", "Cuty Line Limited (ver.1.30, CLLJ, set 1)",  0,                   layout_cmv4 ) // needs verifying dips, missing girls
 GAMEL( 1991, cllb,        cll,        cmast91,  cmast91,  cmaster_state,  init_cll,        ROT0, "Dyna / TAB Austria", "Cuty Line Limited (ver.1.30, CLLJ, set 2)",  0,                   layout_cmv4 ) // needs verifying dips, missing girls
