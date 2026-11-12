@@ -82,6 +82,7 @@ private:
 
 	void receiver_tick();
 	void transmitter_tick();
+	void start_transmit();
 	uint16_t rx_sample_point() const;
 	uint16_t stop_length() const;
 	void output_txd(int state);

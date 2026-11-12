@@ -965,6 +965,45 @@ void i8256_device::output_txd(int state)
 	}
 }
 
+void i8256_device::start_transmit()
+{
+	m_tx_counter = 0;
+
+	if (BIT(m_command3, I8256_CMD3_SBRK))
+	{
+		// single character break: start, data, parity and stop bits all low
+		LOGTX("TX single character break\n");
+		m_tx_break = true;
+		m_tx_bits = 0;
+		m_status &= ~I8256_STATUS_TR_EMPTY;
+		m_tx_state = I8256_STATE_DATA;
+		output_txd(0);
+	}
+	else if (BIT(m_command3, I8256_CMD3_TBRK))
+	{
+		// continuous break inhibits buffer transfers, but not SBRK timing
+		output_txd(0);
+	}
+	else if (!(m_status & I8256_STATUS_TB_EMPTY) &&
+		((m_stop_sel == I8256_STOP_075) ? m_cts_pending : !m_cts))
+	{
+		// transfer the buffer to the transmitter register
+		m_cts_pending = false;
+		m_tx_shift = m_tx_buffer;
+		LOGTX("TX character %02X\n", m_tx_shift);
+		m_tx_break = false;
+		m_tx_bits = 0;
+		m_tx_parity = false;
+		m_status |= I8256_STATUS_TB_EMPTY;
+		m_status &= ~I8256_STATUS_TR_EMPTY;
+		request_interrupt(I8256_INT_TX);
+		m_tx_state = I8256_STATE_DATA;
+		output_txd(0); // start bit
+	}
+	else
+		output_txd(1);
+}
+
 void i8256_device::transmitter_tick()
 {
 	m_tx_counter++;
@@ -972,41 +1011,7 @@ void i8256_device::transmitter_tick()
 	switch (m_tx_state)
 	{
 		case I8256_STATE_START:
-			m_tx_counter = 0;
-
-			if (BIT(m_command3, I8256_CMD3_SBRK))
-			{
-				// single character break: start, data, parity and stop bits all low
-				LOGTX("TX single character break\n");
-				m_tx_break = true;
-				m_tx_bits = 0;
-				m_status &= ~I8256_STATUS_TR_EMPTY;
-				m_tx_state = I8256_STATE_DATA;
-				output_txd(0);
-			}
-			else if (BIT(m_command3, I8256_CMD3_TBRK))
-			{
-				// continuous break inhibits buffer transfers, but not SBRK timing
-				output_txd(0);
-			}
-			else if (!(m_status & I8256_STATUS_TB_EMPTY) &&
-				((m_stop_sel == I8256_STOP_075) ? m_cts_pending : !m_cts))
-			{
-				// transfer the buffer to the transmitter register
-				m_cts_pending = false;
-				m_tx_shift = m_tx_buffer;
-				LOGTX("TX character %02X\n", m_tx_shift);
-				m_tx_break = false;
-				m_tx_bits = 0;
-				m_tx_parity = false;
-				m_status |= I8256_STATUS_TB_EMPTY;
-				m_status &= ~I8256_STATUS_TR_EMPTY;
-				request_interrupt(I8256_INT_TX);
-				m_tx_state = I8256_STATE_DATA;
-				output_txd(0); // start bit
-			}
-			else
-				output_txd(1);
+			start_transmit();
 			break;
 
 		case I8256_STATE_DATA:
@@ -1049,14 +1054,13 @@ void i8256_device::transmitter_tick()
 					m_tx_break = false;
 				}
 
-				// Continuous break starts only after the current character, including stop bits.
-				output_txd(BIT(m_command3, I8256_CMD3_TBRK) ? 0 : 1);
-
 				m_status |= I8256_STATUS_TR_EMPTY;
 				// TRE generates an interrupt when the transmitter register finished
 				// transmitting and the buffer is empty
 				if (m_status & I8256_STATUS_TB_EMPTY)
 					request_interrupt(I8256_INT_TX);
+
+				start_transmit();
 			}
 			break;
 	}
