@@ -9,6 +9,9 @@
 #include "emu.h"
 #include "i8256.h"
 
+#include <algorithm>
+#include <iterator>
+
 #define LOG_SETUP (1U << 1)
 #define LOG_RX    (1U << 2)
 #define LOG_TX    (1U << 3)
