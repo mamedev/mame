@@ -24,15 +24,15 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual void input_strobe(int state) override { m_printer->strobe_w(state); }
-	virtual void input_data0(int state) override { m_printer->data_bit_w<0>(state); }
-	virtual void input_data1(int state) override { m_printer->data_bit_w<1>(state); }
-	virtual void input_data2(int state) override { m_printer->data_bit_w<2>(state); }
-	virtual void input_data3(int state) override { m_printer->data_bit_w<3>(state); }
-	virtual void input_data4(int state) override { m_printer->data_bit_w<4>(state); }
-	virtual void input_data5(int state) override { m_printer->data_bit_w<5>(state); }
-	virtual void input_data6(int state) override { m_printer->data_bit_w<6>(state); }
-	virtual void input_data7(int state) override { m_printer->data_bit_w<7>(state); }
+	virtual void input_strobe(int state) override;
+	virtual void input_data0(int state) override;
+	virtual void input_data1(int state) override;
+	virtual void input_data2(int state) override;
+	virtual void input_data3(int state) override;
+	virtual void input_data4(int state) override;
+	virtual void input_data5(int state) override;
+	virtual void input_data6(int state) override;
+	virtual void input_data7(int state) override;
 
 private:
 	required_device<cgp220_device> m_printer;

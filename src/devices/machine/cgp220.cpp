@@ -75,9 +75,10 @@
 
 #include "machine/input_merger.h"
 
-#include "cgp220.lh"
-
+#include <algorithm>
 #include <cmath>
+
+#include "cgp220.lh"
 
 #define LOG_CARRIAGE (1U << 1)
 
@@ -145,6 +146,7 @@ cgp220_device::cgp220_device(const machine_config &mconfig, const char *tag, dev
 	m_latch(0),
 	m_control(0xfe),
 	m_busy_ff(false),
+	m_outputs(0),
 	m_heads(0),
 	m_motor(0xff),
 	m_paper_phase(0),
@@ -170,9 +172,9 @@ const tiny_rom_entry *cgp220_device::device_rom_region() const
 static INPUT_PORTS_START( cgp220 )
 	PORT_START("BUTTONS")
 	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Feed") PORT_CODE(KEYCODE_9_PAD)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On Line") PORT_CODE(KEYCODE_0_PAD)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Feed") PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("On Line") PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Reset") PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("SWITCHES")
@@ -192,7 +194,7 @@ static INPUT_PORTS_START( cgp220 )
 	PORT_DIPSETTING(   0x00, "600")
 	PORT_DIPSETTING(   0x10, "2400")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Pump") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Pump") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -245,7 +247,16 @@ void cgp220_device::device_add_mconfig(machine_config &config)
 
 void cgp220_device::device_start()
 {
+	// the initial line levels are pushed into the PIA and PTM
+	if (!m_pia->started() || !m_ptm->started())
+		throw device_missing_dependencies();
+
 	m_carriage_timer = timer_alloc(FUNC(cgp220_device::carriage_tick), this);
+
+	m_pia->ca1_w(1);
+	m_ptm->set_g1(1);
+	m_pia->cb1_w(m_strobe);
+	m_pia->cb2_w(m_rxd);
 
 	save_item(NAME(m_rxd));
 	save_item(NAME(m_strobe));
@@ -253,6 +264,7 @@ void cgp220_device::device_start()
 	save_item(NAME(m_latch));
 	save_item(NAME(m_control));
 	save_item(NAME(m_busy_ff));
+	save_item(NAME(m_outputs));
 	save_item(NAME(m_heads));
 	save_item(NAME(m_motor));
 	save_item(NAME(m_paper_phase));
@@ -271,14 +283,9 @@ void cgp220_device::device_reset()
 	m_motor = 0xff;
 	m_cr_vel = 0.0;
 
-	m_pia->ca1_w(1);
-	m_ptm->set_g1(1);
-	m_pia->cb1_w(m_strobe);
-	m_pia->cb2_w(m_rxd);
-
 	m_carriage_timer->enable(false);
 	update_head();
-	update_outputs();
+	update_outputs(true);
 }
 
 
@@ -441,7 +448,6 @@ TIMER_CALLBACK_MEMBER(cgp220_device::carriage_tick)
 			m_cr_cell += (cell > m_cr_cell) ? 1 : -1;
 			m_pia->ca1_w(0);
 			m_pia->ca1_w(1);
-	m_ptm->set_g1(1);
 		}
 		update_head();
 	}
@@ -509,19 +515,36 @@ void cgp220_device::update_head()
 }
 
 
-void cgp220_device::update_outputs()
+void cgp220_device::update_outputs(bool force)
 {
-	if (m_serial)
-		m_busy_cb(BIT(m_control, 5));
-	else
-		m_busy_cb(m_busy_ff || BIT(m_control, 4));
-	m_ack_cb(!BIT(m_control, 0));
-	m_perror_cb(!BIT(m_control, 3));
-	m_fault_cb(!BIT(m_control, 4));
-	m_select_cb(!BIT(m_control, 6));
+	bool const busy = m_serial ? BIT(m_control, 5) : (m_busy_ff || BIT(m_control, 4));
+	u8 const outputs =
+			(busy ? 0x01 : 0x00) |
+			(BIT(~m_control, 0) << 1) |     // ACKNLG
+			(BIT(~m_control, 3) << 2) |     // P.E
+			(BIT(~m_control, 4) << 3) |     // FAULT
+			(BIT(~m_control, 6) << 4) |     // SELECT and READY lamp
+			(BIT(~m_control, 7) << 5);      // ALERT lamp
+	u8 const changed = force ? 0xff : (outputs ^ m_outputs);
+	m_outputs = outputs;
 
-	m_bitmap_printer->set_led_state(bitmap_printer_device::LED_READY, !BIT(m_control, 6));
-	m_bitmap_printer->set_led_state(bitmap_printer_device::LED_ERROR, !BIT(m_control, 7));
-	m_ready_led = !BIT(m_control, 6);
-	m_alert_led = !BIT(m_control, 7);
+	if (BIT(changed, 0))
+		m_busy_cb(BIT(outputs, 0));
+	if (BIT(changed, 1))
+		m_ack_cb(BIT(outputs, 1));
+	if (BIT(changed, 2))
+		m_perror_cb(BIT(outputs, 2));
+	if (BIT(changed, 3))
+		m_fault_cb(BIT(outputs, 3));
+	if (BIT(changed, 4))
+	{
+		m_select_cb(BIT(outputs, 4));
+		m_bitmap_printer->set_led_state(bitmap_printer_device::LED_READY, BIT(outputs, 4));
+		m_ready_led = BIT(outputs, 4);
+	}
+	if (BIT(changed, 5))
+	{
+		m_bitmap_printer->set_led_state(bitmap_printer_device::LED_ERROR, BIT(outputs, 5));
+		m_alert_led = BIT(outputs, 5);
+	}
 }
