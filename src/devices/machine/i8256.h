@@ -148,6 +148,7 @@ private:
 	bool m_tx_parity;
 	bool m_tx_break;
 	bool m_cts_pending;
+	uint8_t m_cts_counter;
 	uint8_t m_txd;
 };
 

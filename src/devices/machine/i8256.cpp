@@ -274,6 +274,7 @@ void i8256_device::device_start()
 	save_item(NAME(m_tx_parity));
 	save_item(NAME(m_tx_break));
 	save_item(NAME(m_cts_pending));
+	save_item(NAME(m_cts_counter));
 	save_item(NAME(m_txd));
 }
 
@@ -329,6 +330,7 @@ void i8256_device::soft_reset()
 	m_tx_parity = false;
 	m_tx_break = false;
 	m_cts_pending = false;
+	m_cts_counter = 0;
 	output_txd(1);
 }
 
@@ -598,7 +600,10 @@ void i8256_device::write(offs_t offset, uint8_t data)
 
 			m_data_bits = 8 - BIT(data, I8256_CMD1_L0, 2);
 			if (m_stop_sel != BIT(data, I8256_CMD1_S0, 2))
+			{
 				m_cts_pending = false;
+				m_cts_counter = 0;
+			}
 			m_stop_sel = BIT(data, I8256_CMD1_S0, 2);
 
 			LOGSETUP("%s CR1: %d data bits, stop bit select %d, %s mode\n", machine().describe_context(),
@@ -985,10 +990,11 @@ void i8256_device::start_transmit()
 		output_txd(0);
 	}
 	else if (!(m_status & I8256_STATUS_TB_EMPTY) &&
-		((m_stop_sel == I8256_STOP_075) ? m_cts_pending : !m_cts))
+		(m_cts_pending || (m_stop_sel != I8256_STOP_075 && !m_cts && !m_cts_counter)))
 	{
 		// transfer the buffer to the transmitter register
 		m_cts_pending = false;
+		m_cts_counter = 0;
 		m_tx_shift = m_tx_buffer;
 		LOGTX("TX character %02X\n", m_tx_shift);
 		m_tx_break = false;
@@ -1006,6 +1012,9 @@ void i8256_device::start_transmit()
 
 void i8256_device::transmitter_tick()
 {
+	if (m_cts_counter && !--m_cts_counter)
+		m_cts_pending = true;
+
 	m_tx_counter++;
 
 	switch (m_tx_state)
@@ -1090,14 +1099,21 @@ void i8256_device::write_rxd(int state)
 void i8256_device::write_cts(int state)
 {
 	state = state ? 1 : 0;
-	if (m_stop_sel == I8256_STOP_075 && m_cts && !state &&
+	if (state)
+		m_cts_counter = 0;
+	else if (m_cts &&
 		!(m_status & I8256_STATUS_TB_EMPTY))
 	{
-		// Ignore edges during data or before the minimum stop interval.
-		// Retain an accepted pulse even if CTS rises before the next TxC tick.
+		const uint16_t minimum_stop = (m_stop_sel == I8256_STOP_075) ? stop_length() : m_divide / 2;
+		// Pulses during data or before the permitted stop interval are ignored.
 		if (m_tx_state == I8256_STATE_START ||
-			(m_tx_state == I8256_STATE_STOP && m_tx_counter >= stop_length()))
-			m_cts_pending = true;
+			(m_tx_state == I8256_STATE_STOP && m_tx_counter >= minimum_stop))
+		{
+			if (m_stop_sel == I8256_STOP_075 || (m_command2 & 0x0f) == I8256_BAUD_TXC)
+				m_cts_pending = true;
+			else
+				m_cts_counter = m_divide / 32;
+		}
 	}
 	m_cts = state;
 }
