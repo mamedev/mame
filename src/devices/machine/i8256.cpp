@@ -853,7 +853,7 @@ void i8256_device::receiver_tick()
 				m_rx_state = I8256_STATE_START;
 
 				const bool fe = !m_rxd;
-				const uint8_t data = m_rx_shift & ((1 << m_data_bits) - 1);
+				const uint8_t data = m_rx_shift & util::make_bitmask<uint16_t>(m_data_bits);
 
 				if (fe && data == 0)
 				{
