@@ -962,6 +962,19 @@ void i8256_device::output_txd(int state)
 	}
 }
 
+void i8256_device::check_break_in()
+{
+	if (BIT(m_command1, I8256_CMD1_BRKI))
+	{
+		const uint8_t input = m_in_p1_cb.isunset() ? m_port1_input : m_in_p1_cb(0);
+		if (!BIT(input, 6))
+		{
+			m_status |= I8256_STATUS_BREAK;
+			request_interrupt(I8256_INT_TX);
+		}
+	}
+}
+
 void i8256_device::start_transmit()
 {
 	m_tx_counter = 0;
@@ -1056,6 +1069,9 @@ void i8256_device::transmitter_tick()
 		case I8256_STATE_STOP:
 			if (m_tx_counter >= stop_length())
 			{
+				// P16 senses break-in at the end of the last stop bit, before TBE or TRE.
+				check_break_in();
+
 				m_tx_counter = 0;
 				m_tx_state = I8256_STATE_START;
 
@@ -1121,7 +1137,11 @@ void i8256_device::write_cts(int state)
 				// In 0.75-stop mode, an eligible edge starts the next frame immediately.
 				if (m_stop_sel == I8256_STOP_075 && m_tx_state != I8256_STATE_MARK && !m_tx_break &&
 					!BIT(m_command3, I8256_CMD3_SBRK) && !BIT(m_command3, I8256_CMD3_TBRK))
+				{
+					if (m_tx_state == I8256_STATE_STOP)
+						check_break_in();
 					start_transmit();
+				}
 			}
 			else
 				m_cts_counter = m_divide / 32;
