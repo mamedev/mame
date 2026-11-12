@@ -88,7 +88,6 @@ public:
 		, m_money_led(*this, "money_led%u", 0U)
 		, m_coin_out(*this, "coin_out%u", 0U)
 		, m_io_coin(*this, "COIN")
-		, m_io_payout(*this, "PAYOUT")
 		, m_io_t6(*this, "T6")
 		, m_io_t7(*this, "T7")
 	{
@@ -123,7 +122,6 @@ private:
 	output_finder<4> m_coin_out;
 
 	required_ioport m_io_coin;
-	required_ioport m_io_payout;
 	required_ioport m_io_t6;
 	required_ioport m_io_t7;
 
