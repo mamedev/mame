@@ -3,7 +3,7 @@
 //TODO: determine when to switch modes and add single bit mode
 
 #include "emu.h"
-#include "pc_joy_sw.h"
+#include "mssw.h"
 
 DEFINE_DEVICE_TYPE(PC_MSSW_PAD, pc_mssw_pad_device, "mssw_pad", "Microsoft Sidewinder Pad")
 

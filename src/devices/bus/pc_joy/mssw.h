@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef MAME_BUS_PC_JOY_PC_JOY_SW_H
-#define MAME_BUS_PC_JOY_PC_JOY_SW_H
+#ifndef MAME_BUS_PC_JOY_MSSW_H
+#define MAME_BUS_PC_JOY_MSSW_H
+
+#pragma once
 
 #include "pc_joy.h"
 
@@ -36,4 +38,4 @@ private:
 
 DECLARE_DEVICE_TYPE(PC_MSSW_PAD, pc_mssw_pad_device)
 
-#endif // MAME_BUS_PC_JOY_PC_JOY_SW_H
+#endif // MAME_BUS_PC_JOY_MSSW_H
