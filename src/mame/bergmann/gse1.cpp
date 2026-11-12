@@ -422,9 +422,7 @@ static INPUT_PORTS_START( gse1 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("NC")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:1" )
 INPUT_PORTS_END
 
 static const z80_daisy_config daisy_chain[] =
