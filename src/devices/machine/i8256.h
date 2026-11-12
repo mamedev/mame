@@ -76,6 +76,7 @@ private:
 	void update_timer_rate();
 	uint8_t read_port1();
 	void write_port1(uint8_t data);
+	uint8_t port1_special_input_mask() const;
 	uint8_t port1_output_mask() const;
 	uint8_t port1_output() const;
 	bool test_clock_enabled() const;
